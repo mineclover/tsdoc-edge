@@ -1,0 +1,218 @@
+/**
+ * TSDoc Edge Configuration Types
+ *
+ * @remarks
+ * Defines the structure of .tsdoc.config.json and related configuration types.
+ *
+ * @public
+ */
+
+/**
+ * Main configuration interface for tsdoc-edge project
+ *
+ * @public
+ */
+export interface TsdocEdgeConfig {
+  /**
+   * Project metadata
+   */
+  project: ProjectConfig;
+
+  /**
+   * Storage paths configuration
+   */
+  paths: PathsConfig;
+
+  /**
+   * Fold/unfold system configuration
+   */
+  fold?: FoldConfig;
+
+  /**
+   * Validation rules configuration
+   */
+  validation?: ValidationConfig;
+
+  /**
+   * Generator options
+   */
+  generator?: GeneratorConfig;
+}
+
+/**
+ * Project metadata configuration
+ *
+ * @public
+ */
+export interface ProjectConfig {
+  /**
+   * Project name
+   */
+  name: string;
+
+  /**
+   * Project version
+   */
+  version: string;
+
+  /**
+   * Root directory (relative to config file)
+   * @defaultValue "."
+   */
+  rootDir?: string;
+
+  /**
+   * Source directories to scan
+   * @defaultValue ["src"]
+   */
+  srcDirs?: string[];
+}
+
+/**
+ * Storage paths configuration
+ *
+ * @public
+ */
+export interface PathsConfig {
+  /**
+   * Directory for storing folded comments (Markdown files)
+   * @defaultValue ".tsdoc-comments"
+   */
+  commentsDir: string;
+
+  /**
+   * SQLite database file path
+   * @defaultValue ".tsdoc.db"
+   */
+  databasePath: string;
+
+  /**
+   * JSONL data export directory
+   * @defaultValue "docs/data"
+   */
+  jsonlDir: string;
+
+  /**
+   * Output directory for generated documentation
+   * @defaultValue "docs/output"
+   */
+  outputDir?: string;
+}
+
+/**
+ * Fold/unfold system configuration
+ *
+ * @public
+ */
+export interface FoldConfig {
+  /**
+   * Enable fold/unfold system
+   * @defaultValue true
+   */
+  enabled?: boolean;
+
+  /**
+   * Auto-export on parse
+   * @defaultValue false
+   */
+  autoExport?: boolean;
+
+  /**
+   * Patterns to exclude from folding (glob patterns)
+   * @defaultValue []
+   */
+  excludePatterns?: string[];
+}
+
+/**
+ * Validation rules configuration
+ *
+ * @public
+ */
+export interface ValidationConfig {
+  /**
+   * Enable strict mode validation
+   * @defaultValue false
+   */
+  strictMode?: boolean;
+
+  /**
+   * Minimum connectivity score (0-100)
+   * @defaultValue 70
+   */
+  minConnectivityScore?: number;
+
+  /**
+   * Rules to enable/disable
+   */
+  rules?: {
+    [ruleName: string]: 'error' | 'warning' | 'info' | 'off';
+  };
+}
+
+/**
+ * Generator options configuration
+ *
+ * @public
+ */
+export interface GeneratorConfig {
+  /**
+   * Markdown template type
+   * @defaultValue "enhanced"
+   */
+  template?: 'basic' | 'enhanced' | 'strict';
+
+  /**
+   * Include private symbols in output
+   * @defaultValue false
+   */
+  includePrivate?: boolean;
+
+  /**
+   * Include internal symbols in output
+   * @defaultValue false
+   */
+  includeInternal?: boolean;
+}
+
+/**
+ * Default configuration values
+ *
+ * @public
+ */
+export const DEFAULT_CONFIG: TsdocEdgeConfig = {
+  project: {
+    name: 'my-project',
+    version: '1.0.0',
+    rootDir: '.',
+    srcDirs: ['src'],
+  },
+  paths: {
+    commentsDir: '.tsdoc-comments',
+    databasePath: '.tsdoc.db',
+    jsonlDir: 'docs/data',
+    outputDir: 'docs/output',
+  },
+  fold: {
+    enabled: true,
+    autoExport: false,
+    excludePatterns: [],
+  },
+  validation: {
+    strictMode: false,
+    minConnectivityScore: 70,
+    rules: {},
+  },
+  generator: {
+    template: 'enhanced',
+    includePrivate: false,
+    includeInternal: false,
+  },
+};
+
+/**
+ * Config file name
+ *
+ * @public
+ */
+export const CONFIG_FILE_NAME = '.tsdoc.config.json';

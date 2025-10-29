@@ -1,0 +1,4 @@
+{"version":"1.0.0","totalFeatures":3,"lastUpdated":"2025-10-29T12:30:00.000Z"}
+{"id":"arch-001","title":"TSDoc Edge - Architecture","description":"전체 아키텍처 개요, 핵심 철학, 컴포넌트 구조","filePath":"architecture.md","relatedSymbols":["000","001","002","004"],"tags":["architecture","overview"],"status":"approved","createdAt":"2025-10-29T12:00:00.000Z","updatedAt":"2025-10-29T12:00:00.000Z"}
+{"id":"feat-id","title":"ID Management System","description":"심볼 ID 생성 및 레지스트리 관리 시스템","filePath":"id-management.md","relatedSymbols":["000","001"],"tags":["id","registry","core"],"status":"approved","createdAt":"2025-10-29T12:10:00.000Z","updatedAt":"2025-10-29T12:10:00.000Z"}
+{"id":"feat-dep","title":"Dependency Tracking System","description":"TSDoc 기반 의존성 명시 및 그래프 분석","filePath":"dependency-tracking.md","relatedSymbols":["001","002","004"],"tags":["dependencies","graph","analysis"],"status":"approved","createdAt":"2025-10-29T12:20:00.000Z","updatedAt":"2025-10-29T12:20:00.000Z"}

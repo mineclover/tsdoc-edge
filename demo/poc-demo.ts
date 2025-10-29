@@ -1,0 +1,561 @@
+#!/usr/bin/env ts-node
+/**
+ * POC Demo for TSDoc Edge Strict Mode
+ * This demonstrates the complete workflow of the 6-category documentation system
+ */
+
+import {
+  SymbolGraphBuilder,
+  SymbolSearchEngine,
+  ConnectivityValidator,
+  StrictModeValidator,
+  EnhancedMarkdownGenerator,
+  DatabaseManager,
+} from '../src';
+import { Symbol, EnhancedSymbolDoc } from '../src/types';
+import * as fs from 'fs';
+import * as path from 'path';
+
+console.log('='.repeat(80));
+console.log('TSDoc Edge - Strict Mode POC Demo');
+console.log('='.repeat(80));
+console.log();
+
+// ========================================
+// STEP 1: Create Symbol
+// ========================================
+console.log('📋 STEP 1: Creating Symbol');
+console.log('-'.repeat(80));
+
+const dataProcessorSymbol: Symbol = {
+  id: 'data-processor-001',
+  name: 'CSVDataProcessor',
+  type: 'class',
+  filePath: '/src/processors/CSVDataProcessor.ts',
+  line: 15,
+  column: 0,
+  isExported: true,
+  isPublic: true,
+  summary: 'Process large CSV files with memory-efficient streaming and parallel processing',
+  tests: [
+    {
+      symbolName: 'CSVDataProcessor',
+      testFilePath: '/tests/processors/CSVDataProcessor.test.ts',
+      testName: 'CSVDataProcessor test suite',
+      scenarios: [
+        'Process small CSV (< 10MB)',
+        'Process large CSV with chunks (> 1GB)',
+        'Handle malformed CSV data',
+        'Edge case: empty file',
+        'Edge case: single row',
+        'Performance: 1M rows in < 5 seconds',
+      ],
+    },
+  ],
+  designDecisions: ['ADR-001', 'ADR-003'],
+  contract: {
+    symbolName: 'CSVDataProcessor',
+    description: 'Process CSV data with configurable strategies',
+    preconditions: ['File must exist', 'File must be readable', 'Valid CSV format'],
+    postconditions: ['Data is processed', 'No memory leaks', 'Progress is tracked'],
+    invariants: ['Chunk size > 0', 'Memory usage < 2GB'],
+    filePath: '/src/processors/CSVDataProcessor.ts',
+  },
+  responsibility: {
+    symbolName: 'CSVDataProcessor',
+    description: 'Handle CSV data processing with streaming',
+    shouldDo: [
+      'Read CSV files in chunks',
+      'Handle NaN values',
+      'Filter special characters',
+      'Track progress',
+      'Report errors',
+    ],
+    shouldNotDo: [
+      'Store entire file in memory',
+      'Make network calls',
+      'Handle business logic',
+      'Manage authentication',
+    ],
+    pattern: 'Strategy Pattern',
+    architecture: 'Data Processing Layer',
+  },
+};
+
+console.log(`✅ Symbol Created: ${dataProcessorSymbol.name}`);
+console.log(`   Type: ${dataProcessorSymbol.type}`);
+console.log(`   Location: ${dataProcessorSymbol.filePath}:${dataProcessorSymbol.line}`);
+console.log(`   Public API: ${dataProcessorSymbol.isPublic ? 'Yes' : 'No'}`);
+console.log(`   Tests: ${dataProcessorSymbol.tests.length} test suite(s)`);
+console.log();
+
+// ========================================
+// STEP 2: Create Enhanced Documentation (6 Categories)
+// ========================================
+console.log('📝 STEP 2: Creating Enhanced Documentation (6 Categories)');
+console.log('-'.repeat(80));
+
+const enhancedDoc: EnhancedSymbolDoc = {
+  symbolId: 'data-processor-001',
+
+  // Category 1: Problem Solving
+  problemSolving: {
+    description:
+      '대규모 CSV 파일(100MB~5GB)을 처리할 때 발생하는 메모리 부족 문제를 해결합니다.',
+    context:
+      '외부 벤더로부터 매일 수신하는 고객 데이터 파일의 크기가 증가하면서, ' +
+      '기존의 pandas.read_csv()로는 전체 파일을 메모리에 로드할 수 없게 되었습니다. ' +
+      '서버 RAM은 8GB이지만, 3GB 이상 파일 처리 시 OutOfMemory 에러가 발생했습니다.',
+    targetUseCase: 'ETL 파이프라인에서 고객 데이터를 데이터 웨어하우스로 적재',
+    relatedProblem: 'memory-optimization-project',
+  },
+
+  // Category 2: Functionality
+  functionality: {
+    mainFeatures: [
+      'CSV 파일 스트림 읽기 (청크 단위)',
+      'NaN 값 처리 (drop/fill/interpolate 전략)',
+      '특수 문자 필터링 (정규식 기반)',
+      '진행률 추적 (콜백 지원)',
+      '병렬 처리 (concurrent.futures)',
+    ],
+    components: [
+      {
+        name: 'loadData',
+        description: 'CSV 파일을 비동기 스트림으로 읽어옵니다',
+        signature: '(filePath: string, options?: LoadOptions) => AsyncGenerator<DataFrame>',
+      },
+      {
+        name: 'cleanText',
+        description: '텍스트에서 특수문자를 제거하고 공백을 정규화합니다',
+        signature: '(text: string, options?: CleanOptions) => string',
+      },
+      {
+        name: 'handleNaN',
+        description: 'NaN 값 처리 전략을 적용합니다',
+        signature: '(df: DataFrame, strategy: NaNStrategy) => DataFrame',
+      },
+      {
+        name: 'processParallel',
+        description: '여러 청크를 병렬로 처리합니다',
+        signature: '(chunks: DataFrame[], workers: number) => Promise<DataFrame[]>',
+      },
+    ],
+    io: {
+      inputs: [
+        {
+          name: 'filePath',
+          type: 'string',
+          description: 'CSV 파일의 절대 경로 또는 상대 경로',
+        },
+        {
+          name: 'options',
+          type: 'ProcessOptions',
+          description:
+            '처리 옵션 (chunkSize, nanStrategy, encoding, onProgress 등)',
+        },
+      ],
+      outputs: [
+        {
+          name: 'result',
+          type: 'AsyncGenerator<ProcessedData>',
+          description: '처리된 데이터 청크의 스트림',
+        },
+      ],
+    },
+    examples: [
+      `// 기본 사용법
+const processor = new CSVDataProcessor();
+for await (const chunk of processor.loadData('data.csv')) {
+  console.log(\`Processed \${chunk.rowCount} rows\`);
+}`,
+      `// 고급 옵션 사용
+const processor = new CSVDataProcessor({
+  chunkSize: 10000,
+  nanStrategy: 'interpolate',
+  encoding: 'utf-8',
+  parallel: true,
+  workers: 4
+});
+
+const result = await processor.process('large-file.csv', {
+  filters: ['trim', 'lowercase', 'remove-special-chars'],
+  onProgress: (percent) => console.log(\`Progress: \${percent}%\`)
+});`,
+    ],
+  },
+
+  // Category 3: Error Experiences
+  errorExperiences: [
+    {
+      id: 'ERR-001',
+      errorType: 'ValueError',
+      message: 'Input array is too large',
+      context:
+        '2024년 1월 15일 프로덕션 환경에서 3GB CSV 파일 처리 중 발생. ' +
+        '기존 pandas.read_csv()를 사용했을 때 전체 파일을 메모리에 로드하려다 실패.',
+      solution:
+        'chunksize 파라미터 사용:\n' +
+        '```python\n' +
+        'for chunk in pd.read_csv(file, chunksize=50000):\n' +
+        '    process(chunk)\n' +
+        '    del chunk  # 명시적 메모리 해제\n' +
+        '```',
+      occurredAt: '2024-01-15T14:30:00Z',
+      prevention:
+        '파일 크기 500MB 초과 시 자동으로 청크 모드 활성화. ' +
+        '단위 테스트에 메모리 프로파일링 추가.',
+    },
+    {
+      id: 'ERR-002',
+      errorType: 'UnicodeDecodeError',
+      message: "codec can't decode byte 0xff in position 1234",
+      context:
+        '레거시 시스템에서 받은 CSV 파일이 ISO-8859-1 인코딩을 사용. ' +
+        '기본 UTF-8로 디코딩 시도 시 에러 발생.',
+      solution:
+        'chardet 라이브러리로 인코딩 자동 감지 및 fallback 체인 구현:\n' +
+        '1. UTF-8 시도\n' +
+        '2. ISO-8859-1 시도\n' +
+        '3. CP1252 시도',
+      prevention: '벤더와 데이터 계약서에 인코딩 명시. 수신 시 검증 로직 추가.',
+    },
+    {
+      id: 'ERR-003',
+      errorType: 'PerformanceWarning',
+      message: 'This DataFrame is highly fragmented',
+      context: '1M 행 데이터를 iterrows()로 순회하니 45분 소요',
+      solution:
+        '벡터화 연산 및 apply() + numba 컴파일 사용으로 3분으로 단축:\n' +
+        '```python\n' +
+        '@numba.jit\n' +
+        'def process_row(row):\n' +
+        '    return row * 2\n' +
+        '\n' +
+        'df["new_col"] = df["old_col"].apply(process_row)\n' +
+        '```',
+      prevention: '모든 데이터 처리에 대해 실제 크기 데이터로 벤치마크 필수',
+    },
+  ],
+
+  // Category 4: Design Decisions
+  decisions: [
+    {
+      id: 'ADR-001',
+      title: 'concurrent.futures를 사용한 병렬 처리',
+      decision:
+        'multiprocessing 대신 concurrent.futures.ThreadPoolExecutor를 사용하여 병렬 처리 구현',
+      rationale:
+        '작업이 I/O bound(파일 읽기, DB 쓰기)이므로 쓰레드 기반 병렬화가 더 효율적. ' +
+        'GIL(Global Interpreter Lock)의 영향이 적고, 메모리 오버헤드가 적음. ' +
+        '쓰레드는 I/O 대기 중에 다른 쓰레드가 실행되므로 CPU 사용률 향상.',
+      alternatives: [
+        {
+          option: 'multiprocessing.Pool',
+          reason:
+            '프로세스 기반 병렬화는 CPU bound 작업에 적합. ' +
+            'I/O bound 작업에서는 프로세스 생성/소멸 오버헤드와 ' +
+            'IPC(Inter-Process Communication) 비용이 이득보다 큼. ' +
+            '메모리 복제로 인한 추가 메모리 사용.',
+        },
+        {
+          option: 'joblib',
+          reason:
+            '불필요한 외부 의존성. concurrent.futures는 표준 라이브러리로 충분한 기능 제공. ' +
+            '팀 내 라이브러리 사용 정책상 표준 라이브러리 우선 사용.',
+        },
+        {
+          option: 'asyncio',
+          reason:
+            '전체 코드베이스를 async/await 스타일로 재작성해야 함. ' +
+            '마이그레이션 비용 대비 성능 개선이 크지 않음. ' +
+            '향후 고려 대상이지만 현재는 투자 대비 효과 낮음.',
+        },
+      ],
+      consequences: [
+        '긍정: I/O heavy 워크로드에서 3배 성능 향상 (45분 → 15분)',
+        '긍정: 표준 라이브러리 사용으로 의존성 최소화',
+        '긍정: 메모리 사용량 증가 없음',
+        '부정: CPU 집약적 전처리 단계에서는 최적이 아님',
+        '완화: CPU intensive 작업이 추가되면 multiprocessing 하이브리드 고려',
+      ],
+      date: '2024-01-10',
+      status: 'accepted',
+    },
+    {
+      id: 'ADR-003',
+      title: 'Parquet 포맷으로 출력',
+      decision: '처리된 데이터를 CSV 대신 Apache Parquet 포맷으로 저장',
+      rationale:
+        '1. 저장 공간 80% 절감 (5GB CSV → 1GB Parquet)\n' +
+        '2. 쿼리 성능 10배 향상 (컬럼 기반 저장)\n' +
+        '3. 스키마 포함으로 데이터 타입 보존\n' +
+        '4. 압축 지원 (snappy, gzip)',
+      alternatives: [
+        {
+          option: 'CSV 유지',
+          reason:
+            'CSV는 범용적이지만 파일 크기가 크고 쿼리 성능이 낮음. ' +
+            '데이터 타입 정보 손실.',
+        },
+        {
+          option: 'JSON',
+          reason: 'CSV보다 더 큰 파일 크기. 파싱 오버헤드.',
+        },
+      ],
+      consequences: [
+        '저장 비용 80% 절감',
+        '다운스트림 분석 쿼리 성능 10배 향상',
+        'Parquet 호환 도구 필요 (pandas, spark, duckdb 등)',
+        '기존 CSV 의존 시스템과의 호환성 고려 필요',
+      ],
+      date: '2024-02-01',
+      status: 'accepted',
+    },
+  ],
+
+  // Category 5: Dependencies
+  dependencies: [
+    {
+      target: 'config_loader',
+      type: 'module',
+      reason:
+        '애플리케이션 설정 로드 (DB 크리덴셜, 파일 경로, 청크 크기, 워커 수 등)',
+      importPath: '../config/config_loader',
+    },
+    {
+      target: 'logger',
+      type: 'module',
+      reason: '구조화된 로깅 (디버깅, 모니터링, 알림)',
+      importPath: '../utils/logger',
+    },
+    {
+      target: 'pandas',
+      type: 'external',
+      reason: 'DataFrame 연산, CSV 파싱, 데이터 변환',
+      version: '>=2.0.0',
+      isOptional: false,
+    },
+    {
+      target: 'numpy',
+      type: 'external',
+      reason: '수치 연산, NaN 처리, 배열 조작',
+      version: '>=1.24.0',
+      isOptional: false,
+    },
+    {
+      target: 'pyarrow',
+      type: 'external',
+      reason: 'Parquet 파일 포맷 읽기/쓰기',
+      version: '>=12.0.0',
+      isOptional: true,
+    },
+    {
+      target: 'chardet',
+      type: 'external',
+      reason: 'CSV 파일 인코딩 자동 감지',
+      version: '>=5.0.0',
+      isOptional: true,
+    },
+  ],
+
+  // Category 6: Future Plans
+  futurePlans: [
+    {
+      id: 'PLAN-001',
+      title: 'S3 직접 스트리밍 지원',
+      description:
+        'AWS S3 버킷에서 파일을 다운로드하지 않고 직접 스트리밍하여 처리. ' +
+        'boto3의 streaming API를 사용하여 네트워크 대역폭 최적화.',
+      priority: 'high',
+      status: 'in-progress',
+      targetMilestone: 'v2.0',
+      estimatedEffort: '2 weeks',
+      blockedBy: [],
+      relatedIssues: ['ISSUE-234', 'ISSUE-245'],
+      createdAt: '2024-02-15T00:00:00Z',
+    },
+    {
+      id: 'PLAN-002',
+      title: '데이터 품질 검증 통합',
+      description:
+        'Great Expectations 프레임워크 통합으로 자동 데이터 품질 검증. ' +
+        '체크 항목: null 비율, outlier 탐지, 스키마 준수, 중복 검사.',
+      priority: 'medium',
+      status: 'planned',
+      targetMilestone: 'v2.1',
+      estimatedEffort: '3 weeks',
+      createdAt: '2024-02-20T00:00:00Z',
+    },
+    {
+      id: 'PLAN-003',
+      title: '다양한 파일 포맷 지원 (JSON, XML)',
+      description:
+        'CSV뿐만 아니라 JSON Lines, XML 파일도 동일한 API로 처리 가능하도록 확장.',
+      priority: 'low',
+      status: 'planned',
+      targetMilestone: 'v3.0',
+      estimatedEffort: '1 week per format',
+      createdAt: '2024-02-25T00:00:00Z',
+    },
+    {
+      id: 'PLAN-004',
+      title: '실시간 진행률 대시보드',
+      description: '웹 UI로 여러 파일의 처리 진행률을 실시간 모니터링',
+      priority: 'medium',
+      status: 'completed',
+      targetMilestone: 'v1.5',
+      createdAt: '2024-01-01T00:00:00Z',
+      completedAt: '2024-02-10T00:00:00Z',
+    },
+  ],
+
+  createdAt: '2024-01-01T00:00:00Z',
+  updatedAt: new Date().toISOString(),
+  version: '1.0.0',
+};
+
+console.log('✅ Enhanced Documentation Created (6 Categories):');
+console.log('   1. ✅ Problem Solving');
+console.log('   2. ✅ Functionality (5 features, 4 components)');
+console.log(`   3. ✅ Error Experiences (${enhancedDoc.errorExperiences.length} errors documented)`);
+console.log(`   4. ✅ Design Decisions (${enhancedDoc.decisions.length} ADRs)`);
+console.log(`   5. ✅ Dependencies (${enhancedDoc.dependencies.length} dependencies)`);
+console.log(`   6. ✅ Future Plans (${enhancedDoc.futurePlans.length} plans)`);
+console.log();
+
+// ========================================
+// STEP 3: Validate with Strict Mode
+// ========================================
+console.log('🔍 STEP 3: Validating with Strict Mode');
+console.log('-'.repeat(80));
+
+const strictValidator = new StrictModeValidator();
+const validation = strictValidator.validate(enhancedDoc, true);
+
+console.log(`Compliance: ${validation.isCompliant ? '✅ COMPLIANT' : '❌ NON-COMPLIANT'}`);
+console.log(`Score: ${validation.complianceScore.toFixed(2)}/100`);
+console.log(`Missing Categories: ${validation.missingCategories.length}`);
+console.log(`Incomplete Categories: ${validation.incompleteCategories.length}`);
+console.log(`Validation Errors: ${validation.errors.length}`);
+
+if (!validation.isCompliant) {
+  console.log('\n⚠️  Validation Report:');
+  const report = strictValidator.generateReport(validation);
+  console.log(report);
+} else {
+  console.log('\n✅ All Strict Mode requirements met!');
+}
+console.log();
+
+// ========================================
+// STEP 4: Generate Enhanced Markdown
+// ========================================
+console.log('📄 STEP 4: Generating Enhanced Markdown Documentation');
+console.log('-'.repeat(80));
+
+const mdGenerator = new EnhancedMarkdownGenerator();
+const markdown = mdGenerator.generateDocument(dataProcessorSymbol, enhancedDoc);
+
+const mdPath = path.join(__dirname, 'output', 'CSVDataProcessor.md');
+fs.mkdirSync(path.dirname(mdPath), { recursive: true });
+fs.writeFileSync(mdPath, markdown, 'utf-8');
+
+console.log(`✅ Markdown Generated: ${mdPath}`);
+console.log(`   Length: ${markdown.length} characters`);
+console.log(`   Lines: ${markdown.split('\n').length}`);
+console.log();
+
+// ========================================
+// STEP 5: Store in Database (SQLite)
+// ========================================
+console.log('💾 STEP 5: Storing in Database (SQLite)');
+console.log('-'.repeat(80));
+
+const dbPath = path.join(__dirname, 'output', 'tsdoc-edge.db');
+const jsonlPath = path.join(__dirname, 'output', 'data');
+
+const dbManager = new DatabaseManager(dbPath, jsonlPath);
+
+const insertSuccess = dbManager.insertSymbol(dataProcessorSymbol, 0);
+console.log(`Symbol Inserted: ${insertSuccess ? '✅ Success' : '❌ Failed'}`);
+
+const docInsertSuccess = dbManager.insertEnhancedDoc(enhancedDoc, 0);
+console.log(`Enhanced Doc Inserted: ${docInsertSuccess ? '✅ Success' : '❌ Failed'}`);
+
+const stats = dbManager.getStatistics();
+console.log(`\nDatabase Statistics:`);
+console.log(`   Total Symbols: ${stats.totalSymbols}`);
+console.log(`   Total Enhanced Docs: ${stats.totalEnhancedDocs}`);
+console.log(`   DB Size: ${(stats.dbSize / 1024).toFixed(2)} KB`);
+console.log();
+
+// ========================================
+// STEP 6: Export to JSONL (Git-friendly)
+// ========================================
+console.log('📦 STEP 6: Exporting to JSONL (Git Version Control)');
+console.log('-'.repeat(80));
+
+const exportPath = dbManager.exportToJSONL();
+console.log(`✅ Exported to: ${exportPath}`);
+
+const jsonlContent = fs.readFileSync(exportPath, 'utf-8');
+const lines = jsonlContent.split('\n').filter((l) => l.trim().length > 0);
+console.log(`   Total Records: ${lines.length}`);
+console.log(`   File Size: ${(fs.statSync(exportPath).size / 1024).toFixed(2)} KB`);
+console.log();
+
+console.log('Sample JSONL Record (first line):');
+console.log(lines[0].substring(0, 200) + '...');
+console.log();
+
+dbManager.close();
+
+// ========================================
+// STEP 7: Search & Query Demo
+// ========================================
+console.log('🔎 STEP 7: Search & Query Demo');
+console.log('-'.repeat(80));
+
+const graphBuilder = new SymbolGraphBuilder();
+graphBuilder.addSymbol(dataProcessorSymbol);
+
+const searchEngine = new SymbolSearchEngine(graphBuilder);
+
+// Search by name
+const searchResults = searchEngine.search({ name: 'CSV' });
+console.log(`Search "CSV": Found ${searchResults.totalCount} result(s)`);
+
+// Find symbols without tests
+const untested = searchEngine.findUntested();
+console.log(`Untested Symbols: ${untested.length}`);
+
+// Find symbols without contract
+const noContract = searchEngine.findWithoutContract();
+console.log(`Symbols without Contract: ${noContract.length}`);
+
+console.log();
+
+// ========================================
+// Summary
+// ========================================
+console.log('='.repeat(80));
+console.log('✅ POC Demo Complete!');
+console.log('='.repeat(80));
+console.log();
+console.log('Generated Files:');
+console.log(`   📄 Markdown: ${mdPath}`);
+console.log(`   💾 SQLite DB: ${dbPath}`);
+console.log(`   📦 JSONL: ${exportPath}`);
+console.log();
+console.log('Key Metrics:');
+console.log(`   📊 Compliance Score: ${validation.complianceScore}/100`);
+console.log(`   📝 Documentation: ${markdown.length} chars, ${markdown.split('\n').length} lines`);
+console.log(`   💾 Database: ${(stats.dbSize / 1024).toFixed(2)} KB`);
+console.log(`   📦 JSONL: ${lines.length} records, ${(fs.statSync(exportPath).size / 1024).toFixed(2)} KB`);
+console.log();
+console.log('Next Steps:');
+console.log('   1. Check generated markdown: cat ' + mdPath);
+console.log('   2. Inspect JSONL: cat ' + exportPath);
+console.log('   3. Query database: sqlite3 ' + dbPath);
+console.log();

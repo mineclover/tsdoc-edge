@@ -1,0 +1,128 @@
+/**
+ * TSDoc Edge - TSDoc-based specification documentation tool
+ *
+ * This library provides utilities for parsing TSDoc comments,
+ * validating them against conventions, and generating documentation.
+ *
+ * @packageDocumentation
+ */
+
+import { TSDocParser } from './parser/TSDocParser';
+import { ConventionValidator } from './validator/ConventionValidator';
+import { MarkdownGenerator } from './generator/MarkdownGenerator';
+
+// Core exports
+export { TSDocParser } from './parser/TSDocParser';
+export { ConventionValidator } from './validator/ConventionValidator';
+export { MarkdownGenerator } from './generator/MarkdownGenerator';
+
+// Graph and search exports
+export { SymbolGraphBuilder } from './graph/SymbolGraphBuilder';
+export { SymbolSearchEngine } from './graph/SymbolSearchEngine';
+
+// Validation exports
+export { ConnectivityValidator } from './validator/ConnectivityValidator';
+export { StrictModeValidator } from './validator/StrictModeValidator';
+
+// Storage exports
+export { DatabaseManager } from './storage/DatabaseManager';
+
+// Generator exports
+export { EnhancedMarkdownGenerator } from './generator/EnhancedMarkdownGenerator';
+
+// Type exports
+export type {
+  ParsedDocComment,
+  ValidationResult,
+  TSDocEdgeConfig,
+  ParseResult,
+} from './types';
+
+// Enhanced type exports
+export type * from './types/enhanced-tags';
+
+// Comment state type exports
+export type * from './types/comment-state';
+
+// Config type exports
+export type * from './types/config';
+
+// Fold/Unfold exports
+export { CommentExporter } from './fold/CommentExporter';
+export { CommentImporter } from './fold/CommentImporter';
+export { CommentStateManager } from './fold/CommentStateManager';
+
+// Config exports
+export { ConfigManager } from './config/ConfigManager';
+
+/**
+ * Main entry point for TSDoc Edge
+ * @public
+ */
+export class TSDocEdge {
+  private parser: TSDocParser;
+  private validator: ConventionValidator;
+  private generator: MarkdownGenerator;
+
+  /**
+   * Creates a new TSDocEdge instance
+   *
+   * @public
+   */
+  constructor() {
+    this.parser = new TSDocParser();
+    this.validator = new ConventionValidator();
+    this.generator = new MarkdownGenerator();
+  }
+
+  /**
+   * Process a source file: parse, validate, and generate documentation
+   *
+   * @param filePath - Path to the source file
+   * @param sourceCode - Source code content
+   * @returns Markdown documentation string
+   * @public
+   */
+  processFile(filePath: string, sourceCode: string): string {
+    // Parse the file
+    const parseResult = this.parser.parseFile(filePath, sourceCode);
+
+    // Validate each comment
+    const validatedComments = parseResult.comments.map((comment) =>
+      this.validator.validate(comment)
+    );
+
+    // Generate documentation
+    return this.generator.generateForComments(validatedComments);
+  }
+
+  /**
+   * Get the parser instance
+   *
+   * @returns TSDocParser instance
+   * @public
+   */
+  getParser(): TSDocParser {
+    return this.parser;
+  }
+
+  /**
+   * Get the validator instance
+   *
+   * @returns ConventionValidator instance
+   * @public
+   */
+  getValidator(): ConventionValidator {
+    return this.validator;
+  }
+
+  /**
+   * Get the generator instance
+   *
+   * @returns MarkdownGenerator instance
+   * @public
+   */
+  getGenerator(): MarkdownGenerator {
+    return this.generator;
+  }
+}

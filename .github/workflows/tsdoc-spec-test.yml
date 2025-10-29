@@ -1,0 +1,36 @@
+name: TSDoc Spec Test
+
+on:
+  push:
+    paths:
+      - 'src/parser/**'
+      - 'src/types/**'
+      - 'demo/tsdoc-spec-test.ts'
+  pull_request:
+    paths:
+      - 'src/parser/**'
+      - 'src/types/**'
+
+jobs:
+  test-spec:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          
+      - name: Install dependencies
+        run: npm ci
+        
+      - name: Build
+        run: npm run build
+        
+      - name: Run TSDoc Spec Test
+        run: npx ts-node demo/tsdoc-spec-test.ts
+        
+      - name: Run Unit Tests
+        run: npm test

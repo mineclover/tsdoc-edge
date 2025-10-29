@@ -1,0 +1,4 @@
+# TSDoc Conventions Directory
+
+This directory contains TSDoc convention rules for the tsdoc-edge project.
+Each rule is documented in a separate markdown file for easy reference and maintenance.

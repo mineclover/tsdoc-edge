@@ -1,0 +1,3 @@
+{"version":"1.0.0","idGeneratorMode":"sequential","totalEntries":2,"lastUpdated":"2025-10-29T12:03:04.054Z"}
+{"id":"000","sourceRef":{"filePath":"demo/sample-code.ts","symbolName":"DataProcessor","type":"class"},"createdAt":"2025-10-29T12:03:04.053Z","updatedAt":"2025-10-29T12:03:04.053Z"}
+{"id":"001","sourceRef":{"filePath":"demo/sample-code.ts","symbolName":"processData","type":"function"},"createdAt":"2025-10-29T12:03:04.054Z","updatedAt":"2025-10-29T12:03:04.054Z"}
