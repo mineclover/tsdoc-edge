@@ -3,10 +3,10 @@
  * @testScenario Verify connectivity validation and SSOT compliance
  */
 
-import { ConnectivityValidator } from '../validator/ConnectivityValidator';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { Symbol } from '../types/graph';
 import { ContractSpec, ResponsibilitySpec } from '../types/tags';
+import { ConnectivityValidator } from '../validator/ConnectivityValidator';
 
 describe('ConnectivityValidator', () => {
   let builder: SymbolGraphBuilder;

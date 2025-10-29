@@ -3,8 +3,8 @@
  * @testScenario Verify strict mode validation for 6-category documentation
  */
 
-import { StrictModeValidator } from '../validator/StrictModeValidator';
 import { EnhancedSymbolDoc } from '../types/enhanced-tags';
+import { StrictModeValidator } from '../validator/StrictModeValidator';
 
 describe('StrictModeValidator', () => {
   let validator: StrictModeValidator;

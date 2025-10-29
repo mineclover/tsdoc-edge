@@ -7,53 +7,45 @@
  * @packageDocumentation
  */
 
+import { MarkdownGenerator } from './generator/MarkdownGenerator';
 import { TSDocParser } from './parser/TSDocParser';
 import { ConventionValidator } from './validator/ConventionValidator';
-import { MarkdownGenerator } from './generator/MarkdownGenerator';
 
-// Core exports
-export { TSDocParser } from './parser/TSDocParser';
-export { ConventionValidator } from './validator/ConventionValidator';
+// Config exports
+export { ConfigManager } from './config/ConfigManager';
+// Fold/Unfold exports
+export { CommentExporter } from './fold/CommentExporter';
+export { CommentImporter } from './fold/CommentImporter';
+export { CommentStateManager } from './fold/CommentStateManager';
+// Generator exports
+export { EnhancedMarkdownGenerator } from './generator/EnhancedMarkdownGenerator';
 export { MarkdownGenerator } from './generator/MarkdownGenerator';
-
 // Graph and search exports
 export { SymbolGraphBuilder } from './graph/SymbolGraphBuilder';
 export { SymbolSearchEngine } from './graph/SymbolSearchEngine';
-
-// Validation exports
-export { ConnectivityValidator } from './validator/ConnectivityValidator';
-export { StrictModeValidator } from './validator/StrictModeValidator';
-
+// Core exports
+export { TSDocParser } from './parser/TSDocParser';
 // Storage exports
 export { DatabaseManager } from './storage/DatabaseManager';
-
-// Generator exports
-export { EnhancedMarkdownGenerator } from './generator/EnhancedMarkdownGenerator';
-
 // Type exports
 export type {
   ParsedDocComment,
-  ValidationResult,
-  TSDocEdgeConfig,
   ParseResult,
+  TSDocEdgeConfig,
+  ValidationResult,
 } from './types';
-
-// Enhanced type exports
-export type * from './types/enhanced-tags';
 
 // Comment state type exports
 export type * from './types/comment-state';
 
 // Config type exports
 export type * from './types/config';
-
-// Fold/Unfold exports
-export { CommentExporter } from './fold/CommentExporter';
-export { CommentImporter } from './fold/CommentImporter';
-export { CommentStateManager } from './fold/CommentStateManager';
-
-// Config exports
-export { ConfigManager } from './config/ConfigManager';
+// Enhanced type exports
+export type * from './types/enhanced-tags';
+// Validation exports
+export { ConnectivityValidator } from './validator/ConnectivityValidator';
+export { ConventionValidator } from './validator/ConventionValidator';
+export { StrictModeValidator } from './validator/StrictModeValidator';
 
 /**
  * Main entry point for TSDoc Edge

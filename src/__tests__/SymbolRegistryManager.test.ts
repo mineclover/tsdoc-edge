@@ -7,10 +7,10 @@
  * @testScenario Search functionality
  */
 
-import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import * as fs from 'fs';
-import * as path from 'path';
 import * as os from 'os';
+import * as path from 'path';
+import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 
 describe('SymbolRegistryManager', () => {
   let tempDir: string;
@@ -664,9 +664,9 @@ describe('SymbolRegistryManager', () => {
 
       const validation = manager.validateIntegrity();
       expect(validation.warnings.length).toBeGreaterThan(0);
-      expect(
-        validation.warnings.some((w) => w.includes('dependency to non-existent symbol'))
-      ).toBe(true);
+      expect(validation.warnings.some((w) => w.includes('dependency to non-existent symbol'))).toBe(
+        true
+      );
     });
 
     test('should include duplicate qualified names in stats', () => {
@@ -713,9 +713,9 @@ describe('SymbolRegistryManager', () => {
       const validation = manager.validateIntegrity();
       expect(validation.isValid).toBe(true); // Cycles are warnings, not errors
       expect(validation.warnings.length).toBeGreaterThan(0);
-      expect(
-        validation.warnings.some((w) => w.includes('Circular dependency detected'))
-      ).toBe(true);
+      expect(validation.warnings.some((w) => w.includes('Circular dependency detected'))).toBe(
+        true
+      );
     });
 
     test('should detect circular parent references as warning', () => {
@@ -743,9 +743,7 @@ describe('SymbolRegistryManager', () => {
       const validation = manager.validateIntegrity();
       expect(validation.isValid).toBe(true); // No errors, only warnings
       expect(validation.warnings.length).toBeGreaterThan(0);
-      expect(
-        validation.warnings.some((w) => w.includes('Circular parent reference'))
-      ).toBe(true);
+      expect(validation.warnings.some((w) => w.includes('Circular parent reference'))).toBe(true);
     });
 
     test('should expose detectDependencyCycles method', () => {

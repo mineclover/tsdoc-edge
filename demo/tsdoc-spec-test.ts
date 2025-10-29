@@ -203,7 +203,7 @@ try {
     const doc = result3.comments[0].docComment;
     const customBlocks = doc.customBlocks || [];
     console.log(`   Custom blocks found: ${customBlocks.length}`);
-    customBlocks.forEach(block => {
+    customBlocks.forEach((block) => {
       console.log(`     - ${block.blockTag.tagName}`);
     });
   }
@@ -373,7 +373,7 @@ const allTests = [
   { name: 'Edge Cases', pass: true },
 ];
 
-const passed = allTests.filter(t => t.pass).length;
+const passed = allTests.filter((t) => t.pass).length;
 const total = allTests.length;
 
 console.log(`Tests: ${passed}/${total} passed`);

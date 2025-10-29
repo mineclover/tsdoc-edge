@@ -3,11 +3,11 @@
  * @packageDocumentation
  */
 
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as crypto from 'crypto';
 import * as ts from 'typescript';
-import { FileCommentState, CommentState } from '../types/comment-state';
+import { CommentState, FileCommentState } from '../types/comment-state';
 
 /**
  * Imports comment states from Markdown and applies to TypeScript files
@@ -214,8 +214,13 @@ export class CommentImporter {
    * @param sourceCode - Source code content
    * @returns Map of hash to comment range
    */
-  private extractSourceComments(sourceCode: string): Map<string, { start: number; end: number; text: string; symbol: string }> {
-    const commentMap = new Map<string, { start: number; end: number; text: string; symbol: string }>();
+  private extractSourceComments(
+    sourceCode: string
+  ): Map<string, { start: number; end: number; text: string; symbol: string }> {
+    const commentMap = new Map<
+      string,
+      { start: number; end: number; text: string; symbol: string }
+    >();
     const sourceFile = ts.createSourceFile('temp.ts', sourceCode, ts.ScriptTarget.Latest, true);
 
     const visit = (node: ts.Node) => {
@@ -234,7 +239,7 @@ export class CommentImporter {
             start: line + 1, // 1-based
             end: endLine + 1,
             text: fullText,
-            symbol: symbolName
+            symbol: symbolName,
           });
         }
       }
@@ -296,9 +301,8 @@ export class CommentImporter {
     // Build replacement map: hash -> replacement text
     const replacementMap = new Map<string, string>();
     for (const comment of fileState.comments) {
-      const replacement = comment.status === 'collapsed'
-        ? comment.collapsedComment
-        : comment.fullComment;
+      const replacement =
+        comment.status === 'collapsed' ? comment.collapsedComment : comment.fullComment;
       replacementMap.set(comment.contentHash, replacement);
     }
 
@@ -310,7 +314,7 @@ export class CommentImporter {
         replaceRanges.push({
           start: range.start,
           end: range.end,
-          replacement: replacementMap.get(hash)!
+          replacement: replacementMap.get(hash)!,
         });
       }
     }

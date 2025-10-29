@@ -6,14 +6,14 @@
  */
 
 import {
-  EnhancedSymbolDoc,
-  StrictModeValidation,
-  ProblemSolving,
-  Functionality,
-  ErrorExperience,
   DecisionRecord,
   DependencySpec,
+  EnhancedSymbolDoc,
+  ErrorExperience,
+  Functionality,
   FuturePlan,
+  ProblemSolving,
+  StrictModeValidation,
 } from '../types/enhanced-tags';
 
 /**

@@ -8,9 +8,9 @@
 import Database from 'better-sqlite3';
 import * as fs from 'fs';
 import * as path from 'path';
-import { Symbol } from '../types/graph';
-import { EnhancedSymbolDoc } from '../types/enhanced-tags';
 import { ConfigManager } from '../config/ConfigManager';
+import { EnhancedSymbolDoc } from '../types/enhanced-tags';
+import { Symbol } from '../types/graph';
 
 /**
  * Database manager for symbol and documentation storage
@@ -392,7 +392,9 @@ export class DatabaseManager {
       mismatches.push(`Symbol count mismatch: DB=${stats.totalSymbols}, JSONL=${symbolCount}`);
     }
     if (stats.totalEnhancedDocs !== docCount) {
-      mismatches.push(`Enhanced doc count mismatch: DB=${stats.totalEnhancedDocs}, JSONL=${docCount}`);
+      mismatches.push(
+        `Enhanced doc count mismatch: DB=${stats.totalEnhancedDocs}, JSONL=${docCount}`
+      );
     }
 
     return {

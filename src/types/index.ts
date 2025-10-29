@@ -5,12 +5,12 @@
 
 import { DocComment } from '@microsoft/tsdoc';
 
+// Re-export enhanced tag types
+export * from './enhanced-tags';
 // Re-export graph types
 export * from './graph';
 // Re-export tag types
 export * from './tags';
-// Re-export enhanced tag types
-export * from './enhanced-tags';
 
 /**
  * Represents a parsed TSDoc comment with validation results

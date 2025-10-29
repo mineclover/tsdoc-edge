@@ -1,11 +1,12 @@
 #!/usr/bin/env ts-node
+
 /**
  * CLI Method Test - Register methods and test CLI commands
  */
 
-import { SymbolRegistryManager } from '../src/storage/SymbolRegistryManager';
-import * as path from 'path';
 import * as fs from 'fs';
+import * as path from 'path';
+import { SymbolRegistryManager } from '../src/storage/SymbolRegistryManager';
 
 console.log('='.repeat(80));
 console.log('CLI Method Registration Test');

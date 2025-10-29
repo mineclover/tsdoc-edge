@@ -6,12 +6,12 @@
  * @testScenario Match symbols with registry
  */
 
-import { FileScanner } from '../scanner/FileScanner';
-import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
-import { DatabaseManager } from '../storage/DatabaseManager';
 import * as fs from 'fs';
-import * as path from 'path';
 import * as os from 'os';
+import * as path from 'path';
+import { FileScanner } from '../scanner/FileScanner';
+import { DatabaseManager } from '../storage/DatabaseManager';
+import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 
 describe('FileScanner', () => {
   let tempDir: string;

@@ -5,19 +5,19 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { CommentExporter } from './CommentExporter';
-import { CommentImporter } from './CommentImporter';
 import { ConfigManager } from '../config/ConfigManager';
 import {
-  StateStorage,
-  FileCommentState,
-  CommentState,
   CollapseOptions,
+  CommentState,
   ExpandOptions,
   ExportResult,
-  ImportResult,
+  FileCommentState,
   FileStatusSummary,
+  ImportResult,
+  StateStorage,
 } from '../types/comment-state';
+import { CommentExporter } from './CommentExporter';
+import { CommentImporter } from './CommentImporter';
 
 /**
  * Manages comment states across the project
@@ -42,9 +42,7 @@ export class CommentStateManager {
       this.storageDir = storageDir;
     } else {
       const configManager = ConfigManager.getInstance();
-      this.storageDir = configManager.resolvePath(
-        configManager.get().paths.commentsDir
-      );
+      this.storageDir = configManager.resolvePath(configManager.get().paths.commentsDir);
     }
 
     this.exporter = new CommentExporter();

@@ -1,4 +1,5 @@
 #!/usr/bin/env ts-node
+
 /**
  * Test Method Registration with Hierarchy
  *
@@ -8,9 +9,9 @@
  * - depth (auto-calculated)
  */
 
-import { SymbolRegistryManager } from '../src/storage/SymbolRegistryManager';
-import * as path from 'path';
 import * as fs from 'fs';
+import * as path from 'path';
+import { SymbolRegistryManager } from '../src/storage/SymbolRegistryManager';
 
 console.log('='.repeat(80));
 console.log('TSDoc Edge - Method Registration Test');
@@ -159,7 +160,9 @@ console.log();
 console.log('All registered symbols:');
 for (const entry of allEntries) {
   const depthIndent = '  '.repeat(entry.sourceRef.depth || 0);
-  console.log(`${depthIndent}${entry.id} → ${entry.sourceRef.qualifiedName} (depth: ${entry.sourceRef.depth})`);
+  console.log(
+    `${depthIndent}${entry.id} → ${entry.sourceRef.qualifiedName} (depth: ${entry.sourceRef.depth})`
+  );
 }
 console.log();
 
@@ -233,7 +236,7 @@ console.log('📋 Step 8: Show JSONL content');
 console.log('-'.repeat(80));
 
 const jsonlContent = fs.readFileSync(registryPath, 'utf-8');
-const lines = jsonlContent.split('\n').filter(l => l.trim());
+const lines = jsonlContent.split('\n').filter((l) => l.trim());
 
 console.log('JSONL file contents:');
 console.log();

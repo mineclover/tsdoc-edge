@@ -1,12 +1,13 @@
 #!/usr/bin/env ts-node
+
 /**
  * Demo script for fold/unfold system
  * This demonstrates the complete workflow of comment management
  */
 
-import { CommentStateManager } from '../src/fold/CommentStateManager';
 import * as fs from 'fs';
 import * as path from 'path';
+import { CommentStateManager } from '../src/fold/CommentStateManager';
 
 console.log('='.repeat(80));
 console.log('TSDoc Edge - Fold/Unfold System Demo');

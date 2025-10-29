@@ -69,7 +69,7 @@ export class SymbolSearchEngine {
 
     // Filter by testing existence
     if (query.hasTesting !== undefined) {
-      results = results.filter((s) => (s.tests.length > 0) === query.hasTesting);
+      results = results.filter((s) => s.tests.length > 0 === query.hasTesting);
     }
 
     // Filter by public API

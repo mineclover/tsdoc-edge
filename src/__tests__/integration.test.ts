@@ -5,9 +5,9 @@
 
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { SymbolSearchEngine } from '../graph/SymbolSearchEngine';
-import { ConnectivityValidator } from '../validator/ConnectivityValidator';
 import { Symbol } from '../types/graph';
 import { ContractSpec, ResponsibilitySpec } from '../types/tags';
+import { ConnectivityValidator } from '../validator/ConnectivityValidator';
 
 describe('TSDoc Edge Integration', () => {
   describe('Complete Workflow: Build -> Search -> Validate', () => {

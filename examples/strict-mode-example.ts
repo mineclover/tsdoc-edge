@@ -4,10 +4,10 @@
  */
 
 import {
-  SymbolGraphBuilder,
   DatabaseManager,
-  StrictModeValidator,
   EnhancedMarkdownGenerator,
+  StrictModeValidator,
+  SymbolGraphBuilder,
 } from '../src';
 import { EnhancedSymbolDoc, Symbol } from '../src/types';
 

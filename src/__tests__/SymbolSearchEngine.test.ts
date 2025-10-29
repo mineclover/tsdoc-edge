@@ -3,8 +3,8 @@
  * @testScenario Verify symbol search and query capabilities
  */
 
-import { SymbolSearchEngine } from '../graph/SymbolSearchEngine';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
+import { SymbolSearchEngine } from '../graph/SymbolSearchEngine';
 import { Symbol } from '../types/graph';
 import { ContractSpec, ResponsibilitySpec } from '../types/tags';
 

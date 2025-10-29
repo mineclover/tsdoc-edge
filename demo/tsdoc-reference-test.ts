@@ -65,7 +65,7 @@ try {
 
   if (result1.comments.length > 0) {
     // Check for link references
-    const userValidatorDoc = result1.comments.find(c => c.symbolName === 'UserValidator');
+    const userValidatorDoc = result1.comments.find((c) => c.symbolName === 'UserValidator');
     if (userValidatorDoc) {
       console.log('   UserValidator comment found:');
       const remarksBlock = userValidatorDoc.docComment.remarksBlock;
@@ -141,7 +141,7 @@ try {
   console.log(`✅ Parsed: ${result2.comments.length} comments`);
   console.log(`   Errors: ${result2.errors.length}`);
 
-  const csvDoc = result2.comments.find(c => c.symbolName === 'process');
+  const csvDoc = result2.comments.find((c) => c.symbolName === 'process');
   if (csvDoc) {
     console.log('   process method found ✓');
     const inheritDoc = csvDoc.docComment.inheritDocTag;
@@ -215,12 +215,12 @@ try {
   console.log(`✅ Parsed: ${result3.comments.length} comments`);
   console.log(`   Errors: ${result3.errors.length}`);
 
-  const userServiceDoc = result3.comments.find(c => c.symbolName === 'UserService');
+  const userServiceDoc = result3.comments.find((c) => c.symbolName === 'UserService');
   if (userServiceDoc && userServiceDoc.docComment.customBlocks) {
     console.log('   UserService custom tags:');
     const blocks = userServiceDoc.docComment.customBlocks;
-    const usesCount = blocks.filter(b => b.blockTag.tagName === '@uses').length;
-    const usedByCount = blocks.filter(b => b.blockTag.tagName === '@usedBy').length;
+    const usesCount = blocks.filter((b) => b.blockTag.tagName === '@uses').length;
+    const usedByCount = blocks.filter((b) => b.blockTag.tagName === '@usedBy').length;
     console.log(`     - @uses: ${usesCount}`);
     console.log(`     - @usedBy: ${usedByCount}`);
   }
@@ -308,7 +308,7 @@ try {
   let usesCount = 0;
   let usedByCount = 0;
 
-  result4.comments.forEach(comment => {
+  result4.comments.forEach((comment) => {
     const doc = comment.docComment;
 
     // Count @see blocks
@@ -318,7 +318,7 @@ try {
 
     // Count custom blocks (@uses, @usedBy)
     if (doc.customBlocks) {
-      doc.customBlocks.forEach(block => {
+      doc.customBlocks.forEach((block) => {
         if (block.blockTag.tagName === '@uses') usesCount++;
         if (block.blockTag.tagName === '@usedBy') usedByCount++;
       });

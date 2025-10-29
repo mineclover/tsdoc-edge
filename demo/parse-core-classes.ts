@@ -1,13 +1,14 @@
 #!/usr/bin/env ts-node
+
 /**
  * Parse core classes and verify documentation
  */
 
+import * as fs from 'fs';
+import * as path from 'path';
 import { TSDocParser } from '../src/parser/TSDocParser';
 import { DatabaseManager } from '../src/storage/DatabaseManager';
 import { SymbolRegistryManager } from '../src/storage/SymbolRegistryManager';
-import * as path from 'path';
-import * as fs from 'fs';
 
 console.log('='.repeat(80));
 console.log('Parsing Core Classes');
@@ -37,7 +38,11 @@ const coreFiles = [
   { path: 'src/graph/SymbolSearchEngine.ts', id: '004', name: 'SymbolSearchEngine' },
   { path: 'src/validator/ConventionValidator.ts', id: '005', name: 'ConventionValidator' },
   { path: 'src/graph/SymbolGraphBuilder.ts', id: '006', name: 'SymbolGraphBuilder' },
-  { path: 'src/generator/EnhancedMarkdownGenerator.ts', id: '007', name: 'EnhancedMarkdownGenerator' },
+  {
+    path: 'src/generator/EnhancedMarkdownGenerator.ts',
+    id: '007',
+    name: 'EnhancedMarkdownGenerator',
+  },
   { path: 'src/utils/IdGenerator.ts', id: '008', name: 'IdGenerator' },
 ];
 
@@ -96,9 +101,7 @@ for (const file of coreFiles) {
       responsibility: hasResponsibility
         ? { symbolName: file.name, description: 'Defined' }
         : undefined,
-      contract: hasContract
-        ? { symbolName: file.name, description: 'Defined' }
-        : undefined,
+      contract: hasContract ? { symbolName: file.name, description: 'Defined' } : undefined,
     };
 
     dbManager.insertSymbol(symbol, 0);

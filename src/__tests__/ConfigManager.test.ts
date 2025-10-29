@@ -2,11 +2,11 @@
  * ConfigManager tests
  */
 
-import { ConfigManager } from '../config/ConfigManager';
-import { TsdocEdgeConfig, DEFAULT_CONFIG } from '../types/config';
 import * as fs from 'fs';
-import * as path from 'path';
 import * as os from 'os';
+import * as path from 'path';
+import { ConfigManager } from '../config/ConfigManager';
+import { DEFAULT_CONFIG, TsdocEdgeConfig } from '../types/config';
 
 describe('ConfigManager', () => {
   let testDir: string;
@@ -88,12 +88,15 @@ describe('ConfigManager', () => {
         },
       });
 
-      configManager.init({
-        project: {
-          name: 'new-name',
-          version: '2.0.0',
+      configManager.init(
+        {
+          project: {
+            name: 'new-name',
+            version: '2.0.0',
+          },
         },
-      }, true);
+        true
+      );
 
       const config = configManager.get();
       expect(config.project.name).toBe('new-name');

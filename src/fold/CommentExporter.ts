@@ -3,11 +3,11 @@
  * @packageDocumentation
  */
 
-import * as ts from 'typescript';
+import * as crypto from 'crypto';
 import * as fs from 'fs';
 import * as path from 'path';
-import * as crypto from 'crypto';
-import { CommentState, CommentLocation, FileCommentState } from '../types/comment-state';
+import * as ts from 'typescript';
+import { CommentLocation, CommentState, FileCommentState } from '../types/comment-state';
 
 /**
  * Exports TSDoc comments from TypeScript files to Markdown format
@@ -25,12 +25,7 @@ export class CommentExporter {
    */
   extractComments(filePath: string, sourceCode: string): CommentState[] {
     const comments: CommentState[] = [];
-    const sourceFile = ts.createSourceFile(
-      filePath,
-      sourceCode,
-      ts.ScriptTarget.Latest,
-      true
-    );
+    const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
 
     this.visitNode(sourceFile, filePath, sourceCode, comments);
 

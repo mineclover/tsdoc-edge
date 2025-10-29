@@ -15,6 +15,6 @@ export class DataProcessor {
    * @public
    */
   processData(data: any[]): any[] {
-    return data.map(item => ({ ...item, processed: true }));
+    return data.map((item) => ({ ...item, processed: true }));
   }
 }

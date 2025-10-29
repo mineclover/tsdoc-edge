@@ -8,8 +8,8 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { TSDocParser } from '../parser/TSDocParser';
-import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import { Symbol } from '../types/graph';
 
 /**
@@ -68,11 +68,7 @@ export class FileScanner {
    * @param db - Database manager
    * @param config - Scanner configuration
    */
-  constructor(
-    registry: SymbolRegistryManager,
-    db: DatabaseManager,
-    config: ScannerConfig
-  ) {
+  constructor(registry: SymbolRegistryManager, db: DatabaseManager, config: ScannerConfig) {
     this.parser = new TSDocParser();
     this.registry = registry;
     this.db = db;
@@ -304,10 +300,7 @@ export class FileScanner {
     for (const pattern of patterns) {
       // Simple glob pattern matching
       const regex = new RegExp(
-        pattern
-          .replace(/\*\*/g, '.*')
-          .replace(/\*/g, '[^/]*')
-          .replace(/\?/g, '.')
+        pattern.replace(/\*\*/g, '.*').replace(/\*/g, '[^/]*').replace(/\?/g, '.')
       );
       if (regex.test(filePath)) {
         return true;

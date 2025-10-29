@@ -1,13 +1,14 @@
 #!/usr/bin/env ts-node
+
 /**
  * Configuration System Demo
  *
  * Demonstrates the new configuration system in TSDoc Edge v0.4.0
  */
 
-import { ConfigManager, CommentStateManager, DatabaseManager } from '../src/index';
 import * as fs from 'fs';
 import * as path from 'path';
+import { CommentStateManager, ConfigManager, DatabaseManager } from '../src/index';
 
 console.log('='.repeat(80));
 console.log('TSDoc Edge - Configuration System Demo');
@@ -78,8 +79,12 @@ configManager.ensureDirectories();
 
 console.log('✅ Directories created:');
 console.log(`   ${fs.existsSync(commentsPath) ? '✓' : '✗'} ${config.paths.commentsDir}`);
-console.log(`   ${fs.existsSync(path.join(demoDir, config.paths.jsonlDir)) ? '✓' : '✗'} ${config.paths.jsonlDir}`);
-console.log(`   ${fs.existsSync(path.join(demoDir, config.paths.outputDir || '')) ? '✓' : '✗'} ${config.paths.outputDir}`);
+console.log(
+  `   ${fs.existsSync(path.join(demoDir, config.paths.jsonlDir)) ? '✓' : '✗'} ${config.paths.jsonlDir}`
+);
+console.log(
+  `   ${fs.existsSync(path.join(demoDir, config.paths.outputDir || '')) ? '✓' : '✗'} ${config.paths.outputDir}`
+);
 console.log();
 
 // DEMO 5: Validate Configuration
@@ -90,7 +95,7 @@ const validation = configManager.validate();
 console.log('Valid:', validation.valid);
 console.log('Errors:', validation.errors.length);
 if (validation.errors.length > 0) {
-  validation.errors.forEach(err => console.log(`  - ${err}`));
+  validation.errors.forEach((err) => console.log(`  - ${err}`));
 }
 console.log();
 

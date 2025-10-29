@@ -6,7 +6,12 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import { SymbolRegistry, SymbolRegistryEntry, SourceRef, DependencyRelation } from '../types/registry';
+import {
+  DependencyRelation,
+  SourceRef,
+  SymbolRegistry,
+  SymbolRegistryEntry,
+} from '../types/registry';
 import { IdGenerator } from '../utils/IdGenerator';
 
 /**
@@ -273,7 +278,10 @@ export class SymbolRegistryManager {
    * }, false);
    * ```
    */
-  findBySourceRef(sourceRef: SourceRef, includeType: boolean = true): SymbolRegistryEntry | undefined {
+  findBySourceRef(
+    sourceRef: SourceRef,
+    includeType: boolean = true
+  ): SymbolRegistryEntry | undefined {
     return this.registry.entries.find((e) => {
       const filePathMatch = e.sourceRef.filePath === sourceRef.filePath;
       const symbolNameMatch = e.sourceRef.symbolName === sourceRef.symbolName;
@@ -540,7 +548,9 @@ export class SymbolRegistryManager {
     const roots = this.registry.entries.filter((e) => !e.sourceRef.memberOf);
 
     // Build tree recursively
-    const buildTree = (entry: SymbolRegistryEntry): SymbolRegistryEntry & { children?: SymbolRegistryEntry[] } => {
+    const buildTree = (
+      entry: SymbolRegistryEntry
+    ): SymbolRegistryEntry & { children?: SymbolRegistryEntry[] } => {
       const children = this.getChildren(entry.id);
       if (children.length === 0) {
         return entry;

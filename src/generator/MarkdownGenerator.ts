@@ -3,8 +3,8 @@
  * @packageDocumentation
  */
 
-import { ParsedDocComment } from '../types';
 import { DocNode, DocNodeKind } from '@microsoft/tsdoc';
+import { ParsedDocComment } from '../types';
 
 /**
  * Generates markdown documentation from parsed TSDoc comments

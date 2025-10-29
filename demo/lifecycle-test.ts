@@ -1,14 +1,15 @@
 #!/usr/bin/env ts-node
+
 /**
  * Complete Lifecycle Test
  * Tests: ID generation → TSDoc parsing → JSONL merge → DB build → Query
  */
 
-import { SymbolRegistryManager } from '../src/storage/SymbolRegistryManager';
+import * as fs from 'fs';
+import * as path from 'path';
 import { TSDocParser } from '../src/parser/TSDocParser';
 import { DatabaseManager } from '../src/storage/DatabaseManager';
-import * as path from 'path';
-import * as fs from 'fs';
+import { SymbolRegistryManager } from '../src/storage/SymbolRegistryManager';
 
 console.log('='.repeat(80));
 console.log('TSDoc Edge - Complete Lifecycle Test');
@@ -120,7 +121,7 @@ console.log('🔗 STEP 4: Merge Parsed Data with Registry');
 console.log('-'.repeat(80));
 
 // Find IDs from parsed comments
-const parsedWithIds = parseResult.comments.map(comment => {
+const parsedWithIds = parseResult.comments.map((comment) => {
   // Extract @id tag from docComment
   let id: string | null = null;
   const customBlocks = comment.docComment.customBlocks;
@@ -158,7 +159,9 @@ for (const item of parsedWithIds) {
   const status = item.matched ? '✅' : '❌';
   console.log(`   ${status} ${item.comment.symbolName} → ID: ${item.id || 'N/A'}`);
   if (item.registryEntry) {
-    console.log(`      Registry: ${item.registryEntry.sourceRef.filePath}:${item.registryEntry.sourceRef.symbolName}`);
+    console.log(
+      `      Registry: ${item.registryEntry.sourceRef.filePath}:${item.registryEntry.sourceRef.symbolName}`
+    );
   }
 }
 console.log();

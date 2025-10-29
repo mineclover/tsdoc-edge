@@ -3,7 +3,6 @@
  * @packageDocumentation
  */
 
-import * as ts from 'typescript';
 import {
   TSDocParser as MicrosoftTSDocParser,
   ParserContext,
@@ -11,6 +10,7 @@ import {
   TSDocTagDefinition,
   TSDocTagSyntaxKind,
 } from '@microsoft/tsdoc';
+import * as ts from 'typescript';
 import { ParsedDocComment, ParseResult } from '../types';
 
 /**
@@ -112,12 +112,7 @@ export class TSDocParser {
     const errors: Error[] = [];
 
     try {
-      const sourceFile = ts.createSourceFile(
-        filePath,
-        sourceCode,
-        ts.ScriptTarget.Latest,
-        true
-      );
+      const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
 
       this.visitNode(sourceFile, filePath, comments, errors);
     } catch (error) {

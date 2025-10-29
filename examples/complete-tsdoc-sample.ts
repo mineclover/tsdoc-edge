@@ -300,10 +300,7 @@ export class CSVDataProcessor {
    *
    * @public
    */
-  async *loadData(
-    filePath: string,
-    options?: LoadOptions
-  ): AsyncGenerator<DataFrame> {
+  async *loadData(filePath: string, options?: LoadOptions): AsyncGenerator<DataFrame> {
     // Implementation
     throw new Error('Not implemented');
   }
@@ -375,10 +372,7 @@ export class CSVDataProcessor {
    *
    * @public
    */
-  async processParallel(
-    chunks: DataFrame[],
-    workers: number = 4
-  ): Promise<DataFrame[]> {
+  async processParallel(chunks: DataFrame[], workers: number = 4): Promise<DataFrame[]> {
     // Implementation
     throw new Error('Not implemented');
   }
@@ -425,10 +419,10 @@ export interface CleanOptions {
  * @public
  */
 export type NaNStrategy =
-  | 'drop'        // Remove rows with NaN
-  | 'fill'        // Fill with mean/median
+  | 'drop' // Remove rows with NaN
+  | 'fill' // Fill with mean/median
   | 'interpolate' // Interpolate from neighbors
-  | 'forward';    // Forward fill
+  | 'forward'; // Forward fill
 
 /**
  * DataFrame type (placeholder for pandas DataFrame)

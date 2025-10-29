@@ -1,14 +1,15 @@
 #!/usr/bin/env ts-node
+
 /**
  * Self-validation script for tsdoc-edge project
  * This script analyzes the tsdoc-edge codebase itself
  * to check TSDoc documentation completeness
  */
 
-import { TSDocParser } from '../src/parser/TSDocParser';
-import { ConventionValidator } from '../src/validator/ConventionValidator';
 import * as fs from 'fs';
 import * as path from 'path';
+import { TSDocParser } from '../src/parser/TSDocParser';
+import { ConventionValidator } from '../src/validator/ConventionValidator';
 
 interface FileAnalysis {
   filePath: string;
@@ -60,16 +61,14 @@ for (const file of tsFiles) {
 
   const parseResult = parser.parseFile(file, sourceCode);
 
-  const validatedComments = parseResult.comments.map(comment =>
-    validator.validate(comment)
-  );
+  const validatedComments = parseResult.comments.map((comment) => validator.validate(comment));
 
   const analysis: FileAnalysis = {
     filePath: relativePath,
     hasDocumentation: parseResult.comments.length > 0,
     validationResults: validatedComments,
     symbolCount: parseResult.comments.length,
-    documentedSymbols: validatedComments.filter(c => c.isValid).length,
+    documentedSymbols: validatedComments.filter((c) => c.isValid).length,
   };
 
   results.push(analysis);
@@ -80,14 +79,18 @@ console.log('📊 SUMMARY');
 console.log('-'.repeat(80));
 
 const totalFiles = results.length;
-const filesWithDocs = results.filter(r => r.hasDocumentation).length;
+const filesWithDocs = results.filter((r) => r.hasDocumentation).length;
 const totalSymbols = results.reduce((sum, r) => sum + r.symbolCount, 0);
 const validSymbols = results.reduce((sum, r) => sum + r.documentedSymbols, 0);
 
 console.log(`Total Files Analyzed: ${totalFiles}`);
-console.log(`Files with Documentation: ${filesWithDocs} (${((filesWithDocs/totalFiles)*100).toFixed(1)}%)`);
+console.log(
+  `Files with Documentation: ${filesWithDocs} (${((filesWithDocs / totalFiles) * 100).toFixed(1)}%)`
+);
 console.log(`Total Symbols Found: ${totalSymbols}`);
-console.log(`Valid Symbols: ${validSymbols} (${totalSymbols > 0 ? ((validSymbols/totalSymbols)*100).toFixed(1) : 0}%)`);
+console.log(
+  `Valid Symbols: ${validSymbols} (${totalSymbols > 0 ? ((validSymbols / totalSymbols) * 100).toFixed(1) : 0}%)`
+);
 console.log();
 
 // Print details
@@ -96,19 +99,18 @@ console.log('-'.repeat(80));
 
 for (const result of results) {
   const status = result.hasDocumentation ? '✅' : '❌';
-  const coverage = result.symbolCount > 0
-    ? `${result.documentedSymbols}/${result.symbolCount}`
-    : '0/0';
+  const coverage =
+    result.symbolCount > 0 ? `${result.documentedSymbols}/${result.symbolCount}` : '0/0';
 
   console.log(`${status} ${result.filePath} (${coverage})`);
 
   // Show validation errors
   const errors = result.validationResults
-    .filter(v => !v.isValid)
-    .flatMap(v => v.validationResults);
+    .filter((v) => !v.isValid)
+    .flatMap((v) => v.validationResults);
 
   if (errors.length > 0) {
-    errors.forEach(err => {
+    errors.forEach((err) => {
       console.log(`   ⚠️  ${err.message}`);
     });
   }

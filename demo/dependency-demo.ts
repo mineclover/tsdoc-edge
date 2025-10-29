@@ -1,12 +1,13 @@
 #!/usr/bin/env ts-node
+
 /**
  * Dependency Graph Demo
  * Demonstrates TSDoc-based dependency tracking
  */
 
-import { SymbolRegistryManager } from '../src/storage/SymbolRegistryManager';
-import * as path from 'path';
 import * as fs from 'fs';
+import * as path from 'path';
+import { SymbolRegistryManager } from '../src/storage/SymbolRegistryManager';
 
 console.log('='.repeat(80));
 console.log('TSDoc Edge - Dependency Graph Demo');
@@ -68,36 +69,16 @@ console.log('🔗 STEP 2: Add Dependency Relationships');
 console.log('-'.repeat(80));
 
 // Validator depends on Parser
-manager.addDependency(
-  validator,
-  parser,
-  'Parse TSDoc comments before validation',
-  'runtime'
-);
+manager.addDependency(validator, parser, 'Parse TSDoc comments before validation', 'runtime');
 
 // Validator depends on DB
-manager.addDependency(
-  validator,
-  db,
-  'Store validation results',
-  'runtime'
-);
+manager.addDependency(validator, db, 'Store validation results', 'runtime');
 
 // Generator depends on Validator
-manager.addDependency(
-  generator,
-  validator,
-  'Get validated comments for generation',
-  'runtime'
-);
+manager.addDependency(generator, validator, 'Get validated comments for generation', 'runtime');
 
 // Generator depends on Parser
-manager.addDependency(
-  generator,
-  parser,
-  'Access parsed doc comments',
-  'type-only'
-);
+manager.addDependency(generator, parser, 'Access parsed doc comments', 'type-only');
 
 manager.save();
 

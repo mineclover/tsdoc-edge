@@ -1,17 +1,18 @@
 #!/usr/bin/env node
+
 /**
  * TSDoc Edge CLI
  * Command-line interface for TSDoc Edge operations
  */
 
-import { DatabaseManager } from './storage/DatabaseManager';
-import { SymbolRegistryManager } from './storage/SymbolRegistryManager';
+import * as fs from 'fs';
+import * as path from 'path';
+import { ConfigManager } from './config/ConfigManager';
 import { SymbolGraphBuilder } from './graph/SymbolGraphBuilder';
 import { SymbolSearchEngine } from './graph/SymbolSearchEngine';
+import { DatabaseManager } from './storage/DatabaseManager';
+import { SymbolRegistryManager } from './storage/SymbolRegistryManager';
 import { ConnectivityValidator } from './validator/ConnectivityValidator';
-import { ConfigManager } from './config/ConfigManager';
-import * as path from 'path';
-import * as fs from 'fs';
 
 // ANSI color codes
 const colors = {
@@ -42,7 +43,9 @@ function printTodos() {
   const dbPath = path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');
 
   if (!fs.existsSync(dbPath)) {
-    console.log(colors.yellow + '⚠️  Database not found. Run demo first: npm run demo' + colors.reset);
+    console.log(
+      colors.yellow + '⚠️  Database not found. Run demo first: npm run demo' + colors.reset
+    );
     console.log();
     console.log('To create the database, run:');
     console.log(colors.cyan + '  npm run demo' + colors.reset);
@@ -85,14 +88,18 @@ function printTodos() {
         for (const plan of plans) {
           totalTodos++;
           const statusIcon =
-            plan.status === 'completed' ? colors.green + '✅' :
-            plan.status === 'in-progress' ? colors.yellow + '🔄' :
-            colors.blue + '📌';
+            plan.status === 'completed'
+              ? colors.green + '✅'
+              : plan.status === 'in-progress'
+                ? colors.yellow + '🔄'
+                : colors.blue + '📌';
 
           const priorityColor =
-            plan.priority === 'high' ? colors.red :
-            plan.priority === 'medium' ? colors.yellow :
-            colors.cyan;
+            plan.priority === 'high'
+              ? colors.red
+              : plan.priority === 'medium'
+                ? colors.yellow
+                : colors.cyan;
 
           console.log(`${statusIcon} ${colors.bold}[${plan.id}]${colors.reset} ${plan.title}`);
           console.log(`   Status: ${colors.bold}${plan.status}${colors.reset}`);
@@ -116,7 +123,6 @@ function printTodos() {
     printSection('📈 Summary');
     console.log(`   Total TODO items: ${colors.green}${totalTodos}${colors.reset}`);
     console.log();
-
   } catch (error) {
     console.error(colors.red + '❌ Error reading database:' + colors.reset, error);
   } finally {
@@ -137,7 +143,9 @@ function printIdCommands() {
         const symbolName = process.argv[5];
 
         if (!filePath || !symbolName) {
-          console.log(colors.red + 'Usage: tsdoc-edge id new <file> <symbol> [options]' + colors.reset);
+          console.log(
+            colors.red + 'Usage: tsdoc-edge id new <file> <symbol> [options]' + colors.reset
+          );
           console.log();
           console.log('Options:');
           console.log('  --type=<type>           Symbol type (class, function, method, property)');
@@ -146,8 +154,12 @@ function printIdCommands() {
           console.log();
           console.log('Examples:');
           console.log('  tsdoc-edge id new src/processor.ts CSVDataProcessor');
-          console.log('  tsdoc-edge id new src/processor.ts loadCSV --type=method --parent=005 --member-type=instance');
-          console.log('  tsdoc-edge id new src/processor.ts createDefault --type=method --parent=005 --member-type=static');
+          console.log(
+            '  tsdoc-edge id new src/processor.ts loadCSV --type=method --parent=005 --member-type=instance'
+          );
+          console.log(
+            '  tsdoc-edge id new src/processor.ts createDefault --type=method --parent=005 --member-type=static'
+          );
           process.exit(1);
         }
 
@@ -192,7 +204,9 @@ function printIdCommands() {
         console.log(colors.green + '✅ ID generated:' + colors.reset);
         console.log();
         console.log(`  ID: ${colors.bold}${id}${colors.reset}`);
-        console.log(`  Qualified Name: ${colors.bold}${entry?.sourceRef.qualifiedName}${colors.reset}`);
+        console.log(
+          `  Qualified Name: ${colors.bold}${entry?.sourceRef.qualifiedName}${colors.reset}`
+        );
         console.log(`  File: ${filePath}`);
         console.log(`  Symbol: ${symbolName}`);
         if (type) {
@@ -211,7 +225,11 @@ function printIdCommands() {
         console.log('Add this to your TSDoc comment:');
         console.log(colors.cyan + `  @id ${id}` + colors.reset);
         if (parent) {
-          console.log(colors.cyan + `  @memberof ${entry?.sourceRef.qualifiedName?.split(/[#.~]/)[0]}` + colors.reset);
+          console.log(
+            colors.cyan +
+              `  @memberof ${entry?.sourceRef.qualifiedName?.split(/[#.~]/)[0]}` +
+              colors.reset
+          );
         }
         console.log();
       }
@@ -226,11 +244,15 @@ function printIdCommands() {
         console.log();
 
         if (entries.length === 0) {
-          console.log(colors.yellow + 'No entries yet. Use "tsdoc-edge id new" to create one.' + colors.reset);
+          console.log(
+            colors.yellow + 'No entries yet. Use "tsdoc-edge id new" to create one.' + colors.reset
+          );
           console.log();
         } else {
           for (const entry of entries) {
-            console.log(`${colors.bold}${entry.id}${colors.reset} → ${entry.sourceRef.filePath}:${entry.sourceRef.symbolName}`);
+            console.log(
+              `${colors.bold}${entry.id}${colors.reset} → ${entry.sourceRef.filePath}:${entry.sourceRef.symbolName}`
+            );
             if (entry.tags && entry.tags.length > 0) {
               console.log(`  Tags: ${entry.tags.join(', ')}`);
             }
@@ -323,8 +345,8 @@ function printInit() {
   printHeader('TSDoc Edge - Initialize Project');
 
   const hasForce = process.argv.includes('--force');
-  const nameArg = process.argv.find(arg => arg.startsWith('--name='));
-  const versionArg = process.argv.find(arg => arg.startsWith('--version='));
+  const nameArg = process.argv.find((arg) => arg.startsWith('--name='));
+  const versionArg = process.argv.find((arg) => arg.startsWith('--version='));
 
   const configManager = ConfigManager.getInstance();
 
@@ -341,12 +363,15 @@ function printInit() {
   const projectVersion = versionArg ? versionArg.split('=')[1] : '1.0.0';
 
   try {
-    configManager.init({
-      project: {
-        name: projectName,
-        version: projectVersion,
+    configManager.init(
+      {
+        project: {
+          name: projectName,
+          version: projectVersion,
+        },
       },
-    }, hasForce);
+      hasForce
+    );
 
     console.log(colors.green + '✅ Configuration file created successfully!' + colors.reset);
     console.log();
@@ -377,7 +402,6 @@ function printInit() {
     console.log('  2. Generate symbol IDs: tsdoc-edge id new <file> <symbol>');
     console.log('  3. Validate your project: tsdoc-edge validate');
     console.log();
-
   } catch (error) {
     console.error(colors.red + '❌ Failed to initialize configuration:' + colors.reset, error);
     process.exit(1);
@@ -402,9 +426,13 @@ function printHelp() {
   console.log('  untested                Find symbols without tests');
   console.log('  without-responsibility  Find symbols without responsibility definitions');
   console.log('  without-contract        Find symbols without contract specifications');
-  console.log('  plans [--status=X]      Show future plans (filter by status: planned/in-progress/completed)');
+  console.log(
+    '  plans [--status=X]      Show future plans (filter by status: planned/in-progress/completed)'
+  );
   console.log('  todo, todos             Show future plans (TODO list) from the database');
-  console.log('  validate                Generate detailed validation report with actionable items');
+  console.log(
+    '  validate                Generate detailed validation report with actionable items'
+  );
   console.log('  help                    Show this help message');
   console.log();
   console.log('Init Options:');
@@ -417,7 +445,9 @@ function printHelp() {
   console.log('  tsdoc-edge init --name=my-project --version=2.0.0');
   console.log('  tsdoc-edge init --force');
   console.log('  tsdoc-edge id new src/utils.ts parseData');
-  console.log('  tsdoc-edge id new src/Service.ts createUser --type=method --parent=005 --member-type=instance');
+  console.log(
+    '  tsdoc-edge id new src/Service.ts createUser --type=method --parent=005 --member-type=instance'
+  );
   console.log('  tsdoc-edge id list');
   console.log('  tsdoc-edge tree');
   console.log('  tsdoc-edge find-method UserService#createUser');
@@ -441,7 +471,9 @@ function printDependencies() {
 
   const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
   if (!fs.existsSync(registryPath)) {
-    console.log(colors.yellow + '⚠️  No registry found. Run "tsdoc-edge id new" first.' + colors.reset);
+    console.log(
+      colors.yellow + '⚠️  No registry found. Run "tsdoc-edge id new" first.' + colors.reset
+    );
     process.exit(1);
   }
 
@@ -464,7 +496,9 @@ function printDependencies() {
     for (const dep of deps) {
       const target = manager.findById(dep.targetId);
       const typeLabel = dep.type ? ` [${dep.type}]` : '';
-      console.log(`${colors.bold}${dep.targetId}${colors.reset}${typeLabel} → ${target?.sourceRef.symbolName || 'unknown'}`);
+      console.log(
+        `${colors.bold}${dep.targetId}${colors.reset}${typeLabel} → ${target?.sourceRef.symbolName || 'unknown'}`
+      );
       console.log(`  Reason: ${dep.reason}`);
       if (target) {
         console.log(`  Location: ${target.sourceRef.filePath}`);
@@ -509,7 +543,9 @@ function printUsedBy() {
     for (const user of usedBy) {
       const from = manager.findById(user.fromId);
       const typeLabel = user.type ? ` [${user.type}]` : '';
-      console.log(`${colors.bold}${user.fromId}${colors.reset}${typeLabel} → ${from?.sourceRef.symbolName || 'unknown'}`);
+      console.log(
+        `${colors.bold}${user.fromId}${colors.reset}${typeLabel} → ${from?.sourceRef.symbolName || 'unknown'}`
+      );
       console.log(`  Reason: ${user.reason}`);
       if (from) {
         console.log(`  Location: ${from.sourceRef.filePath}`);
@@ -558,7 +594,9 @@ function printUndocumented() {
   const dbPath = path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');
 
   if (!fs.existsSync(dbPath)) {
-    console.log(colors.yellow + '⚠️  Database not found. Run demo first: npm run demo' + colors.reset);
+    console.log(
+      colors.yellow + '⚠️  Database not found. Run demo first: npm run demo' + colors.reset
+    );
     console.log();
     return;
   }
@@ -600,7 +638,9 @@ function printUndocumented() {
       console.log(colors.green + '✅ All symbols are documented!' + colors.reset);
       console.log();
     } else {
-      console.log(colors.yellow + `Found ${undocumented.length} undocumented symbols:` + colors.reset);
+      console.log(
+        colors.yellow + `Found ${undocumented.length} undocumented symbols:` + colors.reset
+      );
       console.log();
 
       for (const symbol of undocumented) {
@@ -622,7 +662,9 @@ function printUntested() {
   const dbPath = path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');
 
   if (!fs.existsSync(dbPath)) {
-    console.log(colors.yellow + '⚠️  Database not found. Run demo first: npm run demo' + colors.reset);
+    console.log(
+      colors.yellow + '⚠️  Database not found. Run demo first: npm run demo' + colors.reset
+    );
     console.log();
     return;
   }
@@ -683,7 +725,9 @@ function printWithoutResponsibility() {
   const dbPath = path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');
 
   if (!fs.existsSync(dbPath)) {
-    console.log(colors.yellow + '⚠️  Database not found. Run demo first: npm run demo' + colors.reset);
+    console.log(
+      colors.yellow + '⚠️  Database not found. Run demo first: npm run demo' + colors.reset
+    );
     console.log();
     return;
   }
@@ -722,7 +766,11 @@ function printWithoutResponsibility() {
       console.log(colors.green + '✅ All symbols have responsibility definitions!' + colors.reset);
       console.log();
     } else {
-      console.log(colors.yellow + `Found ${withoutResponsibility.length} symbols without responsibility:` + colors.reset);
+      console.log(
+        colors.yellow +
+          `Found ${withoutResponsibility.length} symbols without responsibility:` +
+          colors.reset
+      );
       console.log();
 
       for (const symbol of withoutResponsibility) {
@@ -744,7 +792,9 @@ function printWithoutContract() {
   const dbPath = path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');
 
   if (!fs.existsSync(dbPath)) {
-    console.log(colors.yellow + '⚠️  Database not found. Run demo first: npm run demo' + colors.reset);
+    console.log(
+      colors.yellow + '⚠️  Database not found. Run demo first: npm run demo' + colors.reset
+    );
     console.log();
     return;
   }
@@ -783,7 +833,9 @@ function printWithoutContract() {
       console.log(colors.green + '✅ All symbols have contract specifications!' + colors.reset);
       console.log();
     } else {
-      console.log(colors.yellow + `Found ${withoutContract.length} symbols without contract:` + colors.reset);
+      console.log(
+        colors.yellow + `Found ${withoutContract.length} symbols without contract:` + colors.reset
+      );
       console.log();
 
       for (const symbol of withoutContract) {
@@ -839,7 +891,9 @@ function printFindMethod() {
       console.log();
 
       for (const result of results) {
-        console.log(`${colors.bold}${result.id}${colors.reset} → ${result.sourceRef.qualifiedName}`);
+        console.log(
+          `${colors.bold}${result.id}${colors.reset} → ${result.sourceRef.qualifiedName}`
+        );
         console.log(`  File: ${result.sourceRef.filePath}:${result.sourceRef.line || '?'}`);
         console.log(`  Type: ${result.sourceRef.type}`);
         console.log();
@@ -904,29 +958,28 @@ function printTree() {
     return;
   }
 
-  const printNode = (
-    node: any,
-    prefix: string = '',
-    isLast: boolean = true
-  ) => {
+  const printNode = (node: any, prefix: string = '', isLast: boolean = true) => {
     const connector = isLast ? '└── ' : '├── ';
     const typeColor =
-      node.sourceRef.type === 'class' ? colors.blue :
-      node.sourceRef.type === 'method' ? colors.green :
-      node.sourceRef.type === 'function' ? colors.cyan :
-      colors.reset;
+      node.sourceRef.type === 'class'
+        ? colors.blue
+        : node.sourceRef.type === 'method'
+          ? colors.green
+          : node.sourceRef.type === 'function'
+            ? colors.cyan
+            : colors.reset;
 
     console.log(
       prefix +
-      connector +
-      colors.bold +
-      node.id +
-      colors.reset +
-      ' ' +
-      typeColor +
-      node.sourceRef.qualifiedName +
-      colors.reset +
-      ` (${node.sourceRef.type})`
+        connector +
+        colors.bold +
+        node.id +
+        colors.reset +
+        ' ' +
+        typeColor +
+        node.sourceRef.qualifiedName +
+        colors.reset +
+        ` (${node.sourceRef.type})`
     );
 
     if (node.children && node.children.length > 0) {
@@ -956,7 +1009,9 @@ function printPlans() {
   const dbPath = path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');
 
   if (!fs.existsSync(dbPath)) {
-    console.log(colors.yellow + '⚠️  Database not found. Run demo first: npm run demo' + colors.reset);
+    console.log(
+      colors.yellow + '⚠️  Database not found. Run demo first: npm run demo' + colors.reset
+    );
     console.log();
     return;
   }
@@ -1008,15 +1063,20 @@ function printPlans() {
 
       for (const { plan, symbolId } of filteredPlans) {
         const statusIcon =
-          plan.status === 'completed' ? colors.green + '✅' :
-          plan.status === 'in-progress' ? colors.yellow + '🔄' :
-          plan.status === 'cancelled' ? colors.red + '❌' :
-          colors.blue + '📌';
+          plan.status === 'completed'
+            ? colors.green + '✅'
+            : plan.status === 'in-progress'
+              ? colors.yellow + '🔄'
+              : plan.status === 'cancelled'
+                ? colors.red + '❌'
+                : colors.blue + '📌';
 
         const priorityColor =
-          plan.priority === 'high' ? colors.red :
-          plan.priority === 'medium' ? colors.yellow :
-          colors.cyan;
+          plan.priority === 'high'
+            ? colors.red
+            : plan.priority === 'medium'
+              ? colors.yellow
+              : colors.cyan;
 
         console.log(`${statusIcon} ${colors.bold}${plan.id}${colors.reset} - ${plan.title}`);
         console.log(`   Symbol: ${symbolId}`);
@@ -1027,7 +1087,9 @@ function printPlans() {
         }
 
         if (plan.targetSymbol) {
-          console.log(`   Target: ${plan.targetSymbol}${plan.targetMethod ? '#' + plan.targetMethod : ''}`);
+          console.log(
+            `   Target: ${plan.targetSymbol}${plan.targetMethod ? '#' + plan.targetMethod : ''}`
+          );
         }
 
         if (plan.implementedBy) {
@@ -1038,7 +1100,9 @@ function printPlans() {
           console.log(`   Milestone: ${colors.cyan}${plan.targetMilestone}${colors.reset}`);
         }
 
-        console.log(`   ${plan.description.substring(0, 100)}${plan.description.length > 100 ? '...' : ''}`);
+        console.log(
+          `   ${plan.description.substring(0, 100)}${plan.description.length > 100 ? '...' : ''}`
+        );
         console.log();
       }
     }
@@ -1055,7 +1119,9 @@ function printValidate() {
   const dbPath = path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');
 
   if (!fs.existsSync(dbPath)) {
-    console.log(colors.yellow + '⚠️  Database not found. Run demo first: npm run demo' + colors.reset);
+    console.log(
+      colors.yellow + '⚠️  Database not found. Run demo first: npm run demo' + colors.reset
+    );
     console.log();
     console.log('To create the database, run:');
     console.log(colors.cyan + '  npm run demo' + colors.reset);
@@ -1110,7 +1176,9 @@ function printValidate() {
       }
     } catch (error) {
       // Relationships table might not exist, that's okay
-      console.log(colors.yellow + 'Note: Relationships table not found, skipping...' + colors.reset);
+      console.log(
+        colors.yellow + 'Note: Relationships table not found, skipping...' + colors.reset
+      );
     }
 
     // Create validator and generate detailed report

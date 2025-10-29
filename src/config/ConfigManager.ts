@@ -10,11 +10,7 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
-import {
-  TsdocEdgeConfig,
-  DEFAULT_CONFIG,
-  CONFIG_FILE_NAME,
-} from '../types/config';
+import { CONFIG_FILE_NAME, DEFAULT_CONFIG, TsdocEdgeConfig } from '../types/config';
 
 /**
  * Configuration manager for tsdoc-edge
@@ -93,9 +89,7 @@ export class ConfigManager {
       const userConfig = JSON.parse(content) as Partial<TsdocEdgeConfig>;
       return this.mergeConfig(DEFAULT_CONFIG, userConfig);
     } catch (error) {
-      throw new Error(
-        `Failed to load config from ${this.configPath}: ${error}`
-      );
+      throw new Error(`Failed to load config from ${this.configPath}: ${error}`);
     }
   }
 
@@ -232,11 +226,9 @@ export class ConfigManager {
   public ensureDirectories(): void {
     const paths = this.config.paths;
 
-    const dirsToCreate = [
-      paths.commentsDir,
-      paths.jsonlDir,
-      paths.outputDir,
-    ].filter(Boolean) as string[];
+    const dirsToCreate = [paths.commentsDir, paths.jsonlDir, paths.outputDir].filter(
+      Boolean
+    ) as string[];
 
     for (const dir of dirsToCreate) {
       const absolutePath = this.resolvePath(dir);

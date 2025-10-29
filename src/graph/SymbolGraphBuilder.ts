@@ -124,9 +124,7 @@ export class SymbolGraphBuilder {
    * @returns Array of relationships
    */
   getRelationships(symbolId: string): SymbolRelationship[] {
-    return this.graph.relationships.filter(
-      (r) => r.from === symbolId || r.to === symbolId
-    );
+    return this.graph.relationships.filter((r) => r.from === symbolId || r.to === symbolId);
   }
 
   /**

@@ -3,15 +3,15 @@
  * @packageDocumentation
  */
 
-import {
-  ConnectivityAnalysis,
-  Symbol,
-  DetailedValidationIssue,
-  DetailedValidationReport,
-} from '../types/graph';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { SymbolSearchEngine } from '../graph/SymbolSearchEngine';
 import { ValidationResult } from '../types';
+import {
+  ConnectivityAnalysis,
+  DetailedValidationIssue,
+  DetailedValidationReport,
+  Symbol,
+} from '../types/graph';
 
 /**
  * Validates connectivity and completeness of documentation across the codebase
@@ -142,13 +142,11 @@ export class ConnectivityValidator {
 
     penalties += (analysis.undocumented.length / totalSymbols) * weights.undocumented * 100;
     penalties += (analysis.untested.length / totalSymbols) * weights.untested * 100;
-    penalties +=
-      (analysis.noResponsibility.length / totalSymbols) * weights.noResponsibility * 100;
+    penalties += (analysis.noResponsibility.length / totalSymbols) * weights.noResponsibility * 100;
     penalties += (analysis.noContract.length / totalSymbols) * weights.noContract * 100;
     penalties += (analysis.orphaned.length / totalSymbols) * weights.orphaned * 100;
     penalties += (analysis.brokenLinks.length / totalSymbols) * weights.brokenLinks * 100;
-    penalties +=
-      (analysis.circularDependencies.length / totalSymbols) * weights.circularDeps * 100;
+    penalties += (analysis.circularDependencies.length / totalSymbols) * weights.circularDeps * 100;
 
     return Math.max(0, Math.min(100, 100 - penalties));
   }
@@ -351,8 +349,7 @@ export class ConnectivityValidator {
 
     const completionPercentage =
       allSymbols.length > 0
-        ? ((documented + tested + withResponsibility + withContract) /
-            (allSymbols.length * 4)) *
+        ? ((documented + tested + withResponsibility + withContract) / (allSymbols.length * 4)) *
           100
         : 0;
 
@@ -517,7 +514,8 @@ export class ConnectivityValidator {
     // Header
     output += '╔═══════════════════════════════════════════════════════════════════════════════╗\n';
     output += '║               DETAILED VALIDATION REPORT - ACTIONABLE ITEMS                  ║\n';
-    output += '╚═══════════════════════════════════════════════════════════════════════════════╝\n\n';
+    output +=
+      '╚═══════════════════════════════════════════════════════════════════════════════╝\n\n';
 
     // Summary
     output += `📊 SUMMARY\n`;

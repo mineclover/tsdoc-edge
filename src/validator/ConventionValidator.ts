@@ -86,9 +86,7 @@ export class ConventionValidator {
    * @returns True if @public tag exists
    */
   private hasPublicTag(docComment: DocComment): boolean {
-    const modifierTag = docComment.modifierTagSet.nodes.find(
-      (tag) => tag.tagName === '@public'
-    );
+    const modifierTag = docComment.modifierTagSet.nodes.find((tag) => tag.tagName === '@public');
     return !!modifierTag;
   }
 

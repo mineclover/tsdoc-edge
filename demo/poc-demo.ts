@@ -1,20 +1,21 @@
 #!/usr/bin/env ts-node
+
 /**
  * POC Demo for TSDoc Edge Strict Mode
  * This demonstrates the complete workflow of the 6-category documentation system
  */
 
-import {
-  SymbolGraphBuilder,
-  SymbolSearchEngine,
-  ConnectivityValidator,
-  StrictModeValidator,
-  EnhancedMarkdownGenerator,
-  DatabaseManager,
-} from '../src';
-import { Symbol, EnhancedSymbolDoc } from '../src/types';
 import * as fs from 'fs';
 import * as path from 'path';
+import {
+  ConnectivityValidator,
+  DatabaseManager,
+  EnhancedMarkdownGenerator,
+  StrictModeValidator,
+  SymbolGraphBuilder,
+  SymbolSearchEngine,
+} from '../src';
+import { EnhancedSymbolDoc, Symbol } from '../src/types';
 
 console.log('='.repeat(80));
 console.log('TSDoc Edge - Strict Mode POC Demo');
@@ -100,8 +101,7 @@ const enhancedDoc: EnhancedSymbolDoc = {
 
   // Category 1: Problem Solving
   problemSolving: {
-    description:
-      '대규모 CSV 파일(100MB~5GB)을 처리할 때 발생하는 메모리 부족 문제를 해결합니다.',
+    description: '대규모 CSV 파일(100MB~5GB)을 처리할 때 발생하는 메모리 부족 문제를 해결합니다.',
     context:
       '외부 벤더로부터 매일 수신하는 고객 데이터 파일의 크기가 증가하면서, ' +
       '기존의 pandas.read_csv()로는 전체 파일을 메모리에 로드할 수 없게 되었습니다. ' +
@@ -151,8 +151,7 @@ const enhancedDoc: EnhancedSymbolDoc = {
         {
           name: 'options',
           type: 'ProcessOptions',
-          description:
-            '처리 옵션 (chunkSize, nanStrategy, encoding, onProgress 등)',
+          description: '처리 옵션 (chunkSize, nanStrategy, encoding, onProgress 등)',
         },
       ],
       outputs: [
@@ -295,8 +294,7 @@ const result = await processor.process('large-file.csv', {
         {
           option: 'CSV 유지',
           reason:
-            'CSV는 범용적이지만 파일 크기가 크고 쿼리 성능이 낮음. ' +
-            '데이터 타입 정보 손실.',
+            'CSV는 범용적이지만 파일 크기가 크고 쿼리 성능이 낮음. ' + '데이터 타입 정보 손실.',
         },
         {
           option: 'JSON',
@@ -319,8 +317,7 @@ const result = await processor.process('large-file.csv', {
     {
       target: 'config_loader',
       type: 'module',
-      reason:
-        '애플리케이션 설정 로드 (DB 크리덴셜, 파일 경로, 청크 크기, 워커 수 등)',
+      reason: '애플리케이션 설정 로드 (DB 크리덴셜, 파일 경로, 청크 크기, 워커 수 등)',
       importPath: '../config/config_loader',
     },
     {
@@ -390,8 +387,7 @@ const result = await processor.process('large-file.csv', {
     {
       id: 'PLAN-003',
       title: '다양한 파일 포맷 지원 (JSON, XML)',
-      description:
-        'CSV뿐만 아니라 JSON Lines, XML 파일도 동일한 API로 처리 가능하도록 확장.',
+      description: 'CSV뿐만 아니라 JSON Lines, XML 파일도 동일한 API로 처리 가능하도록 확장.',
       priority: 'low',
       status: 'planned',
       targetMilestone: 'v3.0',
@@ -418,7 +414,9 @@ const result = await processor.process('large-file.csv', {
 console.log('✅ Enhanced Documentation Created (6 Categories):');
 console.log('   1. ✅ Problem Solving');
 console.log('   2. ✅ Functionality (5 features, 4 components)');
-console.log(`   3. ✅ Error Experiences (${enhancedDoc.errorExperiences.length} errors documented)`);
+console.log(
+  `   3. ✅ Error Experiences (${enhancedDoc.errorExperiences.length} errors documented)`
+);
 console.log(`   4. ✅ Design Decisions (${enhancedDoc.decisions.length} ADRs)`);
 console.log(`   5. ✅ Dependencies (${enhancedDoc.dependencies.length} dependencies)`);
 console.log(`   6. ✅ Future Plans (${enhancedDoc.futurePlans.length} plans)`);
@@ -552,7 +550,9 @@ console.log('Key Metrics:');
 console.log(`   📊 Compliance Score: ${validation.complianceScore}/100`);
 console.log(`   📝 Documentation: ${markdown.length} chars, ${markdown.split('\n').length} lines`);
 console.log(`   💾 Database: ${(stats.dbSize / 1024).toFixed(2)} KB`);
-console.log(`   📦 JSONL: ${lines.length} records, ${(fs.statSync(exportPath).size / 1024).toFixed(2)} KB`);
+console.log(
+  `   📦 JSONL: ${lines.length} records, ${(fs.statSync(exportPath).size / 1024).toFixed(2)} KB`
+);
 console.log();
 console.log('Next Steps:');
 console.log('   1. Check generated markdown: cat ' + mdPath);

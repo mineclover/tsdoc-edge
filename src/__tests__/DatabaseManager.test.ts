@@ -7,12 +7,12 @@
  * @testScenario JSONL export and import
  */
 
-import { DatabaseManager } from '../storage/DatabaseManager';
-import { Symbol } from '../types/graph';
-import { EnhancedSymbolDoc } from '../types/enhanced-tags';
 import * as fs from 'fs';
-import * as path from 'path';
 import * as os from 'os';
+import * as path from 'path';
+import { DatabaseManager } from '../storage/DatabaseManager';
+import { EnhancedSymbolDoc } from '../types/enhanced-tags';
+import { Symbol } from '../types/graph';
 
 describe('DatabaseManager', () => {
   let tempDir: string;
@@ -329,7 +329,10 @@ describe('DatabaseManager', () => {
 
       const content = fs.readFileSync(exportPath, 'utf-8');
       // Should be empty or have minimal content
-      const lines = content.trim().split('\n').filter((l) => l.length > 0);
+      const lines = content
+        .trim()
+        .split('\n')
+        .filter((l) => l.length > 0);
       expect(lines.length).toBe(0);
     });
 
