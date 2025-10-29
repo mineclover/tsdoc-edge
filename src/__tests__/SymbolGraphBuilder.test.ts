@@ -4,7 +4,7 @@
  */
 
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
-import { Symbol, SymbolRelationship } from '../types/graph';
+import type { Symbol, SymbolRelationship } from '../types/graph';
 
 describe('SymbolGraphBuilder', () => {
   let builder: SymbolGraphBuilder;

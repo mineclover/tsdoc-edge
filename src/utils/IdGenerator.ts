@@ -116,7 +116,7 @@ export class IdGenerator {
       // Update sequential counter if in sequential mode
       if (this.mode === 'sequential') {
         const numValue = parseInt(id, this.charset.length);
-        if (!isNaN(numValue) && numValue >= this.sequentialCounter) {
+        if (!Number.isNaN(numValue) && numValue >= this.sequentialCounter) {
           this.sequentialCounter = numValue + 1;
         }
       }
@@ -147,7 +147,7 @@ export class IdGenerator {
    * @returns Number of possible IDs with current length
    */
   getCapacity(): number {
-    return Math.pow(this.charset.length, this.length);
+    return this.charset.length ** this.length;
   }
 
   /**

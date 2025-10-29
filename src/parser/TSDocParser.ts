@@ -5,13 +5,18 @@
 
 import {
   TSDocParser as MicrosoftTSDocParser,
-  ParserContext,
+  type ParserContext,
   TSDocConfiguration,
   TSDocTagDefinition,
   TSDocTagSyntaxKind,
 } from '@microsoft/tsdoc';
 import * as ts from 'typescript';
-import { ParsedDocComment, ParseResult } from '../types';
+import type { ParsedDocComment, ParseResult } from '../types';
+
+// TypeScript compiler API internal types
+interface NodeWithJSDoc extends ts.Node {
+  jsDoc?: ts.JSDoc[];
+}
 
 /**
  * Parser for extracting and parsing TSDoc comments from TypeScript source files
@@ -141,7 +146,7 @@ export class TSDocParser {
     errors: Error[]
   ): void {
     // Check if node has JSDoc comments
-    const jsDocComments = (node as any).jsDoc;
+    const jsDocComments = (node as NodeWithJSDoc).jsDoc;
 
     if (jsDocComments && jsDocComments.length > 0) {
       for (const jsDoc of jsDocComments) {

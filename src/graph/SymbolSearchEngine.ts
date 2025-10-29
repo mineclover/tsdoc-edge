@@ -3,8 +3,8 @@
  * @packageDocumentation
  */
 
-import { Symbol, SymbolQuery, SymbolQueryResult } from '../types/graph';
-import { SymbolGraphBuilder } from './SymbolGraphBuilder';
+import type { Symbol, SymbolQuery, SymbolQueryResult } from '../types/graph';
+import type { SymbolGraphBuilder } from './SymbolGraphBuilder';
 
 /**
  * Search engine for finding symbols based on various criteria
@@ -182,7 +182,7 @@ export class SymbolSearchEngine {
    * @param tag - Tag to search for (e.g., "deprecated", "internal")
    * @returns Symbols with the tag
    */
-  findByTag(tag: string): Symbol[] {
+  findByTag(_tag: string): Symbol[] {
     // This would require parsing tag information from the doc comments
     // For now, return empty array - to be implemented with enhanced parser
     return [];

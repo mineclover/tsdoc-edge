@@ -216,7 +216,7 @@ try {
   console.log(`   Errors: ${result3.errors.length}`);
 
   const userServiceDoc = result3.comments.find((c) => c.symbolName === 'UserService');
-  if (userServiceDoc && userServiceDoc.docComment.customBlocks) {
+  if (userServiceDoc?.docComment.customBlocks) {
     console.log('   UserService custom tags:');
     const blocks = userServiceDoc.docComment.customBlocks;
     const usesCount = blocks.filter((b) => b.blockTag.tagName === '@uses').length;

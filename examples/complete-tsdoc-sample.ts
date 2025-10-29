@@ -300,7 +300,7 @@ export class CSVDataProcessor {
    *
    * @public
    */
-  async *loadData(filePath: string, options?: LoadOptions): AsyncGenerator<DataFrame> {
+  async *loadData(_filePath: string, _options?: LoadOptions): AsyncGenerator<DataFrame> {
     // Implementation
     throw new Error('Not implemented');
   }
@@ -324,7 +324,7 @@ export class CSVDataProcessor {
    *
    * @public
    */
-  cleanText(text: string, options?: CleanOptions): string {
+  cleanText(_text: string, _options?: CleanOptions): string {
     // Implementation
     throw new Error('Not implemented');
   }
@@ -348,7 +348,7 @@ export class CSVDataProcessor {
    *
    * @public
    */
-  handleNaN(df: DataFrame, strategy: NaNStrategy): DataFrame {
+  handleNaN(_df: DataFrame, _strategy: NaNStrategy): DataFrame {
     // Implementation
     throw new Error('Not implemented');
   }
@@ -372,7 +372,7 @@ export class CSVDataProcessor {
    *
    * @public
    */
-  async processParallel(chunks: DataFrame[], workers: number = 4): Promise<DataFrame[]> {
+  async processParallel(_chunks: DataFrame[], _workers: number = 4): Promise<DataFrame[]> {
     // Implementation
     throw new Error('Not implemented');
   }

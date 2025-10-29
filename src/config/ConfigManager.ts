@@ -8,9 +8,9 @@
  * @public
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
-import { CONFIG_FILE_NAME, DEFAULT_CONFIG, TsdocEdgeConfig } from '../types/config';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { CONFIG_FILE_NAME, DEFAULT_CONFIG, type TsdocEdgeConfig } from '../types/config';
 
 /**
  * Configuration manager for tsdoc-edge
@@ -304,7 +304,7 @@ export class ConfigManager {
     section: K,
     value: Partial<TsdocEdgeConfig[K]>
   ): void {
-    this.config[section] = { ...this.config[section], ...value } as any;
+    this.config[section] = { ...this.config[section], ...value } as TsdocEdgeConfig[K];
     this.save(this.config);
   }
 }

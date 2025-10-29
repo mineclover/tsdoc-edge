@@ -3,10 +3,10 @@
  * @packageDocumentation
  */
 
-import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
+import type { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { SymbolSearchEngine } from '../graph/SymbolSearchEngine';
-import { ValidationResult } from '../types';
-import {
+import type { ValidationResult } from '../types';
+import type {
   ConnectivityAnalysis,
   DetailedValidationIssue,
   DetailedValidationReport,

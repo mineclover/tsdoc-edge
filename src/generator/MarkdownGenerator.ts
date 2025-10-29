@@ -3,8 +3,21 @@
  * @packageDocumentation
  */
 
-import { DocNode, DocNodeKind } from '@microsoft/tsdoc';
-import { ParsedDocComment } from '../types';
+import { type DocNode, DocNodeKind } from '@microsoft/tsdoc';
+import type { ParsedDocComment } from '../types';
+
+// TSDoc internal node types (not exposed in public API)
+interface DocPlainText extends DocNode {
+  text: string;
+}
+
+interface DocParagraph extends DocNode {
+  nodes: ReadonlyArray<DocNode>;
+}
+
+interface DocCodeSpan extends DocNode {
+  code: string;
+}
 
 /**
  * Generates markdown documentation from parsed TSDoc comments
@@ -98,17 +111,17 @@ export class MarkdownGenerator {
     for (const node of nodes) {
       switch (node.kind) {
         case DocNodeKind.PlainText:
-          result += (node as any).text;
+          result += (node as DocPlainText).text;
           break;
         case DocNodeKind.SoftBreak:
           result += ' ';
           break;
         case DocNodeKind.Paragraph:
-          result += this.renderDocNodes((node as any).nodes);
+          result += this.renderDocNodes((node as DocParagraph).nodes);
           result += '\n\n';
           break;
         case DocNodeKind.CodeSpan:
-          result += `\`${(node as any).code}\``;
+          result += `\`${(node as DocCodeSpan).code}\``;
           break;
         default:
           // Handle other node types as needed

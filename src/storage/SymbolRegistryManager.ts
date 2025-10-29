@@ -4,9 +4,9 @@
  * @responsibility Manage symbol ID registry stored in JSONL
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
-import {
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import type {
   DependencyRelation,
   SourceRef,
   SymbolRegistry,
@@ -122,7 +122,7 @@ export class SymbolRegistryManager {
       lines.push(JSON.stringify(entry));
     }
 
-    fs.writeFileSync(this.registryPath, lines.join('\n') + '\n', 'utf-8');
+    fs.writeFileSync(this.registryPath, `${lines.join('\n')}\n`, 'utf-8');
   }
 
   /**
@@ -499,7 +499,7 @@ export class SymbolRegistryManager {
       if (!nameMap.has(qn)) {
         nameMap.set(qn, []);
       }
-      nameMap.get(qn)!.push(entry);
+      nameMap.get(qn)?.push(entry);
     }
 
     const duplicates: Array<{ qualifiedName: string; entries: SymbolRegistryEntry[] }> = [];
@@ -643,7 +643,7 @@ export class SymbolRegistryManager {
       path.push(symbolId);
 
       const entry = this.findById(symbolId);
-      if (entry && entry.uses) {
+      if (entry?.uses) {
         for (const dep of entry.uses) {
           const depId = dep.targetId;
           if (!visited.has(depId)) {

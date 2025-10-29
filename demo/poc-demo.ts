@@ -5,17 +5,16 @@
  * This demonstrates the complete workflow of the 6-category documentation system
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import {
-  ConnectivityValidator,
   DatabaseManager,
   EnhancedMarkdownGenerator,
   StrictModeValidator,
   SymbolGraphBuilder,
   SymbolSearchEngine,
 } from '../src';
-import { EnhancedSymbolDoc, Symbol } from '../src/types';
+import type { EnhancedSymbolDoc, Symbol } from '../src/types';
 
 console.log('='.repeat(80));
 console.log('TSDoc Edge - Strict Mode POC Demo');
@@ -504,7 +503,7 @@ console.log(`   File Size: ${(fs.statSync(exportPath).size / 1024).toFixed(2)} K
 console.log();
 
 console.log('Sample JSONL Record (first line):');
-console.log(lines[0].substring(0, 200) + '...');
+console.log(`${lines[0].substring(0, 200)}...`);
 console.log();
 
 dbManager.close();
@@ -555,7 +554,7 @@ console.log(
 );
 console.log();
 console.log('Next Steps:');
-console.log('   1. Check generated markdown: cat ' + mdPath);
-console.log('   2. Inspect JSONL: cat ' + exportPath);
-console.log('   3. Query database: sqlite3 ' + dbPath);
+console.log(`   1. Check generated markdown: cat ${mdPath}`);
+console.log(`   2. Inspect JSONL: cat ${exportPath}`);
+console.log(`   3. Query database: sqlite3 ${dbPath}`);
 console.log();

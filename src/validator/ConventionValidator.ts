@@ -3,8 +3,8 @@
  * @packageDocumentation
  */
 
-import { DocComment } from '@microsoft/tsdoc';
-import { ParsedDocComment, ValidationResult } from '../types';
+import type { DocComment } from '@microsoft/tsdoc';
+import type { ParsedDocComment, ValidationResult } from '../types';
 
 /**
  * Validates TSDoc comments against defined conventions
@@ -108,7 +108,7 @@ export class ConventionValidator {
    * @param docComment - TSDoc comment
    * @returns Array of parameter names that are not documented
    */
-  private getUndocumentedParams(docComment: DocComment): string[] {
+  private getUndocumentedParams(_docComment: DocComment): string[] {
     // This is a simplified implementation
     // In a real implementation, you would extract actual parameters from the function signature
     return [];
@@ -130,7 +130,7 @@ export class ConventionValidator {
    * @param parsedComment - Parsed doc comment
    * @returns True if return documentation is required
    */
-  private shouldHaveReturns(parsedComment: ParsedDocComment): boolean {
+  private shouldHaveReturns(_parsedComment: ParsedDocComment): boolean {
     // This is a simplified check
     // In a real implementation, you would check the actual return type
     return true;

@@ -4,8 +4,8 @@
  * Debug validation script to understand TSDoc parsing issues
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { TSDocParser } from '../src/parser/TSDocParser';
 
 const testFile = path.join(__dirname, '../src/index.ts');

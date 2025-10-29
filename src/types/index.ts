@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import { DocComment } from '@microsoft/tsdoc';
+import type { DocComment } from '@microsoft/tsdoc';
 
 // Re-export enhanced tag types
 export * from './enhanced-tags';

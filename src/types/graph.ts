@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import { ContractSpec, ResponsibilitySpec, SymbolRelationship, TestMapping } from './tags';
+import type { ContractSpec, ResponsibilitySpec, SymbolRelationship, TestMapping } from './tags';
 
 // Re-export types from tags that are used in graph
 export type { SymbolRelationship, ContractSpec, TestMapping, ResponsibilitySpec };

@@ -5,7 +5,7 @@
  * @architecture Validation Layer - Strict Mode Enforcement
  */
 
-import {
+import type {
   DecisionRecord,
   DependencySpec,
   EnhancedSymbolDoc,

@@ -5,8 +5,8 @@
  * Tests: ID generation → TSDoc parsing → JSONL merge → DB build → Query
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { TSDocParser } from '../src/parser/TSDocParser';
 import { DatabaseManager } from '../src/storage/DatabaseManager';
 import { SymbolRegistryManager } from '../src/storage/SymbolRegistryManager';

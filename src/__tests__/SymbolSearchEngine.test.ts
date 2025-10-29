@@ -5,8 +5,8 @@
 
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { SymbolSearchEngine } from '../graph/SymbolSearchEngine';
-import { Symbol } from '../types/graph';
-import { ContractSpec, ResponsibilitySpec } from '../types/tags';
+import type { Symbol } from '../types/graph';
+import type { ContractSpec, ResponsibilitySpec } from '../types/tags';
 
 describe('SymbolSearchEngine', () => {
   let builder: SymbolGraphBuilder;

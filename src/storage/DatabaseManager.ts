@@ -5,12 +5,38 @@
  * @architecture Data Layer - Database Management
  */
 
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import Database from 'better-sqlite3';
-import * as fs from 'fs';
-import * as path from 'path';
 import { ConfigManager } from '../config/ConfigManager';
-import { EnhancedSymbolDoc } from '../types/enhanced-tags';
-import { Symbol } from '../types/graph';
+import type { EnhancedSymbolDoc } from '../types/enhanced-tags';
+import type { Symbol } from '../types/graph';
+
+// SQLite row types
+interface SymbolRow {
+  id: string;
+  name: string;
+  type: string;
+  file_path: string;
+  line: number;
+  column: number;
+  is_exported: number;
+  is_public: number;
+  summary: string | null;
+}
+
+interface EnhancedDocRow {
+  symbol_id: string;
+  problem_solving: string;
+  functionality: string;
+  error_experiences: string;
+  decisions: string;
+  dependencies: string;
+  future_plans: string;
+  created_at: string;
+  updated_at: string;
+  version: string;
+}
 
 /**
  * Database manager for symbol and documentation storage
@@ -29,7 +55,7 @@ import { Symbol } from '../types/graph';
  * @testScenario Statistics tracking
  */
 export class DatabaseManager {
-  private db: Database.Database;
+  public readonly db: Database.Database;
   private dbPath: string;
   private jsonlPath: string;
 
@@ -187,20 +213,20 @@ export class DatabaseManager {
    */
   getSymbol(id: string): Symbol | null {
     const stmt = this.db.prepare('SELECT * FROM symbols WHERE id = ?');
-    const row = stmt.get(id) as any;
+    const row = stmt.get(id) as SymbolRow | undefined;
 
     if (!row) return null;
 
     return {
       id: row.id,
       name: row.name,
-      type: row.type,
+      type: row.type as Symbol['type'],
       filePath: row.file_path,
       line: row.line,
       column: row.column,
       isExported: row.is_exported === 1,
       isPublic: row.is_public === 1,
-      summary: row.summary,
+      summary: row.summary ?? undefined,
       tests: [], // Need to fetch from test_mappings
       designDecisions: [], // Need to fetch from decision_records
     };
@@ -213,7 +239,7 @@ export class DatabaseManager {
    */
   getEnhancedDoc(symbolId: string): EnhancedSymbolDoc | null {
     const stmt = this.db.prepare('SELECT * FROM enhanced_docs WHERE symbol_id = ?');
-    const row = stmt.get(symbolId) as any;
+    const row = stmt.get(symbolId) as EnhancedDocRow | undefined;
 
     if (!row) return null;
 

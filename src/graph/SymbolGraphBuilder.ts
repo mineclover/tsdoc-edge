@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import { Symbol, SymbolGraph, SymbolRelationship } from '../types/graph';
+import type { Symbol, SymbolGraph, SymbolRelationship } from '../types/graph';
 
 /**
  * Builds and maintains a graph of all symbols and their relationships

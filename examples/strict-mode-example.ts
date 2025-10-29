@@ -3,13 +3,8 @@
  * @packageDocumentation
  */
 
-import {
-  DatabaseManager,
-  EnhancedMarkdownGenerator,
-  StrictModeValidator,
-  SymbolGraphBuilder,
-} from '../src';
-import { EnhancedSymbolDoc, Symbol } from '../src/types';
+import { DatabaseManager, EnhancedMarkdownGenerator, StrictModeValidator } from '../src';
+import type { EnhancedSymbolDoc, Symbol } from '../src/types';
 
 /**
  * Example: Creating a fully documented data processor

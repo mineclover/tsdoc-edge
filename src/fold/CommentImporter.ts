@@ -3,11 +3,15 @@
  * @packageDocumentation
  */
 
-import * as crypto from 'crypto';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as crypto from 'node:crypto';
+import * as fs from 'node:fs';
 import * as ts from 'typescript';
-import { CommentState, FileCommentState } from '../types/comment-state';
+import type { CommentState, FileCommentState } from '../types/comment-state';
+
+// TypeScript compiler API internal types
+interface NodeWithJSDoc extends ts.Node {
+  jsDoc?: ts.JSDoc[];
+}
 
 /**
  * Imports comment states from Markdown and applies to TypeScript files
@@ -224,7 +228,7 @@ export class CommentImporter {
     const sourceFile = ts.createSourceFile('temp.ts', sourceCode, ts.ScriptTarget.Latest, true);
 
     const visit = (node: ts.Node) => {
-      const jsDocComments = (node as any).jsDoc;
+      const jsDocComments = (node as NodeWithJSDoc).jsDoc;
       if (jsDocComments && jsDocComments.length > 0) {
         for (const jsDoc of jsDocComments) {
           const fullText = jsDoc.getFullText();
@@ -310,11 +314,12 @@ export class CommentImporter {
     const replaceRanges: Array<{ start: number; end: number; replacement: string }> = [];
 
     for (const [hash, range] of sourceComments.entries()) {
-      if (replacementMap.has(hash)) {
+      const replacement = replacementMap.get(hash);
+      if (replacement !== undefined) {
         replaceRanges.push({
           start: range.start,
           end: range.end,
-          replacement: replacementMap.get(hash)!,
+          replacement,
         });
       }
     }

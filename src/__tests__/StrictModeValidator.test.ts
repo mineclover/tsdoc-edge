@@ -3,7 +3,7 @@
  * @testScenario Verify strict mode validation for 6-category documentation
  */
 
-import { EnhancedSymbolDoc } from '../types/enhanced-tags';
+import type { EnhancedSymbolDoc } from '../types/enhanced-tags';
 import { StrictModeValidator } from '../validator/StrictModeValidator';
 
 describe('StrictModeValidator', () => {

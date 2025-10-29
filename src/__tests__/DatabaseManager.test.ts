@@ -7,12 +7,12 @@
  * @testScenario JSONL export and import
  */
 
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import { DatabaseManager } from '../storage/DatabaseManager';
-import { EnhancedSymbolDoc } from '../types/enhanced-tags';
-import { Symbol } from '../types/graph';
+import type { EnhancedSymbolDoc } from '../types/enhanced-tags';
+import type { Symbol } from '../types/graph';
 
 describe('DatabaseManager', () => {
   let tempDir: string;

@@ -3,10 +3,10 @@
  * @packageDocumentation
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { ConfigManager } from '../config/ConfigManager';
-import {
+import type {
   CollapseOptions,
   CommentState,
   ExpandOptions,
@@ -125,7 +125,7 @@ export class CommentStateManager {
    * @returns Export result
    * @public
    */
-  exportAll(sourceDir: string, pattern: string = '**/*.ts'): ExportResult {
+  exportAll(sourceDir: string, _pattern: string = '**/*.ts'): ExportResult {
     const exportedFiles: string[] = [];
     let filesExported = 0;
     let commentsExported = 0;

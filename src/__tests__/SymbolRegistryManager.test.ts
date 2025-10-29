@@ -7,9 +7,9 @@
  * @testScenario Search functionality
  */
 
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 
 describe('SymbolRegistryManager', () => {
@@ -255,8 +255,9 @@ describe('SymbolRegistryManager', () => {
     test('should get children of a parent', () => {
       const classEntry = manager.findByQualifiedName('UserService');
       expect(classEntry).toBeDefined();
+      if (!classEntry) throw new Error('classEntry is undefined');
 
-      const children = manager.getChildren(classEntry!.id);
+      const children = manager.getChildren(classEntry.id);
       expect(children).toHaveLength(2);
     });
 
@@ -628,7 +629,7 @@ describe('SymbolRegistryManager', () => {
     });
 
     test('should detect orphaned parent references', () => {
-      const id = manager.register({
+      const _id = manager.register({
         filePath: 'src/User.ts',
         symbolName: 'save',
         type: 'method',
@@ -658,7 +659,7 @@ describe('SymbolRegistryManager', () => {
 
       // Manually corrupt the dependency by modifying the registry
       const entry = manager.findById(id1);
-      if (entry && entry.uses) {
+      if (entry?.uses) {
         entry.uses.push({ targetId: 'non-existent-id', reason: 'Invalid dependency' });
       }
 

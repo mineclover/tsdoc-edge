@@ -5,8 +5,8 @@
  * @architecture Document Generation Layer
  */
 
-import { EnhancedSymbolDoc } from '../types/enhanced-tags';
-import { Symbol } from '../types/graph';
+import type { EnhancedSymbolDoc } from '../types/enhanced-tags';
+import type { Symbol } from '../types/graph';
 
 /**
  * Generator for enhanced markdown documentation
@@ -291,11 +291,11 @@ export class EnhancedMarkdownGenerator {
       grouped[plan.status].push(plan);
     });
 
-    const statusOrder = ['in-progress', 'planned', 'completed', 'cancelled'];
+    const statusOrder = ['in-progress', 'planned', 'completed', 'cancelled'] as const;
 
     statusOrder.forEach((status) => {
       if (grouped[status] && grouped[status].length > 0) {
-        md += `### ${this.getStatusEmoji(status as any)} ${this.capitalizeFirst(status)}\n\n`;
+        md += `### ${this.getStatusEmoji(status)} ${this.capitalizeFirst(status)}\n\n`;
 
         grouped[status].forEach((plan) => {
           md += `#### ${plan.id}: ${plan.title}\n\n`;

@@ -5,12 +5,49 @@
  * @architecture Scanner Layer - Full Scan Process
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { TSDocParser } from '../parser/TSDocParser';
-import { DatabaseManager } from '../storage/DatabaseManager';
-import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
-import { Symbol } from '../types/graph';
+import type { DatabaseManager } from '../storage/DatabaseManager';
+import type { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
+import type { Symbol } from '../types/graph';
+
+// TSDoc internal types (not exposed in public API)
+interface DocNodeWithText {
+  kind: string;
+  text?: string;
+}
+
+interface DocNodeWithChildren {
+  kind: string;
+  nodes?: readonly DocNodeWithText[];
+}
+
+interface TSDocBlock {
+  blockTag: { tagName: string };
+  content: {
+    nodes: readonly DocNodeWithChildren[];
+  };
+}
+
+interface TSDocComment {
+  summarySection?: {
+    nodes: readonly DocNodeWithChildren[];
+  };
+  customBlocks?: readonly TSDocBlock[];
+}
+
+interface ParsedComment {
+  symbolName: string;
+  filePath: string;
+  docComment: TSDocComment;
+}
+
+interface RegistryEntry {
+  sourceRef: {
+    type?: string;
+  };
+}
 
 /**
  * Scanner configuration
@@ -162,16 +199,14 @@ export class FileScanner {
    * @returns ID or null if not found
    * @private
    */
-  private extractIdTag(docComment: any): string | null {
+  private extractIdTag(docComment: TSDocComment): string | null {
     const customBlocks = docComment.customBlocks || [];
     for (const block of customBlocks) {
       if (block.blockTag.tagName === '@id') {
         const content = block.content.nodes
-          .flatMap((node: any) => {
+          .flatMap((node) => {
             if (node.kind === 'Paragraph' && node.nodes) {
-              return node.nodes
-                .filter((n: any) => n.kind === 'PlainText')
-                .map((n: any) => n.text || '');
+              return node.nodes.filter((n) => n.kind === 'PlainText').map((n) => n.text || '');
             }
             return [];
           })
@@ -191,16 +226,14 @@ export class FileScanner {
    * @returns Symbol object
    * @private
    */
-  private buildSymbol(comment: any, id: string, registryEntry: any): Symbol {
+  private buildSymbol(comment: ParsedComment, id: string, registryEntry: RegistryEntry): Symbol {
     // Extract summary
     const summarySection = comment.docComment.summarySection;
     const summary = summarySection
       ? summarySection.nodes
-          .flatMap((node: any) => {
+          .flatMap((node) => {
             if (node.kind === 'Paragraph' && node.nodes) {
-              return node.nodes
-                .filter((n: any) => n.kind === 'PlainText')
-                .map((n: any) => n.text || '');
+              return node.nodes.filter((n) => n.kind === 'PlainText').map((n) => n.text || '');
             }
             return [];
           })
@@ -209,14 +242,14 @@ export class FileScanner {
       : '';
 
     // Check if @public tag exists
-    const hasPublicTag = comment.docComment.customBlocks.some(
-      (block: any) => block.blockTag.tagName === '@public'
+    const hasPublicTag = (comment.docComment.customBlocks || []).some(
+      (block) => block.blockTag.tagName === '@public'
     );
 
     return {
       id,
       name: comment.symbolName,
-      type: (registryEntry.sourceRef.type || 'unknown') as any,
+      type: (registryEntry.sourceRef.type || 'unknown') as Symbol['type'],
       filePath: comment.filePath,
       line: 1,
       column: 0,
@@ -249,10 +282,10 @@ export class FileScanner {
         return;
       }
 
-      let entries;
+      let entries: fs.Dirent[];
       try {
         entries = fs.readdirSync(currentDir, { withFileTypes: true });
-      } catch (error) {
+      } catch (_error) {
         // Skip directories that can't be read
         return;
       }

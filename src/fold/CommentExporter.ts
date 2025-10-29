@@ -3,11 +3,16 @@
  * @packageDocumentation
  */
 
-import * as crypto from 'crypto';
-import * as fs from 'fs';
-import * as path from 'path';
+import * as crypto from 'node:crypto';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import * as ts from 'typescript';
-import { CommentLocation, CommentState, FileCommentState } from '../types/comment-state';
+import type { CommentLocation, CommentState, FileCommentState } from '../types/comment-state';
+
+// TypeScript compiler API internal types
+interface NodeWithJSDoc extends ts.Node {
+  jsDoc?: ts.JSDoc[];
+}
 
 /**
  * Exports TSDoc comments from TypeScript files to Markdown format
@@ -46,7 +51,7 @@ export class CommentExporter {
     sourceCode: string,
     comments: CommentState[]
   ): void {
-    const jsDocComments = (node as any).jsDoc;
+    const jsDocComments = (node as NodeWithJSDoc).jsDoc;
 
     if (jsDocComments && jsDocComments.length > 0) {
       for (const jsDoc of jsDocComments) {

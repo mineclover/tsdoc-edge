@@ -5,8 +5,7 @@
  * Demonstrates TSDoc-based dependency tracking
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as path from 'node:path';
 import { SymbolRegistryManager } from '../src/storage/SymbolRegistryManager';
 
 console.log('='.repeat(80));

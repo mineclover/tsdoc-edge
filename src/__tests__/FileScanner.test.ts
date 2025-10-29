@@ -6,9 +6,9 @@
  * @testScenario Match symbols with registry
  */
 
-import * as fs from 'fs';
-import * as os from 'os';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import { FileScanner } from '../scanner/FileScanner';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
@@ -270,7 +270,7 @@ export class TestClass {}`,
 
   describe('Statistics', () => {
     test('should track duration', async () => {
-      const sourceDir = path.join(tempDir, 'src');
+      const _sourceDir = path.join(tempDir, 'src');
 
       // Create empty scan
       const result = await scanner.scan();

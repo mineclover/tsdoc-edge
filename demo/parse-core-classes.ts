@@ -4,8 +4,8 @@
  * Parse core classes and verify documentation
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { TSDocParser } from '../src/parser/TSDocParser';
 import { DatabaseManager } from '../src/storage/DatabaseManager';
 import { SymbolRegistryManager } from '../src/storage/SymbolRegistryManager';
@@ -27,7 +27,7 @@ if (fs.existsSync(dbPath)) {
 }
 
 const dbManager = new DatabaseManager(dbPath, jsonlPath);
-const registry = new SymbolRegistryManager(registryPath);
+const _registry = new SymbolRegistryManager(registryPath);
 
 // Core classes to parse
 const coreFiles = [

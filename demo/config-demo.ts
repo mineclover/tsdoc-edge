@@ -6,8 +6,8 @@
  * Demonstrates the new configuration system in TSDoc Edge v0.4.0
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { CommentStateManager, ConfigManager, DatabaseManager } from '../src/index';
 
 console.log('='.repeat(80));
@@ -123,9 +123,9 @@ console.log('-'.repeat(80));
 
 // Reset singleton to use new config
 ConfigManager.reset();
-const newConfigManager = ConfigManager.getInstance(demoDir);
+const _newConfigManager = ConfigManager.getInstance(demoDir);
 
-const stateManager = new CommentStateManager();
+const _stateManager = new CommentStateManager();
 // Automatically uses config.paths.commentsDir
 
 console.log('✅ CommentStateManager initialized');
@@ -156,7 +156,7 @@ console.log('DEMO 9: Custom Path Override');
 console.log('-'.repeat(80));
 
 const customComments = path.join(demoDir, 'override-comments');
-const customStateManager = new CommentStateManager(customComments);
+const _customStateManager = new CommentStateManager(customComments);
 
 console.log('✅ CommentStateManager with custom path');
 console.log('   Custom path:', customComments);
