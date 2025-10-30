@@ -23,15 +23,7 @@ export class TestCoverageAnalyzer {
    * @public
    */
   analyzeFile(sourceFile: string): TestCoverageInfo {
-    /**
-     * testFile
-     * @public
-     */
     const testFile = this.findTestFile(sourceFile);
-    /**
-     * hasTest
-     * @public
-     */
     const hasTest = !!testFile;
 
     return {
@@ -61,22 +53,10 @@ export class TestCoverageAnalyzer {
    * @returns Test file path or undefined
    */
   private findTestFile(sourceFile: string): string | undefined {
-    /**
-     * dir
-     * @public
-     */
     const dir = path.dirname(sourceFile);
-    /**
-     * basename
-     * @public
-     */
     const basename = path.basename(sourceFile, '.ts');
 
     // Common test file patterns
-    /**
-     * patterns
-     * @public
-     */
     const patterns = [
       // Same directory
       path.join(dir, `${basename}.test.ts`),
@@ -127,25 +107,9 @@ export class TestCoverageAnalyzer {
     filesWithoutTests: number;
     coveragePercentage: number;
   } {
-    /**
-     * totalFiles
-     * @public
-     */
     const totalFiles = coverageInfo.length;
-    /**
-     * filesWithTests
-     * @public
-     */
     const filesWithTests = coverageInfo.filter((info) => info.hasTest).length;
-    /**
-     * filesWithoutTests
-     * @public
-     */
     const filesWithoutTests = totalFiles - filesWithTests;
-    /**
-     * coveragePercentage
-     * @public
-     */
     const coveragePercentage = totalFiles > 0 ? (filesWithTests / totalFiles) * 100 : 0;
 
     return {

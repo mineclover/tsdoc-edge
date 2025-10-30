@@ -63,6 +63,7 @@ export class ConfigManager {
    * Reset singleton instance (for testing)
    *
    * @public
+   * @returns void - No return value
    */
   public static reset(): void {
     ConfigManager.instance = null;
@@ -85,15 +86,7 @@ export class ConfigManager {
     }
 
     try {
-      /**
-       * content
-       * @public
-       */
       const content = fs.readFileSync(this.configPath, 'utf-8');
-      /**
-       * userConfig
-       * @public
-       */
       const userConfig = JSON.parse(content) as Partial<TsdocEdgeConfig>;
       return this.mergeConfig(DEFAULT_CONFIG, userConfig);
       /**
@@ -165,13 +158,10 @@ export class ConfigManager {
    * @throws Error if write fails
    *
    * @public
+   * @returns void - No return value
    */
   public save(config: TsdocEdgeConfig): void {
     try {
-      /**
-       * content
-       * @public
-       */
       const content = JSON.stringify(config, null, 2);
       fs.writeFileSync(this.configPath, content, 'utf-8');
       this.config = config;
@@ -193,6 +183,7 @@ export class ConfigManager {
    * @throws Error if file exists and force is false
    *
    * @public
+   * @returns void - No return value
    */
   public init(options: Partial<TsdocEdgeConfig> = {}, force = false): void {
     if (fs.existsSync(this.configPath) && !force) {
@@ -201,10 +192,6 @@ export class ConfigManager {
       );
     }
 
-    /**
-     * config
-     * @public
-     */
     const config = this.mergeConfig(DEFAULT_CONFIG, options);
     this.save(config);
   }
@@ -246,18 +233,11 @@ export class ConfigManager {
    * Create all configured directories if they don't exist
    *
    * @public
+   * @returns void - No return value
    */
   public ensureDirectories(): void {
-    /**
-     * paths
-     * @public
-     */
     const paths = this.config.paths;
 
-    /**
-     * dirsToCreate
-     * @public
-     */
     const dirsToCreate = [paths.commentsDir, paths.jsonlDir, paths.outputDir].filter(
       Boolean
     ) as string[];
@@ -267,10 +247,6 @@ export class ConfigManager {
      * @public
      */
     for (const dir of dirsToCreate) {
-      /**
-       * absolutePath
-       * @public
-       */
       const absolutePath = this.resolvePath(dir);
       if (!fs.existsSync(absolutePath)) {
         fs.mkdirSync(absolutePath, { recursive: true });
@@ -278,10 +254,6 @@ export class ConfigManager {
     }
 
     // Create parent directory for database file
-    /**
-     * dbDir
-     * @public
-     */
     const dbDir = path.dirname(this.resolvePath(paths.databasePath));
     if (!fs.existsSync(dbDir)) {
       fs.mkdirSync(dbDir, { recursive: true });
@@ -296,10 +268,6 @@ export class ConfigManager {
    * @public
    */
   public validate(): { valid: boolean; errors: string[] } {
-    /**
-     * errors
-     * @public
-     */
     const errors: string[] = [];
 
     // Validate project
@@ -323,10 +291,6 @@ export class ConfigManager {
 
     // Validate connectivity score range
     if (this.config.validation?.minConnectivityScore !== undefined) {
-      /**
-       * score
-       * @public
-       */
       const score = this.config.validation.minConnectivityScore;
       if (score < 0 || score > 100) {
         errors.push('validation.minConnectivityScore must be between 0 and 100');

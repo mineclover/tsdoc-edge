@@ -82,22 +82,10 @@ export class DocumentationFixer {
     } = options;
 
     try {
-      /**
-       * sourceCode
-       * @public
-       */
       const sourceCode = fs.readFileSync(filePath, 'utf-8');
-      /**
-       * sourceFile
-       * @public
-       */
       const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
 
       // Filter scores that need fixing
-      /**
-       * needsFixing
-       * @public
-       */
       const needsFixing = scores.filter(
         (s) => s.filePath === filePath && s.qualityScore < minScore
       );
@@ -111,10 +99,6 @@ export class DocumentationFixer {
       }
 
       // Build fixes
-      /**
-       * fixes
-       * @public
-       */
       const fixes: Array<{ start: number; end: number; replacement: string; isAppend?: boolean }> =
         [];
 
@@ -123,10 +107,6 @@ export class DocumentationFixer {
        * @public
        */
       for (const score of needsFixing) {
-        /**
-         * fix
-         * @public
-         */
         const fix = this.generateFix(sourceFile, score, {
           addSummary,
           addParams,
@@ -149,10 +129,6 @@ export class DocumentationFixer {
       }
 
       // Apply fixes (from end to start to preserve positions)
-      /**
-       * lines
-       * @public
-       */
       const lines = sourceCode.split('\n');
       fixes.sort((a, b) => b.start - a.start);
 
@@ -161,15 +137,7 @@ export class DocumentationFixer {
        * @public
        */
       for (const fix of fixes) {
-        /**
-         * startLine
-         * @public
-         */
         const startLine = this.getLineNumber(sourceCode, fix.start);
-        /**
-         * endLine
-         * @public
-         */
         const endLine = this.getLineNumber(sourceCode, fix.end);
 
         if (fix.isAppend) {
@@ -177,24 +145,12 @@ export class DocumentationFixer {
           lines.splice(endLine, 0, fix.replacement);
         } else {
           // Insert new comment before the declaration
-          /**
-           * indent
-           * @public
-           */
           const indent = this.getIndentation(lines[startLine]);
-          /**
-           * comment
-           * @public
-           */
           const comment = this.formatComment(fix.replacement, indent);
           lines.splice(startLine, 0, comment);
         }
       }
 
-      /**
-       * newContent
-       * @public
-       */
       const newContent = lines.join('\n');
 
       if (!dryRun) {
@@ -240,20 +196,12 @@ export class DocumentationFixer {
     }
   ): { start: number; end: number; replacement: string; isAppend?: boolean } | null {
     // Find the node at the line
-    /**
-     * node
-     * @public
-     */
     const node = this.findNodeAtLine(sourceFile, score.line - 1);
     if (!node) {
       return null;
     }
 
     // Generate documentation parts to add
-    /**
-     * parts
-     * @public
-     */
     const parts: string[] = [];
 
     // If no documentation exists, generate full documentation
@@ -265,10 +213,6 @@ export class DocumentationFixer {
 
       // Parameters
       if (options.addParams) {
-        /**
-         * params
-         * @public
-         */
         const params = this.extractParameters(node);
         /**
          * param
@@ -281,13 +225,13 @@ export class DocumentationFixer {
 
       // Returns
       if (options.addReturns) {
-        /**
-         * returnType
-         * @public
-         */
         const returnType = this.extractReturnType(node);
-        if (returnType && returnType !== 'void') {
-          parts.push(`@returns ${this.generateReturnsDescription(returnType)}`);
+        if (returnType) {
+          if (returnType === 'void') {
+            parts.push('@returns void - No return value');
+          } else {
+            parts.push(`@returns ${this.generateReturnsDescription(returnType)}`);
+          }
         }
       }
 
@@ -321,21 +265,9 @@ export class DocumentationFixer {
 
       if (missing.startsWith('@param') && options.addParams) {
         // Extract param name from missing string "@param paramName"
-        /**
-         * match
-         * @public
-         */
         const match = missing.match(/@param\s+(\w+)/);
         if (match) {
-          /**
-           * paramName
-           * @public
-           */
           const paramName = match[1];
-          /**
-           * param
-           * @public
-           */
           const param = this.extractParameters(node).find((p) => p.name === paramName);
           if (param) {
             parts.push(`@param ${param.name} - ${param.description}`);
@@ -344,13 +276,13 @@ export class DocumentationFixer {
       }
 
       if (missing === '@returns' && options.addReturns) {
-        /**
-         * returnType
-         * @public
-         */
         const returnType = this.extractReturnType(node);
-        if (returnType && returnType !== 'void') {
-          parts.push(`@returns ${this.generateReturnsDescription(returnType)}`);
+        if (returnType) {
+          if (returnType === 'void') {
+            parts.push('@returns void - No return value');
+          } else {
+            parts.push(`@returns ${this.generateReturnsDescription(returnType)}`);
+          }
         }
       }
     }
@@ -361,37 +293,17 @@ export class DocumentationFixer {
 
     // For existing documentation, we need to append to the existing JSDoc
     // This is a simplified approach - we'll add new tags before the closing */
-    /**
-     * jsDocComment
-     * @public
-     */
     const jsDocComment = this.getExistingJSDocComment(node, sourceFile);
     if (!jsDocComment) {
       return null;
     }
 
     // Get indentation from the JSDoc start
-    /**
-     * { line: startLine }
-     * @public
-     */
     const { line: startLine } = sourceFile.getLineAndCharacterOfPosition(jsDocComment.getStart());
-    /**
-     * sourceLines
-     * @public
-     */
     const sourceLines = sourceFile.getFullText().split('\n');
-    /**
-     * indent
-     * @public
-     */
     const indent = this.getIndentation(sourceLines[startLine]);
 
     // Format the new tags with proper indentation
-    /**
-     * formattedParts
-     * @public
-     */
     const formattedParts = parts.map((p) => `${indent} * ${p}`).join('\n');
 
     return {
@@ -411,19 +323,11 @@ export class DocumentationFixer {
    */
   private getExistingJSDocComment(node: ts.Node, _sourceFile: ts.SourceFile): ts.JSDoc | null {
     // For variable declarations, check the parent VariableStatement
-    /**
-     * targetNode
-     * @public
-     */
     let targetNode = node;
     if (ts.isVariableDeclaration(node) && node.parent && node.parent.parent) {
       targetNode = node.parent.parent; // VariableStatement
     }
 
-    /**
-     * jsDocTags
-     * @public
-     */
     const jsDocTags = (targetNode as unknown as { jsDoc?: ts.JSDoc[] }).jsDoc;
     if (!jsDocTags || jsDocTags.length === 0) {
       return null;
@@ -442,21 +346,9 @@ export class DocumentationFixer {
    * @returns Node or null
    */
   private findNodeAtLine(sourceFile: ts.SourceFile, line: number): ts.Node | null {
-    /**
-     * result
-     * @public
-     */
     let result: ts.Node | null = null;
 
-    /**
-     * visit
-     * @public
-     */
     const visit = (node: ts.Node) => {
-      /**
-       * { line: nodeLine }
-       * @public
-       */
       const { line: nodeLine } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
       if (nodeLine === line) {
         // Skip catch clause variables (error parameters)
@@ -513,20 +405,8 @@ export class DocumentationFixer {
     }
 
     return node.parameters.map((param) => {
-      /**
-       * name
-       * @public
-       */
       const name = param.name.getText();
-      /**
-       * type
-       * @public
-       */
       const type = param.type ? param.type.getText() : 'any';
-      /**
-       * description
-       * @public
-       */
       const description = `${name} parameter`;
 
       return { name, type, description };
@@ -576,10 +456,6 @@ export class DocumentationFixer {
    * @returns Indentation string
    */
   private getIndentation(line: string): string {
-    /**
-     * match
-     * @public
-     */
     const match = line.match(/^(\s*)/);
     return match ? match[1] : '';
   }
@@ -592,15 +468,7 @@ export class DocumentationFixer {
    * @returns Formatted comment
    */
   private formatComment(content: string, indent: string): string {
-    /**
-     * lines
-     * @public
-     */
     const lines = content.split('\n');
-    /**
-     * formatted
-     * @public
-     */
     const formatted = [
       `${indent}/**`,
       ...lines.map((line) => `${indent} * ${line}`),

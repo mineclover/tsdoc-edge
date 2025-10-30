@@ -33,15 +33,7 @@ export class CommentExporter {
    * @public
    */
   extractComments(filePath: string, sourceCode: string): CommentState[] {
-    /**
-     * comments
-     * @public
-     */
     const comments: CommentState[] = [];
-    /**
-     * sourceFile
-     * @public
-     */
     const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
 
     this.visitNode(sourceFile, filePath, sourceCode, comments);
@@ -63,10 +55,6 @@ export class CommentExporter {
     sourceCode: string,
     comments: CommentState[]
   ): void {
-    /**
-     * jsDocComments
-     * @public
-     */
     const jsDocComments = (node as NodeWithJSDoc).jsDoc;
 
     if (jsDocComments && jsDocComments.length > 0) {
@@ -75,43 +63,15 @@ export class CommentExporter {
        * @public
        */
       for (const jsDoc of jsDocComments) {
-        /**
-         * fullText
-         * @public
-         */
         const fullText = jsDoc.getFullText();
-        /**
-         * symbolName
-         * @public
-         */
         const symbolName = this.getSymbolName(node);
 
         // Get location
-        /**
-         * sourceFile
-         * @public
-         */
         const sourceFile = node.getSourceFile();
-        /**
-         * { line, character }
-         * @public
-         */
         const { line, character } = sourceFile.getLineAndCharacterOfPosition(jsDoc.pos);
-        /**
-         * endPos
-         * @public
-         */
         const endPos = jsDoc.end;
-        /**
-         * { line: endLine }
-         * @public
-         */
         const { line: endLine } = sourceFile.getLineAndCharacterOfPosition(endPos);
 
-        /**
-         * location
-         * @public
-         */
         const location: CommentLocation = {
           filePath,
           line: line + 1, // 1-based
@@ -120,16 +80,8 @@ export class CommentExporter {
         };
 
         // Create collapsed form
-        /**
-         * collapsedComment
-         * @public
-         */
         const collapsedComment = this.createCollapsedForm(fullText);
 
-        /**
-         * state
-         * @public
-         */
         const state: CommentState = {
           id: this.generateCommentId(location),
           contentHash: this.generateContentHash(fullText, symbolName),
@@ -185,15 +137,7 @@ export class CommentExporter {
    */
   private createCollapsedForm(fullComment: string): string {
     // Extract summary (first non-empty line after /**)
-    /**
-     * lines
-     * @public
-     */
     const lines = fullComment.split('\n');
-    /**
-     * summary
-     * @public
-     */
     let summary = '';
 
     /**
@@ -201,10 +145,6 @@ export class CommentExporter {
      * @public
      */
     for (let i = 0; i < lines.length; i++) {
-      /**
-       * line
-       * @public
-       */
       const line = lines[i].trim();
 
       // Skip opening /**
@@ -219,10 +159,6 @@ export class CommentExporter {
 
       // Extract summary text
       if (line.startsWith('*')) {
-        /**
-         * text
-         * @public
-         */
         const text = line.substring(1).trim();
         if (text) {
           summary = text;
@@ -256,10 +192,6 @@ export class CommentExporter {
    * @returns SHA-256 hash string
    */
   private generateContentHash(fullComment: string, symbolName: string): string {
-    /**
-     * content
-     * @public
-     */
     const content = `${symbolName}:${fullComment.trim()}`;
     return crypto.createHash('sha256').update(content).digest('hex').substring(0, 16);
   }
@@ -272,10 +204,6 @@ export class CommentExporter {
    * @public
    */
   exportToMarkdown(fileState: FileCommentState): string {
-    /**
-     * markdown
-     * @public
-     */
     let markdown = `# ${fileState.filePath}\n\n`;
     markdown += `Last Updated: ${fileState.lastUpdated}\n\n`;
 
@@ -284,10 +212,6 @@ export class CommentExporter {
      * @public
      */
     for (let i = 0; i < fileState.comments.length; i++) {
-      /**
-       * comment
-       * @public
-       */
       const comment = fileState.comments[i];
       markdown += `## Comment ${i + 1}: ${comment.symbol}\n\n`;
       markdown += `**Location**: Line ${comment.location.line}-${comment.location.endLine}, Column ${comment.location.column}\n`;
@@ -321,45 +245,21 @@ export class CommentExporter {
    * @public
    */
   exportFile(filePath: string, sourceCode: string, outputDir: string): string {
-    /**
-     * comments
-     * @public
-     */
     const comments = this.extractComments(filePath, sourceCode);
 
-    /**
-     * fileState
-     * @public
-     */
     const fileState: FileCommentState = {
       filePath,
       lastUpdated: new Date().toISOString(),
       comments,
     };
 
-    /**
-     * markdown
-     * @public
-     */
     const markdown = this.exportToMarkdown(fileState);
 
     // Create output path
-    /**
-     * relativePath
-     * @public
-     */
     const relativePath = filePath.replace(/^(\.\/|\/)?/, '');
-    /**
-     * markdownPath
-     * @public
-     */
     const markdownPath = path.join(outputDir, `${relativePath}.md`);
 
     // Create directory if needed
-    /**
-     * dir
-     * @public
-     */
     const dir = path.dirname(markdownPath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });

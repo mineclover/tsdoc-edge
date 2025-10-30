@@ -59,10 +59,6 @@ export class SymbolRegistryManager {
     });
 
     // Register existing IDs
-    /**
-     * existingIds
-     * @public
-     */
     const existingIds = this.registry.entries.map((e) => e.id);
     this.idGenerator.registerExisting(existingIds);
   }
@@ -72,15 +68,7 @@ export class SymbolRegistryManager {
    * @returns Loaded registry
    */
   private load(): SymbolRegistry {
-    /**
-     * content
-     * @public
-     */
     const content = fs.readFileSync(this.registryPath, 'utf-8');
-    /**
-     * lines
-     * @public
-     */
     const lines = content.split('\n').filter((line) => line.trim().length > 0);
 
     if (lines.length === 0) {
@@ -92,17 +80,9 @@ export class SymbolRegistryManager {
     }
 
     // First line is metadata
-    /**
-     * metadata
-     * @public
-     */
     const metadata = JSON.parse(lines[0]);
 
     // Rest are entries
-    /**
-     * entries
-     * @public
-     */
     const entries: SymbolRegistryEntry[] = [];
     /**
      * i
@@ -122,28 +102,17 @@ export class SymbolRegistryManager {
 
   /**
    * Save registry to JSONL file
+   * @returns void - No return value
    */
   save(): void {
-    /**
-     * dir
-     * @public
-     */
     const dir = path.dirname(this.registryPath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
     }
 
-    /**
-     * lines
-     * @public
-     */
     const lines: string[] = [];
 
     // First line: metadata
-    /**
-     * metadata
-     * @public
-     */
     const metadata = {
       version: this.registry.version,
       idGeneratorMode: this.registry.idGeneratorMode,
@@ -188,37 +157,17 @@ export class SymbolRegistryManager {
    */
   register(sourceRef: SourceRef, tags?: string[], notes?: string): string {
     // Check if already exists
-    /**
-     * existing
-     * @public
-     */
     const existing = this.findBySourceRef(sourceRef);
     if (existing) {
       return existing.id;
     }
 
-    /**
-     * id
-     * @public
-     */
     const id = this.idGenerator.generate();
-    /**
-     * now
-     * @public
-     */
     const now = new Date().toISOString();
 
     // Auto-generate qualifiedName and depth if not provided
-    /**
-     * enrichedSourceRef
-     * @public
-     */
     const enrichedSourceRef = this.enrichSourceRef(sourceRef);
 
-    /**
-     * entry
-     * @public
-     */
     const entry: SymbolRegistryEntry = {
       id,
       sourceRef: enrichedSourceRef,
@@ -238,10 +187,6 @@ export class SymbolRegistryManager {
    * @returns Enriched source reference with qualifiedName and depth
    */
   private enrichSourceRef(sourceRef: SourceRef): SourceRef {
-    /**
-     * enriched
-     * @public
-     */
     const enriched = { ...sourceRef };
 
     // Calculate depth
@@ -268,10 +213,6 @@ export class SymbolRegistryManager {
     }
 
     // Find parent and recursively calculate depth
-    /**
-     * parent
-     * @public
-     */
     const parent = this.findById(sourceRef.memberOf);
     if (!parent) {
       return 1; // Parent not found, assume depth 1
@@ -292,20 +233,12 @@ export class SymbolRegistryManager {
     }
 
     // Find parent symbol
-    /**
-     * parent
-     * @public
-     */
     const parent = this.findById(sourceRef.memberOf);
     if (!parent) {
       return sourceRef.symbolName;
     }
 
     // Determine separator based on memberType
-    /**
-     * separator
-     * @public
-     */
     let separator = '#'; // default: instance
     if (sourceRef.memberType === 'static') {
       separator = '.';
@@ -314,10 +247,6 @@ export class SymbolRegistryManager {
     }
 
     // Build qualified name recursively
-    /**
-     * parentQualified
-     * @public
-     */
     const parentQualified = parent.sourceRef.qualifiedName || parent.sourceRef.symbolName;
     return `${parentQualified}${separator}${sourceRef.symbolName}`;
   }
@@ -363,20 +292,8 @@ export class SymbolRegistryManager {
     includeType: boolean = true
   ): SymbolRegistryEntry | undefined {
     return this.registry.entries.find((e) => {
-      /**
-       * filePathMatch
-       * @public
-       */
       const filePathMatch = e.sourceRef.filePath === sourceRef.filePath;
-      /**
-       * symbolNameMatch
-       * @public
-       */
       const symbolNameMatch = e.sourceRef.symbolName === sourceRef.symbolName;
-      /**
-       * typeMatch
-       * @public
-       */
       const typeMatch = includeType ? e.sourceRef.type === sourceRef.type : true;
 
       return filePathMatch && symbolNameMatch && typeMatch;
@@ -390,10 +307,6 @@ export class SymbolRegistryManager {
    * @returns True if updated
    */
   updateSourceRef(id: string, newSourceRef: SourceRef): boolean {
-    /**
-     * entry
-     * @public
-     */
     const entry = this.findById(id);
     if (!entry) {
       return false;
@@ -436,10 +349,6 @@ export class SymbolRegistryManager {
    * @returns True if deleted
    */
   delete(id: string): boolean {
-    /**
-     * index
-     * @public
-     */
     const index = this.registry.entries.findIndex((e) => e.id === id);
     if (index === -1) {
       return false;
@@ -463,20 +372,12 @@ export class SymbolRegistryManager {
     reason: string,
     type?: 'runtime' | 'type-only' | 'dev'
   ): boolean {
-    /**
-     * entry
-     * @public
-     */
     const entry = this.findById(fromId);
     if (!entry) {
       return false;
     }
 
     // Check if target exists
-    /**
-     * target
-     * @public
-     */
     const target = this.findById(toId);
     if (!target) {
       return false;
@@ -488,10 +389,6 @@ export class SymbolRegistryManager {
     }
 
     // Check if already exists
-    /**
-     * exists
-     * @public
-     */
     const exists = entry.uses.some((dep) => dep.targetId === toId);
     if (exists) {
       return false;
@@ -510,10 +407,6 @@ export class SymbolRegistryManager {
    * @returns Array of dependencies
    */
   getDependencies(id: string): DependencyRelation[] {
-    /**
-     * entry
-     * @public
-     */
     const entry = this.findById(id);
     return entry?.uses || [];
   }
@@ -524,10 +417,6 @@ export class SymbolRegistryManager {
    * @returns Array of symbols that use this one
    */
   getUsedBy(id: string): Array<{ fromId: string; reason: string; type?: string }> {
-    /**
-     * usedBy
-     * @public
-     */
     const usedBy: Array<{ fromId: string; reason: string; type?: string }> = [];
 
     /**
@@ -560,10 +449,6 @@ export class SymbolRegistryManager {
    * @returns Adjacency list representation
    */
   getDependencyGraph(): Map<string, string[]> {
-    /**
-     * graph
-     * @public
-     */
     const graph = new Map<string, string[]>();
 
     /**
@@ -571,10 +456,6 @@ export class SymbolRegistryManager {
      * @public
      */
     for (const entry of this.registry.entries) {
-      /**
-       * deps
-       * @public
-       */
       const deps = entry.uses?.map((d) => d.targetId) || [];
       graph.set(entry.id, deps);
     }
@@ -587,10 +468,6 @@ export class SymbolRegistryManager {
    * @returns Array of orphaned symbol IDs
    */
   findOrphans(): string[] {
-    /**
-     * orphans
-     * @public
-     */
     const orphans: string[] = [];
 
     /**
@@ -598,15 +475,7 @@ export class SymbolRegistryManager {
      * @public
      */
     for (const entry of this.registry.entries) {
-      /**
-       * hasDeps
-       * @public
-       */
       const hasDeps = (entry.uses?.length || 0) > 0;
-      /**
-       * isUsed
-       * @public
-       */
       const isUsed = this.getUsedBy(entry.id).length > 0;
 
       if (!hasDeps && !isUsed) {
@@ -646,10 +515,6 @@ export class SymbolRegistryManager {
     qualifiedName: string;
     entries: SymbolRegistryEntry[];
   }> {
-    /**
-     * nameMap
-     * @public
-     */
     const nameMap = new Map<string, SymbolRegistryEntry[]>();
 
     /**
@@ -657,10 +522,6 @@ export class SymbolRegistryManager {
      * @public
      */
     for (const entry of this.registry.entries) {
-      /**
-       * qn
-       * @public
-       */
       const qn = entry.sourceRef.qualifiedName;
       if (!qn) continue;
 
@@ -670,10 +531,6 @@ export class SymbolRegistryManager {
       nameMap.get(qn)?.push(entry);
     }
 
-    /**
-     * duplicates
-     * @public
-     */
     const duplicates: Array<{ qualifiedName: string; entries: SymbolRegistryEntry[] }> = [];
     /**
      * [qualifiedName, entries]
@@ -703,15 +560,7 @@ export class SymbolRegistryManager {
    * @returns Array of all descendant entries
    */
   getDescendants(parentId: string): SymbolRegistryEntry[] {
-    /**
-     * descendants
-     * @public
-     */
     const descendants: SymbolRegistryEntry[] = [];
-    /**
-     * children
-     * @public
-     */
     const children = this.getChildren(parentId);
 
     /**
@@ -733,24 +582,12 @@ export class SymbolRegistryManager {
    */
   buildHierarchy(): Array<SymbolRegistryEntry & { children?: SymbolRegistryEntry[] }> {
     // Find root symbols (no parent)
-    /**
-     * roots
-     * @public
-     */
     const roots = this.registry.entries.filter((e) => !e.sourceRef.memberOf);
 
     // Build tree recursively
-    /**
-     * buildTree
-     * @public
-     */
     const buildTree = (
       entry: SymbolRegistryEntry
     ): SymbolRegistryEntry & { children?: SymbolRegistryEntry[] } => {
-      /**
-       * children
-       * @public
-       */
       const children = this.getChildren(entry.id);
       if (children.length === 0) {
         return entry;
@@ -770,10 +607,6 @@ export class SymbolRegistryManager {
    * @returns Matching entries
    */
   search(query: string): SymbolRegistryEntry[] {
-    /**
-     * lowerQuery
-     * @public
-     */
     const lowerQuery = query.toLowerCase();
     return this.registry.entries.filter(
       (e) =>
@@ -793,30 +626,14 @@ export class SymbolRegistryManager {
    * @returns Entries in different files, empty if none found
    */
   detectMoved(symbolName: string, type?: string): SymbolRegistryEntry[] {
-    /**
-     * matches
-     * @public
-     */
     const matches = this.registry.entries.filter((e) => {
-      /**
-       * nameMatch
-       * @public
-       */
       const nameMatch = e.sourceRef.symbolName === symbolName;
-      /**
-       * typeMatch
-       * @public
-       */
       const typeMatch = type ? e.sourceRef.type === type : true;
       return nameMatch && typeMatch;
     });
 
     // If found in multiple files, it's likely moved
     if (matches.length > 1) {
-      /**
-       * files
-       * @public
-       */
       const files = new Set(matches.map((m) => m.sourceRef.filePath));
       if (files.size > 1) {
         return matches;
@@ -844,10 +661,6 @@ export class SymbolRegistryManager {
    * @returns Matching entries
    */
   findByNamePattern(pattern: string | RegExp): SymbolRegistryEntry[] {
-    /**
-     * regex
-     * @public
-     */
     const regex = typeof pattern === 'string' ? new RegExp(pattern, 'i') : pattern;
     return this.registry.entries.filter((e) => regex.test(e.sourceRef.symbolName));
   }
@@ -857,35 +670,15 @@ export class SymbolRegistryManager {
    * @returns Array of cycles, each cycle is array of symbol IDs
    */
   detectDependencyCycles(): string[][] {
-    /**
-     * cycles
-     * @public
-     */
     const cycles: string[][] = [];
-    /**
-     * visited
-     * @public
-     */
     const visited = new Set<string>();
-    /**
-     * recursionStack
-     * @public
-     */
     const recursionStack = new Set<string>();
 
-    /**
-     * dfs
-     * @public
-     */
     const dfs = (symbolId: string, path: string[]): void => {
       visited.add(symbolId);
       recursionStack.add(symbolId);
       path.push(symbolId);
 
-      /**
-       * entry
-       * @public
-       */
       const entry = this.findById(symbolId);
       if (entry?.uses) {
         /**
@@ -893,24 +686,12 @@ export class SymbolRegistryManager {
          * @public
          */
         for (const dep of entry.uses) {
-          /**
-           * depId
-           * @public
-           */
           const depId = dep.targetId;
           if (!visited.has(depId)) {
             dfs(depId, [...path]);
           } else if (recursionStack.has(depId)) {
             // Found a cycle
-            /**
-             * cycleStart
-             * @public
-             */
             const cycleStart = path.indexOf(depId);
-            /**
-             * cycle
-             * @public
-             */
             const cycle = path.slice(cycleStart);
             cycle.push(depId); // Complete the cycle
             cycles.push(cycle);
@@ -966,22 +747,10 @@ export class SymbolRegistryManager {
     errors: string[];
     warnings: string[];
   } {
-    /**
-     * errors
-     * @public
-     */
     const errors: string[] = [];
-    /**
-     * warnings
-     * @public
-     */
     const warnings: string[] = [];
 
     // Check for duplicate IDs
-    /**
-     * idSet
-     * @public
-     */
     const idSet = new Set<string>();
     /**
      * entry
@@ -995,10 +764,6 @@ export class SymbolRegistryManager {
     }
 
     // Check for duplicate qualified names
-    /**
-     * duplicateQNames
-     * @public
-     */
     const duplicateQNames = this.findDuplicateQualifiedNames();
     /**
      * dup
@@ -1011,10 +776,6 @@ export class SymbolRegistryManager {
     }
 
     // Check for orphaned parent references
-    /**
-     * allIds
-     * @public
-     */
     const allIds = new Set(this.registry.entries.map((e) => e.id));
     /**
      * entry
@@ -1035,15 +796,7 @@ export class SymbolRegistryManager {
      * @public
      */
     for (const entry of this.registry.entries) {
-      /**
-       * visited
-       * @public
-       */
       const visited = new Set<string>();
-      /**
-       * current
-       * @public
-       */
       let current = entry;
       while (current.sourceRef.memberOf) {
         if (visited.has(current.id)) {
@@ -1053,10 +806,6 @@ export class SymbolRegistryManager {
           break;
         }
         visited.add(current.id);
-        /**
-         * parent
-         * @public
-         */
         const parent = this.findById(current.sourceRef.memberOf);
         if (!parent) break;
         current = parent;
@@ -1065,10 +814,6 @@ export class SymbolRegistryManager {
 
     // Check for circular dependency references (uses cycle)
     // This is common in real codebases (e.g., A imports B, B imports A)
-    /**
-     * depCycles
-     * @public
-     */
     const depCycles = this.detectDependencyCycles();
     /**
      * cycle
@@ -1127,20 +872,8 @@ export class SymbolRegistryManager {
     orphanCount: number;
     duplicateQualifiedNames: number;
   } {
-    /**
-     * files
-     * @public
-     */
     const files = new Set(this.registry.entries.map((e) => e.sourceRef.filePath));
-    /**
-     * tags
-     * @public
-     */
     const tags = new Set(this.registry.entries.flatMap((e) => e.tags || []));
-    /**
-     * totalDeps
-     * @public
-     */
     const totalDeps = this.registry.entries.reduce((sum, e) => sum + (e.uses?.length || 0), 0);
 
     return {

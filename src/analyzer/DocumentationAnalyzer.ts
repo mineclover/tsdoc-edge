@@ -31,15 +31,7 @@ export class DocumentationAnalyzer {
    * @public
    */
   analyzeFile(filePath: string, sourceCode: string, includeChildren = true): DocQualityScore[] {
-    /**
-     * scores
-     * @public
-     */
     const scores: DocQualityScore[] = [];
-    /**
-     * sourceFile
-     * @public
-     */
     const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
 
     this.visitNode(sourceFile, sourceFile, scores, includeChildren);
@@ -63,10 +55,6 @@ export class DocumentationAnalyzer {
     includeChildren: boolean,
     parentSymbol?: string
   ): void {
-    /**
-     * score
-     * @public
-     */
     const score = this.analyzeNode(node, sourceFile, parentSymbol);
 
     if (score) {
@@ -102,10 +90,6 @@ export class DocumentationAnalyzer {
       return null;
     }
 
-    /**
-     * symbolName
-     * @public
-     */
     const symbolName = this.getSymbolName(node);
     if (!symbolName) {
       return null;
@@ -116,70 +100,22 @@ export class DocumentationAnalyzer {
       return null;
     }
 
-    /**
-     * symbolType
-     * @public
-     */
     const symbolType = this.getSymbolType(node);
-    /**
-     * isPublic
-     * @public
-     */
     const isPublic = this.isPublicSymbol(node, symbolName);
-    /**
-     * { line }
-     * @public
-     */
     const { line } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
 
     // Extract JSDoc comment
-    /**
-     * jsDocComment
-     * @public
-     */
     const jsDocComment = this.getJSDocComment(node, sourceFile);
-    /**
-     * hasDoc
-     * @public
-     */
     const hasDoc = !!jsDocComment;
 
-    /**
-     * hasSummary
-     * @public
-     */
     let hasSummary = false;
-    /**
-     * hasCompleteParams
-     * @public
-     */
     let hasCompleteParams = false;
-    /**
-     * hasReturns
-     * @public
-     */
     let hasReturns = false;
-    /**
-     * hasExamples
-     * @public
-     */
     let hasExamples = false;
-    /**
-     * hasCustomTags
-     * @public
-     */
     let hasCustomTags = false;
-    /**
-     * missing
-     * @public
-     */
     const missing: string[] = [];
 
     if (jsDocComment) {
-      /**
-       * analysis
-       * @public
-       */
       const analysis = this.analyzeJSDoc(jsDocComment, node);
       hasSummary = analysis.hasSummary;
       hasCompleteParams = analysis.hasCompleteParams;
@@ -192,10 +128,6 @@ export class DocumentationAnalyzer {
     }
 
     // Calculate quality score
-    /**
-     * qualityScore
-     * @public
-     */
     const qualityScore = this.calculateQualityScore({
       hasDoc,
       hasSummary,
@@ -244,10 +176,6 @@ export class DocumentationAnalyzer {
        * @public
        */
       for (const member of node.members) {
-        /**
-         * childScore
-         * @public
-         */
         const childScore = this.analyzeNode(member, sourceFile, parentScore.symbolName);
         if (childScore) {
           parentScore.children.push(childScore);
@@ -337,10 +265,6 @@ export class DocumentationAnalyzer {
   private isPublicSymbol(node: ts.Node, symbolName: string): boolean {
     // Check for private modifier
     if (ts.canHaveModifiers(node)) {
-      /**
-       * modifiers
-       * @public
-       */
       const modifiers = ts.getModifiers(node);
       if (modifiers) {
         /**
@@ -361,12 +285,16 @@ export class DocumentationAnalyzer {
     }
 
     // Check for export
-    if (ts.canHaveModifiers(node)) {
-      /**
-       * modifiers
-       * @public
-       */
-      const modifiers = ts.getModifiers(node);
+    let hasExport = false;
+
+    // For variable declarations, check the parent VariableStatement
+    let checkNode = node;
+    if (ts.isVariableDeclaration(node) && node.parent && node.parent.parent) {
+      checkNode = node.parent.parent; // VariableStatement
+    }
+
+    if (ts.canHaveModifiers(checkNode)) {
+      const modifiers = ts.getModifiers(checkNode);
       if (modifiers) {
         /**
          * modifier
@@ -374,13 +302,20 @@ export class DocumentationAnalyzer {
          */
         for (const modifier of modifiers) {
           if (modifier.kind === ts.SyntaxKind.ExportKeyword) {
-            return true;
+            hasExport = true;
+            break;
           }
         }
       }
     }
 
-    return true;
+    // For variables, require explicit export to be considered public
+    // For other declarations (functions, classes, etc.), default to public
+    if (ts.isVariableDeclaration(node)) {
+      return hasExport;
+    }
+
+    return hasExport || true;
   }
 
   /**
@@ -392,19 +327,11 @@ export class DocumentationAnalyzer {
    */
   private getJSDocComment(node: ts.Node, sourceFile: ts.SourceFile): string | null {
     // For variable declarations, check the parent VariableStatement
-    /**
-     * targetNode
-     * @public
-     */
     let targetNode = node;
     if (ts.isVariableDeclaration(node) && node.parent && node.parent.parent) {
       targetNode = node.parent.parent; // VariableStatement
     }
 
-    /**
-     * jsDocTags
-     * @public
-     */
     const jsDocTags = (targetNode as unknown as { jsDoc?: ts.JSDoc[] }).jsDoc;
     if (!jsDocTags || jsDocTags.length === 0) {
       return null;
@@ -438,64 +365,28 @@ export class DocumentationAnalyzer {
     hasCustomTags: boolean;
     missing: string[];
   } {
-    /**
-     * missing
-     * @public
-     */
     const missing: string[] = [];
-    /**
-     * symbolType
-     * @public
-     */
     const symbolType = this.getSymbolType(node);
 
     // Parse with TSDoc
-    /**
-     * parserContext
-     * @public
-     */
     const parserContext = this.tsdocParser.parseString(jsDocText);
-    /**
-     * docComment
-     * @public
-     */
     const docComment = parserContext.docComment;
 
     // Check summary
-    /**
-     * hasSummary
-     * @public
-     */
     const hasSummary = docComment.summarySection.nodes.length > 0;
     if (!hasSummary) {
       missing.push('summary');
     }
 
     // Check parameters (only for functions/methods with parameters)
-    /**
-     * hasCompleteParams
-     * @public
-     */
     let hasCompleteParams = true;
-    /**
-     * isFunctionLike
-     * @public
-     */
     const isFunctionLike = ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node);
 
     if (isFunctionLike) {
-      /**
-       * params
-       * @public
-       */
       const params = (node as ts.FunctionDeclaration | ts.MethodDeclaration).parameters;
 
       // Only check params if function has parameters
       if (params.length > 0) {
-        /**
-         * documentedParams
-         * @public
-         */
         const documentedParams = docComment.params.blocks.map((b) => b.parameterName);
 
         /**
@@ -503,10 +394,6 @@ export class DocumentationAnalyzer {
          * @public
          */
         for (const param of params) {
-          /**
-           * paramName
-           * @public
-           */
           const paramName = param.name.getText();
           if (!documentedParams.includes(paramName)) {
             hasCompleteParams = false;
@@ -518,26 +405,14 @@ export class DocumentationAnalyzer {
     // For non-function symbols (variables, properties, types), params don't apply
     // So hasCompleteParams remains true
 
-    // Check returns (only for non-void functions/methods, not constructors)
-    /**
-     * hasReturns
-     * @public
-     */
+    // Check returns (for all functions/methods except constructors)
     let hasReturns = true;
 
     if (isFunctionLike) {
-      /**
-       * isConstructor
-       * @public
-       */
       const isConstructor = ts.isConstructorDeclaration(node);
-      /**
-       * isVoid
-       * @public
-       */
-      const isVoid = this.isVoidFunction(node);
 
-      if (!isConstructor && !isVoid && !docComment.returnsBlock) {
+      // All functions (including void) should have @returns tag
+      if (!isConstructor && !docComment.returnsBlock) {
         hasReturns = false;
         missing.push('@returns');
       }
@@ -545,15 +420,7 @@ export class DocumentationAnalyzer {
     // For non-function symbols, returns don't apply
 
     // Check examples (only recommend for functions, methods, and classes)
-    /**
-     * hasExamples
-     * @public
-     */
     const hasExamples = docComment.customBlocks.some((b) => b.blockTag.tagName === '@example');
-    /**
-     * shouldHaveExample
-     * @public
-     */
     const shouldHaveExample =
       symbolType === 'function' || symbolType === 'method' || symbolType === 'class';
 
@@ -563,10 +430,6 @@ export class DocumentationAnalyzer {
     }
 
     // Check custom tags
-    /**
-     * customTagNames
-     * @public
-     */
     const customTagNames = [
       '@responsibility',
       '@contract',
@@ -574,10 +437,6 @@ export class DocumentationAnalyzer {
       '@postcondition',
       '@testedBy',
     ];
-    /**
-     * hasCustomTags
-     * @public
-     */
     const hasCustomTags = docComment.customBlocks.some((b) =>
       customTagNames.includes(b.blockTag.tagName)
     );
@@ -590,20 +449,6 @@ export class DocumentationAnalyzer {
       hasCustomTags,
       missing,
     };
-  }
-
-  /**
-   * Check if function returns void
-   *
-   * @param node - Function node
-   * @returns True if void function
-   */
-  private isVoidFunction(node: ts.FunctionDeclaration | ts.MethodDeclaration): boolean {
-    if (!node.type) {
-      return false;
-    }
-
-    return node.type.kind === ts.SyntaxKind.VoidKeyword;
   }
 
   /**
@@ -625,10 +470,6 @@ export class DocumentationAnalyzer {
       return 0;
     }
 
-    /**
-     * score
-     * @public
-     */
     let score = 0;
 
     // Base score for having documentation

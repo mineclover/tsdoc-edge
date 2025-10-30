@@ -44,10 +44,6 @@ export class MarkdownGenerator {
    * @public
    */
   generateForComment(comment: ParsedDocComment): string {
-    /**
-     * markdown
-     * @public
-     */
     let markdown = '';
 
     // Add header with symbol name
@@ -55,10 +51,6 @@ export class MarkdownGenerator {
 
     // Add summary
     if (comment.docComment.summarySection) {
-      /**
-       * summary
-       * @public
-       */
       const summary = this.renderDocNodes(comment.docComment.summarySection.nodes);
       markdown += `${summary}\n\n`;
     }
@@ -71,15 +63,7 @@ export class MarkdownGenerator {
        * @public
        */
       for (const param of comment.docComment.params.blocks) {
-        /**
-         * paramName
-         * @public
-         */
         const paramName = param.parameterName;
-        /**
-         * paramDesc
-         * @public
-         */
         const paramDesc = this.renderDocNodes(param.content.nodes);
         markdown += `- **${paramName}**: ${paramDesc}\n`;
       }
@@ -89,10 +73,6 @@ export class MarkdownGenerator {
     // Add returns
     if (comment.docComment.returnsBlock) {
       markdown += `### Returns\n\n`;
-      /**
-       * returnsDesc
-       * @public
-       */
       const returnsDesc = this.renderDocNodes(comment.docComment.returnsBlock.content.nodes);
       markdown += `${returnsDesc}\n\n`;
     }
@@ -100,10 +80,6 @@ export class MarkdownGenerator {
     // Add remarks
     if (comment.docComment.remarksBlock) {
       markdown += `### Remarks\n\n`;
-      /**
-       * remarks
-       * @public
-       */
       const remarks = this.renderDocNodes(comment.docComment.remarksBlock.content.nodes);
       markdown += `${remarks}\n\n`;
     }
@@ -116,10 +92,6 @@ export class MarkdownGenerator {
        * @public
        */
       for (const result of comment.validationResults) {
-        /**
-         * icon
-         * @public
-         */
         const icon = result.severity === 'error' ? '❌' : '⚠️';
         markdown += `${icon} **${result.severity.toUpperCase()}**: ${result.message}\n`;
       }
@@ -137,10 +109,6 @@ export class MarkdownGenerator {
    * @public
    */
   generateForComments(comments: ParsedDocComment[]): string {
-    /**
-     * markdown
-     * @public
-     */
     let markdown = '# API Documentation\n\n';
 
     /**
@@ -162,10 +130,6 @@ export class MarkdownGenerator {
    * @returns Rendered text
    */
   private renderDocNodes(nodes: ReadonlyArray<DocNode>): string {
-    /**
-     * result
-     * @public
-     */
     let result = '';
 
     /**

@@ -41,10 +41,6 @@ export class CommentStateManager {
     if (storageDir) {
       this.storageDir = storageDir;
     } else {
-      /**
-       * configManager
-       * @public
-       */
       const configManager = ConfigManager.getInstance();
       this.storageDir = configManager.resolvePath(configManager.get().paths.commentsDir);
     }
@@ -73,10 +69,6 @@ export class CommentStateManager {
     this.walkDir(this.storageDir, (markdownPath) => {
       if (markdownPath.endsWith('.md')) {
         try {
-          /**
-           * fileState
-           * @public
-           */
           const fileState = this.importer.parseMarkdown(markdownPath);
           this.storage.files[fileState.filePath] = fileState;
           /**
@@ -97,10 +89,6 @@ export class CommentStateManager {
    * @param callback - Callback for each file
    */
   private walkDir(dir: string, callback: (filePath: string) => void): void {
-    /**
-     * entries
-     * @public
-     */
     const entries = fs.readdirSync(dir, { withFileTypes: true });
 
     /**
@@ -108,10 +96,6 @@ export class CommentStateManager {
      * @public
      */
     for (const entry of entries) {
-      /**
-       * fullPath
-       * @public
-       */
       const fullPath = path.join(dir, entry.name);
 
       if (entry.isDirectory()) {
@@ -130,22 +114,10 @@ export class CommentStateManager {
    * @public
    */
   exportFile(filePath: string): string {
-    /**
-     * sourceCode
-     * @public
-     */
     const sourceCode = fs.readFileSync(filePath, 'utf-8');
-    /**
-     * markdownPath
-     * @public
-     */
     const markdownPath = this.exporter.exportFile(filePath, sourceCode, this.storageDir);
 
     // Update storage
-    /**
-     * fileState
-     * @public
-     */
     const fileState = this.importer.parseMarkdown(markdownPath);
     this.storage.files[filePath] = fileState;
     this.storage.lastUpdated = new Date().toISOString();
@@ -163,37 +135,17 @@ export class CommentStateManager {
    * @param _pattern - _pattern parameter
    */
   exportAll(sourceDir: string, _pattern: string = '**/*.ts'): ExportResult {
-    /**
-     * exportedFiles
-     * @public
-     */
     const exportedFiles: string[] = [];
-    /**
-     * filesExported
-     * @public
-     */
     let filesExported = 0;
-    /**
-     * commentsExported
-     * @public
-     */
     let commentsExported = 0;
 
     this.walkDir(sourceDir, (filePath) => {
       if (filePath.endsWith('.ts') && !filePath.endsWith('.test.ts')) {
         try {
-          /**
-           * markdownPath
-           * @public
-           */
           const markdownPath = this.exportFile(filePath);
           exportedFiles.push(markdownPath);
           filesExported++;
 
-          /**
-           * fileState
-           * @public
-           */
           const fileState = this.storage.files[filePath];
           commentsExported += fileState.comments.length;
           /**
@@ -223,10 +175,6 @@ export class CommentStateManager {
    * @public
    */
   importFile(filePath: string, overwrite: boolean = false): string {
-    /**
-     * markdownPath
-     * @public
-     */
     const markdownPath = this.getMarkdownPath(filePath);
 
     if (!fs.existsSync(markdownPath)) {
@@ -244,25 +192,9 @@ export class CommentStateManager {
    * @public
    */
   importAll(overwrite: boolean = false): ImportResult {
-    /**
-     * updatedFiles
-     * @public
-     */
     const updatedFiles: string[] = [];
-    /**
-     * errors
-     * @public
-     */
     const errors: string[] = [];
-    /**
-     * filesUpdated
-     * @public
-     */
     let filesUpdated = 0;
-    /**
-     * commentsUpdated
-     * @public
-     */
     let commentsUpdated = 0;
 
     /**
@@ -271,18 +203,10 @@ export class CommentStateManager {
      */
     for (const filePath in this.storage.files) {
       try {
-        /**
-         * updated
-         * @public
-         */
         const updated = this.importFile(filePath, overwrite);
         updatedFiles.push(updated);
         filesUpdated++;
 
-        /**
-         * fileState
-         * @public
-         */
         const fileState = this.storage.files[filePath];
         commentsUpdated += fileState.comments.length;
         /**
@@ -308,6 +232,7 @@ export class CommentStateManager {
    * @param filePath - Path to TypeScript file
    * @param options - Collapse options
    * @public
+   * @returns void - No return value
    */
   collapse(filePath: string, options: CollapseOptions = {}): void {
     // Export if not already exported
@@ -315,10 +240,6 @@ export class CommentStateManager {
       this.exportFile(filePath);
     }
 
-    /**
-     * fileState
-     * @public
-     */
     const fileState = this.storage.files[filePath];
 
     /**
@@ -346,10 +267,6 @@ export class CommentStateManager {
   private shouldCollapse(comment: CommentState, options: CollapseOptions): boolean {
     // Check minimum lines
     if (options.minLines) {
-      /**
-       * lines
-       * @public
-       */
       const lines = comment.fullComment.split('\n').length;
       if (lines < options.minLines) {
         return false;
@@ -358,10 +275,6 @@ export class CommentStateManager {
 
     // Check pattern
     if (options.pattern) {
-      /**
-       * regex
-       * @public
-       */
       const regex = new RegExp(options.pattern);
       if (!regex.test(comment.symbol)) {
         return false;
@@ -386,12 +299,9 @@ export class CommentStateManager {
    * @param filePath - Path to TypeScript file
    * @param options - Expand options
    * @public
+   * @returns void - No return value
    */
   expand(filePath: string, options: ExpandOptions = {}): void {
-    /**
-     * fileState
-     * @public
-     */
     const fileState = this.storage.files[filePath];
 
     if (!fileState) {
@@ -426,10 +336,6 @@ export class CommentStateManager {
     }
 
     if (options.pattern) {
-      /**
-       * regex
-       * @public
-       */
       const regex = new RegExp(options.pattern);
       return regex.test(comment.symbol);
     }
@@ -445,10 +351,6 @@ export class CommentStateManager {
    * @public
    */
   getStatus(filePath: string): FileStatusSummary {
-    /**
-     * fileState
-     * @public
-     */
     const fileState = this.storage.files[filePath];
 
     if (!fileState) {
@@ -461,15 +363,7 @@ export class CommentStateManager {
       };
     }
 
-    /**
-     * collapsedComments
-     * @public
-     */
     const collapsedComments = fileState.comments.filter((c) => c.status === 'collapsed').length;
-    /**
-     * expandedComments
-     * @public
-     */
     const expandedComments = fileState.comments.filter((c) => c.status === 'expanded').length;
 
     return {
@@ -497,21 +391,9 @@ export class CommentStateManager {
    * @param fileState - File comment state
    */
   private saveFileState(fileState: FileCommentState): void {
-    /**
-     * markdown
-     * @public
-     */
     const markdown = this.exporter.exportToMarkdown(fileState);
-    /**
-     * markdownPath
-     * @public
-     */
     const markdownPath = this.getMarkdownPath(fileState.filePath);
 
-    /**
-     * dir
-     * @public
-     */
     const dir = path.dirname(markdownPath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
@@ -527,10 +409,6 @@ export class CommentStateManager {
    * @returns Markdown file path
    */
   private getMarkdownPath(filePath: string): string {
-    /**
-     * relativePath
-     * @public
-     */
     const relativePath = filePath.replace(/^(\.\/|\/)?/, '');
     return path.join(this.storageDir, `${relativePath}.md`);
   }

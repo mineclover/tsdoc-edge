@@ -117,22 +117,10 @@ export class TSDocParser {
    * @public
    */
   parseFile(filePath: string, sourceCode: string): ParseResult {
-    /**
-     * comments
-     * @public
-     */
     const comments: ParsedDocComment[] = [];
-    /**
-     * errors
-     * @public
-     */
     const errors: Error[] = [];
 
     try {
-      /**
-       * sourceFile
-       * @public
-       */
       const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
 
       this.visitNode(sourceFile, filePath, comments, errors);
@@ -166,10 +154,6 @@ export class TSDocParser {
     errors: Error[]
   ): void {
     // Check if node has JSDoc comments
-    /**
-     * jsDocComments
-     * @public
-     */
     const jsDocComments = (node as NodeWithJSDoc).jsDoc;
 
     if (jsDocComments && jsDocComments.length > 0) {
@@ -180,21 +164,9 @@ export class TSDocParser {
       for (const jsDoc of jsDocComments) {
         try {
           // Get the full JSDoc text including /** and */
-          /**
-           * fullText
-           * @public
-           */
           const fullText = jsDoc.getFullText();
-          /**
-           * parserContext
-           * @public
-           */
           const parserContext: ParserContext = this.parser.parseString(fullText);
 
-          /**
-           * symbolName
-           * @public
-           */
           const symbolName = this.getSymbolName(node);
 
           comments.push({

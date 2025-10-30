@@ -98,37 +98,13 @@ export class RecursiveImprover {
       verbose = false,
     } = options;
 
-    /**
-     * improvedFiles
-     * @public
-     */
     const improvedFiles = new Set<string>();
-    /**
-     * iterationResults
-     * @public
-     */
     const iterationResults: RecursiveImproveResult['iterationResults'] = [];
-    /**
-     * totalSymbolsFixed
-     * @public
-     */
     let totalSymbolsFixed = 0;
 
     // Get initial analysis
-    /**
-     * paths
-     * @public
-     */
     const paths = this.expandEntryPoints(entryPoints);
-    /**
-     * initialReport
-     * @public
-     */
     const initialReport = this.analyzeAll(paths);
-    /**
-     * initialScore
-     * @public
-     */
     const initialScore = initialReport.metrics.healthScore;
 
     if (verbose) {
@@ -138,15 +114,7 @@ export class RecursiveImprover {
       console.log();
     }
 
-    /**
-     * currentScore
-     * @public
-     */
     let currentScore = initialScore;
-    /**
-     * iteration
-     * @public
-     */
     let iteration = 0;
 
     // Iterate until target reached or max iterations
@@ -159,17 +127,9 @@ export class RecursiveImprover {
       }
 
       // Get current analysis
-      /**
-       * report
-       * @public
-       */
       const report = this.analyzeAll(paths);
 
       // Find symbols that need fixing
-      /**
-       * needsFixing
-       * @public
-       */
       const needsFixing = report.docScores.filter(
         (s) => s.qualityScore < targetScore && s.isPublic
       );
@@ -182,10 +142,6 @@ export class RecursiveImprover {
       }
 
       // Group by file
-      /**
-       * byFile
-       * @public
-       */
       const byFile = new Map<string, typeof needsFixing>();
       /**
        * score
@@ -199,10 +155,6 @@ export class RecursiveImprover {
       }
 
       // Fix each file
-      /**
-       * fixes
-       * @public
-       */
       const fixes: FixResult[] = [];
       /**
        * [filePath, scores]
@@ -213,10 +165,6 @@ export class RecursiveImprover {
           console.log(`  Fixing ${filePath} (${scores.length} symbols)...`);
         }
 
-        /**
-         * result
-         * @public
-         */
         const result = this.fixer.fixFile(filePath, scores, {
           ...fixOptions,
           dryRun,
@@ -235,10 +183,6 @@ export class RecursiveImprover {
       }
 
       // Re-analyze to get new score
-      /**
-       * newReport
-       * @public
-       */
       const newReport = this.analyzeAll(paths);
       currentScore = newReport.metrics.healthScore;
 
@@ -278,10 +222,6 @@ export class RecursiveImprover {
    * @returns Entry point paths
    */
   private getEntryPoints(): string[] {
-    /**
-     * config
-     * @public
-     */
     const config = this.configManager.get();
     return config.project.entryPoints || ['src/index.ts'];
   }
@@ -293,20 +233,8 @@ export class RecursiveImprover {
    * @returns All source file paths
    */
   private expandEntryPoints(entryPoints: string[]): string[] {
-    /**
-     * config
-     * @public
-     */
     const config = this.configManager.get();
-    /**
-     * srcDirs
-     * @public
-     */
     const srcDirs = config.project.srcDirs || ['src'];
-    /**
-     * allPaths
-     * @public
-     */
     const allPaths = new Set<string>();
 
     // Add entry points
@@ -315,10 +243,6 @@ export class RecursiveImprover {
      * @public
      */
     for (const entry of entryPoints) {
-      /**
-       * resolved
-       * @public
-       */
       const resolved = this.configManager.resolvePath(entry);
       if (fs.existsSync(resolved)) {
         if (fs.statSync(resolved).isFile()) {
@@ -336,10 +260,6 @@ export class RecursiveImprover {
      * @public
      */
     for (const srcDir of srcDirs) {
-      /**
-       * resolved
-       * @public
-       */
       const resolved = this.configManager.resolvePath(srcDir);
       if (fs.existsSync(resolved)) {
         this.walkDirectory(resolved, allPaths);
@@ -356,10 +276,6 @@ export class RecursiveImprover {
    * @param files - Set to collect files
    */
   private walkDirectory(dir: string, files: Set<string>): void {
-    /**
-     * entries
-     * @public
-     */
     const entries = fs.readdirSync(dir, { withFileTypes: true });
 
     /**
@@ -367,10 +283,6 @@ export class RecursiveImprover {
      * @public
      */
     for (const entry of entries) {
-      /**
-       * fullPath
-       * @public
-       */
       const fullPath = path.join(dir, entry.name);
 
       // Skip node_modules and hidden directories
@@ -394,10 +306,6 @@ export class RecursiveImprover {
    */
   private analyzeAll(paths: string[]): AnalysisReport {
     // Use the first path's directory as the base
-    /**
-     * basePath
-     * @public
-     */
     const basePath = paths.length > 0 ? path.dirname(paths[0]) : 'src';
 
     return this.checker.analyze({

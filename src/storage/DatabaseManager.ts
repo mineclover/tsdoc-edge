@@ -83,25 +83,13 @@ export class DatabaseManager {
       this.dbPath = dbPath;
       this.jsonlPath = jsonlPath;
     } else {
-      /**
-       * configManager
-       * @public
-       */
       const configManager = ConfigManager.getInstance();
-      /**
-       * config
-       * @public
-       */
       const config = configManager.get();
       this.dbPath = configManager.resolvePath(config.paths.databasePath);
       this.jsonlPath = configManager.resolvePath(config.paths.jsonlDir);
     }
 
     // Ensure directories exist
-    /**
-     * dbDir
-     * @public
-     */
     const dbDir = path.dirname(this.dbPath);
     if (!fs.existsSync(dbDir)) {
       fs.mkdirSync(dbDir, { recursive: true });
@@ -121,15 +109,7 @@ export class DatabaseManager {
    * @postcondition All tables and indexes are created
    */
   private initializeSchema(): void {
-    /**
-     * schemaPath
-     * @public
-     */
     const schemaPath = path.join(__dirname, 'schema.sql');
-    /**
-     * schema
-     * @public
-     */
     const schema = fs.readFileSync(schemaPath, 'utf-8');
 
     // Execute the entire schema at once
@@ -156,10 +136,6 @@ export class DatabaseManager {
    * @postcondition Symbol is indexed and searchable
    */
   insertSymbol(symbol: Symbol, jsonlLine: number): boolean {
-    /**
-     * stmt
-     * @public
-     */
     const stmt = this.db.prepare(`
       INSERT OR REPLACE INTO symbols (
         id, name, type, file_path, line, column,
@@ -204,10 +180,6 @@ export class DatabaseManager {
    * @postcondition Documentation is stored and indexed
    */
   insertEnhancedDoc(doc: EnhancedSymbolDoc, jsonlLine: number): boolean {
-    /**
-     * stmt
-     * @public
-     */
     const stmt = this.db.prepare(`
       INSERT OR REPLACE INTO enhanced_docs (
         symbol_id, problem_solving, functionality,
@@ -248,20 +220,12 @@ export class DatabaseManager {
    * @contract Use FTS5 for efficient text search
    */
   searchSymbols(query: string): string[] {
-    /**
-     * stmt
-     * @public
-     */
     const stmt = this.db.prepare(`
       SELECT id FROM symbols_fts
       WHERE symbols_fts MATCH ?
       ORDER BY rank
     `);
 
-    /**
-     * results
-     * @public
-     */
     const results = stmt.all(query) as Array<{ id: string }>;
     return results.map((r) => r.id);
   }
@@ -272,15 +236,7 @@ export class DatabaseManager {
    * @returns Symbol data or null
    */
   getSymbol(id: string): Symbol | null {
-    /**
-     * stmt
-     * @public
-     */
     const stmt = this.db.prepare('SELECT * FROM symbols WHERE id = ?');
-    /**
-     * row
-     * @public
-     */
     const row = stmt.get(id) as SymbolRow | undefined;
 
     if (!row) return null;
@@ -306,15 +262,7 @@ export class DatabaseManager {
    * @returns Enhanced documentation or null
    */
   getEnhancedDoc(symbolId: string): EnhancedSymbolDoc | null {
-    /**
-     * stmt
-     * @public
-     */
     const stmt = this.db.prepare('SELECT * FROM enhanced_docs WHERE symbol_id = ?');
-    /**
-     * row
-     * @public
-     */
     const row = stmt.get(symbolId) as EnhancedDocRow | undefined;
 
     if (!row) return null;
@@ -345,32 +293,12 @@ export class DatabaseManager {
       fs.mkdirSync(this.jsonlPath, { recursive: true });
     }
 
-    /**
-     * timestamp
-     * @public
-     */
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    /**
-     * exportPath
-     * @public
-     */
     const exportPath = path.join(this.jsonlPath, `export-${timestamp}.jsonl`);
 
-    /**
-     * symbols
-     * @public
-     */
     const symbols = this.db.prepare('SELECT * FROM symbols').all();
-    /**
-     * enhancedDocs
-     * @public
-     */
     const enhancedDocs = this.db.prepare('SELECT * FROM enhanced_docs').all();
 
-    /**
-     * lines
-     * @public
-     */
     const lines: string[] = [];
 
     // Export symbols
@@ -379,10 +307,6 @@ export class DatabaseManager {
      * @public
      */
     for (const symbol of symbols) {
-      /**
-       * record
-       * @public
-       */
       const record = {
         type: 'symbol',
         data: symbol,
@@ -396,10 +320,6 @@ export class DatabaseManager {
      * @public
      */
     for (const doc of enhancedDocs) {
-      /**
-       * record
-       * @public
-       */
       const record = {
         type: 'enhanced_doc',
         data: doc,
@@ -426,21 +346,9 @@ export class DatabaseManager {
       throw new Error(`JSONL file not found: ${filePath}`);
     }
 
-    /**
-     * content
-     * @public
-     */
     const content = fs.readFileSync(filePath, 'utf-8');
-    /**
-     * lines
-     * @public
-     */
     const lines = content.split('\n').filter((line) => line.trim().length > 0);
 
-    /**
-     * count
-     * @public
-     */
     let count = 0;
 
     /**
@@ -449,17 +357,9 @@ export class DatabaseManager {
      */
     for (let i = 0; i < lines.length; i++) {
       try {
-        /**
-         * record
-         * @public
-         */
         const record = JSON.parse(lines[i]);
 
         if (record.type === 'symbol') {
-          /**
-           * symbol
-           * @public
-           */
           const symbol: Symbol = {
             id: record.data.id,
             name: record.data.name,
@@ -477,10 +377,6 @@ export class DatabaseManager {
           this.insertSymbol(symbol, i);
           count++;
         } else if (record.type === 'enhanced_doc') {
-          /**
-           * doc
-           * @public
-           */
           const doc: EnhancedSymbolDoc = {
             symbolId: record.data.symbol_id,
             problemSolving: JSON.parse(record.data.problem_solving),
@@ -526,31 +422,11 @@ export class DatabaseManager {
       throw new Error(`JSONL file not found: ${filePath}`);
     }
 
-    /**
-     * content
-     * @public
-     */
     const content = fs.readFileSync(filePath, 'utf-8');
-    /**
-     * lines
-     * @public
-     */
     const lines = content.split('\n').filter((line) => line.trim().length > 0);
 
-    /**
-     * symbolCount
-     * @public
-     */
     let symbolCount = 0;
-    /**
-     * docCount
-     * @public
-     */
     let docCount = 0;
-    /**
-     * mismatches
-     * @public
-     */
     const mismatches: string[] = [];
 
     /**
@@ -559,17 +435,9 @@ export class DatabaseManager {
      */
     for (let i = 0; i < lines.length; i++) {
       try {
-        /**
-         * record
-         * @public
-         */
         const record = JSON.parse(lines[i]);
 
         if (record.type === 'symbol') {
-          /**
-           * dbSymbol
-           * @public
-           */
           const dbSymbol = this.getSymbol(record.data.id);
           if (!dbSymbol) {
             mismatches.push(`Symbol not found in DB: ${record.data.id}`);
@@ -578,10 +446,6 @@ export class DatabaseManager {
           }
           symbolCount++;
         } else if (record.type === 'enhanced_doc') {
-          /**
-           * dbDoc
-           * @public
-           */
           const dbDoc = this.getEnhancedDoc(record.data.symbol_id);
           if (!dbDoc) {
             mismatches.push(`Enhanced doc not found in DB: ${record.data.symbol_id}`);
@@ -597,10 +461,6 @@ export class DatabaseManager {
       }
     }
 
-    /**
-     * stats
-     * @public
-     */
     const stats = this.getStatistics();
     if (stats.totalSymbols !== symbolCount) {
       mismatches.push(`Symbol count mismatch: DB=${stats.totalSymbols}, JSONL=${symbolCount}`);
@@ -623,6 +483,7 @@ export class DatabaseManager {
   /**
    * Close database connection
    * @postcondition Database connection is closed
+   * @returns void - No return value
    */
   close(): void {
     this.db.close();
@@ -637,26 +498,14 @@ export class DatabaseManager {
     totalEnhancedDocs: number;
     dbSize: number;
   } {
-    /**
-     * symbolCount
-     * @public
-     */
     const symbolCount = this.db.prepare('SELECT COUNT(*) as count FROM symbols').get() as {
       count: number;
     };
 
-    /**
-     * docCount
-     * @public
-     */
     const docCount = this.db.prepare('SELECT COUNT(*) as count FROM enhanced_docs').get() as {
       count: number;
     };
 
-    /**
-     * stats
-     * @public
-     */
     const stats = fs.statSync(this.dbPath);
 
     return {

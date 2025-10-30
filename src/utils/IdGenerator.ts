@@ -62,22 +62,10 @@ export class IdGenerator {
    * @postcondition ID is unique within this generator instance
    */
   generate(): string {
-    /**
-     * maxAttempts
-     * @public
-     */
     const maxAttempts = 1000;
-    /**
-     * attempts
-     * @public
-     */
     let attempts = 0;
 
     while (attempts < maxAttempts) {
-      /**
-       * id
-       * @public
-       */
       const id = this.mode === 'random' ? this.generateRandom() : this.generateSequential();
 
       if (!this.usedIds.has(id)) {
@@ -98,20 +86,12 @@ export class IdGenerator {
    * @returns Random ID of current length
    */
   private generateRandom(): string {
-    /**
-     * result
-     * @public
-     */
     let result = '';
     /**
      * i
      * @public
      */
     for (let i = 0; i < this.length; i++) {
-      /**
-       * randomIndex
-       * @public
-       */
       const randomIndex = Math.floor(Math.random() * this.charset.length);
       result += this.charset[randomIndex];
     }
@@ -123,15 +103,7 @@ export class IdGenerator {
    * @returns Sequential ID (001, 002, ...)
    */
   private generateSequential(): string {
-    /**
-     * id
-     * @public
-     */
     const id = this.sequentialCounter.toString(this.charset.length);
-    /**
-     * padded
-     * @public
-     */
     const padded = id.padStart(this.length, '0');
     this.sequentialCounter++;
     return padded;
@@ -140,6 +112,7 @@ export class IdGenerator {
   /**
    * Register existing IDs to prevent collision
    * @param ids - Array of existing IDs
+   * @returns void - No return value
    */
   registerExisting(ids: string[]): void {
     /**
@@ -151,10 +124,6 @@ export class IdGenerator {
 
       // Update sequential counter if in sequential mode
       if (this.mode === 'sequential') {
-        /**
-         * numValue
-         * @public
-         */
         const numValue = parseInt(id, this.charset.length);
         if (!Number.isNaN(numValue) && numValue >= this.sequentialCounter) {
           this.sequentialCounter = numValue + 1;
@@ -219,10 +188,6 @@ export class IdGenerator {
     capacity: number;
     utilization: number;
   } {
-    /**
-     * capacity
-     * @public
-     */
     const capacity = this.getCapacity();
     return {
       mode: this.mode,
@@ -235,6 +200,7 @@ export class IdGenerator {
 
   /**
    * Reset generator state
+   * @returns void - No return value
    */
   reset(): void {
     this.usedIds.clear();

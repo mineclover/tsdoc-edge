@@ -65,10 +65,6 @@ interface RegistryEntryNode {
 }
 
 // ANSI color codes
-/**
- * colors
- * @public
- */
 const colors = {
   reset: '\x1b[0m',
   bold: '\x1b[1m',
@@ -111,10 +107,6 @@ function printSection(title: string): void {
 function printTodos(): void {
   printHeader('TSDoc Edge - TODO List');
 
-  /**
-   * dbPath
-   * @public
-   */
   const dbPath = path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');
 
   if (!fs.existsSync(dbPath)) {
@@ -128,23 +120,11 @@ function printTodos(): void {
     return;
   }
 
-  /**
-   * jsonlPath
-   * @public
-   */
   const jsonlPath = path.join(process.cwd(), 'demo', 'output', 'data');
-  /**
-   * dbManager
-   * @public
-   */
   const dbManager = new DatabaseManager(dbPath, jsonlPath);
 
   try {
     printSection('📊 Database Statistics');
-    /**
-     * stats
-     * @public
-     */
     const stats = dbManager.getStatistics();
     console.log(`   Total Symbols: ${colors.green}${stats.totalSymbols}${colors.reset}`);
     console.log(`   Total Enhanced Docs: ${colors.green}${stats.totalEnhancedDocs}${colors.reset}`);
@@ -154,10 +134,6 @@ function printTodos(): void {
     // Query future plans (TODO items)
     printSection('📋 Future Plans (TODO)');
 
-    /**
-     * query
-     * @public
-     */
     const query = `
       SELECT
         future_plans as plans,
@@ -165,31 +141,15 @@ function printTodos(): void {
       FROM enhanced_docs
     `;
 
-    /**
-     * stmt
-     * @public
-     */
     const stmt = dbManager.db.prepare(query);
-    /**
-     * results
-     * @public
-     */
     const results = stmt.all() as Array<{ plans: string; symbolId: string }>;
 
-    /**
-     * totalTodos
-     * @public
-     */
     let totalTodos = 0;
     /**
      * row
      * @public
      */
     for (const row of results) {
-      /**
-       * plans
-       * @public
-       */
       const plans = JSON.parse(row.plans || '[]');
       if (plans.length > 0) {
         console.log();
@@ -202,10 +162,6 @@ function printTodos(): void {
          */
         for (const plan of plans) {
           totalTodos++;
-          /**
-           * statusIcon
-           * @public
-           */
           const statusIcon =
             plan.status === 'completed'
               ? `${colors.green}✅`
@@ -213,10 +169,6 @@ function printTodos(): void {
                 ? `${colors.yellow}🔄`
                 : `${colors.blue}📌`;
 
-          /**
-           * priorityColor
-           * @public
-           */
           const priorityColor =
             plan.priority === 'high'
               ? colors.red
@@ -263,35 +215,15 @@ function printTodos(): void {
  * @public
  */
 function printIdCommands(): void {
-  /**
-   * registryPath
-   * @public
-   */
   const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
-  /**
-   * manager
-   * @public
-   */
   const manager = new SymbolRegistryManager(registryPath);
 
-  /**
-   * subcommand
-   * @public
-   */
   const subcommand = process.argv[3] || 'help';
 
   switch (subcommand) {
     case 'new':
       {
-        /**
-         * filePath
-         * @public
-         */
         const filePath = process.argv[4];
-        /**
-         * symbolName
-         * @public
-         */
         const symbolName = process.argv[5];
 
         if (!filePath || !symbolName) {
@@ -316,25 +248,9 @@ function printIdCommands(): void {
         }
 
         // Parse options
-        /**
-         * args
-         * @public
-         */
         const args = process.argv.slice(6);
-        /**
-         * type
-         * @public
-         */
         let type: string | undefined;
-        /**
-         * parent
-         * @public
-         */
         let parent: string | undefined;
-        /**
-         * memberType
-         * @public
-         */
         let memberType: 'instance' | 'static' | 'inner' | undefined;
 
         /**
@@ -353,10 +269,6 @@ function printIdCommands(): void {
 
         // Validate parent if provided
         if (parent) {
-          /**
-           * parentEntry
-           * @public
-           */
           const parentEntry = manager.findById(parent);
           if (!parentEntry) {
             console.log(`${colors.red}❌ Parent symbol not found: ${parent}${colors.reset}`);
@@ -366,10 +278,6 @@ function printIdCommands(): void {
           }
         }
 
-        /**
-         * id
-         * @public
-         */
         const id = manager.register({
           filePath,
           symbolName,
@@ -379,10 +287,6 @@ function printIdCommands(): void {
         });
         manager.save();
 
-        /**
-         * entry
-         * @public
-         */
         const entry = manager.findById(id);
 
         console.log(`${colors.green}✅ ID generated:${colors.reset}`);
@@ -421,10 +325,6 @@ function printIdCommands(): void {
 
     case 'list':
       {
-        /**
-         * entries
-         * @public
-         */
         const entries = manager.getAll();
 
         printHeader('Symbol Registry');
@@ -459,20 +359,12 @@ function printIdCommands(): void {
 
     case 'find':
       {
-        /**
-         * id
-         * @public
-         */
         const id = process.argv[4];
         if (!id) {
           console.log(`${colors.red}Usage: tsdoc-edge id find <id>${colors.reset}`);
           process.exit(1);
         }
 
-        /**
-         * entry
-         * @public
-         */
         const entry = manager.findById(id);
         if (!entry) {
           console.log(`${colors.red}❌ ID not found: ${id}${colors.reset}`);
@@ -503,10 +395,6 @@ function printIdCommands(): void {
 
     case 'stats':
       {
-        /**
-         * stats
-         * @public
-         */
         const stats = manager.getStats();
 
         printHeader('Registry Statistics');
@@ -551,26 +439,10 @@ function printIdCommands(): void {
 function printInit(): void {
   printHeader('TSDoc Edge - Initialize Project');
 
-  /**
-   * hasForce
-   * @public
-   */
   const hasForce = process.argv.includes('--force');
-  /**
-   * nameArg
-   * @public
-   */
   const nameArg = process.argv.find((arg) => arg.startsWith('--name='));
-  /**
-   * versionArg
-   * @public
-   */
   const versionArg = process.argv.find((arg) => arg.startsWith('--version='));
 
-  /**
-   * configManager
-   * @public
-   */
   const configManager = ConfigManager.getInstance();
 
   if (configManager.exists() && !hasForce) {
@@ -582,15 +454,7 @@ function printInit(): void {
     return;
   }
 
-  /**
-   * projectName
-   * @public
-   */
   const projectName = nameArg ? nameArg.split('=')[1] : path.basename(process.cwd());
-  /**
-   * projectVersion
-   * @public
-   */
   const projectVersion = versionArg ? versionArg.split('=')[1] : '1.0.0';
 
   try {
@@ -610,10 +474,6 @@ function printInit(): void {
     console.log(`${colors.cyan}   ${configManager.getConfigPath()}${colors.reset}`);
     console.log();
 
-    /**
-     * config
-     * @public
-     */
     const config = configManager.get();
     console.log('Project Settings:');
     console.log(`   Name: ${colors.bold}${config.project.name}${colors.reset}`);
@@ -725,20 +585,12 @@ function printHelp(): void {
  * @public
  */
 function printDependencies(): void {
-  /**
-   * id
-   * @public
-   */
   const id = process.argv[3];
   if (!id) {
     console.log(`${colors.red}Usage: tsdoc-edge deps <id>${colors.reset}`);
     process.exit(1);
   }
 
-  /**
-   * registryPath
-   * @public
-   */
   const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
   if (!fs.existsSync(registryPath)) {
     console.log(
@@ -747,15 +599,7 @@ function printDependencies(): void {
     process.exit(1);
   }
 
-  /**
-   * manager
-   * @public
-   */
   const manager = new SymbolRegistryManager(registryPath);
-  /**
-   * entry
-   * @public
-   */
   const entry = manager.findById(id);
 
   if (!entry) {
@@ -765,10 +609,6 @@ function printDependencies(): void {
 
   printHeader(`Dependencies of ${id} (${entry.sourceRef.symbolName})`);
 
-  /**
-   * deps
-   * @public
-   */
   const deps = manager.getDependencies(id);
 
   if (deps.length === 0) {
@@ -780,15 +620,7 @@ function printDependencies(): void {
      * @public
      */
     for (const dep of deps) {
-      /**
-       * target
-       * @public
-       */
       const target = manager.findById(dep.targetId);
-      /**
-       * typeLabel
-       * @public
-       */
       const typeLabel = dep.type ? ` [${dep.type}]` : '';
       console.log(
         `${colors.bold}${dep.targetId}${colors.reset}${typeLabel} → ${target?.sourceRef.symbolName || 'unknown'}`
@@ -811,35 +643,19 @@ function printDependencies(): void {
  * @public
  */
 function printUsedBy(): void {
-  /**
-   * id
-   * @public
-   */
   const id = process.argv[3];
   if (!id) {
     console.log(`${colors.red}Usage: tsdoc-edge used-by <id>${colors.reset}`);
     process.exit(1);
   }
 
-  /**
-   * registryPath
-   * @public
-   */
   const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
   if (!fs.existsSync(registryPath)) {
     console.log(`${colors.yellow}⚠️  No registry found.${colors.reset}`);
     process.exit(1);
   }
 
-  /**
-   * manager
-   * @public
-   */
   const manager = new SymbolRegistryManager(registryPath);
-  /**
-   * entry
-   * @public
-   */
   const entry = manager.findById(id);
 
   if (!entry) {
@@ -849,10 +665,6 @@ function printUsedBy(): void {
 
   printHeader(`Used By ${id} (${entry.sourceRef.symbolName})`);
 
-  /**
-   * usedBy
-   * @public
-   */
   const usedBy = manager.getUsedBy(id);
 
   if (usedBy.length === 0) {
@@ -864,15 +676,7 @@ function printUsedBy(): void {
      * @public
      */
     for (const user of usedBy) {
-      /**
-       * from
-       * @public
-       */
       const from = manager.findById(user.fromId);
-      /**
-       * typeLabel
-       * @public
-       */
       const typeLabel = user.type ? ` [${user.type}]` : '';
       console.log(
         `${colors.bold}${user.fromId}${colors.reset}${typeLabel} → ${from?.sourceRef.symbolName || 'unknown'}`
@@ -895,25 +699,13 @@ function printUsedBy(): void {
  * @public
  */
 function printOrphans(): void {
-  /**
-   * registryPath
-   * @public
-   */
   const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
   if (!fs.existsSync(registryPath)) {
     console.log(`${colors.yellow}⚠️  No registry found.${colors.reset}`);
     process.exit(1);
   }
 
-  /**
-   * manager
-   * @public
-   */
   const manager = new SymbolRegistryManager(registryPath);
-  /**
-   * orphans
-   * @public
-   */
   const orphans = manager.findOrphans();
 
   printHeader('Orphaned Symbols');
@@ -930,10 +722,6 @@ function printOrphans(): void {
      * @public
      */
     for (const id of orphans) {
-      /**
-       * entry
-       * @public
-       */
       const entry = manager.findById(id);
       if (entry) {
         console.log(`${colors.bold}${id}${colors.reset} → ${entry.sourceRef.symbolName}`);
@@ -952,10 +740,6 @@ function printOrphans(): void {
 function printUndocumented(): void {
   printHeader('Undocumented Symbols');
 
-  /**
-   * dbPath
-   * @public
-   */
   const dbPath = path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');
 
   if (!fs.existsSync(dbPath)) {
@@ -966,40 +750,16 @@ function printUndocumented(): void {
     return;
   }
 
-  /**
-   * jsonlPath
-   * @public
-   */
   const jsonlPath = path.join(process.cwd(), 'demo', 'output', 'data');
-  /**
-   * dbManager
-   * @public
-   */
   const dbManager = new DatabaseManager(dbPath, jsonlPath);
 
   try {
     // Get all symbols from database
-    /**
-     * query
-     * @public
-     */
     const query = 'SELECT * FROM symbols';
-    /**
-     * stmt
-     * @public
-     */
     const stmt = dbManager.db.prepare(query);
-    /**
-     * rows
-     * @public
-     */
     const rows = stmt.all() as SymbolRow[];
 
     // Build symbol graph
-    /**
-     * graphBuilder
-     * @public
-     */
     const graphBuilder = new SymbolGraphBuilder();
 
     /**
@@ -1007,10 +767,6 @@ function printUndocumented(): void {
      * @public
      */
     for (const row of rows) {
-      /**
-       * symbol
-       * @public
-       */
       const symbol: Symbol = {
         id: row.id,
         name: row.name,
@@ -1028,15 +784,7 @@ function printUndocumented(): void {
     }
 
     // Search for undocumented symbols
-    /**
-     * searchEngine
-     * @public
-     */
     const searchEngine = new SymbolSearchEngine(graphBuilder);
-    /**
-     * undocumented
-     * @public
-     */
     const undocumented = searchEngine.findUndocumented();
 
     if (undocumented.length === 0) {
@@ -1077,10 +825,6 @@ function printUndocumented(): void {
 function printUntested(): void {
   printHeader('Untested Symbols');
 
-  /**
-   * dbPath
-   * @public
-   */
   const dbPath = path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');
 
   if (!fs.existsSync(dbPath)) {
@@ -1091,38 +835,14 @@ function printUntested(): void {
     return;
   }
 
-  /**
-   * jsonlPath
-   * @public
-   */
   const jsonlPath = path.join(process.cwd(), 'demo', 'output', 'data');
-  /**
-   * dbManager
-   * @public
-   */
   const dbManager = new DatabaseManager(dbPath, jsonlPath);
 
   try {
-    /**
-     * query
-     * @public
-     */
     const query = 'SELECT * FROM symbols';
-    /**
-     * stmt
-     * @public
-     */
     const stmt = dbManager.db.prepare(query);
-    /**
-     * rows
-     * @public
-     */
     const rows = stmt.all() as SymbolRow[];
 
-    /**
-     * graphBuilder
-     * @public
-     */
     const graphBuilder = new SymbolGraphBuilder();
 
     /**
@@ -1130,10 +850,6 @@ function printUntested(): void {
      * @public
      */
     for (const row of rows) {
-      /**
-       * symbol
-       * @public
-       */
       const symbol: Symbol = {
         id: row.id,
         name: row.name,
@@ -1150,15 +866,7 @@ function printUntested(): void {
       graphBuilder.addSymbol(symbol);
     }
 
-    /**
-     * searchEngine
-     * @public
-     */
     const searchEngine = new SymbolSearchEngine(graphBuilder);
-    /**
-     * untested
-     * @public
-     */
     const untested = searchEngine.findUntested();
 
     if (untested.length === 0) {
@@ -1197,10 +905,6 @@ function printUntested(): void {
 function printWithoutResponsibility(): void {
   printHeader('Symbols Without Responsibility');
 
-  /**
-   * dbPath
-   * @public
-   */
   const dbPath = path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');
 
   if (!fs.existsSync(dbPath)) {
@@ -1211,38 +915,14 @@ function printWithoutResponsibility(): void {
     return;
   }
 
-  /**
-   * jsonlPath
-   * @public
-   */
   const jsonlPath = path.join(process.cwd(), 'demo', 'output', 'data');
-  /**
-   * dbManager
-   * @public
-   */
   const dbManager = new DatabaseManager(dbPath, jsonlPath);
 
   try {
-    /**
-     * query
-     * @public
-     */
     const query = 'SELECT * FROM symbols';
-    /**
-     * stmt
-     * @public
-     */
     const stmt = dbManager.db.prepare(query);
-    /**
-     * rows
-     * @public
-     */
     const rows = stmt.all() as SymbolRow[];
 
-    /**
-     * graphBuilder
-     * @public
-     */
     const graphBuilder = new SymbolGraphBuilder();
 
     /**
@@ -1250,10 +930,6 @@ function printWithoutResponsibility(): void {
      * @public
      */
     for (const row of rows) {
-      /**
-       * symbol
-       * @public
-       */
       const symbol: Symbol = {
         id: row.id,
         name: row.name,
@@ -1270,15 +946,7 @@ function printWithoutResponsibility(): void {
       graphBuilder.addSymbol(symbol);
     }
 
-    /**
-     * searchEngine
-     * @public
-     */
     const searchEngine = new SymbolSearchEngine(graphBuilder);
-    /**
-     * withoutResponsibility
-     * @public
-     */
     const withoutResponsibility = searchEngine.findWithoutResponsibility();
 
     if (withoutResponsibility.length === 0) {
@@ -1321,10 +989,6 @@ function printWithoutResponsibility(): void {
 function printWithoutContract(): void {
   printHeader('Symbols Without Contract');
 
-  /**
-   * dbPath
-   * @public
-   */
   const dbPath = path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');
 
   if (!fs.existsSync(dbPath)) {
@@ -1335,38 +999,14 @@ function printWithoutContract(): void {
     return;
   }
 
-  /**
-   * jsonlPath
-   * @public
-   */
   const jsonlPath = path.join(process.cwd(), 'demo', 'output', 'data');
-  /**
-   * dbManager
-   * @public
-   */
   const dbManager = new DatabaseManager(dbPath, jsonlPath);
 
   try {
-    /**
-     * query
-     * @public
-     */
     const query = 'SELECT * FROM symbols';
-    /**
-     * stmt
-     * @public
-     */
     const stmt = dbManager.db.prepare(query);
-    /**
-     * rows
-     * @public
-     */
     const rows = stmt.all() as SymbolRow[];
 
-    /**
-     * graphBuilder
-     * @public
-     */
     const graphBuilder = new SymbolGraphBuilder();
 
     /**
@@ -1374,10 +1014,6 @@ function printWithoutContract(): void {
      * @public
      */
     for (const row of rows) {
-      /**
-       * symbol
-       * @public
-       */
       const symbol: Symbol = {
         id: row.id,
         name: row.name,
@@ -1394,15 +1030,7 @@ function printWithoutContract(): void {
       graphBuilder.addSymbol(symbol);
     }
 
-    /**
-     * searchEngine
-     * @public
-     */
     const searchEngine = new SymbolSearchEngine(graphBuilder);
-    /**
-     * withoutContract
-     * @public
-     */
     const withoutContract = searchEngine.findWithoutContract();
 
     if (withoutContract.length === 0) {
@@ -1441,10 +1069,6 @@ function printWithoutContract(): void {
  * @public
  */
 function printFindMethod(): void {
-  /**
-   * query
-   * @public
-   */
   const query = process.argv[3];
 
   if (!query) {
@@ -1457,37 +1081,21 @@ function printFindMethod(): void {
     process.exit(1);
   }
 
-  /**
-   * registryPath
-   * @public
-   */
   const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
   if (!fs.existsSync(registryPath)) {
     console.log(`${colors.yellow}⚠️  No registry found.${colors.reset}`);
     process.exit(1);
   }
 
-  /**
-   * manager
-   * @public
-   */
   const manager = new SymbolRegistryManager(registryPath);
 
   printHeader(`Search: ${query}`);
 
   // Try exact match first
-  /**
-   * entry
-   * @public
-   */
   let entry = manager.findByQualifiedName(query);
 
   if (!entry) {
     // Try partial search
-    /**
-     * results
-     * @public
-     */
     const results = manager.search(query);
 
     if (results.length === 0) {
@@ -1524,10 +1132,6 @@ function printFindMethod(): void {
     console.log(`Depth:      ${entry.sourceRef.depth}`);
 
     if (entry.sourceRef.memberOf) {
-      /**
-       * parent
-       * @public
-       */
       const parent = manager.findById(entry.sourceRef.memberOf);
       console.log(`Parent:     ${entry.sourceRef.memberOf} (${parent?.sourceRef.qualifiedName})`);
     }
@@ -1546,10 +1150,6 @@ function printFindMethod(): void {
     console.log();
 
     // Show children if any
-    /**
-     * children
-     * @public
-     */
     const children = manager.getChildren(entry.id);
     if (children.length > 0) {
       console.log(`${colors.cyan}Children (${children.length}):${colors.reset}`);
@@ -1571,25 +1171,13 @@ function printFindMethod(): void {
  * @public
  */
 function printTree(): void {
-  /**
-   * registryPath
-   * @public
-   */
   const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
   if (!fs.existsSync(registryPath)) {
     console.log(`${colors.yellow}⚠️  No registry found.${colors.reset}`);
     process.exit(1);
   }
 
-  /**
-   * manager
-   * @public
-   */
   const manager = new SymbolRegistryManager(registryPath);
-  /**
-   * hierarchy
-   * @public
-   */
   const hierarchy = manager.buildHierarchy();
 
   printHeader('Symbol Hierarchy Tree');
@@ -1600,20 +1188,8 @@ function printTree(): void {
     return;
   }
 
-  /**
-   * printNode
-   * @public
-   */
   const printNode = (node: RegistryEntryNode, prefix: string = '', isLast: boolean = true) => {
-    /**
-     * connector
-     * @public
-     */
     const connector = isLast ? '└── ' : '├── ';
-    /**
-     * typeColor
-     * @public
-     */
     const typeColor =
       node.sourceRef.type === 'class'
         ? colors.blue
@@ -1637,16 +1213,8 @@ function printTree(): void {
     );
 
     if (node.children && node.children.length > 0) {
-      /**
-       * childPrefix
-       * @public
-       */
       const childPrefix = prefix + (isLast ? '    ' : '│   ');
       node.children.forEach((child: RegistryEntryNode, index: number) => {
-        /**
-         * childIsLast
-         * @public
-         */
         const childIsLast = index === (node.children?.length ?? 0) - 1;
         printNode(child, childPrefix, childIsLast);
       });
@@ -1654,10 +1222,6 @@ function printTree(): void {
   };
 
   hierarchy.forEach((root, index) => {
-    /**
-     * isLast
-     * @public
-     */
     const isLast = index === hierarchy.length - 1;
     printNode(root, '', isLast);
   });
@@ -1673,18 +1237,10 @@ function printTree(): void {
  * @public
  */
 function printPlans(): void {
-  /**
-   * status
-   * @public
-   */
   const status = process.argv[3]; // Optional: --status=planned
 
   printHeader('Future Plans');
 
-  /**
-   * dbPath
-   * @public
-   */
   const dbPath = path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');
 
   if (!fs.existsSync(dbPath)) {
@@ -1695,22 +1251,10 @@ function printPlans(): void {
     return;
   }
 
-  /**
-   * jsonlPath
-   * @public
-   */
   const jsonlPath = path.join(process.cwd(), 'demo', 'output', 'data');
-  /**
-   * dbManager
-   * @public
-   */
   const dbManager = new DatabaseManager(dbPath, jsonlPath);
 
   try {
-    /**
-     * query
-     * @public
-     */
     const query = `
       SELECT
         future_plans as plans,
@@ -1718,21 +1262,9 @@ function printPlans(): void {
       FROM enhanced_docs
     `;
 
-    /**
-     * stmt
-     * @public
-     */
     const stmt = dbManager.db.prepare(query);
-    /**
-     * results
-     * @public
-     */
     const results = stmt.all() as Array<{ plans: string; symbolId: string }>;
 
-    /**
-     * allPlans
-     * @public
-     */
     const allPlans: Array<{ plan: FuturePlan; symbolId: string }> = [];
 
     /**
@@ -1740,10 +1272,6 @@ function printPlans(): void {
      * @public
      */
     for (const row of results) {
-      /**
-       * plans
-       * @public
-       */
       const plans = JSON.parse(row.plans || '[]');
       /**
        * plan
@@ -1755,36 +1283,16 @@ function printPlans(): void {
     }
 
     // Filter by status if provided
-    /**
-     * filteredPlans
-     * @public
-     */
     let filteredPlans = allPlans;
     if (status?.startsWith('--status=')) {
-      /**
-       * statusValue
-       * @public
-       */
       const statusValue = status.split('=')[1];
       filteredPlans = allPlans.filter(({ plan }) => plan.status === statusValue);
     }
 
     // Sort by priority (high > medium > low)
-    /**
-     * priorityOrder
-     * @public
-     */
     const priorityOrder = { high: 0, medium: 1, low: 2 };
     filteredPlans.sort((a, b) => {
-      /**
-       * aPriority
-       * @public
-       */
       const aPriority = priorityOrder[a.plan.priority as keyof typeof priorityOrder] ?? 2;
-      /**
-       * bPriority
-       * @public
-       */
       const bPriority = priorityOrder[b.plan.priority as keyof typeof priorityOrder] ?? 2;
       return aPriority - bPriority;
     });
@@ -1801,10 +1309,6 @@ function printPlans(): void {
        * @public
        */
       for (const { plan, symbolId } of filteredPlans) {
-        /**
-         * statusIcon
-         * @public
-         */
         const statusIcon =
           plan.status === 'completed'
             ? `${colors.green}✅`
@@ -1814,10 +1318,6 @@ function printPlans(): void {
                 ? `${colors.red}❌`
                 : `${colors.blue}📌`;
 
-        /**
-         * priorityColor
-         * @public
-         */
         const priorityColor =
           plan.priority === 'high'
             ? colors.red
@@ -1872,10 +1372,6 @@ function printPlans(): void {
 function printValidate(): void {
   printHeader('Detailed Validation Report');
 
-  /**
-   * dbPath
-   * @public
-   */
   const dbPath = path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');
 
   if (!fs.existsSync(dbPath)) {
@@ -1889,40 +1385,16 @@ function printValidate(): void {
     return;
   }
 
-  /**
-   * jsonlPath
-   * @public
-   */
   const jsonlPath = path.join(process.cwd(), 'demo', 'output', 'data');
-  /**
-   * dbManager
-   * @public
-   */
   const dbManager = new DatabaseManager(dbPath, jsonlPath);
 
   try {
     // Get all symbols from database
-    /**
-     * symbolQuery
-     * @public
-     */
     const symbolQuery = 'SELECT * FROM symbols';
-    /**
-     * symbolStmt
-     * @public
-     */
     const symbolStmt = dbManager.db.prepare(symbolQuery);
-    /**
-     * symbolRows
-     * @public
-     */
     const symbolRows = symbolStmt.all() as SymbolRow[];
 
     // Build symbol graph
-    /**
-     * graphBuilder
-     * @public
-     */
     const graphBuilder = new SymbolGraphBuilder();
 
     /**
@@ -1930,10 +1402,6 @@ function printValidate(): void {
      * @public
      */
     for (const row of symbolRows) {
-      /**
-       * symbol
-       * @public
-       */
       const symbol: Symbol = {
         id: row.id,
         name: row.name,
@@ -1952,20 +1420,8 @@ function printValidate(): void {
 
     // Get relationships from database if they exist
     try {
-      /**
-       * relQuery
-       * @public
-       */
       const relQuery = 'SELECT * FROM relationships';
-      /**
-       * relStmt
-       * @public
-       */
       const relStmt = dbManager.db.prepare(relQuery);
-      /**
-       * relRows
-       * @public
-       */
       const relRows = relStmt.all() as RelationshipRow[];
 
       /**
@@ -1990,20 +1446,8 @@ function printValidate(): void {
     }
 
     // Create validator and generate detailed report
-    /**
-     * validator
-     * @public
-     */
     const validator = new ConnectivityValidator(graphBuilder);
-    /**
-     * report
-     * @public
-     */
     const report = validator.generateDetailedReport();
-    /**
-     * formattedReport
-     * @public
-     */
     const formattedReport = validator.formatDetailedReport(report);
 
     console.log(formattedReport);
@@ -2023,30 +1467,10 @@ function printValidate(): void {
  * @returns void
  */
 function printAnalyze(): void {
-  /**
-   * args
-   * @public
-   */
   const args = process.argv.slice(3);
-  /**
-   * targetPath
-   * @public
-   */
   let targetPath = args[0] || 'src';
-  /**
-   * includeChildren
-   * @public
-   */
   let includeChildren = true;
-  /**
-   * includePrivate
-   * @public
-   */
   let includePrivate = false;
-  /**
-   * minQualityScore
-   * @public
-   */
   let minQualityScore = 70;
 
   // Parse options
@@ -2079,15 +1503,7 @@ function printAnalyze(): void {
   console.log(`${colors.cyan}Min quality score: ${minQualityScore}${colors.reset}`);
   console.log();
 
-  /**
-   * checker
-   * @public
-   */
   const checker = new CodeHealthChecker();
-  /**
-   * report
-   * @public
-   */
   const report = checker.analyze({
     path: targetPath,
     includeChildren,
@@ -2104,15 +1520,7 @@ function printAnalyze(): void {
  * @returns void
  */
 function printHealth(): void {
-  /**
-   * args
-   * @public
-   */
   const args = process.argv.slice(3);
-  /**
-   * targetPath
-   * @public
-   */
   const targetPath = args[0] || 'src';
 
   printHeader('TSDoc Edge - Health Check');
@@ -2125,15 +1533,7 @@ function printHealth(): void {
   console.log(`${colors.cyan}Checking health: ${targetPath}${colors.reset}`);
   console.log();
 
-  /**
-   * checker
-   * @public
-   */
   const checker = new CodeHealthChecker();
-  /**
-   * report
-   * @public
-   */
   const report = checker.analyze({
     path: targetPath,
     includeChildren: true,
@@ -2150,25 +1550,9 @@ function printHealth(): void {
  * @returns void
  */
 function printSuggest(): void {
-  /**
-   * args
-   * @public
-   */
   const args = process.argv.slice(3);
-  /**
-   * targetPath
-   * @public
-   */
   let targetPath = args[0] || 'src';
-  /**
-   * minQualityScore
-   * @public
-   */
   let minQualityScore = 70;
-  /**
-   * limit
-   * @public
-   */
   let limit = 20;
 
   // Parse options
@@ -2197,15 +1581,7 @@ function printSuggest(): void {
   console.log(`${colors.cyan}Min quality score: ${minQualityScore}${colors.reset}`);
   console.log();
 
-  /**
-   * checker
-   * @public
-   */
   const checker = new CodeHealthChecker();
-  /**
-   * report
-   * @public
-   */
   const report = checker.analyze({
     path: targetPath,
     includeChildren: true,
@@ -2223,10 +1599,6 @@ function printSuggest(): void {
  * @returns void
  */
 function printAnalysisReport(report: AnalysisReport) {
-  /**
-   * { metrics }
-   * @public
-   */
   const { metrics } = report;
 
   printSection('📊 Overall Metrics');
@@ -2268,10 +1640,6 @@ function printAnalysisReport(report: AnalysisReport) {
      * @public
      */
     for (let i = 0; i < Math.min(10, report.topIssues.length); i++) {
-      /**
-       * issue
-       * @public
-       */
       const issue = report.topIssues[i];
       console.log(
         `   ${i + 1}. ${colors.yellow}${issue.symbolName}${colors.reset} (${getScoreColor(issue.qualityScore)}${issue.qualityScore}/100${colors.reset}) - ${issue.filePath}:${issue.line}`
@@ -2306,41 +1674,17 @@ function printAnalysisReport(report: AnalysisReport) {
  * @returns void
  */
 function printHealthReport(report: AnalysisReport) {
-  /**
-   * { metrics }
-   * @public
-   */
   const { metrics } = report;
 
-  /**
-   * healthScore
-   * @public
-   */
   const healthScore = metrics.healthScore;
-  /**
-   * healthGrade
-   * @public
-   */
   const healthGrade = getHealthGrade(healthScore);
-  /**
-   * healthEmoji
-   * @public
-   */
   const healthEmoji = getHealthEmoji(healthScore);
 
   printSection(`${healthEmoji} Overall Health: ${healthGrade} (${healthScore}/100)`);
   console.log();
 
   // Show health breakdown
-  /**
-   * docScore
-   * @public
-   */
   const docScore = metrics.avgQualityScore;
-  /**
-   * testScore
-   * @public
-   */
   const testScore = Math.round((metrics.filesWithTests / metrics.totalFiles) * 100);
 
   console.log(
@@ -2393,10 +1737,6 @@ function printHealthReport(report: AnalysisReport) {
  * @returns void
  */
 function printSuggestionsReport(report: AnalysisReport, limit: number) {
-  /**
-   * { suggestions }
-   * @public
-   */
   const { suggestions } = report;
 
   if (suggestions.length === 0) {
@@ -2408,31 +1748,11 @@ function printSuggestionsReport(report: AnalysisReport, limit: number) {
   console.log();
 
   // Group by priority
-  /**
-   * critical
-   * @public
-   */
   const critical = suggestions.filter((s) => s.priority === 'critical');
-  /**
-   * high
-   * @public
-   */
   const high = suggestions.filter((s) => s.priority === 'high');
-  /**
-   * medium
-   * @public
-   */
   const medium = suggestions.filter((s) => s.priority === 'medium');
-  /**
-   * low
-   * @public
-   */
   const low = suggestions.filter((s) => s.priority === 'low');
 
-  /**
-   * shown
-   * @public
-   */
   let shown = 0;
 
   if (critical.length > 0) {
@@ -2504,21 +1824,9 @@ function printSuggestionsReport(report: AnalysisReport, limit: number) {
  * @returns void
  */
 function printSuggestion(suggestion: ImprovementSuggestion) {
-  /**
-   * { category, filePath, symbolName, issue, suggestion: action, effort }
-   * @public
-   */
   const { category, filePath, symbolName, issue, suggestion: action, effort } = suggestion;
 
-  /**
-   * categoryIcon
-   * @public
-   */
   const categoryIcon = category === 'documentation' ? '📝' : category === 'testing' ? '🧪' : '🏗️';
-  /**
-   * effortBadge
-   * @public
-   */
   const effortBadge =
     effort === 'small' ? '⚡ Small' : effort === 'medium' ? '🔧 Medium' : '🔨 Large';
 
@@ -2575,15 +1883,7 @@ function getHealthEmoji(score: number): string {
  * @returns Returns string
  */
 function getHealthFocus(metrics: CodeHealthMetrics): string {
-  /**
-   * docScore
-   * @public
-   */
   const docScore = metrics.avgQualityScore;
-  /**
-   * testScore
-   * @public
-   */
   const testScore = Math.round((metrics.filesWithTests / metrics.totalFiles) * 100);
 
   if (docScore < testScore) {
@@ -2600,25 +1900,9 @@ function getHealthFocus(metrics: CodeHealthMetrics): string {
  * @returns void
  */
 function printFix(): void {
-  /**
-   * args
-   * @public
-   */
   const args = process.argv.slice(3);
-  /**
-   * targetPath
-   * @public
-   */
   let targetPath = args[0] || 'src';
-  /**
-   * dryRun
-   * @public
-   */
   let dryRun = false;
-  /**
-   * minScore
-   * @public
-   */
   let minScore = 70;
 
   // Parse options
@@ -2651,16 +1935,8 @@ function printFix(): void {
   // Analyze first
   printSection('📊 Analyzing...');
   const _analyzer = new DocumentationAnalyzer();
-  /**
-   * checker
-   * @public
-   */
   const checker = new CodeHealthChecker();
 
-  /**
-   * report
-   * @public
-   */
   const report = checker.analyze({
     path: targetPath,
     includeChildren: true,
@@ -2670,10 +1946,6 @@ function printFix(): void {
   });
 
   console.log(`   Found ${report.docScores.length} symbols`);
-  /**
-   * needsFixing
-   * @public
-   */
   const needsFixing = report.docScores.filter((s) => s.qualityScore < minScore && s.isPublic);
   console.log(`   ${needsFixing.length} need fixing (quality < ${minScore})`);
   console.log();
@@ -2684,10 +1956,6 @@ function printFix(): void {
   }
 
   // Group by file
-  /**
-   * byFile
-   * @public
-   */
   const byFile = new Map<string, typeof needsFixing>();
   /**
    * score
@@ -2701,21 +1969,9 @@ function printFix(): void {
   }
 
   printSection('🔧 Fixing Files...');
-  /**
-   * { DocumentationFixer }
-   * @public
-   */
   const { DocumentationFixer } = require('./fixer/DocumentationFixer');
-  /**
-   * fixer
-   * @public
-   */
   const fixer = new DocumentationFixer();
 
-  /**
-   * totalFixed
-   * @public
-   */
   let totalFixed = 0;
   /**
    * [filePath, scores]
@@ -2724,10 +1980,6 @@ function printFix(): void {
   for (const [filePath, scores] of byFile.entries()) {
     console.log(`   ${path.basename(filePath)} (${scores.length} symbols)...`);
 
-    /**
-     * result
-     * @public
-     */
     const result = fixer.fixFile(filePath, scores, {
       addSummary: true,
       addParams: true,
@@ -2764,30 +2016,10 @@ function printFix(): void {
  * @returns void
  */
 function printImprove(): void {
-  /**
-   * args
-   * @public
-   */
   const args = process.argv.slice(3);
-  /**
-   * targetScore
-   * @public
-   */
   let targetScore = 80;
-  /**
-   * maxIterations
-   * @public
-   */
   let maxIterations = 10;
-  /**
-   * dryRun
-   * @public
-   */
   let dryRun = false;
-  /**
-   * verbose
-   * @public
-   */
   let verbose = false;
 
   // Parse options
@@ -2814,19 +2046,11 @@ function printImprove(): void {
   console.log(`${colors.cyan}Dry run: ${dryRun}${colors.reset}`);
   console.log();
 
-  /**
-   * improver
-   * @public
-   */
   const improver = new RecursiveImprover();
 
   printSection('🚀 Starting Recursive Improvement...');
   console.log();
 
-  /**
-   * result
-   * @public
-   */
   const result = improver.improve({
     targetScore,
     maxIterations,
@@ -2886,15 +2110,7 @@ function printImprove(): void {
 }
 
 // Main CLI logic
-/**
- * args
- * @public
- */
 const args = process.argv.slice(2);
-/**
- * command
- * @public
- */
 const command = args[0] || 'help';
 
 switch (command) {
