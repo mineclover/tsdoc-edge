@@ -14,6 +14,8 @@ import { StatsHistoryManager } from './analyzer/StatsHistoryManager';
 import { TrackableStatsCollector } from './analyzer/TrackableStatsCollector';
 import { ConfigManager } from './config/ConfigManager';
 import { RecursiveImprover } from './fixer/RecursiveImprover';
+import { InsightDocGenerator } from './generator/InsightDocGenerator';
+import { DepthTraverser } from './graph/DepthTraverser';
 import { SymbolGraphBuilder } from './graph/SymbolGraphBuilder';
 import { SymbolSearchEngine } from './graph/SymbolSearchEngine';
 import { DatabaseManager } from './storage/DatabaseManager';
@@ -549,6 +551,7 @@ function printHelp(): void {
     '  stats [path]            Show documentation statistics with tracking (default: src)'
   );
   console.log('  core-api                Show core API surface (exported + 1 depth dependencies)');
+  console.log('  scan [options]          Scan and document symbol graph by depth');
   console.log('  help                    Show this help message');
   console.log();
   console.log('Init Options:');
@@ -583,6 +586,9 @@ function printHelp(): void {
   console.log('  tsdoc-edge stats --save');
   console.log('  tsdoc-edge stats --compare');
   console.log('  tsdoc-edge core-api');
+  console.log('  tsdoc-edge scan --depth=2 --output=docs/INSIGHTS.md');
+  console.log('  tsdoc-edge scan --entry=TSDocEdge --depth=3');
+  console.log('  tsdoc-edge scan --group-by-category --output=docs/FEATURES.md');
   console.log('  tsdoc-edge fix src/myFile.ts --min-score=80');
   console.log('  tsdoc-edge improve --target=90 --verbose');
   console.log('  tsdoc-edge improve --target=80 --max-iterations=5 --dry-run');
@@ -2407,6 +2413,157 @@ function printCoreApi(): void {
   console.log();
 }
 
+/**
+ * printScan function
+ * @returns void
+ * @public
+ */
+function printScan(): void {
+  // Parse options
+  let depth = 2;
+  let entry: string | undefined;
+  let output: string | undefined;
+  let groupByCategory = false;
+
+  for (const arg of process.argv.slice(3)) {
+    if (arg.startsWith('--depth=')) {
+      depth = Number.parseInt(arg.split('=')[1], 10);
+    } else if (arg.startsWith('--entry=')) {
+      entry = arg.split('=')[1];
+    } else if (arg.startsWith('--output=')) {
+      output = arg.split('=')[1];
+    } else if (arg === '--group-by-category') {
+      groupByCategory = true;
+    }
+  }
+
+  const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+  const jsonlPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
+
+  // Fallback to demo database if .tsdoc doesn't exist
+  const finalDbPath = fs.existsSync(dbPath)
+    ? dbPath
+    : path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');
+  const finalJsonlPath = fs.existsSync(jsonlPath)
+    ? jsonlPath
+    : path.join(process.cwd(), 'demo', 'output', 'data');
+
+  if (!fs.existsSync(finalDbPath)) {
+    console.log(`${colors.yellow}⚠️  No database found. Run analysis first.${colors.reset}`);
+    process.exit(1);
+  }
+
+  // Load symbols from database
+  const dbManager = new DatabaseManager(finalDbPath, finalJsonlPath);
+  const symbolStmt = dbManager.db.prepare('SELECT * FROM symbols');
+  const symbolRows = symbolStmt.all() as SymbolRow[];
+  const relationshipStmt = dbManager.db.prepare('SELECT * FROM relationships');
+  const relationshipRows = relationshipStmt.all() as RelationshipRow[];
+
+  const graphBuilder = new SymbolGraphBuilder();
+
+  // Add symbols
+  for (const row of symbolRows) {
+    const symbol: Symbol = {
+      id: row.id,
+      name: row.name,
+      type: row.type as Symbol['type'],
+      filePath: row.file_path,
+      line: row.line,
+      column: row.column,
+      isExported: row.is_exported === 1,
+      isPublic: row.is_public === 1,
+      summary: row.summary || undefined,
+      tests: [],
+      designDecisions: [],
+    };
+    graphBuilder.addSymbol(symbol);
+  }
+
+  // Add relationships
+  for (const row of relationshipRows) {
+    const relationship: SymbolRelationship = {
+      type: row.type as SymbolRelationship['type'],
+      from: row.from_id,
+      to: row.to_id,
+      filePath: row.file_path,
+      line: row.line,
+      description: row.description,
+    };
+    graphBuilder.addRelationship(relationship);
+  }
+
+  // Create traverser
+  const traverser = new DepthTraverser(graphBuilder);
+
+  // Determine entry points
+  let entryPoints: string[];
+  if (entry) {
+    // Try to find by name first
+    const symbolId = traverser.findSymbolByName(entry);
+    if (symbolId) {
+      entryPoints = [symbolId];
+    } else {
+      // Assume it's an ID
+      entryPoints = [entry];
+    }
+  } else {
+    // Default: all exported symbols
+    entryPoints = traverser.getExportedSymbols();
+  }
+
+  if (entryPoints.length === 0) {
+    console.log(`${colors.red}❌ No entry points found${colors.reset}`);
+    process.exit(1);
+  }
+
+  printHeader('Scanning Symbol Graph');
+  console.log(`Entry points: ${colors.green}${entryPoints.length}${colors.reset}`);
+  console.log(`Max depth: ${colors.green}${depth}${colors.reset}`);
+  console.log();
+
+  // Traverse
+  const result = traverser.traverse(entryPoints, {
+    maxDepth: depth,
+    direction: 'dependencies',
+  });
+
+  console.log(
+    `Found ${colors.bold}${result.totalSymbols}${colors.reset} symbols across ${colors.bold}${result.maxDepthReached + 1}${colors.reset} levels`
+  );
+  console.log();
+
+  // Generate document
+  const generator = new InsightDocGenerator(graphBuilder);
+  const doc = generator.generate(result.symbolsByDepth, {
+    title: groupByCategory ? 'TSDoc Edge - Core Features' : 'TSDoc Edge - Code Insights',
+    entryDescription: entry
+      ? `Entry Point: ${entry}`
+      : `Entry Points: All exported symbols (${entryPoints.length})`,
+    includeTypeBadges: true,
+    includeDependencyCounts: false,
+    groupByCategory,
+  });
+
+  // Output
+  if (output) {
+    const outputPath = path.resolve(process.cwd(), output);
+    const outputDir = path.dirname(outputPath);
+
+    // Ensure directory exists
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+
+    fs.writeFileSync(outputPath, doc, 'utf-8');
+    console.log(`${colors.green}✅ Document written to ${outputPath}${colors.reset}`);
+  } else {
+    console.log(doc);
+  }
+
+  console.log();
+}
+
 // Main CLI logic
 const args = process.argv.slice(2);
 const command = args[0] || 'help';
@@ -2475,6 +2632,9 @@ switch (command) {
     break;
   case 'core-api':
     printCoreApi();
+    break;
+  case 'scan':
+    printScan();
     break;
   case 'help':
   case '--help':

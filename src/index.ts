@@ -33,9 +33,11 @@ export { CommentImporter } from './fold/CommentImporter';
 export { CommentStateManager } from './fold/CommentStateManager';
 // Generator exports
 export { EnhancedMarkdownGenerator } from './generator/EnhancedMarkdownGenerator';
+export { InsightDocGenerator } from './generator/InsightDocGenerator';
 export { MarkdownGenerator } from './generator/MarkdownGenerator';
 export { RelatedDocsGenerator } from './generator/RelatedDocsGenerator';
 // Graph and search exports
+export { DepthTraverser } from './graph/DepthTraverser';
 export { SymbolGraphBuilder } from './graph/SymbolGraphBuilder';
 export { SymbolSearchEngine } from './graph/SymbolSearchEngine';
 // Core exports
