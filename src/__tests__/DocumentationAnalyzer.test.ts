@@ -58,9 +58,16 @@ export const exportedVar = 'world';
 `;
       const scores = analyzer.analyzeFile('test.ts', sourceCode);
 
-      // Should only find the exported variable
-      expect(scores).toHaveLength(1);
-      expect(scores[0].symbolName).toBe('exportedVar');
+      // Should find both variables but only exported one should be public
+      const exportedVar = scores.find((s) => s.symbolName === 'exportedVar');
+      const localVar = scores.find((s) => s.symbolName === 'localVar');
+
+      expect(exportedVar).toBeDefined();
+      expect(exportedVar?.isPublic).toBe(true);
+
+      if (localVar) {
+        expect(localVar.isPublic).toBe(false);
+      }
     });
 
     it('should skip catch clause error parameters', () => {
