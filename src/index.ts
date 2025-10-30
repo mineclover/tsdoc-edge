@@ -11,8 +11,15 @@ import { MarkdownGenerator } from './generator/MarkdownGenerator';
 import { TSDocParser } from './parser/TSDocParser';
 import { ConventionValidator } from './validator/ConventionValidator';
 
+// Analyzer exports
+export { CodeHealthChecker } from './analyzer/CodeHealthChecker';
+export { DocumentationAnalyzer } from './analyzer/DocumentationAnalyzer';
+export { TestCoverageAnalyzer } from './analyzer/TestCoverageAnalyzer';
 // Config exports
 export { ConfigManager } from './config/ConfigManager';
+// Fixer exports
+export { DocumentationFixer } from './fixer/DocumentationFixer';
+export { RecursiveImprover } from './fixer/RecursiveImprover';
 // Fold/Unfold exports
 export { CommentExporter } from './fold/CommentExporter';
 export { CommentImporter } from './fold/CommentImporter';
@@ -34,6 +41,9 @@ export type {
   TSDocEdgeConfig,
   ValidationResult,
 } from './types';
+
+// Analysis type exports
+export type * from './types/analysis';
 
 // Comment state type exports
 export type * from './types/comment-state';

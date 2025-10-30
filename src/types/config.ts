@@ -66,6 +66,13 @@ export interface ProjectConfig {
    * @defaultValue ["src"]
    */
   srcDirs?: string[];
+
+  /**
+   * Entry points for analysis and documentation
+   * These are the main files to start analysis from
+   * @defaultValue ["src/index.ts"]
+   */
+  entryPoints?: string[];
 }
 
 /**

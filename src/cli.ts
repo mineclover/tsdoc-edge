@@ -7,11 +7,15 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { CodeHealthChecker } from './analyzer/CodeHealthChecker';
+import { DocumentationAnalyzer } from './analyzer/DocumentationAnalyzer';
 import { ConfigManager } from './config/ConfigManager';
+import { RecursiveImprover } from './fixer/RecursiveImprover';
 import { SymbolGraphBuilder } from './graph/SymbolGraphBuilder';
 import { SymbolSearchEngine } from './graph/SymbolSearchEngine';
 import { DatabaseManager } from './storage/DatabaseManager';
 import { SymbolRegistryManager } from './storage/SymbolRegistryManager';
+import type { AnalysisReport, CodeHealthMetrics, ImprovementSuggestion } from './types/analysis';
 import type { FuturePlan } from './types/enhanced-tags';
 import type { Symbol } from './types/graph';
 import { ConnectivityValidator } from './validator/ConnectivityValidator';
@@ -465,6 +469,11 @@ function printHelp() {
   console.log(
     '  validate                Generate detailed validation report with actionable items'
   );
+  console.log('  analyze [path]          Analyze code quality and documentation (default: src)');
+  console.log('  health [path]           Check overall code health (default: src)');
+  console.log('  suggest [path]          Generate improvement suggestions (default: src)');
+  console.log('  fix [path]              Fix documentation issues (default: src)');
+  console.log('  improve                 Recursively improve documentation to target score');
   console.log('  help                    Show this help message');
   console.log();
   console.log('Init Options:');
@@ -490,6 +499,14 @@ function printHelp() {
   console.log('  tsdoc-edge plans');
   console.log('  tsdoc-edge plans --status=planned');
   console.log('  tsdoc-edge validate');
+  console.log('  tsdoc-edge analyze src');
+  console.log('  tsdoc-edge analyze src --include-children --min-score=80');
+  console.log('  tsdoc-edge health');
+  console.log('  tsdoc-edge suggest src --limit=30');
+  console.log('  tsdoc-edge fix src --dry-run');
+  console.log('  tsdoc-edge fix src/myFile.ts --min-score=80');
+  console.log('  tsdoc-edge improve --target=90 --verbose');
+  console.log('  tsdoc-edge improve --target=80 --max-iterations=5 --dry-run');
   console.log('  tsdoc-edge help');
   console.log();
 }
@@ -1226,6 +1243,579 @@ function printValidate() {
   }
 }
 
+/**
+ * Analyze code health for a directory
+ */
+function printAnalyze() {
+  const args = process.argv.slice(3);
+  let targetPath = args[0] || 'src';
+  let includeChildren = true;
+  let includePrivate = false;
+  let minQualityScore = 70;
+
+  // Parse options
+  for (const arg of args) {
+    if (arg.startsWith('--no-children')) {
+      includeChildren = false;
+    } else if (arg.startsWith('--include-private')) {
+      includePrivate = true;
+    } else if (arg.startsWith('--min-score=')) {
+      minQualityScore = parseInt(arg.split('=')[1], 10);
+    } else if (!arg.startsWith('--')) {
+      targetPath = arg;
+    }
+  }
+
+  printHeader('TSDoc Edge - Code Analysis');
+
+  if (!fs.existsSync(targetPath)) {
+    console.log(`${colors.red}❌ Path not found: ${targetPath}${colors.reset}`);
+    return;
+  }
+
+  console.log(`${colors.cyan}Analyzing: ${targetPath}${colors.reset}`);
+  console.log(`${colors.cyan}Include children: ${includeChildren}${colors.reset}`);
+  console.log(`${colors.cyan}Include private: ${includePrivate}${colors.reset}`);
+  console.log(`${colors.cyan}Min quality score: ${minQualityScore}${colors.reset}`);
+  console.log();
+
+  const checker = new CodeHealthChecker();
+  const report = checker.analyze({
+    path: targetPath,
+    includeChildren,
+    includePrivate,
+    minQualityScore,
+    generateSuggestions: false,
+  });
+
+  printAnalysisReport(report);
+}
+
+/**
+ * Check code health and generate report
+ */
+function printHealth() {
+  const args = process.argv.slice(3);
+  const targetPath = args[0] || 'src';
+
+  printHeader('TSDoc Edge - Health Check');
+
+  if (!fs.existsSync(targetPath)) {
+    console.log(`${colors.red}❌ Path not found: ${targetPath}${colors.reset}`);
+    return;
+  }
+
+  console.log(`${colors.cyan}Checking health: ${targetPath}${colors.reset}`);
+  console.log();
+
+  const checker = new CodeHealthChecker();
+  const report = checker.analyze({
+    path: targetPath,
+    includeChildren: true,
+    includePrivate: false,
+    minQualityScore: 70,
+    generateSuggestions: false,
+  });
+
+  printHealthReport(report);
+}
+
+/**
+ * Generate improvement suggestions
+ */
+function printSuggest() {
+  const args = process.argv.slice(3);
+  let targetPath = args[0] || 'src';
+  let minQualityScore = 70;
+  let limit = 20;
+
+  // Parse options
+  for (const arg of args) {
+    if (arg.startsWith('--min-score=')) {
+      minQualityScore = parseInt(arg.split('=')[1], 10);
+    } else if (arg.startsWith('--limit=')) {
+      limit = parseInt(arg.split('=')[1], 10);
+    } else if (!arg.startsWith('--')) {
+      targetPath = arg;
+    }
+  }
+
+  printHeader('TSDoc Edge - Improvement Suggestions');
+
+  if (!fs.existsSync(targetPath)) {
+    console.log(`${colors.red}❌ Path not found: ${targetPath}${colors.reset}`);
+    return;
+  }
+
+  console.log(`${colors.cyan}Analyzing: ${targetPath}${colors.reset}`);
+  console.log(`${colors.cyan}Min quality score: ${minQualityScore}${colors.reset}`);
+  console.log();
+
+  const checker = new CodeHealthChecker();
+  const report = checker.analyze({
+    path: targetPath,
+    includeChildren: true,
+    includePrivate: false,
+    minQualityScore,
+    generateSuggestions: true,
+  });
+
+  printSuggestionsReport(report, limit);
+}
+
+/**
+ * Print analysis report
+ */
+function printAnalysisReport(report: AnalysisReport) {
+  const { metrics } = report;
+
+  printSection('📊 Overall Metrics');
+  console.log(`   Total Files: ${colors.green}${metrics.totalFiles}${colors.reset}`);
+  console.log(`   Total Symbols: ${colors.green}${metrics.totalSymbols}${colors.reset}`);
+  console.log(`   Public Symbols: ${colors.green}${metrics.publicSymbols}${colors.reset}`);
+  console.log(
+    `   Documented Symbols: ${colors.green}${metrics.documentedSymbols}${colors.reset} (${Math.round((metrics.documentedSymbols / metrics.totalSymbols) * 100)}%)`
+  );
+  console.log(
+    `   Fully Documented: ${colors.green}${metrics.fullyDocumentedSymbols}${colors.reset} (${Math.round((metrics.fullyDocumentedSymbols / metrics.totalSymbols) * 100)}%)`
+  );
+  console.log();
+
+  printSection('🧪 Test Coverage');
+  console.log(`   Files with Tests: ${colors.green}${metrics.filesWithTests}${colors.reset}`);
+  console.log(
+    `   Files without Tests: ${colors.yellow}${metrics.filesWithoutTests}${colors.reset}`
+  );
+  console.log(
+    `   Coverage: ${getScoreColor(Math.round((metrics.filesWithTests / metrics.totalFiles) * 100))}${Math.round((metrics.filesWithTests / metrics.totalFiles) * 100)}%${colors.reset}`
+  );
+  console.log();
+
+  printSection('📈 Quality Scores');
+  console.log(
+    `   Average Doc Quality: ${getScoreColor(metrics.avgQualityScore)}${metrics.avgQualityScore}/100${colors.reset}`
+  );
+  console.log(
+    `   Overall Health Score: ${getScoreColor(metrics.healthScore)}${metrics.healthScore}/100${colors.reset}`
+  );
+  console.log();
+
+  // Top issues
+  if (report.topIssues.length > 0) {
+    printSection('⚠️  Top Issues (Lowest Quality Scores)');
+    for (let i = 0; i < Math.min(10, report.topIssues.length); i++) {
+      const issue = report.topIssues[i];
+      console.log(
+        `   ${i + 1}. ${colors.yellow}${issue.symbolName}${colors.reset} (${getScoreColor(issue.qualityScore)}${issue.qualityScore}/100${colors.reset}) - ${issue.filePath}:${issue.line}`
+      );
+      if (issue.missing.length > 0) {
+        console.log(`      Missing: ${colors.red}${issue.missing.join(', ')}${colors.reset}`);
+      }
+    }
+    console.log();
+  }
+
+  // Files needing attention
+  if (report.filesNeedingAttention.length > 0) {
+    printSection('📁 Files Needing Attention');
+    for (const file of report.filesNeedingAttention.slice(0, 10)) {
+      console.log(`   • ${file}`);
+    }
+    if (report.filesNeedingAttention.length > 10) {
+      console.log(`   ... and ${report.filesNeedingAttention.length - 10} more`);
+    }
+    console.log();
+  }
+}
+
+/**
+ * Print health report
+ */
+function printHealthReport(report: AnalysisReport) {
+  const { metrics } = report;
+
+  const healthScore = metrics.healthScore;
+  const healthGrade = getHealthGrade(healthScore);
+  const healthEmoji = getHealthEmoji(healthScore);
+
+  printSection(`${healthEmoji} Overall Health: ${healthGrade} (${healthScore}/100)`);
+  console.log();
+
+  // Show health breakdown
+  const docScore = metrics.avgQualityScore;
+  const testScore = Math.round((metrics.filesWithTests / metrics.totalFiles) * 100);
+
+  console.log(
+    `   📝 Documentation Quality: ${getScoreColor(docScore)}${docScore}/100${colors.reset}`
+  );
+  console.log(`   🧪 Test Coverage: ${getScoreColor(testScore)}${testScore}/100${colors.reset}`);
+  console.log();
+
+  // Health recommendations
+  printSection('💡 Recommendations');
+  if (healthScore >= 80) {
+    console.log(`   ${colors.green}✓${colors.reset} Your codebase health is excellent!`);
+    console.log(`   ${colors.green}✓${colors.reset} Keep maintaining this quality standard.`);
+  } else if (healthScore >= 60) {
+    console.log(
+      `   ${colors.yellow}!${colors.reset} Your codebase health is good but can be improved.`
+    );
+    console.log(`   ${colors.yellow}!${colors.reset} Focus on: ${getHealthFocus(metrics)}`);
+  } else if (healthScore >= 40) {
+    console.log(`   ${colors.yellow}⚠${colors.reset} Your codebase health needs attention.`);
+    console.log(`   ${colors.yellow}⚠${colors.reset} Priority: ${getHealthFocus(metrics)}`);
+  } else {
+    console.log(`   ${colors.red}❌${colors.reset} Your codebase health is critical.`);
+    console.log(
+      `   ${colors.red}❌${colors.reset} Urgent action required: ${getHealthFocus(metrics)}`
+    );
+  }
+  console.log();
+
+  // Quick stats
+  printSection('📊 Quick Stats');
+  console.log(`   Total Symbols: ${metrics.totalSymbols}`);
+  console.log(
+    `   Documented: ${metrics.documentedSymbols} (${Math.round((metrics.documentedSymbols / metrics.totalSymbols) * 100)}%)`
+  );
+  console.log(`   Files with Tests: ${metrics.filesWithTests}/${metrics.totalFiles}`);
+  console.log(`   Files Needing Attention: ${report.filesNeedingAttention.length}`);
+  console.log();
+
+  console.log(
+    `${colors.cyan}💡 Tip: Run 'tsdoc-edge suggest' for detailed improvement suggestions${colors.reset}`
+  );
+  console.log();
+}
+
+/**
+ * Print suggestions report
+ */
+function printSuggestionsReport(report: AnalysisReport, limit: number) {
+  const { suggestions } = report;
+
+  if (suggestions.length === 0) {
+    console.log(`${colors.green}✓ No issues found! Your codebase looks great.${colors.reset}`);
+    return;
+  }
+
+  printSection(`🎯 Improvement Suggestions (${suggestions.length} total)`);
+  console.log();
+
+  // Group by priority
+  const critical = suggestions.filter((s) => s.priority === 'critical');
+  const high = suggestions.filter((s) => s.priority === 'high');
+  const medium = suggestions.filter((s) => s.priority === 'medium');
+  const low = suggestions.filter((s) => s.priority === 'low');
+
+  let shown = 0;
+
+  if (critical.length > 0) {
+    console.log(`${colors.red}${colors.bold}🔴 Critical Priority${colors.reset}`);
+    console.log();
+    for (const suggestion of critical.slice(0, limit - shown)) {
+      printSuggestion(suggestion);
+      shown++;
+    }
+  }
+
+  if (high.length > 0 && shown < limit) {
+    console.log(`${colors.yellow}${colors.bold}🟡 High Priority${colors.reset}`);
+    console.log();
+    for (const suggestion of high.slice(0, limit - shown)) {
+      printSuggestion(suggestion);
+      shown++;
+    }
+  }
+
+  if (medium.length > 0 && shown < limit) {
+    console.log(`${colors.blue}${colors.bold}🔵 Medium Priority${colors.reset}`);
+    console.log();
+    for (const suggestion of medium.slice(0, limit - shown)) {
+      printSuggestion(suggestion);
+      shown++;
+    }
+  }
+
+  if (low.length > 0 && shown < limit) {
+    console.log(`${colors.cyan}${colors.bold}⚪ Low Priority${colors.reset}`);
+    console.log();
+    for (const suggestion of low.slice(0, limit - shown)) {
+      printSuggestion(suggestion);
+      shown++;
+    }
+  }
+
+  if (suggestions.length > limit) {
+    console.log();
+    console.log(
+      `${colors.cyan}... and ${suggestions.length - shown} more suggestions${colors.reset}`
+    );
+    console.log(`${colors.cyan}Use --limit=N to show more results${colors.reset}`);
+  }
+
+  console.log();
+}
+
+/**
+ * Print a single suggestion
+ */
+function printSuggestion(suggestion: ImprovementSuggestion) {
+  const { category, filePath, symbolName, issue, suggestion: action, effort } = suggestion;
+
+  const categoryIcon = category === 'documentation' ? '📝' : category === 'testing' ? '🧪' : '🏗️';
+  const effortBadge =
+    effort === 'small' ? '⚡ Small' : effort === 'medium' ? '🔧 Medium' : '🔨 Large';
+
+  console.log(
+    `   ${categoryIcon} ${colors.bold}${symbolName || path.basename(filePath)}${colors.reset}`
+  );
+  console.log(`      Location: ${colors.cyan}${filePath}${colors.reset}`);
+  console.log(`      Issue: ${colors.yellow}${issue}${colors.reset}`);
+  console.log(`      Action: ${colors.green}${action}${colors.reset}`);
+  console.log(`      Effort: ${effortBadge}`);
+  console.log();
+}
+
+/**
+ * Get color for score
+ */
+function getScoreColor(score: number): string {
+  if (score >= 80) return colors.green;
+  if (score >= 60) return colors.yellow;
+  return colors.red;
+}
+
+/**
+ * Get health grade
+ */
+function getHealthGrade(score: number): string {
+  if (score >= 90) return 'A+';
+  if (score >= 80) return 'A';
+  if (score >= 70) return 'B';
+  if (score >= 60) return 'C';
+  if (score >= 50) return 'D';
+  return 'F';
+}
+
+/**
+ * Get health emoji
+ */
+function getHealthEmoji(score: number): string {
+  if (score >= 80) return '🌟';
+  if (score >= 60) return '✅';
+  if (score >= 40) return '⚠️';
+  return '❌';
+}
+
+/**
+ * Get health focus area
+ */
+function getHealthFocus(metrics: CodeHealthMetrics): string {
+  const docScore = metrics.avgQualityScore;
+  const testScore = Math.round((metrics.filesWithTests / metrics.totalFiles) * 100);
+
+  if (docScore < testScore) {
+    return 'Improve documentation quality';
+  } else if (testScore < docScore) {
+    return 'Add more test coverage';
+  } else {
+    return 'Improve both documentation and tests';
+  }
+}
+
+/**
+ * Fix documentation for a specific file or directory
+ */
+function printFix() {
+  const args = process.argv.slice(3);
+  let targetPath = args[0] || 'src';
+  let dryRun = false;
+  let minScore = 70;
+
+  // Parse options
+  for (const arg of args) {
+    if (arg === '--dry-run') {
+      dryRun = true;
+    } else if (arg.startsWith('--min-score=')) {
+      minScore = parseInt(arg.split('=')[1], 10);
+    } else if (!arg.startsWith('--')) {
+      targetPath = arg;
+    }
+  }
+
+  printHeader('TSDoc Edge - Fix Documentation');
+
+  if (!fs.existsSync(targetPath)) {
+    console.log(`${colors.red}❌ Path not found: ${targetPath}${colors.reset}`);
+    return;
+  }
+
+  console.log(`${colors.cyan}Fixing: ${targetPath}${colors.reset}`);
+  console.log(`${colors.cyan}Min score: ${minScore}${colors.reset}`);
+  console.log(`${colors.cyan}Dry run: ${dryRun}${colors.reset}`);
+  console.log();
+
+  // Analyze first
+  printSection('📊 Analyzing...');
+  const _analyzer = new DocumentationAnalyzer();
+  const checker = new CodeHealthChecker();
+
+  const report = checker.analyze({
+    path: targetPath,
+    includeChildren: true,
+    includePrivate: false,
+    minQualityScore: minScore,
+    generateSuggestions: false,
+  });
+
+  console.log(`   Found ${report.docScores.length} symbols`);
+  const needsFixing = report.docScores.filter((s) => s.qualityScore < minScore && s.isPublic);
+  console.log(`   ${needsFixing.length} need fixing (quality < ${minScore})`);
+  console.log();
+
+  if (needsFixing.length === 0) {
+    console.log(`${colors.green}✓ All documentation meets quality standards!${colors.reset}`);
+    return;
+  }
+
+  // Group by file
+  const byFile = new Map<string, typeof needsFixing>();
+  for (const score of needsFixing) {
+    if (!byFile.has(score.filePath)) {
+      byFile.set(score.filePath, []);
+    }
+    byFile.get(score.filePath)?.push(score);
+  }
+
+  printSection('🔧 Fixing Files...');
+  const { DocumentationFixer } = require('./fixer/DocumentationFixer');
+  const fixer = new DocumentationFixer();
+
+  let totalFixed = 0;
+  for (const [filePath, scores] of byFile.entries()) {
+    console.log(`   ${path.basename(filePath)} (${scores.length} symbols)...`);
+
+    const result = fixer.fixFile(filePath, scores, {
+      addSummary: true,
+      addParams: true,
+      addReturns: true,
+      addExamples: false,
+      addCustomTags: true,
+      dryRun,
+      minScore,
+    });
+
+    if (result.error) {
+      console.log(`      ${colors.red}✗ Error: ${result.error}${colors.reset}`);
+    } else if (result.modified) {
+      console.log(`      ${colors.green}✓ Fixed ${result.symbolsFixed} symbols${colors.reset}`);
+      totalFixed += result.symbolsFixed;
+    } else {
+      console.log(`      ${colors.yellow}- No changes needed${colors.reset}`);
+    }
+  }
+
+  console.log();
+  if (dryRun) {
+    console.log(`${colors.cyan}Dry run complete. No files were modified.${colors.reset}`);
+  } else {
+    console.log(
+      `${colors.green}✓ Fixed ${totalFixed} symbols in ${byFile.size} files${colors.reset}`
+    );
+  }
+  console.log();
+}
+
+/**
+ * Recursively improve documentation until target score is reached
+ */
+function printImprove() {
+  const args = process.argv.slice(3);
+  let targetScore = 80;
+  let maxIterations = 10;
+  let dryRun = false;
+  let verbose = false;
+
+  // Parse options
+  for (const arg of args) {
+    if (arg.startsWith('--target=')) {
+      targetScore = parseInt(arg.split('=')[1], 10);
+    } else if (arg.startsWith('--max-iterations=')) {
+      maxIterations = parseInt(arg.split('=')[1], 10);
+    } else if (arg === '--dry-run') {
+      dryRun = true;
+    } else if (arg === '--verbose' || arg === '-v') {
+      verbose = true;
+    }
+  }
+
+  printHeader('TSDoc Edge - Recursive Improvement');
+
+  console.log(`${colors.cyan}Target score: ${targetScore}/100${colors.reset}`);
+  console.log(`${colors.cyan}Max iterations: ${maxIterations}${colors.reset}`);
+  console.log(`${colors.cyan}Dry run: ${dryRun}${colors.reset}`);
+  console.log();
+
+  const improver = new RecursiveImprover();
+
+  printSection('🚀 Starting Recursive Improvement...');
+  console.log();
+
+  const result = improver.improve({
+    targetScore,
+    maxIterations,
+    dryRun,
+    verbose,
+    fixOptions: {
+      addSummary: true,
+      addParams: true,
+      addReturns: true,
+      addExamples: false,
+      addCustomTags: true,
+    },
+  });
+
+  console.log();
+  printSection('📊 Results');
+  console.log(
+    `   Initial Score: ${getScoreColor(result.initialScore)}${result.initialScore}/100${colors.reset}`
+  );
+  console.log(
+    `   Final Score: ${getScoreColor(result.finalScore)}${result.finalScore}/100${colors.reset}`
+  );
+  console.log(
+    `   Improvement: ${colors.green}+${result.finalScore - result.initialScore}${colors.reset} points`
+  );
+  console.log(`   Iterations: ${result.iterations}`);
+  console.log(`   Files Modified: ${result.filesModified}`);
+  console.log(`   Symbols Fixed: ${result.symbolsFixed}`);
+  console.log();
+
+  if (result.improvedFiles.length > 0) {
+    printSection('📁 Modified Files');
+    for (const file of result.improvedFiles.slice(0, 20)) {
+      console.log(`   • ${file}`);
+    }
+    if (result.improvedFiles.length > 20) {
+      console.log(`   ... and ${result.improvedFiles.length - 20} more`);
+    }
+    console.log();
+  }
+
+  if (result.finalScore >= targetScore) {
+    console.log(`${colors.green}🎉 Target score reached!${colors.reset}`);
+  } else {
+    console.log(
+      `${colors.yellow}⚠️  Target score not reached after ${result.iterations} iterations${colors.reset}`
+    );
+    console.log(
+      `${colors.cyan}💡 Try increasing --max-iterations or lowering --target${colors.reset}`
+    );
+  }
+  console.log();
+}
+
 // Main CLI logic
 const args = process.argv.slice(2);
 const command = args[0] || 'help';
@@ -1273,6 +1863,21 @@ switch (command) {
     break;
   case 'validate':
     printValidate();
+    break;
+  case 'analyze':
+    printAnalyze();
+    break;
+  case 'health':
+    printHealth();
+    break;
+  case 'suggest':
+    printSuggest();
+    break;
+  case 'fix':
+    printFix();
+    break;
+  case 'improve':
+    printImprove();
     break;
   case 'help':
   case '--help':
