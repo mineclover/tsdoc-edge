@@ -414,7 +414,9 @@ export class DocumentationAnalyzer {
      * jsDoc
      * @public
      */
-    const jsDoc = jsDocTags[0];
+    // Use the last JSDoc comment, which is the one directly above the declaration
+    // (earlier JSDoc comments might be for the file/module)
+    const jsDoc = jsDocTags[jsDocTags.length - 1];
     return jsDoc.getFullText(sourceFile);
   }
 

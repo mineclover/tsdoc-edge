@@ -429,7 +429,9 @@ export class DocumentationFixer {
       return null;
     }
 
-    return jsDocTags[0];
+    // Use the last JSDoc comment, which is the one directly above the declaration
+    // (earlier JSDoc comments might be for the file/module)
+    return jsDocTags[jsDocTags.length - 1];
   }
 
   /**
