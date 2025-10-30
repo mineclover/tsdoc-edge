@@ -73,6 +73,7 @@ interface RegistryEntryNode {
 const colors = {
   reset: '\x1b[0m',
   bold: '\x1b[1m',
+  dim: '\x1b[2m',
   green: '\x1b[32m',
   yellow: '\x1b[33m',
   blue: '\x1b[34m',
@@ -707,6 +708,124 @@ function printUsedBy(): void {
 
     console.log(`Total: ${colors.green}${usedBy.length}${colors.reset} usages`);
     console.log();
+  }
+}
+
+/**
+ * Print reverse dependencies (who uses this symbol)
+ * Uses DatabaseManager with AST-extracted dependencies
+ * @returns void
+ * @public
+ */
+function printWhoUses(): void {
+  const symbolName = process.argv[3];
+  if (!symbolName) {
+    console.log(`${colors.red}Usage: tsdoc-edge who-uses <symbol-name>${colors.reset}`);
+    console.log();
+    console.log('Examples:');
+    console.log('  tsdoc-edge who-uses DocumentationAnalyzer');
+    console.log('  tsdoc-edge who-uses TSDocParser');
+    console.log('  tsdoc-edge who-uses DatabaseManager');
+    console.log();
+    process.exit(1);
+  }
+
+  const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+  if (!fs.existsSync(dbPath)) {
+    console.log(`${colors.yellow}⚠️  Database not found. Run: npx ts-node demo/analyze-self.ts${colors.reset}`);
+    console.log();
+    process.exit(1);
+  }
+
+  const jsonlPath = path.join(process.cwd(), '.tsdoc', 'data');
+  const dbManager = new DatabaseManager(dbPath, jsonlPath);
+
+  try {
+    // Find symbols matching the name
+    const symbols = dbManager.db.prepare(
+      'SELECT * FROM symbols WHERE name = ? OR name LIKE ?'
+    ).all(symbolName, `${symbolName}.%`) as SymbolRow[];
+
+    if (symbols.length === 0) {
+      console.log(`${colors.red}❌ Symbol not found: ${symbolName}${colors.reset}`);
+      console.log();
+      console.log('Tip: Try searching for the symbol first:');
+      console.log(`  sqlite3 .tsdoc/symbols.db "SELECT name, file_path FROM symbols WHERE name LIKE '%${symbolName}%'"`);
+      console.log();
+      dbManager.close();
+      process.exit(1);
+    }
+
+    // Show all matching symbols
+    if (symbols.length > 1) {
+      console.log(`${colors.cyan}Found ${symbols.length} symbols matching "${symbolName}":${colors.reset}`);
+      console.log();
+      for (const sym of symbols) {
+        console.log(`  • ${sym.name} (${sym.type}) in ${sym.file_path}`);
+      }
+      console.log();
+    }
+
+    // Analyze each symbol
+    for (const symbol of symbols) {
+      printHeader(`Who Uses: ${symbol.name}`);
+
+      console.log(`${colors.cyan}Symbol Info:${colors.reset}`);
+      console.log(`  Name: ${symbol.name}`);
+      console.log(`  Type: ${symbol.type}`);
+      console.log(`  File: ${symbol.file_path}:${symbol.line}`);
+      console.log(`  Exported: ${symbol.is_exported ? '✅ Yes' : '❌ No'}`);
+      if (symbol.summary) {
+        console.log(`  Summary: ${symbol.summary.substring(0, 80)}${symbol.summary.length > 80 ? '...' : ''}`);
+      }
+      console.log();
+
+      const dependents = dbManager.getDependents(symbol.id);
+
+      if (dependents.length === 0) {
+        console.log(`${colors.yellow}⚠️  Not used by any symbol${colors.reset}`);
+        console.log();
+
+        if (!symbol.is_exported) {
+          console.log(`${colors.dim}Note: This symbol is not exported, so it can only be used within its own file.${colors.reset}`);
+          console.log();
+        }
+      } else {
+        console.log(`${colors.green}✅ Used by ${dependents.length} symbol(s):${colors.reset}`);
+        console.log();
+
+        // Group by file
+        const byFile = new Map<string, SymbolRow[]>();
+        for (const depId of dependents) {
+          const depSymbol = dbManager.getSymbol(depId);
+          if (depSymbol) {
+            const depRow = dbManager.db.prepare('SELECT * FROM symbols WHERE id = ?').get(depId) as SymbolRow;
+            const fileSymbols = byFile.get(depSymbol.filePath) || [];
+            fileSymbols.push(depRow);
+            byFile.set(depSymbol.filePath, fileSymbols);
+          }
+        }
+
+        // Print grouped by file
+        for (const [filePath, fileSymbols] of byFile.entries()) {
+          console.log(`${colors.bold}📄 ${filePath}${colors.reset}`);
+          for (const depSymbol of fileSymbols) {
+            console.log(`   ← ${depSymbol.name} (${depSymbol.type})`);
+            if (depSymbol.summary) {
+              console.log(`      ${colors.dim}${depSymbol.summary.substring(0, 60)}${depSymbol.summary.length > 60 ? '...' : ''}${colors.reset}`);
+            }
+          }
+          console.log();
+        }
+
+        console.log(`${colors.cyan}Total: ${dependents.length} usage(s) across ${byFile.size} file(s)${colors.reset}`);
+        console.log();
+      }
+    }
+  } catch (error) {
+    console.error(`${colors.red}❌ Error:${colors.reset}`, error);
+  } finally {
+    dbManager.close();
   }
 }
 
@@ -2580,6 +2699,9 @@ switch (command) {
     break;
   case 'used-by':
     printUsedBy();
+    break;
+  case 'who-uses':
+    printWhoUses();
     break;
   case 'orphans':
     printOrphans();

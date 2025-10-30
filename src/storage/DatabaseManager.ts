@@ -214,6 +214,65 @@ export class DatabaseManager {
   }
 
   /**
+   * Insert a dependency relationship between symbols
+   * @param dependency - Dependency information
+   * @returns True if successful
+   */
+  insertDependency(dependency: {
+    symbolId: string;
+    target: string;
+    type: string;
+    reason: string;
+    version?: string;
+    isOptional?: boolean;
+    importPath?: string;
+  }): boolean {
+    const stmt = this.db.prepare(`
+      INSERT INTO dependencies (
+        symbol_id, target, type, reason, version, is_optional, import_path
+      ) VALUES (?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    try {
+      stmt.run(
+        dependency.symbolId,
+        dependency.target,
+        dependency.type,
+        dependency.reason,
+        dependency.version || null,
+        dependency.isOptional ? 1 : 0,
+        dependency.importPath || null
+      );
+      return true;
+    } catch (error) {
+      console.error('Failed to insert dependency:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get dependencies for a symbol
+   * @param symbolId - Symbol ID
+   * @returns Array of dependency target symbol IDs
+   */
+  getDependencies(symbolId: string): string[] {
+    const stmt = this.db.prepare('SELECT target FROM dependencies WHERE symbol_id = ?');
+    const results = stmt.all(symbolId) as Array<{ target: string }>;
+    return results.map((r) => r.target);
+  }
+
+  /**
+   * Get symbols that depend on a given symbol
+   * @param symbolId - Symbol ID
+   * @returns Array of dependent symbol IDs
+   */
+  getDependents(symbolId: string): string[] {
+    const stmt = this.db.prepare('SELECT symbol_id FROM dependencies WHERE target = ?');
+    const results = stmt.all(symbolId) as Array<{ symbol_id: string }>;
+    return results.map((r) => r.symbol_id);
+  }
+
+  /**
    * Search symbols by text query (full-text search)
    * @param query - Search query
    * @returns Array of matching symbol IDs

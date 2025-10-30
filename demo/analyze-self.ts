@@ -1,28 +1,23 @@
 #!/usr/bin/env ts-node
 
 /**
- * Analyze tsdoc-edge project itself
+ * Analyze tsdoc-edge project itself using AST-based extraction
  */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import {
-  type DocCodeSpan,
-  type DocNode,
-  DocNodeKind,
-  type DocParagraph,
-  type DocPlainText,
-} from '@microsoft/tsdoc';
-import { TSDocParser } from '../src/parser/TSDocParser';
+import { ASTSymbolExtractor } from '../src/analyzer/ASTSymbolExtractor';
+import { DependencyResolver } from '../src/analyzer/DependencyResolver';
 import { DatabaseManager } from '../src/storage/DatabaseManager';
 import type { Symbol } from '../src/types/graph';
 
 console.log('='.repeat(80));
-console.log('Analyzing TSDoc-Edge Project');
+console.log('Analyzing TSDoc-Edge Project (AST-based)');
 console.log('='.repeat(80));
 console.log();
 
-const parser = new TSDocParser();
+const extractor = new ASTSymbolExtractor();
+const resolver = new DependencyResolver();
 const projectRoot = process.cwd();
 const dbPath = path.join(projectRoot, '.tsdoc', 'symbols.db');
 const jsonlPath = path.join(projectRoot, '.tsdoc', 'data');
@@ -80,51 +75,88 @@ const srcDir = path.join(projectRoot, 'src');
 const files = findTypeScriptFiles(srcDir);
 console.log(`Found ${files.length} TypeScript files\n`);
 
+console.log('📝 Extracting symbols using AST...\n');
+
+const allSymbols: Symbol[] = [];
+const allImports: any[] = [];
 let symbolIdCounter = 0;
-let totalSymbols = 0;
-let totalWithDocs = 0;
 
-console.log('📝 Parsing files...\n');
-
+// Phase 1: Extract all symbols and imports
 for (const filePath of files) {
   const sourceCode = fs.readFileSync(filePath, 'utf-8');
-  const parseResult = parser.parseFile(filePath, sourceCode);
-
   const relativePath = path.relative(projectRoot, filePath);
 
-  if (parseResult.comments.length > 0) {
-    console.log(`✅ ${relativePath} (${parseResult.comments.length} comments)`);
+  const result = extractor.extract(relativePath, sourceCode);
 
-    for (const comment of parseResult.comments) {
-      const docComment = comment.docComment;
+  console.log(`✅ ${relativePath}`);
+  console.log(`   Symbols: ${result.symbols.length}, Imports: ${result.imports.length}`);
 
-      // Properly render summary
-      const summary = docComment.summarySection
-        ? renderDocNodes(docComment.summarySection.nodes)
-        : '';
+  // Convert extracted symbols to DB symbols
+  for (const extractedSymbol of result.symbols) {
+    const symbol: Symbol = {
+      id: `sym-${String(symbolIdCounter++).padStart(4, '0')}`,
+      name: extractedSymbol.name,
+      type: extractedSymbol.type,
+      filePath: extractedSymbol.filePath,
+      line: extractedSymbol.line,
+      column: extractedSymbol.column,
+      isExported: extractedSymbol.isExported,
+      isPublic: extractedSymbol.isPublic,
+      summary: extractedSymbol.summary,
+      tests: [],
+      designDecisions: [],
+    };
 
-      // Extract symbol name
-      const symbolName = comment.symbolName || path.basename(filePath, '.ts');
-      const symbolType = inferSymbolType(sourceCode, symbolName);
+    allSymbols.push(symbol);
+  }
 
-      const symbol: Symbol = {
-        id: `sym-${String(symbolIdCounter++).padStart(4, '0')}`,
-        name: symbolName,
-        type: symbolType,
-        filePath: relativePath,
-        line: 1, // Default line number
-        column: 0,
-        isExported: checkIfExported(sourceCode, symbolName),
-        isPublic: checkIfPublic(docComment),
-        summary: summary || undefined,
-        tests: [],
-        designDecisions: [],
-      };
+  allImports.push(...result.imports);
+}
 
-      dbManager.insertSymbol(symbol, 0);
-      totalSymbols++;
-      if (summary) totalWithDocs++;
-    }
+console.log();
+console.log('💾 Saving symbols to database...');
+
+// Save all symbols
+for (const symbol of allSymbols) {
+  dbManager.insertSymbol(symbol, 0);
+}
+
+console.log(`   Saved ${allSymbols.length} symbols`);
+
+// Phase 2: Resolve dependencies and create relationships
+console.log();
+console.log('🔗 Resolving dependencies...');
+
+// Index symbols for dependency resolution
+const extractedSymbols = allSymbols.map((s) => ({
+  name: s.name,
+  type: s.type,
+  filePath: s.filePath,
+  line: s.line,
+  column: s.column,
+  isExported: s.isExported,
+  isPublic: s.isPublic,
+  summary: s.summary,
+}));
+
+resolver.indexSymbols(extractedSymbols);
+const relationships = resolver.resolveImports(allImports, projectRoot);
+
+console.log(`   Found ${relationships.length} relationships`);
+
+// Save relationships
+for (const rel of relationships) {
+  // Find symbol IDs
+  const fromSymbol = allSymbols.find((s) => s.name === rel.from);
+  const toSymbol = allSymbols.find((s) => s.name === rel.to);
+
+  if (fromSymbol && toSymbol) {
+    dbManager.insertDependency({
+      symbolId: fromSymbol.id,
+      target: toSymbol.id,
+      type: rel.type,
+      reason: rel.description || 'Import dependency',
+    });
   }
 }
 
@@ -133,84 +165,19 @@ console.log('✅ Analysis complete!');
 console.log();
 
 const stats = dbManager.getStatistics();
+const withDocs = allSymbols.filter((s) => s.summary).length;
+
 console.log(`📊 Statistics:`);
 console.log(`   Total symbols: ${stats.totalSymbols}`);
-console.log(`   With documentation: ${totalWithDocs}`);
-console.log(`   Documentation rate: ${((totalWithDocs / totalSymbols) * 100).toFixed(1)}%`);
+console.log(`   Exported symbols: ${allSymbols.filter((s) => s.isExported).length}`);
+console.log(`   With documentation: ${withDocs}`);
+console.log(`   Documentation rate: ${((withDocs / stats.totalSymbols) * 100).toFixed(1)}%`);
+console.log(`   Relationships: ${relationships.length}`);
 console.log();
 console.log(`💾 Database saved to: ${dbPath}`);
+console.log();
+console.log('💡 Try these commands:');
+console.log(`   tsdoc-edge scan --depth=1`);
+console.log(`   tsdoc-edge scan --depth=2`);
 
 dbManager.close();
-
-/**
- * Render an array of DocNodes to plain text
- */
-function renderDocNodes(nodes: ReadonlyArray<DocNode>): string {
-  let result = '';
-
-  for (const node of nodes) {
-    switch (node.kind) {
-      case DocNodeKind.PlainText:
-        result += (node as DocPlainText).text;
-        break;
-      case DocNodeKind.SoftBreak:
-        result += ' ';
-        break;
-      case DocNodeKind.Paragraph:
-        result += renderDocNodes((node as DocParagraph).nodes);
-        result += '\n\n';
-        break;
-      case DocNodeKind.CodeSpan:
-        result += `\`${(node as DocCodeSpan).code}\``;
-        break;
-      default:
-        // Handle other node types
-        result += node.toString();
-    }
-  }
-
-  return result.trim();
-}
-
-/**
- * Infer symbol type
- */
-function inferSymbolType(sourceCode: string, symbolName: string): Symbol['type'] {
-  const regex = new RegExp(`(class|interface|type|function|enum)\\s+${symbolName}\\b`);
-  const match = sourceCode.match(regex);
-
-  if (match) {
-    const keyword = match[1];
-    if (keyword === 'class') return 'class';
-    if (keyword === 'interface') return 'interface';
-    if (keyword === 'type') return 'type';
-    if (keyword === 'function') return 'function';
-    if (keyword === 'enum') return 'enum';
-  }
-
-  return 'variable';
-}
-
-/**
- * Check if exported
- */
-function checkIfExported(sourceCode: string, symbolName: string): boolean {
-  // Check if export keyword appears before symbol
-  const exportRegex = new RegExp(`export\\s+.*${symbolName}\\b`);
-  return exportRegex.test(sourceCode);
-}
-
-/**
- * Check if public
- */
-function checkIfPublic(docComment: any): boolean {
-  // Check for @public tag
-  const customBlocks = (docComment as any).customBlocks || [];
-  for (const block of customBlocks) {
-    if (block.blockTag?.tagName === '@public') {
-      return true;
-    }
-  }
-
-  return false;
-}
