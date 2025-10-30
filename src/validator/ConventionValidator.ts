@@ -23,7 +23,7 @@ export class ConventionValidator {
    * @public
    */
   validate(parsedComment: ParsedDocComment): ParsedDocComment {
-    const validationResults: ValidationResult[] = [];
+    const validationResults: ValidationResult[] = [...parsedComment.validationResults];
 
     // Rule 1: Summary must be present
     if (!this.hasSummary(parsedComment.docComment)) {

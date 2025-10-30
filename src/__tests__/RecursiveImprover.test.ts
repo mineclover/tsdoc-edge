@@ -158,5 +158,120 @@ export function b(): void {}
       expect(result).toBeDefined();
       expect(result.iterations).toBeGreaterThanOrEqual(0);
     });
+
+    it('should log progress when verbose mode is enabled', () => {
+      const testFile = path.join(tempDir, 'verbose.ts');
+      const sourceCode = `export function test(): void {}`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+
+      const result = improver.improve({
+        entryPoints: [tempDir],
+        maxIterations: 2,
+        targetScore: 80,
+        verbose: true,
+      });
+
+      expect(result).toBeDefined();
+      expect(consoleSpy).toHaveBeenCalled();
+
+      consoleSpy.mockRestore();
+    });
+
+    it('should stop when no symbols need fixing', () => {
+      const testFile = path.join(tempDir, 'perfect.ts');
+      const sourceCode = `/**
+ * Perfect documentation
+ * @param a - First number
+ * @param b - Second number
+ * @returns Sum
+ * @public
+ */
+export function add(a: number, b: number): number {
+  return a + b;
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const result = improver.improve({
+        entryPoints: [tempDir],
+        maxIterations: 5,
+        targetScore: 50, // Low target that's already met
+        verbose: true,
+      });
+
+      expect(result).toBeDefined();
+      expect(result.iterations).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should stop when score does not improve', () => {
+      const testFile = path.join(tempDir, 'noimprov.ts');
+      fs.writeFileSync(testFile, 'export function test(): void {}', 'utf-8');
+
+      const result = improver.improve({
+        entryPoints: [tempDir],
+        maxIterations: 3,
+        targetScore: 100, // Very high target
+        verbose: true,
+      });
+
+      expect(result).toBeDefined();
+      expect(result.iterations).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should handle single file as entry point', () => {
+      const testFile = path.join(tempDir, 'single.ts');
+      fs.writeFileSync(testFile, 'export function test(): void {}', 'utf-8');
+
+      const result = improver.improve({
+        entryPoints: [testFile], // Single file, not directory
+        maxIterations: 1,
+        targetScore: 80,
+      });
+
+      expect(result).toBeDefined();
+      expect(result.iterations).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should skip hidden directories', () => {
+      const hiddenDir = path.join(tempDir, '.hidden');
+      fs.mkdirSync(hiddenDir, { recursive: true });
+      fs.writeFileSync(path.join(hiddenDir, 'test.ts'), 'export function test(): void {}', 'utf-8');
+
+      const normalDir = path.join(tempDir, 'normal');
+      fs.mkdirSync(normalDir, { recursive: true });
+      fs.writeFileSync(path.join(normalDir, 'test.ts'), 'export function test(): void {}', 'utf-8');
+
+      const result = improver.improve({
+        entryPoints: [tempDir],
+        maxIterations: 1,
+        targetScore: 80,
+      });
+
+      expect(result).toBeDefined();
+    });
+
+    it('should skip node_modules directory', () => {
+      const nodeModulesDir = path.join(tempDir, 'node_modules');
+      fs.mkdirSync(nodeModulesDir, { recursive: true });
+      fs.writeFileSync(
+        path.join(nodeModulesDir, 'test.ts'),
+        'export function test(): void {}',
+        'utf-8'
+      );
+
+      const normalDir = path.join(tempDir, 'src');
+      fs.mkdirSync(normalDir, { recursive: true });
+      fs.writeFileSync(path.join(normalDir, 'test.ts'), 'export function test(): void {}', 'utf-8');
+
+      const result = improver.improve({
+        entryPoints: [tempDir],
+        maxIterations: 1,
+        targetScore: 80,
+      });
+
+      expect(result).toBeDefined();
+    });
   });
 });

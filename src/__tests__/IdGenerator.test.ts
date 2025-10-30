@@ -290,5 +290,113 @@ describe('IdGenerator', () => {
       expect(stats.capacity).toBe(46656);
       expect(stats.utilization).toBeCloseTo(0.00428, 2);
     });
+
+    test('should provide statistics via getStats method', () => {
+      const generator = new IdGenerator({ mode: 'random', length: 4 });
+
+      generator.generate();
+      generator.generate();
+      generator.generate();
+
+      const stats = generator.getStats();
+
+      expect(stats.mode).toBe('random');
+      expect(stats.length).toBe(4);
+      expect(stats.used).toBe(3);
+      expect(stats.capacity).toBeGreaterThan(0);
+      expect(stats.utilization).toBeGreaterThan(0);
+    });
+  });
+
+  describe('Validation', () => {
+    test('should validate ID with correct length', () => {
+      const generator = new IdGenerator({ mode: 'sequential', length: 3 });
+
+      const id1 = generator.generate();
+      expect(generator.isValid(id1)).toBe(true);
+
+      expect(generator.isValid('000')).toBe(true);
+      expect(generator.isValid('abcd')).toBe(true);
+      expect(generator.isValid('12345')).toBe(true);
+    });
+
+    test('should reject ID that is too short', () => {
+      const generator = new IdGenerator({ mode: 'sequential', length: 3 });
+
+      expect(generator.isValid('00')).toBe(false);
+      expect(generator.isValid('a')).toBe(false);
+      expect(generator.isValid('')).toBe(false);
+    });
+
+    test('should reject ID that is too long', () => {
+      const generator = new IdGenerator({ mode: 'sequential', length: 3 });
+
+      expect(generator.isValid('000000')).toBe(false);
+      expect(generator.isValid('abcdefgh')).toBe(false);
+    });
+
+    test('should reject ID with invalid characters', () => {
+      const generator = new IdGenerator({ mode: 'sequential', length: 3 });
+
+      expect(generator.isValid('00!')).toBe(false);
+      expect(generator.isValid('a@c')).toBe(false);
+      expect(generator.isValid('xy-')).toBe(false);
+    });
+
+    test('should validate with custom charset', () => {
+      const generator = new IdGenerator({
+        mode: 'sequential',
+        length: 3,
+        charset: 'ABC',
+      });
+
+      expect(generator.isValid('AAA')).toBe(true);
+      expect(generator.isValid('ABC')).toBe(true);
+      expect(generator.isValid('AAD')).toBe(false); // D not in charset
+    });
+  });
+
+  describe('Reset', () => {
+    test('should reset generator state', () => {
+      const generator = new IdGenerator({ mode: 'sequential', length: 3 });
+
+      generator.generate();
+      generator.generate();
+      generator.generate();
+
+      expect(generator.getUsedCount()).toBe(3);
+
+      generator.reset();
+
+      expect(generator.getUsedCount()).toBe(0);
+      const nextId = generator.generate();
+      expect(nextId).toBe('000'); // Should start from beginning
+    });
+
+    test('should reset sequential counter', () => {
+      const generator = new IdGenerator({ mode: 'sequential', length: 3 });
+
+      generator.generate(); // 000
+      generator.generate(); // 001
+      generator.generate(); // 002
+
+      generator.reset();
+
+      const id = generator.generate();
+      expect(id).toBe('000');
+    });
+
+    test('should reset used IDs set', () => {
+      const generator = new IdGenerator({ mode: 'random', length: 3 });
+
+      const id1 = generator.generate();
+      generator.registerExisting([id1]);
+
+      expect(generator.getUsedCount()).toBeGreaterThan(0);
+
+      generator.reset();
+
+      expect(generator.getUsedCount()).toBe(0);
+    });
   });
 });
