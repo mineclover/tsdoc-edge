@@ -7,7 +7,7 @@ import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';
-import type { CommentLocation, CommentState, FileCommentState } from '../types/comment-state';
+import type { CommentLocation, CommentState, FileCommentState } from '../types/state';
 
 // TypeScript compiler API internal types
 /**

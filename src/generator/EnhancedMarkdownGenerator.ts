@@ -5,8 +5,8 @@
  * @architecture Document Generation Layer
  */
 
-import type { EnhancedSymbolDoc } from '../types/enhanced-tags';
 import type { Symbol } from '../types/graph';
+import type { EnhancedSymbolDoc } from '../types/tags';
 
 /**
  * Generator for enhanced markdown documentation

@@ -9,6 +9,9 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { CodeHealthChecker } from './analyzer/CodeHealthChecker';
 import { DocumentationAnalyzer } from './analyzer/DocumentationAnalyzer';
+import { StatsComparator } from './analyzer/StatsComparator';
+import { StatsHistoryManager } from './analyzer/StatsHistoryManager';
+import { TrackableStatsCollector } from './analyzer/TrackableStatsCollector';
 import { ConfigManager } from './config/ConfigManager';
 import { RecursiveImprover } from './fixer/RecursiveImprover';
 import { SymbolGraphBuilder } from './graph/SymbolGraphBuilder';
@@ -16,8 +19,8 @@ import { SymbolSearchEngine } from './graph/SymbolSearchEngine';
 import { DatabaseManager } from './storage/DatabaseManager';
 import { SymbolRegistryManager } from './storage/SymbolRegistryManager';
 import type { AnalysisReport, CodeHealthMetrics, ImprovementSuggestion } from './types/analysis';
-import type { FuturePlan } from './types/enhanced-tags';
-import type { Symbol } from './types/graph';
+import type { Symbol, SymbolRelationship } from './types/graph';
+import type { FuturePlan } from './types/tags';
 import { ConnectivityValidator } from './validator/ConnectivityValidator';
 
 // Database row types
@@ -542,6 +545,10 @@ function printHelp(): void {
   console.log('  suggest [path]          Generate improvement suggestions (default: src)');
   console.log('  fix [path]              Fix documentation issues (default: src)');
   console.log('  improve                 Recursively improve documentation to target score');
+  console.log(
+    '  stats [path]            Show documentation statistics with tracking (default: src)'
+  );
+  console.log('  core-api                Show core API surface (exported + 1 depth dependencies)');
   console.log('  help                    Show this help message');
   console.log();
   console.log('Init Options:');
@@ -572,6 +579,10 @@ function printHelp(): void {
   console.log('  tsdoc-edge health');
   console.log('  tsdoc-edge suggest src --limit=30');
   console.log('  tsdoc-edge fix src --dry-run');
+  console.log('  tsdoc-edge stats');
+  console.log('  tsdoc-edge stats --save');
+  console.log('  tsdoc-edge stats --compare');
+  console.log('  tsdoc-edge core-api');
   console.log('  tsdoc-edge fix src/myFile.ts --min-score=80');
   console.log('  tsdoc-edge improve --target=90 --verbose');
   console.log('  tsdoc-edge improve --target=80 --max-iterations=5 --dry-run');
@@ -2109,6 +2120,293 @@ function printImprove(): void {
   console.log();
 }
 
+/**
+ * Print documentation statistics
+ * @returns void
+ */
+function printStats(): void {
+  const args = process.argv.slice(3);
+  let targetPath = 'src';
+  let compare = false;
+  let save = false;
+  let historyPath = '.tsdoc-stats-history.json';
+  let warningsOnly = false;
+
+  // Parse options
+  for (const arg of args) {
+    if (arg === '--compare' || arg === '-c') {
+      compare = true;
+    } else if (arg === '--save' || arg === '-s') {
+      save = true;
+    } else if (arg.startsWith('--history=')) {
+      historyPath = arg.split('=')[1];
+    } else if (arg === '--warnings-only' || arg === '-w') {
+      warningsOnly = true;
+    } else if (!arg.startsWith('--')) {
+      targetPath = arg;
+    }
+  }
+
+  printHeader('TSDoc Edge - Documentation Statistics');
+
+  if (!fs.existsSync(targetPath)) {
+    console.log(`${colors.red}❌ Path not found: ${targetPath}${colors.reset}`);
+    return;
+  }
+
+  console.log(`${colors.cyan}Analyzing: ${targetPath}${colors.reset}`);
+  console.log();
+
+  // Load from database
+  const dbPath = path.join(process.cwd(), '.tsdoc.db');
+  const jsonlPath = path.join(process.cwd(), 'demo', 'output', 'data');
+  const dbManager = new DatabaseManager(dbPath, jsonlPath);
+
+  const query = 'SELECT * FROM symbols';
+  const stmt = dbManager.db.prepare(query);
+  const rows = stmt.all() as SymbolRow[];
+
+  // Build symbol graph
+  const graphBuilder = new SymbolGraphBuilder();
+
+  for (const row of rows) {
+    const symbol: Symbol = {
+      id: row.id,
+      name: row.name,
+      type: row.type as Symbol['type'],
+      filePath: row.file_path,
+      line: row.line,
+      column: row.column,
+      isExported: row.is_exported === 1,
+      isPublic: row.is_public === 1,
+      summary: row.summary || undefined,
+      tests: [],
+      designDecisions: [],
+    };
+    graphBuilder.addSymbol(symbol);
+  }
+
+  // Load relationships
+  const relQuery = 'SELECT * FROM relationships';
+  const relStmt = dbManager.db.prepare(relQuery);
+  const relRows = relStmt.all() as RelationshipRow[];
+
+  for (const row of relRows) {
+    const relationship: SymbolRelationship = {
+      type: row.type as SymbolRelationship['type'],
+      from: row.from_id,
+      to: row.to_id,
+      filePath: row.file_path,
+      line: row.line,
+      description: row.description,
+    };
+    graphBuilder.addRelationship(relationship);
+  }
+
+  const symbols = graphBuilder.getAllSymbols();
+
+  // Calculate connection counts
+  const connectionCounts = new Map<string, number>();
+  for (const symbol of symbols) {
+    const deps = graphBuilder.getDependencies(symbol.id);
+    const users = graphBuilder.getDependents(symbol.id);
+    connectionCounts.set(symbol.id, deps.length + users.length);
+  }
+
+  // Collect statistics
+  const collector = new TrackableStatsCollector();
+  let stats = collector.collect(process.cwd(), symbols, connectionCounts);
+
+  // Compare with history if requested
+  if (compare) {
+    const historyManager = new StatsHistoryManager();
+    const latestEntry = historyManager.getLatest(historyPath);
+
+    if (latestEntry) {
+      const comparator = new StatsComparator();
+      stats = comparator.compareWithHistory(stats, latestEntry, symbols, latestEntry.symbolIds);
+    } else {
+      console.log(`${colors.yellow}⚠️  No history found for comparison${colors.reset}`);
+      console.log();
+    }
+  }
+
+  // Print results
+  if (stats.comparison && compare) {
+    const comparator = new StatsComparator();
+    console.log(comparator.summarizeComparison(stats));
+  } else if (warningsOnly) {
+    if (stats.comparison) {
+      const hasWarnings =
+        stats.comparison.overall.hasWarning ||
+        stats.comparison.critical.hasWarning ||
+        stats.comparison.important.hasWarning ||
+        stats.comparison.normal.hasWarning;
+
+      if (hasWarnings) {
+        const comparator = new StatsComparator();
+        console.log(comparator.summarizeComparison(stats));
+      } else {
+        console.log(`${colors.green}✅ No warnings detected${colors.reset}`);
+      }
+    } else {
+      console.log(`${colors.yellow}⚠️  No comparison data available${colors.reset}`);
+    }
+  } else {
+    console.log(collector.summarize(stats));
+  }
+
+  // Save to history if requested
+  if (save) {
+    const historyManager = new StatsHistoryManager();
+    historyManager.save(stats, symbols, historyPath);
+    console.log();
+    console.log(`${colors.green}✅ Statistics saved to ${historyPath}${colors.reset}`);
+  }
+
+  console.log();
+}
+
+/**
+ * printCoreApi function
+ * @returns void
+ * @public
+ */
+function printCoreApi(): void {
+  const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+  const jsonlPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
+
+  if (!fs.existsSync(dbPath)) {
+    console.log(`${colors.yellow}⚠️  No database found. Run analysis first.${colors.reset}`);
+    process.exit(1);
+  }
+
+  // Load symbols from database
+  const dbManager = new DatabaseManager(dbPath, jsonlPath);
+  const symbolStmt = dbManager.db.prepare('SELECT * FROM symbols');
+  const symbolRows = symbolStmt.all() as SymbolRow[];
+  const relationshipStmt = dbManager.db.prepare('SELECT * FROM relationships');
+  const relationshipRows = relationshipStmt.all() as RelationshipRow[];
+
+  const graphBuilder = new SymbolGraphBuilder();
+
+  // Add symbols
+  for (const row of symbolRows) {
+    const symbol: Symbol = {
+      id: row.id,
+      name: row.name,
+      type: row.type as Symbol['type'],
+      filePath: row.file_path,
+      line: row.line,
+      column: row.column,
+      isExported: row.is_exported === 1,
+      isPublic: row.is_public === 1,
+      summary: row.summary || undefined,
+      tests: [],
+      designDecisions: [],
+    };
+    graphBuilder.addSymbol(symbol);
+  }
+
+  // Add relationships
+  for (const row of relationshipRows) {
+    const relationship: SymbolRelationship = {
+      type: row.type as SymbolRelationship['type'],
+      from: row.from_id,
+      to: row.to_id,
+      filePath: row.file_path,
+      line: row.line,
+      description: row.description,
+    };
+    graphBuilder.addRelationship(relationship);
+  }
+
+  const allSymbols = graphBuilder.getAllSymbols();
+
+  // Find exported symbols
+  const exportedSymbols = allSymbols.filter((s) => s.isExported);
+
+  // Collect exported + 1 depth dependencies
+  const coreSymbolIds = new Set<string>();
+
+  // Add all exported symbols
+  for (const symbol of exportedSymbols) {
+    coreSymbolIds.add(symbol.id);
+  }
+
+  // Add direct dependencies of exported symbols (1 depth)
+  for (const symbol of exportedSymbols) {
+    const deps = graphBuilder.getDependencies(symbol.id);
+    for (const dep of deps) {
+      coreSymbolIds.add(dep);
+    }
+  }
+
+  // Get actual symbol objects
+  const coreSymbols = allSymbols.filter((s) => coreSymbolIds.has(s.id));
+
+  // Group by type
+  const byType = new Map<string, Symbol[]>();
+  for (const symbol of coreSymbols) {
+    const list = byType.get(symbol.type) || [];
+    list.push(symbol);
+    byType.set(symbol.type, list);
+  }
+
+  // Print results
+  printHeader('Core API (Exported + 1 Depth Dependencies)');
+  console.log(
+    `Total: ${colors.bold}${coreSymbols.length}${colors.reset} symbols (${colors.green}${exportedSymbols.length}${colors.reset} exported + ${colors.cyan}${coreSymbols.length - exportedSymbols.length}${colors.reset} dependencies)`
+  );
+  console.log();
+
+  // Print by type
+  const typeOrder: Symbol['type'][] = [
+    'class',
+    'interface',
+    'type',
+    'function',
+    'enum',
+    'variable',
+    'method',
+    'property',
+  ];
+
+  for (const type of typeOrder) {
+    const symbols = byType.get(type);
+    if (!symbols || symbols.length === 0) continue;
+
+    console.log(`${colors.bold}${type.toUpperCase()}${colors.reset} (${symbols.length})`);
+
+    for (const symbol of symbols) {
+      const isExported = symbol.isExported;
+      const badge = isExported
+        ? `${colors.green}[exported]${colors.reset}`
+        : `${colors.cyan}[dep]${colors.reset}`;
+      const docBadge = symbol.summary
+        ? `${colors.green}✓${colors.reset}`
+        : `${colors.red}✗${colors.reset}`;
+
+      console.log(`  ${badge} ${docBadge} ${colors.bold}${symbol.name}${colors.reset}`);
+      console.log(`    ${colors.cyan}${symbol.filePath}:${symbol.line}${colors.reset}`);
+
+      if (symbol.summary) {
+        const shortSummary =
+          symbol.summary.length > 80 ? `${symbol.summary.substring(0, 77)}...` : symbol.summary;
+        console.log(`    ${shortSummary}`);
+      }
+
+      console.log();
+    }
+  }
+
+  console.log('─'.repeat(80));
+  console.log(
+    `Documentation coverage: ${coreSymbols.filter((s) => s.summary).length}/${coreSymbols.length} (${((coreSymbols.filter((s) => s.summary).length / coreSymbols.length) * 100).toFixed(1)}%)`
+  );
+  console.log();
+}
+
 // Main CLI logic
 const args = process.argv.slice(2);
 const command = args[0] || 'help';
@@ -2171,6 +2469,12 @@ switch (command) {
     break;
   case 'improve':
     printImprove();
+    break;
+  case 'stats':
+    printStats();
+    break;
+  case 'core-api':
+    printCoreApi();
     break;
   case 'help':
   case '--help':

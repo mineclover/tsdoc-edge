@@ -11,8 +11,8 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { DatabaseManager } from '../storage/DatabaseManager';
-import type { EnhancedSymbolDoc } from '../types/enhanced-tags';
 import type { Symbol } from '../types/graph';
+import type { EnhancedSymbolDoc } from '../types/tags';
 
 describe('DatabaseManager', () => {
   let tempDir: string;

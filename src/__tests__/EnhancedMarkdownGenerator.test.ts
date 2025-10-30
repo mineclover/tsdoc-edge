@@ -4,8 +4,8 @@
  */
 
 import { EnhancedMarkdownGenerator } from '../generator/EnhancedMarkdownGenerator';
-import type { EnhancedSymbolDoc } from '../types/enhanced-tags';
 import type { Symbol } from '../types/graph';
+import type { EnhancedSymbolDoc } from '../types/tags';
 
 describe('EnhancedMarkdownGenerator', () => {
   let generator: EnhancedMarkdownGenerator;

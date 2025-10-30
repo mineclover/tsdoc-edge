@@ -3,7 +3,7 @@
  * @public
  */
 
-import { DocNodeKind, type DocComment, type DocNode } from '@microsoft/tsdoc';
+import { type DocComment, type DocNode, DocNodeKind } from '@microsoft/tsdoc';
 import { MarkdownGenerator } from '../generator/MarkdownGenerator';
 import type { ParsedDocComment } from '../types';
 

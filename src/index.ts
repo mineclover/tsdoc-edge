@@ -14,7 +14,14 @@ import { ConventionValidator } from './validator/ConventionValidator';
 // Analyzer exports
 export { CodeHealthChecker } from './analyzer/CodeHealthChecker';
 export { DocumentationAnalyzer } from './analyzer/DocumentationAnalyzer';
+export { DomainStructureAnalyzer } from './analyzer/DomainStructureAnalyzer';
+export { ImportanceClassifier } from './analyzer/ImportanceClassifier';
+export { InterfaceAnalyzer } from './analyzer/InterfaceAnalyzer';
+export { InterfaceDependencyMapper } from './analyzer/InterfaceDependencyMapper';
+export { StatsComparator } from './analyzer/StatsComparator';
+export { StatsHistoryManager } from './analyzer/StatsHistoryManager';
 export { TestCoverageAnalyzer } from './analyzer/TestCoverageAnalyzer';
+export { TrackableStatsCollector } from './analyzer/TrackableStatsCollector';
 // Config exports
 export { ConfigManager } from './config/ConfigManager';
 // Fixer exports
@@ -27,6 +34,7 @@ export { CommentStateManager } from './fold/CommentStateManager';
 // Generator exports
 export { EnhancedMarkdownGenerator } from './generator/EnhancedMarkdownGenerator';
 export { MarkdownGenerator } from './generator/MarkdownGenerator';
+export { RelatedDocsGenerator } from './generator/RelatedDocsGenerator';
 // Graph and search exports
 export { SymbolGraphBuilder } from './graph/SymbolGraphBuilder';
 export { SymbolSearchEngine } from './graph/SymbolSearchEngine';
@@ -44,14 +52,20 @@ export type {
 
 // Analysis type exports
 export type * from './types/analysis';
-
-// Comment state type exports
-export type * from './types/comment-state';
-
 // Config type exports
 export type * from './types/config';
+// Interface analysis type exports
+export type * from './types/domain';
+// Graph type exports
+export type * from './types/graph';
+// Comment state type exports
+export type * from './types/state';
+// Statistics type exports
+export type * from './types/statistics';
 // Enhanced type exports
-export type * from './types/enhanced-tags';
+export type * from './types/tags';
+// Tag type exports
+export type * from './types/tags';
 // Validation exports
 export { ConnectivityValidator } from './validator/ConnectivityValidator';
 export { ConventionValidator } from './validator/ConventionValidator';

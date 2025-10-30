@@ -14,7 +14,7 @@ import type {
   FuturePlan,
   ProblemSolving,
   StrictModeValidation,
-} from '../types/enhanced-tags';
+} from '../types/tags';
 
 /**
  * Validator for strict mode documentation requirements

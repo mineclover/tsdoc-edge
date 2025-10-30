@@ -1,127 +1,43 @@
 /**
- * Core types for TSDoc Edge
+ * TSDoc Edge Types - Re-organized for better domain separation
+ *
+ * All types are re-exported from their domain-specific modules for backward compatibility.
+ *
  * @packageDocumentation
  */
 
-import type { DocComment } from '@microsoft/tsdoc';
-
-// Re-export enhanced tag types
-export * from './enhanced-tags';
-// Re-export graph types
+// Analysis types - quality, coverage, health
+export * from './analysis';
+export type {
+  AnalysisOptions,
+  AnalysisReport,
+  CodeHealthMetrics,
+  DocQualityScore,
+  ImprovementSuggestion,
+  TestCoverageInfo,
+} from './analysis/quality';
+// Configuration types
+export * from './config';
+// Export TSDocEdgeConfig (duplicate name compatibility)
+export type { TsdocEdgeConfig as TSDocEdgeConfig } from './config/config';
+// Core types - parsing and validation
+export * from './core';
+// Legacy re-exports for backward compatibility
+// These will be deprecated in future versions
+export type {
+  ParsedDocComment,
+  ParseResult,
+  ValidationResult,
+} from './core/parse';
+// Domain analysis types - interface analysis
+export * from './domain';
+// Feature documentation types
+export * from './feature';
+// Graph types - symbols, relationships, connectivity
 export * from './graph';
-// Re-export tag types
+// Registry types - symbol registration
+export * from './registry';
+// State management types - comment folding
+export * from './state';
+// TSDoc tag types - base and enhanced
 export * from './tags';
-
-/**
- * Represents a parsed TSDoc comment with validation results
- * @public
- */
-export interface ParsedDocComment {
-  /**
-   * The original TSDoc comment
-   */
-  docComment: DocComment;
-
-  /**
-   * Source file path
-   */
-  filePath: string;
-
-  /**
-   * Symbol name (function, class, interface, etc.)
-   */
-  symbolName: string;
-
-  /**
-   * Validation results
-   */
-  validationResults: ValidationResult[];
-
-  /**
-   * Whether the comment follows all conventions
-   */
-  isValid: boolean;
-}
-
-/**
- * Validation result for a single rule
- * @public
- */
-export interface ValidationResult {
-  /**
-   * Rule identifier
-   */
-  ruleId: string;
-
-  /**
-   * Severity level
-   */
-  severity: 'error' | 'warning' | 'info';
-
-  /**
-   * Human-readable message
-   */
-  message: string;
-
-  /**
-   * Location in source code
-   */
-  location?: {
-    line: number;
-    column: number;
-  };
-}
-
-/**
- * Configuration for TSDoc parser and validator
- * @public
- */
-export interface TSDocEdgeConfig {
-  /**
-   * Custom TSDoc tags to support
-   */
-  customTags?: string[];
-
-  /**
-   * Validation rules to apply
-   */
-  rules?: {
-    [ruleId: string]: 'error' | 'warning' | 'off';
-  };
-
-  /**
-   * Output format for generated documentation
-   */
-  outputFormat?: 'markdown' | 'html' | 'json';
-
-  /**
-   * Paths to include in parsing
-   */
-  include?: string[];
-
-  /**
-   * Paths to exclude from parsing
-   */
-  exclude?: string[];
-}
-
-/**
- * Result of parsing a source file
- * @public
- */
-export interface ParseResult {
-  /**
-   * Source file path
-   */
-  filePath: string;
-
-  /**
-   * All parsed doc comments from the file
-   */
-  comments: ParsedDocComment[];
-
-  /**
-   * Any errors that occurred during parsing
-   */
-  errors: Error[];
-}

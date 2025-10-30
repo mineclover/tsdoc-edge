@@ -15,7 +15,7 @@ import type {
   FileStatusSummary,
   ImportResult,
   StateStorage,
-} from '../types/comment-state';
+} from '../types/state';
 import { CommentExporter } from './CommentExporter';
 import { CommentImporter } from './CommentImporter';
 

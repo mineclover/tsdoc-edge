@@ -9,8 +9,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import Database from 'better-sqlite3';
 import { ConfigManager } from '../config/ConfigManager';
-import type { EnhancedSymbolDoc } from '../types/enhanced-tags';
 import type { Symbol } from '../types/graph';
+import type { EnhancedSymbolDoc } from '../types/tags';
 
 // SQLite row types
 /**
