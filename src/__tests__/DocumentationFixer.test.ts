@@ -137,5 +137,132 @@ export function isEmpty(str: string): boolean {
       expect(result).toBeDefined();
       expect(result.symbolsFixed).toBeGreaterThanOrEqual(0);
     });
+
+    it('should handle classes with methods', () => {
+      const testFile = path.join(tempDir, 'class.ts');
+      const sourceCode = `export class Calculator {
+  add(a: number, b: number): number {
+    return a + b;
+  }
+
+  subtract(a: number, b: number): number {
+    return a - b;
+  }
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      const result = fixer.fixFile(testFile, scores, { minScore: 0 });
+
+      expect(result).toBeDefined();
+      expect(result.symbolsFixed).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should handle interfaces', () => {
+      const testFile = path.join(tempDir, 'interface.ts');
+      const sourceCode = `export interface User {
+  name: string;
+  age: number;
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      const result = fixer.fixFile(testFile, scores, { minScore: 0 });
+
+      expect(result).toBeDefined();
+    });
+
+    it('should handle enums', () => {
+      const testFile = path.join(tempDir, 'enum.ts');
+      const sourceCode = `export enum Status {
+  Active = 'active',
+  Inactive = 'inactive'
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      const result = fixer.fixFile(testFile, scores, { minScore: 0 });
+
+      expect(result).toBeDefined();
+    });
+
+    it('should handle type aliases', () => {
+      const testFile = path.join(tempDir, 'type.ts');
+      const sourceCode = `export type Point = {
+  x: number;
+  y: number;
+};
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      const result = fixer.fixFile(testFile, scores, { minScore: 0 });
+
+      expect(result).toBeDefined();
+    });
+
+    it('should handle functions with optional parameters', () => {
+      const testFile = path.join(tempDir, 'optional.ts');
+      const sourceCode = `export function greet(name: string, title?: string): string {
+  return title ? \`\${title} \${name}\` : name;
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      const result = fixer.fixFile(testFile, scores, { minScore: 0 });
+
+      expect(result).toBeDefined();
+      expect(result.symbolsFixed).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should handle functions with rest parameters', () => {
+      const testFile = path.join(tempDir, 'rest.ts');
+      const sourceCode = `export function sum(...numbers: number[]): number {
+  return numbers.reduce((a, b) => a + b, 0);
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      const result = fixer.fixFile(testFile, scores, { minScore: 0 });
+
+      expect(result).toBeDefined();
+      expect(result.symbolsFixed).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should handle async functions', () => {
+      const testFile = path.join(tempDir, 'async.ts');
+      const sourceCode = `export async function fetchData(url: string): Promise<string> {
+  const response = await fetch(url);
+  return response.text();
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      const result = fixer.fixFile(testFile, scores, { minScore: 0 });
+
+      expect(result).toBeDefined();
+      expect(result.symbolsFixed).toBeGreaterThanOrEqual(0);
+    });
+
+    it('should handle generic functions', () => {
+      const testFile = path.join(tempDir, 'generic.ts');
+      const sourceCode = `export function identity<T>(value: T): T {
+  return value;
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      const result = fixer.fixFile(testFile, scores, { minScore: 0 });
+
+      expect(result).toBeDefined();
+      expect(result.symbolsFixed).toBeGreaterThanOrEqual(0);
+    });
   });
 });

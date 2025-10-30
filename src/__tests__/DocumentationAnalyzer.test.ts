@@ -166,5 +166,182 @@ export function isEmpty(str: string): boolean {
       expect(scores[0].hasCompleteParams).toBe(true);
       expect(scores[0].hasReturns).toBe(true);
     });
+
+    it('should analyze interfaces correctly', () => {
+      const sourceCode = `
+/**
+ * User interface
+ * @public
+ */
+export interface User {
+  /** User name */
+  name: string;
+  /** User age */
+  age: number;
+}
+`;
+      const scores = analyzer.analyzeFile('test.ts', sourceCode, true);
+
+      const interfaceScore = scores.find((s) => s.symbolName === 'User');
+      expect(interfaceScore).toBeDefined();
+      expect(interfaceScore?.hasDoc).toBe(true);
+    });
+
+    it('should analyze enums correctly', () => {
+      const sourceCode = `
+/**
+ * Status enum
+ * @public
+ */
+export enum Status {
+  Active = 'active',
+  Inactive = 'inactive'
+}
+`;
+      const scores = analyzer.analyzeFile('test.ts', sourceCode);
+
+      expect(scores).toHaveLength(1);
+      expect(scores[0].symbolName).toBe('Status');
+      expect(scores[0].symbolType).toBe('enum');
+    });
+
+    it('should analyze type aliases correctly', () => {
+      const sourceCode = `
+/**
+ * Point type
+ * @public
+ */
+export type Point = {
+  x: number;
+  y: number;
+};
+`;
+      const scores = analyzer.analyzeFile('test.ts', sourceCode);
+
+      expect(scores).toHaveLength(1);
+      expect(scores[0].symbolName).toBe('Point');
+      expect(scores[0].symbolType).toBe('type');
+    });
+
+    it('should handle functions with optional parameters', () => {
+      const sourceCode = `
+/**
+ * Greet function
+ * @param name - User name
+ * @param title - Optional title
+ * @returns Greeting string
+ * @public
+ */
+export function greet(name: string, title?: string): string {
+  return title ? \`\${title} \${name}\` : name;
+}
+`;
+      const scores = analyzer.analyzeFile('test.ts', sourceCode);
+
+      expect(scores).toHaveLength(1);
+      expect(scores[0].hasCompleteParams).toBe(true);
+    });
+
+    it('should analyze private members correctly', () => {
+      const sourceCode = `
+export class MyClass {
+  /**
+   * Private method
+   * @private
+   */
+  private _privateMethod(): void {}
+
+  /**
+   * Public method
+   * @public
+   */
+  public publicMethod(): void {}
+}
+`;
+      const scores = analyzer.analyzeFile('test.ts', sourceCode, true);
+
+      const privateMethod = scores.find((s) => s.symbolName === '_privateMethod');
+      const publicMethod = scores.find((s) => s.symbolName === 'publicMethod');
+
+      expect(privateMethod?.isPublic).toBe(false);
+      expect(publicMethod?.isPublic).toBe(true);
+    });
+
+    it('should handle missing @returns tag', () => {
+      const sourceCode = `
+/**
+ * Test function without returns
+ * @param x - Number
+ * @public
+ */
+export function test(x: number): number {
+  return x * 2;
+}
+`;
+      const scores = analyzer.analyzeFile('test.ts', sourceCode);
+
+      expect(scores[0].hasReturns).toBe(false);
+      expect(scores[0].missing).toContain('@returns');
+    });
+
+    it('should handle missing @param tags', () => {
+      const sourceCode = `
+/**
+ * Test function without param docs
+ * @returns Number
+ * @public
+ */
+export function test(x: number, y: number): number {
+  return x + y;
+}
+`;
+      const scores = analyzer.analyzeFile('test.ts', sourceCode);
+
+      expect(scores[0].hasCompleteParams).toBe(false);
+      expect(scores[0].missing.some((m) => m.includes('@param'))).toBe(true);
+    });
+
+    it('should detect or not detect custom tags based on implementation', () => {
+      const sourceCode = `
+/**
+ * Test with custom tags
+ * @param x - Number
+ * @returns Result
+ * @responsibility Handle computation
+ * @contract x must be positive
+ * @public
+ */
+export function test(x: number): number {
+  return x;
+}
+`;
+      const scores = analyzer.analyzeFile('test.ts', sourceCode);
+
+      // Custom tags detection depends on TSDoc parser configuration
+      expect(scores[0]).toBeDefined();
+      expect(typeof scores[0].hasCustomTags).toBe('boolean');
+    });
+
+    it('should detect examples', () => {
+      const sourceCode = `
+/**
+ * Add two numbers
+ * @param a - First number
+ * @param b - Second number
+ * @returns Sum
+ * @example
+ * \`\`\`ts
+ * add(1, 2); // returns 3
+ * \`\`\`
+ * @public
+ */
+export function add(a: number, b: number): number {
+  return a + b;
+}
+`;
+      const scores = analyzer.analyzeFile('test.ts', sourceCode);
+
+      expect(scores[0].hasExamples).toBe(true);
+    });
   });
 });

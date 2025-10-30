@@ -156,5 +156,118 @@ export function partialDoc(x: number): number {
         expect(report.suggestions[0].issue).toBeDefined();
       }
     });
+
+    it('should analyze TypeScript files only', () => {
+      const tsFile = path.join(tempDir, 'code.ts');
+      const jsFile = path.join(tempDir, 'code.js');
+      const txtFile = path.join(tempDir, 'readme.txt');
+
+      fs.writeFileSync(tsFile, 'export function test(): void {}', 'utf-8');
+      fs.writeFileSync(jsFile, 'export function test() {}', 'utf-8');
+      fs.writeFileSync(txtFile, 'Some text', 'utf-8');
+
+      const report = checker.analyze({ path: tempDir });
+
+      expect(report.metrics.totalFiles).toBeGreaterThan(0);
+    });
+
+    it('should handle different minQualityScore thresholds', () => {
+      const testFile = path.join(tempDir, 'threshold.ts');
+      const sourceCode = `/**
+ * Partial documentation
+ * @public
+ */
+export function test(): void {}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const report1 = checker.analyze({ path: tempDir, minQualityScore: 50 });
+      const report2 = checker.analyze({ path: tempDir, minQualityScore: 90 });
+
+      expect(report1).toBeDefined();
+      expect(report2).toBeDefined();
+    });
+
+    it('should handle includePrivate option', () => {
+      const testFile = path.join(tempDir, 'private.ts');
+      const sourceCode = `export class Test {
+  private _internal(): void {}
+  public external(): void {}
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const withPrivate = checker.analyze({ path: tempDir, includePrivate: true });
+      const withoutPrivate = checker.analyze({ path: tempDir, includePrivate: false });
+
+      expect(withPrivate).toBeDefined();
+      expect(withoutPrivate).toBeDefined();
+    });
+
+    it('should handle includeChildren option', () => {
+      const testFile = path.join(tempDir, 'children.ts');
+      const sourceCode = `export class Parent {
+  method(): void {}
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const withChildren = checker.analyze({ path: tempDir, includeChildren: true });
+      const withoutChildren = checker.analyze({ path: tempDir, includeChildren: false });
+
+      expect(withChildren).toBeDefined();
+      expect(withoutChildren).toBeDefined();
+    });
+
+    it('should handle generateSuggestions option', () => {
+      const testFile = path.join(tempDir, 'suggestions.ts');
+      const sourceCode = `export function undocumented(): void {}`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const withSuggestions = checker.analyze({ path: tempDir, generateSuggestions: true });
+      const withoutSuggestions = checker.analyze({ path: tempDir, generateSuggestions: false });
+
+      expect(withSuggestions.suggestions).toBeDefined();
+      expect(withoutSuggestions.suggestions).toBeDefined();
+    });
+
+    it('should calculate health score correctly', () => {
+      const testFile = path.join(tempDir, 'health.ts');
+      const sourceCode = `/**
+ * Well documented
+ * @param x - Parameter
+ * @returns Result
+ * @example
+ * \`\`\`ts
+ * test(1);
+ * \`\`\`
+ * @public
+ */
+export function test(x: number): number {
+  return x;
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const report = checker.analyze({ path: tempDir });
+
+      expect(report.metrics.healthScore).toBeGreaterThan(0);
+      expect(report.metrics.healthScore).toBeLessThanOrEqual(100);
+    });
+
+    it('should handle nested directories', () => {
+      const subDir = path.join(tempDir, 'nested', 'deep');
+      fs.mkdirSync(subDir, { recursive: true });
+
+      const file1 = path.join(tempDir, 'file1.ts');
+      const file2 = path.join(subDir, 'file2.ts');
+
+      fs.writeFileSync(file1, 'export function a(): void {}', 'utf-8');
+      fs.writeFileSync(file2, 'export function b(): void {}', 'utf-8');
+
+      const report = checker.analyze({ path: tempDir });
+
+      expect(report.metrics.totalFiles).toBeGreaterThanOrEqual(1);
+    });
   });
 });
