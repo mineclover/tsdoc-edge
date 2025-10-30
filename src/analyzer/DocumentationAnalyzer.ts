@@ -111,6 +111,11 @@ export class DocumentationAnalyzer {
       return null;
     }
 
+    // Skip catch clause variables (error parameters)
+    if (ts.isVariableDeclaration(node) && node.parent && ts.isCatchClause(node.parent)) {
+      return null;
+    }
+
     /**
      * symbolType
      * @public

@@ -457,6 +457,10 @@ export class DocumentationFixer {
        */
       const { line: nodeLine } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
       if (nodeLine === line) {
+        // Skip catch clause variables (error parameters)
+        if (ts.isVariableDeclaration(node) && node.parent && ts.isCatchClause(node.parent)) {
+          return;
+        }
         result = node;
         return;
       }

@@ -82,9 +82,10 @@ const colors = {
 /**
  * printHeader function
  * @param title - title parameter
+ * @returns void
  * @public
  */
-function printHeader(title: string) {
+function printHeader(title: string): void {
   console.log(colors.bold + colors.blue + '='.repeat(80) + colors.reset);
   console.log(colors.bold + colors.blue + title + colors.reset);
   console.log(colors.bold + colors.blue + '='.repeat(80) + colors.reset);
@@ -94,18 +95,20 @@ function printHeader(title: string) {
 /**
  * printSection function
  * @param title - title parameter
+ * @returns void
  * @public
  */
-function printSection(title: string) {
+function printSection(title: string): void {
   console.log(colors.bold + colors.cyan + title + colors.reset);
   console.log(colors.cyan + '-'.repeat(80) + colors.reset);
 }
 
 /**
  * printTodos function
+ * @returns void
  * @public
  */
-function printTodos() {
+function printTodos(): void {
   printHeader('TSDoc Edge - TODO List');
 
   /**
@@ -256,9 +259,10 @@ function printTodos() {
 
 /**
  * printIdCommands function
+ * @returns void
  * @public
  */
-function printIdCommands() {
+function printIdCommands(): void {
   /**
    * registryPath
    * @public
@@ -541,9 +545,10 @@ function printIdCommands() {
 
 /**
  * printInit function
+ * @returns void
  * @public
  */
-function printInit() {
+function printInit(): void {
   printHeader('TSDoc Edge - Initialize Project');
 
   /**
@@ -644,9 +649,10 @@ function printInit() {
 
 /**
  * printHelp function
+ * @returns void
  * @public
  */
-function printHelp() {
+function printHelp(): void {
   printHeader('TSDoc Edge CLI - Help');
 
   console.log('Usage:');
@@ -715,9 +721,10 @@ function printHelp() {
 
 /**
  * printDependencies function
+ * @returns void
  * @public
  */
-function printDependencies() {
+function printDependencies(): void {
   /**
    * id
    * @public
@@ -800,9 +807,10 @@ function printDependencies() {
 
 /**
  * printUsedBy function
+ * @returns void
  * @public
  */
-function printUsedBy() {
+function printUsedBy(): void {
   /**
    * id
    * @public
@@ -883,9 +891,10 @@ function printUsedBy() {
 
 /**
  * printOrphans function
+ * @returns void
  * @public
  */
-function printOrphans() {
+function printOrphans(): void {
   /**
    * registryPath
    * @public
@@ -937,9 +946,10 @@ function printOrphans() {
 
 /**
  * printUndocumented function
+ * @returns void
  * @public
  */
-function printUndocumented() {
+function printUndocumented(): void {
   printHeader('Undocumented Symbols');
 
   /**
@@ -1061,9 +1071,10 @@ function printUndocumented() {
 
 /**
  * printUntested function
+ * @returns void
  * @public
  */
-function printUntested() {
+function printUntested(): void {
   printHeader('Untested Symbols');
 
   /**
@@ -1180,9 +1191,10 @@ function printUntested() {
 
 /**
  * printWithoutResponsibility function
+ * @returns void
  * @public
  */
-function printWithoutResponsibility() {
+function printWithoutResponsibility(): void {
   printHeader('Symbols Without Responsibility');
 
   /**
@@ -1303,9 +1315,10 @@ function printWithoutResponsibility() {
 
 /**
  * printWithoutContract function
+ * @returns void
  * @public
  */
-function printWithoutContract() {
+function printWithoutContract(): void {
   printHeader('Symbols Without Contract');
 
   /**
@@ -1424,9 +1437,10 @@ function printWithoutContract() {
 
 /**
  * printFindMethod function
+ * @returns void
  * @public
  */
-function printFindMethod() {
+function printFindMethod(): void {
   /**
    * query
    * @public
@@ -1553,9 +1567,10 @@ function printFindMethod() {
 
 /**
  * printTree function
+ * @returns void
  * @public
  */
-function printTree() {
+function printTree(): void {
   /**
    * registryPath
    * @public
@@ -1654,9 +1669,10 @@ function printTree() {
 
 /**
  * printPlans function
+ * @returns void
  * @public
  */
-function printPlans() {
+function printPlans(): void {
   /**
    * status
    * @public
@@ -1850,9 +1866,10 @@ function printPlans() {
 
 /**
  * printValidate function
+ * @returns void
  * @public
  */
-function printValidate() {
+function printValidate(): void {
   printHeader('Detailed Validation Report');
 
   /**
@@ -2003,8 +2020,9 @@ function printValidate() {
 
 /**
  * Analyze code health for a directory
+ * @returns void
  */
-function printAnalyze() {
+function printAnalyze(): void {
   /**
    * args
    * @public
@@ -2083,8 +2101,9 @@ function printAnalyze() {
 
 /**
  * Check code health and generate report
+ * @returns void
  */
-function printHealth() {
+function printHealth(): void {
   /**
    * args
    * @public
@@ -2128,8 +2147,9 @@ function printHealth() {
 
 /**
  * Generate improvement suggestions
+ * @returns void
  */
-function printSuggest() {
+function printSuggest(): void {
   /**
    * args
    * @public
@@ -2200,6 +2220,7 @@ function printSuggest() {
 /**
  * Print analysis report
  * @param report - report parameter
+ * @returns void
  */
 function printAnalysisReport(report: AnalysisReport) {
   /**
@@ -2282,6 +2303,7 @@ function printAnalysisReport(report: AnalysisReport) {
 /**
  * Print health report
  * @param report - report parameter
+ * @returns void
  */
 function printHealthReport(report: AnalysisReport) {
   /**
@@ -2368,6 +2390,7 @@ function printHealthReport(report: AnalysisReport) {
  * Print suggestions report
  * @param report - report parameter
  * @param limit - limit parameter
+ * @returns void
  */
 function printSuggestionsReport(report: AnalysisReport, limit: number) {
   /**
@@ -2478,6 +2501,7 @@ function printSuggestionsReport(report: AnalysisReport, limit: number) {
 /**
  * Print a single suggestion
  * @param suggestion - suggestion parameter
+ * @returns void
  */
 function printSuggestion(suggestion: ImprovementSuggestion) {
   /**
@@ -2573,8 +2597,9 @@ function getHealthFocus(metrics: CodeHealthMetrics): string {
 
 /**
  * Fix documentation for a specific file or directory
+ * @returns void
  */
-function printFix() {
+function printFix(): void {
   /**
    * args
    * @public
@@ -2736,8 +2761,9 @@ function printFix() {
 
 /**
  * Recursively improve documentation until target score is reached
+ * @returns void
  */
-function printImprove() {
+function printImprove(): void {
   /**
    * args
    * @public
