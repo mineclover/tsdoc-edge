@@ -13,16 +13,28 @@ import type { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import type { Symbol } from '../types/graph';
 
 // TSDoc internal types (not exposed in public API)
+/**
+ * DocNodeWithText interface
+ * @public
+ */
 interface DocNodeWithText {
   kind: string;
   text?: string;
 }
 
+/**
+ * DocNodeWithChildren interface
+ * @public
+ */
 interface DocNodeWithChildren {
   kind: string;
   nodes?: readonly DocNodeWithText[];
 }
 
+/**
+ * TSDocBlock interface
+ * @public
+ */
 interface TSDocBlock {
   blockTag: { tagName: string };
   content: {
@@ -30,6 +42,10 @@ interface TSDocBlock {
   };
 }
 
+/**
+ * TSDocComment interface
+ * @public
+ */
 interface TSDocComment {
   summarySection?: {
     nodes: readonly DocNodeWithChildren[];
@@ -37,12 +53,20 @@ interface TSDocComment {
   customBlocks?: readonly TSDocBlock[];
 }
 
+/**
+ * ParsedComment interface
+ * @public
+ */
 interface ParsedComment {
   symbolName: string;
   filePath: string;
   docComment: TSDocComment;
 }
 
+/**
+ * RegistryEntry interface
+ * @public
+ */
 interface RegistryEntry {
   sourceRef: {
     type?: string;
@@ -123,7 +147,15 @@ export class FileScanner {
    * @contract Scan all TypeScript files and populate database
    */
   async scan(): Promise<ScanResult> {
+    /**
+     * startTime
+     * @public
+     */
     const startTime = Date.now();
+    /**
+     * result
+     * @public
+     */
     const result: ScanResult = {
       filesScanned: 0,
       symbolsFound: 0,
@@ -134,16 +166,32 @@ export class FileScanner {
     };
 
     try {
+      /**
+       * files
+       * @public
+       */
       const files = this.findTypeScriptFiles(this.config.rootDir);
 
+      /**
+       * filePath
+       * @public
+       */
       for (const filePath of files) {
         try {
           await this.scanFile(filePath, result);
           result.filesScanned++;
+          /**
+           * error
+           * @public
+           */
         } catch (error) {
           result.errors.push(`Error scanning ${filePath}: ${error}`);
         }
       }
+      /**
+       * error
+       * @public
+       */
     } catch (error) {
       result.errors.push(`Fatal error: ${error}`);
     }
@@ -159,19 +207,39 @@ export class FileScanner {
    * @private
    */
   private async scanFile(filePath: string, result: ScanResult): Promise<void> {
+    /**
+     * content
+     * @public
+     */
     const content = fs.readFileSync(filePath, 'utf-8');
+    /**
+     * parseResult
+     * @public
+     */
     const parseResult = this.parser.parseFile(filePath, content);
 
+    /**
+     * comment
+     * @public
+     */
     for (const comment of parseResult.comments) {
       result.symbolsFound++;
 
       // Extract @id tag from comment
+      /**
+       * id
+       * @public
+       */
       const id = this.extractIdTag(comment.docComment);
       if (!id) {
         continue;
       }
 
       // Match with registry
+      /**
+       * registryEntry
+       * @public
+       */
       const registryEntry = this.registry.findById(id);
       if (!registryEntry) {
         result.errors.push(`Registry entry not found for ID: ${id} in ${filePath}`);
@@ -181,9 +249,17 @@ export class FileScanner {
       result.symbolsMatched++;
 
       // Extract symbol data
+      /**
+       * symbol
+       * @public
+       */
       const symbol = this.buildSymbol(comment, id, registryEntry);
 
       // Insert into database
+      /**
+       * success
+       * @public
+       */
       const success = this.db.insertSymbol(symbol, 0);
       if (success) {
         result.symbolsInserted++;
@@ -200,9 +276,21 @@ export class FileScanner {
    * @private
    */
   private extractIdTag(docComment: TSDocComment): string | null {
+    /**
+     * customBlocks
+     * @public
+     */
     const customBlocks = docComment.customBlocks || [];
+    /**
+     * block
+     * @public
+     */
     for (const block of customBlocks) {
       if (block.blockTag.tagName === '@id') {
+        /**
+         * content
+         * @public
+         */
         const content = block.content.nodes
           .flatMap((node) => {
             if (node.kind === 'Paragraph' && node.nodes) {
@@ -228,7 +316,15 @@ export class FileScanner {
    */
   private buildSymbol(comment: ParsedComment, id: string, registryEntry: RegistryEntry): Symbol {
     // Extract summary
+    /**
+     * summarySection
+     * @public
+     */
     const summarySection = comment.docComment.summarySection;
+    /**
+     * summary
+     * @public
+     */
     const summary = summarySection
       ? summarySection.nodes
           .flatMap((node) => {
@@ -242,6 +338,10 @@ export class FileScanner {
       : '';
 
     // Check if @public tag exists
+    /**
+     * hasPublicTag
+     * @public
+     */
     const hasPublicTag = (comment.docComment.customBlocks || []).some(
       (block) => block.blockTag.tagName === '@public'
     );
@@ -268,7 +368,15 @@ export class FileScanner {
    * @private
    */
   private findTypeScriptFiles(dir: string): string[] {
+    /**
+     * files
+     * @public
+     */
     const files: string[] = [];
+    /**
+     * excludePatterns
+     * @public
+     */
     const excludePatterns = this.config.exclude || [];
 
     // Check if directory exists
@@ -276,12 +384,20 @@ export class FileScanner {
       return files;
     }
 
+    /**
+     * walk
+     * @public
+     */
     const walk = (currentDir: string): void => {
       // Check if directory should be excluded
       if (this.shouldExclude(currentDir, excludePatterns)) {
         return;
       }
 
+      /**
+       * entries
+       * @public
+       */
       let entries: fs.Dirent[];
       try {
         entries = fs.readdirSync(currentDir, { withFileTypes: true });
@@ -290,7 +406,15 @@ export class FileScanner {
         return;
       }
 
+      /**
+       * entry
+       * @public
+       */
       for (const entry of entries) {
+        /**
+         * fullPath
+         * @public
+         */
         const fullPath = path.join(currentDir, entry.name);
 
         // Skip symlinks if not following
@@ -330,8 +454,16 @@ export class FileScanner {
    * @private
    */
   private shouldExclude(filePath: string, patterns: string[]): boolean {
+    /**
+     * pattern
+     * @public
+     */
     for (const pattern of patterns) {
       // Simple glob pattern matching
+      /**
+       * regex
+       * @public
+       */
       const regex = new RegExp(
         pattern.replace(/\*\*/g, '.*').replace(/\*/g, '[^/]*').replace(/\?/g, '.')
       );
@@ -352,12 +484,24 @@ export class FileScanner {
     verifyResult: ReturnType<DatabaseManager['verifyImport']>;
   }> {
     // Perform scan
+    /**
+     * scanResult
+     * @public
+     */
     const scanResult = await this.scan();
 
     // Export to JSONL
+    /**
+     * exportPath
+     * @public
+     */
     const exportPath = this.db.exportToJSONL();
 
     // Verify import
+    /**
+     * verifyResult
+     * @public
+     */
     const verifyResult = this.db.verifyImport(exportPath);
 
     return {

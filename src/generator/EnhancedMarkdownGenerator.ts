@@ -25,6 +25,10 @@ export class EnhancedMarkdownGenerator {
    * @contract Include all 6 required sections
    */
   generateDocument(symbol: Symbol, enhancedDoc: EnhancedSymbolDoc): string {
+    /**
+     * md
+     * @public
+     */
     let md = '';
 
     // Header
@@ -80,6 +84,10 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateProblemSolving(doc: EnhancedSymbolDoc): string {
+    /**
+     * md
+     * @public
+     */
     let md = `## 1. 🎯 Problem Solving\n\n`;
     md += `### What Problem Does This Solve?\n\n`;
     md += `${doc.problemSolving.description}\n\n`;
@@ -106,6 +114,10 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateFunctionality(doc: EnhancedSymbolDoc): string {
+    /**
+     * md
+     * @public
+     */
     let md = `## 2. ⚙️ Functionality\n\n`;
 
     md += `### Main Features\n\n`;
@@ -162,6 +174,10 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateErrorExperiences(doc: EnhancedSymbolDoc): string {
+    /**
+     * md
+     * @public
+     */
     let md = `## 3. 🐛 Error Experiences\n\n`;
 
     doc.errorExperiences.forEach((err) => {
@@ -189,6 +205,10 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateDecisions(doc: EnhancedSymbolDoc): string {
+    /**
+     * md
+     * @public
+     */
     let md = `## 4. 🔍 Design Decisions\n\n`;
 
     doc.decisions.forEach((decision) => {
@@ -232,6 +252,10 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateDependencies(doc: EnhancedSymbolDoc): string {
+    /**
+     * md
+     * @public
+     */
     let md = `## 5. 🔗 Dependencies\n\n`;
 
     if (doc.dependencies.length === 0) {
@@ -240,6 +264,10 @@ export class EnhancedMarkdownGenerator {
     }
 
     // Group by type
+    /**
+     * grouped
+     * @public
+     */
     const grouped: Record<string, typeof doc.dependencies> = {};
 
     doc.dependencies.forEach((dep) => {
@@ -279,9 +307,17 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateFuturePlans(doc: EnhancedSymbolDoc): string {
+    /**
+     * md
+     * @public
+     */
     let md = `## 6. 🚀 Future Plans\n\n`;
 
     // Group by status
+    /**
+     * grouped
+     * @public
+     */
     const grouped: Record<string, typeof doc.futurePlans> = {};
 
     doc.futurePlans.forEach((plan) => {
@@ -291,6 +327,10 @@ export class EnhancedMarkdownGenerator {
       grouped[plan.status].push(plan);
     });
 
+    /**
+     * statusOrder
+     * @public
+     */
     const statusOrder = ['in-progress', 'planned', 'completed', 'cancelled'] as const;
 
     statusOrder.forEach((status) => {
@@ -336,6 +376,10 @@ export class EnhancedMarkdownGenerator {
    * @returns Badge text
    */
   private getStatusBadge(status: string): string {
+    /**
+     * badges
+     * @public
+     */
     const badges: Record<string, string> = {
       proposed: '🟡 Proposed',
       accepted: '🟢 Accepted',
@@ -352,6 +396,10 @@ export class EnhancedMarkdownGenerator {
    * @returns Badge text
    */
   private getPriorityBadge(priority: string): string {
+    /**
+     * badges
+     * @public
+     */
     const badges: Record<string, string> = {
       high: '🔴 High',
       medium: '🟡 Medium',
@@ -367,6 +415,10 @@ export class EnhancedMarkdownGenerator {
    * @returns Emoji
    */
   private getStatusEmoji(status: 'planned' | 'in-progress' | 'completed' | 'cancelled'): string {
+    /**
+     * emojis
+     * @public
+     */
     const emojis: Record<string, string> = {
       planned: '📋',
       'in-progress': '🏗️',

@@ -87,9 +87,17 @@ export class TSDocEdge {
    */
   processFile(filePath: string, sourceCode: string): string {
     // Parse the file
+    /**
+     * parseResult
+     * @public
+     */
     const parseResult = this.parser.parseFile(filePath, sourceCode);
 
     // Validate each comment
+    /**
+     * validatedComments
+     * @public
+     */
     const validatedComments = parseResult.comments.map((comment) =>
       this.validator.validate(comment)
     );

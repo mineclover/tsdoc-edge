@@ -41,6 +41,10 @@ export class CommentStateManager {
     if (storageDir) {
       this.storageDir = storageDir;
     } else {
+      /**
+       * configManager
+       * @public
+       */
       const configManager = ConfigManager.getInstance();
       this.storageDir = configManager.resolvePath(configManager.get().paths.commentsDir);
     }
@@ -69,8 +73,16 @@ export class CommentStateManager {
     this.walkDir(this.storageDir, (markdownPath) => {
       if (markdownPath.endsWith('.md')) {
         try {
+          /**
+           * fileState
+           * @public
+           */
           const fileState = this.importer.parseMarkdown(markdownPath);
           this.storage.files[fileState.filePath] = fileState;
+          /**
+           * error
+           * @public
+           */
         } catch (error) {
           console.error(`Error loading ${markdownPath}:`, error);
         }
@@ -85,9 +97,21 @@ export class CommentStateManager {
    * @param callback - Callback for each file
    */
   private walkDir(dir: string, callback: (filePath: string) => void): void {
+    /**
+     * entries
+     * @public
+     */
     const entries = fs.readdirSync(dir, { withFileTypes: true });
 
+    /**
+     * entry
+     * @public
+     */
     for (const entry of entries) {
+      /**
+       * fullPath
+       * @public
+       */
       const fullPath = path.join(dir, entry.name);
 
       if (entry.isDirectory()) {
@@ -106,10 +130,22 @@ export class CommentStateManager {
    * @public
    */
   exportFile(filePath: string): string {
+    /**
+     * sourceCode
+     * @public
+     */
     const sourceCode = fs.readFileSync(filePath, 'utf-8');
+    /**
+     * markdownPath
+     * @public
+     */
     const markdownPath = this.exporter.exportFile(filePath, sourceCode, this.storageDir);
 
     // Update storage
+    /**
+     * fileState
+     * @public
+     */
     const fileState = this.importer.parseMarkdown(markdownPath);
     this.storage.files[filePath] = fileState;
     this.storage.lastUpdated = new Date().toISOString();
@@ -124,21 +160,46 @@ export class CommentStateManager {
    * @param pattern - Glob pattern for files (default: **\/*.ts)
    * @returns Export result
    * @public
+   * @param _pattern - _pattern parameter
    */
   exportAll(sourceDir: string, _pattern: string = '**/*.ts'): ExportResult {
+    /**
+     * exportedFiles
+     * @public
+     */
     const exportedFiles: string[] = [];
+    /**
+     * filesExported
+     * @public
+     */
     let filesExported = 0;
+    /**
+     * commentsExported
+     * @public
+     */
     let commentsExported = 0;
 
     this.walkDir(sourceDir, (filePath) => {
       if (filePath.endsWith('.ts') && !filePath.endsWith('.test.ts')) {
         try {
+          /**
+           * markdownPath
+           * @public
+           */
           const markdownPath = this.exportFile(filePath);
           exportedFiles.push(markdownPath);
           filesExported++;
 
+          /**
+           * fileState
+           * @public
+           */
           const fileState = this.storage.files[filePath];
           commentsExported += fileState.comments.length;
+          /**
+           * error
+           * @public
+           */
         } catch (error) {
           console.error(`Error exporting ${filePath}:`, error);
         }
@@ -162,6 +223,10 @@ export class CommentStateManager {
    * @public
    */
   importFile(filePath: string, overwrite: boolean = false): string {
+    /**
+     * markdownPath
+     * @public
+     */
     const markdownPath = this.getMarkdownPath(filePath);
 
     if (!fs.existsSync(markdownPath)) {
@@ -179,19 +244,51 @@ export class CommentStateManager {
    * @public
    */
   importAll(overwrite: boolean = false): ImportResult {
+    /**
+     * updatedFiles
+     * @public
+     */
     const updatedFiles: string[] = [];
+    /**
+     * errors
+     * @public
+     */
     const errors: string[] = [];
+    /**
+     * filesUpdated
+     * @public
+     */
     let filesUpdated = 0;
+    /**
+     * commentsUpdated
+     * @public
+     */
     let commentsUpdated = 0;
 
+    /**
+     * filePath
+     * @public
+     */
     for (const filePath in this.storage.files) {
       try {
+        /**
+         * updated
+         * @public
+         */
         const updated = this.importFile(filePath, overwrite);
         updatedFiles.push(updated);
         filesUpdated++;
 
+        /**
+         * fileState
+         * @public
+         */
         const fileState = this.storage.files[filePath];
         commentsUpdated += fileState.comments.length;
+        /**
+         * error
+         * @public
+         */
       } catch (error) {
         errors.push(`Error importing ${filePath}: ${error}`);
       }
@@ -218,8 +315,16 @@ export class CommentStateManager {
       this.exportFile(filePath);
     }
 
+    /**
+     * fileState
+     * @public
+     */
     const fileState = this.storage.files[filePath];
 
+    /**
+     * comment
+     * @public
+     */
     for (const comment of fileState.comments) {
       if (this.shouldCollapse(comment, options)) {
         comment.status = 'collapsed';
@@ -241,6 +346,10 @@ export class CommentStateManager {
   private shouldCollapse(comment: CommentState, options: CollapseOptions): boolean {
     // Check minimum lines
     if (options.minLines) {
+      /**
+       * lines
+       * @public
+       */
       const lines = comment.fullComment.split('\n').length;
       if (lines < options.minLines) {
         return false;
@@ -249,6 +358,10 @@ export class CommentStateManager {
 
     // Check pattern
     if (options.pattern) {
+      /**
+       * regex
+       * @public
+       */
       const regex = new RegExp(options.pattern);
       if (!regex.test(comment.symbol)) {
         return false;
@@ -275,12 +388,20 @@ export class CommentStateManager {
    * @public
    */
   expand(filePath: string, options: ExpandOptions = {}): void {
+    /**
+     * fileState
+     * @public
+     */
     const fileState = this.storage.files[filePath];
 
     if (!fileState) {
       throw new Error(`File not in storage: ${filePath}`);
     }
 
+    /**
+     * comment
+     * @public
+     */
     for (const comment of fileState.comments) {
       if (this.shouldExpand(comment, options)) {
         comment.status = 'expanded';
@@ -305,6 +426,10 @@ export class CommentStateManager {
     }
 
     if (options.pattern) {
+      /**
+       * regex
+       * @public
+       */
       const regex = new RegExp(options.pattern);
       return regex.test(comment.symbol);
     }
@@ -320,6 +445,10 @@ export class CommentStateManager {
    * @public
    */
   getStatus(filePath: string): FileStatusSummary {
+    /**
+     * fileState
+     * @public
+     */
     const fileState = this.storage.files[filePath];
 
     if (!fileState) {
@@ -332,7 +461,15 @@ export class CommentStateManager {
       };
     }
 
+    /**
+     * collapsedComments
+     * @public
+     */
     const collapsedComments = fileState.comments.filter((c) => c.status === 'collapsed').length;
+    /**
+     * expandedComments
+     * @public
+     */
     const expandedComments = fileState.comments.filter((c) => c.status === 'expanded').length;
 
     return {
@@ -360,9 +497,21 @@ export class CommentStateManager {
    * @param fileState - File comment state
    */
   private saveFileState(fileState: FileCommentState): void {
+    /**
+     * markdown
+     * @public
+     */
     const markdown = this.exporter.exportToMarkdown(fileState);
+    /**
+     * markdownPath
+     * @public
+     */
     const markdownPath = this.getMarkdownPath(fileState.filePath);
 
+    /**
+     * dir
+     * @public
+     */
     const dir = path.dirname(markdownPath);
     if (!fs.existsSync(dir)) {
       fs.mkdirSync(dir, { recursive: true });
@@ -378,6 +527,10 @@ export class CommentStateManager {
    * @returns Markdown file path
    */
   private getMarkdownPath(filePath: string): string {
+    /**
+     * relativePath
+     * @public
+     */
     const relativePath = filePath.replace(/^(\.\/|\/)?/, '');
     return path.join(this.storageDir, `${relativePath}.md`);
   }

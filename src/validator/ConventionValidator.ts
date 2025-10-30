@@ -23,6 +23,10 @@ export class ConventionValidator {
    * @public
    */
   validate(parsedComment: ParsedDocComment): ParsedDocComment {
+    /**
+     * validationResults
+     * @public
+     */
     const validationResults: ValidationResult[] = [];
 
     // Rule 1: Summary must be present
@@ -44,6 +48,10 @@ export class ConventionValidator {
     }
 
     // Rule 3: Parameters must be documented
+    /**
+     * undocumentedParams
+     * @public
+     */
     const undocumentedParams = this.getUndocumentedParams(parsedComment.docComment);
     if (undocumentedParams.length > 0) {
       validationResults.push({
@@ -86,6 +94,10 @@ export class ConventionValidator {
    * @returns True if @public tag exists
    */
   private hasPublicTag(docComment: DocComment): boolean {
+    /**
+     * modifierTag
+     * @public
+     */
     const modifierTag = docComment.modifierTagSet.nodes.find((tag) => tag.tagName === '@public');
     return !!modifierTag;
   }

@@ -40,41 +40,89 @@ export class CodeHealthChecker {
    * @public
    */
   analyze(options: AnalysisOptions): AnalysisReport {
+    /**
+     * { path: targetPath, includeChildren = true, includePrivate = false }
+     * @public
+     */
     const { path: targetPath, includeChildren = true, includePrivate = false } = options;
 
     // Collect source files
+    /**
+     * sourceFiles
+     * @public
+     */
     const sourceFiles = this.collectSourceFiles(targetPath);
 
     // Analyze documentation
+    /**
+     * allDocScores
+     * @public
+     */
     const allDocScores: DocQualityScore[] = [];
+    /**
+     * file
+     * @public
+     */
     for (const file of sourceFiles) {
+      /**
+       * sourceCode
+       * @public
+       */
       const sourceCode = fs.readFileSync(file, 'utf-8');
+      /**
+       * scores
+       * @public
+       */
       const scores = this.docAnalyzer.analyzeFile(file, sourceCode, includeChildren);
 
       // Filter private symbols if needed
+      /**
+       * filtered
+       * @public
+       */
       const filtered = includePrivate ? scores : scores.filter((s) => s.isPublic);
 
       allDocScores.push(...filtered);
     }
 
     // Analyze test coverage
+    /**
+     * testCoverage
+     * @public
+     */
     const testCoverage = this.testAnalyzer.analyzeFiles(sourceFiles);
 
     // Update symbol counts in test coverage
     this.updateSymbolCounts(testCoverage, allDocScores);
 
     // Calculate metrics
+    /**
+     * metrics
+     * @public
+     */
     const metrics = this.calculateMetrics(allDocScores, testCoverage);
 
     // Generate suggestions
+    /**
+     * suggestions
+     * @public
+     */
     const suggestions = options.generateSuggestions
       ? this.generateSuggestions(allDocScores, testCoverage, options)
       : [];
 
     // Find top issues
+    /**
+     * topIssues
+     * @public
+     */
     const topIssues = this.findTopIssues(allDocScores, 10);
 
     // Find files needing attention
+    /**
+     * filesNeedingAttention
+     * @public
+     */
     const filesNeedingAttention = this.findFilesNeedingAttention(allDocScores, testCoverage);
 
     return {
@@ -96,12 +144,20 @@ export class CodeHealthChecker {
    * @returns Array of file paths
    */
   private collectSourceFiles(targetPath: string): string[] {
+    /**
+     * files
+     * @public
+     */
     const files: string[] = [];
 
     if (!fs.existsSync(targetPath)) {
       throw new Error(`Path not found: ${targetPath}`);
     }
 
+    /**
+     * stat
+     * @public
+     */
     const stat = fs.statSync(targetPath);
 
     if (stat.isFile()) {
@@ -124,9 +180,21 @@ export class CodeHealthChecker {
    * @param files - Array to collect file paths
    */
   private walkDirectory(dir: string, files: string[]): void {
+    /**
+     * entries
+     * @public
+     */
     const entries = fs.readdirSync(dir, { withFileTypes: true });
 
+    /**
+     * entry
+     * @public
+     */
     for (const entry of entries) {
+      /**
+       * fullPath
+       * @public
+       */
       const fullPath = path.join(dir, entry.name);
 
       // Skip node_modules and hidden directories
@@ -149,7 +217,15 @@ export class CodeHealthChecker {
    * @param docScores - Documentation quality scores
    */
   private updateSymbolCounts(testCoverage: TestCoverageInfo[], docScores: DocQualityScore[]): void {
+    /**
+     * coverage
+     * @public
+     */
     for (const coverage of testCoverage) {
+      /**
+       * symbolCount
+       * @public
+       */
       const symbolCount = docScores.filter((s) => s.filePath === coverage.sourceFile).length;
       coverage.symbolCount = symbolCount;
 
@@ -171,20 +247,60 @@ export class CodeHealthChecker {
     docScores: DocQualityScore[],
     testCoverage: TestCoverageInfo[]
   ): CodeHealthMetrics {
+    /**
+     * totalFiles
+     * @public
+     */
     const totalFiles = new Set(docScores.map((s) => s.filePath)).size;
+    /**
+     * totalSymbols
+     * @public
+     */
     const totalSymbols = docScores.length;
+    /**
+     * publicSymbols
+     * @public
+     */
     const publicSymbols = docScores.filter((s) => s.isPublic).length;
+    /**
+     * documentedSymbols
+     * @public
+     */
     const documentedSymbols = docScores.filter((s) => s.hasDoc).length;
+    /**
+     * fullyDocumentedSymbols
+     * @public
+     */
     const fullyDocumentedSymbols = docScores.filter((s) => s.qualityScore >= 80).length;
 
+    /**
+     * testStats
+     * @public
+     */
     const testStats = this.testAnalyzer.calculateStatistics(testCoverage);
 
+    /**
+     * avgQualityScore
+     * @public
+     */
     const avgQualityScore =
       totalSymbols > 0 ? docScores.reduce((sum, s) => sum + s.qualityScore, 0) / totalSymbols : 0;
 
     // Calculate overall health score
+    /**
+     * docScore
+     * @public
+     */
     const docScore = avgQualityScore;
+    /**
+     * testScore
+     * @public
+     */
     const testScore = testStats.coveragePercentage;
+    /**
+     * healthScore
+     * @public
+     */
     const healthScore = docScore * 0.6 + testScore * 0.4;
 
     return {
@@ -213,13 +329,33 @@ export class CodeHealthChecker {
     testCoverage: TestCoverageInfo[],
     options: AnalysisOptions
   ): ImprovementSuggestion[] {
+    /**
+     * suggestions
+     * @public
+     */
     const suggestions: ImprovementSuggestion[] = [];
+    /**
+     * minScore
+     * @public
+     */
     const minScore = options.minQualityScore || 70;
 
     // Documentation suggestions
+    /**
+     * score
+     * @public
+     */
     for (const score of docScores) {
       if (score.qualityScore < minScore && score.isPublic) {
+        /**
+         * priority
+         * @public
+         */
         const priority = this.getPriority(score.qualityScore);
+        /**
+         * effort
+         * @public
+         */
         const effort = score.missing.length > 3 ? 'medium' : 'small';
 
         suggestions.push({
@@ -235,9 +371,25 @@ export class CodeHealthChecker {
     }
 
     // Test coverage suggestions
+    /**
+     * filesWithoutTests
+     * @public
+     */
     const filesWithoutTests = this.testAnalyzer.getFilesWithoutTests(testCoverage);
+    /**
+     * file
+     * @public
+     */
     for (const file of filesWithoutTests) {
+      /**
+       * symbolCount
+       * @public
+       */
       const symbolCount = docScores.filter((s) => s.filePath === file).length;
+      /**
+       * effort
+       * @public
+       */
       const effort = symbolCount > 10 ? 'large' : symbolCount > 5 ? 'medium' : 'small';
 
       suggestions.push({
@@ -274,7 +426,15 @@ export class CodeHealthChecker {
    * @returns Suggested test file path
    */
   private suggestTestPath(sourceFile: string): string {
+    /**
+     * dir
+     * @public
+     */
     const dir = path.dirname(sourceFile);
+    /**
+     * basename
+     * @public
+     */
     const basename = path.basename(sourceFile, '.ts');
     return path.join(dir, '__tests__', `${basename}.test.ts`);
   }
@@ -286,6 +446,10 @@ export class CodeHealthChecker {
    * @returns Sorted array
    */
   private sortSuggestions(suggestions: ImprovementSuggestion[]): ImprovementSuggestion[] {
+    /**
+     * priorityOrder
+     * @public
+     */
     const priorityOrder = { critical: 0, high: 1, medium: 2, low: 3 };
 
     return suggestions.sort((a, b) => priorityOrder[a.priority] - priorityOrder[b.priority]);
@@ -316,10 +480,22 @@ export class CodeHealthChecker {
     docScores: DocQualityScore[],
     testCoverage: TestCoverageInfo[]
   ): string[] {
+    /**
+     * files
+     * @public
+     */
     const files = new Set<string>();
 
     // Files with low documentation scores
+    /**
+     * fileScores
+     * @public
+     */
     const fileScores = new Map<string, number[]>();
+    /**
+     * score
+     * @public
+     */
     for (const score of docScores) {
       if (!fileScores.has(score.filePath)) {
         fileScores.set(score.filePath, []);
@@ -327,7 +503,15 @@ export class CodeHealthChecker {
       fileScores.get(score.filePath)?.push(score.qualityScore);
     }
 
+    /**
+     * [file, scores]
+     * @public
+     */
     for (const [file, scores] of fileScores.entries()) {
+      /**
+       * avgScore
+       * @public
+       */
       const avgScore = scores.reduce((sum, s) => sum + s, 0) / scores.length;
       if (avgScore < 60) {
         files.add(file);
@@ -335,6 +519,10 @@ export class CodeHealthChecker {
     }
 
     // Files without tests
+    /**
+     * coverage
+     * @public
+     */
     for (const coverage of testCoverage) {
       if (!coverage.hasTest) {
         files.add(coverage.sourceFile);

@@ -30,6 +30,10 @@ export function normalizeLineEndings(text: string): string {
  * @public
  */
 export function getFileExtension(filePath: string): string {
+  /**
+   * lastDotIndex
+   * @public
+   */
   const lastDotIndex = filePath.lastIndexOf('.');
   if (lastDotIndex === -1) return '';
   return filePath.substring(lastDotIndex + 1);
@@ -42,6 +46,10 @@ export function getFileExtension(filePath: string): string {
  * @public
  */
 export function isTypeScriptOrJavaScript(filePath: string): boolean {
+  /**
+   * ext
+   * @public
+   */
   const ext = getFileExtension(filePath);
   return ['ts', 'tsx', 'js', 'jsx'].includes(ext);
 }

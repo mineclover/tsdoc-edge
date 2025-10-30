@@ -47,11 +47,19 @@ export class SymbolGraphBuilder {
     this.graph.symbols.set(symbol.id, symbol);
 
     // Update name index
+    /**
+     * nameEntry
+     * @public
+     */
     const nameEntry = this.graph.nameIndex.get(symbol.name) || [];
     nameEntry.push(symbol.id);
     this.graph.nameIndex.set(symbol.name, nameEntry);
 
     // Update file index
+    /**
+     * fileEntry
+     * @public
+     */
     const fileEntry = this.graph.fileIndex.get(symbol.filePath) || [];
     fileEntry.push(symbol.id);
     this.graph.fileIndex.set(symbol.filePath, fileEntry);
@@ -75,6 +83,10 @@ export class SymbolGraphBuilder {
     this.graph.relationships.push(relationship);
 
     // Update adjacency list (from -> to)
+    /**
+     * adjacent
+     * @public
+     */
     const adjacent = this.graph.adjacencyList.get(relationship.from) || [];
     if (!adjacent.includes(relationship.to)) {
       adjacent.push(relationship.to);
@@ -82,6 +94,10 @@ export class SymbolGraphBuilder {
     }
 
     // Update reverse adjacency list (to <- from)
+    /**
+     * reverseAdjacent
+     * @public
+     */
     const reverseAdjacent = this.graph.reverseAdjacencyList.get(relationship.to) || [];
     if (!reverseAdjacent.includes(relationship.from)) {
       reverseAdjacent.push(relationship.from);
@@ -104,6 +120,10 @@ export class SymbolGraphBuilder {
    * @returns Array of matching symbols
    */
   getSymbolsByName(name: string): Symbol[] {
+    /**
+     * ids
+     * @public
+     */
     const ids = this.graph.nameIndex.get(name) || [];
     return ids.map((id) => this.graph.symbols.get(id)).filter((s): s is Symbol => !!s);
   }
@@ -114,6 +134,10 @@ export class SymbolGraphBuilder {
    * @returns Array of symbols in the file
    */
   getSymbolsInFile(filePath: string): Symbol[] {
+    /**
+     * ids
+     * @public
+     */
     const ids = this.graph.fileIndex.get(filePath) || [];
     return ids.map((id) => this.graph.symbols.get(id)).filter((s): s is Symbol => !!s);
   }
@@ -153,22 +177,54 @@ export class SymbolGraphBuilder {
    * @testScenario No cycles
    */
   detectCircularDependencies(): string[][] {
+    /**
+     * cycles
+     * @public
+     */
     const cycles: string[][] = [];
+    /**
+     * visited
+     * @public
+     */
     const visited = new Set<string>();
+    /**
+     * recursionStack
+     * @public
+     */
     const recursionStack = new Set<string>();
 
+    /**
+     * dfs
+     * @public
+     */
     const dfs = (symbolId: string, path: string[]): void => {
       visited.add(symbolId);
       recursionStack.add(symbolId);
       path.push(symbolId);
 
+      /**
+       * dependencies
+       * @public
+       */
       const dependencies = this.getDependencies(symbolId);
+      /**
+       * depId
+       * @public
+       */
       for (const depId of dependencies) {
         if (!visited.has(depId)) {
           dfs(depId, [...path]);
         } else if (recursionStack.has(depId)) {
           // Found a cycle
+          /**
+           * cycleStart
+           * @public
+           */
           const cycleStart = path.indexOf(depId);
+          /**
+           * cycle
+           * @public
+           */
           const cycle = path.slice(cycleStart);
           cycle.push(depId); // Complete the cycle
           cycles.push(cycle);
@@ -178,6 +234,10 @@ export class SymbolGraphBuilder {
       recursionStack.delete(symbolId);
     };
 
+    /**
+     * symbolId
+     * @public
+     */
     for (const symbolId of this.graph.symbols.keys()) {
       if (!visited.has(symbolId)) {
         dfs(symbolId, []);
@@ -227,15 +287,47 @@ export class SymbolGraphBuilder {
     maxDependencies: number;
     orphanedSymbols: number;
   } {
+    /**
+     * totalSymbols
+     * @public
+     */
     const totalSymbols = this.graph.symbols.size;
+    /**
+     * totalRelationships
+     * @public
+     */
     const totalRelationships = this.graph.relationships.length;
 
+    /**
+     * totalDeps
+     * @public
+     */
     let totalDeps = 0;
+    /**
+     * maxDeps
+     * @public
+     */
     let maxDeps = 0;
+    /**
+     * orphaned
+     * @public
+     */
     let orphaned = 0;
 
+    /**
+     * symbolId
+     * @public
+     */
     for (const symbolId of this.graph.symbols.keys()) {
+      /**
+       * deps
+       * @public
+       */
       const deps = this.getDependencies(symbolId).length;
+      /**
+       * dependents
+       * @public
+       */
       const dependents = this.getDependents(symbolId).length;
 
       totalDeps += deps;

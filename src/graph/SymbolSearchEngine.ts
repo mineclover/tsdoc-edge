@@ -42,11 +42,23 @@ export class SymbolSearchEngine {
    * @testScenario Complex multi-criteria search
    */
   search(query: SymbolQuery): SymbolQueryResult {
+    /**
+     * startTime
+     * @public
+     */
     const startTime = performance.now();
+    /**
+     * results
+     * @public
+     */
     let results = this.graphBuilder.getAllSymbols();
 
     // Filter by name pattern
     if (query.name) {
+      /**
+       * nameRegex
+       * @public
+       */
       const nameRegex = new RegExp(query.name, 'i');
       results = results.filter((s) => nameRegex.test(s.name));
     }
@@ -58,6 +70,10 @@ export class SymbolSearchEngine {
 
     // Filter by file path
     if (query.filePath) {
+      /**
+       * pathRegex
+       * @public
+       */
       const pathRegex = new RegExp(query.filePath, 'i');
       results = results.filter((s) => pathRegex.test(s.filePath));
     }
@@ -90,6 +106,10 @@ export class SymbolSearchEngine {
       results = this.filterByRelationship(results, query.usedBy, 'usedBy');
     }
 
+    /**
+     * endTime
+     * @public
+     */
     const endTime = performance.now();
 
     return {
@@ -111,19 +131,43 @@ export class SymbolSearchEngine {
     targetName: string,
     relationType: 'any' | 'dependsOn' | 'usedBy'
   ): Symbol[] {
+    /**
+     * targetSymbols
+     * @public
+     */
     const targetSymbols = this.graphBuilder.getSymbolsByName(targetName);
+    /**
+     * targetIds
+     * @public
+     */
     const targetIds = new Set(targetSymbols.map((s) => s.id));
 
     return symbols.filter((symbol) => {
       if (relationType === 'dependsOn') {
+        /**
+         * deps
+         * @public
+         */
         const deps = this.graphBuilder.getDependencies(symbol.id);
         return deps.some((depId) => targetIds.has(depId));
       } else if (relationType === 'usedBy') {
+        /**
+         * dependents
+         * @public
+         */
         const dependents = this.graphBuilder.getDependents(symbol.id);
         return dependents.some((depId) => targetIds.has(depId));
       } else {
         // any relationship
+        /**
+         * deps
+         * @public
+         */
         const deps = this.graphBuilder.getDependencies(symbol.id);
+        /**
+         * dependents
+         * @public
+         */
         const dependents = this.graphBuilder.getDependents(symbol.id);
         return (
           deps.some((depId) => targetIds.has(depId)) ||
@@ -171,7 +215,15 @@ export class SymbolSearchEngine {
    */
   findOrphaned(): Symbol[] {
     return this.graphBuilder.getAllSymbols().filter((s) => {
+      /**
+       * deps
+       * @public
+       */
       const deps = this.graphBuilder.getDependencies(s.id);
+      /**
+       * dependents
+       * @public
+       */
       const dependents = this.graphBuilder.getDependents(s.id);
       return deps.length === 0 && dependents.length === 0 && !s.isExported;
     });
@@ -181,6 +233,7 @@ export class SymbolSearchEngine {
    * Find symbols by tag or annotation
    * @param tag - Tag to search for (e.g., "deprecated", "internal")
    * @returns Symbols with the tag
+   * @param _tag - _tag parameter
    */
   findByTag(_tag: string): Symbol[] {
     // This would require parsing tag information from the doc comments
@@ -194,9 +247,21 @@ export class SymbolSearchEngine {
    * @returns Path of symbol IDs from root to target
    */
   getSymbolPath(symbolId: string): string[][] {
+    /**
+     * paths
+     * @public
+     */
     const paths: string[][] = [];
+    /**
+     * visited
+     * @public
+     */
     const visited = new Set<string>();
 
+    /**
+     * dfs
+     * @public
+     */
     const dfs = (currentId: string, path: string[]): void => {
       if (currentId === symbolId) {
         paths.push([...path, currentId]);
@@ -208,8 +273,16 @@ export class SymbolSearchEngine {
       }
 
       visited.add(currentId);
+      /**
+       * deps
+       * @public
+       */
       const deps = this.graphBuilder.getDependencies(currentId);
 
+      /**
+       * depId
+       * @public
+       */
       for (const depId of deps) {
         dfs(depId, [...path, currentId]);
       }
@@ -218,10 +291,18 @@ export class SymbolSearchEngine {
     };
 
     // Find all root symbols (symbols with no dependents from exported symbols)
+    /**
+     * roots
+     * @public
+     */
     const roots = this.graphBuilder
       .getAllSymbols()
       .filter((s) => s.isExported && this.graphBuilder.getDependents(s.id).length === 0);
 
+    /**
+     * root
+     * @public
+     */
     for (const root of roots) {
       dfs(root.id, []);
     }

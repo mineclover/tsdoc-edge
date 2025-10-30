@@ -14,6 +14,10 @@ import * as ts from 'typescript';
 import type { ParsedDocComment, ParseResult } from '../types';
 
 // TypeScript compiler API internal types
+/**
+ * NodeWithJSDoc interface
+ * @public
+ */
 interface NodeWithJSDoc extends ts.Node {
   jsDoc?: ts.JSDoc[];
 }
@@ -113,13 +117,29 @@ export class TSDocParser {
    * @public
    */
   parseFile(filePath: string, sourceCode: string): ParseResult {
+    /**
+     * comments
+     * @public
+     */
     const comments: ParsedDocComment[] = [];
+    /**
+     * errors
+     * @public
+     */
     const errors: Error[] = [];
 
     try {
+      /**
+       * sourceFile
+       * @public
+       */
       const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
 
       this.visitNode(sourceFile, filePath, comments, errors);
+      /**
+       * error
+       * @public
+       */
     } catch (error) {
       errors.push(error as Error);
     }
@@ -146,15 +166,35 @@ export class TSDocParser {
     errors: Error[]
   ): void {
     // Check if node has JSDoc comments
+    /**
+     * jsDocComments
+     * @public
+     */
     const jsDocComments = (node as NodeWithJSDoc).jsDoc;
 
     if (jsDocComments && jsDocComments.length > 0) {
+      /**
+       * jsDoc
+       * @public
+       */
       for (const jsDoc of jsDocComments) {
         try {
           // Get the full JSDoc text including /** and */
+          /**
+           * fullText
+           * @public
+           */
           const fullText = jsDoc.getFullText();
+          /**
+           * parserContext
+           * @public
+           */
           const parserContext: ParserContext = this.parser.parseString(fullText);
 
+          /**
+           * symbolName
+           * @public
+           */
           const symbolName = this.getSymbolName(node);
 
           comments.push({
@@ -164,6 +204,10 @@ export class TSDocParser {
             validationResults: [], // Will be filled by validator
             isValid: true, // Will be updated by validator
           });
+          /**
+           * error
+           * @public
+           */
         } catch (error) {
           errors.push(error as Error);
         }

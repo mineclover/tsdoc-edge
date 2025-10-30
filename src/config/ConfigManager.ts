@@ -85,9 +85,21 @@ export class ConfigManager {
     }
 
     try {
+      /**
+       * content
+       * @public
+       */
       const content = fs.readFileSync(this.configPath, 'utf-8');
+      /**
+       * userConfig
+       * @public
+       */
       const userConfig = JSON.parse(content) as Partial<TsdocEdgeConfig>;
       return this.mergeConfig(DEFAULT_CONFIG, userConfig);
+      /**
+       * error
+       * @public
+       */
     } catch (error) {
       throw new Error(`Failed to load config from ${this.configPath}: ${error}`);
     }
@@ -156,9 +168,17 @@ export class ConfigManager {
    */
   public save(config: TsdocEdgeConfig): void {
     try {
+      /**
+       * content
+       * @public
+       */
       const content = JSON.stringify(config, null, 2);
       fs.writeFileSync(this.configPath, content, 'utf-8');
       this.config = config;
+      /**
+       * error
+       * @public
+       */
     } catch (error) {
       throw new Error(`Failed to save config to ${this.configPath}: ${error}`);
     }
@@ -181,6 +201,10 @@ export class ConfigManager {
       );
     }
 
+    /**
+     * config
+     * @public
+     */
     const config = this.mergeConfig(DEFAULT_CONFIG, options);
     this.save(config);
   }
@@ -224,13 +248,29 @@ export class ConfigManager {
    * @public
    */
   public ensureDirectories(): void {
+    /**
+     * paths
+     * @public
+     */
     const paths = this.config.paths;
 
+    /**
+     * dirsToCreate
+     * @public
+     */
     const dirsToCreate = [paths.commentsDir, paths.jsonlDir, paths.outputDir].filter(
       Boolean
     ) as string[];
 
+    /**
+     * dir
+     * @public
+     */
     for (const dir of dirsToCreate) {
+      /**
+       * absolutePath
+       * @public
+       */
       const absolutePath = this.resolvePath(dir);
       if (!fs.existsSync(absolutePath)) {
         fs.mkdirSync(absolutePath, { recursive: true });
@@ -238,6 +278,10 @@ export class ConfigManager {
     }
 
     // Create parent directory for database file
+    /**
+     * dbDir
+     * @public
+     */
     const dbDir = path.dirname(this.resolvePath(paths.databasePath));
     if (!fs.existsSync(dbDir)) {
       fs.mkdirSync(dbDir, { recursive: true });
@@ -252,6 +296,10 @@ export class ConfigManager {
    * @public
    */
   public validate(): { valid: boolean; errors: string[] } {
+    /**
+     * errors
+     * @public
+     */
     const errors: string[] = [];
 
     // Validate project
@@ -275,6 +323,10 @@ export class ConfigManager {
 
     // Validate connectivity score range
     if (this.config.validation?.minConnectivityScore !== undefined) {
+      /**
+       * score
+       * @public
+       */
       const score = this.config.validation.minConnectivityScore;
       if (score < 0 || score > 100) {
         errors.push('validation.minConnectivityScore must be between 0 and 100');

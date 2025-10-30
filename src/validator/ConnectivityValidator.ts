@@ -41,14 +41,46 @@ export class ConnectivityValidator {
    * @testScenario Circular dependencies found
    */
   analyze(): ConnectivityAnalysis {
+    /**
+     * undocumented
+     * @public
+     */
     const undocumented = this.searchEngine.findUndocumented();
+    /**
+     * untested
+     * @public
+     */
     const untested = this.searchEngine.findUntested();
+    /**
+     * noResponsibility
+     * @public
+     */
     const noResponsibility = this.searchEngine.findWithoutResponsibility();
+    /**
+     * noContract
+     * @public
+     */
     const noContract = this.searchEngine.findWithoutContract();
+    /**
+     * orphaned
+     * @public
+     */
     const orphaned = this.searchEngine.findOrphaned();
+    /**
+     * brokenLinks
+     * @public
+     */
     const brokenLinks = this.findBrokenLinks();
+    /**
+     * circularDependencies
+     * @public
+     */
     const circularDependencies = this.graphBuilder.detectCircularDependencies();
 
+    /**
+     * connectivityScore
+     * @public
+     */
     const connectivityScore = this.calculateConnectivityScore({
       undocumented,
       untested,
@@ -81,6 +113,10 @@ export class ConnectivityValidator {
     type: string;
     filePath: string;
   }> {
+    /**
+     * brokenLinks
+     * @public
+     */
     const brokenLinks: Array<{
       from: string;
       to: string;
@@ -88,10 +124,26 @@ export class ConnectivityValidator {
       filePath: string;
     }> = [];
 
+    /**
+     * relationships
+     * @public
+     */
     const relationships = this.graphBuilder.getGraph().relationships;
 
+    /**
+     * rel
+     * @public
+     */
     for (const rel of relationships) {
+      /**
+       * fromSymbol
+       * @public
+       */
       const fromSymbol = this.graphBuilder.getSymbol(rel.from);
+      /**
+       * toSymbol
+       * @public
+       */
       const toSymbol = this.graphBuilder.getSymbol(rel.to);
 
       if (!fromSymbol) {
@@ -124,10 +176,18 @@ export class ConnectivityValidator {
   private calculateConnectivityScore(
     analysis: Omit<ConnectivityAnalysis, 'connectivityScore'>
   ): number {
+    /**
+     * totalSymbols
+     * @public
+     */
     const totalSymbols = this.graphBuilder.getAllSymbols().length;
     if (totalSymbols === 0) return 100;
 
     // Weight factors for different issues
+    /**
+     * weights
+     * @public
+     */
     const weights = {
       undocumented: 0.2,
       untested: 0.25,
@@ -138,6 +198,10 @@ export class ConnectivityValidator {
       circularDeps: 0.05,
     };
 
+    /**
+     * penalties
+     * @public
+     */
     let penalties = 0;
 
     penalties += (analysis.undocumented.length / totalSymbols) * weights.undocumented * 100;
@@ -157,6 +221,10 @@ export class ConnectivityValidator {
    * @returns Array of validation results
    */
   validateSymbol(symbol: Symbol): ValidationResult[] {
+    /**
+     * results
+     * @public
+     */
     const results: ValidationResult[] = [];
 
     // Check documentation
@@ -200,7 +268,15 @@ export class ConnectivityValidator {
     }
 
     // Check for orphaned symbols
+    /**
+     * deps
+     * @public
+     */
     const deps = this.graphBuilder.getDependencies(symbol.id);
+    /**
+     * dependents
+     * @public
+     */
     const dependents = this.graphBuilder.getDependents(symbol.id);
 
     if (deps.length === 0 && dependents.length === 0 && !symbol.isExported) {
@@ -219,9 +295,21 @@ export class ConnectivityValidator {
    * @returns Human-readable report string
    */
   generateReport(): string {
+    /**
+     * analysis
+     * @public
+     */
     const analysis = this.analyze();
+    /**
+     * stats
+     * @public
+     */
     const stats = this.graphBuilder.getStatistics();
 
+    /**
+     * report
+     * @public
+     */
     let report = '# Connectivity Analysis Report\n\n';
     report += `## Overall Score: ${analysis.connectivityScore.toFixed(2)}/100\n\n`;
 
@@ -236,6 +324,10 @@ export class ConnectivityValidator {
 
     if (analysis.undocumented.length > 0) {
       report += `### Undocumented Symbols (${analysis.undocumented.length})\n`;
+      /**
+       * sym
+       * @public
+       */
       for (const sym of analysis.undocumented.slice(0, 10)) {
         report += `- ${sym.name} (${sym.filePath}:${sym.line})\n`;
       }
@@ -247,6 +339,10 @@ export class ConnectivityValidator {
 
     if (analysis.untested.length > 0) {
       report += `### Untested Symbols (${analysis.untested.length})\n`;
+      /**
+       * sym
+       * @public
+       */
       for (const sym of analysis.untested.slice(0, 10)) {
         report += `- ${sym.name} (${sym.filePath}:${sym.line})\n`;
       }
@@ -258,6 +354,10 @@ export class ConnectivityValidator {
 
     if (analysis.circularDependencies.length > 0) {
       report += `### Circular Dependencies (${analysis.circularDependencies.length})\n`;
+      /**
+       * cycle
+       * @public
+       */
       for (const cycle of analysis.circularDependencies.slice(0, 5)) {
         report += `- ${cycle.join(' -> ')}\n`;
       }
@@ -269,6 +369,10 @@ export class ConnectivityValidator {
 
     if (analysis.brokenLinks.length > 0) {
       report += `### Broken Links (${analysis.brokenLinks.length})\n`;
+      /**
+       * link
+       * @public
+       */
       for (const link of analysis.brokenLinks.slice(0, 10)) {
         report += `- ${link.from} -> ${link.to} (${link.type})\n`;
       }
@@ -290,16 +394,36 @@ export class ConnectivityValidator {
    * @testScenario Provide fix suggestions
    */
   generateDetailedReport(): DetailedValidationReport {
+    /**
+     * allSymbols
+     * @public
+     */
     const allSymbols = this.graphBuilder.getAllSymbols();
+    /**
+     * allIssues
+     * @public
+     */
     const allIssues: DetailedValidationIssue[] = [];
 
     // Collect all issues from all symbols
+    /**
+     * symbol
+     * @public
+     */
     for (const symbol of allSymbols) {
+      /**
+       * issues
+       * @public
+       */
       const issues = this.extractDetailedIssues(symbol);
       allIssues.push(...issues);
     }
 
     // Group issues by file
+    /**
+     * issuesByFile
+     * @public
+     */
     const issuesByFile = new Map<
       string,
       {
@@ -309,7 +433,15 @@ export class ConnectivityValidator {
       }
     >();
 
+    /**
+     * issue
+     * @public
+     */
     for (const issue of allIssues) {
+      /**
+       * existing
+       * @public
+       */
       const existing = issuesByFile.get(issue.filePath);
       if (existing) {
         existing.issues.push(issue);
@@ -324,8 +456,20 @@ export class ConnectivityValidator {
     }
 
     // Group issues by type
+    /**
+     * issuesByType
+     * @public
+     */
     const issuesByType = new Map<string, DetailedValidationIssue[]>();
+    /**
+     * issue
+     * @public
+     */
     for (const issue of allIssues) {
+      /**
+       * existing
+       * @public
+       */
       const existing = issuesByType.get(issue.issueType);
       if (existing) {
         existing.push(issue);
@@ -335,6 +479,10 @@ export class ConnectivityValidator {
     }
 
     // Calculate severity counts
+    /**
+     * issuesBySeverity
+     * @public
+     */
     const issuesBySeverity = {
       error: allIssues.filter((i) => i.severity === 'error').length,
       warning: allIssues.filter((i) => i.severity === 'warning').length,
@@ -342,11 +490,31 @@ export class ConnectivityValidator {
     };
 
     // Calculate summary statistics
+    /**
+     * documented
+     * @public
+     */
     const documented = allSymbols.filter((s) => s.summary && s.summary.trim() !== '').length;
+    /**
+     * tested
+     * @public
+     */
     const tested = allSymbols.filter((s) => s.tests && s.tests.length > 0).length;
+    /**
+     * withResponsibility
+     * @public
+     */
     const withResponsibility = allSymbols.filter((s) => s.responsibility).length;
+    /**
+     * withContract
+     * @public
+     */
     const withContract = allSymbols.filter((s) => s.contract).length;
 
+    /**
+     * completionPercentage
+     * @public
+     */
     const completionPercentage =
       allSymbols.length > 0
         ? ((documented + tested + withResponsibility + withContract) / (allSymbols.length * 4)) *
@@ -381,6 +549,10 @@ export class ConnectivityValidator {
    * @returns Array of detailed issues
    */
   private extractDetailedIssues(symbol: Symbol): DetailedValidationIssue[] {
+    /**
+     * issues
+     * @public
+     */
     const issues: DetailedValidationIssue[] = [];
 
     // Check documentation
@@ -449,6 +621,10 @@ export class ConnectivityValidator {
 
     // Check for detailed contract elements
     if (symbol.contract) {
+      /**
+       * missingItems
+       * @public
+       */
       const missingItems: string[] = [];
 
       if (
@@ -482,7 +658,15 @@ export class ConnectivityValidator {
     }
 
     // Check for orphaned symbols
+    /**
+     * deps
+     * @public
+     */
     const deps = this.graphBuilder.getDependencies(symbol.id);
+    /**
+     * dependents
+     * @public
+     */
     const dependents = this.graphBuilder.getDependents(symbol.id);
 
     if (deps.length === 0 && dependents.length === 0 && !symbol.isExported) {
@@ -509,6 +693,10 @@ export class ConnectivityValidator {
    * @public
    */
   formatDetailedReport(report: DetailedValidationReport): string {
+    /**
+     * output
+     * @public
+     */
     let output = '';
 
     // Header
@@ -541,16 +729,36 @@ export class ConnectivityValidator {
     output += `📁 ISSUES BY FILE\n`;
     output += `${'─'.repeat(80)}\n`;
 
+    /**
+     * sortedFiles
+     * @public
+     */
     const sortedFiles = Array.from(report.issuesByFile.values()).sort(
       (a, b) => b.issueCount - a.issueCount
     );
 
+    /**
+     * fileGroup
+     * @public
+     */
     for (const fileGroup of sortedFiles) {
       output += `\n📄 ${fileGroup.filePath} (${fileGroup.issueCount} issues)\n`;
 
       // Group by symbol within file
+      /**
+       * issuesBySymbol
+       * @public
+       */
       const issuesBySymbol = new Map<string, DetailedValidationIssue[]>();
+      /**
+       * issue
+       * @public
+       */
       for (const issue of fileGroup.issues) {
+        /**
+         * existing
+         * @public
+         */
         const existing = issuesBySymbol.get(issue.symbolName);
         if (existing) {
           existing.push(issue);
@@ -559,17 +767,41 @@ export class ConnectivityValidator {
         }
       }
 
+      /**
+       * [symbolName, issues]
+       * @public
+       */
       for (const [symbolName, issues] of issuesBySymbol.entries()) {
+        /**
+         * firstIssue
+         * @public
+         */
         const firstIssue = issues[0];
         output += `  ${firstIssue.symbolType} ${symbolName} (line ${firstIssue.line})\n`;
 
         // Sort issues by severity
+        /**
+         * sortedIssues
+         * @public
+         */
         const sortedIssues = issues.sort((a, b) => {
+          /**
+           * severityOrder
+           * @public
+           */
           const severityOrder = { error: 0, warning: 1, info: 2 };
           return severityOrder[a.severity] - severityOrder[b.severity];
         });
 
+        /**
+         * issue
+         * @public
+         */
         for (const issue of sortedIssues) {
+          /**
+           * icon
+           * @public
+           */
           const icon =
             issue.severity === 'error' ? '❌' : issue.severity === 'warning' ? '⚠️ ' : 'ℹ️ ';
           output += `    ${icon} ${issue.message}\n`;
@@ -588,6 +820,10 @@ export class ConnectivityValidator {
     // Quick stats by issue type
     output += `\n📊 ISSUES BY TYPE\n`;
     output += `${'─'.repeat(80)}\n`;
+    /**
+     * [issueType, issues]
+     * @public
+     */
     for (const [issueType, issues] of Array.from(report.issuesByType.entries()).sort(
       (a, b) => b[1].length - a[1].length
     )) {

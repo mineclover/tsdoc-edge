@@ -40,14 +40,30 @@ export class StrictModeValidator {
    * @testScenario Incomplete fields detected
    */
   validate(doc: EnhancedSymbolDoc, isPublicAPI: boolean = true): StrictModeValidation {
+    /**
+     * missingCategories
+     * @public
+     */
     const missingCategories: StrictModeValidation['missingCategories'] = [];
+    /**
+     * incompleteCategories
+     * @public
+     */
     const incompleteCategories: StrictModeValidation['incompleteCategories'] = [];
+    /**
+     * errors
+     * @public
+     */
     const errors: StrictModeValidation['errors'] = [];
 
     // 1. Validate Problem Solving
     if (!doc.problemSolving) {
       missingCategories.push('problemSolving');
     } else {
+      /**
+       * psErrors
+       * @public
+       */
       const psErrors = this.validateProblemSolving(doc.problemSolving);
       if (psErrors.length > 0) {
         incompleteCategories.push({
@@ -68,6 +84,10 @@ export class StrictModeValidator {
     if (!doc.functionality) {
       missingCategories.push('functionality');
     } else {
+      /**
+       * funcErrors
+       * @public
+       */
       const funcErrors = this.validateFunctionality(doc.functionality);
       if (funcErrors.length > 0) {
         incompleteCategories.push({
@@ -95,6 +115,10 @@ export class StrictModeValidator {
         });
       }
     } else {
+      /**
+       * errorErrors
+       * @public
+       */
       const errorErrors = this.validateErrorExperiences(doc.errorExperiences);
       if (errorErrors.length > 0) {
         incompleteCategories.push({
@@ -114,6 +138,10 @@ export class StrictModeValidator {
         });
       }
     } else {
+      /**
+       * decisionErrors
+       * @public
+       */
       const decisionErrors = this.validateDecisions(doc.decisions);
       if (decisionErrors.length > 0) {
         incompleteCategories.push({
@@ -127,6 +155,10 @@ export class StrictModeValidator {
     if (!doc.dependencies) {
       missingCategories.push('dependencies');
     } else {
+      /**
+       * depErrors
+       * @public
+       */
       const depErrors = this.validateDependencies(doc.dependencies);
       if (depErrors.length > 0) {
         incompleteCategories.push({
@@ -140,6 +172,10 @@ export class StrictModeValidator {
     if (!doc.futurePlans) {
       missingCategories.push('futurePlans');
     } else {
+      /**
+       * planErrors
+       * @public
+       */
       const planErrors = this.validateFuturePlans(doc.futurePlans);
       if (planErrors.length > 0) {
         incompleteCategories.push({
@@ -149,12 +185,20 @@ export class StrictModeValidator {
       }
     }
 
+    /**
+     * complianceScore
+     * @public
+     */
     const complianceScore = this.calculateComplianceScore(
       missingCategories,
       incompleteCategories,
       errors
     );
 
+    /**
+     * isCompliant
+     * @public
+     */
     const isCompliant =
       missingCategories.length === 0 && incompleteCategories.length === 0 && errors.length === 0;
 
@@ -174,6 +218,10 @@ export class StrictModeValidator {
    * @returns Array of missing fields
    */
   private validateProblemSolving(ps: ProblemSolving): string[] {
+    /**
+     * missing
+     * @public
+     */
     const missing: string[] = [];
 
     if (!ps.description || ps.description.trim() === '') {
@@ -193,6 +241,10 @@ export class StrictModeValidator {
    * @returns Array of missing fields
    */
   private validateFunctionality(func: Functionality): string[] {
+    /**
+     * missing
+     * @public
+     */
     const missing: string[] = [];
 
     if (!func.mainFeatures || func.mainFeatures.length === 0) {
@@ -212,6 +264,10 @@ export class StrictModeValidator {
    * @returns Array of error messages
    */
   private validateErrorExperiences(errors: ErrorExperience[]): string[] {
+    /**
+     * issues
+     * @public
+     */
     const issues: string[] = [];
 
     errors.forEach((err, index) => {
@@ -230,6 +286,10 @@ export class StrictModeValidator {
    * @returns Array of error messages
    */
   private validateDecisions(decisions: DecisionRecord[]): string[] {
+    /**
+     * issues
+     * @public
+     */
     const issues: string[] = [];
 
     decisions.forEach((dec, index) => {
@@ -250,6 +310,10 @@ export class StrictModeValidator {
    * @returns Array of error messages
    */
   private validateDependencies(deps: DependencySpec[]): string[] {
+    /**
+     * issues
+     * @public
+     */
     const issues: string[] = [];
 
     deps.forEach((dep, index) => {
@@ -267,6 +331,10 @@ export class StrictModeValidator {
    * @returns Array of error messages
    */
   private validateFuturePlans(plans: FuturePlan[]): string[] {
+    /**
+     * issues
+     * @public
+     */
     const issues: string[] = [];
 
     plans.forEach((plan, index) => {
@@ -292,17 +360,37 @@ export class StrictModeValidator {
     incomplete: Array<{ category: string; missingFields: string[] }>,
     errors: Array<{ category: string; field: string; message: string }>
   ): number {
+    /**
+     * totalCategories
+     * @public
+     */
     const totalCategories = 6;
 
     // Each missing category costs 100/6 points
+    /**
+     * missingPenalty
+     * @public
+     */
     const missingPenalty = (missing.length / totalCategories) * 100;
 
     // Incomplete categories cost less (half penalty)
+    /**
+     * incompletePenalty
+     * @public
+     */
     const incompletePenalty = (incomplete.length / totalCategories) * 50;
 
     // Additional errors cost less
+    /**
+     * errorPenalty
+     * @public
+     */
     const errorPenalty = Math.min(errors.length * 2, 20);
 
+    /**
+     * score
+     * @public
+     */
     const score = 100 - missingPenalty - incompletePenalty - errorPenalty;
 
     return Math.max(0, Math.min(100, score));
@@ -314,6 +402,10 @@ export class StrictModeValidator {
    * @returns Human-readable report
    */
   generateReport(validation: StrictModeValidation): string {
+    /**
+     * report
+     * @public
+     */
     let report = `# Strict Mode Validation Report\n\n`;
     report += `**Symbol**: ${validation.symbolId}\n`;
     report += `**Compliance Score**: ${validation.complianceScore.toFixed(2)}/100\n`;
@@ -370,6 +462,10 @@ export class StrictModeValidator {
       | 'futurePlans'
       | string
   ): string {
+    /**
+     * names
+     * @public
+     */
     const names: Record<string, string> = {
       problemSolving: '1. Problem Solving',
       functionality: '2. Functionality',

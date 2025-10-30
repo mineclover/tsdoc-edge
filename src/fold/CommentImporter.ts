@@ -9,6 +9,10 @@ import * as ts from 'typescript';
 import type { CommentState, FileCommentState } from '../types/comment-state';
 
 // TypeScript compiler API internal types
+/**
+ * NodeWithJSDoc interface
+ * @public
+ */
 interface NodeWithJSDoc extends ts.Node {
   jsDoc?: ts.JSDoc[];
 }
@@ -27,27 +31,79 @@ export class CommentImporter {
    * @public
    */
   parseMarkdown(markdownPath: string): FileCommentState {
+    /**
+     * content
+     * @public
+     */
     const content = fs.readFileSync(markdownPath, 'utf-8');
+    /**
+     * lines
+     * @public
+     */
     const lines = content.split('\n');
 
     // Extract file path from first line
+    /**
+     * filePathMatch
+     * @public
+     */
     const filePathMatch = lines[0].match(/^# (.+)$/);
     if (!filePathMatch) {
       throw new Error('Invalid markdown format: missing file path header');
     }
+    /**
+     * filePath
+     * @public
+     */
     const filePath = filePathMatch[1];
 
     // Extract last updated
+    /**
+     * lastUpdatedMatch
+     * @public
+     */
     const lastUpdatedMatch = lines[2].match(/^Last Updated: (.+)$/);
+    /**
+     * lastUpdated
+     * @public
+     */
     const lastUpdated = lastUpdatedMatch ? lastUpdatedMatch[1] : new Date().toISOString();
 
+    /**
+     * comments
+     * @public
+     */
     const comments: CommentState[] = [];
+    /**
+     * currentComment
+     * @public
+     */
     let currentComment: Partial<CommentState> | null = null;
+    /**
+     * inFullComment
+     * @public
+     */
     let inFullComment = false;
+    /**
+     * inCollapsedComment
+     * @public
+     */
     let inCollapsedComment = false;
+    /**
+     * commentBuffer
+     * @public
+     */
     let commentBuffer: string[] = [];
 
+    /**
+     * i
+     * @public
+     */
     for (let i = 4; i < lines.length; i++) {
+      /**
+       * line
+       * @public
+       */
       const line = lines[i];
 
       // New comment section
@@ -56,6 +112,10 @@ export class CommentImporter {
           comments.push(currentComment as CommentState);
         }
 
+        /**
+         * symbolMatch
+         * @public
+         */
         const symbolMatch = line.match(/^## Comment \d+: (.+)$/);
         currentComment = {
           symbol: symbolMatch ? symbolMatch[1] : 'unknown',
@@ -67,6 +127,10 @@ export class CommentImporter {
 
       // Parse location
       if (line.startsWith('**Location**:')) {
+        /**
+         * match
+         * @public
+         */
         const match = line.match(/Line (\d+)-(\d+), Column (\d+)/);
         if (match) {
           currentComment.location = {
@@ -77,6 +141,10 @@ export class CommentImporter {
           };
         } else {
           // Fallback for old format
+          /**
+           * oldMatch
+           * @public
+           */
           const oldMatch = line.match(/Line (\d+), Column (\d+)/);
           if (oldMatch) {
             currentComment.location = {
@@ -92,6 +160,10 @@ export class CommentImporter {
 
       // Parse hash
       if (line.startsWith('**Hash**:')) {
+        /**
+         * match
+         * @public
+         */
         const match = line.match(/`([a-f0-9]+)`/);
         if (match) {
           currentComment.contentHash = match[1];
@@ -101,6 +173,10 @@ export class CommentImporter {
 
       // Parse status
       if (line.startsWith('**Status**:')) {
+        /**
+         * match
+         * @public
+         */
         const match = line.match(/`(expanded|collapsed)`/);
         if (match) {
           currentComment.status = match[1] as 'expanded' | 'collapsed';
@@ -208,6 +284,10 @@ export class CommentImporter {
    * @returns SHA-256 hash string
    */
   private generateContentHash(fullComment: string, symbolName: string): string {
+    /**
+     * content
+     * @public
+     */
     const content = `${symbolName}:${fullComment.trim()}`;
     return crypto.createHash('sha256').update(content).digest('hex').substring(0, 16);
   }
@@ -221,22 +301,62 @@ export class CommentImporter {
   private extractSourceComments(
     sourceCode: string
   ): Map<string, { start: number; end: number; text: string; symbol: string }> {
+    /**
+     * commentMap
+     * @public
+     */
     const commentMap = new Map<
       string,
       { start: number; end: number; text: string; symbol: string }
     >();
+    /**
+     * sourceFile
+     * @public
+     */
     const sourceFile = ts.createSourceFile('temp.ts', sourceCode, ts.ScriptTarget.Latest, true);
 
+    /**
+     * visit
+     * @public
+     */
     const visit = (node: ts.Node) => {
+      /**
+       * jsDocComments
+       * @public
+       */
       const jsDocComments = (node as NodeWithJSDoc).jsDoc;
       if (jsDocComments && jsDocComments.length > 0) {
+        /**
+         * jsDoc
+         * @public
+         */
         for (const jsDoc of jsDocComments) {
+          /**
+           * fullText
+           * @public
+           */
           const fullText = jsDoc.getFullText();
+          /**
+           * symbolName
+           * @public
+           */
           const symbolName = this.getSymbolName(node);
 
+          /**
+           * { line }
+           * @public
+           */
           const { line } = sourceFile.getLineAndCharacterOfPosition(jsDoc.pos);
+          /**
+           * { line: endLine }
+           * @public
+           */
           const { line: endLine } = sourceFile.getLineAndCharacterOfPosition(jsDoc.end);
 
+          /**
+           * hash
+           * @public
+           */
           const hash = this.generateContentHash(fullText, symbolName);
 
           commentMap.set(hash, {
@@ -296,24 +416,60 @@ export class CommentImporter {
       throw new Error(`File not found: ${filePath}`);
     }
 
+    /**
+     * sourceCode
+     * @public
+     */
     const sourceCode = fs.readFileSync(filePath, 'utf-8');
+    /**
+     * lines
+     * @public
+     */
     const lines = sourceCode.split('\n');
 
     // Extract comments from source with hash
+    /**
+     * sourceComments
+     * @public
+     */
     const sourceComments = this.extractSourceComments(sourceCode);
 
     // Build replacement map: hash -> replacement text
+    /**
+     * replacementMap
+     * @public
+     */
     const replacementMap = new Map<string, string>();
+    /**
+     * comment
+     * @public
+     */
     for (const comment of fileState.comments) {
+      /**
+       * replacement
+       * @public
+       */
       const replacement =
         comment.status === 'collapsed' ? comment.collapsedComment : comment.fullComment;
       replacementMap.set(comment.contentHash, replacement);
     }
 
     // Build line ranges to replace
+    /**
+     * replaceRanges
+     * @public
+     */
     const replaceRanges: Array<{ start: number; end: number; replacement: string }> = [];
 
+    /**
+     * [hash, range]
+     * @public
+     */
     for (const [hash, range] of sourceComments.entries()) {
+      /**
+       * replacement
+       * @public
+       */
       const replacement = replacementMap.get(hash);
       if (replacement !== undefined) {
         replaceRanges.push({
@@ -328,7 +484,15 @@ export class CommentImporter {
     replaceRanges.sort((a, b) => b.start - a.start);
 
     // Apply replacements
+    /**
+     * result
+     * @public
+     */
     const result = [...lines];
+    /**
+     * range
+     * @public
+     */
     for (const range of replaceRanges) {
       // Remove old comment lines (1-based line numbers)
       result.splice(range.start - 1, range.end - range.start + 1, range.replacement);
@@ -346,13 +510,25 @@ export class CommentImporter {
    * @public
    */
   importFile(markdownPath: string, overwrite: boolean = false): string {
+    /**
+     * fileState
+     * @public
+     */
     const fileState = this.parseMarkdown(markdownPath);
+    /**
+     * updatedCode
+     * @public
+     */
     const updatedCode = this.applyComments(fileState.filePath, fileState);
 
     if (overwrite) {
       fs.writeFileSync(fileState.filePath, updatedCode, 'utf-8');
       return fileState.filePath;
     } else {
+      /**
+       * backupPath
+       * @public
+       */
       const backupPath = `${fileState.filePath}.backup`;
       fs.writeFileSync(backupPath, updatedCode, 'utf-8');
       return backupPath;

@@ -62,10 +62,22 @@ export class IdGenerator {
    * @postcondition ID is unique within this generator instance
    */
   generate(): string {
+    /**
+     * maxAttempts
+     * @public
+     */
     const maxAttempts = 1000;
+    /**
+     * attempts
+     * @public
+     */
     let attempts = 0;
 
     while (attempts < maxAttempts) {
+      /**
+       * id
+       * @public
+       */
       const id = this.mode === 'random' ? this.generateRandom() : this.generateSequential();
 
       if (!this.usedIds.has(id)) {
@@ -86,8 +98,20 @@ export class IdGenerator {
    * @returns Random ID of current length
    */
   private generateRandom(): string {
+    /**
+     * result
+     * @public
+     */
     let result = '';
+    /**
+     * i
+     * @public
+     */
     for (let i = 0; i < this.length; i++) {
+      /**
+       * randomIndex
+       * @public
+       */
       const randomIndex = Math.floor(Math.random() * this.charset.length);
       result += this.charset[randomIndex];
     }
@@ -99,7 +123,15 @@ export class IdGenerator {
    * @returns Sequential ID (001, 002, ...)
    */
   private generateSequential(): string {
+    /**
+     * id
+     * @public
+     */
     const id = this.sequentialCounter.toString(this.charset.length);
+    /**
+     * padded
+     * @public
+     */
     const padded = id.padStart(this.length, '0');
     this.sequentialCounter++;
     return padded;
@@ -110,11 +142,19 @@ export class IdGenerator {
    * @param ids - Array of existing IDs
    */
   registerExisting(ids: string[]): void {
+    /**
+     * id
+     * @public
+     */
     for (const id of ids) {
       this.usedIds.add(id);
 
       // Update sequential counter if in sequential mode
       if (this.mode === 'sequential') {
+        /**
+         * numValue
+         * @public
+         */
         const numValue = parseInt(id, this.charset.length);
         if (!Number.isNaN(numValue) && numValue >= this.sequentialCounter) {
           this.sequentialCounter = numValue + 1;
@@ -133,6 +173,10 @@ export class IdGenerator {
       return false;
     }
 
+    /**
+     * char
+     * @public
+     */
     for (const char of id) {
       if (!this.charset.includes(char)) {
         return false;
@@ -160,6 +204,13 @@ export class IdGenerator {
 
   /**
    * Get statistics
+   * @returns Returns {
+    mode: string;
+    length: number;
+    used: number;
+    capacity: number;
+    utilization: number;
+  }
    */
   getStats(): {
     mode: string;
@@ -168,6 +219,10 @@ export class IdGenerator {
     capacity: number;
     utilization: number;
   } {
+    /**
+     * capacity
+     * @public
+     */
     const capacity = this.getCapacity();
     return {
       mode: this.mode,

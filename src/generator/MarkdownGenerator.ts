@@ -7,14 +7,26 @@ import { type DocNode, DocNodeKind } from '@microsoft/tsdoc';
 import type { ParsedDocComment } from '../types';
 
 // TSDoc internal node types (not exposed in public API)
+/**
+ * DocPlainText interface
+ * @public
+ */
 interface DocPlainText extends DocNode {
   text: string;
 }
 
+/**
+ * DocParagraph interface
+ * @public
+ */
 interface DocParagraph extends DocNode {
   nodes: ReadonlyArray<DocNode>;
 }
 
+/**
+ * DocCodeSpan interface
+ * @public
+ */
 interface DocCodeSpan extends DocNode {
   code: string;
 }
@@ -32,6 +44,10 @@ export class MarkdownGenerator {
    * @public
    */
   generateForComment(comment: ParsedDocComment): string {
+    /**
+     * markdown
+     * @public
+     */
     let markdown = '';
 
     // Add header with symbol name
@@ -39,6 +55,10 @@ export class MarkdownGenerator {
 
     // Add summary
     if (comment.docComment.summarySection) {
+      /**
+       * summary
+       * @public
+       */
       const summary = this.renderDocNodes(comment.docComment.summarySection.nodes);
       markdown += `${summary}\n\n`;
     }
@@ -46,8 +66,20 @@ export class MarkdownGenerator {
     // Add parameters
     if (comment.docComment.params.blocks.length > 0) {
       markdown += `### Parameters\n\n`;
+      /**
+       * param
+       * @public
+       */
       for (const param of comment.docComment.params.blocks) {
+        /**
+         * paramName
+         * @public
+         */
         const paramName = param.parameterName;
+        /**
+         * paramDesc
+         * @public
+         */
         const paramDesc = this.renderDocNodes(param.content.nodes);
         markdown += `- **${paramName}**: ${paramDesc}\n`;
       }
@@ -57,6 +89,10 @@ export class MarkdownGenerator {
     // Add returns
     if (comment.docComment.returnsBlock) {
       markdown += `### Returns\n\n`;
+      /**
+       * returnsDesc
+       * @public
+       */
       const returnsDesc = this.renderDocNodes(comment.docComment.returnsBlock.content.nodes);
       markdown += `${returnsDesc}\n\n`;
     }
@@ -64,6 +100,10 @@ export class MarkdownGenerator {
     // Add remarks
     if (comment.docComment.remarksBlock) {
       markdown += `### Remarks\n\n`;
+      /**
+       * remarks
+       * @public
+       */
       const remarks = this.renderDocNodes(comment.docComment.remarksBlock.content.nodes);
       markdown += `${remarks}\n\n`;
     }
@@ -71,7 +111,15 @@ export class MarkdownGenerator {
     // Add validation issues if any
     if (comment.validationResults.length > 0) {
       markdown += `### Validation Issues\n\n`;
+      /**
+       * result
+       * @public
+       */
       for (const result of comment.validationResults) {
+        /**
+         * icon
+         * @public
+         */
         const icon = result.severity === 'error' ? '❌' : '⚠️';
         markdown += `${icon} **${result.severity.toUpperCase()}**: ${result.message}\n`;
       }
@@ -89,8 +137,16 @@ export class MarkdownGenerator {
    * @public
    */
   generateForComments(comments: ParsedDocComment[]): string {
+    /**
+     * markdown
+     * @public
+     */
     let markdown = '# API Documentation\n\n';
 
+    /**
+     * comment
+     * @public
+     */
     for (const comment of comments) {
       markdown += this.generateForComment(comment);
       markdown += '---\n\n';
@@ -106,8 +162,16 @@ export class MarkdownGenerator {
    * @returns Rendered text
    */
   private renderDocNodes(nodes: ReadonlyArray<DocNode>): string {
+    /**
+     * result
+     * @public
+     */
     let result = '';
 
+    /**
+     * node
+     * @public
+     */
     for (const node of nodes) {
       switch (node.kind) {
         case DocNodeKind.PlainText:
