@@ -36,11 +36,12 @@ export class ConfigManager {
    * Private constructor (singleton pattern)
    *
    * @param projectRoot - Project root directory
+   * @param configPath - Custom config file path (optional)
    * @private
    */
-  private constructor(projectRoot: string = process.cwd()) {
+  private constructor(projectRoot: string = process.cwd(), configPath?: string) {
     this.projectRoot = projectRoot;
-    this.configPath = path.join(projectRoot, CONFIG_FILE_NAME);
+    this.configPath = configPath || path.join(projectRoot, CONFIG_FILE_NAME);
     this.config = this.loadConfig();
   }
 
@@ -48,13 +49,14 @@ export class ConfigManager {
    * Get singleton instance
    *
    * @param projectRoot - Project root directory (optional, only used on first call)
+   * @param configPath - Custom config file path (optional, only used on first call)
    * @returns ConfigManager instance
    *
    * @public
    */
-  public static getInstance(projectRoot?: string): ConfigManager {
+  public static getInstance(projectRoot?: string, configPath?: string): ConfigManager {
     if (!ConfigManager.instance) {
-      ConfigManager.instance = new ConfigManager(projectRoot);
+      ConfigManager.instance = new ConfigManager(projectRoot, configPath);
     }
     return ConfigManager.instance;
   }

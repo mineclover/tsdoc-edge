@@ -2685,6 +2685,31 @@ function printScan(): void {
 
 // Main CLI logic
 const args = process.argv.slice(2);
+
+// Parse --config option
+let configPath: string | undefined;
+const configArgIndex = args.findIndex(arg => arg.startsWith('--config=') || arg === '--config');
+if (configArgIndex !== -1) {
+  const configArg = args[configArgIndex];
+  if (configArg.startsWith('--config=')) {
+    configPath = configArg.split('=')[1];
+  } else if (args[configArgIndex + 1] && !args[configArgIndex + 1].startsWith('-')) {
+    configPath = args[configArgIndex + 1];
+    args.splice(configArgIndex + 1, 1);
+  }
+  args.splice(configArgIndex, 1);
+
+  // Convert to absolute path if relative
+  if (configPath && !path.isAbsolute(configPath)) {
+    configPath = path.resolve(process.cwd(), configPath);
+  }
+}
+
+// Initialize ConfigManager with custom config path if provided
+if (configPath) {
+  ConfigManager.getInstance(process.cwd(), configPath);
+}
+
 const command = args[0] || 'help';
 
 switch (command) {

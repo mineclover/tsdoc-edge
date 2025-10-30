@@ -1,0 +1,30 @@
+{
+  "project": {
+    "name": "tsdoc-edge",
+    "version": "0.1.0",
+    "rootDir": ".",
+    "srcDirs": ["src"],
+    "entryPoints": ["src/index.ts"]
+  },
+  "paths": {
+    "commentsDir": ".tsdoc-comments",
+    "databasePath": ".tsdoc.db",
+    "jsonlDir": "docs/data",
+    "outputDir": "docs/output"
+  },
+  "fold": {
+    "enabled": true,
+    "autoExport": false,
+    "excludePatterns": ["**/node_modules/**", "**/dist/**", "**/demo/**", "**/__tests__/**"]
+  },
+  "validation": {
+    "strictMode": false,
+    "minConnectivityScore": 70,
+    "rules": {}
+  },
+  "generator": {
+    "template": "enhanced",
+    "includePrivate": false,
+    "includeInternal": false
+  }
+}
