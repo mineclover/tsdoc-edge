@@ -5,7 +5,7 @@
  */
 
 import * as fs from 'node:fs';
-import type { Backlink } from '../types/doc-symbol';
+import type { Backlink } from '../types/feature';
 import type { DocumentSymbolRegistry } from './DocumentSymbolRegistry';
 
 /**

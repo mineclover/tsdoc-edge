@@ -563,10 +563,17 @@ tsdoc-edge/
 │   │   └── ConnectivityValidator.ts
 │   ├── generator/          # 문서 생성
 │   │   └── MarkdownGenerator.ts
-│   ├── types/              # TypeScript 타입 정의
-│   │   ├── index.ts
-│   │   ├── graph.ts        # 그래프 관련 타입
-│   │   └── tags.ts         # 커스텀 태그 타입
+│   ├── types/              # TypeScript 타입 정의 (도메인별 구조화)
+│   │   ├── core/           # 핵심 타입 (파싱, 링킹)
+│   │   ├── analysis/       # 분석 타입 (품질, 통계)
+│   │   ├── graph/          # 그래프 타입 (심볼, 관계)
+│   │   ├── config/         # 설정 타입
+│   │   ├── tags/           # TSDoc 태그 타입
+│   │   ├── domain/         # 도메인 분석 타입
+│   │   ├── state/          # 상태 관리 타입
+│   │   ├── registry/       # 레지스트리 타입
+│   │   ├── feature/        # 기능 문서 타입
+│   │   └── index.ts        # 통합 export
 │   ├── utils/              # 유틸리티 함수
 │   ├── __tests__/          # 테스트 파일 (53개)
 │   │   ├── SymbolGraphBuilder.test.ts
@@ -653,17 +660,20 @@ TSDoc Edge는 연결성과 SSOT를 위한 확장 태그를 제공합니다:
 ## 테스트 결과
 
 ```
-✅ Test Suites: 5 passed, 5 total
-✅ Tests: 53 passed, 53 total
+✅ Test Suites: 26 passed, 26 total
+✅ Tests: 400 passed, 400 total
 ✅ Build: Success
 ✅ TypeScript: No errors
 
 Coverage:
-- SymbolGraphBuilder: 14 tests
-- SymbolSearchEngine: 13 tests
-- ConnectivityValidator: 11 tests
-- Integration: 3 tests
-- TSDocParser: 4 tests
+- Core Engine: SymbolGraphBuilder, SymbolSearchEngine
+- Validators: ConventionValidator, ConnectivityValidator, StrictModeValidator
+- Parsers: TSDocParser
+- Generators: MarkdownGenerator, EnhancedMarkdownGenerator
+- Analyzers: DocumentationAnalyzer, CodeHealthChecker, InterfaceAnalyzer
+- Fixers: DocumentationFixer, RecursiveImprover
+- Infrastructure: DatabaseManager, ConfigManager, FileScanner
+- Integration tests
 ```
 
 ## 라이선스

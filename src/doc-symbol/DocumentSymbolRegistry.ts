@@ -11,7 +11,7 @@ import type {
   DocSymbolWarning,
   DocumentSymbol,
   ParsedDocSymbols,
-} from '../types/doc-symbol';
+} from '../types/feature';
 
 /**
  * Registry for document symbols with SSOT enforcement

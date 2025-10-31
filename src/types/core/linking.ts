@@ -60,7 +60,7 @@ export interface LinkIndex {
  * Link validation result
  * @public
  */
-export interface ValidationResult {
+export interface LinkValidationResult {
   type: 'broken' | 'valid' | 'outdated';
   link: CodeLink | DocLink;
   issue?: string;
@@ -71,9 +71,9 @@ export interface ValidationResult {
  * Validation report
  * @public
  */
-export interface ValidationReport {
+export interface LinkValidationReport {
   totalLinks: number;
-  brokenLinks: ValidationResult[];
+  brokenLinks: LinkValidationResult[];
   validLinks: number;
   fixableLinks: number;
 }

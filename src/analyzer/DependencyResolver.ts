@@ -32,6 +32,7 @@ export class DependencyResolver {
    * Index symbols for quick lookup
    *
    * @param symbols - All extracted symbols
+   * @returns void - No return value
    */
   indexSymbols(symbols: ExtractedSymbol[]): void {
     this.symbolsByFile.clear();

@@ -6,7 +6,7 @@
 
 import * as fs from 'node:fs';
 import * as ts from 'typescript';
-import type { CodeConnection } from '../types/doc-symbol';
+import type { CodeConnection } from '../types/feature';
 
 /**
  * Parses @doc tags from TSDoc comments

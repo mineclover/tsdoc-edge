@@ -6,7 +6,7 @@
 
 import * as fs from 'node:fs';
 import type { Symbol } from '../types/graph';
-import type { StatsHistory, StatsHistoryEntry, TrackableStatistics } from '../types/statistics';
+import type { StatsHistory, StatsHistoryEntry, TrackableStatistics } from '../types/analysis';
 
 /**
  * Manages statistics history persistence
@@ -45,6 +45,7 @@ export class StatsHistoryManager {
    * @param stats - Statistics to save
    * @param symbols - All symbols (for tracking IDs)
    * @param historyPath - Path to history file
+   * @returns void - No return value
    */
   save(stats: TrackableStatistics, symbols: Symbol[], historyPath?: string): void {
     const filePath = historyPath || this.defaultPath;
@@ -166,6 +167,7 @@ export class StatsHistoryManager {
    * Clear history file
    *
    * @param historyPath - Path to history file
+   * @returns void - No return value
    */
   clear(historyPath?: string): void {
     const filePath = historyPath || this.defaultPath;
@@ -180,6 +182,7 @@ export class StatsHistoryManager {
    *
    * @param outputPath - Output file path
    * @param historyPath - Source history file path
+   * @returns void - No return value
    */
   export(outputPath: string, historyPath?: string): void {
     const history = this.load(historyPath);

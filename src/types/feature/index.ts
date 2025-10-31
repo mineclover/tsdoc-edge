@@ -4,3 +4,4 @@
  */
 
 export * from './feature';
+export * from './doc-symbol';

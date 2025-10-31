@@ -11,9 +11,9 @@ import type {
   CodeLink,
   DocLink,
   FixResult,
-  ValidationReport,
-  ValidationResult,
-} from '../types/linking';
+  LinkValidationReport,
+  LinkValidationResult,
+} from '../types/core';
 import type { DocCodeLinker } from './DocCodeLinker';
 
 /**
@@ -44,8 +44,8 @@ export class LinkValidator {
    * @param docFiles - Documentation file paths
    * @returns Validation report
    */
-  validateAll(codeFiles: string[], docFiles: string[]): ValidationReport {
-    const results: ValidationResult[] = [];
+  validateAll(codeFiles: string[], docFiles: string[]): LinkValidationReport {
+    const results: LinkValidationResult[] = [];
 
     // Validate doc → code links
     for (const docFile of docFiles) {
@@ -81,7 +81,7 @@ export class LinkValidator {
    * @param docPath - Document path
    * @returns Validation results
    */
-  validateDocument(docPath: string): ValidationResult[] {
+  validateDocument(docPath: string): LinkValidationResult[] {
     const links = this.linker.findCodeLinks(docPath);
     return links.map((link) => this.validateCodeLink(link));
   }
@@ -92,7 +92,7 @@ export class LinkValidator {
    * @param codePath - Code file path
    * @returns Validation results
    */
-  validateCodeFile(codePath: string): ValidationResult[] {
+  validateCodeFile(codePath: string): LinkValidationResult[] {
     const links = this.linker.findDocLinks(codePath);
     return links.map((link) => this.validateDocLink(link));
   }
@@ -103,7 +103,7 @@ export class LinkValidator {
    * @param link - Code link
    * @returns Validation result
    */
-  private validateCodeLink(link: CodeLink): ValidationResult {
+  private validateCodeLink(link: CodeLink): LinkValidationResult {
     const fullPath = path.resolve(this.projectRoot, link.targetFile);
 
     // 1. Check file exists
@@ -170,7 +170,7 @@ export class LinkValidator {
    * @param link - Doc link
    * @returns Validation result
    */
-  private validateDocLink(link: DocLink): ValidationResult {
+  private validateDocLink(link: DocLink): LinkValidationResult {
     const fullPath = path.resolve(this.projectRoot, link.targetDoc);
 
     // 1. Check document exists
@@ -298,7 +298,7 @@ export class LinkValidator {
    * @param brokenLinks - Broken links to fix
    * @returns Fix results
    */
-  autoFix(brokenLinks: ValidationResult[]): FixResult[] {
+  autoFix(brokenLinks: LinkValidationResult[]): FixResult[] {
     const results: FixResult[] = [];
 
     for (const result of brokenLinks) {

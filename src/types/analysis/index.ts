@@ -4,3 +4,4 @@
  */
 
 export * from './quality';
+export * from './statistics';

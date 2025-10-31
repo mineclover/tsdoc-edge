@@ -9,7 +9,7 @@ import type {
   CodeReference,
   DocumentSymbol,
   ParsedDocSymbols,
-} from '../types/doc-symbol';
+} from '../types/feature';
 
 /**
  * Parses [[]] document symbols from markdown

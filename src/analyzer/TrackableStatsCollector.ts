@@ -5,7 +5,7 @@
  */
 
 import type { Symbol } from '../types/graph';
-import type { DetectableStats, ImportanceCriteria, TrackableStatistics } from '../types/statistics';
+import type { DetectableStats, ImportanceCriteria, TrackableStatistics } from '../types/analysis';
 import { ImportanceClassifier } from './ImportanceClassifier';
 
 /**

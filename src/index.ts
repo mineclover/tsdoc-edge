@@ -62,11 +62,7 @@ export type * from './types/domain';
 export type * from './types/graph';
 // Comment state type exports
 export type * from './types/state';
-// Statistics type exports
-export type * from './types/statistics';
 // Enhanced type exports
-export type * from './types/tags';
-// Tag type exports
 export type * from './types/tags';
 // Validation exports
 export { ConnectivityValidator } from './validator/ConnectivityValidator';
@@ -75,15 +71,11 @@ export { StrictModeValidator } from './validator/StrictModeValidator';
 // Linking exports
 export { DocCodeLinker } from './linking/DocCodeLinker';
 export { LinkValidator } from './linking/LinkValidator';
-// Linking type exports
-export type * from './types/linking';
 // Document symbol exports ([[]] notation)
 export { BacklinkGenerator } from './doc-symbol/BacklinkGenerator';
 export { DocumentSymbolParser } from './doc-symbol/DocumentSymbolParser';
 export { DocumentSymbolRegistry } from './doc-symbol/DocumentSymbolRegistry';
 export { TSDocSymbolParser } from './doc-symbol/TSDocSymbolParser';
-// Document symbol type exports
-export type * from './types/doc-symbol';
 
 /**
  * Main entry point for TSDoc Edge

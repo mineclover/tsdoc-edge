@@ -1,0 +1,1891 @@
+{
+  "timestamp": "2025-10-30T22:39:10.065Z",
+  "statistics": {
+    "totalDefinitions": 10,
+    "totalAuxiliaries": 6,
+    "totalReferences": 204,
+    "totalCodeConnections": 11,
+    "avgReferencesPerSymbol": 20.4
+  },
+  "symbols": [
+    "CoreFeatures",
+    "DocumentSymbolSystem",
+    "Payment System",
+    "UserAuthentication",
+    "AnalysisFeatures",
+    "AutoIndexing",
+    "CoreWorkflow",
+    "NewFeature",
+    "SymbolGraphFeatures",
+    "ValidationFeatures"
+  ],
+  "registryData": {
+    "definitions": [
+      [
+        "CoreFeatures",
+        {
+          "name": "CoreFeatures",
+          "type": "primary",
+          "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+          "line": 1,
+          "level": 1
+        }
+      ],
+      [
+        "DocumentSymbolSystem",
+        {
+          "name": "DocumentSymbolSystem",
+          "type": "primary",
+          "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+          "line": 128,
+          "level": 1
+        }
+      ],
+      [
+        "Payment System",
+        {
+          "name": "Payment System",
+          "type": "primary",
+          "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+          "line": 523,
+          "level": 1
+        }
+      ],
+      [
+        "UserAuthentication",
+        {
+          "name": "UserAuthentication",
+          "type": "primary",
+          "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+          "line": 113,
+          "level": 1
+        }
+      ],
+      [
+        "AnalysisFeatures",
+        {
+          "name": "AnalysisFeatures",
+          "type": "primary",
+          "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/ANALYSIS_FEATURES.md",
+          "line": 1,
+          "level": 1
+        }
+      ],
+      [
+        "AutoIndexing",
+        {
+          "name": "AutoIndexing",
+          "type": "primary",
+          "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/AUTO_INDEXING.md",
+          "line": 1,
+          "level": 1
+        }
+      ],
+      [
+        "CoreWorkflow",
+        {
+          "name": "CoreWorkflow",
+          "type": "primary",
+          "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+          "line": 1,
+          "level": 1
+        }
+      ],
+      [
+        "NewFeature",
+        {
+          "name": "NewFeature",
+          "type": "primary",
+          "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+          "line": 161,
+          "level": 1
+        }
+      ],
+      [
+        "SymbolGraphFeatures",
+        {
+          "name": "SymbolGraphFeatures",
+          "type": "primary",
+          "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/SYMBOL_GRAPH.md",
+          "line": 1,
+          "level": 1
+        }
+      ],
+      [
+        "ValidationFeatures",
+        {
+          "name": "ValidationFeatures",
+          "type": "primary",
+          "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/VALIDATION_FEATURES.md",
+          "line": 1,
+          "level": 1
+        }
+      ]
+    ],
+    "auxiliaries": [
+      [
+        "Authentication",
+        [
+          {
+            "name": "Authentication",
+            "type": "auxiliary",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 15,
+            "level": 2
+          }
+        ]
+      ],
+      [
+        "DocumentSymbol",
+        [
+          {
+            "name": "DocumentSymbol",
+            "type": "auxiliary",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 60,
+            "level": 2
+          },
+          {
+            "name": "DocumentSymbol",
+            "type": "auxiliary",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 61,
+            "level": 3
+          }
+        ]
+      ],
+      [
+        "Authentication System",
+        [
+          {
+            "name": "Authentication System",
+            "type": "auxiliary",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 73,
+            "level": 2
+          }
+        ]
+      ],
+      [
+        "UserAuthentication",
+        [
+          {
+            "name": "UserAuthentication",
+            "type": "auxiliary",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+            "line": 31,
+            "level": 2
+          }
+        ]
+      ],
+      [
+        "NewFeature#Implementation",
+        [
+          {
+            "name": "NewFeature#Implementation",
+            "type": "auxiliary",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+            "line": 120,
+            "level": 2
+          }
+        ]
+      ]
+    ],
+    "references": [
+      [
+        "Symbol",
+        [
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 12,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 147,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 148,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 149,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 150,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 10,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 31,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 139,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 217,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 224,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 136,
+            "level": 0,
+            "section": "Section"
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 66,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 67,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 68,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 68,
+            "level": 0,
+            "section": "Section"
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 88,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 88,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 259,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 278,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+            "line": 7,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+            "line": 7,
+            "level": 0
+          },
+          {
+            "name": "Symbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+            "line": 84,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "CoreWorkflow",
+        [
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 16,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 413,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 42,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 92,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 135,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 149,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 293,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 138,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 178,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 229,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/ANALYSIS_FEATURES.md",
+            "line": 391,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/ANALYSIS_FEATURES.md",
+            "line": 408,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/AUTO_INDEXING.md",
+            "line": 308,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+            "line": 275,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/SYMBOL_GRAPH.md",
+            "line": 281,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/SYMBOL_GRAPH.md",
+            "line": 302,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/VALIDATION_FEATURES.md",
+            "line": 394,
+            "level": 0
+          },
+          {
+            "name": "CoreWorkflow",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/VALIDATION_FEATURES.md",
+            "line": 414,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "AnalysisFeatures",
+        [
+          {
+            "name": "AnalysisFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 36,
+            "level": 0
+          },
+          {
+            "name": "AnalysisFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 418,
+            "level": 0
+          },
+          {
+            "name": "AnalysisFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 173,
+            "level": 0
+          },
+          {
+            "name": "AnalysisFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 180,
+            "level": 0,
+            "section": "Health"
+          },
+          {
+            "name": "AnalysisFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 181,
+            "level": 0,
+            "section": "Quality"
+          },
+          {
+            "name": "AnalysisFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 291,
+            "level": 0
+          },
+          {
+            "name": "AnalysisFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 179,
+            "level": 0
+          },
+          {
+            "name": "AnalysisFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 90,
+            "level": 0
+          },
+          {
+            "name": "AnalysisFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 126,
+            "level": 0
+          },
+          {
+            "name": "AnalysisFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/SYMBOL_GRAPH.md",
+            "line": 279,
+            "level": 0
+          },
+          {
+            "name": "AnalysisFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/SYMBOL_GRAPH.md",
+            "line": 301,
+            "level": 0
+          },
+          {
+            "name": "AnalysisFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/VALIDATION_FEATURES.md",
+            "line": 392,
+            "level": 0
+          },
+          {
+            "name": "AnalysisFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/VALIDATION_FEATURES.md",
+            "line": 412,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "SymbolGraphFeatures",
+        [
+          {
+            "name": "SymbolGraphFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 77,
+            "level": 0
+          },
+          {
+            "name": "SymbolGraphFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 419,
+            "level": 0
+          },
+          {
+            "name": "SymbolGraphFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 58,
+            "level": 0
+          },
+          {
+            "name": "SymbolGraphFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 151,
+            "level": 0
+          },
+          {
+            "name": "SymbolGraphFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 178,
+            "level": 0,
+            "section": "Builder"
+          },
+          {
+            "name": "SymbolGraphFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 179,
+            "level": 0,
+            "section": "Traversal"
+          },
+          {
+            "name": "SymbolGraphFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 180,
+            "level": 0
+          },
+          {
+            "name": "SymbolGraphFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 243,
+            "level": 0,
+            "section": "IDGeneration"
+          },
+          {
+            "name": "SymbolGraphFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/ANALYSIS_FEATURES.md",
+            "line": 392,
+            "level": 0
+          },
+          {
+            "name": "SymbolGraphFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/ANALYSIS_FEATURES.md",
+            "line": 410,
+            "level": 0
+          },
+          {
+            "name": "SymbolGraphFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 92,
+            "level": 0
+          },
+          {
+            "name": "SymbolGraphFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 130,
+            "level": 0
+          },
+          {
+            "name": "SymbolGraphFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/VALIDATION_FEATURES.md",
+            "line": 393,
+            "level": 0
+          },
+          {
+            "name": "SymbolGraphFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/VALIDATION_FEATURES.md",
+            "line": 416,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "ValidationFeatures",
+        [
+          {
+            "name": "ValidationFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 112,
+            "level": 0
+          },
+          {
+            "name": "ValidationFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 428,
+            "level": 0
+          },
+          {
+            "name": "ValidationFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 174,
+            "level": 0
+          },
+          {
+            "name": "ValidationFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 182,
+            "level": 0,
+            "section": "Connectivity"
+          },
+          {
+            "name": "ValidationFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 294,
+            "level": 0
+          },
+          {
+            "name": "ValidationFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 181,
+            "level": 0
+          },
+          {
+            "name": "ValidationFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/ANALYSIS_FEATURES.md",
+            "line": 393,
+            "level": 0
+          },
+          {
+            "name": "ValidationFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/ANALYSIS_FEATURES.md",
+            "line": 411,
+            "level": 0
+          },
+          {
+            "name": "ValidationFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/AUTO_INDEXING.md",
+            "line": 307,
+            "level": 0
+          },
+          {
+            "name": "ValidationFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 91,
+            "level": 0
+          },
+          {
+            "name": "ValidationFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 131,
+            "level": 0
+          },
+          {
+            "name": "ValidationFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+            "line": 276,
+            "level": 0
+          },
+          {
+            "name": "ValidationFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/SYMBOL_GRAPH.md",
+            "line": 280,
+            "level": 0
+          },
+          {
+            "name": "ValidationFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/SYMBOL_GRAPH.md",
+            "line": 303,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "DocumentSymbolSystem",
+        [
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 136,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 423,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 457,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 49,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 93,
+            "level": 0,
+            "section": "Parser"
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 94,
+            "level": 0,
+            "section": "Registry"
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 150,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 282,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 283,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 284,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 285,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 49,
+            "level": 0,
+            "section": "Parser"
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 142,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 182,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 207,
+            "level": 0,
+            "section": "Parser"
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 215,
+            "level": 0,
+            "section": "Parsing"
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/ANALYSIS_FEATURES.md",
+            "line": 394,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/ANALYSIS_FEATURES.md",
+            "line": 404,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/ANALYSIS_FEATURES.md",
+            "line": 405,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/ANALYSIS_FEATURES.md",
+            "line": 406,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/AUTO_INDEXING.md",
+            "line": 306,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/AUTO_INDEXING.md",
+            "line": 326,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/AUTO_INDEXING.md",
+            "line": 327,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 93,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 119,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 120,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 121,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 122,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/SYMBOL_GRAPH.md",
+            "line": 295,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/SYMBOL_GRAPH.md",
+            "line": 296,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/SYMBOL_GRAPH.md",
+            "line": 297,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/SYMBOL_GRAPH.md",
+            "line": 298,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/VALIDATION_FEATURES.md",
+            "line": 395,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/VALIDATION_FEATURES.md",
+            "line": 409,
+            "level": 0
+          },
+          {
+            "name": "DocumentSymbolSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/VALIDATION_FEATURES.md",
+            "line": 410,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "AutoIndexing",
+        [
+          {
+            "name": "AutoIndexing",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 172,
+            "level": 0
+          },
+          {
+            "name": "AutoIndexing",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 424,
+            "level": 0
+          },
+          {
+            "name": "AutoIndexing",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_AUDIT_REPORT.md",
+            "line": 78,
+            "level": 0
+          },
+          {
+            "name": "AutoIndexing",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 134,
+            "level": 0
+          },
+          {
+            "name": "AutoIndexing",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 175,
+            "level": 0
+          },
+          {
+            "name": "AutoIndexing",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 292,
+            "level": 0
+          },
+          {
+            "name": "AutoIndexing",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 137,
+            "level": 0
+          },
+          {
+            "name": "AutoIndexing",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 183,
+            "level": 0
+          },
+          {
+            "name": "AutoIndexing",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 127,
+            "level": 0
+          },
+          {
+            "name": "AutoIndexing",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+            "line": 262,
+            "level": 0
+          },
+          {
+            "name": "AutoIndexing",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+            "line": 274,
+            "level": 0
+          },
+          {
+            "name": "AutoIndexing",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/VALIDATION_FEATURES.md",
+            "line": 413,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "GeneratorFeatures",
+        [
+          {
+            "name": "GeneratorFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 205,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "FixerFeatures",
+        [
+          {
+            "name": "FixerFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 224,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "FoldUnfoldSystem",
+        [
+          {
+            "name": "FoldUnfoldSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 245,
+            "level": 0
+          },
+          {
+            "name": "FoldUnfoldSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 429,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "StorageFeatures",
+        [
+          {
+            "name": "StorageFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 263,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "ConfigurationSystem",
+        [
+          {
+            "name": "ConfigurationSystem",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 284,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "UtilityFeatures",
+        [
+          {
+            "name": "UtilityFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/CORE_FEATURES_V2.md",
+            "line": 307,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "CoreFeatures",
+        [
+          {
+            "name": "CoreFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_AUDIT_REPORT.md",
+            "line": 56,
+            "level": 0
+          },
+          {
+            "name": "CoreFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 71,
+            "level": 0
+          },
+          {
+            "name": "CoreFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 280,
+            "level": 0
+          },
+          {
+            "name": "CoreFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 281,
+            "level": 0
+          },
+          {
+            "name": "CoreFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/ANALYSIS_FEATURES.md",
+            "line": 402,
+            "level": 0
+          },
+          {
+            "name": "CoreFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/ANALYSIS_FEATURES.md",
+            "line": 403,
+            "level": 0
+          },
+          {
+            "name": "CoreFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/AUTO_INDEXING.md",
+            "line": 324,
+            "level": 0
+          },
+          {
+            "name": "CoreFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/AUTO_INDEXING.md",
+            "line": 325,
+            "level": 0
+          },
+          {
+            "name": "CoreFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 117,
+            "level": 0
+          },
+          {
+            "name": "CoreFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 118,
+            "level": 0
+          },
+          {
+            "name": "CoreFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/SYMBOL_GRAPH.md",
+            "line": 293,
+            "level": 0
+          },
+          {
+            "name": "CoreFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/SYMBOL_GRAPH.md",
+            "line": 294,
+            "level": 0
+          },
+          {
+            "name": "CoreFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/VALIDATION_FEATURES.md",
+            "line": 407,
+            "level": 0
+          },
+          {
+            "name": "CoreFeatures",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/VALIDATION_FEATURES.md",
+            "line": 408,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "UserAuthentication",
+        [
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 286,
+            "level": 0
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 287,
+            "level": 0
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 288,
+            "level": 0
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 289,
+            "level": 0
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENTATION_REVIEW_SUMMARY.md",
+            "line": 290,
+            "level": 0
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 121,
+            "level": 0,
+            "section": "Implementation"
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 300,
+            "level": 0
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/ANALYSIS_FEATURES.md",
+            "line": 407,
+            "level": 0
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/AUTO_INDEXING.md",
+            "line": 328,
+            "level": 0
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/AUTO_INDEXING.md",
+            "line": 329,
+            "level": 0
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 123,
+            "level": 0
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 124,
+            "level": 0
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 125,
+            "level": 0
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+            "line": 43,
+            "level": 0
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+            "line": 49,
+            "level": 0,
+            "section": "Implementation"
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+            "line": 58,
+            "level": 0
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+            "line": 65,
+            "level": 0,
+            "section": "Login"
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/SYMBOL_GRAPH.md",
+            "line": 299,
+            "level": 0
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/SYMBOL_GRAPH.md",
+            "line": 300,
+            "level": 0
+          },
+          {
+            "name": "UserAuthentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/VALIDATION_FEATURES.md",
+            "line": 411,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "문서 심볼",
+        [
+          {
+            "name": "문서 심볼",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 7,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "Authentication",
+        [
+          {
+            "name": "Authentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 18,
+            "level": 0
+          },
+          {
+            "name": "Authentication",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 164,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "Login System",
+        [
+          {
+            "name": "Login System",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 26,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "DocumentSymbol",
+        [
+          {
+            "name": "DocumentSymbol",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 84,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "Authentication System",
+        [
+          {
+            "name": "Authentication System",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 94,
+            "level": 0
+          },
+          {
+            "name": "Authentication System",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 121,
+            "level": 0
+          },
+          {
+            "name": "Authentication System",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 127,
+            "level": 0,
+            "section": "Login"
+          },
+          {
+            "name": "Authentication System",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 436,
+            "level": 0
+          },
+          {
+            "name": "Authentication System",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 474,
+            "level": 0
+          },
+          {
+            "name": "Authentication System",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 499,
+            "level": 0
+          },
+          {
+            "name": "Authentication System",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 536,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "SymbolName",
+        [
+          {
+            "name": "SymbolName",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 134,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "Payment System",
+        [
+          {
+            "name": "Payment System",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 156,
+            "level": 0
+          },
+          {
+            "name": "Payment System",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 157,
+            "level": 0
+          },
+          {
+            "name": "Payment System",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 490,
+            "level": 0
+          },
+          {
+            "name": "Payment System",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 496,
+            "level": 0,
+            "section": "Processing"
+          }
+        ]
+      ],
+      [
+        "NonExistent",
+        [
+          {
+            "name": "NonExistent",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 169,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "Order Management",
+        [
+          {
+            "name": "Order Management",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 475,
+            "level": 0
+          },
+          {
+            "name": "Order Management",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/DOCUMENT_SYMBOL_DESIGN.md",
+            "line": 537,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "OtherFeature",
+        [
+          {
+            "name": "OtherFeature",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 40,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "APIDesign",
+        [
+          {
+            "name": "APIDesign",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 131,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "NewFeature",
+        [
+          {
+            "name": "NewFeature",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 301,
+            "level": 0
+          },
+          {
+            "name": "NewFeature",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 302,
+            "level": 0
+          },
+          {
+            "name": "NewFeature",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 303,
+            "level": 0
+          },
+          {
+            "name": "NewFeature",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/FEATURE_DOCS_STRATEGY.md",
+            "line": 304,
+            "level": 0
+          },
+          {
+            "name": "NewFeature",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/ANALYSIS_FEATURES.md",
+            "line": 409,
+            "level": 0
+          },
+          {
+            "name": "NewFeature",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/AUTO_INDEXING.md",
+            "line": 330,
+            "level": 0
+          },
+          {
+            "name": "NewFeature",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/AUTO_INDEXING.md",
+            "line": 331,
+            "level": 0
+          },
+          {
+            "name": "NewFeature",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 128,
+            "level": 0
+          },
+          {
+            "name": "NewFeature",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/CORE_WORKFLOW.md",
+            "line": 129,
+            "level": 0
+          },
+          {
+            "name": "NewFeature",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+            "line": 137,
+            "level": 0,
+            "section": "Implementation"
+          },
+          {
+            "name": "NewFeature",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+            "line": 171,
+            "level": 0
+          },
+          {
+            "name": "NewFeature",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/VALIDATION_FEATURES.md",
+            "line": 415,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "SessionManagement",
+        [
+          {
+            "name": "SessionManagement",
+            "type": "reference",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/docs/features/DOCUMENT_SYMBOL_SYSTEM.md",
+            "line": 44,
+            "level": 0
+          }
+        ]
+      ]
+    ],
+    "codeConnections": [
+      [
+        "AnalysisFeatures",
+        [
+          {
+            "codeSymbol": "CodeHealthChecker",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/src/analyzer/CodeHealthChecker.ts",
+            "line": 27,
+            "docSymbol": "AnalysisFeatures",
+            "section": "Health"
+          },
+          {
+            "codeSymbol": "DocumentationAnalyzer",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/src/analyzer/DocumentationAnalyzer.ts",
+            "line": 18,
+            "docSymbol": "AnalysisFeatures",
+            "section": "Quality"
+          }
+        ]
+      ],
+      [
+        "DocumentSymbolSystem",
+        [
+          {
+            "codeSymbol": "DocumentSymbolParser",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/src/doc-symbol/DocumentSymbolParser.ts",
+            "line": 21,
+            "docSymbol": "DocumentSymbolSystem",
+            "section": "Parser"
+          },
+          {
+            "codeSymbol": "DocumentSymbolRegistry",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/src/doc-symbol/DocumentSymbolRegistry.ts",
+            "line": 23,
+            "docSymbol": "DocumentSymbolSystem",
+            "section": "Registry"
+          }
+        ]
+      ],
+      [
+        "Symbol",
+        [
+          {
+            "codeSymbol": "TSDocSymbolParser",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/src/doc-symbol/TSDocSymbolParser.ts",
+            "line": 17,
+            "docSymbol": "Symbol"
+          }
+        ]
+      ],
+      [
+        "SymbolGraphFeatures",
+        [
+          {
+            "codeSymbol": "DepthTraverser",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/src/graph/DepthTraverser.ts",
+            "line": 64,
+            "docSymbol": "SymbolGraphFeatures",
+            "section": "Traversal"
+          },
+          {
+            "codeSymbol": "SymbolGraphBuilder",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/src/graph/SymbolGraphBuilder.ts",
+            "line": 22,
+            "docSymbol": "SymbolGraphFeatures",
+            "section": "Builder"
+          },
+          {
+            "codeSymbol": "SymbolSearchEngine",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/src/graph/SymbolSearchEngine.ts",
+            "line": 25,
+            "docSymbol": "SymbolGraphFeatures",
+            "section": "Search"
+          }
+        ]
+      ],
+      [
+        "CoreWorkflow",
+        [
+          {
+            "codeSymbol": "TSDocEdge",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/src/index.ts",
+            "line": 94,
+            "docSymbol": "CoreWorkflow"
+          }
+        ]
+      ],
+      [
+        "ValidationFeatures",
+        [
+          {
+            "codeSymbol": "ConnectivityValidator",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/src/validator/ConnectivityValidator.ts",
+            "line": 23,
+            "docSymbol": "ValidationFeatures",
+            "section": "Connectivity"
+          },
+          {
+            "codeSymbol": "StrictModeValidator",
+            "filePath": "/Users/junwoobang/project/tsdoc-edge/src/validator/StrictModeValidator.ts",
+            "line": 32,
+            "docSymbol": "ValidationFeatures",
+            "section": "StrictMode"
+          }
+        ]
+      ]
+    ]
+  }
+}

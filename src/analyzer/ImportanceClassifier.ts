@@ -5,7 +5,7 @@
  */
 
 import type { Symbol } from '../types/graph';
-import type { ImportanceCriteria, ImportanceLevel } from '../types/statistics';
+import type { ImportanceCriteria, ImportanceLevel } from '../types/analysis';
 
 /**
  * Classifies symbols by their importance level

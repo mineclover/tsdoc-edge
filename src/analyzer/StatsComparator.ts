@@ -13,7 +13,7 @@ import type {
   StatsHistoryEntry,
   SymbolChange,
   TrackableStatistics,
-} from '../types/statistics';
+} from '../types/analysis';
 
 /**
  * Compares statistics between snapshots and detects issues
@@ -206,6 +206,7 @@ export class StatsComparator {
    * @param comparison - Comparison result
    * @param level - Importance level name
    * @returns Formatted string
+   * @param _level - _level parameter
    */
   formatComparison(comparison: StatsComparison, _level: string): string {
     const lines: string[] = [];
