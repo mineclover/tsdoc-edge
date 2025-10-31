@@ -159,7 +159,7 @@ describe('DatabaseManager', () => {
       const retrieved = dbManager.getEnhancedDoc('doc-001');
       expect(retrieved).toBeDefined();
       expect(retrieved?.symbolId).toBe('doc-001');
-      expect(retrieved?.problemSolving.description).toBe('Test problem description');
+      expect(retrieved?.problemSolving?.description).toBe('Test problem description');
     });
 
     test('should return null for non-existent enhanced doc', () => {
@@ -171,17 +171,17 @@ describe('DatabaseManager', () => {
       dbManager.insertSymbol(testSymbol, 0);
       dbManager.insertEnhancedDoc(enhancedDoc, 0);
 
-      const updated = {
+      const updated: EnhancedSymbolDoc = {
         ...enhancedDoc,
         problemSolving: {
-          ...enhancedDoc.problemSolving,
           description: 'Updated description',
+          context: 'Test context',
         },
       };
       dbManager.insertEnhancedDoc(updated, 0);
 
       const retrieved = dbManager.getEnhancedDoc('doc-001');
-      expect(retrieved?.problemSolving.description).toBe('Updated description');
+      expect(retrieved?.problemSolving?.description).toBe('Updated description');
     });
   });
 

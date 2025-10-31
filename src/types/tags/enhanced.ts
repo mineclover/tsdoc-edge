@@ -279,45 +279,15 @@ export interface FuturePlan {
 }
 
 /**
- * Enhanced symbol documentation (Strict Mode)
- * Requires all 6 categories to be present for public APIs
+ * Base symbol documentation
+ * Contains minimal required fields for any symbol documentation
  * @public
  */
-export interface EnhancedSymbolDoc {
+export interface BaseSymbolDoc {
   /**
    * Symbol identifier
    */
   symbolId: string;
-
-  /**
-   * 1. Problem Solving
-   */
-  problemSolving: ProblemSolving;
-
-  /**
-   * 2. Functionality
-   */
-  functionality: Functionality;
-
-  /**
-   * 3. Error Experiences
-   */
-  errorExperiences: ErrorExperience[];
-
-  /**
-   * 4. Decisions
-   */
-  decisions: DecisionRecord[];
-
-  /**
-   * 5. Dependencies
-   */
-  dependencies: DependencySpec[];
-
-  /**
-   * 6. Future Plans
-   */
-  futurePlans: FuturePlan[];
 
   /**
    * When this documentation was created
@@ -333,6 +303,53 @@ export interface EnhancedSymbolDoc {
    * Documentation version
    */
   version: string;
+}
+
+/**
+ * Enhanced symbol documentation (Strict Mode)
+ * Extends BaseSymbolDoc with optional 6-category documentation system
+ *
+ * For Strict Mode compliance on public APIs, all 6 categories should be present.
+ * For incremental documentation, categories can be added progressively.
+ *
+ * @public
+ */
+export interface EnhancedSymbolDoc extends BaseSymbolDoc {
+  /**
+   * 1. Problem Solving (optional)
+   * Describes what problem this symbol solves
+   */
+  problemSolving?: ProblemSolving;
+
+  /**
+   * 2. Functionality (optional)
+   * Describes what this symbol does
+   */
+  functionality?: Functionality;
+
+  /**
+   * 3. Error Experiences (optional)
+   * Documents errors encountered and solutions
+   */
+  errorExperiences?: ErrorExperience[];
+
+  /**
+   * 4. Decisions (optional)
+   * Records architectural decisions (ADRs)
+   */
+  decisions?: DecisionRecord[];
+
+  /**
+   * 5. Dependencies (optional)
+   * Lists dependencies and their reasons
+   */
+  dependencies?: DependencySpec[];
+
+  /**
+   * 6. Future Plans (optional)
+   * Documents planned improvements (TODOs)
+   */
+  futurePlans?: FuturePlan[];
 }
 
 /**

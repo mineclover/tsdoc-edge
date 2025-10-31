@@ -41,10 +41,14 @@ export class EnhancedMarkdownGenerator {
     md += `---\n\n`;
 
     // 1. Problem Solving
-    md += this.generateProblemSolving(enhancedDoc);
+    if (enhancedDoc.problemSolving) {
+      md += this.generateProblemSolving(enhancedDoc);
+    }
 
     // 2. Functionality
-    md += this.generateFunctionality(enhancedDoc);
+    if (enhancedDoc.functionality) {
+      md += this.generateFunctionality(enhancedDoc);
+    }
 
     // 3. Error Experiences
     if (enhancedDoc.errorExperiences && enhancedDoc.errorExperiences.length > 0) {
@@ -57,7 +61,9 @@ export class EnhancedMarkdownGenerator {
     }
 
     // 5. Dependencies
-    md += this.generateDependencies(enhancedDoc);
+    if (enhancedDoc.dependencies) {
+      md += this.generateDependencies(enhancedDoc);
+    }
 
     // 6. Future Plans
     if (enhancedDoc.futurePlans && enhancedDoc.futurePlans.length > 0) {
@@ -80,21 +86,24 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateProblemSolving(doc: EnhancedSymbolDoc): string {
+    // Called only when problemSolving is defined
+    const ps = doc.problemSolving!;
+
     let md = `## 1. 🎯 Problem Solving\n\n`;
     md += `### What Problem Does This Solve?\n\n`;
-    md += `${doc.problemSolving.description}\n\n`;
+    md += `${ps.description}\n\n`;
 
     md += `### Context\n\n`;
-    md += `${doc.problemSolving.context}\n\n`;
+    md += `${ps.context}\n\n`;
 
-    if (doc.problemSolving.targetUseCase) {
+    if (ps.targetUseCase) {
       md += `### Target Use Case\n\n`;
-      md += `${doc.problemSolving.targetUseCase}\n\n`;
+      md += `${ps.targetUseCase}\n\n`;
     }
 
-    if (doc.problemSolving.relatedProblem) {
+    if (ps.relatedProblem) {
       md += `### Related Problem\n\n`;
-      md += `${doc.problemSolving.relatedProblem}\n\n`;
+      md += `${ps.relatedProblem}\n\n`;
     }
 
     return md;
@@ -106,16 +115,19 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateFunctionality(doc: EnhancedSymbolDoc): string {
+    // Called only when functionality is defined
+    const func = doc.functionality!;
+
     let md = `## 2. ⚙️ Functionality\n\n`;
 
     md += `### Main Features\n\n`;
-    doc.functionality.mainFeatures.forEach((feature) => {
+    func.mainFeatures.forEach((feature) => {
       md += `- ${feature}\n`;
     });
     md += '\n';
 
     md += `### Components\n\n`;
-    doc.functionality.components.forEach((comp) => {
+    func.components.forEach((comp) => {
       md += `#### \`${comp.name}\`\n\n`;
       md += `${comp.description}\n\n`;
       if (comp.signature) {
@@ -123,29 +135,29 @@ export class EnhancedMarkdownGenerator {
       }
     });
 
-    if (doc.functionality.io) {
+    if (func.io) {
       md += `### Input/Output\n\n`;
 
-      if (doc.functionality.io.inputs.length > 0) {
+      if (func.io.inputs.length > 0) {
         md += `**Inputs**:\n\n`;
-        doc.functionality.io.inputs.forEach((input) => {
+        func.io.inputs.forEach((input) => {
           md += `- **${input.name}** (\`${input.type}\`): ${input.description}\n`;
         });
         md += '\n';
       }
 
-      if (doc.functionality.io.outputs.length > 0) {
+      if (func.io.outputs.length > 0) {
         md += `**Outputs**:\n\n`;
-        doc.functionality.io.outputs.forEach((output) => {
+        func.io.outputs.forEach((output) => {
           md += `- **${output.name}** (\`${output.type}\`): ${output.description}\n`;
         });
         md += '\n';
       }
     }
 
-    if (doc.functionality.examples && doc.functionality.examples.length > 0) {
+    if (func.examples && func.examples.length > 0) {
       md += `### Usage Examples\n\n`;
-      doc.functionality.examples.forEach((example, index) => {
+      func.examples.forEach((example, index) => {
         md += `#### Example ${index + 1}\n\n`;
         md += '```typescript\n';
         md += example;
@@ -162,9 +174,12 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateErrorExperiences(doc: EnhancedSymbolDoc): string {
+    // Called only when errorExperiences is defined
+    const errors = doc.errorExperiences!;
+
     let md = `## 3. 🐛 Error Experiences\n\n`;
 
-    doc.errorExperiences.forEach((err) => {
+    errors.forEach((err) => {
       md += `### ${err.errorType}: ${err.message}\n\n`;
       md += `**Context**: ${err.context}\n\n`;
       md += `**Solution**:\n\n`;
@@ -189,9 +204,12 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateDecisions(doc: EnhancedSymbolDoc): string {
+    // Called only when decisions is defined
+    const decisions = doc.decisions!;
+
     let md = `## 4. 🔍 Design Decisions\n\n`;
 
-    doc.decisions.forEach((decision) => {
+    decisions.forEach((decision) => {
       md += `### ${decision.id}: ${decision.title}\n\n`;
       md += `**Status**: ${this.getStatusBadge(decision.status)}\n\n`;
       md += `**Date**: ${decision.date}\n\n`;
@@ -232,17 +250,20 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateDependencies(doc: EnhancedSymbolDoc): string {
+    // Called only when dependencies is defined
+    const deps = doc.dependencies!;
+
     let md = `## 5. 🔗 Dependencies\n\n`;
 
-    if (doc.dependencies.length === 0) {
+    if (deps.length === 0) {
       md += `*No dependencies*\n\n`;
       return md;
     }
 
     // Group by type
-    const grouped: Record<string, typeof doc.dependencies> = {};
+    const grouped: Record<string, typeof deps> = {};
 
-    doc.dependencies.forEach((dep) => {
+    deps.forEach((dep) => {
       if (!grouped[dep.type]) {
         grouped[dep.type] = [];
       }
@@ -279,12 +300,15 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateFuturePlans(doc: EnhancedSymbolDoc): string {
+    // Called only when futurePlans is defined
+    const plans = doc.futurePlans!;
+
     let md = `## 6. 🚀 Future Plans\n\n`;
 
     // Group by status
-    const grouped: Record<string, typeof doc.futurePlans> = {};
+    const grouped: Record<string, typeof plans> = {};
 
-    doc.futurePlans.forEach((plan) => {
+    plans.forEach((plan) => {
       if (!grouped[plan.status]) {
         grouped[plan.status] = [];
       }
