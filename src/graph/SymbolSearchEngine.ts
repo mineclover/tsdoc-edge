@@ -20,6 +20,7 @@ import type { SymbolGraphBuilder } from './SymbolGraphBuilder';
  * @testScenario Complex multi-criteria search
  * @testScenario Find undocumented symbols
  * @testScenario Find untested symbols
+ * @doc [[SymbolGraphFeatures#Search]]
  */
 export class SymbolSearchEngine {
   private graphBuilder: SymbolGraphBuilder;

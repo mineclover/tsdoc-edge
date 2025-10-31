@@ -23,33 +23,58 @@ TSDoc Edge는 단순한 문서 생성 도구가 아닙니다. 코드베이스의
 
 ## 주요 기능
 
-### ✅ 현재 구현 완료 (v0.1.0)
+### ✅ CLI 도구 (v0.6.0) - NEW! 🔥
 
-- **심볼 그래프 빌더**: 코드베이스의 모든 심볼과 관계를 그래프로 구축
-- **심볼 검색 엔진**: 다양한 조건으로 심볼을 검색하고 필터링
-- **연결성 검증**: SSOT 준수 여부를 점수화하고 문제점 탐지
-- **순환 의존성 감지**: 심볼 간 순환 의존성 자동 탐지
-- **깨진 링크 검출**: 존재하지 않는 심볼에 대한 참조 탐지
-- **커스텀 TSDoc 태그**: 계약, 책임, 테스트 등을 위한 확장 태그
-- **53개 테스트 통과**: 모든 핵심 기능 검증 완료
+**29개 명령어로 완전한 문서 관리**
 
-### ✅ Strict Mode (v0.2.0)
+#### 초기화 및 빌드 (2개)
+- `init` - 프로젝트 설정 초기화
+- `build` - **소스 파일 스캔 및 심볼 DB 생성** 🔥
 
-- **6-Category Documentation**: Problem, Functionality, Errors, Decisions, Dependencies, Plans
-- **SQLite + JSONL**: 빠른 검색과 Git 버전 관리의 조화
-- **Enhanced Markdown**: 완전한 문서 자동 생성
-- **Strict Validation**: 100점 만점 준수도 검증
-- **64개 테스트 통과**: 모든 기능 검증 완료
+#### 심볼 탐색 (9개)
+- `id` (new, list, find, stats) - 심볼 ID 수동 관리
+- `find-method` - 심볼 검색
+- `tree` - 계층 트리 출력
+- `deps` / `used-by` / `who-uses` - 의존성 분석
 
-### ✅ Fold/Unfold System (v0.3.0)
+#### 이슈 찾기 (7개)
+- `orphans` - 사용되지 않는 코드
+- `undocumented` - 미문서화 심볼
+- `untested` - 테스트 없는 심볼
+- `without-responsibility` / `without-contract` - 누락 체크
+- `todos` / `plans` - TODO 및 계획 수집
 
-- **주석 접기/펼치기**: 긴 주석을 프로그래밍적으로 관리
-- **마크다운 저장소**: 주석 상태를 Git으로 버전 관리
-- **패턴 매칭**: 정규식으로 선택적 접기/펼치기
-- **팀 협업**: 동일한 접기 상태 공유 가능
-- **양방향 변환**: TypeScript ↔ Markdown
+#### 품질 검증 (3개)
+- `validate` - TSDoc 유효성 검증
+- `analyze` - 전체 문서 품질 분석
+- `health` - 프로젝트 건강도 점수
 
-### ✅ Configuration System (v0.4.0) - NEW! 🔥
+#### 문서 개선 (3개)
+- `suggest` - 개선 제안
+- `fix` - 자동 수정
+- `improve` - AI 기반 재귀적 개선
+
+#### 통계 및 분석 (6개)
+- `stats` (--save, --compare) - 통계 추적
+- `core-api` - 핵심 API 표면 분석
+- `scan` - 심볼 그래프 깊이 탐색
+
+#### 문서 심볼 시스템 (4개)
+- `index-docs` - [[]] 심볼 인덱싱
+- `validate-docs` - SSOT 검증
+- `update-backlinks` - 백링크 자동 생성
+- `find-doc` - 문서 심볼 검색
+
+**성능**:
+- 소규모 프로젝트 (< 100 파일): ~5초 초기 설정
+- 중규모 프로젝트 (100-500 파일): ~20초 초기 설정
+- 대규모 프로젝트 (> 500 파일): ~50초 초기 설정
+
+**CI/CD 통합**: GitHub Actions, GitLab CI, Jenkins, CircleCI 템플릿 제공
+
+---
+
+### ✅ Configuration System (v0.4.0)
 
 - **init 명령어**: `tsdoc-edge init`로 프로젝트 초기화
 - **설정 파일**: `.tsdoc.config.json`으로 중앙화된 설정 관리
@@ -57,13 +82,32 @@ TSDoc Edge는 단순한 문서 생성 도구가 아닙니다. 코드베이스의
 - **검증 규칙**: 프로젝트별 validation 규칙 정의
 - **환경별 설정**: dev/prod 환경에 맞는 설정 분리
 
+### ✅ Document Symbol System (v0.5.0)
+
+- **[[문서 심볼]]** 정의 및 참조 (Wiki 스타일)
+- H1 레벨에서 심볼 정의: `# [[Authentication System]]`
+- 코드-문서 양방향 연결: `@doc [[Symbol]]` 태그
+- Backlink 자동 생성 및 갱신
+- SSOT 검증 (중복 정의 방지)
+- 문서 기반 드리븐 개발 지원
+
+### ✅ Core Engine (v0.1.0 - v0.3.0)
+
+- **심볼 그래프 빌더**: 코드베이스의 모든 심볼과 관계를 그래프로 구축
+- **심볼 검색 엔진**: 다양한 조건으로 심볼을 검색하고 필터링
+- **연결성 검증**: SSOT 준수 여부를 점수화하고 문제점 탐지
+- **Strict Mode**: 6-카테고리 문서화 시스템
+- **SQLite + JSONL**: 빠른 검색과 Git 버전 관리의 조화
+- **Fold/Unfold System**: 주석 접기/펼치기로 코드 가독성 향상
+- **64개 테스트 통과**: 모든 핵심 기능 검증 완료
+
 ### 🚧 다음 단계
 
 - TypeScript AST 자동 파싱 (TSDoc → EnhancedDoc 자동 변환)
 - 테스트 커버리지 통합
 - 의존성 그래프 시각화
-- CI/CD 통합 (자동 검증)
 - VSCode 확장 (실시간 Strict Mode 검증)
+- AI 기반 문서 생성 고도화
 
 ## 설치
 
@@ -71,34 +115,179 @@ TSDoc Edge는 단순한 문서 생성 도구가 아닙니다. 코드베이스의
 npm install tsdoc-edge
 ```
 
-## 빠른 시작
+## 빠른 시작 - CLI
 
-### 1. 프로젝트 초기화 (v0.4.0 🔥)
+### 1. 설치
 
 ```bash
-# 설정 파일 생성
+npm install -g tsdoc-edge
+```
+
+### 2. 프로젝트 초기화
+
+```bash
+# 프로젝트 설정
+tsdoc-edge init --name=my-project --version=1.0.0
+
+# 소스 코드 스캔 및 데이터베이스 생성
+tsdoc-edge build src
+
+# 현재 문서화 상태 분석
+tsdoc-edge analyze src
+```
+
+**출력 예시**:
+```
+📊 Coverage Summary
+  Total Symbols: 156
+  Documented: 98 (62.8%)
+  Undocumented: 58 (37.2%)
+
+Overall Score: 67/100 (Good)
+```
+
+### 3. 주요 CLI 명령어 (29개)
+
+#### 초기화 및 빌드
+```bash
+tsdoc-edge init                  # 프로젝트 설정 초기화
+tsdoc-edge build src             # 심볼 데이터베이스 생성
+```
+
+#### 품질 검증
+```bash
+tsdoc-edge analyze src           # 문서 품질 전체 분석
+tsdoc-edge health src            # 프로젝트 건강도 점수
+tsdoc-edge validate src          # TSDoc 유효성 검증
+```
+
+#### 이슈 찾기
+```bash
+tsdoc-edge undocumented          # 미문서화 심볼
+tsdoc-edge orphans               # 사용되지 않는 코드
+tsdoc-edge untested              # 테스트 없는 심볼
+```
+
+#### 문서 개선
+```bash
+tsdoc-edge suggest src --limit=5 # 개선 제안
+tsdoc-edge fix src               # 자동 수정
+tsdoc-edge improve src           # AI 기반 개선
+```
+
+#### 통계 및 추적
+```bash
+tsdoc-edge stats src --save      # 통계 저장
+tsdoc-edge stats src --compare   # 이전과 비교
+```
+
+#### 심볼 탐색
+```bash
+tsdoc-edge tree                  # 심볼 계층 트리
+tsdoc-edge deps <id>             # 의존성 조회
+tsdoc-edge used-by <id>          # 역의존성 조회
+tsdoc-edge who-uses <name>       # 심볼 사용처 검색
+```
+
+#### 문서 심볼 시스템
+```bash
+tsdoc-edge index-docs docs       # [[]] 심볼 인덱싱
+tsdoc-edge validate-docs         # SSOT 검증
+tsdoc-edge update-backlinks      # 백링크 생성
+```
+
+**전체 명령어 가이드**: [docs/CLI_WORKFLOWS_AND_SCENARIOS.md](./docs/CLI_WORKFLOWS_AND_SCENARIOS.md) 🔥
+
+### 4. 실전 워크플로우
+
+#### 신규 프로젝트 설정
+```bash
+# 1단계: 초기화
 tsdoc-edge init --name=my-project
 
-# .tsdoc.config.json 생성됨
-# 모든 필요한 디렉토리 자동 생성
+# 2단계: 데이터베이스 생성
+tsdoc-edge build src
+
+# 3단계: 현황 분석
+tsdoc-edge analyze src
+
+# 4단계: 통계 베이스라인 설정
+tsdoc-edge stats src --save
 ```
 
-생성된 `.tsdoc.config.json`:
-```json
-{
-  "project": { "name": "my-project", "version": "1.0.0" },
-  "paths": {
-    "commentsDir": ".tsdoc-comments",
-    "databasePath": ".tsdoc.db",
-    "jsonlDir": "docs/data",
-    "outputDir": "docs/output"
-  },
-  "fold": { "enabled": true },
-  "validation": { "strictMode": false, "minConnectivityScore": 70 }
-}
+#### PR 품질 체크
+```bash
+# 변경 사항 분석
+tsdoc-edge stats src --compare
+
+# Public API 문서화 확인
+tsdoc-edge undocumented --visibility=public
+
+# 전체 검증
+tsdoc-edge validate src
 ```
 
-### 2. 기본 사용법
+#### 레거시 코드 문서화
+```bash
+# 1. 문서 제안 받기
+tsdoc-edge suggest src --limit=10
+
+# 2. 자동 수정 적용
+tsdoc-edge fix src
+
+# 3. 결과 확인
+tsdoc-edge stats src --compare
+```
+
+### 5. CI/CD 통합
+
+**GitHub Actions 예시**:
+```yaml
+name: TSDoc Quality
+
+on: [push, pull_request]
+
+jobs:
+  tsdoc-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - run: npm ci
+
+      - name: Cache Database
+        uses: actions/cache@v3
+        with:
+          path: .tsdoc.db
+          key: tsdoc-${{ hashFiles('src/**/*.ts') }}
+
+      - name: Build Database
+        run: npx tsdoc-edge build src
+
+      - name: Quality Check
+        run: |
+          npx tsdoc-edge analyze src
+          npx tsdoc-edge validate src
+
+      - name: Enforce Standards
+        run: |
+          UNDOC=$(npx tsdoc-edge undocumented --visibility=public | wc -l)
+          if [ $UNDOC -gt 5 ]; then
+            echo "❌ Too many undocumented public APIs"
+            exit 1
+          fi
+```
+
+**더 많은 CI/CD 템플릿** (GitLab CI, Jenkins, CircleCI): [docs/CLI_WORKFLOWS_AND_SCENARIOS.md#cicd-통합-템플릿](./docs/CLI_WORKFLOWS_AND_SCENARIOS.md#🚀-cicd-통합-템플릿)
+
+---
+
+## 프로그래밍 API 사용
+
+### 기본 사용법
 
 ```typescript
 import {
@@ -267,31 +456,80 @@ const exportPath = db.exportToJSONL();
 console.log(`📦 Exported: ${exportPath}`);
 ```
 
-## 상세 가이드
+## 📚 상세 가이드
+
+### CLI 가이드 (권장)
+
+- **🚀 CLI 워크플로우 & 시나리오**: [docs/CLI_WORKFLOWS_AND_SCENARIOS.md](./docs/CLI_WORKFLOWS_AND_SCENARIOS.md) 🔥 **필독!**
+  - **29개 전체 명령어** 상세 설명
+  - **명령어 참조 테이블** (DB 필요 여부, 실행 시간, 출력 파일)
+  - **10개 실전 사용 예시** (실제 출력 결과 포함)
+  - **6개 핵심 워크플로우**
+  - **7개 유저 시나리오**
+  - **ID 서브커맨드 완전 가이드**
+  - **8가지 에러 해결 가이드** + 플로우차트
+  - **성능 벤치마크** (소/중/대규모 프로젝트)
+  - **6가지 최적화 팁**
+  - **CI/CD 통합 템플릿** (GitHub Actions, GitLab CI, Jenkins, CircleCI)
+  - 총 2,750+ 라인의 완전한 가이드
+
+- **⚙️ Configuration System**: [docs/CONFIG_GUIDE.md](./docs/CONFIG_GUIDE.md)
+  - `.tsdoc.config.json` 완벽 가이드
+  - 경로 커스터마이징
+  - 환경별 설정 분리
+  - 프로그래밍 방식 사용
+
+- **🔧 CLI 고급 기능**: [docs/CLI_ADVANCED_FEATURES.md](./docs/CLI_ADVANCED_FEATURES.md)
+  - 필터링 옵션
+  - 출력 포맷
+  - 고급 검색
+
+### 프로그래밍 API 가이드
 
 - **기본 사용법**: [USAGE_GUIDE.md](./USAGE_GUIDE.md)
 - **Strict Mode**: [STRICT_MODE_GUIDE.md](./STRICT_MODE_GUIDE.md)
-- **Configuration System**: [docs/CONFIG_GUIDE.md](./docs/CONFIG_GUIDE.md) 🔥 NEW!
-  - 설정 파일 완벽 가이드
-  - 경로 커스터마이징
-  - 프로그래밍 방식 설정
-  - CI/CD 통합
-- **Fold/Unfold System**: [docs/FOLD_UNFOLD_GUIDE.md](./docs/FOLD_UNFOLD_GUIDE.md)
+
+### 핵심 기능 가이드
+
+- **📖 [[문서 심볼]] 시스템**: [docs/DOCUMENT_SYMBOL_DESIGN.md](./docs/DOCUMENT_SYMBOL_DESIGN.md)
+  - Wiki 스타일 문서 심볼 정의
+  - 코드-문서 양방향 연결
+  - Backlink 자동 생성
+  - SSOT 검증 및 문서 기반 드리븐
+
+- **🔍 의존성 분석**: [docs/DEPENDENCY_ANALYSIS_GUIDE.md](./docs/DEPENDENCY_ANALYSIS_GUIDE.md)
+  - 버그 수정 전 영향 범위 파악
+  - 리팩토링 계획 수립
+  - PR 리뷰용 문서 생성
+  - 실전 시나리오 통합
+
+- **📂 Fold/Unfold System**: [docs/FOLD_UNFOLD_GUIDE.md](./docs/FOLD_UNFOLD_GUIDE.md)
   - 주석 접기/펼치기 완벽 가이드
   - 팀 협업 워크플로우
   - 실전 예제 코드
+
+- **🔄 자동 인덱싱**: [docs/AUTO_INDEXING_GUIDE.md](./docs/AUTO_INDEXING_GUIDE.md)
+  - 파일 저장 시 자동 인덱스 업데이트
+  - Git Hook, VSCode Task, GitHub Actions
+  - 증분 업데이트로 빠른 성능
+
+### 레퍼런스
+
 - **TSDoc 컨벤션**: [docs/tsdoc-conventions/](./docs/tsdoc-conventions/)
   - 7가지 필수/권장 규칙
   - 각 규칙마다 명확한 예시와 이유 제공
-- **TSDoc 스펙 지원**: [docs/TSDOC_SPEC_SUPPORT.md](./docs/TSDOC_SPEC_SUPPORT.md) 🔥 NEW!
+
+- **TSDoc 스펙 지원**: [docs/TSDOC_SPEC_SUPPORT.md](./docs/TSDOC_SPEC_SUPPORT.md)
   - 지원하는 전체 TSDoc 태그 (35개)
   - 파싱 테스트 코드 및 결과
   - 커스텀 태그 추가 방법
-- **POC 결과**: [POC_RESULTS.md](./POC_RESULTS.md)
-- **예제 코드**:
-  - 기본: [examples/sample-code.ts](./examples/sample-code.ts)
-  - Strict Mode: [examples/strict-mode-example.ts](./examples/strict-mode-example.ts)
-  - TSDoc Spec Test: [demo/tsdoc-spec-test.ts](./demo/tsdoc-spec-test.ts) 🔥 NEW!
+
+### 예제 코드
+
+- **CLI 데모**: `tsdoc-edge help` 실행
+- **기본 API**: [examples/sample-code.ts](./examples/sample-code.ts)
+- **Strict Mode**: [examples/strict-mode-example.ts](./examples/strict-mode-example.ts)
+- **TSDoc Spec Test**: [demo/tsdoc-spec-test.ts](./demo/tsdoc-spec-test.ts)
 
 ## 🚀 빠른 POC 데모
 

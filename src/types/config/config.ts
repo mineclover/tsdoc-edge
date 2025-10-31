@@ -104,6 +104,18 @@ export interface PathsConfig {
    * @defaultValue "docs/output"
    */
   outputDir?: string;
+
+  /**
+   * Directory for auto-generated documents (scan command)
+   * @defaultValue "docs/generated"
+   */
+  generatedDir?: string;
+
+  /**
+   * Directory for analysis reports (stats, health, etc.)
+   * @defaultValue ".tsdoc/reports"
+   */
+  reportsDir?: string;
 }
 
 /**
@@ -199,6 +211,8 @@ export const DEFAULT_CONFIG: TsdocEdgeConfig = {
     databasePath: '.tsdoc.db',
     jsonlDir: 'docs/data',
     outputDir: 'docs/output',
+    generatedDir: 'docs/generated',
+    reportsDir: '.tsdoc/reports',
   },
   fold: {
     enabled: true,

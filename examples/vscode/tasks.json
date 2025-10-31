@@ -1,0 +1,46 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Update Doc Index (Single File)",
+      "type": "shell",
+      "command": "npx tsdoc-edge index-docs --file=${file}",
+      "presentation": {
+        "reveal": "silent",
+        "panel": "shared",
+        "showReuseMessage": false
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Update Doc Index (Full Scan)",
+      "type": "shell",
+      "command": "npx tsdoc-edge index-docs docs",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Validate Doc Symbols",
+      "type": "shell",
+      "command": "npx tsdoc-edge validate-docs",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Update Backlinks",
+      "type": "shell",
+      "command": "npx tsdoc-edge update-backlinks ${file}",
+      "presentation": {
+        "reveal": "always",
+        "panel": "shared"
+      },
+      "problemMatcher": []
+    }
+  ]
+}

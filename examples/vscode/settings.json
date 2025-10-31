@@ -1,0 +1,20 @@
+{
+  "// Auto-update document symbol index on save": "",
+  "// Requires extension: emeraldwalk.RunOnSave": "",
+  "// https://marketplace.visualstudio.com/items?itemName=emeraldwalk.RunOnSave": "",
+
+  "emeraldwalk.runonsave": {
+    "commands": [
+      {
+        "match": "docs/.*\\.md$",
+        "cmd": "npx tsdoc-edge index-docs --file=${file}",
+        "isAsync": true
+      }
+    ]
+  },
+
+  "// Optional: Validate on save": "",
+  "files.watcherExclude": {
+    "**/.tsdoc/**": false
+  }
+}

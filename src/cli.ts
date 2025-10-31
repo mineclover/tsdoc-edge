@@ -18,12 +18,17 @@ import { InsightDocGenerator } from './generator/InsightDocGenerator';
 import { DepthTraverser } from './graph/DepthTraverser';
 import { SymbolGraphBuilder } from './graph/SymbolGraphBuilder';
 import { SymbolSearchEngine } from './graph/SymbolSearchEngine';
+import { FileScanner } from './scanner/FileScanner';
 import { DatabaseManager } from './storage/DatabaseManager';
 import { SymbolRegistryManager } from './storage/SymbolRegistryManager';
 import type { AnalysisReport, CodeHealthMetrics, ImprovementSuggestion } from './types/analysis';
 import type { Symbol, SymbolRelationship } from './types/graph';
 import type { FuturePlan } from './types/tags';
 import { ConnectivityValidator } from './validator/ConnectivityValidator';
+import { BacklinkGenerator } from './doc-symbol/BacklinkGenerator';
+import { DocumentSymbolParser } from './doc-symbol/DocumentSymbolParser';
+import { DocumentSymbolRegistry } from './doc-symbol/DocumentSymbolRegistry';
+import { TSDocSymbolParser } from './doc-symbol/TSDocSymbolParser';
 
 // Database row types
 /**
@@ -514,6 +519,84 @@ function printInit(): void {
 }
 
 /**
+ * Build database from source files
+ * @returns void
+ * @public
+ */
+function printBuild(): void {
+  const args = process.argv.slice(3);
+  const targetPath = args[0] || 'src';
+
+  printHeader('TSDoc Edge - Build Database');
+
+  if (!fs.existsSync(targetPath)) {
+    console.log(`${colors.red}❌ Path not found: ${targetPath}${colors.reset}`);
+    process.exit(1);
+  }
+
+  console.log(`${colors.cyan}Building database from: ${targetPath}${colors.reset}`);
+  console.log();
+
+  // Setup paths
+  const config = ConfigManager.getInstance();
+  const dbPath = path.join(process.cwd(), config.get().paths.databasePath || '.tsdoc.db');
+  const jsonlPath = path.join(process.cwd(), config.get().paths.jsonlDir || 'docs/data');
+  const registryPath = path.join(jsonlPath, 'registry.jsonl');
+
+  // Ensure jsonl directory exists
+  if (!fs.existsSync(jsonlPath)) {
+    fs.mkdirSync(jsonlPath, { recursive: true });
+  }
+
+  // Initialize managers
+  const dbManager = new DatabaseManager(dbPath, jsonlPath);
+  const registryManager = new SymbolRegistryManager(registryPath);
+
+  // Create scanner
+  const scanner = new FileScanner(registryManager, dbManager, {
+    rootDir: targetPath,
+    include: ['**/*.ts', '**/*.tsx'],
+    exclude: ['**/node_modules/**', '**/dist/**', '**/*.test.ts', '**/*.spec.ts'],
+  });
+
+  // Run scan
+  console.log(`${colors.cyan}Scanning TypeScript files...${colors.reset}`);
+
+  const startTime = Date.now();
+  scanner.scan().then((result) => {
+    const duration = Date.now() - startTime;
+
+    console.log();
+    console.log(`${colors.green}✅ Database build complete${colors.reset}`);
+    console.log();
+    console.log(`${colors.bold}Statistics:${colors.reset}`);
+    console.log(`  Files scanned: ${colors.cyan}${result.filesScanned}${colors.reset}`);
+    console.log(`  Symbols found: ${colors.cyan}${result.symbolsFound}${colors.reset}`);
+    console.log(`  Symbols inserted: ${colors.green}${result.symbolsInserted}${colors.reset}`);
+    console.log(`  Duration: ${colors.cyan}${duration}ms${colors.reset}`);
+    console.log();
+    console.log(`${colors.dim}Database: ${dbPath}${colors.reset}`);
+
+    if (result.errors.length > 0) {
+      console.log();
+      console.log(`${colors.yellow}⚠️  Errors (${result.errors.length}):${colors.reset}`);
+      result.errors.slice(0, 10).forEach(err => {
+        console.log(`  ${colors.dim}${err}${colors.reset}`);
+      });
+      if (result.errors.length > 10) {
+        console.log(`  ${colors.dim}... and ${result.errors.length - 10} more${colors.reset}`);
+      }
+    }
+
+    console.log();
+  }).catch((error) => {
+    console.log();
+    console.log(`${colors.red}❌ Build failed: ${error.message}${colors.reset}`);
+    process.exit(1);
+  });
+}
+
+/**
  * printHelp function
  * @returns void
  * @public
@@ -526,6 +609,7 @@ function printHelp(): void {
   console.log();
   console.log('Commands:');
   console.log('  init [options]          Initialize project configuration');
+  console.log('  build [path]            Build symbol database from source files (default: src)');
   console.log('  id                      Manage symbol IDs (new, list, find, stats)');
   console.log('  find-method <name>      Search symbol by qualified name (e.g., Class#method)');
   console.log('  tree                    Show symbol hierarchy tree');
@@ -553,12 +637,31 @@ function printHelp(): void {
   );
   console.log('  core-api                Show core API surface (exported + 1 depth dependencies)');
   console.log('  scan [options]          Scan and document symbol graph by depth');
+  console.log('  index-docs [dir]        Index [[]] document symbols (default: docs)');
+  console.log('    --file=<path>         Update index for a single file (incremental)');
+  console.log('  validate-docs [dir]     Validate document symbol SSOT (default: docs)');
+  console.log('  update-backlinks [path] Update backlinks in documents');
+  console.log('  find-doc <symbol>       Find document symbol and show references');
   console.log('  help                    Show this help message');
   console.log();
   console.log('Init Options:');
   console.log('  --name=<name>           Project name (default: current directory name)');
   console.log('  --version=<version>     Project version (default: 1.0.0)');
   console.log('  --force                 Overwrite existing configuration');
+  console.log();
+  console.log('Scan Options:');
+  console.log('  --depth=<N>             Maximum depth to traverse (default: 2)');
+  console.log('  --entry=<name>          Entry point symbol name or ID');
+  console.log('  --direction=<dir>       Traversal direction: dependencies, dependents, or both (default: dependencies)');
+  console.log('  --output=<file>         Output file path');
+  console.log('  --save, -s              Save to default generated directory');
+  console.log('  --group-by-category     Group symbols by category');
+  console.log();
+  console.log('Stats Options:');
+  console.log('  --compare, -c           Compare with previous stats');
+  console.log('  --save, -s              Save statistics history');
+  console.log('  --history=<file>        Custom history file path');
+  console.log('  --warnings-only, -w     Show only warnings');
   console.log();
   console.log('Examples:');
   console.log('  tsdoc-edge init');
@@ -588,11 +691,20 @@ function printHelp(): void {
   console.log('  tsdoc-edge stats --compare');
   console.log('  tsdoc-edge core-api');
   console.log('  tsdoc-edge scan --depth=2 --output=docs/INSIGHTS.md');
-  console.log('  tsdoc-edge scan --entry=TSDocEdge --depth=3');
+  console.log('  tsdoc-edge scan --save --group-by-category');
+  console.log('  tsdoc-edge scan --entry=TSDocEdge --depth=3 --save');
+  console.log('  tsdoc-edge scan --entry=UserService --direction=dependencies --depth=5');
+  console.log('  tsdoc-edge scan --entry=UserService --direction=dependents --depth=3');
+  console.log('  tsdoc-edge scan --direction=both --depth=2');
   console.log('  tsdoc-edge scan --group-by-category --output=docs/FEATURES.md');
   console.log('  tsdoc-edge fix src/myFile.ts --min-score=80');
   console.log('  tsdoc-edge improve --target=90 --verbose');
   console.log('  tsdoc-edge improve --target=80 --max-iterations=5 --dry-run');
+  console.log('  tsdoc-edge index-docs docs');
+  console.log('  tsdoc-edge index-docs --file=docs/API.md');
+  console.log('  tsdoc-edge validate-docs');
+  console.log('  tsdoc-edge update-backlinks docs/API.md');
+  console.log('  tsdoc-edge find-doc UserService');
   console.log('  tsdoc-edge help');
   console.log();
 }
@@ -2254,7 +2366,7 @@ function printStats(): void {
   let targetPath = 'src';
   let compare = false;
   let save = false;
-  let historyPath = '.tsdoc-stats-history.json';
+  let historyPath: string | undefined;
   let warningsOnly = false;
 
   // Parse options
@@ -2270,6 +2382,13 @@ function printStats(): void {
     } else if (!arg.startsWith('--')) {
       targetPath = arg;
     }
+  }
+
+  // Set default history path if not specified
+  if (!historyPath) {
+    const config = ConfigManager.getInstance();
+    const reportsDir = config.get().paths.reportsDir || '.tsdoc/reports';
+    historyPath = path.join(reportsDir, 'stats-history.json');
   }
 
   printHeader('TSDoc Edge - Documentation Statistics');
@@ -2383,6 +2502,12 @@ function printStats(): void {
 
   // Save to history if requested
   if (save) {
+    // Ensure directory exists
+    const historyDir = path.dirname(historyPath);
+    if (!fs.existsSync(historyDir)) {
+      fs.mkdirSync(historyDir, { recursive: true });
+    }
+
     const historyManager = new StatsHistoryManager();
     historyManager.save(stats, symbols, historyPath);
     console.log();
@@ -2542,7 +2667,9 @@ function printScan(): void {
   let depth = 2;
   let entry: string | undefined;
   let output: string | undefined;
+  let save = false;
   let groupByCategory = false;
+  let direction: 'dependencies' | 'dependents' | 'both' = 'dependencies';
 
   for (const arg of process.argv.slice(3)) {
     if (arg.startsWith('--depth=')) {
@@ -2551,8 +2678,20 @@ function printScan(): void {
       entry = arg.split('=')[1];
     } else if (arg.startsWith('--output=')) {
       output = arg.split('=')[1];
+    } else if (arg === '--save' || arg === '-s') {
+      save = true;
     } else if (arg === '--group-by-category') {
       groupByCategory = true;
+    } else if (arg.startsWith('--direction=')) {
+      const dirValue = arg.split('=')[1];
+      if (dirValue === 'dependencies' || dirValue === 'dependents' || dirValue === 'both') {
+        direction = dirValue;
+      } else {
+        console.log(
+          `${colors.red}Invalid direction: ${dirValue}. Use: dependencies, dependents, or both${colors.reset}`
+        );
+        process.exit(1);
+      }
     }
   }
 
@@ -2639,12 +2778,13 @@ function printScan(): void {
   printHeader('Scanning Symbol Graph');
   console.log(`Entry points: ${colors.green}${entryPoints.length}${colors.reset}`);
   console.log(`Max depth: ${colors.green}${depth}${colors.reset}`);
+  console.log(`Direction: ${colors.cyan}${direction}${colors.reset}`);
   console.log();
 
   // Traverse
   const result = traverser.traverse(entryPoints, {
     maxDepth: depth,
-    direction: 'dependencies',
+    direction: direction,
   });
 
   console.log(
@@ -2665,8 +2805,30 @@ function printScan(): void {
   });
 
   // Output
-  if (output) {
-    const outputPath = path.resolve(process.cwd(), output);
+  if (output || save) {
+    let outputPath: string;
+
+    if (output) {
+      // Use explicit output path
+      outputPath = path.resolve(process.cwd(), output);
+    } else {
+      // Auto-generate filename in configured generatedDir
+      const config = ConfigManager.getInstance();
+      const generatedDir = path.resolve(
+        process.cwd(),
+        config.get().paths.generatedDir || 'docs/generated'
+      );
+
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = groupByCategory
+        ? `FEATURES_${timestamp}.md`
+        : entry
+          ? `SCAN_${entry.replace(/[^a-zA-Z0-9]/g, '_')}_${timestamp}.md`
+          : `SCAN_${timestamp}.md`;
+
+      outputPath = path.join(generatedDir, filename);
+    }
+
     const outputDir = path.dirname(outputPath);
 
     // Ensure directory exists
@@ -2681,6 +2843,579 @@ function printScan(): void {
   }
 
   console.log();
+}
+
+/**
+ * Index documents for [[]] symbols
+ */
+function printIndexDocs(): void {
+  // Parse options
+  let targetFile: string | undefined;
+  let docsDir = 'docs';
+
+  for (let i = 3; i < process.argv.length; i++) {
+    const arg = process.argv[i];
+    if (arg.startsWith('--file=')) {
+      targetFile = arg.split('=')[1];
+    } else if (!arg.startsWith('--')) {
+      docsDir = arg;
+    }
+  }
+
+  // Define output paths once
+  const outputDir = path.join(process.cwd(), '.tsdoc');
+  const outputPath = path.join(outputDir, 'doc-symbols.json');
+
+  // Check if incremental update (single file)
+  if (targetFile) {
+    const targetPath = path.resolve(process.cwd(), targetFile);
+
+    if (!fs.existsSync(targetPath)) {
+      console.log(`${colors.red}❌ File not found: ${targetPath}${colors.reset}`);
+      process.exit(1);
+    }
+
+    printHeader(`Updating Index for ${path.basename(targetPath)}`);
+
+    // Load existing index
+    const registry = new DocumentSymbolRegistry();
+    if (fs.existsSync(outputPath)) {
+      try {
+        const indexData = JSON.parse(fs.readFileSync(outputPath, 'utf-8'));
+        if (indexData.registryData) {
+          registry.import(indexData.registryData);
+          console.log(`${colors.cyan}Loaded existing index${colors.reset}`);
+        }
+      } catch (error) {
+        console.log(
+          `${colors.yellow}⚠ Could not load existing index, creating new one${colors.reset}`
+        );
+      }
+    }
+
+    // Unregister old data from this file
+    registry.unregisterFile(targetPath);
+    console.log(`${colors.cyan}Removed old symbols from ${path.basename(targetPath)}${colors.reset}`);
+
+    // Parse and register new data
+    const parser = new DocumentSymbolParser();
+    try {
+      const parsed = parser.parse(targetPath);
+      registry.registerDocument(parsed);
+      console.log(
+        `${colors.green}✅ Updated symbols from ${path.basename(targetPath)}${colors.reset}`
+      );
+
+      if (parsed.primary) {
+        console.log(`  Primary: ${colors.green}[[${parsed.primary.name}]]${colors.reset}`);
+      }
+      if (parsed.auxiliaries.length > 0) {
+        console.log(`  Auxiliaries: ${colors.cyan}${parsed.auxiliaries.length}${colors.reset}`);
+      }
+      if (parsed.references.length > 0) {
+        console.log(`  References: ${colors.cyan}${parsed.references.length}${colors.reset}`);
+      }
+    } catch (error) {
+      console.log(
+        `${colors.red}Error parsing ${targetPath}: ${error instanceof Error ? error.message : String(error)}${colors.reset}`
+      );
+      process.exit(1);
+    }
+
+    // Save updated index
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+
+    const stats = registry.getStatistics();
+    fs.writeFileSync(
+      outputPath,
+      JSON.stringify(
+        {
+          timestamp: new Date().toISOString(),
+          statistics: stats,
+          symbols: Array.from(registry.getAllSymbolNames()),
+          registryData: registry.export(),
+        },
+        null,
+        2
+      ),
+      'utf-8'
+    );
+
+    console.log();
+    console.log(`${colors.green}✅ Index updated: ${outputPath}${colors.reset}`);
+    return;
+  }
+
+  // Full scan mode
+  const docsPath = path.resolve(process.cwd(), docsDir);
+
+  if (!fs.existsSync(docsPath)) {
+    console.log(`${colors.red}❌ Directory not found: ${docsPath}${colors.reset}`);
+    process.exit(1);
+  }
+
+  printHeader('Indexing Document Symbols');
+
+  // Find all markdown files
+  const findMarkdownFiles = (dir: string): string[] => {
+    const files: string[] = [];
+    const entries = fs.readdirSync(dir);
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry);
+      const stat = fs.statSync(fullPath);
+
+      if (stat.isDirectory()) {
+        files.push(...findMarkdownFiles(fullPath));
+      } else if (entry.endsWith('.md') || entry.endsWith('.mdx')) {
+        files.push(fullPath);
+      }
+    }
+
+    return files;
+  };
+
+  const markdownFiles = findMarkdownFiles(docsPath);
+  console.log(`Found ${colors.green}${markdownFiles.length}${colors.reset} markdown files`);
+  console.log();
+
+  // Parse documents
+  const parser = new DocumentSymbolParser();
+  const registry = new DocumentSymbolRegistry();
+
+  let totalPrimary = 0;
+  let totalAux = 0;
+  let totalRefs = 0;
+
+  for (const filePath of markdownFiles) {
+    try {
+      const parsed = parser.parse(filePath);
+      registry.registerDocument(parsed);
+
+      if (parsed.primary) totalPrimary++;
+      totalAux += parsed.auxiliaries.length;
+      totalRefs += parsed.references.length;
+    } catch (error) {
+      console.log(
+        `${colors.red}Error parsing ${filePath}: ${error instanceof Error ? error.message : String(error)}${colors.reset}`
+      );
+    }
+  }
+
+  // Find code files for @doc tags
+  const srcDir = path.resolve(process.cwd(), 'src');
+  const findCodeFiles = (dir: string): string[] => {
+    if (!fs.existsSync(dir)) return [];
+
+    const files: string[] = [];
+    const entries = fs.readdirSync(dir);
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry);
+      const stat = fs.statSync(fullPath);
+
+      if (stat.isDirectory() && entry !== 'node_modules' && entry !== 'dist') {
+        files.push(...findCodeFiles(fullPath));
+      } else if (entry.endsWith('.ts') || entry.endsWith('.tsx')) {
+        files.push(fullPath);
+      }
+    }
+
+    return files;
+  };
+
+  const codeFiles = findCodeFiles(srcDir);
+  const tsdocParser = new TSDocSymbolParser();
+  let totalCodeConns = 0;
+
+  for (const filePath of codeFiles) {
+    const connections = tsdocParser.parseCodeFile(filePath);
+    for (const conn of connections) {
+      registry.registerCodeConnection(conn);
+      totalCodeConns++;
+    }
+  }
+
+  // Print summary
+  printSection('Summary');
+  console.log(`Documents scanned: ${colors.green}${markdownFiles.length}${colors.reset}`);
+  console.log(`Primary definitions: ${colors.green}${totalPrimary}${colors.reset}`);
+  console.log(`Auxiliary definitions: ${colors.cyan}${totalAux}${colors.reset}`);
+  console.log(`References: ${colors.cyan}${totalRefs}${colors.reset}`);
+  console.log(`Code connections: ${colors.cyan}${totalCodeConns}${colors.reset}`);
+  console.log();
+
+  // Save to file
+  if (!fs.existsSync(outputDir)) {
+    fs.mkdirSync(outputDir, { recursive: true });
+  }
+
+  const stats = registry.getStatistics();
+
+  fs.writeFileSync(
+    outputPath,
+    JSON.stringify(
+      {
+        timestamp: new Date().toISOString(),
+        statistics: stats,
+        symbols: Array.from(registry.getAllSymbolNames()),
+        registryData: registry.export(),
+      },
+      null,
+      2
+    ),
+    'utf-8'
+  );
+
+  console.log(`${colors.green}✅ Index created: ${outputPath}${colors.reset}`);
+  console.log();
+}
+
+/**
+ * Validate document symbols (SSOT)
+ */
+function printValidateDocs(): void {
+  const docsDir = process.argv[3] || 'docs';
+  const docsPath = path.resolve(process.cwd(), docsDir);
+
+  if (!fs.existsSync(docsPath)) {
+    console.log(`${colors.red}❌ Directory not found: ${docsPath}${colors.reset}`);
+    process.exit(1);
+  }
+
+  printHeader('Validating Document Symbols');
+
+  // Find and parse documents
+  const findMarkdownFiles = (dir: string): string[] => {
+    const files: string[] = [];
+    const entries = fs.readdirSync(dir);
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry);
+      const stat = fs.statSync(fullPath);
+
+      if (stat.isDirectory()) {
+        files.push(...findMarkdownFiles(fullPath));
+      } else if (entry.endsWith('.md') || entry.endsWith('.mdx')) {
+        files.push(fullPath);
+      }
+    }
+
+    return files;
+  };
+
+  const markdownFiles = findMarkdownFiles(docsPath);
+  const parser = new DocumentSymbolParser();
+  const registry = new DocumentSymbolRegistry();
+
+  for (const filePath of markdownFiles) {
+    try {
+      const parsed = parser.parse(filePath);
+      registry.registerDocument(parsed);
+    } catch (error) {
+      // Errors will be shown in validation
+    }
+  }
+
+  // Validate
+  const validation = registry.validate();
+
+  // Print errors
+  if (validation.errors.length > 0) {
+    printSection('Errors');
+    for (const error of validation.errors) {
+      console.log(`${colors.red}❌ ${error.type}${colors.reset}`);
+      console.log(`   Symbol: [[${error.symbolName}]]`);
+      console.log(`   File: ${error.filePath}:${error.line}`);
+      console.log(`   ${error.message}`);
+      if (error.conflictWith) {
+        console.log(
+          `   Conflicts with: ${error.conflictWith.filePath}:${error.conflictWith.line}`
+        );
+      }
+      console.log();
+    }
+  }
+
+  // Print warnings
+  if (validation.warnings.length > 0) {
+    printSection('Warnings');
+    for (const warning of validation.warnings) {
+      console.log(`${colors.yellow}⚠️  ${warning.type}${colors.reset}`);
+      console.log(`   Symbol: [[${warning.symbolName}]]`);
+      console.log(`   File: ${warning.filePath}`);
+      console.log(`   ${warning.message}`);
+      if (warning.count !== undefined) {
+        console.log(`   Count: ${warning.count}`);
+      }
+      console.log();
+    }
+  }
+
+  // Summary
+  printSection('Summary');
+  const stats = registry.getStatistics();
+  console.log(`Total definitions: ${colors.green}${stats.totalDefinitions}${colors.reset}`);
+  console.log(`Errors: ${validation.errors.length > 0 ? colors.red : colors.green}${validation.errors.length}${colors.reset}`);
+  console.log(`Warnings: ${validation.warnings.length > 0 ? colors.yellow : colors.green}${validation.warnings.length}${colors.reset}`);
+  console.log();
+
+  if (validation.valid) {
+    console.log(`${colors.green}✅ All document symbols are valid${colors.reset}`);
+  } else {
+    console.log(`${colors.red}❌ Validation failed${colors.reset}`);
+    process.exit(1);
+  }
+
+  console.log();
+}
+
+/**
+ * Update backlinks in documents
+ */
+function printUpdateBacklinks(): void {
+  const target = process.argv[3]; // Optional: specific file or directory
+  const docsDir = target || 'docs';
+  const docsPath = path.resolve(process.cwd(), docsDir);
+
+  if (!fs.existsSync(docsPath)) {
+    console.log(`${colors.red}❌ Path not found: ${docsPath}${colors.reset}`);
+    process.exit(1);
+  }
+
+  printHeader('Updating Backlinks');
+
+  // Find all markdown files
+  const findMarkdownFiles = (dir: string): string[] => {
+    const files: string[] = [];
+    const stat = fs.statSync(dir);
+
+    if (stat.isFile()) {
+      return [dir];
+    }
+
+    const entries = fs.readdirSync(dir);
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry);
+      const entryStat = fs.statSync(fullPath);
+
+      if (entryStat.isDirectory()) {
+        files.push(...findMarkdownFiles(fullPath));
+      } else if (entry.endsWith('.md') || entry.endsWith('.mdx')) {
+        files.push(fullPath);
+      }
+    }
+
+    return files;
+  };
+
+  const markdownFiles = findMarkdownFiles(docsPath);
+  const parser = new DocumentSymbolParser();
+  const registry = new DocumentSymbolRegistry();
+
+  // Parse all documents
+  for (const filePath of markdownFiles) {
+    try {
+      const parsed = parser.parse(filePath);
+      registry.registerDocument(parsed);
+    } catch (error) {
+      console.log(
+        `${colors.red}Error parsing ${filePath}: ${error instanceof Error ? error.message : String(error)}${colors.reset}`
+      );
+    }
+  }
+
+  // Parse code connections
+  const srcDir = path.resolve(process.cwd(), 'src');
+  const findCodeFiles = (dir: string): string[] => {
+    if (!fs.existsSync(dir)) return [];
+
+    const files: string[] = [];
+    const entries = fs.readdirSync(dir);
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry);
+      const stat = fs.statSync(fullPath);
+
+      if (stat.isDirectory() && entry !== 'node_modules' && entry !== 'dist') {
+        files.push(...findCodeFiles(fullPath));
+      } else if (entry.endsWith('.ts') || entry.endsWith('.tsx')) {
+        files.push(fullPath);
+      }
+    }
+
+    return files;
+  };
+
+  const codeFiles = findCodeFiles(srcDir);
+  const tsdocParser = new TSDocSymbolParser();
+
+  for (const filePath of codeFiles) {
+    const connections = tsdocParser.parseCodeFile(filePath);
+    for (const conn of connections) {
+      registry.registerCodeConnection(conn);
+    }
+  }
+
+  // Update backlinks
+  const generator = new BacklinkGenerator(registry);
+  const updated = generator.updateAllBacklinks();
+
+  printSection('Updated');
+  for (const filePath of updated) {
+    const symbolName = registry
+      .getAllSymbolNames()
+      .find((name) => registry.getDefinition(name)?.filePath === filePath);
+
+    if (symbolName) {
+      const refs = registry.getReferences(symbolName);
+      const conns = registry.getCodeConnections(symbolName);
+      const total = refs.length + conns.length;
+
+      console.log(
+        `${colors.green}✅${colors.reset} ${filePath} (${colors.cyan}${total}${colors.reset} backlinks)`
+      );
+    }
+  }
+
+  console.log();
+  console.log(`${colors.green}Total: ${updated.length} documents updated${colors.reset}`);
+  console.log();
+}
+
+/**
+ * Find document symbol
+ */
+function printFindDocSymbol(): void {
+  const symbolName = process.argv[3];
+
+  if (!symbolName) {
+    console.log(`${colors.red}Usage: tsdoc-edge find-doc <symbol-name>${colors.reset}`);
+    process.exit(1);
+  }
+
+  const docsDir = 'docs';
+  const docsPath = path.resolve(process.cwd(), docsDir);
+
+  if (!fs.existsSync(docsPath)) {
+    console.log(`${colors.red}❌ Directory not found: ${docsPath}${colors.reset}`);
+    process.exit(1);
+  }
+
+  // Find and parse documents
+  const findMarkdownFiles = (dir: string): string[] => {
+    const files: string[] = [];
+    const entries = fs.readdirSync(dir);
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry);
+      const stat = fs.statSync(fullPath);
+
+      if (stat.isDirectory()) {
+        files.push(...findMarkdownFiles(fullPath));
+      } else if (entry.endsWith('.md') || entry.endsWith('.mdx')) {
+        files.push(fullPath);
+      }
+    }
+
+    return files;
+  };
+
+  const markdownFiles = findMarkdownFiles(docsPath);
+  const parser = new DocumentSymbolParser();
+  const registry = new DocumentSymbolRegistry();
+
+  for (const filePath of markdownFiles) {
+    try {
+      const parsed = parser.parse(filePath);
+      registry.registerDocument(parsed);
+    } catch (error) {
+      // Silent
+    }
+  }
+
+  // Parse code connections
+  const srcDir = path.resolve(process.cwd(), 'src');
+  const findCodeFiles = (dir: string): string[] => {
+    if (!fs.existsSync(dir)) return [];
+
+    const files: string[] = [];
+    const entries = fs.readdirSync(dir);
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry);
+      const stat = fs.statSync(fullPath);
+
+      if (stat.isDirectory() && entry !== 'node_modules' && entry !== 'dist') {
+        files.push(...findCodeFiles(fullPath));
+      } else if (entry.endsWith('.ts') || entry.endsWith('.tsx')) {
+        files.push(fullPath);
+      }
+    }
+
+    return files;
+  };
+
+  const codeFiles = findCodeFiles(srcDir);
+  const tsdocParser = new TSDocSymbolParser();
+
+  for (const filePath of codeFiles) {
+    const connections = tsdocParser.parseCodeFile(filePath);
+    for (const conn of connections) {
+      registry.registerCodeConnection(conn);
+    }
+  }
+
+  // Find symbol
+  const definition = registry.getDefinition(symbolName);
+
+  if (!definition) {
+    console.log(`${colors.red}❌ Symbol not found: [[${symbolName}]]${colors.reset}`);
+    console.log();
+    console.log('Available symbols:');
+    const allSymbols = registry.getAllSymbolNames();
+    for (const name of allSymbols.slice(0, 10)) {
+      console.log(`  - [[${name}]]`);
+    }
+    if (allSymbols.length > 10) {
+      console.log(`  ... and ${allSymbols.length - 10} more`);
+    }
+    process.exit(1);
+  }
+
+  printHeader(`[[${symbolName}]]`);
+
+  console.log(`${colors.bold}Defined in:${colors.reset} ${definition.filePath}:${definition.line}`);
+  console.log();
+
+  const refs = registry.getReferences(symbolName);
+  if (refs.length > 0) {
+    printSection(`Referenced by (${refs.length})`);
+    for (const ref of refs.slice(0, 10)) {
+      const sectionPart = ref.section ? `#${ref.section}` : '';
+      console.log(`  - ${ref.filePath}:${ref.line}${sectionPart}`);
+    }
+    if (refs.length > 10) {
+      console.log(`  ... and ${refs.length - 10} more`);
+    }
+    console.log();
+  }
+
+  const conns = registry.getCodeConnections(symbolName);
+  if (conns.length > 0) {
+    printSection(`Implemented by (${conns.length})`);
+    for (const conn of conns.slice(0, 10)) {
+      const sectionPart = conn.section ? ` (${conn.section})` : '';
+      console.log(`  - ${conn.codeSymbol}${sectionPart} → ${conn.filePath}:${conn.line}`);
+    }
+    if (conns.length > 10) {
+      console.log(`  ... and ${conns.length - 10} more`);
+    }
+    console.log();
+  }
 }
 
 // Main CLI logic
@@ -2715,6 +3450,9 @@ const command = args[0] || 'help';
 switch (command) {
   case 'init':
     printInit();
+    break;
+  case 'build':
+    printBuild();
     break;
   case 'id':
     printIdCommands();
@@ -2782,6 +3520,18 @@ switch (command) {
     break;
   case 'scan':
     printScan();
+    break;
+  case 'index-docs':
+    printIndexDocs();
+    break;
+  case 'validate-docs':
+    printValidateDocs();
+    break;
+  case 'update-backlinks':
+    printUpdateBacklinks();
+    break;
+  case 'find-doc':
+    printFindDocSymbol();
     break;
   case 'help':
   case '--help':

@@ -72,9 +72,23 @@ export type * from './types/tags';
 export { ConnectivityValidator } from './validator/ConnectivityValidator';
 export { ConventionValidator } from './validator/ConventionValidator';
 export { StrictModeValidator } from './validator/StrictModeValidator';
+// Linking exports
+export { DocCodeLinker } from './linking/DocCodeLinker';
+export { LinkValidator } from './linking/LinkValidator';
+// Linking type exports
+export type * from './types/linking';
+// Document symbol exports ([[]] notation)
+export { BacklinkGenerator } from './doc-symbol/BacklinkGenerator';
+export { DocumentSymbolParser } from './doc-symbol/DocumentSymbolParser';
+export { DocumentSymbolRegistry } from './doc-symbol/DocumentSymbolRegistry';
+export { TSDocSymbolParser } from './doc-symbol/TSDocSymbolParser';
+// Document symbol type exports
+export type * from './types/doc-symbol';
 
 /**
  * Main entry point for TSDoc Edge
+ *
+ * @doc [[CoreWorkflow]]
  * @public
  */
 export class TSDocEdge {

@@ -35,7 +35,9 @@ Edit `.tsdoc.config.json` to suit your needs:
     "commentsDir": ".tsdoc-comments",
     "databasePath": ".tsdoc.db",
     "jsonlDir": "docs/data",
-    "outputDir": "docs/output"
+    "outputDir": "docs/output",
+    "generatedDir": "docs/generated",
+    "reportsDir": ".tsdoc/reports"
   },
   "fold": {
     "enabled": true,
@@ -80,10 +82,23 @@ All paths are relative to the project root.
     "commentsDir": string,    // Markdown storage for folded comments
     "databasePath": string,   // SQLite database file
     "jsonlDir": string,       // JSONL export directory (for Git)
-    "outputDir": string       // Generated documentation output
+    "outputDir": string,      // Generated documentation output
+    "generatedDir": string,   // Auto-generated docs (scan command)
+    "reportsDir": string      // Analysis reports (stats, health)
   }
 }
 ```
+
+**Path Purposes:**
+
+| Path | Purpose | Default | Used By |
+|------|---------|---------|---------|
+| `commentsDir` | Folded TSDoc comments storage | `.tsdoc-comments` | fold/unfold |
+| `databasePath` | Symbol database | `.tsdoc.db` | All commands |
+| `jsonlDir` | JSONL exports for Git | `docs/data` | export |
+| `outputDir` | User documentation | `docs/output` | generate |
+| `generatedDir` | Auto-generated analysis docs | `docs/generated` | scan --save |
+| `reportsDir` | Statistics and health reports | `.tsdoc/reports` | stats --save |
 
 **Examples:**
 
@@ -93,12 +108,18 @@ All paths are relative to the project root.
     "commentsDir": ".tsdoc",
     "databasePath": "data/tsdoc.db",
     "jsonlDir": "data/jsonl",
-    "outputDir": "dist/docs"
+    "outputDir": "dist/docs",
+    "generatedDir": "docs/generated",
+    "reportsDir": ".tsdoc/reports"
   }
 }
 ```
 
+**Note:** `generatedDir` and `reportsDir` are automatically excluded from Git (added to `.gitignore`) to prevent committing temporary analysis files.
+
 ### Fold/Unfold System
+
+**⚠️ Note**: CLI commands for fold/unfold are not currently implemented. This feature is available through the API only.
 
 ```typescript
 {
@@ -110,13 +131,27 @@ All paths are relative to the project root.
 }
 ```
 
+**API Usage** (programmatic only):
+
+```typescript
+import { CommentExporter, CommentImporter } from 'tsdoc-edge';
+
+// Export (fold)
+const exporter = new CommentExporter(config);
+await exporter.exportFile('src/myFile.ts');
+
+// Import (unfold)
+const importer = new CommentImporter(config);
+await importer.importFile('src/myFile.ts');
+```
+
 **Examples:**
 
 ```json
 {
   "fold": {
     "enabled": true,
-    "autoExport": true,
+    "autoExport": false,
     "excludePatterns": [
       "**/*.test.ts",
       "**/*.spec.ts",
@@ -125,6 +160,8 @@ All paths are relative to the project root.
   }
 }
 ```
+
+**Future**: CLI commands (`tsdoc-edge fold`, `tsdoc-edge unfold`) are planned for future releases.
 
 ### Validation Rules
 

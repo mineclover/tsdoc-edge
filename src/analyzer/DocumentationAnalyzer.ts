@@ -11,6 +11,7 @@ import type { DocQualityScore } from '../types/analysis';
 /**
  * Analyzes documentation quality of TypeScript symbols
  *
+ * @doc [[AnalysisFeatures#Quality]]
  * @public
  * @responsibility Evaluate TSDoc completeness and quality for all symbols including nested ones
  */

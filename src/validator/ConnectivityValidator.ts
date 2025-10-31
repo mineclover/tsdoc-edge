@@ -16,6 +16,7 @@ import type {
 /**
  * Validates connectivity and completeness of documentation across the codebase
  * @public
+ * @doc [[ValidationFeatures#Connectivity]]
  * @responsibility Ensure SSOT compliance and documentation connectivity
  * @contract Validate all symbols have proper connections and documentation
  */

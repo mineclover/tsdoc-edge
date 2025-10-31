@@ -58,6 +58,7 @@ export interface TraversalResult {
 /**
  * Traverses symbol graph by depth levels using BFS
  *
+ * @doc [[SymbolGraphFeatures#Traversal]]
  * @public
  */
 export class DepthTraverser {

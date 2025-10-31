@@ -27,6 +27,7 @@ import type {
  * @testScenario Missing category fails
  * @testScenario Incomplete fields detected
  * @testScenario Public API stricter validation
+ * @doc [[ValidationFeatures#StrictMode]]
  */
 export class StrictModeValidator {
   /**

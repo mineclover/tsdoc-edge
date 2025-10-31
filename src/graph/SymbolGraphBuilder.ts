@@ -17,6 +17,7 @@ import type { Symbol, SymbolGraph, SymbolRelationship } from '../types/graph';
  * @testScenario Add relationships between symbols
  * @testScenario Search by name and file path
  * @testScenario Find dependencies and reverse dependencies
+ * @doc [[SymbolGraphFeatures#Builder]]
  */
 export class SymbolGraphBuilder {
   private graph: SymbolGraph;

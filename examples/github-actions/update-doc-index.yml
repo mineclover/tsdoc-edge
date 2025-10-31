@@ -1,0 +1,93 @@
+name: Update Document Symbol Index
+
+on:
+  push:
+    paths:
+      - 'docs/**/*.md'
+      - 'src/**/*.ts'
+      - 'src/**/*.tsx'
+  pull_request:
+    paths:
+      - 'docs/**/*.md'
+      - 'src/**/*.ts'
+      - 'src/**/*.tsx'
+
+jobs:
+  update-index:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0  # Fetch all history for diffing
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Update document index (incremental)
+        run: |
+          # Get changed markdown files
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            BASE_SHA="${{ github.event.pull_request.base.sha }}"
+            HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          else
+            BASE_SHA="${{ github.event.before }}"
+            HEAD_SHA="${{ github.sha }}"
+          fi
+
+          CHANGED_MD_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA | grep "^docs/.*\.md$" || true)
+          CHANGED_CODE_FILES=$(git diff --name-only $BASE_SHA $HEAD_SHA | grep "^src/.*\.\(ts\|tsx\)$" || true)
+
+          if [ -n "$CHANGED_MD_FILES" ] || [ -n "$CHANGED_CODE_FILES" ]; then
+            echo "📝 Changed documentation files:"
+            echo "$CHANGED_MD_FILES"
+
+            echo "🔧 Changed code files:"
+            echo "$CHANGED_CODE_FILES"
+
+            # Update index for each changed markdown file
+            for file in $CHANGED_MD_FILES; do
+              if [ -f "$file" ]; then
+                echo "Updating index for: $file"
+                npx tsdoc-edge index-docs --file="$file"
+              fi
+            done
+
+            # If code files changed, do full scan to update @doc tags
+            if [ -n "$CHANGED_CODE_FILES" ]; then
+              echo "Code files changed, running full scan..."
+              npx tsdoc-edge index-docs docs
+            fi
+          else
+            echo "No documentation or code files changed, skipping index update"
+          fi
+
+      - name: Validate document symbols
+        run: npx tsdoc-edge validate-docs
+
+      - name: Commit updated index
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          commit_message: "chore: update document symbol index [skip ci]"
+          file_pattern: ".tsdoc/doc-symbols.json"
+          commit_user_name: "github-actions[bot]"
+          commit_user_email: "github-actions[bot]@users.noreply.github.com"
+
+      - name: Comment PR with validation results
+        if: github.event_name == 'pull_request' && failure()
+        uses: actions/github-script@v6
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: '❌ Document symbol validation failed. Please check the workflow logs for details.'
+            })

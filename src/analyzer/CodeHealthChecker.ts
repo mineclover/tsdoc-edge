@@ -20,6 +20,7 @@ import { TestCoverageAnalyzer } from './TestCoverageAnalyzer';
 /**
  * Checks overall code health and generates improvement suggestions
  *
+ * @doc [[AnalysisFeatures#Health]]
  * @public
  * @responsibility Combine documentation and test analysis to produce actionable reports
  */

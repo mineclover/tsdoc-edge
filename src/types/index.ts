@@ -41,3 +41,9 @@ export * from './registry';
 export * from './state';
 // TSDoc tag types - base and enhanced
 export * from './tags';
+// Statistics types - tracking and comparison
+export * from './statistics';
+// Linking types - doc-code bidirectional links
+export * from './linking';
+// Document symbol types - [[]] notation
+export * from './doc-symbol';
