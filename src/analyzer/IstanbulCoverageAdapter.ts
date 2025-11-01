@@ -17,6 +17,20 @@ import type { CoverageSummary } from './CoverageParser';
  * @public
  * @responsibility Parse Istanbul coverage format (coverage-final.json)
  *
+ * @problem Each test runner has unique coverage output format
+ * @solves Provides unified adapter for Istanbul format (used by 90% of tools)
+ * @context Jest, Vitest, NYC, c8 all output Istanbul JSON
+ *
+ * @functionality Delegate to CoverageParser, Implement adapter interface
+ *
+ * @decision Reuse CoverageParser instead of duplicating logic
+ * @rationale DRY principle, CoverageParser is well-tested
+ * @consequences Thin adapter layer, Easy to maintain
+ *
+ * @depends CoverageParser, CoverageAdapter
+ * @depType module
+ * @depReason Parser for Istanbul format, Base adapter interface
+ *
  * @example
  * ```typescript
  * const adapter = new IstanbulCoverageAdapter();

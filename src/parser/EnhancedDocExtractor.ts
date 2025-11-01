@@ -56,6 +56,24 @@ export interface ExtractedEnhancedDoc {
  * Extract EnhancedSymbolDoc from TypeScript source files automatically.
  * Parses TSDoc comments and combines with AST information.
  *
+ * @problem Manual creation of EnhancedSymbolDoc is tedious and error-prone
+ * @solves Automatically extract enhanced docs from TSDoc custom tags
+ * @context 6-category documentation system requires structured metadata
+ * @useCase Automate documentation generation from annotated source code
+ *
+ * @functionality AST traversal, Custom tag parsing, Completeness calculation, Symbol extraction
+ *
+ * @decision Parse custom TSDoc tags instead of natural language processing
+ * @rationale Structured tags are more reliable than NLP for extracting metadata
+ * @consequences Requires developers to use custom tags, More predictable results
+ *
+ * @depends typescript, @microsoft/tsdoc
+ * @depType external
+ * @depReason TypeScript Compiler API for AST, TSDoc for comment parsing
+ *
+ * @todo Add support for extracting from compiled .d.ts files
+ * @priority low
+ *
  * Usage:
  * ```typescript
  * const extractor = new EnhancedDocExtractor();

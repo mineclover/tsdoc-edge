@@ -65,6 +65,16 @@ export interface CoverageSyncResult {
  *
  * @public
  * @responsibility Define interface for coverage adapters
+ *
+ * @problem Different test runners output coverage in different formats
+ * @solves Provides pluggable adapter interface for any test runner
+ * @context Need to support Jest, Vitest, Mocha, and future tools
+ *
+ * @functionality Parse coverage files, Abstract format differences
+ *
+ * @decision Use adapter pattern for extensibility
+ * @rationale Each test runner has unique output format
+ * @consequences Easy to add new runners, Consistent interface
  */
 export abstract class CoverageAdapter {
   /**
@@ -91,6 +101,26 @@ export abstract class CoverageAdapter {
  * - Map coverage data to symbols based on file path and line number
  * - Provide API to sync coverage into TSDoc symbols
  * - Support pluggable adapters for different test runners
+ *
+ * @problem Test coverage and documentation live in separate silos
+ * @solves Automatically reflects test coverage into symbol metadata
+ * @context Developers need unified view of code quality (docs + tests)
+ * @useCase Identify untested symbols, Track coverage trends in docs
+ *
+ * @functionality Symbol-coverage mapping, File path matching, Coverage calculation, Metadata updates
+ *
+ * @error Symbol not found in coverage due to path mismatch
+ * @errorType MappingError
+ * @errorContext Absolute vs relative file paths
+ * @errorSolution Try multiple path matching strategies (exact, relative, basename)
+ *
+ * @decision Match symbols by file path + line number, not just name
+ * @rationale Same name can exist in multiple files
+ * @consequences Robust matching, Handles refactoring
+ *
+ * @depends CoverageAdapter
+ * @depType module
+ * @depReason Need pluggable adapter for different test runners
  *
  * @example
  * ```typescript
