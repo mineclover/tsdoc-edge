@@ -644,6 +644,9 @@ function printHelp(): void {
   console.log('  update-backlinks [path] Update backlinks in documents');
   console.log('  find-doc <symbol>       Find document symbol and show references');
   console.log('  sync-coverage [path]    Sync test coverage to symbols (default: coverage/coverage-final.json)');
+  console.log('  check-links [path]      Check for broken links in enhanced docs (default: src)');
+  console.log('  parse <path>            Parse enhanced documentation from TypeScript files');
+  console.log('  generate-docs <path> [outdir]  Generate markdown from enhanced docs (default output: ./docs/generated)');
   console.log('  help                    Show this help message');
   console.log();
   console.log('Init Options:');
@@ -709,6 +712,8 @@ function printHelp(): void {
   console.log('  tsdoc-edge find-doc UserService');
   console.log('  tsdoc-edge sync-coverage');
   console.log('  tsdoc-edge sync-coverage coverage/coverage-final.json');
+  console.log('  tsdoc-edge check-links');
+  console.log('  tsdoc-edge check-links src');
   console.log('  tsdoc-edge help');
   console.log();
 }
@@ -3580,6 +3585,334 @@ function printSyncCoverage(): void {
   }
 }
 
+/**
+ * Parse enhanced documentation from TypeScript files
+ * @returns void
+ * @public
+ */
+function printParse(): void {
+  printHeader('TSDoc Edge - Parse Enhanced Docs');
+
+  const sourcePath = process.argv[3];
+
+  if (!sourcePath) {
+    console.log(`${colors.red}✗ Source path required${colors.reset}`);
+    console.log();
+    console.log('Usage:');
+    console.log(`${colors.cyan}  tsdoc-edge parse <file|directory>${colors.reset}`);
+    console.log();
+    console.log('Examples:');
+    console.log(`  tsdoc-edge parse src/analyzer/CodeHealthChecker.ts`);
+    console.log(`  tsdoc-edge parse src`);
+    console.log();
+    return;
+  }
+
+  if (!fs.existsSync(sourcePath)) {
+    console.log(
+      `${colors.red}✗ Source path not found: ${sourcePath}${colors.reset}`
+    );
+    console.log();
+    return;
+  }
+
+  console.log(`Parsing: ${colors.cyan}${sourcePath}${colors.reset}`);
+  console.log();
+
+  try {
+    // Import enhanced doc extractor
+    const { EnhancedDocExtractor } = require('./parser/EnhancedDocExtractor');
+
+    const extractor = new EnhancedDocExtractor({
+      includePartial: true,
+      autoGenerateIds: true,
+    });
+
+    const stats = fs.statSync(sourcePath);
+    let allResults: any[] = [];
+
+    if (stats.isDirectory()) {
+      // Recursively parse all .ts files
+      const parseDirectory = (dir: string) => {
+        const files = fs.readdirSync(dir);
+        for (const file of files) {
+          const filePath = path.join(dir, file);
+          const fileStat = fs.statSync(filePath);
+
+          if (fileStat.isDirectory()) {
+            if (!file.startsWith('.') && file !== 'node_modules') {
+              parseDirectory(filePath);
+            }
+          } else if (file.endsWith('.ts') && !file.endsWith('.test.ts') && !file.endsWith('.d.ts')) {
+            const sourceCode = fs.readFileSync(filePath, 'utf-8');
+            const results = extractor.extractFromFile(filePath, sourceCode);
+            allResults.push(...results);
+          }
+        }
+      };
+
+      parseDirectory(sourcePath);
+    } else {
+      // Parse single file
+      const sourceCode = fs.readFileSync(sourcePath, 'utf-8');
+      allResults = extractor.extractFromFile(sourcePath, sourceCode);
+    }
+
+    if (allResults.length === 0) {
+      console.log(`${colors.yellow}⚠  No enhanced documentation found${colors.reset}`);
+      console.log();
+      console.log('Add custom TSDoc tags to your code:');
+      console.log(`  ${colors.dim}@problem, @functionality, @errorExp, @decision, @dependency, @plan${colors.reset}`);
+      console.log();
+      return;
+    }
+
+    printSection('📊 Extraction Results');
+    console.log(`   Total Symbols: ${colors.cyan}${allResults.length}${colors.reset}`);
+    console.log();
+
+    // Show symbols by completeness
+    const byCompleteness = allResults.sort((a, b) => b.completeness - a.completeness);
+
+    printSection('📋 Symbols by Completeness');
+    byCompleteness.forEach(result => {
+      const relPath = path.relative(process.cwd(), result.symbol.filePath);
+      const completenessColor = result.completeness >= 70 ? colors.green :
+                                 result.completeness >= 40 ? colors.yellow : colors.red;
+      console.log(`   ${colors.cyan}${result.symbol.name}${colors.reset}`);
+      console.log(`     ${relPath}:${result.symbol.line}`);
+      console.log(`     Completeness: ${completenessColor}${result.completeness}%${colors.reset}`);
+      if (result.missing.length > 0) {
+        console.log(`     Missing: ${colors.dim}${result.missing.join(', ')}${colors.reset}`);
+      }
+      console.log();
+    });
+
+    // Calculate average completeness
+    const avgCompleteness = Math.round(
+      allResults.reduce((sum, r) => sum + r.completeness, 0) / allResults.length
+    );
+
+    console.log(`${colors.green}✓ Average Completeness: ${avgCompleteness}%${colors.reset}`);
+    console.log();
+  } catch (error) {
+    console.log(`${colors.red}✗ Error parsing enhanced docs:${colors.reset}`);
+    console.log(`  ${(error as Error).message}`);
+    console.log();
+    process.exit(1);
+  }
+}
+
+/**
+ * Generate markdown documentation from enhanced docs
+ * @returns void
+ * @public
+ */
+function printGenerateDocs(): void {
+  printHeader('TSDoc Edge - Generate Docs');
+
+  const sourcePath = process.argv[3];
+  const outputDir = process.argv[4] || './docs/generated';
+
+  if (!sourcePath) {
+    console.log(`${colors.red}✗ Source path required${colors.reset}`);
+    console.log();
+    console.log('Usage:');
+    console.log(`${colors.cyan}  tsdoc-edge generate-docs <file|directory> [output-dir]${colors.reset}`);
+    console.log();
+    console.log('Examples:');
+    console.log(`  tsdoc-edge generate-docs src/analyzer/CodeHealthChecker.ts`);
+    console.log(`  tsdoc-edge generate-docs src ./docs`);
+    console.log();
+    return;
+  }
+
+  if (!fs.existsSync(sourcePath)) {
+    console.log(
+      `${colors.red}✗ Source path not found: ${sourcePath}${colors.reset}`
+    );
+    console.log();
+    return;
+  }
+
+  console.log(`Generating docs from: ${colors.cyan}${sourcePath}${colors.reset}`);
+  console.log(`Output directory: ${colors.cyan}${outputDir}${colors.reset}`);
+  console.log();
+
+  try {
+    // Import dependencies
+    const { EnhancedDocExtractor } = require('./parser/EnhancedDocExtractor');
+    const { EnhancedMarkdownGenerator } = require('./generator/EnhancedMarkdownGenerator');
+
+    const extractor = new EnhancedDocExtractor({
+      includePartial: true,
+      autoGenerateIds: true,
+    });
+    const generator = new EnhancedMarkdownGenerator();
+
+    const stats = fs.statSync(sourcePath);
+    let allResults: any[] = [];
+
+    if (stats.isDirectory()) {
+      // Recursively parse all .ts files
+      const parseDirectory = (dir: string) => {
+        const files = fs.readdirSync(dir);
+        for (const file of files) {
+          const filePath = path.join(dir, file);
+          const fileStat = fs.statSync(filePath);
+
+          if (fileStat.isDirectory()) {
+            if (!file.startsWith('.') && file !== 'node_modules') {
+              parseDirectory(filePath);
+            }
+          } else if (file.endsWith('.ts') && !file.endsWith('.test.ts') && !file.endsWith('.d.ts')) {
+            const sourceCode = fs.readFileSync(filePath, 'utf-8');
+            const results = extractor.extractFromFile(filePath, sourceCode);
+            allResults.push(...results);
+          }
+        }
+      };
+
+      parseDirectory(sourcePath);
+    } else {
+      // Parse single file
+      const sourceCode = fs.readFileSync(sourcePath, 'utf-8');
+      allResults = extractor.extractFromFile(sourcePath, sourceCode);
+    }
+
+    if (allResults.length === 0) {
+      console.log(`${colors.yellow}⚠  No enhanced documentation found${colors.reset}`);
+      console.log();
+      console.log('Add custom TSDoc tags to your code:');
+      console.log(`  ${colors.dim}@problem, @functionality, @errorExp, @decision, @dependency, @plan${colors.reset}`);
+      console.log();
+      return;
+    }
+
+    // Create output directory
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+
+    printSection('📝 Generating Markdown Files');
+
+    let generated = 0;
+    for (const result of allResults) {
+      // Only generate docs for symbols with reasonable completeness
+      if (result.completeness < 10) {
+        console.log(`   ${colors.dim}Skipping ${result.symbol.name} (${result.completeness}% completeness)${colors.reset}`);
+        continue;
+      }
+
+      const markdown = generator.generateDocument(result.symbol, result.doc);
+      const fileName = `${result.symbol.name}.md`;
+      const outputPath = path.join(outputDir, fileName);
+
+      fs.writeFileSync(outputPath, markdown, 'utf-8');
+      generated++;
+
+      const relPath = path.relative(process.cwd(), outputPath);
+      console.log(`   ${colors.green}✓${colors.reset} ${result.symbol.name}`);
+      console.log(`     ${colors.dim}→ ${relPath}${colors.reset}`);
+    }
+
+    console.log();
+    console.log(`${colors.green}✓ Generated ${generated} markdown file(s)${colors.reset}`);
+    console.log();
+  } catch (error) {
+    console.log(`${colors.red}✗ Error generating docs:${colors.reset}`);
+    console.log(`  ${(error as Error).message}`);
+    console.log();
+    process.exit(1);
+  }
+}
+
+/**
+ * Check for missing/broken links in enhanced documentation
+ * @returns void
+ * @public
+ */
+function printCheckLinks(): void {
+  printHeader('TSDoc Edge - Check Links');
+
+  const sourcePath = process.argv[3] || 'src';
+
+  if (!fs.existsSync(sourcePath)) {
+    console.log(
+      `${colors.red}✗ Source path not found: ${sourcePath}${colors.reset}`
+    );
+    console.log();
+    console.log('Usage:');
+    console.log(`${colors.cyan}  tsdoc-edge check-links [path]${colors.reset}`);
+    console.log();
+    return;
+  }
+
+  console.log(`Analyzing links in: ${colors.cyan}${sourcePath}${colors.reset}`);
+  console.log();
+
+  try {
+    // Import missing link detector
+    const { MissingLinkDetector } = require('./analyzer/MissingLinkDetector');
+
+    // Create detector and analyze
+    printSection('🔍 Scanning Documentation');
+    const detector = new MissingLinkDetector();
+    const report = detector.analyze(sourcePath);
+
+    console.log(`   Total Links Checked: ${colors.green}${report.totalLinks}${colors.reset}`);
+    console.log(`   Broken Links: ${report.brokenLinks > 0 ? colors.red : colors.green}${report.brokenLinks}${colors.reset}`);
+    console.log();
+
+    if (report.brokenLinks === 0) {
+      console.log(`${colors.green}✓ All links are valid!${colors.reset}`);
+      console.log();
+      return;
+    }
+
+    // Show broken links by type
+    printSection('❌ Broken Links by Type');
+    for (const [type, links] of report.byType.entries()) {
+      console.log(`   ${type}: ${colors.red}${links.length}${colors.reset}`);
+    }
+    console.log();
+
+    // Show broken links by file
+    printSection('📁 Broken Links by File');
+    for (const [file, links] of report.byFile.entries()) {
+      const relPath = path.relative(process.cwd(), file);
+      console.log(`   ${relPath}: ${colors.red}${links.length}${colors.reset}`);
+    }
+    console.log();
+
+    // Show detailed broken links
+    printSection('🔗 Broken Link Details');
+    for (const link of report.links.slice(0, 20)) {
+      const relPath = path.relative(process.cwd(), link.sourceFile);
+      console.log(`   ${colors.yellow}${link.linkType}${colors.reset}: ${link.target}`);
+      console.log(`     in ${relPath}:${link.line} (${link.sourceSymbol})`);
+      console.log(`     ${colors.dim}${link.reason}${colors.reset}`);
+      if (link.suggestedFix) {
+        console.log(`     ${colors.cyan}💡 ${link.suggestedFix}${colors.reset}`);
+      }
+      console.log();
+    }
+
+    if (report.links.length > 20) {
+      console.log(`   ... and ${report.links.length - 20} more broken links`);
+      console.log();
+    }
+
+    console.log(`${colors.red}✗ Found ${report.brokenLinks} broken link(s)${colors.reset}`);
+    console.log();
+  } catch (error) {
+    console.log(`${colors.red}✗ Error checking links:${colors.reset}`);
+    console.log(`  ${(error as Error).message}`);
+    console.log();
+    process.exit(1);
+  }
+}
+
 // Main CLI logic
 const args = process.argv.slice(2);
 
@@ -3697,6 +4030,15 @@ switch (command) {
     break;
   case 'sync-coverage':
     printSyncCoverage();
+    break;
+  case 'check-links':
+    printCheckLinks();
+    break;
+  case 'parse':
+    printParse();
+    break;
+  case 'generate-docs':
+    printGenerateDocs();
     break;
   case 'help':
   case '--help':

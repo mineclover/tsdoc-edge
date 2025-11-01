@@ -90,7 +90,7 @@ export interface CoverageSummary {
  * @consequences Works with all major test tools, No custom parsers needed
  *
  * @depends fs, path
- * @depType module
+ * @depType external
  * @depReason File I/O for reading coverage-final.json
  *
  * @example

@@ -24,6 +24,12 @@ export type {
   CoverageSyncResult,
 } from './analyzer/CoverageSyncAdapter';
 export { IstanbulCoverageAdapter } from './analyzer/IstanbulCoverageAdapter';
+export { MissingLinkDetector } from './analyzer/MissingLinkDetector';
+export type {
+  BrokenLink,
+  MissingLinkReport,
+  LinkType,
+} from './analyzer/MissingLinkDetector';
 export { DocumentationAnalyzer } from './analyzer/DocumentationAnalyzer';
 export { DomainStructureAnalyzer } from './analyzer/DomainStructureAnalyzer';
 export { ImportanceClassifier } from './analyzer/ImportanceClassifier';

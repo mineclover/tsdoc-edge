@@ -33,6 +33,20 @@ interface NodeWithJSDoc extends ts.Node {
  * @testScenario Extract custom tags (@id, @contract, @responsibility)
  * @testScenario Handle files with no comments
  * @testScenario Handle malformed TSDoc
+ *
+ * @problem Standard TSDoc doesn't support custom tags needed for TSDoc Edge
+ * @solves Extends Microsoft TSDoc parser with custom tag definitions
+ * @context Need structured metadata beyond standard JSDoc tags
+ *
+ * @functionality Custom tag registration, AST traversal, Comment extraction, TSDoc parsing
+ *
+ * @decision Wrap Microsoft TSDoc parser instead of forking
+ * @rationale Benefit from upstream improvements and standards compliance
+ * @consequences Dependent on @microsoft/tsdoc API stability, Clean architecture
+ *
+ * @depends @microsoft/tsdoc, typescript
+ * @depType external
+ * @depReason TSDoc parsing engine and TypeScript AST
  */
 export class TSDocParser {
   private parser: MicrosoftTSDocParser;
