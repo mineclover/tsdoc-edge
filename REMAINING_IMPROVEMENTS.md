@@ -43,13 +43,15 @@ Overall Coverage: ~85%
 
 ## 🎯 남은 개선 계획
 
-### 1. TypeScript AST 자동 파싱 ⏳ (진행 중)
+### 1. TypeScript AST 자동 파싱 ✅ (완료)
 
 **목표**: TSDoc 주석 → EnhancedDoc 자동 변환
 
-**현재 상황**:
-- 수동으로 EnhancedSymbolDoc 작성 필요
-- 6-카테고리 문서 작성이 번거로움
+**완료 상태**:
+- ✅ EnhancedDocExtractor 구현 완료
+- ✅ 12개 커스텀 태그 파싱 지원
+- ✅ 완전성 점수 계산 (0-100%)
+- ✅ 테스트 12개 작성 (100% 통과)
 
 **개선안**:
 ```typescript
@@ -79,14 +81,17 @@ const docs = parseSourceFile('src/foo.ts');
 
 ---
 
-### 2. 테스트 커버리지 통합 ⏳
+### 2. 테스트 커버리지 통합 ✅ (완료)
 
-**목표**: Jest coverage와 TSDoc Edge 통합
+**목표**: 테스트 커버리지와 TSDoc Edge 통합
 
-**현재 상황**:
-- Jest coverage: 별도 실행
-- TSDoc의 `@testedBy` 태그: 수동 입력
-- 연동 없음
+**완료 상태**:
+- ✅ CoverageParser 구현 (Istanbul 범용 포맷)
+- ✅ CoverageSyncAdapter 구현 (어댑터 패턴)
+- ✅ IstanbulCoverageAdapter 구현
+- ✅ CLI 명령어: `sync-coverage` 추가
+- ✅ 테스트 23개 작성 (100% 통과)
+- ✅ Jest, Vitest, NYC, c8 지원
 
 **개선안**:
 ```bash

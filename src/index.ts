@@ -13,6 +13,17 @@ import { ConventionValidator } from './validator/ConventionValidator';
 
 // Analyzer exports
 export { CodeHealthChecker } from './analyzer/CodeHealthChecker';
+export { CoverageParser } from './analyzer/CoverageParser';
+export {
+  CoverageSyncer,
+  CoverageAdapter,
+  updateSymbolWithCoverage,
+} from './analyzer/CoverageSyncAdapter';
+export type {
+  SymbolCoverage,
+  CoverageSyncResult,
+} from './analyzer/CoverageSyncAdapter';
+export { IstanbulCoverageAdapter } from './analyzer/IstanbulCoverageAdapter';
 export { DocumentationAnalyzer } from './analyzer/DocumentationAnalyzer';
 export { DomainStructureAnalyzer } from './analyzer/DomainStructureAnalyzer';
 export { ImportanceClassifier } from './analyzer/ImportanceClassifier';

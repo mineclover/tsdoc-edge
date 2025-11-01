@@ -77,6 +77,19 @@ export interface Symbol {
    * Related design decisions
    */
   designDecisions: string[];
+
+  /**
+   * Optional metadata (coverage, performance, etc.)
+   */
+  metadata?: {
+    coverage?: {
+      covered: boolean;
+      executionCount?: number;
+      lineCoverage?: number;
+      statementCoverage?: number;
+    };
+    [key: string]: any;
+  };
 }
 
 /**
