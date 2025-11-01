@@ -203,6 +203,50 @@ describe('CoverageSyncAdapter', () => {
       expect(classCoverage.coveredLines).toContain(5);
     });
 
+    test('should mark class as covered if methods are covered (even if declaration line is not)', () => {
+      const parser = new CoverageParser();
+      const data = {
+        '/project/src/MyClass.ts': {
+          path: '/project/src/MyClass.ts',
+          s: { '0': 5, '1': 3 },
+          f: { '0': 10, '1': 5 }, // Both methods covered
+          b: {},
+          statementMap: {
+            '0': { start: { line: 10, column: 0 }, end: { line: 10, column: 20 } },
+            '1': { start: { line: 15, column: 0 }, end: { line: 15, column: 15 } },
+          },
+          fnMap: {
+            '0': { name: 'constructor', decl: { start: { line: 10 } } },
+            '1': { name: 'method1', decl: { start: { line: 15 } } },
+          },
+        },
+      };
+
+      const summary = parser.parseData(data);
+
+      const symbols: Symbol[] = [
+        {
+          id: 'myclass-1',
+          name: 'MyClass',
+          type: 'class',
+          filePath: '/project/src/MyClass.ts',
+          line: 5, // Class declaration line (not tracked by coverage)
+          column: 0,
+          isExported: true,
+          isPublic: true,
+          tests: [],
+          designDecisions: [],
+        },
+      ];
+
+      const adapter = new IstanbulCoverageAdapter();
+      const syncer = new CoverageSyncer(adapter);
+      const result = syncer.syncToSymbols(symbols, summary);
+
+      expect(result.coveredSymbols).toBe(1);
+      expect(result.symbolCoverages[0].covered).toBe(true);
+    });
+
     test('should match symbols by relative path', () => {
       const symbols: Symbol[] = [
         {

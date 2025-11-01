@@ -23,6 +23,20 @@ import { TestCoverageAnalyzer } from './TestCoverageAnalyzer';
  * @doc [[AnalysisFeatures#Health]]
  * @public
  * @responsibility Combine documentation and test analysis to produce actionable reports
+ *
+ * @problem Developers struggle to assess overall code quality and prioritize improvements
+ * @solves Combines documentation quality and test coverage into a single health score
+ * @context Need unified metrics to track code quality over time
+ *
+ * @functionality Health score calculation, Improvement suggestions, Documentation analysis, Test coverage analysis
+ *
+ * @decision Combine doc quality and test coverage into single metric
+ * @rationale Both are essential for maintainability and should be tracked together
+ * @consequences Single score simplifies tracking, May oversimplify complex quality issues
+ *
+ * @depends DocumentationAnalyzer, TestCoverageAnalyzer
+ * @depType module
+ * @depReason Need separate analyzers for modular design
  */
 export class CodeHealthChecker {
   private docAnalyzer: DocumentationAnalyzer;

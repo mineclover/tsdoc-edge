@@ -222,7 +222,20 @@ export class CoverageSyncer {
     }
 
     // For classes, interfaces, types - check if the line is covered
-    const lineCovered = fileCoverage.coveredLines.includes(symbol.line);
+    let lineCovered = fileCoverage.coveredLines.includes(symbol.line);
+
+    // Special handling for classes: check if any methods/constructor are covered
+    if (symbol.type === 'class' && !lineCovered) {
+      // Check if any functions in the class are covered
+      // Class methods typically appear after the class declaration line
+      const classFunctions = fileCoverage.functions.filter(
+        f => f.line > symbol.line && f.line < symbol.line + 100 // Reasonable class size
+      );
+
+      if (classFunctions.length > 0) {
+        lineCovered = classFunctions.some(f => f.covered);
+      }
+    }
 
     return {
       symbolId: symbol.id,
