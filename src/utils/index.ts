@@ -3,6 +3,8 @@
  * @packageDocumentation
  */
 
+export { ConfigLoader } from './ConfigLoader';
+
 /**
  * Check if a string is empty or whitespace only
  * @param str - String to check

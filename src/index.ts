@@ -30,6 +30,11 @@ export type {
   MissingLinkReport,
   LinkType,
 } from './analyzer/MissingLinkDetector';
+export { PreCommitChecker } from './analyzer/PreCommitChecker';
+export type {
+  FileCheckResult,
+  PreCommitReport,
+} from './analyzer/PreCommitChecker';
 export { DocumentationAnalyzer } from './analyzer/DocumentationAnalyzer';
 export { DomainStructureAnalyzer } from './analyzer/DomainStructureAnalyzer';
 export { ImportanceClassifier } from './analyzer/ImportanceClassifier';

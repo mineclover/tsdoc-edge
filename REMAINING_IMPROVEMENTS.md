@@ -379,16 +379,22 @@ CodeHealthChecker: 98.1% coverage
    - 상태: 주요 analyzer 파일에 추가 완료
    - 다음: 공개 API 클래스 추가
 
-2. **Missing Link Detection 개선** ✅
-   - 외부 모듈 자동 제외 (depType='external')
-   - 다음: 설정 파일 지원 (선택적)
-   - 다음: CI/CD 통합 (exit code)
+2. **Missing Link Detection 개선** ✅ (완료)
+   - ✅ 외부 모듈 자동 제외 (depType='external')
+   - ✅ 설정 파일 지원 (.tsdoc.config.json - linkCheck 섹션)
+   - ✅ CI/CD 통합 (failOnBroken 옵션으로 exit code 제어)
+   - ✅ ConfigLoader 구현 (15개 테스트, 100% 통과)
+   - ✅ 외부 모듈 패턴 지원 (node:*, @types/*)
+   - ✅ 체크 타입 선택 가능 (dependency, relatedProblem, symbol, file)
+   - ✅ CONFIG_GUIDE.md에 Link Checking Options 섹션 추가
 
-3. **README 업데이트** ✅
-   - Enhanced Documentation 기능 추가
-   - Coverage Integration 기능 추가
-   - Missing Link Detection 기능 추가
-   - 사용 예제 추가
+3. **README 업데이트** ✅ (완료)
+   - ✅ Enhanced Documentation 기능 추가
+   - ✅ Coverage Integration 기능 추가
+   - ✅ Missing Link Detection 기능 추가
+   - ✅ Link Check 설정 파일 예시 추가 (v0.8.1)
+   - ✅ CI/CD 통합 예시 추가
+   - ✅ 사용 예제 추가
 
 4. **문서 자동 생성 도구** ✅ (완료)
    - CLI: `tsdoc-edge parse` - TSDoc → EnhancedDoc 추출
@@ -397,9 +403,11 @@ CodeHealthChecker: 98.1% coverage
    - 실제 사용 검증 완료
 
 #### 중기 (1-2개월)
-5. **Git Pre-commit Hook**
-   - 변경된 파일의 documentation 체크
-   - Completeness threshold 설정
+5. **Git Pre-commit Hook** ✅ (완료)
+   - PreCommitChecker 구현 완료
+   - CLI 명령어: `install-hook`, `uninstall-hook` 추가
+   - 설정 가능한 threshold (최소/경고)
+   - 테스트: 14개 (100% 통과)
 
 #### 선택적
 5. **의존성 그래프 시각화** (필요시)
@@ -411,7 +419,9 @@ CodeHealthChecker: 98.1% coverage
 **최종 업데이트**: 2025-11-01
 **작성**: Claude Code
 **상태**:
-- ✅ Items 1-3 완료 (AST Parsing, Coverage Integration, Missing Link Detection)
-- ✅ README 업데이트 완료
-- ✅ 문서 자동 생성 도구 완료 (`parse`, `generate-docs` CLI 명령어 추가)
-- 📋 다음: Git Pre-commit Hook (선택적)
+- ✅ Items 1-5 완료 (AST Parsing, Coverage Integration, Missing Link Detection + Config, Git Pre-commit Hook)
+- ✅ README 업데이트 완료 (v0.8.0)
+- ✅ CLI 명령어: 35개 (install-hook, uninstall-hook, pre-commit-run 추가)
+- ✅ 설정 파일 지원: LinkCheckConfig 추가 (ConfigLoader)
+- ✅ 모든 테스트 통과 (474개 tests, 32 suites)
+- 📋 프로젝트 안정화 완료

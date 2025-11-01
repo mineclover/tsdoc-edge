@@ -217,6 +217,102 @@ await importer.importFile('src/myFile.ts');
 }
 ```
 
+### Link Checking Options
+
+Configure how the `check-links` command validates documentation references.
+
+```typescript
+{
+  "linkCheck": {
+    "checkTypes": Array<"dependency" | "relatedProblem" | "symbol" | "file">,
+    "externalModules": string[],      // External modules to exclude
+    "excludePatterns": string[],      // Glob patterns to exclude
+    "enableSuggestions": boolean,     // Enable typo suggestions
+    "maxSuggestionDistance": number,  // Max Levenshtein distance for suggestions
+    "failOnBroken": boolean          // Exit with error code if broken links found
+  }
+}
+```
+
+**Default Configuration:**
+
+```json
+{
+  "linkCheck": {
+    "checkTypes": ["dependency", "relatedProblem", "symbol", "file"],
+    "externalModules": ["fs", "path", "typescript", "node:fs", "node:path", "node:util"],
+    "excludePatterns": [],
+    "enableSuggestions": true,
+    "maxSuggestionDistance": 3,
+    "failOnBroken": false
+  }
+}
+```
+
+**Examples:**
+
+**1. CI/CD Setup (Fail on Broken Links)**
+
+```json
+{
+  "linkCheck": {
+    "failOnBroken": true,
+    "externalModules": [
+      "fs", "path", "typescript",
+      "node:*",        // All Node.js built-ins
+      "@types/*",      // All TypeScript type definitions
+      "react", "express"  // Project dependencies
+    ]
+  }
+}
+```
+
+**2. Minimal Checking (Dependencies Only)**
+
+```json
+{
+  "linkCheck": {
+    "checkTypes": ["dependency"],
+    "enableSuggestions": false
+  }
+}
+```
+
+**3. Custom External Modules**
+
+```json
+{
+  "linkCheck": {
+    "externalModules": [
+      "fs", "path", "typescript",
+      "node:*",           // All node: prefixed modules
+      "@myorg/*",         // All internal packages
+      "lodash", "axios"   // Known external dependencies
+    ]
+  }
+}
+```
+
+**Using with CLI:**
+
+```bash
+# Uses configuration from .tsdoc.config.json
+tsdoc-edge check-links src
+
+# Exit code 0: No broken links
+# Exit code 1: Broken links found (if failOnBroken: true)
+```
+
+**CI/CD Integration:**
+
+```yaml
+# .github/workflows/docs.yml
+- name: Check Documentation Links
+  run: |
+    tsdoc-edge check-links src
+    # Fails build if broken links found
+```
+
 ## Programmatic Usage
 
 ### Using ConfigManager in Code

@@ -24,6 +24,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { EnhancedDocExtractor, type ExtractedEnhancedDoc } from '../parser/EnhancedDocExtractor';
 import type { EnhancedSymbolDoc } from '../types/tags';
+import { ConfigLoader } from '../utils/ConfigLoader';
+import type { LinkCheckConfig } from '../types/config';
 
 /**
  * Types of links that can be broken
@@ -102,11 +104,25 @@ export class MissingLinkDetector {
   private extractor: EnhancedDocExtractor;
   private symbolRegistry: Map<string, ExtractedEnhancedDoc>;
   private fileRegistry: Set<string>;
+  private config: LinkCheckConfig;
 
-  constructor() {
+  /**
+   * Create a new MissingLinkDetector
+   *
+   * @param configLoader - Optional configuration loader
+   */
+  constructor(configLoader?: ConfigLoader) {
     this.extractor = new EnhancedDocExtractor();
     this.symbolRegistry = new Map();
     this.fileRegistry = new Set();
+    this.config = configLoader?.getLinkCheckConfig() ?? {
+      checkTypes: ['dependency', 'relatedProblem', 'symbol', 'file'],
+      externalModules: ['fs', 'path', 'typescript', 'node:fs', 'node:path', 'node:util'],
+      excludePatterns: [],
+      enableSuggestions: true,
+      maxSuggestionDistance: 3,
+      failOnBroken: false,
+    };
   }
 
   /**
@@ -196,11 +212,21 @@ export class MissingLinkDetector {
     const brokenLinks: BrokenLink[] = [];
     let totalLinks = 0;
 
+    // Get check types from config
+    const checkTypes = this.config.checkTypes || ['dependency', 'relatedProblem', 'symbol', 'file'];
+    const shouldCheckDependencies = checkTypes.includes('dependency');
+    const shouldCheckRelatedProblems = checkTypes.includes('relatedProblem');
+
     // Check dependencies
-    if (doc.doc.dependencies) {
+    if (shouldCheckDependencies && doc.doc.dependencies) {
       for (const dep of doc.doc.dependencies) {
         // Skip external dependencies (npm packages, Node.js built-ins)
         if (dep.type === 'external') {
+          continue;
+        }
+
+        // Skip if module is in external modules list
+        if (this.isExternalModule(dep.target)) {
           continue;
         }
 
@@ -209,7 +235,7 @@ export class MissingLinkDetector {
         if (dep.type === 'symbol' || dep.type === 'module') {
           // Check if symbol exists
           if (!this.symbolRegistry.has(dep.target)) {
-            const similar = this.findSimilarSymbols(dep.target);
+            const similar = this.config.enableSuggestions ? this.findSimilarSymbols(dep.target) : [];
 
             brokenLinks.push({
               sourceSymbol: doc.symbol.name,
@@ -238,12 +264,12 @@ export class MissingLinkDetector {
     }
 
     // Check related problems
-    if (doc.doc.problemSolving?.relatedProblem) {
+    if (shouldCheckRelatedProblems && doc.doc.problemSolving?.relatedProblem) {
       totalLinks++;
       const related = doc.doc.problemSolving.relatedProblem;
 
       if (!this.symbolRegistry.has(related)) {
-        const similar = this.findSimilarSymbols(related);
+        const similar = this.config.enableSuggestions ? this.findSimilarSymbols(related) : [];
 
         brokenLinks.push({
           sourceSymbol: doc.symbol.name,
@@ -258,6 +284,27 @@ export class MissingLinkDetector {
     }
 
     return { totalLinks, brokenLinks };
+  }
+
+  /**
+   * Check if a module is marked as external in configuration
+   */
+  private isExternalModule(moduleName: string): boolean {
+    const externalModules = this.config.externalModules || [];
+
+    for (const pattern of externalModules) {
+      if (pattern.endsWith('*')) {
+        // Wildcard pattern (e.g., "node:*")
+        const prefix = pattern.slice(0, -1);
+        if (moduleName.startsWith(prefix)) {
+          return true;
+        }
+      } else if (moduleName === pattern) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**

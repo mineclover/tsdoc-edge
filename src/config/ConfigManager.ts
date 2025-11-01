@@ -119,6 +119,7 @@ export class ConfigManager {
       fold: { ...defaultConfig.fold, ...userConfig.fold },
       validation: { ...defaultConfig.validation, ...userConfig.validation },
       generator: { ...defaultConfig.generator, ...userConfig.generator },
+      preCommit: { ...defaultConfig.preCommit, ...userConfig.preCommit },
     };
   }
 

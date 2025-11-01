@@ -37,6 +37,16 @@ export interface TsdocEdgeConfig {
    * Generator options
    */
   generator?: GeneratorConfig;
+
+  /**
+   * Pre-commit hook configuration
+   */
+  preCommit?: PreCommitConfig;
+
+  /**
+   * Link checking configuration
+   */
+  linkCheck?: LinkCheckConfig;
 }
 
 /**
@@ -195,6 +205,91 @@ export interface GeneratorConfig {
 }
 
 /**
+ * Pre-commit hook configuration
+ *
+ * @public
+ */
+export interface PreCommitConfig {
+  /**
+   * Enable pre-commit hook
+   * @defaultValue false
+   */
+  enabled?: boolean;
+
+  /**
+   * Minimum completeness threshold (0-100)
+   * Files below this threshold will fail the commit
+   * @defaultValue 50
+   */
+  threshold?: number;
+
+  /**
+   * Warning threshold (0-100)
+   * Files below this threshold will show warnings but allow commit
+   * @defaultValue 30
+   */
+  warningThreshold?: number;
+
+  /**
+   * Fail on missing enhanced docs
+   * If true, commits will fail if changed files have no enhanced docs
+   * @defaultValue false
+   */
+  failOnMissing?: boolean;
+
+  /**
+   * Check only modified symbols
+   * If true, only checks symbols in modified lines (requires git)
+   * @defaultValue false
+   */
+  modifiedOnly?: boolean;
+}
+
+/**
+ * Link checking configuration
+ *
+ * @public
+ */
+export interface LinkCheckConfig {
+  /**
+   * Link types to check
+   * @defaultValue ["dependency", "relatedProblem", "symbol", "file"]
+   */
+  checkTypes?: Array<'dependency' | 'relatedProblem' | 'symbol' | 'file'>;
+
+  /**
+   * External dependencies to exclude from validation
+   * These are known external modules that should not be treated as broken links
+   * @defaultValue ["fs", "path", "typescript", "node:*"]
+   */
+  externalModules?: string[];
+
+  /**
+   * Custom patterns to exclude from validation (glob patterns)
+   * @defaultValue []
+   */
+  excludePatterns?: string[];
+
+  /**
+   * Enable typo suggestions
+   * @defaultValue true
+   */
+  enableSuggestions?: boolean;
+
+  /**
+   * Maximum suggestion distance (Levenshtein distance)
+   * @defaultValue 3
+   */
+  maxSuggestionDistance?: number;
+
+  /**
+   * Fail on broken links (exit with non-zero code)
+   * @defaultValue false
+   */
+  failOnBroken?: boolean;
+}
+
+/**
  * Default configuration values
  *
  * @public
@@ -228,6 +323,21 @@ export const DEFAULT_CONFIG: TsdocEdgeConfig = {
     template: 'enhanced',
     includePrivate: false,
     includeInternal: false,
+  },
+  preCommit: {
+    enabled: false,
+    threshold: 50,
+    warningThreshold: 30,
+    failOnMissing: false,
+    modifiedOnly: false,
+  },
+  linkCheck: {
+    checkTypes: ['dependency', 'relatedProblem', 'symbol', 'file'],
+    externalModules: ['fs', 'path', 'typescript', 'node:*', '@types/*'],
+    excludePatterns: [],
+    enableSuggestions: true,
+    maxSuggestionDistance: 3,
+    failOnBroken: false,
   },
 };
 

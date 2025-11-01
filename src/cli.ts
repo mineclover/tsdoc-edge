@@ -647,6 +647,8 @@ function printHelp(): void {
   console.log('  check-links [path]      Check for broken links in enhanced docs (default: src)');
   console.log('  parse <path>            Parse enhanced documentation from TypeScript files');
   console.log('  generate-docs <path> [outdir]  Generate markdown from enhanced docs (default output: ./docs/generated)');
+  console.log('  install-hook            Install git pre-commit hook for documentation checks');
+  console.log('  uninstall-hook          Uninstall git pre-commit hook');
   console.log('  help                    Show this help message');
   console.log();
   console.log('Init Options:');
@@ -3852,12 +3854,25 @@ function printCheckLinks(): void {
   console.log();
 
   try {
-    // Import missing link detector
+    // Import missing link detector and config loader
     const { MissingLinkDetector } = require('./analyzer/MissingLinkDetector');
+    const { ConfigLoader } = require('./utils/ConfigLoader');
+
+    // Load configuration
+    const configLoader = new ConfigLoader();
+    const linkCheckConfig = configLoader.getLinkCheckConfig();
+
+    // Show config info if using a config file
+    if (configLoader.hasConfigFile()) {
+      console.log(
+        `${colors.dim}Using config: ${configLoader.getConfigPath()}${colors.reset}`
+      );
+      console.log();
+    }
 
     // Create detector and analyze
     printSection('🔍 Scanning Documentation');
-    const detector = new MissingLinkDetector();
+    const detector = new MissingLinkDetector(configLoader);
     const report = detector.analyze(sourcePath);
 
     console.log(`   Total Links Checked: ${colors.green}${report.totalLinks}${colors.reset}`);
@@ -3905,12 +3920,224 @@ function printCheckLinks(): void {
 
     console.log(`${colors.red}✗ Found ${report.brokenLinks} broken link(s)${colors.reset}`);
     console.log();
+
+    // Exit with error code if configured
+    if (linkCheckConfig.failOnBroken) {
+      process.exit(1);
+    }
   } catch (error) {
     console.log(`${colors.red}✗ Error checking links:${colors.reset}`);
     console.log(`  ${(error as Error).message}`);
     console.log();
     process.exit(1);
   }
+}
+
+/**
+ * Install pre-commit hook
+ * @returns void
+ * @public
+ */
+function printInstallHook(): void {
+  printHeader('TSDoc Edge - Install Pre-commit Hook');
+
+  const gitDir = path.join(process.cwd(), '.git');
+  if (!fs.existsSync(gitDir)) {
+    console.log(`${colors.red}✗ Not a git repository${colors.reset}`);
+    console.log();
+    console.log('Initialize a git repository first:');
+    console.log(`  ${colors.cyan}git init${colors.reset}`);
+    console.log();
+    return;
+  }
+
+  const hooksDir = path.join(gitDir, 'hooks');
+  const hookPath = path.join(hooksDir, 'pre-commit');
+
+  // Create hooks directory if it doesn't exist
+  if (!fs.existsSync(hooksDir)) {
+    fs.mkdirSync(hooksDir, { recursive: true });
+  }
+
+  // Check if hook already exists
+  if (fs.existsSync(hookPath)) {
+    const existing = fs.readFileSync(hookPath, 'utf-8');
+    if (existing.includes('tsdoc-edge pre-commit-run')) {
+      console.log(`${colors.yellow}⚠  Pre-commit hook already installed${colors.reset}`);
+      console.log();
+      return;
+    }
+
+    console.log(`${colors.yellow}⚠  Pre-commit hook already exists${colors.reset}`);
+    console.log();
+    console.log('To preserve existing hook, add this to your pre-commit script:');
+    console.log(`  ${colors.cyan}tsdoc-edge pre-commit-run${colors.reset}`);
+    console.log();
+    return;
+  }
+
+  // Create hook script
+  const hookScript = `#!/bin/sh
+# TSDoc Edge pre-commit hook
+# Auto-generated - do not edit manually
+
+npx tsdoc-edge pre-commit-run
+exit $?
+`;
+
+  try {
+    fs.writeFileSync(hookPath, hookScript, 'utf-8');
+    fs.chmodSync(hookPath, 0o755); // Make executable
+
+    console.log(`${colors.green}✓ Pre-commit hook installed successfully${colors.reset}`);
+    console.log();
+    console.log('Hook installed at:');
+    console.log(`  ${colors.cyan}${hookPath}${colors.reset}`);
+    console.log();
+    console.log('Configure thresholds in .tsdoc.config.json:');
+    console.log(`  ${colors.dim}"preCommit": {`);
+    console.log(`    "enabled": true,`);
+    console.log(`    "threshold": 50,`);
+    console.log(`    "warningThreshold": 30`);
+    console.log(`  }${colors.reset}`);
+    console.log();
+  } catch (error) {
+    console.log(`${colors.red}✗ Failed to install hook:${colors.reset}`);
+    console.log(`  ${(error as Error).message}`);
+    console.log();
+    process.exit(1);
+  }
+}
+
+/**
+ * Uninstall pre-commit hook
+ * @returns void
+ * @public
+ */
+function printUninstallHook(): void {
+  printHeader('TSDoc Edge - Uninstall Pre-commit Hook');
+
+  const gitDir = path.join(process.cwd(), '.git');
+  if (!fs.existsSync(gitDir)) {
+    console.log(`${colors.red}✗ Not a git repository${colors.reset}`);
+    console.log();
+    return;
+  }
+
+  const hookPath = path.join(gitDir, 'hooks', 'pre-commit');
+
+  if (!fs.existsSync(hookPath)) {
+    console.log(`${colors.yellow}⚠  Pre-commit hook not found${colors.reset}`);
+    console.log();
+    return;
+  }
+
+  const existing = fs.readFileSync(hookPath, 'utf-8');
+  if (!existing.includes('tsdoc-edge pre-commit-run')) {
+    console.log(`${colors.yellow}⚠  Hook exists but was not installed by tsdoc-edge${colors.reset}`);
+    console.log();
+    console.log('Remove manually if needed:');
+    console.log(`  ${colors.cyan}rm ${hookPath}${colors.reset}`);
+    console.log();
+    return;
+  }
+
+  try {
+    fs.unlinkSync(hookPath);
+
+    console.log(`${colors.green}✓ Pre-commit hook uninstalled successfully${colors.reset}`);
+    console.log();
+  } catch (error) {
+    console.log(`${colors.red}✗ Failed to uninstall hook:${colors.reset}`);
+    console.log(`  ${(error as Error).message}`);
+    console.log();
+    process.exit(1);
+  }
+}
+
+/**
+ * Run pre-commit check (called by git hook)
+ * @returns void
+ * @public
+ */
+function printPreCommitRun(): void {
+  const config = ConfigManager.getInstance().get();
+
+  // Check if pre-commit is enabled
+  if (!config.preCommit?.enabled) {
+    // Silently pass if not enabled
+    process.exit(0);
+  }
+
+  // Import PreCommitChecker
+  const { PreCommitChecker } = require('./analyzer/PreCommitChecker');
+
+  const checker = new PreCommitChecker(config.preCommit);
+  const report = checker.check();
+
+  // No files to check
+  if (report.totalFiles === 0) {
+    process.exit(0);
+  }
+
+  // Print results
+  console.log();
+  console.log(`${colors.cyan}TSDoc Edge Pre-commit Check${colors.reset}`);
+  console.log();
+
+  if (report.passed) {
+    console.log(`${colors.green}✓ All files passed documentation check${colors.reset}`);
+    console.log(`  Files checked: ${report.totalFiles}`);
+    if (report.warningFiles > 0) {
+      console.log(`  ${colors.yellow}⚠  Files with warnings: ${report.warningFiles}${colors.reset}`);
+    }
+    console.log();
+
+    // Show warnings
+    for (const result of report.fileResults) {
+      if (result.warningSymbols.length > 0) {
+        console.log(`${colors.yellow}⚠  ${result.filePath}${colors.reset}`);
+        for (const symbol of result.warningSymbols.slice(0, 3)) {
+          console.log(`   ${symbol.name}:${symbol.line} - ${symbol.completeness}% completeness`);
+        }
+        if (result.warningSymbols.length > 3) {
+          console.log(`   ... and ${result.warningSymbols.length - 3} more`);
+        }
+        console.log();
+      }
+    }
+
+    process.exit(0);
+  }
+
+  // Failed
+  console.log(`${colors.red}✗ Documentation check failed${colors.reset}`);
+  console.log(`  Files checked: ${report.totalFiles}`);
+  console.log(`  Files failed: ${report.failedFiles}`);
+  console.log();
+
+  // Show failures
+  for (const result of report.fileResults) {
+    if (!result.passed) {
+      console.log(`${colors.red}✗ ${result.filePath}${colors.reset}`);
+
+      if (result.missingDocs) {
+        console.log(`   No enhanced documentation found`);
+      } else {
+        for (const symbol of result.failedSymbols.slice(0, 3)) {
+          console.log(`   ${symbol.name}:${symbol.line} - ${colors.red}${symbol.completeness}%${colors.reset} (threshold: ${report.config.threshold}%)`);
+        }
+        if (result.failedSymbols.length > 3) {
+          console.log(`   ... and ${result.failedSymbols.length - 3} more`);
+        }
+      }
+      console.log();
+    }
+  }
+
+  console.log('Improve documentation or adjust threshold in .tsdoc.config.json');
+  console.log();
+  process.exit(1);
 }
 
 // Main CLI logic
@@ -4039,6 +4266,15 @@ switch (command) {
     break;
   case 'generate-docs':
     printGenerateDocs();
+    break;
+  case 'install-hook':
+    printInstallHook();
+    break;
+  case 'uninstall-hook':
+    printUninstallHook();
+    break;
+  case 'pre-commit-run':
+    printPreCommitRun();
     break;
   case 'help':
   case '--help':

@@ -23,9 +23,9 @@ TSDoc Edge는 단순한 문서 생성 도구가 아닙니다. 코드베이스의
 
 ## 주요 기능
 
-### ✅ CLI 도구 (v0.7.0) - NEW! 🔥
+### ✅ CLI 도구 (v0.8.0) - NEW! 🔥
 
-**32개 명령어로 완전한 문서 관리**
+**35개 명령어로 완전한 문서 관리**
 
 #### 초기화 및 빌드 (2개)
 - `init` - 프로젝트 설정 초기화
@@ -69,6 +69,11 @@ TSDoc Edge는 단순한 문서 생성 도구가 아닙니다. 코드베이스의
 - `validate-docs` - SSOT 검증
 - `update-backlinks` - 백링크 자동 생성
 - `find-doc` - 문서 심볼 검색
+
+#### Git 통합 (3개) 🔥
+- `install-hook` - **Pre-commit hook 설치**
+- `uninstall-hook` - **Pre-commit hook 제거**
+- `pre-commit-run` - **Hook 실행 (내부 사용)**
 
 **성능**:
 - 소규모 프로젝트 (< 100 파일): ~5초 초기 설정
@@ -179,12 +184,15 @@ tsdoc-edge health src
 
 - **MissingLinkDetector**: 4가지 링크 타입 검증 (dependency, relatedProblem, symbol, file)
 - **Typo 감지**: 유사 심볼 찾기 및 제안 기능
-- **외부 모듈 제외**: fs, path, typescript 등 자동 제외
+- **설정 파일 지원**: `.tsdoc.config.json`으로 외부 모듈, 체크 타입, CI/CD 옵션 설정 🔥
+- **외부 모듈 제외**: fs, path, typescript 등 자동 제외 (설정 가능)
 - **타입별 그룹핑**: dependency, relatedProblem, symbol, file 별로 분류
 - **CLI 명령어**: `check-links <dir>` - 문서 링크 검증
-- **테스트 커버리지**: 9개 테스트 (100% 통과)
+- **테스트 커버리지**: 24개 테스트 (100% 통과)
 
 **실제 사용 예시**:
+
+**1. 기본 사용**
 ```bash
 # 디렉토리 내 모든 문서 링크 검증
 tsdoc-edge check-links src
@@ -207,16 +215,92 @@ tsdoc-edge check-links src
 #      💡 Did you mean: UserService, userRepository?
 ```
 
+**2. 설정 파일로 커스터마이징** (.tsdoc.config.json)
+```json
+{
+  "linkCheck": {
+    "checkTypes": ["dependency", "relatedProblem"],  // 특정 타입만 체크
+    "externalModules": [
+      "fs", "path", "typescript",
+      "node:*",        // 모든 Node.js 내장 모듈
+      "@types/*",      // 모든 TypeScript 타입 정의
+      "react", "express"  // 프로젝트 의존성
+    ],
+    "enableSuggestions": true,      // Typo 제안 활성화
+    "maxSuggestionDistance": 3,     // Levenshtein 거리
+    "failOnBroken": true            // CI/CD에서 broken link 발견 시 실패
+  }
+}
+```
+
+**3. CI/CD 통합**
+```yaml
+# .github/workflows/docs.yml
+- name: Check Documentation Links
+  run: tsdoc-edge check-links src
+  # failOnBroken: true이면 broken link 발견 시 빌드 실패
+```
+
 **주요 효과**:
 - 문서 참조 무결성 자동 검증
 - Typo 자동 감지 및 제안
+- 프로젝트별 설정 가능 (외부 모듈, 체크 타입)
+- CI/CD 통합으로 자동화된 품질 검증
 - SSOT 품질 향상
+
+### ✅ Git Pre-commit Hook (v0.8.0) - NEW! 🔥
+
+**변경된 파일의 문서 품질을 커밋 전에 자동 검증**
+
+- **PreCommitChecker**: Staged files의 enhanced documentation 품질 체크
+- **설정 가능한 Threshold**: 최소/경고 completeness 임계값 설정
+- **CLI 명령어**: `install-hook`, `uninstall-hook` - Git hook 설치/제거
+- **자동 실행**: Git commit 시 자동으로 문서 품질 검증
+- **테스트 커버리지**: 14개 테스트 (100% 통과)
+
+**실제 사용 예시**:
+```bash
+# 1. Git hook 설치
+tsdoc-edge install-hook
+
+# 2. .tsdoc.config.json에서 설정
+{
+  "preCommit": {
+    "enabled": true,
+    "threshold": 50,           // 50% 미만 시 커밋 차단
+    "warningThreshold": 30,    // 30-50% 시 경고
+    "failOnMissing": false     // enhanced docs 없어도 통과
+  }
+}
+
+# 3. 파일 수정 및 커밋 시도
+git add src/foo.ts
+git commit -m "Add feature"
+
+# 결과 예시 (실패):
+# TSDoc Edge Pre-commit Check
+# ✗ Documentation check failed
+#   Files checked: 1
+#   Files failed: 1
+#
+# ✗ src/foo.ts
+#   myFunction:23 - 40% (threshold: 50%)
+#
+# Improve documentation or adjust threshold
+
+# 4. Hook 제거
+tsdoc-edge uninstall-hook
+```
+
+**주요 효과**:
+- 문서 품질 자동 유지 (커밋 전 검증)
+- 팀 전체의 문서 품질 표준 강제
+- CI/CD 이전에 문제 조기 발견
 
 ### 🚧 다음 단계
 
-#### 단기 (1-2주)
-- 문서 자동 생성 도구 (`generate-docs` 명령어 - Enhanced docs → Markdown 변환)
-- Git Pre-commit Hook (변경된 파일의 documentation 체크)
+#### 단기 (선택적)
+- CI/CD 통합 개선 (GitHub Actions, GitLab CI 템플릿)
 
 #### 중장기 (선택적)
 - 의존성 그래프 시각화 (웹 기반 대시보드)
@@ -260,7 +344,7 @@ tsdoc-edge analyze src
 Overall Score: 67/100 (Good)
 ```
 
-### 3. 주요 CLI 명령어 (32개)
+### 3. 주요 CLI 명령어 (35개)
 
 #### 초기화 및 빌드
 ```bash
@@ -280,6 +364,12 @@ tsdoc-edge check-links src       # 문서 링크 검증 🔥
 ```bash
 tsdoc-edge parse src/foo.ts      # TSDoc → EnhancedDoc 자동 추출
 tsdoc-edge sync-coverage         # 테스트 커버리지 동기화
+```
+
+#### Git 통합 🔥
+```bash
+tsdoc-edge install-hook          # Pre-commit hook 설치
+tsdoc-edge uninstall-hook        # Pre-commit hook 제거
 ```
 
 #### 이슈 찾기

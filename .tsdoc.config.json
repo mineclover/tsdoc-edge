@@ -26,5 +26,18 @@
     "template": "enhanced",
     "includePrivate": false,
     "includeInternal": false
+  },
+  "linkCheck": {
+    "checkTypes": ["dependency", "relatedProblem", "symbol", "file"],
+    "externalModules": [
+      "fs", "path", "typescript",
+      "node:*",
+      "@types/*",
+      "eslint", "jest", "prettier"
+    ],
+    "excludePatterns": [],
+    "enableSuggestions": true,
+    "maxSuggestionDistance": 3,
+    "failOnBroken": false
   }
 }
