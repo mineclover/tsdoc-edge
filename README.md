@@ -23,9 +23,9 @@ TSDoc Edge는 단순한 문서 생성 도구가 아닙니다. 코드베이스의
 
 ## 주요 기능
 
-### ✅ CLI 도구 (v0.8.0) - NEW! 🔥
+### ✅ CLI 도구 (v0.8.0 + v0.10.0) - NEW! 🔥
 
-**35개 명령어로 완전한 문서 관리**
+**40개 명령어로 완전한 문서 관리**
 
 #### 초기화 및 빌드 (2개)
 - `init` - 프로젝트 설정 초기화
@@ -64,10 +64,15 @@ TSDoc Edge는 단순한 문서 생성 도구가 아닙니다. 코드베이스의
 - `core-api` - 핵심 API 표면 분석
 - `scan` - 심볼 그래프 깊이 탐색
 
-#### 문서 심볼 시스템 (4개)
+#### 문서 심볼 시스템 (9개)
 - `index-docs` - [[]] 심볼 인덱싱
 - `validate-docs` - SSOT 검증
 - `update-backlinks` - 백링크 자동 생성
+- `update-symbol-refs` - 심볼 참조 footnote 생성 🔥
+- `validate-spec` - 명세서 완성도 검증 🔥
+- `check-duplicates` - 중복 콘텐츠 감지 및 제안 🔥
+- `spec-status` - 명세서 상태 워크플로우 관리 🔥
+- `find-unused-docs` - 미사용/오래된 문서 탐지 🔥
 - `find-doc` - 문서 심볼 검색
 
 #### Git 통합 (3개) 🔥
@@ -92,7 +97,7 @@ TSDoc Edge는 단순한 문서 생성 도구가 아닙니다. 코드베이스의
 - **검증 규칙**: 프로젝트별 validation 규칙 정의
 - **환경별 설정**: dev/prod 환경에 맞는 설정 분리
 
-### ✅ Document Symbol System (v0.5.0)
+### ✅ Document Symbol System (v0.5.0 + v0.10.0 🔥)
 
 - **[[문서 심볼]]** 정의 및 참조 (Wiki 스타일)
 - H1 레벨에서 심볼 정의: `# [[Authentication System]]`
@@ -100,6 +105,406 @@ TSDoc Edge는 단순한 문서 생성 도구가 아닙니다. 코드베이스의
 - Backlink 자동 생성 및 갱신
 - SSOT 검증 (중복 정의 방지)
 - 문서 기반 드리븐 개발 지원
+- **Symbol Footnote Reference (v0.10.0)** 🔥 - 코드 심볼 참조 자동화
+
+### ✅ Document Management System (v0.9.0) - NEW! 🔥
+
+**TSDoc Edge 관리 문서를 명확히 식별하고 오염 방지**
+
+- **Config 기반 문서 영역 지정**: `documentManagement` 설정으로 관리 범위 명확화
+- **YAML Frontmatter 지원**: `tsdoc: managed`로 관리 대상 표시
+- **코드 블록 무시**: 예시 코드의 `[[]]` 심볼은 실제 참조로 인식하지 않음
+- **폴더 분리**: `managed/` (관리 대상), `examples/` (예시)
+- **Backlinks 정확성**: 실제 참조만 Backlinks에 반영
+
+**설정 예시** (.tsdoc.config.json):
+```json
+{
+  "documentManagement": {
+    "enabled": true,
+    "managedDirs": ["managed"],
+    "excludeDirs": ["examples", "archive", "reference"],
+    "requireFrontmatter": false,
+    "ignoreCodeBlocks": true
+  }
+}
+```
+
+**Frontmatter 예시**:
+```yaml
+---
+tsdoc: managed
+version: 1.0.0
+status: active
+primary: DocumentSymbolSystem
+category: feature
+tags:
+  - core
+  - documentation
+---
+
+# [[DocumentSymbolSystem]]
+```
+
+**주요 효과**:
+- ✅ 관리 문서와 수동 문서 명확히 구분
+- ✅ 예시/템플릿 문서 오염 방지
+- ✅ Backlinks 정확성 향상
+- ✅ 문서 메타데이터 관리 (버전, 상태, 카테고리)
+
+### ✅ Symbol Footnote Reference (v0.10.0) - NEW! 🔥
+
+**Markdown footnote로 코드 심볼 자동 참조**
+
+문서에서 코드 심볼을 간결하게 참조하고, 심볼 레지스트리 기반으로 자동으로 상대 경로를 계산하여 footnote를 생성합니다.
+
+**작성 방법**:
+```markdown
+## 핵심 산출물
+### Convention Validation
+- ConventionValidator[^sym-005] - 프로젝트 컨벤션 검증
+  - 필수 태그 확인
+  - 포맷 규칙 검증
+
+### Connectivity Validation
+- ConnectivityValidator[^ConnectivityValidator] - 연결성 검증
+  - 고아 심볼 탐지
+```
+
+**자동 생성되는 결과**:
+```markdown
+## Symbol References
+
+[^sym-005]: [ConventionValidator](../../src/validator/ConventionValidator.ts#ConventionValidator)
+[^ConnectivityValidator]: [ConnectivityValidator](../../src/validator/ConnectivityValidator.ts#ConnectivityValidator)
+```
+
+**사용법**:
+```bash
+# 단일 파일 업데이트
+tsdoc-edge update-symbol-refs managed/features/validation-features.md
+
+# 디렉토리 전체 업데이트
+tsdoc-edge update-symbol-refs managed/
+
+# 결과 예시:
+# Updated
+# ✅ validation-features.md (3 refs)
+#
+# Total: 1 documents updated
+```
+
+**주요 효과**:
+- ✅ 본문 간결성: 긴 경로 대신 `[^sym-XXX]` 짧은 참조
+- ✅ 네이티브 Markdown: 표준 footnote 문법 사용
+- ✅ 중복 제거: 같은 심볼 여러 번 참조해도 footnote는 한 번만
+- ✅ 자동 경로: 상대 경로 수동 계산 불필요
+- ✅ ID/이름 지원: `[^sym-001]` 또는 `[^SymbolName]` 모두 가능
+- ✅ 미해결 참조 탐지: 레지스트리에 없는 심볼 자동 경고
+
+### ✅ Specification Completeness Validation (v0.10.0) - NEW! 🔥
+
+**명세서 품질을 정량적으로 측정하고 검증**
+
+명세서가 필수 섹션, 시나리오, 예시, 코드 참조를 충분히 포함하는지 자동으로 검증합니다.
+
+**검증 항목**:
+```typescript
+// 필수 섹션
+requiredSections: ['개요', '핵심 개념', '핵심 산출물', '사용 시나리오']
+
+// 권장 섹션
+recommendedSections: ['CLI 명령어', '관련 기능', '가이드']
+
+// 최소 개수
+minScenarios: 3          // 최소 3개 시나리오
+minCodeReferences: 5     // 최소 5개 코드 참조
+minExamples: 2           // 최소 2개 예시
+```
+
+**완성도 점수 계산**:
+```
+score =
+  requiredSections × 0.4 +      // 필수 섹션 (40%)
+  recommendedSections × 0.1 +   // 권장 섹션 (10%)
+  scenarios × 0.2 +              // 시나리오 (20%)
+  codeReferences × 0.2 +         // 코드 참조 (20%)
+  examples × 0.1                 // 예시 (10%)
+```
+
+**사용법**:
+```bash
+# 단일 파일 검증
+tsdoc-edge validate-spec managed/features/validation-features.md
+
+# 디렉토리 전체 검증
+tsdoc-edge validate-spec managed/
+
+# 결과 예시:
+# Summary
+# Total specifications: 7
+# Complete: 4
+# Incomplete: 3
+# Average score: 78%
+#
+# Incomplete Specifications
+# ⚠️ core-workflow.md (52%)
+#    Required sections: 50%
+#      Missing: 핵심 개념, 사용 시나리오
+#    Scenarios: 0/3
+#    Examples: 1/2
+```
+
+**CI/CD 통합**:
+```yaml
+# .github/workflows/docs.yml
+- name: Validate Specifications
+  run: tsdoc-edge validate-spec managed/
+  # Exit code 1 if any spec is incomplete
+```
+
+**주요 효과**:
+- ✅ 명세서 품질 정량화: 0-100 점수로 측정
+- ✅ 필수 섹션 강제: 개요, 핵심 개념, 산출물, 시나리오 필수
+- ✅ 실용성 검증: 충분한 예시와 시나리오 요구
+- ✅ 코드 연결 검증: 명세서와 코드 간 연결 강제
+- ✅ CI/CD 통합: 불완전한 명세서 자동 차단
+- ✅ 과다 문서 방지: 완성도 낮은 문서 생성 억제
+
+### ✅ Duplicate Content Detection (v0.10.0) - NEW! 🔥
+
+**중복 콘텐츠를 자동 감지하고 [[심볼]] 참조 사용 제안**
+
+명세서 간의 콘텐츠 유사도를 분석하여 중복 작성을 방지하고, 참조 기반 문서 작성을 권장합니다.
+
+**작동 원리**:
+```typescript
+// Jaccard 유사도 기반 텍스트 비교
+similarity = |A ∩ B| / |A ∪ B|
+
+// 임계값
+similarityThreshold: 0.3        // 30% 이상 유사 시 보고
+highSimilarityThreshold: 0.7    // 70% 이상 유사 시 병합 제안
+```
+
+**제안 규칙**:
+```
+1. 유사도 ≥ 70% + 3개 이상 겹치는 섹션
+   → "merge" (병합 권장)
+
+2. 유사도 ≥ 30% + 2개 이상 겹치는 섹션
+   → "cross-reference" ([[심볼]] 참조 사용 권장)
+
+3. 유사도 < 30%
+   → "keep-separate" (별도 문서 유지)
+```
+
+**사용법**:
+```bash
+# 디렉토리 전체 중복 검사
+tsdoc-edge check-duplicates managed/
+
+# 결과 예시:
+# Summary
+# Total documents: 7
+# Pairs analyzed: 21
+# Similar pairs found: 13
+# Average similarity: 46.0%
+#
+# Suggestions:
+#   Merge: 0
+#   Cross-reference: 13
+#   Keep separate: 8
+#
+# Cross-Reference Suggestions (Moderate Similarity)
+# 🟡 Similarity: 71.0%
+#    File 1: core-workflow.md
+#    File 2: validation-features.md
+#    Use [[symbol]] references to avoid duplication.
+#    Overlapping sections:
+#      - CLI 명령어 (100.0%)
+#      - Backlinks (42.0%)
+```
+
+**CI/CD 통합**:
+```yaml
+# .github/workflows/docs.yml
+- name: Check for Duplicate Content
+  run: tsdoc-edge check-duplicates managed/
+  # Exit code 1 if merge suggestions exist
+```
+
+**주요 효과**:
+- ✅ 중복 작성 방지: 섹션별 유사도 측정으로 중복 감지
+- ✅ 참조 기반 작성 권장: [[심볼]] 사용으로 SSOT 유지
+- ✅ 문서 과다 생성 억제: 유사한 문서 병합 제안
+- ✅ 유지보수 효율화: 중복 콘텐츠 최소화로 수정 부담 감소
+- ✅ 일관성 향상: 참조를 통한 단일 진실 공급원 강제
+- ✅ CI/CD 통합: 고유사도 문서 자동 차단
+
+### ✅ Specification Status Workflow (v0.10.0) - NEW! 🔥
+
+**명세서 생명주기를 상태로 관리하고 자동 검증**
+
+명세서의 상태 전이를 체계적으로 관리하고, 각 상태별 요구사항을 자동으로 검증합니다.
+
+**상태 전이 흐름**:
+```
+draft → review → approved → active → deprecated → archived
+  ↓                                      ↓
+archived                              active (복구)
+```
+
+**상태별 요구사항**:
+```typescript
+draft:      완성도 요구 없음 (자유로운 작성)
+review:     완성도 ≥ 50% (기본 구조 갖춤)
+approved:   완성도 ≥ 80% + 필수 섹션 모두 존재
+active:     완성도 ≥ 80% + 필수 섹션 모두 존재
+deprecated: replacement 필드 필수 (대체 문서 명시)
+archived:   요구사항 없음 (보관)
+```
+
+**사용법**:
+```bash
+# 1. 현재 상태 및 가능한 전이 확인
+tsdoc-edge spec-status show managed/features/new-feature.md
+
+# 출력:
+# Current status: draft
+# Allowed transitions:
+#   ✅ review
+#   ⚠️ approved
+#      Score 45% does not meet requirement (>= 80%)
+
+# 2. 상태 승격
+tsdoc-edge spec-status promote managed/features/new-feature.md review
+
+# Validation Checks:
+# ✅ Transition Allowed
+#    Transition from "draft" to "review" is allowed
+# ✅ Completeness Score
+#    Score 45% meets requirement (>= 50%)
+# ✅ Successfully promoted to "review"
+
+# 3. 승격 가능한 문서 목록
+tsdoc-edge spec-status list-ready managed/
+
+# Ready for Promotion:
+# ✅ feature-a.md
+#    draft → review
+#    All checks passed
+#
+# Not Ready:
+# ⚠️ feature-b.md
+#    review → approved
+#    Score 65% does not meet requirement (>= 80%)
+
+# 4. 상태별 통계
+tsdoc-edge spec-status stats managed/
+
+# Status Distribution:
+# Total documents: 7
+#
+#   active: 4 (57.1%)
+#   review: 2 (28.6%)
+#   draft: 1 (14.3%)
+```
+
+**CI/CD 통합**:
+```yaml
+# .github/workflows/docs.yml
+- name: Check Document Status
+  run: |
+    # active 상태가 아닌 문서는 경고
+    tsdoc-edge spec-status stats managed/
+```
+
+**주요 효과**:
+- ✅ 명세서 성숙도 추적: draft → active 단계적 관리
+- ✅ 자동 품질 게이트: 상태 전이 시 자동 검증
+- ✅ 승인 프로세스: review → approved 단계 강제
+- ✅ 대체 문서 강제: deprecated 시 replacement 필수
+- ✅ 문서 생명주기 가시화: 상태별 통계로 현황 파악
+- ✅ 불완전한 문서 방지: active 상태는 80% 이상 완성도 요구
+
+### ✅ Unused Document Detection (v0.10.0) - NEW! 🔥
+
+**미사용 및 오래된 문서를 자동 탐지하고 정리 제안**
+
+문서 저장소를 정기적으로 스캔하여 사용되지 않거나 오래된 문서를 찾아내고, 적절한 조치를 제안합니다.
+
+**탐지 조건**:
+```typescript
+1. Stale Draft (90일 이상 draft 상태 + 참조 0개)
+   → Action: delete
+
+2. Deprecated 후 오래된 문서 (90일 이상 deprecated)
+   → Action: archive
+
+3. 참조 및 코드 연결이 없는 문서 (orphaned)
+   → Action: review 또는 delete
+
+4. Review 상태로 오래 방치 (60일 이상 review 상태)
+   → Action: review
+
+5. 코드 연결이 없는 기술 명세서
+   → Action: complete (코드 참조 추가 필요)
+```
+
+**사용법**:
+```bash
+# 미사용 문서 탐지
+tsdoc-edge find-unused-docs managed/
+
+# 출력:
+# Summary
+# Total unused/stale documents: 3
+# Average days since modified: 127
+#
+# By Reason:
+#   stale-draft: 2
+#   no-code-connections: 1
+#
+# By Suggested Action:
+#   delete: 2
+#   complete: 1
+#
+# Suggested: Delete
+# 🗑️  managed/drafts/old-idea.md
+#    Last modified: 2024-07-15 (142 days ago)
+#    References: 0 | Code connections: 0
+#    Reason: stale-draft
+#
+# Suggested: Complete
+# ✏️  managed/features/api-design.md
+#    Last modified: 2024-10-01 (33 days ago)
+#    References: 3 | Code connections: 0
+#    Reason: no-code-connections
+#
+# Recommended Actions:
+# 1. Delete stale drafts:
+#    rm managed/drafts/old-idea.md managed/drafts/abandoned.md
+#
+# 2. Review and complete or delete stale documents
+```
+
+**CI/CD 통합**:
+```yaml
+# .github/workflows/docs.yml
+- name: Check for Unused Documents
+  run: tsdoc-edge find-unused-docs managed/
+  # Exit code 1 if unused docs found
+  continue-on-error: true  # 경고만 표시
+```
+
+**주요 효과**:
+- ✅ 자동 정리: 오래된 draft 및 deprecated 문서 자동 식별
+- ✅ 저장소 청결 유지: 사용되지 않는 문서 제거로 검색 품질 향상
+- ✅ 생명주기 관리: 상태별 체류 시간 추적 및 경고
+- ✅ 코드 연결 강제: 기술 명세서의 코드 참조 누락 감지
+- ✅ 참조 기반 탐지: 다른 문서에서 참조되지 않는 orphan 문서 식별
+- ✅ 액션 자동 제안: delete/archive/review/complete 구체적 조치 제시
 
 ### ✅ Core Engine (v0.1.0 - v0.3.0)
 
@@ -405,9 +810,14 @@ tsdoc-edge who-uses <name>       # 심볼 사용처 검색
 tsdoc-edge index-docs docs       # [[]] 심볼 인덱싱
 tsdoc-edge validate-docs         # SSOT 검증
 tsdoc-edge update-backlinks      # 백링크 생성
+tsdoc-edge update-symbol-refs    # 심볼 참조 footnote 생성 🔥
+tsdoc-edge validate-spec         # 명세서 완성도 검증 🔥
+tsdoc-edge check-duplicates      # 중복 콘텐츠 감지 🔥
+tsdoc-edge spec-status stats     # 명세서 상태 워크플로우 🔥
+tsdoc-edge find-unused-docs      # 미사용/오래된 문서 탐지 🔥
 ```
 
-**전체 명령어 가이드**: [docs/CLI_WORKFLOWS_AND_SCENARIOS.md](./docs/CLI_WORKFLOWS_AND_SCENARIOS.md) 🔥
+**전체 명령어 가이드**: [archive/deprecated/CLI_WORKFLOWS_AND_SCENARIOS.md](./archive/deprecated/CLI_WORKFLOWS_AND_SCENARIOS.md) 🔥
 
 ### 4. 실전 워크플로우
 
@@ -492,7 +902,7 @@ jobs:
           fi
 ```
 
-**더 많은 CI/CD 템플릿** (GitLab CI, Jenkins, CircleCI): [docs/CLI_WORKFLOWS_AND_SCENARIOS.md#cicd-통합-템플릿](./docs/CLI_WORKFLOWS_AND_SCENARIOS.md#🚀-cicd-통합-템플릿)
+**더 많은 CI/CD 템플릿** (GitLab CI, Jenkins, CircleCI): [archive/deprecated/CLI_WORKFLOWS_AND_SCENARIOS.md#cicd-통합-템플릿](./archive/deprecated/CLI_WORKFLOWS_AND_SCENARIOS.md#🚀-cicd-통합-템플릿)
 
 ---
 
@@ -658,7 +1068,7 @@ const mdGenerator = new EnhancedMarkdownGenerator();
 const markdown = mdGenerator.generateDocument(symbol, doc);
 
 // 4. SQLite + JSONL 저장
-const db = new DatabaseManager('.tsdoc.db', './docs/data');
+const db = new DatabaseManager('.tsdoc.db', './data');
 db.insertSymbol(symbol, 0);
 db.insertEnhancedDoc(doc, 0);
 
@@ -671,7 +1081,7 @@ console.log(`📦 Exported: ${exportPath}`);
 
 ### CLI 가이드 (권장)
 
-- **🚀 CLI 워크플로우 & 시나리오**: [docs/CLI_WORKFLOWS_AND_SCENARIOS.md](./docs/CLI_WORKFLOWS_AND_SCENARIOS.md) 🔥 **필독!**
+- **🚀 CLI 워크플로우 & 시나리오**: [archive/deprecated/CLI_WORKFLOWS_AND_SCENARIOS.md](./archive/deprecated/CLI_WORKFLOWS_AND_SCENARIOS.md) 🔥
   - **29개 전체 명령어** 상세 설명
   - **명령어 참조 테이블** (DB 필요 여부, 실행 시간, 출력 파일)
   - **10개 실전 사용 예시** (실제 출력 결과 포함)
@@ -684,13 +1094,13 @@ console.log(`📦 Exported: ${exportPath}`);
   - **CI/CD 통합 템플릿** (GitHub Actions, GitLab CI, Jenkins, CircleCI)
   - 총 2,750+ 라인의 완전한 가이드
 
-- **⚙️ Configuration System**: [docs/CONFIG_GUIDE.md](./docs/CONFIG_GUIDE.md)
+- **⚙️ Configuration System**: [archive/guides/CONFIG_GUIDE.md](./archive/guides/CONFIG_GUIDE.md)
   - `.tsdoc.config.json` 완벽 가이드
   - 경로 커스터마이징
   - 환경별 설정 분리
   - 프로그래밍 방식 사용
 
-- **🔧 CLI 고급 기능**: [docs/CLI_ADVANCED_FEATURES.md](./docs/CLI_ADVANCED_FEATURES.md)
+- **🔧 CLI 고급 기능**: [reference/CLI_ADVANCED_FEATURES.md](./reference/CLI_ADVANCED_FEATURES.md)
   - 필터링 옵션
   - 출력 포맷
   - 고급 검색
@@ -702,35 +1112,35 @@ console.log(`📦 Exported: ${exportPath}`);
 
 ### 핵심 기능 가이드
 
-- **📖 [[문서 심볼]] 시스템**: [docs/DOCUMENT_SYMBOL_DESIGN.md](./docs/DOCUMENT_SYMBOL_DESIGN.md)
+- **📖 [[문서 심볼]] 시스템**: [archive/design/DOCUMENT_SYMBOL_DESIGN.md](./archive/design/DOCUMENT_SYMBOL_DESIGN.md)
   - Wiki 스타일 문서 심볼 정의
   - 코드-문서 양방향 연결
   - Backlink 자동 생성
   - SSOT 검증 및 문서 기반 드리븐
 
-- **🔍 의존성 분석**: [docs/DEPENDENCY_ANALYSIS_GUIDE.md](./docs/DEPENDENCY_ANALYSIS_GUIDE.md)
+- **🔍 의존성 분석**: [archive/guides/DEPENDENCY_ANALYSIS_GUIDE.md](./archive/guides/DEPENDENCY_ANALYSIS_GUIDE.md)
   - 버그 수정 전 영향 범위 파악
   - 리팩토링 계획 수립
   - PR 리뷰용 문서 생성
   - 실전 시나리오 통합
 
-- **📂 Fold/Unfold System**: [docs/FOLD_UNFOLD_GUIDE.md](./docs/FOLD_UNFOLD_GUIDE.md)
+- **📂 Fold/Unfold System**: [archive/guides/FOLD_UNFOLD_GUIDE.md](./archive/guides/FOLD_UNFOLD_GUIDE.md)
   - 주석 접기/펼치기 완벽 가이드
   - 팀 협업 워크플로우
   - 실전 예제 코드
 
-- **🔄 자동 인덱싱**: [docs/AUTO_INDEXING_GUIDE.md](./docs/AUTO_INDEXING_GUIDE.md)
+- **🔄 자동 인덱싱**: [managed/features/auto-indexing.md](./managed/features/auto-indexing.md)
   - 파일 저장 시 자동 인덱스 업데이트
   - Git Hook, VSCode Task, GitHub Actions
   - 증분 업데이트로 빠른 성능
 
 ### 레퍼런스
 
-- **TSDoc 컨벤션**: [docs/tsdoc-conventions/](./docs/tsdoc-conventions/)
+- **TSDoc 컨벤션**: [reference/tsdoc-conventions/](./reference/tsdoc-conventions/)
   - 7가지 필수/권장 규칙
   - 각 규칙마다 명확한 예시와 이유 제공
 
-- **TSDoc 스펙 지원**: [docs/TSDOC_SPEC_SUPPORT.md](./docs/TSDOC_SPEC_SUPPORT.md)
+- **TSDoc 스펙 지원**: [reference/TSDOC_SPEC_SUPPORT.md](./reference/TSDOC_SPEC_SUPPORT.md)
   - 지원하는 전체 TSDoc 태그 (35개)
   - 파싱 테스트 코드 및 결과
   - 커스텀 태그 추가 방법

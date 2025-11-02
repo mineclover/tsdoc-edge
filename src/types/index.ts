@@ -41,3 +41,5 @@ export * from './registry';
 export * from './state';
 // TSDoc tag types - base and enhanced
 export * from './tags';
+// Specification types - spec management
+export * from './spec';

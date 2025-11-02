@@ -1,10 +1,11 @@
 {
   "project": {
-    "name": "tsdoc-edge",
-    "version": "0.1.0",
+    "name": "tsdoc-edge-test",
+    "version": "1.0.0",
     "rootDir": ".",
-    "srcDirs": ["src"],
-    "entryPoints": ["src/index.ts"]
+    "srcDirs": [
+      "src"
+    ]
   },
   "paths": {
     "commentsDir": ".tsdoc-comments",
@@ -15,7 +16,7 @@
   "fold": {
     "enabled": true,
     "autoExport": false,
-    "excludePatterns": ["**/node_modules/**", "**/dist/**", "**/demo/**", "**/__tests__/**"]
+    "excludePatterns": []
   },
   "validation": {
     "strictMode": false,
@@ -27,17 +28,5 @@
     "includePrivate": false,
     "includeInternal": false
   },
-  "linkCheck": {
-    "checkTypes": ["dependency", "relatedProblem", "symbol", "file"],
-    "externalModules": [
-      "fs", "path", "typescript",
-      "node:*",
-      "@types/*",
-      "eslint", "jest", "prettier"
-    ],
-    "excludePatterns": [],
-    "enableSuggestions": true,
-    "maxSuggestionDistance": 3,
-    "failOnBroken": false
-  }
+  "preCommit": {}
 }

@@ -30,6 +30,12 @@ import { BacklinkGenerator } from './doc-symbol/BacklinkGenerator';
 import { DocumentSymbolParser } from './doc-symbol/DocumentSymbolParser';
 import { DocumentSymbolRegistry } from './doc-symbol/DocumentSymbolRegistry';
 import { TSDocSymbolParser } from './doc-symbol/TSDocSymbolParser';
+import { SymbolReferenceGenerator } from './doc-symbol/SymbolReferenceGenerator';
+import type { ParsedDocSymbols } from './types/feature';
+import { SpecCompletenessValidator } from './spec/SpecCompletenessValidator';
+import { SpecContentSimilarityChecker } from './spec/SpecContentSimilarityChecker';
+import { SpecStatusManager } from './spec/SpecStatusManager';
+import { UnusedDocumentDetector } from './spec/UnusedDocumentDetector';
 
 // Database row types
 /**
@@ -2912,6 +2918,14 @@ function printIndexDocs(): void {
     const parser = new DocumentSymbolParser();
     try {
       const parsed = parser.parse(targetPath);
+
+      if (!parsed) {
+        console.log(
+          `${colors.yellow}⚠ Skipped ${path.basename(targetPath)} (not a managed document)${colors.reset}`
+        );
+        return;
+      }
+
       registry.registerDocument(parsed);
       console.log(
         `${colors.green}✅ Updated symbols from ${path.basename(targetPath)}${colors.reset}`
@@ -3003,6 +3017,12 @@ function printIndexDocs(): void {
   for (const filePath of markdownFiles) {
     try {
       const parsed = parser.parse(filePath);
+
+      if (!parsed) {
+        // Skip non-managed documents
+        continue;
+      }
+
       registry.registerDocument(parsed);
 
       if (parsed.primary) totalPrimary++;
@@ -3124,7 +3144,9 @@ function printValidateDocs(): void {
   for (const filePath of markdownFiles) {
     try {
       const parsed = parser.parse(filePath);
-      registry.registerDocument(parsed);
+      if (parsed) {
+        registry.registerDocument(parsed);
+      }
     } catch (error) {
       // Errors will be shown in validation
     }
@@ -3231,7 +3253,9 @@ function printUpdateBacklinks(): void {
   for (const filePath of markdownFiles) {
     try {
       const parsed = parser.parse(filePath);
-      registry.registerDocument(parsed);
+      if (parsed) {
+        registry.registerDocument(parsed);
+      }
     } catch (error) {
       console.log(
         `${colors.red}Error parsing ${filePath}: ${error instanceof Error ? error.message : String(error)}${colors.reset}`
@@ -3298,6 +3322,801 @@ function printUpdateBacklinks(): void {
 }
 
 /**
+ * Update symbol references in documents
+ */
+function printUpdateSymbolRefs(): void {
+  const target = process.argv[3]; // Optional: specific file or directory
+  const docsDir = target || 'managed';
+  const docsPath = path.resolve(process.cwd(), docsDir);
+
+  if (!fs.existsSync(docsPath)) {
+    console.log(`${colors.red}❌ Path not found: ${docsPath}${colors.reset}`);
+    process.exit(1);
+  }
+
+  printHeader('Updating Symbol References');
+
+  // Check if symbol registry exists
+  const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
+  if (!fs.existsSync(registryPath)) {
+    console.log(
+      `${colors.yellow}⚠️  No symbol registry found. Run "tsdoc-edge id new" first.${colors.reset}`
+    );
+    console.log();
+    process.exit(1);
+  }
+
+  // Find all markdown files
+  const findMarkdownFiles = (dir: string): string[] => {
+    const files: string[] = [];
+    const stat = fs.statSync(dir);
+
+    if (stat.isFile()) {
+      return [dir];
+    }
+
+    const entries = fs.readdirSync(dir);
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry);
+      const entryStat = fs.statSync(fullPath);
+
+      if (entryStat.isDirectory()) {
+        files.push(...findMarkdownFiles(fullPath));
+      } else if (entry.endsWith('.md') || entry.endsWith('.mdx')) {
+        files.push(fullPath);
+      }
+    }
+
+    return files;
+  };
+
+  const markdownFiles = findMarkdownFiles(docsPath);
+  const parser = new DocumentSymbolParser();
+  const registryManager = new SymbolRegistryManager(registryPath);
+  const generator = new SymbolReferenceGenerator(registryManager);
+
+  // Parse all documents
+  const parsedDocs: ParsedDocSymbols[] = [];
+  for (const filePath of markdownFiles) {
+    try {
+      const parsed = parser.parse(filePath);
+      if (parsed && parsed.symbolFootnoteRefs.length > 0) {
+        parsedDocs.push(parsed);
+      }
+    } catch (error) {
+      console.log(
+        `${colors.red}Error parsing ${filePath}: ${error instanceof Error ? error.message : String(error)}${colors.reset}`
+      );
+    }
+  }
+
+  if (parsedDocs.length === 0) {
+    console.log(`${colors.yellow}No symbol footnote references found${colors.reset}`);
+    console.log();
+    return;
+  }
+
+  // Update documents
+  const result = generator.batchUpdate(parsedDocs);
+
+  // Print results
+  if (result.updated > 0) {
+    printSection('Updated');
+    for (const parsed of parsedDocs) {
+      const refCount = parsed.symbolFootnoteRefs.length;
+      const uniqueRefs = new Set(parsed.symbolFootnoteRefs.map((r) => r.identifier)).size;
+      console.log(
+        `${colors.green}✅${colors.reset} ${parsed.filePath} (${colors.cyan}${uniqueRefs}${colors.reset} refs)`
+      );
+    }
+    console.log();
+  }
+
+  if (result.errors.length > 0) {
+    printSection('Errors');
+    for (const error of result.errors) {
+      console.log(`${colors.red}❌ ${error.file}${colors.reset}`);
+      console.log(`   ${error.error}`);
+    }
+    console.log();
+  }
+
+  // Check for unresolved references
+  let totalUnresolved = 0;
+  for (const parsed of parsedDocs) {
+    const unresolved = generator.getUnresolved(parsed);
+    if (unresolved.length > 0) {
+      if (totalUnresolved === 0) {
+        printSection('Unresolved References');
+      }
+      console.log(`${colors.yellow}⚠️  ${parsed.filePath}${colors.reset}`);
+      for (const u of unresolved) {
+        console.log(`   Line ${u.line}: [^${u.identifier}]`);
+      }
+      totalUnresolved += unresolved.length;
+    }
+  }
+
+  if (totalUnresolved > 0) {
+    console.log();
+  }
+
+  // Summary
+  console.log(
+    `${colors.green}Total: ${result.updated} documents updated${colors.reset}`
+  );
+  if (result.skipped > 0) {
+    console.log(`${colors.yellow}Skipped: ${result.skipped}${colors.reset}`);
+  }
+  if (totalUnresolved > 0) {
+    console.log(
+      `${colors.yellow}Unresolved: ${totalUnresolved} references${colors.reset}`
+    );
+  }
+  console.log();
+}
+
+/**
+ * Check for duplicate content across specifications
+ */
+function printCheckDuplicates(): void {
+  const target = process.argv[3]; // Optional: specific file or directory
+  const docsDir = target || 'managed';
+  const docsPath = path.resolve(process.cwd(), docsDir);
+
+  if (!fs.existsSync(docsPath)) {
+    console.log(`${colors.red}❌ Path not found: ${docsPath}${colors.reset}`);
+    process.exit(1);
+  }
+
+  printHeader('Checking Content Similarity');
+
+  // Find all markdown files
+  const findMarkdownFiles = (dir: string): string[] => {
+    const files: string[] = [];
+    const stat = fs.statSync(dir);
+
+    if (stat.isFile()) {
+      return [dir];
+    }
+
+    const entries = fs.readdirSync(dir);
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry);
+      const entryStat = fs.statSync(fullPath);
+
+      if (entryStat.isDirectory()) {
+        files.push(...findMarkdownFiles(fullPath));
+      } else if (entry.endsWith('.md') || entry.endsWith('.mdx')) {
+        files.push(fullPath);
+      }
+    }
+
+    return files;
+  };
+
+  const markdownFiles = findMarkdownFiles(docsPath);
+
+  if (markdownFiles.length === 0) {
+    console.log(`${colors.yellow}No markdown files found${colors.reset}`);
+    console.log();
+    return;
+  }
+
+  if (markdownFiles.length < 2) {
+    console.log(`${colors.yellow}Need at least 2 files to check for duplicates${colors.reset}`);
+    console.log();
+    return;
+  }
+
+  const checker = new SpecContentSimilarityChecker();
+  const results = checker.checkMultiple(markdownFiles);
+  const summary = checker.getSummary(results);
+
+  // Print summary
+  printSection('Summary');
+  console.log(`Total documents: ${colors.cyan}${markdownFiles.length}${colors.reset}`);
+  console.log(`Pairs analyzed: ${colors.cyan}${(markdownFiles.length * (markdownFiles.length - 1)) / 2}${colors.reset}`);
+  console.log(`Similar pairs found: ${colors.cyan}${summary.totalPairs}${colors.reset}`);
+  console.log(`Average similarity: ${colors.cyan}${(summary.averageSimilarity * 100).toFixed(1)}%${colors.reset}`);
+  console.log();
+  console.log(`${colors.bold}Suggestions:${colors.reset}`);
+  console.log(`  Merge: ${colors.red}${summary.mergeSuggestions}${colors.reset}`);
+  console.log(`  Cross-reference: ${colors.yellow}${summary.crossRefSuggestions}${colors.reset}`);
+  console.log(`  Keep separate: ${colors.green}${summary.keepSeparate}${colors.reset}`);
+  console.log();
+
+  if (results.length === 0) {
+    console.log(`${colors.green}✅ No significant content similarity detected${colors.reset}`);
+    console.log();
+    return;
+  }
+
+  // Print merge suggestions
+  const mergeSuggestions = results.filter((r) => r.suggestion === 'merge');
+  if (mergeSuggestions.length > 0) {
+    printSection('Merge Suggestions (High Similarity)');
+    for (const result of mergeSuggestions) {
+      console.log(`${colors.red}🔴${colors.reset} ${colors.bold}Similarity: ${(result.similarity * 100).toFixed(1)}%${colors.reset}`);
+      console.log(`   File 1: ${result.file1}`);
+      console.log(`   File 2: ${result.file2}`);
+      console.log(`   ${colors.dim}${result.reason}${colors.reset}`);
+
+      if (result.overlappingSections.length > 0) {
+        console.log(`   ${colors.bold}Overlapping sections:${colors.reset}`);
+        for (const section of result.overlappingSections) {
+          console.log(`     - ${section.section} (${(section.similarity * 100).toFixed(1)}%)`);
+        }
+      }
+      console.log();
+    }
+  }
+
+  // Print cross-reference suggestions
+  const crossRefSuggestions = results.filter((r) => r.suggestion === 'cross-reference');
+  if (crossRefSuggestions.length > 0) {
+    printSection('Cross-Reference Suggestions (Moderate Similarity)');
+    for (const result of crossRefSuggestions) {
+      console.log(`${colors.yellow}🟡${colors.reset} ${colors.bold}Similarity: ${(result.similarity * 100).toFixed(1)}%${colors.reset}`);
+      console.log(`   File 1: ${result.file1}`);
+      console.log(`   File 2: ${result.file2}`);
+      console.log(`   ${colors.dim}${result.reason}${colors.reset}`);
+
+      if (result.overlappingSections.length > 0) {
+        console.log(`   ${colors.bold}Overlapping sections:${colors.reset}`);
+        for (const section of result.overlappingSections) {
+          console.log(`     - ${section.section} (${(section.similarity * 100).toFixed(1)}%)`);
+        }
+      }
+      console.log();
+    }
+  }
+
+  // Print keep-separate
+  const keepSeparate = results.filter((r) => r.suggestion === 'keep-separate');
+  if (keepSeparate.length > 0) {
+    printSection('Keep Separate (Low Similarity)');
+    for (const result of keepSeparate) {
+      console.log(`${colors.green}🟢${colors.reset} ${colors.bold}Similarity: ${(result.similarity * 100).toFixed(1)}%${colors.reset}`);
+      console.log(`   File 1: ${result.file1}`);
+      console.log(`   File 2: ${result.file2}`);
+      console.log(`   ${colors.dim}${result.reason}${colors.reset}`);
+      console.log();
+    }
+  }
+
+  // Exit with warning if merge suggestions exist
+  if (mergeSuggestions.length > 0) {
+    console.log(`${colors.yellow}⚠️  Found ${mergeSuggestions.length} pair(s) with high similarity that should be merged${colors.reset}`);
+    process.exit(1);
+  }
+}
+
+/**
+ * Find unused and stale documents
+ */
+function printFindUnusedDocs(): void {
+  const target = process.argv[3];
+  const dir = target || 'managed';
+  const dirPath = path.resolve(process.cwd(), dir);
+
+  if (!fs.existsSync(dirPath)) {
+    console.log(`${colors.red}❌ Directory not found: ${dirPath}${colors.reset}`);
+    process.exit(1);
+  }
+
+  printHeader('Finding Unused Documents');
+
+  const detector = new UnusedDocumentDetector();
+  const results = detector.detect(dirPath);
+  const summary = detector.getSummary(results);
+
+  // Print summary
+  printSection('Summary');
+  console.log(`Total unused/stale documents: ${colors.cyan}${summary.total}${colors.reset}`);
+
+  if (summary.total === 0) {
+    console.log(`${colors.green}✅ No unused or stale documents found${colors.reset}`);
+    console.log();
+    return;
+  }
+
+  console.log(`Average days since modified: ${colors.cyan}${summary.averageDaysSinceModified}${colors.reset}`);
+  console.log();
+
+  console.log(`${colors.bold}By Reason:${colors.reset}`);
+  for (const [reason, count] of Object.entries(summary.byReason)) {
+    console.log(`  ${reason}: ${count}`);
+  }
+  console.log();
+
+  console.log(`${colors.bold}By Suggested Action:${colors.reset}`);
+  for (const [action, count] of Object.entries(summary.byAction)) {
+    const actionColor =
+      action === 'delete'
+        ? colors.red
+        : action === 'archive'
+        ? colors.yellow
+        : colors.blue;
+    console.log(`  ${actionColor}${action}${colors.reset}: ${count}`);
+  }
+  console.log();
+
+  // Group by suggested action
+  const byAction: Record<string, typeof results> = {
+    delete: [],
+    archive: [],
+    review: [],
+    complete: [],
+  };
+
+  for (const result of results) {
+    byAction[result.suggestedAction].push(result);
+  }
+
+  // Print delete suggestions
+  if (byAction.delete.length > 0) {
+    printSection('Suggested: Delete');
+    console.log(`${colors.dim}These documents are stale drafts with no references${colors.reset}`);
+    console.log();
+
+    for (const doc of byAction.delete) {
+      console.log(`${colors.red}🗑️  ${colors.reset}${doc.filePath}`);
+      console.log(`   Last modified: ${doc.lastModified} (${doc.daysSinceModified} days ago)`);
+      console.log(`   References: ${doc.referenceCount} | Code connections: ${doc.codeConnectionCount}`);
+      console.log(`   ${colors.dim}Reason: ${doc.reason}${colors.reset}`);
+      console.log();
+    }
+  }
+
+  // Print archive suggestions
+  if (byAction.archive.length > 0) {
+    printSection('Suggested: Archive');
+    console.log(`${colors.dim}These documents should be moved to archive/${colors.reset}`);
+    console.log();
+
+    for (const doc of byAction.archive) {
+      console.log(`${colors.yellow}📦${colors.reset} ${doc.filePath}`);
+      console.log(`   Last modified: ${doc.lastModified} (${doc.daysSinceModified} days ago)`);
+      console.log(`   References: ${doc.referenceCount} | Code connections: ${doc.codeConnectionCount}`);
+      console.log(`   ${colors.dim}Reason: ${doc.reason}${colors.reset}`);
+      console.log();
+    }
+  }
+
+  // Print review suggestions
+  if (byAction.review.length > 0) {
+    printSection('Suggested: Review');
+    console.log(`${colors.dim}These documents need attention${colors.reset}`);
+    console.log();
+
+    for (const doc of byAction.review) {
+      console.log(`${colors.blue}🔍${colors.reset} ${doc.filePath}`);
+      console.log(`   Last modified: ${doc.lastModified} (${doc.daysSinceModified} days ago)`);
+      console.log(`   References: ${doc.referenceCount} | Code connections: ${doc.codeConnectionCount}`);
+      console.log(`   ${colors.dim}Reason: ${doc.reason}${colors.reset}`);
+      console.log();
+    }
+  }
+
+  // Print complete suggestions
+  if (byAction.complete.length > 0) {
+    printSection('Suggested: Complete');
+    console.log(`${colors.dim}These documents should add code connections${colors.reset}`);
+    console.log();
+
+    for (const doc of byAction.complete) {
+      console.log(`${colors.cyan}✏️${colors.reset}  ${doc.filePath}`);
+      console.log(`   Last modified: ${doc.lastModified} (${doc.daysSinceModified} days ago)`);
+      console.log(`   References: ${doc.referenceCount} | Code connections: ${doc.codeConnectionCount}`);
+      console.log(`   ${colors.dim}Reason: ${doc.reason}${colors.reset}`);
+      console.log();
+    }
+  }
+
+  // Print action recommendations
+  printSection('Recommended Actions');
+  console.log(`1. ${colors.red}Delete${colors.reset} stale drafts:`);
+  console.log(`   ${colors.dim}rm ${byAction.delete.map((d) => d.filePath).join(' ')}${colors.reset}`);
+  console.log();
+
+  if (byAction.archive.length > 0) {
+    console.log(`2. ${colors.yellow}Archive${colors.reset} deprecated documents:`);
+    console.log(`   ${colors.dim}mkdir -p archive/ && mv <file> archive/${colors.reset}`);
+    console.log();
+  }
+
+  if (byAction.review.length > 0) {
+    console.log(`3. ${colors.blue}Review${colors.reset} and complete or delete stale documents`);
+    console.log();
+  }
+
+  // Exit with warning if there are unused docs
+  if (summary.total > 0) {
+    process.exit(1);
+  }
+}
+
+/**
+ * Manage specification status workflow
+ */
+function printSpecStatus(): void {
+  const subcommand = process.argv[3]; // show, promote, list-ready
+  const target = process.argv[4];
+
+  if (!subcommand) {
+    console.log(`${colors.red}Usage:${colors.reset}`);
+    console.log(`  tsdoc-edge spec-status show <file>           - Show current status and allowed transitions`);
+    console.log(`  tsdoc-edge spec-status promote <file> <status> - Promote document to new status`);
+    console.log(`  tsdoc-edge spec-status list-ready [dir]      - List documents ready for promotion`);
+    console.log(`  tsdoc-edge spec-status stats [dir]           - Show status distribution`);
+    process.exit(1);
+  }
+
+  const manager = new SpecStatusManager();
+
+  // show: Show current status
+  if (subcommand === 'show') {
+    if (!target) {
+      console.log(`${colors.red}Usage: tsdoc-edge spec-status show <file>${colors.reset}`);
+      process.exit(1);
+    }
+
+    const filePath = path.resolve(process.cwd(), target);
+
+    if (!fs.existsSync(filePath)) {
+      console.log(`${colors.red}❌ File not found: ${filePath}${colors.reset}`);
+      process.exit(1);
+    }
+
+    printHeader('Specification Status');
+
+    const content = fs.readFileSync(filePath, 'utf-8');
+    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+
+    let currentStatus: string = 'draft';
+    if (frontmatterMatch) {
+      const statusMatch = frontmatterMatch[1].match(/status:\s*["']?(\w+)["']?/);
+      currentStatus = statusMatch ? statusMatch[1] : 'draft';
+    }
+
+    console.log(`File: ${colors.cyan}${filePath}${colors.reset}`);
+    console.log(`Current status: ${colors.bold}${currentStatus}${colors.reset}`);
+    console.log();
+
+    const allowed = manager.getAllowedTransitions(filePath);
+    console.log(`${colors.bold}Allowed transitions:${colors.reset}`);
+    if (allowed.length === 0) {
+      console.log(`  ${colors.dim}(none - terminal status)${colors.reset}`);
+    } else {
+      for (const status of allowed) {
+        const validation = manager.validateTransition(filePath, status);
+        const icon = validation.valid ? colors.green + '✅' : colors.yellow + '⚠️';
+        console.log(`  ${icon} ${status}${colors.reset}`);
+
+        if (!validation.valid) {
+          for (const check of validation.checks.filter((c) => !c.passed)) {
+            console.log(`     ${colors.dim}${check.message}${colors.reset}`);
+          }
+        }
+      }
+    }
+    console.log();
+  }
+
+  // promote: Promote to new status
+  else if (subcommand === 'promote') {
+    const newStatus = process.argv[5];
+
+    if (!target || !newStatus) {
+      console.log(`${colors.red}Usage: tsdoc-edge spec-status promote <file> <status>${colors.reset}`);
+      console.log(`Valid statuses: draft, review, approved, active, deprecated, archived`);
+      process.exit(1);
+    }
+
+    const filePath = path.resolve(process.cwd(), target);
+
+    if (!fs.existsSync(filePath)) {
+      console.log(`${colors.red}❌ File not found: ${filePath}${colors.reset}`);
+      process.exit(1);
+    }
+
+    printHeader('Promoting Specification');
+
+    console.log(`File: ${colors.cyan}${filePath}${colors.reset}`);
+    console.log(`Target status: ${colors.bold}${newStatus}${colors.reset}`);
+    console.log();
+
+    const validation = manager.validateTransition(filePath, newStatus as any);
+
+    printSection('Validation Checks');
+    for (const check of validation.checks) {
+      const icon = check.passed ? colors.green + '✅' : colors.red + '❌';
+      console.log(`${icon} ${check.name}${colors.reset}`);
+      console.log(`   ${colors.dim}${check.message}${colors.reset}`);
+    }
+    console.log();
+
+    if (!validation.valid) {
+      console.log(`${colors.red}❌ Cannot promote: validation failed${colors.reset}`);
+      process.exit(1);
+    }
+
+    // Apply transition
+    try {
+      manager.applyTransition(filePath, newStatus as any);
+      console.log(`${colors.green}✅ Successfully promoted to "${newStatus}"${colors.reset}`);
+    } catch (error) {
+      console.log(`${colors.red}❌ Error: ${(error as Error).message}${colors.reset}`);
+      process.exit(1);
+    }
+  }
+
+  // list-ready: List documents ready for promotion
+  else if (subcommand === 'list-ready') {
+    const dir = target || 'managed';
+    const dirPath = path.resolve(process.cwd(), dir);
+
+    if (!fs.existsSync(dirPath)) {
+      console.log(`${colors.red}❌ Directory not found: ${dirPath}${colors.reset}`);
+      process.exit(1);
+    }
+
+    printHeader('Documents Ready for Promotion');
+
+    // Find all markdown files
+    const findMarkdownFiles = (dir: string): string[] => {
+      const files: string[] = [];
+      const stat = fs.statSync(dir);
+
+      if (stat.isFile()) {
+        return [dir];
+      }
+
+      const entries = fs.readdirSync(dir);
+
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry);
+        const entryStat = fs.statSync(fullPath);
+
+        if (entryStat.isDirectory()) {
+          files.push(...findMarkdownFiles(fullPath));
+        } else if (entry.endsWith('.md') || entry.endsWith('.mdx')) {
+          files.push(fullPath);
+        }
+      }
+
+      return files;
+    };
+
+    const markdownFiles = findMarkdownFiles(dirPath);
+    const promotable = manager.getPromotableDocs(markdownFiles);
+
+    const ready = promotable.filter((p) => p.canPromote);
+    const notReady = promotable.filter((p) => !p.canPromote);
+
+    printSection('Ready for Promotion');
+    if (ready.length === 0) {
+      console.log(`${colors.dim}(no documents ready)${colors.reset}`);
+    } else {
+      for (const doc of ready) {
+        console.log(`${colors.green}✅${colors.reset} ${doc.filePath}`);
+        console.log(`   ${doc.currentStatus} → ${doc.targetStatus}`);
+        console.log(`   ${colors.dim}${doc.reason}${colors.reset}`);
+        console.log();
+      }
+    }
+
+    if (notReady.length > 0) {
+      printSection('Not Ready');
+      for (const doc of notReady) {
+        console.log(`${colors.yellow}⚠️${colors.reset} ${doc.filePath}`);
+        console.log(`   ${doc.currentStatus} → ${doc.targetStatus}`);
+        console.log(`   ${colors.dim}${doc.reason}${colors.reset}`);
+        console.log();
+      }
+    }
+  }
+
+  // stats: Show status distribution
+  else if (subcommand === 'stats') {
+    const dir = target || 'managed';
+    const dirPath = path.resolve(process.cwd(), dir);
+
+    if (!fs.existsSync(dirPath)) {
+      console.log(`${colors.red}❌ Directory not found: ${dirPath}${colors.reset}`);
+      process.exit(1);
+    }
+
+    printHeader('Specification Status Distribution');
+
+    // Find all markdown files
+    const findMarkdownFiles = (dir: string): string[] => {
+      const files: string[] = [];
+      const stat = fs.statSync(dir);
+
+      if (stat.isFile()) {
+        return [dir];
+      }
+
+      const entries = fs.readdirSync(dir);
+
+      for (const entry of entries) {
+        const fullPath = path.join(dir, entry);
+        const entryStat = fs.statSync(fullPath);
+
+        if (entryStat.isDirectory()) {
+          files.push(...findMarkdownFiles(fullPath));
+        } else if (entry.endsWith('.md') || entry.endsWith('.mdx')) {
+          files.push(fullPath);
+        }
+      }
+
+      return files;
+    };
+
+    const markdownFiles = findMarkdownFiles(dirPath);
+    const distribution = manager.getStatusDistribution(markdownFiles);
+
+    printSection('Status Distribution');
+    const total = Object.values(distribution).reduce((sum, count) => sum + count, 0);
+
+    console.log(`Total documents: ${colors.cyan}${total}${colors.reset}`);
+    console.log();
+
+    for (const [status, count] of Object.entries(distribution)) {
+      if (count > 0) {
+        const percentage = ((count / total) * 100).toFixed(1);
+        console.log(`  ${colors.bold}${status}${colors.reset}: ${count} (${percentage}%)`);
+      }
+    }
+    console.log();
+  }
+
+  else {
+    console.log(`${colors.red}Unknown subcommand: ${subcommand}${colors.reset}`);
+    console.log(`Valid subcommands: show, promote, list-ready, stats`);
+    process.exit(1);
+  }
+}
+
+/**
+ * Validate specification completeness
+ */
+function printValidateSpec(): void {
+  const target = process.argv[3]; // Optional: specific file or directory
+  const docsDir = target || 'managed';
+  const docsPath = path.resolve(process.cwd(), docsDir);
+
+  if (!fs.existsSync(docsPath)) {
+    console.log(`${colors.red}❌ Path not found: ${docsPath}${colors.reset}`);
+    process.exit(1);
+  }
+
+  printHeader('Validating Specification Completeness');
+
+  // Find all markdown files
+  const findMarkdownFiles = (dir: string): string[] => {
+    const files: string[] = [];
+    const stat = fs.statSync(dir);
+
+    if (stat.isFile()) {
+      return [dir];
+    }
+
+    const entries = fs.readdirSync(dir);
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry);
+      const entryStat = fs.statSync(fullPath);
+
+      if (entryStat.isDirectory()) {
+        files.push(...findMarkdownFiles(fullPath));
+      } else if (entry.endsWith('.md') || entry.endsWith('.mdx')) {
+        files.push(fullPath);
+      }
+    }
+
+    return files;
+  };
+
+  const markdownFiles = findMarkdownFiles(docsPath);
+
+  if (markdownFiles.length === 0) {
+    console.log(`${colors.yellow}No markdown files found${colors.reset}`);
+    console.log();
+    return;
+  }
+
+  const validator = new SpecCompletenessValidator();
+  const results = validator.validateMultiple(markdownFiles);
+  const summary = validator.getSummary(results);
+
+  // Print summary
+  printSection('Summary');
+  console.log(`Total specifications: ${colors.cyan}${summary.total}${colors.reset}`);
+  console.log(`Complete: ${colors.green}${summary.complete}${colors.reset}`);
+  console.log(`Incomplete: ${colors.yellow}${summary.incomplete}${colors.reset}`);
+  console.log(`Average score: ${colors.cyan}${summary.averageScore}%${colors.reset}`);
+  console.log(`Total issues: ${summary.totalIssues > 0 ? colors.yellow : colors.green}${summary.totalIssues}${colors.reset}`);
+  console.log();
+
+  // Print complete specs
+  const completeSpecs = results.filter((r) => r.isComplete);
+  if (completeSpecs.length > 0) {
+    printSection('Complete Specifications');
+    for (const result of completeSpecs) {
+      console.log(
+        `${colors.green}✅${colors.reset} ${result.filePath} (${colors.green}${result.score}%${colors.reset})`
+      );
+    }
+    console.log();
+  }
+
+  // Print incomplete specs
+  const incompleteSpecs = results.filter((r) => !r.isComplete);
+  if (incompleteSpecs.length > 0) {
+    printSection('Incomplete Specifications');
+    for (const result of incompleteSpecs) {
+      console.log(
+        `${colors.yellow}⚠️${colors.reset} ${result.filePath} (${colors.yellow}${result.score}%${colors.reset})`
+      );
+
+      // Show breakdown
+      console.log(`   Required sections: ${result.breakdown.requiredSections.score}%`);
+      if (result.breakdown.requiredSections.missing.length > 0) {
+        console.log(
+          `     Missing: ${result.breakdown.requiredSections.missing.join(', ')}`
+        );
+      }
+
+      if (result.breakdown.scenarios.count < result.breakdown.scenarios.required) {
+        console.log(
+          `   Scenarios: ${result.breakdown.scenarios.count}/${result.breakdown.scenarios.required}`
+        );
+      }
+
+      if (result.breakdown.codeReferences.count < result.breakdown.codeReferences.required) {
+        console.log(
+          `   Code references: ${result.breakdown.codeReferences.count}/${result.breakdown.codeReferences.required}`
+        );
+      }
+
+      if (result.breakdown.examples.count < result.breakdown.examples.required) {
+        console.log(
+          `   Examples: ${result.breakdown.examples.count}/${result.breakdown.examples.required}`
+        );
+      }
+
+      console.log();
+    }
+  }
+
+  // Print detailed issues
+  const specsWithIssues = results.filter((r) => r.issues.length > 0);
+  if (specsWithIssues.length > 0) {
+    printSection('Issues');
+    for (const result of specsWithIssues) {
+      if (result.issues.length > 0) {
+        console.log(`${colors.yellow}${result.filePath}${colors.reset}`);
+        for (const issue of result.issues) {
+          const icon = issue.severity === 'error' ? colors.red + '❌' : colors.yellow + '⚠️';
+          console.log(`  ${icon} ${issue.message}${colors.reset}`);
+        }
+        console.log();
+      }
+    }
+  }
+
+  // Exit with error if any spec is incomplete
+  if (summary.incomplete > 0) {
+    process.exit(1);
+  }
+}
+
+/**
  * Find document symbol
  */
 function printFindDocSymbol(): void {
@@ -3342,7 +4161,9 @@ function printFindDocSymbol(): void {
   for (const filePath of markdownFiles) {
     try {
       const parsed = parser.parse(filePath);
-      registry.registerDocument(parsed);
+      if (parsed) {
+        registry.registerDocument(parsed);
+      }
     } catch (error) {
       // Silent
     }
@@ -4251,6 +5072,21 @@ switch (command) {
     break;
   case 'update-backlinks':
     printUpdateBacklinks();
+    break;
+  case 'update-symbol-refs':
+    printUpdateSymbolRefs();
+    break;
+  case 'validate-spec':
+    printValidateSpec();
+    break;
+  case 'check-duplicates':
+    printCheckDuplicates();
+    break;
+  case 'spec-status':
+    printSpecStatus();
+    break;
+  case 'find-unused-docs':
+    printFindUnusedDocs();
     break;
   case 'find-doc':
     printFindDocSymbol();
