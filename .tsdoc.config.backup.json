@@ -10,8 +10,8 @@
   "paths": {
     "commentsDir": ".tsdoc-comments",
     "databasePath": ".tsdoc.db",
-    "jsonlDir": "data",
-    "outputDir": "output"
+    "jsonlDir": "docs/data",
+    "outputDir": "docs/output"
   },
   "fold": {
     "enabled": true,
@@ -32,12 +32,12 @@
   "documentManagement": {
     "enabled": true,
     "managedDirs": [
-      "managed"
+      "docs/managed"
     ],
     "excludeDirs": [
-      "examples",
-      "archive",
-      "reference"
+      "docs/examples",
+      "docs/templates",
+      "docs/reference"
     ],
     "requireFrontmatter": false,
     "strictMode": false,

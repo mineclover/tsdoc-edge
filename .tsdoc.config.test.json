@@ -32,12 +32,11 @@
   "documentManagement": {
     "enabled": true,
     "managedDirs": [
-      "managed"
+      "managed-test"
     ],
     "excludeDirs": [
       "examples",
-      "archive",
-      "reference"
+      "archive"
     ],
     "requireFrontmatter": false,
     "strictMode": false,

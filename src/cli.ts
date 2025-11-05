@@ -35,7 +35,11 @@ import type { ParsedDocSymbols } from './types/feature';
 import { SpecCompletenessValidator } from './spec/SpecCompletenessValidator';
 import { SpecContentSimilarityChecker } from './spec/SpecContentSimilarityChecker';
 import { SpecStatusManager } from './spec/SpecStatusManager';
+import { SpecVersionManager } from './spec/SpecVersionManager';
 import { UnusedDocumentDetector } from './spec/UnusedDocumentDetector';
+import { ModuleSpecGenerator } from './generator/ModuleSpecGenerator';
+import { ModuleSpecMarkdownFormatter } from './generator/ModuleSpecMarkdownFormatter';
+import type { ModuleSpecResult } from './types/spec/module-spec';
 
 // Database row types
 /**
@@ -653,9 +657,27 @@ function printHelp(): void {
   console.log('  check-links [path]      Check for broken links in enhanced docs (default: src)');
   console.log('  parse <path>            Parse enhanced documentation from TypeScript files');
   console.log('  generate-docs <path> [outdir]  Generate markdown from enhanced docs (default output: ./docs/generated)');
+  console.log('  generate-spec <file> <symbol> [outdir]  Generate 7-part module specification (default output: ./docs/specs)');
+  console.log('  generate-specs-batch <dir> [options]  Generate specs for all public symbols in directory');
+  console.log('    --min-confidence=N    Only generate specs with confidence >= N% (default: 0)');
+  console.log('    --include-private     Include private symbols (default: false)');
+  console.log('    --recursive           Process subdirectories (default: true)');
   console.log('  install-hook            Install git pre-commit hook for documentation checks');
   console.log('  uninstall-hook          Uninstall git pre-commit hook');
   console.log('  help                    Show this help message');
+  console.log();
+  console.log('Specification Management:');
+  console.log('  validate-spec [dir]     Validate specification completeness (default: managed)');
+  console.log('  check-duplicates [dir]  Check for duplicate content across specs (default: managed)');
+  console.log('  spec-status             Manage specification status workflow');
+  console.log('    show <file>           Show current status and allowed transitions');
+  console.log('    promote <file> <status>  Promote document to new status');
+  console.log('    list-ready [dir]      List documents ready for promotion');
+  console.log('    stats [dir]           Show status distribution');
+  console.log('  find-unused-docs [dir]  Find unused and stale documents (default: managed)');
+  console.log('  spec-history <file>     Show version history of a specification');
+  console.log('  spec-diff <file> <v1> <v2>  Compare two versions of a specification');
+  console.log('  spec-bump <file> <type> Bump specification version (major|minor|patch)');
   console.log();
   console.log('Init Options:');
   console.log('  --name=<name>           Project name (default: current directory name)');
@@ -722,6 +744,8 @@ function printHelp(): void {
   console.log('  tsdoc-edge sync-coverage coverage/coverage-final.json');
   console.log('  tsdoc-edge check-links');
   console.log('  tsdoc-edge check-links src');
+  console.log('  tsdoc-edge generate-spec src/analyzer/CodeHealthChecker.ts CodeHealthChecker');
+  console.log('  tsdoc-edge generate-spec src/parser/TSDocParser.ts parseComment ./managed/specs');
   console.log('  tsdoc-edge help');
   console.log();
 }
@@ -4117,6 +4141,159 @@ function printValidateSpec(): void {
 }
 
 /**
+ * Show specification version history
+ */
+function printSpecHistory(): void {
+  const target = process.argv[3];
+
+  if (!target) {
+    console.log(`${colors.red}Usage: tsdoc-edge spec-history <file>${colors.reset}`);
+    process.exit(1);
+  }
+
+  const filePath = path.resolve(process.cwd(), target);
+
+  if (!fs.existsSync(filePath)) {
+    console.log(`${colors.red}❌ File not found: ${filePath}${colors.reset}`);
+    process.exit(1);
+  }
+
+  const manager = new SpecVersionManager();
+  const history = manager.getHistory(filePath);
+
+  if (history.length === 0) {
+    console.log(`${colors.yellow}No version history found${colors.reset}`);
+    console.log();
+    return;
+  }
+
+  printHeader('Specification Version History');
+  console.log(`File: ${colors.cyan}${path.relative(process.cwd(), filePath)}${colors.reset}`);
+  console.log();
+
+  printSection(`${history.length} versions found`);
+
+  for (const entry of history) {
+    console.log(`${colors.green}v${entry.version}${colors.reset} (${entry.date})`);
+    console.log(`  ${colors.dim}Commit:  ${entry.commit}${colors.reset}`);
+    console.log(`  ${colors.dim}Author:  ${entry.author}${colors.reset}`);
+    console.log(`  ${colors.dim}Message: ${entry.message}${colors.reset}`);
+    console.log();
+  }
+}
+
+/**
+ * Compare specification versions
+ */
+function printSpecDiff(): void {
+  const target = process.argv[3];
+  const fromVersion = process.argv[4];
+  const toVersion = process.argv[5];
+
+  if (!target || !fromVersion || !toVersion) {
+    console.log(`${colors.red}Usage: tsdoc-edge spec-diff <file> <from-version> <to-version>${colors.reset}`);
+    console.log(`Example: tsdoc-edge spec-diff managed/features/validation.md 1.0.0 2.0.0`);
+    process.exit(1);
+  }
+
+  const filePath = path.resolve(process.cwd(), target);
+
+  if (!fs.existsSync(filePath)) {
+    console.log(`${colors.red}❌ File not found: ${filePath}${colors.reset}`);
+    process.exit(1);
+  }
+
+  const manager = new SpecVersionManager();
+
+  try {
+    const diff = manager.diff(filePath, fromVersion, toVersion);
+
+    printHeader('Specification Version Comparison');
+    console.log(`File: ${colors.cyan}${path.relative(process.cwd(), filePath)}${colors.reset}`);
+    console.log(`From: ${colors.yellow}v${diff.from}${colors.reset}`);
+    console.log(`To:   ${colors.green}v${diff.to}${colors.reset}`);
+    console.log();
+
+    printSection('Summary');
+    console.log(diff.summary);
+    console.log();
+
+    if (diff.changes.added.length > 0) {
+      printSection('Added Sections');
+      for (const section of diff.changes.added) {
+        console.log(`${colors.green}+ ${section}${colors.reset}`);
+      }
+      console.log();
+    }
+
+    if (diff.changes.removed.length > 0) {
+      printSection('Removed Sections');
+      for (const section of diff.changes.removed) {
+        console.log(`${colors.red}- ${section}${colors.reset}`);
+      }
+      console.log();
+    }
+
+    if (diff.changes.modified.length > 0) {
+      printSection('Modified Content');
+      for (const section of diff.changes.modified) {
+        console.log(`${colors.yellow}~ ${section}${colors.reset}`);
+      }
+      console.log();
+    }
+  } catch (error) {
+    console.log(`${colors.red}❌ Error: ${error instanceof Error ? error.message : String(error)}${colors.reset}`);
+    process.exit(1);
+  }
+}
+
+/**
+ * Bump specification version
+ */
+function printSpecBump(): void {
+  const target = process.argv[3];
+  const bumpType = process.argv[4] as 'major' | 'minor' | 'patch' | undefined;
+
+  if (!target) {
+    console.log(`${colors.red}Usage: tsdoc-edge spec-bump <file> <bump-type>${colors.reset}`);
+    console.log(`Bump types: major, minor, patch`);
+    console.log(`Example: tsdoc-edge spec-bump managed/features/validation.md minor`);
+    process.exit(1);
+  }
+
+  if (!bumpType || !['major', 'minor', 'patch'].includes(bumpType)) {
+    console.log(`${colors.red}Invalid bump type. Use: major, minor, or patch${colors.reset}`);
+    process.exit(1);
+  }
+
+  const filePath = path.resolve(process.cwd(), target);
+
+  if (!fs.existsSync(filePath)) {
+    console.log(`${colors.red}❌ File not found: ${filePath}${colors.reset}`);
+    process.exit(1);
+  }
+
+  const manager = new SpecVersionManager();
+
+  try {
+    const oldVersion = manager.getCurrentVersion(filePath);
+    const newVersion = manager.bump(filePath, bumpType);
+
+    printHeader('Version Bumped');
+    console.log(`File: ${colors.cyan}${path.relative(process.cwd(), filePath)}${colors.reset}`);
+    console.log(`Old version: ${colors.yellow}${oldVersion}${colors.reset}`);
+    console.log(`New version: ${colors.green}${newVersion}${colors.reset}`);
+    console.log(`Bump type:   ${colors.blue}${bumpType}${colors.reset}`);
+    console.log();
+    console.log(`${colors.green}✓${colors.reset} Version updated successfully`);
+    console.log();
+  } catch (error) {
+    console.log(`${colors.red}❌ Error: ${error instanceof Error ? error.message : String(error)}${colors.reset}`);
+    process.exit(1);
+  }
+}
+
+/**
  * Find document symbol
  */
 function printFindDocSymbol(): void {
@@ -4983,6 +5160,297 @@ if (configArgIndex !== -1) {
   }
 }
 
+/**
+ * printGenerateSpec function - Generate 7-part module specification
+ */
+function printGenerateSpec(): void {
+  printHeader('TSDoc Edge - Generate Module Specification');
+
+  const filePath = process.argv[3];
+  const symbolName = process.argv[4];
+  const outputDir = process.argv[5] || './docs/specs';
+
+  if (!filePath || !symbolName) {
+    console.log(`${colors.red}✗ File path and symbol name required${colors.reset}`);
+    console.log();
+    console.log('Usage:');
+    console.log(`${colors.cyan}  tsdoc-edge generate-spec <file> <symbol> [output-dir]${colors.reset}`);
+    console.log();
+    console.log('Arguments:');
+    console.log('  <file>       Path to TypeScript file');
+    console.log('  <symbol>     Name of function/class/interface to document');
+    console.log('  [output-dir] Output directory (default: ./docs/specs)');
+    console.log();
+    console.log('Examples:');
+    console.log(`  tsdoc-edge generate-spec src/analyzer/CodeHealthChecker.ts CodeHealthChecker`);
+    console.log(`  tsdoc-edge generate-spec src/parser/TSDocParser.ts parseComment ./managed/specs`);
+    console.log();
+    console.log('The 7-part specification framework:');
+    console.log('  1. Purpose    - Why this module exists');
+    console.log('  2. Input      - What parameters it accepts');
+    console.log('  3. Output     - What it returns');
+    console.log('  4. Context    - What dependencies it needs');
+    console.log('  5. Logic      - How it works internally');
+    console.log('  6. Effect     - What side effects it produces');
+    console.log('  7. Scope      - What it exposes publicly');
+    console.log();
+    return;
+  }
+
+  const resolvedPath = path.resolve(process.cwd(), filePath);
+  if (!fs.existsSync(resolvedPath)) {
+    console.log(`${colors.red}✗ File not found: ${filePath}${colors.reset}`);
+    console.log();
+    return;
+  }
+
+  console.log(`File: ${colors.cyan}${filePath}${colors.reset}`);
+  console.log(`Symbol: ${colors.cyan}${symbolName}${colors.reset}`);
+  console.log(`Output: ${colors.cyan}${outputDir}${colors.reset}`);
+  console.log();
+
+  try {
+    const generator = new ModuleSpecGenerator({
+      analyzeLogic: true,
+      analyzeSideEffects: true,
+      includeTodos: true,
+    });
+
+    console.log(`${colors.blue}Generating specification...${colors.reset}`);
+    const result: ModuleSpecResult = generator.generateSpec(resolvedPath, symbolName);
+
+    // Show extraction results
+    console.log();
+    console.log(`${colors.green}✓ Specification generated${colors.reset}`);
+    console.log();
+    console.log('Auto-completed sections:');
+    for (const section of result.autoCompleted) {
+      console.log(`  ${colors.green}✓${colors.reset} ${section}`);
+    }
+
+    if (result.manualRequired.length > 0) {
+      console.log();
+      console.log('Manual review needed:');
+      for (const section of result.manualRequired) {
+        console.log(`  ${colors.yellow}⚠${colors.reset} ${section}`);
+      }
+    }
+
+    if (result.warnings.length > 0) {
+      console.log();
+      console.log('Warnings:');
+      for (const warning of result.warnings) {
+        console.log(`  ${colors.yellow}!${colors.reset} ${warning}`);
+      }
+    }
+
+    console.log();
+    console.log(`${colors.bold}Completion Confidence: ${result.confidence}%${colors.reset}`);
+    console.log();
+
+    // Format as markdown
+    const formatter = new ModuleSpecMarkdownFormatter({
+      includeMetadata: true,
+      includeConfidence: true,
+      includeTodos: true,
+      includeToc: true,
+    });
+
+    const markdown = formatter.format(result.spec);
+
+    // Ensure output directory exists
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+
+    // Generate filename
+    const outputFileName = `${result.spec.symbolId}.md`;
+    const outputPath = path.join(outputDir, outputFileName);
+
+    // Write to file
+    fs.writeFileSync(outputPath, markdown, 'utf-8');
+
+    console.log(`${colors.green}✓ Specification saved to: ${colors.cyan}${outputPath}${colors.reset}`);
+    console.log();
+
+    // Show preview
+    console.log(`${colors.dim}Preview:${colors.reset}`);
+    console.log(`${colors.dim}${'='.repeat(60)}${colors.reset}`);
+    const lines = markdown.split('\n');
+    for (let i = 0; i < Math.min(30, lines.length); i++) {
+      console.log(`${colors.dim}${lines[i]}${colors.reset}`);
+    }
+    if (lines.length > 30) {
+      console.log(`${colors.dim}... (${lines.length - 30} more lines)${colors.reset}`);
+    }
+    console.log(`${colors.dim}${'='.repeat(60)}${colors.reset}`);
+    console.log();
+
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.log(`${colors.red}✗ Error: ${error.message}${colors.reset}`);
+    } else {
+      console.log(`${colors.red}✗ Unknown error occurred${colors.reset}`);
+    }
+    console.log();
+    process.exit(1);
+  }
+}
+
+/**
+ * printGenerateSpecsBatch function - Batch generate module specifications
+ */
+function printGenerateSpecsBatch(): void {
+  printHeader('TSDoc Edge - Batch Generate Module Specifications');
+
+  // Parse arguments
+  let dirPath = '';
+  let outputDir = './docs/specs';
+  let minConfidence = 0;
+  let includePrivate = false;
+  let recursive = true;
+
+  for (let i = 3; i < process.argv.length; i++) {
+    const arg = process.argv[i];
+
+    if (arg.startsWith('--min-confidence=')) {
+      minConfidence = Number.parseInt(arg.split('=')[1], 10);
+    } else if (arg === '--include-private') {
+      includePrivate = true;
+    } else if (arg === '--no-recursive') {
+      recursive = false;
+    } else if (!dirPath) {
+      dirPath = arg;
+    } else if (!arg.startsWith('--')) {
+      outputDir = arg;
+    }
+  }
+
+  if (!dirPath || dirPath.startsWith('--')) {
+    console.log(`${colors.red}✗ Directory path required${colors.reset}`);
+    console.log();
+    console.log('Usage:');
+    console.log(`${colors.cyan}  tsdoc-edge generate-specs-batch <dir> [output-dir] [options]${colors.reset}`);
+    console.log();
+    console.log('Arguments:');
+    console.log('  <dir>        Path to source directory');
+    console.log('  [output-dir] Output directory (default: ./docs/specs)');
+    console.log();
+    console.log('Options:');
+    console.log('  --min-confidence=N    Only generate specs with confidence >= N%');
+    console.log('  --include-private     Include private symbols');
+    console.log('  --no-recursive        Do not process subdirectories');
+    console.log();
+    console.log('Examples:');
+    console.log(`  tsdoc-edge generate-specs-batch src`);
+    console.log(`  tsdoc-edge generate-specs-batch src/analyzer --min-confidence=70`);
+    console.log(`  tsdoc-edge generate-specs-batch src --include-private --no-recursive`);
+    console.log();
+    return;
+  }
+
+  const resolvedPath = path.resolve(process.cwd(), dirPath);
+  if (!fs.existsSync(resolvedPath)) {
+    console.log(`${colors.red}✗ Directory not found: ${dirPath}${colors.reset}`);
+    console.log();
+    return;
+  }
+
+  if (!fs.statSync(resolvedPath).isDirectory()) {
+    console.log(`${colors.red}✗ Path is not a directory: ${dirPath}${colors.reset}`);
+    console.log();
+    return;
+  }
+
+  console.log(`Directory: ${colors.cyan}${dirPath}${colors.reset}`);
+  console.log(`Output: ${colors.cyan}${outputDir}${colors.reset}`);
+  console.log(`Min Confidence: ${colors.cyan}${minConfidence}%${colors.reset}`);
+  console.log(`Include Private: ${colors.cyan}${includePrivate}${colors.reset}`);
+  console.log(`Recursive: ${colors.cyan}${recursive}${colors.reset}`);
+  console.log();
+
+  try {
+    const generator = new ModuleSpecGenerator({
+      analyzeLogic: true,
+      analyzeSideEffects: true,
+      includeTodos: true,
+    });
+
+    console.log(`${colors.blue}Scanning directory...${colors.reset}`);
+    const batchResults = generator.generateSpecsForDirectory(resolvedPath, {
+      recursive,
+      minConfidence,
+      includePrivate,
+    });
+
+    if (batchResults.length === 0) {
+      console.log(`${colors.yellow}⚠ No symbols found matching criteria${colors.reset}`);
+      console.log();
+      return;
+    }
+
+    console.log(`${colors.green}✓ Found ${batchResults.length} files with documentable symbols${colors.reset}`);
+    console.log();
+
+    const formatter = new ModuleSpecMarkdownFormatter({
+      includeMetadata: true,
+      includeConfidence: true,
+      includeTodos: true,
+      includeToc: true,
+    });
+
+    // Ensure output directory exists
+    if (!fs.existsSync(outputDir)) {
+      fs.mkdirSync(outputDir, { recursive: true });
+    }
+
+    let totalSpecs = 0;
+    let totalHighConfidence = 0;
+    let totalMediumConfidence = 0;
+    let totalLowConfidence = 0;
+
+    for (const { filePath: srcPath, results } of batchResults) {
+      const relativePath = path.relative(process.cwd(), srcPath);
+      console.log(`${colors.dim}Processing: ${relativePath}${colors.reset}`);
+
+      for (const result of results) {
+        const markdown = formatter.format(result.spec);
+        const outputFileName = `${result.spec.symbolId}.md`;
+        const outputPath = path.join(outputDir, outputFileName);
+
+        fs.writeFileSync(outputPath, markdown, 'utf-8');
+
+        totalSpecs++;
+        if (result.confidence >= 80) totalHighConfidence++;
+        else if (result.confidence >= 60) totalMediumConfidence++;
+        else totalLowConfidence++;
+
+        const confColor = result.confidence >= 80 ? colors.green : result.confidence >= 60 ? colors.yellow : colors.red;
+        console.log(`  ${colors.green}✓${colors.reset} ${result.spec.symbolName} ${confColor}(${result.confidence}%)${colors.reset}`);
+      }
+    }
+
+    console.log();
+    console.log(`${colors.bold}Summary:${colors.reset}`);
+    console.log(`  Total specifications: ${colors.cyan}${totalSpecs}${colors.reset}`);
+    console.log(`  High confidence (≥80%): ${colors.green}${totalHighConfidence}${colors.reset}`);
+    console.log(`  Medium confidence (60-79%): ${colors.yellow}${totalMediumConfidence}${colors.reset}`);
+    console.log(`  Low confidence (<60%): ${colors.red}${totalLowConfidence}${colors.reset}`);
+    console.log();
+    console.log(`${colors.green}✓ All specifications saved to: ${colors.cyan}${outputDir}${colors.reset}`);
+    console.log();
+
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      console.log(`${colors.red}✗ Error: ${error.message}${colors.reset}`);
+    } else {
+      console.log(`${colors.red}✗ Unknown error occurred${colors.reset}`);
+    }
+    console.log();
+    process.exit(1);
+  }
+}
+
 // Initialize ConfigManager with custom config path if provided
 if (configPath) {
   ConfigManager.getInstance(process.cwd(), configPath);
@@ -5088,6 +5556,15 @@ switch (command) {
   case 'find-unused-docs':
     printFindUnusedDocs();
     break;
+  case 'spec-history':
+    printSpecHistory();
+    break;
+  case 'spec-diff':
+    printSpecDiff();
+    break;
+  case 'spec-bump':
+    printSpecBump();
+    break;
   case 'find-doc':
     printFindDocSymbol();
     break;
@@ -5102,6 +5579,12 @@ switch (command) {
     break;
   case 'generate-docs':
     printGenerateDocs();
+    break;
+  case 'generate-spec':
+    printGenerateSpec();
+    break;
+  case 'generate-specs-batch':
+    printGenerateSpecsBatch();
     break;
   case 'install-hook':
     printInstallHook();

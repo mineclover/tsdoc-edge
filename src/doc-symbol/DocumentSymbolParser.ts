@@ -5,10 +5,14 @@
  */
 
 import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { ConfigManager } from '../config/ConfigManager';
+import { FrontmatterParser } from '../parser/FrontmatterParser';
 import type {
   CodeReference,
   DocumentSymbol,
   ParsedDocSymbols,
+  SymbolFootnoteRef,
 } from '../types/feature';
 
 /**
@@ -19,25 +23,49 @@ import type {
  * @responsibility Extract primary, auxiliary, and reference [[]] symbols
  */
 export class DocumentSymbolParser {
+  private frontmatterParser: FrontmatterParser;
+  private configManager: ConfigManager;
+
+  constructor() {
+    this.frontmatterParser = new FrontmatterParser();
+    this.configManager = ConfigManager.getInstance();
+  }
+
   /**
    * Parse document for [[]] symbols
    *
    * @param filePath - Markdown file path
-   * @returns Parsed symbols
+   * @returns Parsed symbols (null if not managed document)
    */
-  parse(filePath: string): ParsedDocSymbols {
+  parse(filePath: string): ParsedDocSymbols | null {
     if (!fs.existsSync(filePath)) {
       throw new Error(`File not found: ${filePath}`);
     }
 
     const content = fs.readFileSync(filePath, 'utf-8');
-    const lines = content.split('\n');
+
+    // Parse frontmatter
+    const { metadata, body } = this.frontmatterParser.parse(content);
+
+    // Check if document is managed
+    if (!this.isManagedDocument(filePath, metadata)) {
+      return null;
+    }
+
+    // Remove code blocks if configured
+    const config = this.configManager.get();
+    const contentToParse = config.documentManagement?.ignoreCodeBlocks
+      ? this.removeCodeBlocks(body)
+      : body;
+
+    const lines = contentToParse.split('\n');
 
     const result: ParsedDocSymbols = {
       filePath,
       auxiliaries: [],
       references: [],
       codeReferences: [],
+      symbolFootnoteRefs: [],
     };
 
     for (let i = 0; i < lines.length; i++) {
@@ -73,6 +101,10 @@ export class DocumentSymbolParser {
       // Check for code references [text](path)
       const codeRefs = this.extractCodeReferences(line, lineNum);
       result.codeReferences.push(...codeRefs);
+
+      // Check for symbol footnote references [^sym-XXX] or [^SymbolName]
+      const footnoteRefs = this.extractSymbolFootnoteReferences(line, lineNum);
+      result.symbolFootnoteRefs.push(...footnoteRefs);
     }
 
     return result;
@@ -159,6 +191,37 @@ export class DocumentSymbolParser {
   }
 
   /**
+   * Extract symbol footnote references [^sym-XXX] or [^SymbolName]
+   *
+   * @param line - Line content
+   * @param lineNum - Line number
+   * @returns Symbol footnote references found
+   */
+  private extractSymbolFootnoteReferences(line: string, lineNum: number): SymbolFootnoteRef[] {
+    const refs: SymbolFootnoteRef[] = [];
+
+    // Match [^identifier] where identifier is sym-XXX or any other identifier
+    // But exclude footnote definitions like [^identifier]:
+    const regex = /\[\^([^\]]+)\](?!:)/g;
+    let match: RegExpExecArray | null;
+
+    while ((match = regex.exec(line)) !== null) {
+      const identifier = match[1].trim();
+
+      // Check if it's an ID reference (sym-XXX pattern)
+      const isIdRef = /^sym-\w+$/.test(identifier);
+
+      refs.push({
+        identifier,
+        line: lineNum,
+        isIdRef,
+      });
+    }
+
+    return refs;
+  }
+
+  /**
    * Check if file is a code file
    */
   private isCodeFile(filePath: string): boolean {
@@ -166,12 +229,85 @@ export class DocumentSymbolParser {
   }
 
   /**
+   * Check if document should be managed by TSDoc Edge
+   *
+   * @param filePath - Document file path
+   * @param metadata - Frontmatter metadata
+   * @returns Whether document is managed
+   *
+   * @remarks
+   * Checks (in order):
+   * 1. If documentManagement is disabled, all documents are processed
+   * 2. If in excludeDirs, not managed
+   * 3. If requireFrontmatter is true, check metadata.tsdoc === 'managed'
+   * 4. If in managedDirs, managed
+   */
+  private isManagedDocument(filePath: string, metadata: any): boolean {
+    const config = this.configManager.get();
+    const docMgmt = config.documentManagement;
+
+    // Feature disabled - process all documents
+    if (!docMgmt?.enabled) {
+      return true;
+    }
+
+    const normalizedPath = path.normalize(filePath);
+
+    // Check exclude directories
+    if (docMgmt.excludeDirs) {
+      const isExcluded = docMgmt.excludeDirs.some((dir: string) =>
+        normalizedPath.includes(path.normalize(dir))
+      );
+      if (isExcluded) {
+        return false;
+      }
+    }
+
+    // Require frontmatter check
+    if (docMgmt.requireFrontmatter) {
+      return metadata?.tsdoc === 'managed';
+    }
+
+    // Check managed directories
+    if (docMgmt.managedDirs && docMgmt.managedDirs.length > 0) {
+      return docMgmt.managedDirs.some((dir: string) =>
+        normalizedPath.includes(path.normalize(dir))
+      );
+    }
+
+    // Default: process if no specific rules
+    return true;
+  }
+
+  /**
+   * Remove code blocks from markdown content
+   *
+   * @param content - Markdown content
+   * @returns Content with code blocks removed
+   *
+   * @remarks
+   * Removes both fenced code blocks (```) and indented code blocks
+   * This prevents example code from being treated as actual references
+   */
+  private removeCodeBlocks(content: string): string {
+    // Remove fenced code blocks (``` ... ```)
+    let result = content.replace(/```[\s\S]*?```/g, '');
+
+    // Remove inline code (`...`)
+    result = result.replace(/`[^`]+`/g, '');
+
+    return result;
+  }
+
+  /**
    * Parse multiple documents
    *
    * @param filePaths - Document file paths
-   * @returns Parsed symbols for each file
+   * @returns Parsed symbols for each file (excludes non-managed documents)
    */
   parseMultiple(filePaths: string[]): ParsedDocSymbols[] {
-    return filePaths.map((filePath) => this.parse(filePath));
+    return filePaths
+      .map((filePath) => this.parse(filePath))
+      .filter((result): result is ParsedDocSymbols => result !== null);
   }
 }

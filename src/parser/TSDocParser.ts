@@ -102,6 +102,38 @@ export class TSDocParser {
       })
     );
 
+    this.configuration.addTagDefinition(
+      new TSDocTagDefinition({
+        tagName: '@problem',
+        syntaxKind: TSDocTagSyntaxKind.BlockTag,
+        allowMultiple: false,
+      })
+    );
+
+    this.configuration.addTagDefinition(
+      new TSDocTagDefinition({
+        tagName: '@solves',
+        syntaxKind: TSDocTagSyntaxKind.BlockTag,
+        allowMultiple: false,
+      })
+    );
+
+    this.configuration.addTagDefinition(
+      new TSDocTagDefinition({
+        tagName: '@context',
+        syntaxKind: TSDocTagSyntaxKind.BlockTag,
+        allowMultiple: false,
+      })
+    );
+
+    this.configuration.addTagDefinition(
+      new TSDocTagDefinition({
+        tagName: '@depends',
+        syntaxKind: TSDocTagSyntaxKind.BlockTag,
+        allowMultiple: true,
+      })
+    );
+
     // Dependency tags
     this.configuration.addTagDefinition(
       new TSDocTagDefinition({
@@ -119,7 +151,75 @@ export class TSDocParser {
       })
     );
 
+    // Module specification tags
+    this.configuration.addTagDefinition(
+      new TSDocTagDefinition({
+        tagName: '@functionality',
+        syntaxKind: TSDocTagSyntaxKind.BlockTag,
+        allowMultiple: false,
+      })
+    );
+
+    this.configuration.addTagDefinition(
+      new TSDocTagDefinition({
+        tagName: '@algorithm',
+        syntaxKind: TSDocTagSyntaxKind.BlockTag,
+        allowMultiple: false,
+      })
+    );
+
+    this.configuration.addTagDefinition(
+      new TSDocTagDefinition({
+        tagName: '@complexity',
+        syntaxKind: TSDocTagSyntaxKind.BlockTag,
+        allowMultiple: false,
+      })
+    );
+
+    this.configuration.addTagDefinition(
+      new TSDocTagDefinition({
+        tagName: '@sideEffect',
+        syntaxKind: TSDocTagSyntaxKind.BlockTag,
+        allowMultiple: true,
+      })
+    );
+
+    this.configuration.addTagDefinition(
+      new TSDocTagDefinition({
+        tagName: '@mutates',
+        syntaxKind: TSDocTagSyntaxKind.BlockTag,
+        allowMultiple: true,
+      })
+    );
+
+    this.configuration.addTagDefinition(
+      new TSDocTagDefinition({
+        tagName: '@io',
+        syntaxKind: TSDocTagSyntaxKind.BlockTag,
+        allowMultiple: true,
+      })
+    );
+
+    this.configuration.addTagDefinition(
+      new TSDocTagDefinition({
+        tagName: '@scope',
+        syntaxKind: TSDocTagSyntaxKind.BlockTag,
+        allowMultiple: false,
+      })
+    );
+
     this.parser = new MicrosoftTSDocParser(this.configuration);
+  }
+
+  /**
+   * Parse a TSDoc comment string
+   *
+   * @param text - TSDoc comment text including delimiters
+   * @returns Parser context with parsed comment
+   * @public
+   */
+  parseString(text: string): ParserContext {
+    return this.parser.parseString(text);
   }
 
   /**

@@ -55,6 +55,9 @@ export interface ParsedDocSymbols {
 
   /** Code references in this doc */
   codeReferences: CodeReference[];
+
+  /** Symbol footnote references ([^sym-XXX] or [^SymbolName]) */
+  symbolFootnoteRefs: SymbolFootnoteRef[];
 }
 
 /**
@@ -76,6 +79,22 @@ export interface CodeReference {
 
   /** Line in document */
   line: number;
+}
+
+/**
+ * Symbol footnote reference
+ * Syntax: [^sym-XXX] or [^SymbolName]
+ * @public
+ */
+export interface SymbolFootnoteRef {
+  /** Footnote identifier (e.g., "sym-001", "ConventionValidator") */
+  identifier: string;
+
+  /** Line in document where used */
+  line: number;
+
+  /** Is this an ID reference (sym-XXX) or name reference */
+  isIdRef: boolean;
 }
 
 /**

@@ -120,6 +120,10 @@ export class ConfigManager {
       validation: { ...defaultConfig.validation, ...userConfig.validation },
       generator: { ...defaultConfig.generator, ...userConfig.generator },
       preCommit: { ...defaultConfig.preCommit, ...userConfig.preCommit },
+      documentManagement: {
+        ...defaultConfig.documentManagement,
+        ...userConfig.documentManagement,
+      },
     };
   }
 

@@ -96,6 +96,13 @@ export type * from './types/tags';
 export { ConnectivityValidator } from './validator/ConnectivityValidator';
 export { ConventionValidator } from './validator/ConventionValidator';
 export { StrictModeValidator } from './validator/StrictModeValidator';
+export { ModuleSpecValidator } from './validator/ModuleSpecValidator';
+export type {
+  ValidationIssue,
+  ValidationSeverity,
+  ModuleSpecValidationResult,
+  ValidationOptions,
+} from './validator/ModuleSpecValidator';
 // Linking exports
 export { DocCodeLinker } from './linking/DocCodeLinker';
 export { LinkValidator } from './linking/LinkValidator';
@@ -104,6 +111,26 @@ export { BacklinkGenerator } from './doc-symbol/BacklinkGenerator';
 export { DocumentSymbolParser } from './doc-symbol/DocumentSymbolParser';
 export { DocumentSymbolRegistry } from './doc-symbol/DocumentSymbolRegistry';
 export { TSDocSymbolParser } from './doc-symbol/TSDocSymbolParser';
+// Module Specification Generator
+export { ModuleSpecGenerator } from './generator/ModuleSpecGenerator';
+export { ModuleSpecMarkdownFormatter } from './generator/ModuleSpecMarkdownFormatter';
+export type {
+  ModuleSpecTemplate,
+  ModuleSpecResult,
+  ModulePurpose,
+  ModuleInput,
+  ModuleOutput,
+  ModuleContext,
+  ModuleLogic,
+  ModuleEffect,
+  ModuleScope,
+  ParamSpec,
+  ReturnSpec,
+  FailureCase,
+  DependencySpec,
+  ImportSpec,
+  SideEffectSpec,
+} from './types/spec/module-spec';
 
 /**
  * Main entry point for TSDoc Edge

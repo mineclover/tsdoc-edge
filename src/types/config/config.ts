@@ -47,6 +47,11 @@ export interface TsdocEdgeConfig {
    * Link checking configuration
    */
   linkCheck?: LinkCheckConfig;
+
+  /**
+   * Document management configuration
+   */
+  documentManagement?: DocumentManagementConfig;
 }
 
 /**
@@ -290,6 +295,53 @@ export interface LinkCheckConfig {
 }
 
 /**
+ * Document management configuration
+ *
+ * @public
+ */
+export interface DocumentManagementConfig {
+  /**
+   * Enable document management system
+   * @defaultValue false
+   */
+  enabled?: boolean;
+
+  /**
+   * Directories containing TSDoc Edge managed documents
+   * Only files in these directories will be indexed and validated
+   * @defaultValue ["docs/managed"]
+   */
+  managedDirs?: string[];
+
+  /**
+   * Directories to explicitly exclude from document management
+   * Useful for examples, templates, and reference materials
+   * @defaultValue ["docs/examples", "docs/templates"]
+   */
+  excludeDirs?: string[];
+
+  /**
+   * Require YAML frontmatter for managed documents
+   * If true, only files with "tsdoc: managed" frontmatter will be processed
+   * @defaultValue false
+   */
+  requireFrontmatter?: boolean;
+
+  /**
+   * Strict mode: fail if managed documents lack required frontmatter
+   * @defaultValue false
+   */
+  strictMode?: boolean;
+
+  /**
+   * Ignore code blocks when parsing document symbols
+   * Prevents example code from being treated as actual references
+   * @defaultValue true
+   */
+  ignoreCodeBlocks?: boolean;
+}
+
+/**
  * Default configuration values
  *
  * @public
@@ -338,6 +390,14 @@ export const DEFAULT_CONFIG: TsdocEdgeConfig = {
     enableSuggestions: true,
     maxSuggestionDistance: 3,
     failOnBroken: false,
+  },
+  documentManagement: {
+    enabled: false,
+    managedDirs: ['docs/managed'],
+    excludeDirs: ['docs/examples', 'docs/templates'],
+    requireFrontmatter: false,
+    strictMode: false,
+    ignoreCodeBlocks: true,
   },
 };
 

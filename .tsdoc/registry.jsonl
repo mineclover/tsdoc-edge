@@ -1,4 +1,4 @@
-{"version":"1.0.0","idGeneratorMode":"sequential","totalEntries":9,"lastUpdated":"2025-10-29T13:47:25.244Z"}
+{"version":"1.0.0","idGeneratorMode":"sequential","totalEntries":10,"lastUpdated":"2025-11-02T17:21:58.567Z"}
 {"id":"000","sourceRef":{"filePath":"src/parser/TSDocParser.ts","symbolName":"TSDocParser","type":"class","depth":0,"qualifiedName":"TSDocParser"},"createdAt":"2025-10-29T13:47:05.778Z","updatedAt":"2025-10-29T13:47:05.778Z"}
 {"id":"001","sourceRef":{"filePath":"src/storage/SymbolRegistryManager.ts","symbolName":"SymbolRegistryManager","type":"class","depth":0,"qualifiedName":"SymbolRegistryManager"},"createdAt":"2025-10-29T13:47:07.799Z","updatedAt":"2025-10-29T13:47:07.799Z"}
 {"id":"002","sourceRef":{"filePath":"src/storage/DatabaseManager.ts","symbolName":"DatabaseManager","type":"class","depth":0,"qualifiedName":"DatabaseManager"},"createdAt":"2025-10-29T13:47:10.036Z","updatedAt":"2025-10-29T13:47:10.036Z"}
@@ -8,3 +8,4 @@
 {"id":"006","sourceRef":{"filePath":"src/graph/SymbolGraphBuilder.ts","symbolName":"SymbolGraphBuilder","type":"class","depth":0,"qualifiedName":"SymbolGraphBuilder"},"createdAt":"2025-10-29T13:47:20.773Z","updatedAt":"2025-10-29T13:47:20.773Z"}
 {"id":"007","sourceRef":{"filePath":"src/generator/EnhancedMarkdownGenerator.ts","symbolName":"EnhancedMarkdownGenerator","type":"class","depth":0,"qualifiedName":"EnhancedMarkdownGenerator"},"createdAt":"2025-10-29T13:47:23.052Z","updatedAt":"2025-10-29T13:47:23.052Z"}
 {"id":"008","sourceRef":{"filePath":"src/utils/IdGenerator.ts","symbolName":"IdGenerator","type":"class","depth":0,"qualifiedName":"IdGenerator"},"createdAt":"2025-10-29T13:47:25.244Z","updatedAt":"2025-10-29T13:47:25.244Z"}
+{"id":"009","sourceRef":{"filePath":"src/validator/ConnectivityValidator.ts","symbolName":"ConnectivityValidator","type":"class","depth":0,"qualifiedName":"ConnectivityValidator"},"createdAt":"2025-11-02T17:21:58.566Z","updatedAt":"2025-11-02T17:21:58.566Z"}
