@@ -19,6 +19,26 @@ import type {
  * @doc [[ValidationFeatures#Connectivity]]
  * @responsibility Ensure SSOT compliance and documentation connectivity
  * @contract Validate all symbols have proper connections and documentation
+ *
+ * @problem Documentation systems often become disconnected from code, with broken links, missing tests, and orphaned symbols
+ * @solves Analyzes entire symbol graph to detect connectivity issues, calculates quality scores, and generates actionable reports
+ * @context TSDoc Edge enforces SSOT principle by ensuring all symbols are properly documented, tested, and connected
+ *
+ * @functionality
+ * - Connectivity analysis: Detect undocumented, untested, orphaned symbols
+ * - Link validation: Find broken references between symbols
+ * - Circular dependency detection: Identify problematic dependency cycles
+ * - Score calculation: Weighted scoring system (0-100) based on documentation quality
+ * - Detailed reporting: Actionable reports grouped by file, type, and severity
+ * - Contract validation: Ensure preconditions, postconditions, and invariants are defined
+ *
+ * @decision Use weighted penalty system for connectivity scoring
+ * @rationale Different issues have different impact: untested code (25%) is more critical than missing responsibility (15%)
+ * @consequences Clear prioritization of issues, encourages focusing on high-impact problems first
+ *
+ * @depends SymbolGraphBuilder, SymbolSearchEngine
+ * @depType internal
+ * @depReason Requires graph data and search capabilities for connectivity analysis
  */
 export class ConnectivityValidator {
   private graphBuilder: SymbolGraphBuilder;

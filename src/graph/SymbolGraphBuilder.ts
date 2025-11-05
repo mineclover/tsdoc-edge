@@ -18,6 +18,25 @@ import type { Symbol, SymbolGraph, SymbolRelationship } from '../types/graph';
  * @testScenario Search by name and file path
  * @testScenario Find dependencies and reverse dependencies
  * @doc [[SymbolGraphFeatures#Builder]]
+ *
+ * @problem Need to track all code symbols and their relationships across the entire codebase
+ * @solves Provides a centralized graph data structure with efficient indexing for name, file, and dependency lookups
+ * @context TypeScript projects have complex dependency chains that need to be analyzed for documentation connectivity and SSOT compliance
+ *
+ * @functionality
+ * - Symbol management: Add, retrieve, search symbols by ID, name, or file
+ * - Relationship tracking: Manage dependencies and reverse dependencies between symbols
+ * - Index maintenance: Automatic indexing by name and file path for fast lookups
+ * - Graph analysis: Circular dependency detection, statistics calculation
+ * - Adjacency lists: Bidirectional adjacency lists for efficient traversal
+ *
+ * @decision Use adjacency list representation instead of adjacency matrix
+ * @rationale Sparse graphs (most symbols don't depend on each other) benefit from adjacency lists with O(1) edge lookup and O(V+E) space complexity
+ * @consequences Better memory efficiency for large codebases, efficient DFS/BFS traversal for dependency analysis
+ *
+ * @depends Symbol, SymbolGraph, SymbolRelationship
+ * @depType internal
+ * @depReason Core type definitions for graph structure
  */
 export class SymbolGraphBuilder {
   private graph: SymbolGraph;

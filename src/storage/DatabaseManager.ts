@@ -61,6 +61,26 @@ interface EnhancedDocRow {
  * @testScenario Full-text search
  * @testScenario JSONL export and import
  * @testScenario Statistics tracking
+ *
+ * @problem Need fast local symbol lookups while maintaining Git-friendly version control of documentation data
+ * @solves Hybrid storage strategy: SQLite for performance, JSONL for Git compatibility and human readability
+ * @context CLI tools need sub-second query responses, but team collaboration requires mergeable text-based storage
+ *
+ * @functionality
+ * - Schema management: Automatic table creation with indexes for fast lookups
+ * - CRUD operations: Insert, update, retrieve symbols and enhanced docs
+ * - Full-text search: SQLite FTS5 for fast documentation search
+ * - JSONL sync: Bidirectional export/import for version control
+ * - Statistics tracking: Query execution metrics and database statistics
+ * - Coverage integration: Store and retrieve test coverage data
+ *
+ * @decision Use SQLite + JSONL hybrid instead of pure JSON or pure SQL
+ * @rationale SQLite provides O(log n) lookups and FTS5 search, JSONL enables Git diff/merge and human inspection
+ * @consequences Two storage layers to maintain, but gains both performance and version control benefits
+ *
+ * @depends better-sqlite3, ConfigManager
+ * @depType external, internal
+ * @depReason High-performance synchronous SQLite driver, configuration paths
  */
 export class DatabaseManager {
   /**

@@ -40,6 +40,8 @@ import { UnusedDocumentDetector } from './spec/UnusedDocumentDetector';
 import { ModuleSpecGenerator } from './generator/ModuleSpecGenerator';
 import { ModuleSpecMarkdownFormatter } from './generator/ModuleSpecMarkdownFormatter';
 import type { ModuleSpecResult } from './types/spec/module-spec';
+import { UsageTracker } from './analytics/UsageTracker';
+import type { CommandUsageEvent } from './types/analytics';
 
 // Database row types
 /**
@@ -108,6 +110,89 @@ function printHeader(title: string): void {
   console.log(colors.bold + colors.blue + title + colors.reset);
   console.log(colors.bold + colors.blue + '='.repeat(80) + colors.reset);
   console.log();
+}
+
+/**
+ * printUsageAnalytics function
+ * Display CLI usage analytics
+ * @public
+ */
+function printUsageAnalytics(): void {
+  printHeader('TSDoc Edge - Usage Analytics');
+
+  const tracker = new UsageTracker();
+  const subCommand = args[1];
+
+  try {
+    switch (subCommand) {
+      case 'report':
+      case undefined:
+        // Show full report
+        console.log(tracker.formatReport());
+        break;
+
+      case 'export': {
+        const outputPath = args[2] || path.join(process.cwd(), 'usage-analytics.json');
+        const success = tracker.exportToJSON(outputPath);
+        if (success) {
+          console.log(`${colors.green}✓ Analytics exported to: ${colors.cyan}${outputPath}${colors.reset}`);
+        } else {
+          console.log(`${colors.red}✗ Failed to export analytics${colors.reset}`);
+          process.exit(1);
+        }
+        break;
+      }
+
+      case 'clear': {
+        const success = tracker.clear();
+        if (success) {
+          console.log(`${colors.green}✓ Analytics data cleared${colors.reset}`);
+        } else {
+          console.log(`${colors.red}✗ Failed to clear analytics${colors.reset}`);
+          process.exit(1);
+        }
+        break;
+      }
+
+      case 'errors': {
+        const errors = tracker.getRecentErrors(20);
+        if (errors.length === 0) {
+          console.log(`${colors.green}No recent errors!${colors.reset}\n`);
+        } else {
+          console.log(`${colors.bold}Recent Errors (${errors.length}):${colors.reset}\n`);
+          for (const error of errors) {
+            const date = new Date(error.timestamp).toLocaleString();
+            console.log(`${colors.red}✗${colors.reset} ${colors.bold}${error.command}${colors.reset} (${date})`);
+            console.log(`  ${colors.dim}${error.cwd}${colors.reset}`);
+            if (error.error) {
+              console.log(`  ${colors.red}${error.error.split('\n')[0]}${colors.reset}`);
+            }
+            console.log();
+          }
+        }
+        break;
+      }
+
+      case 'help':
+        console.log('Usage: tsdoc-edge usage [command]\n');
+        console.log('Commands:');
+        console.log('  report (default)  Show full usage analytics report');
+        console.log('  export [path]     Export analytics to JSON file');
+        console.log('  clear             Clear all analytics data');
+        console.log('  errors            Show recent command errors');
+        console.log('  help              Show this help message');
+        console.log();
+        break;
+
+      default:
+        console.log(`${colors.red}Unknown subcommand: ${subCommand}${colors.reset}\n`);
+        console.log('Run "tsdoc-edge usage help" for available commands\n');
+        process.exit(1);
+    }
+  } catch (error) {
+    console.log(`${colors.red}Error: ${error instanceof Error ? error.message : 'Unknown error'}${colors.reset}\n`);
+    process.exit(1);
+  }
 }
 
 /**
@@ -5456,8 +5541,15 @@ if (configPath) {
   ConfigManager.getInstance(process.cwd(), configPath);
 }
 
+// Initialize usage tracker
+const usageTracker = new UsageTracker();
 const command = args[0] || 'help';
+const startTime = performance.now();
+let commandSuccess = true;
+let commandError: string | undefined;
 
+// Wrap command execution for analytics
+try {
 switch (command) {
   case 'init':
     printInit();
@@ -5600,9 +5692,37 @@ switch (command) {
   case '-h':
     printHelp();
     break;
+  case 'usage':
+    printUsageAnalytics();
+    break;
   default:
     console.log(`${colors.red}Unknown command: ${command}${colors.reset}`);
     console.log();
     printHelp();
+    commandSuccess = false;
+    commandError = `Unknown command: ${command}`;
     process.exit(1);
+}
+} catch (error) {
+  commandSuccess = false;
+  commandError = error instanceof Error ? error.message : 'Unknown error';
+  throw error;
+} finally {
+  // Record usage event
+  const endTime = performance.now();
+  const duration = endTime - startTime;
+
+  const event: CommandUsageEvent = {
+    command,
+    args: args.slice(1),
+    timestamp: new Date().toISOString(),
+    duration,
+    success: commandSuccess,
+    error: commandError,
+    cwd: process.cwd(),
+    nodeVersion: process.version,
+    version: require('../package.json').version,
+  };
+
+  usageTracker.recordEvent(event);
 }

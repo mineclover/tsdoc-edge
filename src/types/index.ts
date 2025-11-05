@@ -43,3 +43,5 @@ export * from './state';
 export * from './tags';
 // Specification types - spec management
 export * from './spec';
+// Analytics types - usage tracking
+export * from './analytics';

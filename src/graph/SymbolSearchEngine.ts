@@ -21,6 +21,25 @@ import type { SymbolGraphBuilder } from './SymbolGraphBuilder';
  * @testScenario Find undocumented symbols
  * @testScenario Find untested symbols
  * @doc [[SymbolGraphFeatures#Search]]
+ *
+ * @problem Need efficient multi-criteria queries on symbol graph with complex filters (name, type, relationships, documentation status)
+ * @solves Provides unified query interface with regex pattern matching and relationship-based filtering
+ * @context CLI commands and validators need to quickly find symbols matching specific criteria for analysis and reporting
+ *
+ * @functionality
+ * - Multi-criteria search: Name pattern, type, file path, documentation status
+ * - Relationship filtering: Find symbols by dependencies or reverse dependencies
+ * - Specialized finders: Undocumented, untested, orphaned, missing responsibility/contract
+ * - Performance tracking: Measures query execution time
+ * - Regex support: Case-insensitive pattern matching for flexible queries
+ *
+ * @decision Use filter chaining instead of SQL-like query builder
+ * @rationale Simpler implementation, no query parsing needed, leverages native Array.filter performance
+ * @consequences Straightforward code, easy to extend with new filters, performance scales with filter count
+ *
+ * @depends SymbolGraphBuilder
+ * @depType internal
+ * @depReason Requires access to complete symbol graph for querying
  */
 export class SymbolSearchEngine {
   private graphBuilder: SymbolGraphBuilder;

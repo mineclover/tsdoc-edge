@@ -19,6 +19,25 @@ import type {
  * @doc [[DocumentSymbolSystem#Registry]]
  * @public
  * @responsibility Store and validate document symbols
+ *
+ * @problem Documentation systems allow duplicate definitions and broken references, violating SSOT principle
+ * @solves Central registry that enforces single primary definition per symbol and tracks all references
+ * @context Wiki-style [[Symbol]] syntax enables documentation network, but needs validation to prevent inconsistencies
+ *
+ * @functionality
+ * - Symbol registration: Primary definitions, auxiliary definitions, and references
+ * - SSOT validation: Detect duplicate primary definitions, undefined references
+ * - Code connections: Track bidirectional links between docs and code
+ * - Backlink support: Find all documents referencing a symbol
+ * - Warning system: Detect orphaned definitions with no references
+ *
+ * @decision Separate primary, auxiliary, and reference registries
+ * @rationale Primary definitions must be unique (SSOT), auxiliaries can have multiple, references are just pointers
+ * @consequences Clear semantic distinction, enables different validation rules per type
+ *
+ * @depends DocumentSymbol, ParsedDocSymbols, CodeConnection
+ * @depType internal
+ * @depReason Core types for document symbol system
  */
 export class DocumentSymbolRegistry {
   private definitions: Map<string, DocumentSymbol> = new Map();
