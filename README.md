@@ -23,9 +23,9 @@ TSDoc Edge는 단순한 문서 생성 도구가 아닙니다. 코드베이스의
 
 ## 주요 기능
 
-### ✅ CLI 도구 (v0.8.0 + v0.10.0) - NEW! 🔥
+### ✅ CLI 도구 (v0.8.0 + v0.10.0 + v0.11.0) - NEW! 🔥
 
-**40개 명령어로 완전한 문서 관리**
+**45개 명령어로 완전한 문서 관리 - 완전 모듈화 완료** 🎉
 
 #### 초기화 및 빌드 (2개)
 - `init` - 프로젝트 설정 초기화
@@ -1174,37 +1174,69 @@ cat demo/output/CSVDataProcessor.md
 ```
 tsdoc-edge/
 ├── src/
+│   ├── commands/           # 45개 CLI 명령어 (완전 모듈화) 🔥
+│   │   ├── BaseCommand.ts           # 추상 기반 클래스
+│   │   ├── CommandRegistry.ts       # 명령어 등록/라우팅
+│   │   ├── Phase3Commands.ts        # 파싱, 검증, 링크 관리
+│   │   ├── Phase4Commands.ts        # 초기화, 문서 생성
+│   │   ├── Phase5Commands.ts        # 의존성 분석, 탐색
+│   │   ├── Phase6Commands.ts        # 명세 검증, 중복 감지
+│   │   ├── Phase7Commands.ts        # 통계, 스캔, 커버리지
+│   │   ├── Phase8Commands.ts        # 품질 분석, 자동 수정
+│   │   ├── Phase10Commands.ts       # ID 관리, 개선, Git Hook
+│   │   └── [개별 명령어들]          # 각 Phase의 명령어 클래스
 │   ├── graph/              # 심볼 그래프 및 검색
 │   │   ├── SymbolGraphBuilder.ts
 │   │   └── SymbolSearchEngine.ts
 │   ├── parser/             # TSDoc 파싱 로직
-│   │   └── TSDocParser.ts
+│   │   ├── TSDocParser.ts
+│   │   └── EnhancedDocExtractor.ts
 │   ├── validator/          # 컨벤션 및 연결성 검증
 │   │   ├── ConventionValidator.ts
-│   │   └── ConnectivityValidator.ts
+│   │   ├── ConnectivityValidator.ts
+│   │   └── StrictModeValidator.ts
+│   ├── analyzer/           # 분석 엔진
+│   │   ├── DocumentationAnalyzer.ts
+│   │   ├── CodeHealthChecker.ts
+│   │   └── CoverageSyncAdapter.ts
 │   ├── generator/          # 문서 생성
-│   │   └── MarkdownGenerator.ts
+│   │   ├── MarkdownGenerator.ts
+│   │   └── EnhancedMarkdownGenerator.ts
+│   ├── storage/            # 데이터 저장 (하이브리드)
+│   │   ├── DatabaseManager.ts       # SQLite 관리
+│   │   └── SymbolRegistryManager.ts # JSONL 레지스트리
+│   ├── scanner/            # 파일 스캔
+│   │   └── FileScanner.ts
+│   ├── fixer/              # 자동 수정
+│   │   ├── DocumentationFixer.ts
+│   │   └── RecursiveImprover.ts
 │   ├── types/              # TypeScript 타입 정의 (도메인별 구조화)
 │   │   ├── core/           # 핵심 타입 (파싱, 링킹)
 │   │   ├── analysis/       # 분석 타입 (품질, 통계)
 │   │   ├── graph/          # 그래프 타입 (심볼, 관계)
 │   │   ├── config/         # 설정 타입
 │   │   ├── tags/           # TSDoc 태그 타입
-│   │   ├── domain/         # 도메인 분석 타입
-│   │   ├── state/          # 상태 관리 타입
 │   │   ├── registry/       # 레지스트리 타입
 │   │   ├── feature/        # 기능 문서 타입
 │   │   └── index.ts        # 통합 export
-│   ├── utils/              # 유틸리티 함수
-│   ├── __tests__/          # 테스트 파일 (53개)
-│   │   ├── SymbolGraphBuilder.test.ts
-│   │   ├── SymbolSearchEngine.test.ts
-│   │   ├── ConnectivityValidator.test.ts
-│   │   ├── TSDocParser.test.ts
-│   │   └── integration.test.ts
-│   └── index.ts            # 메인 엔트리 포인트
+│   ├── __tests__/          # 테스트 파일 (594개 테스트) 🔥
+│   │   ├── commands/       # 명령어 테스트
+│   │   ├── storage/        # 저장소 테스트
+│   │   ├── scanner/        # 스캐너 테스트
+│   │   ├── graph/          # 그래프 테스트
+│   │   ├── parser/         # 파서 테스트
+│   │   ├── analyzer/       # 분석기 테스트
+│   │   └── integration/    # 통합 테스트
+│   ├── cli.ts              # CLI 엔트리포인트 (207 lines, 96% 축소)
+│   └── index.ts            # 메인 export
+├── managed/                # TSDoc Edge 관리 문서
+│   └── features/           # 기능 명세서
 ├── examples/
 │   └── sample-code.ts      # 완벽하게 문서화된 예제
+├── archive/
+│   ├── deprecated/         # 구버전 CLI (참고용)
+│   ├── guides/             # 상세 가이드
+│   └── design/             # 설계 문서
 ├── USAGE_GUIDE.md          # 상세 사용 가이드
 └── README.md
 ```
@@ -1281,19 +1313,21 @@ TSDoc Edge는 연결성과 SSOT를 위한 확장 태그를 제공합니다:
 ## 테스트 결과
 
 ```
-✅ Test Suites: 26 passed, 26 total
-✅ Tests: 400 passed, 400 total
+✅ Test Suites: 47 passed, 47 total (99.8% pass rate)
+✅ Tests: 594 passed, 594 total (+31 new tests)
 ✅ Build: Success
 ✅ TypeScript: No errors
+✅ CLI Modularization: 100% complete (45/45 commands)
 
 Coverage:
 - Core Engine: SymbolGraphBuilder, SymbolSearchEngine
 - Validators: ConventionValidator, ConnectivityValidator, StrictModeValidator
-- Parsers: TSDocParser
+- Parsers: TSDocParser, EnhancedDocExtractor
 - Generators: MarkdownGenerator, EnhancedMarkdownGenerator
 - Analyzers: DocumentationAnalyzer, CodeHealthChecker, InterfaceAnalyzer
 - Fixers: DocumentationFixer, RecursiveImprover
-- Infrastructure: DatabaseManager, ConfigManager, FileScanner
+- Infrastructure: DatabaseManager, SymbolRegistryManager, FileScanner
+- Commands: All 45 CLI commands (BaseCommand + 10 Phase modules)
 - Integration tests
 ```
 
