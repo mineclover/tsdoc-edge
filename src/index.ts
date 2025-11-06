@@ -45,6 +45,9 @@ export { StatsHistoryManager } from './analyzer/StatsHistoryManager';
 export { TestCoverageAnalyzer } from './analyzer/TestCoverageAnalyzer';
 export { TrackableStatsCollector } from './analyzer/TrackableStatsCollector';
 export { TypeChainTracer } from './analyzer/TypeChainTracer';
+export { CallGraphAnalyzer } from './analyzer/CallGraphAnalyzer';
+export { DependencyChainAnalyzer } from './analyzer/DependencyChainAnalyzer';
+export { IODependencyAnalyzer } from './analyzer/IODependencyAnalyzer';
 // Parser exports
 export { EnhancedDocExtractor } from './parser/EnhancedDocExtractor';
 export type {

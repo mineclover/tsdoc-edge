@@ -12,7 +12,9 @@
 import { UsageTracker } from './analytics/UsageTracker';
 import {
   AnalyzeCommand,
+  AnalyzeIOCommand,
   BuildCommand,
+  VisualizeDepsCommand,
   CheckDuplicatesCommand,
   CheckLinksCommand,
   CommandRegistry,
@@ -60,6 +62,10 @@ import {
   type CommandResult,
 } from './commands';
 import { DetectCircularTypesCommand, FindRootTypesCommand, TypeChainCommand } from './commands/TypeChainCommand';
+import { ParallelWorkCommand } from './commands/ParallelWorkCommand';
+import { TestRelationshipsCommand } from './commands/TestRelationshipsCommand';
+import { AnalyzeChainsCommand } from './commands/AnalyzeChainsCommand';
+import { AnalyzeCallsCommand } from './commands/AnalyzeCallsCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -124,6 +130,10 @@ async function main(): Promise<void> {
   registry.register(new CoreApiCommand());
   registry.register(new ScanCommand());
   registry.register(new SyncCoverageCommand());
+  registry.register(new AnalyzeChainsCommand());
+  registry.register(new AnalyzeCallsCommand());
+  registry.register(new AnalyzeIOCommand());
+  registry.register(new VisualizeDepsCommand());
   registry.register(new UntestedCommand());
   registry.register(new WithoutResponsibilityCommand());
   registry.register(new WithoutContractCommand());
@@ -135,6 +145,8 @@ async function main(): Promise<void> {
   registry.register(new TypeChainCommand());
   registry.register(new FindRootTypesCommand());
   registry.register(new DetectCircularTypesCommand());
+  registry.register(new ParallelWorkCommand());
+  registry.register(new TestRelationshipsCommand());
   registry.register(new HelpCommand(registry));
 
   // Get command
