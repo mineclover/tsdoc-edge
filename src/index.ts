@@ -44,6 +44,7 @@ export { StatsComparator } from './analyzer/StatsComparator';
 export { StatsHistoryManager } from './analyzer/StatsHistoryManager';
 export { TestCoverageAnalyzer } from './analyzer/TestCoverageAnalyzer';
 export { TrackableStatsCollector } from './analyzer/TrackableStatsCollector';
+export { TypeChainTracer } from './analyzer/TypeChainTracer';
 // Parser exports
 export { EnhancedDocExtractor } from './parser/EnhancedDocExtractor';
 export type {

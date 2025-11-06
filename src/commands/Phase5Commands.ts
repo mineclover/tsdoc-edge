@@ -510,7 +510,8 @@ export class OrphansCommand extends BaseCommand {
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
-      if (!fs.existsSync(registryPath)) {
+
+      if (!this.manager && !fs.existsSync(registryPath)) {
         this.printError('No registry found.');
         console.log();
         return this.failure('Registry not found');
@@ -607,7 +608,7 @@ export class UndocumentedCommand extends BaseCommand {
 
       const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
 
-      if (!fs.existsSync(dbPath)) {
+      if (!this.dbManager && !fs.existsSync(dbPath)) {
         this.printError('Database not found. Run "tsdoc-edge build src" first.');
         console.log();
         return this.failure('Database not found');
@@ -731,7 +732,8 @@ export class TreeCommand extends BaseCommand {
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
-      if (!fs.existsSync(registryPath)) {
+
+      if (!this.manager && !fs.existsSync(registryPath)) {
         this.printError('No registry found.');
         console.log();
         return this.failure('Registry not found');

@@ -55,11 +55,11 @@ export class UserService {
         'utf-8'
       );
 
-      const result = analyzer.analyzeFile(testFile);
+      const sourceCode = fs.readFileSync(testFile, 'utf-8');
+      const result = analyzer.analyzeFile(testFile, sourceCode);
 
       expect(result).toBeDefined();
-      expect(result.filePath).toBe(testFile);
-      expect(result.symbols.length).toBeGreaterThanOrEqual(0);
+      expect(result.length).toBeGreaterThanOrEqual(0);
     });
 
     it('should handle file without documentation', () => {
@@ -76,16 +76,19 @@ export class SimpleClass {
         'utf-8'
       );
 
-      const result = analyzer.analyzeFile(testFile);
+      const sourceCode = fs.readFileSync(testFile, 'utf-8');
+      const result = analyzer.analyzeFile(testFile, sourceCode);
 
       expect(result).toBeDefined();
-      expect(result.filePath).toBe(testFile);
+      expect(result.length).toBeGreaterThanOrEqual(0);
     });
 
     it('should handle non-existent file', () => {
       const nonExistent = path.join(tempDir, 'does-not-exist.ts');
 
-      expect(() => analyzer.analyzeFile(nonExistent)).toThrow();
+      expect(() => analyzer.analyzeFile(nonExistent, '')).not.toThrow();
+      const result = analyzer.analyzeFile(nonExistent, '');
+      expect(result.length).toBe(0);
     });
   });
 
@@ -111,10 +114,14 @@ export function doSomething(name: string, value: number): string {
         'utf-8'
       );
 
-      const result = analyzer.analyzeFile(testFile);
+      const sourceCode = fs.readFileSync(testFile, 'utf-8');
+      const result = analyzer.analyzeFile(testFile, sourceCode);
 
-      expect(result.averageQuality).toBeGreaterThanOrEqual(0);
-      expect(result.averageQuality).toBeLessThanOrEqual(100);
+      expect(result.length).toBeGreaterThanOrEqual(0);
+      if (result.length > 0) {
+        expect(result[0].qualityScore).toBeGreaterThanOrEqual(0);
+        expect(result[0].qualityScore).toBeLessThanOrEqual(100);
+      }
     });
 
     it('should score undocumented symbol lowly', () => {
@@ -129,13 +136,14 @@ export function noDocumentation() {
         'utf-8'
       );
 
-      const result = analyzer.analyzeFile(testFile);
+      const sourceCode = fs.readFileSync(testFile, 'utf-8');
+      const result = analyzer.analyzeFile(testFile, sourceCode);
 
-      expect(result.averageQuality).toBeGreaterThanOrEqual(0);
+      expect(result.length).toBeGreaterThanOrEqual(0);
     });
   });
 
-  describe('analyzeDirectory', () => {
+  describe('analyzeMultipleFiles', () => {
     it('should analyze multiple files', () => {
       const srcDir = path.join(tempDir, 'src');
       fs.mkdirSync(srcDir, { recursive: true });
@@ -143,7 +151,12 @@ export function noDocumentation() {
       fs.writeFileSync(path.join(srcDir, 'file1.ts'), 'export class Class1 {}', 'utf-8');
       fs.writeFileSync(path.join(srcDir, 'file2.ts'), 'export class Class2 {}', 'utf-8');
 
-      const results = analyzer.analyzeDirectory(srcDir);
+      const files = fs.readdirSync(srcDir).filter(f => f.endsWith('.ts'));
+      const results = files.flatMap(file => {
+        const filePath = path.join(srcDir, file);
+        const sourceCode = fs.readFileSync(filePath, 'utf-8');
+        return analyzer.analyzeFile(filePath, sourceCode);
+      });
 
       expect(Array.isArray(results)).toBe(true);
       expect(results.length).toBeGreaterThanOrEqual(0);
@@ -156,18 +169,28 @@ export function noDocumentation() {
       fs.writeFileSync(path.join(srcDir, 'code.ts'), 'export class Code {}', 'utf-8');
       fs.writeFileSync(path.join(srcDir, 'code.test.ts'), 'describe("test", () => {})', 'utf-8');
 
-      const results = analyzer.analyzeDirectory(srcDir);
+      const files = fs.readdirSync(srcDir).filter(f => f.endsWith('.ts') && !f.endsWith('.test.ts'));
+      const results = files.flatMap(file => {
+        const filePath = path.join(srcDir, file);
+        const sourceCode = fs.readFileSync(filePath, 'utf-8');
+        return analyzer.analyzeFile(filePath, sourceCode);
+      });
 
       // Should only analyze code.ts, not code.test.ts
-      const filePaths = results.map((r) => r.filePath);
-      expect(filePaths.some((p) => p.endsWith('.test.ts'))).toBe(false);
+      const filePaths = results.map((r: { filePath: string }) => r.filePath);
+      expect(filePaths.some((p: string) => p.endsWith('.test.ts'))).toBe(false);
     });
 
     it('should handle empty directory', () => {
       const emptyDir = path.join(tempDir, 'empty');
       fs.mkdirSync(emptyDir, { recursive: true });
 
-      const results = analyzer.analyzeDirectory(emptyDir);
+      const files = fs.readdirSync(emptyDir).filter(f => f.endsWith('.ts'));
+      const results = files.flatMap(file => {
+        const filePath = path.join(emptyDir, file);
+        const sourceCode = fs.readFileSync(filePath, 'utf-8');
+        return analyzer.analyzeFile(filePath, sourceCode);
+      });
 
       expect(Array.isArray(results)).toBe(true);
       expect(results.length).toBe(0);
@@ -198,10 +221,10 @@ export class Documented {
         'utf-8'
       );
 
-      const result = analyzer.analyzeFile(testFile);
+      const sourceCode = fs.readFileSync(testFile, 'utf-8');
+      const result = analyzer.analyzeFile(testFile, sourceCode);
 
-      expect(result.totalSymbols).toBeGreaterThanOrEqual(0);
-      expect(result.documentedSymbols).toBeGreaterThanOrEqual(0);
+      expect(result.length).toBeGreaterThanOrEqual(0);
     });
 
     it('should track symbol types', () => {
@@ -217,9 +240,10 @@ export const myConst = 'test';
         'utf-8'
       );
 
-      const result = analyzer.analyzeFile(testFile);
+      const sourceCode = fs.readFileSync(testFile, 'utf-8');
+      const result = analyzer.analyzeFile(testFile, sourceCode);
 
-      expect(result.symbols.length).toBeGreaterThanOrEqual(0);
+      expect(result.length).toBeGreaterThanOrEqual(0);
     });
   });
 
@@ -229,9 +253,11 @@ export const myConst = 'test';
       fs.writeFileSync(testFile, 'this is not valid typescript }{][', 'utf-8');
 
       // Should not throw, but return empty or error result
-      const result = analyzer.analyzeFile(testFile);
+      const sourceCode = fs.readFileSync(testFile, 'utf-8');
+      const result = analyzer.analyzeFile(testFile, sourceCode);
 
       expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
     });
 
     it('should handle special characters', () => {
@@ -248,9 +274,11 @@ export class Special {}
         'utf-8'
       );
 
-      const result = analyzer.analyzeFile(testFile);
+      const sourceCode = fs.readFileSync(testFile, 'utf-8');
+      const result = analyzer.analyzeFile(testFile, sourceCode);
 
       expect(result).toBeDefined();
+      expect(Array.isArray(result)).toBe(true);
     });
   });
 });

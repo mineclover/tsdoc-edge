@@ -65,8 +65,8 @@ describe('IstanbulCoverageAdapter', () => {
       const summary = adapter.parseCoverage(coverageFile);
 
       expect(summary).toBeDefined();
-      expect(summary.fileCoverage).toBeDefined();
-      expect(Object.keys(summary.fileCoverage).length).toBeGreaterThan(0);
+      expect(summary.files).toBeDefined();
+      expect(summary.files.size).toBeGreaterThan(0);
     });
 
     it('should parse coverage with multiple files', () => {
@@ -96,7 +96,7 @@ describe('IstanbulCoverageAdapter', () => {
 
       const summary = adapter.parseCoverage(coverageFile);
 
-      expect(Object.keys(summary.fileCoverage).length).toBe(2);
+      expect(summary.files.size).toBe(2);
     });
 
     it('should parse coverage with branches', () => {
@@ -128,7 +128,7 @@ describe('IstanbulCoverageAdapter', () => {
 
       const summary = adapter.parseCoverage(coverageFile);
 
-      expect(summary.fileCoverage['/project/src/conditional.ts']).toBeDefined();
+      expect(summary.files.has('/project/src/conditional.ts')).toBe(true);
     });
 
     it('should parse coverage with functions', () => {
@@ -162,7 +162,7 @@ describe('IstanbulCoverageAdapter', () => {
 
       const summary = adapter.parseCoverage(coverageFile);
 
-      expect(summary.fileCoverage['/project/src/math.ts']).toBeDefined();
+      expect(summary.files.has('/project/src/math.ts')).toBe(true);
     });
 
     it('should handle empty coverage file', () => {
@@ -171,8 +171,8 @@ describe('IstanbulCoverageAdapter', () => {
 
       const summary = adapter.parseCoverage(coverageFile);
 
-      expect(summary.fileCoverage).toBeDefined();
-      expect(Object.keys(summary.fileCoverage).length).toBe(0);
+      expect(summary.files).toBeDefined();
+      expect(summary.files.size).toBe(0);
     });
 
     it('should calculate total statistics', () => {
@@ -202,9 +202,9 @@ describe('IstanbulCoverageAdapter', () => {
 
       const summary = adapter.parseCoverage(coverageFile);
 
-      expect(summary.total).toBeDefined();
-      expect(summary.total.statements).toBeDefined();
-      expect(summary.total.functions).toBeDefined();
+      expect(summary.totalFiles).toBeDefined();
+      expect(summary.statements).toBeDefined();
+      expect(summary.functions).toBeDefined();
     });
 
     it('should handle non-existent file gracefully', () => {
@@ -241,7 +241,7 @@ describe('IstanbulCoverageAdapter', () => {
       const summary = adapter.parseCoverage(coverageFile);
 
       expect(summary).toBeDefined();
-      expect(summary.fileCoverage).toBeDefined();
+      expect(summary.files).toBeDefined();
     });
 
     it('should parse Vitest coverage format', () => {
@@ -265,7 +265,7 @@ describe('IstanbulCoverageAdapter', () => {
       const summary = adapter.parseCoverage(coverageFile);
 
       expect(summary).toBeDefined();
-      expect(summary.fileCoverage).toBeDefined();
+      expect(summary.files).toBeDefined();
     });
   });
 
@@ -290,7 +290,7 @@ describe('IstanbulCoverageAdapter', () => {
 
       const summary = adapter.parseCoverage(coverageFile);
 
-      expect(summary.fileCoverage['/project/src/unused.ts']).toBeDefined();
+      expect(summary.files.has('/project/src/unused.ts')).toBe(true);
     });
 
     it('should handle coverage with high execution counts', () => {
@@ -313,7 +313,7 @@ describe('IstanbulCoverageAdapter', () => {
 
       const summary = adapter.parseCoverage(coverageFile);
 
-      expect(summary.fileCoverage['/project/src/hot.ts']).toBeDefined();
+      expect(summary.files.has('/project/src/hot.ts')).toBe(true);
     });
 
     it('should handle coverage with special characters in paths', () => {
@@ -336,7 +336,7 @@ describe('IstanbulCoverageAdapter', () => {
 
       const summary = adapter.parseCoverage(coverageFile);
 
-      expect(summary.fileCoverage['/project/src/special-file.ts']).toBeDefined();
+      expect(summary.files.has('/project/src/special-file.ts')).toBe(true);
     });
 
     it('should handle coverage with deeply nested structures', () => {
@@ -359,7 +359,7 @@ describe('IstanbulCoverageAdapter', () => {
 
       const summary = adapter.parseCoverage(coverageFile);
 
-      expect(summary.fileCoverage['/project/src/nested/deep/file.ts']).toBeDefined();
+      expect(summary.files.has('/project/src/nested/deep/file.ts')).toBe(true);
     });
   });
 });

@@ -17,7 +17,7 @@ describe('EnhancedDocExtractor', () => {
     });
   });
 
-  describe('extractEnhancedDocs', () => {
+  describe('extractFromFile', () => {
     it('should extract problem tag', () => {
       const source = `
 /**
@@ -27,7 +27,7 @@ describe('EnhancedDocExtractor', () => {
 export class AuthHandler {}
       `;
 
-      const result = extractor.extractEnhancedDocs(source, 'test.ts');
+      const result = extractor.extractFromFile('test.ts', source);
 
       expect(result.length).toBeGreaterThanOrEqual(0);
     });
@@ -41,7 +41,7 @@ export class AuthHandler {}
 export class AuthService {}
       `;
 
-      const result = extractor.extractEnhancedDocs(source, 'test.ts');
+      const result = extractor.extractFromFile('test.ts', source);
 
       expect(result.length).toBeGreaterThanOrEqual(0);
     });
@@ -56,7 +56,7 @@ export class AuthService {}
 export class TokenService {}
       `;
 
-      const result = extractor.extractEnhancedDocs(source, 'test.ts');
+      const result = extractor.extractFromFile('test.ts', source);
 
       expect(result.length).toBeGreaterThanOrEqual(0);
     });
@@ -76,7 +76,7 @@ export class Class1 {}
 export class Class2 {}
       `;
 
-      const result = extractor.extractEnhancedDocs(source, 'test.ts');
+      const result = extractor.extractFromFile('test.ts', source);
 
       expect(result.length).toBeGreaterThanOrEqual(0);
     });
@@ -89,7 +89,7 @@ export class Class2 {}
 export class Simple {}
       `;
 
-      const result = extractor.extractEnhancedDocs(source, 'test.ts');
+      const result = extractor.extractFromFile('test.ts', source);
 
       expect(Array.isArray(result)).toBe(true);
     });
@@ -107,7 +107,7 @@ export class Simple {}
 export class UserRepository {}
       `;
 
-      const result = extractor.extractEnhancedDocs(source, 'test.ts');
+      const result = extractor.extractFromFile('test.ts', source);
 
       expect(result.length).toBeGreaterThanOrEqual(0);
     });
@@ -122,7 +122,7 @@ export class UserRepository {}
 export class CacheService {}
       `;
 
-      const result = extractor.extractEnhancedDocs(source, 'test.ts');
+      const result = extractor.extractFromFile('test.ts', source);
 
       expect(result.length).toBeGreaterThanOrEqual(0);
     });
@@ -137,7 +137,7 @@ export class CacheService {}
 export class NetworkService {}
       `;
 
-      const result = extractor.extractEnhancedDocs(source, 'test.ts');
+      const result = extractor.extractFromFile('test.ts', source);
 
       expect(result.length).toBeGreaterThanOrEqual(0);
     });
@@ -145,7 +145,7 @@ export class NetworkService {}
 
   describe('edge cases', () => {
     it('should handle empty source', () => {
-      const result = extractor.extractEnhancedDocs('', 'test.ts');
+      const result = extractor.extractFromFile('test.ts', '');
 
       expect(Array.isArray(result)).toBe(true);
       expect(result.length).toBe(0);
@@ -154,7 +154,7 @@ export class NetworkService {}
     it('should handle source without comments', () => {
       const source = 'export class NoComments {}';
 
-      const result = extractor.extractEnhancedDocs(source, 'test.ts');
+      const result = extractor.extractFromFile('test.ts', source);
 
       expect(Array.isArray(result)).toBe(true);
     });
@@ -169,7 +169,7 @@ export class NetworkService {}
 export class Test {}
       `;
 
-      const result = extractor.extractEnhancedDocs(source, 'test.ts');
+      const result = extractor.extractFromFile('test.ts', source);
 
       expect(Array.isArray(result)).toBe(true);
     });

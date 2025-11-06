@@ -155,7 +155,7 @@ describe('SymbolRegistryManager', () => {
     });
   });
 
-  describe('findBySource', () => {
+  describe('findBySourceRef', () => {
     it('should find symbol by source reference', () => {
       const manager = new SymbolRegistryManager(registryPath);
 
@@ -165,7 +165,7 @@ describe('SymbolRegistryManager', () => {
         type: 'function',
       });
 
-      const found = manager.findBySource({
+      const found = manager.findBySourceRef({
         filePath: 'src/test.ts',
         symbolName: 'TestSymbol',
         type: 'function',
@@ -178,7 +178,7 @@ describe('SymbolRegistryManager', () => {
     it('should return undefined for non-existent source', () => {
       const manager = new SymbolRegistryManager(registryPath);
 
-      const found = manager.findBySource({
+      const found = manager.findBySourceRef({
         filePath: 'src/nonexistent.ts',
         symbolName: 'Nothing',
         type: 'function',
@@ -188,7 +188,7 @@ describe('SymbolRegistryManager', () => {
     });
   });
 
-  describe('findByName', () => {
+  describe('search', () => {
     it('should find symbols by name', () => {
       const manager = new SymbolRegistryManager(registryPath);
 
@@ -204,18 +204,18 @@ describe('SymbolRegistryManager', () => {
         type: 'class',
       });
 
-      const found = manager.findByName('TestSymbol');
+      const found = manager.search('TestSymbol');
       expect(found.length).toBe(2);
     });
 
     it('should return empty array if no matches', () => {
       const manager = new SymbolRegistryManager(registryPath);
-      const found = manager.findByName('NonExistent');
+      const found = manager.search('NonExistent');
       expect(found.length).toBe(0);
     });
   });
 
-  describe('findByFile', () => {
+  describe('getByFile', () => {
     it('should find all symbols in a file', () => {
       const manager = new SymbolRegistryManager(registryPath);
 
@@ -237,7 +237,7 @@ describe('SymbolRegistryManager', () => {
         type: 'interface',
       });
 
-      const found = manager.findByFile('src/multi.ts');
+      const found = manager.getByFile('src/multi.ts');
       expect(found.length).toBe(2);
     });
   });
@@ -258,7 +258,7 @@ describe('SymbolRegistryManager', () => {
 
       // Load in new manager
       const manager2 = new SymbolRegistryManager(registryPath);
-      const found = manager2.findByName('PersistTest');
+      const found = manager2.search('PersistTest');
       expect(found.length).toBe(1);
       expect(found[0].sourceRef.symbolName).toBe('PersistTest');
     });
@@ -295,7 +295,7 @@ describe('SymbolRegistryManager', () => {
         type: 'function',
       });
 
-      const entries = manager.getAllEntries();
+      const entries = manager.getAll();
       expect(entries.length).toBe(2);
     });
   });
@@ -318,7 +318,7 @@ describe('SymbolRegistryManager', () => {
 
       const stats = manager.getStats();
       expect(stats.totalEntries).toBe(2);
-      expect(stats.version).toBe('1.0.0');
+      expect(stats.fileCount).toBeGreaterThanOrEqual(1);
     });
   });
 
@@ -326,32 +326,31 @@ describe('SymbolRegistryManager', () => {
     it('should add dependency to symbol', () => {
       const manager = new SymbolRegistryManager(registryPath);
 
-      const id = manager.register({
+      const id1 = manager.register({
         filePath: 'src/test.ts',
         symbolName: 'TestClass',
         type: 'class',
       });
 
-      manager.addDependency(id, {
-        target: 'OtherClass',
-        type: 'imports',
-        reason: 'Uses functionality',
+      const id2 = manager.register({
+        filePath: 'src/other.ts',
+        symbolName: 'OtherClass',
+        type: 'class',
       });
 
-      const entry = manager.findById(id);
-      expect(entry?.dependencies).toBeDefined();
-      expect(entry?.dependencies?.length).toBe(1);
-      expect(entry?.dependencies?.[0].target).toBe('OtherClass');
+      const result = manager.addDependency(id1, id2, 'Uses functionality', 'runtime');
+
+      expect(result).toBe(true);
+      const entry = manager.findById(id1);
+      expect(entry?.uses).toBeDefined();
+      expect(entry?.uses?.length).toBe(1);
+      expect(entry?.uses?.[0].targetId).toBe(id2);
     });
 
     it('should return false for non-existent symbol', () => {
       const manager = new SymbolRegistryManager(registryPath);
 
-      const result = manager.addDependency('999', {
-        target: 'SomeClass',
-        type: 'imports',
-        reason: 'Test',
-      });
+      const result = manager.addDependency('999', '888', 'Test', 'runtime');
 
       expect(result).toBe(false);
     });

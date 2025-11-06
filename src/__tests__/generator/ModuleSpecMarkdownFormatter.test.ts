@@ -114,10 +114,11 @@ describe('ModuleSpecMarkdownFormatter', () => {
 
     it('should exclude metadata when disabled', () => {
       const spec = createMockSpec();
-      const fmt = new ModuleSpecMarkdownFormatter({ includeMetadata: false });
+      const fmt = new ModuleSpecMarkdownFormatter({ includeMetadata: false, includeConfidence: false });
       const result = fmt.format(spec);
 
       expect(result).not.toContain('**Generated:**');
+      expect(result).not.toContain('## Metadata');
     });
 
     it('should include table of contents when enabled', () => {

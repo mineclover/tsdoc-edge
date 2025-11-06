@@ -874,13 +874,26 @@ export class ModuleSpecGenerator {
     const lines = jsDoc.split('\n');
 
     for (const line of lines) {
-      const match = line.match(/\*\s*@(\w+)\s+(.+)/);
-      if (match) {
-        const [, tagName, tagValue] = match;
+      // Match tags with values: @tagName value
+      const matchWithValue = line.match(/\*\s*@(\w+)\s+(.+)/);
+      if (matchWithValue) {
+        const [, tagName, tagValue] = matchWithValue;
         if (!tags.has(tagName)) {
           tags.set(tagName, []);
         }
         tags.get(tagName)!.push(tagValue.trim());
+        continue;
+      }
+
+      // Match tags without values: @tagName
+      const matchWithoutValue = line.match(/\*\s*@(\w+)\s*$/);
+      if (matchWithoutValue) {
+        const [, tagName] = matchWithoutValue;
+        if (!tags.has(tagName)) {
+          tags.set(tagName, []);
+        }
+        // Add empty string to indicate tag presence
+        tags.get(tagName)!.push('');
       }
     }
 

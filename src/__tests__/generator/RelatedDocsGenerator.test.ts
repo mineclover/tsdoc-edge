@@ -15,6 +15,7 @@ describe('RelatedDocsGenerator', () => {
     type: 'function',
     filePath: '/src/test.ts',
     line: 1,
+    column: 0,
     isPublic: true,
     isExported: true,
     // summary omitted (undefined),
@@ -116,7 +117,7 @@ describe('RelatedDocsGenerator', () => {
     });
 
     it('should show "No documentation" when summary is missing', () => {
-      const targetSymbol = createMockSymbol({ summary: null });
+      const targetSymbol = createMockSymbol({ summary: undefined });
       const result = generator.generateRelatedDocs(targetSymbol, []);
 
       expect(result).toContain('**Summary:** *(No documentation)*');
@@ -125,8 +126,10 @@ describe('RelatedDocsGenerator', () => {
     it('should include responsibility when present', () => {
       const targetSymbol = createMockSymbol({
         responsibility: {
+          symbolName: 'TestSymbol',
           description: 'Manages user data',
-          scope: 'users',
+          shouldDo: ['Manage data'],
+          shouldNotDo: ['Delete system files'],
         },
       });
       const result = generator.generateRelatedDocs(targetSymbol, []);
@@ -137,6 +140,9 @@ describe('RelatedDocsGenerator', () => {
     it('should include contract preconditions and postconditions', () => {
       const targetSymbol = createMockSymbol({
         contract: {
+          symbolName: 'TestSymbol',
+          description: 'Test contract',
+          filePath: '/test/test.ts',
           preconditions: ['Input must be valid', 'User must be authenticated'],
           postconditions: ['Data is saved', 'Event is emitted'],
           invariants: [],
@@ -155,12 +161,16 @@ describe('RelatedDocsGenerator', () => {
       const targetSymbol = createMockSymbol({
         tests: [
           {
+            symbolName: 'TestSymbol',
             testName: 'should work correctly',
             testFilePath: '/test/main.test.ts',
+            scenarios: ['basic test'],
           },
           {
+            symbolName: 'TestSymbol',
             testName: 'should handle errors',
             testFilePath: '/test/main.test.ts',
+            scenarios: ['error handling'],
           },
         ],
       });
@@ -222,6 +232,9 @@ describe('RelatedDocsGenerator', () => {
       const relatedSymbol = createMockSymbol({
         name: 'Related',
         contract: {
+          symbolName: 'Related',
+          description: 'Test contract',
+          filePath: '/test.ts',
           preconditions: ['Pre1', 'Pre2'],
           postconditions: ['Post1'],
           invariants: [],
@@ -334,14 +347,31 @@ describe('RelatedDocsGenerator', () => {
         createRelatedEntry(
           createMockSymbol({
             summary: 'Documented',
-            contract: { preconditions: [], postconditions: [], invariants: [] },
-            responsibility: { description: 'Test', scope: 'test' },
-            tests: [{ testName: 'test', testFilePath: '/test.ts' }],
+            contract: {
+              symbolName: 'Test',
+              description: 'Test contract',
+              filePath: '/test.ts',
+              preconditions: [],
+              postconditions: [],
+              invariants: []
+            },
+            responsibility: {
+              symbolName: 'Test',
+              description: 'Test',
+              shouldDo: ['Do something'],
+              shouldNotDo: ['Avoid something']
+            },
+            tests: [{
+              symbolName: 'Test',
+              testFilePath: '/test.ts',
+              testName: 'test',
+              scenarios: []
+            }],
           }),
           0.8,
           'Test'
         ),
-        createRelatedEntry(createMockSymbol({ summary: null }), 0.7, 'Test'),
+        createRelatedEntry(createMockSymbol({ summary: undefined }), 0.7, 'Test'),
       ];
 
       const result = generator.generateSummaryReport(targetSymbol, related);
@@ -356,7 +386,7 @@ describe('RelatedDocsGenerator', () => {
     it('should handle zero documented symbols', () => {
       const targetSymbol = createMockSymbol();
       const related = [
-        createRelatedEntry(createMockSymbol({ summary: null }), 0.5, 'Test'),
+        createRelatedEntry(createMockSymbol({ summary: undefined }), 0.5, 'Test'),
       ];
 
       const result = generator.generateSummaryReport(targetSymbol, related);

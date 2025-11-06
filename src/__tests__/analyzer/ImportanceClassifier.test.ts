@@ -100,6 +100,8 @@ describe('ImportanceClassifier', () => {
         responsibility: {
           symbolName: 'ResponsibleFunc',
           description: 'Manages user authentication',
+          shouldDo: ['Authenticate users', 'Manage sessions'],
+          shouldNotDo: ['Store passwords in plain text'],
         },
         tests: [],
         designDecisions: [],

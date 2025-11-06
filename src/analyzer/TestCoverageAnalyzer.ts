@@ -76,6 +76,12 @@ export class TestCoverageAnalyzer {
 
       // Convert src/ to __tests__/
       sourceFile
+        .replace(/^src\//, 'src/__tests__/')
+        .replace('.ts', '.test.ts'),
+      sourceFile
+        .replace(/^src\//, 'src/__tests__/')
+        .replace('.ts', '.spec.ts'),
+      sourceFile
         .replace('/src/', '/__tests__/')
         .replace('.ts', '.test.ts'),
       sourceFile.replace('/src/', '/__tests__/').replace('.ts', '.spec.ts'),

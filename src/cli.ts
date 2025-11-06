@@ -59,6 +59,7 @@ import {
   WithoutResponsibilityCommand,
   type CommandResult,
 } from './commands';
+import { DetectCircularTypesCommand, FindRootTypesCommand, TypeChainCommand } from './commands/TypeChainCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -131,6 +132,9 @@ async function main(): Promise<void> {
   registry.register(new ImproveCommand());
   registry.register(new InstallHookCommand());
   registry.register(new UninstallHookCommand());
+  registry.register(new TypeChainCommand());
+  registry.register(new FindRootTypesCommand());
+  registry.register(new DetectCircularTypesCommand());
   registry.register(new HelpCommand(registry));
 
   // Get command

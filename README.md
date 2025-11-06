@@ -23,19 +23,22 @@ TSDoc Edge는 단순한 문서 생성 도구가 아닙니다. 코드베이스의
 
 ## 주요 기능
 
-### ✅ CLI 도구 (v0.8.0 + v0.10.0 + v0.11.0) - NEW! 🔥
+### ✅ CLI 도구 (v0.8.0 + v0.10.0 + v0.11.0 + v0.12.0) - NEW! 🔥
 
-**45개 명령어로 완전한 문서 관리 - 완전 모듈화 완료** 🎉
+**48개 명령어로 완전한 문서 관리 - 완전 모듈화 완료** 🎉
 
 #### 초기화 및 빌드 (2개)
 - `init` - 프로젝트 설정 초기화
 - `build` - **소스 파일 스캔 및 심볼 DB 생성** 🔥
 
-#### 심볼 탐색 (9개)
+#### 심볼 탐색 (12개) 🔥
 - `id` (new, list, find, stats) - 심볼 ID 수동 관리
 - `find-method` - 심볼 검색
 - `tree` - 계층 트리 출력
 - `deps` / `used-by` / `who-uses` - 의존성 분석
+- `type-chain` - **타입 의존성 체인 시각화** 🔥
+- `find-roots` - **루트 타입 찾기 (진입점 식별)** 🔥
+- `detect-cycles` - **순환 참조 감지 및 경고** 🔥
 
 #### 이슈 찾기 (7개)
 - `orphans` - 사용되지 않는 코드
@@ -1358,3 +1361,108 @@ MIT
 ## 기여
 
 이슈나 PR은 언제든 환영합니다!
+### ✅ Type Chain Tracer (v0.12.0) - NEW! 🔥
+
+**타입 간 의존성을 추적하고 시각화하여 베스트 프랙티스 권장**
+
+명시적 타입 재사용을 권장하고 타입 체인을 시각화하여 아키텍처를 이해하기 쉽게 만듭니다.
+
+**베스트 프랙티스: 명시적 타입 재사용** ✅
+```typescript
+// ✅ GOOD: 명시적 타입 재사용
+interface Position {
+  x: number;
+  y: number;
+}
+
+interface Entity {
+  position: Position;  // 명시적으로 Position 타입 재사용
+}
+
+// ❌ BAD: 암시적 필드 복제
+interface Entity2D {
+  positionX: number;  // Position.x와 동일한 의미지만 암시적
+  positionY: number;  // Position.y와 동일한 의미지만 암시적
+}
+```
+
+**주요 기능**:
+
+1. **타입 체인 시각화** - 타입 간 의존성 경로 표시
+```bash
+# UserDTO에서 User까지의 경로 찾기
+tsdoc-edge type-chain UserDTO User
+
+# 출력:
+# Path 1: 2 step(s)
+#   UserDTO
+#   │
+#   └─ [composition via 'user'] → User
+#      ├─ [composition via 'id'] → UserId
+#      └─ [composition via 'profile'] → UserProfile
+```
+
+2. **의존성 트리 빌드** - 타입의 전체 의존성 시각화
+```bash
+# InterfaceInfo의 의존성 트리 표시
+tsdoc-edge type-chain InterfaceInfo --tree
+
+# 출력:
+# InterfaceInfo
+#    ├─ [composition via 'symbol'] → Symbol
+#    │  ├─ [composition via 'contract'] → ContractSpec
+#    │  ├─ [composition via 'responsibility'] → ResponsibilitySpec
+#    │  └─ [composition (array) via 'tests'] → TestMapping
+#    ├─ [composition (array) via 'properties'] → InterfaceProperty
+#    └─ [composition (array) via 'methods'] → InterfaceMethod
+```
+
+3. **루트 타입 찾기** - 진입점 식별
+```bash
+# 아무도 의존하지 않는 루트 타입 찾기
+tsdoc-edge find-roots
+
+# 출력:
+# Root Types (no incoming dependencies):
+#   ExtractionResult (2 dependencies)
+#   CoverageSummary (1 dependencies)
+#   CommandResult (0 dependencies)
+#   ...
+```
+
+4. **순환 참조 감지** 🚨
+```bash
+# 타입 간 순환 의존성 감지
+tsdoc-edge detect-cycles
+
+# 출력:
+# ⚠ Found 2 circular dependencies:
+# 1. DocQualityScore → DocQualityScore
+# 2. TypeDependencyNode → TypeDependencyNode
+#
+# ⚠ Recommendation: Refactor to remove circular dependencies
+#    - Extract common types to a separate file
+#    - Use dependency inversion principle
+```
+
+**필터 옵션**:
+```bash
+# 최대 깊이 제한
+tsdoc-edge type-chain UserService --max-depth=5
+
+# 외부 타입 포함 (node_modules)
+tsdoc-edge type-chain Config --include-external
+
+# Primitive 타입 포함
+tsdoc-edge type-chain Data --include-primitives
+```
+
+**주요 효과**:
+- ✅ **명시적 타입 재사용 권장**: 암시적 필드 복제 대신 타입 조합 사용
+- ✅ **타입 체인 시각화**: A → B → C 다단계 의존성 경로 추적
+- ✅ **순환 참조 감지**: 타입 간 circular dependency 자동 감지 및 경고
+- ✅ **루트 타입 식별**: 아키텍처 진입점 자동 발견
+- ✅ **리프 타입 식별**: 기본 타입(primitives) 계층 파악
+- ✅ **리팩토링 가이드**: 타입 구조 개선 방향 제시
+
+**테스트 커버리지**: 85개 테스트 (100% 통과)

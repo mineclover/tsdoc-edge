@@ -261,7 +261,7 @@ describe('StatsComparator', () => {
   describe('compareWithHistory', () => {
     it('should compare current stats with history', () => {
       const history: StatsHistoryEntry = {
-        timestamp: Date.now() - 3600000,
+        timestamp: new Date(Date.now() - 3600000).toISOString(),
         overall: { total: 10, documented: 5, undocumented: 5, rate: 50 },
         critical: { total: 3, documented: 2, undocumented: 1, rate: 66.7 },
         important: { total: 4, documented: 2, undocumented: 2, rate: 50 },

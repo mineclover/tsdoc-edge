@@ -5,3 +5,4 @@
 
 export * from './data-flow';
 export * from './interface';
+export * from './type-chain';

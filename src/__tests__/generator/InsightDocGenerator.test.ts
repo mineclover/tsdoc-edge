@@ -17,6 +17,7 @@ describe('InsightDocGenerator', () => {
     type: 'function',
     filePath: '/src/test.ts',
     line: 1,
+    column: 0,
     isPublic: true,
     isExported: true,
     // summary omitted (undefined),
@@ -139,11 +140,11 @@ describe('InsightDocGenerator', () => {
     it('should include dependency counts when enabled', () => {
       const symbol = createMockSymbol({ name: 'Test', id: 'test-id' });
       mockGraphBuilder.getDependencies.mockReturnValue([
-        createMockSymbol({ id: 'dep1' }),
-        createMockSymbol({ id: 'dep2' }),
+        'dep1',
+        'dep2',
       ]);
       mockGraphBuilder.getDependents.mockReturnValue([
-        createMockSymbol({ id: 'user1' }),
+        'user1',
       ]);
 
       const symbolsByDepth = new Map<number, Symbol[]>();
@@ -174,8 +175,10 @@ describe('InsightDocGenerator', () => {
       const symbol = createMockSymbol({
         name: 'Test',
         responsibility: {
+          symbolName: 'Test',
           description: 'Manages user authentication',
-          scope: 'authentication',
+          shouldDo: ['Authenticate users'],
+          shouldNotDo: ['Store passwords'],
         },
       });
 
@@ -191,6 +194,9 @@ describe('InsightDocGenerator', () => {
       const symbol = createMockSymbol({
         name: 'Test',
         contract: {
+          symbolName: 'Test',
+          description: 'Test contract',
+          filePath: '/test.ts',
           preconditions: ['Input must be valid'],
           postconditions: ['Output is sanitized'],
           invariants: [],
@@ -243,7 +249,8 @@ describe('InsightDocGenerator', () => {
       });
 
       expect(result).toContain('## 1. Core Workflow');
-      expect(result).toContain('## 2. Analysis');
+      expect(result).toContain('## 2. Validation');
+      expect(result).toContain('## 3. Generators');
     });
 
     it('should use custom title for category view', () => {
@@ -389,7 +396,7 @@ describe('InsightDocGenerator', () => {
     });
 
     it('should handle symbols with no summary', () => {
-      const symbol = createMockSymbol({ summary: null });
+      const symbol = createMockSymbol({ summary: undefined });
       const symbolsByDepth = new Map<number, Symbol[]>();
       symbolsByDepth.set(0, [symbol]);
 
@@ -399,7 +406,7 @@ describe('InsightDocGenerator', () => {
     });
 
     it('should handle symbols with no responsibility', () => {
-      const symbol = createMockSymbol({ responsibility: null });
+      const symbol = createMockSymbol({ responsibility: undefined });
       const symbolsByDepth = new Map<number, Symbol[]>();
       symbolsByDepth.set(0, [symbol]);
 
@@ -409,7 +416,7 @@ describe('InsightDocGenerator', () => {
     });
 
     it('should handle symbols with no contract', () => {
-      const symbol = createMockSymbol({ contract: null });
+      const symbol = createMockSymbol({ contract: undefined });
       const symbolsByDepth = new Map<number, Symbol[]>();
       symbolsByDepth.set(0, [symbol]);
 
