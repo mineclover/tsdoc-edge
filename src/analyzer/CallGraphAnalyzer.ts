@@ -27,6 +27,7 @@ interface CallSite {
   callerSymbolId: string;
   callerName: string;
   targetName: string;
+  objectName?: string;
   targetSymbolId?: string;
   filePath: string;
   line: number;
@@ -114,7 +115,7 @@ export class CallGraphAnalyzer {
 
     // Resolve call targets and create relationships
     for (const site of callSites) {
-      const targetSymbol = this.resolveCallTarget(site.targetName, site.filePath);
+      const targetSymbol = this.resolveCallTarget(site.targetName, site.filePath, site.objectName);
 
       if (targetSymbol) {
         const key = `${site.callerSymbolId}->${site.targetName}`;
@@ -279,6 +280,7 @@ export class CallGraphAnalyzer {
               callerSymbolId: caller.id,
               callerName: caller.name,
               targetName: targetInfo.name,
+              objectName: targetInfo.objectName,
               filePath: caller.filePath,
               line: pos.line + 1,
               callType: targetInfo.callType
@@ -299,6 +301,7 @@ export class CallGraphAnalyzer {
         callerSymbolId: caller.id,
         callerName: caller.name,
         targetName: targetInfo.name,
+        objectName: targetInfo.objectName,
         filePath: caller.filePath,
         line: pos.line + 1,
         callType: targetInfo.callType
@@ -312,22 +315,38 @@ export class CallGraphAnalyzer {
   /**
    * Extract target name from call expression
    */
-  private extractTargetName(node: ts.CallExpression): { name: string; callType: 'direct' | 'method' | 'constructor' | 'unknown' } | null {
+  private extractTargetName(node: ts.CallExpression): { name: string; callType: 'direct' | 'method' | 'constructor' | 'unknown'; objectName?: string } | null {
     try {
       if (ts.isIdentifier(node.expression)) {
         // Direct call: foo()
+        const name = node.expression.text;
+
+        // Skip built-in global functions
+        if (this.isBuiltInGlobal(name)) {
+          return null;
+        }
+
         return {
-          name: node.expression.text,
+          name,
           callType: 'direct'
         };
       } else if (ts.isPropertyAccessExpression(node.expression)) {
         // Method call: obj.method()
-        if (ts.isIdentifier(node.expression.name)) {
-          return {
-            name: node.expression.name.text,
-            callType: 'method'
-          };
+        const methodName = ts.isIdentifier(node.expression.name) ? node.expression.name.text : null;
+        const objectName = ts.isIdentifier(node.expression.expression) ? node.expression.expression.text : null;
+
+        if (!methodName) return null;
+
+        // Skip built-in object methods (Object.entries, Array.from, etc.)
+        if (objectName && this.isBuiltInObject(objectName)) {
+          return null;
         }
+
+        return {
+          name: methodName,
+          callType: 'method',
+          objectName: objectName || undefined
+        };
       }
     } catch (error) {
       // Skip problematic expressions
@@ -337,34 +356,95 @@ export class CallGraphAnalyzer {
   }
 
   /**
+   * Check if name is a built-in global function
+   */
+  private isBuiltInGlobal(name: string): boolean {
+    const builtins = [
+      'require', 'import', 'export',
+      'parseInt', 'parseFloat', 'isNaN', 'isFinite',
+      'encodeURI', 'decodeURI', 'encodeURIComponent', 'decodeURIComponent',
+      'eval', 'setTimeout', 'setInterval', 'clearTimeout', 'clearInterval'
+    ];
+    return builtins.includes(name);
+  }
+
+  /**
+   * Check if name is a built-in object
+   */
+  private isBuiltInObject(name: string): boolean {
+    const builtins = [
+      'Object', 'Array', 'String', 'Number', 'Boolean', 'Date', 'RegExp',
+      'Math', 'JSON', 'Promise', 'Set', 'Map', 'WeakSet', 'WeakMap',
+      'Symbol', 'Proxy', 'Reflect',
+      'console', 'process', 'Buffer',
+      'Error', 'TypeError', 'ReferenceError', 'SyntaxError',
+      'Intl', 'globalThis', 'window', 'document'
+    ];
+    return builtins.includes(name);
+  }
+
+  /**
    * Resolve call target to a symbol
    */
-  private resolveCallTarget(targetName: string, callerFilePath: string): Symbol | undefined {
+  private resolveCallTarget(targetName: string, callerFilePath: string, objectName?: string): Symbol | undefined {
     // Try to find the target symbol by name
     // Priority: same file > imported symbols > any symbol with that name
 
     // 1. Check symbols in the same file
     for (const [symbolId, symbol] of this.graph.symbols.entries()) {
-      if (symbol.filePath === callerFilePath && symbol.name === targetName) {
-        return symbol;
+      if (symbol.filePath === callerFilePath) {
+        // For methods, try to match ClassName.methodName
+        if (objectName && symbol.name === `${objectName}.${targetName}`) {
+          return symbol;
+        }
+        // Direct name match
+        if (symbol.name === targetName) {
+          return symbol;
+        }
+        // Method name without class prefix
+        if (symbol.name.endsWith(`.${targetName}`)) {
+          return symbol;
+        }
       }
     }
 
     // 2. Check all symbols with matching name (could be imported)
     for (const [symbolId, symbol] of this.graph.symbols.entries()) {
-      if (symbol.name === targetName && symbol.isExported) {
-        return symbol;
+      if (symbol.isExported) {
+        // For methods, try to match ClassName.methodName
+        if (objectName && symbol.name === `${objectName}.${targetName}`) {
+          return symbol;
+        }
+        // Direct name match
+        if (symbol.name === targetName) {
+          return symbol;
+        }
       }
     }
 
-    // 3. Fallback: any symbol with that name
+    // 3. Fallback: any symbol with that name (but prefer methods over variables)
+    let bestMatch: Symbol | undefined;
     for (const [symbolId, symbol] of this.graph.symbols.entries()) {
       if (symbol.name === targetName) {
-        return symbol;
+        // Prefer functions/methods over variables
+        if (symbol.type === 'function' || symbol.type === 'method') {
+          return symbol;
+        }
+        if (!bestMatch) {
+          bestMatch = symbol;
+        }
+      }
+      // Also check method name without class prefix
+      if (symbol.name.endsWith(`.${targetName}`)) {
+        if (symbol.type === 'method') {
+          if (!bestMatch || bestMatch.type !== 'method') {
+            bestMatch = symbol;
+          }
+        }
       }
     }
 
-    return undefined;
+    return bestMatch;
   }
 
   /**
