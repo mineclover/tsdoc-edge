@@ -156,12 +156,16 @@ export class DatabaseManager {
    * @postcondition Symbol is indexed and searchable
    */
   insertSymbol(symbol: Symbol, jsonlLine: number): boolean {
+    const symbolAny = symbol as any; // ExtractedSymbol may have additional fields
+
     const stmt = this.db.prepare(`
       INSERT OR REPLACE INTO symbols (
         id, name, type, file_path, line, column,
         is_exported, is_public, summary,
+        declared_type, inferred_type, generic_params, parameter_types,
+        is_constant, literal_value, value_type,
         created_at, updated_at, version, jsonl_line
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `);
 
     try {
@@ -175,6 +179,13 @@ export class DatabaseManager {
         symbol.isExported ? 1 : 0,
         symbol.isPublic ? 1 : 0,
         symbol.summary || null,
+        symbolAny.declaredType || null,
+        symbolAny.inferredType || null,
+        symbolAny.genericParams ? JSON.stringify(symbolAny.genericParams) : null,
+        symbolAny.parameterTypes ? JSON.stringify(symbolAny.parameterTypes) : null,
+        symbolAny.isConstant ? 1 : 0,
+        symbolAny.literalValue || null,
+        symbolAny.valueType || null,
         new Date().toISOString(),
         new Date().toISOString(),
         '1.0.0',
@@ -557,6 +568,64 @@ export class DatabaseManager {
       verifiedDocs: docCount,
       mismatches,
     };
+  }
+
+  /**
+   * Insert a unified relationship
+   * @param relationship - Unified relationship to insert
+   * @returns True if successful
+   */
+  insertUnifiedRelationship(relationship: {
+    id: string;
+    type: string;
+    category: string;
+    fromSymbols: string[];
+    toSymbols: string[];
+    direction: string;
+    strength: string;
+    evidence: Array<{ type: string; source: string; lineNumber?: number; confidence: number }>;
+    discoveredBy: string;
+    confidence: number;
+    filePath?: string;
+    line?: number;
+    properties?: Record<string, any>;
+    description?: string;
+  }): boolean {
+    const stmt = this.db.prepare(`
+      INSERT OR REPLACE INTO unified_relationships (
+        id, type, category,
+        from_symbols, to_symbols,
+        direction, strength,
+        evidence, discovered_by, confidence,
+        file_path, line, properties,
+        created_at, updated_at, description
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    try {
+      stmt.run(
+        relationship.id,
+        relationship.type,
+        relationship.category,
+        JSON.stringify(relationship.fromSymbols),
+        JSON.stringify(relationship.toSymbols),
+        relationship.direction,
+        relationship.strength,
+        JSON.stringify(relationship.evidence),
+        relationship.discoveredBy,
+        relationship.confidence,
+        relationship.filePath || null,
+        relationship.line || null,
+        relationship.properties ? JSON.stringify(relationship.properties) : null,
+        new Date().toISOString(),
+        new Date().toISOString(),
+        relationship.description || null
+      );
+      return true;
+    } catch (error) {
+      console.error('Failed to insert unified relationship:', error);
+      return false;
+    }
   }
 
   /**

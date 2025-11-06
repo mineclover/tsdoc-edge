@@ -1,0 +1,84 @@
+%% Current System Metrics and Health Dashboard
+%% Generated: 2025-11-07
+
+graph TB
+    subgraph "📊 Symbol Distribution"
+        Total[Total Symbols: 1,438]
+        Total --> Functions[Functions: 681<br/>47.4%]
+        Total --> Methods[Methods: 527<br/>36.6%]
+        Total --> Classes[Classes: 112<br/>7.8%]
+        Total --> Interfaces[Interfaces: 87<br/>6.0%]
+        Total --> Variables[Variables: 21<br/>1.5%]
+        Total --> Constants[Constants: 10<br/>0.7%]
+    end
+
+    subgraph "🔗 Relationship Distribution"
+        TotalRels[Total Relationships: 8,662]
+        TotalRels --> IODeps[I/O Dependencies: 6,705<br/>77.4%]
+        TotalRels --> CodeDeps[Code Dependencies: 1,902<br/>22.0%]
+        TotalRels --> Inherit[Inheritance: 55<br/>0.6%]
+
+        IODeps --> Pipelines[Pipelines: 25,809<br/>length 3 chains]
+    end
+
+    subgraph "✨ Quality Metrics"
+        Quality[Code Quality Score: A+]
+        Quality --> Circular[Circular Dependencies: 0<br/>✅ Perfect]
+        Quality --> Coverage[Doc Coverage: 89%<br/>✅ Excellent]
+        Quality --> TypeInfo[Type Information: 81%<br/>✅ Good]
+        Quality --> Exports[Public API: 462 members<br/>✅ Well-defined]
+    end
+
+    subgraph "⚡ Performance Metrics"
+        Perf[Performance Benchmarks]
+        Perf --> Build[Build: 2.2s<br/>for 131 files]
+        Perf --> Analysis[Analysis: <200ms<br/>all analyzers]
+        Perf --> Query[Queries: <5ms<br/>relationships]
+        Perf --> Search[FTS Search: <10ms<br/>full-text]
+    end
+
+    subgraph "🔥 Critical Hotspots (score ≥ 20)"
+        Hotspots[10 Critical Hotspots]
+        Hotspots --> H1[Symbol: 170<br/>83 in, 4 out]
+        Hotspots --> H2[CommandResult: 146<br/>73 in, 0 out]
+        Hotspots --> H3[BaseCommand: 126<br/>63 in, 0 out]
+        Hotspots --> H4[colors: 110<br/>55 in, 0 out]
+        Hotspots --> H5[SymbolRegistryMgr: 81<br/>38 in, 5 out]
+        Hotspots --> H6[TSDocEdge: 77<br/>0 in, 77 out]
+        Hotspots --> H7[DatabaseManager: 77<br/>37 in, 3 out]
+        Hotspots --> H8[SymbolGraphBuilder: 75<br/>36 in, 3 out]
+        Hotspots --> H9[ConfigManager: 71<br/>34 in, 3 out]
+        Hotspots --> H10[args: 58<br/>0 in, 58 out]
+    end
+
+    subgraph "💾 Storage Metrics"
+        Storage[Total Storage: 4.5 MB]
+        Storage --> SQLite[SQLite DB: 2.4 MB<br/>with indexes]
+        Storage --> JSONL[JSONL Files: 1.8 MB<br/>Git-tracked]
+        Storage --> FTS[FTS Index: 0.3 MB<br/>search index]
+    end
+
+    subgraph "📈 Growth Projection"
+        Current[Current: 8,662 rels<br/>5/17 types (29%)]
+        Current --> Phase2[+Phase 2: ~15,000 rels<br/>9/17 types (53%)]
+        Phase2 --> Phase3[+Phase 3: ~20,000 rels<br/>13/17 types (76%)]
+        Phase3 --> Complete[Complete: ~24,000 rels<br/>17/17 types (100%)]
+    end
+
+    %% Styling
+    style Total fill:#8b5cf6,stroke:#6d28d9,stroke-width:3px,color:#fff
+    style TotalRels fill:#8b5cf6,stroke:#6d28d9,stroke-width:3px,color:#fff
+    style Quality fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style Perf fill:#339af0,stroke:#1864ab,stroke-width:3px,color:#fff
+    style Hotspots fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px,color:#fff
+    style Storage fill:#ffd93d,stroke:#fab005,stroke-width:3px
+    style Current fill:#74c0fc,stroke:#339af0,stroke-width:2px
+    style Complete fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+
+    %% Health indicators
+    Circular --> HealthA[Overall Health: A+]:::health
+    Coverage --> HealthA
+    TypeInfo --> HealthA
+    Exports --> HealthA
+
+    classDef health fill:#51cf66,stroke:#2f9e44,stroke-width:4px,color:#fff,font-size:18px

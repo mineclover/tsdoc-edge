@@ -103,6 +103,8 @@ export interface ImprovementSuggestion {
 
 /**
  * Analysis report
+ *
+ * @doc [[AnalysisReport]]
  */
 export interface AnalysisReport {
   /** Analysis timestamp */

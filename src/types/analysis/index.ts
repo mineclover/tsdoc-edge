@@ -5,3 +5,4 @@
 
 export * from './quality';
 export * from './statistics';
+export * from './test-relationships';

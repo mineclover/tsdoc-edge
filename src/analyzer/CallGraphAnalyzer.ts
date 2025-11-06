@@ -181,36 +181,82 @@ export class CallGraphAnalyzer {
 
   /**
    * Find the AST node for a symbol
+   * Uses name-based matching with line number as fallback
    */
   private findSymbolNode(sourceFile: ts.SourceFile, symbol: Symbol): ts.Node | null {
     let foundNode: ts.Node | null = null;
+    let candidatesByName: ts.Node[] = [];
+
+    // Extract method name from "ClassName.methodName" format
+    const symbolMethodName = symbol.name.includes('.')
+      ? symbol.name.split('.').pop() || symbol.name
+      : symbol.name;
 
     const visitor = (node: ts.Node): void => {
       if (!node || foundNode) return;
 
       try {
-        const nodePos = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+        // Check node type first
+        const isCorrectType =
+          (symbol.type === 'function' && ts.isFunctionDeclaration(node)) ||
+          (symbol.type === 'method' && ts.isMethodDeclaration(node)) ||
+          (symbol.type === 'class' && ts.isClassDeclaration(node));
 
-        if (nodePos.line + 1 === symbol.line) {
-          // Check if this is the right kind of node
-          if (
-            (symbol.type === 'function' && ts.isFunctionDeclaration(node)) ||
-            (symbol.type === 'method' && ts.isMethodDeclaration(node)) ||
-            (symbol.type === 'class' && ts.isClassDeclaration(node))
-          ) {
-            foundNode = node;
-            return;
+        if (isCorrectType) {
+          // Try to get the node's name
+          const nodeName = this.getNodeName(node);
+
+          if (nodeName === symbolMethodName) {
+            try {
+              // Name matches - check if line also matches (exact match)
+              const nodePos = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
+              const lineDiff = Math.abs(nodePos.line + 1 - symbol.line);
+
+              if (lineDiff === 0) {
+                // Perfect match
+                foundNode = node;
+                return;
+              } else {
+                // Any name match is a candidate
+                candidatesByName.push(node);
+              }
+            } catch (error) {
+              // Skip problematic nodes
+            }
           }
         }
 
-        ts.forEachChild(node, visitor);
+        // Recursively visit children (important for class members!)
+        node.forEachChild(visitor);
       } catch (error) {
         // Skip problematic nodes
       }
     };
 
     visitor(sourceFile);
+
+    // If no perfect match, use first candidate
+    if (!foundNode && candidatesByName.length > 0) {
+      foundNode = candidatesByName[0];
+    }
+
     return foundNode;
+  }
+
+  /**
+   * Get the name of a node
+   */
+  private getNodeName(node: ts.Node): string | null {
+    if (ts.isFunctionDeclaration(node) && node.name) {
+      return node.name.text;
+    }
+    if (ts.isMethodDeclaration(node) && ts.isIdentifier(node.name)) {
+      return node.name.text;
+    }
+    if (ts.isClassDeclaration(node) && node.name) {
+      return node.name.text;
+    }
+    return null;
   }
 
   /**
@@ -225,7 +271,7 @@ export class CallGraphAnalyzer {
         // Try to find by endsWith
         for (const [key, file] of this.sourceFiles.entries()) {
           if (key.endsWith(normalized) || normalized.endsWith(key)) {
-            const pos = file.getLineAndCharacterOfPosition(node.getStart());
+            const pos = file.getLineAndCharacterOfPosition(node.getStart(file));
             const targetInfo = this.extractTargetName(node);
             if (!targetInfo) return null;
 
@@ -242,7 +288,7 @@ export class CallGraphAnalyzer {
         return null;
       }
 
-      const pos = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+      const pos = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
       const targetInfo = this.extractTargetName(node);
 
       if (!targetInfo) {

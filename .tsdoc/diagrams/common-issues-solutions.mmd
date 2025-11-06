@@ -1,0 +1,141 @@
+%% Common Issues and Solutions
+%% Documented problems encountered during implementation with fixes
+
+graph TB
+    subgraph "Issue 1: Zero Relationships Bug (CRITICAL)"
+        I1[Problem: 0 relationships<br/>despite 1,247 symbols]
+        I1 --> Root1[Root Cause:<br/>BuildCommand not saving relationships]
+
+        Root1 --> Solution1[Solution:<br/>Add relationship insertion loop]
+
+        Solution1 --> Code1["for (const rel of relationships) {<br/>  dbManager.insertRelationship(rel);<br/>}"]
+
+        Code1 --> Result1[Result:<br/>1,902 → 17,113 relationships<br/>Later refined to 1,989]
+    end
+
+    subgraph "Issue 2: Local Variables Noise"
+        I2[Problem: 1,153 variables<br/>46% of all symbols]
+        I2 --> Root2[Root Cause:<br/>Extracting function-local variables]
+
+        Root2 --> Impact2[Impact:<br/>820 false circular dependencies<br/>Massive noise in analysis]
+
+        Impact2 --> Solution2[Solution:<br/>Top-level filtering]
+
+        Solution2 --> Code2["if (ts.isVariableStatement(node)<br/>    && !parentSymbol) {<br/>  extractVariableStatement(node);<br/>}"]
+
+        Code2 --> Result2[Result:<br/>Variables: 1,153 → 21 (-98%)<br/>Symbols: 2,531 → 1,410 (-44%)<br/>Circulars: 820 → 0 (-100%)]
+    end
+
+    subgraph "Issue 3: Methods Not Exported"
+        I3[Problem: All methods have<br/>is_exported=0]
+        I3 --> Root3[Root Cause:<br/>No parent export propagation]
+
+        Root3 --> Impact3[Impact:<br/>Public API not tracked<br/>Inaccurate API surface]
+
+        Impact3 --> Solution3[Solution:<br/>Export tracking + inheritance]
+
+        Solution3 --> Code3["// Track exports<br/>exportedClasses.add(className);<br/><br/>// Propagate to members<br/>const parentIsExported =<br/>  exportedClasses.has(parent);<br/>const isExported =<br/>  parentIsExported && isPublic;"]
+
+        Code3 --> Result3[Result:<br/>462 exported members identified<br/>Public API correctly tracked]
+    end
+
+    subgraph "Issue 4: No I/O Dependencies"
+        I4[Problem: 0 I/O dependencies<br/>Type matching failing]
+        I4 --> Root4[Root Cause:<br/>No parameter type information<br/>in database]
+
+        Root4 --> Impact4[Impact:<br/>Cannot match types<br/>No data flow analysis]
+
+        Impact4 --> Solution4[Solution:<br/>Add parameter_types column<br/>+ extraction + storage]
+
+        Solution4 --> Code4["// Schema<br/>parameter_types TEXT<br/><br/>// Extraction<br/>parameterTypes: [{name, type}]<br/><br/>// Storage<br/>JSON.stringify(parameterTypes)"]
+
+        Code4 --> Result4[Result:<br/>I/O deps: 0 → 7,446<br/>Pipelines: 0 → 25,809]
+    end
+
+    subgraph "Issue 5: Schema Column Missing"
+        I5[Problem: SqliteError<br/>column not found]
+        I5 --> Root5[Root Cause:<br/>Updated schema not copied to dist/]
+
+        Root5 --> Solution5[Solution:<br/>Copy schema + rebuild DB]
+
+        Solution5 --> Code5["cp src/storage/schema.sql dist/storage/<br/>rm -rf .tsdoc<br/>node dist/cli.js build src"]
+
+        Code5 --> Result5[Result:<br/>Schema synchronized<br/>Build succeeds]
+    end
+
+    subgraph "Issue 6: Type Information Not Captured"
+        I6[Problem: Only JSDoc summaries<br/>No TypeScript type info]
+        I6 --> Root6[Root Cause:<br/>Not using TypeScript Compiler API]
+
+        Root6 --> Impact6[Impact:<br/>No type-based analysis<br/>Missing type relationships]
+
+        Impact6 --> Solution6[Solution:<br/>Create extractTypeInfo()<br/>+ extractFunctionTypeInfo()]
+
+        Solution6 --> Code6["const type = typeChecker<br/>  .getTypeAtLocation(node);<br/>const typeString =<br/>  typeChecker.typeToString(type);"]
+
+        Code6 --> Result6[Result:<br/>1,161 symbols with types<br/>81% type coverage]
+    end
+
+    subgraph "Best Practices Learned"
+        BP1[1. Always filter at extraction<br/>Don't rely on post-processing]
+        BP2[2. Track parent context<br/>Essential for inheritance]
+        BP3[3. Use TypeScript Compiler API<br/>Don't parse strings]
+        BP4[4. Add columns early<br/>Schema changes are expensive]
+        BP5[5. Verify with actual output<br/>Don't trust assumptions]
+
+        BP1 --> BPNote[Applied in all analyzers]
+        BP2 --> BPNote
+        BP3 --> BPNote
+        BP4 --> BPNote
+        BP5 --> BPNote
+    end
+
+    subgraph "Prevention Strategies"
+        PS1[Before: 0 relationships<br/>After: Early validation]
+        PS2[Before: Extract everything<br/>After: Filter aggressively]
+        PS3[Before: Ignore context<br/>After: Track parent/scope]
+        PS4[Before: String parsing<br/>After: Use proper APIs]
+        PS5[Before: Assume schema OK<br/>After: Verify dist/ sync]
+
+        PS1 --> PSImpact[Zero critical bugs<br/>in recent work]
+        PS2 --> PSImpact
+        PS3 --> PSImpact
+        PS4 --> PSImpact
+        PS5 --> PSImpact
+    end
+
+    subgraph "Testing Improvements"
+        T1[Added: Verification commands<br/>after each change]
+        T2[Added: Snapshot testing<br/>for expected counts]
+        T3[Added: Integration tests<br/>end-to-end]
+
+        T1 --> TImpact[Catch issues immediately<br/>No silent failures]
+        T2 --> TImpact
+        T3 --> TImpact
+    end
+
+    %% Styling
+    style I1 fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px,color:#fff
+    style I2 fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px,color:#fff
+    style I3 fill:#ffd93d,stroke:#fab005,stroke-width:2px
+    style I4 fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px,color:#fff
+    style I5 fill:#ffd93d,stroke:#fab005,stroke-width:2px
+    style I6 fill:#ffd93d,stroke:#fab005,stroke-width:2px
+
+    style Result1 fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style Result2 fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style Result3 fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style Result4 fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style Result5 fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style Result6 fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+
+    style Code1 fill:#e1f5ff,stroke:#1864ab,stroke-width:2px
+    style Code2 fill:#e1f5ff,stroke:#1864ab,stroke-width:2px
+    style Code3 fill:#e1f5ff,stroke:#1864ab,stroke-width:2px
+    style Code4 fill:#e1f5ff,stroke:#1864ab,stroke-width:2px
+    style Code5 fill:#e1f5ff,stroke:#1864ab,stroke-width:2px
+    style Code6 fill:#e1f5ff,stroke:#1864ab,stroke-width:2px
+
+    style BPNote fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff
+    style PSImpact fill:#51cf66,stroke:#2f9e44,stroke-width:2px,color:#fff
+    style TImpact fill:#51cf66,stroke:#2f9e44,stroke-width:2px,color:#fff

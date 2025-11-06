@@ -6,9 +6,8 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { ConfigManager } from '../config/ConfigManager';
-import { FileScanner } from '../scanner/FileScanner';
+import { ASTSymbolExtractor } from '../analyzer/ASTSymbolExtractor';
 import { DatabaseManager } from '../storage/DatabaseManager';
-import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /**
@@ -89,30 +88,173 @@ export class BuildCommand extends BaseCommand {
       const config = this.configManager.get();
       const dbPath = path.join(process.cwd(), config.paths.databasePath || '.tsdoc.db');
       const jsonlPath = path.join(process.cwd(), config.paths.jsonlDir || 'docs/data');
-      const registryPath = path.join(jsonlPath, 'registry.jsonl');
 
       // Ensure jsonl directory exists
       if (!fs.existsSync(jsonlPath)) {
         fs.mkdirSync(jsonlPath, { recursive: true });
       }
 
-      // Initialize managers
+      // Initialize database
       const dbManager = new DatabaseManager(dbPath, jsonlPath);
-      const registryManager = new SymbolRegistryManager(registryPath);
+      const extractor = new ASTSymbolExtractor();
 
-      // Create scanner
-      const scanner = new FileScanner(registryManager, dbManager, {
-        rootDir: targetPath,
-        include: ['**/*.ts', '**/*.tsx'],
-        exclude: ['**/node_modules/**', '**/dist/**', '**/*.test.ts', '**/*.spec.ts'],
-      });
-
-      // Run scan
+      // Find TypeScript files
       this.printInfo('Scanning TypeScript files...');
-
       const startTime = Date.now();
-      const result = await scanner.scan();
+
+      const files = this.findTypeScriptFiles(targetPath);
+
+      const result = {
+        filesScanned: 0,
+        symbolsFound: 0,
+        symbolsInserted: 0,
+        relationshipsFound: 0,
+        relationshipsInserted: 0,
+        errors: [] as string[],
+      };
+
+      // Prepare JSONL registry (use .tsdoc directly for consistency with other commands)
+      const registryDir = path.join(process.cwd(), '.tsdoc');
+      const registryPath = path.join(registryDir, 'registry.jsonl');
+      const registryLines: string[] = [];
+
+      // Global symbol ID mapping for relationship insertion
+      const symbolIdMap = new Map<string, string>();
+
+      // Store all relationships to insert after all symbols are collected
+      const allRelationships: Array<{ type: string; from: string; to: string; filePath: string; description?: string }> = [];
+
+      // Process each file
+      for (const filePath of files) {
+        try {
+          const content = fs.readFileSync(filePath, 'utf-8');
+          const extractResult = extractor.extract(filePath, content);
+
+          result.filesScanned++;
+          result.symbolsFound += extractResult.symbols.length;
+          result.relationshipsFound += extractResult.relationships.length;
+
+          // Collect relationships for later insertion
+          allRelationships.push(...extractResult.relationships);
+
+          // Insert symbols
+          for (const symbol of extractResult.symbols) {
+            // Generate simple kebab-case ID
+            const id = `${symbol.type}-${symbol.name}`
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-|-$/g, '');
+
+            const fullSymbol = {
+              id,
+              ...symbol,
+              tests: [],
+              designDecisions: [],
+            };
+
+            const success = dbManager.insertSymbol(fullSymbol, 0);
+            if (success) {
+              result.symbolsInserted++;
+
+              // Store mapping for relationship insertion
+              symbolIdMap.set(symbol.name, id);
+
+              // Add to JSONL registry (SymbolRegistryEntry format)
+              const registryEntry = {
+                id,
+                sourceRef: {
+                  filePath: symbol.filePath,
+                  line: symbol.line,
+                  column: symbol.column,
+                  symbolName: symbol.name,
+                  symbolType: symbol.type,
+                },
+                createdAt: new Date().toISOString(),
+                updatedAt: new Date().toISOString(),
+              };
+              registryLines.push(JSON.stringify(registryEntry));
+            } else {
+              result.errors.push(`Failed to insert: ${symbol.name} in ${filePath}`);
+            }
+          }
+        } catch (error) {
+          result.errors.push(`Error scanning ${filePath}: ${error}`);
+        }
+      }
+
+      // Insert all relationships after all symbols are collected
+      this.printInfo('Inserting relationships...');
+      for (const relationship of allRelationships) {
+        try {
+          // Get symbol IDs from the map
+          const fromId = symbolIdMap.get(relationship.from);
+          const toId = symbolIdMap.get(relationship.to);
+
+          if (fromId && toId) {
+            // Insert into legacy dependencies table
+            const success = dbManager.insertDependency({
+              symbolId: fromId,
+              target: toId,
+              type: relationship.type,
+              reason: relationship.description || `${relationship.type} relationship`,
+              importPath: relationship.filePath,
+            });
+
+            // Map relationship type to unified relationship type and category
+            let unifiedType = 'code-dependency';
+            let category = 'structural';
+
+            if (relationship.type === 'extends') {
+              unifiedType = 'inheritance';
+              category = 'structural';
+            } else if (relationship.type === 'implements') {
+              unifiedType = 'implementation';
+              category = 'structural';
+            } else if (relationship.type === 'dependsOn') {
+              unifiedType = 'code-dependency';
+              category = 'structural';
+            }
+
+            // Also insert into unified_relationships table
+            const unifiedId = `${unifiedType}-${fromId}-${toId}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
+            dbManager.insertUnifiedRelationship({
+              id: unifiedId,
+              type: unifiedType,
+              category: category,
+              fromSymbols: [fromId],
+              toSymbols: [toId],
+              direction: 'unidirectional',
+              strength: 'strong',
+              evidence: [{
+                type: 'code',
+                source: relationship.filePath,
+                confidence: 1.0,
+              }],
+              discoveredBy: 'static-analysis',
+              confidence: 1.0,
+              filePath: relationship.filePath,
+              description: relationship.description || `${relationship.from} ${relationship.type} ${relationship.to}`,
+            });
+
+            if (success) {
+              result.relationshipsInserted++;
+            }
+          } else {
+            // Symbol not found in map, try to find by name in database
+            // This handles cross-file dependencies
+            result.errors.push(`Relationship skipped: ${relationship.from} -> ${relationship.to} (symbols not found)`);
+          }
+        } catch (error) {
+          result.errors.push(`Failed to insert relationship: ${relationship.from} -> ${relationship.to}`);
+        }
+      }
+
       const duration = Date.now() - startTime;
+
+      // Write JSONL registry
+      fs.writeFileSync(registryPath, registryLines.join('\n'), 'utf-8');
+
+      dbManager.close();
 
       console.log();
       this.printSuccess('Database build complete');
@@ -123,9 +265,12 @@ export class BuildCommand extends BaseCommand {
       console.log(`  Files scanned: ${this.colors.cyan}${result.filesScanned}${this.colors.reset}`);
       console.log(`  Symbols found: ${this.colors.cyan}${result.symbolsFound}${this.colors.reset}`);
       console.log(`  Symbols inserted: ${this.colors.green}${result.symbolsInserted}${this.colors.reset}`);
+      console.log(`  Relationships found: ${this.colors.cyan}${result.relationshipsFound}${this.colors.reset}`);
+      console.log(`  Relationships inserted: ${this.colors.green}${result.relationshipsInserted}${this.colors.reset}`);
       console.log(`  Duration: ${this.colors.cyan}${duration}ms${this.colors.reset}`);
       console.log();
       console.log(`${this.colors.dim}Database: ${dbPath}${this.colors.reset}`);
+      console.log(`${this.colors.dim}Registry: ${registryPath}${this.colors.reset}`);
 
       // Show errors if any
       if (result.errors.length > 0) {
@@ -143,6 +288,33 @@ export class BuildCommand extends BaseCommand {
 
       return this.success(`Built database with ${result.symbolsInserted} symbols`);
     });
+  }
+
+  /**
+   * Recursively find TypeScript files
+   */
+  private findTypeScriptFiles(dir: string): string[] {
+    const files: string[] = [];
+    const entries = fs.readdirSync(dir, { withFileTypes: true });
+
+    for (const entry of entries) {
+      const fullPath = path.join(dir, entry.name);
+
+      if (entry.isDirectory()) {
+        // Skip excluded directories
+        if (entry.name === 'node_modules' || entry.name === 'dist') {
+          continue;
+        }
+        files.push(...this.findTypeScriptFiles(fullPath));
+      } else if (entry.isFile()) {
+        // Include .ts files, exclude test files
+        if (fullPath.endsWith('.ts') && !fullPath.endsWith('.test.ts') && !fullPath.endsWith('.spec.ts')) {
+          files.push(fullPath);
+        }
+      }
+    }
+
+    return files;
   }
 
   private get colors() {

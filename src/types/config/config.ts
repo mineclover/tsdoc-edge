@@ -10,6 +10,7 @@
 /**
  * Main configuration interface for tsdoc-edge project
  *
+ * @doc [[TsdocEdgeConfig]]
  * @public
  */
 export interface TsdocEdgeConfig {

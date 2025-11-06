@@ -1,0 +1,133 @@
+%% Confidence Scoring System for I/O Dependencies
+%% Shows how confidence scores (0-1) are calculated
+
+graph TB
+    subgraph "Input Data"
+        Producer[Producer Symbol<br/>function getUser: User]
+        Consumer[Consumer Symbol<br/>function updateUser(user: User)]
+        DataType[Matched Type<br/>User]
+    end
+
+    Producer --> StartCalc[Start Confidence Calculation]
+    Consumer --> StartCalc
+    DataType --> StartCalc
+
+    subgraph "Base Confidence"
+        StartCalc --> BaseConf[Base = 0.5<br/>Type matching only]
+        BaseConf --> Note1[All I/O deps start here]
+    end
+
+    subgraph "Location Factor (+0.2)"
+        BaseConf --> CheckLocation{Same file?}
+
+        CheckLocation -->|Yes| SameFile[+0.2 confidence<br/>Likely related code]
+        CheckLocation -->|No| DiffFile[+0.0<br/>Cross-file dependency]
+
+        SameFile --> Note2[Proximity increases confidence]
+    end
+
+    subgraph "Import Factor (+0.2)"
+        CheckLocation --> CheckImport{Consumer imports<br/>Producer?}
+
+        CheckImport -->|Yes| HasImport[+0.2 confidence<br/>Explicit dependency]
+        CheckImport -->|No| NoImport[+0.0<br/>Inferred only]
+
+        HasImport --> Note3[Code dependency proves connection]
+    end
+
+    subgraph "Type Quality Factor (+0.1)"
+        CheckImport --> CheckType{Custom type?}
+
+        CheckType -->|Yes - PascalCase| CustomType[+0.1 confidence<br/>Domain-specific type]
+        CheckType -->|No - generic| GenericType[+0.0<br/>Common type like Array]
+
+        CustomType --> CheckGeneric{Has generic<br/>parameters?}
+        CheckGeneric -->|Yes - Array&lt;T&gt;| ReduceConf[-0.05<br/>Less specific]
+        CheckGeneric -->|No - User| KeepConf[Keep +0.1]
+
+        CustomType --> Note4[Custom types are more meaningful]
+    end
+
+    subgraph "Confidence Capping"
+        SameFile --> Sum[Sum all factors]
+        DiffFile --> Sum
+        HasImport --> Sum
+        NoImport --> Sum
+        ReduceConf --> Sum
+        KeepConf --> Sum
+
+        Sum --> Cap{Total > 1.0?}
+        Cap -->|Yes| Cap1[Cap at 1.0]
+        Cap -->|No| KeepSum[Keep sum]
+
+        Cap1 --> FinalConf[Final Confidence]
+        KeepSum --> FinalConf
+    end
+
+    subgraph "Confidence Categories"
+        FinalConf --> Categorize{Categorize}
+
+        Categorize -->|>= 0.8| High[High Confidence<br/>Strong evidence]
+        Categorize -->|0.5 - 0.8| Medium[Medium Confidence<br/>Type match only]
+        Categorize -->|< 0.5| Low[Low Confidence<br/>Weak inference]
+
+        High --> HighColor[🟢 Color: Green]
+        Medium --> MediumColor[🟡 Color: Yellow]
+        Low --> LowColor[🔴 Color: Red]
+    end
+
+    subgraph "Strength Mapping"
+        FinalConf --> MapStrength{Map to strength}
+
+        MapStrength -->|>= 0.8| Strong[strength: 'strong']
+        MapStrength -->|0.5 - 0.8| MediumS[strength: 'medium']
+        MapStrength -->|< 0.5| Weak[strength: 'weak']
+    end
+
+    subgraph "Examples"
+        Ex1[Example 1:<br/>Same file + import + User<br/>0.5 + 0.2 + 0.2 + 0.1 = 1.0]
+        Ex2[Example 2:<br/>Same file + User<br/>0.5 + 0.2 + 0.1 = 0.8]
+        Ex3[Example 3:<br/>Different file + User<br/>0.5 + 0.1 = 0.6]
+        Ex4[Example 4:<br/>Different file + Array&lt;T&gt;<br/>0.5 + 0.0 = 0.5]
+
+        Ex1 --> ExCat1[High confidence]
+        Ex2 --> ExCat2[High confidence]
+        Ex3 --> ExCat3[Medium confidence]
+        Ex4 --> ExCat4[Medium confidence]
+    end
+
+    subgraph "Current System Stats"
+        Stats[Total I/O Dependencies: 7,446]
+        Stats --> HighCount[High ≥0.8: 0 deps<br/>0%]
+        Stats --> MedCount[Medium 0.5-0.8: 7,446 deps<br/>100%]
+        Stats --> LowCount[Low <0.5: 0 deps<br/>0%]
+
+        StatsNote[All deps have medium confidence<br/>because cross-file without imports]
+    end
+
+    subgraph "Evidence Storage"
+        FinalConf --> CreateEvidence[Create Evidence Object]
+
+        CreateEvidence --> EvidenceObj["evidence: [{<br/>  type: 'type-signature',<br/>  source: producer.filePath,<br/>  lineNumber: producer.line,<br/>  snippet: 'getUser(): User',<br/>  confidence: 0.8,<br/>  context: 'Consumed by updateUser'<br/>}]"]
+
+        EvidenceObj --> StoreDB[Store in unified_relationships]
+    end
+
+    %% Styling
+    style BaseConf fill:#8b5cf6,stroke:#6d28d9,stroke-width:3px,color:#fff
+    style SameFile fill:#51cf66,stroke:#2f9e44,stroke-width:2px
+    style HasImport fill:#51cf66,stroke:#2f9e44,stroke-width:2px
+    style CustomType fill:#51cf66,stroke:#2f9e44,stroke-width:2px
+    style DiffFile fill:#868e96,stroke:#495057,stroke-width:2px
+    style NoImport fill:#868e96,stroke:#495057,stroke-width:2px
+    style GenericType fill:#868e96,stroke:#495057,stroke-width:2px
+    style High fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style Medium fill:#ffd93d,stroke:#fab005,stroke-width:2px
+    style Low fill:#ff6b6b,stroke:#c92a2a,stroke-width:2px,color:#fff
+    style FinalConf fill:#8b5cf6,stroke:#6d28d9,stroke-width:3px,color:#fff
+
+    style Note1 fill:#fff4e1,stroke:#fab005,stroke-width:1px,stroke-dasharray: 5 5
+    style Note2 fill:#e7f5ff,stroke:#1864ab,stroke-width:1px,stroke-dasharray: 5 5
+    style Note3 fill:#e7f5ff,stroke:#1864ab,stroke-width:1px,stroke-dasharray: 5 5
+    style Note4 fill:#e7f5ff,stroke:#1864ab,stroke-width:1px,stroke-dasharray: 5 5
+    style StatsNote fill:#ffe1e1,stroke:#c92a2a,stroke-width:1px,stroke-dasharray: 5 5

@@ -91,6 +91,20 @@ export class TypeChainCommand extends BaseCommand {
     console.log(`${colors.green}✓${colors.reset} Analyzed ${graph.interfaces.size} interfaces`);
     console.log('');
 
+    // Show statistics
+    const stats = tracer.getGraphStatistics(options);
+    console.log(`${colors.blue}${colors.bold}Statistics:${colors.reset}`);
+    console.log(`  - Total Types: ${stats.totalTypes}`);
+    console.log(`  - Composites: ${stats.composites} (${stats.compositesPercentage.toFixed(1)}%)`);
+    console.log(`  - Complete: ${stats.complete} (${stats.completePercentage.toFixed(1)}%)`);
+    if (stats.hasCircularDependencies) {
+      console.log(`  - ${colors.yellow}Circular Dependencies: ${stats.circularDependencies}${colors.reset}`);
+    } else {
+      console.log(`  - ${colors.green}No Circular Dependencies${colors.reset}`);
+    }
+    console.log(`  - Average Dependencies: ${stats.averageDependencies}`);
+    console.log('');
+
     // Check if source type exists
     if (!graph.interfaces.has(sourceType)) {
       console.error(`${colors.red}✗${colors.reset} Type not found: ${sourceType}`);
@@ -296,6 +310,20 @@ export class FindRootTypesCommand extends BaseCommand {
 
     const { tracer, graph } = this.buildGraph();
 
+    // Show statistics
+    const stats = tracer.getGraphStatistics(options);
+    console.log(`${colors.blue}${colors.bold}Statistics:${colors.reset}`);
+    console.log(`  - Total Types: ${stats.totalTypes}`);
+    console.log(`  - Composites: ${stats.composites} (${stats.compositesPercentage.toFixed(1)}%)`);
+    console.log(`  - Complete: ${stats.complete} (${stats.completePercentage.toFixed(1)}%)`);
+    if (stats.hasCircularDependencies) {
+      console.log(`  - ${colors.yellow}Circular Dependencies: ${stats.circularDependencies}${colors.reset}`);
+    } else {
+      console.log(`  - ${colors.green}No Circular Dependencies${colors.reset}`);
+    }
+    console.log(`  - Average Dependencies: ${stats.averageDependencies}`);
+    console.log('');
+
     const rootTypes = tracer.findRootTypes(options);
     const leafTypes = tracer.findLeafTypes(options);
 
@@ -406,7 +434,21 @@ export class DetectCircularTypesCommand extends BaseCommand {
     console.log(`${colors.blue}${colors.bold}═══════════════════════════════════════════════════════════════════${colors.reset}`);
     console.log('');
 
-    const { tracer } = this.buildGraph();
+    const { tracer, graph } = this.buildGraph();
+
+    // Show statistics
+    const stats = tracer.getGraphStatistics(options);
+    console.log(`${colors.blue}${colors.bold}Statistics:${colors.reset}`);
+    console.log(`  - Total Types: ${stats.totalTypes}`);
+    console.log(`  - Composites: ${stats.composites} (${stats.compositesPercentage.toFixed(1)}%)`);
+    console.log(`  - Complete: ${stats.complete} (${stats.completePercentage.toFixed(1)}%)`);
+    if (stats.hasCircularDependencies) {
+      console.log(`  - ${colors.yellow}Circular Dependencies: ${stats.circularDependencies}${colors.reset}`);
+    } else {
+      console.log(`  - ${colors.green}No Circular Dependencies${colors.reset}`);
+    }
+    console.log(`  - Average Dependencies: ${stats.averageDependencies}`);
+    console.log('');
 
     console.log(`${colors.cyan}ℹ${colors.reset} Detecting circular dependencies...`);
     console.log('');

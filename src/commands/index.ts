@@ -62,3 +62,5 @@ export {
   UninstallHookCommand,
 } from './Phase10Commands';
 export { CommandRegistry } from './CommandRegistry';
+export { AnalyzeIOCommand } from './AnalyzeIOCommand';
+export { VisualizeDepsCommand } from './VisualizeDepsCommand';

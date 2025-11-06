@@ -1,0 +1,84 @@
+%% Relationship Type Coverage by Category
+%% Current: 5/17 types implemented (29%)
+
+graph TB
+    subgraph "Structural Relationships (3 types)"
+        S1[code-dependency<br/>✅ 1,902 rels]:::implemented
+        S2[inheritance<br/>✅ 55 rels]:::implemented
+        S3[interface-impl<br/>❌ Not implemented]:::notimpl
+    end
+
+    subgraph "Data Flow Relationships (3 types)"
+        D1[io-dependency<br/>✅ 6,705 rels]:::implemented
+        D2[pipeline<br/>✅ 25,809 rels]:::implemented
+        D3[event-flow<br/>❌ Not implemented]:::notimpl
+    end
+
+    subgraph "Behavioral Relationships (3 types)"
+        B1[calls<br/>❌ Not implemented<br/>Expected: ~5,000]:::notimpl
+        B2[callback<br/>❌ Not implemented<br/>Expected: ~400]:::notimpl
+        B3[composition<br/>❌ Not implemented<br/>Expected: ~600]:::notimpl
+    end
+
+    subgraph "Type System Relationships (2 types)"
+        T1[type-dependency<br/>❌ Not implemented<br/>Expected: ~1,500]:::notimpl
+        T2[generic-constraint<br/>❌ Not implemented<br/>Expected: ~200]:::notimpl
+    end
+
+    subgraph "Architectural Relationships (2 types)"
+        A1[layer-dependency<br/>❌ Not implemented<br/>Expected: ~100]:::notimpl
+        A2[module-boundary<br/>❌ Not implemented<br/>Expected: ~80]:::notimpl
+    end
+
+    subgraph "Testing Relationships (1 type)"
+        Test1[test-coverage<br/>❌ Not implemented<br/>Expected: ~1,200]:::notimpl
+    end
+
+    subgraph "Documentation Relationships (2 types)"
+        Doc1[doc-reference<br/>❌ Not implemented<br/>Expected: ~800]:::notimpl
+        Doc2[enhancement<br/>❌ Not implemented<br/>Expected: ~500]:::notimpl
+    end
+
+    subgraph "Other (1 type)"
+        O1[circular<br/>✅ 0 detected]:::implemented
+    end
+
+    %% Category completeness
+    S1 --> SC[Structural: 67%<br/>2/3 implemented]
+    S2 --> SC
+    S3 --> SC
+
+    D1 --> DC[Data Flow: 67%<br/>2/3 implemented]
+    D2 --> DC
+    D3 --> DC
+
+    B1 --> BC[Behavioral: 0%<br/>0/3 implemented]
+    B2 --> BC
+    B3 --> BC
+
+    T1 --> TC[Type System: 0%<br/>0/2 implemented]
+    T2 --> TC
+
+    A1 --> AC[Architectural: 0%<br/>0/2 implemented]
+    A2 --> AC
+
+    Test1 --> TestC[Testing: 0%<br/>0/1 implemented]
+
+    Doc1 --> DocC[Documentation: 0%<br/>0/2 implemented]
+    Doc2 --> DocC
+
+    O1 --> OC[Other: 100%<br/>1/1 implemented]
+
+    %% Overall status
+    SC --> Overall[Overall Coverage:<br/>29% implemented<br/>5/17 types]:::overall
+    DC --> Overall
+    BC --> Overall
+    TC --> Overall
+    AC --> Overall
+    TestC --> Overall
+    DocC --> Overall
+    OC --> Overall
+
+    classDef implemented fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    classDef notimpl fill:#868e96,stroke:#495057,stroke-width:2px,color:#fff
+    classDef overall fill:#8b5cf6,stroke:#6d28d9,stroke-width:4px,color:#fff

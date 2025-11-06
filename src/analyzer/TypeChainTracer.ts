@@ -370,6 +370,51 @@ export class TypeChainTracer {
   }
 
   /**
+   * Get overall statistics of the type graph
+   *
+   * @param options - Filter options
+   * @returns Statistics about the type graph
+   * @public
+   */
+  getGraphStatistics(options: TypeChainOptions = {}) {
+    const allTypes = Array.from(this.graph.interfaces.keys());
+    const filteredDeps = this.graph.dependencies.filter((dep) => this.shouldFollowDependency(dep, options));
+
+    // Count composite types (types with dependencies)
+    const compositesSet = new Set<string>();
+    for (const dep of filteredDeps) {
+      compositesSet.add(dep.from);
+    }
+
+    const composites = compositesSet.size;
+    const complete = allTypes.length - composites;
+
+    // Calculate average dependencies per type
+    const depCounts = new Map<string, number>();
+    for (const dep of filteredDeps) {
+      depCounts.set(dep.from, (depCounts.get(dep.from) || 0) + 1);
+    }
+    const totalDeps = Array.from(depCounts.values()).reduce((sum, count) => sum + count, 0);
+    const avgDeps = allTypes.length > 0 ? totalDeps / allTypes.length : 0;
+
+    // Detect cycles
+    const cycles = this.detectCircularDependencies(options);
+
+    return {
+      totalTypes: allTypes.length,
+      composites,
+      compositesPercentage: allTypes.length > 0 ? (composites / allTypes.length) * 100 : 0,
+      complete,
+      completePercentage: allTypes.length > 0 ? (complete / allTypes.length) * 100 : 0,
+      totalDependencies: filteredDeps.length,
+      averageDependencies: Number(avgDeps.toFixed(2)),
+      circularDependencies: cycles.length,
+      hasCircularDependencies: cycles.length > 0,
+      cycles,
+    };
+  }
+
+  /**
    * Check if dependency should be followed based on options
    */
   private shouldFollowDependency(dep: InterfaceDependency, options: TypeChainOptions): boolean {

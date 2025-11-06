@@ -594,7 +594,7 @@ export class StatsCommand extends BaseCommand {
         console.log();
 
         // Count documented vs undocumented
-        const query = 'SELECT COUNT(*) as count FROM symbols WHERE summary IS NOT NULL AND summary != ""';
+        const query = "SELECT COUNT(*) as count FROM symbols WHERE summary IS NOT NULL AND summary != ''";
         const stmt = dbManager.db.prepare(query);
         const result = stmt.get() as { count: number };
 

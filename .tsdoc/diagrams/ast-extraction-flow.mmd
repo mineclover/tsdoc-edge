@@ -1,0 +1,147 @@
+%% TypeScript AST Symbol Extraction Flow
+%% Shows how ASTSymbolExtractor processes TypeScript source code
+
+graph TB
+    subgraph "Input"
+        Source[TypeScript Source Files<br/>*.ts, *.tsx]
+    end
+
+    subgraph "Compilation Phase"
+        Source --> TSCompiler[TypeScript Compiler API]
+        TSCompiler --> Program[ts.Program]
+        Program --> SourceFile[ts.SourceFile AST]
+    end
+
+    subgraph "Traversal Phase (Visitor Pattern)"
+        SourceFile --> VisitNode[visitNode recursion]
+
+        VisitNode --> CheckClass{isClassDeclaration?}
+        VisitNode --> CheckFunc{isFunctionDeclaration?}
+        VisitNode --> CheckInterface{isInterfaceDeclaration?}
+        VisitNode --> CheckVar{isVariableStatement?}
+        VisitNode --> CheckType{isTypeAliasDeclaration?}
+
+        CheckClass -->|Yes| ExtractClass[extractClassSymbol]
+        CheckFunc -->|Yes| ExtractFunc[extractFunctionSymbol]
+        CheckInterface -->|Yes| ExtractInterface[extractInterfaceSymbol]
+        CheckVar -->|Yes + Top-level| ExtractVar[extractVariableStatement]
+        CheckType -->|Yes| ExtractType[extractTypeAliasSymbol]
+
+        CheckClass -->|No| Continue[Continue traversal]
+        CheckFunc -->|No| Continue
+        CheckInterface -->|No| Continue
+        CheckVar -->|No or nested| Continue
+        CheckType -->|No| Continue
+    end
+
+    subgraph "Class Member Extraction"
+        ExtractClass --> TrackExport{Is exported?}
+        TrackExport -->|Yes| AddToExported[Add to exportedClasses Set]
+        TrackExport -->|No| SkipExport[Skip export tracking]
+
+        AddToExported --> IterateMembers[Iterate class members]
+        SkipExport --> IterateMembers
+
+        IterateMembers --> CheckMethod{isMethodDeclaration?}
+        IterateMembers --> CheckProp{isPropertyDeclaration?}
+
+        CheckMethod -->|Yes| ExtractMethod[extractMethodSymbol]
+        CheckProp -->|Yes| ExtractProp[extractPropertySymbol]
+
+        ExtractMethod --> CheckVisibility{Has private modifier?}
+        ExtractProp --> CheckVisibility
+
+        CheckVisibility -->|No - is public| CheckParent{Parent in exportedClasses?}
+        CheckVisibility -->|Yes| MarkPrivate[isExported = false]
+
+        CheckParent -->|Yes| MarkExported[isExported = true]
+        CheckParent -->|No| MarkNotExported[isExported = false]
+    end
+
+    subgraph "Type Information Extraction"
+        ExtractFunc --> ExtractFuncType[extractFunctionTypeInfo]
+        ExtractMethod --> ExtractFuncType
+
+        ExtractFuncType --> GetReturnType{node.type exists?}
+        GetReturnType -->|Yes| TypeToString[typeChecker.typeToString]
+        GetReturnType -->|No| InferType[Infer from implementation]
+
+        TypeToString --> DeclaredType[declaredType: string]
+        InferType --> InferredType[inferredType: string]
+
+        ExtractFuncType --> GetParams[node.parameters]
+        GetParams --> ExtractParamTypes[Extract parameter types]
+
+        ExtractParamTypes --> ParamLoop[For each parameter]
+        ParamLoop --> ParamName[Get parameter name]
+        ParamLoop --> ParamType{param.type exists?}
+
+        ParamType -->|Yes| ParamTypeString[typeToString]
+        ParamType -->|No| ParamNoType[type: undefined]
+
+        ParamTypeString --> ParamObject[{name, type}]
+        ParamNoType --> ParamObject
+
+        ParamObject --> ParamTypes[parameterTypes: Array]
+    end
+
+    subgraph "Constant Detection"
+        ExtractVar --> CheckConst{const keyword?}
+        CheckConst -->|Yes| ExtractValue[extractLiteralValue]
+        CheckConst -->|No| SkipValue[is_constant = false]
+
+        ExtractValue --> CheckLiteral{Literal type?}
+
+        CheckLiteral -->|String| StringLiteral[literalValue: string<br/>valueType: 'string']
+        CheckLiteral -->|Number| NumberLiteral[literalValue: number<br/>valueType: 'number']
+        CheckLiteral -->|Boolean| BoolLiteral[literalValue: boolean<br/>valueType: 'boolean']
+        CheckLiteral -->|Object| ObjectLiteral[literalValue: JSON<br/>valueType: 'object']
+        CheckLiteral -->|Array| ArrayLiteral[literalValue: JSON<br/>valueType: 'array']
+        CheckLiteral -->|Other| NoValue[literalValue: null]
+    end
+
+    subgraph "Symbol Assembly"
+        DeclaredType --> AssembleSymbol[Assemble ExtractedSymbol]
+        InferredType --> AssembleSymbol
+        ParamTypes --> AssembleSymbol
+        MarkExported --> AssembleSymbol
+        MarkNotExported --> AssembleSymbol
+        MarkPrivate --> AssembleSymbol
+        StringLiteral --> AssembleSymbol
+        NumberLiteral --> AssembleSymbol
+        BoolLiteral --> AssembleSymbol
+        ObjectLiteral --> AssembleSymbol
+        ArrayLiteral --> AssembleSymbol
+        NoValue --> AssembleSymbol
+        SkipValue --> AssembleSymbol
+
+        AssembleSymbol --> Symbol[ExtractedSymbol object]
+        Symbol --> SymbolArray[Push to symbols array]
+    end
+
+    subgraph "Output"
+        SymbolArray --> Result[Return symbols array<br/>1,438 symbols extracted]
+        Result --> NextPhase[→ DatabaseManager]
+    end
+
+    %% Styling
+    style Source fill:#e1f5ff,stroke:#1864ab,stroke-width:2px
+    style Result fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style VisitNode fill:#ffe1e1,stroke:#c92a2a,stroke-width:2px
+    style ExtractFuncType fill:#ffd93d,stroke:#fab005,stroke-width:2px
+    style ExtractValue fill:#ffd93d,stroke:#fab005,stroke-width:2px
+    style AssembleSymbol fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff
+
+    %% Annotations
+    Note1[Top-level filtering:<br/>Reduces 1,153→21 variables]
+    CheckVar -.-> Note1
+
+    Note2[Export inheritance:<br/>462 public API members]
+    CheckParent -.-> Note2
+
+    Note3[Type extraction:<br/>81% have type info]
+    TypeToString -.-> Note3
+
+    style Note1 fill:#fff4e1,stroke:#fab005,stroke-width:1px,stroke-dasharray: 5 5
+    style Note2 fill:#fff4e1,stroke:#fab005,stroke-width:1px,stroke-dasharray: 5 5
+    style Note3 fill:#fff4e1,stroke:#fab005,stroke-width:1px,stroke-dasharray: 5 5

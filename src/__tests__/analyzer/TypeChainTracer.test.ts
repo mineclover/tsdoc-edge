@@ -1054,4 +1054,116 @@ describe('TypeChainTracer', () => {
       expect(roots.length).toBeGreaterThan(0);
     });
   });
+
+  describe('getGraphStatistics', () => {
+    it('should return correct statistics for empty graph', () => {
+      const graph = createSimpleGraph([]);
+      tracer = new TypeChainTracer(graph);
+
+      const stats = tracer.getGraphStatistics();
+
+      expect(stats.totalTypes).toBe(0);
+      expect(stats.composites).toBe(0);
+      expect(stats.complete).toBe(0);
+      expect(stats.totalDependencies).toBe(0);
+      expect(stats.averageDependencies).toBe(0);
+      expect(stats.circularDependencies).toBe(0);
+      expect(stats.hasCircularDependencies).toBe(false);
+    });
+
+    it('should return correct statistics for simple graph', () => {
+      const deps = [
+        { from: 'A', to: 'B', type: 'composition' as const },
+        { from: 'A', to: 'C', type: 'composition' as const },
+      ];
+      const graph = createGraphWithDeps(deps);
+      tracer = new TypeChainTracer(graph);
+
+      const stats = tracer.getGraphStatistics();
+
+      expect(stats.totalTypes).toBe(3); // A, B, C
+      expect(stats.composites).toBe(1); // A has dependencies
+      expect(stats.compositesPercentage).toBeCloseTo(33.3, 1);
+      expect(stats.complete).toBe(2); // B, C have no dependencies
+      expect(stats.completePercentage).toBeCloseTo(66.7, 1);
+      expect(stats.totalDependencies).toBe(2);
+      expect(stats.averageDependencies).toBeCloseTo(0.67, 2);
+      expect(stats.circularDependencies).toBe(0);
+      expect(stats.hasCircularDependencies).toBe(false);
+    });
+
+    it('should detect circular dependencies in statistics', () => {
+      const deps = [
+        { from: 'A', to: 'B', type: 'composition' as const },
+        { from: 'B', to: 'A', type: 'composition' as const },
+      ];
+      const graph = createGraphWithDeps(deps);
+      tracer = new TypeChainTracer(graph);
+
+      const stats = tracer.getGraphStatistics();
+
+      expect(stats.totalTypes).toBe(2);
+      expect(stats.composites).toBe(2); // Both have dependencies
+      expect(stats.compositesPercentage).toBe(100);
+      expect(stats.complete).toBe(0);
+      expect(stats.completePercentage).toBe(0);
+      expect(stats.circularDependencies).toBe(1);
+      expect(stats.hasCircularDependencies).toBe(true);
+      expect(stats.cycles.length).toBe(1);
+    });
+
+    it('should calculate average dependencies correctly', () => {
+      const deps = [
+        { from: 'A', to: 'B', type: 'composition' as const },
+        { from: 'A', to: 'C', type: 'composition' as const },
+        { from: 'A', to: 'D', type: 'composition' as const },
+        { from: 'B', to: 'C', type: 'composition' as const },
+      ];
+      const graph = createGraphWithDeps(deps);
+      tracer = new TypeChainTracer(graph);
+
+      const stats = tracer.getGraphStatistics();
+
+      expect(stats.totalTypes).toBe(4);
+      expect(stats.composites).toBe(2); // A and B
+      expect(stats.totalDependencies).toBe(4);
+      // Average: (3 + 1 + 0 + 0) / 4 = 1.0
+      expect(stats.averageDependencies).toBe(1.0);
+    });
+
+    it('should respect includeExternal option', () => {
+      const deps = [
+        { from: 'A', to: 'B', type: 'composition' as const, isExternal: false },
+        { from: 'A', to: 'External', type: 'composition' as const, isExternal: true },
+      ];
+      const graph = createGraphWithDeps(deps);
+      tracer = new TypeChainTracer(graph);
+
+      const statsWithExternal = tracer.getGraphStatistics({ includeExternal: true });
+      expect(statsWithExternal.totalDependencies).toBe(2);
+      expect(statsWithExternal.averageDependencies).toBeCloseTo(0.67, 2);
+
+      const statsWithoutExternal = tracer.getGraphStatistics({ includeExternal: false });
+      expect(statsWithoutExternal.totalDependencies).toBe(1);
+      expect(statsWithoutExternal.averageDependencies).toBeCloseTo(0.33, 2);
+    });
+
+    it('should handle large graphs efficiently', () => {
+      const deps = [];
+      for (let i = 0; i < 100; i++) {
+        deps.push({ from: `Type${i}`, to: `Type${i + 1}`, type: 'composition' as const });
+      }
+      const graph = createGraphWithDeps(deps);
+      tracer = new TypeChainTracer(graph);
+
+      const start = Date.now();
+      const stats = tracer.getGraphStatistics();
+      const duration = Date.now() - start;
+
+      expect(stats.totalTypes).toBe(101);
+      expect(stats.composites).toBe(100);
+      expect(stats.complete).toBe(1);
+      expect(duration).toBeLessThan(1000); // Should complete in less than 1s
+    });
+  });
 });

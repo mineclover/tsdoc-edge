@@ -17,10 +17,21 @@ export interface ExtractedSymbol extends Omit<Symbol, 'id' | 'tests' | 'designDe
   parentSymbol?: string;
   /** Extracted JSDoc summary if available */
   summary?: string;
+  /** Type information */
+  declaredType?: string;
+  inferredType?: string;
+  genericParams?: string[];
+  parameterTypes?: Array<{ name: string; type?: string }>;
+  /** Constant information */
+  isConstant?: boolean;
+  literalValue?: string;
+  valueType?: string;
 }
 
 /**
  * Extraction result
+ *
+ * @doc [[ExtractionResult]]
  */
 export interface ExtractionResult {
   /** All extracted symbols */
@@ -46,6 +57,8 @@ export class ASTSymbolExtractor {
   private relationships: SymbolRelationship[] = [];
   private imports: ExtractionResult['imports'] = [];
   private currentFilePath: string = '';
+  private exportedClasses: Set<string> = new Set();
+  private exportedInterfaces: Set<string> = new Set();
 
   /**
    * Extract all symbols and relationships from a TypeScript file
@@ -59,6 +72,8 @@ export class ASTSymbolExtractor {
     this.relationships = [];
     this.imports = [];
     this.currentFilePath = filePath;
+    this.exportedClasses = new Set();
+    this.exportedInterfaces = new Set();
 
     const sourceFile = ts.createSourceFile(
       filePath,
@@ -69,11 +84,41 @@ export class ASTSymbolExtractor {
 
     this.visitNode(sourceFile, undefined);
 
+    // Build relationships from imports
+    this.buildRelationshipsFromImports();
+
     return {
       symbols: this.symbols,
       relationships: this.relationships,
       imports: this.imports,
     };
+  }
+
+  /**
+   * Build relationships from collected imports
+   * Creates relationships from each symbol in the file to the imported symbols
+   */
+  private buildRelationshipsFromImports(): void {
+    // For each symbol defined in this file, create dependencies to imported symbols
+    for (const symbol of this.symbols) {
+      // Only create relationships for symbols defined at file level (not nested)
+      if (symbol.parentSymbol) continue;
+
+      for (const importInfo of this.imports) {
+        for (const importedName of importInfo.imported) {
+          if (importedName === '*') continue; // Skip wildcard exports
+
+          // Create a relationship from this symbol to the imported symbol
+          this.relationships.push({
+            type: 'dependsOn',
+            from: symbol.name,
+            to: importedName,
+            filePath: importInfo.from,
+            description: `${symbol.name} imports ${importedName} from ${importInfo.modulePath}`,
+          });
+        }
+      }
+    }
   }
 
   /**
@@ -90,10 +135,22 @@ export class ASTSymbolExtractor {
       this.extractReExport(node);
     }
 
+    // Extract variable declarations (including constants)
+    // Only extract top-level variables (not inside functions/methods)
+    if (ts.isVariableStatement(node) && !parentSymbol) {
+      this.extractVariableStatement(node);
+      return;
+    }
+
     // Extract class
     if (ts.isClassDeclaration(node) && node.name) {
       const symbol = this.extractClassSymbol(node);
       this.symbols.push(symbol);
+
+      // Track exported classes
+      if (symbol.isExported) {
+        this.exportedClasses.add(symbol.name);
+      }
 
       // Visit class members with class as parent
       for (const member of node.members) {
@@ -106,6 +163,11 @@ export class ASTSymbolExtractor {
     if (ts.isInterfaceDeclaration(node) && node.name) {
       const symbol = this.extractInterfaceSymbol(node);
       this.symbols.push(symbol);
+
+      // Track exported interfaces
+      if (symbol.isExported) {
+        this.exportedInterfaces.add(symbol.name);
+      }
 
       // Visit interface members
       for (const member of node.members) {
@@ -221,6 +283,37 @@ export class ASTSymbolExtractor {
     const name = node.name!.text;
     const pos = node.getSourceFile().getLineAndCharacterOfPosition(node.getStart());
 
+    // Extract inheritance (extends)
+    if (node.heritageClauses) {
+      for (const clause of node.heritageClauses) {
+        if (clause.token === ts.SyntaxKind.ExtendsKeyword) {
+          for (const type of clause.types) {
+            const baseClassName = type.expression.getText();
+            this.relationships.push({
+              type: 'extends',
+              from: name,
+              to: baseClassName,
+              filePath: this.currentFilePath,
+              description: `${name} extends ${baseClassName}`,
+            });
+          }
+        }
+        // Extract implementation (implements)
+        if (clause.token === ts.SyntaxKind.ImplementsKeyword) {
+          for (const type of clause.types) {
+            const interfaceName = type.expression.getText();
+            this.relationships.push({
+              type: 'implements',
+              from: name,
+              to: interfaceName,
+              filePath: this.currentFilePath,
+              description: `${name} implements ${interfaceName}`,
+            });
+          }
+        }
+      }
+    }
+
     return {
       name,
       type: 'class',
@@ -239,6 +332,24 @@ export class ASTSymbolExtractor {
   private extractInterfaceSymbol(node: ts.InterfaceDeclaration): ExtractedSymbol {
     const name = node.name.text;
     const pos = node.getSourceFile().getLineAndCharacterOfPosition(node.getStart());
+
+    // Extract interface inheritance (extends)
+    if (node.heritageClauses) {
+      for (const clause of node.heritageClauses) {
+        if (clause.token === ts.SyntaxKind.ExtendsKeyword) {
+          for (const type of clause.types) {
+            const baseInterfaceName = type.expression.getText();
+            this.relationships.push({
+              type: 'extends',
+              from: name,
+              to: baseInterfaceName,
+              filePath: this.currentFilePath,
+              description: `${name} extends ${baseInterfaceName}`,
+            });
+          }
+        }
+      }
+    }
 
     return {
       name,
@@ -259,6 +370,9 @@ export class ASTSymbolExtractor {
     const name = node.name!.text;
     const pos = node.getSourceFile().getLineAndCharacterOfPosition(node.getStart());
 
+    // Extract function type information
+    const funcTypeInfo = this.extractFunctionTypeInfo(node);
+
     return {
       name,
       type: 'function',
@@ -269,6 +383,8 @@ export class ASTSymbolExtractor {
       isPublic: !this.hasPrivateModifier(node),
       summary: this.extractJSDocSummary(node),
       parentSymbol,
+      declaredType: funcTypeInfo.returnType,
+      parameterTypes: funcTypeInfo.parameters,
     };
   }
 
@@ -280,16 +396,26 @@ export class ASTSymbolExtractor {
     const pos = node.getSourceFile().getLineAndCharacterOfPosition(node.getStart());
     const fullName = `${parentSymbol}.${name}`;
 
+    // Extract method type information
+    const funcTypeInfo = this.extractFunctionTypeInfo(node);
+
+    // Method is exported if parent class/interface is exported and method is public
+    const isPublic = !this.hasPrivateModifier(node);
+    const parentIsExported = this.exportedClasses.has(parentSymbol) || this.exportedInterfaces.has(parentSymbol);
+    const isExported = parentIsExported && isPublic;
+
     return {
       name: fullName,
       type: 'method',
       filePath: this.currentFilePath,
       line: pos.line + 1,
       column: pos.character,
-      isExported: false, // Methods inherit parent export
-      isPublic: !this.hasPrivateModifier(node),
+      isExported,
+      isPublic,
       summary: this.extractJSDocSummary(node),
       parentSymbol,
+      declaredType: funcTypeInfo.returnType,
+      parameterTypes: funcTypeInfo.parameters,
     };
   }
 
@@ -301,16 +427,31 @@ export class ASTSymbolExtractor {
     const pos = node.getSourceFile().getLineAndCharacterOfPosition(node.getStart());
     const fullName = `${parentSymbol}.${name}`;
 
+    // Extract type information
+    const typeInfo = this.extractTypeInfo(node.type);
+
+    // Extract value if initialized
+    const valueInfo = node.initializer ? this.extractLiteralValue(node.initializer) : null;
+
+    // Property is exported if parent class/interface is exported and property is public
+    const isPublic = !this.hasPrivateModifier(node);
+    const parentIsExported = this.exportedClasses.has(parentSymbol) || this.exportedInterfaces.has(parentSymbol);
+    const isExported = parentIsExported && isPublic;
+
     return {
       name: fullName,
       type: 'property',
       filePath: this.currentFilePath,
       line: pos.line + 1,
       column: pos.character,
-      isExported: false,
-      isPublic: !this.hasPrivateModifier(node),
+      isExported,
+      isPublic,
       summary: this.extractJSDocSummary(node),
       parentSymbol,
+      declaredType: typeInfo?.declaredType,
+      genericParams: typeInfo?.genericParams,
+      literalValue: valueInfo?.value,
+      valueType: valueInfo?.type,
     };
   }
 
@@ -405,5 +546,119 @@ export class ASTSymbolExtractor {
     }
 
     return undefined;
+  }
+
+  /**
+   * Extract variable statement (including constants)
+   */
+  private extractVariableStatement(node: ts.VariableStatement): void {
+    const declarationList = node.declarationList;
+    const isConst = (declarationList.flags & ts.NodeFlags.Const) !== 0;
+
+    for (const declaration of declarationList.declarations) {
+      if (!ts.isIdentifier(declaration.name)) continue;
+
+      const name = declaration.name.text;
+      const pos = node.getSourceFile().getLineAndCharacterOfPosition(node.getStart());
+
+      // Extract type information
+      const typeInfo = this.extractTypeInfo(declaration.type);
+
+      // Extract constant value
+      const valueInfo = declaration.initializer ? this.extractLiteralValue(declaration.initializer) : null;
+
+      // Detect if it's a constant (const keyword + UPPER_SNAKE_CASE pattern)
+      const isConstantPattern = /^[A-Z][A-Z0-9_]*$/.test(name);
+      const isConstantValue = isConst && (isConstantPattern || valueInfo?.isPrimitive);
+
+      this.symbols.push({
+        name,
+        type: isConstantValue ? 'constant' : 'variable',
+        filePath: this.currentFilePath,
+        line: pos.line + 1,
+        column: pos.character,
+        isExported: this.hasExportModifier(node),
+        isPublic: true,
+        summary: this.extractJSDocSummary(node),
+        declaredType: typeInfo?.declaredType,
+        genericParams: typeInfo?.genericParams,
+        isConstant: isConst,
+        literalValue: valueInfo?.value,
+        valueType: valueInfo?.type,
+      });
+    }
+  }
+
+  /**
+   * Extract type information from type node
+   */
+  private extractTypeInfo(typeNode?: ts.TypeNode): { declaredType?: string; genericParams?: string[] } | null {
+    if (!typeNode) return null;
+
+    const declaredType = typeNode.getText();
+    const genericParams: string[] = [];
+
+    // Extract generic parameters if present
+    if (ts.isTypeReferenceNode(typeNode) && typeNode.typeArguments) {
+      for (const arg of typeNode.typeArguments) {
+        genericParams.push(arg.getText());
+      }
+    }
+
+    return {
+      declaredType,
+      genericParams: genericParams.length > 0 ? genericParams : undefined,
+    };
+  }
+
+  /**
+   * Extract literal value from initializer
+   */
+  private extractLiteralValue(node: ts.Expression): { value: string; type: string; isPrimitive: boolean } | null {
+    if (ts.isStringLiteral(node)) {
+      return { value: node.text, type: 'string', isPrimitive: true };
+    }
+    if (ts.isNumericLiteral(node)) {
+      return { value: node.text, type: 'number', isPrimitive: true };
+    }
+    if (node.kind === ts.SyntaxKind.TrueKeyword || node.kind === ts.SyntaxKind.FalseKeyword) {
+      return { value: node.getText(), type: 'boolean', isPrimitive: true };
+    }
+    if (node.kind === ts.SyntaxKind.NullKeyword) {
+      return { value: 'null', type: 'null', isPrimitive: true };
+    }
+    if (node.kind === ts.SyntaxKind.UndefinedKeyword) {
+      return { value: 'undefined', type: 'undefined', isPrimitive: true };
+    }
+    if (ts.isArrayLiteralExpression(node)) {
+      return { value: node.getText(), type: 'array', isPrimitive: false };
+    }
+    if (ts.isObjectLiteralExpression(node)) {
+      return { value: node.getText(), type: 'object', isPrimitive: false };
+    }
+
+    return null;
+  }
+
+  /**
+   * Extract type information for methods and functions
+   */
+  private extractFunctionTypeInfo(node: ts.FunctionDeclaration | ts.MethodDeclaration): {
+    returnType?: string;
+    parameters?: Array<{ name: string; type?: string }>;
+  } {
+    const returnType = node.type?.getText();
+    const parameters: Array<{ name: string; type?: string }> = [];
+
+    for (const param of node.parameters) {
+      if (ts.isIdentifier(param.name)) {
+        parameters.push({
+          name: param.name.text,
+          type: param.type?.getText(),
+        });
+      }
+    }
+
+    return { returnType, parameters: parameters.length > 0 ? parameters : undefined };
   }
 }

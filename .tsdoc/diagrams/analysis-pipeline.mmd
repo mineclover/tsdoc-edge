@@ -1,0 +1,106 @@
+%% Complete Analysis Pipeline Data Flow
+%% From source files to visualization
+
+sequenceDiagram
+    participant User
+    participant CLI as CLI (BuildCommand)
+    participant Scanner as FileScanner
+    participant Extractor as ASTSymbolExtractor
+    participant DB as DatabaseManager
+    participant JSONL as SymbolRegistryManager
+    participant Graph as SymbolGraphBuilder
+    participant Analyzers as Analysis Suite
+    participant Viz as MermaidGenerator
+
+    %% Build Phase
+    User->>CLI: tsdoc-edge build src
+    CLI->>Scanner: Scan directories
+    Scanner-->>CLI: 131 TypeScript files
+
+    Note over CLI,Extractor: Extraction Phase (2.2s)
+
+    loop For each file
+        CLI->>Extractor: extract(file)
+        Extractor->>Extractor: Parse TypeScript AST
+        Extractor->>Extractor: Visit nodes (functions, classes, etc.)
+        Extractor->>Extractor: Extract type information
+        Extractor->>Extractor: Detect constants
+        Extractor->>Extractor: Track exports
+        Extractor-->>CLI: ExtractedSymbol[]
+    end
+
+    Note over CLI,DB: Storage Phase
+
+    CLI->>DB: insertSymbol(symbol) × 1,438
+    DB->>DB: Validate schema
+    DB->>DB: JSON.stringify(metadata)
+    DB->>DB: INSERT INTO symbols
+
+    CLI->>DB: insertRelationship(rel) × 1,902
+    DB->>DB: INSERT INTO dependencies
+
+    CLI->>JSONL: exportToJsonl()
+    JSONL->>DB: SELECT * FROM symbols
+    DB-->>JSONL: All symbols
+    JSONL->>JSONL: Write JSONL lines
+    JSONL-->>CLI: managed/symbols.jsonl
+
+    Note over CLI,User: Build Complete: 1,438 symbols, 1,902 rels
+
+    %% Analysis Phase
+    User->>CLI: tsdoc-edge analyze-chains
+    CLI->>DB: Load symbols & relationships
+    DB-->>CLI: Rows
+
+    CLI->>Graph: Build graph
+    Graph->>Graph: Create adjacency list
+    Graph-->>CLI: SymbolGraph
+
+    CLI->>Analyzers: DependencyChainAnalyzer
+    Analyzers->>Analyzers: DFS traversal
+    Analyzers->>Analyzers: Detect circulars
+    Analyzers->>Analyzers: Calculate hotspots
+    Analyzers-->>CLI: 0 circulars, 10 hotspots
+
+    CLI->>DB: Save circular relationships
+    Note over CLI,User: Analysis Complete: <200ms
+
+    %% I/O Analysis Phase
+    User->>CLI: tsdoc-edge analyze-io
+    CLI->>Graph: Build graph with types
+
+    CLI->>Analyzers: IODependencyAnalyzer
+    Analyzers->>Analyzers: Build producer map (type→symbols)
+    Analyzers->>Analyzers: Build consumer map (type→symbols)
+    Analyzers->>Analyzers: Match types (intersection)
+    Analyzers->>Analyzers: Calculate confidence
+    Analyzers-->>CLI: 7,446 I/O dependencies
+
+    CLI->>Analyzers: Detect pipelines
+    Analyzers->>Analyzers: Build I/O adjacency list
+    Analyzers->>Analyzers: Find A→B→C chains
+    Analyzers-->>CLI: 25,809 pipelines
+
+    CLI->>DB: Save I/O dependencies
+    Note over CLI,User: I/O Analysis Complete
+
+    %% Visualization Phase
+    User->>CLI: tsdoc-edge visualize hotspots
+    CLI->>Graph: Load graph
+    CLI->>Analyzers: Get hotspot data
+    Analyzers-->>CLI: Top 10 hotspots
+
+    CLI->>Viz: generateHotspotDiagram(hotspots)
+    Viz->>Viz: Build Mermaid DSL
+    Viz->>Viz: Add color styling
+    Viz-->>CLI: Mermaid code
+
+    CLI->>CLI: Write to file
+    CLI-->>User: .tsdoc/diagrams/hotspots.mmd
+
+    Note over User,Viz: User opens in VS Code<br/>Diagram renders automatically
+
+    %% Performance annotations
+    Note over Scanner,Extractor: 2.2s for 131 files
+    Note over Analyzers,CLI: <200ms for all analysis
+    Note over DB: 2.4 MB SQLite + 1.8 MB JSONL

@@ -26,7 +26,7 @@ export interface Symbol {
   /**
    * Symbol type (function, class, interface, etc.)
    */
-  type: 'function' | 'class' | 'interface' | 'type' | 'enum' | 'variable' | 'method' | 'property';
+  type: 'function' | 'class' | 'interface' | 'type' | 'enum' | 'variable' | 'constant' | 'method' | 'property';
 
   /**
    * File path where symbol is defined

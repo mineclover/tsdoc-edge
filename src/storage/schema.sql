@@ -6,13 +6,23 @@
 CREATE TABLE IF NOT EXISTS symbols (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
-    type TEXT NOT NULL, -- function, class, interface, etc.
+    type TEXT NOT NULL, -- function, class, interface, constant, variable, etc.
     file_path TEXT NOT NULL,
     line INTEGER NOT NULL,
     column INTEGER NOT NULL,
     is_exported BOOLEAN NOT NULL,
     is_public BOOLEAN NOT NULL,
     summary TEXT,
+    -- Type information
+    declared_type TEXT, -- Declared type annotation (return type for functions/methods)
+    inferred_type TEXT, -- TypeScript inferred type
+    generic_params TEXT, -- JSON array of generic parameters
+    parameter_types TEXT, -- JSON array of parameter types [{name, type}]
+    -- Constant/Value information
+    is_constant BOOLEAN DEFAULT 0, -- true for const declarations
+    literal_value TEXT, -- Literal value for constants
+    value_type TEXT, -- Type of literal value (string, number, boolean, etc.)
+    -- Metadata
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
     version TEXT NOT NULL,
@@ -114,7 +124,7 @@ CREATE TABLE IF NOT EXISTS future_plans (
     FOREIGN KEY (symbol_id) REFERENCES symbols(id) ON DELETE SET NULL
 );
 
--- Dependencies table (denormalized for querying)
+-- Dependencies table (denormalized for querying) - Legacy, will migrate to unified_relationships
 CREATE TABLE IF NOT EXISTS dependencies (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     symbol_id TEXT NOT NULL,
@@ -126,6 +136,46 @@ CREATE TABLE IF NOT EXISTS dependencies (
     import_path TEXT,
     FOREIGN KEY (symbol_id) REFERENCES symbols(id) ON DELETE CASCADE
 );
+
+-- Unified relationships table (17 relationship types)
+CREATE TABLE IF NOT EXISTS unified_relationships (
+    id TEXT PRIMARY KEY,
+    type TEXT NOT NULL,  -- 17 types: code-dependency, inheritance, io-dependency, etc.
+    category TEXT NOT NULL,  -- 7 categories: structural, data-flow, behavioral, etc.
+
+    -- Participants (JSON arrays for multi-party relationships)
+    from_symbols TEXT NOT NULL,  -- JSON: ["symbol-id"] or ["id1", "id2", ...]
+    to_symbols TEXT NOT NULL,    -- JSON: ["symbol-id"] or ["id1", "id2", ...]
+
+    -- Properties
+    direction TEXT NOT NULL,  -- unidirectional, bidirectional, undirected
+    strength TEXT NOT NULL,   -- strong, medium, weak
+
+    -- Evidence (JSON array)
+    evidence TEXT NOT NULL,  -- JSON: [{"type": "code", "source": "file.ts", "lineNumber": 42, "confidence": 1.0}]
+
+    discovered_by TEXT NOT NULL,  -- static-analysis, type-inference, test-analysis, etc.
+    confidence REAL NOT NULL,     -- 0-1
+
+    -- Location
+    file_path TEXT,
+    line INTEGER,
+
+    -- Type-specific properties (JSON)
+    properties TEXT,  -- JSON: {"dataType": "User", "producerMethod": "getUser"}
+
+    -- Metadata
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    description TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_ur_type ON unified_relationships(type);
+CREATE INDEX IF NOT EXISTS idx_ur_category ON unified_relationships(category);
+CREATE INDEX IF NOT EXISTS idx_ur_strength ON unified_relationships(strength);
+CREATE INDEX IF NOT EXISTS idx_ur_confidence ON unified_relationships(confidence);
+CREATE INDEX IF NOT EXISTS idx_ur_from_first ON unified_relationships(json_extract(from_symbols, '$[0]'));
+CREATE INDEX IF NOT EXISTS idx_ur_to_first ON unified_relationships(json_extract(to_symbols, '$[0]'));
 
 -- Test mappings table
 CREATE TABLE IF NOT EXISTS test_mappings (

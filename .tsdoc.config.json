@@ -9,8 +9,8 @@
   },
   "paths": {
     "commentsDir": ".tsdoc-comments",
-    "databasePath": ".tsdoc.db",
-    "jsonlDir": "data",
+    "databasePath": ".tsdoc/symbols.db",
+    "jsonlDir": ".tsdoc/data",
     "outputDir": "output"
   },
   "fold": {

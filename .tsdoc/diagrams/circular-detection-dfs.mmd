@@ -1,0 +1,137 @@
+%% Circular Dependency Detection using DFS
+%% Shows the depth-first search algorithm with recursion stack
+
+graph TB
+    subgraph "Input"
+        Graph[Symbol Graph<br/>Adjacency List:<br/>A → [B, C]<br/>B → [D]<br/>C → [D]<br/>D → [A]]
+    end
+
+    subgraph "Initialization"
+        Graph --> InitSets[Initialize Sets]
+        InitSets --> Visited[visited = Set()]
+        InitSets --> RecStack[recursionStack = Set()]
+        InitSets --> Circulars[circulars = []]
+    end
+
+    subgraph "Main Loop"
+        Visited --> MainLoop[For each symbol in graph]
+        MainLoop --> CheckVisited{Already visited?}
+
+        CheckVisited -->|Yes| NextSymbol[Continue to next]
+        CheckVisited -->|No| StartDFS[Start DFS from symbol]
+    end
+
+    subgraph "DFS Function (Recursive)"
+        StartDFS --> DFSEntry[DFS entry point]
+
+        DFSEntry --> AddVisited[Add to visited set]
+        AddVisited --> AddStack[Add to recursion stack]
+
+        AddStack --> GetDeps[Get dependencies<br/>from adjacency list]
+
+        GetDeps --> DepLoop{For each dependency}
+
+        DepLoop --> CheckDepVisited{Dependency visited?}
+
+        CheckDepVisited -->|No - First time| RecurseDFS[Recurse: DFS(dependency)]
+        CheckDepVisited -->|Yes| CheckInStack{In recursion stack?}
+
+        CheckInStack -->|Yes - CIRCULAR!| Found[🔴 Circular detected!]
+        CheckInStack -->|No - Already processed| NextDep[Continue loop]
+
+        Found --> ExtractPath[Extract circular path]
+        ExtractPath --> CircPath["Path example:<br/>A → B → C → D → A"]
+        CircPath --> AddToCirculars[Add to circulars array]
+
+        RecurseDFS --> CheckResult{Found circular?}
+        CheckResult -->|Yes| Backtrack[Return true + backtrack]
+        CheckResult -->|No| NextDep
+
+        NextDep --> MoreDeps{More dependencies?}
+        MoreDeps -->|Yes| DepLoop
+        MoreDeps -->|No| RemoveStack[Remove from recursion stack]
+
+        RemoveStack --> ReturnFalse[Return false]
+    end
+
+    subgraph "Example Walkthrough"
+        Ex[Example Graph:<br/>A → B<br/>B → C<br/>C → D<br/>D → A]
+
+        Ex --> Step1[Step 1: Visit A<br/>visited: {A}<br/>stack: {A}]
+
+        Step1 --> Step2[Step 2: Visit B (from A)<br/>visited: {A,B}<br/>stack: {A,B}]
+
+        Step2 --> Step3[Step 3: Visit C (from B)<br/>visited: {A,B,C}<br/>stack: {A,B,C}]
+
+        Step3 --> Step4[Step 4: Visit D (from C)<br/>visited: {A,B,C,D}<br/>stack: {A,B,C,D}]
+
+        Step4 --> Step5[Step 5: Try visit A (from D)<br/>✅ A in visited<br/>✅ A in stack<br/>🔴 CIRCULAR!]
+
+        Step5 --> Step6[Extract path:<br/>[A, B, C, D, A]]
+    end
+
+    subgraph "Recursion Stack Visualization"
+        Stack1[Call Stack State:<br/>┌─────────────┐<br/>│ DFS(D) ← current │<br/>├─────────────┤<br/>│ DFS(C)      │<br/>├─────────────┤<br/>│ DFS(B)      │<br/>├─────────────┤<br/>│ DFS(A)      │<br/>└─────────────┘]
+
+        Stack1 --> StackNote[When D tries to visit A,<br/>A is still in the stack<br/>→ Circular detected]
+    end
+
+    subgraph "Why This Works"
+        Proof1[visited set:<br/>Tracks all processed nodes<br/>Prevents infinite loops]
+
+        Proof2[recursion stack:<br/>Tracks current DFS path<br/>Detects back edges]
+
+        Proof3[Back edge definition:<br/>Edge from descendant<br/>to ancestor in DFS tree<br/>→ Creates cycle]
+
+        Proof1 --> Why[Guarantees:<br/>1. Every node visited once<br/>2. All cycles found<br/>3. O(V+E) time]
+        Proof2 --> Why
+        Proof3 --> Why
+    end
+
+    subgraph "Current System Results"
+        AddToCirculars --> Results[Circular Dependencies: 0]
+
+        Results --> Before[Before (with locals):<br/>820 false positives]
+        Results --> After[After (top-level only):<br/>0 circulars ✨]
+
+        After --> Conclusion[Architecture is clean!<br/>No circular dependencies]
+    end
+
+    subgraph "Complexity Analysis"
+        Time[Time: O(V + E)]
+        Space[Space: O(V)]
+
+        Time --> TimeBreak["V = vertices (symbols)<br/>E = edges (dependencies)<br/>Visit each node once<br/>Check each edge once"]
+
+        Space --> SpaceBreak["visited: O(V)<br/>recursionStack: O(V)<br/>circulars: O(V) worst case"]
+    end
+
+    subgraph "Alternative Approaches"
+        Alt1[Tarjan's Algorithm:<br/>Finds strongly connected<br/>components in O(V+E)]
+
+        Alt2[Floyd-Warshall:<br/>All-pairs shortest paths<br/>O(V³) - too slow]
+
+        Alt3[Topological Sort:<br/>DAG check fails on cycle<br/>O(V+E) but less info]
+
+        Alt1 --> AltNote[DFS chosen for:<br/>1. Simplicity<br/>2. Clear paths<br/>3. Easy to understand]
+        Alt2 --> AltNote
+        Alt3 --> AltNote
+    end
+
+    %% Styling
+    style Found fill:#ff6b6b,stroke:#c92a2a,stroke-width:4px,color:#fff
+    style CircPath fill:#ffe1e1,stroke:#c92a2a,stroke-width:2px
+    style Step5 fill:#ff6b6b,stroke:#c92a2a,stroke-width:2px,color:#fff
+    style Results fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style After fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style Conclusion fill:#8b5cf6,stroke:#6d28d9,stroke-width:3px,color:#fff
+
+    style AddVisited fill:#e1f5ff,stroke:#1864ab,stroke-width:2px
+    style AddStack fill:#ffd93d,stroke:#fab005,stroke-width:2px
+    style RemoveStack fill:#ffd93d,stroke:#fab005,stroke-width:2px
+
+    style StackNote fill:#fff4e1,stroke:#fab005,stroke-width:1px,stroke-dasharray: 5 5
+    style Why fill:#e7f5ff,stroke:#1864ab,stroke-width:1px,stroke-dasharray: 5 5
+    style AltNote fill:#e7f5ff,stroke:#1864ab,stroke-width:1px,stroke-dasharray: 5 5
+    style TimeBreak fill:#fff4e1,stroke:#fab005,stroke-width:1px,stroke-dasharray: 5 5
+    style SpaceBreak fill:#fff4e1,stroke:#fab005,stroke-width:1px,stroke-dasharray: 5 5

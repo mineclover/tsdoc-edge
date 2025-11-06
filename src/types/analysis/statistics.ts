@@ -164,6 +164,8 @@ export interface SymbolChange {
 
 /**
  * Trackable statistics snapshot
+ *
+ * @doc [[TrackableStatistics]]
  * @public
  */
 export interface TrackableStatistics {

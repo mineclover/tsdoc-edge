@@ -13,6 +13,27 @@ import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import type { ParsedDocSymbols } from '../types/feature';
 
 /**
+ * Section name mapping for multi-language support
+ * Maps canonical section names to their variations in different languages
+ */
+const SECTION_MAPPINGS: Record<string, string[]> = {
+  // Overview/Purpose
+  '개요': ['개요', 'Overview', 'Purpose', '목적'],
+  // Core Concepts
+  '핵심 개념': ['핵심 개념', 'Core Concepts', 'Key Concepts', 'Structure', '구조'],
+  // Deliverables/Output
+  '핵심 산출물': ['핵심 산출물', 'Deliverables', 'Output', 'Results', 'Type Structure'],
+  // Usage Scenarios
+  '사용 시나리오': ['사용 시나리오', 'Usage Scenarios', 'Scenarios', 'Use Cases', 'Examples'],
+  // CLI Commands
+  'CLI 명령어': ['CLI 명령어', 'CLI Commands', 'Commands'],
+  // Related Features
+  '관련 기능': ['관련 기능', 'Related Features', 'Related Concepts', '관련 개념'],
+  // Guide
+  '가이드': ['가이드', 'Guide', 'Guidelines', 'Best Practices', 'Design Decisions', '설계 결정'],
+};
+
+/**
  * Default specification requirements
  */
 const DEFAULT_REQUIREMENTS: SpecRequirements = {
@@ -173,14 +194,29 @@ export class SpecCompletenessValidator {
     const lines = content.split('\n');
 
     for (const line of lines) {
-      // Match markdown headings (## Section Name)
-      const match = line.match(/^##\s+(.+)$/);
+      // Match markdown headings (## Section Name or ## 1. Section Name)
+      const match = line.match(/^##\s+(?:\d+\.\s+)?(.+?)(?:\s+\([^)]+\))?$/);
       if (match) {
         sections.push(match[1].trim());
       }
     }
 
     return sections;
+  }
+
+  /**
+   * Normalize section name to canonical form
+   * Matches section names across different languages
+   */
+  private normalizeSectionName(sectionName: string): string | null {
+    for (const [canonical, variations] of Object.entries(SECTION_MAPPINGS)) {
+      for (const variation of variations) {
+        if (sectionName.toLowerCase().includes(variation.toLowerCase())) {
+          return canonical;
+        }
+      }
+    }
+    return null;
   }
 
   /**
@@ -195,8 +231,13 @@ export class SpecCompletenessValidator {
     const found: string[] = [];
     const missing: string[] = [];
 
+    // Normalize extracted sections
+    const normalizedSections = sections
+      .map(s => this.normalizeSectionName(s))
+      .filter((s): s is string => s !== null);
+
     for (const required of this.requirements.requiredSections) {
-      if (sections.includes(required)) {
+      if (normalizedSections.includes(required)) {
         found.push(required);
       } else {
         missing.push(required);
@@ -225,8 +266,13 @@ export class SpecCompletenessValidator {
     const found: string[] = [];
     const missing: string[] = [];
 
+    // Normalize extracted sections
+    const normalizedSections = sections
+      .map(s => this.normalizeSectionName(s))
+      .filter((s): s is string => s !== null);
+
     for (const recommended of this.requirements.recommendedSections) {
-      if (sections.includes(recommended)) {
+      if (normalizedSections.includes(recommended)) {
         found.push(recommended);
       } else {
         missing.push(recommended);
@@ -248,9 +294,34 @@ export class SpecCompletenessValidator {
     count: number;
     issues: Array<{ type: 'insufficient_scenarios'; message: string; severity: 'warning' }>;
   } {
-    // Match "### 시나리오 N:" or "### Scenario N:"
-    const scenarioMatches = content.match(/^###\s+(시나리오|Scenario)\s+\d+/gm);
-    const count = scenarioMatches ? scenarioMatches.length : 0;
+    // Match various scenario formats:
+    // - "### 시나리오 N:" or "### Scenario N:"
+    // - "### 1. 프로젝트 초기화" or "### 1. Project Initialization"
+    // - Under "## Usage Scenarios" or "## 사용 시나리오" section
+    const scenarioPatterns = [
+      /^###\s+(시나리오|Scenario)\s+\d+/gm,
+      /^###\s+\d+\.\s+.+/gm,  // Numbered subsections under scenarios
+    ];
+
+    let count = 0;
+    for (const pattern of scenarioPatterns) {
+      const matches = content.match(pattern);
+      if (matches) {
+        count = Math.max(count, matches.length);
+      }
+    }
+
+    // Also check if document has "Usage Scenarios" section with numbered items
+    const usageSectionMatch = content.match(/##\s+\d*\.?\s*(Usage Scenarios?|사용 시나리오)/i);
+    if (usageSectionMatch && count === 0) {
+      // Count numbered subsections after this section
+      const sectionIndex = content.indexOf(usageSectionMatch[0]);
+      const nextSection = content.slice(sectionIndex).match(/\n##\s+/);
+      const sectionEnd = nextSection ? sectionIndex + content.slice(sectionIndex).indexOf(nextSection[0]) : content.length;
+      const sectionContent = content.slice(sectionIndex, sectionEnd);
+      const numberedItems = sectionContent.match(/^###\s+\d+\./gm);
+      count = numberedItems ? numberedItems.length : 0;
+    }
 
     const score = Math.min((count / this.requirements.minScenarios) * 100, 100);
 
