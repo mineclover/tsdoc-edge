@@ -370,6 +370,15 @@ export class ValidateSpecCommand extends BaseCommand {
   }
 
   /**
+   * Colorize score based on value
+   */
+  private colorizeScore(score: number): string {
+    if (score >= 80) return colors.green;
+    if (score >= 60) return colors.yellow;
+    return colors.red;
+  }
+
+  /**
    * execute method
    * @param args - args parameter
    * @returns Returns Promise<CommandResult>
@@ -398,13 +407,24 @@ export class ValidateSpecCommand extends BaseCommand {
       const results = validator.validateMultiple(markdownFiles);
       const summary = validator.getSummary(results);
 
+      // Calculate average design and implementation scores
+      const avgDesign = Math.round(
+        results.reduce((sum, r) => sum + r.designScore, 0) / results.length
+      );
+      const avgImpl = Math.round(
+        results.reduce((sum, r) => sum + r.implementationScore, 0) / results.length
+      );
+
       this.printSection('Summary');
       console.log(`Total specifications: ${colors.cyan}${summary.total}${colors.reset}`);
       console.log(`Complete: ${colors.green}${summary.complete}${colors.reset}`);
       console.log(`Incomplete: ${colors.yellow}${summary.incomplete}${colors.reset}`);
-      console.log(`Average score: ${colors.cyan}${summary.averageScore}%${colors.reset}`);
+      console.log();
+      console.log(`${colors.bold}Score Breakdown:${colors.reset}`);
+      console.log(`  Design Score:         ${this.colorizeScore(avgDesign)}${avgDesign}%${colors.reset}`);
+      console.log(`  Implementation Score: ${this.colorizeScore(avgImpl)}${avgImpl}%${colors.reset}`);
       console.log(
-        `Total issues: ${summary.totalIssues > 0 ? colors.yellow : colors.green}${summary.totalIssues}${colors.reset}`
+        `  Total issues: ${summary.totalIssues > 0 ? colors.yellow : colors.green}${summary.totalIssues}${colors.reset}`
       );
       console.log();
 
@@ -412,8 +432,12 @@ export class ValidateSpecCommand extends BaseCommand {
       if (completeSpecs.length > 0) {
         this.printSection('Complete Specifications');
         for (const result of completeSpecs.slice(0, 5)) {
+          const fileName = path.basename(result.filePath);
           console.log(
-            `${colors.green}✅${colors.reset} ${result.filePath} (${colors.green}${result.score}%${colors.reset})`
+            `${colors.green}✅${colors.reset} ${fileName}`
+          );
+          console.log(
+            `   Design: ${this.colorizeScore(result.designScore)}${result.designScore}%${colors.reset}  Implementation: ${this.colorizeScore(result.implementationScore)}${result.implementationScore}%${colors.reset}`
           );
         }
         if (completeSpecs.length > 5) {
@@ -426,8 +450,12 @@ export class ValidateSpecCommand extends BaseCommand {
       if (incompleteSpecs.length > 0) {
         this.printSection('Incomplete Specifications');
         for (const result of incompleteSpecs.slice(0, 5)) {
+          const fileName = path.basename(result.filePath);
           console.log(
-            `${colors.yellow}⚠️${colors.reset} ${result.filePath} (${colors.yellow}${result.score}%${colors.reset})`
+            `${colors.yellow}⚠️${colors.reset} ${fileName}`
+          );
+          console.log(
+            `   Design: ${this.colorizeScore(result.designScore)}${result.designScore}%${colors.reset}  Implementation: ${this.colorizeScore(result.implementationScore)}${result.implementationScore}%${colors.reset}`
           );
         }
         if (incompleteSpecs.length > 5) {

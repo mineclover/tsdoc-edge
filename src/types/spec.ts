@@ -69,38 +69,55 @@ export interface SpecCompletenessResult {
   /** File path */
   filePath: string;
 
-  /** Overall completeness score (0-100) */
+  /** Overall completeness score (0-100) - DEPRECATED: Use designScore/implementationScore instead */
   score: number;
+
+  /** Design quality score (0-100) - Measured without code */
+  designScore: number;
+
+  /** Implementation quality score (0-100) - Requires code connections */
+  implementationScore: number;
 
   /** Is spec complete */
   isComplete: boolean;
 
   /** Breakdown by category */
   breakdown: {
-    requiredSections: {
-      score: number;
-      found: string[];
-      missing: string[];
+    /** Design-related metrics (measured without code) */
+    design: {
+      structure: {
+        score: number;
+        requiredSections: {
+          found: string[];
+          missing: string[];
+        };
+        recommendedSections: {
+          found: string[];
+          missing: string[];
+        };
+      };
+      scenarios: {
+        score: number;
+        count: number;
+        required: number;
+      };
+      conceptReferences: {
+        score: number;
+        count: number;
+      };
     };
-    recommendedSections: {
-      score: number;
-      found: string[];
-      missing: string[];
-    };
-    scenarios: {
-      score: number;
-      count: number;
-      required: number;
-    };
-    codeReferences: {
-      score: number;
-      count: number;
-      required: number;
-    };
-    examples: {
-      score: number;
-      count: number;
-      required: number;
+    /** Implementation-related metrics (requires code) */
+    implementation: {
+      codeReferences: {
+        score: number;
+        count: number;
+        required: number;
+      };
+      examples: {
+        score: number;
+        count: number;
+        required: number;
+      };
     };
   };
 

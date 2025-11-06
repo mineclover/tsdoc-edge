@@ -64,13 +64,35 @@ export class SpecCompletenessValidator {
     // Count scenarios
     const scenariosResult = this.countScenarios(content);
 
-    // Count code references
+    // Count concept references ([[Symbol]])
+    const conceptReferencesResult = this.countConceptReferences(parsed);
+
+    // Count code references ([^sym-XXX])
     const codeReferencesResult = this.countCodeReferences(parsed);
 
     // Count examples
     const examplesResult = this.countExamples(content);
 
-    // Calculate overall score
+    // Calculate structure score (required + recommended sections)
+    const structureScore = this.calculateStructureScore(
+      requiredSectionsResult.score,
+      recommendedSectionsResult.score
+    );
+
+    // Calculate design score (structure + scenarios + concept references)
+    const designScore = this.calculateDesignScore({
+      structure: structureScore,
+      scenarios: scenariosResult.score,
+      conceptReferences: conceptReferencesResult.score,
+    });
+
+    // Calculate implementation score (code references + examples)
+    const implementationScore = this.calculateImplementationScore({
+      codeReferences: codeReferencesResult.score,
+      examples: examplesResult.score,
+    });
+
+    // Legacy overall score (for backward compatibility)
     const score = this.calculateScore({
       requiredSections: requiredSectionsResult.score,
       recommendedSections: recommendedSectionsResult.score,
@@ -90,32 +112,43 @@ export class SpecCompletenessValidator {
     return {
       filePath,
       score,
-      isComplete: score >= 80 && requiredSectionsResult.score === 100,
+      designScore,
+      implementationScore,
+      isComplete: designScore >= 80 && requiredSectionsResult.score === 100,
       breakdown: {
-        requiredSections: {
-          score: requiredSectionsResult.score,
-          found: requiredSectionsResult.found,
-          missing: requiredSectionsResult.missing,
+        design: {
+          structure: {
+            score: structureScore,
+            requiredSections: {
+              found: requiredSectionsResult.found,
+              missing: requiredSectionsResult.missing,
+            },
+            recommendedSections: {
+              found: recommendedSectionsResult.found,
+              missing: recommendedSectionsResult.missing,
+            },
+          },
+          scenarios: {
+            score: scenariosResult.score,
+            count: scenariosResult.count,
+            required: this.requirements.minScenarios,
+          },
+          conceptReferences: {
+            score: conceptReferencesResult.score,
+            count: conceptReferencesResult.count,
+          },
         },
-        recommendedSections: {
-          score: recommendedSectionsResult.score,
-          found: recommendedSectionsResult.found,
-          missing: recommendedSectionsResult.missing,
-        },
-        scenarios: {
-          score: scenariosResult.score,
-          count: scenariosResult.count,
-          required: this.requirements.minScenarios,
-        },
-        codeReferences: {
-          score: codeReferencesResult.score,
-          count: codeReferencesResult.count,
-          required: this.requirements.minCodeReferences,
-        },
-        examples: {
-          score: examplesResult.score,
-          count: examplesResult.count,
-          required: this.requirements.minExamples,
+        implementation: {
+          codeReferences: {
+            score: codeReferencesResult.score,
+            count: codeReferencesResult.count,
+            required: this.requirements.minCodeReferences,
+          },
+          examples: {
+            score: examplesResult.score,
+            count: examplesResult.count,
+            required: this.requirements.minExamples,
+          },
         },
       },
       issues,
@@ -286,7 +319,65 @@ export class SpecCompletenessValidator {
   }
 
   /**
-   * Calculate overall completeness score
+   * Count concept references ([[Symbol]]) in document
+   */
+  private countConceptReferences(parsed: ParsedDocSymbols | null): {
+    score: number;
+    count: number;
+  } {
+    const count = parsed ? parsed.references.length : 0;
+    // Expect at least 3 concept references for good design
+    const expectedMin = 3;
+    const score = Math.min((count / expectedMin) * 100, 100);
+    return { score, count };
+  }
+
+  /**
+   * Calculate structure score
+   */
+  private calculateStructureScore(
+    requiredSectionsScore: number,
+    recommendedSectionsScore: number
+  ): number {
+    // Required sections are critical (80%), recommended are bonus (20%)
+    return Math.round(requiredSectionsScore * 0.8 + recommendedSectionsScore * 0.2);
+  }
+
+  /**
+   * Calculate design score (measured without code)
+   */
+  private calculateDesignScore(breakdown: {
+    structure: number;
+    scenarios: number;
+    conceptReferences: number;
+  }): number {
+    // Structure is most important (50%), scenarios (30%), concept network (20%)
+    const score =
+      breakdown.structure * 0.5 +
+      breakdown.scenarios * 0.3 +
+      breakdown.conceptReferences * 0.2;
+
+    return Math.round(score);
+  }
+
+  /**
+   * Calculate implementation score (requires code)
+   */
+  private calculateImplementationScore(breakdown: {
+    codeReferences: number;
+    examples: number;
+  }): number {
+    // Code references are more important (70%) than examples (30%)
+    const score =
+      breakdown.codeReferences * 0.7 +
+      breakdown.examples * 0.3;
+
+    return Math.round(score);
+  }
+
+  /**
+   * Calculate overall completeness score (DEPRECATED)
+   * @deprecated Use designScore and implementationScore instead
    */
   private calculateScore(breakdown: {
     requiredSections: number;

@@ -116,14 +116,14 @@ export class SpecStatusManager {
     // Check 3: Required sections for approved/active status
     if (targetStatus === 'approved' || targetStatus === 'active') {
       const completeness = this.validator.validate(filePath);
-      const hasAllRequired = completeness.breakdown.requiredSections.score === 100;
+      const hasAllRequired = completeness.breakdown.design.structure.requiredSections.missing.length === 0;
 
       checks.push({
         name: 'Required Sections',
         passed: hasAllRequired,
         message: hasAllRequired
           ? 'All required sections present'
-          : `Missing required sections: ${completeness.breakdown.requiredSections.missing.join(', ')}`,
+          : `Missing required sections: ${completeness.breakdown.design.structure.requiredSections.missing.join(', ')}`,
       });
 
       if (!hasAllRequired) {
