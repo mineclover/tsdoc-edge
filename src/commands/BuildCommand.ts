@@ -46,14 +46,30 @@ export class BuildCommand extends BaseCommand {
     this.configManager = configManager || ConfigManager.getInstance();
   }
 
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'build';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Build symbol database from source files';
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       const targetPath = args[0] || 'src';

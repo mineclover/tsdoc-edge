@@ -40,14 +40,30 @@ export class UsageCommand extends BaseCommand {
     this.tracker = tracker || new UsageTracker();
   }
 
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'usage';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'View and manage CLI usage analytics';
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       this.printHeader('TSDoc Edge - Usage Analytics');

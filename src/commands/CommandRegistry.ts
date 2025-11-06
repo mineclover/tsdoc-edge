@@ -41,6 +41,7 @@ export class CommandRegistry {
    * Register a command
    *
    * @param command - Command instance
+   * @returns void - No return value
    */
   register(command: BaseCommand): void {
     this.commands.set(command.getName(), command);

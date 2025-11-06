@@ -125,6 +125,8 @@ export class SpecVersionManager {
 
   /**
    * Get current version from frontmatter
+   * @param filePath - filePath parameter
+   * @returns Returns string | null
    */
   getCurrentVersion(filePath: string): string | null {
     if (!fs.existsSync(filePath)) {

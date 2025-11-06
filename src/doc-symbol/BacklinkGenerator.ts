@@ -129,6 +129,7 @@ export class BacklinkGenerator {
    *
    * @param filePath - Document path
    * @param symbolName - Symbol name
+   * @returns void - No return value
    */
   updateBacklinksSection(filePath: string, symbolName: string): void {
     if (!fs.existsSync(filePath)) {

@@ -50,6 +50,7 @@ export class DocumentSymbolRegistry {
    *
    * @param symbols - Parsed document symbols
    * @throws {Error} If duplicate primary definition in same file
+   * @returns void - No return value
    */
   registerDocument(symbols: ParsedDocSymbols): void {
     // Register primary definition
@@ -107,6 +108,7 @@ export class DocumentSymbolRegistry {
    * Register code connection
    *
    * @param connection - Code connection
+   * @returns void - No return value
    */
   registerCodeConnection(connection: CodeConnection): void {
     const existing = this.codeConnections.get(connection.docSymbol) || [];
@@ -296,6 +298,7 @@ export class DocumentSymbolRegistry {
 
   /**
    * Clear all data
+   * @returns void - No return value
    */
   clear(): void {
     this.definitions.clear();
@@ -308,6 +311,7 @@ export class DocumentSymbolRegistry {
    * Unregister all symbols from a specific file
    *
    * @param filePath - File path to unregister
+   * @returns void - No return value
    */
   unregisterFile(filePath: string): void {
     // Remove primary definitions from this file
@@ -371,6 +375,7 @@ export class DocumentSymbolRegistry {
    * Import registry state
    *
    * @param data - Serialized state
+   * @returns void - No return value
    */
   import(data: {
     definitions: Array<[string, DocumentSymbol]>;

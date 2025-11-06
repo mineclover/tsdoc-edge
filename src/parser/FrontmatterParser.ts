@@ -198,6 +198,7 @@ export class FrontmatterParser {
    * Checks:
    * - tsdoc field is "managed"
    * - Required fields present (if strictMode)
+   * @param strictMode - strictMode parameter
    */
   validate(
     metadata: FrontmatterMetadata,

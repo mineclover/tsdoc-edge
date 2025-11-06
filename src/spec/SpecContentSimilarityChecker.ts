@@ -7,11 +7,19 @@
 import * as fs from 'node:fs';
 import type { ContentSimilarity } from '../types/spec';
 
+/**
+ * DocumentSection interface
+ * @public
+ */
 interface DocumentSection {
   name: string;
   content: string;
 }
 
+/**
+ * DocumentContent interface
+ * @public
+ */
 interface DocumentContent {
   filePath: string;
   sections: DocumentSection[];
@@ -252,6 +260,14 @@ export class SpecContentSimilarityChecker {
 
   /**
    * Get summary statistics
+   * @param results - results parameter
+   * @returns Returns {
+    totalPairs: number;
+    mergeSuggestions: number;
+    crossRefSuggestions: number;
+    keepSeparate: number;
+    averageSimilarity: number;
+  }
    */
   getSummary(results: ContentSimilarity[]): {
     totalPairs: number;

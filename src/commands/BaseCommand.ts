@@ -81,6 +81,7 @@ export abstract class BaseCommand {
    * Print header with title
    *
    * @param title - Header title
+   * @returns void - No return value
    */
   protected printHeader(title: string): void {
     console.log(colors.bold + colors.blue + '='.repeat(80) + colors.reset);
@@ -93,6 +94,7 @@ export abstract class BaseCommand {
    * Print section title
    *
    * @param title - Section title
+   * @returns void - No return value
    */
   protected printSection(title: string): void {
     console.log(colors.bold + colors.cyan + title + colors.reset);
@@ -103,6 +105,7 @@ export abstract class BaseCommand {
    * Print success message
    *
    * @param message - Success message
+   * @returns void - No return value
    */
   protected printSuccess(message: string): void {
     console.log(`${colors.green}✓ ${message}${colors.reset}`);
@@ -112,6 +115,7 @@ export abstract class BaseCommand {
    * Print error message
    *
    * @param message - Error message
+   * @returns void - No return value
    */
   protected printError(message: string): void {
     console.log(`${colors.red}✗ ${message}${colors.reset}`);
@@ -121,6 +125,7 @@ export abstract class BaseCommand {
    * Print warning message
    *
    * @param message - Warning message
+   * @returns void - No return value
    */
   protected printWarning(message: string): void {
     console.log(`${colors.yellow}⚠ ${message}${colors.reset}`);
@@ -130,6 +135,7 @@ export abstract class BaseCommand {
    * Print info message
    *
    * @param message - Info message
+   * @returns void - No return value
    */
   protected printInfo(message: string): void {
     console.log(`${colors.cyan}ℹ ${message}${colors.reset}`);

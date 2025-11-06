@@ -319,6 +319,13 @@ export class UnusedDocumentDetector {
 
   /**
    * Get summary statistics
+   * @param results - results parameter
+   * @returns Returns {
+    total: number;
+    byReason: Record<string, number>;
+    byAction: Record<string, number>;
+    averageDaysSinceModified: number;
+  }
    */
   getSummary(results: UnusedDocument[]): {
     total: number;
