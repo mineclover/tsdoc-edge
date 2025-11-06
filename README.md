@@ -222,15 +222,25 @@ minCodeReferences: 5     // 최소 5개 코드 참조
 minExamples: 2           // 최소 2개 예시
 ```
 
-**완성도 점수 계산**:
+**완성도 점수 계산** (v0.11.1 - 설계/구현 분리 🔥):
+```typescript
+// 설계 점수 (Design Score) - 코드 없이 측정 가능
+designScore =
+  structure × 0.5 +           // 문서 구조 (50%)
+    (requiredSections × 0.8 + recommendedSections × 0.2)
+  scenarios × 0.3 +           // 사용 시나리오 (30%)
+  conceptReferences × 0.2     // [[Symbol]] 참조 (20%)
+
+// 구현 점수 (Implementation Score) - 코드 연결 필요
+implementationScore =
+  codeReferences × 0.7 +      // [^sym-XXX] 참조 (70%)
+  examples × 0.3              // 코드 예시 (30%)
 ```
-score =
-  requiredSections × 0.4 +      // 필수 섹션 (40%)
-  recommendedSections × 0.1 +   // 권장 섹션 (10%)
-  scenarios × 0.2 +              // 시나리오 (20%)
-  codeReferences × 0.2 +         // 코드 참조 (20%)
-  examples × 0.1                 // 예시 (10%)
-```
+
+**설계 우선 워크플로우 지원**:
+- 설계 단계: 문서만 작성 → **Design Score 100점 가능**
+- 구현 단계: 코드 연결 추가 → **Implementation Score 측정**
+- 각 점수가 독립적으로 품질을 보장
 
 **사용법**:
 ```bash
@@ -240,19 +250,27 @@ tsdoc-edge validate-spec managed/features/validation-features.md
 # 디렉토리 전체 검증
 tsdoc-edge validate-spec managed/
 
-# 결과 예시:
+# 결과 예시 (v0.11.1 - 분리된 점수):
 # Summary
 # Total specifications: 7
 # Complete: 4
 # Incomplete: 3
-# Average score: 78%
+#
+# Score Breakdown:
+#   Design Score:         75%   ← 문서 구조, 시나리오, 개념
+#   Implementation Score: 94%   ← 코드 연결, 예제
+#
+# Complete Specifications
+# ✅ symbol-graph.md
+#    Design: 100%  Implementation: 100%
+# ✅ validation-features.md
+#    Design: 100%  Implementation: 100%
 #
 # Incomplete Specifications
-# ⚠️ core-workflow.md (52%)
-#    Required sections: 50%
-#      Missing: 핵심 개념, 사용 시나리오
-#    Scenarios: 0/3
-#    Examples: 1/2
+# ⚠️ core-workflow.md
+#    Design: 47%   Implementation: 85%  ← 설계 부족
+# ⚠️ core-features-catalog.md
+#    Design: 30%   Implementation: 100% ← 구조 개선 필요
 ```
 
 **CI/CD 통합**:
@@ -265,6 +283,8 @@ tsdoc-edge validate-spec managed/
 
 **주요 효과**:
 - ✅ 명세서 품질 정량화: 0-100 점수로 측정
+- ✅ **설계/구현 분리 측정**: 각 단계를 독립적으로 평가 (v0.11.1 🔥)
+- ✅ **문서 우선 설계 지원**: 코드 없이 Design Score 100점 달성 가능
 - ✅ 필수 섹션 강제: 개요, 핵심 개념, 산출물, 시나리오 필수
 - ✅ 실용성 검증: 충분한 예시와 시나리오 요구
 - ✅ 코드 연결 검증: 명세서와 코드 간 연결 강제
