@@ -1,5 +1,6 @@
 %% Relationship Type Coverage by Category
-%% Current: 5/17 types implemented (29%)
+%% Current: 6/17 types implemented (35%)
+%% Updated: 2025-11-07 with Call Graph
 
 graph TB
     subgraph "Structural Relationships (3 types)"
@@ -15,7 +16,7 @@ graph TB
     end
 
     subgraph "Behavioral Relationships (3 types)"
-        B1[calls<br/>❌ Not implemented<br/>Expected: ~5,000]:::notimpl
+        B1[calls<br/>✅ 1,511 rels 🆕<br/>472 callers → 605 callees]:::implemented
         B2[callback<br/>❌ Not implemented<br/>Expected: ~400]:::notimpl
         B3[composition<br/>❌ Not implemented<br/>Expected: ~600]:::notimpl
     end
@@ -52,7 +53,7 @@ graph TB
     D2 --> DC
     D3 --> DC
 
-    B1 --> BC[Behavioral: 0%<br/>0/3 implemented]
+    B1 --> BC[Behavioral: 33%<br/>1/3 implemented]
     B2 --> BC
     B3 --> BC
 
@@ -70,7 +71,7 @@ graph TB
     O1 --> OC[Other: 100%<br/>1/1 implemented]
 
     %% Overall status
-    SC --> Overall[Overall Coverage:<br/>29% implemented<br/>5/17 types]:::overall
+    SC --> Overall[Overall Coverage:<br/>35% implemented<br/>6/17 types<br/>10,173 total relationships]:::overall
     DC --> Overall
     BC --> Overall
     TC --> Overall

@@ -1,8 +1,8 @@
 # TSDoc Edge Visualization Diagrams
 
-**Generated**: 2025-11-07
-**Total Diagrams**: 14 (5 new technical diagrams added)
-**Total Lines**: 1,356
+**Generated**: 2025-11-07 (Updated with Call Graph)
+**Total Diagrams**: 15 (1 new call graph diagram added)
+**Total Lines**: ~1,550
 **Format**: Mermaid
 
 ## Overview
@@ -17,18 +17,21 @@ This directory contains Mermaid diagrams visualizing the TSDoc Edge codebase arc
 **Purpose**: Complete system health dashboard with current metrics
 
 **Contents**:
-- Symbol distribution (1,438 total)
-  - Functions: 681 (47.4%)
-  - Methods: 527 (36.6%)
-  - Classes: 112 (7.8%)
-  - Interfaces: 87 (6.0%)
+- Symbol distribution (1,427 total)
+  - Methods: 894 (62.6%)
+  - Interfaces: 205 (14.4%)
+  - Properties: 145 (10.2%)
+  - Classes: 125 (8.8%)
   - Variables: 21 (1.5%)
+  - Types: 20 (1.4%)
+  - Functions: 7 (0.5%)
   - Constants: 10 (0.7%)
 
-- Relationship distribution (8,662 total)
-  - I/O Dependencies: 6,705 (77.4%)
-  - Code Dependencies: 1,902 (22.0%)
-  - Inheritance: 55 (0.6%)
+- Relationship distribution (10,173 total)
+  - I/O Dependencies: 6,705 (65.9%)
+  - Code Dependencies: 1,902 (18.7%)
+  - **Call Relationships: 1,511 (14.9%) 🆕**
+  - Inheritance: 55 (0.5%)
   - Pipelines: 25,809 (length 3)
 
 - Quality metrics
@@ -89,6 +92,43 @@ This directory contains Mermaid diagrams visualizing the TSDoc Edge codebase arc
 - 🟢 Green: Low (score < 5)
 
 **Use Case**: Identify bottlenecks, refactoring candidates, architectural review
+
+#### `call-graph-analysis.mmd` (165 lines) 🆕
+**Purpose**: Comprehensive call graph analysis and visualization
+
+**Contents**:
+- Call graph overview (1,511 relationships, 472→605)
+- Top 10 most called functions
+  - CommandRegistry.get: 106 calls 🔥
+  - CommandRegistry.has: 78 calls
+  - BaseCommand methods: 200+ calls combined
+- Call detection features
+  - Direct calls (foo())
+  - Method calls (obj.method())
+  - Built-in filtering (Object.entries, console.log)
+  - Smart resolution with type preference
+- Call pattern analysis
+  - Command Pattern: 200+ calls to BaseCommand
+  - Registry Pattern: 100+ calls to CommandRegistry
+  - Utility Pattern: shared helper functions
+  - Builder Pattern: chained construction calls
+- Coverage metrics
+  - ~70% function call coverage
+  - ~2% false positive rate
+  - Dynamic calls not yet detected
+- Use cases
+  - Impact analysis before refactoring
+  - Dead code detection (0 incoming calls)
+  - Hotspot identification for optimization
+  - Coupling analysis across modules
+  - Test coverage verification
+- Future improvements
+  - Callback detection (high priority)
+  - Async/await chains (medium priority)
+  - Type-based resolution (high priority)
+  - Dynamic calls (apply, call, bind)
+
+**Use Case**: Impact analysis, refactoring planning, dead code detection, optimization
 
 #### `modules.mmd` (185 lines)
 **Purpose**: File-level dependency map

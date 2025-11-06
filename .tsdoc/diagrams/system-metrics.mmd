@@ -1,24 +1,28 @@
 %% Current System Metrics and Health Dashboard
-%% Generated: 2025-11-07
+%% Generated: 2025-11-07 (Updated with Call Graph)
 
 graph TB
     subgraph "📊 Symbol Distribution"
-        Total[Total Symbols: 1,438]
-        Total --> Functions[Functions: 681<br/>47.4%]
-        Total --> Methods[Methods: 527<br/>36.6%]
-        Total --> Classes[Classes: 112<br/>7.8%]
-        Total --> Interfaces[Interfaces: 87<br/>6.0%]
+        Total[Total Symbols: 1,427]
+        Total --> Functions[Functions: 7<br/>0.5%]
+        Total --> Methods[Methods: 894<br/>62.6%]
+        Total --> Classes[Classes: 125<br/>8.8%]
+        Total --> Interfaces[Interfaces: 205<br/>14.4%]
+        Total --> Properties[Properties: 145<br/>10.2%]
         Total --> Variables[Variables: 21<br/>1.5%]
+        Total --> Types[Types: 20<br/>1.4%]
         Total --> Constants[Constants: 10<br/>0.7%]
     end
 
     subgraph "🔗 Relationship Distribution"
-        TotalRels[Total Relationships: 8,662]
-        TotalRels --> IODeps[I/O Dependencies: 6,705<br/>77.4%]
-        TotalRels --> CodeDeps[Code Dependencies: 1,902<br/>22.0%]
-        TotalRels --> Inherit[Inheritance: 55<br/>0.6%]
+        TotalRels[Total Relationships: 10,173]
+        TotalRels --> IODeps[I/O Dependencies: 6,705<br/>65.9%]
+        TotalRels --> CodeDeps[Code Dependencies: 1,902<br/>18.7%]
+        TotalRels --> Calls[Call Relationships: 1,511<br/>14.9% 🆕]
+        TotalRels --> Inherit[Inheritance: 55<br/>0.5%]
 
         IODeps --> Pipelines[Pipelines: 25,809<br/>length 3 chains]
+        Calls --> CallStats[472 callers → 605 callees<br/>Avg 3.16 calls/function]
     end
 
     subgraph "✨ Quality Metrics"
@@ -59,10 +63,13 @@ graph TB
     end
 
     subgraph "📈 Growth Projection"
-        Current[Current: 8,662 rels<br/>5/17 types (29%)]
-        Current --> Phase2[+Phase 2: ~15,000 rels<br/>9/17 types (53%)]
+        Current[Current: 10,173 rels<br/>4/17 types (24%)]
+        Current --> Phase2[+Phase 2: ~14,000 rels<br/>8/17 types (47%)]
         Phase2 --> Phase3[+Phase 3: ~20,000 rels<br/>13/17 types (76%)]
-        Phase3 --> Complete[Complete: ~24,000 rels<br/>17/17 types (100%)]
+        Phase3 --> Complete[Complete: ~26,000 rels<br/>17/17 types (100%)]
+
+        TypeProgress[Implemented Types:<br/>✅ code-dependency<br/>✅ inheritance<br/>✅ io-dependency<br/>✅ calls 🆕]
+        TypeProgress --> Remaining[Remaining: 13 types<br/>callbacks, pipelines,<br/>event-flow, etc.]
     end
 
     %% Styling
