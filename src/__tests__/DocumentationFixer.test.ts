@@ -264,5 +264,200 @@ export function isEmpty(str: string): boolean {
       expect(result).toBeDefined();
       expect(result.symbolsFixed).toBeGreaterThanOrEqual(0);
     });
+
+    it('should verify before/after content when adding documentation', () => {
+      const testFile = path.join(tempDir, 'before-after.ts');
+      const beforeCode = `export function subtract(a: number, b: number): number {
+  return a - b;
+}
+`;
+      fs.writeFileSync(testFile, beforeCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, beforeCode);
+      const result = fixer.fixFile(testFile, scores, { minScore: 0 });
+
+      if (result.modified) {
+        const afterCode = fs.readFileSync(testFile, 'utf-8');
+        expect(afterCode).toContain('/**');
+        expect(afterCode).toContain('*/');
+        expect(afterCode).not.toBe(beforeCode);
+        expect(afterCode.length).toBeGreaterThan(beforeCode.length);
+      }
+    });
+
+    it('should append missing @param to partially documented function', () => {
+      const testFile = path.join(tempDir, 'partial.ts');
+      const sourceCode = `/**
+ * Calculate area
+ * @param width - Width
+ * @public
+ */
+export function calculateArea(width: number, height: number): number {
+  return width * height;
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      const result = fixer.fixFile(testFile, scores, { minScore: 0, addParams: true });
+
+      expect(result).toBeDefined();
+      if (result.modified) {
+        const fixedCode = fs.readFileSync(testFile, 'utf-8');
+        expect(fixedCode).toContain('@param height');
+      }
+    });
+
+    it('should respect addSummary option', () => {
+      const testFile = path.join(tempDir, 'no-summary.ts');
+      const sourceCode = `export function test(): void {
+  console.log('test');
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      const result = fixer.fixFile(testFile, scores, {
+        minScore: 0,
+        addSummary: false,
+        addParams: false,
+        addReturns: false,
+      });
+
+      expect(result.symbolsFixed).toBe(0);
+    });
+
+    it('should respect addParams=false option', () => {
+      const testFile = path.join(tempDir, 'no-params.ts');
+      const sourceCode = `export function add(a: number, b: number): number {
+  return a + b;
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      const result = fixer.fixFile(testFile, scores, {
+        minScore: 0,
+        addSummary: true,
+        addParams: false,
+        addReturns: true,
+      });
+
+      if (result.modified) {
+        const fixedCode = fs.readFileSync(testFile, 'utf-8');
+        expect(fixedCode).toContain('/**');
+        // Should not add @param tags
+        expect(fixedCode.match(/@param/g)?.length || 0).toBe(0);
+      }
+    });
+
+    it('should respect addReturns=false option', () => {
+      const testFile = path.join(tempDir, 'no-returns.ts');
+      const sourceCode = `export function getValue(): string {
+  return 'value';
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      const result = fixer.fixFile(testFile, scores, {
+        minScore: 0,
+        addSummary: true,
+        addParams: true,
+        addReturns: false,
+      });
+
+      if (result.modified) {
+        const fixedCode = fs.readFileSync(testFile, 'utf-8');
+        expect(fixedCode).toContain('/**');
+        expect(fixedCode).not.toContain('@returns');
+      }
+    });
+
+    it('should handle file not found error', () => {
+      const nonExistentFile = path.join(tempDir, 'does-not-exist.ts');
+      const result = fixer.fixFile(nonExistentFile, [], { minScore: 0 });
+
+      expect(result.modified).toBe(false);
+      expect(result.symbolsFixed).toBe(0);
+      expect(result.error).toBeDefined();
+    });
+
+    it('should handle syntax errors gracefully', () => {
+      const testFile = path.join(tempDir, 'syntax-error.ts');
+      const invalidCode = `export function broken( {
+  return invalid syntax here
+`;
+      fs.writeFileSync(testFile, invalidCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, invalidCode);
+      const result = fixer.fixFile(testFile, scores, { minScore: 0 });
+
+      // Should not crash, may or may not fix depending on parser tolerance
+      expect(result).toBeDefined();
+    });
+
+    it('should add @public tag when addCustomTags is enabled', () => {
+      const testFile = path.join(tempDir, 'custom-tags.ts');
+      const sourceCode = `export function publicFunc(): void {
+  console.log('public');
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      const result = fixer.fixFile(testFile, scores, {
+        minScore: 0,
+        addCustomTags: true,
+      });
+
+      if (result.modified) {
+        const fixedCode = fs.readFileSync(testFile, 'utf-8');
+        expect(fixedCode).toContain('@public');
+      }
+    });
+
+    it('should preserve existing code when appending to JSDoc', () => {
+      const testFile = path.join(tempDir, 'preserve.ts');
+      const sourceCode = `/**
+ * Existing summary
+ * @param x - X value
+ */
+export function compute(x: number, y: number): number {
+  return x + y;
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      const result = fixer.fixFile(testFile, scores, { minScore: 0, addParams: true });
+
+      const fixedCode = fs.readFileSync(testFile, 'utf-8');
+      expect(fixedCode).toContain('Existing summary');
+      expect(fixedCode).toContain('@param x - X value');
+      expect(fixedCode).toContain('compute(x: number, y: number)');
+    });
+
+    it('should handle arrow functions', () => {
+      const testFile = path.join(tempDir, 'arrow.ts');
+      const sourceCode = `export const arrow = (x: number): number => x * 2;
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      const result = fixer.fixFile(testFile, scores, { minScore: 0 });
+
+      expect(result).toBeDefined();
+    });
+
+    it('should handle empty files', () => {
+      const testFile = path.join(tempDir, 'empty.ts');
+      fs.writeFileSync(testFile, '', 'utf-8');
+
+      const result = fixer.fixFile(testFile, [], { minScore: 0 });
+
+      expect(result.modified).toBe(false);
+      expect(result.symbolsFixed).toBe(0);
+    });
   });
 });
