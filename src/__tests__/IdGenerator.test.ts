@@ -398,5 +398,282 @@ describe('IdGenerator', () => {
 
       expect(generator.getUsedCount()).toBe(0);
     });
+
+    test('should reset length to default', () => {
+      const generator = new IdGenerator({ mode: 'sequential', length: 3 });
+
+      // Force length increase by filling capacity
+      generator.registerExisting(['000', '001']);
+      generator.generate();
+
+      // Internal length might have changed during collision handling
+      generator.reset();
+
+      const stats = generator.getStats();
+      expect(stats.length).toBe(3);
+    });
+  });
+
+  describe('Default options', () => {
+    test('should use sequential mode by default', () => {
+      const generator = new IdGenerator();
+
+      const id1 = generator.generate();
+      const id2 = generator.generate();
+
+      expect(id1).toBe('000');
+      expect(id2).toBe('001');
+    });
+
+    test('should use length 3 by default', () => {
+      const generator = new IdGenerator();
+
+      const id = generator.generate();
+      expect(id).toHaveLength(3);
+    });
+
+    test('should use base-36 charset by default', () => {
+      const generator = new IdGenerator();
+      const charset = '0123456789abcdefghijklmnopqrstuvwxyz';
+
+      const id = generator.generate();
+
+      for (const char of id) {
+        expect(charset).toContain(char);
+      }
+    });
+  });
+
+  describe('Register existing edge cases', () => {
+    test('should handle duplicate IDs in registration', () => {
+      const generator = new IdGenerator({ mode: 'sequential', length: 3 });
+
+      generator.registerExisting(['000', '000', '001', '001', '002']);
+
+      expect(generator.getUsedCount()).toBe(3); // Should deduplicate
+    });
+
+    test('should handle non-sequential IDs in sequential mode', () => {
+      const generator = new IdGenerator({ mode: 'sequential', length: 3 });
+
+      generator.registerExisting(['005', '010', '003']);
+
+      const nextId = generator.generate();
+      // Should start from highest + 1 (010 in base-36 = 16, so next is 17 = 011 in base-36)
+      expect(nextId).toBe('011'); // 17 in base-36
+    });
+
+    test('should handle invalid IDs gracefully', () => {
+      const generator = new IdGenerator({ mode: 'sequential', length: 3 });
+
+      // Register IDs with invalid characters
+      generator.registerExisting(['xyz', 'abc', 'invalid']);
+
+      // Should still track these as used
+      expect(generator.getUsedCount()).toBe(3);
+    });
+
+    test('should update sequential counter correctly with base-36', () => {
+      const generator = new IdGenerator({ mode: 'sequential', length: 3 });
+
+      generator.registerExisting(['00z']); // 35 in base-36
+
+      const nextId = generator.generate();
+      expect(nextId).toBe('010'); // 36 in base-36
+    });
+  });
+
+  describe('Collision handling', () => {
+    test('should handle collision by increasing length after max attempts', () => {
+      const generator = new IdGenerator({
+        mode: 'random',
+        length: 1,
+        charset: 'A',
+      });
+
+      const id1 = generator.generate(); // 'A'
+      const id2 = generator.generate(); // Should increase length
+
+      expect(id1).toBe('A');
+      expect(id2.length).toBeGreaterThan(1);
+    });
+
+    test('should continue generating after length increase', () => {
+      const generator = new IdGenerator({
+        mode: 'random',
+        length: 1,
+        charset: 'AB',
+      });
+
+      const id1 = generator.generate();
+      const id2 = generator.generate();
+      const id3 = generator.generate(); // Triggers length increase
+
+      expect(id3.length).toBeGreaterThan(1);
+
+      const id4 = generator.generate();
+      expect(id4.length).toBe(id3.length);
+    });
+  });
+
+  describe('Large scale generation', () => {
+    test('should generate many unique IDs in sequential mode', () => {
+      const generator = new IdGenerator({ mode: 'sequential', length: 3 });
+
+      const ids = new Set<string>();
+      for (let i = 0; i < 1000; i++) {
+        const id = generator.generate();
+        expect(ids.has(id)).toBe(false);
+        ids.add(id);
+      }
+
+      expect(ids.size).toBe(1000);
+    });
+
+    test('should generate many unique IDs in random mode', () => {
+      const generator = new IdGenerator({ mode: 'random', length: 4 });
+
+      const ids = new Set<string>();
+      for (let i = 0; i < 500; i++) {
+        const id = generator.generate();
+        expect(ids.has(id)).toBe(false);
+        ids.add(id);
+      }
+
+      expect(ids.size).toBe(500);
+    });
+  });
+
+  describe('Capacity and utilization', () => {
+    test('should calculate correct capacity for different charsets', () => {
+      const gen1 = new IdGenerator({ length: 2, charset: '01' });
+      expect(gen1.getCapacity()).toBe(4); // 2^2
+
+      const gen2 = new IdGenerator({ length: 2, charset: '0123456789' });
+      expect(gen2.getCapacity()).toBe(100); // 10^2
+
+      const gen3 = new IdGenerator({ length: 3, charset: 'ABC' });
+      expect(gen3.getCapacity()).toBe(27); // 3^3
+    });
+
+    test('should track utilization correctly', () => {
+      const generator = new IdGenerator({ mode: 'sequential', length: 2 });
+
+      const capacity = generator.getCapacity();
+
+      for (let i = 0; i < 10; i++) {
+        generator.generate();
+      }
+
+      const stats = generator.getStats();
+      expect(stats.utilization).toBeCloseTo((10 / capacity) * 100, 2);
+    });
+
+    test('should handle 100% utilization', () => {
+      const generator = new IdGenerator({
+        mode: 'sequential',
+        length: 1,
+        charset: '01',
+      });
+
+      generator.generate(); // 0
+      generator.generate(); // 1
+
+      const stats = generator.getStats();
+      expect(stats.utilization).toBe(100);
+    });
+  });
+
+  describe('String formatting', () => {
+    test('should pad sequential IDs correctly', () => {
+      const generator = new IdGenerator({ mode: 'sequential', length: 5 });
+
+      const id1 = generator.generate();
+      const id2 = generator.generate();
+
+      expect(id1).toBe('00000');
+      expect(id2).toBe('00001');
+    });
+
+    test('should handle leading zeros in sequential mode', () => {
+      const generator = new IdGenerator({ mode: 'sequential', length: 4 });
+
+      generator.registerExisting(['0001', '0010', '0100']);
+
+      const nextId = generator.generate();
+      expect(nextId).toBe('0101'); // 257 in base-36 with padding
+    });
+  });
+
+  describe('Base conversion', () => {
+    test('should convert sequential IDs to correct base', () => {
+      const generator = new IdGenerator({
+        mode: 'sequential',
+        length: 2,
+        charset: '0123456789',
+      });
+
+      const id1 = generator.generate(); // 0
+      const id10 = generator.generate(); // 1
+
+      for (let i = 2; i < 10; i++) {
+        generator.generate();
+      }
+
+      const id11 = generator.generate(); // Should be '10' in base-10
+
+      expect(id1).toBe('00');
+      expect(id11).toBe('10');
+    });
+
+    test('should handle base-2 charset', () => {
+      const generator = new IdGenerator({
+        mode: 'sequential',
+        length: 4,
+        charset: '01',
+      });
+
+      const id1 = generator.generate();
+      const id2 = generator.generate();
+      const id3 = generator.generate();
+      const id4 = generator.generate();
+
+      expect(id1).toBe('0000'); // 0
+      expect(id2).toBe('0001'); // 1
+      expect(id3).toBe('0010'); // 2
+      expect(id4).toBe('0011'); // 3
+    });
+  });
+
+  describe('Statistics consistency', () => {
+    test('should maintain consistent statistics after operations', () => {
+      const generator = new IdGenerator({ mode: 'sequential', length: 3 });
+
+      generator.generate();
+      generator.generate();
+      generator.registerExisting(['010', '011', '012']);
+
+      const stats = generator.getStats();
+
+      expect(stats.used).toBe(5);
+      expect(stats.capacity).toBe(generator.getCapacity());
+      expect(stats.length).toBe(3);
+      expect(stats.mode).toBe('sequential');
+    });
+
+    test('should update statistics after reset', () => {
+      const generator = new IdGenerator({ mode: 'random', length: 3 });
+
+      generator.generate();
+      generator.generate();
+      generator.generate();
+
+      generator.reset();
+
+      const stats = generator.getStats();
+
+      expect(stats.used).toBe(0);
+      expect(stats.utilization).toBe(0);
+    });
   });
 });

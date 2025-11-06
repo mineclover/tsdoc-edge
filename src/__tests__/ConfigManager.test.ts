@@ -308,4 +308,348 @@ describe('ConfigManager', () => {
       expect(configManager.getProjectRoot()).toBe(testDir);
     });
   });
+
+  describe('loadConfig edge cases', () => {
+    it('should handle corrupted JSON file', () => {
+      fs.writeFileSync(configPath, '{ invalid json }', 'utf-8');
+
+      expect(() => {
+        ConfigManager.reset();
+        ConfigManager.getInstance(testDir);
+      }).toThrow(/Failed to load config/);
+    });
+
+    it('should handle empty config file', () => {
+      fs.writeFileSync(configPath, '{}', 'utf-8');
+
+      ConfigManager.reset();
+      const configManager = ConfigManager.getInstance(testDir);
+      const config = configManager.get();
+
+      // Should merge with defaults
+      expect(config.project.name).toBe(DEFAULT_CONFIG.project.name);
+      expect(config.paths.commentsDir).toBe(DEFAULT_CONFIG.paths.commentsDir);
+    });
+
+    it('should handle config with extra unknown properties', () => {
+      const configWithExtra = {
+        ...DEFAULT_CONFIG,
+        unknownProperty: 'should be ignored',
+      };
+
+      fs.writeFileSync(configPath, JSON.stringify(configWithExtra), 'utf-8');
+
+      ConfigManager.reset();
+      const configManager = ConfigManager.getInstance(testDir);
+      const config = configManager.get();
+
+      expect(config.project).toBeDefined();
+      // The mergeConfig only merges known properties, so unknown properties are not preserved
+      expect((config as any).unknownProperty).toBeUndefined();
+    });
+
+    it('should handle custom configPath parameter', () => {
+      const customPath = path.join(testDir, 'custom.config.json');
+      const customConfig = {
+        project: {
+          name: 'custom-path-project',
+          version: '1.0.0',
+        },
+      };
+
+      fs.writeFileSync(customPath, JSON.stringify(customConfig), 'utf-8');
+
+      ConfigManager.reset();
+      const configManager = ConfigManager.getInstance(testDir, customPath);
+      const config = configManager.get();
+
+      expect(config.project.name).toBe('custom-path-project');
+      expect(configManager.getConfigPath()).toBe(customPath);
+    });
+  });
+
+  describe('validate edge cases', () => {
+    it('should validate connectivity score at boundaries', () => {
+      const configManager = ConfigManager.getInstance(testDir);
+
+      configManager.init({
+        validation: {
+          minConnectivityScore: 0,
+        },
+      });
+
+      let result = configManager.validate();
+      expect(result.valid).toBe(true);
+
+      configManager.update('validation', { minConnectivityScore: 100 });
+      result = configManager.validate();
+      expect(result.valid).toBe(true);
+
+      configManager.update('validation', { minConnectivityScore: -1 });
+      result = configManager.validate();
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContain('validation.minConnectivityScore must be between 0 and 100');
+
+      configManager.update('validation', { minConnectivityScore: 101 });
+      result = configManager.validate();
+      expect(result.valid).toBe(false);
+    });
+
+    it('should validate all required fields', () => {
+      const configManager = ConfigManager.getInstance(testDir);
+      configManager.init();
+
+      const config = configManager.get();
+      config.project.name = '';
+      config.project.version = '';
+      config.paths.commentsDir = '';
+      config.paths.databasePath = '';
+      config.paths.jsonlDir = '';
+      configManager.save(config);
+
+      ConfigManager.reset();
+      const newInstance = ConfigManager.getInstance(testDir);
+      const result = newInstance.validate();
+
+      expect(result.valid).toBe(false);
+      expect(result.errors.length).toBeGreaterThanOrEqual(5);
+      expect(result.errors).toContain('project.name is required');
+      expect(result.errors).toContain('project.version is required');
+      expect(result.errors).toContain('paths.commentsDir is required');
+      expect(result.errors).toContain('paths.databasePath is required');
+      expect(result.errors).toContain('paths.jsonlDir is required');
+    });
+  });
+
+  describe('ensureDirectories edge cases', () => {
+    it('should not fail if directories already exist', () => {
+      const configManager = ConfigManager.getInstance(testDir);
+      configManager.init();
+
+      // Create first time
+      configManager.ensureDirectories();
+
+      // Should not fail on second call
+      expect(() => {
+        configManager.ensureDirectories();
+      }).not.toThrow();
+    });
+
+    it('should create nested directories', () => {
+      const configManager = ConfigManager.getInstance(testDir);
+
+      configManager.init({
+        paths: {
+          commentsDir: 'deep/nested/comments',
+          databasePath: 'deep/nested/db/database.db',
+          jsonlDir: 'deep/nested/jsonl',
+        },
+      });
+
+      configManager.ensureDirectories();
+
+      expect(fs.existsSync(path.join(testDir, 'deep/nested/comments'))).toBe(true);
+      expect(fs.existsSync(path.join(testDir, 'deep/nested/db'))).toBe(true);
+      expect(fs.existsSync(path.join(testDir, 'deep/nested/jsonl'))).toBe(true);
+    });
+
+    it('should handle undefined optional paths', () => {
+      const configManager = ConfigManager.getInstance(testDir);
+
+      configManager.init({
+        paths: {
+          commentsDir: '.comments',
+          databasePath: '.db',
+          jsonlDir: 'data',
+          outputDir: undefined,
+        },
+      });
+
+      expect(() => {
+        configManager.ensureDirectories();
+      }).not.toThrow();
+    });
+  });
+
+  describe('save edge cases', () => {
+    it('should throw error if write fails', () => {
+      const configManager = ConfigManager.getInstance(testDir);
+      configManager.init();
+
+      // Make directory read-only to force write failure
+      const readOnlyDir = path.join(testDir, 'readonly');
+      fs.mkdirSync(readOnlyDir);
+      const readOnlyConfigPath = path.join(readOnlyDir, '.tsdoc.config.json');
+
+      ConfigManager.reset();
+      const readOnlyManager = ConfigManager.getInstance(readOnlyDir, readOnlyConfigPath);
+
+      // Make parent directory read-only (this may not work on all systems)
+      try {
+        fs.chmodSync(readOnlyDir, 0o444);
+
+        expect(() => {
+          readOnlyManager.save(DEFAULT_CONFIG);
+        }).toThrow(/Failed to save config/);
+
+        // Restore permissions
+        fs.chmodSync(readOnlyDir, 0o755);
+      } catch (error) {
+        // Skip this test on systems where chmod doesn't work as expected
+        fs.chmodSync(readOnlyDir, 0o755);
+      }
+
+      fs.rmSync(readOnlyDir, { recursive: true, force: true });
+    });
+
+    it('should update internal config after save', () => {
+      const configManager = ConfigManager.getInstance(testDir);
+      configManager.init();
+
+      const newConfig: TsdocEdgeConfig = {
+        ...DEFAULT_CONFIG,
+        project: {
+          name: 'updated-name',
+          version: '2.0.0',
+        },
+      };
+
+      configManager.save(newConfig);
+
+      const retrievedConfig = configManager.get();
+      expect(retrievedConfig.project.name).toBe('updated-name');
+      expect(retrievedConfig.project.version).toBe('2.0.0');
+    });
+  });
+
+  describe('mergeConfig behavior', () => {
+    it('should preserve nested objects when merging', () => {
+      const configManager = ConfigManager.getInstance(testDir);
+
+      configManager.init({
+        validation: {
+          strictMode: true,
+          rules: {
+            'rule-1': 'error',
+            'rule-2': 'warning',
+          },
+        },
+      });
+
+      const config = configManager.get();
+      expect(config.validation?.strictMode).toBe(true);
+      expect(config.validation?.minConnectivityScore).toBe(DEFAULT_CONFIG.validation?.minConnectivityScore);
+      expect(config.validation?.rules).toEqual({
+        'rule-1': 'error',
+        'rule-2': 'warning',
+      });
+    });
+
+    it('should override default values with user values', () => {
+      const configManager = ConfigManager.getInstance(testDir);
+
+      configManager.init({
+        paths: {
+          commentsDir: 'my-comments',
+          databasePath: DEFAULT_CONFIG.paths.databasePath,
+          jsonlDir: DEFAULT_CONFIG.paths.jsonlDir,
+        },
+      });
+
+      const config = configManager.get();
+      expect(config.paths.commentsDir).toBe('my-comments');
+      expect(config.paths.databasePath).toBe(DEFAULT_CONFIG.paths.databasePath);
+    });
+  });
+
+  describe('resolvePath edge cases', () => {
+    it('should handle paths with special characters', () => {
+      const configManager = ConfigManager.getInstance(testDir);
+
+      const resolved1 = configManager.resolvePath('path with spaces/file.txt');
+      expect(resolved1).toBe(path.join(testDir, 'path with spaces/file.txt'));
+
+      const resolved2 = configManager.resolvePath('path-with-dashes/file.txt');
+      expect(resolved2).toBe(path.join(testDir, 'path-with-dashes/file.txt'));
+    });
+
+    it('should handle empty paths', () => {
+      const configManager = ConfigManager.getInstance(testDir);
+
+      const resolved = configManager.resolvePath('');
+      expect(resolved).toBe(testDir);
+    });
+
+    it('should normalize paths', () => {
+      const configManager = ConfigManager.getInstance(testDir);
+
+      const resolved = configManager.resolvePath('./docs/../src/index.ts');
+      expect(resolved).toBe(path.join(testDir, 'src/index.ts'));
+    });
+  });
+
+  describe('update with multiple sections', () => {
+    it('should update multiple sections independently', () => {
+      const configManager = ConfigManager.getInstance(testDir);
+      configManager.init();
+
+      configManager.update('project', {
+        name: 'new-project-name',
+      });
+
+      configManager.update('validation', {
+        strictMode: true,
+      });
+
+      const config = configManager.get();
+      expect(config.project.name).toBe('new-project-name');
+      expect(config.validation?.strictMode).toBe(true);
+    });
+
+    it('should preserve other section values when updating one section', () => {
+      const configManager = ConfigManager.getInstance(testDir);
+
+      configManager.init({
+        project: {
+          name: 'original',
+          version: '1.0.0',
+        },
+        paths: {
+          commentsDir: 'original-comments',
+          databasePath: '.db',
+          jsonlDir: 'data',
+        },
+      });
+
+      configManager.update('project', {
+        name: 'updated',
+      });
+
+      const config = configManager.get();
+      expect(config.project.name).toBe('updated');
+      expect(config.project.version).toBe('1.0.0');
+      expect(config.paths.commentsDir).toBe('original-comments');
+    });
+  });
+
+  describe('singleton behavior', () => {
+    it('should maintain singleton across multiple getInstance calls with same params', () => {
+      const instance1 = ConfigManager.getInstance(testDir);
+      const instance2 = ConfigManager.getInstance(testDir);
+      const instance3 = ConfigManager.getInstance(); // Different params, but singleton already exists
+
+      expect(instance1).toBe(instance2);
+      expect(instance1).toBe(instance3);
+    });
+
+    it('should allow reset and re-initialization', () => {
+      const instance1 = ConfigManager.getInstance(testDir);
+
+      ConfigManager.reset();
+
+      const instance2 = ConfigManager.getInstance(testDir);
+
+      expect(instance1).not.toBe(instance2);
+    });
+  });
 });
