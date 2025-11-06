@@ -25,6 +25,26 @@ import type { Symbol } from '../types/graph/graph';
  * - list: List all registered IDs
  * - find: Find symbol by ID
  * - stats: Show registry statistics
+ *
+ * @public
+ * @problem Need unified interface for symbol ID operations across multiple use cases
+ * @solves Provides single command with subcommands for all ID management tasks
+ * @context CLI users need to register, query, and manage symbol IDs for documentation linking
+ *
+ * @functionality
+ * - Subcommand routing: Dispatches to specialized handlers (new, list, find, stats)
+ * - ID generation: Creates new unique symbol IDs with metadata
+ * - ID lookup: Find symbols by ID or name with fuzzy matching
+ * - Statistics: Show registry utilization and growth metrics
+ * - Error handling: Validates inputs and provides clear usage messages
+ *
+ * @decision Use subcommand pattern instead of separate top-level commands
+ * @rationale Reduces CLI clutter, groups related operations, easier to discover features
+ * @consequences All ID operations under single namespace, requires subcommand parsing
+ *
+ * @depends SymbolRegistryManager, BaseCommand
+ * @depType internal, internal
+ * @depReason Symbol storage backend, command framework
  */
 export class IdCommand extends BaseCommand {
   private manager?: SymbolRegistryManager;
@@ -231,6 +251,25 @@ export class IdCommand extends BaseCommand {
  *
  * Recursively improves documentation until target score is reached.
  * Uses RecursiveImprover to iteratively fix documentation issues.
+ *
+ * @public
+ * @problem Documentation quality degrades over time as code evolves
+ * @solves Automated iterative improvement until quality threshold met
+ * @context Large codebases need systematic quality enforcement
+ *
+ * @functionality
+ * - Iterative improvement: Runs fix command repeatedly until target score reached
+ * - Progress tracking: Shows improvement metrics each iteration
+ * - Configurable thresholds: Set target score and max iterations
+ * - Dry-run mode: Preview changes before applying
+ *
+ * @decision Use recursive approach instead of single-pass
+ * @rationale Some fixes expose new issues, iteration ensures complete improvement
+ * @consequences Slower but more thorough, may require multiple analysis passes
+ *
+ * @depends RecursiveImprover, BaseCommand
+ * @depType internal, internal
+ * @depReason Core improvement engine, command framework
  */
 export class ImproveCommand extends BaseCommand {
   private improver?: RecursiveImprover;
