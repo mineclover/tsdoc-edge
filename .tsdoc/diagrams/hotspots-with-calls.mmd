@@ -1,0 +1,118 @@
+%% Top Hotspots with Call Graph Integration
+%% Generated: 2025-11-07
+%% Updated with 1,511 call relationships
+
+graph TB
+    subgraph "🔥 Top 10 Hotspots (Updated with Call Graph)"
+        Title[Hotspot Analysis<br/>Score = Incoming + Outgoing]
+
+        H1[1. StrictModeValidator.validate<br/>Score: 625<br/>11 in → 614 out]:::critical
+        H2[2. ModuleSpecValidator.validate<br/>Score: 513<br/>505 in → 8 out]:::critical
+        H3[3. InsightDocGenerator.formatSymbol<br/>Score: 214<br/>9 in → 205 out]:::critical
+        H4[4. CommandRegistry.get 🆕<br/>Score: 212<br/>110 in → 102 out]:::critical
+        H5[5. command variable<br/>Score: 174<br/>0 in → 174 out]:::high
+        H6[6. Symbol interface<br/>Score: 166<br/>132 in → 34 out]:::high
+        H7[7. RecursiveImprover.expandEntryPoints<br/>Score: 164<br/>61 in → 103 out]:::high
+        H8[8. ParallelWorkDetector.findBarriersForGroup<br/>Score: 163<br/>61 in → 102 out]:::high
+        H9[9. TestRelationshipsCommand.findTestFiles<br/>Score: 161<br/>61 in → 100 out]:::high
+        H10[10. findMarkdownFiles 🆕<br/>Score: 127<br/>16 in → 111 out]:::medium
+    end
+
+    subgraph "📊 Hotspot Categories"
+        Cat1[Validators<br/>StrictMode: 625<br/>ModuleSpec: 513]:::validators
+        Cat2[Registry Pattern 🆕<br/>CommandRegistry.get: 212<br/>High call traffic]:::registry
+        Cat3[Generators<br/>InsightDoc: 214<br/>High generation load]:::generators
+        Cat4[Type System<br/>Symbol: 166<br/>Core interface]:::types
+        Cat5[Analyzers<br/>Multiple 160+ scores<br/>Heavy computation]:::analyzers
+    end
+
+    subgraph "🎯 Call Graph Impact"
+        Impact[Call Graph Changes]
+
+        Impact --> I1[New Top 10 Entries:<br/>CommandRegistry.get #4<br/>findMarkdownFiles #10]
+        Impact --> I2[Shifted Rankings:<br/>Some symbols moved down<br/>Call-heavy functions rose]
+        Impact --> I3[Pattern Discovery:<br/>Registry pattern visible<br/>Helper functions identified]
+
+        I1 --> Example1[CommandRegistry.get:<br/>Called 106x from commands<br/>Creates bidirectional traffic]
+        I2 --> Example2[Symbol interface:<br/>Still high but relatively lower<br/>Due to new call relationships]
+        I3 --> Example3[findMarkdownFiles:<br/>Called 16x from analyzers<br/>Utility function hotspot]
+    end
+
+    subgraph "⚠️ Risk Analysis"
+        Risk[High-Risk Hotspots]
+
+        Risk --> R1[StrictModeValidator.validate:<br/>625 score - Extreme coupling<br/>614 outgoing deps ⚠️]
+        Risk --> R2[ModuleSpecValidator.validate:<br/>513 score - Heavy incoming<br/>505 callers/refs ⚠️]
+        Risk --> R3[CommandRegistry.get:<br/>212 score - Central registry<br/>Single point of failure ⚠️]
+
+        R1 --> R1Note[Risk: Changes break many paths<br/>Recommendation: Refactor validators]
+        R2 --> R2Note[Risk: Many depend on this<br/>Recommendation: Stable interface]
+        R3 --> R3Note[Risk: Registry bottleneck<br/>Recommendation: Add caching]
+    end
+
+    subgraph "📈 Before/After Comparison"
+        Before[Before Call Graph<br/>Top scores based on<br/>code-deps + io-deps]
+        After[After Call Graph<br/>Top scores include<br/>call relationships]
+
+        Before --> B1[Symbol: 170 → 166<br/>Relatively lower with calls]
+        Before --> B2[CommandResult: 146<br/>Not in new top 10]
+        Before --> B3[BaseCommand: 126<br/>Not in new top 10]
+
+        After --> A1[StrictModeValidator: New #1<br/>Extreme outgoing calls]
+        After --> A2[CommandRegistry.get: New #4<br/>High bidirectional traffic]
+        After --> A3[findMarkdownFiles: New #10<br/>Utility function calls]
+
+        B1 --> Change1[Change: -2.4%<br/>Still important but not extreme]
+        A1 --> Change2[Change: +567%<br/>Reveals validation complexity]
+        A2 --> Change3[Change: New entry<br/>Shows registry pattern]
+    end
+
+    subgraph "🔧 Optimization Opportunities"
+        Opt[Optimization Targets]
+
+        Opt --> O1[StrictModeValidator.validate<br/>Priority: High<br/>Action: Split into smaller validators]
+        Opt --> O2[ModuleSpecValidator.validate<br/>Priority: High<br/>Action: Add validation cache]
+        Opt --> O3[CommandRegistry.get<br/>Priority: Medium<br/>Action: Memoize lookups]
+        Opt --> O4[InsightDocGenerator.formatSymbol<br/>Priority: Medium<br/>Action: Batch formatting]
+
+        O1 --> O1Impact[Impact: Reduce coupling<br/>Easier testing<br/>Better maintainability]
+        O2 --> O2Impact[Impact: Faster validation<br/>Reduced redundancy<br/>Better performance]
+        O3 --> O3Impact[Impact: Faster command dispatch<br/>Reduced registry load<br/>Better scalability]
+        O4 --> O4Impact[Impact: Batch processing<br/>Reduced function calls<br/>Better throughput]
+    end
+
+    subgraph "🎨 Visualization Insights"
+        Viz[Key Insights from Call Graph]
+
+        Viz --> V1[Pattern Recognition:<br/>Registry pattern clearly visible<br/>Helper functions identified]
+        Viz --> V2[Coupling Detection:<br/>Validators extremely coupled<br/>Need architectural review]
+        Viz --> V3[Traffic Analysis:<br/>CommandRegistry is hub<br/>Consider distributed approach]
+        Viz --> V4[Dead Code Hints:<br/>Low incoming = potential unused<br/>Low outgoing = simple functions]
+
+        V1 --> V1Note[Use: Architecture planning<br/>Pattern documentation]
+        V2 --> V2Note[Use: Refactoring priorities<br/>Code quality improvement]
+        V3 --> V3Note[Use: Performance optimization<br/>Load balancing]
+        V4 --> V4Note[Use: Dead code elimination<br/>Codebase cleanup]
+    end
+
+    %% Styling
+    style Title fill:#8b5cf6,stroke:#6d28d9,stroke-width:3px,color:#fff
+    style Impact fill:#339af0,stroke:#1864ab,stroke-width:3px,color:#fff
+    style Risk fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px,color:#fff
+    style Before fill:#74c0fc,stroke:#339af0,stroke-width:2px,color:#fff
+    style After fill:#51cf66,stroke:#2f9e44,stroke-width:2px,color:#fff
+    style Opt fill:#ffd93d,stroke:#fab005,stroke-width:3px
+    style Viz fill:#ff6b9d,stroke:#c92a54,stroke-width:3px,color:#fff
+
+    classDef critical fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px,color:#fff
+    classDef high fill:#ffd93d,stroke:#fab005,stroke-width:2px
+    classDef medium fill:#74c0fc,stroke:#339af0,stroke-width:2px
+    classDef validators fill:#ff6b6b,stroke:#c92a2a,stroke-width:2px,color:#fff
+    classDef registry fill:#339af0,stroke:#1864ab,stroke-width:2px,color:#fff
+    classDef generators fill:#ffd93d,stroke:#fab005,stroke-width:2px
+    classDef types fill:#51cf66,stroke:#2f9e44,stroke-width:2px
+    classDef analyzers fill:#74c0fc,stroke:#339af0,stroke-width:2px
+
+    class H1,H2,H3,H4 critical
+    class H5,H6,H7,H8,H9 high
+    class H10 medium

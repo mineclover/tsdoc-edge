@@ -1,8 +1,8 @@
 # TSDoc Edge Visualization Diagrams
 
 **Generated**: 2025-11-07 (Updated with Call Graph)
-**Total Diagrams**: 15 (1 new call graph diagram added)
-**Total Lines**: ~1,550
+**Total Diagrams**: 16 (2 new call graph diagrams added)
+**Total Lines**: ~1,670
 **Format**: Mermaid
 
 ## Overview
@@ -129,6 +129,42 @@ This directory contains Mermaid diagrams visualizing the TSDoc Edge codebase arc
   - Dynamic calls (apply, call, bind)
 
 **Use Case**: Impact analysis, refactoring planning, dead code detection, optimization
+
+#### `hotspots-with-calls.mmd` (119 lines) 🆕
+**Purpose**: Updated hotspot analysis integrating call graph relationships
+
+**Contents**:
+- Top 10 hotspots with call graph integration
+  - Scores now include incoming + outgoing call relationships
+  - New hotspot formula: Score = Code Deps + I/O Deps + Calls (in + out)
+- New entries in top 10
+  - **CommandRegistry.get**: #4 (212 score) - 110 in, 102 out
+  - **findMarkdownFiles**: #10 (127 score) - 16 in, 111 out
+- Shifted rankings
+  - StrictModeValidator.validate: #1 (625 score, extreme coupling)
+  - ModuleSpecValidator.validate: #2 (513 score, heavy incoming)
+  - Symbol interface: #6 (166 score, down from #1)
+- Hotspot categories
+  - Validators (625, 513 scores)
+  - Registry Pattern (212 score)
+  - Generators (214 score)
+  - Type System (166 score)
+  - Analyzers (160+ scores)
+- Before/after comparison
+  - Symbol: 170 → 166 (-2.4%)
+  - StrictModeValidator: new #1 (+567% reveal)
+  - CommandRegistry.get: new entry (registry pattern)
+- Risk analysis
+  - Extreme coupling: StrictModeValidator (614 outgoing deps)
+  - Heavy incoming: ModuleSpecValidator (505 callers/refs)
+  - Registry bottleneck: CommandRegistry.get (single point of failure)
+- Optimization opportunities
+  - Split StrictModeValidator into smaller validators
+  - Add validation cache to ModuleSpecValidator
+  - Memoize CommandRegistry lookups
+  - Batch InsightDocGenerator formatting
+
+**Use Case**: Refactoring priorities, performance optimization, architectural review, risk assessment
 
 #### `modules.mmd` (185 lines)
 **Purpose**: File-level dependency map
