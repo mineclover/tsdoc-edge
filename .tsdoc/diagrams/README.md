@@ -2,7 +2,7 @@
 
 **Generated**: 2025-11-07 (Updated with Call Graph)
 **Total Diagrams**: 22 (8 new diagrams added)
-**Total Lines**: ~3,289
+**Total Lines**: 2,824 lines
 **Format**: Mermaid
 
 ## Quick Navigation
@@ -44,10 +44,10 @@ This directory contains Mermaid diagrams visualizing the TSDoc Edge codebase arc
 - **Refactoring Teams**: Refactoring Planning Path (2h) - Optimization opportunities
 
 **Diagram Statistics**:
-- Total: 22 diagrams, ~3,289 lines (~150 lines avg)
-- Largest: data-pipeline-flows (312), quality-dashboard (280), symbol-distribution (267)
+- Total: 22 diagrams, 2,824 lines (128 lines avg)
+- Largest: diagram-index (256), data-pipeline-flows (238), quality-dashboard (202)
 - Smallest: tree-database-manager (1), tree-interface-symbol (4)
-- New in Nov 2025: 8 diagrams (+1,698 lines, call graph & quality focus)
+- New in Nov 2025: 8 diagrams (+1,233 lines, call graph & quality focus)
 
 **How Diagrams Connect**:
 - system-metrics → quality-dashboard (metrics feed quality scores)

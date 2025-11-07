@@ -1594,10 +1594,10 @@ TSDoc Edge는 코드와 문서뿐만 아니라 **전체 시스템을 시각적�
 ### 📈 다이어그램 통계
 
 - **총 다이어그램**: 22개
-- **총 라인 수**: ~3,289 lines
-- **평균**: ~150 lines/diagram
-- **최대**: data-pipeline-flows (312 lines)
-- **최소**: tree-database-manager (1 line)
+- **총 라인 수**: 2,824 lines
+- **평균**: 128 lines/diagram
+- **최대**: diagram-index (256 lines), data-pipeline-flows (238 lines)
+- **최소**: tree-database-manager (1 line), tree-interface-symbol (4 lines)
 
 ### 🎯 다이어그램의 가치
 
