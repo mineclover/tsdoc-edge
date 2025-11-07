@@ -69,6 +69,7 @@ import { AnalyzeCallsCommand } from './commands/AnalyzeCallsCommand';
 import { AnalyzeTestsCommand } from './commands/AnalyzeTestsCommand';
 import { AnalyzeTypesCommand } from './commands/AnalyzeTypesCommand';
 import { WorkContextCommand } from './commands/WorkContextCommand';
+import { ExploreEntrypointCommand } from './commands/ExploreEntrypointCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -153,6 +154,7 @@ async function main(): Promise<void> {
   registry.register(new ParallelWorkCommand());
   registry.register(new TestRelationshipsCommand());
   registry.register(new WorkContextCommand());
+  registry.register(new ExploreEntrypointCommand());
   registry.register(new HelpCommand(registry));
 
   // Get command
