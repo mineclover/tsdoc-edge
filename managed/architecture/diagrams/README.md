@@ -1,8 +1,8 @@
 # TSDoc Edge Visualization Diagrams
 
-**Generated**: 2025-11-07 (Updated with Call Graph + Export Analysis)
-**Total Diagrams**: 24 (10 new diagrams added)
-**Total Lines**: 3,296 lines
+**Generated**: 2025-11-07 (Updated with Work-Context Meta-Structure + Reliability)
+**Total Diagrams**: 27 (13 new diagrams added)
+**Total Lines**: ~4,586 lines
 **Format**: Mermaid
 
 ## Quick Navigation
@@ -11,10 +11,12 @@
 
 ### Recommended Quick Start Paths
 
-1. **Executive Overview** (30min): system-metrics → quality-dashboard → relationship-taxonomy
-2. **Developer Onboarding** (2h): symbol-distribution → command-pattern-analysis → analysis-pipeline → common-issues-solutions
-3. **Architecture Review** (1.5h): hotspots-with-calls → modules → data-pipeline-flows → quality-dashboard
-4. **Refactoring Planning** (2h): hotspots-with-calls → call-graph-analysis → command-pattern-analysis → data-pipeline-flows
+1. **Meta-Level Understanding** (45min): **dependency-meta-structure** → relationship-taxonomy → implementation-roadmap
+2. **Work-Context Deep Dive** (1h): **work-context-architecture** → **work-context-reliability-chain** → work-context-workflow.md
+3. **Executive Overview** (30min): system-metrics → quality-dashboard → relationship-taxonomy
+4. **Developer Onboarding** (2h): symbol-distribution → command-pattern-analysis → analysis-pipeline → common-issues-solutions
+5. **Architecture Review** (1.5h): hotspots-with-calls → modules → data-pipeline-flows → quality-dashboard
+6. **Refactoring Planning** (2h): hotspots-with-calls → call-graph-analysis → command-pattern-analysis → data-pipeline-flows
 
 ## Overview
 
@@ -22,7 +24,56 @@ This directory contains Mermaid diagrams visualizing the TSDoc Edge codebase arc
 
 ## Diagram Categories
 
-### 0. Navigation & Index
+### 0. Meta-Level & Core Design ⭐ NEW
+
+#### `dependency-meta-structure.mmd` (520 lines) 🆕 START HERE FOR PHILOSOPHY
+**Purpose**: Meta-level visualization of TSDoc Edge's dependency tracking philosophy and structure
+
+**Contents**:
+- **4 Dependency Dimensions**: Code Space, Data Space, Behavior Space, Meta Space
+- **17 Relationship Types**: Complete taxonomy across 8 categories (6 implemented, 11 pending)
+- **Detection Methods**: Static analysis, type inference, graph traversal, pattern recognition
+- **Inference Chain**: How relationships build on each other (4 layers)
+- **Design Motivation**: Why multi-dimensional approach vs traditional tools
+- **Storage Design**: unified_relationships table schema and query patterns
+- **Big Picture**: From TypeScript code to actionable insights
+- **Current vs Target**: v1.0 (4 types) → v2.0 (17 types)
+
+**Key Statistics**:
+- Current: 10,241 relationships (code: 1,968, io: 6,705, calls: 1,511, inheritance: 57)
+- Target: ~26,000 relationships (+155% when complete)
+- Implementation: 6/17 types (35% complete)
+
+**Use Case**: Understanding TSDoc Edge's core differentiation, planning new relationship types, architectural review, educational material
+
+#### `work-context-architecture.mmd` (320 lines) 🆕 WORK-CONTEXT DEEP DIVE
+**Purpose**: Comprehensive visualization of work-context command architecture and dependencies
+
+**Contents**:
+- **4-Layer Architecture**: CLI Entry → Data Collection → Data Sources → Validation & Display
+- **5 Information Streams**: Symbols, Documents, Dependencies, Tests, Usage (parallel collection)
+- **Dependency Graph**: Class & module dependencies (WorkContextCommand relationships)
+- **Method Call Graph**: Execution flow from execute() to displayContext()
+- **Database Query Pattern**: 4 main queries with join resolution
+- **File System Interaction**: Path resolution, document discovery, validation
+
+**Use Cases**: Understanding work-context implementation, debugging data collection, onboarding, planning reliability enhancements
+
+#### `work-context-reliability-chain.mmd` (450 lines) 🆕 RELIABILITY DESIGN
+**Purpose**: Reliability verification chain for work-context command (implementation of [[Work Context Reliability]])
+
+**Status**: Design Phase (not yet implemented)
+
+**Contents**:
+- **Overall Reliability Flow**: Entry → Collection → Scoring → Display
+- **4 Verification Chains**: Docs (30%), Deps (30%), Tests (20%), Impact (20%)
+- **Scoring Algorithm**: Weighted average with penalties for issues
+- **Grade Classification**: A (90-100%), B (70-89%), C (50-69%), D (0-49%)
+- **Improvement Feedback Loop**: Detection → Analysis → Suggestions → Action → Verification
+
+**Use Cases**: Planning ReliabilityChecker implementation, understanding scoring algorithm, debugging verification steps
+
+### 1. Navigation & Index
 
 #### `diagram-index.mmd` (332 lines) ⭐ START HERE
 **Purpose**: Complete navigation map and index for all 22 diagrams

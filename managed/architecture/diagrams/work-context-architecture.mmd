@@ -1,0 +1,433 @@
+---
+title: Work Context Architecture - 전체 의존성 구조
+type: architecture-diagram
+category: work-context
+status: active
+lastUpdated: 2025-11-07
+purpose: work-context 명령어의 전체 의존성 구조와 메타적 설계를 시각화
+---
+
+# Work Context Architecture
+
+## 1. Overview: 4-Layer Architecture
+
+```mermaid
+graph TB
+    subgraph "Layer 1: CLI Entry"
+        CLI[WorkContextCommand]
+        Args[args: file-path]
+    end
+
+    subgraph "Layer 2: Data Collection"
+        SymbolDB[(Symbol DB)]
+        FileParser[File Parser<br/>@doc tags]
+        DepQuery[Dependency Query]
+        TestQuery[Test Query]
+        UsageQuery[Usage Query]
+    end
+
+    subgraph "Layer 3: Data Sources"
+        Symbols[symbols table]
+        Dependencies[dependencies table]
+        TestMappings[test_mappings table]
+        DocFiles[managed/** docs]
+    end
+
+    subgraph "Layer 4: Validation & Display"
+        Validator[Validation<br/>file exists check]
+        Formatter[Formatter<br/>colored output]
+        Summary[Summary<br/>aggregation]
+    end
+
+    CLI -->|1. resolve path| Args
+    Args -->|2. load| SymbolDB
+    SymbolDB -->|3. query| Symbols
+    SymbolDB -->|4. query| Dependencies
+    SymbolDB -->|5. query| TestMappings
+    Args -->|6. parse| FileParser
+    FileParser -->|7. search| DocFiles
+
+    Symbols -->|8. build context| DepQuery
+    Dependencies -->|9. resolve deps| DepQuery
+    TestMappings -->|10. resolve tests| TestQuery
+    Dependencies -->|11. reverse query| UsageQuery
+
+    DepQuery -->|12. validate| Validator
+    TestQuery -->|13. validate| Validator
+    UsageQuery -->|14. validate| Validator
+    DocFiles -->|15. resolve paths| Validator
+
+    Validator -->|16. format| Formatter
+    Formatter -->|17. aggregate| Summary
+    Summary -->|18. display| CLI
+
+    classDef entry fill:#e1f5ff,stroke:#01579b,stroke-width:2px
+    classDef collection fill:#fff3e0,stroke:#e65100,stroke-width:2px
+    classDef source fill:#f3e5f5,stroke:#4a148c,stroke-width:2px
+    classDef output fill:#e8f5e9,stroke:#1b5e20,stroke-width:2px
+
+    class CLI,Args entry
+    class SymbolDB,FileParser,DepQuery,TestQuery,UsageQuery collection
+    class Symbols,Dependencies,TestMappings,DocFiles source
+    class Validator,Formatter,Summary output
+```
+
+## 2. Data Flow: 5 Information Streams
+
+```mermaid
+graph LR
+    subgraph "Input"
+        File[target file path]
+    end
+
+    subgraph "Stream 1: Symbols"
+        S1[SELECT * FROM symbols<br/>WHERE file_path = ?]
+        S2[Extract: id, name, type]
+        S3[symbols: Symbol[]]
+    end
+
+    subgraph "Stream 2: Documents"
+        D1[Read file content]
+        D2[Regex: /@doc \[\[...\]\]/]
+        D3[Search managed/ dirs]
+        D4[relatedDocs: DocRef[]]
+    end
+
+    subgraph "Stream 3: Dependencies"
+        E1[SELECT * FROM dependencies<br/>WHERE symbol_id IN ...]
+        E2[Resolve target symbols]
+        E3[Filter: exclude same file]
+        E4[dependencies: Dep[]]
+    end
+
+    subgraph "Stream 4: Tests"
+        T1[SELECT * FROM test_mappings<br/>WHERE symbol_id IN ...]
+        T2[Group by test file path]
+        T3[Detect type: unit/integration]
+        T4[tests: Test[]]
+    end
+
+    subgraph "Stream 5: Usage"
+        U1[SELECT * FROM dependencies<br/>WHERE target IN ...]
+        U2[Resolve user symbols]
+        U3[Filter: exclude same file]
+        U4[usedBy: Usage[]]
+    end
+
+    subgraph "Output"
+        Display[Display Context]
+    end
+
+    File --> S1 & D1
+    S1 --> S2 --> S3
+    D1 --> D2 --> D3 --> D4
+    S3 --> E1
+    E1 --> E2 --> E3 --> E4
+    S3 --> T1
+    T1 --> T2 --> T3 --> T4
+    S3 --> U1
+    U1 --> U2 --> U3 --> U4
+
+    S3 & D4 & E4 & T4 & U4 --> Display
+
+    classDef input fill:#e3f2fd,stroke:#0277bd
+    classDef stream fill:#fff9c4,stroke:#f57f17
+    classDef output fill:#c8e6c9,stroke:#2e7d32
+
+    class File input
+    class S1,S2,S3,D1,D2,D3,D4,E1,E2,E3,E4,T1,T2,T3,T4,U1,U2,U3,U4 stream
+    class Display output
+```
+
+## 3. Dependency Graph: Class & Module Dependencies
+
+```mermaid
+graph TB
+    subgraph "Command Layer"
+        WCC[WorkContextCommand<br/>extends BaseCommand]
+    end
+
+    subgraph "Core Dependencies"
+        BC[BaseCommand<br/>success/failure/printError]
+        DBM[DatabaseManager<br/>db.prepare/all/get]
+        SGB[SymbolGraphBuilder<br/>not used directly]
+        TSP[TSDocParser<br/>not used directly]
+        DSP[DocumentSymbolParser<br/>not used directly]
+    end
+
+    subgraph "Type Dependencies"
+        Symbol[Symbol interface<br/>id, name, type, filePath]
+        CR[CommandResult<br/>success: boolean]
+        WC[WorkContext interface<br/>5 data arrays]
+    end
+
+    subgraph "Node.js Modules"
+        FS[fs: readFileSync<br/>existsSync, readdirSync]
+        PATH[path: resolve<br/>relative, join, basename]
+    end
+
+    subgraph "Internal Data Structures"
+        WC_IMPL[WorkContext impl<br/>symbols, relatedDocs<br/>dependencies, tests, usedBy]
+    end
+
+    WCC -->|extends| BC
+    WCC -->|uses| DBM
+    WCC -->|uses| FS
+    WCC -->|uses| PATH
+    WCC -->|returns| CR
+    WCC -->|implements| WC
+    WCC -->|queries| Symbol
+
+    WC -->|contains| Symbol
+    WC_IMPL -->|structure| WC
+
+    DBM -->|queries| Symbol
+
+    classDef command fill:#bbdefb,stroke:#1565c0,stroke-width:2px
+    classDef core fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef type fill:#f8bbd0,stroke:#c2185b,stroke-width:2px
+    classDef node fill:#c5e1a5,stroke:#558b2f,stroke-width:2px
+    classDef internal fill:#d1c4e9,stroke:#512da8,stroke-width:2px
+
+    class WCC command
+    class BC,DBM,SGB,TSP,DSP core
+    class Symbol,CR,WC type
+    class FS,PATH node
+    class WC_IMPL internal
+```
+
+## 4. Method Call Graph: Execution Flow
+
+```mermaid
+graph TB
+    subgraph "Public API"
+        Execute[execute args<br/>Entry Point]
+    end
+
+    subgraph "Error Handling"
+        EWE[executeWithErrorHandling<br/>from BaseCommand]
+    end
+
+    subgraph "Validation"
+        V1[Validate args[0] exists]
+        V2[Resolve absolute path]
+        V3[Check file exists]
+        V4[Check DB exists]
+    end
+
+    subgraph "Core Logic"
+        GC[gatherContext<br/>Main orchestration]
+    end
+
+    subgraph "Data Collection Methods"
+        GC1[Query symbols table]
+        GC2[Parse file for @doc tags]
+        GC3[Query dependencies]
+        GC4[Query test_mappings]
+        GC5[Query reverse deps]
+    end
+
+    subgraph "Helper Methods"
+        FDP[findDocumentPath<br/>Search managed/ dirs]
+        GAMF[getAllMarkdownFiles<br/>Recursive scan]
+        UB[uniqueBy<br/>Deduplication]
+    end
+
+    subgraph "Output"
+        DC[displayContext<br/>Format & Print]
+        DSub1[Display docs]
+        DSub2[Display deps]
+        DSub3[Display tests]
+        DSub4[Display usedBy]
+        DSub5[Display summary]
+    end
+
+    Execute -->|1. wrap| EWE
+    EWE -->|2. validate| V1
+    V1 -->|3. resolve| V2
+    V2 -->|4. check| V3
+    V3 -->|5. check| V4
+    V4 -->|6. orchestrate| GC
+
+    GC -->|7. collect| GC1
+    GC -->|8. collect| GC2
+    GC -->|9. collect| GC3
+    GC -->|10. collect| GC4
+    GC -->|11. collect| GC5
+
+    GC2 -->|uses| FDP
+    FDP -->|uses| GAMF
+    GC3 -->|uses| UB
+    GC5 -->|uses| UB
+
+    GC -->|12. display| DC
+    DC -->|13.1| DSub1
+    DC -->|13.2| DSub2
+    DC -->|13.3| DSub3
+    DC -->|13.4| DSub4
+    DC -->|13.5| DSub5
+
+    classDef api fill:#e1bee7,stroke:#6a1b9a,stroke-width:3px
+    classDef error fill:#ffccbc,stroke:#d84315,stroke-width:2px
+    classDef validation fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef core fill:#bbdefb,stroke:#1565c0,stroke-width:3px
+    classDef collection fill:#c5e1a5,stroke:#558b2f,stroke-width:2px
+    classDef helper fill:#d1c4e9,stroke:#512da8,stroke-width:2px
+    classDef output fill:#a5d6a7,stroke:#2e7d32,stroke-width:2px
+
+    class Execute api
+    class EWE error
+    class V1,V2,V3,V4 validation
+    class GC core
+    class GC1,GC2,GC3,GC4,GC5 collection
+    class FDP,GAMF,UB helper
+    class DC,DSub1,DSub2,DSub3,DSub4,DSub5 output
+```
+
+## 5. Database Query Pattern
+
+```mermaid
+graph LR
+    subgraph "Input"
+        FilePath[file path<br/>src/foo.ts]
+    end
+
+    subgraph "Query 1: Get Symbols"
+        Q1[SELECT * FROM symbols<br/>WHERE file_path = ?]
+        R1[Result: Symbol[]]
+    end
+
+    subgraph "Query 2: Get Dependencies"
+        Q2[SELECT * FROM dependencies<br/>WHERE symbol_id IN ...]
+        R2[Result: Dep[]]
+        Q2_2[SELECT * FROM symbols<br/>WHERE id = target]
+        R2_2[Resolve: Dep.name]
+    end
+
+    subgraph "Query 3: Get Tests"
+        Q3[SELECT * FROM test_mappings<br/>WHERE symbol_id IN ...]
+        R3[Result: TestMapping[]]
+    end
+
+    subgraph "Query 4: Get Usage"
+        Q4[SELECT * FROM dependencies<br/>WHERE target IN ...]
+        R4[Result: Usage[]]
+        Q4_2[SELECT * FROM symbols<br/>WHERE id = symbol_id]
+        R4_2[Resolve: Usage.name]
+    end
+
+    subgraph "Output"
+        Context[WorkContext]
+    end
+
+    FilePath -->|param| Q1
+    Q1 -->|rows| R1
+    R1 -->|symbol_ids| Q2
+    Q2 -->|deps| R2
+    R2 -->|target_ids| Q2_2
+    Q2_2 -->|names| R2_2
+    R1 -->|symbol_ids| Q3
+    Q3 -->|mappings| R3
+    R1 -->|symbol_ids| Q4
+    Q4 -->|usages| R4
+    R4 -->|symbol_ids| Q4_2
+    Q4_2 -->|names| R4_2
+
+    R1 & R2_2 & R3 & R4_2 -->|merge| Context
+
+    classDef input fill:#e3f2fd,stroke:#0277bd
+    classDef query fill:#fff9c4,stroke:#f57f17
+    classDef result fill:#c8e6c9,stroke:#2e7d32
+    classDef output fill:#ce93d8,stroke:#6a1b9a
+
+    class FilePath input
+    class Q1,Q2,Q2_2,Q3,Q4,Q4_2 query
+    class R1,R2,R2_2,R3,R4,R4_2 result
+    class Context output
+```
+
+## 6. File System Interaction
+
+```mermaid
+graph TB
+    subgraph "Input Validation"
+        CheckTarget[fs.existsSync<br/>target file]
+        CheckDB[fs.existsSync<br/>.tsdoc/symbols.db]
+    end
+
+    subgraph "File Parsing"
+        ReadFile[fs.readFileSync<br/>read target file]
+        ParseDoc[Regex parse<br/>@doc tags]
+    end
+
+    subgraph "Document Discovery"
+        SearchDirs[managed/features<br/>managed/workflows<br/>managed/concepts<br/>managed/architecture]
+        ScanRecursive[fs.readdirSync<br/>recursive scan]
+        ReadDoc[fs.readFileSync<br/>read each .md]
+        MatchH1[Regex match<br/>H1: # [[Symbol]]]
+    end
+
+    subgraph "Dependency Validation"
+        CheckDeps[fs.existsSync<br/>check dep file paths]
+        CheckTests[fs.existsSync<br/>check test file paths]
+    end
+
+    subgraph "Path Resolution"
+        Resolve[path.resolve<br/>absolute paths]
+        Relative[path.relative<br/>display paths]
+        Join[path.join<br/>construct paths]
+    end
+
+    CheckTarget -->|pass| CheckDB
+    CheckDB -->|pass| ReadFile
+    ReadFile -->|content| ParseDoc
+    ParseDoc -->|symbol refs| SearchDirs
+    SearchDirs -->|scan| ScanRecursive
+    ScanRecursive -->|.md files| ReadDoc
+    ReadDoc -->|content| MatchH1
+    MatchH1 -->|match| Relative
+
+    CheckDeps -->|validation| Resolve
+    CheckTests -->|validation| Resolve
+    Resolve -->|absolute| Join
+    Join -->|relative| Relative
+
+    classDef validation fill:#ffccbc,stroke:#d84315
+    classDef parse fill:#fff9c4,stroke:#f57f17
+    classDef discover fill:#c5e1a5,stroke:#558b2f
+    classDef check fill:#b3e5fc,stroke:#0277bd
+    classDef path fill:#d1c4e9,stroke:#512da8
+
+    class CheckTarget,CheckDB validation
+    class ReadFile,ParseDoc parse
+    class SearchDirs,ScanRecursive,ReadDoc,MatchH1 discover
+    class CheckDeps,CheckTests check
+    class Resolve,Relative,Join path
+```
+
+## Metadata
+
+**Created**: 2025-11-07
+**Purpose**: Comprehensive visualization of work-context command architecture
+**Total Diagrams**: 6 (overview, data flow, dependencies, call graph, DB queries, file system)
+**Lines**: ~320
+**Use Cases**:
+- Understanding work-context implementation
+- Onboarding new developers
+- Debugging data collection issues
+- Planning reliability enhancements
+- Architectural review
+
+**Related Documents**:
+- [[Work Context Workflow]] - User-facing workflow documentation
+- [[Work Context Reliability]] - Reliability scoring design
+- [[CLI Feedback Cycle]] - Overall CLI architecture
+
+**Verification**:
+```bash
+# Verify implementation
+npx ts-node src/cli.ts work-context src/commands/WorkContextCommand.ts
+
+# Check dependencies
+grep -r "import.*from" src/commands/WorkContextCommand.ts
+```

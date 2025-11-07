@@ -1,0 +1,442 @@
+---
+title: Dependency Meta-Structure - 의존성 분석의 메타적 설계
+type: meta-architecture
+category: core-design
+status: active
+lastUpdated: 2025-11-07
+purpose: TSDoc Edge가 추적하는 의존성의 메타적 구조와 철학을 시각화
+---
+
+# Dependency Meta-Structure: What We Track & Why
+
+## 1. The Meta-Level View: 4 Dependency Dimensions
+
+```mermaid
+graph TB
+    subgraph "Code Space (구조적)"
+        CD[Code Dependency<br/>1,968 relationships<br/>import/export 추적]
+        INH[Inheritance<br/>57 relationships<br/>extends/implements]
+    end
+
+    subgraph "Data Space (흐름적)"
+        IO[I/O Dependency<br/>6,705 relationships<br/>type-based 데이터 흐름]
+        PIPE[Pipeline<br/>25,809 chains<br/>3+ 단계 체인]
+    end
+
+    subgraph "Behavior Space (동적)"
+        CALLS[Call Relationships<br/>1,511 relationships<br/>함수 호출 추적]
+        EVENT[Event Flow<br/>NOT YET<br/>emit/listen 패턴]
+    end
+
+    subgraph "Meta Space (인지적)"
+        DOC[Documentation<br/>NOT YET<br/>@doc [[Symbol]]]
+        TEST[Test Coverage<br/>NOT YET<br/>test→impl 매핑]
+    end
+
+    CD -.->|"함께 사용"| INH
+    IO -.->|"체인화"| PIPE
+    CALLS -.->|"미래"| EVENT
+    DOC -.->|"미래"| TEST
+
+    CD -.->|"코드 구조로<br/>데이터 흐름 추론"| IO
+    IO -.->|"흐름으로<br/>호출 관계 추론"| CALLS
+    CALLS -.->|"호출로<br/>테스트 검증"| TEST
+
+    classDef code fill:#e3f2fd,stroke:#0277bd,stroke-width:3px
+    classDef data fill:#fff9c4,stroke:#f57f17,stroke-width:3px
+    classDef behavior fill:#c8e6c9,stroke:#2e7d32,stroke-width:3px
+    classDef meta fill:#f8bbd0,stroke:#c2185b,stroke-width:3px
+
+    class CD,INH code
+    class IO,PIPE data
+    class CALLS,EVENT behavior
+    class DOC,TEST meta
+```
+
+**핵심 철학**: 코드는 4개의 독립적이지만 연결된 차원에서 이해되어야 한다.
+
+## 2. Relationship Taxonomy: 17 Types Across 4 Dimensions
+
+```mermaid
+graph LR
+    subgraph "1. Code Space (구조적 의존성)"
+        C1[code-dependency<br/>✅ 1,968 rels<br/>import A from B]
+        C2[inheritance<br/>✅ 57 rels<br/>class A extends B]
+        C3[interface-impl<br/>❌ NOT YET<br/>class A implements I]
+    end
+
+    subgraph "2. Data Space (데이터 흐름)"
+        D1[io-dependency<br/>✅ 6,705 rels<br/>return/param match]
+        D2[pipeline<br/>✅ 25,809 chains<br/>A→B→C→D]
+        D3[event-flow<br/>❌ NOT YET<br/>emit/listen]
+    end
+
+    subgraph "3. Behavior Space (동적 관계)"
+        B1[calls<br/>✅ 1,511 rels<br/>foo calls bar]
+        B2[callback<br/>❌ NOT YET<br/>function as param]
+        B3[composition<br/>❌ NOT YET<br/>has-a relationship]
+    end
+
+    subgraph "4. Meta Space (인지적 연결)"
+        M1[doc-reference<br/>❌ NOT YET<br/>@doc [[Symbol]]]
+        M2[test-coverage<br/>❌ NOT YET<br/>test→impl]
+        M3[enhancement<br/>❌ NOT YET<br/>@enhances tag]
+    end
+
+    subgraph "5. Type Space (타입 시스템)"
+        T1[type-dependency<br/>❌ NOT YET<br/>type references]
+        T2[generic-constraint<br/>❌ NOT YET<br/>T extends U]
+    end
+
+    subgraph "6. Architectural Space (계층)"
+        A1[layer-dependency<br/>❌ NOT YET<br/>controller→service]
+        A2[module-boundary<br/>❌ NOT YET<br/>cross-package]
+    end
+
+    subgraph "7. Quality Space (품질)"
+        Q1[circular<br/>✅ 0 detected<br/>A→B→A]
+    end
+
+    C1 -.->|infers| D1
+    D1 -.->|chains into| D2
+    B1 -.->|validates| D1
+    M2 -.->|verifies| B1
+
+    classDef implemented fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef pending fill:#ffccbc,stroke:#d84315,stroke-width:2px
+
+    class C1,C2,D1,D2,B1,Q1 implemented
+    class C3,D3,B2,B3,M1,M2,M3,T1,T2,A1,A2 pending
+```
+
+**현재 구현**: 6/17 types (35%)
+**목표**: 17/17 types (100%)
+
+## 3. Detection Methods: How Each Relationship Is Found
+
+```mermaid
+graph TB
+    subgraph "Static Analysis (코드 파싱)"
+        SA1[TypeScript AST<br/>Compiler API]
+        SA2[Import Statements<br/>→ code-dependency]
+        SA3[Extends Keyword<br/>→ inheritance]
+        SA4[Function Calls<br/>→ calls]
+    end
+
+    subgraph "Type Inference (타입 매칭)"
+        TI1[Return Type<br/>Extraction]
+        TI2[Parameter Type<br/>Extraction]
+        TI3[Cartesian Product<br/>producers × consumers]
+        TI4[→ io-dependency]
+    end
+
+    subgraph "Graph Traversal (체인 추적)"
+        GT1[I/O Dependency<br/>Graph]
+        GT2[DFS from each node]
+        GT3[Find paths length ≥ 3]
+        GT4[→ pipeline]
+    end
+
+    subgraph "Pattern Recognition (미래)"
+        PR1[Regex Patterns<br/>@doc tags]
+        PR2[File Name Patterns<br/>*.test.ts]
+        PR3[Convention Analysis<br/>layer structure]
+        PR4[→ doc, test, layer]
+    end
+
+    SA1 -->|parse| SA2
+    SA1 -->|parse| SA3
+    SA1 -->|parse| SA4
+
+    TI1 & TI2 -->|match| TI3
+    TI3 -->|create| TI4
+
+    TI4 -->|build| GT1
+    GT1 -->|traverse| GT2
+    GT2 -->|filter| GT3
+    GT3 -->|store| GT4
+
+    PR1 & PR2 & PR3 -->|detect| PR4
+
+    classDef current fill:#bbdefb,stroke:#1565c0,stroke-width:2px
+    classDef future fill:#d1c4e9,stroke:#512da8,stroke-width:2px
+
+    class SA1,SA2,SA3,SA4,TI1,TI2,TI3,TI4,GT1,GT2,GT3,GT4 current
+    class PR1,PR2,PR3,PR4 future
+```
+
+## 4. The Inference Chain: How Relationships Build on Each Other
+
+```mermaid
+graph LR
+    subgraph "Layer 1: Direct Detection"
+        L1A[Code Imports<br/>직접 파싱]
+        L1B[Inheritance<br/>직접 파싱]
+        L1C[Function Calls<br/>직접 파싱]
+    end
+
+    subgraph "Layer 2: Type Inference"
+        L2A[Return Types<br/>from L1]
+        L2B[Param Types<br/>from L1]
+        L2C[I/O Deps<br/>type matching]
+    end
+
+    subgraph "Layer 3: Graph Analysis"
+        L3A[Pipeline Chains<br/>from L2C]
+        L3B[Circular Detect<br/>from L1A]
+        L3C[Hotspots<br/>from all]
+    end
+
+    subgraph "Layer 4: Meta Analysis (future)"
+        L4A[Doc Coverage<br/>from all layers]
+        L4B[Test Coverage<br/>from calls + files]
+        L4C[Architecture<br/>from structure]
+    end
+
+    L1A -->|provides| L2A
+    L1A -->|provides| L2B
+    L2A & L2B -->|match| L2C
+    L2C -->|chain| L3A
+    L1A -->|analyze| L3B
+    L1A & L1B & L1C & L2C -->|aggregate| L3C
+
+    L3A & L3B & L3C -->|inform| L4A
+    L1C & L3C -->|inform| L4B
+    L1A & L1B -->|inform| L4C
+
+    classDef layer1 fill:#e3f2fd,stroke:#0277bd,stroke-width:2px
+    classDef layer2 fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef layer3 fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef layer4 fill:#f8bbd0,stroke:#c2185b,stroke-width:2px
+
+    class L1A,L1B,L1C layer1
+    class L2A,L2B,L2C layer2
+    class L3A,L3B,L3C layer3
+    class L4A,L4B,L4C layer4
+```
+
+**핵심 통찰**: 하위 레이어의 관계가 상위 레이어의 추론을 가능하게 한다.
+
+## 5. Why This Meta-Structure? (설계 동기)
+
+```mermaid
+graph TB
+    subgraph "Traditional Tools (단일 차원)"
+        T1[IDE: Code Deps Only<br/>import 추적]
+        T2[Linter: Syntax Only<br/>규칙 검증]
+        T3[Test: Coverage Only<br/>라인 커버리지]
+    end
+
+    subgraph "Our Approach (다차원)"
+        A1[Code + Data + Behavior + Meta<br/>4개 차원 통합]
+    end
+
+    subgraph "Benefits (가치)"
+        B1[Impact Analysis<br/>변경 시 영향 범위]
+        B2[Dead Code Detection<br/>사용되지 않는 코드]
+        B3[Missing Tests<br/>테스트 없는 코드]
+        B4[Doc Drift<br/>문서-코드 불일치]
+        B5[Type Safety<br/>데이터 흐름 검증]
+    end
+
+    T1 & T2 & T3 -.->|한계| A1
+    A1 -->|enables| B1
+    A1 -->|enables| B2
+    A1 -->|enables| B3
+    A1 -->|enables| B4
+    A1 -->|enables| B5
+
+    classDef traditional fill:#ffccbc,stroke:#d84315,stroke-width:2px
+    classDef ours fill:#bbdefb,stroke:#1565c0,stroke-width:3px
+    classDef benefit fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+
+    class T1,T2,T3 traditional
+    class A1 ours
+    class B1,B2,B3,B4,B5 benefit
+```
+
+**차별점**: 단일 도구가 아니라 다차원 분석 플랫폼.
+
+## 6. Dependency Storage: unified_relationships Table
+
+```mermaid
+graph LR
+    subgraph "Schema"
+        S1[symbol_id<br/>source]
+        S2[target<br/>destination]
+        S3[type<br/>relationship type]
+        S4[confidence<br/>0.0-1.0 score]
+        S5[evidence<br/>JSON metadata]
+    end
+
+    subgraph "4 Types Currently Stored"
+        T1[code-dependency<br/>type: import]
+        T2[io-dependency<br/>type: io-dependency<br/>confidence: 0.5-1.0]
+        T3[inheritance<br/>type: inheritance]
+        T4[calls<br/>type: calls]
+    end
+
+    subgraph "Query Patterns"
+        Q1[Forward: symbol_id = ?<br/>이 심볼이 사용하는 것]
+        Q2[Reverse: target = ?<br/>이 심볼을 사용하는 것]
+        Q3[Type Filter: type = ?<br/>특정 관계만]
+        Q4[Confidence: confidence ≥ ?<br/>신뢰도 필터]
+    end
+
+    S1 & S2 & S3 & S4 & S5 -->|store| T1
+    S1 & S2 & S3 & S4 & S5 -->|store| T2
+    S1 & S2 & S3 & S4 & S5 -->|store| T3
+    S1 & S2 & S3 & S4 & S5 -->|store| T4
+
+    T1 & T2 & T3 & T4 -->|query| Q1
+    T1 & T2 & T3 & T4 -->|query| Q2
+    T1 & T2 & T3 & T4 -->|query| Q3
+    T1 & T2 & T3 & T4 -->|query| Q4
+
+    classDef schema fill:#e1bee7,stroke:#6a1b9a,stroke-width:2px
+    classDef type fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef query fill:#bbdefb,stroke:#1565c0,stroke-width:2px
+
+    class S1,S2,S3,S4,S5 schema
+    class T1,T2,T3,T4 type
+    class Q1,Q2,Q3,Q4 query
+```
+
+**설계 원칙**: 단일 테이블에 모든 관계 저장 → 범용 쿼리 가능.
+
+## 7. The Big Picture: From Code to Insight
+
+```mermaid
+graph TB
+    subgraph "Input: TypeScript Codebase"
+        Code[src/**/*.ts<br/>131 files, 1,427 symbols]
+    end
+
+    subgraph "Layer 1: Extraction"
+        E1[AST Parsing<br/>symbols + relationships]
+    end
+
+    subgraph "Layer 2: Storage"
+        S1[(symbols.db<br/>SQLite)]
+        S2[(symbols.jsonl<br/>version control)]
+    end
+
+    subgraph "Layer 3: Analysis"
+        A1[Graph Builder<br/>in-memory graph]
+        A2[Analyzers<br/>hotspots, chains, etc.]
+    end
+
+    subgraph "Layer 4: Commands"
+        C1[work-context<br/>통합 컨텍스트]
+        C2[deps / who-uses<br/>의존성 추적]
+        C3[visualize<br/>다이어그램 생성]
+        C4[analyze-*<br/>건강도 분석]
+    end
+
+    subgraph "Output: Actionable Insights"
+        O1[📊 Reports<br/>분석 결과]
+        O2[🗺️ Diagrams<br/>시각화]
+        O3[✅ Validation<br/>품질 검증]
+        O4[💡 Suggestions<br/>개선 제안]
+    end
+
+    Code -->|parse| E1
+    E1 -->|write| S1
+    E1 -->|write| S2
+    S1 -->|load| A1
+    A1 -->|analyze| A2
+    A2 -->|execute| C1
+    A2 -->|execute| C2
+    A2 -->|execute| C3
+    A2 -->|execute| C4
+
+    C1 -->|generate| O1
+    C2 -->|generate| O2
+    C3 -->|generate| O2
+    C4 -->|generate| O3
+    C1 & C2 & C3 & C4 -->|generate| O4
+
+    classDef input fill:#e3f2fd,stroke:#0277bd,stroke-width:2px
+    classDef layer fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef storage fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef command fill:#bbdefb,stroke:#1565c0,stroke-width:2px
+    classDef output fill:#f8bbd0,stroke:#c2185b,stroke-width:3px
+
+    class Code input
+    class E1 layer
+    class S1,S2 storage
+    class A1,A2 layer
+    class C1,C2,C3,C4 command
+    class O1,O2,O3,O4 output
+```
+
+## 8. Current vs Target State
+
+```mermaid
+graph LR
+    subgraph "Current (v1.0)"
+        C1[✅ 4 relationship types<br/>code, io, calls, inheritance]
+        C2[✅ 10,241 relationships<br/>실제 데이터]
+        C3[✅ work-context 명령어<br/>통합 컨텍스트]
+        C4[⚠️  신뢰도 검증 없음<br/>품질 보증 부족]
+    end
+
+    subgraph "Target (v2.0)"
+        T1[🎯 17 relationship types<br/>모든 차원 커버]
+        T2[🎯 ~26,000 relationships<br/>+155% 증가]
+        T3[🎯 신뢰도 점수<br/>각 섹션별 검증]
+        T4[🎯 자동 개선 제안<br/>피드백 루프]
+    end
+
+    C1 -.->|확장| T1
+    C2 -.->|증가| T2
+    C3 -.->|통합| T3
+    C4 -.->|구현| T4
+
+    classDef current fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
+    classDef target fill:#bbdefb,stroke:#1565c0,stroke-width:3px
+
+    class C1,C2,C3,C4 current
+    class T1,T2,T3,T4 target
+```
+
+**Next Milestone**: test-coverage, doc-reference, interface-impl (Phase 2)
+
+## Metadata
+
+**Created**: 2025-11-07
+**Purpose**: Meta-level visualization of TSDoc Edge's dependency tracking philosophy
+**Total Diagrams**: 8 (meta view, taxonomy, detection, inference, motivation, storage, big picture, roadmap)
+**Lines**: ~520
+
+**Key Insights**:
+1. **4 Dimensions**: Code, Data, Behavior, Meta (not just imports)
+2. **Layered Inference**: Upper layers built on lower layers
+3. **Unified Storage**: Single table for all relationship types
+4. **Progressive Enhancement**: Start with code, add type, add behavior, add meta
+5. **Tool Differentiation**: Multi-dimensional analysis platform vs single-purpose tools
+
+**Related Documents**:
+- [[Relationship Taxonomy]] - Complete 17 types breakdown
+- [[Implementation Roadmap]] - Phased development plan
+- [[System Architecture]] - Overall system design
+- [[Work Context Workflow]] - Primary use case
+
+**Use Cases**:
+- Understanding TSDoc Edge's core differentiation
+- Planning new relationship type implementations
+- Explaining design philosophy to contributors
+- Architectural review and validation
+- Educational material for meta-programming concepts
+
+**Verification**:
+```bash
+# Check current relationships
+sqlite3 .tsdoc/symbols.db "SELECT type, COUNT(*) FROM unified_relationships GROUP BY type"
+
+# Expected:
+# io-dependency|6705
+# code-dependency|1968
+# calls|1511
+# inheritance|57
+```

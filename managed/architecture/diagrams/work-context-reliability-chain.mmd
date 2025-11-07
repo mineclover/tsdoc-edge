@@ -1,0 +1,472 @@
+---
+title: Work Context Reliability Chain - 신뢰도 검증 체인
+type: validation-flow
+category: work-context
+status: design
+lastUpdated: 2025-11-07
+purpose: work-context 명령어의 신뢰도 검증 체인 시각화 ([[Work Context Reliability]] 구현)
+---
+
+# Work Context Reliability Verification Chain
+
+## 1. Overall Reliability Flow
+
+```mermaid
+graph TB
+    subgraph "Entry"
+        WC[work-context<br/>file-path]
+    end
+
+    subgraph "Data Collection"
+        Collect[Gather 4 Streams<br/>docs, deps, tests, usage]
+    end
+
+    subgraph "Reliability Scoring"
+        R1[📚 Docs Reliability<br/>30% weight]
+        R2[🔗 Deps Reliability<br/>30% weight]
+        R3[🧪 Tests Reliability<br/>20% weight]
+        R4[⚠️  Impact Reliability<br/>20% weight]
+    end
+
+    subgraph "Aggregation"
+        Score[Total Score<br/>weighted average]
+        Grade[Grade<br/>A/B/C/D/F]
+    end
+
+    subgraph "Output"
+        Display[Display Context<br/>+ Reliability Info]
+        Suggest[Improvement<br/>Suggestions]
+    end
+
+    WC -->|1. execute| Collect
+    Collect -->|2. verify| R1
+    Collect -->|3. verify| R2
+    Collect -->|4. verify| R3
+    Collect -->|5. verify| R4
+
+    R1 -->|30%| Score
+    R2 -->|30%| Score
+    R3 -->|20%| Score
+    R4 -->|20%| Score
+
+    Score -->|classify| Grade
+    Grade -->|pass| Display
+    Grade -->|analyze| Suggest
+
+    classDef entry fill:#e1bee7,stroke:#6a1b9a,stroke-width:3px
+    classDef collection fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef reliability fill:#bbdefb,stroke:#1565c0,stroke-width:2px
+    classDef aggregate fill:#c5e1a5,stroke:#558b2f,stroke-width:2px
+    classDef output fill:#ffccbc,stroke:#d84315,stroke-width:2px
+
+    class WC entry
+    class Collect collection
+    class R1,R2,R3,R4 reliability
+    class Score,Grade aggregate
+    class Display,Suggest output
+```
+
+## 2. Document Reliability Chain (30% weight)
+
+```mermaid
+graph LR
+    subgraph "Input"
+        DocRefs[@doc tags<br/>from file]
+    end
+
+    subgraph "Verification Steps"
+        V1[1. File Exists<br/>managed/**/]
+        V2[2. H1 Match<br/># [[Symbol]]]
+        V3[3. validate-docs<br/>check syntax]
+        V4[4. check-links<br/>validate links]
+        V5[5. validate-spec<br/>completeness score]
+    end
+
+    subgraph "Scoring"
+        S1[Base: 100%<br/>if file exists]
+        S2[-10%<br/>if H1 mismatch]
+        S3[-20%<br/>if broken links]
+        S4[-30%<br/>if spec < 70%]
+        Final1[Final Score<br/>0-100%]
+    end
+
+    subgraph "Grade"
+        G1{Score?}
+        Pass[✅ 100%<br/>Excellent]
+        Warn[⚠️  50-99%<br/>Issues Found]
+        Fail[❌ 0%<br/>Not Found]
+    end
+
+    DocRefs -->|search| V1
+    V1 -->|found| V2
+    V2 -->|pass| V3
+    V3 -->|pass| V4
+    V4 -->|pass| V5
+
+    V1 -->|result| S1
+    V2 -->|penalty| S2
+    V4 -->|penalty| S3
+    V5 -->|penalty| S4
+    S1 -->|combine| Final1
+    S2 -->|combine| Final1
+    S3 -->|combine| Final1
+    S4 -->|combine| Final1
+
+    Final1 -->|check| G1
+    G1 -->|100| Pass
+    G1 -->|50-99| Warn
+    G1 -->|0| Fail
+
+    classDef input fill:#e3f2fd,stroke:#0277bd
+    classDef verify fill:#fff9c4,stroke:#f57f17
+    classDef score fill:#c8e6c9,stroke:#2e7d32
+    classDef grade fill:#f8bbd0,stroke:#c2185b
+
+    class DocRefs input
+    class V1,V2,V3,V4,V5 verify
+    class S1,S2,S3,S4,Final1 score
+    class G1,Pass,Warn,Fail grade
+```
+
+## 3. Dependencies Reliability Chain (30% weight)
+
+```mermaid
+graph LR
+    subgraph "Input"
+        Deps[Dependencies<br/>from DB query]
+    end
+
+    subgraph "Verification Steps"
+        V1[1. DB Exists<br/>.tsdoc/symbols.db]
+        V2[2. File Exists<br/>fs.existsSync]
+        V3[3. detect-cycles<br/>circular check]
+        V4[4. type-chain<br/>flow validation]
+        V5[5. Build Freshness<br/>mtime check]
+    end
+
+    subgraph "Scoring"
+        S1[Base: 100%<br/>if DB exists]
+        S2[-30%<br/>if files missing]
+        S3[-20%<br/>if circulars found]
+        S4[-10%<br/>if broken chains]
+        S5[-10%<br/>if stale build]
+        Final2[Final Score<br/>0-100%]
+    end
+
+    subgraph "Grade"
+        G2{Score?}
+        Pass2[✅ 100%<br/>All Valid]
+        Warn2[⚠️  70-99%<br/>Some Issues]
+        Fail2[❌ 0-69%<br/>Critical Issues]
+    end
+
+    Deps -->|check| V1
+    V1 -->|query| V2
+    V2 -->|analyze| V3
+    V3 -->|analyze| V4
+    V4 -->|check| V5
+
+    V1 -->|result| S1
+    V2 -->|penalty| S2
+    V3 -->|penalty| S3
+    V4 -->|penalty| S4
+    V5 -->|penalty| S5
+    S1 -->|combine| Final2
+    S2 -->|combine| Final2
+    S3 -->|combine| Final2
+    S4 -->|combine| Final2
+    S5 -->|combine| Final2
+
+    Final2 -->|check| G2
+    G2 -->|100| Pass2
+    G2 -->|70-99| Warn2
+    G2 -->|0-69| Fail2
+
+    classDef input fill:#e3f2fd,stroke:#0277bd
+    classDef verify fill:#fff9c4,stroke:#f57f17
+    classDef score fill:#c8e6c9,stroke:#2e7d32
+    classDef grade fill:#f8bbd0,stroke:#c2185b
+
+    class Deps input
+    class V1,V2,V3,V4,V5 verify
+    class S1,S2,S3,S4,S5,Final2 score
+    class G2,Pass2,Warn2,Fail2 grade
+```
+
+## 4. Tests Reliability Chain (20% weight)
+
+```mermaid
+graph LR
+    subgraph "Input"
+        Tests[Test Mappings<br/>from DB]
+    end
+
+    subgraph "Verification Steps"
+        V1[1. Mapping Exists<br/>test_mappings table]
+        V2[2. File Exists<br/>fs.existsSync]
+        V3[3. sync-coverage<br/>coverage data]
+        V4[4. test-relationships<br/>validate mapping]
+    end
+
+    subgraph "Scoring"
+        S1[Base: 100%<br/>if tests exist]
+        S2[-50%<br/>if no tests]
+        S3[Coverage Bonus<br/>0-20%]
+        Final3[Final Score<br/>0-100%]
+    end
+
+    subgraph "Grade"
+        G3{Score?}
+        Pass3[✅ 100%<br/>80%+ coverage]
+        Warn3[⚠️  70-99%<br/>50-80% coverage]
+        Fail3[❌ 0-69%<br/>No tests]
+    end
+
+    Tests -->|query| V1
+    V1 -->|check| V2
+    V2 -->|fetch| V3
+    V3 -->|verify| V4
+
+    V1 -->|result| S1
+    V1 -->|penalty| S2
+    V3 -->|bonus| S3
+    S1 -->|combine| Final3
+    S2 -->|combine| Final3
+    S3 -->|combine| Final3
+
+    Final3 -->|check| G3
+    G3 -->|100| Pass3
+    G3 -->|70-99| Warn3
+    G3 -->|0-69| Fail3
+
+    classDef input fill:#e3f2fd,stroke:#0277bd
+    classDef verify fill:#fff9c4,stroke:#f57f17
+    classDef score fill:#c8e6c9,stroke:#2e7d32
+    classDef grade fill:#f8bbd0,stroke:#c2185b
+
+    class Tests input
+    class V1,V2,V3,V4 verify
+    class S1,S2,S3,Final3 score
+    class G3,Pass3,Warn3,Fail3 grade
+```
+
+## 5. Impact Reliability Chain (20% weight)
+
+```mermaid
+graph LR
+    subgraph "Input"
+        Usage[Reverse Deps<br/>usedBy array]
+    end
+
+    subgraph "Verification Steps"
+        V1[1. DB Query<br/>dependencies WHERE target]
+        V2[2. Files Exist<br/>all using files]
+        V3[3. Build Freshness<br/>mtime check]
+        V4[4. who-uses<br/>validate reverse deps]
+    end
+
+    subgraph "Scoring"
+        S1[Base: 100%<br/>if query succeeds]
+        S2[-30%<br/>if files missing]
+        S3[-20%<br/>if stale build]
+        Final4[Final Score<br/>0-100%]
+    end
+
+    subgraph "Grade"
+        G4{Score?}
+        Pass4[✅ 100%<br/>Up to Date]
+        Warn4[⚠️  70-99%<br/>Some Stale]
+        Fail4[❌ 0-69%<br/>Rebuild Needed]
+    end
+
+    Usage -->|query| V1
+    V1 -->|check| V2
+    V2 -->|check| V3
+    V3 -->|verify| V4
+
+    V1 -->|result| S1
+    V2 -->|penalty| S2
+    V3 -->|penalty| S3
+    S1 -->|combine| Final4
+    S2 -->|combine| Final4
+    S3 -->|combine| Final4
+
+    Final4 -->|check| G4
+    G4 -->|100| Pass4
+    G4 -->|70-99| Warn4
+    G4 -->|0-69| Fail4
+
+    classDef input fill:#e3f2fd,stroke:#0277bd
+    classDef verify fill:#fff9c4,stroke:#f57f17
+    classDef score fill:#c8e6c9,stroke:#2e7d32
+    classDef grade fill:#f8bbd0,stroke:#c2185b
+
+    class Usage input
+    class V1,V2,V3,V4 verify
+    class S1,S2,S3,Final4 score
+    class G4,Pass4,Warn4,Fail4 grade
+```
+
+## 6. Total Reliability Calculation
+
+```mermaid
+graph TB
+    subgraph "Individual Scores"
+        R1[📚 Docs<br/>Score: X%<br/>Weight: 30%]
+        R2[🔗 Deps<br/>Score: Y%<br/>Weight: 30%]
+        R3[🧪 Tests<br/>Score: Z%<br/>Weight: 20%]
+        R4[⚠️  Impact<br/>Score: W%<br/>Weight: 20%]
+    end
+
+    subgraph "Calculation"
+        Calc[Total = X×0.3 + Y×0.3<br/>+ Z×0.2 + W×0.2]
+    end
+
+    subgraph "Grading"
+        Grade{Total?}
+        A[✅ A: 90-100%<br/>Excellent]
+        B[🟢 B: 70-89%<br/>Good]
+        C[🟡 C: 50-69%<br/>Fair]
+        D[🔴 D: 0-49%<br/>Poor]
+    end
+
+    subgraph "Action Items"
+        Improve[Generate<br/>Improvement Suggestions]
+        I1[Fix missing docs]
+        I2[Rebuild database]
+        I3[Add tests]
+        I4[Update dependencies]
+    end
+
+    R1 -->|30%| Calc
+    R2 -->|30%| Calc
+    R3 -->|20%| Calc
+    R4 -->|20%| Calc
+
+    Calc -->|classify| Grade
+    Grade -->|90-100| A
+    Grade -->|70-89| B
+    Grade -->|50-69| C
+    Grade -->|0-49| D
+
+    A & B & C & D -->|analyze| Improve
+    Improve -->|prioritize| I1
+    Improve -->|prioritize| I2
+    Improve -->|prioritize| I3
+    Improve -->|prioritize| I4
+
+    classDef input fill:#e3f2fd,stroke:#0277bd
+    classDef calc fill:#fff9c4,stroke:#f57f17
+    classDef grade fill:#c8e6c9,stroke:#2e7d32
+    classDef action fill:#ffccbc,stroke:#d84315
+
+    class R1,R2,R3,R4 input
+    class Calc calc
+    class Grade,A,B,C,D grade
+    class Improve,I1,I2,I3,I4 action
+```
+
+## 7. Improvement Feedback Loop
+
+```mermaid
+graph LR
+    subgraph "Detection"
+        WC[work-context<br/>execution]
+        Low[Low Score<br/>< 70%]
+    end
+
+    subgraph "Analysis"
+        Analyze{Which<br/>Section?}
+        AD[Docs Issue]
+        AE[Deps Issue]
+        AT[Tests Issue]
+        AI[Impact Issue]
+    end
+
+    subgraph "Suggestions"
+        SD[Run: validate-docs<br/>Create: managed/**.md]
+        SE[Run: build src<br/>Fix: cycles]
+        ST[Run: untested<br/>Create: __tests__/**]
+        SI[Run: build src<br/>Update: database]
+    end
+
+    subgraph "Action"
+        Execute[Execute Fix]
+    end
+
+    subgraph "Verification"
+        Verify[Re-run<br/>work-context]
+        Check[Score Improved?]
+    end
+
+    WC -->|score| Low
+    Low -->|analyze| Analyze
+    Analyze -->|docs < 50%| AD
+    Analyze -->|deps < 70%| AE
+    Analyze -->|tests = 0%| AT
+    Analyze -->|impact < 70%| AI
+
+    AD -->|suggest| SD
+    AE -->|suggest| SE
+    AT -->|suggest| ST
+    AI -->|suggest| SI
+
+    SD -->|fix| Execute
+    SE -->|fix| Execute
+    ST -->|fix| Execute
+    SI -->|fix| Execute
+
+    Execute -->|re-run| Verify
+    Verify -->|check| Check
+    Check -->|yes ✅| WC
+    Check -->|no ❌| Analyze
+
+    classDef detect fill:#e1bee7,stroke:#6a1b9a,stroke-width:2px
+    classDef analyze fill:#fff9c4,stroke:#f57f17,stroke-width:2px
+    classDef suggest fill:#bbdefb,stroke:#1565c0,stroke-width:2px
+    classDef action fill:#c5e1a5,stroke:#558b2f,stroke-width:2px
+    classDef verify fill:#ffccbc,stroke:#d84315,stroke-width:2px
+
+    class WC,Low detect
+    class Analyze,AD,AE,AT,AI analyze
+    class SD,SE,ST,SI suggest
+    class Execute action
+    class Verify,Check verify
+```
+
+## Metadata
+
+**Created**: 2025-11-07
+**Status**: Design Phase (Implementation Pending)
+**Purpose**: Visualize the reliability verification chain for work-context command
+**Total Diagrams**: 7 (overview, 4 chains, total calc, feedback loop)
+**Lines**: ~450
+
+**Implementation Phases**:
+1. ✅ Phase 1: Basic data collection (current state)
+2. ⏳ Phase 2: Add ReliabilityChecker class
+3. ⏳ Phase 3: Integrate with WorkContextCommand
+4. ⏳ Phase 4: Display reliability scores in output
+5. ⏳ Phase 5: Generate improvement suggestions
+
+**Related Documents**:
+- [[Work Context Reliability]] - Design specification
+- [[Work Context Workflow]] - User workflow
+- [[CLI Feedback Cycle]] - Overall feedback system
+
+**Use Cases**:
+- Understanding reliability scoring algorithm
+- Planning ReliabilityChecker implementation
+- Debugging score calculation issues
+- Documenting verification steps
+- Training developers on quality standards
+
+**Verification Commands**:
+```bash
+# Current: No reliability scoring yet
+tsdoc-edge work-context src/commands/WorkContextCommand.ts
+
+# Future: With reliability
+tsdoc-edge work-context src/commands/WorkContextCommand.ts --reliability
+tsdoc-edge work-context src/commands/WorkContextCommand.ts --min-reliability=70
+```
