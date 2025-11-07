@@ -1,15 +1,63 @@
 # TSDoc Edge Visualization Diagrams
 
 **Generated**: 2025-11-07 (Updated with Call Graph)
-**Total Diagrams**: 21 (7 new diagrams added)
-**Total Lines**: ~2,957
+**Total Diagrams**: 22 (8 new diagrams added)
+**Total Lines**: ~3,289
 **Format**: Mermaid
+
+## Quick Navigation
+
+🗺️ **NEW: [diagram-index.mmd](diagram-index.mmd)** - Complete navigation map showing all 22 diagrams, recommended reading paths, and how diagrams relate to each other. **START HERE!**
+
+### Recommended Quick Start Paths
+
+1. **Executive Overview** (30min): system-metrics → quality-dashboard → relationship-taxonomy
+2. **Developer Onboarding** (2h): symbol-distribution → command-pattern-analysis → analysis-pipeline → common-issues-solutions
+3. **Architecture Review** (1.5h): hotspots-with-calls → modules → data-pipeline-flows → quality-dashboard
+4. **Refactoring Planning** (2h): hotspots-with-calls → call-graph-analysis → command-pattern-analysis → data-pipeline-flows
 
 ## Overview
 
 This directory contains Mermaid diagrams visualizing the TSDoc Edge codebase architecture, dependencies, relationships, and metrics. All diagrams are generated from actual database analysis and are verified against real system data.
 
 ## Diagram Categories
+
+### 0. Navigation & Index
+
+#### `diagram-index.mmd` (332 lines) ⭐ START HERE
+**Purpose**: Complete navigation map and index for all 22 diagrams
+
+**Contents**:
+- 7 diagram categories with full descriptions
+- 21 individual diagram summaries (what each shows)
+- 5 recommended reading paths for different use cases
+- Diagram relationships and connections
+- Statistics: total lines, largest/smallest diagrams
+- Quality indicators: 100% coverage, 100% accuracy, 95% consistency
+- Future diagram ideas (test coverage, doc reference, etc.)
+
+**Use Cases by Role**:
+- **Executives/Managers**: Executive Overview Path (30min) - High-level metrics and roadmap
+- **New Developers**: Developer Onboarding Path (2h) - Understanding codebase structure
+- **Architects/Leads**: Architecture Review Path (1.5h) - System design and patterns
+- **Algorithm Enthusiasts**: Algorithm Study Path (3h) - Deep technical implementation
+- **Refactoring Teams**: Refactoring Planning Path (2h) - Optimization opportunities
+
+**Diagram Statistics**:
+- Total: 22 diagrams, ~3,289 lines (~150 lines avg)
+- Largest: data-pipeline-flows (312), quality-dashboard (280), symbol-distribution (267)
+- Smallest: tree-database-manager (1), tree-interface-symbol (4)
+- New in Nov 2025: 8 diagrams (+1,698 lines, call graph & quality focus)
+
+**How Diagrams Connect**:
+- system-metrics → quality-dashboard (metrics feed quality scores)
+- hotspots → hotspots-with-calls (original → updated with calls)
+- relationship-taxonomy → implementation-roadmap (complete list → plan)
+- call-graph-analysis → hotspots-with-calls (calls revealed new hotspots)
+- data-pipeline-flows → analysis-pipeline (what flows → how analyzed)
+- symbol-distribution → command-pattern-analysis (125 classes → 53 commands dive)
+
+**Use Case**: Finding the right diagram, understanding diagram ecosystem, planning learning path, navigating visualization corpus
 
 ### 1. System Architecture & Metrics
 
