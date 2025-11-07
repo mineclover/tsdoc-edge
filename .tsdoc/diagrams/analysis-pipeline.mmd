@@ -1,5 +1,6 @@
 %% Complete Analysis Pipeline Data Flow
 %% From source files to visualization
+%% Updated: 2025-11-07 with Call Graph Analysis phase
 
 sequenceDiagram
     participant User
@@ -83,6 +84,22 @@ sequenceDiagram
 
     CLI->>DB: Save I/O dependencies
     Note over CLI,User: I/O Analysis Complete
+
+    %% Call Graph Analysis Phase
+    User->>CLI: tsdoc-edge analyze-calls src
+    CLI->>Graph: Build graph from database
+    CLI->>CLI: Build TypeScript program
+
+    CLI->>Analyzers: CallGraphAnalyzer
+    Analyzers->>Analyzers: Extract call sites from functions
+    Analyzers->>Analyzers: Visit AST nodes (CallExpression)
+    Analyzers->>Analyzers: Filter built-in calls
+    Analyzers->>Analyzers: Resolve call targets with type preference
+    Analyzers->>Analyzers: Calculate call frequency
+    Analyzers-->>CLI: 1,511 call relationships
+
+    CLI->>DB: Save call relationships
+    Note over CLI,User: Call Analysis Complete: <5s<br/>472 callers → 605 callees
 
     %% Visualization Phase
     User->>CLI: tsdoc-edge visualize hotspots

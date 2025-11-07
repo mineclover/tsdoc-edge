@@ -1,8 +1,8 @@
 # TSDoc Edge Visualization Diagrams
 
 **Generated**: 2025-11-07 (Updated with Call Graph)
-**Total Diagrams**: 16 (2 new call graph diagrams added)
-**Total Lines**: ~1,670
+**Total Diagrams**: 17 (3 new diagrams added)
+**Total Lines**: ~1,870
 **Format**: Mermaid
 
 ## Overview
@@ -52,18 +52,20 @@ This directory contains Mermaid diagrams visualizing the TSDoc Edge codebase arc
 
 **Use Case**: Executive summary, health monitoring, progress tracking
 
-#### `analysis-pipeline.mmd` (130 lines)
+#### `analysis-pipeline.mmd` (144 lines)
 **Purpose**: Complete sequence diagram of the analysis pipeline
 
 **Flow**:
 1. Build Phase (User → CLI → Scanner → Extractor → DB → JSONL)
 2. Analysis Phase (User → CLI → Graph → Analyzers → DB)
 3. I/O Analysis Phase (IODependencyAnalyzer → Type matching → Pipelines)
-4. Visualization Phase (User → CLI → Graph → Viz → File)
+4. **Call Graph Analysis Phase (CallGraphAnalyzer → AST traversal → Call relationships) 🆕**
+5. Visualization Phase (User → CLI → Graph → Viz → File)
 
 **Performance Annotations**:
 - Extraction: 2.2s for 131 files
 - Analysis: <200ms
+- **Call Analysis: <5s for 1,511 calls 🆕**
 - Storage: 2.4 MB SQLite + 1.8 MB JSONL
 
 **Use Case**: Understanding data flow, debugging pipeline, onboarding
@@ -383,18 +385,51 @@ Excluded: string, number, boolean, void, any, unknown, never, null, undefined, o
 
 ### 4. Implementation Planning
 
-#### `implementation-roadmap.mmd` (95 lines)
+#### `relationship-taxonomy.mmd` (201 lines) ★ NEW
+**Purpose**: Complete classification of all 17 relationship types across 8 categories
+
+**Categories**:
+1. **Structural (3 types)**: code-dependency ✅, inheritance ✅, interface-impl ❌
+2. **Data Flow (3 types)**: io-dependency ✅, pipeline ✅, event-flow ❌
+3. **Behavioral (3 types)**: calls ✅, callback ❌, composition ❌
+4. **Type System (2 types)**: type-dependency ❌, generic-constraint ❌
+5. **Architectural (2 types)**: layer-dependency ❌, module-boundary ❌
+6. **Testing (1 type)**: test-coverage ❌
+7. **Documentation (2 types)**: doc-reference ❌, enhancement ❌
+8. **Other (1 type)**: circular ✅
+
+**For Each Type Includes**:
+- Implementation status (✅ implemented / ❌ pending)
+- Relationship count (actual or expected)
+- Concrete examples with code patterns
+- Use cases and practical applications
+- Detection methodology
+
+**Summary Statistics**:
+- Implemented: 6/17 types (35%)
+- Current relationships: 10,173
+- Target when complete: ~26,000
+- Phase 2 priorities: test-coverage, doc-reference, interface-impl
+
+**Implementation Priority**:
+- Next: test-coverage (~1,200 rels) - Test tracking and untested code detection
+- Then: doc-reference (~800 rels) - SSOT enforcement and backlink generation
+- Then: interface-impl (~200 rels) - Contract verification and design by contract
+
+**Use Case**: Understanding relationship types, planning implementation, learning the taxonomy, feature prioritization
+
+#### `implementation-roadmap.mmd` (84 lines)
 **Purpose**: Phased implementation plan for all 17 relationship types
 
-**Phase 1: COMPLETED (5 types)** ✅
+**Phase 1: COMPLETED (6 types)** ✅
 - code-dependency: 1,902 relationships
 - inheritance: 55 relationships
 - io-dependency: 6,705 relationships
 - pipeline: 25,809 pipelines
 - circular: 0 detected
+- **calls: 1,511 relationships 🆕**
 
-**Phase 2: HIGH PRIORITY (4 types)** 🔥
-- calls: Function invocations (~5,000 expected)
+**Phase 2: HIGH PRIORITY (3 types)** 🔥
 - test-coverage: Test→Implementation (~1,200 expected)
 - doc-reference: Documentation links (~800 expected)
 - interface-impl: Class implements (~200 expected)
@@ -411,24 +446,25 @@ Excluded: string, number, boolean, void, any, unknown, never, null, undefined, o
 - module-boundary: Package imports (~80 expected)
 - enhancement: Enhanced docs (~500 expected)
 
-**Total Projection**: ~24,000 relationships when complete (current: 8,662)
+**Progress**: 35% complete (6/17 types)
+**Total Projection**: ~26,000 relationships when complete (current: 10,173)
 
 **Use Case**: Sprint planning, feature prioritization, progress tracking
 
-#### `relationship-coverage.mmd` (87 lines)
+#### `relationship-coverage.mmd` (86 lines)
 **Purpose**: Current coverage by relationship category
 
 **Category Completeness**:
 - Structural: 67% (2/3 implemented)
 - Data Flow: 67% (2/3 implemented)
-- Behavioral: 0% (0/3 implemented)
+- **Behavioral: 33% (1/3 implemented) 🆕**
 - Type System: 0% (0/2 implemented)
 - Architectural: 0% (0/2 implemented)
 - Testing: 0% (0/1 implemented)
 - Documentation: 0% (0/2 implemented)
 - Other: 100% (1/1 implemented)
 
-**Overall**: 29% implemented (5/17 types)
+**Overall**: 35% implemented (6/17 types)
 
 **Visual**:
 - ✅ Green: Implemented with count
