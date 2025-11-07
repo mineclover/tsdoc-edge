@@ -1,10 +1,10 @@
 %% Diagram Index and Navigation Map
-%% Complete guide to all 21 visualization diagrams
+%% Complete guide to all 24 visualization diagrams
 %% Generated: 2025-11-07
 
 graph TB
     subgraph "🗺️ Diagram Navigation Map"
-        Index[21 Visualization Diagrams<br/>~2,957 total lines<br/>Complete codebase coverage]
+        Index[24 Visualization Diagrams<br/>~3,296 total lines<br/>Complete codebase coverage]
 
         Index --> Quick[Quick Start:<br/>system-metrics.mmd<br/>quality-dashboard.mmd<br/>relationship-taxonomy.mmd]
 
@@ -13,13 +13,15 @@ graph TB
         Index --> Planning[Planning:<br/>Implementation roadmap<br/>Relationship coverage<br/>Quality trends]
     end
 
-    subgraph "📊 Category 1: Overview & Metrics (4 diagrams)"
+    subgraph "📊 Category 1: Overview & Metrics (7 diagrams)"
         Overview[System Overview<br/>High-level health & stats]
 
         Overview --> D1[system-metrics.mmd<br/>115 lines<br/>⭐ START HERE]
         Overview --> D2[quality-dashboard.mmd<br/>280 lines<br/>⭐ QUALITY FOCUS]
         Overview --> D3[symbol-distribution.mmd<br/>267 lines<br/>Symbol breakdown]
         Overview --> D4[command-pattern-analysis.mmd<br/>228 lines<br/>Command deep dive]
+        Overview --> D4A[file-complexity-analysis.mmd<br/>209 lines<br/>File complexity]
+        Overview --> D4B[export-api-surface.mmd<br/>263 lines<br/>⭐ API SURFACE]
 
         D1 --> D1Use[Shows:<br/>1,427 symbols total<br/>10,173 relationships<br/>Quality metrics<br/>Performance stats]
 
@@ -28,6 +30,10 @@ graph TB
         D3 --> D3Use[Shows:<br/>Methods: 894 62.6%<br/>Interfaces: 205 14.4%<br/>Classes: 125 8.8%<br/>Quality indicators]
 
         D4 --> D4Use[Shows:<br/>53 commands total<br/>8 categories<br/>Call patterns<br/>Scaling strategy]
+
+        D4A --> D4AUse[Shows:<br/>118 files analyzed<br/>Avg 12.1 symbols/file<br/>Top complex files<br/>Refactoring priorities]
+
+        D4B --> D4BUse[Shows:<br/>819/1,451 exported 56.4%<br/>Classes: 100% exported<br/>Methods: 52.1% exported<br/>API surface analysis]
     end
 
     subgraph "🔥 Category 2: Hotspots & Dependencies (3 diagrams)"
@@ -136,15 +142,15 @@ graph TB
     subgraph "📈 Diagram Statistics"
         Stats[Diagram Corpus Stats]
 
-        Stats --> Total[Total: 21 diagrams<br/>~2,957 lines total<br/>~141 lines avg]
+        Stats --> Total[Total: 24 diagrams<br/>~3,296 lines total<br/>~137 lines avg]
 
-        Stats --> Categories[7 categories:<br/>Overview: 4<br/>Hotspots: 3<br/>Calls: 2<br/>Data Flow: 2<br/>Relationships: 3<br/>Technical: 5<br/>Trees: 2]
+        Stats --> Categories[7 categories:<br/>Overview: 7<br/>Hotspots: 3<br/>Calls: 2<br/>Data Flow: 2<br/>Relationships: 3<br/>Technical: 5<br/>Trees: 2]
 
-        Stats --> Largest[Largest diagrams:<br/>data-pipeline-flows: 312 lines<br/>quality-dashboard: 280 lines<br/>symbol-distribution: 267 lines<br/>command-pattern-analysis: 228 lines<br/>relationship-taxonomy: 201 lines]
+        Stats --> Largest[Largest diagrams:<br/>data-pipeline-flows: 312 lines<br/>quality-dashboard: 280 lines<br/>symbol-distribution: 267 lines<br/>export-api-surface: 263 lines<br/>command-pattern-analysis: 228 lines]
 
         Stats --> Smallest[Smallest diagrams:<br/>tree-database-manager: 1 line<br/>tree-interface-symbol: 4 lines<br/>hierarchy-class-basecommand: 58 lines<br/>hotspots: 64 lines]
 
-        Stats --> New[New in Nov 2025:<br/>7 diagrams added<br/>+1,366 lines<br/>Call graph focus<br/>Quality & patterns]
+        Stats --> New[New in Nov 2025:<br/>10 diagrams added<br/>+1,705 lines<br/>Call graph, quality, complexity<br/>API surface & patterns]
     end
 
     subgraph "🔄 Diagram Relationships"
@@ -162,6 +168,10 @@ graph TB
 
         Relations --> R6[symbol-distribution → command-pattern-analysis<br/>125 classes → 53 commands deep dive]
 
+        Relations --> R7[file-complexity-analysis → command-pattern-analysis<br/>File complexity → Command patterns]
+
+        Relations --> R8[export-api-surface.mmd → symbol-distribution<br/>Export patterns → Symbol breakdown]
+
         R1 --> R1Why[Why: Quality dashboard<br/>aggregates all metrics<br/>from system-metrics]
 
         R4 --> R4Why[Why: Adding call graph<br/>changed hotspot rankings<br/>revealed new patterns]
@@ -172,25 +182,25 @@ graph TB
     subgraph "💡 Recommended Reading Paths"
         Paths[Learning Paths<br/>Suggested sequences]
 
-        Paths --> Path1[Executive Overview Path:<br/>1. system-metrics<br/>2. quality-dashboard<br/>3. relationship-taxonomy<br/>4. implementation-roadmap]
+        Paths --> Path1[Executive Overview Path:<br/>1. system-metrics<br/>2. quality-dashboard<br/>3. export-api-surface<br/>4. relationship-taxonomy<br/>5. implementation-roadmap]
 
-        Paths --> Path2[Developer Onboarding Path:<br/>1. symbol-distribution<br/>2. command-pattern-analysis<br/>3. analysis-pipeline<br/>4. common-issues-solutions<br/>5. call-graph-analysis]
+        Paths --> Path2[Developer Onboarding Path:<br/>1. symbol-distribution<br/>2. export-api-surface<br/>3. command-pattern-analysis<br/>4. analysis-pipeline<br/>5. common-issues-solutions<br/>6. call-graph-analysis]
 
-        Paths --> Path3[Architecture Review Path:<br/>1. hotspots-with-calls<br/>2. modules<br/>3. data-pipeline-flows<br/>4. symbol-distribution<br/>5. quality-dashboard]
+        Paths --> Path3[Architecture Review Path:<br/>1. hotspots-with-calls<br/>2. file-complexity-analysis<br/>3. modules<br/>4. data-pipeline-flows<br/>5. symbol-distribution<br/>6. quality-dashboard]
 
         Paths --> Path4[Algorithm Study Path:<br/>1. ast-extraction-flow<br/>2. type-matching-algorithm<br/>3. confidence-scoring<br/>4. circular-detection-dfs<br/>5. call-graph-analysis]
 
-        Paths --> Path5[Refactoring Planning Path:<br/>1. hotspots-with-calls<br/>2. call-graph-analysis<br/>3. command-pattern-analysis<br/>4. data-pipeline-flows<br/>5. quality-dashboard]
+        Paths --> Path5[Refactoring Planning Path:<br/>1. hotspots-with-calls<br/>2. file-complexity-analysis<br/>3. call-graph-analysis<br/>4. command-pattern-analysis<br/>5. data-pipeline-flows<br/>6. quality-dashboard]
 
-        Path1 --> Path1Time[Estimated time: 30min<br/>Best for: Managers, stakeholders]
+        Path1 --> Path1Time[Estimated time: 40min<br/>Best for: Managers, stakeholders]
 
-        Path2 --> Path2Time[Estimated time: 2h<br/>Best for: New developers]
+        Path2 --> Path2Time[Estimated time: 2.5h<br/>Best for: New developers]
 
-        Path3 --> Path3Time[Estimated time: 1.5h<br/>Best for: Architects, leads]
+        Path3 --> Path3Time[Estimated time: 2h<br/>Best for: Architects, leads]
 
         Path4 --> Path4Time[Estimated time: 3h<br/>Best for: Algorithm enthusiasts]
 
-        Path5 --> Path5Time[Estimated time: 2h<br/>Best for: Refactoring teams]
+        Path5 --> Path5Time[Estimated time: 2.5h<br/>Best for: Refactoring teams]
     end
 
     subgraph "🎨 Visualization Quality"
