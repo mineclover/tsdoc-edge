@@ -79,7 +79,7 @@ graph TB
         ParamType -->|Yes| ParamTypeString[typeToString]
         ParamType -->|No| ParamNoType[type: undefined]
 
-        ParamTypeString --> ParamObject[{name, type}]
+        ParamTypeString --> ParamObject["Parameter object:<br/>name and type"]
         ParamNoType --> ParamObject
 
         ParamObject --> ParamTypes[parameterTypes: Array]

@@ -47,7 +47,7 @@ graph TB
 
         Impact4 --> Solution4[Solution:<br/>Add parameter_types column<br/>+ extraction + storage]
 
-        Solution4 --> Code4["// Schema<br/>parameter_types TEXT<br/><br/>// Extraction<br/>parameterTypes: [{name, type}]<br/><br/>// Storage<br/>JSON.stringify(parameterTypes)"]
+        Solution4 --> Code4["// Schema<br/>parameter_types TEXT<br/><br/>// Extraction<br/>parameterTypes array<br/><br/>// Storage<br/>JSON.stringify params"]
 
         Code4 --> Result4[Result:<br/>I/O deps: 0 → 7,446<br/>Pipelines: 0 → 25,809]
     end
