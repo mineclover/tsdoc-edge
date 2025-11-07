@@ -66,6 +66,8 @@ import { ParallelWorkCommand } from './commands/ParallelWorkCommand';
 import { TestRelationshipsCommand } from './commands/TestRelationshipsCommand';
 import { AnalyzeChainsCommand } from './commands/AnalyzeChainsCommand';
 import { AnalyzeCallsCommand } from './commands/AnalyzeCallsCommand';
+import { AnalyzeTestsCommand } from './commands/AnalyzeTestsCommand';
+import { AnalyzeTypesCommand } from './commands/AnalyzeTypesCommand';
 import { WorkContextCommand } from './commands/WorkContextCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
@@ -133,6 +135,8 @@ async function main(): Promise<void> {
   registry.register(new SyncCoverageCommand());
   registry.register(new AnalyzeChainsCommand());
   registry.register(new AnalyzeCallsCommand());
+  registry.register(new AnalyzeTestsCommand());
+  registry.register(new AnalyzeTypesCommand());
   registry.register(new AnalyzeIOCommand());
   registry.register(new VisualizeDepsCommand());
   registry.register(new UntestedCommand());

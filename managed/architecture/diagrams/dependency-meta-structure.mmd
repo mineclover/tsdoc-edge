@@ -62,7 +62,7 @@ graph LR
     subgraph "1. Code Space (구조적 의존성)"
         C1[code-dependency<br/>✅ 1,968 rels<br/>import A from B]
         C2[inheritance<br/>✅ 57 rels<br/>class A extends B]
-        C3[interface-impl<br/>❌ NOT YET<br/>class A implements I]
+        C3[interface-impl<br/>✅ IMPLEMENTED<br/>class A implements I]
     end
 
     subgraph "2. Data Space (데이터 흐름)"
@@ -79,13 +79,13 @@ graph LR
 
     subgraph "4. Meta Space (인지적 연결)"
         M1[doc-reference<br/>❌ NOT YET<br/>@doc [[Symbol]]]
-        M2[test-coverage<br/>❌ NOT YET<br/>test→impl]
+        M2[test-coverage<br/>✅ IMPLEMENTED<br/>test→impl]
         M3[enhancement<br/>❌ NOT YET<br/>@enhances tag]
     end
 
     subgraph "5. Type Space (타입 시스템)"
-        T1[type-dependency<br/>❌ NOT YET<br/>type references]
-        T2[generic-constraint<br/>❌ NOT YET<br/>T extends U]
+        T1[type-dependency<br/>✅ IMPLEMENTED<br/>type references]
+        T2[generic-constraint<br/>✅ IMPLEMENTED<br/>T extends U]
     end
 
     subgraph "6. Architectural Space (계층)"
@@ -105,11 +105,11 @@ graph LR
     classDef implemented fill:#c8e6c9,stroke:#2e7d32,stroke-width:2px
     classDef pending fill:#ffccbc,stroke:#d84315,stroke-width:2px
 
-    class C1,C2,D1,D2,B1,Q1 implemented
-    class C3,D3,B2,B3,M1,M2,M3,T1,T2,A1,A2 pending
+    class C1,C2,C3,D1,D2,B1,M2,T1,T2,Q1 implemented
+    class D3,B2,B3,M1,M3,A1,A2 pending
 ```
 
-**현재 구현**: 6/17 types (35%)
+**현재 구현**: 10/17 types (59%)
 **목표**: 17/17 types (100%)
 
 ## 3. Detection Methods: How Each Relationship Is Found
@@ -374,11 +374,11 @@ graph TB
 
 ```mermaid
 graph LR
-    subgraph "Current (v1.0)"
-        C1[✅ 4 relationship types<br/>code, io, calls, inheritance]
-        C2[✅ 10,241 relationships<br/>실제 데이터]
+    subgraph "Current (v1.5)"
+        C1[✅ 10 relationship types<br/>code, io, calls, inheritance,<br/>interface-impl, test-coverage,<br/>type-dependency, generic-constraint]
+        C2[✅ 10,241+ relationships<br/>실제 데이터 (+ analyzers)]
         C3[✅ work-context 명령어<br/>통합 컨텍스트]
-        C4[⚠️  신뢰도 검증 없음<br/>품질 보증 부족]
+        C4[⚠️  analyzer 통합 필요<br/>일부 analyzer 미동작]
     end
 
     subgraph "Target (v2.0)"
@@ -400,7 +400,8 @@ graph LR
     class T1,T2,T3,T4 target
 ```
 
-**Next Milestone**: test-coverage, doc-reference, interface-impl (Phase 2)
+**Next Milestone**: callback, event-flow, doc-reference (Phase 2)
+**Recently Completed**: interface-impl, test-coverage, type-dependency, generic-constraint
 
 ## Metadata
 
