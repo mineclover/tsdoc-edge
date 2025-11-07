@@ -279,6 +279,7 @@ Total:          4.5 MB
 - ✅ Hotspot diagram: `.tsdoc/diagrams/hotspots.mmd` (61 lines)
 - ✅ Color-coded by criticality (red: critical, orange: high, blue: medium, green: low)
 - ✅ Shows incoming/outgoing counts and scores
+- 📝 Validation workflow: See [[Mermaid Validation Workflow]] for diagram quality checks
 
 ## Key Relationships Explained
 

@@ -1,23 +1,19 @@
-%% Top 10 Hotspots (Original - Code Dependencies Only)
-%% NOTE: See hotspots-with-calls.mmd for updated analysis with call graph integration
-%% This diagram shows hotspots based on code-dependency and io-dependency only
-
 graph LR
-  interface_symbol["Symbol<br/>In:83 Out:4<br/>Score:170"]:::critical
+  interface_symbol["Symbol<br/>In:85 Out:4<br/>Score:174"]:::critical
   interface_extractedsymbol["ExtractedSymbol"] --> interface_symbol
   interface_extractionresult["ExtractionResult"] --> interface_symbol
   class_astsymbolextractor["ASTSymbolExtractor"] --> interface_symbol
   interface_symbol --> interface_contractspec["ContractSpec"]
   interface_symbol --> interface_responsibilityspec["ResponsibilitySpec"]
   interface_symbol --> interface_symbolrelationship["SymbolRelationship"]
-  interface_commandresult["CommandResult<br/>In:73 Out:0<br/>Score:146"]:::critical
+  interface_commandresult["CommandResult<br/>In:74 Out:0<br/>Score:148"]:::critical
   variable_args["args"] --> interface_commandresult
   variable_configpath["configPath"] --> interface_commandresult
   variable_configindex["configIndex"] --> interface_commandresult
-  class_basecommand["BaseCommand<br/>In:63 Out:0<br/>Score:126"]:::critical
+  class_basecommand["BaseCommand<br/>In:64 Out:0<br/>Score:128"]:::critical
+  class_analyzecallscommand["AnalyzeCallsCommand"] --> class_basecommand
   class_analyzechainscommand["AnalyzeChainsCommand"] --> class_basecommand
   class_analyzecommand["AnalyzeCommand"] --> class_basecommand
-  class_analyzeiocommand["AnalyzeIOCommand"] --> class_basecommand
   variable_colors["colors<br/>In:55 Out:0<br/>Score:110"]:::critical
   class_analyzecommand["AnalyzeCommand"] --> variable_colors
   class_checklinkscommand["CheckLinksCommand"] --> variable_colors
@@ -29,21 +25,21 @@ graph LR
   class_symbolregistrymanager --> interface_dependencyrelation["DependencyRelation"]
   class_symbolregistrymanager --> interface_sourceref["SourceRef"]
   class_symbolregistrymanager --> interface_symbolregistry["SymbolRegistry"]
-  class_tsdocedge["TSDocEdge<br/>In:0 Out:77<br/>Score:77"]:::critical
+  class_tsdocedge["TSDocEdge<br/>In:0 Out:80<br/>Score:80"]:::critical
   class_tsdocedge --> class_markdowngenerator["MarkdownGenerator"]
   class_tsdocedge --> class_tsdocparser["TSDocParser"]
   class_tsdocedge --> class_conventionvalidator["ConventionValidator"]
-  class_databasemanager["DatabaseManager<br/>In:37 Out:3<br/>Score:77"]:::critical
+  class_databasemanager["DatabaseManager<br/>In:38 Out:3<br/>Score:79"]:::critical
+  class_analyzecallscommand["AnalyzeCallsCommand"] --> class_databasemanager
   class_analyzechainscommand["AnalyzeChainsCommand"] --> class_databasemanager
   class_analyzeiocommand["AnalyzeIOCommand"] --> class_databasemanager
-  class_buildcommand["BuildCommand"] --> class_databasemanager
   class_databasemanager --> class_configmanager["ConfigManager"]
   class_databasemanager --> interface_symbol["Symbol"]
   class_databasemanager --> interface_enhancedsymboldoc["EnhancedSymbolDoc"]
-  class_symbolgraphbuilder["SymbolGraphBuilder<br/>In:36 Out:3<br/>Score:75"]:::critical
+  class_symbolgraphbuilder["SymbolGraphBuilder<br/>In:37 Out:3<br/>Score:77"]:::critical
+  class_analyzecallscommand["AnalyzeCallsCommand"] --> class_symbolgraphbuilder
   class_analyzechainscommand["AnalyzeChainsCommand"] --> class_symbolgraphbuilder
   class_analyzeiocommand["AnalyzeIOCommand"] --> class_symbolgraphbuilder
-  class_parallelworkcommand["ParallelWorkCommand"] --> class_symbolgraphbuilder
   class_symbolgraphbuilder --> interface_symbol["Symbol"]
   class_symbolgraphbuilder --> interface_symbolgraph["SymbolGraph"]
   class_symbolgraphbuilder --> interface_symbolrelationship["SymbolRelationship"]
@@ -54,7 +50,7 @@ graph LR
   class_configmanager --> constant_config_file_name["CONFIG_FILE_NAME"]
   class_configmanager --> constant_default_config["DEFAULT_CONFIG"]
   class_configmanager --> interface_tsdocedgeconfig["TsdocEdgeConfig"]
-  variable_args["args<br/>In:0 Out:58<br/>Score:58"]:::critical
+  variable_args["args<br/>In:0 Out:59<br/>Score:59"]:::critical
   variable_args --> class_usagetracker["UsageTracker"]
   variable_args --> class_analyzecommand["AnalyzeCommand"]
   variable_args --> class_analyzeiocommand["AnalyzeIOCommand"]
