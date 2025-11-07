@@ -21,7 +21,7 @@ graph TB
         CheckVisited -->|No| StartDFS[Start DFS from symbol]
     end
 
-    subgraph "DFS Function (Recursive)"
+    subgraph "DFS Function - Recursive"
         StartDFS --> DFSEntry[DFS entry point]
 
         DFSEntry --> AddVisited[Add to visited set]
@@ -59,19 +59,19 @@ graph TB
 
         Ex --> Step1[Step 1: Visit A<br/>visited: SET-A<br/>stack: SET-A]
 
-        Step1 --> Step2[Step 2: Visit B (from A)<br/>visited: SET-A-B<br/>stack: SET-A-B]
+        Step1 --> Step2[Step 2: Visit B from A<br/>visited: SET-A-B<br/>stack: SET-A-B]
 
-        Step2 --> Step3[Step 3: Visit C (from B)<br/>visited: SET-A-B-C<br/>stack: SET-A-B-C]
+        Step2 --> Step3[Step 3: Visit C from B<br/>visited: SET-A-B-C<br/>stack: SET-A-B-C]
 
-        Step3 --> Step4[Step 4: Visit D (from C)<br/>visited: SET-A-B-C-D<br/>stack: SET-A-B-C-D]
+        Step3 --> Step4[Step 4: Visit D from C<br/>visited: SET-A-B-C-D<br/>stack: SET-A-B-C-D]
 
-        Step4 --> Step5[Step 5: Try visit A (from D)<br/>✅ A in visited<br/>✅ A in stack<br/>🔴 CIRCULAR!]
+        Step4 --> Step5[Step 5: Try visit A from D<br/>A in visited<br/>A in stack<br/>CIRCULAR!]
 
-        Step5 --> Step6[Extract path:<br/>[A, B, C, D, A]]
+        Step5 --> Step6[Extract path:<br/>A to B to C to D to A]
     end
 
     subgraph "Recursion Stack Visualization"
-        Stack1[Call Stack State:<br/>┌─────────────┐<br/>│ DFS(D) ← current │<br/>├─────────────┤<br/>│ DFS(C)      │<br/>├─────────────┤<br/>│ DFS(B)      │<br/>├─────────────┤<br/>│ DFS(A)      │<br/>└─────────────┘]
+        Stack1[Call Stack State:<br/>DFS-D current<br/>DFS-C<br/>DFS-B<br/>DFS-A]
 
         Stack1 --> StackNote[When D tries to visit A,<br/>A is still in the stack<br/>→ Circular detected]
     end
@@ -83,7 +83,7 @@ graph TB
 
         Proof3[Back edge definition:<br/>Edge from descendant<br/>to ancestor in DFS tree<br/>→ Creates cycle]
 
-        Proof1 --> Why[Guarantees:<br/>1. Every node visited once<br/>2. All cycles found<br/>3. O(V+E) time]
+        Proof1 --> Why[Guarantees:<br/>1. Every node visited once<br/>2. All cycles found<br/>3. O-V+E time]
         Proof2 --> Why
         Proof3 --> Why
     end
@@ -91,27 +91,27 @@ graph TB
     subgraph "Current System Results"
         AddToCirculars --> Results[Circular Dependencies: 0]
 
-        Results --> Before[Before (with locals):<br/>820 false positives]
-        Results --> After[After (top-level only):<br/>0 circulars ✨]
+        Results --> Before[Before with locals:<br/>820 false positives]
+        Results --> After[After top-level only:<br/>0 circulars]
 
         After --> Conclusion[Architecture is clean!<br/>No circular dependencies]
     end
 
     subgraph "Complexity Analysis"
-        Time[Time: O(V + E)]
-        Space[Space: O(V)]
+        Time[Time: O-V+E]
+        Space[Space: O-V]
 
-        Time --> TimeBreak["V = vertices (symbols)<br/>E = edges (dependencies)<br/>Visit each node once<br/>Check each edge once"]
+        Time --> TimeBreak["V vertices symbols<br/>E edges dependencies<br/>Visit each node once<br/>Check each edge once"]
 
-        Space --> SpaceBreak["visited: O(V)<br/>recursionStack: O(V)<br/>circulars: O(V) worst case"]
+        Space --> SpaceBreak["visited: O-V<br/>recursionStack: O-V<br/>circulars: O-V worst case"]
     end
 
     subgraph "Alternative Approaches"
-        Alt1[Tarjan's Algorithm:<br/>Finds strongly connected<br/>components in O(V+E)]
+        Alt1[Tarjan Algorithm:<br/>Finds strongly connected<br/>components in O-V+E]
 
-        Alt2[Floyd-Warshall:<br/>All-pairs shortest paths<br/>O(V³) - too slow]
+        Alt2[Floyd-Warshall:<br/>All-pairs shortest paths<br/>O-V³ too slow]
 
-        Alt3[Topological Sort:<br/>DAG check fails on cycle<br/>O(V+E) but less info]
+        Alt3[Topological Sort:<br/>DAG check fails on cycle<br/>O-V+E but less info]
 
         Alt1 --> AltNote[DFS chosen for:<br/>1. Simplicity<br/>2. Clear paths<br/>3. Easy to understand]
         Alt2 --> AltNote
