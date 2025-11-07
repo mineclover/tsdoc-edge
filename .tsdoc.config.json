@@ -11,7 +11,8 @@
     "commentsDir": ".tsdoc-comments",
     "databasePath": ".tsdoc/symbols.db",
     "jsonlDir": ".tsdoc/data",
-    "outputDir": "output"
+    "outputDir": "output",
+    "diagramsDir": ".tsdoc/diagrams"
   },
   "fold": {
     "enabled": true,

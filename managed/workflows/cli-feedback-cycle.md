@@ -2,6 +2,21 @@
 
 **Workflow**: Complete Documentation and Quality Feedback Loop
 
+## 🌟 빠른 시작: Work Context 우선
+
+**파일 작업 전 가장 먼저 실행:**
+
+```bash
+tsdoc-edge work-context <file-path>
+```
+
+이 명령어는 아래 모든 분석 기능을 통합하여 작업에 필요한 정보를 한번에 제공합니다:
+- 📚 관련 문서, 🔗 의존 타입, 🧪 테스트, ⚠️ 영향 범위
+
+자세한 내용: [[Work Context Workflow]]
+
+---
+
 ## Purpose
 
 TSDoc Edge CLI의 전체 피드백 사이클을 정의합니다. 코드 작성 → 문서화 → 검증 → 개선의 순환 구조를 통해 지속적인 품질 향상을 달성합니다.

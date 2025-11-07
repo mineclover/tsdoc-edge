@@ -132,6 +132,12 @@ export interface PathsConfig {
    * @defaultValue ".tsdoc/reports"
    */
   reportsDir?: string;
+
+  /**
+   * Directory for generated Mermaid diagrams
+   * @defaultValue ".tsdoc/diagrams"
+   */
+  diagramsDir?: string;
 }
 
 /**

@@ -10,6 +10,7 @@ import { DatabaseManager } from '../storage/DatabaseManager';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { MermaidGenerator } from '../visualization/MermaidGenerator';
 import { DependencyChainAnalyzer } from '../analyzer/DependencyChainAnalyzer';
+import { ConfigManager } from '../config/ConfigManager';
 
 /**
  * Command for visualizing dependencies with Mermaid diagrams
@@ -30,6 +31,9 @@ export class VisualizeDepsCommand extends BaseCommand {
       const targetSymbol = args[1];
 
       this.printHeader('TSDoc Edge - Dependency Visualization');
+
+      const config = ConfigManager.getInstance();
+      const diagramsDir = (config as any).config?.paths?.diagramsDir || '.tsdoc/diagrams';
 
       const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
       const dbManager = new DatabaseManager(dbPath);
@@ -86,7 +90,7 @@ export class VisualizeDepsCommand extends BaseCommand {
           console.log();
 
           // Save to file
-          const outputPath = path.join(process.cwd(), '.tsdoc', 'diagrams', `tree-${targetSymbol}.mmd`);
+          const outputPath = path.join(process.cwd(), diagramsDir, `tree-${targetSymbol}.mmd`);
           fs.mkdirSync(path.dirname(outputPath), { recursive: true });
           fs.writeFileSync(outputPath, diagram, 'utf-8');
 
@@ -104,7 +108,7 @@ export class VisualizeDepsCommand extends BaseCommand {
           console.log();
 
           // Save to file
-          const outputPath = path.join(process.cwd(), '.tsdoc', 'diagrams', 'hotspots.mmd');
+          const outputPath = path.join(process.cwd(), diagramsDir, 'hotspots.mmd');
           fs.mkdirSync(path.dirname(outputPath), { recursive: true });
           fs.writeFileSync(outputPath, diagram, 'utf-8');
 
@@ -133,7 +137,7 @@ export class VisualizeDepsCommand extends BaseCommand {
             console.log();
 
             // Save to file
-            const outputPath = path.join(process.cwd(), '.tsdoc', 'diagrams', `circular-${circularIndex + 1}.mmd`);
+            const outputPath = path.join(process.cwd(), diagramsDir, `circular-${circularIndex + 1}.mmd`);
             fs.mkdirSync(path.dirname(outputPath), { recursive: true });
             fs.writeFileSync(outputPath, diagram, 'utf-8');
 
@@ -155,7 +159,7 @@ export class VisualizeDepsCommand extends BaseCommand {
           console.log();
 
           // Save to file
-          const outputPath = path.join(process.cwd(), '.tsdoc', 'diagrams', `hierarchy-${targetSymbol}.mmd`);
+          const outputPath = path.join(process.cwd(), diagramsDir, `hierarchy-${targetSymbol}.mmd`);
           fs.mkdirSync(path.dirname(outputPath), { recursive: true });
           fs.writeFileSync(outputPath, diagram, 'utf-8');
 
@@ -172,7 +176,7 @@ export class VisualizeDepsCommand extends BaseCommand {
           console.log();
 
           // Save to file
-          const outputPath = path.join(process.cwd(), '.tsdoc', 'diagrams', 'modules.mmd');
+          const outputPath = path.join(process.cwd(), diagramsDir, 'modules.mmd');
           fs.mkdirSync(path.dirname(outputPath), { recursive: true });
           fs.writeFileSync(outputPath, diagram, 'utf-8');
 
@@ -189,7 +193,7 @@ export class VisualizeDepsCommand extends BaseCommand {
           console.log('  visualize hierarchy <class-id>   - Class hierarchy diagram');
           console.log('  visualize modules [max]          - Module dependency diagram');
           console.log();
-          console.log('All diagrams are saved to .tsdoc/diagrams/');
+          console.log(`All diagrams are saved to ${diagramsDir}/`);
           console.log();
           break;
         }

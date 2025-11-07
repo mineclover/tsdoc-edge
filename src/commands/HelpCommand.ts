@@ -67,14 +67,22 @@ export class HelpCommand extends BaseCommand {
       }
 
       console.log();
-      console.log('Common Examples:');
-      console.log(`  ${colors.dim}tsdoc-edge init${colors.reset}                  Initialize project configuration`);
-      console.log(`  ${colors.dim}tsdoc-edge build src${colors.reset}             Build symbol database`);
-      console.log(`  ${colors.dim}tsdoc-edge analyze src${colors.reset}           Analyze code health`);
-      console.log(`  ${colors.dim}tsdoc-edge validate${colors.reset}              Validate documentation`);
-      console.log(`  ${colors.dim}tsdoc-edge health${colors.reset}                Check overall health`);
-      console.log(`  ${colors.dim}tsdoc-edge fix src --dry-run${colors.reset}     Preview documentation fixes`);
-      console.log(`  ${colors.dim}tsdoc-edge stats${colors.reset}                 Show documentation statistics`);
+      console.log(`${colors.bold}${colors.yellow}🌟 Most Important Command:${colors.reset}`);
+      console.log(`  ${colors.green}${colors.bold}tsdoc-edge work-context <file>${colors.reset}`);
+      console.log(`  ${colors.dim}  → Shows ALL context needed to work on a file (docs, types, tests, impact)${colors.reset}`);
+      console.log(`  ${colors.dim}  → All analysis features exist to serve this single command${colors.reset}`);
+      console.log();
+      console.log('Common Workflow:');
+      console.log(`  ${colors.dim}tsdoc-edge init${colors.reset}                           Initialize project configuration`);
+      console.log(`  ${colors.dim}tsdoc-edge build src${colors.reset}                      Build symbol database`);
+      console.log(`  ${colors.bold}${colors.green}tsdoc-edge work-context src/file.ts${colors.reset}       ${colors.yellow}← Start here before editing!${colors.reset}`);
+      console.log();
+      console.log('Additional Commands:');
+      console.log(`  ${colors.dim}tsdoc-edge analyze src${colors.reset}                    Analyze code health`);
+      console.log(`  ${colors.dim}tsdoc-edge validate${colors.reset}                       Validate documentation`);
+      console.log(`  ${colors.dim}tsdoc-edge health${colors.reset}                         Check overall health`);
+      console.log(`  ${colors.dim}tsdoc-edge fix src --dry-run${colors.reset}              Preview documentation fixes`);
+      console.log(`  ${colors.dim}tsdoc-edge stats${colors.reset}                          Show documentation statistics`);
       console.log();
       console.log('For more information, visit: https://github.com/your-repo/tsdoc-edge');
       console.log();

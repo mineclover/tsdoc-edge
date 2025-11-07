@@ -66,6 +66,7 @@ import { ParallelWorkCommand } from './commands/ParallelWorkCommand';
 import { TestRelationshipsCommand } from './commands/TestRelationshipsCommand';
 import { AnalyzeChainsCommand } from './commands/AnalyzeChainsCommand';
 import { AnalyzeCallsCommand } from './commands/AnalyzeCallsCommand';
+import { WorkContextCommand } from './commands/WorkContextCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -147,6 +148,7 @@ async function main(): Promise<void> {
   registry.register(new DetectCircularTypesCommand());
   registry.register(new ParallelWorkCommand());
   registry.register(new TestRelationshipsCommand());
+  registry.register(new WorkContextCommand());
   registry.register(new HelpCommand(registry));
 
   // Get command
