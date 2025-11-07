@@ -13,6 +13,7 @@ import * as path from 'node:path';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
+import { MermaidSymbolExtractor } from '../doc-symbol/MermaidSymbolExtractor';
 
 interface EntrypointExploration {
   entrypointPath: string;
@@ -73,8 +74,8 @@ export class ExploreEntrypointCommand extends BaseCommand {
         return this.failure('File not found');
       }
 
-      if (!entrypointPath.endsWith('.md')) {
-        this.printError('Entrypoint must be a markdown file');
+      if (!entrypointPath.endsWith('.md') && !entrypointPath.endsWith('.mmd')) {
+        this.printError('Entrypoint must be a markdown (.md) or Mermaid diagram (.mmd) file');
         return this.failure('Invalid file type');
       }
 
@@ -149,8 +150,22 @@ export class ExploreEntrypointCommand extends BaseCommand {
 
       const content = fs.readFileSync(docAbsPath, 'utf-8');
 
-      // Extract [[Symbol]] references
-      const symbolRefs = this.extractSymbolReferences(content);
+      // Extract [[Symbol]] references based on file type
+      let symbolRefs: string[] = [];
+
+      if (currentDoc.endsWith('.mmd')) {
+        // Parse Mermaid diagram
+        const extractor = new MermaidSymbolExtractor();
+        const mermaidResult = extractor.extract(content, currentDoc);
+        symbolRefs = mermaidResult.symbolReferences;
+
+        // Also extract from frontmatter if present
+        const mdSymbolRefs = this.extractSymbolReferences(content);
+        symbolRefs.push(...mdSymbolRefs);
+      } else {
+        // Parse markdown
+        symbolRefs = this.extractSymbolReferences(content);
+      }
 
       for (const symbolRef of symbolRefs) {
         // Check if this is a doc reference (points to another markdown file)

@@ -1,0 +1,414 @@
+/**
+ * Mermaid Symbol Extractor
+ *
+ * @packageDocumentation
+ * @responsibility Extract symbols and relationships from Mermaid diagrams (.mmd)
+ *
+ * @problem Mermaid diagrams contain valuable structural information but not machine-readable
+ * @solves Parse .mmd files to extract node names, relationships, and metadata
+ * @context Enable .mmd files as SSOT entrypoints for explore-entrypoint command
+ *
+ * @functionality
+ * - Parse Mermaid graph syntax (graph TB, graph LR, etc.)
+ * - Extract node definitions with labels
+ * - Extract edges (relationships) between nodes
+ * - Detect symbol patterns in node labels (e.g., "code-dependency<br/>✅ 1,968 rels")
+ * - Generate [[Symbol]] references from node labels
+ */
+
+/**
+ * Extracted symbol from Mermaid diagram
+ */
+export interface MermaidSymbol {
+  /** Node ID in diagram (e.g., "C1", "M2") */
+  nodeId: string;
+
+  /** Display label (may include HTML) */
+  label: string;
+
+  /** Extracted symbol name (cleaned) */
+  symbolName: string;
+
+  /** Symbol type hint (e.g., "code-dependency", "inheritance") */
+  typeHint?: string;
+
+  /** Implementation status (✅, ❌, ⚠️) */
+  status?: 'implemented' | 'not-implemented' | 'partial';
+
+  /** Metrics extracted from label (e.g., "1,968 rels") */
+  metrics?: {
+    count?: number;
+    unit?: string;
+  };
+
+  /** Subgraph this node belongs to */
+  subgraph?: string;
+}
+
+/**
+ * Extracted relationship from Mermaid diagram
+ */
+export interface MermaidRelationship {
+  /** Source node ID */
+  from: string;
+
+  /** Target node ID */
+  to: string;
+
+  /** Edge type (-->, -.->、==>, etc.) */
+  edgeType: 'solid' | 'dotted' | 'thick';
+
+  /** Edge label if any */
+  label?: string;
+
+  /** Direction */
+  direction: 'unidirectional' | 'bidirectional';
+}
+
+/**
+ * Mermaid diagram metadata
+ */
+export interface MermaidMetadata {
+  /** Diagram type (graph, flowchart, classDiagram, etc.) */
+  diagramType: string;
+
+  /** Orientation (TB, LR, RL, BT) */
+  orientation?: string;
+
+  /** Title from frontmatter or title directive */
+  title?: string;
+
+  /** Subgraphs defined */
+  subgraphs: Array<{ id: string; title: string }>;
+}
+
+/**
+ * Complete Mermaid extraction result
+ */
+export interface MermaidExtractionResult {
+  metadata: MermaidMetadata;
+  symbols: MermaidSymbol[];
+  relationships: MermaidRelationship[];
+
+  /** Auto-generated [[Symbol]] references */
+  symbolReferences: string[];
+
+  /** Suggested documentation sections to create */
+  suggestedDocs: Array<{
+    symbolName: string;
+    filename: string;
+    skeleton: string;
+  }>;
+}
+
+/**
+ * Mermaid Symbol Extractor
+ *
+ * @public
+ * @responsibility Parse Mermaid diagrams and extract symbols/relationships
+ */
+export class MermaidSymbolExtractor {
+  /**
+   * Extract symbols and relationships from Mermaid diagram content
+   *
+   * @param content - Mermaid diagram source code
+   * @param filePath - Path to .mmd file (for context)
+   * @returns Extraction result with symbols, relationships, and suggestions
+   * @public
+   */
+  extract(content: string, filePath: string): MermaidExtractionResult {
+    const result: MermaidExtractionResult = {
+      metadata: {
+        diagramType: 'unknown',
+        subgraphs: [],
+      },
+      symbols: [],
+      relationships: [],
+      symbolReferences: [],
+      suggestedDocs: [],
+    };
+
+    // Parse diagram type and orientation
+    const diagramMatch = content.match(/^(graph|flowchart|classDiagram|sequenceDiagram)\s+(TB|LR|RL|BT)?/m);
+    if (diagramMatch) {
+      result.metadata.diagramType = diagramMatch[1];
+      result.metadata.orientation = diagramMatch[2];
+    }
+
+    // Parse subgraphs
+    const subgraphRegex = /subgraph\s+"([^"]+)"/g;
+    let subgraphMatch;
+    let currentSubgraph: string | undefined;
+
+    const lines = content.split('\n');
+    for (const line of lines) {
+      const trimmed = line.trim();
+
+      // Track current subgraph
+      if (trimmed.startsWith('subgraph')) {
+        const match = trimmed.match(/subgraph\s+"([^"]+)"/);
+        if (match) {
+          currentSubgraph = match[1];
+          result.metadata.subgraphs.push({ id: currentSubgraph, title: currentSubgraph });
+        }
+      } else if (trimmed === 'end') {
+        currentSubgraph = undefined;
+      }
+
+      // Parse node definitions: NodeID[Label] or NodeID[Label<br/>More]
+      const nodeMatch = trimmed.match(/^([A-Z0-9]+)\[([^\]]+)\]/);
+      if (nodeMatch) {
+        const nodeId = nodeMatch[1];
+        const label = nodeMatch[2];
+
+        const symbol = this.parseNodeLabel(nodeId, label, currentSubgraph);
+        result.symbols.push(symbol);
+        result.symbolReferences.push(symbol.symbolName);
+      }
+
+      // Parse relationships: A --> B, A -.-> B, A ==> B
+      const relMatch = trimmed.match(/^([A-Z0-9]+)\s+(-->|\.\.->|-\.->|==>|<-->)\s+([A-Z0-9]+)/);
+      if (relMatch) {
+        const from = relMatch[1];
+        const edgeType = this.parseEdgeType(relMatch[2]);
+        const to = relMatch[3];
+
+        result.relationships.push({
+          from,
+          to,
+          edgeType,
+          direction: relMatch[2].includes('<') ? 'bidirectional' : 'unidirectional',
+        });
+      }
+
+      // Parse relationships with labels: A -->|"label"| B
+      const relLabelMatch = trimmed.match(/^([A-Z0-9]+)\s+(-->|\.\.->|-\.->|==>)\|"([^"]+)"\|\s+([A-Z0-9]+)/);
+      if (relLabelMatch) {
+        const from = relLabelMatch[1];
+        const edgeType = this.parseEdgeType(relLabelMatch[2]);
+        const label = relLabelMatch[3];
+        const to = relLabelMatch[4];
+
+        result.relationships.push({
+          from,
+          to,
+          edgeType,
+          label,
+          direction: 'unidirectional',
+        });
+      }
+    }
+
+    // Generate suggested documentation
+    result.suggestedDocs = this.generateDocSuggestions(result.symbols);
+
+    return result;
+  }
+
+  /**
+   * Parse node label to extract symbol information
+   *
+   * Pattern: "code-dependency<br/>✅ 1,968 rels<br/>import A from B"
+   */
+  private parseNodeLabel(nodeId: string, label: string, subgraph?: string): MermaidSymbol {
+    // Remove HTML tags for parsing
+    const cleanLabel = label.replace(/<br\/?>/g, '\n').replace(/<[^>]+>/g, '');
+    const lines = cleanLabel.split('\n').map(l => l.trim()).filter(l => l);
+
+    // First line is usually the symbol name
+    const symbolName = lines[0] || nodeId;
+
+    // Detect status from emoji/symbol
+    let status: MermaidSymbol['status'] = undefined;
+    if (label.includes('✅') || label.includes('IMPLEMENTED')) {
+      status = 'implemented';
+    } else if (label.includes('❌') || label.includes('NOT YET')) {
+      status = 'not-implemented';
+    } else if (label.includes('⚠️') || label.includes('PARTIAL')) {
+      status = 'partial';
+    }
+
+    // Extract metrics (e.g., "1,968 rels")
+    let metrics: MermaidSymbol['metrics'] = undefined;
+    for (const line of lines) {
+      const metricMatch = line.match(/([\d,]+)\s+(\w+)/);
+      if (metricMatch) {
+        const count = parseInt(metricMatch[1].replace(/,/g, ''), 10);
+        const unit = metricMatch[2];
+        metrics = { count, unit };
+        break;
+      }
+    }
+
+    // Type hint is the symbol name normalized
+    const typeHint = symbolName.toLowerCase().replace(/\s+/g, '-');
+
+    return {
+      nodeId,
+      label,
+      symbolName,
+      typeHint,
+      status,
+      metrics,
+      subgraph,
+    };
+  }
+
+  /**
+   * Parse edge type from Mermaid syntax
+   */
+  private parseEdgeType(edge: string): 'solid' | 'dotted' | 'thick' {
+    if (edge.includes('==>')) return 'thick';
+    if (edge.includes('.') || edge.includes('-.-')) return 'dotted';
+    return 'solid';
+  }
+
+  /**
+   * Generate documentation suggestions based on extracted symbols
+   */
+  private generateDocSuggestions(symbols: MermaidSymbol[]): Array<{
+    symbolName: string;
+    filename: string;
+    skeleton: string;
+  }> {
+    const suggestions: Array<{ symbolName: string; filename: string; skeleton: string }> = [];
+
+    for (const symbol of symbols) {
+      if (symbol.status === 'not-implemented') {
+        // Don't suggest docs for unimplemented features
+        continue;
+      }
+
+      const filename = (symbol.typeHint || symbol.symbolName)
+        .toLowerCase()
+        .replace(/\s+/g, '-')
+        .replace(/[^a-z0-9-]/g, ''); // Remove special characters
+      const skeleton = this.generateDocSkeleton(symbol);
+
+      suggestions.push({
+        symbolName: symbol.symbolName,
+        filename: `${filename}.md`,
+        skeleton,
+      });
+    }
+
+    return suggestions;
+  }
+
+  /**
+   * Generate documentation skeleton for a symbol
+   */
+  private generateDocSkeleton(symbol: MermaidSymbol): string {
+    const status = symbol.status === 'implemented' ? 'implemented' : 'planned';
+    const progress = symbol.status === 'implemented' ? '100%' : '0%';
+
+    return `---
+title: ${symbol.symbolName}
+type: relationship
+category: ${symbol.subgraph || 'unknown'}
+status: ${status}
+implementation-progress: ${progress}
+${symbol.metrics ? `relationships-count: ${symbol.metrics.count}` : ''}
+---
+
+# [[${symbol.symbolName}]]
+
+> **Type**: \`${symbol.typeHint}\`
+> **Category**: ${symbol.subgraph || 'TBD'}
+> **Status**: ${symbol.status === 'implemented' ? '✅ Implemented' : '❌ Not Implemented'}
+
+## Purpose
+
+TODO: Describe the purpose of this relationship type
+
+## Pattern
+
+\`\`\`typescript
+// TODO: Add code example showing this pattern
+\`\`\`
+
+## Implementation
+
+### Extractor
+
+**File**: \`src/analyzer/TODO.ts\`
+
+TODO: Document implementation details
+
+## Properties
+
+| Property | Type | Description |
+|----------|------|-------------|
+| \`type\` | \`'${symbol.typeHint}'\` | Fixed value |
+| \`category\` | \`'TODO'\` | TBD |
+
+## Commands
+
+\`\`\`bash
+# TODO: Document relevant commands
+\`\`\`
+
+## Related Checkpoints
+
+- [[Relationship Types]]: Parent index
+${symbol.metrics?.count ? `\n## Statistics\n\n**Current Count**: ${symbol.metrics.count.toLocaleString()} ${symbol.metrics.unit}` : ''}
+
+---
+
+**Implementation File**: TBD
+**Command**: TBD
+`;
+  }
+
+  /**
+   * Validate symbol reference consistency
+   *
+   * Check if [[Symbol]] reference matches existing documentation
+   *
+   * @param symbolRef - Symbol reference string (e.g., "Code Dependency")
+   * @param existingDocs - Map of symbol name to doc file path
+   * @returns Validation result
+   * @public
+   */
+  validateSymbolReference(
+    symbolRef: string,
+    existingDocs: Map<string, string>
+  ): {
+    isValid: boolean;
+    status: 'first-use' | 'exists' | 'mismatch';
+    suggestion?: string;
+    docPath?: string;
+  } {
+    // Normalize symbol reference
+    const normalized = symbolRef.toLowerCase().replace(/\s+/g, '-');
+
+    // Check if doc exists
+    for (const [docSymbol, docPath] of existingDocs.entries()) {
+      const docNormalized = docSymbol.toLowerCase().replace(/\s+/g, '-');
+
+      if (docNormalized === normalized) {
+        return {
+          isValid: true,
+          status: 'exists',
+          docPath,
+        };
+      }
+
+      // Fuzzy match for suggestions
+      if (docNormalized.includes(normalized) || normalized.includes(docNormalized)) {
+        return {
+          isValid: false,
+          status: 'mismatch',
+          suggestion: `Did you mean [[${docSymbol}]]? (found at ${docPath})`,
+        };
+      }
+    }
+
+    // First use - suggest creating doc
+    return {
+      isValid: true,
+      status: 'first-use',
+      suggestion: `Create managed/relationships/${normalized}.md`,
+    };
+  }
+}
