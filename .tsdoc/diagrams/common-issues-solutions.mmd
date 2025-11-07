@@ -23,7 +23,7 @@ graph TB
 
         Solution2 --> Code2["if (ts.isVariableStatement(node)<br/>    && !parentSymbol) {<br/>  extractVariableStatement(node);<br/>}"]
 
-        Code2 --> Result2[Result:<br/>Variables: 1,153 → 21  -98pct<br/>Symbols: 2,531 → 1,410 (-44%)<br/>Circulars: 820 → 0 (-100%)]
+        Code2 --> Result2[Result:<br/>Variables: 1,153 → 21  -98pct<br/>Symbols: 2,531 → 1,410  -44pct<br/>Circulars: 820 → 0  -100pct]
     end
 
     subgraph "Issue 3: Methods Not Exported"
@@ -69,7 +69,7 @@ graph TB
 
         Root6 --> Impact6[Impact:<br/>No type-based analysis<br/>Missing type relationships]
 
-        Impact6 --> Solution6[Solution:<br/>Create extractTypeInfo()<br/>+ extractFunctionTypeInfo()]
+        Impact6 --> Solution6[Solution:<br/>Create extractTypeInfo<br/>plus extractFunctionTypeInfo]
 
         Solution6 --> Code6["const type = typeChecker<br/>  .getTypeAtLocation(node);<br/>const typeString =<br/>  typeChecker.typeToString(type);"]
 

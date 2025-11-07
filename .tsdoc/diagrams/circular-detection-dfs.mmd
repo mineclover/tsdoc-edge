@@ -3,14 +3,14 @@
 
 graph TB
     subgraph "Input"
-        Graph[Symbol Graph<br/>Adjacency List:<br/>A → LIST:B, C]<br/>B → LIST:D]<br/>C → LIST:D]<br/>D → LIST:A]]
+        Graph["Symbol Graph<br/>Adjacency List:<br/>A to B-C<br/>B to D<br/>C to D<br/>D to A"]
     end
 
     subgraph "Initialization"
         Graph --> InitSets[Initialize Sets]
-        InitSets --> Visited[visited = Set()]
-        InitSets --> RecStack[recursionStack = Set()]
-        InitSets --> Circulars[circulars = []]
+        InitSets --> Visited[visited = new Set]
+        InitSets --> RecStack[recursionStack = new Set]
+        InitSets --> Circulars[circulars = empty array]
     end
 
     subgraph "Main Loop"
@@ -33,7 +33,7 @@ graph TB
 
         DepLoop --> CheckDepVisited{Dependency visited?}
 
-        CheckDepVisited -->|No - First time| RecurseDFS[Recurse: DFS(dependency)]
+        CheckDepVisited -->|No - First time| RecurseDFS[Recurse: DFS on dependency]
         CheckDepVisited -->|Yes| CheckInStack{In recursion stack?}
 
         CheckInStack -->|Yes - CIRCULAR!| Found[🔴 Circular detected!]
@@ -57,13 +57,13 @@ graph TB
     subgraph "Example Walkthrough"
         Ex[Example Graph:<br/>A → B<br/>B → C<br/>C → D<br/>D → A]
 
-        Ex --> Step1[Step 1: Visit A<br/>visited: {A}<br/>stack: {A}]
+        Ex --> Step1[Step 1: Visit A<br/>visited: SET-A<br/>stack: SET-A]
 
-        Step1 --> Step2[Step 2: Visit B (from A)<br/>visited: {A,B}<br/>stack: {A,B}]
+        Step1 --> Step2[Step 2: Visit B (from A)<br/>visited: SET-A-B<br/>stack: SET-A-B]
 
-        Step2 --> Step3[Step 3: Visit C (from B)<br/>visited: {A,B,C}<br/>stack: {A,B,C}]
+        Step2 --> Step3[Step 3: Visit C (from B)<br/>visited: SET-A-B-C<br/>stack: SET-A-B-C]
 
-        Step3 --> Step4[Step 4: Visit D (from C)<br/>visited: {A,B,C,D}<br/>stack: {A,B,C,D}]
+        Step3 --> Step4[Step 4: Visit D (from C)<br/>visited: SET-A-B-C-D<br/>stack: SET-A-B-C-D]
 
         Step4 --> Step5[Step 5: Try visit A (from D)<br/>✅ A in visited<br/>✅ A in stack<br/>🔴 CIRCULAR!]
 
