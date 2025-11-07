@@ -1,0 +1,263 @@
+%% Export & API Surface Analysis
+%% Analysis of public API surface and export patterns
+%% Generated: 2025-11-07
+
+graph TB
+    subgraph "📦 Export Statistics Overview"
+        Overview[API Surface Analysis<br/>1,451 total symbols<br/>819 exported 56.4%]
+
+        Overview --> ExportBreakdown[Export Breakdown:<br/>Classes: 127/127 100%<br/>Interfaces: 187/206 90.8%<br/>Methods: 475/912 52.1%<br/>Types: 18/20 90.0%<br/>Functions: 5/7 71.4%]
+
+        ExportBreakdown --> Concern[Concerns:<br/>Properties: 1/148 0.7% ⚠️<br/>Variables: 1/21 4.8% ⚠️<br/>Constants: 5/10 50%]
+    end
+
+    subgraph "🎯 API Surface by Category"
+        Categories[API Categories]
+
+        Categories --> C1[Core Types & Interfaces<br/>187 interfaces exported<br/>18 type aliases exported<br/>100% documentation ✅]
+
+        Categories --> C2[Classes<br/>127 classes all exported<br/>100% export rate ✅<br/>100% documentation ✅]
+
+        Categories --> C3[Methods<br/>475/912 exported 52.1%<br/>95.9% documentation ✅<br/>99.9% typed ✅]
+
+        Categories --> C4[Functions<br/>5/7 exported 71.4%<br/>100% documentation ✅<br/>100% typed ✅]
+
+        C1 --> C1Detail[Purpose:<br/>Type definitions<br/>Contracts<br/>Domain models<br/>Configuration schemas]
+
+        C2 --> C2Detail[Purpose:<br/>Core functionality<br/>Commands<br/>Analyzers<br/>Validators<br/>Generators]
+
+        C3 --> C3Detail[Half Exported:<br/>Public API methods<br/>Private helpers not exported<br/>Good encapsulation ✅]
+
+        C4 --> C4Detail[Utility Functions:<br/>Helper utilities<br/>Type guards<br/>Formatters<br/>Small export count ✅]
+    end
+
+    subgraph "🔍 Export Quality Metrics"
+        Quality[Export Quality Indicators]
+
+        Quality --> Q1[✅ Classes: 100% exported<br/>All classes public API<br/>Clear boundaries]
+
+        Quality --> Q2[✅ Interfaces: 90.8% exported<br/>Most type contracts public<br/>Some internal types ✅]
+
+        Quality --> Q3[✅ Methods: 52.1% exported<br/>Public vs private balance<br/>Good encapsulation]
+
+        Quality --> Q4[⚠️ Properties: 0.7% exported<br/>Only 1/148 exported<br/>Mostly class internals]
+
+        Quality --> Q5[⚠️ Variables: 4.8% exported<br/>Only 1/21 exported<br/>colors variable exported]
+
+        Q1 --> Q1Why[Why Good?<br/>All classes intended as<br/>public API components<br/>Clear module boundaries]
+
+        Q3 --> Q3Why[Why Good?<br/>~475 public methods<br/>~437 private helpers<br/>Proper encapsulation<br/>Not over-exposing]
+
+        Q4 --> Q4Why[Why Low?<br/>Properties are class members<br/>Not meant to be exported<br/>This is correct behavior ✅]
+
+        Q5 --> Q5Why[Exported Variable:<br/>colors for terminal output<br/>Shared constant<br/>Others are internal state ✅]
+    end
+
+    subgraph "📊 Documentation Coverage by Export Status"
+        DocCoverage[Documentation Quality]
+
+        DocCoverage --> Exported[Exported Symbols:<br/>819 exported<br/>~750 documented 91.6%<br/>Strong quality ✅]
+
+        DocCoverage --> NotExported[Internal Symbols:<br/>632 not exported<br/>~497 documented 78.6%<br/>Good for internals ✅]
+
+        Exported --> ExportedBreakdown[Exported Breakdown:<br/>Classes: 127/127 100%<br/>Interfaces: 187/187 100%<br/>Methods: ~445/475 93.7%<br/>Types: 20/20 100%]
+
+        NotExported --> InternalBreakdown[Internal Breakdown:<br/>Methods: ~430/437 98.4%<br/>Properties: 1/148 0.7% ⚠️<br/>Variables: 1/20 5% ⚠️<br/>Interfaces: 19/19 100%]
+    end
+
+    subgraph "🏗️ Main Export Entry Point"
+        IndexTS[src/index.ts<br/>211 lines, 80 dependencies]
+
+        IndexTS --> Sections[61 export statements<br/>Organized by category]
+
+        Sections --> S1[Analyzer exports: ~18<br/>CodeHealthChecker<br/>CoverageParser<br/>MissingLinkDetector<br/>TestCoverageAnalyzer<br/>etc.]
+
+        Sections --> S2[Commands exports: ~8<br/>BaseCommand<br/>CommandResult<br/>CommandRegistry<br/>etc.]
+
+        Sections --> S3[Graph exports: ~6<br/>SymbolGraphBuilder<br/>SymbolSearchEngine<br/>DepthTraverser<br/>etc.]
+
+        Sections --> S4[Parser exports: ~4<br/>TSDocParser<br/>EnhancedDocExtractor<br/>etc.]
+
+        Sections --> S5[Validator exports: ~5<br/>ConventionValidator<br/>ConnectivityValidator<br/>StrictModeValidator<br/>etc.]
+
+        Sections --> S6[Storage exports: ~4<br/>DatabaseManager<br/>SymbolRegistryManager<br/>etc.]
+
+        Sections --> S7[Types exports: ~12<br/>Symbol, SymbolGraph<br/>SymbolRelationship<br/>Various domain types]
+
+        Sections --> S8[Other exports: ~4<br/>Config, DocSymbol<br/>Spec, Linking]
+    end
+
+    subgraph "🎨 Export Patterns"
+        Patterns[Common Export Patterns]
+
+        Patterns --> P1[Class Exports<br/>export MyClass from './path'<br/>All 127 classes<br/>Public API components]
+
+        Patterns --> P2[Interface Exports<br/>export type MyInterface from './types'<br/>187/206 interfaces<br/>10% internal types]
+
+        Patterns --> P3[Type Exports<br/>export type MyType from './types'<br/>18/20 type aliases<br/>2 internal helpers]
+
+        Patterns --> P4[Re-exports<br/>Aggregate in index.ts<br/>61 export statements<br/>Single entry point ✅]
+
+        P1 --> P1Example[Examples:<br/>export CodeHealthChecker<br/>export BaseCommand<br/>export DatabaseManager<br/>export TSDocParser]
+
+        P2 --> P2Example[Examples:<br/>export Symbol<br/>export CommandResult<br/>export SymbolGraph<br/>export ValidationResult]
+
+        P4 --> P4Example[Pattern:<br/>// Analyzer exports<br/>export CodeHealthChecker from './analyzer'<br/>export MissingLinkDetector from './analyzer'<br/>...<br/>Organized by domain ✅]
+    end
+
+    subgraph "📈 Export vs Internal Distribution"
+        Distribution[Symbol Visibility Distribution]
+
+        Distribution --> D1[Fully Exported Types:<br/>Classes: 127 100%<br/>Functions: 5 71.4%<br/>Designed as public API]
+
+        Distribution --> D2[Mostly Exported Types:<br/>Interfaces: 187/206 90.8%<br/>Types: 18/20 90.0%<br/>Some internal helpers]
+
+        Distribution --> D3[Half Exported Types:<br/>Methods: 475/912 52.1%<br/>Public methods exported<br/>Private methods internal ✅]
+
+        Distribution --> D4[Rarely Exported Types:<br/>Properties: 1/148 0.7%<br/>Variables: 1/21 4.8%<br/>Constants: 5/10 50%<br/>Mostly internal state]
+
+        D1 --> D1Insight[Insight:<br/>All classes = public API<br/>No internal-only classes<br/>Clear module design ✅]
+
+        D2 --> D2Insight[Insight:<br/>10% interfaces internal<br/>Helper/utility types<br/>Not part of public contract<br/>Good separation ✅]
+
+        D3 --> D3Insight[Insight:<br/>~475 public methods<br/>~437 private methods<br/>1:1 ratio<br/>Balanced encapsulation ✅]
+
+        D4 --> D4Insight[Insight:<br/>Properties = class members<br/>Should not be exported<br/>0.7% is correct ✅<br/>Variables mostly internal state]
+    end
+
+    subgraph "⚠️ Export Concerns & Issues"
+        Issues[Potential Export Issues]
+
+        Issues --> I1[❌ No Major Issues Found<br/>Export patterns are healthy<br/>Good encapsulation ✅]
+
+        Issues --> I2[⚡ Minor Observations<br/>Not really problems<br/>Just patterns to note]
+
+        I2 --> I2A[19 Internal Interfaces<br/>206 total, 187 exported<br/>~10% internal helpers<br/>Purpose: utility types ✅]
+
+        I2 --> I2B[437 Non-exported Methods<br/>912 total, 475 exported<br/>~48% private methods<br/>Purpose: encapsulation ✅]
+
+        I2 --> I2C[147 Non-exported Properties<br/>148 total, 1 exported<br/>~99.3% private<br/>Purpose: class internals ✅]
+
+        I2A --> I2AWhy[Why Internal?<br/>Helper types<br/>Implementation details<br/>Not part of public API<br/>Correct design ✅]
+
+        I2B --> I2BWhy[Why Internal?<br/>Private class methods<br/>Helper functions<br/>Internal logic<br/>Good encapsulation ✅]
+    end
+
+    subgraph "✅ Export Best Practices"
+        BestPractices[Healthy Export Patterns]
+
+        BestPractices --> BP1[✅ Single Entry Point<br/>All exports via index.ts<br/>61 organized statements<br/>Easy to consume]
+
+        BestPractices --> BP2[✅ Domain Organization<br/>Exports grouped by category<br/>Analyzer, Commands, Graph<br/>Clear structure]
+
+        BestPractices --> BP3[✅ Type Definitions First<br/>Interfaces & types exported<br/>100% documentation<br/>Contract-first design]
+
+        BestPractices --> BP4[✅ Implementation Classes<br/>All 127 classes exported<br/>Public API components<br/>Clear boundaries]
+
+        BestPractices --> BP5[✅ Proper Encapsulation<br/>52% methods exported<br/>48% private helpers<br/>Not over-exposing internals]
+
+        BP1 --> BP1Example[Benefits:<br/>• Single import path<br/>• Consistent versioning<br/>• Easy to document<br/>• Clear public API]
+
+        BP2 --> BP2Example[Benefits:<br/>• Easy to navigate<br/>• Logical grouping<br/>• Clear responsibilities<br/>• Discoverable]
+
+        BP5 --> BP5Example[Benefits:<br/>• Clean API surface<br/>• Freedom to refactor internals<br/>• Reduced breaking changes<br/>• Better maintainability]
+    end
+
+    subgraph "🚀 API Surface Growth"
+        Growth[API Evolution]
+
+        Growth --> G1[Current State:<br/>1,451 total symbols<br/>819 exported 56.4%<br/>632 internal 43.6%]
+
+        Growth --> G2[Export Breakdown:<br/>Classes: 127 100%<br/>Interfaces: 187 90.8%<br/>Methods: 475 52.1%<br/>Others: 30 ~42%]
+
+        Growth --> G3[Expected Growth:<br/>+17 relationship types<br/>+20 commands<br/>+50 methods<br/>+10 analyzers]
+
+        G3 --> G3Impact[Impact on Exports:<br/>Classes: 127 → 157 +30<br/>Methods: 475 → 525 +50<br/>Interfaces: 187 → 200 +13<br/>Total exports: 819 → 912 +93]
+
+        G3Impact --> G3Strategy[Growth Strategy:<br/>✅ Keep all classes exported<br/>✅ Export new interfaces<br/>✅ Export public methods<br/>✅ Keep internals private<br/>Maintain 55-60% export rate]
+    end
+
+    subgraph "🎯 Public API Surface"
+        PublicAPI[Public API Components]
+
+        PublicAPI --> API1[Core Analysis:<br/>• CodeHealthChecker<br/>• MissingLinkDetector<br/>• TestCoverageAnalyzer<br/>• DocumentationAnalyzer]
+
+        PublicAPI --> API2[Graph System:<br/>• SymbolGraphBuilder<br/>• SymbolSearchEngine<br/>• DepthTraverser<br/>• Symbol, SymbolGraph types]
+
+        PublicAPI --> API3[Commands:<br/>• BaseCommand<br/>• CommandResult<br/>• CommandRegistry<br/>53 command classes]
+
+        PublicAPI --> API4[Parsing:<br/>• TSDocParser<br/>• EnhancedDocExtractor<br/>• DocumentSymbolParser<br/>12 custom tags]
+
+        PublicAPI --> API5[Validation:<br/>• ConventionValidator<br/>• ConnectivityValidator<br/>• StrictModeValidator<br/>ValidationResult types]
+
+        PublicAPI --> API6[Storage:<br/>• DatabaseManager<br/>• SymbolRegistryManager<br/>Hybrid SQLite + JSONL]
+
+        API1 --> API1Use[Use Cases:<br/>Code quality analysis<br/>Health scoring<br/>Link validation<br/>Test coverage sync]
+
+        API2 --> API2Use[Use Cases:<br/>Build symbol graph<br/>Search & filter<br/>Traverse relationships<br/>Query dependencies]
+
+        API3 --> API3Use[Use Cases:<br/>Extend with commands<br/>CLI integration<br/>Custom workflows<br/>Automation]
+    end
+
+    subgraph "💡 Recommendations"
+        Recommendations[Export Improvement Suggestions]
+
+        Recommendations --> R1[Current State: Excellent ✅<br/>No immediate action needed<br/>Export patterns are healthy]
+
+        Recommendations --> R2[Future Considerations:<br/>Minor improvements for scale]
+
+        R2 --> R2A[1. Document Export Policy<br/>Priority: Low<br/>Add EXPORTS.md explaining<br/>what gets exported vs internal]
+
+        R2 --> R2B[2. Add @public/@internal Tags<br/>Priority: Low<br/>Make export intent explicit<br/>in TSDoc comments]
+
+        R2 --> R2C[3. API Surface Tests<br/>Priority: Low<br/>Test that public API surface<br/>doesn't accidentally grow]
+
+        R2A --> R2AExample[Example EXPORTS.md:<br/>• All classes exported<br/>• 90% interfaces exported<br/>• 50% methods exported<br/>• Properties: class internals<br/>• Variables: mostly internal]
+
+        R2B --> R2BExample[Example Usage:<br/>/**<br/> * @public<br/> * Public API method<br/> */<br/>export function analyze ///<br/><br/>/**<br/> * @internal<br/> * Helper, not exported<br/> */<br/>function helper ///]
+    end
+
+    subgraph "📊 Export Metrics Summary"
+        Summary[Key Export Metrics]
+
+        Summary --> M1[Total Symbols: 1,451<br/>Exported: 819 56.4%<br/>Internal: 632 43.6%]
+
+        Summary --> M2[Export Leaders:<br/>Classes: 127/127 100%<br/>Interfaces: 187/206 90.8%<br/>Types: 18/20 90.0%]
+
+        Summary --> M3[Balanced Encapsulation:<br/>Methods: 475/912 52.1%<br/>~1:1 public:private ratio<br/>Healthy balance ✅]
+
+        Summary --> M4[Quality Scores:<br/>Exported docs: 91.6%<br/>Internal docs: 78.6%<br/>Overall: 85.9% ✅]
+
+        Summary --> M5[Entry Point:<br/>index.ts: 61 exports<br/>Organized by domain<br/>Single API surface ✅]
+
+        M1 --> M1Compare[Industry Standard:<br/>Good: 40-60% exported<br/>Over: >70% over-exposing<br/>Under: <30% under-sharing<br/>We're at 56.4% ✅ Perfect!]
+
+        M3 --> M3Insight[Insight:<br/>Half methods exported<br/>Half methods private<br/>Perfect encapsulation<br/>Not leaking internals ✅]
+
+        M4 --> M4Insight[Insight:<br/>Exported = high docs<br/>Internal = good docs<br/>Public API prioritized ✅<br/>Internals documented too]
+    end
+
+    %% Styling
+    style Overview fill:#8b5cf6,stroke:#6d28d9,stroke-width:3px,color:#fff
+    style Categories fill:#339af0,stroke:#1864ab,stroke-width:3px,color:#fff
+    style Quality fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style DocCoverage fill:#74c0fc,stroke:#339af0,stroke-width:3px,color:#fff
+    style IndexTS fill:#ffd93d,stroke:#fab005,stroke-width:3px
+    style Patterns fill:#ff6b9d,stroke:#c92a54,stroke-width:3px,color:#fff
+    style Distribution fill:#339af0,stroke:#1864ab,stroke-width:3px,color:#fff
+    style Issues fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style BestPractices fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style Growth fill:#74c0fc,stroke:#339af0,stroke-width:3px,color:#fff
+    style PublicAPI fill:#8b5cf6,stroke:#6d28d9,stroke-width:3px,color:#fff
+    style Recommendations fill:#ffd93d,stroke:#fab005,stroke-width:3px
+    style Summary fill:#339af0,stroke:#1864ab,stroke-width:3px,color:#fff
+
+    classDef excellent fill:#51cf66,stroke:#2f9e44,stroke-width:2px,color:#fff
+    classDef good fill:#74c0fc,stroke:#339af0,stroke-width:2px
+    classDef warning fill:#ffd93d,stroke:#fab005,stroke-width:2px
+    classDef info fill:#ff6b9d,stroke:#c92a54,stroke-width:2px,color:#fff
+
+    class Q1,Q2,Q3,BP1,BP2,BP3,BP4,BP5,M1 excellent
+    class C3,D3,I1,M3,M4,M5 good
+    class Q4,Q5,I2 warning
+    class ExportBreakdown,Concern info

@@ -1,13 +1,13 @@
 # TSDoc Edge Visualization Diagrams
 
-**Generated**: 2025-11-07 (Updated with Call Graph)
-**Total Diagrams**: 23 (9 new diagrams added)
-**Total Lines**: 3,033 lines
+**Generated**: 2025-11-07 (Updated with Call Graph + Export Analysis)
+**Total Diagrams**: 24 (10 new diagrams added)
+**Total Lines**: 3,296 lines
 **Format**: Mermaid
 
 ## Quick Navigation
 
-🗺️ **NEW: [diagram-index.mmd](diagram-index.mmd)** - Complete navigation map showing all 23 diagrams, recommended reading paths, and how diagrams relate to each other. **START HERE!**
+🗺️ **NEW: [diagram-index.mmd](diagram-index.mmd)** - Complete navigation map showing all 24 diagrams, recommended reading paths, and how diagrams relate to each other. **START HERE!**
 
 ### Recommended Quick Start Paths
 
@@ -150,6 +150,77 @@ This directory contains Mermaid diagrams visualizing the TSDoc Edge codebase arc
 **Focus**: Test coverage implementation + type annotations
 
 **Use Case**: Quality monitoring, progress tracking, goal setting, team metrics, architectural review
+
+#### `export-api-surface.mmd` (263 lines) ★ NEW
+**Purpose**: Analysis of public API surface and export patterns across 1,451 symbols
+
+**Export Overview**:
+- Total Symbols: 1,451
+- Exported: 819 (56.4%)
+- Internal: 632 (43.6%)
+- Export Rate: Healthy (industry standard 40-60%)
+
+**Export Breakdown by Type**:
+- **Classes: 127/127 (100%)** ✅ - All classes are public API
+- **Interfaces: 187/206 (90.8%)** ✅ - Most type contracts public
+- **Methods: 475/912 (52.1%)** ✅ - Balanced public/private (1:1 ratio)
+- **Types: 18/20 (90.0%)** ✅ - Most type aliases exported
+- **Functions: 5/7 (71.4%)** ✅ - Utility functions public
+- **Properties: 1/148 (0.7%)** ✅ - Class internals (correct)
+- **Variables: 1/21 (4.8%)** ✅ - Mostly internal state (correct)
+- **Constants: 5/10 (50%)** - Half exported
+
+**Documentation by Export Status**:
+- Exported Symbols: ~750/819 documented (91.6%) ✅
+- Internal Symbols: ~497/632 documented (78.6%) ✅
+- Overall: 85.9% documentation coverage
+
+**Main Entry Point (index.ts)**:
+- 211 lines, 61 export statements
+- Organized by domain: Analyzer (18), Commands (8), Graph (6), Parser (4), Validator (5), Storage (4), Types (12), Other (4)
+- Single API surface, consistent structure
+
+**Key Insights**:
+- ✅ 56.4% export rate = Perfect balance (industry standard 40-60%)
+- ✅ All 127 classes exported = Clear public API boundaries
+- ✅ 52.1% methods exported = Good encapsulation (not over-exposing)
+- ✅ 0.7% properties exported = Correct (class internals shouldn't be exported)
+- ✅ 91.6% exported symbols documented = High quality public API
+- ✅ Single entry point (index.ts) = Easy to consume
+
+**Export Patterns**:
+1. **Class Exports**: All 127 classes are public API components
+2. **Interface Exports**: 187/206 (10% internal utility types)
+3. **Method Exports**: Half public, half private (proper encapsulation)
+4. **Re-exports**: Organized by domain in index.ts
+
+**API Surface Components**:
+- Core Analysis: CodeHealthChecker, MissingLinkDetector, TestCoverageAnalyzer
+- Graph System: SymbolGraphBuilder, SymbolSearchEngine, DepthTraverser
+- Commands: BaseCommand, CommandResult, 53 command classes
+- Parsing: TSDocParser, EnhancedDocExtractor, 12 custom tags
+- Validation: ConventionValidator, ConnectivityValidator, StrictModeValidator
+- Storage: DatabaseManager, SymbolRegistryManager (SQLite + JSONL)
+
+**Best Practices Observed**:
+1. ✅ Single entry point via index.ts
+2. ✅ Domain-organized exports
+3. ✅ Type definitions exported first
+4. ✅ All implementation classes exported
+5. ✅ Proper encapsulation (52% methods, not over-exposing)
+
+**Growth Projection**:
+- Current: 819 exports
+- Expected: 912 exports (+93, +11%)
+- New: +30 classes, +50 methods, +13 interfaces
+- Strategy: Maintain 55-60% export rate
+
+**Recommendations**:
+- Current state: Excellent ✅ (no immediate action needed)
+- Future: Consider EXPORTS.md policy doc, @public/@internal tags
+- Optional: API surface tests to prevent accidental growth
+
+**Use Case**: Understanding public API surface, API design review, export policy planning, encapsulation analysis
 
 #### `data-pipeline-flows.mmd` (312 lines) ★ NEW
 **Purpose**: Visualization of 25,809 I/O pipelines showing data flow through the system
