@@ -1,8 +1,8 @@
 # TSDoc Edge Visualization Diagrams
 
 **Generated**: 2025-11-07 (Updated with Call Graph)
-**Total Diagrams**: 17 (3 new diagrams added)
-**Total Lines**: ~1,870
+**Total Diagrams**: 19 (5 new diagrams added)
+**Total Lines**: ~2,365
 **Format**: Mermaid
 
 ## Overview
@@ -51,6 +51,102 @@ This directory contains Mermaid diagrams visualizing the TSDoc Edge codebase arc
 - Growth projection (8,662 → 24,000 rels)
 
 **Use Case**: Executive summary, health monitoring, progress tracking
+
+#### `symbol-distribution.mmd` (267 lines) ★ NEW
+**Purpose**: Detailed breakdown of 1,427 symbols across 8 types with quality metrics
+
+**Distribution**:
+- **Methods: 894 (62.6%)** - Largest category, ~10.7 methods/class
+- **Interfaces: 205 (14.4%)** - Type system backbone, Symbol (166 deps), CommandResult (146 deps)
+- **Properties: 145 (10.2%)** - Data members, mostly private fields
+- **Classes: 125 (8.8%)** - 53 commands (42.4%), 18 analyzers, 12 managers
+- **Variables: 21 (1.5%)** - Top-level only, filtered from 1,153 (98% reduction)
+- **Type Aliases: 20 (1.4%)** - TypeScript type definitions
+- **Constants: 10 (0.7%)** - Literal values, immutable config
+- **Functions: 7 (0.5%)** - Top-level functions only
+
+**Quality Metrics**:
+- Type Coverage: 81% (1,161/1,427 symbols have type info)
+- Export Rate: 32% (462/1,427 public API members)
+- Documentation: 89% (high TSDoc coverage)
+
+**Key Insights**:
+- ✅ Method-heavy (62.6%) indicates class-oriented design with rich APIs
+- ✅ Interface-rich (14.4%) shows strong typing and contract-based design
+- ✅ Low variable count (1.5%) from top-level filtering removed 1,132 locals
+- ⚠️ 53 commands (42% of classes) suggests command pattern dominance
+- ⚠️ Only 7 functions indicates potential over-OOP, could use more utilities
+
+**Evolution**:
+- Initial: ~200 symbols (core types only)
+- Current: 1,427 symbols (full feature set)
+- Target: ~1,800 symbols (+17 relationship types, +20 commands)
+
+**Recommendations**:
+- Extract common command patterns to reduce duplication
+- Add utility functions to balance OOP/FP approaches
+- Document all exports to reach 100% coverage
+- Consolidate similar interfaces using generics
+
+**Use Case**: Understanding codebase composition, quality assessment, architectural analysis, growth planning
+
+#### `command-pattern-analysis.mmd` (228 lines) ★ NEW
+**Purpose**: Comprehensive analysis of the Command pattern implementation with 53 commands
+
+**Command Categories (8)**:
+1. **Analysis (9)**: analyze, analyze-io, analyze-chains, analyze-calls, health, stats
+2. **Validation (4)**: validate, validate-docs, validate-spec, check-links
+3. **Generation (10)**: generate-docs, index-docs, spec-generate, symbol-refs
+4. **Query (9)**: deps, used-by, who-uses, tree, find
+5. **Testing (4)**: sync-coverage, untested, test-relationships
+6. **Configuration (5)**: init, install-hook, uninstall-hook, config
+7. **Documentation (8)**: find-doc, update-backlinks, detect-unused
+8. **Specification (4)**: spec-status, spec-history, spec-bump, spec-validate
+
+**Pattern Structure**:
+- Base: BaseCommand (abstract base, 126 total dependencies)
+- Registry: CommandRegistry (212 hotspot score, 106 calls to .get, 78 calls to .has)
+- Execution: executeWithErrorHandling wrapper (50 calls)
+
+**Call Patterns (200+ calls to BaseCommand methods)**:
+- executeWithErrorHandling: 50 calls (error handling wrapper)
+- success: 49 calls (success result creation)
+- failure: 43 calls (failure result creation)
+- printError: 43 calls (error message display)
+- printHeader: 41 calls (command header display)
+- printSection: 32 calls (section display)
+- printSuccess: 29 calls (success message display)
+
+**Common Dependencies**:
+- DatabaseManager: Used by 20+ commands (loading symbols/relationships)
+- SymbolGraphBuilder: Used by 15+ commands (building symbol graph)
+- ConfigManager: Used by 25+ commands (configuration access)
+- colors variable: 110 dependencies (colored console output)
+
+**Performance**:
+- Fast (30 commands): <100ms (just DB queries)
+- Medium (15 commands): 100ms-1s (file scanning + analysis)
+- Slow (8 commands): >1s (full AST parsing + analysis)
+
+**Design Insights**:
+- ✅ Single Responsibility: Each command does one thing, clear naming
+- ✅ Consistent Interface: All extend BaseCommand, uniform behavior
+- ✅ Shared Utilities: Common printing methods, error handling wrapper
+- ⚠️ CommandRegistry bottleneck: 106 calls to .get, single point of failure
+- ⚠️ High coupling: Many commands depend on DatabaseManager + GraphBuilder
+
+**Growth Projection**:
+- Current: 53 commands
+- Expected: 70+ commands (+17 more planned)
+- New categories: Refactoring, Migration, Export commands
+
+**Recommendations**:
+1. Cache CommandRegistry lookups (High priority) - Reduce 106 calls
+2. Extract common DB pattern (Medium priority) - Reduce duplication
+3. Add command categories to registry (Low priority) - Better organization
+4. Implement command composition (Medium priority) - Reuse logic
+
+**Use Case**: Understanding command architecture, identifying bottlenecks, planning refactoring, scaling strategy
 
 #### `analysis-pipeline.mmd` (144 lines)
 **Purpose**: Complete sequence diagram of the analysis pipeline

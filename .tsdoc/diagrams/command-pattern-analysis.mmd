@@ -1,0 +1,153 @@
+%% Command Pattern Analysis
+%% 53 commands extending BaseCommand with call patterns
+%% Generated: 2025-11-07
+
+graph TB
+    subgraph "🎯 Command Pattern Overview"
+        Overview[Command Pattern Implementation<br/>53 commands total]
+
+        Overview --> Base[BaseCommand<br/>Abstract base class<br/>126 total dependencies]
+        Overview --> Registry[CommandRegistry<br/>Central registry<br/>212 hotspot score]
+        Overview --> Execution[Execution Pattern<br/>executeWithErrorHandling]
+
+        Base --> BaseAPI[Public API:<br/>execute abstract<br/>executeWithErrorHandling<br/>success, failure<br/>printHeader, printSection, etc.]
+
+        Registry --> RegistryStats[CommandRegistry.get: 106 calls<br/>CommandRegistry.has: 78 calls<br/>Most called functions in codebase]
+
+        Execution --> ExecFlow[Flow:<br/>1. executeWithErrorHandling<br/>2. try execute<br/>3. catch printError<br/>4. return CommandResult]
+    end
+
+    subgraph "📊 Command Categories (8 categories)"
+        Categories[Command Classification]
+
+        Categories --> C1[Analysis Commands 9<br/>analyze, analyze-io, analyze-chains<br/>analyze-calls, health, stats, etc.]
+        Categories --> C2[Validation Commands 4<br/>validate, validate-docs<br/>validate-spec, check-links]
+        Categories --> C3[Generation Commands 10<br/>generate-docs, index-docs<br/>spec-generate, symbol-refs, etc.]
+        Categories --> C4[Query Commands 9<br/>deps, used-by, who-uses<br/>tree, find, etc.]
+        Categories --> C5[Testing Commands 4<br/>sync-coverage, untested<br/>test-relationships, etc.]
+        Categories --> C6[Configuration Commands 5<br/>init, install-hook<br/>uninstall-hook, config, etc.]
+        Categories --> C7[Documentation Commands 8<br/>find-doc, update-backlinks<br/>detect-unused, etc.]
+        Categories --> C8[Specification Commands 4<br/>spec-status, spec-history<br/>spec-bump, spec-validate]
+
+        C1 --> C1Ex[Example:<br/>AnalyzeCommand<br/>AnalyzeIOCommand<br/>AnalyzeChainsCommand]
+        C2 --> C2Ex[Example:<br/>ValidateCommand<br/>CheckLinksCommand<br/>ValidateSpecCommand]
+        C3 --> C3Ex[Example:<br/>GenerateDocsCommand<br/>IndexDocsCommand<br/>SpecGenerateCommand]
+    end
+
+    subgraph "🔗 Dependency Patterns"
+        DepPatterns[Common Dependencies]
+
+        DepPatterns --> D1[DatabaseManager<br/>Used by: 20+ commands<br/>For: Loading symbols/relationships]
+        DepPatterns --> D2[SymbolGraphBuilder<br/>Used by: 15+ commands<br/>For: Building symbol graph]
+        DepPatterns --> D3[ConfigManager<br/>Used by: 25+ commands<br/>For: Configuration access]
+        DepPatterns --> D4[SymbolRegistryManager<br/>Used by: 10+ commands<br/>For: JSONL export/import]
+
+        D1 --> D1Pattern[Pattern:<br/>1. Load from DB<br/>2. Build graph<br/>3. Analyze<br/>4. Report]
+        D2 --> D2Pattern[Pattern:<br/>1. Get symbols<br/>2. Create graph<br/>3. Traverse<br/>4. Extract insights]
+        D3 --> D3Pattern[Pattern:<br/>1. Load config<br/>2. Get paths<br/>3. Apply rules<br/>4. Validate]
+    end
+
+    subgraph "📞 Call Patterns"
+        CallPatterns[BaseCommand Method Calls<br/>200+ calls total]
+
+        CallPatterns --> CP1[executeWithErrorHandling<br/>50 calls<br/>Wrapper for all executions]
+        CallPatterns --> CP2[success<br/>49 calls<br/>Success result creation]
+        CallPatterns --> CP3[failure<br/>43 calls<br/>Failure result creation]
+        CallPatterns --> CP4[printError<br/>43 calls<br/>Error message display]
+        CallPatterns --> CP5[printHeader<br/>41 calls<br/>Command header display]
+        CallPatterns --> CP6[printSection<br/>32 calls<br/>Section display]
+        CallPatterns --> CP7[printSuccess<br/>29 calls<br/>Success message display]
+
+        CP1 --> CP1Why[Why: Standard error handling<br/>Consistent error messages<br/>Result wrapping]
+        CP2 --> CP2Why[Why: Uniform success format<br/>CommandResult type<br/>Status code 0]
+        CP4 --> CP4Why[Why: Colored error output<br/>Consistent formatting<br/>User-friendly messages]
+    end
+
+    subgraph "🎨 Output Patterns"
+        Output[Output Utilities<br/>Used across all commands]
+
+        Output --> O1[colors variable<br/>110 dependencies<br/>Colored console output]
+        Output --> O2[printHeader<br/>Section headers with color]
+        Output --> O3[printSection<br/>Subsections with indentation]
+        Output --> O4[printSuccess/Error<br/>Status messages]
+
+        O1 --> O1Ex[Colors:<br/>green, red, yellow<br/>cyan, blue, magenta<br/>reset, bold, dim]
+        O2 --> O2Ex[Example:<br/>🔍 Analysis Results<br/>📊 Statistics<br/>⚠️  Warnings]
+        O3 --> O3Ex[Example:<br/>  • Item 1<br/>  • Item 2<br/>  → Details]
+    end
+
+    subgraph "⚡ Performance Characteristics"
+        Perf[Command Performance]
+
+        Perf --> Fast[Fast 30 commands<br/><100ms execution]
+        Perf --> Medium[Medium 15 commands<br/>100ms-1s execution]
+        Perf --> Slow[Slow 8 commands<br/>>1s execution]
+
+        Fast --> FastEx[Examples:<br/>config, deps, used-by<br/>Just DB queries]
+        Medium --> MedEx[Examples:<br/>validate, check-links<br/>File scanning + analysis]
+        Slow --> SlowEx[Examples:<br/>build, analyze-io<br/>Full AST parsing + analysis]
+
+        Fast --> FastWhy[Why: Simple queries<br/>No file I/O<br/>Cached data]
+        Slow --> SlowWhy[Why: TypeScript parsing<br/>Heavy computation<br/>Large file scanning]
+    end
+
+    subgraph "🔍 Design Insights"
+        Insights[Pattern Analysis]
+
+        Insights --> I1[✅ Single Responsibility<br/>Each command does one thing<br/>Clear naming convention]
+        Insights --> I2[✅ Consistent Interface<br/>All extend BaseCommand<br/>execute abstract method]
+        Insights --> I3[✅ Shared Utilities<br/>Common printing methods<br/>Error handling wrapper]
+        Insights --> I4[⚠️ Potential Issue<br/>CommandRegistry bottleneck<br/>106 calls to .get]
+        Insights --> I5[⚠️ High Coupling<br/>Many commands depend on<br/>DatabaseManager + GraphBuilder]
+
+        I1 --> I1Benefit[Benefit:<br/>Easy to understand<br/>Easy to test<br/>Easy to maintain]
+        I2 --> I2Benefit[Benefit:<br/>Uniform behavior<br/>Predictable API<br/>Easy to extend]
+        I4 --> I4Risk[Risk:<br/>Single point of failure<br/>Performance bottleneck<br/>Should add caching]
+        I5 --> I5Risk[Risk:<br/>Changes to core classes<br/>affect many commands<br/>Need stable interfaces]
+    end
+
+    subgraph "📈 Growth Projection"
+        Growth[Future Commands]
+
+        Growth --> G1[Expected: 70+ commands<br/>+17 more planned]
+        Growth --> G2[New Categories:<br/>Refactoring commands<br/>Migration commands<br/>Export commands]
+        Growth --> G3[Registry Scaling:<br/>Need caching for 70+ commands<br/>Consider lazy loading<br/>Optimize lookup]
+
+        G1 --> G1Examples[Planned:<br/>refactor-symbol<br/>migrate-docs<br/>export-graph<br/>import-external]
+        G2 --> G2Why[Why: User requests<br/>Common workflows<br/>Automation needs]
+        G3 --> G3How[How: Memoize CommandRegistry.get<br/>Use WeakMap cache<br/>Lazy command instantiation]
+    end
+
+    subgraph "💡 Recommendations"
+        Recs[Optimization Opportunities]
+
+        Recs --> R1[1. Cache CommandRegistry lookups<br/>Priority: High<br/>Impact: Reduce 106 calls]
+        Recs --> R2[2. Extract common DB pattern<br/>Priority: Medium<br/>Impact: Reduce duplication]
+        Recs --> R3[3. Add command categories to registry<br/>Priority: Low<br/>Impact: Better organization]
+        Recs --> R4[4. Implement command composition<br/>Priority: Medium<br/>Impact: Reuse logic]
+
+        R1 --> R1Code[Implementation:<br/>private cache = new Map<br/>get command<br/>  if cache.has return cached<br/>  else load and cache]
+        R2 --> R2Code[Implementation:<br/>abstract class DBCommand extends BaseCommand<br/>  loadGraph<br/>  loadSymbols<br/>  common DB operations]
+        R4 --> R4Code[Implementation:<br/>Commands can call other commands<br/>BuildCommand + AnalyzeCommand<br/>= BuildAndAnalyzeCommand]
+    end
+
+    %% Styling
+    style Overview fill:#8b5cf6,stroke:#6d28d9,stroke-width:3px,color:#fff
+    style Categories fill:#339af0,stroke:#1864ab,stroke-width:3px,color:#fff
+    style DepPatterns fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style CallPatterns fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px,color:#fff
+    style Output fill:#ffd93d,stroke:#fab005,stroke-width:3px
+    style Perf fill:#74c0fc,stroke:#339af0,stroke-width:3px,color:#fff
+    style Insights fill:#ff6b9d,stroke:#c92a54,stroke-width:3px,color:#fff
+    style Growth fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style Recs fill:#ffd93d,stroke:#fab005,stroke-width:3px
+
+    classDef critical fill:#ff6b6b,stroke:#c92a2a,stroke-width:2px,color:#fff
+    classDef high fill:#ffd93d,stroke:#fab005,stroke-width:2px
+    classDef medium fill:#74c0fc,stroke:#339af0,stroke-width:2px
+    classDef low fill:#51cf66,stroke:#2f9e44,stroke-width:2px
+
+    class I4,I5,R1 critical
+    class CP1,CP2,CP3,CP4,R2,R4 high
+    class D1,D2,D3,R3 medium
+    class I1,I2,I3 low
