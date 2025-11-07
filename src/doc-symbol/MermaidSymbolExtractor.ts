@@ -297,6 +297,10 @@ export class MermaidSymbolExtractor {
 
   /**
    * Generate documentation skeleton for a symbol
+   *
+   * Note: Generated as H2 (reference definition), not H1 (canonical definition)
+   * This allows multiple .mmd files to generate reference docs without conflicts.
+   * Manually promote to H1 when establishing as canonical SSOT.
    */
   private generateDocSkeleton(symbol: MermaidSymbol): string {
     const status = symbol.status === 'implemented' ? 'implemented' : 'planned';
@@ -304,14 +308,25 @@ export class MermaidSymbolExtractor {
 
     return `---
 title: ${symbol.symbolName}
-type: relationship
+type: reference
 category: ${symbol.subgraph || 'unknown'}
 status: ${status}
 implementation-progress: ${progress}
 ${symbol.metrics ? `relationships-count: ${symbol.metrics.count}` : ''}
+generated-from: mermaid-diagram
+canonical: false
 ---
 
-# [[${symbol.symbolName}]]
+# Reference: ${symbol.symbolName}
+
+> ⚠️ **This is a reference definition (H2), not canonical (H1)**
+>
+> Generated from Mermaid diagram. To make this the canonical SSOT definition:
+> 1. Change title to: \`# [[${symbol.symbolName}]]\`
+> 2. Update frontmatter: \`canonical: true\`
+> 3. Fill in all TODO sections
+
+## [[${symbol.symbolName}]]
 
 > **Type**: \`${symbol.typeHint}\`
 > **Category**: ${symbol.subgraph || 'TBD'}

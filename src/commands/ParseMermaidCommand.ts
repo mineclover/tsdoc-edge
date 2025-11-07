@@ -64,52 +64,62 @@ export class ParseMermaidCommand extends BaseCommand {
       // Display results
       this.displayParseResults(result);
 
-      // Validate against existing symbols before generating
+      // Check existing files (H2 generation is safe, only warn if canonical H1 exists)
       if (shouldGenerate) {
         console.log();
-        this.printSection('Validating Against Existing Symbols');
+        this.printSection('Checking Existing Documentation');
 
-        const existingSymbols = this.scanExistingSymbols(outputDir);
-        const conflicts: Array<{ symbol: string; existing: string; suggested: string }> = [];
-        const toGenerate: typeof result.suggestedDocs = [];
+        const existingH1Symbols = this.scanExistingH1Symbols(outputDir);
+        const canonicalConflicts: string[] = [];
+        const existingFiles: string[] = [];
 
         for (const suggestion of result.suggestedDocs) {
           const docPath = path.join(outputDir, suggestion.filename);
 
-          if (fs.existsSync(docPath)) {
-            // File exists - check if H1 matches
-            const content = fs.readFileSync(docPath, 'utf-8');
-            const h1Match = content.match(/^#\s+\[\[([^\]]+)\]\]/m);
-            const existingH1 = h1Match ? h1Match[1] : '(no H1 found)';
+          // Check if canonical H1 definition exists
+          if (existingH1Symbols.has(suggestion.symbolName)) {
+            canonicalConflicts.push(
+              `${suggestion.filename} - canonical [[${suggestion.symbolName}]] already exists`
+            );
+          }
 
-            if (existingH1 !== suggestion.symbolName) {
-              conflicts.push({
-                symbol: suggestion.symbolName,
-                existing: existingH1,
-                suggested: suggestion.filename,
-              });
-            }
-          } else {
-            toGenerate.push(suggestion);
+          // Check if file exists (will be overwritten in H2 mode)
+          if (fs.existsSync(docPath)) {
+            existingFiles.push(suggestion.filename);
           }
         }
 
-        if (conflicts.length > 0) {
-          console.log(`  ${this.colors.yellow}⚠️  Conflicts detected (${conflicts.length}):${this.colors.reset}`);
-          conflicts.forEach(c => {
-            console.log(`    • [[${c.symbol}]] vs existing [[${c.existing}]] in ${c.suggested}`);
+        if (canonicalConflicts.length > 0) {
+          console.log(`  ${this.colors.yellow}⚠️  Canonical symbols exist (${canonicalConflicts.length}):${this.colors.reset}`);
+          canonicalConflicts.slice(0, 5).forEach(c => {
+            console.log(`    ${this.colors.dim}${c}${this.colors.reset}`);
           });
+          if (canonicalConflicts.length > 5) {
+            console.log(`    ${this.colors.dim}... and ${canonicalConflicts.length - 5} more${this.colors.reset}`);
+          }
+          console.log(`  ${this.colors.cyan}💡 H2 reference docs will be generated (not canonical H1)${this.colors.reset}`);
           console.log();
-          console.log(`  ${this.colors.cyan}💡 Resolve conflicts manually or use --force to overwrite${this.colors.reset}`);
+        }
+
+        if (existingFiles.length > 0) {
+          console.log(`  ${this.colors.yellow}⚠️  Files will be overwritten (${existingFiles.length}):${this.colors.reset}`);
+          existingFiles.slice(0, 5).forEach(f => {
+            console.log(`    ${this.colors.dim}${f}${this.colors.reset}`);
+          });
+          if (existingFiles.length > 5) {
+            console.log(`    ${this.colors.dim}... and ${existingFiles.length - 5} more${this.colors.reset}`);
+          }
 
           if (!args.includes('--force')) {
-            this.printWarning('Skipping generation due to conflicts (use --force to override)');
-            return this.success('Validation complete');
+            console.log();
+            console.log(`  ${this.colors.cyan}💡 Use --force to overwrite existing files${this.colors.reset}`);
+            this.printWarning('Skipping generation (use --force to overwrite)');
+            return this.success('Check complete');
           }
         }
 
         console.log();
-        this.printSection('Generating Documentation');
+        this.printSection('Generating H2 Reference Documentation');
 
         const outputDirAbs = path.resolve(process.cwd(), outputDir);
         if (!fs.existsSync(outputDirAbs)) {
@@ -120,18 +130,16 @@ export class ParseMermaidCommand extends BaseCommand {
         let generated = 0;
         let skipped = 0;
 
-        // Use validated list (toGenerate) or all if --force
-        const docsToGenerate = args.includes('--force') ? result.suggestedDocs : toGenerate;
-
-        for (const suggestion of docsToGenerate) {
+        for (const suggestion of result.suggestedDocs) {
           const docPath = path.join(outputDirAbs, suggestion.filename);
 
-          if (fs.existsSync(docPath)) {
-            console.log(`  ${this.colors.yellow}⊘${this.colors.reset} ${suggestion.filename} (already exists)`);
+          // In H2 mode, we can safely overwrite (if --force) or skip
+          if (fs.existsSync(docPath) && !args.includes('--force')) {
             skipped++;
           } else {
             fs.writeFileSync(docPath, suggestion.skeleton, 'utf-8');
-            console.log(`  ${this.colors.green}✓${this.colors.reset} ${suggestion.filename}`);
+            const action = fs.existsSync(docPath) ? 'updated' : 'created';
+            console.log(`  ${this.colors.green}✓${this.colors.reset} ${suggestion.filename} (${action} as H2 reference)`);
             generated++;
           }
         }
@@ -244,9 +252,12 @@ export class ParseMermaidCommand extends BaseCommand {
   }
 
   /**
-   * Scan existing markdown files for H1 [[Symbol]] definitions
+   * Scan existing markdown files for canonical H1 [[Symbol]] definitions
+   *
+   * Only detects H1 definitions: # [[Symbol]]
+   * H2 definitions (## [[Symbol]]) are references, not canonical
    */
-  private scanExistingSymbols(dir: string): Map<string, string> {
+  private scanExistingH1Symbols(dir: string): Map<string, string> {
     const symbols = new Map<string, string>();
 
     if (!fs.existsSync(dir)) {
