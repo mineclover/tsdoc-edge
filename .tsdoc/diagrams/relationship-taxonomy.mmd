@@ -71,7 +71,7 @@ graph TB
         A --> A2[module-boundary ❌<br/>~80 expected]
 
         A1 --> A1Ex[Example:<br/>Presentation → Business<br/>Business → Data<br/>→ Layer violations detected]
-        A2 --> A2Ex[Example:<br/>@core/user imports @external/stripe<br/>Internal → External<br/>→ Boundary crossings]
+        A2 --> A2Ex[Example:<br/>@-core/user imports @external/stripe<br/>Internal → External<br/>→ Boundary crossings]
 
         A1 --> A1Use[Use: Architecture compliance<br/>Layer violation detection<br/>Dependency rule enforcement]
         A2 --> A2Use[Use: Module isolation<br/>External dependency tracking<br/>Package organization]
@@ -93,8 +93,8 @@ graph TB
         Doc --> Doc1[doc-reference ❌<br/>~800 expected]
         Doc --> Doc2[enhancement ❌<br/>~500 expected]
 
-        Doc1 --> Doc1Ex[Example:<br/>@doc [[Authentication System]]<br/>managed/auth.md references AuthService<br/>→ Bidirectional doc-code links]
-        Doc2 --> Doc2Ex[Example:<br/>@problem, @functionality tags<br/>Enhanced documentation metadata<br/>→ Structured doc content]
+        Doc1 --> Doc1Ex[Example:<br/>@-doc [[Authentication System]]<br/>managed/auth.md references AuthService<br/>→ Bidirectional doc-code links]
+        Doc2 --> Doc2Ex[Example:<br/>@-problem, @functionality tags<br/>Enhanced documentation metadata<br/>→ Structured doc content]
 
         Doc1 --> Doc1Use[Use: Doc-code sync<br/>SSOT enforcement<br/>Documentation graph]
         Doc2 --> Doc2Use[Use: Documentation quality<br/>Enhanced doc navigation<br/>Metadata-driven insights]

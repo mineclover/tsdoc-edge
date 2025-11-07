@@ -28,14 +28,14 @@ graph TB
     subgraph "🎯 Call Detection Features"
         Features[Detection Capabilities]
 
-        Features --> Direct[Direct Calls<br/>foo()]
-        Features --> Method[Method Calls<br/>obj.method()]
-        Features --> Filtering[Built-in Filtering<br/>Object.entries, console.log]
+        Features --> Direct[Direct Calls<br/>foo-call]
+        Features --> Method[Method Calls<br/>obj-method-call]
+        Features --> Filtering[Built-in Filtering<br/>Object-entries, console-log]
         Features --> SmartResolve[Smart Resolution<br/>Type preference, name matching]
 
         Direct --> Example1[Example:<br/>parseFile calls findFile]
-        Method --> Example2[Example:<br/>analyzer.analyze calls getStats]
-        Filtering --> Example3[Filtered:<br/>Object.entries, Array.from<br/>console.log, Math.floor]
+        Method --> Example2[Example:<br/>analyzer-analyze calls getStats]
+        Filtering --> Example3[Filtered:<br/>Object-entries, Array-from<br/>console-log, Math-floor]
         SmartResolve --> Example4[Priority:<br/>Same file > Exported > Any<br/>Method > Variable]
     end
 

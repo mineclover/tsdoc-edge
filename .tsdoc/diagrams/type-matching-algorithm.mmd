@@ -13,7 +13,7 @@ graph TB
         CheckPrim1 -->|Yes - string, number, etc| SkipProd
         CheckPrim1 -->|No - User, Config, etc| AddToProd[Add to producer map]
 
-        AddToProd --> ProducerMap["Map&lt;typeName, producers[]&gt;<br/><br/>Example:<br/>'User' → [{<br/>  symbolId: 'get-user',<br/>  symbolName: 'getUser',<br/>  returnType: 'User'<br/>}]"]
+        AddToProd --> ProducerMap["Map&lt;typeName, producers[]&gt;<br/><br/>Example:<br/>'User' → LIST:{<br/>  symbolId: 'get-user',<br/>  symbolName: 'getUser',<br/>  returnType: 'User'<br/>}]"]
     end
 
     subgraph "Phase 2: Build Consumer Map"
@@ -28,7 +28,7 @@ graph TB
         CheckPrim2 -->|Yes| SkipCons
         CheckPrim2 -->|No| AddToCons[Add to consumer map]
 
-        AddToCons --> ConsumerMap["Map&lt;typeName, consumers[]&gt;<br/><br/>Example:<br/>'User' → [{<br/>  symbolId: 'update-user',<br/>  symbolName: 'updateUser',<br/>  paramType: 'User'<br/>}]"]
+        AddToCons --> ConsumerMap["Map&lt;typeName, consumers[]&gt;<br/><br/>Example:<br/>'User' → LIST:{<br/>  symbolId: 'update-user',<br/>  symbolName: 'updateUser',<br/>  paramType: 'User'<br/>}]"]
     end
 
     subgraph "Phase 3: Type Matching"
@@ -64,7 +64,7 @@ graph TB
         Ex[Example Type: 'User']
 
         Ex --> ExProd["Producers (2):<br/>1. getUser(): User<br/>2. fetchUser(): User"]
-        Ex --> ExCons["Consumers (3):<br/>1. updateUser(user: User)<br/>2. deleteUser(user: User)<br/>3. notifyUser(user: User)"]
+        Ex --> ExCons["Consumers (3):<br/>1. updateUser-calluser-User<br/>2. deleteUser(user-User<br/>3. notifyUser(user-User"]
 
         ExProd --> ExMatch[Match]
         ExCons --> ExMatch
@@ -101,7 +101,7 @@ graph TB
     end
 
     subgraph "Performance Optimization"
-        Opt1[Use Map for O(1) lookups]
+        Opt1[Use Map for O-1 lookups]
         Opt2[Filter primitives early]
         Opt3[Skip self-references]
         Opt4[Batch insert to DB]
@@ -123,9 +123,9 @@ graph TB
     style PerfNote fill:#e7f5ff,stroke:#1864ab,stroke-width:1px,stroke-dasharray: 5 5
 
     %% Complexity annotations
-    Complexity1[Time: O(n) - build maps]
-    Complexity2[Space: O(n) - store maps]
-    Complexity3[Matching: O(p×c) per type<br/>where p=producers, c=consumers]
+    Complexity1[Time: O-n - build maps]
+    Complexity2[Space: O-n - store maps]
+    Complexity3[Matching: O-p×c per type<br/>where p=producers, c=consumers]
 
     FilterProducers -.-> Complexity1
     FilterConsumers -.-> Complexity1

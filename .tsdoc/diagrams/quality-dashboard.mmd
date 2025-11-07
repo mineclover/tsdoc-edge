@@ -43,7 +43,7 @@ graph TB
 
         DocQuality --> DocFeatures[Documentation Features:<br/>✅ TSDoc standard tags<br/>✅ 12 custom tags<br/>✅ Enhanced metadata<br/>✅ Pre-commit validation]
 
-        DocFeatures --> CustomTags[Custom Tags:<br/>@problem, @functionality<br/>@errorExp, @decision<br/>@dependency, @plan<br/>@contract, @responsibility]
+        DocFeatures --> CustomTags[Custom Tags:<br/>@-problem, @functionality<br/>@errorExp, @-decision<br/>@-dependency, @-plan<br/>@-contract, @-responsibility]
     end
 
     subgraph "🔓 Export Tracking Quality (57/100)"
@@ -58,7 +58,7 @@ graph TB
 
         ExportQuality --> ExportIssue[⚠️ Issue: Export inheritance<br/>All class members marked exported<br/>Should distinguish public/private]
 
-        ExportIssue --> ExportFix[Fix Needed:<br/>1. Track visibility separately<br/>2. Public vs Exported<br/>3. Use @public/@internal tags<br/>4. Update extraction logic]
+        ExportIssue --> ExportFix[Fix Needed:<br/>1. Track visibility separately<br/>2. Public vs Exported<br/>3. Use @-public/@internal tags<br/>4. Update extraction logic]
     end
 
     subgraph "🏛️ Architecture Quality (100/100)"
@@ -103,7 +103,7 @@ graph TB
         P3 --> P3Good[✅ Acceptable<br/>One-time analysis<br/>Cached results]
         P4 --> P4Good[✅ Excellent<br/>Instant queries<br/>FTS indexing]
 
-        Perf --> PerfBottlenecks[Bottlenecks:<br/>⚠️ Large file parsing 500ms<br/>⚠️ IO analysis O(n²)<br/>✅ Most operations optimized]
+        Perf --> PerfBottlenecks[Bottlenecks:<br/>⚠️ Large file parsing 500ms<br/>⚠️ IO analysis O-n²<br/>✅ Most operations optimized]
     end
 
     subgraph "💾 Storage Quality"
@@ -158,7 +158,7 @@ graph TB
         Recs --> R_5[5. Complete relationship types<br/>Priority: Medium<br/>Impact: Full feature set]
 
         R_1 --> R_1Plan[Plan:<br/>1. Detect .test.ts files<br/>2. Map to implementation<br/>3. Calculate coverage<br/>4. Visualize gaps]
-        R_2 --> R_2Plan[Plan:<br/>1. Add @public/@internal tags<br/>2. Track visibility separately<br/>3. Update extraction logic<br/>4. Fix inheritance issue]
+        R_2 --> R_2Plan[Plan:<br/>1. Add @-public/@internal tags<br/>2. Track visibility separately<br/>3. Update extraction logic<br/>4. Fix inheritance issue]
         R_3 --> R_3Plan[Plan:<br/>1. Identify untyped exports<br/>2. Add type annotations<br/>3. Enable strict flags<br/>4. Remove any types]
     end
 

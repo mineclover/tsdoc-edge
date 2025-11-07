@@ -208,13 +208,13 @@ graph TB
 
         R2 --> R2A[1. Document Export Policy<br/>Priority: Low<br/>Add EXPORTS.md explaining<br/>what gets exported vs internal]
 
-        R2 --> R2B[2. Add @public/@internal Tags<br/>Priority: Low<br/>Make export intent explicit<br/>in TSDoc comments]
+        R2 --> R2B[2. Add @-public/@internal Tags<br/>Priority: Low<br/>Make export intent explicit<br/>in TSDoc comments]
 
         R2 --> R2C[3. API Surface Tests<br/>Priority: Low<br/>Test that public API surface<br/>doesn't accidentally grow]
 
         R2A --> R2AExample[Example EXPORTS.md:<br/>• All classes exported<br/>• 90% interfaces exported<br/>• 50% methods exported<br/>• Properties: class internals<br/>• Variables: mostly internal]
 
-        R2B --> R2BExample[Example Usage:<br/>/**<br/> * @public<br/> * Public API method<br/> */<br/>export function analyze ///<br/><br/>/**<br/> * @internal<br/> * Helper, not exported<br/> */<br/>function helper ///]
+        R2B --> R2BExample[Example Usage:<br/>/**<br/> * @-public<br/> * Public API method<br/> */<br/>export function analyze ///<br/><br/>/**<br/> * @internal<br/> * Helper, not exported<br/> */<br/>function helper ///]
     end
 
     subgraph "📊 Export Metrics Summary"
