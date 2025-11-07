@@ -64,8 +64,50 @@ export class ParseMermaidCommand extends BaseCommand {
       // Display results
       this.displayParseResults(result);
 
-      // Generate docs if requested
+      // Validate against existing symbols before generating
       if (shouldGenerate) {
+        console.log();
+        this.printSection('Validating Against Existing Symbols');
+
+        const existingSymbols = this.scanExistingSymbols(outputDir);
+        const conflicts: Array<{ symbol: string; existing: string; suggested: string }> = [];
+        const toGenerate: typeof result.suggestedDocs = [];
+
+        for (const suggestion of result.suggestedDocs) {
+          const docPath = path.join(outputDir, suggestion.filename);
+
+          if (fs.existsSync(docPath)) {
+            // File exists - check if H1 matches
+            const content = fs.readFileSync(docPath, 'utf-8');
+            const h1Match = content.match(/^#\s+\[\[([^\]]+)\]\]/m);
+            const existingH1 = h1Match ? h1Match[1] : '(no H1 found)';
+
+            if (existingH1 !== suggestion.symbolName) {
+              conflicts.push({
+                symbol: suggestion.symbolName,
+                existing: existingH1,
+                suggested: suggestion.filename,
+              });
+            }
+          } else {
+            toGenerate.push(suggestion);
+          }
+        }
+
+        if (conflicts.length > 0) {
+          console.log(`  ${this.colors.yellow}⚠️  Conflicts detected (${conflicts.length}):${this.colors.reset}`);
+          conflicts.forEach(c => {
+            console.log(`    • [[${c.symbol}]] vs existing [[${c.existing}]] in ${c.suggested}`);
+          });
+          console.log();
+          console.log(`  ${this.colors.cyan}💡 Resolve conflicts manually or use --force to overwrite${this.colors.reset}`);
+
+          if (!args.includes('--force')) {
+            this.printWarning('Skipping generation due to conflicts (use --force to override)');
+            return this.success('Validation complete');
+          }
+        }
+
         console.log();
         this.printSection('Generating Documentation');
 
@@ -78,7 +120,10 @@ export class ParseMermaidCommand extends BaseCommand {
         let generated = 0;
         let skipped = 0;
 
-        for (const suggestion of result.suggestedDocs) {
+        // Use validated list (toGenerate) or all if --force
+        const docsToGenerate = args.includes('--force') ? result.suggestedDocs : toGenerate;
+
+        for (const suggestion of docsToGenerate) {
           const docPath = path.join(outputDirAbs, suggestion.filename);
 
           if (fs.existsSync(docPath)) {
@@ -196,6 +241,32 @@ export class ParseMermaidCommand extends BaseCommand {
         console.log(`    ${this.colors.dim}... and ${result.suggestedDocs.length - 5} more${this.colors.reset}`);
       }
     }
+  }
+
+  /**
+   * Scan existing markdown files for H1 [[Symbol]] definitions
+   */
+  private scanExistingSymbols(dir: string): Map<string, string> {
+    const symbols = new Map<string, string>();
+
+    if (!fs.existsSync(dir)) {
+      return symbols;
+    }
+
+    const files = fs.readdirSync(dir);
+    for (const file of files) {
+      if (!file.endsWith('.md')) continue;
+
+      const filePath = path.join(dir, file);
+      const content = fs.readFileSync(filePath, 'utf-8');
+      const h1Match = content.match(/^#\s+\[\[([^\]]+)\]\]/m);
+
+      if (h1Match) {
+        symbols.set(h1Match[1], filePath);
+      }
+    }
+
+    return symbols;
   }
 
   private extractFlag(args: string[], flag: string): string | undefined {

@@ -71,6 +71,7 @@ import { AnalyzeTypesCommand } from './commands/AnalyzeTypesCommand';
 import { WorkContextCommand } from './commands/WorkContextCommand';
 import { ExploreEntrypointCommand } from './commands/ExploreEntrypointCommand';
 import { ParseMermaidCommand } from './commands/ParseMermaidCommand';
+import { ValidateSymbolRefsCommand } from './commands/ValidateSymbolRefsCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -157,6 +158,7 @@ async function main(): Promise<void> {
   registry.register(new WorkContextCommand());
   registry.register(new ExploreEntrypointCommand());
   registry.register(new ParseMermaidCommand());
+  registry.register(new ValidateSymbolRefsCommand());
   registry.register(new HelpCommand(registry));
 
   // Get command
