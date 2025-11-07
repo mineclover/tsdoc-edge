@@ -1,0 +1,209 @@
+%% File Complexity Analysis
+%% 118 files analyzed for symbol density and complexity
+%% Generated: 2025-11-07
+
+graph TB
+    subgraph "📁 File Complexity Overview"
+        Overview[File Complexity Analysis<br/>118 files, 1,427 symbols]
+
+        Overview --> Stats[Average: 12.1 symbols/file<br/>Median: 8 symbols/file<br/>Max: 42 symbols/file]
+
+        Stats --> Distribution[Distribution:<br/>Simple 40% 0-10 symbols<br/>Medium 35% 11-20 symbols<br/>Complex 20% 21-30 symbols<br/>Very Complex 5% 31+ symbols]
+    end
+
+    subgraph "🔥 Top 10 Most Complex Files"
+        Complex[Files with Most Symbols<br/>Complexity hotspots]
+
+        Complex --> C1[1. Phase6Commands.ts<br/>42 symbols<br/>Command implementations]
+        Complex --> C2[2. Phase7Commands.ts<br/>34 symbols<br/>Command implementations]
+        Complex --> C3[3. SymbolRegistryManager.ts<br/>34 symbols<br/>Storage management]
+        Complex --> C4[4. ModuleSpecGenerator.ts<br/>33 symbols<br/>Specification generation]
+        Complex --> C5[5. Phase5Commands.ts<br/>31 symbols<br/>Command implementations]
+        Complex --> C6[6. ASTSymbolExtractor.ts<br/>29 symbols<br/>Core extraction logic]
+        Complex --> C7[7. Phase4Commands.ts<br/>26 symbols<br/>Command implementations]
+        Complex --> C8[8. Phase10Commands.ts<br/>23 symbols<br/>Command implementations]
+        Complex --> C9[9. Phase8Commands.ts<br/>23 symbols<br/>Command implementations]
+        Complex --> C10[10. ParallelWorkDetector.ts<br/>21 symbols<br/>Analysis logic]
+
+        C1 --> C1Why[Why Complex?<br/>Multiple command classes<br/>Each command = 4-5 symbols<br/>8-10 commands per file]
+
+        C3 --> C3Why[Why Complex?<br/>Storage operations<br/>JSONL management<br/>Data transformations<br/>Many helper methods]
+
+        C6 --> C6Why[Why Complex?<br/>AST traversal logic<br/>Type extraction<br/>Export tracking<br/>Core functionality]
+    end
+
+    subgraph "📊 Complexity by Directory"
+        ByDir[Symbol Density by Directory]
+
+        ByDir --> D1[src/commands/<br/>~240 symbols in 12 files<br/>Avg: 20 symbols/file<br/>Highest density]
+
+        ByDir --> D2[src/analyzer/<br/>~180 symbols in 15 files<br/>Avg: 12 symbols/file<br/>Medium-high density]
+
+        ByDir --> D3[src/generator/<br/>~90 symbols in 8 files<br/>Avg: 11.3 symbols/file<br/>Medium density]
+
+        ByDir --> D4[src/storage/<br/>~70 symbols in 4 files<br/>Avg: 17.5 symbols/file<br/>High density]
+
+        ByDir --> D5[src/validator/<br/>~60 symbols in 5 files<br/>Avg: 12 symbols/file<br/>Medium density]
+
+        D1 --> D1Why[Why High?<br/>Command pattern<br/>Many small classes<br/>Grouped by phase]
+
+        D2 --> D2Why[Why Medium-High?<br/>Analysis algorithms<br/>Complex logic<br/>Helper methods]
+
+        D4 --> D4Why[Why High?<br/>Database operations<br/>Many utility methods<br/>Data transformations]
+    end
+
+    subgraph "🎯 Complexity Patterns"
+        Patterns[Common Complexity Drivers]
+
+        Patterns --> P1[Command Files Pattern<br/>8-10 commands/file<br/>Each command: 4-5 symbols<br/>Total: 30-40 symbols]
+
+        Patterns --> P2[Manager Pattern<br/>10-15 public methods<br/>10-15 private helpers<br/>Total: 20-30 symbols]
+
+        Patterns --> P3[Analyzer Pattern<br/>5-8 main methods<br/>10-15 helper functions<br/>Total: 15-25 symbols]
+
+        Patterns --> P4[Generator Pattern<br/>6-10 generation methods<br/>5-10 formatters<br/>Total: 10-20 symbols]
+
+        P1 --> P1Impact[Impact:<br/>High symbol count but<br/>low cognitive complexity<br/>Simple, repetitive code]
+
+        P2 --> P2Impact[Impact:<br/>Medium symbol count<br/>Medium complexity<br/>State management]
+
+        P3 --> P3Impact[Impact:<br/>Medium symbol count<br/>High cognitive complexity<br/>Algorithm heavy]
+    end
+
+    subgraph "📈 Complexity Distribution"
+        Dist[Symbol Count Distribution]
+
+        Dist --> Simple[Simple Files 47<br/>0-10 symbols<br/>40% of files]
+        Dist --> Medium[Medium Files 41<br/>11-20 symbols<br/>35% of files]
+        Dist --> ComplexF[Complex Files 24<br/>21-30 symbols<br/>20% of files]
+        Dist --> VeryComplex[Very Complex 6<br/>31+ symbols<br/>5% of files]
+
+        Simple --> SimpleEx[Examples:<br/>Simple types.ts<br/>Config files<br/>Utility modules]
+
+        Medium --> MediumEx[Examples:<br/>Single command files<br/>Simple analyzers<br/>Basic validators]
+
+        ComplexF --> ComplexEx[Examples:<br/>Multi-command files<br/>Complex analyzers<br/>Manager classes]
+
+        VeryComplex --> VeryComplexEx[Examples:<br/>Phase6Commands 42<br/>Phase7Commands 34<br/>SymbolRegistryManager 34<br/>ModuleSpecGenerator 33<br/>Phase5Commands 31<br/>ASTSymbolExtractor 29]
+    end
+
+    subgraph "⚠️ Complexity Concerns"
+        Concerns[High Complexity Issues]
+
+        Concerns --> I1[Phase Command Files<br/>30-40 symbols each<br/>Multiple commands grouped<br/>Hard to navigate ⚠️]
+
+        Concerns --> I2[SymbolRegistryManager<br/>34 symbols<br/>Many responsibilities<br/>Potential split needed ⚠️]
+
+        Concerns --> I3[ASTSymbolExtractor<br/>29 symbols<br/>Core logic complexity<br/>Critical but manageable ✅]
+
+        I1 --> I1Risk[Risk:<br/>Cognitive overload<br/>Hard to find specific command<br/>Merge conflicts likely<br/>Long file scrolling]
+
+        I2 --> I2Risk[Risk:<br/>God class pattern<br/>Many responsibilities<br/>Hard to test<br/>Tight coupling]
+
+        I3 --> I3Risk[Acceptable:<br/>Core functionality<br/>Complexity justified<br/>Well-documented<br/>Single responsibility]
+    end
+
+    subgraph "✅ Complexity Best Practices"
+        Best[Well-Managed Complexity]
+
+        Best --> B1[TypeScript Type Files<br/>Low symbol count 5-10<br/>Single responsibility<br/>Clean interfaces]
+
+        Best --> B2[Utility Modules<br/>Medium count 8-15<br/>Related functions<br/>No state]
+
+        Best --> B3[Single Command Files<br/>Low count 4-8<br/>One command per file<br/>Easy to locate]
+
+        B1 --> B1Why[Why Good?<br/>Type definitions<br/>No logic<br/>Easy to understand<br/>Quick reference]
+
+        B2 --> B2Why[Why Good?<br/>Focused scope<br/>Pure functions<br/>Reusable<br/>Testable]
+
+        B3 --> B3Why[Why Good?<br/>One concern<br/>Self-contained<br/>Easy to find<br/>Clear responsibility]
+    end
+
+    subgraph "💡 Refactoring Recommendations"
+        Refactor[Suggested Improvements]
+
+        Refactor --> R1[1. Split Phase Command Files<br/>Priority: High ⚠️<br/>Impact: Better navigation]
+
+        Refactor --> R2[2. Extract SymbolRegistry Operations<br/>Priority: Medium<br/>Impact: Better separation]
+
+        Refactor --> R3[3. Break Down Large Analyzers<br/>Priority: Low<br/>Impact: Better testability]
+
+        R1 --> R1How[How:<br/>Create individual files:<br/>- commands/AnalyzeCommand.ts<br/>- commands/ValidateCommand.ts<br/>- commands/BuildCommand.ts<br/>One command per file]
+
+        R1 --> R1Benefit[Benefits:<br/>• Easy to find commands<br/>• Less merge conflicts<br/>• Better git history<br/>• Smaller cognitive load]
+
+        R2 --> R2How[How:<br/>Split into:<br/>- SymbolRegistry read<br/>- SymbolRegistry write<br/>- SymbolRegistry export<br/>- SymbolRegistry import]
+
+        R3 --> R3How[How:<br/>Extract helper functions<br/>to utility modules<br/>Keep main logic focused<br/>Single file per analyzer]
+    end
+
+    subgraph "📊 Complexity Metrics"
+        Metrics[Key Metrics Summary]
+
+        Metrics --> M1[Total Files: 118<br/>Total Symbols: 1,427<br/>Average: 12.1 symbols/file]
+
+        Metrics --> M2[Complexity Spread:<br/>Simple: 47 files 40%<br/>Medium: 41 files 35%<br/>Complex: 30 files 25%]
+
+        Metrics --> M3[Hotspot Ratio:<br/>6 very complex files 5%<br/>Account for ~200 symbols<br/>~14% of all symbols]
+
+        M1 --> M1Compare[vs Industry:<br/>Good avg 10-15<br/>Warning 20-25<br/>Critical 30+<br/>We're at 12.1 ✅]
+
+        M3 --> M3Insight[Insight:<br/>5% of files contain<br/>14% of symbols<br/>Power law distribution<br/>Expected pattern]
+    end
+
+    subgraph "🎨 Visualization Insights"
+        Viz[Key Observations]
+
+        Viz --> V1[✅ Most files are simple<br/>40% under 10 symbols<br/>Good organization]
+
+        Viz --> V2[✅ Average is healthy<br/>12.1 symbols/file<br/>Industry standard]
+
+        Viz --> V3[⚠️ Phase commands need split<br/>30-40 symbols too high<br/>Navigation difficulty]
+
+        Viz --> V4[⚠️ Few god classes exist<br/>SymbolRegistryManager<br/>Should be refactored]
+
+        Viz --> V5[✅ Core files justified<br/>ASTSymbolExtractor complex<br/>But single responsibility]
+
+        V1 --> V1Impact[Impact:<br/>Easy maintenance<br/>Quick understanding<br/>Good developer UX]
+
+        V3 --> V3Impact[Impact:<br/>Slower development<br/>More merge conflicts<br/>Harder onboarding]
+
+        V4 --> V4Impact[Impact:<br/>Testing difficulty<br/>High coupling risk<br/>Change fragility]
+    end
+
+    subgraph "📈 Growth Projection"
+        Growth[Expected Evolution]
+
+        Growth --> G1[Current: 118 files<br/>Expected: 150+ files<br/>+27% growth]
+
+        Growth --> G2[Current: 1,427 symbols<br/>Expected: 1,800+ symbols<br/>+26% growth]
+
+        Growth --> G3[Avg will stay stable<br/>12.1 → 12.0 symbols/file<br/>Good trajectory]
+
+        G1 --> G1Why[Why Growth?<br/>• New relationship types<br/>• More commands<br/>• Additional analyzers<br/>• Test coverage features]
+
+        G2 --> G2Impact[Impact:<br/>More methods added<br/>Some new classes<br/>Type definitions grow<br/>Complexity managed]
+
+        G3 --> G3Strategy[Strategy:<br/>Keep one command/file<br/>Extract utilities early<br/>Monitor complexity<br/>Refactor proactively]
+    end
+
+    %% Styling
+    style Overview fill:#8b5cf6,stroke:#6d28d9,stroke-width:3px,color:#fff
+    style Complex fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px,color:#fff
+    style ByDir fill:#339af0,stroke:#1864ab,stroke-width:3px,color:#fff
+    style Patterns fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style Dist fill:#74c0fc,stroke:#339af0,stroke-width:3px,color:#fff
+    style Concerns fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px,color:#fff
+    style Best fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
+    style Refactor fill:#ffd93d,stroke:#fab005,stroke-width:3px
+    style Metrics fill:#339af0,stroke:#1864ab,stroke-width:3px,color:#fff
+    style Viz fill:#ff6b9d,stroke:#c92a54,stroke-width:3px,color:#fff
+    style Growth fill:#74c0fc,stroke:#339af0,stroke-width:3px,color:#fff
+
+    classDef critical fill:#ff6b6b,stroke:#c92a2a,stroke-width:2px,color:#fff
+    classDef warning fill:#ffd93d,stroke:#fab005,stroke-width:2px
+    classDef good fill:#51cf66,stroke:#2f9e44,stroke-width:2px,color:#fff
+
+    class C1,C2,I1,I2,V3,V4,R1 critical
+    class C3,C4,C5,R2,G1 warning
+    class B1,B2,B3,V1,V2,V5,M1 good

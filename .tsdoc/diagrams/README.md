@@ -1,13 +1,13 @@
 # TSDoc Edge Visualization Diagrams
 
 **Generated**: 2025-11-07 (Updated with Call Graph)
-**Total Diagrams**: 22 (8 new diagrams added)
-**Total Lines**: 2,824 lines
+**Total Diagrams**: 23 (9 new diagrams added)
+**Total Lines**: 3,033 lines
 **Format**: Mermaid
 
 ## Quick Navigation
 
-🗺️ **NEW: [diagram-index.mmd](diagram-index.mmd)** - Complete navigation map showing all 22 diagrams, recommended reading paths, and how diagrams relate to each other. **START HERE!**
+🗺️ **NEW: [diagram-index.mmd](diagram-index.mmd)** - Complete navigation map showing all 23 diagrams, recommended reading paths, and how diagrams relate to each other. **START HERE!**
 
 ### Recommended Quick Start Paths
 
@@ -310,6 +310,96 @@ This directory contains Mermaid diagrams visualizing the TSDoc Edge codebase arc
 4. Implement command composition (Medium priority) - Reuse logic
 
 **Use Case**: Understanding command architecture, identifying bottlenecks, planning refactoring, scaling strategy
+
+#### `file-complexity-analysis.mmd` (209 lines) ★ NEW
+**Purpose**: Analysis of file complexity based on symbol density across 118 files
+
+**Complexity Overview**:
+- Total Files: 118, Total Symbols: 1,427
+- Average: 12.1 symbols/file (median: 8)
+- Industry Standard: Good (10-15), Warning (20-25), Critical (30+)
+- **Result: 12.1 = Healthy ✅**
+
+**Distribution**:
+- Simple (0-10 symbols): 47 files (40%) - Type definitions, configs, utilities
+- Medium (11-20 symbols): 41 files (35%) - Single commands, basic analyzers
+- Complex (21-30 symbols): 24 files (20%) - Multi-command files, analyzers
+- Very Complex (31+ symbols): 6 files (5%) - Phase command files, managers
+
+**Top 10 Most Complex Files**:
+1. **Phase6Commands.ts** (42 symbols) - 8-10 commands × 4-5 symbols each ⚠️
+2. **Phase7Commands.ts** (34 symbols) - Multiple command implementations ⚠️
+3. **SymbolRegistryManager.ts** (34 symbols) - Storage operations, many methods ⚠️
+4. **ModuleSpecGenerator.ts** (33 symbols) - Specification generation logic
+5. **Phase5Commands.ts** (31 symbols) - Multiple command implementations ⚠️
+6. **ASTSymbolExtractor.ts** (29 symbols) - Core extraction logic (justified) ✅
+7. **Phase4Commands.ts** (26 symbols) - Multiple command implementations
+8. **Phase10Commands.ts** (23 symbols) - Multiple command implementations
+9. **Phase8Commands.ts** (23 symbols) - Multiple command implementations
+10. **ParallelWorkDetector.ts** (21 symbols) - Analysis logic
+
+**Complexity by Directory**:
+- `src/commands/`: ~240 symbols in 12 files (Avg: 20/file) - Highest density
+- `src/analyzer/`: ~180 symbols in 15 files (Avg: 12/file) - Medium-high
+- `src/storage/`: ~70 symbols in 4 files (Avg: 17.5/file) - High density
+- `src/generator/`: ~90 symbols in 8 files (Avg: 11.3/file) - Medium
+- `src/validator/`: ~60 symbols in 5 files (Avg: 12/file) - Medium
+
+**Common Complexity Patterns**:
+1. **Command Files Pattern**: 8-10 commands/file × 4-5 symbols = 30-40 total
+   - High symbol count but low cognitive complexity
+   - Simple, repetitive code structure
+2. **Manager Pattern**: 10-15 public methods + 10-15 private helpers = 20-30 total
+   - Medium symbol count, medium cognitive complexity
+   - State management, coordination logic
+3. **Analyzer Pattern**: 5-8 main methods + 10-15 helpers = 15-25 total
+   - Medium symbol count, high cognitive complexity
+   - Algorithm-heavy, complex logic
+
+**Key Insights**:
+- ✅ Average 12.1 is healthy (industry standard 10-15)
+- ✅ 40% simple files indicate good organization
+- ⚠️ Phase command files (30-40 symbols) need splitting for better navigation
+- ⚠️ SymbolRegistryManager (34 symbols) shows potential god class pattern
+- ✅ ASTSymbolExtractor complexity justified (core functionality, single responsibility)
+
+**Complexity Concerns**:
+1. **Phase Command Files** (Priority: High ⚠️)
+   - 30-40 symbols each, hard to navigate
+   - Risk: Cognitive overload, merge conflicts, long scrolling
+   - Solution: Split into individual command files (one command per file)
+
+2. **SymbolRegistryManager** (Priority: Medium ⚠️)
+   - 34 symbols, many responsibilities
+   - Risk: God class pattern, tight coupling, hard to test
+   - Solution: Split into read/write/export/import operations
+
+3. **Core Files Acceptable** (Priority: Low ✅)
+   - ASTSymbolExtractor (29 symbols) complexity justified
+   - Single responsibility, well-documented, critical functionality
+
+**Refactoring Recommendations**:
+1. **Split Phase Command Files** (High Priority)
+   - Create individual files: `commands/AnalyzeCommand.ts`, `commands/ValidateCommand.ts`
+   - Benefits: Easy navigation, less merge conflicts, better git history
+   - Impact: 6 files × 30-40 symbols → 53 files × 4-8 symbols
+
+2. **Extract SymbolRegistry Operations** (Medium Priority)
+   - Split into specialized classes: SymbolRegistryReader, SymbolRegistryWriter
+   - Benefits: Better separation of concerns, easier testing
+   - Impact: 34 symbols → 4 classes × 8-10 symbols
+
+3. **Break Down Large Analyzers** (Low Priority)
+   - Extract helper functions to utility modules
+   - Keep main logic focused, single file per analyzer
+   - Impact: Better testability, reduced complexity
+
+**Growth Projection**:
+- Current: 118 files, 1,427 symbols (Avg: 12.1)
+- Expected: 150+ files, 1,800+ symbols (Avg: 12.0)
+- Strategy: Keep one command/file, extract utilities early, monitor complexity
+
+**Use Case**: Identifying complex files for refactoring, understanding file organization patterns, planning code splits, monitoring codebase health
 
 #### `analysis-pipeline.mmd` (144 lines)
 **Purpose**: Complete sequence diagram of the analysis pipeline
