@@ -1036,7 +1036,7 @@ interface TypeComplexity {
 **Related Documents**:
 - [[Enhanced Database Schema & Type System]] - Storage layer design
 - [[TSDoc Edge System Architecture]] - Overall architecture
-- [[Visualization System]] - Analysis result visualization
+- (Planned: Visualization System for analysis result visualization)
 
 ---
 

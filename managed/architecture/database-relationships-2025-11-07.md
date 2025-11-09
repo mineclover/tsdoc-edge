@@ -627,8 +627,8 @@ graph TD
 
 **Related Documents**:
 - [[TSDoc Edge System Architecture]] - Overall system design
-- [[Analysis System]] - Analyzer implementations
-- [[Visualization System]] - Diagram generation
+- [[Analyzers & Extractors]] - Analyzer implementations
+- (Planned: Visualization System for diagram generation)
 
 ---
 
