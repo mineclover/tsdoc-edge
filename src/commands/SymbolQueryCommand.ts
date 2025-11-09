@@ -73,8 +73,25 @@ export class SymbolQueryCommand extends BaseCommand {
     return 'Query and explore document symbols';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge symbol-query <subcommand> [options]
+
+  Subcommands:
+    list              List all symbols
+    search <query>    Search symbols by name
+    info <symbol>     Show detailed symbol information
+    backlinks <symbol> Show documents that reference the symbol
+    similar <symbol>  Find symbols with similar names
+    stats             Show symbol statistics`;
+  }
+
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag before processing
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const docsDir = this.findDocsDir(args);
       const subcommand = args.find((arg) => !arg.startsWith('--') && arg !== docsDir) || 'help';
 

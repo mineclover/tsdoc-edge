@@ -77,8 +77,17 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
     return 'Validate [[Symbol]] references and detect duplicates';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge validate-symbol-refs [docs-directory]\n\n  Default: managed\n  Options: --fix   Fix detected issues automatically';
+  }
+
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const docsDir = args[0] || 'managed';
       const fixMode = args.includes('--fix');
 
