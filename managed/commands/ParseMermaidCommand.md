@@ -1,21 +1,46 @@
-# [[ParseMermaidCommand]]
+# [[Parse Mermaid Command]]
 
 **Source**: `src/commands/ParseMermaidCommand.ts`
 
 ## Purpose
 
-Parse Mermaid diagrams and extract symbols.
+CLI command to parse Mermaid diagrams and extract symbols and relationships.
 
-## Features
+## Command
 
-- Mermaid syntax parsing
-- Symbol extraction
-- Auto-documentation
+```bash
+tsdoc-edge parse-mermaid <file.mmd>
+```
 
-## Symbol Count
+## Functionality
 
-7 symbols
+Parses Mermaid diagram files and extracts:
+- Symbols from node labels
+- Relationships between nodes
+- Diagram metadata
+- Subgraph structures
+
+## Output
+
+Displays extracted information:
+- Symbol names
+- Relationships
+- Diagram type and orientation
+- Subgraphs
+
+## Use Cases
+
+1. **Debugging**: Verify diagram parsing
+2. **Validation**: Check symbol extraction
+3. **Testing**: Test Mermaid Symbol Extractor
 
 ## Related
 
-- [[Mermaid Symbol Extractor]]: Parser implementation
+- [[Mermaid Symbol Extractor]] - Core parser
+- [[ExploreEntrypointCommand]] - Explore from diagrams
+- [[ValidateSymbolRefsCommand]] - Validate diagram symbols
+
+---
+
+**Category**: Command
+**Status**: Active
