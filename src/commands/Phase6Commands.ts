@@ -94,6 +94,10 @@ export class CheckDuplicatesCommand extends BaseCommand {
     return 'Check for duplicate content in specifications';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge check-duplicates [docs-directory]\n\n  Default: managed';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -102,6 +106,11 @@ export class CheckDuplicatesCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const target = args[0];
       const docsDir = target || 'managed';
       const docsPath = path.resolve(process.cwd(), docsDir);
@@ -261,6 +270,14 @@ export class SpecStatusCommand extends BaseCommand {
     return 'Manage specification status';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge spec-status <subcommand> <file> [status]
+
+  Subcommands:
+    show <file>            Show current status
+    promote <file> <status> Promote to new status`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -269,6 +286,11 @@ export class SpecStatusCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const subcommand = args[0];
       const target = args[1];
 
@@ -521,6 +543,10 @@ export class FindUnusedDocsCommand extends BaseCommand {
     return 'Find unused and stale documents';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge find-unused-docs [docs-directory]\n\n  Default: managed';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -529,6 +555,11 @@ export class FindUnusedDocsCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const target = args[0];
       const dir = target || 'managed';
       const dirPath = path.resolve(process.cwd(), dir);
@@ -673,6 +704,10 @@ export class SpecHistoryCommand extends BaseCommand {
     return 'Show specification version history';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge spec-history <file-path>';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -681,6 +716,11 @@ export class SpecHistoryCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const target = args[0];
 
       if (!target) {
