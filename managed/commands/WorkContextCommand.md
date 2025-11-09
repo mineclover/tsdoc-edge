@@ -55,6 +55,6 @@ tsdoc-edge work-context src/analyzer/CallGraphAnalyzer.ts
 
 ## Related
 
-- [[Core Workflow]]: 전체 워크플로우
+- [[CoreWorkflow]]: 전체 워크플로우
 - [[SSOT]]: 문서-코드 일치성
-- [[Symbol Graph]]: 심볼 관계 분석
+- [[SymbolGraphBuilder]]: 심볼 관계 분석

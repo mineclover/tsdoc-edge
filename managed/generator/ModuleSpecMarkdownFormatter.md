@@ -19,4 +19,4 @@ Creates:
 
 ## Related
 
-- [[Module Spec Generator]]: Content generation
+- [[ModuleSpecGenerator]]: Content generation

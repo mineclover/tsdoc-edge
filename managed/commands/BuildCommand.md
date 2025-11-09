@@ -53,4 +53,4 @@ tsdoc-edge build src
 - [[ASTSymbolExtractor]]: AST 파싱 및 심볼 추출
 - [[SymbolGraphBuilder]]: 관계 그래프 구축
 - [[DatabaseManager]]: 저장소 관리
-- [[Core Workflow]]: 전체 워크플로우
+- [[CoreWorkflow]]: 전체 워크플로우

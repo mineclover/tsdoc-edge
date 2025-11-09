@@ -187,7 +187,7 @@ TODO: Document implementation details
 - (none)
 
 ### Used By
-- **[[I/O Dependency]]** (indirect/inferred) - infers
+- **[[IODependencyAnalyzer]]** (indirect/inferred) - infers
 
 ## Related Checkpoints
 

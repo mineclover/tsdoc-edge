@@ -19,4 +19,4 @@ Criteria:
 
 ## Related
 
-- [[Symbol Graph]]: Symbol analysis
+- [[SymbolGraphBuilder]]: Symbol analysis

@@ -19,5 +19,5 @@ Detects:
 
 ## Related
 
-- [[Test Relationship Analyzer]]: Relationship analysis
+- [[TestRelationshipAnalyzer]]: Relationship analysis
 - [[Test Coverage]]: Coverage tracking

@@ -19,5 +19,5 @@ Extracts:
 
 ## Related
 
-- [[TSDoc Parser]]: Core parsing
+- [[TSDocParser]]: Core parsing
 - [[Module Spec Tag Parser]]: Tag parsing

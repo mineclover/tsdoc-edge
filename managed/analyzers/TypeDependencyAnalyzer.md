@@ -16,4 +16,4 @@
 ## Related
 
 - [[Type Dependency]]: 관계 타입
-- [[Type Chain Tracer]]: 타입 체인
+- [[TypeChainTracer]]: 타입 체인

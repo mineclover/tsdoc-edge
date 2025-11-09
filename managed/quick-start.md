@@ -107,7 +107,7 @@ tsdoc-edge work-context src/commands/BuildCommand.ts
 Work Context: BuildCommand.ts
 
 📚 Related Documentation (2):
-  • [[Core Workflow]]
+  • [[CoreWorkflow]]
   • [[Build Pipeline Guide]]
 
 🔗 Dependencies (5):

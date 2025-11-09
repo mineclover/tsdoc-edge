@@ -54,5 +54,5 @@ Each phase command typically contains:
 ## Related
 
 - [[Build Command]]: Foundation
-- [[Core Workflow]]: Integration
+- [[CoreWorkflow]]: Integration
 - Analysis features in each phase

@@ -20,5 +20,5 @@ Extracts:
 
 ## Related
 
-- [[Module Spec Generator]]: Spec generation
+- [[ModuleSpecGenerator]]: Spec generation
 - [[Enhanced Doc Extractor]]: Doc extraction

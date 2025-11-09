@@ -18,5 +18,5 @@ Analyze and display test-to-code relationships.
 
 ## Related
 
-- [[Test Relationship Analyzer]]: Core analysis
+- [[TestRelationshipAnalyzer]]: Core analysis
 - [[Test Coverage]]: Coverage tracking
