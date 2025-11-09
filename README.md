@@ -104,7 +104,7 @@ tsdoc-edge work-context src/services/UserService.ts
 
 #### 고급 분석 (6개) 🔥 NEW!
 - `analyze-calls` - **함수 호출 관계 분석 (Call Graph)** 🔥
-  - 1,500+ 호출 관계 추적
+  - 1,700+ 호출 관계 추적 (정확히 1,708개)
   - 가장 많이 호출되는 함수 식별
   - 호출 패턴 분석 (Command, Registry, Utility, Builder)
 - `analyze-chains` - **의존성 체인 + 순환 의존성 감지** 🔥
@@ -129,7 +129,13 @@ tsdoc-edge work-context src/services/UserService.ts
 - `stats` (--save, --compare) - 통계 추적
 - `core-api` - 핵심 API 표면 분석
 - `scan` - 심볼 그래프 깊이 탐색
-- `usage` - CLI 사용 분석 🔥 NEW!
+- `usage` - **CLI 사용 패턴 분석 및 최적화** 🔥 NEW!
+  - 모든 명령어 실행 자동 추적
+  - Top 10 가장 많이 사용하는 명령어
+  - 성능 메트릭 (평균 실행 시간, 병목 식별)
+  - 에러 패턴 분석 (최근 에러, 성공률)
+  - 일일/주간 사용 통계
+  - 워크플로우 최적화 인사이트
 
 #### 문서 심볼 시스템 (17개)
 - `index-docs` - [[]] 심볼 인덱싱
@@ -600,6 +606,113 @@ tsdoc-edge find-unused-docs managed/
 - ✅ 코드 연결 강제: 기술 명세서의 코드 참조 누락 감지
 - ✅ 참조 기반 탐지: 다른 문서에서 참조되지 않는 orphan 문서 식별
 - ✅ 액션 자동 제안: delete/archive/review/complete 구체적 조치 제시
+
+### ✅ CLI Usage Analytics (v0.12.0) - NEW! 🔥
+
+**모든 CLI 명령어 실행을 자동 추적하고 워크플로우 최적화 인사이트 제공**
+
+팀의 CLI 사용 패턴을 분석하여 병목을 식별하고, 에러를 추적하며, 워크플로우를 개선할 수 있는 데이터를 제공합니다.
+
+**추적 항목**:
+```typescript
+{
+  command: "validate-symbol-refs",    // 명령어 이름
+  args: ["managed/"],                 // 인자
+  timestamp: "2025-11-09T12:35:00Z",  // 실행 시간
+  duration: 2340,                     // 실행 시간 (ms)
+  success: true,                      // 성공 여부
+  error: null,                        // 에러 메시지
+  cwd: "/path/to/project",           // 작업 디렉토리
+  nodeVersion: "v18.16.0",           // Node.js 버전
+  version: "0.12.0"                  // TSDoc Edge 버전
+}
+```
+
+**제공 인사이트**:
+```bash
+$ tsdoc-edge usage
+
+📊 OVERVIEW
+────────────────────────────────────────────────────────────────
+Total Commands: 248
+First Used: 2025-11-09, 6:38:21 AM
+Last Used: 2025-11-09, 12:42:50 PM
+Total Duration: 322.79s
+
+🏆 TOP COMMANDS
+────────────────────────────────────────────────────────────────
+  validate-symbol-refs   206 (83.1%) ████████████████████████
+  symbol-query            13 (5.2%)  ██
+  help                     5 (2.0%)  █
+  analyze-calls            2 (0.8%)
+  analyze-chains           2 (0.8%)
+
+⚡ PERFORMANCE (평균 실행 시간)
+────────────────────────────────────────────────────────────────
+  analyze-io           84.33s  ← 병목!
+  build                56.79s
+  analyze-calls        8.92s
+  coverage-report      4.50s
+  validate             1.23s
+
+✓ SUCCESS RATES
+────────────────────────────────────────────────────────────────
+  ✗ validate-symbol-refs  1.5%   ← 개선 필요!
+  ✓ symbol-query         100.0%
+  ✓ help                 100.0%
+  ✓ build                100.0%
+
+❌ RECENT ERRORS (최근 10개)
+────────────────────────────────────────────────────────────────
+  core-api (11/9/2025, 12:42:50 PM)
+    no such table: relationships
+
+  test-relationships (11/9/2025, 12:40:58 PM)
+    Cannot read properties of undefined (reading 'replace')
+
+  parallel-work (11/9/2025, 12:40:39 PM)
+    No working modules specified
+```
+
+**사용법**:
+```bash
+# 전체 통계 보기
+tsdoc-edge usage
+
+# 특정 기간 통계
+tsdoc-edge usage --since="2025-11-01"
+
+# 일일 요약
+tsdoc-edge usage --daily
+
+# 특정 명령어 분석
+tsdoc-edge usage --command=build
+
+# 데이터 내보내기
+tsdoc-edge usage --export=json > usage-report.json
+
+# 데이터 초기화
+tsdoc-edge usage --clear
+```
+
+**CI/CD 통합**:
+```yaml
+# .github/workflows/usage-report.yml
+- name: Weekly Usage Report
+  if: github.event.schedule
+  run: |
+    tsdoc-edge usage --export=json > usage-report.json
+    # Slack/Email로 리포트 전송
+```
+
+**주요 효과**:
+- ✅ 병목 식별: 실행 시간이 긴 명령어 자동 발견
+- ✅ 에러 패턴 분석: 반복되는 에러 조기 감지
+- ✅ 워크플로우 최적화: 가장 많이 사용하는 명령어 우선 개선
+- ✅ 성공률 추적: 명령어별 안정성 모니터링
+- ✅ 팀 협업 인사이트: 팀원들이 어떤 기능을 주로 사용하는지 파악
+- ✅ 자동 추적: 별도 설정 없이 모든 명령어 자동 기록
+- ✅ 프라이버시: 로컬 `.tsdoc/analytics/` 디렉토리에만 저장
 
 ### ✅ Core Engine (v0.1.0 - v0.3.0)
 

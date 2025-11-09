@@ -152,6 +152,12 @@ export class IntegrationCoverageCalculator {
     targetSymbol: any
   ): string {
     const sourceFile = sourceSymbol.filePath;
+
+    // Handle cases where filePath might be undefined
+    if (!sourceFile) {
+      return `Add integration test for ${sourceSymbol.name} with ${targetSymbol.name}`;
+    }
+
     const testFileName = sourceFile
       .replace('/src/', '/__tests__/integration/')
       .replace('.ts', '.test.ts');
