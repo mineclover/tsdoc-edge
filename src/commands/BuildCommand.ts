@@ -66,6 +66,10 @@ export class BuildCommand extends BaseCommand {
     return 'Build symbol database from source files';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge build [source-directory]\n\n  Default: src';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -74,6 +78,11 @@ export class BuildCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const targetPath = args[0] || 'src';
 
       this.printHeader('TSDoc Edge - Build Database');

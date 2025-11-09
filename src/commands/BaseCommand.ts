@@ -195,6 +195,51 @@ export abstract class BaseCommand {
   }
 
   /**
+   * Check if help flag is present in arguments
+   *
+   * @param args - Command arguments
+   * @returns True if --help or -h flag is present
+   */
+  protected hasHelpFlag(args: string[]): boolean {
+    return args.includes('--help') || args.includes('-h');
+  }
+
+  /**
+   * Get command usage information
+   * Override this method to provide custom usage info
+   *
+   * @returns Usage string
+   */
+  protected getUsage(): string {
+    return `tsdoc-edge ${this.getName()} [options]`;
+  }
+
+  /**
+   * Display help message for command
+   * Displays name, description, and usage
+   * Note: Named "displayHelp" to avoid conflicts with command-specific help methods
+   *
+   * @returns Success result
+   */
+  protected displayHelp(): CommandResult {
+    this.printHeader(`${this.getName()} - Help`);
+
+    console.log(colors.bold + 'Description:' + colors.reset);
+    console.log(`  ${this.getDescription()}`);
+    console.log();
+
+    console.log(colors.bold + 'Usage:' + colors.reset);
+    console.log(`  ${this.getUsage()}`);
+    console.log();
+
+    console.log(colors.bold + 'Options:' + colors.reset);
+    console.log(`  ${colors.cyan}--help, -h${colors.reset}     Show this help message`);
+    console.log();
+
+    return this.success();
+  }
+
+  /**
    * Handle command execution with error catching
    *
    * @param fn - Async function to execute
