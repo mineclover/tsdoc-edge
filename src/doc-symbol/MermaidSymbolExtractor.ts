@@ -163,7 +163,10 @@ export class MermaidSymbolExtractor {
 
         const symbol = this.parseNodeLabel(nodeId, label, currentSubgraph);
         result.symbols.push(symbol);
-        result.symbolReferences.push(symbol.symbolName);
+        // Only add to symbolReferences if valid symbol name exists
+        if (symbol.symbolName && symbol.symbolName.trim() !== '') {
+          result.symbolReferences.push(symbol.symbolName);
+        }
       }
 
       // Parse relationships: A --> B, A -.-> B, A ==> B
@@ -314,12 +317,52 @@ export class MermaidSymbolExtractor {
       /\s*\/\s*/,      // Contains slash (deps / who-uses)
       /\s*\*\s*/,      // Contains asterisk (analyze-*)
       /🆕/,            // New feature emoji
+      /^[A-Z][a-z]+:\s*/,  // Label patterns (Linter:, Test:, Extract:, Result:)
+      /^Confidence:\s*/,   // Confidence: prefix
+      /\.(mmd|db|jsonl|md|ts|js)$/,  // File extensions
+      /^\(/,           // Starts with parenthesis (file paths)
+      /[≥≤]/,          // Comparison operators
+      /^(Return|Parameter|Import|Extends)\s+(Type|Keyword|Statements?)$/,  // Type keywords
+      /\s+Types?$/,    // Ends with Type or Types
+      /\s+(Analysis|Detection|Drift|Coverage|Tests)$/,  // Analysis categories
+      /^(Create|Define|Parse|Generate|Extract|Follow|Find)\s+/,  // Workflow verbs
+      /^(Code|Doc|Test)\s+/i,  // Category prefixes
+      /Patterns?$/,    // Ends with Pattern/Patterns
+      /^L\d+[A-Z]$/,   // Labels like L2C, L3B
+      /Product$/,      // Ends with Product (Cartesian Product)
+      /Chains$/,       // Ends with Chains
+      /Hotspots?$/,    // Ends with Hotspot/Hotspots
+      /^(Graph|Relationship)\s+/,  // System prefixes
+      /^[A-Z]$/,       // Single uppercase letter (A, B, C, D - node IDs)
+      /^[A-Z]{2,4}$/,  // Short uppercase abbreviations (CD, TEST, FS, PATH, EWE, GC, UB)
+      /^L\d+[A-Z]$/,   // Labels with numbers (L1A, L2A, L2B, L3A, etc.)
+      /^--/,           // CLI flags (--detect-orphans)
+      /\[0\]?$/,       // Array index (args[0)
+      /^(Structural|Behavioral|Architectural|Data Flow)$/,  // Category names
+      /^(Add to|Archive|Delete|Promote|Show|Scan)\s+/,  // Workflow/action verbs
+      /^(Read|Write|Resolve|Check|Query|Group|Build)\s+/i,  // Process verbs
+      /\s+(file|table|path|symbols?|content|exists)$/i,  // Technical suffixes
+      /^(Orphaned|All)\s+/,  // Status prefixes
+      /Stats$/,        // Ends with Stats
+      /Workflow$/,     // Ends with Workflow
+      /Taxonomy$/,     // Ends with Taxonomy
+      /Roadmap$/,      // Ends with Roadmap
+      /^(FS|PATH|CommandResult)$/,  // Technical constants/types
+      /Validation$/,   // Ends with Validation
+      /Resolved$/,     // Ends with Resolved
     ];
 
     const isNonSymbol = nonSymbolPatterns.some(pattern => pattern.test(symbolName));
     if (isNonSymbol) {
-      // This is data/text, not a symbol reference - use nodeId as fallback
-      symbolName = nodeId;
+      // This is data/text, not a symbol reference - check nodeId
+      const isNodeIdNonSymbol = nonSymbolPatterns.some(pattern => pattern.test(nodeId));
+      if (isNodeIdNonSymbol) {
+        // Both label and nodeId are non-symbols, don't create a symbol reference
+        symbolName = '';  // Empty string signals no valid symbol
+      } else {
+        // Use nodeId as fallback if it's a valid symbol
+        symbolName = nodeId;
+      }
     }
 
     // Detect status from emoji/symbol
