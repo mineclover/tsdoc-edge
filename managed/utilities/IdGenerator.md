@@ -104,6 +104,6 @@ const tempId = tempIdGen.generate(); // "x7k"
 
 ## Related
 
-- [[IdCommand]]: CLI ID generation
-- [[IdNewCommand]]: Generate new document IDs
+- (Planned: IdCommand for CLI ID generation)
+- (Planned: IdNewCommand for new document IDs)
 - [[DocumentSymbol]]: Document symbol system

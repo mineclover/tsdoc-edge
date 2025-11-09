@@ -97,6 +97,6 @@ const checker = new SpecContentSimilarityChecker({
 
 ## Related
 
-- [[CheckDuplicatesCommand]]: CLI duplicate detection
+- (Planned: CheckDuplicatesCommand for CLI duplicate detection)
 - [[UnusedDocumentDetector]]: Find orphaned docs
 - [[DocumentSymbolParser]]: Parse doc structure

@@ -257,10 +257,10 @@ jobs:
   - Uses: [[ConfigLoader]] (`src/utils/ConfigLoader.ts`)
   - Validates: Dependencies, symbol references, file paths
 
-**[[CheckDuplicatesCommand]]** - `tsdoc-edge check-duplicates`
+**CheckDuplicatesCommand (Planned)** - `tsdoc-edge check-duplicates`
 - 중복 심볼 탐지
 - **Implementation Chain**:
-  - Command: `src/commands/Phase6Commands.ts`
+  - Command: `src/commands/Phase6Commands.ts` (planned)
   - Checker: [[SpecContentSimilarityChecker]] (`src/spec/SpecContentSimilarityChecker.ts`)
   - Analysis: Content similarity, section overlap detection
   - Suggestions: Merge, cross-reference, or keep separate

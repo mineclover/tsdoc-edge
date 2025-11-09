@@ -19,5 +19,5 @@ Features:
 
 ## Related
 
-- [[Comment State Manager]]: State management
-- [[Comment Exporter]]: Export functionality
+- [[CommentStateManager]]: State management
+- [[CommentExporter]]: Export functionality

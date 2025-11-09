@@ -288,9 +288,9 @@ tsdoc-edge import-registry
 - [[BuildCommand]] - Stores extracted symbols
 - [[DepsCommand]] - Queries dependencies
 - [[WhoUsesCommand]] - Queries reverse dependencies
-- [[SearchCommand]] - Full-text search
 - [[StatsCommand]] - Database statistics
 - All analyzers - Store relationships
+- (Planned: Full-text search command)
 
 **Uses**:
 - `better-sqlite3` - Synchronous SQLite driver
@@ -367,7 +367,7 @@ tsdoc-edge import-registry
 **Commands**:
 - [[BuildCommand]] (`src/commands/BuildCommand.ts`) - Populates DB
 - [[DepsCommand]] (`src/commands/DepsCommand.ts`) - Queries DB
-- [[SearchCommand]] (`src/commands/SearchCommand.ts`) - FTS
+- (Planned: SearchCommand for full-text search)
 
 **Analyzers**:
 - All analyzers store relationships in DB
