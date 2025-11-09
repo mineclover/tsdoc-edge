@@ -68,3 +68,4 @@ export { CoverageReportCommand } from './CoverageReportCommand';
 export { DetectDeadCodeCommand } from './DetectDeadCodeCommand';
 export { SymbolQueryCommand } from './SymbolQueryCommand';
 export { SymbolFixCommand } from './SymbolFixCommand';
+export { AnalyzeConstraintsCommand } from './AnalyzeConstraintsCommand';
