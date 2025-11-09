@@ -220,7 +220,39 @@ export class MermaidSymbolExtractor {
     const lines = cleanLabel.split('\n').map(l => l.trim()).filter(l => l);
 
     // First line is usually the symbol name
-    const symbolName = lines[0] || nodeId;
+    let symbolName = lines[0] || nodeId;
+
+    // Clean up symbol name - if it starts with lowercase and has hyphens,
+    // it's likely a data label (like "code-dependency") not a symbol reference.
+    // Convert to Title Case to match actual symbol names
+    if (symbolName && /^[a-z][a-z-]*$/.test(symbolName)) {
+      // This is a lowercase-hyphenated label - convert to Title Case
+      symbolName = symbolName.split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    }
+
+    // Filter out obvious non-symbols (SQL queries, statistics, problems, commands)
+    const nonSymbolPatterns = [
+      /^SELECT\s+/i,
+      /^INSERT\s+/i,
+      /^UPDATE\s+/i,
+      /^DELETE\s+/i,
+      /^Base:\s*/,
+      /^Problem:\s*/,
+      /^Run:\s*/,
+      /^TODO:/,
+      /^Note:/,
+      /^\d+%$/,  // Pure percentages
+      /^✅\s*/,  // Just checkmark
+      /^❌\s*/,  // Just X mark
+    ];
+
+    const isNonSymbol = nonSymbolPatterns.some(pattern => pattern.test(symbolName));
+    if (isNonSymbol) {
+      // This is data/text, not a symbol reference - use nodeId as fallback
+      symbolName = nodeId;
+    }
 
     // Detect status from emoji/symbol
     let status: MermaidSymbol['status'] = undefined;

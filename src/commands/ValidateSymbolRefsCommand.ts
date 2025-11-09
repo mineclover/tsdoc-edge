@@ -282,9 +282,22 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
 
     // Mermaid symbols are references, not definitions
     // (unless explicitly documented in frontmatter)
+    // Skip node IDs (like "S1", "E1") and other non-symbol patterns
     for (const symbol of result.symbols) {
+      const symbolName = symbol.symbolName;
+
+      // Skip if it's just a node ID (1-3 uppercase letters + digits)
+      if (/^[A-Z]{1,3}\d+$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip if it's a percentage pattern
+      if (/^[-+]?\d+%$/.test(symbolName)) {
+        continue;
+      }
+
       registry.references.push({
-        symbolName: symbol.symbolName,
+        symbolName,
         filePath,
         lineNumber: 0, // Line number not available from parser
         context: `Mermaid node: ${symbol.label}`,
