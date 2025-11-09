@@ -336,7 +336,7 @@ console.log(`Average compliance: ${avgScore.toFixed(2)}%`);
 - [[ValidationFeatures]] (`../features/validation-features.md`) - Validation commands
 - [[ValidateCommand]] - Validation command that uses strict mode
 - [[EnhancedSymbolDoc]] - Enhanced documentation type
-- [[Enhanced Doc Extractor]] - Extracts enhanced docs for validation
+- [[EnhancedDocExtractor]] - Extracts enhanced docs for validation
 
 ## Source
 

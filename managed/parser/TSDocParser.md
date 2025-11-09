@@ -20,4 +20,4 @@ Extracts:
 ## Related
 
 - [[TSDoc Symbol Parser]]: Symbol extraction
-- [[Enhanced Doc Extractor]]: Enhanced parsing
+- [[EnhancedDocExtractor]]: Enhanced parsing
