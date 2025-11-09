@@ -43,30 +43,29 @@ export class IODependencyAnalyzer {
   analyze(): UnifiedRelationship[] {
     const relationships: UnifiedRelationship[] = [];
 
-    // Build type map: type name → symbols that produce it
-    const producers = this.buildProducerMap();
+    // Build both maps in a single pass for better performance
+    const { producers, consumers } = this.buildTypeMaps();
 
-    // Build type map: type name → symbols that consume it
-    const consumers = this.buildConsumerMap();
-
-    // Find matches
+    // Find matches with early filtering
     for (const [typeName, producerSymbols] of producers.entries()) {
       const consumerSymbols = consumers.get(typeName);
 
-      if (consumerSymbols) {
-        for (const producer of producerSymbols) {
-          for (const consumer of consumerSymbols) {
-            // Don't relate a symbol to itself
-            if (producer.symbolId === consumer.symbolId) continue;
+      if (!consumerSymbols || producerSymbols.length === 0 || consumerSymbols.length === 0) {
+        continue; // Skip if no matches possible
+      }
 
-            const relationship = this.createIODependency(
-              producer,
-              consumer,
-              typeName
-            );
+      for (const producer of producerSymbols) {
+        for (const consumer of consumerSymbols) {
+          // Don't relate a symbol to itself
+          if (producer.symbolId === consumer.symbolId) continue;
 
-            relationships.push(relationship);
-          }
+          const relationship = this.createIODependency(
+            producer,
+            consumer,
+            typeName
+          );
+
+          relationships.push(relationship);
         }
       }
     }
@@ -75,60 +74,54 @@ export class IODependencyAnalyzer {
   }
 
   /**
-   * Build map of types and their producers
+   * Build producer and consumer maps in a single pass (optimization)
    */
-  private buildProducerMap(): Map<string, Array<{ symbolId: string; symbolName: string; returnType: string }>> {
+  private buildTypeMaps(): {
+    producers: Map<string, Array<{ symbolId: string; symbolName: string; returnType: string }>>;
+    consumers: Map<string, Array<{ symbolId: string; symbolName: string; paramType: string }>>;
+  } {
     const producers = new Map<string, Array<{ symbolId: string; symbolName: string; returnType: string }>>();
+    const consumers = new Map<string, Array<{ symbolId: string; symbolName: string; paramType: string }>>();
 
+    // Single pass through all symbols
     for (const [symbolId, symbol] of this.graph.symbols.entries()) {
-      if (symbol.type === 'function' || symbol.type === 'method') {
-        const returnType = this.extractReturnType(symbol);
+      // Only process functions and methods
+      if (symbol.type !== 'function' && symbol.type !== 'method') {
+        continue;
+      }
 
-        if (returnType && !this.isPrimitiveType(returnType)) {
-          if (!producers.has(returnType)) {
-            producers.set(returnType, []);
+      // Extract return type (producer)
+      const returnType = this.extractReturnType(symbol);
+      if (returnType && !this.isPrimitiveType(returnType)) {
+        if (!producers.has(returnType)) {
+          producers.set(returnType, []);
+        }
+        producers.get(returnType)!.push({
+          symbolId,
+          symbolName: symbol.name,
+          returnType
+        });
+      }
+
+      // Extract parameter types (consumer)
+      const paramTypes = this.extractParameterTypes(symbol);
+      for (const paramType of paramTypes) {
+        if (!this.isPrimitiveType(paramType)) {
+          if (!consumers.has(paramType)) {
+            consumers.set(paramType, []);
           }
-
-          producers.get(returnType)!.push({
+          consumers.get(paramType)!.push({
             symbolId,
             symbolName: symbol.name,
-            returnType
+            paramType
           });
         }
       }
     }
 
-    return producers;
+    return { producers, consumers };
   }
 
-  /**
-   * Build map of types and their consumers
-   */
-  private buildConsumerMap(): Map<string, Array<{ symbolId: string; symbolName: string; paramType: string }>> {
-    const consumers = new Map<string, Array<{ symbolId: string; symbolName: string; paramType: string }>>();
-
-    for (const [symbolId, symbol] of this.graph.symbols.entries()) {
-      if (symbol.type === 'function' || symbol.type === 'method') {
-        const paramTypes = this.extractParameterTypes(symbol);
-
-        for (const paramType of paramTypes) {
-          if (!this.isPrimitiveType(paramType)) {
-            if (!consumers.has(paramType)) {
-              consumers.set(paramType, []);
-            }
-
-            consumers.get(paramType)!.push({
-              symbolId,
-              symbolName: symbol.name,
-              paramType
-            });
-          }
-        }
-      }
-    }
-
-    return consumers;
-  }
 
   /**
    * Create I/O dependency relationship
