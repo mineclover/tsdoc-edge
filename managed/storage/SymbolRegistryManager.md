@@ -471,7 +471,7 @@ if (validation.warnings.length > 0) {
 
 - [[DatabaseManager]] (`../core-components/DatabaseManager.md`) - SQLite storage for symbols
 - [[IdGenerator]] - Sequential ID generation
-- [[SymbolGraph]] - In-memory symbol graph
+- [[SymbolGraphBuilder]] - In-memory symbol graph
 - [[BuildCommand]] - Primary consumer of registry
 - [[Enhanced Database Schema]] - Extended schema with relationships
 

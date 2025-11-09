@@ -300,7 +300,7 @@ tsdoc-edge import-registry
 **Stores**:
 - [[Symbol]] (`src/types/graph.ts`) - All symbols
 - [[EnhancedSymbolDoc]] (`src/types/tags.ts`) - Documentation
-- [[UnifiedRelationship]] (`src/types/relationships.ts`) - All relationships
+- [[UnifiedRelationships]] (`src/types/relationships.ts`) - All relationships
 
 ## Performance
 
