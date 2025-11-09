@@ -66,3 +66,5 @@ export { AnalyzeIOCommand } from './AnalyzeIOCommand';
 export { VisualizeDepsCommand } from './VisualizeDepsCommand';
 export { CoverageReportCommand } from './CoverageReportCommand';
 export { DetectDeadCodeCommand } from './DetectDeadCodeCommand';
+export { SymbolQueryCommand } from './SymbolQueryCommand';
+export { SymbolFixCommand } from './SymbolFixCommand';

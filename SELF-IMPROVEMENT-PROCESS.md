@@ -433,6 +433,7 @@ tsdoc-edge coverage-report --hierarchical
 
 # Validation
 tsdoc-edge validate-docs managed
+tsdoc-edge validate-symbol-refs managed
 
 # Indexing
 tsdoc-edge index-docs managed
@@ -446,11 +447,20 @@ tsdoc-edge work-context <file>
 # Orphan Detection
 tsdoc-edge explore-entrypoint <doc> --detect-orphans
 
+# Symbol Management (NEW)
+tsdoc-edge symbol-query managed list              # List all symbols
+tsdoc-edge symbol-query managed search "pattern"  # Search symbols
+tsdoc-edge symbol-query managed info "Symbol"     # Symbol details
+tsdoc-edge symbol-query managed backlinks "Symbol" # Show backlinks
+tsdoc-edge symbol-query managed similar "Symbol"  # Find similar
+tsdoc-edge symbol-query managed stats             # Statistics
+
+# Symbol Fixing (NEW)
+tsdoc-edge symbol-fix managed --dry-run          # Preview fixes
+tsdoc-edge symbol-fix managed --yes              # Apply fixes
+
 # Symbol Promotion
 tsdoc-edge promote-symbol <doc> <symbol>
-
-# Reference Validation
-tsdoc-edge validate-symbol-refs managed
 ```
 
 ### Helper Scripts

@@ -75,6 +75,8 @@ import { ValidateSymbolRefsCommand } from './commands/ValidateSymbolRefsCommand'
 import { PromoteSymbolCommand } from './commands/PromoteSymbolCommand';
 import { CoverageReportCommand } from './commands/CoverageReportCommand';
 import { DetectDeadCodeCommand } from './commands/DetectDeadCodeCommand';
+import { SymbolQueryCommand } from './commands/SymbolQueryCommand';
+import { SymbolFixCommand } from './commands/SymbolFixCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -165,6 +167,8 @@ async function main(): Promise<void> {
   registry.register(new PromoteSymbolCommand());
   registry.register(new CoverageReportCommand());
   registry.register(new DetectDeadCodeCommand());
+  registry.register(new SymbolQueryCommand());
+  registry.register(new SymbolFixCommand());
   registry.register(new HelpCommand(registry));
 
   // Get command
