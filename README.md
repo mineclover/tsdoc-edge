@@ -4,6 +4,44 @@
 
 TSDoc Edge는 단순한 문서 생성 도구가 아닙니다. 코드베이스의 모든 심볼(함수, 클래스, 인터페이스 등)을 추적하고, 심볼 간의 관계를 파악하며, 문서와 코드의 완벽한 일치를 강제하는 **문서 연결성 플랫폼**입니다.
 
+---
+
+## 📊 프로젝트 현황
+
+![Health Score](https://img.shields.io/badge/Health-C%20(64%2F100)-yellow?style=flat-square)
+![Documentation](https://img.shields.io/badge/Documentation-93%25-brightgreen?style=flat-square)
+![Test Coverage](https://img.shields.io/badge/Tests-46%25-orange?style=flat-square)
+![Commands](https://img.shields.io/badge/Commands-65-blue?style=flat-square)
+![Symbol Refs](https://img.shields.io/badge/Symbol%20Refs-0%20errors-success?style=flat-square)
+
+**현재 상태**:
+- ✅ 0개 심볼 참조 오류 (완벽!)
+- ✅ 0개 순환 의존성
+- ✅ 0개 죽은 코드
+- ✅ 65개 CLI 명령어 (100% 문서화)
+- ✅ 1,708개 호출 관계 추적
+- ✅ 9,439개 I/O 의존성 분석
+
+---
+
+## 📚 중요 문서
+
+### 시작하기
+- **[빠른 시작](#빠른-시작)** - 3분 안에 시작
+- **[Work Context Workflow](managed/workflows/work-context-workflow.md)** - 가장 중요한 명령어
+
+### 개발자 가이드 🔥
+- **[문서 품질 개선 가이드](DOCUMENTATION_QUALITY_IMPROVEMENT_GUIDE.md)** - 6단계 품질 개선 워크플로우
+- **[컨벤션-기능 매핑](CONVENTION_FEATURE_MAPPING.md)** - 7개 TSDoc 컨벤션과 CLI 명령어 연결
+- **[워크플로우 검증 리포트](WORKFLOW_VALIDATION_REPORT.md)** - 전체 기능 검증 결과 (96.8% 성공률)
+
+### 상세 가이드
+- **[CLI 워크플로우 & 시나리오](archive/deprecated/CLI_WORKFLOWS_AND_SCENARIOS.md)** - 29개 명령어 상세 설명
+- **[Configuration System](archive/guides/CONFIG_GUIDE.md)** - `.tsdoc.config.json` 완벽 가이드
+- **[문서 심볼 시스템](archive/design/DOCUMENT_SYMBOL_DESIGN.md)** - `[[Symbol]]` 설계 문서
+
+---
+
 ## 빠른 시작
 
 ```bash
