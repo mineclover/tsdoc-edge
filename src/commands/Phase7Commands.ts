@@ -693,7 +693,7 @@ export class CoreApiCommand extends BaseCommand {
       try {
         const symbolStmt = dbManager.db.prepare('SELECT * FROM symbols');
         const symbolRows = symbolStmt.all() as SymbolRow[];
-        const relationshipStmt = dbManager.db.prepare('SELECT * FROM relationships');
+        const relationshipStmt = dbManager.db.prepare('SELECT * FROM dependencies');
         const relationshipRows = relationshipStmt.all() as RelationshipRow[];
 
         const graphBuilder = new SymbolGraphBuilder();
@@ -719,10 +719,10 @@ export class CoreApiCommand extends BaseCommand {
         // Add relationships
         for (const row of relationshipRows) {
           const relationship: SymbolRelationship = {
-            type: row.type as SymbolRelationship['type'],
-            from: row.from_id,
-            to: row.to_id,
-            filePath: row.file_path,
+            type: (row.type as SymbolRelationship['type']) || 'dependsOn',
+            from: (row as any).symbol_id,
+            to: (row as any).target,
+            filePath: (row as any).file_path || '',
             line: row.line,
             description: row.description,
           };
