@@ -62,6 +62,10 @@ export class UntestedCommand extends BaseCommand {
     return 'Find symbols without test coverage';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge untested';
+  }
+
   /**
    * execute method
    * @param _args - _args parameter
@@ -70,6 +74,11 @@ export class UntestedCommand extends BaseCommand {
    */
   async execute(_args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(_args)) {
+        return this.displayHelp();
+      }
+
       console.log(`${colors.bold}Untested Symbols${colors.reset}`);
       console.log();
 
@@ -168,6 +177,10 @@ export class WithoutResponsibilityCommand extends BaseCommand {
     return 'Find symbols without @responsibility tag';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge without-responsibility';
+  }
+
   /**
    * execute method
    * @param _args - _args parameter
@@ -176,6 +189,11 @@ export class WithoutResponsibilityCommand extends BaseCommand {
    */
   async execute(_args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(_args)) {
+        return this.displayHelp();
+      }
+
       console.log(`${colors.bold}Symbols Without Responsibility${colors.reset}`);
       console.log();
 
@@ -276,6 +294,10 @@ export class WithoutContractCommand extends BaseCommand {
     return 'Find symbols without contract specification';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge without-contract';
+  }
+
   /**
    * execute method
    * @param _args - _args parameter
@@ -284,6 +306,11 @@ export class WithoutContractCommand extends BaseCommand {
    */
   async execute(_args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(_args)) {
+        return this.displayHelp();
+      }
+
       console.log(`${colors.bold}Symbols Without Contract${colors.reset}`);
       console.log();
 
@@ -388,6 +415,15 @@ export class FixCommand extends BaseCommand {
     return 'Automatically fix documentation issues';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge fix [directory] [options]
+
+  Default: src
+  Options:
+    --dry-run         Preview changes without modifying files
+    --min-score=N     Minimum quality score threshold (default: 70)`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -396,6 +432,11 @@ export class FixCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       let targetPath = args[0] || 'src';
       let dryRun = false;
       let minScore = 70;

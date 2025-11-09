@@ -313,7 +313,19 @@ export class FindRootTypesCommand extends BaseCommand {
     return 'Find root types (types with no incoming dependencies)';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge find-roots [options]
+
+  Options:
+    --include-external    Include external types from node_modules`;
+  }
+
   async execute(args: string[]): Promise<any> {
+    // Check for help flag
+    if (this.hasHelpFlag(args)) {
+      return this.displayHelp();
+    }
+
     const options: TypeChainOptions = {
       includeExternal: args.includes('--include-external'),
     };
@@ -439,7 +451,19 @@ export class DetectCircularTypesCommand extends BaseCommand {
     return 'Detect circular type dependencies';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge detect-cycles [options]
+
+  Options:
+    --include-external    Include external types from node_modules`;
+  }
+
   async execute(args: string[]): Promise<any> {
+    // Check for help flag
+    if (this.hasHelpFlag(args)) {
+      return this.displayHelp();
+    }
+
     const options: TypeChainOptions = {
       includeExternal: args.includes('--include-external'),
     };
