@@ -68,6 +68,8 @@ import { AnalyzeChainsCommand } from './commands/AnalyzeChainsCommand';
 import { AnalyzeCallsCommand } from './commands/AnalyzeCallsCommand';
 import { AnalyzeTestsCommand } from './commands/AnalyzeTestsCommand';
 import { AnalyzeTypesCommand } from './commands/AnalyzeTypesCommand';
+import { AnalyzeEventsCommand } from './commands/AnalyzeEventsCommand';
+import { AnalyzeCallbacksCommand } from './commands/AnalyzeCallbacksCommand';
 import { WorkContextCommand } from './commands/WorkContextCommand';
 import { ExploreEntrypointCommand } from './commands/ExploreEntrypointCommand';
 import { ParseMermaidCommand } from './commands/ParseMermaidCommand';
@@ -147,6 +149,8 @@ async function main(): Promise<void> {
   registry.register(new AnalyzeTestsCommand());
   registry.register(new AnalyzeTypesCommand());
   registry.register(new AnalyzeIOCommand());
+  registry.register(new AnalyzeEventsCommand());
+  registry.register(new AnalyzeCallbacksCommand());
   registry.register(new VisualizeDepsCommand());
   registry.register(new UntestedCommand());
   registry.register(new WithoutResponsibilityCommand());
