@@ -63,6 +63,82 @@ tsdoc-edge work-context src/services/UserService.ts
 
 **모든 분석 기능은 이 하나의 명령어를 위해 존재합니다.**
 
+<details>
+<summary><strong>💡 실제 출력 예시 보기</strong></summary>
+
+```bash
+$ tsdoc-edge work-context src/commands/WorkContextCommand.ts
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 관련 문서 (2개)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • [[WorkContextCommand]] ❌
+    → Not found
+       Referenced in: src/commands/WorkContextCommand.ts:11
+       💡 Create document or remove @doc tag
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 의존 타입 (7개)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  BaseCommand          ✅
+    → src/commands/BaseCommand.ts
+  CommandResult        ✅
+    → src/commands/BaseCommand.ts
+  DatabaseManager      ✅
+    → src/storage/DatabaseManager.ts
+  SymbolGraphBuilder   ✅
+    → src/graph/SymbolGraphBuilder.ts
+  TSDocParser          ✅
+    → src/parser/TSDocParser.ts
+  DocumentSymbolParser ✅
+    → src/doc-symbol/DocumentSymbolParser.ts
+  Symbol               ✅
+    → src/types/graph/graph.ts
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🧪 테스트 (0개)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ❌ No tests found for this file
+     💡 Create test file in src/__tests__/
+     💡 Run: tsdoc-edge untested to see all untested symbols
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️  영향 범위 (14개 파일이 이 파일 사용)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  args                 → src/cli.ts
+  configPath           → src/cli.ts
+  configIndex          → src/cli.ts
+  main                 → src/cli.ts
+  usageTracker         → src/cli.ts
+  registry             → src/cli.ts
+  commandName          → src/cli.ts
+  commandArgs          → src/cli.ts
+  startTime            → src/cli.ts
+  result               → src/cli.ts
+  ... 4 more
+
+  ⚠️  수정 시 위 14개 파일 영향 받음
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 요약
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  심볼: 12개
+  문서: 2개
+  의존: 7개
+  테스트: 0개
+  영향: 14개 파일
+```
+
+**이 한 번의 명령어로**:
+- ✅ 수정 전 알아야 할 모든 의존성 파악
+- ✅ 테스트 누락 즉시 발견
+- ✅ 관련 문서 누락 경고
+- ✅ 영향 범위 사전 파악으로 안전한 수정
+
+**코드 수정 전 항상 실행하세요!**
+
+</details>
+
 자세한 내용: [Work Context Workflow](managed/workflows/work-context-workflow.md)
 
 ## 핵심 개념
