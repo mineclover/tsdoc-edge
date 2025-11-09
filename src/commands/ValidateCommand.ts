@@ -91,6 +91,10 @@ export class ValidateCommand extends BaseCommand {
     return 'Generate detailed validation report';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge validate\n\n  Reads from: demo/output/tsdoc-edge.db';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -99,6 +103,11 @@ export class ValidateCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       this.printHeader('Detailed Validation Report');
 
       const dbPath = path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');

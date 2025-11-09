@@ -59,6 +59,17 @@ export class AnalyzeCommand extends BaseCommand {
     return 'Analyze code health for a directory';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge analyze [directory] [options]
+
+  Default directory: src
+
+  Options:
+    --no-children      Don't analyze child symbols
+    --include-private  Include private symbols
+    --min-score=N      Minimum quality score (default: 70)`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -67,6 +78,11 @@ export class AnalyzeCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       let targetPath = args[0] || 'src';
       let includeChildren = true;
       let includePrivate = false;

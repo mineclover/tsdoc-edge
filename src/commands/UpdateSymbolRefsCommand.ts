@@ -64,6 +64,10 @@ export class UpdateSymbolRefsCommand extends BaseCommand {
     return 'Update code symbol references in documents';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge update-symbol-refs [docs-directory]\n\n  Default: managed';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -72,6 +76,11 @@ export class UpdateSymbolRefsCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const target = args[0];
       const docsDir = target || 'managed';
       const docsPath = path.resolve(process.cwd(), docsDir);

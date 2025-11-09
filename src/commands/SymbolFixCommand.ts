@@ -64,8 +64,24 @@ export class SymbolFixCommand extends BaseCommand {
     return 'Auto-fix common symbol reference issues';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge symbol-fix [docs-directory] [options]
+
+  Default directory: managed
+
+  Options:
+    --dry-run      Preview changes without applying
+    --yes, -y      Auto-confirm all fixes
+    --type=TYPE    Fix only specific type (typo/duplicate-h1/missing-primary/orphaned-aux/formatting)`;
+  }
+
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const docsDir = args[0] || 'managed';
       const dryRun = args.includes('--dry-run');
       const autoConfirm = args.includes('--yes') || args.includes('-y');

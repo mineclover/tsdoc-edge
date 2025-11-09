@@ -25,7 +25,22 @@ export class TypeChainCommand extends BaseCommand {
     return 'Show type dependency chain between two types';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge type-chain <source-type> [target-type] [options]
+
+  Options:
+    --max-depth=N         Maximum depth to traverse (default: 10)
+    --include-external    Include external types from node_modules
+    --include-primitives  Include primitive types
+    --tree                Show as dependency tree`;
+  }
+
   async execute(args: string[]): Promise<any> {
+    // Check for help flag
+    if (this.hasHelpFlag(args)) {
+      return this.displayHelp();
+    }
+
     if (args.length < 1) {
       console.error(`${colors.red}✗${colors.reset} Usage: type-chain <source-type> [target-type] [options]`);
       console.error('');
