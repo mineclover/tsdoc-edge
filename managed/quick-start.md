@@ -317,7 +317,7 @@ tsdoc-edge analyze-pipeline
 
 ## Help & Documentation
 
-**Full Documentation**: [[README]] (`managed/README.md`)
+**Full Documentation**: README (`managed/README.md`)
 
 **Commands**: [[Commands Index]] (`managed/COMMANDS.md`) - All 61 commands
 

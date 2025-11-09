@@ -227,6 +227,7 @@ export class MermaidSymbolExtractor {
       // Relationship types
       'code-dependency': 'Code Dependency',
       'io-dependency': 'IO Dependency',
+      'I/O Dependency': 'IO Dependency',  // Handle slash variant
       'inheritance': 'Inheritance',
       'interface-impl': 'Interface Implementation',
       'calls': 'Call Relationships',
@@ -242,6 +243,7 @@ export class MermaidSymbolExtractor {
       'test-coverage': 'Test Coverage',
       'doc-reference': 'Documentation Reference',
       'enhancement': 'Enhancement',
+      'Function Calls': 'Call Relationships',  // Alias for calls
       // Common command/workflow patterns
       'work-context': 'WorkContextCommand',
     };
@@ -269,9 +271,14 @@ export class MermaidSymbolExtractor {
       /^Run:\s*/,
       /^TODO:/,
       /^Note:/,
+      /^Filter:/,
       /^\d+%$/,  // Pure percentages
+      /^\d+\.\s+/,  // Numbered lists (1., 2., etc.)
       /^✅\s*/,  // Just checkmark
       /^❌\s*/,  // Just X mark
+      /^🧪\s*/,  // Test tube emoji
+      /^🟢|^🔴|^🟡/,  // Colored circles
+      /[\u{1F300}-\u{1F9FF}]/u,  // Contains any emoji
     ];
 
     const isNonSymbol = nonSymbolPatterns.some(pattern => pattern.test(symbolName));

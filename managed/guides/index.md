@@ -292,7 +292,7 @@ tsdoc-edge parse-mermaid <diagram>
 ## Related Documentation
 
 **Core**:
-- [[README]] (`../README.md`) - Main documentation hub
+- README (`../README.md`) - Main documentation hub
 - [[Commands Index]] (`../COMMANDS.md`) - All 61 commands
 
 **Features**:
