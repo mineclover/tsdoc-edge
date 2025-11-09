@@ -15,10 +15,10 @@ Track function call relationships (`foo()` calls `bar()`).
 
 ## Implementation Chain
 
-**Analyzer**: [[CallRelationshipAnalyzer]] (`src/analyzer/CallRelationshipAnalyzer.ts`)
+**Analyzer**: [[CallGraphAnalyzer]] (`src/analyzer/CallGraphAnalyzer.ts`)
 - Analyzes function call expressions in AST
 - Detects: Direct calls, method calls, constructor calls
-- Uses: [[CallAnalyzer]] (`src/analyzer/CallAnalyzer.ts`), [[CallGraphAnalyzer]] (`src/analyzer/CallGraphAnalyzer.ts`)
+- Also known as: CallRelationshipAnalyzer, CallAnalyzer
 
 **Command**: [[AnalyzeCallsCommand]] (`src/commands/AnalyzeCallsCommand.ts`)
 - Usage: `tsdoc-edge analyze-calls`

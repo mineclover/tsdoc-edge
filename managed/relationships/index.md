@@ -76,10 +76,10 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 
 ### [[Call Relationships]] ✅ 1,511
 - **Pattern**: `foo()` calls `bar()`
-- **Impl**: [[CallRelationshipAnalyzer]] (`src/analyzer/CallRelationshipAnalyzer.ts`)
+- **Impl**: [[CallGraphAnalyzer]] (`src/analyzer/CallGraphAnalyzer.ts`)
 - **Cmd**: [[AnalyzeCallsCommand]] (`src/commands/AnalyzeCallsCommand.ts`)
 - **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
-- **Analysis**: [[CallAnalyzer]] (`src/analyzer/CallAnalyzer.ts`), [[CallGraphAnalyzer]] (`src/analyzer/CallGraphAnalyzer.ts`)
+- **Analysis**: Call detection via AST analysis (also known as CallRelationshipAnalyzer, CallAnalyzer)
 - **Doc**: [CALLS.md](./CALLS.md)
 
 ### [[Callback]] ❌
