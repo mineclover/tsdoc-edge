@@ -371,6 +371,26 @@ export class MermaidSymbolExtractor {
       /Resolver$/,     // Ends with Resolver
       /^Base\s+/,      // Starts with Base
       /^Enhanced\s+/,  // Starts with Enhanced
+      /^TypeScript\s+/,  // TypeScript AST, etc.
+      /^Mermaid\s+/,   // Mermaid Validation Workflow, etc.
+      /^(Analyzers?|Visualize)\s*$/,  // Plural categories or action verbs alone
+      /^Type\s*$/,     // Just "Type" alone
+      /Chain$/,        // Ends with Chain (Reliability Chain, Dependency Chain Analysis)
+      /\s+Framework$/,  // Ends with Framework (Module Spec Framework)
+      /^Enhanced[A-Z][a-z]+System$/,  // EnhancedDocumentationSystem pattern
+      /^Symbol\s+(Link|Reference|Validation)/,  // Symbol subsystems
+      /^Work\s+Context\s+/,  // Work Context variations
+      /^(Implementation|Relationship)\s+/,  // Planning/system prefixes
+      /^Dependency\s+(Chain|Graph)\s/,  // Dependency subsystems
+      /^Test\s+Coverage\s/,  // Test Coverage Analysis
+      /^Documentation\s+(Reference|Quality)/,  // Documentation subsystems
+      /^AST\s+/,  // AST Parsing, etc.
+      /^Validate\s+Symbol\s+Refs$/,  // Validate Symbol Refs (action)
+      /^Code\s+Health$/,  // Code Health (abstract)
+      /^Symbol\s+(Graph|Validation)\s*$/,  // Symbol subsystems standalone
+      /^Backlinks\s*$/,  // Backlinks standalone
+      /Planned$/i,  // Ends with Planned (planned features)
+      /^(Id|Improve|SpecStatus|SpecHistory|Plans|Todos|CoreApi|WithoutResponsibility|WithoutContract|Scan|FindDoc|FindMethod|FindUnusedDocs)Command$/,  // Planned commands
     ];
 
     const isNonSymbol = nonSymbolPatterns.some(pattern => pattern.test(symbolName));

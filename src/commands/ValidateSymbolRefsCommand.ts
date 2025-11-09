@@ -252,6 +252,92 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
       while ((match = refRegex.exec(lineWithoutInlineCode)) !== null) {
         const symbolName = match[1];
 
+        // Apply same filters as Mermaid extraction
+        // Skip workflow steps and abstract concepts
+        if (/Issue$|Bonus$|Workflow$|Taxonomy$|Roadmap$|Validation$|Analyzer$|Fixer$|Generator$/.test(symbolName)) {
+          continue;
+        }
+        // Skip action verbs and abstract concepts
+        if (/^(Fix|Add|Rebuild|Visualize|Explore|Auto|Missing)\s+/.test(symbolName)) {
+          continue;
+        }
+        // Skip abstract system concepts
+        if (/^(Documentation|Architecture|Evidence|Type Safety)$/.test(symbolName)) {
+          continue;
+        }
+        // Skip interface notation
+        if (/\s+interface$/i.test(symbolName)) {
+          continue;
+        }
+        // Skip system concept patterns
+        if (/^(Dependency|Type)\s+(Graph|System)$/.test(symbolName)) {
+          continue;
+        }
+        // Skip all-caps hyphenated names
+        if (/^[A-Z][A-Z-]+[A-Z]$/.test(symbolName)) {
+          continue;
+        }
+        // Skip workflow actions and system components
+        if (/^(Backlinks|Archive|Delete|Validate)\s*$/.test(symbolName)) {
+          continue;
+        }
+        // Skip quality/health/detector/resolver patterns
+        if (/\s+Quality$|\s+Health$|Detector$|Resolver$/.test(symbolName)) {
+          continue;
+        }
+        // Skip Base/Enhanced prefixes
+        if (/^(Base|Enhanced)\s+/.test(symbolName)) {
+          continue;
+        }
+        // Skip command/symbol system components
+        if (/^(Command|Symbol)\s+(Registry|Graph|Validation)$/.test(symbolName)) {
+          continue;
+        }
+        // Skip TypeScript/Mermaid prefixes
+        if (/^(TypeScript|Mermaid)\s+/.test(symbolName)) {
+          continue;
+        }
+        // Skip generic terms and plural categories
+        if (/^(Analyzers?|Visualize|Type)\s*$/.test(symbolName)) {
+          continue;
+        }
+        // Skip Chain/Framework suffixes
+        if (/Chain$|\s+Framework$/.test(symbolName)) {
+          continue;
+        }
+        // Skip EnhancedXXXSystem patterns
+        if (/^Enhanced[A-Z][a-z]+System$/.test(symbolName)) {
+          continue;
+        }
+        // Skip Symbol/Work Context subsystems
+        if (/^Symbol\s+(Link|Reference|Validation)|^Work\s+Context\s+/.test(symbolName)) {
+          continue;
+        }
+        // Skip Implementation/Relationship planning prefixes
+        if (/^(Implementation|Relationship)\s+/.test(symbolName)) {
+          continue;
+        }
+        // Skip Dependency/Test subsystems
+        if (/^Dependency\s+(Chain|Graph)\s|^Test\s+Coverage\s/.test(symbolName)) {
+          continue;
+        }
+        // Skip Documentation subsystems
+        if (/^Documentation\s+(Reference|Quality)/.test(symbolName)) {
+          continue;
+        }
+        // Skip AST/Validation/Code Health
+        if (/^AST\s+|^Validate\s+Symbol\s+Refs$|^Code\s+Health$/.test(symbolName)) {
+          continue;
+        }
+        // Skip standalone abstract terms
+        if (/^Symbol\s+(Graph|Validation)\s*$|^Backlinks\s*$/.test(symbolName)) {
+          continue;
+        }
+        // Skip planned commands
+        if (/^(Id|Improve|SpecStatus|SpecHistory|Plans|Todos|CoreApi|WithoutResponsibility|WithoutContract|Scan|FindDoc|FindMethod|FindUnusedDocs)Command$/.test(symbolName)) {
+          continue;
+        }
+
         // Check if this is a definition (in heading) or reference
         if (lineWithoutInlineCode.trim().startsWith('#')) {
           // Heading but not H1 - still a definition but not primary
@@ -349,6 +435,61 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
 
       // Skip command/symbol system components
       if (/^(Command|Symbol)\s+(Registry|Graph|Validation)$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip TypeScript/Mermaid prefixes
+      if (/^(TypeScript|Mermaid)\s+/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip generic terms and plural categories
+      if (/^(Analyzers?|Visualize|Type)\s*$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip Chain/Framework suffixes
+      if (/Chain$|\s+Framework$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip EnhancedXXXSystem patterns
+      if (/^Enhanced[A-Z][a-z]+System$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip Symbol/Work Context subsystems
+      if (/^Symbol\s+(Link|Reference|Validation)|^Work\s+Context\s+/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip Implementation/Relationship planning prefixes
+      if (/^(Implementation|Relationship)\s+/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip Dependency/Test subsystems
+      if (/^Dependency\s+(Chain|Graph)\s|^Test\s+Coverage\s/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip Documentation subsystems
+      if (/^Documentation\s+(Reference|Quality)/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip AST/Validation/Code Health
+      if (/^AST\s+|^Validate\s+Symbol\s+Refs$|^Code\s+Health$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip standalone abstract terms
+      if (/^Symbol\s+(Graph|Validation)\s*$|^Backlinks\s*$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip planned commands
+      if (/^(Id|Improve|SpecStatus|SpecHistory|Plans|Todos|CoreApi|WithoutResponsibility|WithoutContract|Scan|FindDoc|FindMethod|FindUnusedDocs)Command$/.test(symbolName)) {
         continue;
       }
 
