@@ -34,8 +34,19 @@ export class PromoteSymbolCommand extends BaseCommand {
     return 'Promote H2 reference to canonical H1 in separate file';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge promote-symbol <source-file> <symbol-name> [target-dir]
+
+  Default target-dir: managed/relationships`;
+  }
+
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const sourceFile = args[0];
       const symbolName = args[1];
       const targetDir = args[2] || 'managed/relationships';
