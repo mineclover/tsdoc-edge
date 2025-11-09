@@ -91,6 +91,13 @@ export class PlansCommand extends BaseCommand {
     return 'Show future plans from documentation';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge plans [--status=<status>]
+
+  Options:
+    --status=<status>  Filter by status (planned, in-progress, completed, cancelled)`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -99,6 +106,11 @@ export class PlansCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const status = args[0]; // Optional: --status=planned
 
       this.printHeader('Future Plans');
@@ -257,6 +269,15 @@ export class FindMethodCommand extends BaseCommand {
     return 'Find methods/functions by qualified name';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge find-method <qualified-name>
+
+  Examples:
+    tsdoc-edge find-method DataProcessor#loadCSV
+    tsdoc-edge find-method UserService.validateEmail
+    tsdoc-edge find-method processData`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -265,6 +286,11 @@ export class FindMethodCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const query = args[0];
 
       if (!query) {
@@ -413,6 +439,10 @@ export class TodosCommand extends BaseCommand {
     return 'Show TODO items from future plans';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge todos';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -421,6 +451,11 @@ export class TodosCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       this.printHeader('TSDoc Edge - TODO List');
 
       const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
@@ -563,6 +598,10 @@ export class StatsCommand extends BaseCommand {
     return 'Show documentation statistics with optional comparison';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge stats';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -571,6 +610,11 @@ export class StatsCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       this.printHeader('TSDoc Edge - Documentation Statistics');
 
       const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
@@ -670,6 +714,10 @@ export class CoreApiCommand extends BaseCommand {
     return 'Show core API symbols (exported + 1-depth dependencies)';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge core-api';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -678,6 +726,11 @@ export class CoreApiCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
       const jsonlPath = path.join(process.cwd(), '.tsdoc', 'data');
 
@@ -823,6 +876,10 @@ export class ScanCommand extends BaseCommand {
     return 'Scan directory for TypeScript files';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge scan [directory]\n\n  Default: src';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -831,6 +888,11 @@ export class ScanCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const targetPath = args[0] || 'src';
 
       if (!fs.existsSync(targetPath)) {
@@ -926,6 +988,10 @@ export class SyncCoverageCommand extends BaseCommand {
     return 'Sync test coverage data from Istanbul/NYC';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge sync-coverage [coverage-file]\n\n  Default: coverage/coverage-final.json';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -934,6 +1000,11 @@ export class SyncCoverageCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const coveragePath = args[0] || 'coverage/coverage-final.json';
 
       if (!fs.existsSync(coveragePath)) {

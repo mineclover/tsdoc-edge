@@ -817,6 +817,12 @@ export class SpecDiffCommand extends BaseCommand {
     return 'Compare specification versions';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge spec-diff <file> <from-version> <to-version>
+
+  Example: tsdoc-edge spec-diff managed/features/validation.md 1.0.0 2.0.0`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -825,6 +831,11 @@ export class SpecDiffCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const target = args[0];
       const fromVersion = args[1];
       const toVersion = args[2];
@@ -939,6 +950,13 @@ export class SpecBumpCommand extends BaseCommand {
     return 'Bump specification version';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge spec-bump <file> <bump-type>
+
+  Bump types: major, minor, patch
+  Example: tsdoc-edge spec-bump managed/features/validation.md minor`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -947,6 +965,11 @@ export class SpecBumpCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const target = args[0];
       const bumpType = args[1] as 'major' | 'minor' | 'patch' | undefined;
 
@@ -1045,6 +1068,12 @@ export class FindDocCommand extends BaseCommand {
     return 'Find document symbol definitions and references';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge find-doc <symbol-name>
+
+  Example: tsdoc-edge find-doc FeatureName`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -1053,6 +1082,11 @@ export class FindDocCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const symbolName = args[0];
 
       if (!symbolName) {
