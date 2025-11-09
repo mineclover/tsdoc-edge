@@ -61,6 +61,10 @@ export class CheckLinksCommand extends BaseCommand {
     return 'Check for broken links in documentation';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge check-links [docs-directory]\n\n  Default: docs';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -68,6 +72,11 @@ export class CheckLinksCommand extends BaseCommand {
    * @public
    */
   async execute(args: string[]): Promise<CommandResult> {
+    // Check for help flag
+    if (this.hasHelpFlag(args)) {
+      return this.displayHelp();
+    }
+
     return this.executeWithErrorHandling(async () => {
       const sourcePath = args[0] || 'src';
 

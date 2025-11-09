@@ -65,6 +65,10 @@ export class UpdateBacklinksCommand extends BaseCommand {
     return 'Update backlinks in document files';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge update-backlinks [docs-directory]\n\n  Default: docs';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -73,6 +77,11 @@ export class UpdateBacklinksCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const target = args[0];
       const docsDir = target || 'docs';
       const docsPath = path.resolve(process.cwd(), docsDir);
