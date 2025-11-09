@@ -1207,6 +1207,15 @@ console.log(`📦 Exported: ${exportPath}`);
 
 ### 핵심 기능 가이드
 
+- **✨ 문서 품질 개선**: [DOCUMENTATION_QUALITY_IMPROVEMENT_GUIDE.md](./DOCUMENTATION_QUALITY_IMPROVEMENT_GUIDE.md) 🔥
+  - **6단계 품질 개선 워크플로우**
+  - **단계별 상세 가이드** (검증 → 자동 수정 → 수동 개선 → 전체 검증 → 통합)
+  - **일반적인 문제 & 해결책**
+  - **품질 메트릭 설명** (건강도 점수 계산)
+  - **베스트 프랙티스**
+  - **체크리스트** (일일/주간/월간/릴리스)
+  - **CI/CD 통합 예제**
+
 - **📖 [[문서 심볼]] 시스템**: [archive/design/DOCUMENT_SYMBOL_DESIGN.md](./archive/design/DOCUMENT_SYMBOL_DESIGN.md)
   - Wiki 스타일 문서 심볼 정의
   - 코드-문서 양방향 연결
@@ -1234,6 +1243,15 @@ console.log(`📦 Exported: ${exportPath}`);
 - **TSDoc 컨벤션**: [reference/tsdoc-conventions/](./reference/tsdoc-conventions/)
   - 7가지 필수/권장 규칙
   - 각 규칙마다 명확한 예시와 이유 제공
+
+- **컨벤션-기능 매핑**: [CONVENTION_FEATURE_MAPPING.md](./CONVENTION_FEATURE_MAPPING.md) 🔥
+  - **7개 TSDoc 컨벤션과 CLI 명령어 연결**
+  - **자동 수정 가능 여부** (CONV-01~05: 자동, CONV-06~07: 수동)
+  - **검증/수정/품질 명령어** 매핑
+  - **올바른 예제 vs 잘못된 예제**
+  - **품질 영향도 분석**
+  - **강제 전략** (pre-commit, CI/CD, PR bot)
+  - **실전 통합 예제**
 
 - **TSDoc 스펙 지원**: [reference/TSDOC_SPEC_SUPPORT.md](./reference/TSDOC_SPEC_SUPPORT.md)
   - 지원하는 전체 TSDoc 태그 (35개)
