@@ -279,6 +279,26 @@ export class MermaidSymbolExtractor {
       /^🧪\s*/,  // Test tube emoji
       /^🟢|^🔴|^🟡/,  // Colored circles
       /[\u{1F300}-\u{1F9FF}]/u,  // Contains any emoji
+      /^Before:\s*/i,  // Before: prefixes
+      /^After:\s*/i,   // After: prefixes
+      /^Added:\s*/i,   // Added: prefixes
+      /^IDE:\s*/,      // IDE: labels
+      /^Editor:\s*/,   // Editor: labels
+      /^Reverse:\s*/,  // Reverse: labels
+      /\s+from\s+/i,   // Algorithm descriptions (DFS from each node)
+      /\s*\+\s*/,      // Contains plus signs (Code + Data + Behavior)
+      /\s*=\s*\?/,     // Query patterns (target = ?)
+      /^(Target|Confidence|Priority|Impact|Effort)$/,  // Single property names
+      /^I\/O\s+/,      // I/O prefix
+      /Deps$/i,        // Ends with Deps (I/O Deps, Code Deps)
+      /Detect$/i,      // Ends with Detect (Circular Detect)
+      /^⚠️\s*/,        // Warning emoji prefix
+      /^→\s*/,         // Arrow prefix
+      /Test\[/,        // TypeScript type syntax (Test[)
+      /Usage\[/,       // TypeScript type syntax (Usage[)
+      /^usedBy:/,      // usedBy: prefix
+      /^tests:/,       // tests: prefix
+      /[\uAC00-\uD7AF]/,  // Contains Korean characters
     ];
 
     const isNonSymbol = nonSymbolPatterns.some(pattern => pattern.test(symbolName));
