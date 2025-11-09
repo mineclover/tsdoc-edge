@@ -148,8 +148,8 @@ erDiagram
 ## References
 
 **Related Documents**:
-- [[System Architecture]] - 시스템 구조 다이어그램
-- [[Database Schema]] - ERDiagram 예시
+- [[TSDoc Edge System Architecture]] - 시스템 구조 다이어그램
+- [[Enhanced Database Schema & Type System]] - ERDiagram 예시
 
 **External Resources**:
 - [Mermaid Official Docs](https://mermaid.js.org/)

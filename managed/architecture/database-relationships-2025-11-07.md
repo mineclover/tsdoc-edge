@@ -626,7 +626,7 @@ graph TD
 - [^UnifiedRelationship]: `src/types/relationships.ts:45` - Relationship type definition
 
 **Related Documents**:
-- [[System Architecture]] - Overall system design
+- [[TSDoc Edge System Architecture]] - Overall system design
 - [[Analysis System]] - Analyzer implementations
 - [[Visualization System]] - Diagram generation
 
