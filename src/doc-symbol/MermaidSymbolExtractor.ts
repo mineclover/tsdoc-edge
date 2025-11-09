@@ -296,9 +296,24 @@ export class MermaidSymbolExtractor {
       /^→\s*/,         // Arrow prefix
       /Test\[/,        // TypeScript type syntax (Test[)
       /Usage\[/,       // TypeScript type syntax (Usage[)
+      /Symbol\[/,      // TypeScript type syntax (Symbol[)
+      /DocRef\[/,      // TypeScript type syntax (DocRef[)
+      /Dep\[/,         // TypeScript type syntax (Dep[)
       /^usedBy:/,      // usedBy: prefix
       /^tests:/,       // tests: prefix
+      /^symbols:/,     // symbols: prefix
+      /^dependencies:/,// dependencies: prefix
+      /^relatedDocs:/, // relatedDocs: prefix
+      /^path:/,        // path: prefix
+      /^canonical:/,   // canonical: prefix
       /[\uAC00-\uD7AF]/,  // Contains Korean characters
+      /_id$/,          // Ends with _id (symbol_id, etc.)
+      /^[a-z][a-zA-Z]+By$/,  // camelCase ending in By (uniqueBy, etc.)
+      /^(get|find|display|execute|gather)[A-Z]/,  // Function names (getAll, findDoc, etc.)
+      /^fs:/,          // fs: prefix
+      /\s*\/\s*/,      // Contains slash (deps / who-uses)
+      /\s*\*\s*/,      // Contains asterisk (analyze-*)
+      /🆕/,            // New feature emoji
     ];
 
     const isNonSymbol = nonSymbolPatterns.some(pattern => pattern.test(symbolName));
