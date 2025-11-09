@@ -222,11 +222,34 @@ export class MermaidSymbolExtractor {
     // First line is usually the symbol name
     let symbolName = lines[0] || nodeId;
 
-    // Clean up symbol name - if it starts with lowercase and has hyphens,
-    // it's likely a data label (like "code-dependency") not a symbol reference.
-    // Convert to Title Case to match actual symbol names
-    if (symbolName && /^[a-z][a-z-]*$/.test(symbolName)) {
-      // This is a lowercase-hyphenated label - convert to Title Case
+    // Map known relationship types to their canonical symbol names
+    const relationshipTypeMap: Record<string, string> = {
+      'code-dependency': 'Code Dependency',
+      'io-dependency': 'IO Dependency',
+      'inheritance': 'Inheritance',
+      'interface-impl': 'Interface Implementation',
+      'calls': 'Call Relationships',
+      'callback': 'Callback Pattern',
+      'composition': 'Composition Relationship',
+      'circular': 'Circular Dependency',
+      'pipeline': 'Pipeline',
+      'event-flow': 'Event Flow',
+      'type-dependency': 'Type Dependency',
+      'generic-constraint': 'Generic Constraint',
+      'layer-dependency': 'Layer Dependency',
+      'module-boundary': 'Module Boundary',
+      'test-coverage': 'Test Coverage',
+      'doc-reference': 'Documentation Reference',
+      'enhancement': 'Enhancement',
+    };
+
+    // Check if this is a known relationship type
+    if (relationshipTypeMap[symbolName]) {
+      symbolName = relationshipTypeMap[symbolName];
+    } else if (symbolName && /^[a-z][a-z-]*$/.test(symbolName)) {
+      // Clean up symbol name - if it starts with lowercase and has hyphens,
+      // it's likely a data label not a symbol reference.
+      // Convert to Title Case to match actual symbol names
       symbolName = symbolName.split('-')
         .map(word => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
