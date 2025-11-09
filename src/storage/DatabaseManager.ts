@@ -347,6 +347,29 @@ export class DatabaseManager {
   }
 
   /**
+   * Get all symbols from database
+   * @returns Array of all symbols
+   */
+  getAllSymbols(): Symbol[] {
+    const stmt = this.db.prepare('SELECT * FROM symbols');
+    const rows = stmt.all() as SymbolRow[];
+
+    return rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      type: row.type as Symbol['type'],
+      filePath: row.file_path,
+      line: row.line,
+      column: row.column,
+      isExported: row.is_exported === 1,
+      isPublic: row.is_public === 1,
+      summary: row.summary ?? undefined,
+      tests: [],
+      designDecisions: [],
+    }));
+  }
+
+  /**
    * Get enhanced documentation for a symbol
    * @param symbolId - Symbol ID
    * @returns Enhanced documentation or null

@@ -1,6 +1,7 @@
 /**
  * Type Dependency Analyzer
  *
+ * @doc [[TypeDependencyAnalyzer]]
  * @packageDocumentation
  * @responsibility Detect type-level dependencies between symbols
  *

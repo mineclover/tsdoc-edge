@@ -3,224 +3,56 @@ title: Code Dependency
 type: relationship
 category: structural
 status: implemented
-implementation-progress: 100%
+canonical: true
 relationships-count: 1968
 ---
 
 # [[Code Dependency]]
 
-> **Type**: `code-dependency`
-> **Category**: Structural (Code Space)
-> **Status**: ✅ Fully Implemented
-> **Detection Method**: Static AST Analysis
+> **Type**: `code-dependency` | **Status**: ✅ 1,968 relationships
 
-## Purpose
+Track explicit import/export dependencies (`import A from B`).
 
-Track explicit import/export dependencies between modules to understand the structural foundation of the codebase.
+## Implementation Chain
 
-## Pattern
+**Extractor**: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts:216-246`)
+- Parses TypeScript AST to extract import statements
+- Detects: `import`, `require()`, `export from`
+- Stores source → target relationships
 
-```typescript
-// File A imports from File B
-import { Foo } from './B';
-import Bar from './B';
-import * as Baz from './B';
+**Command**: [[BuildCommand]] (`src/commands/BuildCommand.ts`)
+- Usage: `tsdoc-edge build <directory>`
+- Triggers: Symbol extraction → dependency analysis → storage
 
-// Creates relationship:
-// type: 'code-dependency'
-// from: Symbol in File A
-// to: Foo | Bar | namespace Baz
-```
+**Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- Table: `unified_relationships`
+- Type: `code-dependency`
+- Schema: `(source_id, target_id, type, metadata)`
 
-## Implementation
+**Query Commands**:
+- [[DepsCommand]] (`src/commands/DepsCommand.ts`) - Show dependencies of a symbol
+- [[WhoUsesCommand]] (`src/commands/WhoUsesCommand.ts`) - Show reverse dependencies
+- [[OrphansCommand]] (`src/commands/OrphansCommand.ts`) - Find unreferenced files
 
-### Extractor
-
-**File**: `src/analyzer/ASTSymbolExtractor.ts`
-**Lines**: 216-246 (extractImport), 251-276 (extractReExport)
-
-```typescript
-private extractImport(node: ts.ImportDeclaration): void {
-  const moduleSpecifier = node.moduleSpecifier;
-  if (!ts.isStringLiteral(moduleSpecifier)) return;
-
-  const modulePath = moduleSpecifier.text;
-  const imported: string[] = [];
-
-  if (node.importClause) {
-    // Default import
-    if (node.importClause.name) {
-      imported.push(node.importClause.name.text);
-    }
-
-    // Named imports
-    if (node.importClause.namedBindings) {
-      if (ts.isNamedImports(node.importClause.namedBindings)) {
-        for (const element of node.importClause.namedBindings.elements) {
-          imported.push(element.name.text);
-        }
-      }
-    }
-  }
-
-  this.imports.push({ from: this.currentFilePath, imported, modulePath });
-}
-```
-
-### Storage
-
-**File**: `src/commands/BuildCommand.ts`
-**Lines**: 185-249
-
-Relationships are stored in both:
-1. **Legacy table**: `dependencies` (for backward compatibility)
-2. **Unified table**: `unified_relationships` (new system)
-
-```typescript
-// Map to unified type
-let unifiedType = 'code-dependency';
-let category = 'structural';
-
-if (relationship.type === 'dependsOn') {
-  unifiedType = 'code-dependency';
-  category = 'structural';
-}
-
-// Insert into unified_relationships
-dbManager.insertUnifiedRelationship({
-  id: `${unifiedType}-${fromId}-${toId}`,
-  type: unifiedType,
-  category: category,
-  fromSymbols: [fromId],
-  toSymbols: [toId],
-  direction: 'unidirectional',
-  strength: 'strong',
-  evidence: [{ type: 'code', source: relationship.filePath, confidence: 1.0 }],
-  discoveredBy: 'static-analysis',
-  confidence: 1.0,
-  // ...
-});
-```
-
-## Properties
-
-| Property | Type | Description |
-|----------|------|-------------|
-| `type` | `'code-dependency'` | Fixed value |
-| `category` | `'structural'` | Fixed value |
-| `direction` | `'unidirectional'` | A imports B (one-way) |
-| `strength` | `'strong'` | Explicit dependency |
-| `confidence` | `1.0` | 100% certain (direct AST evidence) |
-| `discoveredBy` | `'static-analysis'` | AST parsing |
-| `evidence.type` | `'code'` | Source code evidence |
-
-## Commands
-
-### Build
+## Usage Examples
 
 ```bash
-# Initial extraction during build
+# Extract all code dependencies
 tsdoc-edge build src
 
-# Extracts all import statements and creates code-dependency relationships
+# Query dependencies of a file
+tsdoc-edge deps src/commands/BuildCommand.ts
+
+# Find who uses a symbol
+tsdoc-edge who-uses DatabaseManager
+
+# Detect orphaned files
+tsdoc-edge orphans
 ```
 
-### Query
+## Related
 
-```bash
-# Find what a symbol depends on
-tsdoc-edge deps <symbol-id>
-
-# Find what depends on a symbol
-tsdoc-edge who-uses <symbol-id>
-```
-
-## Relationship to Other Types
-
-### Enables
-
-- **[[IO Dependency]]**: Code structure helps infer data flow
-  - If `A` imports `B`, and `A` has function returning `TypeX`, and `B` has function accepting `TypeX`, an IO dependency is inferred.
-
-### Used By
-
-- **[[Circular Dependency]]**: Detection algorithm
-  - Circular detection traverses code-dependency graph to find cycles
-
-## Statistics
-
-**Current Count**: 1,968 relationships (as of 2025-11-07)
-
-```bash
-# Verify count
-sqlite3 .tsdoc/symbols.db \
-  "SELECT COUNT(*) FROM unified_relationships WHERE type='code-dependency'"
-```
-
-**Most Common Patterns**:
-1. Utility imports: `import { ... } from '../utils/...'`
-2. Type imports: `import type { ... } from '../types/...'`
-3. Cross-module imports: `import { ... } from '../module/...'`
-
-## Example
-
-### Source Code
-
-```typescript
-// src/commands/BuildCommand.ts
-import { ASTSymbolExtractor } from '../analyzer/ASTSymbolExtractor';
-import { DatabaseManager } from '../storage/DatabaseManager';
-```
-
-### Generated Relationships
-
-```json
-[
-  {
-    "id": "code-dependency-class-buildcommand-class-astsymbolextractor",
-    "type": "code-dependency",
-    "category": "structural",
-    "from": "class-buildcommand",
-    "to": "class-astsymbolextractor",
-    "direction": "unidirectional",
-    "strength": "strong",
-    "confidence": 1.0,
-    "discoveredBy": "static-analysis",
-    "filePath": "src/commands/BuildCommand.ts",
-    "description": "BuildCommand imports ASTSymbolExtractor"
-  },
-  {
-    "id": "code-dependency-class-buildcommand-class-databasemanager",
-    "type": "code-dependency",
-    "from": "class-buildcommand",
-    "to": "class-databasemanager",
-    // ...
-  }
-]
-```
-
-## Limitations
-
-1. **Dynamic imports not tracked**: `import()` expressions are not detected
-2. **External modules skipped**: Only local file imports are tracked
-3. **Symbol-level granularity**: Tracks file-level imports, not which specific function uses what
-
-## Future Enhancements
-
-- [ ] Track dynamic `import()` statements
-- [ ] Detect unused imports
-- [ ] Calculate import coupling metrics
-- [ ] Suggest import refactoring
-
-## Related Checkpoints
-
-- [[Relationship Types]]: Parent index
-- [[Inheritance]]: Related structural relationship
-- [[Interface Implementation]]: Related structural relationship
-- [[IO Dependency]]: Derived from code dependencies
-
----
-
-**Implementation File**: `src/analyzer/ASTSymbolExtractor.ts:216-246`
-**Command**: `build`
-**Database Column**: `unified_relationships.type = 'code-dependency'`
+- [[IO Dependency]]: Inferred from code structure (complementary)
+- [[Inheritance]]: Often co-occurs with imports (extends/implements)
+- [[Type Dependency]]: Type-level dependencies (parameters, returns)
+- [[SymbolGraphBuilder]] (`src/graph/SymbolGraph.ts`): Graph traversal for dependency chains

@@ -1,0 +1,87 @@
+# [[Symbol]]
+
+**Source**: `src/types/graph/graph.ts`
+
+## Purpose
+
+Core type representing a code symbol in the symbol graph.
+
+## Symbol Definition
+
+A symbol is any named entity in the codebase:
+- Functions
+- Classes
+- Interfaces
+- Types
+- Enums
+- Variables
+- Constants
+- Methods
+- Properties
+
+## Symbol Structure
+
+```typescript
+interface Symbol {
+  id: string;              // Unique identifier (kebab-case)
+  name: string;            // Symbol name
+  type: SymbolType;        // Symbol type
+  filePath: string;        // Source file path
+  line: number;            // Line number
+  column: number;          // Column number
+  isExported: boolean;     // Exported from module?
+  isPublic: boolean;       // Public API?
+  summary?: string;        // TSDoc summary
+  contract?: ContractSpec; // @contract spec
+  responsibility?: ResponsibilitySpec; // @responsibility
+  tests: TestMapping[];    // Test coverage
+  designDecisions: string[]; // Related design docs
+  tags: string[];          // TSDoc tags
+  metadata: Record<string, unknown>; // Additional data
+}
+```
+
+## Symbol ID Generation
+
+Convention: kebab-case from file path + symbol name
+- `src/graph/SymbolGraph.ts:SymbolGraph` → `symbol-graph`
+- `src/commands/BuildCommand.ts:BuildCommand` → `build-command`
+- `src/utils/formatters.ts:formatError` → `format-error`
+
+## Symbol Metadata
+
+### Contract Specification
+- Input constraints
+- Output guarantees
+- Pre/post conditions
+- Invariants
+
+### Responsibility Specification
+- Primary responsibility
+- Scope of concern
+- Boundaries
+
+### Test Mapping
+- Test file paths
+- Test descriptions
+- Coverage percentage
+
+## Symbol Visibility
+
+### isExported
+- `true`: Exported from module
+- `false`: Internal to file
+
+### isPublic
+- `true`: Part of public API (@public tag)
+- `false`: Internal implementation
+
+## Symbol Count
+
+1 interface (Symbol), 9 symbol types
+
+## Related
+
+- [[SymbolGraphBuilder]]: Graph of symbols and relationships
+- [[SymbolRegistryManager]]: Symbol storage and indexing
+- [[ASTSymbolExtractor]]: Extracts symbols from code

@@ -104,13 +104,27 @@ console.log(`Critical symbols documented: ${criticalStats.documented}/${critical
 
 ## 5. Related Concepts (관련 개념)
 
-- [[TrackableStatsCollector]] - 통계 수집 주체
+- [[TrackableStatsCollector]] - 통계 수집 구현체
 - [[StatsHistoryManager]] - 통계 이력 관리
-- Statistics tracking system - 전체 통계 시스템 개요
-- [[Git Hook Integration]] - 자동 통계 수집
-- [[CLI Feedback Cycle]] - 통계 기반 품질 관리
+- [[StatsCommand]] - CLI 인터페이스
+- [[AnalysisFeatures]] - 분석 기능 전반
 
-## 6. Code References (코드 참조)
+## 6. Commands Using This Type
+
+**[[StatsCommand]]** (`src/commands/Phase7Commands.ts:540`)
+- `TrackableStatistics` 수집 및 출력
+- `--save`: 스냅샷 저장
+- `--compare`: 이전 대비 비교
+
+**[[AnalyzeCommand]]** (`src/commands/AnalyzeCommand.ts`)
+- 중요도별 통계 분석
+- `byImportance` 필드 활용
+
+## 7. Code References (코드 참조)
+
+**Type Definition**: `src/types/TrackableStatistics.ts`
+**Primary Producer**: [[TrackableStatsCollector]] (`src/analyzer/TrackableStatsCollector.ts`)
+**History Manager**: [[StatsHistoryManager]] (`src/analyzer/StatsHistoryManager.ts`)
 
 [^TrackableStatistics]
 [^TrackableStatsCollector]

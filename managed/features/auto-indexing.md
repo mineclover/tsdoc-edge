@@ -59,22 +59,36 @@ tsdoc-edge index-docs --file=docs/API.md
 - 변경 파일만 업데이트
 
 ## 핵심 산출물
-### CLI 명령어
 
-**증분 업데이트:**
-```bash
-tsdoc-edge index-docs --file=<path>
-```
+### Document Indexing Commands
 
-이 명령어는 내부적으로:
+**[[IndexDocsCommand]]** - `tsdoc-edge index-docs [dir] [--file=<path>]`
+- 문서 심볼 인덱스 생성/업데이트
+- `--file`: 증분 업데이트 (단일 파일)
+- 전체 스캔 또는 증분 모드
+- **Impl**: `src/commands/IndexDocsCommand.ts:39`
+
+**[[UpdateBacklinksCommand]]** - `tsdoc-edge update-backlinks`
+- `[[Symbol]]` 역방향 링크 업데이트
+- 심볼 참조 추적 및 Backlinks 섹션 생성
+- **Impl**: `src/commands/UpdateBacklinksCommand.ts:40`
+
+**[[ValidateSymbolRefsCommand]]** - `tsdoc-edge validate-symbol-refs <path>`
+- `[[Symbol]]` 참조 검증
+- 정의되지 않은 심볼 탐지
+- **Impl**: `src/commands/ValidateSymbolRefsCommand.ts:71`
+
+**[[UpdateSymbolRefsCommand]]** - `tsdoc-edge update-symbol-refs <path>`
+- `[[Symbol]]` 참조 자동 수정
+- 누락된 참조 추가
+- **Impl**: `src/commands/UpdateSymbolRefsCommand.ts:40`
+
+### Supporting Components
+
+이 명령어들은 내부적으로:
 - [DocumentSymbolRegistry.unregisterFile()](../../src/doc-symbol/DocumentSymbolRegistry.ts#DocumentSymbolRegistry) - 기존 심볼 제거
 - [DocumentSymbolRegistry.import()](../../src/doc-symbol/DocumentSymbolRegistry.ts#DocumentSymbolRegistry) - 기존 인덱스 로드
 - [DocumentSymbolRegistry.export()](../../src/doc-symbol/DocumentSymbolRegistry.ts#DocumentSymbolRegistry) - 새 인덱스 저장
-
-**전체 스캔:**
-```bash
-tsdoc-edge index-docs [dir]
-```
 
 ### 설정 파일
 **Git Hook:**

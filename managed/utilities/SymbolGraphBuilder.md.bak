@@ -1,0 +1,150 @@
+# [[SymbolGraphBuilder]]
+
+**Source**: `src/graph/SymbolGraphBuilder.ts`
+
+## Purpose
+
+Build and maintain a graph of all symbols and their relationships.
+
+## Graph Structure
+
+### Adjacency List Representation
+
+Uses adjacency lists instead of matrix:
+- **Rationale**: Sparse graphs (most symbols independent)
+- **Benefits**: O(1) edge lookup, O(V+E) space
+- **Use case**: Efficient DFS/BFS traversal
+
+### Graph Components
+
+```typescript
+interface SymbolGraph {
+  symbols: Map<string, Symbol>;
+  relationships: SymbolRelationship[];
+  nameIndex: Map<string, string[]>;           // name → symbol IDs
+  fileIndex: Map<string, string[]>;           // file → symbol IDs
+  adjacencyList: Map<string, string[]>;       // ID → dependencies
+  reverseAdjacencyList: Map<string, string[]>; // ID → dependents
+}
+```
+
+## Core Operations
+
+### Add Symbol
+```typescript
+builder.addSymbol(symbol);
+// Indexes by ID, name, and file path
+// Updates all indices automatically
+```
+
+### Add Relationship
+```typescript
+builder.addRelationship(relationship);
+// Updates adjacency lists (bidirectional)
+// Tracks relationship metadata
+```
+
+### Search by Name
+```typescript
+const symbols = builder.findByName('UserService');
+// Returns all symbols matching name
+// Uses name index for O(1) lookup
+```
+
+### Search by File
+```typescript
+const symbols = builder.findByFile('src/services/UserService.ts');
+// Returns all symbols in file
+// Uses file index for O(1) lookup
+```
+
+## Indexing Strategy
+
+### Name Index
+- Key: Symbol name
+- Value: Array of symbol IDs
+- Handles name collisions
+
+### File Index
+- Key: File path
+- Value: Array of symbol IDs
+- One-to-many relationship
+
+### Adjacency Lists
+
+**Forward (dependencies)**:
+```
+UserService → [UserRepository, Logger, Config]
+```
+
+**Reverse (dependents)**:
+```
+UserRepository ← [UserService, AdminService]
+```
+
+## Graph Analysis
+
+### Find Dependencies
+```typescript
+const deps = builder.getDependencies(symbolId);
+// Direct dependencies only
+```
+
+### Find Dependents
+```typescript
+const dependents = builder.getDependents(symbolId);
+// Who depends on this symbol?
+```
+
+### Circular Detection
+```typescript
+const cycles = builder.detectCircularDeps();
+// Returns all circular dependency cycles
+```
+
+### Graph Statistics
+```typescript
+const stats = builder.getStatistics();
+// {
+//   totalSymbols: 1592,
+//   totalRelationships: 4521,
+//   avgDepsPerSymbol: 2.84,
+//   maxDepth: 8
+// }
+```
+
+## Use Cases
+
+### Build Initial Graph
+```typescript
+const builder = new SymbolGraphBuilder();
+for (const symbol of symbols) {
+  builder.addSymbol(symbol);
+}
+for (const rel of relationships) {
+  builder.addRelationship(rel);
+}
+const graph = builder.build();
+```
+
+### Dependency Analysis
+```typescript
+const deps = builder.getDependencies('user-service');
+const transitiveDeps = builder.getTransitiveDeps('user-service');
+```
+
+### Impact Analysis
+```typescript
+const impacted = builder.getDependents('user-repository');
+// Who would be affected by changes to UserRepository?
+```
+
+## Symbol Count
+
+1 class
+
+## Related
+
+- [[SymbolGraph]]: Graph type definition
+- [[SymbolSearchEngine]]: Advanced search
+- [[DepthTraverser]]: Graph traversal

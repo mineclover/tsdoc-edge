@@ -64,3 +64,5 @@ export {
 export { CommandRegistry } from './CommandRegistry';
 export { AnalyzeIOCommand } from './AnalyzeIOCommand';
 export { VisualizeDepsCommand } from './VisualizeDepsCommand';
+export { CoverageReportCommand } from './CoverageReportCommand';
+export { DetectDeadCodeCommand } from './DetectDeadCodeCommand';

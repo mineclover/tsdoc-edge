@@ -9,6 +9,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import { DocumentSymbolRegistry } from '../doc-symbol/DocumentSymbolRegistry';
 import { TSDocSymbolParser } from '../doc-symbol/TSDocSymbolParser';
+import type { CodeConnection } from '../types/feature';
 
 /**
  * Command for indexing document symbols
@@ -216,6 +217,7 @@ export class IndexDocsCommand extends BaseCommand {
     let totalPrimary = 0;
     let totalAux = 0;
     let totalRefs = 0;
+    let totalSourceConns = 0;
 
     for (const filePath of markdownFiles) {
       try {
@@ -231,6 +233,18 @@ export class IndexDocsCommand extends BaseCommand {
         if (parsed.primary) totalPrimary++;
         totalAux += parsed.auxiliaries.length;
         totalRefs += parsed.references.length;
+
+        // Create code connection from **Source**: pattern
+        if (parsed.sourceFilePath && parsed.primary) {
+          const conn: CodeConnection = {
+            codeSymbol: parsed.primary.name,
+            filePath: parsed.sourceFilePath,
+            line: 1, // Approximate line (file level)
+            docSymbol: parsed.primary.name,
+          };
+          registry.registerCodeConnection(conn);
+          totalSourceConns++;
+        }
       } catch (error) {
         this.printError(
           `Error parsing ${filePath}: ${error instanceof Error ? error.message : String(error)}`
@@ -258,7 +272,9 @@ export class IndexDocsCommand extends BaseCommand {
     console.log(`Primary definitions: ${colors.green}${totalPrimary}${colors.reset}`);
     console.log(`Auxiliary definitions: ${colors.cyan}${totalAux}${colors.reset}`);
     console.log(`References: ${colors.cyan}${totalRefs}${colors.reset}`);
-    console.log(`Code connections: ${colors.cyan}${totalCodeConns}${colors.reset}`);
+    console.log(
+      `Code connections: ${colors.cyan}${totalCodeConns + totalSourceConns}${colors.reset} (${totalCodeConns} from @doc, ${totalSourceConns} from Source:)`
+    );
     console.log();
 
     // Save to file

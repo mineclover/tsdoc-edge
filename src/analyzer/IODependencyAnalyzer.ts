@@ -1,6 +1,7 @@
 /**
  * I/O Dependency Analyzer
  *
+ * @doc [[IODependencyAnalyzer]]
  * @packageDocumentation
  * @responsibility Detect data flow relationships between symbols
  *

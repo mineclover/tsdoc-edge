@@ -94,13 +94,25 @@ Source Code → [TSDocParser] → ExtractionResult
 
 ## 5. Related Concepts (관련 개념)
 
-- [[TSDocParser]] - ExtractionResult 생성 주체
+- [[ASTSymbolExtractor]] - 실제 파싱 구현체
 - [[SymbolGraphBuilder]] - ExtractionResult → Graph 변환
-- Core parsing pipeline - 전체 파싱 파이프라인
-- Symbol graph structure - 심볼 그래프 구조
-- [[CLI Feedback Cycle]] - 파싱을 시작점으로 하는 전체 사이클
+- [[BuildCommand]] - 전체 빌드 프로세스
 
-## 6. Code References (코드 참조)
+## 6. Commands Using This Type
+
+**[[BuildCommand]]** (`src/commands/BuildCommand.ts:40`)
+- 소스 코드 파싱하여 `ExtractionResult` 생성
+- 심볼과 관계를 DB에 저장
+
+**[[ParseCommand]]** (`src/commands/ParseCommand.ts:37`)
+- 단일 파일 파싱 및 `ExtractionResult` 출력
+- 디버깅 및 검증 용도
+
+## 7. Code References (코드 참조)
+
+**Type Definition**: `src/types/ExtractionResult.ts`
+**Primary Producer**: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`)
+**Primary Consumer**: [[BuildCommand]] (`src/commands/BuildCommand.ts`)
 
 [^ExtractionResult]
 [^TSDocParser]

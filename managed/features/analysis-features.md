@@ -227,25 +227,94 @@ Violations:
 ```
 ## CLI 명령어
 
-```bash
-# 건강도 측정
-tsdoc-edge health [path]
-# 품질 분석
-tsdoc-edge analyze [path]
-# 통계 수집
-tsdoc-edge stats [path]
-tsdoc-edge stats [path] --save           # 스냅샷 저장
-tsdoc-edge stats [path] --compare        # 이전과 비교
-# 개선 제안
-tsdoc-edge suggest [path]
-tsdoc-edge suggest [path] --limit=30
+### Query & Analysis Commands
 
-# 특정 문제 찾기
-tsdoc-edge undocumented                  # 미문서화
-tsdoc-edge untested                      # 미테스트
-tsdoc-edge without-responsibility        # 책임 미정의
-tsdoc-edge without-contract              # 계약 미정의
-```
+**[[HealthCommand]]** - `tsdoc-edge health [path]`
+- 코드 건강도 종합 점수 (문서화, 테스트, 연결성)
+- **Implementation Chain**:
+  - Command: `src/commands/HealthCommand.ts`
+  - Analyzer: [[CodeHealthChecker]] (`src/analyzer/CodeHealthChecker.ts`)
+  - Uses: [[DocumentationAnalyzer]] (`src/analyzer/DocumentationAnalyzer.ts`), [[TestCoverageAnalyzer]] (`src/analyzer/TestCoverageAnalyzer.ts`)
+  - Storage: [[SymbolGraphBuilder]] (`src/graph/SymbolGraph.ts`)
+
+**[[AnalyzeCommand]]** - `tsdoc-edge analyze [path]`
+- 코드 품질 분석 (중요도별, 레이어별)
+- **Implementation Chain**:
+  - Command: `src/commands/AnalyzeCommand.ts`
+  - Uses: [[ImportanceClassifier]] (`src/analyzer/ImportanceClassifier.ts`), [[DomainStructureAnalyzer]] (`src/analyzer/DomainStructureAnalyzer.ts`)
+  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+
+**[[StatsCommand]]** - `tsdoc-edge stats [path] [--save] [--compare]`
+- 통계 수집 및 스냅샷 저장/비교
+- **Implementation Chain**:
+  - Command: `src/commands/StatsCommand.ts`
+  - Collector: [[TrackableStatsCollector]] (`src/analyzer/TrackableStatsCollector.ts`)
+  - Comparator: [[StatsComparator]] (`src/analyzer/StatsComparator.ts`)
+  - History: [[StatsHistoryManager]] (`src/analyzer/StatsHistoryManager.ts`)
+
+**[[SuggestCommand]]** - `tsdoc-edge suggest [path] [--limit=30]`
+- 개선 제안 생성 (우선순위별)
+- **Implementation Chain**:
+  - Command: `src/commands/SuggestCommand.ts`
+  - Uses: [[ImportanceClassifier]] (`src/analyzer/ImportanceClassifier.ts`), [[DocumentationAnalyzer]] (`src/analyzer/DocumentationAnalyzer.ts`)
+  - Storage: [[SymbolGraphBuilder]] (`src/graph/SymbolGraph.ts`)
+
+**[[DepsCommand]]** - `tsdoc-edge deps <symbol-id>`
+- 심볼의 의존성 조회
+- **Implementation Chain**:
+  - Command: `src/commands/DepsCommand.ts`
+  - Resolver: [[DependencyResolver]] (`src/analyzer/DependencyResolver.ts`)
+  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+
+**[[WhoUsesCommand]]** - `tsdoc-edge who-uses <symbol-id>`
+- 심볼을 사용하는 곳 조회 (역의존성)
+- **Implementation Chain**:
+  - Command: `src/commands/WhoUsesCommand.ts`
+  - Graph: [[SymbolGraphBuilder]] (`src/graph/SymbolGraph.ts`)
+  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+
+**[[OrphansCommand]]** - `tsdoc-edge orphans`
+- 고아 심볼 탐지 (연결되지 않은 코드)
+- **Implementation Chain**:
+  - Command: `src/commands/OrphansCommand.ts`
+  - Graph: [[SymbolGraphBuilder]] (`src/graph/SymbolGraph.ts`)
+  - Algorithm: DFS traversal from entry points
+
+**[[UndocumentedCommand]]** - `tsdoc-edge undocumented`
+- 미문서화 심볼 탐지
+- **Implementation Chain**:
+  - Command: `src/commands/UndocumentedCommand.ts`
+  - Analyzer: [[DocumentationAnalyzer]] (`src/analyzer/DocumentationAnalyzer.ts`)
+  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+
+**[[UntestedCommand]]** - `tsdoc-edge untested`
+- 미테스트 심볼 탐지
+- **Implementation Chain**:
+  - Command: `src/commands/UntestedCommand.ts`
+  - Analyzer: [[TestCoverageAnalyzer]] (`src/analyzer/TestCoverageAnalyzer.ts`)
+  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+
+**[[WithoutResponsibilityCommand]]** - `tsdoc-edge without-responsibility`
+- 책임 미정의 심볼 (@responsibility 태그 누락)
+- **Implementation Chain**:
+  - Command: `src/commands/WithoutResponsibilityCommand.ts`
+  - Validator: TSDoc parser for @responsibility tag
+  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+
+**[[WithoutContractCommand]]** - `tsdoc-edge without-contract`
+- 계약 미정의 심볼 (@contract 태그 누락)
+- **Implementation Chain**:
+  - Command: `src/commands/WithoutContractCommand.ts`
+  - Validator: TSDoc parser for @contract tag
+  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+
+**[[TreeCommand]]** - `tsdoc-edge tree <symbol-id>`
+- 의존성 트리 시각화
+- **Implementation Chain**:
+  - Command: `src/commands/TreeCommand.ts`
+  - Graph: [[SymbolGraphBuilder]] (`src/graph/SymbolGraph.ts`)
+  - Resolver: [[DependencyResolver]] (`src/analyzer/DependencyResolver.ts`)
+  - Visualization: ASCII tree builder
 
 ## 통계 스냅샷 구조
 `.tsdoc/stats-history.json`:

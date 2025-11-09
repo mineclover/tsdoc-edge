@@ -1,6 +1,7 @@
 /**
  * Test Relationship Analyzer
  *
+ * @doc [[TestRelationshipAnalyzer]]
  * @packageDocumentation
  * @responsibility Detect test-coverage relationships between test files and source symbols
  *

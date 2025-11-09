@@ -1,5 +1,6 @@
 /**
  * Build command for creating symbol database
+ * @doc [[BuildCommand]]
  * @packageDocumentation
  */
 
@@ -36,6 +37,8 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
  * @depends FileScanner, DatabaseManager, SymbolRegistryManager, ConfigManager
  * @depType internal
  * @depReason Core infrastructure for symbol extraction and storage
+ *
+ * @doc [[BuildCommand]]
  */
 export class BuildCommand extends BaseCommand {
   private configManager: ConfigManager;

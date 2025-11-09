@@ -199,6 +199,10 @@ export class MermaidSymbolExtractor {
       }
     }
 
+    // Store current context for relationship generation
+    this.currentSymbols = result.symbols;
+    this.currentRelationships = result.relationships;
+
     // Generate suggested documentation
     result.suggestedDocs = this.generateDocSuggestions(result.symbols);
 
@@ -306,6 +310,9 @@ export class MermaidSymbolExtractor {
     const status = symbol.status === 'implemented' ? 'implemented' : 'planned';
     const progress = symbol.status === 'implemented' ? '100%' : '0%';
 
+    // Generate relationship sections
+    const relationshipSections = this.generateRelationshipSections(symbol);
+
     return `---
 title: ${symbol.symbolName}
 type: reference
@@ -363,6 +370,8 @@ TODO: Document implementation details
 # TODO: Document relevant commands
 \`\`\`
 
+${relationshipSections}
+
 ## Related Checkpoints
 
 - [[Relationship Types]]: Parent index
@@ -374,6 +383,83 @@ ${symbol.metrics?.count ? `\n## Statistics\n\n**Current Count**: ${symbol.metric
 **Command**: TBD
 `;
   }
+
+  /**
+   * Generate relationship sections based on edges
+   */
+  private generateRelationshipSections(symbol: MermaidSymbol): string {
+    if (!this.currentRelationships || this.currentRelationships.length === 0) {
+      return '';
+    }
+
+    const outgoing = this.currentRelationships.filter(r => r.from === symbol.nodeId);
+    const incoming = this.currentRelationships.filter(r => r.to === symbol.nodeId);
+
+    if (outgoing.length === 0 && incoming.length === 0) {
+      return '';
+    }
+
+    let sections = '\n## Relationships\n\n';
+
+    if (outgoing.length > 0) {
+      sections += '### Depends On\n\n';
+      sections += 'This relationship type builds upon or uses:\n\n';
+      for (const rel of outgoing) {
+        const targetSymbol = this.findSymbolByNodeId(rel.to);
+        const edgeStyle = this.getEdgeStyleDescription(rel.edgeType);
+        sections += `- **[[${targetSymbol?.symbolName || rel.to}]]** (${edgeStyle})`;
+        if (rel.label) {
+          sections += ` - ${rel.label}`;
+        }
+        sections += '\n';
+      }
+      sections += '\n';
+    }
+
+    if (incoming.length > 0) {
+      sections += '### Used By\n\n';
+      sections += 'This relationship type is used by:\n\n';
+      for (const rel of incoming) {
+        const sourceSymbol = this.findSymbolByNodeId(rel.from);
+        const edgeStyle = this.getEdgeStyleDescription(rel.edgeType);
+        sections += `- **[[${sourceSymbol?.symbolName || rel.from}]]** (${edgeStyle})`;
+        if (rel.label) {
+          sections += ` - ${rel.label}`;
+        }
+        sections += '\n';
+      }
+      sections += '\n';
+    }
+
+    return sections;
+  }
+
+  /**
+   * Find symbol by node ID
+   */
+  private findSymbolByNodeId(nodeId: string): MermaidSymbol | undefined {
+    return this.currentSymbols?.find(s => s.nodeId === nodeId);
+  }
+
+  /**
+   * Get edge style description
+   */
+  private getEdgeStyleDescription(edgeType: 'solid' | 'dotted' | 'thick'): string {
+    switch (edgeType) {
+      case 'solid':
+        return 'direct dependency';
+      case 'dotted':
+        return 'indirect/inferred';
+      case 'thick':
+        return 'strong coupling';
+      default:
+        return 'related';
+    }
+  }
+
+  // Store current extraction context for relationship generation
+  private currentSymbols?: MermaidSymbol[];
+  private currentRelationships?: MermaidRelationship[];
 
   /**
    * Validate symbol reference consistency

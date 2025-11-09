@@ -91,9 +91,26 @@ if (report.metrics.overallScore < 70) {
 ## 5. Related Concepts (관련 개념)
 
 - [[AnalysisFeatures]] - 분석 기능 전체 설명
-- [[CLI Feedback Cycle]] - 분석 리포트 활용 워크플로우
+- [[HealthCommand]] - `tsdoc-edge health` 명령어 구현
+- [[AnalyzeCommand]] - `tsdoc-edge analyze` 명령어 구현
 
-## 6. Code References (코드 참조)
+## 6. Commands Using This Type
+
+**[[HealthCommand]]** (`src/commands/HealthCommand.ts`)
+- `AnalysisReport` 생성 및 출력
+- 전체 건강도 점수 계산
+
+**[[AnalyzeCommand]]** (`src/commands/AnalyzeCommand.ts`)
+- 코드 품질 분석 수행
+- `AnalysisReport` 기반 개선 제안
+
+**[[SuggestCommand]]** (`src/commands/Phase4Commands.ts:21`)
+- `suggestions` 필드 기반 우선순위 제안
+
+## 7. Code References (코드 참조)
+
+**Type Definition**: `src/types/AnalysisReport.ts`
+**Primary Usage**: [[CodeHealthChecker]] (`src/analyzer/CodeHealthChecker.ts`)
 
 [^AnalysisReport]
 [^CodeHealthChecker]

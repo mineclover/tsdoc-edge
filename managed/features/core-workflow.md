@@ -67,17 +67,86 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 - 설계 결정 및 미래 계획
 ## CLI 명령어
 
-```bash
-# 초기 설정
-tsdoc-edge init
-# 문서 생성 및 분석
-tsdoc-edge analyze src
-tsdoc-edge health src
-tsdoc-edge stats src
-# 검증
-tsdoc-edge validate
-tsdoc-edge undocumented
-```
+### Core Workflow Commands
+
+**[[InitCommand]]** - `tsdoc-edge init`
+- 프로젝트 초기화
+- `.tsdoc.config.json` 생성
+- **Implementation Chain**:
+  - Command: `src/commands/Phase4Commands.ts:153`
+  - Manager: [[ConfigManager]] (`src/config/ConfigManager.ts`)
+  - Creates: `.tsdoc.config.json` with default settings
+
+**[[BuildCommand]]** - `tsdoc-edge build <path>`
+- 소스 코드 파싱 및 심볼 추출
+- 관계 분석 및 DB 저장
+- **Implementation Chain**:
+  - Command: `src/commands/BuildCommand.ts:40`
+  - Extractor: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`)
+  - Parser: [[TSDocParser]] (`src/parser/TSDocParser.ts`)
+  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Output: SQLite DB + JSONL registry
+
+**[[WorkContextCommand]]** - `tsdoc-edge work-context <file-path>`
+- 파일 수정 전 완전한 컨텍스트 제공
+- 의존성, 역의존성, 테스트 매핑 표시
+- **Implementation Chain**:
+  - Command: `src/commands/WorkContextCommand.ts:60`
+  - Parser: [[TSDocParser]] (`src/parser/TSDocParser.ts`)
+  - Doc Parser: [[DocumentSymbolParser]] (`src/doc-symbol/DocumentSymbolParser.ts`)
+  - Graph: [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`)
+  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+
+**[[ExploreEntrypointCommand]]** - `tsdoc-edge explore-entrypoint <doc-path> [--detect-orphans]`
+- 문서 진입점부터 코드 탐색
+- 심볼 커버리지 및 고아 코드 탐지
+- **Implementation Chain**:
+  - Command: `src/commands/ExploreEntrypointCommand.ts:45`
+  - Doc Parser: [[DocumentSymbolParser]] (`src/doc-symbol/DocumentSymbolParser.ts`)
+  - Mermaid Parser: [[MermaidSymbolExtractor]] (`src/doc-symbol/MermaidSymbolExtractor.ts`)
+  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Algorithm: BFS traversal through [[Symbol]] references
+
+**[[ParseCommand]]** - `tsdoc-edge parse <file-path>`
+- 단일 파일 파싱 및 결과 출력
+- 디버깅 및 검증 용도
+- **Implementation Chain**:
+  - Command: `src/commands/ParseCommand.ts:37`
+  - Extractor: [[EnhancedDocExtractor]] (`src/parser/EnhancedDocExtractor.ts`)
+  - Parser: [[TSDocParser]] (`src/parser/TSDocParser.ts`)
+  - Output: Console display with completeness metrics
+
+### Supporting Commands
+
+**[[AnalyzeCommand]]** - `tsdoc-edge analyze <path>`
+- 코드 품질 분석
+- **Implementation Chain**:
+  - Command: `src/commands/AnalyzeCommand.ts:36`
+  - Analyzer: [[CodeHealthChecker]] (`src/analyzer/CodeHealthChecker.ts`)
+  - Output: [[AnalysisReport]] with metrics and issues
+
+**[[HealthCommand]]** - `tsdoc-edge health <path>`
+- 코드 건강도 점수 계산
+- **Implementation Chain**:
+  - Command: `src/commands/HealthCommand.ts:36`
+  - Analyzer: [[CodeHealthChecker]] (`src/analyzer/CodeHealthChecker.ts`)
+  - Metrics: [[CodeHealthMetrics]] (`src/types/analysis.ts`)
+  - Output: Health grade (A+ to F) with recommendations
+
+**[[ValidateCommand]]** - `tsdoc-edge validate [path]`
+- 전체 검증 (컨벤션, 연결성)
+- **Implementation Chain**:
+  - Command: `src/commands/ValidateCommand.ts:67`
+  - Graph: [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`)
+  - Validator: [[ConnectivityValidator]] (`src/validator/ConnectivityValidator.ts`)
+  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+
+**[[UndocumentedCommand]]** - `tsdoc-edge undocumented`
+- 미문서화 심볼 탐지
+- **Implementation Chain**:
+  - Command: `src/commands/Phase5Commands.ts:573`
+  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Query: Filters symbols with missing documentation
 ## 관련 기능
 
 - [[AnalysisFeatures]] - 코드 건강도 및 문서 품질 분석

@@ -8,6 +8,7 @@
  * - 테스트 파일 (이 파일을 테스트하는 파일들)
  * - 영향 범위 (이 파일을 사용하는 곳들)
  *
+ * @doc [[WorkContextCommand]]
  * @packageDocumentation
  */
 
@@ -55,6 +56,7 @@ interface WorkContext {
 /**
  * Work Context Command - 파일 작업에 필요한 모든 컨텍스트 제공
  *
+ * @doc [[WorkContextCommand]]
  * @public
  */
 export class WorkContextCommand extends BaseCommand {

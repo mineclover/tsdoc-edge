@@ -534,6 +534,8 @@ Please add integration tests before committing.
 ---
 
 **Status**: Design Phase
+**Implementation**: [[TestRelationshipsCommand]] (`src/commands/TestRelationshipsCommand.ts`)
+**Related Commands**: [[AnalyzeTestsCommand]], [[ParallelWorkCommand]]
 **Next Steps**: Implement TestRelationshipExtractor
 **Priority**: High (병렬 개발 안전성에 핵심)
-**Last Updated**: 2025-11-06
+**Last Updated**: 2025-11-08

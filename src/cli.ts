@@ -72,6 +72,9 @@ import { WorkContextCommand } from './commands/WorkContextCommand';
 import { ExploreEntrypointCommand } from './commands/ExploreEntrypointCommand';
 import { ParseMermaidCommand } from './commands/ParseMermaidCommand';
 import { ValidateSymbolRefsCommand } from './commands/ValidateSymbolRefsCommand';
+import { PromoteSymbolCommand } from './commands/PromoteSymbolCommand';
+import { CoverageReportCommand } from './commands/CoverageReportCommand';
+import { DetectDeadCodeCommand } from './commands/DetectDeadCodeCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -159,6 +162,9 @@ async function main(): Promise<void> {
   registry.register(new ExploreEntrypointCommand());
   registry.register(new ParseMermaidCommand());
   registry.register(new ValidateSymbolRefsCommand());
+  registry.register(new PromoteSymbolCommand());
+  registry.register(new CoverageReportCommand());
+  registry.register(new DetectDeadCodeCommand());
   registry.register(new HelpCommand(registry));
 
   // Get command

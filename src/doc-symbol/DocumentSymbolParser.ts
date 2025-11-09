@@ -52,6 +52,13 @@ export class DocumentSymbolParser {
       return null;
     }
 
+    // Extract source file path BEFORE removing code blocks (to preserve backticks)
+    let sourceFilePath: string | undefined;
+    const sourceMatch = body.match(/\*\*Source\*\*:\s*`([^`]+)`/);
+    if (sourceMatch) {
+      sourceFilePath = sourceMatch[1];
+    }
+
     // Remove code blocks if configured
     const config = this.configManager.get();
     const contentToParse = config.documentManagement?.ignoreCodeBlocks
@@ -66,6 +73,7 @@ export class DocumentSymbolParser {
       references: [],
       codeReferences: [],
       symbolFootnoteRefs: [],
+      sourceFilePath,
     };
 
     for (let i = 0; i < lines.length; i++) {
@@ -255,9 +263,12 @@ export class DocumentSymbolParser {
 
     // Check exclude directories
     if (docMgmt.excludeDirs) {
-      const isExcluded = docMgmt.excludeDirs.some((dir: string) =>
-        normalizedPath.includes(path.normalize(dir))
-      );
+      const isExcluded = docMgmt.excludeDirs.some((dir: string) => {
+        const normalizedDir = path.normalize(dir);
+        // Check if the path contains this directory as a path segment (not substring)
+        const pathParts = normalizedPath.split(path.sep);
+        return pathParts.includes(normalizedDir);
+      });
       if (isExcluded) {
         return false;
       }
@@ -270,9 +281,12 @@ export class DocumentSymbolParser {
 
     // Check managed directories
     if (docMgmt.managedDirs && docMgmt.managedDirs.length > 0) {
-      return docMgmt.managedDirs.some((dir: string) =>
-        normalizedPath.includes(path.normalize(dir))
-      );
+      return docMgmt.managedDirs.some((dir: string) => {
+        const normalizedDir = path.normalize(dir);
+        // Check if the path contains this directory as a path segment (not substring)
+        const pathParts = normalizedPath.split(path.sep);
+        return pathParts.includes(normalizedDir);
+      });
     }
 
     // Default: process if no specific rules

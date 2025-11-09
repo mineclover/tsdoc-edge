@@ -1,267 +1,194 @@
 ---
-title: Relationship Types Index
-type: index
-category: relationships
+title: Relationship Types
+type: meta-architecture
+category: core-design
 status: active
+canonical: true
 entrypoint: true
-purpose: Single source of truth for all relationship types in TSDoc Edge
+source-diagram: managed/architecture/diagrams/dependency-meta-structure.mmd
 ---
 
 # [[Relationship Types]]
 
-> **SSOT Entrypoint**: This document is the single source of truth for all relationship types tracked by TSDoc Edge.
-> Use `tsdoc-edge work-context managed/relationships/index.md` to explore the entire relationship system.
+> **SSOT**: Master index for all relationship types tracked by TSDoc Edge
+> **Source**: [[Dependency Meta-Structure]] (`managed/architecture/diagrams/dependency-meta-structure.mmd`)
 
-## Overview
-
-TSDoc Edge tracks **17 relationship types** across **7 dimensions** to provide a complete understanding of code architecture.
-
-**Implementation Progress**: 10/17 types (59%)
-
-## Relationship Taxonomy
-
-### 1. Code Space (구조적 의존성)
-
-Structural dependencies between code elements.
-
-- **[[Code Dependency]]** - ✅ Implemented (1,968 rels)
-  - `import A from B` - Static import/export tracking
-  - **Implementation**: `ASTSymbolExtractor.ts:216-246`
-  - **Command**: `build`
-
-- **[[Inheritance]]** - ✅ Implemented (57 rels)
-  - `class A extends B` - Class and interface inheritance
-  - **Implementation**: `ASTSymbolExtractor.ts:286-315, 336-351`
-  - **Command**: `build`
-
-- **[[Interface Implementation]]** - ✅ Implemented (0 rels, ready)
-  - `class A implements I` - Interface implementation tracking
-  - **Implementation**: `ASTSymbolExtractor.ts:301-313`, `BuildCommand.ts:210-216`
-  - **Command**: `build`
-  - **Note**: No usage in current codebase, but detection is active
-
-### 2. Data Space (데이터 흐름)
-
-Data flow relationships based on type matching.
-
-- **[[IO Dependency]]** - ✅ Implemented (6,705 rels)
-  - Type-based data flow: `A's output → B's input`
-  - **Implementation**: `IODependencyAnalyzer.ts`
-  - **Command**: `analyze-io`
-
-- **[[Pipeline]]** - ✅ Implemented (25,809 chains)
-  - Sequential processing chains: `A → B → C → D` (3+ steps)
-  - **Implementation**: `IODependencyAnalyzer.ts` (chain detection)
-  - **Command**: `analyze-chains`
-
-- **[[Event Flow]]** - ❌ Not Implemented
-  - Event-driven relationships: `emit/listen` patterns
-  - **Target**: Phase 2
-
-### 3. Behavior Space (동적 관계)
-
-Runtime behavior and execution relationships.
-
-- **[[Calls]]** - ✅ Implemented (1,511 rels)
-  - Function call relationships: `foo() calls bar()`
-  - **Implementation**: `CallGraphAnalyzer.ts`
-  - **Command**: `analyze-calls`
-
-- **[[Callback]]** - ❌ Not Implemented
-  - Callback pattern: functions passed as parameters
-  - **Target**: Phase 2
-
-- **[[Composition]]** - ❌ Not Implemented
-  - Has-a relationships: `Feature = A + B + C`
-  - **Target**: Phase 2
-
-### 4. Meta Space (인지적 연결)
-
-Human-understandable semantic connections.
-
-- **[[Doc Reference]]** - ❌ Not Implemented
-  - Documentation links: `@doc [[Symbol]]`
-  - **Target**: Phase 2
-
-- **[[Test Coverage]]** - ✅ Implemented (analyzer ready)
-  - Test-to-implementation mapping: `test→impl`
-  - **Implementation**: `TestRelationshipAnalyzer.ts`
-  - **Command**: `analyze-tests`
-  - **Status**: Analyzer created, needs integration
-
-- **[[Enhancement]]** - ❌ Not Implemented
-  - Enhancement relationships: `@enhances OtherSymbol`
-  - **Target**: Phase 3
-
-### 5. Type Space (타입 시스템)
-
-TypeScript type-level dependencies.
-
-- **[[Type Dependency]]** - ✅ Implemented (analyzer ready)
-  - Type references in signatures: `param: TypeA`, `returns TypeB`
-  - **Implementation**: `TypeDependencyAnalyzer.ts`
-  - **Command**: `analyze-types`
-  - **Status**: Analyzer created, needs integration
-
-- **[[Generic Constraint]]** - ✅ Implemented (analyzer ready)
-  - Generic type constraints: `T extends U`
-  - **Implementation**: `TypeDependencyAnalyzer.ts:217-234`
-  - **Command**: `analyze-types`
-  - **Status**: Analyzer created, needs integration
-
-### 6. Architectural Space (계층)
-
-High-level architectural patterns.
-
-- **[[Layer Dependency]]** - ❌ Not Implemented
-  - Architectural layer violations: `controller→service`
-  - **Target**: Phase 3
-
-- **[[Module Boundary]]** - ❌ Not Implemented
-  - Cross-package dependencies tracking
-  - **Target**: Phase 3
-
-### 7. Quality Space (품질)
-
-Code quality and anti-patterns.
-
-- **[[Circular Dependency]]** - ✅ Implemented (0 detected)
-  - Circular import detection: `A→B→A`
-  - **Implementation**: Dependency graph analysis
-  - **Command**: `analyze`
-
-## Implementation Files
-
-### Core Analyzers
-
-- **`src/analyzer/ASTSymbolExtractor.ts`**
-  - Extracts: [[Code Dependency]], [[Inheritance]], [[Interface Implementation]]
-  - Method: AST parsing via TypeScript Compiler API
-
-- **`src/analyzer/IODependencyAnalyzer.ts`**
-  - Extracts: [[IO Dependency]], [[Pipeline]]
-  - Method: Type signature matching (Cartesian product)
-
-- **`src/analyzer/CallGraphAnalyzer.ts`**
-  - Extracts: [[Calls]]
-  - Method: AST traversal for `ts.isCallExpression`
-
-- **`src/analyzer/TestRelationshipAnalyzer.ts`**
-  - Extracts: [[Test Coverage]]
-  - Method: Test file import analysis
-
-- **`src/analyzer/TypeDependencyAnalyzer.ts`**
-  - Extracts: [[Type Dependency]], [[Generic Constraint]]
-  - Method: Type node traversal and extraction
-
-### Commands
-
-- **`src/commands/BuildCommand.ts`** - Initial build with structural relationships
-- **`src/commands/AnalyzeCallsCommand.ts`** - Call graph analysis
-- **`src/commands/AnalyzeTestsCommand.ts`** - Test coverage analysis
-- **`src/commands/AnalyzeTypesCommand.ts`** - Type dependency analysis
-- **`src/commands/AnalyzeChainsCommand.ts`** - Pipeline chain detection
-- **`src/commands/AnalyzeIOCommand.ts`** - IO dependency detection
-
-## Database Schema
-
-All relationships are stored in the unified schema:
-
-```sql
-CREATE TABLE unified_relationships (
-    id TEXT PRIMARY KEY,
-    type TEXT NOT NULL,              -- Relationship type
-    category TEXT NOT NULL,          -- Category (structural, behavioral, etc.)
-    from_symbols TEXT NOT NULL,      -- JSON array of source symbols
-    to_symbols TEXT NOT NULL,        -- JSON array of target symbols
-    direction TEXT NOT NULL,         -- unidirectional, bidirectional, undirected
-    strength TEXT NOT NULL,          -- strong, medium, weak
-    evidence TEXT NOT NULL,          -- JSON array of evidence
-    discovered_by TEXT NOT NULL,     -- static-analysis, type-inference, etc.
-    confidence REAL NOT NULL,        -- 0.0 - 1.0
-    file_path TEXT,
-    line INTEGER,
-    properties TEXT,                 -- JSON for type-specific properties
-    description TEXT,
-    created_at TEXT NOT NULL,
-    updated_at TEXT NOT NULL
-);
-```
-
-**Schema Location**: `src/storage/schema.sql`
-**Manager**: `src/storage/DatabaseManager.ts`
-
-## Usage: Entrypoint-Based Exploration
-
-### 1. Explore Relationship System
+## Usage
 
 ```bash
-# Start from this index to explore all relationship types
-tsdoc-edge work-context managed/relationships/index.md
+# Explore from this entrypoint
+tsdoc-edge explore-entrypoint managed/relationships/index.md --detect-orphans
 
-# Navigate to specific relationship type documentation
-# Follow [[Symbol]] links to understand implementation details
+# Explore from diagram
+tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-structure.mmd
 ```
 
-### 2. Find Implementation for a Relationship Type
+## Status: 10/17 Implemented (59%)
+
+## 1. Code Space (구조적)
+
+### [[Code Dependency]] ✅ 1,968
+- **Pattern**: `import A from B`
+- **Impl**: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts:216-246`)
+- **Cmd**: [[BuildCommand]] (`src/commands/BuildCommand.ts`)
+- **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- **Query**: [[DepsCommand]] (`src/commands/DepsCommand.ts`), [[WhoUsesCommand]] (`src/commands/WhoUsesCommand.ts`)
+- **Doc**: [CODE-DEPENDENCY.md](./CODE-DEPENDENCY.md)
+
+### [[Inheritance]] ✅ 57
+- **Pattern**: `class A extends B`
+- **Impl**: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`)
+- **Cmd**: [[BuildCommand]] (`src/commands/BuildCommand.ts`)
+- **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- **Query**: [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`) - type-based traversal
+- **Doc**: [INHERITANCE.md](./INHERITANCE.md)
+
+### [[Interface Implementation]] ✅
+- **Pattern**: `class A implements I`
+- **Impl**: [[InterfaceImplementationAnalyzer]] (`src/analyzer/InterfaceImplementationAnalyzer.ts`)
+- **Cmd**: [[BuildCommand]] (`src/commands/BuildCommand.ts`)
+- **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- **Query**: Find all implementations of an interface
+- **Doc**: [INTERFACE-IMPL.md](./INTERFACE-IMPL.md)
+
+## 2. Data Space (데이터 흐름)
+
+### [[IO Dependency]] ✅ 6,705
+- **Pattern**: Return type matches param type
+- **Impl**: [[IODependencyAnalyzer]] (`src/analyzer/IODependencyAnalyzer.ts`)
+- **Cmd**: [[AnalyzeIOCommand]] (`src/commands/AnalyzeIOCommand.ts`)
+- **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- **Analysis**: [[IODependencyAnalyzer]] (`src/analyzer/IODependencyAnalyzer.ts`) - detects input/output contracts
+- **Doc**: [IO-DEPENDENCY.md](./IO-DEPENDENCY.md)
+
+### [[Pipeline]] ✅ 25,809
+- **Pattern**: A → B → C → D (3+ steps)
+- **Impl**: [[IODependencyAnalyzer]] (`src/analyzer/IODependencyAnalyzer.ts`)
+- **Cmd**: [[AnalyzeChainsCommand]] (`src/commands/AnalyzeChainsCommand.ts`)
+- **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- **Doc**: [PIPELINE.md](./PIPELINE.md)
+
+### [[Event Flow]] ❌
+- **Pattern**: `emit()` / `on()`
+- **Status**: Phase 2
+
+## 3. Behavior Space (동적)
+
+### [[Call Relationships]] ✅ 1,511
+- **Pattern**: `foo()` calls `bar()`
+- **Impl**: [[CallRelationshipAnalyzer]] (`src/analyzer/CallRelationshipAnalyzer.ts`)
+- **Cmd**: [[AnalyzeCallsCommand]] (`src/commands/AnalyzeCallsCommand.ts`)
+- **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- **Analysis**: [[CallAnalyzer]] (`src/analyzer/CallAnalyzer.ts`), [[CallGraphAnalyzer]] (`src/analyzer/CallGraphAnalyzer.ts`)
+- **Doc**: [CALLS.md](./CALLS.md)
+
+### [[Callback]] ❌
+- **Pattern**: `function(cb: () => void)`
+- **Status**: Phase 2
+
+### [[Composition]] ❌
+- **Pattern**: `class A { b: B }`
+- **Status**: Phase 2
+
+## 4. Meta Space (인지적)
+
+### [[Test Coverage]] ✅
+- **Pattern**: `*.test.ts` → implementation
+- **Impl**: [[TestRelationshipAnalyzer]] (`src/analyzer/TestRelationshipAnalyzer.ts`)
+- **Cmd**: [[TestRelationshipsCommand]] (`src/commands/TestRelationshipsCommand.ts`)
+- **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- **Analysis**: [[TestCoverageAnalyzer]] (`src/analyzer/TestCoverageAnalyzer.ts`)
+- **Query**: [[UntestedCommand]] (`src/commands/UntestedCommand.ts`) - find untested code
+- **Doc**: [TEST-COVERAGE.md](./TEST-COVERAGE.md)
+
+### [[Doc Reference]] ❌
+- **Pattern**: `@doc [[Symbol]]`
+- **Status**: Phase 3
+
+### [[Enhancement]] ❌
+- **Pattern**: `@enhances`
+- **Status**: Phase 3
+
+## 5. Type Space (타입)
+
+### [[Type Dependency]] ✅
+- **Pattern**: Parameter/return types
+- **Impl**: [[TypeDependencyAnalyzer]] (`src/analyzer/TypeDependencyAnalyzer.ts`)
+- **Cmd**: [[AnalyzeTypesCommand]] (`src/commands/AnalyzeTypesCommand.ts`)
+- **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- **Analysis**: Extracts type relationships from signatures
+- **Doc**: [TYPE-DEPENDENCY.md](./TYPE-DEPENDENCY.md)
+
+### [[Generic Constraint]] ✅
+- **Pattern**: `T extends U`
+- **Impl**: [[TypeDependencyAnalyzer]] (`src/analyzer/TypeDependencyAnalyzer.ts`)
+- **Cmd**: [[AnalyzeTypesCommand]] (`src/commands/AnalyzeTypesCommand.ts`)
+- **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- **Analysis**: Detects generic type constraints
+- **Doc**: [GENERIC-CONSTRAINT.md](./GENERIC-CONSTRAINT.md)
+
+## 6. Architectural Space (계층)
+
+### [[Layer Dependency]] ❌
+- **Pattern**: Controller → Service
+- **Status**: Phase 3
+
+### [[Module Boundary]] ❌
+- **Pattern**: Cross-package deps
+- **Status**: Phase 3
+
+## 7. Quality Space (품질)
+
+### [[Circular Dependency]] ✅ 0
+- **Pattern**: A → B → A
+- **Impl**: [[DetectCircularTypesCommand]] (`src/commands/DetectCircularTypesCommand.ts`)
+- **Cmd**: `tsdoc-edge detect-circular-types`
+- **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- **Analysis**: [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`) - cycle detection via DFS
+- **Query**: Returns all circular dependency chains
+- **Doc**: [CIRCULAR.md](./CIRCULAR.md)
+
+## Roadmap
+
+**Phase 1 (10/10 ✅)**: code-dependency, inheritance, interface-impl, io-dependency, pipeline, calls, test-coverage, type-dependency, generic-constraint, circular
+
+**Phase 2 (0/3)**: event-flow, callback, composition
+
+**Phase 3 (0/4)**: doc-reference, enhancement, layer-dependency, module-boundary
+
+## Statistics
+
+**Total**: 36,050+ relationships
+**Coverage**: 7.0% symbols, 19.0% files (from explore-entrypoint)
+
+## Validation
 
 ```bash
-# Example: Find where [[Code Dependency]] is implemented
-tsdoc-edge work-context managed/relationships/code-dependency.md
-
-# This will show:
-# - Implementation files (ASTSymbolExtractor.ts:216-246)
-# - Related commands (BuildCommand)
-# - Dependency chain to other relationships
+tsdoc-edge validate-symbol-refs managed
+sqlite3 .tsdoc/symbols.db "SELECT type, COUNT(*) FROM unified_relationships GROUP BY type"
 ```
-
-### 3. Orphan Code Detection (Planned)
-
-```bash
-# Find code not reachable from any entrypoint
-tsdoc-edge detect-orphans --entrypoint managed/relationships/index.md
-
-# This will:
-# - Start from [[Relationship Types]] checkpoint
-# - Traverse all [[Symbol]] references
-# - Identify files not referenced in the documentation graph
-```
-
-## Next Steps
-
-### Phase 2 (Immediate)
-- [ ] Implement [[Callback]] detection
-- [ ] Implement [[Event Flow]] tracking
-- [ ] Integrate [[Test Coverage]] analyzer into build
-- [ ] Integrate [[Type Dependency]] analyzer into build
-
-### Phase 3 (Future)
-- [ ] Implement [[Layer Dependency]] validation
-- [ ] Implement [[Module Boundary]] tracking
-- [ ] Implement [[Doc Reference]] parsing
-- [ ] Implement [[Enhancement]] tag support
 
 ## Related Documentation
 
-- [[Dependency Meta-Structure]]: `managed/architecture/diagrams/dependency-meta-structure.mmd`
-- [[Work Context Workflow]]: `managed/workflows/work-context-workflow.md`
-- [[System Architecture]]: Main architecture documentation
+**Core Components**:
+- [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`): Central graph data structure
+- [[DatabaseManager]] (`src/storage/DatabaseManager.ts`): SQLite storage layer
+- [[RegistryManager]] (`src/storage/RegistryManager.ts`): JSONL persistence
+- [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`): Primary extractor
 
-## Verification
+**Command References**:
+- [[Commands Index]] (`managed/COMMANDS.md`): All 61 commands organized by category
+- [[BuildCommand]] (`src/commands/BuildCommand.ts`): Extract all symbols and relationships
+- [[WorkContextCommand]] (`src/commands/WorkContextCommand.ts`): Get file context with relationships
 
-```bash
-# Check current relationship counts
-sqlite3 .tsdoc/symbols.db "SELECT type, COUNT(*) FROM unified_relationships GROUP BY type"
+**Workflows**:
+- [[Work Context Workflow]] (`managed/workflows/work-context-workflow.md`): Primary use case
+- [[Dependency Meta-Structure]] (`managed/architecture/diagrams/dependency-meta-structure.mmd`): Visual taxonomy
 
-# Expected output (as of 2025-11-07):
-# io-dependency|6705
-# code-dependency|1968
-# calls|1511
-# inheritance|57
-```
+**Analysis Features**:
+- [[AnalysisFeatures]] (`managed/features/analysis-features.md`): 12 query & analysis commands
+- [[ValidationFeatures]] (`managed/features/validation-features.md`): 8 validation commands
 
 ---
 
-**Last Updated**: 2025-11-07
-**Maintainer**: TSDoc Edge Core Team
-**Status**: Active SSOT Document
+**Last Updated**: 2025-11-08

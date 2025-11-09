@@ -277,6 +277,24 @@ export class ExploreEntrypointCommand extends BaseCommand {
       return relationshipsPath;
     }
 
+    // Try managed/features
+    const featuresPath = path.join('managed/features', `${filename}.md`);
+    if (fs.existsSync(path.resolve(process.cwd(), featuresPath))) {
+      return featuresPath;
+    }
+
+    // Try managed/workflows
+    const workflowsPath = path.join('managed/workflows', `${filename}.md`);
+    if (fs.existsSync(path.resolve(process.cwd(), workflowsPath))) {
+      return workflowsPath;
+    }
+
+    // Try managed/primary-types
+    const typesPath = path.join('managed/primary-types', `${filename}.md`);
+    if (fs.existsSync(path.resolve(process.cwd(), typesPath))) {
+      return typesPath;
+    }
+
     return null;
   }
 
@@ -288,7 +306,7 @@ export class ExploreEntrypointCommand extends BaseCommand {
     const refs: string[] = [];
 
     // Match: **Implementation**: `path/to/file.ts:line`
-    const implRegex = /\*\*Implementation\*\*:?\s*`([^`]+)`/g;
+    const implRegex = /\*\*Impl(?:ementation)?\*\*:?\s*`([^`]+)`/g;
     let match;
     while ((match = implRegex.exec(content)) !== null) {
       refs.push(match[1]);
@@ -300,7 +318,57 @@ export class ExploreEntrypointCommand extends BaseCommand {
       refs.push(match[1]);
     }
 
+    // Match: **Implementation**: [[SymbolName]] (`path/to/file.ts`)
+    const symbolImplRegex = /\*\*Impl(?:ementation)?\*\*:?\s*\[\[([^\]]+)\]\]\s*\(`([^`]+)`\)/g;
+    while ((match = symbolImplRegex.exec(content)) !== null) {
+      refs.push(match[2]); // Extract path from parentheses
+    }
+
+    // Match: **Command**: [[CommandName]] (`tsdoc-edge command`)
+    // This allows extracting command implementation from command references
+    const commandRegex = /\*\*Command\*\*:?\s*\[\[([^\]]+)\]\]/g;
+    while ((match = commandRegex.exec(content)) !== null) {
+      // Convert command symbol to file path
+      const commandSymbol = match[1];
+      const commandFile = this.symbolToCommandFile(commandSymbol);
+      if (commandFile) {
+        refs.push(commandFile);
+      }
+    }
+
+    // Match: **[[CommandName]]** - `tsdoc-edge command`
+    // New format from feature docs
+    const commandFormatRegex = /\*\*\[\[([^\]]+Command)\]\]\*\*/g;
+    while ((match = commandFormatRegex.exec(content)) !== null) {
+      const commandSymbol = match[1];
+      const commandFile = this.symbolToCommandFile(commandSymbol);
+      if (commandFile) {
+        refs.push(commandFile);
+      }
+    }
+
     return refs;
+  }
+
+  /**
+   * Convert [[CommandName]] to src/commands/CommandName.ts
+   */
+  private symbolToCommandFile(symbolName: string): string | null {
+    // Examples:
+    // [[BuildCommand]] -> src/commands/BuildCommand.ts
+    // [[AnalyzeIOCommand]] -> src/commands/AnalyzeIOCommand.ts
+
+    if (symbolName.endsWith('Command')) {
+      return `src/commands/${symbolName}.ts`;
+    }
+
+    // Check for analyzer symbols
+    // [[ASTSymbolExtractor]] -> src/analyzer/ASTSymbolExtractor.ts
+    if (symbolName.includes('Analyzer') || symbolName.includes('Extractor')) {
+      return `src/analyzer/${symbolName}.ts`;
+    }
+
+    return null;
   }
 
   /**

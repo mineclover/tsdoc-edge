@@ -58,6 +58,9 @@ export interface ParsedDocSymbols {
 
   /** Symbol footnote references ([^sym-XXX] or [^SymbolName]) */
   symbolFootnoteRefs: SymbolFootnoteRef[];
+
+  /** Source file path (from **Source**: pattern) */
+  sourceFilePath?: string;
 }
 
 /**

@@ -1,0 +1,16 @@
+---
+title: Generic Constraint
+type: relationship
+category: type-system
+status: implemented
+canonical: true
+---
+
+# [[Generic Constraint]]
+
+> **Type**: `generic-constraint` | **Status**: ✅ Implemented
+
+Track generic type constraints (`T extends U`).
+
+**Implementation**: [[TypeDependencyAnalyzer]] (`src/analyzer/TypeDependencyAnalyzer.ts`)  
+**Command**: [[AnalyzeTypesCommand]]

@@ -222,22 +222,72 @@ jobs:
 ```
 
 ## CLI 명령어
-```bash
-# 전체 검증
-tsdoc-edge validate
 
-# 특정 항목만 검증
-tsdoc-edge orphans                       # 고아 심볼
-tsdoc-edge validate --check-cycles       # 순환 의존성만
-tsdoc-edge validate --strict             # 엄격 모드만
+### Validation Commands
 
-# 특정 파일/디렉토리
-tsdoc-edge validate src/api
-tsdoc-edge validate src/api/UserService.ts
-# 필터링
-tsdoc-edge validate --min-importance=critical
-tsdoc-edge validate --only-public-api
-```
+**[[ValidateCommand]]** - `tsdoc-edge validate [path]`
+- 전체 검증 (컨벤션, 연결성, 엄격 모드)
+- **Implementation Chain**:
+  - Command: `src/commands/ValidateCommand.ts`
+  - Validator: [[ConnectivityValidator]] (`src/validator/ConnectivityValidator.ts`)
+  - Uses: [[SymbolGraphBuilder]], [[SymbolSearchEngine]]
+  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+
+**[[ValidateDocsCommand]]** - `tsdoc-edge validate-docs <path>`
+- 문서 검증 (링크, 구조, 메타데이터)
+- **Implementation Chain**:
+  - Command: `src/commands/ValidateDocsCommand.ts`
+  - Parser: [[DocumentSymbolParser]] (`src/doc-symbol/DocumentSymbolParser.ts`)
+  - Registry: [[DocumentSymbolRegistry]] (`src/doc-symbol/DocumentSymbolRegistry.ts`)
+  - Validation: Registry.validate() for SSOT compliance
+
+**[[ValidateSymbolRefsCommand]]** - `tsdoc-edge validate-symbol-refs <path>`
+- `[[Symbol]]` 참조 검증 (정의 존재, 역방향 링크)
+- **Implementation Chain**:
+  - Command: `src/commands/ValidateSymbolRefsCommand.ts`
+  - Extractor: [[MermaidSymbolExtractor]] (`src/doc-symbol/MermaidSymbolExtractor.ts`)
+  - Uses: Levenshtein distance for similarity checking
+  - Validates: Duplicate definitions, broken references, ambiguous references
+
+**[[CheckLinksCommand]]** - `tsdoc-edge check-links`
+- 깨진 링크 탐지 (import, 참조)
+- **Implementation Chain**:
+  - Command: `src/commands/CheckLinksCommand.ts`
+  - Analyzer: [[MissingLinkDetector]] (`src/analyzer/MissingLinkDetector.ts`)
+  - Uses: [[ConfigLoader]] (`src/utils/ConfigLoader.ts`)
+  - Validates: Dependencies, symbol references, file paths
+
+**[[CheckDuplicatesCommand]]** - `tsdoc-edge check-duplicates`
+- 중복 심볼 탐지
+- **Implementation Chain**:
+  - Command: `src/commands/Phase6Commands.ts`
+  - Checker: [[SpecContentSimilarityChecker]] (`src/spec/SpecContentSimilarityChecker.ts`)
+  - Analysis: Content similarity, section overlap detection
+  - Suggestions: Merge, cross-reference, or keep separate
+
+**[[OrphansCommand]]** - `tsdoc-edge orphans [--fail-on-orphans]`
+- 고아 심볼 탐지
+- **Implementation Chain**:
+  - Command: `src/commands/Phase5Commands.ts`
+  - Registry: [[SymbolRegistryManager]] (`src/registry/SymbolRegistryManager.ts`)
+  - Storage: `.tsdoc/registry.jsonl`
+  - Detects: Symbols with no incoming or outgoing references
+
+**[[DetectCircularTypesCommand]]** - `tsdoc-edge detect-cycles`
+- 순환 의존성 탐지
+- **Implementation Chain**:
+  - Command: `src/commands/TypeChainCommand.ts`
+  - Analyzer: [[InterfaceAnalyzer]], [[InterfaceDependencyMapper]]
+  - Tracer: [[TypeChainTracer]] (`src/analyzer/TypeChainTracer.ts`)
+  - Detection: Circular dependency graph traversal
+
+**[[ValidateSpecCommand]]** - `tsdoc-edge validate-spec <spec-id>`
+- 명세 검증 (완성도, 필수 섹션)
+- **Implementation Chain**:
+  - Command: `src/commands/Phase4Commands.ts`
+  - Validator: [[SpecCompletenessValidator]] (`src/spec/SpecCompletenessValidator.ts`)
+  - Checks: Design score, implementation score, required sections
+  - Metrics: Section completion, TODO markers, quality thresholds
 ## 검증 규칙 설정
 
 ### .tsdoc.config.json 예시

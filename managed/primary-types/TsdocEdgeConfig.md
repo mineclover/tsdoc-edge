@@ -98,11 +98,27 @@ const dbPath = config.paths.databasePath;
 ## 5. Related Concepts (관련 개념)
 
 - [[ConfigManager]] - 싱글톤 설정 관리자
-- Configuration system - 전체 설정 시스템 개요
-- Project initialization - 프로젝트 초기 설정 프로세스
-- [[CLI Feedback Cycle]] - 설정을 활용한 전체 워크플로우
+- [[InitCommand]] - `tsdoc-edge init` 프로젝트 초기화
+- [[ValidateCommand]] - 검증 규칙 적용
 
-## 6. Code References (코드 참조)
+## 6. Commands Using This Type
+
+**[[InitCommand]]** (`src/commands/Phase4Commands.ts:153`)
+- `.tsdoc.config.json` 생성
+- 기본 `TsdocEdgeConfig` 값 초기화
+
+**[[ValidateCommand]]** (`src/commands/ValidateCommand.ts:67`)
+- `validation` 설정 기반 검증 수행
+- `strictMode`, `connectivityThreshold` 사용
+
+**[[BuildCommand]]** (`src/commands/BuildCommand.ts:40`)
+- `paths.sourceDir` 기반 소스 추출
+- `paths.databasePath` DB 저장
+
+## 7. Code References (코드 참조)
+
+**Type Definition**: `src/types/TsdocEdgeConfig.ts`
+**Config Manager**: `src/config/ConfigManager.ts`
 
 [^TsdocEdgeConfig]
 [^ConfigManager]

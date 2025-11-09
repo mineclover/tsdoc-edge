@@ -50,11 +50,19 @@ tsdoc-edge work-context src/services/UserService.ts
 
 **49개 명령어로 완전한 문서 관리 - 완전 모듈화 완료** 🎉
 
-#### 🌟 핵심 워크플로우 (1개) - 가장 중요!
+#### 🌟 핵심 워크플로우 (2개) - 가장 중요!
 - `work-context <file>` - **파일 작업에 필요한 모든 컨텍스트 제공** 🔥
   - 관련 문서, 의존 타입, 테스트, 영향 범위를 한눈에!
   - 모든 분석 기능은 이 명령어를 위해 존재합니다
   - 자세히: [Work Context Workflow](managed/workflows/work-context-workflow.md)
+
+- `explore-entrypoint <doc-path>` - **진입점 기반 전체 의존성 탐색** 🔥 NEW!
+  - `.mmd` 다이어그램 기반 문서 또는 `.md` 문서를 진입점으로 사용
+  - `[[Symbol]]` 참조를 재귀적으로 추적하여 전체 그래프 탐색
+  - `--detect-orphans`로 고아 코드 자동 탐지 (문서에서 도달 불가능한 코드)
+  - **핵심**: 다이어그램으로 기존 심볼 간 관계를 시각적으로 표현 → 진입점으로 활용
+  - 예시: [Mermaid Entrypoint Workflow](managed/workflows/mermaid-entrypoint-workflow.md)
+  - 실제 사용 예: [Example Workflow](managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md)
 
 #### 초기화 및 빌드 (2개)
 - `init` - 프로젝트 설정 초기화
@@ -96,7 +104,7 @@ tsdoc-edge work-context src/services/UserService.ts
 - `core-api` - 핵심 API 표면 분석
 - `scan` - 심볼 그래프 깊이 탐색
 
-#### 문서 심볼 시스템 (9개)
+#### 문서 심볼 시스템 (12개)
 - `index-docs` - [[]] 심볼 인덱싱
 - `validate-docs` - SSOT 검증
 - `update-backlinks` - 백링크 자동 생성
@@ -106,6 +114,9 @@ tsdoc-edge work-context src/services/UserService.ts
 - `spec-status` - 명세서 상태 워크플로우 관리 🔥
 - `find-unused-docs` - 미사용/오래된 문서 탐지 🔥
 - `find-doc` - 문서 심볼 검색
+- `parse-mermaid` - **.mmd 다이어그램 파싱 및 H2 참조 문서 자동 생성** 🔥 NEW!
+- `promote-symbol` - **H2 참조를 H1 canonical로 승격** 🔥 NEW!
+- `validate-symbol-refs` - **[[Symbol]] 일관성 및 중복 검증** 🔥 NEW!
 
 #### Git 통합 (3개) 🔥
 - `install-hook` - **Pre-commit hook 설치**

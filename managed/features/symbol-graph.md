@@ -59,34 +59,59 @@ type Direction =
 
 ## 핵심 산출물
 ### Graph Construction
-- [SymbolGraphBuilder](../../src/graph/SymbolGraphBuilder.ts#SymbolGraphBuilder) - 그래프 구축
-  - AST 기반 심볼 추출
-  - Import 문 분석
-  - 관계 매핑 (depends-on, implements, extends)
 
-- [ASTSymbolExtractor](../../src/analyzer/ASTSymbolExtractor.ts#ASTSymbolExtractor) - AST에서 심볼 추출
-  - 클래스, 인터페이스, 함수, 타입 추출
-  - Export 정보 파악
-  - 접근 제어자 분석
+**[[SymbolGraphBuilder]]** - 그래프 구축
+- AST 기반 심볼 추출
+- Import 문 분석
+- 관계 매핑 (depends-on, implements, extends)
+- **Implementation Chain**:
+  - Core: `src/graph/SymbolGraphBuilder.ts`
+  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Types: Symbol, SymbolGraph, SymbolRelationship
 
-- [DependencyResolver](../../src/analyzer/DependencyResolver.ts#DependencyResolver) - Import 경로 해석
-  - 모듈 경로 해석 (.ts, .tsx, index)
-  - Import 문과 심볼 매핑
-  - 의존성 그래프 구축
+**[[ASTSymbolExtractor]]** - AST에서 심볼 추출
+- 클래스, 인터페이스, 함수, 타입 추출
+- Export 정보 파악
+- 접근 제어자 분석
+- **Implementation Chain**:
+  - Core: `src/analyzer/ASTSymbolExtractor.ts`
+  - Uses: TypeScript Compiler API (`ts.Node`, `ts.SourceFile`)
+  - Storage: [[DatabaseManager]]
+
+**[[DependencyResolver]]** - Import 경로 해석
+- 모듈 경로 해석 (.ts, .tsx, index)
+- Import 문과 심볼 매핑
+- 의존성 그래프 구축
+- **Implementation Chain**:
+  - Core: `src/analyzer/DependencyResolver.ts`
+  - Graph: [[SymbolGraphBuilder]]
+  - Uses: Node.js `path`, `fs` modules
 
 ### Graph Search
-- [SymbolSearchEngine](../../src/graph/SymbolSearchEngine.ts#SymbolSearchEngine) - 다양한 조건 검색
-  - 이름 기반 검색
-  - 타입 필터 (class, interface, function...)
-  - 경로 패턴 검색
-  - Public API 필터
-  - 문서화/테스트 여부 필터
+
+**[[SymbolSearchEngine]]** - 다양한 조건 검색
+- 이름 기반 검색
+- 타입 필터 (class, interface, function...)
+- 경로 패턴 검색
+- Public API 필터
+- 문서화/테스트 여부 필터
+- **Implementation Chain**:
+  - Core: `src/graph/SymbolSearchEngine.ts`
+  - Graph: [[SymbolGraphBuilder]]
+  - Uses: Name/File indexes for O(1) lookup
+
 ### Graph Traversal
-- [DepthTraverser](../../src/graph/DepthTraverser.ts#DepthTraverser) - 깊이별 탐색
-  - N단계 의존성 추적
-  - 방향 지정 (dependencies/dependents/both)
-  - 깊이별 심볼 그룹핑
-  - 영향 범위 분석
+
+**[[DepthTraverser]]** - 깊이별 탐색
+- N단계 의존성 추적
+- 방향 지정 (dependencies/dependents/both)
+- 깊이별 심볼 그룹핑
+- 영향 범위 분석
+- **Implementation Chain**:
+  - Core: `src/graph/DepthTraverser.ts`
+  - Graph: [[SymbolGraphBuilder]]
+  - Algorithm: BFS with visited set
+  - Uses: Adjacency lists for O(V+E) traversal
 ## 사용 시나리오
 
 ### 시나리오 1: 버그 수정 전 영향 범위 파악
@@ -167,16 +192,100 @@ tsdoc-edge validate
 ```
 ## CLI 명령어
 
-### scan 명령어
-```bash
-# 기본 사용
-tsdoc-edge scan --entry=<symbol> [options]
+### Graph Construction Commands
 
-# 옵션
---direction=<dir>       # dependencies | dependents | both (기본: dependencies)
---depth=<N>             # 탐색 깊이 (기본: 2)
---output=<file>         # 마크다운 파일로 저장
---group-by-category     # 카테고리별 그룹핑 (Class, Interface, Function...)
+**[[BuildCommand]]** - `tsdoc-edge build <path>`
+- 심볼 그래프 구축
+- 모든 심볼 및 관계 추출
+- **Implementation Chain**:
+  - Command: `src/commands/BuildCommand.ts`
+  - Extractor: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`)
+  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Config: ConfigManager
+
+**[[AnalyzeCallsCommand]]** - `tsdoc-edge analyze-calls`
+- 함수 호출 관계 분석
+- 호출 그래프 구축
+- **Implementation Chain**:
+  - Command: `src/commands/AnalyzeCallsCommand.ts`
+  - Analyzer: [[CallGraphAnalyzer]] (`src/analyzer/CallGraphAnalyzer.ts`)
+  - Graph: [[SymbolGraphBuilder]]
+  - Storage: [[DatabaseManager]]
+
+**[[AnalyzeIOCommand]]** - `tsdoc-edge analyze-io`
+- I/O 의존성 분석 (타입 기반)
+- 데이터 흐름 그래프
+- **Implementation Chain**:
+  - Command: `src/commands/AnalyzeIOCommand.ts`
+  - Analyzer: [[IODependencyAnalyzer]] (`src/analyzer/IODependencyAnalyzer.ts`)
+  - Graph: [[SymbolGraphBuilder]]
+  - Storage: [[DatabaseManager]]
+
+**[[AnalyzeChainsCommand]]** - `tsdoc-edge analyze-chains`
+- 의존성 체인 분석 (3+ 단계 파이프라인)
+- **Implementation Chain**:
+  - Command: `src/commands/AnalyzeChainsCommand.ts`
+  - Analyzer: [[DependencyChainAnalyzer]] (`src/analyzer/DependencyChainAnalyzer.ts`)
+  - Graph: [[SymbolGraphBuilder]]
+  - Algorithm: DFS with circular detection
+
+**[[AnalyzeTypesCommand]]** - `tsdoc-edge analyze-types`
+- 타입 의존성 분석
+- 제네릭 제약 추적
+- **Implementation Chain**:
+  - Command: `src/commands/AnalyzeTypesCommand.ts`
+  - Analyzer: [[TypeDependencyAnalyzer]] (`src/analyzer/TypeDependencyAnalyzer.ts`)
+  - Graph: [[SymbolGraphBuilder]]
+  - Storage: [[DatabaseManager]]
+
+### Graph Query Commands
+
+**[[ScanCommand]]** - `tsdoc-edge scan --entry=<symbol> [options]`
+- 깊이별 의존성 탐색
+- **Options**: `--direction`, `--depth`, `--output`
+- **Implementation Chain**:
+  - Command: `src/commands/Phase7Commands.ts`
+  - Traverser: [[DepthTraverser]] (`src/graph/DepthTraverser.ts`)
+  - Graph: [[SymbolGraphBuilder]]
+  - Output: Markdown generator for reports
+
+**[[DepsCommand]]** - `tsdoc-edge deps <symbol-id>`
+- 심볼의 직접 의존성 조회
+- **Implementation Chain**:
+  - Command: `src/commands/Phase5Commands.ts`
+  - Storage: [[SymbolRegistryManager]] (`src/storage/SymbolRegistryManager.ts`)
+  - Uses: Adjacency list for O(1) lookup
+
+**[[WhoUsesCommand]]** - `tsdoc-edge who-uses <symbol-id>`
+- 심볼을 사용하는 곳 조회
+- **Implementation Chain**:
+  - Command: `src/commands/Phase5Commands.ts`
+  - Storage: [[SymbolRegistryManager]]
+  - Uses: Reverse adjacency list for O(1) lookup
+
+**[[TreeCommand]]** - `tsdoc-edge tree <symbol-id>`
+- 의존성 트리 시각화
+- **Implementation Chain**:
+  - Command: `src/commands/Phase5Commands.ts`
+  - Traverser: [[DepthTraverser]]
+  - Graph: [[SymbolGraphBuilder]]
+  - Output: Tree-style ASCII visualization
+
+**[[TypeChainCommand]]** - `tsdoc-edge type-chain <type-id>`
+- 타입 체인 추적
+- **Implementation Chain**:
+  - Command: `src/commands/TypeChainCommand.ts`
+  - Tracer: [[TypeChainTracer]] (`src/analyzer/TypeChainTracer.ts`)
+  - Graph: [[SymbolGraphBuilder]]
+  - Algorithm: DFS with type relationship following
+
+**[[DetectCircularTypesCommand]]** - `tsdoc-edge detect-circular-types`
+- 순환 타입 의존성 탐지
+- **Implementation Chain**:
+  - Command: `src/commands/TypeChainCommand.ts`
+  - Tracer: [[TypeChainTracer]]
+  - Algorithm: Tarjan's strongly connected components
+  - Output: Circular dependency paths
 ```
 
 ### 빠른 조회 명령어
@@ -242,17 +351,26 @@ tsdoc-edge tree
 ```
 
 ## 저장소
-### Database (SQLite)
-- [DatabaseManager](../../src/storage/DatabaseManager.ts#DatabaseManager)
-  - 심볼 정보 영속화
-  - 빠른 쿼리 지원
-  - JSONL export/import
 
-### Symbol Registry (JSONL)
-- [SymbolRegistryManager](../../src/storage/SymbolRegistryManager.ts#SymbolRegistryManager)
-  - ID 기반 심볼 추적
-  - 의존성 관계 저장
-  - Git 친화적 JSONL 포맷
+**[[DatabaseManager]]** - SQLite 기반 심볼 저장소
+- 심볼 정보 영속화
+- 빠른 쿼리 지원
+- JSONL export/import
+- **Implementation Chain**:
+  - Core: `src/storage/DatabaseManager.ts`
+  - Uses: `better-sqlite3` for synchronous SQLite access
+  - Schema: Symbols, Relationships, Metadata tables
+  - Indexes: Name, FilePath, Type for fast lookups
+
+**[[SymbolRegistryManager]]** - JSONL 기반 심볼 레지스트리
+- ID 기반 심볼 추적
+- 의존성 관계 저장
+- Git 친화적 JSONL 포맷
+- **Implementation Chain**:
+  - Core: `src/storage/SymbolRegistryManager.ts`
+  - Format: Line-delimited JSON (`.tsdoc/registry.jsonl`)
+  - Uses: [[DatabaseManager]] for dual persistence
+  - Indexing: In-memory maps synced from database
 ## 관련 기능
 
 - [[AnalysisFeatures]] - 코드 건강도 및 중요도 분석
