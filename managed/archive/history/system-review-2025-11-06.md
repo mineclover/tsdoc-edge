@@ -635,7 +635,7 @@ npm run build src
 ## Related Documents
 
 - [[Enhanced Database Schema]] - Target schema design
-- [[Unified Relationship Taxonomy]] - Relationship types
+- [[UnifiedRelationships]] - Relationship types
 - [[Relationship Standard Format]] - Data format spec
 
 ---

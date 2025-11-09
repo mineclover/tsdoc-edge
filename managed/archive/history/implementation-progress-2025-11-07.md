@@ -491,7 +491,7 @@ This session transformed TSDoc Edge from 40% complete to production-ready:
 
 - [[System Review - 2025-11-06]] - Initial state assessment
 - [[Enhanced Database Schema]] - Schema design
-- [[Unified Relationship Taxonomy]] - Relationship types
+- [[UnifiedRelationships]] - Relationship types
 - [[Dependency Chain Analysis]] - Chain detection algorithms
 
 ---
