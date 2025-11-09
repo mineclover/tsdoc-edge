@@ -296,6 +296,12 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
         continue;
       }
 
+      // Skip short uppercase codes (A, CD, TEST) and labels (L1A, L2B)
+      // These are typically node IDs or diagram labels, not symbol references
+      if (/^([A-Z]$|[A-Z]{2,4}$|L\d+[A-Z]$)/.test(symbolName)) {
+        continue;
+      }
+
       registry.references.push({
         symbolName,
         filePath,

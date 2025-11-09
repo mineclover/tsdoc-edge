@@ -163,8 +163,10 @@ export class MermaidSymbolExtractor {
 
         const symbol = this.parseNodeLabel(nodeId, label, currentSubgraph);
         result.symbols.push(symbol);
-        // Only add to symbolReferences if valid symbol name exists
-        if (symbol.symbolName && symbol.symbolName.trim() !== '') {
+        // Only add to symbolReferences if valid symbol name exists and looks like a real symbol
+        // Skip short uppercase codes (A, CD, L1A, etc.) which are typically node IDs
+        const looksLikeNodeId = /^([A-Z]$|[A-Z]{2,4}$|L\d+[A-Z]$)/.test(symbol.symbolName);
+        if (symbol.symbolName && symbol.symbolName.trim() !== '' && !looksLikeNodeId) {
           result.symbolReferences.push(symbol.symbolName);
         }
       }
@@ -356,11 +358,11 @@ export class MermaidSymbolExtractor {
     if (isNonSymbol) {
       // This is data/text, not a symbol reference - check nodeId
       const isNodeIdNonSymbol = nonSymbolPatterns.some(pattern => pattern.test(nodeId));
-      if (isNodeIdNonSymbol) {
-        // Both label and nodeId are non-symbols, don't create a symbol reference
-        symbolName = '';  // Empty string signals no valid symbol
-      } else {
+      if (!isNodeIdNonSymbol) {
         // Use nodeId as fallback if it's a valid symbol
+        symbolName = nodeId;
+      } else {
+        // Both label and nodeId are non-symbols, use nodeId but mark as non-reference
         symbolName = nodeId;
       }
     }
