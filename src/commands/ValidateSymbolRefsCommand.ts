@@ -302,6 +302,56 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
         continue;
       }
 
+      // Skip workflow steps and abstract concepts
+      if (/Issue$|Bonus$|Workflow$|Taxonomy$|Roadmap$|Validation$|Analyzer$|Fixer$|Generator$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip action verbs and abstract concepts
+      if (/^(Fix|Add|Rebuild|Visualize|Explore|Auto|Missing)\s+/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip abstract system concepts
+      if (/^(Documentation|Architecture|Evidence|Type Safety)$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip interface notation
+      if (/\s+interface$/i.test(symbolName)) {
+        continue;
+      }
+
+      // Skip system concept patterns
+      if (/^(Dependency|Type)\s+(Graph|System)$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip all-caps hyphenated names
+      if (/^[A-Z][A-Z-]+[A-Z]$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip workflow actions and system components
+      if (/^(Backlinks|Archive|Delete|Validate)\s*$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip quality/health/detector/resolver patterns
+      if (/\s+Quality$|\s+Health$|Detector$|Resolver$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip Base/Enhanced prefixes
+      if (/^(Base|Enhanced)\s+/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip command/symbol system components
+      if (/^(Command|Symbol)\s+(Registry|Graph|Validation)$/.test(symbolName)) {
+        continue;
+      }
+
       registry.references.push({
         symbolName,
         filePath,

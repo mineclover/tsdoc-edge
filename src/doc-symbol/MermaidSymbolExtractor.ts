@@ -352,6 +352,25 @@ export class MermaidSymbolExtractor {
       /^(FS|PATH|CommandResult)$/,  // Technical constants/types
       /Validation$/,   // Ends with Validation
       /Resolved$/,     // Ends with Resolved
+      /Issue$/,        // Ends with Issue (Docs Issue, Tests Issue, etc.)
+      /Bonus$/,        // Ends with Bonus (Coverage Bonus)
+      /^(Fix|Add|Rebuild|Visualize|Explore)\s+/,  // Action verbs
+      /^(Documentation|Architecture|Evidence|Type Safety)$/,  // Abstract concepts
+      /\s+interface$/i,  // Ends with interface (WorkContext interface)
+      /^(Auto|Missing)\s+/,  // Automation prefixes
+      /^(Dependency|Type)\s+(Graph|System)$/,  // System concepts
+      /Analyzer$/,     // Ends with Analyzer (as standalone workflow step)
+      /Fixer$/,        // Ends with Fixer
+      /Generator$/,    // Ends with Generator
+      /^[A-Z][A-Z-]+[A-Z]$/,  // All caps with hyphens (EXAMPLE-WORKFLOW, FINAL-SUMMARY)
+      /^(Backlinks|Archive|Delete|Validate)\s*$/,  // Workflow actions
+      /\s+Quality$/,   // Ends with Quality
+      /\s+Health$/,    // Ends with Health
+      /^(Command|Symbol)\s+(Registry|Graph|Validation)$/,  // System components
+      /Detector$/,     // Ends with Detector
+      /Resolver$/,     // Ends with Resolver
+      /^Base\s+/,      // Starts with Base
+      /^Enhanced\s+/,  // Starts with Enhanced
     ];
 
     const isNonSymbol = nonSymbolPatterns.some(pattern => pattern.test(symbolName));
