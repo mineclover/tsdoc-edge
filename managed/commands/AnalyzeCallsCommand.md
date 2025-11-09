@@ -18,5 +18,5 @@ Analyze function call relationships.
 
 ## Related
 
-- [[Call Graph Analyzer]]: Core analysis
+- [[CallGraphAnalyzer]]: Core analysis
 - [[Call Relationships]]: Relationship type

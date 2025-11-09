@@ -45,7 +45,7 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 
 ### [[Interface Implementation]] ✅
 - **Pattern**: `class A implements I`
-- **Impl**: [[InterfaceImplementationAnalyzer]] (`src/analyzer/InterfaceImplementationAnalyzer.ts`)
+- **Impl**: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`)
 - **Cmd**: [[BuildCommand]] (`src/commands/BuildCommand.ts`)
 - **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
 - **Query**: Find all implementations of an interface

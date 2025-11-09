@@ -19,4 +19,4 @@ Advanced data flow and execution analysis.
 ## Related
 
 - [[Data Flow Analyzer]]: Data flow tracking
-- [[Call Graph Analyzer]]: Execution flow
+- [[CallGraphAnalyzer]]: Execution flow
