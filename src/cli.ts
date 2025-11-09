@@ -77,6 +77,7 @@ import { CoverageReportCommand } from './commands/CoverageReportCommand';
 import { DetectDeadCodeCommand } from './commands/DetectDeadCodeCommand';
 import { SymbolQueryCommand } from './commands/SymbolQueryCommand';
 import { SymbolFixCommand } from './commands/SymbolFixCommand';
+import { RelationshipStatsCommand } from './commands/RelationshipStatsCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -169,6 +170,7 @@ async function main(): Promise<void> {
   registry.register(new DetectDeadCodeCommand());
   registry.register(new SymbolQueryCommand());
   registry.register(new SymbolFixCommand());
+  registry.register(new RelationshipStatsCommand());
   registry.register(new HelpCommand(registry));
 
   // Get command

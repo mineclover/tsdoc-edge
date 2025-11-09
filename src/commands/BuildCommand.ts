@@ -180,6 +180,9 @@ export class BuildCommand extends BaseCommand {
       // Store all relationships to insert after all symbols are collected
       const allRelationships: Array<{ type: string; from: string; to: string; filePath: string; description?: string }> = [];
 
+      // Store doc relationships (symbol -> document)
+      const allDocRelationships: Array<{ symbolId: string; symbolName: string; docRef: string; filePath: string; line: number }> = [];
+
       // Process each file
       for (const filePath of files) {
         try {
@@ -229,6 +232,18 @@ export class BuildCommand extends BaseCommand {
                 updatedAt: new Date().toISOString(),
               };
               registryLines.push(JSON.stringify(registryEntry));
+
+              // Extract @doc tags for this symbol
+              const docTags = this.extractDocTags(content, symbol.line);
+              for (const docRef of docTags) {
+                allDocRelationships.push({
+                  symbolId: id,
+                  symbolName: symbol.name,
+                  docRef,
+                  filePath: symbol.filePath,
+                  line: symbol.line,
+                });
+              }
             } else {
               result.errors.push(`Failed to insert: ${symbol.name} in ${filePath}`);
             }
@@ -305,6 +320,46 @@ export class BuildCommand extends BaseCommand {
         }
       }
 
+      // Insert doc relationships
+      this.printInfo('Inserting document relationships...');
+      let docRelationshipsInserted = 0;
+
+      for (const docRel of allDocRelationships) {
+        try {
+          const relationshipId = `doc-${docRel.symbolId}-${docRel.docRef}`
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '');
+
+          const success = dbManager.insertUnifiedRelationship({
+            id: relationshipId,
+            type: 'conceptual-relation',
+            category: 'semantic',
+            fromSymbols: [docRel.symbolId],
+            toSymbols: [`doc:${docRel.docRef}`],
+            direction: 'bidirectional',
+            strength: 'medium',
+            evidence: [{
+              type: 'documentation',
+              source: docRel.filePath,
+              lineNumber: docRel.line,
+              confidence: 1.0,
+            }],
+            discoveredBy: 'documentation',
+            confidence: 1.0,
+            filePath: docRel.filePath,
+            line: docRel.line,
+            description: `${docRel.symbolName} documented in [[${docRel.docRef}]]`,
+          });
+
+          if (success) {
+            docRelationshipsInserted++;
+          }
+        } catch (error) {
+          result.errors.push(`Failed to insert doc relationship: ${docRel.symbolName} -> ${docRel.docRef}`);
+        }
+      }
+
       const duration = Date.now() - startTime;
 
       // Write JSONL registry
@@ -328,6 +383,7 @@ export class BuildCommand extends BaseCommand {
       console.log(`  Symbols inserted: ${this.colors.green}${result.symbolsInserted}${this.colors.reset}`);
       console.log(`  Relationships found: ${this.colors.cyan}${result.relationshipsFound}${this.colors.reset}`);
       console.log(`  Relationships inserted: ${this.colors.green}${result.relationshipsInserted}${this.colors.reset}`);
+      console.log(`  Doc relationships: ${this.colors.green}${docRelationshipsInserted}${this.colors.reset}`);
       console.log(`  Duration: ${this.colors.cyan}${duration}ms${this.colors.reset}`);
       console.log();
       console.log(`${this.colors.dim}Database: ${dbPath}${this.colors.reset}`);
@@ -376,6 +432,39 @@ export class BuildCommand extends BaseCommand {
     }
 
     return files;
+  }
+
+  /**
+   * Extract @doc tags from file content near a specific line
+   * @param content - File content
+   * @param symbolLine - Line number where symbol is defined
+   * @returns Array of document references
+   */
+  private extractDocTags(content: string, symbolLine: number): string[] {
+    const docTags: string[] = [];
+    const lines = content.split('\n');
+
+    // Search backwards from symbol line to find TSDoc comment block
+    // Typically comments are within 50 lines before the symbol
+    const searchStart = Math.max(0, symbolLine - 50);
+    const searchEnd = symbolLine;
+
+    for (let i = searchStart; i < searchEnd && i < lines.length; i++) {
+      const line = lines[i];
+
+      // Match @doc [[Symbol]] pattern
+      const docTagRegex = /@doc\s+\[\[([^\]]+)\]\]/g;
+      let match;
+
+      while ((match = docTagRegex.exec(line)) !== null) {
+        const docRef = match[1].trim();
+        if (docRef && !docTags.includes(docRef)) {
+          docTags.push(docRef);
+        }
+      }
+    }
+
+    return docTags;
   }
 
   /**
