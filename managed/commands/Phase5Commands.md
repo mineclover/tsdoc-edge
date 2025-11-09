@@ -19,4 +19,4 @@ Integration coverage and test relationship tracking.
 ## Related
 
 - [[Test Coverage]]: Test relationships
-- [[Integration Coverage]]: Coverage tracking
+- [[Integration Test Traceability]]: Coverage tracking

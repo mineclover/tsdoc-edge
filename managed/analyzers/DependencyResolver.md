@@ -20,4 +20,4 @@ Handles:
 ## Related
 
 - [[Code Dependency]]: Dependency tracking
-- [[Dependency Chain Analyzer]]: Chain analysis
+- [[DependencyChainAnalyzer]]: Chain analysis

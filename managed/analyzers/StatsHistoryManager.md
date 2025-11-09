@@ -18,4 +18,4 @@ Track and manage statistics history over time.
 
 ## Related
 
-- [[Trackable Statistics]]: Stats types
+- [[TrackableStatistics]]: Stats types

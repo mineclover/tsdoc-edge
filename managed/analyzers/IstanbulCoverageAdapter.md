@@ -19,5 +19,5 @@ Converts:
 
 ## Related
 
-- [[Coverage Parser]]: Coverage parsing
-- [[Coverage Sync Adapter]]: Synchronization
+- [[CoverageParser]]: Coverage parsing
+- [[CoverageSyncAdapter]]: Synchronization

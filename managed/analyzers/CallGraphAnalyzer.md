@@ -76,4 +76,4 @@ interface CallSite {
 
 - [[Call Relationships]]: 생성되는 관계 타입
 - [[Pipeline]]: Data flow와 결합
-- [[Work Context]]: 영향 분석에 사용
+- [[WorkContextCommand]]: 영향 분석에 사용

@@ -16,5 +16,5 @@ Interface와 구현 클래스 간 관계 분석.
 
 ## Related
 
-- [[INTERFACE-IMPL]]: 구현 관계 타입
+- [[Interface Implementation]]: 구현 관계 타입
 - [[Type Dependency]]: 타입 의존성

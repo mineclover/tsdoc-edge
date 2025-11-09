@@ -19,5 +19,5 @@ Features:
 
 ## Related
 
-- [[Trackable Statistics]]: Stats tracking
-- [[Stats History Manager]]: History management
+- [[TrackableStatistics]]: Stats tracking
+- [[StatsHistoryManager]]: History management
