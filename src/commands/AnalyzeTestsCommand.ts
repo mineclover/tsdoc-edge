@@ -10,6 +10,7 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { TestRelationshipAnalyzer } from '../analyzer/TestRelationshipAnalyzer';
+import { TestRelationshipExtractor } from '../analyzer/TestRelationshipExtractor';
 
 /**
  * Command for analyzing test coverage relationships
@@ -152,15 +153,93 @@ export class AnalyzeTestsCommand extends BaseCommand {
 
       console.log();
 
+      // Extract integration-verification relationships
+      this.printSection('Integration Verification Analysis');
+      this.printInfo('Analyzing integration test relationships...');
+
+      const extractor = new TestRelationshipExtractor(graph);
+      const allVerifiedRelationships: any[] = [];
+
+      // Find all test files
+      const testFiles = files.filter(f => /\.(test|spec)\.tsx?$/.test(f));
+
+      for (const testFile of testFiles) {
+        try {
+          const usage = extractor.extractFromFile(testFile);
+          const verifiedRels = extractor.inferRelationships(usage);
+
+          for (const vr of verifiedRels) {
+            allVerifiedRelationships.push({
+              testFile,
+              ...vr,
+            });
+          }
+        } catch (error) {
+          // Skip files that fail to parse
+          continue;
+        }
+      }
+
+      console.log();
+      this.printInfo(`Found ${allVerifiedRelationships.length} integration-verification relationships`);
+
+      // Save integration-verification relationships
+      if (allVerifiedRelationships.length > 0) {
+        this.printInfo('Saving integration-verification relationships to database...');
+        let integrationSavedCount = 0;
+
+        for (const vr of allVerifiedRelationships) {
+          const relationshipId = `integration-${vr.source}-${vr.target}-${path.basename(vr.testFile)}`
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '');
+
+          const success = dbManager.insertUnifiedRelationship({
+            id: relationshipId,
+            type: 'integration-verification',
+            category: 'verification',
+            fromSymbols: [vr.source],
+            toSymbols: [vr.target],
+            direction: 'bidirectional',
+            strength: vr.strength,
+            evidence: vr.evidence.map((e: any) => ({
+              type: 'test',
+              source: vr.verifiedBy,
+              lineNumber: e.lineNumber,
+              confidence: 1.0,
+            })),
+            discoveredBy: 'test-analysis',
+            confidence: vr.strength === 'strong' ? 0.9 : vr.strength === 'medium' ? 0.7 : 0.5,
+            filePath: vr.verifiedBy,
+            properties: {
+              verifiedBy: vr.verifiedBy,
+              pattern: vr.evidence[0]?.pattern || 'unknown',
+              testFile: vr.testFile,
+            },
+            description: `Integration between ${vr.source} and ${vr.target} verified by ${path.basename(vr.verifiedBy)}`,
+          });
+
+          if (success) {
+            integrationSavedCount++;
+          }
+        }
+
+        console.log();
+        this.printSuccess(`Saved ${integrationSavedCount} integration-verification relationships to database`);
+      }
+
+      console.log();
+
       // Statistics
       this.printSection('Statistics');
       console.log(`  Total symbols: ${this.colors.cyan}${graph.symbols.size}${this.colors.reset}`);
       console.log(`  Test coverage relationships: ${this.colors.cyan}${testRels.length}${this.colors.reset}`);
+      console.log(`  Integration-verification relationships: ${this.colors.cyan}${allVerifiedRelationships.length}${this.colors.reset}`);
       console.log();
 
       dbManager.close();
 
-      return this.success(`Analyzed ${testRels.length} test coverage relationships`);
+      return this.success(`Analyzed ${testRels.length} test coverage + ${allVerifiedRelationships.length} integration-verification relationships`);
     });
   }
 
