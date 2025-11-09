@@ -222,8 +222,9 @@ export class MermaidSymbolExtractor {
     // First line is usually the symbol name
     let symbolName = lines[0] || nodeId;
 
-    // Map known relationship types to their canonical symbol names
+    // Map known relationship types and common patterns to their canonical symbol names
     const relationshipTypeMap: Record<string, string> = {
+      // Relationship types
       'code-dependency': 'Code Dependency',
       'io-dependency': 'IO Dependency',
       'inheritance': 'Inheritance',
@@ -241,6 +242,8 @@ export class MermaidSymbolExtractor {
       'test-coverage': 'Test Coverage',
       'doc-reference': 'Documentation Reference',
       'enhancement': 'Enhancement',
+      // Common command/workflow patterns
+      'work-context': 'WorkContextCommand',
     };
 
     // Check if this is a known relationship type
