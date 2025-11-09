@@ -72,3 +72,4 @@ export { AnalyzeConstraintsCommand } from './AnalyzeConstraintsCommand';
 export { AnalyzeAlternativesCommand } from './AnalyzeAlternativesCommand';
 export { AnalyzeBehavioralCommand } from './AnalyzeBehavioralCommand';
 export { AnalyzeStructuralCommand } from './AnalyzeStructuralCommand';
+export { AnalyzeFinalCommand } from './AnalyzeFinalCommand';
