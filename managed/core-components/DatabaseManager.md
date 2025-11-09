@@ -295,7 +295,7 @@ tsdoc-edge import-registry
 **Uses**:
 - `better-sqlite3` - Synchronous SQLite driver
 - [[ConfigManager]] (`src/config/ConfigManager.ts`) - Configuration paths
-- [[RegistryManager]] (`src/storage/RegistryManager.ts`) - JSONL operations
+- [[SymbolRegistryManager]] (`src/storage/SymbolRegistryManager.ts`) - JSONL operations
 
 **Stores**:
 - [[Symbol]] (`src/types/graph.ts`) - All symbols
@@ -358,7 +358,7 @@ tsdoc-edge import-registry
 ## Related
 
 **Storage**:
-- [[RegistryManager]] (`src/storage/RegistryManager.ts`) - JSONL operations
+- [[SymbolRegistryManager]] (`src/storage/SymbolRegistryManager.ts`) - JSONL operations
 
 **Core**:
 - [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`) - Graph construction

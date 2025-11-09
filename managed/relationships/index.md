@@ -173,7 +173,7 @@ sqlite3 .tsdoc/symbols.db "SELECT type, COUNT(*) FROM unified_relationships GROU
 **Core Components**:
 - [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`): Central graph data structure
 - [[DatabaseManager]] (`src/storage/DatabaseManager.ts`): SQLite storage layer
-- [[RegistryManager]] (`src/storage/RegistryManager.ts`): JSONL persistence
+- [[SymbolRegistryManager]] (`src/storage/SymbolRegistryManager.ts`): JSONL persistence
 - [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`): Primary extractor
 
 **Command References**:
