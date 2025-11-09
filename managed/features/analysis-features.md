@@ -4,6 +4,8 @@ version: 1.0.0
 status: active
 primary: AnalysisFeatures
 category: feature
+canonical: true
+aliases: [Analysis Features]
 tags:
   - analysis
   - quality
