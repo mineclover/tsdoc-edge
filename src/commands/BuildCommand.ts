@@ -6,6 +6,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import * as crypto from 'node:crypto';
 import { ConfigManager } from '../config/ConfigManager';
 import { ASTSymbolExtractor } from '../analyzer/ASTSymbolExtractor';
 import { DatabaseManager } from '../storage/DatabaseManager';
@@ -67,7 +68,12 @@ export class BuildCommand extends BaseCommand {
   }
 
   protected getUsage(): string {
-    return 'tsdoc-edge build [source-directory]\n\n  Default: src';
+    return `tsdoc-edge build [source-directory] [options]
+
+  Default: src
+  Options:
+    --force          Force full rebuild (ignore file hashes)
+    --incremental    Incremental build (only changed files, default)`;
   }
 
   /**
@@ -83,9 +89,17 @@ export class BuildCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const targetPath = args[0] || 'src';
+      // Parse arguments
+      const forceRebuild = args.includes('--force');
+      const targetPath = args.find(arg => !arg.startsWith('--')) || 'src';
 
       this.printHeader('TSDoc Edge - Build Database');
+
+      if (forceRebuild) {
+        this.printWarning('Force rebuild enabled - all files will be reprocessed');
+      } else {
+        this.printInfo('Incremental build enabled - only changed files will be processed');
+      }
 
       // Validate path
       if (!fs.existsSync(targetPath)) {
@@ -114,7 +128,37 @@ export class BuildCommand extends BaseCommand {
       this.printInfo('Scanning TypeScript files...');
       const startTime = Date.now();
 
-      const files = this.findTypeScriptFiles(targetPath);
+      const allFiles = this.findTypeScriptFiles(targetPath);
+
+      // Filter files based on incremental build
+      let files = allFiles;
+      let skippedFiles = 0;
+
+      if (!forceRebuild) {
+        const changedFiles: string[] = [];
+
+        for (const file of allFiles) {
+          if (this.isFileChanged(dbManager, file)) {
+            changedFiles.push(file);
+          } else {
+            skippedFiles++;
+          }
+        }
+
+        files = changedFiles;
+
+        if (skippedFiles > 0) {
+          this.printSuccess(`Skipped ${skippedFiles} unchanged files (incremental build)`);
+        }
+      }
+
+      if (files.length === 0) {
+        this.printSuccess('No files to process - all files are up to date');
+        dbManager.close();
+        return this.success('No changes detected');
+      }
+
+      this.printInfo(`Processing ${files.length} file(s)...`);
 
       const result = {
         filesScanned: 0,
@@ -266,6 +310,11 @@ export class BuildCommand extends BaseCommand {
       // Write JSONL registry
       fs.writeFileSync(registryPath, registryLines.join('\n'), 'utf-8');
 
+      // Update sync metadata for processed files (for incremental builds)
+      for (const filePath of files) {
+        this.updateSyncMetadata(dbManager, filePath);
+      }
+
       dbManager.close();
 
       console.log();
@@ -327,6 +376,61 @@ export class BuildCommand extends BaseCommand {
     }
 
     return files;
+  }
+
+  /**
+   * Calculate SHA-256 hash of file content
+   */
+  private calculateFileHash(filePath: string): string {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    return crypto.createHash('sha256').update(content).digest('hex');
+  }
+
+  /**
+   * Check if file has changed since last sync (incremental build)
+   */
+  private isFileChanged(dbManager: DatabaseManager, filePath: string): boolean {
+    try {
+      const currentHash = this.calculateFileHash(filePath);
+
+      // Query sync_metadata table
+      const row = dbManager.db.prepare(
+        'SELECT hash FROM sync_metadata WHERE file_path = ?'
+      ).get(filePath) as { hash: string } | undefined;
+
+      if (!row) {
+        // File not in metadata - needs processing
+        return true;
+      }
+
+      // Compare hashes
+      return row.hash !== currentHash;
+    } catch (error) {
+      // If error, assume file changed
+      return true;
+    }
+  }
+
+  /**
+   * Update sync metadata after processing file
+   */
+  private updateSyncMetadata(dbManager: DatabaseManager, filePath: string): void {
+    try {
+      const hash = this.calculateFileHash(filePath);
+      const now = new Date().toISOString();
+
+      // Upsert into sync_metadata
+      dbManager.db.prepare(`
+        INSERT INTO sync_metadata (file_path, last_sync, total_records, hash, status)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(file_path) DO UPDATE SET
+          last_sync = excluded.last_sync,
+          hash = excluded.hash,
+          status = excluded.status
+      `).run(filePath, now, 1, hash, 'synced');
+    } catch (error) {
+      // Silently ignore metadata update errors (non-critical)
+    }
   }
 
   private get colors() {
