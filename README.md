@@ -48,7 +48,7 @@ tsdoc-edge work-context src/services/UserService.ts
 
 ### ✅ CLI 도구 (v0.8.0 + v0.10.0 + v0.11.0 + v0.12.0) - NEW! 🔥
 
-**49개 명령어로 완전한 문서 관리 - 완전 모듈화 완료** 🎉
+**65개 명령어로 완전한 문서 관리 - 완전 모듈화 완료** 🎉
 
 #### 🌟 핵심 워크플로우 (2개) - 가장 중요!
 - `work-context <file>` - **파일 작업에 필요한 모든 컨텍스트 제공** 🔥
@@ -77,18 +77,21 @@ tsdoc-edge work-context src/services/UserService.ts
 - `find-roots` - **루트 타입 찾기 (진입점 식별)** 🔥
 - `detect-cycles` - **순환 참조 감지 및 경고** 🔥
 
-#### 이슈 찾기 (7개)
+#### 이슈 찾기 & 탐지 (9개)
 - `orphans` - 사용되지 않는 코드
 - `undocumented` - 미문서화 심볼
 - `untested` - 테스트 없는 심볼
 - `without-responsibility` / `without-contract` - 누락 체크
 - `todos` / `plans` - TODO 및 계획 수집
+- `detect-dead-code` - **죽은 코드 탐지 (Call Graph 기반)** 🔥 NEW!
+- `parallel-work` - **병렬 개발 영역 감지** 🔥 NEW!
 
-#### 품질 검증 (4개)
+#### 품질 검증 & 커버리지 (5개)
 - `validate` - TSDoc 유효성 검증
 - `analyze` - 전체 문서 품질 분석
 - `health` - 프로젝트 건강도 점수
 - `check-links` - **문서 링크 검증 및 Typo 감지** 🔥
+- `coverage-report` - **@doc 태그 커버리지 검증 (SSOT)** 🔥 NEW!
 
 #### 문서 개선 (3개)
 - `suggest` - 개선 제안
@@ -99,12 +102,36 @@ tsdoc-edge work-context src/services/UserService.ts
 - `parse` - **TSDoc → EnhancedDoc 자동 추출**
 - `sync-coverage` - **테스트 커버리지 동기화**
 
-#### 통계 및 분석 (6개)
+#### 고급 분석 (6개) 🔥 NEW!
+- `analyze-calls` - **함수 호출 관계 분석 (Call Graph)** 🔥
+  - 1,500+ 호출 관계 추적
+  - 가장 많이 호출되는 함수 식별
+  - 호출 패턴 분석 (Command, Registry, Utility, Builder)
+- `analyze-chains` - **의존성 체인 + 순환 의존성 감지** 🔥
+  - 순환 의존성 자동 감지 및 경고
+  - 핫스팟 분석 (Top 10)
+  - 의존성 점수 계산
+- `analyze-io` - **I/O 데이터 흐름 분석 (Type Matching)** 🔥
+  - 9,000+ I/O 의존성 추적
+  - 32,000+ 파이프라인 탐지
+  - 타입 기반 데이터 흐름 시각화
+- `analyze-tests` - **테스트 커버리지 관계 분석** 🔥
+  - 테스트-코드 매핑
+  - 커버리지 품질 평가
+- `analyze-types` - **타입 의존성 분석** 🔥
+  - 타입 간 의존성 추적
+  - 타입 체인 시각화
+- `test-relationships` - **통합 테스트 관계 분석** 🔥
+  - 심볼 간 테스트 커버리지 추적
+  - 통합 테스트 추적성
+
+#### 통계 및 분석 (4개)
 - `stats` (--save, --compare) - 통계 추적
 - `core-api` - 핵심 API 표면 분석
 - `scan` - 심볼 그래프 깊이 탐색
+- `usage` - CLI 사용 분석 🔥 NEW!
 
-#### 문서 심볼 시스템 (12개)
+#### 문서 심볼 시스템 (17개)
 - `index-docs` - [[]] 심볼 인덱싱
 - `validate-docs` - SSOT 검증
 - `update-backlinks` - 백링크 자동 생성
@@ -112,11 +139,16 @@ tsdoc-edge work-context src/services/UserService.ts
 - `validate-spec` - 명세서 완성도 검증 🔥
 - `check-duplicates` - 중복 콘텐츠 감지 및 제안 🔥
 - `spec-status` - 명세서 상태 워크플로우 관리 🔥
+- `spec-bump` - **명세서 버전 증가** 🔥 NEW!
+- `spec-diff` - **명세서 버전 비교** 🔥 NEW!
+- `spec-history` - **명세서 버전 히스토리** 🔥 NEW!
 - `find-unused-docs` - 미사용/오래된 문서 탐지 🔥
 - `find-doc` - 문서 심볼 검색
-- `parse-mermaid` - **.mmd 다이어그램 파싱 및 H2 참조 문서 자동 생성** 🔥 NEW!
-- `promote-symbol` - **H2 참조를 H1 canonical로 승격** 🔥 NEW!
-- `validate-symbol-refs` - **[[Symbol]] 일관성 및 중복 검증** 🔥 NEW!
+- `parse-mermaid` - **.mmd 다이어그램 파싱 및 H2 참조 문서 자동 생성** 🔥
+- `promote-symbol` - **H2 참조를 H1 canonical로 승격** 🔥
+- `validate-symbol-refs` - **[[Symbol]] 일관성 및 중복 검증** 🔥
+- `symbol-query` - **심볼 레지스트리 조회** 🔥 NEW!
+- `symbol-fix` - **심볼 참조 자동 수정** 🔥 NEW!
 
 #### Git 통합 (3개) 🔥
 - `install-hook` - **Pre-commit hook 설치**
@@ -1514,6 +1546,41 @@ tsdoc-edge type-chain Data --include-primitives
 **22개의 Mermaid 다이어그램으로 코드베이스를 완전히 시각화**
 
 TSDoc Edge는 코드와 문서뿐만 아니라 **전체 시스템을 시각적으로 이해**할 수 있도록 22개의 포괄적인 다이어그램을 제공합니다. 모든 다이어그램은 실제 데이터베이스 분석 결과를 기반으로 자동 생성되며, 코드 변경 시 업데이트됩니다.
+
+### 🎨 다이어그램 생성 방법
+
+`visualize` 명령어로 다양한 타입의 다이어그램을 생성할 수 있습니다:
+
+```bash
+# 1. 심볼의 의존성 트리 생성
+tsdoc-edge visualize tree <symbol-id>
+
+# 2. 핫스팟 다이어그램 생성
+tsdoc-edge visualize hotspots
+
+# 3. 순환 의존성 다이어그램 생성
+tsdoc-edge visualize circular [index]
+
+# 4. 클래스 계층 다이어그램 생성
+tsdoc-edge visualize hierarchy <class-id>
+
+# 5. 모듈 의존성 다이어그램 생성
+tsdoc-edge visualize modules [max]
+```
+
+**출력 위치**: 모든 다이어그램은 `.tsdoc/diagrams/` 디렉토리에 저장됩니다.
+
+**예시**:
+```bash
+# DatabaseManager의 의존성 트리 생성
+tsdoc-edge visualize tree DatabaseManager
+
+# 상위 10개 핫스팟 다이어그램 생성
+tsdoc-edge visualize hotspots
+
+# BaseCommand 클래스 계층 생성
+tsdoc-edge visualize hierarchy BaseCommand
+```
 
 ### 🗺️ 시작하기: Diagram Index
 
