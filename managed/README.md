@@ -136,7 +136,7 @@ Foundation components that power the entire system:
 
 - [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`): Graph construction
 - [[SymbolSearchEngine]] (`src/graph/SymbolSearchEngine.ts`): Search algorithms
-- [[RegistryManager]] (`src/storage/RegistryManager.ts`): JSONL operations
+- [[SymbolRegistryManager]] (`src/storage/SymbolRegistryManager.ts`): JSONL operations
 - [[ConfigManager]] (`src/config/ConfigManager.ts`): Configuration management
 
 ## Analyzers & Extractors
@@ -164,7 +164,7 @@ Core analyzers that power relationship detection and symbol extraction:
   - Source: `src/analyzer/IODependencyAnalyzer.ts`
   - Output: 6,705 I/O dependencies
   - Capabilities: Type matching, pipeline detection, confidence scoring
-  - Used by: [[AnalyzeIOCommand]], [[AnalyzePipelineCommand]]
+  - Used by: [[AnalyzeIOCommand]]
 
 - [[CodeHealthChecker]] (`analyzers/CodeHealthChecker.md`): Quality metrics and health reports
   - Source: `src/analyzer/CodeHealthChecker.ts`
@@ -175,10 +175,10 @@ Core analyzers that power relationship detection and symbol extraction:
 ### Supporting Analyzers (20+ components)
 
 See [[Analyzers & Extractors]] (`analyzers/index.md`) for complete list including:
-- [[DocumentationAnalyzer]], [[TestCoverageAnalyzer]], [[MissingLinkDetector]]
-- [[DataFlowAnalyzer]], [[DependencyResolver]], [[DependencyChainAnalyzer]]
-- [[InterfaceAnalyzer]], [[DomainStructureAnalyzer]], [[ImportanceClassifier]]
-- [[ParallelWorkDetector]], [[PreCommitChecker]], [[ReliabilityChecker]]
+- [[MissingLinkDetector]], [[DataFlowAnalyzer]], [[DependencyResolver]]
+- [[DependencyChainAnalyzer]], [[InterfaceAnalyzer]], [[DomainStructureAnalyzer]]
+- [[ImportanceClassifier]], [[ParallelWorkDetector]], [[PreCommitChecker]]
+- [[ReliabilityChecker]]
 
 ## Feature Documentation
 
@@ -190,19 +190,19 @@ See [[Analyzers & Extractors]] (`analyzers/index.md`) for complete list includin
   - Uses: [[ASTSymbolExtractor]] (`analyzers/ASTSymbolExtractor.md`), [[TSDocParser]] (`src/parser/TSDocParser.ts`)
 - [[AnalysisFeatures]] (`features/analysis-features.md`): 12 query & analysis commands (4.2% coverage, 25 files)
   - Core: [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`), [[DependencyResolver]] (`src/analyzer/DependencyResolver.ts`)
-  - Analyzers: [[CodeHealthChecker]] (`analyzers/CodeHealthChecker.md`), [[DocumentationAnalyzer]], [[TestCoverageAnalyzer]]
+  - Analyzers: [[CodeHealthChecker]] (`analyzers/CodeHealthChecker.md`)
 - [[ValidationFeatures]] (`features/validation-features.md`): 8 validation commands (1.9% coverage, 20 files)
-  - Core: [[DocumentValidator]] (`src/validator/DocumentValidator.ts`), [[SymbolValidator]] (`src/validator/SymbolValidator.ts`)
+  - Core: [[ConnectivityValidator]] (`src/validator/ConnectivityValidator.ts`), [[ConventionValidator]] (`src/validator/ConventionValidator.ts`)
   - Commands: [[ValidateCommand]], [[ValidateDocsCommand]], [[ValidateSymbolRefsCommand]]
 - [[SymbolGraphFeatures]] (`features/symbol-graph.md`): Graph-based symbol tracking (3.9% coverage, 24 files)
   - Implementation: [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`)
-  - Uses: [[GraphBuilder]] (`src/graph/GraphBuilder.ts`), [[GraphTraversal]] (`src/graph/GraphTraversal.ts`)
+  - Uses: [[SymbolSearchEngine]] (`src/graph/SymbolSearchEngine.ts`), [[DepthTraverser]] (`src/graph/DepthTraverser.ts`)
 - [[DocumentSymbolSystem]] (`features/document-symbol-system.md`): [[Symbol]] reference system
-  - Parser: [[DocumentSymbolParser]] (`src/doc-symbol/DocumentSymbolParser.ts`)
+  - Parser: [[DocumentSymbolRegistry]] (`src/doc-symbol/DocumentSymbolRegistry.ts`)
   - Extractor: [[MermaidSymbolExtractor]] (`src/doc-symbol/MermaidSymbolExtractor.ts`)
 - [[AutoIndexing]] (`features/auto-indexing.md`): Automatic doc indexing
   - Command: [[IndexDocsCommand]] (`src/commands/IndexDocsCommand.ts`)
-  - Uses: [[BacklinkUpdater]] (`src/doc-symbol/BacklinkUpdater.ts`)
+  - Uses: [[BacklinkGenerator]] (`src/doc-symbol/BacklinkGenerator.ts`)
 
 ### Architecture
 **Path**: `managed/architecture/`
@@ -215,7 +215,7 @@ See [[Analyzers & Extractors]] (`analyzers/index.md`) for complete list includin
   - Analyzers: [[IODependencyAnalyzer]] (`src/analyzer/IODependencyAnalyzer.ts`), [[CallGraphAnalyzer]] (`src/analyzer/CallGraphAnalyzer.ts`)
 - **Database Schema** (`database-relationships-2025-11-07.md`): Storage design
   - SQLite: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
-  - JSONL: [[RegistryManager]] (`src/storage/RegistryManager.ts`)
+  - JSONL: [[SymbolRegistryManager]] (`src/storage/SymbolRegistryManager.ts`)
 - [[Dependency Meta-Structure]] (`diagrams/dependency-meta-structure.mmd`): Visual taxonomy
   - Shows all 17 relationship types across 4 dimensions
   - Entry point for relationship exploration
@@ -228,7 +228,6 @@ See [[Analyzers & Extractors]] (`analyzers/index.md`) for complete list includin
   - Analyzer: [[TestCoverageAnalyzer]] (`src/analyzer/TestCoverageAnalyzer.ts`)
 - [[Parallel Work Theory]] (`parallel-work-theory.md`): Safe parallel development analysis
   - Command: [[ParallelWorkCommand]] (`src/commands/ParallelWorkCommand.ts`)
-  - Uses: [[ConflictDetector]] (`src/analyzer/ConflictDetector.ts`)
 
 ## Primary Types
 **Path**: `managed/primary-types/`
@@ -242,10 +241,8 @@ Core TypeScript interfaces used across the system:
   - Generated by: [[ASTSymbolExtractor]] (`analyzers/ASTSymbolExtractor.md`)
 - [[TrackableStatistics]] (`primary-types/TrackableStatistics.md`): Metrics tracking
   - Used by: [[StatsCommand]] (`src/commands/StatsCommand.ts`)
-  - Calculated by: [[StatisticsCalculator]] (`src/analyzer/StatisticsCalculator.ts`)
 - [[TsdocEdgeConfig]] (`primary-types/TsdocEdgeConfig.md`): Configuration schema
-  - Used by: [[InitCommand]] (`src/commands/InitCommand.ts`), [[ConfigManager]] (`src/config/ConfigManager.ts`)
-  - Validated by: [[ConfigValidator]] (`src/config/ConfigValidator.ts`)
+  - Used by: [[ConfigManager]] (`src/config/ConfigManager.ts`)
 
 ## Navigation
 

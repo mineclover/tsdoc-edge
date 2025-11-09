@@ -217,26 +217,43 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
     lines: string[],
     registry: SymbolRegistry
   ): void {
+    let inCodeBlock = false;
+    let inInlineCode = false;
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const lineNumber = i + 1;
 
+      // Track code block boundaries (``` or ~~~)
+      if (line.trim().match(/^```|^~~~/)) {
+        inCodeBlock = !inCodeBlock;
+        continue;
+      }
+
+      // Skip lines inside code blocks
+      if (inCodeBlock) {
+        continue;
+      }
+
+      // Skip inline code (simplified check - just skip lines with backticks)
+      const lineWithoutInlineCode = line.replace(/`[^`]+`/g, '');
+
       // Check for H1 definition: # [[SymbolName]]
-      const h1Match = line.match(/^#\s+\[\[([^\]]+)\]\]/);
+      const h1Match = lineWithoutInlineCode.match(/^#\s+\[\[([^\]]+)\]\]/);
       if (h1Match) {
         const symbolName = h1Match[1];
         this.addDefinition(registry, symbolName, filePath, lineNumber, true);
         continue;
       }
 
-      // Extract all [[Symbol]] references in the line
+      // Extract all [[Symbol]] references in the line (excluding inline code)
       const refRegex = /\[\[([^\]]+)\]\]/g;
       let match;
-      while ((match = refRegex.exec(line)) !== null) {
+      while ((match = refRegex.exec(lineWithoutInlineCode)) !== null) {
         const symbolName = match[1];
 
         // Check if this is a definition (in heading) or reference
-        if (line.trim().startsWith('#')) {
+        if (lineWithoutInlineCode.trim().startsWith('#')) {
           // Heading but not H1 - still a definition but not primary
           this.addDefinition(registry, symbolName, filePath, lineNumber, false);
         } else {
@@ -245,7 +262,7 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
             symbolName,
             filePath,
             lineNumber,
-            context: line.trim(),
+            context: lineWithoutInlineCode.trim(),
           });
         }
       }
