@@ -382,3 +382,18 @@ tsdoc-edge validate-spec managed | grep "⚠️" -A 1
 - [[SpecCompletenessValidator]]: Validator implementation
 - [[ModuleSpecTypes]]: TypeScript type definitions
 - Documentation quality standards
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:153
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:218
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:227
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:161
+- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:92
+- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:120
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:61
+

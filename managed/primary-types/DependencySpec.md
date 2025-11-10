@@ -58,3 +58,17 @@ Part of [[StrictModeValidator]] scoring:
 
 **Category**: Type Definition
 **Status**: Active
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:43
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:148
+- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:41
+- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:64
+- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:43
+- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:57
+

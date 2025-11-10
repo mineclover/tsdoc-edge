@@ -100,3 +100,13 @@ const checker = new SpecContentSimilarityChecker({
 - (Planned: CheckDuplicatesCommand for CLI duplicate detection)
 - [[UnusedDocumentDetector]]: Find orphaned docs
 - [[DocumentSymbolParser]]: Parse doc structure
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:141
+- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:126
+

@@ -702,3 +702,12 @@ generateNewDiagram(...): string {
 **Last Review**: 2025-11-07
 **Next Review**: After major feature addition
 **Status**: ✅ Production Ready
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Mermaid Diagram Validation Workflow]] → /home/user/tsdoc-edge/managed/architecture/mermaid-validation-workflow.md:111
+

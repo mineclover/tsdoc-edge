@@ -425,20 +425,37 @@ cycle_rate = symbols_in_cycles / total_symbols
 
 ### Referenced By
 
-- [[AnalysisFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/analysis-features.md:171
-- [[AnalysisFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/analysis-features.md:183
-- [[AutoIndexing]] → /Users/junwoobang/project/tsdoc-edge/managed/features/auto-indexing.md:146
-- [[CoreFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-features-catalog.md:86
-- [[CoreFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-features-catalog.md:276
-- [[CoreWorkflow]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-workflow.md:62
-- [[CoreWorkflow]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-workflow.md:86
-- [[DocumentSymbolSystem]] → /Users/junwoobang/project/tsdoc-edge/managed/features/document-symbol-system.md:81
-- [[DocumentSymbolSystem]] → /Users/junwoobang/project/tsdoc-edge/managed/features/document-symbol-system.md:101
-- [[SymbolGraphFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/symbol-graph.md:140
-- [[SymbolGraphFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/symbol-graph.md:156
+- [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:125
+- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:238
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:261
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:21
+- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:21
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:258
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:272
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:273
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:164
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:186
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:105
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:295
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:336
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:337
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:141
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:168
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:169
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:104
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:127
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:128
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:247
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:265
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:266
+- [[DocumentationFixer]] → /home/user/tsdoc-edge/managed/fixer/DocumentationFixer.md:22
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:189
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:264
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:135
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:172
 
 ### Implemented By
 
-- ConnectivityValidator (Connectivity) → /Users/junwoobang/project/tsdoc-edge/src/validator/ConnectivityValidator.ts:23
-- StrictModeValidator (StrictMode) → /Users/junwoobang/project/tsdoc-edge/src/validator/StrictModeValidator.ts:32
+- ConnectivityValidator (Connectivity) → /home/user/tsdoc-edge/src/validator/ConnectivityValidator.ts:43
+- StrictModeValidator (StrictMode) → /home/user/tsdoc-edge/src/validator/StrictModeValidator.ts:32
 

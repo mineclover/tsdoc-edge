@@ -111,3 +111,17 @@ Uses [[DatabaseManager]] for sessions.
 
 **Category**: Type Definition
 **Status**: Active
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:128
+- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:80
+- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:23
+- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:29
+- [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:20
+- [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:26
+

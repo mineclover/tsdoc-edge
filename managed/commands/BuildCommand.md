@@ -54,3 +54,47 @@ tsdoc-edge build src
 - [[SymbolGraphBuilder]]: 관계 그래프 구축
 - [[DatabaseManager]]: 저장소 관리
 - [[CoreWorkflow]]: 전체 워크플로우
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:80
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:165
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:22
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:217
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:246
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:30
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:110
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:134
+- [[Phase Commands]] → /home/user/tsdoc-edge/managed/commands/PhaseCommands.md:56
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:226
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:44
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:113
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:193
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:68
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:118
+- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:62
+- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:46
+- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:67
+- [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:74
+- [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:78
+- [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:90
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:94
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:9
+- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:9
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:15
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:18
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:26
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:34
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:163
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:223
+- [[FileScanner]] → /home/user/tsdoc-edge/managed/utilities/FileScanner.md:68
+- [[String Utilities]] → /home/user/tsdoc-edge/managed/utilities/StringUtilities.md:57
+
+### Implemented By
+
+- BuildCommand → /home/user/tsdoc-edge/src/commands/BuildCommand.ts:44
+

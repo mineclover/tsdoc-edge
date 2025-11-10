@@ -85,3 +85,15 @@ completeness: 85%
 - [[SpecCompletenessValidator]]: Validates completeness
 - (Planned: SpecStatusCommand for CLI status management)
 - [[SpecVersionManager]]: Version history tracking
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:124
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:62
+- [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:54
+- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:79
+

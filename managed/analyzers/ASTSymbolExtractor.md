@@ -310,3 +310,33 @@ tsdoc-edge parse src/commands/BuildCommand.ts
 **Last Updated**: 2025-11-08
 **Responsibility**: Extract all symbols from TypeScript AST
 **Status**: ✅ Active - 1,511 symbols extracted from 126 files
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:217
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:29
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:51
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:73
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:38
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:123
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:25
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:139
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:278
+- [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:72
+- [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:89
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:31
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:8
+- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:8
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:10
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:17
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:25
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:33
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:159
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:69
+- [[FileScanner]] → /home/user/tsdoc-edge/managed/utilities/FileScanner.md:67
+- [[String Utilities]] → /home/user/tsdoc-edge/managed/utilities/StringUtilities.md:56
+

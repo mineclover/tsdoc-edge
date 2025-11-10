@@ -483,3 +483,22 @@ console.log(`saveSymbols is called by ${callers.length} functions`);
 **Last Updated**: 2025-11-09
 **Call Types Supported**: 3 (direct, method, constructor)
 **Average Confidence**: 1.0 (exact AST-based detection)
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:169
+- [[DataFlowAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DataFlowAnalyzer.md:20
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:218
+- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:21
+- [[Phase7Commands]] → /home/user/tsdoc-edge/managed/commands/Phase7Commands.md:22
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:132
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:140
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:279
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:47
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:10
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:64
+

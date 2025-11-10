@@ -21,3 +21,14 @@ Features:
 
 - [[CommentStateManager]]: State management
 - [[CommentExporter]]: Export functionality
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CommentExporter]] → /home/user/tsdoc-edge/managed/fold/CommentExporter.md:23
+- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:23
+- [[CommentStateTypes]] → /home/user/tsdoc-edge/managed/types/CommentStateTypes.md:114
+

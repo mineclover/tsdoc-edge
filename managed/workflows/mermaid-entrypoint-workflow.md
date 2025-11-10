@@ -626,3 +626,15 @@ tsdoc-edge parse-mermaid <path> --generate-docs
 
 **Last Updated**: 2025-11-08
 **Related**: [[Commands Index]], [[Work Context Workflow]], `CLAUDE.md`
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:244
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:92
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:143
+- [[Example - Mermaid Workflow]] → /home/user/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:192
+

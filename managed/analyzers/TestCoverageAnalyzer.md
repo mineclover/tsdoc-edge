@@ -21,3 +21,20 @@ Measures:
 
 - [[Test Coverage]]: Coverage data
 - [[CoverageParser]]: Coverage parsing
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:20
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:62
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:98
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:191
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:93
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:96
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:144
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:201
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:85
+

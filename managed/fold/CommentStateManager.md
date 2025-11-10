@@ -21,3 +21,14 @@ Handles:
 
 - [[CommentExporter]]: Export functionality
 - [[CommentImporter]]: Import functionality
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CommentExporter]] → /home/user/tsdoc-edge/managed/fold/CommentExporter.md:22
+- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:22
+- [[CommentStateTypes]] → /home/user/tsdoc-edge/managed/types/CommentStateTypes.md:112
+

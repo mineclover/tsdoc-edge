@@ -19,3 +19,15 @@ Check validity of all [[Symbol]] links.
 ## Related
 
 - [[Document Symbol System]]: Symbol links
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:93
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:129
+- [[LinkingTypes]] → /home/user/tsdoc-edge/managed/types/LinkingTypes.md:69
+- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:63
+

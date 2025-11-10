@@ -216,3 +216,14 @@ interface RelationshipGraph {
 - [[AnalyzeCallsCommand]]: Analyze call relationships
 - [[TestRelationshipsCommand]]: Test coverage relationships
 - [[AnalyzeChainsCommand]]: Relationship chains
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:371
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:184
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:128
+

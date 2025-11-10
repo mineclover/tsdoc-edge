@@ -20,3 +20,13 @@ Identifies:
 ## Related
 
 - [[Code Dependency]]: Structural analysis
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:138
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:151
+

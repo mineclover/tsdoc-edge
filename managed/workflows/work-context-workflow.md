@@ -418,3 +418,23 @@ done
 **Document Owner**: CLI Team
 **Last Review**: 2025-11-07
 **Status**: ✅ Production Ready
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:221
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:114
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:19
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:14
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:220
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:68
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:136
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:189
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:167
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:280
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:299
+- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:400
+

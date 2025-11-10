@@ -21,3 +21,12 @@ Converts:
 
 - [[CoverageParser]]: Coverage parsing
 - [[CoverageSyncAdapter]]: Synchronization
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:171
+

@@ -68,3 +68,26 @@ tsdoc-edge analyze-pipeline
 - [[Pipeline]]: I/O deps chain into pipelines (3+ step chains)
 - [[Type Dependency]]: Type-level relationships (complementary)
 - [[Call Relationships]]: Actual runtime calls (validation)
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:70
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:18
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:253
+- [[AnalyzeIOCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeIOCommand.md:22
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:38
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:389
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:26
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:52
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:58
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:126
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:273
+- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:142
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:37
+- [[Relationship Standard Format]] → /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:172
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:35
+

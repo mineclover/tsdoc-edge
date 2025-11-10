@@ -367,3 +367,15 @@ if (configManager.exists()) {
 - Project initialization workflow
 - Directory structure conventions
 - [[ConfigManager]] implementation
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:60
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:81
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:86
+- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:92
+

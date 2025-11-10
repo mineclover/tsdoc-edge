@@ -68,3 +68,13 @@ Returns:
 - [[DocCodeLinker]]: Creates link index
 - [[CheckLinksCommand]]: CLI validation command
 - [[UpdateBacklinksCommand]]: Updates backlinks
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[LinkingTypes]] → /home/user/tsdoc-edge/managed/types/LinkingTypes.md:68
+- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:51
+

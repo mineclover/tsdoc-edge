@@ -362,3 +362,17 @@ describe('DepthTraverser', () => {
 - Circular dependency detection
 - Graph traversal patterns
 - Dependency analysis techniques
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:56
+- [[TreeCommand]] → /home/user/tsdoc-edge/managed/commands/TreeCommand.md:122
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:71
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:169
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:191
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:89
+

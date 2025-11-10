@@ -42,3 +42,13 @@ const connections: CodeConnection[] = parser.parseCodeFile('src/file.ts');
 
 **Category**: Type Definition
 **Status**: Active
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:68
+- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:30
+

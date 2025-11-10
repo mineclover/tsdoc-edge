@@ -21,3 +21,13 @@ Tracks:
 
 - [[InterfaceAnalyzer]]: Interface analysis
 - [[Type Dependency]]: Type relationships
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:124
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:157
+

@@ -90,3 +90,12 @@ tsdoc-edge spec-bump managed/features/work-context.md --minor
 - (Planned: SpecHistoryCommand for viewing version history)
 - (Planned: SpecDiffCommand for comparing versions)
 - (Planned: SpecBumpCommand for bumping versions)
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:67
+

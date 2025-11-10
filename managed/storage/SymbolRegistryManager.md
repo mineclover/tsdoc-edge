@@ -518,3 +518,19 @@ Features:
 **Last Updated**: 2025-11-09
 **Symbol Count**: 14 (in this project's registry)
 **Registry Path**: `.tsdoc/registry.jsonl`
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:123
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:186
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:177
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:184
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:149
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:158
+- [[RegistryTypes]] → /home/user/tsdoc-edge/managed/types/RegistryTypes.md:95
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:68
+

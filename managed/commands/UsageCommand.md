@@ -20,3 +20,14 @@ Shows:
 ## Related
 
 - [[TrackableStatistics]]: Stats tracking
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:87
+- [[AnalyticsTypes]] → /home/user/tsdoc-edge/managed/types/AnalyticsTypes.md:60
+- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:83
+

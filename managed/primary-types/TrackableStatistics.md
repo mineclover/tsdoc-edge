@@ -132,3 +132,19 @@ console.log(`Critical symbols documented: ${criticalStats.documented}/${critical
 [^ImportanceStats]
 [^StatsComparison]
 [^SymbolChange]
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:22
+- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:21
+- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:22
+- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:22
+
+### Implemented By
+
+- TrackableStatistics → /home/user/tsdoc-edge/src/types/analysis/statistics.ts:171
+

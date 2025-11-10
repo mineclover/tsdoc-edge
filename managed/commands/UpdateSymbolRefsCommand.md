@@ -19,3 +19,13 @@ Update symbol references in documentation.
 ## Related
 
 - [[Document Symbol System]]: Symbol references
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:66
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:62
+

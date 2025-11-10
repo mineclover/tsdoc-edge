@@ -192,3 +192,17 @@ sqlite3 .tsdoc/symbols.db "SELECT type, COUNT(*) FROM unified_relationships GROU
 ---
 
 **Last Updated**: 2025-11-08
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:220
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:250
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:118
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:270
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:133
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:182
+

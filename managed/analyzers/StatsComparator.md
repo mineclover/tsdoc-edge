@@ -21,3 +21,12 @@ Features:
 
 - [[TrackableStatistics]]: Stats tracking
 - [[StatsHistoryManager]]: History management
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:159
+

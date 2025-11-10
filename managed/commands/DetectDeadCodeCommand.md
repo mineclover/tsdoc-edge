@@ -70,3 +70,13 @@ Warns about:
 - [[CoverageReportCommand]]: Identifies undocumented code
 - [[AnalyzeCallsCommand]]: Call graph analysis
 - [[AnalyzeTypesCommand]]: Type dependency analysis
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:113
+- [[DataFlowTypes]] → /home/user/tsdoc-edge/managed/types/DataFlowTypes.md:78
+

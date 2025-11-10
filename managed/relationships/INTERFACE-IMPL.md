@@ -15,3 +15,16 @@ Track interface implementation (`class A implements I`).
 **Implementation**: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`)
 **Command**: [[BuildCommand]]
 **Note**: Interface implementation detection is integrated into AST symbol extraction
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:84
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:162
+- [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:19
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:57
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:110
+

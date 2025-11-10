@@ -20,3 +20,13 @@ Checks:
 ## Related
 
 - [[SSOT]]: Validation enforcement
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:184
+- [[Phase10Commands]] → /home/user/tsdoc-edge/managed/commands/Phase10Commands.md:21
+

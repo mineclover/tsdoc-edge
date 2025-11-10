@@ -90,3 +90,13 @@ export class MyCommand extends BaseCommand {
 
 - [[CommandRegistry]]: 명령어 등록 시스템
 - All Command implementations extend this class
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:181
+- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:130
+

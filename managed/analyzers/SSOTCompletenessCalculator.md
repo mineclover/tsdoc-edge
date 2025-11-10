@@ -20,3 +20,13 @@ Measures:
 ## Related
 
 - [[SSOT]]: Single Source of Truth concept
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:110
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:142
+

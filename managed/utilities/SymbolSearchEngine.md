@@ -163,3 +163,20 @@ const dead = engine.search({
 - [[SymbolGraphBuilder]]: Builds searchable graph
 - [[Symbol]]: Symbol type definition
 - [[FindMethodCommand]]: CLI symbol search
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:55
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:190
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:58
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:110
+- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:103
+- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:137
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:157
+- [[ConnectivityValidator]] → /home/user/tsdoc-edge/managed/utilities/ConnectivityValidator.md:104
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:88
+

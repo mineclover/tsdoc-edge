@@ -119,3 +119,18 @@ Source Code → [TSDocParser] → ExtractionResult
 [^ExtractedSymbol]
 [^SymbolRelationship]
 [^SymbolGraphBuilder]
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:91
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:173
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:292
+
+### Implemented By
+
+- ExtractionResult → /home/user/tsdoc-edge/src/analyzer/ASTSymbolExtractor.ts:36
+

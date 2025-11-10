@@ -18,3 +18,12 @@
 
 - [[Pipeline]]: 파이프라인 관계
 - [[CallGraphAnalyzer]]: 호출 그래프
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:109
+

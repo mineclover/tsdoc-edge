@@ -21,3 +21,14 @@ Gathers:
 
 - [[TrackableStatistics]]: Stats types
 - [[StatsHistoryManager]]: History tracking
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:158
+- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:82
+- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:101
+

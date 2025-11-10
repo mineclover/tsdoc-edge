@@ -19,3 +19,12 @@ Visualize dependency graphs.
 ## Related
 
 - [[Code Dependency]]: Dependency tracking
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[MermaidGenerator]] → /home/user/tsdoc-edge/managed/utilities/MermaidGenerator.md:90
+

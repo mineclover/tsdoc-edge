@@ -239,3 +239,17 @@ echo "Coverage: $coverage%" > coverage-badge.txt
 - TSDoc `@doc` tag specification
 - SSOT (Single Source of Truth) principles
 - Hierarchical coverage calculation
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:61
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:146
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:43
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:109
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:131
+- [[TestRelationships]] → /home/user/tsdoc-edge/managed/types/TestRelationships.md:74
+

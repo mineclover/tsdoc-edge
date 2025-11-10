@@ -118,3 +118,21 @@ if (report.metrics.overallScore < 70) {
 [^DocQualityScore]
 [^TestCoverageInfo]
 [^ImprovementSuggestion]
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:99
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:102
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:194
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:187
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:114
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:293
+
+### Implemented By
+
+- AnalysisReport → /home/user/tsdoc-edge/src/types/analysis/quality.ts:109
+

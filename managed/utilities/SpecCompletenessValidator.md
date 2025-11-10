@@ -67,3 +67,18 @@ console.log(`Missing: ${result.missingSections.join(', ')}`);
 - [[ValidateSpecCommand]]: CLI validation command
 - [[SpecStatusManager]]: Manages spec lifecycle
 - [[DocumentSymbolParser]]: Parses spec structure
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:137
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:150
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:181
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:219
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:165
+- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:123
+- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:65
+

@@ -58,3 +58,14 @@ const symbols = index.docToSymbol.get('managed/services.md');
 - [[LinkValidator]]: Validates link integrity
 - [[DocumentSymbolParser]]: Parses document symbols
 - [[IndexDocsCommand]]: Creates link index
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:188
+- [[LinkingTypes]] → /home/user/tsdoc-edge/managed/types/LinkingTypes.md:67
+- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:62
+

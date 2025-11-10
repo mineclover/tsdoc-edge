@@ -101,3 +101,16 @@ Special footnote references:
 - [[DocumentSymbolParser]]: Parses `[[Symbol]]` notation
 - [[DocumentSymbolRegistry]]: Stores document symbols
 - [[IndexDocsCommand]]: Builds symbol index
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:127
+- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:79
+- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:57
+- [[FeatureTypes]] → /home/user/tsdoc-edge/managed/types/FeatureTypes.md:81
+- [[IdGenerator]] → /home/user/tsdoc-edge/managed/utilities/IdGenerator.md:79
+

@@ -20,3 +20,15 @@ Criteria:
 ## Related
 
 - [[SymbolGraphBuilder]]: Symbol analysis
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:143
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:188
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:151
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:166
+

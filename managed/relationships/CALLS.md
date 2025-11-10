@@ -55,3 +55,27 @@ tsdoc-edge orphans --type=function
 - [[Test Coverage]]: Tests validate call paths (quality metric)
 - [[Pipeline]]: Multi-step call chains (3+ hops)
 - [[Code Dependency]]: Import dependencies enable calls
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:58
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:209
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:252
+- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:22
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:36
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:388
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:26
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:51
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:59
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:127
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:272
+- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:132
+- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:139
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:113
+- [[Relationship Standard Format]] → /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:171
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:53
+

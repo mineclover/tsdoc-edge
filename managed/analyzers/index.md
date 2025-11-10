@@ -308,3 +308,15 @@ Storage (SQLite + JSONL)
 **Last Updated**: 2025-11-08
 **Total Analyzers**: 20+ components
 **Coverage**: Powers all relationship detection and quality analysis
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:134
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:277
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:144
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:183
+

@@ -20,3 +20,14 @@ Supports:
 ## Related
 
 - [[Test Coverage]]: Coverage data
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[IstanbulCoverageAdapter]] → /home/user/tsdoc-edge/managed/analyzers/IstanbulCoverageAdapter.md:22
+- [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:23
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:162
+

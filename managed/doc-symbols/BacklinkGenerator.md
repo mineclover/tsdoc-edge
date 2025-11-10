@@ -21,3 +21,12 @@ Creates:
 
 - [[UpdateBacklinksCommand]]: CLI interface
 - [[Document Symbol System]]: Symbol references
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:33
+

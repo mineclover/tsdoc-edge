@@ -386,18 +386,25 @@ tsdoc-edge tree
 
 ### Referenced By
 
-- [[AnalysisFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/analysis-features.md:170
-- [[AnalysisFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/analysis-features.md:182
-- [[CoreFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-features-catalog.md:62
-- [[CoreFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-features-catalog.md:267
-- [[CoreWorkflow]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-workflow.md:63
-- [[CoreWorkflow]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-workflow.md:85
-- [[ValidationFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/validation-features.md:142
-- [[ValidationFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/validation-features.md:160
+- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:236
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:257
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:270
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:271
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:81
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:286
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:334
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:335
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:142
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:166
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:167
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:207
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:235
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:236
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:265
 
 ### Implemented By
 
-- DepthTraverser (Traversal) → /Users/junwoobang/project/tsdoc-edge/src/graph/DepthTraverser.ts:64
-- SymbolGraphBuilder (Builder) → /Users/junwoobang/project/tsdoc-edge/src/graph/SymbolGraphBuilder.ts:22
-- SymbolSearchEngine (Search) → /Users/junwoobang/project/tsdoc-edge/src/graph/SymbolSearchEngine.ts:25
+- DepthTraverser (Traversal) → /home/user/tsdoc-edge/src/graph/DepthTraverser.ts:64
+- SymbolGraphBuilder (Builder) → /home/user/tsdoc-edge/src/graph/SymbolGraphBuilder.ts:41
+- SymbolSearchEngine (Search) → /home/user/tsdoc-edge/src/graph/SymbolSearchEngine.ts:44
 

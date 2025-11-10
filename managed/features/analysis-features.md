@@ -433,17 +433,37 @@ jobs:
 
 ### Referenced By
 
-- [[CoreFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-features-catalog.md:31
-- [[CoreFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-features-catalog.md:266
-- [[CoreWorkflow]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-workflow.md:61
-- [[CoreWorkflow]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-workflow.md:80
-- [[SymbolGraphFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/symbol-graph.md:139
-- [[SymbolGraphFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/symbol-graph.md:152
-- [[ValidationFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/validation-features.md:141
-- [[ValidationFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/validation-features.md:154
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:94
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:197
+- [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:124
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:260
+- [[Phase6Commands]] → /home/user/tsdoc-edge/managed/commands/Phase6Commands.md:22
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:192
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:50
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:285
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:326
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:327
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:140
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:159
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:160
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:246
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:259
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:260
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:206
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:226
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:227
+- [[InsightDocGenerator]] → /home/user/tsdoc-edge/managed/generator/InsightDocGenerator.md:22
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:176
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:233
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:263
+- [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:71
+- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:85
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:84
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:134
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:171
 
 ### Implemented By
 
-- CodeHealthChecker (Health) → /Users/junwoobang/project/tsdoc-edge/src/analyzer/CodeHealthChecker.ts:41
-- DocumentationAnalyzer (Quality) → /Users/junwoobang/project/tsdoc-edge/src/analyzer/DocumentationAnalyzer.ts:18
+- CodeHealthChecker (Health) → /home/user/tsdoc-edge/src/analyzer/CodeHealthChecker.ts:41
+- DocumentationAnalyzer (Quality) → /home/user/tsdoc-edge/src/analyzer/DocumentationAnalyzer.ts:18
 

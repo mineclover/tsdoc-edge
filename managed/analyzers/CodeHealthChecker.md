@@ -310,3 +310,25 @@ tsdoc-edge health src --include-private
 **Last Updated**: 2025-11-08
 **Responsibility**: Generate comprehensive health reports with improvement suggestions
 **Status**: ✅ Active - Powers health command
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:74
+- [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:122
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:91
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:97
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:220
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:86
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:18
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:18
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:143
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:113
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:120
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:142
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:281
+- [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:91
+

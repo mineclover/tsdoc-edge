@@ -19,3 +19,12 @@ Check work context reliability and accuracy.
 ## Related
 
 - [[WorkContextCommand]]: Context reliability
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:189
+

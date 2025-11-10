@@ -28,3 +28,16 @@ interface TypeChain {
 
 - [[Type Dependency]]: 타입 의존성 관계
 - [[Type Dependency]]: 관계 타입
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:19
+- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:21
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:199
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:207
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:158
+

@@ -273,7 +273,7 @@ type RelationshipType =
   | 'implementation'      // A implements I
   // 2. Data Flow
   | 'io-dependency'       // A's output feeds B's input
-  | 'pipeline'            // A ’ B ’ C sequential processing
+  | 'pipeline'            // A ï¿½ B ï¿½ C sequential processing
   | 'event-flow'          // A emits events consumed by B
   // 3. Behavioral
   | 'calls'               // A calls function/method B
@@ -292,7 +292,7 @@ type RelationshipType =
   | 'feature-grouping'    // A, B, C belong to same feature
   // 7. Verification
   | 'test-coverage'       // A is tested by TestA
-  | 'integration-verification'; // A”B verified by test
+  | 'integration-verification'; // Aï¿½B verified by test
 ```
 
 ### RelationshipCategory
@@ -312,8 +312,8 @@ type RelationshipCategory =
 
 ```typescript
 type RelationshipDirection =
-  | 'unidirectional'  // A ’ B
-  | 'bidirectional'   // A ” B
+  | 'unidirectional'  // A ï¿½ B
+  | 'bidirectional'   // A ï¿½ B
   | 'undirected';     // A  B (no direction)
 ```
 
@@ -572,3 +572,13 @@ const confidence = evidence.reduce((sum, ev) => sum + ev.confidence, 0) / eviden
 **Last Updated**: 2025-11-09
 **Schema Version**: 1.0
 **Total Relationship Types**: 18 across 7 categories
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Enhanced Database Schema]] â†’ /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:185
+- [[Unified Relationship Taxonomy]] â†’ /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:387
+

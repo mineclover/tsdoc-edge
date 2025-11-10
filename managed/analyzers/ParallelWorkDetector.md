@@ -28,3 +28,13 @@ interface ParallelWorkGroup {
 
 - [[Parallel Work Theory]]: 이론적 배경
 - [[WorkContextCommand]]: 작업 컨텍스트 분석
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:179
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:91
+

@@ -168,19 +168,34 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 
 ### Referenced By
 
-- [[AnalysisFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/analysis-features.md:169
-- [[AnalysisFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/analysis-features.md:181
-- [[AutoIndexing]] → /Users/junwoobang/project/tsdoc-edge/managed/features/auto-indexing.md:147
-- [[CoreFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-features-catalog.md:13
-- [[CoreFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-features-catalog.md:261
-- [[DocumentSymbolSystem]] → /Users/junwoobang/project/tsdoc-edge/managed/features/document-symbol-system.md:80
-- [[DocumentSymbolSystem]] → /Users/junwoobang/project/tsdoc-edge/managed/features/document-symbol-system.md:100
-- [[SymbolGraphFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/symbol-graph.md:141
-- [[SymbolGraphFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/symbol-graph.md:155
-- [[ValidationFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/validation-features.md:143
-- [[ValidationFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/validation-features.md:158
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:54
+- [[ExploreEntrypointCommand]] → /home/user/tsdoc-edge/managed/commands/ExploreEntrypointCommand.md:22
+- [[Phase Commands]] → /home/user/tsdoc-edge/managed/commands/PhaseCommands.md:57
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:56
+- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:237
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:256
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:268
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:269
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:165
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:182
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:32
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:280
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:330
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:331
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:103
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:125
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:126
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:248
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:263
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:264
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:208
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:231
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:232
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:222
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:262
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:227
 
 ### Implemented By
 
-- TSDocEdge → /Users/junwoobang/project/tsdoc-edge/src/index.ts:114
+- TSDocEdge → /home/user/tsdoc-edge/src/index.ts:145
 

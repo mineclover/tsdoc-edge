@@ -107,3 +107,12 @@ const tempId = tempIdGen.generate(); // "x7k"
 - (Planned: IdCommand for CLI ID generation)
 - (Planned: IdNewCommand for new document IDs)
 - [[DocumentSymbol]]: Document symbol system
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:221
+

@@ -125,3 +125,12 @@ tsdoc-edge detect-circular-types
 - [[VisualizeDepsCommand]]: CLI visualization
 - [[DependencyChainAnalyzer]]: Detect patterns
 - [[DetectCircularTypesCommand]]: Find cycles
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:115
+

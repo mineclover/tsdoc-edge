@@ -69,3 +69,21 @@ Related: [[Concept#Section]]
 - [[DocumentSymbolParser]]: 파싱 로직
 - [[DocumentSymbolRegistry]]: 레지스트리 관리
 - [[Document Symbol System]]: 전체 시스템 설명
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:111
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:87
+- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:168
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:60
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:120
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:46
+- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:64
+- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:75
+- [[FeatureTypes]] → /home/user/tsdoc-edge/managed/types/FeatureTypes.md:82
+- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:53
+

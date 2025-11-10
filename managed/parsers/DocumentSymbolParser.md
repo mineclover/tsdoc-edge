@@ -132,3 +132,14 @@ Calls [[SessionCleaner]] to invalidate tokens.
 
 **Category**: Parser
 **Status**: Active
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[FrontmatterParser]] → /home/user/tsdoc-edge/managed/parser/FrontmatterParser.md:22
+- [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:80
+- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:58
+

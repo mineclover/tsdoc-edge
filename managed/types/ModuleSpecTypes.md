@@ -229,3 +229,15 @@ tsdoc-edge improve src/services/UserService.ts
 - [[ModuleSpecGenerator]]: Generates specs
 - [[ModuleSpecValidator]]: Validates specs
 - [[ValidateSpecCommand]]: CLI validation
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:182
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:221
+- [[EnhancedTagTypes]] → /home/user/tsdoc-edge/managed/types/EnhancedTagTypes.md:78
+- [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:108
+

@@ -365,3 +365,19 @@ describe('DocumentSymbolRegistry', () => {
 - SSOT (Single Source of Truth) principles
 - Document symbol validation rules
 - Symbol registry state management
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Mermaid Diagram Validation Workflow]] → /home/user/tsdoc-edge/managed/architecture/mermaid-validation-workflow.md:6
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:58
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:32
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:23
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:106
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:141
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:118
+- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:74
+

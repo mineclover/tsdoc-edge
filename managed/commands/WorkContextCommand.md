@@ -58,3 +58,29 @@ tsdoc-edge work-context src/analyzer/CallGraphAnalyzer.ts
 - [[CoreWorkflow]]: 전체 워크플로우
 - [[SSOT]]: 문서-코드 일치성
 - [[SymbolGraphBuilder]]: 심볼 관계 분석
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:214
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:19
+- [[ParallelWorkDetector]] → /home/user/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:24
+- [[ReliabilityChecker]] → /home/user/tsdoc-edge/managed/analyzers/ReliabilityChecker.md:21
+- [[TestRelationshipAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestRelationshipAnalyzer.md:23
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:228
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:5
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:128
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:158
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:46
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:78
+- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:48
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:164
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:6
+
+### Implemented By
+
+- WorkContextCommand → /home/user/tsdoc-edge/src/commands/WorkContextCommand.ts:97
+

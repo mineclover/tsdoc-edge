@@ -108,3 +108,13 @@ tsdoc-edge config set analytics.enabled false
 - [[UsageCommand]]: Display usage statistics
 - [[ConfigManager]]: Analytics configuration
 - [[StatsCommand]]: Codebase statistics
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:36
+- [[AnalyticsTypes]] → /home/user/tsdoc-edge/managed/types/AnalyticsTypes.md:59
+

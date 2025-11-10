@@ -149,18 +149,26 @@ tsdoc-edge find-doc <symbol>             # 심볼 찾기
 
 ### Referenced By
 
-- [[AutoIndexing]] → /Users/junwoobang/project/tsdoc-edge/managed/features/auto-indexing.md:145
-- [[AutoIndexing]] → /Users/junwoobang/project/tsdoc-edge/managed/features/auto-indexing.md:164
-- [[AutoIndexing]] → /Users/junwoobang/project/tsdoc-edge/managed/features/auto-indexing.md:165
-- [[CoreFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-features-catalog.md:103
-- [[CoreFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-features-catalog.md:271
-- [[CoreWorkflow]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-workflow.md:64
-- [[CoreWorkflow]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-workflow.md:84
-- [[ValidationFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/validation-features.md:144
-- [[ValidationFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/validation-features.md:159
+- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:167
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:147
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:163
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:183
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:184
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:185
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:122
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:290
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:332
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:333
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:143
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:164
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:165
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:209
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:233
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:234
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:266
 
 ### Implemented By
 
-- DocumentSymbolParser (Parser) → /Users/junwoobang/project/tsdoc-edge/src/doc-symbol/DocumentSymbolParser.ts:24
-- DocumentSymbolRegistry (Registry) → /Users/junwoobang/project/tsdoc-edge/src/doc-symbol/DocumentSymbolRegistry.ts:23
+- DocumentSymbolParser (Parser) → /home/user/tsdoc-edge/src/doc-symbol/DocumentSymbolParser.ts:25
+- DocumentSymbolRegistry (Registry) → /home/user/tsdoc-edge/src/doc-symbol/DocumentSymbolRegistry.ts:42
 

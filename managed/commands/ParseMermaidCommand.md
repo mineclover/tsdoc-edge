@@ -44,3 +44,13 @@ Displays extracted information:
 
 **Category**: Command
 **Status**: Active
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[MermaidSymbolExtractor]] → /home/user/tsdoc-edge/managed/doc-symbols/MermaidSymbolExtractor.md:22
+- [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:59
+

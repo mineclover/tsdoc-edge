@@ -20,3 +20,12 @@ Measures:
 ## Related
 
 - [[Test Coverage]]: Coverage metrics
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:157
+

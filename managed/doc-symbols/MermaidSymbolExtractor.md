@@ -21,3 +21,14 @@ Parses:
 
 - [[Parse Mermaid Command]]: CLI interface
 - [[Document Symbol System]]: Symbol integration
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:94
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:125
+- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:66
+

@@ -21,3 +21,14 @@ Supports:
 
 - [[CommentStateManager]]: State management
 - [[CommentImporter]]: Import functionality
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:23
+- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:22
+- [[CommentStateTypes]] → /home/user/tsdoc-edge/managed/types/CommentStateTypes.md:113
+

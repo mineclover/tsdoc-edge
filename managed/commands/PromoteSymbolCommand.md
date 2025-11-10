@@ -20,3 +20,14 @@ Promote auxiliary symbols to primary definitions.
 ## Related
 
 - [[Document Symbol System]]: Primary vs Auxiliary
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:92
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:63
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:105
+

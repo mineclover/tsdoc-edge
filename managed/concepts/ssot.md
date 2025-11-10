@@ -274,3 +274,16 @@ Overall Coverage
 - Canonical source concept
 - Documentation consistency patterns
 - Symbol reference validation
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[MissingLinkDetector]] → /home/user/tsdoc-edge/managed/analyzers/MissingLinkDetector.md:22
+- [[PreCommitChecker]] → /home/user/tsdoc-edge/managed/analyzers/PreCommitChecker.md:22
+- [[SSOTCompletenessCalculator]] → /home/user/tsdoc-edge/managed/analyzers/SSOTCompletenessCalculator.md:22
+- [[Phase8Commands]] → /home/user/tsdoc-edge/managed/commands/Phase8Commands.md:21
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:57
+

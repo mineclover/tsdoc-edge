@@ -278,3 +278,18 @@ Total:               61 commands
 ---
 
 **Last Updated**: 2025-11-08
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:245
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:223
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:259
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:179
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:162
+- [[Example - Mermaid Workflow]] → /home/user/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:193
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:299
+

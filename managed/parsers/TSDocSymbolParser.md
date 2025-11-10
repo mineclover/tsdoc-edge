@@ -100,3 +100,16 @@ Parser extracts:
 
 **Category**: Parser
 **Status**: Active
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:22
+- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:77
+- [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:79
+- [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:22
+- [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:28
+

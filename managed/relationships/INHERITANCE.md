@@ -15,3 +15,18 @@ Track class inheritance hierarchies (`extends`, `implements`).
 
 **Implementation**: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`)  
 **Command**: [[BuildCommand]]
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:15
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:83
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:161
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:57
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:109
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:117
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:36
+

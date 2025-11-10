@@ -124,3 +124,20 @@ const dbPath = config.paths.databasePath;
 [^ConfigManager]
 [^ProjectConfig]
 [^ValidationConfig]
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:23
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:100
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:291
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:158
+- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:91
+
+### Implemented By
+
+- TsdocEdgeConfig → /home/user/tsdoc-edge/src/types/config/config.ts:16
+

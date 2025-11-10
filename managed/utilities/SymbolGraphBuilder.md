@@ -148,3 +148,57 @@ const impacted = builder.getDependents('user-repository');
 - [[SymbolGraphBuilder]]: Graph type definition
 - [[SymbolSearchEngine]]: Advanced search
 - [[DepthTraverser]]: Graph traversal
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:92
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:176
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:210
+- [[ImportanceClassifier]] → /home/user/tsdoc-edge/managed/analyzers/ImportanceClassifier.md:22
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:256
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:54
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:52
+- [[TreeCommand]] → /home/user/tsdoc-edge/managed/commands/TreeCommand.md:121
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:51
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:58
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:189
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:145
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:167
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:180
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:187
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:222
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:85
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:128
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:29
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:53
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:66
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:78
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:133
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:142
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:150
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:159
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:170
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:192
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:200
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:110
+- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:102
+- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:134
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:153
+- [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:73
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:145
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:184
+- [[Relationship Standard Format]] → /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:170
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:38
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:28
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:132
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:156
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:222
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:67
+- [[ConnectivityValidator]] → /home/user/tsdoc-edge/managed/utilities/ConnectivityValidator.md:103
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:87
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:87
+

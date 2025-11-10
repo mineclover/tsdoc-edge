@@ -334,3 +334,13 @@ tsdoc-edge parse-mermaid <diagram>
 **Last Updated**: 2025-11-08
 **Total Guides**: 2 comprehensive guides + 3 workflows
 **Coverage**: Build pipeline, relationship analysis, documentation workflows
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:108
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:148
+

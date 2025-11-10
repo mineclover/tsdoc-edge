@@ -244,3 +244,16 @@ tsdoc-edge symbol-query managed info "BuildCommand"
 - [[ValidateSymbolRefsCommand]]: Validate symbol consistency
 - [[DocumentSymbolParser]]: Symbol extraction implementation
 - [[SELF-IMPROVEMENT-PROCESS]]: Validation workflow
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:180
+- [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:206
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:90
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:143
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:121
+

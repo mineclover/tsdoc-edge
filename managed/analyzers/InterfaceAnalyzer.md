@@ -18,3 +18,15 @@ Interface와 구현 클래스 간 관계 분석.
 
 - [[Interface Implementation]]: 구현 관계 타입
 - [[Type Dependency]]: 타입 의존성
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[InterfaceDependencyMapper]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceDependencyMapper.md:22
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:133
+- [[Phase4Commands]] → /home/user/tsdoc-edge/managed/commands/Phase4Commands.md:22
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:157
+

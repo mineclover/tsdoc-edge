@@ -375,3 +375,17 @@ tsdoc-edge symbol-fix managed --dry-run
 - [[SymbolQueryCommand]]: Symbol exploration and search
 - [[ValidateSymbolRefsCommand]]: Symbol validation
 - [[SELF-IMPROVEMENT-PROCESS]]: Overall improvement workflow
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:123
+- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:153
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:91
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:144
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:25
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:108
+

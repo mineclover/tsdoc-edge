@@ -426,16 +426,16 @@ tsdoc-edge todos                        # TODO 목록
 
 ### Referenced By
 
-- [[AnalysisFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/analysis-features.md:179
-- [[AnalysisFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/analysis-features.md:180
-- [[AutoIndexing]] → /Users/junwoobang/project/tsdoc-edge/managed/features/auto-indexing.md:162
-- [[AutoIndexing]] → /Users/junwoobang/project/tsdoc-edge/managed/features/auto-indexing.md:163
-- [[CoreWorkflow]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-workflow.md:82
-- [[CoreWorkflow]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-workflow.md:83
-- [[DocumentSymbolSystem]] → /Users/junwoobang/project/tsdoc-edge/managed/features/document-symbol-system.md:98
-- [[DocumentSymbolSystem]] → /Users/junwoobang/project/tsdoc-edge/managed/features/document-symbol-system.md:99
-- [[SymbolGraphFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/symbol-graph.md:153
-- [[SymbolGraphFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/symbol-graph.md:154
-- [[ValidationFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/validation-features.md:156
-- [[ValidationFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/validation-features.md:157
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:266
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:267
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:180
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:181
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:162
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:163
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:123
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:124
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:261
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:262
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:229
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:230
 

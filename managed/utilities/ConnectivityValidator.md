@@ -171,3 +171,14 @@ tsdoc-edge check-links
 - [[SymbolGraphBuilder]]: Provides graph data
 - [[SymbolSearchEngine]]: Finds problematic symbols
 - [[ValidateCommand]]: CLI validation
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:195
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:129
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:109
+

@@ -56,3 +56,30 @@ tsdoc-edge orphans
 - [[Inheritance]]: Often co-occurs with imports (extends/implements)
 - [[Type Dependency]]: Type-level dependencies (parameters, returns)
 - [[SymbolGraphBuilder]] (`src/graph/SymbolGraph.ts`): Graph traversal for dependency chains
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:15
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:82
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:160
+- [[DependencyChainAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:22
+- [[DependencyResolver]] → /home/user/tsdoc-edge/managed/analyzers/DependencyResolver.md:22
+- [[DomainStructureAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DomainStructureAnalyzer.md:22
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:251
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:35
+- [[VisualizeDepsCommand]] → /home/user/tsdoc-edge/managed/commands/VisualizeDepsCommand.md:21
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:26
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:50
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:57
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:125
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:271
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:32
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:40
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:112
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:118
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:50
+

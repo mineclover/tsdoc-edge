@@ -539,3 +539,14 @@ Please add integration tests before committing.
 **Next Steps**: Implement TestRelationshipExtractor
 **Priority**: High (병렬 개발 안전성에 핵심)
 **Last Updated**: 2025-11-08
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Phase5Commands]] → /home/user/tsdoc-edge/managed/commands/Phase5Commands.md:22
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:186
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:287
+

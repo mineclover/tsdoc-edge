@@ -1104,3 +1104,13 @@ END;
 **Implementation**: Pending
 **Version**: 2.0.0
 **Last Updated**: 2025-11-06
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:370
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:224
+

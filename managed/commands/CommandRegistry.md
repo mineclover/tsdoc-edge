@@ -19,3 +19,14 @@ Central registry for all CLI commands.
 ## Related
 
 - [[Base Command]]: Command base class
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:45
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:22
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:34
+

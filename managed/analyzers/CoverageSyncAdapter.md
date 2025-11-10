@@ -19,3 +19,13 @@ Sync test coverage data with symbol database.
 ## Related
 
 - [[Test Coverage]]: Coverage tracking
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[IstanbulCoverageAdapter]] → /home/user/tsdoc-edge/managed/analyzers/IstanbulCoverageAdapter.md:23
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:167
+

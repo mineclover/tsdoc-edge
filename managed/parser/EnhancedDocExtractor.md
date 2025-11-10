@@ -445,3 +445,18 @@ export class BuildCommand extends BaseCommand {
 
 **Last Updated**: 2025-11-09
 **Primary Use Case**: Automated documentation generation from annotated source code
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:241
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:183
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:103
+- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:24
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:23
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:154
+- [[EnhancedTagTypes]] → /home/user/tsdoc-edge/managed/types/EnhancedTagTypes.md:79
+

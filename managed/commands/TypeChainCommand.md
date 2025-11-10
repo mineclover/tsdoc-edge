@@ -20,3 +20,15 @@ Trace and display type chains (A → B → C).
 
 - [[TypeChainTracer]]: Core tracing logic
 - [[Type Dependency]]: Type relationships
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:195
+- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:101
+- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:136
+- [[TypeChain]] → /home/user/tsdoc-edge/managed/types/TypeChain.md:57
+

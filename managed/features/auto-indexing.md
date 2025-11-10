@@ -307,11 +307,16 @@ chmod +x .git/hooks/pre-commit
 
 ### Referenced By
 
-- [[CoreFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-features-catalog.md:129
-- [[CoreFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-features-catalog.md:272
-- [[CoreWorkflow]] → /Users/junwoobang/project/tsdoc-edge/managed/features/core-workflow.md:81
-- [[DocumentSymbolSystem]] → /Users/junwoobang/project/tsdoc-edge/managed/features/document-symbol-system.md:69
-- [[DocumentSymbolSystem]] → /Users/junwoobang/project/tsdoc-edge/managed/features/document-symbol-system.md:79
-- [[DocumentSymbolSystem]] → /Users/junwoobang/project/tsdoc-edge/managed/features/document-symbol-system.md:97
-- [[ValidationFeatures]] → /Users/junwoobang/project/tsdoc-edge/managed/features/validation-features.md:155
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:148
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:291
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:328
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:329
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:161
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:92
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:102
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:120
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:121
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:122
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:228
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:267
 

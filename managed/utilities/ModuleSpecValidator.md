@@ -173,3 +173,16 @@ tsdoc-edge validate-spec --strict
 - [[ModuleSpecGenerator]]: Generates module specs
 - [[ValidateSpecCommand]]: CLI validation
 - [[ValidateCommand]]: Overall validation
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:151
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:220
+- [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:110
+- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:91
+- [[ConventionValidator]] → /home/user/tsdoc-edge/managed/utilities/ConventionValidator.md:174
+

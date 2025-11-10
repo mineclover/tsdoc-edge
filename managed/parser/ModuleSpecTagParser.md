@@ -22,3 +22,15 @@ Extracts:
 
 - [[ModuleSpecGenerator]]: Spec generation
 - [[EnhancedDocExtractor]]: Doc extraction
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:206
+- [[CustomTagTypes]] → /home/user/tsdoc-edge/managed/types/CustomTagTypes.md:118
+- [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:109
+- [[ParseTypes]] → /home/user/tsdoc-edge/managed/types/ParseTypes.md:88
+

@@ -49,3 +49,12 @@ export interface EnhancedSymbolDoc extends BaseSymbolDoc {
 
 **Category**: Type Definition
 **Status**: Active
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:143
+

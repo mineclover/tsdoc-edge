@@ -93,3 +93,13 @@ tsdoc-edge find-unused-docs managed --safe-only
 - [[FindUnusedDocsCommand]]: CLI detection command
 - [[SpecStatusManager]]: Manages document status
 - [[DocumentSymbolParser]]: Parses document references
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:125
+- [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:75
+

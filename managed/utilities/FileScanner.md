@@ -73,3 +73,12 @@ Returns:
 - [[TSDocParser]]: Parses TSDoc comments
 - [[ASTSymbolExtractor]]: Extracts symbols from AST
 - [[BuildCommand]]: Triggers full scan
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[String Utilities]] → /home/user/tsdoc-edge/managed/utilities/StringUtilities.md:55
+
