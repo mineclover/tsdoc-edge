@@ -74,6 +74,18 @@ interface WorkContext {
     solution: string;
     prevention?: string;
   }>;
+  relationships: Array<{
+    id: string;
+    type: string;
+    category: string;
+    direction: 'unidirectional' | 'bidirectional' | 'undirected';
+    strength: 'strong' | 'medium' | 'weak';
+    fromSymbols: string[];
+    toSymbols: string[];
+    confidence: number;
+    description?: string;
+    properties?: Record<string, any>;
+  }>;
 }
 
 /**
@@ -160,6 +172,7 @@ export class WorkContextCommand extends BaseCommand {
       contracts: [],
       decisions: [],
       errorPatterns: [],
+      relationships: [],
     };
 
     // 1. Get symbols from this file
@@ -365,6 +378,64 @@ export class WorkContextCommand extends BaseCommand {
         }
       } catch (dbError) {
         console.warn('Failed to fetch error patterns:', dbError);
+      }
+
+      // 9. Get unified relationships (17 relationship types)
+      try {
+        // Query relationships where any symbol in this file is involved
+        // We need to check if symbolId is in from_symbols OR to_symbols JSON arrays
+        const relationshipQueries = symbolIds.map(symbolId => `
+          SELECT * FROM unified_relationships
+          WHERE json_extract(from_symbols, '$[0]') = '${symbolId}'
+             OR json_extract(to_symbols, '$[0]') = '${symbolId}'
+             OR from_symbols LIKE '%"${symbolId}"%'
+             OR to_symbols LIKE '%"${symbolId}"%'
+        `);
+
+        const allRelationships = new Map<string, any>(); // Deduplicate by ID
+
+        for (const query of relationshipQueries) {
+          const rels = dbManager.db.prepare(query).all() as Array<{
+            id: string;
+            type: string;
+            category: string;
+            from_symbols: string;
+            to_symbols: string;
+            direction: string;
+            strength: string;
+            confidence: number;
+            description: string | null;
+            properties: string | null;
+          }>;
+
+          for (const rel of rels) {
+            if (!allRelationships.has(rel.id)) {
+              allRelationships.set(rel.id, rel);
+            }
+          }
+        }
+
+        // Process deduplicated relationships
+        for (const rel of allRelationships.values()) {
+          try {
+            context.relationships.push({
+              id: rel.id,
+              type: rel.type,
+              category: rel.category,
+              direction: rel.direction as 'unidirectional' | 'bidirectional' | 'undirected',
+              strength: rel.strength as 'strong' | 'medium' | 'weak',
+              fromSymbols: JSON.parse(rel.from_symbols),
+              toSymbols: JSON.parse(rel.to_symbols),
+              confidence: rel.confidence,
+              description: rel.description || undefined,
+              properties: rel.properties ? JSON.parse(rel.properties) : undefined,
+            });
+          } catch (jsonError) {
+            console.warn(`Failed to parse relationship ${rel.id}:`, jsonError);
+          }
+        }
+      } catch (dbError) {
+        console.warn('Failed to fetch unified relationships:', dbError);
       }
     }
 
@@ -654,6 +725,86 @@ export class WorkContextCommand extends BaseCommand {
       }
     }
 
+    // 8. Unified Relationships (17 relationship types)
+    if (context.relationships.length > 0) {
+      console.log(colors.bold + divider + colors.reset);
+      console.log(colors.blue + '🔗 통합 관계 (Unified Relationships)' + colors.reset + colors.dim + ` (${context.relationships.length}개)` + colors.reset);
+      console.log(colors.bold + divider + colors.reset);
+
+      // Group relationships by category
+      const relationshipsByCategory = this.groupBy(context.relationships, 'category');
+      const categoryIcons: Record<string, string> = {
+        'structural': '🏗️',
+        'data-flow': '📊',
+        'behavioral': '⚙️',
+        'temporal': '⏱️',
+        'semantic': '💡',
+        'quality': '✨',
+        'organizational': '📁',
+      };
+
+      for (const [category, rels] of Object.entries(relationshipsByCategory)) {
+        const icon = categoryIcons[category] || '🔗';
+        console.log(`\n  ${icon} ${colors.bold}${category.toUpperCase()}${colors.reset} ${colors.dim}(${rels.length}개)${colors.reset}`);
+        console.log();
+
+        // Display limit per category
+        const displayLimit = 5;
+        const displayRels = rels.slice(0, displayLimit);
+
+        for (const rel of displayRels) {
+          // Strength indicator
+          const strengthIcon = rel.strength === 'strong' ? colors.green + '●●●' :
+                              rel.strength === 'medium' ? colors.yellow + '●●○' :
+                              colors.dim + '●○○';
+
+          // Direction indicator
+          const directionIcon = rel.direction === 'bidirectional' ? '↔️' :
+                               rel.direction === 'unidirectional' ? '→' :
+                               '—';
+
+          console.log(`    ${strengthIcon}${colors.reset} ${colors.cyan}${rel.type}${colors.reset} ${directionIcon}`);
+
+          // From → To symbols
+          const fromSymbolNames = rel.fromSymbols
+            .map(id => context.symbols.find(s => s.id === id)?.name || id.split('-').pop())
+            .join(', ');
+          const toSymbolNames = rel.toSymbols
+            .map(id => context.symbols.find(s => s.id === id)?.name || id.split('-').pop())
+            .join(', ');
+
+          console.log(`      ${colors.dim}From:${colors.reset} ${fromSymbolNames}`);
+          console.log(`      ${colors.dim}To:${colors.reset} ${toSymbolNames}`);
+
+          // Confidence
+          const confidencePercent = Math.round(rel.confidence * 100);
+          const confidenceColor = rel.confidence >= 0.8 ? colors.green :
+                                  rel.confidence >= 0.5 ? colors.yellow :
+                                  colors.dim;
+          console.log(`      ${colors.dim}Confidence:${colors.reset} ${confidenceColor}${confidencePercent}%${colors.reset}`);
+
+          // Description
+          if (rel.description) {
+            console.log(`      ${colors.dim}${rel.description}${colors.reset}`);
+          }
+
+          // Properties
+          if (rel.properties && Object.keys(rel.properties).length > 0) {
+            const propStr = Object.entries(rel.properties)
+              .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
+              .join(', ');
+            console.log(`      ${colors.dim}Properties: ${propStr}${colors.reset}`);
+          }
+
+          console.log();
+        }
+
+        if (rels.length > displayLimit) {
+          console.log(`    ${colors.dim}... ${rels.length - displayLimit} more ${category} relationships${colors.reset}`);
+        }
+      }
+    }
+
     // Summary
     console.log(colors.bold + divider + colors.reset);
     console.log(colors.bold + '📊 요약' + colors.reset);
@@ -666,6 +817,7 @@ export class WorkContextCommand extends BaseCommand {
     console.log(`  계약: ${colors.cyan}${context.contracts.length}개${colors.reset}`);
     console.log(`  결정: ${colors.cyan}${context.decisions.length}개${colors.reset}`);
     console.log(`  함정: ${colors.cyan}${context.errorPatterns.length}개${colors.reset}`);
+    console.log(`  관계: ${colors.cyan}${context.relationships.length}개${colors.reset}`);
     console.log();
   }
 
