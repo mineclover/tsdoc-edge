@@ -74,3 +74,4 @@ export { AnalyzeBehavioralCommand } from './AnalyzeBehavioralCommand';
 export { AnalyzeStructuralCommand } from './AnalyzeStructuralCommand';
 export { AnalyzeFinalCommand } from './AnalyzeFinalCommand';
 export { AnalyzeAllCommand } from './AnalyzeAllCommand';
+export { RelationshipQueryCommand } from './RelationshipQueryCommand';

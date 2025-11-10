@@ -76,6 +76,7 @@ import { AnalyzeBehavioralCommand } from './commands/AnalyzeBehavioralCommand';
 import { AnalyzeStructuralCommand } from './commands/AnalyzeStructuralCommand';
 import { AnalyzeFinalCommand } from './commands/AnalyzeFinalCommand';
 import { AnalyzeAllCommand } from './commands/AnalyzeAllCommand';
+import { RelationshipQueryCommand } from './commands/RelationshipQueryCommand';
 import { WorkContextCommand } from './commands/WorkContextCommand';
 import { ExploreEntrypointCommand } from './commands/ExploreEntrypointCommand';
 import { ParseMermaidCommand } from './commands/ParseMermaidCommand';
@@ -163,6 +164,7 @@ async function main(): Promise<void> {
   registry.register(new AnalyzeStructuralCommand());
   registry.register(new AnalyzeFinalCommand());
   registry.register(new AnalyzeAllCommand());
+  registry.register(new RelationshipQueryCommand());
   registry.register(new VisualizeDepsCommand());
   registry.register(new UntestedCommand());
   registry.register(new WithoutResponsibilityCommand());
