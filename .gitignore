@@ -37,3 +37,6 @@ yarn-error.log*
 # Generated files and reports
 docs/generated/
 .tsdoc/reports/
+
+# Temporary files
+tmp/
