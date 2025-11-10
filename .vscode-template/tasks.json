@@ -1,0 +1,190 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Relationship: Check Symbol Safety",
+      "type": "shell",
+      "command": "./scripts/relationship/check-symbol-safety.sh",
+      "args": ["${input:symbolId}"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Relationship: Impact Analysis",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "dist/cli.js",
+        "relationship-impact",
+        "${input:symbolId}",
+        "--depth",
+        "${input:depth}"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Relationship: Show Critical Symbols",
+      "type": "shell",
+      "command": "node",
+      "args": ["dist/cli.js", "relationship-metrics", "--top", "20"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Relationship: Query Symbol",
+      "type": "shell",
+      "command": "node",
+      "args": ["dist/cli.js", "relationship-query", "${input:symbolId}"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Relationship: Validate Data",
+      "type": "shell",
+      "command": "node",
+      "args": ["dist/cli.js", "relationship-validate"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Relationship: Find Clusters",
+      "type": "shell",
+      "command": "node",
+      "args": ["dist/cli.js", "relationship-clusters", "--min-size", "5"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Relationship: Generate Weekly Report",
+      "type": "shell",
+      "command": "./scripts/relationship/weekly-report.sh",
+      "args": [".reports"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Relationship: Check Git Changes",
+      "type": "shell",
+      "command": "./scripts/relationship/find-critical-changes.sh",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Relationship: Export to Gephi",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "dist/cli.js",
+        "relationship-export",
+        "--format",
+        "graphml"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Relationship: Export to Graphviz",
+      "type": "shell",
+      "command": "node",
+      "args": [
+        "dist/cli.js",
+        "relationship-export",
+        "--format",
+        "dot",
+        "--category",
+        "structural"
+      ],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Relationship: Help",
+      "type": "shell",
+      "command": "node",
+      "args": ["dist/cli.js", "relationship-help"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "Build Project",
+      "type": "npm",
+      "script": "build",
+      "problemMatcher": ["$tsc"],
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "TSDoc: Build Database",
+      "type": "shell",
+      "command": "node",
+      "args": ["dist/cli.js", "build", "src"],
+      "dependsOn": "Build Project",
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    },
+    {
+      "label": "TSDoc: Work Context (Current File)",
+      "type": "shell",
+      "command": "node",
+      "args": ["dist/cli.js", "work-context", "${file}"],
+      "problemMatcher": [],
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      }
+    }
+  ],
+  "inputs": [
+    {
+      "id": "symbolId",
+      "type": "promptString",
+      "description": "Enter symbol ID (e.g., class-buildcommand):"
+    },
+    {
+      "id": "depth",
+      "type": "pickString",
+      "description": "Analysis depth:",
+      "options": ["1", "2", "3", "4", "5"],
+      "default": "3"
+    }
+  ]
+}
