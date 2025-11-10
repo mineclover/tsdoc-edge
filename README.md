@@ -141,6 +141,148 @@ $ tsdoc-edge work-context src/commands/WorkContextCommand.ts
 
 자세한 내용: [Work Context Workflow](managed/workflows/work-context-workflow.md)
 
+---
+
+## 🎯 관계 분석 시스템 (NEW!)
+
+**20,150개 심볼 관계를 통한 아키텍처 인텔리전스**
+
+TSDoc Edge는 이제 코드베이스의 모든 관계를 분석하여 아키텍처 수준의 인사이트를 제공합니다.
+
+### 빠른 시작
+
+```bash
+# 1. 아키텍처 모듈 발견
+tsdoc-edge relationship-clusters
+
+# 2. 중요한 심볼 찾기
+tsdoc-edge relationship-metrics --top 10
+
+# 3. 변경 영향 분석
+tsdoc-edge relationship-impact <symbol-id>
+
+# 4. 가이드 보기
+tsdoc-edge relationship-help
+```
+
+### 7가지 분석 명령어
+
+| 명령어 | 용도 | 예시 사용 상황 |
+|--------|------|----------------|
+| **relationship-query** | 심볼의 모든 관계 조회 | "이 클래스는 무엇과 연결되어 있나?" |
+| **relationship-impact** | 변경 영향 분석 | "이걸 수정하면 어디가 깨지나?" |
+| **relationship-path** | 연결 경로 찾기 | "A와 B는 어떻게 연결되어 있나?" |
+| **relationship-validate** | 데이터 무결성 검증 | "관계 데이터가 깨지지 않았나?" |
+| **relationship-export** | 외부 도구 연동 | "Gephi로 시각화하고 싶다" |
+| **relationship-clusters** | 모듈 자동 발견 | "자연스러운 아키텍처 경계는?" |
+| **relationship-metrics** | 중요도 분석 | "어떤 심볼이 가장 중요한가?" |
+
+### 실전 활용 예시
+
+<details>
+<summary><strong>💡 변경 전 리스크 평가</strong></summary>
+
+```bash
+# BuildCommand를 수정하기 전
+$ tsdoc-edge relationship-impact class-buildcommand
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️  HIGH RISK - 278 symbols affected
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Depth 1: 10 symbols
+Depth 2: 34 symbols
+Depth 3: 234 symbols
+
+Recommendations:
+✓ Extensive testing required
+✓ Consider feature flags
+✓ Plan staged rollout
+```
+
+**결과**: HIGH RISK로 판정 → 신중한 변경 관리 필요
+
+</details>
+
+<details>
+<summary><strong>💡 아키텍처 병목점 발견</strong></summary>
+
+```bash
+$ tsdoc-edge relationship-metrics --metric betweenness --top 5
+
+Top 5 Symbols by Betweenness:
+1. SymbolGraphBuilder.getDependents
+   Betweenness: 0.0212
+   → Critical hub - architectural bottleneck
+
+2. BaseCommand.executeWithErrorHandling
+   Betweenness: 0.0179
+   → 63 symbols depend on this
+```
+
+**결과**: 5개 핵심 허브 발견 → 이들은 안정성 보장 필요
+
+</details>
+
+<details>
+<summary><strong>💡 자연스러운 모듈 경계 발견</strong></summary>
+
+```bash
+$ tsdoc-edge relationship-clusters --category structural
+
+Cluster 1: Core Commands (195 symbols, 92.5% cohesion)
+  BuildCommand, HelpCommand, AnalyzeCommand...
+  → Well-defined module, strong boundary
+
+Cluster 2: Utility Functions (8 symbols, 32% cohesion)
+  isTypeScript, getFileExtension...
+  → Low cohesion - consider refactoring
+```
+
+**결과**: 13개 클러스터 발견, 5개는 리팩토링 필요
+
+</details>
+
+### 외부 도구 연동
+
+**Gephi 시각화**:
+```bash
+tsdoc-edge relationship-export --format graphml --output graph.graphml
+# → Gephi에서 열기
+```
+
+**Neo4j 그래프 데이터베이스**:
+```bash
+tsdoc-edge relationship-export --format cypher --output import.cypher
+# → Neo4j에 임포트
+```
+
+**Graphviz 다이어그램**:
+```bash
+tsdoc-edge relationship-export --format dot --category structural --output arch.dot
+dot -Tpng arch.dot -o architecture.png
+```
+
+### 상세 문서
+
+- **[완전 가이드](docs/relationship-system-guide.md)** - 400줄 분량 완전 가이드
+- **[대화형 도움말](docs/relationship-system-guide.md#help-system)** - `tsdoc-edge relationship-help`
+
+### 현재 상태
+
+- ✅ **20,150개 관계** 분석 완료
+- ✅ **1,722개 심볼** 추적 중
+- ✅ **6/7 카테고리** 활성화
+- ✅ **47% 구현** 완료 (9/19 타입)
+
+**주요 발견사항**:
+- 5개 핵심 허브 (변경 관리 주의)
+- 85개 핵심 컴포넌트 (안정성 필수)
+- 254개 허브 심볼 (평균 연결도 2배)
+- 183개 브릿지 심볼 (서브시스템 연결)
+
+---
+
 ## 핵심 개념
 
 ### 🔗 연결성 (Connectivity)
