@@ -195,6 +195,9 @@ export class WorkContextCommand extends BaseCommand {
       metadata: {},
     }));
 
+    // Extract symbol IDs for batch queries
+    const symbolIds = context.symbols.map(s => s.id);
+
     // 2. Parse file for @doc tags (related documents)
     try {
       const fileContent = fs.readFileSync(absolutePath, 'utf-8');
@@ -220,32 +223,30 @@ export class WorkContextCommand extends BaseCommand {
       // Continue even if parsing fails
     }
 
-    // 3. Get dependencies (what this file uses)
-    for (const symbol of context.symbols) {
-      const deps = dbManager.db.prepare(
-        'SELECT * FROM dependencies WHERE symbol_id = ?'
-      ).all(symbol.id) as any[];
+    // 3. Get dependencies (what this file uses) - Optimized with JOIN
+    if (symbolIds.length > 0) {
+      const placeholder = symbolIds.map(() => '?').join(',');
+      const dependencyRows = dbManager.db.prepare(`
+        SELECT DISTINCT
+          s.name, s.type, s.file_path
+        FROM dependencies d
+        INNER JOIN symbols s ON d.target = s.id
+        WHERE d.symbol_id IN (${placeholder})
+          AND s.file_path != ?
+      `).all(...symbolIds, relativePath) as Array<{
+        name: string;
+        type: string;
+        file_path: string;
+      }>;
 
-      for (const dep of deps) {
-        const targetSymbol = dbManager.db.prepare(
-          'SELECT * FROM symbols WHERE id = ?'
-        ).get(dep.target) as any;
-
-        if (targetSymbol && targetSymbol.file_path !== relativePath) {
-          context.dependencies.push({
-            name: targetSymbol.name,
-            type: targetSymbol.type,
-            filePath: targetSymbol.file_path,
-          });
-        }
-      }
+      context.dependencies = dependencyRows.map(row => ({
+        name: row.name,
+        type: row.type,
+        filePath: row.file_path,
+      }));
     }
 
-    // Remove duplicates
-    context.dependencies = this.uniqueBy(context.dependencies, 'name');
-
     // 4. Get test files
-    const symbolIds = context.symbols.map(s => s.id);
     if (symbolIds.length > 0) {
       const testMappings = dbManager.db.prepare(
         `SELECT * FROM test_mappings WHERE symbol_id IN (${symbolIds.map(() => '?').join(',')})`
@@ -262,29 +263,28 @@ export class WorkContextCommand extends BaseCommand {
       }));
     }
 
-    // 5. Get usedBy (what uses this file)
-    for (const symbol of context.symbols) {
-      const usages = dbManager.db.prepare(
-        'SELECT * FROM dependencies WHERE target = ?'
-      ).all(symbol.id) as any[];
+    // 5. Get usedBy (what uses this file) - Optimized with JOIN
+    if (symbolIds.length > 0) {
+      const placeholder = symbolIds.map(() => '?').join(',');
+      const usedByRows = dbManager.db.prepare(`
+        SELECT DISTINCT
+          s.name, s.file_path, s.type
+        FROM dependencies d
+        INNER JOIN symbols s ON d.symbol_id = s.id
+        WHERE d.target IN (${placeholder})
+          AND s.file_path != ?
+      `).all(...symbolIds, relativePath) as Array<{
+        name: string;
+        file_path: string;
+        type: string;
+      }>;
 
-      for (const usage of usages) {
-        const userSymbol = dbManager.db.prepare(
-          'SELECT * FROM symbols WHERE id = ?'
-        ).get(usage.symbol_id) as any;
-
-        if (userSymbol && userSymbol.file_path !== relativePath) {
-          context.usedBy.push({
-            name: userSymbol.name,
-            filePath: userSymbol.file_path,
-            type: userSymbol.type,
-          });
-        }
-      }
+      context.usedBy = usedByRows.map(row => ({
+        name: row.name,
+        filePath: row.file_path,
+        type: row.type,
+      }));
     }
-
-    // Remove duplicates
-    context.usedBy = this.uniqueBy(context.usedBy, 'name');
 
     // 6-8. Get contracts, decisions, and error patterns (optimized)
     if (symbolIds.length > 0) {
@@ -380,43 +380,43 @@ export class WorkContextCommand extends BaseCommand {
         console.warn('Failed to fetch error patterns:', dbError);
       }
 
-      // 9. Get unified relationships (17 relationship types)
+      // 9. Get unified relationships (17 relationship types) - Optimized single query
       try {
-        // Query relationships where any symbol in this file is involved
-        // We need to check if symbolId is in from_symbols OR to_symbols JSON arrays
-        const relationshipQueries = symbolIds.map(symbolId => `
-          SELECT * FROM unified_relationships
-          WHERE json_extract(from_symbols, '$[0]') = '${symbolId}'
-             OR json_extract(to_symbols, '$[0]') = '${symbolId}'
-             OR from_symbols LIKE '%"${symbolId}"%'
-             OR to_symbols LIKE '%"${symbolId}"%'
-        `);
+        // Build WHERE clause for all symbolIds at once
+        const whereConditions = symbolIds.map(() =>
+          `(json_extract(from_symbols, '$[0]') = ?
+            OR json_extract(to_symbols, '$[0]') = ?
+            OR from_symbols LIKE ?
+            OR to_symbols LIKE ?)`
+        ).join(' OR ');
 
-        const allRelationships = new Map<string, any>(); // Deduplicate by ID
-
-        for (const query of relationshipQueries) {
-          const rels = dbManager.db.prepare(query).all() as Array<{
-            id: string;
-            type: string;
-            category: string;
-            from_symbols: string;
-            to_symbols: string;
-            direction: string;
-            strength: string;
-            confidence: number;
-            description: string | null;
-            properties: string | null;
-          }>;
-
-          for (const rel of rels) {
-            if (!allRelationships.has(rel.id)) {
-              allRelationships.set(rel.id, rel);
-            }
-          }
+        // Prepare parameters: for each symbolId, we need it 4 times
+        const params: string[] = [];
+        for (const symbolId of symbolIds) {
+          params.push(symbolId); // json_extract from_symbols
+          params.push(symbolId); // json_extract to_symbols
+          params.push(`%"${symbolId}"%`); // LIKE from_symbols
+          params.push(`%"${symbolId}"%`); // LIKE to_symbols
         }
 
-        // Process deduplicated relationships
-        for (const rel of allRelationships.values()) {
+        const rels = dbManager.db.prepare(`
+          SELECT DISTINCT * FROM unified_relationships
+          WHERE ${whereConditions}
+        `).all(...params) as Array<{
+          id: string;
+          type: string;
+          category: string;
+          from_symbols: string;
+          to_symbols: string;
+          direction: string;
+          strength: string;
+          confidence: number;
+          description: string | null;
+          properties: string | null;
+        }>;
+
+        // Process relationships (already deduplicated by DISTINCT)
+        for (const rel of rels) {
           try {
             context.relationships.push({
               id: rel.id,
