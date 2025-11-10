@@ -76,3 +76,4 @@ export { AnalyzeFinalCommand } from './AnalyzeFinalCommand';
 export { AnalyzeAllCommand } from './AnalyzeAllCommand';
 export { RelationshipQueryCommand } from './RelationshipQueryCommand';
 export { RelationshipImpactCommand } from './RelationshipImpactCommand';
+export { RelationshipPathCommand } from './RelationshipPathCommand';
