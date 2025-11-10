@@ -165,6 +165,59 @@ tsdoc-edge relationship-impact <symbol-id>
 tsdoc-edge relationship-help
 ```
 
+### 🚀 Local-First Workflow Tools (NEW!)
+
+실무에 바로 사용할 수 있는 워크플로우 자동화 도구:
+
+**npm scripts** (package.json에서 바로 실행):
+```bash
+npm run rel:check class-buildcommand     # 빠른 안전성 체크
+npm run rel:impact class-buildcommand    # 영향 분석
+npm run rel:metrics                      # 중요 심볼 top 20
+npm run safety:check class-buildcommand  # 종합 안전성 체크
+npm run report:weekly                    # 주간 리포트 생성
+npm run git:check-critical               # Git 변경사항 검사
+```
+
+**Bash scripts** (일일 개발 워크플로우):
+```bash
+# 수정 전 안전성 확인 (impact + metrics + query 통합)
+./scripts/relationship/check-symbol-safety.sh class-buildcommand
+
+# 주간 아키텍처 리포트 (7개 분석 파일 + 3개 포맷 자동 생성)
+./scripts/relationship/weekly-report.sh .reports
+
+# Git 변경사항 중 critical symbol 자동 검사 (CI/CD 연동 가능)
+./scripts/relationship/find-critical-changes.sh
+./scripts/relationship/find-critical-changes.sh main..HEAD
+```
+
+**Shell aliases** (터미널 단축키):
+```bash
+# Aliases 로드
+source ./scripts/relationship/setup-aliases.sh
+
+# 사용 예시
+rel-before class-buildcommand           # 수정 전 체크
+rel-critical                            # Top 20 critical symbols
+rel-blast class-buildcommand 5          # Depth 5 영향 분석
+rel-viz dot architecture.dot            # Graphviz 시각화 생성
+```
+
+**Git Hooks** (자동 안전 체크):
+```bash
+# Pre-commit hook 설치 (critical symbol 수정 시 자동 경고)
+./scripts/relationship/install-git-hooks.sh
+
+# 이제 git commit 시 자동으로:
+# ✓ Critical symbol 변경 감지
+# ✓ 리스크 평가 및 경고
+# ✓ 커밋 전 확인 요청
+```
+
+**Quick Reference**:
+- [1페이지 치트시트](docs/RELATIONSHIP-QUICK-REFERENCE.md) - 모든 명령어 + 패턴 + 예시
+
 ### 7가지 분석 명령어
 
 | 명령어 | 용도 | 예시 사용 상황 |

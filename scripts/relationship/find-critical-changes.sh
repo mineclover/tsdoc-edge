@@ -5,9 +5,11 @@
 #
 # Usage:
 #   ./find-critical-changes.sh [commit-range]
+#   ./find-critical-changes.sh --staged
 #
 # Examples:
 #   ./find-critical-changes.sh              # Uncommitted changes
+#   ./find-critical-changes.sh --staged     # Only staged changes (for git hook)
 #   ./find-critical-changes.sh HEAD~1       # Last commit
 #   ./find-critical-changes.sh main..HEAD   # Changes since main
 
@@ -22,7 +24,15 @@ else
   TSDOC_CMD="tsdoc-edge"
 fi
 
+STAGED_ONLY=false
 COMMIT_RANGE="${1:-}"
+
+# Check for --staged flag
+if [ "$1" = "--staged" ]; then
+  STAGED_ONLY=true
+  COMMIT_RANGE=""
+fi
+
 TEMP_FILE=$(mktemp)
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
@@ -31,7 +41,10 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # Get changed files
-if [ -z "$COMMIT_RANGE" ]; then
+if [ "$STAGED_ONLY" = true ]; then
+  echo "📝 Analyzing: Staged changes only"
+  ALL_FILES=$(git diff --cached --name-only | grep -E '\.(ts|tsx|js|jsx)$' || echo "")
+elif [ -z "$COMMIT_RANGE" ]; then
   echo "📝 Analyzing: Uncommitted changes"
   CHANGED_FILES=$(git diff --name-only 2>/dev/null || echo "")
   STAGED_FILES=$(git diff --cached --name-only 2>/dev/null || echo "")
