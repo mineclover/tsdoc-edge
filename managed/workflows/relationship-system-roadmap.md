@@ -507,9 +507,9 @@ Target (3 months):
 
 ## Related Documentation
 
-- [[Unified Relationship Type System]] - Type definitions
+- [[Unified Relationship Taxonomy]] - Type definitions
 - [[Work Context Workflow]] - Integration point
-- [[Self-Improvement Process]] - Validation workflow
+- [[SELF-IMPROVEMENT-PROCESS]] - Validation workflow
 - [[Symbol Reference System]] - Doc symbol linking
 
 ---
