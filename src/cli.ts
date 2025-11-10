@@ -83,6 +83,7 @@ import { RelationshipValidateCommand } from './commands/RelationshipValidateComm
 import { RelationshipExportCommand } from './commands/RelationshipExportCommand';
 import { RelationshipClustersCommand } from './commands/RelationshipClustersCommand';
 import { RelationshipMetricsCommand } from './commands/RelationshipMetricsCommand';
+import { RelationshipCheckCommand } from './commands/RelationshipCheckCommand';
 import { RelationshipHelpCommand } from './commands/RelationshipHelpCommand';
 import { WorkContextCommand } from './commands/WorkContextCommand';
 import { ExploreEntrypointCommand } from './commands/ExploreEntrypointCommand';
@@ -178,6 +179,7 @@ async function main(): Promise<void> {
   registry.register(new RelationshipExportCommand());
   registry.register(new RelationshipClustersCommand());
   registry.register(new RelationshipMetricsCommand());
+  registry.register(new RelationshipCheckCommand());
   registry.register(new RelationshipHelpCommand());
   registry.register(new VisualizeDepsCommand());
   registry.register(new UntestedCommand());
