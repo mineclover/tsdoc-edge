@@ -215,8 +215,20 @@ rel-viz dot architecture.dot            # Graphviz 시각화 생성
 # ✓ 커밋 전 확인 요청
 ```
 
+**VS Code Integration** (통합 개발 환경):
+```bash
+# VS Code tasks 설치 (Ctrl+Shift+P에서 바로 실행)
+./scripts/relationship/setup-vscode.sh
+
+# 이제 VS Code에서 바로:
+# ✓ 14개 Relationship 분석 태스크
+# ✓ 현재 파일 work-context
+# ✓ 키보드 단축키로 빠른 실행
+```
+
 **Quick Reference**:
 - [1페이지 치트시트](docs/RELATIONSHIP-QUICK-REFERENCE.md) - 모든 명령어 + 패턴 + 예시
+- [VS Code 태스크 가이드](.vscode-template/README.md) - VS Code 통합 설정
 
 ### 7가지 분석 명령어
 
