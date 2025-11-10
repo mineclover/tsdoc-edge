@@ -208,6 +208,8 @@ export class DependencyChainAnalyzer {
    * - fan-out: A -> B, A -> C, A -> D (one node has multiple outgoing edges)
    * - fan-in: A -> D, B -> D, C -> D (multiple nodes converge to one)
    * - diamond: A -> B -> D, A -> C -> D (both fan-out and fan-in)
+   *
+   * @performance O(n) time complexity with pre-computed incoming edges
    */
   private determineChainType(path: string[]): 'linear' | 'fan-out' | 'fan-in' | 'diamond' {
     if (path.length <= 1) {
@@ -217,34 +219,39 @@ export class DependencyChainAnalyzer {
     let hasFanOut = false;
     let hasFanIn = false;
 
-    // Check each node in the path
-    for (let i = 0; i < path.length - 1; i++) {
+    // Pre-compute incoming edges for all nodes in path (O(n))
+    const incomingCounts = new Map<string, number>();
+    const pathSet = new Set(path);
+
+    for (const node of path) {
+      const deps = this.graph.adjacencyList.get(node) || [];
+      for (const dep of deps) {
+        if (pathSet.has(dep)) {
+          incomingCounts.set(dep, (incomingCounts.get(dep) || 0) + 1);
+        }
+      }
+    }
+
+    // Check for fan-out and fan-in patterns (O(n))
+    for (let i = 0; i < path.length; i++) {
       const currentNode = path[i];
       const dependencies = this.graph.adjacencyList.get(currentNode) || [];
 
-      // Fan-out: Current node has multiple outgoing edges
-      if (dependencies.length > 1) {
+      // Fan-out: Current node has multiple outgoing edges in the path
+      const outgoingInPath = dependencies.filter(dep => pathSet.has(dep));
+      if (outgoingInPath.length > 1) {
         hasFanOut = true;
       }
 
-      // Fan-in: Multiple nodes point to the same target
-      if (i < path.length - 1) {
-        const nextNode = path[i + 1];
-        let incomingCount = 0;
+      // Fan-in: Current node has multiple incoming edges
+      const incoming = incomingCounts.get(currentNode) || 0;
+      if (incoming > 1) {
+        hasFanIn = true;
+      }
 
-        // Count how many nodes in the path point to nextNode
-        for (let j = 0; j < path.length; j++) {
-          if (j !== i) {
-            const deps = this.graph.adjacencyList.get(path[j]) || [];
-            if (deps.includes(nextNode)) {
-              incomingCount++;
-            }
-          }
-        }
-
-        if (incomingCount > 1) {
-          hasFanIn = true;
-        }
+      // Early exit if both patterns found
+      if (hasFanOut && hasFanIn) {
+        return 'diamond';
       }
     }
 

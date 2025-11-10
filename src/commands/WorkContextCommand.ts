@@ -273,59 +273,98 @@ export class WorkContextCommand extends BaseCommand {
     // Remove duplicates
     context.usedBy = this.uniqueBy(context.usedBy, 'name');
 
-    // 6. Get contracts (preconditions, postconditions, invariants)
+    // 6-8. Get contracts, decisions, and error patterns (optimized)
     if (symbolIds.length > 0) {
-      const contracts = dbManager.db.prepare(
-        `SELECT * FROM contracts WHERE symbol_id IN (${symbolIds.map(() => '?').join(',')})`
-      ).all(...symbolIds) as any[];
+      // Create symbol lookup map for O(1) access
+      const symbolMap = new Map(context.symbols.map(s => [s.id, s]));
+      const placeholder = symbolIds.map(() => '?').join(',');
 
-      for (const contract of contracts) {
-        const symbol = context.symbols.find(s => s.id === contract.symbol_id);
-        context.contracts.push({
-          symbolId: contract.symbol_id,
-          symbolName: symbol?.name || 'Unknown',
-          description: contract.description,
-          preconditions: JSON.parse(contract.preconditions),
-          postconditions: JSON.parse(contract.postconditions),
-          invariants: JSON.parse(contract.invariants),
-        });
+      // 6. Get contracts (preconditions, postconditions, invariants)
+      try {
+        const contracts = dbManager.db.prepare(
+          `SELECT * FROM contracts WHERE symbol_id IN (${placeholder})`
+        ).all(...symbolIds) as Array<{
+          symbol_id: string;
+          description: string;
+          preconditions: string;
+          postconditions: string;
+          invariants: string;
+          file_path: string;
+        }>;
+
+        for (const contract of contracts) {
+          try {
+            const symbol = symbolMap.get(contract.symbol_id);
+            context.contracts.push({
+              symbolId: contract.symbol_id,
+              symbolName: symbol?.name || 'Unknown',
+              description: contract.description,
+              preconditions: JSON.parse(contract.preconditions),
+              postconditions: JSON.parse(contract.postconditions),
+              invariants: JSON.parse(contract.invariants),
+            });
+          } catch (jsonError) {
+            // Skip malformed contract data
+            console.warn(`Failed to parse contract for ${contract.symbol_id}:`, jsonError);
+          }
+        }
+      } catch (dbError) {
+        // Continue even if contracts query fails
+        console.warn('Failed to fetch contracts:', dbError);
       }
-    }
 
-    // 7. Get design decisions
-    if (symbolIds.length > 0) {
-      const decisions = dbManager.db.prepare(
-        `SELECT * FROM decision_records WHERE symbol_id IN (${symbolIds.map(() => '?').join(',')}) ORDER BY date DESC`
-      ).all(...symbolIds) as any[];
+      // 7. Get design decisions
+      try {
+        const decisions = dbManager.db.prepare(
+          `SELECT * FROM decision_records WHERE symbol_id IN (${placeholder}) ORDER BY date DESC`
+        ).all(...symbolIds) as Array<{
+          symbol_id: string;
+          title: string;
+          decision: string;
+          rationale: string;
+          status: string;
+          date: string;
+        }>;
 
-      for (const decision of decisions) {
-        const symbol = context.symbols.find(s => s.id === decision.symbol_id);
-        context.decisions.push({
-          title: decision.title,
-          decision: decision.decision,
-          rationale: decision.rationale,
-          status: decision.status,
-          date: decision.date,
-          symbolName: symbol?.name,
-        });
+        for (const decision of decisions) {
+          const symbol = symbolMap.get(decision.symbol_id);
+          context.decisions.push({
+            title: decision.title,
+            decision: decision.decision,
+            rationale: decision.rationale,
+            status: decision.status,
+            date: decision.date,
+            symbolName: symbol?.name,
+          });
+        }
+      } catch (dbError) {
+        console.warn('Failed to fetch design decisions:', dbError);
       }
-    }
 
-    // 8. Get error patterns
-    if (symbolIds.length > 0) {
-      const errors = dbManager.db.prepare(
-        `SELECT * FROM error_experiences WHERE symbol_id IN (${symbolIds.map(() => '?').join(',')})`
-      ).all(...symbolIds) as any[];
+      // 8. Get error patterns
+      try {
+        const errors = dbManager.db.prepare(
+          `SELECT * FROM error_experiences WHERE symbol_id IN (${placeholder})`
+        ).all(...symbolIds) as Array<{
+          symbol_id: string;
+          error_type: string;
+          message: string;
+          solution: string;
+          prevention: string | null;
+        }>;
 
-      for (const error of errors) {
-        const symbol = context.symbols.find(s => s.id === error.symbol_id);
-        context.errorPatterns.push({
-          symbolName: symbol?.name || 'Unknown',
-          errorType: error.error_type,
-          message: error.message,
-          solution: error.solution,
-          prevention: error.prevention,
-        });
+        for (const error of errors) {
+          const symbol = symbolMap.get(error.symbol_id);
+          context.errorPatterns.push({
+            symbolName: symbol?.name || 'Unknown',
+            errorType: error.error_type,
+            message: error.message,
+            solution: error.solution,
+            prevention: error.prevention || undefined,
+          });
+        }
+      } catch (dbError) {
+        console.warn('Failed to fetch error patterns:', dbError);
       }
     }
 
