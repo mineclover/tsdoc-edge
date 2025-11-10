@@ -202,11 +202,62 @@ export class DependencyChainAnalyzer {
 
   /**
    * Determine chain type based on path structure
+   *
+   * Chain patterns:
+   * - linear: A -> B -> C (each node has exactly one outgoing edge)
+   * - fan-out: A -> B, A -> C, A -> D (one node has multiple outgoing edges)
+   * - fan-in: A -> D, B -> D, C -> D (multiple nodes converge to one)
+   * - diamond: A -> B -> D, A -> C -> D (both fan-out and fan-in)
    */
   private determineChainType(path: string[]): 'linear' | 'fan-out' | 'fan-in' | 'diamond' {
-    // Simple heuristic: linear for now
-    // TODO: Implement fan-out, fan-in, diamond detection
-    return 'linear';
+    if (path.length <= 1) {
+      return 'linear';
+    }
+
+    let hasFanOut = false;
+    let hasFanIn = false;
+
+    // Check each node in the path
+    for (let i = 0; i < path.length - 1; i++) {
+      const currentNode = path[i];
+      const dependencies = this.graph.adjacencyList.get(currentNode) || [];
+
+      // Fan-out: Current node has multiple outgoing edges
+      if (dependencies.length > 1) {
+        hasFanOut = true;
+      }
+
+      // Fan-in: Multiple nodes point to the same target
+      if (i < path.length - 1) {
+        const nextNode = path[i + 1];
+        let incomingCount = 0;
+
+        // Count how many nodes in the path point to nextNode
+        for (let j = 0; j < path.length; j++) {
+          if (j !== i) {
+            const deps = this.graph.adjacencyList.get(path[j]) || [];
+            if (deps.includes(nextNode)) {
+              incomingCount++;
+            }
+          }
+        }
+
+        if (incomingCount > 1) {
+          hasFanIn = true;
+        }
+      }
+    }
+
+    // Determine pattern
+    if (hasFanOut && hasFanIn) {
+      return 'diamond';
+    } else if (hasFanOut) {
+      return 'fan-out';
+    } else if (hasFanIn) {
+      return 'fan-in';
+    } else {
+      return 'linear';
+    }
   }
 
   /**

@@ -51,6 +51,29 @@ interface WorkContext {
     filePath: string;
     type: string;
   }>;
+  contracts: Array<{
+    symbolId: string;
+    symbolName: string;
+    description: string;
+    preconditions: string[];
+    postconditions: string[];
+    invariants: string[];
+  }>;
+  decisions: Array<{
+    title: string;
+    decision: string;
+    rationale: string;
+    status: string;
+    date: string;
+    symbolName?: string;
+  }>;
+  errorPatterns: Array<{
+    symbolName: string;
+    errorType: string;
+    message: string;
+    solution: string;
+    prevention?: string;
+  }>;
 }
 
 /**
@@ -134,6 +157,9 @@ export class WorkContextCommand extends BaseCommand {
       typeFlows: [],
       tests: [],
       usedBy: [],
+      contracts: [],
+      decisions: [],
+      errorPatterns: [],
     };
 
     // 1. Get symbols from this file
@@ -244,8 +270,64 @@ export class WorkContextCommand extends BaseCommand {
       }
     }
 
-    // Remove duplicates and limit
+    // Remove duplicates
     context.usedBy = this.uniqueBy(context.usedBy, 'name');
+
+    // 6. Get contracts (preconditions, postconditions, invariants)
+    if (symbolIds.length > 0) {
+      const contracts = dbManager.db.prepare(
+        `SELECT * FROM contracts WHERE symbol_id IN (${symbolIds.map(() => '?').join(',')})`
+      ).all(...symbolIds) as any[];
+
+      for (const contract of contracts) {
+        const symbol = context.symbols.find(s => s.id === contract.symbol_id);
+        context.contracts.push({
+          symbolId: contract.symbol_id,
+          symbolName: symbol?.name || 'Unknown',
+          description: contract.description,
+          preconditions: JSON.parse(contract.preconditions),
+          postconditions: JSON.parse(contract.postconditions),
+          invariants: JSON.parse(contract.invariants),
+        });
+      }
+    }
+
+    // 7. Get design decisions
+    if (symbolIds.length > 0) {
+      const decisions = dbManager.db.prepare(
+        `SELECT * FROM decision_records WHERE symbol_id IN (${symbolIds.map(() => '?').join(',')}) ORDER BY date DESC`
+      ).all(...symbolIds) as any[];
+
+      for (const decision of decisions) {
+        const symbol = context.symbols.find(s => s.id === decision.symbol_id);
+        context.decisions.push({
+          title: decision.title,
+          decision: decision.decision,
+          rationale: decision.rationale,
+          status: decision.status,
+          date: decision.date,
+          symbolName: symbol?.name,
+        });
+      }
+    }
+
+    // 8. Get error patterns
+    if (symbolIds.length > 0) {
+      const errors = dbManager.db.prepare(
+        `SELECT * FROM error_experiences WHERE symbol_id IN (${symbolIds.map(() => '?').join(',')})`
+      ).all(...symbolIds) as any[];
+
+      for (const error of errors) {
+        const symbol = context.symbols.find(s => s.id === error.symbol_id);
+        context.errorPatterns.push({
+          symbolName: symbol?.name || 'Unknown',
+          errorType: error.error_type,
+          message: error.message,
+          solution: error.solution,
+          prevention: error.prevention,
+        });
+      }
+    }
 
     return context;
   }
@@ -360,7 +442,7 @@ export class WorkContextCommand extends BaseCommand {
     console.log(colors.bold + divider + colors.reset);
 
     if (context.dependencies.length > 0) {
-      const displayLimit = 15;
+      const displayLimit = 20;
       let displayed = 0;
       let missingCount = 0;
 
@@ -385,7 +467,7 @@ export class WorkContextCommand extends BaseCommand {
 
       if (context.dependencies.length > displayLimit) {
         console.log();
-        console.log(`  ${colors.dim}... ${context.dependencies.length - displayLimit} more${colors.reset}`);
+        console.log(`  ${colors.dim}... ${context.dependencies.length - displayLimit} more (use --all to show all)${colors.reset}`);
       }
 
       if (missingCount > 0) {
@@ -457,6 +539,82 @@ export class WorkContextCommand extends BaseCommand {
     }
     console.log();
 
+    // 5. Contracts (Preconditions, Postconditions, Invariants)
+    if (context.contracts.length > 0) {
+      console.log(colors.bold + divider + colors.reset);
+      console.log(colors.blue + '📜 계약 (Contracts)' + colors.reset + colors.dim + ` (${context.contracts.length}개)` + colors.reset);
+      console.log(colors.bold + divider + colors.reset);
+
+      for (const contract of context.contracts) {
+        console.log(`  ${colors.bold}${contract.symbolName}${colors.reset}`);
+        console.log(`    ${colors.dim}${contract.description}${colors.reset}`);
+        console.log();
+
+        if (contract.preconditions.length > 0) {
+          console.log(`    ${colors.green}사전조건 (Preconditions):${colors.reset}`);
+          for (const pre of contract.preconditions) {
+            console.log(`      ${colors.cyan}•${colors.reset} ${pre}`);
+          }
+          console.log();
+        }
+
+        if (contract.postconditions.length > 0) {
+          console.log(`    ${colors.green}사후조건 (Postconditions):${colors.reset}`);
+          for (const post of contract.postconditions) {
+            console.log(`      ${colors.cyan}•${colors.reset} ${post}`);
+          }
+          console.log();
+        }
+
+        if (contract.invariants.length > 0) {
+          console.log(`    ${colors.green}불변식 (Invariants):${colors.reset}`);
+          for (const inv of contract.invariants) {
+            console.log(`      ${colors.cyan}•${colors.reset} ${inv}`);
+          }
+          console.log();
+        }
+      }
+    }
+
+    // 6. Design Decisions
+    if (context.decisions.length > 0) {
+      console.log(colors.bold + divider + colors.reset);
+      console.log(colors.blue + '🎯 설계 결정 (Design Decisions)' + colors.reset + colors.dim + ` (${context.decisions.length}개)` + colors.reset);
+      console.log(colors.bold + divider + colors.reset);
+
+      for (const decision of context.decisions) {
+        const statusIcon = decision.status === 'active' ? colors.green + '✅' :
+                          decision.status === 'deprecated' ? colors.yellow + '⚠️' :
+                          colors.dim + '📋';
+
+        console.log(`  ${statusIcon}${colors.reset} ${colors.bold}${decision.title}${colors.reset}`);
+        if (decision.symbolName) {
+          console.log(`    ${colors.dim}Symbol: ${decision.symbolName}${colors.reset}`);
+        }
+        console.log(`    ${colors.dim}Date: ${decision.date}${colors.reset}`);
+        console.log(`    ${colors.cyan}Decision:${colors.reset} ${decision.decision}`);
+        console.log(`    ${colors.cyan}Rationale:${colors.reset} ${decision.rationale}`);
+        console.log();
+      }
+    }
+
+    // 7. Error Patterns
+    if (context.errorPatterns.length > 0) {
+      console.log(colors.bold + divider + colors.reset);
+      console.log(colors.blue + '⚠️  일반적인 함정 (Common Pitfalls)' + colors.reset + colors.dim + ` (${context.errorPatterns.length}개)` + colors.reset);
+      console.log(colors.bold + divider + colors.reset);
+
+      for (const error of context.errorPatterns) {
+        console.log(`  ${colors.yellow}❌${colors.reset} ${colors.bold}${error.errorType}${colors.reset} ${colors.dim}(${error.symbolName})${colors.reset}`);
+        console.log(`    ${colors.yellow}Error:${colors.reset} ${error.message}`);
+        console.log(`    ${colors.green}Solution:${colors.reset} ${error.solution}`);
+        if (error.prevention) {
+          console.log(`    ${colors.cyan}Prevention:${colors.reset} ${error.prevention}`);
+        }
+        console.log();
+      }
+    }
+
     // Summary
     console.log(colors.bold + divider + colors.reset);
     console.log(colors.bold + '📊 요약' + colors.reset);
@@ -466,6 +624,9 @@ export class WorkContextCommand extends BaseCommand {
     console.log(`  의존: ${colors.cyan}${context.dependencies.length}개${colors.reset}`);
     console.log(`  테스트: ${colors.cyan}${context.tests.length}개${colors.reset}`);
     console.log(`  영향: ${colors.cyan}${context.usedBy.length}개 파일${colors.reset}`);
+    console.log(`  계약: ${colors.cyan}${context.contracts.length}개${colors.reset}`);
+    console.log(`  결정: ${colors.cyan}${context.decisions.length}개${colors.reset}`);
+    console.log(`  함정: ${colors.cyan}${context.errorPatterns.length}개${colors.reset}`);
     console.log();
   }
 
