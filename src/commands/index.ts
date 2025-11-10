@@ -80,3 +80,4 @@ export { RelationshipPathCommand } from './RelationshipPathCommand';
 export { RelationshipValidateCommand } from './RelationshipValidateCommand';
 export { RelationshipExportCommand } from './RelationshipExportCommand';
 export { RelationshipClustersCommand } from './RelationshipClustersCommand';
+export { RelationshipMetricsCommand } from './RelationshipMetricsCommand';
