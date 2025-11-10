@@ -18,4 +18,4 @@ Parse TypeScript files and extract TSDoc comments.
 
 ## Related
 
-- [[TSDoc Parser]]: Core parsing
+- [[TSDocParser]]: Core parsing

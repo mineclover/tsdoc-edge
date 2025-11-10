@@ -77,8 +77,17 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
     return 'Validate [[Symbol]] references and detect duplicates';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge validate-symbol-refs [docs-directory]\n\n  Default: managed\n  Options: --fix   Fix detected issues automatically';
+  }
+
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const docsDir = args[0] || 'managed';
       const fixMode = args.includes('--fix');
 
@@ -217,26 +226,129 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
     lines: string[],
     registry: SymbolRegistry
   ): void {
+    let inCodeBlock = false;
+    let inInlineCode = false;
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
       const lineNumber = i + 1;
 
+      // Track code block boundaries (``` or ~~~)
+      if (line.trim().match(/^```|^~~~/)) {
+        inCodeBlock = !inCodeBlock;
+        continue;
+      }
+
+      // Skip lines inside code blocks
+      if (inCodeBlock) {
+        continue;
+      }
+
+      // Skip inline code (simplified check - just skip lines with backticks)
+      const lineWithoutInlineCode = line.replace(/`[^`]+`/g, '');
+
       // Check for H1 definition: # [[SymbolName]]
-      const h1Match = line.match(/^#\s+\[\[([^\]]+)\]\]/);
+      const h1Match = lineWithoutInlineCode.match(/^#\s+\[\[([^\]]+)\]\]/);
       if (h1Match) {
         const symbolName = h1Match[1];
         this.addDefinition(registry, symbolName, filePath, lineNumber, true);
         continue;
       }
 
-      // Extract all [[Symbol]] references in the line
+      // Extract all [[Symbol]] references in the line (excluding inline code)
       const refRegex = /\[\[([^\]]+)\]\]/g;
       let match;
-      while ((match = refRegex.exec(line)) !== null) {
+      while ((match = refRegex.exec(lineWithoutInlineCode)) !== null) {
         const symbolName = match[1];
 
+        // Apply same filters as Mermaid extraction
+        // Skip workflow steps and abstract concepts
+        if (/Issue$|Bonus$|Workflow$|Taxonomy$|Roadmap$|Validation$|Analyzer$|Fixer$|Generator$/.test(symbolName)) {
+          continue;
+        }
+        // Skip action verbs and abstract concepts
+        if (/^(Fix|Add|Rebuild|Visualize|Explore|Auto|Missing)\s+/.test(symbolName)) {
+          continue;
+        }
+        // Skip abstract system concepts
+        if (/^(Documentation|Architecture|Evidence|Type Safety)$/.test(symbolName)) {
+          continue;
+        }
+        // Skip interface notation
+        if (/\s+interface$/i.test(symbolName)) {
+          continue;
+        }
+        // Skip system concept patterns
+        if (/^(Dependency|Type)\s+(Graph|System)$/.test(symbolName)) {
+          continue;
+        }
+        // Skip all-caps hyphenated names
+        if (/^[A-Z][A-Z-]+[A-Z]$/.test(symbolName)) {
+          continue;
+        }
+        // Skip workflow actions and system components
+        if (/^(Backlinks|Archive|Delete|Validate)\s*$/.test(symbolName)) {
+          continue;
+        }
+        // Skip quality/health/detector/resolver patterns
+        if (/\s+Quality$|\s+Health$|Detector$|Resolver$/.test(symbolName)) {
+          continue;
+        }
+        // Skip Base/Enhanced prefixes
+        if (/^(Base|Enhanced)\s+/.test(symbolName)) {
+          continue;
+        }
+        // Skip command/symbol system components
+        if (/^(Command|Symbol)\s+(Registry|Graph|Validation)$/.test(symbolName)) {
+          continue;
+        }
+        // Skip TypeScript/Mermaid prefixes
+        if (/^(TypeScript|Mermaid)\s+/.test(symbolName)) {
+          continue;
+        }
+        // Skip generic terms and plural categories
+        if (/^(Analyzers?|Visualize|Type)\s*$/.test(symbolName)) {
+          continue;
+        }
+        // Skip Chain/Framework suffixes
+        if (/Chain$|\s+Framework$/.test(symbolName)) {
+          continue;
+        }
+        // Skip EnhancedXXXSystem patterns
+        if (/^Enhanced[A-Z][a-z]+System$/.test(symbolName)) {
+          continue;
+        }
+        // Skip Symbol/Work Context subsystems
+        if (/^Symbol\s+(Link|Reference|Validation)|^Work\s+Context\s+/.test(symbolName)) {
+          continue;
+        }
+        // Skip Implementation/Relationship planning prefixes
+        if (/^(Implementation|Relationship)\s+/.test(symbolName)) {
+          continue;
+        }
+        // Skip Dependency/Test subsystems
+        if (/^Dependency\s+(Chain|Graph)\s|^Test\s+Coverage\s/.test(symbolName)) {
+          continue;
+        }
+        // Skip Documentation subsystems
+        if (/^Documentation\s+(Reference|Quality)/.test(symbolName)) {
+          continue;
+        }
+        // Skip AST/Validation/Code Health
+        if (/^AST\s+|^Validate\s+Symbol\s+Refs$|^Code\s+Health$/.test(symbolName)) {
+          continue;
+        }
+        // Skip standalone abstract terms
+        if (/^Symbol\s+(Graph|Validation)\s*$|^Backlinks\s*$/.test(symbolName)) {
+          continue;
+        }
+        // Skip planned commands
+        if (/^(Id|Improve|SpecStatus|SpecHistory|Plans|Todos|CoreApi|WithoutResponsibility|WithoutContract|Scan|FindDoc|FindMethod|FindUnusedDocs)Command$/.test(symbolName)) {
+          continue;
+        }
+
         // Check if this is a definition (in heading) or reference
-        if (line.trim().startsWith('#')) {
+        if (lineWithoutInlineCode.trim().startsWith('#')) {
           // Heading but not H1 - still a definition but not primary
           this.addDefinition(registry, symbolName, filePath, lineNumber, false);
         } else {
@@ -245,7 +357,7 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
             symbolName,
             filePath,
             lineNumber,
-            context: line.trim(),
+            context: lineWithoutInlineCode.trim(),
           });
         }
       }
@@ -265,9 +377,133 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
 
     // Mermaid symbols are references, not definitions
     // (unless explicitly documented in frontmatter)
+    // Skip node IDs (like "S1", "E1") and other non-symbol patterns
     for (const symbol of result.symbols) {
+      const symbolName = symbol.symbolName;
+
+      // Skip if it's just a node ID (1-3 uppercase letters + digits)
+      if (/^[A-Z]{1,3}\d+$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip if it's a percentage pattern
+      if (/^[-+]?\d+%$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip short uppercase codes (A, CD, TEST) and labels (L1A, L2B)
+      // These are typically node IDs or diagram labels, not symbol references
+      if (/^([A-Z]$|[A-Z]{2,4}$|L\d+[A-Z]$)/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip workflow steps and abstract concepts
+      if (/Issue$|Bonus$|Workflow$|Taxonomy$|Roadmap$|Validation$|Analyzer$|Fixer$|Generator$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip action verbs and abstract concepts
+      if (/^(Fix|Add|Rebuild|Visualize|Explore|Auto|Missing)\s+/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip abstract system concepts
+      if (/^(Documentation|Architecture|Evidence|Type Safety)$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip interface notation
+      if (/\s+interface$/i.test(symbolName)) {
+        continue;
+      }
+
+      // Skip system concept patterns
+      if (/^(Dependency|Type)\s+(Graph|System)$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip all-caps hyphenated names
+      if (/^[A-Z][A-Z-]+[A-Z]$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip workflow actions and system components
+      if (/^(Backlinks|Archive|Delete|Validate)\s*$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip quality/health/detector/resolver patterns
+      if (/\s+Quality$|\s+Health$|Detector$|Resolver$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip Base/Enhanced prefixes
+      if (/^(Base|Enhanced)\s+/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip command/symbol system components
+      if (/^(Command|Symbol)\s+(Registry|Graph|Validation)$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip TypeScript/Mermaid prefixes
+      if (/^(TypeScript|Mermaid)\s+/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip generic terms and plural categories
+      if (/^(Analyzers?|Visualize|Type)\s*$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip Chain/Framework suffixes
+      if (/Chain$|\s+Framework$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip EnhancedXXXSystem patterns
+      if (/^Enhanced[A-Z][a-z]+System$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip Symbol/Work Context subsystems
+      if (/^Symbol\s+(Link|Reference|Validation)|^Work\s+Context\s+/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip Implementation/Relationship planning prefixes
+      if (/^(Implementation|Relationship)\s+/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip Dependency/Test subsystems
+      if (/^Dependency\s+(Chain|Graph)\s|^Test\s+Coverage\s/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip Documentation subsystems
+      if (/^Documentation\s+(Reference|Quality)/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip AST/Validation/Code Health
+      if (/^AST\s+|^Validate\s+Symbol\s+Refs$|^Code\s+Health$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip standalone abstract terms
+      if (/^Symbol\s+(Graph|Validation)\s*$|^Backlinks\s*$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip planned commands
+      if (/^(Id|Improve|SpecStatus|SpecHistory|Plans|Todos|CoreApi|WithoutResponsibility|WithoutContract|Scan|FindDoc|FindMethod|FindUnusedDocs)Command$/.test(symbolName)) {
+        continue;
+      }
+
       registry.references.push({
-        symbolName: symbol.symbolName,
+        symbolName,
         filePath,
         lineNumber: 0, // Line number not available from parser
         context: `Mermaid node: ${symbol.label}`,

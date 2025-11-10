@@ -163,7 +163,12 @@ export class MermaidSymbolExtractor {
 
         const symbol = this.parseNodeLabel(nodeId, label, currentSubgraph);
         result.symbols.push(symbol);
-        result.symbolReferences.push(symbol.symbolName);
+        // Only add to symbolReferences if valid symbol name exists and looks like a real symbol
+        // Skip short uppercase codes (A, CD, L1A, etc.) which are typically node IDs
+        const looksLikeNodeId = /^([A-Z]$|[A-Z]{2,4}$|L\d+[A-Z]$)/.test(symbol.symbolName);
+        if (symbol.symbolName && symbol.symbolName.trim() !== '' && !looksLikeNodeId) {
+          result.symbolReferences.push(symbol.symbolName);
+        }
       }
 
       // Parse relationships: A --> B, A -.-> B, A ==> B
@@ -220,7 +225,186 @@ export class MermaidSymbolExtractor {
     const lines = cleanLabel.split('\n').map(l => l.trim()).filter(l => l);
 
     // First line is usually the symbol name
-    const symbolName = lines[0] || nodeId;
+    let symbolName = lines[0] || nodeId;
+
+    // Map known relationship types and common patterns to their canonical symbol names
+    const relationshipTypeMap: Record<string, string> = {
+      // Relationship types
+      'code-dependency': 'Code Dependency',
+      'io-dependency': 'IO Dependency',
+      'I/O Dependency': 'IO Dependency',  // Handle slash variant
+      'inheritance': 'Inheritance',
+      'interface-impl': 'Interface Implementation',
+      'calls': 'Call Relationships',
+      'callback': 'Callback Pattern',
+      'composition': 'Composition Relationship',
+      'circular': 'Circular Dependency',
+      'pipeline': 'Pipeline',
+      'event-flow': 'Event Flow',
+      'type-dependency': 'Type Dependency',
+      'generic-constraint': 'Generic Constraint',
+      'layer-dependency': 'Layer Dependency',
+      'module-boundary': 'Module Boundary',
+      'test-coverage': 'Test Coverage',
+      'doc-reference': 'Documentation Reference',
+      'enhancement': 'Enhancement',
+      'Function Calls': 'Call Relationships',  // Alias for calls
+      // Common command/workflow patterns
+      'work-context': 'WorkContextCommand',
+    };
+
+    // Check if this is a known relationship type
+    if (relationshipTypeMap[symbolName]) {
+      symbolName = relationshipTypeMap[symbolName];
+    } else if (symbolName && /^[a-z][a-z-]*$/.test(symbolName)) {
+      // Clean up symbol name - if it starts with lowercase and has hyphens,
+      // it's likely a data label not a symbol reference.
+      // Convert to Title Case to match actual symbol names
+      symbolName = symbolName.split('-')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+        .join(' ');
+    }
+
+    // Filter out obvious non-symbols (SQL queries, statistics, problems, commands)
+    const nonSymbolPatterns = [
+      /^SELECT\s+/i,
+      /^INSERT\s+/i,
+      /^UPDATE\s+/i,
+      /^DELETE\s+/i,
+      /^Base:\s*/,
+      /^Problem:\s*/,
+      /^Run:\s*/,
+      /^TODO:/,
+      /^Note:/,
+      /^Filter:/,
+      /^\d+%$/,  // Pure percentages
+      /^\d+\.\s+/,  // Numbered lists (1., 2., etc.)
+      /^✅\s*/,  // Just checkmark
+      /^❌\s*/,  // Just X mark
+      /^🧪\s*/,  // Test tube emoji
+      /^🟢|^🔴|^🟡/,  // Colored circles
+      /[\u{1F300}-\u{1F9FF}]/u,  // Contains any emoji
+      /^Before:\s*/i,  // Before: prefixes
+      /^After:\s*/i,   // After: prefixes
+      /^Added:\s*/i,   // Added: prefixes
+      /^IDE:\s*/,      // IDE: labels
+      /^Editor:\s*/,   // Editor: labels
+      /^Reverse:\s*/,  // Reverse: labels
+      /\s+from\s+/i,   // Algorithm descriptions (DFS from each node)
+      /\s*\+\s*/,      // Contains plus signs (Code + Data + Behavior)
+      /\s*=\s*\?/,     // Query patterns (target = ?)
+      /^(Target|Confidence|Priority|Impact|Effort)$/,  // Single property names
+      /^I\/O\s+/,      // I/O prefix
+      /Deps$/i,        // Ends with Deps (I/O Deps, Code Deps)
+      /Detect$/i,      // Ends with Detect (Circular Detect)
+      /^⚠️\s*/,        // Warning emoji prefix
+      /^→\s*/,         // Arrow prefix
+      /Test\[/,        // TypeScript type syntax (Test[)
+      /Usage\[/,       // TypeScript type syntax (Usage[)
+      /Symbol\[/,      // TypeScript type syntax (Symbol[)
+      /DocRef\[/,      // TypeScript type syntax (DocRef[)
+      /Dep\[/,         // TypeScript type syntax (Dep[)
+      /^usedBy:/,      // usedBy: prefix
+      /^tests:/,       // tests: prefix
+      /^symbols:/,     // symbols: prefix
+      /^dependencies:/,// dependencies: prefix
+      /^relatedDocs:/, // relatedDocs: prefix
+      /^path:/,        // path: prefix
+      /^canonical:/,   // canonical: prefix
+      /[\uAC00-\uD7AF]/,  // Contains Korean characters
+      /_id$/,          // Ends with _id (symbol_id, etc.)
+      /^[a-z][a-zA-Z]+By$/,  // camelCase ending in By (uniqueBy, etc.)
+      /^(get|find|display|execute|gather)[A-Z]/,  // Function names (getAll, findDoc, etc.)
+      /^fs:/,          // fs: prefix
+      /\s*\/\s*/,      // Contains slash (deps / who-uses)
+      /\s*\*\s*/,      // Contains asterisk (analyze-*)
+      /🆕/,            // New feature emoji
+      /^[A-Z][a-z]+:\s*/,  // Label patterns (Linter:, Test:, Extract:, Result:)
+      /^Confidence:\s*/,   // Confidence: prefix
+      /\.(mmd|db|jsonl|md|ts|js)$/,  // File extensions
+      /^\(/,           // Starts with parenthesis (file paths)
+      /[≥≤]/,          // Comparison operators
+      /^(Return|Parameter|Import|Extends)\s+(Type|Keyword|Statements?)$/,  // Type keywords
+      /\s+Types?$/,    // Ends with Type or Types
+      /\s+(Analysis|Detection|Drift|Coverage|Tests)$/,  // Analysis categories
+      /^(Create|Define|Parse|Generate|Extract|Follow|Find)\s+/,  // Workflow verbs
+      /^(Code|Doc|Test)\s+/i,  // Category prefixes
+      /Patterns?$/,    // Ends with Pattern/Patterns
+      /^L\d+[A-Z]$/,   // Labels like L2C, L3B
+      /Product$/,      // Ends with Product (Cartesian Product)
+      /Chains$/,       // Ends with Chains
+      /Hotspots?$/,    // Ends with Hotspot/Hotspots
+      /^(Graph|Relationship)\s+/,  // System prefixes
+      /^[A-Z]$/,       // Single uppercase letter (A, B, C, D - node IDs)
+      /^[A-Z]{2,4}$/,  // Short uppercase abbreviations (CD, TEST, FS, PATH, EWE, GC, UB)
+      /^L\d+[A-Z]$/,   // Labels with numbers (L1A, L2A, L2B, L3A, etc.)
+      /^--/,           // CLI flags (--detect-orphans)
+      /\[0\]?$/,       // Array index (args[0)
+      /^(Structural|Behavioral|Architectural|Data Flow)$/,  // Category names
+      /^(Add to|Archive|Delete|Promote|Show|Scan)\s+/,  // Workflow/action verbs
+      /^(Read|Write|Resolve|Check|Query|Group|Build)\s+/i,  // Process verbs
+      /\s+(file|table|path|symbols?|content|exists)$/i,  // Technical suffixes
+      /^(Orphaned|All)\s+/,  // Status prefixes
+      /Stats$/,        // Ends with Stats
+      /Workflow$/,     // Ends with Workflow
+      /Taxonomy$/,     // Ends with Taxonomy
+      /Roadmap$/,      // Ends with Roadmap
+      /^(FS|PATH|CommandResult)$/,  // Technical constants/types
+      /Validation$/,   // Ends with Validation
+      /Resolved$/,     // Ends with Resolved
+      /Issue$/,        // Ends with Issue (Docs Issue, Tests Issue, etc.)
+      /Bonus$/,        // Ends with Bonus (Coverage Bonus)
+      /^(Fix|Add|Rebuild|Visualize|Explore)\s+/,  // Action verbs
+      /^(Documentation|Architecture|Evidence|Type Safety)$/,  // Abstract concepts
+      /\s+interface$/i,  // Ends with interface (WorkContext interface)
+      /^(Auto|Missing)\s+/,  // Automation prefixes
+      /^(Dependency|Type)\s+(Graph|System)$/,  // System concepts
+      /Analyzer$/,     // Ends with Analyzer (as standalone workflow step)
+      /Fixer$/,        // Ends with Fixer
+      /Generator$/,    // Ends with Generator
+      /^[A-Z][A-Z-]+[A-Z]$/,  // All caps with hyphens (EXAMPLE-WORKFLOW, FINAL-SUMMARY)
+      /^(Backlinks|Archive|Delete|Validate)\s*$/,  // Workflow actions
+      /\s+Quality$/,   // Ends with Quality
+      /\s+Health$/,    // Ends with Health
+      /^(Command|Symbol)\s+(Registry|Graph|Validation)$/,  // System components
+      /Detector$/,     // Ends with Detector
+      /Resolver$/,     // Ends with Resolver
+      /^Base\s+/,      // Starts with Base
+      /^Enhanced\s+/,  // Starts with Enhanced
+      /^TypeScript\s+/,  // TypeScript AST, etc.
+      /^Mermaid\s+/,   // Mermaid Validation Workflow, etc.
+      /^(Analyzers?|Visualize)\s*$/,  // Plural categories or action verbs alone
+      /^Type\s*$/,     // Just "Type" alone
+      /Chain$/,        // Ends with Chain (Reliability Chain, Dependency Chain Analysis)
+      /\s+Framework$/,  // Ends with Framework (Module Spec Framework)
+      /^Enhanced[A-Z][a-z]+System$/,  // EnhancedDocumentationSystem pattern
+      /^Symbol\s+(Link|Reference|Validation)/,  // Symbol subsystems
+      /^Work\s+Context\s+/,  // Work Context variations
+      /^(Implementation|Relationship)\s+/,  // Planning/system prefixes
+      /^Dependency\s+(Chain|Graph)\s/,  // Dependency subsystems
+      /^Test\s+Coverage\s/,  // Test Coverage Analysis
+      /^Documentation\s+(Reference|Quality)/,  // Documentation subsystems
+      /^AST\s+/,  // AST Parsing, etc.
+      /^Validate\s+Symbol\s+Refs$/,  // Validate Symbol Refs (action)
+      /^Code\s+Health$/,  // Code Health (abstract)
+      /^Symbol\s+(Graph|Validation)\s*$/,  // Symbol subsystems standalone
+      /^Backlinks\s*$/,  // Backlinks standalone
+      /Planned$/i,  // Ends with Planned (planned features)
+      /^(Id|Improve|SpecStatus|SpecHistory|Plans|Todos|CoreApi|WithoutResponsibility|WithoutContract|Scan|FindDoc|FindMethod|FindUnusedDocs)Command$/,  // Planned commands
+    ];
+
+    const isNonSymbol = nonSymbolPatterns.some(pattern => pattern.test(symbolName));
+    if (isNonSymbol) {
+      // This is data/text, not a symbol reference - check nodeId
+      const isNodeIdNonSymbol = nonSymbolPatterns.some(pattern => pattern.test(nodeId));
+      if (!isNodeIdNonSymbol) {
+        // Use nodeId as fallback if it's a valid symbol
+        symbolName = nodeId;
+      } else {
+        // Both label and nodeId are non-symbols, use nodeId but mark as non-reference
+        symbolName = nodeId;
+      }
+    }
 
     // Detect status from emoji/symbol
     let status: MermaidSymbol['status'] = undefined;

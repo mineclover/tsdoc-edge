@@ -18,5 +18,5 @@ Analyze test coverage and relationships.
 
 ## Related
 
-- [[Test Relationship Analyzer]]: Core analysis
+- [[TestRelationshipAnalyzer]]: Core analysis
 - [[Test Coverage]]: Coverage tracking

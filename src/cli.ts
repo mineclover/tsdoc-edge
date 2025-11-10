@@ -68,6 +68,23 @@ import { AnalyzeChainsCommand } from './commands/AnalyzeChainsCommand';
 import { AnalyzeCallsCommand } from './commands/AnalyzeCallsCommand';
 import { AnalyzeTestsCommand } from './commands/AnalyzeTestsCommand';
 import { AnalyzeTypesCommand } from './commands/AnalyzeTypesCommand';
+import { AnalyzeEventsCommand } from './commands/AnalyzeEventsCommand';
+import { AnalyzeCallbacksCommand } from './commands/AnalyzeCallbacksCommand';
+import { AnalyzeConstraintsCommand } from './commands/AnalyzeConstraintsCommand';
+import { AnalyzeAlternativesCommand } from './commands/AnalyzeAlternativesCommand';
+import { AnalyzeBehavioralCommand } from './commands/AnalyzeBehavioralCommand';
+import { AnalyzeStructuralCommand } from './commands/AnalyzeStructuralCommand';
+import { AnalyzeFinalCommand } from './commands/AnalyzeFinalCommand';
+import { AnalyzeAllCommand } from './commands/AnalyzeAllCommand';
+import { RelationshipQueryCommand } from './commands/RelationshipQueryCommand';
+import { RelationshipImpactCommand } from './commands/RelationshipImpactCommand';
+import { RelationshipPathCommand } from './commands/RelationshipPathCommand';
+import { RelationshipValidateCommand } from './commands/RelationshipValidateCommand';
+import { RelationshipExportCommand } from './commands/RelationshipExportCommand';
+import { RelationshipClustersCommand } from './commands/RelationshipClustersCommand';
+import { RelationshipMetricsCommand } from './commands/RelationshipMetricsCommand';
+import { RelationshipCheckCommand } from './commands/RelationshipCheckCommand';
+import { RelationshipHelpCommand } from './commands/RelationshipHelpCommand';
 import { WorkContextCommand } from './commands/WorkContextCommand';
 import { ExploreEntrypointCommand } from './commands/ExploreEntrypointCommand';
 import { ParseMermaidCommand } from './commands/ParseMermaidCommand';
@@ -75,6 +92,9 @@ import { ValidateSymbolRefsCommand } from './commands/ValidateSymbolRefsCommand'
 import { PromoteSymbolCommand } from './commands/PromoteSymbolCommand';
 import { CoverageReportCommand } from './commands/CoverageReportCommand';
 import { DetectDeadCodeCommand } from './commands/DetectDeadCodeCommand';
+import { SymbolQueryCommand } from './commands/SymbolQueryCommand';
+import { SymbolFixCommand } from './commands/SymbolFixCommand';
+import { RelationshipStatsCommand } from './commands/RelationshipStatsCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -144,6 +164,23 @@ async function main(): Promise<void> {
   registry.register(new AnalyzeTestsCommand());
   registry.register(new AnalyzeTypesCommand());
   registry.register(new AnalyzeIOCommand());
+  registry.register(new AnalyzeEventsCommand());
+  registry.register(new AnalyzeCallbacksCommand());
+  registry.register(new AnalyzeConstraintsCommand());
+  registry.register(new AnalyzeAlternativesCommand());
+  registry.register(new AnalyzeBehavioralCommand());
+  registry.register(new AnalyzeStructuralCommand());
+  registry.register(new AnalyzeFinalCommand());
+  registry.register(new AnalyzeAllCommand());
+  registry.register(new RelationshipQueryCommand());
+  registry.register(new RelationshipImpactCommand());
+  registry.register(new RelationshipPathCommand());
+  registry.register(new RelationshipValidateCommand());
+  registry.register(new RelationshipExportCommand());
+  registry.register(new RelationshipClustersCommand());
+  registry.register(new RelationshipMetricsCommand());
+  registry.register(new RelationshipCheckCommand());
+  registry.register(new RelationshipHelpCommand());
   registry.register(new VisualizeDepsCommand());
   registry.register(new UntestedCommand());
   registry.register(new WithoutResponsibilityCommand());
@@ -165,6 +202,9 @@ async function main(): Promise<void> {
   registry.register(new PromoteSymbolCommand());
   registry.register(new CoverageReportCommand());
   registry.register(new DetectDeadCodeCommand());
+  registry.register(new SymbolQueryCommand());
+  registry.register(new SymbolFixCommand());
+  registry.register(new RelationshipStatsCommand());
   registry.register(new HelpCommand(registry));
 
   // Get command

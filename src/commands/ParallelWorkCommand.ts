@@ -36,8 +36,21 @@ export class ParallelWorkCommand extends BaseCommand {
     return 'Detect parallel development zones based on dependency graph';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge parallel-work --working "Module1,Module2" [--frozen "Module3"]
+
+  Options:
+    --working "M1,M2"    Modules currently being worked on
+    --frozen "M3,M4"     Modules that are frozen`;
+  }
+
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       this.printHeader('TSDoc Edge - Parallel Work Detection');
 
       // Parse arguments

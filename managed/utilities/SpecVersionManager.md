@@ -87,6 +87,6 @@ tsdoc-edge spec-bump managed/features/work-context.md --minor
 ## Related
 
 - [[SpecStatusManager]]: Manages spec lifecycle
-- [[SpecHistoryCommand]]: View version history
-- [[SpecDiffCommand]]: Compare versions
-- [[SpecBumpCommand]]: Bump versions
+- (Planned: SpecHistoryCommand for viewing version history)
+- (Planned: SpecDiffCommand for comparing versions)
+- (Planned: SpecBumpCommand for bumping versions)

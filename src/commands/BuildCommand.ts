@@ -6,6 +6,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import * as crypto from 'node:crypto';
 import { ConfigManager } from '../config/ConfigManager';
 import { ASTSymbolExtractor } from '../analyzer/ASTSymbolExtractor';
 import { DatabaseManager } from '../storage/DatabaseManager';
@@ -66,6 +67,15 @@ export class BuildCommand extends BaseCommand {
     return 'Build symbol database from source files';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge build [source-directory] [options]
+
+  Default: src
+  Options:
+    --force          Force full rebuild (ignore file hashes)
+    --incremental    Incremental build (only changed files, default)`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -74,9 +84,22 @@ export class BuildCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
-      const targetPath = args[0] || 'src';
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
+      // Parse arguments
+      const forceRebuild = args.includes('--force');
+      const targetPath = args.find(arg => !arg.startsWith('--')) || 'src';
 
       this.printHeader('TSDoc Edge - Build Database');
+
+      if (forceRebuild) {
+        this.printWarning('Force rebuild enabled - all files will be reprocessed');
+      } else {
+        this.printInfo('Incremental build enabled - only changed files will be processed');
+      }
 
       // Validate path
       if (!fs.existsSync(targetPath)) {
@@ -105,7 +128,37 @@ export class BuildCommand extends BaseCommand {
       this.printInfo('Scanning TypeScript files...');
       const startTime = Date.now();
 
-      const files = this.findTypeScriptFiles(targetPath);
+      const allFiles = this.findTypeScriptFiles(targetPath);
+
+      // Filter files based on incremental build
+      let files = allFiles;
+      let skippedFiles = 0;
+
+      if (!forceRebuild) {
+        const changedFiles: string[] = [];
+
+        for (const file of allFiles) {
+          if (this.isFileChanged(dbManager, file)) {
+            changedFiles.push(file);
+          } else {
+            skippedFiles++;
+          }
+        }
+
+        files = changedFiles;
+
+        if (skippedFiles > 0) {
+          this.printSuccess(`Skipped ${skippedFiles} unchanged files (incremental build)`);
+        }
+      }
+
+      if (files.length === 0) {
+        this.printSuccess('No files to process - all files are up to date');
+        dbManager.close();
+        return this.success('No changes detected');
+      }
+
+      this.printInfo(`Processing ${files.length} file(s)...`);
 
       const result = {
         filesScanned: 0,
@@ -126,6 +179,9 @@ export class BuildCommand extends BaseCommand {
 
       // Store all relationships to insert after all symbols are collected
       const allRelationships: Array<{ type: string; from: string; to: string; filePath: string; description?: string }> = [];
+
+      // Store doc relationships (symbol -> document)
+      const allDocRelationships: Array<{ symbolId: string; symbolName: string; docRef: string; filePath: string; line: number }> = [];
 
       // Process each file
       for (const filePath of files) {
@@ -176,6 +232,18 @@ export class BuildCommand extends BaseCommand {
                 updatedAt: new Date().toISOString(),
               };
               registryLines.push(JSON.stringify(registryEntry));
+
+              // Extract @doc tags for this symbol
+              const docTags = this.extractDocTags(content, symbol.line);
+              for (const docRef of docTags) {
+                allDocRelationships.push({
+                  symbolId: id,
+                  symbolName: symbol.name,
+                  docRef,
+                  filePath: symbol.filePath,
+                  line: symbol.line,
+                });
+              }
             } else {
               result.errors.push(`Failed to insert: ${symbol.name} in ${filePath}`);
             }
@@ -252,10 +320,55 @@ export class BuildCommand extends BaseCommand {
         }
       }
 
+      // Insert doc relationships
+      this.printInfo('Inserting document relationships...');
+      let docRelationshipsInserted = 0;
+
+      for (const docRel of allDocRelationships) {
+        try {
+          const relationshipId = `doc-${docRel.symbolId}-${docRel.docRef}`
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-|-$/g, '');
+
+          const success = dbManager.insertUnifiedRelationship({
+            id: relationshipId,
+            type: 'conceptual-relation',
+            category: 'semantic',
+            fromSymbols: [docRel.symbolId],
+            toSymbols: [`doc:${docRel.docRef}`],
+            direction: 'bidirectional',
+            strength: 'medium',
+            evidence: [{
+              type: 'documentation',
+              source: docRel.filePath,
+              lineNumber: docRel.line,
+              confidence: 1.0,
+            }],
+            discoveredBy: 'documentation',
+            confidence: 1.0,
+            filePath: docRel.filePath,
+            line: docRel.line,
+            description: `${docRel.symbolName} documented in [[${docRel.docRef}]]`,
+          });
+
+          if (success) {
+            docRelationshipsInserted++;
+          }
+        } catch (error) {
+          result.errors.push(`Failed to insert doc relationship: ${docRel.symbolName} -> ${docRel.docRef}`);
+        }
+      }
+
       const duration = Date.now() - startTime;
 
       // Write JSONL registry
       fs.writeFileSync(registryPath, registryLines.join('\n'), 'utf-8');
+
+      // Update sync metadata for processed files (for incremental builds)
+      for (const filePath of files) {
+        this.updateSyncMetadata(dbManager, filePath);
+      }
 
       dbManager.close();
 
@@ -270,6 +383,7 @@ export class BuildCommand extends BaseCommand {
       console.log(`  Symbols inserted: ${this.colors.green}${result.symbolsInserted}${this.colors.reset}`);
       console.log(`  Relationships found: ${this.colors.cyan}${result.relationshipsFound}${this.colors.reset}`);
       console.log(`  Relationships inserted: ${this.colors.green}${result.relationshipsInserted}${this.colors.reset}`);
+      console.log(`  Doc relationships: ${this.colors.green}${docRelationshipsInserted}${this.colors.reset}`);
       console.log(`  Duration: ${this.colors.cyan}${duration}ms${this.colors.reset}`);
       console.log();
       console.log(`${this.colors.dim}Database: ${dbPath}${this.colors.reset}`);
@@ -318,6 +432,94 @@ export class BuildCommand extends BaseCommand {
     }
 
     return files;
+  }
+
+  /**
+   * Extract @doc tags from file content near a specific line
+   * @param content - File content
+   * @param symbolLine - Line number where symbol is defined
+   * @returns Array of document references
+   */
+  private extractDocTags(content: string, symbolLine: number): string[] {
+    const docTags: string[] = [];
+    const lines = content.split('\n');
+
+    // Search backwards from symbol line to find TSDoc comment block
+    // Typically comments are within 50 lines before the symbol
+    const searchStart = Math.max(0, symbolLine - 50);
+    const searchEnd = symbolLine;
+
+    for (let i = searchStart; i < searchEnd && i < lines.length; i++) {
+      const line = lines[i];
+
+      // Match @doc [[Symbol]] pattern
+      const docTagRegex = /@doc\s+\[\[([^\]]+)\]\]/g;
+      let match;
+
+      while ((match = docTagRegex.exec(line)) !== null) {
+        const docRef = match[1].trim();
+        if (docRef && !docTags.includes(docRef)) {
+          docTags.push(docRef);
+        }
+      }
+    }
+
+    return docTags;
+  }
+
+  /**
+   * Calculate SHA-256 hash of file content
+   */
+  private calculateFileHash(filePath: string): string {
+    const content = fs.readFileSync(filePath, 'utf-8');
+    return crypto.createHash('sha256').update(content).digest('hex');
+  }
+
+  /**
+   * Check if file has changed since last sync (incremental build)
+   */
+  private isFileChanged(dbManager: DatabaseManager, filePath: string): boolean {
+    try {
+      const currentHash = this.calculateFileHash(filePath);
+
+      // Query sync_metadata table
+      const row = dbManager.db.prepare(
+        'SELECT hash FROM sync_metadata WHERE file_path = ?'
+      ).get(filePath) as { hash: string } | undefined;
+
+      if (!row) {
+        // File not in metadata - needs processing
+        return true;
+      }
+
+      // Compare hashes
+      return row.hash !== currentHash;
+    } catch (error) {
+      // If error, assume file changed
+      return true;
+    }
+  }
+
+  /**
+   * Update sync metadata after processing file
+   */
+  private updateSyncMetadata(dbManager: DatabaseManager, filePath: string): void {
+    try {
+      const hash = this.calculateFileHash(filePath);
+      const now = new Date().toISOString();
+
+      // Upsert into sync_metadata
+      dbManager.db.prepare(`
+        INSERT INTO sync_metadata (file_path, last_sync, total_records, hash, status)
+        VALUES (?, ?, ?, ?, ?)
+        ON CONFLICT(file_path) DO UPDATE SET
+          last_sync = excluded.last_sync,
+          hash = excluded.hash,
+          status = excluded.status
+      `).run(filePath, now, 1, hash, 'synced');
+    } catch (error) {
+      // Silently ignore metadata update errors (non-critical)
+    }
   }
 
   private get colors() {

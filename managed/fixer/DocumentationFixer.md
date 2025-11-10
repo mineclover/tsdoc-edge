@@ -19,4 +19,4 @@ Handles:
 
 ## Related
 
-- [[Validation Features]]: Issue detection
+- [[ValidationFeatures]]: Issue detection

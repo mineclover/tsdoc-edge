@@ -19,4 +19,4 @@ Type analysis and interface dependency features.
 ## Related
 
 - [[Type Dependency]]: Type relationships
-- [[Interface Analyzer]]: Interface analysis
+- [[InterfaceAnalyzer]]: Interface analysis

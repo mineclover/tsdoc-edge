@@ -55,15 +55,15 @@ Extracted Symbols
   Total: 96
 
   ✅ Implemented (14):
-    • [[code-dependency]] (1,968 rels)
-    • [[inheritance]] (57 rels)
-    • [[io-dependency]] (6,705 rels)
-    • [[pipeline]] (25,809 chains)
-    • [[calls]] (1,511 rels)
-    • [[test-coverage]]
-    • [[type-dependency]]
-    • [[generic-constraint]]
-    • [[circular]] (0 detected)
+    • [[Code Dependency]] (1,968 rels)
+    • [[Inheritance]] (57 rels)
+    • [[IO Dependency]] (6,705 rels)
+    • [[Pipeline]] (25,809 chains)
+    • [[Calls]] (1,511 rels)
+    • [[Test Coverage]]
+    • [[Type Dependency]]
+    • [[Generic Constraint]]
+    • [[Circular]] (0 detected)
     ...
 
   ❌ Not Implemented (10):

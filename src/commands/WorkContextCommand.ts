@@ -68,16 +68,27 @@ export class WorkContextCommand extends BaseCommand {
     return 'Show all context needed to work on a file (docs, types, tests, impact)';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge work-context <file-path>';
+  }
+
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const targetFile = args[0];
 
       if (!targetFile) {
-        this.printError('File path required: work-context <file-path>');
+        this.printError('File path required');
         console.log();
         console.log('Examples:');
         console.log('  tsdoc-edge work-context src/services/UserService.ts');
         console.log('  tsdoc-edge work-context src/controllers/AuthController.ts');
+        console.log();
+        console.log('Tip: Run with --help for more information');
         return this.failure('Missing file path');
       }
 

@@ -64,6 +64,15 @@ export class IndexDocsCommand extends BaseCommand {
     return 'Index document symbols from markdown files';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge index-docs [docs-directory] [options]
+
+  Default directory: docs
+
+  Options:
+    --file=PATH   Index a single file incrementally`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -72,6 +81,11 @@ export class IndexDocsCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       // Parse options
       let targetFile: string | undefined;
       let docsDir = 'docs';

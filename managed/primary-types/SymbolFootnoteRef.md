@@ -1,0 +1,42 @@
+# [[SymbolFootnoteRef]]
+
+**Source**: `src/types/feature/doc-symbol.ts`
+
+## Purpose
+
+Type for symbol footnote references in documentation.
+
+## Type Definition
+
+```typescript
+export interface SymbolFootnoteRef {
+  id: string;
+  symbolName: string;
+  line: number;
+}
+```
+
+## Syntax
+
+- `[^sym-XXX]` - Symbol footnote
+- `[^SymbolName]` - Named symbol footnote
+
+## Usage
+
+Part of [[ParsedDocSymbols]]:
+
+```typescript
+interface ParsedDocSymbols {
+  symbolFootnoteRefs: SymbolFootnoteRef[];
+  // ...
+}
+```
+
+## Related
+
+- [[ParsedDocSymbols]] - Contains this type
+
+---
+
+**Category**: Type Definition
+**Status**: Active

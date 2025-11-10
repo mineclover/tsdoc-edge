@@ -23,8 +23,21 @@ export class ParseMermaidCommand extends BaseCommand {
     return 'Parse Mermaid diagram (.mmd) and extract symbols/relationships';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge parse-mermaid <file.mmd> [options]
+
+  Options:
+    --generate-docs      Generate documentation files
+    --output=DIR         Output directory (default: managed/relationships)`;
+  }
+
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const mmdPath = args[0];
       const shouldGenerate = args.includes('--generate-docs');
       const outputDir = this.extractFlag(args, '--output') || 'managed/relationships';

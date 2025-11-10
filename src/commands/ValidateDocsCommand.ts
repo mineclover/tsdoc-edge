@@ -61,6 +61,10 @@ export class ValidateDocsCommand extends BaseCommand {
     return 'Validate document symbols for SSOT compliance';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge validate-docs [docs-directory]\n\n  Default: docs';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -69,6 +73,11 @@ export class ValidateDocsCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const docsDir = args[0] || 'docs';
       const docsPath = path.resolve(process.cwd(), docsDir);
 

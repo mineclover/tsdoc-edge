@@ -19,5 +19,5 @@ Tracks:
 
 ## Related
 
-- [[Interface Analyzer]]: Interface analysis
+- [[InterfaceAnalyzer]]: Interface analysis
 - [[Type Dependency]]: Type relationships

@@ -25,8 +25,22 @@ export class VisualizeDepsCommand extends BaseCommand {
     return 'Generate Mermaid diagrams for dependency visualization';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge visualize <subcommand> [symbol]
+
+  Subcommands:
+    tree <symbol>     Dependency tree diagram
+    graph <symbol>    Dependency graph diagram
+    circular          Find circular dependencies`;
+  }
+
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const subcommand = args[0] || 'help';
       const targetSymbol = args[1];
 

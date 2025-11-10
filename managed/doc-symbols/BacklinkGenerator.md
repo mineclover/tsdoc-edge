@@ -19,5 +19,5 @@ Creates:
 
 ## Related
 
-- [[Update Backlinks Command]]: CLI interface
+- [[UpdateBacklinksCommand]]: CLI interface
 - [[Document Symbol System]]: Symbol references

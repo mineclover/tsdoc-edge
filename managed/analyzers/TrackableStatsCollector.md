@@ -19,5 +19,5 @@ Gathers:
 
 ## Related
 
-- [[Trackable Statistics]]: Stats types
-- [[Stats History Manager]]: History tracking
+- [[TrackableStatistics]]: Stats types
+- [[StatsHistoryManager]]: History tracking

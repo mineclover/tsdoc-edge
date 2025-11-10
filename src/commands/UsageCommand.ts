@@ -58,6 +58,16 @@ export class UsageCommand extends BaseCommand {
     return 'View and manage CLI usage analytics';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge usage [subcommand]
+
+  Subcommands:
+    report          Show usage analytics report (default)
+    export [file]   Export analytics to JSON
+    clear           Clear all analytics data
+    errors          Show recent command errors`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -66,6 +76,11 @@ export class UsageCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       this.printHeader('TSDoc Edge - Usage Analytics');
 
       const subCommand = args[0];

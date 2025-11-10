@@ -39,8 +39,17 @@ export class TestRelationshipsCommand extends BaseCommand {
     return 'Analyze integration test coverage for symbol relationships';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge test-relationships [options]';
+  }
+
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       this.printHeader('TSDoc Edge - Test Relationship Analysis');
 
       // Parse arguments

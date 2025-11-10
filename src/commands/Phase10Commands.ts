@@ -67,6 +67,16 @@ export class IdCommand extends BaseCommand {
     return 'Manage symbol IDs (new, list, find, stats)';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge id <subcommand>
+
+  Subcommands:
+    new <file> <symbol>  Generate new ID for a symbol
+    list                 List all registered IDs
+    find <id>            Find source location by ID
+    stats                Show registry statistics`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -75,6 +85,11 @@ export class IdCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
       const manager = this.manager || new SymbolRegistryManager(registryPath);
 
@@ -292,6 +307,16 @@ export class ImproveCommand extends BaseCommand {
     return 'Recursively improve documentation to target score';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge improve [options]
+
+  Options:
+    --target=N           Target quality score (default: 80)
+    --max-iterations=N   Maximum iterations (default: 10)
+    --dry-run            Preview changes without modifying files
+    --verbose, -v        Verbose output`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -300,6 +325,11 @@ export class ImproveCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       let targetScore = 80;
       let maxIterations = 10;
       let dryRun = false;
@@ -395,6 +425,10 @@ export class InstallHookCommand extends BaseCommand {
     return 'Install Git pre-commit hook for documentation checks';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge install-hook';
+  }
+
   /**
    * execute method
    * @param _args - _args parameter
@@ -403,6 +437,11 @@ export class InstallHookCommand extends BaseCommand {
    */
   async execute(_args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(_args)) {
+        return this.displayHelp();
+      }
+
       console.log(`${colors.bold}TSDoc Edge - Install Pre-commit Hook${colors.reset}`);
       console.log();
 
@@ -499,6 +538,10 @@ export class UninstallHookCommand extends BaseCommand {
     return 'Uninstall Git pre-commit hook';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge uninstall-hook';
+  }
+
   /**
    * execute method
    * @param _args - _args parameter
@@ -507,6 +550,11 @@ export class UninstallHookCommand extends BaseCommand {
    */
   async execute(_args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(_args)) {
+        return this.displayHelp();
+      }
+
       console.log(`${colors.bold}TSDoc Edge - Uninstall Pre-commit Hook${colors.reset}`);
       console.log();
 

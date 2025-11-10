@@ -65,6 +65,12 @@ export class ParseCommand extends BaseCommand {
     return 'Parse and display enhanced documentation';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge parse <source-path>
+
+  source-path can be a file or directory`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -73,6 +79,11 @@ export class ParseCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const sourcePath = args[0];
 
       if (!sourcePath) {

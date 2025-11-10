@@ -18,4 +18,4 @@ Validate documentation completeness and quality.
 
 ## Related
 
-- [[Validation Features]]: Documentation validation
+- [[ValidationFeatures]]: Documentation validation

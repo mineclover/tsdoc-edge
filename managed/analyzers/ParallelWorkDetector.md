@@ -27,4 +27,4 @@ interface ParallelWorkGroup {
 ## Related
 
 - [[Parallel Work Theory]]: 이론적 배경
-- [[Work Context]]: 작업 컨텍스트 분석
+- [[WorkContextCommand]]: 작업 컨텍스트 분석

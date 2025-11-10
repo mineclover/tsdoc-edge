@@ -1091,7 +1091,7 @@ END;
 
 ## Related Specifications
 
-- [[Unified Relationship Taxonomy]] - Relationship types
+- [[UnifiedRelationships]] - Relationship types
 - [[Relationship Standard Format]] - Relationship schema
 - [[Integration Test Traceability]] - Test relationships
 

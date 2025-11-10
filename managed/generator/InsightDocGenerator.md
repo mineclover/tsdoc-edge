@@ -19,4 +19,4 @@ Creates:
 
 ## Related
 
-- [[Analysis Features]]: Code analysis
+- [[AnalysisFeatures]]: Code analysis

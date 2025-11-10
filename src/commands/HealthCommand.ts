@@ -59,6 +59,10 @@ export class HealthCommand extends BaseCommand {
     return 'Check code health and generate report';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge health [directory]\n\n  Default: src';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -67,6 +71,11 @@ export class HealthCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const targetPath = args[0] || 'src';
 
       this.printHeader('TSDoc Edge - Health Check');

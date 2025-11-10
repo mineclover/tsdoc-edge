@@ -19,4 +19,4 @@ Shows:
 
 ## Related
 
-- [[Trackable Statistics]]: Stats tracking
+- [[TrackableStatistics]]: Stats tracking

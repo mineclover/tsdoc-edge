@@ -12,5 +12,6 @@ canonical: true
 
 Track interface implementation (`class A implements I`).
 
-**Implementation**: [[InterfaceImplementationAnalyzer]] (`src/analyzer/InterfaceImplementationAnalyzer.ts`)  
+**Implementation**: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`)
 **Command**: [[BuildCommand]]
+**Note**: Interface implementation detection is integrated into AST symbol extraction

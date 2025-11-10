@@ -1034,9 +1034,9 @@ interface TypeComplexity {
 - [^SymbolGraphBuilder]: `src/graph/SymbolGraphBuilder.ts:15` - Graph construction
 
 **Related Documents**:
-- [[Database Schema]] - Storage layer design
-- [[System Architecture]] - Overall architecture
-- [[Visualization System]] - Analysis result visualization
+- [[Enhanced Database Schema & Type System]] - Storage layer design
+- [[TSDoc Edge System Architecture]] - Overall architecture
+- (Planned: Visualization System for analysis result visualization)
 
 ---
 

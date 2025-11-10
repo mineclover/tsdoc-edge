@@ -16,7 +16,16 @@
     "format": "biome format --write .",
     "check": "biome check --write .",
     "prepublishOnly": "npm run build",
-    "demo": "ts-node demo/poc-demo.ts"
+    "demo": "ts-node demo/poc-demo.ts",
+    "rel:check": "node dist/cli.js relationship-check",
+    "rel:impact": "node dist/cli.js relationship-impact",
+    "rel:metrics": "node dist/cli.js relationship-metrics --top 20",
+    "rel:validate": "node dist/cli.js relationship-validate",
+    "rel:clusters": "node dist/cli.js relationship-clusters",
+    "rel:help": "node dist/cli.js relationship-help",
+    "safety:check": "./scripts/relationship/check-symbol-safety.sh",
+    "report:weekly": "./scripts/relationship/weekly-report.sh .reports",
+    "git:check-critical": "./scripts/relationship/find-critical-changes.sh"
   },
   "keywords": [
     "tsdoc",
@@ -31,8 +40,8 @@
     "@biomejs/biome": "2.3.2",
     "@mermaid-js/mermaid-cli": "^11.12.0",
     "@types/better-sqlite3": "^7.6.13",
-    "@types/jest": "^29.5.12",
-    "@types/node": "^20.11.19",
+    "@types/jest": "^29.5.14",
+    "@types/node": "^20.19.24",
     "jest": "^29.7.0",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",

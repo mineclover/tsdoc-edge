@@ -18,4 +18,4 @@ Validate codebase and documentation integrity.
 
 ## Related
 
-- [[Validation Features]]: Validation system
+- [[ValidationFeatures]]: Validation system

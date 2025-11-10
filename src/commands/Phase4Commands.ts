@@ -44,6 +44,16 @@ export class SuggestCommand extends BaseCommand {
     return 'Generate improvement suggestions for code documentation';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge suggest [directory] [options]
+
+  Default directory: src
+
+  Options:
+    --min-score=N    Minimum quality score (default: 70)
+    --limit=N        Maximum suggestions to show (default: 20)`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -52,6 +62,11 @@ export class SuggestCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       let targetPath = args[0] || 'src';
       let minQualityScore = 70;
       let limit = 20;
@@ -169,6 +184,15 @@ export class InitCommand extends BaseCommand {
     return 'Initialize TSDoc Edge configuration';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge init [options]
+
+  Options:
+    --force          Overwrite existing configuration
+    --name=NAME      Project name
+    --version=VER    Project version`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -177,6 +201,11 @@ export class InitCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       this.printHeader('TSDoc Edge - Initialize Project');
 
       const hasForce = args.includes('--force');
@@ -268,6 +297,10 @@ export class IdNewCommand extends BaseCommand {
     return 'Generate new symbol ID';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge id-new <file-path> <symbol-name>';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -276,6 +309,11 @@ export class IdNewCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const filePath = args[0];
       const symbolName = args[1];
 
@@ -369,6 +407,10 @@ export class ValidateSpecCommand extends BaseCommand {
     return 'Validate specification completeness';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge validate-spec [docs-directory]\n\n  Default: managed';
+  }
+
   /**
    * Colorize score based on value
    */
@@ -386,6 +428,11 @@ export class ValidateSpecCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const docsDir = args[0] || 'managed';
       const docsPath = path.resolve(process.cwd(), docsDir);
 
@@ -530,6 +577,12 @@ export class GenerateDocsCommand extends BaseCommand {
     return 'Generate markdown documentation from enhanced docs';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge generate-docs <source-path> [output-dir]
+
+  Default output-dir: ./docs/generated`;
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -538,6 +591,11 @@ export class GenerateDocsCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const sourcePath = args[0];
       const outputDir = args[1] || './docs/generated';
 

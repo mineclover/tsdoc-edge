@@ -19,4 +19,4 @@ Code health and quality analysis.
 ## Related
 
 - [[Code Health]]: Health metrics
-- [[Analysis Features]]: Quality analysis
+- [[AnalysisFeatures]]: Quality analysis

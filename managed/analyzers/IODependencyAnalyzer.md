@@ -16,4 +16,4 @@
 ## Related
 
 - [[IO Dependency]]: I/O 의존성 관계
-- [[Work Context]]: 파일 접근 정보
+- [[WorkContextCommand]]: 파일 접근 정보

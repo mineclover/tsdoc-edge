@@ -20,4 +20,4 @@ Resolves:
 ## Related
 
 - [[Document Symbol System]]: Symbol resolution
-- [[Validate Symbol Refs Command]]: Validation
+- [[ValidateSymbolRefsCommand]]: Validation

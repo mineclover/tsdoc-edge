@@ -51,8 +51,20 @@ export class ExploreEntrypointCommand extends BaseCommand {
     return 'Explore entire dependency graph from a documentation entrypoint';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge explore-entrypoint <doc-path> [options]
+
+  Options:
+    --detect-orphans     Find unreferenced code`;
+  }
+
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const entrypointPath = args[0];
 
       if (!entrypointPath) {

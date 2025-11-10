@@ -19,5 +19,5 @@ Supports:
 
 ## Related
 
-- [[Comment State Manager]]: State management
-- [[Comment Importer]]: Import functionality
+- [[CommentStateManager]]: State management
+- [[CommentImporter]]: Import functionality

@@ -83,5 +83,5 @@ completeness: 85%
 ## Related
 
 - [[SpecCompletenessValidator]]: Validates completeness
-- [[SpecStatusCommand]]: CLI status management
+- (Planned: SpecStatusCommand for CLI status management)
 - [[SpecVersionManager]]: Version history tracking

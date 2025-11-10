@@ -24,8 +24,17 @@ export class AnalyzeCallsCommand extends BaseCommand {
     return 'Analyze function call relationships (call graph)';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge analyze-calls [source-directory]\n\n  Default: src';
+  }
+
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       this.printHeader('TSDoc Edge - Call Graph Analysis');
 
       const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');

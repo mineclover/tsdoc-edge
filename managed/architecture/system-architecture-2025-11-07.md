@@ -694,7 +694,7 @@ generateNewDiagram(...): string {
 - [[Implementation Progress - 2025-11-07]] - 세션 완료 리포트
 - [[System Review - 2025-11-06]] - 초기 상태 분석
 - [[Enhanced Database Schema]] - 데이터베이스 스키마 상세
-- [[Unified Relationship Taxonomy]] - 17가지 관계 타입
+- [[UnifiedRelationships]] - 17가지 관계 타입
 
 ---
 

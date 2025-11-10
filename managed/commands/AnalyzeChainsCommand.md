@@ -18,4 +18,4 @@ Analyze dependency chains.
 
 ## Related
 
-- [[Dependency Chain Analyzer]]: Core analysis
+- [[DependencyChainAnalyzer]]: Core analysis

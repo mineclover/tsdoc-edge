@@ -19,5 +19,5 @@ Handles:
 
 ## Related
 
-- [[Comment Exporter]]: Export functionality
-- [[Comment Importer]]: Import functionality
+- [[CommentExporter]]: Export functionality
+- [[CommentImporter]]: Import functionality

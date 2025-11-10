@@ -45,7 +45,7 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 
 ### [[Interface Implementation]] ✅
 - **Pattern**: `class A implements I`
-- **Impl**: [[InterfaceImplementationAnalyzer]] (`src/analyzer/InterfaceImplementationAnalyzer.ts`)
+- **Impl**: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`)
 - **Cmd**: [[BuildCommand]] (`src/commands/BuildCommand.ts`)
 - **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
 - **Query**: Find all implementations of an interface
@@ -76,10 +76,10 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 
 ### [[Call Relationships]] ✅ 1,511
 - **Pattern**: `foo()` calls `bar()`
-- **Impl**: [[CallRelationshipAnalyzer]] (`src/analyzer/CallRelationshipAnalyzer.ts`)
+- **Impl**: [[CallGraphAnalyzer]] (`src/analyzer/CallGraphAnalyzer.ts`)
 - **Cmd**: [[AnalyzeCallsCommand]] (`src/commands/AnalyzeCallsCommand.ts`)
 - **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
-- **Analysis**: [[CallAnalyzer]] (`src/analyzer/CallAnalyzer.ts`), [[CallGraphAnalyzer]] (`src/analyzer/CallGraphAnalyzer.ts`)
+- **Analysis**: Call detection via AST analysis (also known as CallRelationshipAnalyzer, CallAnalyzer)
 - **Doc**: [CALLS.md](./CALLS.md)
 
 ### [[Callback]] ❌
@@ -173,7 +173,7 @@ sqlite3 .tsdoc/symbols.db "SELECT type, COUNT(*) FROM unified_relationships GROU
 **Core Components**:
 - [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`): Central graph data structure
 - [[DatabaseManager]] (`src/storage/DatabaseManager.ts`): SQLite storage layer
-- [[RegistryManager]] (`src/storage/RegistryManager.ts`): JSONL persistence
+- [[SymbolRegistryManager]] (`src/storage/SymbolRegistryManager.ts`): JSONL persistence
 - [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`): Primary extractor
 
 **Command References**:

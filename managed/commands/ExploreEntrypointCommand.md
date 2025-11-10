@@ -19,5 +19,5 @@ Explore entrypoint and discover connected symbols.
 
 ## Related
 
-- [[Core Workflow]]: Exploration workflow
+- [[CoreWorkflow]]: Exploration workflow
 - [[Document Symbol System]]: Symbol traversal

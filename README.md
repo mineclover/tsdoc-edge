@@ -4,6 +4,44 @@
 
 TSDoc Edge는 단순한 문서 생성 도구가 아닙니다. 코드베이스의 모든 심볼(함수, 클래스, 인터페이스 등)을 추적하고, 심볼 간의 관계를 파악하며, 문서와 코드의 완벽한 일치를 강제하는 **문서 연결성 플랫폼**입니다.
 
+---
+
+## 📊 프로젝트 현황
+
+![Health Score](https://img.shields.io/badge/Health-C%20(64%2F100)-yellow?style=flat-square)
+![Documentation](https://img.shields.io/badge/Documentation-93%25-brightgreen?style=flat-square)
+![Test Coverage](https://img.shields.io/badge/Tests-46%25-orange?style=flat-square)
+![Commands](https://img.shields.io/badge/Commands-65-blue?style=flat-square)
+![Symbol Refs](https://img.shields.io/badge/Symbol%20Refs-0%20errors-success?style=flat-square)
+
+**현재 상태**:
+- ✅ 0개 심볼 참조 오류 (완벽!)
+- ✅ 0개 순환 의존성
+- ✅ 0개 죽은 코드
+- ✅ 65개 CLI 명령어 (100% 문서화)
+- ✅ 1,708개 호출 관계 추적
+- ✅ 9,439개 I/O 의존성 분석
+
+---
+
+## 📚 중요 문서
+
+### 시작하기
+- **[빠른 시작](#빠른-시작)** - 3분 안에 시작
+- **[Work Context Workflow](managed/workflows/work-context-workflow.md)** - 가장 중요한 명령어
+
+### 개발자 가이드 🔥
+- **[문서 품질 개선 가이드](DOCUMENTATION_QUALITY_IMPROVEMENT_GUIDE.md)** - 6단계 품질 개선 워크플로우
+- **[컨벤션-기능 매핑](CONVENTION_FEATURE_MAPPING.md)** - 7개 TSDoc 컨벤션과 CLI 명령어 연결
+- **[워크플로우 검증 리포트](WORKFLOW_VALIDATION_REPORT.md)** - 전체 기능 검증 결과 (96.8% 성공률)
+
+### 상세 가이드
+- **[CLI 워크플로우 & 시나리오](archive/deprecated/CLI_WORKFLOWS_AND_SCENARIOS.md)** - 29개 명령어 상세 설명
+- **[Configuration System](archive/guides/CONFIG_GUIDE.md)** - `.tsdoc.config.json` 완벽 가이드
+- **[문서 심볼 시스템](archive/design/DOCUMENT_SYMBOL_DESIGN.md)** - `[[Symbol]]` 설계 문서
+
+---
+
 ## 빠른 시작
 
 ```bash
@@ -25,7 +63,290 @@ tsdoc-edge work-context src/services/UserService.ts
 
 **모든 분석 기능은 이 하나의 명령어를 위해 존재합니다.**
 
+<details>
+<summary><strong>💡 실제 출력 예시 보기</strong></summary>
+
+```bash
+$ tsdoc-edge work-context src/commands/WorkContextCommand.ts
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📚 관련 문서 (2개)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  • [[WorkContextCommand]] ❌
+    → Not found
+       Referenced in: src/commands/WorkContextCommand.ts:11
+       💡 Create document or remove @doc tag
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🔗 의존 타입 (7개)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  BaseCommand          ✅
+    → src/commands/BaseCommand.ts
+  CommandResult        ✅
+    → src/commands/BaseCommand.ts
+  DatabaseManager      ✅
+    → src/storage/DatabaseManager.ts
+  SymbolGraphBuilder   ✅
+    → src/graph/SymbolGraphBuilder.ts
+  TSDocParser          ✅
+    → src/parser/TSDocParser.ts
+  DocumentSymbolParser ✅
+    → src/doc-symbol/DocumentSymbolParser.ts
+  Symbol               ✅
+    → src/types/graph/graph.ts
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+🧪 테스트 (0개)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  ❌ No tests found for this file
+     💡 Create test file in src/__tests__/
+     💡 Run: tsdoc-edge untested to see all untested symbols
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️  영향 범위 (14개 파일이 이 파일 사용)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  args                 → src/cli.ts
+  configPath           → src/cli.ts
+  configIndex          → src/cli.ts
+  main                 → src/cli.ts
+  usageTracker         → src/cli.ts
+  registry             → src/cli.ts
+  commandName          → src/cli.ts
+  commandArgs          → src/cli.ts
+  startTime            → src/cli.ts
+  result               → src/cli.ts
+  ... 4 more
+
+  ⚠️  수정 시 위 14개 파일 영향 받음
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📊 요약
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+  심볼: 12개
+  문서: 2개
+  의존: 7개
+  테스트: 0개
+  영향: 14개 파일
+```
+
+**이 한 번의 명령어로**:
+- ✅ 수정 전 알아야 할 모든 의존성 파악
+- ✅ 테스트 누락 즉시 발견
+- ✅ 관련 문서 누락 경고
+- ✅ 영향 범위 사전 파악으로 안전한 수정
+
+**코드 수정 전 항상 실행하세요!**
+
+</details>
+
 자세한 내용: [Work Context Workflow](managed/workflows/work-context-workflow.md)
+
+---
+
+## 🎯 관계 분석 시스템 (NEW!)
+
+**20,150개 심볼 관계를 통한 아키텍처 인텔리전스**
+
+TSDoc Edge는 이제 코드베이스의 모든 관계를 분석하여 아키텍처 수준의 인사이트를 제공합니다.
+
+### 빠른 시작
+
+```bash
+# 1. 아키텍처 모듈 발견
+tsdoc-edge relationship-clusters
+
+# 2. 중요한 심볼 찾기
+tsdoc-edge relationship-metrics --top 10
+
+# 3. 변경 영향 분석
+tsdoc-edge relationship-impact <symbol-id>
+
+# 4. 가이드 보기
+tsdoc-edge relationship-help
+```
+
+### 🚀 Local-First Workflow Tools (NEW!)
+
+실무에 바로 사용할 수 있는 워크플로우 자동화 도구:
+
+**npm scripts** (package.json에서 바로 실행):
+```bash
+npm run rel:check class-buildcommand     # 빠른 안전성 체크
+npm run rel:impact class-buildcommand    # 영향 분석
+npm run rel:metrics                      # 중요 심볼 top 20
+npm run safety:check class-buildcommand  # 종합 안전성 체크
+npm run report:weekly                    # 주간 리포트 생성
+npm run git:check-critical               # Git 변경사항 검사
+```
+
+**Bash scripts** (일일 개발 워크플로우):
+```bash
+# 수정 전 안전성 확인 (impact + metrics + query 통합)
+./scripts/relationship/check-symbol-safety.sh class-buildcommand
+
+# 주간 아키텍처 리포트 (7개 분석 파일 + 3개 포맷 자동 생성)
+./scripts/relationship/weekly-report.sh .reports
+
+# Git 변경사항 중 critical symbol 자동 검사 (CI/CD 연동 가능)
+./scripts/relationship/find-critical-changes.sh
+./scripts/relationship/find-critical-changes.sh main..HEAD
+```
+
+**Shell aliases** (터미널 단축키):
+```bash
+# Aliases 로드
+source ./scripts/relationship/setup-aliases.sh
+
+# 사용 예시
+rel-before class-buildcommand           # 수정 전 체크
+rel-critical                            # Top 20 critical symbols
+rel-blast class-buildcommand 5          # Depth 5 영향 분석
+rel-viz dot architecture.dot            # Graphviz 시각화 생성
+```
+
+**Git Hooks** (자동 안전 체크):
+```bash
+# Pre-commit hook 설치 (critical symbol 수정 시 자동 경고)
+./scripts/relationship/install-git-hooks.sh
+
+# 이제 git commit 시 자동으로:
+# ✓ Critical symbol 변경 감지
+# ✓ 리스크 평가 및 경고
+# ✓ 커밋 전 확인 요청
+```
+
+**VS Code Integration** (통합 개발 환경):
+```bash
+# VS Code tasks 설치 (Ctrl+Shift+P에서 바로 실행)
+./scripts/relationship/setup-vscode.sh
+
+# 이제 VS Code에서 바로:
+# ✓ 14개 Relationship 분석 태스크
+# ✓ 현재 파일 work-context
+# ✓ 키보드 단축키로 빠른 실행
+```
+
+**Quick Reference**:
+- [1페이지 치트시트](docs/RELATIONSHIP-QUICK-REFERENCE.md) - 모든 명령어 + 패턴 + 예시
+- [VS Code 태스크 가이드](.vscode-template/README.md) - VS Code 통합 설정
+
+### 7가지 분석 명령어
+
+| 명령어 | 용도 | 예시 사용 상황 |
+|--------|------|----------------|
+| **relationship-query** | 심볼의 모든 관계 조회 | "이 클래스는 무엇과 연결되어 있나?" |
+| **relationship-impact** | 변경 영향 분석 | "이걸 수정하면 어디가 깨지나?" |
+| **relationship-path** | 연결 경로 찾기 | "A와 B는 어떻게 연결되어 있나?" |
+| **relationship-validate** | 데이터 무결성 검증 | "관계 데이터가 깨지지 않았나?" |
+| **relationship-export** | 외부 도구 연동 | "Gephi로 시각화하고 싶다" |
+| **relationship-clusters** | 모듈 자동 발견 | "자연스러운 아키텍처 경계는?" |
+| **relationship-metrics** | 중요도 분석 | "어떤 심볼이 가장 중요한가?" |
+
+### 실전 활용 예시
+
+<details>
+<summary><strong>💡 변경 전 리스크 평가</strong></summary>
+
+```bash
+# BuildCommand를 수정하기 전
+$ tsdoc-edge relationship-impact class-buildcommand
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⚠️  HIGH RISK - 278 symbols affected
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+Depth 1: 10 symbols
+Depth 2: 34 symbols
+Depth 3: 234 symbols
+
+Recommendations:
+✓ Extensive testing required
+✓ Consider feature flags
+✓ Plan staged rollout
+```
+
+**결과**: HIGH RISK로 판정 → 신중한 변경 관리 필요
+
+</details>
+
+<details>
+<summary><strong>💡 아키텍처 병목점 발견</strong></summary>
+
+```bash
+$ tsdoc-edge relationship-metrics --metric betweenness --top 5
+
+Top 5 Symbols by Betweenness:
+1. SymbolGraphBuilder.getDependents
+   Betweenness: 0.0212
+   → Critical hub - architectural bottleneck
+
+2. BaseCommand.executeWithErrorHandling
+   Betweenness: 0.0179
+   → 63 symbols depend on this
+```
+
+**결과**: 5개 핵심 허브 발견 → 이들은 안정성 보장 필요
+
+</details>
+
+<details>
+<summary><strong>💡 자연스러운 모듈 경계 발견</strong></summary>
+
+```bash
+$ tsdoc-edge relationship-clusters --category structural
+
+Cluster 1: Core Commands (195 symbols, 92.5% cohesion)
+  BuildCommand, HelpCommand, AnalyzeCommand...
+  → Well-defined module, strong boundary
+
+Cluster 2: Utility Functions (8 symbols, 32% cohesion)
+  isTypeScript, getFileExtension...
+  → Low cohesion - consider refactoring
+```
+
+**결과**: 13개 클러스터 발견, 5개는 리팩토링 필요
+
+</details>
+
+### 외부 도구 연동
+
+**Gephi 시각화**:
+```bash
+tsdoc-edge relationship-export --format graphml --output graph.graphml
+# → Gephi에서 열기
+```
+
+**Neo4j 그래프 데이터베이스**:
+```bash
+tsdoc-edge relationship-export --format cypher --output import.cypher
+# → Neo4j에 임포트
+```
+
+**Graphviz 다이어그램**:
+```bash
+tsdoc-edge relationship-export --format dot --category structural --output arch.dot
+dot -Tpng arch.dot -o architecture.png
+```
+
+### 상세 문서
+
+- **[완전 가이드](docs/relationship-system-guide.md)** - 400줄 분량 완전 가이드
+- **[대화형 도움말](docs/relationship-system-guide.md#help-system)** - `tsdoc-edge relationship-help`
+
+### 현재 상태
+
+- ✅ **20,150개 관계** 분석 완료
+- ✅ **1,722개 심볼** 추적 중
+- ✅ **6/7 카테고리** 활성화
+- ✅ **47% 구현** 완료 (9/19 타입)
+
+**주요 발견사항**:
+- 5개 핵심 허브 (변경 관리 주의)
+- 85개 핵심 컴포넌트 (안정성 필수)
+- 254개 허브 심볼 (평균 연결도 2배)
+- 183개 브릿지 심볼 (서브시스템 연결)
+
+---
 
 ## 핵심 개념
 
@@ -48,7 +369,7 @@ tsdoc-edge work-context src/services/UserService.ts
 
 ### ✅ CLI 도구 (v0.8.0 + v0.10.0 + v0.11.0 + v0.12.0) - NEW! 🔥
 
-**49개 명령어로 완전한 문서 관리 - 완전 모듈화 완료** 🎉
+**65개 명령어로 완전한 문서 관리 - 완전 모듈화 완료** 🎉
 
 #### 🌟 핵심 워크플로우 (2개) - 가장 중요!
 - `work-context <file>` - **파일 작업에 필요한 모든 컨텍스트 제공** 🔥
@@ -77,18 +398,21 @@ tsdoc-edge work-context src/services/UserService.ts
 - `find-roots` - **루트 타입 찾기 (진입점 식별)** 🔥
 - `detect-cycles` - **순환 참조 감지 및 경고** 🔥
 
-#### 이슈 찾기 (7개)
+#### 이슈 찾기 & 탐지 (9개)
 - `orphans` - 사용되지 않는 코드
 - `undocumented` - 미문서화 심볼
 - `untested` - 테스트 없는 심볼
 - `without-responsibility` / `without-contract` - 누락 체크
 - `todos` / `plans` - TODO 및 계획 수집
+- `detect-dead-code` - **죽은 코드 탐지 (Call Graph 기반)** 🔥 NEW!
+- `parallel-work` - **병렬 개발 영역 감지** 🔥 NEW!
 
-#### 품질 검증 (4개)
+#### 품질 검증 & 커버리지 (5개)
 - `validate` - TSDoc 유효성 검증
 - `analyze` - 전체 문서 품질 분석
 - `health` - 프로젝트 건강도 점수
 - `check-links` - **문서 링크 검증 및 Typo 감지** 🔥
+- `coverage-report` - **@doc 태그 커버리지 검증 (SSOT)** 🔥 NEW!
 
 #### 문서 개선 (3개)
 - `suggest` - 개선 제안
@@ -99,12 +423,42 @@ tsdoc-edge work-context src/services/UserService.ts
 - `parse` - **TSDoc → EnhancedDoc 자동 추출**
 - `sync-coverage` - **테스트 커버리지 동기화**
 
-#### 통계 및 분석 (6개)
+#### 고급 분석 (6개) 🔥 NEW!
+- `analyze-calls` - **함수 호출 관계 분석 (Call Graph)** 🔥
+  - 1,700+ 호출 관계 추적 (정확히 1,708개)
+  - 가장 많이 호출되는 함수 식별
+  - 호출 패턴 분석 (Command, Registry, Utility, Builder)
+- `analyze-chains` - **의존성 체인 + 순환 의존성 감지** 🔥
+  - 순환 의존성 자동 감지 및 경고
+  - 핫스팟 분석 (Top 10)
+  - 의존성 점수 계산
+- `analyze-io` - **I/O 데이터 흐름 분석 (Type Matching)** 🔥
+  - 9,000+ I/O 의존성 추적
+  - 32,000+ 파이프라인 탐지
+  - 타입 기반 데이터 흐름 시각화
+- `analyze-tests` - **테스트 커버리지 관계 분석** 🔥
+  - 테스트-코드 매핑
+  - 커버리지 품질 평가
+- `analyze-types` - **타입 의존성 분석** 🔥
+  - 타입 간 의존성 추적
+  - 타입 체인 시각화
+- `test-relationships` - **통합 테스트 관계 분석** 🔥
+  - 심볼 간 테스트 커버리지 추적
+  - 통합 테스트 추적성
+
+#### 통계 및 분석 (4개)
 - `stats` (--save, --compare) - 통계 추적
 - `core-api` - 핵심 API 표면 분석
 - `scan` - 심볼 그래프 깊이 탐색
+- `usage` - **CLI 사용 패턴 분석 및 최적화** 🔥 NEW!
+  - 모든 명령어 실행 자동 추적
+  - Top 10 가장 많이 사용하는 명령어
+  - 성능 메트릭 (평균 실행 시간, 병목 식별)
+  - 에러 패턴 분석 (최근 에러, 성공률)
+  - 일일/주간 사용 통계
+  - 워크플로우 최적화 인사이트
 
-#### 문서 심볼 시스템 (12개)
+#### 문서 심볼 시스템 (17개)
 - `index-docs` - [[]] 심볼 인덱싱
 - `validate-docs` - SSOT 검증
 - `update-backlinks` - 백링크 자동 생성
@@ -112,11 +466,16 @@ tsdoc-edge work-context src/services/UserService.ts
 - `validate-spec` - 명세서 완성도 검증 🔥
 - `check-duplicates` - 중복 콘텐츠 감지 및 제안 🔥
 - `spec-status` - 명세서 상태 워크플로우 관리 🔥
+- `spec-bump` - **명세서 버전 증가** 🔥 NEW!
+- `spec-diff` - **명세서 버전 비교** 🔥 NEW!
+- `spec-history` - **명세서 버전 히스토리** 🔥 NEW!
 - `find-unused-docs` - 미사용/오래된 문서 탐지 🔥
 - `find-doc` - 문서 심볼 검색
-- `parse-mermaid` - **.mmd 다이어그램 파싱 및 H2 참조 문서 자동 생성** 🔥 NEW!
-- `promote-symbol` - **H2 참조를 H1 canonical로 승격** 🔥 NEW!
-- `validate-symbol-refs` - **[[Symbol]] 일관성 및 중복 검증** 🔥 NEW!
+- `parse-mermaid` - **.mmd 다이어그램 파싱 및 H2 참조 문서 자동 생성** 🔥
+- `promote-symbol` - **H2 참조를 H1 canonical로 승격** 🔥
+- `validate-symbol-refs` - **[[Symbol]] 일관성 및 중복 검증** 🔥
+- `symbol-query` - **심볼 레지스트리 조회** 🔥 NEW!
+- `symbol-fix` - **심볼 참조 자동 수정** 🔥 NEW!
 
 #### Git 통합 (3개) 🔥
 - `install-hook` - **Pre-commit hook 설치**
@@ -568,6 +927,113 @@ tsdoc-edge find-unused-docs managed/
 - ✅ 코드 연결 강제: 기술 명세서의 코드 참조 누락 감지
 - ✅ 참조 기반 탐지: 다른 문서에서 참조되지 않는 orphan 문서 식별
 - ✅ 액션 자동 제안: delete/archive/review/complete 구체적 조치 제시
+
+### ✅ CLI Usage Analytics (v0.12.0) - NEW! 🔥
+
+**모든 CLI 명령어 실행을 자동 추적하고 워크플로우 최적화 인사이트 제공**
+
+팀의 CLI 사용 패턴을 분석하여 병목을 식별하고, 에러를 추적하며, 워크플로우를 개선할 수 있는 데이터를 제공합니다.
+
+**추적 항목**:
+```typescript
+{
+  command: "validate-symbol-refs",    // 명령어 이름
+  args: ["managed/"],                 // 인자
+  timestamp: "2025-11-09T12:35:00Z",  // 실행 시간
+  duration: 2340,                     // 실행 시간 (ms)
+  success: true,                      // 성공 여부
+  error: null,                        // 에러 메시지
+  cwd: "/path/to/project",           // 작업 디렉토리
+  nodeVersion: "v18.16.0",           // Node.js 버전
+  version: "0.12.0"                  // TSDoc Edge 버전
+}
+```
+
+**제공 인사이트**:
+```bash
+$ tsdoc-edge usage
+
+📊 OVERVIEW
+────────────────────────────────────────────────────────────────
+Total Commands: 248
+First Used: 2025-11-09, 6:38:21 AM
+Last Used: 2025-11-09, 12:42:50 PM
+Total Duration: 322.79s
+
+🏆 TOP COMMANDS
+────────────────────────────────────────────────────────────────
+  validate-symbol-refs   206 (83.1%) ████████████████████████
+  symbol-query            13 (5.2%)  ██
+  help                     5 (2.0%)  █
+  analyze-calls            2 (0.8%)
+  analyze-chains           2 (0.8%)
+
+⚡ PERFORMANCE (평균 실행 시간)
+────────────────────────────────────────────────────────────────
+  analyze-io           84.33s  ← 병목!
+  build                56.79s
+  analyze-calls        8.92s
+  coverage-report      4.50s
+  validate             1.23s
+
+✓ SUCCESS RATES
+────────────────────────────────────────────────────────────────
+  ✗ validate-symbol-refs  1.5%   ← 개선 필요!
+  ✓ symbol-query         100.0%
+  ✓ help                 100.0%
+  ✓ build                100.0%
+
+❌ RECENT ERRORS (최근 10개)
+────────────────────────────────────────────────────────────────
+  core-api (11/9/2025, 12:42:50 PM)
+    no such table: relationships
+
+  test-relationships (11/9/2025, 12:40:58 PM)
+    Cannot read properties of undefined (reading 'replace')
+
+  parallel-work (11/9/2025, 12:40:39 PM)
+    No working modules specified
+```
+
+**사용법**:
+```bash
+# 전체 통계 보기
+tsdoc-edge usage
+
+# 특정 기간 통계
+tsdoc-edge usage --since="2025-11-01"
+
+# 일일 요약
+tsdoc-edge usage --daily
+
+# 특정 명령어 분석
+tsdoc-edge usage --command=build
+
+# 데이터 내보내기
+tsdoc-edge usage --export=json > usage-report.json
+
+# 데이터 초기화
+tsdoc-edge usage --clear
+```
+
+**CI/CD 통합**:
+```yaml
+# .github/workflows/usage-report.yml
+- name: Weekly Usage Report
+  if: github.event.schedule
+  run: |
+    tsdoc-edge usage --export=json > usage-report.json
+    # Slack/Email로 리포트 전송
+```
+
+**주요 효과**:
+- ✅ 병목 식별: 실행 시간이 긴 명령어 자동 발견
+- ✅ 에러 패턴 분석: 반복되는 에러 조기 감지
+- ✅ 워크플로우 최적화: 가장 많이 사용하는 명령어 우선 개선
+- ✅ 성공률 추적: 명령어별 안정성 모니터링
+- ✅ 팀 협업 인사이트: 팀원들이 어떤 기능을 주로 사용하는지 파악
+- ✅ 자동 추적: 별도 설정 없이 모든 명령어 자동 기록
+- ✅ 프라이버시: 로컬 `.tsdoc/analytics/` 디렉토리에만 저장
 
 ### ✅ Core Engine (v0.1.0 - v0.3.0)
 
@@ -1175,6 +1641,15 @@ console.log(`📦 Exported: ${exportPath}`);
 
 ### 핵심 기능 가이드
 
+- **✨ 문서 품질 개선**: [DOCUMENTATION_QUALITY_IMPROVEMENT_GUIDE.md](./DOCUMENTATION_QUALITY_IMPROVEMENT_GUIDE.md) 🔥
+  - **6단계 품질 개선 워크플로우**
+  - **단계별 상세 가이드** (검증 → 자동 수정 → 수동 개선 → 전체 검증 → 통합)
+  - **일반적인 문제 & 해결책**
+  - **품질 메트릭 설명** (건강도 점수 계산)
+  - **베스트 프랙티스**
+  - **체크리스트** (일일/주간/월간/릴리스)
+  - **CI/CD 통합 예제**
+
 - **📖 [[문서 심볼]] 시스템**: [archive/design/DOCUMENT_SYMBOL_DESIGN.md](./archive/design/DOCUMENT_SYMBOL_DESIGN.md)
   - Wiki 스타일 문서 심볼 정의
   - 코드-문서 양방향 연결
@@ -1202,6 +1677,15 @@ console.log(`📦 Exported: ${exportPath}`);
 - **TSDoc 컨벤션**: [reference/tsdoc-conventions/](./reference/tsdoc-conventions/)
   - 7가지 필수/권장 규칙
   - 각 규칙마다 명확한 예시와 이유 제공
+
+- **컨벤션-기능 매핑**: [CONVENTION_FEATURE_MAPPING.md](./CONVENTION_FEATURE_MAPPING.md) 🔥
+  - **7개 TSDoc 컨벤션과 CLI 명령어 연결**
+  - **자동 수정 가능 여부** (CONV-01~05: 자동, CONV-06~07: 수동)
+  - **검증/수정/품질 명령어** 매핑
+  - **올바른 예제 vs 잘못된 예제**
+  - **품질 영향도 분석**
+  - **강제 전략** (pre-commit, CI/CD, PR bot)
+  - **실전 통합 예제**
 
 - **TSDoc 스펙 지원**: [reference/TSDOC_SPEC_SUPPORT.md](./reference/TSDOC_SPEC_SUPPORT.md)
   - 지원하는 전체 TSDoc 태그 (35개)
@@ -1514,6 +1998,41 @@ tsdoc-edge type-chain Data --include-primitives
 **22개의 Mermaid 다이어그램으로 코드베이스를 완전히 시각화**
 
 TSDoc Edge는 코드와 문서뿐만 아니라 **전체 시스템을 시각적으로 이해**할 수 있도록 22개의 포괄적인 다이어그램을 제공합니다. 모든 다이어그램은 실제 데이터베이스 분석 결과를 기반으로 자동 생성되며, 코드 변경 시 업데이트됩니다.
+
+### 🎨 다이어그램 생성 방법
+
+`visualize` 명령어로 다양한 타입의 다이어그램을 생성할 수 있습니다:
+
+```bash
+# 1. 심볼의 의존성 트리 생성
+tsdoc-edge visualize tree <symbol-id>
+
+# 2. 핫스팟 다이어그램 생성
+tsdoc-edge visualize hotspots
+
+# 3. 순환 의존성 다이어그램 생성
+tsdoc-edge visualize circular [index]
+
+# 4. 클래스 계층 다이어그램 생성
+tsdoc-edge visualize hierarchy <class-id>
+
+# 5. 모듈 의존성 다이어그램 생성
+tsdoc-edge visualize modules [max]
+```
+
+**출력 위치**: 모든 다이어그램은 `.tsdoc/diagrams/` 디렉토리에 저장됩니다.
+
+**예시**:
+```bash
+# DatabaseManager의 의존성 트리 생성
+tsdoc-edge visualize tree DatabaseManager
+
+# 상위 10개 핫스팟 다이어그램 생성
+tsdoc-edge visualize hotspots
+
+# BaseCommand 클래스 계층 생성
+tsdoc-edge visualize hierarchy BaseCommand
+```
 
 ### 🗺️ 시작하기: Diagram Index
 

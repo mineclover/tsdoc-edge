@@ -18,4 +18,4 @@ Check work context reliability and accuracy.
 
 ## Related
 
-- [[Work Context]]: Context reliability
+- [[WorkContextCommand]]: Context reliability

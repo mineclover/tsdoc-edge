@@ -18,5 +18,5 @@ System management and validation.
 
 ## Related
 
-- [[Pre-commit Checker]]: Validation
-- [[Stats History Manager]]: Statistics
+- [[PreCommitChecker]]: Validation
+- [[StatsHistoryManager]]: Statistics

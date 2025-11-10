@@ -18,5 +18,5 @@ Trace and display type chains (A → B → C).
 
 ## Related
 
-- [[Type Chain Tracer]]: Core tracing logic
+- [[TypeChainTracer]]: Core tracing logic
 - [[Type Dependency]]: Type relationships

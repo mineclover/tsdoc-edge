@@ -25,7 +25,22 @@ export class TypeChainCommand extends BaseCommand {
     return 'Show type dependency chain between two types';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge type-chain <source-type> [target-type] [options]
+
+  Options:
+    --max-depth=N         Maximum depth to traverse (default: 10)
+    --include-external    Include external types from node_modules
+    --include-primitives  Include primitive types
+    --tree                Show as dependency tree`;
+  }
+
   async execute(args: string[]): Promise<any> {
+    // Check for help flag
+    if (this.hasHelpFlag(args)) {
+      return this.displayHelp();
+    }
+
     if (args.length < 1) {
       console.error(`${colors.red}✗${colors.reset} Usage: type-chain <source-type> [target-type] [options]`);
       console.error('');
@@ -298,7 +313,19 @@ export class FindRootTypesCommand extends BaseCommand {
     return 'Find root types (types with no incoming dependencies)';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge find-roots [options]
+
+  Options:
+    --include-external    Include external types from node_modules`;
+  }
+
   async execute(args: string[]): Promise<any> {
+    // Check for help flag
+    if (this.hasHelpFlag(args)) {
+      return this.displayHelp();
+    }
+
     const options: TypeChainOptions = {
       includeExternal: args.includes('--include-external'),
     };
@@ -424,7 +451,19 @@ export class DetectCircularTypesCommand extends BaseCommand {
     return 'Detect circular type dependencies';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge detect-cycles [options]
+
+  Options:
+    --include-external    Include external types from node_modules`;
+  }
+
   async execute(args: string[]): Promise<any> {
+    // Check for help flag
+    if (this.hasHelpFlag(args)) {
+      return this.displayHelp();
+    }
+
     const options: TypeChainOptions = {
       includeExternal: args.includes('--include-external'),
     };

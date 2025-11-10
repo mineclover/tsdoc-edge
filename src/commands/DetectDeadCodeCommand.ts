@@ -59,8 +59,17 @@ export class DetectDeadCodeCommand extends BaseCommand {
     return 'Detect unused/dead code based on call graph and dependency analysis';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge detect-dead-code [options]\n\n  Options:\n    --all              Show all candidates (including low confidence)\n    --confidence=LEVEL Filter by confidence (high/medium/low)';
+  }
+
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const showAll = args.includes('--all');
       const confidenceFilter = this.getConfidenceFilter(args);
 

@@ -400,7 +400,7 @@ done
 
 - [[CLI Feedback Cycle]] - 전체 CLI 워크플로우
 - [[Document Symbol System]] - `@doc [[Symbol]]` 시스템
-- [[Core Workflow]] - 빌드 → 분석 → 검증 흐름
+- [[CoreWorkflow]] - 빌드 → 분석 → 검증 흐름
 
 ---
 

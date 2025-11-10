@@ -288,19 +288,19 @@ tsdoc-edge import-registry
 - [[BuildCommand]] - Stores extracted symbols
 - [[DepsCommand]] - Queries dependencies
 - [[WhoUsesCommand]] - Queries reverse dependencies
-- [[SearchCommand]] - Full-text search
 - [[StatsCommand]] - Database statistics
 - All analyzers - Store relationships
+- (Planned: Full-text search command)
 
 **Uses**:
 - `better-sqlite3` - Synchronous SQLite driver
 - [[ConfigManager]] (`src/config/ConfigManager.ts`) - Configuration paths
-- [[RegistryManager]] (`src/storage/RegistryManager.ts`) - JSONL operations
+- [[SymbolRegistryManager]] (`src/storage/SymbolRegistryManager.ts`) - JSONL operations
 
 **Stores**:
 - [[Symbol]] (`src/types/graph.ts`) - All symbols
 - [[EnhancedSymbolDoc]] (`src/types/tags.ts`) - Documentation
-- [[UnifiedRelationship]] (`src/types/relationships.ts`) - All relationships
+- [[UnifiedRelationships]] (`src/types/relationships.ts`) - All relationships
 
 ## Performance
 
@@ -358,7 +358,7 @@ tsdoc-edge import-registry
 ## Related
 
 **Storage**:
-- [[RegistryManager]] (`src/storage/RegistryManager.ts`) - JSONL operations
+- [[SymbolRegistryManager]] (`src/storage/SymbolRegistryManager.ts`) - JSONL operations
 
 **Core**:
 - [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`) - Graph construction
@@ -367,7 +367,7 @@ tsdoc-edge import-registry
 **Commands**:
 - [[BuildCommand]] (`src/commands/BuildCommand.ts`) - Populates DB
 - [[DepsCommand]] (`src/commands/DepsCommand.ts`) - Queries DB
-- [[SearchCommand]] (`src/commands/SearchCommand.ts`) - FTS
+- (Planned: SearchCommand for full-text search)
 
 **Analyzers**:
 - All analyzers store relationships in DB

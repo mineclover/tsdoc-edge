@@ -107,7 +107,7 @@ tsdoc-edge work-context src/commands/BuildCommand.ts
 Work Context: BuildCommand.ts
 
 📚 Related Documentation (2):
-  • [[Core Workflow]]
+  • [[CoreWorkflow]]
   • [[Build Pipeline Guide]]
 
 🔗 Dependencies (5):
@@ -258,7 +258,7 @@ tsdoc-edge detect-circular-types
 ### Advanced (4 hours)
 1. Create diagram-based docs with [[Mermaid Entrypoint Workflow]] (`managed/workflows/mermaid-entrypoint-workflow.md`)
 2. Understand all [[Analyzers & Extractors]] (`managed/analyzers/index.md`)
-3. Master [[Core Components]] (DatabaseManager, SymbolGraph)
+3. Master core components: [[DatabaseManager]], [[SymbolGraphBuilder]]
 4. Integrate with CI/CD
 
 **Read**: [[Guides & Tutorials]] (`managed/guides/index.md`)
@@ -317,14 +317,14 @@ tsdoc-edge analyze-pipeline
 
 ## Help & Documentation
 
-**Full Documentation**: [[README]] (`managed/README.md`)
+**Full Documentation**: README (`managed/README.md`)
 
 **Commands**: [[Commands Index]] (`managed/COMMANDS.md`) - All 61 commands
 
 **Core Concepts**:
 - [[Relationship Types]] (`managed/relationships/index.md`) - 17 types
 - [[Analyzers & Extractors]] (`managed/analyzers/index.md`) - 20+ analyzers
-- [[Core Components]] (DatabaseManager, SymbolGraph, etc.)
+- Core components: [[DatabaseManager]], [[SymbolGraphBuilder]], [[ConfigManager]]
 
 **Guides**:
 - [[Build Pipeline Guide]] (`managed/guides/build-pipeline-guide.md`)

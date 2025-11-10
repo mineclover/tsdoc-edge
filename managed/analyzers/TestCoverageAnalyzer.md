@@ -20,4 +20,4 @@ Measures:
 ## Related
 
 - [[Test Coverage]]: Coverage data
-- [[Coverage Parser]]: Coverage parsing
+- [[CoverageParser]]: Coverage parsing

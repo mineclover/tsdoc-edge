@@ -27,4 +27,4 @@ interface TypeChain {
 ## Related
 
 - [[Type Dependency]]: 타입 의존성 관계
-- [[TYPE-DEPENDENCY]]: 관계 타입
+- [[Type Dependency]]: 관계 타입

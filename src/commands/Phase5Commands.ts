@@ -93,6 +93,10 @@ export class DepsCommand extends BaseCommand {
     return 'Show dependencies of a symbol';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge deps <symbol-id>';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -101,6 +105,11 @@ export class DepsCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const id = args[0];
       if (!id) {
         this.printError('Usage: tsdoc-edge deps <id>');
@@ -206,6 +215,10 @@ export class UsedByCommand extends BaseCommand {
     return 'Show what uses a symbol (registry)';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge used-by <symbol-id>';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -214,6 +227,11 @@ export class UsedByCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const id = args[0];
       if (!id) {
         this.printError('Usage: tsdoc-edge used-by <id>');
@@ -319,6 +337,10 @@ export class WhoUsesCommand extends BaseCommand {
     return 'Show who uses a symbol (database)';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge who-uses <symbol-name>';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -327,6 +349,11 @@ export class WhoUsesCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const symbolName = args[0];
       if (!symbolName) {
         this.printError('Usage: tsdoc-edge who-uses <symbol-name>');
@@ -501,6 +528,10 @@ export class OrphansCommand extends BaseCommand {
     return 'Find orphaned symbols';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge orphans';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -509,6 +540,11 @@ export class OrphansCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
 
       if (!this.manager && !fs.existsSync(registryPath)) {
@@ -596,6 +632,10 @@ export class UndocumentedCommand extends BaseCommand {
     return 'Find undocumented symbols';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge undocumented';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -604,6 +644,11 @@ export class UndocumentedCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       this.printHeader('Undocumented Symbols');
 
       const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
@@ -723,6 +768,10 @@ export class TreeCommand extends BaseCommand {
     return 'Show symbol hierarchy tree';
   }
 
+  protected getUsage(): string {
+    return 'tsdoc-edge tree';
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -731,6 +780,11 @@ export class TreeCommand extends BaseCommand {
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
 
       if (!this.manager && !fs.existsSync(registryPath)) {

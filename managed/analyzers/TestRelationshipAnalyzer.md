@@ -25,5 +25,5 @@ interface TestCoverage {
 
 ## Related
 
-- [[TEST-COVERAGE]]: 테스트 커버리지 관계
-- [[Work Context]]: 테스트 정보 제공
+- [[Test Coverage]]: 테스트 커버리지 관계
+- [[WorkContextCommand]]: 테스트 정보 제공

@@ -84,8 +84,22 @@ export class CoverageReportCommand extends BaseCommand {
     return 'Report @doc tag coverage for SSOT validation';
   }
 
+  protected getUsage(): string {
+    return `tsdoc-edge coverage-report [options]
+
+  Options:
+    --json               Output as JSON
+    --filter=public      Show only public symbols
+    --hierarchical       Group by file hierarchy`;
+  }
+
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // Check for help flag
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
       const jsonOutput = args.includes('--json');
       const filterPublic = args.includes('--filter=public');
       const hierarchical = args.includes('--hierarchical');

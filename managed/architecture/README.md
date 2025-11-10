@@ -30,7 +30,7 @@ This directory contains the comprehensive SSOT (Single Source of Truth) architec
 - Build time: ~2.2s
 - Analysis time: <200ms
 
-**Checkpoint**: [[System Architecture]]
+**Checkpoint**: [[TSDoc Edge System Architecture]]
 
 ### 2. Database and Relationships (`database-relationships-2025-11-07.md`)
 
@@ -58,7 +58,7 @@ This directory contains the comprehensive SSOT (Single Source of Truth) architec
 - Full-text search: <10ms
 - Complex joins: <50ms
 
-**Checkpoint**: [[Database Schema]], [[UnifiedRelationships]]
+**Checkpoint**: [[Enhanced Database Schema & Type System]], [[UnifiedRelationships]]
 
 ### 3. Analysis and Extraction Systems (`analysis-extraction-systems-2025-11-07.md`)
 
