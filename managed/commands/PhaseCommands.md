@@ -56,3 +56,13 @@ Each phase command typically contains:
 - [[BuildCommand]]: Foundation
 - [[CoreWorkflow]]: Integration
 - Analysis features in each phase
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:70
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:161
+

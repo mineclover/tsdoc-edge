@@ -495,10 +495,23 @@ console.log(`saveSymbols is called by ${callers.length} functions`);
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:218
 - [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:21
 - [[Phase7Commands]] → /home/user/tsdoc-edge/managed/commands/Phase7Commands.md:22
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:66
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:472
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:214
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:132
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:57
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:121
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:244
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:140
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:279
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:118
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:264
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:327
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:47
+- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:211
 - [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:10
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:49
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:18
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:64
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:99
 

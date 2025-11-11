@@ -118,3 +118,14 @@ tsdoc-edge coverage-report --hierarchical
 - [[AnalyzeTestsCommand]]: Analyze test relationships
 - [[TestRelationshipsCommand]]: Show test coverage
 - [[CoverageReportCommand]]: Coverage metrics
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:33
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:133
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:34
+

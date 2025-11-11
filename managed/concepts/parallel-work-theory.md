@@ -616,6 +616,10 @@ API는 유지되지만 동작이 변경되는 경우 감지 불가
 
 - [[ParallelWorkDetector]] → /home/user/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:23
 - [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:22
+- [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:31
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:32
 - [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:151
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:163
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:259
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:288
 

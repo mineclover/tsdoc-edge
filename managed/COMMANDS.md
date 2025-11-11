@@ -289,7 +289,20 @@ Total:               61 commands
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:223
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:259
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:179
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:48
+- [[Circular Dependency]] → /home/user/tsdoc-edge/managed/relationships/CIRCULAR.md:17
+- [[Generic Constraint]] → /home/user/tsdoc-edge/managed/relationships/GENERIC-CONSTRAINT.md:17
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:17
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:17
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:17
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:17
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:46
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:162
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:184
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:61
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:77
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:78
 - [[Example - Mermaid Workflow]] → /home/user/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:193
 - [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:299
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:252
 

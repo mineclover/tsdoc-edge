@@ -27,17 +27,20 @@ Checks:
 
 ### Referenced By
 
-- [[Parse Mermaid Command]] → /home/user/tsdoc-edge/managed/commands/ParseMermaidCommand.md:39
+- [[ParseMermaidCommand]] → /home/user/tsdoc-edge/managed/commands/ParseMermaidCommand.md:41
 - [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:207
 - [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:124
 - [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:154
 - [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:144
 - [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:89
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:165
 - [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:24
 - [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:107
 - [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:143
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:64
 - [[SymbolReferenceResolver]] → /home/user/tsdoc-edge/managed/doc-symbols/SymbolReferenceResolver.md:23
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:81
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:103
 - [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:57
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:121
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:187
@@ -45,4 +48,6 @@ Checks:
 - [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:57
 - [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:81
 - [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:47
+- [[Doc Reference]] → /home/user/tsdoc-edge/managed/relationships/doc-reference.md:40
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:82
 

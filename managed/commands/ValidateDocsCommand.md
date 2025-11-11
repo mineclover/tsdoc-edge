@@ -33,5 +33,6 @@ Validate documentation completeness and quality.
 - [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:119
 - [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:149
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:113
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:230
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:186
 

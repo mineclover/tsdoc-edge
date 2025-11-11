@@ -97,6 +97,15 @@ export class MyCommand extends BaseCommand {
 
 ### Referenced By
 
+- [[CommandRegistry]] → /home/user/tsdoc-edge/managed/commands/CommandRegistry.md:29
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:46
+- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:38
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:44
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:50
 - [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:181
 - [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:130
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:46
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:50
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:40
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:47
 

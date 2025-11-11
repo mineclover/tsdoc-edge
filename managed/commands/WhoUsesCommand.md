@@ -182,6 +182,19 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Referenced By
 
-- [[Core Workflow]] → Features reverse dependency analysis
-- [[Database Manager]] → Uses name search functionality
-- [[QueryCommands]] → Listed in query command group
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:103
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:127
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:44
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:84
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:134
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:70
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:115
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:87
+- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:99
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:127
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:176
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:180
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:174
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:26
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:20
+

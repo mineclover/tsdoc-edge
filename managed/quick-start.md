@@ -336,3 +336,38 @@ tsdoc-edge analyze-pipeline
 **Last Updated**: 2025-11-08
 **Estimated Time**: 5 minutes to first results
 **Difficulty**: Beginner-friendly
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:238
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:202
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:264
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:33
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:277
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:278
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:39
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:246
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:247
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:248
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:291
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:292
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:252
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:307
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:308
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:117
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:25
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:60
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:188
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:189
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:131
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:132
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:308
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:309
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:257
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:258
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:259
+

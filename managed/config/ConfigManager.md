@@ -36,6 +36,7 @@ Features:
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:122
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:65
 - [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:80
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:114
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:184
 - [[AnalyticsTypes]] → /home/user/tsdoc-edge/managed/types/AnalyticsTypes.md:61
 - [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:90

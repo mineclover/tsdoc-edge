@@ -172,3 +172,14 @@ const changed = registry.filter(e =>
 - [[SymbolRegistryManager]]: Registry implementation
 - [[DatabaseManager]]: JSONL sync
 - [[Symbol]]: Full symbol type
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:265
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:282
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:95
+

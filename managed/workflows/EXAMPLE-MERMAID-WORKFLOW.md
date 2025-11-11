@@ -372,3 +372,14 @@ File coverage: 92.3% ✓
 **Date**: 2025-11-08
 **Coverage Achieved**: 95.1% (14.3% → 95.1%)
 **Orphans Reduced**: 89 files → 7 files
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:240
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:97
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:310
+

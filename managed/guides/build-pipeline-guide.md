@@ -388,3 +388,17 @@ tsdoc-edge validate-docs managed
 **Last Updated**: 2025-11-08
 **Guide Type**: Complete workflow from source to queryable graph
 **Audience**: Developers using TSDoc Edge build pipeline
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:12
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:218
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:335
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:38
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:128
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:187
+

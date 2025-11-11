@@ -131,7 +131,13 @@ const dbPath = config.paths.databasePath;
 
 ### Referenced By
 
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:83
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:169
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:170
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:36
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:37
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:23
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:38
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:100
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:291
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:158

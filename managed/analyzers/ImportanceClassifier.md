@@ -31,4 +31,5 @@ Criteria:
 - [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:188
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:151
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:166
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:100
 

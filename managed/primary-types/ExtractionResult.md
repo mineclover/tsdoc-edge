@@ -128,7 +128,14 @@ Source Code → [TSDocParser] → ExtractionResult
 
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:91
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:173
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:200
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:201
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:80
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:81
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:82
+- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:34
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:292
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:130
 
 ### Implemented By
 

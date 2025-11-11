@@ -20,3 +20,12 @@ Extracts:
 ## Related
 
 - [[Document Symbol Parser]]: Markdown parsing
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:93
+

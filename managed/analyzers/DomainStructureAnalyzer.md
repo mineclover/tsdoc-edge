@@ -29,4 +29,5 @@ Identifies:
 
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:138
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:151
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:51
 

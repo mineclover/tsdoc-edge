@@ -250,6 +250,15 @@ fi
 
 ### Referenced By
 
-- [[Core Workflow]] → Quality tracking step
-- [[TrackableStatsCollector]] → Data collection
-- [[QueryCommands]] → Listed in query command group
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:74
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:116
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:80
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:102
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:78
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:124
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:154
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:172
+- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:84
+- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:89
+- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:85
+

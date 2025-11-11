@@ -27,12 +27,20 @@
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:170
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:219
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:80
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:67
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:141
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:80
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:126
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:245
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:141
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:280
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:74
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:268
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:328
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:48
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:43
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:46
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:51
 - [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:10
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:62
 

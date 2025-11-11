@@ -119,3 +119,13 @@ tsdoc-edge analyze-chains
 - [[TypeChainCommand]]: Find type dependency chains
 - [[DetectCircularTypesCommand]]: Detect circular deps
 - [[AnalyzeChainsCommand]]: Analyze chain patterns
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:37
+- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:33
+

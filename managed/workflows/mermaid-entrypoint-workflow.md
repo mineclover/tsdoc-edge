@@ -633,8 +633,11 @@ tsdoc-edge parse-mermaid <path> --generate-docs
 
 ### Referenced By
 
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:241
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:244
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:92
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:143
 - [[Example - Mermaid Workflow]] → /home/user/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:192
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:261
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:262
 

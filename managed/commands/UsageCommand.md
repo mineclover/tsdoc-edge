@@ -28,6 +28,7 @@ Shows:
 ### Referenced By
 
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:87
+- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:120
 - [[AnalyticsTypes]] → /home/user/tsdoc-edge/managed/types/AnalyticsTypes.md:60
 - [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:83
 

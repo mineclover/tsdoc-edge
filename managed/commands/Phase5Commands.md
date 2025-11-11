@@ -20,3 +20,14 @@ Integration coverage and test relationship tracking.
 
 - [[Test Coverage]]: Test relationships
 - [[Integration Test Traceability]]: Coverage tracking
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:170
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:81
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:25
+

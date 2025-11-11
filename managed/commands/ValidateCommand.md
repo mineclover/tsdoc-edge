@@ -28,10 +28,13 @@ Validate codebase and documentation integrity.
 
 - [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:239
 - [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:135
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:141
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:117
 - [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:130
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:48
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:124
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:105
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:229
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:185
 - [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:82
 - [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:90

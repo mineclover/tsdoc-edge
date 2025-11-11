@@ -63,6 +63,7 @@ tsdoc-edge build src
 
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:80
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:165
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:193
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:22
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:217
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:246
@@ -74,8 +75,12 @@ tsdoc-edge build src
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:44
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:113
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:193
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:219
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:68
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:159
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:118
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:16
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:238
 - [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:62
 - [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:46
 - [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:67
@@ -83,16 +88,22 @@ tsdoc-edge build src
 - [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:78
 - [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:90
 - [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:94
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:52
 - [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:9
 - [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:9
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:20
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:24
 - [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:15
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:53
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:18
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:26
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:34
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:163
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:65
 - [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:223
 - [[FileScanner]] → /home/user/tsdoc-edge/managed/utilities/FileScanner.md:68
 - [[String Utilities]] → /home/user/tsdoc-edge/managed/utilities/StringUtilities.md:57
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:103
 
 ### Implemented By
 

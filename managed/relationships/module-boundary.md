@@ -216,7 +216,7 @@ class UserServiceImpl implements IUserService { ... }
 
 - [[Layer Dependency]]: Orthogonal to layers (modules can exist in same layer)
 - [[Code Dependency]]: Module boundaries constrain code dependencies
-- [[Composition]]: Modules use composition for internal structure
+- [[Composition Relationship]]: Modules use composition for internal structure
 
 ---
 
@@ -228,3 +228,12 @@ class UserServiceImpl implements IUserService { ... }
 - v2.0: Basic boundary detection
 - v2.1: Violation reporting
 - v2.2: Auto-fix suggestions
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:70
+

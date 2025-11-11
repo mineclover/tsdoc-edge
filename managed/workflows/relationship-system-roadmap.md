@@ -547,3 +547,15 @@ Target (3 months):
 **Document Owner**: Core Team
 **Last Review**: 2025-11-10
 **Status**: ✅ **58% Implementation Complete** → Continuing
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:181
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:476
+- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:74
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:263
+

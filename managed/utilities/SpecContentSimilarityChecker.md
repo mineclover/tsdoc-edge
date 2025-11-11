@@ -107,6 +107,8 @@ const checker = new SpecContentSimilarityChecker({
 
 ### Referenced By
 
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:122
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:141
 - [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:126
+- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:89
 

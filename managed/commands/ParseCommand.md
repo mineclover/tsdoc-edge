@@ -31,5 +31,6 @@ Parse TypeScript files and extract TSDoc comments.
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:22
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:45
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:98
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:34
 - [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:82
 

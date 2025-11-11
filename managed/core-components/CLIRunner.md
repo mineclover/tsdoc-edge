@@ -133,3 +133,38 @@ Executable via:
 ## Symbol Count
 
 1 main function, 18 local variables
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:33
+- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:30
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:31
+- [[AnalyzeIOCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeIOCommand.md:32
+- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:31
+- [[AnalyzeTypesCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTypesCommand.md:31
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:72
+- [[CommandRegistry]] → /home/user/tsdoc-edge/managed/commands/CommandRegistry.md:30
+- [[CommandRegistry]] → /home/user/tsdoc-edge/managed/commands/CommandRegistry.md:31
+- [[ExploreEntrypointCommand]] → /home/user/tsdoc-edge/managed/commands/ExploreEntrypointCommand.md:32
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:37
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:70
+- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:32
+- [[PromoteSymbolCommand]] → /home/user/tsdoc-edge/managed/commands/PromoteSymbolCommand.md:31
+- [[TreeCommand]] → /home/user/tsdoc-edge/managed/commands/TreeCommand.md:202
+- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:28
+- [[UpdateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateSymbolRefsCommand.md:29
+- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:30
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:32
+- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:32
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:39
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:75
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:33
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:34
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:115
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:83
+- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:93
+

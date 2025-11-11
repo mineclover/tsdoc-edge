@@ -31,7 +31,9 @@ Analyze file I/O dependencies.
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:219
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:54
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:136
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:240
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:44
 - [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:15
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:64
 - [[DataFlowTypes]] → /home/user/tsdoc-edge/managed/types/DataFlowTypes.md:76
 

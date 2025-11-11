@@ -127,3 +127,14 @@ const report = tracker.generateReport({
 - [[UsageTracker]]: Analytics implementation
 - [[UsageCommand]]: Display usage stats
 - [[ConfigManager]]: Analytics configuration
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:31
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:40
+- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:94
+

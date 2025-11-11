@@ -32,6 +32,7 @@ Analyze type dependencies and usage.
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:153
 - [[Generic Constraint]] → /home/user/tsdoc-edge/managed/relationships/GENERIC-CONSTRAINT.md:9
 - [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:9
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:23
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:102
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:110
 

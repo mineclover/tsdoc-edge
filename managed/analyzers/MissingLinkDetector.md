@@ -28,5 +28,6 @@ Finds:
 ### Referenced By
 
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:99
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:158
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:133
 

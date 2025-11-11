@@ -87,7 +87,7 @@ class Core {
 
 ## Related
 
-- [[Composition]]: Enhancement often uses composition
+- [[Composition Relationship]]: Enhancement often uses composition
 - [[Inheritance]]: Different from inheritance (enhancement is compositional)
 - [[Code Dependency]]: Enhancement creates dependency
 

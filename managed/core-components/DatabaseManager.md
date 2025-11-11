@@ -392,8 +392,20 @@ tsdoc-edge import-registry
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:31
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:138
 - [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:53
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:73
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:74
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:46
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:43
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:48
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:94
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:45
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:115
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:139
 - [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:50
 - [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:392
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:35
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:36
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:83
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:152
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:174
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:181
@@ -414,10 +426,14 @@ tsdoc-edge import-registry
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:160
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:242
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:111
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:39
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:131
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:248
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:27
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:148
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:284
 - [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:157
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:206
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:33
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:145
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:184
@@ -437,5 +453,11 @@ tsdoc-edge import-registry
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:157
 - [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:20
 - [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:220
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:276
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:277
 - [[RegistryTypes]] → /home/user/tsdoc-edge/managed/types/RegistryTypes.md:96
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:84
+- [[UnifiedRelationships]] → /home/user/tsdoc-edge/managed/types/UnifiedRelationships.md:128
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:107
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:98
 

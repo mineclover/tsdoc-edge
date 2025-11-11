@@ -427,7 +427,11 @@ done
 
 - [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:221
 - [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:114
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:90
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:79
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:172
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:19
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:184
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:14
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:220
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:68

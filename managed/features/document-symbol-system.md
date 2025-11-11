@@ -152,19 +152,23 @@ tsdoc-edge find-doc <symbol>             # 심볼 찾기
 - [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:167
 - [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:147
 - [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:163
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:183
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:184
 - [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:185
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:186
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:187
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:188
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:189
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:122
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:290
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:332
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:333
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:143
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:164
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:165
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:173
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:174
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:175
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:209
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:233
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:234
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:243
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:244
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:245
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:266
 
 ### Implemented By

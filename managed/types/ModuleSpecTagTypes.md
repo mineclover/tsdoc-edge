@@ -256,3 +256,14 @@ Maps to framework sections:
 - [[ModuleSpecTypes]]: 7-part framework
 - [[ModuleSpecTagParser]]: Parses these tags
 - [[ModuleSpecValidator]]: Validates completeness
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:34
+- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:103
+- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:131
+

@@ -20,3 +20,12 @@ Creates:
 ## Related
 
 - [[ModuleSpecGenerator]]: Content generation
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ModuleSpecGenerator]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecGenerator.md:30
+

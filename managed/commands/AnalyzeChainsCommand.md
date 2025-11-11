@@ -26,6 +26,7 @@ Analyze dependency chains.
 
 ### Referenced By
 
+- [[DependencyChainAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:35
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:56
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:55
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:145

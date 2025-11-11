@@ -502,3 +502,17 @@ tsdoc-edge validate-docs managed
 **Last Updated**: 2025-11-08
 **Guide Type**: Comprehensive relationship analysis workflows
 **Audience**: Developers analyzing codebase relationships
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:13
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:231
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:54
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:116
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:138
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:188
+

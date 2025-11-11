@@ -246,10 +246,16 @@ echo "Coverage: $coverage%" > coverage-badge.txt
 
 ### Referenced By
 
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:68
 - [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:61
+- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:71
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:67
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:132
+- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:30
 - [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:146
 - [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:43
 - [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:109
 - [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:131
 - [[TestRelationships]] → /home/user/tsdoc-edge/managed/types/TestRelationships.md:74
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:253
 

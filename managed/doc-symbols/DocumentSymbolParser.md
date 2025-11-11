@@ -299,6 +299,11 @@ describe('DocumentSymbolParser', () => {
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:117
 - [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:65
 - [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:73
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:85
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:86
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:87
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:88
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:89
 - [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:52
 - [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:63
 - [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:76

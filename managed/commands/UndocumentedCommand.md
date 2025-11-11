@@ -192,6 +192,12 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Referenced By
 
-- [[Core Workflow]] → Documentation quality check
-- [[QueryCommands]] → Listed in query command group
-- [[CI/CD Integration]] → Quality gates
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:129
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:72
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:78
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:100
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:117
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:125
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:190
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:132
+

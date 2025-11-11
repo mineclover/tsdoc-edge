@@ -83,5 +83,13 @@ Uses DFS (Depth-First Search) to detect cycles:
 
 ### Referenced By
 
-- [[COMMANDS]] → Listed in commands overview
-- [[Type Dependency]] → Circular dependency detection
+- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:82
+- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:104
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:89
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:203
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:153
+- [[Circular Dependency]] → /home/user/tsdoc-edge/managed/relationships/CIRCULAR.md:8
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:129
+- [[TypeChain]] → /home/user/tsdoc-edge/managed/types/TypeChain.md:58
+- [[MermaidGenerator]] → /home/user/tsdoc-edge/managed/utilities/MermaidGenerator.md:92
+

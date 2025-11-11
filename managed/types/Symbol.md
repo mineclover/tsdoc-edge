@@ -94,6 +94,7 @@ Convention: kebab-case from file path + symbol name
 
 - [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:44
 - [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:115
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:210
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:100
 - [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:7
 - [[ExploreEntrypointCommand]] → /home/user/tsdoc-edge/managed/commands/ExploreEntrypointCommand.md:12
@@ -109,8 +110,10 @@ Convention: kebab-case from file path + symbol name
 - [[SymbolReferenceResolver]] → /home/user/tsdoc-edge/managed/doc-symbols/SymbolReferenceResolver.md:7
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:96
 - [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:33
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:283
 - [[InterfaceTypes]] → /home/user/tsdoc-edge/managed/types/InterfaceTypes.md:83
 - [[RegistryTypes]] → /home/user/tsdoc-edge/managed/types/RegistryTypes.md:97
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:139
 - [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:88
 - [[Example - Mermaid Workflow]] → /home/user/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:48
 - [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:41

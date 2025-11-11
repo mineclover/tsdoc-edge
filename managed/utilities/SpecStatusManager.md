@@ -94,6 +94,8 @@ completeness: 85%
 
 - [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:124
 - [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:62
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:77
 - [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:54
+- [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:65
 - [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:79
 

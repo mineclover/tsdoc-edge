@@ -27,12 +27,15 @@ Analyze function call relationships.
 
 ### Referenced By
 
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:259
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:39
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:218
 - [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:62
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:53
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:127
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:239
 - [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:15
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:51
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:65
 - [[UnifiedRelationships]] → /home/user/tsdoc-edge/managed/types/UnifiedRelationships.md:116
 

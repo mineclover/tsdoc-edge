@@ -25,7 +25,9 @@
 ### Referenced By
 
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:187
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:217
 - [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:76
+- [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:144
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:73
 - [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:191
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:49

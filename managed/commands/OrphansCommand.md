@@ -194,6 +194,17 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Referenced By
 
-- [[CodeHealthChecker]] → Uses orphan detection
-- [[QueryCommands]] → Listed in query command group
-- [[Dead Code Detection]] → Related analysis
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:106
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:85
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:135
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:71
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:82
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:76
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:115
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:132
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:90
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:123
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:183
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:145
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:27
+

@@ -522,6 +522,20 @@ The system continuously improves itself by:
 - [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:156
 - [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:142
 - [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:166
+- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:182
 - [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:159
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:98
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:99
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:100
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:101
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:102
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:103
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:104
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:105
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:106
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:107
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:108
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:109
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:110
 - [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:401
 

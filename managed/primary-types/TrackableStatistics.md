@@ -141,8 +141,15 @@ console.log(`Critical symbols documented: ${criticalStats.documented}/${critical
 
 - [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:22
 - [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:21
+- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:33
+- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:34
 - [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:22
+- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:32
+- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:33
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:37
 - [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:22
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:290
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:93
 
 ### Implemented By
 

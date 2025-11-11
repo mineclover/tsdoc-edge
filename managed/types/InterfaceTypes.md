@@ -158,3 +158,13 @@ tsdoc-edge deps UserService
 - [[Symbol]]: Base symbol type
 - [[AnalyzeCommand]]: Domain analysis
 - [[DepsCommand]]: Dependency analysis
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:39
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:94
+

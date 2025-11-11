@@ -160,3 +160,13 @@ erDiagram
 **Document Owner**: Documentation Team
 **Last Review**: 2025-11-07
 **Status**: ✅ Reference Guide
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:386
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:163
+

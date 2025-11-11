@@ -222,3 +222,15 @@ tsdoc-edge find-unused-docs managed
 - [[SpecStatusManager]]: Manages status transitions
 - [[UnusedDocumentDetector]]: Finds orphaned docs
 - [[SpecContentSimilarityChecker]]: Detects duplicates
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:76
+- [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:85
+- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:75
+- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:88
+

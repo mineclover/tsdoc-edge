@@ -98,7 +98,7 @@ tsdoc-edge analyze-events --trace user:created
 
 ## Related
 
-- [[Callback]]: Event handlers are specialized callbacks
+- [[Callback Pattern]]: Event handlers are specialized callbacks
 - [[Pipeline]]: Events can form processing pipelines
 - [[Call Relationships]]: Event handlers create indirect calls
 
@@ -107,3 +107,14 @@ tsdoc-edge analyze-events --trace user:created
 **Status**: Planned for v2.1
 **Priority**: High (common in modern architectures)
 **Complexity**: High (requires control flow + pattern matching)
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:134
+- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:140
+- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:41
+

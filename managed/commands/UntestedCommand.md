@@ -228,6 +228,14 @@ Low Priority:
 
 ### Referenced By
 
-- [[Core Workflow]] → Test coverage check
-- [[QueryCommands]] → Listed in query command group
-- [[CI/CD Integration]] → Quality gates
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:115
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:73
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:79
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:101
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:118
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:77
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:116
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:126
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:197
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:86
+

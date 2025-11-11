@@ -115,6 +115,8 @@ tsdoc-edge config set analytics.enabled false
 
 ### Referenced By
 
+- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:32
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:42
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:36
 - [[AnalyticsTypes]] → /home/user/tsdoc-edge/managed/types/AnalyticsTypes.md:59
 

@@ -128,7 +128,14 @@ if (report.metrics.overallScore < 70) {
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:99
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:102
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:194
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:224
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:35
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:36
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:41
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:42
 - [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:187
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:263
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:289
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:114
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:293
 

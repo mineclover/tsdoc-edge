@@ -27,8 +27,11 @@ Track type-level dependencies (parameter/return types, type aliases).
 - [[TypeChainTracer]] → /home/user/tsdoc-edge/managed/analyzers/TypeChainTracer.md:23
 - [[TypeChainTracer]] → /home/user/tsdoc-edge/managed/analyzers/TypeChainTracer.md:24
 - [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:18
+- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:29
 - [[AnalyzeTypesCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTypesCommand.md:22
+- [[AnalyzeTypesCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTypesCommand.md:34
 - [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:37
+- [[DetectCircularTypesCommand]] → /home/user/tsdoc-edge/managed/commands/DetectCircularTypesCommand.md:65
 - [[Phase4Commands]] → /home/user/tsdoc-edge/managed/commands/Phase4Commands.md:21
 - [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:22
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:61

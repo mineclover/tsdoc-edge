@@ -525,12 +525,24 @@ Features:
 
 ### Referenced By
 
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:91
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:45
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:105
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:43
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:129
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:39
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:93
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:202
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:123
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:186
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:264
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:82
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:177
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:184
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:149
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:158
 - [[RegistryTypes]] → /home/user/tsdoc-edge/managed/types/RegistryTypes.md:95
 - [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:68
+- [[IdGenerator]] → /home/user/tsdoc-edge/managed/utilities/IdGenerator.md:87
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:138
 

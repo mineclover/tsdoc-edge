@@ -53,6 +53,11 @@ Displays extracted information:
 
 ### Referenced By
 
+- [[ExploreEntrypointCommand]] → /home/user/tsdoc-edge/managed/commands/ExploreEntrypointCommand.md:31
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:30
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:62
 - [[MermaidSymbolExtractor]] → /home/user/tsdoc-edge/managed/doc-symbols/MermaidSymbolExtractor.md:22
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:104
 - [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:59
+- [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:95
 

@@ -267,3 +267,14 @@ export class UserService { }
 - [[TSDocParser]]: Parses custom tags
 - [[ModuleSpecTagParser]]: Extracts tag values
 - [[ValidateCommand]]: Validates tag presence
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:39
+- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:33
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:39
+

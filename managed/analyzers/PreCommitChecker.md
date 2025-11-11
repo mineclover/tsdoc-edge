@@ -29,4 +29,5 @@ Checks:
 
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:184
 - [[Phase10Commands]] → /home/user/tsdoc-edge/managed/commands/Phase10Commands.md:21
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:159
 

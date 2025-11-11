@@ -317,21 +317,44 @@ tsdoc-edge parse src/commands/BuildCommand.ts
 
 ### Referenced By
 
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:256
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:27
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:217
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:29
 - [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:51
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:62
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:63
+- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:29
+- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:30
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:212
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:213
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:73
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:38
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:123
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:27
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:116
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:243
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:25
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:139
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:278
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:25
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:260
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:326
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:31
 - [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:72
 - [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:89
+- [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:104
+- [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:105
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:31
 - [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:8
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:18
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:19
 - [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:8
+- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:18
+- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:19
 - [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:10
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:47
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:48
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:17
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:25
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:33
@@ -339,4 +362,6 @@ tsdoc-edge parse src/commands/BuildCommand.ts
 - [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:69
 - [[FileScanner]] → /home/user/tsdoc-edge/managed/utilities/FileScanner.md:67
 - [[String Utilities]] → /home/user/tsdoc-edge/managed/utilities/StringUtilities.md:56
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:97
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:98
 

@@ -174,3 +174,13 @@ Total: 4 layer violations
 **Status**: Design/Planning
 **Priority**: High (architecture enforcement)
 **Complexity**: Medium (requires layer configuration + validation)
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:120
+- [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:95
+

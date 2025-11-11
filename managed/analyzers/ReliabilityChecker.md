@@ -27,4 +27,5 @@ Check work context reliability and accuracy.
 ### Referenced By
 
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:189
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:69
 

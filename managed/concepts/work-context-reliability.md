@@ -348,3 +348,20 @@ See [[Work Context Reliability Chain]] diagram (`managed/architecture/diagrams/w
 - Context quality metrics
 - Developer confidence measurement
 - Pre-commit validation patterns
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:132
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:35
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:36
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:31
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:72
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:73
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:74
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:254
+- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:73
+

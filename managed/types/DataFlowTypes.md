@@ -163,3 +163,14 @@ tsdoc-edge detect-dead-code
 - [[AnalyzeIOCommand]]: IO analysis
 - [[AnalyzeChainsCommand]]: Transformation chains
 - [[DetectDeadCodeCommand]]: Dead code detection
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:36
+- [[AnalyzeIOCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeIOCommand.md:36
+- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:72
+

@@ -162,10 +162,16 @@ const impacted = builder.getDependents('user-repository');
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:256
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:54
 - [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:52
+- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:37
 - [[TreeCommand]] → /home/user/tsdoc-edge/managed/commands/TreeCommand.md:121
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:44
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:49
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:46
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:116
 - [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:51
 - [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:58
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:189
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:84
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:145
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:167
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:180
@@ -187,6 +193,7 @@ const impacted = builder.getDependents('user-repository');
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:110
 - [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:102
 - [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:134
+- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:157
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:153
 - [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:73
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:145
@@ -200,5 +207,7 @@ const impacted = builder.getDependents('user-repository');
 - [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:67
 - [[ConnectivityValidator]] → /home/user/tsdoc-edge/managed/utilities/ConnectivityValidator.md:103
 - [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:87
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:141
 - [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:87
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:105
 

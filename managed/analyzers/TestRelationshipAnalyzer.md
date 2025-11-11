@@ -38,6 +38,8 @@ interface TestCoverage {
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:152
 - [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:21
 - [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:21
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:70
 - [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:8
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:22
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:82
 

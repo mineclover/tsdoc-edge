@@ -64,18 +64,31 @@ tsdoc-edge orphans --type=function
 
 - [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:58
 - [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:209
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:265
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:252
 - [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:22
+- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:35
 - [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:36
 - [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:388
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:249
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:64
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:252
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:26
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:51
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:59
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:127
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:272
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:120
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:296
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:320
 - [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:132
 - [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:139
 - [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:113
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:28
 - [[Relationship Standard Format]] → /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:171
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:29
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:61
+- [[Event Flow]] → /home/user/tsdoc-edge/managed/relationships/event-flow.md:53
 - [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:53
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:73
 

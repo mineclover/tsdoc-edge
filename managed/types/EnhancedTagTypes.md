@@ -202,3 +202,14 @@ tsdoc-edge improve src/services/UserService.ts
 - [[ModuleSpecTypes]]: 7-part framework
 - [[EnhancedDocExtractor]]: Extracts enhanced docs
 - [[StrictModeValidator]]: Validates completeness
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:276
+- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:256
+- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:102
+

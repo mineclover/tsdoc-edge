@@ -130,5 +130,8 @@ tsdoc-edge validate
 
 ### Referenced By
 
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:38
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:43
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:38
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:121
 

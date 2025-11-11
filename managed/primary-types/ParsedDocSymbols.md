@@ -120,8 +120,12 @@ Uses [[DatabaseManager]] for sessions.
 
 - [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:128
 - [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:80
+- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:95
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:23
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:29
+- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:44
 - [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:20
 - [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:26
+- [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:39
+- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:85
 

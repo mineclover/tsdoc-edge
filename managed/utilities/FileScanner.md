@@ -80,5 +80,8 @@ Returns:
 
 ### Referenced By
 
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:211
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:92
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:41
 - [[String Utilities]] → /home/user/tsdoc-edge/managed/utilities/StringUtilities.md:55
 

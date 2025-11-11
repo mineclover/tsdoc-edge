@@ -374,6 +374,11 @@ if (configManager.exists()) {
 
 ### Referenced By
 
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:69
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:32
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:30
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:31
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:32
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:60
 - [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:81
 - [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:86

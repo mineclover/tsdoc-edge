@@ -25,12 +25,16 @@
 
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:93
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:186
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:218
 - [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:75
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:73
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:220
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:247
 - [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:136
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:137
 - [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:190
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:116
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:130
 - [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:145
 - [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:129
 - [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:160

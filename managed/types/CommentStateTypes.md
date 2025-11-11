@@ -183,3 +183,14 @@ contentHash = sha256(fullComment);
 - [[CommentStateManager]]: Manages state
 - [[CommentExporter]]: Exports to markdown
 - [[CommentImporter]]: Imports from markdown
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CommentExporter]] → /home/user/tsdoc-edge/managed/fold/CommentExporter.md:33
+- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:33
+- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:33
+

@@ -66,20 +66,34 @@ tsdoc-edge orphans
 - [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:15
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:82
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:160
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:205
 - [[DependencyChainAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:22
 - [[DependencyResolver]] → /home/user/tsdoc-edge/managed/analyzers/DependencyResolver.md:22
 - [[DomainStructureAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DomainStructureAnalyzer.md:22
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:251
 - [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:35
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:86
 - [[VisualizeDepsCommand]] → /home/user/tsdoc-edge/managed/commands/VisualizeDepsCommand.md:21
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:251
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:251
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:26
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:50
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:57
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:125
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:271
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:27
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:295
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:319
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:32
 - [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:40
 - [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:112
 - [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:118
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:23
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:29
+- [[Enhancement]] → /home/user/tsdoc-edge/managed/relationships/enhancement.md:48
 - [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:50
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:75
+- [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:69
+- [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:96
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:134
 

@@ -98,4 +98,5 @@ tsdoc-edge spec-bump managed/features/work-context.md --minor
 ### Referenced By
 
 - [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:67
+- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:77
 

@@ -27,11 +27,14 @@ Map test files to implementation (`*.test.ts` → source).
 - [[IntegrationCoverageCalculator]] → /home/user/tsdoc-edge/managed/analyzers/IntegrationCoverageCalculator.md:22
 - [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:22
 - [[TestRelationshipAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestRelationshipAnalyzer.md:22
+- [[TestRelationshipAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestRelationshipAnalyzer.md:35
 - [[TestRelationshipExtractor]] → /home/user/tsdoc-edge/managed/analyzers/TestRelationshipExtractor.md:23
 - [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:22
+- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:32
 - [[Phase5Commands]] → /home/user/tsdoc-edge/managed/commands/Phase5Commands.md:21
 - [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:22
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:54
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:60
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:323
 - [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:38
 

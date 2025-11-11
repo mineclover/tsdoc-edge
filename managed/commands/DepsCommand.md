@@ -158,6 +158,23 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Referenced By
 
-- [[Core Workflow]] → Features dependency analysis
-- [[Symbol Graph]] → Part of graph query system
-- [[QueryCommands]] → Listed in query command group
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:126
+- [[TreeCommand]] → /home/user/tsdoc-edge/managed/commands/TreeCommand.md:120
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:83
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:133
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:113
+- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:250
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:69
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:114
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:194
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:85
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:137
+- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:98
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:122
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:169
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:173
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:173
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:25
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:20
+- [[InterfaceTypes]] → /home/user/tsdoc-edge/managed/types/InterfaceTypes.md:85
+

@@ -29,6 +29,8 @@ Supports:
 ### Referenced By
 
 - [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:23
+- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:31
 - [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:22
+- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:31
 - [[CommentStateTypes]] → /home/user/tsdoc-edge/managed/types/CommentStateTypes.md:113
 

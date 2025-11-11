@@ -20,3 +20,13 @@ Type analysis and interface dependency features.
 
 - [[Type Dependency]]: Type relationships
 - [[InterfaceAnalyzer]]: Interface analysis
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:30
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:25
+

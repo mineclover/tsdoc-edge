@@ -546,7 +546,11 @@ Please add integration tests before committing.
 
 ### Referenced By
 
+- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:30
+- [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:30
 - [[Phase5Commands]] → /home/user/tsdoc-edge/managed/commands/Phase5Commands.md:22
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:31
 - [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:186
+- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:262
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:287
 

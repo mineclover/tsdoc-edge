@@ -66,6 +66,9 @@ const symbols = index.docToSymbol.get('managed/services.md');
 ### Referenced By
 
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:188
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:76
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:120
 - [[LinkingTypes]] → /home/user/tsdoc-edge/managed/types/LinkingTypes.md:67
 - [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:62
+- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:73
 

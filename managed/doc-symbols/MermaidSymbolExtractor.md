@@ -19,7 +19,7 @@ Parses:
 
 ## Related
 
-- [[Parse Mermaid Command]]: CLI interface
+- [[ParseMermaidCommand]]: CLI interface
 - [[Document Symbol System]]: Symbol integration
 
 ---
@@ -28,6 +28,8 @@ Parses:
 
 ### Referenced By
 
+- [[ParseMermaidCommand]] → /home/user/tsdoc-edge/managed/commands/ParseMermaidCommand.md:54
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:168
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:94
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:125
 - [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:66

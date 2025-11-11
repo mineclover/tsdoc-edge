@@ -28,6 +28,7 @@ Promote auxiliary symbols to primary definitions.
 ### Referenced By
 
 - [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:92
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:162
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:63
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:105
 

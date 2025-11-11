@@ -386,21 +386,64 @@ tsdoc-edge tree
 
 ### Referenced By
 
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:195
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:196
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:261
+- [[DependencyChainAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:36
+- [[DependencyResolver]] → /home/user/tsdoc-edge/managed/analyzers/DependencyResolver.md:35
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:30
+- [[TypeChainTracer]] → /home/user/tsdoc-edge/managed/analyzers/TypeChainTracer.md:34
+- [[TypeChainTracer]] → /home/user/tsdoc-edge/managed/analyzers/TypeChainTracer.md:35
+- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:27
+- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:34
+- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:31
+- [[AnalyzeIOCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeIOCommand.md:33
+- [[AnalyzeTypesCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTypesCommand.md:32
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:76
+- [[TreeCommand]] → /home/user/tsdoc-edge/managed/commands/TreeCommand.md:204
+- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:30
 - [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:236
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:234
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:235
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:236
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:237
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:238
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:239
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:240
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:257
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:270
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:271
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:279
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:280
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:281
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:81
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:286
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:334
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:335
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:142
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:166
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:167
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:176
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:177
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:178
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:207
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:235
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:236
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:246
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:247
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:248
+- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:154
+- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:155
+- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:156
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:265
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:278
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:279
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:115
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:116
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:117
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:118
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:119
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:120
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:121
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:122
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:123
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:124
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:125
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:99
 
 ### Implemented By
 
