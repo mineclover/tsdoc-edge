@@ -23,7 +23,7 @@ tsdoc-edge explore-entrypoint managed/relationships/index.md --detect-orphans
 tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-structure.mmd
 ```
 
-## Status: 13/27 Implemented (48%)
+## Status: 14/27 Implemented (52%)
 
 **Version**: 2.0
 **Last Updated**: 2025-11-11
@@ -165,19 +165,19 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 
 **Phase 1 (10/10 ✅)**: code-dependency, inheritance, implementation, io-dependency, pipeline, calls, test-coverage, type-dependency, generic-constraint, circular-dependency
 
-**Phase 2 (3/7 🔧)**: event-flow ✅, callback ✅, composition ✅, temporal-order, collaboration, substitution, fallback
+**Phase 2 (4/7 🔧)**: event-flow ✅, callback ✅, composition ✅, substitution ✅, temporal-order, collaboration, fallback
 
 **Phase 3 (0/6 📋)**: doc-reference, enhancement, layer-dependency, module-boundary, mutual-exclusion, co-requirement
 
 **Phase 4 (0/4 🔮)**: conceptual-relation, feature-grouping, integration-verification
 
 **Total Types**: 27 across 10 categories
-**Implemented**: 13 (48%)
-**Remaining**: 14 (52%)
+**Implemented**: 14 (52%)
+**Remaining**: 13 (48%)
 
 ## Statistics
 
-**Total**: 36,165+ relationships (108 composition, 7 callback, 0 event-flow, 36,050+ others)
+**Total**: 38,245+ relationships (108 composition, 7 callback, 0 event-flow, 2080 substitution, 36,050+ others)
 **Coverage**: 7.0% symbols, 19.0% files (from explore-entrypoint)
 
 ## Validation
