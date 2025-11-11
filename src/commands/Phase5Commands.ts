@@ -47,6 +47,8 @@ interface RegistryEntryNode {
  * @public
  * @responsibility Show dependencies of a symbol from registry
  * @contract Reads registry, finds symbol, displays all dependencies
+ * @doc [[DepsCommand]]
+ * @doc [[CLI Commands#deps]]
  *
  * @problem Need to understand what a symbol depends on
  * @solves Displays all dependencies with their types and reasons
@@ -169,6 +171,8 @@ export class DepsCommand extends BaseCommand {
  * @public
  * @responsibility Show reverse dependencies from registry
  * @contract Reads registry, finds symbol, displays all usages
+ * @doc [[UsedByCommand]]
+ * @doc [[CLI Commands#used-by]]
  *
  * @problem Need to understand what uses a given symbol
  * @solves Displays all reverse dependencies with details
@@ -291,6 +295,8 @@ export class UsedByCommand extends BaseCommand {
  * @public
  * @responsibility Show reverse dependencies from database (by name)
  * @contract Searches database by name, builds graph, displays dependents
+ * @doc [[WhoUsesCommand]]
+ * @doc [[CLI Commands#who-uses]]
  *
  * @problem Need to find all usages of a symbol by its name
  * @solves Searches database by symbol name and shows all dependents
@@ -482,6 +488,8 @@ export class WhoUsesCommand extends BaseCommand {
  * @public
  * @responsibility Find symbols with no dependencies or usages
  * @contract Reads registry, identifies orphans, displays results
+ * @doc [[OrphansCommand]]
+ * @doc [[CLI Commands#orphans]]
  *
  * @problem Need to identify unused or disconnected symbols
  * @solves Finds symbols that are neither used nor use others
@@ -586,6 +594,8 @@ export class OrphansCommand extends BaseCommand {
  * @public
  * @responsibility Find symbols without documentation
  * @contract Loads database, builds graph, finds undocumented symbols
+ * @doc [[UndocumentedCommand]]
+ * @doc [[CLI Commands#undocumented]]
  *
  * @problem Need to identify symbols lacking documentation
  * @solves Searches for symbols without summary or TSDoc
@@ -722,6 +732,8 @@ export class UndocumentedCommand extends BaseCommand {
  * @public
  * @responsibility Display symbol hierarchy as tree structure
  * @contract Reads registry, builds hierarchy, displays tree
+ * @doc [[TreeCommand]]
+ * @doc [[CLI Commands#tree]]
  *
  * @problem Need to visualize symbol relationships as tree
  * @solves Displays hierarchical tree with symbols and their children

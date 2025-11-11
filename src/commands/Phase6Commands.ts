@@ -48,6 +48,8 @@ function findMarkdownFiles(dir: string): string[] {
  * @public
  * @responsibility Check for content similarity across documents
  * @contract Analyzes documents, detects duplicates, suggests actions
+ * @doc [[CheckDuplicatesCommand]]
+ * @doc [[CLI Commands#check-duplicates]]
  *
  * @problem Documentation may have duplicate or highly similar content
  * @solves Detects content similarity and suggests merging or cross-referencing
@@ -224,6 +226,8 @@ export class CheckDuplicatesCommand extends BaseCommand {
  * @public
  * @responsibility Manage document lifecycle status
  * @contract Validates transitions, updates status, shows statistics
+ * @doc [[SpecStatusCommand]]
+ * @doc [[CLI Commands#spec-status]]
  *
  * @problem Need to track document maturity and readiness
  * @solves Manages status transitions (draft → review → approved → active)
@@ -497,6 +501,8 @@ export class SpecStatusCommand extends BaseCommand {
  * @public
  * @responsibility Find stale and unused documentation
  * @contract Scans documents, detects unused/stale, suggests actions
+ * @doc [[FindUnusedDocsCommand]]
+ * @doc [[CLI Commands#find-unused-docs]]
  *
  * @problem Documentation accumulates over time, some becomes obsolete
  * @solves Identifies unused documents and suggests deletion/archival
@@ -658,6 +664,8 @@ export class FindUnusedDocsCommand extends BaseCommand {
  * @public
  * @responsibility Display version history from Git
  * @contract Reads Git history, shows versions with metadata
+ * @doc [[SpecHistoryCommand]]
+ * @doc [[CLI Commands#spec-history]]
  *
  * @problem Need to track document evolution over time
  * @solves Shows all versions with commit info
