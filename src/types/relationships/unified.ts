@@ -3,7 +3,7 @@
  * @packageDocumentation
  *
  * @responsibility Define comprehensive relationship taxonomy
- * @contract Support all 27 relationship types across 10 categories
+ * @contract Support all 26 relationship types across 10 categories
  *
  * @problem Current system only tracks code dependencies
  * @solves Unified type system for all relationship categories
@@ -20,7 +20,7 @@
  * Relationship type classification
  * @public
  *
- * Total: 27 relationship types across 10 categories
+ * Total: 26 relationship types across 10 categories
  */
 export type RelationshipType =
   // 1. Structural (Code Space)
