@@ -92,6 +92,10 @@ interface WorkContext {
  * Work Context Command - 파일 작업에 필요한 모든 컨텍스트 제공
  *
  * @doc [[WorkContextCommand]]
+ * @requires DatabaseManager
+ * @requires SymbolGraphBuilder
+ * @requires TSDocParser
+ * @requires DocumentSymbolParser
  * @public
  */
 export class WorkContextCommand extends BaseCommand {

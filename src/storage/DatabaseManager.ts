@@ -81,6 +81,7 @@ interface EnhancedDocRow {
  * @depends better-sqlite3, ConfigManager
  * @depType external, internal
  * @depReason High-performance synchronous SQLite driver, configuration paths
+ * @requires ConfigManager
  */
 export class DatabaseManager {
   /**

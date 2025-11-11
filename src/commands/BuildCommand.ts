@@ -38,6 +38,9 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
  * @depends FileScanner, DatabaseManager, SymbolRegistryManager, ConfigManager
  * @depType internal
  * @depReason Core infrastructure for symbol extraction and storage
+ * @requires DatabaseManager
+ * @requires ConfigManager
+ * @requires ASTSymbolExtractor
  *
  * @doc [[BuildCommand]]
  */

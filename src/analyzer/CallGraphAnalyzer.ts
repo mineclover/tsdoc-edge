@@ -39,6 +39,7 @@ interface CallSite {
  *
  * @public
  * @responsibility Detect and analyze function call relationships
+ * @requires SymbolGraph
  */
 export class CallGraphAnalyzer {
   private graph: SymbolGraph;
