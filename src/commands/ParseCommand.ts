@@ -14,6 +14,8 @@ import { EnhancedDocExtractor } from '../parser/EnhancedDocExtractor';
  * @public
  * @responsibility Parse enhanced docs from TypeScript files
  * @contract Extract and display enhanced documentation with completeness metrics
+ * @doc [[Parse Command]]
+ * @doc [[CLI Commands#parse]]
  *
  * @problem Developers need to validate enhanced documentation completeness
  * @solves Parses TypeScript files and extracts enhanced doc tags with completeness scores

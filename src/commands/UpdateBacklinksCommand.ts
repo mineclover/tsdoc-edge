@@ -17,6 +17,8 @@ import { BacklinkGenerator } from '../doc-symbol/BacklinkGenerator';
  * @public
  * @responsibility Update backlinks in all managed documents
  * @contract Parse documents, generate backlinks, update files
+ * @doc [[Update Backlinks Command]]
+ * @doc [[CLI Commands#update-backlinks]]
  *
  * @problem Document backlinks become outdated as references change
  * @solves Automatically regenerates backlinks in all documents

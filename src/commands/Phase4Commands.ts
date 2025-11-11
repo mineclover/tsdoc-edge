@@ -17,6 +17,9 @@ import type { Symbol } from '../types/graph/graph';
 
 /**
  * SuggestCommand - Generate improvement suggestions
+ * @public
+ * @doc [[Suggest Command]]
+ * @doc [[CLI Commands#suggest]]
  */
 export class SuggestCommand extends BaseCommand {
   private checker: CodeHealthChecker;
@@ -164,6 +167,9 @@ export class SuggestCommand extends BaseCommand {
 
 /**
  * InitCommand - Initialize configuration
+ * @public
+ * @doc [[Init Command]]
+ * @doc [[CLI Commands#init]]
  */
 export class InitCommand extends BaseCommand {
   /**
@@ -273,6 +279,9 @@ export class InitCommand extends BaseCommand {
 
 /**
  * IdNewCommand - Generate new symbol ID
+ * @public
+ * @doc [[ID New Command]]
+ * @doc [[CLI Commands#id-new]]
  */
 export class IdNewCommand extends BaseCommand {
   constructor(private manager?: SymbolRegistryManager) {
@@ -383,6 +392,9 @@ export class IdNewCommand extends BaseCommand {
 
 /**
  * ValidateSpecCommand - Validate specification completeness
+ * @public
+ * @doc [[Validate Spec Command]]
+ * @doc [[CLI Commands#validate-spec]]
  */
 export class ValidateSpecCommand extends BaseCommand {
   constructor(private validator?: SpecCompletenessValidator) {
@@ -543,6 +555,9 @@ export class ValidateSpecCommand extends BaseCommand {
 
 /**
  * GenerateDocsCommand - Generate markdown docs from enhanced docs
+ * @public
+ * @doc [[Generate Docs Command]]
+ * @doc [[CLI Commands#generate-docs]]
  */
 export class GenerateDocsCommand extends BaseCommand {
   private extractor: EnhancedDocExtractor;

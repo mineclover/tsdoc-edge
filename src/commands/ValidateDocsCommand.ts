@@ -15,6 +15,8 @@ import { DocumentSymbolRegistry } from '../doc-symbol/DocumentSymbolRegistry';
  * @public
  * @responsibility Validate document symbols against SSOT rules
  * @contract Parse documents, validate symbols, report errors and warnings
+ * @doc [[Validate Docs Command]]
+ * @doc [[CLI Commands#validate-docs]]
  *
  * @problem Document symbols can have conflicts, orphans, or missing definitions
  * @solves Validates all document symbols and reports SSOT violations

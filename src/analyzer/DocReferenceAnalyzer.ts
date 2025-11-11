@@ -145,8 +145,18 @@ export class DocReferenceAnalyzer {
    * @private
    */
   private createRelationship(connection: CodeConnection): UnifiedRelationship | null {
-    // Check if code symbol exists in graph
-    const codeSymbol = this.graph.symbols.get(connection.codeSymbol);
+    // Find code symbol in graph by name (symbols use format: type-lowercasename)
+    let codeSymbol = null;
+    let symbolId = '';
+
+    for (const [id, symbol] of this.graph.symbols.entries()) {
+      if (symbol.name === connection.codeSymbol) {
+        codeSymbol = symbol;
+        symbolId = id;
+        break;
+      }
+    }
+
     if (!codeSymbol) {
       return null;
     }
@@ -155,9 +165,9 @@ export class DocReferenceAnalyzer {
     const sectionPart = connection.section ? `#${connection.section}` : '';
 
     return {
-      id: `doc-reference-${connection.codeSymbol}-${connection.docSymbol}-${connection.line}`,
+      id: `doc-reference-${symbolId}-${connection.docSymbol}-${connection.line}`,
       type: 'doc-reference',
-      from: connection.codeSymbol,
+      from: symbolId,
       to: connection.docSymbol,
       direction: 'unidirectional',
       strength: 'strong',
