@@ -106,6 +106,7 @@ import { RelationshipStatsCommand } from './commands/RelationshipStatsCommand';
 import { RenameCommand } from './commands/RenameCommand';
 import { MoveCommand } from './commands/MoveCommand';
 import { SymbolRenameCommand } from './commands/SymbolRenameCommand';
+import { TaskListCommand, TaskAddCommand, TaskUpdateCommand, TaskStatsCommand } from './commands/TaskCommands';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -227,6 +228,10 @@ async function main(): Promise<void> {
   registry.register(new RenameCommand());
   registry.register(new MoveCommand());
   registry.register(new SymbolRenameCommand());
+  registry.register(new TaskListCommand());
+  registry.register(new TaskAddCommand());
+  registry.register(new TaskUpdateCommand());
+  registry.register(new TaskStatsCommand());
   registry.register(new HelpCommand(registry));
 
   // Get command
