@@ -68,6 +68,7 @@ import { AnalyzeChainsCommand } from './commands/AnalyzeChainsCommand';
 import { AnalyzeCallsCommand } from './commands/AnalyzeCallsCommand';
 import { AnalyzeTestsCommand } from './commands/AnalyzeTestsCommand';
 import { AnalyzeTypesCommand } from './commands/AnalyzeTypesCommand';
+import { AnalyzeCompositionCommand } from './commands/AnalyzeCompositionCommand';
 import { AnalyzeEventsCommand } from './commands/AnalyzeEventsCommand';
 import { AnalyzeCallbacksCommand } from './commands/AnalyzeCallbacksCommand';
 import { AnalyzeConstraintsCommand } from './commands/AnalyzeConstraintsCommand';
@@ -164,6 +165,7 @@ async function main(): Promise<void> {
   registry.register(new SyncCoverageCommand());
   registry.register(new AnalyzeChainsCommand());
   registry.register(new AnalyzeCallsCommand());
+  registry.register(new AnalyzeCompositionCommand());
   registry.register(new AnalyzeTestsCommand());
   registry.register(new AnalyzeTypesCommand());
   registry.register(new AnalyzeIOCommand());

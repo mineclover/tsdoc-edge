@@ -23,7 +23,7 @@ tsdoc-edge explore-entrypoint managed/relationships/index.md --detect-orphans
 tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-structure.mmd
 ```
 
-## Status: 10/27 Implemented (37%)
+## Status: 13/27 Implemented (48%)
 
 **Version**: 2.0
 **Last Updated**: 2025-11-11
@@ -72,9 +72,12 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 - **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
 - **Doc**: [PIPELINE.md](./PIPELINE.md)
 
-### [[Event Flow]] ❌
+### [[Event Flow]] ✅
 - **Pattern**: `emit()` / `on()`
-- **Status**: Phase 2
+- **Impl**: [[EventFlowAnalyzer]] (`src/analyzer/EventFlowAnalyzer.ts`)
+- **Cmd**: [[AnalyzeEventsCommand]] (`src/commands/AnalyzeEventsCommand.ts`)
+- **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- **Doc**: [event-flow.md](./event-flow.md)
 
 ## 3. Behavior Space (동적)
 
@@ -86,13 +89,19 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 - **Analysis**: Call detection via AST analysis (also known as CallRelationshipAnalyzer, CallAnalyzer)
 - **Doc**: [CALLS.md](./CALLS.md)
 
-### [[Callback Pattern]] ❌
+### [[Callback Pattern]] ✅ 7
 - **Pattern**: `function(cb: () => void)`
-- **Status**: Phase 2
+- **Impl**: [[CallbackAnalyzer]] (`src/analyzer/CallbackAnalyzer.ts`)
+- **Cmd**: [[AnalyzeCallbacksCommand]] (`src/commands/AnalyzeCallbacksCommand.ts`)
+- **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- **Doc**: [CALLBACK.md](./CALLBACK.md)
 
-### [[Composition Relationship]] ❌
+### [[Composition Relationship]] ✅ 108
 - **Pattern**: `class A { b: B }`
-- **Status**: Phase 2
+- **Impl**: [[CompositionAnalyzer]] (`src/analyzer/CompositionAnalyzer.ts`)
+- **Cmd**: [[AnalyzeCompositionCommand]] (`src/commands/AnalyzeCompositionCommand.ts`)
+- **Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- **Doc**: [COMPOSITION.md](./COMPOSITION.md)
 
 ## 4. Meta Space (인지적)
 
@@ -156,19 +165,19 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 
 **Phase 1 (10/10 ✅)**: code-dependency, inheritance, implementation, io-dependency, pipeline, calls, test-coverage, type-dependency, generic-constraint, circular-dependency
 
-**Phase 2 (0/7 ⏳)**: event-flow, callback, composition, temporal-order, collaboration, substitution, fallback
+**Phase 2 (3/7 🔧)**: event-flow ✅, callback ✅, composition ✅, temporal-order, collaboration, substitution, fallback
 
 **Phase 3 (0/6 📋)**: doc-reference, enhancement, layer-dependency, module-boundary, mutual-exclusion, co-requirement
 
 **Phase 4 (0/4 🔮)**: conceptual-relation, feature-grouping, integration-verification
 
 **Total Types**: 27 across 10 categories
-**Implemented**: 10 (37%)
-**Remaining**: 17 (63%)
+**Implemented**: 13 (48%)
+**Remaining**: 14 (52%)
 
 ## Statistics
 
-**Total**: 36,050+ relationships
+**Total**: 36,165+ relationships (108 composition, 7 callback, 0 event-flow, 36,050+ others)
 **Coverage**: 7.0% symbols, 19.0% files (from explore-entrypoint)
 
 ## Validation

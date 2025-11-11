@@ -171,60 +171,64 @@ export class EventFlowAnalyzer {
     consumptions: EventConsumption[]
   ): void {
     const visit = (node: ts.Node): void => {
-      // Pattern 1: EventEmitter - .emit('eventName', data)
-      if (ts.isCallExpression(node)) {
-        const expression = node.expression;
+      try {
+        // Pattern 1: EventEmitter - .emit('eventName', data)
+        if (ts.isCallExpression(node)) {
+          const expression = node.expression;
 
-        if (ts.isPropertyAccessExpression(expression)) {
-          const methodName = expression.name.text;
-          const objectExpression = expression.expression;
+          if (ts.isPropertyAccessExpression(expression)) {
+            const methodName = expression.name.text;
+            const objectExpression = expression.expression;
 
-          // Emit patterns
-          if (methodName === 'emit' || methodName === 'trigger' || methodName === 'dispatchEvent') {
-            const eventName = this.extractEventName(node.arguments[0]);
-            if (eventName) {
-              const symbolId = this.findSymbolIdForNode(objectExpression, sourceFile);
-              if (symbolId) {
-                const line = sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1;
+            // Emit patterns
+            if (methodName === 'emit' || methodName === 'trigger' || methodName === 'dispatchEvent') {
+              const eventName = this.extractEventName(node.arguments[0]);
+              if (eventName) {
+                const symbolId = this.findSymbolIdForNode(objectExpression, sourceFile);
+                if (symbolId) {
+                  const line = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
 
-                emissions.push({
-                  symbolId,
-                  symbolName: this.getSymbolName(symbolId),
-                  eventName,
-                  filePath,
-                  line,
-                  pattern: methodName === 'dispatchEvent' ? 'dispatchEvent' : 'emit',
-                });
+                  emissions.push({
+                    symbolId,
+                    symbolName: this.getSymbolName(symbolId),
+                    eventName,
+                    filePath,
+                    line,
+                    pattern: methodName === 'dispatchEvent' ? 'dispatchEvent' : 'emit',
+                  });
+                }
               }
             }
-          }
 
-          // Consumption patterns
-          if (
-            methodName === 'on' ||
-            methodName === 'addEventListener' ||
-            methodName === 'subscribe' ||
-            methodName === 'listen' ||
-            methodName === 'once'
-          ) {
-            const eventName = this.extractEventName(node.arguments[0]);
-            if (eventName) {
-              const symbolId = this.findSymbolIdForNode(objectExpression, sourceFile);
-              if (symbolId) {
-                const line = sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1;
+            // Consumption patterns
+            if (
+              methodName === 'on' ||
+              methodName === 'addEventListener' ||
+              methodName === 'subscribe' ||
+              methodName === 'listen' ||
+              methodName === 'once'
+            ) {
+              const eventName = this.extractEventName(node.arguments[0]);
+              if (eventName) {
+                const symbolId = this.findSymbolIdForNode(objectExpression, sourceFile);
+                if (symbolId) {
+                  const line = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
 
-                consumptions.push({
-                  symbolId,
-                  symbolName: this.getSymbolName(symbolId),
-                  eventName,
-                  filePath,
-                  line,
-                  pattern: methodName === 'addEventListener' ? 'addEventListener' : 'on',
-                });
+                  consumptions.push({
+                    symbolId,
+                    symbolName: this.getSymbolName(symbolId),
+                    eventName,
+                    filePath,
+                    line,
+                    pattern: methodName === 'addEventListener' ? 'addEventListener' : 'on',
+                  });
+                }
               }
             }
           }
         }
+      } catch (error) {
+        // Skip nodes that cause errors (e.g., synthetic nodes)
       }
 
       ts.forEachChild(node, visit);
