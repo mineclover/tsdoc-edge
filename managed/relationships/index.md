@@ -23,7 +23,11 @@ tsdoc-edge explore-entrypoint managed/relationships/index.md --detect-orphans
 tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-structure.mmd
 ```
 
-## Status: 10/17 Implemented (59%)
+## Status: 10/27 Implemented (37%)
+
+**Version**: 2.0
+**Last Updated**: 2025-11-11
+**Source**: `src/types/relationships/unified.ts`
 
 ## 1. Code Space (구조적)
 
@@ -150,11 +154,17 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 
 ## Roadmap
 
-**Phase 1 (10/10 ✅)**: code-dependency, inheritance, interface-impl, io-dependency, pipeline, calls, test-coverage, type-dependency, generic-constraint, circular
+**Phase 1 (10/10 ✅)**: code-dependency, inheritance, implementation, io-dependency, pipeline, calls, test-coverage, type-dependency, generic-constraint, circular-dependency
 
-**Phase 2 (0/3)**: event-flow, callback, composition
+**Phase 2 (0/7 ⏳)**: event-flow, callback, composition, temporal-order, collaboration, substitution, fallback
 
-**Phase 3 (0/4)**: doc-reference, enhancement, layer-dependency, module-boundary
+**Phase 3 (0/6 📋)**: doc-reference, enhancement, layer-dependency, module-boundary, mutual-exclusion, co-requirement
+
+**Phase 4 (0/4 🔮)**: conceptual-relation, feature-grouping, integration-verification
+
+**Total Types**: 27 across 10 categories
+**Implemented**: 10 (37%)
+**Remaining**: 17 (63%)
 
 ## Statistics
 
@@ -191,7 +201,7 @@ sqlite3 .tsdoc/symbols.db "SELECT type, COUNT(*) FROM unified_relationships GROU
 
 ---
 
-**Last Updated**: 2025-11-08
+**Last Updated**: 2025-11-11
 
 ---
 
