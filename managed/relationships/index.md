@@ -82,11 +82,11 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 - **Analysis**: Call detection via AST analysis (also known as CallRelationshipAnalyzer, CallAnalyzer)
 - **Doc**: [CALLS.md](./CALLS.md)
 
-### [[Callback]] ❌
+### [[Callback Pattern]] ❌
 - **Pattern**: `function(cb: () => void)`
 - **Status**: Phase 2
 
-### [[Composition]] ❌
+### [[Composition Relationship]] ❌
 - **Pattern**: `class A { b: B }`
 - **Status**: Phase 2
 

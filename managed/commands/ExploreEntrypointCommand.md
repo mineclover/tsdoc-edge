@@ -28,7 +28,7 @@ Explore entrypoint and discover connected symbols.
 
 ### Referenced By
 
-- [[Parse Mermaid Command]] → /home/user/tsdoc-edge/managed/commands/ParseMermaidCommand.md:38
+- [[ParseMermaidCommand]] → /home/user/tsdoc-edge/managed/commands/ParseMermaidCommand.md:38
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:47
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:88
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:106

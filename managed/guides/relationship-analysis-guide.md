@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# Relationship Analysis Guide
+# [[Relationship Analysis Guide]]
 
 > **Complete guide** to analyzing relationships between symbols in your TypeScript codebase
 

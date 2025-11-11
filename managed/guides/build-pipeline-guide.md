@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# Build Pipeline Guide
+# [[Build Pipeline Guide]]
 
 > **Complete guide** to the TSDoc Edge build pipeline from source code to queryable symbol graph
 

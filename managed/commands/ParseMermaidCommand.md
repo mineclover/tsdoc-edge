@@ -1,4 +1,6 @@
-# [[Parse Mermaid Command]]
+# [[ParseMermaidCommand]]
+
+Parse Mermaid diagram (.mmd) and extract symbols and relationships.
 
 **Source**: `src/commands/ParseMermaidCommand.ts`
 
