@@ -50,8 +50,10 @@ const connections: CodeConnection[] = parser.parseCodeFile('src/file.ts');
 ### Referenced By
 
 - [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:68
-- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:84
-- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:85
+- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:90
+- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:91
+- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:92
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:30
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:43
+- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:44
 

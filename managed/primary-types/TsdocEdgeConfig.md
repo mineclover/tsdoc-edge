@@ -131,17 +131,23 @@ const dbPath = config.paths.databasePath;
 
 ### Referenced By
 
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:83
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:169
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:170
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:36
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:37
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:224
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:88
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:174
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:175
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:39
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:40
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:23
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:38
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:39
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:100
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:151
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:291
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:344
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:158
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:218
 - [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:91
+- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:103
 
 ### Implemented By
 

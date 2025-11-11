@@ -27,5 +27,5 @@ Extracts:
 
 ### Referenced By
 
-- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:93
+- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:97
 

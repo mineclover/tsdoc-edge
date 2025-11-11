@@ -103,7 +103,9 @@ export class MyCommand extends BaseCommand {
 - [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:44
 - [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:50
 - [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:181
+- [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:216
 - [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:130
+- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:164
 - [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:46
 - [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:50
 - [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:40

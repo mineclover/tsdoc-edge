@@ -107,16 +107,21 @@ Parser extracts:
 
 ### Referenced By
 
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:78
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:79
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:47
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:77
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:83
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:84
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:50
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:83
 - [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:118
-- [[MermaidSymbolExtractor]] → /home/user/tsdoc-edge/managed/doc-symbols/MermaidSymbolExtractor.md:33
+- [[MermaidSymbolExtractor]] → /home/user/tsdoc-edge/managed/doc-symbols/MermaidSymbolExtractor.md:35
 - [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:22
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:40
 - [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:77
+- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:100
 - [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:79
+- [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:102
 - [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:22
 - [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:28
 - [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:42
+- [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:43
+- [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:44
 

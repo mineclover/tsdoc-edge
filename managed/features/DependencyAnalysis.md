@@ -248,6 +248,20 @@ tsdoc-edge validate-architecture \
 
 ### Referenced By
 
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:136
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:137
+- [[DetectCircularTypesCommand]] → /home/user/tsdoc-edge/managed/commands/DetectCircularTypesCommand.md:66
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:160
+- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:33
+- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:34
 - [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:88
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:136
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:137
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:138
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:145
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:133
 - [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:150
+- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:169
+- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:170
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:128
 

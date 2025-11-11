@@ -35,11 +35,17 @@ interface TestCoverage {
 ### Referenced By
 
 - [[TestRelationshipExtractor]] → /home/user/tsdoc-edge/managed/analyzers/TestRelationshipExtractor.md:22
+- [[TestRelationshipExtractor]] → /home/user/tsdoc-edge/managed/analyzers/TestRelationshipExtractor.md:31
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:152
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:299
 - [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:21
+- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:30
 - [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:21
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:30
 - [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:70
 - [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:8
 - [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:22
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:23
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:82
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:195
 

@@ -139,15 +139,18 @@ Calls [[SessionCleaner]] to invalidate tokens.
 
 ### Referenced By
 
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:77
-- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:73
-- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:32
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:44
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:82
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:76
+- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:33
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:47
 - [[FrontmatterParser]] → /home/user/tsdoc-edge/managed/parser/FrontmatterParser.md:22
+- [[FrontmatterParser]] → /home/user/tsdoc-edge/managed/parser/FrontmatterParser.md:30
 - [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:80
-- [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:96
-- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:82
+- [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:100
+- [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:101
+- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:88
 - [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:58
 - [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:74
-- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:84
+- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:75
+- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:87
 

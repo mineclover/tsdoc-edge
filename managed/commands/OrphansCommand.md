@@ -194,9 +194,15 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Referenced By
 
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:58
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:247
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:230
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:57
 - [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:106
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:127
+- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:75
 - [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:85
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:135
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:139
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:71
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:82
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:76
@@ -207,4 +213,6 @@ Source: `src/commands/Phase5Commands.ts`
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:183
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:145
 - [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:27
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:279
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:280
 

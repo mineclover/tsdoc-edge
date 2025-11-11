@@ -36,10 +36,15 @@ interface TypeChain {
 ### Referenced By
 
 - [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:19
+- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:27
 - [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:21
+- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:30
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:199
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:207
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:265
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:266
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:158
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:231
 - [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:20
 - [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:21
 

@@ -158,11 +158,16 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Referenced By
 
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:56
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:233
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:55
 - [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:126
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:152
 - [[TreeCommand]] → /home/user/tsdoc-edge/managed/commands/TreeCommand.md:120
 - [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:83
 - [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:133
 - [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:113
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:138
 - [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:250
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:69
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:114
@@ -176,5 +181,7 @@ Source: `src/commands/Phase5Commands.ts`
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:173
 - [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:25
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:20
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:277
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:278
 - [[InterfaceTypes]] → /home/user/tsdoc-edge/managed/types/InterfaceTypes.md:85
 

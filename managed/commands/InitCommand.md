@@ -374,13 +374,17 @@ if (configManager.exists()) {
 
 ### Referenced By
 
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:69
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:32
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:70
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:33
 - [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:30
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:31
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:32
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:60
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:168
 - [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:81
 - [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:86
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:115
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:116
 - [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:92
+- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:100
 

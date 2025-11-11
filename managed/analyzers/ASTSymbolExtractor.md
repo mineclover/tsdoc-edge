@@ -317,26 +317,42 @@ tsdoc-edge parse src/commands/BuildCommand.ts
 
 ### Referenced By
 
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:23
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:35
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:79
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:131
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:170
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:194
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:221
 - [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:256
 - [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:27
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:217
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:276
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:29
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:386
 - [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:51
 - [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:62
 - [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:63
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:64
 - [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:29
 - [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:30
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:212
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:213
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:73
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:159
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:38
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:123
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:259
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:260
 - [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:27
 - [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:116
 - [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:243
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:25
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:139
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:278
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:309
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:310
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:311
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:25
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:260
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:326
@@ -345,23 +361,36 @@ tsdoc-edge parse src/commands/BuildCommand.ts
 - [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:89
 - [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:104
 - [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:105
+- [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:106
+- [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:107
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:31
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:204
 - [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:8
 - [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:18
 - [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:19
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:20
 - [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:8
 - [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:18
 - [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:19
+- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:20
 - [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:10
 - [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:47
 - [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:48
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:49
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:17
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:25
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:33
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:159
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:186
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:187
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:188
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:189
 - [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:69
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:79
 - [[FileScanner]] → /home/user/tsdoc-edge/managed/utilities/FileScanner.md:67
+- [[FileScanner]] → /home/user/tsdoc-edge/managed/utilities/FileScanner.md:76
 - [[String Utilities]] → /home/user/tsdoc-edge/managed/utilities/StringUtilities.md:56
+- [[String Utilities]] → /home/user/tsdoc-edge/managed/utilities/StringUtilities.md:75
 - [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:97
 - [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:98
 

@@ -580,10 +580,12 @@ const confidence = evidence.reduce((sum, ev) => sum + ev.confidence, 0) / eviden
 ### Referenced By
 
 - [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:185
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:203
 - [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:387
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:475
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:250
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:62
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:74
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:133
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:479
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:480
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:266
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:71
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:84
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:140
 

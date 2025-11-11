@@ -362,21 +362,33 @@ console.log(`Average compliance: ${avgScore.toFixed(2)}%`);
 ### Referenced By
 
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:196
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:392
 - [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:29
 - [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:249
 - [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:250
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:227
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:230
 - [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:204
 - [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:250
+- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:251
 - [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:33
+- [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:57
 - [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:30
+- [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:54
 - [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:123
 - [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:155
 - [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:205
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:206
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:207
 - [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:31
+- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:55
 - [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:54
+- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:78
 - [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:32
+- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:56
 - [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:47
+- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:71
 - [[EnhancedTagTypes]] → /home/user/tsdoc-edge/managed/types/EnhancedTagTypes.md:80
+- [[EnhancedTagTypes]] → /home/user/tsdoc-edge/managed/types/EnhancedTagTypes.md:88
 - [[ConventionValidator]] → /home/user/tsdoc-edge/managed/utilities/ConventionValidator.md:175
+- [[ConventionValidator]] → /home/user/tsdoc-edge/managed/utilities/ConventionValidator.md:184
 

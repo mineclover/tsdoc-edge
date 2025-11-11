@@ -546,11 +546,17 @@ Please add integration tests before committing.
 
 ### Referenced By
 
-- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:30
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:206
+- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:31
 - [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:30
 - [[Phase5Commands]] → /home/user/tsdoc-edge/managed/commands/Phase5Commands.md:22
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:31
+- [[Phase5Commands]] → /home/user/tsdoc-edge/managed/commands/Phase5Commands.md:30
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:33
 - [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:186
-- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:262
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:202
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:228
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:247
+- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:264
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:287
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:327
 

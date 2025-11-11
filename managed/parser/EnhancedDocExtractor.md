@@ -453,15 +453,22 @@ export class BuildCommand extends BaseCommand {
 ### Referenced By
 
 - [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:241
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:267
+- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:271
+- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:272
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:183
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:255
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:400
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:260
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:103
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:209
 - [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:24
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:32
+- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:33
+- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:34
 - [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:23
 - [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:38
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:39
 - [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:154
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:207
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:211
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:212
 - [[EnhancedTagTypes]] → /home/user/tsdoc-edge/managed/types/EnhancedTagTypes.md:79
+- [[EnhancedTagTypes]] → /home/user/tsdoc-edge/managed/types/EnhancedTagTypes.md:89
 

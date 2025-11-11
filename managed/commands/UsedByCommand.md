@@ -188,8 +188,17 @@ tsdoc-edge used-by symbol-extractor
 
 ### Referenced By
 
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:63
 - [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:104
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:129
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:130
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:153
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:154
 - [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:114
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:140
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:141
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:142
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:225
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:79
 - [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:86
 - [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:138
@@ -197,4 +206,7 @@ tsdoc-edge used-by symbol-extractor
 - [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:97
 - [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:151
 - [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:167
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:281
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:282
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:254
 

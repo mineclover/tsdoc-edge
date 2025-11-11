@@ -140,31 +140,39 @@ Executable via:
 
 ### Referenced By
 
-- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:33
-- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:30
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:31
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:191
+- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:34
+- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:31
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:33
 - [[AnalyzeIOCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeIOCommand.md:32
-- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:31
+- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:32
 - [[AnalyzeTypesCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTypesCommand.md:31
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:72
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:73
 - [[CommandRegistry]] → /home/user/tsdoc-edge/managed/commands/CommandRegistry.md:30
 - [[CommandRegistry]] → /home/user/tsdoc-edge/managed/commands/CommandRegistry.md:31
-- [[ExploreEntrypointCommand]] → /home/user/tsdoc-edge/managed/commands/ExploreEntrypointCommand.md:32
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:37
-- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:70
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:133
+- [[ExploreEntrypointCommand]] → /home/user/tsdoc-edge/managed/commands/ExploreEntrypointCommand.md:33
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:41
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:71
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:155
 - [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:32
-- [[PromoteSymbolCommand]] → /home/user/tsdoc-edge/managed/commands/PromoteSymbolCommand.md:31
-- [[TreeCommand]] → /home/user/tsdoc-edge/managed/commands/TreeCommand.md:202
-- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:28
-- [[UpdateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateSymbolRefsCommand.md:29
+- [[ParseMermaidCommand]] → /home/user/tsdoc-edge/managed/commands/ParseMermaidCommand.md:56
+- [[PromoteSymbolCommand]] → /home/user/tsdoc-edge/managed/commands/PromoteSymbolCommand.md:32
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:167
+- [[TreeCommand]] → /home/user/tsdoc-edge/managed/commands/TreeCommand.md:203
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:142
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:159
+- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:29
+- [[UpdateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateSymbolRefsCommand.md:30
 - [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:30
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:32
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:34
 - [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:32
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:39
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:75
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:40
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:143
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:76
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:33
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:34
-- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:115
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:83
-- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:93
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:121
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:84
+- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:95
 

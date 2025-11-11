@@ -34,8 +34,12 @@ Trace and display type chains (A → B → C).
 - [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:139
 - [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:100
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:195
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:274
 - [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:101
 - [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:136
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:26
+- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:156
+- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:157
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:29
 - [[TypeChain]] → /home/user/tsdoc-edge/managed/types/TypeChain.md:57
+- [[TypeChain]] → /home/user/tsdoc-edge/managed/types/TypeChain.md:68
 

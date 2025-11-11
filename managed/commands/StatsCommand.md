@@ -250,8 +250,21 @@ fi
 
 ### Referenced By
 
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:60
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:223
+- [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:32
+- [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:33
+- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:32
+- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:33
+- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:32
+- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:33
+- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:34
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:58
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:34
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:31
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:74
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:116
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:222
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:80
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:102
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:78

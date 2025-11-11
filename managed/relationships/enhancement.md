@@ -96,3 +96,14 @@ class Core {
 **Status**: Design/Planning
 **Priority**: Medium
 **Complexity**: Medium (requires pattern recognition)
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:195
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:27
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:73
+

@@ -93,9 +93,13 @@ completeness: 85%
 ### Referenced By
 
 - [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:124
+- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:136
 - [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:62
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:77
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:79
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:80
 - [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:54
 - [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:65
+- [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:66
 - [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:79
+- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:91
 

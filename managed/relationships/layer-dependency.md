@@ -182,5 +182,8 @@ Total: 4 layer violations
 ### Referenced By
 
 - [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:120
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:76
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:88
 - [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:95
+- [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:116
 

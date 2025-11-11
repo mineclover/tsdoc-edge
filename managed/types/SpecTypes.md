@@ -229,8 +229,8 @@ tsdoc-edge find-unused-docs managed
 
 ### Referenced By
 
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:76
-- [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:85
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:78
+- [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:86
 - [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:75
-- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:88
+- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:89
 

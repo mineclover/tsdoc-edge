@@ -100,8 +100,10 @@ tsdoc-edge find-unused-docs managed --safe-only
 
 ### Referenced By
 
-- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:123
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:128
 - [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:125
+- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:137
 - [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:75
-- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:78
+- [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:87
+- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:80
 

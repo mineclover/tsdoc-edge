@@ -28,7 +28,9 @@ Creates:
 
 ### Referenced By
 
-- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:29
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:185
+- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:30
 - [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:33
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:167
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:177
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:178
 

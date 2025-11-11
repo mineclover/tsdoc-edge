@@ -35,8 +35,11 @@ interface ParallelWorkGroup {
 
 ### Referenced By
 
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:160
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:179
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:295
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:91
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:391
 - [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:68
 - [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:260
 

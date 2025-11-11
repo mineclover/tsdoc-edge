@@ -125,19 +125,26 @@ if (report.metrics.overallScore < 70) {
 
 ### Referenced By
 
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:216
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:99
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:102
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:194
-- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:224
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:35
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:36
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:41
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:42
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:239
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:240
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:241
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:242
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:37
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:38
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:45
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:46
 - [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:187
-- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:263
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:289
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:268
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:269
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:319
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:114
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:213
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:293
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:342
 
 ### Implemented By
 

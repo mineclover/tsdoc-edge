@@ -282,22 +282,29 @@ Overall Coverage
 ### Referenced By
 
 - [[MissingLinkDetector]] → /home/user/tsdoc-edge/managed/analyzers/MissingLinkDetector.md:22
+- [[MissingLinkDetector]] → /home/user/tsdoc-edge/managed/analyzers/MissingLinkDetector.md:31
 - [[PreCommitChecker]] → /home/user/tsdoc-edge/managed/analyzers/PreCommitChecker.md:22
+- [[PreCommitChecker]] → /home/user/tsdoc-edge/managed/analyzers/PreCommitChecker.md:32
 - [[SSOTCompletenessCalculator]] → /home/user/tsdoc-edge/managed/analyzers/SSOTCompletenessCalculator.md:22
 - [[SSOTCompletenessCalculator]] → /home/user/tsdoc-edge/managed/analyzers/SSOTCompletenessCalculator.md:30
 - [[SSOTCompletenessCalculator]] → /home/user/tsdoc-edge/managed/analyzers/SSOTCompletenessCalculator.md:31
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:130
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:131
+- [[SSOTCompletenessCalculator]] → /home/user/tsdoc-edge/managed/analyzers/SSOTCompletenessCalculator.md:32
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:135
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:136
 - [[Phase8Commands]] → /home/user/tsdoc-edge/managed/commands/Phase8Commands.md:21
-- [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:220
-- [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:221
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:36
+- [[Phase8Commands]] → /home/user/tsdoc-edge/managed/commands/Phase8Commands.md:30
+- [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:224
+- [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:225
 - [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:37
 - [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:38
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:39
 - [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:57
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:166
-- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:179
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:166
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:167
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:168
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:72
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:175
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:221
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:236
+- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:180
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:171
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:172
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:173
 

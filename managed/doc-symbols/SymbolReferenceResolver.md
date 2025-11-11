@@ -28,7 +28,7 @@ Resolves:
 
 ### Referenced By
 
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:40
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:170
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:91
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:41
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:183
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:92
 

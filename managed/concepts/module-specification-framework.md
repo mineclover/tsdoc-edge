@@ -411,17 +411,26 @@ This framework is inspired by:
 
 - [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:55
 - [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:237
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:71
+- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:268
+- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:269
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:72
 - [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:7
 - [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:152
 - [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:180
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:191
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:192
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:193
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:195
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:196
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:197
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:198
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:199
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:200
 - [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:71
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:224
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:241
 - [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:161
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:193
 - [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:208
-- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:101
-- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:130
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:74
+- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:253
+- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:102
+- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:132
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:75
 

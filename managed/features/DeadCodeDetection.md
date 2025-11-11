@@ -179,6 +179,14 @@ tsdoc-edge orphans --diff origin/main
 
 ### Referenced By
 
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:154
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:157
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:158
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:159
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:171
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:163
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:164
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:135
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:119
 - [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:125
+- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:168
 

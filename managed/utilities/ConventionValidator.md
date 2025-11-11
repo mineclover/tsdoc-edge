@@ -240,8 +240,10 @@ tsdoc-edge validate --strict --json > report.json
 
 ### Referenced By
 
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:277
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:175
+- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:283
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:194
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:42
-- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:133
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:404
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:45
+- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:136
 

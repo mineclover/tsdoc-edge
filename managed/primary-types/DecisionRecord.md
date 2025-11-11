@@ -74,18 +74,24 @@ Part of [[StrictModeValidator]] scoring:
 
 ### Referenced By
 
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:268
+- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:273
 - [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:40
-- [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:54
+- [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:55
+- [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:56
 - [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:147
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:210
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:211
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:216
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:217
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:218
 - [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:40
-- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:55
+- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:56
+- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:57
 - [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:63
-- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:79
+- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:80
+- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:81
 - [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:42
-- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:56
+- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:57
+- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:58
 - [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:56
-- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:72
+- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:73
+- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:74
 

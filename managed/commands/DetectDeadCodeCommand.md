@@ -77,10 +77,12 @@ Warns about:
 
 ### Referenced By
 
-- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:32
+- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:33
 - [[AnalyzeTypesCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTypesCommand.md:30
 - [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:113
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:128
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:129
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:130
 - [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:128
 - [[DataFlowTypes]] → /home/user/tsdoc-edge/managed/types/DataFlowTypes.md:78
+- [[DataFlowTypes]] → /home/user/tsdoc-edge/managed/types/DataFlowTypes.md:88
 

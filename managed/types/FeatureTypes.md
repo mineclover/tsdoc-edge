@@ -152,6 +152,6 @@ tsdoc-edge find-doc user-service
 
 ### Referenced By
 
-- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:75
-- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:86
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:78
+- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:89
 

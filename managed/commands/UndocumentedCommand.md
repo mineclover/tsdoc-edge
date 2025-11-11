@@ -192,12 +192,21 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Referenced By
 
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:248
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:61
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:36
 - [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:129
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:158
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:32
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:72
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:223
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:78
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:100
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:117
 - [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:125
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:190
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:132
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:106
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:98
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:99
 

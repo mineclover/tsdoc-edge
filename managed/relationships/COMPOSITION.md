@@ -295,14 +295,16 @@ tsdoc-edge deps Engine --reverse --type=composition
 ### Referenced By
 
 - [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:390
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:474
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:61
-- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:21
-- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:22
-- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:22
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:28
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:62
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:63
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:477
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:478
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:69
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:24
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:25
+- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:24
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:31
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:69
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:70
 - [[Enhancement]] → /home/user/tsdoc-edge/managed/relationships/enhancement.md:46
+- [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:85
 - [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:97
 

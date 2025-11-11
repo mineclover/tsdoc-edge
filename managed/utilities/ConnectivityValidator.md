@@ -178,10 +178,14 @@ tsdoc-edge check-links
 
 ### Referenced By
 
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:175
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:195
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:41
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:403
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:44
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:129
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:216
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:109
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:140
-- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:104
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:274
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:147
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:107
 

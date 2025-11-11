@@ -31,8 +31,12 @@ Extracts:
 
 - [[ModuleSpecGenerator]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecGenerator.md:31
 - [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:206
-- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:253
+- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:255
+- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:256
 - [[CustomTagTypes]] → /home/user/tsdoc-edge/managed/types/CustomTagTypes.md:118
+- [[CustomTagTypes]] → /home/user/tsdoc-edge/managed/types/CustomTagTypes.md:128
 - [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:109
+- [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:118
 - [[ParseTypes]] → /home/user/tsdoc-edge/managed/types/ParseTypes.md:88
+- [[ParseTypes]] → /home/user/tsdoc-edge/managed/types/ParseTypes.md:97
 

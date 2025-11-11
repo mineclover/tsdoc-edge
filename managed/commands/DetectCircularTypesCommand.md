@@ -83,12 +83,16 @@ Uses DFS (Depth-First Search) to detect cycles:
 
 ### Referenced By
 
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:250
+- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:28
 - [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:82
 - [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:104
+- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:31
 - [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:89
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:203
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:153
 - [[Circular Dependency]] → /home/user/tsdoc-edge/managed/relationships/CIRCULAR.md:8
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:27
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:129
 - [[TypeChain]] → /home/user/tsdoc-edge/managed/types/TypeChain.md:58
 - [[MermaidGenerator]] → /home/user/tsdoc-edge/managed/utilities/MermaidGenerator.md:92

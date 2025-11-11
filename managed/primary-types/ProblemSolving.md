@@ -87,19 +87,26 @@ Part of [[StrictModeValidator]] scoring:
 
 ### Referenced By
 
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:275
+- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:281
 - [[BaseSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:29
+- [[BaseSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:47
 - [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:40
-- [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:62
+- [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:69
+- [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:70
 - [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:37
-- [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:59
+- [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:66
+- [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:67
 - [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:144
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:220
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:221
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:231
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:232
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:233
 - [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:38
-- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:60
+- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:67
+- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:68
 - [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:61
-- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:84
+- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:91
+- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:92
 - [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:39
-- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:61
+- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:68
+- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:69
 

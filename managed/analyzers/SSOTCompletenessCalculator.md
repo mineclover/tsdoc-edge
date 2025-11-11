@@ -30,4 +30,6 @@ Measures:
 - [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:110
 - [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:142
 - [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:160
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:161
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:162
 

@@ -25,12 +25,19 @@
 ### Referenced By
 
 - [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:88
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:163
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:170
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:171
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:65
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:142
 - [[BacklinkGenerator]] → /home/user/tsdoc-edge/managed/doc-symbols/BacklinkGenerator.md:22
+- [[BacklinkGenerator]] → /home/user/tsdoc-edge/managed/doc-symbols/BacklinkGenerator.md:31
 - [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:122
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:167
 - [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:52
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:181
 - [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:65
+- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:95
 - [[Doc Reference]] → /home/user/tsdoc-edge/managed/relationships/doc-reference.md:41
 - [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:64
+- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:73
 

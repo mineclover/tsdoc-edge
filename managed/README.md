@@ -7,7 +7,7 @@ canonical: true
 entrypoint: true
 ---
 
-# TSDoc Edge Documentation
+# [[TSDoc Edge Documentation]]
 
 > **SSOT Platform**: Track every symbol, relationship, and dependency in your TypeScript codebase
 

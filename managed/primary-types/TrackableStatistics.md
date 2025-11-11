@@ -139,17 +139,24 @@ console.log(`Critical symbols documented: ${criticalStats.documented}/${critical
 
 ### Referenced By
 
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:222
 - [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:22
+- [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:35
 - [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:21
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:33
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:34
+- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:35
+- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:36
+- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:37
 - [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:22
-- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:32
-- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:33
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:37
+- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:36
+- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:37
+- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:38
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:39
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:175
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:176
 - [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:22
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:290
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:93
+- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:31
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:320
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:94
 
 ### Implemented By
 

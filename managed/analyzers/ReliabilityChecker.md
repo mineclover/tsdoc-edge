@@ -26,6 +26,8 @@ Check work context reliability and accuracy.
 
 ### Referenced By
 
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:161
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:189
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:297
 - [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:69
 

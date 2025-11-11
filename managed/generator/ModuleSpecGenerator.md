@@ -28,7 +28,11 @@ Creates:
 ### Referenced By
 
 - [[ModuleSpecMarkdownFormatter]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecMarkdownFormatter.md:22
+- [[ModuleSpecMarkdownFormatter]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecMarkdownFormatter.md:30
 - [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:23
+- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:32
 - [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:90
+- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:103
 - [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:119
+- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:133
 

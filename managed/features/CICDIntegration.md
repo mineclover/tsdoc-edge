@@ -285,7 +285,16 @@ Cache TSDoc database between runs:
 
 ### Referenced By
 
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:156
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:169
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:170
 - [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:143
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:144
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:145
 - [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:160
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:161
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:162
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:42
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:43
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:118
 

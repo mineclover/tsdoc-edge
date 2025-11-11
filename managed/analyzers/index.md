@@ -316,58 +316,64 @@ Storage (SQLite + JSONL)
 ### Referenced By
 
 - [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:235
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:191
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:125
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:157
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:193
 - [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:258
-- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:213
-- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:214
-- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:215
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:221
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:222
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:223
 - [[CoverageParser]] → /home/user/tsdoc-edge/managed/analyzers/CoverageParser.md:32
 - [[CoverageSyncAdapter]] → /home/user/tsdoc-edge/managed/analyzers/CoverageSyncAdapter.md:30
-- [[DataFlowAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DataFlowAnalyzer.md:28
+- [[DataFlowAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DataFlowAnalyzer.md:29
 - [[DependencyChainAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:32
-- [[DependencyResolver]] → /home/user/tsdoc-edge/managed/analyzers/DependencyResolver.md:31
-- [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:143
+- [[DependencyResolver]] → /home/user/tsdoc-edge/managed/analyzers/DependencyResolver.md:32
+- [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:145
 - [[DomainStructureAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DomainStructureAnalyzer.md:30
 - [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:28
 - [[ImportanceClassifier]] → /home/user/tsdoc-edge/managed/analyzers/ImportanceClassifier.md:30
 - [[IntegrationCoverageCalculator]] → /home/user/tsdoc-edge/managed/analyzers/IntegrationCoverageCalculator.md:30
 - [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:29
-- [[InterfaceDependencyMapper]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceDependencyMapper.md:31
-- [[IstanbulCoverageAdapter]] → /home/user/tsdoc-edge/managed/analyzers/IstanbulCoverageAdapter.md:31
+- [[InterfaceDependencyMapper]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceDependencyMapper.md:32
+- [[IstanbulCoverageAdapter]] → /home/user/tsdoc-edge/managed/analyzers/IstanbulCoverageAdapter.md:33
 - [[MissingLinkDetector]] → /home/user/tsdoc-edge/managed/analyzers/MissingLinkDetector.md:30
 - [[ParallelWorkDetector]] → /home/user/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:32
 - [[PreCommitChecker]] → /home/user/tsdoc-edge/managed/analyzers/PreCommitChecker.md:30
 - [[ReliabilityChecker]] → /home/user/tsdoc-edge/managed/analyzers/ReliabilityChecker.md:29
-- [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:35
+- [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:36
 - [[TestRelationshipAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestRelationshipAnalyzer.md:32
-- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:30
 - [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:31
-- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:29
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:29
+- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:32
+- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:30
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:31
 - [[AnalyzeIOCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeIOCommand.md:30
 - [[AnalyzeIOCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeIOCommand.md:31
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:64
 - [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:65
 - [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:66
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:29
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:67
 - [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:30
 - [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:31
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:32
 - [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:31
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:30
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:31
 - [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:29
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:215
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:216
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:269
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:228
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:283
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:232
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:134
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:277
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:318
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:319
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:283
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:144
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:183
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:50
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:52
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:185
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:63
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:79
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:207
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:208
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:51
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:53
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:198
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:64
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:80
 - [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:101
 

@@ -228,8 +228,15 @@ Low Priority:
 
 ### Referenced By
 
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:249
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:62
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:132
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:37
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:32
 - [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:115
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:141
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:73
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:224
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:79
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:101
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:118
@@ -238,4 +245,5 @@ Low Priority:
 - [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:126
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:197
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:86
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:107
 

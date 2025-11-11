@@ -633,11 +633,19 @@ tsdoc-edge parse-mermaid <path> --generate-docs
 
 ### Referenced By
 
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:241
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:253
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:98
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:244
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:377
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:92
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:143
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:225
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:226
 - [[Example - Mermaid Workflow]] → /home/user/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:192
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:261
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:262
+- [[Example - Mermaid Workflow]] → /home/user/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:210
+- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:152
+- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:165
+- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:182
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:265
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:266
 

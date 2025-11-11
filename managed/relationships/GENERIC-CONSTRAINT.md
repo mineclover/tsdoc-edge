@@ -22,7 +22,11 @@ Track generic type constraints (`T extends U`).
 ### Referenced By
 
 - [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:82
-- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:28
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:241
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:40
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:264
+- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:33
 - [[AnalyzeTypesCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTypesCommand.md:33
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:61
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:353
 

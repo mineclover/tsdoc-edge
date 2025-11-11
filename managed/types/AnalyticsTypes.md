@@ -134,7 +134,7 @@ const report = tracker.generateReport({
 
 ### Referenced By
 
-- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:31
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:40
-- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:94
+- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:32
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:41
+- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:96
 

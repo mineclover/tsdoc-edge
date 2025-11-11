@@ -582,14 +582,21 @@ db.queryRelationships({
 ### Referenced By
 
 - [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:212
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:221
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:262
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:225
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:242
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:230
 - [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:203
 - [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:212
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:53
+- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:213
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:55
 - [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:178
 - [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:186
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:187
 - [[Relationship Standard Format]] → /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:168
 - [[Relationship Standard Format]] → /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:207
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:66
+- [[Relationship Standard Format]] → /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:208
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:68
 - [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:399
+- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:447
 

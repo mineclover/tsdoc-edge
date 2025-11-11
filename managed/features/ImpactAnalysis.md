@@ -293,8 +293,18 @@ Break large impacts into smaller steps:
 
 ### Referenced By
 
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:138
+- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:35
 - [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:89
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:139
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:140
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:141
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:146
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:79
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:80
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:117
 - [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:119
 - [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:136
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:155
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:129
 

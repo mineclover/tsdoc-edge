@@ -190,7 +190,7 @@ contentHash = sha256(fullComment);
 
 ### Referenced By
 
-- [[CommentExporter]] → /home/user/tsdoc-edge/managed/fold/CommentExporter.md:33
-- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:33
-- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:33
+- [[CommentExporter]] → /home/user/tsdoc-edge/managed/fold/CommentExporter.md:35
+- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:35
+- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:35
 

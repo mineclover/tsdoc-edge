@@ -80,7 +80,7 @@ export function isTypeScriptOrJavaScript(filePath: string): boolean
 
 ### Referenced By
 
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:212
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:93
-- [[FileScanner]] → /home/user/tsdoc-edge/managed/utilities/FileScanner.md:76
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:235
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:103
+- [[FileScanner]] → /home/user/tsdoc-edge/managed/utilities/FileScanner.md:79
 

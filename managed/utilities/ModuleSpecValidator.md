@@ -180,12 +180,17 @@ tsdoc-edge validate-spec --strict
 
 ### Referenced By
 
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:43
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:46
 - [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:151
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:196
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:204
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:205
 - [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:220
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:262
 - [[ModuleSpecGenerator]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecGenerator.md:33
 - [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:110
+- [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:120
 - [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:91
+- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:106
 - [[ConventionValidator]] → /home/user/tsdoc-edge/managed/utilities/ConventionValidator.md:174
+- [[ConventionValidator]] → /home/user/tsdoc-edge/managed/utilities/ConventionValidator.md:187
 

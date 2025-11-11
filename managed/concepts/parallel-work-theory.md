@@ -614,12 +614,20 @@ API는 유지되지만 동작이 변경되는 경우 감지 불가
 
 ### Referenced By
 
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:209
 - [[ParallelWorkDetector]] → /home/user/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:23
+- [[ParallelWorkDetector]] → /home/user/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:35
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:132
 - [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:22
 - [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:31
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:32
+- [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:32
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:34
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:229
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:248
 - [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:151
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:163
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:259
+- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:175
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:174
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:275
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:288
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:328
 

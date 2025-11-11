@@ -28,7 +28,10 @@ Supports:
 ### Referenced By
 
 - [[IstanbulCoverageAdapter]] → /home/user/tsdoc-edge/managed/analyzers/IstanbulCoverageAdapter.md:22
+- [[IstanbulCoverageAdapter]] → /home/user/tsdoc-edge/managed/analyzers/IstanbulCoverageAdapter.md:31
 - [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:23
+- [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:35
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:162
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:281
 - [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:18
 

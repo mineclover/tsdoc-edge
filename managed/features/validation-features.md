@@ -425,59 +425,82 @@ cycle_rate = symbols_in_cycles / total_symbols
 
 ### Referenced By
 
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:67
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:70
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:174
 - [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:125
+- [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:154
 - [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:31
-- [[InterfaceDependencyMapper]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceDependencyMapper.md:32
-- [[MissingLinkDetector]] → /home/user/tsdoc-edge/managed/analyzers/MissingLinkDetector.md:31
+- [[InterfaceDependencyMapper]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceDependencyMapper.md:33
+- [[MissingLinkDetector]] → /home/user/tsdoc-edge/managed/analyzers/MissingLinkDetector.md:32
 - [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:238
+- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:270
 - [[TypeChainTracer]] → /home/user/tsdoc-edge/managed/analyzers/TypeChainTracer.md:36
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:261
-- [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:30
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:318
+- [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:31
+- [[DetectCircularTypesCommand]] → /home/user/tsdoc-edge/managed/commands/DetectCircularTypesCommand.md:68
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:163
 - [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:21
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:34
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:36
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:37
 - [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:21
 - [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:35
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:194
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:42
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:241
+- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:36
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:201
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:45
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:253
 - [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:117
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:169
-- [[MermaidSymbolExtractor]] → /home/user/tsdoc-edge/managed/doc-symbols/MermaidSymbolExtractor.md:32
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:178
+- [[MermaidSymbolExtractor]] → /home/user/tsdoc-edge/managed/doc-symbols/MermaidSymbolExtractor.md:34
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:258
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:282
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:283
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:284
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:309
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:310
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:311
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:312
 - [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:164
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:190
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:196
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:197
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:105
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:295
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:336
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:337
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:346
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:347
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:348
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:349
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:141
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:179
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:180
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:181
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:202
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:203
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:204
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:205
 - [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:104
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:133
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:134
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:135
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:136
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:137
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:138
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:139
+- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:201
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:247
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:270
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:271
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:272
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:295
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:296
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:297
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:298
 - [[DocumentationFixer]] → /home/user/tsdoc-edge/managed/fixer/DocumentationFixer.md:22
+- [[DocumentationFixer]] → /home/user/tsdoc-edge/managed/fixer/DocumentationFixer.md:30
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:189
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:264
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:340
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:341
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:332
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:135
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:215
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:172
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:280
-- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:100
-- [[ConnectivityValidator]] → /home/user/tsdoc-edge/managed/utilities/ConnectivityValidator.md:115
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:75
-- [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:84
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:126
-- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:100
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:222
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:290
+- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:102
+- [[ConnectivityValidator]] → /home/user/tsdoc-edge/managed/utilities/ConnectivityValidator.md:116
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:77
+- [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:85
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:132
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:102
 
 ### Implemented By
 
