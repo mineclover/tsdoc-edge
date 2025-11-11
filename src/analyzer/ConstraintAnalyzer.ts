@@ -21,6 +21,7 @@ import * as path from 'node:path';
 import * as ts from 'typescript';
 import type { SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships';
+import { CoRequirementAnalyzer } from './CoRequirementAnalyzer';
 
 /**
  * Mutual exclusion constraint
@@ -84,7 +85,12 @@ export class ConstraintAnalyzer {
     const mutualExclusions = this.detectMutualExclusion();
     relationships.push(...this.createMutualExclusionRelationships(mutualExclusions));
 
-    // Detect co-requirements from code patterns
+    // Detect co-requirements from @requires tags (primary method)
+    const coReqAnalyzer = new CoRequirementAnalyzer(this.graph);
+    const coReqFromTags = coReqAnalyzer.analyze(this.projectRoot);
+    relationships.push(...coReqFromTags);
+
+    // Also detect co-requirements from code patterns (secondary method)
     if (this.program) {
       const coRequirements = this.detectCoRequirements();
       relationships.push(...this.createCoRequirementRelationships(coRequirements));
