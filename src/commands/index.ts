@@ -83,3 +83,5 @@ export { RelationshipClustersCommand } from './RelationshipClustersCommand';
 export { RelationshipMetricsCommand } from './RelationshipMetricsCommand';
 export { RelationshipCheckCommand } from './RelationshipCheckCommand';
 export { RelationshipHelpCommand } from './RelationshipHelpCommand';
+export { RenameCommand } from './RenameCommand';
+export { MoveCommand } from './MoveCommand';

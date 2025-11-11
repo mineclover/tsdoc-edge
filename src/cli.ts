@@ -95,6 +95,8 @@ import { DetectDeadCodeCommand } from './commands/DetectDeadCodeCommand';
 import { SymbolQueryCommand } from './commands/SymbolQueryCommand';
 import { SymbolFixCommand } from './commands/SymbolFixCommand';
 import { RelationshipStatsCommand } from './commands/RelationshipStatsCommand';
+import { RenameCommand } from './commands/RenameCommand';
+import { MoveCommand } from './commands/MoveCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -205,6 +207,8 @@ async function main(): Promise<void> {
   registry.register(new SymbolQueryCommand());
   registry.register(new SymbolFixCommand());
   registry.register(new RelationshipStatsCommand());
+  registry.register(new RenameCommand());
+  registry.register(new MoveCommand());
   registry.register(new HelpCommand(registry));
 
   // Get command
