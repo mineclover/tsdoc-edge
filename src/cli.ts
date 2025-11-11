@@ -97,6 +97,7 @@ import { SymbolFixCommand } from './commands/SymbolFixCommand';
 import { RelationshipStatsCommand } from './commands/RelationshipStatsCommand';
 import { RenameCommand } from './commands/RenameCommand';
 import { MoveCommand } from './commands/MoveCommand';
+import { SymbolRenameCommand } from './commands/SymbolRenameCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -209,6 +210,7 @@ async function main(): Promise<void> {
   registry.register(new RelationshipStatsCommand());
   registry.register(new RenameCommand());
   registry.register(new MoveCommand());
+  registry.register(new SymbolRenameCommand());
   registry.register(new HelpCommand(registry));
 
   // Get command

@@ -85,3 +85,4 @@ export { RelationshipCheckCommand } from './RelationshipCheckCommand';
 export { RelationshipHelpCommand } from './RelationshipHelpCommand';
 export { RenameCommand } from './RenameCommand';
 export { MoveCommand } from './MoveCommand';
+export { SymbolRenameCommand } from './SymbolRenameCommand';
