@@ -63,6 +63,8 @@ Each phase command typically contains:
 
 ### Referenced By
 
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:71
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:170
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:86
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:87
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:173
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:174
 

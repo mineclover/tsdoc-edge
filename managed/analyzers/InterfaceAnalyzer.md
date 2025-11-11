@@ -29,11 +29,13 @@ Interface와 구현 클래스 간 관계 분석.
 - [[InterfaceDependencyMapper]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceDependencyMapper.md:22
 - [[InterfaceDependencyMapper]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceDependencyMapper.md:31
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:133
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:291
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:293
 - [[Phase4Commands]] → /home/user/tsdoc-edge/managed/commands/Phase4Commands.md:22
 - [[Phase4Commands]] → /home/user/tsdoc-edge/managed/commands/Phase4Commands.md:30
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:157
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:227
-- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:21
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:18
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:231
+- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:25
+- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:26
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:21
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:22
 

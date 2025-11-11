@@ -495,38 +495,51 @@ console.log(`saveSymbols is called by ${callers.length} functions`);
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:137
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:195
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:169
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:191
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:198
 - [[DataFlowAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DataFlowAnalyzer.md:20
-- [[DataFlowAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DataFlowAnalyzer.md:28
+- [[DataFlowAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DataFlowAnalyzer.md:29
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:218
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:277
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:279
 - [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:21
-- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:30
+- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:33
 - [[Phase7Commands]] → /home/user/tsdoc-edge/managed/commands/Phase7Commands.md:22
 - [[Phase7Commands]] → /home/user/tsdoc-edge/managed/commands/Phase7Commands.md:30
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:66
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:70
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:71
 - [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:472
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:214
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:473
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:221
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:222
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:132
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:261
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:262
 - [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:57
 - [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:121
 - [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:244
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:276
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:277
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:278
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:140
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:279
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:312
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:313
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:315
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:316
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:118
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:264
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:327
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:353
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:354
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:355
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:47
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:205
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:206
 - [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:211
+- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:212
 - [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:10
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:49
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:50
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:18
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:53
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:54
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:55
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:22
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:23
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:64
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:190
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:99
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:192
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:105
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:106
 

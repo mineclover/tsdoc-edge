@@ -27,6 +27,8 @@ Creates:
 
 ### Referenced By
 
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:182
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:91
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:194
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:195
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:108
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:109
 

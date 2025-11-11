@@ -389,30 +389,42 @@ tsdoc-edge validate-spec managed | grep "⚠️" -A 1
 
 ### Referenced By
 
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:134
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:38
-- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:31
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:34
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:135
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:136
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:50
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:51
+- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:35
+- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:36
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:42
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:43
 - [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:153
 - [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:218
 - [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:227
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:252
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:253
 - [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:254
 - [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:255
 - [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:256
 - [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:257
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:258
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:259
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:260
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:261
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:262
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:161
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:238
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:248
 - [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:92
 - [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:100
 - [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:101
+- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:102
 - [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:120
 - [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:130
 - [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:131
+- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:132
 - [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:61
 - [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:71
 - [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:72
 - [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:73
 - [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:74
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:75
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:76
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:77
 

@@ -27,5 +27,6 @@ Handles:
 
 ### Referenced By
 
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:266
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:284
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:285
 

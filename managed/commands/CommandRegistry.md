@@ -31,6 +31,6 @@ Central registry for all CLI commands.
 - [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:54
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:22
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:34
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:134
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:135
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:136
 

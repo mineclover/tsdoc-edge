@@ -285,16 +285,17 @@ Cache TSDoc database between runs:
 
 ### Referenced By
 
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:156
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:169
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:170
-- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:143
-- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:144
-- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:145
-- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:160
-- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:161
-- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:162
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:42
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:43
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:162
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:182
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:183
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:149
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:150
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:151
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:167
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:168
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:169
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:57
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:58
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:118
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:139
 

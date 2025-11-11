@@ -129,17 +129,24 @@ Source Code → [TSDocParser] → ExtractionResult
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:219
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:91
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:173
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:215
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:216
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:217
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:218
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:85
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:86
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:87
-- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:35
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:231
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:232
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:233
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:234
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:235
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:236
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:110
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:111
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:112
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:113
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:114
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:115
+- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:43
+- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:44
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:292
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:343
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:137
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:356
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:174
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:175
 
 ### Implemented By
 

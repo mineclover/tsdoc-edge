@@ -34,11 +34,14 @@ Track and manage statistics history over time.
 - [[Phase10Commands]] → /home/user/tsdoc-edge/managed/commands/Phase10Commands.md:31
 - [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:48
 - [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:139
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:171
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:172
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:160
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:279
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:285
 - [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:83
 - [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:102
-- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:118
-- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:119
 - [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:120
+- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:121
+- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:122
+- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:123
 

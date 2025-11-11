@@ -363,13 +363,18 @@ console.log(`Average compliance: ${avgScore.toFixed(2)}%`);
 
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:196
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:392
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:29
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:31
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:32
 - [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:249
 - [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:250
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:230
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:251
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:252
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:234
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:235
 - [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:204
 - [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:250
 - [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:251
+- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:252
 - [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:33
 - [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:57
 - [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:30
@@ -379,6 +384,7 @@ console.log(`Average compliance: ${avgScore.toFixed(2)}%`);
 - [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:205
 - [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:206
 - [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:207
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:208
 - [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:31
 - [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:55
 - [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:54
@@ -390,5 +396,5 @@ console.log(`Average compliance: ${avgScore.toFixed(2)}%`);
 - [[EnhancedTagTypes]] → /home/user/tsdoc-edge/managed/types/EnhancedTagTypes.md:80
 - [[EnhancedTagTypes]] → /home/user/tsdoc-edge/managed/types/EnhancedTagTypes.md:88
 - [[ConventionValidator]] → /home/user/tsdoc-edge/managed/utilities/ConventionValidator.md:175
-- [[ConventionValidator]] → /home/user/tsdoc-edge/managed/utilities/ConventionValidator.md:184
+- [[ConventionValidator]] → /home/user/tsdoc-edge/managed/utilities/ConventionValidator.md:185
 

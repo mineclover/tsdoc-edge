@@ -29,7 +29,9 @@ Converts:
 ### Referenced By
 
 - [[CoverageParser]] → /home/user/tsdoc-edge/managed/analyzers/CoverageParser.md:30
+- [[CoverageParser]] → /home/user/tsdoc-edge/managed/analyzers/CoverageParser.md:31
 - [[CoverageSyncAdapter]] → /home/user/tsdoc-edge/managed/analyzers/CoverageSyncAdapter.md:29
+- [[CoverageSyncAdapter]] → /home/user/tsdoc-edge/managed/analyzers/CoverageSyncAdapter.md:30
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:171
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:293
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:295
 

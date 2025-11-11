@@ -103,7 +103,7 @@ class Core {
 
 ### Referenced By
 
-- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:195
-- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:27
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:73
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:196
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:36
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:97
 

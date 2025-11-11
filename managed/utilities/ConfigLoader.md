@@ -134,9 +134,13 @@ loader.reload();
 
 ### Referenced By
 
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:176
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:42
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:179
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:180
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:54
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:55
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:134
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:273
-- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:124
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:296
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:129
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:130
+- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:399
 

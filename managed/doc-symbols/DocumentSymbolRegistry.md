@@ -376,28 +376,39 @@ describe('DocumentSymbolRegistry', () => {
 - [[Mermaid Diagram Validation Workflow]] → /home/user/tsdoc-edge/managed/architecture/mermaid-validation-workflow.md:6
 - [[Mermaid Diagram Validation Workflow]] → /home/user/tsdoc-edge/managed/architecture/mermaid-validation-workflow.md:131
 - [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:58
-- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:73
-- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:74
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:176
-- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:31
-- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:33
-- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:34
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:79
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:80
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:81
+- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:180
+- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:181
+- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:34
+- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:35
+- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:39
+- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:40
+- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:41
+- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:42
 - [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:32
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:180
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:191
 - [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:23
 - [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:106
 - [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:141
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:174
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:175
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:176
-- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:181
-- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:113
-- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:114
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:121
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:181
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:182
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:183
+- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:187
+- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:188
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:119
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:120
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:121
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:122
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:123
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:124
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:118
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:242
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:252
 - [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:73
+- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:74
 - [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:74
 - [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:85
 - [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:86
+- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:87
 

@@ -130,9 +130,12 @@ tsdoc-edge validate
 
 ### Referenced By
 
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:40
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:47
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:41
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:53
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:54
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:68
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:69
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:52
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:53
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:121
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:214
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:231
 

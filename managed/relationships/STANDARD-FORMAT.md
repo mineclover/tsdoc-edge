@@ -580,12 +580,17 @@ const confidence = evidence.reduce((sum, ev) => sum + ev.confidence, 0) / eviden
 ### Referenced By
 
 - [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:185
-- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:203
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:206
 - [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:387
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:479
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:480
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:266
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:71
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:84
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:140
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:484
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:485
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:486
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:312
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:313
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:88
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:89
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:100
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:101
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:180
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:181
 

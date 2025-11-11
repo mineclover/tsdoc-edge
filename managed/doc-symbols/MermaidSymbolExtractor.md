@@ -29,12 +29,14 @@ Parses:
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:182
-- [[ParseMermaidCommand]] → /home/user/tsdoc-edge/managed/commands/ParseMermaidCommand.md:57
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:181
+- [[ParseMermaidCommand]] → /home/user/tsdoc-edge/managed/commands/ParseMermaidCommand.md:61
+- [[ParseMermaidCommand]] → /home/user/tsdoc-edge/managed/commands/ParseMermaidCommand.md:62
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:192
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:193
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:94
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:183
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:190
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:125
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:243
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:253
 - [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:66
 - [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:86
 

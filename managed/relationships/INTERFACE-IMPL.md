@@ -26,14 +26,16 @@ Track interface implementation (`class A implements I`).
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:266
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:84
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:162
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:223
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:224
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:225
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:243
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:244
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:245
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:246
 - [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:19
-- [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:32
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:91
+- [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:37
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:121
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:122
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:57
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:355
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:370
 - [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:110
-- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:191
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:192
 

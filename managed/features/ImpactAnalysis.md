@@ -293,18 +293,21 @@ Break large impacts into smaller steps:
 
 ### Referenced By
 
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:138
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:143
 - [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:35
 - [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:89
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:139
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:140
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:141
-- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:146
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:79
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:80
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:148
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:149
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:150
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:153
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:93
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:94
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:117
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:141
 - [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:119
 - [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:136
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:155
-- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:129
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:166
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:167
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:168
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:131
 

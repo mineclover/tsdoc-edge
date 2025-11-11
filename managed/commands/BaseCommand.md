@@ -97,17 +97,26 @@ export class MyCommand extends BaseCommand {
 
 ### Referenced By
 
-- [[CommandRegistry]] → /home/user/tsdoc-edge/managed/commands/CommandRegistry.md:29
+- [[CommandRegistry]] → /home/user/tsdoc-edge/managed/commands/CommandRegistry.md:30
+- [[CommandRegistry]] → /home/user/tsdoc-edge/managed/commands/CommandRegistry.md:31
 - [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:46
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:129
 - [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:38
+- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:106
 - [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:44
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:155
 - [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:50
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:176
 - [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:181
 - [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:216
 - [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:130
 - [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:164
 - [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:46
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:142
 - [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:50
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:159
 - [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:40
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:133
 - [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:47
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:140
 

@@ -28,6 +28,7 @@ Measures:
 ### Referenced By
 
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:157
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:290
-- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:20
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:292
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:26
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:27
 

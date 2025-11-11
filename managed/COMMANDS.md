@@ -293,26 +293,40 @@ Total:               61 commands
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:259
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:307
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:308
+- [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:404
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:179
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:203
 - [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:48
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:49
 - [[Circular Dependency]] → /home/user/tsdoc-edge/managed/relationships/CIRCULAR.md:17
+- [[Circular Dependency]] → /home/user/tsdoc-edge/managed/relationships/CIRCULAR.md:18
 - [[Generic Constraint]] → /home/user/tsdoc-edge/managed/relationships/GENERIC-CONSTRAINT.md:17
+- [[Generic Constraint]] → /home/user/tsdoc-edge/managed/relationships/GENERIC-CONSTRAINT.md:18
 - [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:17
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:18
 - [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:17
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:18
 - [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:17
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:18
 - [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:17
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:18
 - [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:46
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:47
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:162
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:184
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:185
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:186
 - [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:61
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:62
 - [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:77
 - [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:78
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:79
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:80
 - [[Example - Mermaid Workflow]] → /home/user/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:193
 - [[Example - Mermaid Workflow]] → /home/user/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:208
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:196
 - [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:299
 - [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:307
 - [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:252
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:253
 

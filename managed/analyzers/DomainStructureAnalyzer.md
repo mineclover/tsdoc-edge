@@ -29,8 +29,9 @@ Identifies:
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:159
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:138
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:287
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:289
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:151
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:275
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:52
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:281
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:60
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:61
 

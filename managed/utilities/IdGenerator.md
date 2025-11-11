@@ -115,6 +115,7 @@ const tempId = tempIdGen.generate(); // "x7k"
 ### Referenced By
 
 - [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:221
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:294
-- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:90
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:304
+- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:94
+- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:95
 

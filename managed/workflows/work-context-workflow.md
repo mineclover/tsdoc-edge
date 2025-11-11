@@ -426,36 +426,40 @@ done
 ### Referenced By
 
 - [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:221
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:254
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:264
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:95
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:274
 - [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:114
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:139
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:145
 - [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:90
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:87
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:187
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:153
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:104
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:105
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:202
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:203
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:19
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:350
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:219
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:352
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:236
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:237
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:14
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:220
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:378
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:379
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:394
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:395
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:68
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:136
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:189
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:227
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:228
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:229
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:235
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:236
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:237
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:167
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:233
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:247
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:151
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:161
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:177
 - [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:280
 - [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:299
-- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:312
-- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:313
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:320
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:321
 - [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:400
-- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:449
+- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:451
 

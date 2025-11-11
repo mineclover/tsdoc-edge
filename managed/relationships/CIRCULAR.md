@@ -23,12 +23,12 @@ Detect circular dependencies (`A → B → A`).
 ### Referenced By
 
 - [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:88
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:240
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:246
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:40
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:267
 - [[DependencyChainAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:23
-- [[DependencyChainAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:37
-- [[DetectCircularTypesCommand]] → /home/user/tsdoc-edge/managed/commands/DetectCircularTypesCommand.md:69
+- [[DependencyChainAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:44
+- [[DetectCircularTypesCommand]] → /home/user/tsdoc-edge/managed/commands/DetectCircularTypesCommand.md:72
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:62
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:352
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:367
 

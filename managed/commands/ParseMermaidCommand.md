@@ -57,13 +57,18 @@ Displays extracted information:
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:99
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:242
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:313
-- [[ExploreEntrypointCommand]] → /home/user/tsdoc-edge/managed/commands/ExploreEntrypointCommand.md:31
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:30
+- [[ExploreEntrypointCommand]] → /home/user/tsdoc-edge/managed/commands/ExploreEntrypointCommand.md:33
+- [[ExploreEntrypointCommand]] → /home/user/tsdoc-edge/managed/commands/ExploreEntrypointCommand.md:34
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:34
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:35
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:62
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:143
 - [[MermaidSymbolExtractor]] → /home/user/tsdoc-edge/managed/doc-symbols/MermaidSymbolExtractor.md:22
-- [[MermaidSymbolExtractor]] → /home/user/tsdoc-edge/managed/doc-symbols/MermaidSymbolExtractor.md:31
+- [[MermaidSymbolExtractor]] → /home/user/tsdoc-edge/managed/doc-symbols/MermaidSymbolExtractor.md:32
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:104
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:327
 - [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:59
 - [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:96
 - [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:97
+- [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:98
 

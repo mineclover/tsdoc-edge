@@ -237,14 +237,17 @@ tsdoc-edge improve src/services/UserService.ts
 ### Referenced By
 
 - [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:182
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:202
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:203
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:206
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:207
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:208
 - [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:221
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:261
-- [[ModuleSpecGenerator]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecGenerator.md:32
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:270
+- [[ModuleSpecGenerator]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecGenerator.md:34
+- [[ModuleSpecGenerator]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecGenerator.md:35
 - [[EnhancedTagTypes]] → /home/user/tsdoc-edge/managed/types/EnhancedTagTypes.md:78
 - [[EnhancedTagTypes]] → /home/user/tsdoc-edge/managed/types/EnhancedTagTypes.md:90
 - [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:108
 - [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:119
-- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:135
+- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:138
+- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:139
 

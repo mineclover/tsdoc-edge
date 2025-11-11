@@ -141,22 +141,29 @@ console.log(`Critical symbols documented: ${criticalStats.documented}/${critical
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:222
 - [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:22
-- [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:35
+- [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:36
 - [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:21
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:35
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:36
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:37
+- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:39
+- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:40
+- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:41
+- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:42
+- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:43
 - [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:22
 - [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:36
 - [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:37
 - [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:38
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:39
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:175
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:176
+- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:39
+- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:40
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:51
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:52
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:188
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:189
 - [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:22
-- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:31
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:320
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:94
+- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:32
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:346
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:347
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:114
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:115
 
 ### Implemented By
 

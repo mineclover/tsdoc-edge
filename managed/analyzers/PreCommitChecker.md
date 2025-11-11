@@ -29,8 +29,9 @@ Checks:
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:160
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:184
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:296
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:298
 - [[Phase10Commands]] → /home/user/tsdoc-edge/managed/commands/Phase10Commands.md:21
 - [[Phase10Commands]] → /home/user/tsdoc-edge/managed/commands/Phase10Commands.md:30
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:159
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:160
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:161
 

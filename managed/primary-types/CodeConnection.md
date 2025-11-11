@@ -50,10 +50,13 @@ const connections: CodeConnection[] = parser.parseCodeFile('src/file.ts');
 ### Referenced By
 
 - [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:68
-- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:90
-- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:91
-- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:92
+- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:93
+- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:94
+- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:95
+- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:96
+- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:97
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:30
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:43
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:44
+- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:45
 

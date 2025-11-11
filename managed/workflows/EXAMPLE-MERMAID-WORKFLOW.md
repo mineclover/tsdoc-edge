@@ -379,10 +379,13 @@ File coverage: 92.3% ✓
 
 ### Referenced By
 
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:252
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:100
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:259
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:260
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:124
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:125
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:154
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:170
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:179
-- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:311
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:315
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:316
 

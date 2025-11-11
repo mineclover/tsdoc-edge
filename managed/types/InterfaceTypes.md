@@ -165,7 +165,9 @@ tsdoc-edge deps UserService
 
 ### Referenced By
 
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:41
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:145
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:96
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:55
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:56
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:152
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:117
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:118
 

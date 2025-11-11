@@ -229,21 +229,29 @@ Low Priority:
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:249
-- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:62
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:132
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:37
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:32
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:64
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:133
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:49
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:35
 - [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:115
-- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:141
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:144
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:145
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:73
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:224
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:148
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:240
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:79
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:101
-- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:118
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:123
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:124
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:125
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:77
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:116
-- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:126
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:136
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:137
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:127
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:197
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:303
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:86
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:107
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:214
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:119
 

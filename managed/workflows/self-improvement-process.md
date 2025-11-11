@@ -519,32 +519,46 @@ The system continuously improves itself by:
 ### Referenced By
 
 - [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:208
-- [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:228
+- [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:234
 - [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:156
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:177
+- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:182
 - [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:142
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:186
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:201
 - [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:166
-- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:184
-- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:185
+- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:192
+- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:193
+- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:194
 - [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:159
-- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:194
-- [[Event Flow]] → /home/user/tsdoc-edge/managed/relationships/event-flow.md:69
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:101
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:102
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:103
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:104
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:105
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:106
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:107
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:108
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:109
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:110
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:111
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:112
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:113
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:196
+- [[Event Flow]] → /home/user/tsdoc-edge/managed/relationships/event-flow.md:72
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:126
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:127
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:128
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:129
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:130
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:131
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:132
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:133
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:134
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:135
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:136
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:137
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:138
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:139
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:140
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:141
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:142
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:143
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:144
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:145
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:146
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:147
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:148
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:149
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:150
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:151
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:156
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:169
 - [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:401
-- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:448
+- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:450
 

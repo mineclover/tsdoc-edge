@@ -306,27 +306,34 @@ scores.forEach(score => {
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:54
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:97
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:190
-- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:211
-- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:212
-- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:213
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:214
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:215
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:216
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:217
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:218
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:219
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:220
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:221
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:87
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:286
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:288
 - [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:19
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:29
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:30
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:29
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:32
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:33
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:34
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:35
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:36
 - [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:189
 - [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:262
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:144
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:166
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:194
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:271
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:272
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:273
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:274
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:226
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:32
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:276
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:277
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:278
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:279
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:280
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:229
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:230
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:34
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:35
 

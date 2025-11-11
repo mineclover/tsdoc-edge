@@ -268,3 +268,33 @@ tsdoc-edge analyze-parallel --task-list tasks.json
 - **[[Workflows Index]]** (`/managed/workflows/index.md`) - Practical workflows
 - **[[Guides & Tutorials]]** (`/managed/guides/index.md`) - Learning resources
 - **[[Relationship Types]]** (`/managed/relationships/index.md`) - Relationship system
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:182
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:183
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:203
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:204
+- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:178
+- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:179
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:264
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:265
+- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:268
+- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:269
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:178
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:179
+- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:183
+- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:184
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:474
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:475
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:193
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:194
+- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:234
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:334
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:217
+- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:206
+

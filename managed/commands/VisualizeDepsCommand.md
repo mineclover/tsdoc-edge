@@ -26,7 +26,8 @@ Visualize dependency graphs.
 
 ### Referenced By
 
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:56
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:69
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:70
 - [[MermaidGenerator]] → /home/user/tsdoc-edge/managed/utilities/MermaidGenerator.md:90
-- [[MermaidGenerator]] → /home/user/tsdoc-edge/managed/utilities/MermaidGenerator.md:102
+- [[MermaidGenerator]] → /home/user/tsdoc-edge/managed/utilities/MermaidGenerator.md:104
 

@@ -116,8 +116,11 @@ tsdoc-edge analyze-events --trace user:created
 
 - [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:134
 - [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:140
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:218
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:74
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:34
+- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:220
+- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:221
+- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:222
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:92
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:49
 - [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:41
+- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:80
 

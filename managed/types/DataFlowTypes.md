@@ -170,7 +170,10 @@ tsdoc-edge detect-dead-code
 
 ### Referenced By
 
-- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:37
-- [[AnalyzeIOCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeIOCommand.md:38
-- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:76
+- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:46
+- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:47
+- [[AnalyzeIOCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeIOCommand.md:47
+- [[AnalyzeIOCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeIOCommand.md:48
+- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:77
+- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:78
 

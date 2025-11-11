@@ -167,17 +167,19 @@ tsdoc-edge undocumented | wc -l
 
 ### Referenced By
 
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:139
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:161
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:144
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:167
 - [[Phase5Commands]] → /home/user/tsdoc-edge/managed/commands/Phase5Commands.md:31
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:172
-- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:146
-- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:165
-- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:147
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:233
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:185
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:152
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:172
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:154
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:251
 - [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:140
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:169
 - [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:153
+- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:180
 - [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:200
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:287
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:113
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:291
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:128
 

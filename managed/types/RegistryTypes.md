@@ -179,7 +179,10 @@ const changed = registry.filter(e =>
 
 ### Referenced By
 
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:283
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:292
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:97
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:344
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:345
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:300
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:301
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:119
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:120
 

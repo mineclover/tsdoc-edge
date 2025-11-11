@@ -66,12 +66,16 @@ const symbols = index.docToSymbol.get('managed/services.md');
 ### Referenced By
 
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:188
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:405
-- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:79
-- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:125
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:406
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:90
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:91
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:138
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:139
 - [[LinkingTypes]] → /home/user/tsdoc-edge/managed/types/LinkingTypes.md:67
 - [[LinkingTypes]] → /home/user/tsdoc-edge/managed/types/LinkingTypes.md:78
 - [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:62
-- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:75
 - [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:76
+- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:77
+- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:78
+- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:401
 

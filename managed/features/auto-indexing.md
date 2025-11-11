@@ -308,29 +308,36 @@ chmod +x .git/hooks/pre-commit
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:183
-- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:75
-- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:32
-- [[UpdateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateSymbolRefsCommand.md:31
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:44
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:82
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:83
+- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:36
+- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:37
+- [[UpdateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateSymbolRefsCommand.md:32
+- [[UpdateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateSymbolRefsCommand.md:33
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:59
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:60
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:148
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:291
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:330
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:331
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:332
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:333
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:188
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:189
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:196
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:197
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:198
 - [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:92
 - [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:102
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:122
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:123
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:124
 - [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:125
 - [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:126
 - [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:127
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:128
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:129
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:130
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:131
 - [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:204
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:248
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:249
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:259
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:260
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:261
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:267
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:335
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:343
 

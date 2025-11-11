@@ -28,10 +28,12 @@ Tracks:
 
 ### Referenced By
 
-- [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:28
+- [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:29
+- [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:30
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:124
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:292
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:294
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:157
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:228
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:19
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:232
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:23
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:24
 

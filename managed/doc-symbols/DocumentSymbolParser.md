@@ -287,40 +287,45 @@ describe('DocumentSymbolParser', () => {
 ### Referenced By
 
 - [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:57
-- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:72
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:78
 - [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:179
-- [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:227
+- [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:233
 - [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:129
 - [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:155
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:174
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:175
+- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:178
+- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:179
 - [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:52
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:78
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:92
 - [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:31
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:179
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:190
 - [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:126
 - [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:146
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:175
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:176
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:182
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:183
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:84
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:93
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:181
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:182
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:188
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:189
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:117
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:241
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:251
 - [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:65
 - [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:85
 - [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:73
 - [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:84
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:86
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:87
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:88
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:89
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:90
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:98
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:99
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:100
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:101
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:102
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:103
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:104
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:105
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:106
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:107
 - [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:52
-- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:63
+- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:64
 - [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:63
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:76
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:80
 - [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:76
 - [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:84
 - [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:80

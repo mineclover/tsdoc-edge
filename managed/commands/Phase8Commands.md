@@ -27,5 +27,6 @@ SSOT validation and completeness checking.
 
 ### Referenced By
 
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:165
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:168
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:169
 

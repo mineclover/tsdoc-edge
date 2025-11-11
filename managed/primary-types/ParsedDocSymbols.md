@@ -119,19 +119,23 @@ Uses [[DatabaseManager]] for sessions.
 ### Referenced By
 
 - [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:128
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:179
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:187
 - [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:80
-- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:101
-- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:102
+- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:103
+- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:104
+- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:105
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:23
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:29
-- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:45
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:46
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:47
+- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:48
+- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:49
 - [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:20
 - [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:26
 - [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:39
 - [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:40
 - [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:41
-- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:88
+- [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:42
+- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:90
+- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:91
 

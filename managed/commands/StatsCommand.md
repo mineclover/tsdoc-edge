@@ -254,24 +254,33 @@ fi
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:223
 - [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:32
 - [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:33
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:32
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:33
+- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:35
+- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:36
 - [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:32
 - [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:33
-- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:34
 - [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:58
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:34
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:31
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:45
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:35
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:74
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:145
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:116
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:222
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:237
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:238
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:80
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:102
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:118
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:119
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:78
-- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:124
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:135
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:125
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:154
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:297
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:172
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:329
 - [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:84
 - [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:89
+- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:129
+- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:130
 - [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:85
+- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:93
 

@@ -79,20 +79,23 @@ Related: [[Concept#Section]]
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:62
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:184
 - [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:111
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:131
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:132
 - [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:87
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:162
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:163
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:164
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:165
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:166
 - [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:168
 - [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:176
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:60
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:138
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:140
 - [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:107
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:108
 - [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:120
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:164
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:165
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:166
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:167
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:168
 - [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:46
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:180
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:181
 - [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:64
 - [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:94
 - [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:75
@@ -100,5 +103,5 @@ Related: [[Concept#Section]]
 - [[FeatureTypes]] → /home/user/tsdoc-edge/managed/types/FeatureTypes.md:82
 - [[FeatureTypes]] → /home/user/tsdoc-edge/managed/types/FeatureTypes.md:91
 - [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:53
-- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:62
+- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:63
 

@@ -26,9 +26,10 @@ Update symbol references in documentation.
 
 ### Referenced By
 
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:172
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:177
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:178
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:66
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:143
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:150
 - [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:62
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:182
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:183
 

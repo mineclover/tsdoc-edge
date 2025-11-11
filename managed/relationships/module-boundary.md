@@ -235,8 +235,9 @@ class UserServiceImpl implements IUserService { ... }
 
 ### Referenced By
 
-- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:196
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:77
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:198
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:102
 - [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:70
-- [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:86
+- [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:88
+- [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:89
 

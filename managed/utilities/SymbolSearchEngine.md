@@ -173,25 +173,30 @@ const dead = engine.search({
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:118
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:179
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:55
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:408
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:409
 - [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:45
 - [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:118
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:156
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:157
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:190
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:287
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:349
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:58
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:316
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:328
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:110
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:278
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:301
 - [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:103
 - [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:137
-- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:164
-- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:165
+- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:171
+- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:172
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:157
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:376
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:99
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:391
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:122
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:123
 - [[ConnectivityValidator]] → /home/user/tsdoc-edge/managed/utilities/ConnectivityValidator.md:104
-- [[ConnectivityValidator]] → /home/user/tsdoc-edge/managed/utilities/ConnectivityValidator.md:118
+- [[ConnectivityValidator]] → /home/user/tsdoc-edge/managed/utilities/ConnectivityValidator.md:122
 - [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:88
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:150
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:151
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:199
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:200
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:201
+- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:402
 
