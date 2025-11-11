@@ -73,6 +73,9 @@ import { AnalyzeSubstitutionCommand } from './commands/AnalyzeSubstitutionComman
 import { AnalyzeFallbackCommand } from './commands/AnalyzeFallbackCommand';
 import { AnalyzeCollaborationCommand } from './commands/AnalyzeCollaborationCommand';
 import { AnalyzeTemporalOrderCommand } from './commands/AnalyzeTemporalOrderCommand';
+import { AnalyzeDocReferenceCommand } from './commands/AnalyzeDocReferenceCommand';
+import { AnalyzeEnhancementCommand } from './commands/AnalyzeEnhancementCommand';
+import { AnalyzeLayerDependencyCommand } from './commands/AnalyzeLayerDependencyCommand';
 import { AnalyzeEventsCommand } from './commands/AnalyzeEventsCommand';
 import { AnalyzeCallbacksCommand } from './commands/AnalyzeCallbacksCommand';
 import { AnalyzeConstraintsCommand } from './commands/AnalyzeConstraintsCommand';
@@ -174,6 +177,9 @@ async function main(): Promise<void> {
   registry.register(new AnalyzeFallbackCommand());
   registry.register(new AnalyzeCollaborationCommand());
   registry.register(new AnalyzeTemporalOrderCommand());
+  registry.register(new AnalyzeDocReferenceCommand());
+  registry.register(new AnalyzeEnhancementCommand());
+  registry.register(new AnalyzeLayerDependencyCommand());
   registry.register(new AnalyzeTestsCommand());
   registry.register(new AnalyzeTypesCommand());
   registry.register(new AnalyzeIOCommand());
