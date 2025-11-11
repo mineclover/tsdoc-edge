@@ -140,6 +140,8 @@ export type {
  * Main entry point for TSDoc Edge
  *
  * @doc [[CoreWorkflow]]
+ * @doc [[TSDocEdge]]
+ * @doc [[Core Architecture#TSDocEdge]]
  * @public
  */
 export class TSDocEdge {

@@ -45,6 +45,8 @@ interface RelationshipRow {
  * @public
  * @responsibility Display future plans from enhanced documentation
  * @contract Reads database, extracts plans, displays with filtering
+ * @doc [[PlansCommand]]
+ * @doc [[CLI Commands#plans]]
  *
  * @problem Need to track and visualize future plans across codebase
  * @solves Shows all @plan tags from enhanced docs with status and priority
@@ -223,6 +225,8 @@ export class PlansCommand extends BaseCommand {
  * @public
  * @responsibility Search for methods/functions by qualified name
  * @contract Searches registry, displays matches with details
+ * @doc [[FindMethodCommand]]
+ * @doc [[CLI Commands#find-method]]
  *
  * @problem Need to find specific methods/functions in codebase
  * @solves Searches by qualified name (Class#method or Class.method)
@@ -392,6 +396,8 @@ export class FindMethodCommand extends BaseCommand {
  * @public
  * @responsibility Display all TODO items from future plans
  * @contract Reads database, extracts todos, displays with stats
+ * @doc [[TodosCommand]]
+ * @doc [[CLI Commands#todos]]
  *
  * @problem Need to see all pending work items across codebase
  * @solves Shows all @plan tags formatted as TODO list
@@ -552,6 +558,8 @@ export class TodosCommand extends BaseCommand {
  * @public
  * @responsibility Display comprehensive documentation statistics
  * @contract Analyzes database, computes stats, optionally compares/saves
+ * @doc [[StatsCommand]]
+ * @doc [[CLI Commands#stats]]
  *
  * @problem Need to track documentation quality metrics over time
  * @solves Collects and displays stats with optional historical comparison
@@ -668,6 +676,8 @@ export class StatsCommand extends BaseCommand {
  * @public
  * @responsibility Display exported symbols and their immediate dependencies
  * @contract Loads database, filters exports, computes 1-depth dependencies
+ * @doc [[CoreApiCommand]]
+ * @doc [[CLI Commands#core-api]]
  *
  * @problem Need to identify public API surface of codebase
  * @solves Shows all exported symbols plus their direct dependencies

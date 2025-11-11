@@ -779,6 +779,8 @@ export class SpecHistoryCommand extends BaseCommand {
  * @public
  * @responsibility Compare two versions of a specification
  * @contract Reads versions from Git, computes diff, displays changes
+ * @doc [[SpecDiffCommand]]
+ * @doc [[CLI Commands#spec-diff]]
  *
  * @problem Need to understand changes between versions
  * @solves Shows added, removed, and modified sections
@@ -912,6 +914,8 @@ export class SpecDiffCommand extends BaseCommand {
  * @public
  * @responsibility Increment specification version number
  * @contract Validates bump type, updates frontmatter, shows changes
+ * @doc [[SpecBumpCommand]]
+ * @doc [[CLI Commands#spec-bump]]
  *
  * @problem Need to increment version following semver
  * @solves Bumps version (major, minor, patch) automatically
@@ -1028,6 +1032,8 @@ export class SpecBumpCommand extends BaseCommand {
  * @public
  * @responsibility Search for document symbol definitions and references
  * @contract Parses documents, searches registry, displays matches
+ * @doc [[FindDocCommand]]
+ * @doc [[CLI Commands#find-doc]]
  *
  * @problem Need to find where document symbols are defined/referenced
  * @solves Searches all documents for symbol definitions and usages
