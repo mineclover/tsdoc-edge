@@ -165,9 +165,9 @@ Track specification completion.
 
 ---
 
-## Advanced Features (6 commands)
+## Advanced Features (9 commands)
 
-Experimental and advanced analysis.
+Experimental, advanced analysis, and graph visualization.
 
 ### [[ParallelWorkCommand]]
 ```bash
@@ -208,6 +208,89 @@ Sync test coverage data.
 tsdoc-edge check-duplicates
 ```
 Find duplicate symbols.
+
+### RelationshipExportCommand
+```bash
+tsdoc-edge relationship-export --format <format> --output <file>
+```
+Export relationships to various formats (JSON, GraphML, DOT, CSV, Cypher, Gephi).
+
+**Formats**:
+- `gephi`: Gephi Lite SDK format (interactive web visualization)
+- `graphml`: GraphML format (Gephi, yEd, Cytoscape)
+- `dot`: Graphviz DOT format
+- `json`: JSON format (programmatic processing)
+- `csv`: CSV format (spreadsheet analysis)
+- `cypher`: Neo4j Cypher statements
+
+**Options**:
+- `--category <cat>`: Filter by category
+- `--type <type>`: Filter by relationship type
+- `--min-confidence <n>`: Minimum confidence level (0-1)
+- `--layout <layout>`: Layout algorithm (circle, grid, random)
+
+**Examples**:
+```bash
+# Export to Gephi Lite
+tsdoc-edge relationship-export --format gephi --output graph.json
+
+# Filtered export
+tsdoc-edge relationship-export --format gephi --category structural --type code-dependency
+```
+
+**Implementation**: `src/commands/RelationshipExportCommand.ts`
+**Doc**: [[Gephi Export]]
+
+### RelationshipVisualizeCommand
+```bash
+tsdoc-edge relationship-visualize <symbol-id> [--format mermaid|dot]
+```
+Generate Mermaid/DOT diagrams of relationships around a symbol.
+
+**Options**:
+- `--format <format>`: Output format (mermaid, dot)
+- `--depth <n>`: Maximum traversal depth (default: 2)
+- `--type <types>`: Filter by relationship types
+- `--category <cats>`: Filter by categories
+- `--output <file>`: Save to file
+
+**Examples**:
+```bash
+# Mermaid flowchart
+tsdoc-edge relationship-visualize class-databasemanager --format mermaid
+
+# GraphViz DOT with filters
+tsdoc-edge relationship-visualize class-buildcommand --format dot --type composition,calls
+```
+
+**Implementation**: `src/commands/RelationshipVisualizeCommand.ts`
+
+### RelationshipPathCommand
+```bash
+tsdoc-edge relationship-path <from-symbol> <to-symbol>
+```
+Find connection paths between two symbols (optimized BFS).
+
+**Options**:
+- `--max-length <n>`: Maximum path length (default: 5)
+- `--limit <n>`: Maximum paths to show (default: 10)
+- `--category <cat>`: Filter by category
+- `--shortest-only`: Show only shortest paths
+
+**Performance**:
+- Graph build: ~160ms (2,213 nodes)
+- Path search: ~250ms
+
+**Examples**:
+```bash
+# Find paths
+tsdoc-edge relationship-path class-buildcommand class-databasemanager
+
+# Shortest paths only
+tsdoc-edge relationship-path class-buildcommand class-databasemanager --shortest-only --max-length 3
+```
+
+**Implementation**: `src/commands/RelationshipPathCommand.ts`
 
 ---
 
