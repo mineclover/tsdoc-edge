@@ -1,5 +1,7 @@
 /**
  * Optimized Relationship Path Command
+ *
+ * @doc [[Relationship Path]]
  * @packageDocumentation
  */
 
