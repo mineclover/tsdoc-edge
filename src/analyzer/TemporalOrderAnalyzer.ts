@@ -168,11 +168,33 @@ export class TemporalOrderAnalyzer {
 
     const callExpressions: { expr: ts.CallExpression; index: number }[] = [];
 
-    // Collect call expressions
+    // Collect call expressions (including awaited calls)
     for (let i = 0; i < statements.length; i++) {
       const stmt = statements[i];
+
+      // Direct call: functionName()
       if (ts.isExpressionStatement(stmt) && ts.isCallExpression(stmt.expression)) {
         callExpressions.push({ expr: stmt.expression, index: i });
+      }
+      // Await call: await functionName()
+      else if (ts.isExpressionStatement(stmt) && ts.isAwaitExpression(stmt.expression)) {
+        if (ts.isCallExpression(stmt.expression.expression)) {
+          callExpressions.push({ expr: stmt.expression.expression, index: i });
+        }
+      }
+      // Variable assignment with call: const x = functionName()
+      else if (ts.isVariableStatement(stmt)) {
+        for (const decl of stmt.declarationList.declarations) {
+          if (decl.initializer && ts.isCallExpression(decl.initializer)) {
+            callExpressions.push({ expr: decl.initializer, index: i });
+          }
+          // const x = await functionName()
+          else if (decl.initializer && ts.isAwaitExpression(decl.initializer)) {
+            if (ts.isCallExpression(decl.initializer.expression)) {
+              callExpressions.push({ expr: decl.initializer.expression, index: i });
+            }
+          }
+        }
       }
     }
 
