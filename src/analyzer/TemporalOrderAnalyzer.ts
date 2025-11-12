@@ -136,10 +136,24 @@ export class TemporalOrderAnalyzer {
           this.analyzeLifecyclePattern(node, sourceFile, sites);
         }
 
-        // Pattern 3: Promise chains
+        // Pattern 3: Promise chains (.then())
         if (ts.isCallExpression(node) && ts.isPropertyAccessExpression(node.expression)) {
-          if (node.expression.name.text === 'then') {
+          if (node.expression.name.text === 'then' || node.expression.name.text === 'catch') {
             this.analyzePromiseChain(node, sourceFile, sites);
+          }
+        }
+
+        // Pattern 4: Constructor field initialization order
+        if (ts.isConstructorDeclaration(node)) {
+          this.analyzeConstructorSequence(node, sourceFile, sites);
+        }
+
+        // Pattern 5: Async/await chains
+        if (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node) || ts.isArrowFunction(node)) {
+          if (node.modifiers?.some(m => m.kind === ts.SyntaxKind.AsyncKeyword)) {
+            if (node.body && ts.isBlock(node.body)) {
+              this.analyzeAsyncSequence(node.body, sourceFile, sites);
+            }
           }
         }
       } catch (error) {
@@ -233,12 +247,58 @@ export class TemporalOrderAnalyzer {
   private analyzeLifecyclePattern(node: ts.CallExpression, sourceFile: ts.SourceFile, sites: TemporalOrderSite[]): void {
     if (!ts.isIdentifier(node.expression)) return;
 
-    const lifecycleNames = ['beforeEach', 'afterEach', 'beforeAll', 'afterAll', 'setup', 'teardown'];
     const methodName = node.expression.text;
 
-    if (lifecycleNames.includes(methodName)) {
-      // This is a lifecycle method - could extract ordering info if needed
-      // For now, we just note its existence
+    // beforeEach/beforeAll always runs before the test
+    // afterEach/afterAll always runs after the test
+    const beforeHooks = ['beforeEach', 'beforeAll', 'setup'];
+    const afterHooks = ['afterEach', 'afterAll', 'teardown'];
+
+    if (beforeHooks.includes(methodName) || afterHooks.includes(methodName)) {
+      // Extract the callback function from the lifecycle hook
+      if (node.arguments.length > 0) {
+        const callback = node.arguments[0];
+
+        // Look for function calls within the callback
+        if (ts.isArrowFunction(callback) || ts.isFunctionExpression(callback)) {
+          if (callback.body && ts.isBlock(callback.body)) {
+            // Extract calls from the lifecycle callback
+            const calls: ts.CallExpression[] = [];
+
+            const extractCalls = (node: ts.Node) => {
+              if (ts.isCallExpression(node)) {
+                calls.push(node);
+              }
+              ts.forEachChild(node, extractCalls);
+            };
+
+            extractCalls(callback.body);
+
+            // Create temporal relationships for calls within lifecycle hooks
+            for (let i = 0; i < calls.length - 1; i++) {
+              const first = calls[i];
+              const second = calls[i + 1];
+
+              const firstSymbol = this.findSymbolForExpression(first.expression, sourceFile);
+              const secondSymbol = this.findSymbolForExpression(second.expression, sourceFile);
+
+              if (firstSymbol && secondSymbol && firstSymbol.id !== secondSymbol.id) {
+                const line = sourceFile.getLineAndCharacterOfPosition(first.getStart(sourceFile)).line + 1;
+
+                sites.push({
+                  firstSymbolId: firstSymbol.id,
+                  firstSymbolName: firstSymbol.name,
+                  secondSymbolId: secondSymbol.id,
+                  secondSymbolName: secondSymbol.name,
+                  filePath: sourceFile.fileName,
+                  line,
+                  pattern: 'setup-teardown'
+                });
+              }
+            }
+          }
+        }
+      }
     }
   }
 
@@ -276,6 +336,117 @@ export class TemporalOrderAnalyzer {
   }
 
   /**
+   * Analyze constructor field initialization sequence
+   *
+   * @param constructor - Constructor declaration node
+   * @param sourceFile - Source file
+   * @param sites - Array to collect sites
+   * @private
+   */
+  private analyzeConstructorSequence(constructor: ts.ConstructorDeclaration, sourceFile: ts.SourceFile, sites: TemporalOrderSite[]): void {
+    if (!constructor.body) return;
+
+    const assignments: { target: string; index: number; node: ts.Node }[] = [];
+
+    // Collect field assignments and method calls
+    for (let i = 0; i < constructor.body.statements.length; i++) {
+      const stmt = constructor.body.statements[i];
+
+      // this.field = value
+      if (ts.isExpressionStatement(stmt) && ts.isBinaryExpression(stmt.expression)) {
+        if (stmt.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+            ts.isPropertyAccessExpression(stmt.expression.left) &&
+            stmt.expression.left.expression.kind === ts.SyntaxKind.ThisKeyword) {
+          const fieldName = stmt.expression.left.name.text;
+          assignments.push({ target: fieldName, index: i, node: stmt });
+        }
+      }
+    }
+
+    // Create sequential relationships for field initialization order
+    for (let i = 0; i < assignments.length - 1; i++) {
+      const first = assignments[i];
+      const second = assignments[i + 1];
+
+      const line = sourceFile.getLineAndCharacterOfPosition(first.node.getStart(sourceFile)).line + 1;
+
+      // Try to resolve these as properties of the containing class
+      sites.push({
+        firstSymbolId: `property-${first.target.toLowerCase()}`,
+        firstSymbolName: first.target,
+        secondSymbolId: `property-${second.target.toLowerCase()}`,
+        secondSymbolName: second.target,
+        filePath: sourceFile.fileName,
+        line,
+        pattern: 'sequential-calls'
+      });
+    }
+  }
+
+  /**
+   * Analyze async/await execution sequences
+   *
+   * @param block - Block node from async function
+   * @param sourceFile - Source file
+   * @param sites - Array to collect sites
+   * @private
+   */
+  private analyzeAsyncSequence(block: ts.Block, sourceFile: ts.SourceFile, sites: TemporalOrderSite[]): void {
+    const awaitCalls: { expr: ts.CallExpression; index: number }[] = [];
+
+    // Collect await expressions
+    for (let i = 0; i < block.statements.length; i++) {
+      const stmt = block.statements[i];
+
+      // await functionName()
+      if (ts.isExpressionStatement(stmt) && ts.isAwaitExpression(stmt.expression)) {
+        if (ts.isCallExpression(stmt.expression.expression)) {
+          awaitCalls.push({ expr: stmt.expression.expression, index: i });
+        }
+      }
+      // const x = await functionName()
+      else if (ts.isVariableStatement(stmt)) {
+        for (const decl of stmt.declarationList.declarations) {
+          if (decl.initializer && ts.isAwaitExpression(decl.initializer)) {
+            if (ts.isCallExpression(decl.initializer.expression)) {
+              awaitCalls.push({ expr: decl.initializer.expression, index: i });
+            }
+          }
+        }
+      }
+      // return await functionName()
+      else if (ts.isReturnStatement(stmt) && stmt.expression && ts.isAwaitExpression(stmt.expression)) {
+        if (ts.isCallExpression(stmt.expression.expression)) {
+          awaitCalls.push({ expr: stmt.expression.expression, index: i });
+        }
+      }
+    }
+
+    // Find sequential await pairs
+    for (let i = 0; i < awaitCalls.length - 1; i++) {
+      const first = awaitCalls[i].expr;
+      const second = awaitCalls[i + 1].expr;
+
+      const firstSymbol = this.findSymbolForExpression(first.expression, sourceFile);
+      const secondSymbol = this.findSymbolForExpression(second.expression, sourceFile);
+
+      if (firstSymbol && secondSymbol && firstSymbol.id !== secondSymbol.id) {
+        const line = sourceFile.getLineAndCharacterOfPosition(first.getStart(sourceFile)).line + 1;
+
+        sites.push({
+          firstSymbolId: firstSymbol.id,
+          firstSymbolName: firstSymbol.name,
+          secondSymbolId: secondSymbol.id,
+          secondSymbolName: secondSymbol.name,
+          filePath: sourceFile.fileName,
+          line,
+          pattern: 'sequential-calls'
+        });
+      }
+    }
+  }
+
+  /**
    * Find symbol for expression
    *
    * @param expression - Expression node
@@ -289,17 +460,35 @@ export class TemporalOrderAnalyzer {
     if (ts.isIdentifier(expression)) {
       name = expression.text;
     } else if (ts.isPropertyAccessExpression(expression)) {
+      // For this.method(), get the method name
       name = expression.name.text;
+      // Also try to get the full qualified name
+      const obj = expression.expression;
+      if (ts.isIdentifier(obj)) {
+        name = `${obj.text}.${name}`;
+      }
     } else if (ts.isCallExpression(expression)) {
       return this.findSymbolForExpression(expression.expression, sourceFile);
     }
 
     if (!name) return null;
 
-    // Find symbol by name
-    for (const symbol of this.graph.symbols.values()) {
-      if (symbol.name === name) {
-        return { id: symbol.id, name: symbol.name };
+    // Try nameIndex first for O(1) lookup
+    if (this.graph.nameIndex && this.graph.nameIndex.has(name)) {
+      const symbolIds = this.graph.nameIndex.get(name);
+      if (symbolIds && symbolIds.length > 0) {
+        const symbolId = symbolIds[0];
+        const symbol = this.graph.symbols.get(symbolId);
+        if (symbol) {
+          return { id: symbolId, name: symbol.name };
+        }
+      }
+    }
+
+    // Fallback: search through all symbols for partial match
+    for (const [symbolId, symbol] of this.graph.symbols.entries()) {
+      if (symbol.name === name || symbol.name.endsWith(`.${name}`)) {
+        return { id: symbolId, name: symbol.name };
       }
     }
 
