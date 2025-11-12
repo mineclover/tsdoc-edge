@@ -227,27 +227,61 @@ export class WorkContextCommand extends BaseCommand {
       // Continue even if parsing fails
     }
 
-    // 3. Get dependencies (what this file uses) - Optimized with JOIN
+    // 3. Get dependencies (what this file uses) - Use unified_relationships
     if (symbolIds.length > 0) {
       const placeholder = symbolIds.map(() => '?').join(',');
-      const dependencyRows = dbManager.db.prepare(`
+
+      // Query unified_relationships for structural relationships (type-dependency, code-dependency)
+      const relationshipRows = dbManager.db.prepare(`
         SELECT DISTINCT
-          s.name, s.type, s.file_path
-        FROM dependencies d
-        INNER JOIN symbols s ON d.target = s.id
-        WHERE d.symbol_id IN (${placeholder})
-          AND s.file_path != ?
-      `).all(...symbolIds, relativePath) as Array<{
-        name: string;
+          r.to_symbols, r.type, r.category
+        FROM unified_relationships r
+        WHERE r.category IN ('structural', 'behavioral')
+          AND json_valid(r.from_symbols)
+          AND EXISTS (
+            SELECT 1 FROM json_each(r.from_symbols) je
+            WHERE je.value IN (${placeholder})
+          )
+      `).all(...symbolIds) as Array<{
+        to_symbols: string;
         type: string;
-        file_path: string;
+        category: string;
       }>;
 
-      context.dependencies = dependencyRows.map(row => ({
-        name: row.name,
-        type: row.type,
-        filePath: row.file_path,
-      }));
+      // Extract target symbol IDs and resolve them
+      const targetIds = new Set<string>();
+      for (const row of relationshipRows) {
+        try {
+          const toSymbols = JSON.parse(row.to_symbols) as string[];
+          for (const target of toSymbols) {
+            if (target) targetIds.add(target);
+          }
+        } catch (error) {
+          // Skip invalid JSON
+        }
+      }
+
+      if (targetIds.size > 0) {
+        const targetPlaceholder = Array.from(targetIds).map(() => '?').join(',');
+        const dependencyRows = dbManager.db.prepare(`
+          SELECT DISTINCT
+            s.id, s.name, s.type, s.file_path
+          FROM symbols s
+          WHERE s.id IN (${targetPlaceholder})
+            AND s.file_path != ?
+        `).all(...Array.from(targetIds), relativePath) as Array<{
+          id: string;
+          name: string;
+          type: string;
+          file_path: string;
+        }>;
+
+        context.dependencies = dependencyRows.map(row => ({
+          name: row.name,
+          type: row.type,
+          filePath: row.file_path,
+        }));
+      }
     }
 
     // 4. Get test files
@@ -267,27 +301,61 @@ export class WorkContextCommand extends BaseCommand {
       }));
     }
 
-    // 5. Get usedBy (what uses this file) - Optimized with JOIN
+    // 5. Get usedBy (what uses this file) - Use unified_relationships
     if (symbolIds.length > 0) {
       const placeholder = symbolIds.map(() => '?').join(',');
-      const usedByRows = dbManager.db.prepare(`
+
+      // Query unified_relationships where this file's symbols are targets
+      const relationshipRows = dbManager.db.prepare(`
         SELECT DISTINCT
-          s.name, s.file_path, s.type
-        FROM dependencies d
-        INNER JOIN symbols s ON d.symbol_id = s.id
-        WHERE d.target IN (${placeholder})
-          AND s.file_path != ?
-      `).all(...symbolIds, relativePath) as Array<{
-        name: string;
-        file_path: string;
+          r.from_symbols, r.type, r.category
+        FROM unified_relationships r
+        WHERE r.category IN ('structural', 'behavioral')
+          AND json_valid(r.to_symbols)
+          AND EXISTS (
+            SELECT 1 FROM json_each(r.to_symbols) je
+            WHERE je.value IN (${placeholder})
+          )
+      `).all(...symbolIds) as Array<{
+        from_symbols: string;
         type: string;
+        category: string;
       }>;
 
-      context.usedBy = usedByRows.map(row => ({
-        name: row.name,
-        filePath: row.file_path,
-        type: row.type,
-      }));
+      // Extract source symbol IDs and resolve them
+      const sourceIds = new Set<string>();
+      for (const row of relationshipRows) {
+        try {
+          const fromSymbols = JSON.parse(row.from_symbols) as string[];
+          for (const source of fromSymbols) {
+            if (source) sourceIds.add(source);
+          }
+        } catch (error) {
+          // Skip invalid JSON
+        }
+      }
+
+      if (sourceIds.size > 0) {
+        const sourcePlaceholder = Array.from(sourceIds).map(() => '?').join(',');
+        const usedByRows = dbManager.db.prepare(`
+          SELECT DISTINCT
+            s.id, s.name, s.file_path, s.type
+          FROM symbols s
+          WHERE s.id IN (${sourcePlaceholder})
+            AND s.file_path != ?
+        `).all(...Array.from(sourceIds), relativePath) as Array<{
+          id: string;
+          name: string;
+          file_path: string;
+          type: string;
+        }>;
+
+        context.usedBy = usedByRows.map(row => ({
+          name: row.name,
+          filePath: row.file_path,
+          type: row.type,
+        }));
+      }
     }
 
     // 6-8. Get contracts, decisions, and error patterns (optimized)
