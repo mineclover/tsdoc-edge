@@ -79,6 +79,7 @@ export { RelationshipImpactCommand } from './RelationshipImpactCommand';
 export { RelationshipPathCommand } from './RelationshipPathCommand';
 export { RelationshipValidateCommand } from './RelationshipValidateCommand';
 export { RelationshipExportCommand } from './RelationshipExportCommand';
+export { RelationshipVisualizeCommand } from './RelationshipVisualizeCommand';
 export { RelationshipClustersCommand } from './RelationshipClustersCommand';
 export { RelationshipMetricsCommand } from './RelationshipMetricsCommand';
 export { RelationshipCheckCommand } from './RelationshipCheckCommand';

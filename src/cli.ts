@@ -89,6 +89,7 @@ import { RelationshipImpactCommand } from './commands/RelationshipImpactCommand'
 import { RelationshipPathCommand } from './commands/RelationshipPathCommand';
 import { RelationshipValidateCommand } from './commands/RelationshipValidateCommand';
 import { RelationshipExportCommand } from './commands/RelationshipExportCommand';
+import { RelationshipVisualizeCommand } from './commands/RelationshipVisualizeCommand';
 import { RelationshipClustersCommand } from './commands/RelationshipClustersCommand';
 import { RelationshipMetricsCommand } from './commands/RelationshipMetricsCommand';
 import { RelationshipCheckCommand } from './commands/RelationshipCheckCommand';
@@ -197,6 +198,7 @@ async function main(): Promise<void> {
   registry.register(new RelationshipPathCommand());
   registry.register(new RelationshipValidateCommand());
   registry.register(new RelationshipExportCommand());
+  registry.register(new RelationshipVisualizeCommand());
   registry.register(new RelationshipClustersCommand());
   registry.register(new RelationshipMetricsCommand());
   registry.register(new RelationshipCheckCommand());

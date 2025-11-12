@@ -1,5 +1,5 @@
 /**
- * Relationship Path Command
+ * Optimized Relationship Path Command
  * @packageDocumentation
  */
 
@@ -19,8 +19,14 @@ interface SymbolPath {
   strength: number;
 }
 
+interface GraphEdge {
+  to: string;
+  type: string;
+  category: string;
+}
+
 /**
- * Command for finding paths between symbols
+ * Optimized command for finding paths between symbols
  * @public
  */
 export class RelationshipPathCommand extends BaseCommand {
@@ -105,17 +111,29 @@ Examples:
       }
 
       console.log();
-      this.printInfo(`Searching for paths (max length: ${options.maxLength})...`);
-      console.log();
+      this.printInfo(`Building relationship graph...`);
 
-      // Find paths
-      const paths = this.findPaths(
-        dbManager,
+      // Build adjacency list once
+      const startBuild = Date.now();
+      const adjacency = this.buildAdjacencyList(dbManager, options.category);
+      const buildTime = Date.now() - startBuild;
+      this.printInfo(`Graph built in ${buildTime}ms (${adjacency.size} nodes)`);
+
+      console.log();
+      this.printInfo(`Searching for paths (max length: ${options.maxLength})...`);
+      const startSearch = Date.now();
+
+      // Find paths using optimized BFS
+      const paths = this.findPathsOptimized(
+        adjacency,
         fromSymbol,
         toSymbol,
-        options.maxLength,
-        options.category
+        options.maxLength
       );
+
+      const searchTime = Date.now() - startSearch;
+      this.printInfo(`Search completed in ${searchTime}ms`);
+      console.log();
 
       if (paths.length === 0) {
         this.printInfo('No paths found between these symbols');
@@ -178,6 +196,8 @@ Examples:
       console.log(`  Shortest path: ${this.colors.cyan}${shortestLength}${this.colors.reset} hops`);
       console.log(`  Longest path: ${this.colors.cyan}${longestLength}${this.colors.reset} hops`);
       console.log(`  Average length: ${this.colors.cyan}${avgLength.toFixed(1)}${this.colors.reset} hops`);
+      console.log(`  Build time: ${this.colors.cyan}${buildTime}ms${this.colors.reset}`);
+      console.log(`  Search time: ${this.colors.cyan}${searchTime}ms${this.colors.reset}`);
       console.log();
 
       // Analyze path categories
@@ -205,14 +225,64 @@ Examples:
   }
 
   /**
-   * Find all paths between two symbols using BFS
+   * Build adjacency list from database (one-time operation)
    */
-  private findPaths(
+  private buildAdjacencyList(
     dbManager: DatabaseManager,
+    category?: string
+  ): Map<string, GraphEdge[]> {
+    const adjacency = new Map<string, GraphEdge[]>();
+
+    // Query all relationships at once
+    let sql = 'SELECT from_symbols, to_symbols, type, category FROM unified_relationships';
+    const params: any[] = [];
+
+    if (category) {
+      sql += ' WHERE category = ?';
+      params.push(category);
+    }
+
+    const relationships = dbManager.db.prepare(sql).all(...params) as any[];
+
+    for (const rel of relationships) {
+      try {
+        const fromSymbols = JSON.parse(rel.from_symbols || '[]');
+        const toSymbols = JSON.parse(rel.to_symbols || '[]');
+
+        for (const from of fromSymbols) {
+          if (!from) continue;
+
+          if (!adjacency.has(from)) {
+            adjacency.set(from, []);
+          }
+
+          for (const to of toSymbols) {
+            if (!to) continue;
+
+            adjacency.get(from)!.push({
+              to,
+              type: rel.type,
+              category: rel.category,
+            });
+          }
+        }
+      } catch (error) {
+        // Skip malformed relationships
+        continue;
+      }
+    }
+
+    return adjacency;
+  }
+
+  /**
+   * Find paths using optimized BFS with adjacency list
+   */
+  private findPathsOptimized(
+    adjacency: Map<string, GraphEdge[]>,
     fromSymbol: string,
     toSymbol: string,
-    maxLength: number,
-    category?: string
+    maxLength: number
   ): SymbolPath[] {
     const allPaths: SymbolPath[] = [];
     const queue: Array<{
@@ -227,77 +297,70 @@ Examples:
       },
     ];
 
-    while (queue.length > 0) {
+    // Early termination if no edges from start
+    if (!adjacency.has(fromSymbol)) {
+      return [];
+    }
+
+    let iterations = 0;
+    const maxIterations = 100000; // Safety limit
+
+    while (queue.length > 0 && iterations < maxIterations) {
+      iterations++;
+
       const { currentSymbol, path, visited } = queue.shift()!;
 
       // Check if we've reached the target
       if (currentSymbol === toSymbol && path.length > 1) {
-        // Calculate path strength based on relationship confidence
         const strength = this.calculatePathStrength(path);
         allPaths.push({
           nodes: path,
-          length: path.length - 1, // Number of hops
+          length: path.length - 1,
           strength,
         });
+
+        // Continue searching for alternative paths
         continue;
       }
 
       // Don't expand if we've reached max length
       if (path.length > maxLength) continue;
 
-      // Find all relationships from current symbol
-      let sql = `
-        SELECT *
-        FROM unified_relationships
-        WHERE (
-          json_extract(from_symbols, '$[0]') = ? OR
-          from_symbols LIKE '%"' || ? || '"%'
-        )
-      `;
+      // Get neighbors from adjacency list (O(1) lookup)
+      const neighbors = adjacency.get(currentSymbol);
+      if (!neighbors) continue;
 
-      const params: any[] = [currentSymbol, currentSymbol];
+      for (const edge of neighbors) {
+        // Avoid cycles (except allow reaching target)
+        if (visited.has(edge.to) && edge.to !== toSymbol) continue;
 
-      if (category) {
-        sql += ' AND category = ?';
-        params.push(category);
+        const newPath = [
+          ...path.slice(0, -1),
+          {
+            symbolId: path[path.length - 1].symbolId,
+            relationshipType: edge.type,
+            category: edge.category,
+          },
+          {
+            symbolId: edge.to,
+            relationshipType: '',
+            category: '',
+          },
+        ];
+
+        const newVisited = new Set(visited);
+        newVisited.add(edge.to);
+
+        queue.push({
+          currentSymbol: edge.to,
+          path: newPath,
+          visited: newVisited,
+        });
       }
+    }
 
-      const relationships = dbManager.db.prepare(sql).all(...params) as any[];
-
-      for (const rel of relationships) {
-        const fromSymbols = JSON.parse(rel.from_symbols);
-        const toSymbols = JSON.parse(rel.to_symbols);
-
-        if (fromSymbols.includes(currentSymbol)) {
-          for (const nextSymbol of toSymbols) {
-            // Avoid cycles
-            if (visited.has(nextSymbol) && nextSymbol !== toSymbol) continue;
-
-            const newPath = [
-              ...path.slice(0, -1),
-              {
-                symbolId: path[path.length - 1].symbolId,
-                relationshipType: rel.type,
-                category: rel.category,
-              },
-              {
-                symbolId: nextSymbol,
-                relationshipType: '',
-                category: '',
-              },
-            ];
-
-            const newVisited = new Set(visited);
-            newVisited.add(nextSymbol);
-
-            queue.push({
-              currentSymbol: nextSymbol,
-              path: newPath,
-              visited: newVisited,
-            });
-          }
-        }
-      }
+    if (iterations >= maxIterations) {
+      console.warn(`Warning: Search terminated after ${maxIterations} iterations`);
     }
 
     return allPaths;
@@ -308,8 +371,6 @@ Examples:
    */
   private calculatePathStrength(path: PathNode[]): number {
     if (path.length <= 1) return 1.0;
-
-    // For now, use a simple heuristic based on path length
     // Shorter paths = stronger connection
     return 1.0 / path.length;
   }
