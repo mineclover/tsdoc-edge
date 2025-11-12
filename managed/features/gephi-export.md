@@ -10,7 +10,8 @@ TSDoc Edge 관계 그래프를 **Gephi Lite** 웹 애플리케이션에서 시�
 
 - **입력**: SQLite 데이터베이스의 unified_relationships 테이블
 - **출력**: @gephi/gephi-lite-sdk 호환 GraphDataset JSON
-- **의존성**: [[RelationshipExportCommand]], [[DatabaseManager]]
+- **의존성**: [[DatabaseManager]]
+- **구현**: Source: src/commands/RelationshipExportCommand.ts
 - **사용처**: Gephi Lite (https://gephi.org/gephi-lite/)
 
 ## Features
@@ -150,10 +151,11 @@ npx ts-node src/scripts/verify-gephi-format.ts
 
 ## Related Features
 
-- [[RelationshipExportCommand]]: Export 명령어 구현
-- [[RelationshipVisualizeCommand]]: Mermaid/DOT 시각화
-- [[RelationshipPathCommand]]: 경로 탐색
+- **Export Command**: Source: src/commands/RelationshipExportCommand.ts
+- **Visualization**: Source: src/commands/RelationshipVisualizeCommand.ts (Mermaid/DOT)
+- **Path Finding**: Source: src/commands/RelationshipPathCommand.ts
 - [[DatabaseManager]]: 데이터베이스 관리
+- [[UnifiedRelationship]]: 관계 데이터 모델
 
 ## Decisions
 

@@ -1,11 +1,11 @@
 {
-  "timestamp": "2025-11-12T15:17:53.649Z",
+  "timestamp": "2025-11-12T15:20:38.426Z",
   "statistics": {
     "totalDefinitions": 238,
     "totalAuxiliaries": 145,
-    "totalReferences": 7292,
+    "totalReferences": 7289,
     "totalCodeConnections": 241,
-    "avgReferencesPerSymbol": 30.638655462184875
+    "avgReferencesPerSymbol": 30.626050420168067
   },
   "symbols": [
     "CLI Commands",
@@ -21018,7 +21018,7 @@
             "name": "DatabaseManager",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/features/gephi-export.md",
-            "line": 114,
+            "line": 115,
             "level": 0
           },
           {
@@ -54185,44 +54185,13 @@
         ]
       ],
       [
-        "RelationshipExportCommand",
+        "UnifiedRelationship",
         [
           {
-            "name": "RelationshipExportCommand",
+            "name": "UnifiedRelationship",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/features/gephi-export.md",
-            "line": 13,
-            "level": 0
-          },
-          {
-            "name": "RelationshipExportCommand",
-            "type": "reference",
-            "filePath": "/home/user/tsdoc-edge/managed/features/gephi-export.md",
-            "line": 111,
-            "level": 0
-          }
-        ]
-      ],
-      [
-        "RelationshipVisualizeCommand",
-        [
-          {
-            "name": "RelationshipVisualizeCommand",
-            "type": "reference",
-            "filePath": "/home/user/tsdoc-edge/managed/features/gephi-export.md",
-            "line": 112,
-            "level": 0
-          }
-        ]
-      ],
-      [
-        "RelationshipPathCommand",
-        [
-          {
-            "name": "RelationshipPathCommand",
-            "type": "reference",
-            "filePath": "/home/user/tsdoc-edge/managed/features/gephi-export.md",
-            "line": 113,
+            "line": 116,
             "level": 0
           }
         ]
