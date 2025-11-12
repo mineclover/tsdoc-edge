@@ -1,5 +1,8 @@
 /**
  * Verify Gephi export format matches @gephi/gephi-lite-sdk types
+ *
+ * @doc [[Gephi Export]]
+ * @packageDocumentation
  */
 
 import * as fs from 'node:fs';
