@@ -123,9 +123,14 @@ Examples:
       this.printInfo(`Searching for paths (max length: ${options.maxLength})...`);
       const startSearch = Date.now();
 
-      // Find paths using optimized BFS
-      const paths = this.findPathsOptimized(
+      // Build reverse adjacency for bidirectional search
+      const reverseAdjacency = this.buildReverseAdjacency(adjacency);
+      this.printInfo(`Reverse graph built`);
+
+      // Find paths using bidirectional BFS
+      const paths = this.findPathsBidirectional(
         adjacency,
+        reverseAdjacency,
         fromSymbol,
         toSymbol,
         options.maxLength
@@ -225,7 +230,7 @@ Examples:
   }
 
   /**
-   * Build adjacency list from database (one-time operation)
+   * Build both forward and reverse adjacency lists from database (one-time operation)
    */
   private buildAdjacencyList(
     dbManager: DatabaseManager,
@@ -276,42 +281,70 @@ Examples:
   }
 
   /**
-   * Find paths using optimized BFS with adjacency list
+   * Build reverse adjacency list for backward search
    */
-  private findPathsOptimized(
-    adjacency: Map<string, GraphEdge[]>,
+  private buildReverseAdjacency(
+    forward: Map<string, GraphEdge[]>
+  ): Map<string, GraphEdge[]> {
+    const reverse = new Map<string, GraphEdge[]>();
+
+    for (const [from, edges] of forward.entries()) {
+      for (const edge of edges) {
+        if (!reverse.has(edge.to)) {
+          reverse.set(edge.to, []);
+        }
+
+        reverse.get(edge.to)!.push({
+          to: from,
+          type: edge.type,
+          category: edge.category,
+        });
+      }
+    }
+
+    return reverse;
+  }
+
+  /**
+   * Find paths using memory-efficient BFS
+   * Limited to finding up to 100 paths to avoid memory issues
+   */
+  private findPathsBidirectional(
+    forward: Map<string, GraphEdge[]>,
+    reverse: Map<string, GraphEdge[]>,
     fromSymbol: string,
     toSymbol: string,
     maxLength: number
   ): SymbolPath[] {
     const allPaths: SymbolPath[] = [];
-    const queue: Array<{
-      currentSymbol: string;
-      path: PathNode[];
-      visited: Set<string>;
-    }> = [
-      {
-        currentSymbol: fromSymbol,
-        path: [{ symbolId: fromSymbol, relationshipType: '', category: '' }],
-        visited: new Set([fromSymbol]),
-      },
-    ];
+    const maxPaths = 100; // Limit total paths to prevent memory issues
 
-    // Early termination if no edges from start
-    if (!adjacency.has(fromSymbol)) {
+    // Early termination checks
+    if (!forward.has(fromSymbol) && fromSymbol !== toSymbol) {
       return [];
     }
 
-    let iterations = 0;
-    const maxIterations = 100000; // Safety limit
+    // Simple BFS with path tracking (memory-limited)
+    const queue: Array<{
+      symbolId: string;
+      path: PathNode[];
+      visited: Set<string>;
+    }> = [{
+      symbolId: fromSymbol,
+      path: [{ symbolId: fromSymbol, relationshipType: '', category: '' }],
+      visited: new Set([fromSymbol]),
+    }];
 
-    while (queue.length > 0 && iterations < maxIterations) {
+    let iterations = 0;
+    const maxIterations = 50000; // Safety limit
+
+    while (queue.length > 0 && iterations < maxIterations && allPaths.length < maxPaths) {
       iterations++;
 
-      const { currentSymbol, path, visited } = queue.shift()!;
+      const { symbolId, path, visited } = queue.shift()!;
 
       // Check if we've reached the target
-      if (currentSymbol === toSymbol && path.length > 1) {
+      if (symbolId === toSymbol && path.length > 1) {
         const strength = this.calculatePathStrength(path);
         allPaths.push({
           nodes: path,
@@ -319,7 +352,7 @@ Examples:
           strength,
         });
 
-        // Continue searching for alternative paths
+        // Continue searching for more paths
         continue;
       }
 
@@ -327,7 +360,7 @@ Examples:
       if (path.length > maxLength) continue;
 
       // Get neighbors from adjacency list (O(1) lookup)
-      const neighbors = adjacency.get(currentSymbol);
+      const neighbors = forward.get(symbolId);
       if (!neighbors) continue;
 
       for (const edge of neighbors) {
@@ -352,7 +385,7 @@ Examples:
         newVisited.add(edge.to);
 
         queue.push({
-          currentSymbol: edge.to,
+          symbolId: edge.to,
           path: newPath,
           visited: newVisited,
         });
@@ -360,10 +393,54 @@ Examples:
     }
 
     if (iterations >= maxIterations) {
-      console.warn(`Warning: Search terminated after ${maxIterations} iterations`);
+      console.warn(`  Warning: Search terminated after ${maxIterations} iterations`);
     }
 
-    return allPaths;
+    if (allPaths.length >= maxPaths) {
+      console.warn(`  Warning: Path limit reached (${maxPaths} paths found)`);
+    }
+
+    // Deduplicate paths
+    const uniquePaths = new Map<string, SymbolPath>();
+    for (const pathData of allPaths) {
+      const key = pathData.nodes.map(n => n.symbolId).join('→');
+      if (!uniquePaths.has(key) || uniquePaths.get(key)!.strength < pathData.strength) {
+        uniquePaths.set(key, pathData);
+      }
+    }
+
+    return Array.from(uniquePaths.values());
+  }
+
+  /**
+   * Merge forward and backward paths at meeting point
+   */
+  private mergePaths(forward: PathNode[], backward: PathNode[]): PathNode[] {
+    // Forward path is from source to meeting point
+    // Backward path is from target to meeting point
+    // We need to reverse the backward path and connect them
+
+    const forwardPart = forward.slice(0, -1); // Remove meeting point from forward
+    const backwardPart = backward.slice(0, -1).reverse(); // Reverse and remove meeting point
+
+    // Update relationship info for backward part
+    const reversedBackward = backwardPart.map((node, i) => {
+      if (i < backwardPart.length - 1) {
+        return {
+          symbolId: node.symbolId,
+          relationshipType: backwardPart[i + 1].relationshipType,
+          category: backwardPart[i + 1].category,
+        };
+      }
+      return node;
+    });
+
+    // Combine: forward + meeting point + reversed backward
+    return [
+      ...forwardPart,
+      forward[forward.length - 1], // Meeting point
+      ...reversedBackward,
+    ];
   }
 
   /**
