@@ -41,8 +41,8 @@ export { FindDocCommand } from './FindDocCommand';
 export { PlansCommand } from './PlansCommand';
 export { FindMethodCommand } from './FindMethodCommand';
 export { TodosCommand } from './TodosCommand';
+export { StatsCommand } from './StatsCommand';
 export {
-  StatsCommand,
   CoreApiCommand,
   ScanCommand,
   SyncCoverageCommand,
