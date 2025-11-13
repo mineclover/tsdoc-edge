@@ -36,10 +36,8 @@ export { SpecStatusCommand } from './SpecStatusCommand';
 export { FindUnusedDocsCommand } from './FindUnusedDocsCommand';
 export { SpecHistoryCommand } from './SpecHistoryCommand';
 export { SpecDiffCommand } from './SpecDiffCommand';
-export {
-  SpecBumpCommand,
-  FindDocCommand,
-} from './Phase6Commands';
+export { SpecBumpCommand } from './SpecBumpCommand';
+export { FindDocCommand } from './Phase6Commands';
 export {
   PlansCommand,
   FindMethodCommand,
