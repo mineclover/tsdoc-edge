@@ -40,8 +40,8 @@ export { SpecBumpCommand } from './SpecBumpCommand';
 export { FindDocCommand } from './FindDocCommand';
 export { PlansCommand } from './PlansCommand';
 export { FindMethodCommand } from './FindMethodCommand';
+export { TodosCommand } from './TodosCommand';
 export {
-  TodosCommand,
   StatsCommand,
   CoreApiCommand,
   ScanCommand,
