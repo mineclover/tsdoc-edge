@@ -33,8 +33,8 @@ export {
 } from './Phase5Commands';
 export { CheckDuplicatesCommand } from './CheckDuplicatesCommand';
 export { SpecStatusCommand } from './SpecStatusCommand';
+export { FindUnusedDocsCommand } from './FindUnusedDocsCommand';
 export {
-  FindUnusedDocsCommand,
   SpecHistoryCommand,
   SpecDiffCommand,
   SpecBumpCommand,
