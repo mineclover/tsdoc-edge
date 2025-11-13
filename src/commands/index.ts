@@ -42,8 +42,8 @@ export { PlansCommand } from './PlansCommand';
 export { FindMethodCommand } from './FindMethodCommand';
 export { TodosCommand } from './TodosCommand';
 export { StatsCommand } from './StatsCommand';
+export { CoreApiCommand } from './CoreApiCommand';
 export {
-  CoreApiCommand,
   ScanCommand,
   SyncCoverageCommand,
 } from './Phase7Commands';
