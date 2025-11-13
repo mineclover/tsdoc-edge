@@ -34,8 +34,8 @@ export {
 export { CheckDuplicatesCommand } from './CheckDuplicatesCommand';
 export { SpecStatusCommand } from './SpecStatusCommand';
 export { FindUnusedDocsCommand } from './FindUnusedDocsCommand';
+export { SpecHistoryCommand } from './SpecHistoryCommand';
 export {
-  SpecHistoryCommand,
   SpecDiffCommand,
   SpecBumpCommand,
   FindDocCommand,
