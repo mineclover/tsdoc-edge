@@ -38,8 +38,8 @@ export { SpecHistoryCommand } from './SpecHistoryCommand';
 export { SpecDiffCommand } from './SpecDiffCommand';
 export { SpecBumpCommand } from './SpecBumpCommand';
 export { FindDocCommand } from './FindDocCommand';
+export { PlansCommand } from './PlansCommand';
 export {
-  PlansCommand,
   FindMethodCommand,
   TodosCommand,
   StatsCommand,
