@@ -31,8 +31,8 @@ export {
   UndocumentedCommand,
   TreeCommand,
 } from './Phase5Commands';
+export { CheckDuplicatesCommand } from './CheckDuplicatesCommand';
 export {
-  CheckDuplicatesCommand,
   SpecStatusCommand,
   FindUnusedDocsCommand,
   SpecHistoryCommand,
