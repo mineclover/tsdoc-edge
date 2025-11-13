@@ -43,10 +43,8 @@ export { FindMethodCommand } from './FindMethodCommand';
 export { TodosCommand } from './TodosCommand';
 export { StatsCommand } from './StatsCommand';
 export { CoreApiCommand } from './CoreApiCommand';
-export {
-  ScanCommand,
-  SyncCoverageCommand,
-} from './Phase7Commands';
+export { ScanCommand } from './ScanCommand';
+export { SyncCoverageCommand } from './SyncCoverageCommand';
 export {
   UntestedCommand,
   WithoutResponsibilityCommand,
