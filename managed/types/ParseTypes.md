@@ -146,10 +146,13 @@ tsdoc-edge validate
 
 ### Referenced By
 
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:59
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:60
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:42
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:43
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:54
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:55
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:72
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:73
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:74
+- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:45
+- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:46
+- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:47
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:64
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:65
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:66
 

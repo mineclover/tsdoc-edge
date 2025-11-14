@@ -96,16 +96,18 @@ completeness: 85%
 - [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:138
 - [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:139
 - [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:62
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:87
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:88
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:89
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:90
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:93
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:94
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:95
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:96
+- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:97
 - [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:54
 - [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:65
 - [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:66
 - [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:67
 - [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:68
+- [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:69
 - [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:79
-- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:94
-- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:95
+- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:96
+- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:97
 

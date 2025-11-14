@@ -379,10 +379,12 @@ Uses: DocumentSymbol, FeatureTypes, LinkingTypes
 
 ### Referenced By
 
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:385
-- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:248
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:392
+- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:249
 - [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:401
-- [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:412
+- [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:414
+- [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:415
 - [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:415
-- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:427
+- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:431
+- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:432
 

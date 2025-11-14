@@ -31,28 +31,31 @@ Analyze and display test-to-code relationships.
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:207
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:411
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:412
-- [[TestRelationshipAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestRelationshipAnalyzer.md:37
-- [[TestRelationshipAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestRelationshipAnalyzer.md:38
+- [[TestRelationshipAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestRelationshipAnalyzer.md:40
+- [[TestRelationshipAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestRelationshipAnalyzer.md:41
+- [[TestRelationshipAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestRelationshipAnalyzer.md:42
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:97
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:353
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:354
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:355
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:356
 - [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:131
-- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:162
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:166
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:167
 - [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:158
-- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:177
-- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:178
+- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:179
+- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:180
 - [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:250
-- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:268
-- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:269
-- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:42
-- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:43
+- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:272
+- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:273
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:54
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:55
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:56
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:96
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:254
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:255
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:260
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:261
 - [[TestRelationships]] → /home/user/tsdoc-edge/managed/types/TestRelationships.md:73
 - [[TestRelationships]] → /home/user/tsdoc-edge/managed/types/TestRelationships.md:86
 - [[TestRelationships]] → /home/user/tsdoc-edge/managed/types/TestRelationships.md:87
 - [[UnifiedRelationships]] → /home/user/tsdoc-edge/managed/types/UnifiedRelationships.md:117
-- [[UnifiedRelationships]] → /home/user/tsdoc-edge/managed/types/UnifiedRelationships.md:132
 - [[UnifiedRelationships]] → /home/user/tsdoc-edge/managed/types/UnifiedRelationships.md:133
+- [[UnifiedRelationships]] → /home/user/tsdoc-edge/managed/types/UnifiedRelationships.md:134
 

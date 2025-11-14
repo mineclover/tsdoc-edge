@@ -295,28 +295,38 @@ tsdoc-edge deps Engine --reverse --type=composition
 ### Referenced By
 
 - [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:390
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:484
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:485
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:486
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:487
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:93
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:94
-- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:33
-- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:34
-- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:35
-- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:36
-- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:32
-- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:33
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:46
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:47
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:98
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:99
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:100
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:101
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:488
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:489
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:490
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:491
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:492
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:110
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:111
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:112
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:39
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:40
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:41
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:42
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:43
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:44
+- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:38
+- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:39
+- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:40
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:58
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:59
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:60
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:120
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:121
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:122
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:123
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:124
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:125
 - [[Enhancement]] → /home/user/tsdoc-edge/managed/relationships/enhancement.md:46
 - [[Enhancement]] → /home/user/tsdoc-edge/managed/relationships/enhancement.md:62
+- [[Enhancement]] → /home/user/tsdoc-edge/managed/relationships/enhancement.md:63
 - [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:85
 - [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:86
 - [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:97
 - [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:116
+- [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:117
 

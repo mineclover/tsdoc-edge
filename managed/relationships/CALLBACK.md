@@ -402,27 +402,34 @@ tsdoc-edge analyze --callback-depth
 ### Referenced By
 
 - [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:204
-- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:296
-- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:297
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:309
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:310
 - [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:391
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:478
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:479
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:480
 - [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:481
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:89
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:90
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:91
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:92
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:48
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:49
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:50
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:51
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:482
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:483
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:484
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:485
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:104
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:105
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:106
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:107
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:108
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:109
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:60
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:61
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:62
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:63
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:64
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:65
 - [[Event Flow]] → /home/user/tsdoc-edge/managed/relationships/event-flow.md:51
 - [[Event Flow]] → /home/user/tsdoc-edge/managed/relationships/event-flow.md:67
 - [[Event Flow]] → /home/user/tsdoc-edge/managed/relationships/event-flow.md:68
 - [[Event Flow]] → /home/user/tsdoc-edge/managed/relationships/event-flow.md:69
 - [[Event Flow]] → /home/user/tsdoc-edge/managed/relationships/event-flow.md:70
 - [[Event Flow]] → /home/user/tsdoc-edge/managed/relationships/event-flow.md:71
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:102
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:103
+- [[Event Flow]] → /home/user/tsdoc-edge/managed/relationships/event-flow.md:72
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:116
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:117
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:118
 

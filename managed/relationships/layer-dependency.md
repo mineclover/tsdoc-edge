@@ -182,13 +182,15 @@ Total: 4 layer violations
 ### Referenced By
 
 - [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:120
-- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:206
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:112
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:113
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:118
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:119
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:207
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:208
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:144
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:145
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:137
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:138
 - [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:95
-- [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:118
-- [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:119
-- [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:120
+- [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:121
+- [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:122
+- [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:123
+- [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:124
 

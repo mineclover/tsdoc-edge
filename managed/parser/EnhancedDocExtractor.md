@@ -453,33 +453,38 @@ export class BuildCommand extends BaseCommand {
 ### Referenced By
 
 - [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:241
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:276
 - [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:277
 - [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:278
 - [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:279
+- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:280
+- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:281
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:183
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:414
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:415
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:273
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:274
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:416
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:281
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:282
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:283
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:103
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:251
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:252
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:268
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:269
 - [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:24
 - [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:34
 - [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:35
 - [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:36
 - [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:37
+- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:38
 - [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:23
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:46
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:47
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:48
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:49
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:54
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:55
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:56
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:57
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:58
 - [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:154
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:217
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:218
 - [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:219
 - [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:220
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:221
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:222
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:223
 - [[EnhancedTagTypes]] → /home/user/tsdoc-edge/managed/types/EnhancedTagTypes.md:79
 - [[EnhancedTagTypes]] → /home/user/tsdoc-edge/managed/types/EnhancedTagTypes.md:90
 - [[EnhancedTagTypes]] → /home/user/tsdoc-edge/managed/types/EnhancedTagTypes.md:91

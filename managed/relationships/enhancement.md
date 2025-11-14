@@ -103,12 +103,12 @@ class Core {
 
 ### Referenced By
 
-- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:204
 - [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:205
-- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:39
-- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:40
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:106
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:107
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:206
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:48
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:49
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:134
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:135
 - [[Conceptual Relation]] → /home/user/tsdoc-edge/managed/relationships/conceptual-relation.md:134
 - [[Conceptual Relation]] → /home/user/tsdoc-edge/managed/relationships/conceptual-relation.md:157
 - [[Feature Grouping]] → /home/user/tsdoc-edge/managed/relationships/feature-grouping.md:176

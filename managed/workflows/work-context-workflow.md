@@ -426,59 +426,63 @@ done
 ### Referenced By
 
 - [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:280
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:336
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:337
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:352
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:353
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:95
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:274
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:505
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:506
 - [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:114
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:150
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:151
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:156
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:157
 - [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:90
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:159
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:112
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:113
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:217
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:218
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:170
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:171
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:132
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:133
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:134
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:232
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:233
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:234
 - [[Codebase Health Report]] → /home/user/tsdoc-edge/managed/features/codebase-health-report.md:342
 - [[Context Quality Improvements]] → /home/user/tsdoc-edge/managed/features/context-quality-improvements.md:196
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:19
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:364
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:365
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:271
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:272
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:366
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:367
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:288
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:289
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:290
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:14
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:220
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:463
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:464
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:465
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:466
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:294
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:567
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:568
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:569
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:570
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:68
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:136
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:189
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:259
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:260
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:261
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:262
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:263
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:264
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:267
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:268
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:269
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:270
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:271
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:272
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:186
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:309
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:310
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:334
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:335
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:151
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:161
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:177
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:221
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:222
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:223
+- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:224
 - [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:280
 - [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:299
-- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:321
-- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:322
-- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:323
-- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:324
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:329
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:330
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:331
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:332
 - [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:400
-- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:454
-- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:455
+- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:456
+- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:457
 

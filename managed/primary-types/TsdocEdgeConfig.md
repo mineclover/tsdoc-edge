@@ -133,33 +133,39 @@ const dbPath = config.paths.databasePath;
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:224
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:462
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:121
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:122
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:180
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:181
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:151
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:152
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:153
 - [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:182
 - [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:183
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:51
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:52
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:53
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:54
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:184
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:185
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:186
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:187
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:60
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:61
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:62
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:63
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:64
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:65
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:23
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:47
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:48
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:49
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:50
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:56
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:57
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:58
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:59
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:60
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:100
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:183
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:184
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:291
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:394
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:395
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:191
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:192
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:379
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:495
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:496
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:158
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:241
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:242
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:249
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:250
 - [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:91
-- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:106
 - [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:107
+- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:108
 
 ### Implemented By
 

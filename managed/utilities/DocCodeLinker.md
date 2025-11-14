@@ -66,19 +66,23 @@ const symbols = index.docToSymbol.get('managed/services.md');
 ### Referenced By
 
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:188
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:424
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:425
-- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:93
-- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:94
-- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:143
-- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:144
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:426
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:104
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:105
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:106
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:156
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:157
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:158
 - [[LinkingTypes]] → /home/user/tsdoc-edge/managed/types/LinkingTypes.md:67
 - [[LinkingTypes]] → /home/user/tsdoc-edge/managed/types/LinkingTypes.md:79
 - [[LinkingTypes]] → /home/user/tsdoc-edge/managed/types/LinkingTypes.md:80
 - [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:62
-- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:78
 - [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:79
 - [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:80
 - [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:81
+- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:82
+- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:83
 - [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:401
+- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:434
 

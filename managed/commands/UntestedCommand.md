@@ -230,36 +230,44 @@ Low Priority:
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:249
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:414
-- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:70
-- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:71
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:136
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:72
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:73
 - [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:137
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:52
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:53
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:36
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:37
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:138
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:64
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:65
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:39
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:40
 - [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:115
-- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:144
-- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:145
-- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:146
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:147
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:148
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:149
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:150
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:73
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:163
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:244
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:245
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:169
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:170
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:260
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:261
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:79
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:101
-- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:123
-- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:124
-- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:125
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:128
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:129
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:130
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:131
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:132
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:77
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:116
-- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:136
-- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:137
-- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:127
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:139
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:140
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:141
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:142
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:128
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:197
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:321
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:334
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:335
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:99
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:256
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:121
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:122
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:262
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:263
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:133
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:134
 

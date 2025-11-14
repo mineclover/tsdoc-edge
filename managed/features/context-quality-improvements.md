@@ -306,6 +306,9 @@ work-context 쿼리 시간: ~200ms (+150ms)
 
 ### Referenced By
 
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:116
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:303
 - [[Codebase Health Report]] → /home/user/tsdoc-edge/managed/features/codebase-health-report.md:155
 - [[Codebase Health Report]] → /home/user/tsdoc-edge/managed/features/codebase-health-report.md:340
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:269
 

@@ -115,15 +115,17 @@ tsdoc-edge config set analytics.enabled false
 
 ### Referenced By
 
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:198
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:199
-- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:36
-- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:37
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:57
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:58
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:211
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:212
+- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:38
+- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:39
+- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:40
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:70
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:71
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:72
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:36
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:187
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:188
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:195
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:196
 - [[AnalyticsTypes]] → /home/user/tsdoc-edge/managed/types/AnalyticsTypes.md:59
 - [[AnalyticsTypes]] → /home/user/tsdoc-edge/managed/types/AnalyticsTypes.md:73
 - [[AnalyticsTypes]] → /home/user/tsdoc-edge/managed/types/AnalyticsTypes.md:74

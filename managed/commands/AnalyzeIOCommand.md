@@ -35,26 +35,30 @@ Analyze file I/O dependencies.
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:375
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:56
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:219
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:335
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:336
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:337
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:338
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:339
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:340
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:54
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:134
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:135
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:136
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:136
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:282
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:283
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:284
+- [[Analyzer Development Guide]] → /home/user/tsdoc-edge/managed/guides/analyzer-development-guide.md:254
 - [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:240
-- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:283
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:294
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:295
+- [[CLI Command Development Guide]] → /home/user/tsdoc-edge/managed/guides/command-development-guide.md:250
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:48
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:238
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:239
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:242
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:243
 - [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:15
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:72
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:73
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:74
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:75
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:78
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:79
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:80
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:81
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:82
 - [[DataFlowTypes]] → /home/user/tsdoc-edge/managed/types/DataFlowTypes.md:76
 - [[DataFlowTypes]] → /home/user/tsdoc-edge/managed/types/DataFlowTypes.md:88
 - [[DataFlowTypes]] → /home/user/tsdoc-edge/managed/types/DataFlowTypes.md:89

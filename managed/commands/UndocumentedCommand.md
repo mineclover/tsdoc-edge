@@ -194,36 +194,42 @@ Source: `src/commands/Phase5Commands.ts`
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:248
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:413
-- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:68
-- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:69
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:50
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:51
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:70
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:71
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:62
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:63
 - [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:129
-- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:163
-- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:164
-- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:165
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:37
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:38
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:168
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:169
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:170
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:171
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:41
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:42
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:72
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:162
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:242
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:243
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:167
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:168
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:258
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:259
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:78
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:100
-- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:120
-- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:121
-- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:122
-- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:126
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:123
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:124
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:125
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:126
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:127
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:127
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:190
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:320
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:332
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:333
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:132
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:184
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:119
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:120
-- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:101
-- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:102
-- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:103
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:188
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:189
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:131
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:132
 - [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:104
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:105
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:106
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:107
 
 ### Implemented By
 

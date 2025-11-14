@@ -343,5 +343,12 @@ interface ConceptualMetrics {
 
 ### Referenced By
 
+- [[Doc Reference]] → /home/user/tsdoc-edge/managed/relationships/doc-reference.md:60
+- [[Doc Reference]] → /home/user/tsdoc-edge/managed/relationships/doc-reference.md:61
+- [[Enhancement]] → /home/user/tsdoc-edge/managed/relationships/enhancement.md:68
+- [[Enhancement]] → /home/user/tsdoc-edge/managed/relationships/enhancement.md:69
 - [[Feature Grouping]] → /home/user/tsdoc-edge/managed/relationships/feature-grouping.md:173
+- [[Feature Grouping]] → /home/user/tsdoc-edge/managed/relationships/feature-grouping.md:196
+- [[Feature Grouping]] → /home/user/tsdoc-edge/managed/relationships/feature-grouping.md:197
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:317
 

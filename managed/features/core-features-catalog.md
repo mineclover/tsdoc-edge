@@ -426,46 +426,59 @@ tsdoc-edge todos                        # TODO 목록
 
 ### Referenced By
 
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:337
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:338
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:339
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:340
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:341
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:342
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:189
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:352
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:353
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:354
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:355
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:356
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:357
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:358
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:359
 - [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:190
 - [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:191
 - [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:192
 - [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:193
 - [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:194
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:220
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:221
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:222
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:223
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:224
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:225
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:134
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:135
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:136
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:137
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:195
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:196
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:197
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:229
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:230
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:231
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:232
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:233
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:234
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:235
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:236
 - [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:138
 - [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:139
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:140
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:141
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:142
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:143
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:144
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:145
 - [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:8
 - [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:226
-- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:239
 - [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:240
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:317
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:318
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:319
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:320
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:321
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:322
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:276
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:277
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:278
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:279
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:280
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:281
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:264
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:265
+- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:241
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:323
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:324
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:325
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:326
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:327
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:328
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:329
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:330
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:288
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:289
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:290
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:291
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:292
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:293
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:294
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:295
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:270
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:271
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:272
 

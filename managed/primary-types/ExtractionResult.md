@@ -130,27 +130,34 @@ Source Code → [TSDocParser] → ExtractionResult
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:460
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:91
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:173
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:246
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:247
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:248
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:249
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:250
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:251
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:252
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:253
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:115
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:116
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:117
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:118
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:119
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:120
-- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:44
-- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:45
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:292
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:392
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:393
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:181
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:182
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:262
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:263
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:264
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:265
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:266
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:267
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:268
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:269
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:270
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:271
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:142
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:143
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:144
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:145
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:146
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:147
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:148
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:149
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:150
+- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:53
+- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:54
+- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:55
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:380
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:493
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:494
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:218
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:219
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:220
 
 ### Implemented By
 

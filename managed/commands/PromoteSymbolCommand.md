@@ -36,14 +36,15 @@ Promote auxiliary symbols to primary definitions.
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:407
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:408
 - [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:92
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:169
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:170
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:171
 - [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:172
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:173
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:174
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:175
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:176
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:63
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:157
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:158
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:105
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:344
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:345
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:161
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:162
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:179
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:437
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:438
 

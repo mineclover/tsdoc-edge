@@ -119,21 +119,23 @@ Uses [[DatabaseManager]] for sessions.
 ### Referenced By
 
 - [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:128
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:196
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:197
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:204
+- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:205
 - [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:80
-- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:109
-- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:110
 - [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:111
 - [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:112
+- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:113
+- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:114
+- [[Document Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/DocumentSymbolParser.md:115
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:23
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:29
-- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:47
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:48
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:49
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:50
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:51
 - [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:52
+- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:53
+- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:54
 - [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:20
 - [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:26
 - [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:39
@@ -142,6 +144,8 @@ Uses [[DatabaseManager]] for sessions.
 - [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:42
 - [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:43
 - [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:44
-- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:93
-- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:94
+- [[SymbolFootnoteRef]] → /home/user/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:45
+- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:95
+- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:96
+- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:97
 

@@ -38,13 +38,15 @@ interface ParallelWorkGroup {
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:160
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:359
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:179
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:317
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:318
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:319
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:320
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:91
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:396
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:397
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:74
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:75
-- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:261
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:82
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:83
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:84
 - [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:262
+- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:263
+- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:264
 

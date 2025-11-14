@@ -424,7 +424,13 @@ TSDoc Edge 코드베이스는 **전반적으로 건강한 상태**입니다:
 
 ### Referenced By
 
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:302
+- [[Analyzer Status]] → /home/user/tsdoc-edge/managed/features/analyzer-status.md:296
+- [[Analyzer Status]] → /home/user/tsdoc-edge/managed/features/analyzer-status.md:297
+- [[Context Quality Improvements]] → /home/user/tsdoc-edge/managed/features/context-quality-improvements.md:212
+- [[Context Quality Improvements]] → /home/user/tsdoc-edge/managed/features/context-quality-improvements.md:213
 - [[Phase Commands Refactoring Guide]] → /home/user/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:8
 - [[Phase Commands Refactoring Guide]] → /home/user/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:190
 - [[Phase Commands Refactoring Guide]] → /home/user/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:246
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:268
 

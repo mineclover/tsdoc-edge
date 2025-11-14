@@ -346,3 +346,16 @@ Path 3 (length: 3):
 - [[Commands Index]] - Full command reference
 - [[Gephi Export]] - Graph visualization
 - [[UnifiedRelationship]] - Relationship data model
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:305
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:306
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:321
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:322
+- [[Gephi Export]] → /home/user/tsdoc-edge/managed/features/gephi-export.md:176
+

@@ -372,6 +372,27 @@ tsdoc-edge work-context src/services/UserService.ts
 
 ## Backlinks
 
+### Referenced By
+
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:294
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:295
+- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:30
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:62
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:63
+- [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:29
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:168
+- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:29
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:262
+- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:27
+- [[UpdateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateSymbolRefsCommand.md:29
+- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:29
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:191
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:66
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:67
+- [[CLI Command Development Guide]] → /home/user/tsdoc-edge/managed/guides/command-development-guide.md:344
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:48
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:203
+
 ### Implemented By
 
 - CheckDuplicatesCommand (check-duplicates) → /home/user/tsdoc-edge/src/commands/CheckDuplicatesCommand.ts:68

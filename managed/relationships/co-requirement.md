@@ -310,6 +310,13 @@ interface CoRequirementMetrics {
 
 ### Referenced By
 
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:130
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:131
+- [[Feature Grouping]] → /home/user/tsdoc-edge/managed/relationships/feature-grouping.md:195
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:315
 - [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:105
 - [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:122
+- [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:142
+- [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:143
+- [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:144
 

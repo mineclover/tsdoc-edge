@@ -28,14 +28,16 @@ Tracks:
 
 ### Referenced By
 
-- [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:29
 - [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:30
+- [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:31
+- [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:32
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:124
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:311
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:312
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:313
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:314
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:157
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:233
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:234
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:23
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:24
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:237
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:238
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:27
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:28
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:29
 

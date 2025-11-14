@@ -33,11 +33,13 @@ Supports:
 - [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:32
 - [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:33
 - [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:34
+- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:35
 - [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:22
 - [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:31
 - [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:32
 - [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:33
 - [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:34
+- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:35
 - [[CommentStateTypes]] → /home/user/tsdoc-edge/managed/types/CommentStateTypes.md:113
 - [[CommentStateTypes]] → /home/user/tsdoc-edge/managed/types/CommentStateTypes.md:122
 - [[CommentStateTypes]] → /home/user/tsdoc-edge/managed/types/CommentStateTypes.md:123

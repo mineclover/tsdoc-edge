@@ -80,14 +80,18 @@ Returns:
 
 ### Referenced By
 
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:284
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:285
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:149
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:150
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:56
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:57
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:311
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:312
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:313
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:188
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:189
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:190
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:67
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:68
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:69
 - [[String Utilities]] → /home/user/tsdoc-edge/managed/utilities/StringUtilities.md:55
 - [[String Utilities]] → /home/user/tsdoc-edge/managed/utilities/StringUtilities.md:79
 - [[String Utilities]] → /home/user/tsdoc-edge/managed/utilities/StringUtilities.md:80
 - [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:400
+- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:435
 

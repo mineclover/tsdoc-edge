@@ -455,8 +455,13 @@ class CheckoutFeature {}
 ### Referenced By
 
 - [[Co-Requirement]] → /home/user/tsdoc-edge/managed/relationships/co-requirement.md:151
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:136
 - [[Conceptual Relation]] → /home/user/tsdoc-edge/managed/relationships/conceptual-relation.md:132
 - [[Conceptual Relation]] → /home/user/tsdoc-edge/managed/relationships/conceptual-relation.md:155
+- [[Conceptual Relation]] → /home/user/tsdoc-edge/managed/relationships/conceptual-relation.md:177
+- [[Enhancement]] → /home/user/tsdoc-edge/managed/relationships/enhancement.md:70
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:319
+- [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:120
 - [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:107
 - [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:124
 

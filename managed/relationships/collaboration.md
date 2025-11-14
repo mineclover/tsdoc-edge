@@ -364,7 +364,15 @@ interface CollaborationMetrics {
 
 ### Referenced By
 
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:64
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:132
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:133
+- [[Event Flow]] → /home/user/tsdoc-edge/managed/relationships/event-flow.md:77
+- [[Event Flow]] → /home/user/tsdoc-edge/managed/relationships/event-flow.md:78
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:316
 - [[Integration Verification]] → /home/user/tsdoc-edge/managed/relationships/integration-verification.md:158
 - [[Integration Verification]] → /home/user/tsdoc-edge/managed/relationships/integration-verification.md:188
 - [[Temporal Order]] → /home/user/tsdoc-edge/managed/relationships/temporal-order.md:220
+- [[Temporal Order]] → /home/user/tsdoc-edge/managed/relationships/temporal-order.md:241
+- [[Temporal Order]] → /home/user/tsdoc-edge/managed/relationships/temporal-order.md:242
 

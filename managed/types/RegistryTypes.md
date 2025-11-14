@@ -179,10 +179,13 @@ const changed = registry.filter(e =>
 
 ### Referenced By
 
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:362
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:363
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:310
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:311
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:121
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:122
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:431
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:432
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:433
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:318
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:319
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:320
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:143
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:144
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:145
 

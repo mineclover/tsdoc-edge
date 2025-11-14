@@ -198,41 +198,51 @@ Source: `src/commands/Phase5Commands.ts`
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:247
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:395
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:396
-- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:252
 - [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:60
 - [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:61
 - [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:106
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:130
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:131
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:132
-- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:79
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:133
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:134
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:135
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:136
 - [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:80
+- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:81
 - [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:85
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:137
-- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:144
-- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:145
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:140
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:141
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:142
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:148
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:149
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:71
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:153
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:155
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:156
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:82
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:117
+- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:118
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:76
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:115
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:132
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:133
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:134
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:135
+- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:136
 - [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:90
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:157
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:160
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:161
 - [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:123
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:183
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:310
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:318
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:319
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:145
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:246
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:253
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:254
 - [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:27
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:70
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:284
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:285
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:82
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:83
 - [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:286
 - [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:287
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:288
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:289
 
 ### Implemented By
 

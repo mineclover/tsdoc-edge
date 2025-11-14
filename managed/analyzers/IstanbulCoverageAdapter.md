@@ -30,9 +30,11 @@ Converts:
 
 - [[CoverageParser]] → /home/user/tsdoc-edge/managed/analyzers/CoverageParser.md:30
 - [[CoverageParser]] → /home/user/tsdoc-edge/managed/analyzers/CoverageParser.md:31
+- [[CoverageParser]] → /home/user/tsdoc-edge/managed/analyzers/CoverageParser.md:32
 - [[CoverageSyncAdapter]] → /home/user/tsdoc-edge/managed/analyzers/CoverageSyncAdapter.md:29
 - [[CoverageSyncAdapter]] → /home/user/tsdoc-edge/managed/analyzers/CoverageSyncAdapter.md:30
+- [[CoverageSyncAdapter]] → /home/user/tsdoc-edge/managed/analyzers/CoverageSyncAdapter.md:31
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:171
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:313
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:314
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:315
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:316
 

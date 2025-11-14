@@ -451,10 +451,12 @@ Uses: DependencySpec, Functionality, FuturePlan, ProblemSolving, DecisionRecord,
 
 ### Referenced By
 
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:302
-- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:246
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:313
+- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:247
 - [[Types Index]] → /home/user/tsdoc-edge/managed/types/index.md:346
-- [[Types Index]] → /home/user/tsdoc-edge/managed/types/index.md:357
+- [[Types Index]] → /home/user/tsdoc-edge/managed/types/index.md:359
+- [[Types Index]] → /home/user/tsdoc-edge/managed/types/index.md:360
 - [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:416
-- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:426
+- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:428
+- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:429
 

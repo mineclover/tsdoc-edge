@@ -33,39 +33,43 @@
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:392
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:93
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:186
-- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:246
-- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:247
-- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:248
-- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:249
-- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:250
-- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:251
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:256
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:257
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:258
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:259
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:260
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:261
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:262
 - [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:75
-- [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:157
-- [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:158
+- [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:163
+- [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:164
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:73
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:220
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:247
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:345
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:346
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:347
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:348
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:349
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:350
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:351
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:352
 - [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:136
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:170
 - [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:171
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:172
 - [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:137
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:176
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:186
+- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:187
 - [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:190
-- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:268
 - [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:269
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:270
 - [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:116
-- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:143
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:145
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:146
 - [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:130
-- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:161
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:164
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:165
 - [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:145
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:193
 - [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:194
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:195
 - [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:129
 - [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:160
 - [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:188
@@ -73,23 +77,24 @@
 - [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:190
 - [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:191
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:50
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:149
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:150
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:151
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:152
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:139
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:308
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:309
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:316
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:317
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:116
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:176
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:177
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:170
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:341
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:342
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:179
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:180
+- [[CLI Command Development Guide]] → /home/user/tsdoc-edge/managed/guides/command-development-guide.md:288
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:244
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:433
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:434
 - [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:72
 - [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:77
-- [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:119
-- [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:120
-- [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:121
-- [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:122
+- [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:123
+- [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:124
+- [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:125
+- [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:126
 - [[CodeHealthMetrics]] → /home/user/tsdoc-edge/managed/types/CodeHealthMetrics.md:75
 - [[CodeHealthMetrics]] → /home/user/tsdoc-edge/managed/types/CodeHealthMetrics.md:87
 - [[CodeHealthMetrics]] → /home/user/tsdoc-edge/managed/types/CodeHealthMetrics.md:88

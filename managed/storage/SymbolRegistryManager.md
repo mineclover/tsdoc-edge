@@ -529,52 +529,64 @@ Features:
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:198
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:490
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:491
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:147
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:148
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:185
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:186
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:187
 - [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:45
 - [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:105
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:167
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:168
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:172
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:173
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:174
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:175
 - [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:43
 - [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:129
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:181
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:182
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:187
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:188
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:189
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:190
 - [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:39
 - [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:93
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:157
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:158
-- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:209
-- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:210
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:166
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:167
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:168
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:169
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:212
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:213
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:214
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:123
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:186
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:356
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:357
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:358
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:359
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:360
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:361
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:424
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:425
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:426
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:427
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:428
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:429
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:430
 - [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:82
-- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:135
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:138
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:139
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:177
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:184
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:344
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:345
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:346
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:347
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:356
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:357
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:358
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:359
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:149
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:313
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:314
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:336
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:337
 - [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:177
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:300
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:301
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:324
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:325
 - [[RegistryTypes]] → /home/user/tsdoc-edge/managed/types/RegistryTypes.md:95
 - [[RegistryTypes]] → /home/user/tsdoc-edge/managed/types/RegistryTypes.md:107
 - [[RegistryTypes]] → /home/user/tsdoc-edge/managed/types/RegistryTypes.md:108
 - [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:68
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:117
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:118
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:138
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:139
 - [[IdGenerator]] → /home/user/tsdoc-edge/managed/utilities/IdGenerator.md:87
 - [[IdGenerator]] → /home/user/tsdoc-edge/managed/utilities/IdGenerator.md:88
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:197
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:198
+- [[IdGenerator]] → /home/user/tsdoc-edge/managed/utilities/IdGenerator.md:89
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:242
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:243
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:244
 

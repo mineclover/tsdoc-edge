@@ -235,13 +235,14 @@ class UserServiceImpl implements IUserService { ... }
 
 ### Referenced By
 
-- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:207
-- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:208
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:114
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:115
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:209
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:210
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:146
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:147
 - [[Feature Grouping]] → /home/user/tsdoc-edge/managed/relationships/feature-grouping.md:174
 - [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:70
-- [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:89
-- [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:90
 - [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:91
+- [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:92
+- [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:93
+- [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:94
 

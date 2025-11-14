@@ -116,16 +116,19 @@ tsdoc-edge analyze-events --trace user:created
 
 - [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:134
 - [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:140
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:225
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:226
 - [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:227
 - [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:228
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:103
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:104
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:54
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:55
+- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:229
+- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:230
+- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:231
+- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:232
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:122
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:123
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:69
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:70
 - [[Collaboration]] → /home/user/tsdoc-edge/managed/relationships/collaboration.md:133
 - [[Collaboration]] → /home/user/tsdoc-edge/managed/relationships/collaboration.md:163
 - [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:41
-- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:81
+- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:86
+- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:87
 

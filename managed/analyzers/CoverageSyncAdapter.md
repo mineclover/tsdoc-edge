@@ -30,8 +30,9 @@ Sync test coverage data with symbol database.
 - [[IstanbulCoverageAdapter]] → /home/user/tsdoc-edge/managed/analyzers/IstanbulCoverageAdapter.md:33
 - [[IstanbulCoverageAdapter]] → /home/user/tsdoc-edge/managed/analyzers/IstanbulCoverageAdapter.md:34
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:167
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:291
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:292
-- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:24
-- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:25
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:293
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:294
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:29
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:30
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:31
 

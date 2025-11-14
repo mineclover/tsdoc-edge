@@ -190,10 +190,13 @@ contentHash = sha256(fullComment);
 
 ### Referenced By
 
-- [[CommentExporter]] → /home/user/tsdoc-edge/managed/fold/CommentExporter.md:39
-- [[CommentExporter]] → /home/user/tsdoc-edge/managed/fold/CommentExporter.md:40
-- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:39
-- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:40
-- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:39
-- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:40
+- [[CommentExporter]] → /home/user/tsdoc-edge/managed/fold/CommentExporter.md:41
+- [[CommentExporter]] → /home/user/tsdoc-edge/managed/fold/CommentExporter.md:42
+- [[CommentExporter]] → /home/user/tsdoc-edge/managed/fold/CommentExporter.md:43
+- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:41
+- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:42
+- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:43
+- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:41
+- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:42
+- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:43
 

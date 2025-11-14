@@ -617,29 +617,33 @@ API는 유지되지만 동작이 변경되는 경우 감지 불가
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:209
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:430
 - [[ParallelWorkDetector]] → /home/user/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:23
-- [[ParallelWorkDetector]] → /home/user/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:39
-- [[ParallelWorkDetector]] → /home/user/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:40
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:142
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:143
+- [[ParallelWorkDetector]] → /home/user/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:42
+- [[ParallelWorkDetector]] → /home/user/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:43
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:147
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:148
 - [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:22
-- [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:33
-- [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:34
 - [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:35
 - [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:36
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:40
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:41
+- [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:37
+- [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:38
+- [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:39
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:44
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:45
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:46
 - [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:229
 - [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:248
 - [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:273
 - [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:274
 - [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:151
-- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:183
-- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:184
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:191
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:192
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:295
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:296
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:288
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:357
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:358
+- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:188
+- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:189
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:197
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:198
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:199
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:299
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:300
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:301
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:376
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:453
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:454
 

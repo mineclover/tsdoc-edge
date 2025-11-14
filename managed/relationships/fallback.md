@@ -229,6 +229,8 @@ try {
 
 ### Referenced By
 
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:318
 - [[Substitution]] → /home/user/tsdoc-edge/managed/relationships/substitution.md:131
 - [[Substitution]] → /home/user/tsdoc-edge/managed/relationships/substitution.md:165
+- [[Substitution]] → /home/user/tsdoc-edge/managed/relationships/substitution.md:188
 

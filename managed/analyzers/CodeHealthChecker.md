@@ -337,61 +337,77 @@ tsdoc-edge health src --include-private
 - [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:148
 - [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:149
 - [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:150
-- [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:33
-- [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:34
+- [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:151
+- [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:152
+- [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:153
+- [[DocumentationAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:154
 - [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:35
 - [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:36
 - [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:37
 - [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:38
 - [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:39
 - [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:40
+- [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:41
+- [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:42
+- [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:43
+- [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:44
+- [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:45
+- [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:46
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:91
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:97
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:220
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:283
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:284
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:285
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:286
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:287
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:288
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:289
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:290
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:86
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:388
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:389
 - [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:18
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:29
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:30
 - [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:31
 - [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:32
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:33
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:34
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:35
 - [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:18
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:30
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:31
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:32
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:33
 - [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:34
 - [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:35
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:36
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:37
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:38
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:39
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:40
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:41
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:156
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:143
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:269
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:270
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:271
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:272
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:273
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:274
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:275
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:276
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:277
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:278
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:279
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:113
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:120
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:162
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:163
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:164
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:165
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:142
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:281
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:324
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:325
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:326
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:327
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:166
+- [[Analyzer Development Guide]] → /home/user/tsdoc-edge/managed/guides/analyzer-development-guide.md:21
+- [[Analyzer Development Guide]] → /home/user/tsdoc-edge/managed/guides/analyzer-development-guide.md:246
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:216
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:369
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:415
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:416
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:417
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:418
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:272
-- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:356
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:363
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:364
 - [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:91
-- [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:107
 - [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:108
 - [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:109
 - [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:110
@@ -399,4 +415,8 @@ tsdoc-edge health src --include-private
 - [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:112
 - [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:113
 - [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:114
+- [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:115
+- [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:116
+- [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:117
+- [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:118
 

@@ -376,6 +376,15 @@ await loadConfig();
 
 - [[Analyzer Status]] → /home/user/tsdoc-edge/managed/features/analyzer-status.md:43
 - [[Analyzer Status]] → /home/user/tsdoc-edge/managed/features/analyzer-status.md:278
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:129
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:130
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:74
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:75
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:148
 - [[Collaboration]] → /home/user/tsdoc-edge/managed/relationships/collaboration.md:134
 - [[Collaboration]] → /home/user/tsdoc-edge/managed/relationships/collaboration.md:164
+- [[Collaboration]] → /home/user/tsdoc-edge/managed/relationships/collaboration.md:186
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:323
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:139
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:140
 

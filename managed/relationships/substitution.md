@@ -357,7 +357,16 @@ interface SubstitutionMetrics {
 
 ### Referenced By
 
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:50
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:51
+- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:41
+- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:42
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:68
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:69
 - [[Fallback]] → /home/user/tsdoc-edge/managed/relationships/fallback.md:106
+- [[Fallback]] → /home/user/tsdoc-edge/managed/relationships/fallback.md:126
+- [[Fallback]] → /home/user/tsdoc-edge/managed/relationships/fallback.md:127
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:322
 - [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:106
 - [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:123
 

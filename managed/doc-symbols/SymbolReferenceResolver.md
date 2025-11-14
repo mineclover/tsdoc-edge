@@ -28,10 +28,13 @@ Resolves:
 
 ### Referenced By
 
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:56
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:57
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:209
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:210
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:111
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:112
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:70
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:71
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:72
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:222
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:223
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:224
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:129
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:130
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:131
 

@@ -35,22 +35,24 @@ Parse TypeScript files and extract TSDoc comments.
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:400
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:81
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:166
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:212
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:213
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:214
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:215
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:222
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:223
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:224
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:225
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:22
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:351
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:352
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:353
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:354
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:45
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:154
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:155
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:157
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:158
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:98
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:180
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:181
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:38
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:39
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:183
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:184
+- [[CLI Command Development Guide]] → /home/user/tsdoc-edge/managed/guides/command-development-guide.md:263
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:42
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:43
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:44
 - [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:82
-- [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:119
-- [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:120
+- [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:122
+- [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:123
 

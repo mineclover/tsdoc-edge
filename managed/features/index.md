@@ -269,23 +269,38 @@ tsdoc-edge test-impact database-manager
 
 ### Referenced By
 
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:297
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:303
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:304
 - [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:254
 - [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:283
-- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:134
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:349
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:207
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:136
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:137
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:367
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:368
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:212
+- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:213
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:350
 - [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:351
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:232
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:146
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:329
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:294
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:379
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:352
+- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:353
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:244
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:245
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:153
+- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:154
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:338
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:339
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:310
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:311
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:475
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:476
 - [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:403
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:285
+- [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:413
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:295
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:296
 - [[Types Index]] → /home/user/tsdoc-edge/managed/types/index.md:348
+- [[Types Index]] → /home/user/tsdoc-edge/managed/types/index.md:358
 - [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:418
+- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:427
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:195
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:208
+- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:209
 
