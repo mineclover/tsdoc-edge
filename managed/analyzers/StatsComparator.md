@@ -35,7 +35,8 @@ Features:
 - [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:169
 - [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:170
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:159
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:284
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:293
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:294
 - [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:118
 - [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:119
 

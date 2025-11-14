@@ -256,4 +256,7 @@ if (violations.length > 0) {
 
 ### Referenced By
 
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md
+- [[Co-Requirement]] → /home/user/tsdoc-edge/managed/relationships/co-requirement.md:115
+- [[Co-Requirement]] → /home/user/tsdoc-edge/managed/relationships/co-requirement.md:120
+- [[Co-Requirement]] → /home/user/tsdoc-edge/managed/relationships/co-requirement.md:148
+

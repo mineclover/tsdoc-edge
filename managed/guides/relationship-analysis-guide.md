@@ -510,49 +510,83 @@ tsdoc-edge validate-docs managed
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:84
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:227
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:228
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:229
-- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:282
-- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:283
-- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:284
-- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:253
-- [[DataFlowAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DataFlowAnalyzer.md:32
-- [[DependencyResolver]] → /home/user/tsdoc-edge/managed/analyzers/DependencyResolver.md:44
-- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:48
-- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:49
-- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:50
-- [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:50
-- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:33
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:325
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:343
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:290
-- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:293
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:457
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:238
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:239
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:240
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:241
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:242
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:243
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:288
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:289
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:290
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:291
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:292
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:293
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:267
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:268
+- [[DataFlowAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DataFlowAnalyzer.md:33
+- [[DataFlowAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DataFlowAnalyzer.md:34
+- [[DependencyResolver]] → /home/user/tsdoc-edge/managed/analyzers/DependencyResolver.md:45
+- [[DependencyResolver]] → /home/user/tsdoc-edge/managed/analyzers/DependencyResolver.md:46
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:52
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:53
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:54
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:55
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:56
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:57
+- [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:51
+- [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:52
+- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:109
+- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:110
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:369
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:370
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:372
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:373
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:307
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:308
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:295
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:296
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:13
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:231
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:353
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:354
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:388
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:389
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:54
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:116
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:138
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:188
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:222
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:223
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:224
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:225
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:78
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:79
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:80
-- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:29
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:39
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:40
-- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:46
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:84
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:85
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:86
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:236
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:237
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:91
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:92
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:93
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:237
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:238
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:239
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:240
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:83
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:84
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:85
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:86
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:87
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:88
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:31
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:32
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:42
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:43
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:44
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:45
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:48
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:49
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:88
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:89
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:90
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:91
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:92
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:93
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:292
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:293
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:294
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:295
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:96
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:97
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:98
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:99
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:100
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:101
 

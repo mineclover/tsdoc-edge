@@ -152,10 +152,10 @@ interface FixResult {
 
 ### Referenced By
 
-- [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:34
 - [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:35
-- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:65
-- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:66
-- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:74
-- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:75
+- [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:36
+- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:67
+- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:68
+- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:76
+- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:77
 

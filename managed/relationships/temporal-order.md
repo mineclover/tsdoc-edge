@@ -374,4 +374,8 @@ await loadConfig();
 
 ### Referenced By
 
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md
+- [[Analyzer Status]] → /home/user/tsdoc-edge/managed/features/analyzer-status.md:43
+- [[Analyzer Status]] → /home/user/tsdoc-edge/managed/features/analyzer-status.md:278
+- [[Collaboration]] → /home/user/tsdoc-edge/managed/relationships/collaboration.md:134
+- [[Collaboration]] → /home/user/tsdoc-edge/managed/relationships/collaboration.md:164
+

@@ -297,3 +297,13 @@ tsdoc-edge build src
 
 - Source: src/analyzer/ - All analyzer implementations
 - Source: src/commands/Analyze*Command.ts - Analyzer command implementations
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Codebase Health Report]] → /home/user/tsdoc-edge/managed/features/codebase-health-report.md:134
+- [[Codebase Health Report]] → /home/user/tsdoc-edge/managed/features/codebase-health-report.md:341
+

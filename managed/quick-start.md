@@ -343,66 +343,74 @@ tsdoc-edge analyze-pipeline
 
 ### Referenced By
 
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:243
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:244
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:303
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:304
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:8
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:237
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:238
-- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:285
-- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:286
-- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:51
-- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:52
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:326
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:327
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:328
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:329
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:50
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:463
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:254
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:255
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:294
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:295
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:58
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:59
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:371
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:372
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:373
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:374
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:51
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:304
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:305
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:306
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:307
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:308
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:309
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:348
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:349
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:350
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:351
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:291
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:292
-- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:294
-- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:295
-- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:296
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:358
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:359
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:360
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:361
-- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:370
-- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:371
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:52
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:320
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:321
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:322
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:323
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:324
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:325
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:378
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:379
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:380
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:381
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:309
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:310
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:297
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:298
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:299
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:300
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:301
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:302
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:396
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:397
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:398
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:399
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:372
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:373
-- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:127
-- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:128
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:41
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:42
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:87
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:88
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:238
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:239
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:240
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:241
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:176
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:177
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:178
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:179
-- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:311
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:374
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:375
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:376
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:377
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:378
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:379
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:133
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:134
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:46
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:47
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:94
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:95
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:296
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:297
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:298
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:299
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:183
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:184
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:185
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:186
 - [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:312
 - [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:313
 - [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:314
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:268
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:269
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:270
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:271
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:315
 - [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:272
 - [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:273
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:274
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:275
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:276
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:277
 

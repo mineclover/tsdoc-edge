@@ -28,10 +28,13 @@ Identifies:
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:159
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:350
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:138
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:289
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:301
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:302
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:151
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:281
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:60
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:287
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:288
 - [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:61
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:62
 

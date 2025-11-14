@@ -417,3 +417,14 @@ TSDoc Edge 코드베이스는 **전반적으로 건강한 상태**입니다:
 - Source: src/analyzer/ (29 analyzer files)
 - Source: src/storage/DatabaseManager.ts
 - Source: src/graph/SymbolGraphBuilder.ts
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Phase Commands Refactoring Guide]] → /home/user/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:8
+- [[Phase Commands Refactoring Guide]] → /home/user/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:190
+- [[Phase Commands Refactoring Guide]] → /home/user/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:246
+

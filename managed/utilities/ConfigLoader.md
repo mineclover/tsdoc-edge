@@ -134,13 +134,14 @@ loader.reload();
 
 ### Referenced By
 
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:179
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:180
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:54
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:184
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:185
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:55
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:56
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:134
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:296
-- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:129
-- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:130
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:315
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:316
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:135
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:136
 - [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:399
 

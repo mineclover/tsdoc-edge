@@ -357,7 +357,7 @@ To add documentation:
 
 ### Referenced By
 
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:235
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:294
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:191
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:192
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:193
@@ -390,8 +390,8 @@ To add documentation:
 - [[ReliabilityChecker]] → /home/user/tsdoc-edge/managed/analyzers/ReliabilityChecker.md:29
 - [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:31
 - [[TestCoverageAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:32
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:276
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:277
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:278
 - [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:30
 - [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:31
 - [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:32
@@ -480,16 +480,16 @@ To add documentation:
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:228
 - [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:152
 - [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:272
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:309
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:310
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:311
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:312
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:313
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:349
 - [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:31
 - [[AnalysisReport]] → /home/user/tsdoc-edge/managed/primary-types/AnalysisReport.md:106
 - [[ExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/ExtractionResult.md:104
 - [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:117
 - [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:114
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:204
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:205
 - [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:50
 - [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:51
 - [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:52
@@ -512,7 +512,7 @@ To add documentation:
 - [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:48
 - [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:49
 - [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:50
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:187
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:207
 - [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:63
 - [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:64
 - [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:65
@@ -530,7 +530,7 @@ To add documentation:
 - [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:100
 - [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:97
 - [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:98
-- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:308
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:309
 - [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:254
 - [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:255
 

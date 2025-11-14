@@ -132,28 +132,34 @@ const dbPath = config.paths.databasePath;
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:224
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:116
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:117
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:175
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:176
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:177
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:178
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:48
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:49
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:50
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:462
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:121
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:122
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:180
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:181
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:182
+- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:183
 - [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:51
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:52
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:53
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:54
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:23
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:47
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:48
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:49
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:50
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:100
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:159
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:183
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:184
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:291
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:357
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:394
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:395
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:158
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:226
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:241
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:242
 - [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:91
-- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:104
+- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:106
+- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:107
 
 ### Implemented By
 

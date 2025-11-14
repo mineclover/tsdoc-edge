@@ -299,3 +299,13 @@ work-context 쿼리 시간: ~200ms (+150ms)
 
 - Commit: feat: Update WorkContextCommand to use unified_relationships table
 - Source: src/commands/WorkContextCommand.ts:230-359
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Codebase Health Report]] → /home/user/tsdoc-edge/managed/features/codebase-health-report.md:155
+- [[Codebase Health Report]] → /home/user/tsdoc-edge/managed/features/codebase-health-report.md:340
+

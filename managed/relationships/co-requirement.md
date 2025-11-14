@@ -310,4 +310,6 @@ interface CoRequirementMetrics {
 
 ### Referenced By
 
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md
+- [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:105
+- [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:122
+

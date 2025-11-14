@@ -357,4 +357,7 @@ interface SubstitutionMetrics {
 
 ### Referenced By
 
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md
+- [[Fallback]] → /home/user/tsdoc-edge/managed/relationships/fallback.md:106
+- [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:106
+- [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:123
+

@@ -367,3 +367,39 @@ tsdoc-edge work-context src/services/UserService.ts
 ---
 
 **Last Updated**: 2025-11-11
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- CheckDuplicatesCommand (check-duplicates) → /home/user/tsdoc-edge/src/commands/CheckDuplicatesCommand.ts:68
+- CheckLinksCommand (check-links) → /home/user/tsdoc-edge/src/commands/CheckLinksCommand.ts:40
+- CoreApiCommand (core-api) → /home/user/tsdoc-edge/src/commands/CoreApiCommand.ts:68
+- DepsCommand (deps) → /home/user/tsdoc-edge/src/commands/DepsCommand.ts:39
+- FindDocCommand (find-doc) → /home/user/tsdoc-edge/src/commands/FindDocCommand.ts:69
+- FindMethodCommand (find-method) → /home/user/tsdoc-edge/src/commands/FindMethodCommand.ts:39
+- FindUnusedDocsCommand (find-unused-docs) → /home/user/tsdoc-edge/src/commands/FindUnusedDocsCommand.ts:39
+- GenerateDocsCommand (generate-docs) → /home/user/tsdoc-edge/src/commands/GenerateDocsCommand.ts:19
+- IdNewCommand (id-new) → /home/user/tsdoc-edge/src/commands/IdNewCommand.ts:18
+- InitCommand (init) → /home/user/tsdoc-edge/src/commands/InitCommand.ts:17
+- OrphansCommand (orphans) → /home/user/tsdoc-edge/src/commands/OrphansCommand.ts:39
+- ParseCommand (parse) → /home/user/tsdoc-edge/src/commands/ParseCommand.ts:39
+- PlansCommand (plans) → /home/user/tsdoc-edge/src/commands/PlansCommand.ts:40
+- SpecBumpCommand (spec-bump) → /home/user/tsdoc-edge/src/commands/SpecBumpCommand.ts:39
+- SpecDiffCommand (spec-diff) → /home/user/tsdoc-edge/src/commands/SpecDiffCommand.ts:39
+- SpecHistoryCommand (spec-history) → /home/user/tsdoc-edge/src/commands/SpecHistoryCommand.ts:39
+- SpecStatusCommand (spec-status) → /home/user/tsdoc-edge/src/commands/SpecStatusCommand.ts:67
+- StatsCommand (stats) → /home/user/tsdoc-edge/src/commands/StatsCommand.ts:39
+- SuggestCommand (suggest) → /home/user/tsdoc-edge/src/commands/SuggestCommand.ts:18
+- TodosCommand (todos) → /home/user/tsdoc-edge/src/commands/TodosCommand.ts:40
+- TreeCommand (tree) → /home/user/tsdoc-edge/src/commands/TreeCommand.ts:53
+- UndocumentedCommand (undocumented) → /home/user/tsdoc-edge/src/commands/UndocumentedCommand.ts:57
+- UpdateBacklinksCommand (update-backlinks) → /home/user/tsdoc-edge/src/commands/UpdateBacklinksCommand.ts:42
+- UpdateSymbolRefsCommand (update-symbol-refs) → /home/user/tsdoc-edge/src/commands/UpdateSymbolRefsCommand.ts:42
+- UsedByCommand (used-by) → /home/user/tsdoc-edge/src/commands/UsedByCommand.ts:39
+- ValidateDocsCommand (validate-docs) → /home/user/tsdoc-edge/src/commands/ValidateDocsCommand.ts:40
+- ValidateSpecCommand (validate-spec) → /home/user/tsdoc-edge/src/commands/ValidateSpecCommand.ts:17
+- WhoUsesCommand (who-uses) → /home/user/tsdoc-edge/src/commands/WhoUsesCommand.ts:54
+

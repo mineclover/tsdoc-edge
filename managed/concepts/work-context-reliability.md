@@ -355,24 +355,26 @@ See [[Work Context Reliability Chain]] diagram (`managed/architecture/diagrams/w
 
 ### Referenced By
 
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:141
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:142
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:52
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:53
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:54
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:55
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:37
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:38
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:83
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:146
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:147
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:56
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:57
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:58
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:59
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:39
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:40
 - [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:84
 - [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:85
 - [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:86
 - [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:87
 - [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:88
+- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:89
 - [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:227
 - [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:246
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:266
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:267
-- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:78
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:281
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:282
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:271
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:272
 - [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:79
+- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:80
 

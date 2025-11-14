@@ -31,12 +31,16 @@ Analyze test coverage and relationships.
 - [[TestRelationshipAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestRelationshipAnalyzer.md:36
 - [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:159
 - [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:171
+- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:172
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:56
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:132
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:136
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:137
 - [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:9
-- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:35
 - [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:36
 - [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:37
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:38
+- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:39
 - [[TestRelationships]] → /home/user/tsdoc-edge/managed/types/TestRelationships.md:72
 - [[TestRelationships]] → /home/user/tsdoc-edge/managed/types/TestRelationships.md:82
+- [[TestRelationships]] → /home/user/tsdoc-edge/managed/types/TestRelationships.md:83
 

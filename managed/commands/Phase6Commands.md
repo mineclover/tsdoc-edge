@@ -27,6 +27,6 @@ Code health and quality analysis.
 
 ### Referenced By
 
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:295
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:296
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:311
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:312
 

@@ -28,19 +28,26 @@ Analyze type dependencies and usage.
 ### Referenced By
 
 - [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:63
-- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:72
+- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:73
+- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:74
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:57
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:133
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:138
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:139
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:153
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:272
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:284
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:285
 - [[Generic Constraint]] → /home/user/tsdoc-edge/managed/relationships/GENERIC-CONSTRAINT.md:9
-- [[Generic Constraint]] → /home/user/tsdoc-edge/managed/relationships/GENERIC-CONSTRAINT.md:22
+- [[Generic Constraint]] → /home/user/tsdoc-edge/managed/relationships/GENERIC-CONSTRAINT.md:23
+- [[Generic Constraint]] → /home/user/tsdoc-edge/managed/relationships/GENERIC-CONSTRAINT.md:24
 - [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:9
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:32
 - [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:33
 - [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:34
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:102
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:110
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:205
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:206
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:35
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:36
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:115
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:123
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:240
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:241
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:242
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:243
 

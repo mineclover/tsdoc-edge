@@ -26,10 +26,12 @@
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:158
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:346
 - [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:262
 - [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:263
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:109
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:285
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:293
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:294
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:278
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:357
 - [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:24

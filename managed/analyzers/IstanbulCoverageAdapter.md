@@ -33,5 +33,6 @@ Converts:
 - [[CoverageSyncAdapter]] → /home/user/tsdoc-edge/managed/analyzers/CoverageSyncAdapter.md:29
 - [[CoverageSyncAdapter]] → /home/user/tsdoc-edge/managed/analyzers/CoverageSyncAdapter.md:30
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:171
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:295
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:313
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:314
 

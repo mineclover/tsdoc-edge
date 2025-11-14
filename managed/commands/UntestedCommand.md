@@ -229,16 +229,23 @@ Low Priority:
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:249
-- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:64
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:133
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:49
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:35
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:414
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:70
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:71
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:136
+- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:137
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:52
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:53
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:36
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:37
 - [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:115
 - [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:144
 - [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:145
+- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:146
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:73
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:148
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:240
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:163
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:244
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:245
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:79
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:101
 - [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:123
@@ -250,8 +257,9 @@ Low Priority:
 - [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:137
 - [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:127
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:197
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:303
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:86
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:214
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:119
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:321
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:99
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:256
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:121
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:122
 

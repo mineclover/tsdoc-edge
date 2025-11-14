@@ -54,13 +54,15 @@ interface ParsedDocSymbols {
 ### Referenced By
 
 - [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:29
-- [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:46
-- [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:47
 - [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:48
+- [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:49
+- [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:50
+- [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:51
 - [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:59
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:78
 - [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:79
 - [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:80
 - [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:81
 - [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:82
+- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:83
+- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:84
 

@@ -453,11 +453,3 @@ describe('User Management Integration', () => {
 **Priority**: High (critical for quality assurance)
 **Estimated Effort**: 3-4 weeks
 **Dependencies**: Test framework integration, test discovery, coverage analysis
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md

@@ -34,13 +34,15 @@ Gathers:
 - [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:138
 - [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:173
 - [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:174
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:175
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:158
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:288
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:301
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:302
 - [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:82
 - [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:101
-- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:124
-- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:125
 - [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:126
 - [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:127
+- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:128
+- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:129
+- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:130
+- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:131
 

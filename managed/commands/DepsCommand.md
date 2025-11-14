@@ -160,12 +160,16 @@ Source: `src/commands/Phase5Commands.ts`
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:56
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:233
-- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:55
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:384
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:385
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:56
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:57
 - [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:126
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:155
 - [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:156
 - [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:157
 - [[TreeCommand]] → /home/user/tsdoc-edge/managed/commands/TreeCommand.md:120
-- [[TreeCommand]] → /home/user/tsdoc-edge/managed/commands/TreeCommand.md:203
+- [[TreeCommand]] → /home/user/tsdoc-edge/managed/commands/TreeCommand.md:204
 - [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:83
 - [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:134
 - [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:135
@@ -173,14 +177,15 @@ Source: `src/commands/Phase5Commands.ts`
 - [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:113
 - [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:141
 - [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:142
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:143
 - [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:250
 - [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:263
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:69
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:137
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:146
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:114
 - [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:194
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:235
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:236
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:237
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:238
 - [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:85
 - [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:137
 - [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:154
@@ -189,17 +194,23 @@ Source: `src/commands/Phase5Commands.ts`
 - [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:167
 - [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:122
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:169
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:292
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:307
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:173
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:274
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:288
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:173
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:324
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:338
 - [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:25
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:67
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:20
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:211
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:279
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:69
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:24
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:252
 - [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:280
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:281
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:282
+- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:283
 - [[InterfaceTypes]] → /home/user/tsdoc-edge/managed/types/InterfaceTypes.md:85
-- [[InterfaceTypes]] → /home/user/tsdoc-edge/managed/types/InterfaceTypes.md:94
+- [[InterfaceTypes]] → /home/user/tsdoc-edge/managed/types/InterfaceTypes.md:95
+
+### Implemented By
+
+- DepsCommand → /home/user/tsdoc-edge/src/commands/DepsCommand.ts:39
 

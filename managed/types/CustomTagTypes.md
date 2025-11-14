@@ -274,10 +274,10 @@ export class UserService { }
 
 ### Referenced By
 
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:54
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:55
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:36
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:37
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:50
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:51
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:57
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:58
+- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:38
+- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:39
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:52
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:53
 

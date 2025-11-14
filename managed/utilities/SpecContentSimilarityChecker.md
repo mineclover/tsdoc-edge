@@ -107,12 +107,14 @@ const checker = new SpecContentSimilarityChecker({
 
 ### Referenced By
 
-- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:142
-- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:143
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:147
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:148
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:141
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:299
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:321
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:322
 - [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:126
-- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:135
-- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:91
+- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:136
+- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:137
 - [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:92
+- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:93
 

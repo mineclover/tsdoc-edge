@@ -84,24 +84,28 @@ Uses DFS (Depth-First Search) to detect cycles:
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:250
-- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:28
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:386
+- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:101
+- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:102
 - [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:82
 - [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:107
 - [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:108
 - [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:109
-- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:31
+- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:32
+- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:33
 - [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:89
 - [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:156
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:203
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:275
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:289
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:153
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:240
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:245
 - [[Circular Dependency]] → /home/user/tsdoc-edge/managed/relationships/CIRCULAR.md:8
 - [[Circular Dependency]] → /home/user/tsdoc-edge/managed/relationships/CIRCULAR.md:23
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:129
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:212
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:39
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:142
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:253
 - [[TypeChain]] → /home/user/tsdoc-edge/managed/types/TypeChain.md:58
-- [[TypeChain]] → /home/user/tsdoc-edge/managed/types/TypeChain.md:68
+- [[TypeChain]] → /home/user/tsdoc-edge/managed/types/TypeChain.md:69
 - [[MermaidGenerator]] → /home/user/tsdoc-edge/managed/utilities/MermaidGenerator.md:92
-- [[MermaidGenerator]] → /home/user/tsdoc-edge/managed/utilities/MermaidGenerator.md:103
+- [[MermaidGenerator]] → /home/user/tsdoc-edge/managed/utilities/MermaidGenerator.md:104
 

@@ -28,14 +28,19 @@ Criteria:
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:160
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:356
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:143
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:291
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:305
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:306
 - [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:188
-- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:263
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:264
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:265
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:151
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:166
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:282
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:283
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:289
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:290
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:291
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:292
 - [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:107
 - [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:108
 

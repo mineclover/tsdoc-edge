@@ -64,75 +64,108 @@ tsdoc-edge orphans
 ### Referenced By
 
 - [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:15
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:252
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:319
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:320
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:22
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:85
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:258
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:483
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:484
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:485
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:82
 - [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:160
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:247
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:248
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:249
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:250
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:268
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:269
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:270
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:271
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:272
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:273
 - [[DependencyChainAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:22
-- [[DependencyChainAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:45
+- [[DependencyChainAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:46
+- [[DependencyChainAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:47
 - [[DependencyResolver]] → /home/user/tsdoc-edge/managed/analyzers/DependencyResolver.md:22
-- [[DependencyResolver]] → /home/user/tsdoc-edge/managed/analyzers/DependencyResolver.md:45
+- [[DependencyResolver]] → /home/user/tsdoc-edge/managed/analyzers/DependencyResolver.md:47
+- [[DependencyResolver]] → /home/user/tsdoc-edge/managed/analyzers/DependencyResolver.md:48
 - [[DomainStructureAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DomainStructureAnalyzer.md:22
 - [[DomainStructureAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DomainStructureAnalyzer.md:35
+- [[DomainStructureAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DomainStructureAnalyzer.md:36
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:251
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:331
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:377
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:378
 - [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:35
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:125
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:126
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:127
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:148
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:170
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:133
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:134
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:135
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:136
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:163
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:164
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:179
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:180
 - [[VisualizeDepsCommand]] → /home/user/tsdoc-edge/managed/commands/VisualizeDepsCommand.md:21
 - [[VisualizeDepsCommand]] → /home/user/tsdoc-edge/managed/commands/VisualizeDepsCommand.md:29
-- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:158
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:314
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:315
+- [[VisualizeDepsCommand]] → /home/user/tsdoc-edge/managed/commands/VisualizeDepsCommand.md:30
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:169
+- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:170
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:330
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:331
 - [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:251
-- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:301
+- [[Build Pipeline Guide]] → /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md:307
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:26
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:50
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:57
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:125
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:271
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:378
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:379
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:380
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:381
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:382
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:432
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:433
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:434
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:435
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:436
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:437
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:438
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:439
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:440
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:441
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:27
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:295
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:319
-- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:381
-- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:382
-- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:383
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:387
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:388
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:389
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:32
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:228
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:245
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:246
 - [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:40
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:91
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:101
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:102
 - [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:112
 - [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:118
-- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:194
-- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:195
-- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:34
-- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:35
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:45
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:46
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:200
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:201
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:202
+- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:203
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:37
+- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:38
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:48
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:49
+- [[Co-Requirement]] → /home/user/tsdoc-edge/managed/relationships/co-requirement.md:117
+- [[Co-Requirement]] → /home/user/tsdoc-edge/managed/relationships/co-requirement.md:150
+- [[Collaboration]] → /home/user/tsdoc-edge/managed/relationships/collaboration.md:137
+- [[Collaboration]] → /home/user/tsdoc-edge/managed/relationships/collaboration.md:165
 - [[Enhancement]] → /home/user/tsdoc-edge/managed/relationships/enhancement.md:48
 - [[Enhancement]] → /home/user/tsdoc-edge/managed/relationships/enhancement.md:64
+- [[Feature Grouping]] → /home/user/tsdoc-edge/managed/relationships/feature-grouping.md:142
+- [[Integration Verification]] → /home/user/tsdoc-edge/managed/relationships/integration-verification.md:157
+- [[Integration Verification]] → /home/user/tsdoc-edge/managed/relationships/integration-verification.md:187
 - [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:50
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:103
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:104
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:105
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:114
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:115
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:116
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:117
 - [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:69
-- [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:86
+- [[Layer Dependency]] → /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:87
 - [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:96
 - [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:117
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:182
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:183
+- [[Temporal Order]] → /home/user/tsdoc-edge/managed/relationships/temporal-order.md:189
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:189
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:190
 

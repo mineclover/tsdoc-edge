@@ -28,10 +28,10 @@ Resolves:
 
 ### Referenced By
 
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:55
 - [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:56
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:196
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:197
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:110
+- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:57
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:209
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:210
 - [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:111
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:112
 

@@ -314,24 +314,34 @@ scores.forEach(score => {
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:219
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:220
 - [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:221
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:222
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:223
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:224
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:225
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:87
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:288
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:299
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:300
 - [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:19
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:32
 - [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:33
 - [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:34
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:35
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:35
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:36
 - [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:36
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:37
 - [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:189
 - [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:262
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:263
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:144
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:166
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:194
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:276
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:277
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:278
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:279
 - [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:280
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:281
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:282
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:283
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:284
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:285
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:286
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:229
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:230
 - [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:34

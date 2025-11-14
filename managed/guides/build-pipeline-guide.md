@@ -396,41 +396,67 @@ tsdoc-edge validate-docs managed
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:78
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:218
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:219
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:220
-- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:275
-- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:276
-- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:277
-- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:41
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:453
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:226
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:227
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:228
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:229
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:230
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:231
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:278
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:279
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:280
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:281
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:282
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:283
 - [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:42
 - [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:43
-- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:44
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:44
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:45
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:46
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:47
+- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:45
+- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:46
 - [[AnalyzeIOCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeIOCommand.md:41
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:102
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:103
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:292
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:293
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:294
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:336
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:221
+- [[AnalyzeIOCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeIOCommand.md:42
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:105
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:106
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:107
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:108
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:304
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:305
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:306
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:307
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:308
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:309
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:364
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:365
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:245
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:246
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:12
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:218
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:351
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:352
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:386
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:387
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:335
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:367
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:38
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:128
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:187
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:217
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:218
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:219
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:66
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:67
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:29
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:230
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:231
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:232
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:69
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:70
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:71
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:72
 - [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:30
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:73
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:79
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:80
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:31
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:32
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:33
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:76
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:77
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:82
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:83
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:84
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:85
 

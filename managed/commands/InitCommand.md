@@ -374,10 +374,11 @@ if (configManager.exists()) {
 
 ### Referenced By
 
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:84
+- [[CLI Commands]] → /home/user/tsdoc-edge/managed/CLI-COMMANDS.md:119
 - [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:85
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:43
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:86
 - [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:44
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:45
 - [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:33
 - [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:34
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:33
@@ -385,11 +386,15 @@ if (configManager.exists()) {
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:35
 - [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:36
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:60
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:171
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:178
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:179
 - [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:81
 - [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:86
-- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:116
 - [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:117
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:118
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:119
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:120
 - [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:92
 - [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:100
+- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:101
 

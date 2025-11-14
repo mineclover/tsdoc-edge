@@ -547,20 +547,26 @@ Please add integration tests before committing.
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:206
-- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:31
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:429
 - [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:32
+- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:33
 - [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:31
 - [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:32
 - [[Phase5Commands]] → /home/user/tsdoc-edge/managed/commands/Phase5Commands.md:22
 - [[Phase5Commands]] → /home/user/tsdoc-edge/managed/commands/Phase5Commands.md:30
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:36
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:37
+- [[Phase5Commands]] → /home/user/tsdoc-edge/managed/commands/Phase5Commands.md:31
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:38
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:39
 - [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:186
 - [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:205
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:206
 - [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:228
 - [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:247
-- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:270
-- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:271
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:269
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:270
+- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:272
+- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:273
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:287
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:335
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:355
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:356
 

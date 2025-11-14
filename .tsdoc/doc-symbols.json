@@ -1,11 +1,11 @@
 {
-  "timestamp": "2025-11-12T15:20:38.426Z",
+  "timestamp": "2025-11-14T02:00:50.130Z",
   "statistics": {
-    "totalDefinitions": 238,
+    "totalDefinitions": 243,
     "totalAuxiliaries": 145,
-    "totalReferences": 7289,
+    "totalReferences": 7318,
     "totalCodeConnections": 241,
-    "avgReferencesPerSymbol": 30.626050420168067
+    "avgReferencesPerSymbol": 30.11522633744856
   },
   "symbols": [
     "CLI Commands",
@@ -121,12 +121,17 @@
     "Impact Analysis",
     "QueryCommands",
     "AnalysisFeatures",
+    "Analyzer Status",
     "AutoIndexing",
+    "Codebase Health Report",
+    "Context Quality Improvements",
     "CoreFeatures",
     "CoreWorkflow",
     "DocumentSymbolSystem",
     "Gephi Export",
     "Features Index",
+    "Phase Commands Refactoring Guide",
+    "Relationship Path",
     "SymbolGraphFeatures",
     "ValidationFeatures",
     "DocumentationFixer",
@@ -1380,12 +1385,42 @@
         }
       ],
       [
+        "Analyzer Status",
+        {
+          "name": "Analyzer Status",
+          "type": "primary",
+          "filePath": "/home/user/tsdoc-edge/managed/features/analyzer-status.md",
+          "line": 1,
+          "level": 1
+        }
+      ],
+      [
         "AutoIndexing",
         {
           "name": "AutoIndexing",
           "type": "primary",
           "filePath": "/home/user/tsdoc-edge/managed/features/auto-indexing.md",
           "line": 2,
+          "level": 1
+        }
+      ],
+      [
+        "Codebase Health Report",
+        {
+          "name": "Codebase Health Report",
+          "type": "primary",
+          "filePath": "/home/user/tsdoc-edge/managed/features/codebase-health-report.md",
+          "line": 1,
+          "level": 1
+        }
+      ],
+      [
+        "Context Quality Improvements",
+        {
+          "name": "Context Quality Improvements",
+          "type": "primary",
+          "filePath": "/home/user/tsdoc-edge/managed/features/context-quality-improvements.md",
+          "line": 1,
           "level": 1
         }
       ],
@@ -1436,6 +1471,26 @@
           "type": "primary",
           "filePath": "/home/user/tsdoc-edge/managed/features/index.md",
           "line": 2,
+          "level": 1
+        }
+      ],
+      [
+        "Phase Commands Refactoring Guide",
+        {
+          "name": "Phase Commands Refactoring Guide",
+          "type": "primary",
+          "filePath": "/home/user/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md",
+          "line": 1,
+          "level": 1
+        }
+      ],
+      [
+        "Relationship Path",
+        {
+          "name": "Relationship Path",
+          "type": "primary",
+          "filePath": "/home/user/tsdoc-edge/managed/features/relationship-path.md",
+          "line": 1,
           "level": 1
         }
       ],
@@ -4345,6 +4400,20 @@
           {
             "name": "Commands Index",
             "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/analyzer-status.md",
+            "line": 277,
+            "level": 0
+          },
+          {
+            "name": "Commands Index",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/codebase-health-report.md",
+            "line": 343,
+            "level": 0
+          },
+          {
+            "name": "Commands Index",
+            "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/features/index.md",
             "line": 223,
             "level": 0
@@ -4354,6 +4423,20 @@
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/features/index.md",
             "line": 234,
+            "level": 0
+          },
+          {
+            "name": "Commands Index",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/relationship-path.md",
+            "line": 15,
+            "level": 0
+          },
+          {
+            "name": "Commands Index",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/relationship-path.md",
+            "line": 192,
             "level": 0
           },
           {
@@ -4708,14 +4791,14 @@
             "name": "Call Relationships",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 246,
+            "line": 305,
             "level": 0
           },
           {
             "name": "Call Relationships",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 247,
+            "line": 306,
             "level": 0
           },
           {
@@ -5261,14 +5344,14 @@
             "name": "Call Relationships",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/relationships/temporal-order.md",
-            "line": 97,
+            "line": 183,
             "level": 0
           },
           {
             "name": "Call Relationships",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/relationships/temporal-order.md",
-            "line": 130,
+            "line": 216,
             "level": 0
           }
         ]
@@ -8300,6 +8383,13 @@
           {
             "name": "WorkContextCommand",
             "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/context-quality-improvements.md",
+            "line": 197,
+            "level": 0
+          },
+          {
+            "name": "WorkContextCommand",
+            "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/features/core-workflow.md",
             "line": 78,
             "level": 0
@@ -8439,35 +8529,35 @@
             "name": "Relationship Types",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 220,
+            "line": 279,
             "level": 0
           },
           {
             "name": "Relationship Types",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 262,
+            "line": 321,
             "level": 0
           },
           {
             "name": "Relationship Types",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 263,
+            "line": 322,
             "level": 0
           },
           {
             "name": "Relationship Types",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 264,
+            "line": 323,
             "level": 0
           },
           {
             "name": "Relationship Types",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 265,
+            "line": 324,
             "level": 0
           },
           {
@@ -8628,28 +8718,28 @@
             "name": "Relationship Types",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 45,
+            "line": 117,
             "level": 0
           },
           {
             "name": "Relationship Types",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 46,
+            "line": 118,
             "level": 0
           },
           {
             "name": "Relationship Types",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 47,
+            "line": 119,
             "level": 0
           },
           {
             "name": "Relationship Types",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 48,
+            "line": 120,
             "level": 0
           },
           {
@@ -9068,6 +9158,13 @@
           {
             "name": "Relationship Types",
             "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/analyzer-status.md",
+            "line": 280,
+            "level": 0
+          },
+          {
+            "name": "Relationship Types",
+            "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/features/index.md",
             "line": 224,
             "level": 0
@@ -9265,7 +9362,7 @@
             "name": "Relationship Types",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/relationships/temporal-order.md",
-            "line": 153,
+            "line": 239,
             "level": 0
           },
           {
@@ -9368,14 +9465,14 @@
             "name": "Code Dependency",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 260,
+            "line": 319,
             "level": 0
           },
           {
             "name": "Code Dependency",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 261,
+            "line": 320,
             "level": 0
           },
           {
@@ -10075,7 +10172,7 @@
             "name": "Code Dependency",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/relationships/temporal-order.md",
-            "line": 103,
+            "line": 189,
             "level": 0
           },
           {
@@ -10108,14 +10205,14 @@
             "name": "Inheritance",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 252,
+            "line": 311,
             "level": 0
           },
           {
             "name": "Inheritance",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 253,
+            "line": 312,
             "level": 0
           },
           {
@@ -10365,28 +10462,28 @@
             "name": "Symbol",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 268,
+            "line": 327,
             "level": 0
           },
           {
             "name": "Symbol",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 269,
+            "line": 328,
             "level": 0
           },
           {
             "name": "Symbol",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 270,
+            "line": 329,
             "level": 0
           },
           {
             "name": "Symbol",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 271,
+            "line": 330,
             "level": 0
           },
           {
@@ -11183,14 +11280,14 @@
             "name": "Pipeline",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 254,
+            "line": 313,
             "level": 0
           },
           {
             "name": "Pipeline",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 255,
+            "line": 314,
             "level": 0
           },
           {
@@ -11575,14 +11672,14 @@
             "name": "Pipeline",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/relationships/temporal-order.md",
-            "line": 99,
+            "line": 185,
             "level": 0
           },
           {
             "name": "Pipeline",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/relationships/temporal-order.md",
-            "line": 131,
+            "line": 217,
             "level": 0
           }
         ]
@@ -11601,14 +11698,14 @@
             "name": "IO Dependency",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 266,
+            "line": 325,
             "level": 0
           },
           {
             "name": "IO Dependency",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 267,
+            "line": 326,
             "level": 0
           },
           {
@@ -12140,14 +12237,14 @@
             "name": "IO Dependency",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/relationships/temporal-order.md",
-            "line": 98,
+            "line": 184,
             "level": 0
           },
           {
             "name": "IO Dependency",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/relationships/temporal-order.md",
-            "line": 132,
+            "line": 218,
             "level": 0
           }
         ]
@@ -12166,14 +12263,14 @@
             "name": "Test Coverage",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 256,
+            "line": 315,
             "level": 0
           },
           {
             "name": "Test Coverage",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 257,
+            "line": 316,
             "level": 0
           },
           {
@@ -12542,14 +12639,14 @@
             "name": "Type Dependency",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 258,
+            "line": 317,
             "level": 0
           },
           {
             "name": "Type Dependency",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 259,
+            "line": 318,
             "level": 0
           },
           {
@@ -12668,35 +12765,35 @@
             "name": "Type Dependency",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 18,
+            "line": 89,
             "level": 0
           },
           {
             "name": "Type Dependency",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 41,
+            "line": 113,
             "level": 0
           },
           {
             "name": "Type Dependency",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 42,
+            "line": 114,
             "level": 0
           },
           {
             "name": "Type Dependency",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 43,
+            "line": 115,
             "level": 0
           },
           {
             "name": "Type Dependency",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 44,
+            "line": 116,
             "level": 0
           },
           {
@@ -12918,14 +13015,14 @@
             "name": "Generic Constraint",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 250,
+            "line": 309,
             "level": 0
           },
           {
             "name": "Generic Constraint",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 251,
+            "line": 310,
             "level": 0
           },
           {
@@ -12960,14 +13057,21 @@
             "name": "Generic Constraint",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 39,
+            "line": 91,
             "level": 0
           },
           {
             "name": "Generic Constraint",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 40,
+            "line": 111,
+            "level": 0
+          },
+          {
+            "name": "Generic Constraint",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
+            "line": 112,
             "level": 0
           },
           {
@@ -13021,14 +13125,14 @@
             "name": "Circular Dependency",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 248,
+            "line": 307,
             "level": 0
           },
           {
             "name": "Circular Dependency",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 249,
+            "line": 308,
             "level": 0
           },
           {
@@ -13118,27 +13222,46 @@
         ]
       ],
       [
+        "Gephi Export",
+        [
+          {
+            "name": "Gephi Export",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
+            "line": 191,
+            "level": 0
+          },
+          {
+            "name": "Gephi Export",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/relationship-path.md",
+            "line": 193,
+            "level": 0
+          }
+        ]
+      ],
+      [
         "Work Context Workflow",
         [
           {
             "name": "Work Context Workflow",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 221,
+            "line": 280,
             "level": 0
           },
           {
             "name": "Work Context Workflow",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 277,
+            "line": 336,
             "level": 0
           },
           {
             "name": "Work Context Workflow",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 278,
+            "line": 337,
             "level": 0
           },
           {
@@ -13237,6 +13360,20 @@
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/concepts/document-symbol-system.md",
             "line": 218,
+            "level": 0
+          },
+          {
+            "name": "Work Context Workflow",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/codebase-health-report.md",
+            "line": 342,
+            "level": 0
+          },
+          {
+            "name": "Work Context Workflow",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/context-quality-improvements.md",
+            "line": 196,
             "level": 0
           },
           {
@@ -13514,7 +13651,7 @@
             "name": "TSDoc Edge Documentation",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 235,
+            "line": 294,
             "level": 0
           },
           {
@@ -14751,14 +14888,14 @@
             "name": "Analyzers & Extractors",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 236,
+            "line": 295,
             "level": 0
           },
           {
             "name": "Analyzers & Extractors",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 237,
+            "line": 296,
             "level": 0
           },
           {
@@ -15387,6 +15524,13 @@
           {
             "name": "Analyzers & Extractors",
             "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/analyzer-status.md",
+            "line": 281,
+            "level": 0
+          },
+          {
+            "name": "Analyzers & Extractors",
+            "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/features/validation-features.md",
             "line": 241,
             "level": 0
@@ -15603,7 +15747,7 @@
             "name": "Features Index",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 238,
+            "line": 297,
             "level": 0
           },
           {
@@ -15741,28 +15885,28 @@
             "name": "Guides & Tutorials",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 239,
+            "line": 298,
             "level": 0
           },
           {
             "name": "Guides & Tutorials",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 240,
+            "line": 299,
             "level": 0
           },
           {
             "name": "Guides & Tutorials",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 241,
+            "line": 300,
             "level": 0
           },
           {
             "name": "Guides & Tutorials",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 242,
+            "line": 301,
             "level": 0
           },
           {
@@ -16978,7 +17122,7 @@
             "name": "Primary Types Index",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 243,
+            "line": 302,
             "level": 0
           },
           {
@@ -17025,14 +17169,14 @@
             "name": "Quick Start Guide",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 244,
+            "line": 303,
             "level": 0
           },
           {
             "name": "Quick Start Guide",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 245,
+            "line": 304,
             "level": 0
           },
           {
@@ -17520,14 +17664,14 @@
             "name": "Example - Mermaid Workflow",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 272,
+            "line": 331,
             "level": 0
           },
           {
             "name": "Example - Mermaid Workflow",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 273,
+            "line": 332,
             "level": 0
           },
           {
@@ -17616,7 +17760,7 @@
             "name": "Workflows Index",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 274,
+            "line": 333,
             "level": 0
           },
           {
@@ -17754,14 +17898,14 @@
             "name": "Mermaid Entrypoint Workflow",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 275,
+            "line": 334,
             "level": 0
           },
           {
             "name": "Mermaid Entrypoint Workflow",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/COMMANDS.md",
-            "line": 276,
+            "line": 335,
             "level": 0
           },
           {
@@ -20905,6 +21049,13 @@
           {
             "name": "DatabaseManager",
             "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/context-quality-improvements.md",
+            "line": 199,
+            "level": 0
+          },
+          {
+            "name": "DatabaseManager",
+            "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/features/core-workflow.md",
             "line": 75,
             "level": 0
@@ -21019,6 +21170,20 @@
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/features/gephi-export.md",
             "line": 115,
+            "level": 0
+          },
+          {
+            "name": "DatabaseManager",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/relationship-path.md",
+            "line": 13,
+            "level": 0
+          },
+          {
+            "name": "DatabaseManager",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/relationship-path.md",
+            "line": 125,
             "level": 0
           },
           {
@@ -28215,14 +28380,14 @@
             "name": "Relationship Analysis Guide",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 37,
+            "line": 109,
             "level": 0
           },
           {
             "name": "Relationship Analysis Guide",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 38,
+            "line": 110,
             "level": 0
           },
           {
@@ -34625,14 +34790,14 @@
             "name": "SymbolGraphFeatures",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 35,
+            "line": 107,
             "level": 0
           },
           {
             "name": "SymbolGraphFeatures",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 36,
+            "line": 108,
             "level": 0
           },
           {
@@ -39158,14 +39323,14 @@
             "name": "DetectCircularTypesCommand",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 29,
+            "line": 101,
             "level": 0
           },
           {
             "name": "DetectCircularTypesCommand",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 30,
+            "line": 102,
             "level": 0
           },
           {
@@ -44733,6 +44898,20 @@
           {
             "name": "TypeDependencyAnalyzer",
             "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/analyzer-status.md",
+            "line": 88,
+            "level": 0
+          },
+          {
+            "name": "TypeDependencyAnalyzer",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/analyzer-status.md",
+            "line": 279,
+            "level": 0
+          },
+          {
+            "name": "TypeDependencyAnalyzer",
+            "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/features/symbol-graph.md",
             "line": 158,
             "level": 0
@@ -45059,21 +45238,21 @@
             "name": "TypeChainTracer",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 19,
+            "line": 90,
             "level": 0
           },
           {
             "name": "TypeChainTracer",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 27,
+            "line": 99,
             "level": 0
           },
           {
             "name": "TypeChainTracer",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 28,
+            "line": 100,
             "level": 0
           },
           {
@@ -45197,28 +45376,28 @@
             "name": "FindRootTypesCommand",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 31,
+            "line": 103,
             "level": 0
           },
           {
             "name": "FindRootTypesCommand",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 32,
+            "line": 104,
             "level": 0
           },
           {
             "name": "FindRootTypesCommand",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 33,
+            "line": 105,
             "level": 0
           },
           {
             "name": "FindRootTypesCommand",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md",
-            "line": 34,
+            "line": 106,
             "level": 0
           },
           {
@@ -54185,13 +54364,105 @@
         ]
       ],
       [
+        "Temporal Order",
+        [
+          {
+            "name": "Temporal Order",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/analyzer-status.md",
+            "line": 43,
+            "level": 0
+          },
+          {
+            "name": "Temporal Order",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/analyzer-status.md",
+            "line": 278,
+            "level": 0
+          },
+          {
+            "name": "Temporal Order",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/relationships/collaboration.md",
+            "line": 134,
+            "level": 0
+          },
+          {
+            "name": "Temporal Order",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/relationships/collaboration.md",
+            "line": 164,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "Analyzer Status",
+        [
+          {
+            "name": "Analyzer Status",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/codebase-health-report.md",
+            "line": 134,
+            "level": 0
+          },
+          {
+            "name": "Analyzer Status",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/codebase-health-report.md",
+            "line": 341,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "Context Quality Improvements",
+        [
+          {
+            "name": "Context Quality Improvements",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/codebase-health-report.md",
+            "line": 155,
+            "level": 0
+          },
+          {
+            "name": "Context Quality Improvements",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/codebase-health-report.md",
+            "line": 340,
+            "level": 0
+          }
+        ]
+      ],
+      [
         "UnifiedRelationship",
         [
           {
             "name": "UnifiedRelationship",
             "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/context-quality-improvements.md",
+            "line": 198,
+            "level": 0
+          },
+          {
+            "name": "UnifiedRelationship",
+            "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/features/gephi-export.md",
             "line": 116,
+            "level": 0
+          },
+          {
+            "name": "UnifiedRelationship",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/relationship-path.md",
+            "line": 126,
+            "level": 0
+          },
+          {
+            "name": "UnifiedRelationship",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/relationship-path.md",
+            "line": 194,
             "level": 0
           }
         ]
@@ -54240,6 +54511,32 @@
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/features/index.md",
             "line": 203,
+            "level": 0
+          }
+        ]
+      ],
+      [
+        "Codebase Health Report",
+        [
+          {
+            "name": "Codebase Health Report",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md",
+            "line": 8,
+            "level": 0
+          },
+          {
+            "name": "Codebase Health Report",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md",
+            "line": 190,
+            "level": 0
+          },
+          {
+            "name": "Codebase Health Report",
+            "type": "reference",
+            "filePath": "/home/user/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md",
+            "line": 246,
             "level": 0
           }
         ]
@@ -56044,14 +56341,14 @@
             "name": "Composition",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/relationships/temporal-order.md",
-            "line": 100,
+            "line": 186,
             "level": 0
           },
           {
             "name": "Composition",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/relationships/temporal-order.md",
-            "line": 133,
+            "line": 219,
             "level": 0
           }
         ]
@@ -56178,26 +56475,7 @@
             "name": "Calls",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/relationships/temporal-order.md",
-            "line": 104,
-            "level": 0
-          }
-        ]
-      ],
-      [
-        "Temporal Order",
-        [
-          {
-            "name": "Temporal Order",
-            "type": "reference",
-            "filePath": "/home/user/tsdoc-edge/managed/relationships/collaboration.md",
-            "line": 134,
-            "level": 0
-          },
-          {
-            "name": "Temporal Order",
-            "type": "reference",
-            "filePath": "/home/user/tsdoc-edge/managed/relationships/collaboration.md",
-            "line": 164,
+            "line": 190,
             "level": 0
           }
         ]
@@ -56357,7 +56635,7 @@
             "name": "Collaboration",
             "type": "reference",
             "filePath": "/home/user/tsdoc-edge/managed/relationships/temporal-order.md",
-            "line": 134,
+            "line": 220,
             "level": 0
           }
         ]
@@ -57487,8 +57765,8 @@
           },
           {
             "codeSymbol": "UsedByCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase5Commands.ts",
-            "line": 196,
+            "filePath": "/home/user/tsdoc-edge/src/commands/UsedByCommand.ts",
+            "line": 39,
             "docSymbol": "UsedByCommand"
           }
         ]
@@ -58585,13 +58863,13 @@
         ]
       ],
       [
-        "Check Links Command",
+        "CheckDuplicatesCommand",
         [
           {
-            "codeSymbol": "CheckLinksCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/CheckLinksCommand.ts",
-            "line": 40,
-            "docSymbol": "Check Links Command"
+            "codeSymbol": "CheckDuplicatesCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/CheckDuplicatesCommand.ts",
+            "line": 68,
+            "docSymbol": "CheckDuplicatesCommand"
           }
         ]
       ],
@@ -58599,11 +58877,81 @@
         "CLI Commands",
         [
           {
+            "codeSymbol": "CheckDuplicatesCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/CheckDuplicatesCommand.ts",
+            "line": 68,
+            "docSymbol": "CLI Commands",
+            "section": "check-duplicates"
+          },
+          {
             "codeSymbol": "CheckLinksCommand",
             "filePath": "/home/user/tsdoc-edge/src/commands/CheckLinksCommand.ts",
             "line": 40,
             "docSymbol": "CLI Commands",
             "section": "check-links"
+          },
+          {
+            "codeSymbol": "CoreApiCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/CoreApiCommand.ts",
+            "line": 68,
+            "docSymbol": "CLI Commands",
+            "section": "core-api"
+          },
+          {
+            "codeSymbol": "DepsCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/DepsCommand.ts",
+            "line": 39,
+            "docSymbol": "CLI Commands",
+            "section": "deps"
+          },
+          {
+            "codeSymbol": "FindDocCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/FindDocCommand.ts",
+            "line": 69,
+            "docSymbol": "CLI Commands",
+            "section": "find-doc"
+          },
+          {
+            "codeSymbol": "FindMethodCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/FindMethodCommand.ts",
+            "line": 39,
+            "docSymbol": "CLI Commands",
+            "section": "find-method"
+          },
+          {
+            "codeSymbol": "FindUnusedDocsCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/FindUnusedDocsCommand.ts",
+            "line": 39,
+            "docSymbol": "CLI Commands",
+            "section": "find-unused-docs"
+          },
+          {
+            "codeSymbol": "GenerateDocsCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/GenerateDocsCommand.ts",
+            "line": 19,
+            "docSymbol": "CLI Commands",
+            "section": "generate-docs"
+          },
+          {
+            "codeSymbol": "IdNewCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/IdNewCommand.ts",
+            "line": 18,
+            "docSymbol": "CLI Commands",
+            "section": "id-new"
+          },
+          {
+            "codeSymbol": "InitCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/InitCommand.ts",
+            "line": 17,
+            "docSymbol": "CLI Commands",
+            "section": "init"
+          },
+          {
+            "codeSymbol": "OrphansCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/OrphansCommand.ts",
+            "line": 39,
+            "docSymbol": "CLI Commands",
+            "section": "orphans"
           },
           {
             "codeSymbol": "ParseCommand",
@@ -58613,165 +58961,74 @@
             "section": "parse"
           },
           {
-            "codeSymbol": "SuggestCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase4Commands.ts",
-            "line": 24,
-            "docSymbol": "CLI Commands",
-            "section": "suggest"
-          },
-          {
-            "codeSymbol": "InitCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase4Commands.ts",
-            "line": 174,
-            "docSymbol": "CLI Commands",
-            "section": "init"
-          },
-          {
-            "codeSymbol": "IdNewCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase4Commands.ts",
-            "line": 286,
-            "docSymbol": "CLI Commands",
-            "section": "id-new"
-          },
-          {
-            "codeSymbol": "ValidateSpecCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase4Commands.ts",
-            "line": 399,
-            "docSymbol": "CLI Commands",
-            "section": "validate-spec"
-          },
-          {
-            "codeSymbol": "GenerateDocsCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase4Commands.ts",
-            "line": 562,
-            "docSymbol": "CLI Commands",
-            "section": "generate-docs"
-          },
-          {
-            "codeSymbol": "DepsCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase5Commands.ts",
-            "line": 72,
-            "docSymbol": "CLI Commands",
-            "section": "deps"
-          },
-          {
-            "codeSymbol": "UsedByCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase5Commands.ts",
-            "line": 196,
-            "docSymbol": "CLI Commands",
-            "section": "used-by"
-          },
-          {
-            "codeSymbol": "WhoUsesCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase5Commands.ts",
-            "line": 320,
-            "docSymbol": "CLI Commands",
-            "section": "who-uses"
-          },
-          {
-            "codeSymbol": "OrphansCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase5Commands.ts",
-            "line": 513,
-            "docSymbol": "CLI Commands",
-            "section": "orphans"
-          },
-          {
-            "codeSymbol": "UndocumentedCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase5Commands.ts",
-            "line": 619,
-            "docSymbol": "CLI Commands",
-            "section": "undocumented"
-          },
-          {
-            "codeSymbol": "TreeCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase5Commands.ts",
-            "line": 757,
-            "docSymbol": "CLI Commands",
-            "section": "tree"
-          },
-          {
-            "codeSymbol": "CheckDuplicatesCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase6Commands.ts",
-            "line": 73,
-            "docSymbol": "CLI Commands",
-            "section": "check-duplicates"
-          },
-          {
-            "codeSymbol": "SpecStatusCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase6Commands.ts",
-            "line": 251,
-            "docSymbol": "CLI Commands",
-            "section": "spec-status"
-          },
-          {
-            "codeSymbol": "FindUnusedDocsCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase6Commands.ts",
-            "line": 526,
-            "docSymbol": "CLI Commands",
-            "section": "find-unused-docs"
-          },
-          {
-            "codeSymbol": "SpecHistoryCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase6Commands.ts",
-            "line": 689,
-            "docSymbol": "CLI Commands",
-            "section": "spec-history"
-          },
-          {
-            "codeSymbol": "SpecDiffCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase6Commands.ts",
-            "line": 804,
-            "docSymbol": "CLI Commands",
-            "section": "spec-diff"
-          },
-          {
-            "codeSymbol": "SpecBumpCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase6Commands.ts",
-            "line": 939,
-            "docSymbol": "CLI Commands",
-            "section": "spec-bump"
-          },
-          {
-            "codeSymbol": "FindDocCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase6Commands.ts",
-            "line": 1057,
-            "docSymbol": "CLI Commands",
-            "section": "find-doc"
-          },
-          {
             "codeSymbol": "PlansCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase7Commands.ts",
-            "line": 70,
+            "filePath": "/home/user/tsdoc-edge/src/commands/PlansCommand.ts",
+            "line": 40,
             "docSymbol": "CLI Commands",
             "section": "plans"
           },
           {
-            "codeSymbol": "FindMethodCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase7Commands.ts",
-            "line": 250,
+            "codeSymbol": "SpecBumpCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/SpecBumpCommand.ts",
+            "line": 39,
             "docSymbol": "CLI Commands",
-            "section": "find-method"
+            "section": "spec-bump"
           },
           {
-            "codeSymbol": "TodosCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase7Commands.ts",
-            "line": 422,
+            "codeSymbol": "SpecDiffCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/SpecDiffCommand.ts",
+            "line": 39,
             "docSymbol": "CLI Commands",
-            "section": "todos"
+            "section": "spec-diff"
+          },
+          {
+            "codeSymbol": "SpecHistoryCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/SpecHistoryCommand.ts",
+            "line": 39,
+            "docSymbol": "CLI Commands",
+            "section": "spec-history"
+          },
+          {
+            "codeSymbol": "SpecStatusCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/SpecStatusCommand.ts",
+            "line": 67,
+            "docSymbol": "CLI Commands",
+            "section": "spec-status"
           },
           {
             "codeSymbol": "StatsCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase7Commands.ts",
-            "line": 583,
+            "filePath": "/home/user/tsdoc-edge/src/commands/StatsCommand.ts",
+            "line": 39,
             "docSymbol": "CLI Commands",
             "section": "stats"
           },
           {
-            "codeSymbol": "CoreApiCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase7Commands.ts",
-            "line": 701,
+            "codeSymbol": "SuggestCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/SuggestCommand.ts",
+            "line": 18,
             "docSymbol": "CLI Commands",
-            "section": "core-api"
+            "section": "suggest"
+          },
+          {
+            "codeSymbol": "TodosCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/TodosCommand.ts",
+            "line": 40,
+            "docSymbol": "CLI Commands",
+            "section": "todos"
+          },
+          {
+            "codeSymbol": "TreeCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/TreeCommand.ts",
+            "line": 53,
+            "docSymbol": "CLI Commands",
+            "section": "tree"
+          },
+          {
+            "codeSymbol": "UndocumentedCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/UndocumentedCommand.ts",
+            "line": 57,
+            "docSymbol": "CLI Commands",
+            "section": "undocumented"
           },
           {
             "codeSymbol": "UpdateBacklinksCommand",
@@ -58788,11 +59045,54 @@
             "section": "update-symbol-refs"
           },
           {
+            "codeSymbol": "UsedByCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/UsedByCommand.ts",
+            "line": 39,
+            "docSymbol": "CLI Commands",
+            "section": "used-by"
+          },
+          {
             "codeSymbol": "ValidateDocsCommand",
             "filePath": "/home/user/tsdoc-edge/src/commands/ValidateDocsCommand.ts",
             "line": 40,
             "docSymbol": "CLI Commands",
             "section": "validate-docs"
+          },
+          {
+            "codeSymbol": "ValidateSpecCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/ValidateSpecCommand.ts",
+            "line": 17,
+            "docSymbol": "CLI Commands",
+            "section": "validate-spec"
+          },
+          {
+            "codeSymbol": "WhoUsesCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/WhoUsesCommand.ts",
+            "line": 54,
+            "docSymbol": "CLI Commands",
+            "section": "who-uses"
+          }
+        ]
+      ],
+      [
+        "Check Links Command",
+        [
+          {
+            "codeSymbol": "CheckLinksCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/CheckLinksCommand.ts",
+            "line": 40,
+            "docSymbol": "Check Links Command"
+          }
+        ]
+      ],
+      [
+        "CoreApiCommand",
+        [
+          {
+            "codeSymbol": "CoreApiCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/CoreApiCommand.ts",
+            "line": 68,
+            "docSymbol": "CoreApiCommand"
           }
         ]
       ],
@@ -58808,6 +59108,94 @@
         ]
       ],
       [
+        "DepsCommand",
+        [
+          {
+            "codeSymbol": "DepsCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/DepsCommand.ts",
+            "line": 39,
+            "docSymbol": "DepsCommand"
+          }
+        ]
+      ],
+      [
+        "FindDocCommand",
+        [
+          {
+            "codeSymbol": "FindDocCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/FindDocCommand.ts",
+            "line": 69,
+            "docSymbol": "FindDocCommand"
+          }
+        ]
+      ],
+      [
+        "FindMethodCommand",
+        [
+          {
+            "codeSymbol": "FindMethodCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/FindMethodCommand.ts",
+            "line": 39,
+            "docSymbol": "FindMethodCommand"
+          }
+        ]
+      ],
+      [
+        "FindUnusedDocsCommand",
+        [
+          {
+            "codeSymbol": "FindUnusedDocsCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/FindUnusedDocsCommand.ts",
+            "line": 39,
+            "docSymbol": "FindUnusedDocsCommand"
+          }
+        ]
+      ],
+      [
+        "Generate Docs Command",
+        [
+          {
+            "codeSymbol": "GenerateDocsCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/GenerateDocsCommand.ts",
+            "line": 19,
+            "docSymbol": "Generate Docs Command"
+          }
+        ]
+      ],
+      [
+        "Id New Command",
+        [
+          {
+            "codeSymbol": "IdNewCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/IdNewCommand.ts",
+            "line": 18,
+            "docSymbol": "Id New Command"
+          }
+        ]
+      ],
+      [
+        "Init Command",
+        [
+          {
+            "codeSymbol": "InitCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/InitCommand.ts",
+            "line": 17,
+            "docSymbol": "Init Command"
+          }
+        ]
+      ],
+      [
+        "OrphansCommand",
+        [
+          {
+            "codeSymbol": "OrphansCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/OrphansCommand.ts",
+            "line": 39,
+            "docSymbol": "OrphansCommand"
+          }
+        ]
+      ],
+      [
         "Parse Command",
         [
           {
@@ -58819,167 +59207,13 @@
         ]
       ],
       [
-        "Suggest Command",
+        "PlansCommand",
         [
           {
-            "codeSymbol": "SuggestCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase4Commands.ts",
-            "line": 24,
-            "docSymbol": "Suggest Command"
-          }
-        ]
-      ],
-      [
-        "Init Command",
-        [
-          {
-            "codeSymbol": "InitCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase4Commands.ts",
-            "line": 174,
-            "docSymbol": "Init Command"
-          }
-        ]
-      ],
-      [
-        "ID New Command",
-        [
-          {
-            "codeSymbol": "IdNewCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase4Commands.ts",
-            "line": 286,
-            "docSymbol": "ID New Command"
-          }
-        ]
-      ],
-      [
-        "Validate Spec Command",
-        [
-          {
-            "codeSymbol": "ValidateSpecCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase4Commands.ts",
-            "line": 399,
-            "docSymbol": "Validate Spec Command"
-          }
-        ]
-      ],
-      [
-        "Generate Docs Command",
-        [
-          {
-            "codeSymbol": "GenerateDocsCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase4Commands.ts",
-            "line": 562,
-            "docSymbol": "Generate Docs Command"
-          }
-        ]
-      ],
-      [
-        "DepsCommand",
-        [
-          {
-            "codeSymbol": "DepsCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase5Commands.ts",
-            "line": 72,
-            "docSymbol": "DepsCommand"
-          }
-        ]
-      ],
-      [
-        "WhoUsesCommand",
-        [
-          {
-            "codeSymbol": "WhoUsesCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase5Commands.ts",
-            "line": 320,
-            "docSymbol": "WhoUsesCommand"
-          }
-        ]
-      ],
-      [
-        "OrphansCommand",
-        [
-          {
-            "codeSymbol": "OrphansCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase5Commands.ts",
-            "line": 513,
-            "docSymbol": "OrphansCommand"
-          }
-        ]
-      ],
-      [
-        "UndocumentedCommand",
-        [
-          {
-            "codeSymbol": "UndocumentedCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase5Commands.ts",
-            "line": 619,
-            "docSymbol": "UndocumentedCommand"
-          }
-        ]
-      ],
-      [
-        "TreeCommand",
-        [
-          {
-            "codeSymbol": "TreeCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase5Commands.ts",
-            "line": 757,
-            "docSymbol": "TreeCommand"
-          }
-        ]
-      ],
-      [
-        "CheckDuplicatesCommand",
-        [
-          {
-            "codeSymbol": "CheckDuplicatesCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase6Commands.ts",
-            "line": 73,
-            "docSymbol": "CheckDuplicatesCommand"
-          }
-        ]
-      ],
-      [
-        "SpecStatusCommand",
-        [
-          {
-            "codeSymbol": "SpecStatusCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase6Commands.ts",
-            "line": 251,
-            "docSymbol": "SpecStatusCommand"
-          }
-        ]
-      ],
-      [
-        "FindUnusedDocsCommand",
-        [
-          {
-            "codeSymbol": "FindUnusedDocsCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase6Commands.ts",
-            "line": 526,
-            "docSymbol": "FindUnusedDocsCommand"
-          }
-        ]
-      ],
-      [
-        "SpecHistoryCommand",
-        [
-          {
-            "codeSymbol": "SpecHistoryCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase6Commands.ts",
-            "line": 689,
-            "docSymbol": "SpecHistoryCommand"
-          }
-        ]
-      ],
-      [
-        "SpecDiffCommand",
-        [
-          {
-            "codeSymbol": "SpecDiffCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase6Commands.ts",
-            "line": 804,
-            "docSymbol": "SpecDiffCommand"
+            "codeSymbol": "PlansCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/PlansCommand.ts",
+            "line": 40,
+            "docSymbol": "PlansCommand"
           }
         ]
       ],
@@ -58988,53 +59222,42 @@
         [
           {
             "codeSymbol": "SpecBumpCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase6Commands.ts",
-            "line": 939,
+            "filePath": "/home/user/tsdoc-edge/src/commands/SpecBumpCommand.ts",
+            "line": 39,
             "docSymbol": "SpecBumpCommand"
           }
         ]
       ],
       [
-        "FindDocCommand",
+        "SpecDiffCommand",
         [
           {
-            "codeSymbol": "FindDocCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase6Commands.ts",
-            "line": 1057,
-            "docSymbol": "FindDocCommand"
+            "codeSymbol": "SpecDiffCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/SpecDiffCommand.ts",
+            "line": 39,
+            "docSymbol": "SpecDiffCommand"
           }
         ]
       ],
       [
-        "PlansCommand",
+        "SpecHistoryCommand",
         [
           {
-            "codeSymbol": "PlansCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase7Commands.ts",
-            "line": 70,
-            "docSymbol": "PlansCommand"
+            "codeSymbol": "SpecHistoryCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/SpecHistoryCommand.ts",
+            "line": 39,
+            "docSymbol": "SpecHistoryCommand"
           }
         ]
       ],
       [
-        "FindMethodCommand",
+        "SpecStatusCommand",
         [
           {
-            "codeSymbol": "FindMethodCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase7Commands.ts",
-            "line": 250,
-            "docSymbol": "FindMethodCommand"
-          }
-        ]
-      ],
-      [
-        "TodosCommand",
-        [
-          {
-            "codeSymbol": "TodosCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase7Commands.ts",
-            "line": 422,
-            "docSymbol": "TodosCommand"
+            "codeSymbol": "SpecStatusCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/SpecStatusCommand.ts",
+            "line": 67,
+            "docSymbol": "SpecStatusCommand"
           }
         ]
       ],
@@ -59043,20 +59266,53 @@
         [
           {
             "codeSymbol": "StatsCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase7Commands.ts",
-            "line": 583,
+            "filePath": "/home/user/tsdoc-edge/src/commands/StatsCommand.ts",
+            "line": 39,
             "docSymbol": "StatsCommand"
           }
         ]
       ],
       [
-        "CoreApiCommand",
+        "Suggest Command",
         [
           {
-            "codeSymbol": "CoreApiCommand",
-            "filePath": "/home/user/tsdoc-edge/src/commands/Phase7Commands.ts",
-            "line": 701,
-            "docSymbol": "CoreApiCommand"
+            "codeSymbol": "SuggestCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/SuggestCommand.ts",
+            "line": 18,
+            "docSymbol": "Suggest Command"
+          }
+        ]
+      ],
+      [
+        "TodosCommand",
+        [
+          {
+            "codeSymbol": "TodosCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/TodosCommand.ts",
+            "line": 40,
+            "docSymbol": "TodosCommand"
+          }
+        ]
+      ],
+      [
+        "TreeCommand",
+        [
+          {
+            "codeSymbol": "TreeCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/TreeCommand.ts",
+            "line": 53,
+            "docSymbol": "TreeCommand"
+          }
+        ]
+      ],
+      [
+        "UndocumentedCommand",
+        [
+          {
+            "codeSymbol": "UndocumentedCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/UndocumentedCommand.ts",
+            "line": 57,
+            "docSymbol": "UndocumentedCommand"
           }
         ]
       ],
@@ -59090,6 +59346,28 @@
             "filePath": "/home/user/tsdoc-edge/src/commands/ValidateDocsCommand.ts",
             "line": 40,
             "docSymbol": "Validate Docs Command"
+          }
+        ]
+      ],
+      [
+        "Validate Spec Command",
+        [
+          {
+            "codeSymbol": "ValidateSpecCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/ValidateSpecCommand.ts",
+            "line": 17,
+            "docSymbol": "Validate Spec Command"
+          }
+        ]
+      ],
+      [
+        "WhoUsesCommand",
+        [
+          {
+            "codeSymbol": "WhoUsesCommand",
+            "filePath": "/home/user/tsdoc-edge/src/commands/WhoUsesCommand.ts",
+            "line": 54,
+            "docSymbol": "WhoUsesCommand"
           }
         ]
       ],

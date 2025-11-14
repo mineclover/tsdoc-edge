@@ -65,56 +65,77 @@ tsdoc-edge work-context src/analyzer/CallGraphAnalyzer.ts
 
 ### Referenced By
 
+- [[CLI Commands]] → /home/user/tsdoc-edge/managed/CLI-COMMANDS.md:281
+- [[CLI Commands]] → /home/user/tsdoc-edge/managed/CLI-COMMANDS.md:289
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:48
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:96
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:232
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:271
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:425
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:426
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:427
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:428
 - [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:214
 - [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:270
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:271
 - [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:19
 - [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:38
+- [[IODependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:39
 - [[ParallelWorkDetector]] → /home/user/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:24
 - [[ParallelWorkDetector]] → /home/user/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:37
+- [[ParallelWorkDetector]] → /home/user/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:38
 - [[ReliabilityChecker]] → /home/user/tsdoc-edge/managed/analyzers/ReliabilityChecker.md:21
 - [[ReliabilityChecker]] → /home/user/tsdoc-edge/managed/analyzers/ReliabilityChecker.md:32
+- [[ReliabilityChecker]] → /home/user/tsdoc-edge/managed/analyzers/ReliabilityChecker.md:33
 - [[TestRelationshipAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestRelationshipAnalyzer.md:23
 - [[TestRelationshipAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestRelationshipAnalyzer.md:39
+- [[TestRelationshipAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TestRelationshipAnalyzer.md:40
 - [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:228
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:263
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:175
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:176
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:267
+- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:268
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:184
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:185
 - [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:5
 - [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:128
 - [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:158
-- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:190
-- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:191
-- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:192
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:194
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:195
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:196
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:197
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:198
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:199
 - [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:46
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:156
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:245
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:246
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:177
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:178
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:254
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:255
 - [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:115
 - [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:116
 - [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:101
 - [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:152
 - [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:174
 - [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:175
+- [[Context Quality Improvements]] → /home/user/tsdoc-edge/managed/features/context-quality-improvements.md:197
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:78
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:177
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:178
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:179
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:187
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:188
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:189
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:190
 - [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:48
-- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:84
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:164
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:216
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:122
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:123
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:124
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:125
+- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:87
+- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:88
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:183
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:258
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:259
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:127
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:128
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:129
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:130
 - [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:6
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:259
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:260
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:261
 
 ### Implemented By
 
-- WorkContextCommand → /home/user/tsdoc-edge/src/commands/WorkContextCommand.ts:97
+- WorkContextCommand → /home/user/tsdoc-edge/src/commands/WorkContextCommand.ts:101
 

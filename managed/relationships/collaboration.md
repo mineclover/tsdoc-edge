@@ -364,4 +364,7 @@ interface CollaborationMetrics {
 
 ### Referenced By
 
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md
+- [[Integration Verification]] → /home/user/tsdoc-edge/managed/relationships/integration-verification.md:158
+- [[Integration Verification]] → /home/user/tsdoc-edge/managed/relationships/integration-verification.md:188
+- [[Temporal Order]] → /home/user/tsdoc-edge/managed/relationships/temporal-order.md:220
+

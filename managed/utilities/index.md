@@ -465,6 +465,16 @@ DatabaseManager
 
 ### Referenced By
 
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:388
+- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:249
 - [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:402
+- [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:413
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:127
 - [[Types Index]] → /home/user/tsdoc-edge/managed/types/index.md:347
+- [[Types Index]] → /home/user/tsdoc-edge/managed/types/index.md:358
+- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:108
+- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:73
+- [[FileScanner]] → /home/user/tsdoc-edge/managed/utilities/FileScanner.md:84
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:211
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:125
 

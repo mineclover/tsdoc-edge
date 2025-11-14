@@ -368,17 +368,29 @@ Total:               61 commands
 
 ### Referenced By
 
+- [[CLI Commands]] → /home/user/tsdoc-edge/managed/CLI-COMMANDS.md:10
+- [[CLI Commands]] → /home/user/tsdoc-edge/managed/CLI-COMMANDS.md:287
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:270
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:331
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:245
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:275
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:276
+- [[Analyzer Status]] → /home/user/tsdoc-edge/managed/features/analyzer-status.md:277
+- [[Codebase Health Report]] → /home/user/tsdoc-edge/managed/features/codebase-health-report.md:343
 - [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:223
+- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:234
+- [[Relationship Path]] → /home/user/tsdoc-edge/managed/features/relationship-path.md:15
+- [[Relationship Path]] → /home/user/tsdoc-edge/managed/features/relationship-path.md:192
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:223
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:259
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:307
 - [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:308
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:309
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:310
 - [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:404
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:179
 - [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:203
+- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:204
 - [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:48
 - [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:49
 - [[Circular Dependency]] → /home/user/tsdoc-edge/managed/relationships/CIRCULAR.md:17
@@ -395,10 +407,11 @@ Total:               61 commands
 - [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:18
 - [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:46
 - [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:47
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:162
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:184
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:185
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:186
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:181
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:203
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:204
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:205
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:206
 - [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:61
 - [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:62
 - [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:77
@@ -407,9 +420,12 @@ Total:               61 commands
 - [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:80
 - [[Example - Mermaid Workflow]] → /home/user/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:193
 - [[Example - Mermaid Workflow]] → /home/user/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:208
+- [[Example - Mermaid Workflow]] → /home/user/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:209
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:196
+- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:206
 - [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:299
 - [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:307
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:308
 - [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:252
 - [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:253
 

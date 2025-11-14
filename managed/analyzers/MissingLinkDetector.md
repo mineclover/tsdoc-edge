@@ -28,10 +28,13 @@ Finds:
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:158
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:358
 - [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:99
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:296
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:315
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:316
 - [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:158
 - [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:159
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:133
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:233
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:235
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:236
 

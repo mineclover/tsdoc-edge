@@ -179,16 +179,20 @@ tsdoc-edge check-links
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:175
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:496
 - [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:195
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:404
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:58
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:59
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:420
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:421
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:61
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:62
 - [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:129
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:233
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:265
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:266
 - [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:109
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:297
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:194
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:195
-- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:116
-- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:117
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:317
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:318
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:201
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:202
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:119
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:120
 

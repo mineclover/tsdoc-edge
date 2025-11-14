@@ -379,13 +379,16 @@ File coverage: 92.3% ✓
 
 ### Referenced By
 
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:259
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:260
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:124
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:125
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:331
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:332
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:128
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:129
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:154
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:170
 - [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:179
-- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:315
+- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:211
+- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:212
+- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:213
 - [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:316
+- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:317
 

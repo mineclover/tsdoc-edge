@@ -155,18 +155,25 @@ for (const [symbolId, symbol] of this.graph.symbols.entries()) {
 - [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:83
 - [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:104
 - [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:105
+- [[Analyzer Status]] → /home/user/tsdoc-edge/managed/features/analyzer-status.md:88
+- [[Analyzer Status]] → /home/user/tsdoc-edge/managed/features/analyzer-status.md:279
 - [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:158
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:268
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:276
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:277
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:281
 - [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:363
 - [[Generic Constraint]] → /home/user/tsdoc-edge/managed/relationships/GENERIC-CONSTRAINT.md:8
 - [[Generic Constraint]] → /home/user/tsdoc-edge/managed/relationships/GENERIC-CONSTRAINT.md:21
+- [[Generic Constraint]] → /home/user/tsdoc-edge/managed/relationships/GENERIC-CONSTRAINT.md:22
 - [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:8
 - [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:29
 - [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:30
 - [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:31
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:101
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:109
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:198
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:199
+- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:32
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:114
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:122
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:228
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:229
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:230
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:231
 

@@ -218,3 +218,13 @@ Gephi는 순환 그래프를 지원하지만 시각화 시 주의 필요
 - [Gephi Lite](https://gephi.org/gephi-lite/)
 - [@gephi/gephi-lite-sdk](https://www.npmjs.com/package/@gephi/gephi-lite-sdk)
 - [Graphology](https://graphology.github.io/)
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:191
+- [[Relationship Path]] → /home/user/tsdoc-edge/managed/features/relationship-path.md:193
+
