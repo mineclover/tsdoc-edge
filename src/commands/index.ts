@@ -24,13 +24,11 @@ export {
   GenerateDocsCommand,
 } from './Phase4Commands';
 export { DepsCommand } from './DepsCommand';
-export {
-  UsedByCommand,
-  WhoUsesCommand,
-  OrphansCommand,
-  UndocumentedCommand,
-  TreeCommand,
-} from './Phase5Commands';
+export { UsedByCommand } from './UsedByCommand';
+export { WhoUsesCommand } from './WhoUsesCommand';
+export { OrphansCommand } from './OrphansCommand';
+export { UndocumentedCommand } from './UndocumentedCommand';
+export { TreeCommand } from './TreeCommand';
 export { CheckDuplicatesCommand } from './CheckDuplicatesCommand';
 export { SpecStatusCommand } from './SpecStatusCommand';
 export { FindUnusedDocsCommand } from './FindUnusedDocsCommand';
