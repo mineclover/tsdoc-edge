@@ -23,8 +23,8 @@ export {
   ValidateSpecCommand,
   GenerateDocsCommand,
 } from './Phase4Commands';
+export { DepsCommand } from './DepsCommand';
 export {
-  DepsCommand,
   UsedByCommand,
   WhoUsesCommand,
   OrphansCommand,
