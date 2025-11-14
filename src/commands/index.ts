@@ -16,13 +16,11 @@ export { ValidateDocsCommand } from './ValidateDocsCommand';
 export { UpdateBacklinksCommand } from './UpdateBacklinksCommand';
 export { UpdateSymbolRefsCommand } from './UpdateSymbolRefsCommand';
 export { CheckLinksCommand } from './CheckLinksCommand';
-export {
-  SuggestCommand,
-  InitCommand,
-  IdNewCommand,
-  ValidateSpecCommand,
-  GenerateDocsCommand,
-} from './Phase4Commands';
+export { SuggestCommand } from './SuggestCommand';
+export { InitCommand } from './InitCommand';
+export { IdNewCommand } from './IdNewCommand';
+export { ValidateSpecCommand } from './ValidateSpecCommand';
+export { GenerateDocsCommand } from './GenerateDocsCommand';
 export { DepsCommand } from './DepsCommand';
 export { UsedByCommand } from './UsedByCommand';
 export { WhoUsesCommand } from './WhoUsesCommand';
