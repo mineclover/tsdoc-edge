@@ -4,11 +4,10 @@
 
 Phase 명령어 파일을 개별 명령어 파일로 분리하는 리팩토링 가이드.
 
-**Status**: 🚧 In Progress (Phase6 ✅ Complete, Phase7 ✅ Complete)
+**Status**: ✅ Complete
 **Priority**: 🔴 High (from [[Codebase Health Report]])
 **Started**: 2025-11-13
-**Phase6 Completed**: 2025-11-13
-**Phase7 Completed**: 2025-11-13
+**Completed**: 2025-11-13
 
 ## Problem
 
@@ -198,44 +197,46 @@ git commit -m "refactor: Remove Phase6Commands after extracting all commands"
 **Progress**: 7/7 (100%) ✅
 **Legacy File Deleted**: 008d386
 
-### Phase5Commands.ts (6 commands)
+### Phase5Commands.ts (6 commands) ✅ COMPLETE
 
-| Command | Lines | Status |
-|---------|-------|--------|
-| DepsCommand | ~150 | ⏳ Pending |
-| UsedByCommand | ~150 | ⏳ Pending |
-| WhoUsesCommand | ~150 | ⏳ Pending |
-| OrphansCommand | ~150 | ⏳ Pending |
-| UndocumentedCommand | ~150 | ⏳ Pending |
-| TreeCommand | ~150 | ⏳ Pending |
+| Command | Lines | Status | Commit |
+|---------|-------|--------|--------|
+| DepsCommand | 134 | ✅ Done | 0bb0e8f |
+| UsedByCommand | 138 | ✅ Done | 9c1ccf6 |
+| WhoUsesCommand | 188 | ✅ Done | 9c1ccf6 |
+| OrphansCommand | 116 | ✅ Done | 9c1ccf6 |
+| UndocumentedCommand | 178 | ✅ Done | 9c1ccf6 |
+| TreeCommand | 148 | ✅ Done | 9c1ccf6 |
 
-**Progress**: 0/6 (0%)
+**Progress**: 6/6 (100%) ✅
+**Legacy File Deleted**: 9c1ccf6
 
-### Phase4Commands.ts (5 commands)
+### Phase4Commands.ts (5 commands) ✅ COMPLETE
 
-| Command | Lines | Status |
-|---------|-------|--------|
-| SuggestCommand | ~150 | ⏳ Pending |
-| InitCommand | ~150 | ⏳ Pending |
-| IdNewCommand | ~150 | ⏳ Pending |
-| ValidateSpecCommand | ~150 | ⏳ Pending |
-| GenerateDocsCommand | ~150 | ⏳ Pending |
+| Command | Lines | Status | Commit |
+|---------|-------|--------|--------|
+| SuggestCommand | 167 | ✅ Done | 243349c |
+| InitCommand | 129 | ✅ Done | 243349c |
+| IdNewCommand | 130 | ✅ Done | 243349c |
+| ValidateSpecCommand | 180 | ✅ Done | 243349c |
+| GenerateDocsCommand | 161 | ✅ Done | 243349c |
 
-**Progress**: 0/5 (0%)
+**Progress**: 5/5 (100%) ✅
+**Legacy File Deleted**: 243349c
 
 ### Overall Progress
 
 ```
-Total: 24 commands
-Completed: 14 commands (58%)
-Remaining: 10 commands (42%)
+Total: 25 commands
+Completed: 25 commands (100%) ✅ COMPLETE
+Remaining: 0 commands (0%)
 
 Phase6Commands.ts: 7/7 ✅ COMPLETE
 Phase7Commands.ts: 7/7 ✅ COMPLETE
-Phase5Commands.ts: 0/6 (pending)
-Phase4Commands.ts: 0/5 (pending)
+Phase5Commands.ts: 6/6 ✅ COMPLETE
+Phase4Commands.ts: 5/5 ✅ COMPLETE
 
-Estimated effort remaining: 10 commands × 15 min = ~2.5 hours
+All Phase Commands refactoring: COMPLETE
 ```
 
 ## Common Issues & Solutions
@@ -318,26 +319,18 @@ Script would:
 - ✅ Clearer ownership per file
 - ✅ Better for code review
 
-## Next Steps
+## Completion Summary
 
-1. ~~**Phase6Commands.ts**~~ ✅ **COMPLETE** (7/7 commands extracted)
+✅ **ALL PHASES COMPLETE**
 
-2. ~~**Phase7Commands.ts**~~ ✅ **COMPLETE** (7/7 commands extracted)
+1. ~~**Phase6Commands.ts**~~ ✅ 7/7 commands extracted
+2. ~~**Phase7Commands.ts**~~ ✅ 7/7 commands extracted
+3. ~~**Phase5Commands.ts**~~ ✅ 6/6 commands extracted
+4. ~~**Phase4Commands.ts**~~ ✅ 5/5 commands extracted
 
-3. **Phase5Commands.ts** (6 commands, 865 lines) - NEXT
-   - DepsCommand
-   - UsedByCommand
-   - WhoUsesCommand
-   - OrphansCommand
-   - UndocumentedCommand
-   - TreeCommand
-
-4. **Phase4Commands.ts** (5 commands, 707 lines)
-   - SuggestCommand
-   - InitCommand
-   - IdNewCommand
-   - ValidateSpecCommand
-   - GenerateDocsCommand
+**Total**: 25 commands successfully refactored
+**Legacy code removed**: 3,515 lines (4 monolithic files)
+**New modular files**: 25 focused command files (avg 142 lines each)
 
 ## Related
 
@@ -350,8 +343,10 @@ Script would:
 - **Start**: 2025-11-13
 - **Phase6 completion**: 2025-11-13 (7 commands)
 - **Phase7 completion**: 2025-11-13 (7 commands)
+- **Phase5 completion**: 2025-11-13 (6 commands)
+- **Phase4 completion**: 2025-11-13 (5 commands)
 - **Target completion**: 2025-11-15
-- **Actual completion**: TBD (14/24 commands done)
+- **Actual completion**: 2025-11-13 ✅ (2 days ahead of schedule!)
 
 ## Phase6 Summary
 
@@ -393,8 +388,36 @@ Completed all 7 commands from Phase7Commands.ts in a single session:
 - ✅ Build successful
 - ✅ Zero regressions
 
+## Phase5 Summary
+
+Completed all 6 commands from Phase5Commands.ts:
+
+**Commits**:
+1. 0bb0e8f - DepsCommand (134 lines)
+2-6. 9c1ccf6 - UsedByCommand, WhoUsesCommand, OrphansCommand, UndocumentedCommand, TreeCommand (combined extraction)
+
+**Results**:
+- ✅ Reduced from 1 file (864 lines) to 6 files (avg 150 lines each)
+- ✅ All commands tested and working
+- ✅ Build successful
+- ✅ Zero regressions
+
+## Phase4 Summary
+
+Completed all 5 commands from Phase4Commands.ts:
+
+**Commits**:
+1. 243349c - All 5 commands (SuggestCommand, InitCommand, IdNewCommand, ValidateSpecCommand, GenerateDocsCommand)
+
+**Results**:
+- ✅ Reduced from 1 file (706 lines) to 5 files (avg 153 lines each)
+- ✅ All commands tested and working
+- ✅ Build successful
+- ✅ Fixed import issues (path module)
+- ✅ Zero regressions
+
 ---
 
 **Last Updated**: 2025-11-13
-**Progress**: 14/24 commands (58%)
-**Status**: 🚧 In Progress (Phase6 ✅ Complete, Phase7 ✅ Complete, Phase5 Next)
+**Progress**: 25/25 commands (100%) ✅ COMPLETE
+**Status**: ✅ Complete
