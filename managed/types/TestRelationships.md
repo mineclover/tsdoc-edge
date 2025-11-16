@@ -9,39 +9,38 @@ Type system for test-code relationship analysis and verification.
 ## Test Symbol Usage
 
 Tracks how production symbols are used in tests:
-```typescript
-interface TestSymbolUsage {
-  testFilePath: string;
-  importedSymbols: ImportedSymbol[];
-  usagePatterns: UsagePattern[];
-}
-```
+
+See implementation: [[TestSymbolUsage]]
+
+**Key Properties**:
+- `testFilePath`: Test file path
+- `importedSymbols`: Imported symbols
+- `usagePatterns`: Usage patterns
 
 ## Imported Symbol
 
 Symbol imported from production code into test:
-```typescript
-interface ImportedSymbol {
-  symbolName: string;      // Name as imported
-  symbolId: string | null; // Resolved ID
-  fromModule: string;      // Module path
-  line: number;            // Import line
-}
-```
+
+See implementation: [[ImportedSymbol]]
+
+**Key Properties**:
+- `symbolName`: Name as imported
+- `symbolId`: Resolved ID (null if not resolved)
+- `fromModule`: Module path
+- `line`: Import line
 
 ## Usage Pattern
 
 How symbol is used in test code:
-```typescript
-interface UsagePattern {
-  symbolId: string;
-  lineNumber: number;
-  usageType: 'import' | 'instantiation' | 'method-call'
-           | 'dependency-injection' | 'property-access';
-  codeSnippet?: string;
-  relatedSymbols?: string[];
-}
-```
+
+See implementation: [[UsagePattern]]
+
+**Key Properties**:
+- `symbolId`: Symbol identifier
+- `lineNumber`: Line number
+- `usageType`: 'import', 'instantiation', 'method-call', 'dependency-injection', or 'property-access'
+- `codeSnippet`: Code snippet (optional)
+- `relatedSymbols`: Related symbols (optional)
 
 ### Usage Types
 
@@ -54,15 +53,15 @@ interface UsagePattern {
 ## Verified Relationship
 
 Relationship confirmed by test evidence:
-```typescript
-interface VerifiedRelationship {
-  source: string;          // Source symbol ID
-  target: string;          // Target symbol ID
-  verifiedBy: string;      // Test file path
-  strength: 'weak' | 'medium' | 'strong';
-  evidence: RelationshipEvidence[];
-}
-```
+
+See implementation: [[VerifiedRelationship]]
+
+**Key Properties**:
+- `source`: Source symbol ID
+- `target`: Target symbol ID
+- `verifiedBy`: Test file path
+- `strength`: 'weak', 'medium', or 'strong'
+- `evidence`: Relationship evidence
 
 ### Verification Strength
 
@@ -73,14 +72,13 @@ interface VerifiedRelationship {
 ## Relationship Evidence
 
 Proof of relationship in test:
-```typescript
-interface RelationshipEvidence {
-  lineNumber: number;
-  codeSnippet: string;
-  pattern: 'dependency-injection' | 'method-call'
-         | 'property-access' | 'co-occurrence';
-}
-```
+
+See implementation: [[RelationshipEvidence]]
+
+**Key Properties**:
+- `lineNumber`: Line number
+- `codeSnippet`: Code snippet
+- `pattern`: 'dependency-injection', 'method-call', 'property-access', or 'co-occurrence'
 
 ### Evidence Patterns
 

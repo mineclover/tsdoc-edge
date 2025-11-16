@@ -9,19 +9,19 @@ Minimal schema for symbol identification in JSONL storage.
 ## Source Reference
 
 Points to code location:
-```typescript
-interface SourceRef {
-  filePath: string;          // Relative to project root
-  symbolName: string;        // Symbol name
-  type?: SymbolType;         // Quick lookup
-  line?: number;             // Approximate (may change)
-  memberOf?: string;         // Parent symbol ID
-  memberType?: 'instance' | 'static' | 'inner';
-  qualifiedName?: string;    // JSDoc convention
-  depth?: number;            // Hierarchy depth
-  sourceHash?: string;       // Change detection
-}
-```
+
+See implementation: [[SourceRef]]
+
+**Key Properties**:
+- `filePath`: Relative to project root
+- `symbolName`: Symbol name
+- `type`: Quick lookup (optional)
+- `line`: Approximate line number (may change) (optional)
+- `memberOf`: Parent symbol ID (optional)
+- `memberType`: 'instance', 'static', or 'inner' (optional)
+- `qualifiedName`: JSDoc convention (optional)
+- `depth`: Hierarchy depth (optional)
+- `sourceHash`: Change detection hash (optional)
 
 ## Qualified Names (JSDoc Convention)
 
@@ -92,26 +92,26 @@ class UserService {              // depth: 0
 ## Dependency Relation
 
 Tracks symbol dependencies:
-```typescript
-interface DependencyRelation {
-  targetId: string;          // Target symbol ID
-  type: 'import' | 'extends' | 'implements' | 'uses';
-  filePath?: string;         // Where defined
-}
-```
+
+See implementation: [[DependencyRelation]]
+
+**Key Properties**:
+- `targetId`: Target symbol ID
+- `type`: 'import', 'extends', 'implements', or 'uses'
+- `filePath`: Where defined (optional)
 
 ## Symbol Registry Entry
 
 Complete registry entry:
-```typescript
-interface SymbolRegistryEntry {
-  id: string;                // Unique ID
-  source: SourceRef;         // Code location
-  dependencies: DependencyRelation[];
-  tags: string[];            // Categorization
-  metadata: Record<string, unknown>;
-}
-```
+
+See implementation: [[SymbolRegistryEntry]]
+
+**Key Properties**:
+- `id`: Unique ID
+- `source`: Code location
+- `dependencies`: Dependency relations
+- `tags`: Categorization tags
+- `metadata`: Additional metadata
 
 ## JSONL Storage Format
 

@@ -28,44 +28,42 @@ Type system for document symbols using `[[Symbol]]` notation.
 
 ## Symbol Structure
 
-```typescript
-interface DocumentSymbol {
-  name: string;              // Symbol name (without [[]])
-  type: DocumentSymbolType;  // primary | auxiliary | reference
-  filePath: string;          // Document file path
-  line: number;              // Line number
-  level: number;             // Heading level (1-6, 0=inline)
-  content?: string;          // Description/context
-  section?: string;          // Section name for #Section refs
-}
-```
+See implementation: [[DocumentSymbol]]
+
+**Key Properties**:
+- `name`: Symbol name (without [[]])
+- `type`: primary, auxiliary, or reference
+- `filePath`: Document file path
+- `line`: Line number
+- `level`: Heading level (1-6, 0=inline)
+- `content`: Description/context (optional)
+- `section`: Section name for #Section refs (optional)
 
 ## Parsed Document Result
 
-```typescript
-interface ParsedDocSymbols {
-  filePath: string;
-  primary?: DocumentSymbol;           // H1 definition
-  auxiliaries: DocumentSymbol[];      // H2+ definitions
-  references: DocumentSymbol[];       // Inline [[refs]]
-  codeReferences: CodeReference[];    // Links to code
-  symbolFootnoteRefs: SymbolFootnoteRef[];
-  sourceFilePath?: string;            // From **Source**: pattern
-}
-```
+See implementation: [[ParsedDocSymbols]]
+
+**Key Properties**:
+- `filePath`: Document file path
+- `primary`: H1 definition (optional)
+- `auxiliaries`: H2+ definitions
+- `references`: Inline [[refs]]
+- `codeReferences`: Links to code
+- `symbolFootnoteRefs`: Symbol footnote references
+- `sourceFilePath`: From **Source**: pattern (optional)
 
 ## Code Reference
 
 Links from docs to code:
-```typescript
-interface CodeReference {
-  text: string;          // Link text
-  targetFile: string;    // Source file path
-  targetSymbol?: string; // Symbol name
-  targetMember?: string; // Member name
-  line?: number;         // Line number
-}
-```
+
+See implementation: [[CodeReference]]
+
+**Key Properties**:
+- `text`: Link text
+- `targetFile`: Source file path
+- `targetSymbol`: Symbol name (optional)
+- `targetMember`: Member name (optional)
+- `line`: Line number (optional)
 
 ## Symbol Footnote
 
