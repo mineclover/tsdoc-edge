@@ -256,9 +256,29 @@ See implementation: [[DatabaseManager]]
 
 **Contents**: Test suites, test cases
 
-**Count**: 0 (not yet indexed)
+**Count**: 0 (not indexed)
 
-**Note**: Tests are not currently indexed in the symbol database
+**Note**: Test files are excluded by FileScanner configuration
+
+**Reason**: FileScanner excludes test patterns by default:
+```typescript
+// src/scanner/FileScanner.ts:138
+exclude: ['**/node_modules/**', '**/dist/**', '**/*.test.ts', '**/*.spec.ts']
+```
+
+**Test Files Available** (19 files in `src/__tests__/`):
+- ASTSymbolExtractor.test.ts
+- CodeHealthChecker.test.ts
+- ConnectivityValidator.test.ts
+- DatabaseManager.test.ts
+- DocumentSymbolParser.test.ts
+- RelationshipIndex.test.ts
+- SymbolGraphBuilder.test.ts
+- SymbolRegistry.test.ts
+- TSDocSymbolParser.test.ts
+- (and 10 more)
+
+**To Enable Test Indexing**: Modify FileScanner configuration to remove test file exclusion patterns
 
 ---
 
