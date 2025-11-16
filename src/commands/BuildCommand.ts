@@ -9,6 +9,7 @@ import * as path from 'node:path';
 import * as crypto from 'node:crypto';
 import { ConfigManager } from '../config/ConfigManager';
 import { ASTSymbolExtractor } from '../analyzer/ASTSymbolExtractor';
+import { TestSymbolParser } from '../parser/TestSymbolParser';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 
@@ -126,6 +127,7 @@ export class BuildCommand extends BaseCommand {
       // Initialize database
       const dbManager = new DatabaseManager(dbPath, jsonlPath);
       const extractor = new ASTSymbolExtractor();
+      const testParser = new TestSymbolParser();
 
       // Find TypeScript files
       this.printInfo('Scanning TypeScript files...');
@@ -190,17 +192,65 @@ export class BuildCommand extends BaseCommand {
       for (const filePath of files) {
         try {
           const content = fs.readFileSync(filePath, 'utf-8');
-          const extractResult = extractor.extract(filePath, content);
+          const isTestFile = filePath.endsWith('.test.ts') || filePath.endsWith('.spec.ts');
 
           result.filesScanned++;
-          result.symbolsFound += extractResult.symbols.length;
-          result.relationshipsFound += extractResult.relationships.length;
 
-          // Collect relationships for later insertion
-          allRelationships.push(...extractResult.relationships);
+          if (isTestFile) {
+            // Process test file with TestSymbolParser
+            const testResult = testParser.extract(filePath, content);
+            result.symbolsFound += testResult.testSymbols.length;
 
-          // Insert symbols
-          for (const symbol of extractResult.symbols) {
+            // Insert test symbols
+            for (const testSymbol of testResult.testSymbols) {
+              const fullSymbol = {
+                ...testSymbol,
+                tests: [],
+                designDecisions: [],
+              };
+
+              const success = dbManager.insertSymbol(fullSymbol, 0);
+              if (success) {
+                result.symbolsInserted++;
+
+                // Store mapping for relationship insertion
+                symbolIdMap.set(testSymbol.name, testSymbol.id);
+
+                // Add to JSONL registry
+                const registryEntry = {
+                  id: testSymbol.id,
+                  sourceRef: {
+                    filePath: testSymbol.filePath,
+                    line: testSymbol.line,
+                    column: testSymbol.column,
+                    symbolName: testSymbol.name,
+                    symbolType: testSymbol.type,
+                  },
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                };
+                registryLines.push(JSON.stringify(registryEntry));
+              } else {
+                result.errors.push(`Failed to insert test symbol: ${testSymbol.name} in ${filePath}`);
+              }
+            }
+
+            // Handle test extraction errors
+            if (testResult.errors.length > 0) {
+              result.errors.push(...testResult.errors.map(e => `${e.file}:${e.line} ${e.message}`));
+            }
+          } else {
+            // Process implementation file with ASTSymbolExtractor
+            const extractResult = extractor.extract(filePath, content);
+
+            result.symbolsFound += extractResult.symbols.length;
+            result.relationshipsFound += extractResult.relationships.length;
+
+            // Collect relationships for later insertion
+            allRelationships.push(...extractResult.relationships);
+
+            // Insert symbols
+            for (const symbol of extractResult.symbols) {
             // Generate simple kebab-case ID
             const id = `${symbol.type}-${symbol.name}`
               .toLowerCase()
@@ -247,8 +297,9 @@ export class BuildCommand extends BaseCommand {
                   line: symbol.line,
                 });
               }
-            } else {
-              result.errors.push(`Failed to insert: ${symbol.name} in ${filePath}`);
+              } else {
+                result.errors.push(`Failed to insert: ${symbol.name} in ${filePath}`);
+              }
             }
           }
         } catch (error) {
@@ -427,8 +478,8 @@ export class BuildCommand extends BaseCommand {
         }
         files.push(...this.findTypeScriptFiles(fullPath));
       } else if (entry.isFile()) {
-        // Include .ts files, exclude test files
-        if (fullPath.endsWith('.ts') && !fullPath.endsWith('.test.ts') && !fullPath.endsWith('.spec.ts')) {
+        // Include all .ts files (including test files)
+        if (fullPath.endsWith('.ts')) {
           files.push(fullPath);
         }
       }
