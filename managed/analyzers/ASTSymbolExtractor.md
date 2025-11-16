@@ -117,33 +117,31 @@ visitNode(node: ts.Node, parent?: ts.Node) {
 
 ## Data Structures
 
-**ExtractedSymbol**:
-```typescript
-interface ExtractedSymbol extends Omit<Symbol, 'id' | 'tests' | 'designDecisions'> {
-  parentSymbol?: string;
-  summary?: string;
-  declaredType?: string;
-  inferredType?: string;
-  genericParams?: string[];
-  parameterTypes?: Array<{ name: string; type?: string }>;
-  isConstant?: boolean;
-  literalValue?: string;
-  valueType?: string;
-}
-```
+### ExtractedSymbol
 
-**ExtractionResult**:
-```typescript
-interface ExtractionResult {
-  symbols: ExtractedSymbol[];
-  relationships: SymbolRelationship[];
-  imports: Array<{
-    from: string;
-    imported: string[];
-    modulePath: string;
-  }>;
-}
-```
+See implementation: [[ExtractedSymbol]]
+
+**Extends**: [[Symbol]] (omits: id, tests, designDecisions)
+
+**Additional Properties**:
+- `parentSymbol`: Parent symbol reference (optional)
+- `summary`: Symbol summary from TSDoc
+- `declaredType`: Explicitly declared type
+- `inferredType`: TypeScript inferred type
+- `genericParams`: Generic type parameters
+- `parameterTypes`: Parameter type information
+- `isConstant`: Whether variable is constant
+- `literalValue`: Literal value for constants
+- `valueType`: Value type classification
+
+### ExtractionResult
+
+See implementation: [[ExtractionResult]]
+
+**Structure**:
+- `symbols`: Array of [[ExtractedSymbol]]
+- `relationships`: Array of [[SymbolRelationship]]
+- `imports`: Import statements information
 
 ## Usage
 

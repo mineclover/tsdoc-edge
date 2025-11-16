@@ -240,40 +240,15 @@ private extractMethodSymbol(node: ts.MethodDeclaration, parentSymbol: string) {
 
 #### Symbol Metadata Structure
 
-```typescript
-interface ExtractedSymbol {
-  // Core identity
-  name: string;
-  type: 'function' | 'class' | 'interface' | 'constant' | 'variable' | 'method' | 'property';
-  filePath: string;
-  line: number;
-  column: number;
+See implementation: [[ExtractedSymbol]]
 
-  // Visibility
-  isExported: boolean;  // Public API
-  isPublic: boolean;    // Not private/protected
-
-  // Type information
-  declaredType?: string;              // Explicit type annotation
-  inferredType?: string;              // TypeScript inferred
-  genericParams?: string[];           // Generic type params
-  parameterTypes?: Array<{            // Function parameters
-    name: string;
-    type?: string;
-  }>;
-
-  // Constant-specific
-  isConstant?: boolean;               // const keyword
-  literalValue?: string;              // Actual value
-  valueType?: string;                 // Value type
-
-  // Documentation
-  summary?: string;                   // TSDoc summary
-
-  // Hierarchy
-  parentSymbol?: string;              // Parent class/interface
-}
-```
+**Categories**:
+- **Core identity**: name, type, filePath, line, column
+- **Visibility**: isExported (public API), isPublic (not private/protected)
+- **Type information**: declaredType, inferredType, genericParams, parameterTypes
+- **Constant-specific**: isConstant, literalValue, valueType
+- **Documentation**: summary (from TSDoc)
+- **Hierarchy**: parentSymbol (parent class/interface)
 
 ## Analysis Systems
 
@@ -705,21 +680,11 @@ sequenceDiagram
 
 **Key Interface**:
 
-```typescript
-interface ExtractedSymbol {
-  // ... (full structure shown above)
-}
+- **Input**: [[ExtractedSymbol]] (see structure above)
+- **Output**: Boolean (success/failure)
+- **Storage**: [[DatabaseManager]].insertSymbol() method
 
-class DatabaseManager {
-  insertSymbol(symbol: Symbol & {
-    metadata?: {
-      declaredType?: string;
-      parameterTypes?: Array<{ name: string; type?: string }>;
-      // ...
-    };
-  }): boolean;
-}
-```
+The insertSymbol method accepts Symbol with extended metadata fields.
 
 ### 2. SymbolGraph → Analyzers
 

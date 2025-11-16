@@ -72,81 +72,61 @@ type RelationshipCategory =
 
 ### Direction
 
-```typescript
-type RelationshipDirection =
-  | 'unidirectional'  // A → B
-  | 'bidirectional'   // A ↔ B
-  | 'undirected';     // A — B
-```
+See implementation: [[RelationshipDirection]]
+
+**3 types**: unidirectional (A → B), bidirectional (A ↔ B), undirected (A — B)
 
 ### Strength
 
-```typescript
-type RelationshipStrength =
-  | 'strong'   // Direct, explicit
-  | 'medium'   // Indirect, inferred
-  | 'weak';    // Loose, potential
-```
+See implementation: [[RelationshipStrength]]
+
+**3 levels**: strong (direct, explicit), medium (indirect, inferred), weak (loose, potential)
 
 ## Discovery Method
 
-How relationship was found:
-```typescript
-type DiscoveryMethod =
-  | 'static-analysis'   // AST parsing
-  | 'ast-parsing'       // TypeScript compiler
-  | 'test-analysis'     // Test files
-  | 'documentation'     // TSDoc/markdown
-  | 'runtime-trace'     // Execution traces
-  | 'type-inference';   // Type system
-```
+See implementation: [[DiscoveryMethod]]
+
+**Methods**: static-analysis, ast-parsing, test-analysis, documentation, runtime-trace, type-inference
 
 ## Relationship Evidence
 
-Proof of relationship:
-```typescript
-interface RelationshipEvidence {
-  type: 'code' | 'documentation' | 'test' | 'trace' | 'type-signature';
-  source: string;        // File path
-  lineNumber?: number;
-  snippet?: string;      // Code snippet
-  confidence: number;    // 0-1
-}
-```
+See implementation: [[RelationshipEvidence]]
+
+**Properties**:
+- `type`: Evidence type (code, documentation, test, trace, type-signature)
+- `source`: File path
+- `lineNumber`: Line number (optional)
+- `snippet`: Code snippet (optional)
+- `confidence`: Confidence score (0-1)
 
 ## Unified Relationship
 
-Complete relationship definition:
-```typescript
-interface UnifiedRelationship {
-  id: string;
-  type: RelationshipType;
-  category: RelationshipCategory;
-  sourceId: string;      // Source symbol
-  targetId: string;      // Target symbol
-  direction: RelationshipDirection;
-  strength: RelationshipStrength;
-  discoveryMethod: DiscoveryMethod;
-  evidence: RelationshipEvidence[];
-  metadata?: Record<string, unknown>;
-  createdAt: string;
-  verifiedAt?: string;
-}
-```
+See implementation: [[UnifiedRelationship]]
+
+**Core Properties**:
+- `id`: Unique identifier
+- `type`: [[RelationshipType]]
+- `category`: [[RelationshipCategory]]
+- `sourceId`, `targetId`: Source and target symbols
+- `direction`: [[RelationshipDirection]]
+- `strength`: [[RelationshipStrength]]
+- `discoveryMethod`: [[DiscoveryMethod]]
+- `evidence`: Array of [[RelationshipEvidence]]
+- `metadata`: Additional properties (optional)
+- `createdAt`, `verifiedAt`: Timestamps
+
+For complete specification, see [[Relationship Standard Format]]
 
 ## Relationship Query
 
-Search relationships:
-```typescript
-interface RelationshipQuery {
-  sourceId?: string;
-  targetId?: string;
-  type?: RelationshipType[];
-  category?: RelationshipCategory[];
-  minStrength?: RelationshipStrength;
-  discoveredBy?: DiscoveryMethod[];
-}
-```
+See implementation: [[RelationshipQuery]]
+
+**Query Parameters**:
+- `sourceId`, `targetId`: Filter by source/target symbols
+- `type`: Filter by relationship types
+- `category`: Filter by categories
+- `minStrength`: Minimum relationship strength
+- `discoveredBy`: Filter by discovery methods
 
 ## SSOT Completeness
 
