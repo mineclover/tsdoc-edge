@@ -8,32 +8,25 @@ Type system for feature documentation structure and metadata.
 
 ## Feature Document
 
-Complete feature specification:
-```typescript
-interface FeatureDocument {
-  id: string;                    // Unique feature ID
-  title: string;                 // Feature title
-  description: string;           // Feature description
-  filePath: string;              // Markdown file path
-  relatedSymbols: string[];      // Symbol IDs
-  tags: string[];                // Categorization tags
-  author?: string;               // Document author
-  createdAt: string;             // ISO timestamp
-  updatedAt: string;             // ISO timestamp
-  status: 'draft' | 'review' | 'approved' | 'deprecated';
-}
-```
+See implementation: [[FeatureDocument]]
+
+**Key Properties**:
+- `id`: Unique feature identifier
+- `title`: Feature title
+- `description`: Feature description
+- `filePath`: Markdown file path
+- `relatedSymbols`: Symbol IDs array
+- `tags`: Categorization tags
+- `status`: draft | review | approved | deprecated
 
 ## Symbol Reference
 
-Reference to code symbol from feature doc:
-```typescript
-interface SymbolReference {
-  symbolId: string;              // Referenced symbol ID
-  line: number;                  // Line in document
-  context?: string;              // Surrounding text
-}
-```
+See implementation: [[SymbolReference]]
+
+**Key Properties**:
+- `symbolId`: Referenced symbol ID
+- `line`: Line number in document
+- `context`: Surrounding text (optional)
 
 ### Syntax
 
@@ -52,15 +45,13 @@ credentials and {@symbol session-manager} to maintain sessions.
 
 ## Feature Index
 
-Collection of all feature documents:
-```typescript
-interface FeatureIndex {
-  features: FeatureDocument[];
-  byId: Map<string, FeatureDocument>;
-  byTag: Map<string, string[]>;    // tag → feature IDs
-  bySymbol: Map<string, string[]>; // symbol → feature IDs
-}
-```
+See implementation: [[FeatureIndex]]
+
+**Key Properties**:
+- `features`: All feature documents
+- `byId`: Map of feature ID to document
+- `byTag`: Map of tag to feature IDs
+- `bySymbol`: Map of symbol to feature IDs
 
 ## Feature Status Lifecycle
 
