@@ -62,7 +62,7 @@ Some text [[SymbolName]] here
 
 ## Output Structure
 
-See implementation: `src/doc-symbol/DocumentSymbolParser.ts`
+See implementation: [[ParsedDocSymbols]]
 
 **ParsedDocSymbols**:
 - `filePath`: string - Path to the markdown file

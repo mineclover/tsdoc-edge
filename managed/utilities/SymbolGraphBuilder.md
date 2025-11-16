@@ -17,7 +17,7 @@ Uses adjacency lists instead of matrix:
 
 ### Graph Components
 
-See implementation: `src/types/graph/graph.ts:101` (SymbolGraph interface)
+See implementation: [[SymbolGraph]]
 
 **Structure**:
 - `symbols`: Map<string, Symbol> - All symbols indexed by ID

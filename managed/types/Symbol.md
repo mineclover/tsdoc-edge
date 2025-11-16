@@ -21,7 +21,7 @@ A symbol is any named entity in the codebase:
 
 ## Symbol Structure
 
-See implementation: `src/types/graph/graph.ts:17`
+See implementation: [[Symbol]]
 
 **Core Properties**:
 - `id`: Unique identifier (kebab-case)

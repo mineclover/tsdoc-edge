@@ -107,7 +107,7 @@ traverse(
 
 ### Result Structure
 
-See implementation: `src/graph/DepthTraverser.ts`
+See implementation: [[TraversalResult]]
 
 **TraversalResult**:
 - `visited`: Set<string> - All visited symbols

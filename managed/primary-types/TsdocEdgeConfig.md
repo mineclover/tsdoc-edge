@@ -20,7 +20,7 @@
 
 ### Type Definition
 
-See implementation: `src/types/config/config.ts:16`
+See implementation: [[TsdocEdgeConfig]]
 
 **Structure**: 8개 도메인별 설정 그룹으로 구성
 - `project`: ProjectConfig - 프로젝트 메타데이터

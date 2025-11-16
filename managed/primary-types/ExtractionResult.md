@@ -20,7 +20,7 @@
 
 ### Type Definition
 
-See implementation: `src/analyzer/ASTSymbolExtractor.ts:36`
+See implementation: [[ExtractionResult]]
 
 **Structure**: 그래프 이론의 V(Vertex)와 E(Edge) 분리
 - `symbols`: ExtractedSymbol[] - 추출된 심볼 목록 (노드)

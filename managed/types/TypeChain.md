@@ -8,7 +8,7 @@ Type system for tracking type dependency chains and paths.
 
 ## Type Chain Step
 
-See implementation: `src/types/domain/type-chain.ts`
+See implementation: [[TypeChainStep]]
 
 **Single link in a dependency chain**:
 - `from`: Source type name
@@ -19,7 +19,7 @@ See implementation: `src/types/domain/type-chain.ts`
 
 ## Type Chain
 
-See implementation: `src/types/domain/type-chain.ts`
+See implementation: [[TypeChain]]
 
 **Complete path from source to target**:
 - `source`: Starting type
