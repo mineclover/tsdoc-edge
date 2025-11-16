@@ -28,14 +28,13 @@ Scan entire project directory and build comprehensive symbol database.
 
 ## Scanner Configuration
 
-```typescript
-interface ScannerConfig {
-  include: string[];  // Glob patterns to include
-  exclude: string[];  // Glob patterns to exclude
-  followSymlinks: boolean;
-  maxDepth: number;
-}
-```
+See implementation: [[ScannerConfig]]
+
+**Key Properties**:
+- `include`: Glob patterns to include
+- `exclude`: Glob patterns to exclude
+- `followSymlinks`: Whether to follow symbolic links
+- `maxDepth`: Maximum directory depth to scan
 
 ## Scan Result
 

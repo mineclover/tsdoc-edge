@@ -34,40 +34,37 @@ Every module should define 7 aspects:
 
 ## Validation Options
 
-```typescript
-interface ValidationOptions {
-  minConfidence?: number;         // 0-1 (default: 0.7)
-  requirePurpose?: boolean;       // Default: true
-  requireParamDescriptions?: boolean;
-  requireReturnDescription?: boolean;
-  requireDependencies?: boolean;
-  requireLogicDescription?: boolean;
-  strictMode?: boolean;           // TODO = error
-}
-```
+See implementation: [[ValidationOptions]]
+
+**Key Properties**:
+- `minConfidence`: Minimum confidence score (0-1, default: 0.7)
+- `requirePurpose`: Require purpose section (default: true)
+- `requireParamDescriptions`: Require parameter docs
+- `requireReturnDescription`: Require return value docs
+- `requireDependencies`: Require dependency listing
+- `requireLogicDescription`: Require algorithm description
+- `strictMode`: Treat TODO as error
 
 ## Validation Result
 
-```typescript
-interface ModuleSpecValidationResult {
-  isValid: boolean;
-  score: number;                  // 0-100
-  issues: ValidationIssue[];
-  passed: string[];               // Sections that passed
-  failed: string[];               // Sections that failed
-}
-```
+See implementation: [[ModuleSpecValidationResult]]
+
+**Key Properties**:
+- `isValid`: Whether spec passes validation
+- `score`: Completeness score (0-100)
+- `issues`: List of validation issues
+- `passed`: Sections that passed validation
+- `failed`: Sections that failed validation
 
 ## Validation Issue
 
-```typescript
-interface ValidationIssue {
-  section: string;                // Which section
-  severity: 'error' | 'warning' | 'info';
-  message: string;
-  suggestion?: string;            // How to fix
-}
-```
+See implementation: [[ValidationIssue]]
+
+**Key Properties**:
+- `section`: Which section has the issue
+- `severity`: 'error', 'warning', or 'info'
+- `message`: Issue description
+- `suggestion`: How to fix (optional)
 
 ## Scoring System
 
