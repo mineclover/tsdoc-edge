@@ -45,20 +45,13 @@ Filters 100+ patterns to prevent false positives:
 
 ## Output Type
 
-Returns `MermaidExtractionResult`:
-```typescript
-interface MermaidExtractionResult {
-  metadata: {
-    diagramType: string;
-    orientation?: string;
-    title?: string;
-    subgraphs: Array<{ id: string; title: string }>;
-  };
-  symbols: MermaidSymbol[];
-  relationships: MermaidRelationship[];
-  symbolReferences: string[];  // For validation
-}
-```
+Returns [[MermaidExtractionResult]]:
+
+**Structure**:
+- `metadata`: Diagram metadata (type, orientation, title, subgraphs)
+- `symbols`: Array of [[MermaidSymbol]]
+- `relationships`: Array of [[MermaidRelationship]]
+- `symbolReferences`: Symbol reference strings for validation
 
 ## Relationship Mapping
 

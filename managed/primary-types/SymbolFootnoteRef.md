@@ -17,14 +17,7 @@ See [[SymbolFootnoteRef]] implementation in source code.
 
 ## Usage
 
-Part of [[ParsedDocSymbols]]:
-
-```typescript
-interface ParsedDocSymbols {
-  symbolFootnoteRefs: SymbolFootnoteRef[];
-  // ...
-}
-```
+Part of [[ParsedDocSymbols]] as the `symbolFootnoteRefs` array field.
 
 ## Related
 

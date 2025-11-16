@@ -350,19 +350,19 @@ analyze(): UnifiedRelationship[] {
 
 All analyzers return `UnifiedRelationship[]`:
 
-```typescript
-interface UnifiedRelationship {
-  id: string;                    // Unique ID: "type-from-to"
-  type: string;                  // Relationship type: "calls", "io-dependency"
-  category: string;              // Category: "behavioral", "data-flow"
-  from: string;                  // Source symbol ID
-  to: string;                    // Target symbol ID
-  direction: 'unidirectional' | 'bidirectional';
-  strength: 'strong' | 'medium' | 'weak';
-  evidence: Evidence[];          // Supporting evidence
-  metadata?: Record<string, any>; // Additional data
-}
-```
+See implementation: [[UnifiedRelationship]]
+
+**Core Fields**:
+- `id`: Unique ID (format: "type-from-to")
+- `type`: Relationship type ("calls", "io-dependency", etc.)
+- `category`: Category ("behavioral", "data-flow", etc.)
+- `from`, `to`: Source and target symbol IDs
+- `direction`: 'unidirectional' or 'bidirectional'
+- `strength`: 'strong', 'medium', or 'weak'
+- `evidence`: Array of supporting evidence
+- `metadata`: Additional type-specific data (optional)
+
+For complete specification, see [[Relationship Standard Format]]
 
 ### Creating a Relationship
 

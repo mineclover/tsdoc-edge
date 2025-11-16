@@ -63,17 +63,15 @@ Depends on [[DatabaseManager]].
 
 ## Output Type
 
-Returns `ParsedDocSymbols`:
-```typescript
-interface ParsedDocSymbols {
-  filePath: string;
-  primary?: DocumentSymbol;
-  auxiliary: DocumentSymbol[];
-  references: string[];
-  codeReferences: CodeReference[];
-  sourceFilePath?: string;
-}
-```
+Returns [[ParsedDocSymbols]]:
+
+**Structure**:
+- `filePath`: Documentation file path
+- `primary`: Primary document symbol (optional, H1 symbol)
+- `auxiliary`: Additional symbols (H2, H3, etc.)
+- `references`: Array of [[Symbol]] reference strings
+- `codeReferences`: Array of [[CodeReference]] objects
+- `sourceFilePath`: Linked source file path (optional)
 
 ## Integration
 

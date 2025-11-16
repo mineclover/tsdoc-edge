@@ -20,14 +20,7 @@ See [[CodeReference]] implementation in source code.
 
 ## Usage
 
-Part of [[ParsedDocSymbols]]:
-
-```typescript
-interface ParsedDocSymbols {
-  codeReferences: CodeReference[];
-  // ...
-}
-```
+Part of [[ParsedDocSymbols]] as the `codeReferences` array field.
 
 ## Related
 

@@ -20,14 +20,7 @@ See [[MermaidRelationship]] implementation in source code.
 
 ## Usage
 
-Part of [[MermaidExtractionResult]]:
-
-```typescript
-interface MermaidExtractionResult {
-  relationships: MermaidRelationship[];
-  // ...
-}
-```
+Part of [[MermaidExtractionResult]] as the `relationships` array field.
 
 ## Related
 
