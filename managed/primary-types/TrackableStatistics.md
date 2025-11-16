@@ -20,18 +20,7 @@
 
 ### Type Definition
 
-```typescript
-interface TrackableStatistics {
-  overall: DetectableStats;                      // 전체 통계
-  byImportance: ImportanceStats;                 // 중요도별 통계
-  symbolImportance: Map<string, ImportanceCriteria>; // 심볼별 중요도
-  comparison?: StatsComparison;                  // 이전 대비 변경
-  newSymbols?: Symbol[];                         // 새로 추가된 심볼
-  deletedSymbols?: string[];                     // 삭제된 심볼
-  changedSymbols?: SymbolChange[];               // 변경된 심볼
-  timestamp: string;                             // 통계 수집 시각
-}
-```
+See [[TrackableStatistics]] implementation in source code.
 
 ### Composed Types
 

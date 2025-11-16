@@ -8,22 +8,7 @@ Type definition for decision record documentation (Architecture Decision Records
 
 ## Type Definition
 
-```typescript
-export interface DecisionRecord {
-  id: string;
-  title: string;
-  decision: string;
-  rationale: string;
-  alternatives: Array<{
-    option: string;
-    reason: string;
-  }>;
-  consequences: string[];
-  date: string;
-  status: 'proposed' | 'accepted' | 'deprecated' | 'superseded';
-  supersededBy?: string;
-}
-```
+See [[DecisionRecord]] implementation in source code.
 
 ## Fields
 

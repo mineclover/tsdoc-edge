@@ -8,20 +8,7 @@ Type definition for symbols extracted from Mermaid diagram nodes.
 
 ## Type Definition
 
-```typescript
-export interface MermaidSymbol {
-  nodeId: string;
-  label: string;
-  symbolName: string;
-  typeHint?: string;
-  status?: 'implemented' | 'not-implemented' | 'partial';
-  metrics?: {
-    count?: number;
-    unit?: string;
-  };
-  subgraph?: string;
-}
-```
+See [[MermaidSymbol]] implementation in source code.
 
 ## Fields
 

@@ -8,14 +8,7 @@ Type for code-to-document connections extracted from `@doc` tags.
 
 ## Type Definition
 
-```typescript
-export interface CodeConnection {
-  codeSymbol: string;
-  docSymbol: string;
-  filePath: string;
-  lineNumber: number;
-}
-```
+See [[CodeConnection]] implementation in source code.
 
 ## Fields
 

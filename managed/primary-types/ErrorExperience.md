@@ -8,17 +8,7 @@ Type definition for error experience documentation in enhanced symbol documentat
 
 ## Type Definition
 
-```typescript
-export interface ErrorExperience {
-  id: string;
-  errorType: string;
-  message: string;
-  context: string;
-  solution: string;
-  occurredAt?: string;
-  prevention?: string;
-}
-```
+See [[ErrorExperience]] implementation in source code.
 
 ## Fields
 

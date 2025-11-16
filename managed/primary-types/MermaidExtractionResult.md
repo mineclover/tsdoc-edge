@@ -8,14 +8,7 @@ Complete result type from Mermaid diagram extraction.
 
 ## Type Definition
 
-```typescript
-export interface MermaidExtractionResult {
-  metadata: MermaidMetadata;
-  symbols: MermaidSymbol[];
-  relationships: MermaidRelationship[];
-  symbolReferences: string[];
-}
-```
+See [[MermaidExtractionResult]] implementation in source code.
 
 ## Fields
 

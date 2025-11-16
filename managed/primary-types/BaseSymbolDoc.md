@@ -8,14 +8,7 @@ Base type for symbol documentation with core metadata fields.
 
 ## Type Definition
 
-```typescript
-export interface BaseSymbolDoc {
-  symbolId: string;
-  createdAt: string;
-  updatedAt: string;
-  version: string;
-}
-```
+See [[BaseSymbolDoc]] implementation in source code.
 
 ## Fields
 

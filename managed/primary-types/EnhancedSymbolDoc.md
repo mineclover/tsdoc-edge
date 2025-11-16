@@ -29,54 +29,17 @@ Extends basic symbol documentation with structured metadata across 6 categories,
 
 ## Type Definition
 
-```typescript
-interface EnhancedSymbolDoc extends BaseSymbolDoc {
-  // 1. Problem Solving (optional)
-  problemSolving?: ProblemSolving;
+See [[EnhancedSymbolDoc]] implementation in source code.
 
-  // 2. Functionality (optional)
-  functionality?: Functionality;
-
-  // 3. Error Experiences (optional)
-  errorExperiences?: ErrorExperience[];
-
-  // 4. Decisions (optional)
-  decisions?: DecisionRecord[];
-
-  // 5. Dependencies (optional)
-  dependencies?: DependencySpec[];
-
-  // 6. Future Plans (optional)
-  futurePlans?: FuturePlan[];
-}
-```
-
-**Base Type**:
-```typescript
-interface BaseSymbolDoc {
-  symbolId: string;      // Symbol identifier
-  createdAt: string;     // ISO 8601 timestamp
-  updatedAt: string;     // ISO 8601 timestamp
-  version: string;       // Documentation version
-}
-```
+**Base Type**: See [[BaseSymbolDoc]]
 
 ## The 6 Categories
 
 ### 1. Problem Solving
 
-**Type**: `ProblemSolving`
+**Type**: See [[ProblemSolving]]
 
 **Purpose**: Describes what problem this symbol solves
-
-```typescript
-interface ProblemSolving {
-  description: string;       // Problem description
-  context: string;           // Why this problem matters
-  targetUseCase?: string;    // Target scenario
-  relatedProblem?: string;   // Related or parent problem
-}
-```
 
 **Example**:
 ```typescript
@@ -90,25 +53,9 @@ interface ProblemSolving {
 
 ### 2. Functionality
 
-**Type**: `Functionality`
+**Type**: See [[Functionality]]
 
 **Purpose**: Describes what this symbol does
-
-```typescript
-interface Functionality {
-  mainFeatures: string[];    // Key features
-  components: Array<{        // Sub-components
-    name: string;
-    description: string;
-    signature?: string;
-  }>;
-  io?: {                     // Input/Output spec
-    inputs: Array<{ name: string; type: string; description: string }>;
-    outputs: Array<{ name: string; type: string; description: string }>;
-  };
-  examples?: string[];       // Usage examples
-}
-```
 
 **Example**:
 ```typescript
@@ -147,21 +94,9 @@ interface Functionality {
 
 ### 3. Error Experiences
 
-**Type**: `ErrorExperience[]`
+**Type**: See [[ErrorExperience]][]
 
 **Purpose**: Documents errors encountered and solutions
-
-```typescript
-interface ErrorExperience {
-  id: string;              // Error identifier
-  errorType: string;       // Error classification
-  message: string;         // Error message
-  context: string;         // How it was encountered
-  solution: string;        // How it was resolved
-  occurredAt?: string;     // When (ISO 8601)
-  prevention?: string;     // How to prevent
-}
-```
 
 **Example**:
 ```typescript
@@ -188,26 +123,9 @@ interface ErrorExperience {
 
 ### 4. Decisions
 
-**Type**: `DecisionRecord[]`
+**Type**: See [[DecisionRecord]][]
 
 **Purpose**: Records architectural decisions (ADRs)
-
-```typescript
-interface DecisionRecord {
-  id: string;                // Decision ID (e.g., "ADR-001")
-  title: string;             // Decision title
-  decision: string;          // What was decided
-  rationale: string;         // Why
-  alternatives: Array<{      // Other options considered
-    option: string;
-    reason: string;          // Why rejected
-  }>;
-  consequences: string[];    // Implications
-  date: string;              // When decided (ISO 8601)
-  status: 'proposed' | 'accepted' | 'deprecated' | 'superseded';
-  supersededBy?: string;     // If replaced
-}
-```
 
 **Example**:
 ```typescript
@@ -240,20 +158,9 @@ interface DecisionRecord {
 
 ### 5. Dependencies
 
-**Type**: `DependencySpec[]`
+**Type**: See [[DependencySpec]][]
 
 **Purpose**: Lists dependencies and their reasons
-
-```typescript
-interface DependencySpec {
-  target: string;                           // Dependency name
-  type: 'module' | 'file' | 'symbol' | 'external';
-  reason: string;                           // Why needed
-  version?: string;                         // Version requirement
-  isOptional?: boolean;                     // Is optional
-  importPath?: string;                      // Import path
-}
-```
 
 **Example**:
 ```typescript
@@ -284,29 +191,9 @@ interface DependencySpec {
 
 ### 6. Future Plans
 
-**Type**: `FuturePlan[]`
+**Type**: See [[FuturePlan]][]
 
 **Purpose**: Documents planned improvements (TODOs)
-
-```typescript
-interface FuturePlan {
-  id: string;                    // Plan ID (e.g., "PLAN-001")
-  title: string;                 // Plan title
-  description: string;           // Detailed description
-  priority?: 'high' | 'medium' | 'low';
-  status: 'planned' | 'in-progress' | 'completed' | 'cancelled';
-  targetSymbol?: string;         // Where to add
-  targetMethod?: string;         // Method name to add
-  targetType?: 'method' | 'function' | 'property' | 'class';
-  implementedBy?: string;        // Symbol ID when completed
-  targetMilestone?: string;      // Target version
-  estimatedEffort?: string;      // Effort estimate
-  blockedBy?: string[];          // Dependencies
-  relatedIssues?: string[];      // Issue tracker IDs
-  createdAt: string;             // ISO 8601
-  completedAt?: string;          // ISO 8601
-}
-```
 
 **Example**:
 ```typescript

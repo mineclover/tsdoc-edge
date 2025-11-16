@@ -8,15 +8,7 @@ Type for relationships extracted from Mermaid diagram edges.
 
 ## Type Definition
 
-```typescript
-export interface MermaidRelationship {
-  from: string;
-  to: string;
-  edgeType: 'solid' | 'dotted' | 'thick';
-  label?: string;
-  direction: 'unidirectional' | 'bidirectional';
-}
-```
+See [[MermaidRelationship]] implementation in source code.
 
 ## Fields
 

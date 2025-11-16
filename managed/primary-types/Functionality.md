@@ -8,21 +8,7 @@ Type definition for functionality documentation in the enhanced symbol documenta
 
 ## Type Definition
 
-```typescript
-export interface Functionality {
-  mainFeatures: string[];
-  components: Array<{
-    name: string;
-    description: string;
-    signature?: string;
-  }>;
-  io?: {
-    inputs: Array<{ name: string; type: string; description: string }>;
-    outputs: Array<{ name: string; type: string; description: string }>;
-  };
-  examples?: string[];
-}
-```
+See [[Functionality]] implementation in source code.
 
 ## Fields
 

@@ -8,17 +8,7 @@ Type definition for parsed document symbols from a single markdown file.
 
 ## Type Definition
 
-```typescript
-export interface ParsedDocSymbols {
-  filePath: string;
-  primary?: DocumentSymbol;
-  auxiliaries: DocumentSymbol[];
-  references: DocumentSymbol[];
-  codeReferences: CodeReference[];
-  symbolFootnoteRefs: SymbolFootnoteRef[];
-  sourceFilePath?: string;
-}
-```
+See [[ParsedDocSymbols]] implementation in source code.
 
 ## Fields
 

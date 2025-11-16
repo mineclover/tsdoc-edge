@@ -8,15 +8,7 @@ Type for document-to-code references.
 
 ## Type Definition
 
-```typescript
-export interface CodeReference {
-  text: string;
-  targetFile: string;
-  targetSymbol?: string;
-  targetMember?: string;
-  line: number;
-}
-```
+See [[CodeReference]] implementation in source code.
 
 ## Fields
 
