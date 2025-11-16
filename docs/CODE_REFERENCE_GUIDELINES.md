@@ -254,11 +254,16 @@ See implementation: [[DatabaseManager]]
 
 **Location**: `__tests__/` directories or `.test.ts` files
 
-**Contents**: Test suites, test cases
+**Contents**: Test suites, test cases, test scenarios
 
-**Count**: 0 (not indexed)
+**Count**: 0 (not yet indexed - implementation pending)
 
-**Note**: Test files are excluded by FileScanner configuration
+**Symbol Types**:
+- `test-suite`: describe() blocks
+- `test-case`: it() or test() blocks
+- `test-scenario`: @testScenario JSDoc tags
+
+**Current Status**: Test files are excluded by FileScanner configuration
 
 **Reason**: FileScanner excludes test patterns by default:
 ```typescript
@@ -278,7 +283,18 @@ exclude: ['**/node_modules/**', '**/dist/**', '**/*.test.ts', '**/*.spec.ts']
 - TSDocSymbolParser.test.ts
 - (and 10 more)
 
-**To Enable Test Indexing**: Modify FileScanner configuration to remove test file exclusion patterns
+**Implementation Plan**: See [[TEST_SYMBOL_EXTRACTION]] for detailed extraction strategy
+
+**Key Features** (When Implemented):
+- Hierarchical test suite structure (describe nesting)
+- Test coverage relationships (test → implementation)
+- Test scenario tracking (@testScenario tags)
+- Usage example extraction from test code
+
+**To Enable Test Indexing**:
+1. Modify FileScanner to include test files
+2. Implement TestSymbolParser (see docs/TEST_SYMBOL_EXTRACTION.md)
+3. Rebuild database with `tsdoc-edge build src --force`
 
 ---
 
