@@ -22,14 +22,9 @@ See [[ErrorExperience]] implementation in source code.
 
 ## Usage
 
-Used in [[EnhancedSymbolDoc]] as Category 3 (15 points):
+Used in [[EnhancedSymbolDoc]] as Category 3 (15 points).
 
-```typescript
-interface EnhancedSymbolDoc {
-  errorExperiences?: ErrorExperience[];  // Category 3
-  // ...
-}
-```
+**Property**: `errorExperiences?: ErrorExperience[]`
 
 ## Validation
 

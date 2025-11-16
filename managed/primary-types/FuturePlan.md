@@ -23,14 +23,9 @@ See [[FuturePlan]] implementation in source code.
 
 ## Usage
 
-Used in [[EnhancedSymbolDoc]] as Category 6 (15 points):
+Used in [[EnhancedSymbolDoc]] as Category 6 (15 points).
 
-```typescript
-interface EnhancedSymbolDoc {
-  futurePlans?: FuturePlan[];  // Category 6
-  // ...
-}
-```
+**Property**: `futurePlans?: FuturePlan[]`
 
 ## Validation
 

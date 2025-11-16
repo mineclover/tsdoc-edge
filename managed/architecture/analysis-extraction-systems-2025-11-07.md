@@ -754,22 +754,17 @@ graph LR
 **Direction**: Unidirectional
 **Strength**: Medium
 
-Each analyzer produces relationships with evidence:
+Each analyzer produces relationships with evidence using the [[UnifiedRelationship]] format:
 
-```typescript
-// Analyzer output format
-interface UnifiedRelationship {
-  type: RelationshipType;
-  from_symbols: string[];
-  to_symbols: string[];
-  confidence: number;
-  evidence: Evidence[];
-  properties?: Record<string, any>;
-}
+**Key Fields**:
+- `type`: RelationshipType
+- `from_symbols`: Source symbols array
+- `to_symbols`: Target symbols array
+- `confidence`: Confidence score (0-1)
+- `evidence`: Supporting evidence array
+- `properties`: Type-specific properties (optional)
 
-// Storage
-DatabaseManager.insertUnifiedRelationship(rel);
-```
+**Storage**: `DatabaseManager.insertUnifiedRelationship(rel)`
 
 **Relationship Types by Analyzer**:
 

@@ -41,14 +41,9 @@ See [[Functionality]] implementation in source code.
 
 ## Usage
 
-Used in [[EnhancedSymbolDoc]] as Category 2 (20 points):
+Used in [[EnhancedSymbolDoc]] as Category 2 (20 points).
 
-```typescript
-interface EnhancedSymbolDoc {
-  functionality?: Functionality;  // Category 2
-  // ...
-}
-```
+**Property**: `functionality?: Functionality`
 
 ## Example
 

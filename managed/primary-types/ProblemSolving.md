@@ -34,14 +34,9 @@ See [[ProblemSolving]] implementation in source code.
 
 ## Usage
 
-Used in [[EnhancedSymbolDoc]] as Category 1 (20 points):
+Used in [[EnhancedSymbolDoc]] as Category 1 (20 points).
 
-```typescript
-interface EnhancedSymbolDoc {
-  problemSolving?: ProblemSolving;  // Category 1
-  // ...
-}
-```
+**Property**: `problemSolving?: ProblemSolving`
 
 ## Example
 

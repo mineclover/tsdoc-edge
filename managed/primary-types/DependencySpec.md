@@ -21,14 +21,9 @@ See [[DependencySpec]] implementation in source code.
 
 ## Usage
 
-Used in [[EnhancedSymbolDoc]] as Category 5 (15 points):
+Used in [[EnhancedSymbolDoc]] as Category 5 (15 points).
 
-```typescript
-interface EnhancedSymbolDoc {
-  dependencies?: DependencySpec[];  // Category 5
-  // ...
-}
-```
+**Property**: `dependencies?: DependencySpec[]`
 
 ## Validation
 

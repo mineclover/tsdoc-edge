@@ -24,14 +24,9 @@ See [[DecisionRecord]] implementation in source code.
 
 ## Usage
 
-Used in [[EnhancedSymbolDoc]] as Category 4 (15 points):
+Used in [[EnhancedSymbolDoc]] as Category 4 (15 points).
 
-```typescript
-interface EnhancedSymbolDoc {
-  decisions?: DecisionRecord[];  // Category 4
-  // ...
-}
-```
+**Property**: `decisions?: DecisionRecord[]`
 
 ## Validation
 
