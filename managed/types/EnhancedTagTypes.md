@@ -43,16 +43,12 @@ See implementation: [[Functionality]]
 
 ### Supporting Types
 
-See implementation: [[Component]]
-
-**Key Properties**:
+Component structure (inline type in [[Functionality]].components):
 - `name`: Component name
 - `description`: Component description
 - `signature`: Function signature (optional)
 
-See implementation: [[IOSpec]]
-
-**Key Properties**:
+IOSpec structure (inline type in [[Functionality]].io):
 - `inputs`: Input specifications (name, type, description)
 - `outputs`: Output specifications (name, type, description)
 
@@ -103,19 +99,13 @@ See implementation: [[DesignDecision]]
 - `date`: Decision date (optional)
 - `revisedBy`: Superseding decision (optional)
 
-See implementation: [[Alternative]]
-
-**Key Properties**:
-- `name`: Alternative name
-- `pros`: Advantages
-- `cons`: Disadvantages
-- `rejected`: Whether rejected
+Note: The `alternatives` field in the documentation contains an array of alternative options as strings. For structured alternatives, use the [[DesignDecision]] interface with the `consequences` field to describe trade-offs.
 
 ## Dependencies
 
 Documents external dependencies:
 
-See implementation: [[DependencyDoc]]
+See implementation: [[DependencySpec]]
 
 **Key Properties**:
 - `name`: Dependency name

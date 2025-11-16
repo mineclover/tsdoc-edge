@@ -111,17 +111,10 @@ See implementation: [[ContentSimilarity]]
 **Key Properties**:
 - `file1`: First file path
 - `file2`: Second file path
-- `overallSimilarity`: Overall similarity (0-1)
-- `sectionMatches`: Section matches
-- `recommendation`: 'merge', 'reference', or 'keep-separate'
-
-See implementation: [[SectionMatch]]
-
-**Key Properties**:
-- `section1`: First section name
-- `section2`: Second section name
 - `similarity`: Similarity score (0-1)
-- `recommendation`: Recommendation text
+- `overlappingSections`: Array of overlapping sections with similarity scores
+- `suggestion`: 'merge', 'cross-reference', or 'keep-separate'
+- `reason`: Reason for suggestion
 
 ## Unused Document
 
