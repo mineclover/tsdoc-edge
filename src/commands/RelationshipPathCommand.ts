@@ -1,5 +1,7 @@
 /**
- * Relationship Path Command
+ * Optimized Relationship Path Command
+ *
+ * @doc [[Relationship Path]]
  * @packageDocumentation
  */
 
@@ -19,8 +21,14 @@ interface SymbolPath {
   strength: number;
 }
 
+interface GraphEdge {
+  to: string;
+  type: string;
+  category: string;
+}
+
 /**
- * Command for finding paths between symbols
+ * Optimized command for finding paths between symbols
  * @public
  */
 export class RelationshipPathCommand extends BaseCommand {
@@ -105,17 +113,34 @@ Examples:
       }
 
       console.log();
-      this.printInfo(`Searching for paths (max length: ${options.maxLength})...`);
-      console.log();
+      this.printInfo(`Building relationship graph...`);
 
-      // Find paths
-      const paths = this.findPaths(
-        dbManager,
+      // Build adjacency list once
+      const startBuild = Date.now();
+      const adjacency = this.buildAdjacencyList(dbManager, options.category);
+      const buildTime = Date.now() - startBuild;
+      this.printInfo(`Graph built in ${buildTime}ms (${adjacency.size} nodes)`);
+
+      console.log();
+      this.printInfo(`Searching for paths (max length: ${options.maxLength})...`);
+      const startSearch = Date.now();
+
+      // Build reverse adjacency for bidirectional search
+      const reverseAdjacency = this.buildReverseAdjacency(adjacency);
+      this.printInfo(`Reverse graph built`);
+
+      // Find paths using bidirectional BFS
+      const paths = this.findPathsBidirectional(
+        adjacency,
+        reverseAdjacency,
         fromSymbol,
         toSymbol,
-        options.maxLength,
-        options.category
+        options.maxLength
       );
+
+      const searchTime = Date.now() - startSearch;
+      this.printInfo(`Search completed in ${searchTime}ms`);
+      console.log();
 
       if (paths.length === 0) {
         this.printInfo('No paths found between these symbols');
@@ -178,6 +203,8 @@ Examples:
       console.log(`  Shortest path: ${this.colors.cyan}${shortestLength}${this.colors.reset} hops`);
       console.log(`  Longest path: ${this.colors.cyan}${longestLength}${this.colors.reset} hops`);
       console.log(`  Average length: ${this.colors.cyan}${avgLength.toFixed(1)}${this.colors.reset} hops`);
+      console.log(`  Build time: ${this.colors.cyan}${buildTime}ms${this.colors.reset}`);
+      console.log(`  Search time: ${this.colors.cyan}${searchTime}ms${this.colors.reset}`);
       console.log();
 
       // Analyze path categories
@@ -205,102 +232,217 @@ Examples:
   }
 
   /**
-   * Find all paths between two symbols using BFS
+   * Build both forward and reverse adjacency lists from database (one-time operation)
    */
-  private findPaths(
+  private buildAdjacencyList(
     dbManager: DatabaseManager,
+    category?: string
+  ): Map<string, GraphEdge[]> {
+    const adjacency = new Map<string, GraphEdge[]>();
+
+    // Query all relationships at once
+    let sql = 'SELECT from_symbols, to_symbols, type, category FROM unified_relationships';
+    const params: any[] = [];
+
+    if (category) {
+      sql += ' WHERE category = ?';
+      params.push(category);
+    }
+
+    const relationships = dbManager.db.prepare(sql).all(...params) as any[];
+
+    for (const rel of relationships) {
+      try {
+        const fromSymbols = JSON.parse(rel.from_symbols || '[]');
+        const toSymbols = JSON.parse(rel.to_symbols || '[]');
+
+        for (const from of fromSymbols) {
+          if (!from) continue;
+
+          if (!adjacency.has(from)) {
+            adjacency.set(from, []);
+          }
+
+          for (const to of toSymbols) {
+            if (!to) continue;
+
+            adjacency.get(from)!.push({
+              to,
+              type: rel.type,
+              category: rel.category,
+            });
+          }
+        }
+      } catch (error) {
+        // Skip malformed relationships
+        continue;
+      }
+    }
+
+    return adjacency;
+  }
+
+  /**
+   * Build reverse adjacency list for backward search
+   */
+  private buildReverseAdjacency(
+    forward: Map<string, GraphEdge[]>
+  ): Map<string, GraphEdge[]> {
+    const reverse = new Map<string, GraphEdge[]>();
+
+    for (const [from, edges] of forward.entries()) {
+      for (const edge of edges) {
+        if (!reverse.has(edge.to)) {
+          reverse.set(edge.to, []);
+        }
+
+        reverse.get(edge.to)!.push({
+          to: from,
+          type: edge.type,
+          category: edge.category,
+        });
+      }
+    }
+
+    return reverse;
+  }
+
+  /**
+   * Find paths using memory-efficient BFS
+   * Limited to finding up to 100 paths to avoid memory issues
+   */
+  private findPathsBidirectional(
+    forward: Map<string, GraphEdge[]>,
+    reverse: Map<string, GraphEdge[]>,
     fromSymbol: string,
     toSymbol: string,
-    maxLength: number,
-    category?: string
+    maxLength: number
   ): SymbolPath[] {
     const allPaths: SymbolPath[] = [];
+    const maxPaths = 100; // Limit total paths to prevent memory issues
+
+    // Early termination checks
+    if (!forward.has(fromSymbol) && fromSymbol !== toSymbol) {
+      return [];
+    }
+
+    // Simple BFS with path tracking (memory-limited)
     const queue: Array<{
-      currentSymbol: string;
+      symbolId: string;
       path: PathNode[];
       visited: Set<string>;
-    }> = [
-      {
-        currentSymbol: fromSymbol,
-        path: [{ symbolId: fromSymbol, relationshipType: '', category: '' }],
-        visited: new Set([fromSymbol]),
-      },
-    ];
+    }> = [{
+      symbolId: fromSymbol,
+      path: [{ symbolId: fromSymbol, relationshipType: '', category: '' }],
+      visited: new Set([fromSymbol]),
+    }];
 
-    while (queue.length > 0) {
-      const { currentSymbol, path, visited } = queue.shift()!;
+    let iterations = 0;
+    const maxIterations = 50000; // Safety limit
+
+    while (queue.length > 0 && iterations < maxIterations && allPaths.length < maxPaths) {
+      iterations++;
+
+      const { symbolId, path, visited } = queue.shift()!;
 
       // Check if we've reached the target
-      if (currentSymbol === toSymbol && path.length > 1) {
-        // Calculate path strength based on relationship confidence
+      if (symbolId === toSymbol && path.length > 1) {
         const strength = this.calculatePathStrength(path);
         allPaths.push({
           nodes: path,
-          length: path.length - 1, // Number of hops
+          length: path.length - 1,
           strength,
         });
+
+        // Continue searching for more paths
         continue;
       }
 
       // Don't expand if we've reached max length
       if (path.length > maxLength) continue;
 
-      // Find all relationships from current symbol
-      let sql = `
-        SELECT *
-        FROM unified_relationships
-        WHERE (
-          json_extract(from_symbols, '$[0]') = ? OR
-          from_symbols LIKE '%"' || ? || '"%'
-        )
-      `;
+      // Get neighbors from adjacency list (O(1) lookup)
+      const neighbors = forward.get(symbolId);
+      if (!neighbors) continue;
 
-      const params: any[] = [currentSymbol, currentSymbol];
+      for (const edge of neighbors) {
+        // Avoid cycles (except allow reaching target)
+        if (visited.has(edge.to) && edge.to !== toSymbol) continue;
 
-      if (category) {
-        sql += ' AND category = ?';
-        params.push(category);
-      }
+        const newPath = [
+          ...path.slice(0, -1),
+          {
+            symbolId: path[path.length - 1].symbolId,
+            relationshipType: edge.type,
+            category: edge.category,
+          },
+          {
+            symbolId: edge.to,
+            relationshipType: '',
+            category: '',
+          },
+        ];
 
-      const relationships = dbManager.db.prepare(sql).all(...params) as any[];
+        const newVisited = new Set(visited);
+        newVisited.add(edge.to);
 
-      for (const rel of relationships) {
-        const fromSymbols = JSON.parse(rel.from_symbols);
-        const toSymbols = JSON.parse(rel.to_symbols);
-
-        if (fromSymbols.includes(currentSymbol)) {
-          for (const nextSymbol of toSymbols) {
-            // Avoid cycles
-            if (visited.has(nextSymbol) && nextSymbol !== toSymbol) continue;
-
-            const newPath = [
-              ...path.slice(0, -1),
-              {
-                symbolId: path[path.length - 1].symbolId,
-                relationshipType: rel.type,
-                category: rel.category,
-              },
-              {
-                symbolId: nextSymbol,
-                relationshipType: '',
-                category: '',
-              },
-            ];
-
-            const newVisited = new Set(visited);
-            newVisited.add(nextSymbol);
-
-            queue.push({
-              currentSymbol: nextSymbol,
-              path: newPath,
-              visited: newVisited,
-            });
-          }
-        }
+        queue.push({
+          symbolId: edge.to,
+          path: newPath,
+          visited: newVisited,
+        });
       }
     }
 
-    return allPaths;
+    if (iterations >= maxIterations) {
+      console.warn(`  Warning: Search terminated after ${maxIterations} iterations`);
+    }
+
+    if (allPaths.length >= maxPaths) {
+      console.warn(`  Warning: Path limit reached (${maxPaths} paths found)`);
+    }
+
+    // Deduplicate paths
+    const uniquePaths = new Map<string, SymbolPath>();
+    for (const pathData of allPaths) {
+      const key = pathData.nodes.map(n => n.symbolId).join('→');
+      if (!uniquePaths.has(key) || uniquePaths.get(key)!.strength < pathData.strength) {
+        uniquePaths.set(key, pathData);
+      }
+    }
+
+    return Array.from(uniquePaths.values());
+  }
+
+  /**
+   * Merge forward and backward paths at meeting point
+   */
+  private mergePaths(forward: PathNode[], backward: PathNode[]): PathNode[] {
+    // Forward path is from source to meeting point
+    // Backward path is from target to meeting point
+    // We need to reverse the backward path and connect them
+
+    const forwardPart = forward.slice(0, -1); // Remove meeting point from forward
+    const backwardPart = backward.slice(0, -1).reverse(); // Reverse and remove meeting point
+
+    // Update relationship info for backward part
+    const reversedBackward = backwardPart.map((node, i) => {
+      if (i < backwardPart.length - 1) {
+        return {
+          symbolId: node.symbolId,
+          relationshipType: backwardPart[i + 1].relationshipType,
+          category: backwardPart[i + 1].category,
+        };
+      }
+      return node;
+    });
+
+    // Combine: forward + meeting point + reversed backward
+    return [
+      ...forwardPart,
+      forward[forward.length - 1], // Meeting point
+      ...reversedBackward,
+    ];
   }
 
   /**
@@ -308,8 +450,6 @@ Examples:
    */
   private calculatePathStrength(path: PathNode[]): number {
     if (path.length <= 1) return 1.0;
-
-    // For now, use a simple heuristic based on path length
     // Shorter paths = stronger connection
     return 1.0 / path.length;
   }

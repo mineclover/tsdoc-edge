@@ -15,6 +15,8 @@ import { ConfigLoader } from '../utils/ConfigLoader';
  * @public
  * @responsibility Check documentation for broken links
  * @contract Analyze documentation, detect broken links, report issues
+ * @doc [[Check Links Command]]
+ * @doc [[CLI Commands#check-links]]
  *
  * @problem Documentation contains broken links that break documentation flow
  * @solves Scans all documentation and reports broken links with suggestions

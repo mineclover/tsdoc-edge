@@ -68,3 +68,26 @@ Returns:
 - [[DocCodeLinker]]: Creates link index
 - [[CheckLinksCommand]]: CLI validation command
 - [[UpdateBacklinksCommand]]: Updates backlinks
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:43
+- [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:44
+- [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:45
+- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:50
+- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:51
+- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:52
+- [[LinkingTypes]] → /home/user/tsdoc-edge/managed/types/LinkingTypes.md:68
+- [[LinkingTypes]] → /home/user/tsdoc-edge/managed/types/LinkingTypes.md:81
+- [[LinkingTypes]] → /home/user/tsdoc-edge/managed/types/LinkingTypes.md:82
+- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:51
+- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:71
+- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:72
+- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:73
+- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:74
+- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:75
+

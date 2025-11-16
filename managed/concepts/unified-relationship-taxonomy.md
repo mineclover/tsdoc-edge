@@ -62,7 +62,7 @@ class User implements Serializable { }               // implementation
 
 **Types**:
 - **io-dependency**: A's output feeds B's input
-- **pipeline**: A ’ B ’ C sequential data processing
+- **pipeline**: A ï¿½ B ï¿½ C sequential data processing
 - **event-flow**: A emits events consumed by B
 
 **Characteristics**:
@@ -75,10 +75,10 @@ class User implements Serializable { }               // implementation
 ```typescript
 // io-dependency
 const symbols = extractor.extract();
-await db.save(symbols);  // extractor output ’ db input
+await db.save(symbols);  // extractor output ï¿½ db input
 
 // pipeline
-data ’ parse() ’ validate() ’ transform() ’ save()
+data ï¿½ parse() ï¿½ validate() ï¿½ transform() ï¿½ save()
 
 // event-flow
 emitter.on('data-ready', handler);
@@ -233,10 +233,10 @@ class BuildCommand {
 **Examples**:
 ```typescript
 // conceptual-relation
-// User ’ UserProfile ’ UserSettings (related user concepts)
+// User ï¿½ï¿½ UserProfile ï¿½ï¿½ UserSettings (related user concepts)
 
 // feature-grouping
-// BuildCommand, WorkContextCommand, TreeCommand ’ "Analysis Features"
+// BuildCommand, WorkContextCommand, TreeCommand ï¿½ "Analysis Features"
 ```
 
 **Use Cases**:
@@ -253,7 +253,7 @@ class BuildCommand {
 
 **Types**:
 - **test-coverage**: A is tested by TestA
-- **integration-verification**: A”B connection verified by test
+- **integration-verification**: Aï¿½B connection verified by test
 
 **Characteristics**:
 - **Strength**: Medium
@@ -271,7 +271,7 @@ describe('BuildCommand', () => {
 });
 
 // integration-verification
-it('BuildCommand ’ DatabaseManager integration', async () => {
+it('BuildCommand ï¿½ DatabaseManager integration', async () => {
   const cmd = new BuildCommand(db);
   await cmd.execute();
   expect(db.symbolCount).toBeGreaterThan(0);
@@ -335,11 +335,11 @@ it('BuildCommand ’ DatabaseManager integration', async () => {
 
 ### Direction Types
 
-**Unidirectional** (A ’ B):
+**Unidirectional** (A ï¿½ B):
 - Clear source and target
 - Examples: imports, calls, data flow
 
-**Bidirectional** (A ” B):
+**Bidirectional** (A ï¿½ B):
 - Mutual relationship
 - Examples: collaboration, mutual exclusion
 
@@ -466,10 +466,10 @@ db.queryRelationships({
 -  Verification: test-coverage
 
 **Planned** (v2.0):
-- ó Data Flow: io-dependency, pipeline, event-flow
-- ó Behavioral: callback, composition
-- ó Alternative: substitution, fallback
-- ó Constraint: co-requirement, mutual-exclusion
+- ï¿½ Data Flow: io-dependency, pipeline, event-flow
+- ï¿½ Behavioral: callback, composition
+- ï¿½ Alternative: substitution, fallback
+- ï¿½ Constraint: co-requirement, mutual-exclusion
 
 **Future** (v3.0):
 - =. Semantic: conceptual-relation, feature-grouping
@@ -574,3 +574,48 @@ db.queryRelationships({
 **Total Types**: 18 (5 implemented, 13 planned)
 **Total Categories**: 7
 **Schema Version**: 1.0
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CallGraphAnalyzer]] â†’ /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:212
+- [[CallGraphAnalyzer]] â†’ /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:281
+- [[CallGraphAnalyzer]] â†’ /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:282
+- [[Concepts Index]] â†’ /home/user/tsdoc-edge/managed/concepts/index.md:225
+- [[Concepts Index]] â†’ /home/user/tsdoc-edge/managed/concepts/index.md:242
+- [[Concepts Index]] â†’ /home/user/tsdoc-edge/managed/concepts/index.md:279
+- [[Concepts Index]] â†’ /home/user/tsdoc-edge/managed/concepts/index.md:280
+- [[DatabaseManager]] â†’ /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:273
+- [[DatabaseManager]] â†’ /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:274
+- [[DatabaseManager]] â†’ /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:275
+- [[Callback Pattern]] â†’ /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:203
+- [[Callback Pattern]] â†’ /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:214
+- [[Callback Pattern]] â†’ /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:215
+- [[Callback Pattern]] â†’ /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:216
+- [[Callback Pattern]] â†’ /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:217
+- [[Callback Pattern]] â†’ /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:218
+- [[Call Relationships]] â†’ /home/user/tsdoc-edge/managed/relationships/CALLS.md:74
+- [[Call Relationships]] â†’ /home/user/tsdoc-edge/managed/relationships/CALLS.md:75
+- [[Call Relationships]] â†’ /home/user/tsdoc-edge/managed/relationships/CALLS.md:76
+- [[Composition Relationship]] â†’ /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:178
+- [[Composition Relationship]] â†’ /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:186
+- [[Composition Relationship]] â†’ /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:187
+- [[Composition Relationship]] â†’ /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:188
+- [[Composition Relationship]] â†’ /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:189
+- [[Composition Relationship]] â†’ /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:190
+- [[Relationship Standard Format]] â†’ /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:168
+- [[Relationship Standard Format]] â†’ /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:209
+- [[Relationship Standard Format]] â†’ /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:210
+- [[Relationship Standard Format]] â†’ /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:211
+- [[Relationship Standard Format]] â†’ /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:212
+- [[Relationship Standard Format]] â†’ /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:213
+- [[IO Dependency]] â†’ /home/user/tsdoc-edge/managed/relationships/io-dependency.md:86
+- [[IO Dependency]] â†’ /home/user/tsdoc-edge/managed/relationships/io-dependency.md:87
+- [[IO Dependency]] â†’ /home/user/tsdoc-edge/managed/relationships/io-dependency.md:88
+- [[Relationship System Roadmap]] â†’ /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:399
+- [[Relationship System Roadmap]] â†’ /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:448
+- [[Relationship System Roadmap]] â†’ /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:449
+

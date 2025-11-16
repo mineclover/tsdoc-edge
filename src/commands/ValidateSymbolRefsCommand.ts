@@ -38,13 +38,14 @@ interface SymbolReference {
  * Validation issue
  */
 interface ValidationIssue {
-  type: 'duplicate-definition' | 'broken-reference' | 'ambiguous-reference' | 'mismatch';
+  type: 'duplicate-definition' | 'broken-reference' | 'ambiguous-reference' | 'mismatch' | 'circular-dependency';
   severity: 'error' | 'warning' | 'info';
   symbolName: string;
   filePath: string;
   lineNumber?: number;
   message: string;
   suggestion?: string;
+  cycle?: string[]; // For circular dependencies
 }
 
 /**
@@ -60,6 +61,7 @@ interface SymbolRegistry {
     uniqueSymbols: number;
     duplicates: number;
     brokenReferences: number;
+    circularDependencies: number;
   };
 }
 
@@ -141,6 +143,7 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
         uniqueSymbols: 0,
         duplicates: 0,
         brokenReferences: 0,
+        circularDependencies: 0,
       },
     };
 
@@ -215,7 +218,107 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
       }
     }
 
+    // Detect circular dependencies
+    this.detectCircularDependencies(registry);
+
     return registry;
+  }
+
+  /**
+   * Detect circular dependencies between documents
+   */
+  private detectCircularDependencies(registry: SymbolRegistry): void {
+    // Build document dependency graph
+    // Map: filePath -> Set<filePath> (files this file references)
+    const docDependencies = new Map<string, Set<string>>();
+
+    // Build graph from references
+    for (const ref of registry.references) {
+      const defs = registry.definitions.get(ref.symbolName);
+      if (!defs || defs.length === 0) continue;
+
+      // Get all files that define this symbol
+      const defFiles = new Set(defs.map(d => d.filePath));
+
+      // Add dependencies: ref.filePath depends on defFiles
+      if (!docDependencies.has(ref.filePath)) {
+        docDependencies.set(ref.filePath, new Set());
+      }
+
+      for (const defFile of defFiles) {
+        if (defFile !== ref.filePath) {
+          docDependencies.get(ref.filePath)!.add(defFile);
+        }
+      }
+    }
+
+    // Detect cycles using DFS
+    const visited = new Set<string>();
+    const recursionStack = new Set<string>();
+    const detectedCycles = new Set<string>(); // To avoid duplicate reporting
+
+    const dfs = (file: string, path: string[]): void => {
+      visited.add(file);
+      recursionStack.add(file);
+
+      const dependencies = docDependencies.get(file);
+      if (dependencies) {
+        for (const depFile of dependencies) {
+          if (!visited.has(depFile)) {
+            dfs(depFile, [...path, file]);
+          } else if (recursionStack.has(depFile)) {
+            // Found a cycle
+            const cycleStart = path.indexOf(depFile);
+            const cycle = [...path.slice(cycleStart), file, depFile];
+
+            // Create a unique key for this cycle (sorted to avoid duplicates)
+            const cycleKey = [...new Set(cycle)].sort().join('->');
+
+            if (!detectedCycles.has(cycleKey)) {
+              detectedCycles.add(cycleKey);
+
+              // Find symbols involved
+              const symbolsInvolved = new Set<string>();
+              for (let i = 0; i < cycle.length - 1; i++) {
+                const fromFile = cycle[i];
+                const toFile = cycle[i + 1];
+
+                // Find references from fromFile to symbols in toFile
+                for (const ref of registry.references) {
+                  if (ref.filePath === fromFile) {
+                    const defs = registry.definitions.get(ref.symbolName);
+                    if (defs && defs.some(d => d.filePath === toFile)) {
+                      symbolsInvolved.add(ref.symbolName);
+                    }
+                  }
+                }
+              }
+
+              registry.issues.push({
+                type: 'circular-dependency',
+                severity: 'warning',
+                symbolName: Array.from(symbolsInvolved).join(', '),
+                filePath: cycle.join(' -> '),
+                message: `Circular dependency detected: ${cycle.length - 1} files form a cycle`,
+                suggestion: 'Consider breaking the cycle by introducing an intermediary concept or removing unnecessary references',
+                cycle,
+              });
+
+              registry.statistics.circularDependencies++;
+            }
+          }
+        }
+      }
+
+      recursionStack.delete(file);
+    };
+
+    // Run DFS from each unvisited file
+    for (const file of docDependencies.keys()) {
+      if (!visited.has(file)) {
+        dfs(file, []);
+      }
+    }
   }
 
   /**
@@ -644,6 +747,12 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
     } else {
       console.log(`  Broken references: ${this.colors.green}0${this.colors.reset}`);
     }
+
+    if (registry.statistics.circularDependencies > 0) {
+      console.log(`  Circular dependencies: ${this.colors.yellow}${registry.statistics.circularDependencies}${this.colors.reset}`);
+    } else {
+      console.log(`  Circular dependencies: ${this.colors.green}0${this.colors.reset}`);
+    }
   }
 
   /**
@@ -675,7 +784,17 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
       warnings.forEach((issue, idx) => {
         console.log(`  ${idx + 1}. ${issue.message}`);
         console.log(`     Symbol: [[${issue.symbolName}]]`);
-        console.log(`     File: ${issue.filePath}`);
+        if (issue.type === 'circular-dependency' && issue.cycle) {
+          console.log(`     ${this.colors.yellow}Cycle:${this.colors.reset}`);
+          for (let i = 0; i < issue.cycle.length - 1; i++) {
+            const isLast = i === issue.cycle.length - 2;
+            console.log(`       ${i + 1}. ${issue.cycle[i]}`);
+            console.log(`          ${this.colors.dim}↓${this.colors.reset}`);
+          }
+          console.log(`       ${this.colors.yellow}(returns to ${issue.cycle[0]})${this.colors.reset}`);
+        } else {
+          console.log(`     File: ${issue.filePath}`);
+        }
         if (issue.suggestion) {
           console.log(`     ${this.colors.cyan}💡 ${issue.suggestion}${this.colors.reset}`);
         }

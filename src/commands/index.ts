@@ -16,39 +16,31 @@ export { ValidateDocsCommand } from './ValidateDocsCommand';
 export { UpdateBacklinksCommand } from './UpdateBacklinksCommand';
 export { UpdateSymbolRefsCommand } from './UpdateSymbolRefsCommand';
 export { CheckLinksCommand } from './CheckLinksCommand';
-export {
-  SuggestCommand,
-  InitCommand,
-  IdNewCommand,
-  ValidateSpecCommand,
-  GenerateDocsCommand,
-} from './Phase4Commands';
-export {
-  DepsCommand,
-  UsedByCommand,
-  WhoUsesCommand,
-  OrphansCommand,
-  UndocumentedCommand,
-  TreeCommand,
-} from './Phase5Commands';
-export {
-  CheckDuplicatesCommand,
-  SpecStatusCommand,
-  FindUnusedDocsCommand,
-  SpecHistoryCommand,
-  SpecDiffCommand,
-  SpecBumpCommand,
-  FindDocCommand,
-} from './Phase6Commands';
-export {
-  PlansCommand,
-  FindMethodCommand,
-  TodosCommand,
-  StatsCommand,
-  CoreApiCommand,
-  ScanCommand,
-  SyncCoverageCommand,
-} from './Phase7Commands';
+export { SuggestCommand } from './SuggestCommand';
+export { InitCommand } from './InitCommand';
+export { IdNewCommand } from './IdNewCommand';
+export { ValidateSpecCommand } from './ValidateSpecCommand';
+export { GenerateDocsCommand } from './GenerateDocsCommand';
+export { DepsCommand } from './DepsCommand';
+export { UsedByCommand } from './UsedByCommand';
+export { WhoUsesCommand } from './WhoUsesCommand';
+export { OrphansCommand } from './OrphansCommand';
+export { UndocumentedCommand } from './UndocumentedCommand';
+export { TreeCommand } from './TreeCommand';
+export { CheckDuplicatesCommand } from './CheckDuplicatesCommand';
+export { SpecStatusCommand } from './SpecStatusCommand';
+export { FindUnusedDocsCommand } from './FindUnusedDocsCommand';
+export { SpecHistoryCommand } from './SpecHistoryCommand';
+export { SpecDiffCommand } from './SpecDiffCommand';
+export { SpecBumpCommand } from './SpecBumpCommand';
+export { FindDocCommand } from './FindDocCommand';
+export { PlansCommand } from './PlansCommand';
+export { FindMethodCommand } from './FindMethodCommand';
+export { TodosCommand } from './TodosCommand';
+export { StatsCommand } from './StatsCommand';
+export { CoreApiCommand } from './CoreApiCommand';
+export { ScanCommand } from './ScanCommand';
+export { SyncCoverageCommand } from './SyncCoverageCommand';
 export {
   UntestedCommand,
   WithoutResponsibilityCommand,
@@ -79,7 +71,11 @@ export { RelationshipImpactCommand } from './RelationshipImpactCommand';
 export { RelationshipPathCommand } from './RelationshipPathCommand';
 export { RelationshipValidateCommand } from './RelationshipValidateCommand';
 export { RelationshipExportCommand } from './RelationshipExportCommand';
+export { RelationshipVisualizeCommand } from './RelationshipVisualizeCommand';
 export { RelationshipClustersCommand } from './RelationshipClustersCommand';
 export { RelationshipMetricsCommand } from './RelationshipMetricsCommand';
 export { RelationshipCheckCommand } from './RelationshipCheckCommand';
 export { RelationshipHelpCommand } from './RelationshipHelpCommand';
+export { RenameCommand } from './RenameCommand';
+export { MoveCommand } from './MoveCommand';
+export { SymbolRenameCommand } from './SymbolRenameCommand';

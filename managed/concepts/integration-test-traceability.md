@@ -539,3 +539,39 @@ Please add integration tests before committing.
 **Next Steps**: Implement TestRelationshipExtractor
 **Priority**: High (병렬 개발 안전성에 핵심)
 **Last Updated**: 2025-11-08
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:206
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:429
+- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:32
+- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:33
+- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:34
+- [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:32
+- [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:33
+- [[ParallelWorkCommand]] → /home/user/tsdoc-edge/managed/commands/ParallelWorkCommand.md:34
+- [[Phase5Commands]] → /home/user/tsdoc-edge/managed/commands/Phase5Commands.md:22
+- [[Phase5Commands]] → /home/user/tsdoc-edge/managed/commands/Phase5Commands.md:30
+- [[Phase5Commands]] → /home/user/tsdoc-edge/managed/commands/Phase5Commands.md:31
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:41
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:42
+- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:43
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:186
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:208
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:209
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:228
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:247
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:269
+- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:270
+- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:278
+- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:279
+- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:280
+- [[CLI Command Development Guide]] → /home/user/tsdoc-edge/managed/guides/command-development-guide.md:347
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:375
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:451
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:452
+

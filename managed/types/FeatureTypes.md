@@ -145,3 +145,17 @@ tsdoc-edge find-doc user-service
 - [[DocumentSymbol]]: Document symbol system
 - [[IndexDocsCommand]]: Document indexing
 - [[FindDocCommand]]: Feature search
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:101
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:102
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:103
+- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:98
+- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:99
+- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:100
+

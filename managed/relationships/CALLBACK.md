@@ -9,7 +9,7 @@ priority: medium
 
 # [[Callback Pattern]]
 
-> **Type**: `callback` | **Status**: =Ë Planned for v2.0
+> **Type**: `callback` | **Status**: =ï¿½ Planned for v2.0
 
 Track callback-based control flow where functions are passed as parameters and invoked later.
 
@@ -22,20 +22,20 @@ Track callback-based control flow where functions are passed as parameters and i
 // Simple callback
 function fetchData(url: string, onSuccess: (data: any) => void) {
   // ... fetch logic
-  onSuccess(data);  //  Callback invoked
+  onSuccess(data);  // ï¿½ Callback invoked
 }
 
 fetchData('/api/users', (data) => {
-  console.log(data);  //  Callback implementation
+  console.log(data);  // ï¿½ Callback implementation
 });
 
 // Event handler callback
 button.addEventListener('click', () => {
-  console.log('Clicked!');  //  Event callback
+  console.log('Clicked!');  // ï¿½ Event callback
 });
 
 // Higher-order function callback
-[1, 2, 3].map(x => x * 2);  //  Array method callback
+[1, 2, 3].map(x => x * 2);  // ï¿½ Array method callback
 ```
 
 **Key Characteristics**:
@@ -50,8 +50,8 @@ button.addEventListener('click', () => {
 ```typescript
 function processUsers(
   users: User[],
-  onEach: (user: User) => void,    //  Callback parameter detected
-  onComplete?: () => void           //  Optional callback
+  onEach: (user: User) => void,    // ï¿½ Callback parameter detected
+  onComplete?: () => void           // ï¿½ Optional callback
 ) {
   users.forEach(onEach);
   onComplete?.();
@@ -67,12 +67,12 @@ function processUsers(
 
 ```typescript
 class EventEmitter {
-  on(event: string, listener: (...args: any[]) => void) {  //  Event callback
+  on(event: string, listener: (...args: any[]) => void) {  // ï¿½ Event callback
     this.listeners.push(listener);
   }
 
   emit(event: string, ...args: any[]) {
-    this.listeners.forEach(listener => listener(...args));  //  Callback invocation
+    this.listeners.forEach(listener => listener(...args));  // ï¿½ Callback invocation
   }
 }
 ```
@@ -87,13 +87,13 @@ class EventEmitter {
 ```typescript
 // Promise callbacks
 fetch('/api/data')
-  .then(response => response.json())      //  Success callback
-  .catch(error => console.error(error));  //  Error callback
+  .then(response => response.json())      // ï¿½ Success callback
+  .catch(error => console.error(error));  // ï¿½ Error callback
 
 // Async iteration callback
 async function processItems(items: Item[], process: (item: Item) => Promise<void>) {
   for (const item of items) {
-    await process(item);  //  Async callback invocation
+    await process(item);  // ï¿½ Async callback invocation
   }
 }
 ```
@@ -170,7 +170,7 @@ INSERT INTO unified_relationships (
 // Callback hell detection
 getData((data1) => {
   processData(data1, (data2) => {
-    saveData(data2, (result) => {  //  Nesting depth: 3 (warning!)
+    saveData(data2, (result) => {  // ï¿½ Nesting depth: 3 (warning!)
       console.log(result);
     });
   });
@@ -236,7 +236,7 @@ For each function F:
     If P.type is function signature:
       For each statement S in F.body:
         If S invokes P:
-          ’ Callback relationship detected
+          ï¿½ Callback relationship detected
           Metadata: {
             parameterName: P.name,
             invocationCount: count(P in F.body),
@@ -245,7 +245,7 @@ For each function F:
           }
 ```
 
-**Complexity**: O(n×m×k) where n=functions, m=params, k=statements
+**Complexity**: O(nï¿½mï¿½k) where n=functions, m=params, k=statements
 
 ## Callback Anti-Patterns
 
@@ -306,8 +306,8 @@ function process(data: Data, onDone: () => void) {
 |--------------|---------|---------|
 | [[Call Relationships]] | Direct call | `foo()` calls `bar()` |
 | **Callback Pattern** | Indirect call | `foo(bar)` invokes `bar` later |
-| [[Event Flow]] | Publish-subscribe | `emitter.emit('event')` ’ handlers |
-| [[Pipeline]] | Sequential processing | `A ’ B ’ C` data flow |
+| [[Event Flow]] | Publish-subscribe | `emitter.emit('event')` ï¿½ handlers |
+| [[Pipeline]] | Sequential processing | `A ï¿½ B ï¿½ C` data flow |
 
 ## Related
 
@@ -362,14 +362,14 @@ tsdoc-edge analyze --callback-depth
 -  Storage in unified_relationships
 
 ### v2.1 (Q3 2025)
-- ó Nesting depth analysis
-- ó Async pattern detection
-- ó Callback hell warnings
+- ï¿½ Nesting depth analysis
+- ï¿½ Async pattern detection
+- ï¿½ Callback hell warnings
 
 ### v2.2 (Q4 2025)
-- ó Migration suggestions (callback ’ Promise)
-- ó Event flow integration
-- ó Error handling validation
+- ï¿½ Migration suggestions (callback ï¿½ Promise)
+- ï¿½ Event flow integration
+- ï¿½ Error handling validation
 
 ## Status
 
@@ -394,3 +394,42 @@ tsdoc-edge analyze --callback-depth
 - `then`, `catch`, `finally`
 
 **Tracking**: See [[Unified Relationship Taxonomy]] for complete relationship catalog
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CallGraphAnalyzer]] â†’ /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:204
+- [[CallGraphAnalyzer]] â†’ /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:309
+- [[CallGraphAnalyzer]] â†’ /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:310
+- [[Unified Relationship Taxonomy]] â†’ /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:391
+- [[Unified Relationship Taxonomy]] â†’ /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:481
+- [[Unified Relationship Taxonomy]] â†’ /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:482
+- [[Unified Relationship Taxonomy]] â†’ /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:483
+- [[Unified Relationship Taxonomy]] â†’ /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:484
+- [[Unified Relationship Taxonomy]] â†’ /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:485
+- [[Call Relationships]] â†’ /home/user/tsdoc-edge/managed/relationships/CALLS.md:104
+- [[Call Relationships]] â†’ /home/user/tsdoc-edge/managed/relationships/CALLS.md:105
+- [[Call Relationships]] â†’ /home/user/tsdoc-edge/managed/relationships/CALLS.md:106
+- [[Call Relationships]] â†’ /home/user/tsdoc-edge/managed/relationships/CALLS.md:107
+- [[Call Relationships]] â†’ /home/user/tsdoc-edge/managed/relationships/CALLS.md:108
+- [[Call Relationships]] â†’ /home/user/tsdoc-edge/managed/relationships/CALLS.md:109
+- [[Pipeline]] â†’ /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:60
+- [[Pipeline]] â†’ /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:61
+- [[Pipeline]] â†’ /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:62
+- [[Pipeline]] â†’ /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:63
+- [[Pipeline]] â†’ /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:64
+- [[Pipeline]] â†’ /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:65
+- [[Event Flow]] â†’ /home/user/tsdoc-edge/managed/relationships/event-flow.md:51
+- [[Event Flow]] â†’ /home/user/tsdoc-edge/managed/relationships/event-flow.md:67
+- [[Event Flow]] â†’ /home/user/tsdoc-edge/managed/relationships/event-flow.md:68
+- [[Event Flow]] â†’ /home/user/tsdoc-edge/managed/relationships/event-flow.md:69
+- [[Event Flow]] â†’ /home/user/tsdoc-edge/managed/relationships/event-flow.md:70
+- [[Event Flow]] â†’ /home/user/tsdoc-edge/managed/relationships/event-flow.md:71
+- [[Event Flow]] â†’ /home/user/tsdoc-edge/managed/relationships/event-flow.md:72
+- [[IO Dependency]] â†’ /home/user/tsdoc-edge/managed/relationships/io-dependency.md:116
+- [[IO Dependency]] â†’ /home/user/tsdoc-edge/managed/relationships/io-dependency.md:117
+- [[IO Dependency]] â†’ /home/user/tsdoc-edge/managed/relationships/io-dependency.md:118
+

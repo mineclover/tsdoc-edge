@@ -367,3 +367,39 @@ if (configManager.exists()) {
 - Project initialization workflow
 - Directory structure conventions
 - [[ConfigManager]] implementation
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CLI Commands]] → /home/user/tsdoc-edge/managed/CLI-COMMANDS.md:119
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:101
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:102
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:103
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:54
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:55
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:56
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:36
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:37
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:38
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:35
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:36
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:37
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:38
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:39
+- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:40
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:60
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:181
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:182
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:81
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:86
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:118
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:119
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:120
+- [[TsdocEdgeConfig]] → /home/user/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:121
+- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:92
+- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:100
+- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:101
+

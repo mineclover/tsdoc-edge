@@ -3,31 +3,39 @@
  * @packageDocumentation
  *
  * @responsibility Define comprehensive relationship taxonomy
- * @contract Support all 7 categories of symbol relationships
+ * @contract Support all 26 relationship types across 10 categories
  *
  * @problem Current system only tracks code dependencies
  * @solves Unified type system for all relationship categories
  * @context SSOT completeness requires tracking all connection types
+ *
+ * @version 2.0
+ * @updated 2025-11-11
+ * @changelog Added 9 missing types: circular-dependency, doc-reference, enhancement,
+ *            type-dependency, generic-constraint, layer-dependency, module-boundary,
+ *            and expanded categories from 7 to 10
  */
 
 /**
  * Relationship type classification
  * @public
+ *
+ * Total: 26 relationship types across 10 categories
  */
 export type RelationshipType =
-  // 1. Structural
+  // 1. Structural (Code Space)
   | 'code-dependency'     // A imports B
   | 'inheritance'         // A extends B
-  | 'implementation'      // A implements I
+  | 'implementation'      // A implements I (interface-impl in docs)
   // 2. Data Flow
   | 'io-dependency'       // A's output feeds B's input
   | 'pipeline'            // A → B → C sequential processing
   | 'event-flow'          // A emits events consumed by B
   // 3. Behavioral
   | 'calls'               // A calls function/method B
-  | 'callback'            // A registers B as callback
+  | 'callback'            // A registers B as callback (callback-pattern in docs)
   | 'collaboration'       // A collaborates with B to achieve goal
-  | 'composition'         // Feature = A + B + C
+  | 'composition'         // Feature = A + B + C (composition-relationship in docs)
   | 'temporal-order'      // A must execute before B
   // 4. Alternative
   | 'substitution'        // A OR B can be used (same interface)
@@ -35,25 +43,39 @@ export type RelationshipType =
   // 5. Constraint
   | 'mutual-exclusion'    // A and B cannot coexist
   | 'co-requirement'      // A requires B to be present
-  // 6. Semantic
+  | 'circular-dependency' // A → B → A (quality/constraint)
+  // 6. Semantic (Meta Space)
   | 'conceptual-relation' // A and B are related concepts
   | 'feature-grouping'    // A, B, C belong to same feature
+  | 'doc-reference'       // Documentation references symbol
+  | 'enhancement'         // A enhances B
   // 7. Verification
   | 'test-coverage'       // A is tested by TestA
-  | 'integration-verification'; // A↔B connection verified by test
+  | 'integration-verification' // A↔B connection verified by test
+  // 8. Type System
+  | 'type-dependency'     // Parameter/return type dependencies
+  | 'generic-constraint'  // T extends U
+  // 9. Architectural
+  | 'layer-dependency'    // Controller → Service layer violation
+  | 'module-boundary'     // Cross-package dependencies;
 
 /**
  * Relationship category
  * @public
+ *
+ * Total: 10 categories covering all relationship dimensions
  */
 export type RelationshipCategory =
-  | 'structural'
-  | 'data-flow'
-  | 'behavioral'
-  | 'alternative'
-  | 'constraint'
-  | 'semantic'
-  | 'verification';
+  | 'structural'      // Code structure (imports, inheritance)
+  | 'data-flow'       // Data movement (I/O, pipelines)
+  | 'behavioral'      // Runtime behavior (calls, callbacks)
+  | 'alternative'     // Substitutability (fallback, substitution)
+  | 'constraint'      // Restrictions (mutual-exclusion, co-requirement, circular)
+  | 'semantic'        // Conceptual (doc-reference, feature-grouping, enhancement)
+  | 'verification'    // Testing (test-coverage, integration-verification)
+  | 'type-system'     // Type relationships (type-dependency, generic-constraint)
+  | 'architectural'   // Architecture (layer-dependency, module-boundary)
+  | 'quality';        // Code quality (circular-dependency)
 
 /**
  * Relationship direction

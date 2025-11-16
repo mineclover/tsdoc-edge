@@ -21,3 +21,14 @@ Supports:
 ## Related
 
 - [[Markdown Generator]]: Base generator
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:156
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:217
+- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:218
+

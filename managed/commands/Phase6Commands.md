@@ -20,3 +20,14 @@ Code health and quality analysis.
 
 - [[Code Health]]: Health metrics
 - [[AnalysisFeatures]]: Quality analysis
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:320
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:321
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:322
+

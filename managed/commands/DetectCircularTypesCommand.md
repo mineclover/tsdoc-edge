@@ -1,0 +1,119 @@
+# [[DetectCircularTypesCommand]]
+
+Detect circular type dependencies in TypeScript code.
+
+**Source**: `src/commands/TypeChainCommand.ts`
+
+## Purpose
+
+Identify circular dependencies in TypeScript type system, helping prevent type resolution issues and improve code structure.
+
+## Command
+
+```bash
+tsdoc-edge detect-cycles [options]
+```
+
+## Options
+
+- `--include-external`: Include external types from node_modules
+
+## Functionality
+
+Analyzes TypeScript types to detect:
+- Direct circular dependencies (A � B � A)
+- Indirect circular dependencies (A � B � C � A)
+- Self-referential types
+- Type composition cycles
+
+## Output
+
+```
+Circular Dependency Detection
+
+Statistics:
+  - Total Types: 450
+  - Composites: 180 (40.0%)
+  - Complete: 250 (55.6%)
+  - Circular Dependencies: 5
+
+Detected Cycles:
+
+1. Type: UserData
+   Cycle: UserData � OrderData � CustomerData � UserData
+   Length: 3
+
+2. Type: ConfigOptions
+   Cycle: ConfigOptions � AdvancedOptions � ConfigOptions
+   Length: 2
+
+Total: 5 circular dependencies found
+```
+
+## Use Cases
+
+1. **Refactoring**: Identify problematic type structures
+2. **Code Review**: Verify type dependency health
+3. **CI/CD**: Fail builds on circular dependencies
+4. **Architecture**: Maintain clean type boundaries
+
+## Algorithm
+
+Uses DFS (Depth-First Search) to detect cycles:
+1. Build type dependency graph
+2. Traverse graph from each type
+3. Track visited nodes and recursion stack
+4. Detect back edges (cycles)
+5. Report cycle paths
+
+## Related
+
+- [[TypeChainCommand]]: Trace type dependency chains
+- [[FindRootTypesCommand]]: Find root types in hierarchy
+- [[TypeDependencyAnalyzer]]: Type analysis engine
+
+---
+
+**Category**: Command
+**Status**: Active
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:250
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:386
+- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:101
+- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:102
+- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:82
+- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:110
+- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:111
+- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:112
+- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:113
+- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:114
+- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:32
+- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:33
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:89
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:158
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:159
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:203
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:291
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:292
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:153
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:251
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:252
+- [[Circular Dependency]] → /home/user/tsdoc-edge/managed/relationships/CIRCULAR.md:8
+- [[Circular Dependency]] → /home/user/tsdoc-edge/managed/relationships/CIRCULAR.md:27
+- [[Circular Dependency]] → /home/user/tsdoc-edge/managed/relationships/CIRCULAR.md:28
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:142
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:258
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:259
+- [[TypeChain]] → /home/user/tsdoc-edge/managed/types/TypeChain.md:58
+- [[TypeChain]] → /home/user/tsdoc-edge/managed/types/TypeChain.md:69
+- [[TypeChain]] → /home/user/tsdoc-edge/managed/types/TypeChain.md:70
+- [[MermaidGenerator]] → /home/user/tsdoc-edge/managed/utilities/MermaidGenerator.md:92
+- [[MermaidGenerator]] → /home/user/tsdoc-edge/managed/utilities/MermaidGenerator.md:105
+- [[MermaidGenerator]] → /home/user/tsdoc-edge/managed/utilities/MermaidGenerator.md:106
+

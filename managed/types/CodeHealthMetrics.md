@@ -123,3 +123,23 @@ tsdoc-edge validate
 - [[HealthCommand]]: Display health metrics
 - [[AnalyzeCommand]]: Analyze code quality
 - [[ValidateCommand]]: Enforce quality standards
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:68
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:69
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:70
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:93
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:94
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:95
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:66
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:67
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:68
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:121
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:278
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:279
+

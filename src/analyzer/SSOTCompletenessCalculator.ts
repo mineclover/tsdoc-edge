@@ -305,9 +305,12 @@ export class SSOTCompletenessCalculator {
       'verification': 5,
       'data-flow': 4,
       'behavioral': 4,
+      'type-system': 4,
       'semantic': 3,
       'alternative': 2,
-      'constraint': 2
+      'constraint': 2,
+      'architectural': 3,
+      'quality': 4
     };
 
     const priority = priorities[category] || 3;
@@ -338,7 +341,10 @@ export class SSOTCompletenessCalculator {
       'alternative': 'substitution',
       'constraint': 'co-requirement',
       'semantic': 'conceptual-relation',
-      'verification': 'test-coverage'
+      'verification': 'test-coverage',
+      'type-system': 'type-dependency',
+      'architectural': 'layer-dependency',
+      'quality': 'circular-dependency'
     };
 
     return examples[category];
@@ -355,7 +361,10 @@ export class SSOTCompletenessCalculator {
       'alternative': 'Document alternative implementations with @alternative tag',
       'constraint': 'Add @requires or @conflicts tags',
       'semantic': 'Add @relatedTo tags for related concepts',
-      'verification': 'Create test files for untested symbols'
+      'verification': 'Create test files for untested symbols',
+      'type-system': 'Add type dependencies and generic constraints',
+      'architectural': 'Document layer dependencies and module boundaries',
+      'quality': 'Detect and resolve circular dependencies'
     };
 
     return suggestions[category];

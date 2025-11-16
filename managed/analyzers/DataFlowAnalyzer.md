@@ -18,3 +18,25 @@
 
 - [[Pipeline]]: 파이프라인 관계
 - [[CallGraphAnalyzer]]: 호출 그래프
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:158
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:346
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:267
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:268
+- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:269
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:109
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:295
+- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:296
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:278
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:365
+- [[Relationship Analysis Guide]] → /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md:366
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:29
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:30
+- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:31
+

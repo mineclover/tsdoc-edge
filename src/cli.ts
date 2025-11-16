@@ -68,6 +68,14 @@ import { AnalyzeChainsCommand } from './commands/AnalyzeChainsCommand';
 import { AnalyzeCallsCommand } from './commands/AnalyzeCallsCommand';
 import { AnalyzeTestsCommand } from './commands/AnalyzeTestsCommand';
 import { AnalyzeTypesCommand } from './commands/AnalyzeTypesCommand';
+import { AnalyzeCompositionCommand } from './commands/AnalyzeCompositionCommand';
+import { AnalyzeSubstitutionCommand } from './commands/AnalyzeSubstitutionCommand';
+import { AnalyzeFallbackCommand } from './commands/AnalyzeFallbackCommand';
+import { AnalyzeCollaborationCommand } from './commands/AnalyzeCollaborationCommand';
+import { AnalyzeTemporalOrderCommand } from './commands/AnalyzeTemporalOrderCommand';
+import { AnalyzeDocReferenceCommand } from './commands/AnalyzeDocReferenceCommand';
+import { AnalyzeEnhancementCommand } from './commands/AnalyzeEnhancementCommand';
+import { AnalyzeLayerDependencyCommand } from './commands/AnalyzeLayerDependencyCommand';
 import { AnalyzeEventsCommand } from './commands/AnalyzeEventsCommand';
 import { AnalyzeCallbacksCommand } from './commands/AnalyzeCallbacksCommand';
 import { AnalyzeConstraintsCommand } from './commands/AnalyzeConstraintsCommand';
@@ -81,6 +89,7 @@ import { RelationshipImpactCommand } from './commands/RelationshipImpactCommand'
 import { RelationshipPathCommand } from './commands/RelationshipPathCommand';
 import { RelationshipValidateCommand } from './commands/RelationshipValidateCommand';
 import { RelationshipExportCommand } from './commands/RelationshipExportCommand';
+import { RelationshipVisualizeCommand } from './commands/RelationshipVisualizeCommand';
 import { RelationshipClustersCommand } from './commands/RelationshipClustersCommand';
 import { RelationshipMetricsCommand } from './commands/RelationshipMetricsCommand';
 import { RelationshipCheckCommand } from './commands/RelationshipCheckCommand';
@@ -95,6 +104,10 @@ import { DetectDeadCodeCommand } from './commands/DetectDeadCodeCommand';
 import { SymbolQueryCommand } from './commands/SymbolQueryCommand';
 import { SymbolFixCommand } from './commands/SymbolFixCommand';
 import { RelationshipStatsCommand } from './commands/RelationshipStatsCommand';
+import { RenameCommand } from './commands/RenameCommand';
+import { MoveCommand } from './commands/MoveCommand';
+import { SymbolRenameCommand } from './commands/SymbolRenameCommand';
+import { TaskListCommand, TaskAddCommand, TaskUpdateCommand, TaskStatsCommand } from './commands/TaskCommands';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -161,6 +174,14 @@ async function main(): Promise<void> {
   registry.register(new SyncCoverageCommand());
   registry.register(new AnalyzeChainsCommand());
   registry.register(new AnalyzeCallsCommand());
+  registry.register(new AnalyzeCompositionCommand());
+  registry.register(new AnalyzeSubstitutionCommand());
+  registry.register(new AnalyzeFallbackCommand());
+  registry.register(new AnalyzeCollaborationCommand());
+  registry.register(new AnalyzeTemporalOrderCommand());
+  registry.register(new AnalyzeDocReferenceCommand());
+  registry.register(new AnalyzeEnhancementCommand());
+  registry.register(new AnalyzeLayerDependencyCommand());
   registry.register(new AnalyzeTestsCommand());
   registry.register(new AnalyzeTypesCommand());
   registry.register(new AnalyzeIOCommand());
@@ -177,6 +198,7 @@ async function main(): Promise<void> {
   registry.register(new RelationshipPathCommand());
   registry.register(new RelationshipValidateCommand());
   registry.register(new RelationshipExportCommand());
+  registry.register(new RelationshipVisualizeCommand());
   registry.register(new RelationshipClustersCommand());
   registry.register(new RelationshipMetricsCommand());
   registry.register(new RelationshipCheckCommand());
@@ -205,6 +227,13 @@ async function main(): Promise<void> {
   registry.register(new SymbolQueryCommand());
   registry.register(new SymbolFixCommand());
   registry.register(new RelationshipStatsCommand());
+  registry.register(new RenameCommand());
+  registry.register(new MoveCommand());
+  registry.register(new SymbolRenameCommand());
+  registry.register(new TaskListCommand());
+  registry.register(new TaskAddCommand());
+  registry.register(new TaskUpdateCommand());
+  registry.register(new TaskStatsCommand());
   registry.register(new HelpCommand(registry));
 
   // Get command

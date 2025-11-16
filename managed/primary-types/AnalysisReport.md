@@ -118,3 +118,56 @@ if (report.metrics.overallScore < 70) {
 [^DocQualityScore]
 [^TestCoverageInfo]
 [^ImprovementSuggestion]
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:216
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:459
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:99
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:102
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:194
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:284
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:285
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:286
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:287
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:288
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:289
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:290
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:291
+- [[CodeHealthChecker]] → /home/user/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:292
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:59
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:60
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:61
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:62
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:63
+- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:64
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:87
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:88
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:89
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:90
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:91
+- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:92
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:187
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:276
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:277
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:278
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:279
+- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:280
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:399
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:400
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:401
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:114
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:276
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:277
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:381
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:491
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:492
+
+### Implemented By
+
+- AnalysisReport → /home/user/tsdoc-edge/src/types/analysis/quality.ts:109
+

@@ -51,12 +51,51 @@ interface WorkContext {
     filePath: string;
     type: string;
   }>;
+  contracts: Array<{
+    symbolId: string;
+    symbolName: string;
+    description: string;
+    preconditions: string[];
+    postconditions: string[];
+    invariants: string[];
+  }>;
+  decisions: Array<{
+    title: string;
+    decision: string;
+    rationale: string;
+    status: string;
+    date: string;
+    symbolName?: string;
+  }>;
+  errorPatterns: Array<{
+    symbolName: string;
+    errorType: string;
+    message: string;
+    solution: string;
+    prevention?: string;
+  }>;
+  relationships: Array<{
+    id: string;
+    type: string;
+    category: string;
+    direction: 'unidirectional' | 'bidirectional' | 'undirected';
+    strength: 'strong' | 'medium' | 'weak';
+    fromSymbols: string[];
+    toSymbols: string[];
+    confidence: number;
+    description?: string;
+    properties?: Record<string, any>;
+  }>;
 }
 
 /**
  * Work Context Command - 파일 작업에 필요한 모든 컨텍스트 제공
  *
  * @doc [[WorkContextCommand]]
+ * @requires DatabaseManager
+ * @requires SymbolGraphBuilder
+ * @requires TSDocParser
+ * @requires DocumentSymbolParser
  * @public
  */
 export class WorkContextCommand extends BaseCommand {
@@ -134,6 +173,10 @@ export class WorkContextCommand extends BaseCommand {
       typeFlows: [],
       tests: [],
       usedBy: [],
+      contracts: [],
+      decisions: [],
+      errorPatterns: [],
+      relationships: [],
     };
 
     // 1. Get symbols from this file
@@ -155,6 +198,9 @@ export class WorkContextCommand extends BaseCommand {
       designDecisions: [],
       metadata: {},
     }));
+
+    // Extract symbol IDs for batch queries
+    const symbolIds = context.symbols.map(s => s.id);
 
     // 2. Parse file for @doc tags (related documents)
     try {
@@ -181,32 +227,64 @@ export class WorkContextCommand extends BaseCommand {
       // Continue even if parsing fails
     }
 
-    // 3. Get dependencies (what this file uses)
-    for (const symbol of context.symbols) {
-      const deps = dbManager.db.prepare(
-        'SELECT * FROM dependencies WHERE symbol_id = ?'
-      ).all(symbol.id) as any[];
+    // 3. Get dependencies (what this file uses) - Use unified_relationships
+    if (symbolIds.length > 0) {
+      const placeholder = symbolIds.map(() => '?').join(',');
 
-      for (const dep of deps) {
-        const targetSymbol = dbManager.db.prepare(
-          'SELECT * FROM symbols WHERE id = ?'
-        ).get(dep.target) as any;
+      // Query unified_relationships for structural relationships (type-dependency, code-dependency)
+      const relationshipRows = dbManager.db.prepare(`
+        SELECT DISTINCT
+          r.to_symbols, r.type, r.category
+        FROM unified_relationships r
+        WHERE r.category IN ('structural', 'behavioral')
+          AND json_valid(r.from_symbols)
+          AND EXISTS (
+            SELECT 1 FROM json_each(r.from_symbols) je
+            WHERE je.value IN (${placeholder})
+          )
+      `).all(...symbolIds) as Array<{
+        to_symbols: string;
+        type: string;
+        category: string;
+      }>;
 
-        if (targetSymbol && targetSymbol.file_path !== relativePath) {
-          context.dependencies.push({
-            name: targetSymbol.name,
-            type: targetSymbol.type,
-            filePath: targetSymbol.file_path,
-          });
+      // Extract target symbol IDs and resolve them
+      const targetIds = new Set<string>();
+      for (const row of relationshipRows) {
+        try {
+          const toSymbols = JSON.parse(row.to_symbols) as string[];
+          for (const target of toSymbols) {
+            if (target) targetIds.add(target);
+          }
+        } catch (error) {
+          // Skip invalid JSON
         }
+      }
+
+      if (targetIds.size > 0) {
+        const targetPlaceholder = Array.from(targetIds).map(() => '?').join(',');
+        const dependencyRows = dbManager.db.prepare(`
+          SELECT DISTINCT
+            s.id, s.name, s.type, s.file_path
+          FROM symbols s
+          WHERE s.id IN (${targetPlaceholder})
+            AND s.file_path != ?
+        `).all(...Array.from(targetIds), relativePath) as Array<{
+          id: string;
+          name: string;
+          type: string;
+          file_path: string;
+        }>;
+
+        context.dependencies = dependencyRows.map(row => ({
+          name: row.name,
+          type: row.type,
+          filePath: row.file_path,
+        }));
       }
     }
 
-    // Remove duplicates
-    context.dependencies = this.uniqueBy(context.dependencies, 'name');
-
     // 4. Get test files
-    const symbolIds = context.symbols.map(s => s.id);
     if (symbolIds.length > 0) {
       const testMappings = dbManager.db.prepare(
         `SELECT * FROM test_mappings WHERE symbol_id IN (${symbolIds.map(() => '?').join(',')})`
@@ -223,29 +301,215 @@ export class WorkContextCommand extends BaseCommand {
       }));
     }
 
-    // 5. Get usedBy (what uses this file)
-    for (const symbol of context.symbols) {
-      const usages = dbManager.db.prepare(
-        'SELECT * FROM dependencies WHERE target = ?'
-      ).all(symbol.id) as any[];
+    // 5. Get usedBy (what uses this file) - Use unified_relationships
+    if (symbolIds.length > 0) {
+      const placeholder = symbolIds.map(() => '?').join(',');
 
-      for (const usage of usages) {
-        const userSymbol = dbManager.db.prepare(
-          'SELECT * FROM symbols WHERE id = ?'
-        ).get(usage.symbol_id) as any;
+      // Query unified_relationships where this file's symbols are targets
+      const relationshipRows = dbManager.db.prepare(`
+        SELECT DISTINCT
+          r.from_symbols, r.type, r.category
+        FROM unified_relationships r
+        WHERE r.category IN ('structural', 'behavioral')
+          AND json_valid(r.to_symbols)
+          AND EXISTS (
+            SELECT 1 FROM json_each(r.to_symbols) je
+            WHERE je.value IN (${placeholder})
+          )
+      `).all(...symbolIds) as Array<{
+        from_symbols: string;
+        type: string;
+        category: string;
+      }>;
 
-        if (userSymbol && userSymbol.file_path !== relativePath) {
-          context.usedBy.push({
-            name: userSymbol.name,
-            filePath: userSymbol.file_path,
-            type: userSymbol.type,
-          });
+      // Extract source symbol IDs and resolve them
+      const sourceIds = new Set<string>();
+      for (const row of relationshipRows) {
+        try {
+          const fromSymbols = JSON.parse(row.from_symbols) as string[];
+          for (const source of fromSymbols) {
+            if (source) sourceIds.add(source);
+          }
+        } catch (error) {
+          // Skip invalid JSON
         }
+      }
+
+      if (sourceIds.size > 0) {
+        const sourcePlaceholder = Array.from(sourceIds).map(() => '?').join(',');
+        const usedByRows = dbManager.db.prepare(`
+          SELECT DISTINCT
+            s.id, s.name, s.file_path, s.type
+          FROM symbols s
+          WHERE s.id IN (${sourcePlaceholder})
+            AND s.file_path != ?
+        `).all(...Array.from(sourceIds), relativePath) as Array<{
+          id: string;
+          name: string;
+          file_path: string;
+          type: string;
+        }>;
+
+        context.usedBy = usedByRows.map(row => ({
+          name: row.name,
+          filePath: row.file_path,
+          type: row.type,
+        }));
       }
     }
 
-    // Remove duplicates and limit
-    context.usedBy = this.uniqueBy(context.usedBy, 'name');
+    // 6-8. Get contracts, decisions, and error patterns (optimized)
+    if (symbolIds.length > 0) {
+      // Create symbol lookup map for O(1) access
+      const symbolMap = new Map(context.symbols.map(s => [s.id, s]));
+      const placeholder = symbolIds.map(() => '?').join(',');
+
+      // 6. Get contracts (preconditions, postconditions, invariants)
+      try {
+        const contracts = dbManager.db.prepare(
+          `SELECT * FROM contracts WHERE symbol_id IN (${placeholder})`
+        ).all(...symbolIds) as Array<{
+          symbol_id: string;
+          description: string;
+          preconditions: string;
+          postconditions: string;
+          invariants: string;
+          file_path: string;
+        }>;
+
+        for (const contract of contracts) {
+          try {
+            const symbol = symbolMap.get(contract.symbol_id);
+            context.contracts.push({
+              symbolId: contract.symbol_id,
+              symbolName: symbol?.name || 'Unknown',
+              description: contract.description,
+              preconditions: JSON.parse(contract.preconditions),
+              postconditions: JSON.parse(contract.postconditions),
+              invariants: JSON.parse(contract.invariants),
+            });
+          } catch (jsonError) {
+            // Skip malformed contract data
+            console.warn(`Failed to parse contract for ${contract.symbol_id}:`, jsonError);
+          }
+        }
+      } catch (dbError) {
+        // Continue even if contracts query fails
+        console.warn('Failed to fetch contracts:', dbError);
+      }
+
+      // 7. Get design decisions
+      try {
+        const decisions = dbManager.db.prepare(
+          `SELECT * FROM decision_records WHERE symbol_id IN (${placeholder}) ORDER BY date DESC`
+        ).all(...symbolIds) as Array<{
+          symbol_id: string;
+          title: string;
+          decision: string;
+          rationale: string;
+          status: string;
+          date: string;
+        }>;
+
+        for (const decision of decisions) {
+          const symbol = symbolMap.get(decision.symbol_id);
+          context.decisions.push({
+            title: decision.title,
+            decision: decision.decision,
+            rationale: decision.rationale,
+            status: decision.status,
+            date: decision.date,
+            symbolName: symbol?.name,
+          });
+        }
+      } catch (dbError) {
+        console.warn('Failed to fetch design decisions:', dbError);
+      }
+
+      // 8. Get error patterns
+      try {
+        const errors = dbManager.db.prepare(
+          `SELECT * FROM error_experiences WHERE symbol_id IN (${placeholder})`
+        ).all(...symbolIds) as Array<{
+          symbol_id: string;
+          error_type: string;
+          message: string;
+          solution: string;
+          prevention: string | null;
+        }>;
+
+        for (const error of errors) {
+          const symbol = symbolMap.get(error.symbol_id);
+          context.errorPatterns.push({
+            symbolName: symbol?.name || 'Unknown',
+            errorType: error.error_type,
+            message: error.message,
+            solution: error.solution,
+            prevention: error.prevention || undefined,
+          });
+        }
+      } catch (dbError) {
+        console.warn('Failed to fetch error patterns:', dbError);
+      }
+
+      // 9. Get unified relationships (17 relationship types) - Optimized single query
+      try {
+        // Build WHERE clause for all symbolIds at once
+        const whereConditions = symbolIds.map(() =>
+          `(json_extract(from_symbols, '$[0]') = ?
+            OR json_extract(to_symbols, '$[0]') = ?
+            OR from_symbols LIKE ?
+            OR to_symbols LIKE ?)`
+        ).join(' OR ');
+
+        // Prepare parameters: for each symbolId, we need it 4 times
+        const params: string[] = [];
+        for (const symbolId of symbolIds) {
+          params.push(symbolId); // json_extract from_symbols
+          params.push(symbolId); // json_extract to_symbols
+          params.push(`%"${symbolId}"%`); // LIKE from_symbols
+          params.push(`%"${symbolId}"%`); // LIKE to_symbols
+        }
+
+        const rels = dbManager.db.prepare(`
+          SELECT DISTINCT * FROM unified_relationships
+          WHERE ${whereConditions}
+        `).all(...params) as Array<{
+          id: string;
+          type: string;
+          category: string;
+          from_symbols: string;
+          to_symbols: string;
+          direction: string;
+          strength: string;
+          confidence: number;
+          description: string | null;
+          properties: string | null;
+        }>;
+
+        // Process relationships (already deduplicated by DISTINCT)
+        for (const rel of rels) {
+          try {
+            context.relationships.push({
+              id: rel.id,
+              type: rel.type,
+              category: rel.category,
+              direction: rel.direction as 'unidirectional' | 'bidirectional' | 'undirected',
+              strength: rel.strength as 'strong' | 'medium' | 'weak',
+              fromSymbols: JSON.parse(rel.from_symbols),
+              toSymbols: JSON.parse(rel.to_symbols),
+              confidence: rel.confidence,
+              description: rel.description || undefined,
+              properties: rel.properties ? JSON.parse(rel.properties) : undefined,
+            });
+          } catch (jsonError) {
+            console.warn(`Failed to parse relationship ${rel.id}:`, jsonError);
+          }
+        }
+      } catch (dbError) {
+        console.warn('Failed to fetch unified relationships:', dbError);
+      }
+    }
 
     return context;
   }
@@ -360,7 +624,7 @@ export class WorkContextCommand extends BaseCommand {
     console.log(colors.bold + divider + colors.reset);
 
     if (context.dependencies.length > 0) {
-      const displayLimit = 15;
+      const displayLimit = 20;
       let displayed = 0;
       let missingCount = 0;
 
@@ -385,7 +649,7 @@ export class WorkContextCommand extends BaseCommand {
 
       if (context.dependencies.length > displayLimit) {
         console.log();
-        console.log(`  ${colors.dim}... ${context.dependencies.length - displayLimit} more${colors.reset}`);
+        console.log(`  ${colors.dim}... ${context.dependencies.length - displayLimit} more (use --all to show all)${colors.reset}`);
       }
 
       if (missingCount > 0) {
@@ -457,6 +721,162 @@ export class WorkContextCommand extends BaseCommand {
     }
     console.log();
 
+    // 5. Contracts (Preconditions, Postconditions, Invariants)
+    if (context.contracts.length > 0) {
+      console.log(colors.bold + divider + colors.reset);
+      console.log(colors.blue + '📜 계약 (Contracts)' + colors.reset + colors.dim + ` (${context.contracts.length}개)` + colors.reset);
+      console.log(colors.bold + divider + colors.reset);
+
+      for (const contract of context.contracts) {
+        console.log(`  ${colors.bold}${contract.symbolName}${colors.reset}`);
+        console.log(`    ${colors.dim}${contract.description}${colors.reset}`);
+        console.log();
+
+        if (contract.preconditions.length > 0) {
+          console.log(`    ${colors.green}사전조건 (Preconditions):${colors.reset}`);
+          for (const pre of contract.preconditions) {
+            console.log(`      ${colors.cyan}•${colors.reset} ${pre}`);
+          }
+          console.log();
+        }
+
+        if (contract.postconditions.length > 0) {
+          console.log(`    ${colors.green}사후조건 (Postconditions):${colors.reset}`);
+          for (const post of contract.postconditions) {
+            console.log(`      ${colors.cyan}•${colors.reset} ${post}`);
+          }
+          console.log();
+        }
+
+        if (contract.invariants.length > 0) {
+          console.log(`    ${colors.green}불변식 (Invariants):${colors.reset}`);
+          for (const inv of contract.invariants) {
+            console.log(`      ${colors.cyan}•${colors.reset} ${inv}`);
+          }
+          console.log();
+        }
+      }
+    }
+
+    // 6. Design Decisions
+    if (context.decisions.length > 0) {
+      console.log(colors.bold + divider + colors.reset);
+      console.log(colors.blue + '🎯 설계 결정 (Design Decisions)' + colors.reset + colors.dim + ` (${context.decisions.length}개)` + colors.reset);
+      console.log(colors.bold + divider + colors.reset);
+
+      for (const decision of context.decisions) {
+        const statusIcon = decision.status === 'active' ? colors.green + '✅' :
+                          decision.status === 'deprecated' ? colors.yellow + '⚠️' :
+                          colors.dim + '📋';
+
+        console.log(`  ${statusIcon}${colors.reset} ${colors.bold}${decision.title}${colors.reset}`);
+        if (decision.symbolName) {
+          console.log(`    ${colors.dim}Symbol: ${decision.symbolName}${colors.reset}`);
+        }
+        console.log(`    ${colors.dim}Date: ${decision.date}${colors.reset}`);
+        console.log(`    ${colors.cyan}Decision:${colors.reset} ${decision.decision}`);
+        console.log(`    ${colors.cyan}Rationale:${colors.reset} ${decision.rationale}`);
+        console.log();
+      }
+    }
+
+    // 7. Error Patterns
+    if (context.errorPatterns.length > 0) {
+      console.log(colors.bold + divider + colors.reset);
+      console.log(colors.blue + '⚠️  일반적인 함정 (Common Pitfalls)' + colors.reset + colors.dim + ` (${context.errorPatterns.length}개)` + colors.reset);
+      console.log(colors.bold + divider + colors.reset);
+
+      for (const error of context.errorPatterns) {
+        console.log(`  ${colors.yellow}❌${colors.reset} ${colors.bold}${error.errorType}${colors.reset} ${colors.dim}(${error.symbolName})${colors.reset}`);
+        console.log(`    ${colors.yellow}Error:${colors.reset} ${error.message}`);
+        console.log(`    ${colors.green}Solution:${colors.reset} ${error.solution}`);
+        if (error.prevention) {
+          console.log(`    ${colors.cyan}Prevention:${colors.reset} ${error.prevention}`);
+        }
+        console.log();
+      }
+    }
+
+    // 8. Unified Relationships (17 relationship types)
+    if (context.relationships.length > 0) {
+      console.log(colors.bold + divider + colors.reset);
+      console.log(colors.blue + '🔗 통합 관계 (Unified Relationships)' + colors.reset + colors.dim + ` (${context.relationships.length}개)` + colors.reset);
+      console.log(colors.bold + divider + colors.reset);
+
+      // Group relationships by category
+      const relationshipsByCategory = this.groupBy(context.relationships, 'category');
+      const categoryIcons: Record<string, string> = {
+        'structural': '🏗️',
+        'data-flow': '📊',
+        'behavioral': '⚙️',
+        'temporal': '⏱️',
+        'semantic': '💡',
+        'quality': '✨',
+        'organizational': '📁',
+      };
+
+      for (const [category, rels] of Object.entries(relationshipsByCategory)) {
+        const icon = categoryIcons[category] || '🔗';
+        console.log(`\n  ${icon} ${colors.bold}${category.toUpperCase()}${colors.reset} ${colors.dim}(${rels.length}개)${colors.reset}`);
+        console.log();
+
+        // Display limit per category
+        const displayLimit = 5;
+        const displayRels = rels.slice(0, displayLimit);
+
+        for (const rel of displayRels) {
+          // Strength indicator
+          const strengthIcon = rel.strength === 'strong' ? colors.green + '●●●' :
+                              rel.strength === 'medium' ? colors.yellow + '●●○' :
+                              colors.dim + '●○○';
+
+          // Direction indicator
+          const directionIcon = rel.direction === 'bidirectional' ? '↔️' :
+                               rel.direction === 'unidirectional' ? '→' :
+                               '—';
+
+          console.log(`    ${strengthIcon}${colors.reset} ${colors.cyan}${rel.type}${colors.reset} ${directionIcon}`);
+
+          // From → To symbols
+          const fromSymbolNames = rel.fromSymbols
+            .map(id => context.symbols.find(s => s.id === id)?.name || id.split('-').pop())
+            .join(', ');
+          const toSymbolNames = rel.toSymbols
+            .map(id => context.symbols.find(s => s.id === id)?.name || id.split('-').pop())
+            .join(', ');
+
+          console.log(`      ${colors.dim}From:${colors.reset} ${fromSymbolNames}`);
+          console.log(`      ${colors.dim}To:${colors.reset} ${toSymbolNames}`);
+
+          // Confidence
+          const confidencePercent = Math.round(rel.confidence * 100);
+          const confidenceColor = rel.confidence >= 0.8 ? colors.green :
+                                  rel.confidence >= 0.5 ? colors.yellow :
+                                  colors.dim;
+          console.log(`      ${colors.dim}Confidence:${colors.reset} ${confidenceColor}${confidencePercent}%${colors.reset}`);
+
+          // Description
+          if (rel.description) {
+            console.log(`      ${colors.dim}${rel.description}${colors.reset}`);
+          }
+
+          // Properties
+          if (rel.properties && Object.keys(rel.properties).length > 0) {
+            const propStr = Object.entries(rel.properties)
+              .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
+              .join(', ');
+            console.log(`      ${colors.dim}Properties: ${propStr}${colors.reset}`);
+          }
+
+          console.log();
+        }
+
+        if (rels.length > displayLimit) {
+          console.log(`    ${colors.dim}... ${rels.length - displayLimit} more ${category} relationships${colors.reset}`);
+        }
+      }
+    }
+
     // Summary
     console.log(colors.bold + divider + colors.reset);
     console.log(colors.bold + '📊 요약' + colors.reset);
@@ -466,6 +886,10 @@ export class WorkContextCommand extends BaseCommand {
     console.log(`  의존: ${colors.cyan}${context.dependencies.length}개${colors.reset}`);
     console.log(`  테스트: ${colors.cyan}${context.tests.length}개${colors.reset}`);
     console.log(`  영향: ${colors.cyan}${context.usedBy.length}개 파일${colors.reset}`);
+    console.log(`  계약: ${colors.cyan}${context.contracts.length}개${colors.reset}`);
+    console.log(`  결정: ${colors.cyan}${context.decisions.length}개${colors.reset}`);
+    console.log(`  함정: ${colors.cyan}${context.errorPatterns.length}개${colors.reset}`);
+    console.log(`  관계: ${colors.cyan}${context.relationships.length}개${colors.reset}`);
     console.log();
   }
 

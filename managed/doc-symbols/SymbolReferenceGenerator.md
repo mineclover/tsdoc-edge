@@ -20,3 +20,17 @@ Creates:
 ## Related
 
 - [[Document Symbol System]]: Symbol notation
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:219
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:220
+- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:221
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:126
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:127
+- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:128
+

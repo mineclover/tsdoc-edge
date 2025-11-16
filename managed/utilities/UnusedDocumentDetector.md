@@ -93,3 +93,23 @@ tsdoc-edge find-unused-docs managed --safe-only
 - [[FindUnusedDocsCommand]]: CLI detection command
 - [[SpecStatusManager]]: Manages document status
 - [[DocumentSymbolParser]]: Parses document references
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:165
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:166
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:167
+- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:125
+- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:140
+- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:141
+- [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:75
+- [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:92
+- [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:93
+- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:88
+- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:89
+- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:90
+

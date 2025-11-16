@@ -15,7 +15,7 @@ canonical: true
 
 ## Purpose
 
-Defines a standard format for storing and querying all types of relationships between symbols, enabling unified tracking across 7 relationship categories.
+Defines a standard format for storing and querying all types of relationships between symbols, enabling unified tracking across 10 relationship categories.
 
 **Problem**: Different relationship types (imports, calls, inheritance) stored in incompatible formats.
 
@@ -42,7 +42,7 @@ interface UnifiedRelationship {
   // ===== Properties =====
   direction: RelationshipDirection;    // uni/bi/undirected
   strength: RelationshipStrength;      // strong/medium/weak
-  category: RelationshipCategory;      // Category (1 of 7)
+  category: RelationshipCategory;      // Category (1 of 10)
 
   // ===== Evidence =====
   evidence: RelationshipEvidence[];    // Supporting evidence
@@ -63,7 +63,7 @@ interface UnifiedRelationship {
 }
 ```
 
-## Relationship Types (18 total)
+## Relationship Types (27 total across 10 categories)
 
 ### 1. Structural (3 types)
 
@@ -267,13 +267,13 @@ interface UnifiedRelationship {
 
 ```typescript
 type RelationshipType =
-  // 1. Structural
+  // 1. Structural (Code Space)
   | 'code-dependency'     // A imports B
   | 'inheritance'         // A extends B
   | 'implementation'      // A implements I
   // 2. Data Flow
   | 'io-dependency'       // A's output feeds B's input
-  | 'pipeline'            // A � B � C sequential processing
+  | 'pipeline'            // A → B → C sequential processing
   | 'event-flow'          // A emits events consumed by B
   // 3. Behavioral
   | 'calls'               // A calls function/method B
@@ -287,33 +287,45 @@ type RelationshipType =
   // 5. Constraint
   | 'mutual-exclusion'    // A and B cannot coexist
   | 'co-requirement'      // A requires B to be present
-  // 6. Semantic
+  | 'circular-dependency' // A → B → A
+  // 6. Semantic (Meta Space)
   | 'conceptual-relation' // A and B are related concepts
   | 'feature-grouping'    // A, B, C belong to same feature
+  | 'doc-reference'       // Documentation references symbol
+  | 'enhancement'         // A enhances B
   // 7. Verification
   | 'test-coverage'       // A is tested by TestA
-  | 'integration-verification'; // A�B verified by test
+  | 'integration-verification' // A↔B verified by test
+  // 8. Type System
+  | 'type-dependency'     // Parameter/return type dependencies
+  | 'generic-constraint'  // T extends U
+  // 9. Architectural
+  | 'layer-dependency'    // Controller → Service
+  | 'module-boundary';    // Cross-package dependencies
 ```
 
 ### RelationshipCategory
 
 ```typescript
 type RelationshipCategory =
-  | 'structural'
-  | 'data-flow'
-  | 'behavioral'
-  | 'alternative'
-  | 'constraint'
-  | 'semantic'
-  | 'verification';
+  | 'structural'      // Code structure (imports, inheritance)
+  | 'data-flow'       // Data movement (I/O, pipelines)
+  | 'behavioral'      // Runtime behavior (calls, callbacks)
+  | 'alternative'     // Substitutability (fallback, substitution)
+  | 'constraint'      // Restrictions (mutual-exclusion, co-requirement, circular)
+  | 'semantic'        // Conceptual (doc-reference, feature-grouping, enhancement)
+  | 'verification'    // Testing (test-coverage, integration-verification)
+  | 'type-system'     // Type relationships (type-dependency, generic-constraint)
+  | 'architectural'   // Architecture (layer-dependency, module-boundary)
+  | 'quality';        // Code quality (circular-dependency)
 ```
 
 ### RelationshipDirection
 
 ```typescript
 type RelationshipDirection =
-  | 'unidirectional'  // A � B
-  | 'bidirectional'   // A � B
+  | 'unidirectional'  // A � B
+  | 'bidirectional'   // A � B
   | 'undirected';     // A  B (no direction)
 ```
 
@@ -564,11 +576,40 @@ const confidence = evidence.reduce((sum, ev) => sum + ev.confidence, 0) / eviden
 ## Status
 
 **Current**: Active, production-ready
-**Version**: v1.0
-**Coverage**: All 7 categories, 18 relationship types
+**Version**: v2.0
+**Coverage**: All 10 categories, 27 relationship types
 
 ---
 
-**Last Updated**: 2025-11-09
-**Schema Version**: 1.0
-**Total Relationship Types**: 18 across 7 categories
+**Last Updated**: 2025-11-11
+**Schema Version**: 2.0
+**Total Relationship Types**: 27 across 10 categories
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:185
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:210
+- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:211
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:387
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:493
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:494
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:495
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:496
+- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:497
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:379
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:380
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:381
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:115
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:116
+- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:117
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:126
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:127
+- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:128
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:227
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:228
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:229
+

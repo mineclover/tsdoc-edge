@@ -73,3 +73,20 @@ export function isTypeScriptOrJavaScript(filePath: string): boolean
 ## Symbol Count
 
 4 utility functions
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:314
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:315
+- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:316
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:191
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:192
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:193
+- [[FileScanner]] → /home/user/tsdoc-edge/managed/utilities/FileScanner.md:82
+- [[FileScanner]] → /home/user/tsdoc-edge/managed/utilities/FileScanner.md:83
+- [[FileScanner]] → /home/user/tsdoc-edge/managed/utilities/FileScanner.md:84
+

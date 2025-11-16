@@ -17,6 +17,8 @@ import type { ParsedDocSymbols } from '../types/feature/doc-symbol';
  * @public
  * @responsibility Update code symbol footnote references in documents
  * @contract Parse documents, resolve symbol references, update footnotes
+ * @doc [[Update Symbol References Command]]
+ * @doc [[CLI Commands#update-symbol-refs]]
  *
  * @problem Symbol footnotes [^SymbolName] need to be updated when code changes
  * @solves Automatically updates footnote references with current code locations

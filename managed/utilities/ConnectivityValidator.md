@@ -171,3 +171,31 @@ tsdoc-edge check-links
 - [[SymbolGraphBuilder]]: Provides graph data
 - [[SymbolSearchEngine]]: Finds problematic symbols
 - [[ValidateCommand]]: CLI validation
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:175
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:496
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:195
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:421
+- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:422
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:75
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:76
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:77
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:129
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:282
+- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:283
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:109
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:340
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:341
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:248
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:249
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:250
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:128
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:129
+- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:130
+

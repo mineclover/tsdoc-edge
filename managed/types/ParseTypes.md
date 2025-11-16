@@ -139,3 +139,20 @@ tsdoc-edge validate
 - [[TSDocParser]]: Parser implementation
 - [[ValidateCommand]]: CLI validation
 - [[ModuleSpecTagParser]]: Custom tag parsing
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:72
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:73
+- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:74
+- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:45
+- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:46
+- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:47
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:64
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:65
+- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:66
+

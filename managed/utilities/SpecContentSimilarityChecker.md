@@ -100,3 +100,23 @@ const checker = new SpecContentSimilarityChecker({
 - (Planned: CheckDuplicatesCommand for CLI duplicate detection)
 - [[UnusedDocumentDetector]]: Find orphaned docs
 - [[DocumentSymbolParser]]: Parse doc structure
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:162
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:163
+- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:164
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:141
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:344
+- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:345
+- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:126
+- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:136
+- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:137
+- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:93
+- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:94
+- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:95
+

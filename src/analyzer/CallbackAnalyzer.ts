@@ -152,25 +152,26 @@ export class CallbackAnalyzer {
     usages: CallbackUsage[]
   ): void {
     const visit = (node: ts.Node): void => {
-      // Pattern 1: Function parameter callbacks
-      // Example: processData(data, handleResult)
-      if (ts.isCallExpression(node)) {
-        const callerSymbolId = this.findSymbolIdForExpression(node.expression, sourceFile);
+      try {
+        // Pattern 1: Function parameter callbacks
+        // Example: processData(data, handleResult)
+        if (ts.isCallExpression(node)) {
+          const callerSymbolId = this.findSymbolIdForExpression(node.expression, sourceFile);
 
-        if (callerSymbolId) {
-          const callerName = this.getSymbolName(callerSymbolId);
+          if (callerSymbolId) {
+            const callerName = this.getSymbolName(callerSymbolId);
 
-          for (const arg of node.arguments) {
-            // Check if argument is a function or identifier referring to a function
-            if (
-              ts.isArrowFunction(arg) ||
-              ts.isFunctionExpression(arg) ||
-              ts.isIdentifier(arg)
-            ) {
-              const callbackSymbolId = this.findSymbolIdForExpression(arg, sourceFile);
+            for (const arg of node.arguments) {
+              // Check if argument is a function or identifier referring to a function
+              if (
+                ts.isArrowFunction(arg) ||
+                ts.isFunctionExpression(arg) ||
+                ts.isIdentifier(arg)
+              ) {
+                const callbackSymbolId = this.findSymbolIdForExpression(arg, sourceFile);
 
-              if (callbackSymbolId && callbackSymbolId !== callerSymbolId) {
-                const line = sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1;
+                if (callbackSymbolId && callbackSymbolId !== callerSymbolId) {
+                  const line = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
 
                 usages.push({
                   callerSymbolId,
@@ -202,7 +203,7 @@ export class CallbackAnalyzer {
               const callbackSymbolId = this.findSymbolIdForExpression(callbackArg, sourceFile);
 
               if (callbackSymbolId && callbackSymbolId !== promiseSymbolId) {
-                const line = sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1;
+                const line = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
                 const pattern = methodName === 'then' ? 'promise-then' : 'promise-catch';
 
                 usages.push({
@@ -235,7 +236,7 @@ export class CallbackAnalyzer {
             const enclosingSymbolId = this.findEnclosingFunctionSymbol(node, sourceFile);
 
             if (enclosingSymbolId && enclosingSymbolId !== asyncFunctionSymbolId) {
-              const line = sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1;
+              const line = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
 
               usages.push({
                 callerSymbolId: enclosingSymbolId,
@@ -249,6 +250,9 @@ export class CallbackAnalyzer {
             }
           }
         }
+      }
+      } catch (error) {
+        // Skip nodes that cause errors (e.g., synthetic nodes)
       }
 
       ts.forEachChild(node, visit);

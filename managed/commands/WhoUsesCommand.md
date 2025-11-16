@@ -1,0 +1,249 @@
+# [[WhoUsesCommand]]
+
+Show who uses a symbol through database name search.
+
+## Purpose
+
+Find all symbols that use a given symbol by searching the database by name, enabling name-based reverse dependency analysis.
+
+## Responsibility
+
+- Search symbols by name (exact or prefix match)
+- Handle multiple matching symbols
+- Build dependency graph for matches
+- Display all symbols that depend on each match
+- Group results by file for clarity
+
+## Input
+
+**Command Syntax:**
+```bash
+tsdoc-edge who-uses <symbol-name>
+```
+
+**Parameters:**
+- `symbol-name`: Name of the symbol to search (supports prefix matching)
+
+**Preconditions:**
+- Database must be built (`.tsdoc/symbols.db`)
+- Symbol graph must be indexed
+
+## Output
+
+**Success Case:**
+```
+Who Uses: SymbolName
+
+Found N matching symbol(s):
+
+1. SymbolName (class) - /path/to/file.ts:10
+   Exported: Yes
+
+   Used by 3 symbol(s):
+   • OtherSymbol (class)
+     → /path/to/other.ts:50
+
+   • AnotherSymbol (function)
+     → /path/to/another.ts:100
+```
+
+**No Matches:**
+```
+No symbols found matching: symbol-name
+```
+
+**Error Cases:**
+- Database not found: "No database found. Run 'tsdoc-edge build' first."
+- Missing symbol name: "Symbol name required"
+
+## Context
+
+### Dependencies
+
+- **[[DatabaseManager]]** (internal): Symbol data and name-based search
+- **[[SymbolGraphBuilder]]**: Dependency graph construction
+- **[[BaseCommand]]**: Command infrastructure
+
+### Used By
+
+- Name-based symbol search
+- Cross-file usage analysis
+- Refactoring impact assessment
+
+### Difference from UsedByCommand
+
+- **WhoUsesCommand**: Database-driven, searches by name, can find multiple matches
+- **UsedByCommand**: Registry-driven, searches by ID, single symbol lookup
+
+## Logic
+
+```mermaid
+graph TD
+    A[Start] --> B[Validate Args]
+    B --> C{Database Exists?}
+    C -->|No| D[Error: Database not found]
+    C -->|Yes| E[Load Database]
+    E --> F[Search Symbols by Name]
+    F --> G{Matches Found?}
+    G -->|No| H[Show: No symbols found]
+    G -->|Yes| I[For Each Match]
+    I --> J[Build Symbol Graph]
+    J --> K[Find Dependents]
+    K --> L{Has Dependents?}
+    L -->|No| M[Show: Not used]
+    L -->|Yes| N[Group by File]
+    N --> O[Display Dependents]
+    O --> P[Show Location]
+    P --> Q[Next Match?]
+    Q -->|Yes| I
+    Q -->|No| R[Success]
+```
+
+### Algorithm
+
+1. **Validation Phase:**
+   - Check for help flag
+   - Validate symbol name argument
+   - Verify database file exists
+
+2. **Search Phase:**
+   - Load DatabaseManager
+   - Search symbols by name (exact or prefix)
+   - Handle no matches case
+
+3. **Graph Building:**
+   - For each matching symbol:
+     - Build dependency graph using SymbolGraphBuilder
+     - Extract file path from symbol
+
+4. **Dependent Analysis:**
+   - Find all symbols that depend on the match
+   - Group dependents by file for clarity
+
+5. **Display Phase:**
+   - Show symbol info (name, type, location, export status)
+   - List all dependent symbols with locations
+   - Display count of dependencies
+
+## Effects
+
+**Side Effects:**
+- None (read-only query)
+- Builds temporary in-memory graph
+
+**Performance:**
+- O(n*m) where:
+  - n = number of matching symbols
+  - m = average dependents per symbol
+- Database query + graph construction
+
+## Scope
+
+**Public API:**
+- Command name: `who-uses`
+- Exported from Phase5Commands
+
+**Usage:**
+```bash
+# Find who uses a symbol by name
+tsdoc-edge who-uses UserService
+
+# Prefix matching
+tsdoc-edge who-uses User
+
+# With help flag
+tsdoc-edge who-uses --help
+```
+
+## Related
+
+- [[DepsCommand]]: Show what a symbol depends on
+- [[UsedByCommand]]: Registry-based reverse dependencies by ID
+- [[DatabaseManager]]: Symbol database and queries
+- [[SymbolGraphBuilder]]: Dependency graph construction
+
+## Implementation
+
+Source: `src/commands/Phase5Commands.ts`
+
+**Key Design Decisions:**
+- Database-driven for name-based search
+- Builds graph dynamically per query
+- Groups results by file for readability
+- Shows export status for import guidance
+
+**Alternatives Considered:**
+- Registry-only: No name-based search support
+- Pre-built graph: Memory intensive for large codebases
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:57
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:234
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:423
+- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:424
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:76
+- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:77
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:103
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:143
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:144
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:145
+- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:146
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:127
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:167
+- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:168
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:44
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:84
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:143
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:144
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:145
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:146
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:147
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:148
+- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:149
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:70
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:183
+- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:184
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:115
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:264
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:265
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:266
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:267
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:268
+- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:269
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:87
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:173
+- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:174
+- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:99
+- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:178
+- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:179
+- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:129
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:176
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:336
+- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:337
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:180
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:297
+- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:298
+- [[CLI Command Development Guide]] → /home/user/tsdoc-edge/managed/guides/command-development-guide.md:237
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:248
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:447
+- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:448
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:26
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:87
+- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:88
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:24
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:264
+- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:265
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:135
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:136
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:137
+- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:138
+
+### Implemented By
+
+- WhoUsesCommand → /home/user/tsdoc-edge/src/commands/WhoUsesCommand.ts:54
+

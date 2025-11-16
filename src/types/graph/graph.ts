@@ -11,6 +11,8 @@ export type { SymbolRelationship, ContractSpec, TestMapping, ResponsibilitySpec 
 /**
  * Represents a symbol in the codebase
  * @public
+ * @doc [[Symbol]]
+ * @doc [[Primary Types#Symbol]]
  */
 export interface Symbol {
   /**

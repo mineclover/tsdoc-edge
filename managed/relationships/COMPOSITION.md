@@ -9,7 +9,7 @@ priority: high
 
 # [[Composition Relationship]]
 
-> **Type**: `composition` | **Status**: =À Planned for v2.0
+> **Type**: `composition` | **Status**: =ÔøΩ Planned for v2.0
 
 Track "has-a" relationships where one class contains instances of another class.
 
@@ -24,7 +24,7 @@ class Engine {
 }
 
 class Car {
-  private engine: Engine;  // ê Composition: Car HAS-A Engine
+  private engine: Engine;  // ÔøΩ Composition: Car HAS-A Engine
 
   constructor() {
     this.engine = new Engine();  // Car owns Engine
@@ -43,9 +43,9 @@ class Car {
 
 ```typescript
 class User {
-  private profile: UserProfile;    // ê Composition detected
-  private posts: Post[];           // ê Composition (array)
-  private metadata?: Metadata;     // ê Composition (optional)
+  private profile: UserProfile;    // ÔøΩ Composition detected
+  private posts: Post[];           // ÔøΩ Composition (array)
+  private metadata?: Metadata;     // ÔøΩ Composition (optional)
 }
 ```
 
@@ -61,7 +61,7 @@ class Database {
   private connection: Connection;
 
   constructor(config: Config) {
-    this.connection = new Connection(config);  // ê Strong composition
+    this.connection = new Connection(config);  // ÔøΩ Strong composition
   }
 }
 ```
@@ -125,7 +125,7 @@ INSERT INTO unified_relationships (
 ```typescript
 // Strong composition (cascade delete)
 class Order {
-  private items: OrderItem[] = [];  // If Order deleted í items deleted
+  private items: OrderItem[] = [];  // If Order deleted ÔøΩ items deleted
 }
 
 // Weak composition (independent lifecycle)
@@ -167,7 +167,7 @@ tsdoc-edge deps --type=composition --layer=domain
 # Before deleting Engine class
 tsdoc-edge who-uses Engine --type=composition
 
-# Shows: Car strongly depends on Engine í cannot delete safely
+# Shows: Car strongly depends on Engine ÔøΩ cannot delete safely
 ```
 
 ### 3. Code Ownership Analysis
@@ -196,14 +196,14 @@ For each class C:
   For each field F in C:
     If F.type is class reference:
       If F is initialized with `new`:
-        í Strong composition
+        ÔøΩ Strong composition
       Else if F assigned from constructor param:
-        í Weak composition (aggregation)
+        ÔøΩ Weak composition (aggregation)
       Else if F is optional:
-        í Weak composition
+        ÔøΩ Weak composition
 ```
 
-**Complexity**: O(n◊m) where n=classes, m=avg fields per class
+**Complexity**: O(nÔøΩm) where n=classes, m=avg fields per class
 
 ## Comparison with Other Relationships
 
@@ -230,7 +230,7 @@ For each class C:
 ```bash
 tsdoc-edge who-uses Engine
 
-# Output: Only Car (composition) í Safe to delete if Car deleted
+# Output: Only Car (composition) ÔøΩ Safe to delete if Car deleted
 ```
 
 ### 2. Impact Analysis
@@ -239,7 +239,7 @@ tsdoc-edge who-uses Engine
 ```bash
 tsdoc-edge deps Engine --reverse --type=composition
 
-# Output: All classes that compose Engine í All need updates
+# Output: All classes that compose Engine ÔøΩ All need updates
 ```
 
 ### 3. Design Quality Metrics
@@ -257,14 +257,14 @@ tsdoc-edge deps Engine --reverse --type=composition
 -  Storage in unified_relationships
 
 ### v2.1 (Q3 2025)
-- Û Ownership strength detection
-- Û Lifecycle analysis
-- Û Aggregation vs composition classification
+- ÔøΩ Ownership strength detection
+- ÔøΩ Lifecycle analysis
+- ÔøΩ Aggregation vs composition classification
 
 ### v2.2 (Q4 2025)
-- Û UML diagram generation
-- Û Design pattern detection (Composite, Decorator)
-- Û Dependency injection suggestions
+- ÔøΩ UML diagram generation
+- ÔøΩ Design pattern detection (Composite, Decorator)
+- ÔøΩ Dependency injection suggestions
 
 ## Status
 
@@ -287,3 +287,46 @@ tsdoc-edge deps Engine --reverse --type=composition
 - Dependency (transient usage)
 
 **Tracking**: See [[Unified Relationship Taxonomy]] for complete relationship catalog
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Unified Relationship Taxonomy]] ‚Üí /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:390
+- [[Unified Relationship Taxonomy]] ‚Üí /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:488
+- [[Unified Relationship Taxonomy]] ‚Üí /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:489
+- [[Unified Relationship Taxonomy]] ‚Üí /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:490
+- [[Unified Relationship Taxonomy]] ‚Üí /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:491
+- [[Unified Relationship Taxonomy]] ‚Üí /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:492
+- [[Call Relationships]] ‚Üí /home/user/tsdoc-edge/managed/relationships/CALLS.md:110
+- [[Call Relationships]] ‚Üí /home/user/tsdoc-edge/managed/relationships/CALLS.md:111
+- [[Call Relationships]] ‚Üí /home/user/tsdoc-edge/managed/relationships/CALLS.md:112
+- [[Inheritance]] ‚Üí /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:39
+- [[Inheritance]] ‚Üí /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:40
+- [[Inheritance]] ‚Üí /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:41
+- [[Inheritance]] ‚Üí /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:42
+- [[Inheritance]] ‚Üí /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:43
+- [[Inheritance]] ‚Üí /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:44
+- [[Interface Implementation]] ‚Üí /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:38
+- [[Interface Implementation]] ‚Üí /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:39
+- [[Interface Implementation]] ‚Üí /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:40
+- [[Type Dependency]] ‚Üí /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:58
+- [[Type Dependency]] ‚Üí /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:59
+- [[Type Dependency]] ‚Üí /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:60
+- [[Code Dependency]] ‚Üí /home/user/tsdoc-edge/managed/relationships/code-dependency.md:120
+- [[Code Dependency]] ‚Üí /home/user/tsdoc-edge/managed/relationships/code-dependency.md:121
+- [[Code Dependency]] ‚Üí /home/user/tsdoc-edge/managed/relationships/code-dependency.md:122
+- [[Code Dependency]] ‚Üí /home/user/tsdoc-edge/managed/relationships/code-dependency.md:123
+- [[Code Dependency]] ‚Üí /home/user/tsdoc-edge/managed/relationships/code-dependency.md:124
+- [[Code Dependency]] ‚Üí /home/user/tsdoc-edge/managed/relationships/code-dependency.md:125
+- [[Enhancement]] ‚Üí /home/user/tsdoc-edge/managed/relationships/enhancement.md:46
+- [[Enhancement]] ‚Üí /home/user/tsdoc-edge/managed/relationships/enhancement.md:62
+- [[Enhancement]] ‚Üí /home/user/tsdoc-edge/managed/relationships/enhancement.md:63
+- [[Layer Dependency]] ‚Üí /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:85
+- [[Layer Dependency]] ‚Üí /home/user/tsdoc-edge/managed/relationships/layer-dependency.md:86
+- [[Module Boundary]] ‚Üí /home/user/tsdoc-edge/managed/relationships/module-boundary.md:97
+- [[Module Boundary]] ‚Üí /home/user/tsdoc-edge/managed/relationships/module-boundary.md:116
+- [[Module Boundary]] ‚Üí /home/user/tsdoc-edge/managed/relationships/module-boundary.md:117
+

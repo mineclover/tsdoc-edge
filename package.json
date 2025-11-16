@@ -48,6 +48,7 @@
     "typescript": "^5.3.3"
   },
   "dependencies": {
+    "@gephi/gephi-lite-sdk": "^1.0.0",
     "@microsoft/tsdoc": "^0.15.0",
     "better-sqlite3": "^12.4.1",
     "typescript": "^5.3.3"

@@ -387,11 +387,25 @@ export class TypeDependencyAnalyzer {
    * @returns Symbol or undefined
    */
   private findSymbolByName(symbolName: string): { id: string; name: string } | undefined {
-    for (const [symbolId, symbol] of Object.entries(this.graph.symbols)) {
+    // First try exact name match using nameIndex (O(1))
+    if (this.graph.nameIndex && this.graph.nameIndex.has(symbolName)) {
+      const symbolIds = this.graph.nameIndex.get(symbolName);
+      if (symbolIds && symbolIds.length > 0) {
+        const symbolId = symbolIds[0];
+        const symbol = this.graph.symbols.get(symbolId);
+        if (symbol) {
+          return { id: symbolId, name: symbol.name };
+        }
+      }
+    }
+
+    // Fallback: search through all symbols for partial match
+    for (const [symbolId, symbol] of this.graph.symbols.entries()) {
       if (symbol.name === symbolName || symbol.name.endsWith(`.${symbolName}`)) {
         return { id: symbolId, name: symbol.name };
       }
     }
+
     return undefined;
   }
 }

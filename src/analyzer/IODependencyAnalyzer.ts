@@ -25,6 +25,7 @@ import type { UnifiedRelationship } from '../types/relationships';
  *
  * @public
  * @responsibility Detect data flow relationships via type analysis
+ * @requires SymbolGraph
  */
 export class IODependencyAnalyzer {
   private graph: SymbolGraph;

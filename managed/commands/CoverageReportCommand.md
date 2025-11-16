@@ -239,3 +239,47 @@ echo "Coverage: $coverage%" > coverage-badge.txt
 - TSDoc `@doc` tag specification
 - SSOT (Single Source of Truth) principles
 - Hierarchical coverage calculation
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:98
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:99
+- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:100
+- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:61
+- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:75
+- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:76
+- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:77
+- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:78
+- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:79
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:71
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:72
+- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:73
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:132
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:162
+- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:163
+- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:37
+- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:38
+- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:39
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:146
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:192
+- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:193
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:43
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:109
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:171
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:172
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:173
+- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:174
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:131
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:186
+- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:187
+- [[TestRelationships]] → /home/user/tsdoc-edge/managed/types/TestRelationships.md:74
+- [[TestRelationships]] → /home/user/tsdoc-edge/managed/types/TestRelationships.md:84
+- [[TestRelationships]] → /home/user/tsdoc-edge/managed/types/TestRelationships.md:85
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:259
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:260
+- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:261
+

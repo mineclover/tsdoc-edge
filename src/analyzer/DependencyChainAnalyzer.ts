@@ -202,11 +202,69 @@ export class DependencyChainAnalyzer {
 
   /**
    * Determine chain type based on path structure
+   *
+   * Chain patterns:
+   * - linear: A -> B -> C (each node has exactly one outgoing edge)
+   * - fan-out: A -> B, A -> C, A -> D (one node has multiple outgoing edges)
+   * - fan-in: A -> D, B -> D, C -> D (multiple nodes converge to one)
+   * - diamond: A -> B -> D, A -> C -> D (both fan-out and fan-in)
+   *
+   * @performance O(n) time complexity with pre-computed incoming edges
    */
   private determineChainType(path: string[]): 'linear' | 'fan-out' | 'fan-in' | 'diamond' {
-    // Simple heuristic: linear for now
-    // TODO: Implement fan-out, fan-in, diamond detection
-    return 'linear';
+    if (path.length <= 1) {
+      return 'linear';
+    }
+
+    let hasFanOut = false;
+    let hasFanIn = false;
+
+    // Pre-compute incoming edges for all nodes in path (O(n))
+    const incomingCounts = new Map<string, number>();
+    const pathSet = new Set(path);
+
+    for (const node of path) {
+      const deps = this.graph.adjacencyList.get(node) || [];
+      for (const dep of deps) {
+        if (pathSet.has(dep)) {
+          incomingCounts.set(dep, (incomingCounts.get(dep) || 0) + 1);
+        }
+      }
+    }
+
+    // Check for fan-out and fan-in patterns (O(n))
+    for (let i = 0; i < path.length; i++) {
+      const currentNode = path[i];
+      const dependencies = this.graph.adjacencyList.get(currentNode) || [];
+
+      // Fan-out: Current node has multiple outgoing edges in the path
+      const outgoingInPath = dependencies.filter(dep => pathSet.has(dep));
+      if (outgoingInPath.length > 1) {
+        hasFanOut = true;
+      }
+
+      // Fan-in: Current node has multiple incoming edges
+      const incoming = incomingCounts.get(currentNode) || 0;
+      if (incoming > 1) {
+        hasFanIn = true;
+      }
+
+      // Early exit if both patterns found
+      if (hasFanOut && hasFanIn) {
+        return 'diamond';
+      }
+    }
+
+    // Determine pattern
+    if (hasFanOut && hasFanIn) {
+      return 'diamond';
+    } else if (hasFanOut) {
+      return 'fan-out';
+    } else if (hasFanIn) {
+      return 'fan-in';
+    } else {
+      return 'linear';
+    }
   }
 
   /**

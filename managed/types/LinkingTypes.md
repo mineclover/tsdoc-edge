@@ -145,3 +145,20 @@ interface FixResult {
 - [[DocCodeLinker]]: Creates link index
 - [[LinkValidator]]: Validates and fixes links
 - [[CheckLinksCommand]]: CLI validation
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:38
+- [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:39
+- [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:40
+- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:68
+- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:69
+- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:70
+- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:76
+- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:77
+- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:78
+
