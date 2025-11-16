@@ -20,18 +20,17 @@
 
 ### Type Definition
 
-```typescript
-interface TsdocEdgeConfig {
-  project: ProjectConfig;           // 프로젝트 메타데이터
-  paths: PathsConfig;                // 파일 경로 설정
-  fold: FoldConfig;                  // 주석 접기 설정
-  validation: ValidationConfig;      // 검증 규칙
-  generator: GeneratorConfig;        // 문서 생성 설정
-  preCommit: PreCommitConfig;        // Git hook 설정
-  linkCheck: LinkCheckConfig;        // 링크 검증 설정
-  documentManagement: DocumentManagementConfig; // 문서 관리 설정
-}
-```
+See implementation: `src/types/config/config.ts:16`
+
+**Structure**: 8개 도메인별 설정 그룹으로 구성
+- `project`: ProjectConfig - 프로젝트 메타데이터
+- `paths`: PathsConfig - 파일 경로 설정
+- `fold`: FoldConfig - 주석 접기 설정
+- `validation`: ValidationConfig - 검증 규칙
+- `generator`: GeneratorConfig - 문서 생성 설정
+- `preCommit`: PreCommitConfig - Git hook 설정
+- `linkCheck`: LinkCheckConfig - 링크 검증 설정
+- `documentManagement`: DocumentManagementConfig - 문서 관리 설정
 
 ### Composed Types
 

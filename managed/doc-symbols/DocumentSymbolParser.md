@@ -62,17 +62,16 @@ Some text [[SymbolName]] here
 
 ## Output Structure
 
-```typescript
-interface ParsedDocSymbols {
-  filePath: string;
-  primary?: DocumentSymbol;           // H1 definition
-  auxiliaries: DocumentSymbol[];      // H2+ definitions
-  references: DocumentSymbol[];       // Inline references
-  codeReferences: CodeReference[];    // Links to code
-  symbolFootnoteRefs: SymbolFootnoteRef[];
-  sourceFilePath?: string;            // From **Source**: pattern
-}
-```
+See implementation: `src/doc-symbol/DocumentSymbolParser.ts`
+
+**ParsedDocSymbols**:
+- `filePath`: string - Path to the markdown file
+- `primary`: DocumentSymbol? - H1 definition (canonical SSOT)
+- `auxiliaries`: DocumentSymbol[] - H2+ definitions (context-specific)
+- `references`: DocumentSymbol[] - Inline references
+- `codeReferences`: CodeReference[] - Links to code
+- `symbolFootnoteRefs`: SymbolFootnoteRef[] - Footnote references
+- `sourceFilePath`: string? - From **Source**: pattern
 
 ## Configuration
 

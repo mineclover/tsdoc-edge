@@ -17,16 +17,15 @@ Uses adjacency lists instead of matrix:
 
 ### Graph Components
 
-```typescript
-interface SymbolGraph {
-  symbols: Map<string, Symbol>;
-  relationships: SymbolRelationship[];
-  nameIndex: Map<string, string[]>;           // name → symbol IDs
-  fileIndex: Map<string, string[]>;           // file → symbol IDs
-  adjacencyList: Map<string, string[]>;       // ID → dependencies
-  reverseAdjacencyList: Map<string, string[]>; // ID → dependents
-}
-```
+See implementation: `src/types/graph/graph.ts:101` (SymbolGraph interface)
+
+**Structure**:
+- `symbols`: Map<string, Symbol> - All symbols indexed by ID
+- `relationships`: SymbolRelationship[] - All relationships
+- `nameIndex`: Map<string, string[]> - name → symbol IDs
+- `fileIndex`: Map<string, string[]> - file → symbol IDs
+- `adjacencyList`: Map<string, string[]> - ID → dependencies
+- `reverseAdjacencyList`: Map<string, string[]> - ID → dependents
 
 ## Core Operations
 
