@@ -8,31 +8,25 @@ Type system for interface analysis and domain-driven design structure.
 
 ## Interface Info
 
-Complete interface metadata:
-```typescript
-interface InterfaceInfo {
-  symbol: Symbol;               // Base symbol info
-  properties: InterfaceProperty[];
-  methods: InterfaceMethod[];
-  extends: string[];            // Extended interfaces
-  typeParameters: string[];     // Generic params
-  domain?: string;              // Domain (user, auth, etc.)
-  domainRole?: DomainRole;      // DDD role
-}
-```
+See implementation: [[InterfaceInfo]]
+
+**Key Properties**:
+- `symbol`: Base symbol information
+- `properties`: Interface properties
+- `methods`: Interface methods
+- `extends`: Extended interfaces
+- `domain`: Domain classification (user, auth, etc.)
+- `domainRole`: DDD role (Entity, Service, Repository, etc.)
 
 ## Interface Property
 
-Property definition:
-```typescript
-interface InterfaceProperty {
-  name: string;
-  type: string;
-  isOptional: boolean;
-  isReadonly: boolean;
-  documentation?: string;
-}
-```
+See implementation: [[InterfaceProperty]]
+
+**Key Properties**:
+- `name`: Property name
+- `type`: Property type
+- `isOptional`: Optional property flag
+- `isReadonly`: Readonly property flag
 
 ### Example Property
 
@@ -48,47 +42,31 @@ interface InterfaceProperty {
 
 ## Interface Method
 
-Method signature:
-```typescript
-interface InterfaceMethod {
-  name: string;
-  parameters: MethodParameter[];
-  returnType: string;
-  documentation?: string;
-}
-```
+See implementation: [[InterfaceMethod]]
+
+**Key Properties**:
+- `name`: Method name
+- `parameters`: Method parameters
+- `returnType`: Return type
+- `documentation`: Method documentation
 
 ## Domain Role
 
-DDD pattern classification:
-```typescript
-type DomainRole =
-  | 'Entity'          // Domain entity
-  | 'ValueObject'     // Immutable value
-  | 'Service'         // Domain service
-  | 'Repository'      // Data access
-  | 'Factory'         // Object creation
-  | 'DTO'             // Data transfer
-  | 'Event'           // Domain event
-  | 'Command'         // Command pattern
-  | 'Query'           // Query pattern
-  | 'Unknown';
-```
+See implementation: [[DomainRole]]
+
+**DDD Classifications**:
+- Entity, ValueObject, Service, Repository, Factory
+- DTO, Event, Command, Query
 
 ## Interface Dependency
 
-Relationship between interfaces:
-```typescript
-interface InterfaceDependency {
-  from: string;              // Source interface
-  to: string;                // Target interface
-  type: 'extends' | 'property' | 'method-param' | 'method-return';
-  location: {
-    file: string;
-    line: number;
-  };
-}
-```
+See implementation: [[InterfaceDependency]]
+
+**Key Properties**:
+- `from`: Source interface
+- `to`: Target interface
+- `type`: Dependency type (extends, property, method-param, method-return)
+- `location`: File and line number
 
 ### Dependency Types
 

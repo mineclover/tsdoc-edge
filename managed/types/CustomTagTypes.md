@@ -51,17 +51,13 @@ Track evolution:
 
 ## Symbol Relationship
 
-Relationship between symbols:
-```typescript
-interface SymbolRelationship {
-  type: 'relatedTo' | 'dependsOn' | 'usedBy' | 'implements' | 'extends';
-  from: string;              // Source symbol ID
-  to: string;                // Target symbol ID
-  description?: string;
-  filePath: string;
-  line?: number;
-}
-```
+See implementation: [[SymbolRelationship]]
+
+**Key Properties**:
+- `type`: Relationship type (relatedTo, dependsOn, usedBy, implements, extends)
+- `from`: Source symbol ID
+- `to`: Target symbol ID
+- `filePath`: Where relationship is defined
 
 ### Example
 
@@ -78,17 +74,14 @@ interface SymbolRelationship {
 
 ## Contract Specification
 
-Behavioral contract:
-```typescript
-interface ContractSpec {
-  symbolName: string;
-  description: string;
-  preconditions: string[];   // Before execution
-  postconditions: string[];  // After execution
-  invariants: string[];      // During execution
-  complexity?: string;       // Time/space complexity
-}
-```
+See implementation: [[ContractSpec]]
+
+**Key Properties**:
+- `symbolName`: Symbol name
+- `description`: Contract description
+- `preconditions`: Must be true before execution
+- `postconditions`: Must be true after execution
+- `invariants`: Always true during execution
 
 ### Example
 
@@ -116,17 +109,13 @@ interface ContractSpec {
 
 ## Test Mapping
 
-Link to test coverage:
-```typescript
-interface TestMapping {
-  symbolId: string;
-  testFile: string;          // Test file path
-  testSuite?: string;        // Test suite name
-  testCases: string[];       // Test case descriptions
-  coverage: number;          // 0-100%
-  lastRun?: string;          // ISO timestamp
-}
-```
+See implementation: [[TestMapping]]
+
+**Key Properties**:
+- `symbolId`: Symbol identifier
+- `testFile`: Test file path
+- `testCases`: Test case descriptions
+- `coverage`: Coverage percentage (0-100%)
 
 ### Example
 
@@ -147,15 +136,13 @@ interface TestMapping {
 
 ## Responsibility Specification
 
-What symbol is responsible for:
-```typescript
-interface ResponsibilitySpec {
-  symbolName: string;
-  responsibility: string;    // Primary responsibility
-  scope: string[];           // Areas of concern
-  boundaries: string[];      // What it doesn't do
-}
-```
+See implementation: [[ResponsibilitySpec]]
+
+**Key Properties**:
+- `symbolName`: Symbol name
+- `responsibility`: Primary responsibility
+- `scope`: Areas of concern
+- `boundaries`: What it doesn't do
 
 ### Example
 
@@ -178,19 +165,16 @@ interface ResponsibilitySpec {
 
 ## Design Decision
 
-Architectural choice documentation:
-```typescript
-interface DesignDecision {
-  id: string;
-  title: string;
-  context: string;           // Why decision needed
-  decision: string;          // What was decided
-  alternatives: string[];    // Other options considered
-  rationale: string;         // Why chosen
-  consequences: string[];    // Trade-offs
-  status: 'proposed' | 'accepted' | 'deprecated' | 'superseded';
-}
-```
+See implementation: [[DesignDecision]]
+
+**Key Properties**:
+- `id`: Unique identifier
+- `title`: Decision title
+- `context`: Why decision needed
+- `decision`: What was decided
+- `alternatives`: Other options considered
+- `rationale`: Why chosen
+- `status`: Decision status (proposed, accepted, deprecated, superseded)
 
 ### Example
 
