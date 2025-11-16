@@ -1,0 +1,544 @@
+================================================================================
+TSDoc EDGE - MANAGED DOCUMENTATION CATEGORIZATION REPORT
+================================================================================
+
+ANALYSIS DATE: November 16, 2025
+TOTAL FILES: 274 markdown files
+SOURCE FILES: 231 TypeScript (production) + 86 tests
+
+================================================================================
+1. API DOCUMENTATION (172 files) - CANDIDATES FOR CONSOLIDATION
+================================================================================
+
+Directory: /home/user/tsdoc-edge/managed/commands/ (53 files)
+├─ Coverage: HIGH duplication with src/commands/*.ts
+├─ Keep: /home/user/tsdoc-edge/managed/commands/CommandRegistry.md
+├─ Remove: 50 individual command .md files
+├─ Reason: Each .ts file already has @public, @responsibility, @contract tags
+└─ Action: Move documentation to expanded TSDoc comments
+
+Directory: /home/user/tsdoc-edge/managed/analyzers/ (31 files)
+├─ Coverage: HIGH duplication with src/analyzer/*.ts
+├─ Keep: /home/user/tsdoc-edge/managed/analyzers/index.md
+├─ Remove: 28 individual analyzer .md files (ASTSymbolExtractor.md, CallGraphAnalyzer.md, etc.)
+├─ Reason: Source files have TSDoc; docs are near-verbatim copies
+└─ Action: Move behavior documentation and examples to TSDoc
+
+Directory: /home/user/tsdoc-edge/managed/utilities/ (19 files)
+├─ Coverage: MEDIUM duplication with src/utilities/*.ts, src/utils/*.ts
+├─ Keep: /home/user/tsdoc-edge/managed/utilities/index.md
+├─ Remove: 17 utility .md files (FileScanner.md, SymbolGraphBuilder.md, etc.)
+├─ Reason: Utility classes have methods documented in code
+└─ Action: Move to TSDoc with code examples
+
+Directory: /home/user/tsdoc-edge/managed/types/ (20 files)
+├─ Coverage: MEDIUM duplication with src/types/**/*.ts
+├─ Keep: /home/user/tsdoc-edge/managed/types/index.md
+├─ Remove: 18 type .md files (Symbol.md, DocumentSymbol.md, etc.)
+├─ Reason: Type definitions have inline documentation
+└─ Action: Expand JSDoc comments with usage patterns
+
+Directory: /home/user/tsdoc-edge/managed/primary-types/ (20 files)
+├─ Coverage: MEDIUM duplication with src/types/*.ts (scattered)
+├─ Keep: /home/user/tsdoc-edge/managed/primary-types/index.md
+├─ Remove: 19 type .md files (TsdocEdgeConfig.md, AnalysisReport.md, etc.)
+├─ Reason: Types defined in code, docs explain properties
+└─ Action: Move property documentation to TSDoc @example sections
+
+Directory: /home/user/tsdoc-edge/managed/parser/ (4 files)
+├─ Coverage: MEDIUM duplication with src/parser/*.ts
+├─ Keep: None (all can move to TSDoc)
+├─ Remove: TSDocParser.md, FrontmatterParser.md, EnhancedDocExtractor.md, ModuleSpecTagParser.md
+├─ Reason: Parser classes have parsing logic already documented
+└─ Action: Move algorithms and error handling to TSDoc
+
+Directory: /home/user/tsdoc-edge/managed/parsers/ (3 files)
+├─ Coverage: MEDIUM duplication with src/parser/*.ts
+├─ Keep: None (all can move to TSDoc)
+├─ Remove: DocumentSymbolParser.md, TSDocSymbolParser.md, MermaidSymbolExtractor.md
+├─ Reason: Duplicate of parser/ directory files
+└─ Action: Remove, consolidate with parser/
+
+Directory: /home/user/tsdoc-edge/managed/generator/ (6 files)
+├─ Coverage: MEDIUM duplication with src/generator/*.ts
+├─ Keep: None (all can move to TSDoc)
+├─ Remove: MarkdownGenerator.md, EnhancedMarkdownGenerator.md, ModuleSpecGenerator.md, etc.
+├─ Reason: Generators are classes with documented methods
+└─ Action: Move generation logic and output examples to TSDoc
+
+Directory: /home/user/tsdoc-edge/managed/fold/ (3 files)
+├─ Coverage: MEDIUM duplication with src/fold/*.ts
+├─ Keep: None (all can move to TSDoc)
+├─ Remove: CommentExporter.md, CommentImporter.md, CommentStateManager.md
+├─ Reason: These are utility classes with documented methods
+└─ Action: Move state management documentation to TSDoc
+
+Directory: /home/user/tsdoc-edge/managed/fixer/ (2 files)
+├─ Coverage: MEDIUM duplication with src/fixer/*.ts
+├─ Keep: None (all can move to TSDoc)
+├─ Remove: DocumentationFixer.md, RecursiveImprover.md
+├─ Reason: These are helper classes
+└─ Action: Move fixing logic to TSDoc
+
+Directory: /home/user/tsdoc-edge/managed/core-components/ (2 files)
+├─ Coverage: MEDIUM duplication with src/ core classes
+├─ Keep: /home/user/tsdoc-edge/managed/core-components/CLIRunner.md (framework overview)
+├─ Remove: DatabaseManager.md
+├─ Reason: DatabaseManager is a class that belongs in TSDoc
+└─ Action: Move to TSDoc, keep CLIRunner for framework context
+
+Directory: /home/user/tsdoc-edge/managed/doc-symbols/ (6 files)
+├─ Coverage: 3 API docs + 3 conceptual
+├─ Keep: BacklinkGenerator.md, SymbolReferenceGenerator.md, SymbolReferenceResolver.md
+├─ Remove: DocumentSymbolParser.md, MermaidSymbolExtractor.md (duplicates)
+├─ Also Remove: DocumentSymbolRegistry.md
+├─ Reason: 3 are duplicate docs; 3 are conceptual (KEEP)
+└─ Action: Consolidate duplicates to TSDoc
+
+Directory: /home/user/tsdoc-edge/managed/graph/ (1 file)
+├─ Coverage: MEDIUM duplication with src/graph/DepthTraverser.ts
+├─ Keep: None
+├─ Remove: DepthTraverser.md
+├─ Reason: This is a utility class with documented traversal methods
+└─ Action: Move to TSDoc
+
+Directory: /home/user/tsdoc-edge/managed/storage/ (1 file)
+├─ Coverage: MEDIUM duplication with src/storage/SymbolRegistryManager.ts
+├─ Keep: None
+├─ Remove: SymbolRegistryManager.md
+├─ Reason: This is a class with documented methods
+└─ Action: Move to TSDoc
+
+Directory: /home/user/tsdoc-edge/managed/config/ (1 file)
+├─ Coverage: MEDIUM duplication with src/config/ConfigManager.ts
+├─ Keep: None
+├─ Remove: ConfigManager.md
+├─ Reason: This is a class with documented methods
+└─ Action: Move to TSDoc
+
+API DOCUMENTATION SUBTOTAL:
+- Files to Remove: 158 files (91% of API docs)
+- Files to Keep: 2-3 index files
+- Reason: Direct duplication with TSDoc in source code
+
+================================================================================
+2. CONCEPTUAL DOCUMENTATION (10 files) - KEEP ALL
+================================================================================
+
+Directory: /home/user/tsdoc-edge/managed/concepts/
+
+├─ /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md
+│  Purpose: 7-aspect specification framework (CRITICAL)
+│  Keep: YES - System design philosophy
+│  Reason: Cannot be expressed in code comments; defines development methodology
+│
+├─ /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md
+│  Purpose: [[Symbol]] reference system explanation
+│  Keep: YES - Conceptual model
+│  Reason: Explains linking philosophy
+│
+├─ /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md
+│  Purpose: Relationship categorization framework
+│  Keep: YES - Domain specification
+│  Reason: Defines meaning of relationships in system
+│
+├─ /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md
+│  Purpose: Symbol linking philosophy
+│  Keep: YES - Architecture principle
+│  Reason: Explains system design decision
+│
+├─ /home/user/tsdoc-edge/managed/concepts/ssot.md
+│  Purpose: Single Source of Truth principles
+│  Keep: YES - Core philosophy
+│  Reason: Guides documentation strategy
+│
+├─ /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md
+│  Purpose: Context consistency patterns
+│  Keep: YES - Reliability principles
+│  Reason: Explains guarantees and patterns
+│
+├─ /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md
+│  Purpose: Multi-developer coordination
+│  Keep: YES - Methodology
+│  Reason: Explains parallel work patterns
+│
+├─ /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md
+│  Purpose: Schema design rationale
+│  Keep: YES - Architectural decision
+│  Reason: Explains database modeling choices
+│
+├─ /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md
+│  Purpose: Testing strategy
+│  Keep: YES - Quality assurance
+│  Reason: Defines testing relationships
+│
+└─ /home/user/tsdoc-edge/managed/concepts/index.md
+   Purpose: Concept navigation
+   Keep: YES - Discovery
+
+CONCEPTUAL DOCUMENTATION SUBTOTAL:
+- Files to Remove: 0
+- Files to Keep: 10 files
+- Total pages: ~80+ pages of system design philosophy
+
+================================================================================
+3. RELATIONSHIP DOCUMENTATION (28 files) - KEEP ALL
+================================================================================
+
+Directory: /home/user/tsdoc-edge/managed/relationships/
+
+Files include type specifications for code relationships:
+├─ CALLS.md (1,511 relationships tracked)
+├─ INHERITANCE.md
+├─ INTERFACE-IMPL.md
+├─ CODE-DEPENDENCY.md
+├─ TYPE-DEPENDENCY.md
+├─ COMPOSITION.md
+├─ CALLBACK.md
+├─ PIPELINE.md
+├─ GENERIC-CONSTRAINT.md
+├─ CIRCULAR.md
+├─ TEST-COVERAGE.md
+├─ COLLABORATION.md
+├─ CO-REQUIREMENT.md
+├─ BEHAVIORAL.md
+├─ CONCEPTUAL.md
+├─ ENHANCEMENT.md
+├─ GENERIC-BINDING.md
+├─ OWNERSHIP.md
+├─ RESPONSE.md
+├─ STANDARD-FORMAT.md
+├─ TYPE-VARIANCE.md
+├─ STRUCTURAL.md
+├─ CUSTOM.md
+└─ index.md
+
+Purpose: Define domain-specific relationship taxonomy
+Keep: YES - All 28 files
+Reason: 
+- Serve as specification for analyzer/relationship-extraction-rules
+- Cannot be expressed in code alone
+- Used by multiple analyzers as classification reference
+- Define semantic meaning of relationships
+
+RELATIONSHIP DOCUMENTATION SUBTOTAL:
+- Files to Remove: 0
+- Files to Keep: 28 files
+- Function: Domain taxonomy and analyzer specifications
+
+================================================================================
+4. WORKFLOW/GUIDE DOCUMENTATION (12 files) - KEEP ALL
+================================================================================
+
+Directory: /home/user/tsdoc-edge/managed/workflows/ (7 files)
+
+├─ /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md
+│  Purpose: Using work-context command
+│  Keep: YES - User procedure
+│
+├─ /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md
+│  Purpose: Mermaid diagram workflow
+│  Keep: YES - User procedure
+│
+├─ /home/user/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md
+│  Purpose: Example usage
+│  Keep: YES - Learning material
+│
+├─ /home/user/tsdoc-edge/managed/workflows/dead-code-deletion-workflow.md
+│  Purpose: Dead code cleanup
+│  Keep: YES - User procedure
+│
+├─ /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md
+│  Purpose: System improvements
+│  Keep: YES - Process documentation
+│
+├─ /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md
+│  Purpose: Development roadmap
+│  Keep: YES - Planning documentation
+│
+└─ /home/user/tsdoc-edge/managed/workflows/index.md
+   Purpose: Workflow navigation
+   Keep: YES - Discovery
+
+Directory: /home/user/tsdoc-edge/managed/guides/ (5 files)
+
+├─ /home/user/tsdoc-edge/managed/guides/command-development-guide.md
+│  Purpose: Creating new commands
+│  Keep: YES - Developer onboarding
+│
+├─ /home/user/tsdoc-edge/managed/guides/analyzer-development-guide.md
+│  Purpose: Creating new analyzers
+│  Keep: YES - Developer onboarding
+│
+├─ /home/user/tsdoc-edge/managed/guides/build-pipeline-guide.md
+│  Purpose: Understanding build process
+│  Keep: YES - Developer documentation
+│
+├─ /home/user/tsdoc-edge/managed/guides/relationship-analysis-guide.md
+│  Purpose: Relationship analysis patterns
+│  Keep: YES - Usage documentation
+│
+└─ /home/user/tsdoc-edge/managed/guides/index.md
+   Purpose: Guide navigation
+   Keep: YES - Discovery
+
+WORKFLOW/GUIDE DOCUMENTATION SUBTOTAL:
+- Files to Remove: 0
+- Files to Keep: 12 files
+- Function: User/developer procedures and onboarding
+
+================================================================================
+5. ARCHITECTURE DOCUMENTATION (5 files) - KEEP ALL
+================================================================================
+
+Directory: /home/user/tsdoc-edge/managed/architecture/ (5 files + subdir)
+
+├─ /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md
+│  Purpose: Overall system design
+│  Keep: YES - System-level architecture
+│  Size: Large document with component interactions
+│
+├─ /home/user/tsdoc-edge/managed/architecture/analysis-extraction-systems-2025-11-07.md
+│  Purpose: Analysis pipeline
+│  Keep: YES - Architectural subsystem
+│  Size: Detailed pipeline documentation
+│
+├─ /home/user/tsdoc-edge/managed/architecture/database-relationships-2025-11-07.md
+│  Purpose: Database schema and relationships
+│  Keep: YES - Data model documentation
+│  Size: Comprehensive schema reference
+│
+├─ /home/user/tsdoc-edge/managed/architecture/mermaid-validation-workflow.md
+│  Purpose: Diagram validation flow
+│  Keep: YES - Workflow documentation
+│  Size: Process flow documentation
+│
+├─ /home/user/tsdoc-edge/managed/architecture/README.md
+│  Purpose: Architecture docs index
+│  Keep: YES - Navigation
+│
+└─ /home/user/tsdoc-edge/managed/architecture/diagrams/
+   ├─ README.md (diagram overview)
+   ├─ mermaid-workflow-complete.md (workflow diagrams)
+   └─ MERMAID_RULES.md (diagram rules)
+
+ARCHITECTURE DOCUMENTATION SUBTOTAL:
+- Files to Remove: 0
+- Files to Keep: 5+ files
+- Function: System-level design and interaction documentation
+
+================================================================================
+6. FEATURE DOCUMENTATION (19 files) - REVIEW AND SPLIT
+================================================================================
+
+Directory: /home/user/tsdoc-edge/managed/features/
+
+KEEP - Conceptual/Workflow Features (8 files):
+├─ /home/user/tsdoc-edge/managed/features/core-workflow.md (conceptual)
+├─ /home/user/tsdoc-edge/managed/features/core-features-catalog.md (overview)
+├─ /home/user/tsdoc-edge/managed/features/analysis-features.md (capabilities)
+├─ /home/user/tsdoc-edge/managed/features/auto-indexing.md (workflow)
+├─ /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md (feature)
+├─ /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md (feature)
+├─ /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md (feature)
+└─ /home/user/tsdoc-edge/managed/features/CICDIntegration.md (feature)
+
+REVIEW/ARCHIVE - Status & Analysis Docs (5 files):
+├─ /home/user/tsdoc-edge/managed/features/analyzer-status.md (ARCHIVE)
+├─ /home/user/tsdoc-edge/managed/features/codebase-health-report.md (ARCHIVE)
+├─ /home/user/tsdoc-edge/managed/features/context-quality-improvements.md (ARCHIVE)
+├─ /home/user/tsdoc-edge/managed/features/gephi-export.md (REVIEW)
+└─ /home/user/tsdoc-edge/managed/features/QueryCommands.md (REVIEW)
+
+REMOVE - Duplicates (1 file):
+└─ /home/user/tsdoc-edge/managed/features/document-symbol-system.md
+   Reason: Duplicate of /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md
+
+FEATURE DOCUMENTATION SUBTOTAL:
+- Files to Keep: 8 files (feature descriptions)
+- Files to Archive: 5 files (session notes, status)
+- Files to Remove: 1 file (duplicate)
+- Files to Review: 5 files (unclear status)
+
+================================================================================
+7. INDEX/TOC FILES (2+ files) - KEEP
+================================================================================
+
+Directory: /home/user/tsdoc-edge/managed/ (root)
+
+├─ /home/user/tsdoc-edge/managed/README.md
+│  Purpose: Main documentation entry point
+│  Keep: YES - Critical navigation hub
+│  Size: Large comprehensive index
+│
+├─ /home/user/tsdoc-edge/managed/COMMANDS.md
+│  Purpose: CLI command reference
+│  Keep: YES - Command discovery
+│  Size: Command catalog
+│
+├─ /home/user/tsdoc-edge/managed/quick-start.md
+│  Purpose: Getting started guide
+│  Keep: YES - Onboarding
+│  Size: Quick reference
+│
+└─ /home/user/tsdoc-edge/managed/CLI-COMMANDS.md
+   Purpose: Alternative command reference
+   Action: CONSOLIDATE with COMMANDS.md (avoid duplication)
+
+INDEX/TOC SUBTOTAL:
+- Files to Keep: 3 files (README, COMMANDS, quick-start)
+- Files to Consolidate: 1 file (CLI-COMMANDS)
+
+================================================================================
+8. ARCHIVE (21 files) - REVIEW/DELETE
+================================================================================
+
+Directory: /home/user/tsdoc-edge/managed/archive/
+
+├─ archive/concepts/ (4 files)
+│  ├─ progressive-disclosure.md
+│  ├─ user-mental-model.md
+│  ├─ immediate-feedback.md
+│  └─ purpose-refinement.md
+│  Status: KEEP recent, DELETE old (6+ months)
+│
+├─ archive/history/ (5 files)
+│  ├─ implementation-progress-2025-11-07.md
+│  ├─ SESSION_SUMMARY.md
+│  ├─ system-review-2025-11-06.md
+│  ├─ implementation-session-2025-11-07.md
+│  └─ work-context-integration-2025-11-07.md
+│  Status: KEEP recent (< 2 weeks), DELETE old
+│
+├─ archive/sessions/ (7 files)
+│  ├─ PARALLEL-ENHANCEMENT-RESULTS.md
+│  ├─ IMPROVEMENT-SUMMARY.md
+│  ├─ DOCUMENTATION-AUDIT.md
+│  ├─ IMPROVEMENT-RESULTS.md
+│  ├─ CLEANUP-SUMMARY.md
+│  ├─ SESSION-2025-11-08-FINAL.md
+│  └─ IMPROVEMENT-2025-11-08.md
+│  Status: KEEP recent, DELETE old
+│
+├─ archive/specs/ (1 file)
+│  └─ enhanced-database-schema.md
+│  Status: DELETE (duplicate in concepts/)
+│
+└─ archive/workflows/ (4 files)
+   ├─ add-enhanced-docs-workflow.md
+   ├─ cognitive-user-flow.md
+   ├─ knowledge-base-workflow.md
+   └─ symbol-linking-workflow.md
+   Status: Review for archival/deletion
+
+ARCHIVE SUBTOTAL:
+- Files to Keep (recent): 11 files
+- Files to Delete (old): 10 files
+- Function: Historical reference
+
+================================================================================
+SUMMARY BY CATEGORY
+================================================================================
+
+Category                      Files  Keep  Remove  Action
+─────────────────────────────────────────────────────────────
+API Documentation (TSDoc      172    2-3   170     CONSOLIDATE
+  - Commands                   53    1     52
+  - Analyzers                  31    1     30
+  - Types                      20    1     19
+  - Primary Types              20    1     19
+  - Utilities                  19    1     18
+  - Parsers                     7    0      7
+  - Generators                  6    0      6
+  - Other classes             16    0     16
+
+Conceptual Docs                10   10      0     KEEP
+  - Concepts                   10   10      0     Core philosophy
+
+Relationship Docs              28   28      0     KEEP
+  - Relationships              28   28      0     Domain taxonomy
+
+Workflow/Guide Docs            12   12      0     KEEP
+  - Workflows                   7    7      0     User procedures
+  - Guides                      5    5      0     Developer onboarding
+
+Architecture Docs               5    5      0     KEEP
+  - Architecture                5    5      0     System design
+
+Feature Docs                   19   13     6      REVIEW
+  - Conceptual features         8    8      0     Capabilities
+  - Status/analysis             5    0      5     Archive
+  - Duplicates                  1    0      1     Remove
+  - Other                       5    5      0     Review
+
+Index/TOC Files                4    3      1      MAINTAIN
+  - Main docs                   4    3      1     Navigation
+
+Archive                        21   11     10     DELETE OLD
+  - Historical                 21   11     10     6+ months
+
+─────────────────────────────────────────────────────────────
+TOTAL                         274  115    159
+
+AFTER CONSOLIDATION: ~115 files (-59%)
+
+================================================================================
+KEY FINDINGS
+================================================================================
+
+1. DUPLICATION LEVEL: 58% of markdown files (158/274) duplicate information
+   already present in TypeScript source code TSDoc comments.
+
+2. SINGLE SOURCE OF TRUTH: Source code is the authoritative source for:
+   - Class/function documentation (@public, @param, @returns)
+   - Type specifications (@interface, @type)
+   - API contracts (@responsibility, @contract)
+
+3. IRREPLACEABLE DOCUMENTATION: 42% of files (116/274) document:
+   - System-level architecture and design decisions
+   - Domain-specific relationships and taxonomy
+   - User workflows and procedures
+   - Developer guides and methodology
+
+4. CONSOLIDATION OPPORTUNITY: 
+   - 158 API documentation files can be merged into 100+ source files
+   - Reduces documentation surface area by 59%
+   - Improves maintainability (single source of truth)
+   - Enhances IDE integration and developer experience
+
+5. LINK STRATEGY NEEDED:
+   - Current: Code → Docs (@doc tags pointing to managed/)
+   - After: Docs → Code (@see tags pointing to source)
+   - Conceptual docs remain as reference architecture
+
+================================================================================
+RECOMMENDATIONS
+================================================================================
+
+IMMEDIATE (Phase 1 - Week 1):
+1. Enhance TSDoc in source files (100+ files)
+   - Add @param, @returns, @example tags
+   - Add @see cross-references to conceptual docs
+   
+2. Create deprecation notices in markdown
+   - Mark API docs as "See source code for current documentation"
+
+SHORT-TERM (Phase 2-3, Weeks 2-3):
+1. Remove 158 redundant API documentation files
+   - Start with lowest-impact directories
+   - Update all cross-references
+   
+2. Consolidate architecture documents
+   - Merge similar documents
+   - Create unified system design document
+
+MEDIUM-TERM (Phase 4, Week 4):
+1. Update navigation and index files
+   - Update README.md with new structure
+   - Generate API reference from TSDoc
+   
+2. Verify all links and references
+   - Automated link checking
+   - Test IDE documentation lookup
+
+================================================================================
