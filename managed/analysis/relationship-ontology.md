@@ -350,7 +350,7 @@ TSDoc Edge defines **26 relationship types** across **10 categories**, but curre
 - `code-dependency` = module-level imports
 - `inheritance` = OOP class hierarchy
 
-#### 3. Semantic Relationships
+#### 3. Semantic Relationships - Most Valuable for Developer Experience
 
 **Issue**: `conceptual-relation` is very broad and could overlap with many specific types.
 
@@ -360,11 +360,21 @@ TSDoc Edge defines **26 relationship types** across **10 categories**, but curre
   - `feature-grouping` (if it were implemented)
   - `doc-reference` (if it were implemented)
 
-**Verdict**: ⚠️ **POTENTIALLY OVER-BROAD**
-- Consider splitting into:
-  - `naming-pattern-relation` (shared domain prefix)
-  - `explicit-relation` (`@relatedTo` tags)
-  - `feature-grouping` (for feature-level grouping)
+**Verdict**: ⚠️ **OVER-BROAD - Requires Refinement** (Priority 1)
+
+**Why prioritize semantic relationships?**:
+1. **Most intuitive**: Developers naturally think in terms of "related concepts"
+2. **Universal applicability**: Works across all project types
+3. **Immediate value**: Helps code navigation without configuration
+4. **Objectively detectable**: Can be derived from naming, tags, and file structure
+5. **Foundation for documentation**: Critical for SSOT completeness
+
+**Recommended split**:
+  - `naming-pattern-relation` (shared domain prefix, e.g., User* → User domain)
+  - `explicit-semantic-relation` (`@relatedTo` tags - developer intent)
+  - `feature-grouping` (feature boundaries from file structure)
+
+**Impact**: Transform 465 generic relationships into precise, queryable semantic connections
 
 ### Over-Connected Relationships
 
@@ -432,15 +442,21 @@ feature-grouping (feature-level clustering)
 
 ### 3. Implement High-Value Missing Types (ENHANCE)
 
-**Priority 1** - Behavioral relationships:
-- `calls`: Function/method call relationships → Critical for understanding execution flow
+**Priority 1** - Semantic relationships (most intuitive and valuable):
+- Split `conceptual-relation` into specific types
+- `naming-pattern-relation`: Domain-based grouping
+- `explicit-semantic-relation`: Explicit `@relatedTo` tags
+- `feature-grouping`: Feature-level clustering
 
-**Priority 2** - Architectural relationships:
-- `layer-dependency`: Track architectural violations
-- `module-boundary`: Cross-module dependencies
+**Priority 2** - Behavioral relationships:
+- `calls`: Function/method call relationships → Critical for understanding execution flow
 
 **Priority 3** - Data flow:
 - `io-dependency`: Data pipeline tracking
+
+**Future consideration** - Architectural relationships (subjective, project-specific):
+- `layer-dependency`: Track architectural violations (requires project-specific rules)
+- `module-boundary`: Cross-module dependencies
 
 ---
 
@@ -568,40 +584,76 @@ graph LR
 
 ## Implementation Plan
 
-### Phase 1: Refine Existing (Pruning)
+### Phase 1: Refine Semantic Relationships (Priority 1 - Most Valuable)
+
+**Focus**: Intuitive, semantic relationships that provide immediate value
 
 **Tasks**:
-1. Split `conceptual-relation` into 3 types:
+1. Split `conceptual-relation` into 3 specific types:
    - Create `naming-pattern-relation` analyzer
+     - Group symbols by shared domain prefix (e.g., User*, Database*)
+     - Algorithm: Extract common prefixes, create pairwise links
    - Create `explicit-semantic-relation` analyzer
-   - Create `feature-grouping` analyzer (future)
+     - Parse `@relatedTo` TSDoc tags
+     - Create bidirectional semantic links
+   - Create `feature-grouping` analyzer
+     - Cluster symbols by feature boundaries
+     - Use file path patterns and naming conventions
 2. Update database schema to support new types
-3. Migrate existing `conceptual-relation` relationships
-4. Update documentation
+3. Migrate existing 465 `conceptual-relation` relationships
+4. Update documentation and examples
 
-**Estimated effort**: 2 days
-
----
-
-### Phase 2: Implement High-Priority Missing Types (Enhancement)
-
-**Tasks**:
-1. Implement `calls` relationship extractor
-   - Parse function/method call AST nodes
-   - Track caller → callee relationships
-2. Implement `layer-dependency` validator
-   - Define layer rules in config
-   - Detect cross-layer violations
-3. Update BuildCommand to collect new types
+**Why first?**:
+- Most intuitive for developers
+- Immediate value for code navigation
+- Foundation for SSOT documentation completeness
 
 **Estimated effort**: 3 days
 
 ---
 
-### Phase 3: Prune Unused Types (Cleanup)
+### Phase 2: Implement Behavioral Relationships (Priority 2)
+
+**Focus**: Runtime execution flow
 
 **Tasks**:
-1. Remove unused types from `unified.ts`:
+1. Implement `calls` relationship extractor
+   - Parse function/method call AST nodes
+   - Track caller → callee relationships
+   - Filter noise (console.log, assertions, etc.)
+2. Update BuildCommand to collect call relationships
+3. Add call graph visualization
+4. Test with complex execution flows
+
+**Why second?**:
+- Critical for understanding runtime behavior
+- Complements structural relationships
+- Well-defined, objective criteria
+
+**Estimated effort**: 2 days
+
+---
+
+### Phase 3: Data Flow Analysis (Priority 3)
+
+**Focus**: Data pipeline tracking
+
+**Tasks**:
+1. Implement `io-dependency` relationship extractor
+   - Detect parameter → return value flows
+   - Track data transformations
+   - Map input sources to output consumers
+2. Integrate with type system analysis
+3. Update documentation
+
+**Estimated effort**: 2 days
+
+---
+
+### Phase 4: Cleanup and Deprecation (Low Priority)
+
+**Tasks**:
+1. Remove low-value unused types from `unified.ts`:
    - `mutual-exclusion`
    - `co-requirement`
    - `fallback`
@@ -611,6 +663,180 @@ graph LR
 3. Clean up references in codebase
 
 **Estimated effort**: 1 day
+
+---
+
+### Future Consideration: Architectural Relationships (Deferred)
+
+**Rationale**: Subjective and project-specific, requires custom configuration
+
+**Potential tasks** (when needed):
+1. Define layer rules in `.tsdoc.config.json`:
+   ```json
+   {
+     "architecturalLayers": {
+       "presentation": ["src/commands/**"],
+       "domain": ["src/analyzer/**", "src/parser/**"],
+       "infrastructure": ["src/storage/**"]
+     },
+     "layerRules": {
+       "presentation": ["domain"],
+       "domain": [],
+       "infrastructure": []
+     }
+   }
+   ```
+2. Implement `layer-dependency` validator
+3. Detect architectural violations
+4. Generate violation reports
+
+**Estimated effort**: 3 days (when prioritized)
+
+---
+
+## Semantic Relationship Design Details
+
+### Why Semantic Relationships Are Most Valuable
+
+**Developer Mental Model Alignment**:
+When developers navigate code, they think:
+- "What else is related to User management?"
+- "Which components belong to the Database feature?"
+- "What symbols are conceptually linked?"
+
+These are **semantic questions**, not structural ones.
+
+**Current Gap**:
+- Structural relationships (imports, inheritance): Well-covered (3,144 relationships)
+- Semantic relationships: Under-represented (465 generic `conceptual-relation`)
+- Result: Developers can't easily navigate by **concept** or **feature**
+
+### Proposed Semantic Relationship Types
+
+#### 1. `naming-pattern-relation` (Domain Grouping)
+
+**Purpose**: Group symbols that belong to the same domain based on naming conventions.
+
+**Detection Algorithm**:
+```typescript
+// Extract domain prefix from symbol names
+User + Service → User domain
+User + Repository → User domain
+User + Controller → User domain
+
+// Create relationships:
+UserService ~ UserRepository (naming-pattern)
+UserService ~ UserController (naming-pattern)
+UserRepository ~ UserController (naming-pattern)
+```
+
+**Examples**:
+```
+Database domain:
+  DatabaseManager ~ DatabaseConfig ~ DatabaseConnection
+
+Symbol domain:
+  SymbolGraph ~ SymbolParser ~ SymbolRegistry
+
+Test domain:
+  TestRunner ~ TestReporter ~ TestCoverage
+```
+
+**Value**: Instant domain clustering without manual documentation
+
+#### 2. `explicit-semantic-relation` (Developer Intent)
+
+**Purpose**: Capture explicit relationships declared by developers via `@relatedTo` tags.
+
+**Detection**: Parse TSDoc `@relatedTo` tags
+
+**Example**:
+```typescript
+/**
+ * User authentication service
+ * @relatedTo UserRepository - Data access
+ * @relatedTo TokenManager - JWT handling
+ * @relatedTo AuthConfig - Configuration
+ */
+export class UserService {
+  // ...
+}
+```
+
+**Relationships Created**:
+```
+UserService ~ UserRepository (explicit-semantic, confidence: 1.0)
+UserService ~ TokenManager (explicit-semantic, confidence: 1.0)
+UserService ~ AuthConfig (explicit-semantic, confidence: 1.0)
+```
+
+**Value**: Captures domain knowledge that can't be inferred from code structure
+
+#### 3. `feature-grouping` (Feature Boundaries)
+
+**Purpose**: Cluster symbols by feature based on file structure.
+
+**Detection Algorithm**:
+```typescript
+// Group by directory structure
+src/features/authentication/ → Authentication feature
+src/features/database/ → Database feature
+
+// Or by file path patterns
+src/analyzer/*.ts → Analysis feature
+src/parser/*.ts → Parsing feature
+src/storage/*.ts → Storage feature
+```
+
+**Examples**:
+```
+Authentication feature:
+  AuthService, TokenManager, PasswordHasher, AuthConfig
+  → All linked via feature-grouping
+
+Analysis feature:
+  TestCoverageAnalyzer, ConceptualRelationAnalyzer, ASTSymbolExtractor
+  → All linked via feature-grouping
+```
+
+**Value**: Feature-based code navigation
+
+### Semantic Relationships vs Structural Relationships
+
+| Dimension | Structural (current) | Semantic (proposed) |
+|-----------|---------------------|---------------------|
+| **Question** | "What does X import?" | "What's related to X conceptually?" |
+| **Scope** | Single file dependencies | Cross-cutting domains |
+| **Discovery** | AST parsing | Naming + docs + structure |
+| **Changeability** | Refactoring changes it | More stable |
+| **Value for docs** | Low (auto-generated) | High (captures intent) |
+
+### Migration Path: `conceptual-relation` → 3 Types
+
+**Current State** (465 relationships):
+```
+conceptual-relation:
+  - 60% naming-pattern matches
+  - 30% @relatedTo tags
+  - 10% other heuristics
+```
+
+**After Migration**:
+```
+naming-pattern-relation: ~280 relationships
+  Example: DatabaseManager ~ DatabaseConfig
+
+explicit-semantic-relation: ~140 relationships
+  Example: UserService ~ UserRepository (@relatedTo)
+
+feature-grouping: ~45 relationships
+  Example: All symbols in src/analyzer/* → Analysis feature
+```
+
+**Benefits**:
+- More precise queries ("show me all naming-pattern relationships")
+- Better confidence scoring (explicit > pattern)
+- Clearer semantics for documentation generation
 
 ---
 
@@ -667,12 +893,32 @@ graph LR
 
 ## Conclusion
 
-The current relationship ontology is **focused but imbalanced**, with heavy emphasis on testing relationships (68.7%) and minimal coverage of behavioral, architectural, and data-flow dimensions.
+The current relationship ontology is **focused but imbalanced**, with heavy emphasis on testing relationships (68.7%) and minimal coverage of semantic, behavioral, and data-flow dimensions.
 
-**Key Actions**:
-1. ✅ **Prune**: Refine `conceptual-relation` into more specific types
-2. ✅ **Enhance**: Implement `calls`, `layer-dependency`, `io-dependency`
-3. ✅ **Cleanup**: Remove 5 low-value defined types
-4. ✅ **Balance**: Shift focus to behavioral and architectural relationships
+**Key Actions (Prioritized by Intuitiveness and Value)**:
 
-This will result in a more **precise, balanced, and queryable** ontology optimized for SSOT documentation completeness.
+1. **Phase 1 - Semantic Refinement** (Highest Value):
+   - ✅ Refine `conceptual-relation` into 3 intuitive types
+   - Focus: `naming-pattern-relation`, `explicit-semantic-relation`, `feature-grouping`
+   - **Why first**: Most intuitive, immediate developer value, foundation for navigation
+
+2. **Phase 2 - Behavioral Analysis**:
+   - ✅ Implement `calls` relationship extractor
+   - Focus: Runtime execution flow understanding
+
+3. **Phase 3 - Data Flow**:
+   - ✅ Implement `io-dependency` for data pipeline tracking
+
+4. **Phase 4 - Cleanup**:
+   - ✅ Remove 5 low-value defined types
+
+5. **Future - Architectural** (Deferred):
+   - ⏸️ `layer-dependency` - Subjective, project-specific rules required
+   - Implement only when project demands it
+
+**Design Philosophy**: Prioritize **semantic, intuitive relationships** over architectural constraints. Focus on relationships that are:
+- Objectively detectable from code
+- Universally meaningful across projects
+- Immediately valuable for developers
+
+This will result in a more **precise, intuitive, and developer-friendly** ontology optimized for SSOT documentation completeness without imposing subjective architectural constraints.
