@@ -493,12 +493,12 @@ export class BuildCommand extends BaseCommand {
 
           const success = dbManager.insertUnifiedRelationship({
             id: relationshipId,
-            type: 'conceptual-relation',
+            type: 'doc-reference',
             category: 'semantic',
             fromSymbols: [docRel.symbolId],
             toSymbols: [`doc:${docRel.docRef}`],
             direction: 'bidirectional',
-            strength: 'medium',
+            strength: 'strong',  // Doc references are explicit, so strong
             evidence: [{
               type: 'documentation',
               source: docRel.filePath,
@@ -509,6 +509,10 @@ export class BuildCommand extends BaseCommand {
             confidence: 1.0,
             filePath: docRel.filePath,
             line: docRel.line,
+            properties: {
+              docTag: true,
+              sourceType: 'tsdoc-tag',
+            },
             description: `${docRel.symbolName} documented in [[${docRel.docRef}]]`,
           });
 
