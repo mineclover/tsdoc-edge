@@ -40,3 +40,4 @@ docs/generated/
 
 # Temporary files
 tmp/
+*.backup*
