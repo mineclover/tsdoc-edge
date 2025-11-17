@@ -440,10 +440,39 @@ export class BuildCommand extends BaseCommand {
           }
         }
 
+        // Insert covers-scenario relationships
+        for (const scenarioRel of testRelationships.coversScenarioRelations) {
+          try {
+            dbManager.insertUnifiedRelationship({
+              id: scenarioRel.id,
+              type: scenarioRel.type,
+              category: scenarioRel.category,
+              fromSymbols: scenarioRel.fromSymbols,
+              toSymbols: scenarioRel.toSymbols,
+              direction: 'unidirectional',
+              strength: scenarioRel.confidence > 0.7 ? 'medium' : 'weak',
+              evidence: [{
+                type: 'semantic',
+                source: 'scenario-matching',
+                confidence: scenarioRel.confidence,
+              }],
+              discoveredBy: 'test-parser',
+              confidence: scenarioRel.confidence,
+              description: `Test case covers scenario`,
+            });
+            result.relationshipsInserted++;
+          } catch (error) {
+            result.errors.push(`Failed to insert covers-scenario relationship: ${scenarioRel.id}`);
+          }
+        }
+
         // Log coverage stats
         const stats = testRelationships.coverageStats;
         this.printSuccess(`Test coverage: ${stats.testCasesWithCoverage}/${stats.totalTestCases} test cases cover ${stats.totalTestedSymbols} symbols`);
         this.printInfo(`Average assertions per test: ${stats.averageAssertions.toFixed(1)}`);
+        if (stats.totalScenarios > 0) {
+          this.printInfo(`Scenario coverage: ${stats.scenariosWithCoverage}/${stats.totalScenarios} scenarios covered`);
+        }
       }
 
       // Insert doc relationships

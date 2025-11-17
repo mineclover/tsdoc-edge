@@ -43,10 +43,13 @@ export interface TestRelationship {
 export interface RelationshipExtractionResult {
   testCoverageRelations: TestRelationship[];
   containsRelations: TestRelationship[];
+  coversScenarioRelations: TestRelationship[];
   coverageStats: {
     totalTestCases: number;
     testCasesWithCoverage: number;
     totalTestedSymbols: number;
+    totalScenarios: number;
+    scenariosWithCoverage: number;
     averageAssertions: number;
   };
 }
@@ -78,14 +81,17 @@ export class TestCoverageAnalyzer {
   analyzeTestCoverage(testSymbols: TestSymbol[]): RelationshipExtractionResult {
     const testCoverageRelations: TestRelationship[] = [];
     const containsRelations: TestRelationship[] = [];
+    const coversScenarioRelations: TestRelationship[] = [];
 
     const testCases = testSymbols.filter((s): s is TestCase => s.type === 'test-case');
     const testSuites = testSymbols.filter((s): s is TestSuite => s.type === 'test-suite');
+    const testScenarios = testSymbols.filter((s) => s.type === 'test-scenario');
 
     let testCasesWithCoverage = 0;
     const testedSymbolsSet = new Set<string>();
     let totalAssertions = 0;
     let casesWithAssertions = 0;
+    const scenariosWithCoverage = new Set<string>();
 
     // 1. Create test-coverage relationships (test-case → implementation)
     for (const testCase of testCases) {
@@ -181,6 +187,30 @@ export class TestCoverageAnalyzer {
       }
     }
 
+    // 3. Create covers-scenario relationships (test-case → test-scenario)
+    for (const scenario of testScenarios) {
+      // Match test cases to scenarios by file path and semantic similarity
+      const scenarioCases = this.matchTestCasesToScenario(scenario, testCases);
+
+      for (const testCase of scenarioCases) {
+        const relationId = ('covers-scenario-' + testCase.id + '-' + scenario.id)
+          .toLowerCase()
+          .replace(/[^a-z0-9-]/g, '-');
+
+        coversScenarioRelations.push({
+          id: relationId,
+          type: 'covers-scenario',
+          fromSymbols: [testCase.id],
+          toSymbols: [scenario.id],
+          category: 'testing',
+          confidence: this.calculateScenarioMatchConfidence(testCase, scenario),
+          metadata: {},
+        });
+
+        scenariosWithCoverage.add(scenario.id);
+      }
+    }
+
     // Calculate stats
     const averageAssertions = casesWithAssertions > 0
       ? totalAssertions / casesWithAssertions
@@ -189,20 +219,109 @@ export class TestCoverageAnalyzer {
     return {
       testCoverageRelations,
       containsRelations,
+      coversScenarioRelations,
       coverageStats: {
         totalTestCases: testCases.length,
         testCasesWithCoverage,
         totalTestedSymbols: testedSymbolsSet.size,
+        totalScenarios: testScenarios.length,
+        scenariosWithCoverage: scenariosWithCoverage.size,
         averageAssertions,
       },
     };
   }
 
   /**
+   * Match test cases to a test scenario
+   *
+   * @param scenario - Test scenario symbol
+   * @param testCases - All test cases
+   * @returns Test cases that cover this scenario
+   */
+  private matchTestCasesToScenario(scenario: TestSymbol, testCases: TestCase[]): TestCase[] {
+    const matches: TestCase[] = [];
+
+    // Only match test cases in the same file
+    const casesInSameFile = testCases.filter(tc => tc.filePath === scenario.filePath);
+
+    for (const testCase of casesInSameFile) {
+      // Check semantic similarity between scenario name and test case name
+      if (this.isSemanticallyRelated(scenario.name, testCase.name)) {
+        matches.push(testCase);
+      }
+    }
+
+    return matches;
+  }
+
+  /**
+   * Check if a test case name is semantically related to a scenario
+   *
+   * @param scenarioName - Scenario description
+   * @param testCaseName - Test case description
+   * @returns True if they appear related
+   */
+  private isSemanticallyRelated(scenarioName: string, testCaseName: string): boolean {
+    // Normalize strings for comparison
+    const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
+    const scenarioWords = new Set(normalize(scenarioName).split(' '));
+    const testWords = normalize(testCaseName).split(' ');
+
+    // Check if test case contains key words from scenario
+    let matchCount = 0;
+    for (const word of testWords) {
+      if (scenarioWords.has(word) && word.length > 3) {
+        // Ignore short words
+        matchCount++;
+      }
+    }
+
+    // Consider related if at least 2 significant words match
+    return matchCount >= 2;
+  }
+
+  /**
+   * Calculate confidence score for scenario match
+   *
+   * @param testCase - Test case
+   * @param scenario - Scenario
+   * @returns Confidence score (0-1)
+   */
+  private calculateScenarioMatchConfidence(testCase: TestCase, scenario: TestSymbol): number {
+    const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+
+    const scenarioWords = new Set(normalize(scenario.name).split(' '));
+    const testWords = normalize(testCase.name).split(' ');
+
+    // Count word matches
+    let matchCount = 0;
+    let totalWords = 0;
+
+    for (const word of testWords) {
+      if (word.length > 3) {
+        totalWords++;
+        if (scenarioWords.has(word)) {
+          matchCount++;
+        }
+      }
+    }
+
+    if (totalWords === 0) return 0.5;
+
+    // Base confidence on word overlap
+    const wordOverlap = matchCount / totalWords;
+
+    // Higher confidence if more words match
+    return Math.min(0.5 + (wordOverlap * 0.5), 1.0);
+  }
+
+  /**
    * Match imported symbols from a test file to implementation symbols
    *
    * This extracts all non-type-only imports from a test file and matches them
-   * to implementation symbols in the database.
+   * to implementation symbols in the database. Filters out test utilities and
+   * framework imports.
    *
    * @param testFilePath - Test file path
    * @returns Matched implementation symbols
@@ -219,8 +338,13 @@ export class TestCoverageAnalyzer {
     const nonTypeImports = importInfo.imports.filter(imp => !imp.isTypeOnly);
 
     for (const imp of nonTypeImports) {
-      // Skip node modules
+      // Skip node modules (test frameworks, utilities)
       if (!imp.modulePath.startsWith('.')) {
+        continue;
+      }
+
+      // Skip test utilities and helper modules
+      if (this.isTestUtility(imp.localName, imp.modulePath)) {
         continue;
       }
 
@@ -232,6 +356,51 @@ export class TestCoverageAnalyzer {
     }
 
     return matched;
+  }
+
+  /**
+   * Check if an import is a test utility or helper (not an implementation symbol)
+   *
+   * @param localName - Local name of the import
+   * @param modulePath - Module path
+   * @returns True if this is a test utility
+   */
+  private isTestUtility(localName: string, modulePath: string): boolean {
+    // Test helper patterns in file path
+    const testHelperPatterns = [
+      '/test-helpers/',
+      '/test-utils/',
+      '/testing/',
+      '/__tests__/helpers/',
+      '/__tests__/utils/',
+      '/fixtures/',
+      '/mocks/',
+    ];
+
+    for (const pattern of testHelperPatterns) {
+      if (modulePath.includes(pattern)) {
+        return true;
+      }
+    }
+
+    // Common test utility names
+    const testUtilityNames = [
+      'setupTest',
+      'cleanupTest',
+      'mockData',
+      'testData',
+      'createMock',
+      'mockImplementation',
+      'TestHelper',
+      'TestUtils',
+      'TestFixture',
+    ];
+
+    if (testUtilityNames.includes(localName)) {
+      return true;
+    }
+
+    return false;
   }
 
   /**
