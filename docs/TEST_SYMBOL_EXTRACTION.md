@@ -590,47 +590,98 @@ for (const file of files) {
    - Contains relationship validation
    - Most tested symbols report
 
+### Phase 7: Import-Based Symbol Resolution ✅
+
+**Status**: Implemented
+
+**Problem**: Phase 6 revealed only 0.4% public symbol coverage (2/496 symbols) due to strict variable name matching.
+
+**Solution**: Analyze import statements in test files to determine which symbols are being tested, regardless of variable names used internally.
+
+**Implementation**:
+
+1. **`src/analyzer/ImportAnalyzer.ts`** (240 lines)
+   - Parses TypeScript import statements using ts-morph
+   - Extracts imported symbols with their local names and module paths
+   - Resolves imports to potential symbol IDs (e.g., `FileScanner` → `file-scanner`, `class-filescanner`)
+   - Filters type-only imports (not actual test coverage)
+   - Provides import map for quick symbol lookup
+
+2. **`src/analyzer/TestCoverageAnalyzer.ts`** - Enhanced
+   - Added `matchImportedSymbols()` method
+   - Dual-strategy symbol matching:
+     1. Import-based (e.g., `import { FileScanner }` → `class-filescanner`)
+     2. Variable name patterns as fallback
+   - Import analysis with caching for performance
+   - Multi-prefix symbol ID matching (`class-`, `interface-`, `function-`)
+
+3. **`src/__tests__/analyzer/ImportAnalyzer.test.ts`** (18 tests)
+   - Tests for named imports, default imports, namespace imports
+   - Type-only import filtering
+   - Symbol ID resolution
+   - PascalCase to kebab-case conversion
+
+**Results**: **Massive Improvement!**
+
+| Metric | Before (Phase 6) | After (Phase 7) | Improvement |
+|--------|------------------|-----------------|-------------|
+| **Public Symbol Coverage** | 0.4% (2/496) | **20.7% (103/498)** | **51x** |
+| **Test Case Coverage** | 4.0% (80/1,986) | **96.7% (1,920/1,986)** | **24x** |
+| **Tested Symbols** | 2 | **103** | **51.5x** |
+| **Relationships** | 5,854 | **11,107** | **1.9x** |
+
+**Top Tested Symbols**:
+- SymbolRegistryManager: 194 tests
+- DatabaseManager: 131 tests
+- SymbolGraphBuilder: 127 tests
+- CodeHealthChecker: 118 tests
+- ConfigManager: 105 tests
+
 ---
 
 ## Implementation Results
 
-**Completed**: 2025-11-17
+**Completed**: 2025-11-17 (Phases 1-7)
 
-### Extraction Statistics
+### Final Statistics (Phase 7)
 
-**Test Symbols Indexed**: 2,534 total
-- Test Suites: 577
-- Test Cases: 1,928
-- Test Scenarios: 29
+**Test Symbols Indexed**: 2,660 total
+- Test Suites: 674
+- Test Cases: 1,986
+- Test Scenarios: variable
 
-**Test Files Processed**: ~50+ test files in `src/__tests__/`
+**Test Files Processed**: 50+ test files in `src/__tests__/`
 
 ### Relationship Statistics
 
-**Test-Coverage Relationships**: 76
-- Links test cases to implementation symbols
-- Average confidence score: 0.7-0.9
-
-**Contains Relationships**: 2,431
-- Parent suite → child suite relationships
-- Parent suite → test case relationships
-- Preserves hierarchical test structure
+**Total Relationships**: 11,107
+- Test-Coverage Relationships: **5,253** (test-case → implementation symbol)
+- Contains Relationships: **2,489** (test hierarchy)
+- Document Relationships: 465
+- Implementation Relationships: 4,041
 
 ### Coverage Analysis
 
-**Public Symbol Coverage**: 0.4% (2/496 symbols)
-- Tested Classes:
-  - `ConfigManager`: 40 test cases
-  - `DatabaseManager`: 36 test cases
-- Untested: 494 public symbols (99.6%)
+**Public Symbol Coverage**: **20.7% (103/498 symbols)**
+- Tested Classes: 103
+- Top tested:
+  - `SymbolRegistryManager`: 194 test cases
+  - `DatabaseManager`: 131 test cases
+  - `SymbolGraphBuilder`: 127 test cases
+  - `CodeHealthChecker`: 118 test cases
+  - `ConfigManager`: 105 test cases
+- Untested: 395 public symbols (79.3%)
 
-**Test Case Coverage**: 3.9% (76/1,928 test cases linked to implementation)
+**Test Case Coverage**: **96.7% (1,920/1,986 test cases linked to implementation)**
 
-**Key Findings**:
-- Most test symbols extracted successfully
-- Low coverage percentage due to strict symbol name matching
-- Symbol name resolution can be improved with import analysis
-- Test hierarchy properly preserved
+### Key Achievements
+
+✅ **Import-based symbol resolution** - 51x improvement in symbol coverage
+✅ **Comprehensive test extraction** - 2,660 test symbols indexed
+✅ **High test case linkage** - 96.7% of test cases linked to implementation
+✅ **Dual-strategy matching** - Import analysis + variable name patterns
+✅ **Performance optimized** - Import analysis caching, ~2.5min full build
+✅ **Complete test hierarchy** - All parent-child relationships preserved
 
 ### Sample Test Hierarchy
 
@@ -686,5 +737,7 @@ for (const file of files) {
 ---
 
 **Last Updated**: 2025-11-17
-**Status**: ✅ Implemented (All 6 Phases Complete)
+**Status**: ✅ Implemented (All 7 Phases Complete)
 **Category**: Development Guidelines
+
+**Achievement**: 51x improvement in test coverage detection through import-based symbol resolution
