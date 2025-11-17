@@ -10,8 +10,10 @@ import * as crypto from 'node:crypto';
 import { ConfigManager } from '../config/ConfigManager';
 import { ASTSymbolExtractor } from '../analyzer/ASTSymbolExtractor';
 import { TestSymbolParser } from '../parser/TestSymbolParser';
+import { TestCoverageAnalyzer } from '../analyzer/TestCoverageAnalyzer';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
+import type { TestSymbol } from '../types/test-symbols';
 
 /**
  * Command for building symbol database from source files
@@ -188,6 +190,9 @@ export class BuildCommand extends BaseCommand {
       // Store doc relationships (symbol -> document)
       const allDocRelationships: Array<{ symbolId: string; symbolName: string; docRef: string; filePath: string; line: number }> = [];
 
+      // Collect all test symbols for relationship extraction
+      const allTestSymbols: TestSymbol[] = [];
+
       // Process each file
       for (const filePath of files) {
         try {
@@ -200,6 +205,9 @@ export class BuildCommand extends BaseCommand {
             // Process test file with TestSymbolParser
             const testResult = testParser.extract(filePath, content);
             result.symbolsFound += testResult.testSymbols.length;
+
+            // Collect test symbols for relationship extraction
+            allTestSymbols.push(...testResult.testSymbols);
 
             // Insert test symbols
             for (const testSymbol of testResult.testSymbols) {
@@ -372,6 +380,70 @@ export class BuildCommand extends BaseCommand {
         } catch (error) {
           result.errors.push(`Failed to insert relationship: ${relationship.from} -> ${relationship.to}`);
         }
+      }
+
+      // Extract and insert test relationships
+      if (allTestSymbols.length > 0) {
+        this.printInfo(`Extracting test relationships (${allTestSymbols.length} test symbols)...`);
+        const coverageAnalyzer = new TestCoverageAnalyzer(dbManager);
+        const testRelationships = coverageAnalyzer.analyzeTestCoverage(allTestSymbols);
+
+        // Insert test-coverage relationships
+        for (const testRel of testRelationships.testCoverageRelations) {
+          try {
+            dbManager.insertUnifiedRelationship({
+              id: testRel.id,
+              type: testRel.type,
+              category: testRel.category,
+              fromSymbols: testRel.fromSymbols,
+              toSymbols: testRel.toSymbols,
+              direction: 'unidirectional',
+              strength: testRel.confidence > 0.7 ? 'strong' : 'medium',
+              evidence: [{
+                type: 'test',
+                source: 'test-code-analysis',
+                confidence: testRel.confidence,
+              }],
+              discoveredBy: 'test-parser',
+              confidence: testRel.confidence,
+              description: `Test coverage: ${testRel.metadata.testedMethods?.join(', ') || 'unknown'} (${testRel.metadata.assertionCount || 0} assertions)`,
+            });
+            result.relationshipsInserted++;
+          } catch (error) {
+            result.errors.push(`Failed to insert test-coverage relationship: ${testRel.id}`);
+          }
+        }
+
+        // Insert contains relationships (test hierarchy)
+        for (const containsRel of testRelationships.containsRelations) {
+          try {
+            dbManager.insertUnifiedRelationship({
+              id: containsRel.id,
+              type: containsRel.type,
+              category: containsRel.category,
+              fromSymbols: containsRel.fromSymbols,
+              toSymbols: containsRel.toSymbols,
+              direction: 'unidirectional',
+              strength: 'strong',
+              evidence: [{
+                type: 'structural',
+                source: 'test-suite-hierarchy',
+                confidence: 1.0,
+              }],
+              discoveredBy: 'test-parser',
+              confidence: 1.0,
+              description: `Test hierarchy (nesting level: ${containsRel.metadata.nestingLevel})`,
+            });
+            result.relationshipsInserted++;
+          } catch (error) {
+            result.errors.push(`Failed to insert contains relationship: ${containsRel.id}`);
+          }
+        }
+
+        // Log coverage stats
+        const stats = testRelationships.coverageStats;
+        this.printSuccess(`Test coverage: ${stats.testCasesWithCoverage}/${stats.totalTestCases} test cases cover ${stats.totalTestedSymbols} symbols`);
+        this.printInfo(`Average assertions per test: ${stats.averageAssertions.toFixed(1)}`);
       }
 
       // Insert doc relationships
