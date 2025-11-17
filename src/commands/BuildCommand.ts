@@ -14,6 +14,7 @@ import { TestCoverageAnalyzer } from '../analyzer/TestCoverageAnalyzer';
 import { NamingPatternRelationAnalyzer } from '../analyzer/NamingPatternRelationAnalyzer';
 import { ExplicitSemanticRelationAnalyzer } from '../analyzer/ExplicitSemanticRelationAnalyzer';
 import { FeatureGroupingAnalyzer } from '../analyzer/FeatureGroupingAnalyzer';
+import { RelationshipInferenceEngine } from '../analyzer/RelationshipInferenceEngine';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import type { TestSymbol } from '../types/test-symbols';
@@ -522,6 +523,7 @@ export class BuildCommand extends BaseCommand {
       // Extract semantic relationships
       this.printInfo('Analyzing semantic relationships...');
       let semanticRelationshipsInserted = 0;
+      let inferredRelationshipsInserted = 0;
 
       try {
         // Build SymbolGraph from database for analyzers
@@ -648,6 +650,39 @@ export class BuildCommand extends BaseCommand {
         const featureStats = featureAnalyzer.getStatistics(featureRelations);
         this.printSuccess(`Feature grouping: ${featureRelations.length} relationships across ${featureStats.uniqueFeatures} features`);
 
+        // 4. Relationship Inference (generate new relationships from existing ones)
+        this.printInfo('Inferring relationships from existing patterns...');
+        const inferenceEngine = new RelationshipInferenceEngine();
+        const allRelationships = dbManager.getAllUnifiedRelationships();
+        const inferredRelationships = inferenceEngine.infer(allRelationships);
+
+        for (const rel of inferredRelationships) {
+          try {
+            dbManager.insertUnifiedRelationship({
+              id: rel.id,
+              type: rel.type,
+              category: rel.category,
+              fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
+              toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
+              direction: rel.direction,
+              strength: rel.strength,
+              evidence: rel.evidence,
+              discoveredBy: rel.discoveredBy,
+              confidence: rel.confidence,
+              filePath: rel.filePath,
+              line: rel.line,
+              properties: rel.properties,
+              description: rel.description,
+            });
+            inferredRelationshipsInserted++;
+          } catch (error) {
+            // Skip duplicate relationships
+          }
+        }
+
+        const inferenceStats = inferenceEngine.getStatistics(allRelationships);
+        this.printSuccess(`Inferred relationships: ${inferredRelationships.length} total (${inferenceStats.byRule['naming-transitivity'] || 0} naming, ${inferenceStats.byRule['feature-closure'] || 0} feature, ${inferenceStats.byRule['test-coverage-inheritance'] || 0} test)`);
+
       } catch (error) {
         this.printWarning(`Failed to analyze semantic relationships: ${error instanceof Error ? error.message : String(error)}`);
       }
@@ -677,6 +712,7 @@ export class BuildCommand extends BaseCommand {
       console.log(`  Relationships inserted: ${this.colors.green}${result.relationshipsInserted}${this.colors.reset}`);
       console.log(`  Doc relationships: ${this.colors.green}${docRelationshipsInserted}${this.colors.reset}`);
       console.log(`  Semantic relationships: ${this.colors.green}${semanticRelationshipsInserted}${this.colors.reset}`);
+      console.log(`  Inferred relationships: ${this.colors.green}${inferredRelationshipsInserted}${this.colors.reset}`);
       console.log(`  Duration: ${this.colors.cyan}${duration}ms${this.colors.reset}`);
       console.log();
       console.log(`${this.colors.dim}Database: ${dbPath}${this.colors.reset}`);

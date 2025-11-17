@@ -11,6 +11,7 @@ import Database from 'better-sqlite3';
 import { ConfigManager } from '../config/ConfigManager';
 import type { Symbol } from '../types/graph';
 import type { EnhancedSymbolDoc } from '../types/tags';
+import type { UnifiedRelationship } from '../types/relationships/unified';
 
 // SQLite row types
 /**
@@ -650,6 +651,55 @@ export class DatabaseManager {
       console.error('Failed to insert unified relationship:', error);
       return false;
     }
+  }
+
+  /**
+   * Get all unified relationships from database
+   * @returns Array of UnifiedRelationship objects
+   * @public
+   */
+  getAllUnifiedRelationships(): UnifiedRelationship[] {
+    const stmt = this.db.prepare(`
+      SELECT * FROM unified_relationships
+    `);
+
+    const rows = stmt.all() as Array<{
+      id: string;
+      type: string;
+      category: string;
+      from_symbols: string;
+      to_symbols: string;
+      direction: string;
+      strength: string;
+      evidence: string;
+      discovered_by: string;
+      confidence: number;
+      file_path: string | null;
+      line: number | null;
+      properties: string | null;
+      created_at: string;
+      updated_at: string;
+      description: string | null;
+    }>;
+
+    return rows.map(row => ({
+      id: row.id,
+      type: row.type as any,
+      category: row.category as any,
+      from: JSON.parse(row.from_symbols),
+      to: JSON.parse(row.to_symbols),
+      direction: row.direction as any,
+      strength: row.strength as any,
+      evidence: JSON.parse(row.evidence),
+      discoveredBy: row.discovered_by as any,
+      confidence: row.confidence,
+      filePath: row.file_path || undefined,
+      line: row.line || undefined,
+      properties: row.properties ? JSON.parse(row.properties) : {},
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      description: row.description || undefined,
+    }));
   }
 
   /**
