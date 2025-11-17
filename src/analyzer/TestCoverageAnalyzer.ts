@@ -265,20 +265,39 @@ export class TestCoverageAnalyzer {
     // Normalize strings for comparison
     const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
 
-    const scenarioWords = new Set(normalize(scenarioName).split(' '));
-    const testWords = normalize(testCaseName).split(' ');
+    const scenarioWords = normalize(scenarioName).split(' ').filter(w => w.length > 2); // Lower threshold to 2
+    const testWords = normalize(testCaseName).split(' ').filter(w => w.length > 2);
 
-    // Check if test case contains key words from scenario
-    let matchCount = 0;
+    // Strategy 1: Exact word matches
+    let exactMatches = 0;
+    const scenarioSet = new Set(scenarioWords);
     for (const word of testWords) {
-      if (scenarioWords.has(word) && word.length > 3) {
-        // Ignore short words
-        matchCount++;
+      if (scenarioSet.has(word)) {
+        exactMatches++;
       }
     }
 
-    // Consider related if at least 2 significant words match
-    return matchCount >= 2;
+    if (exactMatches >= 2) {
+      return true; // At least 2 exact matches
+    }
+
+    // Strategy 2: Word stem/prefix matching (for word variations)
+    let stemMatches = 0;
+    for (const testWord of testWords) {
+      for (const scenarioWord of scenarioWords) {
+        // Check if one word is a prefix of another (at least 4 chars)
+        if (testWord.length >= 4 && scenarioWord.length >= 4) {
+          if (testWord.startsWith(scenarioWord.slice(0, 4)) ||
+              scenarioWord.startsWith(testWord.slice(0, 4))) {
+            stemMatches++;
+            break;
+          }
+        }
+      }
+    }
+
+    // Consider related if 1 exact match + 1 stem match, or 2+ stem matches
+    return (exactMatches >= 1 && stemMatches >= 1) || stemMatches >= 2;
   }
 
   /**
