@@ -11,9 +11,13 @@ import { ConfigManager } from '../config/ConfigManager';
 import { ASTSymbolExtractor } from '../analyzer/ASTSymbolExtractor';
 import { TestSymbolParser } from '../parser/TestSymbolParser';
 import { TestCoverageAnalyzer } from '../analyzer/TestCoverageAnalyzer';
+import { NamingPatternRelationAnalyzer } from '../analyzer/NamingPatternRelationAnalyzer';
+import { ExplicitSemanticRelationAnalyzer } from '../analyzer/ExplicitSemanticRelationAnalyzer';
+import { FeatureGroupingAnalyzer } from '../analyzer/FeatureGroupingAnalyzer';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import type { TestSymbol } from '../types/test-symbols';
+import type { SymbolGraph } from '../types/graph';
 
 /**
  * Command for building symbol database from source files
@@ -515,6 +519,139 @@ export class BuildCommand extends BaseCommand {
         }
       }
 
+      // Extract semantic relationships
+      this.printInfo('Analyzing semantic relationships...');
+      let semanticRelationshipsInserted = 0;
+
+      try {
+        // Build SymbolGraph from database for analyzers
+        const allSymbols = dbManager.getAllSymbols();
+        const symbolMap = new Map(allSymbols.map(s => [s.id, s]));
+
+        // Build indexes for SymbolGraph
+        const nameIndex = new Map<string, string[]>();
+        const fileIndex = new Map<string, string[]>();
+
+        for (const symbol of allSymbols) {
+          // Name index
+          if (!nameIndex.has(symbol.name)) {
+            nameIndex.set(symbol.name, []);
+          }
+          nameIndex.get(symbol.name)!.push(symbol.id);
+
+          // File index
+          if (!fileIndex.has(symbol.filePath)) {
+            fileIndex.set(symbol.filePath, []);
+          }
+          fileIndex.get(symbol.filePath)!.push(symbol.id);
+        }
+
+        const symbolGraph: SymbolGraph = {
+          symbols: symbolMap,
+          relationships: [],
+          nameIndex,
+          fileIndex,
+          adjacencyList: new Map(),
+          reverseAdjacencyList: new Map(),
+        };
+
+        // 1. Naming Pattern Relations
+        const namingAnalyzer = new NamingPatternRelationAnalyzer(symbolGraph);
+        const namingRelations = namingAnalyzer.analyze();
+
+        for (const rel of namingRelations) {
+          try {
+            dbManager.insertUnifiedRelationship({
+              id: rel.id,
+              type: rel.type,
+              category: rel.category,
+              fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
+              toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
+              direction: rel.direction,
+              strength: rel.strength,
+              evidence: rel.evidence,
+              discoveredBy: rel.discoveredBy,
+              confidence: rel.confidence,
+              filePath: rel.filePath,
+              line: rel.line,
+              properties: rel.properties,
+              description: rel.description,
+            });
+            semanticRelationshipsInserted++;
+          } catch (error) {
+            // Skip duplicate relationships
+          }
+        }
+
+        const namingStats = namingAnalyzer.getStatistics(namingRelations);
+        this.printSuccess(`Naming patterns: ${namingRelations.length} relationships across ${namingStats.uniqueDomains} domains`);
+
+        // 2. Explicit Semantic Relations (@relatedTo tags)
+        const explicitAnalyzer = new ExplicitSemanticRelationAnalyzer();
+        const explicitRelations = explicitAnalyzer.analyze(targetPath);
+
+        for (const rel of explicitRelations) {
+          try {
+            dbManager.insertUnifiedRelationship({
+              id: rel.id,
+              type: rel.type,
+              category: rel.category,
+              fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
+              toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
+              direction: rel.direction,
+              strength: rel.strength,
+              evidence: rel.evidence,
+              discoveredBy: rel.discoveredBy,
+              confidence: rel.confidence,
+              filePath: rel.filePath,
+              line: rel.line,
+              properties: rel.properties,
+              description: rel.description,
+            });
+            semanticRelationshipsInserted++;
+          } catch (error) {
+            // Skip duplicate relationships
+          }
+        }
+
+        const explicitStats = explicitAnalyzer.getStatistics(explicitRelations);
+        this.printSuccess(`Explicit semantic: ${explicitRelations.length} relationships (${explicitStats.withDescription} with descriptions)`);
+
+        // 3. Feature Grouping Relations
+        const featureAnalyzer = new FeatureGroupingAnalyzer(symbolGraph);
+        const featureRelations = featureAnalyzer.analyze(targetPath);
+
+        for (const rel of featureRelations) {
+          try {
+            dbManager.insertUnifiedRelationship({
+              id: rel.id,
+              type: rel.type,
+              category: rel.category,
+              fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
+              toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
+              direction: rel.direction,
+              strength: rel.strength,
+              evidence: rel.evidence,
+              discoveredBy: rel.discoveredBy,
+              confidence: rel.confidence,
+              filePath: rel.filePath,
+              line: rel.line,
+              properties: rel.properties,
+              description: rel.description,
+            });
+            semanticRelationshipsInserted++;
+          } catch (error) {
+            // Skip duplicate relationships
+          }
+        }
+
+        const featureStats = featureAnalyzer.getStatistics(featureRelations);
+        this.printSuccess(`Feature grouping: ${featureRelations.length} relationships across ${featureStats.uniqueFeatures} features`);
+
+      } catch (error) {
+        this.printWarning(`Failed to analyze semantic relationships: ${error instanceof Error ? error.message : String(error)}`);
+      }
+
       const duration = Date.now() - startTime;
 
       // Write JSONL registry
@@ -539,6 +676,7 @@ export class BuildCommand extends BaseCommand {
       console.log(`  Relationships found: ${this.colors.cyan}${result.relationshipsFound}${this.colors.reset}`);
       console.log(`  Relationships inserted: ${this.colors.green}${result.relationshipsInserted}${this.colors.reset}`);
       console.log(`  Doc relationships: ${this.colors.green}${docRelationshipsInserted}${this.colors.reset}`);
+      console.log(`  Semantic relationships: ${this.colors.green}${semanticRelationshipsInserted}${this.colors.reset}`);
       console.log(`  Duration: ${this.colors.cyan}${duration}ms${this.colors.reset}`);
       console.log();
       console.log(`${this.colors.dim}Database: ${dbPath}${this.colors.reset}`);
