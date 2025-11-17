@@ -148,10 +148,22 @@ export class RelationshipQueryEngine {
     const byType: Record<string, string[]> = {};
     for (const rel of direct) {
       if (!byType[rel.type]) byType[rel.type] = [];
+
+      const from = Array.isArray(rel.from) ? rel.from : [rel.from];
       const to = Array.isArray(rel.to) ? rel.to : [rel.to];
-      to.forEach(t => {
-        if (t !== symbolId && !byType[rel.type].includes(t)) {
-          byType[rel.type].push(t);
+
+      // If symbolId is in 'from', collect 'to'; if in 'to', collect 'from'
+      const related: string[] = [];
+      if (from.includes(symbolId)) {
+        related.push(...to);
+      }
+      if (to.includes(symbolId)) {
+        related.push(...from);
+      }
+
+      related.forEach(r => {
+        if (r !== symbolId && !byType[rel.type].includes(r)) {
+          byType[rel.type].push(r);
         }
       });
     }
@@ -160,10 +172,22 @@ export class RelationshipQueryEngine {
     const byCategory: Record<string, string[]> = {};
     for (const rel of direct) {
       if (!byCategory[rel.category]) byCategory[rel.category] = [];
+
+      const from = Array.isArray(rel.from) ? rel.from : [rel.from];
       const to = Array.isArray(rel.to) ? rel.to : [rel.to];
-      to.forEach(t => {
-        if (t !== symbolId && !byCategory[rel.category].includes(t)) {
-          byCategory[rel.category].push(t);
+
+      // If symbolId is in 'from', collect 'to'; if in 'to', collect 'from'
+      const related: string[] = [];
+      if (from.includes(symbolId)) {
+        related.push(...to);
+      }
+      if (to.includes(symbolId)) {
+        related.push(...from);
+      }
+
+      related.forEach(r => {
+        if (r !== symbolId && !byCategory[rel.category].includes(r)) {
+          byCategory[rel.category].push(r);
         }
       });
     }
