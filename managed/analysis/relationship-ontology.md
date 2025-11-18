@@ -2,32 +2,34 @@
 
 **Purpose**: Document all relationship types collected by tsdoc, their definitions, implementation, and prepare for ontology modeling and pruning redundancies.
 
-**Status**: ✅ Phase 1 & 2 Complete - Semantic Relationships + Inference Engine
+**Status**: ✅ Phase 1, 2 & 3 Complete - Semantic Relationships + Inference + Test Examples
 **Created**: 2025-11-17
-**Last Updated**: 2025-11-17
+**Last Updated**: 2025-11-18
 **Implementation**:
 - Phase 1: Commit 9743b61 + 2370da6 (Semantic Relationships)
 - Phase 2: Inference Engine Implementation
+- Phase 3: Commit 574597e + 8f4b2eb (Test-as-Example System)
 
 ---
 
 ## Executive Summary
 
-TSDoc Edge currently tracks **9 active relationship types** totaling **15,914 relationships** across **5,019 symbols** (**density: 3.17** ✅):
+TSDoc Edge currently tracks **10 active relationship types** totaling **19,998 relationships** across **5,074 symbols** (**density: 3.94** ✅):
 
 | Type | Count | Percentage | Category | Source |
 |------|-------|------------|----------|--------|
-| test-coverage | 7,567 | 47.5% | Verification | Direct + Inferred |
-| code-dependency | 3,040 | 19.1% | Structural | AST Analysis |
-| contains | 2,452 | 15.4% | Testing | Test Structure |
-| **naming-pattern-relation** ✨ | **2,030** | **12.8%** | **Semantic** | Naming Patterns |
-| covers-scenario | 176 | 1.1% | Testing | Scenario Matching |
-| inheritance | 104 | 0.7% | Structural | AST Analysis |
-| **feature-grouping** ✨ | **56** | **0.4%** | **Semantic** | File Structure |
-| **explicit-semantic-relation** ✨ | **8** | **0.1%** | **Semantic** | @relatedTo Tags |
-| conceptual-relation (deprecated) | 465 | 2.9% | Semantic | Legacy |
+| test-coverage | 8,006 | 40.0% | Verification | Direct + Inferred |
+| **test-as-example** 🎓 | **3,538** | **17.7%** | **Testing** | Test Analysis |
+| code-dependency | 3,140 | 15.7% | Structural | AST Analysis |
+| contains | 2,452 | 12.3% | Testing | Test Structure |
+| **naming-pattern-relation** ✨ | **2,032** | **10.2%** | **Semantic** | Naming Patterns |
+| doc-reference | 484 | 2.4% | Semantic | TSDoc Tags |
+| covers-scenario | 176 | 0.9% | Testing | Scenario Matching |
+| inheritance | 107 | 0.5% | Structural | AST Analysis |
+| **feature-grouping** ✨ | **56** | **0.3%** | **Semantic** | File Structure |
+| **explicit-semantic-relation** ✨ | **7** | **0.0%** | **Semantic** | @relatedTo Tags |
 
-**Achievement**: **Relationship density 3.17 exceeds target 3.0!** 🎯
+**Achievement**: **Relationship density 3.94 exceeds target 3.0 by 31%!** 🎯
 
 **Phase 1 Results** (✨):
 - **2,094 semantic relationships** added across 3 specialized analyzers
@@ -40,6 +42,13 @@ TSDoc Edge currently tracks **9 active relationship types** totaling **15,914 re
 - **Test coverage inheritance**: 2,274 new test-coverage links (suite → implementation)
 - **Density improvement**: From 2.18 → 3.17 (+45%)
 - **14.3% of all relationships** are now inferred automatically
+
+**Phase 3 Results** (🎓 Test-as-Example):
+- **3,538 test-as-example relationships** extracted from 1,986 test cases
+- **100% match rate** (improved from 8.4% initial implementation)
+- **1,293 high-quality examples** (65%) ready for documentation
+- **Automatic example extraction** during build process
+- **Living documentation**: tests serve as always-current examples
 
 ---
 
@@ -433,6 +442,99 @@ TSDocParser ~ FrontmatterParser (parser feature)
 - Total relationships: 56
 - Unique features: 2
 - Largest features: analyzer (20+ symbols), parser (15+ symbols)
+
+---
+
+### 10. test-as-example (3,538 relationships) 🎓 NEW
+
+**Definition**: Links test cases to implementation symbols they serve as documentation examples for.
+
+**Purpose**: Replace generic documentation examples with actual test code that MUST work.
+
+**Category**: `testing`
+
+**Implementation**:
+- **Primary**: `src/analyzer/TestExampleExtractor.ts:233`
+  ```typescript
+  type: 'test-as-example',
+  from: testCaseId,  // e.g., 'test-case-DatabaseManager-65'
+  to: implementationSymbolId,  // e.g., 'class-databasemanager'
+  strength: 'strong' | 'medium' | 'weak',  // Based on quality score
+  properties: {
+    exampleCategory: 'basic-usage' | 'advanced-usage' | 'integration' | 'edge-case',
+    complexity: 'simple' | 'medium' | 'complex',
+    quality: number,  // 0-10 score
+    description: string  // Test description
+  }
+  ```
+- **Command**: `tsdoc-edge test-examples` - Query test examples
+- **During build**: Automatic extraction
+
+**Detection Strategy**:
+1. **Main class identification**: Always link test to primary class being tested
+2. **Description parsing**: Extract method names from test descriptions
+3. **Import analysis**: Parse import statements to find tested symbols
+4. **Method call detection**: Identify methods actually called in test code
+
+**Example Relationships**:
+```
+test-case-DatabaseManager-65 → class-databasemanager (quality: 9/10, basic-usage)
+test-case-DatabaseManager-127 → method-databasemanager-insertsymbol (quality: 8/10, basic-usage)
+test-case-TypeChainTracer-504 → method-typechaintracer-build-dependency-tree (quality: 10/10, edge-case)
+```
+
+**Direction**: Unidirectional (test → implementation)
+
+**Strength**:
+- **Strong** (quality 8-10): Production-ready example
+- **Medium** (quality 5-7): Acceptable example
+- **Weak** (quality 0-4): Reference only
+
+**Discovery Method**: `test-analysis`
+
+**Quality Assessment** (0-10 scale):
+- Good description (>20 chars, >3 words): +1
+- Clear setup (arrange-act-assert): +1
+- Has assertions (expect calls): +1 to +2
+- Simple complexity: +1
+- Too complex (>30 lines): -1
+- Has inline comments: +1
+
+**Statistics**:
+- Total relationships: 3,538
+- Unique test cases: 1,986
+- High-quality examples (8-10): 1,293 (65%)
+- Average symbols per test: 1.8
+- Match rate: 100% (improved from 8.4% initial)
+
+**Categories**:
+- Basic usage: 1,477 examples (74%)
+- Advanced usage: 68 examples (3%)
+- Integration: 313 examples (16%)
+- Edge cases: 128 examples (6%)
+
+**Complexity Distribution**:
+- Simple (<10 lines): 557 examples (28%)
+- Medium (11-30 lines): 781 examples (39%)
+- Complex (30+ lines): 648 examples (33%)
+
+**Philosophy**: **Test Code > Generic Examples** (SSOT Principle)
+- Tests are always up-to-date (run in CI)
+- Tests must work (guaranteed accuracy)
+- Zero maintenance cost (automatic extraction)
+- Living documentation
+
+**CLI Usage**:
+```bash
+# Show all high-quality examples
+tsdoc-edge test-examples --min-quality 8
+
+# Find simple examples for beginners
+tsdoc-edge test-examples --complexity simple
+
+# Find integration examples
+tsdoc-edge test-examples --category integration
+```
 
 ---
 
