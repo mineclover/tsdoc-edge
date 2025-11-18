@@ -110,6 +110,7 @@ import { SymbolRenameCommand } from './commands/SymbolRenameCommand';
 import { TaskListCommand, TaskAddCommand, TaskUpdateCommand, TaskStatsCommand } from './commands/TaskCommands';
 import { ContextCommand } from './commands/ContextCommand';
 import { EnhancedWorkContextCommand } from './commands/EnhancedWorkContextCommand';
+import { TestExamplesCommand } from './commands/TestExamplesCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -222,6 +223,7 @@ async function main(): Promise<void> {
   registry.register(new WorkContextCommand());
   registry.register(new ContextCommand());
   registry.register(new EnhancedWorkContextCommand());
+  registry.register(new TestExamplesCommand());
   registry.register(new ExploreEntrypointCommand());
   registry.register(new ParseMermaidCommand());
   registry.register(new ValidateSymbolRefsCommand());

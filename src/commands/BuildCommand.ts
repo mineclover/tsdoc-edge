@@ -687,6 +687,41 @@ export class BuildCommand extends BaseCommand {
         const inferenceStats = inferenceEngine.getStatistics(allRelationships);
         this.printSuccess(`Inferred relationships: ${inferredRelationships.length} total (${inferenceStats.byRule['naming-transitivity'] || 0} naming, ${inferenceStats.byRule['feature-closure'] || 0} feature, ${inferenceStats.byRule['test-coverage-inheritance'] || 0} test)`);
 
+        // 5. Test Example Extraction (extract test cases as documentation examples)
+        this.printInfo('Extracting test examples for documentation...');
+        const { TestExampleExtractor } = await import('../analyzer/TestExampleExtractor');
+        const exampleExtractor = new TestExampleExtractor(dbManager);
+        const testExamples = exampleExtractor.extractAllExamples();
+        const exampleRelationships = exampleExtractor.createRelationships(testExamples);
+
+        let testExamplesInserted = 0;
+        for (const rel of exampleRelationships) {
+          try {
+            dbManager.insertUnifiedRelationship({
+              id: rel.id,
+              type: rel.type,
+              category: rel.category,
+              fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
+              toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
+              direction: rel.direction,
+              strength: rel.strength,
+              evidence: rel.evidence,
+              discoveredBy: rel.discoveredBy,
+              confidence: rel.confidence,
+              filePath: rel.filePath,
+              line: rel.line,
+              properties: rel.properties,
+              description: rel.description,
+            });
+            testExamplesInserted++;
+          } catch (error) {
+            // Skip duplicate relationships
+          }
+        }
+
+        const highQualityExamples = testExamples.filter(ex => ex.quality >= 8);
+        this.printSuccess(`Test examples: ${testExamples.length} total (${highQualityExamples.length} high-quality, ${testExamplesInserted} relationships)`);
+
       } catch (error) {
         this.printWarning(`Failed to analyze semantic relationships: ${error instanceof Error ? error.message : String(error)}`);
       }

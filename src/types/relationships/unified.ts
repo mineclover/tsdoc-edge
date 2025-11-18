@@ -3,7 +3,7 @@
  * @packageDocumentation
  *
  * @responsibility Define comprehensive relationship taxonomy
- * @contract Support all 26 relationship types across 10 categories
+ * @contract Support all 30 relationship types across 11 categories
  *
  * @problem Current system only tracks code dependencies
  * @solves Unified type system for all relationship categories
@@ -20,7 +20,7 @@
  * Relationship type classification
  * @public
  *
- * Total: 29 relationship types across 10 categories
+ * Total: 30 relationship types across 11 categories
  */
 export type RelationshipType =
   // 1. Structural (Code Space)
@@ -56,6 +56,7 @@ export type RelationshipType =
   | 'integration-verification' // A↔B connection verified by test
   | 'contains'            // Test suite contains test case/suite
   | 'covers-scenario'     // Test case covers test scenario
+  | 'test-as-example'     // Test case serves as documentation example
   // 8. Type System
   | 'type-dependency'     // Parameter/return type dependencies
   | 'generic-constraint'  // T extends U
