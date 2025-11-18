@@ -228,8 +228,9 @@ export class TestExampleExtractor {
     // Get line number
     const { line } = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile));
 
-    // Analyze test case
-    const testedSymbols = this.identifyTestedSymbols(code, testedModuleName);
+    // Analyze test case - pass full source and description for better symbol identification
+    const fullSource = sourceFile.text;
+    const testedSymbols = this.identifyTestedSymbols(fullSource, testedModuleName, code, description);
     const complexity = this.assessComplexity(code);
     const category = this.categorizeExample(description, code);
     const quality = this.assessQuality(code, description, complexity);
@@ -261,33 +262,125 @@ export class TestExampleExtractor {
 
   /**
    * Identify symbols being tested in the code
+   * Uses intelligent matching to find relevant symbols without over-linking
    * @private
    */
-  private identifyTestedSymbols(code: string, moduleName: string): string[] {
+  private identifyTestedSymbols(
+    fullSource: string,
+    moduleName: string,
+    testCode: string,
+    description: string
+  ): string[] {
     const symbols: string[] = [];
 
-    // Look for "new ClassName()" patterns
-    const newPattern = /new\s+([A-Z][a-zA-Z0-9_]+)/g;
-    let match;
-    while ((match = newPattern.exec(code)) !== null) {
-      const className = match[1];
-      symbols.push(`class-${this.toKebabCase(className)}`);
-    }
+    // Get all symbols from database
+    const allSymbols = this.db.getAllSymbols();
 
-    // Look for direct function/method calls
-    const callPattern = /(\w+)\s*\(/g;
-    const methodNames = new Set<string>();
-    while ((match = callPattern.exec(code)) !== null) {
-      const methodName = match[1];
-      if (methodName && !this.isCommonTestKeyword(methodName)) {
-        methodNames.add(methodName);
+    // Create kebab-case version of module name for matching
+    const moduleKebab = this.toKebabCase(moduleName);
+
+    // Get all symbols from the tested module (for reference)
+    const moduleSymbols = allSymbols.filter(s => {
+      const fileName = path.basename(s.filePath, path.extname(s.filePath));
+      const fileKebab = this.toKebabCase(fileName);
+      return fileKebab === moduleKebab;
+    });
+
+    // Strategy 1: ALWAYS include the main class/interface being tested
+    // Try multiple variations because symbol IDs might have inconsistent formats
+    const moduleKebabNoHyphen = moduleKebab.replace(/-/g, '');
+    const mainClass = moduleSymbols.find(s =>
+      s.type === 'class' && (
+        s.id === `class-${moduleKebab}` ||           // class-database-manager
+        s.id === `class-${moduleKebabNoHyphen}` ||  // class-databasemanager
+        s.id.startsWith('class-') && s.id.includes(moduleName.toLowerCase())
+      )
+    );
+
+    if (mainClass) {
+      symbols.push(mainClass.id);
+    } else {
+      // Try to find main interface
+      const mainInterface = moduleSymbols.find(s =>
+        s.type === 'interface' && (
+          s.id === `interface-${moduleKebab}` ||
+          s.id === `interface-${moduleKebabNoHyphen}` ||
+          s.id.startsWith('interface-') && s.id.includes(moduleName.toLowerCase())
+        )
+      );
+      if (mainInterface) {
+        symbols.push(mainInterface.id);
       }
     }
 
-    // Add method symbols
-    for (const methodName of methodNames) {
-      symbols.push(`method-${moduleName.toLowerCase()}-${this.toKebabCase(methodName)}`);
+    // Strategy 2: Parse test description to identify specific methods being tested
+    // Pattern: "should insertSymbol successfully" → method insertSymbol
+    const descWords = description.toLowerCase().split(/\s+/);
+    for (const word of descWords) {
+      if (word.length < 3) continue; // Skip short words
+
+      // Try to find method by name
+      const methodKebab = this.toKebabCase(word);
+      const methodSymbol = moduleSymbols.find(s =>
+        s.type === 'method' && s.id.includes(`-${methodKebab}`)
+      );
+
+      if (methodSymbol && !symbols.includes(methodSymbol.id)) {
+        symbols.push(methodSymbol.id);
+      }
     }
+
+    // Strategy 3: Parse imports to find what's actually being tested
+    // Pattern: import { ClassName } from '...'
+    const importPattern = /import\s+\{([^}]+)\}\s+from/g;
+    let match;
+    while ((match = importPattern.exec(fullSource)) !== null) {
+      const imports = match[1].split(',').map(s => s.trim());
+      for (const importName of imports) {
+        // Clean up "type X as Y" patterns
+        const cleanName = importName.split(' as ')[0].replace(/^type\s+/, '').trim();
+        const kebab = this.toKebabCase(cleanName);
+
+        // Find matching class or interface
+        const matchingSymbol = allSymbols.find(s =>
+          (s.type === 'class' || s.type === 'interface' || s.type === 'type') &&
+          s.id.includes(kebab)
+        );
+
+        if (matchingSymbol && !symbols.includes(matchingSymbol.id)) {
+          symbols.push(matchingSymbol.id);
+        }
+      }
+    }
+
+    // Strategy 4: Identify methods actually called in the test code
+    // Pattern: obj.methodName( or instance.methodName(
+    const methodCallPattern = /\.([a-z][a-zA-Z0-9_]*)\s*\(/g;
+    const calledMethods = new Set<string>();
+
+    while ((match = methodCallPattern.exec(testCode)) !== null) {
+      const methodName = match[1];
+      if (!this.isCommonTestKeyword(methodName)) {
+        calledMethods.add(methodName);
+      }
+    }
+
+    // Find actual method symbols from the module for called methods
+    for (const methodName of calledMethods) {
+      const methodKebab = this.toKebabCase(methodName);
+
+      // Look for method in the module
+      const methodSymbol = moduleSymbols.find(s =>
+        s.type === 'method' && s.id.endsWith(`-${methodKebab}`)
+      );
+
+      if (methodSymbol && !symbols.includes(methodSymbol.id)) {
+        symbols.push(methodSymbol.id);
+      }
+    }
+
+    // Fallback: If only 1 symbol (main class) found, this is probably fine
+    // Most tests will test the class as a whole
 
     return symbols;
   }
