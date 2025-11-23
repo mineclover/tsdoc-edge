@@ -8,6 +8,7 @@ import * as fs from 'node:fs';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { DocReferenceAnalyzer } from '../analyzer/DocReferenceAnalyzer';
+import { BidirectionalDocReferenceGenerator } from '../analyzer/BidirectionalDocReferenceGenerator';
 import { DatabaseManager } from '../storage/DatabaseManager';
 
 /**
@@ -32,7 +33,7 @@ export class AnalyzeDocReferenceCommand extends BaseCommand {
    * @returns Command description
    */
   getDescription(): string {
-    return 'Analyze doc reference relationships (@doc [[Symbol]] tags in TSDoc comments)';
+    return 'Analyze bidirectional doc reference relationships (Code ↔ Doc via @doc [[Symbol]] tags)';
   }
 
   protected getUsage(): string {
@@ -192,7 +193,77 @@ export class AnalyzeDocReferenceCommand extends BaseCommand {
         }
 
         console.log();
-        this.printSuccess(`Saved ${savedCount} doc-reference relationships to database`);
+        this.printSuccess(`Saved ${savedCount} forward (Code → Doc) relationships to database`);
+
+        // Generate and save reverse (Doc → Code) relationships
+        this.printInfo('Generating reverse (Doc → Code) relationships...');
+        const bidirectionalGenerator = new BidirectionalDocReferenceGenerator();
+        const reverseRelationships = bidirectionalGenerator.generateReverseRelationships(relationships);
+
+        if (reverseRelationships.length > 0) {
+          this.printInfo(`Generated ${reverseRelationships.length} reverse relationships`);
+          console.log();
+
+          // Show sample reverse relationships
+          const reverseSamples = reverseRelationships.slice(0, 5);
+          if (reverseSamples.length > 0) {
+            this.printSection('Sample Reverse (Doc → Code) References');
+            for (const rel of reverseSamples) {
+              const fromSymbol = Array.isArray(rel.from) ? rel.from[0] : rel.from;
+              const toSymbol = Array.isArray(rel.to) ? rel.to[0] : rel.to;
+              const section = rel.properties?.section ? `#${rel.properties.section}` : '';
+
+              console.log(`  [[${fromSymbol}${section}]] → ${colors.cyan}${toSymbol}${colors.reset}`);
+            }
+            console.log();
+          }
+
+          // Save reverse relationships to database
+          this.printInfo('Saving reverse relationships to database...');
+          let reverseSavedCount = 0;
+
+          for (const rel of reverseRelationships) {
+            const success = dbManager.insertUnifiedRelationship({
+              id: rel.id,
+              type: 'doc-reference',
+              category: 'semantic',
+              fromSymbols: typeof rel.from === 'string' ? [rel.from] : rel.from,
+              toSymbols: typeof rel.to === 'string' ? [rel.to] : rel.to,
+              direction: 'unidirectional',
+              strength: rel.strength,
+              evidence: rel.evidence.map((e: any) => ({
+                type: e.type,
+                source: e.source || '',
+                lineNumber: e.lineNumber,
+                confidence: e.confidence,
+              })),
+              discoveredBy: rel.discoveredBy,
+              confidence: rel.confidence,
+              filePath: rel.filePath,
+              line: rel.line,
+              properties: rel.properties,
+              description: rel.description,
+            });
+
+            if (success) {
+              reverseSavedCount++;
+            }
+          }
+
+          console.log();
+          this.printSuccess(`Saved ${reverseSavedCount} reverse (Doc → Code) relationships to database`);
+
+          // Show combined statistics
+          const allRelationships = [...relationships, ...reverseRelationships];
+          const combinedStats = bidirectionalGenerator.getStatistics(allRelationships);
+
+          this.printSection('Bidirectional Statistics');
+          console.log(`  Total relationships: ${colors.cyan}${combinedStats.total}${colors.reset}`);
+          console.log(`  Forward (Code → Doc): ${colors.cyan}${combinedStats.forward}${colors.reset}`);
+          console.log(`  Reverse (Doc → Code): ${colors.cyan}${combinedStats.reverse}${colors.reset}`);
+          console.log(`  Unique code symbols: ${colors.cyan}${combinedStats.uniqueCodeSymbols}${colors.reset}`);
+          console.log(`  Unique doc symbols: ${colors.cyan}${combinedStats.uniqueDocSymbols}${colors.reset}`);
+        }
       }
 
       console.log();
