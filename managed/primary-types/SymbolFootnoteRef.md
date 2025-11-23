@@ -8,13 +8,7 @@ Type for symbol footnote references in documentation.
 
 ## Type Definition
 
-```typescript
-export interface SymbolFootnoteRef {
-  id: string;
-  symbolName: string;
-  line: number;
-}
-```
+See [[SymbolFootnoteRef]] implementation in source code.
 
 ## Syntax
 
@@ -23,14 +17,7 @@ export interface SymbolFootnoteRef {
 
 ## Usage
 
-Part of [[ParsedDocSymbols]]:
-
-```typescript
-interface ParsedDocSymbols {
-  symbolFootnoteRefs: SymbolFootnoteRef[];
-  // ...
-}
-```
+Part of [[ParsedDocSymbols]] as the `symbolFootnoteRefs` array field.
 
 ## Related
 

@@ -8,29 +8,25 @@ Type system for tracking type dependency chains and paths.
 
 ## Type Chain Step
 
-Single link in a dependency chain:
-```typescript
-interface TypeChainStep {
-  from: string;              // Source type name
-  to: string;                // Target type name
-  dependency: InterfaceDependency;
-  stepNumber: number;        // 0-indexed
-  depth: number;             // Distance from root
-}
-```
+See implementation: [[TypeChainStep]]
+
+**Single link in a dependency chain**:
+- `from`: Source type name
+- `to`: Target type name
+- `dependency`: InterfaceDependency relationship
+- `stepNumber`: Position in chain (0-indexed)
+- `depth`: Distance from root
 
 ## Type Chain
 
-Complete path from source to target:
-```typescript
-interface TypeChain {
-  source: string;            // Starting type
-  target: string;            // Ending type
-  steps: TypeChainStep[];    // All steps
-  length: number;            // Total steps
-  isCircular: boolean;       // Forms a cycle?
-}
-```
+See implementation: [[TypeChain]]
+
+**Complete path from source to target**:
+- `source`: Starting type
+- `target`: Ending type
+- `steps`: TypeChainStep[] - All steps in the chain
+- `length`: Total number of steps
+- `isCircular`: Whether the chain forms a cycle
 
 ## Example Chain
 

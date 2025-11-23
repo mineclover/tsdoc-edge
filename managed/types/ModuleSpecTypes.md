@@ -10,166 +10,146 @@
 
 ### 1. Purpose - Why It Exists
 
-```typescript
-interface ModulePurpose {
-  problem: string;          // Problem solved
-  responsibility: string;   // What it's responsible for
-  solution: string;         // Solution approach
-  context?: string;         // Additional context
-}
-```
+See implementation: [[ModulePurpose]]
+
+**Key Properties**:
+- `problem`: Problem solved
+- `responsibility`: What it's responsible for
+- `solution`: Solution approach
+- `context`: Additional context (optional)
 
 ### 2. Input - What It Accepts
 
-```typescript
-interface ModuleInput {
-  parameters: ParamSpec[];
-  preconditions: string[];  // Must be true before execution
-  constraints: string[];    // Input value constraints
-  typeSignature?: string;   // Full signature
-}
-```
+See implementation: [[ModuleInput]]
+
+**Key Properties**:
+- `parameters`: Parameter specifications
+- `preconditions`: Must be true before execution
+- `constraints`: Input value constraints
+- `typeSignature`: Full signature (optional)
 
 ### 3. Output - What It Returns
 
-```typescript
-interface ModuleOutput {
-  returnType: ReturnSpec;
-  postconditions: string[]; // Guaranteed after success
-  successCases: string[];   // Success scenarios
-  failureCases: FailureCase[]; // Error scenarios
-}
-```
+See implementation: [[ModuleOutput]]
+
+**Key Properties**:
+- `returnType`: Return type specification
+- `postconditions`: Guaranteed after success
+- `successCases`: Success scenarios
+- `failureCases`: Error scenarios
 
 ### 4. Context - What It Needs
 
-```typescript
-interface ModuleContext {
-  dependencies: DependencySpec[];
-  imports: ImportSpec[];
-  environment: string[];    // Environment variables
-  configuration?: string;   // Config requirements
-}
-```
+See implementation: [[ModuleContext]]
+
+**Key Properties**:
+- `dependencies`: Dependency specifications
+- `imports`: Import specifications
+- `environment`: Environment variables
+- `configuration`: Config requirements (optional)
 
 ### 5. Logic - How It Works
 
-```typescript
-interface ModuleLogic {
-  algorithm: string;        // Algorithm description
-  steps: string[];          // Processing steps
-  complexity?: string;      // Time/space complexity
-  invariants: string[];     // Loop invariants
-}
-```
+See implementation: [[ModuleLogic]]
+
+**Key Properties**:
+- `algorithm`: Algorithm description
+- `steps`: Processing steps
+- `complexity`: Time/space complexity (optional)
+- `invariants`: Loop invariants
 
 ### 6. Effect - What It Changes
 
-```typescript
-interface ModuleEffect {
-  sideEffects: SideEffectSpec[];
-  stateChanges: string[];   // State mutations
-  purity: boolean;          // Pure function?
-  idempotent: boolean;      // Idempotent operation?
-}
-```
+See implementation: [[ModuleEffect]]
+
+**Key Properties**:
+- `sideEffects`: Side effect specifications
+- `stateChanges`: State mutations
+- `purity`: Pure function?
+- `idempotent`: Idempotent operation?
 
 ### 7. Scope - What It Exposes
 
-```typescript
-interface ModuleScope {
-  exports: string[];        // Exported symbols
-  publicApi: string[];      // Public API members
-  visibility: 'public' | 'internal' | 'private';
-  stability: 'stable' | 'experimental' | 'deprecated';
-}
-```
+See implementation: [[ModuleScope]]
+
+**Key Properties**:
+- `exports`: Exported symbols
+- `publicApi`: Public API members
+- `visibility`: 'public', 'internal', or 'private'
+- `stability`: 'stable', 'experimental', or 'deprecated'
 
 ## Supporting Types
 
 ### Parameter Specification
 
-```typescript
-interface ParamSpec {
-  name: string;
-  type: string;
-  description?: string;
-  optional: boolean;
-  defaultValue?: string;
-  constraints?: string[];   // e.g., "must be > 0"
-}
-```
+See implementation: [[ParamSpec]]
+
+**Key Properties**:
+- `name`: Parameter name
+- `type`: Parameter type
+- `description`: Parameter description (optional)
+- `optional`: Is optional?
+- `defaultValue`: Default value (optional)
+- `constraints`: Constraints, e.g., "must be > 0" (optional)
 
 ### Return Specification
 
-```typescript
-interface ReturnSpec {
-  type: string;
-  description?: string;
-}
-```
+See implementation: [[ReturnSpec]]
+
+**Key Properties**:
+- `type`: Return type
+- `description`: Return description (optional)
 
 ### Failure Case
 
-```typescript
-interface FailureCase {
-  condition: string;        // When it fails
-  errorType?: string;       // Error thrown
-  description: string;      // Why it fails
-}
-```
+See implementation: [[FailureCase]]
+
+**Key Properties**:
+- `condition`: When it fails
+- `errorType`: Error thrown (optional)
+- `description`: Why it fails
 
 ### Dependency Specification
 
-```typescript
-interface DependencySpec {
-  name: string;
-  type: 'module' | 'service' | 'external';
-  purpose: string;          // Why needed
-  critical: boolean;        // Required?
-}
-```
+See implementation: [[DependencySpec]]
+
+**Key Properties**:
+- `name`: Dependency name
+- `type`: 'module', 'service', or 'external'
+- `purpose`: Why needed
+- `critical`: Required?
 
 ### Import Specification
 
-```typescript
-interface ImportSpec {
-  source: string;           // Module path
-  symbols: string[];        // Imported symbols
-  isExternal: boolean;      // npm package?
-}
-```
+See implementation: [[ImportSpec]]
+
+**Key Properties**:
+- `source`: Module path
+- `symbols`: Imported symbols
+- `isExternal`: npm package?
 
 ### Side Effect Specification
 
-```typescript
-interface SideEffectSpec {
-  type: 'filesystem' | 'database' | 'network'
-      | 'state' | 'process' | 'other';
-  description: string;
-  operation?: string;       // Read/write/delete
-}
-```
+See implementation: [[SideEffectSpec]]
+
+**Key Properties**:
+- `type`: 'filesystem', 'database', 'network', 'state', 'process', or 'other'
+- `description`: Effect description
+- `operation`: Read/write/delete (optional)
 
 ## Complete Module Specification
 
-```typescript
-interface ModuleSpecTemplate {
-  purpose: ModulePurpose;
-  input: ModuleInput;
-  output: ModuleOutput;
-  context: ModuleContext;
-  logic: ModuleLogic;
-  effect: ModuleEffect;
-  scope: ModuleScope;
-  metadata?: {
-    author?: string;
-    version?: string;
-    lastUpdated?: string;
-    tags?: string[];
-  };
-}
-```
+See implementation: [[ModuleSpecTemplate]]
+
+**Key Properties**:
+- `purpose`: Module purpose
+- `input`: Module input
+- `output`: Module output
+- `context`: Module context
+- `logic`: Module logic
+- `effect`: Module effect
+- `scope`: Module scope
+- `metadata`: Metadata (author, version, lastUpdated, tags) (optional)
 
 ## Example Specification
 

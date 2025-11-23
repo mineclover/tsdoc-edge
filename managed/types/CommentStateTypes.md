@@ -8,124 +8,119 @@ Type system for comment fold/unfold operations.
 
 ## Comment Status
 
-```typescript
-type CommentStatus = 'expanded' | 'collapsed';
-```
+See implementation: [[CommentStatus]]
 
+**Values**:
 - **expanded**: Full comment visible in code
 - **collapsed**: Summary only (detail in markdown)
 
 ## Comment Location
 
 Position in source file:
-```typescript
-interface CommentLocation {
-  filePath: string;     // Relative to project root
-  line: number;         // Start line (1-based)
-  column: number;       // Start column (0-based)
-  endLine: number;      // End line (1-based)
-}
-```
+
+See implementation: [[CommentLocation]]
+
+**Key Properties**:
+- `filePath`: Relative to project root
+- `line`: Start line (1-based)
+- `column`: Start column (0-based)
+- `endLine`: End line (1-based)
 
 ## Comment State
 
 State of a single comment:
-```typescript
-interface CommentState {
-  id: string;              // Unique identifier
-  contentHash: string;     // SHA-256 hash
-  location: CommentLocation;
-  symbol: string;          // Symbol name
-  status: CommentStatus;
-  fullComment: string;     // Original full text
-  collapsedComment: string; // Summary only
-  markdownPath?: string;   // External markdown file
-  lastModified: string;    // ISO timestamp
-}
-```
+
+See implementation: [[CommentState]]
+
+**Key Properties**:
+- `id`: Unique identifier
+- `contentHash`: SHA-256 hash
+- `location`: Comment location
+- `symbol`: Symbol name
+- `status`: Comment status (expanded/collapsed)
+- `fullComment`: Original full text
+- `collapsedComment`: Summary only
+- `markdownPath`: External markdown file (optional)
+- `lastModified`: ISO timestamp
 
 ## File Comment State
 
 All comments in a file:
-```typescript
-interface FileCommentState {
-  filePath: string;
-  comments: CommentState[];
-  isFolded: boolean;       // Any comments folded?
-  lastModified: string;
-}
-```
+
+See implementation: [[FileCommentState]]
+
+**Key Properties**:
+- `filePath`: File path
+- `comments`: Comment states
+- `isFolded`: Any comments folded?
+- `lastModified`: ISO timestamp
 
 ## State Storage
 
 Persistent storage structure:
-```typescript
-interface StateStorage {
-  version: string;         // Storage format version
-  lastUpdated: string;     // ISO timestamp
-  files: Record<string, FileCommentState>;
-}
-```
+
+See implementation: [[StateStorage]]
+
+**Key Properties**:
+- `version`: Storage format version
+- `lastUpdated`: ISO timestamp
+- `files`: File comment states map
 
 ## Collapse/Expand Options
 
 ### Collapse Options
 
-```typescript
-interface CollapseOptions {
-  exportDir?: string;      // Where to export markdown
-  updateSource?: boolean;  // Remove from source?
-  preserveMarkers?: boolean; // Add fold markers?
-  summaryLength?: number;  // Max summary chars
-}
-```
+See implementation: [[CollapseOptions]]
+
+**Key Properties**:
+- `exportDir`: Where to export markdown (optional)
+- `updateSource`: Remove from source? (optional)
+- `preserveMarkers`: Add fold markers? (optional)
+- `summaryLength`: Max summary chars (optional)
 
 ### Expand Options
 
-```typescript
-interface ExpandOptions {
-  restoreDir?: string;     // Where to import from
-  validateSource?: boolean; // Check conflicts?
-  mergeStrategy?: 'overwrite' | 'keep-source' | 'merge';
-}
-```
+See implementation: [[ExpandOptions]]
+
+**Key Properties**:
+- `restoreDir`: Where to import from (optional)
+- `validateSource`: Check conflicts? (optional)
+- `mergeStrategy`: Merge strategy - 'overwrite', 'keep-source', or 'merge'
 
 ## Export/Import Results
 
 ### Export Result
 
-```typescript
-interface ExportResult {
-  exportedCount: number;
-  exportedFiles: string[];
-  errors: Error[];
-}
-```
+See implementation: [[ExportResult]]
+
+**Key Properties**:
+- `exportedCount`: Number of exported comments
+- `exportedFiles`: List of exported files
+- `errors`: Export errors
 
 ### Import Result
 
-```typescript
-interface ImportResult {
-  importedCount: number;
-  updatedFiles: string[];
-  conflicts: ConflictInfo[];
-  errors: Error[];
-}
-```
+See implementation: [[ImportResult]]
+
+**Key Properties**:
+- `importedCount`: Number of imported comments
+- `updatedFiles`: List of updated files
+- `conflicts`: Conflict information
+- `errors`: Import errors
 
 ## File Status Summary
 
 Quick status check:
-```typescript
-interface FileStatusSummary {
-  filePath: string;
-  totalComments: number;
-  expandedComments: number;
-  collapsedComments: number;
-  isFolded: boolean;
-  lastModified: string;
-}
-```
+
+See implementation: [[FileStatusSummary]]
+
+**Key Properties**:
+- `filePath`: File path
+- `totalComments`: Total number of comments
+- `expandedComments`: Number of expanded comments
+- `collapsedComments`: Number of collapsed comments
+- `isFolded`: Any comments folded?
+- `lastModified`: ISO timestamp
 
 ## Content Hashing
 

@@ -9,12 +9,12 @@ Custom TSDoc tags for 7-part module specification framework.
 ## Algorithm Documentation
 
 From `@algorithm` tag:
-```typescript
-interface AlgorithmDoc {
-  description: string;       // Algorithm description
-  steps?: string[];          // Pseudocode steps
-}
-```
+
+See implementation: [[AlgorithmDoc]]
+
+**Key Properties**:
+- `description`: Algorithm description
+- `steps`: Pseudocode steps (optional)
 
 ### Example
 
@@ -29,12 +29,12 @@ interface AlgorithmDoc {
 ## Complexity Documentation
 
 From `@complexity` tag:
-```typescript
-interface ComplexityDoc {
-  notation: string;          // "O(n)", "O(log n)", etc.
-  explanation?: string;      // Why this complexity
-}
-```
+
+See implementation: [[ComplexityDoc]]
+
+**Key Properties**:
+- `notation`: "O(n)", "O(log n)", etc.
+- `explanation`: Why this complexity (optional)
 
 ### Example
 
@@ -47,13 +47,13 @@ interface ComplexityDoc {
 ## Side Effect Documentation
 
 From `@sideEffect` tag:
-```typescript
-interface SideEffectDoc {
-  type: 'filesystem' | 'database' | 'network' | 'state' | 'process' | 'other';
-  description: string;
-  operation?: string;        // "read", "write", "delete"
-}
-```
+
+See implementation: [[SideEffectDoc]]
+
+**Key Properties**:
+- `type`: 'filesystem', 'database', 'network', 'state', 'process', or 'other'
+- `description`: Effect description
+- `operation`: "read", "write", "delete" (optional)
 
 ### Example
 
@@ -68,12 +68,12 @@ interface SideEffectDoc {
 ## Mutation Documentation
 
 From `@mutates` tag:
-```typescript
-interface MutationDoc {
-  target: string;            // What state mutated
-  description: string;       // How it changes
-}
-```
+
+See implementation: [[MutationDoc]]
+
+**Key Properties**:
+- `target`: What state mutated
+- `description`: How it changes
 
 ### Example
 
@@ -87,12 +87,12 @@ interface MutationDoc {
 ## I/O Documentation
 
 From `@io` tag:
-```typescript
-interface IODoc {
-  type: 'file' | 'network' | 'database' | 'console' | 'other';
-  description: string;
-}
-```
+
+See implementation: [[IODoc]]
+
+**Key Properties**:
+- `type`: 'file', 'network', 'database', 'console', or 'other'
+- `description`: I/O description
 
 ### Example
 
@@ -107,12 +107,12 @@ interface IODoc {
 ## Scope Documentation
 
 From `@scope` tag:
-```typescript
-interface ScopeDoc {
-  description: string;
-  accessLevel?: 'public' | 'private' | 'protected' | 'internal';
-}
-```
+
+See implementation: [[ScopeDoc]]
+
+**Key Properties**:
+- `description`: Scope description
+- `accessLevel`: 'public', 'private', 'protected', or 'internal' (optional)
 
 ### Example
 
@@ -126,16 +126,16 @@ interface ScopeDoc {
 ## Module Spec Tags
 
 Complete tag set:
-```typescript
-interface ModuleSpecTags {
-  algorithm?: AlgorithmDoc;
-  complexity?: ComplexityDoc;
-  sideEffects?: SideEffectDoc[];
-  mutations?: MutationDoc[];
-  io?: IODoc[];
-  scope?: ScopeDoc;
-}
-```
+
+See implementation: [[ModuleSpecTags]]
+
+**Key Properties**:
+- `algorithm`: Algorithm documentation (optional)
+- `complexity`: Complexity documentation (optional)
+- `sideEffects`: Side effect documentation (optional)
+- `mutations`: Mutation documentation (optional)
+- `io`: I/O documentation (optional)
+- `scope`: Scope documentation (optional)
 
 ## Tag Names Constants
 

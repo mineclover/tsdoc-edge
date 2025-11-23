@@ -9,6 +9,33 @@ import type { ContractSpec, ResponsibilitySpec, SymbolRelationship, TestMapping 
 export type { SymbolRelationship, ContractSpec, TestMapping, ResponsibilitySpec };
 
 /**
+ * Implementation symbol types (excludes test symbols)
+ * @public
+ */
+export type ImplementationSymbolType =
+  | 'function'
+  | 'class'
+  | 'interface'
+  | 'type'
+  | 'enum'
+  | 'variable'
+  | 'constant'
+  | 'method'
+  | 'property';
+
+/**
+ * Test symbol types
+ * @public
+ */
+export type TestSymbolType = 'test-suite' | 'test-case' | 'test-scenario';
+
+/**
+ * All possible symbol types
+ * @public
+ */
+export type SymbolType = ImplementationSymbolType | TestSymbolType;
+
+/**
  * Represents a symbol in the codebase
  * @public
  * @doc [[Symbol]]
@@ -28,7 +55,7 @@ export interface Symbol {
   /**
    * Symbol type (function, class, interface, etc.)
    */
-  type: 'function' | 'class' | 'interface' | 'type' | 'enum' | 'variable' | 'constant' | 'method' | 'property';
+  type: SymbolType;
 
   /**
    * File path where symbol is defined

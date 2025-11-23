@@ -107,26 +107,23 @@ traverse(
 
 ### Result Structure
 
-```typescript
-interface TraversalResult {
-  visited: Set<string>;           // All visited symbols
-  maxDepth: number;                // Maximum depth reached
-  cycles: CircularDependency[];    // Circular dependencies found
-  chains: DependencyChain[];       // All complete chains
-  symbolDepths: Map<string, number>; // Depth of each symbol
-}
+See implementation: [[TraversalResult]]
 
-interface CircularDependency {
-  cycle: string[];  // Symbols forming the cycle
-  entryPoint: string;  // Where cycle was detected
-}
+**TraversalResult**:
+- `visited`: Set<string> - All visited symbols
+- `maxDepth`: number - Maximum depth reached
+- `cycles`: CircularDependency[] - Circular dependencies found
+- `chains`: DependencyChain[] - All complete chains
+- `symbolDepths`: Map<string, number> - Depth of each symbol
 
-interface DependencyChain {
-  path: string[];   // Complete path from root to leaf
-  depth: number;    // Chain length
-  leaf: string;     // Terminal symbol
-}
-```
+**CircularDependency**:
+- `cycle`: string[] - Symbols forming the cycle
+- `entryPoint`: string - Where cycle was detected
+
+**DependencyChain**:
+- `path`: string[] - Complete path from root to leaf
+- `depth`: number - Chain length
+- `leaf`: string - Terminal symbol
 
 ## Usage
 

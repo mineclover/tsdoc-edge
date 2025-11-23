@@ -8,14 +8,7 @@ Base type for symbol documentation with core metadata fields.
 
 ## Type Definition
 
-```typescript
-export interface BaseSymbolDoc {
-  symbolId: string;
-  createdAt: string;
-  updatedAt: string;
-  version: string;
-}
-```
+See [[BaseSymbolDoc]] implementation in source code.
 
 ## Fields
 
@@ -26,18 +19,13 @@ export interface BaseSymbolDoc {
 
 ## Usage
 
-Extended by [[EnhancedSymbolDoc]]:
-
-```typescript
-export interface EnhancedSymbolDoc extends BaseSymbolDoc {
-  problemSolving?: ProblemSolving;
-  functionality?: Functionality;
-  errorExperiences?: ErrorExperience[];
-  decisions?: DecisionRecord[];
-  dependencies?: DependencySpec[];
-  futurePlans?: FuturePlan[];
-}
-```
+Extended by [[EnhancedSymbolDoc]] which adds:
+- `problemSolving`: Problem-solving documentation
+- `functionality`: Functionality details
+- `errorExperiences`: Known errors and solutions
+- `decisions`: Design decisions
+- `dependencies`: Dependency specifications
+- `futurePlans`: Future development plans
 
 ## Related
 

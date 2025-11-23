@@ -9,42 +9,42 @@ Type system for bidirectional doc-code linking and validation.
 ## Code Link (Doc → Code)
 
 Link from documentation to source code:
-```typescript
-interface CodeLink {
-  docPath: string;         // Source doc file
-  docLine: number;         // Line in doc
-  text: string;            // Link text
-  targetFile: string;      // Target source file
-  targetSymbol?: string;   // Symbol name
-  targetMember?: string;   // Member (Class#method)
-}
-```
+
+See implementation: [[CodeLink]]
+
+**Key Properties**:
+- `docPath`: Source doc file
+- `docLine`: Line in doc
+- `text`: Link text
+- `targetFile`: Target source file
+- `targetSymbol`: Symbol name (optional)
+- `targetMember`: Member (Class#method) (optional)
 
 ## Doc Link (Code → Doc)
 
 Link from source code to documentation:
-```typescript
-interface DocLink {
-  codePath: string;        // Source code file
-  codeLine: number;        // Line in code
-  symbolName: string;      // Symbol being documented
-  tagType: string;         // @see, @link, @doc
-  targetDoc: string;       // Target markdown file
-  targetSection?: string;  // Section anchor
-}
-```
+
+See implementation: [[DocLink]]
+
+**Key Properties**:
+- `codePath`: Source code file
+- `codeLine`: Line in code
+- `symbolName`: Symbol being documented
+- `tagType`: @see, @link, @doc
+- `targetDoc`: Target markdown file
+- `targetSection`: Section anchor (optional)
 
 ## Link Index
 
 Bidirectional mapping between code and docs:
-```typescript
-interface LinkIndex {
-  codeToDoc: Map<string, DocLink[]>;
-  docToCode: Map<string, CodeLink[]>;
-  symbolToDoc: Map<string, string[]>;
-  docToSymbol: Map<string, string[]>;
-}
-```
+
+See implementation: [[LinkIndex]]
+
+**Key Properties**:
+- `codeToDoc`: Map from code files to doc links
+- `docToCode`: Map from doc files to code links
+- `symbolToDoc`: Map from symbols to doc files
+- `docToSymbol`: Map from doc files to symbols
 
 ### Index Usage
 
@@ -65,14 +65,14 @@ const symbols = index.docToSymbol.get('managed/features/user-service.md');
 ## Link Validation Result
 
 Result of validating a single link:
-```typescript
-interface LinkValidationResult {
-  type: 'broken' | 'valid' | 'outdated';
-  link: CodeLink | DocLink;
-  issue?: string;          // Description of problem
-  suggestion?: string;     // How to fix
-}
-```
+
+See implementation: [[LinkValidationResult]]
+
+**Key Properties**:
+- `type`: 'broken', 'valid', or 'outdated'
+- `link`: CodeLink or DocLink
+- `issue`: Description of problem (optional)
+- `suggestion`: How to fix (optional)
 
 ### Validation Types
 
@@ -83,26 +83,26 @@ interface LinkValidationResult {
 ## Link Validation Report
 
 Summary of all link validations:
-```typescript
-interface LinkValidationReport {
-  totalLinks: number;
-  brokenLinks: LinkValidationResult[];
-  validLinks: number;
-  fixableLinks: number;    // Auto-fixable count
-}
-```
+
+See implementation: [[LinkValidationReport]]
+
+**Key Properties**:
+- `totalLinks`: Total number of links
+- `brokenLinks`: Broken link validation results
+- `validLinks`: Number of valid links
+- `fixableLinks`: Auto-fixable count
 
 ## Fix Result
 
 Result of applying a fix to a broken link:
-```typescript
-interface FixResult {
-  link: CodeLink | DocLink;
-  originalText: string;    // Before fix
-  fixedText: string;       // After fix
-  applied: boolean;        // Successfully applied?
-}
-```
+
+See implementation: [[FixResult]]
+
+**Key Properties**:
+- `link`: CodeLink or DocLink
+- `originalText`: Before fix
+- `fixedText`: After fix
+- `applied`: Successfully applied?
 
 ## Link Validation Flow
 

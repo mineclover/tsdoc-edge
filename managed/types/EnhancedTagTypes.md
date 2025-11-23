@@ -9,14 +9,14 @@ Extended documentation structure for comprehensive symbol documentation in Stric
 ## Problem Solving
 
 Documents the problem context:
-```typescript
-interface ProblemSolving {
-  description: string;       // Problem description
-  context: string;           // What problem solved
-  targetUseCase?: string;    // Intended use case
-  relatedProblem?: string;   // Parent/related problem
-}
-```
+
+See implementation: [[ProblemSolving]]
+
+**Key Properties**:
+- `description`: Problem description
+- `context`: What problem solved
+- `targetUseCase`: Intended use case (optional)
+- `relatedProblem`: Parent/related problem (optional)
 
 ### Example
 
@@ -32,48 +32,40 @@ interface ProblemSolving {
 ## Functionality
 
 Documents what the symbol does:
-```typescript
-interface Functionality {
-  mainFeatures: string[];    // Key features
-  components: Component[];   // Sub-components
-  io?: IOSpec;               // Input/output
-  examples?: string[];       // Usage examples
-}
 
-interface Component {
-  name: string;
-  description: string;
-  signature?: string;        // Function signature
-}
+See implementation: [[Functionality]]
 
-interface IOSpec {
-  inputs: Array<{
-    name: string;
-    type: string;
-    description: string;
-  }>;
-  outputs: Array<{
-    name: string;
-    type: string;
-    description: string;
-  }>;
-}
-```
+**Key Properties**:
+- `mainFeatures`: Key features
+- `components`: Sub-components
+- `io`: Input/output specification (optional)
+- `examples`: Usage examples (optional)
+
+### Supporting Types
+
+Component structure (inline type in [[Functionality]].components):
+- `name`: Component name
+- `description`: Component description
+- `signature`: Function signature (optional)
+
+IOSpec structure (inline type in [[Functionality]].io):
+- `inputs`: Input specifications (name, type, description)
+- `outputs`: Output specifications (name, type, description)
 
 ## Error Experience
 
 Documents known errors and solutions:
-```typescript
-interface ErrorExperience {
-  id: string;                // Error identifier
-  errorType: string;         // Error class/name
-  scenario: string;          // When it happens
-  rootCause: string;         // Why it happens
-  solution: string;          // How to fix
-  prevention?: string;       // How to prevent
-  learnedFrom?: string;      // Source of knowledge
-}
-```
+
+See implementation: [[ErrorExperience]]
+
+**Key Properties**:
+- `id`: Error identifier
+- `errorType`: Error class/name
+- `scenario`: When it happens
+- `rootCause`: Why it happens
+- `solution`: How to fix
+- `prevention`: How to prevent (optional)
+- `learnedFrom`: Source of knowledge (optional)
 
 ### Example
 
@@ -92,78 +84,68 @@ interface ErrorExperience {
 ## Design Decisions
 
 Documents architectural choices:
-```typescript
-interface DesignDecision {
-  id: string;                // Decision identifier
-  title: string;             // Decision summary
-  context: string;           // Background/situation
-  decision: string;          // What was decided
-  alternatives: Alternative[];
-  rationale: string;         // Why chosen
-  consequences: string[];    // Trade-offs
-  status: 'proposed' | 'accepted' | 'deprecated' | 'superseded';
-  date?: string;             // Decision date
-  revisedBy?: string;        // Superseding decision
-}
 
-interface Alternative {
-  name: string;
-  pros: string[];
-  cons: string[];
-  rejected: boolean;
-}
-```
+See implementation: [[DesignDecision]]
+
+**Key Properties**:
+- `id`: Decision identifier
+- `title`: Decision summary
+- `context`: Background/situation
+- `decision`: What was decided
+- `alternatives`: Alternative options considered
+- `rationale`: Why chosen
+- `consequences`: Trade-offs
+- `status`: 'proposed', 'accepted', 'deprecated', or 'superseded'
+- `date`: Decision date (optional)
+- `revisedBy`: Superseding decision (optional)
+
+Note: The `alternatives` field in the documentation contains an array of alternative options as strings. For structured alternatives, use the [[DesignDecision]] interface with the `consequences` field to describe trade-offs.
 
 ## Dependencies
 
 Documents external dependencies:
-```typescript
-interface DependencyDoc {
-  name: string;              // Dependency name
-  version?: string;          // Version constraint
-  type: 'npm' | 'internal' | 'external' | 'service';
-  purpose: string;           // Why needed
-  alternatives?: string[];   // Possible replacements
-  critical: boolean;         // Required for core functionality?
-}
-```
+
+See implementation: [[DependencySpec]]
+
+**Key Properties**:
+- `name`: Dependency name
+- `version`: Version constraint (optional)
+- `type`: 'npm', 'internal', 'external', or 'service'
+- `purpose`: Why needed
+- `alternatives`: Possible replacements (optional)
+- `critical`: Required for core functionality?
 
 ## Future Plans
 
 Documents roadmap and TODOs:
-```typescript
-interface FuturePlan {
-  id: string;
-  title: string;
-  description: string;
-  priority: 'high' | 'medium' | 'low';
-  effort: 'small' | 'medium' | 'large';
-  blockers?: string[];       // Blocking issues
-  relatedIssues?: string[];  // GitHub issues
-  estimatedDate?: string;    // Target date
-}
-```
+
+See implementation: [[FuturePlan]]
+
+**Key Properties**:
+- `id`: Plan identifier
+- `title`: Plan title
+- `description`: Plan description
+- `priority`: 'high', 'medium', or 'low'
+- `effort`: 'small', 'medium', or 'large'
+- `blockers`: Blocking issues (optional)
+- `relatedIssues`: GitHub issues (optional)
+- `estimatedDate`: Target date (optional)
 
 ## Enhanced Symbol Documentation
 
 Complete enhanced doc structure:
-```typescript
-interface EnhancedSymbolDoc {
-  symbolId: string;
-  problemSolving?: ProblemSolving;
-  functionality?: Functionality;
-  errorExperiences: ErrorExperience[];
-  designDecisions: DesignDecision[];
-  dependencies: DependencyDoc[];
-  futurePlans: FuturePlan[];
-  metadata: {
-    createdAt: string;
-    updatedAt: string;
-    version: string;
-    authors?: string[];
-  };
-}
-```
+
+See implementation: [[EnhancedSymbolDoc]]
+
+**Key Properties**:
+- `symbolId`: Symbol identifier
+- `problemSolving`: Problem context (optional)
+- `functionality`: Functionality details (optional)
+- `errorExperiences`: Error experiences
+- `designDecisions`: Design decisions
+- `dependencies`: Dependencies
+- `futurePlans`: Future plans
+- `metadata`: Metadata (createdAt, updatedAt, version, authors)
 
 ## Strict Mode Requirements
 

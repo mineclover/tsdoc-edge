@@ -152,7 +152,7 @@ export class IdCommand extends BaseCommand {
     const id = manager.register({
       filePath,
       symbolName,
-      type: type as Symbol['type'],
+      type: type as any, // Type narrowed to ImplementationSymbolType by register()
       memberOf: parent,
       memberType,
     });

@@ -9,72 +9,72 @@ Type system for CLI usage analytics and tracking.
 ## Command Usage Event
 
 Records single command execution:
-```typescript
-interface CommandUsageEvent {
-  command: string;         // Command name
-  args: string[];          // Arguments
-  timestamp: string;       // ISO timestamp
-  duration: number;        // Milliseconds
-  success: boolean;        // Succeeded?
-  error?: string;          // Error message
-  cwd: string;             // Working directory
-  nodeVersion: string;     // Node.js version
-  version: string;         // TSDoc Edge version
-}
-```
+
+See implementation: [[CommandUsageEvent]]
+
+**Key Properties**:
+- `command`: Command name
+- `args`: Arguments
+- `timestamp`: ISO timestamp
+- `duration`: Milliseconds
+- `success`: Succeeded?
+- `error`: Error message (optional)
+- `cwd`: Working directory
+- `nodeVersion`: Node.js version
+- `version`: TSDoc Edge version
 
 ## Usage Statistics
 
 Aggregated analytics:
-```typescript
-interface UsageStatistics {
-  totalCommands: number;
-  commandCounts: Record<string, number>;
-  avgDuration: Record<string, number>;
-  successRate: Record<string, number>;
-  firstUsed: string;       // ISO timestamp
-  lastUsed: string;        // ISO timestamp
-  totalDuration: number;   // Milliseconds
-}
-```
+
+See implementation: [[UsageStatistics]]
+
+**Key Properties**:
+- `totalCommands`: Total number of commands
+- `commandCounts`: Count per command type
+- `avgDuration`: Average duration per command
+- `successRate`: Success rate per command
+- `firstUsed`: ISO timestamp
+- `lastUsed`: ISO timestamp
+- `totalDuration`: Milliseconds
 
 ## Analytics Config
 
 Configuration for analytics collection:
-```typescript
-interface AnalyticsConfig {
-  enabled: boolean;        // Enable/disable
-  storagePath: string;     // JSONL storage path
-  maxEvents: number;       // Max events before cleanup
-  retentionDays: number;   // Days to keep events
-}
-```
+
+See implementation: [[AnalyticsConfig]]
+
+**Key Properties**:
+- `enabled`: Enable/disable analytics
+- `storagePath`: JSONL storage path
+- `maxEvents`: Max events before cleanup
+- `retentionDays`: Days to keep events
 
 ## Usage Report Options
 
 Report generation parameters:
-```typescript
-interface UsageReportOptions {
-  startDate?: Date;        // Filter from
-  endDate?: Date;          // Filter to
-  groupBy?: 'day' | 'week' | 'month';
-  includeErrors?: boolean; // Show error details
-}
-```
+
+See implementation: [[UsageReportOptions]]
+
+**Key Properties**:
+- `startDate`: Filter from (optional)
+- `endDate`: Filter to (optional)
+- `groupBy`: Grouping period - 'day', 'week', or 'month'
+- `includeErrors`: Show error details (optional)
 
 ## Daily Usage Summary
 
 Per-day aggregation:
-```typescript
-interface DailyUsageSummary {
-  date: string;            // YYYY-MM-DD
-  totalCommands: number;
-  uniqueCommands: number;
-  successRate: number;     // 0-1
-  avgDuration: number;     // Milliseconds
-  topCommand: string;      // Most used
-}
-```
+
+See implementation: [[DailyUsageSummary]]
+
+**Key Properties**:
+- `date`: YYYY-MM-DD format
+- `totalCommands`: Total commands for the day
+- `uniqueCommands`: Unique commands used
+- `successRate`: Success rate (0-1)
+- `avgDuration`: Average duration in milliseconds
+- `topCommand`: Most used command
 
 ## Usage Patterns
 

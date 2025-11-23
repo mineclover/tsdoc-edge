@@ -45,3 +45,6 @@ export * from './tags';
 export * from './spec';
 // Analytics types - usage tracking
 export * from './analytics';
+// Test symbol types - test suites, cases, scenarios
+export * from './test-symbols';
+export * from './guards/test-symbol-guards';

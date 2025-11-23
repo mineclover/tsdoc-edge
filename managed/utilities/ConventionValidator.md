@@ -110,17 +110,13 @@ Required:
 
 ## Validation Result
 
-```typescript
-interface ValidationResult {
-  ruleId: string;
-  severity: 'error' | 'warning' | 'info';
-  message: string;
-  location?: {
-    line: number;
-    column: number;
-  };
-}
-```
+See implementation: [[ValidationResult]]
+
+**Key Properties**:
+- `ruleId`: Rule identifier
+- `severity`: 'error', 'warning', or 'info'
+- `message`: Validation message
+- `location`: Source location (line, column) if applicable
 
 ## Convention Enforcement
 

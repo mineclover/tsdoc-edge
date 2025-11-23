@@ -85,6 +85,8 @@ export interface ScannerConfig {
   exclude?: string[];
   /** Whether to follow symlinks */
   followSymlinks?: boolean;
+  /** Whether to include test files (.test.ts, .spec.ts) */
+  includeTestFiles?: boolean;
 }
 
 /**
@@ -133,11 +135,19 @@ export class FileScanner {
     this.parser = new TSDocParser();
     this.registry = registry;
     this.db = db;
+
+    // Build exclude patterns based on includeTestFiles option
+    const defaultExcludePatterns = ['**/node_modules/**', '**/dist/**'];
+    if (!config.includeTestFiles) {
+      defaultExcludePatterns.push('**/*.test.ts', '**/*.spec.ts');
+    }
+
     this.config = {
-      include: ['**/*.ts', '**/*.tsx'],
-      exclude: ['**/node_modules/**', '**/dist/**', '**/*.test.ts', '**/*.spec.ts'],
-      followSymlinks: false,
-      ...config,
+      include: config.include || ['**/*.ts', '**/*.tsx'],
+      exclude: config.exclude || defaultExcludePatterns,
+      followSymlinks: config.followSymlinks ?? false,
+      includeTestFiles: config.includeTestFiles ?? false,
+      rootDir: config.rootDir,
     };
   }
 

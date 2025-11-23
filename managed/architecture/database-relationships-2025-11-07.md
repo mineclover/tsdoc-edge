@@ -404,12 +404,14 @@ WHERE confidence > 0.8
 - **Circular Detection**: from:[A,B,C], to:A represents A→B→C→A
 
 **Schema**:
-```typescript
-interface UnifiedRelationship {
-  from_symbols: string[];  // JSON: ["symbol-id-1", "symbol-id-2"]
-  to_symbols: string[];    // JSON: ["symbol-id-3"]
-}
-```
+
+See implementation: [[UnifiedRelationship]]
+
+**Key Array Fields**:
+- `from_symbols`: Array of source symbol IDs (JSON: ["symbol-id-1", "symbol-id-2"])
+- `to_symbols`: Array of target symbol IDs (JSON: ["symbol-id-3"])
+
+This enables N-to-M relationships and circular detection (e.g., from:[A,B,C], to:A represents A→B→C→A)
 
 **Query Patterns**:
 ```sql

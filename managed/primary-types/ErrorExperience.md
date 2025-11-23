@@ -8,17 +8,7 @@ Type definition for error experience documentation in enhanced symbol documentat
 
 ## Type Definition
 
-```typescript
-export interface ErrorExperience {
-  id: string;
-  errorType: string;
-  message: string;
-  context: string;
-  solution: string;
-  occurredAt?: string;
-  prevention?: string;
-}
-```
+See [[ErrorExperience]] implementation in source code.
 
 ## Fields
 
@@ -32,14 +22,9 @@ export interface ErrorExperience {
 
 ## Usage
 
-Used in [[EnhancedSymbolDoc]] as Category 3 (15 points):
+Used in [[EnhancedSymbolDoc]] as Category 3 (15 points).
 
-```typescript
-interface EnhancedSymbolDoc {
-  errorExperiences?: ErrorExperience[];  // Category 3
-  // ...
-}
-```
+**Property**: `errorExperiences?: ErrorExperience[]`
 
 ## Validation
 

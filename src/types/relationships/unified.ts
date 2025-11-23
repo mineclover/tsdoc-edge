@@ -3,7 +3,7 @@
  * @packageDocumentation
  *
  * @responsibility Define comprehensive relationship taxonomy
- * @contract Support all 26 relationship types across 10 categories
+ * @contract Support all 30 relationship types across 11 categories
  *
  * @problem Current system only tracks code dependencies
  * @solves Unified type system for all relationship categories
@@ -20,7 +20,7 @@
  * Relationship type classification
  * @public
  *
- * Total: 26 relationship types across 10 categories
+ * Total: 30 relationship types across 11 categories
  */
 export type RelationshipType =
   // 1. Structural (Code Space)
@@ -45,13 +45,18 @@ export type RelationshipType =
   | 'co-requirement'      // A requires B to be present
   | 'circular-dependency' // A → B → A (quality/constraint)
   // 6. Semantic (Meta Space)
-  | 'conceptual-relation' // A and B are related concepts
-  | 'feature-grouping'    // A, B, C belong to same feature
+  | 'conceptual-relation' // @deprecated Use naming-pattern-relation or explicit-semantic-relation
+  | 'naming-pattern-relation' // Symbols share domain prefix (UserService ~ UserRepository)
+  | 'explicit-semantic-relation' // Developer-declared via @relatedTo tag
+  | 'feature-grouping'    // A, B, C belong to same feature (file structure)
   | 'doc-reference'       // Documentation references symbol
   | 'enhancement'         // A enhances B
-  // 7. Verification
-  | 'test-coverage'       // A is tested by TestA
+  // 7. Verification & Testing
+  | 'test-coverage'       // Test file tests implementation symbol
   | 'integration-verification' // A↔B connection verified by test
+  | 'contains'            // Test suite contains test case/suite
+  | 'covers-scenario'     // Test case covers test scenario
+  | 'test-as-example'     // Test case serves as documentation example
   // 8. Type System
   | 'type-dependency'     // Parameter/return type dependencies
   | 'generic-constraint'  // T extends U
@@ -63,7 +68,7 @@ export type RelationshipType =
  * Relationship category
  * @public
  *
- * Total: 10 categories covering all relationship dimensions
+ * Total: 11 categories covering all relationship dimensions
  */
 export type RelationshipCategory =
   | 'structural'      // Code structure (imports, inheritance)
@@ -71,8 +76,9 @@ export type RelationshipCategory =
   | 'behavioral'      // Runtime behavior (calls, callbacks)
   | 'alternative'     // Substitutability (fallback, substitution)
   | 'constraint'      // Restrictions (mutual-exclusion, co-requirement, circular)
-  | 'semantic'        // Conceptual (doc-reference, feature-grouping, enhancement)
-  | 'verification'    // Testing (test-coverage, integration-verification)
+  | 'semantic'        // Conceptual (naming-pattern, explicit-semantic, feature-grouping)
+  | 'verification'    // Test verification (test-coverage, integration-verification)
+  | 'testing'         // Test structure (contains, covers-scenario)
   | 'type-system'     // Type relationships (type-dependency, generic-constraint)
   | 'architectural'   // Architecture (layer-dependency, module-boundary)
   | 'quality';        // Code quality (circular-dependency)

@@ -8,16 +8,7 @@ Type definition for enhanced dependency specification in symbol documentation.
 
 ## Type Definition
 
-```typescript
-export interface DependencySpec {
-  target: string;
-  type: 'module' | 'file' | 'symbol' | 'external';
-  reason: string;
-  version?: string;
-  isOptional?: boolean;
-  importPath?: string;
-}
-```
+See [[DependencySpec]] implementation in source code.
 
 ## Fields
 
@@ -30,14 +21,9 @@ export interface DependencySpec {
 
 ## Usage
 
-Used in [[EnhancedSymbolDoc]] as Category 5 (15 points):
+Used in [[EnhancedSymbolDoc]] as Category 5 (15 points).
 
-```typescript
-interface EnhancedSymbolDoc {
-  dependencies?: DependencySpec[];  // Category 5
-  // ...
-}
-```
+**Property**: `dependencies?: DependencySpec[]`
 
 ## Validation
 

@@ -10,31 +10,28 @@ Provide fast and flexible symbol search capabilities across the symbol graph.
 
 ### Symbol Query
 
-Multi-criteria search:
-```typescript
-interface SymbolQuery {
-  namePattern?: string;      // Regex pattern
-  type?: SymbolType[];       // Symbol types
-  filePath?: string;         // File path pattern
-  isPublic?: boolean;        // Public API only?
-  hasDoc?: boolean;          // Documented?
-  hasTests?: boolean;        // Tested?
-  hasContract?: boolean;     // Has @contract?
-  hasResponsibility?: boolean; // Has @responsibility?
-  dependencies?: string[];   // Depends on these
-  dependents?: string[];     // Used by these
-}
-```
+See implementation: [[SymbolQuery]]
+
+**Key Properties**:
+- `namePattern`: Regex pattern for symbol names
+- `type`: Filter by symbol types (function, class, etc.)
+- `filePath`: File path pattern
+- `isPublic`: Public API only?
+- `hasDoc`: Documented symbols only?
+- `hasTests`: Tested symbols only?
+- `hasContract`: Has @contract tag?
+- `hasResponsibility`: Has @responsibility tag?
+- `dependencies`: Must depend on these symbols
+- `dependents`: Must be used by these symbols
 
 ### Query Result
 
-```typescript
-interface SymbolQueryResult {
-  symbols: Symbol[];
-  count: number;
-  executionTime: number;     // Milliseconds
-}
-```
+See implementation: [[SymbolQueryResult]]
+
+**Key Properties**:
+- `symbols`: Matching symbols array
+- `count`: Total number of matches
+- `executionTime`: Query execution time (ms)
 
 ## Search Strategies
 

@@ -9,26 +9,26 @@ Type system for code quality analysis and health checking.
 ## Documentation Quality Score
 
 Per-symbol quality assessment:
-```typescript
-interface DocQualityScore {
-  symbolId: string;
-  symbolName: string;
-  symbolType: string;
-  filePath: string;
-  line: number;
-  isPublic: boolean;
-  hasDoc: boolean;
-  hasSummary: boolean;
-  hasCompleteParams: boolean;
-  hasReturns: boolean;
-  hasExamples: boolean;
-  hasCustomTags: boolean;
-  qualityScore: number;     // 0-100
-  missing: string[];        // Missing doc items
-  parentSymbol?: string;
-  children: DocQualityScore[];
-}
-```
+
+See implementation: [[DocQualityScore]]
+
+**Key Properties**:
+- `symbolId`: Symbol identifier
+- `symbolName`: Symbol name
+- `symbolType`: Type of symbol
+- `filePath`: File path
+- `line`: Line number
+- `isPublic`: Public API flag
+- `hasDoc`: Has documentation
+- `hasSummary`: Has summary
+- `hasCompleteParams`: Has complete parameter docs
+- `hasReturns`: Has return value docs
+- `hasExamples`: Has usage examples
+- `hasCustomTags`: Has custom tags
+- `qualityScore`: Quality score (0-100)
+- `missing`: Missing doc items
+- `parentSymbol`: Parent symbol (optional)
+- `children`: Child quality scores
 
 ### Quality Scoring
 
@@ -53,32 +53,32 @@ Common missing elements:
 ## Test Coverage Info
 
 Per-file test coverage:
-```typescript
-interface TestCoverageInfo {
-  sourceFile: string;
-  testFile?: string;
-  hasTest: boolean;
-  symbolCount: number;
-  estimatedCoverage: number;  // Percentage
-}
-```
+
+See implementation: [[TestCoverageInfo]]
+
+**Key Properties**:
+- `sourceFile`: Source file path
+- `testFile`: Test file path (optional)
+- `hasTest`: Has test file
+- `symbolCount`: Number of symbols
+- `estimatedCoverage`: Estimated coverage percentage
 
 ## Code Health Metrics
 
 Overall codebase health:
-```typescript
-interface CodeHealthMetrics {
-  totalFiles: number;
-  totalSymbols: number;
-  publicSymbols: number;
-  documentedSymbols: number;
-  fullyDocumentedSymbols: number;
-  filesWithTests: number;
-  filesWithoutTests: number;
-  avgQualityScore: number;
-  overallHealthScore: number;  // 0-100
-}
-```
+
+See implementation: [[CodeHealthMetrics]]
+
+**Key Properties**:
+- `totalFiles`: Total number of files
+- `totalSymbols`: Total number of symbols
+- `publicSymbols`: Number of public symbols
+- `documentedSymbols`: Number of documented symbols
+- `fullyDocumentedSymbols`: Number of fully documented symbols
+- `filesWithTests`: Files with tests
+- `filesWithoutTests`: Files without tests
+- `avgQualityScore`: Average quality score
+- `overallHealthScore`: Overall health score (0-100)
 
 ### Health Score Calculation
 

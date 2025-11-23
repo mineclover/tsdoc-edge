@@ -9,30 +9,31 @@ Type system for tracking data flow and transformations through the codebase.
 ## DTO Pattern
 
 Common DTO naming patterns:
-```typescript
-type DTOPattern =
-  | 'suffix-dto'       // UserDTO
-  | 'suffix-request'   // UserRequest
-  | 'suffix-response'  // UserResponse
-  | 'suffix-payload'   // UserPayload
-  | 'suffix-input'     // CreateUserInput
-  | 'suffix-output'    // GetUserOutput
-  | 'suffix-data'      // UserData
-  | 'unknown';
-```
+
+See implementation: [[DTOPattern]]
+
+**Values**:
+- `suffix-dto`: UserDTO
+- `suffix-request`: UserRequest
+- `suffix-response`: UserResponse
+- `suffix-payload`: UserPayload
+- `suffix-input`: CreateUserInput
+- `suffix-output`: GetUserOutput
+- `suffix-data`: UserData
+- `unknown`: Unknown pattern
 
 ## DTO Classification
 
 Identifies DTOs by naming pattern:
-```typescript
-interface DTOClassification {
-  interfaceName: string;
-  pattern: DTOPattern;
-  isDTO: boolean;
-  confidence: number;    // 0-1
-  role?: 'input' | 'output' | 'transfer';
-}
-```
+
+See implementation: [[DTOClassification]]
+
+**Key Properties**:
+- `interfaceName`: Interface name
+- `pattern`: DTO pattern
+- `isDTO`: Is it a DTO?
+- `confidence`: Confidence score (0-1)
+- `role`: Role - 'input', 'output', or 'transfer' (optional)
 
 ### DTO Roles
 
@@ -55,15 +56,15 @@ interface DTOClassification {
 ## Transformation Step
 
 Single step in a data transformation chain:
-```typescript
-interface TransformationStep {
-  from: string;          // Source type
-  to: string;            // Target type
-  transformer?: string;  // Function/method name
-  dependency: InterfaceDependency;
-  stepNumber: number;
-}
-```
+
+See implementation: [[TransformationStep]]
+
+**Key Properties**:
+- `from`: Source type
+- `to`: Target type
+- `transformer`: Function/method name (optional)
+- `dependency`: Interface dependency
+- `stepNumber`: Step number in chain
 
 ### Example Transformation
 
@@ -80,15 +81,15 @@ interface TransformationStep {
 ## Data Transformation Chain
 
 Complete transformation path:
-```typescript
-interface DataTransformationChain {
-  source: string;              // Starting type
-  target: string;              // Ending type
-  steps: TransformationStep[];
-  length: number;
-  transformers: string[];      // All transformer functions
-}
-```
+
+See implementation: [[DataTransformationChain]]
+
+**Key Properties**:
+- `source`: Starting type
+- `target`: Ending type
+- `steps`: Transformation steps
+- `length`: Chain length
+- `transformers`: All transformer functions
 
 ### Example Chain
 
@@ -113,26 +114,26 @@ CreateUserRequest → CreateUserInput → User → UserDTO
 ## Transformation Path
 
 Path between two types:
-```typescript
-interface TransformationPath {
-  from: string;
-  to: string;
-  paths: DataTransformationChain[];
-  shortestPath?: DataTransformationChain;
-}
-```
+
+See implementation: [[TransformationPath]]
+
+**Key Properties**:
+- `from`: Source type
+- `to`: Target type
+- `paths`: All possible transformation chains
+- `shortestPath`: Shortest transformation chain (optional)
 
 ## Data Flow Analysis Result
 
 Complete data flow analysis:
-```typescript
-interface DataFlowAnalysisResult {
-  dtos: DTOClassification[];
-  transformations: DataTransformationChain[];
-  orphanedDTOs: string[];      // DTOs never used
-  deadTransformations: string[]; // Transformers never called
-}
-```
+
+See implementation: [[DataFlowAnalysisResult]]
+
+**Key Properties**:
+- `dtos`: DTO classifications
+- `transformations`: Transformation chains
+- `orphanedDTOs`: DTOs never used
+- `deadTransformations`: Transformers never called
 
 ## Use Cases
 

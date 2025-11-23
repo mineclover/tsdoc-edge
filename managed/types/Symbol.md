@@ -21,25 +21,22 @@ A symbol is any named entity in the codebase:
 
 ## Symbol Structure
 
-```typescript
-interface Symbol {
-  id: string;              // Unique identifier (kebab-case)
-  name: string;            // Symbol name
-  type: SymbolType;        // Symbol type
-  filePath: string;        // Source file path
-  line: number;            // Line number
-  column: number;          // Column number
-  isExported: boolean;     // Exported from module?
-  isPublic: boolean;       // Public API?
-  summary?: string;        // TSDoc summary
-  contract?: ContractSpec; // @contract spec
-  responsibility?: ResponsibilitySpec; // @responsibility
-  tests: TestMapping[];    // Test coverage
-  designDecisions: string[]; // Related design docs
-  tags: string[];          // TSDoc tags
-  metadata: Record<string, unknown>; // Additional data
-}
-```
+See implementation: [[Symbol]]
+
+**Core Properties**:
+- `id`: Unique identifier (kebab-case)
+- `name`: Symbol name
+- `type`: Symbol type (function, class, interface, etc.)
+- `filePath`: Source file path
+- `line`, `column`: Position in source
+- `isExported`: Exported from module?
+- `isPublic`: Public API?
+- `summary`: TSDoc summary
+- `contract`: Contract specification (@contract)
+- `responsibility`: Responsibility specification (@responsibility)
+- `tests`: Test mappings
+- `designDecisions`: Related design docs
+- `metadata`: Additional data (coverage, performance, etc.)
 
 ## Symbol ID Generation
 

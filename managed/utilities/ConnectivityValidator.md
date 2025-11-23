@@ -24,18 +24,17 @@ Different issues have different impact:
 
 ### Analysis Components
 
-```typescript
-interface ConnectivityAnalysis {
-  undocumentedSymbols: Symbol[];
-  untestedSymbols: Symbol[];
-  orphanedSymbols: Symbol[];
-  brokenLinks: Link[];
-  circularDeps: CircularDependency[];
-  missingContracts: Symbol[];
-  missingResponsibilities: Symbol[];
-  score: number;  // 0-100
-}
-```
+See implementation: [[ConnectivityAnalysis]]
+
+**Key Properties**:
+- `undocumentedSymbols`: Symbols without TSDoc comments
+- `untestedSymbols`: Symbols with no test coverage
+- `orphanedSymbols`: Symbols with no incoming dependencies
+- `brokenLinks`: Doc links with missing targets
+- `circularDeps`: Circular dependency chains
+- `missingContracts`: Public APIs without @contract tag
+- `missingResponsibilities`: Symbols without @responsibility tag
+- `score`: Overall connectivity score (0-100)
 
 ## Validation Checks
 
@@ -114,20 +113,14 @@ score = 100
 
 ## Detailed Validation Report
 
-```typescript
-interface DetailedValidationReport {
-  overallScore: number;
-  issues: DetailedValidationIssue[];
-  groupedByFile: Map<string, Issue[]>;
-  groupedByType: Map<IssueType, Issue[]>;
-  summary: {
-    totalIssues: number;
-    errorCount: number;
-    warningCount: number;
-    infoCount: number;
-  };
-}
-```
+See implementation: [[DetailedValidationReport]]
+
+**Key Properties**:
+- `overallScore`: Overall connectivity score (0-100)
+- `issues`: All validation issues found
+- `groupedByFile`: Issues grouped by file path
+- `groupedByType`: Issues grouped by type
+- `summary`: Issue counts by severity (error, warning, info)
 
 ## Usage
 

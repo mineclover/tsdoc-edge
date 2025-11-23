@@ -88,35 +88,35 @@ type SuggestionType =
 
 ## Data Structures
 
-**AnalysisOptions**:
-```typescript
-interface AnalysisOptions {
-  path: string;              // Directory to analyze
-  includeChildren?: boolean; // Recursive analysis
-  includePrivate?: boolean;  // Include private symbols
-}
-```
+### AnalysisOptions
 
-**AnalysisReport**:
-```typescript
-interface AnalysisReport {
-  healthScore: number;                    // 0-100
-  metrics: CodeHealthMetrics;
-  suggestions: ImprovementSuggestion[];
-  timestamp: Date;
-}
-```
+See implementation: [[AnalysisOptions]]
 
-**CodeHealthMetrics**:
-```typescript
-interface CodeHealthMetrics {
-  docQuality: DocQualityScore;
-  testCoverage: TestCoverageInfo;
-  totalSymbols: number;
-  documentedSymbols: number;
-  testedSymbols: number;
-}
-```
+**Key Properties**:
+- `path`: Directory to analyze
+- `includeChildren`: Recursive analysis (optional)
+- `includePrivate`: Include private symbols (optional)
+
+### AnalysisReport
+
+See implementation: [[AnalysisReport]]
+
+**Key Properties**:
+- `healthScore`: Overall health score (0-100)
+- `metrics`: Detailed metrics ([[CodeHealthMetrics]])
+- `suggestions`: Improvement suggestions array
+- `timestamp`: Analysis timestamp
+
+### CodeHealthMetrics
+
+See implementation: [[CodeHealthMetrics]]
+
+**Key Properties**:
+- `docQuality`: Documentation quality score
+- `testCoverage`: Test coverage information
+- `totalSymbols`: Total number of symbols
+- `documentedSymbols`: Number of documented symbols
+- `testedSymbols`: Number of tested symbols
 
 **ImprovementSuggestion**:
 ```typescript

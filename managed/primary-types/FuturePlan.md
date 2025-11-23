@@ -8,18 +8,7 @@ Type definition for future plan documentation in enhanced symbol documentation.
 
 ## Type Definition
 
-```typescript
-export interface FuturePlan {
-  id: string;
-  title: string;
-  description: string;
-  priority?: 'high' | 'medium' | 'low';
-  status: 'planned' | 'in-progress' | 'completed' | 'cancelled';
-  targetSymbol?: string;
-  estimatedEffort?: string;
-  dependencies?: string[];
-}
-```
+See [[FuturePlan]] implementation in source code.
 
 ## Fields
 
@@ -34,14 +23,9 @@ export interface FuturePlan {
 
 ## Usage
 
-Used in [[EnhancedSymbolDoc]] as Category 6 (15 points):
+Used in [[EnhancedSymbolDoc]] as Category 6 (15 points).
 
-```typescript
-interface EnhancedSymbolDoc {
-  futurePlans?: FuturePlan[];  // Category 6
-  // ...
-}
-```
+**Property**: `futurePlans?: FuturePlan[]`
 
 ## Validation
 

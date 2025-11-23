@@ -20,15 +20,7 @@
 
 ### Type Definition
 
-```typescript
-interface AnalysisReport {
-  metrics: CodeHealthMetrics;           // 전체 건강도 메트릭
-  docScores: DocQualityScore[];         // 파일별 문서 품질 점수
-  testCoverage: TestCoverageInfo[];     // 테스트 커버리지 정보
-  suggestions: ImprovementSuggestion[]; // 개선 제안 목록
-  topIssues: DocQualityScore[];         // 상위 문제 파일들
-}
-```
+See [[AnalysisReport]] implementation in source code.
 
 ### Composed Types
 

@@ -8,14 +8,7 @@ Type definition for problem-solving documentation in the enhanced symbol documen
 
 ## Type Definition
 
-```typescript
-export interface ProblemSolving {
-  description: string;
-  context: string;
-  targetUseCase?: string;
-  relatedProblem?: string;
-}
-```
+See [[ProblemSolving]] implementation in source code.
 
 ## Fields
 
@@ -41,14 +34,9 @@ export interface ProblemSolving {
 
 ## Usage
 
-Used in [[EnhancedSymbolDoc]] as Category 1 (20 points):
+Used in [[EnhancedSymbolDoc]] as Category 1 (20 points).
 
-```typescript
-interface EnhancedSymbolDoc {
-  problemSolving?: ProblemSolving;  // Category 1
-  // ...
-}
-```
+**Property**: `problemSolving?: ProblemSolving`
 
 ## Example
 

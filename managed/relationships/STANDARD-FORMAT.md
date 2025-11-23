@@ -29,39 +29,34 @@ Defines a standard format for storing and querying all types of relationships be
 
 ## Standard Format
 
-```typescript
-interface UnifiedRelationship {
-  // ===== Identity =====
-  id: string;                          // Unique relationship ID
-  type: RelationshipType;              // Relationship type
+See implementation: [[UnifiedRelationship]]
 
-  // ===== Participants =====
-  from: string | string[];             // Source symbol(s)
-  to: string | string[];               // Target symbol(s)
+**Identity**:
+- `id`: Unique relationship identifier
+- `type`: Relationship type (27 types across 10 categories)
 
-  // ===== Properties =====
-  direction: RelationshipDirection;    // uni/bi/undirected
-  strength: RelationshipStrength;      // strong/medium/weak
-  category: RelationshipCategory;      // Category (1 of 10)
+**Participants**:
+- `from`: Source symbol(s) ID
+- `to`: Target symbol(s) ID
 
-  // ===== Evidence =====
-  evidence: RelationshipEvidence[];    // Supporting evidence
-  discoveredBy: DiscoveryMethod;       // How discovered
-  confidence: number;                  // Confidence (0-1)
+**Properties**:
+- `direction`: unidirectional, bidirectional, or undirected
+- `strength`: strong, medium, or weak
+- `category`: One of 10 relationship categories
 
-  // ===== Location =====
-  filePath?: string;                   // Where defined
-  line?: number;                       // Line number
+**Evidence**:
+- `evidence`: Supporting evidence array (code, doc, test)
+- `discoveredBy`: Discovery method (ast-parsing, doc-analysis, etc.)
+- `confidence`: Confidence score (0-1)
 
-  // ===== Additional =====
-  properties: Record<string, any>;     // Type-specific props
+**Location**:
+- `filePath`: Where relationship is defined (optional)
+- `line`: Line number (optional)
 
-  // ===== Metadata =====
-  createdAt: string;                   // ISO 8601
-  updatedAt: string;                   // ISO 8601
-  description?: string;                // Optional description
-}
-```
+**Additional**:
+- `properties`: Type-specific properties
+- `description`: Optional description
+- `createdAt`, `updatedAt`: Timestamps
 
 ## Relationship Types (27 total across 10 categories)
 
@@ -265,60 +260,36 @@ interface UnifiedRelationship {
 
 ### RelationshipType
 
-```typescript
-type RelationshipType =
-  // 1. Structural (Code Space)
-  | 'code-dependency'     // A imports B
-  | 'inheritance'         // A extends B
-  | 'implementation'      // A implements I
-  // 2. Data Flow
-  | 'io-dependency'       // A's output feeds B's input
-  | 'pipeline'            // A → B → C sequential processing
-  | 'event-flow'          // A emits events consumed by B
-  // 3. Behavioral
-  | 'calls'               // A calls function/method B
-  | 'callback'            // A registers B as callback
-  | 'collaboration'       // A collaborates with B
-  | 'composition'         // Feature = A + B + C
-  | 'temporal-order'      // A must execute before B
-  // 4. Alternative
-  | 'substitution'        // A OR B (same interface)
-  | 'fallback'            // Try A, if fails use B
-  // 5. Constraint
-  | 'mutual-exclusion'    // A and B cannot coexist
-  | 'co-requirement'      // A requires B to be present
-  | 'circular-dependency' // A → B → A
-  // 6. Semantic (Meta Space)
-  | 'conceptual-relation' // A and B are related concepts
-  | 'feature-grouping'    // A, B, C belong to same feature
-  | 'doc-reference'       // Documentation references symbol
-  | 'enhancement'         // A enhances B
-  // 7. Verification
-  | 'test-coverage'       // A is tested by TestA
-  | 'integration-verification' // A↔B verified by test
-  // 8. Type System
-  | 'type-dependency'     // Parameter/return type dependencies
-  | 'generic-constraint'  // T extends U
-  // 9. Architectural
-  | 'layer-dependency'    // Controller → Service
-  | 'module-boundary';    // Cross-package dependencies
-```
+See implementation: [[RelationshipType]]
+
+**27 Relationship Types**:
+
+1. **Structural** (3): code-dependency, inheritance, implementation
+2. **Data Flow** (3): io-dependency, pipeline, event-flow
+3. **Behavioral** (5): calls, callback, collaboration, composition, temporal-order
+4. **Alternative** (2): substitution, fallback
+5. **Constraint** (3): mutual-exclusion, co-requirement, circular-dependency
+6. **Semantic** (4): conceptual-relation, feature-grouping, doc-reference, enhancement
+7. **Verification** (2): test-coverage, integration-verification
+8. **Type System** (2): type-dependency, generic-constraint
+9. **Architectural** (2): layer-dependency, module-boundary
+10. **Configuration** (1): See categories below
 
 ### RelationshipCategory
 
-```typescript
-type RelationshipCategory =
-  | 'structural'      // Code structure (imports, inheritance)
-  | 'data-flow'       // Data movement (I/O, pipelines)
-  | 'behavioral'      // Runtime behavior (calls, callbacks)
-  | 'alternative'     // Substitutability (fallback, substitution)
-  | 'constraint'      // Restrictions (mutual-exclusion, co-requirement, circular)
-  | 'semantic'        // Conceptual (doc-reference, feature-grouping, enhancement)
-  | 'verification'    // Testing (test-coverage, integration-verification)
-  | 'type-system'     // Type relationships (type-dependency, generic-constraint)
-  | 'architectural'   // Architecture (layer-dependency, module-boundary)
-  | 'quality';        // Code quality (circular-dependency)
-```
+See implementation: [[RelationshipCategory]]
+
+**10 Categories**:
+- `structural`: Code structure (imports, inheritance)
+- `data-flow`: Data movement (I/O, pipelines)
+- `behavioral`: Runtime behavior (calls, callbacks)
+- `alternative`: Substitutability (fallback, substitution)
+- `constraint`: Restrictions (mutual-exclusion, co-requirement, circular)
+- `semantic`: Conceptual (doc-reference, feature-grouping, enhancement)
+- `verification`: Testing (test-coverage, integration-verification)
+- `type-system`: Type relationships (type-dependency, generic-constraint)
+- `architectural`: Architecture (layer-dependency, module-boundary)
+- `quality`: Code quality (circular-dependency)
 
 ### RelationshipDirection
 

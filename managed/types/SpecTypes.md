@@ -9,9 +9,16 @@ Type system for specification document management and quality assessment.
 ## Spec Status
 
 Document lifecycle states:
-```typescript
-type SpecStatus = 'draft' | 'review' | 'approved' | 'active' | 'deprecated' | 'archived';
-```
+
+See implementation: [[SpecStatus]]
+
+**Values**:
+- `draft`: Work in progress
+- `review`: Ready for peer review
+- `approved`: Reviewed and accepted
+- `active`: Currently in use (canonical)
+- `deprecated`: Replaced by newer version
+- `archived`: No longer relevant
 
 ### Status Meanings
 
@@ -25,31 +32,31 @@ type SpecStatus = 'draft' | 'review' | 'approved' | 'active' | 'deprecated' | 'a
 ## Spec Metadata
 
 Document metadata:
-```typescript
-interface SpecMetadata {
-  primary: string;           // Document symbol name
-  version: string;           // Document version
-  status: SpecStatus;
-  category: string;          // Classification
-  tags: string[];            // Search tags
-  lastUpdated: string;       // ISO timestamp
-  authors?: string[];
-  reviewers?: string[];
-}
-```
+
+See implementation: [[SpecMetadata]]
+
+**Key Properties**:
+- `primary`: Document symbol name
+- `version`: Document version
+- `status`: Spec status
+- `category`: Classification
+- `tags`: Search tags
+- `lastUpdated`: ISO timestamp
+- `authors`: Authors (optional)
+- `reviewers`: Reviewers (optional)
 
 ## Spec Requirements
 
 Quality requirements:
-```typescript
-interface SpecRequirements {
-  requiredSections: string[];      // Must have
-  recommendedSections: string[];   // Should have
-  minScenarios: number;            // Min usage scenarios
-  minCodeReferences: number;       // Min code links
-  minExamples: number;             // Min examples
-}
-```
+
+See implementation: [[SpecRequirements]]
+
+**Key Properties**:
+- `requiredSections`: Must have sections
+- `recommendedSections`: Should have sections
+- `minScenarios`: Min usage scenarios
+- `minCodeReferences`: Min code links
+- `minExamples`: Min examples
 
 ### Default Requirements
 
@@ -66,21 +73,18 @@ interface SpecRequirements {
 ## Spec Completeness Result
 
 Comprehensive quality assessment:
-```typescript
-interface SpecCompletenessResult {
-  filePath: string;
-  score: number;                   // Overall (0-100) - DEPRECATED
-  designScore: number;             // Design quality (0-100)
-  implementationScore: number;     // Implementation quality (0-100)
-  isComplete: boolean;
-  breakdown: {
-    design: DesignMetrics;
-    implementation: ImplementationMetrics;
-  };
-  missingSections: string[];
-  suggestions: string[];
-}
-```
+
+See implementation: [[SpecCompletenessResult]]
+
+**Key Properties**:
+- `filePath`: File path
+- `score`: Overall score (0-100) - DEPRECATED
+- `designScore`: Design quality (0-100)
+- `implementationScore`: Implementation quality (0-100)
+- `isComplete`: Is complete?
+- `breakdown`: Design and implementation metrics
+- `missingSections`: Missing sections
+- `suggestions`: Improvement suggestions
 
 ### Design Metrics
 
@@ -101,36 +105,30 @@ Quality requiring code connections:
 ## Content Similarity
 
 Duplicate detection:
-```typescript
-interface ContentSimilarity {
-  file1: string;
-  file2: string;
-  overallSimilarity: number;       // 0-1
-  sectionMatches: SectionMatch[];
-  recommendation: 'merge' | 'reference' | 'keep-separate';
-}
 
-interface SectionMatch {
-  section1: string;
-  section2: string;
-  similarity: number;              // 0-1
-  recommendation: string;
-}
-```
+See implementation: [[ContentSimilarity]]
+
+**Key Properties**:
+- `file1`: First file path
+- `file2`: Second file path
+- `similarity`: Similarity score (0-1)
+- `overlappingSections`: Array of overlapping sections with similarity scores
+- `suggestion`: 'merge', 'cross-reference', or 'keep-separate'
+- `reason`: Reason for suggestion
 
 ## Unused Document
 
 Orphaned document detection:
-```typescript
-interface UnusedDocument {
-  filePath: string;
-  reason: 'orphaned' | 'stale' | 'duplicate';
-  incomingRefs: number;            // How many refs
-  lastModified: string;
-  status: SpecStatus;
-  recommendation: 'delete' | 'archive' | 'review';
-}
-```
+
+See implementation: [[UnusedDocument]]
+
+**Key Properties**:
+- `filePath`: File path
+- `reason`: 'orphaned', 'stale', or 'duplicate'
+- `incomingRefs`: How many refs
+- `lastModified`: Last modified date
+- `status`: Spec status
+- `recommendation`: 'delete', 'archive', or 'review'
 
 ### Detection Criteria
 
@@ -141,16 +139,16 @@ interface UnusedDocument {
 ## Spec Status Transition
 
 Status change validation:
-```typescript
-interface SpecStatusTransition {
-  from: SpecStatus;
-  to: SpecStatus;
-  allowed: boolean;
-  reason?: string;                 // Why not allowed
-  requiredScore?: number;          // Min score needed
-  currentScore?: number;
-}
-```
+
+See implementation: [[SpecStatusTransition]]
+
+**Key Properties**:
+- `from`: From status
+- `to`: To status
+- `allowed`: Is allowed?
+- `reason`: Why not allowed (optional)
+- `requiredScore`: Min score needed (optional)
+- `currentScore`: Current score (optional)
 
 ### Transition Rules
 

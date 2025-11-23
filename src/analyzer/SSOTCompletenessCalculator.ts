@@ -303,6 +303,7 @@ export class SSOTCompletenessCalculator {
     const priorities: Record<RelationshipCategory, number> = {
       'structural': 5,
       'verification': 5,
+      'testing': 5,
       'data-flow': 4,
       'behavioral': 4,
       'type-system': 4,
@@ -340,8 +341,9 @@ export class SSOTCompletenessCalculator {
       'behavioral': 'collaboration',
       'alternative': 'substitution',
       'constraint': 'co-requirement',
-      'semantic': 'conceptual-relation',
+      'semantic': 'naming-pattern-relation',
       'verification': 'test-coverage',
+      'testing': 'contains',
       'type-system': 'type-dependency',
       'architectural': 'layer-dependency',
       'quality': 'circular-dependency'
@@ -362,6 +364,7 @@ export class SSOTCompletenessCalculator {
       'constraint': 'Add @requires or @conflicts tags',
       'semantic': 'Add @relatedTo tags for related concepts',
       'verification': 'Create test files for untested symbols',
+      'testing': 'Structure test suites with proper hierarchy',
       'type-system': 'Add type dependencies and generic constraints',
       'architectural': 'Document layer dependencies and module boundaries',
       'quality': 'Detect and resolve circular dependencies'

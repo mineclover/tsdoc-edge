@@ -9,8 +9,16 @@ import * as path from 'node:path';
 import * as crypto from 'node:crypto';
 import { ConfigManager } from '../config/ConfigManager';
 import { ASTSymbolExtractor } from '../analyzer/ASTSymbolExtractor';
+import { TestSymbolParser } from '../parser/TestSymbolParser';
+import { TestCoverageAnalyzer } from '../analyzer/TestCoverageAnalyzer';
+import { NamingPatternRelationAnalyzer } from '../analyzer/NamingPatternRelationAnalyzer';
+import { ExplicitSemanticRelationAnalyzer } from '../analyzer/ExplicitSemanticRelationAnalyzer';
+import { FeatureGroupingAnalyzer } from '../analyzer/FeatureGroupingAnalyzer';
+import { RelationshipInferenceEngine } from '../analyzer/RelationshipInferenceEngine';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
+import type { TestSymbol } from '../types/test-symbols';
+import type { SymbolGraph } from '../types/graph';
 
 /**
  * Command for building symbol database from source files
@@ -126,6 +134,7 @@ export class BuildCommand extends BaseCommand {
       // Initialize database
       const dbManager = new DatabaseManager(dbPath, jsonlPath);
       const extractor = new ASTSymbolExtractor();
+      const testParser = new TestSymbolParser();
 
       // Find TypeScript files
       this.printInfo('Scanning TypeScript files...');
@@ -186,21 +195,75 @@ export class BuildCommand extends BaseCommand {
       // Store doc relationships (symbol -> document)
       const allDocRelationships: Array<{ symbolId: string; symbolName: string; docRef: string; filePath: string; line: number }> = [];
 
+      // Collect all test symbols for relationship extraction
+      const allTestSymbols: TestSymbol[] = [];
+
       // Process each file
       for (const filePath of files) {
         try {
           const content = fs.readFileSync(filePath, 'utf-8');
-          const extractResult = extractor.extract(filePath, content);
+          const isTestFile = filePath.endsWith('.test.ts') || filePath.endsWith('.spec.ts');
 
           result.filesScanned++;
-          result.symbolsFound += extractResult.symbols.length;
-          result.relationshipsFound += extractResult.relationships.length;
 
-          // Collect relationships for later insertion
-          allRelationships.push(...extractResult.relationships);
+          if (isTestFile) {
+            // Process test file with TestSymbolParser
+            const testResult = testParser.extract(filePath, content);
+            result.symbolsFound += testResult.testSymbols.length;
 
-          // Insert symbols
-          for (const symbol of extractResult.symbols) {
+            // Collect test symbols for relationship extraction
+            allTestSymbols.push(...testResult.testSymbols);
+
+            // Insert test symbols
+            for (const testSymbol of testResult.testSymbols) {
+              const fullSymbol = {
+                ...testSymbol,
+                tests: [],
+                designDecisions: [],
+              };
+
+              const success = dbManager.insertSymbol(fullSymbol, 0);
+              if (success) {
+                result.symbolsInserted++;
+
+                // Store mapping for relationship insertion
+                symbolIdMap.set(testSymbol.name, testSymbol.id);
+
+                // Add to JSONL registry
+                const registryEntry = {
+                  id: testSymbol.id,
+                  sourceRef: {
+                    filePath: testSymbol.filePath,
+                    line: testSymbol.line,
+                    column: testSymbol.column,
+                    symbolName: testSymbol.name,
+                    symbolType: testSymbol.type,
+                  },
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                };
+                registryLines.push(JSON.stringify(registryEntry));
+              } else {
+                result.errors.push(`Failed to insert test symbol: ${testSymbol.name} in ${filePath}`);
+              }
+            }
+
+            // Handle test extraction errors
+            if (testResult.errors.length > 0) {
+              result.errors.push(...testResult.errors.map(e => `${e.file}:${e.line} ${e.message}`));
+            }
+          } else {
+            // Process implementation file with ASTSymbolExtractor
+            const extractResult = extractor.extract(filePath, content);
+
+            result.symbolsFound += extractResult.symbols.length;
+            result.relationshipsFound += extractResult.relationships.length;
+
+            // Collect relationships for later insertion
+            allRelationships.push(...extractResult.relationships);
+
+            // Insert symbols
+            for (const symbol of extractResult.symbols) {
             // Generate simple kebab-case ID
             const id = `${symbol.type}-${symbol.name}`
               .toLowerCase()
@@ -247,8 +310,9 @@ export class BuildCommand extends BaseCommand {
                   line: symbol.line,
                 });
               }
-            } else {
-              result.errors.push(`Failed to insert: ${symbol.name} in ${filePath}`);
+              } else {
+                result.errors.push(`Failed to insert: ${symbol.name} in ${filePath}`);
+              }
             }
           }
         } catch (error) {
@@ -323,6 +387,99 @@ export class BuildCommand extends BaseCommand {
         }
       }
 
+      // Extract and insert test relationships
+      if (allTestSymbols.length > 0) {
+        this.printInfo(`Extracting test relationships (${allTestSymbols.length} test symbols)...`);
+        const coverageAnalyzer = new TestCoverageAnalyzer(dbManager);
+        const testRelationships = coverageAnalyzer.analyzeTestCoverage(allTestSymbols);
+
+        // Insert test-coverage relationships
+        for (const testRel of testRelationships.testCoverageRelations) {
+          try {
+            dbManager.insertUnifiedRelationship({
+              id: testRel.id,
+              type: testRel.type,
+              category: testRel.category,
+              fromSymbols: testRel.fromSymbols,
+              toSymbols: testRel.toSymbols,
+              direction: 'unidirectional',
+              strength: testRel.confidence > 0.7 ? 'strong' : 'medium',
+              evidence: [{
+                type: 'test',
+                source: 'test-code-analysis',
+                confidence: testRel.confidence,
+              }],
+              discoveredBy: 'test-parser',
+              confidence: testRel.confidence,
+              description: `Test coverage: ${testRel.metadata.testedMethods?.join(', ') || 'unknown'} (${testRel.metadata.assertionCount || 0} assertions)`,
+            });
+            result.relationshipsInserted++;
+          } catch (error) {
+            result.errors.push(`Failed to insert test-coverage relationship: ${testRel.id}`);
+          }
+        }
+
+        // Insert contains relationships (test hierarchy)
+        for (const containsRel of testRelationships.containsRelations) {
+          try {
+            dbManager.insertUnifiedRelationship({
+              id: containsRel.id,
+              type: containsRel.type,
+              category: containsRel.category,
+              fromSymbols: containsRel.fromSymbols,
+              toSymbols: containsRel.toSymbols,
+              direction: 'unidirectional',
+              strength: 'strong',
+              evidence: [{
+                type: 'structural',
+                source: 'test-suite-hierarchy',
+                confidence: 1.0,
+              }],
+              discoveredBy: 'test-parser',
+              confidence: 1.0,
+              description: `Test hierarchy (nesting level: ${containsRel.metadata.nestingLevel})`,
+            });
+            result.relationshipsInserted++;
+          } catch (error) {
+            result.errors.push(`Failed to insert contains relationship: ${containsRel.id}`);
+          }
+        }
+
+        // Insert covers-scenario relationships
+        for (const scenarioRel of testRelationships.coversScenarioRelations) {
+          try {
+            dbManager.insertUnifiedRelationship({
+              id: scenarioRel.id,
+              type: scenarioRel.type,
+              category: scenarioRel.category,
+              fromSymbols: scenarioRel.fromSymbols,
+              toSymbols: scenarioRel.toSymbols,
+              direction: 'unidirectional',
+              strength: scenarioRel.confidence > 0.7 ? 'medium' : 'weak',
+              evidence: [{
+                type: 'semantic',
+                source: 'scenario-matching',
+                confidence: scenarioRel.confidence,
+              }],
+              discoveredBy: 'test-parser',
+              confidence: scenarioRel.confidence,
+              description: `Test case covers scenario`,
+            });
+            result.relationshipsInserted++;
+          } catch (error) {
+            result.errors.push(`Failed to insert covers-scenario relationship: ${scenarioRel.id}`);
+          }
+        }
+
+        // Log coverage stats
+        const stats = testRelationships.coverageStats;
+        this.printSuccess(`Test coverage: ${stats.testCasesWithCoverage}/${stats.totalTestCases} test cases cover ${stats.totalTestedSymbols} symbols`);
+        this.printInfo(`Average assertions per test: ${stats.averageAssertions.toFixed(1)}`);
+        if (stats.totalScenarios > 0) {
+          this.printInfo(`Scenario coverage: ${stats.scenariosWithCoverage}/${stats.totalScenarios} scenarios covered`);
+        }
+      }
+
       // Insert doc relationships
       this.printInfo('Inserting document relationships...');
       let docRelationshipsInserted = 0;
@@ -336,12 +493,12 @@ export class BuildCommand extends BaseCommand {
 
           const success = dbManager.insertUnifiedRelationship({
             id: relationshipId,
-            type: 'conceptual-relation',
+            type: 'doc-reference',
             category: 'semantic',
             fromSymbols: [docRel.symbolId],
             toSymbols: [`doc:${docRel.docRef}`],
             direction: 'bidirectional',
-            strength: 'medium',
+            strength: 'strong',  // Doc references are explicit, so strong
             evidence: [{
               type: 'documentation',
               source: docRel.filePath,
@@ -352,6 +509,10 @@ export class BuildCommand extends BaseCommand {
             confidence: 1.0,
             filePath: docRel.filePath,
             line: docRel.line,
+            properties: {
+              docTag: true,
+              sourceType: 'tsdoc-tag',
+            },
             description: `${docRel.symbolName} documented in [[${docRel.docRef}]]`,
           });
 
@@ -361,6 +522,208 @@ export class BuildCommand extends BaseCommand {
         } catch (error) {
           result.errors.push(`Failed to insert doc relationship: ${docRel.symbolName} -> ${docRel.docRef}`);
         }
+      }
+
+      // Extract semantic relationships
+      this.printInfo('Analyzing semantic relationships...');
+      let semanticRelationshipsInserted = 0;
+      let inferredRelationshipsInserted = 0;
+
+      try {
+        // Build SymbolGraph from database for analyzers
+        const allSymbols = dbManager.getAllSymbols();
+        const symbolMap = new Map(allSymbols.map(s => [s.id, s]));
+
+        // Build indexes for SymbolGraph
+        const nameIndex = new Map<string, string[]>();
+        const fileIndex = new Map<string, string[]>();
+
+        for (const symbol of allSymbols) {
+          // Name index
+          if (!nameIndex.has(symbol.name)) {
+            nameIndex.set(symbol.name, []);
+          }
+          nameIndex.get(symbol.name)!.push(symbol.id);
+
+          // File index
+          if (!fileIndex.has(symbol.filePath)) {
+            fileIndex.set(symbol.filePath, []);
+          }
+          fileIndex.get(symbol.filePath)!.push(symbol.id);
+        }
+
+        const symbolGraph: SymbolGraph = {
+          symbols: symbolMap,
+          relationships: [],
+          nameIndex,
+          fileIndex,
+          adjacencyList: new Map(),
+          reverseAdjacencyList: new Map(),
+        };
+
+        // 1. Naming Pattern Relations
+        const namingAnalyzer = new NamingPatternRelationAnalyzer(symbolGraph);
+        const namingRelations = namingAnalyzer.analyze();
+
+        for (const rel of namingRelations) {
+          try {
+            dbManager.insertUnifiedRelationship({
+              id: rel.id,
+              type: rel.type,
+              category: rel.category,
+              fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
+              toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
+              direction: rel.direction,
+              strength: rel.strength,
+              evidence: rel.evidence,
+              discoveredBy: rel.discoveredBy,
+              confidence: rel.confidence,
+              filePath: rel.filePath,
+              line: rel.line,
+              properties: rel.properties,
+              description: rel.description,
+            });
+            semanticRelationshipsInserted++;
+          } catch (error) {
+            // Skip duplicate relationships
+          }
+        }
+
+        const namingStats = namingAnalyzer.getStatistics(namingRelations);
+        this.printSuccess(`Naming patterns: ${namingRelations.length} relationships across ${namingStats.uniqueDomains} domains`);
+
+        // 2. Explicit Semantic Relations (@relatedTo tags)
+        const explicitAnalyzer = new ExplicitSemanticRelationAnalyzer();
+        const explicitRelations = explicitAnalyzer.analyze(targetPath);
+
+        for (const rel of explicitRelations) {
+          try {
+            dbManager.insertUnifiedRelationship({
+              id: rel.id,
+              type: rel.type,
+              category: rel.category,
+              fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
+              toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
+              direction: rel.direction,
+              strength: rel.strength,
+              evidence: rel.evidence,
+              discoveredBy: rel.discoveredBy,
+              confidence: rel.confidence,
+              filePath: rel.filePath,
+              line: rel.line,
+              properties: rel.properties,
+              description: rel.description,
+            });
+            semanticRelationshipsInserted++;
+          } catch (error) {
+            // Skip duplicate relationships
+          }
+        }
+
+        const explicitStats = explicitAnalyzer.getStatistics(explicitRelations);
+        this.printSuccess(`Explicit semantic: ${explicitRelations.length} relationships (${explicitStats.withDescription} with descriptions)`);
+
+        // 3. Feature Grouping Relations
+        const featureAnalyzer = new FeatureGroupingAnalyzer(symbolGraph);
+        const featureRelations = featureAnalyzer.analyze(targetPath);
+
+        for (const rel of featureRelations) {
+          try {
+            dbManager.insertUnifiedRelationship({
+              id: rel.id,
+              type: rel.type,
+              category: rel.category,
+              fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
+              toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
+              direction: rel.direction,
+              strength: rel.strength,
+              evidence: rel.evidence,
+              discoveredBy: rel.discoveredBy,
+              confidence: rel.confidence,
+              filePath: rel.filePath,
+              line: rel.line,
+              properties: rel.properties,
+              description: rel.description,
+            });
+            semanticRelationshipsInserted++;
+          } catch (error) {
+            // Skip duplicate relationships
+          }
+        }
+
+        const featureStats = featureAnalyzer.getStatistics(featureRelations);
+        this.printSuccess(`Feature grouping: ${featureRelations.length} relationships across ${featureStats.uniqueFeatures} features`);
+
+        // 4. Relationship Inference (generate new relationships from existing ones)
+        this.printInfo('Inferring relationships from existing patterns...');
+        const inferenceEngine = new RelationshipInferenceEngine();
+        const allRelationships = dbManager.getAllUnifiedRelationships();
+        const inferredRelationships = inferenceEngine.infer(allRelationships);
+
+        for (const rel of inferredRelationships) {
+          try {
+            dbManager.insertUnifiedRelationship({
+              id: rel.id,
+              type: rel.type,
+              category: rel.category,
+              fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
+              toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
+              direction: rel.direction,
+              strength: rel.strength,
+              evidence: rel.evidence,
+              discoveredBy: rel.discoveredBy,
+              confidence: rel.confidence,
+              filePath: rel.filePath,
+              line: rel.line,
+              properties: rel.properties,
+              description: rel.description,
+            });
+            inferredRelationshipsInserted++;
+          } catch (error) {
+            // Skip duplicate relationships
+          }
+        }
+
+        const inferenceStats = inferenceEngine.getStatistics(allRelationships);
+        this.printSuccess(`Inferred relationships: ${inferredRelationships.length} total (${inferenceStats.byRule['naming-transitivity'] || 0} naming, ${inferenceStats.byRule['feature-closure'] || 0} feature, ${inferenceStats.byRule['test-coverage-inheritance'] || 0} test)`);
+
+        // 5. Test Example Extraction (extract test cases as documentation examples)
+        this.printInfo('Extracting test examples for documentation...');
+        const { TestExampleExtractor } = await import('../analyzer/TestExampleExtractor');
+        const exampleExtractor = new TestExampleExtractor(dbManager);
+        const testExamples = exampleExtractor.extractAllExamples();
+        const exampleRelationships = exampleExtractor.createRelationships(testExamples);
+
+        let testExamplesInserted = 0;
+        for (const rel of exampleRelationships) {
+          try {
+            dbManager.insertUnifiedRelationship({
+              id: rel.id,
+              type: rel.type,
+              category: rel.category,
+              fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
+              toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
+              direction: rel.direction,
+              strength: rel.strength,
+              evidence: rel.evidence,
+              discoveredBy: rel.discoveredBy,
+              confidence: rel.confidence,
+              filePath: rel.filePath,
+              line: rel.line,
+              properties: rel.properties,
+              description: rel.description,
+            });
+            testExamplesInserted++;
+          } catch (error) {
+            // Skip duplicate relationships
+          }
+        }
+
+        const highQualityExamples = testExamples.filter(ex => ex.quality >= 8);
+        this.printSuccess(`Test examples: ${testExamples.length} total (${highQualityExamples.length} high-quality, ${testExamplesInserted} relationships)`);
+
+      } catch (error) {
+        this.printWarning(`Failed to analyze semantic relationships: ${error instanceof Error ? error.message : String(error)}`);
       }
 
       const duration = Date.now() - startTime;
@@ -387,6 +750,8 @@ export class BuildCommand extends BaseCommand {
       console.log(`  Relationships found: ${this.colors.cyan}${result.relationshipsFound}${this.colors.reset}`);
       console.log(`  Relationships inserted: ${this.colors.green}${result.relationshipsInserted}${this.colors.reset}`);
       console.log(`  Doc relationships: ${this.colors.green}${docRelationshipsInserted}${this.colors.reset}`);
+      console.log(`  Semantic relationships: ${this.colors.green}${semanticRelationshipsInserted}${this.colors.reset}`);
+      console.log(`  Inferred relationships: ${this.colors.green}${inferredRelationshipsInserted}${this.colors.reset}`);
       console.log(`  Duration: ${this.colors.cyan}${duration}ms${this.colors.reset}`);
       console.log();
       console.log(`${this.colors.dim}Database: ${dbPath}${this.colors.reset}`);
@@ -427,8 +792,8 @@ export class BuildCommand extends BaseCommand {
         }
         files.push(...this.findTypeScriptFiles(fullPath));
       } else if (entry.isFile()) {
-        // Include .ts files, exclude test files
-        if (fullPath.endsWith('.ts') && !fullPath.endsWith('.test.ts') && !fullPath.endsWith('.spec.ts')) {
+        // Include all .ts files (including test files)
+        if (fullPath.endsWith('.ts')) {
           files.push(fullPath);
         }
       }

@@ -8,31 +8,24 @@ Core type system for TSDoc parsing and validation.
 
 ## Parsed Doc Comment
 
-Represents a single parsed TSDoc comment:
-```typescript
-interface ParsedDocComment {
-  docComment: DocComment;      // TSDoc AST
-  filePath: string;            // Source file
-  symbolName: string;          // Symbol name
-  validationResults: ValidationResult[];
-  isValid: boolean;            // Passes all rules?
-}
-```
+See implementation: [[ParsedDocComment]]
+
+**Key Properties**:
+- `docComment`: TSDoc AST structure
+- `filePath`: Source file path
+- `symbolName`: Symbol name
+- `validationResults`: Validation results array
+- `isValid`: Whether comment passes all validation rules
 
 ## Validation Result
 
-Single validation rule result:
-```typescript
-interface ValidationResult {
-  ruleId: string;              // Rule identifier
-  severity: 'error' | 'warning' | 'info';
-  message: string;             // Human-readable
-  location?: {
-    line: number;
-    column: number;
-  };
-}
-```
+See implementation: [[ValidationResult]]
+
+**Key Properties**:
+- `ruleId`: Rule identifier
+- `severity`: error | warning | info
+- `message`: Human-readable message
+- `location`: Line and column position (optional)
 
 ### Severity Levels
 
@@ -52,14 +45,12 @@ interface ValidationResult {
 
 ## Parse Result
 
-Result of parsing an entire file:
-```typescript
-interface ParseResult {
-  filePath: string;
-  comments: ParsedDocComment[];  // All comments
-  errors: Error[];               // Parse errors
-}
-```
+See implementation: [[ParseResult]]
+
+**Key Properties**:
+- `filePath`: File path
+- `comments`: All parsed comments
+- `errors`: Parse errors
 
 ## Parsing Flow
 
