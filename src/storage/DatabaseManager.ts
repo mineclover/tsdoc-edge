@@ -703,6 +703,33 @@ export class DatabaseManager {
   }
 
   /**
+   * Rebuild FTS5 indexes to fix corruption or sync issues
+   * @returns Rebuild statistics
+   * @contract Rebuild all FTS5 virtual tables from their content tables
+   * @postcondition FTS5 indexes are synchronized with main tables
+   */
+  rebuildFTS5Index(): { symbolsFts: number; enhancedDocsFts: number } {
+    // Rebuild symbols_fts index
+    this.db.prepare("INSERT INTO symbols_fts(symbols_fts) VALUES('rebuild')").run();
+    const symbolsCount = this.db.prepare('SELECT COUNT(*) as count FROM symbols_fts').get() as { count: number };
+
+    // Rebuild enhanced_docs_fts index if it has data
+    let enhancedDocsCount = 0;
+    try {
+      this.db.prepare("INSERT INTO enhanced_docs_fts(enhanced_docs_fts) VALUES('rebuild')").run();
+      const result = this.db.prepare('SELECT COUNT(*) as count FROM enhanced_docs_fts').get() as { count: number };
+      enhancedDocsCount = result.count;
+    } catch (error) {
+      // Skip if table is empty or doesn't exist
+    }
+
+    return {
+      symbolsFts: symbolsCount.count,
+      enhancedDocsFts: enhancedDocsCount,
+    };
+  }
+
+  /**
    * Close database connection
    * @postcondition Database connection is closed
    * @returns void - No return value

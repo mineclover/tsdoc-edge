@@ -36,6 +36,7 @@ import {
   OrphansCommand,
   ParseCommand,
   PlansCommand,
+  RebuildIndexCommand,
   ScanCommand,
   SpecBumpCommand,
   SpecDiffCommand,
@@ -172,6 +173,7 @@ async function main(): Promise<void> {
   registry.register(new FindMethodCommand());
   registry.register(new TodosCommand());
   registry.register(new StatsCommand());
+  registry.register(new RebuildIndexCommand());
   registry.register(new CoreApiCommand());
   registry.register(new ScanCommand());
   registry.register(new SyncCoverageCommand());
