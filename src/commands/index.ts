@@ -80,3 +80,4 @@ export { RenameCommand } from './RenameCommand';
 export { MoveCommand } from './MoveCommand';
 export { SymbolRenameCommand } from './SymbolRenameCommand';
 export { RebuildIndexCommand } from './RebuildIndexCommand';
+export { QueryInferredCommand } from './QueryInferredCommand';

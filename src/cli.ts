@@ -36,6 +36,7 @@ import {
   OrphansCommand,
   ParseCommand,
   PlansCommand,
+  QueryInferredCommand,
   RebuildIndexCommand,
   ScanCommand,
   SpecBumpCommand,
@@ -235,6 +236,7 @@ async function main(): Promise<void> {
   registry.register(new SymbolQueryCommand());
   registry.register(new SymbolFixCommand());
   registry.register(new RelationshipStatsCommand());
+  registry.register(new QueryInferredCommand());
   registry.register(new RenameCommand());
   registry.register(new MoveCommand());
   registry.register(new SymbolRenameCommand());
