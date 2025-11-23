@@ -2,14 +2,18 @@
 
 **Document Type**: Essential Workflow
 **Status**: Active
-**Last Updated**: 2025-11-07
-**Primary Symbols**: [[WorkContextCommand]]
+**Last Updated**: 2025-11-23
+**Primary Symbols**: [[WorkContextCommand]], [[EnhancedWorkContextCommand]]
 
 ## Purpose
 
 **작업자 중심의 핵심 워크플로우**: "이 파일 작업하려면 뭘 봐야 하지?"에 대한 단일 명령어 답변.
 
 모든 분석 기능의 궁극적 목표는 **작업자가 파일을 수정하기 전에 필요한 모든 컨텍스트를 즉시 제공**하는 것입니다.
+
+TSDoc Edge는 두 가지 work-context 명령어를 제공합니다:
+- **`work-context`**: 상세한 메타데이터 중심 (contracts, decisions, error patterns)
+- **`enhanced-work-context`**: 관계 그래프 중심 + LLM 출력 지원
 
 ---
 
@@ -37,21 +41,74 @@ tsdoc-edge who-uses user-service
 
 ### 단일 명령어로 모든 컨텍스트 제공
 
+TSDoc Edge는 두 가지 work-context 명령어를 제공합니다:
+
+#### 1. `work-context` - 상세 메타데이터 중심
+
 ```bash
 tsdoc-edge work-context <file-path>
 ```
+
+**특징**:
+- 계약 (contracts: preconditions, postconditions, invariants)
+- 설계 결정 (design decisions)
+- 에러 패턴 (common pitfalls)
+- 통합 관계 (unified relationships)
+- 한국어 출력
+
+**사용 사례**: 복잡한 비즈니스 로직, 계약 중심 코드
+
+#### 2. `enhanced-work-context` (추천) - 관계 그래프 + LLM
+
+```bash
+# 사람이 읽기 편한 형식 (기본)
+tsdoc-edge enhanced-work-context <file-path>
+tsdoc-edge ewc <file-path>
+
+# LLM 친화적 형식
+tsdoc-edge ewc <file-path> --llm
+
+# LLM 컨텍스트를 파일로 저장
+tsdoc-edge ewc <file-path> --llm --output context.txt
+```
+
+**특징**:
+- 관계 밀도 (relationship density)
+- 커버리지 통계 (test/documentation coverage)
+- 영향 분석 (impact analysis)
+- 의미론적 이웃 (semantic neighbors)
+- **LLM 출력 모드** (AI 어시스턴트 통합)
+- 실행 가능한 권장사항
+
+**사용 사례**:
+- 일반적인 개발 작업
+- AI 어시스턴트와 협업
+- 빠른 컨텍스트 파악
 
 ---
 
 ## Usage
 
-### 기본 사용법
+### Option 1: work-context (상세 메타데이터)
 
 ```bash
 tsdoc-edge work-context src/services/UserService.ts
 ```
 
-### 출력 예시
+### Option 2: enhanced-work-context (추천)
+
+```bash
+# 사람이 읽기 편한 형식
+tsdoc-edge ewc src/services/UserService.ts
+
+# LLM 친화적 형식 (Claude, GPT 등에 복사-붙여넣기)
+tsdoc-edge ewc src/services/UserService.ts --llm
+
+# 파일로 저장
+tsdoc-edge ewc src/services/UserService.ts --llm --output context.txt
+```
+
+### 출력 예시: work-context (상세)
 
 ```
 ================================================================================
@@ -105,6 +162,292 @@ Work Context: UserService.ts
   의존: 5개
   테스트: 2개
   영향: 8개 파일
+```
+
+### 출력 예시: enhanced-work-context (간결 + 통계)
+
+```
+================================================================================
+Work Context: DocReferenceAnalyzer.ts
+================================================================================
+
+📄 src/analyzer/DocReferenceAnalyzer.ts
+
+📊 Summary
+────────────────────────────────────────────────────────────────────────────────
+  Symbols:              8
+  Relationships:        47
+  Relationship Density: 5.88
+  Test Coverage:        0.0% (0 tests)
+  Documentation:        75.0% (36 docs)
+
+🔤 Symbols
+────────────────────────────────────────────────────────────────────────────────
+  Total: 8 (3 exported, 3 public)
+
+  DocReferenceAnalyzer (class) [exported, public]
+  DocReferenceAnalyzer.graph (property)
+  DocReferenceAnalyzer.parser (property)
+  DocReferenceAnalyzer.analyze (method) [exported, public]
+  ...
+
+📄 Documentation
+────────────────────────────────────────────────────────────────────────────────
+  [[Symbol]]
+    Referenced by: DocReferenceAnalyzer, DocReferenceAnalyzer.graph +2
+
+⚠ ️ No test coverage found
+
+📦 Dependencies
+────────────────────────────────────────────────────────────────────────────────
+  This file depends on 5 other file(s)
+
+  src/types/graph/graph.ts
+  src/types/relationships/unified.ts
+  ...
+
+🔗 Impact Analysis
+────────────────────────────────────────────────────────────────────────────────
+  1 file(s) depend on this file
+
+  src/commands/AnalyzeDocReferenceCommand.ts
+
+💡 Recommendations
+────────────────────────────────────────────────────────────────────────────────
+  • Low test coverage (0.0%) - consider adding tests
+```
+
+### 출력 예시: enhanced-work-context --llm (LLM 친화적)
+
+```markdown
+# Context: /home/user/tsdoc-edge/src/analyzer/DocReferenceAnalyzer.ts
+
+> **Entry Point Type**: file
+> **Generated**: 2025-11-23T15:59:17.218Z
+> **Depth**: 2 levels
+
+---
+
+## Summary
+
+**DocReferenceAnalyzer** is a `class`: Analyzes doc reference relationships (@doc [[Symbol]])
+
+## Location
+
+- **File**: `src/analyzer/DocReferenceAnalyzer.ts`
+- **Line**: 49
+- **Type**: `class`
+- **Visibility**: Public API
+- **Exported**: Yes
+
+## Purpose
+
+Analyzes doc reference relationships (@doc [[Symbol]])
+
+## Dependencies
+
+This symbol depends on 4 other symbol(s):
+
+### import
+
+- `interface-symbolgraph` (code-dependency)
+- `interface-unifiedrelationship` (code-dependency)
+- `class-tsdocsymbolparser` (code-dependency)
+- `interface-codeconnection` (code-dependency)
+
+## Usage
+
+**1** symbol(s) use this:
+
+- **class-analyzedocreferencecommand** (code-dependency)
+  - Relationship: import
+
+## Documentation References
+
+### This Code References Documentation
+
+- [[Symbol]] at src/analyzer/DocReferenceAnalyzer.ts:49
+- [[FeatureName]] at src/analyzer/DocReferenceAnalyzer.ts:49
+...
+
+### Documentation That References This Code
+
+- [[FeatureName]] _(inferred)_
+- [[ComponentName]] _(inferred)_
+...
+
+## Test Coverage
+
+⚠️ **No tests found for this symbol.**
+
+## Change Impact Analysis
+
+⚠️ **Modifying this symbol will affect:**
+
+- **1** symbols directly
+- **6** file(s)
+- **42** documentation page(s)
+
+**Recommendation**: Review all affected components before making changes.
+
+---
+
+## Generation Metadata
+
+- Generated by: TSDoc Edge
+- Total relationships: 47
+  - Explicit: 41
+  - Inferred: 6
+- Context depth: 2 level(s)
+- Generated at: 2025-11-23T15:59:17.218Z
+```
+
+---
+
+## Command Comparison
+
+### 기능 비교표
+
+| 기능 | work-context | enhanced-work-context |
+|------|-------------|----------------------|
+| **심볼 정보** | ✅ | ✅ |
+| **의존성** | ✅ | ✅ |
+| **테스트 매핑** | ✅ | ✅ |
+| **영향 범위** | ✅ | ✅ |
+| **문서 참조** | ✅ (@doc 태그) | ✅ (양방향) |
+| **계약 (Contracts)** | ✅ | ❌ |
+| **설계 결정** | ✅ | ❌ |
+| **에러 패턴** | ✅ | ❌ |
+| **관계 밀도** | ❌ | ✅ |
+| **커버리지 통계** | ❌ | ✅ |
+| **의미론적 이웃** | ❌ | ✅ |
+| **실행 가능한 권장사항** | ❌ | ✅ |
+| **LLM 출력 모드** | ❌ | ✅ |
+| **출력 언어** | 한국어 | 영어 |
+| **출력 스타일** | 매우 상세 | 간결 |
+
+### 언제 어떤 명령어를 사용할까?
+
+#### `work-context` 사용 권장
+
+- 계약(contract) 중심 코드 작업
+- 설계 결정(design decision) 추적 필요
+- 알려진 에러 패턴 확인 필요
+- 매우 상세한 메타데이터 필요
+- 한국어 출력 선호
+
+#### `enhanced-work-context` 사용 권장 (기본 추천)
+
+- 일반적인 개발 작업
+- 빠른 컨텍스트 파악
+- AI 어시스턴트(Claude, GPT)와 협업
+- 관계 그래프 기반 분석
+- 통계/메트릭 중심 분석
+- 영어 출력 선호
+
+---
+
+## LLM Integration Workflow
+
+### AI 어시스턴트와 협업하기
+
+**시나리오**: Claude/GPT에게 코드 리뷰, 리팩토링, 버그 수정 요청
+
+#### Step 1: 컨텍스트 생성
+
+```bash
+# LLM 친화적 형식으로 컨텍스트 생성
+tsdoc-edge ewc src/services/UserService.ts --llm --output context.txt
+```
+
+#### Step 2: AI 어시스턴트에게 전달
+
+```
+[복사-붙여넣기 또는 파일 업로드]
+
+Hi Claude, here's the full context for UserService.ts:
+
+<paste context.txt contents>
+
+Please review this code and suggest improvements focusing on:
+1. Error handling
+2. Test coverage
+3. Documentation quality
+```
+
+#### Step 3: AI 피드백 반영
+
+```bash
+# AI 제안사항 반영 후 재분석
+tsdoc-edge ewc src/services/UserService.ts
+
+# 개선 확인
+# - Test Coverage: 0.0% → 85.0%
+# - Documentation: 50.0% → 90.0%
+# - Relationship Density: 2.1 → 5.8
+```
+
+### LLM 출력 포맷 특징
+
+**구조화된 마크다운**:
+- LLM이 파싱하기 쉬운 명확한 섹션 구분
+- 계층적 정보 구조
+- 명확한 레이블 (`##`, `###`, `-`, `*`)
+
+**완전한 컨텍스트**:
+- 모든 의존성 나열
+- 양방향 문서 참조 (Code → Doc, Doc → Code)
+- 명시적/추론 관계 구분
+- 영향 분석 포함
+
+**메타데이터**:
+- 생성 시간
+- 관계 깊이
+- 명시적/추론 관계 개수
+- 총 관계 개수
+
+### Example AI Prompt Templates
+
+#### 1. 코드 리뷰 요청
+
+```
+Context for review:
+<tsdoc-edge ewc output>
+
+Please review this code and check for:
+- Potential bugs
+- Missing error handling
+- Test coverage gaps
+- Documentation improvements
+- Architectural concerns
+```
+
+#### 2. 리팩토링 계획
+
+```
+I want to refactor this file:
+<tsdoc-edge ewc output>
+
+Impact analysis shows:
+- 8 files depend on this
+- 42 documentation pages reference it
+
+Please suggest a safe refactoring strategy that:
+1. Minimizes breaking changes
+2. Maintains backward compatibility
+3. Improves maintainability
+```
+
+#### 3. 테스트 생성
+
+```
+This file has 0% test coverage:
+<tsdoc-edge ewc output>
+
+Please generate unit tests covering:
+- All public methods
+- Edge cases
+- Error scenarios
 ```
 
 ---
