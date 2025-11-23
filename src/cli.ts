@@ -57,6 +57,7 @@ import {
   UsedByCommand,
   ValidateCommand,
   ValidateDocsCommand,
+  ValidateGeneratedDocsCommand,
   ValidateSpecCommand,
   WhoUsesCommand,
   WithoutContractCommand,
@@ -149,6 +150,7 @@ async function main(): Promise<void> {
   registry.register(new IndexDocsCommand());
   registry.register(new ParseCommand());
   registry.register(new ValidateDocsCommand());
+  registry.register(new ValidateGeneratedDocsCommand());
   registry.register(new UpdateBacklinksCommand());
   registry.register(new UpdateSymbolRefsCommand());
   registry.register(new CheckLinksCommand());
