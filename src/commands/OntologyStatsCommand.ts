@@ -99,6 +99,8 @@ Options:
         }
       }
 
+      dbManager.close();
+
       return this.success();
     });
   }

@@ -110,6 +110,8 @@ Examples:
         await this.listRelationships(dbManager, options);
       }
 
+      dbManager.close();
+
       return this.success();
     });
   }
