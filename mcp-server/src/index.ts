@@ -66,7 +66,7 @@ async function main() {
         openWorldHint: false,
       },
     },
-    async (params) => searchSymbolsTool(params, tsdocService)
+    async (params: unknown) => searchSymbolsTool(SearchSymbolsSchema.parse(params), tsdocService)
   );
 
   // 2. Get Ontology Stats Tool
@@ -83,7 +83,7 @@ async function main() {
         openWorldHint: false,
       },
     },
-    async (params) => getOntologyStatsTool(params, tsdocService)
+    async (params: unknown) => getOntologyStatsTool(GetOntologyStatsSchema.parse(params), tsdocService)
   );
 
   // 3. List Relationships Tool
@@ -100,7 +100,7 @@ async function main() {
         openWorldHint: false,
       },
     },
-    async (params) => listRelationshipsTool(params, tsdocService)
+    async (params: unknown) => listRelationshipsTool(ListRelationshipsSchema.parse(params), tsdocService)
   );
 
   // 4. Get Work Context Tool
@@ -117,7 +117,7 @@ async function main() {
         openWorldHint: false,
       },
     },
-    async (params) => getWorkContextTool(params, tsdocService)
+    async (params: unknown) => getWorkContextTool(GetWorkContextSchema.parse(params), tsdocService)
   );
 
   // 5. Get Design Context Tool
@@ -134,7 +134,7 @@ async function main() {
         openWorldHint: false,
       },
     },
-    async (params) => getDesignContextTool(params, tsdocService)
+    async (params: unknown) => getDesignContextTool(GetDesignContextSchema.parse(params), tsdocService)
   );
 
   // 6. Query Relationships Tool
@@ -151,7 +151,7 @@ async function main() {
         openWorldHint: false,
       },
     },
-    async (params) => queryRelationshipsTool(params, tsdocService)
+    async (params: unknown) => queryRelationshipsTool(QueryRelationshipsSchema.parse(params), tsdocService)
   );
 
   // 7. Get Symbol Details Tool
@@ -168,7 +168,7 @@ async function main() {
         openWorldHint: false,
       },
     },
-    async (params) => getSymbolDetailsTool(params, tsdocService)
+    async (params: unknown) => getSymbolDetailsTool(GetSymbolDetailsSchema.parse(params), tsdocService)
   );
 
   // Connect to stdio transport
