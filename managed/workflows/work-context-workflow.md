@@ -3,7 +3,7 @@
 **Document Type**: Essential Workflow
 **Status**: Active
 **Last Updated**: 2025-11-23
-**Primary Symbols**: [[WorkContextCommand]], [[EnhancedWorkContextCommand]]
+**Primary Symbols**: [[WorkContextCommand]], [[DesignContextCommand]]
 
 ## Purpose
 
@@ -11,9 +11,9 @@
 
 모든 분석 기능의 궁극적 목표는 **작업자가 파일을 수정하기 전에 필요한 모든 컨텍스트를 즉시 제공**하는 것입니다.
 
-TSDoc Edge는 두 가지 work-context 명령어를 제공합니다:
-- **`work-context`**: 상세한 메타데이터 중심 (contracts, decisions, error patterns)
-- **`enhanced-work-context`**: 관계 그래프 중심 + LLM 출력 지원
+TSDoc Edge는 두 가지 컨텍스트 명령어를 제공합니다:
+- **`work-context`** (wc): 관계 그래프 중심 + LLM 출력 지원 (일반 작업용)
+- **`design-context`** (dc): 설계 의사결정 추적 (contracts, decisions, error patterns)
 
 ---
 
@@ -41,35 +41,20 @@ tsdoc-edge who-uses user-service
 
 ### 단일 명령어로 모든 컨텍스트 제공
 
-TSDoc Edge는 두 가지 work-context 명령어를 제공합니다:
+TSDoc Edge는 두 가지 컨텍스트 명령어를 제공합니다:
 
-#### 1. `work-context` - 상세 메타데이터 중심
-
-```bash
-tsdoc-edge work-context <file-path>
-```
-
-**특징**:
-- 계약 (contracts: preconditions, postconditions, invariants)
-- 설계 결정 (design decisions)
-- 에러 패턴 (common pitfalls)
-- 통합 관계 (unified relationships)
-- 한국어 출력
-
-**사용 사례**: 복잡한 비즈니스 로직, 계약 중심 코드
-
-#### 2. `enhanced-work-context` (추천) - 관계 그래프 + LLM
+#### 1. `work-context` (추천) - 관계 그래프 + LLM
 
 ```bash
 # 사람이 읽기 편한 형식 (기본)
-tsdoc-edge enhanced-work-context <file-path>
-tsdoc-edge ewc <file-path>
+tsdoc-edge work-context <file-path>
+tsdoc-edge wc <file-path>
 
 # LLM 친화적 형식
-tsdoc-edge ewc <file-path> --llm
+tsdoc-edge wc <file-path> --llm
 
 # LLM 컨텍스트를 파일로 저장
-tsdoc-edge ewc <file-path> --llm --output context.txt
+tsdoc-edge wc <file-path> --llm --output context.txt
 ```
 
 **특징**:
@@ -79,36 +64,56 @@ tsdoc-edge ewc <file-path> --llm --output context.txt
 - 의미론적 이웃 (semantic neighbors)
 - **LLM 출력 모드** (AI 어시스턴트 통합)
 - 실행 가능한 권장사항
+- 영어 출력
 
 **사용 사례**:
 - 일반적인 개발 작업
 - AI 어시스턴트와 협업
 - 빠른 컨텍스트 파악
 
+#### 2. `design-context` - 설계 의사결정 추적
+
+```bash
+tsdoc-edge design-context <file-path>
+tsdoc-edge dc <file-path>
+```
+
+**특징**:
+- 계약 (contracts: preconditions, postconditions, invariants)
+- 설계 결정 (design decisions)
+- 에러 패턴 (common pitfalls)
+- 통합 관계 (unified relationships)
+- 관계 통계 (relationship stats)
+- 한국어 출력
+
+**사용 사례**: 복잡한 비즈니스 로직, 계약 중심 코드, 아키텍처 리뷰
+
 ---
 
 ## Usage
 
-### Option 1: work-context (상세 메타데이터)
-
-```bash
-tsdoc-edge work-context src/services/UserService.ts
-```
-
-### Option 2: enhanced-work-context (추천)
+### Option 1: work-context (추천 - 일반 작업)
 
 ```bash
 # 사람이 읽기 편한 형식
-tsdoc-edge ewc src/services/UserService.ts
+tsdoc-edge work-context src/services/UserService.ts
+tsdoc-edge wc src/services/UserService.ts
 
 # LLM 친화적 형식 (Claude, GPT 등에 복사-붙여넣기)
-tsdoc-edge ewc src/services/UserService.ts --llm
+tsdoc-edge wc src/services/UserService.ts --llm
 
 # 파일로 저장
-tsdoc-edge ewc src/services/UserService.ts --llm --output context.txt
+tsdoc-edge wc src/services/UserService.ts --llm --output context.txt
 ```
 
-### 출력 예시: work-context (상세)
+### Option 2: design-context (설계 추적)
+
+```bash
+tsdoc-edge design-context src/services/UserService.ts
+tsdoc-edge dc src/services/UserService.ts
+```
+
+### 출력 예시: design-context (설계 추적)
 
 ```
 ================================================================================
@@ -164,7 +169,7 @@ Work Context: UserService.ts
   영향: 8개 파일
 ```
 
-### 출력 예시: enhanced-work-context (간결 + 통계)
+### 출력 예시: work-context (관계 + 통계)
 
 ```
 ================================================================================
@@ -217,7 +222,7 @@ Work Context: DocReferenceAnalyzer.ts
   • Low test coverage (0.0%) - consider adding tests
 ```
 
-### 출력 예시: enhanced-work-context --llm (LLM 친화적)
+### 출력 예시: work-context --llm (LLM 친화적)
 
 ```markdown
 # Context: /home/user/tsdoc-edge/src/analyzer/DocReferenceAnalyzer.ts
@@ -308,35 +313,28 @@ This symbol depends on 4 other symbol(s):
 
 ### 기능 비교표
 
-| 기능 | work-context | enhanced-work-context |
-|------|-------------|----------------------|
+| 기능 | work-context | design-context |
+|------|-------------|----------------|
 | **심볼 정보** | ✅ | ✅ |
 | **의존성** | ✅ | ✅ |
 | **테스트 매핑** | ✅ | ✅ |
 | **영향 범위** | ✅ | ✅ |
-| **문서 참조** | ✅ (@doc 태그) | ✅ (양방향) |
-| **계약 (Contracts)** | ✅ | ❌ |
-| **설계 결정** | ✅ | ❌ |
-| **에러 패턴** | ✅ | ❌ |
-| **관계 밀도** | ❌ | ✅ |
-| **커버리지 통계** | ❌ | ✅ |
-| **의미론적 이웃** | ❌ | ✅ |
-| **실행 가능한 권장사항** | ❌ | ✅ |
-| **LLM 출력 모드** | ❌ | ✅ |
-| **출력 언어** | 한국어 | 영어 |
-| **출력 스타일** | 매우 상세 | 간결 |
+| **문서 참조** | ✅ (양방향) | ✅ (@doc 태그) |
+| **관계 밀도** | ✅ | ✅ |
+| **커버리지 통계** | ✅ | ❌ |
+| **의미론적 이웃** | ✅ | ❌ |
+| **실행 가능한 권장사항** | ✅ | ✅ |
+| **계약 (Contracts)** | ❌ | ✅ |
+| **설계 결정** | ❌ | ✅ |
+| **에러 패턴** | ❌ | ✅ |
+| **LLM 출력 모드** | ✅ | ❌ |
+| **출력 언어** | 영어 | 한국어 |
+| **출력 스타일** | 간결 | 매우 상세 |
+| **별칭** | wc | dc |
 
 ### 언제 어떤 명령어를 사용할까?
 
-#### `work-context` 사용 권장
-
-- 계약(contract) 중심 코드 작업
-- 설계 결정(design decision) 추적 필요
-- 알려진 에러 패턴 확인 필요
-- 매우 상세한 메타데이터 필요
-- 한국어 출력 선호
-
-#### `enhanced-work-context` 사용 권장 (기본 추천)
+#### `work-context` 사용 권장 (기본 추천)
 
 - 일반적인 개발 작업
 - 빠른 컨텍스트 파악
@@ -344,6 +342,15 @@ This symbol depends on 4 other symbol(s):
 - 관계 그래프 기반 분석
 - 통계/메트릭 중심 분석
 - 영어 출력 선호
+
+#### `design-context` 사용 권장
+
+- 계약(contract) 중심 코드 작업
+- 설계 결정(design decision) 추적 필요
+- 알려진 에러 패턴 확인 필요
+- 매우 상세한 메타데이터 필요
+- 아키텍처 리뷰
+- 한국어 출력 선호
 
 ---
 
@@ -357,7 +364,7 @@ This symbol depends on 4 other symbol(s):
 
 ```bash
 # LLM 친화적 형식으로 컨텍스트 생성
-tsdoc-edge ewc src/services/UserService.ts --llm --output context.txt
+tsdoc-edge wc src/services/UserService.ts --llm --output context.txt
 ```
 
 #### Step 2: AI 어시스턴트에게 전달
@@ -379,7 +386,7 @@ Please review this code and suggest improvements focusing on:
 
 ```bash
 # AI 제안사항 반영 후 재분석
-tsdoc-edge ewc src/services/UserService.ts
+tsdoc-edge wc src/services/UserService.ts
 
 # 개선 확인
 # - Test Coverage: 0.0% → 85.0%
@@ -412,7 +419,7 @@ tsdoc-edge ewc src/services/UserService.ts
 
 ```
 Context for review:
-<tsdoc-edge ewc output>
+<tsdoc-edge wc --llm output>
 
 Please review this code and check for:
 - Potential bugs
@@ -426,7 +433,7 @@ Please review this code and check for:
 
 ```
 I want to refactor this file:
-<tsdoc-edge ewc output>
+<tsdoc-edge wc --llm output>
 
 Impact analysis shows:
 - 8 files depend on this
@@ -442,7 +449,7 @@ Please suggest a safe refactoring strategy that:
 
 ```
 This file has 0% test coverage:
-<tsdoc-edge ewc output>
+<tsdoc-edge wc --llm output>
 
 Please generate unit tests covering:
 - All public methods
