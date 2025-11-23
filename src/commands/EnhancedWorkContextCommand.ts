@@ -16,6 +16,8 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { ConfigManager } from '../config/ConfigManager';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { EnhancedWorkContextAnalyzer } from '../analyzer/EnhancedWorkContextAnalyzer';
+import { EntryPointContextAggregator } from '../analyzer/EntryPointContextAggregator';
+import { LLMsTextGenerator } from '../generator/LLMsTextGenerator';
 
 /**
  * Enhanced Work Context Command
@@ -28,8 +30,15 @@ import { EnhancedWorkContextAnalyzer } from '../analyzer/EnhancedWorkContextAnal
  * # Get complete context for a file
  * tsdoc-edge enhanced-work-context src/storage/DatabaseManager.ts
  *
+ * # Get LLM-friendly context
+ * tsdoc-edge enhanced-work-context src/storage/DatabaseManager.ts --llm
+ *
+ * # Save LLM context to file
+ * tsdoc-edge enhanced-work-context src/storage/DatabaseManager.ts --llm --output context.txt
+ *
  * # Alias
  * tsdoc-edge ewc src/storage/DatabaseManager.ts
+ * tsdoc-edge ewc src/storage/DatabaseManager.ts --llm
  * ```
  */
 export class EnhancedWorkContextCommand extends BaseCommand {
@@ -48,18 +57,27 @@ export class EnhancedWorkContextCommand extends BaseCommand {
   }
 
   async execute(args: string[]): Promise<CommandResult> {
-    if (args.length < 1) {
-      console.log(`${colors.yellow}Usage:${colors.reset} tsdoc-edge enhanced-work-context <file-path>`);
+    if (args.length < 1 || args[0].startsWith('--')) {
+      console.log(`${colors.yellow}Usage:${colors.reset} tsdoc-edge enhanced-work-context <file-path> [options]`);
+      console.log();
+      console.log('Options:');
+      console.log('  --llm              Generate LLM-friendly context (LLMs.txt format)');
+      console.log('  --output <file>    Save output to file instead of stdout');
+      console.log('  --depth <n>        Context depth for LLM mode (default: 2)');
       console.log();
       console.log('Examples:');
       console.log('  tsdoc-edge enhanced-work-context src/storage/DatabaseManager.ts');
-      console.log('  tsdoc-edge ewc src/commands/BuildCommand.ts');
+      console.log('  tsdoc-edge ewc src/commands/BuildCommand.ts --llm');
+      console.log('  tsdoc-edge ewc src/analyzer/Parser.ts --llm --output context.txt');
       console.log();
       console.log('Tip: Use this before editing a file to see all related context');
       return { exitCode: 1, message: 'File path required' };
     }
 
     const targetFile = args[0];
+    const useLlmFormat = args.includes('--llm');
+    const outputFile = this.getOptionValue(args, '--output');
+    const depth = parseInt(this.getOptionValue(args, '--depth') || '2', 10);
 
     // Resolve absolute path
     const absolutePath = path.resolve(process.cwd(), targetFile);
@@ -84,6 +102,40 @@ export class EnhancedWorkContextCommand extends BaseCommand {
       }
 
       const dbManager = new DatabaseManager(dbPath, config.paths.jsonlDir);
+
+      // Branch: LLM format vs Human-readable format
+      if (useLlmFormat) {
+        // Use LLM-friendly format
+        const aggregator = new EntryPointContextAggregator(dbManager);
+        const context = aggregator.gatherContext(absolutePath, depth);
+
+        const generator = new LLMsTextGenerator(dbManager);
+        const output = generator.generate(context);
+
+        if (outputFile) {
+          // Save to file
+          const outputPath = path.resolve(process.cwd(), outputFile);
+          fs.writeFileSync(outputPath, output, 'utf-8');
+          this.printSuccess(`LLM context saved to: ${outputFile}`);
+          console.log();
+          console.log(`${colors.dim}Context metadata:${colors.reset}`);
+          console.log(`  Entry point: ${context.entryPoint}`);
+          console.log(`  Type: ${context.entryPointType}`);
+          console.log(`  Depth: ${depth}`);
+          console.log(`  Total relationships: ${context.metadata.totalRelationships}`);
+          console.log(`  Explicit: ${context.metadata.explicitCount}`);
+          console.log(`  Inferred: ${context.metadata.inferredCount}`);
+          console.log(`  Output size: ${(output.length / 1024).toFixed(2)} KB`);
+        } else {
+          // Print to stdout
+          console.log(output);
+        }
+
+        dbManager.close();
+        return { exitCode: 0, message: 'LLM context generated' };
+      }
+
+      // Human-readable format (original behavior)
       const analyzer = new EnhancedWorkContextAnalyzer(dbManager);
 
       // Analyze file
@@ -280,5 +332,28 @@ export class EnhancedWorkContextCommand extends BaseCommand {
       this.printError(`Failed to analyze file: ${error instanceof Error ? error.message : String(error)}`);
       return { exitCode: 1, message: 'Analysis failed' };
     }
+  }
+
+  /**
+   * Get option value from args
+   *
+   * @param args - Command arguments
+   * @param option - Option name (e.g., '--depth')
+   * @param defaultValue - Default value if not found
+   * @returns Option value
+   * @private
+   */
+  private getOptionValue(args: string[], option: string, defaultValue?: any): any {
+    const index = args.indexOf(option);
+    if (index !== -1 && index + 1 < args.length) {
+      const value = args[index + 1];
+      // Try to parse as number if default is number
+      if (typeof defaultValue === 'number') {
+        const num = parseInt(value, 10);
+        return isNaN(num) ? defaultValue : num;
+      }
+      return value;
+    }
+    return defaultValue;
   }
 }
