@@ -803,20 +803,46 @@ export class WorkContextCommand extends BaseCommand {
       console.log(colors.blue + '🔗 통합 관계 (Unified Relationships)' + colors.reset + colors.dim + ` (${context.relationships.length}개)` + colors.reset);
       console.log(colors.bold + divider + colors.reset);
 
+      // Calculate relationship statistics
+      const explicitRels = context.relationships.filter(r => !r.properties?.inferred);
+      const inferredRels = context.relationships.filter(r => r.properties?.inferred === true);
+      const density = context.symbols.length > 0 ? (context.relationships.length / context.symbols.length).toFixed(2) : '0.00';
+
+      const strongCount = context.relationships.filter(r => r.strength === 'strong').length;
+      const mediumCount = context.relationships.filter(r => r.strength === 'medium').length;
+      const weakCount = context.relationships.filter(r => r.strength === 'weak').length;
+
+      // Display statistics
+      console.log(`  ${colors.bold}통계:${colors.reset}`);
+      console.log(`    총 관계: ${colors.cyan}${context.relationships.length}개${colors.reset} | 관계 밀도: ${colors.cyan}${density}${colors.reset} (관계/심볼)`);
+      console.log(`    명시적: ${colors.green}${explicitRels.length}개${colors.reset} (${((explicitRels.length / context.relationships.length) * 100).toFixed(1)}%) | 추론: ${colors.yellow}${inferredRels.length}개${colors.reset} (${((inferredRels.length / context.relationships.length) * 100).toFixed(1)}%)`);
+      console.log();
+
       // Group relationships by category
       const relationshipsByCategory = this.groupBy(context.relationships, 'category');
-      const categoryIcons: Record<string, string> = {
-        'structural': '🏗️',
-        'data-flow': '📊',
-        'behavioral': '⚙️',
-        'temporal': '⏱️',
-        'semantic': '💡',
-        'quality': '✨',
-        'organizational': '📁',
-      };
+
+      // Display category distribution
+      console.log(`  ${colors.bold}카테고리별:${colors.reset}`);
+      const sortedCategories = Object.entries(relationshipsByCategory).sort((a, b) => b[1].length - a[1].length);
+      for (const [category, rels] of sortedCategories.slice(0, 5)) {
+        const percentage = ((rels.length / context.relationships.length) * 100).toFixed(1);
+        const categoryIcon = this.getCategoryIcon(category);
+        console.log(`    ${categoryIcon}  ${category.padEnd(15)}: ${colors.cyan}${rels.length}개${colors.reset} (${percentage}%)`);
+      }
+      if (sortedCategories.length > 5) {
+        console.log(`    ${colors.dim}... and ${sortedCategories.length - 5} more categories${colors.reset}`);
+      }
+      console.log();
+
+      // Display strength distribution
+      console.log(`  ${colors.bold}강도 분포:${colors.reset}`);
+      console.log(`    ${colors.green}●●● strong:${colors.reset}   ${strongCount}개 (${((strongCount / context.relationships.length) * 100).toFixed(1)}%)`);
+      console.log(`    ${colors.yellow}●●○ medium:${colors.reset}   ${mediumCount}개 (${((mediumCount / context.relationships.length) * 100).toFixed(1)}%)`);
+      console.log(`    ${colors.dim}●○○ weak:${colors.reset}     ${weakCount}개 (${((weakCount / context.relationships.length) * 100).toFixed(1)}%)`);
+      console.log();
 
       for (const [category, rels] of Object.entries(relationshipsByCategory)) {
-        const icon = categoryIcons[category] || '🔗';
+        const icon = this.getCategoryIcon(category);
         console.log(`\n  ${icon} ${colors.bold}${category.toUpperCase()}${colors.reset} ${colors.dim}(${rels.length}개)${colors.reset}`);
         console.log();
 
@@ -891,6 +917,61 @@ export class WorkContextCommand extends BaseCommand {
     console.log(`  함정: ${colors.cyan}${context.errorPatterns.length}개${colors.reset}`);
     console.log(`  관계: ${colors.cyan}${context.relationships.length}개${colors.reset}`);
     console.log();
+
+    // Actionable recommendations
+    console.log(colors.bold + divider + colors.reset);
+    console.log(colors.bold + '💡 권장사항' + colors.reset);
+    console.log(colors.bold + divider + colors.reset);
+
+    const recommendations: string[] = [];
+
+    // Calculate relationship density
+    const density = context.symbols.length > 0 ? context.relationships.length / context.symbols.length : 0;
+
+    // Relationship density recommendation
+    if (density >= 5.0) {
+      recommendations.push(`${colors.green}✓${colors.reset} 관계 밀도 높음 (${density.toFixed(2)}) - 코드가 잘 연결됨`);
+    } else if (density < 2.0) {
+      recommendations.push(`${colors.yellow}•${colors.reset} 관계 밀도 낮음 (${density.toFixed(2)}) - 관계 추가 권장`);
+    }
+
+    // Test coverage recommendation
+    if (context.tests.length === 0) {
+      recommendations.push(`${colors.yellow}•${colors.reset} 테스트 커버리지 0% - 테스트 추가 필요`);
+    }
+
+    // Inferred relationships recommendation
+    const inferredCount = context.relationships.filter(r => r.properties?.inferred === true).length;
+    if (inferredCount > 0 && inferredCount > context.relationships.length * 0.3) {
+      recommendations.push(`${colors.yellow}•${colors.reset} 추론 관계 ${inferredCount}개 (${((inferredCount / context.relationships.length) * 100).toFixed(1)}%) - 명시적 문서화 권장`);
+    }
+
+    // Contracts recommendation
+    if (context.contracts.length === 0 && context.symbols.some(s => s.isPublic)) {
+      recommendations.push(`${colors.yellow}•${colors.reset} 계약 명세 없음 - @precondition/@postcondition 추가 고려`);
+    }
+
+    // Design decisions recommendation
+    if (context.decisions.length === 0 && context.relationships.length > 10) {
+      recommendations.push(`${colors.yellow}•${colors.reset} 설계 결정 기록 없음 - ADR 작성 권장`);
+    }
+
+    // High impact warning
+    if (context.usedBy.length > 10) {
+      recommendations.push(`${colors.yellow}⚠${colors.reset}  높은 영향도 (${context.usedBy.length}개 파일) - 변경 시 신중히 테스트`);
+    }
+
+    // Error patterns recommendation
+    if (context.errorPatterns.length > 0) {
+      recommendations.push(`${colors.green}✓${colors.reset} ${context.errorPatterns.length}개 알려진 함정 문서화됨 - 참고하여 작업`);
+    }
+
+    if (recommendations.length > 0) {
+      recommendations.forEach(rec => console.log(`  ${rec}`));
+    } else {
+      console.log(`  ${colors.green}✓${colors.reset} ${colors.dim}권장사항 없음 - 코드 상태 양호${colors.reset}`);
+    }
+    console.log();
   }
 
   private groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
@@ -902,5 +983,19 @@ export class WorkContextCommand extends BaseCommand {
       groups[groupKey].push(item);
       return groups;
     }, {} as Record<string, T[]>);
+  }
+
+  private getCategoryIcon(category: string): string {
+    const categoryIcons: Record<string, string> = {
+      'structural': '🏗️',
+      'data-flow': '📊',
+      'behavioral': '⚙️',
+      'temporal': '⏱️',
+      'semantic': '💡',
+      'quality': '✨',
+      'verification': '✅',
+      'organizational': '📁',
+    };
+    return categoryIcons[category] || '🔗';
   }
 }
