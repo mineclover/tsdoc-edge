@@ -4,6 +4,7 @@
  * @responsibility Aggregate all context for a given entry point (file/symbol/doc)
  */
 
+import * as path from 'node:path';
 import type { Symbol, SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 import type { DatabaseManager } from '../storage/DatabaseManager';
@@ -192,14 +193,20 @@ export class EntryPointContextAggregator {
   /**
    * Gather context for file entry point
    *
-   * @param filePath - File path
+   * @param filePath - File path (absolute or relative)
    * @param context - Context to populate
    * @param depth - Traversal depth
    * @private
    */
   private gatherFileContext(filePath: string, context: UnifiedContext, depth: number): void {
+    // Normalize to relative path if absolute (database stores relative paths)
+    let normalizedPath = filePath;
+    if (path.isAbsolute(filePath)) {
+      normalizedPath = path.relative(process.cwd(), filePath);
+    }
+
     // Get all symbols in file
-    const symbols = this.dbManager.getSymbolsByFile(filePath);
+    const symbols = this.dbManager.getSymbolsByFile(normalizedPath);
     context.fileSymbols = symbols;
 
     if (symbols.length > 0) {
