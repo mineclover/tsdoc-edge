@@ -1,1001 +1,360 @@
 /**
- * Work Context Command - 작업자 중심 통합 컨텍스트 제공
+ * Work Context Command - Relationship-based context discovery
+ * @packageDocumentation
+ * @responsibility Provide complete work context before editing a file
  *
- * @remarks
- * 특정 파일을 작업할 때 필요한 모든 컨텍스트를 한눈에 제공:
- * - 관련 문서 (기획서, 명세서)
- * - 의존 타입 (이 파일이 사용하는 타입들)
- * - 테스트 파일 (이 파일을 테스트하는 파일들)
- * - 영향 범위 (이 파일을 사용하는 곳들)
+ * @problem Developers need all context before modifying code
+ * @solves Uses relationship graph for comprehensive, instant context
+ * @context SSOT principle: Minimal queries, maximum information
  *
  * @doc [[WorkContextCommand]]
- * @packageDocumentation
  */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
+import { ConfigManager } from '../config/ConfigManager';
 import { DatabaseManager } from '../storage/DatabaseManager';
-import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
-import { TSDocParser } from '../parser/TSDocParser';
-import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
-import type { Symbol } from '../types/graph/graph';
-
-interface WorkContext {
-  filePath: string;
-  symbols: Symbol[];
-  relatedDocs: Array<{
-    title: string;
-    path: string;
-    symbolRef: string;
-    sourceFile?: string;
-    sourceLine?: number;
-  }>;
-  dependencies: Array<{
-    name: string;
-    type: string;
-    filePath: string;
-  }>;
-  typeFlows: Array<{
-    from: string;
-    to: string;
-    chain: string[];
-  }>;
-  tests: Array<{
-    path: string;
-    coverage?: number;
-    type: 'unit' | 'integration';
-  }>;
-  usedBy: Array<{
-    name: string;
-    filePath: string;
-    type: string;
-  }>;
-  contracts: Array<{
-    symbolId: string;
-    symbolName: string;
-    description: string;
-    preconditions: string[];
-    postconditions: string[];
-    invariants: string[];
-  }>;
-  decisions: Array<{
-    title: string;
-    decision: string;
-    rationale: string;
-    status: string;
-    date: string;
-    symbolName?: string;
-  }>;
-  errorPatterns: Array<{
-    symbolName: string;
-    errorType: string;
-    message: string;
-    solution: string;
-    prevention?: string;
-  }>;
-  relationships: Array<{
-    id: string;
-    type: string;
-    category: string;
-    direction: 'unidirectional' | 'bidirectional' | 'undirected';
-    strength: 'strong' | 'medium' | 'weak';
-    fromSymbols: string[];
-    toSymbols: string[];
-    confidence: number;
-    description?: string;
-    properties?: Record<string, any>;
-  }>;
-}
+import { EnhancedWorkContextAnalyzer } from '../analyzer/EnhancedWorkContextAnalyzer';
+import { EntryPointContextAggregator } from '../analyzer/EntryPointContextAggregator';
+import { LLMsTextGenerator } from '../generator/LLMsTextGenerator';
 
 /**
- * Work Context Command - 파일 작업에 필요한 모든 컨텍스트 제공
+ * Work Context Command
  *
- * @doc [[WorkContextCommand]]
- * @requires DatabaseManager
- * @requires SymbolGraphBuilder
- * @requires TSDocParser
- * @requires DocumentSymbolParser
+ * Shows comprehensive context for a file using relationship graph analysis.
+ *
  * @public
+ * @example
+ * ```bash
+ * # Get complete context for a file
+ * tsdoc-edge work-context src/storage/DatabaseManager.ts
+ *
+ * # Get LLM-friendly context
+ * tsdoc-edge work-context src/storage/DatabaseManager.ts --llm
+ *
+ * # Save LLM context to file
+ * tsdoc-edge work-context src/storage/DatabaseManager.ts --llm --output context.txt
+ *
+ * # Alias
+ * tsdoc-edge wc src/storage/DatabaseManager.ts
+ * tsdoc-edge wc src/storage/DatabaseManager.ts --llm
+ * ```
  */
 export class WorkContextCommand extends BaseCommand {
+  protected configManager = ConfigManager.getInstance();
+
   getName(): string {
     return 'work-context';
   }
 
-  getDescription(): string {
-    return 'Show all context needed to work on a file (docs, types, tests, impact)';
+  getAlias(): string[] {
+    return ['wc'];
   }
 
-  protected getUsage(): string {
-    return 'tsdoc-edge work-context <file-path>';
+  getDescription(): string {
+    return 'Show comprehensive relationship-based context for a file';
   }
 
   async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
-      // Check for help flag
-      if (this.hasHelpFlag(args)) {
-        return this.displayHelp();
-      }
 
-      const targetFile = args[0];
-
-      if (!targetFile) {
-        this.printError('File path required');
-        console.log();
-        console.log('Examples:');
-        console.log('  tsdoc-edge work-context src/services/UserService.ts');
-        console.log('  tsdoc-edge work-context src/controllers/AuthController.ts');
-        console.log();
-        console.log('Tip: Run with --help for more information');
-        return this.failure('Missing file path');
-      }
-
-      // Resolve absolute path
-      const absolutePath = path.resolve(process.cwd(), targetFile);
-
-      if (!fs.existsSync(absolutePath)) {
-        this.printError(`File not found: ${targetFile}`);
-        return this.failure('File not found');
-      }
-
-      this.printHeader(`Work Context: ${path.basename(targetFile)}`);
-      console.log(`📄 ${targetFile}`);
+    if (args.length < 1 || args[0].startsWith('--')) {
+      console.log(`${colors.yellow}Usage:${colors.reset} tsdoc-edge work-context <file-path> [options]`);
       console.log();
+      console.log('Options:');
+      console.log('  --llm              Generate LLM-friendly context (LLMs.txt format)');
+      console.log('  --output <file>    Save output to file instead of stdout');
+      console.log('  --depth <n>        Context depth for LLM mode (default: 2)');
+      console.log();
+      console.log('Examples:');
+      console.log('  tsdoc-edge work-context src/storage/DatabaseManager.ts');
+      console.log('  tsdoc-edge wc src/commands/BuildCommand.ts --llm');
+      console.log('  tsdoc-edge wc src/analyzer/Parser.ts --llm --output context.txt');
+      console.log();
+      console.log('Tip: Use this before editing a file to see all related context');
+      return { exitCode: 1, message: 'File path required' };
+    }
 
-      // Load database
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+    const targetFile = args[0];
+    const useLlmFormat = args.includes('--llm');
+    const outputFile = this.getOptionValue(args, '--output');
+    const depth = parseInt(this.getOptionValue(args, '--depth') || '2', 10);
+
+    // Resolve absolute path
+    const absolutePath = path.resolve(process.cwd(), targetFile);
+
+    if (!fs.existsSync(absolutePath)) {
+      this.printError(`File not found: ${targetFile}`);
+      return { exitCode: 1, message: 'File not found' };
+    }
+
+    console.log();
+    this.printHeader(`Work Context: ${path.basename(targetFile)}`);
+    console.log(`📄 ${targetFile}`);
+    console.log();
+
+    try {
+      const config = this.configManager.get();
+      const dbPath = config.paths.databasePath;
+
       if (!fs.existsSync(dbPath)) {
         this.printError('Database not found. Run: tsdoc-edge build src');
-        return this.failure('Database not found');
+        return { exitCode: 1, message: 'Database not found' };
       }
 
-      const dbManager = new DatabaseManager(dbPath);
-      const context = await this.gatherContext(absolutePath, targetFile, dbManager);
+      const dbManager = new DatabaseManager(dbPath, config.paths.jsonlDir);
 
-      // Display context
-      this.displayContext(context);
+      // Branch: LLM format vs Human-readable format
+      if (useLlmFormat) {
+        // Use LLM-friendly format
+        const aggregator = new EntryPointContextAggregator(dbManager);
+        const context = aggregator.gatherContext(absolutePath, depth);
 
-      return this.success('Context gathered successfully');
-    });
-  }
+        const generator = new LLMsTextGenerator(dbManager);
+        const output = generator.generate(context);
 
-  private async gatherContext(
-    absolutePath: string,
-    relativePath: string,
-    dbManager: DatabaseManager
-  ): Promise<WorkContext> {
-    const context: WorkContext = {
-      filePath: relativePath,
-      symbols: [],
-      relatedDocs: [],
-      dependencies: [],
-      typeFlows: [],
-      tests: [],
-      usedBy: [],
-      contracts: [],
-      decisions: [],
-      errorPatterns: [],
-      relationships: [],
-    };
-
-    // 1. Get symbols from this file
-    const allSymbols = dbManager.db.prepare(
-      'SELECT * FROM symbols WHERE file_path = ?'
-    ).all(relativePath) as any[];
-
-    context.symbols = allSymbols.map(row => ({
-      id: row.id,
-      name: row.name,
-      type: row.type,
-      filePath: row.file_path,
-      line: row.line,
-      column: row.column,
-      isExported: Boolean(row.is_exported),
-      isPublic: Boolean(row.is_public),
-      summary: row.summary,
-      tests: [],
-      designDecisions: [],
-      metadata: {},
-    }));
-
-    // Extract symbol IDs for batch queries
-    const symbolIds = context.symbols.map(s => s.id);
-
-    // 2. Parse file for @doc tags (related documents)
-    try {
-      const fileContent = fs.readFileSync(absolutePath, 'utf-8');
-      const lines = fileContent.split('\n');
-
-      // Simple regex to find @doc tags
-      const docTagRegex = /@doc\s+\[\[([^\]]+)\]\]/g;
-
-      lines.forEach((line, index) => {
-        const matches = line.matchAll(docTagRegex);
-        for (const match of matches) {
-          const symbolRef = match[1];
-          context.relatedDocs.push({
-            title: symbolRef,
-            path: this.findDocumentPath(symbolRef),
-            symbolRef,
-            sourceFile: relativePath,
-            sourceLine: index + 1,
-          });
-        }
-      });
-    } catch (error) {
-      // Continue even if parsing fails
-    }
-
-    // 3. Get dependencies (what this file uses) - Use unified_relationships
-    if (symbolIds.length > 0) {
-      const placeholder = symbolIds.map(() => '?').join(',');
-
-      // Query unified_relationships for structural relationships (type-dependency, code-dependency)
-      const relationshipRows = dbManager.db.prepare(`
-        SELECT DISTINCT
-          r.to_symbols, r.type, r.category
-        FROM unified_relationships r
-        WHERE r.category IN ('structural', 'behavioral')
-          AND json_valid(r.from_symbols)
-          AND EXISTS (
-            SELECT 1 FROM json_each(r.from_symbols) je
-            WHERE je.value IN (${placeholder})
-          )
-      `).all(...symbolIds) as Array<{
-        to_symbols: string;
-        type: string;
-        category: string;
-      }>;
-
-      // Extract target symbol IDs and resolve them
-      const targetIds = new Set<string>();
-      for (const row of relationshipRows) {
-        try {
-          const toSymbols = JSON.parse(row.to_symbols) as string[];
-          for (const target of toSymbols) {
-            if (target) targetIds.add(target);
-          }
-        } catch (error) {
-          // Skip invalid JSON
-        }
-      }
-
-      if (targetIds.size > 0) {
-        const targetPlaceholder = Array.from(targetIds).map(() => '?').join(',');
-        const dependencyRows = dbManager.db.prepare(`
-          SELECT DISTINCT
-            s.id, s.name, s.type, s.file_path
-          FROM symbols s
-          WHERE s.id IN (${targetPlaceholder})
-            AND s.file_path != ?
-        `).all(...Array.from(targetIds), relativePath) as Array<{
-          id: string;
-          name: string;
-          type: string;
-          file_path: string;
-        }>;
-
-        context.dependencies = dependencyRows.map(row => ({
-          name: row.name,
-          type: row.type,
-          filePath: row.file_path,
-        }));
-      }
-    }
-
-    // 4. Get test files
-    if (symbolIds.length > 0) {
-      const testMappings = dbManager.db.prepare(
-        `SELECT * FROM test_mappings WHERE symbol_id IN (${symbolIds.map(() => '?').join(',')})`
-      ).all(...symbolIds) as any[];
-
-      const testPaths = new Set<string>();
-      for (const mapping of testMappings) {
-        testPaths.add(mapping.test_file_path);
-      }
-
-      context.tests = Array.from(testPaths).map(testPath => ({
-        path: testPath,
-        type: testPath.includes('integration') ? 'integration' : 'unit',
-      }));
-    }
-
-    // 5. Get usedBy (what uses this file) - Use unified_relationships
-    if (symbolIds.length > 0) {
-      const placeholder = symbolIds.map(() => '?').join(',');
-
-      // Query unified_relationships where this file's symbols are targets
-      const relationshipRows = dbManager.db.prepare(`
-        SELECT DISTINCT
-          r.from_symbols, r.type, r.category
-        FROM unified_relationships r
-        WHERE r.category IN ('structural', 'behavioral')
-          AND json_valid(r.to_symbols)
-          AND EXISTS (
-            SELECT 1 FROM json_each(r.to_symbols) je
-            WHERE je.value IN (${placeholder})
-          )
-      `).all(...symbolIds) as Array<{
-        from_symbols: string;
-        type: string;
-        category: string;
-      }>;
-
-      // Extract source symbol IDs and resolve them
-      const sourceIds = new Set<string>();
-      for (const row of relationshipRows) {
-        try {
-          const fromSymbols = JSON.parse(row.from_symbols) as string[];
-          for (const source of fromSymbols) {
-            if (source) sourceIds.add(source);
-          }
-        } catch (error) {
-          // Skip invalid JSON
-        }
-      }
-
-      if (sourceIds.size > 0) {
-        const sourcePlaceholder = Array.from(sourceIds).map(() => '?').join(',');
-        const usedByRows = dbManager.db.prepare(`
-          SELECT DISTINCT
-            s.id, s.name, s.file_path, s.type
-          FROM symbols s
-          WHERE s.id IN (${sourcePlaceholder})
-            AND s.file_path != ?
-        `).all(...Array.from(sourceIds), relativePath) as Array<{
-          id: string;
-          name: string;
-          file_path: string;
-          type: string;
-        }>;
-
-        context.usedBy = usedByRows.map(row => ({
-          name: row.name,
-          filePath: row.file_path,
-          type: row.type,
-        }));
-      }
-    }
-
-    // 6-8. Get contracts, decisions, and error patterns (optimized)
-    if (symbolIds.length > 0) {
-      // Create symbol lookup map for O(1) access
-      const symbolMap = new Map(context.symbols.map(s => [s.id, s]));
-      const placeholder = symbolIds.map(() => '?').join(',');
-
-      // 6. Get contracts (preconditions, postconditions, invariants)
-      try {
-        const contracts = dbManager.db.prepare(
-          `SELECT * FROM contracts WHERE symbol_id IN (${placeholder})`
-        ).all(...symbolIds) as Array<{
-          symbol_id: string;
-          description: string;
-          preconditions: string;
-          postconditions: string;
-          invariants: string;
-          file_path: string;
-        }>;
-
-        for (const contract of contracts) {
-          try {
-            const symbol = symbolMap.get(contract.symbol_id);
-            context.contracts.push({
-              symbolId: contract.symbol_id,
-              symbolName: symbol?.name || 'Unknown',
-              description: contract.description,
-              preconditions: JSON.parse(contract.preconditions),
-              postconditions: JSON.parse(contract.postconditions),
-              invariants: JSON.parse(contract.invariants),
-            });
-          } catch (jsonError) {
-            // Skip malformed contract data
-            console.warn(`Failed to parse contract for ${contract.symbol_id}:`, jsonError);
-          }
-        }
-      } catch (dbError) {
-        // Continue even if contracts query fails
-        console.warn('Failed to fetch contracts:', dbError);
-      }
-
-      // 7. Get design decisions
-      try {
-        const decisions = dbManager.db.prepare(
-          `SELECT * FROM decision_records WHERE symbol_id IN (${placeholder}) ORDER BY date DESC`
-        ).all(...symbolIds) as Array<{
-          symbol_id: string;
-          title: string;
-          decision: string;
-          rationale: string;
-          status: string;
-          date: string;
-        }>;
-
-        for (const decision of decisions) {
-          const symbol = symbolMap.get(decision.symbol_id);
-          context.decisions.push({
-            title: decision.title,
-            decision: decision.decision,
-            rationale: decision.rationale,
-            status: decision.status,
-            date: decision.date,
-            symbolName: symbol?.name,
-          });
-        }
-      } catch (dbError) {
-        console.warn('Failed to fetch design decisions:', dbError);
-      }
-
-      // 8. Get error patterns
-      try {
-        const errors = dbManager.db.prepare(
-          `SELECT * FROM error_experiences WHERE symbol_id IN (${placeholder})`
-        ).all(...symbolIds) as Array<{
-          symbol_id: string;
-          error_type: string;
-          message: string;
-          solution: string;
-          prevention: string | null;
-        }>;
-
-        for (const error of errors) {
-          const symbol = symbolMap.get(error.symbol_id);
-          context.errorPatterns.push({
-            symbolName: symbol?.name || 'Unknown',
-            errorType: error.error_type,
-            message: error.message,
-            solution: error.solution,
-            prevention: error.prevention || undefined,
-          });
-        }
-      } catch (dbError) {
-        console.warn('Failed to fetch error patterns:', dbError);
-      }
-
-      // 9. Get unified relationships (17 relationship types) - Optimized single query
-      try {
-        // Build WHERE clause for all symbolIds at once
-        const whereConditions = symbolIds.map(() =>
-          `(json_extract(from_symbols, '$[0]') = ?
-            OR json_extract(to_symbols, '$[0]') = ?
-            OR from_symbols LIKE ?
-            OR to_symbols LIKE ?)`
-        ).join(' OR ');
-
-        // Prepare parameters: for each symbolId, we need it 4 times
-        const params: string[] = [];
-        for (const symbolId of symbolIds) {
-          params.push(symbolId); // json_extract from_symbols
-          params.push(symbolId); // json_extract to_symbols
-          params.push(`%"${symbolId}"%`); // LIKE from_symbols
-          params.push(`%"${symbolId}"%`); // LIKE to_symbols
-        }
-
-        const rels = dbManager.db.prepare(`
-          SELECT DISTINCT * FROM unified_relationships
-          WHERE ${whereConditions}
-        `).all(...params) as Array<{
-          id: string;
-          type: string;
-          category: string;
-          from_symbols: string;
-          to_symbols: string;
-          direction: string;
-          strength: string;
-          confidence: number;
-          description: string | null;
-          properties: string | null;
-        }>;
-
-        // Process relationships (already deduplicated by DISTINCT)
-        for (const rel of rels) {
-          try {
-            context.relationships.push({
-              id: rel.id,
-              type: rel.type,
-              category: rel.category,
-              direction: rel.direction as 'unidirectional' | 'bidirectional' | 'undirected',
-              strength: rel.strength as 'strong' | 'medium' | 'weak',
-              fromSymbols: JSON.parse(rel.from_symbols),
-              toSymbols: JSON.parse(rel.to_symbols),
-              confidence: rel.confidence,
-              description: rel.description || undefined,
-              properties: rel.properties ? JSON.parse(rel.properties) : undefined,
-            });
-          } catch (jsonError) {
-            console.warn(`Failed to parse relationship ${rel.id}:`, jsonError);
-          }
-        }
-      } catch (dbError) {
-        console.warn('Failed to fetch unified relationships:', dbError);
-      }
-    }
-
-    return context;
-  }
-
-  private findDocumentPath(symbolRef: string): string {
-    // Search in managed directories
-    const managedDirs = ['managed/features', 'managed/architecture', 'managed/workflows', 'managed/concepts'];
-
-    for (const dir of managedDirs) {
-      const dirPath = path.join(process.cwd(), dir);
-      if (!fs.existsSync(dirPath)) continue;
-
-      const files = this.getAllMarkdownFiles(dirPath);
-      for (const file of files) {
-        try {
-          const content = fs.readFileSync(file, 'utf-8');
-          // Check for H1 definition: # [[SymbolRef]]
-          const h1Match = content.match(/^#\s+\[\[([^\]]+)\]\]/m);
-          if (h1Match && h1Match[1] === symbolRef) {
-            return path.relative(process.cwd(), file);
-          }
-        } catch {
-          continue;
-        }
-      }
-    }
-
-    return '(not found)';
-  }
-
-  private getAllMarkdownFiles(dir: string): string[] {
-    const files: string[] = [];
-
-    try {
-      const entries = fs.readdirSync(dir, { withFileTypes: true });
-
-      for (const entry of entries) {
-        const fullPath = path.join(dir, entry.name);
-
-        if (entry.isDirectory()) {
-          files.push(...this.getAllMarkdownFiles(fullPath));
-        } else if (entry.isFile() && entry.name.endsWith('.md')) {
-          files.push(fullPath);
-        }
-      }
-    } catch {
-      // Ignore errors
-    }
-
-    return files;
-  }
-
-  private uniqueBy<T>(array: T[], key: keyof T): T[] {
-    const seen = new Set();
-    return array.filter(item => {
-      const value = item[key];
-      if (seen.has(value)) {
-        return false;
-      }
-      seen.add(value);
-      return true;
-    });
-  }
-
-  private displayContext(context: WorkContext): void {
-    const colors = {
-      green: '\x1b[32m',
-      yellow: '\x1b[33m',
-      blue: '\x1b[34m',
-      magenta: '\x1b[35m',
-      cyan: '\x1b[36m',
-      reset: '\x1b[0m',
-      bold: '\x1b[1m',
-      dim: '\x1b[2m',
-    };
-
-    // Section divider
-    const divider = '━'.repeat(80);
-
-    // 1. Related Documents
-    console.log(colors.bold + divider + colors.reset);
-    console.log(colors.blue + '📚 관련 문서' + colors.reset + colors.dim + ` (${context.relatedDocs.length}개)` + colors.reset);
-    console.log(colors.bold + divider + colors.reset);
-
-    if (context.relatedDocs.length > 0) {
-      for (const doc of context.relatedDocs) {
-        const isFound = doc.path !== '(not found)';
-        const statusIcon = isFound ? colors.green + '✅' : colors.yellow + '❌';
-
-        console.log(`  ${colors.cyan}•${colors.reset} ${colors.bold}[[${doc.symbolRef}]]${colors.reset} ${statusIcon}${colors.reset}`);
-
-        if (isFound) {
-          console.log(`    ${colors.dim}→ ${doc.path}${colors.reset}`);
+        if (outputFile) {
+          // Save to file
+          const outputPath = path.resolve(process.cwd(), outputFile);
+          fs.writeFileSync(outputPath, output, 'utf-8');
+          this.printSuccess(`LLM context saved to: ${outputFile}`);
+          console.log();
+          console.log(`${colors.dim}Context metadata:${colors.reset}`);
+          console.log(`  Entry point: ${context.entryPoint}`);
+          console.log(`  Type: ${context.entryPointType}`);
+          console.log(`  Depth: ${depth}`);
+          console.log(`  Total relationships: ${context.metadata.totalRelationships}`);
+          console.log(`  Explicit: ${context.metadata.explicitCount}`);
+          console.log(`  Inferred: ${context.metadata.inferredCount}`);
+          console.log(`  Output size: ${(output.length / 1024).toFixed(2)} KB`);
         } else {
-          console.log(`    ${colors.yellow}→ Not found${colors.reset}`);
-          console.log(`    ${colors.dim}   Searched in: managed/features/, managed/workflows/, managed/concepts/, managed/architecture/${colors.reset}`);
-          if (doc.sourceFile && doc.sourceLine) {
-            console.log(`    ${colors.dim}   Referenced in: ${doc.sourceFile}:${doc.sourceLine}${colors.reset}`);
-          }
-          console.log(`    ${colors.blue}   💡 Create document or remove @doc tag${colors.reset}`);
-        }
-        console.log();
-      }
-    } else {
-      console.log(`  ${colors.dim}No @doc tags found in file${colors.reset}`);
-      console.log();
-    }
-
-    // 2. Dependencies (Types this file uses)
-    console.log(colors.bold + divider + colors.reset);
-    console.log(colors.blue + '🔗 의존 타입' + colors.reset + colors.dim + ` (${context.dependencies.length}개)` + colors.reset);
-    console.log(colors.bold + divider + colors.reset);
-
-    if (context.dependencies.length > 0) {
-      const displayLimit = 20;
-      let displayed = 0;
-      let missingCount = 0;
-
-      for (const dep of context.dependencies) {
-        if (displayed >= displayLimit) break;
-
-        const absoluteDepPath = path.resolve(process.cwd(), dep.filePath);
-        const exists = fs.existsSync(absoluteDepPath);
-        const statusIcon = exists ? colors.green + '✅' : colors.yellow + '❌';
-
-        console.log(`  ${colors.cyan}${dep.name.padEnd(20)}${colors.reset} ${statusIcon}${colors.reset}`);
-        console.log(`    ${colors.dim}→ ${dep.filePath}${colors.reset}`);
-
-        if (!exists) {
-          missingCount++;
-          console.log(`    ${colors.yellow}   File missing - dependency may be stale${colors.reset}`);
-          console.log(`    ${colors.blue}   💡 Run: tsdoc-edge build src${colors.reset}`);
+          // Print to stdout
+          console.log(output);
         }
 
-        displayed++;
+        dbManager.close();
+        return { exitCode: 0, message: 'LLM context generated' };
       }
 
-      if (context.dependencies.length > displayLimit) {
+      // Human-readable format (original behavior)
+      const analyzer = new EnhancedWorkContextAnalyzer(dbManager);
+
+      // Analyze file
+      const context = analyzer.analyze(absolutePath);
+
+      if (context.symbols.length === 0) {
+        this.printWarning('No symbols found in this file');
         console.log();
-        console.log(`  ${colors.dim}... ${context.dependencies.length - displayLimit} more (use --all to show all)${colors.reset}`);
+        console.log('This file may not have been indexed. Try rebuilding:');
+        console.log('  tsdoc-edge build src --force');
+        dbManager.close();
+        return { exitCode: 0, message: 'No symbols found' };
       }
 
-      if (missingCount > 0) {
-        console.log();
-        console.log(`  ${colors.yellow}⚠️  ${missingCount} missing dependencies detected${colors.reset}`);
-      }
-    } else {
-      console.log(`  ${colors.dim}No dependencies found${colors.reset}`);
-    }
-    console.log();
-
-    // 3. Tests
-    console.log(colors.bold + divider + colors.reset);
-    console.log(colors.blue + '🧪 테스트' + colors.reset + colors.dim + ` (${context.tests.length}개)` + colors.reset);
-    console.log(colors.bold + divider + colors.reset);
-
-    if (context.tests.length > 0) {
-      let missingTests = 0;
-
-      for (const test of context.tests) {
-        const absoluteTestPath = path.resolve(process.cwd(), test.path);
-        const exists = fs.existsSync(absoluteTestPath);
-        const icon = exists ? (test.type === 'integration' ? '🔗' : '✅') : '❌';
-
-        console.log(`  ${icon} ${test.path}`);
-
-        if (!exists) {
-          missingTests++;
-          console.log(`    ${colors.yellow}   File missing - test mapping exists but file deleted${colors.reset}`);
-          console.log(`    ${colors.blue}   💡 Run: tsdoc-edge build src to update test mappings${colors.reset}`);
-        } else if (test.coverage !== undefined) {
-          console.log(`     ${colors.dim}→ 커버리지: ${test.coverage}%${colors.reset}`);
-        }
-        console.log();
-      }
-
-      if (missingTests > 0) {
-        console.log(`  ${colors.yellow}⚠️  ${missingTests} test files missing${colors.reset}`);
-        console.log();
-      }
-    } else {
-      console.log(`  ${colors.yellow}❌ No tests found for this file${colors.reset}`);
-      console.log(`  ${colors.blue}   💡 Create test file in src/__tests__/${colors.reset}`);
-      console.log(`  ${colors.blue}   💡 Run: tsdoc-edge untested to see all untested symbols${colors.reset}`);
-      console.log();
-    }
-
-    // 4. Impact (Used By)
-    console.log(colors.bold + divider + colors.reset);
-    console.log(colors.blue + '⚠️  영향 범위' + colors.reset + colors.dim + ` (${context.usedBy.length}개 파일이 이 파일 사용)` + colors.reset);
-    console.log(colors.bold + divider + colors.reset);
-
-    if (context.usedBy.length > 0) {
-      const displayLimit = 10;
-      const toDisplay = context.usedBy.slice(0, displayLimit);
-
-      for (const usage of toDisplay) {
-        console.log(`  ${colors.cyan}${usage.name.padEnd(20)}${colors.reset} ${colors.dim}→ ${usage.filePath}${colors.reset}`);
-      }
-
-      if (context.usedBy.length > displayLimit) {
-        console.log(`  ${colors.dim}... ${context.usedBy.length - displayLimit} more${colors.reset}`);
-      }
-
-      console.log();
-      console.log(`  ${colors.yellow}⚠️  수정 시 위 ${context.usedBy.length}개 파일 영향 받음${colors.reset}`);
-    } else {
-      console.log(`  ${colors.green}✓${colors.reset} ${colors.dim}No files depend on this file${colors.reset}`);
-    }
-    console.log();
-
-    // 5. Contracts (Preconditions, Postconditions, Invariants)
-    if (context.contracts.length > 0) {
-      console.log(colors.bold + divider + colors.reset);
-      console.log(colors.blue + '📜 계약 (Contracts)' + colors.reset + colors.dim + ` (${context.contracts.length}개)` + colors.reset);
-      console.log(colors.bold + divider + colors.reset);
-
-      for (const contract of context.contracts) {
-        console.log(`  ${colors.bold}${contract.symbolName}${colors.reset}`);
-        console.log(`    ${colors.dim}${contract.description}${colors.reset}`);
-        console.log();
-
-        if (contract.preconditions.length > 0) {
-          console.log(`    ${colors.green}사전조건 (Preconditions):${colors.reset}`);
-          for (const pre of contract.preconditions) {
-            console.log(`      ${colors.cyan}•${colors.reset} ${pre}`);
-          }
-          console.log();
-        }
-
-        if (contract.postconditions.length > 0) {
-          console.log(`    ${colors.green}사후조건 (Postconditions):${colors.reset}`);
-          for (const post of contract.postconditions) {
-            console.log(`      ${colors.cyan}•${colors.reset} ${post}`);
-          }
-          console.log();
-        }
-
-        if (contract.invariants.length > 0) {
-          console.log(`    ${colors.green}불변식 (Invariants):${colors.reset}`);
-          for (const inv of contract.invariants) {
-            console.log(`      ${colors.cyan}•${colors.reset} ${inv}`);
-          }
-          console.log();
-        }
-      }
-    }
-
-    // 6. Design Decisions
-    if (context.decisions.length > 0) {
-      console.log(colors.bold + divider + colors.reset);
-      console.log(colors.blue + '🎯 설계 결정 (Design Decisions)' + colors.reset + colors.dim + ` (${context.decisions.length}개)` + colors.reset);
-      console.log(colors.bold + divider + colors.reset);
-
-      for (const decision of context.decisions) {
-        const statusIcon = decision.status === 'active' ? colors.green + '✅' :
-                          decision.status === 'deprecated' ? colors.yellow + '⚠️' :
-                          colors.dim + '📋';
-
-        console.log(`  ${statusIcon}${colors.reset} ${colors.bold}${decision.title}${colors.reset}`);
-        if (decision.symbolName) {
-          console.log(`    ${colors.dim}Symbol: ${decision.symbolName}${colors.reset}`);
-        }
-        console.log(`    ${colors.dim}Date: ${decision.date}${colors.reset}`);
-        console.log(`    ${colors.cyan}Decision:${colors.reset} ${decision.decision}`);
-        console.log(`    ${colors.cyan}Rationale:${colors.reset} ${decision.rationale}`);
-        console.log();
-      }
-    }
-
-    // 7. Error Patterns
-    if (context.errorPatterns.length > 0) {
-      console.log(colors.bold + divider + colors.reset);
-      console.log(colors.blue + '⚠️  일반적인 함정 (Common Pitfalls)' + colors.reset + colors.dim + ` (${context.errorPatterns.length}개)` + colors.reset);
-      console.log(colors.bold + divider + colors.reset);
-
-      for (const error of context.errorPatterns) {
-        console.log(`  ${colors.yellow}❌${colors.reset} ${colors.bold}${error.errorType}${colors.reset} ${colors.dim}(${error.symbolName})${colors.reset}`);
-        console.log(`    ${colors.yellow}Error:${colors.reset} ${error.message}`);
-        console.log(`    ${colors.green}Solution:${colors.reset} ${error.solution}`);
-        if (error.prevention) {
-          console.log(`    ${colors.cyan}Prevention:${colors.reset} ${error.prevention}`);
-        }
-        console.log();
-      }
-    }
-
-    // 8. Unified Relationships (17 relationship types)
-    if (context.relationships.length > 0) {
-      console.log(colors.bold + divider + colors.reset);
-      console.log(colors.blue + '🔗 통합 관계 (Unified Relationships)' + colors.reset + colors.dim + ` (${context.relationships.length}개)` + colors.reset);
-      console.log(colors.bold + divider + colors.reset);
-
-      // Calculate relationship statistics
-      const explicitRels = context.relationships.filter(r => !r.properties?.inferred);
-      const inferredRels = context.relationships.filter(r => r.properties?.inferred === true);
-      const density = context.symbols.length > 0 ? (context.relationships.length / context.symbols.length).toFixed(2) : '0.00';
-
-      const strongCount = context.relationships.filter(r => r.strength === 'strong').length;
-      const mediumCount = context.relationships.filter(r => r.strength === 'medium').length;
-      const weakCount = context.relationships.filter(r => r.strength === 'weak').length;
-
-      // Display statistics
-      console.log(`  ${colors.bold}통계:${colors.reset}`);
-      console.log(`    총 관계: ${colors.cyan}${context.relationships.length}개${colors.reset} | 관계 밀도: ${colors.cyan}${density}${colors.reset} (관계/심볼)`);
-      console.log(`    명시적: ${colors.green}${explicitRels.length}개${colors.reset} (${((explicitRels.length / context.relationships.length) * 100).toFixed(1)}%) | 추론: ${colors.yellow}${inferredRels.length}개${colors.reset} (${((inferredRels.length / context.relationships.length) * 100).toFixed(1)}%)`);
+      // Display summary
+      this.printSection('📊 Summary');
+      console.log(`  ${colors.bold}Symbols:${colors.reset}              ${context.summary.symbolCount}`);
+      console.log(`  ${colors.bold}Relationships:${colors.reset}        ${context.summary.relationshipCount}`);
+      console.log(`  ${colors.bold}Relationship Density:${colors.reset} ${context.summary.density.toFixed(2)}`);
+      console.log(`  ${colors.bold}Test Coverage:${colors.reset}        ${context.summary.testCoverage.toFixed(1)}% (${context.relationships.tests.length} tests)`);
+      console.log(`  ${colors.bold}Documentation:${colors.reset}        ${context.summary.documentationCoverage.toFixed(1)}% (${context.relationships.documentation.length} docs)`);
       console.log();
 
-      // Group relationships by category
-      const relationshipsByCategory = this.groupBy(context.relationships, 'category');
+      // Display symbols
+      this.printSection('🔤 Symbols');
+      const exportedSymbols = context.symbols.filter(s => s.isExported);
+      const publicSymbols = context.symbols.filter(s => s.isPublic);
 
-      // Display category distribution
-      console.log(`  ${colors.bold}카테고리별:${colors.reset}`);
-      const sortedCategories = Object.entries(relationshipsByCategory).sort((a, b) => b[1].length - a[1].length);
-      for (const [category, rels] of sortedCategories.slice(0, 5)) {
-        const percentage = ((rels.length / context.relationships.length) * 100).toFixed(1);
-        const categoryIcon = this.getCategoryIcon(category);
-        console.log(`    ${categoryIcon}  ${category.padEnd(15)}: ${colors.cyan}${rels.length}개${colors.reset} (${percentage}%)`);
-      }
-      if (sortedCategories.length > 5) {
-        console.log(`    ${colors.dim}... and ${sortedCategories.length - 5} more categories${colors.reset}`);
+      console.log(`  Total: ${context.symbols.length} (${exportedSymbols.length} exported, ${publicSymbols.length} public)`);
+      console.log();
+
+      // Show top symbols
+      context.symbols.slice(0, 10).forEach(symbol => {
+        const badges: string[] = [];
+        if (symbol.isExported) badges.push('exported');
+        if (symbol.isPublic) badges.push('public');
+
+        const badgeStr = badges.length > 0 ? ` [${badges.join(', ')}]` : '';
+        console.log(`  ${colors.cyan}${symbol.name}${colors.reset} (${symbol.type})${badgeStr}`);
+      });
+
+      if (context.symbols.length > 10) {
+        console.log(`  ${colors.dim}... and ${context.symbols.length - 10} more${colors.reset}`);
       }
       console.log();
 
-      // Display strength distribution
-      console.log(`  ${colors.bold}강도 분포:${colors.reset}`);
-      console.log(`    ${colors.green}●●● strong:${colors.reset}   ${strongCount}개 (${((strongCount / context.relationships.length) * 100).toFixed(1)}%)`);
-      console.log(`    ${colors.yellow}●●○ medium:${colors.reset}   ${mediumCount}개 (${((mediumCount / context.relationships.length) * 100).toFixed(1)}%)`);
-      console.log(`    ${colors.dim}●○○ weak:${colors.reset}     ${weakCount}개 (${((weakCount / context.relationships.length) * 100).toFixed(1)}%)`);
-      console.log();
+      // Documentation
+      if (context.relationships.documentation.length > 0) {
+        this.printSection('📄 Documentation');
+        const uniqueDocs = new Map<string, string[]>();
 
-      for (const [category, rels] of Object.entries(relationshipsByCategory)) {
-        const icon = this.getCategoryIcon(category);
-        console.log(`\n  ${icon} ${colors.bold}${category.toUpperCase()}${colors.reset} ${colors.dim}(${rels.length}개)${colors.reset}`);
+        for (const doc of context.relationships.documentation) {
+          if (!uniqueDocs.has(doc.docRef)) {
+            uniqueDocs.set(doc.docRef, []);
+          }
+          uniqueDocs.get(doc.docRef)!.push(doc.symbolName);
+        }
+
+        for (const [docRef, symbols] of uniqueDocs) {
+          console.log(`  ${colors.cyan}[[${docRef}]]${colors.reset}`);
+          console.log(`    Referenced by: ${symbols.slice(0, 3).join(', ')}${symbols.length > 3 ? ` +${symbols.length - 3}` : ''}`);
+        }
+        console.log();
+      }
+
+      // Test Coverage
+      if (context.relationships.tests.length > 0) {
+        this.printSection('✅ Test Coverage');
+        console.log(`  ${context.relationships.tests.length} test cases covering ${context.impact.testFiles.size} test file(s)`);
         console.log();
 
-        // Display limit per category
-        const displayLimit = 5;
-        const displayRels = rels.slice(0, displayLimit);
-
-        for (const rel of displayRels) {
-          // Strength indicator
-          const strengthIcon = rel.strength === 'strong' ? colors.green + '●●●' :
-                              rel.strength === 'medium' ? colors.yellow + '●●○' :
-                              colors.dim + '●○○';
-
-          // Direction indicator
-          const directionIcon = rel.direction === 'bidirectional' ? '↔️' :
-                               rel.direction === 'unidirectional' ? '→' :
-                               '—';
-
-          console.log(`    ${strengthIcon}${colors.reset} ${colors.cyan}${rel.type}${colors.reset} ${directionIcon}`);
-
-          // From → To symbols
-          const fromSymbolNames = rel.fromSymbols
-            .map(id => context.symbols.find(s => s.id === id)?.name || id.split('-').pop())
-            .join(', ');
-          const toSymbolNames = rel.toSymbols
-            .map(id => context.symbols.find(s => s.id === id)?.name || id.split('-').pop())
-            .join(', ');
-
-          console.log(`      ${colors.dim}From:${colors.reset} ${fromSymbolNames}`);
-          console.log(`      ${colors.dim}To:${colors.reset} ${toSymbolNames}`);
-
-          // Confidence
-          const confidencePercent = Math.round(rel.confidence * 100);
-          const confidenceColor = rel.confidence >= 0.8 ? colors.green :
-                                  rel.confidence >= 0.5 ? colors.yellow :
-                                  colors.dim;
-          console.log(`      ${colors.dim}Confidence:${colors.reset} ${confidenceColor}${confidencePercent}%${colors.reset}`);
-
-          // Description
-          if (rel.description) {
-            console.log(`      ${colors.dim}${rel.description}${colors.reset}`);
+        // Group by symbol
+        const testsBySymbol = new Map<string, string[]>();
+        for (const test of context.relationships.tests) {
+          if (!testsBySymbol.has(test.symbolName)) {
+            testsBySymbol.set(test.symbolName, []);
           }
-
-          // Properties
-          if (rel.properties && Object.keys(rel.properties).length > 0) {
-            const propStr = Object.entries(rel.properties)
-              .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
-              .join(', ');
-            console.log(`      ${colors.dim}Properties: ${propStr}${colors.reset}`);
-          }
-
-          console.log();
+          testsBySymbol.get(test.symbolName)!.push(test.testName);
         }
 
-        if (rels.length > displayLimit) {
-          console.log(`    ${colors.dim}... ${rels.length - displayLimit} more ${category} relationships${colors.reset}`);
+        // Show top tested symbols
+        const sortedSymbols = Array.from(testsBySymbol.entries())
+          .sort((a, b) => b[1].length - a[1].length)
+          .slice(0, 5);
+
+        for (const [symbolName, tests] of sortedSymbols) {
+          console.log(`  ${colors.green}${symbolName}${colors.reset}: ${tests.length} tests`);
+          tests.slice(0, 3).forEach(testName => {
+            console.log(`    • ${testName}`);
+          });
+          if (tests.length > 3) {
+            console.log(`    ${colors.dim}... and ${tests.length - 3} more${colors.reset}`);
+          }
         }
+
+        console.log();
+        console.log(`  ${colors.dim}Test files:${colors.reset}`);
+        Array.from(context.impact.testFiles).slice(0, 3).forEach(testFile => {
+          console.log(`    ${path.relative(process.cwd(), testFile)}`);
+        });
+        if (context.impact.testFiles.size > 3) {
+          console.log(`    ${colors.dim}... and ${context.impact.testFiles.size - 3} more${colors.reset}`);
+        }
+        console.log();
+      } else {
+        this.printWarning('⚠️  No test coverage found');
+        console.log();
       }
+
+      // Dependencies
+      if (context.relationships.dependencies.length > 0) {
+        this.printSection('📦 Dependencies');
+        console.log(`  This file depends on ${context.impact.dependencyFiles.size} other file(s)`);
+        console.log();
+
+        const depFiles = Array.from(context.impact.dependencyFiles).slice(0, 10);
+        depFiles.forEach(depFile => {
+          const relativePath = path.relative(process.cwd(), depFile);
+          console.log(`  ${colors.blue}${relativePath}${colors.reset}`);
+        });
+
+        if (context.impact.dependencyFiles.size > 10) {
+          console.log(`  ${colors.dim}... and ${context.impact.dependencyFiles.size - 10} more${colors.reset}`);
+        }
+        console.log();
+      }
+
+      // Dependents (Impact Analysis)
+      if (context.relationships.dependents.length > 0) {
+        this.printSection('🔗 Impact Analysis');
+        console.log(`  ${context.impact.dependentFiles.size} file(s) depend on this file`);
+        console.log();
+
+        const depFiles = Array.from(context.impact.dependentFiles).slice(0, 10);
+        depFiles.forEach(depFile => {
+          const relativePath = path.relative(process.cwd(), depFile);
+          console.log(`  ${colors.yellow}${relativePath}${colors.reset}`);
+        });
+
+        if (context.impact.dependentFiles.size > 10) {
+          console.log(`  ${colors.dim}... and ${context.impact.dependentFiles.size - 10} more${colors.reset}`);
+        }
+
+        console.log();
+        this.printWarning('⚠️  Changes to this file may affect the files listed above');
+        console.log();
+      }
+
+      // Semantic Neighbors
+      if (context.relationships.semanticNeighbors.length > 0) {
+        this.printSection('🌐 Semantic Neighbors');
+        console.log(`  ${context.relationships.semanticNeighbors.length} related symbols (same domain/feature)`);
+        console.log();
+
+        const neighborsBySymbol = new Map<string, string[]>();
+        for (const neighbor of context.relationships.semanticNeighbors) {
+          if (!neighborsBySymbol.has(neighbor.symbolName)) {
+            neighborsBySymbol.set(neighbor.symbolName, []);
+          }
+          neighborsBySymbol.get(neighbor.symbolName)!.push(neighbor.neighborName);
+        }
+
+        for (const [symbolName, neighbors] of Array.from(neighborsBySymbol.entries()).slice(0, 5)) {
+          console.log(`  ${colors.cyan}${symbolName}${colors.reset} → ${neighbors.slice(0, 3).join(', ')}${neighbors.length > 3 ? ` +${neighbors.length - 3}` : ''}`);
+        }
+        console.log();
+      }
+
+      // Actionable recommendations
+      this.printSection('💡 Recommendations');
+
+      if (context.summary.testCoverage < 80) {
+        console.log(`  ${colors.yellow}•${colors.reset} Low test coverage (${context.summary.testCoverage.toFixed(1)}%) - consider adding tests`);
+      }
+
+      if (context.summary.documentationCoverage < 50) {
+        console.log(`  ${colors.yellow}•${colors.reset} Low documentation coverage (${context.summary.documentationCoverage.toFixed(1)}%) - add @doc tags`);
+      }
+
+      if (context.relationships.dependents.length > 20) {
+        console.log(`  ${colors.yellow}•${colors.reset} High impact file (${context.relationships.dependents.length} dependents) - test thoroughly`);
+      }
+
+      if (context.summary.density < 2.0) {
+        console.log(`  ${colors.yellow}•${colors.reset} Low relationship density (${context.summary.density.toFixed(2)}) - consider adding semantic relationships`);
+      }
+
+      console.log();
+
+      dbManager.close();
+
+      return { exitCode: 0, message: 'Context displayed' };
+    } catch (error) {
+      this.printError(`Failed to analyze file: ${error instanceof Error ? error.message : String(error)}`);
+      return { exitCode: 1, message: 'Analysis failed' };
     }
-
-    // Summary
-    console.log(colors.bold + divider + colors.reset);
-    console.log(colors.bold + '📊 요약' + colors.reset);
-    console.log(colors.bold + divider + colors.reset);
-    console.log(`  심볼: ${colors.cyan}${context.symbols.length}개${colors.reset}`);
-    console.log(`  문서: ${colors.cyan}${context.relatedDocs.length}개${colors.reset}`);
-    console.log(`  의존: ${colors.cyan}${context.dependencies.length}개${colors.reset}`);
-    console.log(`  테스트: ${colors.cyan}${context.tests.length}개${colors.reset}`);
-    console.log(`  영향: ${colors.cyan}${context.usedBy.length}개 파일${colors.reset}`);
-    console.log(`  계약: ${colors.cyan}${context.contracts.length}개${colors.reset}`);
-    console.log(`  결정: ${colors.cyan}${context.decisions.length}개${colors.reset}`);
-    console.log(`  함정: ${colors.cyan}${context.errorPatterns.length}개${colors.reset}`);
-    console.log(`  관계: ${colors.cyan}${context.relationships.length}개${colors.reset}`);
-    console.log();
-
-    // Actionable recommendations
-    console.log(colors.bold + divider + colors.reset);
-    console.log(colors.bold + '💡 권장사항' + colors.reset);
-    console.log(colors.bold + divider + colors.reset);
-
-    const recommendations: string[] = [];
-
-    // Calculate relationship density
-    const density = context.symbols.length > 0 ? context.relationships.length / context.symbols.length : 0;
-
-    // Relationship density recommendation
-    if (density >= 5.0) {
-      recommendations.push(`${colors.green}✓${colors.reset} 관계 밀도 높음 (${density.toFixed(2)}) - 코드가 잘 연결됨`);
-    } else if (density < 2.0) {
-      recommendations.push(`${colors.yellow}•${colors.reset} 관계 밀도 낮음 (${density.toFixed(2)}) - 관계 추가 권장`);
-    }
-
-    // Test coverage recommendation
-    if (context.tests.length === 0) {
-      recommendations.push(`${colors.yellow}•${colors.reset} 테스트 커버리지 0% - 테스트 추가 필요`);
-    }
-
-    // Inferred relationships recommendation
-    const inferredCount = context.relationships.filter(r => r.properties?.inferred === true).length;
-    if (inferredCount > 0 && inferredCount > context.relationships.length * 0.3) {
-      recommendations.push(`${colors.yellow}•${colors.reset} 추론 관계 ${inferredCount}개 (${((inferredCount / context.relationships.length) * 100).toFixed(1)}%) - 명시적 문서화 권장`);
-    }
-
-    // Contracts recommendation
-    if (context.contracts.length === 0 && context.symbols.some(s => s.isPublic)) {
-      recommendations.push(`${colors.yellow}•${colors.reset} 계약 명세 없음 - @precondition/@postcondition 추가 고려`);
-    }
-
-    // Design decisions recommendation
-    if (context.decisions.length === 0 && context.relationships.length > 10) {
-      recommendations.push(`${colors.yellow}•${colors.reset} 설계 결정 기록 없음 - ADR 작성 권장`);
-    }
-
-    // High impact warning
-    if (context.usedBy.length > 10) {
-      recommendations.push(`${colors.yellow}⚠${colors.reset}  높은 영향도 (${context.usedBy.length}개 파일) - 변경 시 신중히 테스트`);
-    }
-
-    // Error patterns recommendation
-    if (context.errorPatterns.length > 0) {
-      recommendations.push(`${colors.green}✓${colors.reset} ${context.errorPatterns.length}개 알려진 함정 문서화됨 - 참고하여 작업`);
-    }
-
-    if (recommendations.length > 0) {
-      recommendations.forEach(rec => console.log(`  ${rec}`));
-    } else {
-      console.log(`  ${colors.green}✓${colors.reset} ${colors.dim}권장사항 없음 - 코드 상태 양호${colors.reset}`);
-    }
-    console.log();
   }
 
-  private groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
-    return array.reduce((groups, item) => {
-      const groupKey = String(item[key]);
-      if (!groups[groupKey]) {
-        groups[groupKey] = [];
+  /**
+   * Get option value from args
+   *
+   * @param args - Command arguments
+   * @param option - Option name (e.g., '--depth')
+   * @param defaultValue - Default value if not found
+   * @returns Option value
+   * @private
+   */
+  private getOptionValue(args: string[], option: string, defaultValue?: any): any {
+    const index = args.indexOf(option);
+    if (index !== -1 && index + 1 < args.length) {
+      const value = args[index + 1];
+      // Try to parse as number if default is number
+      if (typeof defaultValue === 'number') {
+        const num = parseInt(value, 10);
+        return isNaN(num) ? defaultValue : num;
       }
-      groups[groupKey].push(item);
-      return groups;
-    }, {} as Record<string, T[]>);
-  }
-
-  private getCategoryIcon(category: string): string {
-    const categoryIcons: Record<string, string> = {
-      'structural': '🏗️',
-      'data-flow': '📊',
-      'behavioral': '⚙️',
-      'temporal': '⏱️',
-      'semantic': '💡',
-      'quality': '✨',
-      'verification': '✅',
-      'organizational': '📁',
-    };
-    return categoryIcons[category] || '🔗';
+      return value;
+    }
+    return defaultValue;
   }
 }
