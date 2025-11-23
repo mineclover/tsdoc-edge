@@ -82,3 +82,4 @@ export { SymbolRenameCommand } from './SymbolRenameCommand';
 export { RebuildIndexCommand } from './RebuildIndexCommand';
 export { QueryInferredCommand } from './QueryInferredCommand';
 export { ValidateGeneratedDocsCommand } from './ValidateGeneratedDocsCommand';
+export { ContextToLLMCommand } from './ContextToLLMCommand';

@@ -18,6 +18,7 @@ import {
   CheckDuplicatesCommand,
   CheckLinksCommand,
   CommandRegistry,
+  ContextToLLMCommand,
   CoreApiCommand,
   DepsCommand,
   FindDocCommand,
@@ -239,6 +240,7 @@ async function main(): Promise<void> {
   registry.register(new SymbolFixCommand());
   registry.register(new RelationshipStatsCommand());
   registry.register(new QueryInferredCommand());
+  registry.register(new ContextToLLMCommand());
   registry.register(new RenameCommand());
   registry.register(new MoveCommand());
   registry.register(new SymbolRenameCommand());
