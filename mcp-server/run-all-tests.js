@@ -127,14 +127,12 @@ async function runIntegrationTests() {
   const result = await runCommand('node', ['test-client.js']);
   const duration = Date.now() - startTime;
 
-  // Parse output
-  const passedMatch = result.stdout.match(/Passed: (\d+)/);
-  const failedMatch = result.stdout.match(/Failed: (\d+)/);
-  const totalMatch = result.stdout.match(/Total: (\d+)/);
+  // Parse output from SUMMARY line specifically
+  const summaryMatch = result.stdout.match(/\[SUMMARY\].*?Total:\s*(\d+).*?Passed:\s*(\d+).*?Failed:\s*(\d+)/);
 
-  const passed = passedMatch ? parseInt(passedMatch[1]) : 0;
-  const failed = failedMatch ? parseInt(failedMatch[1]) : 0;
-  const total = totalMatch ? parseInt(totalMatch[1]) : 0;
+  const total = summaryMatch ? parseInt(summaryMatch[1]) : 0;
+  const passed = summaryMatch ? parseInt(summaryMatch[2]) : 0;
+  const failed = summaryMatch ? parseInt(summaryMatch[3]) : 0;
 
   const suite = {
     name: 'Integration Tests',

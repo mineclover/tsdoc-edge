@@ -90,6 +90,7 @@ import { ERROR_MESSAGES } from '../constants.js';
 export class TsDocService {
   private dbPath: string;
   private db: Database.Database | null = null;
+  private relationshipsCache: Relationship[] | null = null;
 
   /**
    * Initialize TSDoc service
@@ -213,6 +214,8 @@ export class TsDocService {
       this.db.close();
       this.db = null;
     }
+    // Clear cache
+    this.relationshipsCache = null;
   }
 
   /**
@@ -243,6 +246,11 @@ export class TsDocService {
    * @private
    */
   private getAllUnifiedRelationships(): Relationship[] {
+    // Return cached relationships if available (performance optimization)
+    if (this.relationshipsCache) {
+      return this.relationshipsCache;
+    }
+
     const db = this.getDb();
 
     const rows = db.prepare(`
@@ -260,7 +268,7 @@ export class TsDocService {
       properties: string | null;
     }>;
 
-    return rows.map(row => ({
+    const relationships = rows.map(row => ({
       id: row.id,
       type: row.type,
       category: row.category,
@@ -272,6 +280,11 @@ export class TsDocService {
       description: row.description || undefined,
       properties: row.properties ? JSON.parse(row.properties) : undefined,
     }));
+
+    // Cache for subsequent calls
+    this.relationshipsCache = relationships;
+
+    return relationships;
   }
 
   /**
