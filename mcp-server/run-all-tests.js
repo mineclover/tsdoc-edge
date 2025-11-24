@@ -1,8 +1,51 @@
 #!/usr/bin/env node
 /**
- * Test Suite Runner with HTML Report Generator
+ * Comprehensive Test Suite Runner with HTML Report Generation
  *
- * Runs all test suites, collects results, and generates comprehensive HTML report
+ * @description
+ * Orchestrates all test suites for TSDoc Edge MCP Server and generates
+ * visual HTML report with performance metrics and coverage statistics.
+ *
+ * ## Purpose
+ * Single entry point for complete test execution with result visualization.
+ * Part of [[MCP Testing Strategy]].
+ *
+ * ## Test Suites Executed
+ * 1. Build Verification - TypeScript compilation
+ * 2. Integration Tests - MCP protocol end-to-end (9 tests)
+ * 3. Detailed Tool Tests - Per-tool scenario coverage (10 tests)
+ * 4. Performance Benchmarks - Database query latency (8 operations)
+ * 5. Database Query Validation - Complex query correctness (3 tests)
+ *
+ * ## Output
+ * - `test-report.html` - Visual dashboard with charts
+ * - `test-results.json` - Machine-readable metrics
+ * - Exit code 0 (success) or 1 (>2 failures)
+ *
+ * ## Data Structure (Flattened)
+ * Results stored in flat structure for easy HTML templating:
+ * ```javascript
+ * {
+ *   metadata: { timestamp, version, branch },
+ *   summary: { totalTests, passed, failed, duration },
+ *   suites: [{ name, passed, tests[], stats }],
+ *   performance: { operations[], memory{} },
+ *   coverage: { tools[], scenarios[] }
+ * }
+ * ```
+ *
+ * ## Usage
+ * ```bash
+ * # Run all tests
+ * node run-all-tests.js
+ *
+ * # CI/CD integration
+ * npm test  # Configured in package.json
+ * ```
+ *
+ * @public
+ * @see [[MCP Testing Strategy]]
+ * @see [[TsDocService]]
  */
 
 import { spawn, execSync } from 'child_process';

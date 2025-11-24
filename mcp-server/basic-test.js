@@ -1,6 +1,61 @@
 #!/usr/bin/env node
 /**
- * Basic functionality test - Test core MCP tools directly
+ * Basic Functionality Test Suite - Service Layer Direct Testing
+ *
+ * @description
+ * Tests [[TsDocService]] class methods directly without MCP protocol overhead.
+ * Validates API contracts, result structures, and database connection resilience.
+ *
+ * ## Purpose
+ * Unit testing level for MCP Server service layer.
+ * Part of [[MCP Testing Strategy]] - Level 1.
+ *
+ * ## Test Coverage (7 tests)
+ * 1. searchSymbols - Symbol search by query
+ * 2. getOntologyStats - Graph statistics retrieval
+ * 3. listRelationships - Relationship filtering
+ * 4. getWorkContext - File context generation
+ * 5. queryRelationships - Symbol relationship traversal
+ * 6. getSymbolDetails - Symbol detail retrieval
+ * 7. Database connection resilience - Auto-reconnect after close()
+ *
+ * ## Prerequisites
+ * Requires indexed database at `<workspace>/.tsdoc/symbols.db`:
+ * ```bash
+ * tsdoc-edge build src
+ * ```
+ *
+ * ## Expected Results
+ * - Total: 7 tests
+ * - Pass Rate: 100%
+ * - Duration: <1s
+ *
+ * ## Usage
+ * ```bash
+ * node basic-test.js
+ * echo $?  # 0 = success, 1 = failure
+ * ```
+ *
+ * ## API Examples Tested
+ * ```javascript
+ * // Search symbols
+ * const result = await service.searchSymbols({
+ *   query: 'DatabaseManager',
+ *   limit: 5
+ * });
+ * // Returns: { total: number, nodes: Symbol[] }
+ *
+ * // List relationships
+ * const result = await service.listRelationships({
+ *   type: 'imports',
+ *   limit: 10
+ * });
+ * // Returns: { total: number, relationships: Relationship[] }
+ * ```
+ *
+ * @public
+ * @see [[MCP Testing Strategy]]
+ * @see [[TsDocService]]
  */
 import { TsDocService } from './dist/services/tsdocService.js';
 
