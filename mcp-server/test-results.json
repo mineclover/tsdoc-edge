@@ -1,7 +1,7 @@
 {
   "metadata": {
-    "timestamp": "2025-11-24T15:33:24.088Z",
-    "date": "11/24/2025, 3:33:24 PM",
+    "timestamp": "2025-11-24T15:59:43.472Z",
+    "date": "11/24/2025, 3:59:43 PM",
     "version": "1.0.0",
     "branch": "claude/rebuild-fts5-index-01Snu2Je5v7b9tWSvU44QCRn"
   },
@@ -10,18 +10,18 @@
     "passed": 23,
     "failed": 0,
     "warnings": 1,
-    "duration": 65347
+    "duration": 65477
   },
   "suites": [
     {
       "name": "Build Verification",
       "passed": true,
-      "duration": 2294,
+      "duration": 2411,
       "tests": [
         {
           "name": "TypeScript Compilation",
           "passed": true,
-          "duration": 2294,
+          "duration": 2411,
           "error": null
         }
       ]
@@ -29,52 +29,52 @@
     {
       "name": "Integration Tests",
       "passed": true,
-      "duration": 1537,
+      "duration": 1545,
       "tests": [
         {
-          "name": "\u001b\u001b[0m Initialize Connection",
+          "name": "Initialize Connection",
           "passed": true,
-          "duration": 170.77777777777777
+          "duration": 171.66666666666666
         },
         {
-          "name": "\u001b\u001b[0m List Available Tools",
+          "name": "List Available Tools",
           "passed": false,
-          "duration": 170.77777777777777
+          "duration": 171.66666666666666
         },
         {
-          "name": "\u001b\u001b[0m Test 1: Search Symbols (DatabaseManager)",
+          "name": "Test 1: Search Symbols (DatabaseManager)",
           "passed": false,
-          "duration": 170.77777777777777
+          "duration": 171.66666666666666
         },
         {
-          "name": "\u001b\u001b[0m Test 2: Get Ontology Stats",
+          "name": "Test 2: Get Ontology Stats",
           "passed": false,
-          "duration": 170.77777777777777
+          "duration": 171.66666666666666
         },
         {
-          "name": "\u001b\u001b[0m Test 3: List Relationships (imports)",
+          "name": "Test 3: List Relationships (imports)",
           "passed": false,
-          "duration": 170.77777777777777
+          "duration": 171.66666666666666
         },
         {
-          "name": "\u001b\u001b[0m Test 4: Get Work Context",
-          "passed": false,
-          "duration": 170.77777777777777
+          "name": "Test 4: Get Work Context",
+          "passed": true,
+          "duration": 171.66666666666666
         },
         {
-          "name": "\u001b\u001b[0m Test 5: Get Design Context",
-          "passed": false,
-          "duration": 170.77777777777777
+          "name": "Test 5: Get Design Context",
+          "passed": true,
+          "duration": 171.66666666666666
         },
         {
-          "name": "\u001b\u001b[0m Test 6: Query Relationships",
+          "name": "Test 6: Query Relationships",
           "passed": false,
-          "duration": 170.77777777777777
+          "duration": 171.66666666666666
         },
         {
-          "name": "\u001b\u001b[0m Test 7: Get Symbol Details",
-          "passed": false,
-          "duration": 170.77777777777777
+          "name": "Test 7: Get Symbol Details",
+          "passed": true,
+          "duration": 171.66666666666666
         }
       ],
       "stats": {
@@ -86,57 +86,57 @@
     {
       "name": "Detailed Tool Tests",
       "passed": true,
-      "duration": 1551,
+      "duration": 1504,
       "tests": [
         {
-          "name": "\u001b\u001b[0m 🔍 Tool 1: Search Symbols - Find Command Classes",
+          "name": "🔍 Tool 1: Search Symbols - Find Command Classes",
           "passed": true,
-          "duration": 155.1
+          "duration": 150.4
         },
         {
-          "name": "\u001b\u001b[0m 📊 Tool 2: Ontology Stats - Detailed Graph Metrics",
+          "name": "📊 Tool 2: Ontology Stats - Detailed Graph Metrics",
           "passed": true,
-          "duration": 155.1
+          "duration": 150.4
         },
         {
-          "name": "\u001b\u001b[0m 🔗 Tool 3: List Relationships - Test Coverage",
+          "name": "🔗 Tool 3: List Relationships - Test Coverage",
           "passed": true,
-          "duration": 155.1
+          "duration": 150.4
         },
         {
-          "name": "\u001b\u001b[0m 📁 Tool 4: Work Context - Real File",
+          "name": "📁 Tool 4: Work Context - Real File",
           "passed": true,
-          "duration": 155.1
+          "duration": 150.4
         },
         {
-          "name": "\u001b\u001b[0m 📐 Tool 5: Design Context - Check Implementation",
+          "name": "📐 Tool 5: Design Context - Check Implementation",
           "passed": true,
-          "duration": 155.1
+          "duration": 150.4
         },
         {
-          "name": "\u001b\u001b[0m 🌐 Tool 6: Query Relationships - DatabaseManager",
+          "name": "🌐 Tool 6: Query Relationships - DatabaseManager",
           "passed": true,
-          "duration": 155.1
+          "duration": 150.4
         },
         {
-          "name": "\u001b\u001b[0m 🔎 Tool 7: Symbol Details - Specific Class",
+          "name": "🔎 Tool 7: Symbol Details - Specific Class",
           "passed": true,
-          "duration": 155.1
+          "duration": 150.4
         },
         {
-          "name": "\u001b\u001b[0m ⚠️  Edge Case: Non-existent Symbol",
+          "name": "⚠️  Edge Case: Non-existent Symbol",
           "passed": true,
-          "duration": 155.1
+          "duration": 150.4
         },
         {
-          "name": "\u001b\u001b[0m ⚠️  Edge Case: Empty Search Query",
+          "name": "⚠️  Edge Case: Empty Search Query",
           "passed": true,
-          "duration": 155.1
+          "duration": 150.4
         },
         {
-          "name": "\u001b\u001b[0m ⚠️  Edge Case: Invalid File Path",
+          "name": "⚠️  Edge Case: Invalid File Path",
           "passed": true,
-          "duration": 155.1
+          "duration": 150.4
         }
       ],
       "stats": {
@@ -153,59 +153,59 @@
         {
           "name": "Database Connection (open + close)",
           "passed": true,
-          "duration": 0.63,
+          "duration": 0.57,
           "metrics": {
-            "avg": 0.63,
-            "p95": 0.76,
+            "avg": 0.57,
+            "p95": 0.7,
             "status": "fast"
           }
         },
         {
           "name": "SELECT symbol by ID (indexed)",
           "passed": true,
-          "duration": 0.25,
+          "duration": 0.22,
           "metrics": {
-            "avg": 0.25,
-            "p95": 0.37,
+            "avg": 0.22,
+            "p95": 0.34,
             "status": "fast"
           }
         },
         {
           "name": "SELECT symbols by type",
           "passed": true,
-          "duration": 1.72,
+          "duration": 1.59,
           "metrics": {
-            "avg": 1.72,
-            "p95": 2.29,
+            "avg": 1.59,
+            "p95": 1.86,
             "status": "fast"
           }
         },
         {
           "name": "SELECT all symbols (5K rows)",
           "passed": true,
-          "duration": 31.76,
+          "duration": 32.4,
           "metrics": {
-            "avg": 31.76,
-            "p95": 34.88,
+            "avg": 32.4,
+            "p95": 39.03,
             "status": "acceptable"
           }
         },
         {
           "name": "SELECT all relationships (20K rows)",
           "passed": false,
-          "duration": 131.61,
+          "duration": 134.28,
           "metrics": {
-            "avg": 131.61,
-            "p95": 180.8,
+            "avg": 134.28,
+            "p95": 185.29,
             "status": "slow"
           }
         },
         {
           "name": "JSON parse (relationship from_symbols)",
           "passed": true,
-          "duration": 0.19,
+          "duration": 0.18,
           "metrics": {
-            "avg": 0.19,
+            "avg": 0.18,
             "p95": 0.24,
             "status": "fast"
           }
@@ -213,20 +213,20 @@
         {
           "name": "COUNT aggregation by type",
           "passed": true,
-          "duration": 0.5,
+          "duration": 0.53,
           "metrics": {
-            "avg": 0.5,
-            "p95": 0.56,
+            "avg": 0.53,
+            "p95": 0.66,
             "status": "fast"
           }
         },
         {
           "name": "searchSymbols (query + filter)",
           "passed": true,
-          "duration": 1.72,
+          "duration": 1.75,
           "metrics": {
-            "avg": 1.72,
-            "p95": 2.32,
+            "avg": 1.75,
+            "p95": 2.63,
             "status": "fast"
           }
         }
@@ -234,23 +234,23 @@
     },
     {
       "name": "Database Query Validation",
-      "passed": true,
-      "duration": 29957,
+      "passed": false,
+      "duration": 30009,
       "tests": [
         {
           "name": "Symbol Types Distribution",
           "passed": true,
-          "duration": 9985.666666666666
+          "duration": 10003
         },
         {
           "name": "Relationship Types",
           "passed": true,
-          "duration": 9985.666666666666
+          "duration": 10003
         },
         {
           "name": "Top Connected Symbols",
           "passed": true,
-          "duration": 9985.666666666666
+          "duration": 10003
         }
       ]
     }
@@ -260,50 +260,50 @@
       {
         "name": "Database Connection (open + close)",
         "status": "fast",
-        "avgTime": 0.63,
-        "p95Time": 0.76
+        "avgTime": 0.57,
+        "p95Time": 0.7
       },
       {
         "name": "SELECT symbol by ID (indexed)",
         "status": "fast",
-        "avgTime": 0.25,
-        "p95Time": 0.37
+        "avgTime": 0.22,
+        "p95Time": 0.34
       },
       {
         "name": "SELECT symbols by type",
         "status": "fast",
-        "avgTime": 1.72,
-        "p95Time": 2.29
+        "avgTime": 1.59,
+        "p95Time": 1.86
       },
       {
         "name": "SELECT all symbols (5K rows)",
         "status": "acceptable",
-        "avgTime": 31.76,
-        "p95Time": 34.88
+        "avgTime": 32.4,
+        "p95Time": 39.03
       },
       {
         "name": "SELECT all relationships (20K rows)",
         "status": "slow",
-        "avgTime": 131.61,
-        "p95Time": 180.8
+        "avgTime": 134.28,
+        "p95Time": 185.29
       },
       {
         "name": "JSON parse (relationship from_symbols)",
         "status": "fast",
-        "avgTime": 0.19,
+        "avgTime": 0.18,
         "p95Time": 0.24
       },
       {
         "name": "COUNT aggregation by type",
         "status": "fast",
-        "avgTime": 0.5,
-        "p95Time": 0.56
+        "avgTime": 0.53,
+        "p95Time": 0.66
       },
       {
         "name": "searchSymbols (query + filter)",
         "status": "fast",
-        "avgTime": 1.72,
-        "p95Time": 2.32
+        "avgTime": 1.75,
+        "p95Time": 2.63
       }
     ],
     "memory": {}

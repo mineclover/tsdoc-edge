@@ -143,18 +143,32 @@ async function runIntegrationTests() {
   };
 
   // Extract individual test results
-  const testLines = result.stdout.split('\n').filter(line => line.includes('[TEST]'));
-  testLines.forEach((line, idx) => {
-    const testName = line.replace(/\[.*?\]/g, '').trim();
-    const nextLine = result.stdout.split('\n')[result.stdout.split('\n').indexOf(line) + 1];
-    const passed = nextLine?.includes('✓');
+  const allLines = result.stdout.split('\n');
+  const testLines = [];
 
-    if (testName) {
-      suite.tests.push({
-        name: testName,
-        passed,
-        duration: duration / testLines.length,
-      });
+  allLines.forEach((line, idx) => {
+    if (line.includes('[TEST]')) {
+      const testName = line.replace(/\x1b\[[0-9;]*m/g, '').replace(/\[.*?\]/g, '').trim();
+      // Look for PASS or FAIL in next few lines
+      let passed = false;
+      for (let i = idx + 1; i < Math.min(idx + 5, allLines.length); i++) {
+        if (allLines[i].includes('[PASS]') || allLines[i].includes('✓')) {
+          passed = true;
+          break;
+        }
+        if (allLines[i].includes('[FAIL]') || allLines[i].includes('✗')) {
+          passed = false;
+          break;
+        }
+      }
+
+      if (testName) {
+        suite.tests.push({
+          name: testName,
+          passed,
+          duration: duration / (total || 1),
+        });
+      }
     }
   });
 
@@ -193,19 +207,31 @@ async function runDetailedTests() {
   };
 
   // Parse test details
-  const testLines = result.stdout.split('\n').filter(line => line.includes('[TEST]'));
-  testLines.forEach((line) => {
-    const testName = line.replace(/\[.*?\]/g, '').trim();
-    const idx = result.stdout.split('\n').indexOf(line);
-    const nextLines = result.stdout.split('\n').slice(idx, idx + 5).join('\n');
-    const passed = nextLines.includes('✓');
+  const allLines = result.stdout.split('\n');
 
-    if (testName) {
-      suite.tests.push({
-        name: testName,
-        passed,
-        duration: duration / testLines.length,
-      });
+  allLines.forEach((line, idx) => {
+    if (line.includes('[TEST]')) {
+      const testName = line.replace(/\x1b\[[0-9;]*m/g, '').replace(/\[.*?\]/g, '').trim();
+      // Look for PASS or FAIL in next few lines
+      let passed = false;
+      for (let i = idx + 1; i < Math.min(idx + 5, allLines.length); i++) {
+        if (allLines[i].includes('[PASS]') || allLines[i].includes('✓')) {
+          passed = true;
+          break;
+        }
+        if (allLines[i].includes('[FAIL]') || allLines[i].includes('✗')) {
+          passed = false;
+          break;
+        }
+      }
+
+      if (testName) {
+        suite.tests.push({
+          name: testName,
+          passed,
+          duration: duration / (total || 1),
+        });
+      }
     }
   });
 
