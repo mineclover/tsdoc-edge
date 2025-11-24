@@ -664,7 +664,7 @@ export class TsDocService {
       : filePath;
 
     // Get symbols in file
-    const symbols = db.prepare('SELECT * FROM symbols WHERE filePath = ?')
+    const symbols = db.prepare('SELECT * FROM symbols WHERE file_path = ?')
       .all(normalizedPath) as Symbol[];
 
     if (symbols.length === 0) {
