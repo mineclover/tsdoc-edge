@@ -190,8 +190,20 @@ export class DocumentSymbolLister {
         break;
       }
 
-      // Skip metadata blocks (> **Key**: value)
+      // Skip metadata blocks (> **Key**: value) but keep regular blockquotes
       if (line.startsWith('>')) {
+        // Check if it's a metadata block (> **Key**: value)
+        if (line.match(/^>\s*\*\*[^*]+\*\*:/)) {
+          continue; // Skip metadata
+        }
+        // Otherwise, it's a summary blockquote - keep it but remove the >
+        const blockquoteContent = line.substring(1).trim();
+        if (blockquoteContent !== '') {
+          foundContent = true;
+          summaryLines.push(blockquoteContent);
+          // Blockquotes are usually single-line summaries
+          break;
+        }
         continue;
       }
 
