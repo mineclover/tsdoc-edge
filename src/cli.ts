@@ -100,6 +100,7 @@ import { RelationshipCheckCommand } from './commands/RelationshipCheckCommand';
 import { RelationshipHelpCommand } from './commands/RelationshipHelpCommand';
 import { WorkContextCommand } from './commands/WorkContextCommand';
 import { DesignContextCommand } from './commands/DesignContextCommand';
+import { DocSymbolsCommand } from './commands/DocSymbolsCommand';
 import { OntologyStatsCommand } from './commands/OntologyStatsCommand';
 import { OntologyListCommand } from './commands/OntologyListCommand';
 import { ExploreEntrypointCommand } from './commands/ExploreEntrypointCommand';
@@ -230,6 +231,7 @@ async function main(): Promise<void> {
   registry.register(new TestRelationshipsCommand());
   registry.register(new WorkContextCommand());
   registry.register(new DesignContextCommand());
+  registry.register(new DocSymbolsCommand());
   registry.register(new OntologyStatsCommand());
   registry.register(new OntologyListCommand());
   registry.register(new ContextCommand());
