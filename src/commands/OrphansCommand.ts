@@ -71,15 +71,21 @@ export class OrphansCommand extends BaseCommand {
     --accurate       Use database relationships for accurate detection (recommended)
     --fast           Use registry for fast detection (may have false positives)
     --exclude-tests  Exclude test files from results
+    --include-members Include class members (methods/properties) in results
+    --classes-only   Show only class-level symbols (exclude members)
 
-  Default: --accurate`;
+  Default: --accurate (members of used classes are automatically excluded)`;
   }
 
   /**
    * Find orphans using database relationships (accurate but slower)
    * @private
    */
-  private findOrphansFromDatabase(excludeTests: boolean): Array<{ id: string; name: string; filePath: string; type: string }> {
+  private findOrphansFromDatabase(
+    excludeTests: boolean,
+    includeMembers: boolean,
+    classesOnly: boolean
+  ): Array<{ id: string; name: string; filePath: string; type: string }> {
     const config = ConfigManager.getInstance().get();
     const dbPath = path.join(process.cwd(), config.paths.databasePath || '.tsdoc.db');
 
@@ -108,10 +114,53 @@ export class OrphansCommand extends BaseCommand {
       AND s.file_path NOT LIKE '%.spec.ts'`;
     }
 
+    if (classesOnly) {
+      query += `
+      AND s.type IN ('class', 'interface', 'type', 'enum')`;
+    }
+
     query += `
       ORDER BY s.file_path, s.name`;
 
-    const orphans = db.prepare(query).all() as Array<{ id: string; name: string; filePath: string; type: string }>;
+    let orphans = db.prepare(query).all() as Array<{ id: string; name: string; filePath: string; type: string }>;
+
+    // Filter out members of used classes (unless includeMembers is true)
+    if (!includeMembers && !classesOnly) {
+      // Get all class IDs that are NOT orphans (i.e., used classes)
+      const usedClassIds = new Set(
+        db.prepare(`
+          SELECT DISTINCT s.id
+          FROM symbols s
+          WHERE s.type = 'class'
+          AND s.id IN (
+            SELECT DISTINCT json_each.value
+            FROM unified_relationships,
+            json_each(unified_relationships.to_symbols)
+          )
+        `).all().map((r: any) => r.id)
+      );
+
+      // Filter out members whose parent class is used
+      orphans = orphans.filter(orphan => {
+        // Check if this is a class member (method or property)
+        if (orphan.type !== 'method' && orphan.type !== 'property') {
+          return true; // Keep non-members
+        }
+
+        // Extract class name from member ID
+        // ID format: "method-classname-methodname" or "property-classname-propname"
+        const parts = orphan.id.split('-');
+        if (parts.length < 3) {
+          return true; // Keep if we can't determine parent class
+        }
+
+        const className = parts[1];
+        const classId = `class-${className}`;
+
+        // If parent class is used, filter out this member
+        return !usedClassIds.has(classId);
+      });
+    }
 
     dbManager.close();
 
@@ -134,6 +183,8 @@ export class OrphansCommand extends BaseCommand {
       const useFast = args.includes('--fast');
       const useAccurate = args.includes('--accurate') || !useFast; // Default to accurate
       const excludeTests = args.includes('--exclude-tests');
+      const includeMembers = args.includes('--include-members');
+      const classesOnly = args.includes('--classes-only');
 
       this.printHeader('Orphaned Symbols');
 
@@ -183,10 +234,15 @@ export class OrphansCommand extends BaseCommand {
         if (excludeTests) {
           this.printInfo('Excluding test files from results');
         }
+        if (classesOnly) {
+          this.printInfo('Showing only class-level symbols');
+        } else if (!includeMembers) {
+          this.printInfo('Excluding members of used classes (use --include-members to show all)');
+        }
         console.log();
 
         try {
-          const orphans = this.findOrphansFromDatabase(excludeTests);
+          const orphans = this.findOrphansFromDatabase(excludeTests, includeMembers, classesOnly);
 
           if (orphans.length === 0) {
             this.printSuccess('No orphaned symbols found');
