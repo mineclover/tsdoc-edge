@@ -1,6 +1,6 @@
 {
   "name": "tsdoc-edge",
-  "version": "0.12.0",
+  "version": "0.12.1",
   "description": "TSDoc-based specification documentation tool with type chain analysis and strict convention parsing",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
