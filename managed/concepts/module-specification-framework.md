@@ -1,5 +1,7 @@
 # [[Module Specification Framework]]
 
+Systematic 7-aspect framework (Purpose, Input, Output, Context, Logic, Effect, Scope) for documenting modules with completeness and consistency.
+
 ## Purpose
 
 Systematic 7-aspect framework for documenting modules, ensuring completeness and consistency across all documentation.

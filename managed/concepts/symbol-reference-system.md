@@ -1,5 +1,7 @@
 # [[Symbol Reference System]]
 
+TSDoc Edge's three-tier `[[Symbol]]` reference system: H1 primary definitions (SSOT), H2 auxiliary definitions (context-specific), and inline references (links).
+
 ## Overview
 
 TSDoc Edge의 `[[Symbol]]` 참조 시스템은 세 가지 방식으로 심볼을 참조하고 정의합니다.

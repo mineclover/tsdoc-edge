@@ -1,5 +1,7 @@
 # [[Gephi Export]]
 
+Export TSDoc Edge relationship graph to Gephi Lite compatible format for visual graph exploration.
+
 ## Purpose
 
 TSDoc Edge 관계 그래프를 **Gephi Lite** 웹 애플리케이션에서 시각화하기 위한 표준 형식 내보내기 기능.

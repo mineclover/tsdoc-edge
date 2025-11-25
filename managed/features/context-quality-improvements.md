@@ -1,5 +1,7 @@
 # [[Context Quality Improvements]]
 
+work-context command enhancement and data consistency improvements for better code editing context.
+
 ## Purpose
 
 TSDoc Edge 컨텍스트 품질 개선 작업 기록 - work-context 명령어 고도화 및 데이터 일관성 개선.

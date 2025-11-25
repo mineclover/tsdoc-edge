@@ -8,6 +8,8 @@ canonical: true
 
 # [[CLI Commands]]
 
+Alphabetically organized reference of all 61+ TSDoc Edge CLI commands with complete usage syntax, options, and examples.
+
 > **Quick Reference**: Complete CLI command reference organized alphabetically with usage and examples
 
 ## Overview

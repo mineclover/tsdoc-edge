@@ -1,5 +1,7 @@
 # [[Relationship System Roadmap]]
 
+Implementation roadmap for TSDoc Edge's 19 relationship types across 6 categories, tracking progress from 37% to 100% completion.
+
 **Document Type**: Implementation Roadmap
 **Status**: In Progress → **58% Complete** ✅
 **Created**: 2025-11-09

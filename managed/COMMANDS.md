@@ -8,6 +8,8 @@ canonical: true
 
 # [[Commands Index]]
 
+Complete reference of all 61 TSDoc Edge CLI commands organized into 7 categories (Core Workflow, Analyzers, Query, Documentation, Spec, Advanced, Utility).
+
 > **Quick Reference**: All 61 TSDoc Edge commands organized by category
 
 ## Core Workflow (6 commands)

@@ -9,6 +9,8 @@ entrypoint: true
 
 # [[TSDoc Edge Documentation]]
 
+Complete documentation index for TSDoc Edge, the SSOT platform for tracking symbols, relationships, and dependencies in TypeScript codebases.
+
 > **SSOT Platform**: Track every symbol, relationship, and dependency in your TypeScript codebase
 
 ## Quick Start

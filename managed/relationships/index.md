@@ -10,6 +10,8 @@ source-diagram: managed/architecture/diagrams/dependency-meta-structure.mmd
 
 # [[Relationship Types]]
 
+Master index for all 26 relationship types tracked by TSDoc Edge across 7 spaces (Code, Data, Behavior, Meta, Type, Architectural, Quality).
+
 > **SSOT**: Master index for all relationship types tracked by TSDoc Edge
 > **Source**: [[Dependency Meta-Structure]] (`managed/architecture/diagrams/dependency-meta-structure.mmd`)
 
