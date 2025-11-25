@@ -146,11 +146,39 @@ node dist/cli.js rename --help  # ✅ Shows usage
 node dist/cli.js move --help    # ✅ Shows usage
 ```
 
+## Related Commands
+
+### symbol-rename (Already Implemented ✅)
+
+The **symbol-rename** command is already fully implemented and handles symbol name changes:
+
+```bash
+# Rename a symbol and update all references
+tsdoc-edge symbol-rename "Old Symbol" "New Symbol"
+
+# Preview changes
+tsdoc-edge symbol-rename "Old Symbol" "New Symbol" --dry-run
+
+# Auto-confirm
+tsdoc-edge symbol-rename "Old Symbol" "New Symbol" --yes
+```
+
+**Features**:
+- ✅ Updates H1 primary definitions: `# [[Symbol]]`
+- ✅ Updates H2 auxiliary definitions: `## [[Symbol]]`
+- ✅ Updates H3 sub-auxiliary definitions: `### [[Symbol]]`
+- ✅ Updates inline references: `[[Symbol]]`
+- ✅ Maintains SSOT principle (exactly 1 H1 definition)
+- ✅ Dry-run mode, validation, confirmation
+
+**Implementation**:
+- `src/commands/SymbolRenameCommand.ts` (~400 lines)
+- `src/utilities/SymbolReferenceUpdater.ts` (~300 lines)
+
 ## Future Enhancements
 
 See `DESIGN-RENAME-MOVE.md` for planned features:
 - [ ] Batch operations (rename multiple files)
-- [ ] Symbol rename (update H1 header)
 - [ ] Git integration (use `git mv`)
 - [ ] Interactive mode (prompt for each change)
 - [ ] Backup mechanism (create .backup files)
