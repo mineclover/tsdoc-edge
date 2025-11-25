@@ -207,15 +207,6 @@ See [[Analyzers & Extractors]] (`analyzers/index.md`) for complete list includin
 ### Architecture
 **Path**: `managed/architecture/`
 
-- **System Architecture** (`system-architecture-2025-11-07.md`): Overall design
-  - CLI: [[CLI Runner]] (`src/cli.ts`), [[CommandRegistry]] (`src/commands/CommandRegistry.ts`)
-  - Core: [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`), [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
-- **Analysis & Extraction** (`analysis-extraction-systems-2025-11-07.md`): Analyzers
-  - Extractors: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`)
-  - Analyzers: [[IODependencyAnalyzer]] (`src/analyzer/IODependencyAnalyzer.ts`), [[CallGraphAnalyzer]] (`src/analyzer/CallGraphAnalyzer.ts`)
-- **Database Schema** (`database-relationships-2025-11-07.md`): Storage design
-  - SQLite: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
-  - JSONL: [[SymbolRegistryManager]] (`src/storage/SymbolRegistryManager.ts`)
 - [[Dependency Meta-Structure]] (`diagrams/dependency-meta-structure.mmd`): Visual taxonomy
   - Shows all 17 relationship types across 4 dimensions
   - Entry point for relationship exploration
@@ -330,11 +321,6 @@ tsdoc-edge explore-entrypoint managed/README.md --detect-orphans
 - `ORPHAN-DOCS-REPORT.md` - Orphan documentation analysis
 - `IMPROVEMENT-SUMMARY.md` - Recent cleanup & improvements
 - `CLEANUP-SUMMARY.md` - Documentation cleanup details
-
-**Archives**:
-- `managed/archive/history/` - Historical sessions & reviews
-- `managed/archive/concepts/` - Design principles
-- `managed/archive/workflows/` - Design workflows
 
 ## Contributing
 
