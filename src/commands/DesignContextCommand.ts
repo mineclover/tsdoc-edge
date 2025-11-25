@@ -122,15 +122,18 @@ export class DesignContextCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-
+      const useLlmFormat = args.includes('--llm');
       const targetFile = args[0];
 
       if (!targetFile) {
         this.printError('File path required');
         console.log();
+        console.log('Options:');
+        console.log('  --llm    Generate LLM-friendly output (LLMs.txt format)');
+        console.log();
         console.log('Examples:');
-        console.log('  tsdoc-edge work-context src/services/UserService.ts');
-        console.log('  tsdoc-edge work-context src/controllers/AuthController.ts');
+        console.log('  tsdoc-edge design-context src/services/UserService.ts');
+        console.log('  tsdoc-edge design-context src/controllers/AuthController.ts --llm');
         console.log();
         console.log('Tip: Run with --help for more information');
         return this.failure('Missing file path');
@@ -157,6 +160,13 @@ export class DesignContextCommand extends BaseCommand {
 
       const dbManager = new DatabaseManager(dbPath);
       const context = await this.gatherContext(absolutePath, targetFile, dbManager);
+
+      // Branch: LLM format vs Human-readable format
+      if (useLlmFormat) {
+        const output = this.generateLlmOutput(context);
+        console.log(output);
+        return this.success('Context generated in LLM format');
+      }
 
       // Display context
       this.displayContext(context);
@@ -577,6 +587,273 @@ export class DesignContextCommand extends BaseCommand {
       seen.add(value);
       return true;
     });
+  }
+
+  /**
+   * Generate LLM-friendly output from work context
+   * @private
+   */
+  private generateLlmOutput(context: WorkContext): string {
+    let output = '';
+
+    // Header
+    output += `# Design Context: ${context.filePath}\n\n`;
+    output += `> **File**: ${context.filePath}\n`;
+    output += `> **Generated**: ${new Date().toISOString()}\n`;
+    output += `> **Type**: Design Context (Contracts, Decisions, Error Patterns)\n\n`;
+    output += `---\n\n`;
+
+    // Summary
+    output += `## Summary\n\n`;
+    output += `This file contains **${context.symbols.length}** symbol(s) with the following design context:\n\n`;
+    output += `- **Contracts**: ${context.contracts.length}\n`;
+    output += `- **Design Decisions**: ${context.decisions.length}\n`;
+    output += `- **Error Patterns**: ${context.errorPatterns.length}\n`;
+    output += `- **Tests**: ${context.tests.length}\n`;
+    output += `- **Dependencies**: ${context.dependencies.length}\n`;
+    output += `- **Used By**: ${context.usedBy.length} files\n`;
+    output += `- **Relationships**: ${context.relationships.length}\n\n`;
+
+    // Symbols
+    if (context.symbols.length > 0) {
+      output += `## Symbols\n\n`;
+      for (const symbol of context.symbols) {
+        const badges = [];
+        if (symbol.isExported) badges.push('exported');
+        if (symbol.isPublic) badges.push('public');
+        const badgeStr = badges.length > 0 ? ` [${badges.join(', ')}]` : '';
+
+        output += `- **${symbol.name}** (\`${symbol.type}\`)${badgeStr}\n`;
+        if (symbol.summary) {
+          output += `  - ${symbol.summary}\n`;
+        }
+        output += `  - Location: \`${symbol.filePath}:${symbol.line}\`\n`;
+      }
+      output += `\n`;
+    }
+
+    // Related Documentation
+    if (context.relatedDocs.length > 0) {
+      output += `## Related Documentation\n\n`;
+      output += `This file references the following documentation:\n\n`;
+      for (const doc of context.relatedDocs) {
+        const status = doc.path !== '(not found)' ? '✓' : '✗';
+        output += `- ${status} [[${doc.symbolRef}]]`;
+        if (doc.path !== '(not found)') {
+          output += ` → \`${doc.path}\``;
+        } else {
+          output += ` (not found)`;
+        }
+        if (doc.sourceFile && doc.sourceLine) {
+          output += ` (referenced at ${doc.sourceFile}:${doc.sourceLine})`;
+        }
+        output += `\n`;
+      }
+      output += `\n`;
+    }
+
+    // Contracts
+    if (context.contracts.length > 0) {
+      output += `## Contracts\n\n`;
+      output += `Design by contract specifications for this file's symbols:\n\n`;
+
+      for (const contract of context.contracts) {
+        output += `### ${contract.symbolName}\n\n`;
+        output += `${contract.description}\n\n`;
+
+        if (contract.preconditions.length > 0) {
+          output += `**Preconditions** (must be true before calling):\n\n`;
+          for (const pre of contract.preconditions) {
+            output += `- ${pre}\n`;
+          }
+          output += `\n`;
+        }
+
+        if (contract.postconditions.length > 0) {
+          output += `**Postconditions** (must be true after execution):\n\n`;
+          for (const post of contract.postconditions) {
+            output += `- ${post}\n`;
+          }
+          output += `\n`;
+        }
+
+        if (contract.invariants.length > 0) {
+          output += `**Invariants** (must always be true):\n\n`;
+          for (const inv of contract.invariants) {
+            output += `- ${inv}\n`;
+          }
+          output += `\n`;
+        }
+      }
+    }
+
+    // Design Decisions
+    if (context.decisions.length > 0) {
+      output += `## Design Decisions\n\n`;
+      output += `Architecture Decision Records (ADRs) for this file:\n\n`;
+
+      for (const decision of context.decisions) {
+        output += `### ${decision.title}\n\n`;
+        if (decision.symbolName) {
+          output += `**Symbol**: ${decision.symbolName}\n\n`;
+        }
+        output += `**Status**: ${decision.status}\n\n`;
+        output += `**Date**: ${decision.date}\n\n`;
+        output += `**Decision**: ${decision.decision}\n\n`;
+        output += `**Rationale**: ${decision.rationale}\n\n`;
+      }
+    }
+
+    // Error Patterns
+    if (context.errorPatterns.length > 0) {
+      output += `## Common Pitfalls\n\n`;
+      output += `Known error patterns and how to avoid them:\n\n`;
+
+      for (const error of context.errorPatterns) {
+        output += `### ${error.errorType} (${error.symbolName})\n\n`;
+        output += `**Error**: ${error.message}\n\n`;
+        output += `**Solution**: ${error.solution}\n\n`;
+        if (error.prevention) {
+          output += `**Prevention**: ${error.prevention}\n\n`;
+        }
+      }
+    }
+
+    // Dependencies
+    if (context.dependencies.length > 0) {
+      output += `## Dependencies\n\n`;
+      output += `This file depends on:\n\n`;
+      const deps = context.dependencies.slice(0, 30);
+      for (const dep of deps) {
+        output += `- **${dep.name}** (\`${dep.type}\`) - \`${dep.filePath}\`\n`;
+      }
+      if (context.dependencies.length > 30) {
+        output += `\n_... and ${context.dependencies.length - 30} more dependencies_\n`;
+      }
+      output += `\n`;
+    }
+
+    // Test Coverage
+    if (context.tests.length > 0) {
+      output += `## Test Coverage\n\n`;
+      output += `This file is tested by:\n\n`;
+      for (const test of context.tests) {
+        const testType = test.type === 'integration' ? '🔗 Integration' : '✅ Unit';
+        output += `- ${testType}: \`${test.path}\`\n`;
+        if (test.coverage !== undefined) {
+          output += `  - Coverage: ${test.coverage}%\n`;
+        }
+      }
+      output += `\n`;
+    } else {
+      output += `## Test Coverage\n\n`;
+      output += `⚠️ **No tests found for this file**. Consider adding tests in \`src/__tests__/\`.\n\n`;
+    }
+
+    // Impact Analysis
+    if (context.usedBy.length > 0) {
+      output += `## Impact Analysis\n\n`;
+      output += `⚠️ **${context.usedBy.length} files** depend on this file. Changes here will impact:\n\n`;
+      const usedBy = context.usedBy.slice(0, 20);
+      for (const usage of usedBy) {
+        output += `- **${usage.name}** (\`${usage.type}\`) - \`${usage.filePath}\`\n`;
+      }
+      if (context.usedBy.length > 20) {
+        output += `\n_... and ${context.usedBy.length - 20} more files_\n`;
+      }
+      output += `\n`;
+    } else {
+      output += `## Impact Analysis\n\n`;
+      output += `✓ No other files depend on this file. Changes are isolated.\n\n`;
+    }
+
+    // Relationship Statistics
+    if (context.relationships.length > 0) {
+      output += `## Relationship Statistics\n\n`;
+
+      const explicitRels = context.relationships.filter(r => !r.properties?.inferred);
+      const inferredRels = context.relationships.filter(r => r.properties?.inferred === true);
+      const density = context.symbols.length > 0
+        ? (context.relationships.length / context.symbols.length).toFixed(2)
+        : '0.00';
+
+      output += `- **Total Relationships**: ${context.relationships.length}\n`;
+      output += `- **Relationship Density**: ${density} (relationships per symbol)\n`;
+      output += `- **Explicit**: ${explicitRels.length} (${((explicitRels.length / context.relationships.length) * 100).toFixed(1)}%)\n`;
+      output += `- **Inferred**: ${inferredRels.length} (${((inferredRels.length / context.relationships.length) * 100).toFixed(1)}%)\n\n`;
+
+      // Group by category
+      const byCategory = this.groupBy(context.relationships, 'category');
+      output += `**By Category**:\n\n`;
+      const sortedCategories = Object.entries(byCategory).sort((a, b) => b[1].length - a[1].length);
+      for (const [category, rels] of sortedCategories) {
+        const percentage = ((rels.length / context.relationships.length) * 100).toFixed(1);
+        output += `- **${category}**: ${rels.length} (${percentage}%)\n`;
+      }
+      output += `\n`;
+
+      // Group by strength
+      const strongCount = context.relationships.filter(r => r.strength === 'strong').length;
+      const mediumCount = context.relationships.filter(r => r.strength === 'medium').length;
+      const weakCount = context.relationships.filter(r => r.strength === 'weak').length;
+
+      output += `**By Strength**:\n\n`;
+      output += `- **Strong**: ${strongCount} (${((strongCount / context.relationships.length) * 100).toFixed(1)}%)\n`;
+      output += `- **Medium**: ${mediumCount} (${((mediumCount / context.relationships.length) * 100).toFixed(1)}%)\n`;
+      output += `- **Weak**: ${weakCount} (${((weakCount / context.relationships.length) * 100).toFixed(1)}%)\n\n`;
+    }
+
+    // Recommendations
+    output += `## Recommendations\n\n`;
+    const recommendations: string[] = [];
+
+    const density = context.symbols.length > 0 ? context.relationships.length / context.symbols.length : 0;
+
+    if (density >= 5.0) {
+      recommendations.push(`✓ High relationship density (${density.toFixed(2)}) - code is well connected`);
+    } else if (density < 2.0) {
+      recommendations.push(`• Low relationship density (${density.toFixed(2)}) - consider adding more relationships`);
+    }
+
+    if (context.tests.length === 0) {
+      recommendations.push(`• No test coverage - add tests in \`src/__tests__/\``);
+    }
+
+    const inferredCount = context.relationships.filter(r => r.properties?.inferred === true).length;
+    if (inferredCount > 0 && inferredCount > context.relationships.length * 0.3) {
+      recommendations.push(`• ${inferredCount} inferred relationships (${((inferredCount / context.relationships.length) * 100).toFixed(1)}%) - consider explicit documentation`);
+    }
+
+    if (context.contracts.length === 0 && context.symbols.some(s => s.isPublic)) {
+      recommendations.push(`• No contract specifications - consider adding @precondition/@postcondition tags`);
+    }
+
+    if (context.decisions.length === 0 && context.relationships.length > 10) {
+      recommendations.push(`• No design decisions recorded - consider creating ADRs`);
+    }
+
+    if (context.usedBy.length > 10) {
+      recommendations.push(`⚠️ High impact (${context.usedBy.length} files) - test carefully when making changes`);
+    }
+
+    if (context.errorPatterns.length > 0) {
+      recommendations.push(`✓ ${context.errorPatterns.length} known pitfalls documented - review before working on this file`);
+    }
+
+    if (recommendations.length > 0) {
+      for (const rec of recommendations) {
+        output += `- ${rec}\n`;
+      }
+    } else {
+      output += `✓ No recommendations - code is in good shape\n`;
+    }
+    output += `\n`;
+
+    // Footer
+    output += `---\n\n`;
+    output += `_Generated by TSDoc Edge design-context command with --llm flag_\n`;
+
+    return output;
   }
 
   private displayContext(context: WorkContext): void {

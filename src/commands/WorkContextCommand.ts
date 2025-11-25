@@ -65,11 +65,15 @@ export class WorkContextCommand extends BaseCommand {
       console.log('  --llm              Generate LLM-friendly context (LLMs.txt format)');
       console.log('  --output <file>    Save output to file instead of stdout');
       console.log('  --depth <n>        Context depth for LLM mode (default: 2)');
+      console.log('  --category <cats>  Filter by categories (comma-separated)');
+      console.log('                     Available: documentation, structural, verification');
       console.log();
       console.log('Examples:');
       console.log('  tsdoc-edge work-context src/storage/DatabaseManager.ts');
       console.log('  tsdoc-edge wc src/commands/BuildCommand.ts --llm');
       console.log('  tsdoc-edge wc src/analyzer/Parser.ts --llm --output context.txt');
+      console.log('  tsdoc-edge wc src/commands/BuildCommand.ts --category structural');
+      console.log('  tsdoc-edge wc src/storage/DatabaseManager.ts --category documentation,verification');
       console.log();
       console.log('Tip: Use this before editing a file to see all related context');
       return { exitCode: 1, message: 'File path required' };
@@ -79,6 +83,7 @@ export class WorkContextCommand extends BaseCommand {
     const useLlmFormat = args.includes('--llm');
     const outputFile = this.getOptionValue(args, '--output');
     const depth = parseInt(this.getOptionValue(args, '--depth') || '2', 10);
+    const categoryFilter = this.getOptionValue(args, '--category')?.split(',').map((c: string) => c.trim());
 
     // Resolve absolute path
     const absolutePath = path.resolve(process.cwd(), targetFile);
@@ -142,6 +147,12 @@ export class WorkContextCommand extends BaseCommand {
       // Analyze file
       const context = analyzer.analyze(absolutePath);
 
+      // Helper function to check if a category should be displayed
+      const shouldShowCategory = (category: string): boolean => {
+        if (!categoryFilter || categoryFilter.length === 0) return true;
+        return categoryFilter.includes(category);
+      };
+
       if (context.symbols.length === 0) {
         this.printWarning('No symbols found in this file');
         console.log();
@@ -184,7 +195,7 @@ export class WorkContextCommand extends BaseCommand {
       console.log();
 
       // Documentation
-      if (context.relationships.documentation.length > 0) {
+      if (shouldShowCategory('documentation') && context.relationships.documentation.length > 0) {
         this.printSection('📄 Documentation');
         const uniqueDocs = new Map<string, string[]>();
 
@@ -203,51 +214,53 @@ export class WorkContextCommand extends BaseCommand {
       }
 
       // Test Coverage
-      if (context.relationships.tests.length > 0) {
-        this.printSection('✅ Test Coverage');
-        console.log(`  ${context.relationships.tests.length} test cases covering ${context.impact.testFiles.size} test file(s)`);
-        console.log();
+      if (shouldShowCategory('verification')) {
+        if (context.relationships.tests.length > 0) {
+          this.printSection('✅ Test Coverage');
+          console.log(`  ${context.relationships.tests.length} test cases covering ${context.impact.testFiles.size} test file(s)`);
+          console.log();
 
-        // Group by symbol
-        const testsBySymbol = new Map<string, string[]>();
-        for (const test of context.relationships.tests) {
-          if (!testsBySymbol.has(test.symbolName)) {
-            testsBySymbol.set(test.symbolName, []);
+          // Group by symbol
+          const testsBySymbol = new Map<string, string[]>();
+          for (const test of context.relationships.tests) {
+            if (!testsBySymbol.has(test.symbolName)) {
+              testsBySymbol.set(test.symbolName, []);
+            }
+            testsBySymbol.get(test.symbolName)!.push(test.testName);
           }
-          testsBySymbol.get(test.symbolName)!.push(test.testName);
-        }
 
-        // Show top tested symbols
-        const sortedSymbols = Array.from(testsBySymbol.entries())
-          .sort((a, b) => b[1].length - a[1].length)
-          .slice(0, 5);
+          // Show top tested symbols
+          const sortedSymbols = Array.from(testsBySymbol.entries())
+            .sort((a, b) => b[1].length - a[1].length)
+            .slice(0, 5);
 
-        for (const [symbolName, tests] of sortedSymbols) {
-          console.log(`  ${colors.green}${symbolName}${colors.reset}: ${tests.length} tests`);
-          tests.slice(0, 3).forEach(testName => {
-            console.log(`    • ${testName}`);
+          for (const [symbolName, tests] of sortedSymbols) {
+            console.log(`  ${colors.green}${symbolName}${colors.reset}: ${tests.length} tests`);
+            tests.slice(0, 3).forEach(testName => {
+              console.log(`    • ${testName}`);
+            });
+            if (tests.length > 3) {
+              console.log(`    ${colors.dim}... and ${tests.length - 3} more${colors.reset}`);
+            }
+          }
+
+          console.log();
+          console.log(`  ${colors.dim}Test files:${colors.reset}`);
+          Array.from(context.impact.testFiles).slice(0, 3).forEach(testFile => {
+            console.log(`    ${path.relative(process.cwd(), testFile)}`);
           });
-          if (tests.length > 3) {
-            console.log(`    ${colors.dim}... and ${tests.length - 3} more${colors.reset}`);
+          if (context.impact.testFiles.size > 3) {
+            console.log(`    ${colors.dim}... and ${context.impact.testFiles.size - 3} more${colors.reset}`);
           }
+          console.log();
+        } else {
+          this.printWarning('⚠️  No test coverage found');
+          console.log();
         }
-
-        console.log();
-        console.log(`  ${colors.dim}Test files:${colors.reset}`);
-        Array.from(context.impact.testFiles).slice(0, 3).forEach(testFile => {
-          console.log(`    ${path.relative(process.cwd(), testFile)}`);
-        });
-        if (context.impact.testFiles.size > 3) {
-          console.log(`    ${colors.dim}... and ${context.impact.testFiles.size - 3} more${colors.reset}`);
-        }
-        console.log();
-      } else {
-        this.printWarning('⚠️  No test coverage found');
-        console.log();
       }
 
       // Dependencies
-      if (context.relationships.dependencies.length > 0) {
+      if (shouldShowCategory('structural') && context.relationships.dependencies.length > 0) {
         this.printSection('📦 Dependencies');
         console.log(`  This file depends on ${context.impact.dependencyFiles.size} other file(s)`);
         console.log();
@@ -265,7 +278,7 @@ export class WorkContextCommand extends BaseCommand {
       }
 
       // Dependents (Impact Analysis)
-      if (context.relationships.dependents.length > 0) {
+      if (shouldShowCategory('structural') && context.relationships.dependents.length > 0) {
         this.printSection('🔗 Impact Analysis');
         console.log(`  ${context.impact.dependentFiles.size} file(s) depend on this file`);
         console.log();
