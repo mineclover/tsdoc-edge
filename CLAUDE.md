@@ -44,6 +44,39 @@ tsdoc-edge update-backlinks
 tsdoc-edge validate-docs
 ```
 
+### work-context 활용 가이드
+
+**파일 수정 전 필수 실행**:
+```bash
+# 기본 사용 (사람이 읽기 편한 형식)
+tsdoc-edge wc src/commands/BuildCommand.ts
+
+# LLM 친화적 형식 (AI 어시스턴트와 협업 시)
+tsdoc-edge wc src/commands/BuildCommand.ts --llm
+
+# 설계 의사결정 추적 (contracts, decisions)
+tsdoc-edge dc src/services/UserService.ts
+```
+
+**제공되는 정보**:
+- 📚 관련 문서: 기획서, 명세서 링크
+- 🔗 의존 타입: 파일이 사용하는 타입들
+- 🧪 테스트: 해당 파일을 테스트하는 파일
+- ⚠️ 영향 범위: 수정 시 영향받는 파일들
+- 💡 권장사항: 테스트 커버리지, 문서화 상태
+
+**관계 분석** (109개 명령어 중 핵심):
+```bash
+# 변경 영향 분석
+tsdoc-edge relationship-impact <symbol-id>
+
+# 중요 심볼 찾기
+tsdoc-edge relationship-metrics --top 10
+
+# 모듈 경계 발견
+tsdoc-edge relationship-clusters
+```
+
 ## 핵심 아키텍처
 
 ### 설계 철학: 체크포인트 기반 평탄화
