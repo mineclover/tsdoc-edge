@@ -61,35 +61,68 @@ The single source of truth for all 17 relationship types tracked by TSDoc Edge.
   - Command: [[TestRelationshipsCommand]] (`src/commands/TestRelationshipsCommand.ts`)
 - And 4 more: [[Type Dependency]], [[Generic Constraint]], [[Interface Implementation]], [[Circular Dependency]]
 
-### [[Commands Index]] - All 64 Commands
+### [[Commands Index]] - All 61+ Commands
 **Path**: `managed/COMMANDS.md`
 
-Complete reference organized by category:
-- **Core Workflow** (8):
-  - [[BuildCommand]] (`src/commands/BuildCommand.ts`) - Extract all symbols
-  - [[WorkContextCommand]] (`src/commands/WorkContextCommand.ts`) - Get file context
-  - [[ExploreEntrypointCommand]] (`src/commands/ExploreEntrypointCommand.ts`) - Explore from docs
-  - [[ParseCommand]] (`src/commands/ParseCommand.ts`) - Parse source files
-- **Relationship Analyzers** (4):
-  - [[AnalyzeCallsCommand]] (`src/commands/AnalyzeCallsCommand.ts`) - Call graph analysis
-  - [[AnalyzeIOCommand]] (`src/commands/AnalyzeIOCommand.ts`) - I/O dependency analysis
-  - [[AnalyzeChainsCommand]] (`src/commands/AnalyzeChainsCommand.ts`) - Dependency chains
-- **Query & Analysis** (11):
-  - [[DepsCommand]] (`src/commands/DepsCommand.ts`) - Show dependencies
-  - [[WhoUsesCommand]] (`src/commands/WhoUsesCommand.ts`) - Show reverse deps
-  - [[OrphansCommand]] (`src/commands/OrphansCommand.ts`) - Find orphaned code
-  - [[HealthCommand]] (`src/commands/HealthCommand.ts`) - Code health metrics
-  - [[StatsCommand]] (`src/commands/StatsCommand.ts`) - Project statistics
-- **Documentation Tools** (12):
-  - [[IndexDocsCommand]] (`src/commands/IndexDocsCommand.ts`) - Index documentation
-  - [[ValidateDocsCommand]] (`src/commands/ValidateDocsCommand.ts`) - Validate docs
-  - [[ParseMermaidCommand]] (`src/commands/ParseMermaidCommand.ts`) - Generate from .mmd
-  - [[PromoteSymbolCommand]] (`src/commands/PromoteSymbolCommand.ts`) - H2 → H1 promotion
-  - [[ValidateSymbolRefsCommand]] (`src/commands/ValidateSymbolRefsCommand.ts`) - Validate [[Symbol]] refs
-- **Validation & Detection** (8): See [[ValidationFeatures]] (`managed/features/validation-features.md`)
-- **Analysis Tools** (12): See [[AnalysisFeatures]] (`managed/features/analysis-features.md`)
+Complete reference organized by category with **new LLM-friendly features**:
 
-See also: [[AnalysisFeatures]] (`managed/features/analysis-features.md`), [[ValidationFeatures]] (`managed/features/validation-features.md`)
+- **Core Workflow** (8):
+  - [[BuildCommand]] - Extract all symbols: `tsdoc-edge build src`
+  - [[WorkContextCommand]] - Get file context: `tsdoc-edge work-context <file>`
+    - ✨ NEW: `--category` filter (documentation, structural, verification)
+  - [[ExploreEntrypointCommand]] - Explore from docs: `tsdoc-edge explore-entrypoint <doc>`
+  - [[ParseCommand]] - Parse source files: `tsdoc-edge parse <file>`
+
+- **Discovery & Navigation** (NEW):
+  - [[DocSymbolsCommand]] - List document symbols: `tsdoc-edge doc-symbols`
+    - ✨ Aliases: `docs`, `glossary`
+    - ✨ Flags: `--llm`, `--search`, `--category`
+    - ✨ Purpose: Project glossary of explicitly defined concepts
+  - [[ContextCommand]] - Symbol context: `tsdoc-edge context <symbol-id>`
+    - ✨ NEW: `--llm` flag for AI-consumable format
+  - [[DesignContextCommand]] - Design context: `tsdoc-edge design-context <symbol-id>`
+    - ✨ NEW: `--llm` flag for design documentation
+
+- **Relationship Analyzers** (6):
+  - [[AnalyzeCallsCommand]] - Call graph analysis
+  - [[AnalyzeIOCommand]] - I/O dependency analysis
+  - [[AnalyzeChainsCommand]] - Dependency chains
+  - [[AnalyzeTypesCommand]] - Type dependencies
+  - [[AnalyzeTestsCommand]] - Test coverage mapping
+  - [[DetectCircularTypesCommand]] - Circular dependency detection
+
+- **Query & Analysis** (11):
+  - [[DepsCommand]] - Show dependencies
+  - [[WhoUsesCommand]] - Show reverse deps
+  - [[OrphansCommand]] - Find orphaned code
+  - [[HealthCommand]] - Code health metrics
+  - [[StatsCommand]] - Project statistics
+  - [[TreeCommand]] - Dependency tree visualization
+
+- **Documentation Tools** (12):
+  - [[IndexDocsCommand]] - Index documentation
+  - [[ValidateDocsCommand]] - Validate docs
+  - [[ParseMermaidCommand]] - Generate from .mmd
+  - [[PromoteSymbolCommand]] - H2 → H1 promotion
+  - [[ValidateSymbolRefsCommand]] - Validate [[Symbol]] refs
+  - [[UpdateBacklinksCommand]] - Update backlinks
+
+**LLM Integration Examples**:
+```bash
+# Get LLM-friendly context
+tsdoc-edge context class-databasemanager --llm
+
+# Get design context for AI
+tsdoc-edge design-context class-buildcommand --llm
+
+# Filter work context by category
+tsdoc-edge work-context src/storage/DatabaseManager.ts --category documentation
+
+# Search document symbols
+tsdoc-edge doc-symbols --search "mermaid" --llm
+```
+
+See also: [[AnalysisFeatures]], [[ValidationFeatures]], [[Context Quality Improvements]]
 
 ### Guides
 **Path**: `managed/guides/`
@@ -123,6 +156,55 @@ Essential guides for mastering TSDoc Edge:
 - **Example**: Mermaid Workflow (`EXAMPLE-MERMAID-WORKFLOW.md`)
   - Real-world example: dependency-meta-structure.mmd
   - Coverage improvement: 14.3% → 95.1%
+
+## Documentation Structure
+
+**See**: [[Category Navigation Guide]] (`CATEGORY-NAVIGATION-GUIDE.md`) - Complete category reference
+
+TSDoc Edge documentation is organized into **15 streamlined categories** (reduced from 25 in Nov 2025):
+
+### Core Categories
+
+1. **analyzers/** (31) - Relationship detection and symbol extraction
+2. **commands/** (52) - All CLI command implementations
+3. **relationships/** (28) - All 26 relationship type specifications
+4. **features/** (26) - Feature specifications and implementations
+5. **types/** (20) - Internal system types
+6. **primary-types/** (20) - Domain model types
+7. **utilities/** (21) - Utility functions and helpers
+
+### Documentation & Learning
+
+8. **concepts/** (13) - Core architectural concepts and design principles
+9. **guides/** (6) - Step-by-step learning guides
+10. **workflows/** (9) - End-to-end workflow guides
+11. **examples/** (3) - Practical usage examples
+
+### Specialized
+
+12. **core-components/** (5) - Essential infrastructure components
+13. **parser/** (7) - Parsing utilities for code and documentation
+14. **code-generation/** (9) - Code and documentation generation (NEW)
+15. **architecture/** (diagrams) - System architecture diagrams
+
+**Quick Navigation**:
+```bash
+# List all document symbols
+tsdoc-edge doc-symbols
+
+# Search for specific topics
+tsdoc-edge doc-symbols --search "mermaid"
+
+# Filter by category
+tsdoc-edge doc-symbols --category workflows
+```
+
+**Recent Improvements** (Nov 2025):
+- ✅ 40% category reduction (25 → 15)
+- ✅ 100% summary coverage (31 missing → 0)
+- ✅ Eliminated micro-categories (1-2 files)
+- ✅ Created unified code-generation category
+- ✅ Added doc-symbols discovery command
 
 ## Core Components
 
