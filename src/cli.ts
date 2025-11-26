@@ -18,6 +18,7 @@ import {
   CheckDuplicatesCommand,
   CheckLinksCommand,
   CommandRegistry,
+  ContextToLLMCommand,
   CoreApiCommand,
   DepsCommand,
   FindDocCommand,
@@ -36,6 +37,8 @@ import {
   OrphansCommand,
   ParseCommand,
   PlansCommand,
+  QueryInferredCommand,
+  RebuildIndexCommand,
   ScanCommand,
   SpecBumpCommand,
   SpecDiffCommand,
@@ -55,6 +58,7 @@ import {
   UsedByCommand,
   ValidateCommand,
   ValidateDocsCommand,
+  ValidateGeneratedDocsCommand,
   ValidateSpecCommand,
   WhoUsesCommand,
   WithoutContractCommand,
@@ -95,6 +99,10 @@ import { RelationshipMetricsCommand } from './commands/RelationshipMetricsComman
 import { RelationshipCheckCommand } from './commands/RelationshipCheckCommand';
 import { RelationshipHelpCommand } from './commands/RelationshipHelpCommand';
 import { WorkContextCommand } from './commands/WorkContextCommand';
+import { DesignContextCommand } from './commands/DesignContextCommand';
+import { DocSymbolsCommand } from './commands/DocSymbolsCommand';
+import { OntologyStatsCommand } from './commands/OntologyStatsCommand';
+import { OntologyListCommand } from './commands/OntologyListCommand';
 import { ExploreEntrypointCommand } from './commands/ExploreEntrypointCommand';
 import { ParseMermaidCommand } from './commands/ParseMermaidCommand';
 import { ValidateSymbolRefsCommand } from './commands/ValidateSymbolRefsCommand';
@@ -109,7 +117,6 @@ import { MoveCommand } from './commands/MoveCommand';
 import { SymbolRenameCommand } from './commands/SymbolRenameCommand';
 import { TaskListCommand, TaskAddCommand, TaskUpdateCommand, TaskStatsCommand } from './commands/TaskCommands';
 import { ContextCommand } from './commands/ContextCommand';
-import { EnhancedWorkContextCommand } from './commands/EnhancedWorkContextCommand';
 import { TestExamplesCommand } from './commands/TestExamplesCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
@@ -147,6 +154,7 @@ async function main(): Promise<void> {
   registry.register(new IndexDocsCommand());
   registry.register(new ParseCommand());
   registry.register(new ValidateDocsCommand());
+  registry.register(new ValidateGeneratedDocsCommand());
   registry.register(new UpdateBacklinksCommand());
   registry.register(new UpdateSymbolRefsCommand());
   registry.register(new CheckLinksCommand());
@@ -172,6 +180,7 @@ async function main(): Promise<void> {
   registry.register(new FindMethodCommand());
   registry.register(new TodosCommand());
   registry.register(new StatsCommand());
+  registry.register(new RebuildIndexCommand());
   registry.register(new CoreApiCommand());
   registry.register(new ScanCommand());
   registry.register(new SyncCoverageCommand());
@@ -221,8 +230,11 @@ async function main(): Promise<void> {
   registry.register(new ParallelWorkCommand());
   registry.register(new TestRelationshipsCommand());
   registry.register(new WorkContextCommand());
+  registry.register(new DesignContextCommand());
+  registry.register(new DocSymbolsCommand());
+  registry.register(new OntologyStatsCommand());
+  registry.register(new OntologyListCommand());
   registry.register(new ContextCommand());
-  registry.register(new EnhancedWorkContextCommand());
   registry.register(new TestExamplesCommand());
   registry.register(new ExploreEntrypointCommand());
   registry.register(new ParseMermaidCommand());
@@ -233,6 +245,8 @@ async function main(): Promise<void> {
   registry.register(new SymbolQueryCommand());
   registry.register(new SymbolFixCommand());
   registry.register(new RelationshipStatsCommand());
+  registry.register(new QueryInferredCommand());
+  registry.register(new ContextToLLMCommand());
   registry.register(new RenameCommand());
   registry.register(new MoveCommand());
   registry.register(new SymbolRenameCommand());

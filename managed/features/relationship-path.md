@@ -1,5 +1,7 @@
 # [[Relationship Path]]
 
+Find connection paths between symbols through relationship traversal for dependency analysis and impact assessment.
+
 ## Purpose
 
 Find connection paths between any two symbols in the codebase through relationship traversal.

@@ -1,5 +1,7 @@
 # [[Phase Commands Refactoring Guide]]
 
+Guide for splitting monolithic Phase command files into individual command files for better maintainability.
+
 ## Purpose
 
 Phase 명령어 파일을 개별 명령어 파일로 분리하는 리팩토링 가이드.

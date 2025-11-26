@@ -9,6 +9,8 @@ created-at: 2025-11-08
 
 # [[Mermaid Entrypoint Workflow]]
 
+Complete workflow for using .mmd diagrams as SSOT entrypoints to explore dependencies and detect orphan code systematically.
+
 > **Purpose**: `.mmd` 다이어그램을 SSOT로 사용하여 진입점 기반 전체 의존성 탐색 및 고아 코드 탐지
 
 ## Overview

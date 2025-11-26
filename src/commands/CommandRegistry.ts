@@ -44,7 +44,14 @@ export class CommandRegistry {
    * @returns void - No return value
    */
   register(command: BaseCommand): void {
+    // Register main command name
     this.commands.set(command.getName(), command);
+
+    // Register aliases
+    const aliases = command.getAlias();
+    for (const alias of aliases) {
+      this.commands.set(alias, command);
+    }
   }
 
   /**

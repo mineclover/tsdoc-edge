@@ -349,6 +349,30 @@ export class DatabaseManager {
   }
 
   /**
+   * Get all symbols in a file
+   * @param filePath - File path
+   * @returns Array of symbols in file
+   */
+  getSymbolsByFile(filePath: string): Symbol[] {
+    const stmt = this.db.prepare('SELECT * FROM symbols WHERE file_path = ?');
+    const rows = stmt.all(filePath) as SymbolRow[];
+
+    return rows.map(row => ({
+      id: row.id,
+      name: row.name,
+      type: row.type as Symbol['type'],
+      filePath: row.file_path,
+      line: row.line,
+      column: row.column,
+      isExported: row.is_exported === 1,
+      isPublic: row.is_public === 1,
+      summary: row.summary ?? undefined,
+      tests: [],
+      designDecisions: [],
+    }));
+  }
+
+  /**
    * Get all symbols from database
    * @returns Array of all symbols
    */
@@ -700,6 +724,33 @@ export class DatabaseManager {
       updatedAt: row.updated_at,
       description: row.description || undefined,
     }));
+  }
+
+  /**
+   * Rebuild FTS5 indexes to fix corruption or sync issues
+   * @returns Rebuild statistics
+   * @contract Rebuild all FTS5 virtual tables from their content tables
+   * @postcondition FTS5 indexes are synchronized with main tables
+   */
+  rebuildFTS5Index(): { symbolsFts: number; enhancedDocsFts: number } {
+    // Rebuild symbols_fts index
+    this.db.prepare("INSERT INTO symbols_fts(symbols_fts) VALUES('rebuild')").run();
+    const symbolsCount = this.db.prepare('SELECT COUNT(*) as count FROM symbols_fts').get() as { count: number };
+
+    // Rebuild enhanced_docs_fts index if it has data
+    let enhancedDocsCount = 0;
+    try {
+      this.db.prepare("INSERT INTO enhanced_docs_fts(enhanced_docs_fts) VALUES('rebuild')").run();
+      const result = this.db.prepare('SELECT COUNT(*) as count FROM enhanced_docs_fts').get() as { count: number };
+      enhancedDocsCount = result.count;
+    } catch (error) {
+      // Skip if table is empty or doesn't exist
+    }
+
+    return {
+      symbolsFts: symbolsCount.count,
+      enhancedDocsFts: enhancedDocsCount,
+    };
   }
 
   /**

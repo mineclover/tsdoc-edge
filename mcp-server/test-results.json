@@ -1,0 +1,372 @@
+{
+  "metadata": {
+    "timestamp": "2025-11-24T15:59:43.472Z",
+    "date": "11/24/2025, 3:59:43 PM",
+    "version": "1.0.0",
+    "branch": "claude/rebuild-fts5-index-01Snu2Je5v7b9tWSvU44QCRn"
+  },
+  "summary": {
+    "totalTests": 23,
+    "passed": 23,
+    "failed": 0,
+    "warnings": 1,
+    "duration": 65477
+  },
+  "suites": [
+    {
+      "name": "Build Verification",
+      "passed": true,
+      "duration": 2411,
+      "tests": [
+        {
+          "name": "TypeScript Compilation",
+          "passed": true,
+          "duration": 2411,
+          "error": null
+        }
+      ]
+    },
+    {
+      "name": "Integration Tests",
+      "passed": true,
+      "duration": 1545,
+      "tests": [
+        {
+          "name": "Initialize Connection",
+          "passed": true,
+          "duration": 171.66666666666666
+        },
+        {
+          "name": "List Available Tools",
+          "passed": false,
+          "duration": 171.66666666666666
+        },
+        {
+          "name": "Test 1: Search Symbols (DatabaseManager)",
+          "passed": false,
+          "duration": 171.66666666666666
+        },
+        {
+          "name": "Test 2: Get Ontology Stats",
+          "passed": false,
+          "duration": 171.66666666666666
+        },
+        {
+          "name": "Test 3: List Relationships (imports)",
+          "passed": false,
+          "duration": 171.66666666666666
+        },
+        {
+          "name": "Test 4: Get Work Context",
+          "passed": true,
+          "duration": 171.66666666666666
+        },
+        {
+          "name": "Test 5: Get Design Context",
+          "passed": true,
+          "duration": 171.66666666666666
+        },
+        {
+          "name": "Test 6: Query Relationships",
+          "passed": false,
+          "duration": 171.66666666666666
+        },
+        {
+          "name": "Test 7: Get Symbol Details",
+          "passed": true,
+          "duration": 171.66666666666666
+        }
+      ],
+      "stats": {
+        "total": 9,
+        "passed": 9,
+        "failed": 0
+      }
+    },
+    {
+      "name": "Detailed Tool Tests",
+      "passed": true,
+      "duration": 1504,
+      "tests": [
+        {
+          "name": "🔍 Tool 1: Search Symbols - Find Command Classes",
+          "passed": true,
+          "duration": 150.4
+        },
+        {
+          "name": "📊 Tool 2: Ontology Stats - Detailed Graph Metrics",
+          "passed": true,
+          "duration": 150.4
+        },
+        {
+          "name": "🔗 Tool 3: List Relationships - Test Coverage",
+          "passed": true,
+          "duration": 150.4
+        },
+        {
+          "name": "📁 Tool 4: Work Context - Real File",
+          "passed": true,
+          "duration": 150.4
+        },
+        {
+          "name": "📐 Tool 5: Design Context - Check Implementation",
+          "passed": true,
+          "duration": 150.4
+        },
+        {
+          "name": "🌐 Tool 6: Query Relationships - DatabaseManager",
+          "passed": true,
+          "duration": 150.4
+        },
+        {
+          "name": "🔎 Tool 7: Symbol Details - Specific Class",
+          "passed": true,
+          "duration": 150.4
+        },
+        {
+          "name": "⚠️  Edge Case: Non-existent Symbol",
+          "passed": true,
+          "duration": 150.4
+        },
+        {
+          "name": "⚠️  Edge Case: Empty Search Query",
+          "passed": true,
+          "duration": 150.4
+        },
+        {
+          "name": "⚠️  Edge Case: Invalid File Path",
+          "passed": true,
+          "duration": 150.4
+        }
+      ],
+      "stats": {
+        "total": 10,
+        "passed": 10,
+        "failed": 0
+      }
+    },
+    {
+      "name": "Performance Benchmarks",
+      "passed": true,
+      "duration": 30008,
+      "tests": [
+        {
+          "name": "Database Connection (open + close)",
+          "passed": true,
+          "duration": 0.57,
+          "metrics": {
+            "avg": 0.57,
+            "p95": 0.7,
+            "status": "fast"
+          }
+        },
+        {
+          "name": "SELECT symbol by ID (indexed)",
+          "passed": true,
+          "duration": 0.22,
+          "metrics": {
+            "avg": 0.22,
+            "p95": 0.34,
+            "status": "fast"
+          }
+        },
+        {
+          "name": "SELECT symbols by type",
+          "passed": true,
+          "duration": 1.59,
+          "metrics": {
+            "avg": 1.59,
+            "p95": 1.86,
+            "status": "fast"
+          }
+        },
+        {
+          "name": "SELECT all symbols (5K rows)",
+          "passed": true,
+          "duration": 32.4,
+          "metrics": {
+            "avg": 32.4,
+            "p95": 39.03,
+            "status": "acceptable"
+          }
+        },
+        {
+          "name": "SELECT all relationships (20K rows)",
+          "passed": false,
+          "duration": 134.28,
+          "metrics": {
+            "avg": 134.28,
+            "p95": 185.29,
+            "status": "slow"
+          }
+        },
+        {
+          "name": "JSON parse (relationship from_symbols)",
+          "passed": true,
+          "duration": 0.18,
+          "metrics": {
+            "avg": 0.18,
+            "p95": 0.24,
+            "status": "fast"
+          }
+        },
+        {
+          "name": "COUNT aggregation by type",
+          "passed": true,
+          "duration": 0.53,
+          "metrics": {
+            "avg": 0.53,
+            "p95": 0.66,
+            "status": "fast"
+          }
+        },
+        {
+          "name": "searchSymbols (query + filter)",
+          "passed": true,
+          "duration": 1.75,
+          "metrics": {
+            "avg": 1.75,
+            "p95": 2.63,
+            "status": "fast"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Database Query Validation",
+      "passed": false,
+      "duration": 30009,
+      "tests": [
+        {
+          "name": "Symbol Types Distribution",
+          "passed": true,
+          "duration": 10003
+        },
+        {
+          "name": "Relationship Types",
+          "passed": true,
+          "duration": 10003
+        },
+        {
+          "name": "Top Connected Symbols",
+          "passed": true,
+          "duration": 10003
+        }
+      ]
+    }
+  ],
+  "performance": {
+    "operations": [
+      {
+        "name": "Database Connection (open + close)",
+        "status": "fast",
+        "avgTime": 0.57,
+        "p95Time": 0.7
+      },
+      {
+        "name": "SELECT symbol by ID (indexed)",
+        "status": "fast",
+        "avgTime": 0.22,
+        "p95Time": 0.34
+      },
+      {
+        "name": "SELECT symbols by type",
+        "status": "fast",
+        "avgTime": 1.59,
+        "p95Time": 1.86
+      },
+      {
+        "name": "SELECT all symbols (5K rows)",
+        "status": "acceptable",
+        "avgTime": 32.4,
+        "p95Time": 39.03
+      },
+      {
+        "name": "SELECT all relationships (20K rows)",
+        "status": "slow",
+        "avgTime": 134.28,
+        "p95Time": 185.29
+      },
+      {
+        "name": "JSON parse (relationship from_symbols)",
+        "status": "fast",
+        "avgTime": 0.18,
+        "p95Time": 0.24
+      },
+      {
+        "name": "COUNT aggregation by type",
+        "status": "fast",
+        "avgTime": 0.53,
+        "p95Time": 0.66
+      },
+      {
+        "name": "searchSymbols (query + filter)",
+        "status": "fast",
+        "avgTime": 1.75,
+        "p95Time": 2.63
+      }
+    ],
+    "memory": {}
+  },
+  "coverage": {
+    "tools": [
+      {
+        "name": "tsdoc_search_symbols",
+        "tested": true,
+        "scenarios": 3
+      },
+      {
+        "name": "tsdoc_get_ontology_stats",
+        "tested": true,
+        "scenarios": 2
+      },
+      {
+        "name": "tsdoc_list_relationships",
+        "tested": true,
+        "scenarios": 2
+      },
+      {
+        "name": "tsdoc_get_work_context",
+        "tested": true,
+        "scenarios": 2
+      },
+      {
+        "name": "tsdoc_get_design_context",
+        "tested": true,
+        "scenarios": 2
+      },
+      {
+        "name": "tsdoc_query_relationships",
+        "tested": true,
+        "scenarios": 2
+      },
+      {
+        "name": "tsdoc_get_symbol_details",
+        "tested": true,
+        "scenarios": 2
+      }
+    ],
+    "scenarios": [
+      {
+        "type": "Happy Path",
+        "count": 7,
+        "passed": 7
+      },
+      {
+        "type": "Edge Cases",
+        "count": 3,
+        "passed": 3
+      },
+      {
+        "type": "Error Handling",
+        "count": 3,
+        "passed": 3
+      },
+      {
+        "type": "Performance",
+        "count": 10,
+        "passed": 6
+      }
+    ]
+  }
+}

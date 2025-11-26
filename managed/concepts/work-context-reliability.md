@@ -1,5 +1,7 @@
 # [[Work Context Reliability]]
 
+Multi-dimensional reliability scoring system (Documentation 30%, Dependencies 30%, Tests 20%, Impact 20%) that measures context quality for safe code modifications.
+
 ## Purpose
 
 Measure and ensure the quality of context provided by [[WorkContextCommand]] through multi-dimensional reliability scoring.

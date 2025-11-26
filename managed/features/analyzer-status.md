@@ -1,5 +1,7 @@
 # [[Analyzer Status]]
 
+Current status of all relationship analyzers in TSDoc Edge - which are active, relationship counts, and activation blockers.
+
 ## Purpose
 
 Current status of all relationship analyzers in TSDoc Edge, showing which analyzers are active, how many relationships they detect, and why some analyzers cannot be activated.

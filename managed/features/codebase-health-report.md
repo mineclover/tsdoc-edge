@@ -1,5 +1,7 @@
 # [[Codebase Health Report]]
 
+Comprehensive health assessment of TSDoc Edge codebase - structure quality, documentation coverage, and improvement recommendations.
+
 ## Purpose
 
 TSDoc Edge 코드베이스의 전반적인 건강도 평가 및 개선 권장사항 제공.

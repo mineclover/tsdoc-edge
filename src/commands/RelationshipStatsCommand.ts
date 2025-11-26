@@ -72,6 +72,14 @@ export class RelationshipStatsCommand extends BaseCommand {
 
       const totalRelationships = byType.reduce((sum, row) => sum + row.count, 0);
       console.log(`  Total relationships: ${this.colors.cyan}${totalRelationships}${this.colors.reset}`);
+
+      // Get inferred vs explicit breakdown
+      const allRels = dbManager.getAllUnifiedRelationships();
+      const inferredCount = allRels.filter(r => r.properties?.inferred === true).length;
+      const explicitCount = totalRelationships - inferredCount;
+
+      console.log(`  Explicit relationships: ${this.colors.green}${explicitCount}${this.colors.reset}`);
+      console.log(`  Inferred relationships: ${this.colors.yellow}${inferredCount}${this.colors.reset} (${((inferredCount / totalRelationships) * 100).toFixed(1)}%)`);
       console.log();
 
       // Category breakdown

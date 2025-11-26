@@ -59,11 +59,13 @@ export class ContextCommand extends BaseCommand {
       console.log('  --type <types>       Filter by relationship types (comma-separated)');
       console.log('  --category <cats>    Filter by categories (comma-separated)');
       console.log('  --min-confidence <n> Minimum confidence (0-1)');
+      console.log('  --llm                Generate LLM-friendly output (LLMs.txt format)');
       console.log();
       console.log('Examples:');
       console.log('  tsdoc-edge context class-databasemanager');
       console.log('  tsdoc-edge context class-databasemanager --depth 2');
       console.log('  tsdoc-edge context class-databasemanager --type doc-reference,test-coverage');
+      console.log('  tsdoc-edge context class-databasemanager --llm');
       return { exitCode: 1, message: 'Symbol ID required' };
     }
 
@@ -71,10 +73,13 @@ export class ContextCommand extends BaseCommand {
 
     // Parse options
     const options = this.parseOptions(args.slice(1));
+    const useLlmFormat = args.includes('--llm');
 
-    console.log();
-    this.printSection(`Context: ${symbolId}`);
-    console.log();
+    if (!useLlmFormat) {
+      console.log();
+      this.printSection(`Context: ${symbolId}`);
+      console.log();
+    }
 
     try {
       const config = this.configManager.get();
@@ -89,14 +94,6 @@ export class ContextCommand extends BaseCommand {
         return { exitCode: 1, message: 'Symbol not found' };
       }
 
-      // Display symbol info
-      console.log(`  ${colors.bold}Symbol:${colors.reset}     ${symbol.name}`);
-      console.log(`  ${colors.bold}Type:${colors.reset}       ${symbol.type}`);
-      console.log(`  ${colors.bold}Location:${colors.reset}   ${symbol.filePath}:${symbol.line}`);
-      console.log(`  ${colors.bold}Exported:${colors.reset}   ${symbol.isExported ? 'Yes' : 'No'}`);
-      console.log(`  ${colors.bold}Public:${colors.reset}     ${symbol.isPublic ? 'Yes' : 'No'}`);
-      console.log();
-
       // Query relationships
       const engine = new RelationshipQueryEngine(dbManager);
       const context = engine.getContext(symbolId, {
@@ -108,6 +105,23 @@ export class ContextCommand extends BaseCommand {
 
       // Display statistics
       const stats = engine.getStatistics(symbolId);
+
+      // Branch: LLM format vs Human-readable format
+      if (useLlmFormat) {
+        // Generate LLM-friendly output
+        const output = this.generateLlmOutput(symbol, context, stats, options, dbManager);
+        console.log(output);
+        dbManager.close();
+        return { exitCode: 0, message: 'Context generated in LLM format' };
+      }
+
+      // Display symbol info
+      console.log(`  ${colors.bold}Symbol:${colors.reset}     ${symbol.name}`);
+      console.log(`  ${colors.bold}Type:${colors.reset}       ${symbol.type}`);
+      console.log(`  ${colors.bold}Location:${colors.reset}   ${symbol.filePath}:${symbol.line}`);
+      console.log(`  ${colors.bold}Exported:${colors.reset}   ${symbol.isExported ? 'Yes' : 'No'}`);
+      console.log(`  ${colors.bold}Public:${colors.reset}     ${symbol.isPublic ? 'Yes' : 'No'}`);
+      console.log();
       console.log(`  ${colors.bold}Relationships:${colors.reset} ${stats.total} direct`);
       console.log();
 
@@ -241,6 +255,164 @@ export class ContextCommand extends BaseCommand {
       this.printError(`Failed to get context: ${error instanceof Error ? error.message : String(error)}`);
       return { exitCode: 1, message: 'Failed to get context' };
     }
+  }
+
+  /**
+   * Generate LLM-friendly output
+   * @private
+   */
+  private generateLlmOutput(
+    symbol: any,
+    context: any,
+    stats: any,
+    options: any,
+    dbManager: DatabaseManager
+  ): string {
+    let output = '';
+
+    // Header
+    output += `# Context: ${symbol.name}\n\n`;
+    output += `> **Symbol ID**: ${symbol.id}\n`;
+    output += `> **Type**: ${symbol.type}\n`;
+    output += `> **Generated**: ${new Date().toISOString()}\n\n`;
+    output += `---\n\n`;
+
+    // Summary
+    output += `## Summary\n\n`;
+    output += `**${symbol.name}** is a \`${symbol.type}\``;
+    if (symbol.summary) {
+      output += `: ${symbol.summary}`;
+    }
+    output += `\n\n`;
+
+    // Location
+    output += `## Location\n\n`;
+    output += `- **File**: \`${symbol.filePath}\`\n`;
+    output += `- **Line**: ${symbol.line}\n`;
+    output += `- **Type**: \`${symbol.type}\`\n`;
+    output += `- **Visibility**: ${symbol.isPublic ? 'Public API' : 'Internal'}\n`;
+    output += `- **Exported**: ${symbol.isExported ? 'Yes' : 'No'}\n\n`;
+
+    // Relationship Statistics
+    output += `## Relationship Statistics\n\n`;
+    output += `- **Total Relationships**: ${stats.total}\n`;
+    output += `- **Direct Dependencies**: ${context.dependencies.length}\n`;
+    output += `- **Test Coverage**: ${context.tests.length} test(s)\n`;
+    output += `- **Documentation References**: ${context.documentation.length}\n`;
+    output += `- **Semantic Neighbors**: ${context.semanticNeighbors.length}\n\n`;
+
+    // Documentation
+    if (context.documentation.length > 0) {
+      output += `## Documentation\n\n`;
+      output += `This symbol is documented in the following locations:\n\n`;
+      for (const doc of context.documentation) {
+        const docName = doc.replace('doc:', '');
+        output += `- [[${docName}]]\n`;
+      }
+      output += `\n`;
+    }
+
+    // Dependencies
+    if (context.dependencies.length > 0) {
+      output += `## Dependencies\n\n`;
+      output += `This symbol depends on:\n\n`;
+      const deps = context.dependencies.slice(0, 20);
+      for (const depId of deps) {
+        const depSymbol = dbManager.getSymbol(depId);
+        if (depSymbol) {
+          output += `- **${depSymbol.name}** (\`${depSymbol.type}\`) - \`${depSymbol.filePath}\`\n`;
+        } else {
+          output += `- \`${depId}\` (external)\n`;
+        }
+      }
+      if (context.dependencies.length > 20) {
+        output += `\n_... and ${context.dependencies.length - 20} more dependencies_\n`;
+      }
+      output += `\n`;
+    }
+
+    // Test Coverage
+    if (context.tests.length > 0) {
+      output += `## Test Coverage\n\n`;
+      output += `This symbol is tested by:\n\n`;
+      const tests = context.tests.slice(0, 15);
+      for (const testId of tests) {
+        const testSymbol = dbManager.getSymbol(testId);
+        if (testSymbol) {
+          const fileName = testSymbol.filePath.split('/').pop() || testSymbol.filePath;
+          output += `- **${testSymbol.name}** - \`${fileName}\`\n`;
+        }
+      }
+      if (context.tests.length > 15) {
+        output += `\n_... and ${context.tests.length - 15} more tests_\n`;
+      }
+      output += `\n`;
+    }
+
+    // Semantic Neighbors
+    if (context.semanticNeighbors.length > 0) {
+      output += `## Semantic Neighbors\n\n`;
+      output += `Related symbols you may want to understand:\n\n`;
+      const neighbors = context.semanticNeighbors.slice(0, 10);
+      for (const neighborId of neighbors) {
+        const neighborSymbol = dbManager.getSymbol(neighborId);
+        if (neighborSymbol) {
+          output += `- **${neighborSymbol.name}** (\`${neighborSymbol.type}\`) - \`${neighborSymbol.filePath}\`\n`;
+        }
+      }
+      if (context.semanticNeighbors.length > 10) {
+        output += `\n_... and ${context.semanticNeighbors.length - 10} more neighbors_\n`;
+      }
+      output += `\n`;
+    }
+
+    // Relationship Breakdown
+    output += `## Relationship Breakdown\n\n`;
+    output += `### By Type\n\n`;
+    const sortedTypes = Object.entries(stats.byType).sort((a: any, b: any) => b[1] - a[1]);
+    for (const [type, count] of sortedTypes) {
+      output += `- **${type}**: ${count}\n`;
+    }
+    output += `\n`;
+
+    output += `### By Category\n\n`;
+    const sortedCategories = Object.entries(stats.byCategory).sort((a: any, b: any) => b[1] - a[1]);
+    for (const [category, count] of sortedCategories) {
+      output += `- **${category}**: ${count}\n`;
+    }
+    output += `\n`;
+
+    // Multi-hop traversal
+    if (options.depth && options.depth > 1) {
+      output += `## ${options.depth}-Hop Neighborhood\n\n`;
+      const engine = new RelationshipQueryEngine(dbManager);
+      const traversal = engine.traverse(symbol.id, {
+        maxDepth: options.depth,
+        types: options.types,
+        categories: options.categories,
+        minConfidence: options.minConfidence,
+      });
+
+      const byDepth = new Map<number, string[]>();
+      for (const [sym, depth] of traversal) {
+        if (sym === symbol.id) continue;
+        if (!byDepth.has(depth)) byDepth.set(depth, []);
+        byDepth.get(depth)!.push(sym);
+      }
+
+      for (let d = 1; d <= options.depth; d++) {
+        const symbols = byDepth.get(d) || [];
+        output += `- **${d} hop${d > 1 ? 's' : ''}**: ${symbols.length} symbols\n`;
+      }
+
+      output += `\n**Total reachable**: ${traversal.size - 1} symbols\n\n`;
+    }
+
+    // Footer
+    output += `---\n\n`;
+    output += `_Generated by TSDoc Edge context command with --llm flag_\n`;
+
+    return output;
   }
 
   /**

@@ -71,6 +71,15 @@ export abstract class BaseCommand {
   abstract getName(): string;
 
   /**
+   * Get command aliases
+   *
+   * @returns Array of command aliases (default: empty array)
+   */
+  getAlias(): string[] {
+    return [];
+  }
+
+  /**
    * Get command description
    *
    * @returns Command description

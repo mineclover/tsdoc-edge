@@ -8,6 +8,8 @@ canonical: true
 
 # [[Example - Mermaid Workflow]]
 
+Real-world example of using dependency-meta-structure.mmd as SSOT entrypoint to explore the entire system and achieve 95% coverage.
+
 > **Real-world example**: dependency-meta-structure.mmd를 SSOT로 사용하여 전체 시스템 탐색
 
 ## Scenario

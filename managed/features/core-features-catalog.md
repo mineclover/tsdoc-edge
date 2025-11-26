@@ -406,7 +406,6 @@ tsdoc-edge todos                        # TODO 목록
 - [기본 사용법](../../USAGE_GUIDE.md)
 - [Strict Mode](../../STRICT_MODE_GUIDE.md)
 ### 설계 문서
-- [문서 심볼 설계](../../archive/design/DOCUMENT_SYMBOL_DESIGN.md)
 - [TSDoc 스펙 지원](../../reference/TSDOC_SPEC_SUPPORT.md)
 
 ### 컨벤션
