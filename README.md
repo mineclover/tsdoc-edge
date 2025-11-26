@@ -337,8 +337,8 @@ dot -Tpng arch.dot -o architecture.png
 
 - ✅ **20,150개 관계** 분석 완료
 - ✅ **1,722개 심볼** 추적 중
-- ✅ **6/7 카테고리** 활성화
-- ✅ **47% 구현** 완료 (9/19 타입)
+- ✅ **9개 카테고리** 완전 지원 (Structural, Data Flow, Behavioral, Alternative, Constraint, Semantic, Testing, Type System, Architectural)
+- ✅ **93% 구현** 완료 (29/31 타입)
 
 **주요 발견사항**:
 - 5개 핵심 허브 (변경 관리 주의)
