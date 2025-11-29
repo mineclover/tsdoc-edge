@@ -4,14 +4,14 @@
  */
 
 import { NamingPatternRelationAnalyzer } from '../../analyzer/NamingPatternRelationAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import type { SymbolGraph, Symbol, SymbolType } from '../../types/graph';
 
 // Helper to create test symbols
 const createSymbol = (
   id: string,
   name: string,
   filePath: string = 'src/test.ts',
-  type: string = 'class'
+  type: SymbolType = 'class'
 ): Symbol => ({
   id,
   name,
@@ -21,9 +21,8 @@ const createSymbol = (
   column: 1,
   isExported: true,
   isPublic: true,
-  dependencies: [],
-  dependents: [],
-  tags: {},
+  tests: [],
+  designDecisions: [],
 });
 
 // Helper to create mock symbol graph

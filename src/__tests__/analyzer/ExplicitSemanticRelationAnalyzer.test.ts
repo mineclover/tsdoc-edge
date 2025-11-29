@@ -49,7 +49,7 @@ describe('ExplicitSemanticRelationAnalyzer', () => {
         testFile,
         `
 /**
- * Simple class without @relatedTo tags
+ * Simple class without any special tags
  */
 export class SimpleClass {
   method() {
@@ -387,7 +387,7 @@ export class ServiceB {}
       expect(stats.total).toBe(3);
       expect(stats.withDescription).toBe(2); // ServiceB and ServiceA back reference
       expect(stats.withoutDescription).toBe(1); // ServiceC
-      expect(stats.uniqueSymbols).toBe(4); // ServiceA, ServiceB, ServiceC, ServiceA (as target)
+      expect(stats.uniqueSymbols).toBe(3); // ServiceA, ServiceB, ServiceC (unique symbols)
     });
 
     it('should find most connected symbols', () => {

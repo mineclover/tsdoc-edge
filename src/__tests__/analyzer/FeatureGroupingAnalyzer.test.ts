@@ -31,9 +31,8 @@ const createSymbol = (id: string, name: string, filePath: string): Symbol => ({
   column: 1,
   isExported: true,
   isPublic: true,
-  dependencies: [],
-  dependents: [],
-  tags: {},
+  tests: [],
+  designDecisions: [],
 });
 
 describe('FeatureGroupingAnalyzer', () => {

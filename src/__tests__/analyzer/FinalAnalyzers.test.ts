@@ -56,9 +56,8 @@ const createSymbol = (id: string, name: string, filePath: string = 'src/test.ts'
   column: 1,
   isExported: true,
   isPublic: true,
-  dependencies: [],
-  dependents: [],
-  tags: {},
+  tests: [],
+  designDecisions: [],
 });
 
 describe('FinalAnalyzers', () => {

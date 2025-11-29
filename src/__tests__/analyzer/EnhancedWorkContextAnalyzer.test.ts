@@ -5,7 +5,7 @@
 
 import { EnhancedWorkContextAnalyzer } from '../../analyzer/EnhancedWorkContextAnalyzer';
 import type { DatabaseManager } from '../../storage/DatabaseManager';
-import type { Symbol } from '../../types/graph';
+import type { Symbol, SymbolType } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships/unified';
 
 // Mock DatabaseManager
@@ -28,7 +28,7 @@ const createSymbol = (
   id: string,
   name: string,
   filePath: string,
-  type: string = 'class'
+  type: SymbolType = 'class'
 ): Symbol => ({
   id,
   name,
@@ -38,9 +38,8 @@ const createSymbol = (
   column: 1,
   isExported: true,
   isPublic: true,
-  dependencies: [],
-  dependents: [],
-  tags: {},
+  tests: [],
+  designDecisions: [],
 });
 
 describe('EnhancedWorkContextAnalyzer', () => {
@@ -118,8 +117,14 @@ describe('EnhancedWorkContextAnalyzer', () => {
           category: 'structural',
           from: 'class-user-service',
           to: 'class-db-manager',
+          direction: 'unidirectional',
+          strength: 'strong',
           confidence: 1.0,
-          metadata: {},
+          evidence: [],
+          discoveredBy: 'static-analysis',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          properties: {},
         },
       ];
 
@@ -145,8 +150,14 @@ describe('EnhancedWorkContextAnalyzer', () => {
           category: 'structural',
           from: 'class-controller',
           to: 'class-user-service',
+          direction: 'unidirectional',
+          strength: 'strong',
           confidence: 1.0,
-          metadata: {},
+          evidence: [],
+          discoveredBy: 'static-analysis',
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          properties: {},
         },
       ];
 
@@ -167,7 +178,7 @@ describe('EnhancedWorkContextAnalyzer', () => {
       const symbols = [
         createSymbol('class-user-service', 'UserService', 'src/services/UserService.ts'),
         createSymbol('method-get-user', 'getUser', 'src/services/UserService.ts', 'method'),
-        createSymbol('test-user-service', 'UserServiceTest', 'src/__tests__/UserService.test.ts', 'test'),
+        createSymbol('test-user-service', 'UserServiceTest', 'src/__tests__/UserService.test.ts', 'test-suite'),
       ];
       const mockDb = createMockDb(symbols);
       const analyzer = new EnhancedWorkContextAnalyzer(mockDb);

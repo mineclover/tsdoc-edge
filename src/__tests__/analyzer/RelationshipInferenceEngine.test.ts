@@ -17,12 +17,15 @@ const createRelationship = (
   type: type as any,
   from,
   to,
+  direction: options.direction || 'undirected',
+  strength: options.strength || 'medium',
   category: options.category || 'semantic',
   confidence: options.confidence || 0.8,
   evidence: [],
-  discoveredBy: 'test',
+  discoveredBy: 'static-analysis',
   createdAt: new Date().toISOString(),
   updatedAt: new Date().toISOString(),
+  properties: options.properties || {},
   ...options,
 });
 
