@@ -10,7 +10,7 @@ source-diagram: managed/architecture/diagrams/dependency-meta-structure.mmd
 
 # [[Relationship Types]]
 
-Master index for all 26 relationship types tracked by TSDoc Edge across 7 spaces (Code, Data, Behavior, Meta, Type, Architectural, Quality).
+Master index for all 31 relationship types tracked by TSDoc Edge across 9 categories (Structural, Data Flow, Behavioral, Alternative, Constraint, Semantic, Testing, Type System, Architectural).
 
 > **SSOT**: Master index for all relationship types tracked by TSDoc Edge
 > **Source**: [[Dependency Meta-Structure]] (`managed/architecture/diagrams/dependency-meta-structure.mmd`)
@@ -25,10 +25,10 @@ tsdoc-edge explore-entrypoint managed/relationships/index.md --detect-orphans
 tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-structure.mmd
 ```
 
-## Status: 26/26 Implemented (100%) ✅
+## Status: 29/31 Implemented (93%) ✅
 
-**Version**: 2.0
-**Last Updated**: 2025-11-11
+**Version**: 2.1
+**Last Updated**: 2025-11-26
 **Source**: `src/types/relationships/unified.ts`
 
 ## 1. Code Space (구조적)

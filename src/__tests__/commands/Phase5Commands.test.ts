@@ -254,9 +254,14 @@ describe('Phase 5 Commands', () => {
 
   describe('WhoUsesCommand', () => {
     let command: WhoUsesCommand;
+    const originalCwd = process.cwd();
 
     beforeEach(() => {
       command = new WhoUsesCommand();
+    });
+
+    afterEach(() => {
+      process.chdir(originalCwd);
     });
 
     it('should have correct name', () => {
@@ -274,6 +279,8 @@ describe('Phase 5 Commands', () => {
     });
 
     it('should return error if database not found', async () => {
+      // Change to temp directory where no database exists
+      process.chdir(tempDir);
       const result = await command.execute(['TestSymbol']);
       expect(result.exitCode).toBe(1);
       expect(result.message).toContain('not found');
@@ -436,7 +443,7 @@ describe('Phase 5 Commands', () => {
       } as any;
 
       const cmd = new OrphansCommand(mockManager);
-      const result = await cmd.execute([]);
+      const result = await cmd.execute(['--fast']);
 
       expect(result.exitCode).toBe(0);
     });
@@ -454,7 +461,7 @@ describe('Phase 5 Commands', () => {
       } as any;
 
       const cmd = new OrphansCommand(mockManager);
-      const result = await cmd.execute([]);
+      const result = await cmd.execute(['--fast']);
 
       expect(result.exitCode).toBe(0);
       expect(mockManager.findOrphans).toHaveBeenCalled();
@@ -473,7 +480,7 @@ describe('Phase 5 Commands', () => {
       } as any;
 
       const cmd = new OrphansCommand(mockManager);
-      const result = await cmd.execute([]);
+      const result = await cmd.execute(['--fast']);
 
       expect(result.exitCode).toBe(0);
     });
@@ -484,7 +491,7 @@ describe('Phase 5 Commands', () => {
       } as any;
 
       const cmd = new OrphansCommand(mockManager);
-      await cmd.execute([]);
+      await cmd.execute(['--fast']);
 
       expect(mockManager.findOrphans).toHaveBeenCalled();
     });

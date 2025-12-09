@@ -11,14 +11,14 @@ TSDoc Edge는 단순한 문서 생성 도구가 아닙니다. 코드베이스의
 ![Health Score](https://img.shields.io/badge/Health-C%20(64%2F100)-yellow?style=flat-square)
 ![Documentation](https://img.shields.io/badge/Documentation-93%25-brightgreen?style=flat-square)
 ![Test Coverage](https://img.shields.io/badge/Tests-46%25-orange?style=flat-square)
-![Commands](https://img.shields.io/badge/Commands-65-blue?style=flat-square)
+![Commands](https://img.shields.io/badge/Commands-109-blue?style=flat-square)
 ![Symbol Refs](https://img.shields.io/badge/Symbol%20Refs-0%20errors-success?style=flat-square)
 
 **현재 상태**:
 - ✅ 0개 심볼 참조 오류 (완벽!)
 - ✅ 0개 순환 의존성
 - ✅ 0개 죽은 코드
-- ✅ 65개 CLI 명령어 (100% 문서화)
+- ✅ 109개 CLI 명령어 (15개 카테고리)
 - ✅ 1,708개 호출 관계 추적
 - ✅ 9,439개 I/O 의존성 분석
 
@@ -337,8 +337,8 @@ dot -Tpng arch.dot -o architecture.png
 
 - ✅ **20,150개 관계** 분석 완료
 - ✅ **1,722개 심볼** 추적 중
-- ✅ **6/7 카테고리** 활성화
-- ✅ **47% 구현** 완료 (9/19 타입)
+- ✅ **9개 카테고리** 완전 지원 (Structural, Data Flow, Behavioral, Alternative, Constraint, Semantic, Testing, Type System, Architectural)
+- ✅ **93% 구현** 완료 (29/31 타입)
 
 **주요 발견사항**:
 - 5개 핵심 허브 (변경 관리 주의)
@@ -369,7 +369,7 @@ dot -Tpng arch.dot -o architecture.png
 
 ### ✅ CLI 도구 (v0.8.0 + v0.10.0 + v0.11.0 + v0.12.0) - NEW! 🔥
 
-**65개 명령어로 완전한 문서 관리 - 완전 모듈화 완료** 🎉
+**109개 명령어로 완전한 문서 관리 (15개 카테고리)** 🎉
 
 #### 🌟 핵심 워크플로우 (2개) - 가장 중요!
 - `work-context <file>` - **파일 작업에 필요한 모든 컨텍스트 제공** 🔥
