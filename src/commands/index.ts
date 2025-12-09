@@ -41,18 +41,14 @@ export { StatsCommand } from './StatsCommand';
 export { CoreApiCommand } from './CoreApiCommand';
 export { ScanCommand } from './ScanCommand';
 export { SyncCoverageCommand } from './SyncCoverageCommand';
-export {
-  UntestedCommand,
-  WithoutResponsibilityCommand,
-  WithoutContractCommand,
-  FixCommand,
-} from './Phase8Commands';
-export {
-  IdCommand,
-  ImproveCommand,
-  InstallHookCommand,
-  UninstallHookCommand,
-} from './Phase10Commands';
+export { UntestedCommand } from './UntestedCommand';
+export { WithoutResponsibilityCommand } from './WithoutResponsibilityCommand';
+export { WithoutContractCommand } from './WithoutContractCommand';
+export { FixCommand } from './FixCommand';
+export { IdCommand } from './IdCommand';
+export { ImproveCommand } from './ImproveCommand';
+export { InstallHookCommand } from './InstallHookCommand';
+export { UninstallHookCommand } from './UninstallHookCommand';
 export { CommandRegistry } from './CommandRegistry';
 export { AnalyzeIOCommand } from './AnalyzeIOCommand';
 export { VisualizeDepsCommand } from './VisualizeDepsCommand';
