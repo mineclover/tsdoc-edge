@@ -29,8 +29,10 @@ Phase4Commands.ts:   707 lines (5 commands)
 Phase5Commands.ts:   865 lines (6 commands)
 Phase6Commands.ts: 1,178 lines (7 commands)
 Phase7Commands.ts: 1,065 lines (6 commands)
+Phase8Commands.ts:   555 lines (4 commands)
+Phase10Commands.ts:  595 lines (4 commands)
 ───────────────────────────────────────────
-Total:           3,815 lines (24 commands)
+Total:           4,965 lines (33 commands)
 ```
 
 ## Solution
@@ -226,17 +228,43 @@ git commit -m "refactor: Remove Phase6Commands after extracting all commands"
 **Progress**: 5/5 (100%) ✅
 **Legacy File Deleted**: 243349c
 
+### Phase8Commands.ts (4 commands) ✅ COMPLETE
+
+| Command | Lines | Status | Commit |
+|---------|-------|--------|--------|
+| UntestedCommand | 131 | ✅ Done | 8f4f02c |
+| WithoutResponsibilityCommand | 129 | ✅ Done | 8f4f02c |
+| WithoutContractCommand | 129 | ✅ Done | 8f4f02c |
+| FixCommand | 165 | ✅ Done | 8f4f02c |
+
+**Progress**: 4/4 (100%) ✅
+**Legacy File Deleted**: 8f4f02c
+
+### Phase10Commands.ts (4 commands) ✅ COMPLETE
+
+| Command | Lines | Status | Commit |
+|---------|-------|--------|--------|
+| IdCommand | 241 | ✅ Done | 8f4f02c |
+| ImproveCommand | 138 | ✅ Done | 8f4f02c |
+| InstallHookCommand | 109 | ✅ Done | 8f4f02c |
+| UninstallHookCommand | 83 | ✅ Done | 8f4f02c |
+
+**Progress**: 4/4 (100%) ✅
+**Legacy File Deleted**: 8f4f02c
+
 ### Overall Progress
 
 ```
-Total: 25 commands
-Completed: 25 commands (100%) ✅ COMPLETE
+Total: 33 commands
+Completed: 33 commands (100%) ✅ COMPLETE
 Remaining: 0 commands (0%)
 
+Phase4Commands.ts: 5/5 ✅ COMPLETE
+Phase5Commands.ts: 6/6 ✅ COMPLETE
 Phase6Commands.ts: 7/7 ✅ COMPLETE
 Phase7Commands.ts: 7/7 ✅ COMPLETE
-Phase5Commands.ts: 6/6 ✅ COMPLETE
-Phase4Commands.ts: 5/5 ✅ COMPLETE
+Phase8Commands.ts: 4/4 ✅ COMPLETE
+Phase10Commands.ts: 4/4 ✅ COMPLETE
 
 All Phase Commands refactoring: COMPLETE
 ```
@@ -325,14 +353,16 @@ Script would:
 
 ✅ **ALL PHASES COMPLETE**
 
-1. ~~**Phase6Commands.ts**~~ ✅ 7/7 commands extracted
-2. ~~**Phase7Commands.ts**~~ ✅ 7/7 commands extracted
-3. ~~**Phase5Commands.ts**~~ ✅ 6/6 commands extracted
-4. ~~**Phase4Commands.ts**~~ ✅ 5/5 commands extracted
+1. ~~**Phase4Commands.ts**~~ ✅ 5/5 commands extracted
+2. ~~**Phase5Commands.ts**~~ ✅ 6/6 commands extracted
+3. ~~**Phase6Commands.ts**~~ ✅ 7/7 commands extracted
+4. ~~**Phase7Commands.ts**~~ ✅ 7/7 commands extracted
+5. ~~**Phase8Commands.ts**~~ ✅ 4/4 commands extracted
+6. ~~**Phase10Commands.ts**~~ ✅ 4/4 commands extracted
 
-**Total**: 25 commands successfully refactored
-**Legacy code removed**: 3,515 lines (4 monolithic files)
-**New modular files**: 25 focused command files (avg 142 lines each)
+**Total**: 33 commands successfully refactored
+**Legacy code removed**: 4,965 lines (6 monolithic files)
+**New modular files**: 33 focused command files (avg ~140 lines each)
 
 ## Related
 
@@ -343,12 +373,14 @@ Script would:
 ## Timeline
 
 - **Start**: 2025-11-13
+- **Phase4 completion**: 2025-11-13 (5 commands)
+- **Phase5 completion**: 2025-11-13 (6 commands)
 - **Phase6 completion**: 2025-11-13 (7 commands)
 - **Phase7 completion**: 2025-11-13 (7 commands)
-- **Phase5 completion**: 2025-11-13 (6 commands)
-- **Phase4 completion**: 2025-11-13 (5 commands)
+- **Phase8 completion**: 2025-12-09 (4 commands)
+- **Phase10 completion**: 2025-12-09 (4 commands)
 - **Target completion**: 2025-11-15
-- **Actual completion**: 2025-11-13 ✅ (2 days ahead of schedule!)
+- **Actual completion**: 2025-12-09 ✅ (All phases complete!)
 
 ## Phase6 Summary
 
@@ -418,10 +450,36 @@ Completed all 5 commands from Phase4Commands.ts:
 - ✅ Fixed import issues (path module)
 - ✅ Zero regressions
 
+## Phase8 Summary
+
+Completed all 4 commands from Phase8Commands.ts:
+
+**Commit**:
+1. 8f4f02c - All 4 commands (UntestedCommand, WithoutResponsibilityCommand, WithoutContractCommand, FixCommand)
+
+**Results**:
+- ✅ Reduced from 1 file (555 lines) to 4 files (avg 138 lines each)
+- ✅ All commands tested and working
+- ✅ Build successful
+- ✅ Zero regressions
+
+## Phase10 Summary
+
+Completed all 4 commands from Phase10Commands.ts:
+
+**Commit**:
+1. 8f4f02c - All 4 commands (IdCommand, ImproveCommand, InstallHookCommand, UninstallHookCommand)
+
+**Results**:
+- ✅ Reduced from 1 file (595 lines) to 4 files (avg 143 lines each)
+- ✅ All commands tested and working
+- ✅ Build successful
+- ✅ Zero regressions
+
 ---
 
-**Last Updated**: 2025-11-13
-**Progress**: 25/25 commands (100%) ✅ COMPLETE
+**Last Updated**: 2025-12-09
+**Progress**: 33/33 commands (100%) ✅ COMPLETE
 **Status**: ✅ Complete
 
 ---
