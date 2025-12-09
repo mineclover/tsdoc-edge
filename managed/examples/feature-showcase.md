@@ -257,11 +257,19 @@ Files Needing Attention: 55
 
 ## Related Documents
 
+### Core Documents
 - [[CoreWorkflow]] - 핵심 워크플로우
 - [[DocumentSymbolSystem]] - 심볼 시스템 상세
 - [[Relationship Ontology]] - 관계 타입 정의
 - [[Module Specification Framework]] - 7관점 명세 프레임워크
+
+### Workflows
 - [[Work Context Workflow]] - 컨텍스트 워크플로우 가이드
+- [[Relationship System Roadmap]] - 관계 분석 시스템 로드맵
+
+### Project Reports
+- [[Codebase Health Report]] - 코드베이스 건강도 분석
+- [[Phase Commands Refactoring Guide]] - 명령어 리팩토링 가이드
 
 ---
 
