@@ -37,6 +37,10 @@ yarn-error.log*
 # Generated files and reports
 docs/generated/
 .tsdoc/reports/
+.tsdoc/symbols.db
+.tsdoc/registry.jsonl
+.tsdoc/doc-symbols.json
+.tsdoc/data/
 
 # Temporary files
 tmp/
