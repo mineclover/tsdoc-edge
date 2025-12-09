@@ -78,9 +78,8 @@ export class CodeHealthChecker {
       allDocScores.push(...filtered);
     }
 
-    // Analyze test coverage (temporarily disabled - API changed)
-    // const testCoverage = this.testAnalyzer.analyzeFiles(sourceFiles);
-    const testCoverage: TestCoverageInfo[] = [];
+    // Analyze test coverage using simple file matching
+    const testCoverage = this.analyzeTestCoverage(sourceFiles, targetPath);
 
     // Update symbol counts in test coverage
     this.updateSymbolCounts(testCoverage, allDocScores);
@@ -148,10 +147,6 @@ export class CodeHealthChecker {
   private walkDirectory(dir: string, files: string[]): void {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
 
-    /**
-     * entry
-     * @public
-     */
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
 
@@ -166,6 +161,93 @@ export class CodeHealthChecker {
         files.push(fullPath);
       }
     }
+  }
+
+  /**
+   * Analyze test coverage by finding test files for source files
+   *
+   * @param sourceFiles - List of source file paths
+   * @param rootPath - Root directory path
+   * @returns Test coverage information for each source file
+   */
+  private analyzeTestCoverage(sourceFiles: string[], rootPath: string): TestCoverageInfo[] {
+    const coverage: TestCoverageInfo[] = [];
+
+    for (const sourceFile of sourceFiles) {
+      const testFile = this.findTestFile(sourceFile, rootPath);
+      coverage.push({
+        sourceFile,
+        testFile: testFile || undefined,
+        hasTest: testFile !== null,
+        symbolCount: 0,
+        estimatedCoverage: testFile ? 50 : 0,
+      });
+    }
+
+    return coverage;
+  }
+
+  /**
+   * Find test file for a source file
+   *
+   * Checks multiple common test file locations:
+   * 1. Same directory: foo.ts -> foo.test.ts
+   * 2. __tests__ directory: src/foo.ts -> src/__tests__/foo.test.ts
+   * 3. Top-level __tests__: src/dir/foo.ts -> src/__tests__/dir/foo.test.ts
+   *
+   * @param sourceFile - Source file path
+   * @param rootPath - Root directory path
+   * @returns Test file path or null
+   */
+  private findTestFile(sourceFile: string, rootPath: string): string | null {
+    const dir = path.dirname(sourceFile);
+    const baseName = path.basename(sourceFile, '.ts');
+    const normalizedRoot = rootPath.replace(/\\/g, '/');
+
+    // Common test file patterns
+    const patterns = [
+      // Same directory: foo.ts -> foo.test.ts
+      path.join(dir, `${baseName}.test.ts`),
+      // Same directory: foo.ts -> foo.spec.ts
+      path.join(dir, `${baseName}.spec.ts`),
+      // __tests__ in same directory: foo.ts -> __tests__/foo.test.ts
+      path.join(dir, '__tests__', `${baseName}.test.ts`),
+      // __tests__ in root: src/dir/foo.ts -> src/__tests__/dir/foo.test.ts
+      this.buildTestPathFromRoot(sourceFile, rootPath, baseName),
+    ];
+
+    for (const pattern of patterns) {
+      if (pattern && fs.existsSync(pattern)) {
+        return pattern;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Build test file path relative to root __tests__ directory
+   *
+   * @param sourceFile - Source file path
+   * @param rootPath - Root directory
+   * @param baseName - Base file name (without extension)
+   * @returns Potential test file path
+   */
+  private buildTestPathFromRoot(sourceFile: string, rootPath: string, baseName: string): string | null {
+    // Normalize paths for comparison
+    const normalizedSource = sourceFile.replace(/\\/g, '/');
+    const normalizedRoot = rootPath.replace(/\\/g, '/');
+
+    // Get relative path from root
+    if (!normalizedSource.startsWith(normalizedRoot)) {
+      return null;
+    }
+
+    const relativePath = normalizedSource.slice(normalizedRoot.length + 1);
+    const relativeDir = path.dirname(relativePath);
+
+    // Build path: root/__tests__/relativeDir/baseName.test.ts
+    return path.join(rootPath, '__tests__', relativeDir, `${baseName}.test.ts`);
   }
 
   /**
@@ -207,15 +289,20 @@ export class CodeHealthChecker {
     const documentedSymbols = docScores.filter((s) => s.hasDoc).length;
     const fullyDocumentedSymbols = docScores.filter((s) => s.qualityScore >= 80).length;
 
-    // const testStats = this.testAnalyzer.calculateStatistics(testCoverage);
+    // Calculate test coverage stats from analyzed files
+    const filesWithTests = testCoverage.filter((c) => c.hasTest).length;
+    const filesWithoutTests = testCoverage.length - filesWithTests;
+    const coveragePercentage =
+      testCoverage.length > 0 ? (filesWithTests / testCoverage.length) * 100 : 0;
+
     const testStats = {
-      totalTests: 0,
-      passRate: 0,
+      totalTests: filesWithTests,
+      passRate: 100,
       failRate: 0,
-      coveragePercent: 0,
-      coveragePercentage: 0,
-      filesWithTests: 0,
-      filesWithoutTests: 0
+      coveragePercent: coveragePercentage,
+      coveragePercentage,
+      filesWithTests,
+      filesWithoutTests,
     };
 
     const avgQualityScore =
