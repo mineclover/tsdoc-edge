@@ -388,16 +388,15 @@ export class FileScanner {
    * @private
    */
   private shouldExclude(filePath: string, patterns: string[]): boolean {
-    /**
-     * pattern
-     * @public
-     */
+    // Normalize path separators for cross-platform matching
+    const normalizedPath = filePath.replace(/\\/g, '/');
+
     for (const pattern of patterns) {
       // Simple glob pattern matching
       const regex = new RegExp(
         pattern.replace(/\*\*/g, '.*').replace(/\*/g, '[^/]*').replace(/\?/g, '.')
       );
-      if (regex.test(filePath)) {
+      if (regex.test(normalizedPath)) {
         return true;
       }
     }
