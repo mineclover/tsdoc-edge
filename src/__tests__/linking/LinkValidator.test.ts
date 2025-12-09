@@ -37,11 +37,14 @@ describe('LinkValidator', () => {
       const codeFile = path.join(tempDir, 'code.ts');
       const docFile = path.join(tempDir, 'doc.md');
 
+      // Use relative path from project root for @see tag
+      const relativeDocPath = path.relative(projectRoot, docFile).replace(/\\/g, '/');
+
       fs.writeFileSync(
         codeFile,
         `
 /**
- * @see ${docFile}
+ * @see ${relativeDocPath}
  */
 export class Valid {}
       `
@@ -148,14 +151,18 @@ export class Broken {}
       const doc1 = path.join(tempDir, 'guide.md');
       const doc2 = path.join(tempDir, 'api.md');
 
+      // Use relative paths from project root for @see tags
+      const relativeDoc1 = path.relative(projectRoot, doc1).replace(/\\/g, '/');
+      const relativeDoc2 = path.relative(projectRoot, doc2).replace(/\\/g, '/');
+
       fs.writeFileSync(doc1, '# Guide');
       fs.writeFileSync(doc2, '# API');
       fs.writeFileSync(
         codeFile,
         `
 /**
- * @see ${doc1}
- * @link ${doc2}
+ * @see ${relativeDoc1}
+ * @link ${relativeDoc2}
  */
 export class Test {}
       `
@@ -169,14 +176,15 @@ export class Test {}
 
     it('should detect missing documents', () => {
       const codeFile = path.join(tempDir, 'test.ts');
-      const missingDoc = path.join(tempDir, 'missing.md');
+      // Use relative path for missing doc (file doesn't exist)
+      const missingDocRelative = 'missing.md';
 
       fs.writeFileSync(
         codeFile,
         `
 /**
  * Test class documentation
- * @see ${missingDoc}
+ * @see ${missingDocRelative}
  */
 export class Test {}
       `
