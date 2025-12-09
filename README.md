@@ -348,6 +348,52 @@ dot -Tpng arch.dot -o architecture.png
 
 ---
 
+## 🔌 LSP 통합 (NEW!)
+
+VS Code, Vim, Emacs 등 LSP 클라이언트에서 TSDoc Edge 분석 결과를 실시간으로 활용할 수 있습니다.
+
+### 지원 기능
+
+| 기능 | 설명 |
+|------|------|
+| **Hover** | 심볼 정보 + 영향 분석 (downstream/upstream) |
+| **Code Lens** | 심볼별 `↓3 ↑5` 형태로 영향 범위 표시 |
+| **Code Action** | 영향 분석, 관련 심볼 탐색 액션 |
+| **Document Link** | `[[Symbol]]` 참조 클릭 시 정의로 이동 |
+| **Definition** | 심볼 정의로 이동 |
+| **Workspace Symbol** | 워크스페이스 전체 심볼 검색 |
+| **Diagnostics** | 순환 의존성, 레이어 위반 자동 경고 |
+
+### 빠른 시작
+
+```bash
+# 1. 데이터베이스 빌드
+tsdoc-edge build src
+
+# 2. LSP 서버 실행 (stdio 모드)
+node dist/lsp/server.js
+```
+
+### VS Code 연동
+
+VS Code 확장에서 LSP 클라이언트를 설정합니다:
+
+```ts
+const serverModule = context.asAbsolutePath('dist/lsp/server.js')
+const serverOptions = { module: serverModule, transport: TransportKind.stdio }
+const client = new LanguageClient('tsdoc-edge', 'TSDoc Edge', serverOptions, clientOptions)
+```
+
+### 성능
+
+- **캐싱**: 5초 TTL로 파일별 캐싱
+- **Prepared Statements**: 쿼리 재컴파일 방지
+- **응답 시간**: 0-1ms (캐시 히트 시)
+
+📖 **상세 문서**: [managed/features/lsp-integration.md](managed/features/lsp-integration.md)
+
+---
+
 ## 핵심 개념
 
 ### 🔗 연결성 (Connectivity)

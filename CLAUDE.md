@@ -113,8 +113,28 @@ tsdoc-edge relationship-clusters
 5. **문서 심볼** (`src/doc-symbol/`): `[[Symbol]]` 기반 양방향 연결
 6. **명세서 관리** (`src/spec/`): 문서 완성도 및 생명주기 관리
 7. **분석** (`src/analyzer/`): 코드 건강도 및 품질 분석
+8. **LSP 서버** (`src/lsp/`): IDE 통합 실시간 분석
 
 설정: `.tsdoc.config.json`으로 모든 동작 제어
+
+### LSP 통합
+
+IDE에서 실시간 분석 결과 활용:
+
+```bash
+# LSP 서버 실행
+node dist/lsp/server.js
+```
+
+**지원 기능**:
+- Hover: 심볼 정보 + 영향 분석
+- Code Lens: `↓downstream ↑upstream` 인라인 표시
+- Code Action: 영향 분석, 관련 심볼 탐색
+- Document Link: `[[Symbol]]` 클릭 시 정의로 이동
+- Definition: 심볼 정의로 이동
+- Diagnostics: 순환 의존성, 레이어 위반 경고
+
+상세: `managed/features/lsp-integration.md`
 
 ## 개발 시 주의사항
 
@@ -149,6 +169,7 @@ src/
 ├── commands/     # CLI 명령어
 ├── doc-symbol/   # [[Symbol]] 시스템
 ├── graph/        # 심볼 그래프
+├── lsp/          # LSP 서버 (server.ts, service.ts)
 ├── parser/       # TSDoc 파싱
 ├── storage/      # DB + JSONL
 ├── validator/    # 검증
@@ -160,3 +181,4 @@ src/
 - `README.md`: 프로젝트 개요 및 전체 기능
 - `managed/workflows/work-context-workflow.md`: work-context 명령어 상세
 - `managed/features/`: 기능별 명세서
+- `managed/features/lsp-integration.md`: LSP 통합 상세 문서
