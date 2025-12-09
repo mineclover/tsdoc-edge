@@ -123,8 +123,16 @@ export class BuildCommand extends BaseCommand {
 
       // Setup paths
       const config = this.configManager.get();
-      const dbPath = path.join(process.cwd(), config.paths.databasePath || '.tsdoc.db');
-      const jsonlPath = path.join(process.cwd(), config.paths.jsonlDir || 'docs/data');
+      const dbPathConfig = config.paths.databasePath || '.tsdoc.db';
+      const jsonlPathConfig = config.paths.jsonlDir || 'docs/data';
+
+      // Use path as-is if absolute, otherwise join with cwd
+      const dbPath = path.isAbsolute(dbPathConfig)
+        ? dbPathConfig
+        : path.join(process.cwd(), dbPathConfig);
+      const jsonlPath = path.isAbsolute(jsonlPathConfig)
+        ? jsonlPathConfig
+        : path.join(process.cwd(), jsonlPathConfig);
 
       // Ensure jsonl directory exists
       if (!fs.existsSync(jsonlPath)) {
