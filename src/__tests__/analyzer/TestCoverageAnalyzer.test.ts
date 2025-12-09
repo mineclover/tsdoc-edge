@@ -1,25 +1,44 @@
 /**
  * Tests for TestCoverageAnalyzer
+ *
+ * Tests the relationship extraction between test symbols and implementation symbols.
  */
 
 import * as fs from 'node:fs';
+import * as os from 'node:os';
 import * as path from 'node:path';
-import { TestCoverageAnalyzer } from '../../analyzer/TestCoverageAnalyzer';
+import {
+  TestCoverageAnalyzer,
+  type TestRelationship,
+  type RelationshipExtractionResult,
+} from '../../analyzer/TestCoverageAnalyzer';
+import { DatabaseManager } from '../../storage/DatabaseManager';
+import type { TestCase, TestSuite, TestScenario, TestSymbol } from '../../types/test-symbols';
 
 describe('TestCoverageAnalyzer', () => {
   let analyzer: TestCoverageAnalyzer;
+  let db: DatabaseManager;
   let tempDir: string;
 
-  beforeEach(() => {
-    analyzer = new TestCoverageAnalyzer();
-    tempDir = path.join(process.cwd(), '.test-temp', `coverage-${Date.now()}`);
-    fs.mkdirSync(tempDir, { recursive: true });
+  beforeAll(() => {
+    // Create temp directory for test database
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'tsdoc-edge-test-'));
   });
 
-  afterEach(() => {
+  afterAll(() => {
+    // Cleanup temp directory
     if (fs.existsSync(tempDir)) {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
+  });
+
+  beforeEach(() => {
+    db = new DatabaseManager(tempDir);
+    analyzer = new TestCoverageAnalyzer(db);
+  });
+
+  afterEach(() => {
+    db.close();
   });
 
   describe('constructor', () => {
@@ -29,824 +48,285 @@ describe('TestCoverageAnalyzer', () => {
     });
   });
 
-  describe('analyzeFile', () => {
-    it('should return coverage info with hasTest true when test file exists', () => {
-      const sourceFile = path.join(tempDir, 'service.ts');
-      const testFile = path.join(tempDir, 'service.test.ts');
+  describe('analyzeTestCoverage', () => {
+    it('should return empty results for empty input', () => {
+      const result = analyzer.analyzeTestCoverage([]);
 
-      fs.writeFileSync(sourceFile, 'export class Service {}', 'utf-8');
-      fs.writeFileSync(testFile, 'describe("Service", () => {})', 'utf-8');
-
-      const result = analyzer.analyzeFile(sourceFile);
-
-      expect(result).toBeDefined();
-      expect(result.sourceFile).toBe(sourceFile);
-      expect(result.testFile).toBe(testFile);
-      expect(result.hasTest).toBe(true);
-      expect(result.estimatedCoverage).toBe(50);
+      expect(result.testCoverageRelations).toEqual([]);
+      expect(result.containsRelations).toEqual([]);
+      expect(result.coversScenarioRelations).toEqual([]);
+      expect(result.coverageStats.totalTestCases).toBe(0);
     });
 
-    it('should return coverage info with hasTest false when no test file exists', () => {
-      const sourceFile = path.join(tempDir, 'untested.ts');
+    it('should create contains relationships for test suites', () => {
+      const testSuite: TestSuite = {
+        id: 'suite-1',
+        name: 'Test Suite',
+        type: 'test-suite',
+        filePath: '/test/example.test.ts',
+        line: 1,
+        column: 0,
+        parentSymbol: null,
+        childSuites: ['suite-2'],
+        testCases: ['case-1'],
+        nestingLevel: 0,
+        isExported: false,
+        isPublic: true,
+        tests: [],
+        designDecisions: [],
+      };
 
-      fs.writeFileSync(sourceFile, 'export class Untested {}', 'utf-8');
+      const childSuite: TestSuite = {
+        id: 'suite-2',
+        name: 'Child Suite',
+        type: 'test-suite',
+        filePath: '/test/example.test.ts',
+        line: 10,
+        column: 0,
+        parentSymbol: 'suite-1',
+        childSuites: [],
+        testCases: [],
+        nestingLevel: 1,
+        isExported: false,
+        isPublic: true,
+        tests: [],
+        designDecisions: [],
+      };
 
-      const result = analyzer.analyzeFile(sourceFile);
+      const testCase: TestCase = {
+        id: 'case-1',
+        name: 'should work',
+        type: 'test-case',
+        filePath: '/test/example.test.ts',
+        line: 5,
+        column: 0,
+        parentSymbol: 'suite-1',
+        testedSymbols: [],
+        testedMethods: [],
+        assertionCount: 1,
+        isExported: false,
+        isPublic: true,
+        tests: [],
+        designDecisions: [],
+      };
 
-      expect(result).toBeDefined();
-      expect(result.sourceFile).toBe(sourceFile);
-      expect(result.testFile).toBeUndefined();
-      expect(result.hasTest).toBe(false);
-      expect(result.estimatedCoverage).toBe(0);
+      const result = analyzer.analyzeTestCoverage([testSuite, childSuite, testCase]);
+
+      expect(result.containsRelations.length).toBeGreaterThan(0);
+
+      // Find suite -> child suite relationship
+      const suiteToChild = result.containsRelations.find(
+        (r) => r.fromSymbols.includes('suite-1') && r.toSymbols.includes('suite-2')
+      );
+      expect(suiteToChild).toBeDefined();
+      expect(suiteToChild?.type).toBe('contains');
+
+      // Find suite -> test case relationship
+      const suiteToCase = result.containsRelations.find(
+        (r) => r.fromSymbols.includes('suite-1') && r.toSymbols.includes('case-1')
+      );
+      expect(suiteToCase).toBeDefined();
+      expect(suiteToCase?.type).toBe('contains');
     });
 
-    it('should initialize symbolCount to 0', () => {
-      const sourceFile = path.join(tempDir, 'code.ts');
-      fs.writeFileSync(sourceFile, 'export class Code {}', 'utf-8');
+    it('should return correct coverage stats', () => {
+      const testCase1: TestCase = {
+        id: 'case-1',
+        name: 'test 1',
+        type: 'test-case',
+        filePath: '/test/a.test.ts',
+        line: 1,
+        column: 0,
+        parentSymbol: null,
+        testedSymbols: [],
+        testedMethods: [],
+        assertionCount: 3,
+        isExported: false,
+        isPublic: true,
+        tests: [],
+        designDecisions: [],
+      };
 
-      const result = analyzer.analyzeFile(sourceFile);
+      const testCase2: TestCase = {
+        id: 'case-2',
+        name: 'test 2',
+        type: 'test-case',
+        filePath: '/test/b.test.ts',
+        line: 1,
+        column: 0,
+        parentSymbol: null,
+        testedSymbols: [],
+        testedMethods: [],
+        assertionCount: 2,
+        isExported: false,
+        isPublic: true,
+        tests: [],
+        designDecisions: [],
+      };
 
-      expect(result.symbolCount).toBe(0);
+      const result = analyzer.analyzeTestCoverage([testCase1, testCase2]);
+
+      expect(result.coverageStats.totalTestCases).toBe(2);
+      expect(result.coverageStats.averageAssertions).toBe(2.5);
     });
 
-    it('should find .spec.ts test files', () => {
-      const sourceFile = path.join(tempDir, 'helper.ts');
-      const testFile = path.join(tempDir, 'helper.spec.ts');
+    it('should handle test cases without assertions', () => {
+      const testCase: TestCase = {
+        id: 'case-no-assert',
+        name: 'test without assertions',
+        type: 'test-case',
+        filePath: '/test/empty.test.ts',
+        line: 1,
+        column: 0,
+        parentSymbol: null,
+        testedSymbols: [],
+        testedMethods: [],
+        assertionCount: 0,
+        isExported: false,
+        isPublic: true,
+        tests: [],
+        designDecisions: [],
+      };
 
-      fs.writeFileSync(sourceFile, 'export function helper() {}', 'utf-8');
-      fs.writeFileSync(testFile, 'describe("helper", () => {})', 'utf-8');
+      const result = analyzer.analyzeTestCoverage([testCase]);
 
-      const result = analyzer.analyzeFile(sourceFile);
-
-      expect(result.testFile).toBe(testFile);
-      expect(result.hasTest).toBe(true);
+      expect(result.coverageStats.totalTestCases).toBe(1);
+      expect(result.coverageStats.averageAssertions).toBe(0);
     });
 
-    it('should prefer .test.ts over .spec.ts when both exist', () => {
-      const sourceFile = path.join(tempDir, 'module.ts');
-      const testFile = path.join(tempDir, 'module.test.ts');
-      const specFile = path.join(tempDir, 'module.spec.ts');
+    it('should handle mixed symbol types', () => {
+      const testSuite: TestSuite = {
+        id: 'suite-mixed',
+        name: 'Mixed Suite',
+        type: 'test-suite',
+        filePath: '/test/mixed.test.ts',
+        line: 1,
+        column: 0,
+        parentSymbol: null,
+        childSuites: [],
+        testCases: ['case-mixed'],
+        nestingLevel: 0,
+        isExported: false,
+        isPublic: true,
+        tests: [],
+        designDecisions: [],
+      };
 
-      fs.writeFileSync(sourceFile, 'export class Module {}', 'utf-8');
-      fs.writeFileSync(testFile, 'describe("Module", () => {})', 'utf-8');
-      fs.writeFileSync(specFile, 'describe("Module", () => {})', 'utf-8');
+      const testCase: TestCase = {
+        id: 'case-mixed',
+        name: 'mixed test',
+        type: 'test-case',
+        filePath: '/test/mixed.test.ts',
+        line: 5,
+        column: 0,
+        parentSymbol: 'suite-mixed',
+        testedSymbols: ['SomeClass'],
+        testedMethods: ['someMethod'],
+        assertionCount: 1,
+        isExported: false,
+        isPublic: true,
+        tests: [],
+        designDecisions: [],
+      };
 
-      const result = analyzer.analyzeFile(sourceFile);
+      const scenario: TestScenario = {
+        id: 'scenario-1',
+        name: 'mixed scenario',
+        type: 'test-scenario',
+        filePath: '/test/mixed.test.ts',
+        line: 3,
+        column: 0,
+        parentSymbol: null,
+        coveredBy: [],
+        description: 'A mixed scenario for testing',
+        isExported: false,
+        isPublic: true,
+        tests: [],
+        designDecisions: [],
+      };
 
-      expect(result.testFile).toBe(testFile);
-    });
-  });
+      const result = analyzer.analyzeTestCoverage([testSuite, testCase, scenario]);
 
-  describe('analyzeFiles', () => {
-    it('should analyze multiple source files', () => {
-      const sourceFiles = [
-        path.join(tempDir, 'file1.ts'),
-        path.join(tempDir, 'file2.ts'),
-        path.join(tempDir, 'file3.ts'),
-      ];
-
-      sourceFiles.forEach((file) => {
-        fs.writeFileSync(file, 'export class Test {}', 'utf-8');
-      });
-
-      const results = analyzer.analyzeFiles(sourceFiles);
-
-      expect(results).toHaveLength(3);
-      expect(results.map((r) => r.sourceFile)).toEqual(sourceFiles);
-    });
-
-    it('should handle empty array', () => {
-      const results = analyzer.analyzeFiles([]);
-
-      expect(results).toEqual([]);
-    });
-
-    it('should process files independently', () => {
-      const sourceFile1 = path.join(tempDir, 'tested.ts');
-      const testFile1 = path.join(tempDir, 'tested.test.ts');
-      const sourceFile2 = path.join(tempDir, 'untested.ts');
-
-      fs.writeFileSync(sourceFile1, 'export class Tested {}', 'utf-8');
-      fs.writeFileSync(testFile1, 'describe("Tested", () => {})', 'utf-8');
-      fs.writeFileSync(sourceFile2, 'export class Untested {}', 'utf-8');
-
-      const results = analyzer.analyzeFiles([sourceFile1, sourceFile2]);
-
-      expect(results).toHaveLength(2);
-      expect(results[0].hasTest).toBe(true);
-      expect(results[1].hasTest).toBe(false);
-    });
-
-    it('should return array of TestCoverageInfo objects', () => {
-      const sourceFiles = [path.join(tempDir, 'test.ts')];
-      fs.writeFileSync(sourceFiles[0], 'export class Test {}', 'utf-8');
-
-      const results = analyzer.analyzeFiles(sourceFiles);
-
-      expect(Array.isArray(results)).toBe(true);
-      expect(results[0]).toHaveProperty('sourceFile');
-      expect(results[0]).toHaveProperty('hasTest');
-      expect(results[0]).toHaveProperty('estimatedCoverage');
-      expect(results[0]).toHaveProperty('symbolCount');
-    });
-  });
-
-  describe('findTestFile - __tests__ directory patterns', () => {
-    it('should find test in __tests__ sibling directory', () => {
-      const srcDir = path.join(tempDir, 'src');
-      const testsDir = path.join(srcDir, '__tests__');
-      fs.mkdirSync(testsDir, { recursive: true });
-
-      const sourceFile = path.join(srcDir, 'utils.ts');
-      const testFile = path.join(testsDir, 'utils.test.ts');
-
-      fs.writeFileSync(sourceFile, 'export function utils() {}', 'utf-8');
-      fs.writeFileSync(testFile, 'describe("utils", () => {})', 'utf-8');
-
-      const result = analyzer.analyzeFile(sourceFile);
-
-      expect(result.testFile).toBe(testFile);
-      expect(result.hasTest).toBe(true);
-    });
-
-    it('should find .spec.ts in __tests__ sibling directory', () => {
-      const srcDir = path.join(tempDir, 'src');
-      const testsDir = path.join(srcDir, '__tests__');
-      fs.mkdirSync(testsDir, { recursive: true });
-
-      const sourceFile = path.join(srcDir, 'parser.ts');
-      const testFile = path.join(testsDir, 'parser.spec.ts');
-
-      fs.writeFileSync(sourceFile, 'export class Parser {}', 'utf-8');
-      fs.writeFileSync(testFile, 'describe("Parser", () => {})', 'utf-8');
-
-      const result = analyzer.analyzeFile(sourceFile);
-
-      expect(result.testFile).toBe(testFile);
-    });
-
-    it('should find test in __tests__ parent directory of nested files', () => {
-      // When source is at src/modules/auth.ts, the parent directory of src/modules is src
-      // So this test checks if we look for __tests__ at that parent level
-      const srcDir = path.join(tempDir, 'src');
-      const modulesDir = path.join(srcDir, 'modules');
-      const testsDir = path.join(srcDir, '__tests__');
-
-      fs.mkdirSync(modulesDir, { recursive: true });
-      fs.mkdirSync(testsDir, { recursive: true });
-
-      const sourceFile = path.join(modulesDir, 'auth.ts');
-      const testFile = path.join(testsDir, 'auth.test.ts');
-
-      fs.writeFileSync(sourceFile, 'export class Auth {}', 'utf-8');
-      fs.writeFileSync(testFile, 'describe("Auth", () => {})', 'utf-8');
-
-      const result = analyzer.analyzeFile(sourceFile);
-
-      expect(result.testFile).toBe(testFile);
-    });
-  });
-
-  describe('findTestFile - tests directory patterns', () => {
-    it('should find test in tests sibling directory', () => {
-      const srcDir = path.join(tempDir, 'src');
-      const testsDir = path.join(srcDir, 'tests');
-      fs.mkdirSync(testsDir, { recursive: true });
-
-      const sourceFile = path.join(srcDir, 'validator.ts');
-      const testFile = path.join(testsDir, 'validator.test.ts');
-
-      fs.writeFileSync(sourceFile, 'export class Validator {}', 'utf-8');
-      fs.writeFileSync(testFile, 'describe("Validator", () => {})', 'utf-8');
-
-      const result = analyzer.analyzeFile(sourceFile);
-
-      expect(result.testFile).toBe(testFile);
-    });
-
-    it('should find .spec.ts in tests sibling directory', () => {
-      const srcDir = path.join(tempDir, 'src');
-      const testsDir = path.join(srcDir, 'tests');
-      fs.mkdirSync(testsDir, { recursive: true });
-
-      const sourceFile = path.join(srcDir, 'database.ts');
-      const testFile = path.join(testsDir, 'database.spec.ts');
-
-      fs.writeFileSync(sourceFile, 'export class Database {}', 'utf-8');
-      fs.writeFileSync(testFile, 'describe("Database", () => {})', 'utf-8');
-
-      const result = analyzer.analyzeFile(sourceFile);
-
-      expect(result.testFile).toBe(testFile);
+      expect(result.coverageStats.totalTestCases).toBe(1);
+      expect(result.coverageStats.totalScenarios).toBe(1);
     });
   });
 
-  describe('findTestFile - src to __tests__ conversion', () => {
-    it('should find test by converting /src/ to /__tests__/', () => {
-      const srcDir = path.join(tempDir, 'src');
-      const testDir = path.join(tempDir, '__tests__');
-      fs.mkdirSync(srcDir, { recursive: true });
-      fs.mkdirSync(testDir, { recursive: true });
+  describe('RelationshipExtractionResult interface', () => {
+    it('should have correct structure', () => {
+      const result: RelationshipExtractionResult = {
+        testCoverageRelations: [],
+        containsRelations: [],
+        coversScenarioRelations: [],
+        coverageStats: {
+          totalTestCases: 0,
+          testCasesWithCoverage: 0,
+          totalTestedSymbols: 0,
+          totalScenarios: 0,
+          scenariosWithCoverage: 0,
+          averageAssertions: 0,
+        },
+      };
 
-      const sourceFile = path.join(srcDir, 'logger.ts');
-      const testFile = path.join(testDir, 'logger.test.ts');
-
-      fs.writeFileSync(sourceFile, 'export class Logger {}', 'utf-8');
-      fs.writeFileSync(testFile, 'describe("Logger", () => {})', 'utf-8');
-
-      const result = analyzer.analyzeFile(sourceFile);
-
-      expect(result.testFile).toBe(testFile);
-      expect(result.hasTest).toBe(true);
-    });
-
-    it('should find .spec.ts by converting /src/ to /__tests__/', () => {
-      const srcDir = path.join(tempDir, 'src');
-      const testDir = path.join(tempDir, '__tests__');
-      fs.mkdirSync(srcDir, { recursive: true });
-      fs.mkdirSync(testDir, { recursive: true });
-
-      const sourceFile = path.join(srcDir, 'router.ts');
-      const testFile = path.join(testDir, 'router.spec.ts');
-
-      fs.writeFileSync(sourceFile, 'export class Router {}', 'utf-8');
-      fs.writeFileSync(testFile, 'describe("Router", () => {})', 'utf-8');
-
-      const result = analyzer.analyzeFile(sourceFile);
-
-      expect(result.testFile).toBe(testFile);
-    });
-
-    it('should handle nested directories when converting src to __tests__', () => {
-      const srcDir = path.join(tempDir, 'src', 'modules', 'auth');
-      const testDir = path.join(tempDir, '__tests__', 'modules', 'auth');
-      fs.mkdirSync(srcDir, { recursive: true });
-      fs.mkdirSync(testDir, { recursive: true });
-
-      const sourceFile = path.join(srcDir, 'oauth.ts');
-      const testFile = path.join(testDir, 'oauth.test.ts');
-
-      fs.writeFileSync(sourceFile, 'export class OAuth {}', 'utf-8');
-      fs.writeFileSync(testFile, 'describe("OAuth", () => {})', 'utf-8');
-
-      const result = analyzer.analyzeFile(sourceFile);
-
-      expect(result.testFile).toBe(testFile);
+      expect(result.testCoverageRelations).toEqual([]);
+      expect(result.containsRelations).toEqual([]);
+      expect(result.coversScenarioRelations).toEqual([]);
+      expect(result.coverageStats.totalTestCases).toBe(0);
     });
   });
 
-  describe('calculateStatistics', () => {
-    it('should calculate coverage percentage correctly', () => {
-      const coverageInfo = [
-        {
-          sourceFile: 'file1.ts',
-          testFile: 'file1.test.ts',
-          hasTest: true,
-          symbolCount: 5,
-          estimatedCoverage: 50,
+  describe('TestRelationship interface', () => {
+    it('should have correct structure', () => {
+      const relation: TestRelationship = {
+        id: 'test-relation-1',
+        type: 'test-coverage',
+        fromSymbols: ['test-case-1'],
+        toSymbols: ['class-myclass'],
+        category: 'testing',
+        confidence: 0.8,
+        metadata: {
+          testedMethods: ['doSomething'],
+          assertionCount: 3,
         },
-        {
-          sourceFile: 'file2.ts',
-          hasTest: false,
-          symbolCount: 3,
-          estimatedCoverage: 0,
-        },
-      ];
+      };
 
-      const stats = analyzer.calculateStatistics(coverageInfo);
-
-      expect(stats.totalFiles).toBe(2);
-      expect(stats.filesWithTests).toBe(1);
-      expect(stats.filesWithoutTests).toBe(1);
-      expect(stats.coveragePercentage).toBe(50);
+      expect(relation.id).toBe('test-relation-1');
+      expect(relation.type).toBe('test-coverage');
+      expect(relation.category).toBe('testing');
+      expect(relation.confidence).toBe(0.8);
+      expect(relation.metadata.testedMethods).toContain('doSomething');
     });
 
-    it('should return 100% coverage when all files have tests', () => {
-      const coverageInfo = [
-        {
-          sourceFile: 'file1.ts',
-          testFile: 'file1.test.ts',
-          hasTest: true,
-          symbolCount: 10,
-          estimatedCoverage: 50,
+    it('should support contains relationship type', () => {
+      const relation: TestRelationship = {
+        id: 'contains-1',
+        type: 'contains',
+        fromSymbols: ['suite-1'],
+        toSymbols: ['case-1'],
+        category: 'testing',
+        confidence: 1.0,
+        metadata: {
+          nestingLevel: 1,
         },
-        {
-          sourceFile: 'file2.ts',
-          testFile: 'file2.test.ts',
-          hasTest: true,
-          symbolCount: 8,
-          estimatedCoverage: 50,
-        },
-      ];
+      };
 
-      const stats = analyzer.calculateStatistics(coverageInfo);
-
-      expect(stats.coveragePercentage).toBe(100);
-      expect(stats.filesWithTests).toBe(2);
-      expect(stats.filesWithoutTests).toBe(0);
+      expect(relation.type).toBe('contains');
+      expect(relation.metadata.nestingLevel).toBe(1);
     });
 
-    it('should return 0% coverage when no files have tests', () => {
-      const coverageInfo = [
-        {
-          sourceFile: 'file1.ts',
-          hasTest: false,
-          symbolCount: 5,
-          estimatedCoverage: 0,
-        },
-        {
-          sourceFile: 'file2.ts',
-          hasTest: false,
-          symbolCount: 3,
-          estimatedCoverage: 0,
-        },
-      ];
-
-      const stats = analyzer.calculateStatistics(coverageInfo);
-
-      expect(stats.coveragePercentage).toBe(0);
-      expect(stats.filesWithTests).toBe(0);
-      expect(stats.filesWithoutTests).toBe(2);
-    });
-
-    it('should handle empty coverage info array', () => {
-      const stats = analyzer.calculateStatistics([]);
-
-      expect(stats.totalFiles).toBe(0);
-      expect(stats.filesWithTests).toBe(0);
-      expect(stats.filesWithoutTests).toBe(0);
-      expect(stats.coveragePercentage).toBe(0);
-    });
-
-    it('should handle single file with test', () => {
-      const coverageInfo = [
-        {
-          sourceFile: 'single.ts',
-          testFile: 'single.test.ts',
-          hasTest: true,
-          symbolCount: 1,
-          estimatedCoverage: 50,
-        },
-      ];
-
-      const stats = analyzer.calculateStatistics(coverageInfo);
-
-      expect(stats.totalFiles).toBe(1);
-      expect(stats.filesWithTests).toBe(1);
-      expect(stats.coveragePercentage).toBe(100);
-    });
-
-    it('should handle single file without test', () => {
-      const coverageInfo = [
-        {
-          sourceFile: 'single.ts',
-          hasTest: false,
-          symbolCount: 1,
-          estimatedCoverage: 0,
-        },
-      ];
-
-      const stats = analyzer.calculateStatistics(coverageInfo);
-
-      expect(stats.totalFiles).toBe(1);
-      expect(stats.filesWithTests).toBe(0);
-      expect(stats.coveragePercentage).toBe(0);
-    });
-
-    it('should handle fractional coverage percentages', () => {
-      const coverageInfo = Array(3)
-        .fill(null)
-        .map((_, i) => ({
-          sourceFile: `file${i}.ts`,
-          testFile: i === 0 ? `file${i}.test.ts` : undefined,
-          hasTest: i === 0,
-          symbolCount: 5,
-          estimatedCoverage: i === 0 ? 50 : 0,
-        }));
-
-      const stats = analyzer.calculateStatistics(coverageInfo);
-
-      expect(stats.totalFiles).toBe(3);
-      expect(stats.filesWithTests).toBe(1);
-      expect(stats.coveragePercentage).toBeCloseTo(33.33, 1);
-    });
-  });
-
-  describe('getFilesWithoutTests', () => {
-    it('should return only files without tests', () => {
-      const coverageInfo = [
-        {
-          sourceFile: 'tested.ts',
-          testFile: 'tested.test.ts',
-          hasTest: true,
-          symbolCount: 5,
-          estimatedCoverage: 50,
-        },
-        {
-          sourceFile: 'untested1.ts',
-          hasTest: false,
-          symbolCount: 3,
-          estimatedCoverage: 0,
-        },
-        {
-          sourceFile: 'untested2.ts',
-          hasTest: false,
-          symbolCount: 4,
-          estimatedCoverage: 0,
-        },
-      ];
-
-      const result = analyzer.getFilesWithoutTests(coverageInfo);
-
-      expect(result).toEqual(['untested1.ts', 'untested2.ts']);
-      expect(result).not.toContain('tested.ts');
-    });
-
-    it('should return empty array when all files have tests', () => {
-      const coverageInfo = [
-        {
-          sourceFile: 'file1.ts',
-          testFile: 'file1.test.ts',
-          hasTest: true,
-          symbolCount: 5,
-          estimatedCoverage: 50,
-        },
-        {
-          sourceFile: 'file2.ts',
-          testFile: 'file2.test.ts',
-          hasTest: true,
-          symbolCount: 3,
-          estimatedCoverage: 50,
-        },
-      ];
-
-      const result = analyzer.getFilesWithoutTests(coverageInfo);
-
-      expect(result).toEqual([]);
-    });
-
-    it('should return all files when none have tests', () => {
-      const coverageInfo = [
-        {
-          sourceFile: 'file1.ts',
-          hasTest: false,
-          symbolCount: 5,
-          estimatedCoverage: 0,
-        },
-        {
-          sourceFile: 'file2.ts',
-          hasTest: false,
-          symbolCount: 3,
-          estimatedCoverage: 0,
-        },
-      ];
-
-      const result = analyzer.getFilesWithoutTests(coverageInfo);
-
-      expect(result).toHaveLength(2);
-      expect(result).toContain('file1.ts');
-      expect(result).toContain('file2.ts');
-    });
-
-    it('should handle empty array', () => {
-      const result = analyzer.getFilesWithoutTests([]);
-
-      expect(result).toEqual([]);
-    });
-
-    it('should preserve file paths exactly', () => {
-      const file1 = '/absolute/path/to/file1.ts';
-      const file2 = '/absolute/path/to/file2.ts';
-
-      const coverageInfo = [
-        {
-          sourceFile: file1,
-          hasTest: false,
-          symbolCount: 5,
-          estimatedCoverage: 0,
-        },
-        {
-          sourceFile: file2,
-          hasTest: false,
-          symbolCount: 3,
-          estimatedCoverage: 0,
-        },
-      ];
-
-      const result = analyzer.getFilesWithoutTests(coverageInfo);
-
-      expect(result).toEqual([file1, file2]);
-    });
-  });
-
-  describe('prioritizeForTesting', () => {
-    it('should sort files by symbol count in descending order', () => {
-      const coverageInfo = [
-        {
-          sourceFile: 'small.ts',
-          hasTest: false,
-          symbolCount: 2,
-          estimatedCoverage: 0,
-        },
-        {
-          sourceFile: 'large.ts',
-          hasTest: false,
-          symbolCount: 10,
-          estimatedCoverage: 0,
-        },
-        {
-          sourceFile: 'medium.ts',
-          hasTest: false,
-          symbolCount: 5,
-          estimatedCoverage: 0,
-        },
-      ];
-
-      const result = analyzer.prioritizeForTesting(coverageInfo);
-
-      expect(result[0].sourceFile).toBe('large.ts');
-      expect(result[1].sourceFile).toBe('medium.ts');
-      expect(result[2].sourceFile).toBe('small.ts');
-    });
-
-    it('should exclude files with tests', () => {
-      const coverageInfo = [
-        {
-          sourceFile: 'tested.ts',
-          testFile: 'tested.test.ts',
-          hasTest: true,
-          symbolCount: 100,
-          estimatedCoverage: 50,
-        },
-        {
-          sourceFile: 'untested.ts',
-          hasTest: false,
-          symbolCount: 5,
-          estimatedCoverage: 0,
-        },
-      ];
-
-      const result = analyzer.prioritizeForTesting(coverageInfo);
-
-      expect(result).toHaveLength(1);
-      expect(result[0].sourceFile).toBe('untested.ts');
-    });
-
-    it('should handle empty array', () => {
-      const result = analyzer.prioritizeForTesting([]);
-
-      expect(result).toEqual([]);
-    });
-
-    it('should handle all files with tests', () => {
-      const coverageInfo = [
-        {
-          sourceFile: 'file1.ts',
-          testFile: 'file1.test.ts',
-          hasTest: true,
-          symbolCount: 5,
-          estimatedCoverage: 50,
-        },
-        {
-          sourceFile: 'file2.ts',
-          testFile: 'file2.test.ts',
-          hasTest: true,
-          symbolCount: 3,
-          estimatedCoverage: 50,
-        },
-      ];
-
-      const result = analyzer.prioritizeForTesting(coverageInfo);
-
-      expect(result).toEqual([]);
-    });
-
-    it('should return TestCoverageInfo with all properties', () => {
-      const coverageInfo = [
-        {
-          sourceFile: 'file.ts',
-          hasTest: false,
-          symbolCount: 5,
-          estimatedCoverage: 0,
-        },
-      ];
-
-      const result = analyzer.prioritizeForTesting(coverageInfo);
-
-      expect(result[0]).toHaveProperty('sourceFile');
-      expect(result[0]).toHaveProperty('hasTest');
-      expect(result[0]).toHaveProperty('symbolCount');
-      expect(result[0]).toHaveProperty('estimatedCoverage');
-    });
-
-    it('should handle files with same symbol count', () => {
-      const coverageInfo = [
-        {
-          sourceFile: 'file1.ts',
-          hasTest: false,
-          symbolCount: 5,
-          estimatedCoverage: 0,
-        },
-        {
-          sourceFile: 'file2.ts',
-          hasTest: false,
-          symbolCount: 5,
-          estimatedCoverage: 0,
-        },
-      ];
-
-      const result = analyzer.prioritizeForTesting(coverageInfo);
-
-      expect(result).toHaveLength(2);
-      expect(result[0].symbolCount).toBe(5);
-      expect(result[1].symbolCount).toBe(5);
-    });
-
-    it('should handle zero symbol count', () => {
-      const coverageInfo = [
-        {
-          sourceFile: 'empty.ts',
-          hasTest: false,
-          symbolCount: 0,
-          estimatedCoverage: 0,
-        },
-        {
-          sourceFile: 'nonempty.ts',
-          hasTest: false,
-          symbolCount: 5,
-          estimatedCoverage: 0,
-        },
-      ];
-
-      const result = analyzer.prioritizeForTesting(coverageInfo);
-
-      expect(result[0].sourceFile).toBe('nonempty.ts');
-      expect(result[1].sourceFile).toBe('empty.ts');
-    });
-  });
-
-  describe('edge cases and error handling', () => {
-    it('should handle file without .ts extension', () => {
-      const sourceFile = path.join(tempDir, 'file.js');
-      fs.writeFileSync(sourceFile, 'export const test = 1;', 'utf-8');
-
-      // Should not throw
-      const result = analyzer.analyzeFile(sourceFile);
-
-      expect(result).toBeDefined();
-      expect(result.sourceFile).toBe(sourceFile);
-    });
-
-    it('should handle deeply nested directories', () => {
-      const deepDir = path.join(tempDir, 'a', 'b', 'c', 'd', 'e');
-      fs.mkdirSync(deepDir, { recursive: true });
-
-      const sourceFile = path.join(deepDir, 'deep.ts');
-      fs.writeFileSync(sourceFile, 'export class Deep {}', 'utf-8');
-
-      const result = analyzer.analyzeFile(sourceFile);
-
-      expect(result).toBeDefined();
-      expect(result.sourceFile).toBe(sourceFile);
-    });
-
-    it('should handle file paths with special characters', () => {
-      const fileName = 'my-special_file.123.ts';
-      const sourceFile = path.join(tempDir, fileName);
-      const testFile = path.join(tempDir, 'my-special_file.123.test.ts');
-
-      fs.writeFileSync(sourceFile, 'export class Special {}', 'utf-8');
-      fs.writeFileSync(testFile, 'describe("Special", () => {})', 'utf-8');
-
-      const result = analyzer.analyzeFile(sourceFile);
-
-      expect(result.testFile).toBe(testFile);
-      expect(result.hasTest).toBe(true);
-    });
-
-    it('should not fail with non-existent source file path', () => {
-      const sourceFile = path.join(tempDir, 'nonexistent.ts');
-
-      // Should not throw
-      const result = analyzer.analyzeFile(sourceFile);
-
-      expect(result).toBeDefined();
-      expect(result.sourceFile).toBe(sourceFile);
-      expect(result.hasTest).toBe(false);
-    });
-
-    it('should handle multiple test files (first match wins)', () => {
-      const sourceFile = path.join(tempDir, 'multi.ts');
-      const testFile1 = path.join(tempDir, 'multi.test.ts');
-      const testFile2 = path.join(tempDir, '__tests__', 'multi.test.ts');
-
-      fs.mkdirSync(path.join(tempDir, '__tests__'), { recursive: true });
-      fs.writeFileSync(sourceFile, 'export class Multi {}', 'utf-8');
-      fs.writeFileSync(testFile1, 'describe("Multi", () => {})', 'utf-8');
-      fs.writeFileSync(testFile2, 'describe("Multi", () => {})', 'utf-8');
-
-      const result = analyzer.analyzeFile(sourceFile);
-
-      expect(result.testFile).toBe(testFile1);
-    });
-
-    it('should handle very long file paths', () => {
-      const longName = 'a'.repeat(100);
-      const sourceFile = path.join(tempDir, `${longName}.ts`);
-      fs.writeFileSync(sourceFile, 'export class A {}', 'utf-8');
-
-      const result = analyzer.analyzeFile(sourceFile);
-
-      expect(result).toBeDefined();
-      expect(result.sourceFile).toBe(sourceFile);
-    });
-
-    it('should calculate statistics with large numbers', () => {
-      const coverageInfo = Array(1000)
-        .fill(null)
-        .map((_, i) => ({
-          sourceFile: `file${i}.ts`,
-          testFile: i % 3 === 0 ? `file${i}.test.ts` : undefined,
-          hasTest: i % 3 === 0,
-          symbolCount: i,
-          estimatedCoverage: i % 3 === 0 ? 50 : 0,
-        }));
-
-      const stats = analyzer.calculateStatistics(coverageInfo);
-
-      expect(stats.totalFiles).toBe(1000);
-      expect(stats.filesWithTests).toBe(334); // 1000 / 3 ≈ 333.33
-      expect(stats.filesWithoutTests).toBe(666);
-      expect(stats.coveragePercentage).toBeCloseTo(33.4, 0);
-    });
-  });
-
-  describe('integration scenarios', () => {
-    it('should analyze project with mixed test coverage', () => {
-      const srcDir = path.join(tempDir, 'src');
-      const testDir = path.join(tempDir, '__tests__');
-      fs.mkdirSync(srcDir, { recursive: true });
-      fs.mkdirSync(testDir, { recursive: true });
-
-      // Create source files
-      const files = ['auth.ts', 'logger.ts', 'utils.ts', 'config.ts', 'parser.ts'];
-      files.forEach((file) => {
-        fs.writeFileSync(path.join(srcDir, file), `export class ${file.split('.')[0]} {}`, 'utf-8');
-      });
-
-      // Create tests for some files
-      fs.writeFileSync(path.join(testDir, 'auth.test.ts'), 'describe("auth", () => {})', 'utf-8');
-      fs.writeFileSync(path.join(testDir, 'logger.test.ts'), 'describe("logger", () => {})', 'utf-8');
-
-      const sourceFiles = files.map((f) => path.join(srcDir, f));
-      const coverage = analyzer.analyzeFiles(sourceFiles);
-      const stats = analyzer.calculateStatistics(coverage);
-      const untested = analyzer.getFilesWithoutTests(coverage);
-
-      expect(coverage).toHaveLength(5);
-      expect(stats.filesWithTests).toBe(2);
-      expect(stats.coveragePercentage).toBe(40);
-      expect(untested).toHaveLength(3);
-    });
-
-    it('should prioritize files correctly in real scenario', () => {
-      const srcDir = path.join(tempDir, 'src');
-      fs.mkdirSync(srcDir, { recursive: true });
-
-      const coverage = [
-        {
-          sourceFile: path.join(srcDir, 'small.ts'),
-          hasTest: false,
-          symbolCount: 2,
-          estimatedCoverage: 0,
-        },
-        {
-          sourceFile: path.join(srcDir, 'large.ts'),
-          hasTest: false,
-          symbolCount: 50,
-          estimatedCoverage: 0,
-        },
-        {
-          sourceFile: path.join(srcDir, 'tested.ts'),
-          testFile: path.join(srcDir, 'tested.test.ts'),
-          hasTest: true,
-          symbolCount: 100,
-          estimatedCoverage: 50,
-        },
-        {
-          sourceFile: path.join(srcDir, 'medium.ts'),
-          hasTest: false,
-          symbolCount: 15,
-          estimatedCoverage: 0,
-        },
-      ];
-
-      const prioritized = analyzer.prioritizeForTesting(coverage);
-
-      expect(prioritized).toHaveLength(3);
-      expect(prioritized[0].symbolCount).toBe(50);
-      expect(prioritized[1].symbolCount).toBe(15);
-      expect(prioritized[2].symbolCount).toBe(2);
+    it('should support covers-scenario relationship type', () => {
+      const relation: TestRelationship = {
+        id: 'covers-scenario-1',
+        type: 'covers-scenario',
+        fromSymbols: ['case-1'],
+        toSymbols: ['scenario-1'],
+        category: 'testing',
+        confidence: 0.7,
+        metadata: {},
+      };
+
+      expect(relation.type).toBe('covers-scenario');
+      expect(relation.confidence).toBe(0.7);
     });
   });
 });

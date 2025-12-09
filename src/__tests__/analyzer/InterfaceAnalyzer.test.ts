@@ -237,22 +237,18 @@ export interface EmptyInterface {}
 
     it('should use existing symbols if provided', () => {
       const testFile = path.join(tempDir, 'existing.ts');
-      fs.writeFileSync(
-        testFile,
-        `
-export interface User {
+      const sourceCode = `export interface User {
   id: string;
 }
-`,
-        'utf-8'
-      );
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
 
       const existingSymbol: Symbol = {
         id: 'existing-user',
         name: 'User',
         type: 'interface',
         filePath: testFile,
-        line: 2,
+        line: 1,
         column: 1,
         isExported: true,
         isPublic: true,
@@ -260,12 +256,14 @@ export interface User {
         designDecisions: [],
       };
 
-      const results = analyzer.analyzeFile(
-        testFile,
-        fs.readFileSync(testFile, 'utf-8'),
-        [existingSymbol]
-      );
+      const results = analyzer.analyzeFile(testFile, sourceCode, [existingSymbol]);
 
+      // When existing symbol matches (name, type, filePath), it should be reused
+      // The match is based on name and type and filePath
+      expect(results.length).toBe(1);
+      expect(results[0].symbol.name).toBe('User');
+      expect(results[0].symbol.type).toBe('interface');
+      // ID should be the existing symbol's ID when matched
       expect(results[0].symbol.id).toBe('existing-user');
     });
 
