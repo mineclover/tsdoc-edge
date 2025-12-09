@@ -274,4 +274,147 @@ export class TestRelationshipAnalyzer {
       coveragePercentage: totalSymbols > 0 ? (testedSymbols.size / totalSymbols) * 100 : 0,
     };
   }
+
+  /**
+   * Analyze integration verification relationships
+   * Detects when a test file verifies the integration between multiple symbols
+   *
+   * @param existingRelationships - Existing relationships in the system
+   * @returns Array of integration-verification relationships
+   * @public
+   */
+  analyzeIntegrationVerification(existingRelationships: UnifiedRelationship[]): UnifiedRelationship[] {
+    if (!this.program) {
+      console.warn('TestRelationshipAnalyzer: No program provided, cannot analyze integration verification');
+      return [];
+    }
+
+    const integrationRels: UnifiedRelationship[] = [];
+
+    // Build a map of test files to their imported symbols
+    const testFileImports = new Map<string, Set<string>>();
+
+    for (const sourceFile of this.program.getSourceFiles()) {
+      if (sourceFile.isDeclarationFile) continue;
+
+      const filePath = sourceFile.fileName.replace(/\\/g, '/');
+      if (!this.isTestFile(filePath)) continue;
+
+      const imports = this.extractImports(sourceFile);
+      const symbolIds = new Set<string>();
+
+      for (const imp of imports) {
+        const symbol = this.findSymbolByName(imp.importedSymbol);
+        if (symbol) {
+          symbolIds.add(symbol.id);
+        }
+      }
+
+      if (symbolIds.size >= 2) {
+        testFileImports.set(filePath, symbolIds);
+      }
+    }
+
+    // Build a map of existing relationships for quick lookup
+    const existingRelsMap = new Map<string, UnifiedRelationship>();
+    for (const rel of existingRelationships) {
+      if (typeof rel.from === 'string' && typeof rel.to === 'string') {
+        existingRelsMap.set(`${rel.from}->${rel.to}`, rel);
+        existingRelsMap.set(`${rel.to}->${rel.from}`, rel);
+      }
+    }
+
+    // For each test file that imports multiple symbols, check if those symbols have relationships
+    for (const [testFilePath, symbolIds] of testFileImports) {
+      const symbolArray = Array.from(symbolIds);
+
+      // Check all pairs of symbols
+      for (let i = 0; i < symbolArray.length; i++) {
+        for (let j = i + 1; j < symbolArray.length; j++) {
+          const symbolA = symbolArray[i];
+          const symbolB = symbolArray[j];
+
+          // Check if there's an existing relationship between these symbols
+          const relKey1 = `${symbolA}->${symbolB}`;
+          const relKey2 = `${symbolB}->${symbolA}`;
+
+          if (existingRelsMap.has(relKey1) || existingRelsMap.has(relKey2)) {
+            const existingRel = existingRelsMap.get(relKey1) || existingRelsMap.get(relKey2);
+            const timestamp = new Date().toISOString();
+
+            const integrationRel: UnifiedRelationship = {
+              id: `integration-verification-${symbolA}-${symbolB}-${path.basename(testFilePath)}`
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-')
+                .replace(/^-|-$/g, '')
+                .slice(0, 100),
+              type: 'integration-verification',
+              category: 'verification',
+              from: symbolA,
+              to: symbolB,
+              direction: 'bidirectional',
+              strength: 'strong',
+              evidence: [
+                {
+                  type: 'test',
+                  source: testFilePath,
+                  confidence: 0.85,
+                  snippet: `Test file imports both ${symbolA} and ${symbolB}`,
+                  context: `Integration test verifies relationship: ${existingRel?.type || 'unknown'}`,
+                },
+              ],
+              discoveredBy: 'test-analysis',
+              confidence: 0.85,
+              filePath: testFilePath,
+              properties: {
+                testFile: testFilePath,
+                verifiedRelationshipType: existingRel?.type,
+                verifiedRelationshipId: existingRel?.id,
+                symbolA,
+                symbolB,
+              },
+              createdAt: timestamp,
+              updatedAt: timestamp,
+              description: `Integration between ${symbolA} and ${symbolB} verified by ${path.basename(testFilePath)}`,
+            };
+
+            integrationRels.push(integrationRel);
+          }
+        }
+      }
+    }
+
+    return integrationRels;
+  }
+
+  /**
+   * Get integration verification statistics
+   *
+   * @param relationships - Integration verification relationships
+   * @returns Statistics
+   * @public
+   */
+  getIntegrationStatistics(relationships: UnifiedRelationship[]): {
+    totalVerifications: number;
+    verifiedRelationshipTypes: Record<string, number>;
+    testFilesWithIntegration: Set<string>;
+  } {
+    const verifiedRelationshipTypes: Record<string, number> = {};
+    const testFilesWithIntegration = new Set<string>();
+
+    for (const rel of relationships) {
+      const verifiedType = rel.properties?.verifiedRelationshipType || 'unknown';
+      verifiedRelationshipTypes[verifiedType] = (verifiedRelationshipTypes[verifiedType] || 0) + 1;
+
+      if (rel.filePath) {
+        testFilesWithIntegration.add(rel.filePath);
+      }
+    }
+
+    return {
+      totalVerifications: relationships.length,
+      verifiedRelationshipTypes,
+      testFilesWithIntegration,
+    };
+  }
 }

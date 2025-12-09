@@ -5,6 +5,7 @@
  */
 
 import type { SymbolGraph } from '../types/graph';
+import type { UnifiedRelationship } from '../types/relationships';
 
 /**
  * Dependency chain result
@@ -287,26 +288,116 @@ export class DependencyChainAnalyzer {
   }
 
   /**
-   * Calculate risk score for a chain
-   * @param chain - Dependency chain
-   * @returns Risk score (0-10)
+   * Analyze circular dependencies and return as UnifiedRelationships
+   *
+   * @returns Array of circular-dependency relationships
+   * @public
    */
-  calculateRisk(chain: DependencyChain): number {
-    let score = 0;
+  analyzeCircularDependencies(): UnifiedRelationship[] {
+    const circulars = this.detectCircularDependencies();
+    const relationships: UnifiedRelationship[] = [];
+    const seenCycles = new Set<string>();
 
-    // Long chains are risky
-    if (chain.length > 5) {
-      score += 3;
-    }
-    if (chain.length > 10) {
-      score += 3;
+    for (const circular of circulars) {
+      // Create a canonical key to avoid duplicate cycles (A→B→A same as B→A→B)
+      const sortedSymbols = [...circular.symbols].sort();
+      const cycleKey = sortedSymbols.join('→');
+
+      if (seenCycles.has(cycleKey)) continue;
+      seenCycles.add(cycleKey);
+
+      const timestamp = new Date().toISOString();
+
+      // Get symbol info for evidence
+      const firstSymbol = this.graph.symbols.get(circular.path[0]);
+      const lastSymbol = this.graph.symbols.get(circular.path[circular.path.length - 1]);
+
+      const relationship: UnifiedRelationship = {
+        id: `circular-dependency-${sortedSymbols.join('-')}`
+          .toLowerCase()
+          .replace(/[^a-z0-9]+/g, '-')
+          .replace(/^-|-$/g, '')
+          .slice(0, 100), // Limit ID length
+        type: 'circular-dependency',
+        category: 'quality',
+        from: circular.path[0],
+        to: circular.path[circular.path.length - 1],
+        direction: 'bidirectional',
+        strength: 'strong',
+        evidence: [
+          {
+            type: 'code',
+            source: firstSymbol?.filePath || '',
+            lineNumber: firstSymbol?.line,
+            snippet: `Cycle: ${circular.path.join(' → ')}`,
+            confidence: 1.0,
+            context: `Circular dependency with ${circular.length} symbols`,
+          },
+        ],
+        discoveredBy: 'static-analysis',
+        confidence: 1.0,
+        filePath: firstSymbol?.filePath,
+        line: firstSymbol?.line,
+        properties: {
+          cyclePath: circular.path,
+          cycleLength: circular.length,
+          involvedSymbols: circular.symbols,
+          riskLevel: circular.length > 3 ? 'high' : circular.length > 2 ? 'medium' : 'low',
+        },
+        createdAt: timestamp,
+        updatedAt: timestamp,
+        description: `Circular dependency: ${circular.path.join(' → ')}`,
+      };
+
+      relationships.push(relationship);
     }
 
-    // Circular dependencies are very risky
-    if (chain.hasCircular) {
-      score += 4;
+    return relationships;
+  }
+
+  /**
+   * Get statistics for circular dependencies
+   *
+   * @param relationships - Circular dependency relationships
+   * @returns Statistics object
+   * @public
+   */
+  getCircularStatistics(relationships: UnifiedRelationship[]): {
+    totalCycles: number;
+    byLength: Record<number, number>;
+    highRisk: number;
+    mediumRisk: number;
+    lowRisk: number;
+    affectedSymbols: Set<string>;
+  } {
+    const byLength: Record<number, number> = {};
+    const affectedSymbols = new Set<string>();
+    let highRisk = 0;
+    let mediumRisk = 0;
+    let lowRisk = 0;
+
+    for (const rel of relationships) {
+      const length = rel.properties?.cycleLength || 0;
+      byLength[length] = (byLength[length] || 0) + 1;
+
+      const involvedSymbols = rel.properties?.involvedSymbols as string[] || [];
+      for (const sym of involvedSymbols) {
+        affectedSymbols.add(sym);
+      }
+
+      const riskLevel = rel.properties?.riskLevel;
+      if (riskLevel === 'high') highRisk++;
+      else if (riskLevel === 'medium') mediumRisk++;
+      else lowRisk++;
     }
 
-    return Math.min(score, 10);
+    return {
+      totalCycles: relationships.length,
+      byLength,
+      highRisk,
+      mediumRisk,
+      lowRisk,
+      affectedSymbols,
+    };
   }
 }

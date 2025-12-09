@@ -273,4 +273,271 @@ export class LayerDependencyAnalyzer {
       violationsByLayer,
     };
   }
+
+  /**
+   * Analyze module boundary relationships
+   * Detects cross-package/cross-module dependencies
+   *
+   * @returns Array of module-boundary relationships
+   * @public
+   */
+  analyzeModuleBoundaries(): UnifiedRelationship[] {
+    const relationships: UnifiedRelationship[] = [];
+    const moduleDeps = this.collectModuleDependencies();
+
+    for (const dep of moduleDeps) {
+      const relationship = this.createModuleBoundaryRelationship(dep);
+      if (relationship) {
+        relationships.push(relationship);
+      }
+    }
+
+    return relationships;
+  }
+
+  /**
+   * Collect module dependencies from existing relationships
+   *
+   * @returns Array of module dependencies
+   * @private
+   */
+  private collectModuleDependencies(): Array<{
+    from: string;
+    fromModule: string;
+    to: string;
+    toModule: string;
+    filePath: string;
+  }> {
+    const moduleDeps: Array<{
+      from: string;
+      fromModule: string;
+      to: string;
+      toModule: string;
+      filePath: string;
+    }> = [];
+
+    for (const rel of this.graph.relationships) {
+      const fromSymbol = this.graph.symbols.get(rel.from);
+      const toSymbol = this.graph.symbols.get(rel.to);
+
+      if (!fromSymbol || !toSymbol) continue;
+
+      const fromModule = this.extractModule(fromSymbol.filePath);
+      const toModule = this.extractModule(toSymbol.filePath);
+
+      // Only track cross-module dependencies
+      if (fromModule && toModule && fromModule !== toModule) {
+        moduleDeps.push({
+          from: rel.from,
+          fromModule,
+          to: rel.to,
+          toModule,
+          filePath: fromSymbol.filePath,
+        });
+      }
+    }
+
+    return moduleDeps;
+  }
+
+  /**
+   * Extract module name from file path
+   *
+   * @param filePath - File path
+   * @returns Module name or null
+   * @private
+   */
+  private extractModule(filePath: string): string | null {
+    const normalized = filePath.replace(/\\/g, '/');
+
+    // Common module patterns:
+    // src/modules/auth/...
+    // src/features/user/...
+    // packages/core/...
+    // apps/web/...
+
+    // Pattern 1: src/modules/<module>/...
+    const modulesMatch = normalized.match(/src\/modules\/([^/]+)/);
+    if (modulesMatch) return modulesMatch[1];
+
+    // Pattern 2: src/features/<feature>/...
+    const featuresMatch = normalized.match(/src\/features\/([^/]+)/);
+    if (featuresMatch) return featuresMatch[1];
+
+    // Pattern 3: packages/<package>/...
+    const packagesMatch = normalized.match(/packages\/([^/]+)/);
+    if (packagesMatch) return packagesMatch[1];
+
+    // Pattern 4: apps/<app>/...
+    const appsMatch = normalized.match(/apps\/([^/]+)/);
+    if (appsMatch) return appsMatch[1];
+
+    // Pattern 5: src/<folder>/ where folder is a top-level module
+    const srcMatch = normalized.match(/src\/([^/]+)/);
+    if (srcMatch) {
+      const folder = srcMatch[1];
+      // Skip common non-module folders
+      const nonModuleFolders = ['types', 'utils', 'helpers', 'constants', 'config', '__tests__'];
+      if (!nonModuleFolders.includes(folder)) {
+        return folder;
+      }
+    }
+
+    return null;
+  }
+
+  /**
+   * Create module boundary relationship
+   *
+   * @param dep - Module dependency
+   * @returns Unified relationship
+   * @private
+   */
+  private createModuleBoundaryRelationship(dep: {
+    from: string;
+    fromModule: string;
+    to: string;
+    toModule: string;
+    filePath: string;
+  }): UnifiedRelationship {
+    const timestamp = new Date().toISOString();
+
+    // Determine if this is a problematic boundary crossing
+    const isProblematic = this.isProblematicBoundaryCross(dep.fromModule, dep.toModule);
+
+    return {
+      id: `module-boundary-${dep.from}-${dep.to}`
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/^-|-$/g, '')
+        .slice(0, 100),
+      type: 'module-boundary',
+      category: 'architectural',
+      from: dep.from,
+      to: dep.to,
+      direction: 'unidirectional',
+      strength: isProblematic ? 'strong' : 'medium',
+      evidence: [
+        {
+          type: 'code',
+          source: dep.filePath,
+          lineNumber: 0,
+          snippet: `${dep.fromModule} → ${dep.toModule}`,
+          confidence: 0.9,
+          context: isProblematic ? 'Cross-module dependency (review recommended)' : 'Cross-module dependency',
+        },
+      ],
+      discoveredBy: 'static-analysis',
+      confidence: 0.9,
+      filePath: dep.filePath,
+      properties: {
+        fromModule: dep.fromModule,
+        toModule: dep.toModule,
+        isProblematic,
+        boundaryType: this.classifyBoundaryType(dep.fromModule, dep.toModule),
+      },
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      description: `${dep.fromModule} → ${dep.toModule}` +
+        (isProblematic ? ' (review recommended)' : ''),
+    };
+  }
+
+  /**
+   * Check if a boundary crossing is potentially problematic
+   *
+   * @param fromModule - Source module
+   * @param toModule - Target module
+   * @returns True if problematic
+   * @private
+   */
+  private isProblematicBoundaryCross(fromModule: string, toModule: string): boolean {
+    // Define allowed dependencies (module A can depend on module B)
+    const allowedDeps: Record<string, string[]> = {
+      // Common patterns - features can use core, but not other features
+      'commands': ['analyzer', 'graph', 'storage', 'types', 'parser', 'validator'],
+      'analyzer': ['graph', 'storage', 'types', 'parser'],
+      'graph': ['storage', 'types'],
+      'storage': ['types'],
+      'validator': ['graph', 'types', 'storage'],
+      'parser': ['types'],
+    };
+
+    // If we have specific rules for the source module
+    if (allowedDeps[fromModule]) {
+      return !allowedDeps[fromModule].includes(toModule);
+    }
+
+    // By default, any cross-module dependency is flagged for review
+    return false;
+  }
+
+  /**
+   * Classify the type of boundary crossing
+   *
+   * @param fromModule - Source module
+   * @param toModule - Target module
+   * @returns Boundary type
+   * @private
+   */
+  private classifyBoundaryType(fromModule: string, toModule: string): string {
+    // Core modules that are expected to be depended upon
+    const coreModules = ['types', 'utils', 'helpers', 'constants', 'config', 'graph', 'storage'];
+
+    if (coreModules.includes(toModule)) {
+      return 'to-core';
+    }
+
+    if (coreModules.includes(fromModule)) {
+      return 'from-core';
+    }
+
+    // Feature-to-feature dependencies
+    return 'feature-to-feature';
+  }
+
+  /**
+   * Get module boundary statistics
+   *
+   * @param relationships - Module boundary relationships
+   * @returns Statistics
+   * @public
+   */
+  getModuleBoundaryStatistics(relationships: UnifiedRelationship[]): {
+    totalBoundaries: number;
+    problematicCount: number;
+    byModulePair: Record<string, number>;
+    byBoundaryType: Record<string, number>;
+    uniqueModules: Set<string>;
+  } {
+    const byModulePair: Record<string, number> = {};
+    const byBoundaryType: Record<string, number> = {};
+    const uniqueModules = new Set<string>();
+    let problematicCount = 0;
+
+    for (const rel of relationships) {
+      const fromModule = rel.properties?.fromModule || 'unknown';
+      const toModule = rel.properties?.toModule || 'unknown';
+      const pairKey = `${fromModule} → ${toModule}`;
+      const boundaryType = rel.properties?.boundaryType || 'unknown';
+
+      byModulePair[pairKey] = (byModulePair[pairKey] || 0) + 1;
+      byBoundaryType[boundaryType] = (byBoundaryType[boundaryType] || 0) + 1;
+
+      uniqueModules.add(fromModule);
+      uniqueModules.add(toModule);
+
+      if (rel.properties?.isProblematic) {
+        problematicCount++;
+      }
+    }
+
+    return {
+      totalBoundaries: relationships.length,
+      problematicCount,
+      byModulePair,
+      byBoundaryType,
+      uniqueModules,
+    };
+  }
 }

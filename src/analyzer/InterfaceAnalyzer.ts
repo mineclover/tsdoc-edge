@@ -204,8 +204,13 @@ export class InterfaceAnalyzer {
     const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
 
     // Find existing symbol info
+    // Normalize paths for comparison (handle Windows/Unix differences)
+    const normalizedFilePath = sourceFile.fileName.replace(/\\/g, '/');
     const existingSymbol = existingSymbols?.find(
-      (s) => s.name === name && s.type === 'interface' && s.filePath === sourceFile.fileName
+      (s) =>
+        s.name === name &&
+        s.type === 'interface' &&
+        s.filePath.replace(/\\/g, '/') === normalizedFilePath
     );
 
     // Create base symbol
