@@ -5,9 +5,11 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "bin": {
-    "tsdoc-edge": "./dist/cli.js"
+    "tsdoc-edge": "./dist/cli.js",
+    "tsdoc-edge-lsp": "./dist/lsp/server.js"
   },
   "scripts": {
+    "lsp": "node dist/lsp/server.js",
     "build": "tsc && cp src/storage/schema.sql dist/storage/",
     "dev": "tsc --watch",
     "test": "jest",
@@ -51,6 +53,8 @@
     "@gephi/gephi-lite-sdk": "^1.0.0",
     "@microsoft/tsdoc": "^0.15.0",
     "better-sqlite3": "^12.4.1",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.3",
+    "vscode-languageserver": "^9.0.1",
+    "vscode-languageserver-textdocument": "^1.0.12"
   }
 }
