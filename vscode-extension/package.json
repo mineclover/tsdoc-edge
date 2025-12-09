@@ -1,0 +1,80 @@
+{
+  "name": "tsdoc-edge-vscode",
+  "displayName": "TSDoc Edge",
+  "description": "TSDoc Edge integration for VS Code - Real-time impact analysis 및 symbol documentation",
+  "version": "0.1.0",
+  "publisher": "tsdoc-edge",
+  "engines": {
+    "vscode": "^1.85.0"
+  },
+  "categories": [
+    "Programming Languages",
+    "Linters",
+    "Other"
+  ],
+  "activationEvents": [
+    "onLanguage:typescript",
+    "onLanguage:typescriptreact",
+    "onLanguage:javascript",
+    "onLanguage:javascriptreact"
+  ],
+  "main": "./out/extension.js",
+  "contributes": {
+    "commands": [
+      {
+        "command": "tsdoc-edge.showImpact",
+        "title": "TSDoc Edge: Show Impact Analysis"
+      },
+      {
+        "command": "tsdoc-edge.workContext",
+        "title": "TSDoc Edge: Show Work Context"
+      },
+      {
+        "command": "tsdoc-edge.refreshAnalysis",
+        "title": "TSDoc Edge: Refresh Analysis"
+      }
+    ],
+    "configuration": {
+      "title": "TSDoc Edge",
+      "properties": {
+        "tsdocEdge.enable": {
+          "type": "boolean",
+          "default": true,
+          "description": "Enable TSDoc Edge LSP"
+        },
+        "tsdocEdge.showCodeLens": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show impact counts as Code Lens"
+        },
+        "tsdocEdge.showDiagnostics": {
+          "type": "boolean",
+          "default": true,
+          "description": "Show architectural warnings"
+        },
+        "tsdocEdge.impactThreshold": {
+          "type": "number",
+          "default": 10,
+          "description": "Threshold for high-impact symbol warnings"
+        }
+      }
+    }
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "eslint src --ext ts"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/vscode": "^1.85.0",
+    "@typescript-eslint/eslint-plugin": "^6.13.0",
+    "@typescript-eslint/parser": "^6.13.0",
+    "eslint": "^8.55.0",
+    "typescript": "^5.3.0"
+  },
+  "dependencies": {
+    "vscode-languageclient": "^9.0.1"
+  }
+}
