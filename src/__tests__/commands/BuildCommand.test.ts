@@ -84,14 +84,18 @@ describe('BuildCommand', () => {
     });
 
     it('should use default path "src" if not specified', async () => {
-      // Create src in cwd
-      const cwd = process.cwd();
-      const srcDir = path.join(cwd, 'src');
+      // Use tempDir src instead of cwd to avoid scanning entire project
+      const srcDir = path.join(tempDir, 'src');
 
-      if (fs.existsSync(srcDir)) {
+      // Change to tempDir so default 'src' resolves to our test directory
+      const originalCwd = process.cwd();
+      process.chdir(tempDir);
+
+      try {
         const result = await command.execute([]);
-        // Should not error
         expect(result).toBeDefined();
+      } finally {
+        process.chdir(originalCwd);
       }
     });
 
