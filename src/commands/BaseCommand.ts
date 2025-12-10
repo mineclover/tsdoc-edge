@@ -3,6 +3,9 @@
  * @packageDocumentation
  */
 
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+
 /**
  * Command execution result
  */
@@ -268,5 +271,68 @@ export abstract class BaseCommand {
       this.printError(unknownError.message);
       return this.failure(unknownError);
     }
+  }
+
+  /**
+   * Get database path from config or default
+   * Reads .tsdoc.config.json and returns the configured database path,
+   * or falls back to .tsdoc/symbols.db for backwards compatibility
+   *
+   * @returns Absolute path to the database file
+   */
+  protected getDatabasePath(): string {
+    const configPath = path.join(process.cwd(), '.tsdoc.config.json');
+
+    if (fs.existsSync(configPath)) {
+      try {
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+        if (config.paths?.databasePath) {
+          return path.join(process.cwd(), config.paths.databasePath);
+        }
+      } catch {
+        // Ignore config parse errors, use default
+      }
+    }
+
+    // Default fallback for backwards compatibility
+    return path.join(process.cwd(), '.tsdoc', 'symbols.db');
+  }
+
+  /**
+   * Get JSONL directory path from config or default
+   *
+   * @returns Absolute path to the JSONL directory
+   */
+  protected getJsonlPath(): string {
+    const configPath = path.join(process.cwd(), '.tsdoc.config.json');
+
+    if (fs.existsSync(configPath)) {
+      try {
+        const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+        if (config.paths?.jsonlDir) {
+          return path.join(process.cwd(), config.paths.jsonlDir);
+        }
+      } catch {
+        // Ignore config parse errors, use default
+      }
+    }
+
+    // Default fallback
+    return path.join(process.cwd(), '.tsdoc', 'data');
+  }
+
+  /**
+   * Check if database exists and return failure result if not
+   * Use this for consistent error messaging across commands
+   *
+   * @returns CommandResult if database not found, null if exists
+   */
+  protected checkDatabaseExists(): CommandResult | null {
+    const dbPath = this.getDatabasePath();
+    if (!fs.existsSync(dbPath)) {
+      this.printError('Database not found. Run: tsdoc-edge build src');
+      return this.failure('Database not found');
+    }
+    return null;
   }
 }

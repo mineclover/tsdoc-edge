@@ -3,28 +3,12 @@
  * @packageDocumentation
  */
 
-import * as fs from 'node:fs';
-import * as path from 'node:path';
 import { BaseCommand, colors, type CommandResult } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
+import { DatabaseManager, type SymbolRow } from '../storage/DatabaseManager';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { SymbolSearchEngine } from '../graph/SymbolSearchEngine';
 import type { Symbol } from '../types/graph/graph';
-
-/**
- * Interface for symbol rows from database
- */
-interface SymbolRow {
-  id: string;
-  name: string;
-  type: string;
-  file_path: string;
-  line: number;
-  column: number;
-  is_exported: number;
-  is_public: number;
-  summary: string | null;
-}
+import type { SymbolType } from '../types/graph';
 
 /**
  * UntestedCommand - Find symbols without test coverage
@@ -76,23 +60,17 @@ export class UntestedCommand extends BaseCommand {
       console.log(`${colors.bold}Untested Symbols${colors.reset}`);
       console.log();
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
-
-      if (!fs.existsSync(dbPath)) {
-        console.log(
-          `${colors.yellow}⚠️  Database not found. Run 'build' first.${colors.reset}`
-        );
-        console.log();
-        return { exitCode: 0, message: 'Database not found' };
+      if (!this.dbManager) {
+        const dbCheck = this.checkDatabaseExists();
+        if (dbCheck) return dbCheck;
       }
 
-      const jsonlPath = path.join(process.cwd(), '.tsdoc', 'data');
+      const dbPath = this.getDatabasePath();
+      const jsonlPath = this.getJsonlPath();
       const dbManager = this.dbManager || new DatabaseManager(dbPath, jsonlPath);
 
       try {
-        const query = 'SELECT * FROM symbols';
-        const stmt = dbManager.db.prepare(query);
-        const rows = stmt.all() as SymbolRow[];
+        const rows = dbManager.getAllSymbolRows();
 
         const graphBuilder = this.graphBuilder || new SymbolGraphBuilder();
 
@@ -100,7 +78,7 @@ export class UntestedCommand extends BaseCommand {
           const symbol: Symbol = {
             id: row.id,
             name: row.name,
-            type: row.type as Symbol['type'],
+            type: row.type as SymbolType,
             filePath: row.file_path,
             line: row.line,
             column: row.column,

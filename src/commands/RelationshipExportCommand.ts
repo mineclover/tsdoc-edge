@@ -5,10 +5,9 @@
  * @packageDocumentation
  */
 
-import * as path from 'node:path';
 import * as fs from 'node:fs';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
+import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
 type ExportFormat = 'json' | 'graphml' | 'dot' | 'csv' | 'cypher' | 'gephi';
 
@@ -90,7 +89,7 @@ Examples:
 
       this.printHeader(`Export Relationships (${options.format.toUpperCase()})`);
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
       // Build query
@@ -115,14 +114,14 @@ Examples:
       console.log();
       this.printInfo('Querying relationships...');
 
-      const relationships = dbManager.db.prepare(sql).all(...params) as any[];
+      const relationships = dbManager.db.prepare(sql).all(...params) as UnifiedRelationshipRow[];
 
       this.printInfo(`Found ${relationships.length} relationships`);
       console.log();
 
       // Get symbols for context
-      const symbols = dbManager.db.prepare('SELECT * FROM symbols').all() as any[];
-      const symbolMap = new Map(symbols.map((s: any) => [s.id, s]));
+      const symbols = dbManager.getAllSymbolRows();
+      const symbolMap = new Map(symbols.map((s) => [s.id, s]));
 
       // Export based on format
       let content: string;

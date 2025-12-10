@@ -813,18 +813,63 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
   private fixIssues(registry: SymbolRegistry): number {
     let fixed = 0;
 
-    // For now, just report what would be fixed
-    // TODO: Implement actual fixes
-
     for (const issue of registry.issues) {
       if (issue.type === 'ambiguous-reference' && issue.severity === 'warning') {
-        console.log(`  ${this.colors.green}✓${this.colors.reset} Would create: ${issue.suggestion}`);
-        // TODO: Create skeleton document
-        fixed++;
+        // Create skeleton document for undefined symbols
+        const normalizedName = this.normalizeSymbolName(issue.symbolName);
+        const targetPath = path.join('managed', 'relationships', `${normalizedName}.md`);
+
+        // Ensure directory exists
+        const targetDir = path.dirname(targetPath);
+        if (!fs.existsSync(targetDir)) {
+          fs.mkdirSync(targetDir, { recursive: true });
+        }
+
+        // Only create if file doesn't exist
+        if (!fs.existsSync(targetPath)) {
+          const skeletonContent = this.generateSkeletonDocument(issue.symbolName);
+          fs.writeFileSync(targetPath, skeletonContent);
+          console.log(`  ${this.colors.green}✓${this.colors.reset} Created: ${targetPath}`);
+          fixed++;
+        } else {
+          console.log(`  ${this.colors.yellow}⚠${this.colors.reset} Skipped (exists): ${targetPath}`);
+        }
+      } else if (issue.type === 'broken-reference' && issue.severity === 'error' && issue.suggestion?.startsWith('Did you mean')) {
+        // Log suggestion but don't auto-fix broken references (needs manual review)
+        console.log(`  ${this.colors.yellow}⚠${this.colors.reset} Manual fix needed: ${issue.filePath}:${issue.lineNumber}`);
+        console.log(`     ${this.colors.cyan}${issue.suggestion}${this.colors.reset}`);
       }
     }
 
     return fixed;
+  }
+
+  /**
+   * Generate skeleton document for a new symbol definition
+   */
+  private generateSkeletonDocument(symbolName: string): string {
+    const normalizedName = this.normalizeSymbolName(symbolName);
+    const timestamp = new Date().toISOString().split('T')[0];
+
+    return `# [[${symbolName}]]
+
+> Auto-generated skeleton document. Please fill in the details.
+
+## Overview
+
+<!-- TODO: Describe what ${symbolName} represents -->
+
+## Purpose
+
+<!-- TODO: Explain the purpose of this concept/component -->
+
+## Related Concepts
+
+<!-- TODO: Link to related symbols using [[Symbol]] notation -->
+
+---
+*Generated: ${timestamp}*
+`;
   }
 
   private get colors() {

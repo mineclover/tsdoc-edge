@@ -192,7 +192,10 @@ export class BuildCommand extends BaseCommand {
       // Prepare JSONL registry (use .tsdoc directly for consistency with other commands)
       const registryDir = path.join(process.cwd(), '.tsdoc');
       const registryPath = path.join(registryDir, 'registry.jsonl');
-      const registryLines: string[] = [];
+      // First line is metadata (required by SymbolRegistryManager)
+      const registryLines: string[] = [
+        JSON.stringify({ version: '1.0.0', idGeneratorMode: 'sequential' }),
+      ];
 
       // Global symbol ID mapping for relationship insertion
       const symbolIdMap = new Map<string, string>();
@@ -736,7 +739,10 @@ export class BuildCommand extends BaseCommand {
 
       const duration = Date.now() - startTime;
 
-      // Write JSONL registry
+      // Write JSONL registry (ensure directory exists)
+      if (!fs.existsSync(registryDir)) {
+        fs.mkdirSync(registryDir, { recursive: true });
+      }
       fs.writeFileSync(registryPath, registryLines.join('\n'), 'utf-8');
 
       // Update sync metadata for processed files (for incremental builds)

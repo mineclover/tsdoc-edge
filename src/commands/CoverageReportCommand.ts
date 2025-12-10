@@ -134,6 +134,9 @@ export class CoverageReportCommand extends BaseCommand {
         this.displayReport(report, hierarchical);
       }
 
+      // Close database connection
+      this.db.close();
+
       return this.success();
     });
   }

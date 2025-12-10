@@ -3,8 +3,6 @@
  * @packageDocumentation
  */
 
-import * as path from 'node:path';
-import * as fs from 'node:fs';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
 
@@ -36,14 +34,10 @@ export class RelationshipStatsCommand extends BaseCommand {
 
       this.printHeader('TSDoc Edge - Relationship Statistics');
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbCheck = this.checkDatabaseExists();
+      if (dbCheck) return dbCheck;
 
-      if (!fs.existsSync(dbPath)) {
-        this.printError('Database not found. Run: tsdoc-edge build src');
-        return this.failure('Database not found');
-      }
-
-      const dbManager = new DatabaseManager(dbPath);
+      const dbManager = new DatabaseManager(this.getDatabasePath());
 
       // Get total symbols
       const totalSymbols = dbManager.db.prepare('SELECT COUNT(*) as count FROM symbols').get() as { count: number };
@@ -109,15 +103,18 @@ export class RelationshipStatsCommand extends BaseCommand {
       // Implementation progress
       this.printSection('Implementation Progress');
 
-      // Define all 19 relationship types
+      // Define all relationship types by category (30 types across 11 categories)
       const allTypes = {
         structural: ['code-dependency', 'inheritance', 'implementation'],
         'data-flow': ['io-dependency', 'pipeline', 'event-flow'],
         behavioral: ['calls', 'callback', 'collaboration', 'composition', 'temporal-order'],
         alternative: ['substitution', 'fallback'],
-        constraint: ['mutual-exclusion', 'co-requirement'],
-        semantic: ['conceptual-relation', 'feature-grouping'],
+        constraint: ['mutual-exclusion', 'co-requirement', 'circular-dependency'],
+        semantic: ['naming-pattern-relation', 'explicit-semantic-relation', 'feature-grouping', 'doc-reference', 'enhancement'],
         verification: ['test-coverage', 'integration-verification'],
+        testing: ['contains', 'covers-scenario', 'test-as-example'],
+        'type-system': ['type-dependency', 'generic-constraint'],
+        architectural: ['layer-dependency', 'module-boundary'],
       };
 
       const implementedTypes = new Set(byType.map(r => r.type));

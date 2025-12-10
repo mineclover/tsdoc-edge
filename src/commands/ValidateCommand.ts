@@ -3,41 +3,12 @@
  * @packageDocumentation
  */
 
-import * as fs from 'node:fs';
-import * as path from 'node:path';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
+import { DatabaseManager, type SymbolRow } from '../storage/DatabaseManager';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { ConnectivityValidator } from '../validator/ConnectivityValidator';
-import type { Symbol } from '../types/graph/graph';
-
-/**
- * Database row types
- */
-interface SymbolRow {
-  id: string;
-  name: string;
-  type: string;
-  file_path: string;
-  line: number;
-  column: number;
-  is_exported: number;
-  is_public: number;
-  summary: string | null;
-}
-
-/**
- * RelationshipRow interface
- * @public
- */
-interface RelationshipRow {
-  type: string;
-  from_id: string;
-  to_id: string;
-  file_path: string | null;
-  line: number;
-  description: string;
-}
+import type { Symbol, SymbolRelationship } from '../types/graph/graph';
+import type { SymbolType } from '../types/graph';
 
 /**
  * Command for generating detailed validation reports
@@ -92,7 +63,7 @@ export class ValidateCommand extends BaseCommand {
   }
 
   protected getUsage(): string {
-    return 'tsdoc-edge validate\n\n  Reads from: demo/output/tsdoc-edge.db';
+    return 'tsdoc-edge validate\n\n  Reads from: configured database path (.tsdoc.config.json)';
   }
 
   /**
@@ -110,33 +81,26 @@ export class ValidateCommand extends BaseCommand {
 
       this.printHeader('Detailed Validation Report');
 
-      const dbPath = path.join(process.cwd(), 'demo', 'output', 'tsdoc-edge.db');
-
-      if (!fs.existsSync(dbPath)) {
-        this.printWarning('Database not found. Run demo first: npm run demo');
-        console.log();
-        console.log('To create the database, run:');
-        this.printInfo('  npm run demo');
-        console.log();
-        return this.failure('Database not found', 1);
+      if (!this.dbManager) {
+        const dbCheck = this.checkDatabaseExists();
+        if (dbCheck) return dbCheck;
       }
 
-      const jsonlPath = path.join(process.cwd(), 'demo', 'output', 'data');
+      const dbPath = this.getDatabasePath();
+      const jsonlPath = this.getJsonlPath();
       const dbManager = this.dbManager || new DatabaseManager(dbPath, jsonlPath);
       const graphBuilder = this.graphBuilder || new SymbolGraphBuilder();
 
       try {
         // Get all symbols from database
-        const symbolQuery = 'SELECT * FROM symbols';
-        const symbolStmt = dbManager.db.prepare(symbolQuery);
-        const symbolRows = symbolStmt.all() as SymbolRow[];
+        const { symbols: symbolRows, dependencies: depRows } = dbManager.getGraphData();
 
         // Build symbol graph
         for (const row of symbolRows) {
           const symbol: Symbol = {
             id: row.id,
             name: row.name,
-            type: row.type as Symbol['type'],
+            type: row.type as SymbolType,
             filePath: row.file_path,
             line: row.line,
             column: row.column,
@@ -149,25 +113,14 @@ export class ValidateCommand extends BaseCommand {
           graphBuilder.addSymbol(symbol);
         }
 
-        // Get relationships from database if they exist
-        try {
-          const relQuery = 'SELECT * FROM relationships';
-          const relStmt = dbManager.db.prepare(relQuery);
-          const relRows = relStmt.all() as RelationshipRow[];
-
-          for (const row of relRows) {
-            graphBuilder.addRelationship({
-              type: row.type as 'dependsOn' | 'usedBy' | 'implements' | 'extends' | 'relatedTo',
-              from: row.from_id,
-              to: row.to_id,
-              filePath: row.file_path || '',
-              line: row.line,
-              description: row.description,
-            });
-          }
-        } catch (_error) {
-          // Relationships table might not exist, that's okay
-          this.printWarning('Relationships table not found, skipping...');
+        // Add relationships
+        for (const rel of depRows) {
+          graphBuilder.addRelationship({
+            type: (rel.type || 'dependsOn') as SymbolRelationship['type'],
+            from: rel.symbol_id,
+            to: rel.target,
+            filePath: rel.import_path || '',
+          });
         }
 
         // Create validator and generate detailed report

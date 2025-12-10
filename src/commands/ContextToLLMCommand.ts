@@ -111,14 +111,11 @@ export class ContextToLLMCommand extends BaseCommand {
       console.log();
 
       // Initialize database
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
-      const jsonlPath = path.join(process.cwd(), '.tsdoc', 'data');
+      const dbCheck = this.checkDatabaseExists();
+      if (dbCheck) return dbCheck;
 
-      if (!fs.existsSync(dbPath)) {
-        this.printError('Database not found. Run "tsdoc-edge build src" first.');
-        return this.failure('Database not found');
-      }
-
+      const dbPath = this.getDatabasePath();
+      const jsonlPath = this.getJsonlPath();
       const dbManager = new DatabaseManager(dbPath, jsonlPath);
 
       try {

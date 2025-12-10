@@ -3,9 +3,8 @@
  * @packageDocumentation
  */
 
-import * as path from 'node:path';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
+import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
 interface SymbolMetrics {
   symbolId: string;
@@ -94,7 +93,7 @@ Examples:
 
       this.printHeader('Symbol Importance Analysis');
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
       console.log();
@@ -226,14 +225,14 @@ Examples:
       params.push(category);
     }
 
-    const relationships = dbManager.db.prepare(sql).all(...params) as any[];
+    const relationships = dbManager.db.prepare(sql).all(...params) as UnifiedRelationshipRow[];
 
     const outgoing = new Map<string, Set<string>>();
     const incoming = new Map<string, Set<string>>();
     const symbolNames = new Map<string, string>();
 
     // Get all symbol names
-    const symbols = dbManager.db.prepare('SELECT id, name FROM symbols').all() as any[];
+    const symbols = dbManager.db.prepare('SELECT id, name FROM symbols').all() as Array<{ id: string; name: string }>;
     for (const symbol of symbols) {
       symbolNames.set(symbol.id, symbol.name);
       outgoing.set(symbol.id, new Set());

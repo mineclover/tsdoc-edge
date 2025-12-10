@@ -3,39 +3,11 @@
  * @packageDocumentation
  */
 
-import * as fs from 'node:fs';
-import * as path from 'node:path';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import type { Symbol, SymbolRelationship } from '../types/graph/graph';
-
-/**
- * SymbolRow interface for database results
- */
-interface SymbolRow {
-  id: string;
-  name: string;
-  type: string;
-  file_path: string;
-  line: number;
-  column: number;
-  is_exported: number;
-  is_public: number;
-  summary: string | null;
-}
-
-/**
- * RelationshipRow interface for database results
- */
-interface RelationshipRow {
-  type: string;
-  from_id: string;
-  to_id: string;
-  file_path: string;
-  line: number;
-  description: string;
-}
+import type { SymbolType } from '../types/graph';
 
 /**
  * Command for showing core API symbols
@@ -108,23 +80,17 @@ export class CoreApiCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
-      const jsonlPath = path.join(process.cwd(), '.tsdoc', 'data');
-
-      if (!fs.existsSync(dbPath)) {
-        this.printError('No database found. Run analysis first.');
-        console.log();
-        return this.failure('Database not found');
+      if (!this.dbManager) {
+        const dbCheck = this.checkDatabaseExists();
+        if (dbCheck) return dbCheck;
       }
 
-      // Load symbols from database
+      const dbPath = this.getDatabasePath();
+      const jsonlPath = this.getJsonlPath();
       const dbManager = this.dbManager || new DatabaseManager(dbPath, jsonlPath);
 
       try {
-        const symbolStmt = dbManager.db.prepare('SELECT * FROM symbols');
-        const symbolRows = symbolStmt.all() as SymbolRow[];
-        const relationshipStmt = dbManager.db.prepare('SELECT * FROM dependencies');
-        const relationshipRows = relationshipStmt.all() as RelationshipRow[];
+        const { symbols: symbolRows, dependencies: depRows } = dbManager.getGraphData();
 
         const graphBuilder = new SymbolGraphBuilder();
 
@@ -133,13 +99,13 @@ export class CoreApiCommand extends BaseCommand {
           const symbol: Symbol = {
             id: row.id,
             name: row.name,
-            type: row.type as Symbol['type'],
+            type: row.type as SymbolType,
             filePath: row.file_path,
             line: row.line,
             column: row.column,
             isExported: row.is_exported === 1,
             isPublic: row.is_public === 1,
-            summary: row.summary || undefined,
+            summary: row.summary ?? undefined,
             tests: [],
             designDecisions: [],
           };
@@ -147,14 +113,12 @@ export class CoreApiCommand extends BaseCommand {
         }
 
         // Add relationships
-        for (const row of relationshipRows) {
+        for (const rel of depRows) {
           const relationship: SymbolRelationship = {
-            type: (row.type as SymbolRelationship['type']) || 'dependsOn',
-            from: (row as any).symbol_id,
-            to: (row as any).target,
-            filePath: (row as any).file_path || '',
-            line: row.line,
-            description: row.description,
+            type: (rel.type as SymbolRelationship['type']) || 'dependsOn',
+            from: rel.symbol_id,
+            to: rel.target,
+            filePath: rel.import_path || '',
           };
           graphBuilder.addRelationship(relationship);
         }

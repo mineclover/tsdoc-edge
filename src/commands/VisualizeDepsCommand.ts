@@ -11,6 +11,8 @@ import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { MermaidGenerator } from '../visualization/MermaidGenerator';
 import { DependencyChainAnalyzer } from '../analyzer/DependencyChainAnalyzer';
 import { ConfigManager } from '../config/ConfigManager';
+import type { SymbolType } from '../types/graph';
+import type { SymbolRelationship } from '../types/tags';
 
 /**
  * Command for visualizing dependencies with Mermaid diagrams
@@ -49,38 +51,36 @@ export class VisualizeDepsCommand extends BaseCommand {
       const config = ConfigManager.getInstance();
       const diagramsDir = (config as any).config?.paths?.diagramsDir || '.tsdoc/diagrams';
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
       // Load graph from database
       this.printInfo('Loading dependency graph...');
       const graphBuilder = new SymbolGraphBuilder();
+      const { symbols: symbolRows, dependencies: depRows } = dbManager.getGraphData();
 
-      const symbolsQuery = dbManager.db.prepare('SELECT * FROM symbols').all() as any[];
-      const relsQuery = dbManager.db.prepare('SELECT * FROM dependencies').all() as any[];
-
-      for (const row of symbolsQuery) {
+      for (const row of symbolRows) {
         graphBuilder.addSymbol({
           id: row.id,
           name: row.name,
-          type: row.type,
+          type: row.type as SymbolType,
           filePath: row.file_path,
           line: row.line,
           column: row.column,
           isExported: Boolean(row.is_exported),
           isPublic: Boolean(row.is_public),
-          summary: row.summary,
+          summary: row.summary ?? undefined,
           tests: [],
           designDecisions: [],
           metadata: {},
         });
       }
 
-      for (const rel of relsQuery) {
+      for (const rel of depRows) {
         graphBuilder.addRelationship({
           from: rel.symbol_id,
           to: rel.target,
-          type: rel.type || 'dependsOn',
+          type: (rel.type || 'dependsOn') as SymbolRelationship['type'],
           filePath: rel.import_path || '',
         });
       }

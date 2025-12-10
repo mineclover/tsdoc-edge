@@ -4,6 +4,114 @@ All notable changes to TSDoc Edge will be documented in this file.
 
 ## [Unreleased]
 
+### Changed - Code Quality Improvements
+
+#### ValidateSymbolRefsCommand
+- **Implemented auto-fix for ambiguous references**: `--fix` flag now creates skeleton documents for undefined symbols
+- **Added skeleton document generator**: Creates well-structured markdown templates with proper `[[Symbol]]` notation
+
+#### DatabaseManager
+- **Improved error handling**: Removed console.error/warn in favor of silent returns with meaningful boolean status
+- **Enhanced type safety**: Replaced `as any` patterns with proper type definitions (`ExtendedSymbolFields`, `UnifiedRelationship` property types)
+- **Cleaned up spurious JSDoc comments**: Removed auto-generated comments on loop variables and error handlers
+- **Added graph data helper methods**: `getAllSymbolRows()`, `getAllDependencyRows()`, `getGraphData()` for type-safe database queries
+- **Exported row interfaces**: `SymbolRow`, `DependencyRow`, `UnifiedRelationshipRow` now exported for use in commands
+
+#### ModuleSpecGenerator & Formatter
+- **Improved TODO placeholders**: Changed generic "TODO:" messages to actionable "@tag" suggestions
+  - `"TODO: Describe..."` → `"Add @problem tag to describe..."`
+  - Provides clearer guidance on what TSDoc tags to add
+
+#### LSP Service
+- **Added eslint-disable comments**: Explicit `@typescript-eslint/no-explicit-any` annotations for dynamically loaded database
+- **Improved code documentation**: Clarified that `any` types are intentional due to dynamic `require()` loading
+
+#### UsageTracker (Analytics)
+- **Removed noisy console.warn calls**: Silent failure pattern now uses clean returns without logging
+- **Improved error handling comments**: Each catch block now documents why silent failure is appropriate
+
+#### RelationshipStatsCommand
+- **Updated relationship type definitions**: Replaced deprecated `conceptual-relation` with new types
+- **Expanded type coverage**: Now includes all 30 relationship types across 11 categories (was 19 types across 7 categories)
+
+#### Analyze Commands Refactored (21 commands)
+- **AnalyzeTemporalOrderCommand**: Uses `getGraphData()` instead of raw SQL queries
+- **AnalyzeCompositionCommand**: Refactored with proper type imports
+- **AnalyzeCallsCommand**: Refactored with proper type imports
+- **AnalyzeSubstitutionCommand**: Refactored with proper type imports
+- **AnalyzeCollaborationCommand**: Refactored with proper type imports
+- **AnalyzeFallbackCommand**: Refactored with proper type imports
+- **AnalyzeEventsCommand**: Refactored with proper type imports
+- **AnalyzeStructuralCommand**: Refactored with proper type imports
+- **AnalyzeConstraintsCommand**: Refactored with proper type imports
+- **AnalyzeChainsCommand**: Refactored with proper type imports
+- **AnalyzeAlternativesCommand**: Refactored with proper type imports
+- **AnalyzeBehavioralCommand**: Refactored with proper type imports
+- **AnalyzeCallbacksCommand**: Refactored with proper type imports
+- **AnalyzeEnhancementCommand**: Refactored with proper type imports
+- **AnalyzeIOCommand**: Refactored with proper type imports
+- **AnalyzeLayerDependencyCommand**: Refactored with proper type imports
+- **AnalyzeTypesCommand**: Refactored with proper type imports
+- **AnalyzeTestsCommand**: Refactored with proper type imports
+- **AnalyzeDocReferenceCommand**: Refactored with proper type imports
+- **AnalyzeFinalCommand**: Refactored with proper type imports
+- **AnalyzeAllCommand**: Refactored with proper type imports
+- **Common improvements**:
+  - Uses imported `SymbolRow` and `DependencyRow` types
+  - Uses `SymbolType` and `SymbolRelationship['type']` for proper type casts
+  - Replaced `console.error` with `this.printError()` method
+  - Replaced `as any[]` with `ReturnType<typeof analyzer.analyze>`
+  - Replaced special Unicode characters with ASCII equivalents for portability
+
+#### Other Commands Refactored (12 commands)
+- **VisualizeDepsCommand**: Uses `getGraphData()` instead of raw SQL queries
+- **TestRelationshipsCommand**: Refactored with proper type imports, fixed field name casing
+- **ParallelWorkCommand**: Refactored with proper type imports, fixed field name casing
+- **CoreApiCommand**: Uses `getGraphData()`, removed local `SymbolRow` and `RelationshipRow` interfaces
+- **WhoUsesCommand**: Uses exported `SymbolRow` from DatabaseManager instead of local interface
+- **UndocumentedCommand**: Uses `getGraphData()`, removed local `SymbolRow` interface
+- **UntestedCommand**: Uses exported `SymbolRow`, uses `SymbolType` for type casts
+- **ValidateCommand**: Uses `getGraphData()`, removed local `SymbolRow` and `RelationshipRow` interfaces
+- **WithoutContractCommand**: Uses exported `SymbolRow`, uses `SymbolType` for type casts
+- **WithoutResponsibilityCommand**: Uses exported `SymbolRow`, uses `SymbolType` for type casts
+- **RelationshipExportCommand**: Uses `getAllSymbolRows()` instead of raw SQL with `as any[]` cast
+- **OntologyStatsCommand**: Uses `getAllSymbolRows()`, removed dead code referencing non-existent `kind` field
+- **DesignContextCommand**: Uses `SymbolRow` type instead of `as any[]`, added proper `SymbolType` casting
+
+#### Relationship Commands Refactored (8 commands)
+- **RelationshipQueryCommand**: Uses `UnifiedRelationshipRow` type instead of `as any[]`
+- **RelationshipImpactCommand**: Uses `UnifiedRelationshipRow` type instead of `as any[]`
+- **RelationshipPathCommand**: Uses `UnifiedRelationshipRow` type instead of `as any[]`
+- **RelationshipMetricsCommand**: Uses `UnifiedRelationshipRow` and proper symbol type
+- **RelationshipClustersCommand**: Uses `UnifiedRelationshipRow` type instead of `as any[]`
+- **RelationshipExportCommand**: Uses `UnifiedRelationshipRow` type instead of `as any[]`
+- **RelationshipVisualizeCommand**: Uses `UnifiedRelationshipRow` type instead of `as any[]`
+- **RelationshipValidateCommand**: Uses proper typed arrays instead of `as any[]` for all queries
+
+#### Error Handling Improvements
+- **AnalyzeTemporalOrderCommand**: Replaced `console.error` with `this.printError()` for consistent output
+- **TypeChainCommand**: Replaced `console.error` and `process.exit(1)` with `this.printError()` and `return this.failure()` for proper command result handling
+- **ExploreEntrypointCommand**: Added proper type annotation for file path query
+
+#### Resource Management Fixes
+- **CoverageReportCommand**: Added missing `db.close()` call to properly release database connection
+- **DesignContextCommand**: Added try/finally block with `dbManager.close()` to ensure connection is released
+- **DetectDeadCodeCommand**: Added missing `db.close()` call to properly release database connection
+
+#### Exit Code Fixes
+- **WithoutResponsibilityCommand**: Fixed incorrect `exitCode: 0` for missing database (now returns failure)
+- **WithoutContractCommand**: Fixed incorrect `exitCode: 0` for missing database (now returns failure)
+- **UntestedCommand**: Fixed incorrect `exitCode: 0` for missing database (now returns failure)
+- Standardized error message format to `"Database not found. Run: tsdoc-edge build src"`
+
+#### Analyzer Type Safety Improvements
+- **FinalAnalyzers**: Replaced `as any[]` with proper typed array for pipeline detection query
+- **TestCoverageUnifier**: Replaced `as any[]` with proper typed array for test mapping query
+
+#### Other Type Safety Improvements
+- **TaskManager**: Added `TaskRow` interface, replaced `as any[]` and `row: any` with proper types
+- **LSP Service**: Replaced `as any[]` with proper typed arrays for relationship and symbol queries
+
 ## [0.12.1] - 2025-11-25
 
 ### Changed - Codebase Optimization 🧹

@@ -3,9 +3,8 @@
  * @packageDocumentation
  */
 
-import * as path from 'node:path';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
+import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
 interface Cluster {
   id: number;
@@ -74,7 +73,7 @@ Examples:
 
       this.printHeader('Architectural Cluster Analysis');
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
       console.log();
@@ -231,7 +230,7 @@ Examples:
       params.push(category);
     }
 
-    const relationships = dbManager.db.prepare(sql).all(...params) as any[];
+    const relationships = dbManager.db.prepare(sql).all(...params) as UnifiedRelationshipRow[];
 
     const adjacencyMap = new Map<string, Map<string, string>>();
 

@@ -534,6 +534,7 @@ describe('Phase 5 Commands', () => {
           }),
         },
         close: jest.fn(),
+        getGraphData: jest.fn().mockReturnValue({ symbols: [], dependencies: [] }),
       } as any;
 
       const cmd = new UndocumentedCommand(mockDbManager);
@@ -546,22 +547,26 @@ describe('Phase 5 Commands', () => {
       const mockDbManager = {
         db: {
           prepare: jest.fn().mockReturnValue({
-            all: jest.fn().mockReturnValue([
-              {
-                id: 'sym-1',
-                name: 'DocumentedClass',
-                type: 'class',
-                file_path: '/path/to/class.ts',
-                line: 10,
-                column: 0,
-                is_exported: 1,
-                is_public: 1,
-                summary: 'A documented class',
-              },
-            ]),
+            all: jest.fn().mockReturnValue([]),
           }),
         },
         close: jest.fn(),
+        getGraphData: jest.fn().mockReturnValue({
+          symbols: [
+            {
+              id: 'sym-1',
+              name: 'DocumentedClass',
+              type: 'class',
+              file_path: '/path/to/class.ts',
+              line: 10,
+              column: 0,
+              is_exported: 1,
+              is_public: 1,
+              summary: 'A documented class',
+            },
+          ],
+          dependencies: [],
+        }),
       } as any;
 
       const cmd = new UndocumentedCommand(mockDbManager);
@@ -574,22 +579,26 @@ describe('Phase 5 Commands', () => {
       const mockDbManager = {
         db: {
           prepare: jest.fn().mockReturnValue({
-            all: jest.fn().mockReturnValue([
-              {
-                id: 'sym-1',
-                name: 'UndocumentedClass',
-                type: 'class',
-                file_path: '/path/to/class.ts',
-                line: 10,
-                column: 0,
-                is_exported: 1,
-                is_public: 1,
-                summary: null,
-              },
-            ]),
+            all: jest.fn().mockReturnValue([]),
           }),
         },
         close: jest.fn(),
+        getGraphData: jest.fn().mockReturnValue({
+          symbols: [
+            {
+              id: 'sym-1',
+              name: 'UndocumentedClass',
+              type: 'class',
+              file_path: '/path/to/class.ts',
+              line: 10,
+              column: 0,
+              is_exported: 1,
+              is_public: 1,
+              summary: null,
+            },
+          ],
+          dependencies: [],
+        }),
       } as any;
 
       const cmd = new UndocumentedCommand(mockDbManager);
@@ -606,12 +615,13 @@ describe('Phase 5 Commands', () => {
           }),
         },
         close: jest.fn(),
+        getGraphData: jest.fn().mockReturnValue({ symbols: [], dependencies: [] }),
       } as any;
 
       const cmd = new UndocumentedCommand(mockDbManager);
       await cmd.execute([]);
 
-      expect(mockDbManager.db.prepare).toHaveBeenCalled();
+      expect(mockDbManager.getGraphData).toHaveBeenCalled();
     });
   });
 

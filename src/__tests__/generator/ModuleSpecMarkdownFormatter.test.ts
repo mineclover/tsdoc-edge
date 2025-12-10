@@ -171,10 +171,10 @@ describe('ModuleSpecMarkdownFormatter', () => {
       });
       const result = formatter.format(spec);
 
-      expect(result).toContain('TODO: Describe the problem');
+      expect(result).toContain('Add @problem tag to describe the problem this module solves');
     });
 
-    it('should not show TODO when includeTodos is false', () => {
+    it('should not show suggestion when includeTodos is false', () => {
       const spec = createMockSpec({
         purpose: {
           problem: '',
@@ -185,7 +185,7 @@ describe('ModuleSpecMarkdownFormatter', () => {
       const fmt = new ModuleSpecMarkdownFormatter({ includeTodos: false });
       const result = fmt.format(spec);
 
-      expect(result).not.toContain('TODO');
+      expect(result).not.toContain('Add @problem tag');
     });
   });
 
@@ -462,7 +462,7 @@ describe('ModuleSpecMarkdownFormatter', () => {
       expect(result).toContain('Uses binary search');
     });
 
-    it('should render TODO for missing algorithm', () => {
+    it('should render suggestion for missing algorithm', () => {
       const spec = createMockSpec({
         logic: {
           features: [],
@@ -473,7 +473,7 @@ describe('ModuleSpecMarkdownFormatter', () => {
       });
       const result = formatter.format(spec);
 
-      expect(result).toContain('TODO: Describe the algorithm');
+      expect(result).toContain('Add @algorithm tag to describe the processing steps');
     });
 
     it('should render complexity', () => {

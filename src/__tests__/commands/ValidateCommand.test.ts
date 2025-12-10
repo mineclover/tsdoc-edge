@@ -32,6 +32,7 @@ describe('ValidateCommand', () => {
         }),
       },
       close: jest.fn(),
+      getGraphData: jest.fn().mockReturnValue({ symbols: [], dependencies: [] }),
     } as any;
 
     mockGraphBuilder = new SymbolGraphBuilder() as jest.Mocked<SymbolGraphBuilder>;
@@ -59,9 +60,11 @@ describe('ValidateCommand', () => {
     });
 
     it('should fail if database does not exist', async () => {
+      // Test with no injected dbManager - so it checks for database existence
+      const commandWithoutDb = new ValidateCommand(undefined, mockGraphBuilder, mockValidator);
       mockFsExists.mockReturnValue(false);
 
-      const result = await command.execute([]);
+      const result = await commandWithoutDb.execute([]);
 
       expect(result.exitCode).toBe(1);
       expect(result.message).toContain('Database not found');

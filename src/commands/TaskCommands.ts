@@ -4,8 +4,6 @@
  * @responsibility Manage tasks and checklists via CLI
  */
 
-import * as fs from 'node:fs';
-import * as path from 'node:path';
 import { BaseCommand, colors, type CommandResult } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { TaskManager } from '../task/TaskManager';
@@ -43,7 +41,7 @@ Options:
         return this.displayHelp();
       }
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
       const taskManager = new TaskManager(dbManager);
 
@@ -215,7 +213,7 @@ Options:
         return this.failure('Missing title');
       }
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
       const taskManager = new TaskManager(dbManager);
 
@@ -314,7 +312,7 @@ Options:
 
       const taskId = args[0];
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
       const taskManager = new TaskManager(dbManager);
 
@@ -376,7 +374,7 @@ export class TaskStatsCommand extends BaseCommand {
 
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
       const taskManager = new TaskManager(dbManager);
 

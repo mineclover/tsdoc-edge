@@ -7,7 +7,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
+import { DatabaseManager, type SymbolRow, type DependencyRow } from '../storage/DatabaseManager';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { TemporalOrderAnalyzer } from '../analyzer/TemporalOrderAnalyzer';
 
@@ -36,43 +36,41 @@ export class AnalyzeTemporalOrderCommand extends BaseCommand {
 
       this.printHeader('TSDoc Edge - Temporal Order Analysis');
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
       // Load graph from database
       this.printInfo('Loading dependency graph...');
       const graphBuilder = new SymbolGraphBuilder();
+      const { symbols: symbolRows, dependencies: depRows } = dbManager.getGraphData();
 
-      const symbolsQuery = dbManager.db.prepare('SELECT * FROM symbols').all() as any[];
-      const relsQuery = dbManager.db.prepare('SELECT * FROM dependencies').all() as any[];
-
-      for (const row of symbolsQuery) {
+      for (const row of symbolRows) {
         graphBuilder.addSymbol({
           id: row.id,
           name: row.name,
-          type: row.type,
+          type: row.type as import('../types/graph').SymbolType,
           filePath: row.file_path,
           line: row.line,
           column: row.column,
           isExported: Boolean(row.is_exported),
           isPublic: Boolean(row.is_public),
-          summary: row.summary,
+          summary: row.summary ?? undefined,
           tests: [],
           designDecisions: [],
           metadata: {
-            declaredType: row.declared_type,
-            inferredType: row.inferred_type,
+            declaredType: row.declared_type ?? undefined,
+            inferredType: row.inferred_type ?? undefined,
             genericParams: row.generic_params ? JSON.parse(row.generic_params) : undefined,
             parameterTypes: row.parameter_types ? JSON.parse(row.parameter_types) : undefined,
           },
         });
       }
 
-      for (const rel of relsQuery) {
+      for (const rel of depRows) {
         graphBuilder.addRelationship({
           from: rel.symbol_id,
           to: rel.target,
-          type: rel.type || 'dependsOn',
+          type: (rel.type || 'dependsOn') as import('../types/tags').SymbolRelationship['type'],
           filePath: rel.import_path || '',
         });
       }
@@ -100,9 +98,8 @@ export class AnalyzeTemporalOrderCommand extends BaseCommand {
 
       try {
         temporalOrderRels = analyzer.analyze();
-      } catch (error: any) {
-        console.error('Error during temporal order analysis:', error.message);
-        console.error('Stack:', error.stack);
+      } catch (error) {
+        this.printError(`Error during temporal order analysis: ${error instanceof Error ? error.message : String(error)}`);
         throw error;
       }
 

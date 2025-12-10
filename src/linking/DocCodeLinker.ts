@@ -223,6 +223,27 @@ export class DocCodeLinker {
    * Get comment text from JSDoc tag
    */
   private getTagComment(tag: ts.JSDocTag): string | undefined {
+    // Handle JSDocSeeTag specially - TypeScript parses "@see path/to/file.md" in complex ways:
+    // - For "doc.md": name has the full text, comment may be "*" from multiline JSDoc
+    // - For "/absolute/path.md": name is empty, comment has the full path
+    // - For "docs/guide.md": name is "docs", comment is "/guide.md" (TS interprets as code reference)
+    if (ts.isJSDocSeeTag(tag)) {
+      const seeTag = tag as ts.JSDocSeeTag;
+      const nameText = seeTag.name?.getText() || '';
+      let commentText = typeof tag.comment === 'string' ? tag.comment : '';
+
+      // Filter out JSDoc comment line markers (* from multiline comments)
+      if (commentText === '*' || commentText.startsWith('* ')) {
+        commentText = '';
+      }
+
+      // Combine name and comment to reconstruct the original path
+      const combined = nameText + commentText;
+      if (combined) {
+        return combined;
+      }
+    }
+
     if (typeof tag.comment === 'string') {
       return tag.comment;
     }

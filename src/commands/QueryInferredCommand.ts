@@ -67,7 +67,7 @@ export class QueryInferredCommand extends BaseCommand {
 
       this.printHeader('TSDoc Edge - Inferred Relationships');
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbPath = this.getDatabasePath();
       const jsonlPath = path.join(process.cwd(), '.tsdoc', 'data');
       const dbManager = new DatabaseManager(dbPath, jsonlPath);
 

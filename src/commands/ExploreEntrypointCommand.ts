@@ -96,12 +96,10 @@ export class ExploreEntrypointCommand extends BaseCommand {
       console.log();
 
       // Load database
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
-      if (!fs.existsSync(dbPath)) {
-        this.printError('Database not found. Run: tsdoc-edge build src');
-        return this.failure('Database not found');
-      }
+      const dbCheck = this.checkDatabaseExists();
+      if (dbCheck) return dbCheck;
 
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
       const detectOrphans = args.includes('--detect-orphans');
 
@@ -222,8 +220,8 @@ export class ExploreEntrypointCommand extends BaseCommand {
     // Calculate statistics
     const allSymbols = dbManager.db.prepare('SELECT id FROM symbols').all() as Array<{ id: string }>;
     const allFiles = new Set(
-      dbManager.db.prepare('SELECT DISTINCT file_path FROM symbols').all()
-        .map((row: any) => row.file_path)
+      (dbManager.db.prepare('SELECT DISTINCT file_path FROM symbols').all() as Array<{ file_path: string }>)
+        .map((row) => row.file_path)
     );
 
     exploration.statistics.totalSymbolsInDb = allSymbols.length;

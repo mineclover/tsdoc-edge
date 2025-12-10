@@ -42,18 +42,18 @@ export class TypeChainCommand extends BaseCommand {
     }
 
     if (args.length < 1) {
-      console.error(`${colors.red}✗${colors.reset} Usage: type-chain <source-type> [target-type] [options]`);
-      console.error('');
-      console.error('Options:');
-      console.error('  --max-depth <n>       Maximum depth to traverse (default: 10)');
-      console.error('  --include-external    Include external types from node_modules');
-      console.error('  --include-primitives  Include primitive types');
-      console.error('  --tree                Show as dependency tree (default if no target)');
-      console.error('');
-      console.error('Examples:');
-      console.error('  type-chain UserDTO User         # Find path from UserDTO to User');
-      console.error('  type-chain UserService --tree   # Show UserService dependency tree');
-      process.exit(1);
+      this.printError('Usage: type-chain <source-type> [target-type] [options]');
+      console.log('');
+      console.log('Options:');
+      console.log('  --max-depth <n>       Maximum depth to traverse (default: 10)');
+      console.log('  --include-external    Include external types from node_modules');
+      console.log('  --include-primitives  Include primitive types');
+      console.log('  --tree                Show as dependency tree (default if no target)');
+      console.log('');
+      console.log('Examples:');
+      console.log('  type-chain UserDTO User         # Find path from UserDTO to User');
+      console.log('  type-chain UserService --tree   # Show UserService dependency tree');
+      return this.failure('Missing required argument');
     }
 
     const sourceType = args[0];
@@ -82,8 +82,8 @@ export class TypeChainCommand extends BaseCommand {
     const srcDir = path.join(cwd, 'src');
 
     if (!fs.existsSync(srcDir)) {
-      console.error(`${colors.red}✗${colors.reset} Source directory not found: ${srcDir}`);
-      process.exit(1);
+      this.printError(`Source directory not found: ${srcDir}`);
+      return this.failure('Source directory not found');
     }
 
     console.log(`${colors.cyan}ℹ${colors.reset} Analyzing interfaces in: ${srcDir}`);
@@ -122,7 +122,7 @@ export class TypeChainCommand extends BaseCommand {
 
     // Check if source type exists
     if (!graph.interfaces.has(sourceType)) {
-      console.error(`${colors.red}✗${colors.reset} Type not found: ${sourceType}`);
+      this.printError(`Type not found: ${sourceType}`);
       console.log('');
       console.log('Available types:');
       const types = Array.from(graph.interfaces.keys()).slice(0, 10);
@@ -132,7 +132,7 @@ export class TypeChainCommand extends BaseCommand {
       if (graph.interfaces.size > 10) {
         console.log(`  ... and ${graph.interfaces.size - 10} more`);
       }
-      process.exit(1);
+      return this.failure('Type not found');
     }
 
     if (showTree) {
@@ -142,8 +142,8 @@ export class TypeChainCommand extends BaseCommand {
     } else {
       // Check if target exists
       if (!graph.interfaces.has(targetType!)) {
-        console.error(`${colors.red}✗${colors.reset} Target type not found: ${targetType}`);
-        process.exit(1);
+        this.printError(`Target type not found: ${targetType}`);
+        return this.failure('Target type not found');
       }
 
       // Find chain

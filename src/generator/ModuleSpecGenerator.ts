@@ -576,7 +576,8 @@ export class ModuleSpecGenerator {
         algorithm += '\n\nSteps:\n' + specTags.algorithm.steps.map((s, i) => `${i + 1}. ${s}`).join('\n');
       }
     } else if (this.options.includeTodos) {
-      algorithm = 'TODO: Describe the algorithm or approach';
+      // Provide more helpful default based on symbol kind
+      algorithm = 'Add @algorithm tag to describe the processing logic';
     }
 
     // PRIORITY: Use @complexity tag if available

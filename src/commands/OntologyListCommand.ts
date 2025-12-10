@@ -7,8 +7,6 @@
  * @solves Provides detailed listing of instances with filtering options
  */
 
-import * as path from 'node:path';
-import * as fs from 'node:fs';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import type { UnifiedRelationship } from '../types/relationships';
@@ -95,13 +93,10 @@ Examples:
         return this.failure('Missing required option');
       }
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbCheck = this.checkDatabaseExists();
+      if (dbCheck) return dbCheck;
 
-      if (!fs.existsSync(dbPath)) {
-        this.printError('Database not found. Run: tsdoc-edge build src');
-        return this.failure('Database not found');
-      }
-
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
       if (options.type === 'node') {

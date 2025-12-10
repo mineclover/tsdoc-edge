@@ -3,9 +3,8 @@
  * @packageDocumentation
  */
 
-import * as path from 'node:path';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
+import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
 interface ValidationIssue {
   type: 'orphan' | 'duplicate' | 'low-confidence' | 'inconsistent';
@@ -65,7 +64,7 @@ Examples:
 
       this.printHeader('Relationship Validation');
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
       console.log();
@@ -207,7 +206,7 @@ Examples:
     try {
       const relationships = dbManager.db
         .prepare('SELECT id, from_symbols, to_symbols FROM unified_relationships')
-        .all() as any[];
+        .all() as Array<{ id: string; from_symbols: string; to_symbols: string }>;
 
       for (const rel of relationships) {
         const fromSymbols = JSON.parse(rel.from_symbols);
@@ -257,13 +256,13 @@ Examples:
         HAVING count > 1
       `
         )
-        .all() as any[];
+        .all() as Array<{ type: string; from_symbols: string; to_symbols: string; count: number }>;
 
       for (const dup of duplicates) {
         issues.push({
           type: 'duplicate',
           severity: 'warning',
-          message: `Duplicate relationship: ${dup.type} (${dup.from_symbols} → ${dup.to_symbols}) appears ${dup.count} times`,
+          message: `Duplicate relationship: ${dup.type} (${dup.from_symbols} -> ${dup.to_symbols}) appears ${dup.count} times`,
         });
       }
     } catch (error) {
@@ -289,7 +288,7 @@ Examples:
         ORDER BY confidence ASC
       `
         )
-        .all(threshold) as any[];
+        .all(threshold) as Array<{ id: string; type: string; confidence: number }>;
 
       for (const rel of lowConfidence) {
         issues.push({
@@ -322,7 +321,7 @@ Examples:
         WHERE direction = 'bidirectional'
       `
         )
-        .all() as any[];
+        .all() as Array<{ id: string; type: string; from_symbols: string; to_symbols: string }>;
 
       for (const rel of bidirectional) {
         const fromSymbols = JSON.parse(rel.from_symbols);

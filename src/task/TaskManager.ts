@@ -21,6 +21,32 @@ import type {
 import { TaskStatus as TS, TaskPriority as TP, TaskType as TT } from '../types/task';
 
 /**
+ * Database row interface for tasks table
+ */
+interface TaskRow {
+  id: string;
+  title: string;
+  description: string | null;
+  status: string;
+  priority: string;
+  type: string;
+  assigned_to: string | null;
+  symbol_id: string | null;
+  file_path: string | null;
+  line: number | null;
+  estimated_hours: number | null;
+  actual_hours: number | null;
+  due_date: string | null;
+  parent_id: string | null;
+  dependencies: string | null;
+  tags: string | null;
+  created_at: string;
+  updated_at: string;
+  completed_at: string | null;
+  notes: string | null;
+}
+
+/**
  * Task Manager
  * @public
  * @responsibility CRUD operations for tasks and project management
@@ -137,7 +163,7 @@ export class TaskManager {
    * @public
    */
   getTask(id: string): Task | null {
-    const row = this.dbManager.db.prepare('SELECT * FROM tasks WHERE id = ?').get(id) as any;
+    const row = this.dbManager.db.prepare('SELECT * FROM tasks WHERE id = ?').get(id) as TaskRow | undefined;
 
     if (!row) return null;
 
@@ -258,7 +284,7 @@ export class TaskManager {
 
     query += ' ORDER BY priority DESC, due_date ASC, created_at DESC';
 
-    const rows = this.dbManager.db.prepare(query).all(...params) as any[];
+    const rows = this.dbManager.db.prepare(query).all(...params) as TaskRow[];
     return rows.map((row) => this.rowToTask(row));
   }
 
@@ -394,7 +420,7 @@ export class TaskManager {
    * @returns Task object
    * @private
    */
-  private rowToTask(row: any): Task {
+  private rowToTask(row: TaskRow): Task {
     return {
       id: row.id,
       title: row.title,

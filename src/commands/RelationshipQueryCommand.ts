@@ -3,9 +3,8 @@
  * @packageDocumentation
  */
 
-import * as path from 'node:path';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
+import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
 /**
  * Command for querying symbol relationships
@@ -61,7 +60,7 @@ Examples:
 
       this.printHeader(`Relationships for: ${symbolId}`);
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
       // Query relationships
@@ -92,7 +91,7 @@ Examples:
       sql += ' LIMIT ?';
       params.push(options.limit);
 
-      const relationships = dbManager.db.prepare(sql).all(...params) as any[];
+      const relationships = dbManager.db.prepare(sql).all(...params) as UnifiedRelationshipRow[];
 
       if (relationships.length === 0) {
         this.printInfo('No relationships found');
@@ -122,7 +121,7 @@ Examples:
       }
 
       // Group by category
-      const byCategory = new Map<string, any[]>();
+      const byCategory = new Map<string, UnifiedRelationshipRow[]>();
       for (const rel of filteredRels) {
         if (!byCategory.has(rel.category)) {
           byCategory.set(rel.category, []);

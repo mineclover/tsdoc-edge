@@ -95,10 +95,12 @@ export class TsdocEdgeService {
   private workspaceRoot: string;
   /** Path to SQLite database (.tsdoc/symbols.db) */
   private dbPath: string;
-  /** SQLite database connection (better-sqlite3) */
+  /** SQLite database connection (better-sqlite3, dynamically loaded via require) */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private db: any | null = null;
 
   /** Cache for symbol queries */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private symbolCache = new Map<string, CacheEntry<any>>();
   /** Cache for code lens data per file */
   private codeLensCache = new Map<string, CacheEntry<CodeLensInfo[]>>();
@@ -111,6 +113,7 @@ export class TsdocEdgeService {
   private static readonly CACHE_TTL = 5000;
 
   /** Prepared SQL statements for query reuse */
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private statements: Record<string, any> = {};
 
   /**
@@ -181,7 +184,8 @@ export class TsdocEdgeService {
    * @returns Prepared statement or null if database is not connected
    * @internal
    */
-  private getStatement(name: string, sql: string): any {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private getStatement(name: string, sql: string): any | null {
     if (!this.db) return null;
     if (!this.statements[name]) {
       this.statements[name] = this.db.prepare(sql);
@@ -539,7 +543,7 @@ export class TsdocEdgeService {
           AND line <= ?
         ORDER BY line DESC
         LIMIT 1
-      `).get(`%${fileName}`, line) as any;
+      `).get(`%${fileName}`, line) as { id: string; name: string; type: string } | undefined;
 
       return symbol || null;
     } catch (error) {
@@ -572,7 +576,7 @@ export class TsdocEdgeService {
           SELECT to_symbols
           FROM unified_relationships
           WHERE from_symbols LIKE ?
-        `).all(`%${current.id}%`) as any[];
+        `).all(`%${current.id}%`) as Array<{ to_symbols: string }>;
 
         for (const rel of relationships) {
           const toSymbols = JSON.parse(rel.to_symbols);
@@ -593,7 +597,7 @@ export class TsdocEdgeService {
         SELECT COUNT(DISTINCT from_symbols) as count
         FROM unified_relationships
         WHERE to_symbols LIKE ?
-      `).get(`%${symbolId}%`) as any;
+      `).get(`%${symbolId}%`) as { count: number } | undefined;
 
       return {
         downstream: visited.size,
@@ -625,7 +629,7 @@ export class TsdocEdgeService {
         FROM unified_relationships
         WHERE from_symbols LIKE ? OR to_symbols LIKE ?
         LIMIT ?
-      `).all(`%${symbolId}%`, `%${symbolId}%`, limit * 2) as any[];
+      `).all(`%${symbolId}%`, `%${symbolId}%`, limit * 2) as Array<{ from_symbols: string; to_symbols: string; rel_type: string }>;
 
       const relatedIds = new Set<string>();
 
@@ -640,7 +644,7 @@ export class TsdocEdgeService {
             // Get symbol details
             const symbol = this.db.prepare(`
               SELECT id, name, type FROM symbols WHERE id = ?
-            `).get(symId) as any;
+            `).get(symId) as { id: string; name: string; type: string } | undefined;
 
             if (symbol) {
               related.push({
@@ -674,6 +678,8 @@ export class TsdocEdgeService {
   findSymbolByName(name: string): { id: string; name: string; type: string; filePath: string; line: number } | null {
     if (!this.db) return null;
 
+    type SymbolLocation = { id: string; name: string; type: string; file_path: string; line: number | null };
+
     try {
       // First try exact match
       let symbol = this.db.prepare(`
@@ -681,7 +687,7 @@ export class TsdocEdgeService {
         FROM symbols
         WHERE name = ?
         LIMIT 1
-      `).get(name) as any;
+      `).get(name) as SymbolLocation | undefined;
 
       // If not found, try case-insensitive match
       if (!symbol) {
@@ -690,7 +696,7 @@ export class TsdocEdgeService {
           FROM symbols
           WHERE LOWER(name) = LOWER(?)
           LIMIT 1
-        `).get(name) as any;
+        `).get(name) as SymbolLocation | undefined;
       }
 
       // If still not found, try partial match
@@ -701,7 +707,7 @@ export class TsdocEdgeService {
           WHERE name LIKE ?
           ORDER BY LENGTH(name)
           LIMIT 1
-        `).get(`%${name}%`) as any;
+        `).get(`%${name}%`) as SymbolLocation | undefined;
       }
 
       if (!symbol) return null;

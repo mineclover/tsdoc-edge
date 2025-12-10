@@ -5,9 +5,8 @@
  * @packageDocumentation
  */
 
-import * as path from 'node:path';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
+import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
 interface PathNode {
   symbolId: string;
@@ -89,7 +88,7 @@ Examples:
 
       this.printHeader(`Paths: ${fromSymbol} → ${toSymbol}`);
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
       // Verify both symbols exist
@@ -249,7 +248,7 @@ Examples:
       params.push(category);
     }
 
-    const relationships = dbManager.db.prepare(sql).all(...params) as any[];
+    const relationships = dbManager.db.prepare(sql).all(...params) as UnifiedRelationshipRow[];
 
     for (const rel of relationships) {
       try {

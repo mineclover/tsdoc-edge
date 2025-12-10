@@ -7,8 +7,6 @@
  * @solves Provides hierarchical view of nodes, relationships, and their distribution
  */
 
-import * as path from 'node:path';
-import * as fs from 'node:fs';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
 
@@ -16,7 +14,6 @@ interface OntologyStats {
   nodes: {
     total: number;
     byType: Map<string, number>;
-    byKind: Map<string, number>;
   };
   relationships: {
     total: number;
@@ -78,14 +75,10 @@ Options:
       const detailed = args.includes('--detailed');
       const jsonOutput = args.includes('--json');
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbCheck = this.checkDatabaseExists();
+      if (dbCheck) return dbCheck;
 
-      if (!fs.existsSync(dbPath)) {
-        this.printError('Database not found. Run: tsdoc-edge build src');
-        return this.failure('Database not found');
-      }
-
-      const dbManager = new DatabaseManager(dbPath);
+      const dbManager = new DatabaseManager(this.getDatabasePath());
       const stats = this.gatherOntologyStats(dbManager);
 
       if (jsonOutput) {
@@ -107,25 +100,16 @@ Options:
 
   private gatherOntologyStats(dbManager: DatabaseManager): OntologyStats {
     // Get all symbols
-    const symbols = dbManager.db.prepare('SELECT * FROM symbols').all() as Array<{
-      id: string;
-      name: string;
-      type: string;
-      kind?: string;
-    }>;
+    const symbols = dbManager.getAllSymbolRows();
 
     // Get all relationships
     const relationships = dbManager.getAllUnifiedRelationships();
 
     // Calculate node statistics
     const nodesByType = new Map<string, number>();
-    const nodesByKind = new Map<string, number>();
 
     for (const symbol of symbols) {
       nodesByType.set(symbol.type, (nodesByType.get(symbol.type) || 0) + 1);
-      if (symbol.kind) {
-        nodesByKind.set(symbol.kind, (nodesByKind.get(symbol.kind) || 0) + 1);
-      }
     }
 
     // Calculate relationship statistics
@@ -181,7 +165,6 @@ Options:
       nodes: {
         total: totalNodes,
         byType: nodesByType,
-        byKind: nodesByKind,
       },
       relationships: {
         total: totalRels,
@@ -294,7 +277,6 @@ Options:
       nodes: {
         total: stats.nodes.total,
         byType: Object.fromEntries(stats.nodes.byType),
-        byKind: Object.fromEntries(stats.nodes.byKind),
       },
       relationships: {
         total: stats.relationships.total,

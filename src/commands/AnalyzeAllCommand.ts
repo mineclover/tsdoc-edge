@@ -15,6 +15,8 @@ import { BehavioralAnalyzer } from '../analyzer/BehavioralAnalyzer';
 import { ImplementationAnalyzer } from '../analyzer/ImplementationAnalyzer';
 import { TestCoverageUnifier } from '../analyzer/TestCoverageUnifier';
 import { FinalAnalyzers } from '../analyzer/FinalAnalyzers';
+import type { SymbolType } from '../types/graph';
+import type { SymbolRelationship } from '../types/tags';
 
 /**
  * Command for analyzing all relationship types at once
@@ -42,43 +44,41 @@ export class AnalyzeAllCommand extends BaseCommand {
 
       this.printHeader('TSDoc Edge - Complete Relationship Analysis');
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
       // Load graph from database
       this.printInfo('Loading dependency graph...');
       const graphBuilder = new SymbolGraphBuilder();
+      const { symbols: symbolRows, dependencies: depRows } = dbManager.getGraphData();
 
-      const symbolsQuery = dbManager.db.prepare('SELECT * FROM symbols').all() as any[];
-      const relsQuery = dbManager.db.prepare('SELECT * FROM dependencies').all() as any[];
-
-      for (const row of symbolsQuery) {
+      for (const row of symbolRows) {
         graphBuilder.addSymbol({
           id: row.id,
           name: row.name,
-          type: row.type,
+          type: row.type as SymbolType,
           filePath: row.file_path,
           line: row.line,
           column: row.column,
           isExported: Boolean(row.is_exported),
           isPublic: Boolean(row.is_public),
-          summary: row.summary,
+          summary: row.summary ?? undefined,
           tests: [],
           designDecisions: [],
           metadata: {
-            declaredType: row.declared_type,
-            inferredType: row.inferred_type,
+            declaredType: row.declared_type ?? undefined,
+            inferredType: row.inferred_type ?? undefined,
             genericParams: row.generic_params ? JSON.parse(row.generic_params) : undefined,
             parameterTypes: row.parameter_types ? JSON.parse(row.parameter_types) : undefined,
           },
         });
       }
 
-      for (const rel of relsQuery) {
+      for (const rel of depRows) {
         graphBuilder.addRelationship({
           from: rel.symbol_id,
           to: rel.target,
-          type: rel.type || 'dependsOn',
+          type: (rel.type || 'dependsOn') as SymbolRelationship['type'],
           filePath: rel.import_path || '',
         });
       }

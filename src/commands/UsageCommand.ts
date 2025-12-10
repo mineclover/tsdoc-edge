@@ -3,7 +3,6 @@
  * @packageDocumentation
  */
 
-import * as path from 'node:path';
 import { UsageTracker } from '../analytics/UsageTracker';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 

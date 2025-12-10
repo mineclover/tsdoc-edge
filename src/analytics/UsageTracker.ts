@@ -94,9 +94,8 @@ export class UsageTracker {
       this.autoCleanup();
 
       return true;
-    } catch (error) {
-      // Silent fail - don't break CLI if analytics fails
-      console.warn('Failed to record usage event:', error);
+    } catch {
+      // Silent fail - analytics should never break CLI functionality
       return false;
     }
   }
@@ -128,8 +127,8 @@ export class UsageTracker {
       }
 
       return events;
-    } catch (error) {
-      console.warn('Failed to read usage events:', error);
+    } catch {
+      // Return empty array on read errors - analytics data is non-critical
       return [];
     }
   }
@@ -328,8 +327,8 @@ export class UsageTracker {
       // Rewrite file
       const content = toKeep.map((e) => JSON.stringify(e)).join('\n') + '\n';
       fs.writeFileSync(this.eventsPath, content, 'utf-8');
-    } catch (error) {
-      console.warn('Failed to cleanup events:', error);
+    } catch {
+      // Cleanup failure is not critical - will try again on next event
     }
   }
 
@@ -344,8 +343,8 @@ export class UsageTracker {
         fs.unlinkSync(this.eventsPath);
       }
       return true;
-    } catch (error) {
-      console.warn('Failed to clear analytics:', error);
+    } catch {
+      // Silent fail - return false to indicate failure
       return false;
     }
   }
@@ -373,8 +372,8 @@ export class UsageTracker {
 
       fs.writeFileSync(outputPath, JSON.stringify(exportData, null, 2), 'utf-8');
       return true;
-    } catch (error) {
-      console.warn('Failed to export analytics:', error);
+    } catch {
+      // Export failure - return false to indicate failure
       return false;
     }
   }

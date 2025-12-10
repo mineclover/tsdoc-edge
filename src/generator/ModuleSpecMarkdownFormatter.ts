@@ -146,7 +146,7 @@ export class ModuleSpecMarkdownFormatter {
       lines.push(`**Problem:**  \n${purpose.problem}`);
       lines.push('');
     } else if (this.options.includeTodos) {
-      lines.push('**Problem:**  \n> TODO: Describe the problem this module solves');
+      lines.push('**Problem:**  \n> Add @problem tag to describe the problem this module solves');
       lines.push('');
     }
 
@@ -154,7 +154,7 @@ export class ModuleSpecMarkdownFormatter {
       lines.push(`**Responsibility:**  \n${purpose.responsibility}`);
       lines.push('');
     } else if (this.options.includeTodos) {
-      lines.push('**Responsibility:**  \n> TODO: Describe the main responsibility');
+      lines.push('**Responsibility:**  \n> Add @responsibility tag to describe the main responsibility');
       lines.push('');
     }
 
@@ -380,7 +380,7 @@ export class ModuleSpecMarkdownFormatter {
     } else if (this.options.includeTodos) {
       lines.push('### Algorithm');
       lines.push('');
-      lines.push('> TODO: Describe the algorithm or processing steps');
+      lines.push('> Add @algorithm tag to describe the processing steps');
       lines.push('');
     }
 

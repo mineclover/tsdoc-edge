@@ -13,12 +13,25 @@ import type { Symbol } from '../types/graph';
 import type { EnhancedSymbolDoc } from '../types/tags';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 
+/**
+ * Extended symbol type that may include additional AST-extracted fields
+ */
+interface ExtendedSymbolFields {
+  declaredType?: string;
+  inferredType?: string;
+  genericParams?: string[];
+  parameterTypes?: Array<{ name: string; type?: string }>;
+  isConstant?: boolean;
+  literalValue?: string;
+  valueType?: string;
+}
+
 // SQLite row types
 /**
  * SymbolRow interface
  * @public
  */
-interface SymbolRow {
+export interface SymbolRow {
   id: string;
   name: string;
   type: string;
@@ -28,6 +41,48 @@ interface SymbolRow {
   is_exported: number;
   is_public: number;
   summary: string | null;
+  declared_type?: string | null;
+  inferred_type?: string | null;
+  generic_params?: string | null;
+  parameter_types?: string | null;
+}
+
+/**
+ * DependencyRow interface for database queries
+ * @public
+ */
+export interface DependencyRow {
+  symbol_id: string;
+  target: string;
+  type: string;
+  reason: string;
+  version: string | null;
+  is_optional: number;
+  import_path: string | null;
+}
+
+/**
+ * UnifiedRelationshipRow interface for raw database queries
+ * Use this when querying unified_relationships table directly with dynamic WHERE clauses
+ * @public
+ */
+export interface UnifiedRelationshipRow {
+  id: string;
+  type: string;
+  category: string;
+  from_symbols: string; // JSON string
+  to_symbols: string; // JSON string
+  direction: string;
+  strength: string;
+  evidence: string; // JSON string
+  discovered_by: string;
+  confidence: number;
+  file_path: string | null;
+  line: number | null;
+  properties: string | null; // JSON string
+  created_at: string;
+  updated_at: string;
+  description: string | null;
 }
 
 /**
@@ -138,14 +193,9 @@ export class DatabaseManager {
     // SQLite can handle multiple statements in a single exec() call
     try {
       this.db.exec(schema);
-      /**
-       * error
-       * @public
-       */
     } catch (error) {
-      // If the schema is already initialized, ignore the error
-      // This happens when opening an existing database
-      console.warn('Schema initialization warning:', error);
+      // Schema already initialized - this is expected when opening existing database
+      // Silently ignore as this is normal behavior
     }
   }
 
@@ -157,9 +207,7 @@ export class DatabaseManager {
    * @precondition Symbol ID must be unique
    * @postcondition Symbol is indexed and searchable
    */
-  insertSymbol(symbol: Symbol, jsonlLine: number): boolean {
-    const symbolAny = symbol as any; // ExtractedSymbol may have additional fields
-
+  insertSymbol(symbol: Symbol & Partial<ExtendedSymbolFields>, jsonlLine: number): boolean {
     const stmt = this.db.prepare(`
       INSERT OR REPLACE INTO symbols (
         id, name, type, file_path, line, column,
@@ -181,25 +229,22 @@ export class DatabaseManager {
         symbol.isExported ? 1 : 0,
         symbol.isPublic ? 1 : 0,
         symbol.summary || null,
-        symbolAny.declaredType || null,
-        symbolAny.inferredType || null,
-        symbolAny.genericParams ? JSON.stringify(symbolAny.genericParams) : null,
-        symbolAny.parameterTypes ? JSON.stringify(symbolAny.parameterTypes) : null,
-        symbolAny.isConstant ? 1 : 0,
-        symbolAny.literalValue || null,
-        symbolAny.valueType || null,
+        symbol.declaredType || null,
+        symbol.inferredType || null,
+        symbol.genericParams ? JSON.stringify(symbol.genericParams) : null,
+        symbol.parameterTypes ? JSON.stringify(symbol.parameterTypes) : null,
+        symbol.isConstant ? 1 : 0,
+        symbol.literalValue || null,
+        symbol.valueType || null,
         new Date().toISOString(),
         new Date().toISOString(),
         '1.0.0',
         jsonlLine
       );
       return true;
-      /**
-       * error
-       * @public
-       */
     } catch (error) {
-      console.error('Failed to insert symbol:', error);
+      // Symbol insertion failed - likely a constraint violation
+      // Return false to allow caller to handle the error
       return false;
     }
   }
@@ -236,12 +281,9 @@ export class DatabaseManager {
         jsonlLine
       );
       return true;
-      /**
-       * error
-       * @public
-       */
     } catch (error) {
-      console.error('Failed to insert enhanced doc:', error);
+      // Enhanced doc insertion failed
+      // Return false to allow caller to handle the error
       return false;
     }
   }
@@ -278,7 +320,8 @@ export class DatabaseManager {
       );
       return true;
     } catch (error) {
-      console.error('Failed to insert dependency:', error);
+      // Dependency insertion failed
+      // Return false to allow caller to handle the error
       return false;
     }
   }
@@ -441,10 +484,6 @@ export class DatabaseManager {
     const lines: string[] = [];
 
     // Export symbols
-    /**
-     * symbol
-     * @public
-     */
     for (const symbol of symbols) {
       const record = {
         type: 'symbol',
@@ -454,10 +493,6 @@ export class DatabaseManager {
     }
 
     // Export enhanced docs
-    /**
-     * doc
-     * @public
-     */
     for (const doc of enhancedDocs) {
       const record = {
         type: 'enhanced_doc',
@@ -490,10 +525,6 @@ export class DatabaseManager {
 
     let count = 0;
 
-    /**
-     * i
-     * @public
-     */
     for (let i = 0; i < lines.length; i++) {
       try {
         const record = JSON.parse(lines[i]);
@@ -532,12 +563,10 @@ export class DatabaseManager {
           this.insertEnhancedDoc(doc, i);
           count++;
         }
-        /**
-         * error
-         * @public
-         */
       } catch (error) {
-        console.error(`Error parsing line ${i}:`, error);
+        // Skip malformed lines during import
+        // Errors are silently skipped as partial import is acceptable
+        continue;
       }
     }
 
@@ -568,10 +597,6 @@ export class DatabaseManager {
     let docCount = 0;
     const mismatches: string[] = [];
 
-    /**
-     * i
-     * @public
-     */
     for (let i = 0; i < lines.length; i++) {
       try {
         const record = JSON.parse(lines[i]);
@@ -591,10 +616,6 @@ export class DatabaseManager {
           }
           docCount++;
         }
-        /**
-         * error
-         * @public
-         */
       } catch (error) {
         mismatches.push(`Error parsing line ${i}: ${error}`);
       }
@@ -672,7 +693,8 @@ export class DatabaseManager {
       );
       return true;
     } catch (error) {
-      console.error('Failed to insert unified relationship:', error);
+      // Unified relationship insertion failed
+      // Return false to allow caller to handle the error
       return false;
     }
   }
@@ -708,14 +730,14 @@ export class DatabaseManager {
 
     return rows.map(row => ({
       id: row.id,
-      type: row.type as any,
-      category: row.category as any,
-      from: JSON.parse(row.from_symbols),
-      to: JSON.parse(row.to_symbols),
-      direction: row.direction as any,
-      strength: row.strength as any,
-      evidence: JSON.parse(row.evidence),
-      discoveredBy: row.discovered_by as any,
+      type: row.type as UnifiedRelationship['type'],
+      category: row.category as UnifiedRelationship['category'],
+      from: JSON.parse(row.from_symbols) as string | string[],
+      to: JSON.parse(row.to_symbols) as string | string[],
+      direction: row.direction as UnifiedRelationship['direction'],
+      strength: row.strength as UnifiedRelationship['strength'],
+      evidence: JSON.parse(row.evidence) as UnifiedRelationship['evidence'],
+      discoveredBy: row.discovered_by as UnifiedRelationship['discoveredBy'],
       confidence: row.confidence,
       filePath: row.file_path || undefined,
       line: row.line || undefined,
@@ -785,6 +807,38 @@ export class DatabaseManager {
       totalSymbols: symbolCount.count,
       totalEnhancedDocs: docCount.count,
       dbSize: stats.size,
+    };
+  }
+
+  /**
+   * Get all symbol rows for graph building
+   * @returns Array of SymbolRow objects
+   * @public
+   */
+  getAllSymbolRows(): SymbolRow[] {
+    const stmt = this.db.prepare('SELECT * FROM symbols');
+    return stmt.all() as SymbolRow[];
+  }
+
+  /**
+   * Get all dependency rows for graph building
+   * @returns Array of DependencyRow objects
+   * @public
+   */
+  getAllDependencyRows(): DependencyRow[] {
+    const stmt = this.db.prepare('SELECT * FROM dependencies');
+    return stmt.all() as DependencyRow[];
+  }
+
+  /**
+   * Get symbols and dependencies for graph building (common pattern)
+   * @returns Object containing symbol and dependency rows
+   * @public
+   */
+  getGraphData(): { symbols: SymbolRow[]; dependencies: DependencyRow[] } {
+    return {
+      symbols: this.getAllSymbolRows(),
+      dependencies: this.getAllDependencyRows(),
     };
   }
 }

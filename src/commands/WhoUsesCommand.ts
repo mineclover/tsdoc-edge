@@ -3,25 +3,8 @@
  * @packageDocumentation
  */
 
-import * as fs from 'node:fs';
-import * as path from 'node:path';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
-
-/**
- * SymbolRow interface for database results
- */
-interface SymbolRow {
-  id: string;
-  name: string;
-  type: string;
-  file_path: string;
-  line: number;
-  column: number;
-  is_exported: number;
-  is_public: number;
-  summary: string | null;
-}
+import { DatabaseManager, type SymbolRow } from '../storage/DatabaseManager';
 
 /**
  * Command for showing who uses a symbol (database-driven)
@@ -106,14 +89,13 @@ export class WhoUsesCommand extends BaseCommand {
         return this.failure('Symbol name required');
       }
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
-      if (!fs.existsSync(dbPath)) {
-        this.printError('Database not found. Run "tsdoc-edge build src" first.');
-        console.log();
-        return this.failure('Database not found');
+      if (!this.dbManager) {
+        const dbCheck = this.checkDatabaseExists();
+        if (dbCheck) return dbCheck;
       }
 
-      const jsonlPath = path.join(process.cwd(), '.tsdoc', 'data');
+      const dbPath = this.getDatabasePath();
+      const jsonlPath = this.getJsonlPath();
       const dbManager = this.dbManager || new DatabaseManager(dbPath, jsonlPath);
 
       try {

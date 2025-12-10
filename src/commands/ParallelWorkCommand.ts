@@ -8,6 +8,8 @@ import { DatabaseManager } from '../storage/DatabaseManager';
 import { ConfigManager } from '../config/ConfigManager';
 import { ParallelWorkDetector } from '../analyzer/ParallelWorkDetector';
 import { BaseCommand, type CommandResult } from './BaseCommand';
+import type { SymbolType } from '../types/graph';
+import type { SymbolRelationship } from '../types/tags';
 import * as path from 'node:path';
 
 /**
@@ -68,38 +70,30 @@ export class ParallelWorkCommand extends BaseCommand {
 
       this.printInfo('Building dependency graph...');
       const graphBuilder = new SymbolGraphBuilder();
+      const { symbols: symbolRows, dependencies: depRows } = dbManager.getGraphData();
 
-      // Load all symbols using existing query method
-      const symbolsQuery = dbManager.db.prepare('SELECT * FROM symbols').all() as any[];
-
-      for (const row of symbolsQuery) {
-        const symbol = {
+      for (const row of symbolRows) {
+        graphBuilder.addSymbol({
           id: row.id,
           name: row.name,
-          type: row.type,
-          filePath: row.filePath,
+          type: row.type as SymbolType,
+          filePath: row.file_path,
           line: row.line || 0,
           column: row.column || 0,
-          isExported: Boolean(row.isExported),
-          isPublic: Boolean(row.isPublic),
-          summary: row.summary || '',
+          isExported: Boolean(row.is_exported),
+          isPublic: Boolean(row.is_public),
+          summary: row.summary ?? '',
           tests: [],
           designDecisions: [],
           metadata: {},
-        };
-        graphBuilder.addSymbol(symbol);
+        });
       }
 
-      // Load relationships from dependencies table
-      const relsQuery = dbManager.db
-        .prepare('SELECT symbol_id, target, type FROM dependencies')
-        .all() as any[];
-
-      for (const rel of relsQuery) {
+      for (const rel of depRows) {
         graphBuilder.addRelationship({
           from: rel.symbol_id,
           to: rel.target,
-          type: rel.type || 'dependsOn',
+          type: (rel.type || 'dependsOn') as SymbolRelationship['type'],
           filePath: '',
         });
       }

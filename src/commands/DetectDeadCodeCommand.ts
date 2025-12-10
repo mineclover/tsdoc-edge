@@ -93,6 +93,9 @@ export class DetectDeadCodeCommand extends BaseCommand {
       // Display results
       this.displayResults(filtered, showAll);
 
+      // Close database connection
+      this.db.close();
+
       return this.success();
     });
   }

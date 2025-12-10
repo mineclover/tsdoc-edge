@@ -86,7 +86,7 @@ export class TestCoverageUnifier {
            FROM test_mappings
            WHERE symbol_id IS NOT NULL`
         )
-        .all() as any[];
+        .all() as Array<{ symbol_id: string; test_file_path: string; test_name: string | null }>;
 
       for (const mapping of mappings) {
         // Verify symbol exists in graph

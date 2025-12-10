@@ -71,10 +71,10 @@ export class FinalAnalyzers {
            WHERE d1.type = 'calls' AND d2.type = 'calls'
            LIMIT 50`
         )
-        .all() as any[];
+        .all() as Array<{ stage1: string; stage2: string; stage3: string }>;
 
       for (const chain of chains) {
-        // Create pipeline for stage1 → stage2
+        // Create pipeline for stage1 -> stage2
         relationships.push({
           id: `pipeline-${chain.stage1}-${chain.stage2}`
             .toLowerCase()

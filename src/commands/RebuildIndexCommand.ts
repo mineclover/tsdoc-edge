@@ -3,8 +3,6 @@
  * @packageDocumentation
  */
 
-import * as fs from 'node:fs';
-import * as path from 'node:path';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
 
@@ -79,15 +77,13 @@ export class RebuildIndexCommand extends BaseCommand {
 
       this.printHeader('TSDoc Edge - Rebuild FTS5 Index');
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
-
-      if (!fs.existsSync(dbPath)) {
-        this.printError('Database not found. Run "tsdoc-edge build src" first.');
-        console.log();
-        return this.failure('Database not found');
+      if (!this.dbManager) {
+        const dbCheck = this.checkDatabaseExists();
+        if (dbCheck) return dbCheck;
       }
 
-      const jsonlPath = path.join(process.cwd(), '.tsdoc', 'data');
+      const dbPath = this.getDatabasePath();
+      const jsonlPath = this.getJsonlPath();
       const dbManager = this.dbManager || new DatabaseManager(dbPath, jsonlPath);
 
       try {

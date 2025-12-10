@@ -10,7 +10,6 @@
  * @doc [[TestExamplesCommand]]
  */
 
-import * as fs from 'node:fs';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { ConfigManager } from '../config/ConfigManager';
 import { DatabaseManager } from '../storage/DatabaseManager';
@@ -62,15 +61,13 @@ export class TestExamplesCommand extends BaseCommand {
     console.log();
 
     try {
+      const dbCheck = this.checkDatabaseExists();
+      if (dbCheck) return dbCheck;
+
       const config = this.configManager.get();
-      const dbPath = config.paths.databasePath;
-
-      if (!fs.existsSync(dbPath)) {
-        this.printError('Database not found. Run: tsdoc-edge build src');
-        return { exitCode: 1, message: 'Database not found' };
-      }
-
-      const dbManager = new DatabaseManager(dbPath, config.paths.jsonlDir);
+      const dbPath = this.getDatabasePath();
+      const jsonlPath = this.getJsonlPath();
+      const dbManager = new DatabaseManager(dbPath, jsonlPath);
       const extractor = new TestExampleExtractor(dbManager);
 
       // Extract examples

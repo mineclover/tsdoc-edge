@@ -8,7 +8,6 @@ import * as path from 'node:path';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import { DatabaseManager } from '../storage/DatabaseManager';
-import { ConfigManager } from '../config/ConfigManager';
 
 /**
  * Command for finding orphaned symbols
@@ -86,11 +85,10 @@ export class OrphansCommand extends BaseCommand {
     includeMembers: boolean,
     classesOnly: boolean
   ): Array<{ id: string; name: string; filePath: string; type: string }> {
-    const config = ConfigManager.getInstance().get();
-    const dbPath = path.join(process.cwd(), config.paths.databasePath || '.tsdoc.db');
+    const dbPath = this.getDatabasePath();
 
     if (!fs.existsSync(dbPath)) {
-      throw new Error('Database not found. Run "tsdoc-edge build" first.');
+      throw new Error('Database not found. Run: tsdoc-edge build src');
     }
 
     const dbManager = new DatabaseManager(dbPath, '');

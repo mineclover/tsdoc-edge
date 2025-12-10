@@ -99,13 +99,11 @@ export class WorkContextCommand extends BaseCommand {
     console.log();
 
     try {
-      const config = this.configManager.get();
-      const dbPath = config.paths.databasePath;
+      const dbCheck = this.checkDatabaseExists();
+      if (dbCheck) return dbCheck;
 
-      if (!fs.existsSync(dbPath)) {
-        this.printError('Database not found. Run: tsdoc-edge build src');
-        return { exitCode: 1, message: 'Database not found' };
-      }
+      const config = this.configManager.get();
+      const dbPath = this.getDatabasePath();
 
       const dbManager = new DatabaseManager(dbPath, config.paths.jsonlDir);
 

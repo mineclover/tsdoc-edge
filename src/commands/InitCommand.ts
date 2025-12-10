@@ -3,7 +3,6 @@
  * @packageDocumentation
  */
 
-import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { ConfigManager } from '../config/ConfigManager';

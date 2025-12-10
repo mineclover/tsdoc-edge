@@ -4,9 +4,8 @@
  */
 
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
+import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
 /**
  * Command for visualizing relationships as diagrams
@@ -68,7 +67,7 @@ Examples:
 
       this.printHeader(`Relationship Visualization: ${symbolId}`);
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
       // Get symbol info
@@ -164,7 +163,7 @@ Examples:
       params.push(options.category);
     }
 
-    const rels = dbManager.db.prepare(sql).all(...params) as any[];
+    const rels = dbManager.db.prepare(sql).all(...params) as UnifiedRelationshipRow[];
 
     for (const rel of rels) {
       // Check if already added

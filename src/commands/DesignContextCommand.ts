@@ -15,11 +15,12 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
+import { DatabaseManager, type SymbolRow } from '../storage/DatabaseManager';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { TSDocParser } from '../parser/TSDocParser';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import type { Symbol } from '../types/graph/graph';
+import type { SymbolType } from '../types/graph';
 
 interface WorkContext {
   filePath: string;
@@ -152,26 +153,28 @@ export class DesignContextCommand extends BaseCommand {
       console.log();
 
       // Load database
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
-      if (!fs.existsSync(dbPath)) {
-        this.printError('Database not found. Run: tsdoc-edge build src');
-        return this.failure('Database not found');
-      }
+      const dbCheck = this.checkDatabaseExists();
+      if (dbCheck) return dbCheck;
 
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
-      const context = await this.gatherContext(absolutePath, targetFile, dbManager);
+      try {
+        const context = await this.gatherContext(absolutePath, targetFile, dbManager);
 
-      // Branch: LLM format vs Human-readable format
-      if (useLlmFormat) {
-        const output = this.generateLlmOutput(context);
-        console.log(output);
-        return this.success('Context generated in LLM format');
+        // Branch: LLM format vs Human-readable format
+        if (useLlmFormat) {
+          const output = this.generateLlmOutput(context);
+          console.log(output);
+          return this.success('Context generated in LLM format');
+        }
+
+        // Display context
+        this.displayContext(context);
+
+        return this.success('Context gathered successfully');
+      } finally {
+        dbManager.close();
       }
-
-      // Display context
-      this.displayContext(context);
-
-      return this.success('Context gathered successfully');
     });
   }
 
@@ -197,18 +200,18 @@ export class DesignContextCommand extends BaseCommand {
     // 1. Get symbols from this file
     const allSymbols = dbManager.db.prepare(
       'SELECT * FROM symbols WHERE file_path = ?'
-    ).all(relativePath) as any[];
+    ).all(relativePath) as SymbolRow[];
 
     context.symbols = allSymbols.map(row => ({
       id: row.id,
       name: row.name,
-      type: row.type,
+      type: row.type as SymbolType,
       filePath: row.file_path,
       line: row.line,
       column: row.column,
       isExported: Boolean(row.is_exported),
       isPublic: Boolean(row.is_public),
-      summary: row.summary,
+      summary: row.summary ?? undefined,
       tests: [],
       designDecisions: [],
       metadata: {},
@@ -303,7 +306,7 @@ export class DesignContextCommand extends BaseCommand {
     if (symbolIds.length > 0) {
       const testMappings = dbManager.db.prepare(
         `SELECT * FROM test_mappings WHERE symbol_id IN (${symbolIds.map(() => '?').join(',')})`
-      ).all(...symbolIds) as any[];
+      ).all(...symbolIds) as Array<{ symbol_id: string; test_file_path: string; test_name: string }>;
 
       const testPaths = new Set<string>();
       for (const mapping of testMappings) {

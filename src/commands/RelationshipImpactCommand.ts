@@ -5,7 +5,7 @@
 
 import * as path from 'node:path';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
+import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
 interface ImpactNode {
   symbolId: string;
@@ -76,7 +76,7 @@ Examples:
 
       this.printHeader(`Impact Analysis: ${symbolId}`);
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+      const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
       // Verify symbol exists
@@ -275,7 +275,7 @@ Examples:
         params.push(minConfidence);
       }
 
-      const relationships = dbManager.db.prepare(sql).all(...params) as any[];
+      const relationships = dbManager.db.prepare(sql).all(...params) as UnifiedRelationshipRow[];
 
       for (const rel of relationships) {
         const fromSymbols = JSON.parse(rel.from_symbols);

@@ -92,15 +92,13 @@ export class SyncCoverageCommand extends BaseCommand {
       console.log(`Coverage file: ${colors.cyan}${coveragePath}${colors.reset}`);
       console.log();
 
-      const dbPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
-      const jsonlPath = path.join(process.cwd(), '.tsdoc', 'data');
-
-      if (!fs.existsSync(dbPath)) {
-        this.printError('Database not found. Run "tsdoc-edge build src" first.');
-        console.log();
-        return this.failure('Database not found');
+      if (!this.dbManager) {
+        const dbCheck = this.checkDatabaseExists();
+        if (dbCheck) return dbCheck;
       }
 
+      const dbPath = this.getDatabasePath();
+      const jsonlPath = this.getJsonlPath();
       const dbManager = this.dbManager || new DatabaseManager(dbPath, jsonlPath);
 
       try {
