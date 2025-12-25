@@ -327,7 +327,7 @@ if (!result.isCompliant) {
 
 - EnhancedDocExtractor (`../parser/EnhancedDocExtractor.md`) - Extracts from source code
 - StrictModeValidator (`../analyzers/StrictModeValidator.md`) - Validates compliance
-- [[EnhancedMarkdownGenerator]] - Generates markdown from EnhancedSymbolDoc
+- [[Code Generation]] - Generates markdown from EnhancedSymbolDoc
 - [[DatabaseManager]] (`../core-components/DatabaseManager.md`) - Stores enhanced docs
 
 ## Comparison: EnhancedSymbolDoc vs Standard JSDoc

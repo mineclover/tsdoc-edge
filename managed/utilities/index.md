@@ -414,7 +414,7 @@ Uses: SymbolSearchEngine, SymbolGraphBuilder, UsageTracker
 Uses: SpecStatusManager, SpecVersionManager, SpecContentSimilarityChecker, ModuleSpecValidator
 
 ### Documentation System
-Uses: DocCodeLinker, UnusedDocumentDetector, MermaidGenerator, [[RecursiveImprover]]
+Uses: DocCodeLinker, UnusedDocumentDetector, MermaidGenerator, [[Utilities Index]]
 
 ---
 

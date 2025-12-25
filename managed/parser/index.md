@@ -8,31 +8,112 @@ canonical: true
 
 # [[Parser Components]]
 
-> Source code and documentation parsing utilities
+> Source code and documentation parsing utilities for TSDoc Edge
 
 ## Overview
 
-Components responsible for parsing TypeScript source code, TSDoc comments, and documentation files.
+The parser system extracts structured information from TypeScript source code, TSDoc comments, and markdown documentation files.
 
-## Components
+## Source Code Parsing
 
-### Source Parsing
+### [[TSDocParser]]
 
-- [[TSDocParser]] - Parse TSDoc comments from TypeScript files
-- [[ModuleSpecTagParser]] - Parse module specification tags
+**Source**: `src/parser/TSDocParser.ts`
 
-### Document Parsing
+Parses TSDoc comments from TypeScript source files using the official TSDoc parser.
 
-- [[DocumentSymbolParser]] - Parse `[[Symbol]]` references from markdown
-- [[FrontmatterParser]] - Parse YAML frontmatter from documents
-- [[MermaidSymbolExtractor]] - Extract symbols from Mermaid diagrams
+- Extracts @tags and their content
+- Handles multiline comments
+- Preserves source locations
+- Supports all standard TSDoc tags
 
-### Enhanced Extraction
+### [[Parser Components]]
 
-- [[EnhancedDocExtractor]] - Enhanced documentation extraction with additional metadata
+**Source**: `src/parser/ModuleSpecTagParser.ts`
+
+Parses module specification tags from TSDoc comments.
+
+- @purpose, @responsibility, @context
+- @input, @output, @effect
+- @decision, @rationale, @consequences
+- Custom TSDoc Edge tags
+
+### [[EnhancedDocExtractor]]
+
+**Source**: `src/parser/EnhancedDocExtractor.ts`
+
+Enhanced documentation extraction with additional metadata.
+
+- Extended tag support
+- Relationship extraction
+- Cross-reference detection
+- Semantic analysis
+
+## Document Parsing
+
+### [[DocumentSymbolParser]]
+
+**Source**: `src/doc-symbol/DocumentSymbolParser.ts`
+
+Parses `[[Symbol]]` references from markdown documentation.
+
+- Primary definitions (H1 headers)
+- Auxiliary definitions (H2+ headers)
+- References (inline links)
+- Code connection detection
+
+### [[Parser Components]]
+
+**Source**: `src/parser/FrontmatterParser.ts`
+
+Parses YAML frontmatter from markdown documents.
+
+- Title, type, category extraction
+- Status and priority metadata
+- Custom frontmatter fields
+- Validation support
+
+### [[Parser Components]]
+
+**Source**: `src/doc-symbol/MermaidSymbolExtractor.ts`
+
+Extracts symbols and relationships from Mermaid diagrams.
+
+- Class diagram parsing
+- Flowchart analysis
+- Relationship detection
+- Symbol linking
+
+## Test Parsing
+
+### TestSymbolParser
+
+**Source**: `src/parser/TestSymbolParser.ts`
+
+Parses test files to extract test-to-code relationships.
+
+- Test file detection
+- Import analysis
+- Mock detection
+- Coverage mapping
+
+## Usage
+
+```typescript
+import { TSDocParser } from './parser/TSDocParser';
+import { DocumentSymbolParser } from './doc-symbol/DocumentSymbolParser';
+
+// Parse TSDoc from source
+const tsdocParser = new TSDocParser();
+const comments = tsdocParser.parse(sourceFile);
+
+// Parse document symbols
+const docParser = new DocumentSymbolParser();
+const symbols = docParser.parse(markdownFile);
+```
 
 ## Related
 
 - [[Parser System]] - Parser system architecture
-- [[Analyzers & Extractors]] - Analysis components
+- [[Analyzers & Extractors]] - Analysis that uses parsed data
 - [[Document Symbol System]] - Symbol reference system

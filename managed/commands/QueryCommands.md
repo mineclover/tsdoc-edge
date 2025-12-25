@@ -89,6 +89,6 @@ Find untested code.
 
 ## Related
 
-- [[Phase5Commands]]: Dependencies and usage queries
-- [[Phase7Commands]]: Statistics and reporting
+- [[Phase Commands]]: Dependencies and usage queries
+- [[Phase Commands]]: Statistics and reporting
 - [[WorkContextCommand]]: Comprehensive file context

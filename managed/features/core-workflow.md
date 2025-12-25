@@ -103,7 +103,7 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 - **Implementation Chain**:
   - Command: `src/commands/ExploreEntrypointCommand.ts:45`
   - Doc Parser: [[DocumentSymbolParser]] (`src/doc-symbol/DocumentSymbolParser.ts`)
-  - Mermaid Parser: [[MermaidSymbolExtractor]] (`src/doc-symbol/MermaidSymbolExtractor.ts`)
+  - Mermaid Parser: [[Parser Components]] (`src/doc-symbol/MermaidSymbolExtractor.ts`)
   - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
   - Algorithm: BFS traversal through [[Symbol]] references
 

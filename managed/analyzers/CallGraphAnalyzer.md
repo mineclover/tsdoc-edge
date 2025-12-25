@@ -497,7 +497,7 @@ console.log(`saveSymbols is called by ${callers.length} functions`);
 - DataFlowAnalyzer → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DataFlowAnalyzer.md:20
 - Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:218
 - AnalyzeCallsCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:21
-- [[Phase7Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/Phase7Commands.md:22
+- [[Phase Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/Phase7Commands.md:22
 - [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:132
 - Analyzer Development Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:21
 - Analyzer Development Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:33

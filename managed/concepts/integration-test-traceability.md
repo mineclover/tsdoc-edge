@@ -555,7 +555,7 @@ Please add integration tests before committing.
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:260
-- [[Phase5Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/Phase5Commands.md:22
+- [[Phase Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/Phase5Commands.md:22
 - [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:228
 - [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:247
 - [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:347

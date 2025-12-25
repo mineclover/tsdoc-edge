@@ -121,7 +121,7 @@ tsdoc-edge undocumented
 
 ## Related
 
-- [[Phase5Commands]]: Source file (`src/commands/Phase5Commands.ts`)
+- [[Phase Commands]]: Source file (`src/commands/Phase5Commands.ts`)
 - SymbolRegistryManager: Registry data access
 - DatabaseManager: Database queries
 - [[SymbolGraphBuilder]]: Graph construction

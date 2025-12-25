@@ -81,7 +81,7 @@ tsdoc-edge work-context src/analyzer/CallGraphAnalyzer.ts
 - [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:325
 - [[CallGraphAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:214
 - [[IODependencyAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:19
-- [[ParallelWorkDetector]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:24
+- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:24
 - ReliabilityChecker → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ReliabilityChecker.md:21
 - [[TestRelationshipAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/TestRelationshipAnalyzer.md:23
 - [[Module Specification Framework]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/module-specification-framework.md:230

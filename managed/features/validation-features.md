@@ -245,7 +245,7 @@ jobs:
 - `[[Symbol]]` 참조 검증 (정의 존재, 역방향 링크)
 - **Implementation Chain**:
   - Command: `src/commands/ValidateSymbolRefsCommand.ts`
-  - Extractor: [[MermaidSymbolExtractor]] (`src/doc-symbol/MermaidSymbolExtractor.ts`)
+  - Extractor: [[Parser Components]] (`src/doc-symbol/MermaidSymbolExtractor.ts`)
   - Uses: Levenshtein distance for similarity checking
   - Validates: Duplicate definitions, broken references, ambiguous references
 
@@ -253,7 +253,7 @@ jobs:
 - 깨진 링크 탐지 (import, 참조)
 - **Implementation Chain**:
   - Command: `src/commands/CheckLinksCommand.ts`
-  - Analyzer: [[MissingLinkDetector]] (`src/analyzer/MissingLinkDetector.ts`)
+  - Analyzer: [[Analyzers & Extractors]] (`src/analyzer/MissingLinkDetector.ts`)
   - Uses: ConfigLoader (`src/utils/ConfigLoader.ts`)
   - Validates: Dependencies, symbol references, file paths
 
@@ -453,7 +453,7 @@ cycle_rate = symbols_in_cycles / total_symbols
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:332
 - Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:135
 - [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:193
-- [[DocumentationFixer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/DocumentationFixer.md:22
+- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/DocumentationFixer.md:22
 
 ### Implemented By
 

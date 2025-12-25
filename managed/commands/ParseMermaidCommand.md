@@ -65,7 +65,7 @@ Displays extracted information:
 - [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:122
 - [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:296
 - [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:362
-- [[MermaidSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/MermaidSymbolExtractor.md:22
+- [[Parser Components]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/MermaidSymbolExtractor.md:22
 - [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:178
 - [[Mermaid Symbol Extractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/MermaidSymbolExtractor.md:64
 

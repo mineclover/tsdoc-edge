@@ -111,7 +111,7 @@ class DocumentSymbolRegistry {
 
 **Source**: `src/doc-symbol/DocumentSymbolRegistry.ts`
 
-### [[BacklinkGenerator]]
+### [[Parser Components]]
 
 자동 Backlinks 섹션 생성
 

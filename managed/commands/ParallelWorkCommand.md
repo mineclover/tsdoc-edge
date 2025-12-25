@@ -26,7 +26,7 @@ Detect and suggest parallel work opportunities.
 
 ## Related
 
-- [[ParallelWorkDetector]]: Core detection logic
+- [[Analyzers & Extractors]]: Core detection logic
 - Parallel Work Theory: Theoretical foundation
 
 ---

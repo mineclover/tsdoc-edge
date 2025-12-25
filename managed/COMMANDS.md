@@ -294,7 +294,7 @@ tsdoc-edge relationship-path class-buildcommand class-databasemanager --shortest
 
 **Implementation**: `src/commands/RelationshipPathCommand.ts`
 
-### [[Phase8Commands]]
+### [[Phase Commands]]
 SSOT validation and completeness checking commands.
 - Completeness calculation
 - Missing link detection
@@ -303,7 +303,7 @@ SSOT validation and completeness checking commands.
 **Implementation**: `src/commands/Phase8Commands.ts`
 
 ### Phase4Commands
-Type analysis and interface dependency features. See [[Phase4Commands]].
+Type analysis and interface dependency features. See [[Phase Commands]].
 - Interface dependency mapping
 - Type chain analysis
 - Generic constraint tracking

@@ -98,7 +98,7 @@ Complete reference organized by category with **new LLM-friendly features**:
   - [[HealthCommand]] - Code health metrics
   - [[StatsCommand]] - Project statistics
   - [[TreeCommand]] - Dependency tree visualization
-  - [[Phase8Commands]] - SSOT validation and completeness
+  - [[Phase Commands]] - SSOT validation and completeness
 
 - **Documentation Tools** (12):
   - [[IndexDocsCommand]] - Index documentation
@@ -260,9 +260,9 @@ Core analyzers that power relationship detection and symbol extraction:
 ### Supporting Analyzers (20+ components)
 
 See [[Analyzers & Extractors]] (`analyzers/index.md`) for complete list including:
-- [[MissingLinkDetector]], DataFlowAnalyzer, DependencyResolver
+- [[Analyzers & Extractors]], DataFlowAnalyzer, DependencyResolver
 - DependencyChainAnalyzer, InterfaceAnalyzer, DomainStructureAnalyzer
-- ImportanceClassifier, [[ParallelWorkDetector]], PreCommitChecker
+- ImportanceClassifier, [[Analyzers & Extractors]], PreCommitChecker
 - ReliabilityChecker
 
 ## Feature Documentation
@@ -284,10 +284,10 @@ See [[Analyzers & Extractors]] (`analyzers/index.md`) for complete list includin
   - Uses: SymbolSearchEngine (`src/graph/SymbolSearchEngine.ts`), DepthTraverser (`src/graph/DepthTraverser.ts`)
 - DocumentSymbolSystem (`features/document-symbol-system.md`): [[Symbol]] reference system
   - Parser: [[DocumentSymbolRegistry]] (`src/doc-symbol/DocumentSymbolRegistry.ts`)
-  - Extractor: [[MermaidSymbolExtractor]] (`src/doc-symbol/MermaidSymbolExtractor.ts`)
+  - Extractor: [[Parser Components]] (`src/doc-symbol/MermaidSymbolExtractor.ts`)
 - [[AutoIndexing]] (`features/auto-indexing.md`): Automatic doc indexing
   - Command: [[IndexDocsCommand]] (`src/commands/IndexDocsCommand.ts`)
-  - Uses: [[BacklinkGenerator]] (`src/doc-symbol/BacklinkGenerator.ts`)
+  - Uses: [[Parser Components]] (`src/doc-symbol/BacklinkGenerator.ts`)
 
 ### Architecture
 **Path**: `managed/architecture/`

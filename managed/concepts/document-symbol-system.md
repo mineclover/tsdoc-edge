@@ -44,7 +44,7 @@ See [[Reference]]          # Inline: Reference (unlimited)
 |-----------|---------|--------|
 | [[DocumentSymbolParser]] | Extract symbols from markdown | `src/doc-symbol/DocumentSymbolParser.ts` |
 | [[DocumentSymbolRegistry]] | Enforce SSOT validation | `src/doc-symbol/DocumentSymbolRegistry.ts` |
-| [[BacklinkGenerator]] | Generate automatic backlinks | `src/doc-symbol/BacklinkGenerator.ts` |
+| [[Parser Components]] | Generate automatic backlinks | `src/doc-symbol/BacklinkGenerator.ts` |
 | SymbolLinkResolver | Resolve references to files | `src/doc-symbol/SymbolLinkResolver.ts` |
 
 ### 3. Validation Rules
@@ -285,7 +285,7 @@ tsdoc-edge symbol-query managed stats
 
 ### Referenced By
 
-- [[RelatedDocsGenerator]] → /Users/junwoobang/workflow/tsdoc-edge/managed/code-generation/RelatedDocsGenerator.md:22
+- [[Code Generation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/code-generation/RelatedDocsGenerator.md:22
 - [[CheckLinksCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/CheckLinksCommand.md:21
 - [[ExploreEntrypointCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ExploreEntrypointCommand.md:23
 - [[IndexDocsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/IndexDocsCommand.md:59
@@ -298,8 +298,8 @@ tsdoc-edge symbol-query managed stats
 - [[Spec Management System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/spec-management-system.md:33
 - [[Spec Management System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/spec-management-system.md:185
 - [[Storage System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/storage-system.md:151
-- [[BacklinkGenerator]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/BacklinkGenerator.md:23
-- [[MermaidSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/MermaidSymbolExtractor.md:23
+- [[Parser Components]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/BacklinkGenerator.md:23
+- [[Parser Components]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/MermaidSymbolExtractor.md:23
 - SymbolReferenceGenerator → /Users/junwoobang/workflow/tsdoc-edge/managed/features/SymbolReferenceGenerator.md:22
 - SymbolReferenceResolver → /Users/junwoobang/workflow/tsdoc-edge/managed/features/SymbolReferenceResolver.md:22
 - [[Doc Reference]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/doc-reference.md:39

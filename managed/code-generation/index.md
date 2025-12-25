@@ -8,34 +8,125 @@ canonical: true
 
 # [[Code Generation]]
 
-> Documentation and code generation utilities
+> Documentation and code generation utilities for TSDoc Edge
 
 ## Overview
 
-Components responsible for generating documentation, comments, and formatted output from analyzed code.
+The code generation system transforms analyzed code and metadata into various output formats including markdown documentation, module specifications, and related documentation links.
 
-## Components
+## Comment Management
 
-### Comment Management
+### [[Code Generation]]
 
-- [[CommentExporter]] - Export TSDoc comments to external format
-- [[CommentImporter]] - Import comments from external sources
-- [[CommentStateManager]] - Manage comment state during processing
+**Source**: `src/generator/CommentExporter.ts`
 
-### Documentation Generation
+Exports TSDoc comments to external format for version control and editing.
 
-- [[MarkdownGenerator]] - Generate markdown documentation
-- [[EnhancedMarkdownGenerator]] - Enhanced markdown with additional features
-- [[InsightDocGenerator]] - Generate insight documentation
-- [[RelatedDocsGenerator]] - Generate related documentation links
+- Extracts comments from TypeScript files
+- Preserves structure and formatting
+- Supports incremental export
 
-### Module Specification
+### [[Code Generation]]
 
-- [[ModuleSpecGenerator]] - Generate module specifications
-- [[ModuleSpecMarkdownFormatter]] - Format module specs as markdown
+**Source**: `src/generator/CommentImporter.ts`
+
+Imports comments from external sources back into code.
+
+- Merges external edits into source
+- Handles conflict resolution
+- Validates comment syntax
+
+### [[Code Generation]]
+
+**Source**: `src/generator/CommentStateManager.ts`
+
+Manages comment state during fold/unfold operations.
+
+- Tracks comment modifications
+- Maintains sync between code and docs
+- Detects stale comments
+
+## Documentation Generators
+
+### [[Code Generation]]
+
+**Source**: `src/generator/MarkdownGenerator.ts`
+
+Base markdown generation from structured data.
+
+- Paragraphs, code spans, plain text
+- Consistent formatting
+- Extensible base class
+
+### [[Code Generation]]
+
+**Source**: `src/generator/EnhancedMarkdownGenerator.ts`
+
+Enhanced markdown with additional features.
+
+- Rich formatting options
+- Symbol linking support
+- Cross-reference generation
+
+### [[Code Generation]]
+
+**Source**: `src/generator/InsightDocGenerator.ts`
+
+Generates insight documentation from code analysis.
+
+- Pattern insights
+- Usage analytics
+- Best practice recommendations
+
+### [[Code Generation]]
+
+**Source**: `src/generator/RelatedDocsGenerator.ts`
+
+Generates related documentation suggestions.
+
+- Similarity-based recommendations
+- Symbol relationship links
+- Context-aware suggestions
+
+## Module Specification
+
+### [[Code Generation]]
+
+**Source**: `src/generator/ModuleSpecGenerator.ts`
+
+Generates module specifications from code analysis.
+
+- Purpose, input, output documentation
+- Dependency extraction
+- Effect documentation
+
+### [[Code Generation]]
+
+**Source**: `src/generator/ModuleSpecMarkdownFormatter.ts`
+
+Formats module specifications as markdown.
+
+- Structured section output
+- Consistent formatting
+- Template-based generation
+
+## Usage
+
+```typescript
+import { EnhancedMarkdownGenerator } from './generator/EnhancedMarkdownGenerator';
+import { ModuleSpecGenerator } from './generator/ModuleSpecGenerator';
+
+// Generate markdown documentation
+const mdGenerator = new EnhancedMarkdownGenerator();
+const markdown = mdGenerator.generate(symbolData);
+
+// Generate module spec
+const specGenerator = new ModuleSpecGenerator();
+const spec = specGenerator.generate(moduleAnalysis);
+```
 
 ## Related
 
-- [[Analyzers & Extractors]] - Analysis components
-- [[Parser System]] - Parsing components
-- [[Features Index]] - Feature documentation
+- [[Analyzers & Extractors]] - Analysis that feeds generation
+- [[Parser System]] - Parsing that provides input data
+- [[Document Symbol System]] - Symbol linking in generated docs

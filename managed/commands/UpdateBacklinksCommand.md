@@ -35,7 +35,7 @@ canonical: true
 - [[CLI Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/CLI-COMMANDS.md:178
 - [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:88
 - [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:88
-- [[BacklinkGenerator]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/BacklinkGenerator.md:22
+- [[Parser Components]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/BacklinkGenerator.md:22
 - [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:122
 - [[AutoIndexing]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/auto-indexing.md:52
 - [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:94

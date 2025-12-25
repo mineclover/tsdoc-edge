@@ -104,7 +104,7 @@ Core components that power relationship detection, symbol extraction, and qualit
 - Untested code detection
 - Used by: [[CodeHealthChecker]], TestRelationshipsCommand
 
-**[[MissingLinkDetector]]** (`src/analyzer/MissingLinkDetector.ts`)
+**[[Analyzers & Extractors]]** (`src/analyzer/MissingLinkDetector.ts`)
 - Detect broken [[Symbol]] references
 - Orphan documentation detection
 - Link validation
@@ -176,7 +176,7 @@ Core components that power relationship detection, symbol extraction, and qualit
 - Sync coverage data with symbol graph
 - Coverage relationship creation
 
-**[[IstanbulCoverageAdapter]]** (`src/analyzer/IstanbulCoverageAdapter.ts`)
+**[[Analyzers & Extractors]]** (`src/analyzer/IstanbulCoverageAdapter.ts`)
 - Istanbul format adapter
 - Coverage data normalization
 
@@ -184,7 +184,7 @@ Core components that power relationship detection, symbol extraction, and qualit
 
 ### Development Workflow
 
-**[[ParallelWorkDetector]]** (`src/analyzer/ParallelWorkDetector.ts`)
+**[[Analyzers & Extractors]]** (`src/analyzer/ParallelWorkDetector.ts`)
 - Detect parallel work conflicts
 - File dependency analysis
 - Safe parallel work identification

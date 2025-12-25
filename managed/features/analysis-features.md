@@ -448,7 +448,7 @@ jobs:
 - [[DocumentationAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:124
 - [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:260
 - InsightDocGenerator → /Users/junwoobang/workflow/tsdoc-edge/managed/code-generation/InsightDocGenerator.md:22
-- [[Phase6Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/Phase6Commands.md:22
+- [[Phase Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/Phase6Commands.md:22
 - [[SuggestCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SuggestCommand.md:192
 - [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:50
 - [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:285
