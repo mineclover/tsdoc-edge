@@ -1,4 +1,12 @@
-# DepthTraverser
+---
+title: Depth Traverser
+type: component
+category: core-components
+status: active
+canonical: true
+---
+
+# [[DepthTraverser]]
 
 **Source**: `src/graph/DepthTraverser.ts`
 

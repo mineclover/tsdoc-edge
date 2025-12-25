@@ -1,4 +1,12 @@
-# ModuleSpecMarkdownFormatter
+---
+title: Module Spec Markdown Formatter
+type: component
+category: code-generation
+status: active
+canonical: true
+---
+
+# [[ModuleSpecMarkdownFormatter]]
 
 **Source**: `src/generator/ModuleSpecMarkdownFormatter.ts`
 

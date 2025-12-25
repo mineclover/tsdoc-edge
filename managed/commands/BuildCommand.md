@@ -78,7 +78,6 @@ tsdoc-edge build src
 - [[CoverageReportCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/CoverageReportCommand.md:110
 - [[InitCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/InitCommand.md:134
 - [[Module Specification Framework]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/module-specification-framework.md:228
-- [[CLI Runner]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/CLIRunner.md:44
 - [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:113
 - [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:193
 - [[SymbolRegistryManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/SymbolRegistryManager.md:223

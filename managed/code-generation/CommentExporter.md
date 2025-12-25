@@ -1,4 +1,12 @@
-# CommentExporter
+---
+title: Comment Exporter
+type: component
+category: code-generation
+status: active
+canonical: true
+---
+
+# [[CommentExporter]]
 
 **Source**: `src/fold/CommentExporter.ts`
 

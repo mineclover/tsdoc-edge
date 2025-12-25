@@ -211,8 +211,8 @@ IDE 통합을 위한 Language Server Protocol 지원.
 
 ---
 
-### [[MCP Testing Strategy]]
-**Path**: `mcp-testing-strategy.md`
+### MCP Testing Strategy
+**Path**: `mcp-testing-strategy.md` | **Link**: [[MCP Testing Strategy]]
 
 Model Context Protocol 도구 테스트 전략.
 

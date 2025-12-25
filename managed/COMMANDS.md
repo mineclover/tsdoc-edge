@@ -302,6 +302,14 @@ SSOT validation and completeness checking commands.
 
 **Implementation**: `src/commands/Phase8Commands.ts`
 
+### Phase4Commands
+Type analysis and interface dependency features. See [[Phase4Commands]].
+- Interface dependency mapping
+- Type chain analysis
+- Generic constraint tracking
+
+**Implementation**: `src/commands/Phase4Commands.ts`
+
 ---
 
 ## Utility Commands (19 commands)

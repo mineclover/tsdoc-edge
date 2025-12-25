@@ -1,3 +1,11 @@
+---
+title: Enhanced Markdown Generator
+type: component
+category: code-generation
+status: active
+canonical: true
+---
+
 # [[EnhancedMarkdownGenerator]]
 
 **Source**: `src/generator/EnhancedMarkdownGenerator.ts`

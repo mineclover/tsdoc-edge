@@ -1,4 +1,12 @@
-# CommentImporter
+---
+title: Comment Importer
+type: component
+category: code-generation
+status: active
+canonical: true
+---
+
+# [[CommentImporter]]
 
 **Source**: `src/fold/CommentImporter.ts`
 

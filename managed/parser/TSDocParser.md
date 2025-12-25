@@ -1,3 +1,11 @@
+---
+title: T S Doc Parser
+type: component
+category: parser
+status: active
+canonical: true
+---
+
 # [[TSDocParser]]
 
 **Source**: `src/parser/TSDocParser.ts`

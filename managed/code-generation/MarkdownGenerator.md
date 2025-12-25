@@ -1,3 +1,11 @@
+---
+title: Markdown Generator
+type: component
+category: code-generation
+status: active
+canonical: true
+---
+
 # [[MarkdownGenerator]]
 
 **Source**: `src/generator/MarkdownGenerator.ts`

@@ -77,7 +77,6 @@ tsdoc-edge work-context src/analyzer/CallGraphAnalyzer.ts
 - ReliabilityChecker → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ReliabilityChecker.md:21
 - [[TestRelationshipAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/TestRelationshipAnalyzer.md:23
 - [[Module Specification Framework]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/module-specification-framework.md:230
-- [[CLI Runner]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/CLIRunner.md:46
 - [[Impact Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/ImpactAnalysis.md:101
 - [[Impact Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/ImpactAnalysis.md:152
 - [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:78

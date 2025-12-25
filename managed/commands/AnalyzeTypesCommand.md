@@ -29,7 +29,6 @@ Analyze type dependencies and usage.
 
 - [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:70
 - [[DetectDeadCodeCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:63
-- [[CLI Runner]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/CLIRunner.md:57
 - [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:153
 - [[Generic Constraint]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/GENERIC-CONSTRAINT.md:9
 - [[Type Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:9

@@ -166,27 +166,27 @@ TSDoc Edge documentation is organized into **15 streamlined categories** (reduce
 
 ### Core Categories
 
-1. **analyzers/** (31) - Relationship detection and symbol extraction
-2. **commands/** (52) - All CLI command implementations
-3. **relationships/** (28) - All 26 relationship type specifications
-4. **features/** (26) - Feature specifications including [[LSP Integration]], [[MCP Testing Strategy]]
-5. **types/** (20) - Internal system types
-6. **primary-types/** (20) - Domain model types
-7. **utilities/** (21) - Utility functions and helpers
+1. **analyzers/** - [[Analyzers & Extractors]] - Relationship detection and symbol extraction
+2. **commands/** - [[Commands Index]] - All CLI command implementations
+3. **relationships/** - [[Relationship Types]] - All 17 relationship type specifications
+4. **features/** - [[Features Index]] - Feature specifications including [[LSP Integration]]
+5. **types/** - [[Types Index]] - Internal system types
+6. **primary-types/** - [[Primary Types Index]] - Domain model types
+7. **utilities/** - [[Utilities Index]] - Utility functions and helpers
 
 ### Documentation & Learning
 
-8. **concepts/** (13) - Core architectural concepts and design principles
-9. **guides/** (6) - Step-by-step learning guides
-10. **workflows/** (9) - End-to-end workflow guides
-11. **examples/** (3) - Practical usage examples
+8. **concepts/** - [[Concepts Index]] - Core architectural concepts and design principles
+9. **guides/** - [[Guides & Tutorials]] - Step-by-step learning guides
+10. **workflows/** - [[Workflows Index]] - End-to-end workflow guides
+11. **examples/** - [[Examples]] - Practical usage examples
 
-### Specialized
+### Infrastructure
 
-12. **core-components/** (5) - Essential infrastructure components
-13. **parser/** (7) - Parsing utilities for code and documentation
-14. **code-generation/** (9) - Code and documentation generation (NEW)
-15. **architecture/** (diagrams) - System architecture diagrams
+12. **core/** - [[Core Systems]] - High-level system architecture
+13. **core-components/** - [[Core Components]] - Essential infrastructure components
+14. **parser/** - [[Parser Components]] - Parsing utilities for code and documentation
+15. **code-generation/** - [[Code Generation]] - Code and documentation generation
 
 **Quick Navigation**:
 ```bash

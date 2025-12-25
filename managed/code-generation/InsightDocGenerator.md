@@ -1,4 +1,12 @@
-# InsightDocGenerator
+---
+title: Insight Doc Generator
+type: component
+category: code-generation
+status: active
+canonical: true
+---
+
+# [[InsightDocGenerator]]
 
 **Source**: `src/generator/InsightDocGenerator.ts`
 

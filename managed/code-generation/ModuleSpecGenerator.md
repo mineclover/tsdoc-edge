@@ -1,4 +1,12 @@
-# ModuleSpecGenerator
+---
+title: Module Spec Generator
+type: component
+category: code-generation
+status: active
+canonical: true
+---
+
+# [[ModuleSpecGenerator]]
 
 **Source**: `src/generator/ModuleSpecGenerator.ts`
 

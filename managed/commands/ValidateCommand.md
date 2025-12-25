@@ -32,7 +32,6 @@ Validate codebase and documentation integrity.
 - [[InitCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/InitCommand.md:135
 - [[StatsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/StatsCommand.md:141
 - [[UndocumentedCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UndocumentedCommand.md:117
-- [[CLI Runner]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/CLIRunner.md:48
 - [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:124
 - [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:105
 - [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:287

@@ -102,7 +102,6 @@ Convention: kebab-case from file path + symbol name
 - [[ValidateSymbolRefsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:7
 - [[Analyzer System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/analyzer-system.md:154
 - [[Spec Management System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/spec-management-system.md:97
-- [[CLI Runner]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/CLIRunner.md:64
 - [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:126
 - [[DocumentSymbolParser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolParser.md:102
 - [[DocumentSymbolParser]]#Section → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolParser.md:102

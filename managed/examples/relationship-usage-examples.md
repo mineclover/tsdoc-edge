@@ -1,3 +1,11 @@
+---
+title: relationship-usage-examples
+type: component
+category: examples
+status: active
+canonical: true
+---
+
 # [[Relationship Usage Examples]]
 
 **Purpose**: Practical examples of using tsdoc relationship types for documentation and code navigation

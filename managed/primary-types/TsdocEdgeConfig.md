@@ -131,7 +131,6 @@ const dbPath = config.paths.databasePath;
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:278
-- [[CLI Runner]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/CLIRunner.md:100
 - ConfigManager → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/ConfigManager.md:23
 - [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:379
 - TsdocEdgeConfig → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:23

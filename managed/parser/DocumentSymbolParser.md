@@ -1,3 +1,11 @@
+---
+title: Document Symbol Parser
+type: component
+category: parser
+status: active
+canonical: true
+---
+
 # [[Document Symbol Parser]]
 
 **Source**: `src/doc-symbol/DocumentSymbolParser.ts`

@@ -7,7 +7,7 @@ canonical: true
 aliases: [Enhanced Doc Extractor]
 ---
 
-# EnhancedDocExtractor
+# [[EnhancedDocExtractor]]
 
 > **Extracts enhanced documentation** from TypeScript source files using AST + TSDoc custom tags
 

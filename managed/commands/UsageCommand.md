@@ -27,7 +27,6 @@ Shows:
 
 ### Referenced By
 
-- [[CLI Runner]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/CLIRunner.md:87
 - [[AnalyticsTypes]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/AnalyticsTypes.md:105
 - UsageTracker → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/UsageTracker.md:83
 

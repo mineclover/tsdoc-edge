@@ -1,4 +1,12 @@
-# FrontmatterParser
+---
+title: Frontmatter Parser
+type: component
+category: parser
+status: active
+canonical: true
+---
+
+# [[FrontmatterParser]]
 
 **Source**: `src/parser/FrontmatterParser.ts`
 

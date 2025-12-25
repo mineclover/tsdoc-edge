@@ -1,3 +1,11 @@
+---
+title: Mermaid Symbol Extractor
+type: component
+category: parser
+status: active
+canonical: true
+---
+
 # [[Mermaid Symbol Extractor]]
 
 **Source**: `src/doc-symbol/MermaidSymbolExtractor.ts`

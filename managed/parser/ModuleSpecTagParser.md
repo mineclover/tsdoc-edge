@@ -1,4 +1,12 @@
-# ModuleSpecTagParser
+---
+title: Module Spec Tag Parser
+type: component
+category: parser
+status: active
+canonical: true
+---
+
+# [[ModuleSpecTagParser]]
 
 **Source**: `src/parser/ModuleSpecTagParser.ts`
 

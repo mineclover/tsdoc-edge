@@ -23,7 +23,7 @@ TSDoc Edge의 모든 주요 기능을 실제로 활용하는 종합 예시 문�
 
 H2 이하에서 정의된 심볼은 Auxiliary Definition으로 취급됩니다:
 
-#### [[Feature Showcase - Symbol References]]
+#### Feature Showcase - Symbol References
 
 다른 문서나 코드를 참조할 때 `SymbolName` 형식을 사용합니다:
 

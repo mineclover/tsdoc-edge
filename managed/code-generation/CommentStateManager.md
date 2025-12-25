@@ -1,4 +1,12 @@
-# CommentStateManager
+---
+title: Comment State Manager
+type: component
+category: code-generation
+status: active
+canonical: true
+---
+
+# [[CommentStateManager]]
 
 **Source**: `src/fold/CommentStateManager.ts`
 
