@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# Query Commands
+# [[QueryCommands]]
 
 **Source**: `src/commands/Phase5Commands.ts`, `src/commands/Phase7Commands.ts`
 

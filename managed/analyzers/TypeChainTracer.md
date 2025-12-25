@@ -1,12 +1,12 @@
 ---
-title: # [[TypeChainTracer]]
+title: TypeChainTracer
 type: analyzer
 category: core-components
 status: active
 canonical: true
 ---
 
-# TypeChainTracer
+# [[TypeChainTracer]]
 
 **Source**: `src/analyzer/TypeChainTracer.ts`
 
