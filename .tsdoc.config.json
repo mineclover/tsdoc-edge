@@ -32,6 +32,7 @@
       "guides",
       "workflows",
       "relationships",
+      "commands",
       "core",
       "core-components",
       "features",
@@ -39,7 +40,8 @@
       "parser",
       "primary-types",
       "types",
-      "utilities"
+      "utilities",
+      "analyzers"
     ]
   },
   "generator": {
