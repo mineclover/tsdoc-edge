@@ -1,3 +1,11 @@
+---
+title: SpecStatusManager
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # SpecStatusManager
 
 **Source**: `src/spec/SpecStatusManager.ts`

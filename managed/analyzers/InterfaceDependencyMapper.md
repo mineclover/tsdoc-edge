@@ -1,3 +1,11 @@
+---
+title: # InterfaceDependencyMapper
+type: analyzer
+category: core-components
+status: active
+canonical: true
+---
+
 # InterfaceDependencyMapper
 
 **Source**: `src/analyzer/InterfaceDependencyMapper.ts`
@@ -28,6 +36,5 @@ Tracks:
 
 ### Referenced By
 
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:124
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:157
-
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:124
+- ValidationFeatures → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:157

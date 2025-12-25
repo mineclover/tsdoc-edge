@@ -162,7 +162,7 @@ tsdoc-edge health src --include-private
 
 **Used By**:
 - [[HealthCommand]] (`src/commands/HealthCommand.ts`) - CLI interface
-- [[AnalysisFeatures]] (`managed/features/analysis-features.md`) - Feature documentation
+- AnalysisFeatures (`managed/features/analysis-features.md`) - Feature documentation
 
 **Uses**:
 - [[DocumentationAnalyzer]] (`src/analyzer/DocumentationAnalyzer.ts`) - Doc quality
@@ -303,7 +303,7 @@ tsdoc-edge health src --include-private
 - AnalysisReport (`managed/primary-types/AnalysisReport.md`)
 
 **Features**:
-- [[AnalysisFeatures]] (`managed/features/analysis-features.md`)
+- AnalysisFeatures (`managed/features/analysis-features.md`)
 
 ---
 
@@ -317,23 +317,23 @@ tsdoc-edge health src --include-private
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:212
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:236
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:272
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:212
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:236
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:272
 - [[DocumentationAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:74
 - [[DocumentationAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:122
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:91
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:97
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:220
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:91
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:97
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:220
 - [[AnalyzeCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/AnalyzeCommand.md:18
 - [[HealthCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/HealthCommand.md:18
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:143
+- AnalysisFeatures → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:143
 - [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:113
 - [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:120
-- [[Analyzer Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:21
-- [[Analyzer Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:258
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:216
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:369
+- Analyzer Development Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:21
+- Analyzer Development Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:258
+- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:216
+- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:369
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:272
 - AnalysisReport → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/AnalysisReport.md:91
 

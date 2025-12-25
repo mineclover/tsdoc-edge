@@ -1,3 +1,11 @@
+---
+title: UnusedDocumentDetector
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # [[UnusedDocumentDetector]]
 
 **Source**: `src/spec/UnusedDocumentDetector.ts`

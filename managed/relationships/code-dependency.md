@@ -15,24 +15,24 @@ Track explicit import/export dependencies (`import A from B`).
 
 ## Implementation Chain
 
-**Extractor**: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts:216-246`)
+**Extractor**: ASTSymbolExtractor (`src/analyzer/ASTSymbolExtractor.ts:216-246`)
 - Parses TypeScript AST to extract import statements
 - Detects: `import`, `require()`, `export from`
 - Stores source → target relationships
 
-**Command**: [[BuildCommand]] (`src/commands/BuildCommand.ts`)
+**Command**: BuildCommand (`src/commands/BuildCommand.ts`)
 - Usage: `tsdoc-edge build <directory>`
 - Triggers: Symbol extraction → dependency analysis → storage
 
-**Storage**: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+**Storage**: DatabaseManager (`src/storage/DatabaseManager.ts`)
 - Table: `unified_relationships`
 - Type: `code-dependency`
 - Schema: `(source_id, target_id, type, metadata)`
 
 **Query Commands**:
-- [[DepsCommand]] (`src/commands/DepsCommand.ts`) - Show dependencies of a symbol
-- [[WhoUsesCommand]] (`src/commands/WhoUsesCommand.ts`) - Show reverse dependencies
-- [[OrphansCommand]] (`src/commands/OrphansCommand.ts`) - Find unreferenced files
+- DepsCommand (`src/commands/DepsCommand.ts`) - Show dependencies of a symbol
+- WhoUsesCommand (`src/commands/WhoUsesCommand.ts`) - Show reverse dependencies
+- OrphansCommand (`src/commands/OrphansCommand.ts`) - Find unreferenced files
 
 ## Usage Examples
 
@@ -55,7 +55,7 @@ tsdoc-edge orphans
 - [[IO Dependency]]: Inferred from code structure (complementary)
 - [[Inheritance]]: Often co-occurs with imports (extends/implements)
 - [[Type Dependency]]: Type-level dependencies (parameters, returns)
-- [[SymbolGraphBuilder]] (`src/graph/SymbolGraph.ts`): Graph traversal for dependency chains
+- SymbolGraphBuilder (`src/graph/SymbolGraph.ts`): Graph traversal for dependency chains
 
 ---
 
@@ -63,28 +63,28 @@ tsdoc-edge orphans
 
 ### Referenced By
 
-- [[Commands Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:17
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:24
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:108
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:312
-- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:102
-- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:180
+- Commands Index → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:17
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:24
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:108
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:312
+- ASTSymbolExtractor → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:102
+- ASTSymbolExtractor → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:180
 - DependencyChainAnalyzer → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:22
 - DependencyResolver → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DependencyResolver.md:22
 - DomainStructureAnalyzer → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DomainStructureAnalyzer.md:22
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:251
-- [[BuildCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/BuildCommand.md:35
-- [[VisualizeDepsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/VisualizeDepsCommand.md:21
-- [[Build Pipeline Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:251
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:33
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:57
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:64
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:199
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:359
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:251
+- BuildCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/BuildCommand.md:35
+- VisualizeDepsCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/VisualizeDepsCommand.md:21
+- Build Pipeline Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:251
+- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:33
+- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:57
+- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:64
+- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:199
+- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:359
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:27
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:295
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:319
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:32
+- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:32
 - [[Call Relationships]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/CALLS.md:40
 - [[Composition Relationship]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/COMPOSITION.md:112
 - [[Composition Relationship]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/COMPOSITION.md:118

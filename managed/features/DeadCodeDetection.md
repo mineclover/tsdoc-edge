@@ -1,3 +1,11 @@
+---
+title: Dead Code Detection
+type: feature
+category: feature
+status: active
+canonical: true
+---
+
 # [[Dead Code Detection]]
 
 Identify unused code that can be safely removed.

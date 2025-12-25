@@ -1,3 +1,11 @@
+---
+title: MermaidGenerator
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # MermaidGenerator
 
 **Source**: `src/visualization/MermaidGenerator.ts`

@@ -1,3 +1,11 @@
+---
+title: RecursiveImprover
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # [[RecursiveImprover]]
 
 **Source**: `src/fixer/RecursiveImprover.ts`

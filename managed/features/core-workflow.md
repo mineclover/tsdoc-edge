@@ -83,8 +83,8 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 - **Implementation Chain**:
   - Command: `src/commands/BuildCommand.ts:40`
   - Extractor: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`)
-  - Parser: [[TSDocParser]] (`src/parser/TSDocParser.ts`)
-  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Parser: TSDocParser (`src/parser/TSDocParser.ts`)
+  - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
   - Output: SQLite DB + JSONL registry
 
 **[[WorkContextCommand]]** - `tsdoc-edge work-context <file-path>`
@@ -92,10 +92,10 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 - 의존성, 역의존성, 테스트 매핑 표시
 - **Implementation Chain**:
   - Command: `src/commands/WorkContextCommand.ts:60`
-  - Parser: [[TSDocParser]] (`src/parser/TSDocParser.ts`)
+  - Parser: TSDocParser (`src/parser/TSDocParser.ts`)
   - Doc Parser: [[DocumentSymbolParser]] (`src/doc-symbol/DocumentSymbolParser.ts`)
   - Graph: [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`)
-  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
 
 **[[ExploreEntrypointCommand]]** - `tsdoc-edge explore-entrypoint <doc-path> [--detect-orphans]`
 - 문서 진입점부터 코드 탐색
@@ -104,7 +104,7 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
   - Command: `src/commands/ExploreEntrypointCommand.ts:45`
   - Doc Parser: [[DocumentSymbolParser]] (`src/doc-symbol/DocumentSymbolParser.ts`)
   - Mermaid Parser: [[MermaidSymbolExtractor]] (`src/doc-symbol/MermaidSymbolExtractor.ts`)
-  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
   - Algorithm: BFS traversal through [[Symbol]] references
 
 **[[ParseCommand]]** - `tsdoc-edge parse <file-path>`
@@ -113,7 +113,7 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 - **Implementation Chain**:
   - Command: `src/commands/ParseCommand.ts:37`
   - Extractor: EnhancedDocExtractor (`src/parser/EnhancedDocExtractor.ts`)
-  - Parser: [[TSDocParser]] (`src/parser/TSDocParser.ts`)
+  - Parser: TSDocParser (`src/parser/TSDocParser.ts`)
   - Output: Console display with completeness metrics
 
 ### Supporting Commands
@@ -139,13 +139,13 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
   - Command: `src/commands/ValidateCommand.ts:67`
   - Graph: [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`)
   - Validator: ConnectivityValidator (`src/validator/ConnectivityValidator.ts`)
-  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
 
 **[[UndocumentedCommand]]** - `tsdoc-edge undocumented`
 - 미문서화 심볼 탐지
 - **Implementation Chain**:
   - Command: `src/commands/Phase5Commands.ts:573`
-  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
   - Query: Filters symbols with missing documentation
 ## 관련 기능
 
@@ -164,11 +164,20 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 
 ---
 
+## Related
+
+- [[AnalysisFeatures]] - Code health and documentation quality analysis
+- [[ValidationFeatures]] - Strict mode and connectivity validation
+- [[SymbolGraphFeatures]] - Symbol dependency graph construction
+- DocumentSymbolSystem - Document symbol system
+
+---
+
 ## Backlinks
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:231
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:231
 - [[BuildCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/BuildCommand.md:54
 - [[ExploreEntrypointCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ExploreEntrypointCommand.md:22
 - [[WorkContextCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WorkContextCommand.md:56

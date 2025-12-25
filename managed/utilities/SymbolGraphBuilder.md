@@ -1,3 +1,11 @@
+---
+title: SymbolGraphBuilder
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # [[SymbolGraphBuilder]]
 
 **Source**: `src/graph/SymbolGraphBuilder.ts`
@@ -154,9 +162,9 @@ const impacted = builder.getDependents('user-repository');
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:180
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:235
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:241
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:180
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:235
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:241
 - [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:112
 - [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:196
 - [[CallGraphAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:210
@@ -171,10 +179,10 @@ const impacted = builder.getDependents('user-repository');
 - [[WhoUsesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WhoUsesCommand.md:116
 - [[WorkContextCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WorkContextCommand.md:51
 - [[WorkContextCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WorkContextCommand.md:58
-- [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:189
+- DatabaseManager → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:189
 - DepthTraverser → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DepthTraverser.md:118
 - DepthTraverser → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DepthTraverser.md:150
-- [[SymbolRegistryManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/SymbolRegistryManager.md:222
+- SymbolRegistryManager → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/SymbolRegistryManager.md:222
 - [[QueryCommands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/QueryCommands.md:84
 - [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:145
 - [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:167
@@ -197,8 +205,8 @@ const impacted = builder.getDependents('user-repository');
 - [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:110
 - [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:227
 - ExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ExtractionResult.md:77
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:145
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:184
+- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:145
+- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:184
 - [[Relationship Standard Format]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:222
 - [[Code Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/code-dependency.md:38
 - [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:34

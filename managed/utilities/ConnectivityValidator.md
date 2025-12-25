@@ -1,3 +1,11 @@
+---
+title: ConnectivityValidator
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # ConnectivityValidator
 
 **Source**: `src/validator/ConnectivityValidator.ts`
@@ -171,7 +179,7 @@ tsdoc-edge check-links
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:238
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:238
 - [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:129
 - [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:109
 

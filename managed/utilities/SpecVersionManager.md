@@ -1,3 +1,11 @@
+---
+title: SpecVersionManager
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # SpecVersionManager
 
 **Source**: `src/spec/SpecVersionManager.ts`

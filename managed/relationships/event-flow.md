@@ -1,3 +1,11 @@
+---
+title: Event Flow
+type: relationship
+category: behavioral
+status: planned
+canonical: true
+---
+
 # [[Event Flow]]
 
 Event-driven communication flow tracking.

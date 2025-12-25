@@ -1,3 +1,11 @@
+---
+title: Dependency Analysis
+type: feature
+category: feature
+status: active
+canonical: true
+---
+
 # [[Dependency Analysis]]
 
 Analyze symbol dependencies and relationships to understand code structure.

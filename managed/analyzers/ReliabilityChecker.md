@@ -1,3 +1,11 @@
+---
+title: # ReliabilityChecker
+type: analyzer
+category: core-components
+status: active
+canonical: true
+---
+
 # ReliabilityChecker
 
 **Source**: `src/analyzer/ReliabilityChecker.ts`
@@ -18,7 +26,7 @@ Check work context reliability and accuracy.
 
 ## Related
 
-- [[WorkContextCommand]]: Context reliability
+- WorkContextCommand: Context reliability
 
 ---
 
@@ -26,6 +34,5 @@ Check work context reliability and accuracy.
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:224
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:189
-
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:224
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:189

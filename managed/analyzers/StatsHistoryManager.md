@@ -1,3 +1,11 @@
+---
+title: # StatsHistoryManager
+type: analyzer
+category: core-components
+status: active
+canonical: true
+---
+
 # StatsHistoryManager
 
 **Source**: `src/analyzer/StatsHistoryManager.ts`
@@ -31,7 +39,6 @@ Track and manage statistics history over time.
 - [[Phase10Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/Phase10Commands.md:22
 - [[StatsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/StatsCommand.md:48
 - [[StatsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/StatsCommand.md:139
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:160
+- AnalysisFeatures → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:160
 - TrackableStatistics → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TrackableStatistics.md:83
 - TrackableStatistics → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TrackableStatistics.md:102
-

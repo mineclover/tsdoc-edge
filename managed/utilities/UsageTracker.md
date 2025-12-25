@@ -1,3 +1,11 @@
+---
+title: UsageTracker
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # UsageTracker
 
 **Source**: `src/analytics/UsageTracker.ts`
@@ -115,6 +123,6 @@ tsdoc-edge config set analytics.enabled false
 
 ### Referenced By
 
-- [[CLI Runner]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/CLIRunner.md:36
+- CLI Runner → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/CLIRunner.md:36
 - [[AnalyticsTypes]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/AnalyticsTypes.md:104
 

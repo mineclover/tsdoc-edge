@@ -32,7 +32,7 @@ lastUpdated: 2025-01-15
 같은 심볼을 여러 파일에서 보조 정의 가능. Primary 없는 Auxiliary는 orphaned 에러.
 
 ### 2. 심볼 참조 (Symbol Reference)
-문서 내 참조는 `[[Symbol]]` 또는 섹션 지정 `[[Symbol#Section]]` 형식 사용.
+문서 내 참조는 `[[Symbol]]` 또는 섹션 지정 ``[[Symbol#Section]]`` 형식 사용.
 
 ### 3. 코드 연결 (Code Connection)
 TypeScript 코드에서 `@doc [[Symbol]]` 태그로 문서와 연결.
@@ -145,11 +145,19 @@ tsdoc-edge find-doc <symbol>             # 심볼 찾기
 ---
 ---
 
+## Related
+
+- [[AutoIndexing]] - Automatic index updates on file save
+- [[CoreWorkflow]] - Main documentation pipeline
+- [[ValidationFeatures]] - Connectivity and SSOT validation
+
+---
+
 ## Backlinks
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:243
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:243
 - [[Symbol Reference System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/symbol-reference-system.md:169
 - [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:147
 - [[AutoIndexing]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/auto-indexing.md:163

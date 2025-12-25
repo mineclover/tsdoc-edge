@@ -169,7 +169,7 @@ tsdoc-edge parse src/commands/BuildCommand.ts
 ## Integration
 
 **Used By**:
-- [[BuildCommand]] (`src/commands/BuildCommand.ts`) - Primary user
+- BuildCommand (`src/commands/BuildCommand.ts`) - Primary user
 - [[ParseCommand]] (`src/commands/ParseCommand.ts`) - Single file parsing
 - [[Code Dependency]] (`managed/relationships/CODE-DEPENDENCY.md`) - Import extraction
 - [[Inheritance]] (`managed/relationships/INHERITANCE.md`) - Extends detection
@@ -181,8 +181,8 @@ tsdoc-edge parse src/commands/BuildCommand.ts
 
 **Produces**:
 - ExtractionResult (`managed/primary-types/ExtractionResult.md`)
-- Symbols for [[SymbolGraphBuilder]] (`src/graph/SymbolGraph.ts`)
-- Relationships for [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- Symbols for SymbolGraphBuilder (`src/graph/SymbolGraph.ts`)
+- Relationships for DatabaseManager (`src/storage/DatabaseManager.ts`)
 
 ## Example Output
 
@@ -289,7 +289,7 @@ tsdoc-edge parse src/commands/BuildCommand.ts
 - [[Interface Implementation]] (`managed/relationships/INTERFACE-IMPL.md`)
 
 **Commands**:
-- [[BuildCommand]] (`src/commands/BuildCommand.ts`) - Primary user
+- BuildCommand (`src/commands/BuildCommand.ts`) - Primary user
 - [[ParseCommand]] (`src/commands/ParseCommand.ts`) - Single file
 
 **Analyzers**:
@@ -300,8 +300,8 @@ tsdoc-edge parse src/commands/BuildCommand.ts
 - ExtractionResult (`managed/primary-types/ExtractionResult.md`)
 
 **Core**:
-- [[SymbolGraphBuilder]] (`src/graph/SymbolGraph.ts`) - Storage target
-- [[DatabaseManager]] (`src/storage/DatabaseManager.ts`) - Persistence
+- SymbolGraphBuilder (`src/graph/SymbolGraph.ts`) - Storage target
+- DatabaseManager (`src/storage/DatabaseManager.ts`) - Persistence
 
 ---
 
@@ -315,30 +315,30 @@ tsdoc-edge parse src/commands/BuildCommand.ts
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:25
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:37
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:102
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:194
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:233
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:275
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:217
-- [[BuildCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/BuildCommand.md:51
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:25
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:37
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:102
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:194
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:233
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:275
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:217
+- BuildCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/BuildCommand.md:51
 - [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:73
 - [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:38
 - [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:123
-- [[Build Pipeline Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:27
-- [[Build Pipeline Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:116
-- [[Build Pipeline Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:243
+- Build Pipeline Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:27
+- Build Pipeline Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:116
+- Build Pipeline Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:243
 - [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:265
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:32
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:213
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:366
+- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:32
+- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:213
+- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:366
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:25
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:260
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:326
 - ExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ExtractionResult.md:76
 - ExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ExtractionResult.md:93
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:31
+- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:31
 - [[Inheritance]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/INHERITANCE.md:8
 - [[Interface Implementation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:8
 - [[Code Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/code-dependency.md:10

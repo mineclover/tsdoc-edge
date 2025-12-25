@@ -1,3 +1,11 @@
+---
+title: IdGenerator
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # IdGenerator
 
 **Source**: `src/utils/IdGenerator.ts`
@@ -114,5 +122,5 @@ const tempId = tempIdGen.generate(); // "x7k"
 
 ### Referenced By
 
-- [[SymbolRegistryManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/SymbolRegistryManager.md:221
+- SymbolRegistryManager → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/SymbolRegistryManager.md:221
 

@@ -1,3 +1,11 @@
+---
+title: # DataFlowAnalyzer
+type: analyzer
+category: core-components
+status: active
+canonical: true
+---
+
 # DataFlowAnalyzer
 
 **Source**: `src/analyzer/DataFlowAnalyzer.ts`
@@ -25,7 +33,6 @@
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:221
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:109
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:221
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:109
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:278
-

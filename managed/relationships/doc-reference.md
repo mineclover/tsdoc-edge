@@ -1,3 +1,11 @@
+---
+title: Doc Reference
+type: relationship
+category: semantic
+status: planned
+canonical: true
+---
+
 # [[Doc Reference]]
 
 Documentation cross-reference relationship tracking.
@@ -46,9 +54,9 @@ Related: [[OrderProcessor]], [[PaymentGateway]]
 
 ## Related
 
-- [[Document Symbol System]]: Overall documentation symbol tracking
-- [[ValidateSymbolRefsCommand]]: Validation of doc references
-- [[UpdateBacklinksCommand]]: Backlink generation from references
+- Document Symbol System: Overall documentation symbol tracking
+- ValidateSymbolRefsCommand: Validation of doc references
+- UpdateBacklinksCommand: Backlink generation from references
 
 ---
 

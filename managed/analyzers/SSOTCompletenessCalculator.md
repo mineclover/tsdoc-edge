@@ -1,3 +1,11 @@
+---
+title: # SSOTCompletenessCalculator
+type: analyzer
+category: core-components
+status: active
+canonical: true
+---
+
 # SSOTCompletenessCalculator
 
 **Source**: `src/analyzer/SSOTCompletenessCalculator.ts`

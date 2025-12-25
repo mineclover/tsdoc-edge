@@ -333,7 +333,7 @@ console.log(`Average compliance: ${avgScore.toFixed(2)}%`);
 ## Related
 
 - [[Module Specification Framework]] (`../concepts/module-specification-framework.md`) - Alternative framework
-- [[ValidationFeatures]] (`../features/validation-features.md`) - Validation commands
+- ValidationFeatures (`../features/validation-features.md`) - Validation commands
 - [[ValidateCommand]] - Validation command that uses strict mode
 - EnhancedSymbolDoc - Enhanced documentation type
 - EnhancedDocExtractor - Extracts enhanced docs for validation

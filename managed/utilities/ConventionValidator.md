@@ -1,3 +1,11 @@
+---
+title: ConventionValidator
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # ConventionValidator
 
 **Source**: `src/validator/ConventionValidator.ts`
@@ -236,5 +244,5 @@ tsdoc-edge validate --strict --json > report.json
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:238
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:238
 

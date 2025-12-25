@@ -306,8 +306,8 @@ function process(data: Data, onDone: () => void) {
 |--------------|---------|---------|
 | [[Call Relationships]] | Direct call | `foo()` calls `bar()` |
 | **Callback Pattern** | Indirect call | `foo(bar)` invokes `bar` later |
-| [[Event Flow]] | Publish-subscribe | `emitter.emit('event')` � handlers |
-| [[Pipeline]] | Sequential processing | `A � B � C` data flow |
+| [[Event Flow]] | Publish-subscribe | `emitter.emit('event')` → handlers |
+| [[Pipeline]] | Sequential processing | `A → B → C` data flow |
 
 ## Related
 
@@ -393,7 +393,7 @@ tsdoc-edge analyze --callback-depth
 - `done`, `next`
 - `then`, `catch`, `finally`
 
-**Tracking**: See [[Unified Relationship Taxonomy]] for complete relationship catalog
+**Tracking**: See Unified Relationship Taxonomy for complete relationship catalog
 
 ---
 

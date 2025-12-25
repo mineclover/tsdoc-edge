@@ -231,7 +231,7 @@ jobs:
   - Command: `src/commands/ValidateCommand.ts`
   - Validator: ConnectivityValidator (`src/validator/ConnectivityValidator.ts`)
   - Uses: [[SymbolGraphBuilder]], SymbolSearchEngine
-  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
 
 **[[ValidateDocsCommand]]** - `tsdoc-edge validate-docs <path>`
 - 문서 검증 (링크, 구조, 메타데이터)
@@ -269,7 +269,7 @@ jobs:
 - 고아 심볼 탐지
 - **Implementation Chain**:
   - Command: `src/commands/Phase5Commands.ts`
-  - Registry: [[SymbolRegistryManager]] (`src/registry/SymbolRegistryManager.ts`)
+  - Registry: SymbolRegistryManager (`src/registry/SymbolRegistryManager.ts`)
   - Storage: `.tsdoc/registry.jsonl`
   - Detects: Symbols with no incoming or outgoing references
 
@@ -421,12 +421,20 @@ cycle_rate = symbols_in_cycles / total_symbols
 
 ---
 
+## Related
+
+- [[CoreWorkflow]] - Build pipeline integration
+- [[SymbolGraphFeatures]] - Connectivity analysis
+- [[AnalysisFeatures]] - Code health metrics
+
+---
+
 ## Backlinks
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:93
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:237
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:93
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:237
 - [[DocumentationAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:125
 - StrictModeValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/StrictModeValidator.md:238
 - [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:261
@@ -443,7 +451,7 @@ cycle_rate = symbols_in_cycles / total_symbols
 - [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:263
 - [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:352
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:332
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:135
+- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:135
 - [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:193
 - [[DocumentationFixer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/DocumentationFixer.md:22
 

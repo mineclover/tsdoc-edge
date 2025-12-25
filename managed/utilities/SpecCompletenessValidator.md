@@ -1,3 +1,11 @@
+---
+title: SpecCompletenessValidator
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # [[SpecCompletenessValidator]]
 
 **Source**: `src/spec/SpecCompletenessValidator.ts`

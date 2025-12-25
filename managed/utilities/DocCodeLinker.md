@@ -1,3 +1,11 @@
+---
+title: DocCodeLinker
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # [[DocCodeLinker]]
 
 **Source**: `src/linking/DocCodeLinker.ts`

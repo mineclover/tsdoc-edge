@@ -1,3 +1,11 @@
+---
+title: # DependencyChainAnalyzer
+type: analyzer
+category: core-components
+status: active
+canonical: true
+---
+
 # DependencyChainAnalyzer
 
 **Source**: `src/analyzer/DependencyChainAnalyzer.ts`
@@ -28,10 +36,9 @@ Detects:
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:222
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:222
 - DependencyResolver → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DependencyResolver.md:23
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:119
-- [[AnalyzeChainsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:21
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:119
+- AnalyzeChainsCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:21
 - [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:149
 - MermaidGenerator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/MermaidGenerator.md:91
-

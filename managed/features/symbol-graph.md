@@ -66,7 +66,7 @@ type Direction =
 - 관계 매핑 (depends-on, implements, extends)
 - **Implementation Chain**:
   - Core: `src/graph/SymbolGraphBuilder.ts`
-  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
   - Types: Symbol, SymbolGraph, SymbolRelationship
 
 **[[ASTSymbolExtractor]]** - AST에서 심볼 추출
@@ -76,7 +76,7 @@ type Direction =
 - **Implementation Chain**:
   - Core: `src/analyzer/ASTSymbolExtractor.ts`
   - Uses: TypeScript Compiler API (`ts.Node`, `ts.SourceFile`)
-  - Storage: [[DatabaseManager]]
+  - Storage: DatabaseManager
 
 **DependencyResolver** - Import 경로 해석
 - 모듈 경로 해석 (.ts, .tsx, index)
@@ -200,7 +200,7 @@ tsdoc-edge validate
 - **Implementation Chain**:
   - Command: `src/commands/BuildCommand.ts`
   - Extractor: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`)
-  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
   - Config: ConfigManager
 
 **[[AnalyzeCallsCommand]]** - `tsdoc-edge analyze-calls`
@@ -210,7 +210,7 @@ tsdoc-edge validate
   - Command: `src/commands/AnalyzeCallsCommand.ts`
   - Analyzer: [[CallGraphAnalyzer]] (`src/analyzer/CallGraphAnalyzer.ts`)
   - Graph: [[SymbolGraphBuilder]]
-  - Storage: [[DatabaseManager]]
+  - Storage: DatabaseManager
 
 **[[AnalyzeIOCommand]]** - `tsdoc-edge analyze-io`
 - I/O 의존성 분석 (타입 기반)
@@ -219,7 +219,7 @@ tsdoc-edge validate
   - Command: `src/commands/AnalyzeIOCommand.ts`
   - Analyzer: [[IODependencyAnalyzer]] (`src/analyzer/IODependencyAnalyzer.ts`)
   - Graph: [[SymbolGraphBuilder]]
-  - Storage: [[DatabaseManager]]
+  - Storage: DatabaseManager
 
 **[[AnalyzeChainsCommand]]** - `tsdoc-edge analyze-chains`
 - 의존성 체인 분석 (3+ 단계 파이프라인)
@@ -236,7 +236,7 @@ tsdoc-edge validate
   - Command: `src/commands/AnalyzeTypesCommand.ts`
   - Analyzer: [[TypeDependencyAnalyzer]] (`src/analyzer/TypeDependencyAnalyzer.ts`)
   - Graph: [[SymbolGraphBuilder]]
-  - Storage: [[DatabaseManager]]
+  - Storage: DatabaseManager
 
 ### Graph Query Commands
 
@@ -253,14 +253,14 @@ tsdoc-edge validate
 - 심볼의 직접 의존성 조회
 - **Implementation Chain**:
   - Command: `src/commands/Phase5Commands.ts`
-  - Storage: [[SymbolRegistryManager]] (`src/storage/SymbolRegistryManager.ts`)
+  - Storage: SymbolRegistryManager (`src/storage/SymbolRegistryManager.ts`)
   - Uses: Adjacency list for O(1) lookup
 
 **[[WhoUsesCommand]]** - `tsdoc-edge who-uses <symbol-id>`
 - 심볼을 사용하는 곳 조회
 - **Implementation Chain**:
   - Command: `src/commands/Phase5Commands.ts`
-  - Storage: [[SymbolRegistryManager]]
+  - Storage: SymbolRegistryManager
   - Uses: Reverse adjacency list for O(1) lookup
 
 **[[TreeCommand]]** - `tsdoc-edge tree <symbol-id>`
@@ -352,7 +352,7 @@ tsdoc-edge tree
 
 ## 저장소
 
-**[[DatabaseManager]]** - SQLite 기반 심볼 저장소
+**DatabaseManager** - SQLite 기반 심볼 저장소
 - 심볼 정보 영속화
 - 빠른 쿼리 지원
 - JSONL export/import
@@ -362,14 +362,14 @@ tsdoc-edge tree
   - Schema: Symbols, Relationships, Metadata tables
   - Indexes: Name, FilePath, Type for fast lookups
 
-**[[SymbolRegistryManager]]** - JSONL 기반 심볼 레지스트리
+**SymbolRegistryManager** - JSONL 기반 심볼 레지스트리
 - ID 기반 심볼 추적
 - 의존성 관계 저장
 - Git 친화적 JSONL 포맷
 - **Implementation Chain**:
   - Core: `src/storage/SymbolRegistryManager.ts`
   - Format: Line-delimited JSON (`.tsdoc/registry.jsonl`)
-  - Uses: [[DatabaseManager]] for dual persistence
+  - Uses: DatabaseManager for dual persistence
   - Indexing: In-memory maps synced from database
 ## 관련 기능
 
@@ -382,11 +382,19 @@ tsdoc-edge tree
 
 ---
 
+## Related
+
+- [[AnalysisFeatures]] - Code quality analysis using graph
+- [[ValidationFeatures]] - Connectivity validation
+- [[CoreWorkflow]] - Build system integration
+
+---
+
 ## Backlinks
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:240
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:240
 - [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:257
 - [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:81
 - [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:286

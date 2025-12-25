@@ -1,4 +1,12 @@
-# [[CoverageSyncAdapter]]
+---
+title: # CoverageSyncAdapter
+type: analyzer
+category: core-components
+status: active
+canonical: true
+---
+
+# CoverageSyncAdapter
 
 **Source**: `src/analyzer/CoverageSyncAdapter.ts`
 
@@ -27,5 +35,4 @@ Sync test coverage data with symbol database.
 ### Referenced By
 
 - [[IstanbulCoverageAdapter]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/IstanbulCoverageAdapter.md:23
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:167
-
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:167

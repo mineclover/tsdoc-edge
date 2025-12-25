@@ -286,7 +286,7 @@ tsdoc-edge deps Engine --reverse --type=composition
 - Association (any relationship)
 - Dependency (transient usage)
 
-**Tracking**: See [[Unified Relationship Taxonomy]] for complete relationship catalog
+**Tracking**: See Unified Relationship Taxonomy for complete relationship catalog
 
 ---
 

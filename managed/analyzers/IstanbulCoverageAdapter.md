@@ -1,3 +1,11 @@
+---
+title: IstanbulCoverageAdapter
+type: analyzer
+category: core-components
+status: active
+canonical: true
+---
+
 # [[IstanbulCoverageAdapter]]
 
 **Source**: `src/analyzer/IstanbulCoverageAdapter.ts`
@@ -19,8 +27,8 @@ Converts:
 
 ## Related
 
-- [[CoverageParser]]: Coverage parsing
-- [[CoverageSyncAdapter]]: Synchronization
+- CoverageParser: Coverage parsing
+- CoverageSyncAdapter: Synchronization
 
 ---
 
@@ -28,5 +36,4 @@ Converts:
 
 ### Referenced By
 
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:171
-
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:171

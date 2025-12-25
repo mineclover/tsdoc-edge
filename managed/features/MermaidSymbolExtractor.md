@@ -1,3 +1,11 @@
+---
+title: MermaidSymbolExtractor
+type: feature
+category: feature
+status: active
+canonical: true
+---
+
 # [[MermaidSymbolExtractor]]
 
 **Source**: `src/doc-symbol/MermaidSymbolExtractor.ts`
@@ -20,7 +28,7 @@ Parses:
 ## Related
 
 - [[ParseMermaidCommand]]: CLI interface
-- [[Document Symbol System]]: Symbol integration
+- Document Symbol System: Symbol integration
 
 ---
 
@@ -28,7 +36,7 @@ Parses:
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:245
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:245
 - [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:94
 - [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:125
 

@@ -1,3 +1,11 @@
+---
+title: ModuleSpecValidator
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # ModuleSpecValidator
 
 **Source**: `src/validator/ModuleSpecValidator.ts`

@@ -1,3 +1,11 @@
+---
+title: ParallelWorkDetector
+type: analyzer
+category: core-components
+status: active
+canonical: true
+---
+
 # [[ParallelWorkDetector]]
 
 **Source**: `src/analyzer/ParallelWorkDetector.ts`
@@ -27,7 +35,7 @@ interface ParallelWorkGroup {
 ## Related
 
 - Parallel Work Theory: 이론적 배경
-- [[WorkContextCommand]]: 작업 컨텍스트 분석
+- WorkContextCommand: 작업 컨텍스트 분석
 
 ---
 
@@ -35,6 +43,5 @@ interface ParallelWorkGroup {
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:223
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:179
-
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:223
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:179

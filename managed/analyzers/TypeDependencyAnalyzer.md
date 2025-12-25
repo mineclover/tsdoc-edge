@@ -1,3 +1,11 @@
+---
+title: TypeDependencyAnalyzer
+type: analyzer
+category: core-components
+status: active
+canonical: true
+---
+
 # [[TypeDependencyAnalyzer]]
 
 **Source**: `src/analyzer/TypeDependencyAnalyzer.ts`
@@ -147,15 +155,14 @@ for (const [symbolId, symbol] of this.graph.symbols.entries()) {
 
 ### Referenced By
 
-- [[DetectCircularTypesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/DetectCircularTypesCommand.md:51
+- DetectCircularTypesCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/DetectCircularTypesCommand.md:51
 - [[FindRootTypesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/FindRootTypesCommand.md:36
 - [[FindRootTypesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/FindRootTypesCommand.md:83
-- [[Analyzer Status]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analyzer-status.md:90
-- [[Analyzer Status]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analyzer-status.md:281
+- Analyzer Status → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analyzer-status.md:90
+- Analyzer Status → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analyzer-status.md:281
 - [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:158
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:281
 - [[Generic Constraint]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/GENERIC-CONSTRAINT.md:8
 - [[Type Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:8
 - [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:116
 - [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:124
-

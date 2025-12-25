@@ -411,11 +411,11 @@ lodash.map(array, fn);  // External library, not tracked
 ## Related
 
 - [[Call Relationships]] (`../relationships/CALLS.md`) - Relationship type documentation
-- [[SymbolGraphBuilder]] - Graph construction that uses this analyzer
-- [[DatabaseManager]] (`../core-components/DatabaseManager.md`) - Stores relationships
+- SymbolGraphBuilder - Graph construction that uses this analyzer
+- DatabaseManager (`../core-components/DatabaseManager.md`) - Stores relationships
 - [[Unified Relationship Taxonomy]] (`../concepts/unified-relationship-taxonomy.md`) - Calls category
 - [[Pipeline]] - Sequential call chains
-- [[WorkContextCommand]] - Uses call graph for impact analysis
+- WorkContextCommand - Uses call graph for impact analysis
 
 ## Comparison: CallGraphAnalyzer vs Other Analyzers
 
@@ -490,29 +490,29 @@ console.log(`saveSymbols is called by ${callers.length} functions`);
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:34
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:103
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:200
-- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:189
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:34
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:103
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:200
+- ASTSymbolExtractor → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:189
 - DataFlowAnalyzer → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DataFlowAnalyzer.md:20
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:218
-- [[AnalyzeCallsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:21
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:218
+- AnalyzeCallsCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:21
 - [[Phase7Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/Phase7Commands.md:22
 - [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:132
-- [[Analyzer Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:21
-- [[Analyzer Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:33
-- [[Analyzer Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:55
-- [[Analyzer Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:256
-- [[Build Pipeline Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:57
-- [[Build Pipeline Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:121
-- [[Build Pipeline Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:244
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:134
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:214
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:367
+- Analyzer Development Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:21
+- Analyzer Development Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:33
+- Analyzer Development Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:55
+- Analyzer Development Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:256
+- Build Pipeline Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:57
+- Build Pipeline Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:121
+- Build Pipeline Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:244
+- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:134
+- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:214
+- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:367
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:118
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:264
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:327
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:47
+- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:47
 - [[Call Relationships]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/CALLS.md:10
 - [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:73
 

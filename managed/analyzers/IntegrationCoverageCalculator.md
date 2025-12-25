@@ -1,4 +1,12 @@
-# [[IntegrationCoverageCalculator]]
+---
+title: # IntegrationCoverageCalculator
+type: analyzer
+category: core-components
+status: active
+canonical: true
+---
+
+# IntegrationCoverageCalculator
 
 **Source**: `src/analyzer/IntegrationCoverageCalculator.ts`
 
@@ -27,5 +35,4 @@ Measures:
 
 ### Referenced By
 
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:157
-
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:157

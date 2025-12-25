@@ -1,3 +1,11 @@
+---
+title: Codebase Health Report
+type: feature
+category: feature
+status: active
+canonical: true
+---
+
 # [[Codebase Health Report]]
 
 Comprehensive health assessment of TSDoc Edge codebase - structure quality, documentation coverage, and improvement recommendations.
@@ -411,7 +419,7 @@ TSDoc Edge 코드베이스는 **전반적으로 건강한 상태**입니다:
 - Context Quality Improvements: 최근 개선 작업
 - [[Analyzer Status]]: Analyzer 활성화 상태
 - [[Work Context Workflow]]: 핵심 워크플로우
-- [[Commands Index]]: 전체 명령어 목록
+- Commands Index: 전체 명령어 목록
 
 ## Links
 

@@ -1,3 +1,11 @@
+---
+title: SpecContentSimilarityChecker
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # SpecContentSimilarityChecker
 
 **Source**: `src/spec/SpecContentSimilarityChecker.ts`

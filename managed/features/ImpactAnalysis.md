@@ -1,3 +1,11 @@
+---
+title: Impact Analysis
+type: feature
+category: feature
+status: active
+canonical: true
+---
+
 # [[Impact Analysis]]
 
 Assess the impact of code changes before making them.

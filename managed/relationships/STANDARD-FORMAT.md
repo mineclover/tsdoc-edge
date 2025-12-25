@@ -29,7 +29,7 @@ Defines a standard format for storing and querying all types of relationships be
 
 ## Standard Format
 
-See implementation: [[UnifiedRelationships]]
+See implementation: UnifiedRelationships
 
 **Identity**:
 - `id`: Unique relationship identifier
@@ -493,8 +493,8 @@ const confidence = evidence.reduce((sum, ev) => sum + ev.confidence, 0) / eviden
 ## Related
 
 - [[Unified Relationship Taxonomy]] - Relationship classification
-- [[DatabaseManager]] (`../core-components/DatabaseManager.md`) - Storage
-- [[SymbolGraphBuilder]] - Graph construction
+- DatabaseManager (`../core-components/DatabaseManager.md`) - Storage
+- SymbolGraphBuilder - Graph construction
 - [[Call Relationships]] (`CALLS.md`) - Specific type example
 - [[IO Dependency]] (`IO-DEPENDENCY.md`) - Data flow example
 
@@ -563,6 +563,6 @@ const confidence = evidence.reduce((sum, ev) => sum + ev.confidence, 0) / eviden
 ### Referenced By
 
 - [[Unified Relationship Taxonomy]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:387
-- [[Analyzer Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:95
-- [[UnifiedRelationships]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/UnifiedRelationships.md:109
+- Analyzer Development Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:95
+- UnifiedRelationships → /Users/junwoobang/workflow/tsdoc-edge/managed/types/UnifiedRelationships.md:109
 

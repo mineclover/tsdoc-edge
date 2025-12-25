@@ -13,7 +13,7 @@ canonical: true
 Track generic type constraints (`T extends U`).
 
 **Implementation**: [[TypeDependencyAnalyzer]] (`src/analyzer/TypeDependencyAnalyzer.ts`)  
-**Command**: [[AnalyzeTypesCommand]]
+**Command**: AnalyzeTypesCommand
 
 ---
 
@@ -21,9 +21,9 @@ Track generic type constraints (`T extends U`).
 
 ### Referenced By
 
-- [[Commands Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:84
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:42
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:318
+- Commands Index → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:84
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:42
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:318
 - [[TypeDependencyAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:91
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:68
+- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:68
 

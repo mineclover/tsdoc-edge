@@ -1,3 +1,11 @@
+---
+title: MCP Testing Strategy
+type: feature
+category: feature
+status: active
+canonical: true
+---
+
 # [[MCP Testing Strategy]]
 
 **Owner**: MCP Team

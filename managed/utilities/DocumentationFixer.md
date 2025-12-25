@@ -1,3 +1,11 @@
+---
+title: DocumentationFixer
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # [[DocumentationFixer]]
 
 **Source**: `src/fixer/DocumentationFixer.ts`

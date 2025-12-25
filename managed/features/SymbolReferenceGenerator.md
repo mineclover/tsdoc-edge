@@ -1,3 +1,11 @@
+---
+title: SymbolReferenceGenerator
+type: feature
+category: feature
+status: active
+canonical: true
+---
+
 # SymbolReferenceGenerator
 
 **Source**: `src/doc-symbol/SymbolReferenceGenerator.ts`
@@ -19,4 +27,4 @@ Creates:
 
 ## Related
 
-- [[Document Symbol System]]: Symbol notation
+- Document Symbol System: Symbol notation

@@ -1,3 +1,11 @@
+---
+title: ConfigLoader
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # ConfigLoader
 
 **Source**: `src/utils/ConfigLoader.ts`

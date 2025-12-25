@@ -1,4 +1,12 @@
-# [[TestRelationshipExtractor]]
+---
+title: # TestRelationshipExtractor
+type: analyzer
+category: core-components
+status: active
+canonical: true
+---
+
+# TestRelationshipExtractor
 
 **Source**: `src/analyzer/TestRelationshipExtractor.ts`
 

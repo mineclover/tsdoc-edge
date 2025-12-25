@@ -285,7 +285,7 @@ tsdoc-edge test-impact database-manager
 
 ## Related Documentation
 
-- **[[Commands Index]]** (`/managed/COMMANDS.md`) - All 61 commands
+- **Commands Index** (`/managed/COMMANDS.md`) - All 61 commands
 - **[[Relationship Types]]** (`/managed/relationships/index.md`) - 17 relationship types
 - **[[Guides & Tutorials]]** (`/managed/guides/index.md`) - Learning resources
 - **[[CoreFeatures]]** (`core-features-catalog.md`) - Detailed feature catalog

@@ -1,3 +1,11 @@
+---
+title: Analyzer Status
+type: feature
+category: feature
+status: active
+canonical: true
+---
+
 # [[Analyzer Status]]
 
 Current status of all relationship analyzers in TSDoc Edge - which are active, relationship counts, and activation blockers.
@@ -287,7 +295,7 @@ tsdoc-edge build src
 
 ## Related Documentation
 
-- [[Commands Index]] - All available commands
+- Commands Index - All available commands
 - [[Temporal Order]] - Temporal order relationship type
 - [[TypeDependencyAnalyzer]] - Type dependency analyzer
 - [[Relationship Types]] - All relationship types

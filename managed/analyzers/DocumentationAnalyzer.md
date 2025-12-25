@@ -1,3 +1,12 @@
+---
+title: Documentation Analyzer
+type: analyzer
+category: quality
+status: active
+canonical: true
+source: src/analyzer/DocumentationAnalyzer.ts
+---
+
 # [[DocumentationAnalyzer]]
 
 **Source**: `src/analyzer/DocumentationAnalyzer.ts`
@@ -287,8 +296,8 @@ scores.forEach(score => {
 
 - [[CodeHealthChecker]]: Uses DocumentationAnalyzer for health reports
 - [[TSDocParser]]: Parses TSDoc comments
-- [[AnalysisFeatures]]: Part of analysis feature set
-- [[ValidationFeatures]]: Documentation validation
+- AnalysisFeatures: Part of analysis feature set
+- ValidationFeatures: Documentation validation
 
 ## See Also
 
@@ -306,10 +315,10 @@ scores.forEach(score => {
 - [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:54
 - [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:118
 - [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:211
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:87
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:87
 - [[AnalyzeCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/AnalyzeCommand.md:19
 - [[SuggestCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SuggestCommand.md:189
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:144
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:166
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:194
+- AnalysisFeatures → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:144
+- AnalysisFeatures → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:166
+- AnalysisFeatures → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:194
 

@@ -1,3 +1,11 @@
+---
+title: SymbolReferenceResolver
+type: feature
+category: feature
+status: active
+canonical: true
+---
+
 # SymbolReferenceResolver
 
 **Source**: `src/doc-symbol/SymbolReferenceResolver.ts`
@@ -19,5 +27,5 @@ Resolves:
 
 ## Related
 
-- [[Document Symbol System]]: Symbol resolution
+- Document Symbol System: Symbol resolution
 - [[ValidateSymbolRefsCommand]]: Validation

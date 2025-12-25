@@ -1,3 +1,11 @@
+---
+title: MissingLinkDetector
+type: analyzer
+category: core-components
+status: active
+canonical: true
+---
+
 # [[MissingLinkDetector]]
 
 **Source**: `src/analyzer/MissingLinkDetector.ts`
@@ -27,7 +35,6 @@ Finds:
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:221
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:99
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:133
-
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:221
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:99
+- ValidationFeatures → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:133

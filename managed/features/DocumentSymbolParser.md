@@ -1,3 +1,11 @@
+---
+title: DocumentSymbolParser
+type: feature
+category: feature
+status: active
+canonical: true
+---
+
 # [[DocumentSymbolParser]]
 
 **Source**: `src/doc-symbol/DocumentSymbolParser.ts`
@@ -150,7 +158,7 @@ if (line.trim().startsWith('#') && line.includes('[[')) {
 ### Inline Reference Pattern
 
 ```typescript
-// Matches: [[Symbol]] or [[Symbol#Section]]
+// Matches: [[Symbol]] or `[[Symbol#Section]]`
 const regex = /\[\[([^\]#]+)(?:#([^\]]+))?\]\]/g;
 ```
 
@@ -290,7 +298,7 @@ describe('DocumentSymbolParser', () => {
 - [[SymbolQueryCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolQueryCommand.md:129
 - [[SymbolQueryCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolQueryCommand.md:155
 - [[WorkContextCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WorkContextCommand.md:52
-- [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:31
+- Document Symbol System → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:31
 - [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:126
 - [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:146
 - [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:84

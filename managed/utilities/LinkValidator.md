@@ -1,3 +1,11 @@
+---
+title: LinkValidator
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # [[LinkValidator]]
 
 **Source**: `src/linking/LinkValidator.ts`

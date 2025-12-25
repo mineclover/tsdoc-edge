@@ -1,3 +1,11 @@
+---
+title: DocumentSymbolRegistry
+type: feature
+category: feature
+status: active
+canonical: true
+---
+
 # [[DocumentSymbolRegistry]]
 
 **Source**: `src/doc-symbol/DocumentSymbolRegistry.ts`
@@ -372,9 +380,9 @@ describe('DocumentSymbolRegistry', () => {
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:244
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:244
 - [[IndexDocsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/IndexDocsCommand.md:58
-- [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:32
+- Document Symbol System → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:32
 - [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:118
 - [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:278
 - DocumentSymbol → /Users/junwoobang/workflow/tsdoc-edge/managed/types/DocumentSymbol.md:100

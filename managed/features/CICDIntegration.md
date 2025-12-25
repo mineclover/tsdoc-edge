@@ -1,3 +1,11 @@
+---
+title: CI/CD Integration
+type: feature
+category: feature
+status: active
+canonical: true
+---
+
 # [[CI/CD Integration]]
 
 Integrate TSDoc Edge quality checks into CI/CD pipelines.

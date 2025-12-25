@@ -1,3 +1,11 @@
+---
+title: Phase Commands Refactoring Guide
+type: feature
+category: feature
+status: active
+canonical: true
+---
+
 # [[Phase Commands Refactoring Guide]]
 
 Guide for splitting monolithic Phase command files into individual command files for better maintainability.

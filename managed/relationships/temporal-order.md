@@ -374,8 +374,8 @@ await loadConfig();
 
 ### Referenced By
 
-- [[Analyzer Status]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analyzer-status.md:45
-- [[Analyzer Status]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analyzer-status.md:280
+- Analyzer Status → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analyzer-status.md:45
+- Analyzer Status → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analyzer-status.md:280
 - [[Collaboration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/collaboration.md:134
 - [[Collaboration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/collaboration.md:164
 

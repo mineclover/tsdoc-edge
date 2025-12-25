@@ -244,7 +244,7 @@ Violations:
 - **Implementation Chain**:
   - Command: `src/commands/AnalyzeCommand.ts`
   - Uses: ImportanceClassifier (`src/analyzer/ImportanceClassifier.ts`), DomainStructureAnalyzer (`src/analyzer/DomainStructureAnalyzer.ts`)
-  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
 
 **[[StatsCommand]]** - `tsdoc-edge stats [path] [--save] [--compare]`
 - 통계 수집 및 스냅샷 저장/비교
@@ -266,14 +266,14 @@ Violations:
 - **Implementation Chain**:
   - Command: `src/commands/DepsCommand.ts`
   - Resolver: DependencyResolver (`src/analyzer/DependencyResolver.ts`)
-  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
 
 **[[WhoUsesCommand]]** - `tsdoc-edge who-uses <symbol-id>`
 - 심볼을 사용하는 곳 조회 (역의존성)
 - **Implementation Chain**:
   - Command: `src/commands/WhoUsesCommand.ts`
   - Graph: [[SymbolGraphBuilder]] (`src/graph/SymbolGraph.ts`)
-  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
 
 **[[OrphansCommand]]** - `tsdoc-edge orphans`
 - 고아 심볼 탐지 (연결되지 않은 코드)
@@ -287,28 +287,28 @@ Violations:
 - **Implementation Chain**:
   - Command: `src/commands/UndocumentedCommand.ts`
   - Analyzer: [[DocumentationAnalyzer]] (`src/analyzer/DocumentationAnalyzer.ts`)
-  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
 
 **[[UntestedCommand]]** - `tsdoc-edge untested`
 - 미테스트 심볼 탐지
 - **Implementation Chain**:
   - Command: `src/commands/UntestedCommand.ts`
   - Analyzer: [[TestCoverageAnalyzer]] (`src/analyzer/TestCoverageAnalyzer.ts`)
-  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
 
 **WithoutResponsibilityCommand** - `tsdoc-edge without-responsibility`
 - 책임 미정의 심볼 (@responsibility 태그 누락)
 - **Implementation Chain**:
   - Command: `src/commands/WithoutResponsibilityCommand.ts`
   - Validator: TSDoc parser for @responsibility tag
-  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
 
 **WithoutContractCommand** - `tsdoc-edge without-contract`
 - 계약 미정의 심볼 (@contract 태그 누락)
 - **Implementation Chain**:
   - Command: `src/commands/WithoutContractCommand.ts`
   - Validator: TSDoc parser for @contract tag
-  - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+  - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
 
 **[[TreeCommand]]** - `tsdoc-edge tree <symbol-id>`
 - 의존성 트리 시각화
@@ -429,12 +429,20 @@ jobs:
 
 ---
 
+## Related
+
+- [[CoreWorkflow]] - Core documentation pipeline
+- [[SymbolGraphFeatures]] - Symbol dependency analysis
+- [[ValidationFeatures]] - Code validation and quality checks
+
+---
+
 ## Backlinks
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:93
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:234
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:93
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:234
 - [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:115
 - [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:218
 - [[DocumentationAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:124
@@ -455,8 +463,8 @@ jobs:
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:331
 - AnalysisReport → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/AnalysisReport.md:71
 - TrackableStatistics → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TrackableStatistics.md:85
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:84
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:134
+- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:84
+- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:134
 - [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:192
 
 ### Implemented By

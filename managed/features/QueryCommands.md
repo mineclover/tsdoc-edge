@@ -1,3 +1,11 @@
+---
+title: QueryCommands
+type: feature
+category: feature
+status: active
+canonical: true
+---
+
 # [[QueryCommands]]
 
 **Phase 5 Commands**: Symbol queries and graph analysis
@@ -114,8 +122,8 @@ tsdoc-edge undocumented
 ## Related
 
 - [[Phase5Commands]]: Source file (`src/commands/Phase5Commands.ts`)
-- [[SymbolRegistryManager]]: Registry data access
-- [[DatabaseManager]]: Database queries
+- SymbolRegistryManager: Registry data access
+- DatabaseManager: Database queries
 - [[SymbolGraphBuilder]]: Graph construction
 
 ## Performance

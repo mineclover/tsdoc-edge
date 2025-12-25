@@ -1,3 +1,11 @@
+---
+title: FileScanner
+type: utility
+category: utility
+status: active
+canonical: true
+---
+
 # FileScanner
 
 **Source**: `src/scanner/FileScanner.ts`
@@ -69,7 +77,7 @@ Returns:
 
 ## Related
 
-- [[TSDocParser]]: Parses TSDoc comments
+- TSDocParser: Parses TSDoc comments
 - [[ASTSymbolExtractor]]: Extracts symbols from AST
 - [[BuildCommand]]: Triggers full scan
 

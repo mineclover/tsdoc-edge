@@ -20,14 +20,14 @@ Core components that power relationship detection, symbol extraction, and qualit
 
 ## Primary Analyzers
 
-### [[ASTSymbolExtractor]] - Symbol Extraction ✅
+### ASTSymbolExtractor - Symbol Extraction ✅
 
 **Source**: `src/analyzer/ASTSymbolExtractor.ts`
 **Doc**: [ASTSymbolExtractor.md](./ASTSymbolExtractor.md)
 
 **Purpose**: Extract all symbols from TypeScript AST
 **Output**: 1,511 symbols from 126 files
-**Used By**: [[BuildCommand]], [[ParseCommand]]
+**Used By**: BuildCommand, [[ParseCommand]]
 
 **Capabilities**:
 - Classes, functions, interfaces, types
@@ -44,7 +44,7 @@ Core components that power relationship detection, symbol extraction, and qualit
 
 **Purpose**: Detect function call relationships
 **Output**: 1,511 call relationships
-**Used By**: [[AnalyzeCallsCommand]]
+**Used By**: AnalyzeCallsCommand
 
 **Capabilities**:
 - Direct calls, method calls, constructors
@@ -61,7 +61,7 @@ Core components that power relationship detection, symbol extraction, and qualit
 
 **Purpose**: Match return types with parameter types
 **Output**: 6,705 I/O dependencies
-**Used By**: [[AnalyzeIOCommand]], [[AnalyzeChainsCommand]]
+**Used By**: AnalyzeIOCommand, AnalyzeChainsCommand
 
 **Capabilities**:
 - Type matching algorithm
@@ -102,7 +102,7 @@ Core components that power relationship detection, symbol extraction, and qualit
 - Parse Istanbul/NYC coverage
 - Symbol-level coverage
 - Untested code detection
-- Used by: [[CodeHealthChecker]], [[TestRelationshipsCommand]]
+- Used by: [[CodeHealthChecker]], TestRelationshipsCommand
 
 **[[MissingLinkDetector]]** (`src/analyzer/MissingLinkDetector.ts`)
 - Detect broken [[Symbol]] references
@@ -162,17 +162,17 @@ Core components that power relationship detection, symbol extraction, and qualit
 - Coverage relationship tracking
 - Test gap detection
 
-**[[IntegrationCoverageCalculator]]** (`src/analyzer/IntegrationCoverageCalculator.ts`)
+**IntegrationCoverageCalculator** (`src/analyzer/IntegrationCoverageCalculator.ts`)
 - Integration test coverage
 - Relationship coverage metrics
 - Gap analysis
 
-**[[CoverageParser]]** (`src/analyzer/CoverageParser.ts`)
+**CoverageParser** (`src/analyzer/CoverageParser.ts`)
 - Parse coverage reports (Istanbul, NYC)
 - Multiple format support
 - Coverage data extraction
 
-**[[CoverageSyncAdapter]]** (`src/analyzer/CoverageSyncAdapter.ts`)
+**CoverageSyncAdapter** (`src/analyzer/CoverageSyncAdapter.ts`)
 - Sync coverage data with symbol graph
 - Coverage relationship creation
 
@@ -257,13 +257,13 @@ Storage (SQLite + JSONL)
 ```
 
 **Entry Points**:
-- [[BuildCommand]] → [[ASTSymbolExtractor]]
-- [[AnalyzeCallsCommand]] → [[CallGraphAnalyzer]]
-- [[AnalyzeIOCommand]] → [[IODependencyAnalyzer]]
+- BuildCommand → ASTSymbolExtractor
+- AnalyzeCallsCommand → [[CallGraphAnalyzer]]
+- AnalyzeIOCommand → [[IODependencyAnalyzer]]
 - [[HealthCommand]] → [[CodeHealthChecker]]
 
 **Storage**:
-- All analyzers use [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- All analyzers use DatabaseManager (`src/storage/DatabaseManager.ts`)
 - Relationships stored in `unified_relationships` table
 
 ---
@@ -285,8 +285,8 @@ Storage (SQLite + JSONL)
 ## Related
 
 **Commands**:
-- [[Commands Index]] (`managed/COMMANDS.md`) - All 61 commands
-- [[BuildCommand]] (`src/commands/BuildCommand.ts`)
+- Commands Index (`managed/COMMANDS.md`) - All 61 commands
+- BuildCommand (`src/commands/BuildCommand.ts`)
 - [[HealthCommand]] (`src/commands/HealthCommand.ts`)
 
 **Relationships**:
@@ -296,12 +296,12 @@ Storage (SQLite + JSONL)
 - [[IO Dependency]] (`managed/relationships/IO-DEPENDENCY.md`)
 
 **Core**:
-- [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`)
-- [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
+- SymbolGraphBuilder (`src/graph/SymbolGraphBuilder.ts`)
+- DatabaseManager (`src/storage/DatabaseManager.ts`)
 
 **Features**:
-- [[AnalysisFeatures]] (`managed/features/analysis-features.md`)
-- [[ValidationFeatures]] (`managed/features/validation-features.md`)
+- AnalysisFeatures (`managed/features/analysis-features.md`)
+- ValidationFeatures (`managed/features/validation-features.md`)
 
 ---
 
@@ -315,14 +315,14 @@ Storage (SQLite + JSONL)
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:188
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:220
-- [[Analyzer Status]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analyzer-status.md:283
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:208
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:365
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:188
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:220
+- Analyzer Status → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analyzer-status.md:283
+- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:208
+- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:365
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:283
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:144
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:183
+- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:144
+- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:183
 - [[Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/index.md:349
 - [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:417
 

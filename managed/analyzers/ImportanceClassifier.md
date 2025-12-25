@@ -1,3 +1,11 @@
+---
+title: # ImportanceClassifier
+type: analyzer
+category: core-components
+status: active
+canonical: true
+---
+
 # ImportanceClassifier
 
 **Source**: `src/analyzer/ImportanceClassifier.ts`
@@ -19,7 +27,7 @@ Criteria:
 
 ## Related
 
-- [[SymbolGraphBuilder]]: Symbol analysis
+- SymbolGraphBuilder: Symbol analysis
 
 ---
 
@@ -27,9 +35,8 @@ Criteria:
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:223
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:143
+- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:223
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:143
 - [[SuggestCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SuggestCommand.md:188
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:151
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:166
-
+- AnalysisFeatures → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:151
+- AnalysisFeatures → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:166

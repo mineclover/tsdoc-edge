@@ -1,4 +1,12 @@
-# [[CoverageParser]]
+---
+title: # CoverageParser
+type: analyzer
+category: core-components
+status: active
+canonical: true
+---
+
+# CoverageParser
 
 **Source**: `src/analyzer/CoverageParser.ts`
 
@@ -29,5 +37,4 @@ Supports:
 
 - [[IstanbulCoverageAdapter]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/IstanbulCoverageAdapter.md:22
 - [[TestCoverageAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:23
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:162
-
+- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:162

@@ -1,3 +1,11 @@
+---
+title: LSP Integration
+type: feature
+category: feature
+status: active
+canonical: true
+---
+
 # [[LSP Integration]]
 
 ## 요약
@@ -269,3 +277,10 @@ vscode.commands.registerCommand('tsdoc.showImpactAnalysis', (symbolId, direction
 - StatementManager 크기 제한 확인: 기본 50개
 - 영향 분석 제한 확인: MAX_IMPACT_SYMBOLS = 100
 - 서버 재시작으로 전체 리소스 해제
+
+## Related
+
+- [[SymbolGraphFeatures]] - Dependency graph data
+- [[AnalysisFeatures]] - Code health metrics
+- [[CoreWorkflow]] - Build pipeline integration
+
