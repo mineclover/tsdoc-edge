@@ -1,3 +1,11 @@
+---
+title: Parse Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[ParseCommand]]
 
 **Source**: `src/commands/ParseCommand.ts`

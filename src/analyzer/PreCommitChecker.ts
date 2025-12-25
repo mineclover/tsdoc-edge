@@ -19,6 +19,7 @@
  * @depType external, internal
  * @depReason Git commands for staged files, Enhanced doc parsing
  *
+ * @doc [[PreCommitChecker]]
  * @public
  */
 

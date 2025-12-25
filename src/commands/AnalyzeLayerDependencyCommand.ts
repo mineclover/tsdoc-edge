@@ -14,6 +14,7 @@ import type { SymbolRelationship } from '../types/tags';
 /**
  * Command to analyze layer dependency relationships
  *
+ * @doc [[AnalyzeLayerDependencyCommand]]
  * @public
  * @responsibility Analyze architectural layer dependencies
  */

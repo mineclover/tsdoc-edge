@@ -42,6 +42,7 @@ interface ExplicitRelationSite {
 /**
  * Analyzes explicit semantic relationships
  *
+ * @doc [[ExplicitSemanticRelationAnalyzer]]
  * @public
  * @responsibility Parse @relatedTo tags and create semantic relationships
  *

@@ -1,3 +1,11 @@
+---
+title: Interface Types
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # InterfaceTypes
 
 **Source**: `src/types/domain/interface.ts`

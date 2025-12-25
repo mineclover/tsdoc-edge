@@ -68,6 +68,7 @@ interface SymbolRegistry {
 /**
  * Validate Symbol References Command
  *
+ * @doc [[ValidateSymbolRefsCommand]]
  * @public
  */
 export class ValidateSymbolRefsCommand extends BaseCommand {

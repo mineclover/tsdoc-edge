@@ -25,6 +25,7 @@ interface EnhancementSite {
 /**
  * Analyzes enhancement relationships (@enhances tags)
  *
+ * @doc [[EnhancementAnalyzer]]
  * @public
  * @responsibility Detect code enhancements via @enhances tags
  *

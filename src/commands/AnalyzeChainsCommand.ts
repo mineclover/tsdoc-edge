@@ -13,6 +13,7 @@ import type { SymbolRelationship } from '../types/tags';
 
 /**
  * Command for analyzing dependency chains
+ * @doc [[AnalyzeChainsCommand]]
  * @public
  */
 export class AnalyzeChainsCommand extends BaseCommand {

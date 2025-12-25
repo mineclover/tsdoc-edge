@@ -1,3 +1,11 @@
+---
+title: Future Plan
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # FuturePlan
 
 **Source**: `src/types/tags/enhanced.ts`

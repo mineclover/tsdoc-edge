@@ -1,3 +1,11 @@
+---
+title: Code Connection
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # [[CodeConnection]]
 
 **Source**: `src/types/feature/doc-symbol.ts`

@@ -10,6 +10,7 @@ import { DatabaseManager } from '../storage/DatabaseManager';
 /**
  * Command to query inferred relationships
  *
+ * @doc [[QueryInferredCommand]]
  * @public
  * @responsibility Query and display inferred (auto-generated) relationships
  * @contract Filter relationships by inferred flag and display statistics

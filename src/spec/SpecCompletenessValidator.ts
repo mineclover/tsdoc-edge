@@ -47,6 +47,7 @@ const DEFAULT_REQUIREMENTS: SpecRequirements = {
 /**
  * Validates specification document completeness
  *
+ * @doc [[SpecCompletenessValidator]]
  * @public
  * @responsibility Measure specification quality and completeness
  */

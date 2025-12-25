@@ -1,3 +1,11 @@
+---
+title: Help Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[HelpCommand]]
 
 **Source**: `src/commands/HelpCommand.ts`

@@ -24,6 +24,7 @@ import type {
 /**
  * Integration Coverage Calculator
  *
+ * @doc [[IntegrationCoverageCalculator]]
  * @public
  * @responsibility 관계 검증 커버리지 계산 및 분석
  */

@@ -1,3 +1,11 @@
+---
+title: Feature Types
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # FeatureTypes
 
 **Source**: `src/types/feature/feature.ts`

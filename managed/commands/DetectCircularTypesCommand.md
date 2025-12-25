@@ -1,3 +1,11 @@
+---
+title: Detect Circular Types Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[DetectCircularTypesCommand]]
 
 Detect circular type dependencies in TypeScript code.

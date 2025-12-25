@@ -24,6 +24,7 @@ interface FeatureGroup {
 /**
  * Analyzes feature grouping relationships
  *
+ * @doc [[FeatureGroupingAnalyzer]]
  * @public
  * @responsibility Detect symbols belonging to same feature
  *

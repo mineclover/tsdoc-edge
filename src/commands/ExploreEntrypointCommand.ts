@@ -40,6 +40,7 @@ interface EntrypointExploration {
 /**
  * Explore Entrypoint Command - 진입점 기반 탐색
  *
+ * @doc [[ExploreEntrypointCommand]]
  * @public
  */
 export class ExploreEntrypointCommand extends BaseCommand {

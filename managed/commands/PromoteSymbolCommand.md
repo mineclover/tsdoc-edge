@@ -1,3 +1,11 @@
+---
+title: Promote Symbol Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[PromoteSymbolCommand]]
 
 **Source**: `src/commands/PromoteSymbolCommand.ts`

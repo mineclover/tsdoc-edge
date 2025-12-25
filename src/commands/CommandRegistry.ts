@@ -8,6 +8,7 @@ import type { BaseCommand } from './BaseCommand';
 /**
  * Registry for managing CLI commands
  *
+ * @doc [[CommandRegistry]]
  * @public
  * @responsibility Register and retrieve CLI commands
  * @contract Provide command lookup and listing

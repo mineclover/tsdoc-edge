@@ -16,6 +16,7 @@ import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
  * - find: Find symbol by ID
  * - stats: Show registry statistics
  *
+ * @doc [[IdCommand]]
  * @public
  * @problem Need unified interface for symbol ID operations across multiple use cases
  * @solves Provides single command with subcommands for all ID management tasks

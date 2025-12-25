@@ -1,3 +1,11 @@
+---
+title: Symbol Query Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[SymbolQueryCommand]]
 
 **Source**: `src/commands/SymbolQueryCommand.ts`

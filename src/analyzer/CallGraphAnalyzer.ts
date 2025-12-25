@@ -37,6 +37,7 @@ interface CallSite {
 /**
  * Call Graph Analyzer
  *
+ * @doc [[CallGraphAnalyzer]]
  * @public
  * @responsibility Detect and analyze function call relationships
  * @requires SymbolGraph

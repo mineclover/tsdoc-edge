@@ -15,6 +15,7 @@ import type { SymbolRelationship } from '../types/tags';
 
 /**
  * Command for analyzing type dependencies
+ * @doc [[AnalyzeTypesCommand]]
  * @public
  */
 export class AnalyzeTypesCommand extends BaseCommand {

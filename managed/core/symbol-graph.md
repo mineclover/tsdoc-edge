@@ -1,3 +1,11 @@
+---
+title: symbol-graph
+type: system
+category: core
+status: active
+canonical: true
+---
+
 # [[Symbol Graph System]]
 
 > 코드 심볼과 관계를 그래프 구조로 관리하는 핵심 시스템

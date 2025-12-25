@@ -20,6 +20,7 @@ import type { SymbolRelationship } from '../types/tags';
 
 /**
  * Command for analyzing all relationship types at once
+ * @doc [[AnalyzeAllCommand]]
  * @public
  */
 export class AnalyzeAllCommand extends BaseCommand {

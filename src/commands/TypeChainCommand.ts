@@ -14,6 +14,7 @@ import { BaseCommand, colors } from './BaseCommand';
 /**
  * Command to analyze type dependency chains
  *
+ * @doc [[TypeChainCommand]]
  * @public
  */
 export class TypeChainCommand extends BaseCommand {

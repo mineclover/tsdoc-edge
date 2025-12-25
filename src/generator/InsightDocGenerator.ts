@@ -9,6 +9,7 @@ import type { Symbol } from '../types/graph';
 
 /**
  * Options for insight document generation
+ * @doc [[InsightDocGenerator]]
  * @public
  */
 export interface InsightGenOptions {

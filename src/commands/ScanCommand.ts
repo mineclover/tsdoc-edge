@@ -10,6 +10,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 /**
  * Command for scanning files
  *
+ * @doc [[ScanCommand]]
  * @public
  * @responsibility Scan directory for TypeScript files
  * @contract Uses FileScanner to find .ts/.tsx files

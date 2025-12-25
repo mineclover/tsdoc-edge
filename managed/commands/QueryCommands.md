@@ -1,3 +1,11 @@
+---
+title: Query Commands
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # Query Commands
 
 **Source**: `src/commands/Phase5Commands.ts`, `src/commands/Phase7Commands.ts`

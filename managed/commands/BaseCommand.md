@@ -1,3 +1,11 @@
+---
+title: Base Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[BaseCommand]]
 
 **Source**: `src/commands/BaseCommand.ts`

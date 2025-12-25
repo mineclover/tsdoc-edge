@@ -14,6 +14,7 @@ import type { ImportanceCriteria, ImportanceLevel } from '../types/analysis';
  * Important: Structural types, highly connected symbols
  * Normal: Private utilities, helpers
  *
+ * @doc [[ImportanceClassifier]]
  * @public
  */
 export class ImportanceClassifier {

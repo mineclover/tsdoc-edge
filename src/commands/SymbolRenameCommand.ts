@@ -39,6 +39,7 @@ interface RenameValidation {
  *
  * Renames a documentation symbol and updates all references to it
  *
+ * @doc [[SymbolRenameCommand]]
  * @public
  * @responsibility Rename symbols safely with reference updates
  * @contract Find all references, update them, maintain SSOT principle

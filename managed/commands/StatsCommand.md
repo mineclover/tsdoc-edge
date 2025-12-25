@@ -1,3 +1,11 @@
+---
+title: Stats Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[StatsCommand]]
 
 Show documentation statistics with optional historical comparison.

@@ -1,3 +1,11 @@
+---
+title: Linking Types
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # LinkingTypes
 
 **Source**: `src/types/core/linking.ts`

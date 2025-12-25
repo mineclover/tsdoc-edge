@@ -1,3 +1,11 @@
+---
+title: Parsed Doc Symbols
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # ParsedDocSymbols
 
 **Source**: `src/types/feature/doc-symbol.ts`

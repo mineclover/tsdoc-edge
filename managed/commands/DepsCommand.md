@@ -1,3 +1,11 @@
+---
+title: Deps Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[DepsCommand]]
 
 Show dependencies of a symbol from the registry.

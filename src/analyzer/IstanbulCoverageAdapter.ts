@@ -14,6 +14,7 @@ import type { CoverageSummary } from './CoverageParser';
  * Istanbul coverage adapter
  * Works with Jest, Vitest, NYC, c8, and other tools that output Istanbul format
  *
+ * @doc [[IstanbulCoverageAdapter]]
  * @public
  * @responsibility Parse Istanbul coverage format (coverage-final.json)
  *

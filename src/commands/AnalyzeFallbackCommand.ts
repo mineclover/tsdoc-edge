@@ -15,6 +15,7 @@ import type { SymbolRelationship } from '../types/tags';
 
 /**
  * Command for analyzing fallback relationships
+ * @doc [[AnalyzeFallbackCommand]]
  * @public
  */
 export class AnalyzeFallbackCommand extends BaseCommand {

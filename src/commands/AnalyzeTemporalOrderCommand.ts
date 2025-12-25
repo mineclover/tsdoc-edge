@@ -13,6 +13,7 @@ import { TemporalOrderAnalyzer } from '../analyzer/TemporalOrderAnalyzer';
 
 /**
  * Command for analyzing temporal-order relationships
+ * @doc [[AnalyzeTemporalOrderCommand]]
  * @public
  */
 export class AnalyzeTemporalOrderCommand extends BaseCommand {

@@ -14,6 +14,7 @@ import type { CodeConnection } from '../types/feature';
 /**
  * Command for indexing document symbols
  *
+ * @doc [[IndexDocsCommand]]
  * @public
  * @responsibility Index document symbols from markdown files
  * @contract Parse markdown files, extract [[Symbol]] definitions and references

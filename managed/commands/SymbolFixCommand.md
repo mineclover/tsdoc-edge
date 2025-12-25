@@ -1,3 +1,11 @@
+---
+title: Symbol Fix Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[SymbolFixCommand]]
 
 **Source**: `src/commands/SymbolFixCommand.ts`

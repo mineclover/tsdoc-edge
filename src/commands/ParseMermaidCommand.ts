@@ -12,6 +12,7 @@ import { MermaidSymbolExtractor } from '../doc-symbol/MermaidSymbolExtractor';
 /**
  * Parse Mermaid Command - Mermaid 다이어그램 파싱 및 문서 생성
  *
+ * @doc [[ParseMermaidCommand]]
  * @public
  */
 export class ParseMermaidCommand extends BaseCommand {

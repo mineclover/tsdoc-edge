@@ -1,3 +1,11 @@
+---
+title: Command Registry
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[CommandRegistry]]
 
 **Source**: `src/commands/CommandRegistry.ts`

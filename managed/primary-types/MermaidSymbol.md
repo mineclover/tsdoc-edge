@@ -1,3 +1,11 @@
+---
+title: Mermaid Symbol
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # MermaidSymbol
 
 **Source**: `src/doc-symbol/MermaidSymbolExtractor.ts`

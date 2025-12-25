@@ -12,6 +12,7 @@ import { RecursiveImprover } from '../fixer/RecursiveImprover';
  * Recursively improves documentation until target score is reached.
  * Uses RecursiveImprover to iteratively fix documentation issues.
  *
+ * @doc [[ImproveCommand]]
  * @public
  * @problem Documentation quality degrades over time as code evolves
  * @solves Automated iterative improvement until quality threshold met

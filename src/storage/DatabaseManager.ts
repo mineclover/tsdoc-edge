@@ -29,6 +29,7 @@ interface ExtendedSymbolFields {
 // SQLite row types
 /**
  * SymbolRow interface
+ * @doc [[DatabaseManager]]
  * @public
  */
 export interface SymbolRow {

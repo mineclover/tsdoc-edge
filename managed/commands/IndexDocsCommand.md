@@ -1,3 +1,11 @@
+---
+title: Index Docs Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[IndexDocsCommand]]
 
 **Source**: `src/commands/IndexDocsCommand.ts`

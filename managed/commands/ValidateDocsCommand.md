@@ -1,3 +1,11 @@
+---
+title: Validate Docs Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[ValidateDocsCommand]]
 
 **Source**: `src/commands/ValidateDocsCommand.ts`

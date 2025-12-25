@@ -1,3 +1,11 @@
+---
+title: Explore Entrypoint Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[ExploreEntrypointCommand]]
 
 **Source**: `src/commands/ExploreEntrypointCommand.ts`

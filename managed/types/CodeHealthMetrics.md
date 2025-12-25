@@ -1,3 +1,11 @@
+---
+title: Code Health Metrics
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # CodeHealthMetrics
 
 **Source**: `src/types/analysis/quality.ts`

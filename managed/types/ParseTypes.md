@@ -1,3 +1,11 @@
+---
+title: Parse Types
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # ParseTypes
 
 **Source**: `src/types/core/parse.ts`

@@ -13,6 +13,7 @@ import { LLMsTextGenerator } from '../generator/LLMsTextGenerator';
 /**
  * Command to generate LLM-friendly context for an entry point
  *
+ * @doc [[ContextToLLMCommand]]
  * @public
  * @responsibility Generate comprehensive context in LLMs.txt format
  * @contract Aggregate all relationships and format for LLM consumption

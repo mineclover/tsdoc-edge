@@ -106,6 +106,22 @@ export class ValidateDocsCommand extends BaseCommand {
         }
       }
 
+      // Load code connections from index file if available
+      const indexPath = path.resolve(process.cwd(), '.tsdoc/doc-symbols.json');
+      if (fs.existsSync(indexPath)) {
+        try {
+          const indexData = JSON.parse(fs.readFileSync(indexPath, 'utf-8'));
+          const codeConnections = indexData.registryData?.codeConnections || [];
+          for (const [symbolName, connections] of codeConnections) {
+            for (const conn of connections) {
+              registry.registerCodeConnection(conn);
+            }
+          }
+        } catch (e) {
+          // Ignore errors loading index
+        }
+      }
+
       // Validate
       const validation = registry.validate();
 

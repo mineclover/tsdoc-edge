@@ -1,3 +1,11 @@
+---
+title: relationship-ontology
+type: concept
+category: concepts
+status: active
+canonical: true
+---
+
 # [[Relationship Ontology]]
 
 **Purpose**: Document all relationship types collected by tsdoc, their definitions, implementation, and prepare for ontology modeling and pruning redundancies.

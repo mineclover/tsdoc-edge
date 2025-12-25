@@ -1,3 +1,11 @@
+---
+title: Detect Dead Code Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[DetectDeadCodeCommand]]
 
 **Source**: `src/commands/DetectDeadCodeCommand.ts`

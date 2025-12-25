@@ -1,3 +1,11 @@
+---
+title: validator-system
+type: system
+category: core
+status: active
+canonical: true
+---
+
 # [[Validator System]]
 
 > 문서 품질, 연결성, 규칙 준수를 검증하는 다층 검증 시스템

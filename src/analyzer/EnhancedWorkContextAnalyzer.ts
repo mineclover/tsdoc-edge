@@ -16,6 +16,7 @@ import type { Symbol } from '../types/graph';
 
 /**
  * Enhanced work context for a file
+ * @doc [[EnhancedWorkContextAnalyzer]]
  * @public
  */
 export interface EnhancedWorkContext {

@@ -35,6 +35,7 @@ interface DomainGroupingSite {
 /**
  * Analyzes naming pattern relationships
  *
+ * @doc [[NamingPatternRelationAnalyzer]]
  * @public
  * @responsibility Detect domain-based grouping from symbol names
  *

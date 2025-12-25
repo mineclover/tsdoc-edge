@@ -16,6 +16,7 @@ interface ValidationIssue {
 
 /**
  * Command for validating relationship data integrity
+ * @doc [[RelationshipValidateCommand]]
  * @public
  */
 export class RelationshipValidateCommand extends BaseCommand {

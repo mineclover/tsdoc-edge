@@ -13,6 +13,7 @@ import type { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 /**
  * Generates and updates Symbol References section in documents
  *
+ * @doc [[SymbolReferenceGenerator]]
  * @public
  * @responsibility Auto-generate Symbol References footnotes
  */

@@ -92,6 +92,7 @@ export interface UnifiedContext {
 /**
  * Aggregates all context for a given entry point
  *
+ * @doc [[EntryPointContextAggregator]]
  * @public
  * @responsibility Provide unified view of all relationships and context
  * @contract Combine symbol graph, relationships, docs, tests

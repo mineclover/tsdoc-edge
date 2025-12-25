@@ -1,3 +1,11 @@
+---
+title: Phase10 Commands
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[Phase10Commands]]
 
 **Source**: `src/commands/Phase10Commands.ts`

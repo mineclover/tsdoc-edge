@@ -1,3 +1,11 @@
+---
+title: Symbol
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # [[Symbol]]
 
 **Source**: `src/types/graph/graph.ts`

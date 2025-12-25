@@ -15,6 +15,7 @@ import type { SymbolRelationship } from '../types/tags';
 
 /**
  * Command for analyzing event flow relationships
+ * @doc [[AnalyzeEventsCommand]]
  * @public
  */
 export class AnalyzeEventsCommand extends BaseCommand {

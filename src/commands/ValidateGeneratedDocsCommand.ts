@@ -11,6 +11,7 @@ import { GeneratedDocsValidator } from '../validator/GeneratedDocsValidator';
 /**
  * Command to validate generated markdown documentation
  *
+ * @doc [[ValidateGeneratedDocsCommand]]
  * @public
  * @responsibility Validate generated markdown docs for structure and completeness
  * @contract Check required sections, metadata, and formatting

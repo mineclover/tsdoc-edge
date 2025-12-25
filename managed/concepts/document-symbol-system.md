@@ -1,3 +1,11 @@
+---
+title: document-symbol-system
+type: concept
+category: concepts
+status: active
+canonical: true
+---
+
 # Document Symbol System
 
 > See [[Document Symbol System]] for full specification

@@ -9,6 +9,7 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
 /**
  * Command for viewing and managing CLI usage analytics
  *
+ * @doc [[UsageCommand]]
  * @public
  * @responsibility Provide CLI interface for usage analytics
  * @contract Execute analytics operations and return results

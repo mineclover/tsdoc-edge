@@ -41,6 +41,7 @@ interface OntologyStats {
  * - Graph metrics (density, degree distribution)
  * - Ontology model visualization
  *
+ * @doc [[OntologyStatsCommand]]
  * @public
  */
 export class OntologyStatsCommand extends BaseCommand {

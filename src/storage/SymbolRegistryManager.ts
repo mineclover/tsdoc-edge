@@ -19,6 +19,7 @@ import { IdGenerator } from '../utils/IdGenerator';
  * Manages the JSONL file containing ID-to-source mappings
  *
  * @id 001
+ * @doc [[SymbolRegistryManager]]
  * @public
  * @responsibility Manage symbol ID registry stored in JSONL with hierarchy tracking
  * @contract Provide CRUD operations for symbol registry with auto-generated qualified names

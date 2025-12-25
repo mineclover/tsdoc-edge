@@ -11,6 +11,7 @@ import * as path from 'node:path';
 
 /**
  * Coverage data for a single file
+ * @doc [[CoverageParser]]
  * @public
  */
 export interface FileCoverage {

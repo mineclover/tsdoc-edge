@@ -8,6 +8,7 @@ import type { Symbol } from '../types/graph';
 
 /**
  * Related documentation entry
+ * @doc [[RelatedDocsGenerator]]
  * @public
  */
 export interface RelatedDocEntry {

@@ -1,3 +1,11 @@
+---
+title: Extraction Result
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # ExtractionResult
 
 **Primary Type**: Symbol Extraction Output

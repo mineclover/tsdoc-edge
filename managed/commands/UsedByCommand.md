@@ -1,3 +1,11 @@
+---
+title: Used By Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[UsedByCommand]]
 
 **Source**: `src/commands/Phase5Commands.ts`

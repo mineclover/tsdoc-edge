@@ -1,3 +1,11 @@
+---
+title: Unified Relationships
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # [[UnifiedRelationships]]
 
 **Source**: `src/types/relationships/unified.ts`

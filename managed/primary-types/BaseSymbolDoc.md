@@ -1,3 +1,11 @@
+---
+title: Base Symbol Doc
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # BaseSymbolDoc
 
 **Source**: `src/types/tags/enhanced.ts`

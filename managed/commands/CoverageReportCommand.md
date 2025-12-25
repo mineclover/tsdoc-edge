@@ -1,3 +1,11 @@
+---
+title: Coverage Report Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[CoverageReportCommand]]
 
 **Source**: `src/commands/CoverageReportCommand.ts`

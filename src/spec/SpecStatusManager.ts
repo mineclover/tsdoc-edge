@@ -35,6 +35,7 @@ const COMPLETENESS_REQUIREMENTS: Record<SpecStatus, number> = {
 /**
  * Manages specification document status workflow
  *
+ * @doc [[SpecStatusManager]]
  * @public
  * @responsibility Enforce status transitions and validation rules
  */

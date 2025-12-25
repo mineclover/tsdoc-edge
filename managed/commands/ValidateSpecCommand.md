@@ -1,3 +1,11 @@
+---
+title: Validate Spec Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[ValidateSpecCommand]]
 
 **Source**: `src/commands/Phase4Commands.ts:349`

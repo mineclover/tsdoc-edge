@@ -32,6 +32,7 @@ interface FixSuggestion {
 /**
  * Auto-fix common symbol reference issues
  *
+ * @doc [[SymbolFixCommand]]
  * @public
  * @responsibility Detect and fix symbol reference issues
  * @contract Scan documents, detect issues, apply fixes safely

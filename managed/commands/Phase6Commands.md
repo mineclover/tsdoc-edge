@@ -1,3 +1,11 @@
+---
+title: Phase6 Commands
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[Phase6Commands]]
 
 **Source**: `src/commands/Phase6Commands.ts`

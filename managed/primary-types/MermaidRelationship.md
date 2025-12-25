@@ -1,3 +1,11 @@
+---
+title: Mermaid Relationship
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # MermaidRelationship
 
 **Source**: `src/doc-symbol/MermaidSymbolExtractor.ts`

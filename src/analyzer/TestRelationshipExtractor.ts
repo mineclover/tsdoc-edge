@@ -29,6 +29,7 @@ import type { SymbolGraph } from '../types/graph';
 /**
  * Test Relationship Extractor
  *
+ * @doc [[TestRelationshipExtractor]]
  * @public
  * @responsibility 테스트 파일 분석 및 심볼 관계 추출
  */

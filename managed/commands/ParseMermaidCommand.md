@@ -1,3 +1,11 @@
+---
+title: Parse Mermaid Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[ParseMermaidCommand]]
 
 Parse Mermaid diagram (.mmd) and extract symbols and relationships.

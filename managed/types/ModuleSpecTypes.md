@@ -1,3 +1,11 @@
+---
+title: Module Spec Types
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # ModuleSpecTypes
 
 **Source**: `src/types/spec/module-spec.ts`

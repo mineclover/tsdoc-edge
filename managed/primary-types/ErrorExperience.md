@@ -1,3 +1,11 @@
+---
+title: Error Experience
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # ErrorExperience
 
 **Source**: `src/types/tags/enhanced.ts`

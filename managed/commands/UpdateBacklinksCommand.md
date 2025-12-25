@@ -1,3 +1,11 @@
+---
+title: Update Backlinks Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[UpdateBacklinksCommand]]
 
 **Source**: `src/commands/UpdateBacklinksCommand.ts`

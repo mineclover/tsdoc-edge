@@ -1,3 +1,11 @@
+---
+title: Analyze Types Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[AnalyzeTypesCommand]]
 
 **Source**: `src/commands/AnalyzeTypesCommand.ts`

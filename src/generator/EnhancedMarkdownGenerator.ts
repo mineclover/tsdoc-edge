@@ -12,6 +12,7 @@ import type { EnhancedSymbolDoc } from '../types/tags';
  * Generator for enhanced markdown documentation
  *
  * @id 007
+ * @doc [[EnhancedMarkdownGenerator]]
  * @public
  * @responsibility Transform enhanced docs into readable markdown format
  * @contract Generate structured markdown with all 6 categories

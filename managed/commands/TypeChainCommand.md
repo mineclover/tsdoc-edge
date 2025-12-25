@@ -1,3 +1,11 @@
+---
+title: Type Chain Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[TypeChainCommand]]
 
 **Source**: `src/commands/TypeChainCommand.ts`

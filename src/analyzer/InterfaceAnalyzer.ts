@@ -37,6 +37,7 @@ interface ImportInfo {
 /**
  * Analyzes TypeScript interfaces for domain-driven development
  *
+ * @doc [[InterfaceAnalyzer]]
  * @public
  * @responsibility Extract and analyze interface structures from TypeScript code
  * @contract Provide detailed interface information including properties, methods, and dependencies

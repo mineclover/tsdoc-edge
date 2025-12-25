@@ -1,3 +1,11 @@
+---
+title: Visualize Deps Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[VisualizeDepsCommand]]
 
 **Source**: `src/commands/VisualizeDepsCommand.ts`

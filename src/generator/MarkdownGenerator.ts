@@ -9,6 +9,7 @@ import type { ParsedDocComment } from '../types';
 // TSDoc internal node types (not exposed in public API)
 /**
  * DocPlainText interface
+ * @doc [[MarkdownGenerator]]
  * @public
  */
 interface DocPlainText extends DocNode {

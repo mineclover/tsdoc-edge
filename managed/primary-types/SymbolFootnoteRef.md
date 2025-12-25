@@ -1,3 +1,11 @@
+---
+title: Symbol Footnote Ref
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # SymbolFootnoteRef
 
 **Source**: `src/types/feature/doc-symbol.ts`

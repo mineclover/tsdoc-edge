@@ -1,3 +1,11 @@
+---
+title: Untested Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[UntestedCommand]]
 
 Find symbols without test coverage.

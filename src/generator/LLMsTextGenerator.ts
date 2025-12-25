@@ -10,6 +10,7 @@ import type { DatabaseManager } from '../storage/DatabaseManager';
 /**
  * Generates LLMs.txt format documentation
  *
+ * @doc [[LLMsTextGenerator]]
  * @public
  * @responsibility Transform unified context into LLM-readable format
  * @contract Follow LLMs.txt specification for clarity

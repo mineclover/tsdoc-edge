@@ -7,6 +7,7 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /**
  * Command providing guided help for the relationship system
+ * @doc [[RelationshipHelpCommand]]
  * @public
  */
 export class RelationshipHelpCommand extends BaseCommand {

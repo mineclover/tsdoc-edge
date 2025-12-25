@@ -31,6 +31,7 @@ export interface FormatterOptions {
 /**
  * Module specification markdown formatter
  *
+ * @doc [[ModuleSpecMarkdownFormatter]]
  * @public
  * @responsibility Convert ModuleSpecTemplate to formatted markdown
  */

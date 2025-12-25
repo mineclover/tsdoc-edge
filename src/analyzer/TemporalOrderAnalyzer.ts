@@ -35,6 +35,7 @@ interface TemporalOrderSite {
 /**
  * Temporal Order Analyzer
  *
+ * @doc [[TemporalOrderAnalyzer]]
  * @public
  * @responsibility Detect and analyze temporal-order relationships
  */

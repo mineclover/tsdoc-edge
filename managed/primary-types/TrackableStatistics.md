@@ -1,3 +1,11 @@
+---
+title: Trackable Statistics
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # TrackableStatistics
 
 **Primary Type**: Statistics Tracking System Root

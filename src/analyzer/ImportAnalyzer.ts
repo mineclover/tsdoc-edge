@@ -5,7 +5,8 @@
  * This provides more accurate symbol resolution than variable name matching.
  *
  * @module ImportAnalyzer
- */
+
+ * @doc [[ImportAnalyzer]] */
 
 import * as ts from 'typescript';
 

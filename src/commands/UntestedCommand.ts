@@ -16,6 +16,7 @@ import type { SymbolType } from '../types/graph';
  * Searches the database for symbols that don't have associated tests.
  * Helps identify gaps in test coverage and improve code quality.
  *
+ * @doc [[UntestedCommand]]
  * @public
  */
 export class UntestedCommand extends BaseCommand {

@@ -1,3 +1,11 @@
+---
+title: Analyze Chains Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[AnalyzeChainsCommand]]
 
 **Source**: `src/commands/AnalyzeChainsCommand.ts`

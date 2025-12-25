@@ -1,3 +1,11 @@
+---
+title: analyzer-system
+type: system
+category: core
+status: active
+canonical: true
+---
+
 # [[Analyzer System]]
 
 > 50개 이상의 분석기로 30가지 관계 유형을 자동 탐지하는 분석 엔진

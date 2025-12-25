@@ -21,6 +21,7 @@ export interface ImportInfo {
 /**
  * Dependency resolver
  *
+ * @doc [[DependencyResolver]]
  * @public
  * @responsibility Resolve import paths to actual symbol relationships
  */

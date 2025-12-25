@@ -31,6 +31,7 @@ interface ListOptions {
  *
  * Supports filtering and pagination.
  *
+ * @doc [[OntologyListCommand]]
  * @public
  */
 export class OntologyListCommand extends BaseCommand {

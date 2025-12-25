@@ -1,3 +1,11 @@
+---
+title: Health Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[HealthCommand]]
 
 **Source**: `src/commands/HealthCommand.ts`

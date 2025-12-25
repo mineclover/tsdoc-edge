@@ -19,6 +19,7 @@ import type {
 /**
  * Traces and analyzes type dependency chains
  *
+ * @doc [[TypeChainTracer]]
  * @public
  * @responsibility Track type dependency paths and detect circular dependencies
  * @contract Provide complete type chain analysis with cycle detection and root finding

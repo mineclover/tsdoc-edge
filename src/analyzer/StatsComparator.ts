@@ -18,6 +18,7 @@ import type {
 /**
  * Compares statistics between snapshots and detects issues
  *
+ * @doc [[StatsComparator]]
  * @public
  */
 export class StatsComparator {

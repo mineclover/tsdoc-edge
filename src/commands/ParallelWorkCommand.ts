@@ -15,6 +15,7 @@ import * as path from 'node:path';
 /**
  * Parallel Work Command
  *
+ * @doc [[ParallelWorkCommand]]
  * @public
  * @responsibility 병렬 개발 가능 영역 탐지 CLI 제공
  * @contract 작업 중인 모듈과 frozen 모듈을 입력받아 충돌 분석 및 병렬 영역 제시

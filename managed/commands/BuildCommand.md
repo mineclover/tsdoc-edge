@@ -1,3 +1,11 @@
+---
+title: Build Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[BuildCommand]]
 
 **Source**: `src/commands/BuildCommand.ts`

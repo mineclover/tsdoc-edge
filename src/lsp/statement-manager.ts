@@ -7,7 +7,8 @@
  * @packageDocumentation
  * @module lsp/statement-manager
  * @internal
- */
+
+ * @doc [[statement-manager]] */
 
 /**
  * Statement entry with usage tracking

@@ -13,6 +13,7 @@ import type {
 /**
  * Analyzes domain structure for domain-driven development
  *
+ * @doc [[DomainStructureAnalyzer]]
  * @public
  * @responsibility Analyze domain boundaries and cohesion
  * @contract Calculate cohesion and coupling metrics for domains

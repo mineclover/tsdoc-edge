@@ -1,3 +1,11 @@
+---
+title: Update Symbol Refs Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[UpdateSymbolRefsCommand]]
 
 **Source**: `src/commands/UpdateSymbolRefsCommand.ts`

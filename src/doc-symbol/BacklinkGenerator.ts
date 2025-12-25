@@ -11,6 +11,7 @@ import type { DocumentSymbolRegistry } from './DocumentSymbolRegistry';
 /**
  * Generates and updates backlinks in documents
  *
+ * @doc [[BacklinkGenerator]]
  * @public
  * @responsibility Auto-generate backlink sections
  */

@@ -35,6 +35,7 @@ interface SubstitutionGroup {
 /**
  * Substitution Analyzer
  *
+ * @doc [[SubstitutionAnalyzer]]
  * @public
  * @responsibility Detect and analyze substitution relationships
  */

@@ -1,3 +1,11 @@
+---
+title: Analyze Calls Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[AnalyzeCallsCommand]]
 
 **Source**: `src/commands/AnalyzeCallsCommand.ts`

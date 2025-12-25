@@ -35,6 +35,7 @@ interface FallbackSite {
 /**
  * Fallback Analyzer
  *
+ * @doc [[FallbackAnalyzer]]
  * @public
  * @responsibility Detect and analyze fallback relationships
  */

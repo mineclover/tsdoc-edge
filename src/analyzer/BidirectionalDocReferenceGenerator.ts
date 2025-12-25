@@ -9,6 +9,7 @@ import type { UnifiedRelationship } from '../types/relationships/unified';
 /**
  * Generates bidirectional doc-reference relationships
  *
+ * @doc [[BidirectionalDocReferenceGenerator]]
  * @public
  * @responsibility Create Doc → Code relationships from Code → Doc references
  *

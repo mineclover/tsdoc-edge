@@ -1,3 +1,11 @@
+---
+title: storage-system
+type: system
+category: core
+status: active
+canonical: true
+---
+
 # [[Storage System]]
 
 > SQLite + JSONL 하이브리드 저장소로 빠른 조회와 버전 관리 동시 지원

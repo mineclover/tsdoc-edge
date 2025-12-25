@@ -4,7 +4,8 @@
  * Shows all available commands with their descriptions.
  * Uses CommandRegistry to dynamically list registered commands.
  *
- * @packageDocumentation
+
+ * @doc [[HelpCommand]] * @packageDocumentation
  */
 
 import { BaseCommand, colors, type CommandResult } from './BaseCommand';

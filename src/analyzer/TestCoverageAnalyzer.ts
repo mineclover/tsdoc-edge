@@ -58,6 +58,7 @@ export interface RelationshipExtractionResult {
  * Test coverage analyzer
  * Extracts relationships between test symbols and implementation symbols
  *
+ * @doc [[TestCoverageAnalyzer]]
  * @public
  * @responsibility Create test-coverage, contains, and covers-scenario relationships
  */

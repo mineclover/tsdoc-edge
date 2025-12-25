@@ -1,3 +1,11 @@
+---
+title: work-context-workflow
+type: workflow
+category: workflows
+status: active
+canonical: true
+---
+
 # [[Work Context Workflow]]
 
 **Document Type**: Essential Workflow

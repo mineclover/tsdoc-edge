@@ -33,6 +33,7 @@ interface SuiteContext {
  * Test symbol parser
  * Extracts test symbols from TypeScript test files
  *
+ * @doc [[TestSymbolParser]]
  * @public
  * @responsibility Parse test files and extract test suites, cases, and scenarios
  */

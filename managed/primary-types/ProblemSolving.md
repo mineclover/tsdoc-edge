@@ -1,3 +1,11 @@
+---
+title: Problem Solving
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # ProblemSolving
 
 **Source**: `src/types/tags/enhanced.ts`

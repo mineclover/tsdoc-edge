@@ -21,6 +21,7 @@ import type {
 /**
  * Module specification tag parser
  *
+ * @doc [[ModuleSpecTagParser]]
  * @public
  * @responsibility Extract 7-part module spec tags from TSDoc
  */

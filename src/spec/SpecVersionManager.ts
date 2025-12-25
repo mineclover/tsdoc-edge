@@ -41,6 +41,7 @@ export interface VersionDiff {
 /**
  * Manages specification document version tracking
  *
+ * @doc [[SpecVersionManager]]
  * @public
  * @responsibility Track versions, compare changes, and manage version bumps
  */

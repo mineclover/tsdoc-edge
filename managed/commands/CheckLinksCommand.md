@@ -1,3 +1,11 @@
+---
+title: Check Links Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[CheckLinksCommand]]
 
 **Source**: `src/commands/CheckLinksCommand.ts`

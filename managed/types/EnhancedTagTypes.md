@@ -1,3 +1,11 @@
+---
+title: Enhanced Tag Types
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # EnhancedTagTypes
 
 **Source**: `src/types/tags/enhanced.ts`

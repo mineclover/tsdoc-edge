@@ -23,6 +23,7 @@ interface H2Section {
 /**
  * Promote Symbol Command - H2를 독립 파일의 H1으로 승격
  *
+ * @doc [[PromoteSymbolCommand]]
  * @public
  */
 export class PromoteSymbolCommand extends BaseCommand {

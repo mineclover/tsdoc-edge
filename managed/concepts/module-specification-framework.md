@@ -1,3 +1,11 @@
+---
+title: module-specification-framework
+type: concept
+category: concepts
+status: active
+canonical: true
+---
+
 # [[Module Specification Framework]]
 
 Systematic 7-aspect framework (Purpose, Input, Output, Context, Logic, Effect, Scope) for documenting modules with completeness and consistency.

@@ -11,6 +11,7 @@ import type { AnalysisReport } from '../types/analysis';
 /**
  * Command for analyzing code health
  *
+ * @doc [[AnalyzeCommand]]
  * @public
  * @responsibility Analyze code health for a directory
  * @contract Execute code health analysis and return formatted report

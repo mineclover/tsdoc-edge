@@ -16,6 +16,7 @@ import type { SymbolRelationship } from '../types/tags';
 
 /**
  * Command for analyzing test coverage relationships
+ * @doc [[AnalyzeTestsCommand]]
  * @public
  */
 export class AnalyzeTestsCommand extends BaseCommand {

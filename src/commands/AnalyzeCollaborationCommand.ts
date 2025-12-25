@@ -12,6 +12,7 @@ import type { SymbolRelationship } from '../types/tags';
 
 /**
  * Command for analyzing collaboration relationships
+ * @doc [[AnalyzeCollaborationCommand]]
  * @public
  */
 export class AnalyzeCollaborationCommand extends BaseCommand {

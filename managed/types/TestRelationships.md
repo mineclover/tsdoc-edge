@@ -1,3 +1,11 @@
+---
+title: Test Relationships
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # TestRelationships
 
 **Source**: `src/types/analysis/test-relationships.ts`

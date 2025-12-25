@@ -22,6 +22,7 @@ import type { Symbol } from '../types/graph';
 
 /**
  * Extraction options
+ * @doc [[EnhancedDocExtractor]]
  * @public
  */
 export interface ExtractionOptions {

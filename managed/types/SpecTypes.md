@@ -1,3 +1,11 @@
+---
+title: Spec Types
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # SpecTypes
 
 **Source**: `src/types/spec.ts`

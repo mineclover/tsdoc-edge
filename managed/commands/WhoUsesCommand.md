@@ -1,3 +1,11 @@
+---
+title: Who Uses Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[WhoUsesCommand]]
 
 Show who uses a symbol through database name search.

@@ -51,6 +51,7 @@ export interface GeneratorOptions {
 /**
  * Module specification generator
  *
+ * @doc [[ModuleSpecGenerator]]
  * @public
  * @responsibility Extract and generate 7-part module specifications from TypeScript code
  * @functionality

@@ -1,3 +1,11 @@
+---
+title: Analytics Types
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # [[AnalyticsTypes]]
 
 **Source**: `src/types/analytics/index.ts`

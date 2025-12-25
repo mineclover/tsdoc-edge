@@ -1,3 +1,11 @@
+---
+title: Parallel Work Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[ParallelWorkCommand]]
 
 **Source**: `src/commands/ParallelWorkCommand.ts`

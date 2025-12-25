@@ -20,6 +20,7 @@ interface TypeAnalysisResult {
 /**
  * Maps and analyzes dependencies between interfaces
  *
+ * @doc [[InterfaceDependencyMapper]]
  * @public
  * @responsibility Identify and map dependencies between interfaces
  * @contract Build complete dependency graph with all relationship types

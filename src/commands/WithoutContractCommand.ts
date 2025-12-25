@@ -16,6 +16,7 @@ import type { SymbolType } from '../types/graph';
  * Finds symbols lacking contract documentation (pre/post-conditions, invariants).
  * Essential for understanding API guarantees and constraints.
  *
+ * @doc [[WithoutContractCommand]]
  * @public
  */
 export class WithoutContractCommand extends BaseCommand {

@@ -7,7 +7,8 @@
  * @packageDocumentation
  * @module lsp/cache-manager
  * @internal
- */
+
+ * @doc [[cache-manager]] */
 
 /**
  * Cache entry with TTL tracking

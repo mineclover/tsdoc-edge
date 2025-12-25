@@ -11,6 +11,7 @@ import type { AnalysisReport, CodeHealthMetrics } from '../types/analysis';
 /**
  * Command for checking code health
  *
+ * @doc [[HealthCommand]]
  * @public
  * @responsibility Check code health and generate health report
  * @contract Execute health check and return formatted health report

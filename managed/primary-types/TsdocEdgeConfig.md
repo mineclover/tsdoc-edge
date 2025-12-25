@@ -1,3 +1,11 @@
+---
+title: Tsdoc Edge Config
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # TsdocEdgeConfig
 
 **Primary Type**: Project Configuration Root

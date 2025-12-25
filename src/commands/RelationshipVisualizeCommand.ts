@@ -9,6 +9,7 @@ import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/Databas
 
 /**
  * Command for visualizing relationships as diagrams
+ * @doc [[RelationshipVisualizeCommand]]
  * @public
  */
 export class RelationshipVisualizeCommand extends BaseCommand {

@@ -24,6 +24,7 @@ interface CoRequirementSite {
 /**
  * Analyzes co-requirement relationships
  *
+ * @doc [[CoRequirementAnalyzer]]
  * @public
  * @responsibility Detect co-requirement dependencies
  *

@@ -11,6 +11,7 @@ import { RelationshipQueryCommand } from './RelationshipQueryCommand';
 /**
  * Quick command to check if it's safe to modify a symbol
  * Combines impact, metrics, and query for a comprehensive safety check
+ * @doc [[RelationshipCheckCommand]]
  * @public
  */
 export class RelationshipCheckCommand extends BaseCommand {

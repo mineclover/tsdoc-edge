@@ -18,6 +18,7 @@ import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
  * Test example metadata
+ * @doc [[TestExampleExtractor]]
  * @public
  */
 export interface TestExample {

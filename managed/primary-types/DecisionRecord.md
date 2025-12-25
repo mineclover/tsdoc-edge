@@ -1,3 +1,11 @@
+---
+title: Decision Record
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # DecisionRecord
 
 **Source**: `src/types/tags/enhanced.ts`

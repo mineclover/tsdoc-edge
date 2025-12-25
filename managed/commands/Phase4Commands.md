@@ -1,3 +1,11 @@
+---
+title: Phase4 Commands
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[Phase4Commands]]
 
 **Source**: `src/commands/Phase4Commands.ts`

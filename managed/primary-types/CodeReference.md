@@ -1,3 +1,11 @@
+---
+title: Code Reference
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # [[CodeReference]]
 
 **Source**: `src/types/feature/doc-symbol.ts`

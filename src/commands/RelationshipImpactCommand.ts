@@ -17,6 +17,7 @@ interface ImpactNode {
 
 /**
  * Command for analyzing change impact through relationships
+ * @doc [[RelationshipImpactCommand]]
  * @public
  */
 export class RelationshipImpactCommand extends BaseCommand {

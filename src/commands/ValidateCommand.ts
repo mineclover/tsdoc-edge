@@ -13,6 +13,7 @@ import type { SymbolType } from '../types/graph';
 /**
  * Command for generating detailed validation reports
  *
+ * @doc [[ValidateCommand]]
  * @public
  * @responsibility Generate detailed validation report from database
  * @contract Read database, build symbol graph, validate connectivity

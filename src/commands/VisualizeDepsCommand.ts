@@ -16,6 +16,7 @@ import type { SymbolRelationship } from '../types/tags';
 
 /**
  * Command for visualizing dependencies with Mermaid diagrams
+ * @doc [[VisualizeDepsCommand]]
  * @public
  */
 export class VisualizeDepsCommand extends BaseCommand {

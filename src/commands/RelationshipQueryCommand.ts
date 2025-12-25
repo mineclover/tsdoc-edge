@@ -8,6 +8,7 @@ import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/Databas
 
 /**
  * Command for querying symbol relationships
+ * @doc [[RelationshipQueryCommand]]
  * @public
  */
 export class RelationshipQueryCommand extends BaseCommand {

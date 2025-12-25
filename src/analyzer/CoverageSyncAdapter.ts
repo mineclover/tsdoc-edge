@@ -17,6 +17,7 @@ import type { FileCoverage, FunctionCoverage, CoverageSummary } from './Coverage
 
 /**
  * Coverage data for a specific symbol
+ * @doc [[CoverageSyncAdapter]]
  * @public
  */
 export interface SymbolCoverage {

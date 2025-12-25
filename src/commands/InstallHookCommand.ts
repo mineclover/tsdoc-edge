@@ -13,6 +13,7 @@ import { BaseCommand, colors, type CommandResult } from './BaseCommand';
  * Creates a pre-commit hook script that runs tsdoc-edge checks
  * before allowing commits.
  *
+ * @doc [[InstallHookCommand]]
  * @public
  */
 export class InstallHookCommand extends BaseCommand {

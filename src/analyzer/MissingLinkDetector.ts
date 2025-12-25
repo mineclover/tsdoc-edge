@@ -29,6 +29,7 @@ import type { LinkCheckConfig } from '../types/config';
 
 /**
  * Types of links that can be broken
+ * @doc [[MissingLinkDetector]]
  * @public
  */
 export type LinkType =

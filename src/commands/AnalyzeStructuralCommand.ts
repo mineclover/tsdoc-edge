@@ -16,6 +16,7 @@ import type { SymbolRelationship } from '../types/tags';
 
 /**
  * Command for analyzing structural and verification relationships
+ * @doc [[AnalyzeStructuralCommand]]
  * @public
  */
 export class AnalyzeStructuralCommand extends BaseCommand {

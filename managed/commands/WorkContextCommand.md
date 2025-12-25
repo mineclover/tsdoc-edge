@@ -1,3 +1,11 @@
+---
+title: Work Context Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[WorkContextCommand]]
 
 **Source**: `src/commands/WorkContextCommand.ts`

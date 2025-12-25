@@ -1,3 +1,11 @@
+---
+title: Undocumented Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[UndocumentedCommand]]
 
 Find symbols without documentation (no summary or TSDoc comments).

@@ -7,6 +7,7 @@ import type { SymbolGraph } from '../types/graph/graph';
 
 /**
  * 충돌 유형
+ * @doc [[ParallelWorkDetector]]
  * @public
  */
 export type ConflictType = 'direct' | 'transitive' | 'shared-mutable';

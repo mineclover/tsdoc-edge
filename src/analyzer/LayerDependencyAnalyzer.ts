@@ -28,6 +28,7 @@ interface LayerDependency {
 /**
  * Analyzes layer dependency relationships
  *
+ * @doc [[LayerDependencyAnalyzer]]
  * @public
  * @responsibility Detect architectural layer violations
  *

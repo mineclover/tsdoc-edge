@@ -1,3 +1,11 @@
+---
+title: Document Symbol
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # DocumentSymbol
 
 **Source**: `src/types/feature/doc-symbol.ts`

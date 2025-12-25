@@ -39,6 +39,7 @@ interface CompositionSite {
 /**
  * Composition Analyzer
  *
+ * @doc [[CompositionAnalyzer]]
  * @public
  * @responsibility Detect and analyze composition relationships
  */

@@ -1,3 +1,11 @@
+---
+title: Usage Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[UsageCommand]]
 
 **Source**: `src/commands/UsageCommand.ts`

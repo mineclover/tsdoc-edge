@@ -1,3 +1,11 @@
+---
+title: Mermaid Extraction Result
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # MermaidExtractionResult
 
 **Source**: `src/doc-symbol/MermaidSymbolExtractor.ts`

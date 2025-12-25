@@ -16,7 +16,8 @@ type SymbolType = 'function' | 'class' | 'interface' | 'type' | 'enum' | 'variab
  * Validates TSDoc comments against defined conventions
  *
  * Enforces minimum documentation requirements based on symbol type:
- * - Functions: summary, @param, @returns, @public
+ * - Functions: summary, @param, @returns, @doc [[ConventionValidator]]
+ * @public
  * - Classes: summary, constructor docs, method docs, @public
  * - Interfaces: summary, property docs, @public
  * - Types: summary, usage description, @public

@@ -1,3 +1,11 @@
+---
+title: Analyze I O Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[AnalyzeIOCommand]]
 
 **Source**: `src/commands/AnalyzeIOCommand.ts`

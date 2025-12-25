@@ -41,6 +41,7 @@ export interface DocValidationResult {
 /**
  * Validator for generated markdown documentation
  *
+ * @doc [[GeneratedDocsValidator]]
  * @public
  * @responsibility Validate markdown docs generated from TSDoc comments
  * @contract Check structure, required sections, and consistency

@@ -1,3 +1,11 @@
+---
+title: parser-system
+type: system
+category: core
+status: active
+canonical: true
+---
+
 # [[Parser System]]
 
 > TypeScript 소스와 TSDoc 주석을 파싱하여 구조화된 메타데이터 추출

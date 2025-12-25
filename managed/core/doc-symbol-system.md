@@ -1,3 +1,11 @@
+---
+title: doc-symbol-system
+type: system
+category: core
+status: active
+canonical: true
+---
+
 # [[Document Symbol System]]
 
 > `[[Symbol]]` 표기법으로 문서와 코드를 양방향 연결하는 SSOT 시스템

@@ -1,3 +1,11 @@
+---
+title: Orphans Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[OrphansCommand]]
 
 Find orphaned symbols that have no dependencies or usages.

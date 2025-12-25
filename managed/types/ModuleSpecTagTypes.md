@@ -1,3 +1,11 @@
+---
+title: Module Spec Tag Types
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # ModuleSpecTagTypes
 
 **Source**: `src/types/tags/module-spec-tags.ts`

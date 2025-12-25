@@ -20,6 +20,7 @@ const STALE_THRESHOLDS = {
 /**
  * Detects unused and stale specification documents
  *
+ * @doc [[UnusedDocumentDetector]]
  * @public
  * @responsibility Identify documents that should be archived or deleted
  */

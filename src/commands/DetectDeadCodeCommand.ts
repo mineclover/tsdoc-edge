@@ -20,6 +20,7 @@ interface DeadCodeSymbol {
 /**
  * Command for detecting unused/dead code
  *
+ * @doc [[DetectDeadCodeCommand]]
  * @public
  * @responsibility Detect code that is never used based on call graph and dependency analysis
  * @contract Analyze symbols and relationships to find dead code candidates

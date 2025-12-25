@@ -15,6 +15,7 @@ import type { SymbolRelationship } from '../types/tags';
 
 /**
  * Command for analyzing composition relationships
+ * @doc [[AnalyzeCompositionCommand]]
  * @public
  */
 export class AnalyzeCompositionCommand extends BaseCommand {

@@ -1,3 +1,11 @@
+---
+title: Custom Tag Types
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # CustomTagTypes
 
 **Source**: `src/types/tags/base.ts`

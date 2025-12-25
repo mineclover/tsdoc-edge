@@ -1,3 +1,11 @@
+---
+title: relationship-system-roadmap
+type: workflow
+category: workflows
+status: active
+canonical: true
+---
+
 # [[Relationship System Roadmap]]
 
 Implementation roadmap for TSDoc Edge's 19 relationship types across 6 categories, tracking progress from 37% to 100% completion.

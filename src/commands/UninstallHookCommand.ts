@@ -12,6 +12,7 @@ import { BaseCommand, colors, type CommandResult } from './BaseCommand';
  *
  * Removes the pre-commit hook script if it was installed by tsdoc-edge.
  *
+ * @doc [[UninstallHookCommand]]
  * @public
  */
 export class UninstallHookCommand extends BaseCommand {

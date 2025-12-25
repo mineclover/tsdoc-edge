@@ -7,6 +7,7 @@
 /**
  * Frontmatter metadata interface
  *
+ * @doc [[FrontmatterParser]]
  * @public
  */
 export interface FrontmatterMetadata {

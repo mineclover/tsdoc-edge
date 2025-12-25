@@ -19,6 +19,7 @@ interface SymbolMetrics {
 
 /**
  * Command for calculating graph metrics to identify key symbols
+ * @doc [[RelationshipMetricsCommand]]
  * @public
  */
 export class RelationshipMetricsCommand extends BaseCommand {

@@ -18,6 +18,7 @@ import * as fs from 'node:fs';
 /**
  * Test Relationships Command
  *
+ * @doc [[TestRelationshipsCommand]]
  * @public
  * @responsibility 통합 테스트 관계 검증 CLI 제공
  * @contract 테스트 파일을 분석하여 모듈 간 연결 검증 상태 제공

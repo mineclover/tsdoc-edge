@@ -43,6 +43,7 @@ export interface Hotspot {
 
 /**
  * Dependency chain analyzer
+ * @doc [[DependencyChainAnalyzer]]
  * @public
  */
 export class DependencyChainAnalyzer {

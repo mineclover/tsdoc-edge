@@ -8,6 +8,7 @@ import { DatabaseManager } from '../storage/DatabaseManager';
 
 /**
  * Command for showing relationship statistics and implementation progress
+ * @doc [[RelationshipStatsCommand]]
  * @public
  */
 export class RelationshipStatsCommand extends BaseCommand {

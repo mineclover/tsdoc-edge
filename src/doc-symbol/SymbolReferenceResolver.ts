@@ -11,6 +11,7 @@ import type { SymbolRegistryEntry } from '../types/registry';
 
 /**
  * Resolved symbol reference
+ * @doc [[SymbolReferenceResolver]]
  * @public
  */
 export interface ResolvedSymbolRef {

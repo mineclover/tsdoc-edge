@@ -11,6 +11,7 @@ import { DatabaseManager } from '../storage/DatabaseManager';
 /**
  * Command for syncing test coverage data
  *
+ * @doc [[SyncCoverageCommand]]
  * @public
  * @responsibility Sync test coverage from Istanbul/NYC reports
  * @contract Reads coverage JSON, maps to symbols, updates database

@@ -56,6 +56,7 @@ export interface ValidationOptions {
 /**
  * Module specification validator
  *
+ * @doc [[ModuleSpecValidator]]
  * @public
  * @responsibility Validate module specifications against quality criteria
  */

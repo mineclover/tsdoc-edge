@@ -12,6 +12,7 @@ import type { Task, TaskFilter } from '../types/task';
 
 /**
  * Task List Command
+ * @doc [[TaskCommands]]
  * @public
  */
 export class TaskListCommand extends BaseCommand {

@@ -11,6 +11,7 @@ import { ImportanceClassifier } from './ImportanceClassifier';
 /**
  * Collects statistics that can be tracked over time
  *
+ * @doc [[TrackableStatsCollector]]
  * @public
  */
 export class TrackableStatsCollector {

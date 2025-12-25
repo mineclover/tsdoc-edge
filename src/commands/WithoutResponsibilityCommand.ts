@@ -16,6 +16,7 @@ import type { SymbolType } from '../types/graph';
  * Identifies symbols that lack responsibility documentation.
  * Helps ensure all code has clear ownership and purpose defined.
  *
+ * @doc [[WithoutResponsibilityCommand]]
  * @public
  */
 export class WithoutResponsibilityCommand extends BaseCommand {

@@ -1,3 +1,11 @@
+---
+title: Functionality
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # [[Functionality]]
 
 **Source**: `src/types/tags/enhanced.ts`

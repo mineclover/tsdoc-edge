@@ -16,6 +16,7 @@ import type { ParsedDocComment, ParseResult } from '../types';
 // TypeScript compiler API internal types
 /**
  * NodeWithJSDoc interface
+ * @doc [[TSDocParser]]
  * @public
  */
 interface NodeWithJSDoc extends ts.Node {

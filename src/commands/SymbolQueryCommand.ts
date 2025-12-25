@@ -41,6 +41,7 @@ interface SymbolInfo {
 /**
  * Query and explore document symbols
  *
+ * @doc [[SymbolQueryCommand]]
  * @public
  * @responsibility Provide symbol search and exploration capabilities
  * @contract Parse documents, index symbols, respond to queries

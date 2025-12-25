@@ -11,6 +11,7 @@ import type { StatsHistory, StatsHistoryEntry, TrackableStatistics } from '../ty
 /**
  * Manages statistics history persistence
  *
+ * @doc [[StatsHistoryManager]]
  * @public
  */
 export class StatsHistoryManager {

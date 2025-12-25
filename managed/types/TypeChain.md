@@ -1,3 +1,11 @@
+---
+title: Type Chain
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # TypeChain
 
 **Source**: `src/types/domain/type-chain.ts`

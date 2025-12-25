@@ -1,3 +1,11 @@
+---
+title: Phase8 Commands
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[Phase8Commands]]
 
 **Source**: `src/commands/Phase8Commands.ts`

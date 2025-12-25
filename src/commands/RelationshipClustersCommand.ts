@@ -17,6 +17,7 @@ interface Cluster {
 
 /**
  * Command for finding architectural clusters using community detection
+ * @doc [[RelationshipClustersCommand]]
  * @public
  */
 export class RelationshipClustersCommand extends BaseCommand {

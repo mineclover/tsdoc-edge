@@ -1,3 +1,11 @@
+---
+title: symbol-reference-system
+type: concept
+category: concepts
+status: active
+canonical: true
+---
+
 # [[Symbol Reference System]]
 
 TSDoc Edge's three-tier `[[Symbol]]` reference system: H1 primary definitions (SSOT), H2 auxiliary definitions (context-specific), and inline references (links).

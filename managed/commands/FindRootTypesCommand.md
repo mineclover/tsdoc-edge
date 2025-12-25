@@ -1,3 +1,11 @@
+---
+title: Find Root Types Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[FindRootTypesCommand]]
 
 Find root types (types with no incoming dependencies).

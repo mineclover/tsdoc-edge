@@ -1,3 +1,11 @@
+---
+title: Validate Symbol Refs Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[ValidateSymbolRefsCommand]]
 
 **Source**: `src/commands/ValidateSymbolRefsCommand.ts`

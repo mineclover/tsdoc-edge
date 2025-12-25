@@ -12,6 +12,7 @@ import type { SymbolRelationship } from '../types/tags';
 
 /**
  * Command for analyzing final relationship types
+ * @doc [[AnalyzeFinalCommand]]
  * @public
  */
 export class AnalyzeFinalCommand extends BaseCommand {

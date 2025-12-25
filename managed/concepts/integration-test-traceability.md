@@ -1,3 +1,11 @@
+---
+title: integration-test-traceability
+type: concept
+category: concepts
+status: active
+canonical: true
+---
+
 # [[Integration Test Traceability]]
 
 **Document Type**: Architectural Concept

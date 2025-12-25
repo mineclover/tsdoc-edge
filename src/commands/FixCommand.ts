@@ -19,6 +19,7 @@ import { CodeHealthChecker } from '../analyzer/CodeHealthChecker';
  *
  * Supports dry-run mode for preview without modifications.
  *
+ * @doc [[FixCommand]]
  * @public
  */
 export class FixCommand extends BaseCommand {

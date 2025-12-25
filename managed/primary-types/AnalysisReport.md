@@ -1,3 +1,11 @@
+---
+title: Analysis Report
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # AnalysisReport
 
 **Primary Type**: Code Analysis Result

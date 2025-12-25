@@ -9,6 +9,7 @@ import type { ContentSimilarity } from '../types/spec';
 
 /**
  * DocumentSection interface
+ * @doc [[SpecContentSimilarityChecker]]
  * @public
  */
 interface DocumentSection {

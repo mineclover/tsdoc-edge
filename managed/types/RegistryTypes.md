@@ -1,3 +1,11 @@
+---
+title: Registry Types
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # RegistryTypes
 
 **Source**: `src/types/registry/registry.ts`

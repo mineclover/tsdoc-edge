@@ -1,3 +1,11 @@
+---
+title: Dependency Spec
+type: type
+category: primary-types
+status: active
+canonical: true
+---
+
 # DependencySpec
 
 **Source**: `src/types/tags/enhanced.ts`

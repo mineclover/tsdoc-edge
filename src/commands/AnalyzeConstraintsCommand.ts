@@ -15,6 +15,7 @@ import type { SymbolRelationship } from '../types/tags';
 
 /**
  * Command for analyzing constraint relationships
+ * @doc [[AnalyzeConstraintsCommand]]
  * @public
  */
 export class AnalyzeConstraintsCommand extends BaseCommand {

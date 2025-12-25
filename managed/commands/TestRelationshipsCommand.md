@@ -1,3 +1,11 @@
+---
+title: Test Relationships Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[TestRelationshipsCommand]]
 
 **Source**: `src/commands/TestRelationshipsCommand.ts`

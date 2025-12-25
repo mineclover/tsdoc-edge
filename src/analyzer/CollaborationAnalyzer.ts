@@ -36,6 +36,7 @@ interface CollaborationPattern {
 /**
  * Collaboration Analyzer
  *
+ * @doc [[CollaborationAnalyzer]]
  * @public
  * @responsibility Detect and analyze collaboration relationships
  */

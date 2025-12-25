@@ -5,6 +5,7 @@
  * Manages tsdoc-edge configuration file (.tsdoc.config.json).
  * Provides singleton access to configuration across the application.
  *
+ * @doc [[ConfigManager]]
  * @public
  */
 

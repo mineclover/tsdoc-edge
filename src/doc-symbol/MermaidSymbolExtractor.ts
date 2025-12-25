@@ -104,6 +104,7 @@ export interface MermaidExtractionResult {
 /**
  * Mermaid Symbol Extractor
  *
+ * @doc [[MermaidSymbolExtractor]]
  * @public
  * @responsibility Parse Mermaid diagrams and extract symbols/relationships
  */

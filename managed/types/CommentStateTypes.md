@@ -1,3 +1,11 @@
+---
+title: Comment State Types
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # CommentStateTypes
 
 **Source**: `src/types/state/comment.ts`

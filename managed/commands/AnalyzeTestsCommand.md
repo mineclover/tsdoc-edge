@@ -1,3 +1,11 @@
+---
+title: Analyze Tests Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[AnalyzeTestsCommand]]
 
 **Source**: `src/commands/AnalyzeTestsCommand.ts`

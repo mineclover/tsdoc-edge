@@ -1,3 +1,11 @@
+---
+title: Data Flow Types
+type: type
+category: types
+status: active
+canonical: true
+---
+
 # DataFlowTypes
 
 **Source**: `src/types/domain/data-flow.ts`

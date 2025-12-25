@@ -1,3 +1,11 @@
+---
+title: spec-management-system
+type: system
+category: core
+status: active
+canonical: true
+---
+
 # [[Spec Management System]]
 
 > 문서 명세의 완성도, 상태, 버전을 관리하는 생명주기 시스템

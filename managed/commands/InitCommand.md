@@ -1,3 +1,11 @@
+---
+title: Init Command
+type: command
+category: commands
+status: active
+canonical: true
+---
+
 # [[InitCommand]]
 
 **Source**: `src/commands/Phase4Commands.ts:153`

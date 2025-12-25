@@ -14,6 +14,7 @@ import type { SymbolRelationship } from '../types/tags';
 /**
  * Command to analyze enhancement relationships
  *
+ * @doc [[AnalyzeEnhancementCommand]]
  * @public
  * @responsibility Analyze @enhances tags in code
  */
