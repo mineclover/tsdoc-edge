@@ -451,6 +451,17 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
           continue;
         }
 
+        // Skip relationship type names used as mermaid node labels (not actual doc symbols)
+        // Handle both hyphenated (layer-dependency) and spaced (Layer Dependency) versions
+        if (/^(enhancement|layer[- ]dependency|module[- ]boundary|callback|event[- ]flow|composition|doc[- ]reference|test[- ]coverage|generic[- ]constraint)$/i.test(symbolName)) {
+          continue;
+        }
+
+        // Skip diagram-specific labels
+        if (/^(Impact\d+|Phase\s+\d+|Layer\s+\d+|L\d+[A-Z])$/i.test(symbolName)) {
+          continue;
+        }
+
         // Check if this is a definition (in heading) or reference
         if (lineWithoutInlineCode.trim().startsWith('#')) {
           // Heading but not H1 - still a definition but not primary
@@ -603,6 +614,17 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
 
       // Skip planned commands
       if (/^(Id|Improve|SpecStatus|SpecHistory|Plans|Todos|CoreApi|WithoutResponsibility|WithoutContract|Scan|FindDoc|FindMethod|FindUnusedDocs)Command$/.test(symbolName)) {
+        continue;
+      }
+
+      // Skip relationship type names used as mermaid node labels (not actual doc symbols)
+      // Handle both hyphenated (layer-dependency) and spaced (Layer Dependency) versions
+      if (/^(enhancement|layer[- ]dependency|module[- ]boundary|callback|event[- ]flow|composition|doc[- ]reference|test[- ]coverage|generic[- ]constraint)$/i.test(symbolName)) {
+        continue;
+      }
+
+      // Skip diagram-specific labels (Impact1, Phase 1, etc.)
+      if (/^(Impact\d+|Phase\s+\d+|Layer\s+\d+|L\d+[A-Z])$/i.test(symbolName)) {
         continue;
       }
 
