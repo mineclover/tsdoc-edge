@@ -189,6 +189,12 @@ export interface ValidationConfig {
   rules?: {
     [ruleName: string]: 'error' | 'warning' | 'info' | 'off';
   };
+
+  /**
+   * Directories to exclude from validation (e.g., examples, architecture)
+   * These directories are still indexed but not validated
+   */
+  excludeDirs?: string[];
 }
 
 /**

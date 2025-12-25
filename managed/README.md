@@ -179,7 +179,7 @@ TSDoc Edge documentation is organized into **15 streamlined categories** (reduce
 8. **concepts/** - [[Concepts Index]] - Core architectural concepts and design principles
 9. **guides/** - [[Guides & Tutorials]] - Step-by-step learning guides
 10. **workflows/** - [[Workflows Index]] - End-to-end workflow guides
-11. **examples/** - [[Examples]] - Practical usage examples
+11. **examples/** - Examples - Practical usage examples (excluded from validation)
 
 ### Infrastructure
 

@@ -8,6 +8,7 @@ import * as path from 'node:path';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import { DocumentSymbolRegistry } from '../doc-symbol/DocumentSymbolRegistry';
+import { ConfigManager } from '../config/ConfigManager';
 
 /**
  * Command for validating document symbols
@@ -165,18 +166,28 @@ export class ValidateDocsCommand extends BaseCommand {
   }
 
   /**
-   * Find all markdown files recursively
+   * Find all markdown files recursively, respecting validation.excludeDirs
    */
-  private findMarkdownFiles(dir: string): string[] {
+  private findMarkdownFiles(dir: string, excludeDirs?: string[]): string[] {
     const files: string[] = [];
     const entries = fs.readdirSync(dir);
+
+    // Get exclude dirs from config if not provided
+    if (!excludeDirs) {
+      const config = ConfigManager.getInstance().get();
+      excludeDirs = (config.validation as any)?.excludeDirs || [];
+    }
 
     for (const entry of entries) {
       const fullPath = path.join(dir, entry);
       const stat = fs.statSync(fullPath);
 
       if (stat.isDirectory()) {
-        files.push(...this.findMarkdownFiles(fullPath));
+        // Skip excluded directories
+        if (excludeDirs && excludeDirs.includes(entry)) {
+          continue;
+        }
+        files.push(...this.findMarkdownFiles(fullPath, excludeDirs || []));
       } else if (entry.endsWith('.md') || entry.endsWith('.mdx')) {
         files.push(fullPath);
       }

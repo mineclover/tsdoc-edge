@@ -22,7 +22,11 @@
   "validation": {
     "strictMode": false,
     "minConnectivityScore": 70,
-    "rules": {}
+    "rules": {},
+    "excludeDirs": [
+      "examples",
+      "architecture"
+    ]
   },
   "generator": {
     "template": "enhanced",
