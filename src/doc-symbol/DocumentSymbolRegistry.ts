@@ -12,6 +12,7 @@ import type {
   DocumentSymbol,
   ParsedDocSymbols,
 } from '../types/feature';
+import { ConfigManager } from '../config/ConfigManager';
 
 /**
  * Registry for document symbols with SSOT enforcement
@@ -240,16 +241,33 @@ export class DocumentSymbolRegistry {
     }
 
     // Check for definitions without code implementation
+    const config = ConfigManager.getInstance().get();
+    const skipCodeImplDirs = config.validation?.skipCodeImplDirs || [];
+
     for (const [name, definition] of this.definitions.entries()) {
       const codeConns = this.codeConnections.get(name) || [];
 
       if (codeConns.length === 0) {
-        warnings.push({
-          type: 'no_code_impl',
-          symbolName: name,
-          filePath: definition.filePath,
-          message: `Symbol [[${name}]] has no code implementation`,
+        // Skip warning if file is in a skipCodeImplDirs directory
+        const pathParts = definition.filePath.split('/');
+        const isSkipped = skipCodeImplDirs.some((dir) => pathParts.includes(dir));
+
+        // Also skip root-level managed docs (files directly in managed/ without subdirectory)
+        const managedDirs = config.documentManagement?.managedDirs || ['managed'];
+        const isRootManagedDoc = managedDirs.some((dir) => {
+          const idx = pathParts.indexOf(dir);
+          // File is directly in managed dir if the next part is the filename (ends with .md)
+          return idx !== -1 && idx === pathParts.length - 2;
         });
+
+        if (!isSkipped && !isRootManagedDoc) {
+          warnings.push({
+            type: 'no_code_impl',
+            symbolName: name,
+            filePath: definition.filePath,
+            message: `Symbol [[${name}]] has no code implementation`,
+          });
+        }
       }
     }
 

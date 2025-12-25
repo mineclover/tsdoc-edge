@@ -11,7 +11,7 @@ import type { AnalysisReport } from '../types/analysis';
 /**
  * SuggestCommand - Generate improvement suggestions
  * @public
- * @doc [[Suggest Command]]
+ * @doc [[SuggestCommand]]
  * @doc [[CLI Commands#suggest]]
  */
 export class SuggestCommand extends BaseCommand {

@@ -26,6 +26,20 @@
     "excludeDirs": [
       "examples",
       "architecture"
+    ],
+    "skipCodeImplDirs": [
+      "concepts",
+      "guides",
+      "workflows",
+      "relationships",
+      "core",
+      "core-components",
+      "features",
+      "code-generation",
+      "parser",
+      "primary-types",
+      "types",
+      "utilities"
     ]
   },
   "generator": {

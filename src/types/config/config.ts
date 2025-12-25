@@ -195,6 +195,13 @@ export interface ValidationConfig {
    * These directories are still indexed but not validated
    */
   excludeDirs?: string[];
+
+  /**
+   * Directories to skip no_code_impl check (e.g., concepts, guides, workflows)
+   * Documents in these directories won't trigger "no code implementation" warnings
+   * @defaultValue ["concepts", "guides", "workflows", "relationships"]
+   */
+  skipCodeImplDirs?: string[];
 }
 
 /**
@@ -383,6 +390,7 @@ export const DEFAULT_CONFIG: TsdocEdgeConfig = {
     strictMode: false,
     minConnectivityScore: 70,
     rules: {},
+    skipCodeImplDirs: ['concepts', 'guides', 'workflows', 'relationships'],
   },
   generator: {
     template: 'enhanced',
