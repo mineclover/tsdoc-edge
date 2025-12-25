@@ -364,7 +364,7 @@ Core TypeScript interfaces used across the system:
   - [[Circular Dependency]] (`relationships/CIRCULAR.md`) - 0 found
 
 **Commands**:
-- [[Commands Index]]: All 61 commands organized
+- [[Commands Index]]: All 104 commands organized
 - Individual docs: [[BuildCommand]], [[WorkContextCommand]], etc.
 
 **Workflows**:

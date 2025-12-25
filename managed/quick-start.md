@@ -319,7 +319,7 @@ tsdoc-edge analyze-pipeline
 
 **Full Documentation**: README (`managed/README.md`)
 
-**Commands**: [[Commands Index]] (`managed/COMMANDS.md`) - All 61 commands
+**Commands**: [[Commands Index]] (`managed/COMMANDS.md`) - All 104 commands
 
 **Core Concepts**:
 - [[Relationship Types]] (`managed/relationships/index.md`) - 17 types

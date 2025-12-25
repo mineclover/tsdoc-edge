@@ -8,405 +8,204 @@ canonical: true
 
 # [[CLI Commands]]
 
-Alphabetically organized reference of all 61+ TSDoc Edge CLI commands with complete usage syntax, options, and examples.
+Alphabetical reference of all 104 TSDoc Edge CLI commands.
 
-> **Quick Reference**: Complete CLI command reference organized alphabetically with usage and examples
+> See [[Commands Index]] for commands organized by category.
 
-## Overview
+## A
 
-TSDoc Edge provides 61+ commands for analyzing, querying, and managing TypeScript documentation. This document serves as the canonical reference for all CLI commands.
+| Command | Description |
+|---------|-------------|
+| `analyze` | Analyze code health for a directory |
+| `analyze-all` | Run all relationship analyzers |
+| `analyze-alternatives` | Analyze substitution and fallback patterns |
+| `analyze-behavioral` | Analyze collaboration, composition, temporal-order |
+| `analyze-callbacks` | Analyze callback patterns |
+| `analyze-calls` | Analyze function call relationships |
+| `analyze-chains` | Analyze dependency chains |
+| `analyze-collaboration` | Analyze mutual dependencies |
+| `analyze-composition` | Analyze has-a patterns |
+| `analyze-constraints` | Analyze co-requirements and mutual exclusion |
+| `analyze-doc-reference` | Analyze Code ↔ Doc via @doc tags |
+| `analyze-enhancement` | Analyze @enhances tag relationships |
+| `analyze-events` | Analyze event flow patterns |
+| `analyze-fallback` | Analyze error recovery patterns |
+| `analyze-final` | Analyze pipeline and feature-grouping |
+| `analyze-io` | Analyze I/O data flow dependencies |
+| `analyze-layer-dependency` | Analyze architectural layers |
+| `analyze-structural` | Analyze implementation + test coverage |
+| `analyze-substitution` | Analyze interchangeable implementations |
+| `analyze-temporal-order` | Analyze execution sequence |
+| `analyze-tests` | Analyze test coverage relationships |
+| `analyze-types` | Analyze type dependencies |
 
-See also: [[Commands Index]] for commands organized by category.
+## B-C
 
----
+| Command | Description |
+|---------|-------------|
+| `build` | Build symbol database from source |
+| `check-duplicates` | Check for duplicate content |
+| `check-links` | Check for broken links |
+| `context` | Show context info |
+| `context-to-llm` | Generate LLM-friendly context |
+| `core-api` | Show core API symbols |
+| `coverage-report` | Coverage reporting |
 
-## analyze-calls
+## D
 
-Analyze call relationships between functions and methods.
+| Command | Description |
+|---------|-------------|
+| `deps` | Show dependencies of a symbol |
+| `design-context` | Show design decisions for a file |
+| `detect-cycles` | Detect circular dependencies |
+| `detect-dead-code` | Find unused code |
+| `doc-symbols` | List document symbols |
 
-```bash
-tsdoc-edge analyze-calls [source-dir]
-```
+## E-F
 
-**Detection**: Behavioral relationship analyzer
-**Output**: Call graph with caller → callee relationships
-**Relationship Type**: [[Call Relationships]]
+| Command | Description |
+|---------|-------------|
+| `explore-entrypoint` | Traverse doc graph from entrypoint |
+| `find-doc` | Find document definitions |
+| `find-method` | Find methods by name |
+| `find-roots` | Find root types |
+| `find-unused-docs` | Find unused documents |
+| `fix` | Auto-fix common issues |
 
-**See**: [[AnalyzeCallsCommand]]
+## G-H
 
----
+| Command | Description |
+|---------|-------------|
+| `generate-docs` | Generate markdown documentation |
+| `health` | Check codebase health score |
+| `help` | Show help message |
 
-## build
+## I
 
-Build the symbol database by extracting all symbols and relationships from source code.
+| Command | Description |
+|---------|-------------|
+| `id` | Manage symbol IDs |
+| `id-new` | Generate new symbol ID |
+| `improve` | Improve documentation quality |
+| `index-docs` | Index document symbols |
+| `init` | Initialize TSDoc Edge configuration |
+| `install-hook` | Install pre-commit hook |
 
-```bash
-tsdoc-edge build <source-directory>
-```
+## M-O
 
-**Features**:
-- Incremental build support (only processes changed files)
-- Extracts symbols, relationships, and TSDoc comments
-- Creates SQLite database and JSONL registry
+| Command | Description |
+|---------|-------------|
+| `move` | Move doc and update references |
+| `ontology-list` | List ontology nodes/relationships |
+| `ontology-stats` | Show ontology statistics |
+| `orphans` | Find orphaned symbols |
 
-**Example**:
-```bash
-tsdoc-edge build src
-tsdoc-edge build --full src  # Force full rebuild
-```
+## P
 
-**See**: [[BuildCommand]]
+| Command | Description |
+|---------|-------------|
+| `parallel-work` | Detect parallel development zones |
+| `parse` | Parse and display enhanced docs |
+| `parse-mermaid` | Parse Mermaid diagrams |
+| `plans` | Show future plans |
+| `promote-symbol` | Promote H2 to H1 |
 
----
+## Q
 
-## check-links
+| Command | Description |
+|---------|-------------|
+| `query-inferred` | Query inferred relationships |
 
-Check for broken links in documentation files.
+## R
 
-```bash
-tsdoc-edge check-links [docs-directory]
-```
+| Command | Description |
+|---------|-------------|
+| `rebuild-index` | Rebuild FTS5 indexes |
+| `relationship-check` | Quick safety check |
+| `relationship-clusters` | Find architectural clusters |
+| `relationship-export` | Export relationships |
+| `relationship-help` | Interactive guide |
+| `relationship-impact` | Analyze change impact |
+| `relationship-metrics` | Calculate graph metrics |
+| `relationship-path` | Find connection paths |
+| `relationship-query` | Query relationships for a symbol |
+| `relationship-stats` | Show relationship statistics |
+| `relationship-validate` | Validate data integrity |
+| `relationship-visualize` | Generate Mermaid diagrams |
+| `rename` | Rename doc and update references |
 
-**Features**:
-- Validates `[[Symbol]]` references
-- Detects broken internal links
-- Suggests fixes for common typos
-- Categorizes issues by type and file
+## S
 
-**Example**:
-```bash
-tsdoc-edge check-links managed
-tsdoc-edge check-links --fail-on-broken managed  # Exit with error if broken links found
-```
+| Command | Description |
+|---------|-------------|
+| `scan` | Scan directory for TypeScript files |
+| `spec-bump` | Bump specification version |
+| `spec-diff` | Compare specification versions |
+| `spec-history` | Show version history |
+| `spec-status` | Manage specification status |
+| `stats` | Show documentation statistics |
+| `suggest` | Generate improvement suggestions |
+| `symbol-fix` | Fix symbol issues |
+| `symbol-query` | Query document symbols |
+| `symbol-rename` | Rename symbol |
+| `sync-coverage` | Sync Istanbul coverage data |
 
-**Configuration**: `.tsdoc.config.json` → `linkCheck`
+## T
 
-**See**: [[CheckLinksCommand]]
+| Command | Description |
+|---------|-------------|
+| `test-examples` | Extract test examples |
+| `test-relationships` | Analyze test relationships |
+| `todos` | Show TODO items |
+| `tree` | Show symbol hierarchy |
+| `type-chain` | Show type dependency chain |
 
----
+## U
 
-## generate-docs
+| Command | Description |
+|---------|-------------|
+| `undocumented` | Find undocumented symbols |
+| `uninstall-hook` | Uninstall pre-commit hook |
+| `untested` | Find symbols without tests |
+| `update-backlinks` | Update backlinks in docs |
+| `update-symbol-refs` | Update code references |
+| `usage` | View CLI analytics |
+| `used-by` | Show what uses a symbol (registry) |
 
-Generate documentation from code symbols and templates.
+## V
 
-```bash
-tsdoc-edge generate-docs [options]
-```
+| Command | Description |
+|---------|-------------|
+| `validate` | Generate validation report |
+| `validate-docs` | Validate document symbols |
+| `validate-generated-docs` | Validate generated docs |
+| `validate-spec` | Validate spec completeness |
+| `validate-symbol-refs` | Validate [[Symbol]] references |
+| `visualize` | Generate dependency diagrams |
 
-**Features**:
-- Template-based documentation generation
-- Symbol-driven content
-- Automatic cross-references
-- Customizable output formats
+## W
 
-**Example**:
-```bash
-tsdoc-edge generate-docs --template api
-tsdoc-edge generate-docs --symbols "class-*" --output docs/api
-```
-
-**See**: GenerateDocsCommand
-
----
-
-## id-new
-
-Generate a new unique symbol ID for documentation.
-
-```bash
-tsdoc-edge id-new <symbol-name>
-```
-
-**Features**:
-- Kebab-case ID generation
-- Collision detection
-- Type prefix support
-
-**Example**:
-```bash
-tsdoc-edge id-new "UserService"
-# Output: class-userservice
-
-tsdoc-edge id-new "calculateTotal"
-# Output: function-calculatetotal
-```
-
-**See**: IdNewCommand
-
----
-
-## init
-
-Initialize TSDoc Edge in a project.
-
-```bash
-tsdoc-edge init [options]
-```
-
-**Features**:
-- Creates `.tsdoc/` directory structure
-- Generates default configuration (`.tsdoc.config.json`)
-- Sets up managed documentation directory
-- Optionally installs git hooks
-
-**Example**:
-```bash
-tsdoc-edge init
-tsdoc-edge init --with-hooks  # Also install git hooks
-tsdoc-edge init --managed-dir docs  # Custom docs directory
-```
-
-**See**: [[InitCommand]]
-
----
-
-## parse
-
-Parse a TypeScript file and display its structure and TSDoc comments.
-
-```bash
-tsdoc-edge parse <file-path>
-```
-
-**Features**:
-- Display symbol hierarchy
-- Show TSDoc tags and comments
-- Validate TSDoc syntax
-- Export as JSON
-
-**Example**:
-```bash
-tsdoc-edge parse src/services/UserService.ts
-tsdoc-edge parse src/services/UserService.ts --json > output.json
-```
-
-**See**: [[ParseCommand]]
-
----
-
-## suggest
-
-Suggest documentation improvements and missing @doc tags.
-
-```bash
-tsdoc-edge suggest [source-directory]
-```
-
-**Features**:
-- Identifies symbols missing documentation
-- Suggests @doc tag additions
-- Detects incomplete TSDoc comments
-- Prioritizes by symbol importance
-
-**Example**:
-```bash
-tsdoc-edge suggest src
-tsdoc-edge suggest src --min-connections 5  # Only suggest for well-connected symbols
-```
-
-**See**: [[SuggestCommand]]
+| Command | Description |
+|---------|-------------|
+| `who-uses` | Show who uses a symbol (database) |
+| `without-contract` | Find missing contracts |
+| `without-responsibility` | Find missing @responsibility |
+| `work-context` | Get context before editing a file |
 
 ---
 
-## update-backlinks
-
-Update bidirectional `[[Symbol]]` backlinks in documentation files.
+## Getting Help
 
 ```bash
-tsdoc-edge update-backlinks [docs-directory]
+# General help
+tsdoc-edge help
+
+# Command-specific help
+tsdoc-edge <command> --help
 ```
 
-**Features**:
-- Scans for `[[Symbol]]` references
-- Generates "Referenced By" sections
-- Creates bidirectional navigation
-- Maintains backlink accuracy
+## See Also
 
-**Example**:
-```bash
-tsdoc-edge update-backlinks managed
-tsdoc-edge update-backlinks --clean managed  # Remove orphaned backlinks
-```
-
-**See**: [[UpdateBacklinksCommand]]
-
----
-
-## update-symbol-refs
-
-Update code symbol footnote references in documentation.
-
-```bash
-tsdoc-edge update-symbol-refs [docs-directory]
-```
-
-**Features**:
-- Resolves `[^SymbolName]` footnotes
-- Updates symbol locations (file:line)
-- Tracks unresolved references
-- Batch document updates
-
-**Example**:
-```bash
-tsdoc-edge update-symbol-refs managed
-```
-
-**Pattern**:
-```markdown
-This feature uses the UserService[^UserService] to authenticate.
-
-[^UserService]: src/services/UserService.ts:15
-```
-
-**See**: [[UpdateSymbolRefsCommand]]
-
----
-
-## validate-docs
-
-Validate documentation quality and completeness.
-
-```bash
-tsdoc-edge validate-docs [docs-directory]
-```
-
-**Features**:
-- Check documentation coverage
-- Validate symbol references
-- Detect broken links
-- Verify documentation structure
-- Quality metrics and scoring
-
-**Example**:
-```bash
-tsdoc-edge validate-docs managed
-tsdoc-edge validate-docs --min-score 80 managed  # Fail if score < 80
-```
-
-**Checks**:
-- ✓ H1 headers with `[[Symbol]]`
-- ✓ Frontmatter completeness
-- ✓ Internal link validity
-- ✓ Code example syntax
-- ✓ Backlink accuracy
-
-**See**: [[ValidateDocsCommand]]
-
----
-
-## validate-spec
-
-Validate specification completeness using the 7-aspect framework.
-
-```bash
-tsdoc-edge validate-spec [options]
-```
-
-**Features**:
-- Checks 7 aspects: Purpose, Input, Output, Context, Logic, Effect, Scope
-- Generates completeness scores
-- Identifies missing aspects
-- Tracks specification evolution
-
-**7 Aspects**:
-1. **Purpose**: Why the module exists
-2. **Input**: Parameters and constraints
-3. **Output**: Return values and results
-4. **Context**: Dependencies and environment
-5. **Logic**: Algorithm and implementation
-6. **Effect**: Side effects and state changes
-7. **Scope**: Public interface and visibility
-
-**Example**:
-```bash
-tsdoc-edge validate-spec src
-tsdoc-edge validate-spec --min-aspects 5 src  # Require at least 5/7 aspects
-```
-
-**See**: [[ValidateSpecCommand]]
-
----
-
-## work-context
-
-Display complete context needed before modifying a file.
-
-```bash
-tsdoc-edge work-context <file-path>
-```
-
-**Features**:
-- Show file dependencies (imports/exports)
-- List symbols defined in file
-- Display related documentation
-- Show who uses this file
-- Provide modification impact analysis
-
-**Example**:
-```bash
-tsdoc-edge work-context src/services/UserService.ts
-```
-
-**Output Sections**:
-1. **File Overview**: Path, type, exports
-2. **Dependencies**: What this file imports
-3. **Dependents**: Who imports this file
-4. **Symbols**: Classes, functions, interfaces
-5. **Documentation**: Related `[[Symbol]]` docs
-6. **Impact Analysis**: Change risk assessment
-
-**See**: [[WorkContextCommand]]
-
----
-
-## Related Documentation
-
-- [[Commands Index]]: All commands organized by category
-- [[BuildCommand]]: Detailed build command documentation
-- [[WorkContextCommand]]: Work context workflow
-- [[Relationship Types]]: All 26 relationship types
-
----
-
-**Last Updated**: 2025-11-11
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:344
-
-### Implemented By
-
-- CheckDuplicatesCommand (check-duplicates) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/CheckDuplicatesCommand.ts:68
-- CheckLinksCommand (check-links) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/CheckLinksCommand.ts:40
-- CoreApiCommand (core-api) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/CoreApiCommand.ts:40
-- DepsCommand (deps) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/DepsCommand.ts:39
-- FindDocCommand (find-doc) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/FindDocCommand.ts:69
-- FindMethodCommand (find-method) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/FindMethodCommand.ts:39
-- FindUnusedDocsCommand (find-unused-docs) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/FindUnusedDocsCommand.ts:39
-- GenerateDocsCommand (generate-docs) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/GenerateDocsCommand.ts:19
-- IdNewCommand (id-new) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/IdNewCommand.ts:17
-- InitCommand (init) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/InitCommand.ts:16
-- OrphansCommand (orphans) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/OrphansCommand.ts:40
-- ParseCommand (parse) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/ParseCommand.ts:39
-- PlansCommand (plans) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/PlansCommand.ts:38
-- RebuildIndexCommand (rebuild-index) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/RebuildIndexCommand.ts:35
-- SpecBumpCommand (spec-bump) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/SpecBumpCommand.ts:39
-- SpecDiffCommand (spec-diff) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/SpecDiffCommand.ts:39
-- SpecHistoryCommand (spec-history) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/SpecHistoryCommand.ts:39
-- SpecStatusCommand (spec-status) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/SpecStatusCommand.ts:67
-- StatsCommand (stats) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/StatsCommand.ts:37
-- SuggestCommand (suggest) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/SuggestCommand.ts:17
-- TodosCommand (todos) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/TodosCommand.ts:38
-- TreeCommand (tree) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/TreeCommand.ts:53
-- UndocumentedCommand (undocumented) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/UndocumentedCommand.ts:41
-- UpdateBacklinksCommand (update-backlinks) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/UpdateBacklinksCommand.ts:42
-- UpdateSymbolRefsCommand (update-symbol-refs) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/UpdateSymbolRefsCommand.ts:42
-- UsedByCommand (used-by) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/UsedByCommand.ts:39
-- ValidateDocsCommand (validate-docs) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/ValidateDocsCommand.ts:40
-- ValidateSpecCommand (validate-spec) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/ValidateSpecCommand.ts:17
-- WhoUsesCommand (who-uses) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/WhoUsesCommand.ts:37
-
+- [[Commands Index]] - Commands by category
+- [[Quick Start Guide]] - Getting started
+- [[CLI Command Development Guide]] - Create new commands
