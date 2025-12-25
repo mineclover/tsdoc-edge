@@ -306,13 +306,6 @@ tsdoc-edge build src
 
 ### Referenced By
 
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:301
-- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:107
-- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:108
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:365
-- [[Codebase Health Report]] → /home/user/tsdoc-edge/managed/features/codebase-health-report.md:134
-- [[Codebase Health Report]] → /home/user/tsdoc-edge/managed/features/codebase-health-report.md:341
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:294
-- [[Temporal Order]] → /home/user/tsdoc-edge/managed/relationships/temporal-order.md:239
-- [[Temporal Order]] → /home/user/tsdoc-edge/managed/relationships/temporal-order.md:240
+- [[Codebase Health Report]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/codebase-health-report.md:136
+- [[Codebase Health Report]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/codebase-health-report.md:343
 

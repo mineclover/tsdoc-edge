@@ -1,4 +1,4 @@
-# [[FeatureTypes]]
+# FeatureTypes
 
 **Source**: `src/types/feature/feature.ts`
 
@@ -8,7 +8,7 @@ Type system for feature documentation structure and metadata.
 
 ## Feature Document
 
-See implementation: [[FeatureDocument]]
+See implementation: FeatureDocument
 
 **Key Properties**:
 - `id`: Unique feature identifier
@@ -21,7 +21,7 @@ See implementation: [[FeatureDocument]]
 
 ## Symbol Reference
 
-See implementation: [[SymbolReference]]
+See implementation: SymbolReference
 
 **Key Properties**:
 - `symbolId`: Referenced symbol ID
@@ -45,7 +45,7 @@ credentials and {@symbol session-manager} to maintain sessions.
 
 ## Feature Index
 
-See implementation: [[FeatureIndex]]
+See implementation: FeatureIndex
 
 **Key Properties**:
 - `features`: All feature documents
@@ -133,20 +133,6 @@ tsdoc-edge find-doc user-service
 
 ## Related
 
-- [[DocumentSymbol]]: Document symbol system
+- DocumentSymbol: Document symbol system
 - [[IndexDocsCommand]]: Document indexing
-- [[FindDocCommand]]: Feature search
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:101
-- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:102
-- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:103
-- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:98
-- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:99
-- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:100
-
+- FindDocCommand: Feature search

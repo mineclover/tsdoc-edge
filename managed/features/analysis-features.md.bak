@@ -294,14 +294,14 @@ Violations:
   - Analyzer: [[TestCoverageAnalyzer]] (`src/analyzer/TestCoverageAnalyzer.ts`)
   - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
 
-**[[WithoutResponsibilityCommand]]** - `tsdoc-edge without-responsibility`
+**WithoutResponsibilityCommand** - `tsdoc-edge without-responsibility`
 - 책임 미정의 심볼 (@responsibility 태그 누락)
 - **Implementation Chain**:
   - Command: `src/commands/WithoutResponsibilityCommand.ts`
   - Validator: TSDoc parser for @responsibility tag
   - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
 
-**[[WithoutContractCommand]]** - `tsdoc-edge without-contract`
+**WithoutContractCommand** - `tsdoc-edge without-contract`
 - 계약 미정의 심볼 (@contract 태그 누락)
 - **Implementation Chain**:
   - Command: `src/commands/WithoutContractCommand.ts`

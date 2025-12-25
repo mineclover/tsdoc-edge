@@ -36,3 +36,6 @@ export {
   SymbolSearchResult,
   DiagnosticInfo,
 } from './service';
+
+export { CacheManager, CacheEntry, CacheManagerOptions } from './cache-manager';
+export { StatementManager, StatementManagerOptions } from './statement-manager';

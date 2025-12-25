@@ -11,13 +11,13 @@ Define comprehensive testing strategy for TSDoc Edge MCP Server to ensure reliab
 ## Context
 
 MCP (Model Context Protocol) Server provides 7 tools to Claude:
-- [[tsdoc_search_symbols]]
-- [[tsdoc_get_ontology_stats]]
-- [[tsdoc_list_relationships]]
-- [[tsdoc_get_work_context]]
-- [[tsdoc_get_design_context]]
-- [[tsdoc_query_relationships]]
-- [[tsdoc_get_symbol_details]]
+- tsdoc_search_symbols
+- tsdoc_get_ontology_stats
+- tsdoc_list_relationships
+- tsdoc_get_work_context
+- tsdoc_get_design_context
+- tsdoc_query_relationships
+- tsdoc_get_symbol_details
 
 Each tool must be tested at multiple levels to guarantee LLM-safe operation.
 
@@ -25,7 +25,7 @@ Each tool must be tested at multiple levels to guarantee LLM-safe operation.
 
 ### Level 1: Unit Tests (Service Layer)
 **File**: `basic-test.js`
-**Target**: [[TsDocService]] class methods directly
+**Target**: TsDocService class methods directly
 **Coverage**: 7 core operations
 
 **Purpose**:
@@ -129,7 +129,7 @@ Real codebase entities used:
 ## Performance Optimization
 
 ### Caching Strategy
-**Implementation**: [[TsDocService]].relationshipsCache
+**Implementation**: TsDocService.relationshipsCache
 
 **Behavior**:
 - First call: Load all 20K relationships (131ms)
@@ -205,10 +205,10 @@ Alert if any operation:
 
 ## Related Documentation
 
-- [[MCP Server Implementation]]
-- [[TsDocService API]]
-- [[Database Schema]]
-- [[Performance Optimization]]
+- MCP Server Implementation
+- TsDocService API
+- Database Schema
+- Performance Optimization
 
 ## Decision Log
 

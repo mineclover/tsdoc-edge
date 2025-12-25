@@ -26,13 +26,6 @@ Sync test coverage data with symbol database.
 
 ### Referenced By
 
-- [[IstanbulCoverageAdapter]] → /home/user/tsdoc-edge/managed/analyzers/IstanbulCoverageAdapter.md:23
-- [[IstanbulCoverageAdapter]] → /home/user/tsdoc-edge/managed/analyzers/IstanbulCoverageAdapter.md:33
-- [[IstanbulCoverageAdapter]] → /home/user/tsdoc-edge/managed/analyzers/IstanbulCoverageAdapter.md:34
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:167
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:293
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:294
-- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:29
-- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:30
-- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:31
+- [[IstanbulCoverageAdapter]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/IstanbulCoverageAdapter.md:23
+- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:167
 

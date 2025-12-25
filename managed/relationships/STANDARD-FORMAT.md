@@ -29,7 +29,7 @@ Defines a standard format for storing and querying all types of relationships be
 
 ## Standard Format
 
-See implementation: [[UnifiedRelationship]]
+See implementation: [[UnifiedRelationships]]
 
 **Identity**:
 - `id`: Unique relationship identifier
@@ -260,7 +260,7 @@ See implementation: [[UnifiedRelationship]]
 
 ### RelationshipType
 
-See implementation: [[RelationshipType]]
+See implementation: RelationshipType
 
 **27 Relationship Types**:
 
@@ -277,7 +277,7 @@ See implementation: [[RelationshipType]]
 
 ### RelationshipCategory
 
-See implementation: [[RelationshipCategory]]
+See implementation: RelationshipCategory
 
 **10 Categories**:
 - `structural`: Code structure (imports, inheritance)
@@ -562,25 +562,7 @@ const confidence = evidence.reduce((sum, ev) => sum + ev.confidence, 0) / eviden
 
 ### Referenced By
 
-- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:185
-- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:210
-- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:211
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:387
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:493
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:494
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:495
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:496
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:497
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:379
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:380
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:381
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:115
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:116
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:117
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:126
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:127
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:128
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:227
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:228
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:229
+- [[Unified Relationship Taxonomy]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:387
+- [[Analyzer Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:95
+- [[UnifiedRelationships]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/UnifiedRelationships.md:109
 

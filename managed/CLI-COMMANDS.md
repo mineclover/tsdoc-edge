@@ -105,7 +105,7 @@ tsdoc-edge generate-docs --template api
 tsdoc-edge generate-docs --symbols "class-*" --output docs/api
 ```
 
-**See**: [[GenerateDocsCommand]]
+**See**: GenerateDocsCommand
 
 ---
 
@@ -131,7 +131,7 @@ tsdoc-edge id-new "calculateTotal"
 # Output: function-calculatetotal
 ```
 
-**See**: [[IdNewCommand]]
+**See**: IdNewCommand
 
 ---
 
@@ -376,53 +376,37 @@ tsdoc-edge work-context src/services/UserService.ts
 
 ### Referenced By
 
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:294
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:295
-- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:30
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:62
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:63
-- [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:29
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:168
-- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:29
-- [[SuggestCommand]] → /home/user/tsdoc-edge/managed/commands/SuggestCommand.md:262
-- [[UpdateBacklinksCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateBacklinksCommand.md:27
-- [[UpdateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/UpdateSymbolRefsCommand.md:29
-- [[ValidateDocsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateDocsCommand.md:29
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:191
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:66
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:67
-- [[CLI Command Development Guide]] → /home/user/tsdoc-edge/managed/guides/command-development-guide.md:344
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:48
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:203
+- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:344
 
 ### Implemented By
 
-- CheckDuplicatesCommand (check-duplicates) → /home/user/tsdoc-edge/src/commands/CheckDuplicatesCommand.ts:68
-- CheckLinksCommand (check-links) → /home/user/tsdoc-edge/src/commands/CheckLinksCommand.ts:40
-- CoreApiCommand (core-api) → /home/user/tsdoc-edge/src/commands/CoreApiCommand.ts:68
-- DepsCommand (deps) → /home/user/tsdoc-edge/src/commands/DepsCommand.ts:39
-- FindDocCommand (find-doc) → /home/user/tsdoc-edge/src/commands/FindDocCommand.ts:69
-- FindMethodCommand (find-method) → /home/user/tsdoc-edge/src/commands/FindMethodCommand.ts:39
-- FindUnusedDocsCommand (find-unused-docs) → /home/user/tsdoc-edge/src/commands/FindUnusedDocsCommand.ts:39
-- GenerateDocsCommand (generate-docs) → /home/user/tsdoc-edge/src/commands/GenerateDocsCommand.ts:19
-- IdNewCommand (id-new) → /home/user/tsdoc-edge/src/commands/IdNewCommand.ts:18
-- InitCommand (init) → /home/user/tsdoc-edge/src/commands/InitCommand.ts:17
-- OrphansCommand (orphans) → /home/user/tsdoc-edge/src/commands/OrphansCommand.ts:39
-- ParseCommand (parse) → /home/user/tsdoc-edge/src/commands/ParseCommand.ts:39
-- PlansCommand (plans) → /home/user/tsdoc-edge/src/commands/PlansCommand.ts:40
-- SpecBumpCommand (spec-bump) → /home/user/tsdoc-edge/src/commands/SpecBumpCommand.ts:39
-- SpecDiffCommand (spec-diff) → /home/user/tsdoc-edge/src/commands/SpecDiffCommand.ts:39
-- SpecHistoryCommand (spec-history) → /home/user/tsdoc-edge/src/commands/SpecHistoryCommand.ts:39
-- SpecStatusCommand (spec-status) → /home/user/tsdoc-edge/src/commands/SpecStatusCommand.ts:67
-- StatsCommand (stats) → /home/user/tsdoc-edge/src/commands/StatsCommand.ts:39
-- SuggestCommand (suggest) → /home/user/tsdoc-edge/src/commands/SuggestCommand.ts:18
-- TodosCommand (todos) → /home/user/tsdoc-edge/src/commands/TodosCommand.ts:40
-- TreeCommand (tree) → /home/user/tsdoc-edge/src/commands/TreeCommand.ts:53
-- UndocumentedCommand (undocumented) → /home/user/tsdoc-edge/src/commands/UndocumentedCommand.ts:57
-- UpdateBacklinksCommand (update-backlinks) → /home/user/tsdoc-edge/src/commands/UpdateBacklinksCommand.ts:42
-- UpdateSymbolRefsCommand (update-symbol-refs) → /home/user/tsdoc-edge/src/commands/UpdateSymbolRefsCommand.ts:42
-- UsedByCommand (used-by) → /home/user/tsdoc-edge/src/commands/UsedByCommand.ts:39
-- ValidateDocsCommand (validate-docs) → /home/user/tsdoc-edge/src/commands/ValidateDocsCommand.ts:40
-- ValidateSpecCommand (validate-spec) → /home/user/tsdoc-edge/src/commands/ValidateSpecCommand.ts:17
-- WhoUsesCommand (who-uses) → /home/user/tsdoc-edge/src/commands/WhoUsesCommand.ts:54
+- CheckDuplicatesCommand (check-duplicates) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/CheckDuplicatesCommand.ts:68
+- CheckLinksCommand (check-links) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/CheckLinksCommand.ts:40
+- CoreApiCommand (core-api) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/CoreApiCommand.ts:40
+- DepsCommand (deps) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/DepsCommand.ts:39
+- FindDocCommand (find-doc) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/FindDocCommand.ts:69
+- FindMethodCommand (find-method) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/FindMethodCommand.ts:39
+- FindUnusedDocsCommand (find-unused-docs) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/FindUnusedDocsCommand.ts:39
+- GenerateDocsCommand (generate-docs) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/GenerateDocsCommand.ts:19
+- IdNewCommand (id-new) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/IdNewCommand.ts:17
+- InitCommand (init) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/InitCommand.ts:16
+- OrphansCommand (orphans) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/OrphansCommand.ts:40
+- ParseCommand (parse) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/ParseCommand.ts:39
+- PlansCommand (plans) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/PlansCommand.ts:38
+- RebuildIndexCommand (rebuild-index) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/RebuildIndexCommand.ts:35
+- SpecBumpCommand (spec-bump) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/SpecBumpCommand.ts:39
+- SpecDiffCommand (spec-diff) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/SpecDiffCommand.ts:39
+- SpecHistoryCommand (spec-history) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/SpecHistoryCommand.ts:39
+- SpecStatusCommand (spec-status) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/SpecStatusCommand.ts:67
+- StatsCommand (stats) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/StatsCommand.ts:37
+- SuggestCommand (suggest) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/SuggestCommand.ts:17
+- TodosCommand (todos) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/TodosCommand.ts:38
+- TreeCommand (tree) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/TreeCommand.ts:53
+- UndocumentedCommand (undocumented) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/UndocumentedCommand.ts:41
+- UpdateBacklinksCommand (update-backlinks) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/UpdateBacklinksCommand.ts:42
+- UpdateSymbolRefsCommand (update-symbol-refs) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/UpdateSymbolRefsCommand.ts:42
+- UsedByCommand (used-by) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/UsedByCommand.ts:39
+- ValidateDocsCommand (validate-docs) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/ValidateDocsCommand.ts:40
+- ValidateSpecCommand (validate-spec) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/ValidateSpecCommand.ts:17
+- WhoUsesCommand (who-uses) → /Users/junwoobang/workflow/tsdoc-edge/src/commands/WhoUsesCommand.ts:37
 

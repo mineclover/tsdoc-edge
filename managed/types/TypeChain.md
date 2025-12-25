@@ -1,4 +1,4 @@
-# [[TypeChain]]
+# TypeChain
 
 **Source**: `src/types/domain/type-chain.ts`
 
@@ -8,7 +8,7 @@ Type system for tracking type dependency chains and paths.
 
 ## Type Chain Step
 
-See implementation: [[TypeChainStep]]
+See implementation: TypeChainStep
 
 **Single link in a dependency chain**:
 - `from`: Source type name
@@ -19,7 +19,7 @@ See implementation: [[TypeChainStep]]
 
 ## Type Chain
 
-See implementation: [[TypeChain]]
+See implementation: TypeChain
 
 **Complete path from source to target**:
 - `source`: Starting type
@@ -122,12 +122,5 @@ tsdoc-edge analyze-chains
 
 ### Referenced By
 
-- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:59
-- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:60
-- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:61
-- [[DetectCircularTypesCommand]] → /home/user/tsdoc-edge/managed/commands/DetectCircularTypesCommand.md:85
-- [[DetectCircularTypesCommand]] → /home/user/tsdoc-edge/managed/commands/DetectCircularTypesCommand.md:86
-- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:53
-- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:54
-- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:55
+- TypeChain → /Users/junwoobang/workflow/tsdoc-edge/managed/types/TypeChain.md:22
 

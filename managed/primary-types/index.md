@@ -20,7 +20,7 @@ TSDoc Edge 시스템의 주요 타입 정의를 카테고리별로 정리한 인
 
 ## Configuration Types (설정 타입)
 
-### [[TsdocEdgeConfig]]
+### TsdocEdgeConfig
 **Path**: `TsdocEdgeConfig.md`
 **Priority**: ⭐⭐⭐ Critical
 
@@ -41,7 +41,7 @@ TSDoc Edge의 전체 설정을 정의하는 타입.
 
 ## Analysis Types (분석 타입)
 
-### [[AnalysisReport]]
+### AnalysisReport
 **Path**: `AnalysisReport.md`
 **Priority**: ⭐⭐⭐ Critical
 
@@ -59,7 +59,7 @@ TSDoc Edge의 전체 설정을 정의하는 타입.
 
 ---
 
-### [[TrackableStatistics]]
+### TrackableStatistics
 **Path**: `TrackableStatistics.md`
 **Priority**: ⭐⭐ High
 
@@ -79,7 +79,7 @@ TSDoc Edge의 전체 설정을 정의하는 타입.
 
 ## Documentation Types (문서 타입)
 
-### [[EnhancedSymbolDoc]]
+### EnhancedSymbolDoc
 **Path**: `EnhancedSymbolDoc.md`
 **Priority**: ⭐⭐⭐ Critical
 
@@ -97,7 +97,7 @@ TSDoc Edge의 전체 설정을 정의하는 타입.
 
 ---
 
-### [[BaseSymbolDoc]]
+### BaseSymbolDoc
 **Path**: `BaseSymbolDoc.md`
 **Priority**: ⭐⭐ High
 
@@ -114,7 +114,7 @@ TSDoc Edge의 전체 설정을 정의하는 타입.
 
 ---
 
-### [[ParsedDocSymbols]]
+### ParsedDocSymbols
 **Path**: `ParsedDocSymbols.md`
 **Priority**: ⭐⭐ High
 
@@ -129,7 +129,7 @@ TSDoc Edge의 전체 설정을 정의하는 타입.
 
 ---
 
-### [[SymbolFootnoteRef]]
+### SymbolFootnoteRef
 **Path**: `SymbolFootnoteRef.md`
 **Priority**: ⭐ Medium
 
@@ -141,7 +141,7 @@ TSDoc Edge의 전체 설정을 정의하는 타입.
 
 ## Mermaid Types (다이어그램 타입)
 
-### [[MermaidExtractionResult]]
+### MermaidExtractionResult
 **Path**: `MermaidExtractionResult.md`
 **Priority**: ⭐⭐ High
 
@@ -158,7 +158,7 @@ Mermaid 다이어그램 파싱 결과 타입.
 
 ---
 
-### [[MermaidSymbol]]
+### MermaidSymbol
 **Path**: `MermaidSymbol.md`
 **Priority**: ⭐⭐ High
 
@@ -174,7 +174,7 @@ Mermaid 다이어그램 노드 → 심볼 변환 타입.
 
 ---
 
-### [[MermaidRelationship]]
+### MermaidRelationship
 **Path**: `MermaidRelationship.md`
 **Priority**: ⭐⭐ High
 
@@ -192,7 +192,7 @@ Mermaid 다이어그램 엣지 → 관계 변환 타입.
 
 ## Extraction Types (추출 타입)
 
-### [[ExtractionResult]]
+### ExtractionResult
 **Path**: `ExtractionResult.md`
 **Priority**: ⭐⭐⭐ Critical
 
@@ -247,7 +247,7 @@ AST 파싱 및 심볼 추출 결과 타입.
 
 ## Specification Types (명세 타입)
 
-### [[DependencySpec]]
+### DependencySpec
 **Path**: `DependencySpec.md`
 **Priority**: ⭐⭐ High
 
@@ -280,7 +280,7 @@ AST 파싱 및 심볼 추출 결과 타입.
 
 ---
 
-### [[FuturePlan]]
+### FuturePlan
 **Path**: `FuturePlan.md`
 **Priority**: ⭐ Medium
 
@@ -296,7 +296,7 @@ AST 파싱 및 심볼 추출 결과 타입.
 
 ---
 
-### [[ProblemSolving]]
+### ProblemSolving
 **Path**: `ProblemSolving.md`
 **Priority**: ⭐ Medium
 
@@ -312,7 +312,7 @@ AST 파싱 및 심볼 추출 결과 타입.
 
 ---
 
-### [[DecisionRecord]]
+### DecisionRecord
 **Path**: `DecisionRecord.md`
 **Priority**: ⭐ Medium
 
@@ -328,7 +328,7 @@ AST 파싱 및 심볼 추출 결과 타입.
 
 ---
 
-### [[ErrorExperience]]
+### ErrorExperience
 **Path**: `ErrorExperience.md`
 **Priority**: ⭐ Medium
 
@@ -451,12 +451,6 @@ Uses: DependencySpec, Functionality, FuturePlan, ProblemSolving, DecisionRecord,
 
 ### Referenced By
 
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:313
-- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:247
-- [[Types Index]] → /home/user/tsdoc-edge/managed/types/index.md:346
-- [[Types Index]] → /home/user/tsdoc-edge/managed/types/index.md:359
-- [[Types Index]] → /home/user/tsdoc-edge/managed/types/index.md:360
-- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:416
-- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:428
-- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:429
+- [[Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/index.md:346
+- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:416
 

@@ -1,4 +1,4 @@
-# [[ParseTypes]]
+# ParseTypes
 
 **Source**: `src/types/core/parse.ts`
 
@@ -8,7 +8,7 @@ Core type system for TSDoc parsing and validation.
 
 ## Parsed Doc Comment
 
-See implementation: [[ParsedDocComment]]
+See implementation: ParsedDocComment
 
 **Key Properties**:
 - `docComment`: TSDoc AST structure
@@ -19,7 +19,7 @@ See implementation: [[ParsedDocComment]]
 
 ## Validation Result
 
-See implementation: [[ValidationResult]]
+See implementation: ValidationResult
 
 **Key Properties**:
 - `ruleId`: Rule identifier
@@ -45,7 +45,7 @@ See implementation: [[ValidationResult]]
 
 ## Parse Result
 
-See implementation: [[ParseResult]]
+See implementation: ParseResult
 
 **Key Properties**:
 - `filePath`: File path
@@ -129,21 +129,4 @@ tsdoc-edge validate
 
 - [[TSDocParser]]: Parser implementation
 - [[ValidateCommand]]: CLI validation
-- [[ModuleSpecTagParser]]: Custom tag parsing
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:72
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:73
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:74
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:45
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:46
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:47
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:64
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:65
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:66
-
+- ModuleSpecTagParser: Custom tag parsing

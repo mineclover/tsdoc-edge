@@ -358,7 +358,7 @@ PaymentService → Stripe API
 ## Integration with Other Relationships
 
 **Verifies**:
-- [[Calls]]: Integration tests verify call relationships work
+- [[Call Relationships]]: Integration tests verify call relationships work
 - [[Code Dependency]]: Tests verify dependencies are correct
 - [[Collaboration]]: Tests validate collaboration patterns
 - [[IO Dependency]]: Tests verify data flow works
@@ -439,7 +439,7 @@ describe('User Management Integration', () => {
 ## Related
 
 - [[Test Coverage]] (`TEST-COVERAGE.md`): Unit test coverage
-- [[Calls]] (`CALLS.md`): Call relationships
+- [[Call Relationships]] (`CALLS.md`): Call relationships
 - [[Code Dependency]] (`code-dependency.md`): Dependency verification
 - [[Collaboration]] (`collaboration.md`): Collaboration validation
 
@@ -453,19 +453,3 @@ describe('User Management Integration', () => {
 **Priority**: High (critical for quality assurance)
 **Estimated Effort**: 3-4 weeks
 **Dependencies**: Test framework integration, test discovery, coverage analysis
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:68
-- [[Test Coverage]] → /home/user/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:69
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:137
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:138
-- [[Collaboration]] → /home/user/tsdoc-edge/managed/relationships/collaboration.md:184
-- [[Collaboration]] → /home/user/tsdoc-edge/managed/relationships/collaboration.md:185
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:320
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:136
-

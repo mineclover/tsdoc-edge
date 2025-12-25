@@ -19,15 +19,4 @@ SSOT validation and completeness checking.
 ## Related
 
 - [[SSOT]]: Single Source of Truth
-- [[Missing Link Detector]]: Link detection
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:175
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:176
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:177
-
+- Missing Link Detector: Link detection

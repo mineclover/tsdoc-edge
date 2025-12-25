@@ -253,7 +253,7 @@ tsdoc-edge analyze-conceptual --find-gaps
 **Complements**:
 - [[Feature Grouping]]: Features implement concepts
 - [[Doc Reference]]: Documents explain concepts
-- [[Enhancement]]: Enhancements improve concepts
+- Enhancement: Enhancements improve concepts
 
 **Enables**:
 - Domain-Driven Design (DDD)
@@ -323,8 +323,8 @@ interface ConceptualMetrics {
 
 - [[Feature Grouping]] (`feature-grouping.md`): Feature-level grouping
 - [[Doc Reference]] (`doc-reference.md`): Documentation connections
-- [[Enhancement]] (`enhancement.md`): Concept improvements
-- [[Composition]] (`COMPOSITION.md`): Implementation structure
+- Enhancement (`enhancement.md`): Concept improvements
+- [[Composition Relationship]] (`COMPOSITION.md`): Implementation structure
 
 ## Tags
 
@@ -343,12 +343,5 @@ interface ConceptualMetrics {
 
 ### Referenced By
 
-- [[Doc Reference]] → /home/user/tsdoc-edge/managed/relationships/doc-reference.md:60
-- [[Doc Reference]] → /home/user/tsdoc-edge/managed/relationships/doc-reference.md:61
-- [[Enhancement]] → /home/user/tsdoc-edge/managed/relationships/enhancement.md:68
-- [[Enhancement]] → /home/user/tsdoc-edge/managed/relationships/enhancement.md:69
-- [[Feature Grouping]] → /home/user/tsdoc-edge/managed/relationships/feature-grouping.md:173
-- [[Feature Grouping]] → /home/user/tsdoc-edge/managed/relationships/feature-grouping.md:196
-- [[Feature Grouping]] → /home/user/tsdoc-edge/managed/relationships/feature-grouping.md:197
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:317
+- [[Feature Grouping]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/feature-grouping.md:173
 

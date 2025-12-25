@@ -1,4 +1,4 @@
-# [[SymbolFootnoteRef]]
+# SymbolFootnoteRef
 
 **Source**: `src/types/feature/doc-symbol.ts`
 
@@ -8,7 +8,7 @@ Type for symbol footnote references in documentation.
 
 ## Type Definition
 
-See [[SymbolFootnoteRef]] implementation in source code.
+See SymbolFootnoteRef implementation in source code.
 
 ## Syntax
 
@@ -17,11 +17,11 @@ See [[SymbolFootnoteRef]] implementation in source code.
 
 ## Usage
 
-Part of [[ParsedDocSymbols]] as the `symbolFootnoteRefs` array field.
+Part of ParsedDocSymbols as the `symbolFootnoteRefs` array field.
 
 ## Related
 
-- [[ParsedDocSymbols]] - Contains this type
+- ParsedDocSymbols - Contains this type
 
 ---
 
@@ -34,13 +34,6 @@ Part of [[ParsedDocSymbols]] as the `symbolFootnoteRefs` array field.
 
 ### Referenced By
 
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:60
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:89
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:90
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:91
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:92
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:93
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:94
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:95
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:96
+- ParsedDocSymbols → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:60
+- SymbolFootnoteRef → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:11
 

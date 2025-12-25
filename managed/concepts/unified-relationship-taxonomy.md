@@ -581,41 +581,11 @@ db.queryRelationships({
 
 ### Referenced By
 
-- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:212
-- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:281
-- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:282
-- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:225
-- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:242
-- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:279
-- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:280
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:273
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:274
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:275
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:203
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:214
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:215
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:216
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:217
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:218
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:74
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:75
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:76
-- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:178
-- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:186
-- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:187
-- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:188
-- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:189
-- [[Composition Relationship]] → /home/user/tsdoc-edge/managed/relationships/COMPOSITION.md:190
-- [[Relationship Standard Format]] → /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:168
-- [[Relationship Standard Format]] → /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:209
-- [[Relationship Standard Format]] → /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:210
-- [[Relationship Standard Format]] → /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:211
-- [[Relationship Standard Format]] → /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:212
-- [[Relationship Standard Format]] → /home/user/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:213
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:86
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:87
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:88
-- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:399
-- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:448
-- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:449
+- [[CallGraphAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:212
+- [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:225
+- [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:242
+- [[Callback Pattern]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/CALLBACK.md:203
+- [[Composition Relationship]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/COMPOSITION.md:178
+- [[Relationship Standard Format]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:220
+- [[Relationship System Roadmap]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:401
 

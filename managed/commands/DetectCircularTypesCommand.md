@@ -83,37 +83,14 @@ Uses DFS (Depth-First Search) to detect cycles:
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:250
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:386
-- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:101
-- [[TypeDependencyAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:102
-- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:82
-- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:110
-- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:111
-- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:112
-- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:113
-- [[FindRootTypesCommand]] → /home/user/tsdoc-edge/managed/commands/FindRootTypesCommand.md:114
-- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:32
-- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:33
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:89
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:158
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:159
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:203
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:291
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:292
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:153
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:251
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:252
-- [[Circular Dependency]] → /home/user/tsdoc-edge/managed/relationships/CIRCULAR.md:8
-- [[Circular Dependency]] → /home/user/tsdoc-edge/managed/relationships/CIRCULAR.md:27
-- [[Circular Dependency]] → /home/user/tsdoc-edge/managed/relationships/CIRCULAR.md:28
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:142
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:258
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:259
-- [[TypeChain]] → /home/user/tsdoc-edge/managed/types/TypeChain.md:58
-- [[TypeChain]] → /home/user/tsdoc-edge/managed/types/TypeChain.md:69
-- [[TypeChain]] → /home/user/tsdoc-edge/managed/types/TypeChain.md:70
-- [[MermaidGenerator]] → /home/user/tsdoc-edge/managed/utilities/MermaidGenerator.md:92
-- [[MermaidGenerator]] → /home/user/tsdoc-edge/managed/utilities/MermaidGenerator.md:105
-- [[MermaidGenerator]] → /home/user/tsdoc-edge/managed/utilities/MermaidGenerator.md:106
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:72
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:304
+- [[FindRootTypesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/FindRootTypesCommand.md:82
+- [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:89
+- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:203
+- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:153
+- [[Circular Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/CIRCULAR.md:8
+- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:144
+- TypeChain → /Users/junwoobang/workflow/tsdoc-edge/managed/types/TypeChain.md:70
+- MermaidGenerator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/MermaidGenerator.md:92
 

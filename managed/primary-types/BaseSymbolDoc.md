@@ -1,4 +1,4 @@
-# [[BaseSymbolDoc]]
+# BaseSymbolDoc
 
 **Source**: `src/types/tags/enhanced.ts`
 
@@ -8,7 +8,7 @@ Base type for symbol documentation with core metadata fields.
 
 ## Type Definition
 
-See [[BaseSymbolDoc]] implementation in source code.
+See BaseSymbolDoc implementation in source code.
 
 ## Fields
 
@@ -19,7 +19,7 @@ See [[BaseSymbolDoc]] implementation in source code.
 
 ## Usage
 
-Extended by [[EnhancedSymbolDoc]] which adds:
+Extended by EnhancedSymbolDoc which adds:
 - `problemSolving`: Problem-solving documentation
 - `functionality`: Functionality details
 - `errorExperiences`: Known errors and solutions
@@ -29,8 +29,8 @@ Extended by [[EnhancedSymbolDoc]] which adds:
 
 ## Related
 
-- [[EnhancedSymbolDoc]] - Extends this base type
-- [[ProblemSolving]] - Category 1
+- EnhancedSymbolDoc - Extends this base type
+- ProblemSolving - Category 1
 - [[Functionality]] - Category 2
 
 ---
@@ -44,19 +44,7 @@ Extended by [[EnhancedSymbolDoc]] which adds:
 
 ### Referenced By
 
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:143
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:224
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:225
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:226
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:227
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:228
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:229
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:230
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:231
-- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:80
-- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:81
-- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:82
-- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:73
-- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:74
-- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:75
+- BaseSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:11
+- EnhancedSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:27
+- EnhancedSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:130
 

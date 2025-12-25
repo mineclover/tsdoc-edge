@@ -72,25 +72,25 @@ type RelationshipCategory =
 
 ### Direction
 
-See implementation: [[RelationshipDirection]]
+See implementation: RelationshipDirection
 
 **3 types**: unidirectional (A → B), bidirectional (A ↔ B), undirected (A — B)
 
 ### Strength
 
-See implementation: [[RelationshipStrength]]
+See implementation: RelationshipStrength
 
 **3 levels**: strong (direct, explicit), medium (indirect, inferred), weak (loose, potential)
 
 ## Discovery Method
 
-See implementation: [[DiscoveryMethod]]
+See implementation: DiscoveryMethod
 
 **Methods**: static-analysis, ast-parsing, test-analysis, documentation, runtime-trace, type-inference
 
 ## Relationship Evidence
 
-See implementation: [[RelationshipEvidence]]
+See implementation: RelationshipEvidence
 
 **Properties**:
 - `type`: Evidence type (code, documentation, test, trace, type-signature)
@@ -101,17 +101,17 @@ See implementation: [[RelationshipEvidence]]
 
 ## Unified Relationship
 
-See implementation: [[UnifiedRelationship]]
+See implementation: [[UnifiedRelationships]]
 
 **Core Properties**:
 - `id`: Unique identifier
-- `type`: [[RelationshipType]]
-- `category`: [[RelationshipCategory]]
+- `type`: RelationshipType
+- `category`: RelationshipCategory
 - `sourceId`, `targetId`: Source and target symbols
-- `direction`: [[RelationshipDirection]]
-- `strength`: [[RelationshipStrength]]
-- `discoveryMethod`: [[DiscoveryMethod]]
-- `evidence`: Array of [[RelationshipEvidence]]
+- `direction`: RelationshipDirection
+- `strength`: RelationshipStrength
+- `discoveryMethod`: DiscoveryMethod
+- `evidence`: Array of RelationshipEvidence
 - `metadata`: Additional properties (optional)
 - `createdAt`, `verifiedAt`: Timestamps
 
@@ -119,7 +119,7 @@ For complete specification, see [[Relationship Standard Format]]
 
 ## Relationship Query
 
-See implementation: [[RelationshipQuery]]
+See implementation: RelationshipQuery
 
 **Query Parameters**:
 - `sourceId`, `targetId`: Filter by source/target symbols
@@ -203,23 +203,6 @@ interface RelationshipGraph {
 
 ### Referenced By
 
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:371
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:419
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:420
-- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:64
-- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:65
-- [[AnalyzeCallsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:66
-- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:62
-- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:63
-- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:64
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:55
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:56
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:57
-- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:184
-- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:215
-- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:216
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:128
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:436
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:437
-- [[Analyzer Development Guide]] → /home/user/tsdoc-edge/managed/guides/analyzer-development-guide.md:249
+- [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:128
+- [[Analyzer Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:261
 

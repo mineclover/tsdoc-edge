@@ -1,4 +1,4 @@
-# [[CommentStateTypes]]
+# CommentStateTypes
 
 **Source**: `src/types/state/comment.ts`
 
@@ -8,7 +8,7 @@ Type system for comment fold/unfold operations.
 
 ## Comment Status
 
-See implementation: [[CommentStatus]]
+See implementation: CommentStatus
 
 **Values**:
 - **expanded**: Full comment visible in code
@@ -18,7 +18,7 @@ See implementation: [[CommentStatus]]
 
 Position in source file:
 
-See implementation: [[CommentLocation]]
+See implementation: CommentLocation
 
 **Key Properties**:
 - `filePath`: Relative to project root
@@ -30,7 +30,7 @@ See implementation: [[CommentLocation]]
 
 State of a single comment:
 
-See implementation: [[CommentState]]
+See implementation: CommentState
 
 **Key Properties**:
 - `id`: Unique identifier
@@ -47,7 +47,7 @@ See implementation: [[CommentState]]
 
 All comments in a file:
 
-See implementation: [[FileCommentState]]
+See implementation: FileCommentState
 
 **Key Properties**:
 - `filePath`: File path
@@ -59,7 +59,7 @@ See implementation: [[FileCommentState]]
 
 Persistent storage structure:
 
-See implementation: [[StateStorage]]
+See implementation: StateStorage
 
 **Key Properties**:
 - `version`: Storage format version
@@ -70,7 +70,7 @@ See implementation: [[StateStorage]]
 
 ### Collapse Options
 
-See implementation: [[CollapseOptions]]
+See implementation: CollapseOptions
 
 **Key Properties**:
 - `exportDir`: Where to export markdown (optional)
@@ -80,7 +80,7 @@ See implementation: [[CollapseOptions]]
 
 ### Expand Options
 
-See implementation: [[ExpandOptions]]
+See implementation: ExpandOptions
 
 **Key Properties**:
 - `restoreDir`: Where to import from (optional)
@@ -91,7 +91,7 @@ See implementation: [[ExpandOptions]]
 
 ### Export Result
 
-See implementation: [[ExportResult]]
+See implementation: ExportResult
 
 **Key Properties**:
 - `exportedCount`: Number of exported comments
@@ -100,7 +100,7 @@ See implementation: [[ExportResult]]
 
 ### Import Result
 
-See implementation: [[ImportResult]]
+See implementation: ImportResult
 
 **Key Properties**:
 - `importedCount`: Number of imported comments
@@ -112,7 +112,7 @@ See implementation: [[ImportResult]]
 
 Quick status check:
 
-See implementation: [[FileStatusSummary]]
+See implementation: FileStatusSummary
 
 **Key Properties**:
 - `filePath`: File path
@@ -175,23 +175,6 @@ contentHash = sha256(fullComment);
 
 ## Related
 
-- [[CommentStateManager]]: Manages state
-- [[CommentExporter]]: Exports to markdown
-- [[CommentImporter]]: Imports from markdown
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[CommentExporter]] → /home/user/tsdoc-edge/managed/fold/CommentExporter.md:41
-- [[CommentExporter]] → /home/user/tsdoc-edge/managed/fold/CommentExporter.md:42
-- [[CommentExporter]] → /home/user/tsdoc-edge/managed/fold/CommentExporter.md:43
-- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:41
-- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:42
-- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:43
-- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:41
-- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:42
-- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:43
-
+- CommentStateManager: Manages state
+- CommentExporter: Exports to markdown
+- CommentImporter: Imports from markdown

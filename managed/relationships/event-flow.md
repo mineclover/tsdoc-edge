@@ -114,21 +114,8 @@ tsdoc-edge analyze-events --trace user:created
 
 ### Referenced By
 
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:134
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:140
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:227
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:228
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:229
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:230
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:231
-- [[Callback Pattern]] → /home/user/tsdoc-edge/managed/relationships/CALLBACK.md:232
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:122
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:123
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:69
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:70
-- [[Collaboration]] → /home/user/tsdoc-edge/managed/relationships/collaboration.md:133
-- [[Collaboration]] → /home/user/tsdoc-edge/managed/relationships/collaboration.md:163
-- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:41
-- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:86
-- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:87
+- [[Callback Pattern]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/CALLBACK.md:134
+- [[Callback Pattern]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/CALLBACK.md:140
+- [[Collaboration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/collaboration.md:133
+- [[Collaboration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/collaboration.md:163
 

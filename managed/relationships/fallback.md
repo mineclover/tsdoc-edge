@@ -210,8 +210,8 @@ try {
 ## Related
 
 - [[Substitution]] (`substitution.md`): Equal alternatives
-- [[Error Handling]]: Exception handling patterns
-- [[Resilience]]: System reliability patterns
+- Error Handling: Exception handling patterns
+- Resilience: System reliability patterns
 
 ## Tags
 
@@ -229,8 +229,6 @@ try {
 
 ### Referenced By
 
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:318
-- [[Substitution]] → /home/user/tsdoc-edge/managed/relationships/substitution.md:131
-- [[Substitution]] → /home/user/tsdoc-edge/managed/relationships/substitution.md:165
-- [[Substitution]] → /home/user/tsdoc-edge/managed/relationships/substitution.md:188
+- [[Substitution]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/substitution.md:131
+- [[Substitution]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/substitution.md:165
 

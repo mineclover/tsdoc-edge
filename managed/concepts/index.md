@@ -18,8 +18,8 @@ TSDoc Edge의 설계 원칙, 이론적 기반, 핵심 개념을 설명하는 문
 
 ## Foundational Concepts (핵심 개념)
 
-### [[SSOT]]
-**Path**: `ssot.md`
+### SSOT
+**Path**: `ssot.md` (planned)
 **Priority**: ⭐⭐⭐ Critical
 
 Single Source of Truth - 모든 정보는 정확히 하나의 출처를 가진다.
@@ -141,8 +141,21 @@ Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.
 
 ---
 
-### [[Enhanced Database Schema]]
-**Path**: `enhanced-database-schema.md`
+### [[Relationship Ontology]]
+**Path**: `relationship-ontology.md`
+**Priority**: ⭐⭐ High
+
+관계 타입 간의 의미적 연결과 추론 규칙 정의.
+
+**Key Features**:
+- 관계 타입 계층 구조
+- 의미적 추론 규칙
+- 암시적 관계 도출
+
+---
+
+### Enhanced Database Schema
+**Path**: `enhanced-database-schema.md` (planned)
 **Priority**: ⭐ Design
 
 심볼, 관계, 타입 정보 추적을 위한 향상된 데이터베이스 설계.
@@ -162,8 +175,8 @@ Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.
 
 ## Quality Concepts (품질 개념)
 
-### [[Work Context Reliability]]
-**Path**: `work-context-reliability.md`
+### Work Context Reliability
+**Path**: `work-context-reliability.md` (planned)
 **Priority**: ⭐⭐ High
 
 Work Context 명령어의 신뢰성을 보장하는 원칙.
@@ -204,8 +217,8 @@ Work Context 명령어의 신뢰성을 보장하는 원칙.
 
 ## Theory Concepts (이론 개념)
 
-### [[Parallel Work Theory]]
-**Path**: `parallel-work-theory.md`
+### Parallel Work Theory
+**Path**: `parallel-work-theory.md` (planned)
 **Priority**: ⭐ Theory
 
 병렬 작업 가능성 탐지 이론.
@@ -231,34 +244,34 @@ tsdoc-edge analyze-parallel --task-list tasks.json
 
 | Concept | Type | Priority | Status |
 |---------|------|----------|--------|
-| [[SSOT]] | Foundational | Critical | ✅ Active |
+| SSOT | Foundational | Critical | 📋 Planned |
 | [[Symbol Reference System]] | Foundational | Critical | ✅ Active |
 | [[Document Symbol System]] | Foundational | High | ✅ Active |
 | [[Module Specification Framework]] | Architecture | High | ✅ Active |
 | [[Unified Relationship Taxonomy]] | Architecture | High | ✅ Active |
-| [[Enhanced Database Schema]] | Architecture | Design | 📋 Design |
-| [[Work Context Reliability]] | Quality | High | ✅ Active |
-| [[Integration Test Traceability]] | Quality | Design | 📋 Design |
-| [[Parallel Work Theory]] | Theory | Theory | 📋 Theory |
+| Enhanced Database Schema | Architecture | Design | 📋 Planned |
+| Work Context Reliability | Quality | High | 📋 Planned |
+| [[Integration Test Traceability]] | Quality | Design | ✅ Active |
+| Parallel Work Theory | Theory | Theory | 📋 Planned |
 
 ---
 
 ## Learning Path
 
 ### For Beginners
-1. [[SSOT]] (5 min) - 가장 중요한 원칙
+1. SSOT (5 min) - 가장 중요한 원칙
 2. [[Symbol Reference System]] (10 min) - 참조 시스템 이해
 3. [[Document Symbol System]] (10 min) - 실전 적용
 
 ### For Architects
 1. [[Module Specification Framework]] (15 min)
 2. [[Unified Relationship Taxonomy]] (20 min)
-3. [[Enhanced Database Schema]] (15 min)
+3. Enhanced Database Schema (15 min) - planned
 
 ### For Contributors
-1. [[Work Context Reliability]] (10 min)
+1. Work Context Reliability (10 min) - planned
 2. [[Integration Test Traceability]] (10 min)
-3. [[Parallel Work Theory]] (10 min)
+3. Parallel Work Theory (10 min) - planned
 
 ---
 
@@ -268,55 +281,3 @@ tsdoc-edge analyze-parallel --task-list tasks.json
 - **[[Workflows Index]]** (`/managed/workflows/index.md`) - Practical workflows
 - **[[Guides & Tutorials]]** (`/managed/guides/index.md`) - Learning resources
 - **[[Relationship Types]]** (`/managed/relationships/index.md`) - Relationship system
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:198
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:199
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:200
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:201
-- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:204
-- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:205
-- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:206
-- [[Enhanced Database Schema]] → /home/user/tsdoc-edge/managed/concepts/enhanced-database-schema.md:207
-- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:184
-- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:185
-- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:186
-- [[Integration Test Traceability]] → /home/user/tsdoc-edge/managed/concepts/integration-test-traceability.md:187
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:274
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:275
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:276
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:277
-- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:274
-- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:275
-- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:276
-- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:277
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:193
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:194
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:195
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:196
-- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:187
-- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:188
-- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:189
-- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:190
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:475
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:476
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:477
-- [[Unified Relationship Taxonomy]] → /home/user/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:478
-- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:200
-- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:201
-- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:202
-- [[Work Context Reliability]] → /home/user/tsdoc-edge/managed/concepts/work-context-reliability.md:203
-- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:235
-- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:236
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:449
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:450
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:268
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:269
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:207
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:208
-

@@ -1,4 +1,4 @@
-# [[ConventionValidator]]
+# ConventionValidator
 
 **Source**: `src/validator/ConventionValidator.ts`
 
@@ -110,7 +110,7 @@ Required:
 
 ## Validation Result
 
-See implementation: [[ValidationResult]]
+See implementation: ValidationResult
 
 **Key Properties**:
 - `ruleId`: Rule identifier
@@ -226,8 +226,8 @@ tsdoc-edge validate --strict --json > report.json
 
 ## Related
 
-- [[ModuleSpecValidator]]: Validates module specs
-- [[StrictModeValidator]]: Strict mode enforcement
+- ModuleSpecValidator: Validates module specs
+- StrictModeValidator: Strict mode enforcement
 - [[ValidateCommand]]: CLI validation
 
 ---
@@ -236,18 +236,5 @@ tsdoc-edge validate --strict --json > report.json
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:175
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:497
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:311
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:312
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:313
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:194
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:423
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:424
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:78
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:79
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:80
-- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:147
-- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:148
-- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:149
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:238
 

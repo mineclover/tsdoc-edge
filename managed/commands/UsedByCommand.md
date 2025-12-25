@@ -188,53 +188,15 @@ tsdoc-edge used-by symbol-extractor
 
 ### Referenced By
 
-- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:74
-- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:75
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:104
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:139
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:140
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:141
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:142
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:165
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:166
-- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:114
-- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:150
-- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:151
-- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:152
-- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:153
-- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:154
-- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:155
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:262
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:263
-- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:79
-- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:143
-- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:144
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:86
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:138
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:166
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:167
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:168
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:169
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:170
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:171
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:172
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:97
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:151
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:171
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:172
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:173
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:174
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:175
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:176
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:177
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:290
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:291
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:292
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:293
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:262
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:263
+- [[DepsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/DepsCommand.md:104
+- [[WhoUsesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WhoUsesCommand.md:114
+- [[Dead Code Detection]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DeadCodeDetection.md:79
+- [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:86
+- [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:138
+- [[Impact Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/ImpactAnalysis.md:97
+- [[Impact Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/ImpactAnalysis.md:151
 
 ### Implemented By
 
-- UsedByCommand → /home/user/tsdoc-edge/src/commands/UsedByCommand.ts:39
+- UsedByCommand → /Users/junwoobang/workflow/tsdoc-edge/src/commands/UsedByCommand.ts:39
 

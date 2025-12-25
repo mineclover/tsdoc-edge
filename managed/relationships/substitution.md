@@ -266,8 +266,8 @@ class Penguin extends Bird {
 
 **Enables**:
 - [[Fallback]]: Substitution enables fallback strategies
-- [[Alternative]]: Substitution provides alternatives
-- [[Polymorphism]]: Runtime substitution via polymorphism
+- Alternative: Substitution provides alternatives
+- Polymorphism: Runtime substitution via polymorphism
 
 **Requires**:
 - [[Interface Implementation]]: Interface defines contract
@@ -338,7 +338,7 @@ interface SubstitutionMetrics {
 - [[Interface Implementation]] (`INTERFACE-IMPL.md`): Enables substitution
 - [[Inheritance]] (`INHERITANCE.md`): Base class substitution
 - [[Type Dependency]] (`TYPE-DEPENDENCY.md`): Type-based substitution
-- [[Composition]] (`COMPOSITION.md`): Composition over substitution
+- [[Composition Relationship]] (`COMPOSITION.md`): Composition over substitution
 
 ## Tags
 
@@ -357,16 +357,7 @@ interface SubstitutionMetrics {
 
 ### Referenced By
 
-- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:50
-- [[Inheritance]] → /home/user/tsdoc-edge/managed/relationships/INHERITANCE.md:51
-- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:41
-- [[Interface Implementation]] → /home/user/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:42
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:68
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:69
-- [[Fallback]] → /home/user/tsdoc-edge/managed/relationships/fallback.md:106
-- [[Fallback]] → /home/user/tsdoc-edge/managed/relationships/fallback.md:126
-- [[Fallback]] → /home/user/tsdoc-edge/managed/relationships/fallback.md:127
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:322
-- [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:106
-- [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:123
+- [[Fallback]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/fallback.md:106
+- [[Mutual Exclusion]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/mutual-exclusion.md:106
+- [[Mutual Exclusion]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/mutual-exclusion.md:123
 

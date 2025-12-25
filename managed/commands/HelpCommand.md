@@ -18,4 +18,4 @@ Display help information for CLI commands.
 
 ## Related
 
-- [[Command Registry]]: Command lookup
+- [[CommandRegistry]]: Command lookup

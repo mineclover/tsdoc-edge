@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# [[EnhancedSymbolDoc]]
+# EnhancedSymbolDoc
 
 > **6-category enhanced documentation** type for comprehensive symbol documentation
 
@@ -29,15 +29,15 @@ Extends basic symbol documentation with structured metadata across 6 categories,
 
 ## Type Definition
 
-See [[EnhancedSymbolDoc]] implementation in source code.
+See EnhancedSymbolDoc implementation in source code.
 
-**Base Type**: See [[BaseSymbolDoc]]
+**Base Type**: See BaseSymbolDoc
 
 ## The 6 Categories
 
 ### 1. Problem Solving
 
-**Type**: See [[ProblemSolving]]
+**Type**: See ProblemSolving
 
 **Purpose**: Describes what problem this symbol solves
 
@@ -94,7 +94,7 @@ See [[EnhancedSymbolDoc]] implementation in source code.
 
 ### 3. Error Experiences
 
-**Type**: See [[ErrorExperience]][]
+**Type**: See ErrorExperience[]
 
 **Purpose**: Documents errors encountered and solutions
 
@@ -123,7 +123,7 @@ See [[EnhancedSymbolDoc]] implementation in source code.
 
 ### 4. Decisions
 
-**Type**: See [[DecisionRecord]][]
+**Type**: See DecisionRecord[]
 
 **Purpose**: Records architectural decisions (ADRs)
 
@@ -158,7 +158,7 @@ See [[EnhancedSymbolDoc]] implementation in source code.
 
 ### 5. Dependencies
 
-**Type**: See [[DependencySpec]][]
+**Type**: See DependencySpec[]
 
 **Purpose**: Lists dependencies and their reasons
 
@@ -191,7 +191,7 @@ See [[EnhancedSymbolDoc]] implementation in source code.
 
 ### 6. Future Plans
 
-**Type**: See [[FuturePlan]][]
+**Type**: See FuturePlan[]
 
 **Purpose**: Documents planned improvements (TODOs)
 
@@ -251,7 +251,7 @@ See [[EnhancedSymbolDoc]] implementation in source code.
 -  **Required**: Future Plans
 
 **Validation**:
-- Use [[StrictModeValidator]] to check compliance
+- Use StrictModeValidator to check compliance
 - Generates compliance score (0-100)
 - Lists missing/incomplete categories
 
@@ -314,19 +314,19 @@ if (!result.isCompliant) {
 
 ## Related Types
 
-- [[BaseSymbolDoc]] - Base documentation interface
-- [[ProblemSolving]] - Category 1 type
+- BaseSymbolDoc - Base documentation interface
+- ProblemSolving - Category 1 type
 - [[Functionality]] - Category 2 type
-- [[ErrorExperience]] - Category 3 type
-- [[DecisionRecord]] - Category 4 type
-- [[DependencySpec]] - Category 5 type
-- [[FuturePlan]] - Category 6 type
-- [[StrictModeValidation]] - Validation result type
+- ErrorExperience - Category 3 type
+- DecisionRecord - Category 4 type
+- DependencySpec - Category 5 type
+- FuturePlan - Category 6 type
+- StrictModeValidation - Validation result type
 
 ## Related Components
 
-- [[EnhancedDocExtractor]] (`../parser/EnhancedDocExtractor.md`) - Extracts from source code
-- [[StrictModeValidator]] (`../analyzers/StrictModeValidator.md`) - Validates compliance
+- EnhancedDocExtractor (`../parser/EnhancedDocExtractor.md`) - Extracts from source code
+- StrictModeValidator (`../analyzers/StrictModeValidator.md`) - Validates compliance
 - [[EnhancedMarkdownGenerator]] - Generates markdown from EnhancedSymbolDoc
 - [[DatabaseManager]] (`../core-components/DatabaseManager.md`) - Stores enhanced docs
 
@@ -514,91 +514,23 @@ console.log(validator.generateReport(result));
 
 ### Referenced By
 
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:240
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:288
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:289
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:290
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:291
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:292
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:293
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:294
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:295
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:127
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:362
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:363
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:364
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:365
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:366
-- [[EnhancedMarkdownGenerator]] → /home/user/tsdoc-edge/managed/generator/EnhancedMarkdownGenerator.md:31
-- [[EnhancedMarkdownGenerator]] → /home/user/tsdoc-edge/managed/generator/EnhancedMarkdownGenerator.md:32
-- [[EnhancedMarkdownGenerator]] → /home/user/tsdoc-edge/managed/generator/EnhancedMarkdownGenerator.md:33
-- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:207
-- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:273
-- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:274
-- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:275
-- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:276
-- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:277
-- [[BaseSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:22
-- [[BaseSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:28
-- [[BaseSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:43
-- [[BaseSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:44
-- [[BaseSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:45
-- [[BaseSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:46
-- [[BaseSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:47
-- [[BaseSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:48
-- [[BaseSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:49
-- [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:27
-- [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:39
-- [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:64
-- [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:65
-- [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:66
-- [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:67
-- [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:68
-- [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:69
-- [[DecisionRecord]] → /home/user/tsdoc-edge/managed/primary-types/DecisionRecord.md:70
-- [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:24
-- [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:36
-- [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:61
-- [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:62
-- [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:63
-- [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:64
-- [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:65
-- [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:66
-- [[DependencySpec]] → /home/user/tsdoc-edge/managed/primary-types/DependencySpec.md:67
-- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:25
-- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:37
-- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:67
-- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:68
-- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:69
-- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:70
-- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:71
-- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:72
-- [[ErrorExperience]] → /home/user/tsdoc-edge/managed/primary-types/ErrorExperience.md:73
-- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:44
-- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:60
-- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:93
-- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:94
-- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:95
-- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:96
-- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:97
-- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:98
-- [[Functionality]] → /home/user/tsdoc-edge/managed/primary-types/Functionality.md:99
-- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:26
-- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:38
-- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:68
-- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:69
-- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:70
-- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:71
-- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:72
-- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:73
-- [[FuturePlan]] → /home/user/tsdoc-edge/managed/primary-types/FuturePlan.md:74
-- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:37
-- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:53
-- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:86
-- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:87
-- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:88
-- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:89
-- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:90
-- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:91
-- [[ProblemSolving]] → /home/user/tsdoc-edge/managed/primary-types/ProblemSolving.md:92
+- StrictModeValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/StrictModeValidator.md:240
+- [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:127
+- EnhancedDocExtractor → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:207
+- BaseSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:22
+- BaseSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:32
+- DecisionRecord → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/DecisionRecord.md:27
+- DecisionRecord → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/DecisionRecord.md:39
+- DependencySpec → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/DependencySpec.md:24
+- DependencySpec → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/DependencySpec.md:36
+- EnhancedSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:25
+- ErrorExperience → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ErrorExperience.md:25
+- ErrorExperience → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ErrorExperience.md:37
+- [[Functionality]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/Functionality.md:44
+- [[Functionality]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/Functionality.md:60
+- FuturePlan → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/FuturePlan.md:26
+- FuturePlan → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/FuturePlan.md:38
+- ProblemSolving → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ProblemSolving.md:37
+- ProblemSolving → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ProblemSolving.md:53
+- EnhancedTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/EnhancedTagTypes.md:121
 

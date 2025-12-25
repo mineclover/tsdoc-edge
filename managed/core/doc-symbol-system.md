@@ -123,7 +123,7 @@ class BacklinkGenerator {
 
 **Source**: `src/doc-symbol/BacklinkGenerator.ts`
 
-### [[SymbolReferenceGenerator]]
+### SymbolReferenceGenerator
 
 각주 형식 참조 생성
 
@@ -140,7 +140,7 @@ class SymbolReferenceGenerator {
 
 **Source**: `src/doc-symbol/SymbolReferenceGenerator.ts`
 
-### [[SymbolReferenceResolver]]
+### SymbolReferenceResolver
 
 심볼 참조를 코드/문서 위치로 해석
 
@@ -176,7 +176,7 @@ See also:
 - [[Yet Another]]
 
 ## References
-[^sym-001]: [[SymbolName]] - 설명    <!-- Footnote reference -->
+[^sym-001]: SymbolName - 설명    <!-- Footnote reference -->
 ```
 
 ### 심볼 유형
@@ -253,7 +253,7 @@ interface DocSymbolValidation {
 
 ## 설계 의사결정
 
-### [[ADR-007: SSOT via Primary Symbol]]
+### ADR-007: SSOT via Primary Symbol]]
 
 ```
 @decision H1 [[Symbol]]만 Primary 정의로 인정
@@ -267,7 +267,7 @@ interface DocSymbolValidation {
   - 명확한 SSOT 보장
 ```
 
-### [[ADR-008: Automatic Backlinks]]
+### ADR-008: Automatic Backlinks]]
 
 ```
 @decision Backlinks 섹션 자동 생성

@@ -56,7 +56,7 @@ Validator System은 코드와 문서의 품질을 다양한 관점에서 검증�
 
 ## 핵심 컴포넌트
 
-### [[ConnectivityValidator]]
+### ConnectivityValidator
 
 SSOT 연결성을 분석하고 검증
 
@@ -78,7 +78,7 @@ class ConnectivityValidator {
 
 **Source**: `src/validator/ConnectivityValidator.ts`
 
-### [[ConventionValidator]]
+### ConventionValidator
 
 네이밍 및 문서화 컨벤션 검증
 
@@ -98,7 +98,7 @@ class ConventionValidator {
 
 **Source**: `src/validator/ConventionValidator.ts`
 
-### [[StrictModeValidator]]
+### StrictModeValidator
 
 엄격 모드에서 추가 규칙 적용
 
@@ -116,7 +116,7 @@ class StrictModeValidator {
 
 **Source**: `src/validator/StrictModeValidator.ts`
 
-### [[ModuleSpecValidator]]
+### ModuleSpecValidator
 
 모듈 명세 완성도 검증
 
@@ -347,4 +347,11 @@ issues.forEach(issue => {
 ---
 
 ## Backlinks
-<!-- 이 섹션은 자동 생성됩니다 -->
+
+### Referenced By
+
+- [[Analyzer System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/analyzer-system.md:235
+- [[Parser System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/parser-system.md:180
+- [[Spec Management System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/spec-management-system.md:187
+- [[Symbol Graph System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/symbol-graph.md:121
+

@@ -1,4 +1,4 @@
-# [[SpecVersionManager]]
+# SpecVersionManager
 
 **Source**: `src/spec/SpecVersionManager.ts`
 
@@ -86,7 +86,7 @@ tsdoc-edge spec-bump managed/features/work-context.md --minor
 
 ## Related
 
-- [[SpecStatusManager]]: Manages spec lifecycle
+- SpecStatusManager: Manages spec lifecycle
 - (Planned: SpecHistoryCommand for viewing version history)
 - (Planned: SpecDiffCommand for comparing versions)
 - (Planned: SpecBumpCommand for bumping versions)
@@ -97,10 +97,5 @@ tsdoc-edge spec-bump managed/features/work-context.md --minor
 
 ### Referenced By
 
-- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:67
-- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:83
-- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:84
-- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:85
-- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:86
-- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:87
+- SpecStatusManager → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SpecStatusManager.md:67
 

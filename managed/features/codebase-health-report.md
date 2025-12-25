@@ -168,7 +168,7 @@ This indicates:
 
 ### 7. Data Quality ✅ Excellent
 
-From database quality check (see [[Context Quality Improvements]]):
+From database quality check (see Context Quality Improvements):
 
 ```
 ✅ Duplicate relationships: 0
@@ -408,7 +408,7 @@ TSDoc Edge 코드베이스는 **전반적으로 건강한 상태**입니다:
 
 ## Related
 
-- [[Context Quality Improvements]]: 최근 개선 작업
+- Context Quality Improvements: 최근 개선 작업
 - [[Analyzer Status]]: Analyzer 활성화 상태
 - [[Work Context Workflow]]: 핵심 워크플로우
 - [[Commands Index]]: 전체 명령어 목록
@@ -426,13 +426,7 @@ TSDoc Edge 코드베이스는 **전반적으로 건강한 상태**입니다:
 
 ### Referenced By
 
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:302
-- [[Analyzer Status]] → /home/user/tsdoc-edge/managed/features/analyzer-status.md:296
-- [[Analyzer Status]] → /home/user/tsdoc-edge/managed/features/analyzer-status.md:297
-- [[Context Quality Improvements]] → /home/user/tsdoc-edge/managed/features/context-quality-improvements.md:212
-- [[Context Quality Improvements]] → /home/user/tsdoc-edge/managed/features/context-quality-improvements.md:213
-- [[Phase Commands Refactoring Guide]] → /home/user/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:8
-- [[Phase Commands Refactoring Guide]] → /home/user/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:190
-- [[Phase Commands Refactoring Guide]] → /home/user/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:246
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:268
+- [[Phase Commands Refactoring Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:10
+- [[Phase Commands Refactoring Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:216
+- [[Phase Commands Refactoring Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:274
 

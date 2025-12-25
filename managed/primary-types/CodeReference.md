@@ -20,11 +20,11 @@ See [[CodeReference]] implementation in source code.
 
 ## Usage
 
-Part of [[ParsedDocSymbols]] as the `codeReferences` array field.
+Part of ParsedDocSymbols as the `codeReferences` array field.
 
 ## Related
 
-- [[ParsedDocSymbols]] - Contains this type
+- ParsedDocSymbols - Contains this type
 - [[CodeConnection]] - Code-to-doc references
 
 ---
@@ -38,19 +38,9 @@ Part of [[ParsedDocSymbols]] as the `codeReferences` array field.
 
 ### Referenced By
 
-- [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:29
-- [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:49
-- [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:50
-- [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:51
-- [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:52
-- [[CodeConnection]] → /home/user/tsdoc-edge/managed/primary-types/CodeConnection.md:53
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:59
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:81
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:82
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:83
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:84
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:85
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:86
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:87
-- [[ParsedDocSymbols]] → /home/user/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:88
+- [[Document Symbol Parser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/DocumentSymbolParser.md:63
+- [[CodeConnection]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/CodeConnection.md:29
+- [[CodeReference]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/CodeReference.md:11
+- ParsedDocSymbols → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:59
+- DocumentSymbol → /Users/junwoobang/workflow/tsdoc-edge/managed/types/DocumentSymbol.md:59
 

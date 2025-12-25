@@ -6,7 +6,7 @@ priority: high
 created: 2025-11-26
 ---
 
-# [[Test Coverage Improvement Plan]]
+# Test Coverage Improvement Plan
 
 현재 Analyzer 테스트 커버리지 36.5% → 목표 80% 달성을 위한 계획
 
@@ -129,4 +129,4 @@ npm test -- --watch
 
 - **테스트 프레임워크**: Jest 29.7
 - **테스트 위치**: `src/__tests__/analyzer/`
-- **관련 문서**: [[Testing Strategy]], [[Code Health Checker]]
+- **관련 문서**: Testing Strategy, Code Health Checker

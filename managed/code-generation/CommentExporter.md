@@ -1,4 +1,4 @@
-# [[CommentExporter]]
+# CommentExporter
 
 **Source**: `src/fold/CommentExporter.ts`
 
@@ -19,8 +19,8 @@ Supports:
 
 ## Related
 
-- [[CommentStateManager]]: State management
-- [[CommentImporter]]: Import functionality
+- CommentStateManager: State management
+- CommentImporter: Import functionality
 
 ---
 
@@ -28,19 +28,7 @@ Supports:
 
 ### Referenced By
 
-- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:23
-- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:31
-- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:32
-- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:33
-- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:34
-- [[CommentImporter]] → /home/user/tsdoc-edge/managed/fold/CommentImporter.md:35
-- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:22
-- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:31
-- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:32
-- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:33
-- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:34
-- [[CommentStateManager]] → /home/user/tsdoc-edge/managed/fold/CommentStateManager.md:35
-- [[CommentStateTypes]] → /home/user/tsdoc-edge/managed/types/CommentStateTypes.md:113
-- [[CommentStateTypes]] → /home/user/tsdoc-edge/managed/types/CommentStateTypes.md:122
-- [[CommentStateTypes]] → /home/user/tsdoc-edge/managed/types/CommentStateTypes.md:123
+- CommentImporter → /Users/junwoobang/workflow/tsdoc-edge/managed/code-generation/CommentImporter.md:23
+- CommentStateManager → /Users/junwoobang/workflow/tsdoc-edge/managed/code-generation/CommentStateManager.md:22
+- CommentStateTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/CommentStateTypes.md:177
 

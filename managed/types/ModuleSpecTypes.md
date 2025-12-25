@@ -1,4 +1,4 @@
-# [[ModuleSpecTypes]]
+# ModuleSpecTypes
 
 **Source**: `src/types/spec/module-spec.ts`
 
@@ -10,7 +10,7 @@
 
 ### 1. Purpose - Why It Exists
 
-See implementation: [[ModulePurpose]]
+See implementation: ModulePurpose
 
 **Key Properties**:
 - `problem`: Problem solved
@@ -20,7 +20,7 @@ See implementation: [[ModulePurpose]]
 
 ### 2. Input - What It Accepts
 
-See implementation: [[ModuleInput]]
+See implementation: ModuleInput
 
 **Key Properties**:
 - `parameters`: Parameter specifications
@@ -30,7 +30,7 @@ See implementation: [[ModuleInput]]
 
 ### 3. Output - What It Returns
 
-See implementation: [[ModuleOutput]]
+See implementation: ModuleOutput
 
 **Key Properties**:
 - `returnType`: Return type specification
@@ -40,7 +40,7 @@ See implementation: [[ModuleOutput]]
 
 ### 4. Context - What It Needs
 
-See implementation: [[ModuleContext]]
+See implementation: ModuleContext
 
 **Key Properties**:
 - `dependencies`: Dependency specifications
@@ -50,7 +50,7 @@ See implementation: [[ModuleContext]]
 
 ### 5. Logic - How It Works
 
-See implementation: [[ModuleLogic]]
+See implementation: ModuleLogic
 
 **Key Properties**:
 - `algorithm`: Algorithm description
@@ -60,7 +60,7 @@ See implementation: [[ModuleLogic]]
 
 ### 6. Effect - What It Changes
 
-See implementation: [[ModuleEffect]]
+See implementation: ModuleEffect
 
 **Key Properties**:
 - `sideEffects`: Side effect specifications
@@ -70,7 +70,7 @@ See implementation: [[ModuleEffect]]
 
 ### 7. Scope - What It Exposes
 
-See implementation: [[ModuleScope]]
+See implementation: ModuleScope
 
 **Key Properties**:
 - `exports`: Exported symbols
@@ -82,7 +82,7 @@ See implementation: [[ModuleScope]]
 
 ### Parameter Specification
 
-See implementation: [[ParamSpec]]
+See implementation: ParamSpec
 
 **Key Properties**:
 - `name`: Parameter name
@@ -94,7 +94,7 @@ See implementation: [[ParamSpec]]
 
 ### Return Specification
 
-See implementation: [[ReturnSpec]]
+See implementation: ReturnSpec
 
 **Key Properties**:
 - `type`: Return type
@@ -102,7 +102,7 @@ See implementation: [[ReturnSpec]]
 
 ### Failure Case
 
-See implementation: [[FailureCase]]
+See implementation: FailureCase
 
 **Key Properties**:
 - `condition`: When it fails
@@ -111,7 +111,7 @@ See implementation: [[FailureCase]]
 
 ### Dependency Specification
 
-See implementation: [[DependencySpec]]
+See implementation: DependencySpec
 
 **Key Properties**:
 - `name`: Dependency name
@@ -121,7 +121,7 @@ See implementation: [[DependencySpec]]
 
 ### Import Specification
 
-See implementation: [[ImportSpec]]
+See implementation: ImportSpec
 
 **Key Properties**:
 - `source`: Module path
@@ -130,7 +130,7 @@ See implementation: [[ImportSpec]]
 
 ### Side Effect Specification
 
-See implementation: [[SideEffectSpec]]
+See implementation: SideEffectSpec
 
 **Key Properties**:
 - `type`: 'filesystem', 'database', 'network', 'state', 'process', or 'other'
@@ -139,7 +139,7 @@ See implementation: [[SideEffectSpec]]
 
 ## Complete Module Specification
 
-See implementation: [[ModuleSpecTemplate]]
+See implementation: ModuleSpecTemplate
 
 **Key Properties**:
 - `purpose`: Module purpose
@@ -206,8 +206,8 @@ tsdoc-edge improve src/services/UserService.ts
 
 ## Related
 
-- [[ModuleSpecGenerator]]: Generates specs
-- [[ModuleSpecValidator]]: Validates specs
+- ModuleSpecGenerator: Generates specs
+- ModuleSpecValidator: Validates specs
 - [[ValidateSpecCommand]]: CLI validation
 
 ---
@@ -216,25 +216,8 @@ tsdoc-edge improve src/services/UserService.ts
 
 ### Referenced By
 
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:182
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:218
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:219
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:220
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:221
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:222
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:221
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:284
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:285
-- [[ModuleSpecGenerator]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecGenerator.md:36
-- [[ModuleSpecGenerator]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecGenerator.md:37
-- [[ModuleSpecGenerator]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecGenerator.md:38
-- [[EnhancedTagTypes]] → /home/user/tsdoc-edge/managed/types/EnhancedTagTypes.md:78
-- [[EnhancedTagTypes]] → /home/user/tsdoc-edge/managed/types/EnhancedTagTypes.md:92
-- [[EnhancedTagTypes]] → /home/user/tsdoc-edge/managed/types/EnhancedTagTypes.md:93
-- [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:108
-- [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:120
-- [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:121
-- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:144
-- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:145
-- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:146
+- [[ValidateSpecCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateSpecCommand.md:182
+- [[Module Specification Framework]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/module-specification-framework.md:223
+- EnhancedTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/EnhancedTagTypes.md:159
+- ModuleSpecTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:148
 

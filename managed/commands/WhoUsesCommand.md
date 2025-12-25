@@ -182,68 +182,24 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:57
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:234
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:423
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:424
-- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:76
-- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:77
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:103
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:143
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:144
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:145
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:146
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:127
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:167
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:168
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:44
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:84
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:143
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:144
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:145
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:146
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:147
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:148
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:149
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:70
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:183
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:184
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:115
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:264
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:265
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:266
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:267
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:268
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:269
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:87
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:173
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:174
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:99
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:178
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:179
-- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:129
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:176
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:336
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:337
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:180
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:297
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:298
-- [[CLI Command Development Guide]] → /home/user/tsdoc-edge/managed/guides/command-development-guide.md:237
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:248
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:447
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:448
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:26
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:87
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:88
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:24
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:264
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:265
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:135
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:136
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:137
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:138
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:76
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:288
+- [[DepsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/DepsCommand.md:103
+- [[OrphansCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/OrphansCommand.md:127
+- [[UsedByCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UsedByCommand.md:44
+- [[UsedByCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UsedByCommand.md:84
+- [[CLI Runner]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/CLIRunner.md:70
+- [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:115
+- [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:87
+- [[Impact Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/ImpactAnalysis.md:99
+- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:176
+- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:180
+- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:237
+- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:248
+- [[Code Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/code-dependency.md:26
+- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:26
 
 ### Implemented By
 
-- WhoUsesCommand → /home/user/tsdoc-edge/src/commands/WhoUsesCommand.ts:54
+- WhoUsesCommand → /Users/junwoobang/workflow/tsdoc-edge/src/commands/WhoUsesCommand.ts:37
 

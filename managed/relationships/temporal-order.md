@@ -321,11 +321,11 @@ await loadConfig();
 - [[Call Relationships]]: Calls may imply temporal order
 - [[IO Dependency]]: Data flow often implies temporal sequence
 - [[Pipeline]]: Pipelines enforce temporal order
-- [[Composition]]: Component initialization order
+- [[Composition Relationship]]: Component initialization order
 
 **Differs from**:
 - [[Code Dependency]]: Imports are static, not temporal
-- [[Calls]]: Calls happen at runtime, may not be ordered
+- [[Call Relationships]]: Calls happen at runtime, may not be ordered
 
 ## Benefits
 
@@ -354,7 +354,7 @@ await loadConfig();
 - [[Call Relationships]] (`CALLS.md`): Function invocations
 - [[Pipeline]] (`PIPELINE.md`): Multi-step data flow
 - [[IO Dependency]] (`io-dependency.md`): Data dependencies
-- [[Composition]] (`COMPOSITION.md`): Component relationships
+- [[Composition Relationship]] (`COMPOSITION.md`): Component relationships
 - [[Collaboration]] (`collaboration.md`): Cooperative behavior
 
 ## Tags
@@ -374,17 +374,8 @@ await loadConfig();
 
 ### Referenced By
 
-- [[Analyzer Status]] → /home/user/tsdoc-edge/managed/features/analyzer-status.md:43
-- [[Analyzer Status]] → /home/user/tsdoc-edge/managed/features/analyzer-status.md:278
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:129
-- [[Call Relationships]] → /home/user/tsdoc-edge/managed/relationships/CALLS.md:130
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:74
-- [[Pipeline]] → /home/user/tsdoc-edge/managed/relationships/PIPELINE.md:75
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:148
-- [[Collaboration]] → /home/user/tsdoc-edge/managed/relationships/collaboration.md:134
-- [[Collaboration]] → /home/user/tsdoc-edge/managed/relationships/collaboration.md:164
-- [[Collaboration]] → /home/user/tsdoc-edge/managed/relationships/collaboration.md:186
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:323
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:139
-- [[IO Dependency]] → /home/user/tsdoc-edge/managed/relationships/io-dependency.md:140
+- [[Analyzer Status]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analyzer-status.md:45
+- [[Analyzer Status]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analyzer-status.md:280
+- [[Collaboration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/collaboration.md:134
+- [[Collaboration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/collaboration.md:164
 

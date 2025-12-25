@@ -10,7 +10,7 @@ tags:
   - ssot
 lastUpdated: 2025-01-15
 ---
-# [[DocumentSymbolSystem]]
+# DocumentSymbolSystem
 
 > Wiki 스타일 [[]] 문법으로 문서와 코드를 양방향 연결
 ## 개요
@@ -149,58 +149,19 @@ tsdoc-edge find-doc <symbol>             # 심볼 찾기
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:180
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:447
-- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:167
-- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:197
-- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:198
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:147
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:199
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:200
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:163
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:201
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:202
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:203
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:204
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:205
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:206
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:207
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:208
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:209
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:210
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:211
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:122
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:290
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:344
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:345
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:346
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:347
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:348
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:349
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:143
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:237
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:238
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:239
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:240
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:241
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:242
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:243
-- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:195
-- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:243
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:209
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:303
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:304
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:305
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:306
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:307
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:308
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:309
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:354
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:473
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:474
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:243
+- [[Symbol Reference System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/symbol-reference-system.md:169
+- [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:147
+- [[AutoIndexing]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/auto-indexing.md:163
+- [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:122
+- [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:290
+- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:143
+- [[Features Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/index.md:195
+- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:209
+- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:354
 
 ### Implemented By
 
-- DocumentSymbolParser (Parser) → /home/user/tsdoc-edge/src/doc-symbol/DocumentSymbolParser.ts:25
-- DocumentSymbolRegistry (Registry) → /home/user/tsdoc-edge/src/doc-symbol/DocumentSymbolRegistry.ts:42
+- DocumentSymbolParser (Parser) → /Users/junwoobang/workflow/tsdoc-edge/src/doc-symbol/DocumentSymbolParser.ts:25
+- DocumentSymbolRegistry (Registry) → /Users/junwoobang/workflow/tsdoc-edge/src/doc-symbol/DocumentSymbolRegistry.ts:42
 

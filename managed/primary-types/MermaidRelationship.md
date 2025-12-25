@@ -1,4 +1,4 @@
-# [[MermaidRelationship]]
+# MermaidRelationship
 
 **Source**: `src/doc-symbol/MermaidSymbolExtractor.ts`
 
@@ -8,7 +8,7 @@ Type for relationships extracted from Mermaid diagram edges.
 
 ## Type Definition
 
-See [[MermaidRelationship]] implementation in source code.
+See MermaidRelationship implementation in source code.
 
 ## Fields
 
@@ -20,11 +20,11 @@ See [[MermaidRelationship]] implementation in source code.
 
 ## Usage
 
-Part of [[MermaidExtractionResult]] as the `relationships` array field.
+Part of MermaidExtractionResult as the `relationships` array field.
 
 ## Related
 
-- [[MermaidExtractionResult]] - Contains this
+- MermaidExtractionResult - Contains this
 - [[Mermaid Symbol Extractor]] - Creates this
 
 ---
@@ -38,19 +38,8 @@ Part of [[MermaidExtractionResult]] as the `relationships` array field.
 
 ### Referenced By
 
-- [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:119
-- [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:120
-- [[Mermaid Symbol Extractor]] → /home/user/tsdoc-edge/managed/parsers/MermaidSymbolExtractor.md:121
-- [[MermaidExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/MermaidExtractionResult.md:30
-- [[MermaidExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/MermaidExtractionResult.md:47
-- [[MermaidExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/MermaidExtractionResult.md:48
-- [[MermaidExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/MermaidExtractionResult.md:49
-- [[MermaidExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/MermaidExtractionResult.md:50
-- [[MermaidExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/MermaidExtractionResult.md:51
-- [[MermaidExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/MermaidExtractionResult.md:52
-- [[MermaidExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/MermaidExtractionResult.md:53
-- [[MermaidExtractionResult]] → /home/user/tsdoc-edge/managed/primary-types/MermaidExtractionResult.md:54
-- [[MermaidSymbol]] → /home/user/tsdoc-edge/managed/primary-types/MermaidSymbol.md:33
-- [[MermaidSymbol]] → /home/user/tsdoc-edge/managed/primary-types/MermaidSymbol.md:58
-- [[MermaidSymbol]] → /home/user/tsdoc-edge/managed/primary-types/MermaidSymbol.md:59
+- [[Mermaid Symbol Extractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/MermaidSymbolExtractor.md:51
+- MermaidExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidExtractionResult.md:30
+- MermaidRelationship → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidRelationship.md:11
+- MermaidSymbol → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidSymbol.md:33
 

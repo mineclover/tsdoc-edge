@@ -1,4 +1,4 @@
-# [[CustomTagTypes]]
+# CustomTagTypes
 
 **Source**: `src/types/tags/base.ts`
 
@@ -51,7 +51,7 @@ Track evolution:
 
 ## Symbol Relationship
 
-See implementation: [[SymbolRelationship]]
+See implementation: SymbolRelationship
 
 **Key Properties**:
 - `type`: Relationship type (relatedTo, dependsOn, usedBy, implements, extends)
@@ -74,7 +74,7 @@ See implementation: [[SymbolRelationship]]
 
 ## Contract Specification
 
-See implementation: [[ContractSpec]]
+See implementation: ContractSpec
 
 **Key Properties**:
 - `symbolName`: Symbol name
@@ -109,7 +109,7 @@ See implementation: [[ContractSpec]]
 
 ## Test Mapping
 
-See implementation: [[TestMapping]]
+See implementation: TestMapping
 
 **Key Properties**:
 - `symbolId`: Symbol identifier
@@ -136,7 +136,7 @@ See implementation: [[TestMapping]]
 
 ## Responsibility Specification
 
-See implementation: [[ResponsibilitySpec]]
+See implementation: ResponsibilitySpec
 
 **Key Properties**:
 - `symbolName`: Symbol name
@@ -165,7 +165,7 @@ See implementation: [[ResponsibilitySpec]]
 
 ## Design Decision
 
-See implementation: [[DesignDecision]]
+See implementation: DesignDecision
 
 **Key Properties**:
 - `id`: Unique identifier
@@ -249,22 +249,5 @@ export class UserService { }
 ## Related
 
 - [[TSDocParser]]: Parses custom tags
-- [[ModuleSpecTagParser]]: Extracts tag values
+- ModuleSpecTagParser: Extracts tag values
 - [[ValidateCommand]]: Validates tag presence
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:69
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:70
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:71
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:39
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:40
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:41
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:61
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:62
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:63
-

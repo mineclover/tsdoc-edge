@@ -179,24 +179,5 @@ tsdoc-edge orphans --diff origin/main
 
 ### Referenced By
 
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:173
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:174
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:175
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:176
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:177
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:200
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:201
-- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:181
-- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:182
-- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:183
-- [[UntestedCommand]] → /home/user/tsdoc-edge/managed/commands/UntestedCommand.md:184
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:152
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:153
-- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:137
-- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:138
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:125
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:175
-- [[Dependency Analysis]] → /home/user/tsdoc-edge/managed/features/DependencyAnalysis.md:176
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:184
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:185
+- [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:125
 

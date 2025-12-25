@@ -3,7 +3,7 @@
 **Document Type**: Essential Workflow
 **Status**: Active
 **Last Updated**: 2025-11-23
-**Primary Symbols**: [[WorkContextCommand]], [[DesignContextCommand]]
+**Primary Symbols**: [[WorkContextCommand]], DesignContextCommand
 
 ## Purpose
 
@@ -225,7 +225,6 @@ Work Context: DocReferenceAnalyzer.ts
 ### 출력 예시: work-context --llm (LLM 친화적)
 
 ```markdown
-# Context: /home/user/tsdoc-edge/src/analyzer/DocReferenceAnalyzer.ts
 
 > **Entry Point Type**: file
 > **Generated**: 2025-11-23T15:59:17.218Z
@@ -748,7 +747,7 @@ done
 
 ## Related Workflows
 
-- [[CLI Feedback Cycle]] - 전체 CLI 워크플로우
+- CLI Feedback Cycle - 전체 CLI 워크플로우
 - [[Document Symbol System]] - `@doc [[Symbol]]` 시스템
 - [[CoreWorkflow]] - 빌드 → 분석 → 검증 흐름
 
@@ -775,64 +774,23 @@ done
 
 ### Referenced By
 
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:280
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:352
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:353
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:95
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:274
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:505
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:506
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:114
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:156
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:157
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:90
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:170
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:171
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:132
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:133
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:134
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:232
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:233
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:234
-- [[Codebase Health Report]] → /home/user/tsdoc-edge/managed/features/codebase-health-report.md:342
-- [[Context Quality Improvements]] → /home/user/tsdoc-edge/managed/features/context-quality-improvements.md:196
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:19
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:366
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:367
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:288
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:289
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:290
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:14
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:294
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:567
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:568
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:569
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:570
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:68
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:136
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:189
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:267
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:268
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:269
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:270
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:271
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:272
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:186
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:334
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:335
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:151
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:161
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:177
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:222
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:223
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:224
-- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:280
-- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:299
-- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:329
-- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:330
-- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:331
-- [[Mermaid Entrypoint Workflow]] → /home/user/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:332
-- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:400
-- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:456
-- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:457
+- [[Commands Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:282
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:118
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:328
+- [[CoverageReportCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/CoverageReportCommand.md:114
+- [[UsedByCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UsedByCommand.md:90
+- [[Codebase Health Report]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/codebase-health-report.md:344
+- [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:19
+- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:14
+- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:294
+- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:68
+- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:136
+- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:189
+- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:188
+- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:151
+- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:161
+- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:177
+- [[Mermaid Entrypoint Workflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:282
+- [[Mermaid Entrypoint Workflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:301
+- [[Relationship System Roadmap]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:402
 

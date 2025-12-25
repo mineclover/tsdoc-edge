@@ -18,16 +18,5 @@ Advanced data flow and execution analysis.
 
 ## Related
 
-- [[Data Flow Analyzer]]: Data flow tracking
+- Data Flow Analyzer: Data flow tracking
 - [[CallGraphAnalyzer]]: Execution flow
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:276
-- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:277
-- [[CallGraphAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:278
-

@@ -1,4 +1,4 @@
-# [[DataFlowTypes]]
+# DataFlowTypes
 
 **Source**: `src/types/domain/data-flow.ts`
 
@@ -10,7 +10,7 @@ Type system for tracking data flow and transformations through the codebase.
 
 Common DTO naming patterns:
 
-See implementation: [[DTOPattern]]
+See implementation: DTOPattern
 
 **Values**:
 - `suffix-dto`: UserDTO
@@ -26,7 +26,7 @@ See implementation: [[DTOPattern]]
 
 Identifies DTOs by naming pattern:
 
-See implementation: [[DTOClassification]]
+See implementation: DTOClassification
 
 **Key Properties**:
 - `interfaceName`: Interface name
@@ -57,7 +57,7 @@ See implementation: [[DTOClassification]]
 
 Single step in a data transformation chain:
 
-See implementation: [[TransformationStep]]
+See implementation: TransformationStep
 
 **Key Properties**:
 - `from`: Source type
@@ -82,7 +82,7 @@ See implementation: [[TransformationStep]]
 
 Complete transformation path:
 
-See implementation: [[DataTransformationChain]]
+See implementation: DataTransformationChain
 
 **Key Properties**:
 - `source`: Starting type
@@ -115,7 +115,7 @@ CreateUserRequest → CreateUserInput → User → UserDTO
 
 Path between two types:
 
-See implementation: [[TransformationPath]]
+See implementation: TransformationPath
 
 **Key Properties**:
 - `from`: Source type
@@ -127,7 +127,7 @@ See implementation: [[TransformationPath]]
 
 Complete data flow analysis:
 
-See implementation: [[DataFlowAnalysisResult]]
+See implementation: DataFlowAnalysisResult
 
 **Key Properties**:
 - `dtos`: DTO classifications
@@ -164,20 +164,3 @@ tsdoc-edge detect-dead-code
 - [[AnalyzeIOCommand]]: IO analysis
 - [[AnalyzeChainsCommand]]: Transformation chains
 - [[DetectDeadCodeCommand]]: Dead code detection
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:56
-- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:57
-- [[AnalyzeChainsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeChainsCommand.md:58
-- [[AnalyzeIOCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeIOCommand.md:58
-- [[AnalyzeIOCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeIOCommand.md:59
-- [[AnalyzeIOCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeIOCommand.md:60
-- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:82
-- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:83
-- [[DetectDeadCodeCommand]] → /home/user/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:84
-

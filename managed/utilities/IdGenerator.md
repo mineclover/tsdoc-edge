@@ -1,4 +1,4 @@
-# [[IdGenerator]]
+# IdGenerator
 
 **Source**: `src/utils/IdGenerator.ts`
 
@@ -106,7 +106,7 @@ const tempId = tempIdGen.generate(); // "x7k"
 
 - (Planned: IdCommand for CLI ID generation)
 - (Planned: IdNewCommand for new document IDs)
-- [[DocumentSymbol]]: Document symbol system
+- DocumentSymbol: Document symbol system
 
 ---
 
@@ -114,10 +114,5 @@ const tempId = tempIdGen.generate(); // "x7k"
 
 ### Referenced By
 
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:221
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:324
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:325
-- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:101
-- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:102
-- [[DocumentSymbol]] → /home/user/tsdoc-edge/managed/types/DocumentSymbol.md:103
+- [[SymbolRegistryManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/SymbolRegistryManager.md:221
 

@@ -76,7 +76,7 @@ class TSDocParser {
 
 **Source**: `src/parser/TSDocParser.ts`
 
-### [[EnhancedDocExtractor]]
+### EnhancedDocExtractor
 
 6-카테고리 확장 문서 추출
 
@@ -95,7 +95,7 @@ class EnhancedDocExtractor {
 
 **Source**: `src/parser/EnhancedDocExtractor.ts`
 
-### [[ModuleSpecTagParser]]
+### ModuleSpecTagParser
 
 7-part 모듈 명세 태그 파싱
 
@@ -115,7 +115,7 @@ class ModuleSpecTagParser {
 
 **Source**: `src/parser/ModuleSpecTagParser.ts`
 
-### [[TestSymbolParser]]
+### TestSymbolParser
 
 테스트 파일 구조 추출
 
@@ -272,7 +272,7 @@ interface ModuleSpecTags {
 
 ## 설계 의사결정
 
-### [[ADR-003: TSDoc Wrapping Strategy]]
+### ADR-003: TSDoc Wrapping Strategy]]
 
 ```
 @decision Microsoft TSDoc 래핑 (포크 대신)
@@ -285,7 +285,7 @@ interface ModuleSpecTags {
   - 버전 업그레이드 시 테스트 필요
 ```
 
-### [[ADR-004: Custom Tags over NLP]]
+### ADR-004: Custom Tags over NLP]]
 
 ```
 @decision 자연어 처리 대신 구조화된 커스텀 태그
@@ -362,4 +362,14 @@ console.log(`${result.cases.length}개 테스트 케이스`);
 ---
 
 ## Backlinks
-<!-- 이 섹션은 자동 생성됩니다 -->
+
+### Referenced By
+
+- [[Analyzer System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/analyzer-system.md:233
+- [[Spec Management System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/spec-management-system.md:186
+- [[Storage System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/storage-system.md:149
+- [[Symbol Graph System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/symbol-graph.md:30
+- [[Symbol Graph System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/symbol-graph.md:118
+- [[Validator System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/validator-system.md:32
+- [[Validator System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/validator-system.md:173
+

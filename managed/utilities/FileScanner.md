@@ -1,4 +1,4 @@
-# [[FileScanner]]
+# FileScanner
 
 **Source**: `src/scanner/FileScanner.ts`
 
@@ -28,7 +28,7 @@ Scan entire project directory and build comprehensive symbol database.
 
 ## Scanner Configuration
 
-See implementation: [[ScannerConfig]]
+See implementation: ScannerConfig
 
 **Key Properties**:
 - `include`: Glob patterns to include
@@ -79,18 +79,5 @@ Returns:
 
 ### Referenced By
 
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:311
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:312
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:313
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:188
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:189
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:190
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:67
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:68
-- [[TSDocParser]] → /home/user/tsdoc-edge/managed/parser/TSDocParser.md:69
-- [[String Utilities]] → /home/user/tsdoc-edge/managed/utilities/StringUtilities.md:55
-- [[String Utilities]] → /home/user/tsdoc-edge/managed/utilities/StringUtilities.md:79
-- [[String Utilities]] → /home/user/tsdoc-edge/managed/utilities/StringUtilities.md:80
-- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:400
-- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:435
+- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:400
 

@@ -1,4 +1,4 @@
-# [[SymbolSearchEngine]]
+# SymbolSearchEngine
 
 **Source**: `src/graph/SymbolSearchEngine.ts`
 
@@ -10,7 +10,7 @@ Provide fast and flexible symbol search capabilities across the symbol graph.
 
 ### Symbol Query
 
-See implementation: [[SymbolQuery]]
+See implementation: SymbolQuery
 
 **Key Properties**:
 - `namePattern`: Regex pattern for symbol names
@@ -26,7 +26,7 @@ See implementation: [[SymbolQuery]]
 
 ### Query Result
 
-See implementation: [[SymbolQueryResult]]
+See implementation: SymbolQueryResult
 
 **Key Properties**:
 - `symbols`: Matching symbols array
@@ -159,7 +159,7 @@ const dead = engine.search({
 
 - [[SymbolGraphBuilder]]: Builds searchable graph
 - [[Symbol]]: Symbol type definition
-- [[FindMethodCommand]]: CLI symbol search
+- FindMethodCommand: CLI symbol search
 
 ---
 
@@ -167,49 +167,17 @@ const dead = engine.search({
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:118
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:179
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:502
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:503
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:55
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:431
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:432
-- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:45
-- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:118
-- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:169
-- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:170
-- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:171
-- [[UndocumentedCommand]] → /home/user/tsdoc-edge/managed/commands/UndocumentedCommand.md:172
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:190
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:440
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:441
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:58
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:382
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:383
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:110
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:348
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:349
-- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:103
-- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:137
-- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:184
-- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:185
-- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:186
-- [[DepthTraverser]] → /home/user/tsdoc-edge/managed/graph/DepthTraverser.md:187
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:231
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:561
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:562
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:148
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:149
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:150
-- [[ConnectivityValidator]] → /home/user/tsdoc-edge/managed/utilities/ConnectivityValidator.md:104
-- [[ConnectivityValidator]] → /home/user/tsdoc-edge/managed/utilities/ConnectivityValidator.md:128
-- [[ConnectivityValidator]] → /home/user/tsdoc-edge/managed/utilities/ConnectivityValidator.md:129
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:88
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:256
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:257
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:258
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:259
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:260
-- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:402
-- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:437
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:181
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:242
+- [[UndocumentedCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UndocumentedCommand.md:45
+- [[UndocumentedCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UndocumentedCommand.md:118
+- [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:190
+- DepthTraverser → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DepthTraverser.md:119
+- DepthTraverser → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DepthTraverser.md:153
+- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:58
+- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:110
+- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:231
+- ConnectivityValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/ConnectivityValidator.md:121
+- [[SymbolGraphBuilder]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:96
+- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:402
 

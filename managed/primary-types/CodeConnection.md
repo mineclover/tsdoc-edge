@@ -19,7 +19,7 @@ See [[CodeConnection]] implementation in source code.
 
 ## Usage
 
-Returned by [[TSDoc Symbol Parser]]:
+Returned by TSDoc Symbol Parser:
 
 ```typescript
 const parser = new TSDocSymbolParser();
@@ -28,7 +28,7 @@ const connections: CodeConnection[] = parser.parseCodeFile('src/file.ts');
 
 ## Related
 
-- [[TSDoc Symbol Parser]] - Creates this type
+- TSDoc Symbol Parser - Creates this type
 - [[CodeReference]] - Document-to-code references
 
 ---
@@ -42,19 +42,6 @@ const connections: CodeConnection[] = parser.parseCodeFile('src/file.ts');
 
 ### Referenced By
 
-- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:68
-- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:102
-- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:103
-- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:104
-- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:105
-- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:106
-- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:107
-- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:108
-- [[TSDoc Symbol Parser]] → /home/user/tsdoc-edge/managed/parsers/TSDocSymbolParser.md:109
-- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:30
-- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:43
-- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:44
-- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:45
-- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:46
-- [[CodeReference]] → /home/user/tsdoc-edge/managed/primary-types/CodeReference.md:47
+- [[CodeConnection]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/CodeConnection.md:11
+- [[CodeReference]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/CodeReference.md:28
 

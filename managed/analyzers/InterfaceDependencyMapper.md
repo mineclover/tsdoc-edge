@@ -1,4 +1,4 @@
-# [[InterfaceDependencyMapper]]
+# InterfaceDependencyMapper
 
 **Source**: `src/analyzer/InterfaceDependencyMapper.ts`
 
@@ -19,7 +19,7 @@ Tracks:
 
 ## Related
 
-- [[InterfaceAnalyzer]]: Interface analysis
+- InterfaceAnalyzer: Interface analysis
 - [[Type Dependency]]: Type relationships
 
 ---
@@ -28,16 +28,6 @@ Tracks:
 
 ### Referenced By
 
-- [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:30
-- [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:31
-- [[InterfaceAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:32
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:124
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:313
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:314
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:157
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:237
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:238
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:27
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:28
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:29
+- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:124
+- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:157
 

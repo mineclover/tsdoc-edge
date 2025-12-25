@@ -18,19 +18,5 @@ System management and validation.
 
 ## Related
 
-- [[PreCommitChecker]]: Validation
-- [[StatsHistoryManager]]: Statistics
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[PreCommitChecker]] → /home/user/tsdoc-edge/managed/analyzers/PreCommitChecker.md:35
-- [[PreCommitChecker]] → /home/user/tsdoc-edge/managed/analyzers/PreCommitChecker.md:36
-- [[PreCommitChecker]] → /home/user/tsdoc-edge/managed/analyzers/PreCommitChecker.md:37
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:35
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:36
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:37
-
+- PreCommitChecker: Validation
+- StatsHistoryManager: Statistics

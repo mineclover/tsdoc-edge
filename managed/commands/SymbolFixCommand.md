@@ -96,7 +96,7 @@ tsdoc-edge symbol-fix managed --type=typo --dry-run
 
 ```markdown
 # Generated file: managed/concepts/<symbol-name>.md
-# [[SymbolName]]
+# SymbolName
 
 **Status**: 🚧 Stub (needs documentation)
 
@@ -374,7 +374,7 @@ tsdoc-edge symbol-fix managed --dry-run
 - [[Symbol Reference System]]: Reference conventions (H1/H2/inline)
 - [[SymbolQueryCommand]]: Symbol exploration and search
 - [[ValidateSymbolRefsCommand]]: Symbol validation
-- [[SELF-IMPROVEMENT-PROCESS]]: Overall improvement workflow
+- SELF-IMPROVEMENT-PROCESS: Overall improvement workflow
 
 ---
 
@@ -382,43 +382,8 @@ tsdoc-edge symbol-fix managed --dry-run
 
 ### Referenced By
 
-- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:64
-- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:65
-- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:66
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:123
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:153
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:166
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:167
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:168
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:169
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:170
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:171
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:172
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:173
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:174
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:175
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:41
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:42
-- [[ValidateSymbolRefsCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:43
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:91
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:144
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:177
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:178
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:179
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:180
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:25
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:108
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:178
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:179
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:180
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:181
-- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:178
-- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:179
-- [[Symbol Reference System]] → /home/user/tsdoc-edge/managed/concepts/symbol-reference-system.md:180
-- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:110
-- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:111
-- [[DocumentSymbolParser]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolParser.md:112
-- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:69
-- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:70
-- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:71
+- [[SymbolQueryCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolQueryCommand.md:123
+- [[SymbolQueryCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolQueryCommand.md:153
+- [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:91
+- [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:144
 

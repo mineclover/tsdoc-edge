@@ -26,14 +26,7 @@ Update symbol references in documentation.
 
 ### Referenced By
 
-- [[CLI Commands]] → /home/user/tsdoc-edge/managed/CLI-COMMANDS.md:198
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:190
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:191
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:192
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:66
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:173
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:174
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:62
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:186
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:187
+- [[CLI Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/CLI-COMMANDS.md:200
+- [[CLI Runner]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/CLIRunner.md:66
+- [[AutoIndexing]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/auto-indexing.md:62
 

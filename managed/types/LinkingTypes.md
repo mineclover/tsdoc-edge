@@ -1,4 +1,4 @@
-# [[LinkingTypes]]
+# LinkingTypes
 
 **Source**: `src/types/core/linking.ts`
 
@@ -10,7 +10,7 @@ Type system for bidirectional doc-code linking and validation.
 
 Link from documentation to source code:
 
-See implementation: [[CodeLink]]
+See implementation: CodeLink
 
 **Key Properties**:
 - `docPath`: Source doc file
@@ -24,7 +24,7 @@ See implementation: [[CodeLink]]
 
 Link from source code to documentation:
 
-See implementation: [[DocLink]]
+See implementation: DocLink
 
 **Key Properties**:
 - `codePath`: Source code file
@@ -38,7 +38,7 @@ See implementation: [[DocLink]]
 
 Bidirectional mapping between code and docs:
 
-See implementation: [[LinkIndex]]
+See implementation: LinkIndex
 
 **Key Properties**:
 - `codeToDoc`: Map from code files to doc links
@@ -66,7 +66,7 @@ const symbols = index.docToSymbol.get('managed/features/user-service.md');
 
 Result of validating a single link:
 
-See implementation: [[LinkValidationResult]]
+See implementation: LinkValidationResult
 
 **Key Properties**:
 - `type`: 'broken', 'valid', or 'outdated'
@@ -84,7 +84,7 @@ See implementation: [[LinkValidationResult]]
 
 Summary of all link validations:
 
-See implementation: [[LinkValidationReport]]
+See implementation: LinkValidationReport
 
 **Key Properties**:
 - `totalLinks`: Total number of links
@@ -96,7 +96,7 @@ See implementation: [[LinkValidationReport]]
 
 Result of applying a fix to a broken link:
 
-See implementation: [[FixResult]]
+See implementation: FixResult
 
 **Key Properties**:
 - `link`: CodeLink or DocLink
@@ -145,20 +145,3 @@ See implementation: [[FixResult]]
 - [[DocCodeLinker]]: Creates link index
 - [[LinkValidator]]: Validates and fixes links
 - [[CheckLinksCommand]]: CLI validation
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:38
-- [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:39
-- [[CheckLinksCommand]] → /home/user/tsdoc-edge/managed/commands/CheckLinksCommand.md:40
-- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:68
-- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:69
-- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:70
-- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:76
-- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:77
-- [[LinkValidator]] → /home/user/tsdoc-edge/managed/utilities/LinkValidator.md:78
-

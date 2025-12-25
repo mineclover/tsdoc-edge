@@ -248,36 +248,6 @@ tsdoc-edge validate-architecture \
 
 ### Referenced By
 
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:155
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:156
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:157
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:158
-- [[DetectCircularTypesCommand]] → /home/user/tsdoc-edge/managed/commands/DetectCircularTypesCommand.md:74
-- [[DetectCircularTypesCommand]] → /home/user/tsdoc-edge/managed/commands/DetectCircularTypesCommand.md:75
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:178
-- [[OrphansCommand]] → /home/user/tsdoc-edge/managed/commands/OrphansCommand.md:179
-- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:36
-- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:37
-- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:38
-- [[TypeChainCommand]] → /home/user/tsdoc-edge/managed/commands/TypeChainCommand.md:39
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:88
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:154
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:155
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:156
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:157
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:158
-- [[UsedByCommand]] → /home/user/tsdoc-edge/managed/commands/UsedByCommand.md:159
-- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:165
-- [[WhoUsesCommand]] → /home/user/tsdoc-edge/managed/commands/WhoUsesCommand.md:166
-- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:147
-- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:148
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:150
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:186
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:187
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:188
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:189
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:190
-- [[Impact Analysis]] → /home/user/tsdoc-edge/managed/features/ImpactAnalysis.md:191
-- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:132
-- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:133
+- [[UsedByCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UsedByCommand.md:88
+- [[Impact Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/ImpactAnalysis.md:150
 

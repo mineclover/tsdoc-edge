@@ -345,8 +345,8 @@ class CartService {
 
 **Contains**:
 - [[Code Dependency]]: Components in feature have dependencies
-- [[Calls]]: Components call each other within feature
-- [[Composition]]: Feature composed of components
+- [[Call Relationships]]: Components call each other within feature
+- [[Composition Relationship]]: Feature composed of components
 
 **Enables**:
 - Feature toggles
@@ -433,9 +433,9 @@ class CheckoutFeature {}
 ## Related
 
 - [[Conceptual Relation]] (`conceptual-relation.md`): Domain-level relationships
-- [[Module Boundary]] (`module-boundary.md`): Technical boundaries
-- [[Composition]] (`COMPOSITION.md`): Component composition
-- [[Enhancement]] (`enhancement.md`): Feature enhancements
+- Module Boundary (`module-boundary.md`): Technical boundaries
+- [[Composition Relationship]] (`COMPOSITION.md`): Component composition
+- Enhancement (`enhancement.md`): Feature enhancements
 
 ## Tags
 
@@ -454,14 +454,9 @@ class CheckoutFeature {}
 
 ### Referenced By
 
-- [[Co-Requirement]] → /home/user/tsdoc-edge/managed/relationships/co-requirement.md:151
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:136
-- [[Conceptual Relation]] → /home/user/tsdoc-edge/managed/relationships/conceptual-relation.md:132
-- [[Conceptual Relation]] → /home/user/tsdoc-edge/managed/relationships/conceptual-relation.md:155
-- [[Conceptual Relation]] → /home/user/tsdoc-edge/managed/relationships/conceptual-relation.md:177
-- [[Enhancement]] → /home/user/tsdoc-edge/managed/relationships/enhancement.md:70
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:319
-- [[Module Boundary]] → /home/user/tsdoc-edge/managed/relationships/module-boundary.md:120
-- [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:107
-- [[Mutual Exclusion]] → /home/user/tsdoc-edge/managed/relationships/mutual-exclusion.md:124
+- [[Co-Requirement]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/co-requirement.md:151
+- [[Conceptual Relation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/conceptual-relation.md:132
+- [[Conceptual Relation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/conceptual-relation.md:155
+- [[Mutual Exclusion]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/mutual-exclusion.md:107
+- [[Mutual Exclusion]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/mutual-exclusion.md:124
 

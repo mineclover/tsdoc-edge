@@ -609,8 +609,8 @@ tsdoc-edge parse-mermaid <path> --generate-docs
 ## Related Workflows
 
 - [[Work Context Workflow]]: 파일 작업 전 컨텍스트 확인
-- [[Symbol Validation]]: 심볼 중복 및 일관성 검증
-- [[Documentation Quality]]: 문서 품질 가이드
+- Symbol Validation: 심볼 중복 및 일관성 검증
+- Documentation Quality: 문서 품질 가이드
 
 ---
 
@@ -635,33 +635,12 @@ tsdoc-edge parse-mermaid <path> --generate-docs
 
 ### Referenced By
 
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:349
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:350
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:351
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:98
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:504
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:318
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:565
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:566
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:92
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:143
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:263
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:264
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:265
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:266
-- [[Example - Mermaid Workflow]] → /home/user/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:192
-- [[Example - Mermaid Workflow]] → /home/user/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:218
-- [[Example - Mermaid Workflow]] → /home/user/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:219
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:152
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:165
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:182
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:215
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:216
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:217
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:299
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:300
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:301
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:302
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:303
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:304
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:121
+- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:318
+- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:92
+- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:143
+- [[Example - Mermaid Workflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:194
+- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:152
+- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:165
+- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:182
 

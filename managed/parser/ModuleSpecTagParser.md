@@ -1,4 +1,4 @@
-# [[ModuleSpecTagParser]]
+# ModuleSpecTagParser
 
 **Source**: `src/parser/ModuleSpecTagParser.ts`
 
@@ -20,8 +20,8 @@ Extracts:
 
 ## Related
 
-- [[ModuleSpecGenerator]]: Spec generation
-- [[EnhancedDocExtractor]]: Doc extraction
+- ModuleSpecGenerator: Spec generation
+- EnhancedDocExtractor: Doc extraction
 
 ---
 
@@ -29,22 +29,8 @@ Extracts:
 
 ### Referenced By
 
-- [[ModuleSpecGenerator]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecGenerator.md:33
-- [[ModuleSpecGenerator]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecGenerator.md:34
-- [[ModuleSpecGenerator]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecGenerator.md:35
-- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:206
-- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:263
-- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:264
-- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:265
-- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:266
-- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:267
-- [[CustomTagTypes]] → /home/user/tsdoc-edge/managed/types/CustomTagTypes.md:118
-- [[CustomTagTypes]] → /home/user/tsdoc-edge/managed/types/CustomTagTypes.md:129
-- [[CustomTagTypes]] → /home/user/tsdoc-edge/managed/types/CustomTagTypes.md:130
-- [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:109
-- [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:118
-- [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:119
-- [[ParseTypes]] → /home/user/tsdoc-edge/managed/types/ParseTypes.md:88
-- [[ParseTypes]] → /home/user/tsdoc-edge/managed/types/ParseTypes.md:98
-- [[ParseTypes]] → /home/user/tsdoc-edge/managed/types/ParseTypes.md:99
+- EnhancedDocExtractor → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:206
+- CustomTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/CustomTagTypes.md:147
+- ModuleSpecTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:149
+- ParseTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/ParseTypes.md:103
 

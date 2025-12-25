@@ -303,8 +303,8 @@ class B { process() { return globalState.value; } }
 ## Integration with Other Relationships
 
 **Enables**:
-- [[Composition]]: Collaborators often composed together
-- [[Calls]]: Collaboration implemented via calls
+- [[Composition Relationship]]: Collaborators often composed together
+- [[Call Relationships]]: Collaboration implemented via calls
 - [[Event Flow]]: Event-driven collaboration
 - [[Temporal Order]]: Collaborations may have execution order
 
@@ -341,8 +341,8 @@ interface CollaborationMetrics {
 
 ## Related
 
-- [[Composition]] (`COMPOSITION.md`): Structural relationships
-- [[Calls]] (`CALLS.md`): Implementation mechanism
+- [[Composition Relationship]] (`COMPOSITION.md`): Structural relationships
+- [[Call Relationships]] (`CALLS.md`): Implementation mechanism
 - [[Event Flow]] (`event-flow.md`): Event-driven collaboration
 - [[Temporal Order]] (`temporal-order.md`): Execution sequencing
 - [[Code Dependency]] (`code-dependency.md`): Static dependencies
@@ -364,15 +364,7 @@ interface CollaborationMetrics {
 
 ### Referenced By
 
-- [[Type Dependency]] → /home/user/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:64
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:132
-- [[Code Dependency]] → /home/user/tsdoc-edge/managed/relationships/code-dependency.md:133
-- [[Event Flow]] → /home/user/tsdoc-edge/managed/relationships/event-flow.md:77
-- [[Event Flow]] → /home/user/tsdoc-edge/managed/relationships/event-flow.md:78
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:316
-- [[Integration Verification]] → /home/user/tsdoc-edge/managed/relationships/integration-verification.md:158
-- [[Integration Verification]] → /home/user/tsdoc-edge/managed/relationships/integration-verification.md:188
-- [[Temporal Order]] → /home/user/tsdoc-edge/managed/relationships/temporal-order.md:220
-- [[Temporal Order]] → /home/user/tsdoc-edge/managed/relationships/temporal-order.md:241
-- [[Temporal Order]] → /home/user/tsdoc-edge/managed/relationships/temporal-order.md:242
+- [[Integration Verification]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/integration-verification.md:158
+- [[Integration Verification]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/integration-verification.md:188
+- [[Temporal Order]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/temporal-order.md:220
 

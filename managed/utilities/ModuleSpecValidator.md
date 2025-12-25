@@ -1,4 +1,4 @@
-# [[ModuleSpecValidator]]
+# ModuleSpecValidator
 
 **Source**: `src/validator/ModuleSpecValidator.ts`
 
@@ -34,7 +34,7 @@ Every module should define 7 aspects:
 
 ## Validation Options
 
-See implementation: [[ValidationOptions]]
+See implementation: ValidationOptions
 
 **Key Properties**:
 - `minConfidence`: Minimum confidence score (0-1, default: 0.7)
@@ -47,7 +47,7 @@ See implementation: [[ValidationOptions]]
 
 ## Validation Result
 
-See implementation: [[ModuleSpecValidationResult]]
+See implementation: ModuleSpecValidationResult
 
 **Key Properties**:
 - `isValid`: Whether spec passes validation
@@ -58,7 +58,7 @@ See implementation: [[ModuleSpecValidationResult]]
 
 ## Validation Issue
 
-See implementation: [[ValidationIssue]]
+See implementation: ValidationIssue
 
 **Key Properties**:
 - `section`: Which section has the issue
@@ -167,7 +167,7 @@ tsdoc-edge validate-spec --strict
 
 ## Related
 
-- [[ModuleSpecGenerator]]: Generates module specs
+- ModuleSpecGenerator: Generates module specs
 - [[ValidateSpecCommand]]: CLI validation
 - [[ValidateCommand]]: Overall validation
 
@@ -177,28 +177,9 @@ tsdoc-edge validate-spec --strict
 
 ### Referenced By
 
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:81
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:82
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:83
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:151
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:223
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:224
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:225
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:226
-- [[ValidateSpecCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateSpecCommand.md:227
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:220
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:286
-- [[Module Specification Framework]] → /home/user/tsdoc-edge/managed/concepts/module-specification-framework.md:287
-- [[ModuleSpecGenerator]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecGenerator.md:39
-- [[ModuleSpecGenerator]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecGenerator.md:40
-- [[ModuleSpecGenerator]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecGenerator.md:41
-- [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:110
-- [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:122
-- [[ModuleSpecTagTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:123
-- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:91
-- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:116
-- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:117
-- [[ConventionValidator]] → /home/user/tsdoc-edge/managed/utilities/ConventionValidator.md:174
-- [[ConventionValidator]] → /home/user/tsdoc-edge/managed/utilities/ConventionValidator.md:193
-- [[ConventionValidator]] → /home/user/tsdoc-edge/managed/utilities/ConventionValidator.md:194
+- [[ValidateSpecCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateSpecCommand.md:151
+- [[Module Specification Framework]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/module-specification-framework.md:222
+- ModuleSpecTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:150
+- ModuleSpecTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/ModuleSpecTypes.md:176
+- ConventionValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/ConventionValidator.md:180
 

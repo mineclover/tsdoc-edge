@@ -10,7 +10,7 @@ Type system for CLI usage analytics and tracking.
 
 Records single command execution:
 
-See implementation: [[CommandUsageEvent]]
+See implementation: CommandUsageEvent
 
 **Key Properties**:
 - `command`: Command name
@@ -27,7 +27,7 @@ See implementation: [[CommandUsageEvent]]
 
 Aggregated analytics:
 
-See implementation: [[UsageStatistics]]
+See implementation: UsageStatistics
 
 **Key Properties**:
 - `totalCommands`: Total number of commands
@@ -42,7 +42,7 @@ See implementation: [[UsageStatistics]]
 
 Configuration for analytics collection:
 
-See implementation: [[AnalyticsConfig]]
+See implementation: AnalyticsConfig
 
 **Key Properties**:
 - `enabled`: Enable/disable analytics
@@ -54,7 +54,7 @@ See implementation: [[AnalyticsConfig]]
 
 Report generation parameters:
 
-See implementation: [[UsageReportOptions]]
+See implementation: UsageReportOptions
 
 **Key Properties**:
 - `startDate`: Filter from (optional)
@@ -66,7 +66,7 @@ See implementation: [[UsageReportOptions]]
 
 Per-day aggregation:
 
-See implementation: [[DailyUsageSummary]]
+See implementation: DailyUsageSummary
 
 **Key Properties**:
 - `date`: YYYY-MM-DD format
@@ -124,23 +124,6 @@ const report = tracker.generateReport({
 
 ## Related
 
-- [[UsageTracker]]: Analytics implementation
+- UsageTracker: Analytics implementation
 - [[UsageCommand]]: Display usage stats
-- [[ConfigManager]]: Analytics configuration
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:35
-- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:36
-- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:37
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:64
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:65
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:66
-- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:102
-- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:103
-- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:104
-
+- ConfigManager: Analytics configuration

@@ -1,4 +1,4 @@
-# [[RegistryTypes]]
+# RegistryTypes
 
 **Source**: `src/types/registry/registry.ts`
 
@@ -10,7 +10,7 @@ Minimal schema for symbol identification in JSONL storage.
 
 Points to code location:
 
-See implementation: [[SourceRef]]
+See implementation: SourceRef
 
 **Key Properties**:
 - `filePath`: Relative to project root
@@ -93,7 +93,7 @@ class UserService {              // depth: 0
 
 Tracks symbol dependencies:
 
-See implementation: [[DependencyRelation]]
+See implementation: DependencyRelation
 
 **Key Properties**:
 - `targetId`: Target symbol ID
@@ -104,7 +104,7 @@ See implementation: [[DependencyRelation]]
 
 Complete registry entry:
 
-See implementation: [[SymbolRegistryEntry]]
+See implementation: SymbolRegistryEntry
 
 **Key Properties**:
 - `id`: Unique ID
@@ -172,20 +172,3 @@ const changed = registry.filter(e =>
 - [[SymbolRegistryManager]]: Registry implementation
 - [[DatabaseManager]]: JSONL sync
 - [[Symbol]]: Full symbol type
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:431
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:432
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:433
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:318
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:319
-- [[SymbolRegistryManager]] → /home/user/tsdoc-edge/managed/storage/SymbolRegistryManager.md:320
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:143
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:144
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:145
-

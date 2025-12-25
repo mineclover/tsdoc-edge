@@ -256,14 +256,7 @@ if (violations.length > 0) {
 
 ### Referenced By
 
-- [[Co-Requirement]] → /home/user/tsdoc-edge/managed/relationships/co-requirement.md:115
-- [[Co-Requirement]] → /home/user/tsdoc-edge/managed/relationships/co-requirement.md:120
-- [[Co-Requirement]] → /home/user/tsdoc-edge/managed/relationships/co-requirement.md:148
-- [[Co-Requirement]] → /home/user/tsdoc-edge/managed/relationships/co-requirement.md:169
-- [[Co-Requirement]] → /home/user/tsdoc-edge/managed/relationships/co-requirement.md:170
-- [[Feature Grouping]] → /home/user/tsdoc-edge/managed/relationships/feature-grouping.md:198
-- [[Feature Grouping]] → /home/user/tsdoc-edge/managed/relationships/feature-grouping.md:199
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:321
-- [[Substitution]] → /home/user/tsdoc-edge/managed/relationships/substitution.md:189
-- [[Substitution]] → /home/user/tsdoc-edge/managed/relationships/substitution.md:190
+- [[Co-Requirement]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/co-requirement.md:115
+- [[Co-Requirement]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/co-requirement.md:120
+- [[Co-Requirement]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/co-requirement.md:148
 

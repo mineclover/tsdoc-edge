@@ -1,4 +1,4 @@
-# [[InterfaceTypes]]
+# InterfaceTypes
 
 **Source**: `src/types/domain/interface.ts`
 
@@ -8,7 +8,7 @@ Type system for interface analysis and domain-driven design structure.
 
 ## Interface Info
 
-See implementation: [[InterfaceInfo]]
+See implementation: InterfaceInfo
 
 **Key Properties**:
 - `symbol`: Base symbol information
@@ -20,7 +20,7 @@ See implementation: [[InterfaceInfo]]
 
 ## Interface Property
 
-See implementation: [[InterfaceProperty]]
+See implementation: InterfaceProperty
 
 **Key Properties**:
 - `name`: Property name
@@ -42,7 +42,7 @@ See implementation: [[InterfaceProperty]]
 
 ## Interface Method
 
-See implementation: [[InterfaceMethod]]
+See implementation: InterfaceMethod
 
 **Key Properties**:
 - `name`: Method name
@@ -52,7 +52,7 @@ See implementation: [[InterfaceMethod]]
 
 ## Domain Role
 
-See implementation: [[DomainRole]]
+See implementation: DomainRole
 
 **DDD Classifications**:
 - Entity, ValueObject, Service, Repository, Factory
@@ -60,7 +60,7 @@ See implementation: [[DomainRole]]
 
 ## Interface Dependency
 
-See implementation: [[InterfaceDependency]]
+See implementation: InterfaceDependency
 
 **Key Properties**:
 - `from`: Source interface
@@ -136,19 +136,3 @@ tsdoc-edge deps UserService
 - [[Symbol]]: Base symbol type
 - [[AnalyzeCommand]]: Domain analysis
 - [[DepsCommand]]: Dependency analysis
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:71
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:72
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:73
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:176
-- [[DepsCommand]] → /home/user/tsdoc-edge/managed/commands/DepsCommand.md:177
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:140
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:141
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:142
-

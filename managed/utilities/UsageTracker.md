@@ -1,4 +1,4 @@
-# [[UsageTracker]]
+# UsageTracker
 
 **Source**: `src/analytics/UsageTracker.ts`
 
@@ -106,7 +106,7 @@ tsdoc-edge config set analytics.enabled false
 ## Related
 
 - [[UsageCommand]]: Display usage statistics
-- [[ConfigManager]]: Analytics configuration
+- ConfigManager: Analytics configuration
 - [[StatsCommand]]: Codebase statistics
 
 ---
@@ -115,18 +115,6 @@ tsdoc-edge config set analytics.enabled false
 
 ### Referenced By
 
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:211
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:212
-- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:38
-- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:39
-- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:40
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:70
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:71
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:72
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:36
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:195
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:196
-- [[AnalyticsTypes]] → /home/user/tsdoc-edge/managed/types/AnalyticsTypes.md:59
-- [[AnalyticsTypes]] → /home/user/tsdoc-edge/managed/types/AnalyticsTypes.md:73
-- [[AnalyticsTypes]] → /home/user/tsdoc-edge/managed/types/AnalyticsTypes.md:74
+- [[CLI Runner]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/CLIRunner.md:36
+- [[AnalyticsTypes]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/AnalyticsTypes.md:104
 

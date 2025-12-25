@@ -1,4 +1,4 @@
-# [[ModuleSpecGenerator]]
+# ModuleSpecGenerator
 
 **Source**: `src/generator/ModuleSpecGenerator.ts`
 
@@ -19,7 +19,7 @@ Creates:
 
 ## Related
 
-- [[Module Spec Framework]]: Specification structure
+- Module Spec Framework: Specification structure
 
 ---
 
@@ -27,16 +27,8 @@ Creates:
 
 ### Referenced By
 
-- [[ModuleSpecMarkdownFormatter]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecMarkdownFormatter.md:22
-- [[ModuleSpecMarkdownFormatter]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecMarkdownFormatter.md:30
-- [[ModuleSpecMarkdownFormatter]] → /home/user/tsdoc-edge/managed/generator/ModuleSpecMarkdownFormatter.md:31
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:23
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:32
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:33
-- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:90
-- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:108
-- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:109
-- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:119
-- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:139
-- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:140
+- ModuleSpecMarkdownFormatter → /Users/junwoobang/workflow/tsdoc-edge/managed/code-generation/ModuleSpecMarkdownFormatter.md:22
+- ModuleSpecTagParser → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:23
+- ModuleSpecTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/ModuleSpecTypes.md:175
+- ModuleSpecValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:141
 

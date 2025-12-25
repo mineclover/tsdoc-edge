@@ -84,9 +84,9 @@ Regressions Detected:
 ### Dependencies
 
 - **[[DatabaseManager]]** (internal): Symbol data access
-- **[[TrackableStatsCollector]]**: Stats collection
-- **[[StatsHistoryManager]]**: Snapshot storage and retrieval
-- **[[StatsComparator]]**: Historical comparison
+- **TrackableStatsCollector**: Stats collection
+- **StatsHistoryManager**: Snapshot storage and retrieval
+- **StatsComparator**: Historical comparison
 - **[[BaseCommand]]**: Command infrastructure
 
 ### Used By
@@ -214,9 +214,9 @@ tsdoc-edge stats --compare baseline --save current
 ## Related
 
 - [[HealthCommand]]: Overall codebase health check
-- [[TrackableStatsCollector]]: Stats collection engine
-- [[StatsHistoryManager]]: Snapshot management
-- [[StatsComparator]]: Comparison logic
+- TrackableStatsCollector: Stats collection engine
+- StatsHistoryManager: Snapshot management
+- StatsComparator: Comparison logic
 - [[ValidateCommand]]: Documentation validation
 
 ## Implementation
@@ -250,67 +250,24 @@ fi
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:60
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:223
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:409
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:410
-- [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:33
-- [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:34
-- [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:35
-- [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:36
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:38
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:39
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:40
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:41
-- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:33
-- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:34
-- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:35
-- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:36
-- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:62
-- [[BaseCommand]] → /home/user/tsdoc-edge/managed/commands/BaseCommand.md:63
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:57
-- [[HealthCommand]] → /home/user/tsdoc-edge/managed/commands/HealthCommand.md:58
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:39
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:40
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:74
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:163
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:164
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:116
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:254
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:255
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:256
-- [[DatabaseManager]] → /home/user/tsdoc-edge/managed/core-components/DatabaseManager.md:257
-- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:80
-- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:102
-- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:119
-- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:120
-- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:121
-- [[CI/CD Integration]] → /home/user/tsdoc-edge/managed/features/CICDIntegration.md:122
-- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:78
-- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:137
-- [[Dead Code Detection]] → /home/user/tsdoc-edge/managed/features/DeadCodeDetection.md:138
-- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:126
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:154
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:323
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:324
-- [[CLI Command Development Guide]] → /home/user/tsdoc-edge/managed/guides/command-development-guide.md:31
-- [[CLI Command Development Guide]] → /home/user/tsdoc-edge/managed/guides/command-development-guide.md:45
-- [[CLI Command Development Guide]] → /home/user/tsdoc-edge/managed/guides/command-development-guide.md:238
-- [[CLI Command Development Guide]] → /home/user/tsdoc-edge/managed/guides/command-development-guide.md:338
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:246
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:439
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:440
-- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:84
-- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:89
-- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:138
-- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:139
-- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:140
-- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:141
-- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:85
-- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:93
-- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:94
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:79
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:277
+- [[CLI Runner]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/CLIRunner.md:74
+- [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:116
+- [[CI/CD Integration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/CICDIntegration.md:80
+- [[CI/CD Integration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/CICDIntegration.md:102
+- [[Dead Code Detection]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DeadCodeDetection.md:78
+- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:154
+- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:31
+- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:45
+- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:238
+- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:338
+- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:246
+- TrackableStatistics → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TrackableStatistics.md:84
+- TrackableStatistics → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TrackableStatistics.md:89
+- UsageTracker → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/UsageTracker.md:85
 
 ### Implemented By
 
-- StatsCommand → /home/user/tsdoc-edge/src/commands/StatsCommand.ts:39
+- StatsCommand → /Users/junwoobang/workflow/tsdoc-edge/src/commands/StatsCommand.ts:37
 

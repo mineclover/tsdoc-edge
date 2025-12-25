@@ -1,4 +1,4 @@
-# [[TsdocEdgeConfig]]
+# TsdocEdgeConfig
 
 **Primary Type**: Project Configuration Root
 
@@ -20,7 +20,7 @@
 
 ### Type Definition
 
-See implementation: [[TsdocEdgeConfig]]
+See implementation: TsdocEdgeConfig
 
 **Structure**: 8개 도메인별 설정 그룹으로 구성
 - `project`: ProjectConfig - 프로젝트 메타데이터
@@ -96,7 +96,7 @@ const dbPath = config.paths.databasePath;
 
 ## 5. Related Concepts (관련 개념)
 
-- [[ConfigManager]] - 싱글톤 설정 관리자
+- ConfigManager - 싱글톤 설정 관리자
 - [[InitCommand]] - `tsdoc-edge init` 프로젝트 초기화
 - [[ValidateCommand]] - 검증 규칙 적용
 
@@ -130,43 +130,15 @@ const dbPath = config.paths.databasePath;
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:224
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:462
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:151
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:152
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:153
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:182
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:183
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:184
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:185
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:186
-- [[InitCommand]] → /home/user/tsdoc-edge/managed/commands/InitCommand.md:187
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:60
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:61
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:62
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:63
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:64
-- [[ValidateCommand]] → /home/user/tsdoc-edge/managed/commands/ValidateCommand.md:65
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:23
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:56
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:57
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:58
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:59
-- [[ConfigManager]] → /home/user/tsdoc-edge/managed/config/ConfigManager.md:60
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:100
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:191
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:192
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:379
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:495
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:496
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:158
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:249
-- [[Quick Start Guide]] → /home/user/tsdoc-edge/managed/quick-start.md:250
-- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:91
-- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:107
-- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:108
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:278
+- [[CLI Runner]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/CLIRunner.md:100
+- ConfigManager → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/ConfigManager.md:23
+- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:379
+- TsdocEdgeConfig → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:23
+- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:158
+- ConfigLoader → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/ConfigLoader.md:91
 
 ### Implemented By
 
-- TsdocEdgeConfig → /home/user/tsdoc-edge/src/types/config/config.ts:16
+- TsdocEdgeConfig → /Users/junwoobang/workflow/tsdoc-edge/src/types/config/config.ts:16
 

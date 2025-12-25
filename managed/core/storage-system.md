@@ -211,7 +211,7 @@ interface SymbolRegistryEntry {
 
 ## 설계 의사결정
 
-### [[ADR-005: Hybrid Storage Strategy]]
+### ADR-005: Hybrid Storage Strategy]]
 
 ```
 @decision SQLite + JSONL 하이브리드 저장소
@@ -225,7 +225,7 @@ interface SymbolRegistryEntry {
   - 양방향 변환 지원
 ```
 
-### [[ADR-006: Synchronous SQLite]]
+### ADR-006: Synchronous SQLite]]
 
 ```
 @decision better-sqlite3 (동기 API) 사용
@@ -336,4 +336,13 @@ registry.save();
 ---
 
 ## Backlinks
-<!-- 이 섹션은 자동 생성됩니다 -->
+
+### Referenced By
+
+- [[Analyzer System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/analyzer-system.md:34
+- [[Analyzer System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/analyzer-system.md:234
+- [[Parser System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/parser-system.md:181
+- [[Spec Management System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/spec-management-system.md:188
+- [[Symbol Graph System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/symbol-graph.md:31
+- [[Symbol Graph System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/symbol-graph.md:119
+

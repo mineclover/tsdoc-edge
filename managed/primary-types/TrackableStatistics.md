@@ -1,4 +1,4 @@
-# [[TrackableStatistics]]
+# TrackableStatistics
 
 **Primary Type**: Statistics Tracking System Root
 
@@ -20,7 +20,7 @@
 
 ### Type Definition
 
-See [[TrackableStatistics]] implementation in source code.
+See TrackableStatistics implementation in source code.
 
 ### Composed Types
 
@@ -93,8 +93,8 @@ console.log(`Critical symbols documented: ${criticalStats.documented}/${critical
 
 ## 5. Related Concepts (관련 개념)
 
-- [[TrackableStatsCollector]] - 통계 수집 구현체
-- [[StatsHistoryManager]] - 통계 이력 관리
+- TrackableStatsCollector - 통계 수집 구현체
+- StatsHistoryManager - 통계 이력 관리
 - [[StatsCommand]] - CLI 인터페이스
 - [[AnalysisFeatures]] - 분석 기능 전반
 
@@ -112,8 +112,8 @@ console.log(`Critical symbols documented: ${criticalStats.documented}/${critical
 ## 7. Code References (코드 참조)
 
 **Type Definition**: `src/types/TrackableStatistics.ts`
-**Primary Producer**: [[TrackableStatsCollector]] (`src/analyzer/TrackableStatsCollector.ts`)
-**History Manager**: [[StatsHistoryManager]] (`src/analyzer/StatsHistoryManager.ts`)
+**Primary Producer**: TrackableStatsCollector (`src/analyzer/TrackableStatsCollector.ts`)
+**History Manager**: StatsHistoryManager (`src/analyzer/StatsHistoryManager.ts`)
 
 [^TrackableStatistics]
 [^TrackableStatsCollector]
@@ -128,47 +128,14 @@ console.log(`Critical symbols documented: ${criticalStats.documented}/${critical
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:222
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:461
-- [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:22
-- [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:40
-- [[StatsComparator]] → /home/user/tsdoc-edge/managed/analyzers/StatsComparator.md:41
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:21
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:45
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:46
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:47
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:48
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:49
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:50
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:51
-- [[StatsHistoryManager]] → /home/user/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:52
-- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:22
-- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:40
-- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:41
-- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:42
-- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:43
-- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:44
-- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:45
-- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:46
-- [[TrackableStatsCollector]] → /home/user/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:47
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:65
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:66
-- [[AnalyzeCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeCommand.md:67
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:207
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:208
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:209
-- [[StatsCommand]] → /home/user/tsdoc-edge/managed/commands/StatsCommand.md:210
-- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:22
-- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:33
-- [[UsageCommand]] → /home/user/tsdoc-edge/managed/commands/UsageCommand.md:34
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:402
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:403
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:404
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:135
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:136
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:137
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:276
+- StatsComparator → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/StatsComparator.md:22
+- StatsHistoryManager → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:21
+- TrackableStatsCollector → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:22
+- [[UsageCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UsageCommand.md:22
+- TrackableStatistics → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TrackableStatistics.md:23
 
 ### Implemented By
 
-- TrackableStatistics → /home/user/tsdoc-edge/src/types/analysis/statistics.ts:171
+- TrackableStatistics → /Users/junwoobang/workflow/tsdoc-edge/src/types/analysis/statistics.ts:171
 

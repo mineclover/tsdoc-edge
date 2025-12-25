@@ -178,26 +178,26 @@ code-dependency being extracted first.
 
 ### Error 1: missing_primary
 ```markdown
-Some text [[SymbolName]] here
+Some text SymbolName here
 ```
 - Inline reference exists
-- But no `# [[SymbolName]]` anywhere
+- But no `# SymbolName` anywhere
 - **Fix**: Create primary definition or fix typo
 
 ### Error 2: orphaned_auxiliary
 ```markdown
-## [[SymbolName]]
+## SymbolName
 Custom explanation...
 ```
 - Auxiliary definition exists
-- But no `# [[SymbolName]]` anywhere
+- But no `# SymbolName` anywhere
 - **Fix**: Create primary definition or convert to inline
 
 ### Error 3: duplicate_primary
 ```markdown
-# [[SymbolName]]  ← File 1
+# SymbolName  ← File 1
 ...
-# [[SymbolName]]  ← File 2
+# SymbolName  ← File 2
 ```
 - Multiple primary definitions
 - **Fix**: Choose canonical, convert others to auxiliary
@@ -277,8 +277,8 @@ tsdoc-edge validate-docs managed 2>&1 | grep "missing_primary"
 
 ## Related
 
-- [[SELF-IMPROVEMENT-PROCESS]]: Complete validation workflow
-- [[DocumentSymbolSystem]]: Implementation details
+- SELF-IMPROVEMENT-PROCESS: Complete validation workflow
+- DocumentSymbolSystem: Implementation details
 - [[IndexDocsCommand]]: How symbols are indexed
 
 ---
@@ -287,38 +287,11 @@ tsdoc-edge validate-docs managed 2>&1 | grep "missing_primary"
 
 ### Referenced By
 
-- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:79
-- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:80
-- [[IndexDocsCommand]] → /home/user/tsdoc-edge/managed/commands/IndexDocsCommand.md:81
-- [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:205
-- [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:242
-- [[SymbolFixCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolFixCommand.md:243
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:152
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:186
-- [[SymbolQueryCommand]] → /home/user/tsdoc-edge/managed/commands/SymbolQueryCommand.md:187
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:141
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:205
-- [[Document Symbol System]] → /home/user/tsdoc-edge/managed/concepts/document-symbol-system.md:206
-- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:222
-- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:237
-- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:277
-- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:278
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:139
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:197
-- [[SSOT]] → /home/user/tsdoc-edge/managed/concepts/ssot.md:198
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:148
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:193
-- [[DocumentSymbolRegistry]] → /home/user/tsdoc-edge/managed/doc-symbols/DocumentSymbolRegistry.md:194
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:122
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:123
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:124
-- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:402
-- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:446
-- [[Relationship System Roadmap]] → /home/user/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:447
-- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:61
-- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:78
-- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:79
-- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:80
-- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:81
-- [[SELF-IMPROVEMENT-PROCESS]] → /home/user/tsdoc-edge/managed/workflows/self-improvement-process.md:82
+- [[SymbolFixCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolFixCommand.md:205
+- [[SymbolQueryCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolQueryCommand.md:152
+- [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:141
+- [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:222
+- [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:237
+- [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:148
+- [[Relationship System Roadmap]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:404
 

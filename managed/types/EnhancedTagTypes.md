@@ -1,4 +1,4 @@
-# [[EnhancedTagTypes]]
+# EnhancedTagTypes
 
 **Source**: `src/types/tags/enhanced.ts`
 
@@ -10,7 +10,7 @@ Extended documentation structure for comprehensive symbol documentation in Stric
 
 Documents the problem context:
 
-See implementation: [[ProblemSolving]]
+See implementation: ProblemSolving
 
 **Key Properties**:
 - `description`: Problem description
@@ -56,7 +56,7 @@ IOSpec structure (inline type in [[Functionality]].io):
 
 Documents known errors and solutions:
 
-See implementation: [[ErrorExperience]]
+See implementation: ErrorExperience
 
 **Key Properties**:
 - `id`: Error identifier
@@ -85,7 +85,7 @@ See implementation: [[ErrorExperience]]
 
 Documents architectural choices:
 
-See implementation: [[DesignDecision]]
+See implementation: DesignDecision
 
 **Key Properties**:
 - `id`: Decision identifier
@@ -99,13 +99,13 @@ See implementation: [[DesignDecision]]
 - `date`: Decision date (optional)
 - `revisedBy`: Superseding decision (optional)
 
-Note: The `alternatives` field in the documentation contains an array of alternative options as strings. For structured alternatives, use the [[DesignDecision]] interface with the `consequences` field to describe trade-offs.
+Note: The `alternatives` field in the documentation contains an array of alternative options as strings. For structured alternatives, use the DesignDecision interface with the `consequences` field to describe trade-offs.
 
 ## Dependencies
 
 Documents external dependencies:
 
-See implementation: [[DependencySpec]]
+See implementation: DependencySpec
 
 **Key Properties**:
 - `name`: Dependency name
@@ -119,7 +119,7 @@ See implementation: [[DependencySpec]]
 
 Documents roadmap and TODOs:
 
-See implementation: [[FuturePlan]]
+See implementation: FuturePlan
 
 **Key Properties**:
 - `id`: Plan identifier
@@ -135,7 +135,7 @@ See implementation: [[FuturePlan]]
 
 Complete enhanced doc structure:
 
-See implementation: [[EnhancedSymbolDoc]]
+See implementation: EnhancedSymbolDoc
 
 **Key Properties**:
 - `symbolId`: Symbol identifier
@@ -181,23 +181,6 @@ tsdoc-edge improve src/services/UserService.ts
 
 ## Related
 
-- [[ModuleSpecTypes]]: 7-part framework
-- [[EnhancedDocExtractor]]: Extracts enhanced docs
-- [[StrictModeValidator]]: Validates completeness
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:308
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:309
-- [[StrictModeValidator]] → /home/user/tsdoc-edge/managed/analyzers/StrictModeValidator.md:310
-- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:278
-- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:279
-- [[EnhancedDocExtractor]] → /home/user/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:280
-- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:110
-- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:111
-- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:112
-
+- ModuleSpecTypes: 7-part framework
+- EnhancedDocExtractor: Extracts enhanced docs
+- StrictModeValidator: Validates completeness

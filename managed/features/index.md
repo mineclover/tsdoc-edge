@@ -37,7 +37,7 @@ tsdoc-edge work-context <file-path>    # 파일 작업 전 컨텍스트 확인
 
 ---
 
-### [[DocumentSymbolSystem]]
+### DocumentSymbolSystem
 **Path**: `document-symbol-system.md`
 
 Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.
@@ -68,8 +68,8 @@ Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.
 
 ---
 
-### [[DependencyAnalysis]]
-**Path**: `DependencyAnalysis.md`
+### Dependency Analysis
+**Path**: `DependencyAnalysis.md` (planned)
 
 심볼 의존성 분석 및 관계 탐색.
 
@@ -83,8 +83,8 @@ Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.
 
 ---
 
-### [[ImpactAnalysis]]
-**Path**: `ImpactAnalysis.md`
+### Impact Analysis
+**Path**: `ImpactAnalysis.md` (planned)
 
 코드 변경의 영향 범위 평가.
 
@@ -98,8 +98,8 @@ Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.
 
 ---
 
-### [[DeadCodeDetection]]
-**Path**: `DeadCodeDetection.md`
+### Dead Code Detection
+**Path**: `DeadCodeDetection.md` (planned)
 
 미사용 코드 탐지 및 제거 전략.
 
@@ -167,8 +167,8 @@ Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.
 
 ## Integration Features (통합 기능)
 
-### [[CICDIntegration]]
-**Path**: `CICDIntegration.md`
+### CI/CD Integration
+**Path**: `CICDIntegration.md` (planned)
 
 CI/CD 파이프라인 통합 및 품질 게이트.
 
@@ -196,20 +196,47 @@ CI/CD 파이프라인 통합 및 품질 게이트.
 
 ---
 
+### [[LSP Integration]]
+**Path**: `lsp-integration.md`
+
+IDE 통합을 위한 Language Server Protocol 지원.
+
+**주요 기능**:
+- Hover: 심볼 정보 및 영향 분석
+- Code Lens: 의존성 인라인 표시
+- Diagnostics: 순환 의존성, 레이어 위반 경고
+- Document Link: `[[Symbol]]` 클릭 시 정의로 이동
+
+**Commands**: LSP 서버 실행 (`node dist/lsp/server.js`)
+
+---
+
+### [[MCP Testing Strategy]]
+**Path**: `mcp-testing-strategy.md`
+
+Model Context Protocol 도구 테스트 전략.
+
+**주요 기능**:
+- MCP 도구 테스트 프레임워크
+- 통합 테스트 가이드
+- 도구별 테스트 시나리오
+
+---
+
 ## Feature Matrix
 
 | Feature | Status | Commands | Priority |
 |---------|--------|----------|----------|
 | [[CoreWorkflow]] | ✅ Active | build, parse | Critical |
-| [[DocumentSymbolSystem]] | ✅ Active | index-docs | Critical |
+| DocumentSymbolSystem | ✅ Active | index-docs | Critical |
 | [[AnalysisFeatures]] | ✅ Active | analyze, health | High |
-| [[DependencyAnalysis]] | ✅ Active | deps, used-by | High |
-| [[ImpactAnalysis]] | ✅ Active | analyze-impact | High |
+| DependencyAnalysis | ✅ Active | deps, used-by | High |
+| ImpactAnalysis | ✅ Active | analyze-impact | High |
 | [[SymbolGraphFeatures]] | ✅ Active | scan, deps | High |
 | [[QueryCommands]] | ✅ Active | deps, orphans | Medium |
 | [[ValidationFeatures]] | ✅ Active | validate | Medium |
-| [[DeadCodeDetection]] | ✅ Active | orphans | Medium |
-| [[CICDIntegration]] | ✅ Active | (CI/CD) | Medium |
+| DeadCodeDetection | ✅ Active | orphans | Medium |
+| CICDIntegration | ✅ Active | (CI/CD) | Medium |
 | [[AutoIndexing]] | ✅ Active | watch | Low |
 
 ---
@@ -269,38 +296,9 @@ tsdoc-edge test-impact database-manager
 
 ### Referenced By
 
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:303
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:304
-- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:254
-- [[Concepts Index]] → /home/user/tsdoc-edge/managed/concepts/index.md:283
-- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:136
-- [[QueryCommands]] → /home/user/tsdoc-edge/managed/features/QueryCommands.md:137
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:367
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:368
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:212
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:213
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:350
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:351
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:352
-- [[CoreFeatures]] → /home/user/tsdoc-edge/managed/features/core-features-catalog.md:353
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:244
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:245
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:153
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:154
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:338
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:339
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:310
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:311
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:475
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:476
-- [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:403
-- [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:413
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:295
-- [[Relationship Types]] → /home/user/tsdoc-edge/managed/relationships/index.md:296
-- [[Types Index]] → /home/user/tsdoc-edge/managed/types/index.md:348
-- [[Types Index]] → /home/user/tsdoc-edge/managed/types/index.md:358
-- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:418
-- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:427
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:195
-- [[Workflows Index]] → /home/user/tsdoc-edge/managed/workflows/index.md:209
+- [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:254
+- [[Primary Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/index.md:403
+- [[Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/index.md:348
+- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:418
+- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:195
 

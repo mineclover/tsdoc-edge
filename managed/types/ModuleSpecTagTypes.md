@@ -1,4 +1,4 @@
-# [[ModuleSpecTagTypes]]
+# ModuleSpecTagTypes
 
 **Source**: `src/types/tags/module-spec-tags.ts`
 
@@ -10,7 +10,7 @@ Custom TSDoc tags for 7-part module specification framework.
 
 From `@algorithm` tag:
 
-See implementation: [[AlgorithmDoc]]
+See implementation: AlgorithmDoc
 
 **Key Properties**:
 - `description`: Algorithm description
@@ -30,7 +30,7 @@ See implementation: [[AlgorithmDoc]]
 
 From `@complexity` tag:
 
-See implementation: [[ComplexityDoc]]
+See implementation: ComplexityDoc
 
 **Key Properties**:
 - `notation`: "O(n)", "O(log n)", etc.
@@ -48,7 +48,7 @@ See implementation: [[ComplexityDoc]]
 
 From `@sideEffect` tag:
 
-See implementation: [[SideEffectDoc]]
+See implementation: SideEffectDoc
 
 **Key Properties**:
 - `type`: 'filesystem', 'database', 'network', 'state', 'process', or 'other'
@@ -69,7 +69,7 @@ See implementation: [[SideEffectDoc]]
 
 From `@mutates` tag:
 
-See implementation: [[MutationDoc]]
+See implementation: MutationDoc
 
 **Key Properties**:
 - `target`: What state mutated
@@ -88,7 +88,7 @@ See implementation: [[MutationDoc]]
 
 From `@io` tag:
 
-See implementation: [[IODoc]]
+See implementation: IODoc
 
 **Key Properties**:
 - `type`: 'file', 'network', 'database', 'console', or 'other'
@@ -108,7 +108,7 @@ See implementation: [[IODoc]]
 
 From `@scope` tag:
 
-See implementation: [[ScopeDoc]]
+See implementation: ScopeDoc
 
 **Key Properties**:
 - `description`: Scope description
@@ -127,7 +127,7 @@ See implementation: [[ScopeDoc]]
 
 Complete tag set:
 
-See implementation: [[ModuleSpecTags]]
+See implementation: ModuleSpecTags
 
 **Key Properties**:
 - `algorithm`: Algorithm documentation (optional)
@@ -253,23 +253,6 @@ Maps to framework sections:
 
 ## Related
 
-- [[ModuleSpecTypes]]: 7-part framework
-- [[ModuleSpecTagParser]]: Parses these tags
-- [[ModuleSpecValidator]]: Validates completeness
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:42
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:43
-- [[ModuleSpecTagParser]] → /home/user/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:44
-- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:113
-- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:114
-- [[ModuleSpecTypes]] → /home/user/tsdoc-edge/managed/types/ModuleSpecTypes.md:115
-- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:141
-- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:142
-- [[ModuleSpecValidator]] → /home/user/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:143
-
+- ModuleSpecTypes: 7-part framework
+- ModuleSpecTagParser: Parses these tags
+- ModuleSpecValidator: Validates completeness

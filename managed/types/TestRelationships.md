@@ -1,4 +1,4 @@
-# [[TestRelationships]]
+# TestRelationships
 
 **Source**: `src/types/analysis/test-relationships.ts`
 
@@ -10,7 +10,7 @@ Type system for test-code relationship analysis and verification.
 
 Tracks how production symbols are used in tests:
 
-See implementation: [[TestSymbolUsage]]
+See implementation: TestSymbolUsage
 
 **Key Properties**:
 - `testFilePath`: Test file path
@@ -21,7 +21,7 @@ See implementation: [[TestSymbolUsage]]
 
 Symbol imported from production code into test:
 
-See implementation: [[ImportedSymbol]]
+See implementation: ImportedSymbol
 
 **Key Properties**:
 - `symbolName`: Name as imported
@@ -33,7 +33,7 @@ See implementation: [[ImportedSymbol]]
 
 How symbol is used in test code:
 
-See implementation: [[UsagePattern]]
+See implementation: UsagePattern
 
 **Key Properties**:
 - `symbolId`: Symbol identifier
@@ -54,7 +54,7 @@ See implementation: [[UsagePattern]]
 
 Relationship confirmed by test evidence:
 
-See implementation: [[VerifiedRelationship]]
+See implementation: VerifiedRelationship
 
 **Key Properties**:
 - `source`: Source symbol ID
@@ -73,7 +73,7 @@ See implementation: [[VerifiedRelationship]]
 
 Proof of relationship in test:
 
-See implementation: [[RelationshipEvidence]]
+See implementation: RelationshipEvidence
 
 **Key Properties**:
 - `lineNumber`: Line number
@@ -116,20 +116,3 @@ tsdoc-edge coverage-report --hierarchical
 - [[AnalyzeTestsCommand]]: Analyze test relationships
 - [[TestRelationshipsCommand]]: Show test coverage
 - [[CoverageReportCommand]]: Coverage metrics
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:43
-- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:44
-- [[AnalyzeTestsCommand]] → /home/user/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:45
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:153
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:154
-- [[CoverageReportCommand]] → /home/user/tsdoc-edge/managed/commands/CoverageReportCommand.md:155
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:52
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:53
-- [[TestRelationshipsCommand]] → /home/user/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:54
-

@@ -72,7 +72,7 @@ class SymbolGraphBuilder {
 
 **Source**: `src/graph/SymbolGraphBuilder.ts`
 
-### [[SymbolSearchEngine]]
+### SymbolSearchEngine
 
 다중 조건 기반 심볼 검색 엔진
 
@@ -95,7 +95,7 @@ class SymbolSearchEngine {
 
 **Source**: `src/graph/SymbolSearchEngine.ts`
 
-### [[DepthTraverser]]
+### DepthTraverser
 
 BFS 기반 의존성 순회
 
@@ -165,7 +165,7 @@ interface Symbol {
 
 ## 설계 의사결정
 
-### [[ADR-001: Adjacency List vs Matrix]]
+### ADR-001: Adjacency List vs Matrix]]
 
 ```
 @decision 인접 리스트 방식 채택
@@ -178,7 +178,7 @@ interface Symbol {
   - 양방향 인접 리스트로 역방향 조회 지원
 ```
 
-### [[ADR-002: Multi-Index Strategy]]
+### ADR-002: Multi-Index Strategy]]
 
 ```
 @decision 4개 인덱스 동시 유지 (id, name, file, adjacency)
@@ -268,4 +268,14 @@ if (cycles.length > 0) {
 ---
 
 ## Backlinks
-<!-- 이 섹션은 자동 생성됩니다 -->
+
+### Referenced By
+
+- [[Analyzer System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/analyzer-system.md:33
+- [[Analyzer System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/analyzer-system.md:232
+- [[Parser System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/parser-system.md:34
+- [[Parser System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/parser-system.md:179
+- [[Storage System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/storage-system.md:148
+- [[Validator System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/validator-system.md:31
+- [[Validator System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/validator-system.md:172
+

@@ -19,4 +19,4 @@ Features:
 
 ## Related
 
-- [[Documentation Fixer]]: Fix implementation
+- Documentation Fixer: Fix implementation

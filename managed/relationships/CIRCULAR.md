@@ -22,19 +22,9 @@ Detect circular dependencies (`A → B → A`).
 
 ### Referenced By
 
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:88
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:319
-- [[Commands Index]] → /home/user/tsdoc-edge/managed/COMMANDS.md:320
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:40
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:267
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:467
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:468
-- [[DependencyChainAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:23
-- [[DependencyChainAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:51
-- [[DependencyChainAnalyzer]] → /home/user/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:52
-- [[DetectCircularTypesCommand]] → /home/user/tsdoc-edge/managed/commands/DetectCircularTypesCommand.md:80
-- [[DetectCircularTypesCommand]] → /home/user/tsdoc-edge/managed/commands/DetectCircularTypesCommand.md:81
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:69
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:513
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:514
+- [[Commands Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:90
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:42
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:321
+- DependencyChainAnalyzer → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:23
+- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:69
 

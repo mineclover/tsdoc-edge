@@ -14,6 +14,8 @@
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import { SymbolKind, DiagnosticSeverity } from 'vscode-languageserver/node';
+import { CacheManager } from './cache-manager';
+import { StatementManager } from './statement-manager';
 
 /**
  * Code Lens information for displaying impact counts on symbols
@@ -62,18 +64,13 @@ export interface DiagnosticInfo {
   severity: DiagnosticSeverity;
 }
 
-/**
- * Cache entry with TTL for performance optimization
- *
- * @typeParam T - Type of cached value
- * @internal
- */
-interface CacheEntry<T> {
-  /** Cached value */
-  value: T;
-  /** Unix timestamp when the entry was created */
-  timestamp: number;
-}
+/** Cache names used by the service */
+const CACHE_NAMES = {
+  SYMBOL: 'symbol',
+  CODE_LENS: 'codeLens',
+  DIAGNOSTICS: 'diagnostics',
+  IMPACT: 'impact',
+} as const;
 
 /**
  * TSDoc Edge Service - Bridge between LSP protocol and TSDoc Edge database
@@ -99,22 +96,14 @@ export class TsdocEdgeService {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private db: any | null = null;
 
-  /** Cache for symbol queries */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private symbolCache = new Map<string, CacheEntry<any>>();
-  /** Cache for code lens data per file */
-  private codeLensCache = new Map<string, CacheEntry<CodeLensInfo[]>>();
-  /** Cache for diagnostics per file */
-  private diagnosticsCache = new Map<string, CacheEntry<DiagnosticInfo[]>>();
-  /** Cache for impact analysis results */
-  private impactCache = new Map<string, CacheEntry<{ downstream: number; upstream: number }>>();
+  /** Cache manager for all caches */
+  private cacheManager: CacheManager;
 
-  /** Cache TTL in milliseconds (5 seconds for real-time updates) */
-  private static readonly CACHE_TTL = 5000;
+  /** Statement manager for prepared SQL statements */
+  private statementManager: StatementManager | null = null;
 
-  /** Prepared SQL statements for query reuse */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private statements: Record<string, any> = {};
+  /** Maximum symbols to return in impact analysis */
+  private static readonly MAX_IMPACT_SYMBOLS = 100;
 
   /**
    * Creates a new TsdocEdgeService instance
@@ -124,19 +113,21 @@ export class TsdocEdgeService {
   constructor(workspaceRoot: string) {
     this.workspaceRoot = workspaceRoot;
     this.dbPath = path.join(workspaceRoot, '.tsdoc', 'symbols.db');
-    this.initDatabase();
-  }
 
-  /**
-   * Check if cache entry is valid based on TTL
-   *
-   * @param entry - Cache entry to validate
-   * @returns True if entry exists and is within TTL
-   * @internal
-   */
-  private isCacheValid<T>(entry: CacheEntry<T> | undefined): entry is CacheEntry<T> {
-    if (!entry) return false;
-    return Date.now() - entry.timestamp < TsdocEdgeService.CACHE_TTL;
+    // Initialize cache manager with defaults
+    this.cacheManager = new CacheManager({
+      ttl: 5000,
+      maxSize: 500,
+      cleanupInterval: 30000,
+    });
+
+    // Create named caches
+    this.cacheManager.createCache(CACHE_NAMES.SYMBOL);
+    this.cacheManager.createCache(CACHE_NAMES.CODE_LENS);
+    this.cacheManager.createCache(CACHE_NAMES.DIAGNOSTICS);
+    this.cacheManager.createCache(CACHE_NAMES.IMPACT);
+
+    this.initDatabase();
   }
 
   /**
@@ -147,10 +138,7 @@ export class TsdocEdgeService {
    * @public
    */
   invalidateCache(): void {
-    this.symbolCache.clear();
-    this.codeLensCache.clear();
-    this.diagnosticsCache.clear();
-    this.impactCache.clear();
+    this.cacheManager.clearAll();
   }
 
   /**
@@ -163,34 +151,8 @@ export class TsdocEdgeService {
    */
   invalidateFileCache(filePath: string): void {
     const fileName = path.basename(filePath);
-    // Remove entries that contain this file
-    for (const key of this.codeLensCache.keys()) {
-      if (key.includes(fileName)) {
-        this.codeLensCache.delete(key);
-      }
-    }
-    for (const key of this.diagnosticsCache.keys()) {
-      if (key.includes(fileName)) {
-        this.diagnosticsCache.delete(key);
-      }
-    }
-  }
-
-  /**
-   * Get or create a prepared SQL statement
-   *
-   * @param name - Unique identifier for the statement
-   * @param sql - SQL query string
-   * @returns Prepared statement or null if database is not connected
-   * @internal
-   */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private getStatement(name: string, sql: string): any | null {
-    if (!this.db) return null;
-    if (!this.statements[name]) {
-      this.statements[name] = this.db.prepare(sql);
-    }
-    return this.statements[name];
+    this.cacheManager.deleteMatching(CACHE_NAMES.CODE_LENS, (key) => key.includes(fileName));
+    this.cacheManager.deleteMatching(CACHE_NAMES.DIAGNOSTICS, (key) => key.includes(fileName));
   }
 
   /**
@@ -208,6 +170,9 @@ export class TsdocEdgeService {
       // eslint-disable-next-line @typescript-eslint/no-var-requires
       const Database = require('better-sqlite3');
       this.db = new Database(this.dbPath, { readonly: true });
+
+      // Initialize statement manager with database
+      this.statementManager = new StatementManager(this.db, { maxStatements: 50 });
     } catch (error) {
       console.error(`Failed to open database: ${error}`);
     }
@@ -294,18 +259,18 @@ export class TsdocEdgeService {
    */
   private getImpactCounts(symbolId: string): { downstream: number; upstream: number } {
     // Check cache
-    const cached = this.impactCache.get(symbolId);
-    if (this.isCacheValid(cached)) {
-      return cached.value;
+    const cached = this.cacheManager.get<{ downstream: number; upstream: number }>(CACHE_NAMES.IMPACT, symbolId);
+    if (cached) {
+      return cached;
     }
 
-    const downstreamStmt = this.getStatement('downstream', `
+    const downstreamStmt = this.statementManager?.prepare('downstream', `
       SELECT COUNT(*) as count
       FROM unified_relationships
       WHERE from_symbols LIKE ?
     `);
 
-    const upstreamStmt = this.getStatement('upstream', `
+    const upstreamStmt = this.statementManager?.prepare('upstream', `
       SELECT COUNT(*) as count
       FROM unified_relationships
       WHERE to_symbols LIKE ?
@@ -317,10 +282,7 @@ export class TsdocEdgeService {
     const result = { downstream, upstream };
 
     // Store in cache
-    this.impactCache.set(symbolId, {
-      value: result,
-      timestamp: Date.now(),
-    });
+    this.cacheManager.set(CACHE_NAMES.IMPACT, symbolId, result);
 
     return result;
   }
@@ -339,13 +301,13 @@ export class TsdocEdgeService {
       const fileName = path.basename(normalizedPath);
 
       // Check cache
-      const cached = this.codeLensCache.get(fileName);
-      if (this.isCacheValid(cached)) {
-        return cached.value;
+      const cached = this.cacheManager.get<CodeLensInfo[]>(CACHE_NAMES.CODE_LENS, fileName);
+      if (cached) {
+        return cached;
       }
 
       // Get all symbols in this file using cached statement
-      const symbolsStmt = this.getStatement('fileSymbols', `
+      const symbolsStmt = this.statementManager?.prepare('fileSymbols', `
         SELECT id, name, line
         FROM symbols
         WHERE file_path LIKE ?
@@ -369,10 +331,7 @@ export class TsdocEdgeService {
       }
 
       // Store in cache
-      this.codeLensCache.set(fileName, {
-        value: codeLenses,
-        timestamp: Date.now(),
-      });
+      this.cacheManager.set(CACHE_NAMES.CODE_LENS, fileName, codeLenses);
 
       return codeLenses;
     } catch (error) {
@@ -425,15 +384,15 @@ export class TsdocEdgeService {
       const fileName = path.basename(normalizedPath);
 
       // Check cache
-      const cached = this.diagnosticsCache.get(fileName);
-      if (this.isCacheValid(cached)) {
-        return cached.value;
+      const cached = this.cacheManager.get<DiagnosticInfo[]>(CACHE_NAMES.DIAGNOSTICS, fileName);
+      if (cached) {
+        return cached;
       }
 
       const diagnostics: DiagnosticInfo[] = [];
 
       // Check for circular dependencies using cached statement
-      const circularStmt = this.getStatement('circularDeps', `
+      const circularStmt = this.statementManager?.prepare('circularDeps', `
         SELECT from_symbols, to_symbols, properties, file_path, line
         FROM unified_relationships
         WHERE type = 'circular-dependency'
@@ -451,7 +410,7 @@ export class TsdocEdgeService {
       }
 
       // Check for layer violations using cached statement
-      const violationStmt = this.getStatement('layerViolations', `
+      const violationStmt = this.statementManager?.prepare('layerViolations', `
         SELECT from_symbols, to_symbols, properties, file_path, line
         FROM unified_relationships
         WHERE type = 'layer-dependency'
@@ -470,7 +429,7 @@ export class TsdocEdgeService {
       }
 
       // Check for high-impact symbols (warning for symbols with many dependents)
-      const highImpactStmt = this.getStatement('highImpact', `
+      const highImpactStmt = this.statementManager?.prepare('highImpact', `
         SELECT s.id, s.name, s.line, COUNT(r.id) as count
         FROM symbols s
         JOIN unified_relationships r ON r.from_symbols LIKE '%' || s.id || '%'
@@ -489,10 +448,7 @@ export class TsdocEdgeService {
       }
 
       // Store in cache
-      this.diagnosticsCache.set(fileName, {
-        value: diagnostics,
-        timestamp: Date.now(),
-      });
+      this.cacheManager.set(CACHE_NAMES.DIAGNOSTICS, fileName, diagnostics);
 
       return diagnostics;
     } catch (error) {
@@ -556,10 +512,15 @@ export class TsdocEdgeService {
    * Get impact analysis for a symbol
    *
    * @param symbolId - Symbol ID
-   * @param maxDepth - Maximum depth to traverse
-   * @returns Impact counts
+   * @param maxDepth - Maximum depth to traverse (default: 3)
+   * @param includeSymbols - Whether to include symbol IDs in result (default: true)
+   * @returns Impact counts and optionally symbol IDs
    */
-  getImpactAnalysis(symbolId: string, maxDepth: number = 3): { downstream: number; upstream: number; symbols: string[] } {
+  getImpactAnalysis(
+    symbolId: string,
+    maxDepth: number = 3,
+    includeSymbols: boolean = true
+  ): { downstream: number; upstream: number; symbols: string[] } {
     if (!this.db) return { downstream: 0, upstream: 0, symbols: [] };
 
     try {
@@ -567,24 +528,34 @@ export class TsdocEdgeService {
       const queue: Array<{ id: string; depth: number }> = [{ id: symbolId, depth: 0 }];
       visited.add(symbolId);
 
-      while (queue.length > 0) {
+      // Use prepared statement for BFS queries
+      const relationshipStmt = this.statementManager?.prepare('impactRelationships', `
+        SELECT to_symbols
+        FROM unified_relationships
+        WHERE from_symbols LIKE ?
+      `);
+
+      // BFS with size limit to prevent memory issues
+      const maxSymbols = TsdocEdgeService.MAX_IMPACT_SYMBOLS;
+
+      while (queue.length > 0 && visited.size <= maxSymbols) {
         const current = queue.shift()!;
         if (current.depth >= maxDepth) continue;
 
         // Find downstream dependencies
-        const relationships = this.db.prepare(`
-          SELECT to_symbols
-          FROM unified_relationships
-          WHERE from_symbols LIKE ?
-        `).all(`%${current.id}%`) as Array<{ to_symbols: string }>;
+        const relationships = relationshipStmt?.all(`%${current.id}%`) as Array<{ to_symbols: string }> || [];
 
         for (const rel of relationships) {
-          const toSymbols = JSON.parse(rel.to_symbols);
-          for (const toSym of toSymbols) {
-            if (!visited.has(toSym)) {
-              visited.add(toSym);
-              queue.push({ id: toSym, depth: current.depth + 1 });
+          try {
+            const toSymbols = JSON.parse(rel.to_symbols);
+            for (const toSym of toSymbols) {
+              if (!visited.has(toSym) && visited.size <= maxSymbols) {
+                visited.add(toSym);
+                queue.push({ id: toSym, depth: current.depth + 1 });
+              }
             }
+          } catch {
+            // Skip malformed JSON
           }
         }
       }
@@ -592,17 +563,21 @@ export class TsdocEdgeService {
       // Remove the starting symbol from count
       visited.delete(symbolId);
 
-      // Get upstream count
-      const upstreamCount = this.db.prepare(`
+      // Get upstream count using prepared statement
+      const upstreamStmt = this.statementManager?.prepare('impactUpstream', `
         SELECT COUNT(DISTINCT from_symbols) as count
         FROM unified_relationships
         WHERE to_symbols LIKE ?
-      `).get(`%${symbolId}%`) as { count: number } | undefined;
+      `);
+      const upstreamCount = upstreamStmt?.get(`%${symbolId}%`) as { count: number } | undefined;
+
+      // Only convert to array if requested to save memory
+      const symbolArray = includeSymbols ? Array.from(visited) : [];
 
       return {
         downstream: visited.size,
         upstream: upstreamCount?.count || 0,
-        symbols: Array.from(visited),
+        symbols: symbolArray,
       };
     } catch (error) {
       console.error(`getImpactAnalysis error: ${error}`);
@@ -726,9 +701,22 @@ export class TsdocEdgeService {
   }
 
   /**
-   * Close database connection
+   * Close database connection and cleanup all resources
+   *
+   * This method should be called when the LSP server shuts down
+   * to prevent memory leaks.
    */
   close(): void {
+    // Dispose cache manager (stops timer and clears caches)
+    this.cacheManager.dispose();
+
+    // Dispose statement manager
+    if (this.statementManager) {
+      this.statementManager.dispose();
+      this.statementManager = null;
+    }
+
+    // Close database connection
     if (this.db) {
       this.db.close();
       this.db = null;

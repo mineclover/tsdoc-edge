@@ -1,4 +1,4 @@
-# [[ExtractionResult]]
+# ExtractionResult
 
 **Primary Type**: Symbol Extraction Output
 
@@ -20,7 +20,7 @@
 
 ### Type Definition
 
-See implementation: [[ExtractionResult]]
+See implementation: ExtractionResult
 
 **Structure**: 그래프 이론의 V(Vertex)와 E(Edge) 분리
 - `symbols`: ExtractedSymbol[] - 추출된 심볼 목록 (노드)
@@ -125,40 +125,14 @@ Source Code → [TSDocParser] → ExtractionResult
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:219
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:460
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:91
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:173
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:262
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:263
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:264
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:265
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:266
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:267
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:268
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:269
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:270
-- [[ASTSymbolExtractor]] → /home/user/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:271
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:142
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:143
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:144
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:145
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:146
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:147
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:148
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:149
-- [[BuildCommand]] → /home/user/tsdoc-edge/managed/commands/BuildCommand.md:150
-- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:53
-- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:54
-- [[ParseCommand]] → /home/user/tsdoc-edge/managed/commands/ParseCommand.md:55
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:380
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:493
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:494
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:218
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:219
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:220
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:273
+- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:82
+- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:111
+- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:193
+- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:380
+- ExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ExtractionResult.md:23
 
 ### Implemented By
 
-- ExtractionResult → /home/user/tsdoc-edge/src/analyzer/ASTSymbolExtractor.ts:36
+- ExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/src/analyzer/ASTSymbolExtractor.ts:36
 

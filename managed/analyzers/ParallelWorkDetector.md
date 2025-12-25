@@ -26,7 +26,7 @@ interface ParallelWorkGroup {
 
 ## Related
 
-- [[Parallel Work Theory]]: 이론적 배경
+- Parallel Work Theory: 이론적 배경
 - [[WorkContextCommand]]: 작업 컨텍스트 분석
 
 ---
@@ -35,18 +35,6 @@ interface ParallelWorkGroup {
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:160
-- [[TSDoc Edge Documentation]] → /home/user/tsdoc-edge/managed/README.md:359
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:179
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:319
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:320
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:91
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:396
-- [[TSDoc Edge System Architecture]] → /home/user/tsdoc-edge/managed/architecture/system-architecture-2025-11-07.md:397
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:82
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:83
-- [[WorkContextCommand]] → /home/user/tsdoc-edge/managed/commands/WorkContextCommand.md:84
-- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:262
-- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:263
-- [[Parallel Work Theory]] → /home/user/tsdoc-edge/managed/concepts/parallel-work-theory.md:264
+- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:223
+- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:179
 

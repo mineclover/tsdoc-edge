@@ -147,7 +147,7 @@ tsdoc-edge orphans              # 고아 심볼
 ```
 
 ---
-## 5. [[DocumentSymbolSystem]]
+## 5. DocumentSymbolSystem
 
 > Wiki 스타일 [[]] 문법으로 문서와 코드를 양방향 연결
 **주요 산출물:**
@@ -390,7 +390,7 @@ tsdoc-edge todos                        # TODO 목록
 6. 리팩토링 시나리오 실습
 
 ### 3. 문서 시스템
-7. [[DocumentSymbolSystem]] - [[]] 문법 학습
+7. DocumentSymbolSystem - [[]] 문법 학습
 8. [[AutoIndexing]] - 자동화 설정
 9. 프로젝트에 적용
 
@@ -425,59 +425,6 @@ tsdoc-edge todos                        # TODO 목록
 
 ### Referenced By
 
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:352
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:353
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:354
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:355
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:356
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:357
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:358
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:359
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:190
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:191
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:192
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:193
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:194
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:195
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:196
-- [[AutoIndexing]] → /home/user/tsdoc-edge/managed/features/auto-indexing.md:197
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:229
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:230
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:231
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:232
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:233
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:234
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:235
-- [[CoreWorkflow]] → /home/user/tsdoc-edge/managed/features/core-workflow.md:236
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:138
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:139
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:140
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:141
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:142
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:143
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:144
-- [[DocumentSymbolSystem]] → /home/user/tsdoc-edge/managed/features/document-symbol-system.md:145
-- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:8
-- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:226
-- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:240
-- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:241
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:323
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:324
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:325
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:326
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:327
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:328
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:329
-- [[SymbolGraphFeatures]] → /home/user/tsdoc-edge/managed/features/symbol-graph.md:330
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:288
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:289
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:290
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:291
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:292
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:293
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:294
-- [[ValidationFeatures]] → /home/user/tsdoc-edge/managed/features/validation-features.md:295
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:270
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:271
-- [[Work Context Workflow]] → /home/user/tsdoc-edge/managed/workflows/work-context-workflow.md:272
+- [[Features Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/index.md:8
+- [[Features Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/index.md:226
 

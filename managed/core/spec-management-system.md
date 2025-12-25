@@ -78,7 +78,7 @@ class SpecCompletenessValidator {
 
 **Source**: `src/spec/SpecCompletenessValidator.ts`
 
-### [[SpecStatusManager]]
+### SpecStatusManager
 
 문서 상태 생명주기 관리
 
@@ -98,7 +98,7 @@ class SpecStatusManager {
 
 **Source**: `src/spec/SpecStatusManager.ts`
 
-### [[SpecVersionManager]]
+### SpecVersionManager
 
 버전 이력 추적
 
@@ -377,4 +377,8 @@ interface UnusedDocument {
 ---
 
 ## Backlinks
-<!-- 이 섹션은 자동 생성됩니다 -->
+
+### Referenced By
+
+- [[Validator System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/validator-system.md:175
+

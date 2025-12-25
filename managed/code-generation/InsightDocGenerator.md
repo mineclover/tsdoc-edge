@@ -1,4 +1,4 @@
-# [[InsightDocGenerator]]
+# InsightDocGenerator
 
 **Source**: `src/generator/InsightDocGenerator.ts`
 
@@ -20,14 +20,3 @@ Creates:
 ## Related
 
 - [[AnalysisFeatures]]: Code analysis
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:383
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:384
-- [[AnalysisFeatures]] → /home/user/tsdoc-edge/managed/features/analysis-features.md:385
-

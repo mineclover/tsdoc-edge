@@ -350,7 +350,7 @@ analyze(): UnifiedRelationship[] {
 
 All analyzers return `UnifiedRelationship[]`:
 
-See implementation: [[UnifiedRelationship]]
+See implementation: [[UnifiedRelationships]]
 
 **Core Fields**:
 - `id`: Unique ID (format: "type-from-to")
@@ -888,7 +888,7 @@ Here's a complete analyzer for detecting composition relationships:
 /**
  * Composition Analyzer
  *
- * @doc [[CompositionAnalyzer]]
+ * @doc CompositionAnalyzer
  * @packageDocumentation
  * @responsibility Detect composition relationships (class has-a property)
  */
@@ -1013,6 +1013,6 @@ export class CompositionAnalyzer {
 
 ### Referenced By
 
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:21
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:333
+- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:21
+- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:333
 

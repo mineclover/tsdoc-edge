@@ -1,4 +1,4 @@
-# [[SpecStatusManager]]
+# SpecStatusManager
 
 **Source**: `src/spec/SpecStatusManager.ts`
 
@@ -84,7 +84,7 @@ completeness: 85%
 
 - [[SpecCompletenessValidator]]: Validates completeness
 - (Planned: SpecStatusCommand for CLI status management)
-- [[SpecVersionManager]]: Version history tracking
+- SpecVersionManager: Version history tracking
 
 ---
 
@@ -92,22 +92,8 @@ completeness: 85%
 
 ### Referenced By
 
-- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:124
-- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:138
-- [[SpecTypes]] → /home/user/tsdoc-edge/managed/types/SpecTypes.md:139
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:62
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:93
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:94
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:95
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:96
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:97
-- [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:54
-- [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:65
-- [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:66
-- [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:67
-- [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:68
-- [[SpecVersionManager]] → /home/user/tsdoc-edge/managed/utilities/SpecVersionManager.md:69
-- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:79
-- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:96
-- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:97
+- SpecTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/SpecTypes.md:190
+- [[SpecCompletenessValidator]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:62
+- SpecVersionManager → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SpecVersionManager.md:54
+- [[UnusedDocumentDetector]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:79
 

@@ -1,4 +1,4 @@
-# [[SpecTypes]]
+# SpecTypes
 
 **Source**: `src/types/spec.ts`
 
@@ -10,7 +10,7 @@ Type system for specification document management and quality assessment.
 
 Document lifecycle states:
 
-See implementation: [[SpecStatus]]
+See implementation: SpecStatus
 
 **Values**:
 - `draft`: Work in progress
@@ -33,7 +33,7 @@ See implementation: [[SpecStatus]]
 
 Document metadata:
 
-See implementation: [[SpecMetadata]]
+See implementation: SpecMetadata
 
 **Key Properties**:
 - `primary`: Document symbol name
@@ -49,7 +49,7 @@ See implementation: [[SpecMetadata]]
 
 Quality requirements:
 
-See implementation: [[SpecRequirements]]
+See implementation: SpecRequirements
 
 **Key Properties**:
 - `requiredSections`: Must have sections
@@ -74,7 +74,7 @@ See implementation: [[SpecRequirements]]
 
 Comprehensive quality assessment:
 
-See implementation: [[SpecCompletenessResult]]
+See implementation: SpecCompletenessResult
 
 **Key Properties**:
 - `filePath`: File path
@@ -106,7 +106,7 @@ Quality requiring code connections:
 
 Duplicate detection:
 
-See implementation: [[ContentSimilarity]]
+See implementation: ContentSimilarity
 
 **Key Properties**:
 - `file1`: First file path
@@ -120,7 +120,7 @@ See implementation: [[ContentSimilarity]]
 
 Orphaned document detection:
 
-See implementation: [[UnusedDocument]]
+See implementation: UnusedDocument
 
 **Key Properties**:
 - `filePath`: File path
@@ -140,7 +140,7 @@ See implementation: [[UnusedDocument]]
 
 Status change validation:
 
-See implementation: [[SpecStatusTransition]]
+See implementation: SpecStatusTransition
 
 **Key Properties**:
 - `from`: From status
@@ -217,26 +217,6 @@ tsdoc-edge find-unused-docs managed
 ## Related
 
 - [[SpecCompletenessValidator]]: Validates completeness
-- [[SpecStatusManager]]: Manages status transitions
+- SpecStatusManager: Manages status transitions
 - [[UnusedDocumentDetector]]: Finds orphaned docs
-- [[SpecContentSimilarityChecker]]: Detects duplicates
-
----
-
-## Backlinks
-
-### Referenced By
-
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:90
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:91
-- [[SpecCompletenessValidator]] → /home/user/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:92
-- [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:89
-- [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:90
-- [[SpecContentSimilarityChecker]] → /home/user/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:91
-- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:75
-- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:76
-- [[SpecStatusManager]] → /home/user/tsdoc-edge/managed/utilities/SpecStatusManager.md:77
-- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:90
-- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:91
-- [[UnusedDocumentDetector]] → /home/user/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:92
-
+- SpecContentSimilarityChecker: Detects duplicates

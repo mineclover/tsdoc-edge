@@ -37,7 +37,7 @@ TSDoc Edge의 가장 기본이 되는 타입. 모든 심볼(함수, 클래스, �
 
 ---
 
-### [[DocumentSymbol]]
+### DocumentSymbol
 **Path**: `DocumentSymbol.md`
 **Priority**: ⭐⭐⭐ Critical
 
@@ -74,7 +74,7 @@ TSDoc Edge의 가장 기본이 되는 타입. 모든 심볼(함수, 클래스, �
 
 ---
 
-### [[TestRelationships]]
+### TestRelationships
 **Path**: `TestRelationships.md`
 **Priority**: ⭐⭐ High
 
@@ -90,7 +90,7 @@ TSDoc Edge의 가장 기본이 되는 타입. 모든 심볼(함수, 클래스, �
 
 ---
 
-### [[TypeChain]]
+### TypeChain
 **Path**: `TypeChain.md`
 **Priority**: ⭐⭐ High
 
@@ -108,7 +108,7 @@ TSDoc Edge의 가장 기본이 되는 타입. 모든 심볼(함수, 클래스, �
 
 ## Parsing Types (파싱 관련 타입)
 
-### [[ParseTypes]]
+### ParseTypes
 **Path**: `ParseTypes.md`
 **Priority**: ⭐⭐ High
 
@@ -123,7 +123,7 @@ TSDoc 파싱 결과를 표현하는 타입.
 
 ---
 
-### [[CustomTagTypes]]
+### CustomTagTypes
 **Path**: `CustomTagTypes.md`
 **Priority**: ⭐⭐ High
 
@@ -138,7 +138,7 @@ TSDoc 파싱 결과를 표현하는 타입.
 
 ---
 
-### [[EnhancedTagTypes]]
+### EnhancedTagTypes
 **Path**: `EnhancedTagTypes.md`
 **Priority**: ⭐ Medium
 
@@ -148,7 +148,7 @@ TSDoc 파싱 결과를 표현하는 타입.
 
 ---
 
-### [[CommentStateTypes]]
+### CommentStateTypes
 **Path**: `CommentStateTypes.md`
 **Priority**: ⭐ Medium
 
@@ -162,7 +162,7 @@ TSDoc 파싱 결과를 표현하는 타입.
 
 ## Specification Types (명세 관련 타입)
 
-### [[ModuleSpecTypes]]
+### ModuleSpecTypes
 **Path**: `ModuleSpecTypes.md`
 **Priority**: ⭐⭐ High
 
@@ -181,7 +181,7 @@ TSDoc 파싱 결과를 표현하는 타입.
 
 ---
 
-### [[ModuleSpecTagTypes]]
+### ModuleSpecTagTypes
 **Path**: `ModuleSpecTagTypes.md`
 **Priority**: ⭐⭐ High
 
@@ -193,7 +193,7 @@ TSDoc 파싱 결과를 표현하는 타입.
 
 ---
 
-### [[SpecTypes]]
+### SpecTypes
 **Path**: `SpecTypes.md`
 **Priority**: ⭐⭐ High
 
@@ -209,7 +209,7 @@ TSDoc 파싱 결과를 표현하는 타입.
 
 ---
 
-### [[FeatureTypes]]
+### FeatureTypes
 **Path**: `FeatureTypes.md`
 **Priority**: ⭐ Medium
 
@@ -219,7 +219,7 @@ TSDoc 파싱 결과를 표현하는 타입.
 
 ---
 
-### [[LinkingTypes]]
+### LinkingTypes
 **Path**: `LinkingTypes.md`
 **Priority**: ⭐ Medium
 
@@ -248,7 +248,7 @@ TSDoc 파싱 결과를 표현하는 타입.
 
 ---
 
-### [[CodeHealthMetrics]]
+### CodeHealthMetrics
 **Path**: `CodeHealthMetrics.md`
 **Priority**: ⭐⭐ High
 
@@ -264,7 +264,7 @@ TSDoc 파싱 결과를 표현하는 타입.
 
 ---
 
-### [[DataFlowTypes]]
+### DataFlowTypes
 **Path**: `DataFlowTypes.md`
 **Priority**: ⭐ Medium
 
@@ -276,7 +276,7 @@ TSDoc 파싱 결과를 표현하는 타입.
 
 ---
 
-### [[InterfaceTypes]]
+### InterfaceTypes
 **Path**: `InterfaceTypes.md`
 **Priority**: ⭐ Medium
 
@@ -288,7 +288,7 @@ TSDoc 파싱 결과를 표현하는 타입.
 
 ## Storage Types (저장소 관련 타입)
 
-### [[RegistryTypes]]
+### RegistryTypes
 **Path**: `RegistryTypes.md`
 **Priority**: ⭐⭐ High
 
@@ -379,12 +379,6 @@ Uses: DocumentSymbol, FeatureTypes, LinkingTypes
 
 ### Referenced By
 
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:392
-- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:249
-- [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:401
-- [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:414
-- [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:415
-- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:415
-- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:431
-- [[Utilities Index]] → /home/user/tsdoc-edge/managed/utilities/index.md:432
+- [[Primary Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/index.md:401
+- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:415
 

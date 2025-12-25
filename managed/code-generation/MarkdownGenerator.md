@@ -19,4 +19,4 @@ Supports:
 
 ## Related
 
-- [[Enhanced Markdown Generator]]: Enhanced features
+- [[EnhancedMarkdownGenerator]]: Enhanced features

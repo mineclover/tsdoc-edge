@@ -783,7 +783,7 @@ Examples:
 **Core**:
 - [[BaseCommand]] (`managed/commands/BaseCommand.md`)
 - [[CommandRegistry]] (`managed/commands/CommandRegistry.md`)
-- [[CLIRunner]] (`managed/core-components/CLIRunner.md`)
+- CLIRunner (`managed/core-components/CLIRunner.md`)
 
 **Examples**:
 - [[StatsCommand]] (`managed/commands/StatsCommand.md`)
@@ -809,7 +809,7 @@ Examples:
 
 ### Referenced By
 
-- [[Analyzer Development Guide]] → /home/user/tsdoc-edge/managed/guides/analyzer-development-guide.md:257
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:20
-- [[Guides & Tutorials]] → /home/user/tsdoc-edge/managed/guides/index.md:331
+- [[Analyzer Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:269
+- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:20
+- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:331
 

@@ -490,6 +490,23 @@ documents.onDidChangeContent((change) => {
   }
 });
 
+// Shutdown handler - cleanup resources
+connection.onShutdown(() => {
+  connection.console.log('LSP server shutting down, cleaning up resources...');
+  if (tsdocService) {
+    tsdocService.close();
+    tsdocService = null;
+  }
+});
+
+// Exit handler - final cleanup
+connection.onExit(() => {
+  if (tsdocService) {
+    tsdocService.close();
+    tsdocService = null;
+  }
+});
+
 // Make the text document manager listen on the connection
 documents.listen(connection);
 

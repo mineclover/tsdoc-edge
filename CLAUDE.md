@@ -169,7 +169,7 @@ src/
 ├── commands/     # CLI 명령어
 ├── doc-symbol/   # [[Symbol]] 시스템
 ├── graph/        # 심볼 그래프
-├── lsp/          # LSP 서버 (server.ts, service.ts)
+├── lsp/          # LSP 서버 (server.ts, service.ts, cache-manager.ts, statement-manager.ts)
 ├── parser/       # TSDoc 파싱
 ├── storage/      # DB + JSONL
 ├── validator/    # 검증

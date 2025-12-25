@@ -20,7 +20,7 @@ Supports:
 
 ## Related
 
-- [[Markdown Generator]]: Base generator
+- [[MarkdownGenerator]]: Base generator
 
 ---
 
@@ -28,7 +28,5 @@ Supports:
 
 ### Referenced By
 
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:156
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:217
-- [[EnhancedSymbolDoc]] → /home/user/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:218
+- EnhancedSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:143
 

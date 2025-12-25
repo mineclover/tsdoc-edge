@@ -39,7 +39,7 @@ TSDoc Edge 시스템의 유틸리티 모듈을 기능별로 정리한 인덱스�
 
 ---
 
-### [[SymbolSearchEngine]]
+### SymbolSearchEngine
 **Path**: `SymbolSearchEngine.md`
 **Priority**: ⭐⭐⭐ Critical
 
@@ -63,7 +63,7 @@ TSDoc Edge 시스템의 유틸리티 모듈을 기능별로 정리한 인덱스�
 
 ## Validation Utilities (검증 관련)
 
-### [[ConventionValidator]]
+### ConventionValidator
 **Path**: `ConventionValidator.md`
 **Priority**: ⭐⭐⭐ Critical
 
@@ -81,7 +81,7 @@ TSDoc Edge 시스템의 유틸리티 모듈을 기능별로 정리한 인덱스�
 
 ---
 
-### [[ConnectivityValidator]]
+### ConnectivityValidator
 **Path**: `ConnectivityValidator.md`
 **Priority**: ⭐⭐ High
 
@@ -113,7 +113,7 @@ TSDoc Edge 시스템의 유틸리티 모듈을 기능별로 정리한 인덱스�
 
 ---
 
-### [[ModuleSpecValidator]]
+### ModuleSpecValidator
 **Path**: `ModuleSpecValidator.md`
 **Priority**: ⭐⭐ High
 
@@ -151,7 +151,7 @@ TSDoc Edge 시스템의 유틸리티 모듈을 기능별로 정리한 인덱스�
 
 ## Specification Utilities (명세 관련)
 
-### [[SpecStatusManager]]
+### SpecStatusManager
 **Path**: `SpecStatusManager.md`
 **Priority**: ⭐⭐ High
 
@@ -169,7 +169,7 @@ TSDoc Edge 시스템의 유틸리티 모듈을 기능별로 정리한 인덱스�
 
 ---
 
-### [[SpecVersionManager]]
+### SpecVersionManager
 **Path**: `SpecVersionManager.md`
 **Priority**: ⭐ Medium
 
@@ -184,7 +184,7 @@ TSDoc Edge 시스템의 유틸리티 모듈을 기능별로 정리한 인덱스�
 
 ---
 
-### [[SpecContentSimilarityChecker]]
+### SpecContentSimilarityChecker
 **Path**: `SpecContentSimilarityChecker.md`
 **Priority**: ⭐ Medium
 
@@ -203,7 +203,7 @@ TSDoc Edge 시스템의 유틸리티 모듈을 기능별로 정리한 인덱스�
 
 ## Generator Utilities (생성 관련)
 
-### [[MermaidGenerator]]
+### MermaidGenerator
 **Path**: `MermaidGenerator.md`
 **Priority**: ⭐⭐ High
 
@@ -221,7 +221,7 @@ Mermaid 다이어그램 생성 유틸리티.
 
 ---
 
-### [[IdGenerator]]
+### IdGenerator
 **Path**: `IdGenerator.md`
 **Priority**: ⭐⭐ High
 
@@ -278,7 +278,7 @@ Mermaid 다이어그램 생성 유틸리티.
 
 ---
 
-### [[UsageTracker]]
+### UsageTracker
 **Path**: `UsageTracker.md`
 **Priority**: ⭐ Medium
 
@@ -296,7 +296,7 @@ Mermaid 다이어그램 생성 유틸리티.
 
 ## Scanning Utilities (스캔 관련)
 
-### [[FileScanner]]
+### FileScanner
 **Path**: `FileScanner.md`
 **Priority**: ⭐⭐⭐ Critical
 
@@ -314,7 +314,7 @@ Mermaid 다이어그램 생성 유틸리티.
 
 ## Configuration Utilities (설정 관련)
 
-### [[ConfigLoader]]
+### ConfigLoader
 **Path**: `ConfigLoader.md`
 **Priority**: ⭐⭐⭐ Critical
 
@@ -334,7 +334,7 @@ Mermaid 다이어그램 생성 유틸리티.
 
 ## String Utilities (문자열 관련)
 
-### [[String Utilities]]
+### String Utilities
 **Path**: `StringUtilities.md`
 **Priority**: ⭐ Low
 
@@ -414,7 +414,7 @@ Uses: SymbolSearchEngine, SymbolGraphBuilder, UsageTracker
 Uses: SpecStatusManager, SpecVersionManager, SpecContentSimilarityChecker, ModuleSpecValidator
 
 ### Documentation System
-Uses: DocCodeLinker, UnusedDocumentDetector, MermaidGenerator
+Uses: DocCodeLinker, UnusedDocumentDetector, MermaidGenerator, [[RecursiveImprover]]
 
 ---
 
@@ -423,10 +423,10 @@ Uses: DocCodeLinker, UnusedDocumentDetector, MermaidGenerator
 Top 5 most important utilities:
 
 1. **[[SymbolGraphBuilder]]** - Foundation of dependency analysis
-2. **[[ConfigLoader]]** - System initialization
-3. **[[FileScanner]]** - Source file discovery
+2. **ConfigLoader** - System initialization
+3. **FileScanner** - Source file discovery
 4. **[[DocCodeLinker]]** - Traceability core
-5. **[[SymbolSearchEngine]]** - Query foundation
+5. **SymbolSearchEngine** - Query foundation
 
 ---
 
@@ -465,18 +465,6 @@ DatabaseManager
 
 ### Referenced By
 
-- [[Analyzers & Extractors]] → /home/user/tsdoc-edge/managed/analyzers/index.md:395
-- [[Features Index]] → /home/user/tsdoc-edge/managed/features/index.md:250
-- [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:402
-- [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:416
-- [[Primary Types Index]] → /home/user/tsdoc-edge/managed/primary-types/index.md:417
-- [[Symbol]] → /home/user/tsdoc-edge/managed/types/Symbol.md:151
-- [[Types Index]] → /home/user/tsdoc-edge/managed/types/index.md:347
-- [[Types Index]] → /home/user/tsdoc-edge/managed/types/index.md:361
-- [[Types Index]] → /home/user/tsdoc-edge/managed/types/index.md:362
-- [[ConfigLoader]] → /home/user/tsdoc-edge/managed/utilities/ConfigLoader.md:109
-- [[DocCodeLinker]] → /home/user/tsdoc-edge/managed/utilities/DocCodeLinker.md:76
-- [[FileScanner]] → /home/user/tsdoc-edge/managed/utilities/FileScanner.md:85
-- [[SymbolGraphBuilder]] → /home/user/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:261
-- [[SymbolSearchEngine]] → /home/user/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:136
+- [[Primary Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/index.md:402
+- [[Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/index.md:347
 

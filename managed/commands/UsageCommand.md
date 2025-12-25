@@ -19,7 +19,7 @@ Shows:
 
 ## Related
 
-- [[TrackableStatistics]]: Stats tracking
+- TrackableStatistics: Stats tracking
 
 ---
 
@@ -27,16 +27,7 @@ Shows:
 
 ### Referenced By
 
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:87
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:175
-- [[CLI Runner]] → /home/user/tsdoc-edge/managed/core-components/CLIRunner.md:176
-- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:142
-- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:143
-- [[TrackableStatistics]] → /home/user/tsdoc-edge/managed/primary-types/TrackableStatistics.md:144
-- [[AnalyticsTypes]] → /home/user/tsdoc-edge/managed/types/AnalyticsTypes.md:60
-- [[AnalyticsTypes]] → /home/user/tsdoc-edge/managed/types/AnalyticsTypes.md:69
-- [[AnalyticsTypes]] → /home/user/tsdoc-edge/managed/types/AnalyticsTypes.md:70
-- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:83
-- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:95
-- [[UsageTracker]] → /home/user/tsdoc-edge/managed/utilities/UsageTracker.md:96
+- [[CLI Runner]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/CLIRunner.md:87
+- [[AnalyticsTypes]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/AnalyticsTypes.md:105
+- UsageTracker → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/UsageTracker.md:83
 
