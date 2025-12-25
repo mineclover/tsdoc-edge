@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# BaseSymbolDoc
+# [[BaseSymbolDoc]]
 
 **Source**: `src/types/tags/enhanced.ts`
 

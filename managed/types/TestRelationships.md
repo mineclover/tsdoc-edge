@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# TestRelationships
+# [[TestRelationships]]
 
 **Source**: `src/types/analysis/test-relationships.ts`
 

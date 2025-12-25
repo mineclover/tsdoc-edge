@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# EnhancedSymbolDoc
+# [[EnhancedSymbolDoc]]
 
 > **6-category enhanced documentation** type for comprehensive symbol documentation
 

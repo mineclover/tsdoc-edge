@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# DependencySpec
+# [[DependencySpec]]
 
 **Source**: `src/types/tags/enhanced.ts`
 

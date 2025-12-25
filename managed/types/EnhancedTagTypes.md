@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# EnhancedTagTypes
+# [[EnhancedTagTypes]]
 
 **Source**: `src/types/tags/enhanced.ts`
 

@@ -10,7 +10,7 @@ tags:
   - ssot
 lastUpdated: 2025-01-15
 ---
-# DocumentSymbolSystem
+# [[DocumentSymbolSystem]]
 
 > Wiki 스타일 [[]] 문법으로 문서와 코드를 양방향 연결
 ## 개요

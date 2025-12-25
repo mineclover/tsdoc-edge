@@ -1,5 +1,5 @@
 ---
-title: # TypeChainTracer
+title: # [[TypeChainTracer]]
 type: analyzer
 category: core-components
 status: active

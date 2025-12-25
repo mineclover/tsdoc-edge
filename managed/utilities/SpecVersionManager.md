@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# SpecVersionManager
+# [[SpecVersionManager]]
 
 **Source**: `src/spec/SpecVersionManager.ts`
 

@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# MermaidExtractionResult
+# [[MermaidExtractionResult]]
 
 **Source**: `src/doc-symbol/MermaidSymbolExtractor.ts`
 

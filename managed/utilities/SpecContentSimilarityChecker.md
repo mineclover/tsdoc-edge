@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# SpecContentSimilarityChecker
+# [[SpecContentSimilarityChecker]]
 
 **Source**: `src/spec/SpecContentSimilarityChecker.ts`
 

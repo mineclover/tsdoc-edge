@@ -31,7 +31,7 @@ tsdoc-edge index-docs managed
 
 ### 1. Primary Definition
 ```markdown
-# SymbolName
+# [[SymbolName]]
 ```
 - H1 레벨
 - Canonical definition

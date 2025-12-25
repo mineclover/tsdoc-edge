@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# RegistryTypes
+# [[RegistryTypes]]
 
 **Source**: `src/types/registry/registry.ts`
 

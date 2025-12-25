@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# DataFlowTypes
+# [[DataFlowTypes]]
 
 **Source**: `src/types/domain/data-flow.ts`
 

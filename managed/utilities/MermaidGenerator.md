@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# MermaidGenerator
+# [[MermaidGenerator]]
 
 **Source**: `src/visualization/MermaidGenerator.ts`
 

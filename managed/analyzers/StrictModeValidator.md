@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# StrictModeValidator
+# [[StrictModeValidator]]
 
 > **Validates enhanced documentation compliance** with 6-category strict mode requirements
 

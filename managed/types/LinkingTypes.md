@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# LinkingTypes
+# [[LinkingTypes]]
 
 **Source**: `src/types/core/linking.ts`
 

@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# ParseTypes
+# [[ParseTypes]]
 
 **Source**: `src/types/core/parse.ts`
 

@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# FileScanner
+# [[FileScanner]]
 
 **Source**: `src/scanner/FileScanner.ts`
 

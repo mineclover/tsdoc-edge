@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# ExtractionResult
+# [[ExtractionResult]]
 
 **Primary Type**: Symbol Extraction Output
 

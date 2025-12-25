@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# ConnectivityValidator
+# [[ConnectivityValidator]]
 
 **Source**: `src/validator/ConnectivityValidator.ts`
 

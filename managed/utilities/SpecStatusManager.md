@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# SpecStatusManager
+# [[SpecStatusManager]]
 
 **Source**: `src/spec/SpecStatusManager.ts`
 

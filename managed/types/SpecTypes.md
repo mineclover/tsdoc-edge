@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# SpecTypes
+# [[SpecTypes]]
 
 **Source**: `src/types/spec.ts`
 

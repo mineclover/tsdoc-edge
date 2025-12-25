@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# MermaidRelationship
+# [[MermaidRelationship]]
 
 **Source**: `src/doc-symbol/MermaidSymbolExtractor.ts`
 

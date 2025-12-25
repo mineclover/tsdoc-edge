@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# DocumentSymbol
+# [[DocumentSymbol]]
 
 **Source**: `src/types/feature/doc-symbol.ts`
 

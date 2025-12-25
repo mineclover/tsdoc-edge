@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# ConfigLoader
+# [[ConfigLoader]]
 
 **Source**: `src/utils/ConfigLoader.ts`
 

@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# IdGenerator
+# [[IdGenerator]]
 
 **Source**: `src/utils/IdGenerator.ts`
 

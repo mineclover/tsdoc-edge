@@ -200,7 +200,7 @@ tsdoc-edge index-docs docs
 # Git hook
 cp examples/git-hooks/pre-commit .git/hooks/pre-commit
 chmod +x .git/hooks/pre-commit
-# VSCode
+# [[VSCode]]
 # .vscode/settings.json에 Run on Save 설정 추가
 ```
 

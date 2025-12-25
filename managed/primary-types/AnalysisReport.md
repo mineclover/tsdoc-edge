@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# AnalysisReport
+# [[AnalysisReport]]
 
 **Primary Type**: Code Analysis Result
 

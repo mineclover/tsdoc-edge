@@ -23,7 +23,7 @@ Extract and categorize all `[[Symbol]]` notation from markdown files for the doc
 ### 1. Primary Definition (H1)
 
 ```markdown
-# SymbolName
+# [[SymbolName]]
 ```
 
 - **Canonical SSOT** definition

@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# ProblemSolving
+# [[ProblemSolving]]
 
 **Source**: `src/types/tags/enhanced.ts`
 

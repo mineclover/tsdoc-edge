@@ -104,7 +104,7 @@ tsdoc-edge symbol-fix managed --type=typo --dry-run
 
 ```markdown
 # Generated file: managed/concepts/<symbol-name>.md
-# SymbolName
+# [[SymbolName]]
 
 **Status**: 🚧 Stub (needs documentation)
 

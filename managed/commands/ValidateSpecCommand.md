@@ -117,7 +117,7 @@ Validates documentation against the 7-aspect framework:
 ### Complete Specification
 
 ```markdown
-# SymbolName
+# [[SymbolName]]
 
 ## Purpose
 Clear explanation of why this exists...

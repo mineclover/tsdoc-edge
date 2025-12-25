@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# CodeHealthMetrics
+# [[CodeHealthMetrics]]
 
 **Source**: `src/types/analysis/quality.ts`
 

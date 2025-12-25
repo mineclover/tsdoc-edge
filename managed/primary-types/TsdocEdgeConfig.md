@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# TsdocEdgeConfig
+# [[TsdocEdgeConfig]]
 
 **Primary Type**: Project Configuration Root
 

@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# TypeChain
+# [[TypeChain]]
 
 **Source**: `src/types/domain/type-chain.ts`
 

@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# FuturePlan
+# [[FuturePlan]]
 
 **Source**: `src/types/tags/enhanced.ts`
 

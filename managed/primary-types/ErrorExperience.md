@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# ErrorExperience
+# [[ErrorExperience]]
 
 **Source**: `src/types/tags/enhanced.ts`
 

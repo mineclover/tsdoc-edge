@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# SymbolSearchEngine
+# [[SymbolSearchEngine]]
 
 **Source**: `src/graph/SymbolSearchEngine.ts`
 

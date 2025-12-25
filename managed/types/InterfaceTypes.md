@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# InterfaceTypes
+# [[InterfaceTypes]]
 
 **Source**: `src/types/domain/interface.ts`
 

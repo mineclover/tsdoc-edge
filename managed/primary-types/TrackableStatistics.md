@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# TrackableStatistics
+# [[TrackableStatistics]]
 
 **Primary Type**: Statistics Tracking System Root
 

@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# ModuleSpecTypes
+# [[ModuleSpecTypes]]
 
 **Source**: `src/types/spec/module-spec.ts`
 

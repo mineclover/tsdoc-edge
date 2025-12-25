@@ -240,7 +240,7 @@ tsdoc-edge orphans
 # Code health report
 tsdoc-edge health src
 
-# Statistics
+# [[Statistics]]
 tsdoc-edge stats
 
 # Find undocumented

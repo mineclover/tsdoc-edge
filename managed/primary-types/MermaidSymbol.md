@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# MermaidSymbol
+# [[MermaidSymbol]]
 
 **Source**: `src/doc-symbol/MermaidSymbolExtractor.ts`
 

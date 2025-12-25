@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# ConventionValidator
+# [[ConventionValidator]]
 
 **Source**: `src/validator/ConventionValidator.ts`
 

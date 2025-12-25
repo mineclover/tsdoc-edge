@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# UsageTracker
+# [[UsageTracker]]
 
 **Source**: `src/analytics/UsageTracker.ts`
 

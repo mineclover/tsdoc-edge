@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# DecisionRecord
+# [[DecisionRecord]]
 
 **Source**: `src/types/tags/enhanced.ts`
 

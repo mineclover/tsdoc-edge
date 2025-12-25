@@ -218,7 +218,7 @@ tsdoc-edge coverage-report --hierarchical | grep -A 50 "Undocumented" | grep "co
 
 ### Track Coverage Over Time
 ```bash
-# Baseline
+# [[Baseline]]
 tsdoc-edge coverage-report --hierarchical --json > baseline.json
 
 # After changes

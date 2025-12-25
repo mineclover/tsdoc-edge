@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# FeatureTypes
+# [[FeatureTypes]]
 
 **Source**: `src/types/feature/feature.ts`
 

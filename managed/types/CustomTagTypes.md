@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# CustomTagTypes
+# [[CustomTagTypes]]
 
 **Source**: `src/types/tags/base.ts`
 

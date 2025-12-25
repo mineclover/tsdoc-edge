@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# CommentStateTypes
+# [[CommentStateTypes]]
 
 **Source**: `src/types/state/comment.ts`
 

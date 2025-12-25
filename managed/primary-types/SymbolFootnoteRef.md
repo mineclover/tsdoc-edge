@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# SymbolFootnoteRef
+# [[SymbolFootnoteRef]]
 
 **Source**: `src/types/feature/doc-symbol.ts`
 

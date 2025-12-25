@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# ModuleSpecValidator
+# [[ModuleSpecValidator]]
 
 **Source**: `src/validator/ModuleSpecValidator.ts`
 

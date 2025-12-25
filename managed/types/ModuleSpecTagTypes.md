@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# ModuleSpecTagTypes
+# [[ModuleSpecTagTypes]]
 
 **Source**: `src/types/tags/module-spec-tags.ts`
 

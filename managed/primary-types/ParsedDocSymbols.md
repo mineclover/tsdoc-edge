@@ -6,7 +6,7 @@ status: active
 canonical: true
 ---
 
-# ParsedDocSymbols
+# [[ParsedDocSymbols]]
 
 **Source**: `src/types/feature/doc-symbol.ts`
 
