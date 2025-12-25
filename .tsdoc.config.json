@@ -24,8 +24,7 @@
     "minConnectivityScore": 70,
     "rules": {},
     "excludeDirs": [
-      "examples",
-      "architecture"
+      "examples"
     ],
     "skipCodeImplDirs": [
       "concepts",
@@ -41,7 +40,8 @@
       "primary-types",
       "types",
       "utilities",
-      "analyzers"
+      "analyzers",
+      "architecture"
     ]
   },
   "generator": {
