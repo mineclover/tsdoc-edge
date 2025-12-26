@@ -16,6 +16,7 @@ import * as fs from 'node:fs';
 import { SymbolKind, DiagnosticSeverity } from 'vscode-languageserver/node';
 import { CacheManager } from './cache-manager';
 import { StatementManager } from './statement-manager';
+import { IncrementalBuilder, type IncrementalExtractResult } from './incremental-builder';
 
 /**
  * Code Lens information for displaying impact counts on symbols
@@ -102,6 +103,12 @@ export class TsdocEdgeService {
   /** Statement manager for prepared SQL statements */
   private statementManager: StatementManager | null = null;
 
+  /** Incremental builder for file updates */
+  private incrementalBuilder: IncrementalBuilder | null = null;
+
+  /** Whether incremental mode is enabled */
+  private incrementalMode: boolean = false;
+
   /** Maximum symbols to return in impact analysis */
   private static readonly MAX_IMPACT_SYMBOLS = 100;
 
@@ -128,6 +135,117 @@ export class TsdocEdgeService {
     this.cacheManager.createCache(CACHE_NAMES.IMPACT);
 
     this.initDatabase();
+  }
+
+  /**
+   * Enable incremental mode for real-time file updates
+   *
+   * In incremental mode, file changes are immediately reflected in the database
+   * rather than requiring a full rebuild.
+   *
+   * @public
+   */
+  enableIncrementalMode(): boolean {
+    if (this.incrementalMode) return true;
+
+    // Re-open database in write mode
+    if (this.db) {
+      this.db.close();
+      this.db = null;
+    }
+
+    if (!fs.existsSync(this.dbPath)) {
+      console.warn(`Cannot enable incremental mode: database not found at ${this.dbPath}`);
+      return false;
+    }
+
+    try {
+      // eslint-disable-next-line @typescript-eslint/no-var-requires
+      const Database = require('better-sqlite3');
+      this.db = new Database(this.dbPath); // Open in write mode
+
+      // Reinitialize statement manager
+      if (this.statementManager) {
+        this.statementManager.dispose();
+      }
+      this.statementManager = new StatementManager(this.db, { maxStatements: 50 });
+
+      // Initialize incremental builder
+      this.incrementalBuilder = new IncrementalBuilder(this.workspaceRoot, this.db);
+      this.incrementalMode = true;
+
+      console.log('Incremental mode enabled');
+      return true;
+    } catch (error) {
+      console.error(`Failed to enable incremental mode: ${error}`);
+      return false;
+    }
+  }
+
+  /**
+   * Check if incremental mode is active
+   */
+  isIncrementalModeEnabled(): boolean {
+    return this.incrementalMode;
+  }
+
+  /**
+   * Process a file change (for incremental updates)
+   *
+   * @param filePath - Absolute path to the changed file
+   * @param content - Optional file content (if not provided, reads from disk)
+   * @returns Extraction result or null if incremental mode is not enabled
+   */
+  processFileChange(filePath: string, content?: string): IncrementalExtractResult | null {
+    if (!this.incrementalMode || !this.incrementalBuilder) {
+      return null;
+    }
+
+    // Only process TypeScript files
+    if (!filePath.endsWith('.ts') && !filePath.endsWith('.tsx')) {
+      return null;
+    }
+
+    try {
+      let result: IncrementalExtractResult;
+
+      if (content !== undefined) {
+        // Process from provided content (unsaved buffer)
+        result = this.incrementalBuilder.processContent(filePath, content);
+      } else {
+        // Process from disk
+        result = this.incrementalBuilder.processFileChange(filePath);
+      }
+
+      // Invalidate caches for this file
+      this.invalidateFileCache(filePath);
+
+      return result;
+    } catch (error) {
+      console.error(`Failed to process file change: ${error}`);
+      return null;
+    }
+  }
+
+  /**
+   * Handle file deletion
+   *
+   * @param filePath - Absolute path to the deleted file
+   * @returns Number of symbols removed
+   */
+  handleFileDelete(filePath: string): number {
+    if (!this.incrementalMode || !this.incrementalBuilder) {
+      return 0;
+    }
+
+    try {
+      const removed = this.incrementalBuilder.removeFile(filePath);
+      this.invalidateFileCache(filePath);
+      return removed;
+    } catch (error) {
+      console.error(`Failed to handle file deletion: ${error}`);
+      return 0;
+    }
   }
 
   /**

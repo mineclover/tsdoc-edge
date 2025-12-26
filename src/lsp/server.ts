@@ -143,6 +143,16 @@ connection.onInitialized(() => {
       connection.console.log('Workspace folder change event received.');
     });
   }
+
+  // Enable incremental mode for real-time updates
+  if (tsdocService) {
+    const enabled = tsdocService.enableIncrementalMode();
+    if (enabled) {
+      connection.console.log('Incremental mode enabled - file changes will update symbols in real-time');
+    } else {
+      connection.console.log('Incremental mode not available - run "tsdoc-edge build" first');
+    }
+  }
 });
 
 // Hover provider - show symbol info and impact analysis
@@ -464,13 +474,18 @@ function getWordAtPosition(line: string, character: number): string | null {
   return null;
 }
 
-// Document change handlers - trigger diagnostics
+// Debounce timer for incremental builds
+let incrementalBuildTimer: ReturnType<typeof setTimeout> | null = null;
+const INCREMENTAL_BUILD_DELAY = 1000; // 1 second debounce
+
+// Document change handlers - trigger diagnostics and incremental builds
 documents.onDidChangeContent((change) => {
   if (!tsdocService) return;
 
   const filePath = new URL(change.document.uri).pathname;
 
   try {
+    // Get diagnostics from current database state
     const diagnostics = tsdocService.getDiagnostics(filePath);
 
     connection.sendDiagnostics({
@@ -485,9 +500,58 @@ documents.onDidChangeContent((change) => {
         source: 'tsdoc-edge',
       })),
     });
+
+    // Debounced incremental build for unsaved content
+    if (tsdocService.isIncrementalModeEnabled()) {
+      if (incrementalBuildTimer) {
+        clearTimeout(incrementalBuildTimer);
+      }
+
+      incrementalBuildTimer = setTimeout(() => {
+        const content = change.document.getText();
+        const result = tsdocService?.processFileChange(filePath, content);
+        if (result && result.errors.length === 0) {
+          connection.console.log(`Incremental update: ${result.symbols.length} symbols in ${path.basename(filePath)}`);
+        }
+        incrementalBuildTimer = null;
+      }, INCREMENTAL_BUILD_DELAY);
+    }
   } catch (error) {
     connection.console.error(`Diagnostics error: ${error}`);
   }
+});
+
+// Handle file save - immediately update symbols
+documents.onDidSave((event) => {
+  if (!tsdocService) return;
+
+  const filePath = new URL(event.document.uri).pathname;
+
+  if (tsdocService.isIncrementalModeEnabled()) {
+    // Cancel any pending debounced build
+    if (incrementalBuildTimer) {
+      clearTimeout(incrementalBuildTimer);
+      incrementalBuildTimer = null;
+    }
+
+    // Immediately process the saved file
+    const result = tsdocService.processFileChange(filePath);
+    if (result) {
+      if (result.errors.length > 0) {
+        connection.console.warn(`Incremental build errors in ${path.basename(filePath)}: ${result.errors.join(', ')}`);
+      } else {
+        connection.console.log(`File saved: updated ${result.symbols.length} symbols in ${path.basename(filePath)}`);
+      }
+    }
+  }
+});
+
+// Handle file close - cleanup
+documents.onDidClose((event) => {
+  if (!tsdocService) return;
+
+  const filePath = new URL(event.document.uri).pathname;
+  tsdocService.invalidateFileCache(filePath);
 });
 
 // Shutdown handler - cleanup resources
