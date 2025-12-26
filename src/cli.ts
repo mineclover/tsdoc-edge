@@ -12,7 +12,6 @@
 import { UsageTracker } from './analytics/UsageTracker';
 import {
   AnalyzeCommand,
-  AnalyzeIOCommand,
   BuildCommand,
   VisualizeDepsCommand,
   CheckDuplicatesCommand,
@@ -63,31 +62,12 @@ import {
   WhoUsesCommand,
   WithoutContractCommand,
   WithoutResponsibilityCommand,
+  AnalyzeRelationshipsCommand,
   type CommandResult,
 } from './commands';
 import { DetectCircularTypesCommand, FindRootTypesCommand, TypeChainCommand } from './commands/TypeChainCommand';
 import { ParallelWorkCommand } from './commands/ParallelWorkCommand';
 import { TestRelationshipsCommand } from './commands/TestRelationshipsCommand';
-import { AnalyzeChainsCommand } from './commands/AnalyzeChainsCommand';
-import { AnalyzeCallsCommand } from './commands/AnalyzeCallsCommand';
-import { AnalyzeTestsCommand } from './commands/AnalyzeTestsCommand';
-import { AnalyzeTypesCommand } from './commands/AnalyzeTypesCommand';
-import { AnalyzeCompositionCommand } from './commands/AnalyzeCompositionCommand';
-import { AnalyzeSubstitutionCommand } from './commands/AnalyzeSubstitutionCommand';
-import { AnalyzeFallbackCommand } from './commands/AnalyzeFallbackCommand';
-import { AnalyzeCollaborationCommand } from './commands/AnalyzeCollaborationCommand';
-import { AnalyzeTemporalOrderCommand } from './commands/AnalyzeTemporalOrderCommand';
-import { AnalyzeDocReferenceCommand } from './commands/AnalyzeDocReferenceCommand';
-import { AnalyzeEnhancementCommand } from './commands/AnalyzeEnhancementCommand';
-import { AnalyzeLayerDependencyCommand } from './commands/AnalyzeLayerDependencyCommand';
-import { AnalyzeEventsCommand } from './commands/AnalyzeEventsCommand';
-import { AnalyzeCallbacksCommand } from './commands/AnalyzeCallbacksCommand';
-import { AnalyzeConstraintsCommand } from './commands/AnalyzeConstraintsCommand';
-import { AnalyzeAlternativesCommand } from './commands/AnalyzeAlternativesCommand';
-import { AnalyzeBehavioralCommand } from './commands/AnalyzeBehavioralCommand';
-import { AnalyzeStructuralCommand } from './commands/AnalyzeStructuralCommand';
-import { AnalyzeFinalCommand } from './commands/AnalyzeFinalCommand';
-import { AnalyzeAllCommand } from './commands/AnalyzeAllCommand';
 import { RelationshipQueryCommand } from './commands/RelationshipQueryCommand';
 import { RelationshipImpactCommand } from './commands/RelationshipImpactCommand';
 import { RelationshipPathCommand } from './commands/RelationshipPathCommand';
@@ -185,27 +165,7 @@ async function main(): Promise<void> {
   registry.register(new CoreApiCommand());
   registry.register(new ScanCommand());
   registry.register(new SyncCoverageCommand());
-  registry.register(new AnalyzeChainsCommand());
-  registry.register(new AnalyzeCallsCommand());
-  registry.register(new AnalyzeCompositionCommand());
-  registry.register(new AnalyzeSubstitutionCommand());
-  registry.register(new AnalyzeFallbackCommand());
-  registry.register(new AnalyzeCollaborationCommand());
-  registry.register(new AnalyzeTemporalOrderCommand());
-  registry.register(new AnalyzeDocReferenceCommand());
-  registry.register(new AnalyzeEnhancementCommand());
-  registry.register(new AnalyzeLayerDependencyCommand());
-  registry.register(new AnalyzeTestsCommand());
-  registry.register(new AnalyzeTypesCommand());
-  registry.register(new AnalyzeIOCommand());
-  registry.register(new AnalyzeEventsCommand());
-  registry.register(new AnalyzeCallbacksCommand());
-  registry.register(new AnalyzeConstraintsCommand());
-  registry.register(new AnalyzeAlternativesCommand());
-  registry.register(new AnalyzeBehavioralCommand());
-  registry.register(new AnalyzeStructuralCommand());
-  registry.register(new AnalyzeFinalCommand());
-  registry.register(new AnalyzeAllCommand());
+  registry.register(new AnalyzeRelationshipsCommand());
   registry.register(new RelationshipQueryCommand());
   registry.register(new RelationshipImpactCommand());
   registry.register(new RelationshipPathCommand());
