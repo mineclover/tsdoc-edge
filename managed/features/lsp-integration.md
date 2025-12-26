@@ -176,11 +176,45 @@ const serverOptions = { module: serverModule, transport: TransportKind.stdio }
 ```
 
 ### 데이터베이스 준비
-LSP 서버는 `.tsdoc/symbols.db`를 readonly 모드로 읽습니다 (`service.ts:138`).
+LSP 서버는 `.tsdoc/symbols.db`를 사용합니다. 초기 빌드가 필요합니다:
 
-사전 빌드 필수:
 ```bash
 tsdoc-edge build src
+```
+
+## 증분 빌드 (Incremental Build)
+
+LSP 서버가 시작되면 자동으로 증분 모드가 활성화됩니다. 파일 변경 시 전체 빌드 없이 해당 파일의 심볼만 업데이트됩니다.
+
+### 동작 방식
+
+1. **서버 초기화**: `server.ts:147-155`에서 `enableIncrementalMode()` 호출
+2. **파일 수정 시**: 1초 디바운스 후 심볼 추출 (`server.ts:504-518`)
+3. **파일 저장 시**: 즉시 심볼 업데이트 (`server.ts:524-546`)
+
+### IncrementalBuilder
+
+`src/lsp/incremental-builder.ts`에서 단일 파일 심볼 추출을 담당합니다.
+
+주요 메서드:
+- `extractFile(filePath)`: 디스크에서 파일 읽어 심볼 추출
+- `processContent(filePath, content)`: 버퍼 내용으로 심볼 추출 (저장 전)
+- `updateDatabase(result)`: 데이터베이스에 심볼 저장
+- `removeFile(filePath)`: 파일 삭제 시 심볼 제거
+
+### TsdocEdgeService 증분 메서드
+
+- `enableIncrementalMode()`: 쓰기 모드로 DB 재연결
+- `isIncrementalModeEnabled()`: 증분 모드 활성화 여부 확인
+- `processFileChange(filePath, content?)`: 파일 변경 처리
+- `handleFileDelete(filePath)`: 파일 삭제 처리
+
+### 증분 심볼 식별
+
+증분 빌드로 생성된 심볼은 `jsonl_line = -1`로 표시됩니다:
+
+```sql
+SELECT * FROM symbols WHERE jsonl_line = -1
 ```
 
 ## 메모리 관리
