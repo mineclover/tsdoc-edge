@@ -14,7 +14,7 @@ Current status of all relationship analyzers in TSDoc Edge - which are active, r
 
 Current status of all relationship analyzers in TSDoc Edge, showing which analyzers are active, how many relationships they detect, and why some analyzers cannot be activated.
 
-**Last Updated**: 2025-11-12
+**Last Updated**: 2025-12-26
 
 ## Active Analyzers (16 types)
 
@@ -188,7 +188,7 @@ Current status of all relationship analyzers in TSDoc Edge, showing which analyz
 
 | Metric | Value |
 |--------|-------|
-| **Total Relationships** | 40,762 |
+| **Total Relationships** | 49,448 |
 | **Active Analyzer Types** | 16 |
 | **Inactive Analyzer Types** | 8 (3 architectural mismatches, 2 not implemented, 2 naming confusion, 1 documentation-driven) |
 | **Active Categories** | 6 (all categories active) |
@@ -198,12 +198,12 @@ Current status of all relationship analyzers in TSDoc Edge, showing which analyz
 
 | Category | Types | Relationships | Percentage |
 |----------|-------|---------------|------------|
-| Data-Flow | 1 | 17,269 | 42.4% |
-| Semantic | 2 | 8,847 | 21.7% |
-| Behavioral | 6 | 7,561 | 18.5% |
-| Structural | 3 | 3,982 | 9.8% |
-| Alternative | 2 | 2,095 | 5.1% |
-| Verification | 2 | 1,008 | 2.5% |
+| Data-Flow | 1 | 22,629 | 45.8% |
+| Testing | 2 | 11,981 | 24.2% |
+| Structural | 3 | 4,938 | 10.0% |
+| Semantic | 2 | 3,573 | 7.2% |
+| Behavioral | 6 | 3,482 | 7.0% |
+| Alternative | 2 | 2,845 | 5.8% |
 
 ---
 

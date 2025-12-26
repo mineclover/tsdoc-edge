@@ -8,19 +8,19 @@ TSDoc Edge는 단순한 문서 생성 도구가 아닙니다. 코드베이스의
 
 ## 📊 프로젝트 현황
 
-![Health Score](https://img.shields.io/badge/Health-C%20(64%2F100)-yellow?style=flat-square)
-![Documentation](https://img.shields.io/badge/Documentation-93%25-brightgreen?style=flat-square)
-![Test Coverage](https://img.shields.io/badge/Tests-46%25-orange?style=flat-square)
-![Commands](https://img.shields.io/badge/Commands-109-blue?style=flat-square)
+![Health Score](https://img.shields.io/badge/Health-A%20(90%2F100)-brightgreen?style=flat-square)
+![Documentation](https://img.shields.io/badge/Documentation-74%25-green?style=flat-square)
+![Test Coverage](https://img.shields.io/badge/Tests-2812%20passed-brightgreen?style=flat-square)
+![Commands](https://img.shields.io/badge/Commands-98-blue?style=flat-square)
 ![Symbol Refs](https://img.shields.io/badge/Symbol%20Refs-0%20errors-success?style=flat-square)
 
 **현재 상태**:
 - ✅ 0개 심볼 참조 오류 (완벽!)
 - ✅ 0개 순환 의존성
 - ✅ 0개 죽은 코드
-- ✅ 109개 CLI 명령어 (15개 카테고리)
-- ✅ 1,708개 호출 관계 추적
-- ✅ 9,439개 I/O 의존성 분석
+- ✅ 98개 CLI 명령어
+- ✅ 49,448개 심볼 관계 추적
+- ✅ 22,629개 I/O 의존성 분석
 
 ---
 
@@ -143,9 +143,9 @@ $ tsdoc-edge work-context src/commands/WorkContextCommand.ts
 
 ---
 
-## 🎯 관계 분석 시스템 (NEW!)
+## 🎯 관계 분석 시스템
 
-**20,150개 심볼 관계를 통한 아키텍처 인텔리전스**
+**49,448개 심볼 관계를 통한 아키텍처 인텔리전스**
 
 TSDoc Edge는 이제 코드베이스의 모든 관계를 분석하여 아키텍처 수준의 인사이트를 제공합니다.
 
