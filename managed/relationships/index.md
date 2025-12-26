@@ -39,7 +39,7 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 - **Cmd**: BuildCommand (`src/commands/BuildCommand.ts`)
 - **Storage**: DatabaseManager (`src/storage/DatabaseManager.ts`)
 - **Query**: DepsCommand (`src/commands/DepsCommand.ts`), WhoUsesCommand (`src/commands/WhoUsesCommand.ts`)
-- **Doc**: [CODE-DEPENDENCY.md](./CODE-DEPENDENCY.md)
+- **Doc**: [code-dependency.md](./code-dependency.md)
 
 ### [[Inheritance]] ✅ 57
 - **Pattern**: `class A extends B`
@@ -47,7 +47,7 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 - **Cmd**: BuildCommand (`src/commands/BuildCommand.ts`)
 - **Storage**: DatabaseManager (`src/storage/DatabaseManager.ts`)
 - **Query**: SymbolGraphBuilder (`src/graph/SymbolGraphBuilder.ts`) - type-based traversal
-- **Doc**: [INHERITANCE.md](./INHERITANCE.md)
+- **Doc**: [inheritance.md](./inheritance.md)
 
 ### [[Interface Implementation]] ✅
 - **Pattern**: `class A implements I`
@@ -55,7 +55,7 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 - **Cmd**: BuildCommand (`src/commands/BuildCommand.ts`)
 - **Storage**: DatabaseManager (`src/storage/DatabaseManager.ts`)
 - **Query**: Find all implementations of an interface
-- **Doc**: [INTERFACE-IMPL.md](./INTERFACE-IMPL.md)
+- **Doc**: [interface-impl.md](./interface-impl.md)
 
 ## 2. Data Space (데이터 흐름)
 
@@ -65,14 +65,14 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 - **Cmd**: AnalyzeIOCommand (`src/commands/AnalyzeIOCommand.ts`)
 - **Storage**: DatabaseManager (`src/storage/DatabaseManager.ts`)
 - **Analysis**: [[IODependencyAnalyzer]] (`src/analyzer/IODependencyAnalyzer.ts`) - detects input/output contracts
-- **Doc**: [IO-DEPENDENCY.md](./IO-DEPENDENCY.md)
+- **Doc**: [io-dependency.md](./io-dependency.md)
 
 ### [[Pipeline]] ✅ 25,809
 - **Pattern**: A → B → C → D (3+ steps)
 - **Impl**: [[IODependencyAnalyzer]] (`src/analyzer/IODependencyAnalyzer.ts`)
 - **Cmd**: AnalyzeChainsCommand (`src/commands/AnalyzeChainsCommand.ts`)
 - **Storage**: DatabaseManager (`src/storage/DatabaseManager.ts`)
-- **Doc**: [PIPELINE.md](./PIPELINE.md)
+- **Doc**: [pipeline.md](./pipeline.md)
 
 ### [[Event Flow]] ✅
 - **Pattern**: `emit()` / `on()`
@@ -89,21 +89,21 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 - **Cmd**: AnalyzeCallsCommand (`src/commands/AnalyzeCallsCommand.ts`)
 - **Storage**: DatabaseManager (`src/storage/DatabaseManager.ts`)
 - **Analysis**: Call detection via AST analysis (also known as CallRelationshipAnalyzer, CallAnalyzer)
-- **Doc**: [CALLS.md](./CALLS.md)
+- **Doc**: [calls.md](./calls.md)
 
 ### [[Callback Pattern]] ✅ 7
 - **Pattern**: `function(cb: () => void)`
 - **Impl**: CallbackAnalyzer (`src/analyzer/CallbackAnalyzer.ts`)
 - **Cmd**: AnalyzeCallbacksCommand (`src/commands/AnalyzeCallbacksCommand.ts`)
 - **Storage**: DatabaseManager (`src/storage/DatabaseManager.ts`)
-- **Doc**: [CALLBACK.md](./CALLBACK.md)
+- **Doc**: [callback.md](./callback.md)
 
 ### [[Composition Relationship]] ✅ 108
 - **Pattern**: `class A { b: B }`
 - **Impl**: CompositionAnalyzer (`src/analyzer/CompositionAnalyzer.ts`)
 - **Cmd**: AnalyzeCompositionCommand (`src/commands/AnalyzeCompositionCommand.ts`)
 - **Storage**: DatabaseManager (`src/storage/DatabaseManager.ts`)
-- **Doc**: [COMPOSITION.md](./COMPOSITION.md)
+- **Doc**: [composition.md](./composition.md)
 
 ## 4. Meta Space (인지적)
 
@@ -114,7 +114,7 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 - **Storage**: DatabaseManager (`src/storage/DatabaseManager.ts`)
 - **Analysis**: [[TestCoverageAnalyzer]] (`src/analyzer/TestCoverageAnalyzer.ts`)
 - **Query**: UntestedCommand (`src/commands/UntestedCommand.ts`) - find untested code
-- **Doc**: [TEST-COVERAGE.md](./TEST-COVERAGE.md)
+- **Doc**: [test-coverage.md](./test-coverage.md)
 
 ### [[Doc Reference]] ❌
 - **Pattern**: `@doc [[Symbol]]`
@@ -132,7 +132,7 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 - **Cmd**: AnalyzeTypesCommand (`src/commands/AnalyzeTypesCommand.ts`)
 - **Storage**: DatabaseManager (`src/storage/DatabaseManager.ts`)
 - **Analysis**: Extracts type relationships from signatures
-- **Doc**: [TYPE-DEPENDENCY.md](./TYPE-DEPENDENCY.md)
+- **Doc**: [type-dependency.md](./type-dependency.md)
 
 ### [[Generic Constraint]] ✅
 - **Pattern**: `T extends U`
@@ -140,7 +140,7 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 - **Cmd**: AnalyzeTypesCommand (`src/commands/AnalyzeTypesCommand.ts`)
 - **Storage**: DatabaseManager (`src/storage/DatabaseManager.ts`)
 - **Analysis**: Detects generic type constraints
-- **Doc**: [GENERIC-CONSTRAINT.md](./GENERIC-CONSTRAINT.md)
+- **Doc**: [generic-constraint.md](./generic-constraint.md)
 
 ## 6. Architectural Space (계층)
 
@@ -161,7 +161,7 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 - **Storage**: DatabaseManager (`src/storage/DatabaseManager.ts`)
 - **Analysis**: SymbolGraphBuilder (`src/graph/SymbolGraphBuilder.ts`) - cycle detection via DFS
 - **Query**: Returns all circular dependency chains
-- **Doc**: [CIRCULAR.md](./CIRCULAR.md)
+- **Doc**: [circular.md](./circular.md)
 
 ## Roadmap
 
@@ -188,6 +188,21 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 tsdoc-edge validate-symbol-refs managed
 sqlite3 .tsdoc/symbols.db "SELECT type, COUNT(*) FROM unified_relationships GROUP BY type"
 ```
+
+## All Relationship Documents
+
+| Category | Document |
+|----------|----------|
+| Structural | [code-dependency.md](./code-dependency.md), [inheritance.md](./inheritance.md), [interface-impl.md](./interface-impl.md) |
+| Data Flow | [io-dependency.md](./io-dependency.md), [pipeline.md](./pipeline.md), [event-flow.md](./event-flow.md) |
+| Behavioral | [calls.md](./calls.md), [callback.md](./callback.md), [composition.md](./composition.md) |
+| Alternative | [substitution.md](./substitution.md), [fallback.md](./fallback.md) |
+| Constraint | [temporal-order.md](./temporal-order.md), [mutual-exclusion.md](./mutual-exclusion.md), [co-requirement.md](./co-requirement.md) |
+| Semantic | [collaboration.md](./collaboration.md), [conceptual-relation.md](./conceptual-relation.md), [feature-grouping.md](./feature-grouping.md) |
+| Testing | [test-coverage.md](./test-coverage.md), [integration-verification.md](./integration-verification.md) |
+| Type System | [type-dependency.md](./type-dependency.md), [generic-constraint.md](./generic-constraint.md) |
+| Quality | [circular.md](./circular.md) |
+| Reference | [doc-reference.md](./doc-reference.md), [standard-format.md](./standard-format.md) |
 
 ## Related Documentation
 
