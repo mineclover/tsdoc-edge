@@ -103,6 +103,7 @@ import { DesignContextCommand } from './commands/DesignContextCommand';
 import { DocSymbolsCommand } from './commands/DocSymbolsCommand';
 import { OntologyStatsCommand } from './commands/OntologyStatsCommand';
 import { OntologyListCommand } from './commands/OntologyListCommand';
+import { SystemStatusCommand } from './commands/SystemStatusCommand';
 import { ExploreEntrypointCommand } from './commands/ExploreEntrypointCommand';
 import { ParseMermaidCommand } from './commands/ParseMermaidCommand';
 import { ValidateSymbolRefsCommand } from './commands/ValidateSymbolRefsCommand';
@@ -234,6 +235,7 @@ async function main(): Promise<void> {
   registry.register(new DocSymbolsCommand());
   registry.register(new OntologyStatsCommand());
   registry.register(new OntologyListCommand());
+  registry.register(new SystemStatusCommand());
   registry.register(new ContextCommand());
   registry.register(new TestExamplesCommand());
   registry.register(new ExploreEntrypointCommand());

@@ -1,149 +1,126 @@
-%% Relationship Type Taxonomy
-%% Complete classification of all 17 relationship types
-%% Generated: 2025-11-07
+---
+title: Relationship Type Taxonomy
+type: architecture-diagram
+category: core-design
+status: active
+updated: 2025-12-26
+---
 
+# [[Relationship Taxonomy]]
+
+> Complete classification of all 19 relationship types across 8 categories
+
+```mermaid
 graph TB
-    subgraph "🏗️ 1. Structural Relationships (3 types)"
+    subgraph "1. Structural (6.8% - 4,845 rels)"
         S[Structural<br/>Code-level dependencies]
 
-        S --> S1[code-dependency ✅<br/>1,902 relationships]
-        S --> S2[inheritance ✅<br/>55 relationships]
-        S --> S3[interface-impl ❌<br/>~200 expected]
+        S --> S1[code-dependency ✅<br/>3,311 rels]
+        S --> S2[inheritance ✅<br/>114 rels]
+        S --> S3[contains ✅<br/>2,573 rels]
 
-        S1 --> S1Ex[Example:<br/>UserService imports User<br/>AuthController imports UserService]
-        S2 --> S2Ex[Example:<br/>AnalyzeCommand extends BaseCommand<br/>Cat extends Animal]
-        S3 --> S3Ex[Example:<br/>UserService implements IUserService<br/>Cache implements ICache]
-
-        S1 --> S1Use[Use: Import analysis<br/>Module boundaries<br/>Coupling detection]
-        S2 --> S2Use[Use: Class hierarchy<br/>OOP design review<br/>Override detection]
-        S3 --> S3Use[Use: Contract verification<br/>Interface compliance<br/>Abstraction analysis]
+        S1 --> S1Use[Import analysis<br/>Module boundaries]
+        S2 --> S2Use[Class hierarchy<br/>OOP design]
+        S3 --> S3Use[Parent-child<br/>containment]
     end
 
-    subgraph "🌊 2. Data Flow Relationships (3 types)"
+    subgraph "2. Data Flow (31.2% - 22,131 rels)"
         D[Data Flow<br/>Type-based connections]
 
-        D --> D1[io-dependency ✅<br/>6,705 relationships]
-        D --> D2[pipeline ✅<br/>25,809 pipelines]
-        D --> D3[event-flow ❌<br/>~300 expected]
+        D --> D1[io-dependency ✅<br/>22,131 rels]
 
-        D1 --> D1Ex[Example:<br/>getUser returns User<br/>updateUser accepts User<br/>→ getUser→updateUser]
-        D2 --> D2Ex[Example:<br/>A→B→C chains<br/>fetchData→parseData→saveData<br/>Length 3+ pipelines]
-        D3 --> D3Ex[Example:<br/>emitter.emit 'userCreated'<br/>listener.on 'userCreated'<br/>→ Publisher→Subscriber]
-
-        D1 --> D1Use[Use: Data lineage<br/>Type flow tracking<br/>Producer-consumer analysis]
-        D2 --> D2Use[Use: Process flows<br/>Chain optimization<br/>Bottleneck detection]
-        D3 --> D3Use[Use: Event architecture<br/>Pub/sub patterns<br/>Message flow analysis]
+        D1 --> D1Use[Data lineage<br/>Type flow tracking]
     end
 
-    subgraph "⚡ 3. Behavioral Relationships (3 types)"
+    subgraph "3. Behavioral (5.4% - 3,809 rels)"
         B[Behavioral<br/>Runtime interactions]
 
-        B --> B1[calls ✅<br/>1,511 relationships]
-        B --> B2[callback ❌<br/>~400 expected]
-        B --> B3[composition ❌<br/>~600 expected]
+        B --> B1[calls ✅<br/>3,433 rels]
+        B --> B2[collaboration ✅<br/>343 rels]
+        B --> B3[composition ✅<br/>21 rels]
+        B --> B4[temporal-order ✅<br/>12 rels]
 
-        B1 --> B1Ex[Example:<br/>AnalyzeCommand calls CommandRegistry.get<br/>BaseCommand calls printHeader<br/>→ 106 calls to CommandRegistry.get]
-        B2 --> B2Ex[Example:<br/>fs.readFile path, callback<br/>Promise.then onSuccess<br/>→ async callback registration]
-        B3 --> B3Ex[Example:<br/>class User has Address<br/>class Car has Engine<br/>→ has-a relationships]
-
-        B1 --> B1Use[Use: Call graph analysis<br/>Impact analysis<br/>Dead code detection]
-        B2 --> B2Use[Use: Async flow tracking<br/>Callback hell detection<br/>Promise chain analysis]
-        B3 --> B3Use[Use: Object design<br/>Composition patterns<br/>Delegation analysis]
+        B1 --> B1Use[Call graph<br/>Impact analysis]
+        B2 --> B2Use[Symbol interaction<br/>patterns]
+        B3 --> B3Use[has-a relationships]
+        B4 --> B4Use[Execution order]
     end
 
-    subgraph "📝 4. Type System Relationships (2 types)"
-        T[Type System<br/>TypeScript-specific]
+    subgraph "4. Semantic (35.6% - 25,262 rels)"
+        M[Semantic<br/>Meaning-based]
 
-        T --> T1[type-dependency ❌<br/>~1,500 expected]
-        T --> T2[generic-constraint ❌<br/>~200 expected]
+        M --> M1[feature-grouping ✅<br/>21,645 rels]
+        M --> M2[naming-pattern ✅<br/>2,567 rels]
+        M --> M3[doc-reference ✅<br/>1,050 rels]
 
-        T1 --> T1Ex[Example:<br/>type UserDTO = Pick User, 'id'<br/>type Response = Result User<br/>→ type references type]
-        T2 --> T2Ex[Example:<br/>function sort T extends Comparable<br/>class Box T extends Serializable<br/>→ generic bounds]
-
-        T1 --> T1Use[Use: Type dependency graph<br/>Type refactoring impact<br/>Circular type detection]
-        T2 --> T2Use[Use: Generic usage patterns<br/>Constraint verification<br/>Type safety analysis]
+        M1 --> M1Use[Feature clusters<br/>Module coherence]
+        M2 --> M2Use[Naming conventions<br/>patterns]
+        M3 --> M3Use[Doc-code links<br/>SSOT]
     end
 
-    subgraph "🏛️ 5. Architectural Relationships (2 types)"
-        A[Architectural<br/>High-level structure]
+    subgraph "5. Testing (16.8% - 11,933 rels)"
+        T[Testing<br/>Test coverage]
 
-        A --> A1[layer-dependency ❌<br/>~100 expected]
-        A --> A2[module-boundary ❌<br/>~80 expected]
+        T --> T1[test-coverage ✅<br/>8,248 rels]
+        T --> T2[test-as-example ✅<br/>3,762 rels]
+        T --> T3[covers-scenario ✅<br/>176 rels]
 
-        A1 --> A1Ex[Example:<br/>Presentation → Business<br/>Business → Data<br/>→ Layer violations detected]
-        A2 --> A2Ex[Example:<br/>core-user imports external-stripe<br/>Internal to External<br/>Boundary crossings detected]
-
-        A1 --> A1Use[Use: Architecture compliance<br/>Layer violation detection<br/>Dependency rule enforcement]
-        A2 --> A2Use[Use: Module isolation<br/>External dependency tracking<br/>Package organization]
+        T1 --> T1Use[Test→impl mapping]
+        T2 --> T2Use[Usage examples]
+        T3 --> T3Use[Scenario coverage]
     end
 
-    subgraph "🧪 6. Testing Relationships (1 type)"
-        Test[Testing<br/>Test coverage]
+    subgraph "6. Verification (4.0% - 2,826 rels)"
+        V[Verification<br/>Quality assurance]
 
-        Test --> Test1[test-coverage ❌<br/>~1,200 expected]
+        V --> V1[verification ✅<br/>2,826 rels]
 
-        Test1 --> Test1Ex[Example:<br/>UserService.test.ts → UserService.ts<br/>AuthController.test.ts → AuthController.ts<br/>→ Test→Implementation mapping]
-
-        Test1 --> Test1Use[Use: Coverage tracking<br/>Untested code detection<br/>Test organization]
+        V1 --> V1Use[Correctness checks]
     end
 
-    subgraph "📚 7. Documentation Relationships (2 types)"
-        Doc[Documentation<br/>Code-docs links]
+    subgraph "7. Alternative (0.1% - 62 rels)"
+        A[Alternative<br/>Fallback options]
 
-        Doc --> Doc1[doc-reference ❌<br/>~800 expected]
-        Doc --> Doc2[enhancement ❌<br/>~500 expected]
+        A --> A1[fallback ✅<br/>62 rels]
 
-        Doc1 --> Doc1Ex[Example:<br/>doc tag AuthenticationSystem<br/>managed/auth.md references AuthService<br/>Bidirectional doc-code links]
-        Doc2 --> Doc2Ex[Example:<br/>problem and functionality tags<br/>Enhanced documentation metadata<br/>Structured doc content]
-
-        Doc1 --> Doc1Use[Use: Doc-code sync<br/>SSOT enforcement<br/>Documentation graph]
-        Doc2 --> Doc2Use[Use: Documentation quality<br/>Enhanced doc navigation<br/>Metadata-driven insights]
+        A1 --> A1Use[Backup strategies]
     end
 
-    subgraph "⭕ 8. Other (1 type)"
-        Other[Other<br/>Special cases]
+    subgraph "8. Constraint (0.0% - 1,440 rels)"
+        X[Constraint<br/>Type system]
 
-        Other --> Other1[circular ✅<br/>0 detected]
+        X --> X1[type-dependency ✅<br/>1,420 rels]
+        X --> X2[co-requirement ✅<br/>8 rels]
+        X --> X3[mutual-exclusion ✅<br/>12 rels]
 
-        Other1 --> Other1Ex[Example:<br/>A→B→C→A cycle<br/>Mutual dependencies<br/>→ Circular import detection]
-
-        Other1 --> Other1Use[Use: Code smell detection<br/>Refactoring priorities<br/>Architecture validation]
+        X1 --> X1Use[Type references]
+        X2 --> X2Use[Required pairs]
+        X3 --> X3Use[Conflicts]
     end
 
-    subgraph "📊 Summary Statistics"
-        Summary[Relationship Taxonomy<br/>17 types across 8 categories]
+    classDef implemented fill:#51cf66,stroke:#2f9e44,stroke-width:2px,color:#fff
+    classDef category fill:#8b5cf6,stroke:#6d28d9,stroke-width:2px,color:#fff
 
-        Summary --> Implemented[✅ Implemented: 6 types<br/>10,173 relationships<br/>35% complete]
-        Summary --> Pending[❌ Not Implemented: 11 types<br/>~16,000 expected<br/>65% remaining]
+    class S1,S2,S3,D1,B1,B2,B3,B4,M1,M2,M3,T1,T2,T3,V1,A1,X1,X2,X3 implemented
+    class S,D,B,M,T,V,A,X category
+```
 
-        Implemented --> ImpBreakdown[code-dependency: 1,902<br/>inheritance: 55<br/>io-dependency: 6,705<br/>pipeline: 25,809<br/>circular: 0<br/>calls: 1,511]
+## Summary
 
-        Pending --> PendBreakdown[Phase 2 Priority: 3 types<br/>Phase 3 Medium: 4 types<br/>Phase 4 Low: 4 types]
+| Category | Types | Relationships | % |
+|----------|-------|--------------|---|
+| Semantic | 3 | 25,262 | 35.6% |
+| Data Flow | 1 | 22,131 | 31.2% |
+| Testing | 3 | 11,933 | 16.8% |
+| Structural | 3 | 4,845 | 6.8% |
+| Behavioral | 4 | 3,809 | 5.4% |
+| Verification | 1 | 2,826 | 4.0% |
+| Constraint | 3 | 1,440 | 2.0% |
+| Alternative | 1 | 62 | 0.1% |
+| **Total** | **19** | **70,892** | **100%** |
 
-        Summary --> Total[Target: ~26,000 rels<br/>when all 17 types implemented]
-    end
+## Related
 
-    subgraph "🎯 Implementation Priority"
-        Priority[Next to Implement]
-
-        Priority --> P1[🔥 test-coverage<br/>High impact<br/>~1,200 new rels]
-        Priority --> P2[🔥 doc-reference<br/>SSOT validation<br/>~800 new rels]
-        Priority --> P3[🔥 interface-impl<br/>Contract verification<br/>~200 new rels]
-
-        P1 --> P1Why[Why: Improve test tracking<br/>Find untested code<br/>Validate coverage]
-        P2 --> P2Why[Why: Document-code sync<br/>SSOT enforcement<br/>Backlink generation]
-        P3 --> P3Why[Why: Interface compliance<br/>Design by contract<br/>Abstraction analysis]
-    end
-
-    %% Styling
-    classDef implemented fill:#51cf66,stroke:#2f9e44,stroke-width:3px,color:#fff
-    classDef notimpl fill:#868e96,stroke:#495057,stroke-width:2px,color:#fff
-    classDef category fill:#8b5cf6,stroke:#6d28d9,stroke-width:3px,color:#fff
-    classDef summary fill:#339af0,stroke:#1864ab,stroke-width:3px,color:#fff
-    classDef priority fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px,color:#fff
-
-    class S1,S2,D1,D2,B1,Other1 implemented
-    class S3,D3,B2,B3,T1,T2,A1,A2,Test1,Doc1,Doc2 notimpl
-    class S,D,B,T,A,Test,Doc,Other category
-    class Summary,Implemented,Pending,Total summary
-    class Priority,P1,P2,P3 priority
+- [[Implementation Roadmap]] - Status tracking
+- [[Dependency Meta-Structure]] - Meta architecture
+- [[Relationship Types]] - Detailed definitions

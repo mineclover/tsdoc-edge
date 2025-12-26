@@ -453,7 +453,12 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
 
         // Skip relationship type names used as mermaid node labels (not actual doc symbols)
         // Handle both hyphenated (layer-dependency) and spaced (Layer Dependency) versions
-        if (/^(enhancement|layer[- ]dependency|module[- ]boundary|callback|event[- ]flow|composition|doc[- ]reference|test[- ]coverage|generic[- ]constraint)$/i.test(symbolName)) {
+        if (/^(enhancement|layer[- ]dependency|module[- ]boundary|callback|event[- ]flow|composition|doc[- ]reference|test[- ]coverage|generic[- ]constraint|contains|calls|verification|covers[- ]scenario|co[- ]requirement|mutual[- ]exclusion|fallback|temporal[- ]order|collaboration|naming[- ]pattern|feature[- ]grouping|test[- ]as[- ]example)$/i.test(symbolName)) {
+          continue;
+        }
+
+        // Skip relationship category names used in diagrams
+        if (/^(structural|data[- ]flow|behavioral|semantic|testing|verification|alternative|constraint)$/i.test(symbolName)) {
           continue;
         }
 
@@ -619,7 +624,12 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
 
       // Skip relationship type names used as mermaid node labels (not actual doc symbols)
       // Handle both hyphenated (layer-dependency) and spaced (Layer Dependency) versions
-      if (/^(enhancement|layer[- ]dependency|module[- ]boundary|callback|event[- ]flow|composition|doc[- ]reference|test[- ]coverage|generic[- ]constraint)$/i.test(symbolName)) {
+      if (/^(enhancement|layer[- ]dependency|module[- ]boundary|callback|event[- ]flow|composition|doc[- ]reference|test[- ]coverage|generic[- ]constraint|contains|calls|verification|covers[- ]scenario|co[- ]requirement|mutual[- ]exclusion|fallback|temporal[- ]order|collaboration|naming[- ]pattern|feature[- ]grouping|test[- ]as[- ]example)$/i.test(symbolName)) {
+        continue;
+      }
+
+      // Skip relationship category names used in diagrams
+      if (/^(structural|data[- ]flow|behavioral|semantic|testing|verification|alternative|constraint)$/i.test(symbolName)) {
         continue;
       }
 

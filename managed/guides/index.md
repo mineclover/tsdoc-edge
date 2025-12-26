@@ -17,9 +17,15 @@ Learn how to effectively use TSDoc Edge for building, analyzing, and documenting
 
 New to TSDoc Edge? Start here:
 
+1. [[TSDoc Edge User Guide]] (`../user-guide.md`) - **Complete user guide** (recommended starting point)
+2. [[Quick Start Guide]] (`../quick-start.md`) - 5-minute quick start
+3. [[Work Context Workflow]] (`../workflows/work-context-workflow.md`) - Core workflow
+
+## Learning Guides
+
 1. [[Build Pipeline Guide]] (`build-pipeline-guide.md`) - Learn the build process
 2. [[Relationship Analysis Guide]] (`relationship-analysis-guide.md`) - Understand relationships
-3. [[Work Context Workflow]] (`../workflows/work-context-workflow.md`) - Daily workflow
+3. [[Usage Scenarios]] (`usage-scenarios.md`) - 10가지 대표 사용 시나리오
 
 ## Development Guides
 
@@ -50,9 +56,9 @@ TypeScript Source
   ↓
 [[DatabaseManager]]
   ↓
-[[CallGraphAnalyzer]] + [[IODependencyAnalyzer]]
+19 Analyzers
   ↓
-36,050+ Relationships
+70,892 Relationships (8 categories)
 ```
 
 **Time**: ~15 minutes read
@@ -69,7 +75,7 @@ TypeScript Source
 
 **Path**: `managed/guides/relationship-analysis-guide.md`
 
-Comprehensive guide to analyzing all 17 relationship types tracked by TSDoc Edge.
+Comprehensive guide to analyzing all 19 relationship types tracked by TSDoc Edge.
 
 **What You'll Learn**:
 - [[Code Dependency]] (`../relationships/CODE-DEPENDENCY.md`) - Import/export analysis
@@ -219,15 +225,14 @@ Complete workflow for creating diagram-based documentation.
 
 **Master Index**: [[Relationship Types]] (`../relationships/index.md`)
 
-Understand all 17 relationship types:
-- 10 implemented ✅
-- 7 planned for future phases
+All 19 relationship types are implemented (100%):
+- 8 categories: Semantic, Data Flow, Testing, Structural, Behavioral, Verification, Alternative, Constraint
 
-**Key Relationships**:
-- [[Code Dependency]] - 1,968 relationships
-- [[IO Dependency]] - 6,705 relationships
-- [[Call Relationships]] - 1,511 relationships
-- [[Pipeline]] - 25,809 chains
+**Key Relationships** (2025-12-26):
+- [[IO Dependency]] - 22,131 relationships (31.2%)
+- [[Feature Grouping]] - 21,645 relationships (30.5%)
+- [[Test Coverage]] - 8,248 relationships (11.6%)
+- [[Calls]] - 3,433 relationships (4.8%)
 
 ---
 
@@ -391,7 +396,7 @@ tsdoc-edge parse-mermaid <diagram>
 
 **Core**:
 - README (`../README.md`) - Main documentation hub
-- [[Commands Index]] (`../COMMANDS.md`) - All 61 commands
+- [[Commands Index]] (`../COMMANDS.md`) - All 109 commands
 
 **Features**:
 - [[CoreWorkflow]] (`../features/core-workflow.md`)
@@ -429,8 +434,8 @@ tsdoc-edge parse-mermaid <diagram>
 
 ---
 
-**Last Updated**: 2025-11-14
-**Total Guides**: 4 comprehensive guides + 3 workflows
+**Last Updated**: 2025-12-26
+**Total Guides**: 4 comprehensive guides + 3 workflows + user guide
 **Coverage**: Build pipeline, relationship analysis, documentation workflows, development guides (commands & analyzers)
 
 ---

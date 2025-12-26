@@ -53,8 +53,8 @@ tsdoc-edge build src
 
 **Output**:
 ```
-Extracted: 1,511 symbols
-Relationships: 1,968 code dependencies
+Extracted: 5,247 symbols
+Relationships: 70,892 total
 Time: ~2-3 seconds
 ```
 
@@ -82,9 +82,9 @@ tsdoc-edge analyze-pipeline
 
 **Output**:
 ```
-Call relationships: 1,511
-I/O dependencies: 6,705
-Pipeline chains: 25,809
+Call relationships: 3,433
+I/O dependencies: 22,131
+Test coverage: 8,248
 ```
 
 **Learn More**: [[Relationship Analysis Guide]] (`managed/guides/relationship-analysis-guide.md`)
