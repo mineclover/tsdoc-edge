@@ -9,6 +9,9 @@
  * 5. Logic - How it works internally
  * 6. Effect - What side effects it produces
  * 7. Scope - What it exposes publicly
+ *
+ * @packageDocumentation
+ * @doc [[ModuleSpecTypes]]
  */
 
 /**

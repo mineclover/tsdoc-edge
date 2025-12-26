@@ -4,6 +4,7 @@
  * Custom TSDoc tags for 7-part module specification framework
  *
  * @packageDocumentation
+ * @doc [[ModuleSpecTagTypes]]
  */
 
 /**

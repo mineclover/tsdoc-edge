@@ -2,6 +2,7 @@
  * Document symbol parser for [[]] notation
  * @packageDocumentation
  * @responsibility Parse [[]] symbols from markdown documents
+ * @doc [[Document Symbol System]]
  */
 
 import * as fs from 'node:fs';

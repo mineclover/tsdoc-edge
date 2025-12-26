@@ -3,6 +3,7 @@
  *
  * @packageDocumentation
  * @responsibility Validate module specifications for completeness and quality
+ * @doc [[ModuleSpecValidator]]
  */
 
 import type { ModuleSpecTemplate } from '../types/spec/module-spec';

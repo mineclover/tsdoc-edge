@@ -6,9 +6,9 @@ status: active
 canonical: true
 ---
 
-# Document Symbol System
+# [[Document Symbol System]]
 
-> See [[Document Symbol System]] for full specification
+> Core system for bidirectional document linking with `[[Symbol]]` notation
 
 **Core Components**: `src/doc-symbol/`
 
