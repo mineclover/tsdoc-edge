@@ -55,10 +55,8 @@ import {
   UpdateSymbolRefsCommand,
   UsageCommand,
   UsedByCommand,
-  ValidateCommand,
-  ValidateDocsCommand,
-  ValidateGeneratedDocsCommand,
-  ValidateSpecCommand,
+  ValidateUnifiedCommand,
+  SymbolUnifiedCommand,
   WhoUsesCommand,
   WithoutContractCommand,
   WithoutResponsibilityCommand,
@@ -77,15 +75,11 @@ import { OntologyListCommand } from './commands/OntologyListCommand';
 import { SystemStatusCommand } from './commands/SystemStatusCommand';
 import { ExploreEntrypointCommand } from './commands/ExploreEntrypointCommand';
 import { ParseMermaidCommand } from './commands/ParseMermaidCommand';
-import { ValidateSymbolRefsCommand } from './commands/ValidateSymbolRefsCommand';
 import { PromoteSymbolCommand } from './commands/PromoteSymbolCommand';
 import { CoverageReportCommand } from './commands/CoverageReportCommand';
 import { DetectDeadCodeCommand } from './commands/DetectDeadCodeCommand';
-import { SymbolQueryCommand } from './commands/SymbolQueryCommand';
-import { SymbolFixCommand } from './commands/SymbolFixCommand';
 import { RenameCommand } from './commands/RenameCommand';
 import { MoveCommand } from './commands/MoveCommand';
-import { SymbolRenameCommand } from './commands/SymbolRenameCommand';
 import { TaskListCommand, TaskAddCommand, TaskUpdateCommand, TaskStatsCommand } from './commands/TaskCommands';
 import { ContextCommand } from './commands/ContextCommand';
 import { TestExamplesCommand } from './commands/TestExamplesCommand';
@@ -120,19 +114,17 @@ async function main(): Promise<void> {
   registry.register(new BuildCommand());
   registry.register(new UsageCommand());
   registry.register(new AnalyzeCommand());
-  registry.register(new ValidateCommand());
+  registry.register(new ValidateUnifiedCommand());
+  registry.register(new SymbolUnifiedCommand());
   registry.register(new HealthCommand());
   registry.register(new IndexDocsCommand());
   registry.register(new ParseCommand());
-  registry.register(new ValidateDocsCommand());
-  registry.register(new ValidateGeneratedDocsCommand());
   registry.register(new UpdateBacklinksCommand());
   registry.register(new UpdateSymbolRefsCommand());
   registry.register(new CheckLinksCommand());
   registry.register(new SuggestCommand());
   registry.register(new InitCommand());
   registry.register(new IdNewCommand());
-  registry.register(new ValidateSpecCommand());
   registry.register(new GenerateDocsCommand());
   registry.register(new DepsCommand());
   registry.register(new UsedByCommand());
@@ -181,17 +173,13 @@ async function main(): Promise<void> {
   registry.register(new TestExamplesCommand());
   registry.register(new ExploreEntrypointCommand());
   registry.register(new ParseMermaidCommand());
-  registry.register(new ValidateSymbolRefsCommand());
   registry.register(new PromoteSymbolCommand());
   registry.register(new CoverageReportCommand());
   registry.register(new DetectDeadCodeCommand());
-  registry.register(new SymbolQueryCommand());
-  registry.register(new SymbolFixCommand());
   registry.register(new QueryInferredCommand());
   registry.register(new ContextToLLMCommand());
   registry.register(new RenameCommand());
   registry.register(new MoveCommand());
-  registry.register(new SymbolRenameCommand());
   registry.register(new TaskListCommand());
   registry.register(new TaskAddCommand());
   registry.register(new TaskUpdateCommand());

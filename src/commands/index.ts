@@ -66,6 +66,8 @@ export { RelationshipMetricsCommand } from './RelationshipMetricsCommand';
 export { RelationshipCheckCommand } from './RelationshipCheckCommand';
 export { RelationshipHelpCommand } from './RelationshipHelpCommand';
 export { RelationshipCommand } from './RelationshipCommand';
+export { ValidateUnifiedCommand } from './ValidateUnifiedCommand';
+export { SymbolUnifiedCommand } from './SymbolUnifiedCommand';
 export { AnalyzeRelationshipsCommand } from './AnalyzeRelationshipsCommand';
 export { RenameCommand } from './RenameCommand';
 export { MoveCommand } from './MoveCommand';
