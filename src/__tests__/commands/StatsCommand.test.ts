@@ -20,7 +20,14 @@ describe('StatsCommand', () => {
     })),
     db: {
       prepare: jest.fn(() => ({
-        get: jest.fn(() => ({ count: docCount })),
+        get: jest.fn(() => ({
+          total: stats.totalSymbols || 10,
+          documented: docCount,
+          test_total: stats.testTotal || 0,
+          test_documented: 0,
+          source_total: stats.totalSymbols || 10,
+          source_documented: docCount,
+        })),
       })),
     },
     close: jest.fn(),
