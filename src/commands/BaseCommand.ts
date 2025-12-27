@@ -52,10 +52,6 @@ export const colors = {
  * @decision Use abstract class instead of interface
  * @rationale Provides default implementations for common operations, enforces structure while allowing customization
  * @consequences Child classes inherit common functionality, can override when needed
- *
- * @depends None (base utility)
- * @depType internal
- * @depReason Foundation for command pattern
  */
 export abstract class BaseCommand {
   /**

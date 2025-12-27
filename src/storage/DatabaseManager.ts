@@ -135,10 +135,9 @@ interface EnhancedDocRow {
  * @rationale SQLite provides O(log n) lookups and FTS5 search, JSONL enables Git diff/merge and human inspection
  * @consequences Two storage layers to maintain, but gains both performance and version control benefits
  *
- * @depends better-sqlite3, ConfigManager
- * @depType external, internal
- * @depReason High-performance synchronous SQLite driver, configuration paths
- * @requires ConfigManager
+ * @depends ConfigManager
+ * @depType internal
+ * @depReason Configuration paths
  */
 export class DatabaseManager {
   /**

@@ -27,13 +27,13 @@ import { DatabaseManager } from '../storage/DatabaseManager';
  * - Summary display: Total symbols covered
  * - Error handling: Handle missing coverage file
  *
- * @decision Use CoverageSyncAdapter for sync logic
- * @rationale Specialized adapter for coverage formats
+ * @decision Use DatabaseManager for storage
+ * @rationale Direct database access for coverage updates
  * @consequences Requires Istanbul/NYC coverage report
  *
- * @depends CoverageSyncAdapter, DatabaseManager
+ * @depends DatabaseManager
  * @depType internal
- * @depReason Coverage data import
+ * @depReason Coverage data storage
  */
 export class SyncCoverageCommand extends BaseCommand {
   private dbManager?: DatabaseManager;
