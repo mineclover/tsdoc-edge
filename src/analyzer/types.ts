@@ -76,6 +76,7 @@ export type AnalyzerType =
   | 'enhancement'
   | 'events'
   | 'fallback'
+  | 'integration-verification'
   | 'io'
   | 'layer-dependency'
   | 'module-boundary'

@@ -27,6 +27,7 @@ import { SubstitutionAnalyzer } from './SubstitutionAnalyzer';
 import { TemporalOrderAnalyzer } from './TemporalOrderAnalyzer';
 import { TestCoverageUnifier } from './TestCoverageUnifier';
 import { TypeDependencyAnalyzer } from './TypeDependencyAnalyzer';
+import { IntegrationVerificationAnalyzer } from './IntegrationVerificationAnalyzer';
 
 /**
  * Wrapper to adapt existing analyzers to common interface
@@ -137,6 +138,13 @@ const ANALYZER_METADATA: Record<AnalyzerType, AnalyzerMetadata> = {
     description: 'Fallback patterns',
     category: 'alternative',
     requires: ['graph', 'program'],
+  },
+  'integration-verification': {
+    type: 'integration-verification',
+    name: 'Integration Verification',
+    description: 'Integration tests verifying symbol connections',
+    category: 'verification',
+    requires: ['graph'],
   },
   io: {
     type: 'io',
@@ -354,6 +362,9 @@ export class AnalyzerRegistry {
 
       case 'fallback':
         return new FallbackAnalyzer(graph, program).analyze();
+
+      case 'integration-verification':
+        return new IntegrationVerificationAnalyzer(graph, ctx.projectRoot).analyze();
 
       case 'io':
         return new IODependencyAnalyzer(graph).analyze();
