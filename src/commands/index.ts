@@ -52,3 +52,4 @@ export { MoveCommand } from './MoveCommand';
 export { RebuildIndexCommand } from './RebuildIndexCommand';
 export { QueryInferredCommand } from './QueryInferredCommand';
 export { LintCommand } from './LintCommand';
+export { PreCommitRunCommand } from './PreCommitRunCommand';
