@@ -120,7 +120,7 @@ tsdoc-edge validate-docs         # Validate SSOT
 tsdoc-edge update-backlinks      # Update backlinks
 ```
 
-**Full list**: [[Commands Index]] (74 commands)
+**Full list**: [[Commands Index]] (67 commands)
 
 ---
 
@@ -266,7 +266,7 @@ tsdoc-edge validate-symbol-refs   # Find broken refs
 ### Core Documentation
 - [[TSDoc Edge Documentation]] - Main README
 - [[Quick Start Guide]] - Getting started
-- [[Commands Index]] - All 109 commands
+- [[Commands Index]] - All 67 commands
 
 ### Relationship System
 - [[Relationship Types]] - 19 types, 8 categories
