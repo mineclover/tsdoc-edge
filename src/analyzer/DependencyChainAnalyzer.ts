@@ -320,7 +320,7 @@ export class DependencyChainAnalyzer {
           .replace(/^-|-$/g, '')
           .slice(0, 100), // Limit ID length
         type: 'circular-dependency',
-        category: 'quality',
+        category: 'constraint',
         from: circular.path[0],
         to: circular.path[circular.path.length - 1],
         direction: 'bidirectional',

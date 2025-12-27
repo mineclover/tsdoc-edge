@@ -78,6 +78,7 @@ export type AnalyzerType =
   | 'fallback'
   | 'io'
   | 'layer-dependency'
+  | 'module-boundary'
   | 'structural'
   | 'substitution'
   | 'temporal-order'

@@ -152,6 +152,13 @@ const ANALYZER_METADATA: Record<AnalyzerType, AnalyzerMetadata> = {
     category: 'architectural',
     requires: ['graph'],
   },
+  'module-boundary': {
+    type: 'module-boundary',
+    name: 'Module Boundary',
+    description: 'Cross-module dependencies',
+    category: 'architectural',
+    requires: ['graph'],
+  },
   structural: {
     type: 'structural',
     name: 'Structural',
@@ -353,6 +360,9 @@ export class AnalyzerRegistry {
 
       case 'layer-dependency':
         return new LayerDependencyAnalyzer(graph).analyze();
+
+      case 'module-boundary':
+        return new LayerDependencyAnalyzer(graph).analyzeModuleBoundaries();
 
       case 'structural':
         return new ImplementationAnalyzer(ctx.graph, ctx.program).analyze();
