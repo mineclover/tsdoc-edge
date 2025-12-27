@@ -79,7 +79,7 @@ export class ConfigManager {
    *
    * @remarks
    * If config file doesn't exist, returns default configuration.
-   * Invalid JSON will throw an error.
+   * Invalid JSON will throw an error with helpful message.
    *
    * @private
    */
@@ -92,11 +92,13 @@ export class ConfigManager {
       const content = fs.readFileSync(this.configPath, 'utf-8');
       const userConfig = JSON.parse(content) as Partial<TsdocEdgeConfig>;
       return this.mergeConfig(DEFAULT_CONFIG, userConfig);
-      /**
-       * error
-       * @public
-       */
     } catch (error) {
+      if (error instanceof SyntaxError) {
+        throw new Error(
+          `Invalid JSON in ${this.configPath}: ${error.message}\n` +
+            'Hint: Check for trailing commas, missing quotes, or unescaped characters.'
+        );
+      }
       throw new Error(`Failed to load config from ${this.configPath}: ${error}`);
     }
   }
@@ -271,43 +273,88 @@ export class ConfigManager {
   /**
    * Validate configuration
    *
-   * @returns Validation result with errors
+   * @returns Validation result with errors and warnings
    *
    * @public
    */
-  public validate(): { valid: boolean; errors: string[] } {
+  public validate(): { valid: boolean; errors: string[]; warnings: string[] } {
     const errors: string[] = [];
+    const warnings: string[] = [];
 
-    // Validate project
+    // Validate project section
     if (!this.config.project.name) {
-      errors.push('project.name is required');
+      errors.push('Missing project.name: Set a project name in .tsdoc.config.json');
     }
     if (!this.config.project.version) {
-      errors.push('project.version is required');
+      errors.push('Missing project.version: Set a version (e.g., "1.0.0") in .tsdoc.config.json');
     }
 
-    // Validate paths
+    // Validate srcDirs
+    if (this.config.project.srcDirs) {
+      for (const srcDir of this.config.project.srcDirs) {
+        const absolutePath = this.resolvePath(srcDir);
+        if (!fs.existsSync(absolutePath)) {
+          warnings.push(`Source directory not found: ${srcDir} (resolved to ${absolutePath})`);
+        }
+      }
+    }
+
+    // Validate paths section
     if (!this.config.paths.commentsDir) {
-      errors.push('paths.commentsDir is required');
+      errors.push('Missing paths.commentsDir: Required for storing comments');
     }
     if (!this.config.paths.databasePath) {
-      errors.push('paths.databasePath is required');
+      errors.push('Missing paths.databasePath: Required for symbol database');
     }
     if (!this.config.paths.jsonlDir) {
-      errors.push('paths.jsonlDir is required');
+      errors.push('Missing paths.jsonlDir: Required for version-controlled data');
+    }
+
+    // Validate path formats (no absolute paths allowed for portability)
+    const pathFields = ['commentsDir', 'databasePath', 'jsonlDir', 'outputDir'] as const;
+    for (const field of pathFields) {
+      const pathValue = this.config.paths[field];
+      if (pathValue && path.isAbsolute(pathValue)) {
+        warnings.push(
+          `Absolute path in paths.${field}: "${pathValue}" - Consider using relative paths for portability`
+        );
+      }
     }
 
     // Validate connectivity score range
     if (this.config.validation?.minConnectivityScore !== undefined) {
       const score = this.config.validation.minConnectivityScore;
-      if (score < 0 || score > 100) {
-        errors.push('validation.minConnectivityScore must be between 0 and 100');
+      if (typeof score !== 'number') {
+        errors.push('Invalid validation.minConnectivityScore: Must be a number between 0 and 100');
+      } else if (score < 0 || score > 100) {
+        errors.push(`Invalid validation.minConnectivityScore: ${score} is out of range (0-100)`);
+      }
+    }
+
+    // Validate generator options
+    if (this.config.generator?.template !== undefined) {
+      const validTemplates = ['basic', 'enhanced', 'strict'];
+      if (!validTemplates.includes(this.config.generator.template)) {
+        errors.push(
+          `Invalid generator.template: "${this.config.generator.template}" - Must be one of: ${validTemplates.join(', ')}`
+        );
+      }
+    }
+
+    // Validate fold settings
+    if (this.config.fold?.excludePatterns) {
+      for (const pattern of this.config.fold.excludePatterns) {
+        if (typeof pattern !== 'string') {
+          errors.push('Invalid fold.excludePatterns: All patterns must be strings');
+          break;
+        }
       }
     }
 
     return {
       valid: errors.length === 0,
       errors,
+      warnings,
     };
   }
 
