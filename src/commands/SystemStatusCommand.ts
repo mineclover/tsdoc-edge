@@ -105,11 +105,23 @@ Options:
   }
 
   private getSymbolStats(dbManager: DatabaseManager): SymbolStats {
-    const totalQuery = 'SELECT COUNT(*) as count FROM symbols';
-    const total = (dbManager.db.prepare(totalQuery).get() as { count: number }).count;
-
-    const documentedQuery = "SELECT COUNT(*) as count FROM symbols WHERE summary IS NOT NULL AND summary != ''";
-    const documented = (dbManager.db.prepare(documentedQuery).get() as { count: number }).count;
+    // Combined query for all stats
+    const statsQuery = `
+      SELECT
+        COUNT(*) as total,
+        SUM(CASE WHEN summary IS NOT NULL AND summary != '' THEN 1 ELSE 0 END) as documented,
+        SUM(CASE WHEN type IN ('test-case', 'test-suite') THEN 1 ELSE 0 END) as test_total,
+        SUM(CASE WHEN type NOT IN ('test-case', 'test-suite') THEN 1 ELSE 0 END) as source_total,
+        SUM(CASE WHEN type NOT IN ('test-case', 'test-suite') AND summary IS NOT NULL AND summary != '' THEN 1 ELSE 0 END) as source_documented
+      FROM symbols
+    `;
+    const stats = dbManager.db.prepare(statsQuery).get() as {
+      total: number;
+      documented: number;
+      test_total: number;
+      source_total: number;
+      source_documented: number;
+    };
 
     const byTypeQuery = 'SELECT type, COUNT(*) as count FROM symbols GROUP BY type ORDER BY count DESC';
     const byType: Record<string, number> = {};
@@ -118,10 +130,14 @@ Options:
     }
 
     return {
-      total,
-      documented,
-      undocumented: total - documented,
-      coverage: total > 0 ? Math.round((documented / total) * 1000) / 10 : 0,
+      total: stats.total,
+      documented: stats.documented,
+      undocumented: stats.total - stats.documented,
+      coverage: stats.total > 0 ? Math.round((stats.documented / stats.total) * 1000) / 10 : 0,
+      sourceTotal: stats.source_total,
+      sourceDocumented: stats.source_documented,
+      sourceCoverage: stats.source_total > 0 ? Math.round((stats.source_documented / stats.source_total) * 1000) / 10 : 0,
+      testTotal: stats.test_total,
       byType,
     };
   }
@@ -296,8 +312,9 @@ Options:
 
     // Symbol Distribution
     this.printSection('Symbol Distribution');
-    console.log(`  Documented:     ${colors.green}${symbols.documented.toLocaleString()}${colors.reset} (${symbols.coverage}%)`);
-    console.log(`  Undocumented:   ${colors.yellow}${symbols.undocumented.toLocaleString()}${colors.reset}`);
+    console.log(`  ${colors.bold}Overall:${colors.reset}        ${colors.green}${symbols.documented.toLocaleString()}${colors.reset} / ${symbols.total.toLocaleString()} (${symbols.coverage}%)`);
+    console.log(`  ${colors.bold}Source Code:${colors.reset}    ${colors.green}${symbols.sourceDocumented.toLocaleString()}${colors.reset} / ${symbols.sourceTotal.toLocaleString()} (${symbols.sourceCoverage}%)`);
+    console.log(`  ${colors.dim}Test Symbols:   ${symbols.testTotal.toLocaleString()} (${Math.round((symbols.testTotal / symbols.total) * 1000) / 10}% of total)${colors.reset}`);
     const topTypes = Object.entries(symbols.byType).slice(0, 5);
     if (topTypes.length > 0) {
       console.log(`  Top types:`);
@@ -363,6 +380,10 @@ interface SymbolStats {
   documented: number;
   undocumented: number;
   coverage: number;
+  sourceTotal: number;
+  sourceDocumented: number;
+  sourceCoverage: number;
+  testTotal: number;
   byType: Record<string, number>;
 }
 
