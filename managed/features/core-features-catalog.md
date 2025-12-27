@@ -1,6 +1,6 @@
 ---
 tsdoc: managed
-version: 2.0.0
+version: 2.1.0
 status: active
 primary: CoreFeatures
 category: feature
@@ -8,7 +8,7 @@ tags:
   - catalog
   - index
   - core
-lastUpdated: 2025-01-15
+lastUpdated: 2025-12-27
 ---
 # [[CoreFeatures]]
 
@@ -320,12 +320,31 @@ import type { TSDocEdgeConfig, ValidationResult } from 'tsdoc-edge';
 참조: [src/types/](../../src/types/)
 ---
 
-## CLI 명령어 전체 목록
-### 초기 설정
+## CLI 명령어 전체 목록 (81개)
+
+### 초기 설정 & 빌드
 ```bash
-tsdoc-edge init [options]
+tsdoc-edge init [options]               # 프로젝트 초기화
+tsdoc-edge build <path>                 # 심볼 데이터베이스 빌드
 ```
-### 심볼 ID 관리
+
+### 파일 컨텍스트 (가장 중요!)
+```bash
+tsdoc-edge work-context <file>          # 파일 작업 전 전체 컨텍스트 (wc)
+tsdoc-edge design-context <file>        # 설계 의사결정 컨텍스트 (dc)
+```
+
+### 관계 분석 (Unified Relationship System)
+```bash
+tsdoc-edge relationship stats           # 관계 유형별 통계
+tsdoc-edge relationship impact <id>     # 변경 영향 분석
+tsdoc-edge relationship metrics         # 중요 심볼 메트릭스
+tsdoc-edge relationship clusters        # 모듈 경계 발견
+tsdoc-edge relationship chain <id>      # 의존성 체인
+tsdoc-edge relationship cycles          # 순환 의존성 탐지
+```
+
+### 심볼 관리
 ```bash
 tsdoc-edge id new <file> <symbol>       # ID 생성
 tsdoc-edge id list                      # 전체 목록
@@ -333,47 +352,45 @@ tsdoc-edge deps <id>                    # 의존성
 tsdoc-edge used-by <id>                 # 사용처
 tsdoc-edge tree                         # 계층 구조
 tsdoc-edge find-method <Class#method>   # 메서드 찾기
-```
-
-### 그래프 탐색
-```bash
-tsdoc-edge scan [options]               # N단계 깊이 탐색
 tsdoc-edge who-uses <name>              # AST 기반 검색
 ```
+
 ### 문서 품질
 ```bash
 tsdoc-edge analyze [path]               # 품질 분석
-tsdoc-edge health [path]                # 건강도 측정
+tsdoc-edge health [path]                # 건강도 측정 (점수/100)
 tsdoc-edge stats [path]                 # 통계 추적
-tsdoc-edge core-api                     # 핵심 API 표면
+tsdoc-edge suggest [path]               # 개선 제안
+tsdoc-edge lint [path]                  # 종합 린팅
 ```
 
 ### 검증
 ```bash
 tsdoc-edge validate                     # 전체 검증
+tsdoc-edge validate-docs [dir]          # SSOT 검증
+tsdoc-edge validate-symbol-refs         # 심볼 참조 검증
 tsdoc-edge orphans                      # 고아 심볼
 tsdoc-edge undocumented                 # 미문서화
 tsdoc-edge untested                     # 미테스트
-tsdoc-edge without-responsibility       # 책임 미정의
-tsdoc-edge without-contract             # 계약 미정의
 ```
+
 ### 자동 수정
 ```bash
-tsdoc-edge fix [path]                   # 문제 수정
-tsdoc-edge improve                      # 재귀적 개선
+tsdoc-edge fix [path] --dry-run         # 문제 수정 (미리보기)
+tsdoc-edge improve --target=90          # 목표 점수까지 개선
 ```
 
 ### 문서 심볼
 ```bash
 tsdoc-edge index-docs [dir]             # 인덱싱
-tsdoc-edge validate-docs [dir]          # SSOT 검증
 tsdoc-edge update-backlinks [path]      # 백링크 생성
 tsdoc-edge find-doc <symbol>            # 심볼 찾기
 ```
-### 미래 계획
+
+### 시스템 상태
 ```bash
-tsdoc-edge plans [--status=<status>]    # 계획 목록
-tsdoc-edge todos                        # TODO 목록
+tsdoc-edge system-status                # 전체 시스템 상태
+tsdoc-edge coverage-report              # 테스트 커버리지 리포트
 ```
 
 ---

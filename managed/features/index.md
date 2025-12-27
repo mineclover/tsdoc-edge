@@ -4,11 +4,22 @@ type: index
 category: features
 status: active
 canonical: true
+lastUpdated: 2025-12-27
 ---
 
 # [[Features Index]]
 
 > TSDoc Edge 기능 카탈로그 - 모든 기능의 진입점
+
+## Project Status
+
+| Metric | Value |
+|--------|-------|
+| Commands | 81 |
+| Test Suites | 195 |
+| Tests | 2,873 |
+| Health Score | 74/100 |
+| Vulnerabilities | 0 |
 
 ## Quick Navigation
 
@@ -285,8 +296,8 @@ tsdoc-edge test-impact database-manager
 
 ## Related Documentation
 
-- **Commands Index** (`/managed/COMMANDS.md`) - All 61 commands
-- **[[Relationship Types]]** (`/managed/relationships/index.md`) - 17 relationship types
+- **Commands Index** (`/managed/COMMANDS.md`) - All 81 commands
+- **[[Relationship Types]]** (`/managed/relationships/index.md`) - 13 relationship types, 10 categories
 - **[[Guides & Tutorials]]** (`/managed/guides/index.md`) - Learning resources
 - **[[CoreFeatures]]** (`core-features-catalog.md`) - Detailed feature catalog
 

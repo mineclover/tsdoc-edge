@@ -126,7 +126,7 @@ Create `.tsdoc.config.json`:
 ```
 src/
 ├── analyzer/      # Code analysis (health, coverage)
-├── commands/      # CLI commands (67 commands)
+├── commands/      # CLI commands (81 commands)
 ├── doc-symbol/    # [[Symbol]] system
 ├── graph/         # Symbol graph
 ├── lsp/           # LSP server
@@ -151,10 +151,10 @@ npm test           # Run tests
 
 | Metric | Value |
 |--------|-------|
-| Symbols | 6,300+ |
-| Relationships | 45,000+ |
-| CLI Commands | 67 |
-| Test Suites | 191 |
+| CLI Commands | 81 |
+| Test Suites | 195 |
+| Tests | 2,873 |
+| Health Score | 74/100 |
 
 ---
 
