@@ -39,10 +39,12 @@ describe('StatementManager', () => {
 
     it('should execute prepared statements', () => {
       const insertStmt = stmtManager.prepare('insert', 'INSERT INTO test (id, value) VALUES (?, ?)');
-      insertStmt.run('1', 'hello');
+      expect(insertStmt).not.toBeNull();
+      insertStmt!.run('1', 'hello');
 
       const selectStmt = stmtManager.prepare('select', 'SELECT * FROM test WHERE id = ?');
-      const result = selectStmt.get('1') as { id: string; value: string };
+      expect(selectStmt).not.toBeNull();
+      const result = selectStmt!.get('1') as { id: string; value: string };
 
       expect(result.id).toBe('1');
       expect(result.value).toBe('hello');

@@ -8,17 +8,30 @@
  */
 
 import { StatementManager, StatementManagerOptions } from '../../lsp/statement-manager';
+import type { SqliteDatabase } from '../../types/database';
 
 describe('StatementManager', () => {
-  // Mock database
-  const createMockDb = () => ({
+  // Mock database with required SqliteDatabase properties
+  const createMockDb = (): SqliteDatabase => ({
+    memory: false,
+    readonly: false,
+    name: 'test.db',
+    open: true,
+    inTransaction: false,
     prepare: jest.fn((sql: string) => ({
-      sql,
+      database: {} as SqliteDatabase,
+      source: sql,
+      reader: true,
+      readonly: true,
       get: jest.fn(),
       all: jest.fn(),
       run: jest.fn(),
+      iterate: jest.fn(),
     })),
-  });
+    exec: jest.fn().mockReturnThis(),
+    close: jest.fn().mockReturnThis(),
+    transaction: jest.fn((fn) => fn),
+  } as unknown as SqliteDatabase);
 
   describe('constructor', () => {
     it('should create manager with default options', () => {
@@ -50,7 +63,8 @@ describe('StatementManager', () => {
       const stmt = manager.prepare('selectAll', 'SELECT * FROM symbols');
 
       expect(stmt).toBeDefined();
-      expect(stmt.sql).toBe('SELECT * FROM symbols');
+      expect(stmt).not.toBeNull();
+      expect(stmt!.source).toBe('SELECT * FROM symbols');
       expect(db.prepare).toHaveBeenCalledWith('SELECT * FROM symbols');
       expect(manager.getStats().size).toBe(1);
 
@@ -81,11 +95,10 @@ describe('StatementManager', () => {
 
     it('should handle prepare error gracefully', () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-      const db = {
-        prepare: jest.fn(() => {
-          throw new Error('SQL syntax error');
-        }),
-      };
+      const db = createMockDb();
+      (db.prepare as jest.Mock).mockImplementation(() => {
+        throw new Error('SQL syntax error');
+      });
       const manager = new StatementManager(db);
 
       const stmt = manager.prepare('bad', 'INVALID SQL');
@@ -173,11 +186,10 @@ describe('StatementManager', () => {
 
     it('should handle error gracefully', () => {
       const consoleSpy = jest.spyOn(console, 'error').mockImplementation();
-      const db = {
-        prepare: jest.fn(() => {
-          throw new Error('Error');
-        }),
-      };
+      const db = createMockDb();
+      (db.prepare as jest.Mock).mockImplementation(() => {
+        throw new Error('Error');
+      });
       const manager = new StatementManager(db);
 
       const stmt = manager.prepareOnce('INVALID');

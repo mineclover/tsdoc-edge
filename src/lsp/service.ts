@@ -14,6 +14,7 @@
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import { SymbolKind, DiagnosticSeverity } from 'vscode-languageserver/node';
+import type { SqliteDatabase, SymbolRow, CountRow, RelTypeCountRow, UnifiedRelRow, HighImpactRow } from '../types/database';
 import { CacheManager } from './cache-manager';
 import { StatementManager } from './statement-manager';
 import { IncrementalBuilder, type IncrementalExtractResult } from './incremental-builder';
@@ -94,8 +95,7 @@ export class TsdocEdgeService {
   /** Path to SQLite database (.tsdoc/symbols.db) */
   private dbPath: string;
   /** SQLite database connection (better-sqlite3, dynamically loaded via require) */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private db: any | null = null;
+  private db: SqliteDatabase | null = null;
 
   /** Cache manager for all caches */
   private cacheManager: CacheManager;
@@ -171,8 +171,8 @@ export class TsdocEdgeService {
       }
       this.statementManager = new StatementManager(this.db, { maxStatements: 50 });
 
-      // Initialize incremental builder
-      this.incrementalBuilder = new IncrementalBuilder(this.workspaceRoot, this.db);
+      // Initialize incremental builder (db is now verified as non-null)
+      this.incrementalBuilder = new IncrementalBuilder(this.workspaceRoot, this.db!);
       this.incrementalMode = true;
 
       console.log('Incremental mode enabled');
@@ -322,22 +322,22 @@ export class TsdocEdgeService {
           AND line <= ?
         ORDER BY line DESC
         LIMIT 1
-      `).get(`%${path.basename(normalizedPath)}`, line);
+      `).get(`%${path.basename(normalizedPath)}`, line) as SymbolRow | undefined;
 
       if (!symbol) return null;
 
       // Get impact analysis
-      const downstreamCount = this.db.prepare(`
+      const downstreamCount = (this.db.prepare(`
         SELECT COUNT(*) as count
         FROM unified_relationships
         WHERE from_symbols LIKE ?
-      `).get(`%${symbol.id}%`)?.count || 0;
+      `).get(`%${symbol.id}%`) as CountRow | undefined)?.count || 0;
 
-      const upstreamCount = this.db.prepare(`
+      const upstreamCount = (this.db.prepare(`
         SELECT COUNT(*) as count
         FROM unified_relationships
         WHERE to_symbols LIKE ?
-      `).get(`%${symbol.id}%`)?.count || 0;
+      `).get(`%${symbol.id}%`) as CountRow | undefined)?.count || 0;
 
       // Build markdown content
       let content = `## ${symbol.name}\n\n`;
@@ -360,7 +360,7 @@ export class TsdocEdgeService {
         GROUP BY type
         ORDER BY count DESC
         LIMIT 5
-      `).all(`%${symbol.id}%`, `%${symbol.id}%`);
+      `).all(`%${symbol.id}%`, `%${symbol.id}%`) as RelTypeCountRow[];
 
       if (relTypes.length > 0) {
         content += `\n**Relationship Types:**\n`;
@@ -398,8 +398,8 @@ export class TsdocEdgeService {
       WHERE to_symbols LIKE ?
     `);
 
-    const downstream = downstreamStmt?.get(`%${symbolId}%`)?.count || 0;
-    const upstream = upstreamStmt?.get(`%${symbolId}%`)?.count || 0;
+    const downstream = (downstreamStmt?.get(`%${symbolId}%`) as CountRow | undefined)?.count || 0;
+    const upstream = (upstreamStmt?.get(`%${symbolId}%`) as CountRow | undefined)?.count || 0;
 
     const result = { downstream, upstream };
 
@@ -437,7 +437,7 @@ export class TsdocEdgeService {
         ORDER BY line
       `);
 
-      const symbols = symbolsStmt?.all(`%${fileName}`) || [];
+      const symbols = (symbolsStmt?.all(`%${fileName}`) || []) as SymbolRow[];
       const codeLenses: CodeLensInfo[] = [];
 
       for (const symbol of symbols) {
@@ -480,7 +480,7 @@ export class TsdocEdgeService {
         LIMIT 50
       `).all(`%${query}%`);
 
-      return symbols.map((sym: any) => ({
+      return (symbols as SymbolRow[]).map((sym) => ({
         name: sym.name,
         kind: this.mapTypeToKind(sym.type),
         filePath: sym.file_path,
@@ -520,7 +520,7 @@ export class TsdocEdgeService {
         WHERE type = 'circular-dependency'
           AND file_path LIKE ?
       `);
-      const circulars = circularStmt?.all(`%${fileName}`) || [];
+      const circulars = (circularStmt?.all(`%${fileName}`) || []) as UnifiedRelRow[];
 
       for (const circular of circulars) {
         const props = JSON.parse(circular.properties || '{}');
@@ -539,7 +539,7 @@ export class TsdocEdgeService {
           AND json_extract(properties, '$.isViolation') = 1
           AND file_path LIKE ?
       `);
-      const violations = violationStmt?.all(`%${fileName}`) || [];
+      const violations = (violationStmt?.all(`%${fileName}`) || []) as UnifiedRelRow[];
 
       for (const violation of violations) {
         const props = JSON.parse(violation.properties || '{}');
@@ -559,7 +559,7 @@ export class TsdocEdgeService {
         GROUP BY s.id
         HAVING count > 10
       `);
-      const highImpact = highImpactStmt?.all(`%${fileName}`) || [];
+      const highImpact = (highImpactStmt?.all(`%${fileName}`) || []) as HighImpactRow[];
 
       for (const sym of highImpact) {
         diagnostics.push({

@@ -12,8 +12,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { ParserContext } from '@microsoft/tsdoc';
 import { TSDocParser } from '../parser/TSDocParser';
-import { ASTSymbolExtractor } from '../analyzer/ASTSymbolExtractor';
-import { EnhancedDocExtractor } from '../parser/EnhancedDocExtractor';
+import { ASTSymbolExtractor, type ExtractedSymbol, type ExtractionResult } from '../analyzer/ASTSymbolExtractor';
+import { EnhancedDocExtractor, type ExtractedEnhancedDoc } from '../parser/EnhancedDocExtractor';
 import { ModuleSpecTagParser } from '../parser/ModuleSpecTagParser';
 import type { ModuleSpecTags } from '../types/tags/module-spec-tags';
 import type {
@@ -324,7 +324,7 @@ export class ModuleSpecGenerator {
   private extractPurpose(
     tsdocContext: ParserContext | null,
     customTags: Map<string, string[]>,
-    enhancedDoc?: any
+    enhancedDoc?: ExtractedEnhancedDoc
   ): ModulePurpose {
     const purpose: ModulePurpose = {
       problem: '',
@@ -436,7 +436,7 @@ export class ModuleSpecGenerator {
     node: ts.Node,
     tsdocContext: ParserContext | null,
     customTags: Map<string, string[]>,
-    enhancedDoc?: any
+    enhancedDoc?: ExtractedEnhancedDoc
   ): ModuleOutput {
     const returnType: ReturnSpec = {
       type: 'void',
@@ -465,12 +465,12 @@ export class ModuleSpecGenerator {
     }
 
     // Extract failure cases from @errorExp or enhancedDoc
-    if (enhancedDoc?.doc.errorExperiences?.errors) {
-      for (const error of enhancedDoc.doc.errorExperiences.errors) {
+    if (enhancedDoc?.doc.errorExperiences?.length) {
+      for (const error of enhancedDoc.doc.errorExperiences) {
         failureCases.push({
-          condition: error.situation || 'Unknown condition',
+          condition: error.context || 'Unknown condition',
           errorType: error.errorType,
-          description: error.lesson || error.situation || '',
+          description: error.solution || error.context || '',
         });
       }
     }
@@ -491,8 +491,8 @@ export class ModuleSpecGenerator {
     filePath: string,
     sourceCode: string,
     customTags: Map<string, string[]>,
-    imports: any[],
-    enhancedDoc?: any
+    imports: ExtractionResult['imports'],
+    enhancedDoc?: ExtractedEnhancedDoc
   ): ModuleContext {
     const dependencies: DependencySpec[] = [];
     const importSpecs: ImportSpec[] = [];
@@ -512,13 +512,13 @@ export class ModuleSpecGenerator {
     }
 
     // Extract from enhancedDoc dependencies
-    if (enhancedDoc?.doc.dependencies?.deps) {
-      for (const dep of enhancedDoc.doc.dependencies.deps) {
+    if (enhancedDoc?.doc.dependencies?.length) {
+      for (const dep of enhancedDoc.doc.dependencies) {
         dependencies.push({
-          name: dep.name || 'Unknown',
+          name: dep.target || 'Unknown',
           type: dep.type === 'external' ? 'external' : 'module',
           purpose: dep.reason || 'Dependency',
-          critical: dep.critical || false,
+          critical: !dep.isOptional,
         });
       }
     }
@@ -556,7 +556,7 @@ export class ModuleSpecGenerator {
     node: ts.Node,
     sourceFile: ts.SourceFile,
     customTags: Map<string, string[]>,
-    enhancedDoc: any,
+    enhancedDoc: ExtractedEnhancedDoc | undefined,
     specTags: ModuleSpecTags
   ): ModuleLogic {
     const features: string[] = [];
@@ -692,7 +692,7 @@ export class ModuleSpecGenerator {
    */
   private extractScope(
     node: ts.Node,
-    astSymbol: any,
+    astSymbol: ExtractedSymbol | undefined,
     customTags: Map<string, string[]>,
     specTags: ModuleSpecTags
   ): ModuleScope {
@@ -806,24 +806,27 @@ export class ModuleSpecGenerator {
 
   /**
    * Extract plain text from TSDoc DocNode
+   * Uses type assertions for the polymorphic TSDoc node structure
    */
-  private extractTextFromDocNode(node: any): string {
+  private extractTextFromDocNode(node: unknown): string {
     if (!node) return '';
 
+    const n = node as Record<string, unknown>;
+
     // Handle DocSection or DocNodeContainer
-    if (node.nodes) {
-      return node.nodes.map((n: any) => this.extractTextFromDocNode(n)).join('');
+    if (Array.isArray(n.nodes)) {
+      return (n.nodes as unknown[]).map((child) => this.extractTextFromDocNode(child)).join('');
     }
 
     // Handle DocPlainText
-    if (node.text) {
-      return node.text;
+    if (typeof n.text === 'string') {
+      return n.text;
     }
 
     // Handle DocParagraph or other containers
-    if (node.getChildNodes) {
-      const children = node.getChildNodes();
-      return children.map((n: any) => this.extractTextFromDocNode(n)).join('');
+    if (typeof n.getChildNodes === 'function') {
+      const children = (n.getChildNodes as () => unknown[])();
+      return children.map((child) => this.extractTextFromDocNode(child)).join('');
     }
 
     return '';

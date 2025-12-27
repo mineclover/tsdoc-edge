@@ -7,7 +7,7 @@
  */
 
 import * as ts from 'typescript';
-import { TSDocParser } from '@microsoft/tsdoc';
+import { TSDocParser, type ParserContext } from '@microsoft/tsdoc';
 import type {
   BaseSymbolDoc,
   EnhancedSymbolDoc,
@@ -294,7 +294,7 @@ export class EnhancedDocExtractor {
    * Extract enhanced documentation from TSDoc
    */
   private extractEnhancedDoc(
-    tsdocContext: any,
+    _tsdocContext: ParserContext | null,
     symbol: Symbol,
     rawComment: string
   ): EnhancedSymbolDoc {
@@ -447,7 +447,7 @@ export class EnhancedDocExtractor {
         alternatives: [],
         consequences: tags.consequences ? this.parseList(tags.consequences) : [],
         date: tags.decisiondate || new Date().toISOString().split('T')[0],
-        status: (tags.decisionstatus as any) || 'accepted',
+        status: (tags.decisionstatus as DecisionRecord['status']) || 'accepted',
       });
     }
 
@@ -495,7 +495,7 @@ export class EnhancedDocExtractor {
         id: `PLAN-${Date.now()}`,
         title: planText.substring(0, 50),
         description: planText,
-        priority: (tags.priority as any) || 'normal',
+        priority: (tags.priority as FuturePlan['priority']) || 'medium',
         status: 'planned',
         createdAt: new Date().toISOString(),
       });

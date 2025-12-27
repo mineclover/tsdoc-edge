@@ -12,6 +12,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';
+import type { SqliteDatabase } from '../types/database';
 
 /**
  * Extracted symbol from a single file
@@ -71,11 +72,10 @@ export type BuildEventCallback = (event: {
  */
 export class IncrementalBuilder {
   private workspaceRoot: string;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private db: any;
+  private db: SqliteDatabase | null;
   private onBuildEvent: BuildEventCallback | null = null;
 
-  constructor(workspaceRoot: string, db: any) {
+  constructor(workspaceRoot: string, db: SqliteDatabase | null) {
     this.workspaceRoot = workspaceRoot;
     this.db = db;
   }
@@ -278,14 +278,17 @@ export class IncrementalBuilder {
     const startTime = Date.now();
     const relativePath = path.relative(this.workspaceRoot, result.filePath).replace(/\\/g, '/');
 
+    // Capture db reference for closure
+    const db = this.db;
+
     // Start transaction
-    const transaction = this.db.transaction(() => {
+    const transaction = db.transaction(() => {
       // Delete existing symbols for this file
-      const deleteStmt = this.db.prepare('DELETE FROM symbols WHERE file_path = ?');
+      const deleteStmt = db.prepare('DELETE FROM symbols WHERE file_path = ?');
       const deleteResult = deleteStmt.run(relativePath);
 
       // Insert new symbols with all required fields
-      const insertStmt = this.db.prepare(`
+      const insertStmt = db.prepare(`
         INSERT OR REPLACE INTO symbols (
           id, name, type, file_path, line, column,
           is_exported, is_public, summary, declared_type,

@@ -10,14 +10,15 @@
 
  * @doc [[statement-manager]] */
 
+import type { SqliteDatabase, SqliteStatement } from '../types/database';
+
 /**
  * Statement entry with usage tracking
  * @internal
  */
 interface StatementEntry {
   /** Prepared statement object */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  statement: any;
+  statement: SqliteStatement;
   /** Last access timestamp for LRU */
   lastUsed: number;
 }
@@ -49,8 +50,7 @@ export interface StatementManagerOptions {
  */
 export class StatementManager {
   /** Database connection */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private db: any | null;
+  private db: SqliteDatabase | null;
 
   /** Maximum cached statements */
   private readonly maxStatements: number;
@@ -64,8 +64,7 @@ export class StatementManager {
    * @param db - SQLite database connection (better-sqlite3)
    * @param options - Configuration options
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  constructor(db: any | null, options: StatementManagerOptions = {}) {
+  constructor(db: SqliteDatabase | null, options: StatementManagerOptions = {}) {
     this.db = db;
     this.maxStatements = options.maxStatements ?? 50;
   }
@@ -77,8 +76,7 @@ export class StatementManager {
    * @param sql - SQL query string
    * @returns Prepared statement or null if database is not connected
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  prepare(name: string, sql: string): any | null {
+  prepare(name: string, sql: string): SqliteStatement | null {
     if (!this.db) return null;
 
     const existing = this.statements.get(name);
@@ -114,8 +112,7 @@ export class StatementManager {
    * @param sql - SQL query string
    * @returns Prepared statement for immediate use, or null
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  prepareOnce(sql: string): any | null {
+  prepareOnce(sql: string): SqliteStatement | null {
     if (!this.db) return null;
 
     try {
@@ -181,8 +178,7 @@ export class StatementManager {
    * @param db - New database connection
    * @returns void - No return value
    */
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  setDatabase(db: any | null): void {
+  setDatabase(db: SqliteDatabase | null): void {
     // Clear existing statements as they're bound to old connection
     this.statements.clear();
     this.db = db;
