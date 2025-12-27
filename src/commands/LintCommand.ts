@@ -144,12 +144,20 @@ export class LintCommand extends BaseCommand {
       warnings.push(`Health score needs improvement: ${report.metrics.healthScore}/100`);
     }
 
-    // Top issues
-    for (const issue of report.topIssues.slice(0, 5)) {
+    // Boilerplate methods to ignore (common patterns that don't need documentation)
+    const boilerplateMethods = new Set([
+      'getName', 'getDescription', 'getUsage', 'getInstance',
+      'execute', 'constructor', 'toString', 'valueOf',
+    ]);
+
+    // Top issues (excluding boilerplate)
+    const significantIssues = report.topIssues.filter(
+      (issue) => !boilerplateMethods.has(issue.symbolName)
+    );
+
+    for (const issue of significantIssues.slice(0, 5)) {
       if (issue.qualityScore < 50) {
-        issues.push(`${issue.symbolName}: score ${issue.qualityScore}/100`);
-      } else if (issue.qualityScore < 70) {
-        warnings.push(`${issue.symbolName}: score ${issue.qualityScore}/100`);
+        issues.push(`${issue.symbolName}: score ${issue.qualityScore}/100 (${issue.filePath})`);
       }
     }
 
@@ -167,9 +175,15 @@ export class LintCommand extends BaseCommand {
     const warnings: string[] = [];
 
     const allSymbols = db.getAllSymbolRows();
-    const documented = allSymbols.filter((s) => s.summary);
-    const coverage = allSymbols.length > 0
-      ? Math.round((documented.length / allSymbols.length) * 100)
+
+    // Exclude test symbols from documentation requirements
+    const implSymbols = allSymbols.filter((s) =>
+      s.type !== 'test-case' && s.type !== 'test-suite'
+    );
+
+    const documented = implSymbols.filter((s) => s.summary);
+    const coverage = implSymbols.length > 0
+      ? Math.round((documented.length / implSymbols.length) * 100)
       : 0;
 
     if (coverage < 50) {
@@ -178,15 +192,21 @@ export class LintCommand extends BaseCommand {
       warnings.push(`Documentation coverage needs improvement: ${coverage}%`);
     }
 
-    // Check for undocumented public symbols
-    const undocumentedPublic = allSymbols.filter(
-      (s) => s.is_public === 1 && !s.summary
+    // Check for undocumented public non-test symbols
+    const undocumentedPublic = implSymbols.filter(
+      (s) => s.is_public === 1 && s.is_exported === 1 && !s.summary
     );
 
-    if (undocumentedPublic.length > 50) {
-      issues.push(`${undocumentedPublic.length} public symbols without documentation`);
-    } else if (undocumentedPublic.length > 20) {
-      warnings.push(`${undocumentedPublic.length} public symbols without documentation`);
+    // Calculate undocumented ratio
+    const exportedPublic = implSymbols.filter((s) => s.is_public === 1 && s.is_exported === 1);
+    const undocRatio = exportedPublic.length > 0
+      ? Math.round((undocumentedPublic.length / exportedPublic.length) * 100)
+      : 0;
+
+    if (undocRatio > 50) {
+      issues.push(`${undocRatio}% of exported symbols undocumented (${undocumentedPublic.length}/${exportedPublic.length})`);
+    } else if (undocRatio > 30) {
+      warnings.push(`${undocRatio}% of exported symbols undocumented (${undocumentedPublic.length}/${exportedPublic.length})`);
     }
 
     return {

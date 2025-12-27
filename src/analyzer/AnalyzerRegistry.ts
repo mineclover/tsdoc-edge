@@ -40,6 +40,11 @@ class AnalyzerAdapter implements RelationshipAnalyzer {
     private readonly analyzeFunc: (ctx: AnalyzerContext) => UnifiedRelationship[]
   ) {}
 
+  /**
+   * Run analysis and return relationships
+   * @param context - Analysis context with graph and program
+   * @returns Array of discovered relationships
+   */
   analyze(context: AnalyzerContext): UnifiedRelationship[] {
     return this.analyzeFunc(context);
   }
@@ -258,7 +263,10 @@ export class AnalyzerRegistry {
   }
 
   /**
-   * Run analysis and return results
+   * Run a specific analyzer and return discovered relationships
+   * @param type - The analyzer type to run
+   * @param context - Analysis context with graph, program, and db
+   * @returns Array of unified relationships discovered
    */
   analyze(type: AnalyzerType, context: AnalyzerContext): UnifiedRelationship[] {
     const analyzer = this.create(type, context);
@@ -358,5 +366,8 @@ export class AnalyzerRegistry {
   }
 }
 
-// Export singleton getter
+/**
+ * Get the singleton AnalyzerRegistry instance
+ * @returns AnalyzerRegistry singleton
+ */
 export const getAnalyzerRegistry = () => AnalyzerRegistry.getInstance();
