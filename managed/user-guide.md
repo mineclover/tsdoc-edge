@@ -5,16 +5,16 @@ category: getting-started
 status: active
 canonical: true
 entrypoint: true
-updated: 2025-12-26
+updated: 2025-12-27
 ---
 
 # [[TSDoc Edge User Guide]]
 
 > **Complete user guide** - All you need to know to use TSDoc Edge effectively
 
-**Current Statistics** (2025-12-26):
-- Symbols: 5,247 | Relationships: 70,892 | Types: 19 | Categories: 8
-- Commands: 109 | Documents: 212 | Graph Density: 13.51
+**Current Statistics** (2025-12-27):
+- Symbols: 5,587 | Relationships: 49,448 | Types: 13/30 (43%) | Categories: 10
+- Commands: 74 | Documents: 213 | Graph Density: 8.85
 
 ---
 
@@ -73,22 +73,20 @@ tsdoc-edge wc <file-path> --llm     # LLM-friendly output
 
 ## 3. Relationship Analysis
 
-TSDoc Edge tracks **19 relationship types** across **8 categories**:
+TSDoc Edge tracks **13 relationship types** across **10 categories**:
 
 | Category | % | Key Types |
 |----------|---|-----------|
-| Semantic | 35.6% | feature-grouping, naming-pattern, doc-reference |
-| Data Flow | 31.2% | io-dependency |
-| Testing | 16.8% | test-coverage, test-as-example |
-| Structural | 6.8% | code-dependency, inheritance, contains |
-| Behavioral | 5.4% | calls, collaboration, composition |
-| Verification | 4.0% | verification |
-| Constraint | 2.0% | type-dependency |
-| Alternative | 0.1% | fallback |
+| Data Flow | 45.8% | io-dependency |
+| Testing | 24.2% | test-coverage, test-as-example |
+| Structural | 10.0% | code-dependency, inheritance, contains |
+| Semantic | 7.2% | feature-grouping, naming-pattern, doc-reference |
+| Behavioral | 7.0% | calls |
+| Verification | 5.8% | verification |
 
 **Commands**:
 ```bash
-tsdoc-edge relationship-stats     # View statistics
+tsdoc-edge relationship stats     # View statistics
 tsdoc-edge deps <symbol>          # Forward dependencies
 tsdoc-edge who-uses <symbol>      # Reverse dependencies
 ```
@@ -122,7 +120,7 @@ tsdoc-edge validate-docs         # Validate SSOT
 tsdoc-edge update-backlinks      # Update backlinks
 ```
 
-**Full list**: [[Commands Index]] (109 commands)
+**Full list**: [[Commands Index]] (74 commands)
 
 ---
 
@@ -160,14 +158,14 @@ tsdoc-edge wc src/path/to/file.ts
 ```bash
 tsdoc-edge deps <symbol>           # What this uses
 tsdoc-edge who-uses <symbol>       # What uses this
-tsdoc-edge relationship-impact <id>  # Full impact analysis
+tsdoc-edge relationship impact <id>  # Full impact analysis
 ```
 
 ### Understanding Architecture
 ```bash
 tsdoc-edge ontology-stats          # Graph overview
-tsdoc-edge relationship-metrics    # Important symbols
-tsdoc-edge relationship-clusters   # Module boundaries
+tsdoc-edge relationship metrics    # Important symbols
+tsdoc-edge relationship clusters   # Module boundaries
 ```
 
 ### System Status (NEW)
@@ -229,13 +227,13 @@ tsdoc-edge ss --compact            # One-line summary
 ```
 TypeScript Source
        ↓
-  [[ASTSymbolExtractor]] → Symbols (5,247)
+  [[ASTSymbolExtractor]] → Symbols (5,587)
        ↓
   [[DatabaseManager]] → SQLite + JSONL
        ↓
-  Analyzers → Relationships (70,892)
+  Analyzers → Relationships (49,448)
        ↓
-  CLI Commands (109) → Analysis & Reports
+  CLI Commands (74) → Analysis & Reports
 ```
 
 **Details**: [[Implementation Roadmap]] | [[Dependency Meta-Structure]]
@@ -291,13 +289,13 @@ tsdoc-edge validate-symbol-refs   # Find broken refs
 
 | Metric | Value | Updated |
 |--------|-------|---------|
-| Symbols | 5,247 | 2025-12-26 |
-| Relationships | 70,892 | 2025-12-26 |
-| Relationship Types | 19 (100%) | 2025-12-26 |
-| Categories | 8 | 2025-12-26 |
-| CLI Commands | 109 | 2025-12-26 |
-| Documents | 212 | 2025-12-26 |
-| Graph Density | 13.51 | 2025-12-26 |
+| Symbols | 5,587 | 2025-12-27 |
+| Relationships | 49,448 | 2025-12-27 |
+| Relationship Types | 13/30 (43%) | 2025-12-27 |
+| Categories | 10 | 2025-12-27 |
+| CLI Commands | 74 | 2025-12-27 |
+| Documents | 213 | 2025-12-27 |
+| Graph Density | 8.85 | 2025-12-27 |
 
 **Live stats**: `tsdoc-edge ontology-stats`
 

@@ -1,449 +1,772 @@
 /**
- * Tests for SymbolRegistryManager
+ * SymbolRegistryManager tests
+ * @testScenario Basic ID registration and retrieval
+ * @testScenario Hierarchy tracking with parent-child relationships
+ * @testScenario Automatic qualifiedName generation
+ * @testScenario Depth calculation
+ * @testScenario Search functionality
  */
 
 import * as fs from 'node:fs';
+import * as os from 'node:os';
 import * as path from 'node:path';
 import { SymbolRegistryManager } from '../../storage/SymbolRegistryManager';
 
 describe('SymbolRegistryManager', () => {
   let tempDir: string;
   let registryPath: string;
+  let manager: SymbolRegistryManager;
 
   beforeEach(() => {
-    tempDir = path.join(process.cwd(), '.test-temp', `registry-${Date.now()}`);
+    // Create temporary directory for each test
+    tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'tsdoc-test-'));
     registryPath = path.join(tempDir, 'registry.jsonl');
-    fs.mkdirSync(tempDir, { recursive: true });
+    manager = new SymbolRegistryManager(registryPath);
   });
 
   afterEach(() => {
+    // Clean up temporary directory
     if (fs.existsSync(tempDir)) {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
   });
 
-  describe('constructor', () => {
-    it('should create new registry if file does not exist', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-      expect(manager).toBeDefined();
-      expect(fs.existsSync(registryPath)).toBe(false); // Not saved yet
+  describe('Basic Registration', () => {
+    test('should register a new symbol and generate ID', () => {
+      const id = manager.register({
+        filePath: 'src/utils.ts',
+        symbolName: 'parseData',
+        type: 'function',
+        line: 10,
+      });
+
+      expect(id).toBe('000');
+
+      const entry = manager.findById(id);
+      expect(entry).toBeDefined();
+      expect(entry?.sourceRef.symbolName).toBe('parseData');
+      expect(entry?.sourceRef.type).toBe('function');
     });
 
-    it('should load existing registry if file exists', () => {
-      // Create registry file
-      const metadata = {
-        version: '1.0.0',
-        idGeneratorMode: 'sequential',
-        nextSequentialId: 5,
-        totalEntries: 1,
-        lastUpdated: new Date().toISOString(),
-      };
-      const entry = {
-        id: '003',
-        sourceRef: {
-          filePath: 'src/test.ts',
-          symbolName: 'TestClass',
-          type: 'class',
-        },
-        qualifiedName: 'TestClass',
-        depth: 0,
-        registeredAt: new Date().toISOString(),
-      };
+    test('should generate sequential IDs', () => {
+      const id1 = manager.register({
+        filePath: 'src/utils.ts',
+        symbolName: 'parseData',
+        type: 'function',
+      });
 
-      fs.writeFileSync(registryPath, JSON.stringify(metadata) + '\n' + JSON.stringify(entry) + '\n', 'utf-8');
+      const id2 = manager.register({
+        filePath: 'src/utils.ts',
+        symbolName: 'formatData',
+        type: 'function',
+      });
 
-      const manager = new SymbolRegistryManager(registryPath);
-      const retrieved = manager.findById('003');
-      expect(retrieved).toBeDefined();
-      expect(retrieved?.sourceRef.symbolName).toBe('TestClass');
+      expect(id1).toBe('000');
+      expect(id2).toBe('001');
+    });
+
+    test('should list all symbols', () => {
+      manager.register({
+        filePath: 'src/utils.ts',
+        symbolName: 'parseData',
+        type: 'function',
+      });
+
+      manager.register({
+        filePath: 'src/utils.ts',
+        symbolName: 'formatData',
+        type: 'function',
+      });
+
+      const all = manager.getAll();
+      expect(all).toHaveLength(2);
     });
   });
 
-  describe('register', () => {
-    it('should register a new symbol and generate ID', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-
-      const id = manager.register({
-        filePath: 'src/example.ts',
-        symbolName: 'ExampleClass',
+  describe('Hierarchy Support', () => {
+    test('should register class with methods', () => {
+      const classId = manager.register({
+        filePath: 'src/DataService.ts',
+        symbolName: 'DataService',
         type: 'class',
       });
 
-      expect(id).toBeDefined();
-      expect(id).toMatch(/^\d{3}$/); // Format: 000, 001, etc.
-    });
-
-    it('should return existing ID if symbol already registered', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-
-      const id1 = manager.register({
-        filePath: 'src/example.ts',
-        symbolName: 'ExampleClass',
-        type: 'class',
-      });
-
-      const id2 = manager.register({
-        filePath: 'src/example.ts',
-        symbolName: 'ExampleClass',
-        type: 'class',
-      });
-
-      expect(id1).toBe(id2);
-    });
-
-    it('should generate different IDs for different symbols', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-
-      const id1 = manager.register({
-        filePath: 'src/class1.ts',
-        symbolName: 'Class1',
-        type: 'class',
-      });
-
-      const id2 = manager.register({
-        filePath: 'src/class2.ts',
-        symbolName: 'Class2',
-        type: 'class',
-      });
-
-      expect(id1).not.toBe(id2);
-    });
-
-    it('should handle parent-child relationships', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-
-      const parentId = manager.register({
-        filePath: 'src/parent.ts',
-        symbolName: 'ParentClass',
-        type: 'class',
-      });
-
-      const childId = manager.register({
-        filePath: 'src/parent.ts',
-        symbolName: 'method',
+      const methodId = manager.register({
+        filePath: 'src/DataService.ts',
+        symbolName: 'getData',
         type: 'method',
-        memberOf: parentId,
+        memberOf: classId,
         memberType: 'instance',
       });
 
-      const child = manager.findById(childId);
-      expect(child?.sourceRef.memberOf).toBe(parentId);
-      expect(child?.sourceRef.qualifiedName).toBe('ParentClass#method');
-      expect(child?.sourceRef.depth).toBe(1);
+      expect(classId).toBe('000');
+      expect(methodId).toBe('001');
+
+      const method = manager.findById(methodId);
+      expect(method?.sourceRef.memberOf).toBe(classId);
+      expect(method?.sourceRef.memberType).toBe('instance');
+    });
+
+    test('should auto-generate qualifiedName for instance method', () => {
+      const classId = manager.register({
+        filePath: 'src/DataService.ts',
+        symbolName: 'DataService',
+        type: 'class',
+      });
+
+      const methodId = manager.register({
+        filePath: 'src/DataService.ts',
+        symbolName: 'getData',
+        type: 'method',
+        memberOf: classId,
+        memberType: 'instance',
+      });
+
+      const method = manager.findById(methodId);
+      expect(method?.sourceRef.qualifiedName).toBe('DataService#getData');
+    });
+
+    test('should auto-generate qualifiedName for static method', () => {
+      const classId = manager.register({
+        filePath: 'src/DataService.ts',
+        symbolName: 'DataService',
+        type: 'class',
+      });
+
+      const methodId = manager.register({
+        filePath: 'src/DataService.ts',
+        symbolName: 'create',
+        type: 'method',
+        memberOf: classId,
+        memberType: 'static',
+      });
+
+      const method = manager.findById(methodId);
+      expect(method?.sourceRef.qualifiedName).toBe('DataService.create');
+    });
+
+    test('should auto-generate qualifiedName for inner function', () => {
+      const classId = manager.register({
+        filePath: 'src/DataService.ts',
+        symbolName: 'DataService',
+        type: 'class',
+      });
+
+      const methodId = manager.register({
+        filePath: 'src/DataService.ts',
+        symbolName: 'getData',
+        type: 'method',
+        memberOf: classId,
+        memberType: 'instance',
+      });
+
+      const innerId = manager.register({
+        filePath: 'src/DataService.ts',
+        symbolName: 'sanitize',
+        type: 'function',
+        memberOf: methodId,
+        memberType: 'inner',
+      });
+
+      const inner = manager.findById(innerId);
+      expect(inner?.sourceRef.qualifiedName).toBe('DataService#getData~sanitize');
+    });
+
+    test('should calculate depth correctly', () => {
+      const classId = manager.register({
+        filePath: 'src/DataService.ts',
+        symbolName: 'DataService',
+        type: 'class',
+      });
+
+      const methodId = manager.register({
+        filePath: 'src/DataService.ts',
+        symbolName: 'getData',
+        type: 'method',
+        memberOf: classId,
+        memberType: 'instance',
+      });
+
+      const innerId = manager.register({
+        filePath: 'src/DataService.ts',
+        symbolName: 'sanitize',
+        type: 'function',
+        memberOf: methodId,
+        memberType: 'inner',
+      });
+
+      const classEntry = manager.findById(classId);
+      const methodEntry = manager.findById(methodId);
+      const innerEntry = manager.findById(innerId);
+
+      expect(classEntry?.sourceRef.depth).toBe(0);
+      expect(methodEntry?.sourceRef.depth).toBe(1);
+      expect(innerEntry?.sourceRef.depth).toBe(2);
     });
   });
 
-  describe('findById', () => {
-    it('should find symbol by ID', () => {
-      const manager = new SymbolRegistryManager(registryPath);
+  describe('Search Functionality', () => {
+    beforeEach(() => {
+      const classId = manager.register({
+        filePath: 'src/UserService.ts',
+        symbolName: 'UserService',
+        type: 'class',
+      });
 
+      manager.register({
+        filePath: 'src/UserService.ts',
+        symbolName: 'createUser',
+        type: 'method',
+        memberOf: classId,
+        memberType: 'instance',
+      });
+
+      manager.register({
+        filePath: 'src/UserService.ts',
+        symbolName: 'getUser',
+        type: 'method',
+        memberOf: classId,
+        memberType: 'instance',
+      });
+    });
+
+    test('should find by qualified name', () => {
+      const entry = manager.findByQualifiedName('UserService#createUser');
+      expect(entry).toBeDefined();
+      expect(entry?.sourceRef.symbolName).toBe('createUser');
+    });
+
+    test('should return undefined for non-existent qualified name', () => {
+      const entry = manager.findByQualifiedName('UserService#deleteUser');
+      expect(entry).toBeUndefined();
+    });
+
+    test('should search by partial string', () => {
+      const results = manager.search('User');
+      expect(results.length).toBeGreaterThanOrEqual(3);
+    });
+
+    test('should search by method name', () => {
+      const results = manager.search('createUser');
+      expect(results).toHaveLength(1);
+      expect(results[0].sourceRef.symbolName).toBe('createUser');
+    });
+
+    test('should get children of a parent', () => {
+      const classEntry = manager.findByQualifiedName('UserService');
+      expect(classEntry).toBeDefined();
+      if (!classEntry) throw new Error('classEntry is undefined');
+
+      const children = manager.getChildren(classEntry.id);
+      expect(children).toHaveLength(2);
+    });
+
+    test('should get all descendants', () => {
+      const classId = manager.register({
+        filePath: 'src/DataService.ts',
+        symbolName: 'DataService',
+        type: 'class',
+      });
+
+      const methodId = manager.register({
+        filePath: 'src/DataService.ts',
+        symbolName: 'process',
+        type: 'method',
+        memberOf: classId,
+        memberType: 'instance',
+      });
+
+      manager.register({
+        filePath: 'src/DataService.ts',
+        symbolName: 'helper',
+        type: 'function',
+        memberOf: methodId,
+        memberType: 'inner',
+      });
+
+      const descendants = manager.getDescendants(classId);
+      expect(descendants).toHaveLength(2); // method + inner function
+    });
+  });
+
+  describe('Hierarchy Building', () => {
+    test('should build hierarchy tree', () => {
+      const classId = manager.register({
+        filePath: 'src/UserService.ts',
+        symbolName: 'UserService',
+        type: 'class',
+      });
+
+      manager.register({
+        filePath: 'src/UserService.ts',
+        symbolName: 'createUser',
+        type: 'method',
+        memberOf: classId,
+        memberType: 'instance',
+      });
+
+      manager.register({
+        filePath: 'src/UserService.ts',
+        symbolName: 'getUser',
+        type: 'method',
+        memberOf: classId,
+        memberType: 'instance',
+      });
+
+      const hierarchy = manager.buildHierarchy();
+      expect(hierarchy).toHaveLength(1); // One root
+      expect(hierarchy[0].id).toBe(classId);
+      expect(hierarchy[0].children).toHaveLength(2);
+    });
+
+    test('should handle multiple root symbols', () => {
+      manager.register({
+        filePath: 'src/UserService.ts',
+        symbolName: 'UserService',
+        type: 'class',
+      });
+
+      manager.register({
+        filePath: 'src/DataService.ts',
+        symbolName: 'DataService',
+        type: 'class',
+      });
+
+      const hierarchy = manager.buildHierarchy();
+      expect(hierarchy).toHaveLength(2);
+    });
+  });
+
+  describe('Dependency Management', () => {
+    test('should add dependency between symbols', () => {
+      const id1 = manager.register({
+        filePath: 'src/UserService.ts',
+        symbolName: 'UserService',
+        type: 'class',
+      });
+
+      const id2 = manager.register({
+        filePath: 'src/Database.ts',
+        symbolName: 'Database',
+        type: 'class',
+      });
+
+      manager.addDependency(id1, id2, 'Database connection', 'runtime');
+
+      const deps = manager.getDependencies(id1);
+      expect(deps).toHaveLength(1);
+      expect(deps[0].targetId).toBe(id2);
+      expect(deps[0].type).toBe('runtime');
+    });
+
+    test('should get reverse dependencies', () => {
+      const id1 = manager.register({
+        filePath: 'src/UserService.ts',
+        symbolName: 'UserService',
+        type: 'class',
+      });
+
+      const id2 = manager.register({
+        filePath: 'src/Database.ts',
+        symbolName: 'Database',
+        type: 'class',
+      });
+
+      manager.addDependency(id1, id2, 'Database connection', 'runtime');
+
+      const usedBy = manager.getUsedBy(id2);
+      expect(usedBy).toHaveLength(1);
+      expect(usedBy[0].fromId).toBe(id1);
+      expect(usedBy[0].reason).toBe('Database connection');
+    });
+  });
+
+  describe('Persistence', () => {
+    test('should save and load registry', () => {
       const id = manager.register({
-        filePath: 'src/test.ts',
-        symbolName: 'TestSymbol',
+        filePath: 'src/utils.ts',
+        symbolName: 'parseData',
         type: 'function',
-      });
-
-      const found = manager.findById(id);
-      expect(found).toBeDefined();
-      expect(found?.sourceRef.symbolName).toBe('TestSymbol');
-    });
-
-    it('should return undefined for non-existent ID', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-      const found = manager.findById('999');
-      expect(found).toBeUndefined();
-    });
-  });
-
-  describe('findBySourceRef', () => {
-    it('should find symbol by source reference', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-
-      manager.register({
-        filePath: 'src/test.ts',
-        symbolName: 'TestSymbol',
-        type: 'function',
-      });
-
-      const found = manager.findBySourceRef({
-        filePath: 'src/test.ts',
-        symbolName: 'TestSymbol',
-        type: 'function',
-      });
-
-      expect(found).toBeDefined();
-      expect(found?.sourceRef.symbolName).toBe('TestSymbol');
-    });
-
-    it('should return undefined for non-existent source', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-
-      const found = manager.findBySourceRef({
-        filePath: 'src/nonexistent.ts',
-        symbolName: 'Nothing',
-        type: 'function',
-      });
-
-      expect(found).toBeUndefined();
-    });
-  });
-
-  describe('search', () => {
-    it('should find symbols by name', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-
-      manager.register({
-        filePath: 'src/test1.ts',
-        symbolName: 'TestSymbol',
-        type: 'function',
-      });
-
-      manager.register({
-        filePath: 'src/test2.ts',
-        symbolName: 'TestSymbol',
-        type: 'class',
-      });
-
-      const found = manager.search('TestSymbol');
-      expect(found.length).toBe(2);
-    });
-
-    it('should return empty array if no matches', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-      const found = manager.search('NonExistent');
-      expect(found.length).toBe(0);
-    });
-  });
-
-  describe('getByFile', () => {
-    it('should find all symbols in a file', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-
-      manager.register({
-        filePath: 'src/multi.ts',
-        symbolName: 'Symbol1',
-        type: 'class',
-      });
-
-      manager.register({
-        filePath: 'src/multi.ts',
-        symbolName: 'Symbol2',
-        type: 'function',
-      });
-
-      manager.register({
-        filePath: 'src/other.ts',
-        symbolName: 'Symbol3',
-        type: 'interface',
-      });
-
-      const found = manager.getByFile('src/multi.ts');
-      expect(found.length).toBe(2);
-    });
-  });
-
-  describe('save and load', () => {
-    it('should persist registry to disk', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-
-      manager.register({
-        filePath: 'src/persist.ts',
-        symbolName: 'PersistTest',
-        type: 'class',
       });
 
       manager.save();
 
-      expect(fs.existsSync(registryPath)).toBe(true);
-
-      // Load in new manager
+      // Create new manager instance
       const manager2 = new SymbolRegistryManager(registryPath);
-      const found = manager2.search('PersistTest');
-      expect(found.length).toBe(1);
-      expect(found[0].sourceRef.symbolName).toBe('PersistTest');
+      const entry = manager2.findById(id);
+
+      expect(entry).toBeDefined();
+      expect(entry?.sourceRef.symbolName).toBe('parseData');
     });
 
-    it('should create directory if it does not exist', () => {
-      const deepPath = path.join(tempDir, 'deep', 'nested', 'registry.jsonl');
-      const manager = new SymbolRegistryManager(deepPath);
+    test('should preserve hierarchy on save/load', () => {
+      const classId = manager.register({
+        filePath: 'src/UserService.ts',
+        symbolName: 'UserService',
+        type: 'class',
+      });
 
       manager.register({
-        filePath: 'src/test.ts',
-        symbolName: 'Test',
-        type: 'function',
+        filePath: 'src/UserService.ts',
+        symbolName: 'createUser',
+        type: 'method',
+        memberOf: classId,
+        memberType: 'instance',
       });
 
       manager.save();
 
-      expect(fs.existsSync(deepPath)).toBe(true);
+      // Create new manager instance
+      const manager2 = new SymbolRegistryManager(registryPath);
+      const method = manager2.findByQualifiedName('UserService#createUser');
+
+      expect(method).toBeDefined();
+      expect(method?.sourceRef.memberOf).toBe(classId);
+      expect(method?.sourceRef.qualifiedName).toBe('UserService#createUser');
+      expect(method?.sourceRef.depth).toBe(1);
     });
   });
 
-  describe('getAllEntries', () => {
-    it('should return all registry entries', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-
+  describe('Statistics', () => {
+    test('should get statistics', () => {
       manager.register({
-        filePath: 'src/test1.ts',
-        symbolName: 'Symbol1',
-        type: 'class',
-      });
-
-      manager.register({
-        filePath: 'src/test2.ts',
-        symbolName: 'Symbol2',
+        filePath: 'src/utils.ts',
+        symbolName: 'parseData',
         type: 'function',
       });
 
-      const entries = manager.getAll();
-      expect(entries.length).toBe(2);
-    });
-  });
-
-  describe('getStats', () => {
-    it('should return registry statistics', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-
       manager.register({
-        filePath: 'src/test1.ts',
-        symbolName: 'Symbol1',
-        type: 'class',
-      });
-
-      manager.register({
-        filePath: 'src/test2.ts',
-        symbolName: 'Symbol2',
+        filePath: 'src/helpers.ts',
+        symbolName: 'formatData',
         type: 'function',
       });
 
       const stats = manager.getStats();
       expect(stats.totalEntries).toBe(2);
-      expect(stats.fileCount).toBeGreaterThanOrEqual(1);
+      expect(stats.fileCount).toBe(2);
     });
   });
 
-  describe('addDependency', () => {
-    it('should add dependency to symbol', () => {
-      const manager = new SymbolRegistryManager(registryPath);
+  describe('Type-based Duplicate Detection', () => {
+    test('should differentiate symbols by type', () => {
+      const classId = manager.register({
+        filePath: 'src/User.ts',
+        symbolName: 'User',
+        type: 'class',
+      });
 
+      const interfaceId = manager.register({
+        filePath: 'src/User.ts',
+        symbolName: 'User',
+        type: 'interface',
+      });
+
+      expect(classId).not.toBe(interfaceId);
+
+      const classEntry = manager.findBySourceRef({
+        filePath: 'src/User.ts',
+        symbolName: 'User',
+        type: 'class',
+      });
+
+      const interfaceEntry = manager.findBySourceRef({
+        filePath: 'src/User.ts',
+        symbolName: 'User',
+        type: 'interface',
+      });
+
+      expect(classEntry?.id).toBe(classId);
+      expect(interfaceEntry?.id).toBe(interfaceId);
+    });
+
+    test('should find without type matching when specified', () => {
+      manager.register({
+        filePath: 'src/Data.ts',
+        symbolName: 'Data',
+        type: 'class',
+      });
+
+      const found = manager.findBySourceRef(
+        {
+          filePath: 'src/Data.ts',
+          symbolName: 'Data',
+          type: 'interface',
+        },
+        false // includeType = false
+      );
+
+      expect(found).toBeDefined();
+    });
+  });
+
+  describe('QualifiedName Duplicate Detection', () => {
+    test('should find duplicate qualified names', () => {
+      const class1Id = manager.register({
+        filePath: 'src/User.ts',
+        symbolName: 'User',
+        type: 'class',
+      });
+
+      manager.register({
+        filePath: 'src/User.ts',
+        symbolName: 'save',
+        type: 'method',
+        memberOf: class1Id,
+        memberType: 'instance',
+      });
+
+      const class2Id = manager.register({
+        filePath: 'src/Admin.ts',
+        symbolName: 'User',
+        type: 'class',
+      });
+
+      manager.register({
+        filePath: 'src/Admin.ts',
+        symbolName: 'save',
+        type: 'method',
+        memberOf: class2Id,
+        memberType: 'instance',
+      });
+
+      const duplicates = manager.findDuplicateQualifiedNames();
+      expect(duplicates.length).toBeGreaterThan(0);
+
+      const userDup = duplicates.find((d) => d.qualifiedName === 'User');
+      expect(userDup).toBeDefined();
+      expect(userDup?.entries).toHaveLength(2);
+    });
+
+    test('should not report unique qualified names', () => {
+      manager.register({
+        filePath: 'src/User.ts',
+        symbolName: 'User',
+        type: 'class',
+      });
+
+      const duplicates = manager.findDuplicateQualifiedNames();
+      expect(duplicates).toHaveLength(0);
+    });
+  });
+
+  describe('Refactoring Detection', () => {
+    test('should detect moved symbols', () => {
+      manager.register({
+        filePath: 'src/old/User.ts',
+        symbolName: 'User',
+        type: 'class',
+      });
+
+      manager.register({
+        filePath: 'src/new/User.ts',
+        symbolName: 'User',
+        type: 'class',
+      });
+
+      const moved = manager.detectMoved('User', 'class');
+      expect(moved).toHaveLength(2);
+      expect(moved[0].sourceRef.filePath).not.toBe(moved[1].sourceRef.filePath);
+    });
+
+    test('should not detect moved when in same file', () => {
+      manager.register({
+        filePath: 'src/User.ts',
+        symbolName: 'User',
+        type: 'class',
+      });
+
+      const moved = manager.detectMoved('User', 'class');
+      expect(moved).toHaveLength(0);
+    });
+
+    test('should detect potential renames in file', () => {
+      manager.register({
+        filePath: 'src/User.ts',
+        symbolName: 'OldUser',
+        type: 'class',
+      });
+
+      manager.register({
+        filePath: 'src/User.ts',
+        symbolName: 'NewUser',
+        type: 'class',
+      });
+
+      const renames = manager.detectPotentialRenames('src/User.ts', 'class');
+      expect(renames).toHaveLength(2);
+    });
+
+    test('should find symbols by name pattern', () => {
+      manager.register({
+        filePath: 'src/UserService.ts',
+        symbolName: 'UserService',
+        type: 'class',
+      });
+
+      manager.register({
+        filePath: 'src/UserController.ts',
+        symbolName: 'UserController',
+        type: 'class',
+      });
+
+      const matches = manager.findByNamePattern(/^User/);
+      expect(matches).toHaveLength(2);
+    });
+  });
+
+  describe('Registry Integrity Validation', () => {
+    test('should validate clean registry', () => {
+      manager.register({
+        filePath: 'src/User.ts',
+        symbolName: 'User',
+        type: 'class',
+      });
+
+      const validation = manager.validateIntegrity();
+      expect(validation.isValid).toBe(true);
+      expect(validation.errors).toHaveLength(0);
+      expect(validation.warnings).toHaveLength(0);
+    });
+
+    test('should detect orphaned parent references', () => {
+      const _id = manager.register({
+        filePath: 'src/User.ts',
+        symbolName: 'save',
+        type: 'method',
+        memberOf: 'non-existent-id',
+      });
+
+      const validation = manager.validateIntegrity();
+      expect(validation.warnings.length).toBeGreaterThan(0);
+      expect(validation.warnings.some((w) => w.includes('non-existent parent'))).toBe(true);
+    });
+
+    test('should detect invalid dependency references', () => {
       const id1 = manager.register({
-        filePath: 'src/test.ts',
-        symbolName: 'TestClass',
+        filePath: 'src/User.ts',
+        symbolName: 'User',
         type: 'class',
       });
 
       const id2 = manager.register({
-        filePath: 'src/other.ts',
-        symbolName: 'OtherClass',
+        filePath: 'src/Database.ts',
+        symbolName: 'Database',
         type: 'class',
       });
 
-      const result = manager.addDependency(id1, id2, 'Uses functionality', 'runtime');
+      // Add valid dependency first
+      manager.addDependency(id1, id2, 'Uses database');
 
-      expect(result).toBe(true);
+      // Manually corrupt the dependency by modifying the registry
       const entry = manager.findById(id1);
-      expect(entry?.uses).toBeDefined();
-      expect(entry?.uses?.length).toBe(1);
-      expect(entry?.uses?.[0].targetId).toBe(id2);
+      if (entry?.uses) {
+        entry.uses.push({ targetId: 'non-existent-id', reason: 'Invalid dependency' });
+      }
+
+      const validation = manager.validateIntegrity();
+      expect(validation.warnings.length).toBeGreaterThan(0);
+      expect(validation.warnings.some((w) => w.includes('dependency to non-existent symbol'))).toBe(
+        true
+      );
     });
 
-    it('should return false for non-existent symbol', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-
-      const result = manager.addDependency('999', '888', 'Test', 'runtime');
-
-      expect(result).toBe(false);
-    });
-  });
-
-  describe('getChildren', () => {
-    it('should return child symbols', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-
-      const parentId = manager.register({
-        filePath: 'src/parent.ts',
-        symbolName: 'ParentClass',
+    test('should include duplicate qualified names in stats', () => {
+      manager.register({
+        filePath: 'src/User1.ts',
+        symbolName: 'User',
         type: 'class',
       });
 
       manager.register({
-        filePath: 'src/parent.ts',
-        symbolName: 'method1',
-        type: 'method',
-        memberOf: parentId,
-        memberType: 'instance',
-      });
-
-      manager.register({
-        filePath: 'src/parent.ts',
-        symbolName: 'method2',
-        type: 'method',
-        memberOf: parentId,
-        memberType: 'instance',
-      });
-
-      const children = manager.getChildren(parentId);
-      expect(children.length).toBe(2);
-    });
-  });
-
-  describe('qualifiedName generation', () => {
-    it('should generate qualified name for top-level symbol', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-
-      const id = manager.register({
-        filePath: 'src/test.ts',
-        symbolName: 'TopLevel',
+        filePath: 'src/User2.ts',
+        symbolName: 'User',
         type: 'class',
       });
 
-      const entry = manager.findById(id);
-      expect(entry?.sourceRef.qualifiedName).toBe('TopLevel');
-      expect(entry?.sourceRef.depth).toBe(0);
+      const stats = manager.getStats();
+      expect(stats.duplicateQualifiedNames).toBe(1);
     });
 
-    it('should generate qualified name for method', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-
-      const classId = manager.register({
-        filePath: 'src/test.ts',
-        symbolName: 'TestClass',
+    test('should detect circular dependencies (uses cycle)', () => {
+      const id1 = manager.register({
+        filePath: 'src/A.ts',
+        symbolName: 'A',
         type: 'class',
       });
 
-      const methodId = manager.register({
-        filePath: 'src/test.ts',
-        symbolName: 'testMethod',
-        type: 'method',
-        memberOf: classId,
-        memberType: 'instance',
-      });
-
-      const entry = manager.findById(methodId);
-      expect(entry?.sourceRef.qualifiedName).toBe('TestClass#testMethod');
-      expect(entry?.sourceRef.depth).toBe(1);
-    });
-
-    it('should generate qualified name for property', () => {
-      const manager = new SymbolRegistryManager(registryPath);
-
-      const classId = manager.register({
-        filePath: 'src/test.ts',
-        symbolName: 'TestClass',
+      const id2 = manager.register({
+        filePath: 'src/B.ts',
+        symbolName: 'B',
         type: 'class',
       });
 
-      const propId = manager.register({
-        filePath: 'src/test.ts',
-        symbolName: 'testProp',
-        type: 'property',
-        memberOf: classId,
-        memberType: 'static',
+      const id3 = manager.register({
+        filePath: 'src/C.ts',
+        symbolName: 'C',
+        type: 'class',
       });
 
-      const entry = manager.findById(propId);
-      expect(entry?.sourceRef.qualifiedName).toBe('TestClass.testProp');
-      expect(entry?.sourceRef.depth).toBe(1);
+      // Create cycle: A → B → C → A
+      manager.addDependency(id1, id2, 'A uses B');
+      manager.addDependency(id2, id3, 'B uses C');
+      manager.addDependency(id3, id1, 'C uses A');
+
+      const validation = manager.validateIntegrity();
+      expect(validation.isValid).toBe(true); // Cycles are warnings, not errors
+      expect(validation.warnings.length).toBeGreaterThan(0);
+      expect(validation.warnings.some((w) => w.includes('Circular dependency detected'))).toBe(
+        true
+      );
+    });
+
+    test('should detect circular parent references as warning', () => {
+      const id1 = manager.register({
+        filePath: 'src/A.ts',
+        symbolName: 'A',
+        type: 'class',
+      });
+
+      const id2 = manager.register({
+        filePath: 'src/B.ts',
+        symbolName: 'B',
+        type: 'class',
+      });
+
+      // Manually create circular parent reference (shouldn't happen normally)
+      const entry1 = manager.findById(id1);
+      const entry2 = manager.findById(id2);
+
+      if (entry1 && entry2) {
+        entry1.sourceRef.memberOf = id2;
+        entry2.sourceRef.memberOf = id1;
+      }
+
+      const validation = manager.validateIntegrity();
+      expect(validation.isValid).toBe(true); // No errors, only warnings
+      expect(validation.warnings.length).toBeGreaterThan(0);
+      expect(validation.warnings.some((w) => w.includes('Circular parent reference'))).toBe(true);
+    });
+
+    test('should expose detectDependencyCycles method', () => {
+      const id1 = manager.register({
+        filePath: 'src/A.ts',
+        symbolName: 'A',
+        type: 'class',
+      });
+
+      const id2 = manager.register({
+        filePath: 'src/B.ts',
+        symbolName: 'B',
+        type: 'class',
+      });
+
+      manager.addDependency(id1, id2, 'A uses B');
+      manager.addDependency(id2, id1, 'B uses A');
+
+      const cycles = manager.detectDependencyCycles();
+      expect(cycles.length).toBeGreaterThan(0);
+      expect(cycles[0]).toContain(id1);
+      expect(cycles[0]).toContain(id2);
     });
   });
 });

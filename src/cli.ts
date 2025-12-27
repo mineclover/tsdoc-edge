@@ -17,10 +17,8 @@ import {
   CheckDuplicatesCommand,
   CheckLinksCommand,
   CommandRegistry,
-  ContextToLLMCommand,
   CoreApiCommand,
   DepsCommand,
-  FindDocCommand,
   FindMethodCommand,
   FindUnusedDocsCommand,
   FixCommand,
@@ -28,7 +26,6 @@ import {
   HealthCommand,
   HelpCommand,
   IdCommand,
-  IdNewCommand,
   ImproveCommand,
   IndexDocsCommand,
   InitCommand,
@@ -38,7 +35,6 @@ import {
   PlansCommand,
   QueryInferredCommand,
   RebuildIndexCommand,
-  ScanCommand,
   SpecBumpCommand,
   SpecDiffCommand,
   SpecHistoryCommand,
@@ -54,12 +50,9 @@ import {
   UpdateBacklinksCommand,
   UpdateSymbolRefsCommand,
   UsageCommand,
-  UsedByCommand,
   ValidateUnifiedCommand,
   SymbolUnifiedCommand,
   WhoUsesCommand,
-  WithoutContractCommand,
-  WithoutResponsibilityCommand,
   AnalyzeRelationshipsCommand,
   type CommandResult,
 } from './commands';
@@ -78,10 +71,8 @@ import { ParseMermaidCommand } from './commands/ParseMermaidCommand';
 import { PromoteSymbolCommand } from './commands/PromoteSymbolCommand';
 import { CoverageReportCommand } from './commands/CoverageReportCommand';
 import { DetectDeadCodeCommand } from './commands/DetectDeadCodeCommand';
-import { RenameCommand } from './commands/RenameCommand';
 import { MoveCommand } from './commands/MoveCommand';
 import { TaskListCommand, TaskAddCommand, TaskUpdateCommand, TaskStatsCommand } from './commands/TaskCommands';
-import { ContextCommand } from './commands/ContextCommand';
 import { TestExamplesCommand } from './commands/TestExamplesCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
@@ -124,10 +115,8 @@ async function main(): Promise<void> {
   registry.register(new CheckLinksCommand());
   registry.register(new SuggestCommand());
   registry.register(new InitCommand());
-  registry.register(new IdNewCommand());
   registry.register(new GenerateDocsCommand());
   registry.register(new DepsCommand());
-  registry.register(new UsedByCommand());
   registry.register(new WhoUsesCommand());
   registry.register(new OrphansCommand());
   registry.register(new UndocumentedCommand());
@@ -138,21 +127,17 @@ async function main(): Promise<void> {
   registry.register(new SpecHistoryCommand());
   registry.register(new SpecDiffCommand());
   registry.register(new SpecBumpCommand());
-  registry.register(new FindDocCommand());
   registry.register(new PlansCommand());
   registry.register(new FindMethodCommand());
   registry.register(new TodosCommand());
   registry.register(new StatsCommand());
   registry.register(new RebuildIndexCommand());
   registry.register(new CoreApiCommand());
-  registry.register(new ScanCommand());
   registry.register(new SyncCoverageCommand());
   registry.register(new AnalyzeRelationshipsCommand());
   registry.register(new RelationshipCommand());
   registry.register(new VisualizeDepsCommand());
   registry.register(new UntestedCommand());
-  registry.register(new WithoutResponsibilityCommand());
-  registry.register(new WithoutContractCommand());
   registry.register(new FixCommand());
   registry.register(new IdCommand());
   registry.register(new ImproveCommand());
@@ -169,7 +154,6 @@ async function main(): Promise<void> {
   registry.register(new OntologyStatsCommand());
   registry.register(new OntologyListCommand());
   registry.register(new SystemStatusCommand());
-  registry.register(new ContextCommand());
   registry.register(new TestExamplesCommand());
   registry.register(new ExploreEntrypointCommand());
   registry.register(new ParseMermaidCommand());
@@ -177,8 +161,6 @@ async function main(): Promise<void> {
   registry.register(new CoverageReportCommand());
   registry.register(new DetectDeadCodeCommand());
   registry.register(new QueryInferredCommand());
-  registry.register(new ContextToLLMCommand());
-  registry.register(new RenameCommand());
   registry.register(new MoveCommand());
   registry.register(new TaskListCommand());
   registry.register(new TaskAddCommand());

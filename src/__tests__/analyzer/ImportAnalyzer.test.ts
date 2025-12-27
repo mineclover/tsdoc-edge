@@ -94,7 +94,7 @@ describe('ImportAnalyzer', () => {
 
     it('should parse type-only imports', () => {
       const sourceCode = `
-        import type { Symbol } from '../types/graph';
+        import type { Symbol } from '../../types/graph';
         import { type Config, DatabaseManager } from '../storage/DatabaseManager';
       `;
 
@@ -108,9 +108,9 @@ describe('ImportAnalyzer', () => {
 
     it('should parse multiple import statements', () => {
       const sourceCode = `
-        import { FileScanner } from '../scanner/FileScanner';
+        import { FileScanner } from '../../scanner/FileScanner';
         import { DatabaseManager } from '../storage/DatabaseManager';
-        import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
+        import { SymbolRegistryManager } from '../../storage/SymbolRegistryManager';
       `;
 
       const result = analyzer.analyzeImports(sourceCode);
@@ -124,7 +124,7 @@ describe('ImportAnalyzer', () => {
     it('should create import map for quick lookup', () => {
       const sourceCode = `
         import { DatabaseManager } from '../storage/DatabaseManager';
-        import { FileScanner } from '../scanner/FileScanner';
+        import { FileScanner } from '../../scanner/FileScanner';
       `;
 
       const result = analyzer.analyzeImports(sourceCode);
@@ -141,7 +141,7 @@ describe('ImportAnalyzer', () => {
 
     it('should handle mixed import styles', () => {
       const sourceCode = `
-        import DefaultExport, { NamedExport, type TypeExport } from '../module';
+        import DefaultExport, { NamedExport, type TypeExport } from '../../module';
       `;
 
       const result = analyzer.analyzeImports(sourceCode);
@@ -196,7 +196,7 @@ describe('ImportAnalyzer', () => {
 
     it('should skip type-only imports', () => {
       const sourceCode = `
-        import type { Symbol } from '../types/graph';
+        import type { Symbol } from '../../types/graph';
         import { DatabaseManager } from '../storage/DatabaseManager';
       `;
 
@@ -224,7 +224,7 @@ describe('ImportAnalyzer', () => {
 
     it('should convert PascalCase to kebab-case', () => {
       const sourceCode = `
-        import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
+        import { SymbolRegistryManager } from '../../storage/SymbolRegistryManager';
       `;
 
       const result = analyzer.analyzeImports(sourceCode);
@@ -235,7 +235,7 @@ describe('ImportAnalyzer', () => {
 
     it('should handle multiple potential symbol IDs', () => {
       const sourceCode = `
-        import { Manager as TestManager } from '../test/TestHelper';
+        import { Manager as TestManager } from '../../test/TestHelper';
       `;
 
       const result = analyzer.analyzeImports(sourceCode);

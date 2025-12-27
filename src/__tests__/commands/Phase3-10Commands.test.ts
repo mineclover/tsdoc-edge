@@ -13,11 +13,9 @@ import {
   CheckLinksCommand,
   SuggestCommand,
   InitCommand,
-  IdNewCommand,
   ValidateSpecCommand,
   GenerateDocsCommand,
   DepsCommand,
-  UsedByCommand,
   WhoUsesCommand,
   OrphansCommand,
   UndocumentedCommand,
@@ -28,17 +26,13 @@ import {
   SpecHistoryCommand,
   SpecDiffCommand,
   SpecBumpCommand,
-  FindDocCommand,
   PlansCommand,
   FindMethodCommand,
   TodosCommand,
   StatsCommand,
   CoreApiCommand,
-  ScanCommand,
   SyncCoverageCommand,
   UntestedCommand,
-  WithoutResponsibilityCommand,
-  WithoutContractCommand,
   FixCommand,
   HelpCommand,
   IdCommand,
@@ -106,14 +100,6 @@ describe('Phase 4 Commands', () => {
     });
   });
 
-  describe('IdNewCommand', () => {
-    it('should have correct name and description', () => {
-      const command = new IdNewCommand();
-      expect(command.getName()).toBe('id-new');
-      expect(command.getDescription()).toContain('ID');
-    });
-  });
-
   describe('ValidateSpecCommand', () => {
     it('should have correct name and description', () => {
       const command = new ValidateSpecCommand();
@@ -137,14 +123,6 @@ describe('Phase 5 Commands', () => {
       const command = new DepsCommand();
       expect(command.getName()).toBe('deps');
       expect(command.getDescription()).toContain('dependencies');
-    });
-  });
-
-  describe('UsedByCommand', () => {
-    it('should have correct name and description', () => {
-      const command = new UsedByCommand();
-      expect(command.getName()).toBe('used-by');
-      expect(command.getDescription()).toContain('uses');
     });
   });
 
@@ -229,14 +207,6 @@ describe('Phase 6 Commands', () => {
       expect(command.getDescription()).toContain('version');
     });
   });
-
-  describe('FindDocCommand', () => {
-    it('should have correct name and description', () => {
-      const command = new FindDocCommand();
-      expect(command.getName()).toBe('find-doc');
-      expect(command.getDescription()).toContain('document');
-    });
-  });
 });
 
 describe('Phase 7 Commands', () => {
@@ -280,14 +250,6 @@ describe('Phase 7 Commands', () => {
     });
   });
 
-  describe('ScanCommand', () => {
-    it('should have correct name and description', () => {
-      const command = new ScanCommand();
-      expect(command.getName()).toBe('scan');
-      expect(command.getDescription()).toContain('Scan');
-    });
-  });
-
   describe('SyncCoverageCommand', () => {
     it('should have correct name and description', () => {
       const command = new SyncCoverageCommand();
@@ -303,22 +265,6 @@ describe('Phase 8 Commands', () => {
       const command = new UntestedCommand();
       expect(command.getName()).toBe('untested');
       expect(command.getDescription()).toContain('test');
-    });
-  });
-
-  describe('WithoutResponsibilityCommand', () => {
-    it('should have correct name and description', () => {
-      const command = new WithoutResponsibilityCommand();
-      expect(command.getName()).toBe('without-responsibility');
-      expect(command.getDescription()).toContain('responsibility');
-    });
-  });
-
-  describe('WithoutContractCommand', () => {
-    it('should have correct name and description', () => {
-      const command = new WithoutContractCommand();
-      expect(command.getName()).toBe('without-contract');
-      expect(command.getDescription()).toContain('contract');
     });
   });
 
