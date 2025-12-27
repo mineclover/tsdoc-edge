@@ -460,7 +460,7 @@ describe('DependencyChainAnalyzer', () => {
 
       expect(relationships.length).toBeGreaterThan(0);
       expect(relationships[0].type).toBe('circular-dependency');
-      expect(relationships[0].category).toBe('quality');
+      expect(relationships[0].category).toBe('constraint');
       expect(relationships[0].direction).toBe('bidirectional');
       expect(relationships[0].properties.cyclePath).toBeDefined();
     });
