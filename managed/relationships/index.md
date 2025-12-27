@@ -213,7 +213,7 @@ sqlite3 .tsdoc/symbols.db "SELECT type, COUNT(*) FROM unified_relationships GROU
 - ASTSymbolExtractor (`src/analyzer/ASTSymbolExtractor.ts`): Primary extractor
 
 **Command References**:
-- Commands Index (`managed/COMMANDS.md`): All 61 commands organized by category
+- Commands Index (`managed/COMMANDS.md`): All 81 commands organized by category
 - BuildCommand (`src/commands/BuildCommand.ts`): Extract all symbols and relationships
 - WorkContextCommand (`src/commands/WorkContextCommand.ts`): Get file context with relationships
 

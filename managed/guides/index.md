@@ -396,14 +396,14 @@ tsdoc-edge parse-mermaid <diagram>
 
 **Core**:
 - README (`../README.md`) - Main documentation hub
-- [[Commands Index]] (`../COMMANDS.md`) - All 109 commands
+- [[Commands Index]] (`../COMMANDS.md`) - All 81 commands
 
 **Features**:
 - [[CoreWorkflow]] (`../features/core-workflow.md`)
 - [[AnalysisFeatures]] (`../features/analysis-features.md`)
 - [[ValidationFeatures]] (`../features/validation-features.md`)
 - [[SymbolGraphFeatures]] (`../features/symbol-graph.md`)
-- DocumentSymbolSystem (`../features/document-symbol-system.md`)
+- [[DocumentSymbolSystem]] (`../concepts/document-symbol-system.md`)
 - [[AutoIndexing]] (`../features/auto-indexing.md`)
 
 **Relationships**:

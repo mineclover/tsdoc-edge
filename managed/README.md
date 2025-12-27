@@ -282,7 +282,7 @@ See [[Analyzers & Extractors]] (`analyzers/index.md`) for complete list includin
 - [[SymbolGraphFeatures]] (`features/symbol-graph.md`): Graph-based symbol tracking (3.9% coverage, 24 files)
   - Implementation: [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`)
   - Uses: SymbolSearchEngine (`src/graph/SymbolSearchEngine.ts`), DepthTraverser (`src/graph/DepthTraverser.ts`)
-- DocumentSymbolSystem (`features/document-symbol-system.md`): [[Symbol]] reference system
+- [[DocumentSymbolSystem]] (`concepts/document-symbol-system.md`): [[Symbol]] reference system
   - Parser: [[DocumentSymbolRegistry]] (`src/doc-symbol/DocumentSymbolRegistry.ts`)
   - Extractor: [[Parser Components]] (`src/doc-symbol/MermaidSymbolExtractor.ts`)
 - [[AutoIndexing]] (`features/auto-indexing.md`): Automatic doc indexing
@@ -364,7 +364,7 @@ Core TypeScript interfaces used across the system:
   - [[Circular Dependency]] (`relationships/CIRCULAR.md`) - 0 found
 
 **Commands**:
-- [[Commands Index]]: All 104 commands organized
+- [[Commands Index]]: All 81 commands organized
 - Individual docs: [[BuildCommand]], [[WorkContextCommand]], etc.
 
 **Workflows**:
