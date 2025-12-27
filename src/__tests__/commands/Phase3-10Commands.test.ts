@@ -7,13 +7,11 @@
 
 import {
   ParseCommand,
-  ValidateDocsCommand,
   UpdateBacklinksCommand,
   UpdateSymbolRefsCommand,
   CheckLinksCommand,
   SuggestCommand,
   InitCommand,
-  ValidateSpecCommand,
   GenerateDocsCommand,
   DepsCommand,
   WhoUsesCommand,
@@ -47,14 +45,6 @@ describe('Phase 3 Commands', () => {
       const command = new ParseCommand();
       expect(command.getName()).toBe('parse');
       expect(command.getDescription()).toContain('Parse');
-    });
-  });
-
-  describe('ValidateDocsCommand', () => {
-    it('should have correct name and description', () => {
-      const command = new ValidateDocsCommand();
-      expect(command.getName()).toBe('validate-docs');
-      expect(command.getDescription()).toContain('Validate');
     });
   });
 
@@ -97,14 +87,6 @@ describe('Phase 4 Commands', () => {
       const command = new InitCommand();
       expect(command.getName()).toBe('init');
       expect(command.getDescription()).toContain('Initialize');
-    });
-  });
-
-  describe('ValidateSpecCommand', () => {
-    it('should have correct name and description', () => {
-      const command = new ValidateSpecCommand();
-      expect(command.getName()).toBe('validate-spec');
-      expect(command.getDescription()).toContain('spec');
     });
   });
 
