@@ -430,7 +430,7 @@ describe('BaseCommand', () => {
       const result = command.testCheckDatabaseExists();
       expect(result).not.toBeNull();
       expect(result?.exitCode).toBe(1);
-      expect(result?.message).toBe('Database not found');
+      expect(result?.message).toContain('Database not found');
     });
 
     it('should return null when database exists', () => {

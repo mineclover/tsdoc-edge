@@ -326,9 +326,114 @@ export abstract class BaseCommand {
   protected checkDatabaseExists(): CommandResult | null {
     const dbPath = this.getDatabasePath();
     if (!fs.existsSync(dbPath)) {
-      this.printError('Database not found. Run: tsdoc-edge build src');
-      return this.failure('Database not found');
+      this.printError('Database not found');
+      console.log();
+      console.log(`${colors.dim}The symbol database has not been built yet.${colors.reset}`);
+      console.log();
+      console.log(`${colors.cyan}To fix this, run:${colors.reset}`);
+      console.log(`  tsdoc-edge build src`);
+      console.log();
+      return this.failure('Database not found. Run: tsdoc-edge build src');
     }
     return null;
+  }
+
+  /**
+   * Check if a file exists and return failure with helpful message
+   *
+   * @param filePath - Path to check
+   * @param fileType - Description of file type (e.g., "Source file", "Config file")
+   * @returns CommandResult if file not found, null if exists
+   */
+  protected checkFileExists(filePath: string, fileType = 'File'): CommandResult | null {
+    if (!fs.existsSync(filePath)) {
+      this.printError(`${fileType} not found: ${filePath}`);
+      console.log();
+
+      // Provide suggestions based on file type
+      if (filePath.endsWith('.ts') || filePath.endsWith('.tsx')) {
+        console.log(`${colors.dim}Check that the file path is correct and the file exists.${colors.reset}`);
+      } else if (filePath.endsWith('.md')) {
+        console.log(`${colors.dim}Check that the markdown file exists in the managed/ directory.${colors.reset}`);
+      } else if (filePath.includes('.tsdoc')) {
+        console.log(`${colors.dim}Run 'tsdoc-edge init' to create the configuration.${colors.reset}`);
+      }
+      console.log();
+
+      return this.failure(`${fileType} not found: ${filePath}`);
+    }
+    return null;
+  }
+
+  /**
+   * Check if a directory exists and return failure with helpful message
+   *
+   * @param dirPath - Path to check
+   * @param dirType - Description of directory type
+   * @returns CommandResult if directory not found, null if exists
+   */
+  protected checkDirectoryExists(dirPath: string, dirType = 'Directory'): CommandResult | null {
+    if (!fs.existsSync(dirPath)) {
+      this.printError(`${dirType} not found: ${dirPath}`);
+      console.log();
+      console.log(`${colors.dim}Create the directory or check the path.${colors.reset}`);
+      console.log();
+      return this.failure(`${dirType} not found: ${dirPath}`);
+    }
+    return null;
+  }
+
+  /**
+   * Check if config file exists and return failure with helpful message
+   *
+   * @returns CommandResult if config not found, null if exists
+   */
+  protected checkConfigExists(): CommandResult | null {
+    const configPath = path.join(process.cwd(), '.tsdoc.config.json');
+    if (!fs.existsSync(configPath)) {
+      this.printError('Configuration file not found');
+      console.log();
+      console.log(`${colors.dim}TSDoc Edge requires a configuration file to operate.${colors.reset}`);
+      console.log();
+      console.log(`${colors.cyan}To create one, run:${colors.reset}`);
+      console.log(`  tsdoc-edge init`);
+      console.log();
+      return this.failure('Configuration file not found. Run: tsdoc-edge init');
+    }
+    return null;
+  }
+
+  /**
+   * Format and display a user-friendly error with context
+   *
+   * @param error - The error that occurred
+   * @param context - Additional context about what was being attempted
+   * @returns CommandResult with error
+   */
+  protected handleError(error: unknown, context?: string): CommandResult {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+
+    if (context) {
+      this.printError(`Failed to ${context}`);
+    } else {
+      this.printError('An error occurred');
+    }
+    console.log();
+    console.log(`${colors.dim}Error: ${errorMessage}${colors.reset}`);
+    console.log();
+
+    // Provide suggestions for common errors
+    if (errorMessage.includes('ENOENT')) {
+      console.log(`${colors.yellow}Hint:${colors.reset} A file or directory was not found. Check the path.`);
+    } else if (errorMessage.includes('EACCES')) {
+      console.log(`${colors.yellow}Hint:${colors.reset} Permission denied. Check file permissions.`);
+    } else if (errorMessage.includes('SQLITE')) {
+      console.log(`${colors.yellow}Hint:${colors.reset} Database error. Try running 'tsdoc-edge build src' to rebuild.`);
+    } else if (errorMessage.includes('JSON')) {
+      console.log(`${colors.yellow}Hint:${colors.reset} Invalid JSON. Check for syntax errors in the file.`);
+    }
+    console.log();
+
+    return this.failure(error instanceof Error ? error : new Error(errorMessage));
   }
 }
