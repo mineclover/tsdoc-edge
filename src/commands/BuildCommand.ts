@@ -573,131 +573,60 @@ export class BuildCommand extends BaseCommand {
           reverseAdjacencyList: new Map(),
         };
 
+        // Helper to transform UnifiedRelationship to batch insert format
+        const toBatchFormat = (rel: any) => ({
+          id: rel.id,
+          type: rel.type,
+          category: rel.category,
+          fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
+          toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
+          direction: rel.direction,
+          strength: rel.strength,
+          evidence: rel.evidence,
+          discoveredBy: rel.discoveredBy,
+          confidence: rel.confidence,
+          filePath: rel.filePath,
+          line: rel.line,
+          properties: rel.properties,
+          description: rel.description,
+        });
+
         // 1. Naming Pattern Relations
         const namingAnalyzer = new NamingPatternRelationAnalyzer(symbolGraph);
         const namingRelations = namingAnalyzer.analyze();
-
-        for (const rel of namingRelations) {
-          try {
-            dbManager.insertUnifiedRelationship({
-              id: rel.id,
-              type: rel.type,
-              category: rel.category,
-              fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
-              toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
-              direction: rel.direction,
-              strength: rel.strength,
-              evidence: rel.evidence,
-              discoveredBy: rel.discoveredBy,
-              confidence: rel.confidence,
-              filePath: rel.filePath,
-              line: rel.line,
-              properties: rel.properties,
-              description: rel.description,
-            });
-            semanticRelationshipsInserted++;
-          } catch (error) {
-            // Skip duplicate relationships
-          }
-        }
+        const namingInserted = dbManager.batchInsertUnifiedRelationships(namingRelations.map(toBatchFormat));
+        semanticRelationshipsInserted += namingInserted;
 
         const namingStats = namingAnalyzer.getStatistics(namingRelations);
-        this.printSuccess(`Naming patterns: ${namingRelations.length} relationships across ${namingStats.uniqueDomains} domains`);
+        this.printSuccess(`Naming patterns: ${namingInserted} relationships across ${namingStats.uniqueDomains} domains`);
 
         // 2. Explicit Semantic Relations (@relatedTo tags)
         const explicitAnalyzer = new ExplicitSemanticRelationAnalyzer();
         const explicitRelations = explicitAnalyzer.analyze(targetPath);
-
-        for (const rel of explicitRelations) {
-          try {
-            dbManager.insertUnifiedRelationship({
-              id: rel.id,
-              type: rel.type,
-              category: rel.category,
-              fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
-              toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
-              direction: rel.direction,
-              strength: rel.strength,
-              evidence: rel.evidence,
-              discoveredBy: rel.discoveredBy,
-              confidence: rel.confidence,
-              filePath: rel.filePath,
-              line: rel.line,
-              properties: rel.properties,
-              description: rel.description,
-            });
-            semanticRelationshipsInserted++;
-          } catch (error) {
-            // Skip duplicate relationships
-          }
-        }
+        const explicitInserted = dbManager.batchInsertUnifiedRelationships(explicitRelations.map(toBatchFormat));
+        semanticRelationshipsInserted += explicitInserted;
 
         const explicitStats = explicitAnalyzer.getStatistics(explicitRelations);
-        this.printSuccess(`Explicit semantic: ${explicitRelations.length} relationships (${explicitStats.withDescription} with descriptions)`);
+        this.printSuccess(`Explicit semantic: ${explicitInserted} relationships (${explicitStats.withDescription} with descriptions)`);
 
         // 3. Feature Grouping Relations
         const featureAnalyzer = new FeatureGroupingAnalyzer(symbolGraph);
         const featureRelations = featureAnalyzer.analyze(targetPath);
-
-        for (const rel of featureRelations) {
-          try {
-            dbManager.insertUnifiedRelationship({
-              id: rel.id,
-              type: rel.type,
-              category: rel.category,
-              fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
-              toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
-              direction: rel.direction,
-              strength: rel.strength,
-              evidence: rel.evidence,
-              discoveredBy: rel.discoveredBy,
-              confidence: rel.confidence,
-              filePath: rel.filePath,
-              line: rel.line,
-              properties: rel.properties,
-              description: rel.description,
-            });
-            semanticRelationshipsInserted++;
-          } catch (error) {
-            // Skip duplicate relationships
-          }
-        }
+        const featureInserted = dbManager.batchInsertUnifiedRelationships(featureRelations.map(toBatchFormat));
+        semanticRelationshipsInserted += featureInserted;
 
         const featureStats = featureAnalyzer.getStatistics(featureRelations);
-        this.printSuccess(`Feature grouping: ${featureRelations.length} relationships across ${featureStats.uniqueFeatures} features`);
+        this.printSuccess(`Feature grouping: ${featureInserted} relationships across ${featureStats.uniqueFeatures} features`);
 
         // 4. Relationship Inference (generate new relationships from existing ones)
         this.printInfo('Inferring relationships from existing patterns...');
         const inferenceEngine = new RelationshipInferenceEngine();
         const allRelationships = dbManager.getAllUnifiedRelationships();
         const inferredRelationships = inferenceEngine.infer(allRelationships);
-
-        for (const rel of inferredRelationships) {
-          try {
-            dbManager.insertUnifiedRelationship({
-              id: rel.id,
-              type: rel.type,
-              category: rel.category,
-              fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
-              toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
-              direction: rel.direction,
-              strength: rel.strength,
-              evidence: rel.evidence,
-              discoveredBy: rel.discoveredBy,
-              confidence: rel.confidence,
-              filePath: rel.filePath,
-              line: rel.line,
-              properties: rel.properties,
-              description: rel.description,
-            });
-            inferredRelationshipsInserted++;
-          } catch (error) {
-            // Skip duplicate relationships
-          }
-        }
+        inferredRelationshipsInserted = dbManager.batchInsertUnifiedRelationships(inferredRelationships.map(toBatchFormat));
 
         const inferenceStats = inferenceEngine.getStatistics(allRelationships);
-        this.printSuccess(`Inferred relationships: ${inferredRelationships.length} total (${inferenceStats.byRule['naming-transitivity'] || 0} naming, ${inferenceStats.byRule['feature-closure'] || 0} feature, ${inferenceStats.byRule['test-coverage-inheritance'] || 0} test)`);
+        this.printSuccess(`Inferred relationships: ${inferredRelationshipsInserted} total (${inferenceStats.byRule['naming-transitivity'] || 0} naming, ${inferenceStats.byRule['feature-closure'] || 0} feature, ${inferenceStats.byRule['test-coverage-inheritance'] || 0} test)`);
 
         // 5. Test Example Extraction (extract test cases as documentation examples)
         this.printInfo('Extracting test examples for documentation...');
@@ -705,31 +634,7 @@ export class BuildCommand extends BaseCommand {
         const exampleExtractor = new TestExampleExtractor(dbManager);
         const testExamples = exampleExtractor.extractAllExamples();
         const exampleRelationships = exampleExtractor.createRelationships(testExamples);
-
-        let testExamplesInserted = 0;
-        for (const rel of exampleRelationships) {
-          try {
-            dbManager.insertUnifiedRelationship({
-              id: rel.id,
-              type: rel.type,
-              category: rel.category,
-              fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
-              toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
-              direction: rel.direction,
-              strength: rel.strength,
-              evidence: rel.evidence,
-              discoveredBy: rel.discoveredBy,
-              confidence: rel.confidence,
-              filePath: rel.filePath,
-              line: rel.line,
-              properties: rel.properties,
-              description: rel.description,
-            });
-            testExamplesInserted++;
-          } catch (error) {
-            // Skip duplicate relationships
-          }
-        }
+        const testExamplesInserted = dbManager.batchInsertUnifiedRelationships(exampleRelationships.map(toBatchFormat));
 
         const highQualityExamples = testExamples.filter(ex => ex.quality >= 8);
         this.printSuccess(`Test examples: ${testExamples.length} total (${highQualityExamples.length} high-quality, ${testExamplesInserted} relationships)`);

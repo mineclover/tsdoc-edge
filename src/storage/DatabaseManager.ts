@@ -181,6 +181,86 @@ export class DatabaseManager {
   }
 
   /**
+   * Run a function within a transaction for better performance
+   * @param fn - Function to run within transaction
+   * @returns Result of the function
+   * @public
+   */
+  transaction<T>(fn: () => T): T {
+    return this.db.transaction(fn)();
+  }
+
+  /**
+   * Batch insert unified relationships within a transaction
+   * @param relationships - Array of relationships to insert
+   * @returns Number of successfully inserted relationships
+   * @public
+   */
+  batchInsertUnifiedRelationships(relationships: Array<{
+    id: string;
+    type: string;
+    category: string;
+    fromSymbols: string[];
+    toSymbols: string[];
+    direction: string;
+    strength: string;
+    evidence: Array<{ type: string; source: string; lineNumber?: number; confidence: number }>;
+    discoveredBy: string;
+    confidence: number;
+    filePath?: string;
+    line?: number;
+    properties?: Record<string, any>;
+    description?: string;
+  }>): number {
+    if (relationships.length === 0) return 0;
+
+    const stmt = this.db.prepare(`
+      INSERT OR REPLACE INTO unified_relationships (
+        id, type, category,
+        from_symbols, to_symbols,
+        direction, strength,
+        evidence, discovered_by, confidence,
+        file_path, line, properties,
+        created_at, updated_at, description
+      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `);
+
+    let inserted = 0;
+    const now = new Date().toISOString();
+
+    const insertAll = this.db.transaction(() => {
+      for (const rel of relationships) {
+        try {
+          stmt.run(
+            rel.id,
+            rel.type,
+            rel.category,
+            JSON.stringify(rel.fromSymbols),
+            JSON.stringify(rel.toSymbols),
+            rel.direction,
+            rel.strength,
+            JSON.stringify(rel.evidence),
+            rel.discoveredBy,
+            rel.confidence,
+            rel.filePath || null,
+            rel.line || null,
+            rel.properties ? JSON.stringify(rel.properties) : null,
+            now,
+            now,
+            rel.description || null
+          );
+          inserted++;
+        } catch {
+          // Skip failed inserts
+        }
+      }
+    });
+
+    insertAll();
+    return inserted;
+  }
+
+  /**
    * Initialize database schema
    * @precondition Database connection is established
    * @postcondition All tables and indexes are created

@@ -16,9 +16,12 @@ lastUpdated: 2025-12-27
 | Metric | Value |
 |--------|-------|
 | Commands | 81 |
-| Test Suites | 195 |
-| Tests | 2,873 |
-| Health Score | 74/100 |
+| Test Suites | 196 |
+| Tests | 2,885 |
+| Health Score | 90/100 (A) |
+| Symbols | 6,696 |
+| Relationships | 66,483 |
+| Relationship Types | 26/28 (93%) |
 | Vulnerabilities | 0 |
 
 ## Quick Navigation

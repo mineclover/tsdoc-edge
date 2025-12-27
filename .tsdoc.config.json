@@ -1,6 +1,6 @@
 {
   "project": {
-    "name": "tsdoc-edge-test",
+    "name": "tsdoc-edge",
     "version": "1.0.0",
     "rootDir": ".",
     "srcDirs": [
@@ -9,10 +9,11 @@
   },
   "paths": {
     "commentsDir": ".tsdoc-comments",
-    "databasePath": ".tsdoc/symbols.db",
-    "jsonlDir": ".tsdoc/data",
-    "outputDir": "output",
-    "diagramsDir": ".tsdoc/diagrams"
+    "databasePath": ".tsdoc.db",
+    "jsonlDir": "docs/data",
+    "outputDir": "docs/output",
+    "generatedDir": "docs/generated",
+    "reportsDir": ".tsdoc/reports"
   },
   "fold": {
     "enabled": true,
@@ -23,25 +24,11 @@
     "strictMode": false,
     "minConnectivityScore": 70,
     "rules": {},
-    "excludeDirs": [
-      "examples"
-    ],
     "skipCodeImplDirs": [
       "concepts",
       "guides",
       "workflows",
-      "relationships",
-      "commands",
-      "core",
-      "core-components",
-      "features",
-      "code-generation",
-      "parser",
-      "primary-types",
-      "types",
-      "utilities",
-      "analyzers",
-      "architecture"
+      "relationships"
     ]
   },
   "generator": {
@@ -49,15 +36,21 @@
     "includePrivate": false,
     "includeInternal": false
   },
-  "preCommit": {},
+  "preCommit": {
+    "enabled": false,
+    "threshold": 50,
+    "warningThreshold": 30,
+    "failOnMissing": false,
+    "modifiedOnly": false
+  },
   "documentManagement": {
-    "enabled": true,
+    "enabled": false,
     "managedDirs": [
-      "managed"
+      "docs/managed"
     ],
     "excludeDirs": [
-      "archive",
-      "reference"
+      "docs/examples",
+      "docs/templates"
     ],
     "requireFrontmatter": false,
     "strictMode": false,

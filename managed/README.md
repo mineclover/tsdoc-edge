@@ -40,7 +40,7 @@ tsdoc-edge explore-entrypoint managed/relationships/index.md --detect-orphans
 
 The single source of truth for all 17 relationship types tracked by TSDoc Edge.
 
-**Current Status**: 10/17 implemented (59%)
+**Current Status**: 26/28 types implemented (93%)
 - [[Code Dependency]] (`managed/relationships/CODE-DEPENDENCY.md`) - 1,968 relationships
   - Extractor: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`)
   - Commands: [[BuildCommand]] (`src/commands/BuildCommand.ts`)
@@ -61,7 +61,7 @@ The single source of truth for all 17 relationship types tracked by TSDoc Edge.
   - Command: [[TestRelationshipsCommand]] (`src/commands/TestRelationshipsCommand.ts`)
 - And 4 more: [[Type Dependency]], [[Generic Constraint]], [[Interface Implementation]], [[Circular Dependency]]
 
-### [[Commands Index]] - All 61+ Commands
+### [[Commands Index]] - All 81 Commands
 **Path**: `managed/COMMANDS.md`
 
 Complete reference organized by category with **new LLM-friendly features**:
