@@ -6,7 +6,9 @@
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
+/** A cluster of related symbols in the architecture */
 interface Cluster {
+  /** Cluster identifier */
   id: number;
   symbols: string[];
   internalEdges: number;

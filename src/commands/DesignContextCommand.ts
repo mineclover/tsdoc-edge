@@ -22,7 +22,9 @@ import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import type { Symbol } from '../types/graph/graph';
 import type { SymbolType } from '../types/graph';
 
+/** Context information for a file being worked on */
 interface WorkContext {
+  /** Path to the file */
   filePath: string;
   symbols: Symbol[];
   relatedDocs: Array<{

@@ -8,18 +8,21 @@
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
+/** A node in a relationship path */
 interface PathNode {
   symbolId: string;
   relationshipType: string;
   category: string;
 }
 
+/** A path between two symbols through relationships */
 interface SymbolPath {
   nodes: PathNode[];
   length: number;
   strength: number;
 }
 
+/** An edge in the relationship graph */
 interface GraphEdge {
   to: string;
   type: string;

@@ -44,9 +44,22 @@ export class CodeHealthChecker {
   // Note: TestCoverageAnalyzer API has changed, temporarily disabled
   // private testAnalyzer: TestCoverageAnalyzer;
 
+  /** Boilerplate methods that don't need documentation */
+  private static readonly BOILERPLATE_METHODS = new Set([
+    'getName', 'getDescription', 'getUsage', 'getInstance',
+    'execute', 'constructor', 'toString', 'valueOf',
+    'toJSON', 'clone', 'equals', 'hashCode',
+    'getAlias', 'configManager', 'dbManager', 'db',
+  ]);
+
   constructor() {
     this.docAnalyzer = new DocumentationAnalyzer();
     // this.testAnalyzer = new TestCoverageAnalyzer();
+  }
+
+  /** Check if a symbol name is a boilerplate method */
+  private isBoilerplate(symbolName: string): boolean {
+    return CodeHealthChecker.BOILERPLATE_METHODS.has(symbolName);
   }
 
   /**
@@ -342,13 +355,9 @@ export class CodeHealthChecker {
     const suggestions: ImprovementSuggestion[] = [];
     const minScore = options.minQualityScore || 70;
 
-    // Documentation suggestions
-    /**
-     * score
-     * @public
-     */
+    // Documentation suggestions (excluding boilerplate methods)
     for (const score of docScores) {
-      if (score.qualityScore < minScore && score.isPublic) {
+      if (score.qualityScore < minScore && score.isPublic && !this.isBoilerplate(score.symbolName)) {
         const priority = this.getPriority(score.qualityScore);
         const effort = score.missing.length > 3 ? 'medium' : 'small';
 
@@ -435,7 +444,7 @@ export class CodeHealthChecker {
    */
   private findTopIssues(docScores: DocQualityScore[], limit: number): DocQualityScore[] {
     return docScores
-      .filter((s) => s.isPublic)
+      .filter((s) => s.isPublic && !this.isBoilerplate(s.symbolName))
       .sort((a, b) => a.qualityScore - b.qualityScore)
       .slice(0, limit);
   }

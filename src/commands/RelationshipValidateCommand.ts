@@ -6,6 +6,7 @@
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
+/** A relationship validation issue */
 interface ValidationIssue {
   type: 'orphan' | 'duplicate' | 'low-confidence' | 'inconsistent';
   severity: 'error' | 'warning' | 'info';

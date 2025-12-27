@@ -7,6 +7,7 @@ import * as path from 'node:path';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
+/** A symbol affected by a change at a given depth */
 interface ImpactNode {
   symbolId: string;
   depth: number;

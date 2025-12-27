@@ -11,13 +11,21 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import type { UnifiedRelationship } from '../types/relationships';
 
+/** Options for filtering ontology element listings */
 interface ListOptions {
+  /** Element type to list */
   type?: 'node' | 'relationship';
+  /** Filter by name */
   name?: string;
+  /** Filter by category */
   category?: string;
+  /** Filter by strength */
   strength?: string;
+  /** Maximum number of results */
   limit?: number;
+  /** Offset for pagination */
   offset?: number;
+  /** Output format */
   format?: 'table' | 'json' | 'csv';
 }
 

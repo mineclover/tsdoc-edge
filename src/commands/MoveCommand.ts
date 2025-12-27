@@ -1,8 +1,17 @@
+/**
+ * MoveCommand - Move documentation files with reference updates
+ * @packageDocumentation
+ */
+
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { ReferenceUpdater } from '../utilities/ReferenceUpdater';
 
+/**
+ * Command to move documentation files and update all references
+ * @public
+ */
 export class MoveCommand extends BaseCommand {
   getName(): string {
     return 'move';

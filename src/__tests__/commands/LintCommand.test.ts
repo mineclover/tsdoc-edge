@@ -27,7 +27,7 @@ describe('LintCommand', () => {
       metrics: { healthScore: 80 },
       topIssues: [],
     };
-    (CodeHealthChecker as jest.Mock).mockImplementation(() => ({
+    (CodeHealthChecker as unknown as jest.Mock).mockImplementation(() => ({
       analyze: jest.fn().mockReturnValue(mockHealthReport),
     }));
 

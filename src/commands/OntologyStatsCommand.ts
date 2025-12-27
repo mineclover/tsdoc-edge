@@ -10,7 +10,9 @@
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
 
+/** Statistics about the ontology knowledge graph */
 interface OntologyStats {
+  /** Node statistics */
   nodes: {
     total: number;
     byType: Map<string, number>;

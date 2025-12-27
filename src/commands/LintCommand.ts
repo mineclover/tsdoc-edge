@@ -7,11 +7,19 @@ import { BaseCommand, colors, type CommandResult } from './BaseCommand';
 import { CodeHealthChecker } from '../analyzer/CodeHealthChecker';
 import { DatabaseManager } from '../storage/DatabaseManager';
 
+/**
+ * Result of a single lint check category
+ */
 interface LintResult {
+  /** Category name (e.g., 'Code Health', 'Documentation') */
   category: string;
+  /** Whether this check passed */
   passed: boolean;
+  /** Optional score (0-100) */
   score?: number;
+  /** List of issues found */
   issues: string[];
+  /** List of warnings found */
   warnings: string[];
 }
 
@@ -144,19 +152,10 @@ export class LintCommand extends BaseCommand {
       warnings.push(`Health score needs improvement: ${report.metrics.healthScore}/100`);
     }
 
-    // Boilerplate methods to ignore (common patterns that don't need documentation)
-    const boilerplateMethods = new Set([
-      'getName', 'getDescription', 'getUsage', 'getInstance',
-      'execute', 'constructor', 'toString', 'valueOf',
-    ]);
-
-    // Top issues (excluding boilerplate)
-    const significantIssues = report.topIssues.filter(
-      (issue) => !boilerplateMethods.has(issue.symbolName)
-    );
-
-    for (const issue of significantIssues.slice(0, 5)) {
-      if (issue.qualityScore < 50) {
+    // Top issues (CodeHealthChecker already filters boilerplate methods)
+    // Threshold of 40 means only severely undocumented symbols are reported
+    for (const issue of report.topIssues.slice(0, 5)) {
+      if (issue.qualityScore < 40) {
         issues.push(`${issue.symbolName}: score ${issue.qualityScore}/100 (${issue.filePath})`);
       }
     }

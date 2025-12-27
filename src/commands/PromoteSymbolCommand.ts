@@ -13,7 +13,9 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 
+/** Parsed H2 section from a document */
 interface H2Section {
+  /** Symbol name from the H2 header */
   symbolName: string;
   content: string;
   startLine: number;

@@ -15,6 +15,7 @@ const SUBCOMMANDS = {
   rename: { command: SymbolRenameCommand, description: 'Rename symbols across codebase' },
 } as const;
 
+/** Available symbol subcommand names */
 type SubcommandName = keyof typeof SUBCOMMANDS;
 
 /**

@@ -215,6 +215,8 @@ export class AnalyzerRegistry {
 
   /**
    * Get metadata for an analyzer type
+   * @param type - The analyzer type
+   * @returns Metadata or undefined if not found
    */
   getMetadata(type: AnalyzerType): AnalyzerMetadata | undefined {
     return ANALYZER_METADATA[type];
@@ -238,6 +240,9 @@ export class AnalyzerRegistry {
 
   /**
    * Create an analyzer instance
+   * @param type - The analyzer type
+   * @param context - Analysis context
+   * @returns Analyzer instance
    */
   create(type: AnalyzerType, context: AnalyzerContext): RelationshipAnalyzer {
     const metadata = ANALYZER_METADATA[type];
@@ -275,6 +280,8 @@ export class AnalyzerRegistry {
 
   /**
    * Run all analyzers
+   * @param context - Analysis context
+   * @returns All discovered relationships
    */
   analyzeAll(context: AnalyzerContext): UnifiedRelationship[] {
     const results: UnifiedRelationship[] = [];

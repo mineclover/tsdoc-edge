@@ -457,6 +457,9 @@ connection.onDefinition((params: DefinitionParams): Definition | null => {
 
 /**
  * Extract word at position from line
+ * @param line - Line text
+ * @param character - Character position
+ * @returns Word at position or null
  */
 function getWordAtPosition(line: string, character: number): string | null {
   const wordPattern = /[a-zA-Z_][a-zA-Z0-9_]*/g;

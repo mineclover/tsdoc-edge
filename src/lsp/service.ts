@@ -771,6 +771,7 @@ export class TsdocEdgeService {
   findSymbolByName(name: string): { id: string; name: string; type: string; filePath: string; line: number } | null {
     if (!this.db) return null;
 
+    /** Database result for symbol lookup */
     type SymbolLocation = { id: string; name: string; type: string; file_path: string; line: number | null };
 
     try {

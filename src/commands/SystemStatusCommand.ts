@@ -357,6 +357,7 @@ Options:
   }
 }
 
+/** Symbol statistics for system status */
 interface SymbolStats {
   total: number;
   documented: number;
@@ -365,6 +366,7 @@ interface SymbolStats {
   byType: Record<string, number>;
 }
 
+/** Relationship statistics for system status */
 interface RelationshipStats {
   total: number;
   types: number;
@@ -374,24 +376,28 @@ interface RelationshipStats {
   byCategory: Record<string, number>;
 }
 
+/** Document statistics for system status */
 interface DocumentStats {
   total: number;
   withSymbols: number;
   coverage: number;
 }
 
+/** Validation status for system status */
 interface ValidationStatus {
   errors: number;
   warnings: number;
   issues: string[];
 }
 
+/** Health status for system status */
 interface HealthStatus {
   score: number;
   grade: string;
   factors: string[];
 }
 
+/** Complete system status */
 interface SystemStatus {
   timestamp: string;
   symbols: SymbolStats;

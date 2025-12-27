@@ -82,6 +82,7 @@ export class IncrementalBuilder {
 
   /**
    * Set callback for build events
+   * @param callback - Function to call on build events
    */
   setEventCallback(callback: BuildEventCallback): void {
     this.onBuildEvent = callback;
@@ -89,6 +90,8 @@ export class IncrementalBuilder {
 
   /**
    * Extract symbols from a single file
+   * @param filePath - Path to the file
+   * @returns Extraction result with symbols and relationships
    */
   extractFile(filePath: string): IncrementalExtractResult {
     const result: IncrementalExtractResult = {
@@ -263,6 +266,8 @@ export class IncrementalBuilder {
 
   /**
    * Update database with extracted symbols (incremental)
+   * @param result - Extraction result to persist
+   * @returns Count of inserted and deleted symbols
    */
   updateDatabase(result: IncrementalExtractResult): { inserted: number; deleted: number } {
     if (!this.db) {
@@ -330,6 +335,8 @@ export class IncrementalBuilder {
 
   /**
    * Remove all symbols for a deleted file
+   * @param filePath - Path to the deleted file
+   * @returns Number of deleted symbols
    */
   removeFile(filePath: string): number {
     if (!this.db) return 0;
@@ -354,6 +361,8 @@ export class IncrementalBuilder {
 
   /**
    * Process a file change (extract and update)
+   * @param filePath - Path to the changed file
+   * @returns Extraction result
    */
   processFileChange(filePath: string): IncrementalExtractResult {
     const result = this.extractFile(filePath);
@@ -365,6 +374,9 @@ export class IncrementalBuilder {
 
   /**
    * Process file content directly (for unsaved buffer)
+   * @param filePath - Path to the file
+   * @param content - File content
+   * @returns Extraction result
    */
   processContent(filePath: string, content: string): IncrementalExtractResult {
     const result: IncrementalExtractResult = {

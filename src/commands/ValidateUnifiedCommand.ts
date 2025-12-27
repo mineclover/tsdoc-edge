@@ -19,6 +19,7 @@ const SUBCOMMANDS = {
   refs: { command: ValidateSymbolRefsCommand, description: 'Validate symbol references' },
 } as const;
 
+/** Available validation subcommand names */
 type SubcommandName = keyof typeof SUBCOMMANDS;
 
 /**

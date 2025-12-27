@@ -15,7 +15,9 @@ import { DatabaseManager } from '../storage/DatabaseManager';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import { MermaidSymbolExtractor } from '../doc-symbol/MermaidSymbolExtractor';
 
+/** Result of exploring an entrypoint file and its dependencies */
 interface EntrypointExploration {
+  /** Path to the entrypoint file */
   entrypointPath: string;
   discoveredSymbols: Set<string>;
   discoveredFiles: Set<string>;

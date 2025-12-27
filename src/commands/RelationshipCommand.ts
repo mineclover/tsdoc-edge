@@ -31,6 +31,7 @@ const SUBCOMMANDS = {
   help: { command: RelationshipHelpCommand, description: 'Interactive guide' },
 } as const;
 
+/** Available relationship subcommand names */
 type SubcommandName = keyof typeof SUBCOMMANDS;
 
 /**

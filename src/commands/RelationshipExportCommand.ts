@@ -9,6 +9,7 @@ import * as fs from 'node:fs';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
+/** Supported export formats for relationship data */
 type ExportFormat = 'json' | 'graphml' | 'dot' | 'csv' | 'cypher' | 'gephi';
 
 /**

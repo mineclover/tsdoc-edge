@@ -6,6 +6,7 @@
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
+/** Graph metrics for a symbol */
 interface SymbolMetrics {
   symbolId: string;
   symbolName: string;
