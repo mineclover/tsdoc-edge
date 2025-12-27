@@ -8,6 +8,8 @@ import type { TestCase, TestScenario, TestSuite, TestSymbol } from '../test-symb
 
 /**
  * Check if a symbol is any kind of test symbol
+ * @param symbol - Symbol to check
+ * @returns True if the symbol is a test-suite, test-case, or test-scenario
  * @public
  */
 export function isTestSymbol(symbol: Symbol): symbol is TestSymbol {
@@ -16,6 +18,8 @@ export function isTestSymbol(symbol: Symbol): symbol is TestSymbol {
 
 /**
  * Check if a symbol is a test suite
+ * @param symbol - Symbol to check
+ * @returns True if the symbol is a test-suite
  * @public
  */
 export function isTestSuite(symbol: Symbol): symbol is TestSuite {
@@ -24,6 +28,8 @@ export function isTestSuite(symbol: Symbol): symbol is TestSuite {
 
 /**
  * Check if a symbol is a test case
+ * @param symbol - Symbol to check
+ * @returns True if the symbol is a test-case
  * @public
  */
 export function isTestCase(symbol: Symbol): symbol is TestCase {
@@ -32,6 +38,8 @@ export function isTestCase(symbol: Symbol): symbol is TestCase {
 
 /**
  * Check if a symbol is a test scenario
+ * @param symbol - Symbol to check
+ * @returns True if the symbol is a test-scenario
  * @public
  */
 export function isTestScenario(symbol: Symbol): symbol is TestScenario {
@@ -40,6 +48,8 @@ export function isTestScenario(symbol: Symbol): symbol is TestScenario {
 
 /**
  * Check if a symbol is an implementation symbol (not a test)
+ * @param symbol - Symbol to check
+ * @returns True if the symbol is not a test symbol
  * @public
  */
 export function isImplementationSymbol(symbol: Symbol): boolean {
@@ -48,6 +58,8 @@ export function isImplementationSymbol(symbol: Symbol): boolean {
 
 /**
  * Filter test symbols from a symbol array
+ * @param symbols - Array of symbols to filter
+ * @returns Array containing only test symbols
  * @public
  */
 export function filterTestSymbols(symbols: Symbol[]): TestSymbol[] {
@@ -56,6 +68,8 @@ export function filterTestSymbols(symbols: Symbol[]): TestSymbol[] {
 
 /**
  * Filter implementation symbols from a symbol array
+ * @param symbols - Array of symbols to filter
+ * @returns Array containing only implementation symbols
  * @public
  */
 export function filterImplementationSymbols(symbols: Symbol[]): Symbol[] {
@@ -64,6 +78,8 @@ export function filterImplementationSymbols(symbols: Symbol[]): Symbol[] {
 
 /**
  * Group symbols by type category (implementation vs test)
+ * @param symbols - Array of symbols to group
+ * @returns Object with implementation and test symbol arrays
  * @public
  */
 export function groupSymbolsByCategory(symbols: Symbol[]): {

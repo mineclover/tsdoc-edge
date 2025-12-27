@@ -146,6 +146,7 @@ export class ReferenceUpdater {
    *
    * @param references - References to update
    * @param newPath - New file path (relative to managed/)
+   * @returns void - No return value
    *
    * @public
    */

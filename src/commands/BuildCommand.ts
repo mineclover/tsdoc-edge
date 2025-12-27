@@ -43,7 +43,7 @@ import type { SymbolGraph } from '../types/graph';
  * @rationale Large codebases require non-blocking I/O, better UX with progress
  * @consequences Slightly more complex error handling, but better performance
  *
- * @depends FileScanner, DatabaseManager, SymbolRegistryManager, ConfigManager
+ * @depends DatabaseManager, ConfigManager, ASTSymbolExtractor
  * @depType internal
  * @depReason Core infrastructure for symbol extraction and storage
  * @requires DatabaseManager
@@ -186,6 +186,7 @@ export class BuildCommand extends BaseCommand {
         symbolsInserted: 0,
         relationshipsFound: 0,
         relationshipsInserted: 0,
+        relationshipsSkipped: 0, // Relationships to external symbols (not errors)
         errors: [] as string[],
       };
 
@@ -389,9 +390,9 @@ export class BuildCommand extends BaseCommand {
               result.relationshipsInserted++;
             }
           } else {
-            // Symbol not found in map, try to find by name in database
-            // This handles cross-file dependencies
-            result.errors.push(`Relationship skipped: ${relationship.from} -> ${relationship.to} (symbols not found)`);
+            // Symbol not found in map - likely an external type (e.g., EventEmitter, Promise)
+            // This is expected behavior, not an error
+            result.relationshipsSkipped++;
           }
         } catch (error) {
           result.errors.push(`Failed to insert relationship: ${relationship.from} -> ${relationship.to}`);
@@ -763,6 +764,9 @@ export class BuildCommand extends BaseCommand {
       console.log(`  Symbols inserted: ${this.colors.green}${result.symbolsInserted}${this.colors.reset}`);
       console.log(`  Relationships found: ${this.colors.cyan}${result.relationshipsFound}${this.colors.reset}`);
       console.log(`  Relationships inserted: ${this.colors.green}${result.relationshipsInserted}${this.colors.reset}`);
+      if (result.relationshipsSkipped > 0) {
+        console.log(`  Relationships skipped: ${this.colors.dim}${result.relationshipsSkipped} (external types)${this.colors.reset}`);
+      }
       console.log(`  Doc relationships: ${this.colors.green}${docRelationshipsInserted}${this.colors.reset}`);
       console.log(`  Semantic relationships: ${this.colors.green}${semanticRelationshipsInserted}${this.colors.reset}`);
       console.log(`  Inferred relationships: ${this.colors.green}${inferredRelationshipsInserted}${this.colors.reset}`);

@@ -63,6 +63,7 @@ export class TemporalOrderAnalyzer {
    * Set TypeScript program for AST analysis
    *
    * @param program - TypeScript program
+   * @returns void - No return value
    * @public
    */
   setProgram(program: ts.Program): void {

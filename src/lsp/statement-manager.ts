@@ -140,6 +140,7 @@ export class StatementManager {
    * Remove a specific statement from cache
    *
    * @param name - Statement name to remove
+   * @returns void - No return value
    */
   remove(name: string): void {
     this.statements.delete(name);
@@ -159,6 +160,7 @@ export class StatementManager {
 
   /**
    * Clear all cached statements
+   * @returns void - No return value
    */
   clear(): void {
     this.statements.clear();
@@ -166,6 +168,7 @@ export class StatementManager {
 
   /**
    * Dispose the manager and release resources
+   * @returns void - No return value
    */
   dispose(): void {
     this.statements.clear();
@@ -176,6 +179,7 @@ export class StatementManager {
    * Update database reference (e.g., after reconnection)
    *
    * @param db - New database connection
+   * @returns void - No return value
    */
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setDatabase(db: any | null): void {

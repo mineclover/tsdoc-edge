@@ -104,13 +104,13 @@ export class RelationshipStatsCommand extends BaseCommand {
       // Implementation progress
       this.printSection('Implementation Progress');
 
-      // Define all relationship types by category (30 types across 11 categories)
+      // Define all relationship types by category (28 types across 10 categories)
       const allTypes = {
         structural: ['code-dependency', 'inheritance', 'implementation'],
-        'data-flow': ['io-dependency', 'pipeline', 'event-flow'],
+        'data-flow': ['io-dependency', 'event-flow'],
         behavioral: ['calls', 'callback', 'collaboration', 'composition', 'temporal-order'],
         alternative: ['substitution', 'fallback'],
-        constraint: ['mutual-exclusion', 'co-requirement', 'circular-dependency'],
+        constraint: ['co-requirement', 'circular-dependency'],
         semantic: ['naming-pattern-relation', 'explicit-semantic-relation', 'feature-grouping', 'doc-reference', 'enhancement'],
         verification: ['test-coverage', 'integration-verification'],
         testing: ['contains', 'covers-scenario', 'test-as-example'],

@@ -378,7 +378,6 @@ Examples:
       'io-dependency': 'produces/consumes',
       'test-coverage': 'tested by',
       'collaboration': 'collaborates',
-      'pipeline': 'pipeline',
     };
 
     return labels[type] || type;

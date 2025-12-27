@@ -3,7 +3,7 @@
  * @packageDocumentation
  *
  * @responsibility Define comprehensive relationship taxonomy
- * @contract Support all 30 relationship types across 11 categories
+ * @contract Support all 28 relationship types across 10 categories
  *
  * @problem Current system only tracks code dependencies
  * @solves Unified type system for all relationship categories
@@ -23,7 +23,7 @@
  * Relationship type classification
  * @public
  *
- * Total: 30 relationship types across 11 categories
+ * Total: 28 relationship types across 10 categories
  */
 export type RelationshipType =
   // 1. Structural (Code Space)
@@ -32,7 +32,6 @@ export type RelationshipType =
   | 'implementation'      // A implements I (interface-impl in docs)
   // 2. Data Flow
   | 'io-dependency'       // A's output feeds B's input
-  | 'pipeline'            // A → B → C sequential processing
   | 'event-flow'          // A emits events consumed by B
   // 3. Behavioral
   | 'calls'               // A calls function/method B
@@ -44,9 +43,8 @@ export type RelationshipType =
   | 'substitution'        // A OR B can be used (same interface)
   | 'fallback'            // Try A, if fails use B
   // 5. Constraint
-  | 'mutual-exclusion'    // A and B cannot coexist
   | 'co-requirement'      // A requires B to be present
-  | 'circular-dependency' // A → B → A (quality/constraint)
+  | 'circular-dependency' // A → B → A (detected cycle)
   // 6. Semantic (Meta Space)
   | 'conceptual-relation' // @deprecated Use naming-pattern-relation or explicit-semantic-relation
   | 'naming-pattern-relation' // Symbols share domain prefix (UserService ~ UserRepository)
@@ -71,14 +69,14 @@ export type RelationshipType =
  * Relationship category
  * @public
  *
- * Total: 11 categories covering all relationship dimensions
+ * Total: 10 categories covering all relationship dimensions
  */
 export type RelationshipCategory =
   | 'structural'      // Code structure (imports, inheritance)
-  | 'data-flow'       // Data movement (I/O, pipelines)
+  | 'data-flow'       // Data movement (I/O, events)
   | 'behavioral'      // Runtime behavior (calls, callbacks)
   | 'alternative'     // Substitutability (fallback, substitution)
-  | 'constraint'      // Restrictions (mutual-exclusion, co-requirement, circular)
+  | 'constraint'      // Restrictions (co-requirement, circular-dependency)
   | 'semantic'        // Conceptual (naming-pattern, explicit-semantic, feature-grouping)
   | 'verification'    // Test verification (test-coverage, integration-verification)
   | 'testing'         // Test structure (contains, covers-scenario)
@@ -199,7 +197,6 @@ export interface UnifiedRelationship {
    * Type-specific properties
    * Examples:
    * - io-dependency: { dataType: 'UserData' }
-   * - pipeline: { order: 2 }
    * - event-flow: { eventName: 'data-ready' }
    * - collaboration: { role: 'payment-processor' }
    * - feature-grouping: { featureName: 'Authentication' }

@@ -208,6 +208,7 @@ export class AnalyzerRegistry {
 
   /**
    * Get all available analyzer types
+   * @returns Array of all registered analyzer types
    */
   getTypes(): AnalyzerType[] {
     return Object.keys(ANALYZER_METADATA) as AnalyzerType[];
@@ -224,6 +225,7 @@ export class AnalyzerRegistry {
 
   /**
    * Get all metadata grouped by category
+   * @returns Map of category names to analyzer metadata arrays
    */
   getMetadataByCategory(): Map<string, AnalyzerMetadata[]> {
     const byCategory = new Map<string, AnalyzerMetadata[]>();

@@ -83,6 +83,7 @@ export class IncrementalBuilder {
   /**
    * Set callback for build events
    * @param callback - Function to call on build events
+   * @returns void - No return value
    */
   setEventCallback(callback: BuildEventCallback): void {
     this.onBuildEvent = callback;

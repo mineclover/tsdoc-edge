@@ -68,6 +68,7 @@ export class CallGraphAnalyzer {
    * Set TypeScript program for AST analysis
    *
    * @param program - TypeScript program
+   * @returns void - No return value
    * @public
    */
   setProgram(program: ts.Program): void {
@@ -551,6 +552,7 @@ export class CallGraphAnalyzer {
   /**
    * Get call statistics
    *
+   * @param relationships - Unified relationships to analyze
    * @returns Call statistics
    * @public
    */

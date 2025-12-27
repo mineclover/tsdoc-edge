@@ -11,7 +11,6 @@
  *
  * @functionality
  * - Match return types with parameter types
- * - Detect pipeline patterns (A → B → C)
  * - Find event flow patterns
  * - Calculate confidence scores
  */
@@ -272,68 +271,5 @@ export class IODependencyAnalyzer {
     }
 
     return Math.min(confidence, 1.0);
-  }
-
-  /**
-   * Detect pipeline patterns (A → B → C)
-   *
-   * @param dependencies - I/O dependencies
-   * @returns Pipeline relationships
-   * @public
-   */
-  detectPipelines(dependencies: UnifiedRelationship[]): UnifiedRelationship[] {
-    const pipelines: UnifiedRelationship[] = [];
-
-    // Build adjacency list for I/O dependencies
-    const ioDeps = new Map<string, string[]>();
-
-    for (const dep of dependencies) {
-      if (typeof dep.from === 'string' && typeof dep.to === 'string') {
-        if (!ioDeps.has(dep.from)) {
-          ioDeps.set(dep.from, []);
-        }
-        ioDeps.get(dep.from)!.push(dep.to);
-      }
-    }
-
-    // Find chains A → B → C
-    for (const [start, targets] of ioDeps.entries()) {
-      for (const middle of targets) {
-        const nextTargets = ioDeps.get(middle);
-
-        if (nextTargets) {
-          for (const end of nextTargets) {
-            const pipeline: UnifiedRelationship = {
-              id: `pipeline-${start}-${middle}-${end}`,
-              type: 'pipeline',
-              category: 'data-flow',
-              from: [start, middle],
-              to: end,
-              direction: 'unidirectional',
-              strength: 'medium',
-              evidence: [{
-                type: 'code',
-                source: '',
-                confidence: 0.8,
-                context: `Detected chain: ${start} → ${middle} → ${end}`
-              }],
-              discoveredBy: 'static-analysis',
-              confidence: 0.8,
-              properties: {
-                chain: [start, middle, end],
-                length: 3
-              },
-              createdAt: new Date().toISOString(),
-              updatedAt: new Date().toISOString(),
-              description: `Pipeline: ${start} → ${middle} → ${end}`
-            };
-
-            pipelines.push(pipeline);
-          }
-        }
-      }
-    }
-
-    return pipelines;
   }
 }

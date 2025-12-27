@@ -143,6 +143,7 @@ export class TsdocEdgeService {
    * In incremental mode, file changes are immediately reflected in the database
    * rather than requiring a full rebuild.
    *
+   * @returns True if incremental mode was enabled successfully
    * @public
    */
   enableIncrementalMode(): boolean {
@@ -184,6 +185,7 @@ export class TsdocEdgeService {
 
   /**
    * Check if incremental mode is active
+   * @returns True if incremental mode is enabled
    */
   isIncrementalModeEnabled(): boolean {
     return this.incrementalMode;
@@ -253,6 +255,7 @@ export class TsdocEdgeService {
    *
    * Call this when the database is updated (e.g., after `tsdoc-edge build`)
    *
+   * @returns void - No return value
    * @public
    */
   invalidateCache(): void {
@@ -265,6 +268,7 @@ export class TsdocEdgeService {
    * Call this when a file is modified to refresh its analysis
    *
    * @param filePath - Absolute path to the file
+   * @returns void - No return value
    * @public
    */
   invalidateFileCache(filePath: string): void {
@@ -824,6 +828,8 @@ export class TsdocEdgeService {
    *
    * This method should be called when the LSP server shuts down
    * to prevent memory leaks.
+   *
+   * @returns void - No return value
    */
   close(): void {
     // Dispose cache manager (stops timer and clears caches)

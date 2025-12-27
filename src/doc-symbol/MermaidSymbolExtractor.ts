@@ -240,7 +240,6 @@ export class MermaidSymbolExtractor {
       'callback': 'Callback Pattern',
       'composition': 'Composition Relationship',
       'circular': 'Circular Dependency',
-      'pipeline': 'Pipeline',
       'event-flow': 'Event Flow',
       'type-dependency': 'Type Dependency',
       'generic-constraint': 'Generic Constraint',

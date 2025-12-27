@@ -119,10 +119,8 @@ export class RecursiveImprover {
 
     // Iterate until target reached or max iterations
     while (currentScore < targetScore && iteration < maxIterations) {
-      iteration++;
-
       if (verbose) {
-        console.log(`\n=== Iteration ${iteration} ===`);
+        console.log(`\n=== Iteration ${iteration + 1} ===`);
         console.log(`Current score: ${currentScore}/100`);
       }
 
@@ -185,6 +183,9 @@ export class RecursiveImprover {
       // Re-analyze to get new score
       const newReport = this.analyzeAll(paths);
       currentScore = newReport.metrics.healthScore;
+
+      // Increment iteration counter after successful work
+      iteration++;
 
       iterationResults.push({
         iteration,

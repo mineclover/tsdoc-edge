@@ -406,14 +406,18 @@ export class DocumentationAnalyzer {
     // For non-function symbols (variables, properties, types), params don't apply
     // So hasCompleteParams remains true
 
-    // Check returns (for all functions/methods except constructors)
+    // Check returns (for functions/methods with non-void return types)
     let hasReturns = true;
 
     if (isFunctionLike) {
       const isConstructor = ts.isConstructorDeclaration(node);
+      const funcNode = node as ts.FunctionDeclaration | ts.MethodDeclaration;
 
-      // All functions (including void) should have @returns tag
-      if (!isConstructor && !docComment.returnsBlock) {
+      // Check if function has void return type (explicit or implicit)
+      const hasVoidReturn = this.hasVoidReturnType(funcNode);
+
+      // Only require @returns for non-void, non-constructor functions
+      if (!isConstructor && !hasVoidReturn && !docComment.returnsBlock) {
         hasReturns = false;
         missing.push('@returns');
       }
@@ -450,6 +454,46 @@ export class DocumentationAnalyzer {
       hasCustomTags,
       missing,
     };
+  }
+
+  /**
+   * Check if function has void return type
+   *
+   * @param node - Function or method declaration
+   * @returns True if function returns void or has no return type annotation
+   */
+  private hasVoidReturnType(node: ts.FunctionDeclaration | ts.MethodDeclaration): boolean {
+    const returnType = node.type;
+
+    // No explicit return type - check if function body has return statements
+    if (!returnType) {
+      // If no explicit type and no return statements with values, treat as void
+      const body = node.body;
+      if (!body) return true; // Abstract method or declaration
+
+      let hasNonVoidReturn = false;
+      const checkReturns = (n: ts.Node): void => {
+        if (ts.isReturnStatement(n) && n.expression) {
+          hasNonVoidReturn = true;
+        }
+        ts.forEachChild(n, checkReturns);
+      };
+      checkReturns(body);
+      return !hasNonVoidReturn;
+    }
+
+    // Explicit void type
+    if (returnType.kind === ts.SyntaxKind.VoidKeyword) {
+      return true;
+    }
+
+    // Check for 'void' in type text (handles Promise<void>, etc.)
+    const typeText = returnType.getText();
+    if (typeText === 'void' || typeText === 'Promise<void>') {
+      return true;
+    }
+
+    return false;
   }
 
   /**

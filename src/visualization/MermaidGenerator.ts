@@ -4,8 +4,8 @@
  * @packageDocumentation
  */
 
-import type { SymbolGraph } from '../types/graph';
 import type { CircularDependency, Hotspot } from '../analyzer/DependencyChainAnalyzer';
+import type { SymbolGraph } from '../types/graph';
 
 /**
  * Mermaid diagram generator
@@ -201,10 +201,12 @@ export class MermaidGenerator {
     const fileMap = new Map<string, string[]>();
     for (const [symbolId, symbol] of this.graph.symbols.entries()) {
       const file = symbol.filePath;
-      if (!fileMap.has(file)) {
-        fileMap.set(file, []);
+      const existing = fileMap.get(file);
+      if (existing) {
+        existing.push(symbolId);
+      } else {
+        fileMap.set(file, [symbolId]);
       }
-      fileMap.get(file)!.push(symbolId);
     }
 
     // Count dependencies between files
@@ -214,8 +216,10 @@ export class MermaidGenerator {
       if (!symbol) continue;
 
       const fromFile = symbol.filePath;
-      if (!fileDeps.has(fromFile)) {
-        fileDeps.set(fromFile, new Set());
+      let fromDeps = fileDeps.get(fromFile);
+      if (!fromDeps) {
+        fromDeps = new Set();
+        fileDeps.set(fromFile, fromDeps);
       }
 
       for (const depId of deps) {
@@ -224,7 +228,7 @@ export class MermaidGenerator {
 
         const toFile = depSymbol.filePath;
         if (fromFile !== toFile) {
-          fileDeps.get(fromFile)!.add(toFile);
+          fromDeps.add(toFile);
         }
       }
     }
@@ -264,7 +268,7 @@ export class MermaidGenerator {
   private formatLabel(name: string): string {
     // Truncate long names
     if (name.length > 30) {
-      return name.substring(0, 27) + '...';
+      return `${name.substring(0, 27)}...`;
     }
     return name;
   }

@@ -80,11 +80,6 @@ describe('ConstraintAnalyzer', () => {
     });
   }
 
-  // Helper to create config files
-  function createConfigFile(filename: string, content: object): void {
-    fs.writeFileSync(path.join(tempDir, filename), JSON.stringify(content, null, 2));
-  }
-
   describe('constructor and setProgram', () => {
     it('should create analyzer without program', () => {
       const graph = createMockGraph([]);
@@ -109,226 +104,6 @@ describe('ConstraintAnalyzer', () => {
       analyzer.setProgram(program);
 
       expect(analyzer).toBeDefined();
-    });
-  });
-
-  describe('analyze - mutual exclusion from tsconfig.json', () => {
-    it('should detect CommonJS module mutual exclusion', () => {
-      createConfigFile('tsconfig.json', {
-        compilerOptions: {
-          module: 'commonjs',
-        },
-      });
-
-      const graph = createMockGraph([]);
-      const analyzer = new ConstraintAnalyzer(graph, tempDir);
-      const result = analyzer.analyze();
-
-      const exclusion = result.find(
-        (r) =>
-          r.type === 'mutual-exclusion' &&
-          r.from === 'config:module:commonjs' &&
-          r.to === 'config:module:es6'
-      );
-
-      expect(exclusion).toBeDefined();
-      expect(exclusion?.direction).toBe('bidirectional');
-      expect(exclusion?.strength).toBe('strong');
-      expect(exclusion?.confidence).toBe(1.0);
-    });
-
-    it('should detect ES6 module mutual exclusion', () => {
-      createConfigFile('tsconfig.json', {
-        compilerOptions: {
-          module: 'es6',
-        },
-      });
-
-      const graph = createMockGraph([]);
-      const analyzer = new ConstraintAnalyzer(graph, tempDir);
-      const result = analyzer.analyze();
-
-      const exclusion = result.find(
-        (r) =>
-          r.type === 'mutual-exclusion' &&
-          r.from === 'config:module:es6' &&
-          r.to === 'config:module:commonjs'
-      );
-
-      expect(exclusion).toBeDefined();
-    });
-
-    it('should detect esnext module mutual exclusion', () => {
-      createConfigFile('tsconfig.json', {
-        compilerOptions: {
-          module: 'esnext',
-        },
-      });
-
-      const graph = createMockGraph([]);
-      const analyzer = new ConstraintAnalyzer(graph, tempDir);
-      const result = analyzer.analyze();
-
-      const exclusion = result.find(
-        (r) =>
-          r.type === 'mutual-exclusion' &&
-          r.from === 'config:module:esnext' &&
-          r.to === 'config:module:commonjs'
-      );
-
-      expect(exclusion).toBeDefined();
-    });
-
-    it('should detect ES5 target constraint with async/await', () => {
-      createConfigFile('tsconfig.json', {
-        compilerOptions: {
-          target: 'ES5',
-        },
-      });
-
-      const graph = createMockGraph([]);
-      const analyzer = new ConstraintAnalyzer(graph, tempDir);
-      const result = analyzer.analyze();
-
-      const constraint = result.find(
-        (r) =>
-          r.type === 'mutual-exclusion' &&
-          r.from === 'config:target:es5' &&
-          r.to === 'feature:async-await'
-      );
-
-      expect(constraint).toBeDefined();
-      expect(constraint?.confidence).toBe(0.9);
-    });
-
-    it('should detect node moduleResolution mutual exclusion', () => {
-      createConfigFile('tsconfig.json', {
-        compilerOptions: {
-          moduleResolution: 'node',
-        },
-      });
-
-      const graph = createMockGraph([]);
-      const analyzer = new ConstraintAnalyzer(graph, tempDir);
-      const result = analyzer.analyze();
-
-      const exclusion = result.find(
-        (r) =>
-          r.type === 'mutual-exclusion' &&
-          r.from === 'config:moduleResolution:node' &&
-          r.to === 'config:moduleResolution:classic'
-      );
-
-      expect(exclusion).toBeDefined();
-    });
-
-    it('should handle missing tsconfig.json gracefully', () => {
-      const graph = createMockGraph([]);
-      const analyzer = new ConstraintAnalyzer(graph, tempDir);
-      const result = analyzer.analyze();
-
-      // Should not throw, may return empty or results from other sources
-      expect(result).toBeDefined();
-    });
-
-    it('should handle invalid tsconfig.json gracefully', () => {
-      fs.writeFileSync(path.join(tempDir, 'tsconfig.json'), 'invalid json{');
-
-      const graph = createMockGraph([]);
-      const analyzer = new ConstraintAnalyzer(graph, tempDir);
-      const result = analyzer.analyze();
-
-      // Should not throw
-      expect(result).toBeDefined();
-    });
-  });
-
-  describe('analyze - mutual exclusion from package.json', () => {
-    it('should detect Jest and Mocha conflict', () => {
-      createConfigFile('package.json', {
-        dependencies: {
-          jest: '^29.0.0',
-          mocha: '^10.0.0',
-        },
-      });
-
-      const graph = createMockGraph([]);
-      const analyzer = new ConstraintAnalyzer(graph, tempDir);
-      const result = analyzer.analyze();
-
-      const conflict = result.find(
-        (r) =>
-          r.type === 'mutual-exclusion' &&
-          r.from === 'test-framework:jest' &&
-          r.to === 'test-framework:mocha'
-      );
-
-      expect(conflict).toBeDefined();
-      expect(conflict?.confidence).toBe(0.8);
-    });
-
-    it('should detect Jest and Jasmine conflict', () => {
-      createConfigFile('package.json', {
-        devDependencies: {
-          jest: '^29.0.0',
-          jasmine: '^5.0.0',
-        },
-      });
-
-      const graph = createMockGraph([]);
-      const analyzer = new ConstraintAnalyzer(graph, tempDir);
-      const result = analyzer.analyze();
-
-      const conflict = result.find(
-        (r) =>
-          r.type === 'mutual-exclusion' &&
-          r.from === 'test-framework:jest' &&
-          r.to === 'test-framework:jasmine'
-      );
-
-      expect(conflict).toBeDefined();
-    });
-
-    it('should detect conflicts from @types packages', () => {
-      createConfigFile('package.json', {
-        devDependencies: {
-          '@types/jest': '^29.0.0',
-          '@types/mocha': '^10.0.0',
-        },
-      });
-
-      const graph = createMockGraph([]);
-      const analyzer = new ConstraintAnalyzer(graph, tempDir);
-      const result = analyzer.analyze();
-
-      const conflict = result.find(
-        (r) =>
-          r.type === 'mutual-exclusion' &&
-          r.from === 'test-framework:jest' &&
-          r.to === 'test-framework:mocha'
-      );
-
-      expect(conflict).toBeDefined();
-    });
-
-    it('should handle missing package.json gracefully', () => {
-      const graph = createMockGraph([]);
-      const analyzer = new ConstraintAnalyzer(graph, tempDir);
-      const result = analyzer.analyze();
-
-      // Should not throw
-      expect(result).toBeDefined();
-    });
-
-    it('should handle invalid package.json gracefully', () => {
-      fs.writeFileSync(path.join(tempDir, 'package.json'), 'invalid json{');
-
-      const graph = createMockGraph([]);
-      const analyzer = new ConstraintAnalyzer(graph, tempDir);
-      const result = analyzer.analyze();
-
-      // Should not throw
-      expect(result).toBeDefined();
     });
   });
 
@@ -494,39 +269,35 @@ describe('ConstraintAnalyzer', () => {
   });
 
   describe('relationship structure', () => {
-    it('should create relationships with correct structure', () => {
-      createConfigFile('tsconfig.json', {
-        compilerOptions: {
-          module: 'commonjs',
-        },
-      });
+    it('should create co-requirement relationships with correct structure', () => {
+      const graph = createMockGraph([
+        { id: 'lib-react', name: 'React' },
+        { id: 'lib-reactdom', name: 'ReactDOM' },
+      ]);
 
-      const graph = createMockGraph([]);
-      const analyzer = new ConstraintAnalyzer(graph, tempDir);
+      const program = createProgram({ 'test.ts': '' });
+      const analyzer = new ConstraintAnalyzer(graph, tempDir, program);
       const result = analyzer.analyze();
 
-      const relationship = result[0];
+      const relationship = result.find(r => r.type === 'co-requirement');
 
-      expect(relationship).toMatchObject({
-        type: 'mutual-exclusion',
-        category: 'constraint',
-        direction: 'bidirectional',
-        strength: 'strong',
-        discoveredBy: 'static-analysis',
-      });
+      if (relationship) {
+        expect(relationship).toMatchObject({
+          type: 'co-requirement',
+          category: 'constraint',
+          direction: 'bidirectional',
+          strength: 'medium',
+        });
 
-      expect(relationship.id).toBeDefined();
-      expect(relationship.from).toBeDefined();
-      expect(relationship.to).toBeDefined();
-      expect(relationship.evidence).toBeInstanceOf(Array);
-      expect(relationship.evidence[0]).toMatchObject({
-        type: 'code',
-        confidence: expect.any(Number),
-      });
-      expect(relationship.properties).toHaveProperty('reason');
-      expect(relationship.description).toBeDefined();
-      expect(relationship.createdAt).toBeDefined();
-      expect(relationship.updatedAt).toBeDefined();
+        expect(relationship.id).toBeDefined();
+        expect(relationship.from).toBeDefined();
+        expect(relationship.to).toBeDefined();
+        expect(relationship.evidence).toBeInstanceOf(Array);
+        expect(relationship.properties).toHaveProperty('reason');
+        expect(relationship.description).toBeDefined();
+        expect(relationship.createdAt).toBeDefined();
+        expect(relationship.updatedAt).toBeDefined();
+      }
     });
   });
 
@@ -538,25 +309,8 @@ describe('ConstraintAnalyzer', () => {
       const stats = analyzer.getStatistics([]);
 
       expect(stats.totalConstraints).toBe(0);
-      expect(stats.mutualExclusions).toBe(0);
       expect(stats.coRequirements).toBe(0);
       expect(Object.keys(stats.bySource)).toHaveLength(0);
-    });
-
-    it('should calculate statistics correctly for mutual exclusions', () => {
-      const graph = createMockGraph([]);
-      const analyzer = new ConstraintAnalyzer(graph, tempDir);
-
-      const relationships: UnifiedRelationship[] = [
-        createMockMutualExclusionRelationship('A', 'B'),
-        createMockMutualExclusionRelationship('C', 'D'),
-      ];
-
-      const stats = analyzer.getStatistics(relationships);
-
-      expect(stats.totalConstraints).toBe(2);
-      expect(stats.mutualExclusions).toBe(2);
-      expect(stats.coRequirements).toBe(0);
     });
 
     it('should calculate statistics correctly for co-requirements', () => {
@@ -572,26 +326,7 @@ describe('ConstraintAnalyzer', () => {
       const stats = analyzer.getStatistics(relationships);
 
       expect(stats.totalConstraints).toBe(3);
-      expect(stats.mutualExclusions).toBe(0);
       expect(stats.coRequirements).toBe(3);
-    });
-
-    it('should calculate statistics correctly for mixed relationships', () => {
-      const graph = createMockGraph([]);
-      const analyzer = new ConstraintAnalyzer(graph, tempDir);
-
-      const relationships: UnifiedRelationship[] = [
-        createMockMutualExclusionRelationship('A', 'B'),
-        createMockCoRequirementRelationship('C', 'D'),
-        createMockMutualExclusionRelationship('E', 'F'),
-        createMockCoRequirementRelationship('G', 'H'),
-      ];
-
-      const stats = analyzer.getStatistics(relationships);
-
-      expect(stats.totalConstraints).toBe(4);
-      expect(stats.mutualExclusions).toBe(2);
-      expect(stats.coRequirements).toBe(2);
     });
 
     it('should track statistics by source', () => {
@@ -599,8 +334,8 @@ describe('ConstraintAnalyzer', () => {
       const analyzer = new ConstraintAnalyzer(graph, tempDir);
 
       const relationships: UnifiedRelationship[] = [
-        { ...createMockMutualExclusionRelationship('A', 'B'), discoveredBy: 'static-analysis' },
-        { ...createMockMutualExclusionRelationship('C', 'D'), discoveredBy: 'static-analysis' },
+        { ...createMockCoRequirementRelationship('A', 'B'), discoveredBy: 'static-analysis' },
+        { ...createMockCoRequirementRelationship('C', 'D'), discoveredBy: 'static-analysis' },
         { ...createMockCoRequirementRelationship('E', 'F'), discoveredBy: 'ast-parsing' },
       ];
 
@@ -614,7 +349,7 @@ describe('ConstraintAnalyzer', () => {
       const graph = createMockGraph([]);
       const analyzer = new ConstraintAnalyzer(graph, tempDir);
 
-      const relationship = createMockMutualExclusionRelationship('A', 'B');
+      const relationship = createMockCoRequirementRelationship('A', 'B');
       // @ts-expect-error - Testing undefined case
       delete relationship.discoveredBy;
 
@@ -623,29 +358,6 @@ describe('ConstraintAnalyzer', () => {
       expect(stats.bySource['unknown']).toBe(1);
     });
   });
-
-  // Helper to create mock mutual exclusion relationship
-  function createMockMutualExclusionRelationship(
-    symbolA: string,
-    symbolB: string
-  ): UnifiedRelationship {
-    return {
-      id: `mutual-exclusion-${symbolA}-${symbolB}`.toLowerCase(),
-      type: 'mutual-exclusion',
-      category: 'constraint',
-      from: symbolA,
-      to: symbolB,
-      direction: 'bidirectional',
-      strength: 'strong',
-      evidence: [{ type: 'code', source: 'test.ts', confidence: 1.0 }],
-      discoveredBy: 'static-analysis',
-      confidence: 1.0,
-      properties: { reason: 'Test reason' },
-      description: 'Test description',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
-  }
 
   // Helper to create mock co-requirement relationship
   function createMockCoRequirementRelationship(

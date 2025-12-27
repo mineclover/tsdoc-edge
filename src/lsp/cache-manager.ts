@@ -90,6 +90,7 @@ export class CacheManager {
    * Create a new named cache
    *
    * @param name - Unique cache name
+   * @returns void - No return value
    */
   createCache<T>(name: string): void {
     if (!this.caches.has(name)) {
@@ -126,6 +127,7 @@ export class CacheManager {
    * @param cacheName - Name of the cache
    * @param key - Cache key
    * @param value - Value to cache
+   * @returns void - No return value
    */
   set<T>(cacheName: string, key: string, value: T): void {
     let cache = this.caches.get(cacheName);
@@ -161,6 +163,7 @@ export class CacheManager {
    *
    * @param cacheName - Name of the cache
    * @param key - Cache key
+   * @returns void - No return value
    */
   delete(cacheName: string, key: string): void {
     const cache = this.caches.get(cacheName);
@@ -174,6 +177,7 @@ export class CacheManager {
    *
    * @param cacheName - Name of the cache
    * @param predicate - Function that returns true for keys to delete
+   * @returns void - No return value
    */
   deleteMatching(cacheName: string, predicate: (key: string) => boolean): void {
     const cache = this.caches.get(cacheName);
@@ -190,6 +194,7 @@ export class CacheManager {
    * Clear a specific cache
    *
    * @param cacheName - Name of the cache to clear
+   * @returns void - No return value
    */
   clearCache(cacheName: string): void {
     const cache = this.caches.get(cacheName);
@@ -200,6 +205,7 @@ export class CacheManager {
 
   /**
    * Clear all caches
+   * @returns void - No return value
    */
   clearAll(): void {
     for (const cache of this.caches.values()) {
@@ -222,6 +228,7 @@ export class CacheManager {
 
   /**
    * Dispose the cache manager and release all resources
+   * @returns void - No return value
    */
   dispose(): void {
     if (this.disposed) return;

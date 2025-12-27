@@ -3,17 +3,15 @@
  *
  * @doc [[ConstraintAnalyzer]]
  * @packageDocumentation
- * @responsibility Detect co-requirement and mutual-exclusion relationships
+ * @responsibility Detect co-requirement relationships
  *
  * @problem Features may have implicit constraints that aren't documented
  * @solves Static analysis of configuration, imports, and usage patterns
  * @context Essential for preventing invalid configurations and feature combinations
  *
  * @functionality
- * - Detect mutual-exclusion in configurations (tsconfig, package.json)
  * - Detect co-requirements through complementary imports
  * - Detect paired features that always appear together
- * - Identify conflicting compiler options
  */
 
 import * as fs from 'node:fs';
@@ -22,17 +20,6 @@ import * as ts from 'typescript';
 import type { SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships';
 import { CoRequirementAnalyzer } from './CoRequirementAnalyzer';
-
-/**
- * Mutual exclusion constraint
- */
-interface MutualExclusion {
-  symbolA: string;
-  symbolB: string;
-  reason: string;
-  source: string;
-  confidence: number;
-}
 
 /**
  * Co-requirement constraint
@@ -66,6 +53,7 @@ export class ConstraintAnalyzer {
    * Set TypeScript program for AST analysis
    *
    * @param program - TypeScript program
+   * @returns void - No return value
    * @public
    */
   setProgram(program: ts.Program): void {
@@ -81,10 +69,6 @@ export class ConstraintAnalyzer {
   analyze(): UnifiedRelationship[] {
     const relationships: UnifiedRelationship[] = [];
 
-    // Detect mutual-exclusion from configurations
-    const mutualExclusions = this.detectMutualExclusion();
-    relationships.push(...this.createMutualExclusionRelationships(mutualExclusions));
-
     // Detect co-requirements from @requires tags (primary method)
     const coReqAnalyzer = new CoRequirementAnalyzer(this.graph);
     const coReqFromTags = coReqAnalyzer.analyze(this.projectRoot);
@@ -97,123 +81,6 @@ export class ConstraintAnalyzer {
     }
 
     return relationships;
-  }
-
-  /**
-   * Detect mutual-exclusion constraints from configuration files
-   *
-   * @returns Array of mutual exclusion constraints
-   * @private
-   */
-  private detectMutualExclusion(): MutualExclusion[] {
-    const exclusions: MutualExclusion[] = [];
-
-    // Check tsconfig.json for mutually exclusive options
-    const tsconfigPath = path.join(this.projectRoot, 'tsconfig.json');
-    if (fs.existsSync(tsconfigPath)) {
-      try {
-        const content = fs.readFileSync(tsconfigPath, 'utf-8');
-        const tsconfig = JSON.parse(content);
-        const compilerOptions = tsconfig.compilerOptions || {};
-
-        // Module system mutual exclusions
-        if (compilerOptions.module) {
-          const module = compilerOptions.module;
-          const moduleSymbol = `config:module:${module}`;
-
-          // CommonJS vs ES6 module exclusion
-          if (module === 'commonjs') {
-            exclusions.push({
-              symbolA: moduleSymbol,
-              symbolB: 'config:module:es6',
-              reason: 'CommonJS and ES6 modules are mutually exclusive',
-              source: tsconfigPath,
-              confidence: 1.0,
-            });
-          } else if (module === 'es6' || module === 'esnext') {
-            exclusions.push({
-              symbolA: moduleSymbol,
-              symbolB: 'config:module:commonjs',
-              reason: 'ES6 and CommonJS modules are mutually exclusive',
-              source: tsconfigPath,
-              confidence: 1.0,
-            });
-          }
-        }
-
-        // Target version exclusions
-        if (compilerOptions.target) {
-          const target = compilerOptions.target.toLowerCase();
-          const targetSymbol = `config:target:${target}`;
-
-          // ES5 vs modern features
-          if (target === 'es5') {
-            exclusions.push({
-              symbolA: targetSymbol,
-              symbolB: 'feature:async-await',
-              reason: 'ES5 target requires downleveling async/await',
-              source: tsconfigPath,
-              confidence: 0.9,
-            });
-          }
-        }
-
-        // moduleResolution exclusions
-        if (compilerOptions.moduleResolution) {
-          const resolution = compilerOptions.moduleResolution.toLowerCase();
-          if (resolution === 'node') {
-            exclusions.push({
-              symbolA: 'config:moduleResolution:node',
-              symbolB: 'config:moduleResolution:classic',
-              reason: 'Node and Classic module resolution are mutually exclusive',
-              source: tsconfigPath,
-              confidence: 1.0,
-            });
-          }
-        }
-      } catch (error) {
-        // Skip if JSON parse fails
-      }
-    }
-
-    // Check package.json for script conflicts
-    const packagePath = path.join(this.projectRoot, 'package.json');
-    if (fs.existsSync(packagePath)) {
-      try {
-        const content = fs.readFileSync(packagePath, 'utf-8');
-        const pkg = JSON.parse(content);
-
-        // Check for conflicting test frameworks
-        const deps = { ...pkg.dependencies, ...pkg.devDependencies };
-        const hasJest = deps.jest || deps['@types/jest'];
-        const hasMocha = deps.mocha || deps['@types/mocha'];
-        const hasJasmine = deps.jasmine || deps['@types/jasmine'];
-
-        if (hasJest && hasMocha) {
-          exclusions.push({
-            symbolA: 'test-framework:jest',
-            symbolB: 'test-framework:mocha',
-            reason: 'Jest and Mocha test frameworks conflict',
-            source: packagePath,
-            confidence: 0.8,
-          });
-        }
-
-        if (hasJest && hasJasmine) {
-          exclusions.push({
-            symbolA: 'test-framework:jest',
-            symbolB: 'test-framework:jasmine',
-            reason: 'Jest and Jasmine test frameworks conflict',
-            source: packagePath,
-            confidence: 0.8,
-          });
-        }
-      } catch (error) {
-        // Skip if JSON parse fails
-      }
-    }
-
-    return exclusions;
   }
 
   /**
@@ -402,44 +269,6 @@ export class ConstraintAnalyzer {
   }
 
   /**
-   * Create relationships from mutual exclusion constraints
-   *
-   * @param exclusions - Mutual exclusion constraints
-   * @returns Array of relationships
-   * @private
-   */
-  private createMutualExclusionRelationships(exclusions: MutualExclusion[]): UnifiedRelationship[] {
-    return exclusions.map((exclusion) => ({
-      id: `mutual-exclusion-${exclusion.symbolA}-${exclusion.symbolB}`
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/^-|-$/g, ''),
-      type: 'mutual-exclusion',
-      category: 'constraint',
-      from: exclusion.symbolA,
-      to: exclusion.symbolB,
-      direction: 'bidirectional',
-      strength: 'strong',
-      evidence: [
-        {
-          type: 'code',
-          source: exclusion.source,
-          lineNumber: 0,
-          confidence: exclusion.confidence,
-        },
-      ],
-      discoveredBy: 'static-analysis',
-      confidence: exclusion.confidence,
-      properties: {
-        reason: exclusion.reason,
-      },
-      description: exclusion.reason,
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    }));
-  }
-
-  /**
    * Create relationships from co-requirement constraints
    *
    * @param coRequirements - Co-requirement constraints
@@ -485,21 +314,17 @@ export class ConstraintAnalyzer {
    */
   getStatistics(relationships: UnifiedRelationship[]): {
     totalConstraints: number;
-    mutualExclusions: number;
     coRequirements: number;
     bySource: Record<string, number>;
   } {
     const stats = {
       totalConstraints: relationships.length,
-      mutualExclusions: 0,
       coRequirements: 0,
       bySource: {} as Record<string, number>,
     };
 
     for (const rel of relationships) {
-      if (rel.type === 'mutual-exclusion') {
-        stats.mutualExclusions++;
-      } else if (rel.type === 'co-requirement') {
+      if (rel.type === 'co-requirement') {
         stats.coRequirements++;
       }
 
