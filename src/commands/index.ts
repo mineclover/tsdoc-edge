@@ -51,3 +51,4 @@ export { AnalyzeRelationshipsCommand } from './AnalyzeRelationshipsCommand';
 export { MoveCommand } from './MoveCommand';
 export { RebuildIndexCommand } from './RebuildIndexCommand';
 export { QueryInferredCommand } from './QueryInferredCommand';
+export { LintCommand } from './LintCommand';

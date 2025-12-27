@@ -74,6 +74,7 @@ import { DetectDeadCodeCommand } from './commands/DetectDeadCodeCommand';
 import { MoveCommand } from './commands/MoveCommand';
 import { TaskListCommand, TaskAddCommand, TaskUpdateCommand, TaskStatsCommand } from './commands/TaskCommands';
 import { TestExamplesCommand } from './commands/TestExamplesCommand';
+import { LintCommand } from './commands/LintCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -166,6 +167,7 @@ async function main(): Promise<void> {
   registry.register(new TaskAddCommand());
   registry.register(new TaskUpdateCommand());
   registry.register(new TaskStatsCommand());
+  registry.register(new LintCommand());
   registry.register(new HelpCommand(registry));
 
   // Get command
