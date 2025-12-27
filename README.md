@@ -154,7 +154,7 @@ npm test           # Run tests
 | Symbols | 6,300+ |
 | Relationships | 45,000+ |
 | CLI Commands | 67 |
-| Test Suites | 129 |
+| Test Suites | 140 |
 
 ---
 
