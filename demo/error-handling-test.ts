@@ -10,7 +10,6 @@ import { CoverageParser } from '../src/analyzer/CoverageParser';
 import { ConfigManager } from '../src/config/ConfigManager';
 import { TSDocParser } from '../src/parser/TSDocParser';
 import { DatabaseManager } from '../src/storage/DatabaseManager';
-import { FileScanner } from '../src/scanner/FileScanner';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
