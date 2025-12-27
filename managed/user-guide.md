@@ -14,7 +14,7 @@ updated: 2025-12-27
 
 **Current Statistics** (2025-12-27):
 - Symbols: 5,587 | Relationships: 49,448 | Types: 13/30 (43%) | Categories: 10
-- Commands: 74 | Documents: 213 | Graph Density: 8.85
+- Commands: 65 | Documents: 213 | Graph Density: 8.85
 
 ---
 
