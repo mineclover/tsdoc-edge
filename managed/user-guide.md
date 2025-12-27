@@ -86,9 +86,9 @@ TSDoc Edge tracks **13 relationship types** across **10 categories**:
 
 **Commands**:
 ```bash
-tsdoc-edge relationship stats     # View statistics
-tsdoc-edge deps <symbol>          # Forward dependencies
-tsdoc-edge who-uses <symbol>      # Reverse dependencies
+tsdoc-edge relationship stats           # View statistics
+tsdoc-edge relationship query <symbol>  # All relationships
+tsdoc-edge who-uses <symbol>            # Reverse dependencies
 ```
 
 **Details**: [[Relationship Types]] | [[Relationship Analysis Guide]]
@@ -107,10 +107,9 @@ tsdoc-edge ontology-stats        # Graph statistics
 
 ### Queries
 ```bash
-tsdoc-edge search <query>        # Full-text search
-tsdoc-edge deps <symbol>         # Dependencies
-tsdoc-edge who-uses <symbol>     # Who uses this
-tsdoc-edge orphans               # Find orphaned code
+tsdoc-edge relationship query <symbol>  # Forward/reverse dependencies
+tsdoc-edge who-uses <symbol>            # Who uses this
+tsdoc-edge orphans                      # Find orphaned code
 ```
 
 ### Documentation
@@ -156,9 +155,9 @@ tsdoc-edge wc src/path/to/file.ts
 
 ### Refactoring Safely
 ```bash
-tsdoc-edge deps <symbol>           # What this uses
-tsdoc-edge who-uses <symbol>       # What uses this
-tsdoc-edge relationship impact <id>  # Full impact analysis
+tsdoc-edge relationship query <symbol>  # What this uses/is used by
+tsdoc-edge who-uses <symbol>            # What uses this
+tsdoc-edge relationship impact <id>     # Full impact analysis
 ```
 
 ### Understanding Architecture
