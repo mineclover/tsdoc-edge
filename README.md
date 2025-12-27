@@ -151,8 +151,8 @@ npm test           # Run tests
 
 | Metric | Value |
 |--------|-------|
-| Symbols | 7,200+ |
-| Relationships | 73,000+ |
+| Symbols | 6,300+ |
+| Relationships | 51,000+ |
 | CLI Commands | 67 |
 | Test Suites | 127 |
 
