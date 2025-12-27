@@ -7,6 +7,7 @@
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
+import Database from 'better-sqlite3';
 import { TsdocEdgeService } from '../lsp/service';
 
 describe('TsdocEdgeService', () => {
@@ -38,7 +39,6 @@ describe('TsdocEdgeService', () => {
 
     it('should initialize with database', () => {
       // Create a minimal SQLite database
-      const Database = require('better-sqlite3');
       const db = new Database(dbPath);
       db.exec(`
         CREATE TABLE IF NOT EXISTS symbols (
@@ -85,7 +85,6 @@ describe('TsdocEdgeService', () => {
     let db: any;
 
     beforeEach(() => {
-      const Database = require('better-sqlite3');
       db = new Database(dbPath);
       db.exec(`
         CREATE TABLE IF NOT EXISTS symbols (
@@ -277,7 +276,6 @@ describe('TsdocEdgeService', () => {
 
   describe('incremental mode', () => {
     beforeEach(() => {
-      const Database = require('better-sqlite3');
       const db = new Database(dbPath);
       db.exec(`
         CREATE TABLE IF NOT EXISTS symbols (

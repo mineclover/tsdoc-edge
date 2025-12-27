@@ -13,6 +13,7 @@
 
 import * as path from 'node:path';
 import * as fs from 'node:fs';
+import Database from 'better-sqlite3';
 import { SymbolKind, DiagnosticSeverity } from 'vscode-languageserver/node';
 import type { SqliteDatabase, SymbolRow, CountRow, RelTypeCountRow, UnifiedRelRow, HighImpactRow } from '../types/database';
 import { CacheManager } from './cache-manager';
@@ -161,8 +162,6 @@ export class TsdocEdgeService {
     }
 
     try {
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const Database = require('better-sqlite3');
       this.db = new Database(this.dbPath); // Open in write mode
 
       // Reinitialize statement manager
@@ -288,9 +287,6 @@ export class TsdocEdgeService {
     }
 
     try {
-      // Dynamic import of better-sqlite3
-      // eslint-disable-next-line @typescript-eslint/no-var-requires
-      const Database = require('better-sqlite3');
       this.db = new Database(this.dbPath, { readonly: true });
 
       // Initialize statement manager with database
