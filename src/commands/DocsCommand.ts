@@ -1,43 +1,42 @@
 /**
- * Unified Symbol Command
- * Routes to appropriate symbol subcommand
+ * Unified Docs Command
+ * Routes to appropriate docs subcommand
  * @packageDocumentation
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { SymbolQueryCommand } from './SymbolQueryCommand';
-import { SymbolFixCommand } from './SymbolFixCommand';
-import { SymbolRenameCommand } from './SymbolRenameCommand';
-import { DepsCommand } from './DepsCommand';
-import { WhoUsesCommand } from './WhoUsesCommand';
-import { OrphansCommand } from './OrphansCommand';
-import { FindMethodCommand } from './FindMethodCommand';
+import { IndexDocsCommand } from './IndexDocsCommand';
+import { UpdateBacklinksCommand } from './UpdateBacklinksCommand';
+import { CheckLinksCommand } from './CheckLinksCommand';
+import { UpdateSymbolRefsCommand } from './UpdateSymbolRefsCommand';
+import { GenerateDocsCommand } from './GenerateDocsCommand';
+import { ValidateDocsCommand } from './ValidateDocsCommand';
+import { FindUnusedDocsCommand } from './FindUnusedDocsCommand';
 
 const SUBCOMMANDS = {
-  query: { command: SymbolQueryCommand, description: 'Query symbol information' },
-  fix: { command: SymbolFixCommand, description: 'Fix symbol issues' },
-  rename: { command: SymbolRenameCommand, description: 'Rename symbols across codebase' },
-  deps: { command: DepsCommand, description: 'Show symbol dependencies' },
-  'who-uses': { command: WhoUsesCommand, description: 'Show who uses a symbol' },
-  orphans: { command: OrphansCommand, description: 'Find orphaned symbols' },
-  'find-method': { command: FindMethodCommand, description: 'Find methods by name' },
+  index: { command: IndexDocsCommand, description: 'Index document symbols from markdown' },
+  backlinks: { command: UpdateBacklinksCommand, description: 'Update backlinks in documents' },
+  'check-links': { command: CheckLinksCommand, description: 'Check for broken links' },
+  'update-refs': { command: UpdateSymbolRefsCommand, description: 'Update code symbol references' },
+  generate: { command: GenerateDocsCommand, description: 'Generate markdown documentation' },
+  validate: { command: ValidateDocsCommand, description: 'Validate documentation' },
+  'find-unused': { command: FindUnusedDocsCommand, description: 'Find unused documents' },
 } as const;
 
-/** Available symbol subcommand names */
 type SubcommandName = keyof typeof SUBCOMMANDS;
 
 /**
- * Unified command for all symbol operations
+ * Unified command for all docs operations
  * @public
  */
-export class SymbolUnifiedCommand extends BaseCommand {
+export class DocsCommand extends BaseCommand {
   /**
    * getName method
    * @returns Returns string
    * @public
    */
   getName(): string {
-    return 'symbol';
+    return 'docs';
   }
 
   /**
@@ -46,7 +45,7 @@ export class SymbolUnifiedCommand extends BaseCommand {
    * @public
    */
   getAlias(): string[] {
-    return ['sym'];
+    return ['d'];
   }
 
   /**
@@ -55,7 +54,7 @@ export class SymbolUnifiedCommand extends BaseCommand {
    * @public
    */
   getDescription(): string {
-    return 'Unified symbol operations (query|deps|who-uses|orphans|...)';
+    return 'Unified docs operations (index|backlinks|check-links|generate|...)';
   }
 
   /**
@@ -65,22 +64,22 @@ export class SymbolUnifiedCommand extends BaseCommand {
    */
   protected getUsage(): string {
     const subcommandList = Object.entries(SUBCOMMANDS)
-      .map(([name, { description }]) => `  ${name.padEnd(12)} ${description}`)
+      .map(([name, { description }]) => `  ${name.padEnd(14)} ${description}`)
       .join('\n');
 
-    return `tsdoc-edge symbol <subcommand> [options]
+    return `tsdoc-edge docs <subcommand> [options]
 
 Subcommands:
 ${subcommandList}
 
 Examples:
-  tsdoc-edge symbol query <symbol-id>
-  tsdoc-edge symbol deps <symbol-name>
-  tsdoc-edge symbol who-uses <symbol-name>
-  tsdoc-edge symbol orphans --exclude-tests
-  tsdoc-edge symbol find-method DatabaseManager.insert
+  tsdoc-edge docs index managed
+  tsdoc-edge docs backlinks managed
+  tsdoc-edge docs check-links managed
+  tsdoc-edge docs generate src
+  tsdoc-edge docs validate managed
 
-Use 'tsdoc-edge symbol <subcommand> --help' for subcommand details.`;
+Use 'tsdoc-edge docs <subcommand> --help' for subcommand details.`;
   }
 
   /**
@@ -104,7 +103,7 @@ Use 'tsdoc-edge symbol <subcommand> --help' for subcommand details.`;
         console.log();
         console.log('Available subcommands:');
         for (const [name, { description }] of Object.entries(SUBCOMMANDS)) {
-          console.log(`  ${this.colors.cyan}${name.padEnd(10)}${this.colors.reset} ${description}`);
+          console.log(`  ${this.colors.cyan}${name.padEnd(14)}${this.colors.reset} ${description}`);
         }
         console.log();
         return this.failure(`Unknown subcommand: ${subcommandName}`);

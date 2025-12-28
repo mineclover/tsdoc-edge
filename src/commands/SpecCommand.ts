@@ -1,52 +1,38 @@
 /**
- * Unified Symbol Command
- * Routes to appropriate symbol subcommand
+ * Unified Spec Command
+ * Routes to appropriate spec subcommand
  * @packageDocumentation
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { SymbolQueryCommand } from './SymbolQueryCommand';
-import { SymbolFixCommand } from './SymbolFixCommand';
-import { SymbolRenameCommand } from './SymbolRenameCommand';
-import { DepsCommand } from './DepsCommand';
-import { WhoUsesCommand } from './WhoUsesCommand';
-import { OrphansCommand } from './OrphansCommand';
-import { FindMethodCommand } from './FindMethodCommand';
+import { SpecStatusCommand } from './SpecStatusCommand';
+import { SpecHistoryCommand } from './SpecHistoryCommand';
+import { SpecDiffCommand } from './SpecDiffCommand';
+import { SpecBumpCommand } from './SpecBumpCommand';
+import { ValidateSpecCommand } from './ValidateSpecCommand';
 
 const SUBCOMMANDS = {
-  query: { command: SymbolQueryCommand, description: 'Query symbol information' },
-  fix: { command: SymbolFixCommand, description: 'Fix symbol issues' },
-  rename: { command: SymbolRenameCommand, description: 'Rename symbols across codebase' },
-  deps: { command: DepsCommand, description: 'Show symbol dependencies' },
-  'who-uses': { command: WhoUsesCommand, description: 'Show who uses a symbol' },
-  orphans: { command: OrphansCommand, description: 'Find orphaned symbols' },
-  'find-method': { command: FindMethodCommand, description: 'Find methods by name' },
+  status: { command: SpecStatusCommand, description: 'Manage specification status' },
+  history: { command: SpecHistoryCommand, description: 'Show specification version history' },
+  diff: { command: SpecDiffCommand, description: 'Compare specification versions' },
+  bump: { command: SpecBumpCommand, description: 'Bump specification version' },
+  validate: { command: ValidateSpecCommand, description: 'Validate specifications' },
 } as const;
 
-/** Available symbol subcommand names */
 type SubcommandName = keyof typeof SUBCOMMANDS;
 
 /**
- * Unified command for all symbol operations
+ * Unified command for all spec operations
  * @public
  */
-export class SymbolUnifiedCommand extends BaseCommand {
+export class SpecCommand extends BaseCommand {
   /**
    * getName method
    * @returns Returns string
    * @public
    */
   getName(): string {
-    return 'symbol';
-  }
-
-  /**
-   * getAlias method
-   * @returns Returns string[]
-   * @public
-   */
-  getAlias(): string[] {
-    return ['sym'];
+    return 'spec';
   }
 
   /**
@@ -55,7 +41,7 @@ export class SymbolUnifiedCommand extends BaseCommand {
    * @public
    */
   getDescription(): string {
-    return 'Unified symbol operations (query|deps|who-uses|orphans|...)';
+    return 'Unified spec operations (status|history|diff|bump|validate)';
   }
 
   /**
@@ -65,22 +51,22 @@ export class SymbolUnifiedCommand extends BaseCommand {
    */
   protected getUsage(): string {
     const subcommandList = Object.entries(SUBCOMMANDS)
-      .map(([name, { description }]) => `  ${name.padEnd(12)} ${description}`)
+      .map(([name, { description }]) => `  ${name.padEnd(10)} ${description}`)
       .join('\n');
 
-    return `tsdoc-edge symbol <subcommand> [options]
+    return `tsdoc-edge spec <subcommand> [options]
 
 Subcommands:
 ${subcommandList}
 
 Examples:
-  tsdoc-edge symbol query <symbol-id>
-  tsdoc-edge symbol deps <symbol-name>
-  tsdoc-edge symbol who-uses <symbol-name>
-  tsdoc-edge symbol orphans --exclude-tests
-  tsdoc-edge symbol find-method DatabaseManager.insert
+  tsdoc-edge spec status managed
+  tsdoc-edge spec history <spec-file>
+  tsdoc-edge spec diff <version1> <version2>
+  tsdoc-edge spec bump <spec-file> --minor
+  tsdoc-edge spec validate managed
 
-Use 'tsdoc-edge symbol <subcommand> --help' for subcommand details.`;
+Use 'tsdoc-edge spec <subcommand> --help' for subcommand details.`;
   }
 
   /**

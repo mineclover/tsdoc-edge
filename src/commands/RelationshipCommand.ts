@@ -16,6 +16,8 @@ import { RelationshipStatsCommand } from './RelationshipStatsCommand';
 import { RelationshipCheckCommand } from './RelationshipCheckCommand';
 import { RelationshipVisualizeCommand } from './RelationshipVisualizeCommand';
 import { RelationshipHelpCommand } from './RelationshipHelpCommand';
+import { AnalyzeRelationshipsCommand } from './AnalyzeRelationshipsCommand';
+import { TypeChainCommand, DetectCircularTypesCommand, FindRootTypesCommand } from './TypeChainCommand';
 
 const SUBCOMMANDS = {
   query: { command: RelationshipQueryCommand, description: 'Query relationships for a symbol' },
@@ -28,6 +30,10 @@ const SUBCOMMANDS = {
   stats: { command: RelationshipStatsCommand, description: 'Show statistics' },
   check: { command: RelationshipCheckCommand, description: 'Check relationships' },
   visualize: { command: RelationshipVisualizeCommand, description: 'Visualize relationships' },
+  analyze: { command: AnalyzeRelationshipsCommand, description: 'Run relationship analyzers' },
+  'type-chain': { command: TypeChainCommand, description: 'Show type dependency chain' },
+  cycles: { command: DetectCircularTypesCommand, description: 'Detect circular dependencies' },
+  roots: { command: FindRootTypesCommand, description: 'Find root types (no incoming deps)' },
   help: { command: RelationshipHelpCommand, description: 'Interactive guide' },
 } as const;
 
@@ -39,14 +45,38 @@ type SubcommandName = keyof typeof SUBCOMMANDS;
  * @public
  */
 export class RelationshipCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'relationship';
   }
 
+  /**
+   * getAlias method
+   * @returns Returns string[]
+   * @public
+   */
+  getAlias(): string[] {
+    return ['rel', 'r'];
+  }
+
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Unified relationship analysis (query|impact|path|clusters|...)';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     const subcommandList = Object.entries(SUBCOMMANDS)
       .map(([name, { description }]) => `  ${name.padEnd(12)} ${description}`)
@@ -62,17 +92,24 @@ Examples:
   tsdoc-edge relationship impact <symbol-id> --depth 5
   tsdoc-edge relationship path <from> <to>
   tsdoc-edge relationship clusters --min-size 5
-  tsdoc-edge relationship metrics --top 10
-  tsdoc-edge relationship export --format graphml
-  tsdoc-edge relationship stats --detailed
+  tsdoc-edge relationship analyze --type=calls
+  tsdoc-edge relationship type-chain TypeA TypeB
+  tsdoc-edge relationship cycles
+  tsdoc-edge relationship roots
 
 Use 'tsdoc-edge relationship <subcommand> --help' for subcommand details.`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
-      // No args or help flag
-      if (args.length === 0 || this.hasHelpFlag(args)) {
+      // Only show unified help if no args or first arg is help flag
+      if (args.length === 0 || args[0] === '--help' || args[0] === '-h') {
         return this.displayHelp();
       }
 

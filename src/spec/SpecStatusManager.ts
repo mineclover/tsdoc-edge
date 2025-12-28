@@ -210,7 +210,14 @@ export class SpecStatusManager {
       return 'draft';
     }
 
-    return statusMatch[1] as SpecStatus;
+    const validStatuses: SpecStatus[] = ['draft', 'review', 'approved', 'active', 'deprecated', 'archived'];
+    const status = statusMatch[1];
+
+    if (!validStatuses.includes(status as SpecStatus)) {
+      return 'draft'; // Default for invalid status values
+    }
+
+    return status as SpecStatus;
   }
 
   /**

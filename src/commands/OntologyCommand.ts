@@ -1,48 +1,32 @@
 /**
- * Unified Validate Command
- * Routes to appropriate validation subcommand
+ * Unified Ontology Command
+ * Routes to appropriate ontology subcommand
  * @packageDocumentation
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { ValidateCommand } from './ValidateCommand';
-import { ValidateDocsCommand } from './ValidateDocsCommand';
-import { ValidateGeneratedDocsCommand } from './ValidateGeneratedDocsCommand';
-import { ValidateSpecCommand } from './ValidateSpecCommand';
-import { ValidateSymbolRefsCommand } from './ValidateSymbolRefsCommand';
+import { OntologyStatsCommand } from './OntologyStatsCommand';
+import { OntologyListCommand } from './OntologyListCommand';
 
 const SUBCOMMANDS = {
-  connectivity: { command: ValidateCommand, description: 'Validate symbol connectivity' },
-  docs: { command: ValidateDocsCommand, description: 'Validate documentation files' },
-  generated: { command: ValidateGeneratedDocsCommand, description: 'Validate generated docs' },
-  spec: { command: ValidateSpecCommand, description: 'Validate specification files' },
-  refs: { command: ValidateSymbolRefsCommand, description: 'Validate symbol references' },
+  stats: { command: OntologyStatsCommand, description: 'Show ontology statistics' },
+  list: { command: OntologyListCommand, description: 'List ontology elements' },
 } as const;
 
-/** Available validation subcommand names */
 type SubcommandName = keyof typeof SUBCOMMANDS;
 
 /**
- * Unified command for all validation operations
+ * Unified command for all ontology operations
  * @public
  */
-export class ValidateUnifiedCommand extends BaseCommand {
+export class OntologyCommand extends BaseCommand {
   /**
    * getName method
    * @returns Returns string
    * @public
    */
   getName(): string {
-    return 'val';
-  }
-
-  /**
-   * getAlias method
-   * @returns Returns string[]
-   * @public
-   */
-  getAlias(): string[] {
-    return ['v', 'validate'];
+    return 'ontology';
   }
 
   /**
@@ -51,7 +35,7 @@ export class ValidateUnifiedCommand extends BaseCommand {
    * @public
    */
   getDescription(): string {
-    return 'Unified validation (connectivity|docs|generated|spec|refs)';
+    return 'Unified ontology operations (stats|list)';
   }
 
   /**
@@ -61,22 +45,21 @@ export class ValidateUnifiedCommand extends BaseCommand {
    */
   protected getUsage(): string {
     const subcommandList = Object.entries(SUBCOMMANDS)
-      .map(([name, { description }]) => `  ${name.padEnd(14)} ${description}`)
+      .map(([name, { description }]) => `  ${name.padEnd(8)} ${description}`)
       .join('\n');
 
-    return `tsdoc-edge val <subcommand> [options]
+    return `tsdoc-edge ontology <subcommand> [options]
 
 Subcommands:
 ${subcommandList}
 
 Examples:
-  tsdoc-edge val connectivity
-  tsdoc-edge val docs
-  tsdoc-edge val generated
-  tsdoc-edge val spec <spec-file>
-  tsdoc-edge val refs
+  tsdoc-edge ontology stats
+  tsdoc-edge ontology list --nodes class
+  tsdoc-edge ontology list --rels test-coverage
+  tsdoc-edge ontology list --category structural
 
-Use 'tsdoc-edge val <subcommand> --help' for subcommand details.`;
+Use 'tsdoc-edge ontology <subcommand> --help' for subcommand details.`;
   }
 
   /**
@@ -100,7 +83,7 @@ Use 'tsdoc-edge val <subcommand> --help' for subcommand details.`;
         console.log();
         console.log('Available subcommands:');
         for (const [name, { description }] of Object.entries(SUBCOMMANDS)) {
-          console.log(`  ${this.colors.cyan}${name.padEnd(14)}${this.colors.reset} ${description}`);
+          console.log(`  ${this.colors.cyan}${name.padEnd(8)}${this.colors.reset} ${description}`);
         }
         console.log();
         return this.failure(`Unknown subcommand: ${subcommandName}`);
