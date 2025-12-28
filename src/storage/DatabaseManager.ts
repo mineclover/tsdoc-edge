@@ -389,7 +389,7 @@ export class DatabaseManager {
    */
   getDependencies(symbolId: string): string[] {
     const results = this.drizzleDb
-      .select({ target: schema.dependencies.target })
+      .selectDistinct({ target: schema.dependencies.target })
       .from(schema.dependencies)
       .where(eq(schema.dependencies.symbolId, symbolId))
       .all();
@@ -403,7 +403,7 @@ export class DatabaseManager {
    */
   getDependents(symbolId: string): string[] {
     const results = this.drizzleDb
-      .select({ symbolId: schema.dependencies.symbolId })
+      .selectDistinct({ symbolId: schema.dependencies.symbolId })
       .from(schema.dependencies)
       .where(eq(schema.dependencies.target, symbolId))
       .all();
