@@ -525,9 +525,13 @@ export class DocumentationAnalyzer {
 
     // For undocumented symbols, give partial credit to simple types
     if (!metrics.hasDoc) {
-      // Simple types without docs get 40 points (they're often self-documenting)
-      if (isSimpleType) {
-        return 40;
+      // Type aliases and interfaces without docs get 70 points (self-documenting)
+      if (symbolType === 'type' || symbolType === 'interface') {
+        return 70;
+      }
+      // Enums and properties get 50 points
+      if (symbolType === 'enum' || symbolType === 'property') {
+        return 50;
       }
       return 0;
     }
