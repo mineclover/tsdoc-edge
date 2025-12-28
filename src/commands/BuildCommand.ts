@@ -808,20 +808,16 @@ export class BuildCommand extends BaseCommand {
   private isFileChanged(dbManager: DatabaseManager, filePath: string): boolean {
     try {
       const currentHash = this.calculateFileHash(filePath);
+      const storedHash = dbManager.getSyncMetadataHash(filePath);
 
-      // Query sync_metadata table
-      const row = dbManager.db.prepare(
-        'SELECT hash FROM sync_metadata WHERE file_path = ?'
-      ).get(filePath) as { hash: string } | undefined;
-
-      if (!row) {
+      if (!storedHash) {
         // File not in metadata - needs processing
         return true;
       }
 
       // Compare hashes
-      return row.hash !== currentHash;
-    } catch (error) {
+      return storedHash !== currentHash;
+    } catch {
       // If error, assume file changed
       return true;
     }
@@ -833,18 +829,8 @@ export class BuildCommand extends BaseCommand {
   private updateSyncMetadata(dbManager: DatabaseManager, filePath: string): void {
     try {
       const hash = this.calculateFileHash(filePath);
-      const now = new Date().toISOString();
-
-      // Upsert into sync_metadata
-      dbManager.db.prepare(`
-        INSERT INTO sync_metadata (file_path, last_sync, total_records, hash, status)
-        VALUES (?, ?, ?, ?, ?)
-        ON CONFLICT(file_path) DO UPDATE SET
-          last_sync = excluded.last_sync,
-          hash = excluded.hash,
-          status = excluded.status
-      `).run(filePath, now, 1, hash, 'synced');
-    } catch (error) {
+      dbManager.upsertSyncMetadata(filePath, hash, 'synced');
+    } catch {
       // Silently ignore metadata update errors (non-critical)
     }
   }

@@ -119,9 +119,9 @@ export class RebuildIndexCommand extends BaseCommand {
         }
         console.log();
 
-        // Test search
+        // Test search using Drizzle
         this.printSection('🧪 Testing Search Functionality');
-        const testSymbols = dbManager.db.prepare('SELECT name FROM symbols LIMIT 1').all() as Array<{ name: string }>;
+        const testSymbols = dbManager.querySymbols({ limit: 1 });
 
         if (testSymbols.length > 0) {
           const testName = testSymbols[0].name;

@@ -11,27 +11,43 @@ describe('StatsCommand', () => {
   let command: StatsCommand;
   let consoleSpy: jest.SpyInstance;
 
-  // Mock DatabaseManager
-  const createMockDb = (stats: any = {}, docCount = 0) => ({
-    getStatistics: jest.fn(() => ({
-      totalSymbols: stats.totalSymbols || 10,
-      totalEnhancedDocs: stats.totalEnhancedDocs || 5,
-      dbSize: stats.dbSize || 1024,
-    })),
-    db: {
-      prepare: jest.fn(() => ({
-        get: jest.fn(() => ({
-          total: stats.totalSymbols || 10,
-          documented: docCount,
-          test_total: stats.testTotal || 0,
-          test_documented: 0,
-          source_total: stats.totalSymbols || 10,
-          source_documented: docCount,
-        })),
+  // Mock DatabaseManager with Drizzle ORM methods
+  const createMockDb = (stats: any = {}, docCount = 0) => {
+    const totalSymbols = stats.totalSymbols || 10;
+    const testTotal = stats.testTotal || 0;
+
+    // Create mock symbol rows
+    const symbolRows: any[] = [];
+    for (let i = 0; i < totalSymbols; i++) {
+      const isTest = i < testTotal;
+      const isDocumented = i < docCount;
+      symbolRows.push({
+        id: `symbol-${i}`,
+        name: `symbol${i}`,
+        type: isTest ? 'test-case' : 'function',
+        file_path: `src/file${i}.ts`,
+        line: i + 1,
+        column: 0,
+        is_exported: 1,
+        is_public: 1,
+        summary: isDocumented ? `Documentation for symbol ${i}` : null,
+        declared_type: null,
+        inferred_type: null,
+        generic_params: null,
+        parameter_types: null,
+      });
+    }
+
+    return {
+      getStatistics: jest.fn(() => ({
+        totalSymbols: totalSymbols,
+        totalEnhancedDocs: stats.totalEnhancedDocs || 5,
+        dbSize: stats.dbSize || 1024,
       })),
-    },
-    close: jest.fn(),
-  });
+      getAllSymbolRows: jest.fn(() => symbolRows),
+      close: jest.fn(),
+    };
+  };
 
   beforeEach(() => {
     consoleSpy = jest.spyOn(console, 'log').mockImplementation();

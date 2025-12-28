@@ -9,7 +9,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { eq, like, or, sql } from 'drizzle-orm';
+import { eq, like, or, and, desc, asc, sql, ne, inArray, gte, lte } from 'drizzle-orm';
 import { ConfigManager } from '../config/ConfigManager';
 import type { Symbol } from '../types/graph';
 import type { EnhancedSymbolDoc } from '../types/tags';
@@ -882,5 +882,654 @@ export class DatabaseManager {
       symbols: this.getAllSymbolRows(),
       dependencies: this.getAllDependencyRows(),
     };
+  }
+
+  // ========== Sync Metadata Methods ==========
+
+  /**
+   * Get sync metadata hash for a file
+   */
+  getSyncMetadataHash(filePath: string): string | null {
+    const row = this.drizzleDb
+      .select({ hash: schema.syncMetadata.hash })
+      .from(schema.syncMetadata)
+      .where(eq(schema.syncMetadata.filePath, filePath))
+      .get();
+    return row?.hash ?? null;
+  }
+
+  /**
+   * Upsert sync metadata for a file
+   */
+  upsertSyncMetadata(filePath: string, hash: string, status: string = 'synced'): void {
+    const now = new Date().toISOString();
+    this.drizzleDb.insert(schema.syncMetadata)
+      .values({
+        filePath,
+        lastSync: now,
+        totalRecords: 1,
+        hash,
+        status,
+      })
+      .onConflictDoUpdate({
+        target: schema.syncMetadata.filePath,
+        set: {
+          lastSync: now,
+          hash,
+          status,
+        },
+      })
+      .run();
+  }
+
+  // ========== Symbol Query Methods ==========
+
+  /**
+   * Count symbols with optional filters
+   */
+  countSymbols(options?: { type?: string; filePath?: string; isPublic?: boolean }): number {
+    let query = this.drizzleDb.select({ count: sql<number>`count(*)` }).from(schema.symbols);
+
+    if (options?.type) {
+      query = query.where(eq(schema.symbols.type, options.type)) as typeof query;
+    }
+    if (options?.filePath) {
+      query = query.where(eq(schema.symbols.filePath, options.filePath)) as typeof query;
+    }
+    if (options?.isPublic !== undefined) {
+      query = query.where(eq(schema.symbols.isPublic, options.isPublic)) as typeof query;
+    }
+
+    return query.get()?.count ?? 0;
+  }
+
+  /**
+   * Count symbols grouped by type
+   */
+  countSymbolsByType(): Array<{ type: string; count: number }> {
+    return this.drizzleDb
+      .select({
+        type: schema.symbols.type,
+        count: sql<number>`count(*)`,
+      })
+      .from(schema.symbols)
+      .groupBy(schema.symbols.type)
+      .orderBy(desc(sql`count(*)`))
+      .all();
+  }
+
+  /**
+   * Get all symbol IDs
+   */
+  getAllSymbolIds(): string[] {
+    const rows = this.drizzleDb
+      .select({ id: schema.symbols.id })
+      .from(schema.symbols)
+      .all();
+    return rows.map((r) => r.id);
+  }
+
+  /**
+   * Get distinct file paths
+   */
+  getDistinctFilePaths(): string[] {
+    const rows = this.drizzleDb
+      .selectDistinct({ filePath: schema.symbols.filePath })
+      .from(schema.symbols)
+      .all();
+    return rows.map((r) => r.filePath);
+  }
+
+  /**
+   * Get symbols with filters and pagination
+   */
+  querySymbols(options: {
+    type?: string;
+    filePath?: string;
+    isPublic?: boolean;
+    isExported?: boolean;
+    namePattern?: string;
+    limit?: number;
+    offset?: number;
+    orderBy?: 'name' | 'type' | 'filePath';
+    orderDir?: 'asc' | 'desc';
+  }): SymbolRow[] {
+    const conditions = [];
+
+    if (options.type) {
+      conditions.push(eq(schema.symbols.type, options.type));
+    }
+    if (options.filePath) {
+      conditions.push(eq(schema.symbols.filePath, options.filePath));
+    }
+    if (options.isPublic !== undefined) {
+      conditions.push(eq(schema.symbols.isPublic, options.isPublic));
+    }
+    if (options.isExported !== undefined) {
+      conditions.push(eq(schema.symbols.isExported, options.isExported));
+    }
+    if (options.namePattern) {
+      conditions.push(like(schema.symbols.name, options.namePattern));
+    }
+
+    let query = this.drizzleDb.select().from(schema.symbols);
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as typeof query;
+    }
+
+    // Order
+    const orderColumn = options.orderBy === 'type' ? schema.symbols.type
+      : options.orderBy === 'filePath' ? schema.symbols.filePath
+      : schema.symbols.name;
+    const orderFn = options.orderDir === 'desc' ? desc : asc;
+    query = query.orderBy(orderFn(orderColumn)) as typeof query;
+
+    // Pagination
+    if (options.limit) {
+      query = query.limit(options.limit) as typeof query;
+    }
+    if (options.offset) {
+      query = query.offset(options.offset) as typeof query;
+    }
+
+    const rows = query.all();
+    return rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      file_path: row.filePath,
+      line: row.line,
+      column: row.column,
+      is_exported: row.isExported ? 1 : 0,
+      is_public: row.isPublic ? 1 : 0,
+      summary: row.summary,
+      declared_type: row.declaredType,
+      inferred_type: row.inferredType,
+      generic_params: row.genericParams,
+      parameter_types: row.parameterTypes,
+    }));
+  }
+
+  // ========== Relationship Query Methods ==========
+
+  /**
+   * Count all relationships
+   */
+  countRelationships(): number {
+    return this.drizzleDb
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.unifiedRelationships)
+      .get()?.count ?? 0;
+  }
+
+  /**
+   * Count relationships grouped by category
+   */
+  countRelationshipsByCategory(): Array<{ category: string; count: number }> {
+    return this.drizzleDb
+      .select({
+        category: schema.unifiedRelationships.category,
+        count: sql<number>`count(*)`,
+      })
+      .from(schema.unifiedRelationships)
+      .groupBy(schema.unifiedRelationships.category)
+      .orderBy(desc(sql`count(*)`))
+      .all();
+  }
+
+  /**
+   * Count relationships grouped by type
+   */
+  countRelationshipsByType(): Array<{ type: string; count: number }> {
+    return this.drizzleDb
+      .select({
+        type: schema.unifiedRelationships.type,
+        count: sql<number>`count(*)`,
+      })
+      .from(schema.unifiedRelationships)
+      .groupBy(schema.unifiedRelationships.type)
+      .orderBy(desc(sql`count(*)`))
+      .all();
+  }
+
+  /**
+   * Query relationships with filters
+   */
+  queryRelationships(options: {
+    type?: string;
+    category?: string;
+    strength?: string;
+    minConfidence?: number;
+    symbolId?: string;
+    limit?: number;
+    offset?: number;
+  }): UnifiedRelationship[] {
+    const conditions = [];
+
+    if (options.type) {
+      conditions.push(eq(schema.unifiedRelationships.type, options.type));
+    }
+    if (options.category) {
+      conditions.push(eq(schema.unifiedRelationships.category, options.category));
+    }
+    if (options.strength) {
+      conditions.push(eq(schema.unifiedRelationships.strength, options.strength));
+    }
+    if (options.minConfidence !== undefined) {
+      conditions.push(gte(schema.unifiedRelationships.confidence, options.minConfidence));
+    }
+    if (options.symbolId) {
+      const pattern = `%"${options.symbolId}"%`;
+      conditions.push(or(
+        like(schema.unifiedRelationships.fromSymbols, pattern),
+        like(schema.unifiedRelationships.toSymbols, pattern)
+      ));
+    }
+
+    let query = this.drizzleDb.select().from(schema.unifiedRelationships);
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as typeof query;
+    }
+
+    if (options.limit) {
+      query = query.limit(options.limit) as typeof query;
+    }
+    if (options.offset) {
+      query = query.offset(options.offset) as typeof query;
+    }
+
+    const rows = query.all();
+    return rows.map((row) => ({
+      id: row.id,
+      type: row.type as UnifiedRelationship['type'],
+      category: row.category as UnifiedRelationship['category'],
+      from: JSON.parse(row.fromSymbols) as string | string[],
+      to: JSON.parse(row.toSymbols) as string | string[],
+      direction: row.direction as UnifiedRelationship['direction'],
+      strength: row.strength as UnifiedRelationship['strength'],
+      evidence: JSON.parse(row.evidence) as UnifiedRelationship['evidence'],
+      discoveredBy: row.discoveredBy as UnifiedRelationship['discoveredBy'],
+      confidence: row.confidence,
+      filePath: row.filePath ?? undefined,
+      line: row.line ?? undefined,
+      properties: row.properties ? JSON.parse(row.properties) : {},
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      description: row.description ?? undefined,
+    }));
+  }
+
+  /**
+   * Get raw relationship rows (for backwards compatibility)
+   */
+  getAllUnifiedRelationshipRows(): UnifiedRelationshipRow[] {
+    const rows = this.drizzleDb.select().from(schema.unifiedRelationships).all();
+    return rows.map((row) => ({
+      id: row.id,
+      type: row.type,
+      category: row.category,
+      from_symbols: row.fromSymbols,
+      to_symbols: row.toSymbols,
+      direction: row.direction,
+      strength: row.strength,
+      evidence: row.evidence,
+      discovered_by: row.discoveredBy,
+      confidence: row.confidence,
+      file_path: row.filePath,
+      line: row.line,
+      properties: row.properties,
+      created_at: row.createdAt,
+      updated_at: row.updatedAt,
+      description: row.description,
+    }));
+  }
+
+  /**
+   * Delete a relationship by ID
+   */
+  deleteRelationship(id: string): boolean {
+    try {
+      this.drizzleDb
+        .delete(schema.unifiedRelationships)
+        .where(eq(schema.unifiedRelationships.id, id))
+        .run();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Clear all relationships
+   */
+  clearAllRelationships(): number {
+    const count = this.countRelationships();
+    this.drizzleDb.delete(schema.unifiedRelationships).run();
+    return count;
+  }
+
+  // ========== Test Mapping Methods ==========
+
+  /**
+   * Get test mappings for a symbol
+   */
+  getTestMappings(symbolId: string): Array<{
+    testFilePath: string;
+    testName: string;
+    scenarios: string[];
+    coverage: Record<string, unknown> | null;
+  }> {
+    const rows = this.drizzleDb
+      .select()
+      .from(schema.testMappings)
+      .where(eq(schema.testMappings.symbolId, symbolId))
+      .all();
+
+    return rows.map((row) => ({
+      testFilePath: row.testFilePath,
+      testName: row.testName,
+      scenarios: JSON.parse(row.scenarios),
+      coverage: row.coverage ? JSON.parse(row.coverage) : null,
+    }));
+  }
+
+  /**
+   * Insert a test mapping
+   */
+  insertTestMapping(mapping: {
+    symbolId: string;
+    testFilePath: string;
+    testName: string;
+    scenarios: string[];
+    coverage?: Record<string, unknown>;
+  }): boolean {
+    try {
+      this.drizzleDb.insert(schema.testMappings)
+        .values({
+          symbolId: mapping.symbolId,
+          testFilePath: mapping.testFilePath,
+          testName: mapping.testName,
+          scenarios: JSON.stringify(mapping.scenarios),
+          coverage: mapping.coverage ? JSON.stringify(mapping.coverage) : null,
+        })
+        .run();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  // ========== Contract Methods ==========
+
+  /**
+   * Get contract for a symbol
+   */
+  getContract(symbolId: string): {
+    description: string;
+    preconditions: string[];
+    postconditions: string[];
+    invariants: string[];
+    filePath: string;
+  } | null {
+    const row = this.drizzleDb
+      .select()
+      .from(schema.contracts)
+      .where(eq(schema.contracts.symbolId, symbolId))
+      .get();
+
+    if (!row) return null;
+
+    return {
+      description: row.description,
+      preconditions: JSON.parse(row.preconditions),
+      postconditions: JSON.parse(row.postconditions),
+      invariants: JSON.parse(row.invariants),
+      filePath: row.filePath,
+    };
+  }
+
+  /**
+   * Get all contracts
+   */
+  getAllContracts(): Array<{
+    symbolId: string;
+    description: string;
+    preconditions: string[];
+    postconditions: string[];
+    invariants: string[];
+    filePath: string;
+  }> {
+    const rows = this.drizzleDb.select().from(schema.contracts).all();
+    return rows.map((row) => ({
+      symbolId: row.symbolId,
+      description: row.description,
+      preconditions: JSON.parse(row.preconditions),
+      postconditions: JSON.parse(row.postconditions),
+      invariants: JSON.parse(row.invariants),
+      filePath: row.filePath,
+    }));
+  }
+
+  // ========== Decision Record Methods ==========
+
+  /**
+   * Get decision records for a symbol
+   */
+  getDecisionRecords(symbolId: string): Array<{
+    id: string;
+    title: string;
+    decision: string;
+    rationale: string;
+    status: string;
+    date: string;
+    supersededBy: string | null;
+  }> {
+    const rows = this.drizzleDb
+      .select()
+      .from(schema.decisionRecords)
+      .where(eq(schema.decisionRecords.symbolId, symbolId))
+      .all();
+
+    return rows.map((row) => ({
+      id: row.id,
+      title: row.title,
+      decision: row.decision,
+      rationale: row.rationale,
+      status: row.status,
+      date: row.date,
+      supersededBy: row.supersededBy,
+    }));
+  }
+
+  /**
+   * Get all decision records
+   */
+  getAllDecisionRecords(): Array<{
+    id: string;
+    symbolId: string | null;
+    title: string;
+    decision: string;
+    rationale: string;
+    status: string;
+    date: string;
+    supersededBy: string | null;
+  }> {
+    const rows = this.drizzleDb.select().from(schema.decisionRecords).all();
+    return rows.map((row) => ({
+      id: row.id,
+      symbolId: row.symbolId,
+      title: row.title,
+      decision: row.decision,
+      rationale: row.rationale,
+      status: row.status,
+      date: row.date,
+      supersededBy: row.supersededBy,
+    }));
+  }
+
+  // ========== Error Experience Methods ==========
+
+  /**
+   * Get error experiences for a symbol
+   */
+  getErrorExperiences(symbolId: string): Array<{
+    id: string;
+    errorType: string;
+    message: string;
+    context: string;
+    solution: string;
+    occurredAt: string | null;
+    prevention: string | null;
+  }> {
+    const rows = this.drizzleDb
+      .select()
+      .from(schema.errorExperiences)
+      .where(eq(schema.errorExperiences.symbolId, symbolId))
+      .all();
+
+    return rows.map((row) => ({
+      id: row.id,
+      errorType: row.errorType,
+      message: row.message,
+      context: row.context,
+      solution: row.solution,
+      occurredAt: row.occurredAt,
+      prevention: row.prevention,
+    }));
+  }
+
+  // ========== Future Plans Methods ==========
+
+  /**
+   * Query future plans with filters
+   */
+  queryFuturePlans(options?: {
+    symbolId?: string;
+    status?: string;
+    priority?: string;
+    limit?: number;
+  }): Array<{
+    id: string;
+    symbolId: string | null;
+    title: string;
+    description: string;
+    priority: string;
+    status: string;
+    targetMilestone: string | null;
+    estimatedEffort: string | null;
+    createdAt: string;
+    completedAt: string | null;
+  }> {
+    const conditions = [];
+
+    if (options?.symbolId) {
+      conditions.push(eq(schema.futurePlans.symbolId, options.symbolId));
+    }
+    if (options?.status) {
+      conditions.push(eq(schema.futurePlans.status, options.status));
+    }
+    if (options?.priority) {
+      conditions.push(eq(schema.futurePlans.priority, options.priority));
+    }
+
+    let query = this.drizzleDb.select().from(schema.futurePlans);
+
+    if (conditions.length > 0) {
+      query = query.where(and(...conditions)) as typeof query;
+    }
+
+    query = query.orderBy(desc(schema.futurePlans.createdAt)) as typeof query;
+
+    if (options?.limit) {
+      query = query.limit(options.limit) as typeof query;
+    }
+
+    return query.all().map((row) => ({
+      id: row.id,
+      symbolId: row.symbolId,
+      title: row.title,
+      description: row.description,
+      priority: row.priority,
+      status: row.status,
+      targetMilestone: row.targetMilestone,
+      estimatedEffort: row.estimatedEffort,
+      createdAt: row.createdAt,
+      completedAt: row.completedAt,
+    }));
+  }
+
+  // ========== Responsibility Methods ==========
+
+  /**
+   * Get responsibility for a symbol
+   */
+  getResponsibility(symbolId: string): {
+    description: string;
+    shouldDo: string[];
+    shouldNotDo: string[];
+    pattern: string | null;
+    architecture: string | null;
+  } | null {
+    const row = this.drizzleDb
+      .select()
+      .from(schema.responsibilities)
+      .where(eq(schema.responsibilities.symbolId, symbolId))
+      .get();
+
+    if (!row) return null;
+
+    return {
+      description: row.description,
+      shouldDo: JSON.parse(row.shouldDo),
+      shouldNotDo: JSON.parse(row.shouldNotDo),
+      pattern: row.pattern,
+      architecture: row.architecture,
+    };
+  }
+
+  // ========== Clear/Delete Methods ==========
+
+  /**
+   * Clear all data from the database
+   */
+  clearAll(): void {
+    this.drizzleDb.delete(schema.syncMetadata).run();
+    this.drizzleDb.delete(schema.testMappings).run();
+    this.drizzleDb.delete(schema.errorExperiences).run();
+    this.drizzleDb.delete(schema.contracts).run();
+    this.drizzleDb.delete(schema.responsibilities).run();
+    this.drizzleDb.delete(schema.decisionRecords).run();
+    this.drizzleDb.delete(schema.futurePlans).run();
+    this.drizzleDb.delete(schema.unifiedRelationships).run();
+    this.drizzleDb.delete(schema.dependencies).run();
+    this.drizzleDb.delete(schema.enhancedDocs).run();
+    this.drizzleDb.delete(schema.symbols).run();
+  }
+
+  /**
+   * Delete symbols by file path
+   */
+  deleteSymbolsByFile(filePath: string): number {
+    const result = this.drizzleDb
+      .delete(schema.symbols)
+      .where(eq(schema.symbols.filePath, filePath))
+      .run();
+    return result.changes;
+  }
+
+  /**
+   * Get Drizzle DB instance for advanced queries
+   */
+  getDrizzle() {
+    return this.drizzleDb;
+  }
+
+  /**
+   * Get schema for advanced queries
+   */
+  getSchema() {
+    return schema;
   }
 }

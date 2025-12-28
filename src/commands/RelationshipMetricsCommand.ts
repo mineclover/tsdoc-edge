@@ -219,22 +219,18 @@ Examples:
     incoming: Map<string, Set<string>>;
     symbolNames: Map<string, string>;
   } {
-    let sql = 'SELECT * FROM unified_relationships';
-    const params: any[] = [];
-
-    if (category) {
-      sql += ' WHERE category = ?';
-      params.push(category);
-    }
-
-    const relationships = dbManager.db.prepare(sql).all(...params) as UnifiedRelationshipRow[];
+    // Use Drizzle ORM methods
+    const allRelationships = dbManager.getAllUnifiedRelationshipRows();
+    const relationships = category
+      ? allRelationships.filter(r => r.category === category)
+      : allRelationships;
 
     const outgoing = new Map<string, Set<string>>();
     const incoming = new Map<string, Set<string>>();
     const symbolNames = new Map<string, string>();
 
-    // Get all symbol names
-    const symbols = dbManager.db.prepare('SELECT id, name FROM symbols').all() as Array<{ id: string; name: string }>;
+    // Get all symbol names using Drizzle
+    const symbols = dbManager.getAllSymbolRows();
     for (const symbol of symbols) {
       symbolNames.set(symbol.id, symbol.name);
       outgoing.set(symbol.id, new Set());

@@ -371,10 +371,11 @@ Examples:
 
     if (orphanedIds.length > 0) {
       try {
-        const uniqueIds = [...new Set(orphanedIds)];
+        const uniqueIds = [...new Set(orphanedIds)].filter((id): id is string => id !== undefined);
         for (const id of uniqueIds) {
-          dbManager.db.prepare('DELETE FROM unified_relationships WHERE id = ?').run(id);
-          fixed++;
+          if (dbManager.deleteRelationship(id)) {
+            fixed++;
+          }
         }
         console.log(`  ${this.colors.green}✓${this.colors.reset} Removed ${fixed} orphaned relationships`);
       } catch (error) {

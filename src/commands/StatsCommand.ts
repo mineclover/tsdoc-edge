@@ -97,35 +97,18 @@ export class StatsCommand extends BaseCommand {
         console.log(`DB Size: ${colors.cyan}${(stats.dbSize / 1024).toFixed(2)} KB${colors.reset}`);
         console.log();
 
-        // Count documented vs undocumented - separated by source/test
-        const coverageQuery = `
-          SELECT
-            COUNT(*) as total,
-            SUM(CASE WHEN summary IS NOT NULL AND summary != '' THEN 1 ELSE 0 END) as documented,
-            SUM(CASE WHEN type IN ('test-case', 'test-suite') THEN 1 ELSE 0 END) as test_total,
-            SUM(CASE WHEN type IN ('test-case', 'test-suite') AND summary IS NOT NULL AND summary != '' THEN 1 ELSE 0 END) as test_documented,
-            SUM(CASE WHEN type NOT IN ('test-case', 'test-suite') THEN 1 ELSE 0 END) as source_total,
-            SUM(CASE WHEN type NOT IN ('test-case', 'test-suite') AND summary IS NOT NULL AND summary != '' THEN 1 ELSE 0 END) as source_documented
-          FROM symbols
-        `;
-        const coverageResult = dbManager.db.prepare(coverageQuery).get() as {
-          total: number;
-          documented: number;
-          test_total: number;
-          test_documented: number;
-          source_total: number;
-          source_documented: number;
-        };
+        // Count documented vs undocumented - separated by source/test using Drizzle
+        const allSymbols = dbManager.getAllSymbolRows();
 
-        const total = coverageResult.total;
-        const documented = coverageResult.documented;
+        const total = allSymbols.length;
+        const documented = allSymbols.filter(s => s.summary && s.summary.trim() !== '').length;
+        const testTotal = allSymbols.filter(s => s.type === 'test-case' || s.type === 'test-suite').length;
+        const sourceTotal = total - testTotal;
+        const sourceDocumented = allSymbols.filter(s =>
+          s.type !== 'test-case' && s.type !== 'test-suite' && s.summary && s.summary.trim() !== ''
+        ).length;
         const coverage = total > 0 ? (documented / total) * 100 : 0;
-
-        const sourceTotal = coverageResult.source_total;
-        const sourceDocumented = coverageResult.source_documented;
         const sourceCoverage = sourceTotal > 0 ? (sourceDocumented / sourceTotal) * 100 : 0;
-
-        const testTotal = coverageResult.test_total;
 
         this.printSection('📈 Documentation Coverage');
         console.log(`${colors.bold}Overall:${colors.reset}`);

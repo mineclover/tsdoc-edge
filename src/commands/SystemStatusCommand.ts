@@ -105,60 +105,54 @@ Options:
   }
 
   private getSymbolStats(dbManager: DatabaseManager): SymbolStats {
-    // Combined query for all stats
-    const statsQuery = `
-      SELECT
-        COUNT(*) as total,
-        SUM(CASE WHEN summary IS NOT NULL AND summary != '' THEN 1 ELSE 0 END) as documented,
-        SUM(CASE WHEN type IN ('test-case', 'test-suite') THEN 1 ELSE 0 END) as test_total,
-        SUM(CASE WHEN type NOT IN ('test-case', 'test-suite') THEN 1 ELSE 0 END) as source_total,
-        SUM(CASE WHEN type NOT IN ('test-case', 'test-suite') AND summary IS NOT NULL AND summary != '' THEN 1 ELSE 0 END) as source_documented
-      FROM symbols
-    `;
-    const stats = dbManager.db.prepare(statsQuery).get() as {
-      total: number;
-      documented: number;
-      test_total: number;
-      source_total: number;
-      source_documented: number;
-    };
+    // Use Drizzle ORM methods
+    const allSymbols = dbManager.getAllSymbolRows();
 
-    const byTypeQuery = 'SELECT type, COUNT(*) as count FROM symbols GROUP BY type ORDER BY count DESC';
+    const total = allSymbols.length;
+    const documented = allSymbols.filter(s => s.summary && s.summary.trim() !== '').length;
+    const testTotal = allSymbols.filter(s => s.type === 'test-case' || s.type === 'test-suite').length;
+    const sourceTotal = total - testTotal;
+    const sourceDocumented = allSymbols.filter(s =>
+      s.type !== 'test-case' && s.type !== 'test-suite' && s.summary && s.summary.trim() !== ''
+    ).length;
+
+    // Count by type using Drizzle
+    const byTypeData = dbManager.countSymbolsByType();
     const byType: Record<string, number> = {};
-    for (const row of dbManager.db.prepare(byTypeQuery).all() as { type: string; count: number }[]) {
+    for (const row of byTypeData) {
       byType[row.type] = row.count;
     }
 
     return {
-      total: stats.total,
-      documented: stats.documented,
-      undocumented: stats.total - stats.documented,
-      coverage: stats.total > 0 ? Math.round((stats.documented / stats.total) * 1000) / 10 : 0,
-      sourceTotal: stats.source_total,
-      sourceDocumented: stats.source_documented,
-      sourceCoverage: stats.source_total > 0 ? Math.round((stats.source_documented / stats.source_total) * 1000) / 10 : 0,
-      testTotal: stats.test_total,
+      total,
+      documented,
+      undocumented: total - documented,
+      coverage: total > 0 ? Math.round((documented / total) * 1000) / 10 : 0,
+      sourceTotal,
+      sourceDocumented,
+      sourceCoverage: sourceTotal > 0 ? Math.round((sourceDocumented / sourceTotal) * 1000) / 10 : 0,
+      testTotal,
       byType,
     };
   }
 
   private getRelationshipStats(dbManager: DatabaseManager): RelationshipStats {
-    const totalQuery = 'SELECT COUNT(*) as count FROM unified_relationships';
-    const total = (dbManager.db.prepare(totalQuery).get() as { count: number }).count;
+    // Use Drizzle ORM methods
+    const total = dbManager.countRelationships();
 
-    const byTypeQuery = 'SELECT type, COUNT(*) as count FROM unified_relationships GROUP BY type ORDER BY count DESC';
+    const byTypeData = dbManager.countRelationshipsByType();
     const byType: Record<string, number> = {};
-    for (const row of dbManager.db.prepare(byTypeQuery).all() as { type: string; count: number }[]) {
+    for (const row of byTypeData) {
       byType[row.type] = row.count;
     }
 
-    const byCategoryQuery = 'SELECT category, COUNT(*) as count FROM unified_relationships GROUP BY category ORDER BY count DESC';
+    const byCategoryData = dbManager.countRelationshipsByCategory();
     const byCategory: Record<string, number> = {};
-    for (const row of dbManager.db.prepare(byCategoryQuery).all() as { category: string; count: number }[]) {
+    for (const row of byCategoryData) {
       byCategory[row.category] = row.count;
     }
 
-    const symbolCount = (dbManager.db.prepare('SELECT COUNT(*) as count FROM symbols').get() as { count: number }).count;
+    const symbolCount = dbManager.countSymbols();
     const density = symbolCount > 0 ? Math.round((total / symbolCount) * 100) / 100 : 0;
 
     return {

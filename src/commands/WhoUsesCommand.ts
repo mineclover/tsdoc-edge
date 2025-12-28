@@ -157,15 +157,17 @@ export class WhoUsesCommand extends BaseCommand {
             console.log(`${colors.green}✅ Used by ${dependents.length} symbol(s):${colors.reset}`);
             console.log();
 
-            // Group by file
+            // Group by file - use Drizzle ORM method
+            const allSymbolRows = dbManager.getAllSymbolRows();
+            const symbolRowMap = new Map(allSymbolRows.map(s => [s.id, s]));
+
             const byFile = new Map<string, SymbolRow[]>();
             for (const depId of dependents) {
-              const depSymbol = dbManager.getSymbol(depId);
-              if (depSymbol) {
-                const depRow = dbManager.db.prepare('SELECT * FROM symbols WHERE id = ?').get(depId) as SymbolRow;
-                const fileSymbols = byFile.get(depSymbol.filePath) || [];
+              const depRow = symbolRowMap.get(depId);
+              if (depRow) {
+                const fileSymbols = byFile.get(depRow.file_path) || [];
                 fileSymbols.push(depRow);
-                byFile.set(depSymbol.filePath, fileSymbols);
+                byFile.set(depRow.file_path, fileSymbols);
               }
             }
 

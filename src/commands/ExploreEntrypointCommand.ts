@@ -220,17 +220,14 @@ export class ExploreEntrypointCommand extends BaseCommand {
       }
     }
 
-    // Calculate statistics
-    const allSymbols = dbManager.db.prepare('SELECT id FROM symbols').all() as Array<{ id: string }>;
-    const allFiles = new Set(
-      (dbManager.db.prepare('SELECT DISTINCT file_path FROM symbols').all() as Array<{ file_path: string }>)
-        .map((row) => row.file_path)
-    );
+    // Calculate statistics using Drizzle
+    const allSymbolIds = dbManager.getAllSymbolIds();
+    const allFiles = new Set(dbManager.getDistinctFilePaths());
 
-    exploration.statistics.totalSymbolsInDb = allSymbols.length;
+    exploration.statistics.totalSymbolsInDb = allSymbolIds.length;
     exploration.statistics.discoveredSymbols = exploration.discoveredSymbols.size;
     exploration.statistics.coveragePercentage =
-      (exploration.discoveredSymbols.size / allSymbols.length) * 100;
+      (exploration.discoveredSymbols.size / allSymbolIds.length) * 100;
 
     exploration.statistics.totalFilesInDb = allFiles.size;
     exploration.statistics.discoveredFiles = exploration.discoveredFiles.size;
@@ -239,9 +236,8 @@ export class ExploreEntrypointCommand extends BaseCommand {
 
     // Detect orphans if requested
     if (detectOrphans) {
-      exploration.orphanedSymbols = allSymbols
-        .filter((s) => !exploration.discoveredSymbols.has(s.id))
-        .map((s) => s.id);
+      exploration.orphanedSymbols = allSymbolIds
+        .filter((id) => !exploration.discoveredSymbols.has(id));
 
       exploration.orphanedFiles = Array.from(allFiles).filter(
         (f) => !exploration.discoveredFiles.has(f)

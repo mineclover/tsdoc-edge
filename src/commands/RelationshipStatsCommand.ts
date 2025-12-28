@@ -40,36 +40,39 @@ export class RelationshipStatsCommand extends BaseCommand {
 
       const dbManager = new DatabaseManager(this.getDatabasePath());
 
-      // Get total symbols
-      const totalSymbols = dbManager.db.prepare('SELECT COUNT(*) as count FROM symbols').get() as { count: number };
+      // Get total symbols using Drizzle
+      const totalSymbolsCount = dbManager.countSymbols();
 
-      // Get relationships by category
-      const byCategory = dbManager.db.prepare(`
-        SELECT category, COUNT(*) as count
-        FROM unified_relationships
-        GROUP BY category
-        ORDER BY count DESC
-      `).all() as Array<{ category: string; count: number }>;
+      // Get relationships by category using Drizzle
+      const byCategory = dbManager.countRelationshipsByCategory();
 
-      // Get relationships by type
-      const byType = dbManager.db.prepare(`
-        SELECT type, category, COUNT(*) as count
-        FROM unified_relationships
-        GROUP BY type, category
-        ORDER BY count DESC
-      `).all() as Array<{ type: string; category: string; count: number }>;
+      // Get relationships by type using Drizzle
+      const byTypeRaw = dbManager.countRelationshipsByType();
+
+      // Build byType with category info from all relationships
+      const allRels = dbManager.getAllUnifiedRelationships();
+      const typeToCategory = new Map<string, string>();
+      for (const rel of allRels) {
+        if (!typeToCategory.has(rel.type)) {
+          typeToCategory.set(rel.type, rel.category);
+        }
+      }
+      const byType = byTypeRaw.map(row => ({
+        type: row.type,
+        category: typeToCategory.get(row.type) || 'unknown',
+        count: row.count,
+      }));
 
       console.log();
 
       // Overall statistics
       this.printSection('Overall Statistics');
-      console.log(`  Total symbols: ${this.colors.cyan}${totalSymbols.count}${this.colors.reset}`);
+      console.log(`  Total symbols: ${this.colors.cyan}${totalSymbolsCount}${this.colors.reset}`);
 
       const totalRelationships = byType.reduce((sum, row) => sum + row.count, 0);
       console.log(`  Total relationships: ${this.colors.cyan}${totalRelationships}${this.colors.reset}`);
 
-      // Get inferred vs explicit breakdown
-      const allRels = dbManager.getAllUnifiedRelationships();
+      // Get inferred vs explicit breakdown (allRels already fetched above)
       const inferredCount = allRels.filter(r => r.properties?.inferred === true).length;
       const explicitCount = totalRelationships - inferredCount;
 
