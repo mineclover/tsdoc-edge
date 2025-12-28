@@ -126,6 +126,10 @@ export class VisualizeDepsCommand extends BaseCommand {
           const resolved = this.resolveSymbol(dbManager, targetSymbol);
           if (resolved) {
             resolvedSymbol = resolved.id;
+          } else if (!graph.symbols.has(targetSymbol)) {
+            this.printError(`Symbol not found: ${targetSymbol}`);
+            dbManager.close();
+            return this.failure('Symbol not found');
           }
 
           this.printSection(`Dependency Tree: ${resolvedSymbol}`);
@@ -202,6 +206,10 @@ export class VisualizeDepsCommand extends BaseCommand {
           const resolvedHierarchy = this.resolveSymbol(dbManager, targetSymbol);
           if (resolvedHierarchy) {
             resolvedClass = resolvedHierarchy.id;
+          } else if (!graph.symbols.has(targetSymbol)) {
+            this.printError(`Symbol not found: ${targetSymbol}`);
+            dbManager.close();
+            return this.failure('Symbol not found');
           }
 
           this.printSection(`Class Hierarchy: ${resolvedClass}`);
