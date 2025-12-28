@@ -3,23 +3,19 @@
  * @packageDocumentation
  */
 
-import * as fs from 'node:fs';
-import * as path from 'node:path';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
+import { DatabaseManager, type SymbolRow } from '../storage/DatabaseManager';
 
 /**
- * RegistryEntryNode interface for hierarchy tree
+ * TreeNode interface for hierarchy tree
  */
-interface RegistryEntryNode {
+interface TreeNode {
   id: string;
-  sourceRef: {
-    type?: string;
-    qualifiedName?: string;
-    symbolName?: string;
-    filePath?: string;
-  };
-  children?: RegistryEntryNode[];
+  name: string;
+  type: string;
+  filePath: string;
+  line: number;
+  children: TreeNode[];
 }
 
 /**
@@ -42,20 +38,20 @@ interface RegistryEntryNode {
  * - Type indicators: Show symbol types in tree
  * - Depth control: Handle deep hierarchies gracefully
  *
- * @decision Use SymbolRegistryManager for hierarchy data
- * @rationale Registry stores parent-child relationships
- * @consequences Requires registry to be built first
+ * @decision Use DatabaseManager with Drizzle ORM for hierarchy data
+ * @rationale Database provides efficient queries for symbol relationships
+ * @consequences Requires database to be built first
  *
- * @depends SymbolRegistryManager
+ * @depends DatabaseManager
  * @depType internal
- * @depReason Symbol hierarchy data
+ * @depReason Symbol hierarchy data via Drizzle ORM
  */
 export class TreeCommand extends BaseCommand {
-  private manager?: SymbolRegistryManager;
+  private dbManager?: DatabaseManager;
 
-  constructor(manager?: SymbolRegistryManager) {
+  constructor(dbManager?: DatabaseManager) {
     super();
-    this.manager = manager;
+    this.dbManager = dbManager;
   }
 
   /**
@@ -76,8 +72,18 @@ export class TreeCommand extends BaseCommand {
     return 'Show symbol hierarchy tree';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
-    return 'tsdoc-edge tree';
+    return `tsdoc-edge tree [path-filter]
+
+Examples:
+  tsdoc-edge tree                      Show all symbols
+  tsdoc-edge tree src/commands         Filter by path
+  tsdoc-edge tree DatabaseManager      Filter by name pattern`;
   }
 
   /**
@@ -93,68 +99,176 @@ export class TreeCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
+      // Parse filter path from args
+      const filterPath = args[0];
 
-      if (!this.manager && !fs.existsSync(registryPath)) {
-        this.printError('No registry found.');
+      const dbCheck = this.checkDatabaseExists();
+      if (dbCheck) return dbCheck;
+
+      const dbPath = this.getDatabasePath();
+      const jsonlPath = this.getJsonlPath();
+      const dbManager = this.dbManager || new DatabaseManager(dbPath, jsonlPath);
+
+      try {
+        this.printHeader('Symbol Hierarchy Tree');
+
+        // Get symbols from database using Drizzle ORM
+        const allSymbols = dbManager.getAllSymbolRows();
+
+        if (allSymbols.length === 0) {
+          console.log(`${colors.yellow}No symbols found in database${colors.reset}`);
+          console.log();
+          return this.success();
+        }
+
+        // Filter by path if provided
+        let symbols = allSymbols;
+        if (filterPath) {
+          symbols = allSymbols.filter(s => s.file_path.includes(filterPath));
+          console.log(`${colors.dim}Filtering by path: ${filterPath}${colors.reset}`);
+          console.log();
+
+          if (symbols.length === 0) {
+            console.log(`${colors.yellow}No symbols found matching: ${filterPath}${colors.reset}`);
+            console.log();
+            return this.success();
+          }
+        }
+
+        // Build hierarchy tree from symbols
+        const hierarchy = this.buildHierarchy(symbols);
+
+        // Print tree
+        const printNode = (node: TreeNode, prefix: string = '', isLast: boolean = true) => {
+          const connector = isLast ? '└── ' : '├── ';
+          const typeColor =
+            node.type === 'class'
+              ? colors.blue
+              : node.type === 'method'
+                ? colors.green
+                : node.type === 'function'
+                  ? colors.cyan
+                  : node.type === 'interface'
+                    ? colors.yellow
+                    : colors.reset;
+
+          console.log(
+            prefix +
+              connector +
+              typeColor +
+              colors.bold +
+              node.name +
+              colors.reset +
+              ` ${colors.dim}(${node.type})${colors.reset}`
+          );
+
+          if (node.children.length > 0) {
+            const childPrefix = prefix + (isLast ? '    ' : '│   ');
+            node.children.forEach((child, index) => {
+              const childIsLast = index === node.children.length - 1;
+              printNode(child, childPrefix, childIsLast);
+            });
+          }
+        };
+
+        hierarchy.forEach((root, index) => {
+          const isLast = index === hierarchy.length - 1;
+          printNode(root, '', isLast);
+        });
+
         console.log();
-        return this.failure('Registry not found');
-      }
-
-      const manager = this.manager || new SymbolRegistryManager(registryPath);
-      const hierarchy = manager.buildHierarchy();
-
-      this.printHeader('Symbol Hierarchy Tree');
-
-      if (hierarchy.length === 0) {
-        console.log(`${colors.yellow}No symbols registered${colors.reset}`);
+        console.log(`Total symbols: ${colors.bold}${symbols.length}${colors.reset}`);
         console.log();
+
         return this.success();
+      } finally {
+        if (!this.dbManager) {
+          dbManager.close();
+        }
       }
+    });
+  }
 
-      const printNode = (node: RegistryEntryNode, prefix: string = '', isLast: boolean = true) => {
-        const connector = isLast ? '└── ' : '├── ';
-        const typeColor =
-          node.sourceRef.type === 'class'
-            ? colors.blue
-            : node.sourceRef.type === 'method'
-              ? colors.green
-              : node.sourceRef.type === 'function'
-                ? colors.cyan
-                : colors.reset;
+  /**
+   * Build hierarchy tree from symbols
+   * Groups by file, then by class/interface containing methods
+   */
+  private buildHierarchy(symbols: SymbolRow[]): TreeNode[] {
+    // Group symbols by file
+    const byFile = new Map<string, SymbolRow[]>();
+    for (const symbol of symbols) {
+      const fileSymbols = byFile.get(symbol.file_path) || [];
+      fileSymbols.push(symbol);
+      byFile.set(symbol.file_path, fileSymbols);
+    }
 
-        console.log(
-          prefix +
-            connector +
-            colors.bold +
-            node.id +
-            colors.reset +
-            ' ' +
-            typeColor +
-            node.sourceRef.qualifiedName +
-            colors.reset +
-            ` (${node.sourceRef.type})`
+    const roots: TreeNode[] = [];
+
+    for (const [filePath, fileSymbols] of byFile.entries()) {
+      // Separate classes/interfaces from methods/properties
+      const containers = fileSymbols.filter(s =>
+        ['class', 'interface', 'type', 'enum'].includes(s.type)
+      );
+      const members = fileSymbols.filter(s =>
+        ['method', 'property', 'getter', 'setter'].includes(s.type)
+      );
+      const standalone = fileSymbols.filter(s =>
+        ['function', 'variable', 'constant'].includes(s.type)
+      );
+
+      // Build container nodes with their members
+      for (const container of containers) {
+        const containerNode: TreeNode = {
+          id: container.id,
+          name: container.name,
+          type: container.type,
+          filePath: container.file_path,
+          line: container.line,
+          children: [],
+        };
+
+        // Find members that belong to this container (by name prefix)
+        const containerMembers = members.filter(m =>
+          m.name.startsWith(`${container.name}.`)
         );
 
-        if (node.children && node.children.length > 0) {
-          const childPrefix = prefix + (isLast ? '    ' : '│   ');
-          node.children.forEach((child: RegistryEntryNode, index: number) => {
-            const childIsLast = index === (node.children?.length ?? 0) - 1;
-            printNode(child, childPrefix, childIsLast);
+        for (const member of containerMembers) {
+          containerNode.children.push({
+            id: member.id,
+            name: member.name.replace(`${container.name}.`, ''),
+            type: member.type,
+            filePath: member.file_path,
+            line: member.line,
+            children: [],
           });
         }
-      };
 
-      hierarchy.forEach((root, index) => {
-        const isLast = index === hierarchy.length - 1;
-        printNode(root, '', isLast);
-      });
+        // Sort children by line number
+        containerNode.children.sort((a, b) => a.line - b.line);
 
-      console.log();
-      console.log(`Total symbols: ${colors.bold}${manager.getAll().length}${colors.reset}`);
-      console.log();
+        roots.push(containerNode);
+      }
 
-      return this.success();
+      // Add standalone functions/variables
+      for (const item of standalone) {
+        roots.push({
+          id: item.id,
+          name: item.name,
+          type: item.type,
+          filePath: item.file_path,
+          line: item.line,
+          children: [],
+        });
+      }
+    }
+
+    // Sort roots by file path, then by line
+    roots.sort((a, b) => {
+      const fileCompare = a.filePath.localeCompare(b.filePath);
+      if (fileCompare !== 0) return fileCompare;
+      return a.line - b.line;
     });
+
+    return roots;
   }
 }
