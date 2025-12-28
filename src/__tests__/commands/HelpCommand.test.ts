@@ -57,20 +57,20 @@ describe('HelpCommand', () => {
       registry.register(new TestCmd());
       command = new HelpCommand(registry);
 
-      const result = await command.execute([]);
+      const result = await command.execute(['--all']);
 
       expect(result.exitCode).toBe(0);
       const logOutput = consoleSpy.mock.calls.flat().join('\n');
       expect(logOutput).toContain('test-cmd');
     });
 
-    it('should show work-context as important command', async () => {
+    it('should show wc as important command', async () => {
       command = new HelpCommand();
 
       await command.execute([]);
 
       const logOutput = consoleSpy.mock.calls.flat().join('\n');
-      expect(logOutput).toContain('work-context');
+      expect(logOutput).toContain('wc <file>');
     });
 
     it('should show common workflow', async () => {
