@@ -9,7 +9,7 @@
 import * as fs from 'node:fs';
 import type { DatabaseManager } from '../storage/DatabaseManager';
 import type { TestCase, TestSuite, TestSymbol } from '../types/test-symbols';
-import type { Symbol } from '../types/graph/graph';
+import type { Symbol, SymbolType } from '../types/graph/graph';
 import { ImportAnalyzer, type ImportAnalysisResult } from './ImportAnalyzer';
 
 /**
@@ -575,11 +575,10 @@ export class TestCoverageAnalyzer {
    */
   private findSymbolById(symbolId: string): Symbol | null {
     try {
-      const query = 'SELECT * FROM symbols WHERE id = ? AND type IN (\'class\', \'interface\', \'function\') LIMIT 1';
-      const result = this.db['db'].prepare(query).get(symbolId);
+      const result = this.db.findSymbolByIdWithType(symbolId, ['class', 'interface', 'function']);
 
       if (result) {
-        return this.rowToSymbol(result);
+        return this.schemaRowToSymbol(result);
       }
 
       return null;
@@ -673,18 +672,14 @@ export class TestCoverageAnalyzer {
    */
   private findSymbolByName(symbolName: string, filePattern: string | null): Symbol | null {
     try {
-      let query = 'SELECT * FROM symbols WHERE name = ? AND type IN (\'class\', \'interface\', \'function\') LIMIT 1';
-      const params: any[] = [symbolName];
-
-      if (filePattern) {
-        query = 'SELECT * FROM symbols WHERE name = ? AND type IN (\'class\', \'interface\', \'function\') AND file_path LIKE ? LIMIT 1';
-        params.push('%' + filePattern + '%');
-      }
-
-      const result = this.db['db'].prepare(query).get(...params);
+      const result = this.db.findSymbolByNameWithType(
+        symbolName,
+        ['class', 'interface', 'function'],
+        filePattern ?? undefined
+      );
 
       if (result) {
-        return this.rowToSymbol(result);
+        return this.schemaRowToSymbol(result);
       }
 
       return null;
@@ -694,18 +689,28 @@ export class TestCoverageAnalyzer {
   }
 
   /**
-   * Convert database row to Symbol object
+   * Convert Drizzle schema row to Symbol object
    */
-  private rowToSymbol(row: any): Symbol {
+  private schemaRowToSymbol(row: {
+    id: string;
+    name: string;
+    type: string;
+    filePath: string;
+    line: number;
+    column: number;
+    isExported: boolean;
+    isPublic: boolean;
+    summary: string | null;
+  }): Symbol {
     return {
       id: row.id,
       name: row.name,
-      type: row.type,
-      filePath: row.file_path,
+      type: row.type as SymbolType,
+      filePath: row.filePath,
       line: row.line,
       column: row.column,
-      isExported: row.is_exported === 1,
-      isPublic: row.is_public === 1,
+      isExported: row.isExported,
+      isPublic: row.isPublic,
       summary: row.summary || undefined,
       tests: [],
       designDecisions: [],

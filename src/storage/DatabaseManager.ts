@@ -1051,6 +1051,214 @@ export class DatabaseManager {
     }));
   }
 
+  /**
+   * Get symbols by a list of IDs
+   */
+  getSymbolsByIds(ids: string[]): SymbolRow[] {
+    if (ids.length === 0) return [];
+
+    const rows = this.drizzleDb
+      .select()
+      .from(schema.symbols)
+      .where(inArray(schema.symbols.id, ids))
+      .all();
+
+    return rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      file_path: row.filePath,
+      line: row.line,
+      column: row.column,
+      is_exported: row.isExported ? 1 : 0,
+      is_public: row.isPublic ? 1 : 0,
+      summary: row.summary,
+      declared_type: row.declaredType,
+      inferred_type: row.inferredType,
+      generic_params: row.genericParams,
+      parameter_types: row.parameterTypes,
+    }));
+  }
+
+  /**
+   * Get symbol at a specific file path and line (for hover info)
+   * Returns the symbol defined at or before the given line
+   */
+  getSymbolAtLine(filePathPattern: string, line: number): SymbolRow | null {
+    // Use raw SQL for ORDER BY line DESC with LIKE pattern
+    const row = this.db.prepare(`
+      SELECT id, name, type, file_path, line, column, is_exported, is_public,
+             summary, declared_type, inferred_type, generic_params, parameter_types
+      FROM symbols
+      WHERE file_path LIKE ?
+        AND line <= ?
+      ORDER BY line DESC
+      LIMIT 1
+    `).get(filePathPattern, line) as any | undefined;
+
+    if (!row) return null;
+
+    return {
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      file_path: row.file_path,
+      line: row.line,
+      column: row.column,
+      is_exported: row.is_exported,
+      is_public: row.is_public,
+      summary: row.summary,
+      declared_type: row.declared_type,
+      inferred_type: row.inferred_type,
+      generic_params: row.generic_params,
+      parameter_types: row.parameter_types,
+    };
+  }
+
+  /**
+   * Count relationships where symbol is in from_symbols (downstream)
+   */
+  countDownstreamRelationships(symbolId: string): number {
+    const pattern = `%"${symbolId}"%`;
+    const result = this.db.prepare(`
+      SELECT COUNT(*) as count FROM unified_relationships WHERE from_symbols LIKE ?
+    `).get(pattern) as { count: number } | undefined;
+    return result?.count || 0;
+  }
+
+  /**
+   * Count relationships where symbol is in to_symbols (upstream)
+   */
+  countUpstreamRelationships(symbolId: string): number {
+    const pattern = `%"${symbolId}"%`;
+    const result = this.db.prepare(`
+      SELECT COUNT(*) as count FROM unified_relationships WHERE to_symbols LIKE ?
+    `).get(pattern) as { count: number } | undefined;
+    return result?.count || 0;
+  }
+
+  /**
+   * Get relationship type counts for a symbol
+   */
+  getRelationshipTypeCounts(symbolId: string, limit: number = 5): Array<{ type: string; count: number }> {
+    const pattern = `%"${symbolId}"%`;
+    const rows = this.db.prepare(`
+      SELECT type, COUNT(*) as count
+      FROM unified_relationships
+      WHERE from_symbols LIKE ? OR to_symbols LIKE ?
+      GROUP BY type
+      ORDER BY count DESC
+      LIMIT ?
+    `).all(pattern, pattern, limit) as Array<{ type: string; count: number }>;
+    return rows;
+  }
+
+  /**
+   * Search symbols by name pattern
+   */
+  searchSymbolsByName(query: string, limit: number = 50): SymbolRow[] {
+    const pattern = `%${query}%`;
+    const rows = this.db.prepare(`
+      SELECT id, name, type, file_path, line, column, is_exported, is_public,
+             summary, declared_type, inferred_type, generic_params, parameter_types
+      FROM symbols
+      WHERE name LIKE ?
+      ORDER BY name
+      LIMIT ?
+    `).all(pattern, limit) as any[];
+
+    return rows.map(row => ({
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      file_path: row.file_path,
+      line: row.line,
+      column: row.column,
+      is_exported: row.is_exported,
+      is_public: row.is_public,
+      summary: row.summary,
+      declared_type: row.declared_type,
+      inferred_type: row.inferred_type,
+      generic_params: row.generic_params,
+      parameter_types: row.parameter_types,
+    }));
+  }
+
+  /**
+   * Find symbol by name (exact match first, then case-insensitive, then partial)
+   */
+  findSymbolByName(name: string): SymbolRow | null {
+    // Exact match
+    let row = this.db.prepare(`
+      SELECT id, name, type, file_path, line, column, is_exported, is_public,
+             summary, declared_type, inferred_type, generic_params, parameter_types
+      FROM symbols WHERE name = ? LIMIT 1
+    `).get(name) as any | undefined;
+
+    // Case-insensitive match
+    if (!row) {
+      row = this.db.prepare(`
+        SELECT id, name, type, file_path, line, column, is_exported, is_public,
+               summary, declared_type, inferred_type, generic_params, parameter_types
+        FROM symbols WHERE LOWER(name) = LOWER(?) LIMIT 1
+      `).get(name) as any | undefined;
+    }
+
+    // Partial match
+    if (!row) {
+      row = this.db.prepare(`
+        SELECT id, name, type, file_path, line, column, is_exported, is_public,
+               summary, declared_type, inferred_type, generic_params, parameter_types
+        FROM symbols WHERE name LIKE ? ORDER BY LENGTH(name) LIMIT 1
+      `).get(`%${name}%`) as any | undefined;
+    }
+
+    if (!row) return null;
+
+    return {
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      file_path: row.file_path,
+      line: row.line,
+      column: row.column,
+      is_exported: row.is_exported,
+      is_public: row.is_public,
+      summary: row.summary,
+      declared_type: row.declared_type,
+      inferred_type: row.inferred_type,
+      generic_params: row.generic_params,
+      parameter_types: row.parameter_types,
+    };
+  }
+
+  /**
+   * Get relationships for a symbol with limit
+   */
+  getRelationshipsForSymbol(symbolId: string, limit: number): Array<{
+    fromSymbols: string;
+    toSymbols: string;
+    type: string;
+  }> {
+    const pattern = `%"${symbolId}"%`;
+    const rows = this.db.prepare(`
+      SELECT from_symbols, to_symbols, type
+      FROM unified_relationships
+      WHERE from_symbols LIKE ? OR to_symbols LIKE ?
+      LIMIT ?
+    `).all(pattern, pattern, limit) as Array<{
+      from_symbols: string;
+      to_symbols: string;
+      type: string;
+    }>;
+
+    return rows.map(r => ({
+      fromSymbols: r.from_symbols,
+      toSymbols: r.to_symbols,
+      type: r.type,
+    }));
+  }
+
   // ========== Relationship Query Methods ==========
 
   /**
@@ -1400,6 +1608,70 @@ export class DatabaseManager {
     }));
   }
 
+  /**
+   * Get all error experiences
+   */
+  getAllErrorExperiences(): Array<{
+    id: string;
+    symbolId: string;
+    errorType: string;
+    message: string;
+    context: string;
+    solution: string;
+    occurredAt: string | null;
+    prevention: string | null;
+  }> {
+    const rows = this.drizzleDb.select().from(schema.errorExperiences).all();
+    return rows.map((row) => ({
+      id: row.id,
+      symbolId: row.symbolId,
+      errorType: row.errorType,
+      message: row.message,
+      context: row.context,
+      solution: row.solution,
+      occurredAt: row.occurredAt,
+      prevention: row.prevention,
+    }));
+  }
+
+  /**
+   * Get all test mappings
+   */
+  getAllTestMappings(): Array<{
+    symbolId: string;
+    testFilePath: string;
+    testName: string;
+    scenarios: string[];
+    coverage: Record<string, unknown> | null;
+  }> {
+    const rows = this.drizzleDb.select().from(schema.testMappings).all();
+    return rows.map((row) => ({
+      symbolId: row.symbolId,
+      testFilePath: row.testFilePath,
+      testName: row.testName,
+      scenarios: JSON.parse(row.scenarios),
+      coverage: row.coverage ? JSON.parse(row.coverage) : null,
+    }));
+  }
+
+  /**
+   * Get all enhanced docs with future plans
+   */
+  getAllEnhancedDocsWithPlans(): Array<{
+    symbolId: string;
+    futurePlans: string;
+  }> {
+    const rows = this.drizzleDb
+      .select({
+        symbolId: schema.enhancedDocs.symbolId,
+        futurePlans: schema.enhancedDocs.futurePlans,
+      })
+      .from(schema.enhancedDocs)
+      .all();
+
+    return rows;
+  }
+
   // ========== Future Plans Methods ==========
 
   /**
@@ -1531,5 +1803,529 @@ export class DatabaseManager {
    */
   getSchema() {
     return schema;
+  }
+
+  // ========== Task Methods ==========
+
+  /**
+   * Ensure tasks table exists
+   */
+  ensureTasksTable(): void {
+    this.db.exec(`
+      CREATE TABLE IF NOT EXISTS tasks (
+        id TEXT PRIMARY KEY,
+        title TEXT NOT NULL,
+        description TEXT,
+        status TEXT NOT NULL,
+        priority TEXT NOT NULL,
+        type TEXT NOT NULL,
+        assigned_to TEXT,
+        symbol_id TEXT,
+        file_path TEXT,
+        line INTEGER,
+        estimated_hours REAL,
+        actual_hours REAL,
+        due_date TEXT,
+        parent_id TEXT,
+        dependencies TEXT,
+        tags TEXT,
+        created_at TEXT NOT NULL,
+        updated_at TEXT NOT NULL,
+        completed_at TEXT,
+        notes TEXT
+      );
+
+      CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
+      CREATE INDEX IF NOT EXISTS idx_tasks_priority ON tasks(priority);
+      CREATE INDEX IF NOT EXISTS idx_tasks_symbol ON tasks(symbol_id);
+      CREATE INDEX IF NOT EXISTS idx_tasks_file ON tasks(file_path);
+      CREATE INDEX IF NOT EXISTS idx_tasks_due ON tasks(due_date);
+    `);
+  }
+
+  /**
+   * Insert a task
+   */
+  insertTask(task: {
+    id: string;
+    title: string;
+    description?: string;
+    status: string;
+    priority: string;
+    type: string;
+    assignedTo?: string;
+    symbolId?: string;
+    filePath?: string;
+    line?: number;
+    estimatedHours?: number;
+    actualHours?: number;
+    dueDate?: string;
+    parentId?: string;
+    dependencies?: string[];
+    tags?: string[];
+    createdAt: string;
+    updatedAt: string;
+    completedAt?: string;
+    notes?: string;
+  }): void {
+    this.drizzleDb.insert(schema.tasks).values({
+      id: task.id,
+      title: task.title,
+      description: task.description ?? null,
+      status: task.status,
+      priority: task.priority,
+      type: task.type,
+      assignedTo: task.assignedTo ?? null,
+      symbolId: task.symbolId ?? null,
+      filePath: task.filePath ?? null,
+      line: task.line ?? null,
+      estimatedHours: task.estimatedHours ?? null,
+      actualHours: task.actualHours ?? null,
+      dueDate: task.dueDate ?? null,
+      parentId: task.parentId ?? null,
+      dependencies: task.dependencies ? JSON.stringify(task.dependencies) : null,
+      tags: task.tags ? JSON.stringify(task.tags) : null,
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
+      completedAt: task.completedAt ?? null,
+      notes: task.notes ?? null,
+    }).run();
+  }
+
+  /**
+   * Get task by ID
+   */
+  getTaskById(id: string): schema.TaskRow | null {
+    const row = this.drizzleDb
+      .select()
+      .from(schema.tasks)
+      .where(eq(schema.tasks.id, id))
+      .get();
+    return row ?? null;
+  }
+
+  /**
+   * Update a task
+   */
+  updateTask(id: string, updates: {
+    title?: string;
+    description?: string;
+    status?: string;
+    priority?: string;
+    type?: string;
+    assignedTo?: string;
+    estimatedHours?: number;
+    actualHours?: number;
+    dueDate?: string;
+    tags?: string[];
+    updatedAt: string;
+    completedAt?: string;
+    notes?: string;
+  }): void {
+    const values: Record<string, unknown> = {
+      updatedAt: updates.updatedAt,
+    };
+    if (updates.title !== undefined) values.title = updates.title;
+    if (updates.description !== undefined) values.description = updates.description;
+    if (updates.status !== undefined) values.status = updates.status;
+    if (updates.priority !== undefined) values.priority = updates.priority;
+    if (updates.type !== undefined) values.type = updates.type;
+    if (updates.assignedTo !== undefined) values.assignedTo = updates.assignedTo;
+    if (updates.estimatedHours !== undefined) values.estimatedHours = updates.estimatedHours;
+    if (updates.actualHours !== undefined) values.actualHours = updates.actualHours;
+    if (updates.dueDate !== undefined) values.dueDate = updates.dueDate;
+    if (updates.tags !== undefined) values.tags = JSON.stringify(updates.tags);
+    if (updates.completedAt !== undefined) values.completedAt = updates.completedAt;
+    if (updates.notes !== undefined) values.notes = updates.notes;
+
+    this.drizzleDb
+      .update(schema.tasks)
+      .set(values)
+      .where(eq(schema.tasks.id, id))
+      .run();
+  }
+
+  /**
+   * Delete a task
+   */
+  deleteTask(id: string): boolean {
+    const result = this.drizzleDb
+      .delete(schema.tasks)
+      .where(eq(schema.tasks.id, id))
+      .run();
+    return result.changes > 0;
+  }
+
+  /**
+   * Get all tasks
+   */
+  getAllTasks(): schema.TaskRow[] {
+    return this.drizzleDb
+      .select()
+      .from(schema.tasks)
+      .orderBy(desc(schema.tasks.priority), asc(schema.tasks.dueDate), desc(schema.tasks.createdAt))
+      .all();
+  }
+
+  /**
+   * Get tasks with dynamic filters
+   */
+  getTasksWithFilters(filter?: {
+    status?: string | string[];
+    priority?: string | string[];
+    type?: string | string[];
+    assignedTo?: string;
+    symbolId?: string;
+    dueBefore?: string;
+    dueAfter?: string;
+  }): schema.TaskRow[] {
+    let query = this.drizzleDb.select().from(schema.tasks).$dynamic();
+
+    if (filter?.status) {
+      const statuses = Array.isArray(filter.status) ? filter.status : [filter.status];
+      query = query.where(inArray(schema.tasks.status, statuses));
+    }
+
+    if (filter?.priority) {
+      const priorities = Array.isArray(filter.priority) ? filter.priority : [filter.priority];
+      query = query.where(inArray(schema.tasks.priority, priorities));
+    }
+
+    if (filter?.type) {
+      const types = Array.isArray(filter.type) ? filter.type : [filter.type];
+      query = query.where(inArray(schema.tasks.type, types));
+    }
+
+    if (filter?.assignedTo) {
+      query = query.where(eq(schema.tasks.assignedTo, filter.assignedTo));
+    }
+
+    if (filter?.symbolId) {
+      query = query.where(eq(schema.tasks.symbolId, filter.symbolId));
+    }
+
+    if (filter?.dueBefore) {
+      query = query.where(lte(schema.tasks.dueDate, filter.dueBefore));
+    }
+
+    if (filter?.dueAfter) {
+      query = query.where(gte(schema.tasks.dueDate, filter.dueAfter));
+    }
+
+    return query
+      .orderBy(desc(schema.tasks.priority), asc(schema.tasks.dueDate), desc(schema.tasks.createdAt))
+      .all();
+  }
+
+  // ==========================================
+  // Command Helper Methods
+  // ==========================================
+
+  /**
+   * Check if symbol exists by ID
+   */
+  symbolExists(id: string): boolean {
+    const result = this.drizzleDb
+      .select({ id: schema.symbols.id })
+      .from(schema.symbols)
+      .where(eq(schema.symbols.id, id))
+      .get();
+    return !!result;
+  }
+
+  /**
+   * Find symbols by name (exact or pattern match)
+   */
+  findSymbolsByNamePattern(name: string): SymbolRow[] {
+    const rows = this.drizzleDb
+      .select()
+      .from(schema.symbols)
+      .where(or(eq(schema.symbols.name, name), like(schema.symbols.name, `${name}.%`)))
+      .all();
+
+    return rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      file_path: row.filePath,
+      line: row.line,
+      column: row.column,
+      is_exported: row.isExported ? 1 : 0,
+      is_public: row.isPublic ? 1 : 0,
+      summary: row.summary,
+      declared_type: row.declaredType,
+      inferred_type: row.inferredType,
+      generic_params: row.genericParams,
+      parameter_types: row.parameterTypes,
+      is_constant: row.isConstant ? 1 : 0,
+      literal_value: row.literalValue,
+      value_type: row.valueType,
+      created_at: row.createdAt,
+      updated_at: row.updatedAt,
+      version: row.version,
+      jsonl_line: row.jsonlLine,
+    }));
+  }
+
+  /**
+   * Get symbol IDs by file path
+   */
+  getSymbolIdsByFilePath(filePath: string): string[] {
+    const rows = this.drizzleDb
+      .select({ id: schema.symbols.id })
+      .from(schema.symbols)
+      .where(eq(schema.symbols.filePath, filePath))
+      .all();
+    return rows.map((r) => r.id);
+  }
+
+  /**
+   * Get symbol file path by ID
+   */
+  getSymbolFilePath(id: string): string | null {
+    const result = this.drizzleDb
+      .select({ filePath: schema.symbols.filePath })
+      .from(schema.symbols)
+      .where(eq(schema.symbols.id, id))
+      .get();
+    return result?.filePath ?? null;
+  }
+
+  /**
+   * Get dependency targets for a symbol
+   */
+  getDependencyTargets(symbolId: string): string[] {
+    const rows = this.drizzleDb
+      .select({ target: schema.dependencies.target })
+      .from(schema.dependencies)
+      .where(eq(schema.dependencies.symbolId, symbolId))
+      .all();
+    return rows.map((r) => r.target);
+  }
+
+  /**
+   * Get all relationships with from/to symbols
+   */
+  getAllRelationshipsForValidation(): Array<{
+    id: string;
+    fromSymbols: string;
+    toSymbols: string;
+  }> {
+    return this.drizzleDb
+      .select({
+        id: schema.unifiedRelationships.id,
+        fromSymbols: schema.unifiedRelationships.fromSymbols,
+        toSymbols: schema.unifiedRelationships.toSymbols,
+      })
+      .from(schema.unifiedRelationships)
+      .all();
+  }
+
+  /**
+   * Find duplicate relationships
+   */
+  findDuplicateRelationships(): Array<{
+    type: string;
+    fromSymbols: string;
+    toSymbols: string;
+    count: number;
+  }> {
+    const rows = this.db
+      .prepare(
+        `
+        SELECT
+          type,
+          from_symbols,
+          to_symbols,
+          COUNT(*) as count
+        FROM unified_relationships
+        GROUP BY type, from_symbols, to_symbols
+        HAVING COUNT(*) > 1
+      `
+      )
+      .all() as Array<{
+      type: string;
+      from_symbols: string;
+      to_symbols: string;
+      count: number;
+    }>;
+
+    return rows.map((r) => ({
+      type: r.type,
+      fromSymbols: r.from_symbols,
+      toSymbols: r.to_symbols,
+      count: r.count,
+    }));
+  }
+
+  /**
+   * Get low confidence relationships
+   */
+  getLowConfidenceRelationships(threshold: number): Array<{
+    id: string;
+    type: string;
+    confidence: number;
+  }> {
+    return this.drizzleDb
+      .select({
+        id: schema.unifiedRelationships.id,
+        type: schema.unifiedRelationships.type,
+        confidence: schema.unifiedRelationships.confidence,
+      })
+      .from(schema.unifiedRelationships)
+      .where(lte(schema.unifiedRelationships.confidence, threshold))
+      .orderBy(asc(schema.unifiedRelationships.confidence))
+      .all();
+  }
+
+  /**
+   * Get bidirectional relationships
+   */
+  getBidirectionalRelationships(): Array<{
+    id: string;
+    type: string;
+    fromSymbols: string;
+    toSymbols: string;
+  }> {
+    return this.drizzleDb
+      .select({
+        id: schema.unifiedRelationships.id,
+        type: schema.unifiedRelationships.type,
+        fromSymbols: schema.unifiedRelationships.fromSymbols,
+        toSymbols: schema.unifiedRelationships.toSymbols,
+      })
+      .from(schema.unifiedRelationships)
+      .where(eq(schema.unifiedRelationships.direction, 'bidirectional'))
+      .all();
+  }
+
+  /**
+   * Check if reverse relationship exists
+   */
+  hasReverseRelationship(type: string, fromSymbols: string, toSymbols: string): boolean {
+    const result = this.drizzleDb
+      .select({ id: schema.unifiedRelationships.id })
+      .from(schema.unifiedRelationships)
+      .where(
+        and(
+          eq(schema.unifiedRelationships.type, type),
+          eq(schema.unifiedRelationships.fromSymbols, toSymbols),
+          eq(schema.unifiedRelationships.toSymbols, fromSymbols)
+        )
+      )
+      .get();
+    return !!result;
+  }
+
+  /**
+   * Count incoming calls for a symbol (for dead code detection)
+   */
+  countIncomingCalls(symbolId: string): number {
+    const result = this.drizzleDb
+      .select({ count: sql<number>`COUNT(*)` })
+      .from(schema.unifiedRelationships)
+      .where(
+        and(
+          eq(schema.unifiedRelationships.type, 'calls'),
+          like(schema.unifiedRelationships.toSymbols, `%"${symbolId}"%`)
+        )
+      )
+      .get();
+    return result?.count ?? 0;
+  }
+
+  /**
+   * Count all incoming references for a symbol (for dead code detection)
+   */
+  countIncomingReferences(symbolId: string): number {
+    const result = this.drizzleDb
+      .select({ count: sql<number>`COUNT(*)` })
+      .from(schema.unifiedRelationships)
+      .where(
+        and(
+          inArray(schema.unifiedRelationships.type, [
+            'code-dependency',
+            'calls',
+            'inheritance',
+            'type-dependency',
+          ]),
+          like(schema.unifiedRelationships.toSymbols, `%"${symbolId}"%`)
+        )
+      )
+      .get();
+    return result?.count ?? 0;
+  }
+
+  /**
+   * Get caller file paths for a symbol (for dead code detection)
+   */
+  getCallerFilePaths(symbolId: string): string[] {
+    const rows = this.db
+      .prepare(
+        `SELECT s.file_path
+         FROM unified_relationships r
+         JOIN symbols s ON json_extract(r.from_symbols, '$[0]') = s.id
+         WHERE r.type = 'calls' AND r.to_symbols LIKE ?`
+      )
+      .all(`%"${symbolId}"%`) as Array<{ file_path: string }>;
+    return rows.map((r) => r.file_path);
+  }
+
+  /**
+   * Check if test_mappings table exists
+   */
+  hasTestMappingsTable(): boolean {
+    const result = this.db
+      .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='test_mappings'`)
+      .get();
+    return !!result;
+  }
+
+  /**
+   * Get test mappings with symbol info
+   */
+  getTestMappingsWithSymbols(): Array<{
+    symbolId: string;
+    testFilePath: string;
+    testName: string;
+  }> {
+    return this.drizzleDb
+      .select({
+        symbolId: schema.testMappings.symbolId,
+        testFilePath: schema.testMappings.testFilePath,
+        testName: schema.testMappings.testName,
+      })
+      .from(schema.testMappings)
+      .all();
+  }
+
+  /**
+   * Find symbol by ID with type filter
+   */
+  findSymbolByIdWithType(symbolId: string, types: string[]): schema.Symbol | null {
+    return (
+      this.drizzleDb
+        .select()
+        .from(schema.symbols)
+        .where(and(eq(schema.symbols.id, symbolId), inArray(schema.symbols.type, types)))
+        .get() ?? null
+    );
+  }
+
+  /**
+   * Find symbol by name and optional file pattern with type filter
+   */
+  findSymbolByNameWithType(
+    name: string,
+    types: string[],
+    filePattern?: string
+  ): schema.Symbol | null {
+    let conditions = and(eq(schema.symbols.name, name), inArray(schema.symbols.type, types));
+
+    if (filePattern) {
+      conditions = and(conditions, like(schema.symbols.filePath, `%${filePattern}%`));
+    }
+
+    return this.drizzleDb.select().from(schema.symbols).where(conditions).get() ?? null;
   }
 }

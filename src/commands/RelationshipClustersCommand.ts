@@ -225,21 +225,18 @@ Examples:
     dbManager: DatabaseManager,
     category?: string
   ): Map<string, Map<string, string>> {
-    let sql = 'SELECT * FROM unified_relationships';
-    const params: any[] = [];
+    // Use Drizzle ORM to query relationships
+    let relationships = dbManager.getAllUnifiedRelationships();
 
     if (category) {
-      sql += ' WHERE category = ?';
-      params.push(category);
+      relationships = relationships.filter(r => r.category === category);
     }
-
-    const relationships = dbManager.db.prepare(sql).all(...params) as UnifiedRelationshipRow[];
 
     const adjacencyMap = new Map<string, Map<string, string>>();
 
     for (const rel of relationships) {
-      const fromSymbols = JSON.parse(rel.from_symbols);
-      const toSymbols = JSON.parse(rel.to_symbols);
+      const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
+      const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
 
       for (const from of fromSymbols) {
         if (!adjacencyMap.has(from)) {

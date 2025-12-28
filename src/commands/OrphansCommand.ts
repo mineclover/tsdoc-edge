@@ -92,50 +92,61 @@ export class OrphansCommand extends BaseCommand {
     }
 
     const dbManager = new DatabaseManager(dbPath, '');
-    const db = dbManager.db;
 
-    // Find symbols with no incoming relationships
-    let query = `
-      SELECT DISTINCT s.id, s.name, s.file_path as filePath, s.type
-      FROM symbols s
-      WHERE s.id NOT IN (
-        SELECT DISTINCT json_each.value
-        FROM unified_relationships,
-        json_each(unified_relationships.to_symbols)
-      )`;
+    // Build set of all "to" symbol IDs from relationships using Drizzle ORM
+    const allRels = dbManager.getAllUnifiedRelationships();
+    const usedSymbolIds = new Set<string>();
+    for (const rel of allRels) {
+      const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
+      for (const to of toSymbols) {
+        if (to) usedSymbolIds.add(to);
+      }
+    }
 
+    // Get all symbols and filter to find orphans
+    const allSymbols = dbManager.getAllSymbolRows();
+    let orphans = allSymbols
+      .filter(s => !usedSymbolIds.has(s.id))
+      .map(s => ({
+        id: s.id,
+        name: s.name,
+        filePath: s.file_path,
+        type: s.type,
+      }));
+
+    // Apply filters
     if (excludeTests) {
-      query += `
-      AND s.type NOT IN ('test-suite', 'test-case')
-      AND s.file_path NOT LIKE '%/__tests__/%'
-      AND s.file_path NOT LIKE '%.test.ts'
-      AND s.file_path NOT LIKE '%.spec.ts'`;
+      orphans = orphans.filter(s =>
+        s.type !== 'test-suite' &&
+        s.type !== 'test-case' &&
+        !s.filePath.includes('/__tests__/') &&
+        !s.filePath.endsWith('.test.ts') &&
+        !s.filePath.endsWith('.spec.ts')
+      );
     }
 
     if (classesOnly) {
-      query += `
-      AND s.type IN ('class', 'interface', 'type', 'enum')`;
+      orphans = orphans.filter(s =>
+        s.type === 'class' ||
+        s.type === 'interface' ||
+        s.type === 'type' ||
+        s.type === 'enum'
+      );
     }
 
-    query += `
-      ORDER BY s.file_path, s.name`;
-
-    let orphans = db.prepare(query).all() as Array<{ id: string; name: string; filePath: string; type: string }>;
+    // Sort by file path and name
+    orphans.sort((a, b) => {
+      const fileCompare = a.filePath.localeCompare(b.filePath);
+      return fileCompare !== 0 ? fileCompare : a.name.localeCompare(b.name);
+    });
 
     // Filter out members of used classes (unless includeMembers is true)
     if (!includeMembers && !classesOnly) {
       // Get all class IDs that are NOT orphans (i.e., used classes)
       const usedClassIds = new Set(
-        db.prepare(`
-          SELECT DISTINCT s.id
-          FROM symbols s
-          WHERE s.type = 'class'
-          AND s.id IN (
-            SELECT DISTINCT json_each.value
-            FROM unified_relationships,
-            json_each(unified_relationships.to_symbols)
-          )
-        `).all().map((r: any) => r.id)
+        allSymbols
+          .filter(s => s.type === 'class' && usedSymbolIds.has(s.id))
+          .map(s => s.id)
       );
 
       // Filter out members whose parent class is used

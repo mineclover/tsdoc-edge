@@ -100,19 +100,12 @@ export class TodosCommand extends BaseCommand {
         // Query future plans (TODO items)
         this.printSection('📋 Future Plans (TODO)');
 
-        const query = `
-          SELECT
-            future_plans as plans,
-            symbol_id as symbolId
-          FROM enhanced_docs
-        `;
-
-        const stmt = dbManager.db.prepare(query);
-        const results = stmt.all() as Array<{ plans: string; symbolId: string }>;
+        // Use Drizzle ORM to query enhanced docs with future plans
+        const results = dbManager.getAllEnhancedDocsWithPlans();
 
         let totalTodos = 0;
         for (const row of results) {
-          const plans = JSON.parse(row.plans || '[]');
+          const plans = JSON.parse(row.futurePlans || '[]');
           if (plans.length > 0) {
             console.log();
             console.log(`${colors.bold}Symbol: ${row.symbolId}${colors.reset}`);

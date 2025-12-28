@@ -220,6 +220,32 @@ export const syncMetadata = sqliteTable('sync_metadata', {
   status: text('status').notNull(), // synced, modified, error
 });
 
+/**
+ * Tasks table for project management
+ */
+export const tasks = sqliteTable('tasks', {
+  id: text('id').primaryKey(),
+  title: text('title').notNull(),
+  description: text('description'),
+  status: text('status').notNull(),
+  priority: text('priority').notNull(),
+  type: text('type').notNull(),
+  assignedTo: text('assigned_to'),
+  symbolId: text('symbol_id'),
+  filePath: text('file_path'),
+  line: integer('line'),
+  estimatedHours: real('estimated_hours'),
+  actualHours: real('actual_hours'),
+  dueDate: text('due_date'),
+  parentId: text('parent_id'),
+  dependencies: text('dependencies'), // JSON array
+  tags: text('tags'), // JSON array
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+  completedAt: text('completed_at'),
+  notes: text('notes'),
+});
+
 // Type exports for use in application code
 export type Symbol = typeof symbols.$inferSelect;
 export type NewSymbol = typeof symbols.$inferInsert;
@@ -256,3 +282,6 @@ export type NewIndexingRule = typeof indexingRules.$inferInsert;
 
 export type SyncMetadataRow = typeof syncMetadata.$inferSelect;
 export type NewSyncMetadata = typeof syncMetadata.$inferInsert;
+
+export type TaskRow = typeof tasks.$inferSelect;
+export type NewTask = typeof tasks.$inferInsert;

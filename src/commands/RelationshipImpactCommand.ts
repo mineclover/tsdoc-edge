@@ -82,9 +82,7 @@ Examples:
       const dbManager = new DatabaseManager(dbPath);
 
       // Verify symbol exists
-      const symbol = dbManager.db
-        .prepare('SELECT * FROM symbols WHERE id = ?')
-        .get(symbolId) as any;
+      const symbol = dbManager.getSymbol(symbolId);
 
       if (!symbol) {
         this.printError(`Symbol not found: ${symbolId}`);
@@ -249,39 +247,20 @@ Examples:
 
       if (current.depth >= maxDepth) continue;
 
-      // Query relationships based on direction
-      let sql = 'SELECT * FROM unified_relationships WHERE ';
-      const params: any[] = [];
+      // Use Drizzle ORM to query relationships
+      let relationships = dbManager.getUnifiedRelationshipsBySymbol(current.symbolId);
 
-      if (direction === 'downstream') {
-        // Who depends on this symbol
-        sql += '(from_symbols LIKE ? OR json_extract(from_symbols, \'$[0]\') = ?)';
-        params.push(`%"${current.symbolId}"%`, current.symbolId);
-      } else if (direction === 'upstream') {
-        // What this depends on
-        sql += '(to_symbols LIKE ? OR json_extract(to_symbols, \'$[0]\') = ?)';
-        params.push(`%"${current.symbolId}"%`, current.symbolId);
-      } else {
-        // Both
-        sql += '(from_symbols LIKE ? OR to_symbols LIKE ? OR json_extract(from_symbols, \'$[0]\') = ? OR json_extract(to_symbols, \'$[0]\') = ?)';
-        params.push(`%"${current.symbolId}"%`, `%"${current.symbolId}"%`, current.symbolId, current.symbolId);
-      }
-
+      // Filter by category and confidence
       if (category) {
-        sql += ' AND category = ?';
-        params.push(category);
+        relationships = relationships.filter(r => r.category === category);
       }
-
       if (minConfidence !== undefined) {
-        sql += ' AND confidence >= ?';
-        params.push(minConfidence);
+        relationships = relationships.filter(r => r.confidence >= minConfidence);
       }
-
-      const relationships = dbManager.db.prepare(sql).all(...params) as UnifiedRelationshipRow[];
 
       for (const rel of relationships) {
-        const fromSymbols = JSON.parse(rel.from_symbols);
-        const toSymbols = JSON.parse(rel.to_symbols);
+        const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
+        const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
 
         // Find the next symbol in the chain
         let nextSymbols: string[] = [];

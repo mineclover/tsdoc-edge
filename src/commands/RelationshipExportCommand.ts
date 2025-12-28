@@ -93,29 +93,25 @@ Examples:
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
-      // Build query
-      let sql = 'SELECT * FROM unified_relationships WHERE 1=1';
-      const params: any[] = [];
-
-      if (options.category) {
-        sql += ' AND category = ?';
-        params.push(options.category);
-      }
-
-      if (options.type) {
-        sql += ' AND type = ?';
-        params.push(options.type);
-      }
-
-      if (options.minConfidence !== undefined) {
-        sql += ' AND confidence >= ?';
-        params.push(options.minConfidence);
-      }
-
+      // Use Drizzle ORM to query relationships
       console.log();
       this.printInfo('Querying relationships...');
 
-      const relationships = dbManager.db.prepare(sql).all(...params) as UnifiedRelationshipRow[];
+      let allRels = dbManager.getAllUnifiedRelationshipRows();
+
+      // Apply filters
+      if (options.category) {
+        allRels = allRels.filter(r => r.category === options.category);
+      }
+      if (options.type) {
+        allRels = allRels.filter(r => r.type === options.type);
+      }
+      if (options.minConfidence !== undefined) {
+        const minConf = options.minConfidence;
+        allRels = allRels.filter(r => r.confidence >= minConf);
+      }
+
+      const relationships = allRels;
 
       this.printInfo(`Found ${relationships.length} relationships`);
       console.log();

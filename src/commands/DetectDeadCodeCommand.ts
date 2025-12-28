@@ -260,12 +260,7 @@ export class DetectDeadCodeCommand extends BaseCommand {
    */
   private async getIncomingCalls(symbolId: string): Promise<number> {
     try {
-      const stmt = this.db['db'].prepare(
-        `SELECT COUNT(*) as count FROM unified_relationships
-         WHERE type = 'calls' AND target_id = ?`
-      );
-      const result = stmt.get(symbolId) as { count: number };
-      return result.count;
+      return this.db.countIncomingCalls(symbolId);
     } catch (error) {
       return 0;
     }
@@ -282,12 +277,7 @@ export class DetectDeadCodeCommand extends BaseCommand {
       // - calls: function/method calls
       // - inheritance: extends/implements
       // - type-dependency: type annotations
-      const stmt = this.db['db'].prepare(
-        `SELECT COUNT(*) as count FROM unified_relationships
-         WHERE target_id = ? AND type IN ('code-dependency', 'calls', 'inheritance', 'type-dependency')`
-      );
-      const result = stmt.get(symbolId) as { count: number };
-      return result.count;
+      return this.db.countIncomingReferences(symbolId);
     } catch (error) {
       return 0;
     }
@@ -298,17 +288,11 @@ export class DetectDeadCodeCommand extends BaseCommand {
    */
   private async isOnlyCalledByTests(symbolId: string): Promise<boolean> {
     try {
-      const stmt = this.db['db'].prepare(
-        `SELECT s.file_path
-         FROM unified_relationships r
-         JOIN symbols s ON r.source_id = s.id
-         WHERE r.type = 'calls' AND r.target_id = ?`
-      );
-      const callers = stmt.all(symbolId) as Array<{ file_path: string }>;
+      const callerFilePaths = this.db.getCallerFilePaths(symbolId);
 
-      if (callers.length === 0) return false;
+      if (callerFilePaths.length === 0) return false;
 
-      return callers.every((caller) => this.isTestFile(caller.file_path));
+      return callerFilePaths.every((filePath) => this.isTestFile(filePath));
     } catch (error) {
       return false;
     }

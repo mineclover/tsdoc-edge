@@ -16,6 +16,7 @@
  */
 
 import type { Database } from 'better-sqlite3';
+import type { DatabaseManager } from '../storage/DatabaseManager';
 import type { SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships';
 
@@ -37,11 +38,23 @@ interface TestCoverage {
  */
 export class TestCoverageUnifier {
   private graph: SymbolGraph;
-  private db: Database;
+  private dbManager: DatabaseManager | null;
+  private db: Database | null;
 
-  constructor(graph: SymbolGraph, db: Database) {
+  /**
+   * Constructor supporting both DatabaseManager and raw Database for backwards compatibility
+   */
+  constructor(graph: SymbolGraph, db: Database | DatabaseManager) {
     this.graph = graph;
-    this.db = db;
+    if ('drizzleDb' in db) {
+      // It's a DatabaseManager
+      this.dbManager = db as DatabaseManager;
+      this.db = null;
+    } else {
+      // It's a raw Database
+      this.dbManager = null;
+      this.db = db as Database;
+    }
   }
 
   /**
@@ -69,34 +82,55 @@ export class TestCoverageUnifier {
     const coverages: TestCoverage[] = [];
 
     try {
-      // Check if test_mappings table exists
-      const tableCheck = this.db
-        .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='test_mappings'`)
-        .get();
+      if (this.dbManager) {
+        // Use DatabaseManager helper methods
+        if (!this.dbManager.hasTestMappingsTable()) {
+          console.warn('TestCoverageUnifier: test_mappings table not found');
+          return [];
+        }
 
-      if (!tableCheck) {
-        console.warn('TestCoverageUnifier: test_mappings table not found');
-        return [];
-      }
+        const mappings = this.dbManager.getTestMappingsWithSymbols();
 
-      // Extract test mappings
-      const mappings = this.db
-        .prepare(
-          `SELECT symbol_id, test_file_path, test_name
-           FROM test_mappings
-           WHERE symbol_id IS NOT NULL`
-        )
-        .all() as Array<{ symbol_id: string; test_file_path: string; test_name: string | null }>;
+        for (const mapping of mappings) {
+          // Verify symbol exists in graph
+          if (this.graph.symbols.has(mapping.symbolId)) {
+            coverages.push({
+              symbolId: mapping.symbolId,
+              testFile: mapping.testFilePath,
+              testName: mapping.testName || 'unknown test',
+              confidence: 1.0,
+            });
+          }
+        }
+      } else if (this.db) {
+        // Fallback to raw database access for backwards compatibility
+        const tableCheck = this.db
+          .prepare(`SELECT name FROM sqlite_master WHERE type='table' AND name='test_mappings'`)
+          .get();
 
-      for (const mapping of mappings) {
-        // Verify symbol exists in graph
-        if (this.graph.symbols.has(mapping.symbol_id)) {
-          coverages.push({
-            symbolId: mapping.symbol_id,
-            testFile: mapping.test_file_path,
-            testName: mapping.test_name || 'unknown test',
-            confidence: 1.0,
-          });
+        if (!tableCheck) {
+          console.warn('TestCoverageUnifier: test_mappings table not found');
+          return [];
+        }
+
+        const mappings = this.db
+          .prepare(
+            `SELECT symbol_id, test_file_path, test_name
+             FROM test_mappings
+             WHERE symbol_id IS NOT NULL`
+          )
+          .all() as Array<{ symbol_id: string; test_file_path: string; test_name: string | null }>;
+
+        for (const mapping of mappings) {
+          // Verify symbol exists in graph
+          if (this.graph.symbols.has(mapping.symbol_id)) {
+            coverages.push({
+              symbolId: mapping.symbol_id,
+              testFile: mapping.test_file_path,
+              testName: mapping.test_name || 'unknown test',
+              confidence: 1.0,
+            });
+          }
         }
       }
     } catch (error) {

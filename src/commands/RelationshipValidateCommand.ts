@@ -206,19 +206,15 @@ Examples:
     const issues: ValidationIssue[] = [];
 
     try {
-      const relationships = dbManager.db
-        .prepare('SELECT id, from_symbols, to_symbols FROM unified_relationships')
-        .all() as Array<{ id: string; from_symbols: string; to_symbols: string }>;
+      const relationships = dbManager.getAllRelationshipsForValidation();
 
       for (const rel of relationships) {
-        const fromSymbols = JSON.parse(rel.from_symbols);
-        const toSymbols = JSON.parse(rel.to_symbols);
+        const fromSymbols = JSON.parse(rel.fromSymbols);
+        const toSymbols = JSON.parse(rel.toSymbols);
 
         // Check each symbol exists
         for (const symbolId of [...fromSymbols, ...toSymbols]) {
-          const exists = dbManager.db
-            .prepare('SELECT id FROM symbols WHERE id = ?')
-            .get(symbolId);
+          const exists = dbManager.symbolExists(symbolId);
 
           if (!exists) {
             issues.push({
@@ -245,26 +241,13 @@ Examples:
     const issues: ValidationIssue[] = [];
 
     try {
-      const duplicates = dbManager.db
-        .prepare(
-          `
-        SELECT
-          type,
-          from_symbols,
-          to_symbols,
-          COUNT(*) as count
-        FROM unified_relationships
-        GROUP BY type, from_symbols, to_symbols
-        HAVING count > 1
-      `
-        )
-        .all() as Array<{ type: string; from_symbols: string; to_symbols: string; count: number }>;
+      const duplicates = dbManager.findDuplicateRelationships();
 
       for (const dup of duplicates) {
         issues.push({
           type: 'duplicate',
           severity: 'warning',
-          message: `Duplicate relationship: ${dup.type} (${dup.from_symbols} -> ${dup.to_symbols}) appears ${dup.count} times`,
+          message: `Duplicate relationship: ${dup.type} (${dup.fromSymbols} -> ${dup.toSymbols}) appears ${dup.count} times`,
         });
       }
     } catch (error) {
@@ -281,16 +264,7 @@ Examples:
     const issues: ValidationIssue[] = [];
 
     try {
-      const lowConfidence = dbManager.db
-        .prepare(
-          `
-        SELECT id, type, confidence
-        FROM unified_relationships
-        WHERE confidence < ?
-        ORDER BY confidence ASC
-      `
-        )
-        .all(threshold) as Array<{ id: string; type: string; confidence: number }>;
+      const lowConfidence = dbManager.getLowConfidenceRelationships(threshold);
 
       for (const rel of lowConfidence) {
         issues.push({
@@ -315,34 +289,20 @@ Examples:
 
     try {
       // Find bidirectional relationships
-      const bidirectional = dbManager.db
-        .prepare(
-          `
-        SELECT id, type, from_symbols, to_symbols
-        FROM unified_relationships
-        WHERE direction = 'bidirectional'
-      `
-        )
-        .all() as Array<{ id: string; type: string; from_symbols: string; to_symbols: string }>;
+      const bidirectional = dbManager.getBidirectionalRelationships();
 
       for (const rel of bidirectional) {
-        const fromSymbols = JSON.parse(rel.from_symbols);
-        const toSymbols = JSON.parse(rel.to_symbols);
+        const fromSymbols = JSON.parse(rel.fromSymbols);
+        const toSymbols = JSON.parse(rel.toSymbols);
 
         // Check if reverse relationship exists
-        const reverse = dbManager.db
-          .prepare(
-            `
-          SELECT id
-          FROM unified_relationships
-          WHERE type = ?
-            AND from_symbols = ?
-            AND to_symbols = ?
-        `
-          )
-          .get(rel.type, rel.to_symbols, rel.from_symbols);
+        const hasReverse = dbManager.hasReverseRelationship(
+          rel.type,
+          rel.fromSymbols,
+          rel.toSymbols
+        );
 
-        if (!reverse) {
+        if (!hasReverse) {
           issues.push({
             type: 'inconsistent',
             severity: 'warning',

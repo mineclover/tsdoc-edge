@@ -100,9 +100,7 @@ export class WhoUsesCommand extends BaseCommand {
 
       try {
         // Find symbols matching the name
-        const symbols = dbManager.db
-          .prepare('SELECT * FROM symbols WHERE name = ? OR name LIKE ?')
-          .all(symbolName, `${symbolName}.%`) as SymbolRow[];
+        const symbols = dbManager.findSymbolsByNamePattern(symbolName);
 
         if (symbols.length === 0) {
           this.printError(`Symbol not found: ${symbolName}`);

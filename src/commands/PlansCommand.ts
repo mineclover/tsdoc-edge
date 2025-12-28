@@ -95,20 +95,13 @@ export class PlansCommand extends BaseCommand {
       const dbManager = this.dbManager || new DatabaseManager(dbPath, jsonlPath);
 
       try {
-        const query = `
-          SELECT
-            future_plans as plans,
-            symbol_id as symbolId
-          FROM enhanced_docs
-        `;
-
-        const stmt = dbManager.db.prepare(query);
-        const results = stmt.all() as Array<{ plans: string; symbolId: string }>;
+        // Use Drizzle ORM to query enhanced docs with future plans
+        const results = dbManager.getAllEnhancedDocsWithPlans();
 
         const allPlans: Array<{ plan: FuturePlan; symbolId: string }> = [];
 
         for (const row of results) {
-          const plans = JSON.parse(row.plans || '[]');
+          const plans = JSON.parse(row.futurePlans || '[]');
           for (const plan of plans) {
             allPlans.push({ plan, symbolId: row.symbolId });
           }

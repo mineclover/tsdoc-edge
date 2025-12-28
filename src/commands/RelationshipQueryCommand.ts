@@ -64,35 +64,39 @@ Examples:
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
-      // Query relationships
-      let sql = `
-        SELECT *
-        FROM unified_relationships
-        WHERE (
-          json_extract(from_symbols, '$[0]') = ? OR
-          json_extract(to_symbols, '$[0]') = ? OR
-          from_symbols LIKE '%"' || ? || '"%' OR
-          to_symbols LIKE '%"' || ? || '"%'
-        )
-      `;
-
-      const params: any[] = [symbolId, symbolId, symbolId, symbolId];
+      // Use Drizzle ORM to query relationships
+      let rels = dbManager.getUnifiedRelationshipsBySymbol(symbolId);
 
       // Apply filters
       if (options.type) {
-        sql += ' AND type = ?';
-        params.push(options.type);
+        rels = rels.filter(r => r.type === options.type);
       }
-
       if (options.category) {
-        sql += ' AND category = ?';
-        params.push(options.category);
+        rels = rels.filter(r => r.category === options.category);
       }
 
-      sql += ' LIMIT ?';
-      params.push(options.limit);
+      // Apply limit
+      rels = rels.slice(0, options.limit);
 
-      const relationships = dbManager.db.prepare(sql).all(...params) as UnifiedRelationshipRow[];
+      // Convert to row format for compatibility
+      const relationships = rels.map(r => ({
+        id: r.id,
+        type: r.type,
+        category: r.category,
+        from_symbols: JSON.stringify(Array.isArray(r.from) ? r.from : [r.from]),
+        to_symbols: JSON.stringify(Array.isArray(r.to) ? r.to : [r.to]),
+        direction: r.direction,
+        strength: r.strength,
+        evidence: JSON.stringify(r.evidence),
+        discovered_by: r.discoveredBy,
+        confidence: r.confidence,
+        file_path: r.filePath ?? null,
+        line: r.line ?? null,
+        properties: r.properties ? JSON.stringify(r.properties) : null,
+        created_at: r.createdAt,
+        updated_at: r.updatedAt,
+        description: r.description ?? null,
+      })) as UnifiedRelationshipRow[];
 
       if (relationships.length === 0) {
         this.printInfo('No relationships found');

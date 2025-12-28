@@ -385,7 +385,7 @@ export class AnalyzerRegistry {
         return new TemporalOrderAnalyzer(graph, program).analyze();
 
       case 'tests':
-        return new TestCoverageUnifier(graph, ctx.db!).analyze();
+        return new TestCoverageUnifier(graph, ctx.dbManager ?? ctx.db!).analyze();
 
       case 'types':
         return new TypeDependencyAnalyzer(graph, program).analyze();

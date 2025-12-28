@@ -384,9 +384,8 @@ export class ExploreEntrypointCommand extends BaseCommand {
    * Find all symbols defined in a file
    */
   private findSymbolsInFile(filePath: string, dbManager: DatabaseManager): Array<{ id: string }> {
-    return dbManager.db
-      .prepare('SELECT id FROM symbols WHERE file_path = ?')
-      .all(filePath) as Array<{ id: string }>;
+    const ids = dbManager.getSymbolIdsByFilePath(filePath);
+    return ids.map((id) => ({ id }));
   }
 
   /**
@@ -397,26 +396,22 @@ export class ExploreEntrypointCommand extends BaseCommand {
     exploration: EntrypointExploration,
     dbManager: DatabaseManager
   ): void {
-    const deps = dbManager.db
-      .prepare('SELECT target FROM dependencies WHERE symbol_id = ?')
-      .all(symbolId) as Array<{ target: string }>;
+    const deps = dbManager.getDependencyTargets(symbolId);
 
-    for (const dep of deps) {
-      if (!exploration.discoveredSymbols.has(dep.target)) {
-        exploration.discoveredSymbols.add(dep.target);
+    for (const target of deps) {
+      if (!exploration.discoveredSymbols.has(target)) {
+        exploration.discoveredSymbols.add(target);
 
         // Get file for this symbol
-        const symbolRow = dbManager.db
-          .prepare('SELECT file_path FROM symbols WHERE id = ?')
-          .get(dep.target) as { file_path: string } | undefined;
+        const filePath = dbManager.getSymbolFilePath(target);
 
-        if (symbolRow) {
-          exploration.discoveredFiles.add(symbolRow.file_path);
+        if (filePath) {
+          exploration.discoveredFiles.add(filePath);
         }
 
         exploration.relationships.push({
           from: symbolId,
-          to: dep.target,
+          to: target,
           type: 'code-dependency',
         });
       }

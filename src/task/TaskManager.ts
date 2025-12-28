@@ -8,6 +8,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { DatabaseManager } from '../storage/DatabaseManager';
+import type * as schema from '../storage/schema';
 import type {
   Task,
   TaskStatus,
@@ -21,32 +22,6 @@ import type {
 import { TaskStatus as TS, TaskPriority as TP, TaskType as TT } from '../types/task';
 
 /**
- * Database row interface for tasks table
- */
-interface TaskRow {
-  id: string;
-  title: string;
-  description: string | null;
-  status: string;
-  priority: string;
-  type: string;
-  assigned_to: string | null;
-  symbol_id: string | null;
-  file_path: string | null;
-  line: number | null;
-  estimated_hours: number | null;
-  actual_hours: number | null;
-  due_date: string | null;
-  parent_id: string | null;
-  dependencies: string | null;
-  tags: string | null;
-  created_at: string;
-  updated_at: string;
-  completed_at: string | null;
-  notes: string | null;
-}
-
-/**
  * Task Manager
  * @public
  * @responsibility CRUD operations for tasks and project management
@@ -56,44 +31,7 @@ export class TaskManager {
 
   constructor(dbManager: DatabaseManager) {
     this.dbManager = dbManager;
-    this.ensureTasksTable();
-  }
-
-  /**
-   * Ensure tasks table exists
-   * @private
-   */
-  private ensureTasksTable(): void {
-    this.dbManager.db.exec(`
-      CREATE TABLE IF NOT EXISTS tasks (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        description TEXT,
-        status TEXT NOT NULL,
-        priority TEXT NOT NULL,
-        type TEXT NOT NULL,
-        assigned_to TEXT,
-        symbol_id TEXT,
-        file_path TEXT,
-        line INTEGER,
-        estimated_hours REAL,
-        actual_hours REAL,
-        due_date TEXT,
-        parent_id TEXT,
-        dependencies TEXT,
-        tags TEXT,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        completed_at TEXT,
-        notes TEXT
-      );
-
-      CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
-      CREATE INDEX IF NOT EXISTS idx_tasks_priority ON tasks(priority);
-      CREATE INDEX IF NOT EXISTS idx_tasks_symbol ON tasks(symbol_id);
-      CREATE INDEX IF NOT EXISTS idx_tasks_file ON tasks(file_path);
-      CREATE INDEX IF NOT EXISTS idx_tasks_due ON tasks(due_date);
-    `);
+    this.dbManager.ensureTasksTable();
   }
 
   /**
@@ -119,39 +57,29 @@ export class TaskManager {
       updatedAt: now,
     };
 
-    this.dbManager.db
-      .prepare(
-        `
-      INSERT INTO tasks (
-        id, title, description, status, priority, type,
-        assigned_to, symbol_id, file_path, line,
-        estimated_hours, actual_hours, due_date, parent_id,
-        dependencies, tags, created_at, updated_at, completed_at, notes
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `
-      )
-      .run(
-        task.id,
-        task.title,
-        task.description || null,
-        task.status,
-        task.priority,
-        task.type,
-        task.assignedTo || null,
-        task.symbolId || null,
-        task.filePath || null,
-        task.line || null,
-        task.estimatedHours || null,
-        task.actualHours || null,
-        task.dueDate || null,
-        task.parentId || null,
-        task.dependencies ? JSON.stringify(task.dependencies) : null,
-        task.tags ? JSON.stringify(task.tags) : null,
-        task.createdAt,
-        task.updatedAt,
-        task.completedAt || null,
-        task.notes || null
-      );
+    // Use Drizzle ORM via DatabaseManager
+    this.dbManager.insertTask({
+      id: task.id,
+      title: task.title,
+      description: task.description,
+      status: task.status,
+      priority: task.priority,
+      type: task.type,
+      assignedTo: task.assignedTo,
+      symbolId: task.symbolId,
+      filePath: task.filePath,
+      line: task.line,
+      estimatedHours: task.estimatedHours,
+      actualHours: task.actualHours,
+      dueDate: task.dueDate,
+      parentId: task.parentId,
+      dependencies: task.dependencies,
+      tags: task.tags,
+      createdAt: task.createdAt,
+      updatedAt: task.updatedAt,
+      completedAt: task.completedAt,
+      notes: task.notes,
+    });
 
     return task;
   }
@@ -163,11 +91,12 @@ export class TaskManager {
    * @public
    */
   getTask(id: string): Task | null {
-    const row = this.dbManager.db.prepare('SELECT * FROM tasks WHERE id = ?').get(id) as TaskRow | undefined;
+    // Use Drizzle ORM via DatabaseManager
+    const row = this.dbManager.getTaskById(id);
 
     if (!row) return null;
 
-    return this.rowToTask(row);
+    return this.drizzleRowToTask(row);
   }
 
   /**
@@ -193,32 +122,22 @@ export class TaskManager {
       updated.completedAt = now;
     }
 
-    this.dbManager.db
-      .prepare(
-        `
-      UPDATE tasks SET
-        title = ?, description = ?, status = ?, priority = ?, type = ?,
-        assigned_to = ?, estimated_hours = ?, actual_hours = ?, due_date = ?,
-        tags = ?, updated_at = ?, completed_at = ?, notes = ?
-      WHERE id = ?
-    `
-      )
-      .run(
-        updated.title,
-        updated.description || null,
-        updated.status,
-        updated.priority,
-        updated.type,
-        updated.assignedTo || null,
-        updated.estimatedHours || null,
-        updated.actualHours || null,
-        updated.dueDate || null,
-        updated.tags ? JSON.stringify(updated.tags) : null,
-        updated.updatedAt,
-        updated.completedAt || null,
-        updated.notes || null,
-        id
-      );
+    // Use Drizzle ORM via DatabaseManager
+    this.dbManager.updateTask(id, {
+      title: updated.title,
+      description: updated.description,
+      status: updated.status,
+      priority: updated.priority,
+      type: updated.type,
+      assignedTo: updated.assignedTo,
+      estimatedHours: updated.estimatedHours,
+      actualHours: updated.actualHours,
+      dueDate: updated.dueDate,
+      tags: updated.tags,
+      updatedAt: updated.updatedAt,
+      completedAt: updated.completedAt,
+      notes: updated.notes,
+    });
 
     return updated;
   }
@@ -230,8 +149,8 @@ export class TaskManager {
    * @public
    */
   deleteTask(id: string): boolean {
-    const result = this.dbManager.db.prepare('DELETE FROM tasks WHERE id = ?').run(id);
-    return result.changes > 0;
+    // Use Drizzle ORM via DatabaseManager
+    return this.dbManager.deleteTask(id);
   }
 
   /**
@@ -241,51 +160,9 @@ export class TaskManager {
    * @public
    */
   listTasks(filter?: TaskFilter): Task[] {
-    let query = 'SELECT * FROM tasks WHERE 1=1';
-    const params: any[] = [];
-
-    if (filter?.status) {
-      const statuses = Array.isArray(filter.status) ? filter.status : [filter.status];
-      query += ` AND status IN (${statuses.map(() => '?').join(',')})`;
-      params.push(...statuses);
-    }
-
-    if (filter?.priority) {
-      const priorities = Array.isArray(filter.priority) ? filter.priority : [filter.priority];
-      query += ` AND priority IN (${priorities.map(() => '?').join(',')})`;
-      params.push(...priorities);
-    }
-
-    if (filter?.type) {
-      const types = Array.isArray(filter.type) ? filter.type : [filter.type];
-      query += ` AND type IN (${types.map(() => '?').join(',')})`;
-      params.push(...types);
-    }
-
-    if (filter?.assignedTo) {
-      query += ' AND assigned_to = ?';
-      params.push(filter.assignedTo);
-    }
-
-    if (filter?.symbolId) {
-      query += ' AND symbol_id = ?';
-      params.push(filter.symbolId);
-    }
-
-    if (filter?.dueBefore) {
-      query += ' AND due_date <= ?';
-      params.push(filter.dueBefore);
-    }
-
-    if (filter?.dueAfter) {
-      query += ' AND due_date >= ?';
-      params.push(filter.dueAfter);
-    }
-
-    query += ' ORDER BY priority DESC, due_date ASC, created_at DESC';
-
-    const rows = this.dbManager.db.prepare(query).all(...params) as TaskRow[];
-    return rows.map((row) => this.rowToTask(row));
+    // Use Drizzle ORM via DatabaseManager
+    const rows = this.dbManager.getTasksWithFilters(filter);
+    return rows.map((row) => this.drizzleRowToTask(row));
   }
 
   /**
@@ -415,12 +292,12 @@ export class TaskManager {
   }
 
   /**
-   * Convert database row to Task object
-   * @param row - Database row
+   * Convert Drizzle ORM row to Task object
+   * @param row - Drizzle ORM row (camelCase properties)
    * @returns Task object
    * @private
    */
-  private rowToTask(row: TaskRow): Task {
+  private drizzleRowToTask(row: schema.TaskRow): Task {
     return {
       id: row.id,
       title: row.title,
@@ -428,19 +305,19 @@ export class TaskManager {
       status: row.status as TaskStatus,
       priority: row.priority as TaskPriority,
       type: row.type as TaskType,
-      assignedTo: row.assigned_to || undefined,
-      symbolId: row.symbol_id || undefined,
-      filePath: row.file_path || undefined,
+      assignedTo: row.assignedTo || undefined,
+      symbolId: row.symbolId || undefined,
+      filePath: row.filePath || undefined,
       line: row.line || undefined,
-      estimatedHours: row.estimated_hours || undefined,
-      actualHours: row.actual_hours || undefined,
-      dueDate: row.due_date || undefined,
-      parentId: row.parent_id || undefined,
+      estimatedHours: row.estimatedHours || undefined,
+      actualHours: row.actualHours || undefined,
+      dueDate: row.dueDate || undefined,
+      parentId: row.parentId || undefined,
       dependencies: row.dependencies ? JSON.parse(row.dependencies) : undefined,
       tags: row.tags ? JSON.parse(row.tags) : undefined,
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-      completedAt: row.completed_at || undefined,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      completedAt: row.completedAt || undefined,
       notes: row.notes || undefined,
     };
   }

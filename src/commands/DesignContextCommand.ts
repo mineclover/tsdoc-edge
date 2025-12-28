@@ -199,10 +199,8 @@ export class DesignContextCommand extends BaseCommand {
       relationships: [],
     };
 
-    // 1. Get symbols from this file
-    const allSymbols = dbManager.db.prepare(
-      'SELECT * FROM symbols WHERE file_path = ?'
-    ).all(relativePath) as SymbolRow[];
+    // 1. Get symbols from this file (using Drizzle ORM)
+    const allSymbols = dbManager.querySymbols({ filePath: relativePath });
 
     context.symbols = allSymbols.map(row => ({
       id: row.id,
@@ -247,54 +245,30 @@ export class DesignContextCommand extends BaseCommand {
       // Continue even if parsing fails
     }
 
-    // 3. Get dependencies (what this file uses) - Use unified_relationships
+    // 3. Get dependencies (what this file uses) - Use unified_relationships via Drizzle
     if (symbolIds.length > 0) {
-      const placeholder = symbolIds.map(() => '?').join(',');
+      const symbolIdSet = new Set(symbolIds);
 
-      // Query unified_relationships for structural relationships (type-dependency, code-dependency)
-      const relationshipRows = dbManager.db.prepare(`
-        SELECT DISTINCT
-          r.to_symbols, r.type, r.category
-        FROM unified_relationships r
-        WHERE r.category IN ('structural', 'behavioral')
-          AND json_valid(r.from_symbols)
-          AND EXISTS (
-            SELECT 1 FROM json_each(r.from_symbols) je
-            WHERE je.value IN (${placeholder})
-          )
-      `).all(...symbolIds) as Array<{
-        to_symbols: string;
-        type: string;
-        category: string;
-      }>;
+      // Query unified_relationships for structural/behavioral relationships
+      const allRels = dbManager.getAllUnifiedRelationships();
+      const dependencyRels = allRels.filter(rel => {
+        if (rel.category !== 'structural' && rel.category !== 'behavioral') return false;
+        const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
+        return fromSymbols.some(s => symbolIdSet.has(s));
+      });
 
-      // Extract target symbol IDs and resolve them
+      // Extract target symbol IDs
       const targetIds = new Set<string>();
-      for (const row of relationshipRows) {
-        try {
-          const toSymbols = JSON.parse(row.to_symbols) as string[];
-          for (const target of toSymbols) {
-            if (target) targetIds.add(target);
-          }
-        } catch (error) {
-          // Skip invalid JSON
+      for (const rel of dependencyRels) {
+        const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
+        for (const target of toSymbols) {
+          if (target) targetIds.add(target);
         }
       }
 
       if (targetIds.size > 0) {
-        const targetPlaceholder = Array.from(targetIds).map(() => '?').join(',');
-        const dependencyRows = dbManager.db.prepare(`
-          SELECT DISTINCT
-            s.id, s.name, s.type, s.file_path
-          FROM symbols s
-          WHERE s.id IN (${targetPlaceholder})
-            AND s.file_path != ?
-        `).all(...Array.from(targetIds), relativePath) as Array<{
-          id: string;
-          name: string;
-          type: string;
-          file_path: string;
-        }>;
+        const dependencyRows = dbManager.getSymbolsByIds(Array.from(targetIds))
+          .filter(row => row.file_path !== relativePath);
 
         context.dependencies = dependencyRows.map(row => ({
           name: row.name,
@@ -304,15 +278,15 @@ export class DesignContextCommand extends BaseCommand {
       }
     }
 
-    // 4. Get test files
+    // 4. Get test files (using Drizzle ORM)
     if (symbolIds.length > 0) {
-      const testMappings = dbManager.db.prepare(
-        `SELECT * FROM test_mappings WHERE symbol_id IN (${symbolIds.map(() => '?').join(',')})`
-      ).all(...symbolIds) as Array<{ symbol_id: string; test_file_path: string; test_name: string }>;
+      const symbolIdSet = new Set(symbolIds);
+      const allTestMappings = dbManager.getAllTestMappings();
+      const relevantMappings = allTestMappings.filter(m => symbolIdSet.has(m.symbolId));
 
       const testPaths = new Set<string>();
-      for (const mapping of testMappings) {
-        testPaths.add(mapping.test_file_path);
+      for (const mapping of relevantMappings) {
+        testPaths.add(mapping.testFilePath);
       }
 
       context.tests = Array.from(testPaths).map(testPath => ({
@@ -321,54 +295,30 @@ export class DesignContextCommand extends BaseCommand {
       }));
     }
 
-    // 5. Get usedBy (what uses this file) - Use unified_relationships
+    // 5. Get usedBy (what uses this file) - Use unified_relationships via Drizzle
     if (symbolIds.length > 0) {
-      const placeholder = symbolIds.map(() => '?').join(',');
+      const symbolIdSet = new Set(symbolIds);
 
       // Query unified_relationships where this file's symbols are targets
-      const relationshipRows = dbManager.db.prepare(`
-        SELECT DISTINCT
-          r.from_symbols, r.type, r.category
-        FROM unified_relationships r
-        WHERE r.category IN ('structural', 'behavioral')
-          AND json_valid(r.to_symbols)
-          AND EXISTS (
-            SELECT 1 FROM json_each(r.to_symbols) je
-            WHERE je.value IN (${placeholder})
-          )
-      `).all(...symbolIds) as Array<{
-        from_symbols: string;
-        type: string;
-        category: string;
-      }>;
+      const allRels = dbManager.getAllUnifiedRelationships();
+      const usedByRels = allRels.filter(rel => {
+        if (rel.category !== 'structural' && rel.category !== 'behavioral') return false;
+        const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
+        return toSymbols.some(s => symbolIdSet.has(s));
+      });
 
-      // Extract source symbol IDs and resolve them
+      // Extract source symbol IDs
       const sourceIds = new Set<string>();
-      for (const row of relationshipRows) {
-        try {
-          const fromSymbols = JSON.parse(row.from_symbols) as string[];
-          for (const source of fromSymbols) {
-            if (source) sourceIds.add(source);
-          }
-        } catch (error) {
-          // Skip invalid JSON
+      for (const rel of usedByRels) {
+        const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
+        for (const source of fromSymbols) {
+          if (source) sourceIds.add(source);
         }
       }
 
       if (sourceIds.size > 0) {
-        const sourcePlaceholder = Array.from(sourceIds).map(() => '?').join(',');
-        const usedByRows = dbManager.db.prepare(`
-          SELECT DISTINCT
-            s.id, s.name, s.file_path, s.type
-          FROM symbols s
-          WHERE s.id IN (${sourcePlaceholder})
-            AND s.file_path != ?
-        `).all(...Array.from(sourceIds), relativePath) as Array<{
-          id: string;
-          name: string;
-          file_path: string;
-          type: string;
-        }>;
+        const usedByRows = dbManager.getSymbolsByIds(Array.from(sourceIds))
+          .filter(row => row.file_path !== relativePath);
 
         context.usedBy = usedByRows.map(row => ({
           name: row.name,
@@ -378,40 +328,27 @@ export class DesignContextCommand extends BaseCommand {
       }
     }
 
-    // 6-8. Get contracts, decisions, and error patterns (optimized)
+    // 6-8. Get contracts, decisions, and error patterns (using Drizzle ORM)
     if (symbolIds.length > 0) {
       // Create symbol lookup map for O(1) access
       const symbolMap = new Map(context.symbols.map(s => [s.id, s]));
-      const placeholder = symbolIds.map(() => '?').join(',');
+      const symbolIdSet = new Set(symbolIds);
 
       // 6. Get contracts (preconditions, postconditions, invariants)
       try {
-        const contracts = dbManager.db.prepare(
-          `SELECT * FROM contracts WHERE symbol_id IN (${placeholder})`
-        ).all(...symbolIds) as Array<{
-          symbol_id: string;
-          description: string;
-          preconditions: string;
-          postconditions: string;
-          invariants: string;
-          file_path: string;
-        }>;
+        const allContracts = dbManager.getAllContracts();
+        const contracts = allContracts.filter(c => symbolIdSet.has(c.symbolId));
 
         for (const contract of contracts) {
-          try {
-            const symbol = symbolMap.get(contract.symbol_id);
-            context.contracts.push({
-              symbolId: contract.symbol_id,
-              symbolName: symbol?.name || 'Unknown',
-              description: contract.description,
-              preconditions: JSON.parse(contract.preconditions),
-              postconditions: JSON.parse(contract.postconditions),
-              invariants: JSON.parse(contract.invariants),
-            });
-          } catch (jsonError) {
-            // Skip malformed contract data
-            console.warn(`Failed to parse contract for ${contract.symbol_id}:`, jsonError);
-          }
+          const symbol = symbolMap.get(contract.symbolId);
+          context.contracts.push({
+            symbolId: contract.symbolId,
+            symbolName: symbol?.name || 'Unknown',
+            description: contract.description,
+            preconditions: contract.preconditions,
+            postconditions: contract.postconditions,
+            invariants: contract.invariants,
+          });
         }
       } catch (dbError) {
         // Continue even if contracts query fails
@@ -420,19 +357,13 @@ export class DesignContextCommand extends BaseCommand {
 
       // 7. Get design decisions
       try {
-        const decisions = dbManager.db.prepare(
-          `SELECT * FROM decision_records WHERE symbol_id IN (${placeholder}) ORDER BY date DESC`
-        ).all(...symbolIds) as Array<{
-          symbol_id: string;
-          title: string;
-          decision: string;
-          rationale: string;
-          status: string;
-          date: string;
-        }>;
+        const allDecisions = dbManager.getAllDecisionRecords();
+        const decisions = allDecisions
+          .filter(d => d.symbolId && symbolIdSet.has(d.symbolId))
+          .sort((a, b) => b.date.localeCompare(a.date));
 
         for (const decision of decisions) {
-          const symbol = symbolMap.get(decision.symbol_id);
+          const symbol = decision.symbolId ? symbolMap.get(decision.symbolId) : undefined;
           context.decisions.push({
             title: decision.title,
             decision: decision.decision,
@@ -448,21 +379,14 @@ export class DesignContextCommand extends BaseCommand {
 
       // 8. Get error patterns
       try {
-        const errors = dbManager.db.prepare(
-          `SELECT * FROM error_experiences WHERE symbol_id IN (${placeholder})`
-        ).all(...symbolIds) as Array<{
-          symbol_id: string;
-          error_type: string;
-          message: string;
-          solution: string;
-          prevention: string | null;
-        }>;
+        const allErrors = dbManager.getAllErrorExperiences();
+        const errors = allErrors.filter(e => symbolIdSet.has(e.symbolId));
 
         for (const error of errors) {
-          const symbol = symbolMap.get(error.symbol_id);
+          const symbol = symbolMap.get(error.symbolId);
           context.errorPatterns.push({
             symbolName: symbol?.name || 'Unknown',
-            errorType: error.error_type,
+            errorType: error.errorType,
             message: error.message,
             solution: error.solution,
             prevention: error.prevention || undefined,
@@ -472,59 +396,30 @@ export class DesignContextCommand extends BaseCommand {
         console.warn('Failed to fetch error patterns:', dbError);
       }
 
-      // 9. Get unified relationships (17 relationship types) - Optimized single query
+      // 9. Get unified relationships (17 relationship types) - Using Drizzle ORM
       try {
-        // Build WHERE clause for all symbolIds at once
-        const whereConditions = symbolIds.map(() =>
-          `(json_extract(from_symbols, '$[0]') = ?
-            OR json_extract(to_symbols, '$[0]') = ?
-            OR from_symbols LIKE ?
-            OR to_symbols LIKE ?)`
-        ).join(' OR ');
+        const allRels = dbManager.getAllUnifiedRelationships();
+        const relevantRels = allRels.filter(rel => {
+          const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
+          const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
+          return fromSymbols.some(s => symbolIdSet.has(s)) ||
+                 toSymbols.some(s => symbolIdSet.has(s));
+        });
 
-        // Prepare parameters: for each symbolId, we need it 4 times
-        const params: string[] = [];
-        for (const symbolId of symbolIds) {
-          params.push(symbolId); // json_extract from_symbols
-          params.push(symbolId); // json_extract to_symbols
-          params.push(`%"${symbolId}"%`); // LIKE from_symbols
-          params.push(`%"${symbolId}"%`); // LIKE to_symbols
-        }
-
-        const rels = dbManager.db.prepare(`
-          SELECT DISTINCT * FROM unified_relationships
-          WHERE ${whereConditions}
-        `).all(...params) as Array<{
-          id: string;
-          type: string;
-          category: string;
-          from_symbols: string;
-          to_symbols: string;
-          direction: string;
-          strength: string;
-          confidence: number;
-          description: string | null;
-          properties: string | null;
-        }>;
-
-        // Process relationships (already deduplicated by DISTINCT)
-        for (const rel of rels) {
-          try {
-            context.relationships.push({
-              id: rel.id,
-              type: rel.type,
-              category: rel.category,
-              direction: rel.direction as 'unidirectional' | 'bidirectional' | 'undirected',
-              strength: rel.strength as 'strong' | 'medium' | 'weak',
-              fromSymbols: JSON.parse(rel.from_symbols),
-              toSymbols: JSON.parse(rel.to_symbols),
-              confidence: rel.confidence,
-              description: rel.description || undefined,
-              properties: rel.properties ? JSON.parse(rel.properties) : undefined,
-            });
-          } catch (jsonError) {
-            console.warn(`Failed to parse relationship ${rel.id}:`, jsonError);
-          }
+        // Process relationships
+        for (const rel of relevantRels) {
+          context.relationships.push({
+            id: rel.id,
+            type: rel.type,
+            category: rel.category,
+            direction: rel.direction as 'unidirectional' | 'bidirectional' | 'undirected',
+            strength: rel.strength as 'strong' | 'medium' | 'weak',
+            fromSymbols: Array.isArray(rel.from) ? rel.from : [rel.from],
+            toSymbols: Array.isArray(rel.to) ? rel.to : [rel.to],
+            confidence: rel.confidence,
+            description: rel.description || undefined,
+            properties: rel.properties as Record<string, any> | undefined,
+          });
         }
       } catch (dbError) {
         console.warn('Failed to fetch unified relationships:', dbError);

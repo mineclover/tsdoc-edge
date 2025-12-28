@@ -95,12 +95,8 @@ Examples:
       const dbManager = new DatabaseManager(dbPath);
 
       // Verify both symbols exist
-      const fromExists = dbManager.db
-        .prepare('SELECT id FROM symbols WHERE id = ?')
-        .get(fromSymbol);
-      const toExists = dbManager.db
-        .prepare('SELECT id FROM symbols WHERE id = ?')
-        .get(toSymbol);
+      const fromExists = dbManager.symbolExists(fromSymbol);
+      const toExists = dbManager.symbolExists(toSymbol);
 
       if (!fromExists) {
         this.printError(`Source symbol not found: ${fromSymbol}`);
@@ -242,21 +238,17 @@ Examples:
   ): Map<string, GraphEdge[]> {
     const adjacency = new Map<string, GraphEdge[]>();
 
-    // Query all relationships at once
-    let sql = 'SELECT from_symbols, to_symbols, type, category FROM unified_relationships';
-    const params: any[] = [];
+    // Use Drizzle ORM to query all relationships
+    let relationships = dbManager.getAllUnifiedRelationships();
 
     if (category) {
-      sql += ' WHERE category = ?';
-      params.push(category);
+      relationships = relationships.filter(r => r.category === category);
     }
-
-    const relationships = dbManager.db.prepare(sql).all(...params) as UnifiedRelationshipRow[];
 
     for (const rel of relationships) {
       try {
-        const fromSymbols = JSON.parse(rel.from_symbols || '[]');
-        const toSymbols = JSON.parse(rel.to_symbols || '[]');
+        const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
+        const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
 
         for (const from of fromSymbols) {
           if (!from) continue;

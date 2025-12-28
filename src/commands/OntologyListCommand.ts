@@ -162,38 +162,42 @@ Examples:
   }
 
   private async listNodes(dbManager: DatabaseManager, options: ListOptions): Promise<void> {
-    let query = 'SELECT * FROM symbols';
-    const params: any[] = [];
+    // Query symbols using Drizzle ORM
+    const queryOptions: {
+      type?: string;
+      limit?: number;
+      offset?: number;
+      orderBy?: 'name' | 'type' | 'filePath';
+      orderDir?: 'asc' | 'desc';
+    } = {
+      orderBy: 'name',
+      orderDir: 'asc',
+    };
 
     if (options.name) {
-      query += ' WHERE type = ?';
-      params.push(options.name);
+      queryOptions.type = options.name;
     }
-
-    query += ' ORDER BY name';
-
     if (options.limit) {
-      query += ' LIMIT ? OFFSET ?';
-      params.push(options.limit, options.offset || 0);
+      queryOptions.limit = options.limit;
+      queryOptions.offset = options.offset || 0;
     }
 
-    const nodes = dbManager.db.prepare(query).all(...params) as Array<{
-      id: string;
-      name: string;
-      type: string;
-      kind?: string;
-      filePath?: string;
-      line?: number;
-    }>;
+    const symbolRows = dbManager.querySymbols(queryOptions);
+    const nodes = symbolRows.map(row => ({
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      kind: row.type,
+      filePath: row.file_path,
+      line: row.line,
+    }));
 
-    // Get total count
-    let countQuery = 'SELECT COUNT(*) as count FROM symbols';
-    const countParams: any[] = [];
+    // Get total count using Drizzle ORM
+    const countOptions: { type?: string } = {};
     if (options.name) {
-      countQuery += ' WHERE type = ?';
-      countParams.push(options.name);
+      countOptions.type = options.name;
     }
-    const total = (dbManager.db.prepare(countQuery).get(...countParams) as { count: number }).count;
+    const total = dbManager.countSymbols(countOptions);
 
     if (options.format === 'json') {
       console.log(JSON.stringify({

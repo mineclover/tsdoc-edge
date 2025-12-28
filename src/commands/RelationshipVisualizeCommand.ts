@@ -72,9 +72,7 @@ Examples:
       const dbManager = new DatabaseManager(dbPath);
 
       // Get symbol info
-      const symbol = dbManager.db
-        .prepare('SELECT * FROM symbols WHERE id = ?')
-        .get(symbolId) as any;
+      const symbol = dbManager.getSymbol(symbolId);
 
       if (!symbol) {
         this.printError(`Symbol not found: ${symbolId}`);
@@ -142,41 +140,51 @@ Examples:
 
     visited.add(symbolId);
 
-    // Query relationships
-    let sql = `
-      SELECT *
-      FROM unified_relationships
-      WHERE (
-        json_extract(from_symbols, '$[0]') = ? OR
-        json_extract(to_symbols, '$[0]') = ?
-      )
-    `;
+    // Use Drizzle ORM method and filter in JavaScript
+    let rels = dbManager.getUnifiedRelationshipsBySymbol(symbolId);
 
-    const params: any[] = [symbolId, symbolId];
-
+    // Apply filters
     if (options.type) {
-      sql += ' AND type = ?';
-      params.push(options.type);
+      rels = rels.filter(r => r.type === options.type);
     }
-
     if (options.category) {
-      sql += ' AND category = ?';
-      params.push(options.category);
+      rels = rels.filter(r => r.category === options.category);
     }
 
-    const rels = dbManager.db.prepare(sql).all(...params) as UnifiedRelationshipRow[];
+    // Convert to row format for compatibility
+    const relRows = rels.map(r => ({
+      id: r.id,
+      type: r.type,
+      category: r.category,
+      from_symbols: JSON.stringify(Array.isArray(r.from) ? r.from : [r.from]),
+      to_symbols: JSON.stringify(Array.isArray(r.to) ? r.to : [r.to]),
+      direction: r.direction,
+      strength: r.strength,
+      evidence: JSON.stringify(r.evidence),
+      discovered_by: r.discoveredBy,
+      confidence: r.confidence,
+      file_path: r.filePath ?? null,
+      line: r.line ?? null,
+      properties: r.properties ? JSON.stringify(r.properties) : null,
+      created_at: r.createdAt,
+      updated_at: r.updatedAt,
+      description: r.description ?? null,
+    })) as UnifiedRelationshipRow[];
 
-    for (const rel of rels) {
+    for (let i = 0; i < rels.length; i++) {
+      const rel = rels[i];
+      const relRow = relRows[i];
+
       // Check if already added
       if (relationships.some(r => r.id === rel.id)) {
         continue;
       }
 
-      relationships.push(rel);
+      relationships.push(relRow);
 
       // Recurse to connected symbols
-      const fromSymbols = JSON.parse(rel.from_symbols || '[]');
-      const toSymbols = JSON.parse(rel.to_symbols || '[]');
+      const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
+      const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
 
       if (options.direction === 'both' || options.direction === 'from') {
         for (const toId of toSymbols) {
