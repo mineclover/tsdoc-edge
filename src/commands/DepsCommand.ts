@@ -195,14 +195,15 @@ export class DepsCommand extends BaseCommand {
         if (matches.length === 1) {
           symbol = dbManager.getSymbol(matches[0].id);
         } else if (matches.length > 1) {
-          // Auto-select if first match is exact class/interface match
-          const first = matches[0];
-          const isExactMatch = first.name.toLowerCase() === idOrName.toLowerCase();
-          const isPrimaryType = ['class', 'interface', 'function', 'type'].includes(first.type);
+          // Auto-select if any match is exact class/interface/function/type match
+          const primaryMatch = matches.find(m =>
+            m.name.toLowerCase() === idOrName.toLowerCase() &&
+            ['class', 'interface', 'function', 'type'].includes(m.type)
+          );
 
-          if (isExactMatch && isPrimaryType) {
-            symbol = dbManager.getSymbol(first.id);
-            console.log(`${colors.dim}Selected: ${first.name} (${first.type})${colors.reset}`);
+          if (primaryMatch) {
+            symbol = dbManager.getSymbol(primaryMatch.id);
+            console.log(`${colors.dim}Selected: ${primaryMatch.name} (${primaryMatch.type})${colors.reset}`);
             console.log();
           } else {
             console.log(`${colors.yellow}Multiple matches found:${colors.reset}`);
