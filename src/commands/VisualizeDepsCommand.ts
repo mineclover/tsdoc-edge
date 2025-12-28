@@ -20,14 +20,29 @@ import type { SymbolRelationship } from '../types/tags';
  * @public
  */
 export class VisualizeDepsCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'visualize';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Generate Mermaid diagrams for dependency visualization';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge visualize <subcommand> [symbol]
 
@@ -37,6 +52,12 @@ export class VisualizeDepsCommand extends BaseCommand {
     circular          Find circular dependencies`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       // Check for help flag
@@ -98,14 +119,21 @@ export class VisualizeDepsCommand extends BaseCommand {
             return this.failure('Missing symbol ID');
           }
 
-          this.printSection(`Dependency Tree: ${targetSymbol}`);
-          const diagram = generator.generateDependencyTree(targetSymbol);
+          // Resolve symbol name to ID if needed
+          let resolvedSymbol = targetSymbol;
+          const resolved = this.resolveSymbol(dbManager, targetSymbol);
+          if (resolved) {
+            resolvedSymbol = resolved.id;
+          }
+
+          this.printSection(`Dependency Tree: ${resolvedSymbol}`);
+          const diagram = generator.generateDependencyTree(resolvedSymbol);
           console.log();
           console.log(diagram);
           console.log();
 
           // Save to file
-          const outputPath = path.join(process.cwd(), diagramsDir, `tree-${targetSymbol}.mmd`);
+          const outputPath = path.join(process.cwd(), diagramsDir, `tree-${resolvedSymbol}.mmd`);
           fs.mkdirSync(path.dirname(outputPath), { recursive: true });
           fs.writeFileSync(outputPath, diagram, 'utf-8');
 
@@ -167,14 +195,21 @@ export class VisualizeDepsCommand extends BaseCommand {
             return this.failure('Missing class ID');
           }
 
-          this.printSection(`Class Hierarchy: ${targetSymbol}`);
-          const diagram = generator.generateClassHierarchy(targetSymbol);
+          // Resolve symbol name to ID if needed
+          let resolvedClass = targetSymbol;
+          const resolvedHierarchy = this.resolveSymbol(dbManager, targetSymbol);
+          if (resolvedHierarchy) {
+            resolvedClass = resolvedHierarchy.id;
+          }
+
+          this.printSection(`Class Hierarchy: ${resolvedClass}`);
+          const diagram = generator.generateClassHierarchy(resolvedClass);
           console.log();
           console.log(diagram);
           console.log();
 
           // Save to file
-          const outputPath = path.join(process.cwd(), diagramsDir, `hierarchy-${targetSymbol}.mmd`);
+          const outputPath = path.join(process.cwd(), diagramsDir, `hierarchy-${resolvedClass}.mmd`);
           fs.mkdirSync(path.dirname(outputPath), { recursive: true });
           fs.writeFileSync(outputPath, diagram, 'utf-8');
 
