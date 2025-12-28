@@ -41,8 +41,16 @@ export class UntestedCommand extends BaseCommand {
     return 'Find symbols without test coverage';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
-    return 'tsdoc-edge untested';
+    return `tsdoc-edge untested [options]
+
+  Options:
+    --exclude-tests  Exclude symbols from test files (__tests__, .test.ts, .spec.ts)`;
   }
 
   /**
@@ -58,7 +66,12 @@ export class UntestedCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const excludeTests = _args.includes('--exclude-tests');
+
       console.log(`${colors.bold}Untested Symbols${colors.reset}`);
+      if (excludeTests) {
+        console.log(`${colors.dim}Excluding test files${colors.reset}`);
+      }
       console.log();
 
       if (!this.dbManager) {
@@ -93,7 +106,16 @@ export class UntestedCommand extends BaseCommand {
         }
 
         const searchEngine = new SymbolSearchEngine(graphBuilder);
-        const untested = searchEngine.findUntested();
+        let untested = searchEngine.findUntested();
+
+        // Filter out test files if requested
+        if (excludeTests) {
+          untested = untested.filter(s =>
+            !s.filePath.includes('__tests__') &&
+            !s.filePath.includes('.test.') &&
+            !s.filePath.includes('.spec.')
+          );
+        }
 
         if (untested.length === 0) {
           console.log(`${colors.green}✅ All symbols have tests!${colors.reset}`);

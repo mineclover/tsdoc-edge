@@ -163,10 +163,15 @@ export class SymbolSearchEngine {
 
   /**
    * Find symbols with no tests
+   * Excludes test-related symbol types (test-suite, test-case, test-scenario)
+   * since they ARE tests themselves
    * @returns Untested symbols
    */
   findUntested(): Symbol[] {
-    return this.graphBuilder.getAllSymbols().filter((s) => s.tests.length === 0);
+    const testTypes = ['test-suite', 'test-case', 'test-scenario'];
+    return this.graphBuilder.getAllSymbols().filter(
+      (s) => s.tests.length === 0 && !testTypes.includes(s.type)
+    );
   }
 
   /**
