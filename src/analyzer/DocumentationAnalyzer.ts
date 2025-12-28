@@ -128,6 +128,9 @@ export class DocumentationAnalyzer {
       missing.push('documentation');
     }
 
+    // Check if type is self-documenting
+    const isSelfDocumenting = this.isSelfDocumentingType(node);
+
     // Calculate quality score
     const qualityScore = this.calculateQualityScore({
       hasDoc,
@@ -138,6 +141,7 @@ export class DocumentationAnalyzer {
       hasCustomTags,
       isPublic,
       symbolType,
+      isSelfDocumenting,
     });
 
     return {
@@ -255,6 +259,68 @@ export class DocumentationAnalyzer {
     if (ts.isEnumDeclaration(node)) return 'enum';
     if (ts.isVariableDeclaration(node)) return 'variable';
     return 'unknown';
+  }
+
+  /**
+   * Check if a type alias is self-documenting
+   *
+   * Self-documenting types include:
+   * - Simple aliases: `type Foo = Bar`
+   * - Inferred types: `type X = typeof something.$inferSelect`
+   * - Utility types: `type X = Pick<T, K>`, `Omit`, `Partial`, etc.
+   *
+   * @param node - TypeScript AST node
+   * @returns True if self-documenting
+   */
+  private isSelfDocumentingType(node: ts.Node): boolean {
+    if (!ts.isTypeAliasDeclaration(node)) {
+      return false;
+    }
+
+    const typeNode = node.type;
+
+    // Simple type reference: `type Foo = Bar`
+    if (ts.isTypeReferenceNode(typeNode)) {
+      const typeName = typeNode.typeName.getText();
+      // Utility types are self-documenting
+      const utilityTypes = ['Pick', 'Omit', 'Partial', 'Required', 'Readonly', 'Record', 'Exclude', 'Extract', 'NonNullable', 'ReturnType', 'Parameters', 'InstanceType'];
+      if (utilityTypes.includes(typeName)) {
+        return true;
+      }
+      // Simple alias without type arguments is self-documenting
+      if (!typeNode.typeArguments || typeNode.typeArguments.length === 0) {
+        return true;
+      }
+    }
+
+    // typeof expressions: `type X = typeof foo` or `type X = typeof foo.$inferSelect`
+    if (ts.isTypeQueryNode(typeNode)) {
+      return true;
+    }
+
+    // Indexed access: `type X = Foo['bar']` or `type X = Foo[keyof Foo]`
+    if (ts.isIndexedAccessTypeNode(typeNode)) {
+      return true;
+    }
+
+    // Union/Intersection of simple types
+    if (ts.isUnionTypeNode(typeNode) || ts.isIntersectionTypeNode(typeNode)) {
+      // Check if all members are type references or simple types
+      const allSimple = typeNode.types.every(t =>
+        ts.isTypeReferenceNode(t) ||
+        ts.isLiteralTypeNode(t) ||
+        t.kind === ts.SyntaxKind.StringKeyword ||
+        t.kind === ts.SyntaxKind.NumberKeyword ||
+        t.kind === ts.SyntaxKind.BooleanKeyword ||
+        t.kind === ts.SyntaxKind.NullKeyword ||
+        t.kind === ts.SyntaxKind.UndefinedKeyword
+      );
+      if (allSimple) {
+        return true;
+      }
+    }
+
+    return false;
   }
 
   /**
@@ -517,15 +583,21 @@ export class DocumentationAnalyzer {
     hasCustomTags: boolean;
     isPublic: boolean;
     symbolType: string;
+    isSelfDocumenting: boolean;
   }): number {
-    const { symbolType } = metrics;
+    const { symbolType, isSelfDocumenting } = metrics;
 
     // Simple types are often self-documenting (type aliases, interfaces, enums)
     const isSimpleType = ['type', 'interface', 'enum', 'property'].includes(symbolType);
 
-    // For undocumented symbols, give partial credit to simple types
+    // For undocumented symbols, give partial credit based on type
     if (!metrics.hasDoc) {
-      // Type aliases and interfaces without docs get 70 points (self-documenting)
+      // Self-documenting types (simple aliases, inferred types, utility types)
+      // get 85 points - they don't need documentation
+      if (isSelfDocumenting) {
+        return 85;
+      }
+      // Other type aliases and interfaces get 70 points
       if (symbolType === 'type' || symbolType === 'interface') {
         return 70;
       }
