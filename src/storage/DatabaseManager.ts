@@ -9,7 +9,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import Database from 'better-sqlite3';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { eq, like, or, and, desc, asc, sql, ne, inArray, gte, lte } from 'drizzle-orm';
+import { eq, like, or, and, desc, asc, sql, ne, inArray, gte, lte, count } from 'drizzle-orm';
 import { ConfigManager } from '../config/ConfigManager';
 import type { Symbol } from '../types/graph';
 import type { EnhancedSymbolDoc } from '../types/tags';
@@ -95,6 +95,10 @@ export interface UnifiedRelationshipRow {
  * @public
  */
 export class DatabaseManager {
+  /**
+   * db property
+   * @public
+   */
   public readonly db: Database.Database;
   private drizzleDb: ReturnType<typeof drizzle>;
   private dbPath: string;
@@ -222,10 +226,24 @@ export class DatabaseManager {
     const schemaPath = path.join(__dirname, 'schema.sql');
     const schemaSql = fs.readFileSync(schemaPath, 'utf-8');
 
-    try {
-      this.db.exec(schemaSql);
-    } catch {
-      // Schema already initialized
+    // Split schema into individual statements and execute via Drizzle
+    // Remove SQL comments and split by semicolon
+    const cleanedSql = schemaSql
+      .split('\n')
+      .map(line => line.replace(/--.*$/, '').trim())
+      .join('\n');
+
+    const statements = cleanedSql
+      .split(';')
+      .map(s => s.trim())
+      .filter(s => s.length > 0);
+
+    for (const statement of statements) {
+      try {
+        this.drizzleDb.run(sql.raw(statement));
+      } catch {
+        // Statement already executed or table exists
+      }
     }
   }
 
@@ -393,18 +411,21 @@ export class DatabaseManager {
   }
 
   /**
-   * Search symbols by text query (FTS5)
-   * @param query - Full-text search query
+   * Search symbols by text query
+   * @param query - Search query (searches name and summary)
    * @returns Array of matching symbol IDs
    */
   searchSymbols(query: string): string[] {
-    // FTS5 requires raw SQL
-    const stmt = this.db.prepare(`
-      SELECT id FROM symbols_fts
-      WHERE symbols_fts MATCH ?
-      ORDER BY rank
-    `);
-    const results = stmt.all(query) as Array<{ id: string }>;
+    const pattern = `%${query}%`;
+    const results = this.drizzleDb
+      .select({ id: schema.symbols.id })
+      .from(schema.symbols)
+      .where(or(
+        like(schema.symbols.name, pattern),
+        like(schema.symbols.summary, pattern)
+      ))
+      .orderBy(asc(schema.symbols.name))
+      .all();
     return results.map((r) => r.id);
   }
 
@@ -811,24 +832,24 @@ export class DatabaseManager {
   }
 
   /**
-   * Rebuild FTS5 indexes
+   * Rebuild search indexes (returns symbol counts for compatibility)
+   * @deprecated FTS5 has been removed. This method now returns symbol counts using standard queries.
    */
   rebuildFTS5Index(): { symbolsFts: number; enhancedDocsFts: number } {
-    this.db.prepare("INSERT INTO symbols_fts(symbols_fts) VALUES('rebuild')").run();
-    const symbolsCount = this.db.prepare('SELECT COUNT(*) as count FROM symbols_fts').get() as { count: number };
+    // FTS5 removed - return counts from regular tables
+    const symbolsResult = this.drizzleDb
+      .select({ count: count() })
+      .from(schema.symbols)
+      .get();
 
-    let enhancedDocsCount = 0;
-    try {
-      this.db.prepare("INSERT INTO enhanced_docs_fts(enhanced_docs_fts) VALUES('rebuild')").run();
-      const result = this.db.prepare('SELECT COUNT(*) as count FROM enhanced_docs_fts').get() as { count: number };
-      enhancedDocsCount = result.count;
-    } catch {
-      // Skip if table is empty
-    }
+    const enhancedDocsResult = this.drizzleDb
+      .select({ count: count() })
+      .from(schema.enhancedDocs)
+      .get();
 
     return {
-      symbolsFts: symbolsCount.count,
-      enhancedDocsFts: enhancedDocsCount,
+      symbolsFts: symbolsResult?.count || 0,
+      enhancedDocsFts: enhancedDocsResult?.count || 0,
     };
   }
 
@@ -1131,16 +1152,16 @@ export class DatabaseManager {
    * @returns Symbol row or null if not found
    */
   getSymbolAtLine(filePathPattern: string, line: number): SymbolRow | null {
-    // Use raw SQL for ORDER BY line DESC with LIKE pattern
-    const row = this.db.prepare(`
-      SELECT id, name, type, file_path, line, column, is_exported, is_public,
-             summary, declared_type, inferred_type, generic_params, parameter_types
-      FROM symbols
-      WHERE file_path LIKE ?
-        AND line <= ?
-      ORDER BY line DESC
-      LIMIT 1
-    `).get(filePathPattern, line) as any | undefined;
+    const row = this.drizzleDb
+      .select()
+      .from(schema.symbols)
+      .where(and(
+        like(schema.symbols.filePath, filePathPattern),
+        lte(schema.symbols.line, line)
+      ))
+      .orderBy(desc(schema.symbols.line))
+      .limit(1)
+      .get();
 
     if (!row) return null;
 
@@ -1148,16 +1169,16 @@ export class DatabaseManager {
       id: row.id,
       name: row.name,
       type: row.type,
-      file_path: row.file_path,
+      file_path: row.filePath,
       line: row.line,
       column: row.column,
-      is_exported: row.is_exported,
-      is_public: row.is_public,
+      is_exported: row.isExported ? 1 : 0,
+      is_public: row.isPublic ? 1 : 0,
       summary: row.summary,
-      declared_type: row.declared_type,
-      inferred_type: row.inferred_type,
-      generic_params: row.generic_params,
-      parameter_types: row.parameter_types,
+      declared_type: row.declaredType,
+      inferred_type: row.inferredType,
+      generic_params: row.genericParams,
+      parameter_types: row.parameterTypes,
     };
   }
 
@@ -1168,9 +1189,11 @@ export class DatabaseManager {
    */
   countDownstreamRelationships(symbolId: string): number {
     const pattern = `%"${symbolId}"%`;
-    const result = this.db.prepare(`
-      SELECT COUNT(*) as count FROM unified_relationships WHERE from_symbols LIKE ?
-    `).get(pattern) as { count: number } | undefined;
+    const result = this.drizzleDb
+      .select({ count: count() })
+      .from(schema.unifiedRelationships)
+      .where(like(schema.unifiedRelationships.fromSymbols, pattern))
+      .get();
     return result?.count || 0;
   }
 
@@ -1181,9 +1204,11 @@ export class DatabaseManager {
    */
   countUpstreamRelationships(symbolId: string): number {
     const pattern = `%"${symbolId}"%`;
-    const result = this.db.prepare(`
-      SELECT COUNT(*) as count FROM unified_relationships WHERE to_symbols LIKE ?
-    `).get(pattern) as { count: number } | undefined;
+    const result = this.drizzleDb
+      .select({ count: count() })
+      .from(schema.unifiedRelationships)
+      .where(like(schema.unifiedRelationships.toSymbols, pattern))
+      .get();
     return result?.count || 0;
   }
 
@@ -1195,14 +1220,20 @@ export class DatabaseManager {
    */
   getRelationshipTypeCounts(symbolId: string, limit: number = 5): Array<{ type: string; count: number }> {
     const pattern = `%"${symbolId}"%`;
-    const rows = this.db.prepare(`
-      SELECT type, COUNT(*) as count
-      FROM unified_relationships
-      WHERE from_symbols LIKE ? OR to_symbols LIKE ?
-      GROUP BY type
-      ORDER BY count DESC
-      LIMIT ?
-    `).all(pattern, pattern, limit) as Array<{ type: string; count: number }>;
+    const rows = this.drizzleDb
+      .select({
+        type: schema.unifiedRelationships.type,
+        count: count(),
+      })
+      .from(schema.unifiedRelationships)
+      .where(or(
+        like(schema.unifiedRelationships.fromSymbols, pattern),
+        like(schema.unifiedRelationships.toSymbols, pattern)
+      ))
+      .groupBy(schema.unifiedRelationships.type)
+      .orderBy(desc(count()))
+      .limit(limit)
+      .all();
     return rows;
   }
 
@@ -1214,29 +1245,28 @@ export class DatabaseManager {
    */
   searchSymbolsByName(query: string, limit: number = 50): SymbolRow[] {
     const pattern = `%${query}%`;
-    const rows = this.db.prepare(`
-      SELECT id, name, type, file_path, line, column, is_exported, is_public,
-             summary, declared_type, inferred_type, generic_params, parameter_types
-      FROM symbols
-      WHERE name LIKE ?
-      ORDER BY name
-      LIMIT ?
-    `).all(pattern, limit) as any[];
+    const rows = this.drizzleDb
+      .select()
+      .from(schema.symbols)
+      .where(like(schema.symbols.name, pattern))
+      .orderBy(asc(schema.symbols.name))
+      .limit(limit)
+      .all();
 
     return rows.map(row => ({
       id: row.id,
       name: row.name,
       type: row.type,
-      file_path: row.file_path,
+      file_path: row.filePath,
       line: row.line,
       column: row.column,
-      is_exported: row.is_exported,
-      is_public: row.is_public,
+      is_exported: row.isExported ? 1 : 0,
+      is_public: row.isPublic ? 1 : 0,
       summary: row.summary,
-      declared_type: row.declared_type,
-      inferred_type: row.inferred_type,
-      generic_params: row.generic_params,
-      parameter_types: row.parameter_types,
+      declared_type: row.declaredType,
+      inferred_type: row.inferredType,
+      generic_params: row.genericParams,
+      parameter_types: row.parameterTypes,
     }));
   }
 
@@ -1247,28 +1277,32 @@ export class DatabaseManager {
    */
   findSymbolByName(name: string): SymbolRow | null {
     // Exact match
-    let row = this.db.prepare(`
-      SELECT id, name, type, file_path, line, column, is_exported, is_public,
-             summary, declared_type, inferred_type, generic_params, parameter_types
-      FROM symbols WHERE name = ? LIMIT 1
-    `).get(name) as any | undefined;
+    let row = this.drizzleDb
+      .select()
+      .from(schema.symbols)
+      .where(eq(schema.symbols.name, name))
+      .limit(1)
+      .get();
 
     // Case-insensitive match
     if (!row) {
-      row = this.db.prepare(`
-        SELECT id, name, type, file_path, line, column, is_exported, is_public,
-               summary, declared_type, inferred_type, generic_params, parameter_types
-        FROM symbols WHERE LOWER(name) = LOWER(?) LIMIT 1
-      `).get(name) as any | undefined;
+      row = this.drizzleDb
+        .select()
+        .from(schema.symbols)
+        .where(sql`LOWER(${schema.symbols.name}) = ${name.toLowerCase()}`)
+        .limit(1)
+        .get();
     }
 
-    // Partial match
+    // Partial match (order by shortest name first)
     if (!row) {
-      row = this.db.prepare(`
-        SELECT id, name, type, file_path, line, column, is_exported, is_public,
-               summary, declared_type, inferred_type, generic_params, parameter_types
-        FROM symbols WHERE name LIKE ? ORDER BY LENGTH(name) LIMIT 1
-      `).get(`%${name}%`) as any | undefined;
+      row = this.drizzleDb
+        .select()
+        .from(schema.symbols)
+        .where(like(schema.symbols.name, `%${name}%`))
+        .orderBy(sql`LENGTH(${schema.symbols.name})`)
+        .limit(1)
+        .get();
     }
 
     if (!row) return null;
@@ -1277,16 +1311,16 @@ export class DatabaseManager {
       id: row.id,
       name: row.name,
       type: row.type,
-      file_path: row.file_path,
+      file_path: row.filePath,
       line: row.line,
       column: row.column,
-      is_exported: row.is_exported,
-      is_public: row.is_public,
+      is_exported: row.isExported ? 1 : 0,
+      is_public: row.isPublic ? 1 : 0,
       summary: row.summary,
-      declared_type: row.declared_type,
-      inferred_type: row.inferred_type,
-      generic_params: row.generic_params,
-      parameter_types: row.parameter_types,
+      declared_type: row.declaredType,
+      inferred_type: row.inferredType,
+      generic_params: row.genericParams,
+      parameter_types: row.parameterTypes,
     };
   }
 
@@ -1302,22 +1336,21 @@ export class DatabaseManager {
     type: string;
   }> {
     const pattern = `%"${symbolId}"%`;
-    const rows = this.db.prepare(`
-      SELECT from_symbols, to_symbols, type
-      FROM unified_relationships
-      WHERE from_symbols LIKE ? OR to_symbols LIKE ?
-      LIMIT ?
-    `).all(pattern, pattern, limit) as Array<{
-      from_symbols: string;
-      to_symbols: string;
-      type: string;
-    }>;
+    const rows = this.drizzleDb
+      .select({
+        fromSymbols: schema.unifiedRelationships.fromSymbols,
+        toSymbols: schema.unifiedRelationships.toSymbols,
+        type: schema.unifiedRelationships.type,
+      })
+      .from(schema.unifiedRelationships)
+      .where(or(
+        like(schema.unifiedRelationships.fromSymbols, pattern),
+        like(schema.unifiedRelationships.toSymbols, pattern)
+      ))
+      .limit(limit)
+      .all();
 
-    return rows.map(r => ({
-      fromSymbols: r.from_symbols,
-      toSymbols: r.to_symbols,
-      type: r.type,
-    }));
+    return rows;
   }
 
   // ========== Relationship Query Methods ==========
@@ -1890,38 +1923,12 @@ export class DatabaseManager {
 
   /**
    * Ensure tasks table exists
+   * @deprecated Tasks table is now created in schema.sql via initializeSchema()
+   * This method is kept for backwards compatibility with existing code.
    */
   ensureTasksTable(): void {
-    this.db.exec(`
-      CREATE TABLE IF NOT EXISTS tasks (
-        id TEXT PRIMARY KEY,
-        title TEXT NOT NULL,
-        description TEXT,
-        status TEXT NOT NULL,
-        priority TEXT NOT NULL,
-        type TEXT NOT NULL,
-        assigned_to TEXT,
-        symbol_id TEXT,
-        file_path TEXT,
-        line INTEGER,
-        estimated_hours REAL,
-        actual_hours REAL,
-        due_date TEXT,
-        parent_id TEXT,
-        dependencies TEXT,
-        tags TEXT,
-        created_at TEXT NOT NULL,
-        updated_at TEXT NOT NULL,
-        completed_at TEXT,
-        notes TEXT
-      );
-
-      CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
-      CREATE INDEX IF NOT EXISTS idx_tasks_priority ON tasks(priority);
-      CREATE INDEX IF NOT EXISTS idx_tasks_symbol ON tasks(symbol_id);
-      CREATE INDEX IF NOT EXISTS idx_tasks_file ON tasks(file_path);
-      CREATE INDEX IF NOT EXISTS idx_tasks_due ON tasks(due_date);
-    `);
+    // No-op: Tasks table is created in schema.sql during initializeSchema()
+    // This method is kept for backwards compatibility
   }
 
   /**
@@ -2126,15 +2133,91 @@ export class DatabaseManager {
   }
 
   /**
-   * Find symbols by name (exact or pattern match)
+   * Find symbols by name (exact, case-insensitive, or partial match)
    * @param name - Symbol name to search for
    * @returns Array of matching symbol rows
    */
   findSymbolsByNamePattern(name: string): SymbolRow[] {
-    const rows = this.drizzleDb
+    // Try exact match first
+    let rows = this.drizzleDb
       .select()
       .from(schema.symbols)
       .where(or(eq(schema.symbols.name, name), like(schema.symbols.name, `${name}.%`)))
+      .all();
+
+    // Try case-insensitive match if no results
+    if (rows.length === 0) {
+      const lowerName = name.toLowerCase();
+      rows = this.drizzleDb
+        .select()
+        .from(schema.symbols)
+        .where(or(
+          sql`LOWER(${schema.symbols.name}) = ${lowerName}`,
+          sql`LOWER(${schema.symbols.name}) LIKE ${lowerName + '.%'}`
+        ))
+        .all();
+    }
+
+    // Try partial match if still no results
+    if (rows.length === 0) {
+      rows = this.drizzleDb
+        .select()
+        .from(schema.symbols)
+        .where(sql`LOWER(${schema.symbols.name}) LIKE ${'%' + name.toLowerCase() + '%'}`)
+        .orderBy(sql`LENGTH(${schema.symbols.name})`)
+        .limit(20)
+        .all();
+    }
+
+    return rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      file_path: row.filePath,
+      line: row.line,
+      column: row.column,
+      is_exported: row.isExported ? 1 : 0,
+      is_public: row.isPublic ? 1 : 0,
+      summary: row.summary,
+      declared_type: row.declaredType,
+      inferred_type: row.inferredType,
+      generic_params: row.genericParams,
+      parameter_types: row.parameterTypes,
+      is_constant: row.isConstant ? 1 : 0,
+      literal_value: row.literalValue,
+      value_type: row.valueType,
+      created_at: row.createdAt,
+      updated_at: row.updatedAt,
+      version: row.version,
+      jsonl_line: row.jsonlLine,
+    }));
+  }
+
+  /**
+   * Find methods/functions by partial name match
+   * Specifically searches for method and function types
+   * @param methodName - Method name to search (can be partial)
+   * @returns Array of matching method symbols
+   */
+  findMethodsByNamePart(methodName: string): SymbolRow[] {
+    const lowerName = methodName.toLowerCase();
+
+    // Search for methods/functions where the name ends with the method name
+    // e.g., searching "getSymbol" finds "DatabaseManager.getSymbol"
+    const rows = this.drizzleDb
+      .select()
+      .from(schema.symbols)
+      .where(
+        and(
+          or(eq(schema.symbols.type, 'method'), eq(schema.symbols.type, 'function')),
+          or(
+            sql`LOWER(${schema.symbols.name}) = ${lowerName}`,
+            sql`LOWER(${schema.symbols.name}) LIKE ${'%.' + lowerName}`
+          )
+        )
+      )
+      .orderBy(schema.symbols.name)
+      .limit(50)
       .all();
 
     return rows.map((row) => ({

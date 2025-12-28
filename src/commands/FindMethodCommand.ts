@@ -198,33 +198,36 @@ export class FindMethodCommand extends BaseCommand {
     const dbManager = new DatabaseManager(dbPath, jsonlPath);
 
     try {
-      // Search for methods/functions matching the query
-      const matches = dbManager.findSymbolsByNamePattern(query);
+      // First try dedicated method search
+      let methodMatches = dbManager.findMethodsByNamePart(query);
 
-      // Filter to only methods and functions
-      const methodMatches = matches.filter(s =>
-        ['method', 'function'].includes(s.type) ||
-        s.name.includes('.')
-      );
-
+      // Fall back to general pattern search if no methods found
       if (methodMatches.length === 0) {
-        // Try broader search
-        const allMatches = matches.slice(0, 20);
-        if (allMatches.length === 0) {
-          console.log(`${colors.yellow}No symbols found${colors.reset}`);
+        const allMatches = dbManager.findSymbolsByNamePattern(query);
+
+        // Filter to only methods and functions
+        methodMatches = allMatches.filter(s =>
+          ['method', 'function'].includes(s.type)
+        );
+
+        // If still no methods, show all matching symbols
+        if (methodMatches.length === 0 && allMatches.length > 0) {
+          console.log(`Found ${colors.bold}${allMatches.length}${colors.reset} matching symbols:`);
           console.log();
+
+          for (const match of allMatches.slice(0, 20)) {
+            console.log(`${colors.bold}${match.id}${colors.reset} → ${match.name}`);
+            console.log(`  File: ${match.file_path}:${match.line}`);
+            console.log(`  Type: ${match.type}`);
+            console.log();
+          }
           return this.success();
         }
+      }
 
-        console.log(`Found ${colors.bold}${allMatches.length}${colors.reset} matching symbols:`);
+      if (methodMatches.length === 0) {
+        console.log(`${colors.yellow}No methods found${colors.reset}`);
         console.log();
-
-        for (const match of allMatches) {
-          console.log(`${colors.bold}${match.id}${colors.reset} → ${match.name}`);
-          console.log(`  File: ${match.file_path}:${match.line}`);
-          console.log(`  Type: ${match.type}`);
-          console.log();
-        }
         return this.success();
       }
 
