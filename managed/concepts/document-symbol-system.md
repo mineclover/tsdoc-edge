@@ -3,12 +3,14 @@ title: document-symbol-system
 type: concept
 category: concepts
 status: active
-canonical: true
+canonical: false
 ---
 
-# [[Document Symbol System]]
+## [[Document Symbol System]]
 
-> Core system for bidirectional document linking with `[[Symbol]]` notation
+> See main definition at: [[Document Symbol System]] in `managed/core/doc-symbol-system.md`
+
+Core system for bidirectional document linking with `[[Symbol]]` notation
 
 **Core Components**: `src/doc-symbol/`
 

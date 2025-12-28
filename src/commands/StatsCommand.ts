@@ -30,9 +30,9 @@ import { DatabaseManager } from '../storage/DatabaseManager';
  * @rationale Centralized stats collection with history tracking
  * @consequences Requires database to be built first
  *
- * @depends DatabaseManager, TrackableStatsCollector, StatsHistoryManager, StatsComparator
+ * @depends DatabaseManager, TrackableStatsCollector, StatsHistoryManager
  * @depType internal
- * @depReason Stats collection and comparison
+ * @depReason Stats collection and history tracking
  */
 export class StatsCommand extends BaseCommand {
   private dbManager?: DatabaseManager;
