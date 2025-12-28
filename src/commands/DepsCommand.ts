@@ -7,6 +7,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
+import { DatabaseManager } from '../storage/DatabaseManager';
 
 /**
  * Command for showing symbol dependencies
@@ -62,6 +63,11 @@ export class DepsCommand extends BaseCommand {
     return 'Show dependencies of a symbol';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge deps <symbol-id>';
   }
@@ -81,9 +87,16 @@ export class DepsCommand extends BaseCommand {
 
       const id = args[0];
       if (!id) {
-        this.printError('Usage: tsdoc-edge deps <id>');
+        console.log(`${colors.yellow}Usage:${colors.reset} tsdoc-edge deps <symbol-name>`);
         console.log();
-        return this.failure('Symbol ID required');
+        console.log('Examples:');
+        console.log(`  ${colors.dim}tsdoc-edge deps DatabaseManager${colors.reset}`);
+        console.log(`  ${colors.dim}tsdoc-edge deps BuildCommand${colors.reset}`);
+        console.log(`  ${colors.dim}tsdoc-edge deps class-basecommand${colors.reset}  ${colors.dim}(exact ID)${colors.reset}`);
+        console.log();
+        console.log(`Tip: Use ${colors.cyan}tsdoc-edge stats${colors.reset} to see available symbols`);
+        console.log();
+        return this.failure('Symbol name required');
       }
 
       const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
@@ -94,17 +107,46 @@ export class DepsCommand extends BaseCommand {
       }
 
       const manager = this.manager || new SymbolRegistryManager(registryPath);
-      const entry = manager.findById(id);
+      let entry = manager.findById(id);
 
+      // Try name pattern match if not found by ID
       if (!entry) {
-        this.printError(`Symbol not found: ${id}`);
-        console.log();
-        return this.failure(`Symbol not found: ${id}`);
+        const matches = manager.findByNamePattern(id);
+        if (matches.length === 1) {
+          entry = matches[0];
+        } else if (matches.length > 1) {
+          // Auto-select if first match is exact class/interface match
+          const first = matches[0];
+          const isExactMatch = first.sourceRef.symbolName.toLowerCase() === id.toLowerCase();
+          const isPrimaryType = ['class', 'interface', 'function', 'type'].includes(first.sourceRef.type || '');
+
+          if (isExactMatch && isPrimaryType) {
+            entry = first;
+            console.log(`${colors.dim}Selected: ${first.sourceRef.symbolName} (${first.sourceRef.type})${colors.reset}`);
+            console.log();
+          } else {
+            console.log(`${colors.yellow}Multiple matches found:${colors.reset}`);
+            for (const m of matches.slice(0, 10)) {
+              console.log(`  ${colors.cyan}${m.id}${colors.reset} (${m.sourceRef.symbolName}) [${m.sourceRef.type || 'unknown'}]`);
+            }
+            if (matches.length > 10) {
+              console.log(`  ... and ${matches.length - 10} more`);
+            }
+            console.log();
+            console.log('Please use a more specific ID or name.');
+            return this.failure(`Multiple matches found: ${id}`);
+          }
+        }
       }
 
-      this.printHeader(`Dependencies of ${id} (${entry.sourceRef.symbolName})`);
+      if (!entry) {
+        // Fall back to database search
+        return this.findDepsFromDatabase(id);
+      }
 
-      const deps = manager.getDependencies(id);
+      this.printHeader(`Dependencies of ${entry.id} (${entry.sourceRef.symbolName})`);
+
+      const deps = manager.getDependencies(entry.id);
 
       if (deps.length === 0) {
         console.log(`${colors.yellow}No dependencies${colors.reset}`);
@@ -129,5 +171,102 @@ export class DepsCommand extends BaseCommand {
 
       return this.success();
     });
+  }
+
+  private async findDepsFromDatabase(idOrName: string): Promise<CommandResult> {
+    const dbCheck = this.checkDatabaseExists();
+    if (dbCheck) {
+      this.printError(`Symbol not found: ${idOrName}`);
+      console.log();
+      return this.failure(`Symbol not found: ${idOrName}`);
+    }
+
+    const dbPath = this.getDatabasePath();
+    const jsonlPath = this.getJsonlPath();
+    const dbManager = new DatabaseManager(dbPath, jsonlPath);
+
+    try {
+      // Try exact ID match first
+      let symbol = dbManager.getSymbol(idOrName);
+
+      // Try name search if not found
+      if (!symbol) {
+        const matches = dbManager.findSymbolsByNamePattern(idOrName);
+        if (matches.length === 1) {
+          symbol = dbManager.getSymbol(matches[0].id);
+        } else if (matches.length > 1) {
+          // Auto-select if first match is exact class/interface match
+          const first = matches[0];
+          const isExactMatch = first.name.toLowerCase() === idOrName.toLowerCase();
+          const isPrimaryType = ['class', 'interface', 'function', 'type'].includes(first.type);
+
+          if (isExactMatch && isPrimaryType) {
+            symbol = dbManager.getSymbol(first.id);
+            console.log(`${colors.dim}Selected: ${first.name} (${first.type})${colors.reset}`);
+            console.log();
+          } else {
+            console.log(`${colors.yellow}Multiple matches found:${colors.reset}`);
+            for (const m of matches.slice(0, 10)) {
+              console.log(`  ${colors.cyan}${m.id}${colors.reset} (${m.name}) [${m.type}]`);
+            }
+            if (matches.length > 10) {
+              console.log(`  ... and ${matches.length - 10} more`);
+            }
+            console.log();
+            console.log('Please use a more specific ID or name.');
+            return this.failure(`Multiple matches found: ${idOrName}`);
+          }
+        }
+      }
+
+      if (!symbol) {
+        this.printError(`Symbol not found: ${idOrName}`);
+        console.log();
+        return this.failure(`Symbol not found: ${idOrName}`);
+      }
+
+      this.printHeader(`Dependencies of ${symbol.name} (${symbol.type})`);
+      console.log(`${colors.dim}File: ${symbol.filePath}:${symbol.line}${colors.reset}`);
+      console.log();
+
+      // Get relationships from database using Drizzle ORM
+      const relationships = dbManager.queryRelationships({ symbolId: symbol.id, limit: 100 });
+
+      // Filter for outgoing relationships (where this symbol is the source)
+      const outgoing = relationships.filter(rel => {
+        const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
+        return fromSymbols.includes(symbol!.id);
+      });
+
+      if (outgoing.length === 0) {
+        console.log(`${colors.yellow}No dependencies found${colors.reset}`);
+        console.log();
+      } else {
+        console.log(`${colors.bold}Dependencies:${colors.reset}`);
+        console.log();
+
+        for (const rel of outgoing) {
+          const typeLabel = ` [${rel.type}]`;
+          const targetIds = Array.isArray(rel.to) ? rel.to : [rel.to];
+
+          for (const targetId of targetIds) {
+            const target = dbManager.getSymbol(targetId);
+            console.log(
+              `  ${colors.bold}→${colors.reset} ${colors.cyan}${target?.name || targetId}${colors.reset}${typeLabel}`
+            );
+            if (target) {
+              console.log(`    ${colors.dim}${target.filePath}:${target.line}${colors.reset}`);
+            }
+          }
+        }
+        console.log();
+        console.log(`Total: ${colors.green}${outgoing.length}${colors.reset} relationships`);
+        console.log();
+      }
+
+      return this.success();
+    } finally {
+      dbManager.close();
+    }
   }
 }
