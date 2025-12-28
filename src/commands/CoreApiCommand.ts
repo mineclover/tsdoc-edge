@@ -63,8 +63,16 @@ export class CoreApiCommand extends BaseCommand {
     return 'Show core API symbols (exported + 1-depth dependencies)';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
-    return 'tsdoc-edge core-api';
+    return `tsdoc-edge core-api [options]
+
+  Options:
+    --exclude-tests  Exclude symbols from test files (__tests__, .test.ts, .spec.ts)`;
   }
 
   /**
@@ -80,6 +88,8 @@ export class CoreApiCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const excludeTests = args.includes('--exclude-tests');
+
       if (!this.dbManager) {
         const dbCheck = this.checkDatabaseExists();
         if (dbCheck) return dbCheck;
@@ -94,8 +104,17 @@ export class CoreApiCommand extends BaseCommand {
 
         const graphBuilder = new SymbolGraphBuilder();
 
-        // Add symbols
+        // Helper to check if file is a test file
+        const isTestFile = (filePath: string) =>
+          filePath.includes('__tests__') ||
+          filePath.includes('.test.') ||
+          filePath.includes('.spec.');
+
+        // Add symbols (filter test files if requested)
         for (const row of symbolRows) {
+          if (excludeTests && isTestFile(row.file_path)) {
+            continue;
+          }
           const symbol: Symbol = {
             id: row.id,
             name: row.name,
@@ -148,6 +167,9 @@ export class CoreApiCommand extends BaseCommand {
         const coreSymbols = allSymbols.filter((s) => coreSymbolIds.has(s.id));
 
         this.printHeader('Core API Symbols');
+        if (excludeTests) {
+          console.log(`${colors.dim}Excluding test files${colors.reset}`);
+        }
         console.log(`Total exported: ${colors.green}${exportedSymbols.length}${colors.reset}`);
         console.log(`Core API size: ${colors.cyan}${coreSymbols.length}${colors.reset} (exported + 1-depth deps)`);
         console.log();
