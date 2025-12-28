@@ -6,6 +6,7 @@
 import * as path from 'node:path';
 import { BaseCommand, colors, type CommandResult } from './BaseCommand';
 import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
+import { DatabaseManager } from '../storage/DatabaseManager';
 
 /**
  * IdCommand - Complete symbol ID management
@@ -58,6 +59,11 @@ export class IdCommand extends BaseCommand {
     return 'Manage symbol IDs (new, list, find, stats)';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge id <subcommand>
 
@@ -167,52 +173,159 @@ export class IdCommand extends BaseCommand {
   private async handleList(manager: SymbolRegistryManager): Promise<CommandResult> {
     const entries = manager.getAll();
 
+    // If registry is empty, show symbols from database
+    if (entries.length === 0) {
+      return this.handleListFromDatabase();
+    }
+
     console.log(`${colors.bold}Symbol Registry${colors.reset}`);
     console.log(`Total entries: ${colors.green}${entries.length}${colors.reset}`);
     console.log();
 
-    if (entries.length === 0) {
-      console.log(`${colors.yellow}No entries yet. Use "tsdoc-edge id new" to create one.${colors.reset}`);
-      console.log();
-    } else {
-      for (const entry of entries) {
-        console.log(`${colors.bold}${entry.id}${colors.reset} → ${entry.sourceRef.filePath}:${entry.sourceRef.symbolName}`);
-        if (entry.tags && entry.tags.length > 0) {
-          console.log(`  Tags: ${entry.tags.join(', ')}`);
-        }
-        console.log();
+    for (const entry of entries) {
+      console.log(`${colors.bold}${entry.id}${colors.reset} → ${entry.sourceRef.filePath}:${entry.sourceRef.symbolName}`);
+      if (entry.tags && entry.tags.length > 0) {
+        console.log(`  Tags: ${entry.tags.join(', ')}`);
       }
+      console.log();
     }
 
     return { exitCode: 0, message: `Listed ${entries.length} entries` };
   }
 
+  private async handleListFromDatabase(): Promise<CommandResult> {
+    const dbCheck = this.checkDatabaseExists();
+    if (dbCheck) {
+      console.log(`${colors.yellow}No registry entries and no database found.${colors.reset}`);
+      console.log(`Run ${colors.cyan}tsdoc-edge build src${colors.reset} first.`);
+      console.log();
+      return dbCheck;
+    }
+
+    const dbPath = this.getDatabasePath();
+    const jsonlPath = this.getJsonlPath();
+    const dbManager = new DatabaseManager(dbPath, jsonlPath);
+
+    try {
+      // Get symbols from database using Drizzle ORM
+      const symbols = dbManager.querySymbols({ limit: 50, orderBy: 'name', orderDir: 'asc' });
+      const total = dbManager.countSymbols({});
+
+      console.log(`${colors.bold}Symbols from Database${colors.reset}`);
+      console.log(`Showing: ${colors.green}${symbols.length}${colors.reset} of ${colors.cyan}${total}${colors.reset}`);
+      console.log();
+      console.log(`${colors.dim}Note: Short ID registry is empty. Showing database symbols instead.${colors.reset}`);
+      console.log(`${colors.dim}Use ${colors.cyan}tsdoc-edge id new <file> <symbol>${colors.reset}${colors.dim} to register short IDs.${colors.reset}`);
+      console.log();
+
+      for (const symbol of symbols) {
+        console.log(`${colors.bold}${symbol.id}${colors.reset}`);
+        console.log(`  Name: ${symbol.name} (${symbol.type})`);
+        console.log(`  File: ${symbol.file_path}:${symbol.line}`);
+        console.log();
+      }
+
+      if (total > symbols.length) {
+        console.log(`${colors.dim}... and ${total - symbols.length} more symbols${colors.reset}`);
+        console.log();
+      }
+
+      return { exitCode: 0, message: `Listed ${symbols.length} symbols from database` };
+    } finally {
+      dbManager.close();
+    }
+  }
+
   private async handleFind(manager: SymbolRegistryManager, args: string[]): Promise<CommandResult> {
     const id = args[0];
     if (!id) {
-      console.log(`${colors.red}Usage: tsdoc-edge id find <id>${colors.reset}`);
+      console.log(`${colors.red}Usage: tsdoc-edge id find <id-or-name>${colors.reset}`);
       return { exitCode: 1, message: 'Missing ID argument' };
     }
 
+    // Try registry first
     const entry = manager.findById(id);
-    if (!entry) {
-      console.log(`${colors.red}❌ ID not found: ${id}${colors.reset}`);
-      return { exitCode: 1, message: `ID not found: ${id}` };
+    if (entry) {
+      console.log(`${colors.bold}Symbol: ${id}${colors.reset}`);
+      console.log();
+      console.log(`ID: ${colors.bold}${entry.id}${colors.reset}`);
+      console.log(`File: ${entry.sourceRef.filePath}`);
+      console.log(`Symbol: ${entry.sourceRef.symbolName}`);
+      if (entry.sourceRef.type) {
+        console.log(`Type: ${entry.sourceRef.type}`);
+      }
+      console.log(`Created: ${entry.createdAt}`);
+      console.log(`Updated: ${entry.updatedAt}`);
+      console.log();
+      return { exitCode: 0, message: `Found ID: ${id}` };
     }
 
-    console.log(`${colors.bold}Symbol: ${id}${colors.reset}`);
-    console.log();
-    console.log(`ID: ${colors.bold}${entry.id}${colors.reset}`);
-    console.log(`File: ${entry.sourceRef.filePath}`);
-    console.log(`Symbol: ${entry.sourceRef.symbolName}`);
-    if (entry.sourceRef.type) {
-      console.log(`Type: ${entry.sourceRef.type}`);
-    }
-    console.log(`Created: ${entry.createdAt}`);
-    console.log(`Updated: ${entry.updatedAt}`);
-    console.log();
+    // Fall back to database search
+    return this.handleFindFromDatabase(id);
+  }
 
-    return { exitCode: 0, message: `Found ID: ${id}` };
+  private async handleFindFromDatabase(idOrName: string): Promise<CommandResult> {
+    const dbCheck = this.checkDatabaseExists();
+    if (dbCheck) {
+      console.log(`${colors.red}❌ ID not found: ${idOrName}${colors.reset}`);
+      return { exitCode: 1, message: `ID not found: ${idOrName}` };
+    }
+
+    const dbPath = this.getDatabasePath();
+    const jsonlPath = this.getJsonlPath();
+    const dbManager = new DatabaseManager(dbPath, jsonlPath);
+
+    try {
+      // Try exact ID match first
+      const symbol = dbManager.getSymbol(idOrName);
+      if (symbol) {
+        console.log(`${colors.bold}Symbol Found (from database)${colors.reset}`);
+        console.log();
+        console.log(`ID: ${colors.bold}${symbol.id}${colors.reset}`);
+        console.log(`Name: ${symbol.name}`);
+        console.log(`Type: ${symbol.type}`);
+        console.log(`File: ${symbol.filePath}:${symbol.line}`);
+        console.log(`Exported: ${symbol.isExported ? 'Yes' : 'No'}`);
+        if (symbol.summary) {
+          console.log(`Summary: ${symbol.summary.substring(0, 80)}${symbol.summary.length > 80 ? '...' : ''}`);
+        }
+        console.log();
+        return { exitCode: 0, message: `Found symbol: ${idOrName}` };
+      }
+
+      // Try name search
+      const matches = dbManager.findSymbolsByNamePattern(idOrName);
+      if (matches.length > 0) {
+        console.log(`${colors.bold}Symbols matching "${idOrName}"${colors.reset}`);
+        console.log(`Found: ${colors.green}${matches.length}${colors.reset} match(es)`);
+        console.log();
+
+        for (const match of matches.slice(0, 10)) {
+          console.log(`${colors.bold}${match.id}${colors.reset}`);
+          console.log(`  Name: ${match.name} (${match.type})`);
+          console.log(`  File: ${match.file_path}:${match.line}`);
+          console.log();
+        }
+
+        if (matches.length > 10) {
+          console.log(`${colors.dim}... and ${matches.length - 10} more matches${colors.reset}`);
+          console.log();
+        }
+
+        return { exitCode: 0, message: `Found ${matches.length} matches` };
+      }
+
+      console.log(`${colors.red}❌ No symbol found matching: ${idOrName}${colors.reset}`);
+      console.log();
+      console.log('Tips:');
+      console.log(`  ${colors.dim}• Use symbol name (e.g., DatabaseManager)${colors.reset}`);
+      console.log(`  ${colors.dim}• Use full ID (e.g., databasemanager-class-databasemanager)${colors.reset}`);
+      console.log(`  ${colors.dim}• Run ${colors.cyan}tsdoc-edge id list${colors.reset}${colors.dim} to see available symbols${colors.reset}`);
+      console.log();
+      return { exitCode: 1, message: `Symbol not found: ${idOrName}` };
+    } finally {
+      dbManager.close();
+    }
   }
 
   private async handleStats(manager: SymbolRegistryManager): Promise<CommandResult> {
