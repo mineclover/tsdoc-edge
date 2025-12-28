@@ -64,8 +64,16 @@ export class UndocumentedCommand extends BaseCommand {
     return 'Find undocumented symbols';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
-    return 'tsdoc-edge undocumented';
+    return `tsdoc-edge undocumented [options]
+
+  Options:
+    --exclude-tests  Exclude symbols from test files (__tests__, .test.ts, .spec.ts)`;
   }
 
   /**
@@ -81,7 +89,14 @@ export class UndocumentedCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const excludeTests = args.includes('--exclude-tests');
+
       this.printHeader('Undocumented Symbols');
+
+      if (excludeTests) {
+        console.log(`${colors.dim}Excluding test files${colors.reset}`);
+        console.log();
+      }
 
       if (!this.dbManager) {
         const dbCheck = this.checkDatabaseExists();
@@ -118,7 +133,16 @@ export class UndocumentedCommand extends BaseCommand {
 
         // Search for undocumented symbols
         const searchEngine = new SymbolSearchEngine(graphBuilder);
-        const undocumented = searchEngine.findUndocumented();
+        let undocumented = searchEngine.findUndocumented();
+
+        // Filter out test files if requested
+        if (excludeTests) {
+          undocumented = undocumented.filter(s =>
+            !s.filePath.includes('__tests__') &&
+            !s.filePath.includes('.test.') &&
+            !s.filePath.includes('.spec.')
+          );
+        }
 
         if (undocumented.length === 0) {
           this.printSuccess('All symbols are documented!');
