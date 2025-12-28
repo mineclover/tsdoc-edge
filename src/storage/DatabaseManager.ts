@@ -132,6 +132,8 @@ export class DatabaseManager {
 
   /**
    * Run a function within a transaction
+   * @param fn - Function to execute within transaction
+   * @returns Result of the function
    */
   transaction<T>(fn: () => T): T {
     return this.db.transaction(fn)();
@@ -139,6 +141,8 @@ export class DatabaseManager {
 
   /**
    * Batch insert unified relationships
+   * @param relationships - Array of relationship objects to insert
+   * @returns Number of successfully inserted relationships
    */
   batchInsertUnifiedRelationships(relationships: Array<{
     id: string;
@@ -227,6 +231,9 @@ export class DatabaseManager {
 
   /**
    * Insert a symbol into the database
+   * @param symbol - Symbol object with optional extended fields
+   * @param jsonlLine - Line number in JSONL file for sync tracking
+   * @returns True if insert succeeded
    */
   insertSymbol(symbol: Symbol & Partial<ExtendedSymbolFields>, jsonlLine: number): boolean {
     try {
@@ -284,6 +291,9 @@ export class DatabaseManager {
 
   /**
    * Insert enhanced documentation
+   * @param doc - Enhanced symbol documentation object
+   * @param jsonlLine - Line number in JSONL file for sync tracking
+   * @returns True if insert succeeded
    */
   insertEnhancedDoc(doc: EnhancedSymbolDoc, jsonlLine: number): boolean {
     try {
@@ -324,6 +334,8 @@ export class DatabaseManager {
 
   /**
    * Insert a dependency relationship
+   * @param dependency - Dependency relationship object
+   * @returns True if insert succeeded
    */
   insertDependency(dependency: {
     symbolId: string;
@@ -354,6 +366,8 @@ export class DatabaseManager {
 
   /**
    * Get dependencies for a symbol
+   * @param symbolId - ID of the symbol
+   * @returns Array of dependency target IDs
    */
   getDependencies(symbolId: string): string[] {
     const results = this.drizzleDb
@@ -366,6 +380,8 @@ export class DatabaseManager {
 
   /**
    * Get symbols that depend on a given symbol
+   * @param symbolId - ID of the target symbol
+   * @returns Array of dependent symbol IDs
    */
   getDependents(symbolId: string): string[] {
     const results = this.drizzleDb
@@ -378,6 +394,8 @@ export class DatabaseManager {
 
   /**
    * Search symbols by text query (FTS5)
+   * @param query - Full-text search query
+   * @returns Array of matching symbol IDs
    */
   searchSymbols(query: string): string[] {
     // FTS5 requires raw SQL
@@ -392,6 +410,8 @@ export class DatabaseManager {
 
   /**
    * Get symbol by ID
+   * @param id - Symbol ID
+   * @returns Symbol object or null if not found
    */
   getSymbol(id: string): Symbol | null {
     const row = this.drizzleDb
@@ -419,6 +439,8 @@ export class DatabaseManager {
 
   /**
    * Get all symbols in a file
+   * @param filePath - Path to the source file
+   * @returns Array of symbols in the file
    */
   getSymbolsByFile(filePath: string): Symbol[] {
     const rows = this.drizzleDb
@@ -465,6 +487,8 @@ export class DatabaseManager {
 
   /**
    * Get enhanced documentation for a symbol
+   * @param symbolId - ID of the symbol
+   * @returns Enhanced documentation or null if not found
    */
   getEnhancedDoc(symbolId: string): EnhancedSymbolDoc | null {
     const row = this.drizzleDb
@@ -519,6 +543,8 @@ export class DatabaseManager {
 
   /**
    * Import data from JSONL file
+   * @param filePath - Path to JSONL file
+   * @returns Number of imported records
    */
   importFromJSONL(filePath: string): number {
     if (!fs.existsSync(filePath)) {
@@ -590,6 +616,8 @@ export class DatabaseManager {
 
   /**
    * Verify imported data integrity
+   * @param filePath - Path to JSONL file to verify against
+   * @returns Verification result with counts and mismatches
    */
   verifyImport(filePath: string): {
     success: boolean;
@@ -652,6 +680,8 @@ export class DatabaseManager {
 
   /**
    * Insert a unified relationship
+   * @param relationship - Relationship object to insert
+   * @returns True if insert succeeded
    */
   insertUnifiedRelationship(relationship: {
     id: string;
@@ -744,6 +774,8 @@ export class DatabaseManager {
 
   /**
    * Get unified relationships by symbol
+   * @param symbolId - ID of the symbol
+   * @returns Array of relationships involving the symbol
    */
   getUnifiedRelationshipsBySymbol(symbolId: string): UnifiedRelationship[] {
     const pattern = `%"${symbolId}"%`;
@@ -888,6 +920,8 @@ export class DatabaseManager {
 
   /**
    * Get sync metadata hash for a file
+   * @param filePath - Path to the file
+   * @returns Hash string or null if not found
    */
   getSyncMetadataHash(filePath: string): string | null {
     const row = this.drizzleDb
@@ -900,6 +934,9 @@ export class DatabaseManager {
 
   /**
    * Upsert sync metadata for a file
+   * @param filePath - Path to the file
+   * @param hash - Content hash
+   * @param status - Sync status (default: 'synced')
    */
   upsertSyncMetadata(filePath: string, hash: string, status: string = 'synced'): void {
     const now = new Date().toISOString();
@@ -926,6 +963,8 @@ export class DatabaseManager {
 
   /**
    * Count symbols with optional filters
+   * @param options - Filter options (type, filePath, isPublic)
+   * @returns Number of matching symbols
    */
   countSymbols(options?: { type?: string; filePath?: string; isPublic?: boolean }): number {
     let query = this.drizzleDb.select({ count: sql<number>`count(*)` }).from(schema.symbols);
@@ -982,6 +1021,8 @@ export class DatabaseManager {
 
   /**
    * Get symbols with filters and pagination
+   * @param options - Query options including filters, pagination, and sorting
+   * @returns Array of matching symbol rows
    */
   querySymbols(options: {
     type?: string;
@@ -1053,6 +1094,8 @@ export class DatabaseManager {
 
   /**
    * Get symbols by a list of IDs
+   * @param ids - Array of symbol IDs
+   * @returns Array of matching symbol rows
    */
   getSymbolsByIds(ids: string[]): SymbolRow[] {
     if (ids.length === 0) return [];
@@ -1083,6 +1126,9 @@ export class DatabaseManager {
   /**
    * Get symbol at a specific file path and line (for hover info)
    * Returns the symbol defined at or before the given line
+   * @param filePathPattern - File path pattern (supports LIKE wildcards)
+   * @param line - Line number
+   * @returns Symbol row or null if not found
    */
   getSymbolAtLine(filePathPattern: string, line: number): SymbolRow | null {
     // Use raw SQL for ORDER BY line DESC with LIKE pattern
@@ -1117,6 +1163,8 @@ export class DatabaseManager {
 
   /**
    * Count relationships where symbol is in from_symbols (downstream)
+   * @param symbolId - ID of the symbol
+   * @returns Number of downstream relationships
    */
   countDownstreamRelationships(symbolId: string): number {
     const pattern = `%"${symbolId}"%`;
@@ -1128,6 +1176,8 @@ export class DatabaseManager {
 
   /**
    * Count relationships where symbol is in to_symbols (upstream)
+   * @param symbolId - ID of the symbol
+   * @returns Number of upstream relationships
    */
   countUpstreamRelationships(symbolId: string): number {
     const pattern = `%"${symbolId}"%`;
@@ -1139,6 +1189,9 @@ export class DatabaseManager {
 
   /**
    * Get relationship type counts for a symbol
+   * @param symbolId - ID of the symbol
+   * @param limit - Maximum number of types to return (default: 5)
+   * @returns Array of type/count pairs
    */
   getRelationshipTypeCounts(symbolId: string, limit: number = 5): Array<{ type: string; count: number }> {
     const pattern = `%"${symbolId}"%`;
@@ -1155,6 +1208,9 @@ export class DatabaseManager {
 
   /**
    * Search symbols by name pattern
+   * @param query - Search query (supports partial match)
+   * @param limit - Maximum number of results (default: 50)
+   * @returns Array of matching symbol rows
    */
   searchSymbolsByName(query: string, limit: number = 50): SymbolRow[] {
     const pattern = `%${query}%`;
@@ -1186,6 +1242,8 @@ export class DatabaseManager {
 
   /**
    * Find symbol by name (exact match first, then case-insensitive, then partial)
+   * @param name - Symbol name to search for
+   * @returns Matching symbol row or null
    */
   findSymbolByName(name: string): SymbolRow | null {
     // Exact match
@@ -1234,6 +1292,9 @@ export class DatabaseManager {
 
   /**
    * Get relationships for a symbol with limit
+   * @param symbolId - ID of the symbol
+   * @param limit - Maximum number of relationships to return
+   * @returns Array of relationship summaries
    */
   getRelationshipsForSymbol(symbolId: string, limit: number): Array<{
     fromSymbols: string;
@@ -1303,6 +1364,8 @@ export class DatabaseManager {
 
   /**
    * Query relationships with filters
+   * @param options - Filter options (type, category, strength, minConfidence, symbolId, pagination)
+   * @returns Array of matching relationships
    */
   queryRelationships(options: {
     type?: string;
@@ -1396,6 +1459,8 @@ export class DatabaseManager {
 
   /**
    * Delete a relationship by ID
+   * @param id - Relationship ID
+   * @returns True if deleted successfully
    */
   deleteRelationship(id: string): boolean {
     try {
@@ -1422,6 +1487,8 @@ export class DatabaseManager {
 
   /**
    * Get test mappings for a symbol
+   * @param symbolId - ID of the symbol
+   * @returns Array of test mapping objects
    */
   getTestMappings(symbolId: string): Array<{
     testFilePath: string;
@@ -1445,6 +1512,8 @@ export class DatabaseManager {
 
   /**
    * Insert a test mapping
+   * @param mapping - Test mapping object
+   * @returns True if inserted successfully
    */
   insertTestMapping(mapping: {
     symbolId: string;
@@ -1473,6 +1542,8 @@ export class DatabaseManager {
 
   /**
    * Get contract for a symbol
+   * @param symbolId - ID of the symbol
+   * @returns Contract object or null if not found
    */
   getContract(symbolId: string): {
     description: string;
@@ -1524,6 +1595,8 @@ export class DatabaseManager {
 
   /**
    * Get decision records for a symbol
+   * @param symbolId - ID of the symbol
+   * @returns Array of decision record objects
    */
   getDecisionRecords(symbolId: string): Array<{
     id: string;
@@ -1581,6 +1654,8 @@ export class DatabaseManager {
 
   /**
    * Get error experiences for a symbol
+   * @param symbolId - ID of the symbol
+   * @returns Array of error experience objects
    */
   getErrorExperiences(symbolId: string): Array<{
     id: string;
@@ -1676,6 +1751,8 @@ export class DatabaseManager {
 
   /**
    * Query future plans with filters
+   * @param options - Filter options (symbolId, status, priority, limit)
+   * @returns Array of future plan objects
    */
   queryFuturePlans(options?: {
     symbolId?: string;
@@ -1736,6 +1813,8 @@ export class DatabaseManager {
 
   /**
    * Get responsibility for a symbol
+   * @param symbolId - ID of the symbol
+   * @returns Responsibility object or null if not found
    */
   getResponsibility(symbolId: string): {
     description: string;
@@ -1782,6 +1861,8 @@ export class DatabaseManager {
 
   /**
    * Delete symbols by file path
+   * @param filePath - Path to the file
+   * @returns Number of deleted symbols
    */
   deleteSymbolsByFile(filePath: string): number {
     const result = this.drizzleDb
@@ -1845,6 +1926,7 @@ export class DatabaseManager {
 
   /**
    * Insert a task
+   * @param task - Task object to insert
    */
   insertTask(task: {
     id: string;
@@ -1894,6 +1976,8 @@ export class DatabaseManager {
 
   /**
    * Get task by ID
+   * @param id - Task ID
+   * @returns Task row or null if not found
    */
   getTaskById(id: string): schema.TaskRow | null {
     const row = this.drizzleDb
@@ -1906,6 +1990,8 @@ export class DatabaseManager {
 
   /**
    * Update a task
+   * @param id - Task ID
+   * @param updates - Fields to update
    */
   updateTask(id: string, updates: {
     title?: string;
@@ -1947,6 +2033,8 @@ export class DatabaseManager {
 
   /**
    * Delete a task
+   * @param id - Task ID
+   * @returns True if deleted successfully
    */
   deleteTask(id: string): boolean {
     const result = this.drizzleDb
@@ -1969,6 +2057,8 @@ export class DatabaseManager {
 
   /**
    * Get tasks with dynamic filters
+   * @param filter - Filter options (status, priority, type, assignedTo, symbolId, due dates)
+   * @returns Array of matching task rows
    */
   getTasksWithFilters(filter?: {
     status?: string | string[];
@@ -2023,6 +2113,8 @@ export class DatabaseManager {
 
   /**
    * Check if symbol exists by ID
+   * @param id - Symbol ID
+   * @returns True if symbol exists
    */
   symbolExists(id: string): boolean {
     const result = this.drizzleDb
@@ -2035,6 +2127,8 @@ export class DatabaseManager {
 
   /**
    * Find symbols by name (exact or pattern match)
+   * @param name - Symbol name to search for
+   * @returns Array of matching symbol rows
    */
   findSymbolsByNamePattern(name: string): SymbolRow[] {
     const rows = this.drizzleDb
@@ -2069,6 +2163,8 @@ export class DatabaseManager {
 
   /**
    * Get symbol IDs by file path
+   * @param filePath - Path to the source file
+   * @returns Array of symbol IDs
    */
   getSymbolIdsByFilePath(filePath: string): string[] {
     const rows = this.drizzleDb
@@ -2081,6 +2177,8 @@ export class DatabaseManager {
 
   /**
    * Get symbol file path by ID
+   * @param id - Symbol ID
+   * @returns File path or null if not found
    */
   getSymbolFilePath(id: string): string | null {
     const result = this.drizzleDb
@@ -2093,6 +2191,8 @@ export class DatabaseManager {
 
   /**
    * Get dependency targets for a symbol
+   * @param symbolId - ID of the symbol
+   * @returns Array of target symbol IDs
    */
   getDependencyTargets(symbolId: string): string[] {
     const rows = this.drizzleDb
@@ -2160,6 +2260,8 @@ export class DatabaseManager {
 
   /**
    * Get low confidence relationships
+   * @param threshold - Maximum confidence value to include
+   * @returns Array of relationship objects with low confidence
    */
   getLowConfidenceRelationships(threshold: number): Array<{
     id: string;
@@ -2201,6 +2303,10 @@ export class DatabaseManager {
 
   /**
    * Check if reverse relationship exists
+   * @param type - Relationship type
+   * @param fromSymbols - Original from symbols (becomes to)
+   * @param toSymbols - Original to symbols (becomes from)
+   * @returns True if reverse relationship exists
    */
   hasReverseRelationship(type: string, fromSymbols: string, toSymbols: string): boolean {
     const result = this.drizzleDb
@@ -2219,6 +2325,8 @@ export class DatabaseManager {
 
   /**
    * Count incoming calls for a symbol (for dead code detection)
+   * @param symbolId - ID of the symbol
+   * @returns Number of incoming call relationships
    */
   countIncomingCalls(symbolId: string): number {
     const result = this.drizzleDb
@@ -2236,6 +2344,8 @@ export class DatabaseManager {
 
   /**
    * Count all incoming references for a symbol (for dead code detection)
+   * @param symbolId - ID of the symbol
+   * @returns Number of incoming reference relationships
    */
   countIncomingReferences(symbolId: string): number {
     const result = this.drizzleDb
@@ -2258,6 +2368,8 @@ export class DatabaseManager {
 
   /**
    * Get caller file paths for a symbol (for dead code detection)
+   * @param symbolId - ID of the symbol
+   * @returns Array of file paths that call this symbol
    */
   getCallerFilePaths(symbolId: string): string[] {
     const rows = this.db
@@ -2301,6 +2413,9 @@ export class DatabaseManager {
 
   /**
    * Find symbol by ID with type filter
+   * @param symbolId - ID of the symbol
+   * @param types - Array of allowed symbol types
+   * @returns Symbol or null if not found or type mismatch
    */
   findSymbolByIdWithType(symbolId: string, types: string[]): schema.Symbol | null {
     return (
@@ -2314,6 +2429,10 @@ export class DatabaseManager {
 
   /**
    * Find symbol by name and optional file pattern with type filter
+   * @param name - Symbol name
+   * @param types - Array of allowed symbol types
+   * @param filePattern - Optional file path pattern to filter by
+   * @returns Symbol or null if not found
    */
   findSymbolByNameWithType(
     name: string,
