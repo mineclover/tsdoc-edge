@@ -75,6 +75,19 @@ export class CodeHealthChecker {
     // Collect source files
     const sourceFiles = this.collectSourceFiles(targetPath);
 
+    // Determine root path for test file detection
+    // Use the nearest 'src' directory to find test files in src/__tests__/
+    let testRootPath = targetPath;
+    const normalized = targetPath.replace(/\\/g, '/');
+    const srcIndex = normalized.lastIndexOf('/src/');
+    if (srcIndex >= 0) {
+      testRootPath = normalized.substring(0, srcIndex + 4); // Include '/src'
+    } else if (normalized.startsWith('src/') || normalized === 'src') {
+      testRootPath = 'src';
+    } else if (fs.existsSync(targetPath) && fs.statSync(targetPath).isFile()) {
+      testRootPath = path.dirname(targetPath);
+    }
+
     // Analyze documentation
     const allDocScores: DocQualityScore[] = [];
     /**
@@ -92,7 +105,7 @@ export class CodeHealthChecker {
     }
 
     // Analyze test coverage using simple file matching
-    const testCoverage = this.analyzeTestCoverage(sourceFiles, targetPath);
+    const testCoverage = this.analyzeTestCoverage(sourceFiles, testRootPath);
 
     // Update symbol counts in test coverage
     this.updateSymbolCounts(testCoverage, allDocScores);
