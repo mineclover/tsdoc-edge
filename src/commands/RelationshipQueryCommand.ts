@@ -12,14 +12,29 @@ import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/Databas
  * @public
  */
 export class RelationshipQueryCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'relationship-query';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Query relationships for a specific symbol';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge relationship-query <symbol-id> [options]
 
@@ -36,6 +51,12 @@ Examples:
   tsdoc-edge relationship-query build-command --direction from`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       // Check for help flag
@@ -49,7 +70,7 @@ Examples:
         return this.displayHelp();
       }
 
-      const symbolId = args[0];
+      let symbolId = args[0];
 
       // Parse options
       const options = {
@@ -59,10 +80,16 @@ Examples:
         limit: Number.parseInt(this.getOption(args, '--limit') || '50', 10),
       };
 
-      this.printHeader(`Relationships for: ${symbolId}`);
-
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
+
+      // Resolve symbol name to ID if needed
+      const resolved = this.resolveSymbol(dbManager, symbolId);
+      if (resolved) {
+        symbolId = resolved.id;
+      }
+
+      this.printHeader(`Relationships for: ${symbolId}`);
 
       // Use Drizzle ORM to query relationships
       let rels = dbManager.getUnifiedRelationshipsBySymbol(symbolId);
