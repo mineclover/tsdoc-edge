@@ -2,9 +2,30 @@
 
 All notable changes to TSDoc Edge will be documented in this file.
 
-## [Unreleased]
+## [0.13.0] - 2025-12-28
 
-### Changed - Code Quality Improvements
+### Added
+- **CLI --version flag**: Added `--version` and `-v` flags for version display
+- **CI/CD workflows**: Added GitHub Actions for CI (test/lint/build) and release (npm publish)
+- **GitHub templates**: Issue templates (bug report, feature request) and PR template
+- **LICENSE file**: MIT license
+- **CONTRIBUTING.md**: Contribution guidelines
+
+### Changed
+- **Package optimization**: Reduced npm package size from 7.1MB to ~965KB via .npmignore
+- **Package metadata**: Added repository, bugs, homepage, engines fields to package.json
+- **files field**: Explicit package inclusion via files array in package.json
+- **Command deduplication**: Fixed duplicate commands in help output
+
+### Removed
+- **Unused analyzers**: Removed 5 unused analyzers (DependencyResolver, IstanbulCoverageAdapter, CoverageSyncAdapter, DomainStructureAnalyzer, StatsComparator) - 1,235 lines
+
+### Performance
+- **Build time**: Optimized from 56s to 11s (80% improvement)
+- **Query optimization**: Added symbol-specific relationship queries (94% faster)
+- **Analyzer integration**: Added LayerDependencyAnalyzer and DependencyChainAnalyzer to BuildCommand
+
+### Code Quality Improvements
 
 #### ValidateSymbolRefsCommand
 - **Implemented auto-fix for ambiguous references**: `--fix` flag now creates skeleton documents for undefined symbols

@@ -69,9 +69,21 @@ export interface TestExample {
  */
 export class TestExampleExtractor {
   private db: DatabaseManager;
+  private symbolsCache: ReturnType<DatabaseManager['getAllSymbols']> | null = null;
 
   constructor(db: DatabaseManager) {
     this.db = db;
+  }
+
+  /**
+   * Get all symbols with caching
+   * @private
+   */
+  private getAllSymbolsCached(): ReturnType<DatabaseManager['getAllSymbols']> {
+    if (!this.symbolsCache) {
+      this.symbolsCache = this.db.getAllSymbols();
+    }
+    return this.symbolsCache;
   }
 
   /**
@@ -81,7 +93,7 @@ export class TestExampleExtractor {
    * @returns Array of test examples
    */
   extractAllExamples(testFilePattern = '**/*.test.ts'): TestExample[] {
-    const allSymbols = this.db.getAllSymbols();
+    const allSymbols = this.getAllSymbolsCached();
     const testFiles = allSymbols
       .filter(s => s.filePath.includes('.test.ts') || s.filePath.includes('__tests__'))
       .map(s => s.filePath);
@@ -274,8 +286,8 @@ export class TestExampleExtractor {
   ): string[] {
     const symbols: string[] = [];
 
-    // Get all symbols from database
-    const allSymbols = this.db.getAllSymbols();
+    // Get all symbols from database (cached)
+    const allSymbols = this.getAllSymbolsCached();
 
     // Create kebab-case version of module name for matching
     const moduleKebab = this.toKebabCase(moduleName);

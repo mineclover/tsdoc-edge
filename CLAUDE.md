@@ -2,6 +2,18 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## 프로젝트 현황 (2025-12-28)
+
+| Metric | Value |
+|--------|-------|
+| CLI Commands | 67 |
+| Test Cases | 2,885 |
+| Symbols | 6,726 |
+| Relationships | 38,704 |
+| Relationship Types | 13/28 (46%) |
+| Build Time | 11s |
+| Health Score | 74/100 (B) |
+
 ## 프로젝트 개요
 
 TSDoc Edge는 TypeScript 코드베이스의 모든 심볼을 추적하고, 심볼 간 관계를 파악하며, 문서와 코드의 완벽한 일치를 강제하는 **SSOT(Single Source of Truth) 문서 연결성 플랫폼**입니다.
@@ -65,7 +77,7 @@ tsdoc-edge dc src/services/UserService.ts
 - ⚠️ 영향 범위: 수정 시 영향받는 파일들
 - 💡 권장사항: 테스트 커버리지, 문서화 상태
 
-**관계 분석** (109개 명령어 중 핵심):
+**관계 분석** (67개 명령어 중 핵심):
 ```bash
 # 변경 영향 분석
 tsdoc-edge relationship-impact <symbol-id>

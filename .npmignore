@@ -1,0 +1,68 @@
+# Source files (only dist is needed)
+src/
+*.ts
+!*.d.ts
+
+# Test files
+__tests__/
+*.test.ts
+*.test.js
+*.spec.ts
+*.spec.js
+jest.config.js
+coverage/
+
+# Development files
+.tsdoc/
+.tsdoc.db
+*.db
+
+# Documentation (internal)
+managed/
+archive/
+demo/
+docs/
+examples/
+generated/
+reference/
+.reports/
+
+# Development artifacts
+*.md
+!README.md
+!CHANGELOG.md
+CLAUDE.md
+CONTRIBUTING.md
+.vscode/
+.vscode-template/
+vscode-extension/
+mcp-server/
+scripts/
+
+# Build artifacts
+node_modules/
+tsconfig.json
+biome.json
+.gitignore
+
+# Temp and cache
+var/
+tmp/
+*.log
+.DS_Store
+*.tgz
+
+# Analytics and state
+usage-analytics.json
+
+# Shell scripts
+*.sh
+
+# Config files (except main)
+.tsdoc.config.*.json
+.tsdoc.demo.config.json
+.github/
+.claude/
+
+# Text/analysis files
+*.txt

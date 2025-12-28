@@ -238,15 +238,8 @@ export class EntryPointContextAggregator {
       }
     }
 
-    // Get all relationships
-    const allRels = this.dbManager.getAllUnifiedRelationships();
-
-    // Filter relationships involving this symbol
-    const relevantRels = allRels.filter(rel => {
-      const from = Array.isArray(rel.from) ? rel.from : [rel.from];
-      const to = Array.isArray(rel.to) ? rel.to : [rel.to];
-      return from.includes(symbolId) || to.includes(symbolId);
-    });
+    // Get relationships for this symbol (optimized query)
+    const relevantRels = this.dbManager.getUnifiedRelationshipsBySymbol(symbolId);
 
     // Process relationships by type
     for (const rel of relevantRels) {
@@ -315,7 +308,7 @@ export class EntryPointContextAggregator {
 
     // Calculate impact
     context.impact.directImpact = context.usedBy.length;
-    context.impact.transitiveImpact = this.calculateTransitiveImpact(symbolId, depth, allRels);
+    context.impact.transitiveImpact = this.calculateTransitiveImpact(symbolId, depth);
     context.impact.affectedFiles = this.getAffectedFiles(context);
     context.impact.affectedTests = context.testCoverage.map(t => t.testFile);
     context.impact.affectedDocs = [
@@ -336,21 +329,11 @@ export class EntryPointContextAggregator {
     // Remove [[ ]] if present
     const cleanSymbol = docSymbol.replace(/^\[\[|\]\]$/g, '').trim();
 
-    // Get all relationships
-    const allRels = this.dbManager.getAllUnifiedRelationships();
+    // Get relationships for this doc symbol (optimized query)
+    const allRels = this.dbManager.getUnifiedRelationshipsBySymbol(cleanSymbol);
 
     // Find all code symbols that reference this doc
-    const docRels = allRels.filter(rel => {
-      const from = Array.isArray(rel.from) ? rel.from : [rel.from];
-      const to = Array.isArray(rel.to) ? rel.to : [rel.to];
-
-      return rel.type === 'doc-reference' && (
-        to.includes(cleanSymbol) ||
-        to.some(t => t.includes(cleanSymbol)) ||
-        from.includes(cleanSymbol) ||
-        from.some(f => f.includes(cleanSymbol))
-      );
-    });
+    const docRels = allRels.filter(rel => rel.type === 'doc-reference');
 
     for (const rel of docRels) {
       const from = Array.isArray(rel.from) ? rel.from[0] : rel.from;
@@ -385,14 +368,12 @@ export class EntryPointContextAggregator {
    *
    * @param symbolId - Starting symbol
    * @param depth - How deep to traverse
-   * @param allRels - All relationships
    * @returns Number of transitively affected symbols
    * @private
    */
   private calculateTransitiveImpact(
     symbolId: string,
-    depth: number,
-    allRels: UnifiedRelationship[]
+    depth: number
   ): number {
     if (depth === 0) return 0;
 
@@ -406,9 +387,9 @@ export class EntryPointContextAggregator {
       if (visited.has(id) || level >= depth) continue;
       visited.add(id);
 
-      // Find all symbols that depend on this one
-      const dependents = allRels.filter(rel => {
-        const from = Array.isArray(rel.from) ? rel.from : [rel.from];
+      // Find all symbols that depend on this one (using optimized query)
+      const rels = this.dbManager.getUnifiedRelationshipsBySymbol(id);
+      const dependents = rels.filter(rel => {
         const to = Array.isArray(rel.to) ? rel.to : [rel.to];
         return to.includes(id) && ['code-dependency', 'calls', 'inheritance'].includes(rel.type);
       });

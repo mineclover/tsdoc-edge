@@ -396,7 +396,7 @@ tsdoc-edge parse-mermaid <diagram>
 
 **Core**:
 - README (`../README.md`) - Main documentation hub
-- [[Commands Index]] (`../COMMANDS.md`) - All 81 commands
+- [[Commands Index]] (`../COMMANDS.md`) - All 67 commands
 
 **Features**:
 - [[CoreWorkflow]] (`../features/core-workflow.md`)

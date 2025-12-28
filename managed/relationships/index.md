@@ -25,10 +25,10 @@ tsdoc-edge explore-entrypoint managed/relationships/index.md --detect-orphans
 tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-structure.mmd
 ```
 
-## Status: 29/31 Implemented (93%) ✅
+## Status: 13/28 Implemented (46%)
 
-**Version**: 2.1
-**Last Updated**: 2025-11-26
+**Version**: 2.2
+**Last Updated**: 2025-12-28
 **Source**: `src/types/relationships/unified.ts`
 
 ## 1. Code Space (구조적)
@@ -213,7 +213,7 @@ sqlite3 .tsdoc/symbols.db "SELECT type, COUNT(*) FROM unified_relationships GROU
 - ASTSymbolExtractor (`src/analyzer/ASTSymbolExtractor.ts`): Primary extractor
 
 **Command References**:
-- Commands Index (`managed/COMMANDS.md`): All 81 commands organized by category
+- Commands Index (`managed/COMMANDS.md`): All 67 commands organized by category
 - BuildCommand (`src/commands/BuildCommand.ts`): Extract all symbols and relationships
 - WorkContextCommand (`src/commands/WorkContextCommand.ts`): Get file context with relationships
 

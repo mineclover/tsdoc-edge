@@ -285,7 +285,7 @@ Storage (SQLite + JSONL)
 ## Related
 
 **Commands**:
-- Commands Index (`managed/COMMANDS.md`) - All 81 commands
+- Commands Index (`managed/COMMANDS.md`) - All 67 commands
 - BuildCommand (`src/commands/BuildCommand.ts`)
 - [[HealthCommand]] (`src/commands/HealthCommand.ts`)
 

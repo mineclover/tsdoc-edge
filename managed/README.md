@@ -40,7 +40,7 @@ tsdoc-edge explore-entrypoint managed/relationships/index.md --detect-orphans
 
 The single source of truth for all 17 relationship types tracked by TSDoc Edge.
 
-**Current Status**: 26/28 types implemented (93%)
+**Current Status**: 13/28 types implemented (46%)
 - [[Code Dependency]] (`managed/relationships/CODE-DEPENDENCY.md`) - 1,968 relationships
   - Extractor: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`)
   - Commands: [[BuildCommand]] (`src/commands/BuildCommand.ts`)
@@ -61,7 +61,7 @@ The single source of truth for all 17 relationship types tracked by TSDoc Edge.
   - Command: [[TestRelationshipsCommand]] (`src/commands/TestRelationshipsCommand.ts`)
 - And 4 more: [[Type Dependency]], [[Generic Constraint]], [[Interface Implementation]], [[Circular Dependency]]
 
-### [[Commands Index]] - All 81 Commands
+### [[Commands Index]] - All 67 Commands
 **Path**: `managed/COMMANDS.md`
 
 Complete reference organized by category with **new LLM-friendly features**:
@@ -364,7 +364,7 @@ Core TypeScript interfaces used across the system:
   - [[Circular Dependency]] (`relationships/CIRCULAR.md`) - 0 found
 
 **Commands**:
-- [[Commands Index]]: All 81 commands organized
+- [[Commands Index]]: All 67 commands organized
 - Individual docs: [[BuildCommand]], [[WorkContextCommand]], etc.
 
 **Workflows**:
@@ -374,19 +374,34 @@ Core TypeScript interfaces used across the system:
 
 ## Statistics
 
-**Current Coverage** (from explore-entrypoint):
-- **Symbols Discovered**: 100 / 1,511 (6.6%)
-- **Files Discovered**: 18 / 126 (14.3%)
-- **Documentation Files**: 32 active
-- **Total Relationships**: 36,050+
+**Current Status** (Dec 2025):
+- **Total Symbols**: 6,726
+- **Total Relationships**: 38,704
+- **Relationship Types**: 13/28 implemented (46%)
+- **CLI Commands**: 67
+- **Test Cases**: 2,885 (100% passing)
+- **Health Score**: 74/100 (B)
 
-**Recent Improvements**:
-- Cleaned 47 → 32 docs (32% reduction)
-- Compressed relationship docs (96% less content)
-- Created command index
-- Verified all primary-types usage
+**Relationship Type Breakdown**:
+| Type | Count |
+|------|-------|
+| naming-pattern-relation | 16,901 |
+| test-coverage | 7,303 |
+| test-as-example | 5,612 |
+| contains | 3,849 |
+| code-dependency | 2,761 |
+| doc-reference | 927 |
+| covers-scenario | 701 |
+| circular-dependency | 501 |
+| inheritance | 93 |
+| feature-grouping | 46 |
+| layer-dependency | 5 |
+| explicit-semantic-relation | 4 |
+| implementation | 1 |
 
-See `IMPROVEMENT-SUMMARY.md` for details.
+**Performance** (after optimization):
+- Build time: 11 seconds (80% improvement from 56s)
+- Query performance: 14ms per symbol (optimized)
 
 ## Validation
 
@@ -420,5 +435,5 @@ To add documentation:
 ---
 
 **Project**: TSDoc Edge - SSOT Documentation & Relationship Platform
-**Version**: 0.12.0
-**Last Updated**: 2025-11-08
+**Version**: 0.12.1
+**Last Updated**: 2025-12-28

@@ -4,7 +4,7 @@ type: index
 category: features
 status: active
 canonical: true
-lastUpdated: 2025-12-27
+lastUpdated: 2025-12-28
 ---
 
 # [[Features Index]]
@@ -15,14 +15,14 @@ lastUpdated: 2025-12-27
 
 | Metric | Value |
 |--------|-------|
-| Commands | 81 |
+| Commands | 67 |
 | Test Suites | 196 |
 | Tests | 2,885 |
-| Health Score | 90/100 (A) |
-| Symbols | 6,696 |
-| Relationships | 66,483 |
-| Relationship Types | 26/28 (93%) |
-| Vulnerabilities | 0 |
+| Health Score | 74/100 (B) |
+| Symbols | 6,726 |
+| Relationships | 38,704 |
+| Relationship Types | 13/28 (46%) |
+| Build Time | 11s (optimized) |
 
 ## Quick Navigation
 
@@ -299,8 +299,8 @@ tsdoc-edge test-impact database-manager
 
 ## Related Documentation
 
-- **Commands Index** (`/managed/COMMANDS.md`) - All 81 commands
-- **[[Relationship Types]]** (`/managed/relationships/index.md`) - 13 relationship types, 10 categories
+- **Commands Index** (`/managed/COMMANDS.md`) - All 67 commands
+- **[[Relationship Types]]** (`/managed/relationships/index.md`) - 11 relationship types implemented
 - **[[Guides & Tutorials]]** (`/managed/guides/index.md`) - Learning resources
 - **[[CoreFeatures]]** (`core-features-catalog.md`) - Detailed feature catalog
 

@@ -182,6 +182,13 @@ async function main(): Promise<void> {
     commandArgs = [];
   }
 
+  // Handle --version and -v flags
+  if (commandName === '--version' || commandName === '-v') {
+    const version = require('../package.json').version;
+    console.log(`tsdoc-edge v${version}`);
+    process.exit(0);
+  }
+
   // Track command execution
   const startTime = performance.now();
   let result: CommandResult;

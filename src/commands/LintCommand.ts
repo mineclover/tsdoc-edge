@@ -175,9 +175,15 @@ export class LintCommand extends BaseCommand {
 
     const allSymbols = db.getAllSymbolRows();
 
-    // Exclude test symbols from documentation requirements
+    // Exclude test symbols and fixture/demo files from documentation requirements
     const implSymbols = allSymbols.filter((s) =>
-      s.type !== 'test-case' && s.type !== 'test-suite'
+      s.type !== 'test-case' &&
+      s.type !== 'test-suite' &&
+      s.type !== 'test-scenario' &&
+      !s.file_path?.includes('__tests__') &&
+      !s.file_path?.includes('/demo/') &&
+      !s.file_path?.includes('/fixtures/') &&
+      !s.file_path?.includes('/examples/')
     );
 
     const documented = implSymbols.filter((s) => s.summary);
@@ -224,11 +230,22 @@ export class LintCommand extends BaseCommand {
     const allSymbols = db.getAllSymbolRows();
     const allRelationships = db.getAllUnifiedRelationships();
 
-    const density = allSymbols.length > 0
-      ? Math.round((allRelationships.length / allSymbols.length) * 100) / 100
+    // Exclude test symbols and fixture/demo files for accurate metrics
+    const implSymbols = allSymbols.filter((s) =>
+      s.type !== 'test-case' &&
+      s.type !== 'test-suite' &&
+      s.type !== 'test-scenario' &&
+      !s.file_path?.includes('__tests__') &&
+      !s.file_path?.includes('/demo/') &&
+      !s.file_path?.includes('/fixtures/') &&
+      !s.file_path?.includes('/examples/')
+    );
+
+    const density = implSymbols.length > 0
+      ? Math.round((allRelationships.length / implSymbols.length) * 100) / 100
       : 0;
 
-    // Check for orphaned symbols (no relationships)
+    // Check for orphaned symbols (no relationships) - excluding test symbols
     const symbolsWithRels = new Set<string>();
     for (const rel of allRelationships) {
       const sources = Array.isArray(rel.from) ? rel.from : [rel.from];
@@ -237,15 +254,24 @@ export class LintCommand extends BaseCommand {
       for (const t of targets) symbolsWithRels.add(t);
     }
 
-    const orphanedCount = allSymbols.filter((s) => !symbolsWithRels.has(s.id)).length;
-    const orphanRatio = allSymbols.length > 0
-      ? Math.round((orphanedCount / allSymbols.length) * 100)
+    // Only count orphans from top-level implementation symbols (exclude methods/properties)
+    // Methods and properties inherit connectivity from their parent class
+    const topLevelSymbols = implSymbols.filter((s) =>
+      s.type !== 'method' && s.type !== 'property'
+    );
+    const orphanedCount = topLevelSymbols.filter((s) => !symbolsWithRels.has(s.id)).length;
+    const orphanRatio = topLevelSymbols.length > 0
+      ? Math.round((orphanedCount / topLevelSymbols.length) * 100)
       : 0;
 
+    // Calculate score based on connected ratio (inverse of orphan ratio)
+    const connectedRatio = 100 - orphanRatio;
+    const score = Math.round(connectedRatio);
+
     if (orphanRatio > 30) {
-      issues.push(`${orphanRatio}% of symbols have no relationships (${orphanedCount} orphans)`);
+      issues.push(`${orphanRatio}% of top-level symbols are orphans (${orphanedCount}/${topLevelSymbols.length})`);
     } else if (orphanRatio > 15) {
-      warnings.push(`${orphanRatio}% of symbols have no relationships (${orphanedCount} orphans)`);
+      warnings.push(`${orphanRatio}% of top-level symbols are orphans (${orphanedCount}/${topLevelSymbols.length})`);
     }
 
     if (density < 3) {
@@ -255,7 +281,7 @@ export class LintCommand extends BaseCommand {
     return {
       category: 'Relationships',
       passed: issues.length === 0,
-      score: Math.min(100, Math.round(density * 10)),
+      score,
       issues,
       warnings,
     };
@@ -293,16 +319,16 @@ export class LintCommand extends BaseCommand {
   }
 
   private printResults(results: LintResult[]): void {
-    console.log(`${colors.bold}Results${colors.reset}`);
+    console.log(`${colors.bold}Results${colors.reset} ${colors.dim}(excluding test-case/test-suite)${colors.reset}`);
     console.log();
 
     for (const result of results) {
       const status = result.passed
         ? `${colors.green}✓${colors.reset}`
         : `${colors.red}✗${colors.reset}`;
-      const scoreColor = result.score && result.score >= 70
+      const scoreColor = result.score && result.score >= 80
         ? colors.green
-        : result.score && result.score >= 50
+        : result.score && result.score >= 60
           ? colors.yellow
           : colors.red;
 
@@ -322,7 +348,16 @@ export class LintCommand extends BaseCommand {
     const passed = results.filter((r) => r.passed).length;
     const total = results.length;
 
+    // Calculate overall score (weighted average)
+    const scores = results.filter((r) => r.score !== undefined).map((r) => r.score!);
+    const overallScore = scores.length > 0
+      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
+      : 0;
+    const grade = this.getGrade(overallScore);
+    const gradeColor = overallScore >= 80 ? colors.green : overallScore >= 60 ? colors.yellow : colors.red;
+
     console.log(`${colors.bold}Summary${colors.reset}`);
+    console.log(`  Overall: ${gradeColor}${grade} (${overallScore}/100)${colors.reset}`);
     console.log(`  Checks: ${passed}/${total} passed`);
     console.log(`  Issues: ${colors.red}${issues}${colors.reset}`);
     console.log(`  Warnings: ${colors.yellow}${warnings}${colors.reset}`);
@@ -335,5 +370,19 @@ export class LintCommand extends BaseCommand {
     } else {
       console.log(`${colors.red}✗ Quality checks failed${colors.reset}`);
     }
+  }
+
+  private getGrade(score: number): string {
+    if (score >= 95) return 'A+';
+    if (score >= 90) return 'A';
+    if (score >= 85) return 'A-';
+    if (score >= 80) return 'B+';
+    if (score >= 75) return 'B';
+    if (score >= 70) return 'B-';
+    if (score >= 65) return 'C+';
+    if (score >= 60) return 'C';
+    if (score >= 55) return 'C-';
+    if (score >= 50) return 'D';
+    return 'F';
   }
 }

@@ -1,9 +1,15 @@
 {
   "name": "tsdoc-edge",
-  "version": "0.12.1",
+  "version": "0.13.0",
   "description": "TSDoc-based specification documentation tool with type chain analysis and strict convention parsing",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "LICENSE",
+    "README.md",
+    "CHANGELOG.md"
+  ],
   "bin": {
     "tsdoc-edge": "./dist/cli.js",
     "tsdoc-edge-lsp": "./dist/lsp/server.js"
@@ -33,11 +39,26 @@
     "tsdoc",
     "documentation",
     "typescript",
-    "spec",
-    "api-documentation"
+    "api-documentation",
+    "symbol-graph",
+    "code-analysis",
+    "dependency-analysis",
+    "relationship-analysis",
+    "lsp"
   ],
-  "author": "",
+  "author": "Junwoo Bang",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/junwoobang/tsdoc-edge.git"
+  },
+  "bugs": {
+    "url": "https://github.com/junwoobang/tsdoc-edge/issues"
+  },
+  "homepage": "https://github.com/junwoobang/tsdoc-edge#readme",
+  "engines": {
+    "node": ">=18.0.0"
+  },
   "devDependencies": {
     "@biomejs/biome": "2.3.2",
     "@mermaid-js/mermaid-cli": "^11.12.0",

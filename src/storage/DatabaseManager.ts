@@ -829,6 +829,59 @@ export class DatabaseManager {
   }
 
   /**
+   * Get unified relationships involving a specific symbol
+   * Uses index for efficient lookup instead of loading all relationships
+   * @param symbolId - Symbol ID to find relationships for
+   * @returns Array of UnifiedRelationship objects involving the symbol
+   * @public
+   */
+  getUnifiedRelationshipsBySymbol(symbolId: string): UnifiedRelationship[] {
+    const stmt = this.db.prepare(`
+      SELECT * FROM unified_relationships
+      WHERE from_symbols LIKE ? OR to_symbols LIKE ?
+    `);
+
+    const pattern = `%"${symbolId}"%`;
+    const rows = stmt.all(pattern, pattern) as Array<{
+      id: string;
+      type: string;
+      category: string;
+      from_symbols: string;
+      to_symbols: string;
+      direction: string;
+      strength: string;
+      evidence: string;
+      discovered_by: string;
+      confidence: number;
+      file_path: string | null;
+      line: number | null;
+      properties: string | null;
+      created_at: string;
+      updated_at: string;
+      description: string | null;
+    }>;
+
+    return rows.map(row => ({
+      id: row.id,
+      type: row.type as UnifiedRelationship['type'],
+      category: row.category as UnifiedRelationship['category'],
+      from: JSON.parse(row.from_symbols) as string | string[],
+      to: JSON.parse(row.to_symbols) as string | string[],
+      direction: row.direction as UnifiedRelationship['direction'],
+      strength: row.strength as UnifiedRelationship['strength'],
+      evidence: JSON.parse(row.evidence) as UnifiedRelationship['evidence'],
+      discoveredBy: row.discovered_by as UnifiedRelationship['discoveredBy'],
+      confidence: row.confidence,
+      filePath: row.file_path || undefined,
+      line: row.line || undefined,
+      properties: row.properties ? JSON.parse(row.properties) : {},
+      createdAt: row.created_at,
+      updatedAt: row.updated_at,
+      description: row.description || undefined,
+    }));
+  }
+
+  /**
    * Rebuild FTS5 indexes to fix corruption or sync issues
    * @returns Rebuild statistics
    * @contract Rebuild all FTS5 virtual tables from their content tables

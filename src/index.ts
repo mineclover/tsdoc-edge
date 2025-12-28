@@ -14,16 +14,6 @@ import { ConventionValidator } from './validator/ConventionValidator';
 // Analyzer exports
 export { CodeHealthChecker } from './analyzer/CodeHealthChecker';
 export { CoverageParser } from './analyzer/CoverageParser';
-export {
-  CoverageSyncer,
-  CoverageAdapter,
-  updateSymbolWithCoverage,
-} from './analyzer/CoverageSyncAdapter';
-export type {
-  SymbolCoverage,
-  CoverageSyncResult,
-} from './analyzer/CoverageSyncAdapter';
-export { IstanbulCoverageAdapter } from './analyzer/IstanbulCoverageAdapter';
 export { MissingLinkDetector } from './analyzer/MissingLinkDetector';
 export type {
   BrokenLink,
@@ -36,11 +26,9 @@ export type {
   PreCommitReport,
 } from './analyzer/PreCommitChecker';
 export { DocumentationAnalyzer } from './analyzer/DocumentationAnalyzer';
-export { DomainStructureAnalyzer } from './analyzer/DomainStructureAnalyzer';
 export { ImportanceClassifier } from './analyzer/ImportanceClassifier';
 export { InterfaceAnalyzer } from './analyzer/InterfaceAnalyzer';
 export { InterfaceDependencyMapper } from './analyzer/InterfaceDependencyMapper';
-export { StatsComparator } from './analyzer/StatsComparator';
 export { StatsHistoryManager } from './analyzer/StatsHistoryManager';
 export { TestCoverageAnalyzer } from './analyzer/TestCoverageAnalyzer';
 export { TrackableStatsCollector } from './analyzer/TrackableStatsCollector';

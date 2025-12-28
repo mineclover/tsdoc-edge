@@ -76,12 +76,20 @@ export class CommandRegistry {
   }
 
   /**
-   * Get all registered commands
+   * Get all registered commands (deduplicated)
    *
-   * @returns Array of commands
+   * @returns Array of unique commands
    */
   getAll(): BaseCommand[] {
-    return Array.from(this.commands.values());
+    const seen = new Set<BaseCommand>();
+    const result: BaseCommand[] = [];
+    for (const cmd of this.commands.values()) {
+      if (!seen.has(cmd)) {
+        seen.add(cmd);
+        result.push(cmd);
+      }
+    }
+    return result;
   }
 
   /**

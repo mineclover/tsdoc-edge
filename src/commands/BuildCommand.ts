@@ -14,6 +14,8 @@ import { TestCoverageAnalyzer } from '../analyzer/TestCoverageAnalyzer';
 import { NamingPatternRelationAnalyzer } from '../analyzer/NamingPatternRelationAnalyzer';
 import { ExplicitSemanticRelationAnalyzer } from '../analyzer/ExplicitSemanticRelationAnalyzer';
 import { FeatureGroupingAnalyzer } from '../analyzer/FeatureGroupingAnalyzer';
+import { LayerDependencyAnalyzer } from '../analyzer/LayerDependencyAnalyzer';
+import { DependencyChainAnalyzer } from '../analyzer/DependencyChainAnalyzer';
 import { RelationshipInferenceEngine } from '../analyzer/RelationshipInferenceEngine';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
@@ -564,13 +566,33 @@ export class BuildCommand extends BaseCommand {
           fileIndex.get(symbol.filePath)!.push(symbol.id);
         }
 
+        // Get existing relationships from database to populate the graph
+        const existingRels = dbManager.getAllUnifiedRelationships();
+        const relationships = existingRels.map(rel => ({
+          from: typeof rel.from === 'string' ? rel.from : rel.from[0],
+          to: typeof rel.to === 'string' ? rel.to : rel.to[0],
+          type: rel.type as 'relatedTo' | 'dependsOn' | 'usedBy' | 'implements' | 'extends',
+          filePath: rel.filePath || '',
+          line: rel.line,
+        }));
+
+        // Build adjacency lists
+        const adjacencyList = new Map<string, string[]>();
+        const reverseAdjacencyList = new Map<string, string[]>();
+        for (const rel of relationships) {
+          if (!adjacencyList.has(rel.from)) adjacencyList.set(rel.from, []);
+          adjacencyList.get(rel.from)!.push(rel.to);
+          if (!reverseAdjacencyList.has(rel.to)) reverseAdjacencyList.set(rel.to, []);
+          reverseAdjacencyList.get(rel.to)!.push(rel.from);
+        }
+
         const symbolGraph: SymbolGraph = {
           symbols: symbolMap,
-          relationships: [],
+          relationships,
           nameIndex,
           fileIndex,
-          adjacencyList: new Map(),
-          reverseAdjacencyList: new Map(),
+          adjacencyList,
+          reverseAdjacencyList,
         };
 
         // Helper to transform UnifiedRelationship to batch insert format
@@ -618,7 +640,21 @@ export class BuildCommand extends BaseCommand {
         const featureStats = featureAnalyzer.getStatistics(featureRelations);
         this.printSuccess(`Feature grouping: ${featureInserted} relationships across ${featureStats.uniqueFeatures} features`);
 
-        // 4. Relationship Inference (generate new relationships from existing ones)
+        // 4. Layer Dependency Analysis (architectural layer violations)
+        const layerAnalyzer = new LayerDependencyAnalyzer(symbolGraph);
+        const layerRelations = layerAnalyzer.analyze();
+        const layerInserted = dbManager.batchInsertUnifiedRelationships(layerRelations.map(toBatchFormat));
+        semanticRelationshipsInserted += layerInserted;
+        this.printSuccess(`Layer dependencies: ${layerInserted} relationships`);
+
+        // 5. Circular Dependency Detection
+        const chainAnalyzer = new DependencyChainAnalyzer(symbolGraph);
+        const circularRelations = chainAnalyzer.analyzeCircularDependencies();
+        const circularInserted = dbManager.batchInsertUnifiedRelationships(circularRelations.map(toBatchFormat));
+        semanticRelationshipsInserted += circularInserted;
+        this.printSuccess(`Circular dependencies: ${circularInserted} detected`);
+
+        // 6. Relationship Inference (generate new relationships from existing ones)
         this.printInfo('Inferring relationships from existing patterns...');
         const inferenceEngine = new RelationshipInferenceEngine();
         const allRelationships = dbManager.getAllUnifiedRelationships();
@@ -628,7 +664,7 @@ export class BuildCommand extends BaseCommand {
         const inferenceStats = inferenceEngine.getStatistics(allRelationships);
         this.printSuccess(`Inferred relationships: ${inferredRelationshipsInserted} total (${inferenceStats.byRule['naming-transitivity'] || 0} naming, ${inferenceStats.byRule['feature-closure'] || 0} feature, ${inferenceStats.byRule['test-coverage-inheritance'] || 0} test)`);
 
-        // 5. Test Example Extraction (extract test cases as documentation examples)
+        // 7. Test Example Extraction (extract test cases as documentation examples)
         this.printInfo('Extracting test examples for documentation...');
         const { TestExampleExtractor } = await import('../analyzer/TestExampleExtractor');
         const exampleExtractor = new TestExampleExtractor(dbManager);
