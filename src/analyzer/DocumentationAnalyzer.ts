@@ -137,6 +137,7 @@ export class DocumentationAnalyzer {
       hasExamples,
       hasCustomTags,
       isPublic,
+      symbolType,
     });
 
     return {
@@ -499,6 +500,11 @@ export class DocumentationAnalyzer {
   /**
    * Calculate quality score
    *
+   * Scoring considers symbol type:
+   * - Type aliases, interfaces, enums: Higher base score, don't need @returns/@param
+   * - Properties: Higher base score, documentation optional
+   * - Functions, methods, classes: Full documentation expected
+   *
    * @param metrics - Documentation metrics
    * @returns Quality score (0-100)
    */
@@ -510,35 +516,53 @@ export class DocumentationAnalyzer {
     hasExamples: boolean;
     hasCustomTags: boolean;
     isPublic: boolean;
+    symbolType: string;
   }): number {
+    const { symbolType } = metrics;
+
+    // Simple types are often self-documenting (type aliases, interfaces, enums)
+    const isSimpleType = ['type', 'interface', 'enum', 'property'].includes(symbolType);
+
+    // For undocumented symbols, give partial credit to simple types
     if (!metrics.hasDoc) {
+      // Simple types without docs get 40 points (they're often self-documenting)
+      if (isSimpleType) {
+        return 40;
+      }
       return 0;
     }
 
     let score = 0;
 
-    // Base score for having documentation
-    score += 20;
+    // Base score for having documentation (higher for simple types)
+    if (isSimpleType) {
+      score += 50; // Type aliases with any doc are already well-documented
+    } else {
+      score += 20;
+    }
 
-    // Summary (essential)
-    if (metrics.hasSummary) score += 30;
+    // Summary (essential for all)
+    if (metrics.hasSummary) {
+      score += isSimpleType ? 40 : 30; // Simple types with summary are complete
+    }
 
-    // Parameters (important for functions)
-    if (metrics.hasCompleteParams) score += 20;
+    // Parameters (only matters for functions/methods)
+    if (metrics.hasCompleteParams) {
+      score += isSimpleType ? 0 : 20; // Not applicable to simple types
+    }
 
-    // Returns (important for functions)
-    if (metrics.hasReturns) score += 15;
+    // Returns (only matters for functions/methods)
+    if (metrics.hasReturns) {
+      score += isSimpleType ? 0 : 15; // Not applicable to simple types
+    }
 
-    // Examples (good to have)
-    if (metrics.hasExamples) score += 10;
+    // Examples (good to have for complex symbols)
+    if (metrics.hasExamples) {
+      score += isSimpleType ? 5 : 10;
+    }
 
     // Custom tags (excellent)
     if (metrics.hasCustomTags) score += 5;
-
-    // Public APIs should have higher standards
-    if (metrics.isPublic && score < 80) {
-      score = Math.floor(score * 0.9); // Penalty for incomplete public API docs
-    }
 
     return Math.min(100, score);
   }
