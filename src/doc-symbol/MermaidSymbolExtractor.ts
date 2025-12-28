@@ -157,12 +157,24 @@ export class MermaidSymbolExtractor {
       }
 
       // Parse node definitions: NodeID[Label] or NodeID[Label<br/>More]
-      const nodeMatch = trimmed.match(/^([A-Z0-9]+)\[([^\]]+)\]/);
-      if (nodeMatch) {
+      // Node IDs can be uppercase, lowercase, numbers, underscores, hyphens
+      // Use global regex to find ALL node definitions on a line (e.g., A["x"] --> B["y"])
+      const nodeRegex = /([A-Za-z0-9_-]+)\["?([^\]"]+)"?\]/g;
+      let nodeMatch;
+      const seenNodes = new Set<string>();
+      while ((nodeMatch = nodeRegex.exec(trimmed)) !== null) {
         const nodeId = nodeMatch[1];
         const label = nodeMatch[2];
 
+        // Skip duplicate nodes (same ID already processed)
+        if (seenNodes.has(nodeId)) continue;
+        seenNodes.add(nodeId);
+
         const symbol = this.parseNodeLabel(nodeId, label, currentSubgraph);
+
+        // Skip if we already have this node
+        if (result.symbols.some(s => s.nodeId === nodeId)) continue;
+
         result.symbols.push(symbol);
         // Only add to symbolReferences if valid symbol name exists and looks like a real symbol
         // Skip short uppercase codes (A, CD, L1A, etc.) which are typically node IDs
@@ -173,7 +185,9 @@ export class MermaidSymbolExtractor {
       }
 
       // Parse relationships: A --> B, A -.-> B, A ==> B
-      const relMatch = trimmed.match(/^([A-Z0-9]+)\s+(-->|\.\.->|-\.->|==>|<-->)\s+([A-Z0-9]+)/);
+      // Also handles: A["Label"] --> B["Label"]
+      // Node IDs can be uppercase, lowercase, numbers, underscores, hyphens
+      const relMatch = trimmed.match(/^([A-Za-z0-9_-]+)(?:\["[^\]"]*"\])?\s*(-->|\.\.->|-\.->|==>|<-->)\s*([A-Za-z0-9_-]+)/);
       if (relMatch) {
         const from = relMatch[1];
         const edgeType = this.parseEdgeType(relMatch[2]);
@@ -188,7 +202,9 @@ export class MermaidSymbolExtractor {
       }
 
       // Parse relationships with labels: A -->|"label"| B
-      const relLabelMatch = trimmed.match(/^([A-Z0-9]+)\s+(-->|\.\.->|-\.->|==>)\|"([^"]+)"\|\s+([A-Z0-9]+)/);
+      // Also handles: A["Label"] -->|"edge label"| B["Label"]
+      // Node IDs can be uppercase, lowercase, numbers, underscores, hyphens
+      const relLabelMatch = trimmed.match(/^([A-Za-z0-9_-]+)(?:\["[^\]"]*"\])?\s*(-->|\.\.->|-\.->|==>)\|"([^"]+)"\|\s*([A-Za-z0-9_-]+)/);
       if (relLabelMatch) {
         const from = relLabelMatch[1];
         const edgeType = this.parseEdgeType(relLabelMatch[2]);

@@ -60,6 +60,11 @@ export class AnalyzeCommand extends BaseCommand {
     return 'Analyze code health for a directory';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge analyze [directory] [options]
 

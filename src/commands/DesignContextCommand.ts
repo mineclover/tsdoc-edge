@@ -102,22 +102,48 @@ interface WorkContext {
  * @public
  */
 export class DesignContextCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'design-context';
   }
 
+  /**
+   * getAlias method
+   * @returns Returns string[]
+   * @public
+   */
   getAlias(): string[] {
     return ['dc'];
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Show design decisions, contracts, and error patterns for a file';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge design-context <file-path>';
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       // Check for help flag

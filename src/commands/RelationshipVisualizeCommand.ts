@@ -13,14 +13,29 @@ import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/Databas
  * @public
  */
 export class RelationshipVisualizeCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'relationship-visualize';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Visualize relationships as Mermaid diagrams';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge relationship-visualize <symbol-id> [options]
 
@@ -40,6 +55,12 @@ Examples:
   tsdoc-edge relationship-visualize class-databasemanager --style=flowchart --type=composition`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       // Check for help flag
@@ -71,15 +92,16 @@ Examples:
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
-      // Get symbol info
-      const symbol = dbManager.getSymbol(symbolId);
+      // Resolve symbol by ID or name
+      const resolved = this.resolveSymbol(dbManager, symbolId);
 
-      if (!symbol) {
+      if (!resolved) {
         this.printError(`Symbol not found: ${symbolId}`);
         dbManager.close();
         return this.failure('Symbol not found');
       }
 
+      const { symbol, id: resolvedId } = resolved;
       console.log(`Symbol: ${symbol.name} (${symbol.type})`);
       console.log(`Format: ${options.format}, Style: ${options.style}, Depth: ${options.depth}\n`);
 
@@ -89,7 +111,7 @@ Examples:
 
       this.collectRelationships(
         dbManager,
-        symbolId,
+        resolvedId,
         options,
         0,
         visited,

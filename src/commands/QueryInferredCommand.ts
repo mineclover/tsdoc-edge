@@ -49,6 +49,11 @@ export class QueryInferredCommand extends BaseCommand {
     return 'Query inferred (auto-generated) relationships';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge query-inferred [relationship-type]\n\n  Examples:\n    tsdoc-edge query-inferred              # All inferred relationships\n    tsdoc-edge query-inferred doc-reference  # Only doc-reference';
   }

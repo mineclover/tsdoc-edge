@@ -64,14 +64,29 @@ export class SymbolRenameCommand extends BaseCommand {
     this.updater = new SymbolReferenceUpdater();
   }
 
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'symbol-rename';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Rename symbol and update all references';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge symbol-rename <old-symbol> <new-symbol> [options]
 
@@ -90,6 +105,12 @@ export class SymbolRenameCommand extends BaseCommand {
     tsdoc-edge symbol-rename "OldName" "NewName" --yes`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       // Check for help flag

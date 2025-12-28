@@ -16,14 +16,29 @@ import type { Task, TaskFilter } from '../types/task';
  * @public
  */
 export class TaskListCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'task-list';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'List tasks with optional filters';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge task-list [options]
 
@@ -36,6 +51,12 @@ Options:
   --json                 Output as JSON`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       if (this.hasHelpFlag(args)) {
@@ -179,14 +200,29 @@ Options:
  * @public
  */
 export class TaskAddCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'task-add';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Add a new task';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge task-add "<title>" [options]
 
@@ -202,6 +238,12 @@ Options:
   --estimate=<hours>     Estimated hours`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       if (this.hasHelpFlag(args) || args.length === 0) {
@@ -284,14 +326,29 @@ Options:
  * @public
  */
 export class TaskUpdateCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'task-update';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Update task status or properties';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge task-update <task-id> [options]
 
@@ -305,6 +362,12 @@ Options:
   --actual=<hours>        Set actual hours spent`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       if (this.hasHelpFlag(args) || args.length === 0) {
@@ -365,14 +428,30 @@ Options:
  * @public
  */
 export class TaskStatsCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'task-stats';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Show task statistics';
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       const dbPath = this.getDatabasePath();

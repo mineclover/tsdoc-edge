@@ -17,14 +17,29 @@ type ExportFormat = 'json' | 'graphml' | 'dot' | 'csv' | 'cypher' | 'gephi';
  * @public
  */
 export class RelationshipExportCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'relationship-export';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Export relationships to various formats (JSON, GraphML, DOT, CSV, Cypher, Gephi)';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge relationship-export [options]
 
@@ -63,6 +78,12 @@ Examples:
   tsdoc-edge relationship-export --format json --min-confidence 0.8 --output high-conf.json`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       if (this.hasHelpFlag(args)) {

@@ -52,6 +52,15 @@ export class StatsCommand extends BaseCommand {
   }
 
   /**
+   * getAlias method
+   * @returns Returns string[]
+   * @public
+   */
+  getAlias(): string[] {
+    return ['s'];
+  }
+
+  /**
    * getDescription method
    * @returns Returns string
    * @public
@@ -60,6 +69,11 @@ export class StatsCommand extends BaseCommand {
     return 'Show documentation statistics with optional comparison';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge stats';
   }
@@ -99,16 +113,28 @@ export class StatsCommand extends BaseCommand {
 
         // Count documented vs undocumented - separated by source/test using Drizzle
         const allSymbols = dbManager.getAllSymbolRows();
-
         const total = allSymbols.length;
+
+        // Show guidance if no symbols
+        if (total === 0) {
+          console.log(`${colors.yellow}No symbols found in database.${colors.reset}`);
+          console.log();
+          console.log(`${colors.bold}Getting Started:${colors.reset}`);
+          console.log(`  1. Run ${colors.cyan}tsdoc-edge build src${colors.reset} to build the symbol database`);
+          console.log(`  2. Run ${colors.cyan}tsdoc-edge stats${colors.reset} again to see statistics`);
+          console.log();
+          return this.success();
+        }
+
         const documented = allSymbols.filter(s => s.summary && s.summary.trim() !== '').length;
         const testTotal = allSymbols.filter(s => s.type === 'test-case' || s.type === 'test-suite').length;
         const sourceTotal = total - testTotal;
         const sourceDocumented = allSymbols.filter(s =>
           s.type !== 'test-case' && s.type !== 'test-suite' && s.summary && s.summary.trim() !== ''
         ).length;
-        const coverage = total > 0 ? (documented / total) * 100 : 0;
+        const coverage = (documented / total) * 100;
         const sourceCoverage = sourceTotal > 0 ? (sourceDocumented / sourceTotal) * 100 : 0;
+        const testPercent = (testTotal / total) * 100;
 
         this.printSection('📈 Documentation Coverage');
         console.log(`${colors.bold}Overall:${colors.reset}`);
@@ -119,7 +145,7 @@ export class StatsCommand extends BaseCommand {
         console.log(`  Documented: ${colors.green}${sourceDocumented}${colors.reset} / ${sourceTotal}`);
         console.log(`  Coverage: ${colors.bold}${sourceCoverage.toFixed(1)}%${colors.reset}`);
         console.log();
-        console.log(`${colors.dim}Test Symbols: ${testTotal} (${((testTotal / total) * 100).toFixed(1)}% of total)${colors.reset}`);
+        console.log(`${colors.dim}Test Symbols: ${testTotal} (${testPercent.toFixed(1)}% of total)${colors.reset}`);
         console.log();
 
         return this.success();

@@ -214,6 +214,11 @@ export class AnalyzerRegistry {
 
   private constructor() {}
 
+  /**
+   * getInstance method
+   * @returns Returns AnalyzerRegistry
+   * @public
+   */
   static getInstance(): AnalyzerRegistry {
     if (!AnalyzerRegistry.instance) {
       AnalyzerRegistry.instance = new AnalyzerRegistry();

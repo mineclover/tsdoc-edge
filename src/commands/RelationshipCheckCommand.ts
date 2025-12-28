@@ -15,14 +15,29 @@ import { RelationshipQueryCommand } from './RelationshipQueryCommand';
  * @public
  */
 export class RelationshipCheckCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'relationship-check';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Quick safety check before modifying a symbol (combines impact + metrics + query)';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge relationship-check <symbol-id> [options]
 
@@ -56,6 +71,12 @@ Output includes:
   ✓ Recommendations`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       if (this.hasHelpFlag(args)) {

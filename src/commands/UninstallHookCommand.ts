@@ -34,6 +34,11 @@ export class UninstallHookCommand extends BaseCommand {
     return 'Uninstall Git pre-commit hook';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge uninstall-hook';
   }

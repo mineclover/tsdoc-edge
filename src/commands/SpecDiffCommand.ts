@@ -62,6 +62,11 @@ export class SpecDiffCommand extends BaseCommand {
     return 'Compare specification versions';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge spec-diff <file> <from-version> <to-version>
 

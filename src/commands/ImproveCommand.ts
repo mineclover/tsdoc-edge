@@ -53,6 +53,11 @@ export class ImproveCommand extends BaseCommand {
     return 'Recursively improve documentation to target score';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge improve [options]
 

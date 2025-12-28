@@ -60,6 +60,11 @@ export class WhoUsesCommand extends BaseCommand {
     return 'Show who uses a symbol (database)';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge who-uses <symbol-name>';
   }
@@ -100,7 +105,7 @@ export class WhoUsesCommand extends BaseCommand {
 
       try {
         // Find symbols matching the name
-        const symbols = dbManager.findSymbolsByNamePattern(symbolName);
+        let symbols = dbManager.findSymbolsByNamePattern(symbolName);
 
         if (symbols.length === 0) {
           this.printError(`Symbol not found: ${symbolName}`);
@@ -113,17 +118,34 @@ export class WhoUsesCommand extends BaseCommand {
           return this.failure(`Symbol not found: ${symbolName}`);
         }
 
-        // Show all matching symbols
+        // Auto-select if exact name match with primary type (class, interface, function, type)
         if (symbols.length > 1) {
-          console.log(`${colors.cyan}Found ${symbols.length} symbols matching "${symbolName}":${colors.reset}`);
-          console.log();
-          for (const sym of symbols) {
-            console.log(`  • ${sym.name} (${sym.type}) in ${sym.file_path}`);
+          const primaryMatch = symbols.find(s =>
+            s.name.toLowerCase() === symbolName.toLowerCase() &&
+            ['class', 'interface', 'function', 'type'].includes(s.type)
+          );
+
+          if (primaryMatch) {
+            console.log(`${colors.dim}Selected: ${primaryMatch.name} (${primaryMatch.type})${colors.reset}`);
+            console.log();
+            symbols = [primaryMatch];
+          } else {
+            // Show all matches and let user choose
+            console.log(`${colors.cyan}Found ${symbols.length} symbols matching "${symbolName}":${colors.reset}`);
+            console.log();
+            for (const sym of symbols.slice(0, 15)) {
+              console.log(`  • ${sym.name} (${sym.type}) in ${sym.file_path}`);
+            }
+            if (symbols.length > 15) {
+              console.log(`  ... and ${symbols.length - 15} more`);
+            }
+            console.log();
+            console.log('Use a more specific name or the full symbol ID.');
+            return this.success();
           }
-          console.log();
         }
 
-        // Analyze each symbol
+        // Analyze selected symbol(s)
         for (const symbol of symbols) {
           this.printHeader(`Who Uses: ${symbol.name}`);
 

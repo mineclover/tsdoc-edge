@@ -24,14 +24,29 @@ interface SymbolMetrics {
  * @public
  */
 export class RelationshipMetricsCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'relationship-metrics';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Calculate graph metrics to identify architecturally important symbols';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge relationship-metrics [options]
 
@@ -72,6 +87,12 @@ Examples:
   tsdoc-edge relationship-metrics --detailed --top 15`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       if (this.hasHelpFlag(args)) {

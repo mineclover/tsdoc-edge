@@ -63,6 +63,11 @@ export class OrphansCommand extends BaseCommand {
     return 'Find orphaned symbols';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge orphans [options]
 

@@ -22,14 +22,29 @@ interface ImpactNode {
  * @public
  */
 export class RelationshipImpactCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'relationship-impact';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Analyze impact of changing a symbol (what would be affected)';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge relationship-impact <symbol-id> [options]
 
@@ -56,6 +71,12 @@ Examples:
   tsdoc-edge relationship-impact class-buildcommand --category structural`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       if (this.hasHelpFlag(args)) {
@@ -76,19 +97,20 @@ Examples:
         minConfidence: Number.parseFloat(this.getOption(args, '--min-confidence') || '0.5'),
       };
 
-      this.printHeader(`Impact Analysis: ${symbolId}`);
-
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
-      // Verify symbol exists
-      const symbol = dbManager.getSymbol(symbolId);
+      // Resolve symbol by ID or name
+      const resolved = this.resolveSymbol(dbManager, symbolId);
 
-      if (!symbol) {
+      if (!resolved) {
         this.printError(`Symbol not found: ${symbolId}`);
         dbManager.close();
         return { success: false, message: 'Symbol not found', exitCode: 1 };
       }
+
+      const { symbol, id: resolvedId } = resolved;
+      this.printHeader(`Impact Analysis: ${symbol.name}`);
 
       console.log();
       this.printInfo(`Analyzing impact for: ${symbol.name} (${symbol.type})`);
@@ -98,7 +120,7 @@ Examples:
       // Perform impact analysis
       const impactedSymbols = this.analyzeImpact(
         dbManager,
-        symbolId,
+        resolvedId,
         options.depth,
         options.direction,
         options.category,

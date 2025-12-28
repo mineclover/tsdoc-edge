@@ -35,6 +35,11 @@ export class InstallHookCommand extends BaseCommand {
     return 'Install Git pre-commit hook for documentation checks';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge install-hook';
   }

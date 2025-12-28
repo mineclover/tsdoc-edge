@@ -46,14 +46,29 @@ interface EntrypointExploration {
  * @public
  */
 export class ExploreEntrypointCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'explore-entrypoint';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Explore entire dependency graph from a documentation entrypoint';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge explore-entrypoint <doc-path> [options]
 
@@ -61,6 +76,12 @@ export class ExploreEntrypointCommand extends BaseCommand {
     --detect-orphans     Find unreferenced code`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       // Check for help flag

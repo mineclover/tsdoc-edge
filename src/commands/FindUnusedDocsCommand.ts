@@ -62,6 +62,11 @@ export class FindUnusedDocsCommand extends BaseCommand {
     return 'Find unused and stale documents';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge find-unused-docs [docs-directory]\n\n  Default: managed';
   }

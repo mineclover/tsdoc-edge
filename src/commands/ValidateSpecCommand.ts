@@ -37,6 +37,11 @@ export class ValidateSpecCommand extends BaseCommand {
     return 'Validate specification completeness';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge validate-spec [docs-directory]\n\n  Default: managed';
   }

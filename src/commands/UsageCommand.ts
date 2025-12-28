@@ -58,6 +58,11 @@ export class UsageCommand extends BaseCommand {
     return 'View and manage CLI usage analytics';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge usage [subcommand]
 

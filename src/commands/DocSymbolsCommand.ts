@@ -38,21 +38,74 @@ import { DocumentSymbolLister, type DocumentSymbol } from '../utilities/Document
  * ```
  */
 export class DocSymbolsCommand extends BaseCommand {
+  /**
+   * configManager property
+   * @public
+   */
   protected configManager = ConfigManager.getInstance();
 
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'doc-symbols';
   }
 
+  /**
+   * getAlias method
+   * @returns Returns string[]
+   * @public
+   */
   getAlias(): string[] {
-    return ['docs', 'glossary'];
+    return ['glossary'];
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'List all explicitly defined document symbols (project concepts)';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
+  protected getUsage(): string {
+    return `tsdoc-edge doc-symbols [options]
+
+List all explicitly defined document symbols (project concepts) from managed/.
+Shows project's core concepts, not auto-generated code symbols.
+
+Options:
+  --category <cat>   Filter by category (features, concepts, workflows, etc.)
+  --search <query>   Search by keyword in name or summary
+  --llm              Generate LLM-friendly project glossary format
+
+Examples:
+  tsdoc-edge doc-symbols                    List all symbols
+  tsdoc-edge doc-symbols --category features
+  tsdoc-edge doc-symbols --search database
+  tsdoc-edge doc-symbols --llm > glossary.txt`;
+  }
+
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
+    // Check for help flag
+    if (this.hasHelpFlag(args)) {
+      return this.displayHelp();
+    }
+
     const useLlmFormat = args.includes('--llm');
     const categoryFilter = this.getOptionValue(args, '--category')?.split(',').map((c: string) => c.trim());
     const searchQuery = this.getOptionValue(args, '--search')?.toLowerCase();

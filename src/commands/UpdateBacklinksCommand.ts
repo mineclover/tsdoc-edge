@@ -67,6 +67,11 @@ export class UpdateBacklinksCommand extends BaseCommand {
     return 'Update backlinks in document files';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge update-backlinks [docs-directory]\n\n  Default: docs';
   }

@@ -90,6 +90,11 @@ export class SpecStatusCommand extends BaseCommand {
     return 'Manage specification status';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge spec-status <subcommand> <file> [status]
 

@@ -52,18 +52,39 @@ export class DetectDeadCodeCommand extends BaseCommand {
     this.db = db || new DatabaseManager();
   }
 
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'detect-dead-code';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Detect unused/dead code based on call graph and dependency analysis';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge detect-dead-code [options]\n\n  Options:\n    --all              Show all candidates (including low confidence)\n    --confidence=LEVEL Filter by confidence (high/medium/low)';
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       // Check for help flag

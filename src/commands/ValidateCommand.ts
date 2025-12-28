@@ -63,6 +63,11 @@ export class ValidateCommand extends BaseCommand {
     return 'Generate detailed validation report';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge validate\n\n  Reads from: configured database path (.tsdoc.config.json)';
   }

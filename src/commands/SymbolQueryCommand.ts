@@ -66,14 +66,29 @@ export class SymbolQueryCommand extends BaseCommand {
     this.parser = new DocumentSymbolParser();
   }
 
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'symbol-query';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Query and explore document symbols';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge symbol-query <subcommand> [options]
 
@@ -86,6 +101,12 @@ export class SymbolQueryCommand extends BaseCommand {
     stats             Show symbol statistics`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       // Check for help flag before processing
@@ -94,7 +115,7 @@ export class SymbolQueryCommand extends BaseCommand {
       }
 
       const docsDir = this.findDocsDir(args);
-      const subcommand = args.find((arg) => !arg.startsWith('--') && arg !== docsDir) || 'help';
+      const subcommand = args.find((arg) => !arg.startsWith('--')) || 'help';
 
       this.printHeader('Symbol Query');
 
@@ -259,7 +280,7 @@ export class SymbolQueryCommand extends BaseCommand {
    * Search symbols by name
    */
   private searchSymbols(args: string[]): CommandResult {
-    const query = args.find((arg) => !arg.startsWith('--') && arg !== 'search' && arg !== this.findDocsDir(args));
+    const query = args.find((arg) => !arg.startsWith('--') && arg !== 'search');
 
     if (!query) {
       this.printError('Usage: symbol-query search <pattern>');
@@ -297,7 +318,7 @@ export class SymbolQueryCommand extends BaseCommand {
    * Show detailed symbol information
    */
   private showSymbolInfo(args: string[]): CommandResult {
-    const symbolName = args.find((arg) => !arg.startsWith('--') && arg !== 'info' && arg !== this.findDocsDir(args));
+    const symbolName = args.find((arg) => !arg.startsWith('--') && arg !== 'info');
 
     if (!symbolName) {
       this.printError('Usage: symbol-query info <symbol-name>');
@@ -391,7 +412,7 @@ export class SymbolQueryCommand extends BaseCommand {
    * Show backlinks (documents that reference this symbol)
    */
   private showBacklinks(args: string[]): CommandResult {
-    const symbolName = args.find((arg) => !arg.startsWith('--') && arg !== 'backlinks' && arg !== this.findDocsDir(args));
+    const symbolName = args.find((arg) => !arg.startsWith('--') && arg !== 'backlinks');
 
     if (!symbolName) {
       this.printError('Usage: symbol-query backlinks <symbol-name>');
@@ -449,7 +470,7 @@ export class SymbolQueryCommand extends BaseCommand {
    * Find similar symbols
    */
   private findSimilar(args: string[]): CommandResult {
-    const symbolName = args.find((arg) => !arg.startsWith('--') && arg !== 'similar' && arg !== this.findDocsDir(args));
+    const symbolName = args.find((arg) => !arg.startsWith('--') && arg !== 'similar');
 
     if (!symbolName) {
       this.printError('Usage: symbol-query similar <symbol-name>');
@@ -623,9 +644,14 @@ export class SymbolQueryCommand extends BaseCommand {
 
   /**
    * Find docs directory from args
+   * Uses --dir=<path> flag, defaults to 'managed'
    */
   private findDocsDir(args: string[]): string {
-    return args.find((arg) => !arg.startsWith('--') && arg !== 'list' && arg !== 'search' && arg !== 'info' && arg !== 'backlinks' && arg !== 'similar' && arg !== 'stats') || 'managed';
+    const dirArg = args.find((arg) => arg.startsWith('--dir='));
+    if (dirArg) {
+      return dirArg.split('=')[1];
+    }
+    return 'managed';
   }
 
   /**

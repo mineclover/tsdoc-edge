@@ -5,6 +5,17 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import type { DatabaseManager, SymbolRow } from '../storage/DatabaseManager';
+import type { Symbol } from '../types/graph/graph';
+
+/**
+ * Result of symbol resolution
+ */
+export interface ResolvedSymbol {
+  symbol: Symbol | SymbolRow;
+  id: string;
+  autoSelected: boolean;
+}
 
 /**
  * Command execution result
@@ -315,6 +326,77 @@ export abstract class BaseCommand {
 
     // Default fallback
     return path.join(process.cwd(), '.tsdoc', 'data');
+  }
+
+  /**
+   * Resolve symbol by ID or name pattern
+   * Automatically selects class/interface if exact name match exists
+   *
+   * @param dbManager - Database manager instance
+   * @param symbolIdOrName - Symbol ID or name to look up
+   * @returns Resolved symbol or null if not found
+   */
+  protected resolveSymbol(dbManager: DatabaseManager, symbolIdOrName: string): ResolvedSymbol | null {
+    // Try exact ID first
+    const exactSymbol = dbManager.getSymbol(symbolIdOrName);
+    if (exactSymbol) {
+      return { symbol: exactSymbol as Symbol, id: symbolIdOrName, autoSelected: false };
+    }
+
+    // Try name pattern match
+    const matches = dbManager.findSymbolsByNamePattern(symbolIdOrName);
+    if (matches.length === 0) {
+      return null;
+    }
+
+    // Auto-select if exact name match with primary type
+    const primaryMatch = matches.find(m =>
+      m.name.toLowerCase() === symbolIdOrName.toLowerCase() &&
+      ['class', 'interface', 'function', 'type'].includes(m.type)
+    );
+
+    if (primaryMatch) {
+      console.log(`${colors.dim}Selected: ${primaryMatch.name} (${primaryMatch.type})${colors.reset}`);
+      console.log();
+      const symbol = dbManager.getSymbol(primaryMatch.id);
+      return symbol ? { symbol: symbol as Symbol, id: primaryMatch.id, autoSelected: true } : null;
+    }
+
+    // Return first match if only one
+    if (matches.length === 1) {
+      const symbol = dbManager.getSymbol(matches[0].id);
+      return symbol ? { symbol: symbol as Symbol, id: matches[0].id, autoSelected: false } : null;
+    }
+
+    // If multiple matches, try to auto-select a class/interface
+    // Prefer matches where the search term is at the start of the name
+    const searchLower = symbolIdOrName.toLowerCase();
+    const classOrInterfaceMatches = matches.filter(m => ['class', 'interface'].includes(m.type));
+
+    if (classOrInterfaceMatches.length > 0) {
+      // Prefer match where name starts with the search term
+      const startsWithMatch = classOrInterfaceMatches.find(m =>
+        m.name.toLowerCase().startsWith(searchLower)
+      );
+      const selected = startsWithMatch || classOrInterfaceMatches[0];
+
+      console.log(`${colors.dim}Selected: ${selected.name} (${selected.type})${colors.reset}`);
+      console.log();
+      const symbol = dbManager.getSymbol(selected.id);
+      return symbol ? { symbol: symbol as Symbol, id: selected.id, autoSelected: true } : null;
+    }
+
+    // Multiple ambiguous matches - show options
+    console.log(`${colors.yellow}Multiple matches found:${colors.reset}`);
+    for (const m of matches.slice(0, 10)) {
+      console.log(`  ${colors.cyan}${m.id}${colors.reset} (${m.name}) [${m.type}]`);
+    }
+    if (matches.length > 10) {
+      console.log(`  ... and ${matches.length - 10} more`);
+    }
+    console.log();
+    console.log('Please use a more specific ID or name.');
+    return null;
   }
 
   /**

@@ -18,14 +18,29 @@ import { BaseCommand, colors } from './BaseCommand';
  * @public
  */
 export class TypeChainCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'type-chain';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Show type dependency chain between two types';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge type-chain <source-type> [target-type] [options]
 
@@ -36,6 +51,12 @@ export class TypeChainCommand extends BaseCommand {
     --tree                Show as dependency tree`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<any>
+   * @public
+   */
   async execute(args: string[]): Promise<any> {
     // Check for help flag
     if (this.hasHelpFlag(args)) {
@@ -306,14 +327,29 @@ export class TypeChainCommand extends BaseCommand {
  * @public
  */
 export class FindRootTypesCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'find-roots';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Find root types (types with no incoming dependencies)';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge find-roots [options]
 
@@ -321,6 +357,12 @@ export class FindRootTypesCommand extends BaseCommand {
     --include-external    Include external types from node_modules`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<any>
+   * @public
+   */
   async execute(args: string[]): Promise<any> {
     // Check for help flag
     if (this.hasHelpFlag(args)) {
@@ -444,14 +486,29 @@ export class FindRootTypesCommand extends BaseCommand {
  * @public
  */
 export class DetectCircularTypesCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'detect-cycles';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Detect circular type dependencies';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge detect-cycles [options]
 
@@ -459,6 +516,12 @@ export class DetectCircularTypesCommand extends BaseCommand {
     --include-external    Include external types from node_modules`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<any>
+   * @public
+   */
   async execute(args: string[]): Promise<any> {
     // Check for help flag
     if (this.hasHelpFlag(args)) {

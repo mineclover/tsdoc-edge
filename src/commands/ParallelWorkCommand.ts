@@ -31,14 +31,29 @@ import * as path from 'node:path';
  * @depReason 의존성 분석 로직 필요
  */
 export class ParallelWorkCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'parallel-work';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Detect parallel development zones based on dependency graph';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge parallel-work --working "Module1,Module2" [--frozen "Module3"]
 
@@ -47,6 +62,12 @@ export class ParallelWorkCommand extends BaseCommand {
     --frozen "M3,M4"     Modules that are frozen`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       // Check for help flag

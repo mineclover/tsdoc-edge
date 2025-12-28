@@ -16,14 +16,29 @@ import { MermaidSymbolExtractor } from '../doc-symbol/MermaidSymbolExtractor';
  * @public
  */
 export class ParseMermaidCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'parse-mermaid';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Parse Mermaid diagram (.mmd) and extract symbols/relationships';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge parse-mermaid <file.mmd> [options]
 
@@ -32,6 +47,12 @@ export class ParseMermaidCommand extends BaseCommand {
     --output=DIR         Output directory (default: managed/relationships)`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       // Check for help flag

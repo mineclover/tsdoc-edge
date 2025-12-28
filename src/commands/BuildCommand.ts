@@ -72,6 +72,15 @@ export class BuildCommand extends BaseCommand {
   }
 
   /**
+   * getAlias method
+   * @returns Returns string[]
+   * @public
+   */
+  getAlias(): string[] {
+    return ['b'];
+  }
+
+  /**
    * getDescription method
    * @returns Returns string
    * @public
@@ -80,13 +89,19 @@ export class BuildCommand extends BaseCommand {
     return 'Build symbol database from source files';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge build [source-directory] [options]
 
   Default: src
   Options:
     --force          Force full rebuild (ignore file hashes)
-    --incremental    Incremental build (only changed files, default)`;
+    --incremental    Incremental build (only changed files, default)
+    --exclude-tests  Exclude test files (.test.ts, .spec.ts) from indexing`;
   }
 
   /**
@@ -104,6 +119,7 @@ export class BuildCommand extends BaseCommand {
 
       // Parse arguments
       const forceRebuild = args.includes('--force');
+      const excludeTests = args.includes('--exclude-tests');
       const targetPath = args.find(arg => !arg.startsWith('--')) || 'src';
 
       this.printHeader('TSDoc Edge - Build Database');
@@ -112,6 +128,10 @@ export class BuildCommand extends BaseCommand {
         this.printWarning('Force rebuild enabled - all files will be reprocessed');
       } else {
         this.printInfo('Incremental build enabled - only changed files will be processed');
+      }
+
+      if (excludeTests) {
+        this.printInfo('Excluding test files from indexing');
       }
 
       // Validate path
@@ -150,7 +170,17 @@ export class BuildCommand extends BaseCommand {
       this.printInfo('Scanning TypeScript files...');
       const startTime = Date.now();
 
-      const allFiles = this.findTypeScriptFiles(targetPath);
+      let allFiles = this.findTypeScriptFiles(targetPath);
+
+      // Filter out test files if --exclude-tests is set
+      if (excludeTests) {
+        const originalCount = allFiles.length;
+        allFiles = allFiles.filter(f => !f.endsWith('.test.ts') && !f.endsWith('.spec.ts'));
+        const excluded = originalCount - allFiles.length;
+        if (excluded > 0) {
+          this.printInfo(`Excluded ${excluded} test files`);
+        }
+      }
 
       // Filter files based on incremental build
       let files = allFiles;
@@ -186,11 +216,15 @@ export class BuildCommand extends BaseCommand {
         filesScanned: 0,
         symbolsFound: 0,
         symbolsInserted: 0,
+        symbolsCollisions: 0,
         relationshipsFound: 0,
         relationshipsInserted: 0,
         relationshipsSkipped: 0, // Relationships to external symbols (not errors)
         errors: [] as string[],
       };
+
+      // Track seen IDs to detect collisions
+      const seenIds = new Map<string, string>(); // id -> first file path
 
       // Prepare JSONL registry (use .tsdoc directly for consistency with other commands)
       const registryDir = path.join(process.cwd(), '.tsdoc');
@@ -230,6 +264,14 @@ export class BuildCommand extends BaseCommand {
 
             // Insert test symbols
             for (const testSymbol of testResult.testSymbols) {
+              // Check for ID collision
+              if (seenIds.has(testSymbol.id)) {
+                result.symbolsCollisions++;
+                result.errors.push(`ID collision: ${testSymbol.id} (${filePath} vs ${seenIds.get(testSymbol.id)})`);
+                continue; // Skip duplicate
+              }
+              seenIds.set(testSymbol.id, filePath);
+
               const fullSymbol = {
                 ...testSymbol,
                 tests: [],
@@ -251,7 +293,7 @@ export class BuildCommand extends BaseCommand {
                     line: testSymbol.line,
                     column: testSymbol.column,
                     symbolName: testSymbol.name,
-                    symbolType: testSymbol.type,
+                    type: testSymbol.type,
                   },
                   createdAt: new Date().toISOString(),
                   updatedAt: new Date().toISOString(),
@@ -278,11 +320,30 @@ export class BuildCommand extends BaseCommand {
 
             // Insert symbols
             for (const symbol of extractResult.symbols) {
-            // Generate simple kebab-case ID
-            const id = `${symbol.type}-${symbol.name}`
+            // Generate unique ID including file base name to avoid collisions
+            const fileBase = path.basename(filePath, path.extname(filePath))
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-');
+            const symbolName = symbol.name
               .toLowerCase()
               .replace(/[^a-z0-9]+/g, '-')
               .replace(/^-|-$/g, '');
+            let id = `${fileBase}-${symbol.type}-${symbolName}`
+              .replace(/--+/g, '-')
+              .replace(/^-|-$/g, '');
+
+            // If ID collision within same build, add line number for uniqueness
+            if (seenIds.has(id)) {
+              id = `${id}-L${symbol.line}`;
+            }
+
+            // Check for ID collision (shouldn't happen after adding line number)
+            if (seenIds.has(id)) {
+              result.symbolsCollisions++;
+              result.errors.push(`ID collision: ${id} (${filePath} vs ${seenIds.get(id)})`);
+              continue;
+            }
+            seenIds.set(id, filePath);
 
             const fullSymbol = {
               id,
@@ -306,7 +367,7 @@ export class BuildCommand extends BaseCommand {
                   line: symbol.line,
                   column: symbol.column,
                   symbolName: symbol.name,
-                  symbolType: symbol.type,
+                  type: symbol.type,
                 },
                 createdAt: new Date().toISOString(),
                 updatedAt: new Date().toISOString(),
@@ -703,6 +764,9 @@ export class BuildCommand extends BaseCommand {
       console.log(`  Files scanned: ${this.colors.cyan}${result.filesScanned}${this.colors.reset}`);
       console.log(`  Symbols found: ${this.colors.cyan}${result.symbolsFound}${this.colors.reset}`);
       console.log(`  Symbols inserted: ${this.colors.green}${result.symbolsInserted}${this.colors.reset}`);
+      if (result.symbolsCollisions > 0) {
+        console.log(`  ID collisions skipped: ${this.colors.yellow}${result.symbolsCollisions}${this.colors.reset}`);
+      }
       console.log(`  Relationships found: ${this.colors.cyan}${result.relationshipsFound}${this.colors.reset}`);
       console.log(`  Relationships inserted: ${this.colors.green}${result.relationshipsInserted}${this.colors.reset}`);
       if (result.relationshipsSkipped > 0) {
@@ -728,6 +792,10 @@ export class BuildCommand extends BaseCommand {
         }
       }
 
+      // Suggest work-context as next step
+      console.log(`${this.colors.bold}${this.colors.yellow}💡 Next Step:${this.colors.reset}`);
+      console.log(`  Before editing a file, run: ${this.colors.green}tsdoc-edge wc <file>${this.colors.reset}`);
+      console.log(`  ${this.colors.dim}This shows all context needed (docs, types, tests, impact)${this.colors.reset}`);
       console.log();
 
       return this.success(`Built database with ${result.symbolsInserted} symbols`);

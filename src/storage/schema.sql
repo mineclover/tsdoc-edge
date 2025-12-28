@@ -29,33 +29,6 @@ CREATE TABLE IF NOT EXISTS symbols (
     jsonl_line INTEGER NOT NULL -- Line number in JSONL file for quick lookup
 );
 
--- Full-text search index for symbols
-CREATE VIRTUAL TABLE IF NOT EXISTS symbols_fts USING fts5(
-    id,
-    name,
-    summary,
-    content='symbols',
-    content_rowid='rowid'
-);
-
--- Triggers to keep FTS index in sync
-CREATE TRIGGER IF NOT EXISTS symbols_ai AFTER INSERT ON symbols BEGIN
-    INSERT INTO symbols_fts(rowid, id, name, summary)
-    VALUES (new.rowid, new.id, new.name, new.summary);
-END;
-
-CREATE TRIGGER IF NOT EXISTS symbols_ad AFTER DELETE ON symbols BEGIN
-    DELETE FROM symbols_fts WHERE rowid = old.rowid;
-END;
-
-CREATE TRIGGER IF NOT EXISTS symbols_au AFTER UPDATE ON symbols BEGIN
-    UPDATE symbols_fts SET
-        id = new.id,
-        name = new.name,
-        summary = new.summary
-    WHERE rowid = new.rowid;
-END;
-
 -- Enhanced documentation table (Strict Mode)
 CREATE TABLE IF NOT EXISTS enhanced_docs (
     symbol_id TEXT PRIMARY KEY,
@@ -70,17 +43,6 @@ CREATE TABLE IF NOT EXISTS enhanced_docs (
     version TEXT NOT NULL,
     jsonl_line INTEGER NOT NULL,
     FOREIGN KEY (symbol_id) REFERENCES symbols(id) ON DELETE CASCADE
-);
-
--- Full-text search for enhanced documentation
-CREATE VIRTUAL TABLE IF NOT EXISTS enhanced_docs_fts USING fts5(
-    symbol_id,
-    problem_content,
-    functionality_content,
-    error_content,
-    decision_content,
-    content='enhanced_docs',
-    content_rowid='rowid'
 );
 
 -- Error experiences table (denormalized for querying)
@@ -254,3 +216,33 @@ CREATE INDEX IF NOT EXISTS idx_dependencies_target ON dependencies(target);
 
 CREATE INDEX IF NOT EXISTS idx_tests_symbol ON test_mappings(symbol_id);
 CREATE INDEX IF NOT EXISTS idx_tests_file ON test_mappings(test_file_path);
+
+-- Tasks table for project management
+CREATE TABLE IF NOT EXISTS tasks (
+    id TEXT PRIMARY KEY,
+    title TEXT NOT NULL,
+    description TEXT,
+    status TEXT NOT NULL,
+    priority TEXT NOT NULL,
+    type TEXT NOT NULL,
+    assigned_to TEXT,
+    symbol_id TEXT,
+    file_path TEXT,
+    line INTEGER,
+    estimated_hours REAL,
+    actual_hours REAL,
+    due_date TEXT,
+    parent_id TEXT,
+    dependencies TEXT,  -- JSON array
+    tags TEXT,          -- JSON array
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    completed_at TEXT,
+    notes TEXT
+);
+
+CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status);
+CREATE INDEX IF NOT EXISTS idx_tasks_priority ON tasks(priority);
+CREATE INDEX IF NOT EXISTS idx_tasks_symbol ON tasks(symbol_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_file ON tasks(file_path);
+CREATE INDEX IF NOT EXISTS idx_tasks_due ON tasks(due_date);

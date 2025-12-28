@@ -61,6 +61,11 @@ export class TodosCommand extends BaseCommand {
     return 'Show TODO items from future plans';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge todos';
   }

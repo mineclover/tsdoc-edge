@@ -37,21 +37,73 @@ import { TestExampleExtractor, type TestExample } from '../analyzer/TestExampleE
  * ```
  */
 export class TestExamplesCommand extends BaseCommand {
+  /**
+   * configManager property
+   * @public
+   */
   protected configManager = ConfigManager.getInstance();
 
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'test-examples';
   }
 
+  /**
+   * getAlias method
+   * @returns Returns string[]
+   * @public
+   */
   getAlias(): string[] {
     return ['examples', 'tex'];
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Extract and show test cases as documentation examples';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
+  protected getUsage(): string {
+    return `tsdoc-edge test-examples [options]
+
+Options:
+  --file <name>        Filter by test file name
+  --min-quality <n>    Minimum quality score (0-10)
+  --complexity <level> Filter by complexity: simple, medium, complex
+  --category <cat>     Filter by category: basic-usage, advanced-usage, integration, edge-case
+  --limit <n>          Maximum examples to show (default: 20)
+
+Examples:
+  tsdoc-edge tex                           Show top examples
+  tsdoc-edge tex --file DatabaseManager    Filter by file name
+  tsdoc-edge tex --min-quality 8           Show only high-quality examples
+  tsdoc-edge tex --complexity simple       Show simple examples`;
+  }
+
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
+    // Check for help flag first
+    if (this.hasHelpFlag(args)) {
+      return this.displayHelp();
+    }
+
     // Parse options
     const options = this.parseOptions(args);
 

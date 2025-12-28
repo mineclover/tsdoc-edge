@@ -61,6 +61,11 @@ export class SyncCoverageCommand extends BaseCommand {
     return 'Sync test coverage data from Istanbul/NYC';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge sync-coverage [coverage-file]\n\n  Default: coverage/coverage-final.json';
   }

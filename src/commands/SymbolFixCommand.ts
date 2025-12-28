@@ -57,14 +57,29 @@ export class SymbolFixCommand extends BaseCommand {
     this.parser = new DocumentSymbolParser();
   }
 
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'symbol-fix';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Auto-fix common symbol reference issues';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge symbol-fix [docs-directory] [options]
 
@@ -76,6 +91,12 @@ export class SymbolFixCommand extends BaseCommand {
     --type=TYPE    Fix only specific type (typo/duplicate-h1/missing-primary/orphaned-aux/formatting)`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       // Check for help flag

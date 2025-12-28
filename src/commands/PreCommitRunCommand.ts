@@ -18,14 +18,29 @@ import { PreCommitChecker } from '../analyzer/PreCommitChecker';
  * @public
  */
 export class PreCommitRunCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'pre-commit-run';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Run pre-commit documentation checks on staged files';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge pre-commit-run [options]
 
@@ -35,6 +50,12 @@ export class PreCommitRunCommand extends BaseCommand {
     --threshold=N  Override quality threshold (default: from config)`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       if (this.hasHelpFlag(args)) {

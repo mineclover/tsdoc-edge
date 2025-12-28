@@ -40,6 +40,11 @@ export class SuggestCommand extends BaseCommand {
     return 'Generate improvement suggestions for code documentation';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge suggest [directory] [options]
 

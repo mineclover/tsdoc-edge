@@ -58,6 +58,11 @@ export class RebuildIndexCommand extends BaseCommand {
     return 'Rebuild FTS5 search indexes to fix corruption';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge rebuild-index';
   }

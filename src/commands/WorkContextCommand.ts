@@ -42,20 +42,45 @@ import { LLMsTextGenerator } from '../generator/LLMsTextGenerator';
  * ```
  */
 export class WorkContextCommand extends BaseCommand {
+  /**
+   * configManager property
+   * @public
+   */
   protected configManager = ConfigManager.getInstance();
 
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'work-context';
   }
 
+  /**
+   * getAlias method
+   * @returns Returns string[]
+   * @public
+   */
   getAlias(): string[] {
     return ['wc'];
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Show comprehensive relationship-based context for a file';
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
 
     if (args.length < 1 || args[0].startsWith('--')) {

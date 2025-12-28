@@ -15,30 +15,19 @@ import {
   BuildCommand,
   VisualizeDepsCommand,
   CheckDuplicatesCommand,
-  CheckLinksCommand,
   CommandRegistry,
   CoreApiCommand,
-  DepsCommand,
-  FindMethodCommand,
-  FindUnusedDocsCommand,
   FixCommand,
-  GenerateDocsCommand,
   HealthCommand,
   HelpCommand,
   IdCommand,
   ImproveCommand,
-  IndexDocsCommand,
   InitCommand,
   InstallHookCommand,
-  OrphansCommand,
   ParseCommand,
   PlansCommand,
   QueryInferredCommand,
   RebuildIndexCommand,
-  SpecBumpCommand,
-  SpecDiffCommand,
-  SpecHistoryCommand,
-  SpecStatusCommand,
   StatsCommand,
   SuggestCommand,
   SyncCoverageCommand,
@@ -47,24 +36,17 @@ import {
   UndocumentedCommand,
   UninstallHookCommand,
   UntestedCommand,
-  UpdateBacklinksCommand,
-  UpdateSymbolRefsCommand,
   UsageCommand,
   ValidateUnifiedCommand,
   SymbolUnifiedCommand,
-  WhoUsesCommand,
-  AnalyzeRelationshipsCommand,
   type CommandResult,
 } from './commands';
-import { DetectCircularTypesCommand, FindRootTypesCommand, TypeChainCommand } from './commands/TypeChainCommand';
 import { ParallelWorkCommand } from './commands/ParallelWorkCommand';
 import { TestRelationshipsCommand } from './commands/TestRelationshipsCommand';
 import { RelationshipCommand } from './commands/RelationshipCommand';
 import { WorkContextCommand } from './commands/WorkContextCommand';
 import { DesignContextCommand } from './commands/DesignContextCommand';
 import { DocSymbolsCommand } from './commands/DocSymbolsCommand';
-import { OntologyStatsCommand } from './commands/OntologyStatsCommand';
-import { OntologyListCommand } from './commands/OntologyListCommand';
 import { SystemStatusCommand } from './commands/SystemStatusCommand';
 import { ExploreEntrypointCommand } from './commands/ExploreEntrypointCommand';
 import { ParseMermaidCommand } from './commands/ParseMermaidCommand';
@@ -72,12 +54,70 @@ import { PromoteSymbolCommand } from './commands/PromoteSymbolCommand';
 import { CoverageReportCommand } from './commands/CoverageReportCommand';
 import { DetectDeadCodeCommand } from './commands/DetectDeadCodeCommand';
 import { MoveCommand } from './commands/MoveCommand';
-import { TaskListCommand, TaskAddCommand, TaskUpdateCommand, TaskStatsCommand } from './commands/TaskCommands';
 import { TestExamplesCommand } from './commands/TestExamplesCommand';
 import { LintCommand } from './commands/LintCommand';
 import { PreCommitRunCommand } from './commands/PreCommitRunCommand';
+import { SpecCommand } from './commands/SpecCommand';
+import { TaskCommand } from './commands/TaskCommand';
+import { OntologyCommand } from './commands/OntologyCommand';
+import { DocsCommand } from './commands/DocsCommand';
+// Backward compatibility imports for frequently used standalone commands
+import { ValidateDocsCommand } from './commands/ValidateDocsCommand';
+import { IndexDocsCommand } from './commands/IndexDocsCommand';
+import { FindUnusedDocsCommand } from './commands/FindUnusedDocsCommand';
+import { UpdateBacklinksCommand } from './commands/UpdateBacklinksCommand';
+import { CheckLinksCommand } from './commands/CheckLinksCommand';
+import { DepsCommand } from './commands/DepsCommand';
+import { WhoUsesCommand } from './commands/WhoUsesCommand';
+import { OrphansCommand } from './commands/OrphansCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
+
+/**
+ * Calculate Levenshtein distance between two strings
+ * @param a - a parameter
+ * @param b - b parameter
+ * @returns Returns number
+ */
+function levenshteinDistance(a: string, b: string): number {
+  const matrix: number[][] = [];
+  for (let i = 0; i <= b.length; i++) {
+    matrix[i] = [i];
+  }
+  for (let j = 0; j <= a.length; j++) {
+    matrix[0][j] = j;
+  }
+  for (let i = 1; i <= b.length; i++) {
+    for (let j = 1; j <= a.length; j++) {
+      if (b.charAt(i - 1) === a.charAt(j - 1)) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1,
+          matrix[i][j - 1] + 1,
+          matrix[i - 1][j] + 1
+        );
+      }
+    }
+  }
+  return matrix[b.length][a.length];
+}
+
+/**
+ * Find similar command names
+ * @param input - input parameter
+ * @param commands - commands parameter
+ * @param maxDistance - maxDistance parameter
+ * @returns Returns string[]
+ */
+function findSimilarCommands(input: string, commands: string[], maxDistance = 3): string[] {
+  return commands
+    .map(cmd => ({ cmd, distance: levenshteinDistance(input.toLowerCase(), cmd.toLowerCase()) }))
+    .filter(({ distance }) => distance <= maxDistance)
+    .sort((a, b) => a.distance - b.distance)
+    .slice(0, 3)
+    .map(({ cmd }) => cmd);
+}
 
 // Parse command line arguments
 const args = process.argv.slice(2);
@@ -103,58 +143,45 @@ async function main(): Promise<void> {
   const usageTracker = new UsageTracker();
   const registry = new CommandRegistry();
 
-  // Register commands
+  // Register commands - Core workflow
   registry.register(new BuildCommand());
-  registry.register(new UsageCommand());
-  registry.register(new AnalyzeCommand());
-  registry.register(new ValidateUnifiedCommand());
-  registry.register(new SymbolUnifiedCommand());
-  registry.register(new HealthCommand());
-  registry.register(new IndexDocsCommand());
-  registry.register(new ParseCommand());
-  registry.register(new UpdateBacklinksCommand());
-  registry.register(new UpdateSymbolRefsCommand());
-  registry.register(new CheckLinksCommand());
-  registry.register(new SuggestCommand());
-  registry.register(new InitCommand());
-  registry.register(new GenerateDocsCommand());
-  registry.register(new DepsCommand());
-  registry.register(new WhoUsesCommand());
-  registry.register(new OrphansCommand());
-  registry.register(new UndocumentedCommand());
-  registry.register(new TreeCommand());
-  registry.register(new CheckDuplicatesCommand());
-  registry.register(new SpecStatusCommand());
-  registry.register(new FindUnusedDocsCommand());
-  registry.register(new SpecHistoryCommand());
-  registry.register(new SpecDiffCommand());
-  registry.register(new SpecBumpCommand());
-  registry.register(new PlansCommand());
-  registry.register(new FindMethodCommand());
-  registry.register(new TodosCommand());
-  registry.register(new StatsCommand());
-  registry.register(new RebuildIndexCommand());
-  registry.register(new CoreApiCommand());
-  registry.register(new SyncCoverageCommand());
-  registry.register(new AnalyzeRelationshipsCommand());
-  registry.register(new RelationshipCommand());
-  registry.register(new VisualizeDepsCommand());
-  registry.register(new UntestedCommand());
-  registry.register(new FixCommand());
-  registry.register(new IdCommand());
-  registry.register(new ImproveCommand());
-  registry.register(new InstallHookCommand());
-  registry.register(new UninstallHookCommand());
-  registry.register(new TypeChainCommand());
-  registry.register(new FindRootTypesCommand());
-  registry.register(new DetectCircularTypesCommand());
-  registry.register(new ParallelWorkCommand());
-  registry.register(new TestRelationshipsCommand());
   registry.register(new WorkContextCommand());
   registry.register(new DesignContextCommand());
+  registry.register(new HealthCommand());
+  registry.register(new StatsCommand());
+  registry.register(new InitCommand());
+
+  // Register commands - Unified commands
+  registry.register(new ValidateUnifiedCommand());
+  registry.register(new SymbolUnifiedCommand());
+  registry.register(new RelationshipCommand());
+  registry.register(new SpecCommand());
+  registry.register(new TaskCommand());
+  registry.register(new OntologyCommand());
+  registry.register(new DocsCommand());
+
+  // Register commands - Analysis & tools
+  registry.register(new AnalyzeCommand());
+  registry.register(new SuggestCommand());
+  registry.register(new FixCommand());
+  registry.register(new ImproveCommand());
+  registry.register(new LintCommand());
+
+  // Register commands - Code exploration
+  registry.register(new ParseCommand());
+  registry.register(new TreeCommand());
+  registry.register(new UndocumentedCommand());
+  registry.register(new UntestedCommand());
+  registry.register(new CoreApiCommand());
   registry.register(new DocSymbolsCommand());
-  registry.register(new OntologyStatsCommand());
-  registry.register(new OntologyListCommand());
+  registry.register(new PlansCommand());
+  registry.register(new TodosCommand());
+
+  // Register commands - Specialized
+  registry.register(new VisualizeDepsCommand());
+  registry.register(new CheckDuplicatesCommand());
+  registry.register(new ParallelWorkCommand());
+  registry.register(new TestRelationshipsCommand());
   registry.register(new SystemStatusCommand());
   registry.register(new TestExamplesCommand());
   registry.register(new ExploreEntrypointCommand());
@@ -164,11 +191,25 @@ async function main(): Promise<void> {
   registry.register(new DetectDeadCodeCommand());
   registry.register(new QueryInferredCommand());
   registry.register(new MoveCommand());
-  registry.register(new TaskListCommand());
-  registry.register(new TaskAddCommand());
-  registry.register(new TaskUpdateCommand());
-  registry.register(new TaskStatsCommand());
-  registry.register(new LintCommand());
+  registry.register(new SyncCoverageCommand());
+  registry.register(new RebuildIndexCommand());
+  registry.register(new IdCommand());
+
+  // Register commands - Utility
+  registry.register(new UsageCommand());
+  registry.register(new InstallHookCommand());
+  registry.register(new UninstallHookCommand());
+
+  // Backward compatibility - frequently used standalone commands
+  // These are also available as subcommands (e.g., docs validate, symbol deps)
+  registry.register(new ValidateDocsCommand());
+  registry.register(new IndexDocsCommand());
+  registry.register(new FindUnusedDocsCommand());
+  registry.register(new UpdateBacklinksCommand());
+  registry.register(new CheckLinksCommand());
+  registry.register(new DepsCommand());
+  registry.register(new WhoUsesCommand());
+  registry.register(new OrphansCommand());
   registry.register(new PreCommitRunCommand());
   registry.register(new HelpCommand(registry));
 
@@ -183,7 +224,7 @@ async function main(): Promise<void> {
   }
 
   // Handle --version and -v flags
-  if (commandName === '--version' || commandName === '-v') {
+  if (commandName === '--version' || commandName === '-v' || commandName === 'version') {
     const version = require('../package.json').version;
     console.log(`tsdoc-edge v${version}`);
     process.exit(0);
@@ -197,15 +238,26 @@ async function main(): Promise<void> {
     const command = registry.get(commandName);
 
     if (!command) {
-      // Command not found - show error and help
+      // Command not found - show error with suggestions
       console.log(`\x1b[31m✗ Unknown command: ${commandName}\x1b[0m`);
       console.log();
-      console.log('Available commands:');
-      for (const cmd of registry.getAll()) {
-        console.log(`  ${cmd.getName().padEnd(20)} ${cmd.getDescription()}`);
+
+      // Find similar commands
+      const allNames = registry.getNames();
+      const similar = findSimilarCommands(commandName, allNames);
+
+      if (similar.length > 0) {
+        console.log('\x1b[33mDid you mean?\x1b[0m');
+        for (const name of similar) {
+          const cmd = registry.get(name);
+          if (cmd) {
+            console.log(`  \x1b[36m${name.padEnd(20)}\x1b[0m ${cmd.getDescription()}`);
+          }
+        }
+        console.log();
       }
-      console.log();
-      console.log('Use the old CLI for other commands: tsdoc-edge <command>');
+
+      console.log('Run \x1b[36mtsdoc-edge --help\x1b[0m to see all commands');
       console.log();
 
       result = {

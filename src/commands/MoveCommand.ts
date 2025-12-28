@@ -13,22 +13,61 @@ import { ReferenceUpdater } from '../utilities/ReferenceUpdater';
  * @public
  */
 export class MoveCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'move';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Move a documentation file and update all references';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
-    return 'tsdoc-edge move <source> <destination> [--dry-run] [--yes]';
+    return `tsdoc-edge move <source> <destination> [options]
+
+Move a documentation file and automatically update all references to it.
+
+Options:
+  --dry-run    Show what would be changed without making changes
+  --yes        Skip confirmation prompt
+
+Examples:
+  tsdoc-edge move features/old.md features/new.md
+  tsdoc-edge move features/file.md archive/
+  tsdoc-edge move concepts/api.md features/ --dry-run`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
-    const [sourcePath, destPath] = args;
-    
+    // Check for help flag
+    if (this.hasHelpFlag(args)) {
+      return this.displayHelp();
+    }
+
+    const [sourcePath, destPath] = args.filter(a => !a.startsWith('--'));
+
     if (!sourcePath || !destPath) {
+      this.printError('Source and destination paths required');
+      console.log();
       console.log(this.getUsage());
       return { exitCode: 1, message: 'Missing arguments' };
     }

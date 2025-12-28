@@ -34,14 +34,29 @@ interface GraphEdge {
  * @public
  */
 export class RelationshipPathCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'relationship-path';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Find connection paths between two symbols';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge relationship-path <from-symbol> <to-symbol> [options]
 
@@ -67,6 +82,12 @@ Examples:
   tsdoc-edge relationship-path class-buildcommand class-databasemanager --category structural`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       if (this.hasHelpFlag(args)) {
@@ -94,21 +115,24 @@ Examples:
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
-      // Verify both symbols exist
-      const fromExists = dbManager.symbolExists(fromSymbol);
-      const toExists = dbManager.symbolExists(toSymbol);
+      // Resolve both symbols by ID or name
+      const fromResolved = this.resolveSymbol(dbManager, fromSymbol);
+      const toResolved = this.resolveSymbol(dbManager, toSymbol);
 
-      if (!fromExists) {
+      if (!fromResolved) {
         this.printError(`Source symbol not found: ${fromSymbol}`);
         dbManager.close();
         return { success: false, message: 'Source symbol not found', exitCode: 1 };
       }
 
-      if (!toExists) {
+      if (!toResolved) {
         this.printError(`Target symbol not found: ${toSymbol}`);
         dbManager.close();
         return { success: false, message: 'Target symbol not found', exitCode: 1 };
       }
+
+      const resolvedFromSymbol = fromResolved.id;
+      const resolvedToSymbol = toResolved.id;
 
       console.log();
       this.printInfo(`Building relationship graph...`);
@@ -131,8 +155,8 @@ Examples:
       const paths = this.findPathsBidirectional(
         adjacency,
         reverseAdjacency,
-        fromSymbol,
-        toSymbol,
+        resolvedFromSymbol,
+        resolvedToSymbol,
         options.maxLength
       );
 
@@ -225,7 +249,7 @@ Examples:
 
       dbManager.close();
 
-      return this.success(`Found ${paths.length} path(s) between ${fromSymbol} and ${toSymbol}`);
+      return this.success(`Found ${paths.length} path(s) between ${fromResolved.symbol.name} and ${toResolved.symbol.name}`);
     });
   }
 

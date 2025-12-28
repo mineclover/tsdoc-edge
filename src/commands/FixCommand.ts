@@ -43,6 +43,11 @@ export class FixCommand extends BaseCommand {
     return 'Automatically fix documentation issues';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge fix [directory] [options]
 

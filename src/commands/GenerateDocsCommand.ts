@@ -49,6 +49,11 @@ export class GenerateDocsCommand extends BaseCommand {
     return 'Generate markdown documentation from enhanced docs';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge generate-docs <source-path> [output-dir]
 
@@ -82,6 +87,13 @@ export class GenerateDocsCommand extends BaseCommand {
 
       if (!fs.existsSync(sourcePath)) {
         this.printError(`Source path not found: ${sourcePath}`);
+        console.log();
+        console.log('This command expects a TypeScript file or directory path.');
+        console.log();
+        console.log('Examples:');
+        this.printInfo('  tsdoc-edge d generate src/commands/BuildCommand.ts');
+        this.printInfo('  tsdoc-edge d generate src/commands');
+        console.log();
         return this.failure(`Source path not found: ${sourcePath}`);
       }
 

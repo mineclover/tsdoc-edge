@@ -506,16 +506,23 @@ export class TestSymbolParser {
   }
 
   /**
-   * Extract file base name from file path
-   * Example: "src/__tests__/DatabaseManager.test.ts" → "database-manager"
+   * Extract file base name from file path including parent directory for uniqueness
+   * Example: "src/__tests__/lsp/IncrementalBuilder.test.ts" → "lsp-incremental-builder"
    */
   private extractFileBaseName(filePath: string): string {
-    const fileName = filePath.split('/').pop() || '';
+    const parts = filePath.split('/');
+    const fileName = parts.pop() || '';
+    const parentDir = parts.pop() || '';
     const baseName = fileName
       .replace(/\.test\.ts$/, '')
       .replace(/\.spec\.ts$/, '')
       .replace(/\.ts$/, '');
-    return this.toKebabCase(baseName);
+
+    // Include parent directory if not __tests__ to avoid collisions
+    const prefix = parentDir && parentDir !== '__tests__'
+      ? this.toKebabCase(parentDir) + '-'
+      : '';
+    return prefix + this.toKebabCase(baseName);
   }
 
   /**
@@ -523,6 +530,8 @@ export class TestSymbolParser {
    */
   private toKebabCase(str: string): string {
     return str
+      .replace(/\.\.\//g, 'parent-') // preserve ../ as "parent-"
+      .replace(/\.\//g, 'current-') // preserve ./ as "current-"
       .replace(/([a-z])([A-Z])/g, '$1-$2') // camelCase to kebab-case
       .replace(/[\s_]+/g, '-') // spaces and underscores to hyphens
       .replace(/[^\w-]/g, '') // remove non-word chars except hyphens

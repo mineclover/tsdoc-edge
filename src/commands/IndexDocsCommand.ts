@@ -65,6 +65,11 @@ export class IndexDocsCommand extends BaseCommand {
     return 'Index document symbols from markdown files';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge index-docs [docs-directory] [options]
 

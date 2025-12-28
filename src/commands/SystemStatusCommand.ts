@@ -26,18 +26,38 @@ import { DatabaseManager } from '../storage/DatabaseManager';
  * @public
  */
 export class SystemStatusCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'system-status';
   }
 
+  /**
+   * getAlias method
+   * @returns Returns string[]
+   * @public
+   */
   getAlias(): string[] {
     return ['status', 'ss'];
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Show comprehensive system status and health overview';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge system-status [options]
 
@@ -46,6 +66,12 @@ Options:
   --compact Compact single-line output`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       if (this.hasHelpFlag(args)) {

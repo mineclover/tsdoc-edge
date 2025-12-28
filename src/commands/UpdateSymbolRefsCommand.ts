@@ -66,6 +66,11 @@ export class UpdateSymbolRefsCommand extends BaseCommand {
     return 'Update code symbol references in documents';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge update-symbol-refs [docs-directory]\n\n  Default: managed';
   }

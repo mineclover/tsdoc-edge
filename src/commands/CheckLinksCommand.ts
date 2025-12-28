@@ -63,6 +63,11 @@ export class CheckLinksCommand extends BaseCommand {
     return 'Check for broken links in documentation';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge check-links [docs-directory]\n\n  Default: docs';
   }

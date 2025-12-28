@@ -411,10 +411,6 @@ cycle_rate = symbols_in_cycles / total_symbols
 - DocumentSymbolSystem - 문서 심볼 SSOT 검증
 
 ## 가이드
-
-## Symbol References
-
-[^ConnectivityValidator]: [ConnectivityValidator](../../src/validator/ConnectivityValidator.ts#ConnectivityValidator)
 [^sym-003]: [StrictModeValidator](../../src/validator/StrictModeValidator.ts#StrictModeValidator)
 [^sym-005]: [ConventionValidator](../../src/validator/ConventionValidator.ts#ConventionValidator)
 

@@ -61,6 +61,11 @@ export class PlansCommand extends BaseCommand {
     return 'Show future plans from documentation';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge plans [--status=<status>]
 

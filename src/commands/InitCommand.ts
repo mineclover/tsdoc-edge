@@ -32,6 +32,11 @@ export class InitCommand extends BaseCommand {
     return 'Initialize TSDoc Edge configuration';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge init [options]
 

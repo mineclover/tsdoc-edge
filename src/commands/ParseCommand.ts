@@ -67,6 +67,11 @@ export class ParseCommand extends BaseCommand {
     return 'Parse and display enhanced documentation';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge parse <source-path>
 

@@ -47,9 +47,11 @@ export class VisualizeDepsCommand extends BaseCommand {
     return `tsdoc-edge visualize <subcommand> [symbol]
 
   Subcommands:
-    tree <symbol>     Dependency tree diagram
-    graph <symbol>    Dependency graph diagram
-    circular          Find circular dependencies`;
+    tree <symbol>        Dependency tree for a symbol
+    hotspots             Top hotspots diagram
+    circular [index]     Circular dependency diagram
+    hierarchy <class>    Class hierarchy diagram
+    modules [max]        Module dependency diagram`;
   }
 
   /**

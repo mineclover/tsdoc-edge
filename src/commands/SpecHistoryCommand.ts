@@ -62,6 +62,11 @@ export class SpecHistoryCommand extends BaseCommand {
     return 'Show specification version history';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge spec-history <file-path>';
   }

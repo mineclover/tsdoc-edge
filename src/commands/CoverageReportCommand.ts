@@ -76,14 +76,29 @@ export class CoverageReportCommand extends BaseCommand {
     this.parser = new TSDocParser();
   }
 
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'coverage-report';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Report @doc tag coverage for SSOT validation';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge coverage-report [options]
 
@@ -93,6 +108,12 @@ export class CoverageReportCommand extends BaseCommand {
     --hierarchical       Group by file hierarchy`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       // Check for help flag

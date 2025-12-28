@@ -57,6 +57,11 @@ export class ValidateGeneratedDocsCommand extends BaseCommand {
     return 'Validate generated markdown documentation';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge validate-generated-docs <path>
 

@@ -91,6 +91,11 @@ export class CheckDuplicatesCommand extends BaseCommand {
     return 'Check for duplicate content in specifications';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge check-duplicates [docs-directory]\n\n  Default: managed';
   }

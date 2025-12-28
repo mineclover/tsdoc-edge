@@ -659,11 +659,38 @@ export class SymbolRegistryManager {
   /**
    * Find symbols by name pattern (for refactoring detection)
    * @param pattern - RegExp pattern or string
-   * @returns Matching entries
+   * @returns Matching entries, prioritized by relevance
    */
   findByNamePattern(pattern: string | RegExp): SymbolRegistryEntry[] {
+    const searchName = typeof pattern === 'string' ? pattern : pattern.source;
     const regex = typeof pattern === 'string' ? new RegExp(pattern, 'i') : pattern;
-    return this.registry.entries.filter((e) => regex.test(e.sourceRef.symbolName));
+    const matches = this.registry.entries.filter((e) => regex.test(e.sourceRef.symbolName));
+
+    // Prioritize: exact match > class/interface > others
+    const priorityTypes = ['class', 'interface', 'function', 'type'];
+
+    return matches.sort((a, b) => {
+      const aName = a.sourceRef.symbolName;
+      const bName = b.sourceRef.symbolName;
+      const aType = a.sourceRef.type || '';
+      const bType = b.sourceRef.type || '';
+
+      // Exact name match first
+      const aExact = aName.toLowerCase() === searchName.toLowerCase();
+      const bExact = bName.toLowerCase() === searchName.toLowerCase();
+      if (aExact && !bExact) return -1;
+      if (!aExact && bExact) return 1;
+
+      // Then priority types (class, interface, function)
+      const aPriority = priorityTypes.indexOf(aType);
+      const bPriority = priorityTypes.indexOf(bType);
+      if (aPriority !== -1 && bPriority === -1) return -1;
+      if (aPriority === -1 && bPriority !== -1) return 1;
+      if (aPriority !== bPriority) return aPriority - bPriority;
+
+      // Shorter names first (less specific matches later)
+      return aName.length - bName.length;
+    });
   }
 
   /**

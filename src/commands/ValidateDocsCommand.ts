@@ -64,6 +64,11 @@ export class ValidateDocsCommand extends BaseCommand {
     return 'Validate document symbols for SSOT compliance';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge validate-docs [docs-directory]\n\n  Default: docs';
   }

@@ -1,0 +1,12 @@
+graph LR
+  graph_interface_symbol["Symbol"] -->|"1"| server_variable_text["text"]
+  server_variable_text["text"] -->|"2"| service_class_tsdocedgeservice["TsdocEdgeService"]
+  service_class_tsdocedgeservice["TsdocEdgeService"] -->|"3"| database_interface_symbolrow["SymbolRow"]
+  database_interface_symbolrow["SymbolRow"] -->|"4"| graph_interface_symbol["Symbol"]
+
+  graph_interface_symbol:::circular
+  server_variable_text:::circular
+  service_class_tsdocedgeservice:::circular
+  database_interface_symbolrow:::circular
+
+  classDef circular fill:#ff6b6b,stroke:#c92a2a,stroke-width:3px,color:#fff

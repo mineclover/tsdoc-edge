@@ -52,6 +52,15 @@ export class HealthCommand extends BaseCommand {
   }
 
   /**
+   * getAlias method
+   * @returns Returns string[]
+   * @public
+   */
+  getAlias(): string[] {
+    return ['h'];
+  }
+
+  /**
    * getDescription method
    * @returns Returns string
    * @public
@@ -60,6 +69,11 @@ export class HealthCommand extends BaseCommand {
     return 'Check code health and generate report';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return 'tsdoc-edge health [directory]\n\n  Default: src';
   }

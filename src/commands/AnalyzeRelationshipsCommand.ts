@@ -27,14 +27,29 @@ export class AnalyzeRelationshipsCommand extends BaseCommand {
     this.registry = getAnalyzerRegistry();
   }
 
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'analyze-relationships';
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
     return 'Unified relationship analyzer (--type=calls|types|chains|...)';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     const types = this.registry.getTypes().join('|');
     return `tsdoc-edge analyze-relationships [options]
@@ -52,6 +67,12 @@ Examples:
   tsdoc-edge analyze-relationships --list`;
   }
 
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       if (this.hasHelpFlag(args)) {

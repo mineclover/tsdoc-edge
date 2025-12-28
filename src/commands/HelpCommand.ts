@@ -42,50 +42,58 @@ export class HelpCommand extends BaseCommand {
 
   /**
    * execute method
-   * @param _args - _args parameter
+   * @param args - args parameter
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(_args: string[]): Promise<CommandResult> {
+  async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
-      console.log(`${colors.bold}TSDoc Edge CLI - Help${colors.reset}`);
-      console.log();
-      console.log('Usage:');
-      console.log('  tsdoc-edge <command> [options]');
+      const showAll = args.includes('--all') || args.includes('-a');
+
+      console.log(`${colors.bold}TSDoc Edge CLI${colors.reset}`);
       console.log();
 
-      if (this.registry) {
-        console.log('Available Commands:');
-        console.log();
+      // Most important command highlight
+      console.log(`${colors.bold}${colors.yellow}🌟 Key Command:${colors.reset}`);
+      console.log(`  ${colors.green}${colors.bold}tsdoc-edge wc <file>${colors.reset}  ${colors.dim}Shows all context needed before editing a file${colors.reset}`);
+      console.log();
 
+      // Quick start
+      console.log(`${colors.bold}Quick Start:${colors.reset}`);
+      console.log(`  ${colors.cyan}init${colors.reset}           Initialize project`);
+      console.log(`  ${colors.cyan}build src${colors.reset}      Build symbol database ${colors.dim}(alias: b)${colors.reset}`);
+      console.log(`  ${colors.cyan}wc <file>${colors.reset}      Get work context before editing`);
+      console.log();
+
+      // Core commands by category
+      console.log(`${colors.bold}Core Commands:${colors.reset}`);
+      console.log(`  ${colors.cyan}stats${colors.reset}          Show documentation statistics ${colors.dim}(s)${colors.reset}`);
+      console.log(`  ${colors.cyan}health${colors.reset}         Check code health ${colors.dim}(h)${colors.reset}`);
+      console.log(`  ${colors.cyan}symbol${colors.reset}         Symbol operations ${colors.dim}(sym)${colors.reset} - deps, who-uses, orphans`);
+      console.log(`  ${colors.cyan}relationship${colors.reset}   Relationship analysis ${colors.dim}(r)${colors.reset} - impact, path, clusters`);
+      console.log(`  ${colors.cyan}validate${colors.reset}       Validation commands ${colors.dim}(v)${colors.reset} - docs, connectivity`);
+      console.log(`  ${colors.cyan}docs${colors.reset}           Documentation tools ${colors.dim}(d)${colors.reset} - index, backlinks, generate`);
+      console.log();
+
+      if (showAll && this.registry) {
+        console.log(`${colors.bold}All Commands:${colors.reset}`);
         const commands = this.registry.getAll();
-        const maxNameLength = Math.max(...commands.map((c) => c.getName().length));
-
         for (const cmd of commands) {
-          const name = cmd.getName().padEnd(maxNameLength);
-          console.log(`  ${colors.cyan}${name}${colors.reset}  ${cmd.getDescription()}`);
+          const name = cmd.getName();
+          const aliases = cmd.getAlias();
+          const aliasStr = aliases.length > 0 ? ` ${colors.dim}(${aliases.join(', ')})${colors.reset}` : '';
+          console.log(`  ${colors.cyan}${name.padEnd(18)}${colors.reset}${aliasStr.padEnd(15)} ${cmd.getDescription()}`);
         }
+        console.log();
+      } else {
+        console.log(`${colors.dim}Run 'tsdoc-edge help --all' to see all ${this.registry?.getAll().length || 0} commands${colors.reset}`);
+        console.log();
       }
 
-      console.log();
-      console.log(`${colors.bold}${colors.yellow}🌟 Most Important Command:${colors.reset}`);
-      console.log(`  ${colors.green}${colors.bold}tsdoc-edge work-context <file>${colors.reset}`);
-      console.log(`  ${colors.dim}  → Shows ALL context needed to work on a file (docs, types, tests, impact)${colors.reset}`);
-      console.log(`  ${colors.dim}  → All analysis features exist to serve this single command${colors.reset}`);
-      console.log();
-      console.log('Common Workflow:');
-      console.log(`  ${colors.dim}tsdoc-edge init${colors.reset}                           Initialize project configuration`);
-      console.log(`  ${colors.dim}tsdoc-edge build src${colors.reset}                      Build symbol database`);
-      console.log(`  ${colors.bold}${colors.green}tsdoc-edge work-context src/file.ts${colors.reset}       ${colors.yellow}← Start here before editing!${colors.reset}`);
-      console.log();
-      console.log('Additional Commands:');
-      console.log(`  ${colors.dim}tsdoc-edge analyze src${colors.reset}                    Analyze code health`);
-      console.log(`  ${colors.dim}tsdoc-edge validate${colors.reset}                       Validate documentation`);
-      console.log(`  ${colors.dim}tsdoc-edge health${colors.reset}                         Check overall health`);
-      console.log(`  ${colors.dim}tsdoc-edge fix src --dry-run${colors.reset}              Preview documentation fixes`);
-      console.log(`  ${colors.dim}tsdoc-edge stats${colors.reset}                          Show documentation statistics`);
-      console.log();
-      console.log('For more information, visit: https://github.com/your-repo/tsdoc-edge');
+      console.log(`${colors.bold}Examples:${colors.reset}`);
+      console.log(`  ${colors.dim}tsdoc-edge wc src/commands/BuildCommand.ts${colors.reset}`);
+      console.log(`  ${colors.dim}tsdoc-edge sym deps DatabaseManager${colors.reset}`);
+      console.log(`  ${colors.dim}tsdoc-edge r impact UserService${colors.reset}`);
       console.log();
 
       return {

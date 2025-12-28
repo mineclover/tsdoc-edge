@@ -62,6 +62,11 @@ export class SpecBumpCommand extends BaseCommand {
     return 'Bump specification version';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
   protected getUsage(): string {
     return `tsdoc-edge spec-bump <file> <bump-type>
 
