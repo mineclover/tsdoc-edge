@@ -456,8 +456,20 @@ export class DesignContextCommand extends BaseCommand {
   }
 
   private findDocumentPath(symbolRef: string): string {
-    // Search in managed directories
-    const managedDirs = ['managed/features', 'managed/architecture', 'managed/workflows', 'managed/concepts'];
+    // Search in all managed subdirectories
+    const managedPath = path.join(process.cwd(), 'managed');
+    if (!fs.existsSync(managedPath)) {
+      return '(not found)';
+    }
+
+    // Get all subdirectories in managed/
+    const entries = fs.readdirSync(managedPath, { withFileTypes: true });
+    const managedDirs = entries
+      .filter(e => e.isDirectory())
+      .map(e => path.join('managed', e.name));
+
+    // Also check root managed/ directory
+    managedDirs.unshift('managed');
 
     for (const dir of managedDirs) {
       const dirPath = path.join(process.cwd(), dir);
@@ -813,7 +825,7 @@ export class DesignContextCommand extends BaseCommand {
           console.log(`    ${colors.dim}→ ${doc.path}${colors.reset}`);
         } else {
           console.log(`    ${colors.yellow}→ Not found${colors.reset}`);
-          console.log(`    ${colors.dim}   Searched in: managed/features/, managed/workflows/, managed/concepts/, managed/architecture/${colors.reset}`);
+          console.log(`    ${colors.dim}   Searched in: managed/*/${colors.reset}`);
           if (doc.sourceFile && doc.sourceLine) {
             console.log(`    ${colors.dim}   Referenced in: ${doc.sourceFile}:${doc.sourceLine}${colors.reset}`);
           }
