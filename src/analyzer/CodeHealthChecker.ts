@@ -357,6 +357,20 @@ export class CodeHealthChecker {
 
     // Documentation suggestions (excluding boilerplate methods)
     for (const score of docScores) {
+      // Critical: Mismatched @param names (documented param doesn't exist in signature)
+      if (score.mismatchedParams && score.mismatchedParams.length > 0) {
+        suggestions.push({
+          priority: 'critical',
+          category: 'documentation',
+          filePath: score.filePath,
+          symbolName: score.symbolName,
+          issue: `Mismatched @param: ${score.mismatchedParams.join(', ')}`,
+          suggestion: `Remove or rename @param tags that don't match function signature`,
+          effort: 'small',
+        });
+      }
+
+      // Low quality documentation
       if (score.qualityScore < minScore && score.isPublic && !this.isBoilerplate(score.symbolName)) {
         const priority = this.getPriority(score.qualityScore);
         const effort = score.missing.length > 3 ? 'medium' : 'small';

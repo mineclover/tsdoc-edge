@@ -129,10 +129,9 @@ export class CommentStateManager {
    * Export all TypeScript files in a directory
    *
    * @param sourceDir - Source directory to scan
-   * @param pattern - Glob pattern for files (default: **\/*.ts)
+   * @param _pattern - Glob pattern for files (default: **\/*.ts)
    * @returns Export result
    * @public
-   * @param _pattern - _pattern parameter
    */
   exportAll(sourceDir: string, _pattern: string = '**/*.ts'): ExportResult {
     const exportedFiles: string[] = [];

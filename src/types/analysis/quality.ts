@@ -39,6 +39,10 @@ export interface DocQualityScore {
   parentSymbol?: string;
   /** Child symbols */
   children: DocQualityScore[];
+  /** Mismatched @param names (documented but not in signature) */
+  mismatchedParams?: string[];
+  /** Missing @returns for non-void function */
+  missingReturns?: boolean;
 }
 
 /**

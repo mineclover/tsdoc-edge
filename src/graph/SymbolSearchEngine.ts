@@ -199,9 +199,8 @@ export class SymbolSearchEngine {
 
   /**
    * Find symbols by tag or annotation
-   * @param tag - Tag to search for (e.g., "deprecated", "internal")
+   * @param _tag - Tag to search for (e.g., "deprecated", "internal")
    * @returns Symbols with the tag
-   * @param _tag - _tag parameter
    */
   findByTag(_tag: string): Symbol[] {
     // This would require parsing tag information from the doc comments

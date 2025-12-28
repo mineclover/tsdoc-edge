@@ -115,6 +115,8 @@ export class DocumentationAnalyzer {
     let hasExamples = false;
     let hasCustomTags = false;
     const missing: string[] = [];
+    let mismatchedParams: string[] = [];
+    let missingReturns = false;
 
     if (jsDocComment) {
       const analysis = this.analyzeJSDoc(jsDocComment, node);
@@ -124,6 +126,8 @@ export class DocumentationAnalyzer {
       hasExamples = analysis.hasExamples;
       hasCustomTags = analysis.hasCustomTags;
       missing.push(...analysis.missing);
+      mismatchedParams = analysis.mismatchedParams;
+      missingReturns = analysis.missingReturns;
     } else {
       missing.push('documentation');
     }
@@ -161,6 +165,8 @@ export class DocumentationAnalyzer {
       missing,
       parentSymbol,
       children: [],
+      mismatchedParams: mismatchedParams.length > 0 ? mismatchedParams : undefined,
+      missingReturns: missingReturns ? true : undefined,
     };
   }
 
@@ -432,8 +438,11 @@ export class DocumentationAnalyzer {
     hasExamples: boolean;
     hasCustomTags: boolean;
     missing: string[];
+    mismatchedParams: string[];
+    missingReturns: boolean;
   } {
     const missing: string[] = [];
+    const mismatchedParams: string[] = [];
     const symbolType = this.getSymbolType(node);
 
     // Parse with TSDoc
@@ -452,21 +461,24 @@ export class DocumentationAnalyzer {
 
     if (isFunctionLike) {
       const params = (node as ts.FunctionDeclaration | ts.MethodDeclaration).parameters;
+      const actualParamNames = params.map((p) => p.name.getText());
+      // Filter out empty or invalid param names from documented params
+      const documentedParams = docComment.params.blocks
+        .map((b) => b.parameterName)
+        .filter((name) => name && name.trim().length > 0 && /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(name));
 
-      // Only check params if function has parameters
-      if (params.length > 0) {
-        const documentedParams = docComment.params.blocks.map((b) => b.parameterName);
+      // Check for missing params (in signature but not documented)
+      for (const paramName of actualParamNames) {
+        if (!documentedParams.includes(paramName)) {
+          hasCompleteParams = false;
+          missing.push(`@param ${paramName}`);
+        }
+      }
 
-        /**
-         * param
-         * @public
-         */
-        for (const param of params) {
-          const paramName = param.name.getText();
-          if (!documentedParams.includes(paramName)) {
-            hasCompleteParams = false;
-            missing.push(`@param ${paramName}`);
-          }
+      // Check for mismatched params (documented but not in signature)
+      for (const docParam of documentedParams) {
+        if (!actualParamNames.includes(docParam)) {
+          mismatchedParams.push(docParam);
         }
       }
     }
@@ -475,6 +487,7 @@ export class DocumentationAnalyzer {
 
     // Check returns (for functions/methods with non-void return types)
     let hasReturns = true;
+    let missingReturns = false;
 
     if (isFunctionLike) {
       const isConstructor = ts.isConstructorDeclaration(node);
@@ -486,6 +499,7 @@ export class DocumentationAnalyzer {
       // Only require @returns for non-void, non-constructor functions
       if (!isConstructor && !hasVoidReturn && !docComment.returnsBlock) {
         hasReturns = false;
+        missingReturns = true;
         missing.push('@returns');
       }
     }
@@ -520,6 +534,8 @@ export class DocumentationAnalyzer {
       hasExamples,
       hasCustomTags,
       missing,
+      mismatchedParams,
+      missingReturns,
     };
   }
 

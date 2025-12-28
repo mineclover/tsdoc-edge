@@ -312,13 +312,13 @@ export class ConventionValidator {
    *
    * Based on TSDOC_CONVENTIONS.md scoring system:
    * - Base score: 40 points for having a summary
-   * - +10 points: @public tag (for public symbols)
-   * - +10 points: All @param documented
-   * - +10 points: @returns documented (for non-void)
-   * - +10 points: @responsibility defined
-   * - +10 points: @contract defined
-   * - +5 points: @example provided
-   * - +5 points: @testedBy link
+   * - +10 points: public tag (for public symbols)
+   * - +10 points: All params documented
+   * - +10 points: returns documented (for non-void)
+   * - +10 points: responsibility defined
+   * - +10 points: contract defined
+   * - +5 points: example provided
+   * - +5 points: testedBy link
    *
    * @param parsedComment - Parsed doc comment
    * @returns Quality score from 0-100
