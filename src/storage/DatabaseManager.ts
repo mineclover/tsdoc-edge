@@ -1,5 +1,5 @@
 /**
- * SQLite database manager for TSDoc Edge
+ * SQLite database manager for TSDoc Edge using Drizzle ORM
  * @packageDocumentation
  * @responsibility Manage SQLite database operations and JSONL synchronization
  * @architecture Data Layer - Database Management
@@ -8,10 +8,13 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import Database from 'better-sqlite3';
+import { drizzle } from 'drizzle-orm/better-sqlite3';
+import { eq, like, or, sql } from 'drizzle-orm';
 import { ConfigManager } from '../config/ConfigManager';
 import type { Symbol } from '../types/graph';
 import type { EnhancedSymbolDoc } from '../types/tags';
 import type { UnifiedRelationship } from '../types/relationships/unified';
+import * as schema from './schema';
 
 /**
  * Extended symbol type that may include additional AST-extracted fields
@@ -26,7 +29,7 @@ interface ExtendedSymbolFields {
   valueType?: string;
 }
 
-// SQLite row types
+// SQLite row types (for backwards compatibility)
 /**
  * SymbolRow interface
  * @doc [[DatabaseManager]]
@@ -64,87 +67,36 @@ export interface DependencyRow {
 
 /**
  * UnifiedRelationshipRow interface for raw database queries
- * Use this when querying unified_relationships table directly with dynamic WHERE clauses
  * @public
  */
 export interface UnifiedRelationshipRow {
   id: string;
   type: string;
   category: string;
-  from_symbols: string; // JSON string
-  to_symbols: string; // JSON string
+  from_symbols: string;
+  to_symbols: string;
   direction: string;
   strength: string;
-  evidence: string; // JSON string
+  evidence: string;
   discovered_by: string;
   confidence: number;
   file_path: string | null;
   line: number | null;
-  properties: string | null; // JSON string
+  properties: string | null;
   created_at: string;
   updated_at: string;
   description: string | null;
 }
 
 /**
- * EnhancedDocRow interface
- * @public
- */
-interface EnhancedDocRow {
-  symbol_id: string;
-  problem_solving: string;
-  functionality: string;
-  error_experiences: string;
-  decisions: string;
-  dependencies: string;
-  future_plans: string;
-  created_at: string;
-  updated_at: string;
-  version: string;
-}
-
-/**
  * Database manager for symbol and documentation storage
+ * Uses Drizzle ORM for type-safe database operations
  *
- * @id 002
  * @public
- * @responsibility Manage SQLite database operations and JSONL synchronization
- * @contract Manage database lifecycle and provide CRUD operations
- * @precondition Database file path must be valid
- * @postcondition Database is initialized with schema
- * @testScenario Database initialization with schema
- * @testScenario Symbol insertion and retrieval
- * @testScenario Enhanced documentation storage
- * @testScenario Full-text search
- * @testScenario JSONL export and import
- * @testScenario Statistics tracking
- *
- * @problem Need fast local symbol lookups while maintaining Git-friendly version control of documentation data
- * @solves Hybrid storage strategy: SQLite for performance, JSONL for Git compatibility and human readability
- * @context CLI tools need sub-second query responses, but team collaboration requires mergeable text-based storage
- *
- * @functionality
- * - Schema management: Automatic table creation with indexes for fast lookups
- * - CRUD operations: Insert, update, retrieve symbols and enhanced docs
- * - Full-text search: SQLite FTS5 for fast documentation search
- * - JSONL sync: Bidirectional export/import for version control
- * - Statistics tracking: Query execution metrics and database statistics
- * - Coverage integration: Store and retrieve test coverage data
- *
- * @decision Use SQLite + JSONL hybrid instead of pure JSON or pure SQL
- * @rationale SQLite provides O(log n) lookups and FTS5 search, JSONL enables Git diff/merge and human inspection
- * @consequences Two storage layers to maintain, but gains both performance and version control benefits
- *
- * @depends ConfigManager
- * @depType internal
- * @depReason Configuration paths
  */
 export class DatabaseManager {
-  /**
-   * db property
-   * @public
-   */
   public readonly db: Database.Database;
+  private drizzleDb: ReturnType<typeof drizzle>;
   private dbPath: string;
   private jsonlPath: string;
 
@@ -152,10 +104,8 @@ export class DatabaseManager {
    * Create a new DatabaseManager
    * @param dbPath - Path to SQLite database file (optional, defaults to config)
    * @param jsonlPath - Path to JSONL data directory (optional, defaults to config)
-   * @contract Initialize database with schema
    */
   constructor(dbPath?: string, jsonlPath?: string) {
-    // Use provided paths or get from config
     if (dbPath && jsonlPath) {
       this.dbPath = dbPath;
       this.jsonlPath = jsonlPath;
@@ -166,7 +116,6 @@ export class DatabaseManager {
       this.jsonlPath = configManager.resolvePath(config.paths.jsonlDir);
     }
 
-    // Ensure directories exist
     const dbDir = path.dirname(this.dbPath);
     if (!fs.existsSync(dbDir)) {
       fs.mkdirSync(dbDir, { recursive: true });
@@ -177,24 +126,19 @@ export class DatabaseManager {
     }
 
     this.db = new Database(this.dbPath);
+    this.drizzleDb = drizzle(this.db, { schema });
     this.initializeSchema();
   }
 
   /**
-   * Run a function within a transaction for better performance
-   * @param fn - Function to run within transaction
-   * @returns Result of the function
-   * @public
+   * Run a function within a transaction
    */
   transaction<T>(fn: () => T): T {
     return this.db.transaction(fn)();
   }
 
   /**
-   * Batch insert unified relationships within a transaction
-   * @param relationships - Array of relationships to insert
-   * @returns Number of successfully inserted relationships
-   * @public
+   * Batch insert unified relationships
    */
   batchInsertUnifiedRelationships(relationships: Array<{
     id: string;
@@ -209,21 +153,10 @@ export class DatabaseManager {
     confidence: number;
     filePath?: string;
     line?: number;
-    properties?: Record<string, any>;
+    properties?: Record<string, unknown>;
     description?: string;
   }>): number {
     if (relationships.length === 0) return 0;
-
-    const stmt = this.db.prepare(`
-      INSERT OR REPLACE INTO unified_relationships (
-        id, type, category,
-        from_symbols, to_symbols,
-        direction, strength,
-        evidence, discovered_by, confidence,
-        file_path, line, properties,
-        created_at, updated_at, description
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
 
     let inserted = 0;
     const now = new Date().toISOString();
@@ -231,24 +164,45 @@ export class DatabaseManager {
     const insertAll = this.db.transaction(() => {
       for (const rel of relationships) {
         try {
-          stmt.run(
-            rel.id,
-            rel.type,
-            rel.category,
-            JSON.stringify(rel.fromSymbols),
-            JSON.stringify(rel.toSymbols),
-            rel.direction,
-            rel.strength,
-            JSON.stringify(rel.evidence),
-            rel.discoveredBy,
-            rel.confidence,
-            rel.filePath || null,
-            rel.line || null,
-            rel.properties ? JSON.stringify(rel.properties) : null,
-            now,
-            now,
-            rel.description || null
-          );
+          this.drizzleDb.insert(schema.unifiedRelationships)
+            .values({
+              id: rel.id,
+              type: rel.type,
+              category: rel.category,
+              fromSymbols: JSON.stringify(rel.fromSymbols),
+              toSymbols: JSON.stringify(rel.toSymbols),
+              direction: rel.direction,
+              strength: rel.strength,
+              evidence: JSON.stringify(rel.evidence),
+              discoveredBy: rel.discoveredBy,
+              confidence: rel.confidence,
+              filePath: rel.filePath ?? null,
+              line: rel.line ?? null,
+              properties: rel.properties ? JSON.stringify(rel.properties) : null,
+              createdAt: now,
+              updatedAt: now,
+              description: rel.description ?? null,
+            })
+            .onConflictDoUpdate({
+              target: schema.unifiedRelationships.id,
+              set: {
+                type: rel.type,
+                category: rel.category,
+                fromSymbols: JSON.stringify(rel.fromSymbols),
+                toSymbols: JSON.stringify(rel.toSymbols),
+                direction: rel.direction,
+                strength: rel.strength,
+                evidence: JSON.stringify(rel.evidence),
+                discoveredBy: rel.discoveredBy,
+                confidence: rel.confidence,
+                filePath: rel.filePath ?? null,
+                line: rel.line ?? null,
+                properties: rel.properties ? JSON.stringify(rel.properties) : null,
+                updatedAt: now,
+                description: rel.description ?? null,
+              },
+            })
+            .run();
           inserted++;
         } catch {
           // Skip failed inserts
@@ -260,118 +214,116 @@ export class DatabaseManager {
     return inserted;
   }
 
-  /**
-   * Initialize database schema
-   * @precondition Database connection is established
-   * @postcondition All tables and indexes are created
-   */
   private initializeSchema(): void {
     const schemaPath = path.join(__dirname, 'schema.sql');
-    const schema = fs.readFileSync(schemaPath, 'utf-8');
+    const schemaSql = fs.readFileSync(schemaPath, 'utf-8');
 
-    // Execute the entire schema at once
-    // SQLite can handle multiple statements in a single exec() call
     try {
-      this.db.exec(schema);
-    } catch (error) {
-      // Schema already initialized - this is expected when opening existing database
-      // Silently ignore as this is normal behavior
+      this.db.exec(schemaSql);
+    } catch {
+      // Schema already initialized
     }
   }
 
   /**
    * Insert a symbol into the database
-   * @param symbol - Symbol to insert
-   * @param jsonlLine - Line number in JSONL file
-   * @returns True if successful
-   * @precondition Symbol ID must be unique
-   * @postcondition Symbol is indexed and searchable
    */
   insertSymbol(symbol: Symbol & Partial<ExtendedSymbolFields>, jsonlLine: number): boolean {
-    const stmt = this.db.prepare(`
-      INSERT OR REPLACE INTO symbols (
-        id, name, type, file_path, line, column,
-        is_exported, is_public, summary,
-        declared_type, inferred_type, generic_params, parameter_types,
-        is_constant, literal_value, value_type,
-        created_at, updated_at, version, jsonl_line
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
     try {
-      stmt.run(
-        symbol.id,
-        symbol.name,
-        symbol.type,
-        symbol.filePath,
-        symbol.line,
-        symbol.column,
-        symbol.isExported ? 1 : 0,
-        symbol.isPublic ? 1 : 0,
-        symbol.summary || null,
-        symbol.declaredType || null,
-        symbol.inferredType || null,
-        symbol.genericParams ? JSON.stringify(symbol.genericParams) : null,
-        symbol.parameterTypes ? JSON.stringify(symbol.parameterTypes) : null,
-        symbol.isConstant ? 1 : 0,
-        symbol.literalValue || null,
-        symbol.valueType || null,
-        new Date().toISOString(),
-        new Date().toISOString(),
-        '1.0.0',
-        jsonlLine
-      );
+      this.drizzleDb.insert(schema.symbols)
+        .values({
+          id: symbol.id,
+          name: symbol.name,
+          type: symbol.type,
+          filePath: symbol.filePath,
+          line: symbol.line,
+          column: symbol.column,
+          isExported: symbol.isExported,
+          isPublic: symbol.isPublic,
+          summary: symbol.summary ?? null,
+          declaredType: symbol.declaredType ?? null,
+          inferredType: symbol.inferredType ?? null,
+          genericParams: symbol.genericParams ? JSON.stringify(symbol.genericParams) : null,
+          parameterTypes: symbol.parameterTypes ? JSON.stringify(symbol.parameterTypes) : null,
+          isConstant: symbol.isConstant ?? false,
+          literalValue: symbol.literalValue ?? null,
+          valueType: symbol.valueType ?? null,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+          version: '1.0.0',
+          jsonlLine,
+        })
+        .onConflictDoUpdate({
+          target: schema.symbols.id,
+          set: {
+            name: symbol.name,
+            type: symbol.type,
+            filePath: symbol.filePath,
+            line: symbol.line,
+            column: symbol.column,
+            isExported: symbol.isExported,
+            isPublic: symbol.isPublic,
+            summary: symbol.summary ?? null,
+            declaredType: symbol.declaredType ?? null,
+            inferredType: symbol.inferredType ?? null,
+            genericParams: symbol.genericParams ? JSON.stringify(symbol.genericParams) : null,
+            parameterTypes: symbol.parameterTypes ? JSON.stringify(symbol.parameterTypes) : null,
+            isConstant: symbol.isConstant ?? false,
+            literalValue: symbol.literalValue ?? null,
+            valueType: symbol.valueType ?? null,
+            updatedAt: new Date().toISOString(),
+            jsonlLine,
+          },
+        })
+        .run();
       return true;
-    } catch (error) {
-      // Symbol insertion failed - likely a constraint violation
-      // Return false to allow caller to handle the error
+    } catch {
       return false;
     }
   }
 
   /**
    * Insert enhanced documentation
-   * @param doc - Enhanced documentation
-   * @param jsonlLine - Line number in JSONL file
-   * @returns True if successful
-   * @precondition Symbol must exist
-   * @postcondition Documentation is stored and indexed
    */
   insertEnhancedDoc(doc: EnhancedSymbolDoc, jsonlLine: number): boolean {
-    const stmt = this.db.prepare(`
-      INSERT OR REPLACE INTO enhanced_docs (
-        symbol_id, problem_solving, functionality,
-        error_experiences, decisions, dependencies, future_plans,
-        created_at, updated_at, version, jsonl_line
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
     try {
-      stmt.run(
-        doc.symbolId,
-        JSON.stringify(doc.problemSolving),
-        JSON.stringify(doc.functionality),
-        JSON.stringify(doc.errorExperiences),
-        JSON.stringify(doc.decisions),
-        JSON.stringify(doc.dependencies),
-        JSON.stringify(doc.futurePlans),
-        doc.createdAt,
-        doc.updatedAt,
-        doc.version,
-        jsonlLine
-      );
+      this.drizzleDb.insert(schema.enhancedDocs)
+        .values({
+          symbolId: doc.symbolId,
+          problemSolving: JSON.stringify(doc.problemSolving),
+          functionality: JSON.stringify(doc.functionality),
+          errorExperiences: JSON.stringify(doc.errorExperiences),
+          decisions: JSON.stringify(doc.decisions),
+          dependencies: JSON.stringify(doc.dependencies),
+          futurePlans: JSON.stringify(doc.futurePlans),
+          createdAt: doc.createdAt,
+          updatedAt: doc.updatedAt,
+          version: doc.version,
+          jsonlLine,
+        })
+        .onConflictDoUpdate({
+          target: schema.enhancedDocs.symbolId,
+          set: {
+            problemSolving: JSON.stringify(doc.problemSolving),
+            functionality: JSON.stringify(doc.functionality),
+            errorExperiences: JSON.stringify(doc.errorExperiences),
+            decisions: JSON.stringify(doc.decisions),
+            dependencies: JSON.stringify(doc.dependencies),
+            futurePlans: JSON.stringify(doc.futurePlans),
+            updatedAt: doc.updatedAt,
+            version: doc.version,
+            jsonlLine,
+          },
+        })
+        .run();
       return true;
-    } catch (error) {
-      // Enhanced doc insertion failed
-      // Return false to allow caller to handle the error
+    } catch {
       return false;
     }
   }
 
   /**
-   * Insert a dependency relationship between symbols
-   * @param dependency - Dependency information
-   * @returns True if successful
+   * Insert a dependency relationship
    */
   insertDependency(dependency: {
     symbolId: string;
@@ -382,77 +334,71 @@ export class DatabaseManager {
     isOptional?: boolean;
     importPath?: string;
   }): boolean {
-    const stmt = this.db.prepare(`
-      INSERT INTO dependencies (
-        symbol_id, target, type, reason, version, is_optional, import_path
-      ) VALUES (?, ?, ?, ?, ?, ?, ?)
-    `);
-
     try {
-      stmt.run(
-        dependency.symbolId,
-        dependency.target,
-        dependency.type,
-        dependency.reason,
-        dependency.version || null,
-        dependency.isOptional ? 1 : 0,
-        dependency.importPath || null
-      );
+      this.drizzleDb.insert(schema.dependencies)
+        .values({
+          symbolId: dependency.symbolId,
+          target: dependency.target,
+          type: dependency.type,
+          reason: dependency.reason,
+          version: dependency.version ?? null,
+          isOptional: dependency.isOptional ?? false,
+          importPath: dependency.importPath ?? null,
+        })
+        .run();
       return true;
-    } catch (error) {
-      // Dependency insertion failed
-      // Return false to allow caller to handle the error
+    } catch {
       return false;
     }
   }
 
   /**
    * Get dependencies for a symbol
-   * @param symbolId - Symbol ID
-   * @returns Array of dependency target symbol IDs
    */
   getDependencies(symbolId: string): string[] {
-    const stmt = this.db.prepare('SELECT target FROM dependencies WHERE symbol_id = ?');
-    const results = stmt.all(symbolId) as Array<{ target: string }>;
+    const results = this.drizzleDb
+      .select({ target: schema.dependencies.target })
+      .from(schema.dependencies)
+      .where(eq(schema.dependencies.symbolId, symbolId))
+      .all();
     return results.map((r) => r.target);
   }
 
   /**
    * Get symbols that depend on a given symbol
-   * @param symbolId - Symbol ID
-   * @returns Array of dependent symbol IDs
    */
   getDependents(symbolId: string): string[] {
-    const stmt = this.db.prepare('SELECT symbol_id FROM dependencies WHERE target = ?');
-    const results = stmt.all(symbolId) as Array<{ symbol_id: string }>;
-    return results.map((r) => r.symbol_id);
+    const results = this.drizzleDb
+      .select({ symbolId: schema.dependencies.symbolId })
+      .from(schema.dependencies)
+      .where(eq(schema.dependencies.target, symbolId))
+      .all();
+    return results.map((r) => r.symbolId);
   }
 
   /**
-   * Search symbols by text query (full-text search)
-   * @param query - Search query
-   * @returns Array of matching symbol IDs
-   * @contract Use FTS5 for efficient text search
+   * Search symbols by text query (FTS5)
    */
   searchSymbols(query: string): string[] {
+    // FTS5 requires raw SQL
     const stmt = this.db.prepare(`
       SELECT id FROM symbols_fts
       WHERE symbols_fts MATCH ?
       ORDER BY rank
     `);
-
     const results = stmt.all(query) as Array<{ id: string }>;
     return results.map((r) => r.id);
   }
 
   /**
    * Get symbol by ID
-   * @param id - Symbol ID
-   * @returns Symbol data or null
    */
   getSymbol(id: string): Symbol | null {
-    const stmt = this.db.prepare('SELECT * FROM symbols WHERE id = ?');
-    const row = stmt.get(id) as SymbolRow | undefined;
+    const row = this.drizzleDb
+      .select()
+      .from(schema.symbols)
+      .where(eq(schema.symbols.id, id))
+      .get();
 
     if (!row) return null;
 
@@ -460,35 +406,36 @@ export class DatabaseManager {
       id: row.id,
       name: row.name,
       type: row.type as Symbol['type'],
-      filePath: row.file_path,
+      filePath: row.filePath,
       line: row.line,
       column: row.column,
-      isExported: row.is_exported === 1,
-      isPublic: row.is_public === 1,
+      isExported: row.isExported ?? false,
+      isPublic: row.isPublic ?? false,
       summary: row.summary ?? undefined,
-      tests: [], // Need to fetch from test_mappings
-      designDecisions: [], // Need to fetch from decision_records
+      tests: [],
+      designDecisions: [],
     };
   }
 
   /**
    * Get all symbols in a file
-   * @param filePath - File path
-   * @returns Array of symbols in file
    */
   getSymbolsByFile(filePath: string): Symbol[] {
-    const stmt = this.db.prepare('SELECT * FROM symbols WHERE file_path = ?');
-    const rows = stmt.all(filePath) as SymbolRow[];
+    const rows = this.drizzleDb
+      .select()
+      .from(schema.symbols)
+      .where(eq(schema.symbols.filePath, filePath))
+      .all();
 
-    return rows.map(row => ({
+    return rows.map((row) => ({
       id: row.id,
       name: row.name,
       type: row.type as Symbol['type'],
-      filePath: row.file_path,
+      filePath: row.filePath,
       line: row.line,
       column: row.column,
-      isExported: row.is_exported === 1,
-      isPublic: row.is_public === 1,
+      isExported: row.isExported ?? false,
+      isPublic: row.isPublic ?? false,
       summary: row.summary ?? undefined,
       tests: [],
       designDecisions: [],
@@ -496,22 +443,20 @@ export class DatabaseManager {
   }
 
   /**
-   * Get all symbols from database
-   * @returns Array of all symbols
+   * Get all symbols
    */
   getAllSymbols(): Symbol[] {
-    const stmt = this.db.prepare('SELECT * FROM symbols');
-    const rows = stmt.all() as SymbolRow[];
+    const rows = this.drizzleDb.select().from(schema.symbols).all();
 
     return rows.map((row) => ({
       id: row.id,
       name: row.name,
       type: row.type as Symbol['type'],
-      filePath: row.file_path,
+      filePath: row.filePath,
       line: row.line,
       column: row.column,
-      isExported: row.is_exported === 1,
-      isPublic: row.is_public === 1,
+      isExported: row.isExported ?? false,
+      isPublic: row.isPublic ?? false,
       summary: row.summary ?? undefined,
       tests: [],
       designDecisions: [],
@@ -520,37 +465,34 @@ export class DatabaseManager {
 
   /**
    * Get enhanced documentation for a symbol
-   * @param symbolId - Symbol ID
-   * @returns Enhanced documentation or null
    */
   getEnhancedDoc(symbolId: string): EnhancedSymbolDoc | null {
-    const stmt = this.db.prepare('SELECT * FROM enhanced_docs WHERE symbol_id = ?');
-    const row = stmt.get(symbolId) as EnhancedDocRow | undefined;
+    const row = this.drizzleDb
+      .select()
+      .from(schema.enhancedDocs)
+      .where(eq(schema.enhancedDocs.symbolId, symbolId))
+      .get();
 
     if (!row) return null;
 
     return {
-      symbolId: row.symbol_id,
-      problemSolving: JSON.parse(row.problem_solving),
+      symbolId: row.symbolId,
+      problemSolving: JSON.parse(row.problemSolving),
       functionality: JSON.parse(row.functionality),
-      errorExperiences: JSON.parse(row.error_experiences),
+      errorExperiences: JSON.parse(row.errorExperiences),
       decisions: JSON.parse(row.decisions),
       dependencies: JSON.parse(row.dependencies),
-      futurePlans: JSON.parse(row.future_plans),
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
+      futurePlans: JSON.parse(row.futurePlans),
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
       version: row.version,
     };
   }
 
   /**
    * Export all data to JSONL format
-   * @returns Path to exported JSONL file
-   * @contract Export data in Git-friendly JSONL format
-   * @postcondition One JSON object per line
    */
   exportToJSONL(): string {
-    // Ensure directory exists
     if (!fs.existsSync(this.jsonlPath)) {
       fs.mkdirSync(this.jsonlPath, { recursive: true });
     }
@@ -558,42 +500,25 @@ export class DatabaseManager {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
     const exportPath = path.join(this.jsonlPath, `export-${timestamp}.jsonl`);
 
-    const symbols = this.db.prepare('SELECT * FROM symbols').all();
-    const enhancedDocs = this.db.prepare('SELECT * FROM enhanced_docs').all();
+    const symbolRows = this.drizzleDb.select().from(schema.symbols).all();
+    const enhancedDocRows = this.drizzleDb.select().from(schema.enhancedDocs).all();
 
     const lines: string[] = [];
 
-    // Export symbols
-    for (const symbol of symbols) {
-      const record = {
-        type: 'symbol',
-        data: symbol,
-      };
-      lines.push(JSON.stringify(record));
+    for (const symbol of symbolRows) {
+      lines.push(JSON.stringify({ type: 'symbol', data: symbol }));
     }
 
-    // Export enhanced docs
-    for (const doc of enhancedDocs) {
-      const record = {
-        type: 'enhanced_doc',
-        data: doc,
-      };
-      lines.push(JSON.stringify(record));
+    for (const doc of enhancedDocRows) {
+      lines.push(JSON.stringify({ type: 'enhanced_doc', data: doc }));
     }
 
-    // Write synchronously
     fs.writeFileSync(exportPath, lines.join('\n') + (lines.length > 0 ? '\n' : ''));
-
     return exportPath;
   }
 
   /**
    * Import data from JSONL file
-   * @param filePath - Path to JSONL file
-   * @returns Number of records imported
-   * @contract Parse JSONL and populate database
-   * @precondition File must be valid JSONL format
-   * @postcondition Database is updated with imported data
    */
   importFromJSONL(filePath: string): number {
     if (!fs.existsSync(filePath)) {
@@ -614,11 +539,11 @@ export class DatabaseManager {
             id: record.data.id,
             name: record.data.name,
             type: record.data.type,
-            filePath: record.data.file_path,
+            filePath: record.data.file_path || record.data.filePath,
             line: record.data.line,
             column: record.data.column,
-            isExported: record.data.is_exported === 1,
-            isPublic: record.data.is_public === 1,
+            isExported: record.data.is_exported === 1 || record.data.isExported,
+            isPublic: record.data.is_public === 1 || record.data.isPublic,
             summary: record.data.summary,
             tests: [],
             designDecisions: [],
@@ -628,24 +553,34 @@ export class DatabaseManager {
           count++;
         } else if (record.type === 'enhanced_doc') {
           const doc: EnhancedSymbolDoc = {
-            symbolId: record.data.symbol_id,
-            problemSolving: JSON.parse(record.data.problem_solving),
-            functionality: JSON.parse(record.data.functionality),
-            errorExperiences: JSON.parse(record.data.error_experiences),
-            decisions: JSON.parse(record.data.decisions),
-            dependencies: JSON.parse(record.data.dependencies),
-            futurePlans: JSON.parse(record.data.future_plans),
-            createdAt: record.data.created_at,
-            updatedAt: record.data.updated_at,
+            symbolId: record.data.symbol_id || record.data.symbolId,
+            problemSolving: typeof record.data.problem_solving === 'string'
+              ? JSON.parse(record.data.problem_solving)
+              : record.data.problemSolving,
+            functionality: typeof record.data.functionality === 'string'
+              ? JSON.parse(record.data.functionality)
+              : record.data.functionality,
+            errorExperiences: typeof record.data.error_experiences === 'string'
+              ? JSON.parse(record.data.error_experiences)
+              : record.data.errorExperiences,
+            decisions: typeof record.data.decisions === 'string'
+              ? JSON.parse(record.data.decisions)
+              : record.data.decisions,
+            dependencies: typeof record.data.dependencies === 'string'
+              ? JSON.parse(record.data.dependencies)
+              : record.data.dependencies,
+            futurePlans: typeof record.data.future_plans === 'string'
+              ? JSON.parse(record.data.future_plans)
+              : record.data.futurePlans,
+            createdAt: record.data.created_at || record.data.createdAt,
+            updatedAt: record.data.updated_at || record.data.updatedAt,
             version: record.data.version,
           };
 
           this.insertEnhancedDoc(doc, i);
           count++;
         }
-      } catch (error) {
-        // Skip malformed lines during import
-        // Errors are silently skipped as partial import is acceptable
+      } catch {
         continue;
       }
     }
@@ -655,9 +590,6 @@ export class DatabaseManager {
 
   /**
    * Verify imported data integrity
-   * @param filePath - Path to JSONL file
-   * @returns Verification result with mismatches
-   * @contract Compare JSONL file with database records
    */
   verifyImport(filePath: string): {
     success: boolean;
@@ -690,9 +622,9 @@ export class DatabaseManager {
           }
           symbolCount++;
         } else if (record.type === 'enhanced_doc') {
-          const dbDoc = this.getEnhancedDoc(record.data.symbol_id);
+          const dbDoc = this.getEnhancedDoc(record.data.symbol_id || record.data.symbolId);
           if (!dbDoc) {
-            mismatches.push(`Enhanced doc not found in DB: ${record.data.symbol_id}`);
+            mismatches.push(`Enhanced doc not found in DB: ${record.data.symbol_id || record.data.symbolId}`);
           }
           docCount++;
         }
@@ -706,9 +638,7 @@ export class DatabaseManager {
       mismatches.push(`Symbol count mismatch: DB=${stats.totalSymbols}, JSONL=${symbolCount}`);
     }
     if (stats.totalEnhancedDocs !== docCount) {
-      mismatches.push(
-        `Enhanced doc count mismatch: DB=${stats.totalEnhancedDocs}, JSONL=${docCount}`
-      );
+      mismatches.push(`Enhanced doc count mismatch: DB=${stats.totalEnhancedDocs}, JSONL=${docCount}`);
     }
 
     return {
@@ -722,8 +652,6 @@ export class DatabaseManager {
 
   /**
    * Insert a unified relationship
-   * @param relationship - Unified relationship to insert
-   * @returns True if successful
    */
   insertUnifiedRelationship(relationship: {
     id: string;
@@ -738,168 +666,132 @@ export class DatabaseManager {
     confidence: number;
     filePath?: string;
     line?: number;
-    properties?: Record<string, any>;
+    properties?: Record<string, unknown>;
     description?: string;
   }): boolean {
-    const stmt = this.db.prepare(`
-      INSERT OR REPLACE INTO unified_relationships (
-        id, type, category,
-        from_symbols, to_symbols,
-        direction, strength,
-        evidence, discovered_by, confidence,
-        file_path, line, properties,
-        created_at, updated_at, description
-      ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    `);
-
     try {
-      stmt.run(
-        relationship.id,
-        relationship.type,
-        relationship.category,
-        JSON.stringify(relationship.fromSymbols),
-        JSON.stringify(relationship.toSymbols),
-        relationship.direction,
-        relationship.strength,
-        JSON.stringify(relationship.evidence),
-        relationship.discoveredBy,
-        relationship.confidence,
-        relationship.filePath || null,
-        relationship.line || null,
-        relationship.properties ? JSON.stringify(relationship.properties) : null,
-        new Date().toISOString(),
-        new Date().toISOString(),
-        relationship.description || null
-      );
+      const now = new Date().toISOString();
+      this.drizzleDb.insert(schema.unifiedRelationships)
+        .values({
+          id: relationship.id,
+          type: relationship.type,
+          category: relationship.category,
+          fromSymbols: JSON.stringify(relationship.fromSymbols),
+          toSymbols: JSON.stringify(relationship.toSymbols),
+          direction: relationship.direction,
+          strength: relationship.strength,
+          evidence: JSON.stringify(relationship.evidence),
+          discoveredBy: relationship.discoveredBy,
+          confidence: relationship.confidence,
+          filePath: relationship.filePath ?? null,
+          line: relationship.line ?? null,
+          properties: relationship.properties ? JSON.stringify(relationship.properties) : null,
+          createdAt: now,
+          updatedAt: now,
+          description: relationship.description ?? null,
+        })
+        .onConflictDoUpdate({
+          target: schema.unifiedRelationships.id,
+          set: {
+            type: relationship.type,
+            category: relationship.category,
+            fromSymbols: JSON.stringify(relationship.fromSymbols),
+            toSymbols: JSON.stringify(relationship.toSymbols),
+            direction: relationship.direction,
+            strength: relationship.strength,
+            evidence: JSON.stringify(relationship.evidence),
+            discoveredBy: relationship.discoveredBy,
+            confidence: relationship.confidence,
+            filePath: relationship.filePath ?? null,
+            line: relationship.line ?? null,
+            properties: relationship.properties ? JSON.stringify(relationship.properties) : null,
+            updatedAt: now,
+            description: relationship.description ?? null,
+          },
+        })
+        .run();
       return true;
-    } catch (error) {
-      // Unified relationship insertion failed
-      // Return false to allow caller to handle the error
+    } catch {
       return false;
     }
   }
 
   /**
-   * Get all unified relationships from database
-   * @returns Array of UnifiedRelationship objects
-   * @public
+   * Get all unified relationships
    */
   getAllUnifiedRelationships(): UnifiedRelationship[] {
-    const stmt = this.db.prepare(`
-      SELECT * FROM unified_relationships
-    `);
+    const rows = this.drizzleDb.select().from(schema.unifiedRelationships).all();
 
-    const rows = stmt.all() as Array<{
-      id: string;
-      type: string;
-      category: string;
-      from_symbols: string;
-      to_symbols: string;
-      direction: string;
-      strength: string;
-      evidence: string;
-      discovered_by: string;
-      confidence: number;
-      file_path: string | null;
-      line: number | null;
-      properties: string | null;
-      created_at: string;
-      updated_at: string;
-      description: string | null;
-    }>;
-
-    return rows.map(row => ({
+    return rows.map((row) => ({
       id: row.id,
       type: row.type as UnifiedRelationship['type'],
       category: row.category as UnifiedRelationship['category'],
-      from: JSON.parse(row.from_symbols) as string | string[],
-      to: JSON.parse(row.to_symbols) as string | string[],
+      from: JSON.parse(row.fromSymbols) as string | string[],
+      to: JSON.parse(row.toSymbols) as string | string[],
       direction: row.direction as UnifiedRelationship['direction'],
       strength: row.strength as UnifiedRelationship['strength'],
       evidence: JSON.parse(row.evidence) as UnifiedRelationship['evidence'],
-      discoveredBy: row.discovered_by as UnifiedRelationship['discoveredBy'],
+      discoveredBy: row.discoveredBy as UnifiedRelationship['discoveredBy'],
       confidence: row.confidence,
-      filePath: row.file_path || undefined,
-      line: row.line || undefined,
+      filePath: row.filePath ?? undefined,
+      line: row.line ?? undefined,
       properties: row.properties ? JSON.parse(row.properties) : {},
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-      description: row.description || undefined,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      description: row.description ?? undefined,
     }));
   }
 
   /**
-   * Get unified relationships involving a specific symbol
-   * Uses index for efficient lookup instead of loading all relationships
-   * @param symbolId - Symbol ID to find relationships for
-   * @returns Array of UnifiedRelationship objects involving the symbol
-   * @public
+   * Get unified relationships by symbol
    */
   getUnifiedRelationshipsBySymbol(symbolId: string): UnifiedRelationship[] {
-    const stmt = this.db.prepare(`
-      SELECT * FROM unified_relationships
-      WHERE from_symbols LIKE ? OR to_symbols LIKE ?
-    `);
-
     const pattern = `%"${symbolId}"%`;
-    const rows = stmt.all(pattern, pattern) as Array<{
-      id: string;
-      type: string;
-      category: string;
-      from_symbols: string;
-      to_symbols: string;
-      direction: string;
-      strength: string;
-      evidence: string;
-      discovered_by: string;
-      confidence: number;
-      file_path: string | null;
-      line: number | null;
-      properties: string | null;
-      created_at: string;
-      updated_at: string;
-      description: string | null;
-    }>;
+    const rows = this.drizzleDb
+      .select()
+      .from(schema.unifiedRelationships)
+      .where(
+        or(
+          like(schema.unifiedRelationships.fromSymbols, pattern),
+          like(schema.unifiedRelationships.toSymbols, pattern)
+        )
+      )
+      .all();
 
-    return rows.map(row => ({
+    return rows.map((row) => ({
       id: row.id,
       type: row.type as UnifiedRelationship['type'],
       category: row.category as UnifiedRelationship['category'],
-      from: JSON.parse(row.from_symbols) as string | string[],
-      to: JSON.parse(row.to_symbols) as string | string[],
+      from: JSON.parse(row.fromSymbols) as string | string[],
+      to: JSON.parse(row.toSymbols) as string | string[],
       direction: row.direction as UnifiedRelationship['direction'],
       strength: row.strength as UnifiedRelationship['strength'],
       evidence: JSON.parse(row.evidence) as UnifiedRelationship['evidence'],
-      discoveredBy: row.discovered_by as UnifiedRelationship['discoveredBy'],
+      discoveredBy: row.discoveredBy as UnifiedRelationship['discoveredBy'],
       confidence: row.confidence,
-      filePath: row.file_path || undefined,
-      line: row.line || undefined,
+      filePath: row.filePath ?? undefined,
+      line: row.line ?? undefined,
       properties: row.properties ? JSON.parse(row.properties) : {},
-      createdAt: row.created_at,
-      updatedAt: row.updated_at,
-      description: row.description || undefined,
+      createdAt: row.createdAt,
+      updatedAt: row.updatedAt,
+      description: row.description ?? undefined,
     }));
   }
 
   /**
-   * Rebuild FTS5 indexes to fix corruption or sync issues
-   * @returns Rebuild statistics
-   * @contract Rebuild all FTS5 virtual tables from their content tables
-   * @postcondition FTS5 indexes are synchronized with main tables
+   * Rebuild FTS5 indexes
    */
   rebuildFTS5Index(): { symbolsFts: number; enhancedDocsFts: number } {
-    // Rebuild symbols_fts index
     this.db.prepare("INSERT INTO symbols_fts(symbols_fts) VALUES('rebuild')").run();
     const symbolsCount = this.db.prepare('SELECT COUNT(*) as count FROM symbols_fts').get() as { count: number };
 
-    // Rebuild enhanced_docs_fts index if it has data
     let enhancedDocsCount = 0;
     try {
       this.db.prepare("INSERT INTO enhanced_docs_fts(enhanced_docs_fts) VALUES('rebuild')").run();
       const result = this.db.prepare('SELECT COUNT(*) as count FROM enhanced_docs_fts').get() as { count: number };
       enhancedDocsCount = result.count;
-    } catch (error) {
-      // Skip if table is empty or doesn't exist
+    } catch {
+      // Skip if table is empty
     }
 
     return {
@@ -910,8 +802,6 @@ export class DatabaseManager {
 
   /**
    * Close database connection
-   * @postcondition Database connection is closed
-   * @returns void - No return value
    */
   close(): void {
     this.db.close();
@@ -919,54 +809,73 @@ export class DatabaseManager {
 
   /**
    * Get database statistics
-   * @returns Statistics object
    */
   getStatistics(): {
     totalSymbols: number;
     totalEnhancedDocs: number;
     dbSize: number;
   } {
-    const symbolCount = this.db.prepare('SELECT COUNT(*) as count FROM symbols').get() as {
-      count: number;
-    };
+    const symbolResult = this.drizzleDb
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.symbols)
+      .get();
 
-    const docCount = this.db.prepare('SELECT COUNT(*) as count FROM enhanced_docs').get() as {
-      count: number;
-    };
+    const docResult = this.drizzleDb
+      .select({ count: sql<number>`count(*)` })
+      .from(schema.enhancedDocs)
+      .get();
 
     const stats = fs.statSync(this.dbPath);
 
     return {
-      totalSymbols: symbolCount.count,
-      totalEnhancedDocs: docCount.count,
+      totalSymbols: symbolResult?.count ?? 0,
+      totalEnhancedDocs: docResult?.count ?? 0,
       dbSize: stats.size,
     };
   }
 
   /**
    * Get all symbol rows for graph building
-   * @returns Array of SymbolRow objects
-   * @public
    */
   getAllSymbolRows(): SymbolRow[] {
-    const stmt = this.db.prepare('SELECT * FROM symbols');
-    return stmt.all() as SymbolRow[];
+    const rows = this.drizzleDb.select().from(schema.symbols).all();
+
+    return rows.map((row) => ({
+      id: row.id,
+      name: row.name,
+      type: row.type,
+      file_path: row.filePath,
+      line: row.line,
+      column: row.column,
+      is_exported: row.isExported ? 1 : 0,
+      is_public: row.isPublic ? 1 : 0,
+      summary: row.summary,
+      declared_type: row.declaredType,
+      inferred_type: row.inferredType,
+      generic_params: row.genericParams,
+      parameter_types: row.parameterTypes,
+    }));
   }
 
   /**
    * Get all dependency rows for graph building
-   * @returns Array of DependencyRow objects
-   * @public
    */
   getAllDependencyRows(): DependencyRow[] {
-    const stmt = this.db.prepare('SELECT * FROM dependencies');
-    return stmt.all() as DependencyRow[];
+    const rows = this.drizzleDb.select().from(schema.dependencies).all();
+
+    return rows.map((row) => ({
+      symbol_id: row.symbolId,
+      target: row.target,
+      type: row.type,
+      reason: row.reason,
+      version: row.version,
+      is_optional: row.isOptional ? 1 : 0,
+      import_path: row.importPath,
+    }));
   }
 
   /**
-   * Get symbols and dependencies for graph building (common pattern)
-   * @returns Object containing symbol and dependency rows
-   * @public
+   * Get symbols and dependencies for graph building
    */
   getGraphData(): { symbols: SymbolRow[]; dependencies: DependencyRow[] } {
     return {
