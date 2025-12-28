@@ -60,10 +60,10 @@ Subcommands:
 ${subcommandList}
 
 Examples:
-  tsdoc-edge spec status managed
-  tsdoc-edge spec history <spec-file>
-  tsdoc-edge spec diff <version1> <version2>
-  tsdoc-edge spec bump <spec-file> --minor
+  tsdoc-edge spec status show managed/features/work-context.md
+  tsdoc-edge spec history managed/features/work-context.md
+  tsdoc-edge spec diff v1.0 v2.0 managed/features/work-context.md
+  tsdoc-edge spec bump managed/features/work-context.md --minor
   tsdoc-edge spec validate managed
 
 Use 'tsdoc-edge spec <subcommand> --help' for subcommand details.`;
