@@ -169,6 +169,10 @@ export class DatabaseManager {
     let inserted = 0;
     const now = new Date().toISOString();
 
+    // Prepare statement for join table updates
+    const deleteJoinStmt = this.db.prepare('DELETE FROM relationship_symbols WHERE relationship_id = ?');
+    const insertJoinStmt = this.db.prepare('INSERT OR IGNORE INTO relationship_symbols (relationship_id, symbol_id, role) VALUES (?, ?, ?)');
+
     const insertAll = this.db.transaction(() => {
       for (const rel of relationships) {
         try {
@@ -211,6 +215,16 @@ export class DatabaseManager {
               },
             })
             .run();
+
+          // Update join table for fast lookups
+          deleteJoinStmt.run(rel.id);
+          for (const symbolId of rel.fromSymbols) {
+            insertJoinStmt.run(rel.id, symbolId, 'from');
+          }
+          for (const symbolId of rel.toSymbols) {
+            insertJoinStmt.run(rel.id, symbolId, 'to');
+          }
+
           inserted++;
         } catch {
           // Skip failed inserts
@@ -244,6 +258,58 @@ export class DatabaseManager {
       } catch {
         // Statement already executed or table exists
       }
+    }
+
+    // Migrate existing data to relationship_symbols if needed
+    this.migrateRelationshipSymbols();
+  }
+
+  /**
+   * Migrate existing unified_relationships data to relationship_symbols join table
+   * This is a one-time migration for existing databases
+   * @internal
+   */
+  private migrateRelationshipSymbols(): void {
+    try {
+      // Check if migration is needed (join table is empty but relationships exist)
+      const joinCount = this.db.prepare('SELECT COUNT(*) as count FROM relationship_symbols').get() as { count: number };
+      const relCount = this.db.prepare('SELECT COUNT(*) as count FROM unified_relationships').get() as { count: number };
+
+      if (joinCount.count === 0 && relCount.count > 0) {
+        console.log('Migrating relationship_symbols join table...');
+
+        // Get all relationships and populate join table
+        const relationships = this.db.prepare(`
+          SELECT id, from_symbols, to_symbols FROM unified_relationships
+        `).all() as Array<{ id: string; from_symbols: string; to_symbols: string }>;
+
+        const insertStmt = this.db.prepare(`
+          INSERT OR IGNORE INTO relationship_symbols (relationship_id, symbol_id, role) VALUES (?, ?, ?)
+        `);
+
+        const insertAll = this.db.transaction(() => {
+          for (const rel of relationships) {
+            try {
+              const fromSymbols = JSON.parse(rel.from_symbols) as string[];
+              const toSymbols = JSON.parse(rel.to_symbols) as string[];
+
+              for (const symbolId of fromSymbols) {
+                insertStmt.run(rel.id, symbolId, 'from');
+              }
+              for (const symbolId of toSymbols) {
+                insertStmt.run(rel.id, symbolId, 'to');
+              }
+            } catch {
+              // Skip malformed entries
+            }
+          }
+        });
+
+        insertAll();
+        console.log(`Migrated ${relationships.length} relationships to join table`);
+      }
+    } catch {
+      // Table might not exist yet, will be created by schema
     }
   }
 
@@ -761,9 +827,41 @@ export class DatabaseManager {
           },
         })
         .run();
+
+      // Update join table for fast lookups
+      this.updateRelationshipSymbols(relationship.id, relationship.fromSymbols, relationship.toSymbols);
+
       return true;
     } catch {
       return false;
+    }
+  }
+
+  /**
+   * Update relationship_symbols join table for fast indexed lookups
+   * @internal
+   */
+  private updateRelationshipSymbols(relationshipId: string, fromSymbols: string[], toSymbols: string[]): void {
+    // Delete existing entries for this relationship
+    this.drizzleDb.delete(schema.relationshipSymbols)
+      .where(eq(schema.relationshipSymbols.relationshipId, relationshipId))
+      .run();
+
+    // Insert new entries
+    const entries: Array<{ relationshipId: string; symbolId: string; role: string }> = [];
+
+    for (const symbolId of fromSymbols) {
+      entries.push({ relationshipId, symbolId, role: 'from' });
+    }
+
+    for (const symbolId of toSymbols) {
+      entries.push({ relationshipId, symbolId, role: 'to' });
+    }
+
+    if (entries.length > 0) {
+      this.drizzleDb.insert(schema.relationshipSymbols)
+        .values(entries)
+        .run();
     }
   }
 
@@ -795,20 +893,36 @@ export class DatabaseManager {
 
   /**
    * Get unified relationships by symbol
+   * Uses indexed join table for O(1) lookup instead of LIKE on JSON
    * @param symbolId - ID of the symbol
    * @returns Array of relationships involving the symbol
    */
   getUnifiedRelationshipsBySymbol(symbolId: string): UnifiedRelationship[] {
-    const pattern = `%"${symbolId}"%`;
     const rows = this.drizzleDb
-      .select()
-      .from(schema.unifiedRelationships)
-      .where(
-        or(
-          like(schema.unifiedRelationships.fromSymbols, pattern),
-          like(schema.unifiedRelationships.toSymbols, pattern)
-        )
+      .selectDistinct({
+        id: schema.unifiedRelationships.id,
+        type: schema.unifiedRelationships.type,
+        category: schema.unifiedRelationships.category,
+        fromSymbols: schema.unifiedRelationships.fromSymbols,
+        toSymbols: schema.unifiedRelationships.toSymbols,
+        direction: schema.unifiedRelationships.direction,
+        strength: schema.unifiedRelationships.strength,
+        evidence: schema.unifiedRelationships.evidence,
+        discoveredBy: schema.unifiedRelationships.discoveredBy,
+        confidence: schema.unifiedRelationships.confidence,
+        filePath: schema.unifiedRelationships.filePath,
+        line: schema.unifiedRelationships.line,
+        properties: schema.unifiedRelationships.properties,
+        createdAt: schema.unifiedRelationships.createdAt,
+        updatedAt: schema.unifiedRelationships.updatedAt,
+        description: schema.unifiedRelationships.description,
+      })
+      .from(schema.relationshipSymbols)
+      .innerJoin(
+        schema.unifiedRelationships,
+        eq(schema.relationshipSymbols.relationshipId, schema.unifiedRelationships.id)
       )
+      .where(eq(schema.relationshipSymbols.symbolId, symbolId))
       .all();
 
     return rows.map((row) => ({
@@ -1184,57 +1298,155 @@ export class DatabaseManager {
 
   /**
    * Count relationships where symbol is in from_symbols (downstream)
+   * Uses indexed join table for O(1) lookup instead of LIKE on JSON
    * @param symbolId - ID of the symbol
    * @returns Number of downstream relationships
    */
   countDownstreamRelationships(symbolId: string): number {
-    const pattern = `%"${symbolId}"%`;
     const result = this.drizzleDb
       .select({ count: count() })
-      .from(schema.unifiedRelationships)
-      .where(like(schema.unifiedRelationships.fromSymbols, pattern))
+      .from(schema.relationshipSymbols)
+      .where(and(
+        eq(schema.relationshipSymbols.symbolId, symbolId),
+        eq(schema.relationshipSymbols.role, 'from')
+      ))
       .get();
     return result?.count || 0;
   }
 
   /**
    * Count relationships where symbol is in to_symbols (upstream)
+   * Uses indexed join table for O(1) lookup instead of LIKE on JSON
    * @param symbolId - ID of the symbol
    * @returns Number of upstream relationships
    */
   countUpstreamRelationships(symbolId: string): number {
-    const pattern = `%"${symbolId}"%`;
     const result = this.drizzleDb
       .select({ count: count() })
-      .from(schema.unifiedRelationships)
-      .where(like(schema.unifiedRelationships.toSymbols, pattern))
+      .from(schema.relationshipSymbols)
+      .where(and(
+        eq(schema.relationshipSymbols.symbolId, symbolId),
+        eq(schema.relationshipSymbols.role, 'to')
+      ))
       .get();
     return result?.count || 0;
   }
 
   /**
    * Get relationship type counts for a symbol
+   * Uses indexed join table for O(1) lookup instead of LIKE on JSON
    * @param symbolId - ID of the symbol
    * @param limit - Maximum number of types to return (default: 5)
    * @returns Array of type/count pairs
    */
   getRelationshipTypeCounts(symbolId: string, limit: number = 5): Array<{ type: string; count: number }> {
-    const pattern = `%"${symbolId}"%`;
     const rows = this.drizzleDb
       .select({
         type: schema.unifiedRelationships.type,
         count: count(),
       })
-      .from(schema.unifiedRelationships)
-      .where(or(
-        like(schema.unifiedRelationships.fromSymbols, pattern),
-        like(schema.unifiedRelationships.toSymbols, pattern)
-      ))
+      .from(schema.relationshipSymbols)
+      .innerJoin(
+        schema.unifiedRelationships,
+        eq(schema.relationshipSymbols.relationshipId, schema.unifiedRelationships.id)
+      )
+      .where(eq(schema.relationshipSymbols.symbolId, symbolId))
       .groupBy(schema.unifiedRelationships.type)
       .orderBy(desc(count()))
       .limit(limit)
       .all();
     return rows;
+  }
+
+  /**
+   * Get relationship edges directly from join table (for graph building)
+   * Avoids JSON.parse overhead by using the pre-computed relationship_symbols table
+   * @param category - Optional category filter
+   * @returns Array of edges with from/to symbol IDs
+   */
+  getRelationshipEdges(category?: string): Array<{ fromSymbolId: string; toSymbolId: string }> {
+    // Get all 'from' symbols paired with their relationship IDs
+    const fromSymbolsQuery = this.drizzleDb
+      .select({
+        relationshipId: schema.relationshipSymbols.relationshipId,
+        symbolId: schema.relationshipSymbols.symbolId,
+      })
+      .from(schema.relationshipSymbols)
+      .where(eq(schema.relationshipSymbols.role, 'from'));
+
+    // Get all 'to' symbols paired with their relationship IDs
+    const toSymbolsQuery = this.drizzleDb
+      .select({
+        relationshipId: schema.relationshipSymbols.relationshipId,
+        symbolId: schema.relationshipSymbols.symbolId,
+      })
+      .from(schema.relationshipSymbols)
+      .where(eq(schema.relationshipSymbols.role, 'to'));
+
+    // If category filter, we need to join with unified_relationships
+    let fromSymbols: Array<{ relationshipId: string; symbolId: string }>;
+    let toSymbols: Array<{ relationshipId: string; symbolId: string }>;
+
+    if (category) {
+      fromSymbols = this.drizzleDb
+        .select({
+          relationshipId: schema.relationshipSymbols.relationshipId,
+          symbolId: schema.relationshipSymbols.symbolId,
+        })
+        .from(schema.relationshipSymbols)
+        .innerJoin(
+          schema.unifiedRelationships,
+          eq(schema.relationshipSymbols.relationshipId, schema.unifiedRelationships.id)
+        )
+        .where(and(
+          eq(schema.relationshipSymbols.role, 'from'),
+          eq(schema.unifiedRelationships.category, category)
+        ))
+        .all();
+
+      toSymbols = this.drizzleDb
+        .select({
+          relationshipId: schema.relationshipSymbols.relationshipId,
+          symbolId: schema.relationshipSymbols.symbolId,
+        })
+        .from(schema.relationshipSymbols)
+        .innerJoin(
+          schema.unifiedRelationships,
+          eq(schema.relationshipSymbols.relationshipId, schema.unifiedRelationships.id)
+        )
+        .where(and(
+          eq(schema.relationshipSymbols.role, 'to'),
+          eq(schema.unifiedRelationships.category, category)
+        ))
+        .all();
+    } else {
+      fromSymbols = fromSymbolsQuery.all();
+      toSymbols = toSymbolsQuery.all();
+    }
+
+    // Build lookup map for 'to' symbols by relationship ID
+    const toSymbolsByRelId = new Map<string, string[]>();
+    for (const { relationshipId, symbolId } of toSymbols) {
+      if (!toSymbolsByRelId.has(relationshipId)) {
+        toSymbolsByRelId.set(relationshipId, []);
+      }
+      toSymbolsByRelId.get(relationshipId)!.push(symbolId);
+    }
+
+    // Generate edges
+    const edges: Array<{ fromSymbolId: string; toSymbolId: string }> = [];
+    for (const { relationshipId, symbolId: fromId } of fromSymbols) {
+      const toIds = toSymbolsByRelId.get(relationshipId);
+      if (toIds) {
+        for (const toId of toIds) {
+          if (fromId !== toId) {
+            edges.push({ fromSymbolId: fromId, toSymbolId: toId });
+          }
+        }
+      }
+    }
+
+    return edges;
   }
 
   /**
@@ -1326,6 +1538,7 @@ export class DatabaseManager {
 
   /**
    * Get relationships for a symbol with limit
+   * Uses indexed join table for O(1) lookup instead of LIKE on JSON
    * @param symbolId - ID of the symbol
    * @param limit - Maximum number of relationships to return
    * @returns Array of relationship summaries
@@ -1335,18 +1548,18 @@ export class DatabaseManager {
     toSymbols: string;
     type: string;
   }> {
-    const pattern = `%"${symbolId}"%`;
     const rows = this.drizzleDb
-      .select({
+      .selectDistinct({
         fromSymbols: schema.unifiedRelationships.fromSymbols,
         toSymbols: schema.unifiedRelationships.toSymbols,
         type: schema.unifiedRelationships.type,
       })
-      .from(schema.unifiedRelationships)
-      .where(or(
-        like(schema.unifiedRelationships.fromSymbols, pattern),
-        like(schema.unifiedRelationships.toSymbols, pattern)
-      ))
+      .from(schema.relationshipSymbols)
+      .innerJoin(
+        schema.unifiedRelationships,
+        eq(schema.relationshipSymbols.relationshipId, schema.unifiedRelationships.id)
+      )
+      .where(eq(schema.relationshipSymbols.symbolId, symbolId))
       .limit(limit)
       .all();
 
@@ -1397,6 +1610,7 @@ export class DatabaseManager {
 
   /**
    * Query relationships with filters
+   * Uses indexed join table when symbolId is specified for O(1) lookup
    * @param options - Filter options (type, category, strength, minConfidence, symbolId, pagination)
    * @returns Array of matching relationships
    */
@@ -1409,7 +1623,7 @@ export class DatabaseManager {
     limit?: number;
     offset?: number;
   }): UnifiedRelationship[] {
-    const conditions = [];
+    const conditions: ReturnType<typeof eq>[] = [];
 
     if (options.type) {
       conditions.push(eq(schema.unifiedRelationships.type, options.type));
@@ -1423,28 +1637,65 @@ export class DatabaseManager {
     if (options.minConfidence !== undefined) {
       conditions.push(gte(schema.unifiedRelationships.confidence, options.minConfidence));
     }
+
+    let rows;
+
     if (options.symbolId) {
-      const pattern = `%"${options.symbolId}"%`;
-      conditions.push(or(
-        like(schema.unifiedRelationships.fromSymbols, pattern),
-        like(schema.unifiedRelationships.toSymbols, pattern)
-      ));
+      // Use indexed join table for O(1) lookup when symbolId is specified
+      conditions.push(eq(schema.relationshipSymbols.symbolId, options.symbolId));
+
+      let query = this.drizzleDb
+        .selectDistinct({
+          id: schema.unifiedRelationships.id,
+          type: schema.unifiedRelationships.type,
+          category: schema.unifiedRelationships.category,
+          fromSymbols: schema.unifiedRelationships.fromSymbols,
+          toSymbols: schema.unifiedRelationships.toSymbols,
+          direction: schema.unifiedRelationships.direction,
+          strength: schema.unifiedRelationships.strength,
+          evidence: schema.unifiedRelationships.evidence,
+          discoveredBy: schema.unifiedRelationships.discoveredBy,
+          confidence: schema.unifiedRelationships.confidence,
+          filePath: schema.unifiedRelationships.filePath,
+          line: schema.unifiedRelationships.line,
+          properties: schema.unifiedRelationships.properties,
+          createdAt: schema.unifiedRelationships.createdAt,
+          updatedAt: schema.unifiedRelationships.updatedAt,
+          description: schema.unifiedRelationships.description,
+        })
+        .from(schema.relationshipSymbols)
+        .innerJoin(
+          schema.unifiedRelationships,
+          eq(schema.relationshipSymbols.relationshipId, schema.unifiedRelationships.id)
+        )
+        .where(and(...conditions));
+
+      if (options.limit) {
+        query = query.limit(options.limit) as typeof query;
+      }
+      if (options.offset) {
+        query = query.offset(options.offset) as typeof query;
+      }
+
+      rows = query.all();
+    } else {
+      // No symbolId - query unified_relationships directly
+      let query = this.drizzleDb.select().from(schema.unifiedRelationships);
+
+      if (conditions.length > 0) {
+        query = query.where(and(...conditions)) as typeof query;
+      }
+
+      if (options.limit) {
+        query = query.limit(options.limit) as typeof query;
+      }
+      if (options.offset) {
+        query = query.offset(options.offset) as typeof query;
+      }
+
+      rows = query.all();
     }
 
-    let query = this.drizzleDb.select().from(schema.unifiedRelationships);
-
-    if (conditions.length > 0) {
-      query = query.where(and(...conditions)) as typeof query;
-    }
-
-    if (options.limit) {
-      query = query.limit(options.limit) as typeof query;
-    }
-    if (options.offset) {
-      query = query.offset(options.offset) as typeof query;
-    }
-
-    const rows = query.all();
     return rows.map((row) => ({
       id: row.id,
       type: row.type as UnifiedRelationship['type'],
@@ -2408,17 +2659,23 @@ export class DatabaseManager {
 
   /**
    * Count incoming calls for a symbol (for dead code detection)
+   * Uses indexed join table for O(1) lookup instead of LIKE on JSON
    * @param symbolId - ID of the symbol
    * @returns Number of incoming call relationships
    */
   countIncomingCalls(symbolId: string): number {
     const result = this.drizzleDb
       .select({ count: sql<number>`COUNT(*)` })
-      .from(schema.unifiedRelationships)
+      .from(schema.relationshipSymbols)
+      .innerJoin(
+        schema.unifiedRelationships,
+        eq(schema.relationshipSymbols.relationshipId, schema.unifiedRelationships.id)
+      )
       .where(
         and(
-          eq(schema.unifiedRelationships.type, 'calls'),
-          like(schema.unifiedRelationships.toSymbols, `%"${symbolId}"%`)
+          eq(schema.relationshipSymbols.symbolId, symbolId),
+          eq(schema.relationshipSymbols.role, 'to'),
+          eq(schema.unifiedRelationships.type, 'calls')
         )
       )
       .get();
@@ -2427,22 +2684,28 @@ export class DatabaseManager {
 
   /**
    * Count all incoming references for a symbol (for dead code detection)
+   * Uses indexed join table for O(1) lookup instead of LIKE on JSON
    * @param symbolId - ID of the symbol
    * @returns Number of incoming reference relationships
    */
   countIncomingReferences(symbolId: string): number {
     const result = this.drizzleDb
       .select({ count: sql<number>`COUNT(*)` })
-      .from(schema.unifiedRelationships)
+      .from(schema.relationshipSymbols)
+      .innerJoin(
+        schema.unifiedRelationships,
+        eq(schema.relationshipSymbols.relationshipId, schema.unifiedRelationships.id)
+      )
       .where(
         and(
+          eq(schema.relationshipSymbols.symbolId, symbolId),
+          eq(schema.relationshipSymbols.role, 'to'),
           inArray(schema.unifiedRelationships.type, [
             'code-dependency',
             'calls',
             'inheritance',
             'type-dependency',
-          ]),
-          like(schema.unifiedRelationships.toSymbols, `%"${symbolId}"%`)
+          ])
         )
       )
       .get();

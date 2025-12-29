@@ -73,6 +73,12 @@ export class CacheManager {
   /** Track if manager is disposed */
   private disposed = false;
 
+  /** Last activity timestamp for idle detection */
+  private lastActivityTime: number = Date.now();
+
+  /** Track if cleanup already ran since last activity */
+  private cleanedSinceLastActivity = false;
+
   /**
    * Creates a new CacheManager instance
    *
@@ -113,10 +119,15 @@ export class CacheManager {
     if (!entry) return undefined;
 
     // Check TTL
-    if (Date.now() - entry.timestamp >= this.ttl) {
+    const now = Date.now();
+    if (now - entry.timestamp >= this.ttl) {
       cache.delete(key);
       return undefined;
     }
+
+    // Track activity
+    this.lastActivityTime = now;
+    this.cleanedSinceLastActivity = false;
 
     return entry.value;
   }
@@ -141,10 +152,15 @@ export class CacheManager {
       this.evictOldest(cache);
     }
 
+    const now = Date.now();
     cache.set(key, {
       value,
-      timestamp: Date.now(),
+      timestamp: now,
     });
+
+    // Track activity
+    this.lastActivityTime = now;
+    this.cleanedSinceLastActivity = false;
   }
 
   /**
@@ -267,6 +283,11 @@ export class CacheManager {
   private cleanupExpired(): void {
     if (this.disposed) return;
 
+    // Skip cleanup if already cleaned since last activity (idle detection)
+    if (this.cleanedSinceLastActivity) {
+      return;
+    }
+
     const now = Date.now();
 
     for (const cache of this.caches.values()) {
@@ -281,19 +302,49 @@ export class CacheManager {
         this.evictOldest(cache, cache.size - this.maxSize);
       }
     }
+
+    // Mark as cleaned until next activity
+    this.cleanedSinceLastActivity = true;
   }
 
   /**
-   * Evict oldest entries from a cache
+   * Evict oldest entries from a cache using O(n) linear scan
+   * (avoids O(n log n) sort overhead)
    * @internal
    */
   private evictOldest(cache: Map<string, CacheEntry<unknown>>, count: number = 1): void {
-    if (cache.size === 0) return;
+    if (cache.size === 0 || count <= 0) return;
 
-    const entries = Array.from(cache.entries())
-      .sort((a, b) => a[1].timestamp - b[1].timestamp);
+    // For single eviction, use simple linear scan to find minimum
+    if (count === 1) {
+      let oldestKey: string | null = null;
+      let oldestTime = Infinity;
 
-    for (let i = 0; i < Math.min(count, entries.length); i++) {
+      for (const [key, entry] of cache.entries()) {
+        if (entry.timestamp < oldestTime) {
+          oldestTime = entry.timestamp;
+          oldestKey = key;
+        }
+      }
+
+      if (oldestKey) {
+        cache.delete(oldestKey);
+      }
+      return;
+    }
+
+    // For multiple evictions, collect timestamps and use partial selection
+    // Still O(n) - single pass to collect, then k deletions
+    const entries: Array<[string, number]> = [];
+    for (const [key, entry] of cache.entries()) {
+      entries.push([key, entry.timestamp]);
+    }
+
+    // Sort only if we need multiple evictions (rare case during cleanup)
+    entries.sort((a, b) => a[1] - b[1]);
+
+    const deleteCount = Math.min(count, entries.length);
+    for (let i = 0; i < deleteCount; i++) {
       cache.delete(entries[i][0]);
     }
   }

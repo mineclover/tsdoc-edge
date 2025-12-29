@@ -2,17 +2,17 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## 프로젝트 현황 (2025-12-28)
+## 프로젝트 현황 (2025-12-29)
 
 | Metric | Value |
 |--------|-------|
-| CLI Commands | 67 |
-| Test Cases | 2,885 |
+| CLI Commands | 55 |
+| Test Cases | 2,742 |
 | Symbols | 6,726 |
 | Relationships | 38,704 |
 | Relationship Types | 13/28 (46%) |
 | Build Time | 11s |
-| Health Score | 74/100 (B) |
+| Health Score | 81/100 (A) |
 
 ## 프로젝트 개요
 

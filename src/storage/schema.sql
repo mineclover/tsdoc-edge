@@ -139,6 +139,19 @@ CREATE INDEX IF NOT EXISTS idx_ur_confidence ON unified_relationships(confidence
 CREATE INDEX IF NOT EXISTS idx_ur_from_first ON unified_relationships(json_extract(from_symbols, '$[0]'));
 CREATE INDEX IF NOT EXISTS idx_ur_to_first ON unified_relationships(json_extract(to_symbols, '$[0]'));
 
+-- Relationship symbols join table for fast O(1) lookups
+-- Replaces expensive LIKE '%symbolId%' queries with indexed JOIN
+CREATE TABLE IF NOT EXISTS relationship_symbols (
+    relationship_id TEXT NOT NULL,
+    symbol_id TEXT NOT NULL,
+    role TEXT NOT NULL,  -- 'from' or 'to'
+    PRIMARY KEY (relationship_id, symbol_id, role),
+    FOREIGN KEY (relationship_id) REFERENCES unified_relationships(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_rs_symbol ON relationship_symbols(symbol_id);
+CREATE INDEX IF NOT EXISTS idx_rs_symbol_role ON relationship_symbols(symbol_id, role);
+
 -- Test mappings table
 CREATE TABLE IF NOT EXISTS test_mappings (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

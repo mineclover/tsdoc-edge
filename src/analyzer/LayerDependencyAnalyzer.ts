@@ -134,43 +134,48 @@ export class LayerDependencyAnalyzer {
     return layerDeps;
   }
 
+  // Pre-compiled regex patterns for layer classification (reused across calls)
+  private static readonly LAYER_PATH_PATTERNS: Array<[RegExp, Layer]> = [
+    [/[/\\]controller/i, 'controller'],
+    [/[/\\]service/i, 'service'],
+    [/[/\\](?:repository|repo)/i, 'repository'],
+    [/[/\\](?:model|entity)/i, 'model'],
+    [/[/\\](?:util|helper)/i, 'util'],
+  ];
+
+  private static readonly LAYER_NAME_PATTERNS: Array<[RegExp, Layer]> = [
+    [/controller$/i, 'controller'],
+    [/service$/i, 'service'],
+    [/(?:repository|repo)$/i, 'repository'],
+    [/(?:model|entity)$/i, 'model'],
+    [/(?:util|helper)$/i, 'util'],
+  ];
+
   /**
    * Classify symbol into architectural layer
+   * Uses pre-compiled regex for efficient matching
    *
    * @param symbol - Symbol to classify
    * @returns Layer classification
    * @private
    */
   private classifyLayer(symbol: any): Layer {
-    const filePath = symbol.filePath.toLowerCase();
-    const name = symbol.name.toLowerCase();
+    const filePath = symbol.filePath;
+    const name = symbol.name;
 
-    // Check file path
-    if (filePath.includes('/controller') || filePath.includes('\\controller')) {
-      return 'controller';
-    }
-    if (filePath.includes('/service') || filePath.includes('\\service')) {
-      return 'service';
-    }
-    if (filePath.includes('/repository') || filePath.includes('\\repository') ||
-        filePath.includes('/repo') || filePath.includes('\\repo')) {
-      return 'repository';
-    }
-    if (filePath.includes('/model') || filePath.includes('\\model') ||
-        filePath.includes('/entity') || filePath.includes('\\entity')) {
-      return 'model';
-    }
-    if (filePath.includes('/util') || filePath.includes('\\util') ||
-        filePath.includes('/helper') || filePath.includes('\\helper')) {
-      return 'util';
+    // Check file path with pre-compiled regex
+    for (const [pattern, layer] of LayerDependencyAnalyzer.LAYER_PATH_PATTERNS) {
+      if (pattern.test(filePath)) {
+        return layer;
+      }
     }
 
-    // Check symbol name suffix
-    if (name.endsWith('controller')) return 'controller';
-    if (name.endsWith('service')) return 'service';
-    if (name.endsWith('repository') || name.endsWith('repo')) return 'repository';
-    if (name.endsWith('model') || name.endsWith('entity')) return 'model';
-    if (name.endsWith('util') || name.endsWith('helper')) return 'util';
+    // Check symbol name suffix with pre-compiled regex
+    for (const [pattern, layer] of LayerDependencyAnalyzer.LAYER_NAME_PATTERNS) {
+      if (pattern.test(name)) {
+        return layer;
+      }
+    }
 
     return 'unknown';
   }

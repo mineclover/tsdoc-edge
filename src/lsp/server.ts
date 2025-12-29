@@ -342,67 +342,72 @@ connection.onCodeAction((params: CodeActionParams): CodeAction[] => {
 });
 
 // Document Link provider - [[Symbol]] references
+// Optimized with batch lookup to reduce DB queries
 connection.onDocumentLinks((params: DocumentLinkParams): DocumentLink[] => {
   if (!tsdocService) return [];
 
   const document = documents.get(params.textDocument.uri);
   if (!document) return [];
 
-  const links: DocumentLink[] = [];
   const text = document.getText();
 
   try {
+    // Collect all symbol names first, then batch lookup
+    const symbolMatches: Array<{ name: string; index: number; length: number; type: 'ref' | 'see' }> = [];
+
     // Find [[Symbol]] patterns
     const symbolRefPattern = /\[\[([^\]]+)\]\]/g;
     let match;
 
     while ((match = symbolRefPattern.exec(text)) !== null) {
-      const symbolName = match[1];
-      const startPos = document.positionAt(match.index);
-      const endPos = document.positionAt(match.index + match[0].length);
-
-      // Look up symbol location
-      const symbolLocation = tsdocService.findSymbolByName(symbolName);
-
-      if (symbolLocation) {
-        links.push({
-          range: {
-            start: startPos,
-            end: endPos,
-          },
-          target: `file://${symbolLocation.filePath}#L${symbolLocation.line}`,
-          tooltip: `Go to ${symbolName} (${symbolLocation.type})`,
-          data: { symbolId: symbolLocation.id },
-        });
-      } else {
-        // Symbol not found - could link to search
-        links.push({
-          range: {
-            start: startPos,
-            end: endPos,
-          },
-          tooltip: `Symbol "${symbolName}" not found in database`,
-          data: { symbolName, notFound: true },
-        });
-      }
+      symbolMatches.push({
+        name: match[1],
+        index: match.index,
+        length: match[0].length,
+        type: 'ref',
+      });
     }
 
     // Find @see references in TSDoc comments
     const seeRefPattern = /@see\s+(\w+)/g;
     while ((match = seeRefPattern.exec(text)) !== null) {
-      const symbolName = match[1];
-      const startPos = document.positionAt(match.index + 5); // Skip "@see "
-      const endPos = document.positionAt(match.index + match[0].length);
+      symbolMatches.push({
+        name: match[1],
+        index: match.index + 5, // Skip "@see "
+        length: match[0].length - 5,
+        type: 'see',
+      });
+    }
 
-      const symbolLocation = tsdocService.findSymbolByName(symbolName);
+    if (symbolMatches.length === 0) return [];
+
+    // Batch lookup all symbol names at once
+    const uniqueNames = [...new Set(symbolMatches.map(m => m.name))];
+    const symbolLocations = tsdocService.findSymbolsByNames(uniqueNames);
+
+    // Build links from matches
+    const links: DocumentLink[] = [];
+
+    for (const match of symbolMatches) {
+      const startPos = document.positionAt(match.index);
+      const endPos = document.positionAt(match.index + match.length);
+      const symbolLocation = symbolLocations.get(match.name);
+
       if (symbolLocation) {
         links.push({
-          range: {
-            start: startPos,
-            end: endPos,
-          },
+          range: { start: startPos, end: endPos },
           target: `file://${symbolLocation.filePath}#L${symbolLocation.line}`,
-          tooltip: `Go to ${symbolName}`,
+          tooltip: match.type === 'ref'
+            ? `Go to ${match.name} (${symbolLocation.type})`
+            : `Go to ${match.name}`,
+          data: { symbolId: symbolLocation.id },
+        });
+      } else if (match.type === 'ref') {
+        // Only show "not found" for [[Symbol]] refs, not @see
+        links.push({
+          range: { start: startPos, end: endPos },
+          tooltip: `Symbol "${match.name}" not found in database`,
+          data: { symbolName: match.name, notFound: true },
         });
       }
     }
@@ -560,6 +565,13 @@ documents.onDidClose((event) => {
 // Shutdown handler - cleanup resources
 connection.onShutdown(() => {
   connection.console.log('LSP server shutting down, cleaning up resources...');
+
+  // Clear any pending incremental build timer
+  if (incrementalBuildTimer) {
+    clearTimeout(incrementalBuildTimer);
+    incrementalBuildTimer = null;
+  }
+
   if (tsdocService) {
     tsdocService.close();
     tsdocService = null;
@@ -568,6 +580,12 @@ connection.onShutdown(() => {
 
 // Exit handler - final cleanup
 connection.onExit(() => {
+  // Ensure timer is cleared on exit as well
+  if (incrementalBuildTimer) {
+    clearTimeout(incrementalBuildTimer);
+    incrementalBuildTimer = null;
+  }
+
   if (tsdocService) {
     tsdocService.close();
     tsdocService = null;

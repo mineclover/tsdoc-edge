@@ -43,6 +43,9 @@ import type {
 export class UsageTracker {
   private config: AnalyticsConfig;
   private eventsPath: string;
+  private eventCount: number = 0;
+  private lastCleanupCheck: number = 0;
+  private static readonly CLEANUP_CHECK_INTERVAL = 100; // Check every 100 events
 
   /**
    * Create a new UsageTracker
@@ -63,6 +66,22 @@ export class UsageTracker {
     // Ensure storage directory exists
     if (this.config.enabled) {
       this.ensureStorageDir();
+      // Estimate current event count from file size (avg ~200 bytes per event)
+      this.eventCount = this.estimateEventCount();
+    }
+  }
+
+  /**
+   * Estimate event count from file size (avoids full file read)
+   */
+  private estimateEventCount(): number {
+    try {
+      if (!fs.existsSync(this.eventsPath)) return 0;
+      const stats = fs.statSync(this.eventsPath);
+      // Estimate ~200 bytes per event line
+      return Math.floor(stats.size / 200);
+    } catch {
+      return 0;
     }
   }
 
@@ -89,9 +108,13 @@ export class UsageTracker {
     try {
       const line = JSON.stringify(event) + '\n';
       fs.appendFileSync(this.eventsPath, line, 'utf-8');
+      this.eventCount++;
 
-      // Auto-cleanup if events exceed max
-      this.autoCleanup();
+      // Only check cleanup every CLEANUP_CHECK_INTERVAL events
+      if (this.eventCount - this.lastCleanupCheck >= UsageTracker.CLEANUP_CHECK_INTERVAL) {
+        this.lastCleanupCheck = this.eventCount;
+        this.autoCleanup();
+      }
 
       return true;
     } catch {
@@ -301,14 +324,22 @@ export class UsageTracker {
   }
 
   /**
-   * Auto-cleanup old events
+   * Auto-cleanup old events (only runs if file size indicates excess)
    */
   private autoCleanup(): void {
     try {
+      // Quick check using estimated count - avoid file read if not needed
+      const estimatedCount = this.estimateEventCount();
+      if (estimatedCount <= this.config.maxEvents) {
+        return;
+      }
+
+      // Only now load events (expensive operation)
       const events = this.getEvents();
 
-      // Check if cleanup needed
+      // Double-check with actual count
       if (events.length <= this.config.maxEvents) {
+        this.eventCount = events.length; // Sync estimate
         return;
       }
 
@@ -327,8 +358,11 @@ export class UsageTracker {
       // Rewrite file
       const content = toKeep.map((e) => JSON.stringify(e)).join('\n') + '\n';
       fs.writeFileSync(this.eventsPath, content, 'utf-8');
+
+      // Update count after cleanup
+      this.eventCount = toKeep.length;
     } catch {
-      // Cleanup failure is not critical - will try again on next event
+      // Cleanup failure is not critical - will try again on next interval
     }
   }
 

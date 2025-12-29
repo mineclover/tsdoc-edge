@@ -222,6 +222,7 @@ Examples:
 
   /**
    * Check for relationships referencing non-existent symbols
+   * Uses batch lookup to minimize database queries
    */
   private checkOrphanedRelationships(dbManager: DatabaseManager): ValidationIssue[] {
     const issues: ValidationIssue[] = [];
@@ -229,20 +230,35 @@ Examples:
     try {
       const relationships = dbManager.getAllRelationshipsForValidation();
 
+      // Collect all unique symbol IDs and track which relationship uses which
+      const symbolToRelationships = new Map<string, string[]>();
       for (const rel of relationships) {
-        const fromSymbols = JSON.parse(rel.fromSymbols);
-        const toSymbols = JSON.parse(rel.toSymbols);
+        const fromSymbols = JSON.parse(rel.fromSymbols) as string[];
+        const toSymbols = JSON.parse(rel.toSymbols) as string[];
 
-        // Check each symbol exists
         for (const symbolId of [...fromSymbols, ...toSymbols]) {
-          const exists = dbManager.symbolExists(symbolId);
+          if (!symbolToRelationships.has(symbolId)) {
+            symbolToRelationships.set(symbolId, []);
+          }
+          symbolToRelationships.get(symbolId)!.push(rel.id);
+        }
+      }
 
-          if (!exists) {
+      // Batch lookup all symbols at once
+      const uniqueSymbolIds = Array.from(symbolToRelationships.keys());
+      const existingSymbols = new Set(
+        dbManager.getSymbolsByIds(uniqueSymbolIds).map(s => s.id)
+      );
+
+      // Find missing symbols
+      for (const [symbolId, relIds] of symbolToRelationships) {
+        if (!existingSymbols.has(symbolId)) {
+          for (const relId of relIds) {
             issues.push({
               type: 'orphan',
               severity: 'error',
-              message: `Relationship ${rel.id} references non-existent symbol: ${symbolId}`,
-              relationshipId: rel.id,
+              message: `Relationship ${relId} references non-existent symbol: ${symbolId}`,
+              relationshipId: relId,
               symbolId,
             });
           }
@@ -371,14 +387,6 @@ Examples:
     }
 
     return fixed;
-  }
-
-  private getOption(args: string[], flag: string): string | undefined {
-    const index = args.indexOf(flag);
-    if (index !== -1 && index + 1 < args.length) {
-      return args[index + 1];
-    }
-    return undefined;
   }
 
   private get colors() {

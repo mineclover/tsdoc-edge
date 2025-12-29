@@ -47,21 +47,107 @@ export class CallGraphAnalyzer {
   private program: ts.Program | null = null;
   private sourceFiles: Map<string, ts.SourceFile> = new Map();
 
+  // Symbol lookup indexes for O(1) access instead of O(n) iteration
+  private symbolsByName: Map<string, Symbol[]> = new Map();
+  private symbolsByFile: Map<string, Symbol[]> = new Map();
+  private exportedSymbols: Symbol[] = [];
+  private indexesBuilt: boolean = false;
+
   constructor(graph: SymbolGraph, program?: ts.Program) {
     this.graph = graph;
     this.program = program || null;
 
     // Cache source files if program is provided
     if (this.program) {
-      for (const sourceFile of this.program.getSourceFiles()) {
-        if (!sourceFile.isDeclarationFile) {
-          const normalized = sourceFile.fileName.replace(/\\/g, '/');
-          this.sourceFiles.set(normalized, sourceFile);
-          // Also store with just the filename
-          this.sourceFiles.set(sourceFile.fileName, sourceFile);
+      this.cacheSourceFiles(this.program);
+    }
+  }
+
+  /**
+   * Cache source files from program with multiple lookup keys
+   */
+  private cacheSourceFiles(program: ts.Program): void {
+    this.sourceFiles.clear();
+    for (const sourceFile of program.getSourceFiles()) {
+      if (!sourceFile.isDeclarationFile) {
+        const normalized = sourceFile.fileName.replace(/\\/g, '/');
+        this.sourceFiles.set(normalized, sourceFile);
+        // Also index by filename for faster lookup
+        const fileName = normalized.split('/').pop();
+        if (fileName) {
+          // Store with filename key only if not already set (avoid collisions)
+          if (!this.sourceFiles.has(fileName)) {
+            this.sourceFiles.set(fileName, sourceFile);
+          }
         }
       }
     }
+  }
+
+  /**
+   * Get source file with fallback path matching
+   */
+  private getSourceFile(filePath: string): ts.SourceFile | undefined {
+    const normalized = filePath.replace(/\\/g, '/');
+
+    // Try direct lookup first
+    let sourceFile = this.sourceFiles.get(normalized);
+    if (sourceFile) return sourceFile;
+
+    // Try filename only
+    const fileName = normalized.split('/').pop();
+    if (fileName) {
+      sourceFile = this.sourceFiles.get(fileName);
+      if (sourceFile) return sourceFile;
+    }
+
+    // Fallback: check path suffixes (rare case)
+    for (const [key, file] of this.sourceFiles.entries()) {
+      if (key.endsWith(normalized) || normalized.endsWith(key)) {
+        return file;
+      }
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Build symbol lookup indexes for fast resolution
+   */
+  private buildSymbolIndexes(): void {
+    if (this.indexesBuilt) return;
+
+    this.symbolsByName.clear();
+    this.symbolsByFile.clear();
+    this.exportedSymbols = [];
+
+    for (const symbol of this.graph.symbols.values()) {
+      // Index by name
+      const byName = this.symbolsByName.get(symbol.name) || [];
+      byName.push(symbol);
+      this.symbolsByName.set(symbol.name, byName);
+
+      // Index by method suffix (e.g., "methodName" from "ClassName.methodName")
+      if (symbol.name.includes('.')) {
+        const methodName = symbol.name.split('.').pop()!;
+        const byMethodName = this.symbolsByName.get(methodName) || [];
+        byMethodName.push(symbol);
+        this.symbolsByName.set(methodName, byMethodName);
+      }
+
+      // Index by file
+      const normalized = symbol.filePath.replace(/\\/g, '/');
+      const byFile = this.symbolsByFile.get(normalized) || [];
+      byFile.push(symbol);
+      this.symbolsByFile.set(normalized, byFile);
+
+      // Track exported symbols
+      if (symbol.isExported) {
+        this.exportedSymbols.push(symbol);
+      }
+    }
+
+    this.indexesBuilt = true;
   }
 
   /**
@@ -73,16 +159,9 @@ export class CallGraphAnalyzer {
    */
   setProgram(program: ts.Program): void {
     this.program = program;
-
-    // Cache source files (use normalized paths for better matching)
-    for (const sourceFile of program.getSourceFiles()) {
-      if (!sourceFile.isDeclarationFile) {
-        const normalized = sourceFile.fileName.replace(/\\/g, '/');
-        this.sourceFiles.set(normalized, sourceFile);
-        // Also store with just the filename
-        this.sourceFiles.set(sourceFile.fileName, sourceFile);
-      }
-    }
+    this.cacheSourceFiles(program);
+    // Invalidate indexes so they get rebuilt on next analyze()
+    this.indexesBuilt = false;
   }
 
   /**
@@ -96,6 +175,9 @@ export class CallGraphAnalyzer {
       console.warn('CallGraphAnalyzer: No program provided, cannot analyze calls');
       return [];
     }
+
+    // Build indexes once before resolution
+    this.buildSymbolIndexes();
 
     const relationships: UnifiedRelationship[] = [];
     const callSites: CallSite[] = [];
@@ -141,20 +223,8 @@ export class CallGraphAnalyzer {
   private extractCallSites(symbol: Symbol): CallSite[] {
     const callSites: CallSite[] = [];
 
-    // Try multiple path formats
-    const normalized = symbol.filePath.replace(/\\/g, '/');
-    let sourceFile = this.sourceFiles.get(symbol.filePath) || this.sourceFiles.get(normalized);
-
-    // If not found, try to find by matching the end of the path
-    if (!sourceFile) {
-      for (const [key, file] of this.sourceFiles.entries()) {
-        if (key.endsWith(normalized) || normalized.endsWith(key)) {
-          sourceFile = file;
-          break;
-        }
-      }
-    }
-
+    // Use optimized source file lookup
+    const sourceFile = this.getSourceFile(symbol.filePath);
     if (!sourceFile) {
       return callSites;
     }
@@ -268,28 +338,9 @@ export class CallGraphAnalyzer {
    */
   private extractCallSite(node: ts.CallExpression, caller: Symbol): CallSite | null {
     try {
-      const normalized = caller.filePath.replace(/\\/g, '/');
-      const sourceFile = this.sourceFiles.get(caller.filePath) || this.sourceFiles.get(normalized);
-
+      // Use optimized source file lookup
+      const sourceFile = this.getSourceFile(caller.filePath);
       if (!sourceFile) {
-        // Try to find by endsWith
-        for (const [key, file] of this.sourceFiles.entries()) {
-          if (key.endsWith(normalized) || normalized.endsWith(key)) {
-            const pos = file.getLineAndCharacterOfPosition(node.getStart(file));
-            const targetInfo = this.extractTargetName(node);
-            if (!targetInfo) return null;
-
-            return {
-              callerSymbolId: caller.id,
-              callerName: caller.name,
-              targetName: targetInfo.name,
-              objectName: targetInfo.objectName,
-              filePath: caller.filePath,
-              line: pos.line + 1,
-              callType: targetInfo.callType
-            };
-          }
-        }
         return null;
       }
 
@@ -387,62 +438,61 @@ export class CallGraphAnalyzer {
   }
 
   /**
-   * Resolve call target to a symbol
+   * Resolve call target to a symbol using indexed lookups (O(1) instead of O(n))
    */
   private resolveCallTarget(targetName: string, callerFilePath: string, objectName?: string): Symbol | undefined {
-    // Try to find the target symbol by name
-    // Priority: same file > imported symbols > any symbol with that name
+    const normalizedPath = callerFilePath.replace(/\\/g, '/');
 
-    // 1. Check symbols in the same file
-    for (const [symbolId, symbol] of this.graph.symbols.entries()) {
-      if (symbol.filePath === callerFilePath) {
-        // For methods, try to match ClassName.methodName
-        if (objectName && symbol.name === `${objectName}.${targetName}`) {
-          return symbol;
-        }
-        // Direct name match
-        if (symbol.name === targetName) {
-          return symbol;
-        }
-        // Method name without class prefix
-        if (symbol.name.endsWith(`.${targetName}`)) {
-          return symbol;
-        }
+    // 1. Check symbols in the same file first (highest priority)
+    const fileSymbols = this.symbolsByFile.get(normalizedPath);
+    if (fileSymbols) {
+      // For methods, try to match ClassName.methodName
+      if (objectName) {
+        const fullName = `${objectName}.${targetName}`;
+        const match = fileSymbols.find(s => s.name === fullName);
+        if (match) return match;
       }
+
+      // Direct name match in same file
+      const directMatch = fileSymbols.find(s => s.name === targetName);
+      if (directMatch) return directMatch;
+
+      // Method name without class prefix
+      const methodMatch = fileSymbols.find(s => s.name.endsWith(`.${targetName}`));
+      if (methodMatch) return methodMatch;
     }
 
-    // 2. Check all symbols with matching name (could be imported)
-    for (const [symbolId, symbol] of this.graph.symbols.entries()) {
+    // 2. Get candidates by name from index
+    const candidates = this.symbolsByName.get(targetName) || [];
+
+    // Check exported symbols first (likely imports)
+    for (const symbol of candidates) {
       if (symbol.isExported) {
-        // For methods, try to match ClassName.methodName
         if (objectName && symbol.name === `${objectName}.${targetName}`) {
           return symbol;
         }
-        // Direct name match
         if (symbol.name === targetName) {
           return symbol;
         }
       }
     }
 
-    // 3. Fallback: any symbol with that name (but prefer methods over variables)
+    // 3. Fallback: any symbol with that name (prefer functions/methods)
     let bestMatch: Symbol | undefined;
-    for (const [symbolId, symbol] of this.graph.symbols.entries()) {
-      if (symbol.name === targetName) {
-        // Prefer functions/methods over variables
-        if (symbol.type === 'function' || symbol.type === 'method') {
-          return symbol;
-        }
-        if (!bestMatch) {
-          bestMatch = symbol;
-        }
+    for (const symbol of candidates) {
+      if (symbol.type === 'function' || symbol.type === 'method') {
+        return symbol;
       }
-      // Also check method name without class prefix
-      if (symbol.name.endsWith(`.${targetName}`)) {
-        if (symbol.type === 'method') {
-          if (!bestMatch || bestMatch.type !== 'method') {
-            bestMatch = symbol;
-          }
+      if (!bestMatch) {
+        bestMatch = symbol;
+      }
+    }
+
+    // Also check method suffix matches if no direct match found
+    if (!bestMatch) {
+      for (const symbol of candidates) {
+        if (symbol.name.endsWith(`.${targetName}`) && symbol.type === 'method') {
+          return symbol;
         }
       }
     }

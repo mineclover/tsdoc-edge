@@ -161,23 +161,41 @@ export class TsdocEdgeService {
       return false;
     }
 
-    try {
-      this.db = new Database(this.dbPath); // Open in write mode
+    let newDb: SqliteDatabase | null = null;
+    let newStatementManager: StatementManager | null = null;
 
-      // Reinitialize statement manager
+    try {
+      newDb = new Database(this.dbPath); // Open in write mode
+
+      // Dispose old statement manager before creating new one
       if (this.statementManager) {
         this.statementManager.dispose();
+        this.statementManager = null;
       }
-      this.statementManager = new StatementManager(this.db, { maxStatements: 50 });
 
-      // Initialize incremental builder (db is now verified as non-null)
-      this.incrementalBuilder = new IncrementalBuilder(this.workspaceRoot, this.db!);
+      newStatementManager = new StatementManager(newDb, { maxStatements: 50 });
+
+      // Initialize incremental builder
+      this.incrementalBuilder = new IncrementalBuilder(this.workspaceRoot, newDb);
+
+      // All succeeded, assign to instance variables
+      this.db = newDb;
+      this.statementManager = newStatementManager;
       this.incrementalMode = true;
 
       console.log('Incremental mode enabled');
       return true;
     } catch (error) {
       console.error(`Failed to enable incremental mode: ${error}`);
+
+      // Cleanup on error: dispose newly created resources
+      if (newStatementManager) {
+        newStatementManager.dispose();
+      }
+      if (newDb) {
+        newDb.close();
+      }
+
       return false;
     }
   }
@@ -311,29 +329,34 @@ export class TsdocEdgeService {
       // Find symbol at this position
       const normalizedPath = filePath.replace(/\\/g, '/');
 
-      const symbol = this.db.prepare(`
+      // Use cached prepared statements to prevent memory leaks
+      const symbolStmt = this.statementManager?.prepare('hoverSymbol', `
         SELECT id, name, type, summary, file_path, line
         FROM symbols
         WHERE file_path LIKE ?
           AND line <= ?
         ORDER BY line DESC
         LIMIT 1
-      `).get(`%${path.basename(normalizedPath)}`, line) as SymbolRow | undefined;
+      `);
+
+      const symbol = symbolStmt?.get(`%${path.basename(normalizedPath)}`, line) as SymbolRow | undefined;
 
       if (!symbol) return null;
 
-      // Get impact analysis
-      const downstreamCount = (this.db.prepare(`
-        SELECT COUNT(*) as count
-        FROM unified_relationships
-        WHERE from_symbols LIKE ?
-      `).get(`%${symbol.id}%`) as CountRow | undefined)?.count || 0;
+      // Get impact analysis using indexed JOIN (O(1) instead of O(n) LIKE scan)
+      const downstreamStmt = this.statementManager?.prepare('hoverDownstreamJoin', `
+        SELECT COUNT(DISTINCT rs.relationship_id) as count
+        FROM relationship_symbols rs
+        WHERE rs.symbol_id = ? AND rs.role = 'from'
+      `);
+      const downstreamCount = (downstreamStmt?.get(symbol.id) as CountRow | undefined)?.count || 0;
 
-      const upstreamCount = (this.db.prepare(`
-        SELECT COUNT(*) as count
-        FROM unified_relationships
-        WHERE to_symbols LIKE ?
-      `).get(`%${symbol.id}%`) as CountRow | undefined)?.count || 0;
+      const upstreamStmt = this.statementManager?.prepare('hoverUpstreamJoin', `
+        SELECT COUNT(DISTINCT rs.relationship_id) as count
+        FROM relationship_symbols rs
+        WHERE rs.symbol_id = ? AND rs.role = 'to'
+      `);
+      const upstreamCount = (upstreamStmt?.get(symbol.id) as CountRow | undefined)?.count || 0;
 
       // Build markdown content
       let content = `## ${symbol.name}\n\n`;
@@ -348,15 +371,17 @@ export class TsdocEdgeService {
       content += `- **Downstream:** ${downstreamCount} dependents\n`;
       content += `- **Upstream:** ${upstreamCount} dependencies\n`;
 
-      // Get relationship types
-      const relTypes = this.db.prepare(`
-        SELECT type, COUNT(*) as count
-        FROM unified_relationships
-        WHERE from_symbols LIKE ? OR to_symbols LIKE ?
-        GROUP BY type
+      // Get relationship types using indexed JOIN
+      const relTypesStmt = this.statementManager?.prepare('hoverRelTypesJoin', `
+        SELECT ur.type, COUNT(DISTINCT ur.id) as count
+        FROM unified_relationships ur
+        INNER JOIN relationship_symbols rs ON ur.id = rs.relationship_id
+        WHERE rs.symbol_id = ?
+        GROUP BY ur.type
         ORDER BY count DESC
         LIMIT 5
-      `).all(`%${symbol.id}%`, `%${symbol.id}%`) as RelTypeCountRow[];
+      `);
+      const relTypes = (relTypesStmt?.all(symbol.id) || []) as RelTypeCountRow[];
 
       if (relTypes.length > 0) {
         content += `\n**Relationship Types:**\n`;
@@ -374,6 +399,7 @@ export class TsdocEdgeService {
 
   /**
    * Get impact counts for a symbol (cached)
+   * Uses indexed JOIN on relationship_symbols table for O(1) lookup
    */
   private getImpactCounts(symbolId: string): { downstream: number; upstream: number } {
     // Check cache
@@ -382,20 +408,21 @@ export class TsdocEdgeService {
       return cached;
     }
 
-    const downstreamStmt = this.statementManager?.prepare('downstream', `
-      SELECT COUNT(*) as count
-      FROM unified_relationships
-      WHERE from_symbols LIKE ?
+    // Use JOIN on relationship_symbols for indexed lookup (O(1) instead of O(n) LIKE scan)
+    const downstreamStmt = this.statementManager?.prepare('downstreamJoin', `
+      SELECT COUNT(DISTINCT rs.relationship_id) as count
+      FROM relationship_symbols rs
+      WHERE rs.symbol_id = ? AND rs.role = 'from'
     `);
 
-    const upstreamStmt = this.statementManager?.prepare('upstream', `
-      SELECT COUNT(*) as count
-      FROM unified_relationships
-      WHERE to_symbols LIKE ?
+    const upstreamStmt = this.statementManager?.prepare('upstreamJoin', `
+      SELECT COUNT(DISTINCT rs.relationship_id) as count
+      FROM relationship_symbols rs
+      WHERE rs.symbol_id = ? AND rs.role = 'to'
     `);
 
-    const downstream = (downstreamStmt?.get(`%${symbolId}%`) as CountRow | undefined)?.count || 0;
-    const upstream = (upstreamStmt?.get(`%${symbolId}%`) as CountRow | undefined)?.count || 0;
+    const downstream = (downstreamStmt?.get(symbolId) as CountRow | undefined)?.count || 0;
+    const upstream = (upstreamStmt?.get(symbolId) as CountRow | undefined)?.count || 0;
 
     const result = { downstream, upstream };
 
@@ -407,6 +434,7 @@ export class TsdocEdgeService {
 
   /**
    * Get code lenses for a file
+   * Optimized with batch impact count query
    *
    * @param filePath - File path
    * @returns Array of code lens info
@@ -434,15 +462,25 @@ export class TsdocEdgeService {
       `);
 
       const symbols = (symbolsStmt?.all(`%${fileName}`) || []) as SymbolRow[];
+
+      if (symbols.length === 0) {
+        this.cacheManager.set(CACHE_NAMES.CODE_LENS, fileName, []);
+        return [];
+      }
+
+      // Batch query for all impact counts at once
+      const symbolIds = symbols.map(s => s.id);
+      const impactCounts = this.getBatchImpactCounts(symbolIds);
+
       const codeLenses: CodeLensInfo[] = [];
 
       for (const symbol of symbols) {
-        const { downstream, upstream } = this.getImpactCounts(symbol.id);
+        const counts = impactCounts.get(symbol.id) || { downstream: 0, upstream: 0 };
 
-        if (downstream > 0 || upstream > 0) {
+        if (counts.downstream > 0 || counts.upstream > 0) {
           codeLenses.push({
             line: symbol.line,
-            title: `↓${downstream} ↑${upstream}`,
+            title: `↓${counts.downstream} ↑${counts.upstream}`,
             symbolId: symbol.id,
           });
         }
@@ -459,6 +497,81 @@ export class TsdocEdgeService {
   }
 
   /**
+   * Get impact counts for multiple symbols in a single query
+   * Uses batch query on relationship_symbols join table
+   *
+   * @param symbolIds - Array of symbol IDs
+   * @returns Map of symbolId -> { downstream, upstream }
+   */
+  private getBatchImpactCounts(symbolIds: string[]): Map<string, { downstream: number; upstream: number }> {
+    const results = new Map<string, { downstream: number; upstream: number }>();
+    if (!this.db || symbolIds.length === 0) return results;
+
+    // Initialize all symbols with zero counts
+    for (const id of symbolIds) {
+      results.set(id, { downstream: 0, upstream: 0 });
+    }
+
+    try {
+      // Check cache first
+      const uncachedIds: string[] = [];
+      for (const id of symbolIds) {
+        const cached = this.cacheManager.get<{ downstream: number; upstream: number }>(CACHE_NAMES.IMPACT, id);
+        if (cached) {
+          results.set(id, cached);
+        } else {
+          uncachedIds.push(id);
+        }
+      }
+
+      if (uncachedIds.length === 0) return results;
+
+      // Batch query for downstream counts
+      const placeholders = uncachedIds.map(() => '?').join(',');
+      const downstreamStmt = this.db.prepare(`
+        SELECT symbol_id, COUNT(DISTINCT relationship_id) as count
+        FROM relationship_symbols
+        WHERE symbol_id IN (${placeholders}) AND role = 'from'
+        GROUP BY symbol_id
+      `);
+      const downstreamRows = downstreamStmt.all(...uncachedIds) as Array<{ symbol_id: string; count: number }>;
+
+      // Batch query for upstream counts
+      const upstreamStmt = this.db.prepare(`
+        SELECT symbol_id, COUNT(DISTINCT relationship_id) as count
+        FROM relationship_symbols
+        WHERE symbol_id IN (${placeholders}) AND role = 'to'
+        GROUP BY symbol_id
+      `);
+      const upstreamRows = upstreamStmt.all(...uncachedIds) as Array<{ symbol_id: string; count: number }>;
+
+      // Build result map
+      for (const row of downstreamRows) {
+        const existing = results.get(row.symbol_id) || { downstream: 0, upstream: 0 };
+        existing.downstream = row.count;
+        results.set(row.symbol_id, existing);
+      }
+
+      for (const row of upstreamRows) {
+        const existing = results.get(row.symbol_id) || { downstream: 0, upstream: 0 };
+        existing.upstream = row.count;
+        results.set(row.symbol_id, existing);
+      }
+
+      // Cache the results
+      for (const id of uncachedIds) {
+        const counts = results.get(id) || { downstream: 0, upstream: 0 };
+        this.cacheManager.set(CACHE_NAMES.IMPACT, id, counts);
+      }
+
+      return results;
+    } catch (error) {
+      console.error(`getBatchImpactCounts error: ${error}`);
+      return results;
+    }
+  }
+
+  /**
    * Search symbols in workspace
    *
    * @param query - Search query
@@ -468,15 +581,17 @@ export class TsdocEdgeService {
     if (!this.db) return [];
 
     try {
-      const symbols = this.db.prepare(`
+      const stmt = this.statementManager?.prepare('searchSymbols', `
         SELECT id, name, type, file_path, line
         FROM symbols
         WHERE name LIKE ?
         ORDER BY name
         LIMIT 50
-      `).all(`%${query}%`);
+      `);
 
-      return (symbols as SymbolRow[]).map((sym) => ({
+      const symbols = (stmt?.all(`%${query}%`) || []) as SymbolRow[];
+
+      return symbols.map((sym) => ({
         name: sym.name,
         kind: this.mapTypeToKind(sym.type),
         filePath: sym.file_path,
@@ -546,11 +661,11 @@ export class TsdocEdgeService {
         });
       }
 
-      // Check for high-impact symbols (warning for symbols with many dependents)
-      const highImpactStmt = this.statementManager?.prepare('highImpact', `
-        SELECT s.id, s.name, s.line, COUNT(r.id) as count
+      // Check for high-impact symbols using indexed JOIN (O(1) instead of O(n) LIKE scan)
+      const highImpactStmt = this.statementManager?.prepare('highImpactJoin', `
+        SELECT s.id, s.name, s.line, COUNT(DISTINCT rs.relationship_id) as count
         FROM symbols s
-        JOIN unified_relationships r ON r.from_symbols LIKE '%' || s.id || '%'
+        INNER JOIN relationship_symbols rs ON rs.symbol_id = s.id AND rs.role = 'from'
         WHERE s.file_path LIKE ?
         GROUP BY s.id
         HAVING count > 10
@@ -610,14 +725,16 @@ export class TsdocEdgeService {
       const normalizedPath = filePath.replace(/\\/g, '/');
       const fileName = path.basename(normalizedPath);
 
-      const symbol = this.db.prepare(`
+      const stmt = this.statementManager?.prepare('symbolAtPosition', `
         SELECT id, name, type
         FROM symbols
         WHERE file_path LIKE ?
           AND line <= ?
         ORDER BY line DESC
         LIMIT 1
-      `).get(`%${fileName}`, line) as { id: string; name: string; type: string } | undefined;
+      `);
+
+      const symbol = stmt?.get(`%${fileName}`, line) as { id: string; name: string; type: string } | undefined;
 
       return symbol || null;
     } catch (error) {
@@ -628,6 +745,7 @@ export class TsdocEdgeService {
 
   /**
    * Get impact analysis for a symbol
+   * Uses relationship_symbols JOIN for O(1) lookup instead of LIKE
    *
    * @param symbolId - Symbol ID
    * @param maxDepth - Maximum depth to traverse (default: 3)
@@ -646,11 +764,12 @@ export class TsdocEdgeService {
       const queue: Array<{ id: string; depth: number }> = [{ id: symbolId, depth: 0 }];
       visited.add(symbolId);
 
-      // Use prepared statement for BFS queries
-      const relationshipStmt = this.statementManager?.prepare('impactRelationships', `
-        SELECT to_symbols
-        FROM unified_relationships
-        WHERE from_symbols LIKE ?
+      // Use JOIN on relationship_symbols for BFS (no JSON.parse needed)
+      const downstreamStmt = this.statementManager?.prepare('impactDownstreamJoin', `
+        SELECT DISTINCT rs2.symbol_id
+        FROM relationship_symbols rs1
+        INNER JOIN relationship_symbols rs2 ON rs2.relationship_id = rs1.relationship_id AND rs2.role = 'to'
+        WHERE rs1.symbol_id = ? AND rs1.role = 'from'
       `);
 
       // BFS with size limit to prevent memory issues
@@ -660,20 +779,13 @@ export class TsdocEdgeService {
         const current = queue.shift()!;
         if (current.depth >= maxDepth) continue;
 
-        // Find downstream dependencies
-        const relationships = relationshipStmt?.all(`%${current.id}%`) as Array<{ to_symbols: string }> || [];
+        // Find downstream dependencies using indexed lookup
+        const toSymbols = (downstreamStmt?.all(current.id) || []) as Array<{ symbol_id: string }>;
 
-        for (const rel of relationships) {
-          try {
-            const toSymbols = JSON.parse(rel.to_symbols);
-            for (const toSym of toSymbols) {
-              if (!visited.has(toSym) && visited.size <= maxSymbols) {
-                visited.add(toSym);
-                queue.push({ id: toSym, depth: current.depth + 1 });
-              }
-            }
-          } catch {
-            // Skip malformed JSON
+        for (const row of toSymbols) {
+          if (!visited.has(row.symbol_id) && visited.size <= maxSymbols) {
+            visited.add(row.symbol_id);
+            queue.push({ id: row.symbol_id, depth: current.depth + 1 });
           }
         }
       }
@@ -681,13 +793,14 @@ export class TsdocEdgeService {
       // Remove the starting symbol from count
       visited.delete(symbolId);
 
-      // Get upstream count using prepared statement
-      const upstreamStmt = this.statementManager?.prepare('impactUpstream', `
-        SELECT COUNT(DISTINCT from_symbols) as count
-        FROM unified_relationships
-        WHERE to_symbols LIKE ?
+      // Get upstream count using indexed lookup
+      const upstreamStmt = this.statementManager?.prepare('impactUpstreamJoin', `
+        SELECT COUNT(DISTINCT rs2.symbol_id) as count
+        FROM relationship_symbols rs1
+        INNER JOIN relationship_symbols rs2 ON rs2.relationship_id = rs1.relationship_id AND rs2.role = 'from'
+        WHERE rs1.symbol_id = ? AND rs1.role = 'to'
       `);
-      const upstreamCount = upstreamStmt?.get(`%${symbolId}%`) as { count: number } | undefined;
+      const upstreamCount = upstreamStmt?.get(symbolId) as { count: number } | undefined;
 
       // Only convert to array if requested to save memory
       const symbolArray = includeSymbols ? Array.from(visited) : [];
@@ -714,48 +827,30 @@ export class TsdocEdgeService {
     if (!this.db) return [];
 
     try {
-      const related: Array<{ id: string; name: string; type: string; relationshipType: string }> = [];
-
-      // Get directly related symbols
-      const relationships = this.db.prepare(`
-        SELECT from_symbols, to_symbols, type as rel_type
-        FROM unified_relationships
-        WHERE from_symbols LIKE ? OR to_symbols LIKE ?
+      // Use JOIN on relationship_symbols for efficient lookup (no JSON.parse needed)
+      const relatedStmt = this.statementManager?.prepare('relatedSymbolsJoin', `
+        SELECT DISTINCT s.id, s.name, s.type, ur.type as rel_type
+        FROM relationship_symbols rs1
+        INNER JOIN unified_relationships ur ON ur.id = rs1.relationship_id
+        INNER JOIN relationship_symbols rs2 ON rs2.relationship_id = rs1.relationship_id AND rs2.symbol_id != ?
+        INNER JOIN symbols s ON s.id = rs2.symbol_id
+        WHERE rs1.symbol_id = ?
         LIMIT ?
-      `).all(`%${symbolId}%`, `%${symbolId}%`, limit * 2) as Array<{ from_symbols: string; to_symbols: string; rel_type: string }>;
+      `);
 
-      const relatedIds = new Set<string>();
+      const rows = (relatedStmt?.all(symbolId, symbolId, limit) || []) as Array<{
+        id: string;
+        name: string;
+        type: string;
+        rel_type: string;
+      }>;
 
-      for (const rel of relationships) {
-        const fromSymbols = JSON.parse(rel.from_symbols);
-        const toSymbols = JSON.parse(rel.to_symbols);
-
-        for (const symId of [...fromSymbols, ...toSymbols]) {
-          if (symId !== symbolId && !relatedIds.has(symId)) {
-            relatedIds.add(symId);
-
-            // Get symbol details
-            const symbol = this.db.prepare(`
-              SELECT id, name, type FROM symbols WHERE id = ?
-            `).get(symId) as { id: string; name: string; type: string } | undefined;
-
-            if (symbol) {
-              related.push({
-                id: symbol.id,
-                name: symbol.name,
-                type: symbol.type,
-                relationshipType: rel.rel_type,
-              });
-
-              if (related.length >= limit) break;
-            }
-          }
-        }
-
-        if (related.length >= limit) break;
-      }
-
-      return related;
+      return rows.map(row => ({
+        id: row.id,
+        name: row.name,
+        type: row.type,
+        relationshipType: row.rel_type,
+      }));
     } catch (error) {
       console.error(`getRelatedSymbols error: ${error}`);
       return [];
@@ -763,7 +858,7 @@ export class TsdocEdgeService {
   }
 
   /**
-   * Find symbol by name
+   * Find symbol by name (with caching)
    *
    * @param name - Symbol name to search
    * @returns Symbol location or null
@@ -771,51 +866,133 @@ export class TsdocEdgeService {
   findSymbolByName(name: string): { id: string; name: string; type: string; filePath: string; line: number } | null {
     if (!this.db) return null;
 
+    // Check cache first
+    const cached = this.cacheManager.get<{ id: string; name: string; type: string; filePath: string; line: number } | null>(CACHE_NAMES.SYMBOL, `name:${name}`);
+    if (cached !== undefined) {
+      return cached;
+    }
+
     /** Database result for symbol lookup */
     type SymbolLocation = { id: string; name: string; type: string; file_path: string; line: number | null };
 
     try {
       // First try exact match
-      let symbol = this.db.prepare(`
+      const exactStmt = this.statementManager?.prepare('findSymbolExact', `
         SELECT id, name, type, file_path, line
         FROM symbols
         WHERE name = ?
         LIMIT 1
-      `).get(name) as SymbolLocation | undefined;
+      `);
+      let symbol = exactStmt?.get(name) as SymbolLocation | undefined;
 
       // If not found, try case-insensitive match
       if (!symbol) {
-        symbol = this.db.prepare(`
+        const caseInsensitiveStmt = this.statementManager?.prepare('findSymbolCaseInsensitive', `
           SELECT id, name, type, file_path, line
           FROM symbols
           WHERE LOWER(name) = LOWER(?)
           LIMIT 1
-        `).get(name) as SymbolLocation | undefined;
+        `);
+        symbol = caseInsensitiveStmt?.get(name) as SymbolLocation | undefined;
       }
 
       // If still not found, try partial match
       if (!symbol) {
-        symbol = this.db.prepare(`
+        const partialStmt = this.statementManager?.prepare('findSymbolPartial', `
           SELECT id, name, type, file_path, line
           FROM symbols
           WHERE name LIKE ?
           ORDER BY LENGTH(name)
           LIMIT 1
-        `).get(`%${name}%`) as SymbolLocation | undefined;
+        `);
+        symbol = partialStmt?.get(`%${name}%`) as SymbolLocation | undefined;
       }
 
-      if (!symbol) return null;
-
-      return {
+      const result = symbol ? {
         id: symbol.id,
         name: symbol.name,
         type: symbol.type,
         filePath: symbol.file_path,
         line: symbol.line || 1,
-      };
+      } : null;
+
+      // Cache the result (including null for not found)
+      this.cacheManager.set(CACHE_NAMES.SYMBOL, `name:${name}`, result);
+
+      return result;
     } catch (error) {
       console.error(`findSymbolByName error: ${error}`);
       return null;
+    }
+  }
+
+  /**
+   * Batch find symbols by names (optimized for document links)
+   * Uses IN clause for efficient batch lookup
+   *
+   * @param names - Array of symbol names to search
+   * @returns Map of name -> symbol location
+   */
+  findSymbolsByNames(names: string[]): Map<string, { id: string; name: string; type: string; filePath: string; line: number }> {
+    const results = new Map<string, { id: string; name: string; type: string; filePath: string; line: number }>();
+    if (!this.db || names.length === 0) return results;
+
+    /** Database result for symbol lookup */
+    type SymbolLocation = { id: string; name: string; type: string; file_path: string; line: number | null };
+
+    try {
+      // Check cache first for each name
+      const uncachedNames: string[] = [];
+      for (const name of names) {
+        const cached = this.cacheManager.get<{ id: string; name: string; type: string; filePath: string; line: number } | null>(CACHE_NAMES.SYMBOL, `name:${name}`);
+        if (cached !== undefined) {
+          if (cached !== null) {
+            results.set(name, cached);
+          }
+        } else {
+          uncachedNames.push(name);
+        }
+      }
+
+      if (uncachedNames.length === 0) return results;
+
+      // Batch query for uncached names using IN clause
+      const placeholders = uncachedNames.map(() => '?').join(',');
+      const batchStmt = this.db.prepare(`
+        SELECT id, name, type, file_path, line
+        FROM symbols
+        WHERE name IN (${placeholders})
+      `);
+
+      const symbols = batchStmt.all(...uncachedNames) as SymbolLocation[];
+
+      // Build lookup map from results
+      const foundNames = new Set<string>();
+      for (const symbol of symbols) {
+        const result = {
+          id: symbol.id,
+          name: symbol.name,
+          type: symbol.type,
+          filePath: symbol.file_path,
+          line: symbol.line || 1,
+        };
+        results.set(symbol.name, result);
+        foundNames.add(symbol.name);
+        // Cache the result
+        this.cacheManager.set(CACHE_NAMES.SYMBOL, `name:${symbol.name}`, result);
+      }
+
+      // Cache null for not found names
+      for (const name of uncachedNames) {
+        if (!foundNames.has(name)) {
+          this.cacheManager.set(CACHE_NAMES.SYMBOL, `name:${name}`, null);
+        }
+      }
+
+      return results;
+    } catch (error) {
+      console.error(`findSymbolsByNames error: ${error}`);
+      return results;
     }
   }
 

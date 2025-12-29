@@ -231,6 +231,7 @@ Examples:
 
   /**
    * Build directed graph from relationships
+   * Uses getRelationshipEdges for efficient edge retrieval (avoids JSON.parse)
    */
   private buildGraph(
     dbManager: DatabaseManager,
@@ -240,12 +241,6 @@ Examples:
     incoming: Map<string, Set<string>>;
     symbolNames: Map<string, string>;
   } {
-    // Use Drizzle ORM methods
-    const allRelationships = dbManager.getAllUnifiedRelationshipRows();
-    const relationships = category
-      ? allRelationships.filter(r => r.category === category)
-      : allRelationships;
-
     const outgoing = new Map<string, Set<string>>();
     const incoming = new Map<string, Set<string>>();
     const symbolNames = new Map<string, string>();
@@ -258,23 +253,17 @@ Examples:
       incoming.set(symbol.id, new Set());
     }
 
-    // Build adjacency lists
-    for (const rel of relationships) {
-      const fromSymbols = JSON.parse(rel.from_symbols);
-      const toSymbols = JSON.parse(rel.to_symbols);
+    // Get edges directly from join table (no JSON.parse needed)
+    const edges = dbManager.getRelationshipEdges(category);
 
-      for (const from of fromSymbols) {
-        for (const to of toSymbols) {
-          if (from !== to) {
-            // Directed edges
-            if (!outgoing.has(from)) outgoing.set(from, new Set());
-            if (!incoming.has(to)) incoming.set(to, new Set());
+    // Build adjacency lists from pre-computed edges
+    for (const { fromSymbolId, toSymbolId } of edges) {
+      // Handle symbols not in the known set (external dependencies)
+      if (!outgoing.has(fromSymbolId)) outgoing.set(fromSymbolId, new Set());
+      if (!incoming.has(toSymbolId)) incoming.set(toSymbolId, new Set());
 
-            outgoing.get(from)!.add(to);
-            incoming.get(to)!.add(from);
-          }
-        }
-      }
+      outgoing.get(fromSymbolId)!.add(toSymbolId);
+      incoming.get(toSymbolId)!.add(fromSymbolId);
     }
 
     return { outgoing, incoming, symbolNames };
@@ -480,14 +469,6 @@ Examples:
 
   private capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
-  }
-
-  private getOption(args: string[], flag: string): string | undefined {
-    const index = args.indexOf(flag);
-    if (index !== -1 && index + 1 < args.length) {
-      return args[index + 1];
-    }
-    return undefined;
   }
 
   private get colors() {

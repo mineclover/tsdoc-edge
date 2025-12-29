@@ -57,7 +57,7 @@ export class WhoUsesCommand extends BaseCommand {
    * @public
    */
   getDescription(): string {
-    return 'Show who uses a symbol (database)';
+    return 'Show what depends on a symbol (B ← A)';
   }
 
   /**
@@ -177,18 +177,14 @@ export class WhoUsesCommand extends BaseCommand {
             console.log(`${colors.green}✅ Used by ${dependents.length} symbol(s):${colors.reset}`);
             console.log();
 
-            // Group by file - use Drizzle ORM method
-            const allSymbolRows = dbManager.getAllSymbolRows();
-            const symbolRowMap = new Map(allSymbolRows.map(s => [s.id, s]));
+            // Batch lookup only the dependent symbols (not all symbols)
+            const dependentSymbols = dbManager.getSymbolsByIds(dependents);
 
             const byFile = new Map<string, SymbolRow[]>();
-            for (const depId of dependents) {
-              const depRow = symbolRowMap.get(depId);
-              if (depRow) {
-                const fileSymbols = byFile.get(depRow.file_path) || [];
-                fileSymbols.push(depRow);
-                byFile.set(depRow.file_path, fileSymbols);
-              }
+            for (const depRow of dependentSymbols) {
+              const fileSymbols = byFile.get(depRow.file_path) || [];
+              fileSymbols.push(depRow);
+              byFile.set(depRow.file_path, fileSymbols);
             }
 
             // Print grouped by file

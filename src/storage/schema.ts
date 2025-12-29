@@ -155,6 +155,19 @@ export const unifiedRelationships = sqliteTable('unified_relationships', {
 ]);
 
 /**
+ * Relationship symbols join table for fast O(1) lookups
+ * Replaces expensive LIKE '%symbolId%' queries with indexed JOIN
+ */
+export const relationshipSymbols = sqliteTable('relationship_symbols', {
+  relationshipId: text('relationship_id').notNull().references(() => unifiedRelationships.id, { onDelete: 'cascade' }),
+  symbolId: text('symbol_id').notNull(),
+  role: text('role').notNull(), // 'from' or 'to'
+}, (table) => [
+  index('idx_rs_symbol').on(table.symbolId),
+  index('idx_rs_symbol_role').on(table.symbolId, table.role),
+]);
+
+/**
  * Test mappings table
  */
 export const testMappings = sqliteTable('test_mappings', {
@@ -267,6 +280,9 @@ export type NewDependency = typeof dependencies.$inferInsert;
 
 export type UnifiedRelationship = typeof unifiedRelationships.$inferSelect;
 export type NewUnifiedRelationship = typeof unifiedRelationships.$inferInsert;
+
+export type RelationshipSymbol = typeof relationshipSymbols.$inferSelect;
+export type NewRelationshipSymbol = typeof relationshipSymbols.$inferInsert;
 
 export type TestMapping = typeof testMappings.$inferSelect;
 export type NewTestMapping = typeof testMappings.$inferInsert;
