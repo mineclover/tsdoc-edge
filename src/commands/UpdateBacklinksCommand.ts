@@ -44,7 +44,8 @@ export class UpdateBacklinksCommand extends BaseCommand {
     private docParser?: DocumentSymbolParser,
     private tsdocParser?: TSDocSymbolParser,
     private registry?: DocumentSymbolRegistry,
-    private generator?: BacklinkGenerator
+    private generator?: BacklinkGenerator,
+    private showDeprecationWarning = false
   ) {
     super();
   }
@@ -87,6 +88,11 @@ export class UpdateBacklinksCommand extends BaseCommand {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
+      }
+
+      // Deprecation warning (only when called directly as legacy command)
+      if (this.showDeprecationWarning) {
+        this.printDeprecationWarning('tsdoc-edge docs backlinks');
       }
 
       const target = args[0];

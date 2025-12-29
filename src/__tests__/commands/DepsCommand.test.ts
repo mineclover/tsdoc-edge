@@ -17,7 +17,7 @@ describe('DepsCommand', () => {
     });
 
     it('should return command description', () => {
-      expect(command.getDescription()).toContain('dependencies');
+      expect(command.getDescription()).toContain('depends on');
     });
   });
 

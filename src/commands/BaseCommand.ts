@@ -161,6 +161,18 @@ export abstract class BaseCommand {
   }
 
   /**
+   * Print deprecation warning for legacy commands
+   *
+   * @param alternativeCommand - The recommended alternative command
+   * @returns void
+   */
+  protected printDeprecationWarning(alternativeCommand: string): void {
+    console.log(`${colors.yellow}⚠ Deprecation Notice:${colors.reset} This command will be removed in a future version.`);
+    console.log(`  ${colors.dim}Use instead:${colors.reset} ${colors.cyan}${alternativeCommand}${colors.reset}`);
+    console.log('');
+  }
+
+  /**
    * Create success result
    *
    * @param message - Optional success message
@@ -223,6 +235,171 @@ export abstract class BaseCommand {
     return args.includes('--help') || args.includes('-h');
   }
 
+  // ============================================================================
+  // Option Parsing Utilities
+  // ============================================================================
+
+  /**
+   * Get option value from arguments
+   * Supports both --flag value and --flag=value formats
+   *
+   * @param args - Command arguments
+   * @param flag - Flag name (e.g., '--format')
+   * @returns Option value or undefined
+   *
+   * @example
+   * // Both formats work:
+   * getOption(['--format', 'json'], '--format') // 'json'
+   * getOption(['--format=json'], '--format')    // 'json'
+   */
+  protected getOption(args: string[], flag: string): string | undefined {
+    // Try --flag value format
+    const index = args.indexOf(flag);
+    if (index !== -1 && index + 1 < args.length && !args[index + 1].startsWith('-')) {
+      return args[index + 1];
+    }
+
+    // Try --flag=value format
+    const equalMatch = args.find(arg => arg.startsWith(`${flag}=`));
+    if (equalMatch) {
+      return equalMatch.slice(flag.length + 1);
+    }
+
+    return undefined;
+  }
+
+  /**
+   * Get option value with default fallback
+   *
+   * @param args - Command arguments
+   * @param flag - Flag name
+   * @param defaultValue - Default value if not specified
+   * @returns Option value or default
+   */
+  protected getOptionWithDefault(args: string[], flag: string, defaultValue: string): string {
+    return this.getOption(args, flag) ?? defaultValue;
+  }
+
+  /**
+   * Check if a boolean flag is present
+   *
+   * @param args - Command arguments
+   * @param flags - Flag(s) to check (e.g., '--verbose' or ['--verbose', '-v'])
+   * @returns True if any of the flags is present
+   */
+  protected hasFlag(args: string[], flags: string | string[]): boolean {
+    const flagList = Array.isArray(flags) ? flags : [flags];
+    return flagList.some(flag => args.includes(flag));
+  }
+
+  /**
+   * Get numeric option value
+   *
+   * @param args - Command arguments
+   * @param flag - Flag name
+   * @param defaultValue - Default value if not specified or invalid
+   * @returns Numeric value or default
+   */
+  protected getNumericOption(args: string[], flag: string, defaultValue: number): number {
+    const value = this.getOption(args, flag);
+    if (value === undefined) return defaultValue;
+    const num = parseInt(value, 10);
+    return isNaN(num) ? defaultValue : num;
+  }
+
+  /**
+   * Get all positional arguments (non-flag arguments)
+   *
+   * @param args - Command arguments
+   * @returns Array of positional arguments
+   */
+  protected getPositionalArgs(args: string[]): string[] {
+    const result: string[] = [];
+    let i = 0;
+    while (i < args.length) {
+      const arg = args[i];
+      if (arg.startsWith('-')) {
+        // Skip flag and its value if it has one
+        if (!arg.includes('=') && i + 1 < args.length && !args[i + 1].startsWith('-')) {
+          i += 2;
+        } else {
+          i++;
+        }
+      } else {
+        result.push(arg);
+        i++;
+      }
+    }
+    return result;
+  }
+
+  // ============================================================================
+  // Usage Error Helpers
+  // ============================================================================
+
+  /**
+   * Print usage error with consistent formatting
+   * Shows error message, usage, examples, and tips
+   *
+   * @param message - Error message
+   * @param options - Additional options for error display
+   */
+  protected printUsageError(
+    message: string,
+    options: {
+      examples?: string[];
+      tip?: string;
+      validValues?: string[];
+    } = {}
+  ): void {
+    this.printError(message);
+    console.log();
+    console.log(`${colors.bold}Usage:${colors.reset}`);
+    console.log(`  ${this.getUsage()}`);
+    console.log();
+
+    if (options.validValues && options.validValues.length > 0) {
+      console.log(`${colors.bold}Valid values:${colors.reset}`);
+      console.log(`  ${options.validValues.join(', ')}`);
+      console.log();
+    }
+
+    if (options.examples && options.examples.length > 0) {
+      console.log(`${colors.bold}Examples:${colors.reset}`);
+      for (const ex of options.examples) {
+        console.log(`  ${colors.dim}${ex}${colors.reset}`);
+      }
+      console.log();
+    }
+
+    if (options.tip) {
+      console.log(`${colors.cyan}Tip:${colors.reset} ${options.tip}`);
+      console.log();
+    }
+  }
+
+  /**
+   * Validate option value against allowed values
+   *
+   * @param value - Value to validate
+   * @param allowedValues - Array of allowed values
+   * @param optionName - Name of the option for error message
+   * @returns CommandResult if invalid, null if valid
+   */
+  protected validateOptionValue(
+    value: string | undefined,
+    allowedValues: string[],
+    optionName: string
+  ): CommandResult | null {
+    if (value !== undefined && !allowedValues.includes(value)) {
+      this.printUsageError(`Invalid value '${value}' for ${optionName}`, {
+        validValues: allowedValues,
+      });
+      return this.failure(`Invalid ${optionName}: ${value}`);
+    }
+    return null;
+  }
+
   /**
    * Get command usage information
    * Override this method to provide custom usage info
@@ -245,15 +422,15 @@ export abstract class BaseCommand {
 
     console.log(colors.bold + 'Description:' + colors.reset);
     console.log(`  ${this.getDescription()}`);
-    console.log();
+    console.log('');
 
     console.log(colors.bold + 'Usage:' + colors.reset);
     console.log(`  ${this.getUsage()}`);
-    console.log();
+    console.log('');
 
     console.log(colors.bold + 'Options:' + colors.reset);
     console.log(`  ${colors.cyan}--help, -h${colors.reset}     Show this help message`);
-    console.log();
+    console.log('');
 
     return this.success();
   }

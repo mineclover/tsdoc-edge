@@ -41,7 +41,8 @@ import { ConfigManager } from '../config/ConfigManager';
 export class ValidateDocsCommand extends BaseCommand {
   constructor(
     private parser?: DocumentSymbolParser,
-    private registry?: DocumentSymbolRegistry
+    private registry?: DocumentSymbolRegistry,
+    private showDeprecationWarning = false
   ) {
     super();
   }
@@ -84,6 +85,11 @@ export class ValidateDocsCommand extends BaseCommand {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
+      }
+
+      // Deprecation warning (only when called directly as legacy command)
+      if (this.showDeprecationWarning) {
+        this.printDeprecationWarning('tsdoc-edge validate docs');
       }
 
       const docsDir = args[0] || 'docs';

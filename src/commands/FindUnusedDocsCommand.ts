@@ -38,10 +38,12 @@ import { UnusedDocumentDetector } from '../spec/UnusedDocumentDetector';
  */
 export class FindUnusedDocsCommand extends BaseCommand {
   private detector?: UnusedDocumentDetector;
+  private showDeprecationWarning: boolean;
 
-  constructor(detector?: UnusedDocumentDetector) {
+  constructor(detector?: UnusedDocumentDetector, showDeprecationWarning = false) {
     super();
     this.detector = detector;
+    this.showDeprecationWarning = showDeprecationWarning;
   }
 
   /**
@@ -82,6 +84,11 @@ export class FindUnusedDocsCommand extends BaseCommand {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
+      }
+
+      // Deprecation warning (only when called directly as legacy command)
+      if (this.showDeprecationWarning) {
+        this.printDeprecationWarning('tsdoc-edge docs unused');
       }
 
       const target = args[0];

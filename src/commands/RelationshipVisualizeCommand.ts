@@ -442,18 +442,4 @@ Examples:
     return name.replace(/"/g, '\\"');
   }
 
-  /**
-   * Get option value
-   */
-  private getOption(args: string[], flag: string): string | undefined {
-    const index = args.findIndex(arg => arg.startsWith(flag));
-    if (index === -1) return undefined;
-
-    const arg = args[index];
-    if (arg.includes('=')) {
-      return arg.split('=')[1];
-    }
-
-    return args[index + 1];
-  }
 }

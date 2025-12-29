@@ -61,11 +61,6 @@ import { SpecCommand } from './commands/SpecCommand';
 import { TaskCommand } from './commands/TaskCommand';
 import { OntologyCommand } from './commands/OntologyCommand';
 import { DocsCommand } from './commands/DocsCommand';
-// Backward compatibility imports for frequently used standalone commands
-import { ValidateDocsCommand } from './commands/ValidateDocsCommand';
-import { IndexDocsCommand } from './commands/IndexDocsCommand';
-import { FindUnusedDocsCommand } from './commands/FindUnusedDocsCommand';
-import { UpdateBacklinksCommand } from './commands/UpdateBacklinksCommand';
 import { CheckLinksCommand } from './commands/CheckLinksCommand';
 import { DepsCommand } from './commands/DepsCommand';
 import { WhoUsesCommand } from './commands/WhoUsesCommand';
@@ -200,12 +195,7 @@ async function main(): Promise<void> {
   registry.register(new InstallHookCommand());
   registry.register(new UninstallHookCommand());
 
-  // Backward compatibility - frequently used standalone commands
-  // These are also available as subcommands (e.g., docs validate, symbol deps)
-  registry.register(new ValidateDocsCommand());
-  registry.register(new IndexDocsCommand());
-  registry.register(new FindUnusedDocsCommand());
-  registry.register(new UpdateBacklinksCommand());
+  // Standalone utility commands
   registry.register(new CheckLinksCommand());
   registry.register(new DepsCommand());
   registry.register(new WhoUsesCommand());

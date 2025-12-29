@@ -104,7 +104,7 @@ describe('Phase 5 Commands', () => {
     it('should have correct name and description', () => {
       const command = new DepsCommand();
       expect(command.getName()).toBe('deps');
-      expect(command.getDescription()).toContain('dependencies');
+      expect(command.getDescription()).toContain('depends on');
     });
   });
 
@@ -112,7 +112,7 @@ describe('Phase 5 Commands', () => {
     it('should have correct name and description', () => {
       const command = new WhoUsesCommand();
       expect(command.getName()).toBe('who-uses');
-      expect(command.getDescription()).toContain('uses');
+      expect(command.getDescription()).toContain('depends on');
     });
   });
 

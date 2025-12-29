@@ -17,7 +17,7 @@ describe('WhoUsesCommand', () => {
     });
 
     it('should return command description', () => {
-      expect(command.getDescription()).toContain('uses');
+      expect(command.getDescription()).toContain('depends on');
     });
   });
 

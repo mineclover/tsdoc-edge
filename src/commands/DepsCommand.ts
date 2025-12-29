@@ -60,7 +60,7 @@ export class DepsCommand extends BaseCommand {
    * @public
    */
   getDescription(): string {
-    return 'Show dependencies of a symbol';
+    return 'Show what a symbol depends on (A → B)';
   }
 
   /**

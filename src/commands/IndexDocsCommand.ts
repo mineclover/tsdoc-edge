@@ -42,7 +42,8 @@ export class IndexDocsCommand extends BaseCommand {
   constructor(
     private docParser?: DocumentSymbolParser,
     private tsdocParser?: TSDocSymbolParser,
-    private registry?: DocumentSymbolRegistry
+    private registry?: DocumentSymbolRegistry,
+    private showDeprecationWarning = false
   ) {
     super();
   }
@@ -90,6 +91,11 @@ export class IndexDocsCommand extends BaseCommand {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
+      }
+
+      // Deprecation warning (only when called directly as legacy command)
+      if (this.showDeprecationWarning) {
+        this.printDeprecationWarning('tsdoc-edge docs index');
       }
 
       // Parse options
