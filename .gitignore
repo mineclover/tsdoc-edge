@@ -42,6 +42,10 @@ docs/generated/
 .tsdoc/doc-symbols.json
 .tsdoc/data/
 
+# Database files
+*.db
+.tsdoc.db
+
 # Temporary files
 tmp/
 *.backup*
