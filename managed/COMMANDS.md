@@ -8,7 +8,7 @@ canonical: true
 
 # [[Commands Index]]
 
-Complete reference of all 81 TSDoc Edge CLI commands organized by category.
+Complete reference of all 55 TSDoc Edge CLI commands organized by category.
 
 ## Quick Start
 
