@@ -324,6 +324,10 @@ export class DatabaseManager {
       this.drizzleDb.insert(schema.symbols)
         .values({
           id: symbol.id,
+          uuid: symbol.uuid ?? null,
+          localPath: symbol.localPath ?? null,
+          globalPath: symbol.globalPath ?? null,
+          scope: symbol.scope ?? null,
           name: symbol.name,
           type: symbol.type,
           filePath: symbol.filePath,
@@ -347,6 +351,10 @@ export class DatabaseManager {
         .onConflictDoUpdate({
           target: schema.symbols.id,
           set: {
+            uuid: symbol.uuid ?? null,
+            localPath: symbol.localPath ?? null,
+            globalPath: symbol.globalPath ?? null,
+            scope: symbol.scope ?? null,
             name: symbol.name,
             type: symbol.type,
             filePath: symbol.filePath,
@@ -511,6 +519,10 @@ export class DatabaseManager {
 
     return {
       id: row.id,
+      uuid: row.uuid ?? undefined,
+      localPath: row.localPath ?? undefined,
+      globalPath: row.globalPath ?? undefined,
+      scope: row.scope ?? undefined,
       name: row.name,
       type: row.type as Symbol['type'],
       filePath: row.filePath,

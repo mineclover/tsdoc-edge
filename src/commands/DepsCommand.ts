@@ -233,18 +233,45 @@ export class DepsCommand extends BaseCommand {
       }
 
       // Collect dependency info
-      const deps: Array<{ name: string; type: string; file: string; line: number; relType: string }> = [];
+      const deps: Array<{
+        name: string;
+        type: string;
+        file: string;
+        line: number;
+        relType: string;
+        summary?: string;
+        signature?: string;
+        usageContext?: string;
+      }> = [];
       for (const rel of outgoing) {
         const targetIds = Array.isArray(rel.to) ? rel.to : [rel.to];
         for (const targetId of targetIds) {
           const target = dbManager.getSymbol(targetId);
           if (target) {
+            // Get extended symbol row data for signature construction
+            const targetRows = dbManager.getSymbolsByIds([targetId]);
+            const targetRow = targetRows.length > 0 ? targetRows[0] : null;
+
+            // Construct method signature if available
+            let signature: string | undefined;
+            if (targetRow && (target.type === 'function' || target.type === 'method')) {
+              const params = targetRow.parameter_types ? JSON.parse(targetRow.parameter_types) : [];
+              const paramStr = params.map((p: { name: string; type?: string }) =>
+                `${p.name}${p.type ? ': ' + p.type : ''}`
+              ).join(', ');
+              const returnType = targetRow.declared_type || 'unknown';
+              signature = `${target.name}(${paramStr}): ${returnType}`;
+            }
+
             deps.push({
               name: target.name,
               type: target.type,
               file: target.filePath,
               line: target.line,
               relType: rel.type,
+              summary: target.summary || undefined,
+              signature,
+              usageContext: rel.description || undefined,
             });
           }
         }
@@ -287,6 +314,8 @@ export class DepsCommand extends BaseCommand {
             type: symbol.type,
             file: symbol.filePath,
             line: symbol.line,
+            summary: symbol.summary || undefined,
+            exported: symbol.isExported,
           })
           .section('targets', deps.map(dep => ({
             name: dep.name,
@@ -294,6 +323,9 @@ export class DepsCommand extends BaseCommand {
             relation: dep.relType,
             file: dep.file,
             line: dep.line,
+            summary: dep.summary,
+            signature: dep.signature,
+            usageContext: dep.usageContext,
           })))
           .print();
       }

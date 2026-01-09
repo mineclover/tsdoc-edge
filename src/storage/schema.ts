@@ -9,7 +9,14 @@ import { sqliteTable, text, integer, real, index } from 'drizzle-orm/sqlite-core
  * Symbols table: Core symbol information
  */
 export const symbols = sqliteTable('symbols', {
+  // Legacy ID (kept for backwards compatibility)
   id: text('id').primaryKey(),
+  // New stable identifier system (optional for backwards compatibility)
+  uuid: text('uuid').unique(),
+  localPath: text('local_path'),
+  globalPath: text('global_path'),
+  scope: text('scope'),
+  // Core symbol info
   name: text('name').notNull(),
   type: text('type').notNull(), // function, class, interface, constant, variable, etc.
   filePath: text('file_path').notNull(),
@@ -33,6 +40,10 @@ export const symbols = sqliteTable('symbols', {
   version: text('version').notNull(),
   jsonlLine: integer('jsonl_line').notNull(),
 }, (table) => [
+  index('idx_symbols_uuid').on(table.uuid),
+  index('idx_symbols_local_path').on(table.localPath),
+  index('idx_symbols_global_path').on(table.globalPath),
+  index('idx_symbols_scope').on(table.scope),
   index('idx_symbols_name').on(table.name),
   index('idx_symbols_type').on(table.type),
   index('idx_symbols_file').on(table.filePath),

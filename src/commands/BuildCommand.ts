@@ -9,6 +9,7 @@ import * as path from 'node:path';
 import * as crypto from 'node:crypto';
 import { ConfigManager } from '../config/ConfigManager';
 import { ASTSymbolExtractor } from '../analyzer/ASTSymbolExtractor';
+import { SymbolIdentifierGenerator } from '../analyzer/SymbolIdentifierGenerator';
 import { TestSymbolParser } from '../parser/TestSymbolParser';
 import { TestCoverageAnalyzer } from '../analyzer/TestCoverageAnalyzer';
 import { NamingPatternRelationAnalyzer } from '../analyzer/NamingPatternRelationAnalyzer';
@@ -165,6 +166,7 @@ export class BuildCommand extends BaseCommand {
       const dbManager = new DatabaseManager(dbPath, jsonlPath);
       const extractor = new ASTSymbolExtractor();
       const testParser = new TestSymbolParser();
+      const idGenerator = new SymbolIdentifierGenerator(process.cwd());
 
       // Find TypeScript files
       this.printInfo('Scanning TypeScript files...');
@@ -264,16 +266,33 @@ export class BuildCommand extends BaseCommand {
 
             // Insert test symbols
             for (const testSymbol of testResult.testSymbols) {
+              // Generate stable identifiers for test symbols
+              const identifiers = idGenerator.generateIdentifiers(
+                filePath,
+                testSymbol.name,
+                testSymbol.type,
+                false, // test symbols are typically not exported
+                undefined
+              );
+
+              // Use testSymbol.id if already generated, otherwise use identifiers.legacyId
+              const id = testSymbol.id || identifiers.legacyId;
+
               // Check for ID collision
-              if (seenIds.has(testSymbol.id)) {
+              if (seenIds.has(id)) {
                 result.symbolsCollisions++;
-                result.errors.push(`ID collision: ${testSymbol.id} (${filePath} vs ${seenIds.get(testSymbol.id)})`);
+                result.errors.push(`ID collision: ${id} (${filePath} vs ${seenIds.get(id)})`);
                 continue; // Skip duplicate
               }
-              seenIds.set(testSymbol.id, filePath);
+              seenIds.set(id, filePath);
 
               const fullSymbol = {
                 ...testSymbol,
+                id,
+                uuid: identifiers.uuid,
+                localPath: identifiers.localPath,
+                globalPath: identifiers.globalPath,
+                scope: identifiers.scope,
                 tests: [],
                 designDecisions: [],
               };
@@ -320,22 +339,22 @@ export class BuildCommand extends BaseCommand {
 
             // Insert symbols
             for (const symbol of extractResult.symbols) {
-            // Generate unique ID including file base name to avoid collisions
-            const fileBase = path.basename(filePath, path.extname(filePath))
-              .toLowerCase()
-              .replace(/[^a-z0-9]+/g, '-');
-            const symbolName = symbol.name
-              .toLowerCase()
-              .replace(/[^a-z0-9]+/g, '-')
-              .replace(/^-|-$/g, '');
-            let id = `${fileBase}-${symbol.type}-${symbolName}`
-              .replace(/--+/g, '-')
-              .replace(/^-|-$/g, '');
+              // Generate stable identifiers using SymbolIdentifierGenerator
+              const identifiers = idGenerator.generateIdentifiers(
+                filePath,
+                symbol.name,
+                symbol.type,
+                symbol.isExported,
+                symbol.parentSymbol
+              );
 
-            // If ID collision within same build, add line number for uniqueness
-            if (seenIds.has(id)) {
-              id = `${id}-L${symbol.line}`;
-            }
+              // Use legacy ID for backwards compatibility and primary key
+              let id = identifiers.legacyId;
+
+              // If ID collision within same build, add line number for uniqueness
+              if (seenIds.has(id)) {
+                id = `${id}-L${symbol.line}`;
+              }
 
             // Check for ID collision (shouldn't happen after adding line number)
             if (seenIds.has(id)) {
@@ -346,8 +365,12 @@ export class BuildCommand extends BaseCommand {
             seenIds.set(id, filePath);
 
             const fullSymbol = {
-              id,
               ...symbol,
+              id,
+              uuid: identifiers.uuid,
+              localPath: identifiers.localPath,
+              globalPath: identifiers.globalPath,
+              scope: identifiers.scope,
               tests: [],
               designDecisions: [],
             };

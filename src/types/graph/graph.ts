@@ -43,9 +43,43 @@ export type SymbolType = ImplementationSymbolType | TestSymbolType;
  */
 export interface Symbol {
   /**
-   * Unique identifier for the symbol
+   * Legacy unique identifier (name-based, may change on refactor)
+   * @deprecated Use uuid for stable references
    */
   id: string;
+
+  /**
+   * Permanent unique identifier (UUID)
+   * This ID never changes, even if symbol is renamed or moved
+   * Use this for linking metadata, enrichments, and cross-references
+   * Optional for backwards compatibility during migration
+   */
+  uuid?: string;
+
+  /**
+   * Local symbol path (file-scoped identifier)
+   * Format: "path/to/file.ts::SymbolName" or "path/to/file.ts::ClassName.methodName"
+   * Changes when file is moved or symbol is renamed
+   * Optional for backwards compatibility during migration
+   */
+  localPath?: string;
+
+  /**
+   * Global symbol path (export-scoped identifier)
+   * Format: "@package/scope::SymbolName" (for exported symbols)
+   * Derived from package.json exports or module resolution
+   * Only present if symbol is exported
+   */
+  globalPath?: string;
+
+  /**
+   * Scope (package/module boundary)
+   * Format: "@package/scope" or "package/submodule"
+   * Used for uniqueness validation within scope
+   * Derived from nearest package.json or module boundary
+   * Optional for backwards compatibility during migration
+   */
+  scope?: string;
 
   /**
    * Symbol name

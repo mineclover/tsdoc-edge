@@ -7,7 +7,7 @@ import type { OutputSchema } from './types';
 import { arrayOf, groupedArrayOf } from './types';
 
 /**
- * Schema for deps command output
+ * Schema for deps command output (enhanced with semantic info)
  */
 export const DepsSchema: OutputSchema = {
   root: 'dependencies',
@@ -17,6 +17,9 @@ export const DepsSchema: OutputSchema = {
       type: 'string',
       file: 'string',
       line: 'number',
+      summary: { type: 'string', optional: true },
+      description: { type: 'string', optional: true },
+      exported: { type: 'boolean', optional: true },
     },
     targets: arrayOf('target', {
       name: 'string',
@@ -24,6 +27,9 @@ export const DepsSchema: OutputSchema = {
       relation: 'string',
       file: 'string',
       line: 'number',
+      summary: { type: 'string', optional: true },
+      signature: { type: 'string', optional: true },
+      usageContext: { type: 'string', optional: true },
     }),
   },
 };

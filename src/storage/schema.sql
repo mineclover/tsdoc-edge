@@ -5,6 +5,12 @@
 -- Symbols table: Core symbol information
 CREATE TABLE IF NOT EXISTS symbols (
     id TEXT PRIMARY KEY,
+    -- Stable identifier system (optional for backwards compatibility)
+    uuid TEXT UNIQUE,
+    local_path TEXT,
+    global_path TEXT,
+    scope TEXT,
+    -- Core symbol info
     name TEXT NOT NULL,
     type TEXT NOT NULL, -- function, class, interface, constant, variable, etc.
     file_path TEXT NOT NULL,
