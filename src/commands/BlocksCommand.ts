@@ -1,0 +1,226 @@
+/**
+ * Blocks Command - Display code blocks for a symbol
+ * @packageDocumentation
+ */
+
+import Database from 'better-sqlite3';
+import { BaseCommand, type CommandResult } from './BaseCommand';
+import { XmlBuilder } from '../output/XmlBuilder';
+import type { OutputSchema } from '../output/types';
+import { arrayOf } from '../output/types';
+
+const BlocksSchema: OutputSchema = {
+  root: 'code-blocks',
+  sections: {
+    symbol: {
+      id: 'string',
+      name: 'string',
+      type: 'string',
+      file: 'string',
+    },
+    summary: {
+      totalBlocks: 'number',
+      totalLines: 'number',
+      averageComplexity: 'number',
+      byType: 'string', // JSON
+    },
+    blocks: arrayOf('block', {
+      id: 'string',
+      type: 'string',
+      startLine: 'number',
+      endLine: 'number',
+      lines: 'number',
+      purpose: 'string',
+      complexity: 'number',
+      sideEffects: 'number',
+    }),
+  },
+};
+
+export class BlocksCommand extends BaseCommand {
+  getName(): string {
+    return 'blocks';
+  }
+
+  getAlias(): string[] {
+    return ['bl'];
+  }
+
+  getDescription(): string {
+    return 'Display code blocks for a symbol';
+  }
+
+  async execute(args: string[]): Promise<CommandResult> {
+    if (args.length === 0) {
+      return {
+        exitCode: 1,
+        message: 'Usage: blocks <symbol-id> [--type=<type>] [--human]',
+      };
+    }
+
+    const symbolId = args[0];
+    const useXml = !args.includes('--human');
+    const typeFilter = args.find(a => a.startsWith('--type='))?.split('=')[1];
+
+    const dbCheck = this.checkDatabaseExists();
+    if (dbCheck) return dbCheck;
+
+    const dbPath = this.getDatabasePath();
+    const db = new Database(dbPath, { readonly: true });
+
+    try {
+      // Get symbol info
+      const symbol = db.prepare(`
+        SELECT id, name, type, file_path as file
+        FROM symbols
+        WHERE id = ?
+      `).get(symbolId) as { id: string; name: string; type: string; file: string } | undefined;
+
+      if (!symbol) {
+        db.close();
+        return {
+          exitCode: 1,
+          message: `Symbol not found: ${symbolId}`,
+        };
+      }
+
+      // Get blocks
+      let query = `
+        SELECT
+          id, type, start_line as startLine, end_line as endLine,
+          purpose, complexity, side_effects as sideEffects
+        FROM code_blocks
+        WHERE symbol_id = ?
+      `;
+
+      const params: any[] = [symbolId];
+
+      if (typeFilter) {
+        query += ' AND type = ?';
+        params.push(typeFilter);
+      }
+
+      query += ' ORDER BY start_line';
+
+      const blocks = db.prepare(query).all(...params) as Array<{
+        id: string;
+        type: string;
+        startLine: number;
+        endLine: number;
+        purpose: string;
+        complexity: number;
+        sideEffects: string;
+      }>;
+
+      if (blocks.length === 0) {
+        db.close();
+        if (useXml) {
+          new XmlBuilder(BlocksSchema)
+            .section('symbol', symbol)
+            .section('summary', {
+              totalBlocks: 0,
+              totalLines: 0,
+              averageComplexity: 0,
+              byType: '{}',
+            })
+            .section('blocks', [])
+            .print();
+        } else {
+          console.log(`\n\x1b[33mNo blocks found for symbol: ${symbol.name}\x1b[0m`);
+          console.log('\x1b[2mBlocks are detected during build. Run `tsdoc-edge build` first.\x1b[0m\n');
+        }
+        return { exitCode: 0, message: 'No blocks found' };
+      }
+
+      // Calculate statistics
+      const totalBlocks = blocks.length;
+      const totalLines = blocks.reduce((sum, b) => sum + (b.endLine - b.startLine + 1), 0);
+      const averageComplexity = blocks.reduce((sum, b) => sum + (b.complexity || 0), 0) / totalBlocks;
+
+      const byType: Record<string, number> = {};
+      for (const block of blocks) {
+        byType[block.type] = (byType[block.type] || 0) + 1;
+      }
+
+      // Format blocks for output
+      const formattedBlocks = blocks.map(b => ({
+        id: b.id,
+        type: b.type,
+        startLine: b.startLine,
+        endLine: b.endLine,
+        lines: b.endLine - b.startLine + 1,
+        purpose: b.purpose || '',
+        complexity: b.complexity || 0,
+        sideEffects: b.sideEffects ? JSON.parse(b.sideEffects).length : 0,
+      }));
+
+      if (useXml) {
+        new XmlBuilder(BlocksSchema)
+          .section('symbol', symbol)
+          .section('summary', {
+            totalBlocks,
+            totalLines,
+            averageComplexity: Math.round(averageComplexity * 10) / 10,
+            byType: JSON.stringify(byType),
+          })
+          .section('blocks', formattedBlocks)
+          .print();
+      } else {
+        console.log('\n\x1b[1m\x1b[36mCode Blocks\x1b[0m');
+        console.log('\x1b[36m' + '='.repeat(80) + '\x1b[0m\n');
+
+        console.log('\x1b[1mSymbol:\x1b[0m');
+        console.log(`  ${symbol.type}: \x1b[1m${symbol.name}\x1b[0m`);
+        console.log(`  File: \x1b[2m${symbol.file}\x1b[0m\n`);
+
+        console.log('\x1b[1mStatistics:\x1b[0m');
+        console.log(`  Total blocks: \x1b[36m${totalBlocks}\x1b[0m`);
+        console.log(`  Total lines: \x1b[36m${totalLines}\x1b[0m`);
+        console.log(`  Average complexity: \x1b[36m${averageComplexity.toFixed(1)}\x1b[0m`);
+        console.log(`  By type: ${Object.entries(byType).map(([t, c]) => `${t}=${c}`).join(', ')}`);
+        console.log();
+
+        console.log('\x1b[1mBlocks:\x1b[0m\n');
+        for (const block of formattedBlocks) {
+          const typeColor = this.getBlockTypeColor(block.type);
+          console.log(`${typeColor}■\x1b[0m \x1b[1m${block.type.toUpperCase()}\x1b[0m (lines ${block.startLine}-${block.endLine})`);
+          console.log(`  Purpose: ${block.purpose}`);
+          console.log(`  Complexity: ${block.complexity}, Side effects: ${block.sideEffects}`);
+          console.log();
+        }
+      }
+
+      db.close();
+      return { exitCode: 0, message: `Found ${blocks.length} blocks` };
+    } catch (error) {
+      db.close();
+      return {
+        exitCode: 1,
+        message: `Error: ${error instanceof Error ? error.message : String(error)}`,
+      };
+    }
+  }
+
+  private getBlockTypeColor(type: string): string {
+    switch (type) {
+      case 'validation':
+        return '\x1b[33m'; // Yellow
+      case 'transformation':
+        return '\x1b[36m'; // Cyan
+      case 'query':
+        return '\x1b[34m'; // Blue
+      case 'mutation':
+        return '\x1b[31m'; // Red
+      case 'logging':
+        return '\x1b[90m'; // Gray
+      case 'error-handling':
+        return '\x1b[35m'; // Magenta
+      case 'http':
+        return '\x1b[32m'; // Green
+      case 'business-logic':
+        return '\x1b[1m\x1b[37m'; // Bold white
+      default:
+        return '\x1b[37m'; // White
+    }
+  }
+}
