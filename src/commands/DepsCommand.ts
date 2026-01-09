@@ -8,6 +8,8 @@ import * as path from 'node:path';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { XmlBuilder } from '../output/XmlBuilder';
+import { DepsSchema } from '../output/schemas';
 
 /**
  * Command for showing symbol dependencies
@@ -85,7 +87,13 @@ export class DepsCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const id = args[0];
+      // Parse options
+      const typeFilter = args.find(a => a.startsWith('--type='))?.split('=')[1];
+      const showAll = args.includes('--all');
+      const useHuman = args.includes('--human');
+      const filteredArgs = args.filter(a => !a.startsWith('--'));
+
+      const id = filteredArgs[0];
       if (!id) {
         console.log(`${colors.yellow}Usage:${colors.reset} tsdoc-edge deps <symbol-name>`);
         console.log();
@@ -122,8 +130,10 @@ export class DepsCommand extends BaseCommand {
 
           if (isExactMatch && isPrimaryType) {
             entry = first;
-            console.log(`${colors.dim}Selected: ${first.sourceRef.symbolName} (${first.sourceRef.type})${colors.reset}`);
-            console.log();
+            if (useHuman) {
+              console.log(`Selected: ${first.sourceRef.symbolName} (${first.sourceRef.type})`);
+              console.log();
+            }
           } else {
             console.log(`${colors.yellow}Multiple matches found:${colors.reset}`);
             for (const m of matches.slice(0, 10)) {
@@ -141,39 +151,15 @@ export class DepsCommand extends BaseCommand {
 
       if (!entry) {
         // Fall back to database search
-        return this.findDepsFromDatabase(id);
+        return this.findDepsFromDatabase(id, typeFilter, showAll, useHuman);
       }
 
-      this.printHeader(`Dependencies of ${entry.id} (${entry.sourceRef.symbolName})`);
-
-      const deps = manager.getDependencies(entry.id);
-
-      if (deps.length === 0) {
-        console.log(`${colors.yellow}No dependencies${colors.reset}`);
-        console.log();
-      } else {
-        for (const dep of deps) {
-          const target = manager.findById(dep.targetId);
-          const typeLabel = dep.type ? ` [${dep.type}]` : '';
-          console.log(
-            `${colors.bold}${dep.targetId}${colors.reset}${typeLabel} → ${target?.sourceRef.symbolName || 'unknown'}`
-          );
-          console.log(`  Reason: ${dep.reason}`);
-          if (target) {
-            console.log(`  Location: ${target.sourceRef.filePath}`);
-          }
-          console.log();
-        }
-
-        console.log(`Total: ${colors.green}${deps.length}${colors.reset} dependencies`);
-        console.log();
-      }
-
-      return this.success();
+      // Use database for all lookups
+      return this.findDepsFromDatabase(entry.id, typeFilter, showAll, useHuman);
     });
   }
 
-  private async findDepsFromDatabase(idOrName: string): Promise<CommandResult> {
+  private async findDepsFromDatabase(idOrName: string, typeFilter?: string, showAll?: boolean, useHuman?: boolean): Promise<CommandResult> {
     const dbCheck = this.checkDatabaseExists();
     if (dbCheck) {
       this.printError(`Symbol not found: ${idOrName}`);
@@ -203,10 +189,12 @@ export class DepsCommand extends BaseCommand {
 
           if (primaryMatch) {
             symbol = dbManager.getSymbol(primaryMatch.id);
-            console.log(`${colors.dim}Selected: ${primaryMatch.name} (${primaryMatch.type})${colors.reset}`);
-            console.log();
+            if (useHuman) {
+              console.log(`Selected: ${primaryMatch.name} (${primaryMatch.type})`);
+              console.log();
+            }
           } else {
-            console.log(`${colors.yellow}Multiple matches found:${colors.reset}`);
+            console.log('Multiple matches found:');
             for (const m of matches.slice(0, 10)) {
               console.log(`  ${colors.cyan}${m.id}${colors.reset} (${m.name}) [${m.type}]`);
             }
@@ -226,43 +214,88 @@ export class DepsCommand extends BaseCommand {
         return this.failure(`Symbol not found: ${idOrName}`);
       }
 
-      this.printHeader(`Dependencies of ${symbol.name} (${symbol.type})`);
-      console.log(`${colors.dim}File: ${symbol.filePath}:${symbol.line}${colors.reset}`);
-      console.log();
-
       // Get relationships from database using Drizzle ORM
-      const relationships = dbManager.queryRelationships({ symbolId: symbol.id, limit: 100 });
+      const queryOptions: { symbolId: string; limit: number; type?: string } = { symbolId: symbol.id, limit: 200 };
+      if (typeFilter) {
+        queryOptions.type = typeFilter;
+      }
+      const relationships = dbManager.queryRelationships(queryOptions);
 
       // Filter for outgoing relationships (where this symbol is the source)
-      const outgoing = relationships.filter(rel => {
+      let outgoing = relationships.filter(rel => {
         const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
         return fromSymbols.includes(symbol!.id);
       });
 
-      if (outgoing.length === 0) {
-        console.log(`${colors.yellow}No dependencies found${colors.reset}`);
-        console.log();
-      } else {
-        console.log(`${colors.bold}Dependencies:${colors.reset}`);
-        console.log();
+      // By default, only show code-dependency (unless --all or --type specified)
+      if (!showAll && !typeFilter) {
+        outgoing = outgoing.filter(rel => rel.type === 'code-dependency');
+      }
 
-        for (const rel of outgoing) {
-          const typeLabel = ` [${rel.type}]`;
-          const targetIds = Array.isArray(rel.to) ? rel.to : [rel.to];
-
-          for (const targetId of targetIds) {
-            const target = dbManager.getSymbol(targetId);
-            console.log(
-              `  ${colors.bold}→${colors.reset} ${colors.cyan}${target?.name || targetId}${colors.reset}${typeLabel}`
-            );
-            if (target) {
-              console.log(`    ${colors.dim}${target.filePath}:${target.line}${colors.reset}`);
-            }
+      // Collect dependency info
+      const deps: Array<{ name: string; type: string; file: string; line: number; relType: string }> = [];
+      for (const rel of outgoing) {
+        const targetIds = Array.isArray(rel.to) ? rel.to : [rel.to];
+        for (const targetId of targetIds) {
+          const target = dbManager.getSymbol(targetId);
+          if (target) {
+            deps.push({
+              name: target.name,
+              type: target.type,
+              file: target.filePath,
+              line: target.line,
+              relType: rel.type,
+            });
           }
         }
+      }
+
+      if (useHuman) {
+        // Human-readable format
+        this.printHeader(`Dependencies of ${symbol.name} (${symbol.type})`);
+        console.log(`File: ${symbol.filePath}:${symbol.line}`);
         console.log();
-        console.log(`Total: ${colors.green}${outgoing.length}${colors.reset} relationships`);
-        console.log();
+
+        if (deps.length === 0) {
+          console.log('No dependencies found');
+          if (!showAll && !typeFilter) {
+            console.log('Tip: Use --all to see all relationship types');
+          }
+        } else {
+          const byType = new Map<string, typeof deps>();
+          for (const dep of deps) {
+            const list = byType.get(dep.relType) || [];
+            list.push(dep);
+            byType.set(dep.relType, list);
+          }
+
+          for (const [relType, typeDeps] of byType.entries()) {
+            console.log(`${relType} (${typeDeps.length}):`);
+            for (const dep of typeDeps) {
+              console.log(`  → ${dep.name} (${dep.type})`);
+              console.log(`    ${dep.file}:${dep.line}`);
+            }
+            console.log();
+          }
+          console.log(`Total: ${deps.length} dependencies`);
+        }
+      } else {
+        // XML format (default)
+        new XmlBuilder(DepsSchema)
+          .section('source', {
+            name: symbol.name,
+            type: symbol.type,
+            file: symbol.filePath,
+            line: symbol.line,
+          })
+          .section('targets', deps.map(dep => ({
+            name: dep.name,
+            type: dep.type,
+            relation: dep.relType,
+            file: dep.file,
+            line: dep.line,
+          })))
+          .print();
       }
 
       return this.success();

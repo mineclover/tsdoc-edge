@@ -18,6 +18,7 @@ import { DatabaseManager } from '../storage/DatabaseManager';
 import { EnhancedWorkContextAnalyzer } from '../analyzer/EnhancedWorkContextAnalyzer';
 import { EntryPointContextAggregator } from '../analyzer/EntryPointContextAggregator';
 import { LLMsTextGenerator } from '../generator/LLMsTextGenerator';
+import { XMLContextGenerator } from '../generator/XMLContextGenerator';
 
 /**
  * Work Context Command
@@ -87,9 +88,10 @@ export class WorkContextCommand extends BaseCommand {
       console.log(`${colors.yellow}Usage:${colors.reset} tsdoc-edge work-context <file-path> [options]`);
       console.log();
       console.log('Options:');
-      console.log('  --llm              Generate LLM-friendly context (LLMs.txt format)');
+      console.log('  --human            Human-readable format with colors (default: XML)');
+      console.log('  --llm              LLMs.txt markdown format');
       console.log('  --output <file>    Save output to file instead of stdout');
-      console.log('  --depth <n>        Context depth for LLM mode (default: 2)');
+      console.log('  --depth <n>        Context depth (default: 2)');
       console.log('  --category <cats>  Filter by categories (comma-separated)');
       console.log('                     Available: documentation, structural, verification');
       console.log();
@@ -105,7 +107,10 @@ export class WorkContextCommand extends BaseCommand {
     }
 
     const targetFile = args[0];
+    const useHumanFormat = args.includes('--human');
     const useLlmFormat = args.includes('--llm');
+    // Default to XML format unless --human or --llm is specified
+    const useXmlFormat = !useHumanFormat && !useLlmFormat;
     const outputFile = this.getOptionValue(args, '--output');
     const depth = parseInt(this.getOptionValue(args, '--depth') || '2', 10);
     const categoryFilter = this.getOptionValue(args, '--category')?.split(',').map((c: string) => c.trim());
@@ -118,10 +123,13 @@ export class WorkContextCommand extends BaseCommand {
       return { exitCode: 1, message: 'File not found' };
     }
 
-    console.log();
-    this.printHeader(`Work Context: ${path.basename(targetFile)}`);
-    console.log(`📄 ${targetFile}`);
-    console.log();
+    // Only show header for human-readable format
+    if (!useXmlFormat) {
+      console.log();
+      this.printHeader(`Work Context: ${path.basename(targetFile)}`);
+      console.log(`📄 ${targetFile}`);
+      console.log();
+    }
 
     try {
       const dbCheck = this.checkDatabaseExists();
@@ -132,7 +140,27 @@ export class WorkContextCommand extends BaseCommand {
 
       const dbManager = new DatabaseManager(dbPath, config.paths.jsonlDir);
 
-      // Branch: LLM format vs Human-readable format
+      // Branch: XML format vs LLM format vs Human-readable format
+      if (useXmlFormat) {
+        // Use compact XML format (optimized for Claude) - no header decoration
+        const aggregator = new EntryPointContextAggregator(dbManager);
+        const context = aggregator.gatherContext(absolutePath, depth);
+
+        const generator = new XMLContextGenerator();
+        const output = generator.generate(context);
+
+        if (outputFile) {
+          const outputPath = path.resolve(process.cwd(), outputFile);
+          fs.writeFileSync(outputPath, output, 'utf-8');
+          console.log(`XML context saved to: ${outputFile}`);
+        } else {
+          console.log(output);
+        }
+
+        dbManager.close();
+        return { exitCode: 0, message: 'XML context generated' };
+      }
+
       if (useLlmFormat) {
         // Use LLM-friendly format
         const aggregator = new EntryPointContextAggregator(dbManager);

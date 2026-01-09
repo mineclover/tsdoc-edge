@@ -65,6 +65,11 @@ import { CheckLinksCommand } from './commands/CheckLinksCommand';
 import { DepsCommand } from './commands/DepsCommand';
 import { WhoUsesCommand } from './commands/WhoUsesCommand';
 import { OrphansCommand } from './commands/OrphansCommand';
+import { EndpointsCommand } from './commands/EndpointsCommand';
+import { HubsCommand } from './commands/HubsCommand';
+import { LayersCommand } from './commands/LayersCommand';
+import { CommonCommand } from './commands/CommonCommand';
+import { RoutesCommand } from './commands/RoutesCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -201,6 +206,14 @@ async function main(): Promise<void> {
   registry.register(new WhoUsesCommand());
   registry.register(new OrphansCommand());
   registry.register(new PreCommitRunCommand());
+
+  // Analysis commands
+  registry.register(new EndpointsCommand());
+  registry.register(new HubsCommand());
+  registry.register(new LayersCommand());
+  registry.register(new CommonCommand());
+  registry.register(new RoutesCommand());
+
   registry.register(new HelpCommand(registry));
 
   // Get command

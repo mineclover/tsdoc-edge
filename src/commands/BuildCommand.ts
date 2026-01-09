@@ -238,7 +238,7 @@ export class BuildCommand extends BaseCommand {
       const symbolIdMap = new Map<string, string>();
 
       // Store all relationships to insert after all symbols are collected
-      const allRelationships: Array<{ type: string; from: string; to: string; filePath: string; description?: string }> = [];
+      const allRelationships: Array<{ type: string; from: string; to: string; filePath: string; description?: string; line?: number }> = [];
 
       // Store doc relationships (symbol -> document)
       const allDocRelationships: Array<{ symbolId: string; symbolName: string; docRef: string; filePath: string; line: number }> = [];
@@ -399,6 +399,35 @@ export class BuildCommand extends BaseCommand {
       this.printInfo('Inserting relationships...');
       for (const relationship of allRelationships) {
         try {
+          // Handle re-export relationships specially
+          if (relationship.type === 're-exports') {
+            const toId = symbolIdMap.get(relationship.to);
+            if (toId) {
+              const unifiedId = `re-export-${relationship.from.replace(/[^a-z0-9]+/gi, '-')}-${toId}`.toLowerCase();
+              dbManager.insertUnifiedRelationship({
+                id: unifiedId,
+                type: 're-export',
+                category: 'structural',
+                fromSymbols: [relationship.from],
+                toSymbols: [toId],
+                direction: 'unidirectional',
+                strength: 'medium',
+                evidence: [{
+                  type: 'code',
+                  source: relationship.filePath,
+                  confidence: 1.0,
+                }],
+                discoveredBy: 'static-analysis',
+                confidence: 1.0,
+                filePath: relationship.filePath,
+                line: relationship.line,
+                description: relationship.description,
+              });
+              result.relationshipsInserted++;
+            }
+            continue;
+          }
+
           // Get symbol IDs from the map
           const fromId = symbolIdMap.get(relationship.from);
           const toId = symbolIdMap.get(relationship.to);
@@ -674,14 +703,13 @@ export class BuildCommand extends BaseCommand {
           description: rel.description,
         });
 
-        // 1. Naming Pattern Relations
-        const namingAnalyzer = new NamingPatternRelationAnalyzer(symbolGraph);
-        const namingRelations = namingAnalyzer.analyze();
-        const namingInserted = dbManager.batchInsertUnifiedRelationships(namingRelations.map(toBatchFormat));
-        semanticRelationshipsInserted += namingInserted;
-
-        const namingStats = namingAnalyzer.getStatistics(namingRelations);
-        this.printSuccess(`Naming patterns: ${namingInserted} relationships across ${namingStats.uniqueDomains} domains`);
+        // 1. Naming Pattern Relations - DISABLED (produces noise based on name similarity)
+        // const namingAnalyzer = new NamingPatternRelationAnalyzer(symbolGraph);
+        // const namingRelations = namingAnalyzer.analyze();
+        // const namingInserted = dbManager.batchInsertUnifiedRelationships(namingRelations.map(toBatchFormat));
+        // semanticRelationshipsInserted += namingInserted;
+        // const namingStats = namingAnalyzer.getStatistics(namingRelations);
+        // this.printSuccess(`Naming patterns: ${namingInserted} relationships across ${namingStats.uniqueDomains} domains`);
 
         // 2. Explicit Semantic Relations (@relatedTo tags)
         const explicitAnalyzer = new ExplicitSemanticRelationAnalyzer();

@@ -99,25 +99,66 @@ export class ASTSymbolExtractor {
    * Creates relationships from each symbol in the file to the imported symbols
    */
   private buildRelationshipsFromImports(): void {
-    // For each symbol defined in this file, create dependencies to imported symbols
-    for (const symbol of this.symbols) {
-      // Only create relationships for symbols defined at file level (not nested)
-      if (symbol.parentSymbol) continue;
+    // Relationships are now built during symbol extraction by tracking type references
+    // This method is kept for compatibility but does nothing
+    // See extractTypeReferences() called during class/interface/function extraction
+  }
 
-      for (const importInfo of this.imports) {
-        for (const importedName of importInfo.imported) {
-          if (importedName === '*') continue; // Skip wildcard exports
+  /**
+   * Collect all type references from a node and its children
+   */
+  private collectTypeReferences(node: ts.Node, importedNames: Set<string>): Set<string> {
+    const refs = new Set<string>();
 
-          // Create a relationship from this symbol to the imported symbol
-          this.relationships.push({
-            type: 'dependsOn',
-            from: symbol.name,
-            to: importedName,
-            filePath: importInfo.from,
-            description: `${symbol.name} imports ${importedName} from ${importInfo.modulePath}`,
-          });
+    const visit = (n: ts.Node) => {
+      // Type reference (e.g., Foo, Promise<Bar>)
+      if (ts.isTypeReferenceNode(n)) {
+        const typeName = n.typeName.getText();
+        const baseName = typeName.split('<')[0].split('.')[0];
+        if (importedNames.has(baseName)) {
+          refs.add(baseName);
         }
       }
+      // Identifier in expressions (e.g., new Foo(), Foo.bar)
+      if (ts.isIdentifier(n) && importedNames.has(n.text)) {
+        // Check if it's actually used as a type/value, not just a property name
+        const parent = n.parent;
+        if (parent && (
+          ts.isNewExpression(parent) ||
+          ts.isCallExpression(parent) ||
+          ts.isPropertyAccessExpression(parent) && parent.expression === n ||
+          ts.isTypeReferenceNode(parent)
+        )) {
+          refs.add(n.text);
+        }
+      }
+      ts.forEachChild(n, visit);
+    };
+
+    visit(node);
+    return refs;
+  }
+
+  /**
+   * Extract type references for a symbol and create dependencies
+   */
+  private extractTypeReferences(symbolName: string, node: ts.Node): void {
+    const importedNames = new Set<string>();
+    for (const imp of this.imports) {
+      for (const name of imp.imported) {
+        if (name !== '*') importedNames.add(name);
+      }
+    }
+
+    const refs = this.collectTypeReferences(node, importedNames);
+    for (const ref of refs) {
+      this.relationships.push({
+        type: 'dependsOn',
+        from: symbolName,
+        to: ref,
+        filePath: this.currentFilePath,
+        description: `${symbolName} uses ${ref}`,
+      });
     }
   }
 
@@ -255,18 +296,40 @@ export class ASTSymbolExtractor {
 
     const modulePath = node.moduleSpecifier.text;
     const imported: string[] = [];
+    const pos = node.getSourceFile().getLineAndCharacterOfPosition(node.getStart());
 
     if (node.exportClause) {
       if (ts.isNamedExports(node.exportClause)) {
         // export { Foo, Bar } from './foo'
         for (const element of node.exportClause.elements) {
-          imported.push(element.name.text);
+          const exportedName = element.name.text;
+          imported.push(exportedName);
+
+          // Create re-export relationship: this barrel file re-exports the symbol
+          this.relationships.push({
+            type: 're-exports',
+            from: this.currentFilePath,
+            to: exportedName,
+            filePath: this.currentFilePath,
+            line: pos.line + 1,
+            description: `${this.currentFilePath} re-exports ${exportedName} from ${modulePath}`,
+          });
         }
       }
     } else {
       // export * from './foo'
       // We can't know what's exported, so mark it as wildcard
       imported.push('*');
+
+      // Create wildcard re-export relationship
+      this.relationships.push({
+        type: 're-exports',
+        from: this.currentFilePath,
+        to: `* from ${modulePath}`,
+        filePath: this.currentFilePath,
+        line: pos.line + 1,
+        description: `${this.currentFilePath} re-exports all from ${modulePath}`,
+      });
     }
 
     this.imports.push({
@@ -314,6 +377,9 @@ export class ASTSymbolExtractor {
       }
     }
 
+    // Extract type references used within the class
+    this.extractTypeReferences(name, node);
+
     return {
       name,
       type: 'class',
@@ -351,6 +417,9 @@ export class ASTSymbolExtractor {
       }
     }
 
+    // Extract type references used within the interface
+    this.extractTypeReferences(name, node);
+
     return {
       name,
       type: 'interface',
@@ -372,6 +441,9 @@ export class ASTSymbolExtractor {
 
     // Extract function type information
     const funcTypeInfo = this.extractFunctionTypeInfo(node);
+
+    // Extract type references used within the function
+    this.extractTypeReferences(name, node);
 
     return {
       name,
@@ -461,6 +533,9 @@ export class ASTSymbolExtractor {
   private extractTypeSymbol(node: ts.TypeAliasDeclaration): ExtractedSymbol {
     const name = node.name.text;
     const pos = node.getSourceFile().getLineAndCharacterOfPosition(node.getStart());
+
+    // Extract type references used within the type alias
+    this.extractTypeReferences(name, node);
 
     return {
       name,

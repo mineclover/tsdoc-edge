@@ -5,6 +5,9 @@
 
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager, type SymbolRow } from '../storage/DatabaseManager';
+import { XmlBuilder } from '../output/XmlBuilder';
+import { WhoUsesSchema } from '../output/schemas';
+import type { GroupedSectionData } from '../output/types';
 
 /**
  * Command for showing who uses a symbol (database-driven)
@@ -82,7 +85,9 @@ export class WhoUsesCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const symbolName = args[0];
+      const useHuman = args.includes('--human');
+      const filteredArgs = args.filter(a => !a.startsWith('--'));
+      const symbolName = filteredArgs[0];
       if (!symbolName) {
         this.printError('Usage: tsdoc-edge who-uses <symbol-name>');
         console.log();
@@ -126,8 +131,10 @@ export class WhoUsesCommand extends BaseCommand {
           );
 
           if (primaryMatch) {
-            console.log(`${colors.dim}Selected: ${primaryMatch.name} (${primaryMatch.type})${colors.reset}`);
-            console.log();
+            if (useHuman) {
+              console.log(`Selected: ${primaryMatch.name} (${primaryMatch.type})`);
+              console.log();
+            }
             symbols = [primaryMatch];
           } else {
             // Show all matches and let user choose
@@ -147,62 +154,112 @@ export class WhoUsesCommand extends BaseCommand {
 
         // Analyze selected symbol(s)
         for (const symbol of symbols) {
-          this.printHeader(`Who Uses: ${symbol.name}`);
+          // Query unified_relationships for incoming relationships
+          const relationships = dbManager.queryRelationships({ symbolId: symbol.id, limit: 200 });
 
-          console.log(`${colors.cyan}Symbol Info:${colors.reset}`);
-          console.log(`  Name: ${symbol.name}`);
-          console.log(`  Type: ${symbol.type}`);
-          console.log(`  File: ${symbol.file_path}:${symbol.line}`);
-          console.log(`  Exported: ${symbol.is_exported ? '✅ Yes' : '❌ No'}`);
-          if (symbol.summary) {
-            console.log(
-              `  Summary: ${symbol.summary.substring(0, 80)}${symbol.summary.length > 80 ? '...' : ''}`
-            );
+          // Filter for incoming relationships (where this symbol is the target)
+          const incoming = relationships.filter(rel => {
+            const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
+            return toSymbols.includes(symbol.id);
+          });
+
+          // Group by relationship type
+          const byType = new Map<string, string[]>();
+          for (const rel of incoming) {
+            const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
+            for (const fromId of fromSymbols) {
+              const list = byType.get(rel.type) || [];
+              if (!list.includes(fromId)) {
+                list.push(fromId);
+              }
+              byType.set(rel.type, list);
+            }
           }
-          console.log();
 
-          const dependents = dbManager.getDependents(symbol.id);
+          // Also check legacy dependencies table
+          const legacyDependents = dbManager.getDependents(symbol.id);
+          if (legacyDependents.length > 0) {
+            const existing = byType.get('code-dependency') || [];
+            for (const dep of legacyDependents) {
+              if (!existing.includes(dep)) {
+                existing.push(dep);
+              }
+            }
+            byType.set('code-dependency', existing);
+          }
 
-          if (dependents.length === 0) {
-            console.log(`${colors.yellow}⚠️  Not used by any symbol${colors.reset}`);
+          const totalCount = Array.from(byType.values()).reduce((sum, arr) => sum + arr.length, 0);
+
+          if (useHuman) {
+            // Human-readable format
+            this.printHeader(`Who Uses: ${symbol.name}`);
+            console.log(`Name: ${symbol.name}`);
+            console.log(`Type: ${symbol.type}`);
+            console.log(`File: ${symbol.file_path}:${symbol.line}`);
+            console.log(`Exported: ${symbol.is_exported ? 'Yes' : 'No'}`);
+            if (symbol.summary) {
+              console.log(`Summary: ${symbol.summary.substring(0, 80)}${symbol.summary.length > 80 ? '...' : ''}`);
+            }
             console.log();
 
-            if (!symbol.is_exported) {
-              console.log(
-                `${colors.dim}Note: This symbol is not exported, so it can only be used within its own file.${colors.reset}`
-              );
+            if (byType.size === 0) {
+              console.log('Not used by any symbol');
+              if (!symbol.is_exported) {
+                console.log('Note: This symbol is not exported.');
+              }
+            } else {
+              console.log(`Referenced in ${totalCount} relationship(s):`);
               console.log();
+
+              for (const [type, ids] of byType.entries()) {
+                console.log(`${type} (${ids.length}):`);
+                const depSymbols = dbManager.getSymbolsByIds(ids.slice(0, 10));
+                for (const dep of depSymbols) {
+                  console.log(`  <- ${dep.name} (${dep.type}) ${dep.file_path}:${dep.line}`);
+                }
+                if (ids.length > 10) {
+                  console.log(`  ... and ${ids.length - 10} more`);
+                }
+                console.log();
+              }
             }
           } else {
-            console.log(`${colors.green}✅ Used by ${dependents.length} symbol(s):${colors.reset}`);
-            console.log();
+            // XML format (default)
+            // Build grouped dependents data
+            const dependentsData: GroupedSectionData = {};
+            for (const [type, ids] of byType.entries()) {
+              const depSymbols = dbManager.getSymbolsByIds(ids);
+              const items: Array<Record<string, unknown>> = [];
 
-            // Batch lookup only the dependent symbols (not all symbols)
-            const dependentSymbols = dbManager.getSymbolsByIds(dependents);
+              for (const dep of depSymbols) {
+                items.push({
+                  name: dep.name,
+                  type: dep.type,
+                  file: dep.file_path,
+                  line: dep.line,
+                });
+              }
 
-            const byFile = new Map<string, SymbolRow[]>();
-            for (const depRow of dependentSymbols) {
-              const fileSymbols = byFile.get(depRow.file_path) || [];
-              fileSymbols.push(depRow);
-              byFile.set(depRow.file_path, fileSymbols);
-            }
-
-            // Print grouped by file
-            for (const [filePath, fileSymbols] of byFile.entries()) {
-              console.log(`${colors.bold}📄 ${filePath}${colors.reset}`);
-              for (const depSymbol of fileSymbols) {
-                console.log(`   ← ${depSymbol.name} (${depSymbol.type})`);
-                if (depSymbol.summary) {
-                  console.log(
-                    `      ${colors.dim}${depSymbol.summary.substring(0, 60)}${depSymbol.summary.length > 60 ? '...' : ''}${colors.reset}`
-                  );
+              // For non-symbol refs (like file paths in re-export)
+              for (const id of ids) {
+                if (!depSymbols.find(d => d.id === id)) {
+                  items.push({ name: id, type: 'unknown', file: '', line: 0 });
                 }
               }
-              console.log();
+
+              dependentsData[type] = items;
             }
 
-            console.log(`${colors.cyan}Total: ${dependents.length} usage(s) across ${byFile.size} file(s)${colors.reset}`);
-            console.log();
+            new XmlBuilder(WhoUsesSchema)
+              .section('source', {
+                name: symbol.name,
+                type: symbol.type,
+                file: symbol.file_path,
+                line: symbol.line,
+                exported: symbol.is_exported,
+              })
+              .section('dependents', dependentsData)
+              .print();
           }
         }
 

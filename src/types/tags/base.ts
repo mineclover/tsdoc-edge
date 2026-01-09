@@ -48,7 +48,7 @@ export interface SymbolRelationship {
   /**
    * Type of relationship
    */
-  type: 'relatedTo' | 'dependsOn' | 'usedBy' | 'implements' | 'extends';
+  type: 'relatedTo' | 'dependsOn' | 'usedBy' | 'implements' | 'extends' | 're-exports';
 
   /**
    * Source symbol identifier

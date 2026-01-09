@@ -33,6 +33,52 @@ npm test
 - Run `npm run check` to auto-fix issues
 - All public APIs must have TSDoc comments
 
+## Output Builder Convention
+
+When creating CLI commands that output structured data:
+
+### Use XmlBuilder for Structured Output
+
+```typescript
+import { XmlBuilder } from '../output/XmlBuilder';
+import { MyCommandSchema } from '../output/schemas';
+
+// Define schema
+export const MyCommandSchema: OutputSchema = {
+  root: 'my-data',
+  sections: {
+    source: { name: 'string', type: 'string' },
+    items: arrayOf('item', { id: 'string', value: 'number' }),
+  },
+};
+
+// Use in command
+new XmlBuilder(MyCommandSchema)
+  .section('source', { name: 'Foo', type: 'class' })
+  .section('items', [{ id: 'a', value: 1 }])
+  .print();
+```
+
+### Schema Types
+
+1. **ObjectSchema**: Simple objects
+2. **ArraySchema**: Arrays with auto-indexing via `arrayOf()`
+3. **GroupedArraySchema**: Grouped data via `groupedArrayOf()`
+
+### Benefits
+
+- **Auto-escape**: XML entities automatically escaped
+- **Consistent formatting**: Uniform indentation and structure
+- **Parseable**: Use `XmlParser` to convert XML → JSON
+- **Schema validation**: Type-safe data structures
+
+### When NOT to Use
+
+- Complex nested documents (use custom generators like `XMLContextGenerator`)
+- Human-only output (use console.log with colors)
+
+See `src/output/SPEC.md` for complete specification.
+
 ## Testing
 
 - Tests are located in `src/__tests__/`
