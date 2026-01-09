@@ -159,6 +159,7 @@ export const BuildResultSchema: OutputSchema = {
       blocksInserted: 'number',
       entryPointsFound: 'number',
       entryPointsInserted: 'number',
+      exposureAnalyzed: 'number',
       durationMs: 'number',
     },
     paths: {

@@ -383,6 +383,37 @@ export class DatabaseManager {
   }
 
   /**
+   * Update symbol exposure information
+   * @param symbolId - Symbol ID
+   * @param exposure - Exposure information
+   * @returns True if update succeeded
+   */
+  updateSymbolExposure(symbolId: string, exposure: {
+    exposureScope: { level: string; boundaries: string[]; exportedVia?: string };
+    exportPath?: string;
+    accessibility: string;
+    visibilityBoundaries: { canBeImportedBy: string[]; restrictedTo?: string[]; reason?: string };
+  }): boolean {
+    try {
+      this.drizzleDb.update(schema.symbols)
+        .set({
+          exposureScope: JSON.stringify(exposure.exposureScope),
+          exposureLevel: exposure.exposureScope.level,
+          exportPath: exposure.exportPath ?? null,
+          accessibility: exposure.accessibility,
+          visibilityBoundaries: JSON.stringify(exposure.visibilityBoundaries),
+          updatedAt: new Date().toISOString(),
+        })
+        .where(eq(schema.symbols.id, symbolId))
+        .run();
+      return true;
+    } catch (error) {
+      console.error('Failed to update symbol exposure:', error);
+      return false;
+    }
+  }
+
+  /**
    * Insert enhanced documentation
    * @param doc - Enhanced symbol documentation object
    * @param jsonlLine - Line number in JSONL file for sync tracking

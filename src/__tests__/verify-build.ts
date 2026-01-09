@@ -5,6 +5,7 @@
 
 import { DatabaseManager } from '../storage/DatabaseManager';
 import * as path from 'node:path';
+import Database from 'better-sqlite3';
 
 const dbPath = path.join(process.cwd(), '.tsdoc.db');
 const dbManager = new DatabaseManager(dbPath);
@@ -92,5 +93,38 @@ if (allEndpoints.length > 0) {
     console.log(`     - ${ep.method} ${ep.path} (handler: ${ep.handlerSymbolId || 'N/A'})`);
   });
 }
+
+// Test exposure information
+console.log('\n4. Exposure Analysis:');
+// Query raw symbols with exposure info using better-sqlite3
+const db = new Database(dbPath, { readonly: true });
+const symbolsRaw = db.prepare('SELECT * FROM symbols').all();
+const symbolsWithExposure = symbolsRaw.filter((s: any) => s.exposure_level !== null);
+console.log(`   Total symbols: ${symbolsRaw.length}`);
+console.log(`   Symbols with exposure info: ${symbolsWithExposure.length}`);
+
+if (symbolsWithExposure.length > 0) {
+  // Count by exposure level
+  const exposureByLevel: Record<string, number> = {};
+  for (const symbol of symbolsWithExposure) {
+    const level = (symbol as any).exposure_level || 'unknown';
+    exposureByLevel[level] = (exposureByLevel[level] || 0) + 1;
+  }
+
+  console.log('   By exposure level:');
+  for (const [level, count] of Object.entries(exposureByLevel)) {
+    console.log(`     ${level}: ${count}`);
+  }
+
+  console.log('\n   Samples:');
+  symbolsWithExposure.slice(0, 3).forEach((symbol: any) => {
+    const scope = symbol.exposure_scope ? JSON.parse(symbol.exposure_scope) : null;
+    console.log(`     - ${symbol.name} (${symbol.type}): ${symbol.exposure_level}, export path: ${symbol.export_path || 'N/A'}`);
+    if (scope) {
+      console.log(`       boundaries: ${scope.boundaries?.join(', ') || 'none'}`);
+    }
+  });
+}
+db.close();
 
 console.log('\n=== Verification Complete ===');

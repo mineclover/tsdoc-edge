@@ -262,6 +262,7 @@ export class BuildCommand extends BaseCommand {
         blocksInserted: 0,
         entryPointsFound: 0,
         entryPointsInserted: 0,
+        exposureAnalyzed: 0,
         errors: [] as string[],
       };
 
@@ -459,8 +460,15 @@ export class BuildCommand extends BaseCommand {
               if (symbol.isExported) {
                 try {
                   const exposure = exposureAnalyzer.analyzeSymbol(fullSymbol);
-                  // Update symbol with exposure info (could be done via update query)
-                  // For now, exposure info is calculated but not stored yet
+                  const success = dbManager.updateSymbolExposure(id, {
+                    exposureScope: exposure.exposureScope,
+                    exportPath: exposure.exportPath,
+                    accessibility: exposure.accessibility,
+                    visibilityBoundaries: exposure.visibilityBoundary,
+                  });
+                  if (success) {
+                    result.exposureAnalyzed++;
+                  }
                 } catch (expError) {
                   // Non-critical, continue
                 }
@@ -1115,6 +1123,7 @@ export class BuildCommand extends BaseCommand {
           blocksInserted: result.blocksInserted,
           entryPointsFound: result.entryPointsFound,
           entryPointsInserted: result.entryPointsInserted,
+          exposureAnalyzed: result.exposureAnalyzed,
           durationMs: duration,
         })
         .section('paths', {
