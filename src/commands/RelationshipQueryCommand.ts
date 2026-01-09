@@ -64,13 +64,15 @@ Examples:
         return this.displayHelp();
       }
 
-      if (args.length === 0) {
+      // Filter out flags to get positional arguments
+      const positionalArgs = args.filter(arg => !arg.startsWith('--'));
+      if (positionalArgs.length === 0) {
         this.printError('Symbol ID required');
         console.log();
         return this.displayHelp();
       }
 
-      let symbolId = args[0];
+      let symbolId = positionalArgs[0];
 
       // Parse options
       const options = {
@@ -88,8 +90,6 @@ Examples:
       if (resolved) {
         symbolId = resolved.id;
       }
-
-      this.printHeader(`Relationships for: ${symbolId}`);
 
       // Use Drizzle ORM to query relationships
       let rels = dbManager.getUnifiedRelationshipsBySymbol(symbolId);
@@ -126,8 +126,27 @@ Examples:
       })) as UnifiedRelationshipRow[];
 
       if (relationships.length === 0) {
-        this.printInfo('No relationships found');
-        console.log();
+        if (this.hasFlag(args, '--human')) {
+          this.printHeader(`Relationships for: ${symbolId}`);
+          this.printInfo('No relationships found');
+          console.log();
+        } else {
+          this.printOutput('relationship-query', {
+            query: {
+              symbolId,
+              type: options.type || 'all',
+              category: options.category || 'all',
+              direction: options.direction,
+              limit: options.limit,
+            },
+            results: {
+              totalFound: 0,
+            },
+            message: {
+              text: 'No relationships found',
+            },
+          }, args);
+        }
         dbManager.close();
         return this.success('Query complete');
       }
@@ -146,8 +165,28 @@ Examples:
       });
 
       if (filteredRels.length === 0) {
-        this.printInfo(`No relationships found in direction: ${options.direction}`);
-        console.log();
+        if (this.hasFlag(args, '--human')) {
+          this.printHeader(`Relationships for: ${symbolId}`);
+          this.printInfo(`No relationships found in direction: ${options.direction}`);
+          console.log();
+        } else {
+          this.printOutput('relationship-query', {
+            query: {
+              symbolId,
+              type: options.type || 'all',
+              category: options.category || 'all',
+              direction: options.direction,
+              limit: options.limit,
+            },
+            results: {
+              totalFound: 0,
+              afterFiltering: 0,
+            },
+            message: {
+              text: `No relationships found in direction: ${options.direction}`,
+            },
+          }, args);
+        }
         dbManager.close();
         return this.success('Query complete');
       }
@@ -161,50 +200,99 @@ Examples:
         byCategory.get(rel.category)!.push(rel);
       }
 
-      // Display results
-      console.log();
-      this.printSection('Query Results');
-      this.printInfo(`Found ${filteredRels.length} relationships`);
-      console.log();
-
-      for (const [category, rels] of byCategory.entries()) {
-        console.log(`  ${this.colors.bold}${category}${this.colors.reset} (${rels.length})`);
-        console.log();
-
-        for (const rel of rels) {
-          const fromSymbols = JSON.parse(rel.from_symbols);
-          const toSymbols = JSON.parse(rel.to_symbols);
-
-          const directionSymbol = rel.direction === 'unidirectional' ? '→'
-            : rel.direction === 'bidirectional' ? '↔'
-            : '—';
-
-          const fromDisplay = fromSymbols.join(', ');
-          const toDisplay = toSymbols.join(', ');
-
-          console.log(`    ${this.colors.cyan}${rel.type}${this.colors.reset}`);
-          console.log(`    ${fromDisplay} ${directionSymbol} ${toDisplay}`);
-          console.log(`    ${this.colors.dim}${rel.description || 'No description'}${this.colors.reset}`);
-          console.log(`    ${this.colors.dim}Strength: ${rel.strength}, Confidence: ${rel.confidence}${this.colors.reset}`);
-          console.log();
-        }
-      }
-
-      // Statistics
-      console.log();
-      this.printSection('Statistics');
-
+      // Build statistics by type
       const byType = new Map<string, number>();
       for (const rel of filteredRels) {
         byType.set(rel.type, (byType.get(rel.type) || 0) + 1);
       }
 
-      console.log(`  ${this.colors.dim}Relationships by type:${this.colors.reset}`);
-      for (const [type, count] of Array.from(byType.entries()).sort((a, b) => b[1] - a[1])) {
-        console.log(`    ${type}: ${this.colors.cyan}${count}${this.colors.reset}`);
-      }
+      if (this.hasFlag(args, '--human')) {
+        // Original color output
+        this.printHeader(`Relationships for: ${symbolId}`);
 
-      console.log();
+        // Display results
+        console.log();
+        this.printSection('Query Results');
+        this.printInfo(`Found ${filteredRels.length} relationships`);
+        console.log();
+
+        for (const [category, rels] of byCategory.entries()) {
+          console.log(`  ${this.colors.bold}${category}${this.colors.reset} (${rels.length})`);
+          console.log();
+
+          for (const rel of rels) {
+            const fromSymbols = JSON.parse(rel.from_symbols);
+            const toSymbols = JSON.parse(rel.to_symbols);
+
+            const directionSymbol = rel.direction === 'unidirectional' ? '→'
+              : rel.direction === 'bidirectional' ? '↔'
+              : '—';
+
+            const fromDisplay = fromSymbols.join(', ');
+            const toDisplay = toSymbols.join(', ');
+
+            console.log(`    ${this.colors.cyan}${rel.type}${this.colors.reset}`);
+            console.log(`    ${fromDisplay} ${directionSymbol} ${toDisplay}`);
+            console.log(`    ${this.colors.dim}${rel.description || 'No description'}${this.colors.reset}`);
+            console.log(`    ${this.colors.dim}Strength: ${rel.strength}, Confidence: ${rel.confidence}${this.colors.reset}`);
+            console.log();
+          }
+        }
+
+        // Statistics
+        console.log();
+        this.printSection('Statistics');
+
+        console.log(`  ${this.colors.dim}Relationships by type:${this.colors.reset}`);
+        for (const [type, count] of Array.from(byType.entries()).sort((a, b) => b[1] - a[1])) {
+          console.log(`    ${type}: ${this.colors.cyan}${count}${this.colors.reset}`);
+        }
+
+        console.log();
+      } else {
+        // XML output
+        const categoriesData: Record<string, Array<Record<string, unknown>>> = {};
+
+        for (const [category, rels] of byCategory.entries()) {
+          categoriesData[category] = rels.map(rel => {
+            const fromSymbols = JSON.parse(rel.from_symbols);
+            const toSymbols = JSON.parse(rel.to_symbols);
+
+            return {
+              id: rel.id,
+              type: rel.type,
+              from: fromSymbols.join(', '),
+              to: toSymbols.join(', '),
+              direction: rel.direction,
+              strength: rel.strength,
+              confidence: rel.confidence,
+              description: rel.description || 'No description',
+              discoveredBy: rel.discovered_by,
+              filePath: rel.file_path || '',
+              line: rel.line || '',
+            };
+          });
+        }
+
+        this.printOutput('relationship-query', {
+          query: {
+            symbolId,
+            type: options.type || 'all',
+            category: options.category || 'all',
+            direction: options.direction,
+            limit: options.limit,
+          },
+          results: {
+            totalFound: filteredRels.length,
+          },
+          categories: categoriesData,
+          statistics: {
+            byType: Array.from(byType.entries())
+              .sort((a, b) => b[1] - a[1])
+              .map(([type, count]) => ({ type, count })),
+          },
+        }, args);
+      }
 
       dbManager.close();
 
