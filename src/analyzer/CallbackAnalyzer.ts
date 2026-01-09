@@ -205,7 +205,7 @@ export class CallbackAnalyzer {
 
               if (callbackSymbolId && callbackSymbolId !== promiseSymbolId) {
                 const line = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
-                const pattern = methodName === 'then' ? 'promise-then' : 'promise-catch';
+                const pattern: 'promise-then' | 'promise-catch' = methodName === 'then' ? 'promise-then' : 'promise-catch';
 
                 usages.push({
                   callerSymbolId: promiseSymbolId,
@@ -214,7 +214,7 @@ export class CallbackAnalyzer {
                   callbackName: this.getSymbolName(callbackSymbolId),
                   filePath,
                   line,
-                  pattern: pattern as any,
+                  pattern,
                 });
               }
             }

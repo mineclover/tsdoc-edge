@@ -30,9 +30,9 @@ interface IstanbulFunctionData {
 
 interface IstanbulFileData {
   path: string;
-  s: Record<string, number>; // statement coverage counts
-  f: Record<string, number>; // function coverage counts
-  b: Record<string, number[]>; // branch coverage counts
+  s?: Record<string, number>; // statement coverage counts
+  f?: Record<string, number>; // function coverage counts
+  b?: Record<string, number[]>; // branch coverage counts
   statementMap?: Record<string, IstanbulRange>;
   fnMap?: Record<string, IstanbulFunctionData>;
 }

@@ -30,7 +30,7 @@ export interface SymbolIdentifiers {
 interface PackageInfo {
   name: string;
   version: string;
-  exports?: Record<string, any>;
+  exports?: Record<string, unknown>;
   scope: string;
   packageDir: string;
 }

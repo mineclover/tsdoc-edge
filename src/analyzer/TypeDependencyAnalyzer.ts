@@ -95,10 +95,11 @@ export class TypeDependencyAnalyzer {
       if (!toSymbol) continue;
 
       // Create relationship
-      const relationshipType = ref.context === 'generic-constraint' ? 'generic-constraint' : 'type-dependency';
+      const relationshipType: 'generic-constraint' | 'type-dependency' =
+        ref.context === 'generic-constraint' ? 'generic-constraint' : 'type-dependency';
       const relationship: UnifiedRelationship = {
         id: `${relationshipType}-${fromSymbol.id}-${toSymbol.id}`,
-        type: relationshipType as any,
+        type: relationshipType,
         category: 'structural',
         from: fromSymbol.id,
         to: toSymbol.id,

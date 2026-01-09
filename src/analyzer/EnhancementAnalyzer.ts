@@ -7,7 +7,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';
-import type { SymbolGraph } from '../types/graph';
+import type { SymbolGraph, Symbol } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
@@ -212,7 +212,11 @@ export class EnhancementAnalyzer {
       }
       // Handle array of comment parts
       if (Array.isArray(tag.comment)) {
-        return tag.comment.map((part: any) => part.text || '').join('');
+        return tag.comment
+          .map((part: ts.JSDocText | ts.JSDocLink) =>
+            'text' in part ? part.text : ''
+          )
+          .join('');
       }
     }
     return null;
@@ -307,7 +311,7 @@ export class EnhancementAnalyzer {
    * @returns Symbol if found
    * @private
    */
-  private findSymbolByName(name: string): any {
+  private findSymbolByName(name: string): Symbol | undefined {
     for (const symbol of this.graph.symbols.values()) {
       if (symbol.name === name) {
         return symbol;

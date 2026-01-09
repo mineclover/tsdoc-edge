@@ -17,7 +17,7 @@
  *   DatabaseConfig ~ DatabaseConnection (naming-pattern)
  */
 
-import type { SymbolGraph } from '../types/graph';
+import type { SymbolGraph, Symbol } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
@@ -96,7 +96,7 @@ export class NamingPatternRelationAnalyzer {
    */
   private detectDomainGroupings(): DomainGroupingSite[] {
     const sites: DomainGroupingSite[] = [];
-    const symbolsByDomain = new Map<string, any[]>();
+    const symbolsByDomain = new Map<string, Symbol[]>();
 
     // Group symbols by domain prefix
     for (const symbol of this.graph.symbols.values()) {

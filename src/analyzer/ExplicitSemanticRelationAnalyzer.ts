@@ -233,7 +233,11 @@ export class ExplicitSemanticRelationAnalyzer {
     if (tag.comment) {
       if (typeof tag.comment === 'string') return tag.comment;
       if (Array.isArray(tag.comment)) {
-        return tag.comment.map((part: any) => part.text || '').join('');
+        return tag.comment
+          .map((part: ts.JSDocText | ts.JSDocLink) =>
+            'text' in part ? part.text : ''
+          )
+          .join('');
       }
     }
     return null;

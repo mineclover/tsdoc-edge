@@ -4,7 +4,7 @@
  * @responsibility Analyze architectural layer dependencies
  */
 
-import type { SymbolGraph } from '../types/graph';
+import type { SymbolGraph, Symbol } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
@@ -159,7 +159,7 @@ export class LayerDependencyAnalyzer {
    * @returns Layer classification
    * @private
    */
-  private classifyLayer(symbol: any): Layer {
+  private classifyLayer(symbol: Symbol): Layer {
     const filePath = symbol.filePath;
     const name = symbol.name;
 
