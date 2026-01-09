@@ -6,7 +6,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { EnhancedDocExtractor } from '../parser/EnhancedDocExtractor';
+import { EnhancedDocExtractor, type ExtractedEnhancedDoc } from '../parser/EnhancedDocExtractor';
 
 /**
  * Command for parsing enhanced documentation
@@ -116,7 +116,7 @@ export class ParseCommand extends BaseCommand {
       console.log();
 
       const stats = fs.statSync(sourcePath);
-      let allResults: any[] = [];
+      let allResults: ExtractedEnhancedDoc[] = [];
 
       if (stats.isDirectory()) {
         allResults = this.parseDirectory(sourcePath);
@@ -178,8 +178,8 @@ export class ParseCommand extends BaseCommand {
   /**
    * Recursively parse directory
    */
-  private parseDirectory(dir: string): any[] {
-    const results: any[] = [];
+  private parseDirectory(dir: string): ExtractedEnhancedDoc[] {
+    const results: ExtractedEnhancedDoc[] = [];
     const files = fs.readdirSync(dir);
 
     for (const file of files) {

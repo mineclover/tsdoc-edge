@@ -10,7 +10,7 @@ import { InterfaceDependencyMapper } from '../analyzer/InterfaceDependencyMapper
 import { TypeChainTracer } from '../analyzer/TypeChainTracer';
 import type { TypeChainOptions, TypeChainAnalysisResult, TypeDependencyNode } from '../types/domain/type-chain';
 import type { InterfaceDependency, InterfaceDependencyGraph, InterfaceInfo } from '../types/domain/interface';
-import { BaseCommand, colors } from './BaseCommand';
+import { BaseCommand, colors, type CommandResult } from './BaseCommand';
 
 /**
  * Command to analyze type dependency chains
@@ -55,10 +55,10 @@ export class TypeChainCommand extends BaseCommand {
   /**
    * execute method
    * @param args - args parameter
-   * @returns Returns Promise<any>
+   * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<any> {
+  async execute(args: string[]): Promise<CommandResult> {
     // Check for help flag
     if (this.hasHelpFlag(args)) {
       return this.displayHelp();
@@ -361,10 +361,10 @@ export class FindRootTypesCommand extends BaseCommand {
   /**
    * execute method
    * @param args - args parameter
-   * @returns Returns Promise<any>
+   * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<any> {
+  async execute(args: string[]): Promise<CommandResult> {
     // Check for help flag
     if (this.hasHelpFlag(args)) {
       return this.displayHelp();
@@ -520,10 +520,10 @@ export class DetectCircularTypesCommand extends BaseCommand {
   /**
    * execute method
    * @param args - args parameter
-   * @returns Returns Promise<any>
+   * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<any> {
+  async execute(args: string[]): Promise<CommandResult> {
     // Check for help flag
     if (this.hasHelpFlag(args)) {
       return this.displayHelp();
