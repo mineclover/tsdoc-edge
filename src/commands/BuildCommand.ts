@@ -956,6 +956,113 @@ export class BuildCommand extends BaseCommand {
         this.printWarning(`Failed to analyze semantic relationships: ${error instanceof Error ? error.message : String(error)}`);
       }
 
+      // Analyze inheritance relationships
+      this.printInfo('Analyzing inheritance relationships...');
+      let inheritanceRelationshipsInserted = 0;
+
+      try {
+        const classAndInterfaceSymbols = Array.from(symbolMap.values()).filter(
+          s => s.type === 'class' || s.type === 'interface'
+        );
+
+        for (const symbol of classAndInterfaceSymbols) {
+          try {
+            const inheritanceRels = inheritanceAnalyzer.analyzeSymbol(symbol);
+
+            for (const inhRel of inheritanceRels) {
+              const relId = `inheritance-${inhRel.from}-${inhRel.to}`;
+              const success = dbManager.insertUnifiedRelationship({
+                id: relId,
+                type: inhRel.type, // 'extends' or 'implements'
+                category: 'structural',
+                fromSymbols: [inhRel.from],
+                toSymbols: [inhRel.to],
+                direction: inhRel.direction,
+                strength: 'strong',
+                evidence: [{
+                  type: 'code',
+                  source: inhRel.filePath,
+                  lineNumber: inhRel.line,
+                  confidence: 1.0,
+                }],
+                discoveredBy: 'inheritance-analyzer',
+                confidence: 1.0,
+                filePath: inhRel.filePath,
+                line: inhRel.line,
+                properties: {
+                  abstractionFrom: inhRel.abstractionLevel.from,
+                  abstractionTo: inhRel.abstractionLevel.to,
+                  hierarchyDepth: inhRel.hierarchyDepth,
+                  inheritanceChain: JSON.stringify(inhRel.inheritanceChain),
+                  overriddenMembers: inhRel.overriddenMembers.length > 0 ? JSON.stringify(inhRel.overriddenMembers) : undefined,
+                },
+                description: `${inhRel.from} ${inhRel.type} ${inhRel.to} (hierarchy depth: ${inhRel.hierarchyDepth})`,
+              });
+
+              if (success) {
+                inheritanceRelationshipsInserted++;
+              }
+            }
+          } catch (inhError) {
+            // Non-critical, continue
+          }
+        }
+
+        if (inheritanceRelationshipsInserted > 0) {
+          this.printSuccess(`Inheritance: ${inheritanceRelationshipsInserted} relationships`);
+        }
+      } catch (error) {
+        this.printWarning(`Failed to analyze inheritance: ${error instanceof Error ? error.message : String(error)}`);
+      }
+
+      // Create endpoint-handler relationships
+      this.printInfo('Creating endpoint-handler relationships...');
+      let endpointHandlerRelsInserted = 0;
+
+      try {
+        const endpoints = dbManager.getAllEndpoints();
+        for (const endpoint of endpoints) {
+          if (endpoint.handlerSymbolId) {
+            const relId = `endpoint-handler-${endpoint.id}`;
+            const success = dbManager.insertUnifiedRelationship({
+              id: relId,
+              type: 'endpoint-uses-handler',
+              category: 'structural',
+              fromSymbols: [endpoint.id],
+              toSymbols: [endpoint.handlerSymbolId],
+              direction: 'unidirectional',
+              strength: 'strong',
+              evidence: [{
+                type: 'code',
+                source: endpoint.filePath,
+                lineNumber: endpoint.line || 0,
+                confidence: 1.0,
+              }],
+              discoveredBy: 'endpoint-analyzer',
+              confidence: 1.0,
+              filePath: endpoint.filePath,
+              line: endpoint.line || undefined,
+              properties: {
+                method: endpoint.method,
+                path: endpoint.path,
+                scope: endpoint.scope,
+              },
+              description: `${endpoint.method} ${endpoint.path} → ${endpoint.handlerSymbolId}`,
+            });
+
+            if (success) {
+              endpointHandlerRelsInserted++;
+            }
+          }
+        }
+
+        if (endpointHandlerRelsInserted > 0) {
+          this.printSuccess(`Endpoint-handler: ${endpointHandlerRelsInserted} relationships`);
+        }
+      } catch (error) {
+        this.printWarning(`Failed to create endpoint-handler relationships: ${error instanceof Error ? error.message : String(error)}`);
+      }
+
       const duration = Date.now() - startTime;
 
       // Write JSONL registry (ensure directory exists)
@@ -991,6 +1098,8 @@ export class BuildCommand extends BaseCommand {
       console.log(`  Doc relationships: ${this.colors.green}${docRelationshipsInserted}${this.colors.reset}`);
       console.log(`  Semantic relationships: ${this.colors.green}${semanticRelationshipsInserted}${this.colors.reset}`);
       console.log(`  Inferred relationships: ${this.colors.green}${inferredRelationshipsInserted}${this.colors.reset}`);
+      console.log(`  Inheritance relationships: ${this.colors.green}${inheritanceRelationshipsInserted}${this.colors.reset}`);
+      console.log(`  Endpoint-handler relationships: ${this.colors.green}${endpointHandlerRelsInserted}${this.colors.reset}`);
       console.log(`  Endpoints found: ${this.colors.cyan}${result.endpointsFound}${this.colors.reset}`);
       console.log(`  Endpoints inserted: ${this.colors.green}${result.endpointsInserted}${this.colors.reset}`);
       console.log(`  Blocks found: ${this.colors.cyan}${result.blocksFound}${this.colors.reset}`);
