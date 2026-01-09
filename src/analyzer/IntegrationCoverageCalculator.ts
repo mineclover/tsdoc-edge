@@ -14,7 +14,7 @@
  * - 검증 강도별 통계 제공
  */
 
-import type { SymbolGraph, SymbolRelationship } from '../types/graph';
+import type { SymbolGraph, SymbolRelationship, Symbol } from '../types/graph';
 import type {
   VerifiedRelationship,
   RelationshipCoverage,
@@ -130,8 +130,8 @@ export class IntegrationCoverageCalculator {
    */
   private determineUnverifiedReason(
     rel: SymbolRelationship,
-    sourceSymbol: any,
-    targetSymbol: any
+    sourceSymbol: Symbol,
+    targetSymbol: Symbol
   ): UnverifiedRelationship['reason'] {
     // Check if source has any tests
     const sourceHasTests = sourceSymbol.tests && sourceSymbol.tests.length > 0;
@@ -149,8 +149,8 @@ export class IntegrationCoverageCalculator {
    * Generate suggestion for adding integration test
    */
   private generateSuggestion(
-    sourceSymbol: any,
-    targetSymbol: any
+    sourceSymbol: Symbol,
+    targetSymbol: Symbol
   ): string {
     const sourceFile = sourceSymbol.filePath;
 

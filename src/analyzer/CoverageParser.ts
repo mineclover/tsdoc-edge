@@ -10,6 +10,36 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 /**
+ * Istanbul coverage format - raw data structure
+ */
+interface IstanbulLocation {
+  line: number;
+  column: number;
+}
+
+interface IstanbulRange {
+  start: IstanbulLocation;
+  end: IstanbulLocation;
+}
+
+interface IstanbulFunctionData {
+  name: string;
+  decl?: IstanbulRange;
+  loc?: IstanbulRange;
+}
+
+interface IstanbulFileData {
+  path: string;
+  s: Record<string, number>; // statement coverage counts
+  f: Record<string, number>; // function coverage counts
+  b: Record<string, number[]>; // branch coverage counts
+  statementMap?: Record<string, IstanbulRange>;
+  fnMap?: Record<string, IstanbulFunctionData>;
+}
+
+type IstanbulCoverageData = Record<string, IstanbulFileData>;
+
+/**
  * Coverage data for a single file
  * @doc [[CoverageParser]]
  * @public
@@ -116,10 +146,10 @@ export class CoverageParser {
     }
 
     const content = fs.readFileSync(coveragePath, 'utf-8');
-    let data: any;
+    let data: IstanbulCoverageData;
 
     try {
-      data = JSON.parse(content);
+      data = JSON.parse(content) as IstanbulCoverageData;
     } catch (error) {
       throw new Error(`Invalid JSON in coverage file: ${error}`);
     }
@@ -133,7 +163,7 @@ export class CoverageParser {
    * @param data - Raw Istanbul coverage data
    * @returns Coverage summary
    */
-  parseData(data: any): CoverageSummary {
+  parseData(data: IstanbulCoverageData): CoverageSummary {
     const files = new Map<string, FileCoverage>();
 
     let totalStatements = 0;
@@ -153,17 +183,17 @@ export class CoverageParser {
       // Aggregate totals
       const sCount = Object.keys(fileData.s || {}).length;
       const sCovered = Object.values(fileData.s || {}).filter(
-        (count: any) => count > 0
+        (count: number) => count > 0
       ).length;
 
       const fCount = Object.keys(fileData.f || {}).length;
       const fCovered = Object.values(fileData.f || {}).filter(
-        (count: any) => count > 0
+        (count: number) => count > 0
       ).length;
 
       const bCount = Object.keys(fileData.b || {}).length;
       const bCovered = Object.values(fileData.b || {}).filter(
-        (branches: any) => branches.some((b: any) => b > 0)
+        (branches: number[]) => branches.some((b: number) => b > 0)
       ).length;
 
       // Line coverage
@@ -196,27 +226,27 @@ export class CoverageParser {
   /**
    * Parse coverage data for a single file
    */
-  private parseFile(fileData: any): FileCoverage {
+  private parseFile(fileData: IstanbulFileData): FileCoverage {
     const filePath = fileData.path;
 
     // Statement coverage
     const sCount = Object.keys(fileData.s || {}).length;
     const sCovered = Object.values(fileData.s || {}).filter(
-      (count: any) => count > 0
+      (count: number) => count > 0
     ).length;
     const statementCoverage = sCount > 0 ? (sCovered / sCount) * 100 : 0;
 
     // Function coverage
     const fCount = Object.keys(fileData.f || {}).length;
     const fCovered = Object.values(fileData.f || {}).filter(
-      (count: any) => count > 0
+      (count: number) => count > 0
     ).length;
     const functionCoverage = fCount > 0 ? (fCovered / fCount) * 100 : 0;
 
     // Branch coverage
     const bCount = Object.keys(fileData.b || {}).length;
     const bCovered = Object.values(fileData.b || {}).filter(
-      (branches: any) => branches.some((b: any) => b > 0)
+      (branches: number[]) => branches.some((b: number) => b > 0)
     ).length;
     const branchCoverage = bCount > 0 ? (bCovered / bCount) * 100 : 0;
 
@@ -254,7 +284,7 @@ export class CoverageParser {
   /**
    * Build line coverage map from statement map
    */
-  private getLineMap(fileData: any): Map<number, boolean> {
+  private getLineMap(fileData: IstanbulFileData): Map<number, boolean> {
     const lineMap = new Map<number, boolean>();
     const statementMap = fileData.statementMap || {};
     const s = fileData.s || {};
@@ -277,7 +307,7 @@ export class CoverageParser {
   /**
    * Extract function coverage data
    */
-  private extractFunctions(fileData: any): FunctionCoverage[] {
+  private extractFunctions(fileData: IstanbulFileData): FunctionCoverage[] {
     const functions: FunctionCoverage[] = [];
     const fnMap = fileData.fnMap || {};
     const f = fileData.f || {};

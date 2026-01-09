@@ -111,9 +111,11 @@ export class BlockChunkAnalyzer {
       const startLine = sourceFile.getLineAndCharacterOfPosition(functionNode.body.getStart()).line + 1;
       const endLine = sourceFile.getLineAndCharacterOfPosition(functionNode.body.getEnd()).line + 1;
 
-      const blockType = this.inferBlockType([functionNode.body as any]);
-      const dependencies = this.extractDependencies([functionNode.body as any]);
-      const sideEffects = this.detectSideEffects([functionNode.body as any]);
+      // Treat expression body as a statement for analysis
+      const expressionAsStatement = functionNode.body as unknown as ts.Statement;
+      const blockType = this.inferBlockType([expressionAsStatement]);
+      const dependencies = this.extractDependencies([expressionAsStatement]);
+      const sideEffects = this.detectSideEffects([expressionAsStatement]);
 
       blocks.push({
         id: `${symbolId}::block-1`,

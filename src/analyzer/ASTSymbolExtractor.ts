@@ -572,7 +572,7 @@ export class ASTSymbolExtractor {
    * Check if node has export modifier
    */
   private hasExportModifier(node: ts.Node): boolean {
-    const modifiers = (node as any).modifiers;
+    const modifiers = ts.canHaveModifiers(node) ? ts.getModifiers(node) : undefined;
     if (!modifiers) return false;
     return modifiers.some(
       (mod: ts.Modifier) => mod.kind === ts.SyntaxKind.ExportKeyword
@@ -583,7 +583,7 @@ export class ASTSymbolExtractor {
    * Check if node has private modifier
    */
   private hasPrivateModifier(node: ts.Node): boolean {
-    const modifiers = (node as any).modifiers;
+    const modifiers = ts.canHaveModifiers(node) ? ts.getModifiers(node) : undefined;
     if (!modifiers) return false;
     return modifiers.some(
       (mod: ts.Modifier) => mod.kind === ts.SyntaxKind.PrivateKeyword
@@ -594,7 +594,7 @@ export class ASTSymbolExtractor {
    * Check if node has public modifier
    */
   private hasPublicModifier(node: ts.Node): boolean {
-    const modifiers = (node as any).modifiers;
+    const modifiers = ts.canHaveModifiers(node) ? ts.getModifiers(node) : undefined;
     if (!modifiers) return false;
     return modifiers.some(
       (mod: ts.Modifier) => mod.kind === ts.SyntaxKind.PublicKeyword
@@ -605,7 +605,7 @@ export class ASTSymbolExtractor {
    * Extract JSDoc summary if available
    */
   private extractJSDocSummary(node: ts.Node): string | undefined {
-    const jsDocComments = (node as any).jsDoc;
+    const jsDocComments = (node as ts.Node & { jsDoc?: ts.JSDoc[] }).jsDoc;
     if (!jsDocComments || jsDocComments.length === 0) return undefined;
 
     const firstJsDoc = jsDocComments[0];
@@ -613,9 +613,11 @@ export class ASTSymbolExtractor {
       if (typeof firstJsDoc.comment === 'string') {
         return firstJsDoc.comment;
       }
-      // Handle complex JSDoc comment structures
-      return firstJsDoc.comment
-        .map((part: any) => part.text || '')
+      // Handle complex JSDoc comment structures (array of JSDocText/JSDocLink)
+      return (firstJsDoc.comment as ts.NodeArray<ts.JSDocText | ts.JSDocLink>)
+        .map((part: ts.JSDocText | ts.JSDocLink) =>
+          'text' in part ? part.text : ''
+        )
         .join('')
         .trim();
     }
