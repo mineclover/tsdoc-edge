@@ -351,7 +351,8 @@ export class DatabaseManager {
         .onConflictDoUpdate({
           target: schema.symbols.id,
           set: {
-            uuid: symbol.uuid ?? null,
+            // uuid and created_at should NEVER be updated - they're permanent
+            // uuid: symbol.uuid ?? null,  ← DO NOT UPDATE UUID!
             localPath: symbol.localPath ?? null,
             globalPath: symbol.globalPath ?? null,
             scope: symbol.scope ?? null,
