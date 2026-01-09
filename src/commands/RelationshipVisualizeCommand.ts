@@ -5,7 +5,17 @@
 
 import * as fs from 'node:fs';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
+import { DatabaseManager, type UnifiedRelationshipRow, type SymbolRow } from '../storage/DatabaseManager';
+
+interface VisualizeOptions {
+  format: string;
+  type?: string;
+  category?: string;
+  depth: number;
+  direction: string;
+  output?: string;
+  style: string;
+}
 
 /**
  * Command for visualizing relationships as diagrams
@@ -102,12 +112,13 @@ Examples:
       }
 
       const { symbol, id: resolvedId } = resolved;
-      console.log(`Symbol: ${symbol.name} (${symbol.type})`);
+      const symbolRow = symbol as SymbolRow;
+      console.log(`Symbol: ${symbolRow.name} (${symbolRow.type})`);
       console.log(`Format: ${options.format}, Style: ${options.style}, Depth: ${options.depth}\n`);
 
       // Collect relationships
       const visited = new Set<string>();
-      const relationships: any[] = [];
+      const relationships: UnifiedRelationshipRow[] = [];
 
       this.collectRelationships(
         dbManager,
@@ -123,9 +134,9 @@ Examples:
       // Generate diagram
       let diagram = '';
       if (options.format === 'mermaid') {
-        diagram = this.generateMermaidDiagram(symbol, relationships, options);
+        diagram = this.generateMermaidDiagram(symbolRow, relationships, options);
       } else if (options.format === 'dot') {
-        diagram = this.generateDotDiagram(symbol, relationships, options);
+        diagram = this.generateDotDiagram(symbolRow, relationships, options);
       } else {
         this.printError(`Unsupported format: ${options.format}`);
         dbManager.close();
@@ -151,10 +162,10 @@ Examples:
   private collectRelationships(
     dbManager: DatabaseManager,
     symbolId: string,
-    options: any,
+    options: VisualizeOptions,
     depth: number,
     visited: Set<string>,
-    relationships: any[]
+    relationships: UnifiedRelationshipRow[]
   ): void {
     if (depth >= options.depth || visited.has(symbolId)) {
       return;
@@ -229,7 +240,7 @@ Examples:
   /**
    * Generate Mermaid diagram
    */
-  private generateMermaidDiagram(symbol: any, relationships: any[], options: any): string {
+  private generateMermaidDiagram(symbol: SymbolRow, relationships: UnifiedRelationshipRow[], options: VisualizeOptions): string {
     const lines: string[] = [];
 
     // Header
@@ -309,7 +320,7 @@ Examples:
   /**
    * Generate DOT diagram (GraphViz)
    */
-  private generateDotDiagram(symbol: any, relationships: any[], options: any): string {
+  private generateDotDiagram(symbol: SymbolRow, relationships: UnifiedRelationshipRow[], options: VisualizeOptions): string {
     const lines: string[] = [];
 
     lines.push('digraph G {');

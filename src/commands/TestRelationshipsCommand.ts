@@ -9,8 +9,8 @@ import { DatabaseManager } from '../storage/DatabaseManager';
 import { ConfigManager } from '../config/ConfigManager';
 import { TestRelationshipExtractor } from '../analyzer/TestRelationshipExtractor';
 import { IntegrationCoverageCalculator } from '../analyzer/IntegrationCoverageCalculator';
-import type { VerifiedRelationship, TestRelationshipAnalysis } from '../types/analysis/test-relationships';
-import type { SymbolType } from '../types/graph';
+import type { VerifiedRelationship, TestRelationshipAnalysis, RelationshipCoverage } from '../types/analysis/test-relationships';
+import type { SymbolType, SymbolGraph } from '../types/graph';
 import type { SymbolRelationship } from '../types/tags';
 import * as path from 'node:path';
 import * as fs from 'node:fs';
@@ -273,9 +273,9 @@ export class TestRelationshipsCommand extends BaseCommand {
    */
   private displayModuleAnalysis(
     moduleName: string,
-    coverage: any,
+    coverage: RelationshipCoverage,
     allVerified: VerifiedRelationship[],
-    graph: any
+    graph: SymbolGraph
   ): void {
     // Find symbol ID by name
     const symbolIds = graph.nameIndex.get(moduleName);
@@ -287,6 +287,11 @@ export class TestRelationshipsCommand extends BaseCommand {
 
     const symbolId = symbolIds[0];
     const symbol = graph.symbols.get(symbolId);
+
+    if (!symbol) {
+      this.printError(`Symbol not found in graph: ${symbolId}`);
+      return;
+    }
 
     this.printSection(`Relationship Verification for: ${moduleName}`);
     console.log(`  Symbol ID: ${this.colors.dim}${symbolId}${this.colors.reset}`);
@@ -343,7 +348,7 @@ export class TestRelationshipsCommand extends BaseCommand {
   /**
    * Display unverified relationships only
    */
-  private displayUnverifiedOnly(coverage: any): void {
+  private displayUnverifiedOnly(coverage: RelationshipCoverage): void {
     this.printSection(`Unverified Relationships (${coverage.unverifiedRelationships.length})`);
 
     for (const ur of coverage.unverifiedRelationships) {
