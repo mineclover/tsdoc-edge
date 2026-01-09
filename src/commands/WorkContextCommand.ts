@@ -408,16 +408,10 @@ export class WorkContextCommand extends BaseCommand {
    * @returns Option value
    * @private
    */
-  private getOptionValue(args: string[], option: string, defaultValue?: any): any {
+  private getOptionValue(args: string[], option: string, defaultValue?: string): string | undefined {
     const index = args.indexOf(option);
     if (index !== -1 && index + 1 < args.length) {
-      const value = args[index + 1];
-      // Try to parse as number if default is number
-      if (typeof defaultValue === 'number') {
-        const num = parseInt(value, 10);
-        return isNaN(num) ? defaultValue : num;
-      }
-      return value;
+      return args[index + 1];
     }
     return defaultValue;
   }

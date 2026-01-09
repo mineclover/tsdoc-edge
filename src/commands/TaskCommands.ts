@@ -387,7 +387,7 @@ Options:
         return this.failure('Task not found');
       }
 
-      const updates: any = {};
+      const updates: Record<string, unknown> = {};
 
       for (const arg of args.slice(1)) {
         if (arg.startsWith('--status=')) {

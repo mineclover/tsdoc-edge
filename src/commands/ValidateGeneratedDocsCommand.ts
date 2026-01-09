@@ -6,7 +6,7 @@
 import * as path from 'node:path';
 import * as fs from 'node:fs';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { GeneratedDocsValidator } from '../validator/GeneratedDocsValidator';
+import { GeneratedDocsValidator, type DocValidationResult } from '../validator/GeneratedDocsValidator';
 
 /**
  * Command to validate generated markdown documentation
@@ -104,7 +104,7 @@ export class ValidateGeneratedDocsCommand extends BaseCommand {
       this.printHeader('TSDoc Edge - Validate Generated Docs');
 
       const stats = fs.statSync(targetPath);
-      let results: any[] = [];
+      let results: DocValidationResult[] = [];
 
       if (stats.isDirectory()) {
         console.log(`Validating directory: ${colors.cyan}${targetPath}${colors.reset}`);

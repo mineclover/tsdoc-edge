@@ -65,7 +65,7 @@ export class HttpEndpointsCommand extends BaseCommand {
         WHERE 1=1
       `;
 
-      const params: any[] = [];
+      const params: unknown[] = [];
 
       if (methodFilter) {
         query += ' AND method = ?';

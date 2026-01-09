@@ -298,7 +298,7 @@ Examples:
     complexity?: 'simple' | 'medium' | 'complex';
     category?: 'basic-usage' | 'advanced-usage' | 'integration' | 'edge-case';
   } {
-    const options: any = {};
+    const options: Record<string, unknown> = {};
 
     for (let i = 0; i < args.length; i++) {
       const arg = args[i];

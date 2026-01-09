@@ -92,7 +92,7 @@ export class BlocksCommand extends BaseCommand {
         WHERE symbol_id = ?
       `;
 
-      const params: any[] = [symbolId];
+      const params: unknown[] = [symbolId];
 
       if (typeFilter) {
         query += ' AND type = ?';

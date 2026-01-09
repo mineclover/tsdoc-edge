@@ -9,6 +9,15 @@ import { RelationshipMetricsCommand } from './RelationshipMetricsCommand';
 import { RelationshipQueryCommand } from './RelationshipQueryCommand';
 
 /**
+ * Options for relationship check command
+ */
+interface RelationshipCheckOptions {
+  depth: number;
+  category?: string;
+  json: boolean;
+}
+
+/**
  * Quick command to check if it's safe to modify a symbol
  * Combines impact, metrics, and query for a comprehensive safety check
  * @doc [[RelationshipCheckCommand]]
@@ -180,7 +189,7 @@ Output includes:
   /**
    * Execute in JSON mode for automation
    */
-  private async executeJsonMode(symbolId: string, options: any): Promise<CommandResult> {
+  private async executeJsonMode(symbolId: string, options: RelationshipCheckOptions): Promise<CommandResult> {
     try {
       const impactCmd = new RelationshipImpactCommand();
       const metricsInfo = await this.getCentralityInfo(symbolId);

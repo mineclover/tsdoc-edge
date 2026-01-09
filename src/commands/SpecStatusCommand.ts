@@ -7,6 +7,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { SpecStatusManager } from '../spec/SpecStatusManager';
+import type { SpecStatus } from '../types/spec';
 
 /**
  * Helper function to recursively find markdown files
@@ -208,7 +209,7 @@ export class SpecStatusCommand extends BaseCommand {
         console.log(`Target status: ${colors.bold}${newStatus}${colors.reset}`);
         console.log();
 
-        const validation = manager.validateTransition(filePath, newStatus as any);
+        const validation = manager.validateTransition(filePath, newStatus as SpecStatus);
 
         this.printSection('Validation Checks');
         for (const check of validation.checks) {
@@ -225,7 +226,7 @@ export class SpecStatusCommand extends BaseCommand {
         }
 
         // Apply transition
-        manager.applyTransition(filePath, newStatus as any);
+        manager.applyTransition(filePath, newStatus as SpecStatus);
         this.printSuccess(`Successfully promoted to "${newStatus}"`);
         console.log();
         return this.success();
