@@ -87,7 +87,7 @@ interface WorkContext {
     toSymbols: string[];
     confidence: number;
     description?: string;
-    properties?: Record<string, any>;
+    properties?: Record<string, unknown>;
   }>;
 }
 
@@ -444,7 +444,7 @@ export class DesignContextCommand extends BaseCommand {
             toSymbols: Array.isArray(rel.to) ? rel.to : [rel.to],
             confidence: rel.confidence,
             description: rel.description || undefined,
-            properties: rel.properties as Record<string, any> | undefined,
+            properties: rel.properties as Record<string, unknown> | undefined,
           });
         }
       } catch (dbError) {

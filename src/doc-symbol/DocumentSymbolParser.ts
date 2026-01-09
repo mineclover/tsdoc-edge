@@ -251,7 +251,7 @@ export class DocumentSymbolParser {
    * 3. If requireFrontmatter is true, check metadata.tsdoc === 'managed'
    * 4. If in managedDirs, managed
    */
-  private isManagedDocument(filePath: string, metadata: any): boolean {
+  private isManagedDocument(filePath: string, metadata: Record<string, unknown>): boolean {
     const config = this.configManager.get();
     const docMgmt = config.documentManagement;
 

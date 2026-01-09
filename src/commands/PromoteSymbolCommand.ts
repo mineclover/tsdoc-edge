@@ -257,11 +257,11 @@ export class PromoteSymbolCommand extends BaseCommand {
   /**
    * Extract frontmatter from content
    */
-  private extractFrontmatter(content: string): Record<string, any> {
+  private extractFrontmatter(content: string): Record<string, unknown> {
     const frontmatterMatch = content.match(/^---\n([\s\S]+?)\n---/);
     if (!frontmatterMatch) return {};
 
-    const frontmatter: Record<string, any> = {};
+    const frontmatter: Record<string, unknown> = {};
     const lines = frontmatterMatch[1].split('\n');
 
     for (const line of lines) {
@@ -280,7 +280,7 @@ export class PromoteSymbolCommand extends BaseCommand {
   private generateCanonicalDocument(
     symbolName: string,
     h2Content: string,
-    sourceFrontmatter: Record<string, any>,
+    sourceFrontmatter: Record<string, unknown>,
     sourceFile: string
   ): string {
     // Determine category from source or default

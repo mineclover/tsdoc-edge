@@ -270,33 +270,35 @@ Examples:
 
   private saveRelationships(
     dbManager: DatabaseManager,
-    rels: any[],
+    rels: unknown[],
     type: string,
     category: string
   ): number {
     let savedCount = 0;
 
     for (const rel of rels) {
+      const relData = rel as Record<string, unknown>;
+      const evidence = relData.evidence as Array<Record<string, unknown>> | undefined;
       const success = dbManager.insertUnifiedRelationship({
-        id: rel.id,
-        type: rel.type || type,
-        category: rel.category || category,
-        fromSymbols: typeof rel.from === 'string' ? [rel.from] : rel.from,
-        toSymbols: typeof rel.to === 'string' ? [rel.to] : rel.to,
-        direction: rel.direction || 'unidirectional',
-        strength: rel.strength,
-        evidence: rel.evidence?.map((e: any) => ({
-          type: e.type,
-          source: e.source || '',
-          lineNumber: e.lineNumber,
-          confidence: e.confidence,
+        id: relData.id as string,
+        type: (relData.type as string) || type,
+        category: (relData.category as string) || category,
+        fromSymbols: typeof relData.from === 'string' ? [relData.from] : (relData.from as string[]),
+        toSymbols: typeof relData.to === 'string' ? [relData.to] : (relData.to as string[]),
+        direction: (relData.direction as string) || 'unidirectional',
+        strength: (relData.strength as string) || 'medium',
+        evidence: evidence?.map((e: Record<string, unknown>) => ({
+          type: e.type as string,
+          source: (e.source as string) || '',
+          lineNumber: e.lineNumber as number | undefined,
+          confidence: (e.confidence as number) || 0.8,
         })) || [],
         discoveredBy: 'static-analysis',
-        confidence: rel.confidence,
-        filePath: rel.filePath,
-        line: rel.line,
-        properties: rel.properties,
-        description: rel.description,
+        confidence: (relData.confidence as number) || 0.8,
+        filePath: relData.filePath as string | undefined,
+        line: relData.line as number | undefined,
+        properties: relData.properties as Record<string, unknown> | undefined,
+        description: relData.description as string | undefined,
       });
 
       if (success) {

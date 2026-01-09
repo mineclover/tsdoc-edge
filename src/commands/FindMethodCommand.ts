@@ -8,6 +8,7 @@ import * as path from 'node:path';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import type { SymbolRegistryEntry } from '../types/registry';
 
 /**
  * Command for finding methods by qualified name
@@ -126,7 +127,7 @@ export class FindMethodCommand extends BaseCommand {
     });
   }
 
-  private displayRegistryEntry(entry: any, manager: SymbolRegistryManager): CommandResult {
+  private displayRegistryEntry(entry: SymbolRegistryEntry, manager: SymbolRegistryManager): CommandResult {
     const displayName = entry.sourceRef.qualifiedName || entry.sourceRef.symbolName || entry.id;
     console.log(`${colors.bold}${entry.id}${colors.reset} → ${displayName}`);
     console.log();
@@ -167,7 +168,7 @@ export class FindMethodCommand extends BaseCommand {
     return this.success();
   }
 
-  private displayRegistryResults(results: any[], manager: SymbolRegistryManager): CommandResult {
+  private displayRegistryResults(results: SymbolRegistryEntry[], manager: SymbolRegistryManager): CommandResult {
     if (results.length === 1) {
       return this.displayRegistryEntry(results[0], manager);
     }

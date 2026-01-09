@@ -411,7 +411,7 @@ CREATE INDEX symbol_type IF NOT EXISTS FOR (s:Symbol) ON (s.type);
   /**
    * Format properties for Cypher
    */
-  private cypherProps(props: Record<string, any>): string {
+  private cypherProps(props: Record<string, unknown>): string {
     const entries = Object.entries(props).map(([key, value]) => {
       if (typeof value === 'string') {
         return `${key}: "${value.replace(/"/g, '\\"')}"`;
@@ -428,7 +428,7 @@ CREATE INDEX symbol_type IF NOT EXISTS FOR (s:Symbol) ON (s.type);
    */
   private exportGephi(relationships: UnifiedRelationshipRow[], symbolMap: Map<string, SymbolRow>, layout: string): string {
     // Build node data
-    const nodeData: Record<string, Record<string, any>> = {};
+    const nodeData: Record<string, Record<string, unknown>> = {};
     const nodeLayout: Record<string, { x: number; y: number }> = {};
     const symbolsArray = Array.from(symbolMap.values());
 
@@ -447,12 +447,12 @@ CREATE INDEX symbol_type IF NOT EXISTS FOR (s:Symbol) ON (s.type);
     }
 
     // Build edge data
-    const edgeData: Record<string, Record<string, any>> = {};
+    const edgeData: Record<string, Record<string, unknown>> = {};
     const edges: Array<{
       key: string;
       source: string;
       target: string;
-      attributes: Record<string, any>;
+      attributes: Record<string, unknown>;
     }> = [];
 
     let edgeCounter = 0;
