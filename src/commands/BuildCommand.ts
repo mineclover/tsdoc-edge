@@ -18,10 +18,15 @@ import { FeatureGroupingAnalyzer } from '../analyzer/FeatureGroupingAnalyzer';
 import { LayerDependencyAnalyzer } from '../analyzer/LayerDependencyAnalyzer';
 import { DependencyChainAnalyzer } from '../analyzer/DependencyChainAnalyzer';
 import { RelationshipInferenceEngine } from '../analyzer/RelationshipInferenceEngine';
+import { EndpointDetectionAnalyzer } from '../analyzer/EndpointDetectionAnalyzer';
+import { BlockChunkAnalyzer } from '../analyzer/BlockChunkAnalyzer';
+import { ExposureAnalyzer } from '../analyzer/ExposureAnalyzer';
+import { InheritanceAnalyzer } from '../analyzer/InheritanceAnalyzer';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import type { TestSymbol } from '../types/test-symbols';
 import type { SymbolGraph } from '../types/graph';
+import * as ts from 'typescript';
 
 /**
  * Command for building symbol database from source files
@@ -214,6 +219,23 @@ export class BuildCommand extends BaseCommand {
 
       this.printInfo(`Processing ${files.length} file(s)...`);
 
+      // Initialize TypeScript program for advanced analyzers
+      const compilerOptions: ts.CompilerOptions = {
+        target: ts.ScriptTarget.ES2020,
+        module: ts.ModuleKind.CommonJS,
+        allowJs: true,
+        checkJs: false,
+        noEmit: true,
+      };
+      const program = ts.createProgram(allFiles, compilerOptions);
+
+      // Initialize new analyzers
+      const endpointAnalyzer = new EndpointDetectionAnalyzer(program);
+      const blockAnalyzer = new BlockChunkAnalyzer(program);
+      const exposureAnalyzer = new ExposureAnalyzer(process.cwd());
+      const symbolMap = new Map();
+      const inheritanceAnalyzer = new InheritanceAnalyzer(program, symbolMap);
+
       const result = {
         filesScanned: 0,
         symbolsFound: 0,
@@ -222,6 +244,10 @@ export class BuildCommand extends BaseCommand {
         relationshipsFound: 0,
         relationshipsInserted: 0,
         relationshipsSkipped: 0, // Relationships to external symbols (not errors)
+        endpointsFound: 0,
+        endpointsInserted: 0,
+        blocksFound: 0,
+        blocksInserted: 0,
         errors: [] as string[],
       };
 
@@ -410,6 +436,112 @@ export class BuildCommand extends BaseCommand {
               }
               } else {
                 result.errors.push(`Failed to insert: ${symbol.name} in ${filePath}`);
+              }
+
+              // Store symbol in map for inheritance analysis
+              symbolMap.set(id, fullSymbol);
+
+              // Analyze exposure for exported symbols
+              if (symbol.isExported) {
+                try {
+                  const exposure = exposureAnalyzer.analyzeSymbol(fullSymbol);
+                  // Update symbol with exposure info (could be done via update query)
+                  // For now, exposure info is calculated but not stored yet
+                } catch (expError) {
+                  // Non-critical, continue
+                }
+              }
+            }
+
+            // Detect HTTP endpoints in this file
+            try {
+              const endpoints = endpointAnalyzer.analyzeFile(filePath);
+              result.endpointsFound += endpoints.length;
+
+              for (const endpoint of endpoints) {
+                const success = dbManager.insertEndpoint({
+                  id: endpoint.id,
+                  method: endpoint.method,
+                  path: endpoint.path,
+                  pathParams: endpoint.pathParams.length > 0 ? JSON.stringify(endpoint.pathParams) : null,
+                  queryParams: endpoint.queryParams ? JSON.stringify(endpoint.queryParams) : null,
+                  handlerSymbolId: endpoint.handlerSymbolId,
+                  controllerSymbolId: endpoint.controllerSymbolId ?? null,
+                  requestType: endpoint.requestType ?? null,
+                  responseType: endpoint.responseType ?? null,
+                  scope: endpoint.scope,
+                  middlewares: endpoint.middlewares.length > 0 ? JSON.stringify(endpoint.middlewares) : null,
+                  filePath: endpoint.filePath,
+                  line: endpoint.line ?? null,
+                  description: endpoint.description ?? null,
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                });
+
+                if (success) {
+                  result.endpointsInserted++;
+                }
+              }
+            } catch (endpointError) {
+              // Non-critical, continue
+            }
+
+            // Analyze code blocks for functions/methods
+            for (const symbol of extractResult.symbols) {
+              if (symbol.type === 'function' || symbol.type === 'method') {
+                try {
+                  const sourceFile = program.getSourceFile(filePath);
+                  if (sourceFile) {
+                    // Find the function/method node
+                    const findNode = (node: ts.Node): ts.FunctionDeclaration | ts.MethodDeclaration | ts.ArrowFunction | null => {
+                      if ((ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node) || ts.isArrowFunction(node))) {
+                        const nodePos = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+                        if (nodePos.line + 1 === symbol.line) {
+                          return node as any;
+                        }
+                      }
+                      let found: any = null;
+                      ts.forEachChild(node, child => {
+                        if (!found) {
+                          found = findNode(child);
+                        }
+                      });
+                      return found;
+                    };
+
+                    const functionNode = findNode(sourceFile);
+                    if (functionNode) {
+                      const symbolId = symbolIdMap.get(symbol.name);
+                      if (symbolId) {
+                        const blockResult = blockAnalyzer.analyzeFunction(functionNode, symbolId, filePath);
+                        result.blocksFound += blockResult.blocks.length;
+
+                        for (const block of blockResult.blocks) {
+                          const success = dbManager.insertCodeBlock({
+                            id: block.id,
+                            symbolId: block.symbolId,
+                            type: block.type,
+                            startLine: block.startLine,
+                            endLine: block.endLine,
+                            purpose: block.purpose ?? null,
+                            dependencies: block.dependencies.length > 0 ? JSON.stringify(block.dependencies) : null,
+                            sideEffects: block.sideEffects.length > 0 ? JSON.stringify(block.sideEffects) : null,
+                            scope: block.scope ?? null,
+                            complexity: block.complexity ?? null,
+                            createdAt: new Date().toISOString(),
+                            updatedAt: new Date().toISOString(),
+                          });
+
+                          if (success) {
+                            result.blocksInserted++;
+                          }
+                        }
+                      }
+                    }
+                  }
+                } catch (blockError) {
+                  // Non-critical, continue
+                }
               }
             }
           }
@@ -826,6 +958,10 @@ export class BuildCommand extends BaseCommand {
       console.log(`  Doc relationships: ${this.colors.green}${docRelationshipsInserted}${this.colors.reset}`);
       console.log(`  Semantic relationships: ${this.colors.green}${semanticRelationshipsInserted}${this.colors.reset}`);
       console.log(`  Inferred relationships: ${this.colors.green}${inferredRelationshipsInserted}${this.colors.reset}`);
+      console.log(`  Endpoints found: ${this.colors.cyan}${result.endpointsFound}${this.colors.reset}`);
+      console.log(`  Endpoints inserted: ${this.colors.green}${result.endpointsInserted}${this.colors.reset}`);
+      console.log(`  Blocks found: ${this.colors.cyan}${result.blocksFound}${this.colors.reset}`);
+      console.log(`  Blocks inserted: ${this.colors.green}${result.blocksInserted}${this.colors.reset}`);
       console.log(`  Duration: ${this.colors.cyan}${duration}ms${this.colors.reset}`);
       console.log();
       console.log(`${this.colors.dim}Database: ${dbPath}${this.colors.reset}`);
