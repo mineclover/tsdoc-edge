@@ -7,6 +7,8 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { DatabaseManager, SymbolRow } from '../storage/DatabaseManager';
 import type { Symbol } from '../types/graph/graph';
+import { XmlBuilder } from '../output/XmlBuilder';
+import type { SectionData, GroupedSectionData } from '../output/types';
 
 /**
  * Result of symbol resolution
@@ -455,6 +457,124 @@ export abstract class BaseCommand {
       this.printError(unknownError.message);
       return this.failure(unknownError);
     }
+  }
+
+  /**
+   * Print command output in XML or human-readable format
+   * Provides unified output interface for all commands
+   *
+   * @param rootTag - Root XML tag name (e.g., 'statistics', 'health-report')
+   * @param sections - Data sections to output
+   * @param args - Command arguments (to check for --human flag)
+   *
+   * @example
+   * ```typescript
+   * this.printOutput('statistics', {
+   *   database: { totalSymbols: 100, dbSizeKB: 500 },
+   *   coverage: { documented: 75, coveragePercent: 75.0 }
+   * }, args);
+   * ```
+   */
+  protected printOutput(
+    rootTag: string,
+    sections: Record<string, SectionData | GroupedSectionData>,
+    args: string[]
+  ): void {
+    // Check if human-readable format is requested
+    if (this.hasFlag(args, '--human')) {
+      // Human format should be handled by the command itself
+      // This method only handles XML output
+      return;
+    }
+
+    // Build XML output dynamically
+    const lines: string[] = [];
+    lines.push(`<${rootTag}>`);
+
+    for (const [sectionName, sectionData] of Object.entries(sections)) {
+      lines.push(...this.buildXmlSection(sectionName, sectionData, 1));
+    }
+
+    lines.push(`</${rootTag}>`);
+    console.log(lines.join('\n'));
+  }
+
+  /**
+   * Build XML section recursively
+   * @private
+   */
+  private buildXmlSection(
+    name: string,
+    data: SectionData | GroupedSectionData,
+    indent: number
+  ): string[] {
+    const lines: string[] = [];
+    const indentStr = '  '.repeat(indent);
+
+    if (Array.isArray(data)) {
+      // Array section
+      lines.push(`${indentStr}<${name} count="${data.length}">`);
+      data.forEach((item, index) => {
+        lines.push(`${indentStr}  <item index="${index + 1}">`);
+        for (const [key, value] of Object.entries(item as Record<string, unknown>)) {
+          lines.push(`${indentStr}    <${key}>${this.escapeXml(value)}</${key}>`);
+        }
+        lines.push(`${indentStr}  </item>`);
+      });
+      lines.push(`${indentStr}</${name}>`);
+    } else if (typeof data === 'object' && data !== null) {
+      // Check if it's a grouped array (has string keys with array values)
+      const entries = Object.entries(data);
+      const isGrouped = entries.length > 0 && entries.every(([_, v]) => Array.isArray(v));
+
+      if (isGrouped) {
+        // Grouped array section
+        lines.push(`${indentStr}<${name} count="${entries.length}">`);
+        for (const [groupName, groupItems] of entries) {
+          const items = groupItems as Array<Record<string, unknown>>;
+          lines.push(`${indentStr}  <group name="${groupName}" count="${items.length}">`);
+          items.forEach((item, index) => {
+            lines.push(`${indentStr}    <item index="${index + 1}">`);
+            for (const [key, value] of Object.entries(item)) {
+              lines.push(`${indentStr}      <${key}>${this.escapeXml(value)}</${key}>`);
+            }
+            lines.push(`${indentStr}    </item>`);
+          });
+          lines.push(`${indentStr}  </group>`);
+        }
+        lines.push(`${indentStr}</${name}>`);
+      } else {
+        // Object section
+        lines.push(`${indentStr}<${name}>`);
+        for (const [key, value] of entries) {
+          if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+            // Nested object
+            lines.push(...this.buildXmlSection(key, value as Record<string, unknown>, indent + 1));
+          } else {
+            lines.push(`${indentStr}  <${key}>${this.escapeXml(value)}</${key}>`);
+          }
+        }
+        lines.push(`${indentStr}</${name}>`);
+      }
+    }
+
+    return lines;
+  }
+
+  /**
+   * Escape XML special characters
+   * @private
+   */
+  private escapeXml(value: unknown): string {
+    if (value === null || value === undefined) {
+      return '';
+    }
+    return String(value)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
   }
 
   /**

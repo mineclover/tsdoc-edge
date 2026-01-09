@@ -91,8 +91,6 @@ export class StatsCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      this.printHeader('TSDoc Edge - Documentation Statistics');
-
       if (!this.dbManager) {
         const dbCheck = this.checkDatabaseExists();
         if (dbCheck) return dbCheck;
@@ -105,24 +103,33 @@ export class StatsCommand extends BaseCommand {
       try {
         const stats = dbManager.getStatistics();
 
-        this.printSection('📊 Database Statistics');
-        console.log(`Total Symbols: ${colors.green}${stats.totalSymbols}${colors.reset}`);
-        console.log(`Total Enhanced Docs: ${colors.green}${stats.totalEnhancedDocs}${colors.reset}`);
-        console.log(`DB Size: ${colors.cyan}${(stats.dbSize / 1024).toFixed(2)} KB${colors.reset}`);
-        console.log();
-
         // Count documented vs undocumented - separated by source/test using Drizzle
         const allSymbols = dbManager.getAllSymbolRows();
         const total = allSymbols.length;
 
         // Show guidance if no symbols
         if (total === 0) {
-          console.log(`${colors.yellow}No symbols found in database.${colors.reset}`);
-          console.log();
-          console.log(`${colors.bold}Getting Started:${colors.reset}`);
-          console.log(`  1. Run ${colors.cyan}tsdoc-edge build src${colors.reset} to build the symbol database`);
-          console.log(`  2. Run ${colors.cyan}tsdoc-edge stats${colors.reset} again to see statistics`);
-          console.log();
+          if (this.hasFlag(args, '--human')) {
+            this.printHeader('TSDoc Edge - Documentation Statistics');
+            console.log(`${colors.yellow}No symbols found in database.${colors.reset}`);
+            console.log();
+            console.log(`${colors.bold}Getting Started:${colors.reset}`);
+            console.log(`  1. Run ${colors.cyan}tsdoc-edge build src${colors.reset} to build the symbol database`);
+            console.log(`  2. Run ${colors.cyan}tsdoc-edge stats${colors.reset} again to see statistics`);
+            console.log();
+          } else {
+            // XML output for empty database
+            this.printOutput('statistics', {
+              database: {
+                totalSymbols: 0,
+                totalEnhancedDocs: 0,
+                dbSizeKB: 0,
+              },
+              message: {
+                text: 'No symbols found in database. Run tsdoc-edge build src to build the symbol database.',
+              },
+            }, args);
+          }
           return this.success();
         }
 
@@ -136,17 +143,54 @@ export class StatsCommand extends BaseCommand {
         const sourceCoverage = sourceTotal > 0 ? (sourceDocumented / sourceTotal) * 100 : 0;
         const testPercent = (testTotal / total) * 100;
 
-        this.printSection('📈 Documentation Coverage');
-        console.log(`${colors.bold}Overall:${colors.reset}`);
-        console.log(`  Documented: ${colors.green}${documented}${colors.reset} / ${total}`);
-        console.log(`  Coverage: ${colors.bold}${coverage.toFixed(1)}%${colors.reset}`);
-        console.log();
-        console.log(`${colors.bold}Source Code Only:${colors.reset} ${colors.dim}(excluding test-case, test-suite)${colors.reset}`);
-        console.log(`  Documented: ${colors.green}${sourceDocumented}${colors.reset} / ${sourceTotal}`);
-        console.log(`  Coverage: ${colors.bold}${sourceCoverage.toFixed(1)}%${colors.reset}`);
-        console.log();
-        console.log(`${colors.dim}Test Symbols: ${testTotal} (${testPercent.toFixed(1)}% of total)${colors.reset}`);
-        console.log();
+        // Check if human-readable format is requested
+        if (this.hasFlag(args, '--human')) {
+          // Original color output
+          this.printHeader('TSDoc Edge - Documentation Statistics');
+
+          this.printSection('📊 Database Statistics');
+          console.log(`Total Symbols: ${colors.green}${stats.totalSymbols}${colors.reset}`);
+          console.log(`Total Enhanced Docs: ${colors.green}${stats.totalEnhancedDocs}${colors.reset}`);
+          console.log(`DB Size: ${colors.cyan}${(stats.dbSize / 1024).toFixed(2)} KB${colors.reset}`);
+          console.log();
+
+          this.printSection('📈 Documentation Coverage');
+          console.log(`${colors.bold}Overall:${colors.reset}`);
+          console.log(`  Documented: ${colors.green}${documented}${colors.reset} / ${total}`);
+          console.log(`  Coverage: ${colors.bold}${coverage.toFixed(1)}%${colors.reset}`);
+          console.log();
+          console.log(`${colors.bold}Source Code Only:${colors.reset} ${colors.dim}(excluding test-case, test-suite)${colors.reset}`);
+          console.log(`  Documented: ${colors.green}${sourceDocumented}${colors.reset} / ${sourceTotal}`);
+          console.log(`  Coverage: ${colors.bold}${sourceCoverage.toFixed(1)}%${colors.reset}`);
+          console.log();
+          console.log(`${colors.dim}Test Symbols: ${testTotal} (${testPercent.toFixed(1)}% of total)${colors.reset}`);
+          console.log();
+        } else {
+          // XML output (default)
+          this.printOutput('statistics', {
+            database: {
+              totalSymbols: stats.totalSymbols,
+              totalEnhancedDocs: stats.totalEnhancedDocs,
+              dbSizeKB: (stats.dbSize / 1024).toFixed(2),
+            },
+            coverage: {
+              overall: {
+                documented,
+                total,
+                coveragePercent: coverage.toFixed(1),
+              },
+              source: {
+                documented: sourceDocumented,
+                total: sourceTotal,
+                coveragePercent: sourceCoverage.toFixed(1),
+              },
+              tests: {
+                total: testTotal,
+                percentOfTotal: testPercent.toFixed(1),
+              },
+            },
+          }, args);
+        }
 
         return this.success();
       } finally {

@@ -95,13 +95,13 @@ export class IdCommand extends BaseCommand {
 
       switch (subcommand) {
         case 'new':
-          return await this.handleNew(manager, args.slice(1));
+          return await this.handleNew(manager, args);
         case 'list':
-          return await this.handleList(manager);
+          return await this.handleList(manager, args);
         case 'find':
-          return await this.handleFind(manager, args.slice(1));
+          return await this.handleFind(manager, args);
         case 'stats':
-          return await this.handleStats(manager);
+          return await this.handleStats(manager, args);
         default:
           return this.showHelp();
       }
@@ -109,8 +109,10 @@ export class IdCommand extends BaseCommand {
   }
 
   private async handleNew(manager: SymbolRegistryManager, args: string[]): Promise<CommandResult> {
-    const filePath = args[0];
-    const symbolName = args[1];
+    // Filter out subcommand and flags
+    const positionalArgs = args.slice(1).filter(arg => !arg.startsWith('--'));
+    const filePath = positionalArgs[0];
+    const symbolName = positionalArgs[1];
 
     if (!filePath || !symbolName) {
       console.log(`${colors.red}Usage: tsdoc-edge id new <file> <symbol> [options]${colors.reset}`);
@@ -128,7 +130,7 @@ export class IdCommand extends BaseCommand {
     let parent: string | undefined;
     let memberType: 'instance' | 'static' | 'inner' | undefined;
 
-    for (const arg of args.slice(2)) {
+    for (const arg of args.slice(1)) {
       if (arg.startsWith('--type=')) {
         type = arg.split('=')[1];
       } else if (arg.startsWith('--parent=')) {
@@ -158,43 +160,78 @@ export class IdCommand extends BaseCommand {
 
     const entry = manager.findById(id);
 
-    console.log(`${colors.green}✅ ID generated:${colors.reset}`);
-    console.log();
-    console.log(`  ID: ${colors.bold}${id}${colors.reset}`);
-    console.log(`  Qualified Name: ${colors.bold}${entry?.sourceRef.qualifiedName}${colors.reset}`);
-    console.log(`  File: ${filePath}`);
-    console.log();
-    console.log('Add this to your TSDoc comment:');
-    console.log(`${colors.cyan}  @id ${id}${colors.reset}`);
-    console.log();
+    if (this.hasFlag(args, '--human')) {
+      // Original color output
+      console.log(`${colors.green}✅ ID generated:${colors.reset}`);
+      console.log();
+      console.log(`  ID: ${colors.bold}${id}${colors.reset}`);
+      console.log(`  Qualified Name: ${colors.bold}${entry?.sourceRef.qualifiedName}${colors.reset}`);
+      console.log(`  File: ${filePath}`);
+      console.log();
+      console.log('Add this to your TSDoc comment:');
+      console.log(`${colors.cyan}  @id ${id}${colors.reset}`);
+      console.log();
+    } else {
+      // XML output
+      this.printOutput('id-new', {
+        result: {
+          id,
+          qualifiedName: entry?.sourceRef.qualifiedName || '',
+          filePath,
+          symbolName,
+          type: type || 'unknown',
+        },
+        usage: {
+          tsdocTag: `@id ${id}`,
+        },
+      }, args);
+    }
 
     return { exitCode: 0, message: `ID generated: ${id}` };
   }
 
-  private async handleList(manager: SymbolRegistryManager): Promise<CommandResult> {
+  private async handleList(manager: SymbolRegistryManager, args: string[]): Promise<CommandResult> {
     const entries = manager.getAll();
 
     // If registry is empty, show symbols from database
     if (entries.length === 0) {
-      return this.handleListFromDatabase();
+      return this.handleListFromDatabase(args);
     }
 
-    console.log(`${colors.bold}Symbol Registry${colors.reset}`);
-    console.log(`Total entries: ${colors.green}${entries.length}${colors.reset}`);
-    console.log();
-
-    for (const entry of entries) {
-      console.log(`${colors.bold}${entry.id}${colors.reset} → ${entry.sourceRef.filePath}:${entry.sourceRef.symbolName}`);
-      if (entry.tags && entry.tags.length > 0) {
-        console.log(`  Tags: ${entry.tags.join(', ')}`);
-      }
+    if (this.hasFlag(args, '--human')) {
+      // Original color output
+      console.log(`${colors.bold}Symbol Registry${colors.reset}`);
+      console.log(`Total entries: ${colors.green}${entries.length}${colors.reset}`);
       console.log();
+
+      for (const entry of entries) {
+        console.log(`${colors.bold}${entry.id}${colors.reset} → ${entry.sourceRef.filePath}:${entry.sourceRef.symbolName}`);
+        if (entry.tags && entry.tags.length > 0) {
+          console.log(`  Tags: ${entry.tags.join(', ')}`);
+        }
+        console.log();
+      }
+    } else {
+      // XML output
+      this.printOutput('id-list', {
+        source: {
+          type: 'registry',
+          totalEntries: entries.length,
+        },
+        entries: entries.map(entry => ({
+          id: entry.id,
+          filePath: entry.sourceRef.filePath,
+          symbolName: entry.sourceRef.symbolName,
+          qualifiedName: entry.sourceRef.qualifiedName,
+          tags: entry.tags?.join(', ') || '',
+        })),
+      }, args);
     }
 
     return { exitCode: 0, message: `Listed ${entries.length} entries` };
   }
 
-  private async handleListFromDatabase(): Promise<CommandResult> {
+  private async handleListFromDatabase(args: string[]): Promise<CommandResult> {
     const dbCheck = this.checkDatabaseExists();
     if (dbCheck) {
       console.log(`${colors.yellow}No registry entries and no database found.${colors.reset}`);
@@ -212,23 +249,45 @@ export class IdCommand extends BaseCommand {
       const symbols = dbManager.querySymbols({ limit: 50, orderBy: 'name', orderDir: 'asc' });
       const total = dbManager.countSymbols({});
 
-      console.log(`${colors.bold}Symbols from Database${colors.reset}`);
-      console.log(`Showing: ${colors.green}${symbols.length}${colors.reset} of ${colors.cyan}${total}${colors.reset}`);
-      console.log();
-      console.log(`${colors.dim}Note: Short ID registry is empty. Showing database symbols instead.${colors.reset}`);
-      console.log(`${colors.dim}Use ${colors.cyan}tsdoc-edge id new <file> <symbol>${colors.reset}${colors.dim} to register short IDs.${colors.reset}`);
-      console.log();
-
-      for (const symbol of symbols) {
-        console.log(`${colors.bold}${symbol.id}${colors.reset}`);
-        console.log(`  Name: ${symbol.name} (${symbol.type})`);
-        console.log(`  File: ${symbol.file_path}:${symbol.line}`);
+      if (this.hasFlag(args, '--human')) {
+        // Original color output
+        console.log(`${colors.bold}Symbols from Database${colors.reset}`);
+        console.log(`Showing: ${colors.green}${symbols.length}${colors.reset} of ${colors.cyan}${total}${colors.reset}`);
         console.log();
-      }
-
-      if (total > symbols.length) {
-        console.log(`${colors.dim}... and ${total - symbols.length} more symbols${colors.reset}`);
+        console.log(`${colors.dim}Note: Short ID registry is empty. Showing database symbols instead.${colors.reset}`);
+        console.log(`${colors.dim}Use ${colors.cyan}tsdoc-edge id new <file> <symbol>${colors.reset}${colors.dim} to register short IDs.${colors.reset}`);
         console.log();
+
+        for (const symbol of symbols) {
+          console.log(`${colors.bold}${symbol.id}${colors.reset}`);
+          console.log(`  Name: ${symbol.name} (${symbol.type})`);
+          console.log(`  File: ${symbol.file_path}:${symbol.line}`);
+          console.log();
+        }
+
+        if (total > symbols.length) {
+          console.log(`${colors.dim}... and ${total - symbols.length} more symbols${colors.reset}`);
+          console.log();
+        }
+      } else {
+        // XML output
+        this.printOutput('id-list', {
+          source: {
+            type: 'database',
+            showing: symbols.length,
+            total,
+          },
+          note: {
+            text: 'Short ID registry is empty. Showing database symbols instead.',
+          },
+          symbols: symbols.map(symbol => ({
+            id: symbol.id,
+            name: symbol.name,
+            type: symbol.type,
+            filePath: symbol.file_path,
+            line: symbol.line,
+          })),
+        }, args);
       }
 
       return { exitCode: 0, message: `Listed ${symbols.length} symbols from database` };
@@ -238,7 +297,10 @@ export class IdCommand extends BaseCommand {
   }
 
   private async handleFind(manager: SymbolRegistryManager, args: string[]): Promise<CommandResult> {
-    const id = args[0];
+    // Filter out subcommand and flags
+    const positionalArgs = args.slice(1).filter(arg => !arg.startsWith('--'));
+    const id = positionalArgs[0];
+
     if (!id) {
       console.log(`${colors.red}Usage: tsdoc-edge id find <id-or-name>${colors.reset}`);
       return { exitCode: 1, message: 'Missing ID argument' };
@@ -247,25 +309,44 @@ export class IdCommand extends BaseCommand {
     // Try registry first
     const entry = manager.findById(id);
     if (entry) {
-      console.log(`${colors.bold}Symbol: ${id}${colors.reset}`);
-      console.log();
-      console.log(`ID: ${colors.bold}${entry.id}${colors.reset}`);
-      console.log(`File: ${entry.sourceRef.filePath}`);
-      console.log(`Symbol: ${entry.sourceRef.symbolName}`);
-      if (entry.sourceRef.type) {
-        console.log(`Type: ${entry.sourceRef.type}`);
+      if (this.hasFlag(args, '--human')) {
+        // Original color output
+        console.log(`${colors.bold}Symbol: ${id}${colors.reset}`);
+        console.log();
+        console.log(`ID: ${colors.bold}${entry.id}${colors.reset}`);
+        console.log(`File: ${entry.sourceRef.filePath}`);
+        console.log(`Symbol: ${entry.sourceRef.symbolName}`);
+        if (entry.sourceRef.type) {
+          console.log(`Type: ${entry.sourceRef.type}`);
+        }
+        console.log(`Created: ${entry.createdAt}`);
+        console.log(`Updated: ${entry.updatedAt}`);
+        console.log();
+      } else {
+        // XML output
+        this.printOutput('id-find', {
+          source: {
+            type: 'registry',
+          },
+          symbol: {
+            id: entry.id,
+            filePath: entry.sourceRef.filePath,
+            symbolName: entry.sourceRef.symbolName,
+            qualifiedName: entry.sourceRef.qualifiedName,
+            type: entry.sourceRef.type || 'unknown',
+            createdAt: entry.createdAt,
+            updatedAt: entry.updatedAt,
+          },
+        }, args);
       }
-      console.log(`Created: ${entry.createdAt}`);
-      console.log(`Updated: ${entry.updatedAt}`);
-      console.log();
       return { exitCode: 0, message: `Found ID: ${id}` };
     }
 
     // Fall back to database search
-    return this.handleFindFromDatabase(id);
+    return this.handleFindFromDatabase(id, args);
   }
 
-  private async handleFindFromDatabase(idOrName: string): Promise<CommandResult> {
+  private async handleFindFromDatabase(idOrName: string, args: string[]): Promise<CommandResult> {
     const dbCheck = this.checkDatabaseExists();
     if (dbCheck) {
       console.log(`${colors.red}❌ ID not found: ${idOrName}${colors.reset}`);
@@ -280,39 +361,76 @@ export class IdCommand extends BaseCommand {
       // Try exact ID match first
       const symbol = dbManager.getSymbol(idOrName);
       if (symbol) {
-        console.log(`${colors.bold}Symbol Found (from database)${colors.reset}`);
-        console.log();
-        console.log(`ID: ${colors.bold}${symbol.id}${colors.reset}`);
-        console.log(`Name: ${symbol.name}`);
-        console.log(`Type: ${symbol.type}`);
-        console.log(`File: ${symbol.filePath}:${symbol.line}`);
-        console.log(`Exported: ${symbol.isExported ? 'Yes' : 'No'}`);
-        if (symbol.summary) {
-          console.log(`Summary: ${symbol.summary.substring(0, 80)}${symbol.summary.length > 80 ? '...' : ''}`);
+        if (this.hasFlag(args, '--human')) {
+          // Original color output
+          console.log(`${colors.bold}Symbol Found (from database)${colors.reset}`);
+          console.log();
+          console.log(`ID: ${colors.bold}${symbol.id}${colors.reset}`);
+          console.log(`Name: ${symbol.name}`);
+          console.log(`Type: ${symbol.type}`);
+          console.log(`File: ${symbol.filePath}:${symbol.line}`);
+          console.log(`Exported: ${symbol.isExported ? 'Yes' : 'No'}`);
+          if (symbol.summary) {
+            console.log(`Summary: ${symbol.summary.substring(0, 80)}${symbol.summary.length > 80 ? '...' : ''}`);
+          }
+          console.log();
+        } else {
+          // XML output
+          this.printOutput('id-find', {
+            source: {
+              type: 'database',
+            },
+            symbol: {
+              id: symbol.id,
+              name: symbol.name,
+              type: symbol.type,
+              filePath: symbol.filePath,
+              line: symbol.line,
+              exported: symbol.isExported ? 'yes' : 'no',
+              summary: symbol.summary || '',
+            },
+          }, args);
         }
-        console.log();
         return { exitCode: 0, message: `Found symbol: ${idOrName}` };
       }
 
       // Try name search
       const matches = dbManager.findSymbolsByNamePattern(idOrName);
       if (matches.length > 0) {
-        console.log(`${colors.bold}Symbols matching "${idOrName}"${colors.reset}`);
-        console.log(`Found: ${colors.green}${matches.length}${colors.reset} match(es)`);
-        console.log();
-
-        for (const match of matches.slice(0, 10)) {
-          console.log(`${colors.bold}${match.id}${colors.reset}`);
-          console.log(`  Name: ${match.name} (${match.type})`);
-          console.log(`  File: ${match.file_path}:${match.line}`);
+        if (this.hasFlag(args, '--human')) {
+          // Original color output
+          console.log(`${colors.bold}Symbols matching "${idOrName}"${colors.reset}`);
+          console.log(`Found: ${colors.green}${matches.length}${colors.reset} match(es)`);
           console.log();
-        }
 
-        if (matches.length > 10) {
-          console.log(`${colors.dim}... and ${matches.length - 10} more matches${colors.reset}`);
-          console.log();
-        }
+          for (const match of matches.slice(0, 10)) {
+            console.log(`${colors.bold}${match.id}${colors.reset}`);
+            console.log(`  Name: ${match.name} (${match.type})`);
+            console.log(`  File: ${match.file_path}:${match.line}`);
+            console.log();
+          }
 
+          if (matches.length > 10) {
+            console.log(`${colors.dim}... and ${matches.length - 10} more matches${colors.reset}`);
+            console.log();
+          }
+        } else {
+          // XML output
+          this.printOutput('id-find', {
+            source: {
+              type: 'database-search',
+              query: idOrName,
+              totalMatches: matches.length,
+            },
+            matches: matches.slice(0, 10).map(match => ({
+              id: match.id,
+              name: match.name,
+              type: match.type,
+              filePath: match.file_path,
+              line: match.line,
+            })),
+          }, args);
+        }
         return { exitCode: 0, message: `Found ${matches.length} matches` };
       }
 
@@ -329,22 +447,41 @@ export class IdCommand extends BaseCommand {
     }
   }
 
-  private async handleStats(manager: SymbolRegistryManager): Promise<CommandResult> {
+  private async handleStats(manager: SymbolRegistryManager, args: string[]): Promise<CommandResult> {
     const stats = manager.getStats();
 
-    console.log(`${colors.bold}Registry Statistics${colors.reset}`);
-    console.log();
-    console.log(`Total Entries: ${colors.green}${stats.totalEntries}${colors.reset}`);
-    console.log(`Files: ${colors.cyan}${stats.fileCount}${colors.reset}`);
-    console.log(`Tags: ${colors.cyan}${stats.tagCount}${colors.reset}`);
-    console.log();
-    console.log(`${colors.bold}ID Generator Stats:${colors.reset}`);
-    console.log(`  Mode: ${stats.idStats.mode}`);
-    console.log(`  Length: ${stats.idStats.length} chars`);
-    console.log(`  Used: ${stats.idStats.used}`);
-    console.log(`  Capacity: ${stats.idStats.capacity}`);
-    console.log(`  Utilization: ${stats.idStats.utilization.toFixed(2)}%`);
-    console.log();
+    if (this.hasFlag(args, '--human')) {
+      // Original color output
+      console.log(`${colors.bold}Registry Statistics${colors.reset}`);
+      console.log();
+      console.log(`Total Entries: ${colors.green}${stats.totalEntries}${colors.reset}`);
+      console.log(`Files: ${colors.cyan}${stats.fileCount}${colors.reset}`);
+      console.log(`Tags: ${colors.cyan}${stats.tagCount}${colors.reset}`);
+      console.log();
+      console.log(`${colors.bold}ID Generator Stats:${colors.reset}`);
+      console.log(`  Mode: ${stats.idStats.mode}`);
+      console.log(`  Length: ${stats.idStats.length} chars`);
+      console.log(`  Used: ${stats.idStats.used}`);
+      console.log(`  Capacity: ${stats.idStats.capacity}`);
+      console.log(`  Utilization: ${stats.idStats.utilization.toFixed(2)}%`);
+      console.log();
+    } else {
+      // XML output
+      this.printOutput('id-stats', {
+        registry: {
+          totalEntries: stats.totalEntries,
+          fileCount: stats.fileCount,
+          tagCount: stats.tagCount,
+        },
+        idGenerator: {
+          mode: stats.idStats.mode,
+          length: stats.idStats.length,
+          used: stats.idStats.used,
+          capacity: stats.idStats.capacity,
+          utilizationPercent: stats.idStats.utilization.toFixed(2),
+        },
+      }, args);
+    }
 
     return { exitCode: 0, message: 'Statistics displayed' };
   }

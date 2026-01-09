@@ -91,17 +91,14 @@ export class HealthCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const targetPath = args[0] || 'src';
-
-      this.printHeader('TSDoc Edge - Health Check');
+      // Filter out flags to get positional arguments
+      const positionalArgs = args.filter(arg => !arg.startsWith('--'));
+      const targetPath = positionalArgs[0] || 'src';
 
       if (!fs.existsSync(targetPath)) {
         this.printError(`Path not found: ${targetPath}`);
         return this.failure(`Path not found: ${targetPath}`);
       }
-
-      this.printInfo(`Checking health: ${targetPath}`);
-      console.log();
 
       const report = this.checker.analyze({
         path: targetPath,
@@ -111,7 +108,61 @@ export class HealthCommand extends BaseCommand {
         generateSuggestions: false,
       });
 
-      this.printHealthReport(report);
+      // Check if human-readable format is requested
+      if (this.hasFlag(args, '--human')) {
+        // Original color output
+        this.printHeader('TSDoc Edge - Health Check');
+        this.printInfo(`Checking health: ${targetPath}`);
+        console.log();
+        this.printHealthReport(report);
+      } else {
+        // XML output (default)
+        const { metrics } = report;
+        const healthScore = metrics.healthScore;
+        const healthGrade = this.getHealthGrade(healthScore);
+        const docScore = metrics.avgQualityScore;
+        const testScore = Math.round((metrics.filesWithTests / metrics.totalFiles) * 100);
+
+        // Build recommendations based on health score
+        const recommendations: string[] = [];
+        if (healthScore >= 80) {
+          recommendations.push('Your codebase health is excellent!');
+          recommendations.push('Keep maintaining this quality standard.');
+        } else if (healthScore >= 60) {
+          recommendations.push('Your codebase health is good but can be improved.');
+          recommendations.push(`Focus on: ${this.getHealthFocus(metrics)}`);
+        } else if (healthScore >= 40) {
+          recommendations.push('Your codebase health needs attention.');
+          recommendations.push(`Priority: ${this.getHealthFocus(metrics)}`);
+        } else {
+          recommendations.push('Your codebase health is critical.');
+          recommendations.push(`Urgent action required: ${this.getHealthFocus(metrics)}`);
+        }
+
+        this.printOutput('health', {
+          target: {
+            path: targetPath,
+          },
+          overall: {
+            healthScore,
+            healthGrade,
+            maxScore: 100,
+          },
+          breakdown: {
+            documentationQuality: docScore,
+            testCoverage: testScore,
+          },
+          recommendations: recommendations.map((text) => ({ text })),
+          statistics: {
+            totalSymbols: metrics.totalSymbols,
+            documented: metrics.documentedSymbols,
+            documentedPercent: Math.round((metrics.documentedSymbols / metrics.totalSymbols) * 100),
+            filesWithTests: metrics.filesWithTests,
+            totalFiles: metrics.totalFiles,
+            filesNeedingAttention: report.filesNeedingAttention.length,
+          },
+        }, args);
+      }
 
       return this.success();
     });
