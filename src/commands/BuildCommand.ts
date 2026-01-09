@@ -27,6 +27,8 @@ import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import type { TestSymbol } from '../types/test-symbols';
 import type { SymbolGraph } from '../types/graph';
+import { XmlBuilder } from '../output/XmlBuilder';
+import { BuildResultSchema } from '../output/schemas';
 import * as ts from 'typescript';
 
 /**
@@ -110,6 +112,14 @@ export class BuildCommand extends BaseCommand {
     --incremental    Incremental build (only changed files, default)
     --exclude-tests  Exclude test files (.test.ts, .spec.ts) from indexing`;
   }
+
+  // Override print methods to suppress console output (use XML output instead)
+  protected printHeader(_title: string): void {}
+  protected printSection(_title: string): void {}
+  protected printSuccess(_message: string): void {}
+  protected printError(_message: string): void {}
+  protected printWarning(_message: string): void {}
+  protected printInfo(_message: string): void {}
 
   /**
    * execute method
@@ -971,9 +981,13 @@ export class BuildCommand extends BaseCommand {
 
             for (const inhRel of inheritanceRels) {
               const relId = `inheritance-${inhRel.from}-${inhRel.to}`;
+              // Map InheritanceType to unified RelationshipType
+              const unifiedType = inhRel.type === 'extends' ? 'inheritance' :
+                                  inhRel.type === 'implements' ? 'implementation' :
+                                  'inheritance'; // fallback for 'mixins'
               const success = dbManager.insertUnifiedRelationship({
                 id: relId,
-                type: inhRel.type, // 'extends' or 'implements'
+                type: unifiedType,
                 category: 'structural',
                 fromSymbols: [inhRel.from],
                 toSymbols: [inhRel.to],
@@ -990,6 +1004,7 @@ export class BuildCommand extends BaseCommand {
                 filePath: inhRel.filePath,
                 line: inhRel.line,
                 properties: {
+                  inheritanceType: inhRel.type, // Store original type
                   abstractionFrom: inhRel.abstractionLevel.from,
                   abstractionTo: inhRel.abstractionLevel.to,
                   hierarchyDepth: inhRel.hierarchyDepth,
@@ -1026,8 +1041,8 @@ export class BuildCommand extends BaseCommand {
             const relId = `endpoint-handler-${endpoint.id}`;
             const success = dbManager.insertUnifiedRelationship({
               id: relId,
-              type: 'endpoint-uses-handler',
-              category: 'structural',
+              type: 'calls', // Endpoint calls/invokes handler
+              category: 'behavioral',
               fromSymbols: [endpoint.id],
               toSymbols: [endpoint.handlerSymbolId],
               direction: 'unidirectional',
@@ -1043,6 +1058,7 @@ export class BuildCommand extends BaseCommand {
               filePath: endpoint.filePath,
               line: endpoint.line || undefined,
               properties: {
+                relationshipContext: 'endpoint-handler',
                 method: endpoint.method,
                 path: endpoint.path,
                 scope: endpoint.scope,
@@ -1078,56 +1094,35 @@ export class BuildCommand extends BaseCommand {
 
       dbManager.close();
 
-      console.log();
-      this.printSuccess('Database build complete');
-      console.log();
-
-      // Print statistics
-      this.printSection('Statistics');
-      console.log(`  Files scanned: ${this.colors.cyan}${result.filesScanned}${this.colors.reset}`);
-      console.log(`  Symbols found: ${this.colors.cyan}${result.symbolsFound}${this.colors.reset}`);
-      console.log(`  Symbols inserted: ${this.colors.green}${result.symbolsInserted}${this.colors.reset}`);
-      if (result.symbolsCollisions > 0) {
-        console.log(`  ID collisions skipped: ${this.colors.yellow}${result.symbolsCollisions}${this.colors.reset}`);
-      }
-      console.log(`  Relationships found: ${this.colors.cyan}${result.relationshipsFound}${this.colors.reset}`);
-      console.log(`  Relationships inserted: ${this.colors.green}${result.relationshipsInserted}${this.colors.reset}`);
-      if (result.relationshipsSkipped > 0) {
-        console.log(`  Relationships skipped: ${this.colors.dim}${result.relationshipsSkipped} (external types)${this.colors.reset}`);
-      }
-      console.log(`  Doc relationships: ${this.colors.green}${docRelationshipsInserted}${this.colors.reset}`);
-      console.log(`  Semantic relationships: ${this.colors.green}${semanticRelationshipsInserted}${this.colors.reset}`);
-      console.log(`  Inferred relationships: ${this.colors.green}${inferredRelationshipsInserted}${this.colors.reset}`);
-      console.log(`  Inheritance relationships: ${this.colors.green}${inheritanceRelationshipsInserted}${this.colors.reset}`);
-      console.log(`  Endpoint-handler relationships: ${this.colors.green}${endpointHandlerRelsInserted}${this.colors.reset}`);
-      console.log(`  Endpoints found: ${this.colors.cyan}${result.endpointsFound}${this.colors.reset}`);
-      console.log(`  Endpoints inserted: ${this.colors.green}${result.endpointsInserted}${this.colors.reset}`);
-      console.log(`  Blocks found: ${this.colors.cyan}${result.blocksFound}${this.colors.reset}`);
-      console.log(`  Blocks inserted: ${this.colors.green}${result.blocksInserted}${this.colors.reset}`);
-      console.log(`  Entry points found: ${this.colors.cyan}${result.entryPointsFound}${this.colors.reset}`);
-      console.log(`  Entry points inserted: ${this.colors.green}${result.entryPointsInserted}${this.colors.reset}`);
-      console.log(`  Duration: ${this.colors.cyan}${duration}ms${this.colors.reset}`);
-      console.log();
-      console.log(`${this.colors.dim}Database: ${dbPath}${this.colors.reset}`);
-      console.log(`${this.colors.dim}Registry: ${registryPath}${this.colors.reset}`);
-
-      // Show errors if any
-      if (result.errors.length > 0) {
-        console.log();
-        this.printWarning(`Errors (${result.errors.length}):`);
-        result.errors.slice(0, 10).forEach((err) => {
-          console.log(`  ${this.colors.dim}${err}${this.colors.reset}`);
-        });
-        if (result.errors.length > 10) {
-          console.log(`  ${this.colors.dim}... and ${result.errors.length - 10} more${this.colors.reset}`);
-        }
-      }
-
-      // Suggest work-context as next step
-      console.log(`${this.colors.bold}${this.colors.yellow}💡 Next Step:${this.colors.reset}`);
-      console.log(`  Before editing a file, run: ${this.colors.green}tsdoc-edge wc <file>${this.colors.reset}`);
-      console.log(`  ${this.colors.dim}This shows all context needed (docs, types, tests, impact)${this.colors.reset}`);
-      console.log();
+      // Output build result as XML
+      new XmlBuilder(BuildResultSchema)
+        .section('statistics', {
+          filesScanned: result.filesScanned,
+          symbolsFound: result.symbolsFound,
+          symbolsInserted: result.symbolsInserted,
+          symbolsCollisions: result.symbolsCollisions,
+          relationshipsFound: result.relationshipsFound,
+          relationshipsInserted: result.relationshipsInserted,
+          relationshipsSkipped: result.relationshipsSkipped,
+          docRelationships: docRelationshipsInserted,
+          semanticRelationships: semanticRelationshipsInserted,
+          inferredRelationships: inferredRelationshipsInserted,
+          inheritanceRelationships: inheritanceRelationshipsInserted,
+          endpointHandlerRelationships: endpointHandlerRelsInserted,
+          endpointsFound: result.endpointsFound,
+          endpointsInserted: result.endpointsInserted,
+          blocksFound: result.blocksFound,
+          blocksInserted: result.blocksInserted,
+          entryPointsFound: result.entryPointsFound,
+          entryPointsInserted: result.entryPointsInserted,
+          durationMs: duration,
+        })
+        .section('paths', {
+          database: dbPath,
+          registry: registryPath,
+        })
+        .section('errors', result.errors.map(err => ({ message: err })))
+        .print();
 
       return this.success(`Built database with ${result.symbolsInserted} symbols`);
     });

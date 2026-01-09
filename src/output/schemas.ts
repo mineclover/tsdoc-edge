@@ -133,3 +133,40 @@ export const RoutesSchema: OutputSchema = {
     }),
   },
 };
+
+/**
+ * Schema for build command result
+ */
+export const BuildResultSchema: OutputSchema = {
+  root: 'build-result',
+  sections: {
+    statistics: {
+      filesScanned: 'number',
+      symbolsFound: 'number',
+      symbolsInserted: 'number',
+      symbolsCollisions: 'number',
+      relationshipsFound: 'number',
+      relationshipsInserted: 'number',
+      relationshipsSkipped: 'number',
+      docRelationships: 'number',
+      semanticRelationships: 'number',
+      inferredRelationships: 'number',
+      inheritanceRelationships: 'number',
+      endpointHandlerRelationships: 'number',
+      endpointsFound: 'number',
+      endpointsInserted: 'number',
+      blocksFound: 'number',
+      blocksInserted: 'number',
+      entryPointsFound: 'number',
+      entryPointsInserted: 'number',
+      durationMs: 'number',
+    },
+    paths: {
+      database: 'string',
+      registry: 'string',
+    },
+    errors: arrayOf('error', {
+      message: 'string',
+    }),
+  },
+};
