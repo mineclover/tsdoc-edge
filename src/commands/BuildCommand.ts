@@ -27,6 +27,7 @@ import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import type { TestSymbol } from '../types/test-symbols';
 import type { SymbolGraph } from '../types/graph';
+import type { UnifiedRelationship } from '../types/relationships/unified';
 import { XmlBuilder } from '../output/XmlBuilder';
 import { BuildResultSchema } from '../output/schemas';
 import * as ts from 'typescript';
@@ -549,10 +550,10 @@ export class BuildCommand extends BaseCommand {
                       if ((ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node) || ts.isArrowFunction(node))) {
                         const nodePos = sourceFile.getLineAndCharacterOfPosition(node.getStart());
                         if (nodePos.line + 1 === symbol.line) {
-                          return node as any;
+                          return node;
                         }
                       }
-                      let found: any = null;
+                      let found: ts.FunctionDeclaration | ts.MethodDeclaration | ts.ArrowFunction | null = null;
                       ts.forEachChild(node, child => {
                         if (!found) {
                           found = findNode(child);
@@ -927,12 +928,12 @@ export class BuildCommand extends BaseCommand {
         };
 
         // Helper to transform UnifiedRelationship to batch insert format
-        const toBatchFormat = (rel: any) => ({
+        const toBatchFormat = (rel: UnifiedRelationship) => ({
           id: rel.id,
           type: rel.type,
           category: rel.category,
-          fromSymbols: [typeof rel.from === 'string' ? rel.from : rel.from[0]],
-          toSymbols: [typeof rel.to === 'string' ? rel.to : rel.to[0]],
+          fromSymbols: Array.isArray(rel.from) ? rel.from : [rel.from],
+          toSymbols: Array.isArray(rel.to) ? rel.to : [rel.to],
           direction: rel.direction,
           strength: rel.strength,
           evidence: rel.evidence,
