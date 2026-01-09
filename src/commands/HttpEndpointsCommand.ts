@@ -43,7 +43,6 @@ export class HttpEndpointsCommand extends BaseCommand {
   }
 
   async execute(args: string[]): Promise<CommandResult> {
-    const useXml = !args.includes('--human');
     const methodFilter = args.find(a => a.startsWith('--method='))?.split('=')[1];
     const scopeFilter = args.find(a => a.startsWith('--scope='))?.split('=')[1];
     const pathFilter = args.find(a => a.startsWith('--path='))?.split('=')[1];
@@ -118,41 +117,14 @@ export class HttpEndpointsCommand extends BaseCommand {
         byScope[stat.scope] = (byScope[stat.scope] || 0) + stat.total;
       }
 
-      if (useXml) {
-        new XmlBuilder(HttpEndpointsSchema)
-          .section('summary', {
-            total: endpoints.length,
-            byMethod: JSON.stringify(byMethod),
-            byScope: JSON.stringify(byScope),
-          })
-          .section('endpoints', endpoints)
-          .print();
-      } else {
-        console.log('\n\x1b[1m\x1b[36mHTTP Endpoints\x1b[0m');
-        console.log('\x1b[36m' + '='.repeat(80) + '\x1b[0m\n');
-
-        // Statistics
-        console.log('\x1b[1mStatistics:\x1b[0m');
-        console.log(`  Total endpoints: \x1b[36m${endpoints.length}\x1b[0m`);
-        console.log(`  By method: ${Object.entries(byMethod).map(([m, c]) => `${m}=${c}`).join(', ')}`);
-        console.log(`  By scope: ${Object.entries(byScope).map(([s, c]) => `${s}=${c}`).join(', ')}`);
-        console.log();
-
-        if (endpoints.length === 0) {
-          console.log('\x1b[33mNo endpoints found.\x1b[0m');
-          console.log('\x1b[2mRun `tsdoc-edge build` to detect endpoints.\x1b[0m\n');
-        } else {
-          // Group by path
-          for (const endpoint of endpoints) {
-            const methodColor = this.getMethodColor(endpoint.method);
-            console.log(`\x1b[1m${methodColor}${endpoint.method.padEnd(7)}\x1b[0m ${endpoint.path}`);
-            console.log(`  \x1b[2mScope: ${endpoint.scope}\x1b[0m`);
-            console.log(`  \x1b[2mHandler: ${endpoint.handler}\x1b[0m`);
-            console.log(`  \x1b[2m${endpoint.file}:${endpoint.line}\x1b[0m`);
-            console.log();
-          }
-        }
-      }
+      new XmlBuilder(HttpEndpointsSchema)
+        .section('summary', {
+          total: endpoints.length,
+          byMethod: JSON.stringify(byMethod),
+          byScope: JSON.stringify(byScope),
+        })
+        .section('endpoints', endpoints)
+        .print();
 
       db.close();
       return { exitCode: 0, message: `Found ${endpoints.length} endpoints` };
@@ -162,23 +134,6 @@ export class HttpEndpointsCommand extends BaseCommand {
         exitCode: 1,
         message: `Error: ${error instanceof Error ? error.message : String(error)}`,
       };
-    }
-  }
-
-  private getMethodColor(method: string): string {
-    switch (method) {
-      case 'GET':
-        return '\x1b[32m'; // Green
-      case 'POST':
-        return '\x1b[34m'; // Blue
-      case 'PUT':
-        return '\x1b[33m'; // Yellow
-      case 'DELETE':
-        return '\x1b[31m'; // Red
-      case 'PATCH':
-        return '\x1b[35m'; // Magenta
-      default:
-        return '\x1b[37m'; // White
     }
   }
 }

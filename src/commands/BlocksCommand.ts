@@ -54,12 +54,11 @@ export class BlocksCommand extends BaseCommand {
     if (args.length === 0) {
       return {
         exitCode: 1,
-        message: 'Usage: blocks <symbol-id> [--type=<type>] [--human]',
+        message: 'Usage: blocks <symbol-id> [--type=<type>]',
       };
     }
 
     const symbolId = args[0];
-    const useXml = !args.includes('--human');
     const typeFilter = args.find(a => a.startsWith('--type='))?.split('=')[1];
 
     const dbCheck = this.checkDatabaseExists();
@@ -114,21 +113,16 @@ export class BlocksCommand extends BaseCommand {
 
       if (blocks.length === 0) {
         db.close();
-        if (useXml) {
-          new XmlBuilder(BlocksSchema)
-            .section('symbol', symbol)
-            .section('summary', {
-              totalBlocks: 0,
-              totalLines: 0,
-              averageComplexity: 0,
-              byType: '{}',
-            })
-            .section('blocks', [])
-            .print();
-        } else {
-          console.log(`\n\x1b[33mNo blocks found for symbol: ${symbol.name}\x1b[0m`);
-          console.log('\x1b[2mBlocks are detected during build. Run `tsdoc-edge build` first.\x1b[0m\n');
-        }
+        new XmlBuilder(BlocksSchema)
+          .section('symbol', symbol)
+          .section('summary', {
+            totalBlocks: 0,
+            totalLines: 0,
+            averageComplexity: 0,
+            byType: '{}',
+          })
+          .section('blocks', [])
+          .print();
         return { exitCode: 0, message: 'No blocks found' };
       }
 
@@ -154,41 +148,16 @@ export class BlocksCommand extends BaseCommand {
         sideEffects: b.sideEffects ? JSON.parse(b.sideEffects).length : 0,
       }));
 
-      if (useXml) {
-        new XmlBuilder(BlocksSchema)
-          .section('symbol', symbol)
-          .section('summary', {
-            totalBlocks,
-            totalLines,
-            averageComplexity: Math.round(averageComplexity * 10) / 10,
-            byType: JSON.stringify(byType),
-          })
-          .section('blocks', formattedBlocks)
-          .print();
-      } else {
-        console.log('\n\x1b[1m\x1b[36mCode Blocks\x1b[0m');
-        console.log('\x1b[36m' + '='.repeat(80) + '\x1b[0m\n');
-
-        console.log('\x1b[1mSymbol:\x1b[0m');
-        console.log(`  ${symbol.type}: \x1b[1m${symbol.name}\x1b[0m`);
-        console.log(`  File: \x1b[2m${symbol.file}\x1b[0m\n`);
-
-        console.log('\x1b[1mStatistics:\x1b[0m');
-        console.log(`  Total blocks: \x1b[36m${totalBlocks}\x1b[0m`);
-        console.log(`  Total lines: \x1b[36m${totalLines}\x1b[0m`);
-        console.log(`  Average complexity: \x1b[36m${averageComplexity.toFixed(1)}\x1b[0m`);
-        console.log(`  By type: ${Object.entries(byType).map(([t, c]) => `${t}=${c}`).join(', ')}`);
-        console.log();
-
-        console.log('\x1b[1mBlocks:\x1b[0m\n');
-        for (const block of formattedBlocks) {
-          const typeColor = this.getBlockTypeColor(block.type);
-          console.log(`${typeColor}■\x1b[0m \x1b[1m${block.type.toUpperCase()}\x1b[0m (lines ${block.startLine}-${block.endLine})`);
-          console.log(`  Purpose: ${block.purpose}`);
-          console.log(`  Complexity: ${block.complexity}, Side effects: ${block.sideEffects}`);
-          console.log();
-        }
-      }
+      new XmlBuilder(BlocksSchema)
+        .section('symbol', symbol)
+        .section('summary', {
+          totalBlocks,
+          totalLines,
+          averageComplexity: Math.round(averageComplexity * 10) / 10,
+          byType: JSON.stringify(byType),
+        })
+        .section('blocks', formattedBlocks)
+        .print();
 
       db.close();
       return { exitCode: 0, message: `Found ${blocks.length} blocks` };
@@ -198,29 +167,6 @@ export class BlocksCommand extends BaseCommand {
         exitCode: 1,
         message: `Error: ${error instanceof Error ? error.message : String(error)}`,
       };
-    }
-  }
-
-  private getBlockTypeColor(type: string): string {
-    switch (type) {
-      case 'validation':
-        return '\x1b[33m'; // Yellow
-      case 'transformation':
-        return '\x1b[36m'; // Cyan
-      case 'query':
-        return '\x1b[34m'; // Blue
-      case 'mutation':
-        return '\x1b[31m'; // Red
-      case 'logging':
-        return '\x1b[90m'; // Gray
-      case 'error-handling':
-        return '\x1b[35m'; // Magenta
-      case 'http':
-        return '\x1b[32m'; // Green
-      case 'business-logic':
-        return '\x1b[1m\x1b[37m'; // Bold white
-      default:
-        return '\x1b[37m'; // White
     }
   }
 }
