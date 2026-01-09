@@ -157,6 +157,7 @@ export const BuildResultSchema: OutputSchema = {
       endpointsInserted: 'number',
       blocksFound: 'number',
       blocksInserted: 'number',
+      blockDependenciesFound: 'number',
       entryPointsFound: 'number',
       entryPointsInserted: 'number',
       exposureAnalyzed: 'number',

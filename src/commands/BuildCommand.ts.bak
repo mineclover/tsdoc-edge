@@ -113,14 +113,6 @@ export class BuildCommand extends BaseCommand {
     --exclude-tests  Exclude test files (.test.ts, .spec.ts) from indexing`;
   }
 
-  // Override print methods to suppress console output (use XML output instead)
-  protected printHeader(_title: string): void {}
-  protected printSection(_title: string): void {}
-  protected printSuccess(_message: string): void {}
-  protected printError(_message: string): void {}
-  protected printWarning(_message: string): void {}
-  protected printInfo(_message: string): void {}
-
   /**
    * execute method
    * @param args - args parameter
@@ -262,8 +254,6 @@ export class BuildCommand extends BaseCommand {
         blocksInserted: 0,
         entryPointsFound: 0,
         entryPointsInserted: 0,
-        exposureAnalyzed: 0,
-        blockDependenciesFound: 0,
         errors: [] as string[],
       };
 
@@ -461,15 +451,8 @@ export class BuildCommand extends BaseCommand {
               if (symbol.isExported) {
                 try {
                   const exposure = exposureAnalyzer.analyzeSymbol(fullSymbol);
-                  const success = dbManager.updateSymbolExposure(id, {
-                    exposureScope: exposure.exposureScope,
-                    exportPath: exposure.exportPath,
-                    accessibility: exposure.accessibility,
-                    visibilityBoundaries: exposure.visibilityBoundary,
-                  });
-                  if (success) {
-                    result.exposureAnalyzed++;
-                  }
+                  // Update symbol with exposure info (could be done via update query)
+                  // For now, exposure info is calculated but not stored yet
                 } catch (expError) {
                   // Non-critical, continue
                 }
@@ -586,40 +569,6 @@ export class BuildCommand extends BaseCommand {
 
                           if (success) {
                             result.blocksInserted++;
-
-                            // Create relationships for block dependencies
-                            result.blockDependenciesFound += block.dependencies.length;
-                            for (const depName of block.dependencies) {
-                              const depSymbolId = symbolIdMap.get(depName);
-                              if (depSymbolId) {
-                                const relId = `block-dep-${block.id}-${depSymbolId}`;
-                                const relSuccess = dbManager.insertUnifiedRelationship({
-                                  id: relId,
-                                  type: 'calls',
-                                  category: 'behavioral',
-                                  fromSymbols: [block.id],
-                                  toSymbols: [depSymbolId],
-                                  direction: 'unidirectional',
-                                  strength: 'medium',
-                                  evidence: [{
-                                    type: 'code',
-                                    source: filePath,
-                                    lineNumber: block.startLine,
-                                    confidence: 0.8,
-                                  }],
-                                  discoveredBy: 'block-analyzer',
-                                  confidence: 0.8,
-                                  filePath,
-                                  line: block.startLine,
-                                  properties: {
-                                    relationshipContext: 'block-dependency',
-                                    blockType: block.type,
-                                  },
-                                  description: `Block ${block.id} uses ${depName}`,
-                                });
-                                // Don't count these in main relationships stats
-                              }
-                            }
                           }
                         }
                       }
@@ -1024,13 +973,9 @@ export class BuildCommand extends BaseCommand {
 
             for (const inhRel of inheritanceRels) {
               const relId = `inheritance-${inhRel.from}-${inhRel.to}`;
-              // Map InheritanceType to unified RelationshipType
-              const unifiedType = inhRel.type === 'extends' ? 'inheritance' :
-                                  inhRel.type === 'implements' ? 'implementation' :
-                                  'inheritance'; // fallback for 'mixins'
               const success = dbManager.insertUnifiedRelationship({
                 id: relId,
-                type: unifiedType,
+                type: inhRel.type, // 'extends' or 'implements'
                 category: 'structural',
                 fromSymbols: [inhRel.from],
                 toSymbols: [inhRel.to],
@@ -1047,7 +992,6 @@ export class BuildCommand extends BaseCommand {
                 filePath: inhRel.filePath,
                 line: inhRel.line,
                 properties: {
-                  inheritanceType: inhRel.type, // Store original type
                   abstractionFrom: inhRel.abstractionLevel.from,
                   abstractionTo: inhRel.abstractionLevel.to,
                   hierarchyDepth: inhRel.hierarchyDepth,
@@ -1084,8 +1028,8 @@ export class BuildCommand extends BaseCommand {
             const relId = `endpoint-handler-${endpoint.id}`;
             const success = dbManager.insertUnifiedRelationship({
               id: relId,
-              type: 'calls', // Endpoint calls/invokes handler
-              category: 'behavioral',
+              type: 'endpoint-uses-handler',
+              category: 'structural',
               fromSymbols: [endpoint.id],
               toSymbols: [endpoint.handlerSymbolId],
               direction: 'unidirectional',
@@ -1101,7 +1045,6 @@ export class BuildCommand extends BaseCommand {
               filePath: endpoint.filePath,
               line: endpoint.line || undefined,
               properties: {
-                relationshipContext: 'endpoint-handler',
                 method: endpoint.method,
                 path: endpoint.path,
                 scope: endpoint.scope,
@@ -1156,10 +1099,8 @@ export class BuildCommand extends BaseCommand {
           endpointsInserted: result.endpointsInserted,
           blocksFound: result.blocksFound,
           blocksInserted: result.blocksInserted,
-          blockDependenciesFound: result.blockDependenciesFound,
           entryPointsFound: result.entryPointsFound,
           entryPointsInserted: result.entryPointsInserted,
-          exposureAnalyzed: result.exposureAnalyzed,
           durationMs: duration,
         })
         .section('paths', {

@@ -7,6 +7,28 @@ import { DatabaseManager } from '../storage/DatabaseManager';
 import * as path from 'node:path';
 import Database from 'better-sqlite3';
 
+interface SymbolRow {
+  id: string;
+  name: string;
+  type: string;
+  file_path: string;
+  line: number;
+  column: number;
+  is_exported: number;
+  is_public: number;
+  exposure_level: string | null;
+  exposure_scope: string | null;
+  export_path: string | null;
+  accessibility: string | null;
+  visibility_boundaries: string | null;
+}
+
+interface ExposureScope {
+  level: string;
+  boundaries: string[];
+  exportedVia?: string;
+}
+
 const dbPath = path.join(process.cwd(), '.tsdoc.db');
 const dbManager = new DatabaseManager(dbPath);
 
@@ -82,6 +104,25 @@ if (endpointHandlerRels.length > 0) {
   });
 }
 
+// Test block-dependency relationships
+const blockDependencyRels = allRels.filter(r => {
+  if (r.type !== 'calls') return false;
+  if (typeof r.properties !== 'object' || r.properties === null) return false;
+  const props = typeof r.properties === 'string' ? JSON.parse(r.properties) : r.properties;
+  return props?.relationshipContext === 'block-dependency';
+});
+console.log(`\n   Block-dependency relationships: ${blockDependencyRels.length}`);
+
+if (blockDependencyRels.length > 0) {
+  console.log('   Samples:');
+  blockDependencyRels.slice(0, 3).forEach(rel => {
+    const props = typeof rel.properties === 'string' ? JSON.parse(rel.properties) : rel.properties;
+    const from = Array.isArray(rel.from) ? rel.from[0] : rel.from;
+    const to = Array.isArray(rel.to) ? rel.to[0] : rel.to;
+    console.log(`     - ${from} (${props?.blockType}) → ${to}`);
+  });
+}
+
 // Test endpoints
 console.log('\n3. Endpoints:');
 const allEndpoints = dbManager.getAllEndpoints();
@@ -98,8 +139,8 @@ if (allEndpoints.length > 0) {
 console.log('\n4. Exposure Analysis:');
 // Query raw symbols with exposure info using better-sqlite3
 const db = new Database(dbPath, { readonly: true });
-const symbolsRaw = db.prepare('SELECT * FROM symbols').all();
-const symbolsWithExposure = symbolsRaw.filter((s: any) => s.exposure_level !== null);
+const symbolsRaw = db.prepare('SELECT * FROM symbols').all() as SymbolRow[];
+const symbolsWithExposure = symbolsRaw.filter(s => s.exposure_level !== null);
 console.log(`   Total symbols: ${symbolsRaw.length}`);
 console.log(`   Symbols with exposure info: ${symbolsWithExposure.length}`);
 
@@ -107,7 +148,7 @@ if (symbolsWithExposure.length > 0) {
   // Count by exposure level
   const exposureByLevel: Record<string, number> = {};
   for (const symbol of symbolsWithExposure) {
-    const level = (symbol as any).exposure_level || 'unknown';
+    const level = symbol.exposure_level || 'unknown';
     exposureByLevel[level] = (exposureByLevel[level] || 0) + 1;
   }
 
@@ -117,8 +158,8 @@ if (symbolsWithExposure.length > 0) {
   }
 
   console.log('\n   Samples:');
-  symbolsWithExposure.slice(0, 3).forEach((symbol: any) => {
-    const scope = symbol.exposure_scope ? JSON.parse(symbol.exposure_scope) : null;
+  symbolsWithExposure.slice(0, 3).forEach(symbol => {
+    const scope: ExposureScope | null = symbol.exposure_scope ? JSON.parse(symbol.exposure_scope) : null;
     console.log(`     - ${symbol.name} (${symbol.type}): ${symbol.exposure_level}, export path: ${symbol.export_path || 'N/A'}`);
     if (scope) {
       console.log(`       boundaries: ${scope.boundaries?.join(', ') || 'none'}`);
