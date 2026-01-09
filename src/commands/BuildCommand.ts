@@ -22,6 +22,7 @@ import { EndpointDetectionAnalyzer } from '../analyzer/EndpointDetectionAnalyzer
 import { BlockChunkAnalyzer } from '../analyzer/BlockChunkAnalyzer';
 import { ExposureAnalyzer } from '../analyzer/ExposureAnalyzer';
 import { InheritanceAnalyzer } from '../analyzer/InheritanceAnalyzer';
+import { EntryPointDetector } from '../analyzer/EntryPointDetector';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import type { TestSymbol } from '../types/test-symbols';
@@ -235,6 +236,7 @@ export class BuildCommand extends BaseCommand {
       const exposureAnalyzer = new ExposureAnalyzer(process.cwd());
       const symbolMap = new Map();
       const inheritanceAnalyzer = new InheritanceAnalyzer(program, symbolMap);
+      const entryPointDetector = new EntryPointDetector(program, process.cwd());
 
       const result = {
         filesScanned: 0,
@@ -248,6 +250,8 @@ export class BuildCommand extends BaseCommand {
         endpointsInserted: 0,
         blocksFound: 0,
         blocksInserted: 0,
+        entryPointsFound: 0,
+        entryPointsInserted: 0,
         errors: [] as string[],
       };
 
@@ -483,6 +487,35 @@ export class BuildCommand extends BaseCommand {
                 }
               }
             } catch (endpointError) {
+              // Non-critical, continue
+            }
+
+            // Detect entry points in this file
+            try {
+              const entryPoints = entryPointDetector.analyzeFile(filePath);
+              result.entryPointsFound += entryPoints.length;
+
+              for (const ep of entryPoints) {
+                const success = dbManager.insertEntryPoint({
+                  id: ep.id,
+                  type: ep.type,
+                  filePath: ep.filePath,
+                  symbolId: ep.symbolId ?? null,
+                  functionName: ep.functionName ?? null,
+                  line: ep.line,
+                  description: ep.description ?? null,
+                  isAsync: ep.isAsync,
+                  bootstrapOrder: ep.bootstrapOrder ?? null,
+                  dependencies: ep.dependencies.length > 0 ? JSON.stringify(ep.dependencies) : null,
+                  createdAt: new Date().toISOString(),
+                  updatedAt: new Date().toISOString(),
+                });
+
+                if (success) {
+                  result.entryPointsInserted++;
+                }
+              }
+            } catch (entryPointError) {
               // Non-critical, continue
             }
 
@@ -962,6 +995,8 @@ export class BuildCommand extends BaseCommand {
       console.log(`  Endpoints inserted: ${this.colors.green}${result.endpointsInserted}${this.colors.reset}`);
       console.log(`  Blocks found: ${this.colors.cyan}${result.blocksFound}${this.colors.reset}`);
       console.log(`  Blocks inserted: ${this.colors.green}${result.blocksInserted}${this.colors.reset}`);
+      console.log(`  Entry points found: ${this.colors.cyan}${result.entryPointsFound}${this.colors.reset}`);
+      console.log(`  Entry points inserted: ${this.colors.green}${result.entryPointsInserted}${this.colors.reset}`);
       console.log(`  Duration: ${this.colors.cyan}${duration}ms${this.colors.reset}`);
       console.log();
       console.log(`${this.colors.dim}Database: ${dbPath}${this.colors.reset}`);

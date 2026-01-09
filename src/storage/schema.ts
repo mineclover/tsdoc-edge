@@ -340,6 +340,25 @@ export const codeBlocks = sqliteTable('code_blocks', {
   index('idx_blocks_lines').on(table.startLine, table.endLine),
 ]);
 
+export const entryPoints = sqliteTable('entry_points', {
+  id: text('id').primaryKey(),
+  type: text('type').notNull(), // cli, main-function, application, server, worker, test-runner, script
+  filePath: text('file_path').notNull(),
+  symbolId: text('symbol_id').references(() => symbols.id, { onDelete: 'set null' }),
+  functionName: text('function_name'),
+  line: integer('line').notNull(),
+  description: text('description'),
+  isAsync: integer('is_async', { mode: 'boolean' }).notNull().default(false),
+  bootstrapOrder: integer('bootstrap_order'),
+  dependencies: text('dependencies'), // JSON array of dependency module names or symbol IDs
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+}, (table) => [
+  index('idx_entry_points_type').on(table.type),
+  index('idx_entry_points_file').on(table.filePath),
+  index('idx_entry_points_symbol').on(table.symbolId),
+]);
+
 // Type exports for use in application code
 export type Symbol = typeof symbols.$inferSelect;
 export type NewSymbol = typeof symbols.$inferInsert;
@@ -388,3 +407,6 @@ export type NewEndpoint = typeof endpoints.$inferInsert;
 
 export type CodeBlock = typeof codeBlocks.$inferSelect;
 export type NewCodeBlock = typeof codeBlocks.$inferInsert;
+
+export type EntryPoint = typeof entryPoints.$inferSelect;
+export type NewEntryPoint = typeof entryPoints.$inferInsert;

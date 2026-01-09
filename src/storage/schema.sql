@@ -331,3 +331,24 @@ CREATE TABLE IF NOT EXISTS code_blocks (
 CREATE INDEX IF NOT EXISTS idx_blocks_symbol ON code_blocks(symbol_id);
 CREATE INDEX IF NOT EXISTS idx_blocks_type ON code_blocks(type);
 CREATE INDEX IF NOT EXISTS idx_blocks_lines ON code_blocks(start_line, end_line);
+
+-- Entry Points table (application entry points)
+CREATE TABLE IF NOT EXISTS entry_points (
+    id TEXT PRIMARY KEY,
+    type TEXT NOT NULL, -- cli, main-function, application, server, worker, test-runner, script
+    file_path TEXT NOT NULL,
+    symbol_id TEXT, -- Symbol ID if linked to a function
+    function_name TEXT, -- Function name (main, bootstrap, etc.)
+    line INTEGER NOT NULL,
+    description TEXT,
+    is_async BOOLEAN NOT NULL DEFAULT 0,
+    bootstrap_order INTEGER, -- Order in which entry points are initialized
+    dependencies TEXT, -- JSON array of dependency module names or symbol IDs
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY (symbol_id) REFERENCES symbols(id) ON DELETE SET NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_entry_points_type ON entry_points(type);
+CREATE INDEX IF NOT EXISTS idx_entry_points_file ON entry_points(file_path);
+CREATE INDEX IF NOT EXISTS idx_entry_points_symbol ON entry_points(symbol_id);

@@ -3002,4 +3002,90 @@ export class DatabaseManager {
   deleteAllCodeBlocks(): void {
     this.drizzleDb.delete(schema.codeBlocks).run();
   }
+
+  // ==================== Entry Point Management ====================
+
+  /**
+   * Insert or update an entry point
+   */
+  insertEntryPoint(entryPoint: schema.NewEntryPoint): boolean {
+    try {
+      this.drizzleDb.insert(schema.entryPoints)
+        .values({
+          ...entryPoint,
+          createdAt: entryPoint.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        })
+        .onConflictDoUpdate({
+          target: schema.entryPoints.id,
+          set: {
+            type: entryPoint.type,
+            filePath: entryPoint.filePath,
+            symbolId: entryPoint.symbolId,
+            functionName: entryPoint.functionName,
+            line: entryPoint.line,
+            description: entryPoint.description,
+            isAsync: entryPoint.isAsync,
+            bootstrapOrder: entryPoint.bootstrapOrder,
+            dependencies: entryPoint.dependencies,
+            updatedAt: new Date().toISOString(),
+          },
+        })
+        .run();
+      return true;
+    } catch (error) {
+      console.error('Failed to insert entry point:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get all entry points
+   */
+  getAllEntryPoints(): schema.EntryPoint[] {
+    return this.drizzleDb.select().from(schema.entryPoints).all();
+  }
+
+  /**
+   * Get entry points by type
+   */
+  getEntryPointsByType(type: string): schema.EntryPoint[] {
+    return this.drizzleDb
+      .select()
+      .from(schema.entryPoints)
+      .where(eq(schema.entryPoints.type, type))
+      .all();
+  }
+
+  /**
+   * Get entry points by file
+   */
+  getEntryPointsByFile(filePath: string): schema.EntryPoint[] {
+    return this.drizzleDb
+      .select()
+      .from(schema.entryPoints)
+      .where(eq(schema.entryPoints.filePath, filePath))
+      .all();
+  }
+
+  /**
+   * Get entry point statistics
+   */
+  getEntryPointStats(): { total: number; byType: Record<string, number> } {
+    const entryPoints = this.getAllEntryPoints();
+    const byType: Record<string, number> = {};
+
+    for (const ep of entryPoints) {
+      byType[ep.type] = (byType[ep.type] || 0) + 1;
+    }
+
+    return { total: entryPoints.length, byType };
+  }
+
+  /**
+   * Delete all entry points
+   */
+  deleteAllEntryPoints(): void {
+    this.drizzleDb.delete(schema.entryPoints).run();
+  }
 }
