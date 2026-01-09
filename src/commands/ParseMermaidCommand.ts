@@ -7,7 +7,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { MermaidSymbolExtractor } from '../doc-symbol/MermaidSymbolExtractor';
+import { MermaidSymbolExtractor, type MermaidExtractionResult, type MermaidSymbol, type MermaidRelationship } from '../doc-symbol/MermaidSymbolExtractor';
 
 /**
  * Parse Mermaid Command - Mermaid 다이어그램 파싱 및 문서 생성
@@ -201,7 +201,7 @@ export class ParseMermaidCommand extends BaseCommand {
     });
   }
 
-  private displayParseResults(result: any): void {
+  private displayParseResults(result: MermaidExtractionResult): void {
     // Metadata
     this.printSection('Diagram Metadata');
     console.log(`  Type: ${this.colors.cyan}${result.metadata.diagramType}${this.colors.reset}`);
@@ -210,7 +210,7 @@ export class ParseMermaidCommand extends BaseCommand {
     }
     if (result.metadata.subgraphs.length > 0) {
       console.log(`  Subgraphs: ${this.colors.cyan}${result.metadata.subgraphs.length}${this.colors.reset}`);
-      result.metadata.subgraphs.forEach((sg: any) => {
+      result.metadata.subgraphs.forEach((sg) => {
         console.log(`    • ${sg.title}`);
       });
     }
@@ -222,14 +222,14 @@ export class ParseMermaidCommand extends BaseCommand {
     console.log();
 
     // Group by status
-    const implemented = result.symbols.filter((s: any) => s.status === 'implemented');
-    const notImplemented = result.symbols.filter((s: any) => s.status === 'not-implemented');
-    const partial = result.symbols.filter((s: any) => s.status === 'partial');
+    const implemented = result.symbols.filter((s: MermaidSymbol) => s.status === 'implemented');
+    const notImplemented = result.symbols.filter((s: MermaidSymbol) => s.status === 'not-implemented');
+    const partial = result.symbols.filter((s: MermaidSymbol) => s.status === 'partial');
 
     if (implemented.length > 0) {
       console.log(`  ${this.colors.green}✅ Implemented (${implemented.length}):${this.colors.reset}`);
-      implemented.forEach((s: any) => {
-        const metrics = s.metrics ? ` (${s.metrics.count.toLocaleString()} ${s.metrics.unit})` : '';
+      implemented.forEach((s: MermaidSymbol) => {
+        const metrics = s.metrics && s.metrics.count !== undefined ? ` (${s.metrics.count.toLocaleString()} ${s.metrics.unit})` : '';
         console.log(`    • [[${s.symbolName}]]${metrics}`);
       });
       console.log();
@@ -237,7 +237,7 @@ export class ParseMermaidCommand extends BaseCommand {
 
     if (partial.length > 0) {
       console.log(`  ${this.colors.yellow}⚠️  Partial (${partial.length}):${this.colors.reset}`);
-      partial.forEach((s: any) => {
+      partial.forEach((s: MermaidSymbol) => {
         console.log(`    • [[${s.symbolName}]]`);
       });
       console.log();
@@ -245,7 +245,7 @@ export class ParseMermaidCommand extends BaseCommand {
 
     if (notImplemented.length > 0) {
       console.log(`  ${this.colors.dim}❌ Not Implemented (${notImplemented.length}):${this.colors.reset}`);
-      notImplemented.forEach((s: any) => {
+      notImplemented.forEach((s: MermaidSymbol) => {
         console.log(`    ${this.colors.dim}• [[${s.symbolName}]]${this.colors.reset}`);
       });
       console.log();
@@ -256,9 +256,9 @@ export class ParseMermaidCommand extends BaseCommand {
     console.log(`  Total edges: ${this.colors.cyan}${result.relationships.length}${this.colors.reset}`);
 
     const byType = {
-      solid: result.relationships.filter((r: any) => r.edgeType === 'solid').length,
-      dotted: result.relationships.filter((r: any) => r.edgeType === 'dotted').length,
-      thick: result.relationships.filter((r: any) => r.edgeType === 'thick').length,
+      solid: result.relationships.filter((r: MermaidRelationship) => r.edgeType === 'solid').length,
+      dotted: result.relationships.filter((r: MermaidRelationship) => r.edgeType === 'dotted').length,
+      thick: result.relationships.filter((r: MermaidRelationship) => r.edgeType === 'thick').length,
     };
 
     if (byType.solid > 0) {
@@ -277,7 +277,7 @@ export class ParseMermaidCommand extends BaseCommand {
       this.printSection('Documentation Suggestions');
       console.log(`  ${result.suggestedDocs.length} documents can be auto-generated:`);
       console.log();
-      result.suggestedDocs.slice(0, 5).forEach((doc: any) => {
+      result.suggestedDocs.slice(0, 5).forEach((doc) => {
         console.log(`    • ${doc.filename} for [[${doc.symbolName}]]`);
       });
       if (result.suggestedDocs.length > 5) {

@@ -7,7 +7,7 @@
 
 import * as fs from 'node:fs';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
+import { DatabaseManager, type UnifiedRelationshipRow, type SymbolRow } from '../storage/DatabaseManager';
 
 /** Supported export formats for relationship data */
 type ExportFormat = 'json' | 'graphml' | 'dot' | 'csv' | 'cypher' | 'gephi';
@@ -184,7 +184,7 @@ Examples:
   /**
    * Export to JSON format
    */
-  private exportJSON(relationships: any[], symbolMap: Map<string, any>): string {
+  private exportJSON(relationships: UnifiedRelationshipRow[], symbolMap: Map<string, SymbolRow>): string {
     const data = {
       metadata: {
         exportDate: new Date().toISOString(),
@@ -217,7 +217,7 @@ Examples:
   /**
    * Export to GraphML format
    */
-  private exportGraphML(relationships: any[], symbolMap: Map<string, any>): string {
+  private exportGraphML(relationships: UnifiedRelationshipRow[], symbolMap: Map<string, SymbolRow>): string {
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -286,7 +286,7 @@ Examples:
   /**
    * Export to Graphviz DOT format
    */
-  private exportDOT(relationships: any[], symbolMap: Map<string, any>): string {
+  private exportDOT(relationships: UnifiedRelationshipRow[], symbolMap: Map<string, SymbolRow>): string {
     let dot = `digraph relationships {
   // Graph settings
   rankdir=LR;
@@ -338,7 +338,7 @@ Examples:
   /**
    * Export to CSV format
    */
-  private exportCSV(relationships: any[]): string {
+  private exportCSV(relationships: UnifiedRelationshipRow[]): string {
     const header = 'id,type,category,from_symbols,to_symbols,direction,strength,confidence,description\n';
 
     const rows = relationships.map((r) => {
@@ -355,7 +355,7 @@ Examples:
   /**
    * Export to Neo4j Cypher statements
    */
-  private exportCypher(relationships: any[], symbolMap: Map<string, any>): string {
+  private exportCypher(relationships: UnifiedRelationshipRow[], symbolMap: Map<string, SymbolRow>): string {
     let cypher = `// TSDoc Edge Relationship Export - Neo4j Cypher
 // Generated: ${new Date().toISOString()}
 
@@ -426,7 +426,7 @@ CREATE INDEX symbol_type IF NOT EXISTS FOR (s:Symbol) ON (s.type);
    * Export to Gephi Lite SDK format
    * Based on @gephi/gephi-lite-sdk GraphDataset structure
    */
-  private exportGephi(relationships: any[], symbolMap: Map<string, any>, layout: string): string {
+  private exportGephi(relationships: UnifiedRelationshipRow[], symbolMap: Map<string, SymbolRow>, layout: string): string {
     // Build node data
     const nodeData: Record<string, Record<string, any>> = {};
     const nodeLayout: Record<string, { x: number; y: number }> = {};
@@ -439,7 +439,7 @@ CREATE INDEX symbol_type IF NOT EXISTS FOR (s:Symbol) ON (s.type);
         type: symbol.type,
         filePath: symbol.file_path,
         isPublic: symbol.is_public ? 1 : 0,
-        hasTests: symbol.has_tests ? 1 : 0,
+        hasTests: (symbol as unknown as Record<string, unknown>).has_tests ? 1 : 0,
       };
 
       // Calculate layout position
@@ -472,7 +472,7 @@ CREATE INDEX symbol_type IF NOT EXISTS FOR (s:Symbol) ON (s.type);
                 confidence: rel.confidence,
                 direction: rel.direction,
                 strength: rel.strength,
-                weight: rel.weight || 1,
+                weight: (rel as unknown as Record<string, unknown>).weight as number | undefined || 1,
               };
 
               edges.push({

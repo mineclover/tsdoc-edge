@@ -8,7 +8,8 @@ import * as path from 'node:path';
 import { InterfaceAnalyzer } from '../analyzer/InterfaceAnalyzer';
 import { InterfaceDependencyMapper } from '../analyzer/InterfaceDependencyMapper';
 import { TypeChainTracer } from '../analyzer/TypeChainTracer';
-import type { TypeChainOptions } from '../types/domain/type-chain';
+import type { TypeChainOptions, TypeChainAnalysisResult, TypeDependencyNode } from '../types/domain/type-chain';
+import type { InterfaceDependency, InterfaceDependencyGraph, InterfaceInfo } from '../types/domain/interface';
 import { BaseCommand, colors } from './BaseCommand';
 
 /**
@@ -114,7 +115,7 @@ export class TypeChainCommand extends BaseCommand {
     const mapper = new InterfaceDependencyMapper();
 
     const files = this.findTypeScriptFiles(srcDir);
-    const allInterfaces: any[] = [];
+    const allInterfaces: InterfaceInfo[] = [];
 
     for (const file of files) {
       const sourceCode = fs.readFileSync(file, 'utf-8');
@@ -179,7 +180,7 @@ export class TypeChainCommand extends BaseCommand {
   /**
    * Display dependency tree
    */
-  private displayDependencyTree(result: any): void {
+  private displayDependencyTree(result: TypeChainAnalysisResult): void {
     console.log(`${colors.cyan}${colors.bold}Dependency Tree: ${result.source}${colors.reset}`);
     console.log(`${colors.blue}────────────────────────────────────────────────────────────────────${colors.reset}`);
     console.log('');
@@ -207,7 +208,7 @@ export class TypeChainCommand extends BaseCommand {
   /**
    * Display type chains
    */
-  private displayTypeChains(result: any): void {
+  private displayTypeChains(result: TypeChainAnalysisResult): void {
     console.log(`${colors.cyan}${colors.bold}Type Chain: ${result.source} → ${result.target}${colors.reset}`);
     console.log(`${colors.blue}────────────────────────────────────────────────────────────────────${colors.reset}`);
     console.log('');
@@ -253,7 +254,7 @@ export class TypeChainCommand extends BaseCommand {
   /**
    * Print tree recursively
    */
-  private printTree(node: any, prefix: string, isLast: boolean, visited = new Set<string>()): void {
+  private printTree(node: TypeDependencyNode, prefix: string, isLast: boolean, visited = new Set<string>()): void {
     const connector = isLast ? '└─' : '├─';
     const typeColor = node.visited ? colors.yellow : colors.cyan;
     const cycleMarker = node.visited ? ` ${colors.yellow}(cycle)${colors.reset}` : '';
@@ -283,7 +284,7 @@ export class TypeChainCommand extends BaseCommand {
   /**
    * Format dependency relation for display
    */
-  private formatRelation(dep: any): string {
+  private formatRelation(dep: InterfaceDependency): string {
     let relation = dep.dependencyType;
 
     if (dep.typeRelation && dep.typeRelation !== 'direct') {
@@ -434,7 +435,7 @@ export class FindRootTypesCommand extends BaseCommand {
     return this.success();
   }
 
-  private buildGraph(): any {
+  private buildGraph(): { tracer: TypeChainTracer; graph: InterfaceDependencyGraph } {
     const cwd = process.cwd();
     const srcDir = path.join(cwd, 'src');
 
@@ -442,7 +443,7 @@ export class FindRootTypesCommand extends BaseCommand {
     const mapper = new InterfaceDependencyMapper();
 
     const files = this.findTypeScriptFiles(srcDir);
-    const allInterfaces: any[] = [];
+    const allInterfaces: InterfaceInfo[] = [];
 
     for (const file of files) {
       const sourceCode = fs.readFileSync(file, 'utf-8');
@@ -579,7 +580,7 @@ export class DetectCircularTypesCommand extends BaseCommand {
     return this.success();
   }
 
-  private buildGraph(): any {
+  private buildGraph(): { tracer: TypeChainTracer; graph: InterfaceDependencyGraph } {
     const cwd = process.cwd();
     const srcDir = path.join(cwd, 'src');
 
@@ -602,7 +603,7 @@ export class DetectCircularTypesCommand extends BaseCommand {
     };
     walk(srcDir);
 
-    const allInterfaces: any[] = [];
+    const allInterfaces: InterfaceInfo[] = [];
     for (const file of files) {
       const sourceCode = fs.readFileSync(file, 'utf-8');
       const interfaces = analyzer.analyzeFile(file, sourceCode);
