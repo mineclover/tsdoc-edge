@@ -2806,4 +2806,200 @@ export class DatabaseManager {
 
     return this.drizzleDb.select().from(schema.symbols).where(conditions).get() ?? null;
   }
+
+  // ============================================================================
+  // Endpoint Management
+  // ============================================================================
+
+  /**
+   * Insert or update an endpoint
+   */
+  insertEndpoint(endpoint: schema.NewEndpoint): boolean {
+    try {
+      this.drizzleDb.insert(schema.endpoints)
+        .values({
+          ...endpoint,
+          createdAt: endpoint.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        })
+        .onConflictDoUpdate({
+          target: schema.endpoints.id,
+          set: {
+            method: endpoint.method,
+            path: endpoint.path,
+            pathParams: endpoint.pathParams,
+            queryParams: endpoint.queryParams,
+            handlerSymbolId: endpoint.handlerSymbolId,
+            controllerSymbolId: endpoint.controllerSymbolId,
+            requestType: endpoint.requestType,
+            responseType: endpoint.responseType,
+            scope: endpoint.scope,
+            middlewares: endpoint.middlewares,
+            filePath: endpoint.filePath,
+            line: endpoint.line,
+            description: endpoint.description,
+            updatedAt: new Date().toISOString(),
+          },
+        })
+        .run();
+      return true;
+    } catch (error) {
+      console.error('Failed to insert endpoint:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get all endpoints
+   */
+  getAllEndpoints(): schema.Endpoint[] {
+    return this.drizzleDb
+      .select()
+      .from(schema.endpoints)
+      .all();
+  }
+
+  /**
+   * Get endpoints by method
+   */
+  getEndpointsByMethod(method: string): schema.Endpoint[] {
+    return this.drizzleDb
+      .select()
+      .from(schema.endpoints)
+      .where(eq(schema.endpoints.method, method))
+      .all();
+  }
+
+  /**
+   * Get endpoints by scope
+   */
+  getEndpointsByScope(scope: string): schema.Endpoint[] {
+    return this.drizzleDb
+      .select()
+      .from(schema.endpoints)
+      .where(eq(schema.endpoints.scope, scope))
+      .all();
+  }
+
+  /**
+   * Get endpoints by path pattern
+   */
+  getEndpointsByPath(pathPattern: string): schema.Endpoint[] {
+    return this.drizzleDb
+      .select()
+      .from(schema.endpoints)
+      .where(like(schema.endpoints.path, `%${pathPattern}%`))
+      .all();
+  }
+
+  /**
+   * Get endpoint by ID
+   */
+  getEndpoint(id: string): schema.Endpoint | null {
+    return this.drizzleDb
+      .select()
+      .from(schema.endpoints)
+      .where(eq(schema.endpoints.id, id))
+      .get() ?? null;
+  }
+
+  /**
+   * Delete all endpoints
+   */
+  deleteAllEndpoints(): void {
+    this.drizzleDb.delete(schema.endpoints).run();
+  }
+
+  /**
+   * Get endpoint statistics
+   */
+  getEndpointStats(): {
+    total: number;
+    byMethod: Record<string, number>;
+    byScope: Record<string, number>;
+  } {
+    const endpoints = this.getAllEndpoints();
+
+    const byMethod: Record<string, number> = {};
+    const byScope: Record<string, number> = {};
+
+    for (const endpoint of endpoints) {
+      byMethod[endpoint.method] = (byMethod[endpoint.method] || 0) + 1;
+      byScope[endpoint.scope] = (byScope[endpoint.scope] || 0) + 1;
+    }
+
+    return {
+      total: endpoints.length,
+      byMethod,
+      byScope,
+    };
+  }
+
+  // ============================================================================
+  // Code Block Management
+  // ============================================================================
+
+  /**
+   * Insert or update a code block
+   */
+  insertCodeBlock(block: schema.NewCodeBlock): boolean {
+    try {
+      this.drizzleDb.insert(schema.codeBlocks)
+        .values({
+          ...block,
+          createdAt: block.createdAt || new Date().toISOString(),
+          updatedAt: new Date().toISOString(),
+        })
+        .onConflictDoUpdate({
+          target: schema.codeBlocks.id,
+          set: {
+            symbolId: block.symbolId,
+            type: block.type,
+            startLine: block.startLine,
+            endLine: block.endLine,
+            purpose: block.purpose,
+            dependencies: block.dependencies,
+            sideEffects: block.sideEffects,
+            scope: block.scope,
+            complexity: block.complexity,
+            updatedAt: new Date().toISOString(),
+          },
+        })
+        .run();
+      return true;
+    } catch (error) {
+      console.error('Failed to insert code block:', error);
+      return false;
+    }
+  }
+
+  /**
+   * Get code blocks for a symbol
+   */
+  getCodeBlocksBySymbol(symbolId: string): schema.CodeBlock[] {
+    return this.drizzleDb
+      .select()
+      .from(schema.codeBlocks)
+      .where(eq(schema.codeBlocks.symbolId, symbolId))
+      .orderBy(asc(schema.codeBlocks.startLine))
+      .all();
+  }
+
+  /**
+   * Get code blocks by type
+   */
+  getCodeBlocksByType(type: string): schema.CodeBlock[] {
+    return this.drizzleDb
+      .select()
+      .from(schema.codeBlocks)
+      .where(eq(schema.codeBlocks.type, type))
+      .all();
+  }
+
+  /**
+   * Delete all code blocks
+   */
+  deleteAllCodeBlocks(): void {
+    this.drizzleDb.delete(schema.codeBlocks).run();
+  }
 }

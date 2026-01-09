@@ -66,6 +66,7 @@ import { DepsCommand } from './commands/DepsCommand';
 import { WhoUsesCommand } from './commands/WhoUsesCommand';
 import { OrphansCommand } from './commands/OrphansCommand';
 import { EndpointsCommand } from './commands/EndpointsCommand';
+import { HttpEndpointsCommand } from './commands/HttpEndpointsCommand';
 import { HubsCommand } from './commands/HubsCommand';
 import { LayersCommand } from './commands/LayersCommand';
 import { CommonCommand } from './commands/CommonCommand';
@@ -209,6 +210,7 @@ async function main(): Promise<void> {
 
   // Analysis commands
   registry.register(new EndpointsCommand());
+  registry.register(new HttpEndpointsCommand());
   registry.register(new HubsCommand());
   registry.register(new LayersCommand());
   registry.register(new CommonCommand());
