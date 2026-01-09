@@ -28,6 +28,12 @@ CREATE TABLE IF NOT EXISTS symbols (
     is_constant BOOLEAN DEFAULT 0, -- true for const declarations
     literal_value TEXT, -- Literal value for constants
     value_type TEXT, -- Type of literal value (string, number, boolean, etc.)
+    -- Exposure and visibility tracking
+    exposure_scope TEXT, -- JSON: {level, boundaries, exportedVia}
+    exposure_level TEXT, -- public, package, module, file, private
+    export_path TEXT, -- Actual import path (@pkg/module/subpath)
+    accessibility TEXT, -- public, protected, private, internal
+    visibility_boundaries TEXT, -- JSON: {canBeImportedBy, restrictedTo, reason}
     -- Metadata
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
@@ -132,6 +138,13 @@ CREATE TABLE IF NOT EXISTS unified_relationships (
     -- Type-specific properties (JSON)
     properties TEXT,  -- JSON: {"dataType": "User", "producerMethod": "getUser"}
 
+    -- Inheritance-specific fields
+    abstraction_from TEXT, -- concrete, abstract, interface, mixin
+    abstraction_to TEXT,
+    hierarchy_depth INTEGER, -- 0 = direct, 1+ = transitive
+    inheritance_chain TEXT, -- JSON array: ["Child", "Parent", "GrandParent"]
+    overridden_members TEXT, -- JSON array: ["method1", "method2"]
+
     -- Metadata
     created_at TEXT NOT NULL,
     updated_at TEXT NOT NULL,
@@ -219,6 +232,12 @@ CREATE INDEX IF NOT EXISTS idx_symbols_name ON symbols(name);
 CREATE INDEX IF NOT EXISTS idx_symbols_type ON symbols(type);
 CREATE INDEX IF NOT EXISTS idx_symbols_file ON symbols(file_path);
 CREATE INDEX IF NOT EXISTS idx_symbols_public ON symbols(is_public);
+CREATE INDEX IF NOT EXISTS idx_symbols_uuid ON symbols(uuid);
+CREATE INDEX IF NOT EXISTS idx_symbols_local_path ON symbols(local_path);
+CREATE INDEX IF NOT EXISTS idx_symbols_global_path ON symbols(global_path);
+CREATE INDEX IF NOT EXISTS idx_symbols_scope ON symbols(scope);
+CREATE INDEX IF NOT EXISTS idx_symbols_exposure ON symbols(exposure_level);
+CREATE INDEX IF NOT EXISTS idx_symbols_accessibility ON symbols(accessibility);
 
 CREATE INDEX IF NOT EXISTS idx_errors_symbol ON error_experiences(symbol_id);
 CREATE INDEX IF NOT EXISTS idx_errors_type ON error_experiences(error_type);
@@ -265,3 +284,50 @@ CREATE INDEX IF NOT EXISTS idx_tasks_priority ON tasks(priority);
 CREATE INDEX IF NOT EXISTS idx_tasks_symbol ON tasks(symbol_id);
 CREATE INDEX IF NOT EXISTS idx_tasks_file ON tasks(file_path);
 CREATE INDEX IF NOT EXISTS idx_tasks_due ON tasks(due_date);
+
+-- HTTP Endpoints table (for API route tracking)
+CREATE TABLE IF NOT EXISTS endpoints (
+    id TEXT PRIMARY KEY,
+    method TEXT NOT NULL, -- GET, POST, PUT, DELETE, PATCH
+    path TEXT NOT NULL, -- /api/users/:id
+    path_params TEXT, -- JSON array: ["id"]
+    query_params TEXT, -- JSON array: ["limit", "offset"]
+    handler_symbol_id TEXT, -- Handler function symbol ID
+    controller_symbol_id TEXT, -- Controller class symbol ID (if applicable)
+    request_type TEXT, -- DTO type for request body
+    response_type TEXT, -- DTO type for response
+    scope TEXT NOT NULL, -- public, internal, private, admin
+    middlewares TEXT, -- JSON array of middleware symbol IDs
+    file_path TEXT NOT NULL,
+    line INTEGER,
+    description TEXT,
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY (handler_symbol_id) REFERENCES symbols(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_endpoints_path ON endpoints(path);
+CREATE INDEX IF NOT EXISTS idx_endpoints_method ON endpoints(method);
+CREATE INDEX IF NOT EXISTS idx_endpoints_scope ON endpoints(scope);
+CREATE INDEX IF NOT EXISTS idx_endpoints_handler ON endpoints(handler_symbol_id);
+
+-- Code Blocks table (for block-level chunking)
+CREATE TABLE IF NOT EXISTS code_blocks (
+    id TEXT PRIMARY KEY,
+    symbol_id TEXT NOT NULL, -- Parent symbol ID
+    type TEXT NOT NULL, -- validation, transformation, query, mutation, etc.
+    start_line INTEGER NOT NULL,
+    end_line INTEGER NOT NULL,
+    purpose TEXT, -- Description of what this block does
+    dependencies TEXT, -- JSON array of symbol IDs used in this block
+    side_effects TEXT, -- JSON array: [{type, target, description}]
+    scope TEXT, -- local, closure, module
+    complexity INTEGER, -- Cyclomatic complexity (optional)
+    created_at TEXT NOT NULL,
+    updated_at TEXT NOT NULL,
+    FOREIGN KEY (symbol_id) REFERENCES symbols(id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_blocks_symbol ON code_blocks(symbol_id);
+CREATE INDEX IF NOT EXISTS idx_blocks_type ON code_blocks(type);
+CREATE INDEX IF NOT EXISTS idx_blocks_lines ON code_blocks(start_line, end_line);

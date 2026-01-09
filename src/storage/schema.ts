@@ -34,6 +34,12 @@ export const symbols = sqliteTable('symbols', {
   isConstant: integer('is_constant', { mode: 'boolean' }).default(false),
   literalValue: text('literal_value'),
   valueType: text('value_type'),
+  // Exposure and visibility tracking
+  exposureScope: text('exposure_scope'), // JSON: {level, boundaries, exportedVia}
+  exposureLevel: text('exposure_level'), // public, package, module, file, private
+  exportPath: text('export_path'), // Actual import path (@pkg/module/subpath)
+  accessibility: text('accessibility'), // public, protected, private, internal
+  visibilityBoundaries: text('visibility_boundaries'), // JSON: {canBeImportedBy, restrictedTo, reason}
   // Metadata
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
@@ -48,6 +54,8 @@ export const symbols = sqliteTable('symbols', {
   index('idx_symbols_type').on(table.type),
   index('idx_symbols_file').on(table.filePath),
   index('idx_symbols_public').on(table.isPublic),
+  index('idx_symbols_exposure').on(table.exposureLevel),
+  index('idx_symbols_accessibility').on(table.accessibility),
 ]);
 
 /**
@@ -155,6 +163,13 @@ export const unifiedRelationships = sqliteTable('unified_relationships', {
   filePath: text('file_path'),
   line: integer('line'),
   properties: text('properties'), // JSON
+  // Inheritance-specific fields
+  abstractionFrom: text('abstraction_from'), // concrete, abstract, interface, mixin
+  abstractionTo: text('abstraction_to'),
+  hierarchyDepth: integer('hierarchy_depth'), // 0 = direct, 1+ = transitive
+  inheritanceChain: text('inheritance_chain'), // JSON array: ["Child", "Parent", "GrandParent"]
+  overriddenMembers: text('overridden_members'), // JSON array: ["method1", "method2"]
+  // Metadata
   createdAt: text('created_at').notNull(),
   updatedAt: text('updated_at').notNull(),
   description: text('description'),
@@ -268,7 +283,62 @@ export const tasks = sqliteTable('tasks', {
   updatedAt: text('updated_at').notNull(),
   completedAt: text('completed_at'),
   notes: text('notes'),
-});
+}, (table) => [
+  index('idx_tasks_status').on(table.status),
+  index('idx_tasks_priority').on(table.priority),
+  index('idx_tasks_symbol').on(table.symbolId),
+  index('idx_tasks_file').on(table.filePath),
+  index('idx_tasks_due').on(table.dueDate),
+]);
+
+/**
+ * HTTP Endpoints table (for API route tracking)
+ */
+export const endpoints = sqliteTable('endpoints', {
+  id: text('id').primaryKey(),
+  method: text('method').notNull(), // GET, POST, PUT, DELETE, PATCH
+  path: text('path').notNull(), // /api/users/:id
+  pathParams: text('path_params'), // JSON array: ["id"]
+  queryParams: text('query_params'), // JSON array: ["limit", "offset"]
+  handlerSymbolId: text('handler_symbol_id').references(() => symbols.id, { onDelete: 'cascade' }),
+  controllerSymbolId: text('controller_symbol_id'), // Controller class symbol ID (if applicable)
+  requestType: text('request_type'), // DTO type for request body
+  responseType: text('response_type'), // DTO type for response
+  scope: text('scope').notNull(), // public, internal, private, admin
+  middlewares: text('middlewares'), // JSON array of middleware symbol IDs
+  filePath: text('file_path').notNull(),
+  line: integer('line'),
+  description: text('description'),
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+}, (table) => [
+  index('idx_endpoints_path').on(table.path),
+  index('idx_endpoints_method').on(table.method),
+  index('idx_endpoints_scope').on(table.scope),
+  index('idx_endpoints_handler').on(table.handlerSymbolId),
+]);
+
+/**
+ * Code Blocks table (for block-level chunking)
+ */
+export const codeBlocks = sqliteTable('code_blocks', {
+  id: text('id').primaryKey(),
+  symbolId: text('symbol_id').notNull().references(() => symbols.id, { onDelete: 'cascade' }),
+  type: text('type').notNull(), // validation, transformation, query, mutation, etc.
+  startLine: integer('start_line').notNull(),
+  endLine: integer('end_line').notNull(),
+  purpose: text('purpose'), // Description of what this block does
+  dependencies: text('dependencies'), // JSON array of symbol IDs used in this block
+  sideEffects: text('side_effects'), // JSON array: [{type, target, description}]
+  scope: text('scope'), // local, closure, module
+  complexity: integer('complexity'), // Cyclomatic complexity (optional)
+  createdAt: text('created_at').notNull(),
+  updatedAt: text('updated_at').notNull(),
+}, (table) => [
+  index('idx_blocks_symbol').on(table.symbolId),
+  index('idx_blocks_type').on(table.type),
+  index('idx_blocks_lines').on(table.startLine, table.endLine),
+]);
 
 // Type exports for use in application code
 export type Symbol = typeof symbols.$inferSelect;
@@ -312,3 +382,9 @@ export type NewSyncMetadata = typeof syncMetadata.$inferInsert;
 
 export type TaskRow = typeof tasks.$inferSelect;
 export type NewTask = typeof tasks.$inferInsert;
+
+export type Endpoint = typeof endpoints.$inferSelect;
+export type NewEndpoint = typeof endpoints.$inferInsert;
+
+export type CodeBlock = typeof codeBlocks.$inferSelect;
+export type NewCodeBlock = typeof codeBlocks.$inferInsert;
