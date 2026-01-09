@@ -73,7 +73,7 @@ export class VisualizeDepsCommand extends BaseCommand {
       this.printHeader('TSDoc Edge - Dependency Visualization');
 
       const config = ConfigManager.getInstance();
-      const diagramsDir = (config as any).config?.paths?.diagramsDir || '.tsdoc/diagrams';
+      const diagramsDir = config.get().paths?.diagramsDir || '.tsdoc/diagrams';
 
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);

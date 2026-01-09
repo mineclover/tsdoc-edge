@@ -395,11 +395,13 @@ export class CoverageReportCommand extends BaseCommand {
       // Extract file paths from codeConnections
       const connections = data.registryData?.codeConnections || {};
       for (const [_symbol, connArray] of Object.entries(connections)) {
-        const conns = (connArray as any)[1] || [];
-        for (const conn of conns) {
-          if (conn.filePath) {
+        const conns = (connArray as unknown as Array<unknown>)[1] || [];
+        const connList = Array.isArray(conns) ? conns : [];
+        for (const conn of connList) {
+          const typedConn = conn as { filePath?: string };
+          if (typedConn.filePath) {
             // Convert absolute path to relative
-            const relativePath = conn.filePath.replace(/.*\/tsdoc-edge\//, '');
+            const relativePath = typedConn.filePath.replace(/.*\/tsdoc-edge\//, '');
             if (!files.includes(relativePath)) {
               files.push(relativePath);
             }

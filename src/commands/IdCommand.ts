@@ -7,6 +7,7 @@ import * as path from 'node:path';
 import { BaseCommand, colors, type CommandResult } from './BaseCommand';
 import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import type { ImplementationSymbolType } from '../types/graph';
 
 /**
  * IdCommand - Complete symbol ID management
@@ -149,7 +150,7 @@ export class IdCommand extends BaseCommand {
     const id = manager.register({
       filePath,
       symbolName,
-      type: type as any, // Type narrowed to ImplementationSymbolType by register()
+      type: type as ImplementationSymbolType | undefined,
       memberOf: parent,
       memberType,
     });

@@ -202,7 +202,7 @@ export class ValidateDocsCommand extends BaseCommand {
     // Get exclude dirs from config if not provided
     if (!excludeDirs) {
       const config = ConfigManager.getInstance().get();
-      excludeDirs = (config.validation as any)?.excludeDirs || [];
+      excludeDirs = config.validation?.excludeDirs || [];
     }
 
     for (const entry of entries) {
