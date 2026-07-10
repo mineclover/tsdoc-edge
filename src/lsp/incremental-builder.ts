@@ -24,6 +24,8 @@ export interface ExtractedSymbol {
   filePath: string;
   line: number;
   column: number;
+  endLine: number;
+  endColumn: number;
   isExported: boolean;
   isPublic: boolean;
   summary: string | null;
@@ -165,7 +167,6 @@ export class IncrementalBuilder {
 
     // Extract variables (const/let)
     if (ts.isVariableStatement(node)) {
-      const isExported = node.modifiers?.some(m => m.kind === ts.SyntaxKind.ExportKeyword) ?? false;
       node.declarationList.declarations.forEach(decl => {
         if (ts.isIdentifier(decl.name)) {
           const isConst = (node.declarationList.flags & ts.NodeFlags.Const) !== 0;
@@ -195,6 +196,7 @@ export class IncrementalBuilder {
     filePath: string
   ): ExtractedSymbol {
     const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+    const end = sourceFile.getLineAndCharacterOfPosition(node.getEnd());
     const nameText = ts.isIdentifier(name) ? name.text : name.getText();
 
     // Check export status
@@ -219,6 +221,8 @@ export class IncrementalBuilder {
       filePath: relativePath,
       line: line + 1,
       column: character + 1,
+      endLine: end.line + 1,
+      endColumn: end.character + 1,
       isExported,
       isPublic,
       summary,
@@ -239,7 +243,6 @@ export class IncrementalBuilder {
    * Extract JSDoc summary from node
    */
   private extractJsDocSummary(node: ts.Node, sourceFile: ts.SourceFile): string | null {
-    const jsDocTags = ts.getJSDocTags(node);
     const fullText = sourceFile.getFullText();
     const nodeStart = node.getFullStart();
 
@@ -377,7 +380,11 @@ export class IncrementalBuilder {
   }
 
   /**
-   * Process file content directly (for unsaved buffer)
+   * Process file content directly for an unsaved in-memory overlay.
+   *
+   * Unsaved content must never update persistent storage. The caller owns the
+   * returned overlay and replaces it with a whole-project canonical refresh
+   * after a successful save.
    * @param filePath - Path to the file
    * @param content - File content
    * @returns Extraction result
@@ -400,7 +407,6 @@ export class IncrementalBuilder {
       );
 
       this.visitNode(sourceFile, sourceFile, result, filePath);
-      this.updateDatabase(result);
     } catch (error) {
       result.errors.push(`Parse error: ${error}`);
     }

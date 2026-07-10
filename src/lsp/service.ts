@@ -11,14 +11,40 @@
  * @solves Bridge between LSP protocol and TSDoc Edge database
  */
 
-import * as path from 'node:path';
 import * as fs from 'node:fs';
+import * as path from 'node:path';
 import Database from 'better-sqlite3';
-import { SymbolKind, DiagnosticSeverity } from 'vscode-languageserver/node';
-import type { SqliteDatabase, SymbolRow, CountRow, RelTypeCountRow, UnifiedRelRow, HighImpactRow } from '../types/database';
+import { DiagnosticSeverity, SymbolKind } from 'vscode-languageserver/node';
+import {
+  CanonicalGraphCoordinator,
+  type CanonicalGraphCoordinatorDependencies,
+  type CanonicalGraphCoordinatorOptions,
+  type CanonicalGraphRefreshResult,
+  canonicalGraphOptionsFromEnvironment,
+  DEFAULT_CANONICAL_GRAPH_DATABASE,
+} from '../indexer';
+import { GraphRepository } from '../storage/GraphRepository';
+import type {
+  CountRow,
+  HighImpactRow,
+  RelTypeCountRow,
+  SqliteDatabase,
+  SymbolRow,
+  UnifiedRelRow,
+} from '../types/database';
 import { CacheManager } from './cache-manager';
+import {
+  CanonicalGraphLspView,
+  canonicalNodeDisplayName,
+  type CanonicalLspSymbolLocation,
+} from './canonical-graph-view';
 import { StatementManager } from './statement-manager';
-import { IncrementalBuilder, type IncrementalExtractResult } from './incremental-builder';
+import {
+  type ExtractedSymbol,
+  IncrementalBuilder,
+  type IncrementalExtractResult,
+} from './incremental-builder';
+import { isTypeScriptSourcePath } from './uri';
 
 /**
  * Code Lens information for displaying impact counts on symbols
@@ -67,6 +93,13 @@ export interface DiagnosticInfo {
   severity: DiagnosticSeverity;
 }
 
+/** Optional canonical graph wiring for hosts and focused tests. */
+export interface TsdocEdgeServiceOptions {
+  /** `false` disables canonical reads and refresh even when environment variables exist. */
+  readonly canonicalGraph?: CanonicalGraphCoordinatorOptions | false;
+  readonly canonicalGraphDependencies?: CanonicalGraphCoordinatorDependencies;
+}
+
 /** Cache names used by the service */
 const CACHE_NAMES = {
   SYMBOL: 'symbol',
@@ -110,6 +143,21 @@ export class TsdocEdgeService {
   /** Whether incremental mode is enabled */
   private incrementalMode: boolean = false;
 
+  /** Whole-project canonical refresh path used for saved files. */
+  private canonicalCoordinator: CanonicalGraphCoordinator | null = null;
+
+  /** Read-only fallback when a Build-created canonical DB exists without router runtime config. */
+  private canonicalRepository: GraphRepository | null = null;
+
+  /** Immutable view of the active canonical revision. */
+  private canonicalView: CanonicalGraphLspView | null = null;
+
+  /** Active revision observed by the current canonical view. */
+  private canonicalRevisionId: string | null = null;
+
+  /** TS5 syntax-only results for unsaved buffers; never persisted. */
+  private readonly unsavedOverlays = new Map<string, IncrementalExtractResult>();
+
   /** Maximum symbols to return in impact analysis */
   private static readonly MAX_IMPACT_SYMBOLS = 100;
 
@@ -118,9 +166,9 @@ export class TsdocEdgeService {
    *
    * @param workspaceRoot - Root directory of the workspace
    */
-  constructor(workspaceRoot: string) {
-    this.workspaceRoot = workspaceRoot;
-    this.dbPath = path.join(workspaceRoot, '.tsdoc', 'symbols.db');
+  constructor(workspaceRoot: string, options: TsdocEdgeServiceOptions = {}) {
+    this.workspaceRoot = path.resolve(workspaceRoot);
+    this.dbPath = path.join(this.workspaceRoot, '.tsdoc', 'symbols.db');
 
     // Initialize cache manager with defaults
     this.cacheManager = new CacheManager({
@@ -135,6 +183,7 @@ export class TsdocEdgeService {
     this.cacheManager.createCache(CACHE_NAMES.DIAGNOSTICS);
     this.cacheManager.createCache(CACHE_NAMES.IMPACT);
 
+    this.initCanonicalGraph(options);
     this.initDatabase();
   }
 
@@ -149,6 +198,14 @@ export class TsdocEdgeService {
    */
   enableIncrementalMode(): boolean {
     if (this.incrementalMode) return true;
+
+    if (this.isCanonicalGraphEnabled()) {
+      // Canonical saved-file updates are whole-project refreshes. TS5 remains
+      // only as a non-persistent syntax extractor for unsaved buffers.
+      this.incrementalBuilder = new IncrementalBuilder(this.workspaceRoot, null);
+      this.incrementalMode = true;
+      return true;
+    }
 
     // Re-open database in write mode
     if (this.db) {
@@ -208,6 +265,58 @@ export class TsdocEdgeService {
     return this.incrementalMode;
   }
 
+  /** Whether canonical graph reads or refreshes are active. */
+  isCanonicalGraphEnabled(): boolean {
+    return (
+      this.canonicalCoordinator !== null ||
+      this.canonicalRepository !== null ||
+      this.canonicalView !== null
+    );
+  }
+
+  /** Refresh or reload the canonical graph after a file save/watch event. */
+  async refreshCanonicalGraph(filePath?: string): Promise<CanonicalGraphRefreshResult | null> {
+    if (this.canonicalCoordinator) {
+      const refreshed = await this.canonicalCoordinator.refresh();
+      if (refreshed.status === 'committed') {
+        this.installCanonicalRevision(refreshed.graph, refreshed.revision.revisionId);
+        if (filePath) this.unsavedOverlays.delete(path.resolve(filePath));
+      }
+      return refreshed;
+    }
+
+    if (this.canonicalRepository) {
+      const active = this.canonicalRepository.readActiveRevision();
+      if (!active) return null;
+
+      const revisionChanged = active.metadata.revisionId !== this.canonicalRevisionId;
+      if (revisionChanged || !this.canonicalView) {
+        this.installCanonicalRevision(active.graph, active.metadata.revisionId);
+        if (filePath) this.unsavedOverlays.delete(path.resolve(filePath));
+      } else {
+        this.invalidateCache();
+      }
+      return {
+        status: 'committed',
+        graph: active.graph,
+        revision: active.metadata,
+      };
+    }
+
+    return null;
+  }
+
+  /** Inspect a transient unsaved overlay without exposing mutable internal state. */
+  getUnsavedOverlay(filePath: string): IncrementalExtractResult | null {
+    return this.unsavedOverlays.get(path.resolve(filePath)) ?? null;
+  }
+
+  /** Drop a transient overlay when its document is closed or deleted. */
+  clearUnsavedOverlay(filePath: string): void {
+    this.unsavedOverlays.delete(path.resolve(filePath));
+    this.invalidateFileCache(filePath);
+  }
+
   /**
    * Process a file change (for incremental updates)
    *
@@ -221,7 +330,7 @@ export class TsdocEdgeService {
     }
 
     // Only process TypeScript files
-    if (!filePath.endsWith('.ts') && !filePath.endsWith('.tsx')) {
+    if (!isTypeScriptSourcePath(filePath)) {
       return null;
     }
 
@@ -231,9 +340,14 @@ export class TsdocEdgeService {
       if (content !== undefined) {
         // Process from provided content (unsaved buffer)
         result = this.incrementalBuilder.processContent(filePath, content);
+        this.unsavedOverlays.set(path.resolve(filePath), result);
+      } else if (this.isCanonicalGraphEnabled()) {
+        // Saved content must use async whole-project refreshCanonicalGraph().
+        return null;
       } else {
         // Process from disk
         result = this.incrementalBuilder.processFileChange(filePath);
+        this.unsavedOverlays.delete(path.resolve(filePath));
       }
 
       // Invalidate caches for this file
@@ -253,6 +367,8 @@ export class TsdocEdgeService {
    * @returns Number of symbols removed
    */
   handleFileDelete(filePath: string): number {
+    this.unsavedOverlays.delete(path.resolve(filePath));
+    if (this.isCanonicalGraphEnabled()) return 0;
     if (!this.incrementalMode || !this.incrementalBuilder) {
       return 0;
     }
@@ -294,13 +410,58 @@ export class TsdocEdgeService {
     this.cacheManager.deleteMatching(CACHE_NAMES.DIAGNOSTICS, (key) => key.includes(fileName));
   }
 
+  /** Initialize canonical refresh or a Build-created read-only snapshot. */
+  private initCanonicalGraph(options: TsdocEdgeServiceOptions): void {
+    if (options.canonicalGraph === false) return;
+
+    const configured =
+      options.canonicalGraph ?? canonicalGraphOptionsFromEnvironment(this.workspaceRoot);
+    if (configured) {
+      this.canonicalCoordinator = new CanonicalGraphCoordinator(
+        { ...configured, rootDir: this.workspaceRoot },
+        options.canonicalGraphDependencies
+      );
+      const active = this.canonicalCoordinator.readActiveRevision();
+      if (active) this.installCanonicalRevision(active.graph, active.metadata.revisionId);
+      return;
+    }
+
+    const databasePath = path.resolve(
+      this.workspaceRoot,
+      process.env.TSDOC_EDGE_CANONICAL_GRAPH_DB ?? DEFAULT_CANONICAL_GRAPH_DATABASE
+    );
+    if (!fs.existsSync(databasePath)) return;
+
+    try {
+      this.canonicalRepository = new GraphRepository(databasePath, { readOnly: true });
+      const active = this.canonicalRepository.readActiveRevision();
+      if (active) this.installCanonicalRevision(active.graph, active.metadata.revisionId);
+    } catch (error) {
+      console.error(`Failed to open canonical graph database: ${error}`);
+      this.canonicalRepository?.close();
+      this.canonicalRepository = null;
+    }
+  }
+
+  /** Install one immutable revision and invalidate all derived query caches. */
+  private installCanonicalRevision(
+    graph: ConstructorParameters<typeof CanonicalGraphLspView>[0],
+    revisionId: string
+  ): void {
+    this.canonicalView = new CanonicalGraphLspView(graph);
+    this.canonicalRevisionId = revisionId;
+    this.invalidateCache();
+  }
+
   /**
    * Initialize SQLite database connection in readonly mode
    * @internal
    */
   private initDatabase(): void {
     if (!fs.existsSync(this.dbPath)) {
-      console.warn(`TSDoc Edge database not found at: ${this.dbPath}`);
+      if (!this.canonicalView && !this.canonicalCoordinator) {
+        console.warn(`TSDoc Edge database not found at: ${this.dbPath}`);
+      }
       return;
     }
 
@@ -314,6 +475,86 @@ export class TsdocEdgeService {
     }
   }
 
+  /** Resolve the innermost transient declaration at an LSP position. */
+  private overlaySymbolAtPosition(
+    overlay: IncrementalExtractResult,
+    line: number,
+    character: number
+  ): ExtractedSymbol | null {
+    const column = character + 1;
+    const candidates = overlay.symbols.filter((symbol) => {
+      if (line < symbol.line || line > symbol.endLine) return false;
+      if (line === symbol.line && column < symbol.column) return false;
+      if (line === symbol.endLine && column > symbol.endColumn) return false;
+      return true;
+    });
+    candidates.sort(
+      (left, right) =>
+        overlayRangeSize(left) - overlayRangeSize(right) ||
+        right.line - left.line ||
+        right.column - left.column ||
+        compareText(left.id, right.id)
+    );
+    return candidates[0] ?? null;
+  }
+
+  /** Match a transient declaration to its last saved canonical peer. */
+  private canonicalPeerForOverlay(
+    filePath: string,
+    symbol: ExtractedSymbol
+  ): CanonicalLspSymbolLocation | null {
+    if (!this.canonicalView) return null;
+    return (
+      this.canonicalView
+        .symbolsInFile(filePath)
+        .find(
+          ({ node }) =>
+            node.kind.toLocaleLowerCase() === symbol.type.toLocaleLowerCase() &&
+            canonicalNodeDisplayName(node) === symbol.name
+        ) ?? null
+    );
+  }
+
+  /** Search dirty-document declarations before considering saved graph rows. */
+  private searchUnsavedOverlays(query: string): SymbolSearchResult[] {
+    const folded = query.toLocaleLowerCase();
+    const results: SymbolSearchResult[] = [];
+    for (const [filePath, overlay] of this.unsavedOverlays) {
+      for (const symbol of overlay.symbols) {
+        if (!symbol.name.toLocaleLowerCase().includes(folded)) continue;
+        results.push({
+          name: symbol.name,
+          kind: this.mapTypeToKind(symbol.type),
+          filePath,
+          line: symbol.line,
+        });
+      }
+    }
+    return results.sort(
+      (left, right) =>
+        compareText(left.name, right.name) ||
+        compareText(left.filePath, right.filePath) ||
+        left.line - right.line
+    );
+  }
+
+  /** Remove saved results for files currently owned by a dirty overlay. */
+  private mergeOverlaySearchResults(
+    overlays: SymbolSearchResult[],
+    saved: SymbolSearchResult[]
+  ): SymbolSearchResult[] {
+    const dirtyFiles = new Set(this.unsavedOverlays.keys());
+    return [
+      ...overlays,
+      ...saved.filter((result) => {
+        const absolute = path.isAbsolute(result.filePath)
+          ? path.resolve(result.filePath)
+          : path.resolve(this.workspaceRoot, result.filePath);
+        return !dirtyFiles.has(absolute);
+      }),
+    ].slice(0, 50);
+  }
+
   /**
    * Get hover information for a symbol at position
    *
@@ -323,6 +564,47 @@ export class TsdocEdgeService {
    * @returns Markdown hover content or null
    */
   getHoverInfo(filePath: string, line: number, character: number): string | null {
+    const overlay = this.getUnsavedOverlay(filePath);
+    if (overlay) {
+      const symbol = this.overlaySymbolAtPosition(overlay, line, character);
+      if (!symbol) return null;
+
+      const peer = this.canonicalPeerForOverlay(filePath, symbol);
+      const counts =
+        peer && this.canonicalView
+          ? this.canonicalView.impactCounts(peer.node.id)
+          : { dependents: 0, dependencies: 0 };
+      let content = `## ${symbol.name}\n\n`;
+      content += `**Type:** ${symbol.type}\n\n`;
+      if (symbol.summary) content += `${symbol.summary}\n\n`;
+      content += `*Unsaved buffer overlay*\n\n`;
+      content += `---\n\n### Impact Analysis\n\n`;
+      content += `- **Dependents:** ${counts.dependents}\n`;
+      content += `- **Dependencies:** ${counts.dependencies}\n`;
+      return content;
+    }
+
+    const canonical = this.canonicalView?.symbolAtPosition(filePath, line, character);
+    if (canonical && this.canonicalView) {
+      const counts = this.canonicalView.impactCounts(canonical.node.id);
+      const edgeKinds = new Set([
+        ...this.canonicalView.analysis.index
+          .getIncomingEdges(canonical.node.id)
+          .map((edge) => edge.kind),
+        ...this.canonicalView.analysis.index
+          .getOutgoingEdges(canonical.node.id)
+          .map((edge) => edge.kind),
+      ]);
+      let content = `## ${canonicalNodeDisplayName(canonical.node)}\n\n`;
+      content += `**Type:** ${canonical.node.kind}\n\n`;
+      content += `---\n\n### Impact Analysis\n\n`;
+      content += `- **Dependents:** ${counts.dependents}\n`;
+      content += `- **Dependencies:** ${counts.dependencies}\n`;
+      if (edgeKinds.size > 0) {
+        content += `\n**Raw graph edge kinds:** ${[...edgeKinds].sort().join(', ')}\n`;
+      }
+      return content;
+    }
     if (!this.db) return null;
 
     try {
@@ -330,32 +612,43 @@ export class TsdocEdgeService {
       const normalizedPath = filePath.replace(/\\/g, '/');
 
       // Use cached prepared statements to prevent memory leaks
-      const symbolStmt = this.statementManager?.prepare('hoverSymbol', `
+      const symbolStmt = this.statementManager?.prepare(
+        'hoverSymbol',
+        `
         SELECT id, name, type, summary, file_path, line
         FROM symbols
         WHERE file_path LIKE ?
           AND line <= ?
         ORDER BY line DESC
         LIMIT 1
-      `);
+      `
+      );
 
-      const symbol = symbolStmt?.get(`%${path.basename(normalizedPath)}`, line) as SymbolRow | undefined;
+      const symbol = symbolStmt?.get(`%${path.basename(normalizedPath)}`, line) as
+        | SymbolRow
+        | undefined;
 
       if (!symbol) return null;
 
       // Get impact analysis using indexed JOIN (O(1) instead of O(n) LIKE scan)
-      const downstreamStmt = this.statementManager?.prepare('hoverDownstreamJoin', `
+      const downstreamStmt = this.statementManager?.prepare(
+        'hoverDownstreamJoin',
+        `
         SELECT COUNT(DISTINCT rs.relationship_id) as count
         FROM relationship_symbols rs
         WHERE rs.symbol_id = ? AND rs.role = 'from'
-      `);
+      `
+      );
       const downstreamCount = (downstreamStmt?.get(symbol.id) as CountRow | undefined)?.count || 0;
 
-      const upstreamStmt = this.statementManager?.prepare('hoverUpstreamJoin', `
+      const upstreamStmt = this.statementManager?.prepare(
+        'hoverUpstreamJoin',
+        `
         SELECT COUNT(DISTINCT rs.relationship_id) as count
         FROM relationship_symbols rs
         WHERE rs.symbol_id = ? AND rs.role = 'to'
-      `);
+      `
+      );
       const upstreamCount = (upstreamStmt?.get(symbol.id) as CountRow | undefined)?.count || 0;
 
       // Build markdown content
@@ -372,7 +665,9 @@ export class TsdocEdgeService {
       content += `- **Upstream:** ${upstreamCount} dependencies\n`;
 
       // Get relationship types using indexed JOIN
-      const relTypesStmt = this.statementManager?.prepare('hoverRelTypesJoin', `
+      const relTypesStmt = this.statementManager?.prepare(
+        'hoverRelTypesJoin',
+        `
         SELECT ur.type, COUNT(DISTINCT ur.id) as count
         FROM unified_relationships ur
         INNER JOIN relationship_symbols rs ON ur.id = rs.relationship_id
@@ -380,7 +675,8 @@ export class TsdocEdgeService {
         GROUP BY ur.type
         ORDER BY count DESC
         LIMIT 5
-      `);
+      `
+      );
       const relTypes = (relTypesStmt?.all(symbol.id) || []) as RelTypeCountRow[];
 
       if (relTypes.length > 0) {
@@ -402,24 +698,37 @@ export class TsdocEdgeService {
    * Uses indexed JOIN on relationship_symbols table for O(1) lookup
    */
   private getImpactCounts(symbolId: string): { downstream: number; upstream: number } {
+    if (this.canonicalView?.analysis.index.getNode(symbolId)) {
+      const counts = this.canonicalView.impactCounts(symbolId);
+      return { downstream: counts.dependents, upstream: counts.dependencies };
+    }
     // Check cache
-    const cached = this.cacheManager.get<{ downstream: number; upstream: number }>(CACHE_NAMES.IMPACT, symbolId);
+    const cached = this.cacheManager.get<{ downstream: number; upstream: number }>(
+      CACHE_NAMES.IMPACT,
+      symbolId
+    );
     if (cached) {
       return cached;
     }
 
     // Use JOIN on relationship_symbols for indexed lookup (O(1) instead of O(n) LIKE scan)
-    const downstreamStmt = this.statementManager?.prepare('downstreamJoin', `
+    const downstreamStmt = this.statementManager?.prepare(
+      'downstreamJoin',
+      `
       SELECT COUNT(DISTINCT rs.relationship_id) as count
       FROM relationship_symbols rs
       WHERE rs.symbol_id = ? AND rs.role = 'from'
-    `);
+    `
+    );
 
-    const upstreamStmt = this.statementManager?.prepare('upstreamJoin', `
+    const upstreamStmt = this.statementManager?.prepare(
+      'upstreamJoin',
+      `
       SELECT COUNT(DISTINCT rs.relationship_id) as count
       FROM relationship_symbols rs
       WHERE rs.symbol_id = ? AND rs.role = 'to'
-    `);
+    `
+    );
 
     const downstream = (downstreamStmt?.get(symbolId) as CountRow | undefined)?.count || 0;
     const upstream = (upstreamStmt?.get(symbolId) as CountRow | undefined)?.count || 0;
@@ -440,6 +749,37 @@ export class TsdocEdgeService {
    * @returns Array of code lens info
    */
   getCodeLenses(filePath: string): CodeLensInfo[] {
+    const overlay = this.getUnsavedOverlay(filePath);
+    if (overlay) {
+      return overlay.symbols.map((symbol) => {
+        const peer = this.canonicalPeerForOverlay(filePath, symbol);
+        const counts =
+          peer && this.canonicalView
+            ? this.canonicalView.impactCounts(peer.node.id)
+            : { dependents: 0, dependencies: 0 };
+        return {
+          line: symbol.line,
+          title: `↓${counts.dependents} ↑${counts.dependencies}`,
+          symbolId:
+            peer?.node.id ??
+            `overlay:${path.resolve(filePath)}#${symbol.id}:${symbol.line}:${symbol.column}`,
+        };
+      });
+    }
+
+    if (this.canonicalView) {
+      return this.canonicalView.symbolsInFile(filePath).flatMap(({ node, line }) => {
+        const counts = this.canonicalView?.impactCounts(node.id);
+        if (!counts || (counts.dependents === 0 && counts.dependencies === 0)) return [];
+        return [
+          {
+            line,
+            title: `↓${counts.dependents} ↑${counts.dependencies}`,
+            symbolId: node.id,
+          },
+        ];
+      });
+    }
     if (!this.db) return [];
 
     try {
@@ -453,13 +793,16 @@ export class TsdocEdgeService {
       }
 
       // Get all symbols in this file using cached statement
-      const symbolsStmt = this.statementManager?.prepare('fileSymbols', `
+      const symbolsStmt = this.statementManager?.prepare(
+        'fileSymbols',
+        `
         SELECT id, name, line
         FROM symbols
         WHERE file_path LIKE ?
           AND type IN ('class', 'function', 'interface', 'method')
         ORDER BY line
-      `);
+      `
+      );
 
       const symbols = (symbolsStmt?.all(`%${fileName}`) || []) as SymbolRow[];
 
@@ -469,7 +812,7 @@ export class TsdocEdgeService {
       }
 
       // Batch query for all impact counts at once
-      const symbolIds = symbols.map(s => s.id);
+      const symbolIds = symbols.map((s) => s.id);
       const impactCounts = this.getBatchImpactCounts(symbolIds);
 
       const codeLenses: CodeLensInfo[] = [];
@@ -503,8 +846,21 @@ export class TsdocEdgeService {
    * @param symbolIds - Array of symbol IDs
    * @returns Map of symbolId -> { downstream, upstream }
    */
-  private getBatchImpactCounts(symbolIds: string[]): Map<string, { downstream: number; upstream: number }> {
+  private getBatchImpactCounts(
+    symbolIds: string[]
+  ): Map<string, { downstream: number; upstream: number }> {
     const results = new Map<string, { downstream: number; upstream: number }>();
+    if (this.canonicalView) {
+      for (const id of symbolIds) {
+        if (!this.canonicalView.analysis.index.getNode(id)) continue;
+        const counts = this.canonicalView.impactCounts(id);
+        results.set(id, {
+          downstream: counts.dependents,
+          upstream: counts.dependencies,
+        });
+      }
+      return results;
+    }
     if (!this.db || symbolIds.length === 0) return results;
 
     // Initialize all symbols with zero counts
@@ -516,7 +872,10 @@ export class TsdocEdgeService {
       // Check cache first
       const uncachedIds: string[] = [];
       for (const id of symbolIds) {
-        const cached = this.cacheManager.get<{ downstream: number; upstream: number }>(CACHE_NAMES.IMPACT, id);
+        const cached = this.cacheManager.get<{ downstream: number; upstream: number }>(
+          CACHE_NAMES.IMPACT,
+          id
+        );
         if (cached) {
           results.set(id, cached);
         } else {
@@ -534,7 +893,10 @@ export class TsdocEdgeService {
         WHERE symbol_id IN (${placeholders}) AND role = 'from'
         GROUP BY symbol_id
       `);
-      const downstreamRows = downstreamStmt.all(...uncachedIds) as Array<{ symbol_id: string; count: number }>;
+      const downstreamRows = downstreamStmt.all(...uncachedIds) as Array<{
+        symbol_id: string;
+        count: number;
+      }>;
 
       // Batch query for upstream counts
       const upstreamStmt = this.db.prepare(`
@@ -543,7 +905,10 @@ export class TsdocEdgeService {
         WHERE symbol_id IN (${placeholders}) AND role = 'to'
         GROUP BY symbol_id
       `);
-      const upstreamRows = upstreamStmt.all(...uncachedIds) as Array<{ symbol_id: string; count: number }>;
+      const upstreamRows = upstreamStmt.all(...uncachedIds) as Array<{
+        symbol_id: string;
+        count: number;
+      }>;
 
       // Build result map
       for (const row of downstreamRows) {
@@ -578,28 +943,46 @@ export class TsdocEdgeService {
    * @returns Array of matching symbols
    */
   searchSymbols(query: string): SymbolSearchResult[] {
-    if (!this.db) return [];
+    const overlays = this.searchUnsavedOverlays(query);
+    if (this.canonicalView) {
+      return this.mergeOverlaySearchResults(
+        overlays,
+        this.canonicalView.search(query).map(({ node, filePath, line }) => ({
+          name: canonicalNodeDisplayName(node),
+          kind: this.mapTypeToKind(node.kind),
+          filePath,
+          line,
+        }))
+      );
+    }
+    if (!this.db) return overlays.slice(0, 50);
 
     try {
-      const stmt = this.statementManager?.prepare('searchSymbols', `
+      const stmt = this.statementManager?.prepare(
+        'searchSymbols',
+        `
         SELECT id, name, type, file_path, line
         FROM symbols
         WHERE name LIKE ?
         ORDER BY name
         LIMIT 50
-      `);
+      `
+      );
 
       const symbols = (stmt?.all(`%${query}%`) || []) as SymbolRow[];
 
-      return symbols.map((sym) => ({
-        name: sym.name,
-        kind: this.mapTypeToKind(sym.type),
-        filePath: sym.file_path,
-        line: sym.line || 1,
-      }));
+      return this.mergeOverlaySearchResults(
+        overlays,
+        symbols.map((sym) => ({
+          name: sym.name,
+          kind: this.mapTypeToKind(sym.type),
+          filePath: sym.file_path,
+          line: sym.line || 1,
+        }))
+      );
     } catch (error) {
       console.error(`searchSymbols error: ${error}`);
-      return [];
+      return overlays.slice(0, 50);
     }
   }
 
@@ -610,6 +993,46 @@ export class TsdocEdgeService {
    * @returns Array of diagnostics
    */
   getDiagnostics(filePath: string): DiagnosticInfo[] {
+    const overlay = this.getUnsavedOverlay(filePath);
+    if (overlay) {
+      const diagnostics: DiagnosticInfo[] = overlay.errors.map((message) => ({
+        line: 1,
+        message,
+        severity: DiagnosticSeverity.Warning,
+      }));
+      for (const symbol of overlay.symbols) {
+        const peer = this.canonicalPeerForOverlay(filePath, symbol);
+        const dependents =
+          peer && this.canonicalView ? this.canonicalView.impactCounts(peer.node.id).dependents : 0;
+        if (dependents > 10) {
+          diagnostics.push({
+            line: symbol.line,
+            message: `High-impact symbol: ${symbol.name} has ${dependents} dependents`,
+            severity: DiagnosticSeverity.Information,
+          });
+        }
+      }
+      return diagnostics;
+    }
+
+    if (this.canonicalView) {
+      const canonicalView = this.canonicalView;
+      const canonicalDiagnostics = canonicalView
+        .symbolsInFile(filePath)
+        .flatMap(({ node, line }) => {
+          const dependents = canonicalView.impactCounts(node.id).dependents;
+          return dependents > 10
+            ? [
+                {
+                  line,
+                  message: `High-impact symbol: ${canonicalNodeDisplayName(node)} has ${dependents} dependents`,
+                  severity: DiagnosticSeverity.Information,
+                },
+              ]
+            : [];
+        });
+      return [...canonicalDiagnostics, ...this.getLegacyArchitecturalDiagnostics(filePath)];
+    }
     if (!this.db) return [];
 
     try {
@@ -625,12 +1048,15 @@ export class TsdocEdgeService {
       const diagnostics: DiagnosticInfo[] = [];
 
       // Check for circular dependencies using cached statement
-      const circularStmt = this.statementManager?.prepare('circularDeps', `
+      const circularStmt = this.statementManager?.prepare(
+        'circularDeps',
+        `
         SELECT from_symbols, to_symbols, properties, file_path, line
         FROM unified_relationships
         WHERE type = 'circular-dependency'
           AND file_path LIKE ?
-      `);
+      `
+      );
       const circulars = (circularStmt?.all(`%${fileName}`) || []) as UnifiedRelRow[];
 
       for (const circular of circulars) {
@@ -643,13 +1069,16 @@ export class TsdocEdgeService {
       }
 
       // Check for layer violations using cached statement
-      const violationStmt = this.statementManager?.prepare('layerViolations', `
+      const violationStmt = this.statementManager?.prepare(
+        'layerViolations',
+        `
         SELECT from_symbols, to_symbols, properties, file_path, line
         FROM unified_relationships
         WHERE type = 'layer-dependency'
           AND json_extract(properties, '$.isViolation') = 1
           AND file_path LIKE ?
-      `);
+      `
+      );
       const violations = (violationStmt?.all(`%${fileName}`) || []) as UnifiedRelRow[];
 
       for (const violation of violations) {
@@ -662,14 +1091,17 @@ export class TsdocEdgeService {
       }
 
       // Check for high-impact symbols using indexed JOIN (O(1) instead of O(n) LIKE scan)
-      const highImpactStmt = this.statementManager?.prepare('highImpactJoin', `
+      const highImpactStmt = this.statementManager?.prepare(
+        'highImpactJoin',
+        `
         SELECT s.id, s.name, s.line, COUNT(DISTINCT rs.relationship_id) as count
         FROM symbols s
         INNER JOIN relationship_symbols rs ON rs.symbol_id = s.id AND rs.role = 'from'
         WHERE s.file_path LIKE ?
         GROUP BY s.id
         HAVING count > 10
-      `);
+      `
+      );
       const highImpact = (highImpactStmt?.all(`%${fileName}`) || []) as HighImpactRow[];
 
       for (const sym of highImpact) {
@@ -686,6 +1118,58 @@ export class TsdocEdgeService {
       return diagnostics;
     } catch (error) {
       console.error(`getDiagnostics error: ${error}`);
+      return [];
+    }
+  }
+
+  /** Preserve file-scoped legacy enrichment that has no canonical fact-plane equivalent yet. */
+  private getLegacyArchitecturalDiagnostics(filePath: string): DiagnosticInfo[] {
+    if (!this.db) return [];
+
+    try {
+      const fileName = path.basename(filePath.replace(/\\/g, '/'));
+      const diagnostics: DiagnosticInfo[] = [];
+      const circularStmt = this.statementManager?.prepare(
+        'canonicalCircularDeps',
+        `
+        SELECT properties, line
+        FROM unified_relationships
+        WHERE type = 'circular-dependency'
+          AND file_path LIKE ?
+      `
+      );
+      const circulars = (circularStmt?.all(`%${fileName}`) || []) as UnifiedRelRow[];
+      for (const circular of circulars) {
+        const props = JSON.parse(circular.properties || '{}');
+        diagnostics.push({
+          line: circular.line || 1,
+          message: `Circular dependency detected: ${props.cyclePath?.join(' → ') || 'unknown cycle'}`,
+          severity: DiagnosticSeverity.Warning,
+        });
+      }
+
+      const violationStmt = this.statementManager?.prepare(
+        'canonicalLayerViolations',
+        `
+        SELECT properties, line
+        FROM unified_relationships
+        WHERE type = 'layer-dependency'
+          AND json_extract(properties, '$.isViolation') = 1
+          AND file_path LIKE ?
+      `
+      );
+      const violations = (violationStmt?.all(`%${fileName}`) || []) as UnifiedRelRow[];
+      for (const violation of violations) {
+        const props = JSON.parse(violation.properties || '{}');
+        diagnostics.push({
+          line: violation.line || 1,
+          message: `Architecture violation: ${props.fromLayer} → ${props.toLayer}`,
+          severity: DiagnosticSeverity.Warning,
+        });
+      }
+      return diagnostics;
+    } catch (error) {
+      console.error(`getLegacyArchitecturalDiagnostics error: ${error}`);
       return [];
     }
   }
@@ -716,25 +1200,49 @@ export class TsdocEdgeService {
    *
    * @param filePath - File path
    * @param line - Line number (1-based)
+   * @param character - Character position (0-based)
    * @returns Symbol info or null
    */
-  getSymbolAtPosition(filePath: string, line: number): { id: string; name: string; type: string } | null {
+  getSymbolAtPosition(
+    filePath: string,
+    line: number,
+    character = 0
+  ): { id: string; name: string; type: string } | null {
+    const overlay = this.getUnsavedOverlay(filePath);
+    if (overlay) {
+      const symbol = this.overlaySymbolAtPosition(overlay, line, character);
+      return symbol ? { id: symbol.id, name: symbol.name, type: symbol.type } : null;
+    }
+
+    const canonical = this.canonicalView?.symbolAtPosition(filePath, line, character);
+    if (canonical) {
+      return {
+        id: canonical.node.id,
+        name: canonicalNodeDisplayName(canonical.node),
+        type: canonical.node.kind,
+      };
+    }
     if (!this.db) return null;
 
     try {
       const normalizedPath = filePath.replace(/\\/g, '/');
       const fileName = path.basename(normalizedPath);
 
-      const stmt = this.statementManager?.prepare('symbolAtPosition', `
+      const stmt = this.statementManager?.prepare(
+        'symbolAtPosition',
+        `
         SELECT id, name, type
         FROM symbols
         WHERE file_path LIKE ?
           AND line <= ?
         ORDER BY line DESC
         LIMIT 1
-      `);
+      `
+      );
 
-      const symbol = stmt?.get(`%${fileName}`, line) as { id: string; name: string; type: string } | undefined;
+      const symbol = stmt?.get(`%${fileName}`, line) as
+        | { id: string; name: string; type: string }
+        | undefined;
 
       return symbol || null;
     } catch (error) {
@@ -757,6 +1265,19 @@ export class TsdocEdgeService {
     maxDepth: number = 3,
     includeSymbols: boolean = true
   ): { downstream: number; upstream: number; symbols: string[] } {
+    if (this.canonicalView?.analysis.index.getNode(symbolId)) {
+      const affected = this.canonicalView
+        .impact(symbolId, maxDepth)
+        .slice(0, TsdocEdgeService.MAX_IMPACT_SYMBOLS);
+      const dependencies = this.canonicalView.analysis.dependencies(symbolId, {
+        external: 'exclude',
+      });
+      return {
+        downstream: affected.length,
+        upstream: dependencies.length,
+        symbols: includeSymbols ? [...affected] : [],
+      };
+    }
     if (!this.db) return { downstream: 0, upstream: 0, symbols: [] };
 
     try {
@@ -765,12 +1286,15 @@ export class TsdocEdgeService {
       visited.add(symbolId);
 
       // Use JOIN on relationship_symbols for BFS (no JSON.parse needed)
-      const downstreamStmt = this.statementManager?.prepare('impactDownstreamJoin', `
+      const downstreamStmt = this.statementManager?.prepare(
+        'impactDownstreamJoin',
+        `
         SELECT DISTINCT rs2.symbol_id
         FROM relationship_symbols rs1
         INNER JOIN relationship_symbols rs2 ON rs2.relationship_id = rs1.relationship_id AND rs2.role = 'to'
         WHERE rs1.symbol_id = ? AND rs1.role = 'from'
-      `);
+      `
+      );
 
       // BFS with size limit to prevent memory issues
       const maxSymbols = TsdocEdgeService.MAX_IMPACT_SYMBOLS;
@@ -794,12 +1318,15 @@ export class TsdocEdgeService {
       visited.delete(symbolId);
 
       // Get upstream count using indexed lookup
-      const upstreamStmt = this.statementManager?.prepare('impactUpstreamJoin', `
+      const upstreamStmt = this.statementManager?.prepare(
+        'impactUpstreamJoin',
+        `
         SELECT COUNT(DISTINCT rs2.symbol_id) as count
         FROM relationship_symbols rs1
         INNER JOIN relationship_symbols rs2 ON rs2.relationship_id = rs1.relationship_id AND rs2.role = 'from'
         WHERE rs1.symbol_id = ? AND rs1.role = 'to'
-      `);
+      `
+      );
       const upstreamCount = upstreamStmt?.get(symbolId) as { count: number } | undefined;
 
       // Only convert to array if requested to save memory
@@ -823,12 +1350,25 @@ export class TsdocEdgeService {
    * @param limit - Maximum number of related symbols
    * @returns Array of related symbol info
    */
-  getRelatedSymbols(symbolId: string, limit: number = 10): Array<{ id: string; name: string; type: string; relationshipType: string }> {
+  getRelatedSymbols(
+    symbolId: string,
+    limit: number = 10
+  ): Array<{ id: string; name: string; type: string; relationshipType: string }> {
+    if (this.canonicalView?.analysis.index.getNode(symbolId)) {
+      return this.canonicalView.related(symbolId, limit).map(({ node, relationshipType }) => ({
+        id: node.id,
+        name: canonicalNodeDisplayName(node),
+        type: node.kind,
+        relationshipType,
+      }));
+    }
     if (!this.db) return [];
 
     try {
       // Use JOIN on relationship_symbols for efficient lookup (no JSON.parse needed)
-      const relatedStmt = this.statementManager?.prepare('relatedSymbolsJoin', `
+      const relatedStmt = this.statementManager?.prepare(
+        'relatedSymbolsJoin',
+        `
         SELECT DISTINCT s.id, s.name, s.type, ur.type as rel_type
         FROM relationship_symbols rs1
         INNER JOIN unified_relationships ur ON ur.id = rs1.relationship_id
@@ -836,7 +1376,8 @@ export class TsdocEdgeService {
         INNER JOIN symbols s ON s.id = rs2.symbol_id
         WHERE rs1.symbol_id = ?
         LIMIT ?
-      `);
+      `
+      );
 
       const rows = (relatedStmt?.all(symbolId, symbolId, limit) || []) as Array<{
         id: string;
@@ -845,7 +1386,7 @@ export class TsdocEdgeService {
         rel_type: string;
       }>;
 
-      return rows.map(row => ({
+      return rows.map((row) => ({
         id: row.id,
         name: row.name,
         type: row.type,
@@ -863,58 +1404,93 @@ export class TsdocEdgeService {
    * @param name - Symbol name to search
    * @returns Symbol location or null
    */
-  findSymbolByName(name: string): { id: string; name: string; type: string; filePath: string; line: number } | null {
+  findSymbolByName(
+    name: string
+  ): { id: string; name: string; type: string; filePath: string; line: number } | null {
+    const canonical = this.canonicalView?.findByName(name);
+    if (canonical) {
+      return {
+        id: canonical.node.id,
+        name: canonicalNodeDisplayName(canonical.node),
+        type: canonical.node.kind,
+        filePath: canonical.filePath,
+        line: canonical.line,
+      };
+    }
     if (!this.db) return null;
 
     // Check cache first
-    const cached = this.cacheManager.get<{ id: string; name: string; type: string; filePath: string; line: number } | null>(CACHE_NAMES.SYMBOL, `name:${name}`);
+    const cached = this.cacheManager.get<{
+      id: string;
+      name: string;
+      type: string;
+      filePath: string;
+      line: number;
+    } | null>(CACHE_NAMES.SYMBOL, `name:${name}`);
     if (cached !== undefined) {
       return cached;
     }
 
     /** Database result for symbol lookup */
-    type SymbolLocation = { id: string; name: string; type: string; file_path: string; line: number | null };
+    type SymbolLocation = {
+      id: string;
+      name: string;
+      type: string;
+      file_path: string;
+      line: number | null;
+    };
 
     try {
       // First try exact match
-      const exactStmt = this.statementManager?.prepare('findSymbolExact', `
+      const exactStmt = this.statementManager?.prepare(
+        'findSymbolExact',
+        `
         SELECT id, name, type, file_path, line
         FROM symbols
         WHERE name = ?
         LIMIT 1
-      `);
+      `
+      );
       let symbol = exactStmt?.get(name) as SymbolLocation | undefined;
 
       // If not found, try case-insensitive match
       if (!symbol) {
-        const caseInsensitiveStmt = this.statementManager?.prepare('findSymbolCaseInsensitive', `
+        const caseInsensitiveStmt = this.statementManager?.prepare(
+          'findSymbolCaseInsensitive',
+          `
           SELECT id, name, type, file_path, line
           FROM symbols
           WHERE LOWER(name) = LOWER(?)
           LIMIT 1
-        `);
+        `
+        );
         symbol = caseInsensitiveStmt?.get(name) as SymbolLocation | undefined;
       }
 
       // If still not found, try partial match
       if (!symbol) {
-        const partialStmt = this.statementManager?.prepare('findSymbolPartial', `
+        const partialStmt = this.statementManager?.prepare(
+          'findSymbolPartial',
+          `
           SELECT id, name, type, file_path, line
           FROM symbols
           WHERE name LIKE ?
           ORDER BY LENGTH(name)
           LIMIT 1
-        `);
+        `
+        );
         symbol = partialStmt?.get(`%${name}%`) as SymbolLocation | undefined;
       }
 
-      const result = symbol ? {
-        id: symbol.id,
-        name: symbol.name,
-        type: symbol.type,
-        filePath: symbol.file_path,
-        line: symbol.line || 1,
-      } : null;
+      const result = symbol
+        ? {
+            id: symbol.id,
+            name: symbol.name,
+            type: symbol.type,
+            filePath: symbol.file_path,
+            line: symbol.line || 1,
+          }
+        : null;
 
       // Cache the result (including null for not found)
       this.cacheManager.set(CACHE_NAMES.SYMBOL, `name:${name}`, result);
@@ -933,18 +1509,49 @@ export class TsdocEdgeService {
    * @param names - Array of symbol names to search
    * @returns Map of name -> symbol location
    */
-  findSymbolsByNames(names: string[]): Map<string, { id: string; name: string; type: string; filePath: string; line: number }> {
-    const results = new Map<string, { id: string; name: string; type: string; filePath: string; line: number }>();
+  findSymbolsByNames(
+    names: string[]
+  ): Map<string, { id: string; name: string; type: string; filePath: string; line: number }> {
+    const results = new Map<
+      string,
+      { id: string; name: string; type: string; filePath: string; line: number }
+    >();
+    if (this.canonicalView) {
+      for (const name of names) {
+        const canonical = this.canonicalView.findByName(name);
+        if (!canonical) continue;
+        results.set(name, {
+          id: canonical.node.id,
+          name: canonicalNodeDisplayName(canonical.node),
+          type: canonical.node.kind,
+          filePath: canonical.filePath,
+          line: canonical.line,
+        });
+      }
+      return results;
+    }
     if (!this.db || names.length === 0) return results;
 
     /** Database result for symbol lookup */
-    type SymbolLocation = { id: string; name: string; type: string; file_path: string; line: number | null };
+    type SymbolLocation = {
+      id: string;
+      name: string;
+      type: string;
+      file_path: string;
+      line: number | null;
+    };
 
     try {
       // Check cache first for each name
       const uncachedNames: string[] = [];
       for (const name of names) {
-        const cached = this.cacheManager.get<{ id: string; name: string; type: string; filePath: string; line: number } | null>(CACHE_NAMES.SYMBOL, `name:${name}`);
+        const cached = this.cacheManager.get<{
+          id: string;
+          name: string;
+          type: string;
+          filePath: string;
+          line: number;
+        } | null>(CACHE_NAMES.SYMBOL, `name:${name}`);
         if (cached !== undefined) {
           if (cached !== null) {
             results.set(name, cached);
@@ -1005,6 +1612,14 @@ export class TsdocEdgeService {
    * @returns void - No return value
    */
   close(): void {
+    this.unsavedOverlays.clear();
+    this.canonicalView = null;
+    this.canonicalRevisionId = null;
+    this.canonicalCoordinator?.close();
+    this.canonicalCoordinator = null;
+    this.canonicalRepository?.close();
+    this.canonicalRepository = null;
+
     // Dispose cache manager (stops timer and clears caches)
     this.cacheManager.dispose();
 
@@ -1020,4 +1635,12 @@ export class TsdocEdgeService {
       this.db = null;
     }
   }
+}
+
+function overlayRangeSize(symbol: ExtractedSymbol): number {
+  return (symbol.endLine - symbol.line) * 1_000_000 + (symbol.endColumn - symbol.column);
+}
+
+function compareText(left: string, right: string): number {
+  return left < right ? -1 : left > right ? 1 : 0;
 }

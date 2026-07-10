@@ -37,35 +37,40 @@
  * @see managed/features/lsp-integration.md - Full documentation
  */
 
+import * as path from 'node:path';
 import {
-  createConnection,
-  TextDocuments,
-  ProposedFeatures,
-  InitializeParams,
-  TextDocumentSyncKind,
-  InitializeResult,
-  CodeLens,
-  CodeLensParams,
-  Hover,
-  HoverParams,
-  Diagnostic,
-  DiagnosticSeverity,
-  DidChangeConfigurationNotification,
-  WorkspaceSymbol,
-  WorkspaceSymbolParams,
-  CodeAction,
   CodeActionKind,
-  CodeActionParams,
-  Command,
-  DocumentLink,
-  DocumentLinkParams,
-  Definition,
-  DefinitionParams,
-  Location,
+  createConnection,
+  DidChangeConfigurationNotification,
+  DidChangeWatchedFilesNotification,
+  FileChangeType,
+  ProposedFeatures,
+  TextDocuments,
+  TextDocumentSyncKind,
+  type CodeAction,
+  type CodeActionParams,
+  type CodeLens,
+  type CodeLensParams,
+  type Definition,
+  type DefinitionParams,
+  type DocumentLink,
+  type DocumentLinkParams,
+  type Hover,
+  type HoverParams,
+  type InitializeParams,
+  type InitializeResult,
+  type WorkspaceSymbol,
+  type WorkspaceSymbolParams,
+  WatchKind,
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
-import * as path from 'node:path';
 import { TsdocEdgeService } from './service';
+import {
+  filePathFromUri,
+  fileUriFromPath,
+  isTypeScriptSourcePath,
+  resolveWorkspaceRoot,
+} from './uri';
 
 /**
  * LSP connection using stdio transport
@@ -91,6 +96,7 @@ let tsdocService: TsdocEdgeService | null = null;
  */
 let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
+let hasWatchedFilesDynamicRegistration = false;
 
 connection.onInitialize((params: InitializeParams): InitializeResult => {
   const capabilities = params.capabilities;
@@ -101,11 +107,16 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
   hasWorkspaceFolderCapability = !!(
     capabilities.workspace && !!capabilities.workspace.workspaceFolders
   );
+  hasWatchedFilesDynamicRegistration = !!(
+    capabilities.workspace?.didChangeWatchedFiles?.dynamicRegistration
+  );
 
   // Initialize TSDoc Edge service
-  const workspaceRoot = params.workspaceFolders?.[0]?.uri
-    ? new URL(params.workspaceFolders[0].uri).pathname
-    : process.cwd();
+  const workspaceRoot = resolveWorkspaceRoot(
+    params.workspaceFolders?.map((folder) => folder.uri),
+    params.rootUri,
+    process.cwd()
+  );
 
   try {
     tsdocService = new TsdocEdgeService(workspaceRoot);
@@ -116,7 +127,11 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
 
   return {
     capabilities: {
-      textDocumentSync: TextDocumentSyncKind.Incremental,
+      textDocumentSync: {
+        openClose: true,
+        change: TextDocumentSyncKind.Incremental,
+        save: true,
+      },
       hoverProvider: true,
       codeLensProvider: {
         resolveProvider: true,
@@ -144,11 +159,30 @@ connection.onInitialized(() => {
     });
   }
 
+  if (hasWatchedFilesDynamicRegistration) {
+    void connection.client
+      .register(DidChangeWatchedFilesNotification.type, {
+        watchers: [
+          {
+            globPattern: '**/*.{ts,tsx,mts,cts}',
+            kind: WatchKind.Create | WatchKind.Change | WatchKind.Delete,
+          },
+        ],
+      })
+      .catch((error) => {
+        connection.console.error(`Failed to register TypeScript file watchers: ${error}`);
+      });
+  }
+
   // Enable incremental mode for real-time updates
   if (tsdocService) {
     const enabled = tsdocService.enableIncrementalMode();
     if (enabled) {
-      connection.console.log('Incremental mode enabled - file changes will update symbols in real-time');
+      connection.console.log(
+        tsdocService.isCanonicalGraphEnabled()
+          ? 'Canonical saved-file refresh enabled; unsaved buffers remain in-memory overlays'
+          : 'Legacy incremental mode enabled - file changes will update symbols in real-time'
+      );
     } else {
       connection.console.log('Incremental mode not available - run "tsdoc-edge build" first');
     }
@@ -162,7 +196,8 @@ connection.onHover((params: HoverParams): Hover | null => {
   const document = documents.get(params.textDocument.uri);
   if (!document) return null;
 
-  const filePath = new URL(params.textDocument.uri).pathname;
+  const filePath = filePathFromUri(params.textDocument.uri);
+  if (!filePath) return null;
   const position = params.position;
 
   try {
@@ -186,7 +221,8 @@ connection.onHover((params: HoverParams): Hover | null => {
 connection.onCodeLens((params: CodeLensParams): CodeLens[] => {
   if (!tsdocService) return [];
 
-  const filePath = new URL(params.textDocument.uri).pathname;
+  const filePath = filePathFromUri(params.textDocument.uri);
+  if (!filePath) return [];
 
   try {
     const codeLenses = tsdocService.getCodeLenses(filePath);
@@ -224,7 +260,7 @@ connection.onWorkspaceSymbol((params: WorkspaceSymbolParams): WorkspaceSymbol[] 
       name: sym.name,
       kind: sym.kind,
       location: {
-        uri: `file://${sym.filePath}`,
+        uri: fileUriFromPath(sym.filePath),
         range: {
           start: { line: sym.line - 1, character: 0 },
           end: { line: sym.line - 1, character: 0 },
@@ -244,13 +280,18 @@ connection.onCodeAction((params: CodeActionParams): CodeAction[] => {
   const document = documents.get(params.textDocument.uri);
   if (!document) return [];
 
-  const filePath = new URL(params.textDocument.uri).pathname;
+  const filePath = filePathFromUri(params.textDocument.uri);
+  if (!filePath) return [];
   const actions: CodeAction[] = [];
 
   try {
     // Get symbol at current position
     const line = params.range.start.line + 1;
-    const symbolInfo = tsdocService.getSymbolAtPosition(filePath, line);
+    const symbolInfo = tsdocService.getSymbolAtPosition(
+      filePath,
+      line,
+      params.range.start.character
+    );
 
     if (symbolInfo) {
       // Add "Show Impact Analysis" action
@@ -357,9 +398,7 @@ connection.onDocumentLinks((params: DocumentLinkParams): DocumentLink[] => {
 
     // Find [[Symbol]] patterns
     const symbolRefPattern = /\[\[([^\]]+)\]\]/g;
-    let match;
-
-    while ((match = symbolRefPattern.exec(text)) !== null) {
+    for (const match of text.matchAll(symbolRefPattern)) {
       symbolMatches.push({
         name: match[1],
         index: match.index,
@@ -370,7 +409,7 @@ connection.onDocumentLinks((params: DocumentLinkParams): DocumentLink[] => {
 
     // Find @see references in TSDoc comments
     const seeRefPattern = /@see\s+(\w+)/g;
-    while ((match = seeRefPattern.exec(text)) !== null) {
+    for (const match of text.matchAll(seeRefPattern)) {
       symbolMatches.push({
         name: match[1],
         index: match.index + 5, // Skip "@see "
@@ -396,7 +435,7 @@ connection.onDocumentLinks((params: DocumentLinkParams): DocumentLink[] => {
       if (symbolLocation) {
         links.push({
           range: { start: startPos, end: endPos },
-          target: `file://${symbolLocation.filePath}#L${symbolLocation.line}`,
+          target: fileUriFromPath(symbolLocation.filePath, symbolLocation.line),
           tooltip: match.type === 'ref'
             ? `Go to ${match.name} (${symbolLocation.type})`
             : `Go to ${match.name}`,
@@ -431,8 +470,6 @@ connection.onDefinition((params: DefinitionParams): Definition | null => {
   const document = documents.get(params.textDocument.uri);
   if (!document) return null;
 
-  const filePath = new URL(params.textDocument.uri).pathname;
-
   try {
     // Get word at position
     const line = document.getText({
@@ -448,7 +485,7 @@ connection.onDefinition((params: DefinitionParams): Definition | null => {
     if (!symbolLocation) return null;
 
     return {
-      uri: `file://${symbolLocation.filePath}`,
+      uri: fileUriFromPath(symbolLocation.filePath),
       range: {
         start: { line: symbolLocation.line - 1, character: 0 },
         end: { line: symbolLocation.line - 1, character: 0 },
@@ -468,13 +505,11 @@ connection.onDefinition((params: DefinitionParams): Definition | null => {
  */
 function getWordAtPosition(line: string, character: number): string | null {
   const wordPattern = /[a-zA-Z_][a-zA-Z0-9_]*/g;
-  let match;
-
-  while ((match = wordPattern.exec(line)) !== null) {
+  for (const match of line.matchAll(wordPattern)) {
     const start = match.index;
     const end = start + match[0].length;
 
-    if (character >= start && character <= end) {
+    if (character >= start && character < end) {
       return match[0];
     }
   }
@@ -482,47 +517,76 @@ function getWordAtPosition(line: string, character: number): string | null {
   return null;
 }
 
-// Debounce timer for incremental builds
-let incrementalBuildTimer: ReturnType<typeof setTimeout> | null = null;
+// Per-document debounce timers prevent one editor from cancelling another.
+const incrementalBuildTimers = new Map<string, ReturnType<typeof setTimeout>>();
 const INCREMENTAL_BUILD_DELAY = 1000; // 1 second debounce
+
+function clearIncrementalBuildTimer(uri: string): void {
+  const timer = incrementalBuildTimers.get(uri);
+  if (timer) clearTimeout(timer);
+  incrementalBuildTimers.delete(uri);
+}
+
+function clearAllIncrementalBuildTimers(): void {
+  for (const timer of incrementalBuildTimers.values()) clearTimeout(timer);
+  incrementalBuildTimers.clear();
+}
+
+function publishDiagnosticsForDocument(document: TextDocument): void {
+  if (!tsdocService) return;
+  const filePath = filePathFromUri(document.uri);
+  if (!filePath) return;
+
+  const diagnostics = tsdocService.getDiagnostics(filePath);
+  connection.sendDiagnostics({
+    uri: document.uri,
+    diagnostics: diagnostics.map((diagnostic) => ({
+      severity: diagnostic.severity,
+      range: {
+        start: { line: diagnostic.line - 1, character: 0 },
+        end: { line: diagnostic.line - 1, character: Number.MAX_SAFE_INTEGER },
+      },
+      message: diagnostic.message,
+      source: 'tsdoc-edge',
+    })),
+  });
+}
+
+function publishDiagnosticsForOpenDocuments(): void {
+  for (const document of documents.all()) publishDiagnosticsForDocument(document);
+}
 
 // Document change handlers - trigger diagnostics and incremental builds
 documents.onDidChangeContent((change) => {
   if (!tsdocService) return;
 
-  const filePath = new URL(change.document.uri).pathname;
+  const filePath = filePathFromUri(change.document.uri);
+  if (!filePath || !isTypeScriptSourcePath(filePath)) return;
 
   try {
-    // Get diagnostics from current database state
-    const diagnostics = tsdocService.getDiagnostics(filePath);
-
-    connection.sendDiagnostics({
-      uri: change.document.uri,
-      diagnostics: diagnostics.map((d) => ({
-        severity: d.severity,
-        range: {
-          start: { line: d.line - 1, character: 0 },
-          end: { line: d.line - 1, character: Number.MAX_SAFE_INTEGER },
-        },
-        message: d.message,
-        source: 'tsdoc-edge',
-      })),
-    });
-
     // Debounced incremental build for unsaved content
     if (tsdocService.isIncrementalModeEnabled()) {
-      if (incrementalBuildTimer) {
-        clearTimeout(incrementalBuildTimer);
-      }
-
-      incrementalBuildTimer = setTimeout(() => {
-        const content = change.document.getText();
-        const result = tsdocService?.processFileChange(filePath, content);
-        if (result && result.errors.length === 0) {
-          connection.console.log(`Incremental update: ${result.symbols.length} symbols in ${path.basename(filePath)}`);
+      // Update the in-memory projection immediately so hover/code actions never
+      // fall back to the saved graph for a dirty document. Only diagnostics and
+      // logging are debounced per document.
+      const result = tsdocService.processFileChange(filePath, change.document.getText());
+      clearIncrementalBuildTimer(change.document.uri);
+      const timer = setTimeout(() => {
+        try {
+          const document = documents.get(change.document.uri) ?? change.document;
+          if (result && result.errors.length === 0) {
+            connection.console.log(`Incremental update: ${result.symbols.length} symbols in ${path.basename(filePath)}`);
+          }
+          publishDiagnosticsForDocument(document);
+        } catch (error) {
+          connection.console.error(`Incremental overlay error: ${error}`);
+        } finally {
+          incrementalBuildTimers.delete(change.document.uri);
         }
-        incrementalBuildTimer = null;
       }, INCREMENTAL_BUILD_DELAY);
+      incrementalBuildTimers.set(change.document.uri, timer);
+    } else {
+      publishDiagnosticsForDocument(change.document);
     }
   } catch (error) {
     connection.console.error(`Diagnostics error: ${error}`);
@@ -530,18 +594,32 @@ documents.onDidChangeContent((change) => {
 });
 
 // Handle file save - immediately update symbols
-documents.onDidSave((event) => {
+documents.onDidSave(async (event) => {
   if (!tsdocService) return;
 
-  const filePath = new URL(event.document.uri).pathname;
+  const filePath = filePathFromUri(event.document.uri);
+  if (!filePath || !isTypeScriptSourcePath(filePath)) return;
+  clearIncrementalBuildTimer(event.document.uri);
+  // The buffer is now represented by disk. Clear it before any async refresh so
+  // a superseded request cannot leave stale transient state behind.
+  tsdocService.clearUnsavedOverlay(filePath);
+
+  if (tsdocService.isCanonicalGraphEnabled()) {
+    try {
+      const refreshed = await tsdocService.refreshCanonicalGraph(filePath);
+      if (refreshed?.status === 'committed') {
+        connection.console.log(
+          `File saved: canonical graph ${refreshed.graph.fingerprint.slice(0, 12)} (${refreshed.graph.nodes.length} nodes, ${refreshed.graph.edges.length} edges)`
+        );
+      }
+      publishDiagnosticsForOpenDocuments();
+    } catch (error) {
+      connection.console.error(`Canonical graph refresh failed after save: ${error}`);
+    }
+    return;
+  }
 
   if (tsdocService.isIncrementalModeEnabled()) {
-    // Cancel any pending debounced build
-    if (incrementalBuildTimer) {
-      clearTimeout(incrementalBuildTimer);
-      incrementalBuildTimer = null;
-    }
-
     // Immediately process the saved file
     const result = tsdocService.processFileChange(filePath);
     if (result) {
@@ -551,6 +629,47 @@ documents.onDidSave((event) => {
         connection.console.log(`File saved: updated ${result.symbols.length} symbols in ${path.basename(filePath)}`);
       }
     }
+    publishDiagnosticsForOpenDocuments();
+  }
+});
+
+// File deletes and rename-away events require the same whole-project replacement
+// so removed nodes and incident edges disappear in one transaction.
+connection.onDidChangeWatchedFiles(async (event) => {
+  if (!tsdocService) return;
+  const changes = event.changes.flatMap((change) => {
+    const filePath = filePathFromUri(change.uri);
+    return filePath && isTypeScriptSourcePath(filePath) ? [{ ...change, filePath }] : [];
+  });
+  if (changes.length === 0) return;
+
+  for (const change of changes) {
+    if (change.type === FileChangeType.Deleted) {
+      clearIncrementalBuildTimer(change.uri);
+      tsdocService.clearUnsavedOverlay(change.filePath);
+    }
+  }
+
+  try {
+    if (tsdocService.isCanonicalGraphEnabled()) {
+      const refreshed = await tsdocService.refreshCanonicalGraph();
+      if (refreshed?.status === 'committed') {
+        connection.console.log(
+          `Workspace files changed: canonical graph ${refreshed.graph.fingerprint.slice(0, 12)} refreshed`
+        );
+      }
+    } else if (tsdocService.isIncrementalModeEnabled()) {
+      for (const change of changes) {
+        if (change.type === FileChangeType.Deleted) {
+          tsdocService.handleFileDelete(change.filePath);
+        } else {
+          tsdocService.processFileChange(change.filePath);
+        }
+      }
+    }
+    publishDiagnosticsForOpenDocuments();
+  } catch (error) {
+    connection.console.error(`Graph refresh failed after watched-file change: ${error}`);
   }
 });
 
@@ -558,19 +677,18 @@ documents.onDidSave((event) => {
 documents.onDidClose((event) => {
   if (!tsdocService) return;
 
-  const filePath = new URL(event.document.uri).pathname;
-  tsdocService.invalidateFileCache(filePath);
+  clearIncrementalBuildTimer(event.document.uri);
+  const filePath = filePathFromUri(event.document.uri);
+  if (!filePath) return;
+  tsdocService.clearUnsavedOverlay(filePath);
+  connection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
 });
 
 // Shutdown handler - cleanup resources
 connection.onShutdown(() => {
   connection.console.log('LSP server shutting down, cleaning up resources...');
 
-  // Clear any pending incremental build timer
-  if (incrementalBuildTimer) {
-    clearTimeout(incrementalBuildTimer);
-    incrementalBuildTimer = null;
-  }
+  clearAllIncrementalBuildTimers();
 
   if (tsdocService) {
     tsdocService.close();
@@ -580,11 +698,7 @@ connection.onShutdown(() => {
 
 // Exit handler - final cleanup
 connection.onExit(() => {
-  // Ensure timer is cleared on exit as well
-  if (incrementalBuildTimer) {
-    clearTimeout(incrementalBuildTimer);
-    incrementalBuildTimer = null;
-  }
+  clearAllIncrementalBuildTimers();
 
   if (tsdocService) {
     tsdocService.close();

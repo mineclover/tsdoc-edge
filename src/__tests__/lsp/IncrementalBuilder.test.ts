@@ -261,11 +261,16 @@ export function myFunc() {}`
         }
       `;
 
-      const result = builder.processContent('/virtual/file.ts', content);
+      const db = createMockDb();
+      const overlayBuilder = new IncrementalBuilder(tempDir, db);
+      const result = overlayBuilder.processContent('/virtual/file.ts', content);
 
       expect(result.errors).toHaveLength(0);
       const classSymbol = result.symbols.find((s) => s.name === 'BufferClass');
       expect(classSymbol).toBeDefined();
+      expect(classSymbol?.endLine).toBeGreaterThanOrEqual(classSymbol?.line ?? 0);
+      expect(classSymbol?.endColumn).toBeGreaterThan(0);
+      expect(db.transaction).not.toHaveBeenCalled();
     });
 
     it('should handle invalid content', () => {
