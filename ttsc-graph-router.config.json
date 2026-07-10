@@ -1,0 +1,9 @@
+{
+  "cacheDir": ".tsdoc/ttsc-graph-router",
+  "repos": {
+    "tsdoc-edge": {
+      "cwd": ".",
+      "tsconfig": "tsconfig.ttsc.json"
+    }
+  }
+}

@@ -2,22 +2,21 @@
   "name": "tsdoc-edge",
   "version": "0.13.0",
   "description": "TSDoc-based specification documentation tool with type chain analysis and strict convention parsing",
+  "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": [
-    "dist",
-    "LICENSE",
-    "README.md",
-    "CHANGELOG.md"
-  ],
+  "files": ["dist", "LICENSE", "README.md", "CHANGELOG.md"],
   "bin": {
     "tsdoc-edge": "./dist/cli.js",
     "tsdoc-edge-lsp": "./dist/lsp/server.js"
   },
   "scripts": {
     "lsp": "node dist/lsp/server.js",
-    "build": "tsc && cp src/storage/schema.sql dist/storage/",
-    "dev": "tsc --watch",
+    "clean": "node scripts/clean-dist.cjs",
+    "build": "npm run clean && node scripts/run-ttsc.cjs -p tsconfig.ttsc.json && cp src/storage/schema.sql dist/storage/",
+    "typecheck": "node scripts/run-ttsc.cjs -p tsconfig.ttsc.json --noEmit",
+    "dev": "node scripts/run-ttsc.cjs -p tsconfig.ttsc.json --watch",
+    "ttsc:version": "node scripts/run-ttsc.cjs --version",
     "test": "jest",
     "test:watch": "jest --watch",
     "lint": "biome check .",
@@ -69,7 +68,8 @@
     "jest": "^29.7.0",
     "ts-jest": "^29.1.2",
     "ts-node": "^10.9.2",
-    "typescript": "^5.3.3"
+    "ttsc": "0.16.8",
+    "typescript-native": "npm:typescript@7.0.2"
   },
   "dependencies": {
     "@gephi/gephi-lite-sdk": "^1.0.0",

@@ -41,9 +41,13 @@ docs/generated/
 .tsdoc/registry.jsonl
 .tsdoc/doc-symbols.json
 .tsdoc/data/
+.tsdoc/ttsc-graph-router/
 
 # Database files
 *.db
+*.db-journal
+*.db-shm
+*.db-wal
 .tsdoc.db
 
 # Temporary files
