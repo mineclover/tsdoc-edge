@@ -4,6 +4,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import Database from 'better-sqlite3';
 import { DatabaseManager } from '../../storage/DatabaseManager';
 import type { Symbol } from '../../types/graph';
 import type { EnhancedSymbolDoc } from '../../types/tags';
@@ -45,6 +46,66 @@ describe('DatabaseManager', () => {
 
     it('should initialize database connection', () => {
       expect(dbManager.db).toBeDefined();
+    });
+
+    it('additively migrates symbol columns before creating their indexes', () => {
+      dbManager.close();
+      const legacyDbPath = path.join(tempDir, 'legacy.db');
+      const legacy = new Database(legacyDbPath);
+      legacy.exec(`
+        CREATE TABLE symbols (
+          id TEXT PRIMARY KEY,
+          name TEXT NOT NULL,
+          type TEXT NOT NULL,
+          file_path TEXT NOT NULL,
+          line INTEGER NOT NULL,
+          column INTEGER NOT NULL,
+          is_exported BOOLEAN NOT NULL,
+          is_public BOOLEAN NOT NULL,
+          summary TEXT,
+          declared_type TEXT,
+          inferred_type TEXT,
+          generic_params TEXT,
+          parameter_types TEXT,
+          is_constant BOOLEAN DEFAULT 0,
+          literal_value TEXT,
+          value_type TEXT,
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL,
+          version TEXT NOT NULL,
+          jsonl_line INTEGER NOT NULL
+        );
+      `);
+      legacy.close();
+
+      dbManager = new DatabaseManager(legacyDbPath, jsonlPath);
+      const columns = new Set(
+        (dbManager.db.prepare('PRAGMA table_info(symbols)').all() as Array<{ name: string }>).map(
+          (column) => column.name
+        )
+      );
+      expect([...columns]).toEqual(
+        expect.arrayContaining([
+          'uuid',
+          'local_path',
+          'global_path',
+          'scope',
+          'exposure_scope',
+          'exposure_level',
+          'export_path',
+          'accessibility',
+          'visibility_boundaries',
+        ])
+      );
+      const indexes = new Set(
+        (
+          dbManager.db
+            .prepare("SELECT name FROM sqlite_master WHERE type = 'index'")
+            .all() as Array<{ name: string }>
+        ).map((index) => index.name)
+      );
+      expect(indexes.has('idx_symbols_uuid')).toBe(true);
+      expect(indexes.has('idx_symbols_exposure')).toBe(true);
     });
 
     it('should create necessary directories if they do not exist', () => {

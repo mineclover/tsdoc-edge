@@ -162,10 +162,13 @@ export const BuildResultSchema: OutputSchema = {
       entryPointsInserted: 'number',
       exposureAnalyzed: 'number',
       durationMs: 'number',
+      canonicalGraphNodes: { type: 'number', optional: true },
+      canonicalGraphEdges: { type: 'number', optional: true },
     },
     paths: {
       database: 'string',
       registry: 'string',
+      canonicalGraphDatabase: { type: 'string', optional: true },
     },
     errors: arrayOf('error', {
       message: 'string',

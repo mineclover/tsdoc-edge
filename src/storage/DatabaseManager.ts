@@ -148,35 +148,42 @@ export class DatabaseManager {
    * @param relationships - Array of relationship objects to insert
    * @returns Number of successfully inserted relationships
    */
-  batchInsertUnifiedRelationships(relationships: Array<{
-    id: string;
-    type: string;
-    category: string;
-    fromSymbols: string[];
-    toSymbols: string[];
-    direction: string;
-    strength: string;
-    evidence: Array<{ type: string; source: string; lineNumber?: number; confidence: number }>;
-    discoveredBy: string;
-    confidence: number;
-    filePath?: string;
-    line?: number;
-    properties?: Record<string, unknown>;
-    description?: string;
-  }>): number {
+  batchInsertUnifiedRelationships(
+    relationships: Array<{
+      id: string;
+      type: string;
+      category: string;
+      fromSymbols: string[];
+      toSymbols: string[];
+      direction: string;
+      strength: string;
+      evidence: Array<{ type: string; source: string; lineNumber?: number; confidence: number }>;
+      discoveredBy: string;
+      confidence: number;
+      filePath?: string;
+      line?: number;
+      properties?: Record<string, unknown>;
+      description?: string;
+    }>
+  ): number {
     if (relationships.length === 0) return 0;
 
     let inserted = 0;
     const now = new Date().toISOString();
 
     // Prepare statement for join table updates
-    const deleteJoinStmt = this.db.prepare('DELETE FROM relationship_symbols WHERE relationship_id = ?');
-    const insertJoinStmt = this.db.prepare('INSERT OR IGNORE INTO relationship_symbols (relationship_id, symbol_id, role) VALUES (?, ?, ?)');
+    const deleteJoinStmt = this.db.prepare(
+      'DELETE FROM relationship_symbols WHERE relationship_id = ?'
+    );
+    const insertJoinStmt = this.db.prepare(
+      'INSERT OR IGNORE INTO relationship_symbols (relationship_id, symbol_id, role) VALUES (?, ?, ?)'
+    );
 
     const insertAll = this.db.transaction(() => {
       for (const rel of relationships) {
         try {
-          this.drizzleDb.insert(schema.unifiedRelationships)
+          this.drizzleDb
+            .insert(schema.unifiedRelationships)
             .values({
               id: rel.id,
               type: rel.type,
@@ -240,17 +247,22 @@ export class DatabaseManager {
     const schemaPath = path.join(__dirname, 'schema.sql');
     const schemaSql = fs.readFileSync(schemaPath, 'utf-8');
 
+    // CREATE TABLE IF NOT EXISTS cannot add columns to an older symbols table.
+    // Apply nullable, backwards-compatible additions before schema indexes and
+    // Drizzle queries reference them.
+    this.migrateLegacySymbolColumns();
+
     // Split schema into individual statements and execute via Drizzle
     // Remove SQL comments and split by semicolon
     const cleanedSql = schemaSql
       .split('\n')
-      .map(line => line.replace(/--.*$/, '').trim())
+      .map((line) => line.replace(/--.*$/, '').trim())
       .join('\n');
 
     const statements = cleanedSql
       .split(';')
-      .map(s => s.trim())
-      .filter(s => s.length > 0);
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
 
     for (const statement of statements) {
       try {
@@ -264,6 +276,35 @@ export class DatabaseManager {
     this.migrateRelationshipSymbols();
   }
 
+  /** Add nullable symbol columns introduced after the original schema. */
+  private migrateLegacySymbolColumns(): void {
+    const existing = this.db.prepare('PRAGMA table_info(symbols)').all() as Array<{
+      name: string;
+    }>;
+    if (existing.length === 0) return;
+
+    const names = new Set(existing.map((column) => column.name));
+    const additions: ReadonlyArray<readonly [name: string, declaration: string]> = [
+      ['uuid', 'TEXT'],
+      ['local_path', 'TEXT'],
+      ['global_path', 'TEXT'],
+      ['scope', 'TEXT'],
+      ['exposure_scope', 'TEXT'],
+      ['exposure_level', 'TEXT'],
+      ['export_path', 'TEXT'],
+      ['accessibility', 'TEXT'],
+      ['visibility_boundaries', 'TEXT'],
+    ];
+    const missing = additions.filter(([name]) => !names.has(name));
+    if (missing.length === 0) return;
+
+    this.db.transaction(() => {
+      for (const [name, declaration] of missing) {
+        this.db.exec(`ALTER TABLE symbols ADD COLUMN ${name} ${declaration}`);
+      }
+    })();
+  }
+
   /**
    * Migrate existing unified_relationships data to relationship_symbols join table
    * This is a one-time migration for existing databases
@@ -272,16 +313,22 @@ export class DatabaseManager {
   private migrateRelationshipSymbols(): void {
     try {
       // Check if migration is needed (join table is empty but relationships exist)
-      const joinCount = this.db.prepare('SELECT COUNT(*) as count FROM relationship_symbols').get() as { count: number };
-      const relCount = this.db.prepare('SELECT COUNT(*) as count FROM unified_relationships').get() as { count: number };
+      const joinCount = this.db
+        .prepare('SELECT COUNT(*) as count FROM relationship_symbols')
+        .get() as { count: number };
+      const relCount = this.db
+        .prepare('SELECT COUNT(*) as count FROM unified_relationships')
+        .get() as { count: number };
 
       if (joinCount.count === 0 && relCount.count > 0) {
         console.log('Migrating relationship_symbols join table...');
 
         // Get all relationships and populate join table
-        const relationships = this.db.prepare(`
+        const relationships = this.db
+          .prepare(`
           SELECT id, from_symbols, to_symbols FROM unified_relationships
-        `).all() as Array<{ id: string; from_symbols: string; to_symbols: string }>;
+        `)
+          .all() as Array<{ id: string; from_symbols: string; to_symbols: string }>;
 
         const insertStmt = this.db.prepare(`
           INSERT OR IGNORE INTO relationship_symbols (relationship_id, symbol_id, role) VALUES (?, ?, ?)
@@ -321,7 +368,8 @@ export class DatabaseManager {
    */
   insertSymbol(symbol: Symbol & Partial<ExtendedSymbolFields>, jsonlLine: number): boolean {
     try {
-      this.drizzleDb.insert(schema.symbols)
+      this.drizzleDb
+        .insert(schema.symbols)
         .values({
           id: symbol.id,
           uuid: symbol.uuid ?? null,
@@ -388,14 +436,18 @@ export class DatabaseManager {
    * @param exposure - Exposure information
    * @returns True if update succeeded
    */
-  updateSymbolExposure(symbolId: string, exposure: {
-    exposureScope: { level: string; boundaries: string[]; exportedVia?: string };
-    exportPath?: string;
-    accessibility: string;
-    visibilityBoundaries: { canBeImportedBy: string[]; restrictedTo?: string[]; reason?: string };
-  }): boolean {
+  updateSymbolExposure(
+    symbolId: string,
+    exposure: {
+      exposureScope: { level: string; boundaries: string[]; exportedVia?: string };
+      exportPath?: string;
+      accessibility: string;
+      visibilityBoundaries: { canBeImportedBy: string[]; restrictedTo?: string[]; reason?: string };
+    }
+  ): boolean {
     try {
-      this.drizzleDb.update(schema.symbols)
+      this.drizzleDb
+        .update(schema.symbols)
         .set({
           exposureScope: JSON.stringify(exposure.exposureScope),
           exposureLevel: exposure.exposureScope.level,
@@ -421,7 +473,8 @@ export class DatabaseManager {
    */
   insertEnhancedDoc(doc: EnhancedSymbolDoc, jsonlLine: number): boolean {
     try {
-      this.drizzleDb.insert(schema.enhancedDocs)
+      this.drizzleDb
+        .insert(schema.enhancedDocs)
         .values({
           symbolId: doc.symbolId,
           problemSolving: JSON.stringify(doc.problemSolving),
@@ -471,7 +524,8 @@ export class DatabaseManager {
     importPath?: string;
   }): boolean {
     try {
-      this.drizzleDb.insert(schema.dependencies)
+      this.drizzleDb
+        .insert(schema.dependencies)
         .values({
           symbolId: dependency.symbolId,
           target: dependency.target,
@@ -526,10 +580,7 @@ export class DatabaseManager {
     const results = this.drizzleDb
       .select({ id: schema.symbols.id })
       .from(schema.symbols)
-      .where(or(
-        like(schema.symbols.name, pattern),
-        like(schema.symbols.summary, pattern)
-      ))
+      .where(or(like(schema.symbols.name, pattern), like(schema.symbols.summary, pattern)))
       .orderBy(asc(schema.symbols.name))
       .all();
     return results.map((r) => r.id);
@@ -541,11 +592,7 @@ export class DatabaseManager {
    * @returns Symbol object or null if not found
    */
   getSymbol(id: string): Symbol | null {
-    const row = this.drizzleDb
-      .select()
-      .from(schema.symbols)
-      .where(eq(schema.symbols.id, id))
-      .get();
+    const row = this.drizzleDb.select().from(schema.symbols).where(eq(schema.symbols.id, id)).get();
 
     if (!row) return null;
 
@@ -711,24 +758,30 @@ export class DatabaseManager {
         } else if (record.type === 'enhanced_doc') {
           const doc: EnhancedSymbolDoc = {
             symbolId: record.data.symbol_id || record.data.symbolId,
-            problemSolving: typeof record.data.problem_solving === 'string'
-              ? JSON.parse(record.data.problem_solving)
-              : record.data.problemSolving,
-            functionality: typeof record.data.functionality === 'string'
-              ? JSON.parse(record.data.functionality)
-              : record.data.functionality,
-            errorExperiences: typeof record.data.error_experiences === 'string'
-              ? JSON.parse(record.data.error_experiences)
-              : record.data.errorExperiences,
-            decisions: typeof record.data.decisions === 'string'
-              ? JSON.parse(record.data.decisions)
-              : record.data.decisions,
-            dependencies: typeof record.data.dependencies === 'string'
-              ? JSON.parse(record.data.dependencies)
-              : record.data.dependencies,
-            futurePlans: typeof record.data.future_plans === 'string'
-              ? JSON.parse(record.data.future_plans)
-              : record.data.futurePlans,
+            problemSolving:
+              typeof record.data.problem_solving === 'string'
+                ? JSON.parse(record.data.problem_solving)
+                : record.data.problemSolving,
+            functionality:
+              typeof record.data.functionality === 'string'
+                ? JSON.parse(record.data.functionality)
+                : record.data.functionality,
+            errorExperiences:
+              typeof record.data.error_experiences === 'string'
+                ? JSON.parse(record.data.error_experiences)
+                : record.data.errorExperiences,
+            decisions:
+              typeof record.data.decisions === 'string'
+                ? JSON.parse(record.data.decisions)
+                : record.data.decisions,
+            dependencies:
+              typeof record.data.dependencies === 'string'
+                ? JSON.parse(record.data.dependencies)
+                : record.data.dependencies,
+            futurePlans:
+              typeof record.data.future_plans === 'string'
+                ? JSON.parse(record.data.future_plans)
+                : record.data.futurePlans,
             createdAt: record.data.created_at || record.data.createdAt,
             updatedAt: record.data.updated_at || record.data.updatedAt,
             version: record.data.version,
@@ -783,7 +836,9 @@ export class DatabaseManager {
         } else if (record.type === 'enhanced_doc') {
           const dbDoc = this.getEnhancedDoc(record.data.symbol_id || record.data.symbolId);
           if (!dbDoc) {
-            mismatches.push(`Enhanced doc not found in DB: ${record.data.symbol_id || record.data.symbolId}`);
+            mismatches.push(
+              `Enhanced doc not found in DB: ${record.data.symbol_id || record.data.symbolId}`
+            );
           }
           docCount++;
         }
@@ -797,7 +852,9 @@ export class DatabaseManager {
       mismatches.push(`Symbol count mismatch: DB=${stats.totalSymbols}, JSONL=${symbolCount}`);
     }
     if (stats.totalEnhancedDocs !== docCount) {
-      mismatches.push(`Enhanced doc count mismatch: DB=${stats.totalEnhancedDocs}, JSONL=${docCount}`);
+      mismatches.push(
+        `Enhanced doc count mismatch: DB=${stats.totalEnhancedDocs}, JSONL=${docCount}`
+      );
     }
 
     return {
@@ -832,7 +889,8 @@ export class DatabaseManager {
   }): boolean {
     try {
       const now = new Date().toISOString();
-      this.drizzleDb.insert(schema.unifiedRelationships)
+      this.drizzleDb
+        .insert(schema.unifiedRelationships)
         .values({
           id: relationship.id,
           type: relationship.type,
@@ -873,7 +931,11 @@ export class DatabaseManager {
         .run();
 
       // Update join table for fast lookups
-      this.updateRelationshipSymbols(relationship.id, relationship.fromSymbols, relationship.toSymbols);
+      this.updateRelationshipSymbols(
+        relationship.id,
+        relationship.fromSymbols,
+        relationship.toSymbols
+      );
 
       return true;
     } catch {
@@ -885,9 +947,14 @@ export class DatabaseManager {
    * Update relationship_symbols join table for fast indexed lookups
    * @internal
    */
-  private updateRelationshipSymbols(relationshipId: string, fromSymbols: string[], toSymbols: string[]): void {
+  private updateRelationshipSymbols(
+    relationshipId: string,
+    fromSymbols: string[],
+    toSymbols: string[]
+  ): void {
     // Delete existing entries for this relationship
-    this.drizzleDb.delete(schema.relationshipSymbols)
+    this.drizzleDb
+      .delete(schema.relationshipSymbols)
       .where(eq(schema.relationshipSymbols.relationshipId, relationshipId))
       .run();
 
@@ -903,9 +970,7 @@ export class DatabaseManager {
     }
 
     if (entries.length > 0) {
-      this.drizzleDb.insert(schema.relationshipSymbols)
-        .values(entries)
-        .run();
+      this.drizzleDb.insert(schema.relationshipSymbols).values(entries).run();
     }
   }
 
@@ -995,10 +1060,7 @@ export class DatabaseManager {
    */
   rebuildFTS5Index(): { symbolsFts: number; enhancedDocsFts: number } {
     // FTS5 removed - return counts from regular tables
-    const symbolsResult = this.drizzleDb
-      .select({ count: count() })
-      .from(schema.symbols)
-      .get();
+    const symbolsResult = this.drizzleDb.select({ count: count() }).from(schema.symbols).get();
 
     const enhancedDocsResult = this.drizzleDb
       .select({ count: count() })
@@ -1119,7 +1181,8 @@ export class DatabaseManager {
    */
   upsertSyncMetadata(filePath: string, hash: string, status: string = 'synced'): void {
     const now = new Date().toISOString();
-    this.drizzleDb.insert(schema.syncMetadata)
+    this.drizzleDb
+      .insert(schema.syncMetadata)
       .values({
         filePath,
         lastSync: now,
@@ -1180,10 +1243,7 @@ export class DatabaseManager {
    * Get all symbol IDs
    */
   getAllSymbolIds(): string[] {
-    const rows = this.drizzleDb
-      .select({ id: schema.symbols.id })
-      .from(schema.symbols)
-      .all();
+    const rows = this.drizzleDb.select({ id: schema.symbols.id }).from(schema.symbols).all();
     return rows.map((r) => r.id);
   }
 
@@ -1239,9 +1299,12 @@ export class DatabaseManager {
     }
 
     // Order
-    const orderColumn = options.orderBy === 'type' ? schema.symbols.type
-      : options.orderBy === 'filePath' ? schema.symbols.filePath
-      : schema.symbols.name;
+    const orderColumn =
+      options.orderBy === 'type'
+        ? schema.symbols.type
+        : options.orderBy === 'filePath'
+          ? schema.symbols.filePath
+          : schema.symbols.name;
     const orderFn = options.orderDir === 'desc' ? desc : asc;
     query = query.orderBy(orderFn(orderColumn)) as typeof query;
 
@@ -1313,10 +1376,7 @@ export class DatabaseManager {
     const row = this.drizzleDb
       .select()
       .from(schema.symbols)
-      .where(and(
-        like(schema.symbols.filePath, filePathPattern),
-        lte(schema.symbols.line, line)
-      ))
+      .where(and(like(schema.symbols.filePath, filePathPattern), lte(schema.symbols.line, line)))
       .orderBy(desc(schema.symbols.line))
       .limit(1)
       .get();
@@ -1350,10 +1410,12 @@ export class DatabaseManager {
     const result = this.drizzleDb
       .select({ count: count() })
       .from(schema.relationshipSymbols)
-      .where(and(
-        eq(schema.relationshipSymbols.symbolId, symbolId),
-        eq(schema.relationshipSymbols.role, 'from')
-      ))
+      .where(
+        and(
+          eq(schema.relationshipSymbols.symbolId, symbolId),
+          eq(schema.relationshipSymbols.role, 'from')
+        )
+      )
       .get();
     return result?.count || 0;
   }
@@ -1368,10 +1430,12 @@ export class DatabaseManager {
     const result = this.drizzleDb
       .select({ count: count() })
       .from(schema.relationshipSymbols)
-      .where(and(
-        eq(schema.relationshipSymbols.symbolId, symbolId),
-        eq(schema.relationshipSymbols.role, 'to')
-      ))
+      .where(
+        and(
+          eq(schema.relationshipSymbols.symbolId, symbolId),
+          eq(schema.relationshipSymbols.role, 'to')
+        )
+      )
       .get();
     return result?.count || 0;
   }
@@ -1383,7 +1447,10 @@ export class DatabaseManager {
    * @param limit - Maximum number of types to return (default: 5)
    * @returns Array of type/count pairs
    */
-  getRelationshipTypeCounts(symbolId: string, limit: number = 5): Array<{ type: string; count: number }> {
+  getRelationshipTypeCounts(
+    symbolId: string,
+    limit: number = 5
+  ): Array<{ type: string; count: number }> {
     const rows = this.drizzleDb
       .select({
         type: schema.unifiedRelationships.type,
@@ -1442,10 +1509,12 @@ export class DatabaseManager {
           schema.unifiedRelationships,
           eq(schema.relationshipSymbols.relationshipId, schema.unifiedRelationships.id)
         )
-        .where(and(
-          eq(schema.relationshipSymbols.role, 'from'),
-          eq(schema.unifiedRelationships.category, category)
-        ))
+        .where(
+          and(
+            eq(schema.relationshipSymbols.role, 'from'),
+            eq(schema.unifiedRelationships.category, category)
+          )
+        )
         .all();
 
       toSymbols = this.drizzleDb
@@ -1458,10 +1527,12 @@ export class DatabaseManager {
           schema.unifiedRelationships,
           eq(schema.relationshipSymbols.relationshipId, schema.unifiedRelationships.id)
         )
-        .where(and(
-          eq(schema.relationshipSymbols.role, 'to'),
-          eq(schema.unifiedRelationships.category, category)
-        ))
+        .where(
+          and(
+            eq(schema.relationshipSymbols.role, 'to'),
+            eq(schema.unifiedRelationships.category, category)
+          )
+        )
         .all();
     } else {
       fromSymbols = fromSymbolsQuery.all();
@@ -1509,7 +1580,7 @@ export class DatabaseManager {
       .limit(limit)
       .all();
 
-    return rows.map(row => ({
+    return rows.map((row) => ({
       id: row.id,
       name: row.name,
       type: row.type,
@@ -1587,7 +1658,10 @@ export class DatabaseManager {
    * @param limit - Maximum number of relationships to return
    * @returns Array of relationship summaries
    */
-  getRelationshipsForSymbol(symbolId: string, limit: number): Array<{
+  getRelationshipsForSymbol(
+    symbolId: string,
+    limit: number
+  ): Array<{
     fromSymbols: string;
     toSymbols: string;
     type: string;
@@ -1616,10 +1690,12 @@ export class DatabaseManager {
    * Count all relationships
    */
   countRelationships(): number {
-    return this.drizzleDb
-      .select({ count: sql<number>`count(*)` })
-      .from(schema.unifiedRelationships)
-      .get()?.count ?? 0;
+    return (
+      this.drizzleDb
+        .select({ count: sql<number>`count(*)` })
+        .from(schema.unifiedRelationships)
+        .get()?.count ?? 0
+    );
   }
 
   /**
@@ -1851,7 +1927,8 @@ export class DatabaseManager {
     coverage?: Record<string, unknown>;
   }): boolean {
     try {
-      this.drizzleDb.insert(schema.testMappings)
+      this.drizzleDb
+        .insert(schema.testMappings)
         .values({
           symbolId: mapping.symbolId,
           testFilePath: mapping.testFilePath,
@@ -2252,28 +2329,31 @@ export class DatabaseManager {
     completedAt?: string;
     notes?: string;
   }): void {
-    this.drizzleDb.insert(schema.tasks).values({
-      id: task.id,
-      title: task.title,
-      description: task.description ?? null,
-      status: task.status,
-      priority: task.priority,
-      type: task.type,
-      assignedTo: task.assignedTo ?? null,
-      symbolId: task.symbolId ?? null,
-      filePath: task.filePath ?? null,
-      line: task.line ?? null,
-      estimatedHours: task.estimatedHours ?? null,
-      actualHours: task.actualHours ?? null,
-      dueDate: task.dueDate ?? null,
-      parentId: task.parentId ?? null,
-      dependencies: task.dependencies ? JSON.stringify(task.dependencies) : null,
-      tags: task.tags ? JSON.stringify(task.tags) : null,
-      createdAt: task.createdAt,
-      updatedAt: task.updatedAt,
-      completedAt: task.completedAt ?? null,
-      notes: task.notes ?? null,
-    }).run();
+    this.drizzleDb
+      .insert(schema.tasks)
+      .values({
+        id: task.id,
+        title: task.title,
+        description: task.description ?? null,
+        status: task.status,
+        priority: task.priority,
+        type: task.type,
+        assignedTo: task.assignedTo ?? null,
+        symbolId: task.symbolId ?? null,
+        filePath: task.filePath ?? null,
+        line: task.line ?? null,
+        estimatedHours: task.estimatedHours ?? null,
+        actualHours: task.actualHours ?? null,
+        dueDate: task.dueDate ?? null,
+        parentId: task.parentId ?? null,
+        dependencies: task.dependencies ? JSON.stringify(task.dependencies) : null,
+        tags: task.tags ? JSON.stringify(task.tags) : null,
+        createdAt: task.createdAt,
+        updatedAt: task.updatedAt,
+        completedAt: task.completedAt ?? null,
+        notes: task.notes ?? null,
+      })
+      .run();
   }
 
   /**
@@ -2282,11 +2362,7 @@ export class DatabaseManager {
    * @returns Task row or null if not found
    */
   getTaskById(id: string): schema.TaskRow | null {
-    const row = this.drizzleDb
-      .select()
-      .from(schema.tasks)
-      .where(eq(schema.tasks.id, id))
-      .get();
+    const row = this.drizzleDb.select().from(schema.tasks).where(eq(schema.tasks.id, id)).get();
     return row ?? null;
   }
 
@@ -2295,21 +2371,24 @@ export class DatabaseManager {
    * @param id - Task ID
    * @param updates - Fields to update
    */
-  updateTask(id: string, updates: {
-    title?: string;
-    description?: string;
-    status?: string;
-    priority?: string;
-    type?: string;
-    assignedTo?: string;
-    estimatedHours?: number;
-    actualHours?: number;
-    dueDate?: string;
-    tags?: string[];
-    updatedAt: string;
-    completedAt?: string;
-    notes?: string;
-  }): void {
+  updateTask(
+    id: string,
+    updates: {
+      title?: string;
+      description?: string;
+      status?: string;
+      priority?: string;
+      type?: string;
+      assignedTo?: string;
+      estimatedHours?: number;
+      actualHours?: number;
+      dueDate?: string;
+      tags?: string[];
+      updatedAt: string;
+      completedAt?: string;
+      notes?: string;
+    }
+  ): void {
     const values: Record<string, unknown> = {
       updatedAt: updates.updatedAt,
     };
@@ -2326,11 +2405,7 @@ export class DatabaseManager {
     if (updates.completedAt !== undefined) values.completedAt = updates.completedAt;
     if (updates.notes !== undefined) values.notes = updates.notes;
 
-    this.drizzleDb
-      .update(schema.tasks)
-      .set(values)
-      .where(eq(schema.tasks.id, id))
-      .run();
+    this.drizzleDb.update(schema.tasks).set(values).where(eq(schema.tasks.id, id)).run();
   }
 
   /**
@@ -2339,10 +2414,7 @@ export class DatabaseManager {
    * @returns True if deleted successfully
    */
   deleteTask(id: string): boolean {
-    const result = this.drizzleDb
-      .delete(schema.tasks)
-      .where(eq(schema.tasks.id, id))
-      .run();
+    const result = this.drizzleDb.delete(schema.tasks).where(eq(schema.tasks.id, id)).run();
     return result.changes > 0;
   }
 
@@ -2446,10 +2518,12 @@ export class DatabaseManager {
       rows = this.drizzleDb
         .select()
         .from(schema.symbols)
-        .where(or(
-          sql`LOWER(${schema.symbols.name}) = ${lowerName}`,
-          sql`LOWER(${schema.symbols.name}) LIKE ${lowerName + '.%'}`
-        ))
+        .where(
+          or(
+            sql`LOWER(${schema.symbols.name}) = ${lowerName}`,
+            sql`LOWER(${schema.symbols.name}) LIKE ${lowerName + '.%'}`
+          )
+        )
         .all();
     }
 
@@ -2847,7 +2921,8 @@ export class DatabaseManager {
    */
   insertEndpoint(endpoint: schema.NewEndpoint): boolean {
     try {
-      this.drizzleDb.insert(schema.endpoints)
+      this.drizzleDb
+        .insert(schema.endpoints)
         .values({
           ...endpoint,
           createdAt: endpoint.createdAt || new Date().toISOString(),
@@ -2884,10 +2959,7 @@ export class DatabaseManager {
    * Get all endpoints
    */
   getAllEndpoints(): schema.Endpoint[] {
-    return this.drizzleDb
-      .select()
-      .from(schema.endpoints)
-      .all();
+    return this.drizzleDb.select().from(schema.endpoints).all();
   }
 
   /**
@@ -2927,11 +2999,10 @@ export class DatabaseManager {
    * Get endpoint by ID
    */
   getEndpoint(id: string): schema.Endpoint | null {
-    return this.drizzleDb
-      .select()
-      .from(schema.endpoints)
-      .where(eq(schema.endpoints.id, id))
-      .get() ?? null;
+    return (
+      this.drizzleDb.select().from(schema.endpoints).where(eq(schema.endpoints.id, id)).get() ??
+      null
+    );
   }
 
   /**
@@ -2975,7 +3046,8 @@ export class DatabaseManager {
    */
   insertCodeBlock(block: schema.NewCodeBlock): boolean {
     try {
-      this.drizzleDb.insert(schema.codeBlocks)
+      this.drizzleDb
+        .insert(schema.codeBlocks)
         .values({
           ...block,
           createdAt: block.createdAt || new Date().toISOString(),
@@ -3041,7 +3113,8 @@ export class DatabaseManager {
    */
   insertEntryPoint(entryPoint: schema.NewEntryPoint): boolean {
     try {
-      this.drizzleDb.insert(schema.entryPoints)
+      this.drizzleDb
+        .insert(schema.entryPoints)
         .values({
           ...entryPoint,
           createdAt: entryPoint.createdAt || new Date().toISOString(),
