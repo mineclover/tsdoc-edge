@@ -14,6 +14,7 @@ import {
   type ProjectGraphInput,
   type ProjectGraphSource,
   type ProjectIndexRequest,
+  type ProjectIndexResult,
 } from './contracts';
 
 /**
@@ -28,7 +29,7 @@ export class ProjectIndexer {
   constructor(private readonly source: ProjectGraphSource) {}
 
   /** Load, validate, and deterministically assemble a project graph. */
-  async index(request: ProjectIndexRequest): Promise<CanonicalProjectGraph> {
+  async index(request: ProjectIndexRequest): Promise<ProjectIndexResult> {
     const expectedRoot = canonicalFsPath(request.rootDir);
     const input = await this.source.load({ ...request, rootDir: expectedRoot });
     const actualRoot = canonicalFsPath(input.rootDir);
@@ -52,13 +53,16 @@ export class ProjectIndexer {
     const fingerprint = createHash('sha256').update(stableJson({ nodes, edges })).digest('hex');
 
     return deepFreeze({
-      contractVersion: PROJECT_GRAPH_CONTRACT_VERSION,
-      rootDir: expectedRoot,
-      tsconfigPath: actualTsconfig,
-      nodes,
-      edges,
-      provenance: canonicalJsonClone(input.provenance, 'provenance'),
-      fingerprint,
+      graph: deepFreeze({
+        contractVersion: PROJECT_GRAPH_CONTRACT_VERSION,
+        rootDir: expectedRoot,
+        tsconfigPath: actualTsconfig,
+        nodes,
+        edges,
+        provenance: canonicalJsonClone(input.provenance, 'provenance'),
+        fingerprint,
+      }),
+      diagnostics: Object.freeze(input.diagnostics ? [...input.diagnostics] : []),
     });
   }
 

@@ -8,8 +8,8 @@ describe('ProjectIndexer', () => {
     const first = new ProjectIndexer(sourceFor(graphInput(false)));
     const second = new ProjectIndexer(sourceFor(graphInput(true)));
 
-    const left = await first.index({ rootDir });
-    const right = await second.index({ rootDir });
+    const left = (await first.index({ rootDir })).graph;
+    const right = (await second.index({ rootDir })).graph;
 
     expect(left.nodes.map((node) => node.id)).toEqual(['src/a.ts#A:class', 'src/b.ts#B:class']);
     expect(left.nodes.map((node) => node.sourceId)).toEqual(left.nodes.map((node) => node.id));
@@ -74,7 +74,7 @@ describe('ProjectIndexer', () => {
     ];
     input.edges = [];
 
-    const graph = await new ProjectIndexer(sourceFor(input)).index({ rootDir });
+    const graph = (await new ProjectIndexer(sourceFor(input)).index({ rootDir })).graph;
 
     expect(graph.nodes.map((node) => node.id)).toEqual([
       'bundled:///libs/lib.es5.d.ts#Array:interface',
@@ -85,7 +85,7 @@ describe('ProjectIndexer', () => {
 
   it('deep-clones and freezes the revision so its fingerprint cannot become stale', async () => {
     const input = graphInput(false);
-    const graph = await new ProjectIndexer(sourceFor(input)).index({ rootDir });
+    const graph = (await new ProjectIndexer(sourceFor(input)).index({ rootDir })).graph;
     const metadata = input.nodes[0].customProducerField as { z: number };
     metadata.z = 99;
 

@@ -7,6 +7,8 @@
  * @packageDocumentation
  */
 
+import type { CanonicalDiagnostic } from './diagnostics-contract';
+
 export const PROJECT_GRAPH_CONTRACT_VERSION = '1.0' as const;
 
 /** Source location supplied by a graph producer. */
@@ -64,6 +66,8 @@ export interface ProjectGraphInput {
   nodes: ProjectGraphSourceNode[];
   edges: ProjectGraphSourceEdge[];
   provenance: ProjectGraphProvenance;
+  /** Optional diagnostics collected by the producer; not part of graph fingerprint. */
+  diagnostics?: readonly CanonicalDiagnostic[];
 }
 
 /** Request shared by batch and saved-file indexing flows. */
@@ -87,6 +91,12 @@ export type CanonicalGraphNode = Readonly<ProjectGraphSourceNode & { sourceId: s
 
 /** Canonical edge with lossless producer kind and evidence. */
 export type CanonicalGraphEdge = Readonly<ProjectGraphSourceEdge>;
+
+/** Result of assembling one canonical graph revision. */
+export interface ProjectIndexResult {
+  readonly graph: CanonicalProjectGraph;
+  readonly diagnostics: readonly CanonicalDiagnostic[];
+}
 
 /** Deterministic graph revision consumed by persistence, CLI, and LSP. */
 export interface CanonicalProjectGraph {

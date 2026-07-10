@@ -9,6 +9,27 @@ export {
   DEFAULT_GRAPH_TSCONFIG,
 } from './CanonicalGraphCoordinator';
 export * from './contracts';
+export {
+  formatCanonicalId,
+  isProvisionalOverlayId,
+  parseCanonicalId,
+  CANONICAL_ID_SCHEME,
+  OVERLAY_ID_SUFFIX,
+} from './canonical-id';
+export {
+  CANONICAL_DIAGNOSTICS_CONTRACT_VERSION,
+  normalizeRouterDiagnostics,
+  type CanonicalDiagnostic,
+  type CanonicalDiagnosticCategory,
+  type CanonicalDiagnosticSeverity,
+} from './diagnostics-contract';
+export { generateLegacyId, normalizeLegacyKind } from './legacy-id';
+export {
+  InMemoryAliasResolver,
+  materializeAliases,
+  type AliasMatchStrategy,
+  type SymbolAliasRecord,
+} from './symbol-alias';
 export { ProjectIndexer } from './ProjectIndexer';
 export {
   TtscGraphRouterArtifactAdapter,
