@@ -15,7 +15,6 @@
  * - Calculate confidence scores
  */
 
-import * as ts from 'typescript';
 import type { SymbolGraph, Symbol } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships';
 
@@ -28,7 +27,6 @@ import type { UnifiedRelationship } from '../types/relationships';
  */
 export class IODependencyAnalyzer {
   private graph: SymbolGraph;
-  private typeChecker: ts.TypeChecker | null = null;
 
   constructor(graph: SymbolGraph) {
     this.graph = graph;

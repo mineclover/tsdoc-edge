@@ -8,7 +8,9 @@
 
 import { AnalyzerRegistry, getAnalyzerRegistry } from '../../analyzer/AnalyzerRegistry';
 import type { AnalyzerContext, AnalyzerType } from '../../analyzer/types';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import { GraphAnalysisService } from '../../graph-analysis';
+import type { CanonicalProjectGraph } from '../../indexer';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 
 describe('AnalyzerRegistry', () => {
   let registry: AnalyzerRegistry;
@@ -89,6 +91,13 @@ describe('AnalyzerRegistry', () => {
       expect(metadata?.requires).toContain('graph');
       expect(metadata?.requires).toContain('program');
     });
+
+    it('keeps canonical structural results out of the legacy DB', () => {
+      const metadata = registry.getMetadata('structural');
+
+      expect(metadata?.requires).toEqual(['graphAnalysis']);
+      expect(metadata?.persistence).toBe('read-only');
+    });
   });
 
   describe('getMetadataByCategory', () => {
@@ -128,9 +137,9 @@ describe('AnalyzerRegistry', () => {
         graph: createMockGraph(),
       };
 
-      expect(() =>
-        registry.create('unknown' as AnalyzerType, context)
-      ).toThrow('Unknown analyzer type');
+      expect(() => registry.create('unknown' as AnalyzerType, context)).toThrow(
+        'Unknown analyzer type'
+      );
     });
 
     it('should throw when required context is missing', () => {
@@ -139,9 +148,7 @@ describe('AnalyzerRegistry', () => {
         // program is missing
       };
 
-      expect(() => registry.create('calls', context)).toThrow(
-        "requires 'program'"
-      );
+      expect(() => registry.create('calls', context)).toThrow("requires 'program'");
     });
 
     it('should create analyzer with valid context', () => {
@@ -168,6 +175,48 @@ describe('AnalyzerRegistry', () => {
       const results = registry.analyze('io', context);
 
       expect(Array.isArray(results)).toBe(true);
+    });
+
+    it('runs structural analysis from canonical compiler facts without a TS program', () => {
+      const graph: CanonicalProjectGraph = {
+        contractVersion: '1.0',
+        rootDir: '/repo',
+        tsconfigPath: '/repo/tsconfig.json',
+        nodes: [
+          {
+            id: 'src/service.ts#Service:class',
+            sourceId: 'src/service.ts#Service:class',
+            kind: 'class',
+            name: 'Service',
+          },
+          {
+            id: 'src/api.ts#IService:interface',
+            sourceId: 'src/api.ts#IService:interface',
+            kind: 'interface',
+            name: 'IService',
+          },
+        ],
+        edges: [
+          {
+            kind: 'implements',
+            from: 'src/service.ts#Service:class',
+            to: 'src/api.ts#IService:interface',
+          },
+        ],
+        provenance: { adapter: 'fixture', producer: '@ttsc/graph' },
+        fingerprint: 'fixture',
+      };
+
+      const results = registry.analyze('structural', {
+        graphAnalysis: new GraphAnalysisService(graph),
+      });
+
+      expect(results).toHaveLength(1);
+      expect(results[0]).toMatchObject({
+        type: 'implementation',
+        from: 'src/service.ts#Service:class',
+        to: 'src/api.ts#IService:interface',
+      });
     });
   });
 

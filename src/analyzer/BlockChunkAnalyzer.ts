@@ -28,7 +28,6 @@ import {
  */
 export class BlockChunkAnalyzer {
   private program: ts.Program;
-  private typeChecker: ts.TypeChecker;
   private strategy: ChunkingStrategy;
 
   constructor(
@@ -36,7 +35,6 @@ export class BlockChunkAnalyzer {
     strategy: Partial<ChunkingStrategy> = {},
   ) {
     this.program = program;
-    this.typeChecker = program.getTypeChecker();
     this.strategy = {
       minBlockSize: 1,
       maxBlockSize: 50,

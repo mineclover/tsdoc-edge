@@ -34,7 +34,6 @@ export interface EndpointDetectionConfig {
  */
 export class EndpointDetectionAnalyzer {
   private program: ts.Program;
-  private typeChecker: ts.TypeChecker;
   private config: EndpointDetectionConfig;
 
   constructor(
@@ -42,7 +41,6 @@ export class EndpointDetectionAnalyzer {
     config: Partial<EndpointDetectionConfig> = {},
   ) {
     this.program = program;
-    this.typeChecker = program.getTypeChecker();
     this.config = {
       frameworks: ['express', 'fastify', 'hono'],
       minConfidence: 0.7,

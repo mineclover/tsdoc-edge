@@ -56,13 +56,11 @@ const DEFAULT_CONFIG: EntryPointDetectionConfig = {
  */
 export class EntryPointDetector {
   private program: ts.Program;
-  private typeChecker: ts.TypeChecker;
   private config: EntryPointDetectionConfig;
   private projectRoot: string;
 
   constructor(program: ts.Program, projectRoot: string, config: Partial<EntryPointDetectionConfig> = {}) {
     this.program = program;
-    this.typeChecker = program.getTypeChecker();
     this.projectRoot = projectRoot;
     this.config = { ...DEFAULT_CONFIG, ...config };
   }

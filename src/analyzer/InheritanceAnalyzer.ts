@@ -32,13 +32,11 @@ import type {
  */
 export class InheritanceAnalyzer {
   private program: ts.Program;
-  private typeChecker: ts.TypeChecker;
   private symbolMap: Map<string, Symbol>;
   private inheritanceCache: Map<string, InheritanceRelationship[]> = new Map();
 
   constructor(program: ts.Program, symbolMap: Map<string, Symbol>) {
     this.program = program;
-    this.typeChecker = program.getTypeChecker();
     this.symbolMap = symbolMap;
   }
 

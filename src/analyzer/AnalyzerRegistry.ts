@@ -4,9 +4,7 @@
  * @packageDocumentation
  */
 
-import type { AnalyzerContext, AnalyzerMetadata, AnalyzerType, RelationshipAnalyzer } from './types';
 import type { UnifiedRelationship } from '../types/relationships';
-
 // Import existing analyzers
 import { AlternativesAnalyzer } from './AlternativesAnalyzer';
 import { BehavioralAnalyzer } from './BehavioralAnalyzer';
@@ -20,14 +18,19 @@ import { DocReferenceAnalyzer } from './DocReferenceAnalyzer';
 import { EnhancementAnalyzer } from './EnhancementAnalyzer';
 import { EventFlowAnalyzer } from './EventFlowAnalyzer';
 import { FallbackAnalyzer } from './FallbackAnalyzer';
+import { IntegrationVerificationAnalyzer } from './IntegrationVerificationAnalyzer';
 import { IODependencyAnalyzer } from './IODependencyAnalyzer';
 import { LayerDependencyAnalyzer } from './LayerDependencyAnalyzer';
-import { ImplementationAnalyzer } from './ImplementationAnalyzer';
 import { SubstitutionAnalyzer } from './SubstitutionAnalyzer';
 import { TemporalOrderAnalyzer } from './TemporalOrderAnalyzer';
 import { TestCoverageUnifier } from './TestCoverageUnifier';
 import { TypeDependencyAnalyzer } from './TypeDependencyAnalyzer';
-import { IntegrationVerificationAnalyzer } from './IntegrationVerificationAnalyzer';
+import type {
+  AnalyzerContext,
+  AnalyzerMetadata,
+  AnalyzerType,
+  RelationshipAnalyzer,
+} from './types';
 
 /**
  * Wrapper to adapt existing analyzers to common interface
@@ -170,9 +173,10 @@ const ANALYZER_METADATA: Record<AnalyzerType, AnalyzerMetadata> = {
   structural: {
     type: 'structural',
     name: 'Structural',
-    description: 'Code dependencies, inheritance',
+    description: 'Compiler-resolved access, construction, inheritance, and implementation facts',
     category: 'structural',
-    requires: ['graph', 'program'],
+    requires: ['graphAnalysis'],
+    persistence: 'read-only',
   },
   substitution: {
     type: 'substitution',
@@ -312,7 +316,7 @@ export class AnalyzerRegistry {
       try {
         const metadata = ANALYZER_METADATA[type];
         // Check if context has required dependencies
-        const hasRequired = metadata.requires.every(req => context[req]);
+        const hasRequired = metadata.requires.every((req) => context[req]);
         if (hasRequired) {
           results.push(...this.runAnalyzer(type, context));
         }
@@ -329,7 +333,8 @@ export class AnalyzerRegistry {
    * Internal: Run specific analyzer
    */
   private runAnalyzer(type: AnalyzerType, ctx: AnalyzerContext): UnifiedRelationship[] {
-    const { graph, program, dbManager } = ctx;
+    const graph = ctx.graph as NonNullable<AnalyzerContext['graph']>;
+    const { program } = ctx;
 
     switch (type) {
       case 'alternatives':
@@ -381,7 +386,11 @@ export class AnalyzerRegistry {
         return new LayerDependencyAnalyzer(graph).analyzeModuleBoundaries();
 
       case 'structural':
-        return new ImplementationAnalyzer(ctx.graph, ctx.program).analyze();
+        return [
+          ...(
+            ctx.graphAnalysis as NonNullable<AnalyzerContext['graphAnalysis']>
+          ).projectUnifiedRelationships({ categories: ['structural'] }),
+        ];
 
       case 'substitution':
         return new SubstitutionAnalyzer(graph).analyze();

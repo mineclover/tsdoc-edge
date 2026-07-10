@@ -4,19 +4,22 @@
  * @packageDocumentation
  */
 
+import type { Database } from 'better-sqlite3';
 import type * as ts from 'typescript';
+import type { GraphAnalysisService } from '../graph-analysis';
+import type { DatabaseManager } from '../storage/DatabaseManager';
 import type { SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships';
-import type { DatabaseManager } from '../storage/DatabaseManager';
-import type { Database } from 'better-sqlite3';
 
 /**
  * Context provided to all analyzers
  * Contains all possible dependencies an analyzer might need
  */
 export interface AnalyzerContext {
-  /** Symbol graph (required) */
-  graph: SymbolGraph;
+  /** Legacy DB-backed symbol graph (optional during canonical graph cutover) */
+  graph?: SymbolGraph;
+  /** Canonical compiler graph analysis (optional - required by migrated analyzers) */
+  graphAnalysis?: GraphAnalysisService;
   /** TypeScript program (optional - for AST analysis) */
   program?: ts.Program;
   /** Database manager (optional - for DB queries) */
@@ -55,9 +58,20 @@ export interface AnalyzerMetadata {
   type: string;
   name: string;
   description: string;
-  category: 'structural' | 'behavioral' | 'data-flow' | 'alternative' | 'constraint' | 'semantic' | 'verification' | 'type-system' | 'architectural';
+  category:
+    | 'structural'
+    | 'behavioral'
+    | 'data-flow'
+    | 'alternative'
+    | 'constraint'
+    | 'semantic'
+    | 'verification'
+    | 'type-system'
+    | 'architectural';
   /** Required context fields */
-  requires: Array<'graph' | 'program' | 'dbManager' | 'db' | 'projectRoot'>;
+  requires: Array<'graph' | 'graphAnalysis' | 'program' | 'dbManager' | 'db' | 'projectRoot'>;
+  /** Canonical IDs stay read-only until canonical node persistence is atomic. */
+  persistence?: 'legacy-db' | 'read-only';
 }
 
 /**
