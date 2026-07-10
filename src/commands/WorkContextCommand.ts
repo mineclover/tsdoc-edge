@@ -16,6 +16,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { ConfigManager } from '../config/ConfigManager';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { EnhancedWorkContextAnalyzer } from '../analyzer/EnhancedWorkContextAnalyzer';
+import { CanonicalAliasContext } from '../indexer';
 import { EntryPointContextAggregator } from '../analyzer/EntryPointContextAggregator';
 import { LLMsTextGenerator } from '../generator/LLMsTextGenerator';
 import { XMLContextGenerator } from '../generator/XMLContextGenerator';
@@ -193,7 +194,8 @@ export class WorkContextCommand extends BaseCommand {
       }
 
       // Human-readable format (original behavior)
-      const analyzer = new EnhancedWorkContextAnalyzer(dbManager);
+      const canonicalContext = CanonicalAliasContext.tryOpen(process.cwd());
+      const analyzer = new EnhancedWorkContextAnalyzer(dbManager, canonicalContext ?? undefined);
 
       // Analyze file
       const context = analyzer.analyze(absolutePath);
@@ -220,6 +222,10 @@ export class WorkContextCommand extends BaseCommand {
       console.log(`  ${colors.bold}Relationship Density:${colors.reset} ${context.summary.density.toFixed(2)}`);
       console.log(`  ${colors.bold}Test Coverage:${colors.reset}        ${context.summary.testCoverage.toFixed(1)}% (${context.relationships.tests.length} tests)`);
       console.log(`  ${colors.bold}Documentation:${colors.reset}        ${context.summary.documentationCoverage.toFixed(1)}% (${context.relationships.documentation.length} docs)`);
+      if (context.canonical) {
+        console.log(`  ${colors.bold}Canonical revision:${colors.reset}   ${context.canonical.revisionId.slice(0, 12)}`);
+        console.log(`  ${colors.bold}Canonical aliases:${colors.reset}     ${context.canonical.symbols.length}`);
+      }
       console.log();
 
       // Display symbols
@@ -369,6 +375,22 @@ export class WorkContextCommand extends BaseCommand {
         console.log();
       }
 
+      // Canonical structural enrichment (alias hop)
+      if (shouldShowCategory('structural') && context.canonical && context.canonical.symbols.length > 0) {
+        this.printSection('🧭 Canonical Structural Graph');
+        console.log(`  Revision ${context.canonical.revisionId.slice(0, 12)} via legacy alias hop`);
+        console.log();
+        for (const symbol of context.canonical.symbols.slice(0, 10)) {
+          console.log(
+            `  ${colors.cyan}${symbol.canonicalId}${colors.reset} (${symbol.legacyId}) ↓${symbol.dependents} ↑${symbol.dependencies}`
+          );
+        }
+        if (context.canonical.symbols.length > 10) {
+          console.log(`  ${colors.dim}... and ${context.canonical.symbols.length - 10} more${colors.reset}`);
+        }
+        console.log();
+      }
+
       // Actionable recommendations
       this.printSection('💡 Recommendations');
 
@@ -390,6 +412,7 @@ export class WorkContextCommand extends BaseCommand {
 
       console.log();
 
+      canonicalContext?.close();
       dbManager.close();
 
       return { exitCode: 0, message: 'Context displayed' };

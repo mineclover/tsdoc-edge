@@ -5,6 +5,7 @@
 
 import * as path from 'node:path';
 import { BaseCommand, type CommandResult } from './BaseCommand';
+import { CanonicalAliasContext } from '../indexer';
 import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
 /** A symbol affected by a change at a given depth */
@@ -99,6 +100,7 @@ Examples:
 
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
+      const canonicalContext = CanonicalAliasContext.tryOpen(process.cwd());
 
       // Resolve symbol by ID or name
       const resolved = this.resolveSymbol(dbManager, symbolId);
@@ -106,10 +108,12 @@ Examples:
       if (!resolved) {
         this.printError(`Symbol not found: ${symbolId}`);
         dbManager.close();
+        canonicalContext?.close();
         return { success: false, message: 'Symbol not found', exitCode: 1 };
       }
 
       const { symbol, id: resolvedId } = resolved;
+      const canonicalId = canonicalContext?.resolveCanonicalId(resolvedId) ?? null;
       this.printHeader(`Impact Analysis: ${symbol.name}`);
 
       console.log();
@@ -129,8 +133,19 @@ Examples:
 
       if (impactedSymbols.length === 0) {
         this.printSuccess('No impact found (symbol is isolated)');
+        if (canonicalId && canonicalContext) {
+          const canonicalImpact = canonicalContext.analysis
+            .impact(canonicalId, { maxDepth: options.depth, external: 'boundary' })
+            .affected.map((node) => node.node.id);
+          if (canonicalImpact.length > 0) {
+            console.log();
+            this.printSection('Canonical Structural Impact');
+            this.printInfo(`${canonicalImpact.length} affected canonical nodes via alias hop`);
+          }
+        }
         console.log();
         dbManager.close();
+        canonicalContext?.close();
         return this.success('Analysis complete');
       }
 
@@ -214,6 +229,23 @@ Examples:
       }
       console.log();
 
+      if (canonicalId && canonicalContext) {
+        const canonicalImpact = canonicalContext.analysis
+          .impact(canonicalId, { maxDepth: options.depth, external: 'boundary' })
+          .affected.map((node) => node.node.id);
+        if (canonicalImpact.length > 0) {
+          this.printSection('Canonical Structural Impact');
+          this.printInfo(`${canonicalImpact.length} affected canonical nodes via alias hop`);
+          for (const affectedId of canonicalImpact.slice(0, 10)) {
+            console.log(`  → ${affectedId}`);
+          }
+          if (canonicalImpact.length > 10) {
+            console.log(`  ${this.colors.dim}... and ${canonicalImpact.length - 10} more${this.colors.reset}`);
+          }
+          console.log();
+        }
+      }
+
       // Risk assessment
       this.printSection('Change Risk Assessment');
 
@@ -240,6 +272,7 @@ Examples:
       console.log();
 
       dbManager.close();
+      canonicalContext?.close();
 
       return this.success(`Impact analysis complete: ${impactedSymbols.length} symbols affected`);
     });

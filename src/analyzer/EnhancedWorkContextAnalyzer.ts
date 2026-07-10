@@ -10,6 +10,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import type { CanonicalAliasContext } from '../indexer/CanonicalAliasContext';
 import type { DatabaseManager } from '../storage/DatabaseManager';
 import { RelationshipQueryEngine } from '../query/RelationshipQueryEngine';
 import type { Symbol } from '../types/graph';
@@ -79,6 +80,17 @@ export interface EnhancedWorkContext {
     /** Documentation referencing this file */
     documentationFiles: Set<string>;
   };
+
+  /** Canonical structural enrichment via explicit legacy alias hop */
+  canonical?: {
+    revisionId: string;
+    symbols: Array<{
+      legacyId: string;
+      canonicalId: string;
+      dependencies: number;
+      dependents: number;
+    }>;
+  };
 }
 
 /**
@@ -100,10 +112,12 @@ export interface EnhancedWorkContext {
 export class EnhancedWorkContextAnalyzer {
   private db: DatabaseManager;
   private queryEngine: RelationshipQueryEngine;
+  private readonly canonicalContext?: CanonicalAliasContext;
 
-  constructor(db: DatabaseManager) {
+  constructor(db: DatabaseManager, canonicalContext?: CanonicalAliasContext) {
     this.db = db;
     this.queryEngine = new RelationshipQueryEngine(db);
+    this.canonicalContext = canonicalContext;
   }
 
   /**
@@ -274,6 +288,30 @@ export class EnhancedWorkContextAnalyzer {
     context.summary.documentationCoverage = fileSymbols.length > 0
       ? (symbolsWithDocs.size / fileSymbols.length) * 100
       : 0;
+
+    if (this.canonicalContext) {
+      const canonicalSymbols: NonNullable<EnhancedWorkContext['canonical']>['symbols'] = [];
+      for (const symbol of fileSymbols) {
+        const canonicalId = this.canonicalContext.resolveCanonicalId(symbol.id);
+        if (!canonicalId) continue;
+        const counts = this.canonicalContext.structuralCounts(canonicalId);
+        if (!counts) continue;
+        canonicalSymbols.push({
+          legacyId: symbol.id,
+          canonicalId,
+          dependencies: counts.dependencies,
+          dependents: counts.dependents,
+        });
+      }
+      if (canonicalSymbols.length > 0) {
+        context.canonical = {
+          revisionId: this.canonicalContext.revisionId,
+          symbols: canonicalSymbols.sort((left, right) =>
+            left.canonicalId.localeCompare(right.canonicalId)
+          ),
+        };
+      }
+    }
 
     return context;
   }

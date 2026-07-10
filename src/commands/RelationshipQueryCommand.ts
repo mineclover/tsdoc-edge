@@ -4,6 +4,7 @@
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
+import { CanonicalAliasContext } from '../indexer';
 import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
 /**
@@ -84,12 +85,25 @@ Examples:
 
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
+      const canonicalContext = CanonicalAliasContext.tryOpen(process.cwd());
 
       // Resolve symbol name to ID if needed
       const resolved = this.resolveSymbol(dbManager, symbolId);
       if (resolved) {
         symbolId = resolved.id;
       }
+      const canonicalId = canonicalContext?.resolveCanonicalId(symbolId) ?? null;
+      const canonicalStructural = canonicalId
+        ? {
+            canonicalId,
+            dependencies: canonicalContext!
+              .analysis.dependencies(canonicalId, { external: 'exclude' })
+              .map((neighbor) => neighbor.node.id),
+            dependents: canonicalContext!
+              .analysis.dependents(canonicalId, { external: 'exclude' })
+              .map((neighbor) => neighbor.node.id),
+          }
+        : null;
 
       // Use Drizzle ORM to query relationships
       let rels = dbManager.getUnifiedRelationshipsBySymbol(symbolId);
@@ -148,6 +162,7 @@ Examples:
           }, args);
         }
         dbManager.close();
+        canonicalContext?.close();
         return this.success('Query complete');
       }
 
@@ -188,6 +203,7 @@ Examples:
           }, args);
         }
         dbManager.close();
+        canonicalContext?.close();
         return this.success('Query complete');
       }
 
@@ -248,6 +264,14 @@ Examples:
           console.log(`    ${type}: ${this.colors.cyan}${count}${this.colors.reset}`);
         }
 
+        if (canonicalStructural) {
+          console.log();
+          this.printSection('Canonical Structural Graph');
+          console.log(`  ${canonicalStructural.canonicalId}`);
+          console.log(`  Dependencies: ${canonicalStructural.dependencies.length}`);
+          console.log(`  Dependents: ${canonicalStructural.dependents.length}`);
+        }
+
         console.log();
       } else {
         // XML output
@@ -291,10 +315,12 @@ Examples:
               .sort((a, b) => b[1] - a[1])
               .map(([type, count]) => ({ type, count })),
           },
+          ...(canonicalStructural ? { canonicalStructural } : {}),
         }, args);
       }
 
       dbManager.close();
+      canonicalContext?.close();
 
       return this.success(`Found ${filteredRels.length} relationships for ${symbolId}`);
     });
