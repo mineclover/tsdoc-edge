@@ -132,10 +132,10 @@ describe('LSP canonical graph refresh boundary', () => {
   });
 
   async function canonicalGraph(name: string) {
-    return new ProjectIndexer({ id: 'fixture', load: async () => graphInput(name) }).index({
+    return (await new ProjectIndexer({ id: 'fixture', load: async () => graphInput(name) }).index({
       rootDir: tempDir,
       tsconfigPath: 'tsconfig.ttsc.json',
-    });
+    })).graph;
   }
 
   function graphInput(name = 'A'): ProjectGraphInput {

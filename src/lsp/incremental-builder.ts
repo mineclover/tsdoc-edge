@@ -12,6 +12,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';
+import { generateLegacyId } from '../indexer/legacy-id';
 import type { SqliteDatabase } from '../types/database';
 
 /**
@@ -210,9 +211,9 @@ export class IncrementalBuilder {
     // Extract JSDoc summary
     const summary = this.extractJsDocSummary(node, sourceFile);
 
-    // Generate symbol ID
+    // Generate symbol ID using the shared legacy projection contract.
     const relativePath = path.relative(this.workspaceRoot, filePath).replace(/\\/g, '/');
-    const id = `${type}-${nameText.toLowerCase()}`.replace(/[^a-z0-9-]/g, '-');
+    const id = generateLegacyId(filePath, nameText, type);
 
     return {
       id,

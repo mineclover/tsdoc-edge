@@ -22,6 +22,8 @@ import {
   type CanonicalGraphRefreshResult,
   canonicalGraphOptionsFromEnvironment,
   DEFAULT_CANONICAL_GRAPH_DATABASE,
+  type CanonicalDiagnostic,
+  type CanonicalProjectGraph,
 } from '../indexer';
 import { GraphRepository } from '../storage/GraphRepository';
 import type {
@@ -36,15 +38,19 @@ import { CacheManager } from './cache-manager';
 import {
   CanonicalGraphLspView,
   canonicalNodeDisplayName,
-  type CanonicalLspSymbolLocation,
 } from './canonical-graph-view';
 import { StatementManager } from './statement-manager';
 import {
-  type ExtractedSymbol,
   IncrementalBuilder,
   type IncrementalExtractResult,
 } from './incremental-builder';
+import { GraphDeltaBuilder, OverlayGraphView } from './overlay';
 import { isTypeScriptSourcePath } from './uri';
+
+interface UnsavedFileOverlay {
+  readonly delta: ReturnType<typeof GraphDeltaBuilder.fromExtract>;
+  readonly extract: IncrementalExtractResult;
+}
 
 /**
  * Code Lens information for displaying impact counts on symbols
@@ -155,8 +161,14 @@ export class TsdocEdgeService {
   /** Active revision observed by the current canonical view. */
   private canonicalRevisionId: string | null = null;
 
+  /** Compiler/router diagnostics for the active canonical revision. */
+  private canonicalDiagnostics: readonly CanonicalDiagnostic[] = [];
+
   /** TS5 syntax-only results for unsaved buffers; never persisted. */
-  private readonly unsavedOverlays = new Map<string, IncrementalExtractResult>();
+  private readonly unsavedOverlays = new Map<string, UnsavedFileOverlay>();
+
+  /** Effective canonical graph views for dirty files. */
+  private readonly overlayViews = new Map<string, OverlayGraphView>();
 
   /** Maximum symbols to return in impact analysis */
   private static readonly MAX_IMPACT_SYMBOLS = 100;
@@ -279,8 +291,13 @@ export class TsdocEdgeService {
     if (this.canonicalCoordinator) {
       const refreshed = await this.canonicalCoordinator.refresh();
       if (refreshed.status === 'committed') {
-        this.installCanonicalRevision(refreshed.graph, refreshed.revision.revisionId);
-        if (filePath) this.unsavedOverlays.delete(path.resolve(filePath));
+        const diagnostics = this.canonicalCoordinator.readActiveRevision()?.diagnostics ?? [];
+        this.installCanonicalRevision(
+          refreshed.graph,
+          refreshed.revision.revisionId,
+          diagnostics
+        );
+        if (filePath) this.clearUnsavedOverlay(filePath);
       }
       return refreshed;
     }
@@ -291,8 +308,12 @@ export class TsdocEdgeService {
 
       const revisionChanged = active.metadata.revisionId !== this.canonicalRevisionId;
       if (revisionChanged || !this.canonicalView) {
-        this.installCanonicalRevision(active.graph, active.metadata.revisionId);
-        if (filePath) this.unsavedOverlays.delete(path.resolve(filePath));
+        this.installCanonicalRevision(
+          active.graph,
+          active.metadata.revisionId,
+          active.diagnostics
+        );
+        if (filePath) this.clearUnsavedOverlay(filePath);
       } else {
         this.invalidateCache();
       }
@@ -308,12 +329,14 @@ export class TsdocEdgeService {
 
   /** Inspect a transient unsaved overlay without exposing mutable internal state. */
   getUnsavedOverlay(filePath: string): IncrementalExtractResult | null {
-    return this.unsavedOverlays.get(path.resolve(filePath)) ?? null;
+    return this.unsavedOverlays.get(path.resolve(filePath))?.extract ?? null;
   }
 
   /** Drop a transient overlay when its document is closed or deleted. */
   clearUnsavedOverlay(filePath: string): void {
-    this.unsavedOverlays.delete(path.resolve(filePath));
+    const resolved = path.resolve(filePath);
+    this.unsavedOverlays.delete(resolved);
+    this.overlayViews.delete(resolved);
     this.invalidateFileCache(filePath);
   }
 
@@ -340,14 +363,14 @@ export class TsdocEdgeService {
       if (content !== undefined) {
         // Process from provided content (unsaved buffer)
         result = this.incrementalBuilder.processContent(filePath, content);
-        this.unsavedOverlays.set(path.resolve(filePath), result);
+        this.installUnsavedOverlay(filePath, result);
       } else if (this.isCanonicalGraphEnabled()) {
         // Saved content must use async whole-project refreshCanonicalGraph().
         return null;
       } else {
         // Process from disk
         result = this.incrementalBuilder.processFileChange(filePath);
-        this.unsavedOverlays.delete(path.resolve(filePath));
+        this.clearUnsavedOverlay(filePath);
       }
 
       // Invalidate caches for this file
@@ -367,7 +390,7 @@ export class TsdocEdgeService {
    * @returns Number of symbols removed
    */
   handleFileDelete(filePath: string): number {
-    this.unsavedOverlays.delete(path.resolve(filePath));
+    this.clearUnsavedOverlay(filePath);
     if (this.isCanonicalGraphEnabled()) return 0;
     if (!this.incrementalMode || !this.incrementalBuilder) {
       return 0;
@@ -422,7 +445,7 @@ export class TsdocEdgeService {
         options.canonicalGraphDependencies
       );
       const active = this.canonicalCoordinator.readActiveRevision();
-      if (active) this.installCanonicalRevision(active.graph, active.metadata.revisionId);
+      if (active) this.installCanonicalRevision(active.graph, active.metadata.revisionId, active.diagnostics);
       return;
     }
 
@@ -435,7 +458,7 @@ export class TsdocEdgeService {
     try {
       this.canonicalRepository = new GraphRepository(databasePath, { readOnly: true });
       const active = this.canonicalRepository.readActiveRevision();
-      if (active) this.installCanonicalRevision(active.graph, active.metadata.revisionId);
+      if (active) this.installCanonicalRevision(active.graph, active.metadata.revisionId, active.diagnostics);
     } catch (error) {
       console.error(`Failed to open canonical graph database: ${error}`);
       this.canonicalRepository?.close();
@@ -446,11 +469,60 @@ export class TsdocEdgeService {
   /** Install one immutable revision and invalidate all derived query caches. */
   private installCanonicalRevision(
     graph: ConstructorParameters<typeof CanonicalGraphLspView>[0],
-    revisionId: string
+    revisionId: string,
+    diagnostics: readonly CanonicalDiagnostic[] = []
   ): void {
     this.canonicalView = new CanonicalGraphLspView(graph);
     this.canonicalRevisionId = revisionId;
+    this.canonicalDiagnostics = diagnostics;
+    this.rebuildOverlayViews(graph, revisionId);
     this.invalidateCache();
+  }
+
+  /** Build or refresh canonical-id GraphDelta overlays for dirty files. */
+  private installUnsavedOverlay(filePath: string, extract: IncrementalExtractResult): void {
+    const resolved = path.resolve(filePath);
+    const baseGraph = this.canonicalView?.graph ?? this.emptyCanonicalGraph();
+    const baseRevisionId = this.canonicalRevisionId ?? 'uninitialized';
+    const delta = GraphDeltaBuilder.fromExtract({
+      baseGraph,
+      baseRevisionId,
+      filePath: resolved,
+      extract,
+    });
+    const overlay = { delta, extract };
+    this.unsavedOverlays.set(resolved, overlay);
+    this.overlayViews.set(resolved, new OverlayGraphView(baseGraph, delta));
+  }
+
+  private emptyCanonicalGraph(): CanonicalProjectGraph {
+    return {
+      contractVersion: '1.0',
+      rootDir: this.workspaceRoot,
+      tsconfigPath: path.join(this.workspaceRoot, 'tsconfig.ttsc.json'),
+      nodes: [],
+      edges: [],
+      provenance: { adapter: 'overlay', producer: 'tsdoc-edge/lsp-overlay' },
+      fingerprint: 'empty',
+    };
+  }
+
+  private rebuildOverlayViews(graph: ConstructorParameters<typeof CanonicalGraphLspView>[0], revisionId: string): void {
+    this.overlayViews.clear();
+    for (const [filePath, overlay] of this.unsavedOverlays) {
+      const delta = GraphDeltaBuilder.fromExtract({
+        baseGraph: graph,
+        baseRevisionId: revisionId,
+        filePath,
+        extract: overlay.extract,
+      });
+      this.unsavedOverlays.set(filePath, { delta, extract: overlay.extract });
+      this.overlayViews.set(filePath, new OverlayGraphView(graph, delta));
+    }
+  }
+
+  private getOverlayView(filePath: string): OverlayGraphView | null {
+    return this.overlayViews.get(path.resolve(filePath)) ?? null;
   }
 
   /**
@@ -475,58 +547,19 @@ export class TsdocEdgeService {
     }
   }
 
-  /** Resolve the innermost transient declaration at an LSP position. */
-  private overlaySymbolAtPosition(
-    overlay: IncrementalExtractResult,
-    line: number,
-    character: number
-  ): ExtractedSymbol | null {
-    const column = character + 1;
-    const candidates = overlay.symbols.filter((symbol) => {
-      if (line < symbol.line || line > symbol.endLine) return false;
-      if (line === symbol.line && column < symbol.column) return false;
-      if (line === symbol.endLine && column > symbol.endColumn) return false;
-      return true;
-    });
-    candidates.sort(
-      (left, right) =>
-        overlayRangeSize(left) - overlayRangeSize(right) ||
-        right.line - left.line ||
-        right.column - left.column ||
-        compareText(left.id, right.id)
-    );
-    return candidates[0] ?? null;
-  }
-
-  /** Match a transient declaration to its last saved canonical peer. */
-  private canonicalPeerForOverlay(
-    filePath: string,
-    symbol: ExtractedSymbol
-  ): CanonicalLspSymbolLocation | null {
-    if (!this.canonicalView) return null;
-    return (
-      this.canonicalView
-        .symbolsInFile(filePath)
-        .find(
-          ({ node }) =>
-            node.kind.toLocaleLowerCase() === symbol.type.toLocaleLowerCase() &&
-            canonicalNodeDisplayName(node) === symbol.name
-        ) ?? null
-    );
-  }
-
   /** Search dirty-document declarations before considering saved graph rows. */
   private searchUnsavedOverlays(query: string): SymbolSearchResult[] {
     const folded = query.toLocaleLowerCase();
     const results: SymbolSearchResult[] = [];
-    for (const [filePath, overlay] of this.unsavedOverlays) {
-      for (const symbol of overlay.symbols) {
-        if (!symbol.name.toLocaleLowerCase().includes(folded)) continue;
+    for (const [filePath, overlayView] of this.overlayViews) {
+      for (const { node, line } of overlayView.view.symbolsInFile(filePath)) {
+        const name = canonicalNodeDisplayName(node);
+        if (!name.toLocaleLowerCase().includes(folded)) continue;
         results.push({
-          name: symbol.name,
-          kind: this.mapTypeToKind(symbol.type),
+          name,
+          kind: this.mapTypeToKind(node.kind),
           filePath,
-          line: symbol.line,
+          line,
         });
       }
     }
@@ -564,19 +597,14 @@ export class TsdocEdgeService {
    * @returns Markdown hover content or null
    */
   getHoverInfo(filePath: string, line: number, character: number): string | null {
-    const overlay = this.getUnsavedOverlay(filePath);
-    if (overlay) {
-      const symbol = this.overlaySymbolAtPosition(overlay, line, character);
+    const overlayView = this.getOverlayView(filePath);
+    if (overlayView) {
+      const symbol = overlayView.view.symbolAtPosition(filePath, line, character);
       if (!symbol) return null;
 
-      const peer = this.canonicalPeerForOverlay(filePath, symbol);
-      const counts =
-        peer && this.canonicalView
-          ? this.canonicalView.impactCounts(peer.node.id)
-          : { dependents: 0, dependencies: 0 };
-      let content = `## ${symbol.name}\n\n`;
-      content += `**Type:** ${symbol.type}\n\n`;
-      if (symbol.summary) content += `${symbol.summary}\n\n`;
+      const counts = overlayView.view.impactCounts(symbol.node.id);
+      let content = `## ${canonicalNodeDisplayName(symbol.node)}\n\n`;
+      content += `**Type:** ${symbol.node.kind}\n\n`;
       content += `*Unsaved buffer overlay*\n\n`;
       content += `---\n\n### Impact Analysis\n\n`;
       content += `- **Dependents:** ${counts.dependents}\n`;
@@ -749,20 +777,14 @@ export class TsdocEdgeService {
    * @returns Array of code lens info
    */
   getCodeLenses(filePath: string): CodeLensInfo[] {
-    const overlay = this.getUnsavedOverlay(filePath);
-    if (overlay) {
-      return overlay.symbols.map((symbol) => {
-        const peer = this.canonicalPeerForOverlay(filePath, symbol);
-        const counts =
-          peer && this.canonicalView
-            ? this.canonicalView.impactCounts(peer.node.id)
-            : { dependents: 0, dependencies: 0 };
+    const overlayView = this.getOverlayView(filePath);
+    if (overlayView) {
+      return overlayView.view.symbolsInFile(filePath).map(({ node, line }) => {
+        const counts = overlayView.view.impactCounts(node.id);
         return {
-          line: symbol.line,
+          line,
           title: `↓${counts.dependents} ↑${counts.dependencies}`,
-          symbolId:
-            peer?.node.id ??
-            `overlay:${path.resolve(filePath)}#${symbol.id}:${symbol.line}:${symbol.column}`,
+          symbolId: node.id,
         };
       });
     }
@@ -993,21 +1015,18 @@ export class TsdocEdgeService {
    * @returns Array of diagnostics
    */
   getDiagnostics(filePath: string): DiagnosticInfo[] {
-    const overlay = this.getUnsavedOverlay(filePath);
-    if (overlay) {
-      const diagnostics: DiagnosticInfo[] = overlay.errors.map((message) => ({
-        line: 1,
-        message,
-        severity: DiagnosticSeverity.Warning,
-      }));
-      for (const symbol of overlay.symbols) {
-        const peer = this.canonicalPeerForOverlay(filePath, symbol);
-        const dependents =
-          peer && this.canonicalView ? this.canonicalView.impactCounts(peer.node.id).dependents : 0;
+    const overlayView = this.getOverlayView(filePath);
+    if (overlayView) {
+      const diagnostics: DiagnosticInfo[] = [];
+      for (const diagnostic of overlayView.delta.diagnostics ?? []) {
+        diagnostics.push(mapCanonicalDiagnostic(diagnostic));
+      }
+      for (const { node, line } of overlayView.view.symbolsInFile(filePath)) {
+        const dependents = overlayView.view.impactCounts(node.id).dependents;
         if (dependents > 10) {
           diagnostics.push({
-            line: symbol.line,
-            message: `High-impact symbol: ${symbol.name} has ${dependents} dependents`,
+            line,
+            message: `High-impact symbol: ${canonicalNodeDisplayName(node)} has ${dependents} dependents`,
             severity: DiagnosticSeverity.Information,
           });
         }
@@ -1017,7 +1036,18 @@ export class TsdocEdgeService {
 
     if (this.canonicalView) {
       const canonicalView = this.canonicalView;
-      const canonicalDiagnostics = canonicalView
+      const relativeFile = path
+        .relative(this.workspaceRoot, path.resolve(filePath))
+        .replace(/\\/g, '/');
+      const canonicalDiagnostics = this.canonicalDiagnostics
+        .filter(
+          (diagnostic) =>
+            !diagnostic.file ||
+            diagnostic.file === relativeFile ||
+            path.resolve(this.workspaceRoot, diagnostic.file) === path.resolve(filePath)
+        )
+        .map((diagnostic) => mapCanonicalDiagnostic(diagnostic));
+      const impactDiagnostics = canonicalView
         .symbolsInFile(filePath)
         .flatMap(({ node, line }) => {
           const dependents = canonicalView.impactCounts(node.id).dependents;
@@ -1031,7 +1061,11 @@ export class TsdocEdgeService {
               ]
             : [];
         });
-      return [...canonicalDiagnostics, ...this.getLegacyArchitecturalDiagnostics(filePath)];
+      return [
+        ...canonicalDiagnostics,
+        ...impactDiagnostics,
+        ...this.getLegacyArchitecturalDiagnostics(filePath),
+      ];
     }
     if (!this.db) return [];
 
@@ -1208,10 +1242,16 @@ export class TsdocEdgeService {
     line: number,
     character = 0
   ): { id: string; name: string; type: string } | null {
-    const overlay = this.getUnsavedOverlay(filePath);
-    if (overlay) {
-      const symbol = this.overlaySymbolAtPosition(overlay, line, character);
-      return symbol ? { id: symbol.id, name: symbol.name, type: symbol.type } : null;
+    const overlayView = this.getOverlayView(filePath);
+    if (overlayView) {
+      const symbol = overlayView.view.symbolAtPosition(filePath, line, character);
+      return symbol
+        ? {
+            id: symbol.node.id,
+            name: canonicalNodeDisplayName(symbol.node),
+            type: symbol.node.kind,
+          }
+        : null;
     }
 
     const canonical = this.canonicalView?.symbolAtPosition(filePath, line, character);
@@ -1613,8 +1653,10 @@ export class TsdocEdgeService {
    */
   close(): void {
     this.unsavedOverlays.clear();
+    this.overlayViews.clear();
     this.canonicalView = null;
     this.canonicalRevisionId = null;
+    this.canonicalDiagnostics = [];
     this.canonicalCoordinator?.close();
     this.canonicalCoordinator = null;
     this.canonicalRepository?.close();
@@ -1637,8 +1679,18 @@ export class TsdocEdgeService {
   }
 }
 
-function overlayRangeSize(symbol: ExtractedSymbol): number {
-  return (symbol.endLine - symbol.line) * 1_000_000 + (symbol.endColumn - symbol.column);
+function mapCanonicalDiagnostic(diagnostic: CanonicalDiagnostic): DiagnosticInfo {
+  const severityByCategory: Record<CanonicalDiagnostic['severity'], DiagnosticSeverity> = {
+    error: DiagnosticSeverity.Error,
+    warning: DiagnosticSeverity.Warning,
+    info: DiagnosticSeverity.Information,
+    hint: DiagnosticSeverity.Hint,
+  };
+  return {
+    line: diagnostic.startLine,
+    message: diagnostic.message,
+    severity: severityByCategory[diagnostic.severity],
+  };
 }
 
 function compareText(left: string, right: string): number {

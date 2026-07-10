@@ -398,7 +398,7 @@ export function myFunc() {}`
       const result = builder.extractFile(filePath);
       const symbol = result.symbols.find((s) => s.name === 'MyClassName');
 
-      expect(symbol?.id).toBe('class-myclassname');
+      expect(symbol?.id).toBe('test-class-myclassname');
     });
   });
 });
