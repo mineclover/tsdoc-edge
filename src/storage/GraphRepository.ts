@@ -18,8 +18,10 @@ import {
   PROJECT_GRAPH_CONTRACT_VERSION,
   type ProjectGraphProvenance,
 } from '../indexer/contracts';
+import type { CanonicalDiagnostic } from '../indexer/diagnostics-contract';
+import type { SymbolAliasRecord } from '../indexer/symbol-alias';
 
-export const GRAPH_REPOSITORY_SCHEMA_VERSION = 1 as const;
+export const GRAPH_REPOSITORY_SCHEMA_VERSION = 2 as const;
 export const CANONICAL_GRAPH_ARTIFACT_NAME = 'tsdoc-edge/canonical-project-graph' as const;
 export const CANONICAL_GRAPH_FINGERPRINT_ALGORITHM = 'sha256/canonical-json-v1' as const;
 
@@ -72,6 +74,8 @@ export interface CanonicalGraphRevisionMetadata {
 export interface ActiveCanonicalGraphRevision {
   readonly metadata: CanonicalGraphRevisionMetadata;
   readonly graph: CanonicalProjectGraph;
+  readonly aliases: readonly SymbolAliasRecord[];
+  readonly diagnostics: readonly CanonicalDiagnostic[];
 }
 
 export interface GraphRepositoryOptions {
@@ -87,6 +91,8 @@ export interface GraphRepositoryReplaceOptions {
    * still be empty; `undefined` disables the guard.
    */
   readonly expectedActiveRevisionId?: string | null;
+  readonly aliases?: readonly SymbolAliasRecord[];
+  readonly diagnostics?: readonly CanonicalDiagnostic[];
 }
 
 /** Raised when another process committed a graph while a refresh was running. */
@@ -175,6 +181,39 @@ CREATE INDEX IF NOT EXISTS idx_canonical_graph_edges_from
   ON canonical_graph_edges(revision_id, from_node_id, kind);
 CREATE INDEX IF NOT EXISTS idx_canonical_graph_edges_to
   ON canonical_graph_edges(revision_id, to_node_id, kind);
+
+CREATE TABLE IF NOT EXISTS canonical_symbol_aliases (
+  revision_id TEXT NOT NULL,
+  canonical_id TEXT NOT NULL,
+  legacy_id TEXT NOT NULL,
+  match_strategy TEXT NOT NULL,
+  confidence REAL NOT NULL,
+  payload_json TEXT NOT NULL,
+  PRIMARY KEY (revision_id, canonical_id),
+  UNIQUE (revision_id, legacy_id),
+  FOREIGN KEY (revision_id)
+    REFERENCES canonical_graph_revisions(revision_id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_canonical_symbol_aliases_legacy
+  ON canonical_symbol_aliases(revision_id, legacy_id);
+
+CREATE TABLE IF NOT EXISTS canonical_graph_diagnostics (
+  revision_id TEXT NOT NULL,
+  ordinal INTEGER NOT NULL CHECK (ordinal >= 0),
+  diagnostic_id TEXT NOT NULL,
+  severity TEXT NOT NULL,
+  category TEXT NOT NULL,
+  file_path TEXT,
+  payload_json TEXT NOT NULL,
+  PRIMARY KEY (revision_id, diagnostic_id),
+  UNIQUE (revision_id, ordinal),
+  FOREIGN KEY (revision_id)
+    REFERENCES canonical_graph_revisions(revision_id) ON DELETE CASCADE
+);
+
+CREATE INDEX IF NOT EXISTS idx_canonical_graph_diagnostics_file
+  ON canonical_graph_diagnostics(revision_id, file_path);
 `;
 
 /**
@@ -232,6 +271,8 @@ export class GraphRepository {
     const artifactContract = artifactContractFor(graph);
     const revisionId = revisionIdFor(graph, artifactContract);
     const storedAt = this.clock().toISOString();
+    const aliases = options.aliases ?? [];
+    const diagnostics = options.diagnostics ?? [];
 
     const replace = this.database.transaction(() => {
       if (options.expectedActiveRevisionId !== undefined) {
@@ -291,6 +332,39 @@ export class GraphRepository {
         insertEdge.run(revisionId, ordinal, edge.kind, edge.from, edge.to, stableJson(edge));
       });
 
+      const insertAlias = this.database.prepare(
+        `INSERT INTO canonical_symbol_aliases
+          (revision_id, canonical_id, legacy_id, match_strategy, confidence, payload_json)
+         VALUES (?, ?, ?, ?, ?, ?)`
+      );
+      for (const alias of aliases) {
+        insertAlias.run(
+          revisionId,
+          alias.canonicalId,
+          alias.legacyId,
+          alias.matchStrategy,
+          alias.confidence,
+          stableJson(alias)
+        );
+      }
+
+      const insertDiagnostic = this.database.prepare(
+        `INSERT INTO canonical_graph_diagnostics
+          (revision_id, ordinal, diagnostic_id, severity, category, file_path, payload_json)
+         VALUES (?, ?, ?, ?, ?, ?, ?)`
+      );
+      diagnostics.forEach((diagnostic, ordinal) => {
+        insertDiagnostic.run(
+          revisionId,
+          ordinal,
+          diagnostic.id,
+          diagnostic.severity,
+          diagnostic.category,
+          diagnostic.file ?? null,
+          stableJson(diagnostic)
+        );
+      });
+
       // The active pointer is deliberately the final write in the revision.
       this.database
         .prepare('INSERT INTO canonical_graph_state (singleton, active_revision_id) VALUES (1, ?)')
@@ -341,6 +415,18 @@ export class GraphRepository {
            WHERE revision_id = ? ORDER BY ordinal`
         )
         .all(row.revision_id) as PayloadRow[];
+      const aliasRows = this.database
+        .prepare(
+          `SELECT payload_json FROM canonical_symbol_aliases
+           WHERE revision_id = ? ORDER BY canonical_id`
+        )
+        .all(row.revision_id) as PayloadRow[];
+      const diagnosticRows = this.database
+        .prepare(
+          `SELECT payload_json FROM canonical_graph_diagnostics
+           WHERE revision_id = ? ORDER BY ordinal`
+        )
+        .all(row.revision_id) as PayloadRow[];
 
       if (nodeRows.length !== row.node_count || edgeRows.length !== row.edge_count) {
         throw new Error(`Canonical graph revision ${row.revision_id} has inconsistent row counts`);
@@ -348,6 +434,10 @@ export class GraphRepository {
 
       const nodes = nodeRows.map((value) => parseJson<CanonicalGraphNode>(value.payload_json));
       const edges = edgeRows.map((value) => parseJson<CanonicalGraphEdge>(value.payload_json));
+      const aliases = aliasRows.map((value) => parseJson<SymbolAliasRecord>(value.payload_json));
+      const diagnostics = diagnosticRows.map((value) =>
+        parseJson<CanonicalDiagnostic>(value.payload_json)
+      );
       const provenance = parseJson<ProjectGraphProvenance>(row.provenance_json);
       const artifactContract = parseJson<CanonicalGraphArtifactContract>(
         row.artifact_contract_json
@@ -390,6 +480,8 @@ export class GraphRepository {
           storedAt: row.stored_at,
         }),
         graph,
+        aliases,
+        diagnostics,
       });
     });
 

@@ -11,6 +11,7 @@ import {
 } from '../storage/GraphRepository';
 import type { CanonicalProjectGraph, ProjectGraphSource } from './contracts';
 import { ProjectIndexer } from './ProjectIndexer';
+import { materializeAliases } from './symbol-alias';
 import { TtscGraphRouterArtifactAdapter } from './TtscGraphRouterArtifactAdapter';
 
 export const DEFAULT_CANONICAL_GRAPH_DATABASE = '.tsdoc/canonical-graph.db' as const;
@@ -114,11 +115,12 @@ export class CanonicalGraphCoordinator {
         return { status: 'superseded', requestedFingerprint: null };
       }
       const expectedRevisionId = this.repository.readActiveRevision()?.metadata.revisionId ?? null;
-      const graph = await this.indexer.index({
+      const indexed = await this.indexer.index({
         rootDir: this.rootDir,
         tsconfigPath: this.tsconfigPath,
         refresh: true,
       });
+      const graph = indexed.graph;
 
       if (generation !== this.requestedGeneration) {
         return {
@@ -130,6 +132,8 @@ export class CanonicalGraphCoordinator {
       try {
         const revision = this.repository.replaceActiveRevision(graph, {
           expectedActiveRevisionId: expectedRevisionId,
+          aliases: materializeAliases(graph),
+          diagnostics: indexed.diagnostics,
         });
         return { status: 'committed', graph, revision };
       } catch (error) {

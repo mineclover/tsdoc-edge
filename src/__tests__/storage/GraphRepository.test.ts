@@ -104,7 +104,7 @@ describe('GraphRepository', () => {
         contractVersion: '1.0',
         fingerprintAlgorithm: CANONICAL_GRAPH_FINGERPRINT_ALGORITHM,
         identityScheme: '@ttsc/graph:path#qualifiedName:kind',
-        repositorySchemaVersion: 1,
+        repositorySchemaVersion: 2,
       },
     });
     expect(Object.isFrozen(active?.graph)).toBe(true);
@@ -347,7 +347,7 @@ describe('GraphRepository', () => {
           contractVersion: '1.0',
           fingerprintAlgorithm: CANONICAL_GRAPH_FINGERPRINT_ALGORITHM,
           identityScheme: '@ttsc/graph:path#qualifiedName:kind',
-          repositorySchemaVersion: 1,
+          repositorySchemaVersion: 2,
         }),
         '2026-07-11T00:00:00.000Z'
       );
@@ -433,10 +433,10 @@ describe('GraphRepository', () => {
       },
       ...overrides,
     };
-    return new ProjectIndexer({ id: 'fixture', load: async () => input }).index({
+    return (await new ProjectIndexer({ id: 'fixture', load: async () => input }).index({
       rootDir: tempDir,
       tsconfigPath: 'tsconfig.ttsc.json',
-    });
+    })).graph;
   }
 });
 
@@ -466,7 +466,7 @@ function legacyRevisionIdForTest(graph: CanonicalProjectGraph): string {
           contractVersion: '1.0',
           fingerprintAlgorithm: CANONICAL_GRAPH_FINGERPRINT_ALGORITHM,
           identityScheme: '@ttsc/graph:path#qualifiedName:kind',
-          repositorySchemaVersion: 1,
+          repositorySchemaVersion: 2,
         },
         contentFingerprint: graph.fingerprint,
         provenance: graph.provenance,
