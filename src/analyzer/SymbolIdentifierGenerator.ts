@@ -7,6 +7,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { randomUUID } from 'node:crypto';
+import { generateLegacyId } from '../indexer/legacy-id';
 
 /**
  * Symbol identifier components
@@ -61,7 +62,7 @@ export class SymbolIdentifierGenerator {
     const localPath = this.generateLocalPath(filePath, symbolName, parentSymbol);
     const scope = this.extractScope(filePath);
     const globalPath = isExported ? this.generateGlobalPath(filePath, symbolName, scope, parentSymbol) : undefined;
-    const legacyId = this.generateLegacyId(filePath, symbolName, symbolType);
+    const legacyId = generateLegacyId(filePath, symbolName, symbolType);
 
     return { uuid, localPath, globalPath, scope, legacyId };
   }
@@ -155,25 +156,6 @@ export class SymbolIdentifierGenerator {
       .replace(/^packages\//, '');
 
     return normalized || 'root';
-  }
-
-  /**
-   * Generate legacy ID (for backwards compatibility)
-   * Format: "filename-type-symbolname"
-   */
-  private generateLegacyId(filePath: string, symbolName: string, symbolType: string): string {
-    const fileBase = path.basename(filePath, path.extname(filePath))
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-');
-
-    const normalizedSymbolName = symbolName
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/^-|-$/g, '');
-
-    return `${fileBase}-${symbolType}-${normalizedSymbolName}`
-      .replace(/--+/g, '-')
-      .replace(/^-|-$/g, '');
   }
 
   /**
