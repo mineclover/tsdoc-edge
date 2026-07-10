@@ -11,39 +11,38 @@ import { MarkdownGenerator } from './generator/MarkdownGenerator';
 import { TSDocParser } from './parser/TSDocParser';
 import { ConventionValidator } from './validator/ConventionValidator';
 
+export { CallGraphAnalyzer } from './analyzer/CallGraphAnalyzer';
 // Analyzer exports
 export { CodeHealthChecker } from './analyzer/CodeHealthChecker';
 export { CoverageParser } from './analyzer/CoverageParser';
-export { MissingLinkDetector } from './analyzer/MissingLinkDetector';
-export type {
-  BrokenLink,
-  MissingLinkReport,
-  LinkType,
-} from './analyzer/MissingLinkDetector';
-export { PreCommitChecker } from './analyzer/PreCommitChecker';
-export type {
-  FileCheckResult,
-  PreCommitReport,
-} from './analyzer/PreCommitChecker';
+export { DependencyChainAnalyzer } from './analyzer/DependencyChainAnalyzer';
 export { DocumentationAnalyzer } from './analyzer/DocumentationAnalyzer';
 export { ImportanceClassifier } from './analyzer/ImportanceClassifier';
 export { InterfaceAnalyzer } from './analyzer/InterfaceAnalyzer';
 export { InterfaceDependencyMapper } from './analyzer/InterfaceDependencyMapper';
+export { IODependencyAnalyzer } from './analyzer/IODependencyAnalyzer';
+export type {
+  BrokenLink,
+  LinkType,
+  MissingLinkReport,
+} from './analyzer/MissingLinkDetector';
+export { MissingLinkDetector } from './analyzer/MissingLinkDetector';
+export type {
+  FileCheckResult,
+  PreCommitReport,
+} from './analyzer/PreCommitChecker';
+export { PreCommitChecker } from './analyzer/PreCommitChecker';
 export { StatsHistoryManager } from './analyzer/StatsHistoryManager';
 export { TestCoverageAnalyzer } from './analyzer/TestCoverageAnalyzer';
 export { TrackableStatsCollector } from './analyzer/TrackableStatsCollector';
 export { TypeChainTracer } from './analyzer/TypeChainTracer';
-export { CallGraphAnalyzer } from './analyzer/CallGraphAnalyzer';
-export { DependencyChainAnalyzer } from './analyzer/DependencyChainAnalyzer';
-export { IODependencyAnalyzer } from './analyzer/IODependencyAnalyzer';
-// Parser exports
-export { EnhancedDocExtractor } from './parser/EnhancedDocExtractor';
-export type {
-  ExtractionOptions,
-  ExtractedEnhancedDoc,
-} from './parser/EnhancedDocExtractor';
 // Config exports
 export { ConfigManager } from './config/ConfigManager';
+// Document symbol exports ([[]] notation)
+export { BacklinkGenerator } from './doc-symbol/BacklinkGenerator';
+export { DocumentSymbolParser } from './doc-symbol/DocumentSymbolParser';
+export { DocumentSymbolRegistry } from './doc-symbol/DocumentSymbolRegistry';
+export { TSDocSymbolParser } from './doc-symbol/TSDocSymbolParser';
 // Fixer exports
 export { DocumentationFixer } from './fixer/DocumentationFixer';
 export { RecursiveImprover } from './fixer/RecursiveImprover';
@@ -55,15 +54,32 @@ export { CommentStateManager } from './fold/CommentStateManager';
 export { EnhancedMarkdownGenerator } from './generator/EnhancedMarkdownGenerator';
 export { InsightDocGenerator } from './generator/InsightDocGenerator';
 export { MarkdownGenerator } from './generator/MarkdownGenerator';
+// Module Specification Generator
+export { ModuleSpecGenerator } from './generator/ModuleSpecGenerator';
+export { ModuleSpecMarkdownFormatter } from './generator/ModuleSpecMarkdownFormatter';
 export { RelatedDocsGenerator } from './generator/RelatedDocsGenerator';
 // Graph and search exports
 export { DepthTraverser } from './graph/DepthTraverser';
 export { SymbolGraphBuilder } from './graph/SymbolGraphBuilder';
 export { SymbolSearchEngine } from './graph/SymbolSearchEngine';
+// Canonical graph analysis exports
+export * from './graph-analysis';
+// Canonical project indexing exports
+export * from './indexer';
+// Linking exports
+export { DocCodeLinker } from './linking/DocCodeLinker';
+export { LinkValidator } from './linking/LinkValidator';
+export type {
+  ExtractedEnhancedDoc,
+  ExtractionOptions,
+} from './parser/EnhancedDocExtractor';
+// Parser exports
+export { EnhancedDocExtractor } from './parser/EnhancedDocExtractor';
 // Core exports
 export { TSDocParser } from './parser/TSDocParser';
 // Storage exports
 export { DatabaseManager } from './storage/DatabaseManager';
+export * from './storage/GraphRepository';
 // Type exports
 export type {
   ParsedDocComment,
@@ -71,7 +87,6 @@ export type {
   TSDocEdgeConfig,
   ValidationResult,
 } from './types';
-
 // Analysis type exports
 export type * from './types/analysis';
 // Config type exports
@@ -80,6 +95,23 @@ export type * from './types/config';
 export type * from './types/domain';
 // Graph type exports
 export type * from './types/graph';
+export type {
+  DependencySpec,
+  FailureCase,
+  ImportSpec,
+  ModuleContext,
+  ModuleEffect,
+  ModuleInput,
+  ModuleLogic,
+  ModuleOutput,
+  ModulePurpose,
+  ModuleScope,
+  ModuleSpecResult,
+  ModuleSpecTemplate,
+  ParamSpec,
+  ReturnSpec,
+  SideEffectSpec,
+} from './types/spec/module-spec';
 // Comment state type exports
 export type * from './types/state';
 // Enhanced type exports
@@ -87,42 +119,14 @@ export type * from './types/tags';
 // Validation exports
 export { ConnectivityValidator } from './validator/ConnectivityValidator';
 export { ConventionValidator } from './validator/ConventionValidator';
-export { StrictModeValidator } from './validator/StrictModeValidator';
-export { ModuleSpecValidator } from './validator/ModuleSpecValidator';
 export type {
-  ValidationIssue,
-  ValidationSeverity,
   ModuleSpecValidationResult,
+  ValidationIssue,
   ValidationOptions,
+  ValidationSeverity,
 } from './validator/ModuleSpecValidator';
-// Linking exports
-export { DocCodeLinker } from './linking/DocCodeLinker';
-export { LinkValidator } from './linking/LinkValidator';
-// Document symbol exports ([[]] notation)
-export { BacklinkGenerator } from './doc-symbol/BacklinkGenerator';
-export { DocumentSymbolParser } from './doc-symbol/DocumentSymbolParser';
-export { DocumentSymbolRegistry } from './doc-symbol/DocumentSymbolRegistry';
-export { TSDocSymbolParser } from './doc-symbol/TSDocSymbolParser';
-// Module Specification Generator
-export { ModuleSpecGenerator } from './generator/ModuleSpecGenerator';
-export { ModuleSpecMarkdownFormatter } from './generator/ModuleSpecMarkdownFormatter';
-export type {
-  ModuleSpecTemplate,
-  ModuleSpecResult,
-  ModulePurpose,
-  ModuleInput,
-  ModuleOutput,
-  ModuleContext,
-  ModuleLogic,
-  ModuleEffect,
-  ModuleScope,
-  ParamSpec,
-  ReturnSpec,
-  FailureCase,
-  DependencySpec,
-  ImportSpec,
-  SideEffectSpec,
-} from './types/spec/module-spec';
+export { ModuleSpecValidator } from './validator/ModuleSpecValidator';
+export { StrictModeValidator } from './validator/StrictModeValidator';
 
 /**
  * Main entry point for TSDoc Edge
