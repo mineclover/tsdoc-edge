@@ -187,6 +187,8 @@ src/
 ├── commands/      # CLI commands (55 commands)
 ├── doc-symbol/    # [[Symbol]] system
 ├── graph/         # Symbol graph
+├── graph-analysis/# Canonical @ttsc/graph queries and projections
+├── indexer/       # graph-router adapter + canonical graph assembly
 ├── lsp/           # LSP server
 ├── parser/        # TSDoc parsing
 ├── storage/       # SQLite + JSONL
@@ -198,10 +200,48 @@ src/
 ## Development
 
 ```bash
-npm run build      # Compile TypeScript
-npm run dev        # Watch mode
-npm test           # Run tests
+npm run ttsc:version # Verify ttsc + native TypeScript toolchain
+npm run typecheck    # Type-check with ttsc / TypeScript 7
+npm run build        # Compile with ttsc
+npm run dev          # ttsc watch mode
+npm test             # Run the TypeScript 5 / ts-jest test lane
 ```
+
+The build compiler and runtime parser are intentionally separated during the
+TypeScript 7 migration. `ttsc` uses the stable `typescript-native` 7.0.2 toolchain,
+while the `typescript` 5.x dependency remains the legacy Compiler API used by
+syntax/document analyzers, the unsaved-buffer LSP path, and Jest tests. The old
+`build:legacy`, `typecheck:legacy`, and `dev:legacy` lanes have been removed;
+TS5 is a runtime compatibility dependency, not a second build compiler.
+
+Compiler-resolved structural analysis now uses the canonical graph:
+
+```bash
+export TSDOC_EDGE_GRAPH_ROUTER_MODULE=/path/to/ttsc-graph-router/dist/artifact-source.js
+tsdoc-edge build src --canonical-graph
+tsdoc-edge relationship analyze --type=structural
+```
+
+Build refresh is explicitly opt-in through `--canonical-graph` (or
+`TSDOC_EDGE_CANONICAL_GRAPH=1`); setting the router module alone is only
+configuration and does not change a normal legacy-enrichment build.
+
+`ttsc-graph-router.config.json` routes the current repository. The analysis
+reads the router's raw `@ttsc/graph` artifact with `refresh: true`; it does not
+assume a separate `.ttsc/graph.json` file. Artifact contract `1.0.0`, raw/saved-file
+capabilities, producer/router provenance, and the exact `@ttsc/graph` binary
+version are checked before indexing. The complete node/edge snapshot is then
+atomically replaced in `.tsdoc/canonical-graph.db`; canonical IDs are never mixed
+into the legacy symbol tables.
+
+Build, structural analysis, and LSP saved-file refresh share the same
+`ProjectIndexer -> GraphRepository` boundary. LSP reads canonical impact,
+dependency, symbol, hover, and code-lens data from that revision. Unsaved buffers
+still use the TS5 syntax parser, but remain an in-memory, per-document overlay and
+never write SQLite. Saved-file refreshes are single-flight/coalesced, and a
+Build-created canonical DB is opened read-only when no router module is configured.
+Set the same `TSDOC_EDGE_GRAPH_ROUTER_MODULE` when starting the LSP to enable
+saved-file whole-project refreshes.
 
 ---
 
@@ -213,8 +253,8 @@ npm test           # Run tests
 | Symbols | 6,726 |
 | Relationships | 38,704 |
 | Relationship Types | 13/28 (46%) |
-| Test Suites | 191 |
-| Tests | 2,755 |
+| Test Suites | 190 |
+| Tests | 2,761 |
 | Build Time | 11s |
 
 ---

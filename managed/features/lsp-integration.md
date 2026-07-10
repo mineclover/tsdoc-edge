@@ -76,11 +76,20 @@ title: `↓${downstream} ↑${upstream}`
 ## 서비스 아키텍처
 
 ### TsdocEdgeService
-`src/lsp/service.ts:90-725`에서 LSP 서버와 SQLite 데이터베이스를 연결합니다.
+`src/lsp/service.ts`는 canonical graph revision과 legacy enrichment를 조합한다.
+`.tsdoc/canonical-graph.db`가 있으면 symbol lookup, hover, code lens, dependency,
+dependent, impact를 canonical node/edge에서 읽는다. legacy DB는 아직 canonical에 없는
+문서·테스트·endpoint 등 enrichment의 호환 경로다. 파일 단위 순환 의존성과 레이어
+위반 진단은 canonical impact 진단과 병합하되, 심볼 ID 자체는 alias 계약 전까지 섞지
+않는다.
 
 #### 모듈 구조
 - **CacheManager** (`cache-manager.ts`): TTL 기반 캐시 관리, 자동 정리, LRU eviction
 - **StatementManager** (`statement-manager.ts`): Prepared statement 관리, LRU eviction
+- **CanonicalGraphCoordinator** (`../indexer/CanonicalGraphCoordinator.ts`): 저장 파일의
+  whole-project graph refresh와 원자 교체
+- **CanonicalGraphLspView** (`canonical-graph-view.ts`): canonical id/file/evidence 기반
+  LSP 조회 projection
 
 #### 캐싱 전략
 `CacheManager`를 통해 4가지 명명된 캐시 운영:
@@ -117,15 +126,28 @@ title: `↓${downstream} ↑${upstream}`
 **findSymbolByName()**
 `service.ts:641-701` - 3단계 검색 (정확 일치 → 대소문자 무시 → 부분 일치)
 
+#### 저장소 쿼리
+
+Canonical path:
+
+- `canonical_graph_revisions` - contract/provenance와 active revision
+- `canonical_graph_nodes` - raw node payload
+- `canonical_graph_edges` - raw edge payload
+- `canonical_graph_state` - active pointer
+
+Revision과 node/edge는 한 transaction으로 교체되고 CAS가 오래된 비동기 refresh를
+막는다. legacy path는 `StatementManager`를 통한 prepared statement caching을 유지한다.
+
+Legacy 주요 테이블:
+
+- `symbols` - 문서/enrichment 심볼 정보
+- `unified_relationships` - 아직 전환되지 않은 관계
+
 #### 데이터베이스 쿼리
 `StatementManager`를 통한 Prepared statements 캐싱:
 - 최대 50개 statement 유지
 - LRU 방식으로 eviction
 - `prepareOnce()`: 일회성 동적 쿼리용
-
-주요 테이블:
-- `symbols` - 심볼 정보
-- `unified_relationships` - 심볼 간 관계
 
 ## 설정 및 실행
 
@@ -176,46 +198,64 @@ const serverOptions = { module: serverModule, transport: TransportKind.stdio }
 ```
 
 ### 데이터베이스 준비
-LSP 서버는 `.tsdoc/symbols.db`를 사용합니다. 초기 빌드가 필요합니다:
+Canonical saved-file refresh를 사용하려면 graph-router module을 지정하고 같은
+`ProjectIndexer -> GraphRepository` 경로로 초기 빌드를 실행한다:
 
 ```bash
-tsdoc-edge build src
+export TSDOC_EDGE_GRAPH_ROUTER_MODULE=/path/to/ttsc-graph-router/dist/artifact-source.js
+tsdoc-edge build src --canonical-graph
+node dist/lsp/server.js
 ```
+
+Build가 만든 `.tsdoc/canonical-graph.db`는 router runtime 환경 변수가 없는 LSP에서도
+schema/WAL 초기화를 하지 않는 read-only connection으로 읽을 수 있다. save/source
+watch event에서 외부 Build가 교체한 revision을 다시 읽지만, 새 revision을 직접 만들려면
+module 설정이 필요하다.
+legacy `.tsdoc/symbols.db`는 enrichment fallback 동안만 사용한다.
 
 ## 증분 빌드 (Incremental Build)
 
-LSP 서버가 시작되면 자동으로 증분 모드가 활성화됩니다. 파일 변경 시 전체 빌드 없이 해당 파일의 심볼만 업데이트됩니다.
+Canonical 모드에서는 단일 파일 edge patch를 하지 않는다. graph-router artifact가
+whole-project snapshot이므로 저장·삭제 이벤트마다 `refresh: true`로 다시 만들고
+`GraphRepository` 전체 revision을 교체한다. coordinator는 whole-project producer를
+single-flight로 직렬화하고 대기 요청을 coalesce한다. generation guard와 SQLite
+`BEGIN IMMEDIATE` compare-and-swap이 오래된 결과의 overwrite를 막는다.
 
 ### 동작 방식
 
-1. **서버 초기화**: `server.ts:147-155`에서 `enableIncrementalMode()` 호출
-2. **파일 수정 시**: 1초 디바운스 후 심볼 추출 (`server.ts:504-518`)
-3. **파일 저장 시**: 즉시 심볼 업데이트 (`server.ts:524-546`)
+1. **서버 초기화**: canonical DB가 있으면 active revision을 읽는다.
+2. **파일 수정 시**: TS5 syntax-only overlay를 즉시 메모리에 만들고, 파일별 1초
+   디바운스 후 진단을 publish한다.
+3. **파일 저장 시**: 해당 overlay를 먼저 제거하고 DB write 없이 whole-project canonical
+   refresh를 수행한다.
+4. **저장 성공 시**: 새 revision을 publish하고 열린 문서 전체 진단을 다시 계산한다.
+5. **파일 생성·변경·삭제 시**: 동적 watched-file registration이 같은 whole-project
+   replace를 실행해 stale
+   node와 incident edge를 함께 제거한다.
 
 ### IncrementalBuilder
 
-`src/lsp/incremental-builder.ts`에서 단일 파일 심볼 추출을 담당합니다.
+`src/lsp/incremental-builder.ts`는 canonical 모드에서 미저장 content의 syntax-only
+overlay extraction만 담당한다. `processContent()`는 SQLite를 호출하지 않는다.
 
 주요 메서드:
-- `extractFile(filePath)`: 디스크에서 파일 읽어 심볼 추출
-- `processContent(filePath, content)`: 버퍼 내용으로 심볼 추출 (저장 전)
-- `updateDatabase(result)`: 데이터베이스에 심볼 저장
-- `removeFile(filePath)`: 파일 삭제 시 심볼 제거
+- `processContent(filePath, content)`: 버퍼 내용을 메모리 overlay로 추출
+- `refreshCanonicalGraph(filePath?)`: 저장된 전체 project graph를 원자 교체
+- legacy fallback에서만 `extractFile`, `updateDatabase`, `removeFile`을 사용
 
 ### TsdocEdgeService 증분 메서드
 
-- `enableIncrementalMode()`: 쓰기 모드로 DB 재연결
+- `enableIncrementalMode()`: canonical 모드에서는 DB 없는 overlay extractor 활성화
 - `isIncrementalModeEnabled()`: 증분 모드 활성화 여부 확인
-- `processFileChange(filePath, content?)`: 파일 변경 처리
-- `handleFileDelete(filePath)`: 파일 삭제 처리
+- `isCanonicalGraphEnabled()`: saved-file whole-project refresh 사용 여부
+- `processFileChange(filePath, content)`: 미저장 overlay 갱신
+- `refreshCanonicalGraph(filePath?)`: save/delete 후 canonical revision 교체
+- `getUnsavedOverlay(filePath)`: 테스트/host용 overlay 조회
 
-### 증분 심볼 식별
-
-증분 빌드로 생성된 심볼은 `jsonl_line = -1`로 표시됩니다:
-
-```sql
-SELECT * FROM symbols WHERE jsonl_line = -1
-```
+현재 overlay ID는 아직 legacy syntax ID다. dirty file에서는 overlay가 hover, symbol,
+code lens, diagnostics, workspace search를 우선하고 이름·kind가 같은 저장 심볼의 impact만
+canonical peer에서 가져온다. persisted topology 자체에 edge delta로 merge하지는 않으며,
+canonical-id 기반 `GraphDelta`는 후속 parity 단계다.
 
 ## 메모리 관리
 
@@ -317,4 +357,3 @@ vscode.commands.registerCommand('tsdoc.showImpactAnalysis', (symbolId, direction
 - [[SymbolGraphFeatures]] - Dependency graph data
 - [[AnalysisFeatures]] - Code health metrics
 - [[CoreWorkflow]] - Build pipeline integration
-

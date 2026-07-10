@@ -12,7 +12,95 @@ canonical: true
 
 Learn how TSDoc Edge extracts symbols, analyzes relationships, and builds a queryable database from your TypeScript codebase.
 
+## Compiler toolchain
+
+Repository builds, type checks, and watch mode use `ttsc@0.16.8` with the native
+TypeScript `7.0.2` stable compiler:
+
+```bash
+npm run ttsc:version
+npm run typecheck
+npm run build
+npm run dev
+```
+
+`npm run build` removes `dist/` before compiling so deleted TS5 analyzers cannot
+survive as stale JavaScript or declaration files in the published package.
+
+`scripts/run-ttsc.cjs` resolves the platform package installed by the
+`typescript-native` alias and passes its absolute binary path to `ttsc`. This
+keeps the build compiler independent from the `typescript` 5.x package still
+used by the legacy Compiler API analyzers, `ts-jest`, and `ts-node`.
+Optional dependencies must remain enabled during `npm install`, because both
+`ttsc` and `typescript-native` obtain their platform binaries through optional
+packages.
+
+`tsconfig.ttsc.json` uses Node16 module semantics required by the TS7 compiler.
+The old `build:legacy`, `typecheck:legacy`, and `dev:legacy` scripts have been
+removed after the stable TS7 lane passed build, CLI, LSP, and test gates. The
+`typescript` 5.x package remains a runtime dependency while syntax/document
+analyzers, `ts-jest`, and the unsaved-buffer LSP path still use the Compiler API.
+
+## Canonical graph analysis
+
+`src/graph-analysis/` indexes one immutable `CanonicalProjectGraph` and exposes
+unambiguous `dependencies` (outgoing), `dependents` (incoming), change impact,
+degree metrics, raw-kind summaries, and relationship projection. Unknown edge
+kinds stay in the canonical graph and are not guessed into the legacy ontology.
+
+The first migrated analyzer is `--type=structural`. This is TSDoc Edge's local
+structural relationship projection over compiler-resolved `accesses`,
+`instantiates`, `extends`, and `implements` facts. It no longer creates a
+TypeScript 5 program and rescans heritage clauses:
+
+```bash
+export TSDOC_EDGE_GRAPH_ROUTER_MODULE=/path/to/ttsc-graph-router/dist/artifact-source.js
+tsdoc-edge relationship analyze --type=structural
+```
+
+The default router config is `ttsc-graph-router.config.json`, and the default
+repo id is the current directory name. Override them with `--router-config` and
+`--router-repo`. The module path is explicit until the private graph-router
+package has an installable distribution contract.
+
+The graph-router boundary is pinned to raw artifact contract `1.0.0`. The adapter
+validates its saved-file/raw capability record and complete producer, router,
+cache, project, and tsconfig provenance before `ProjectIndexer` accepts the dump.
+Actual compiler version remains unreported (`null`); the TypeScript 7.0 value is
+a compatibility target, not fabricated compiler provenance. A future diagnostic
+fact plane fails closed until the canonical repository has an explicit diagnostic
+contract.
+
+`GraphRepository` now stores each complete canonical
+`path#qualifiedName:kind` node/edge revision in `.tsdoc/canonical-graph.db`.
+Revision, nodes, edges, and the active pointer change in one SQLite transaction;
+rollback preserves the old graph, and rename/delete removes stale nodes and
+incident edges together. These tables are separate from legacy symbols and
+relationships. Structural ontology projections therefore remain read-only with
+respect to the legacy DB, while the source canonical snapshot is persisted.
+`--type=all` requires a router module instead of silently skipping this plane.
+
+`BuildCommand` performs the same canonical refresh before its legacy per-file
+hash short-circuit only when `--canonical-graph` (or
+`TSDOC_EDGE_CANONICAL_GRAPH=1`) explicitly enables it. The router module and
+config variables are parameters, not implicit activation switches, so an LSP
+environment cannot silently change ordinary Build behavior:
+
+```bash
+tsdoc-edge build src --canonical-graph \
+  --router-module=/path/to/ttsc-graph-router/dist/artifact-source.js
+```
+
+The legacy symbol/document/test enrichment remains available during migration,
+but the redundant second `InheritanceAnalyzer` pass has been removed. Canonical
+topology and legacy enrichment are separate data planes rather than mixed IDs.
+
 ## Overview
+
+> 코드 그래프 생성과 저장의 canonical 경로는
+> `graph-router -> [[ProjectIndexer]] -> GraphRepository`다. 아래
+> `ASTSymbolExtractor -> DatabaseManager` 흐름은 문서·테스트·endpoint·block
+> enrichment를 유지하는 legacy data plane이며 canonical IDs와 섞지 않는다.
 
 The build pipeline transforms TypeScript source code into a comprehensive symbol graph with relationships:
 
@@ -403,4 +491,3 @@ tsdoc-edge validate-docs managed
 - [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:38
 - [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:128
 - [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:187
-
