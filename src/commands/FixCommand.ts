@@ -141,7 +141,7 @@ export class FixCommand extends BaseCommand {
       console.log();
 
       // Import DocumentationFixer dynamically
-      const { DocumentationFixer } = await import('../fixer/DocumentationFixer');
+      const { DocumentationFixer } = await import('../fixer/DocumentationFixer.js');
       const fixer = new DocumentationFixer();
 
       let totalFixed = 0;

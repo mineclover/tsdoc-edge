@@ -132,6 +132,7 @@ describe('IncrementalBuilder', () => {
       expect(result.errors).toHaveLength(0);
       const symbolNames = result.symbols.map((s) => s.name);
       expect(symbolNames).toContain('ContentClass');
+      expect(mockDb.transaction).not.toHaveBeenCalled();
     });
 
     it('should handle syntax errors gracefully', () => {

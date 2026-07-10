@@ -21,8 +21,11 @@ import { RelationshipInferenceEngine } from '../analyzer/RelationshipInferenceEn
 import { EndpointDetectionAnalyzer } from '../analyzer/EndpointDetectionAnalyzer';
 import { BlockChunkAnalyzer } from '../analyzer/BlockChunkAnalyzer';
 import { ExposureAnalyzer } from '../analyzer/ExposureAnalyzer';
-import { InheritanceAnalyzer } from '../analyzer/InheritanceAnalyzer';
 import { EntryPointDetector } from '../analyzer/EntryPointDetector';
+import {
+  CanonicalGraphCoordinator,
+  type CanonicalGraphCoordinatorOptions,
+} from '../indexer';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import type { TestSymbol } from '../types/test-symbols';
@@ -31,6 +34,12 @@ import type { UnifiedRelationship } from '../types/relationships/unified';
 import { XmlBuilder } from '../output/XmlBuilder';
 import { BuildResultSchema } from '../output/schemas';
 import * as ts from 'typescript';
+
+export interface BuildCommandDependencies {
+  readonly canonicalCoordinatorFactory?: (
+    options: CanonicalGraphCoordinatorOptions
+  ) => CanonicalGraphCoordinator;
+}
 
 /**
  * Command for building symbol database from source files
@@ -67,7 +76,10 @@ import * as ts from 'typescript';
 export class BuildCommand extends BaseCommand {
   private configManager: ConfigManager;
 
-  constructor(configManager?: ConfigManager) {
+  constructor(
+    configManager?: ConfigManager,
+    private readonly dependencies: BuildCommandDependencies = {}
+  ) {
     super();
     this.configManager = configManager || ConfigManager.getInstance();
   }
@@ -111,7 +123,13 @@ export class BuildCommand extends BaseCommand {
   Options:
     --force          Force full rebuild (ignore file hashes)
     --incremental    Incremental build (only changed files, default)
-    --exclude-tests  Exclude test files (.test.ts, .spec.ts) from indexing`;
+    --exclude-tests  Exclude test files (.test.ts, .spec.ts) from indexing
+    --canonical-graph  Explicitly refresh and persist the canonical ttsc graph revision
+    --router-module=<path>  Built graph-router artifact-source entrypoint
+    --router-config=<path>  Router config (default: ttsc-graph-router.config.json)
+    --router-repo=<id>      Router repo id (default: project directory name)
+    --graph-tsconfig=<path> Project graph tsconfig (default: tsconfig.ttsc.json)
+    --canonical-graph-db=<path> Canonical revision database`;
   }
 
   // Override print methods to suppress console output (use XML output instead)
@@ -138,7 +156,7 @@ export class BuildCommand extends BaseCommand {
       // Parse arguments
       const forceRebuild = args.includes('--force');
       const excludeTests = args.includes('--exclude-tests');
-      const targetPath = args.find(arg => !arg.startsWith('--')) || 'src';
+      const targetPath = this.firstPositionalArgument(args) || 'src';
 
       this.printHeader('TSDoc Edge - Build Database');
 
@@ -157,6 +175,8 @@ export class BuildCommand extends BaseCommand {
         this.printError(`Path not found: ${targetPath}`);
         return this.failure(`Path not found: ${targetPath}`);
       }
+
+      const canonicalGraph = await this.refreshCanonicalGraph(args);
 
       this.printInfo(`Building database from: ${targetPath}`);
       console.log();
@@ -181,6 +201,7 @@ export class BuildCommand extends BaseCommand {
 
       // Initialize database
       const dbManager = new DatabaseManager(dbPath, jsonlPath);
+      try {
       const extractor = new ASTSymbolExtractor();
       const testParser = new TestSymbolParser();
       const idGenerator = new SymbolIdentifierGenerator(process.cwd());
@@ -225,8 +246,11 @@ export class BuildCommand extends BaseCommand {
 
       if (files.length === 0) {
         this.printSuccess('No files to process - all files are up to date');
-        dbManager.close();
-        return this.success('No changes detected');
+        return this.success(
+          canonicalGraph
+            ? `Canonical graph ${canonicalGraph.fingerprint.slice(0, 12)} persisted; no legacy changes detected`
+            : 'No changes detected'
+        );
       }
 
       this.printInfo(`Processing ${files.length} file(s)...`);
@@ -245,8 +269,6 @@ export class BuildCommand extends BaseCommand {
       const endpointAnalyzer = new EndpointDetectionAnalyzer(program);
       const blockAnalyzer = new BlockChunkAnalyzer(program);
       const exposureAnalyzer = new ExposureAnalyzer(process.cwd());
-      const symbolMap = new Map();
-      const inheritanceAnalyzer = new InheritanceAnalyzer(program, symbolMap);
       const entryPointDetector = new EntryPointDetector(program, process.cwd());
 
       const result = {
@@ -455,9 +477,6 @@ export class BuildCommand extends BaseCommand {
                 result.errors.push(`Failed to insert: ${symbol.name} in ${filePath}`);
               }
 
-              // Store symbol in map for inheritance analysis
-              symbolMap.set(id, fullSymbol);
-
               // Analyze exposure for exported symbols
               if (symbol.isExported) {
                 try {
@@ -639,6 +658,7 @@ export class BuildCommand extends BaseCommand {
 
       // Insert all relationships after all symbols are collected
       this.printInfo('Inserting relationships...');
+      let inheritanceRelationshipsInserted = 0;
       for (const relationship of allRelationships) {
         try {
           // Handle re-export relationships specially
@@ -722,6 +742,9 @@ export class BuildCommand extends BaseCommand {
 
             if (success) {
               result.relationshipsInserted++;
+              if (relationship.type === 'extends' || relationship.type === 'implements') {
+                inheritanceRelationshipsInserted++;
+              }
             }
           } else {
             // Symbol not found in map - likely an external type (e.g., EventEmitter, Promise)
@@ -997,7 +1020,7 @@ export class BuildCommand extends BaseCommand {
 
         // 7. Test Example Extraction (extract test cases as documentation examples)
         this.printInfo('Extracting test examples for documentation...');
-        const { TestExampleExtractor } = await import('../analyzer/TestExampleExtractor');
+        const { TestExampleExtractor } = await import('../analyzer/TestExampleExtractor.js');
         const exampleExtractor = new TestExampleExtractor(dbManager);
         const testExamples = exampleExtractor.extractAllExamples();
         const exampleRelationships = exampleExtractor.createRelationships(testExamples);
@@ -1008,70 +1031,6 @@ export class BuildCommand extends BaseCommand {
 
       } catch (error) {
         this.printWarning(`Failed to analyze semantic relationships: ${error instanceof Error ? error.message : String(error)}`);
-      }
-
-      // Analyze inheritance relationships
-      this.printInfo('Analyzing inheritance relationships...');
-      let inheritanceRelationshipsInserted = 0;
-
-      try {
-        const classAndInterfaceSymbols = Array.from(symbolMap.values()).filter(
-          s => s.type === 'class' || s.type === 'interface'
-        );
-
-        for (const symbol of classAndInterfaceSymbols) {
-          try {
-            const inheritanceRels = inheritanceAnalyzer.analyzeSymbol(symbol);
-
-            for (const inhRel of inheritanceRels) {
-              const relId = `inheritance-${inhRel.from}-${inhRel.to}`;
-              // Map InheritanceType to unified RelationshipType
-              const unifiedType = inhRel.type === 'extends' ? 'inheritance' :
-                                  inhRel.type === 'implements' ? 'implementation' :
-                                  'inheritance'; // fallback for 'mixins'
-              const success = dbManager.insertUnifiedRelationship({
-                id: relId,
-                type: unifiedType,
-                category: 'structural',
-                fromSymbols: [inhRel.from],
-                toSymbols: [inhRel.to],
-                direction: inhRel.direction,
-                strength: 'strong',
-                evidence: [{
-                  type: 'code',
-                  source: inhRel.filePath,
-                  lineNumber: inhRel.line,
-                  confidence: 1.0,
-                }],
-                discoveredBy: 'inheritance-analyzer',
-                confidence: 1.0,
-                filePath: inhRel.filePath,
-                line: inhRel.line,
-                properties: {
-                  inheritanceType: inhRel.type, // Store original type
-                  abstractionFrom: inhRel.abstractionLevel.from,
-                  abstractionTo: inhRel.abstractionLevel.to,
-                  hierarchyDepth: inhRel.hierarchyDepth,
-                  inheritanceChain: JSON.stringify(inhRel.inheritanceChain),
-                  overriddenMembers: inhRel.overriddenMembers.length > 0 ? JSON.stringify(inhRel.overriddenMembers) : undefined,
-                },
-                description: `${inhRel.from} ${inhRel.type} ${inhRel.to} (hierarchy depth: ${inhRel.hierarchyDepth})`,
-              });
-
-              if (success) {
-                inheritanceRelationshipsInserted++;
-              }
-            }
-          } catch (inhError) {
-            // Non-critical, continue
-          }
-        }
-
-        if (inheritanceRelationshipsInserted > 0) {
-          this.printSuccess(`Inheritance: ${inheritanceRelationshipsInserted} relationships`);
-        }
-      } catch (error) {
-        this.printWarning(`Failed to analyze inheritance: ${error instanceof Error ? error.message : String(error)}`);
       }
 
       // Create endpoint-handler relationships
@@ -1136,8 +1095,6 @@ export class BuildCommand extends BaseCommand {
         this.updateSyncMetadata(dbManager, filePath);
       }
 
-      dbManager.close();
-
       // Output build result as XML
       new XmlBuilder(BuildResultSchema)
         .section('statistics', {
@@ -1162,16 +1119,106 @@ export class BuildCommand extends BaseCommand {
           entryPointsInserted: result.entryPointsInserted,
           exposureAnalyzed: result.exposureAnalyzed,
           durationMs: duration,
+          ...(canonicalGraph
+            ? {
+                canonicalGraphNodes: canonicalGraph.nodeCount,
+                canonicalGraphEdges: canonicalGraph.edgeCount,
+              }
+            : {}),
         })
         .section('paths', {
           database: dbPath,
           registry: registryPath,
+          ...(canonicalGraph
+            ? { canonicalGraphDatabase: canonicalGraph.databasePath }
+            : {}),
         })
         .section('errors', result.errors.map(err => ({ message: err })))
         .print();
 
-      return this.success(`Built database with ${result.symbolsInserted} symbols`);
+      return this.success(
+        `Built database with ${result.symbolsInserted} symbols${canonicalGraph ? ` and canonical graph ${canonicalGraph.fingerprint.slice(0, 12)}` : ''}`
+      );
+      } finally {
+        dbManager.close();
+      }
     });
+  }
+
+  /** Refresh the canonical graph before legacy per-file hash short-circuiting. */
+  private async refreshCanonicalGraph(args: string[]): Promise<{
+    fingerprint: string;
+    nodeCount: number;
+    edgeCount: number;
+    databasePath: string;
+  } | null> {
+    const enabled =
+      args.includes('--canonical-graph') || process.env.TSDOC_EDGE_CANONICAL_GRAPH === '1';
+    if (!enabled) return null;
+
+    const moduleSpecifier =
+      this.getOption(args, '--router-module') ?? process.env.TSDOC_EDGE_GRAPH_ROUTER_MODULE;
+    if (!moduleSpecifier) {
+      throw new Error(
+        '--canonical-graph requires --router-module or TSDOC_EDGE_GRAPH_ROUTER_MODULE'
+      );
+    }
+
+    const rootDir = this.configManager.getProjectRoot();
+    const coordinatorOptions: CanonicalGraphCoordinatorOptions = {
+      rootDir,
+      moduleSpecifier,
+      configPath:
+        this.getOption(args, '--router-config') ??
+        process.env.TSDOC_EDGE_GRAPH_ROUTER_CONFIG,
+      repoId:
+        this.getOption(args, '--router-repo') ??
+        process.env.TSDOC_EDGE_GRAPH_ROUTER_REPO,
+      tsconfigPath:
+        this.getOption(args, '--graph-tsconfig') ??
+        process.env.TSDOC_EDGE_GRAPH_TSCONFIG,
+      repositoryPath:
+        this.getOption(args, '--canonical-graph-db') ??
+        process.env.TSDOC_EDGE_CANONICAL_GRAPH_DB,
+    };
+    const coordinator = this.dependencies.canonicalCoordinatorFactory
+      ? this.dependencies.canonicalCoordinatorFactory(coordinatorOptions)
+      : new CanonicalGraphCoordinator(coordinatorOptions);
+
+    try {
+      const refreshed = await coordinator.refresh();
+      if (refreshed.status !== 'committed') {
+        throw new Error('Canonical graph refresh was superseded unexpectedly');
+      }
+      return {
+        fingerprint: refreshed.graph.fingerprint,
+        nodeCount: refreshed.graph.nodes.length,
+        edgeCount: refreshed.graph.edges.length,
+        databasePath: coordinator.repositoryPath,
+      };
+    } finally {
+      coordinator.close();
+    }
+  }
+
+  /** Find the source-directory positional argument without consuming option values. */
+  private firstPositionalArgument(args: readonly string[]): string | undefined {
+    const valuedOptions = new Set([
+      '--router-module',
+      '--router-config',
+      '--router-repo',
+      '--graph-tsconfig',
+      '--canonical-graph-db',
+    ]);
+    for (let index = 0; index < args.length; index++) {
+      const argument = args[index];
+      if (valuedOptions.has(argument)) {
+        index++;
+        continue;
+      }
+      if (!argument.startsWith('-')) return argument;
+    }
+    return undefined;
   }
 
   /**
