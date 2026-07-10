@@ -177,9 +177,16 @@ describe('TtscGraphRouterArtifactAdapter', () => {
     );
   });
 
-  it('fails closed when the producer starts returning an unsupported diagnostic plane', async () => {
+  it('normalizes diagnostics into the separate canonical diagnostics plane', async () => {
     const artifact = validArtifact();
-    (artifact.dump as typeof artifact.dump & { diagnostics?: unknown[] }).diagnostics = [];
+    (artifact.dump as typeof artifact.dump & { diagnostics?: unknown[] }).diagnostics = [
+      {
+        message: 'Cannot find name',
+        severity: 'error',
+        file: 'src/index.ts',
+        startLine: 4,
+      },
+    ];
     artifact.capabilities.diagnosticsCollected = true;
     const adapter = new TtscGraphRouterArtifactAdapter({
       configPath: '/workspace/router.json',
@@ -191,9 +198,16 @@ describe('TtscGraphRouterArtifactAdapter', () => {
       }),
     });
 
-    await expect(adapter.load({ rootDir })).rejects.toThrow(
-      'canonical node/edge contract does not yet persist diagnostics'
-    );
+    const loaded = await adapter.load({ rootDir });
+    expect(loaded.diagnostics).toEqual([
+      expect.objectContaining({
+        message: 'Cannot find name',
+        severity: 'error',
+        startLine: 4,
+        category: 'compiler',
+      }),
+    ]);
+    expect(loaded.provenance.diagnosticsCollected).toBe(true);
   });
 
   it('rejects diagnostics when field presence and capability disagree', async () => {

@@ -6,6 +6,7 @@
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { canonicalFsPath } from './canonical-path';
+import { normalizeRouterDiagnostics } from './diagnostics-contract';
 import type {
   ProjectGraphInput,
   ProjectGraphSource,
@@ -196,12 +197,16 @@ export class TtscGraphRouterArtifactAdapter implements ProjectGraphSource {
 
     const loadedRoot = targetRoot;
     const loadedTsconfig = targetTsconfig;
+    const diagnostics = loaded.capabilities.diagnosticsCollected
+      ? normalizeRouterDiagnostics(loaded.dump.diagnostics ?? [], { rootDir: loadedRoot })
+      : undefined;
     return {
       rootDir: loadedRoot,
       tsconfigPath: loadedTsconfig,
       // Unknown producer fields and kinds are intentionally preserved.
       nodes: loaded.dump.nodes.map((node) => ({ ...node })),
       edges: loaded.dump.edges.map((edge) => ({ ...edge })),
+      diagnostics,
       provenance: {
         adapter: this.id,
         producer: loaded.producer.name,
@@ -296,9 +301,9 @@ export class TtscGraphRouterArtifactAdapter implements ProjectGraphSource {
       );
     }
     if (capabilities.diagnosticsCollected) {
-      throw new Error(
-        'ttsc graph diagnostics were collected, but the canonical node/edge contract does not yet persist diagnostics'
-      );
+      if (!diagnosticsPresent) {
+        throw new Error('ttsc graph artifact declared diagnostics but dump.diagnostics is missing');
+      }
     }
 
     const provenance = artifact.provenance;
