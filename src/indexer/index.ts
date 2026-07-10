@@ -1,4 +1,7 @@
 export {
+  CanonicalAliasContext,
+} from './CanonicalAliasContext';
+export {
   CanonicalGraphCoordinator,
   type CanonicalGraphCoordinatorDependencies,
   type CanonicalGraphCoordinatorOptions,
@@ -24,6 +27,11 @@ export {
   type CanonicalDiagnosticSeverity,
 } from './diagnostics-contract';
 export { generateLegacyId, normalizeLegacyKind } from './legacy-id';
+export {
+  verifyLegacyAstParity,
+  type LegacyParityMismatch,
+  type LegacyParityResult,
+} from './LegacyAstParityAdapter';
 export {
   InMemoryAliasResolver,
   materializeAliases,
