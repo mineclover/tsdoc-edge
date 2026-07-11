@@ -368,7 +368,7 @@ tsdoc-edge symbol-query managed info "Symbol2"
 
 ```bash
 # Unit tests
-npm test src/commands/SymbolFixCommand.test.ts
+npm test -- SymbolFixCommand.test.ts
 
 # Integration tests
 ./scripts/test-symbol-fix.sh
@@ -394,4 +394,3 @@ tsdoc-edge symbol-fix managed --dry-run
 - [[SymbolQueryCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolQueryCommand.md:153
 - [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:91
 - [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:144
-

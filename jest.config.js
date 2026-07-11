@@ -1,20 +1,30 @@
 module.exports = {
-  preset: 'ts-jest',
   testEnvironment: 'node',
-  roots: ['<rootDir>/src'],
-  testMatch: ['**/__tests__/**/*.test.ts', '**/?(*.)+(spec|test).ts'],
-  testPathIgnorePatterns: ['/node_modules/', '/dist/', 'src/types/'],
-  collectCoverageFrom: ['src/**/*.ts', '!src/**/*.d.ts', '!src/**/*.test.ts', '!src/**/*.spec.ts'],
+  roots: ['<rootDir>/.test-dist'],
+  testMatch: ['**/__tests__/**/*.test.js'],
+  testPathIgnorePatterns: ['/node_modules/', '/dist/'],
+  moduleFileExtensions: ['js', 'json', 'node'],
+  transform: {
+    '^.+\\.js$': [
+      'babel-jest',
+      {
+        babelrc: false,
+        configFile: false,
+      },
+    ],
+  },
+  collectCoverageFrom: [
+    '.test-dist/**/*.js',
+    '!.test-dist/**/*.test.js',
+    '!.test-dist/**/*.spec.js',
+    '!.test-dist/**/__tests__/**',
+  ],
+  coverageProvider: 'babel',
   coverageDirectory: 'coverage',
   coverageReporters: ['text', 'lcov', 'html'],
-  // Memory optimization
-  maxWorkers: 2,
-  workerIdleMemoryLimit: '256MB',
-  // Clear mocks and modules between tests
+  maxWorkers: 1,
   clearMocks: true,
   restoreMocks: true,
-  // Global setup to reset singletons after each test file
-  setupFilesAfterEnv: ['<rootDir>/src/__tests__/setup.ts'],
-  // Reduce memory by not caching transforms
+  setupFilesAfterEnv: ['<rootDir>/.test-dist/__tests__/setup.js'],
   cache: false,
 };

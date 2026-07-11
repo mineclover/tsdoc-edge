@@ -13,6 +13,9 @@ build/
 # Testing
 coverage/
 .nyc_output/
+.test-dist/
+.test-dist.lock
+.test-results/
 
 # Environment
 .env

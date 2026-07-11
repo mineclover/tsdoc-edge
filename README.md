@@ -228,15 +228,22 @@ npm run ttsc:version # Verify ttsc + native TypeScript toolchain
 npm run typecheck    # Type-check with ttsc / TypeScript 7
 npm run build        # Compile with ttsc
 npm run dev          # ttsc watch mode
-npm test             # Run the TypeScript 5 / ts-jest test lane
+npm test             # TS7 typecheck + AOT compile + JavaScript-only Jest
+npm run test:watch   # Safe serial TS7 compile/test watch loop
 ```
 
 The build compiler and runtime parser are intentionally separated during the
 TypeScript 7 migration. `ttsc` uses the stable `typescript-native` 7.0.2 toolchain,
 while the `typescript` 5.x dependency remains the legacy Compiler API used by
-syntax/document analyzers, the unsaved-buffer LSP path, and Jest tests. The old
+syntax/document analyzers and the unsaved-buffer LSP path. Tests are compiled by
+TS7 into `.test-dist` before Jest executes JavaScript; `ts-jest` has been removed. The old
 `build:legacy`, `typecheck:legacy`, and `dev:legacy` lanes have been removed;
 TS5 is a runtime compatibility dependency, not a second build compiler.
+
+The repository test wiring is complete, while the release runtime matrix is still being
+qualified. Node 22 with an ABI-matched native dependency has passed the full suite repeatedly;
+macOS Node 24/V8 13.6 still shows an intermittent Jest GC crash. See
+`managed/workflows/ts7-test-compilation-lane.md` for the exact boundary and remaining gate.
 
 Compiler-resolved structural analysis now uses the canonical graph:
 

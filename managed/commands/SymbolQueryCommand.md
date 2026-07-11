@@ -234,7 +234,7 @@ tsdoc-edge symbol-query managed info "<symbol-without-primary>"
 
 ```bash
 # Unit tests
-npm test src/commands/SymbolQueryCommand.test.ts
+npm test -- SymbolQueryCommand.test.ts
 
 # Integration tests
 ./scripts/test-symbol-query.sh
@@ -264,4 +264,3 @@ tsdoc-edge symbol-query managed info "BuildCommand"
 - [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:90
 - [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:143
 - [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:121
-

@@ -73,12 +73,42 @@ function main() {
     env,
     stdio: 'inherit',
   });
+  let forwardedSignal;
+  const signalExitCodes = {
+    SIGINT: 130,
+    SIGTERM: 143,
+    SIGKILL: 137,
+  };
+  const forwardSignal = (signal) => {
+    forwardedSignal = signal;
+    if (child.exitCode === null && child.signalCode === null) {
+      child.kill(signal);
+    }
+  };
+  const onSigint = () => forwardSignal('SIGINT');
+  const onSigterm = () => forwardSignal('SIGTERM');
+  const removeSignalHandlers = () => {
+    process.removeListener('SIGINT', onSigint);
+    process.removeListener('SIGTERM', onSigterm);
+  };
+
+  process.once('SIGINT', onSigint);
+  process.once('SIGTERM', onSigterm);
+  let settled = false;
+  const finish = (exitCode) => {
+    if (settled) {
+      return;
+    }
+    settled = true;
+    removeSignalHandlers();
+    process.exitCode = exitCode;
+  };
   child.once('error', (error) => {
     console.error(error.message);
-    process.exitCode = 1;
+    finish(1);
   });
-  child.once('exit', (code) => {
-    process.exitCode = code ?? 1;
+  child.once('close', (code, signal) => {
+    finish(code ?? signalExitCodes[forwardedSignal ?? signal] ?? 1);
   });
 }
 

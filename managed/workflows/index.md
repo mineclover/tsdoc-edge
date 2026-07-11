@@ -163,7 +163,7 @@ compiler-evidence 기반 spec governance로 확장하는 구현 계획.
 
 **Tracks**:
 
-- Current next: TS7 test compilation → runner-neutral test evidence
+- Current next: runner-neutral test evidence; P4 runtime qualification in parallel
 - Legacy/canonical differential baseline
 - ttsc capability와 analyzer 소유권 판정
 - Canonical provider와 Spec Graph 계약
@@ -175,18 +175,18 @@ compiler-evidence 기반 spec governance로 확장하는 구현 계획.
 ### [[TS7 Test Compilation Lane]]
 
 **Path**: `ts7-test-compilation-lane.md`
-**Priority**: ⭐⭐⭐ Current prerequisite
+**Priority**: Repository wiring implemented; runtime qualification pending
 
 TypeScript 7로 source와 test를 선컴파일하고 Jest가 JavaScript만 실행하도록 전환하는
-P4.0 구현 절차. `ts-jest` 제거, parity/coverage gate, SWC fallback과 다음 runner-neutral
-evidence adapter handoff를 정의합니다.
+P4.0 구현과 검증 기록. `ts-jest` 제거, parity/coverage gate, safe serial watch와 다음
+runner-neutral evidence adapter handoff를 정의합니다.
 
 **Target Flow**:
 
 1. TS7 no-emit typecheck
 2. TS7 AOT compile to `.test-dist`
 3. Jest JavaScript-only execution
-4. Full parity 후 `ts-jest` 제거
+4. JavaScript-only Jest 실행과 TypeScript source-map coverage
 
 ---
 

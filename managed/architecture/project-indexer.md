@@ -81,11 +81,11 @@ normalizer가 v1 assembler에 전달할 때만 `compatibilityTsconfigPath` bridg
 달라 현재 AST 기반 코드와 `ts-jest`를 동시에 깨뜨리므로, build compiler 전환과
 runtime API 전환을 분리한다.
 
-Test transformer는 [[TS7 Test Compilation Lane]] P4.0에서 별도로 정리한다. 목표는
-source/test를 `ttsc`/TypeScript 7로 `.test-dist`에 선컴파일하고 Jest가 JavaScript만
-실행하게 한 뒤 `ts-jest`를 제거하는 것이다. 이 결정은 test toolchain의 TS5 결합을
-제거하지만, legacy analyzer·문서 변환기·LSP syntax overlay가 직접 사용하는
-`typescript@5.9.x` runtime 제거를 의미하지 않는다.
+Test transformer는 [[TS7 Test Compilation Lane]] P4.0에서 별도로 정리했다. source/test를
+`ttsc`/TypeScript 7로 `.test-dist`에 선컴파일하고 Jest가 JavaScript만 실행하며,
+`ts-jest`는 제거됐다. 이 결정은 test toolchain의 TS5 결합을 제거하지만, legacy
+analyzer·문서 변환기·LSP syntax overlay가 직접 사용하는 `typescript@5.9.x` runtime
+제거를 의미하지 않는다.
 
 graph-router raw artifact contract `1.0.0`은 raw fact plane, saved-file snapshot,
 합성 구조 없음, unsaved buffer 없음, one-based evidence, unknown field 보존을
@@ -145,6 +145,7 @@ context는 delta digest에 참여하며 apply 시 persisted base provenance와 e
 | --- | --- | --- |
 | Raw artifact API | 구현 | graph-router contract `1.0.0` / capability / provenance |
 | Repository ttsc compiler lane | 구현 | `scripts/run-ttsc.cjs` / `tsconfig.ttsc.json` |
+| TS7 test compilation lane | wiring cutover; runtime qualification pending | `tsconfig.test.ttsc.json` / `.test-dist` / JavaScript-only Jest |
 | TS-version-neutral contract | 구현 | `src/indexer/contracts.ts` |
 | Canonical assembler | 구현 | `src/indexer/ProjectIndexer.ts` |
 | graph-router adapter | 구현 | `src/indexer/TtscGraphRouterArtifactAdapter.ts` |
@@ -170,13 +171,10 @@ release gate로 승격하고 신규/rename overlay edge를 saved-file refresh �
 
 현재 TS5 정리 범위도 구분한다. 별도 legacy build/typecheck/watch lane,
 `ImplementationAnalyzer`, Build의 중복 `InheritanceAnalyzer` pass, 사용되지 않던
-TypeChecker 초기화는 제거되었다. 그러나 구문·문서 변환기, `ts-jest`, LSP 미저장
+TypeChecker 초기화와 `ts-jest`는 제거되었다. 그러나 구문·문서 변환기와 LSP 미저장
 버퍼 extractor가 Compiler API를 사용하므로 `typescript@5.9.x` runtime dependency
-자체는 아직 제거 대상이 아니다.
-
-P4.0 완료 후 위 목록에서 `ts-jest`는 제거되지만 나머지 runtime consumer 판정은 그대로
-유지한다. P4.0 이전에는 현재 문장이 구현 상태를, [[TS7 Test Compilation Lane]]은 승인된
-다음 변경 절차를 나타낸다.
+자체는 아직 제거 대상이 아니다. [[TS7 Test Compilation Lane]]은 repository wiring cutover
+증거와 남은 Node engines/native dependency 정렬 및 clean-install release gate를 소유한다.
 
 Canonical structural source graph는 별도 revision tables에 영속화한다. projection을
 legacy `unified_relationships`에 복제하지 않고, revision-scoped alias table을 통해

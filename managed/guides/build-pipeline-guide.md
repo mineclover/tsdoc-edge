@@ -30,7 +30,7 @@ survive as stale JavaScript or declaration files in the published package.
 `scripts/run-ttsc.cjs` resolves the platform package installed by the
 `typescript-native` alias and passes its absolute binary path to `ttsc`. This
 keeps the build compiler independent from the `typescript` 5.x package still
-used by the legacy Compiler API analyzers, `ts-jest`, and `ts-node`.
+used by the legacy Compiler API analyzers and `ts-node`.
 Optional dependencies must remain enabled during `npm install`, because both
 `ttsc` and `typescript-native` obtain their platform binaries through optional
 packages.
@@ -39,7 +39,25 @@ packages.
 The old `build:legacy`, `typecheck:legacy`, and `dev:legacy` scripts have been
 removed after the stable TS7 lane passed build, CLI, LSP, and test gates. The
 `typescript` 5.x package remains a runtime dependency while syntax/document
-analyzers, `ts-jest`, and the unsaved-buffer LSP path still use the Compiler API.
+analyzers and the unsaved-buffer LSP path still use the Compiler API.
+
+Tests use the same TS7 authority through a separate deterministic lane:
+
+```bash
+npm run test:typecheck # source/test/setup no-emit gate
+npm run test:compile   # emit .test-dist and copy runtime assets
+npm run test:run       # validate manifest, then execute emitted JavaScript
+npm test               # run all three gates in order
+npm run test:watch     # serial compile/test rerun on source changes
+```
+
+`ts-jest` is not part of this pipeline. `babel-jest` receives emitted JavaScript only and
+preserves Jest mock hoisting; external source maps restore stack traces and coverage to
+`src/*.ts`. Standalone `test:run` rejects missing, stale, or modified `.test-dist` output using
+the compile completion manifest. The conservative watch coordinator uses one-shot compile/test
+cycles because
+the installed `ttsc@0.16.8` persistent watcher does not exclude the resolved `.test-dist`
+output directory.
 
 ## Canonical graph analysis
 

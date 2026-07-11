@@ -1,0 +1,14 @@
+{
+  "extends": "./tsconfig.ttsc.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./.test-dist",
+    "declaration": false,
+    "declarationMap": false,
+    "sourceMap": true,
+    "inlineSources": true,
+    "noEmitOnError": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", ".test-dist"]
+}

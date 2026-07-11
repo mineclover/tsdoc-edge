@@ -5,8 +5,8 @@
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { UsageCommand } from '../../commands/UsageCommand';
 import { UsageTracker } from '../../analytics/UsageTracker';
+import { UsageCommand } from '../../commands/UsageCommand';
 
 describe('UsageCommand', () => {
   let command: UsageCommand;
@@ -73,10 +73,12 @@ describe('UsageCommand', () => {
     });
 
     it('should export to default path if not specified', async () => {
+      const exportToJSON = jest.spyOn(tracker, 'exportToJSON').mockReturnValue(true);
+
       const result = await command.execute(['export']);
 
       expect(result.exitCode).toBe(0);
-      // Should export to cwd
+      expect(exportToJSON).toHaveBeenCalledWith('usage-analytics.json');
     });
 
     it('should clear analytics data', async () => {

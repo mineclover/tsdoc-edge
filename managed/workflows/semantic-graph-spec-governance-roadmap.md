@@ -65,7 +65,7 @@ graph와 비교한다.
   합치지 않는다.
 - 모든 언어와 프레임워크를 첫 릴리스에서 지원하지 않는다.
 - TS5 runtime dependency를 canonical cutover와 동시에 제거하지 않는다. `ts-jest` test
-  transformer는 P4.0에서 제거하되, 문서 파싱과 미저장 syntax extraction을 포함한 runtime
+  transformer는 P4.0에서 제거됐지만, 문서 파싱과 미저장 syntax extraction을 포함한 runtime
   Compiler API consumer는 별도 소유권 판정 후 이관한다.
 
 ## 현재 기준선
@@ -129,27 +129,30 @@ phase 완료 조건으로 계속 추적한다.
 - [x] evidence/enrichment/policy immutable exact-pin revision store kernel
 - [x] exact spec-to-code binding과 minimal conformance kernel
 - [x] strict JSON convention pack compiler와 `convention check` saved-revision CLI canary
-- [ ] P4.0 TS7 test compilation → Jest JavaScript-only execution cutover
+- [x] P4.0 repository wiring: TS7 AOT → Jest JavaScript-only execution
+- [ ] P4.0 runtime/release qualification: Node contract와 clean-install matrix
 - [ ] LSP spec diagnostics와 CodeAction
 - [ ] 외부 TypeScript library reference pilot
 - [ ] provider SDK와 non-ttsc provider pilot
 
-### 다음 선행 루프 — P4.0 TS7 test compilation
+### 저장소 wiring 완료 — P4.0 TS7 test compilation
 
 다음 product loop인 evidence collector를 시작하기 전에 test toolchain 자체가 TS7 source를
-검증하도록 경계를 닫는다. 목표 경로는 `test:typecheck → test:compile → test:run`이며,
+검증하도록 경계를 닫았다. 현재 경로는 `test:typecheck → test:compile → test:run`이며,
 `ttsc`/TypeScript 7이 source와 test를 `.test-dist` JavaScript로 만들고 Jest는 생성된
 JavaScript만 실행한다.
 
-현재 `npm test`는 `ts-jest`와 TypeScript 5 transform을 사용하므로 TS7 test compatibility
-proof가 아니다. P4.0은 기존 lane을 parity baseline으로 유지한 shadow AOT canary, module-mock
-hoisting, setup/asset/path/source-map/coverage 검증, full-suite parity 순서로 진행하고 승인 후
-`ts-jest`와 parity-only lane을 제거한다. AOT가 즉시 닫히지 않을 때만
-`TS7 typecheck + @swc/jest transpile-only`를 exit condition이 있는 임시 fallback으로 허용한다.
+`npm test`는 TS7 typecheck와 AOT compile을 fail-fast로 실행한 뒤 JavaScript-only Jest를
+실행한다. 기존 lane으로 217 suite/2,978 test parity를 고정하고 module-mock hoisting,
+setup/asset/path/source-map/coverage, `maxWorkers=2` 두 회 반복을 검증한 뒤 `ts-jest`와
+parity-only lane을 제거했다. SWC fallback은 사용하지 않았다.
 
 세부 파일, 명령, canary, rollback과 완료 조건은 [[TS7 Test Compilation Lane]]이 소유한다.
 이 루프는 `typescript@5` production runtime 제거와 runner artifact의 `EvidenceRevision` 변환을
-포함하지 않는다. 다음 loop는 Jest/JUnit/Vitest artifact를 dependency-free adapter로 읽는다.
+포함하지 않는다. Node `>=18` 선언과 `better-sqlite3@12.4.1`의
+`20.x || 22.x || 23.x || 24.x` 지원 범위를 먼저 정렬한 뒤 지원 runtime clean-install
+matrix를 닫아야 한다. 이 release qualification과 병렬로 시작할 다음 product loop는
+Jest/JUnit/Vitest artifact를 dependency-free adapter로 읽는다.
 
 ## 목표 아키텍처
 
@@ -522,7 +525,8 @@ spec-overlay/evidence/enrichment/policy/rule-set/derived-model digest를 모두 
 - [x] `EvidenceRevision`, `EnrichmentRevision` contract와 exact-pin store 구현
 - [x] `PolicyRevision` contract/factory와 default empty policy 동작
 - [x] `PolicyRevision` exact-pin store 구현
-- [ ] P4.0 [[TS7 Test Compilation Lane]] 완료
+- [x] P4.0 [[TS7 Test Compilation Lane]] repository wiring cutover
+- [ ] P4.0 Node runtime/release qualification
 - [ ] runner-neutral test evidence adapter와 exact revision input 구현
 - [ ] TSDoc/API enrichment adapter를 첫 소비 규칙과 함께 구현
 - [ ] evidence/enrichment revision list, retention과 GC 구현
@@ -743,7 +747,7 @@ npm run typecheck
 npm run build
 npm test -- --runInBand
 
-# P4.0 target gates; these scripts become authoritative after cutover
+# P4.0 authoritative test lane
 npm run test:typecheck
 npm run test:compile
 npm run test:run -- --runInBand
@@ -810,10 +814,12 @@ Phase 3 안의 early external canary를 통과하기 전에는 provider ID, delt
 contract를 stable로 표시하지 않는다. Phase 6은 동일 계약의 end-to-end 제품 승인
 gate다.
 
-현재 다음 실행 slice는 Phase 4의 남은 evidence/report 제품 계층 앞에 P4.0을 삽입한다.
+P4.0 repository wiring이 끝났으므로 다음 product slice는 Phase 4의 runner-neutral evidence
+import와 exact-pin convention check다. Node runtime/release qualification은 병렬 선행 gate로
+남으며 evidence 구현 시작을 막지는 않지만 release 완료를 뜻하지도 않는다.
 
 ```text
-P4.0  TS7 test compilation lane
+P4.0  TS7 test compilation lane  [repository wiring complete; runtime qualification pending]
   ↓
 Runner-neutral evidence import and exact-pin convention check
   ↓
