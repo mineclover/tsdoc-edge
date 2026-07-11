@@ -3,20 +3,15 @@
  * @packageDocumentation
  */
 
-import type { CanonicalProjectGraph } from '../../indexer/contracts';
-import { CanonicalGraphLspView } from '../canonical-graph-view';
-import { applyGraphDelta, type GraphDelta } from './GraphDelta';
+import { EffectiveCodeGraphView } from './EffectiveCodeGraphView';
+import type { CodeGraphRevision, GraphDelta } from './GraphDelta';
 
-/** Canonical graph view with one in-memory GraphDelta applied. */
-export class OverlayGraphView {
-  readonly effectiveGraph: CanonicalProjectGraph;
-  readonly view: CanonicalGraphLspView;
-
+/** Compatibility name for a one-file EffectiveCodeGraphView. */
+export class OverlayGraphView extends EffectiveCodeGraphView {
   constructor(
-    readonly baseGraph: CanonicalProjectGraph,
+    baseRevision: CodeGraphRevision,
     readonly delta: GraphDelta
   ) {
-    this.effectiveGraph = applyGraphDelta(baseGraph, delta);
-    this.view = new CanonicalGraphLspView(this.effectiveGraph);
+    super(baseRevision, [delta]);
   }
 }

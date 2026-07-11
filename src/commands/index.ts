@@ -53,3 +53,5 @@ export { RebuildIndexCommand } from './RebuildIndexCommand';
 export { QueryInferredCommand } from './QueryInferredCommand';
 export { LintCommand } from './LintCommand';
 export { PreCommitRunCommand } from './PreCommitRunCommand';
+export { ConventionCommand } from './ConventionCommand';
+export { ConventionCheckCommand } from './ConventionCheckCommand';

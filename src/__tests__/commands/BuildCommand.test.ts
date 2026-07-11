@@ -144,9 +144,11 @@ describe('BuildCommand', () => {
         id: 'fixture',
         load: async () => canonicalGraphInput(tempDir),
       };
+      const canonicalCoordinatorFactory = jest.fn(
+        (options) => new CanonicalGraphCoordinator(options, { source })
+      );
       command = new BuildCommand(ConfigManager.getInstance(), {
-        canonicalCoordinatorFactory: (options) =>
-          new CanonicalGraphCoordinator(options, { source }),
+        canonicalCoordinatorFactory,
       });
 
       const result = await command.execute([
@@ -155,11 +157,19 @@ describe('BuildCommand', () => {
         '--router-module=fixture-module',
         `--router-config=${routerConfig}`,
         '--router-repo=test',
+        '--graph-workspace=test-workspace',
+        '--graph-namespace=test/graph',
         `--canonical-graph-db=${canonicalDatabase}`,
       ]);
 
       expect(result.error).toBeUndefined();
       expect(result).toMatchObject({ exitCode: 0 });
+      expect(canonicalCoordinatorFactory).toHaveBeenCalledWith(
+        expect.objectContaining({
+          workspaceId: 'test-workspace',
+          graphNamespace: 'test/graph',
+        })
+      );
       const repository = new GraphRepository(canonicalDatabase);
       expect(repository.readActiveRevision()).toMatchObject({
         graph: {

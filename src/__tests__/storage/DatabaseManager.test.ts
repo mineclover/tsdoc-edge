@@ -5,6 +5,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import Database from 'better-sqlite3';
+import { ConfigManager } from '../../config/ConfigManager';
 import { DatabaseManager } from '../../storage/DatabaseManager';
 import type { Symbol } from '../../types/graph';
 import type { EnhancedSymbolDoc } from '../../types/tags';
@@ -30,6 +31,7 @@ describe('DatabaseManager', () => {
   afterEach(() => {
     // Clean up
     dbManager.close();
+    jest.restoreAllMocks();
     if (fs.existsSync(tempDir)) {
       fs.rmSync(tempDir, { recursive: true, force: true });
     }
@@ -46,6 +48,40 @@ describe('DatabaseManager', () => {
 
     it('should initialize database connection', () => {
       expect(dbManager.db).toBeDefined();
+    });
+
+    it('honors an explicit database path when the JSONL path is omitted', () => {
+      dbManager.close();
+      const explicitDbPath = path.join(tempDir, 'explicit.db');
+
+      dbManager = new DatabaseManager(explicitDbPath);
+
+      expect(fs.existsSync(explicitDbPath)).toBe(true);
+    });
+
+    it('does not load ConfigManager when both storage paths are explicit', () => {
+      dbManager.close();
+      const explicitDbPath = path.join(tempDir, 'fully-explicit.db');
+      const explicitJsonlPath = path.join(tempDir, 'fully-explicit-data');
+      const getInstance = jest.spyOn(ConfigManager, 'getInstance').mockImplementation(() => {
+        throw new Error('ConfigManager must not be loaded');
+      });
+
+      dbManager = new DatabaseManager(explicitDbPath, explicitJsonlPath);
+
+      expect(getInstance).not.toHaveBeenCalled();
+      expect(fs.existsSync(explicitDbPath)).toBe(true);
+      expect(fs.existsSync(explicitJsonlPath)).toBe(true);
+    });
+
+    it('treats an existing directory database argument as <dir>/.tsdoc.db', () => {
+      dbManager.close();
+      const expectedDbPath = path.join(tempDir, '.tsdoc.db');
+
+      dbManager = new DatabaseManager(tempDir, jsonlPath);
+
+      expect(fs.existsSync(expectedDbPath)).toBe(true);
+      expect(fs.statSync(expectedDbPath).isFile()).toBe(true);
     });
 
     it('additively migrates symbol columns before creating their indexes', () => {
@@ -106,6 +142,59 @@ describe('DatabaseManager', () => {
       );
       expect(indexes.has('idx_symbols_uuid')).toBe(true);
       expect(indexes.has('idx_symbols_exposure')).toBe(true);
+    });
+
+    it('additively migrates inheritance fields on a legacy relationships table', () => {
+      dbManager.close();
+      const legacyDbPath = path.join(tempDir, 'legacy-relationships.db');
+      const legacy = new Database(legacyDbPath);
+      legacy.exec(`
+        CREATE TABLE unified_relationships (
+          id TEXT PRIMARY KEY,
+          type TEXT NOT NULL,
+          category TEXT NOT NULL,
+          from_symbols TEXT NOT NULL,
+          to_symbols TEXT NOT NULL,
+          direction TEXT NOT NULL,
+          strength TEXT NOT NULL,
+          evidence TEXT NOT NULL,
+          discovered_by TEXT NOT NULL,
+          confidence REAL NOT NULL,
+          file_path TEXT,
+          line INTEGER,
+          properties TEXT,
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL,
+          description TEXT
+        );
+        INSERT INTO unified_relationships (
+          id, type, category, from_symbols, to_symbols, direction, strength,
+          evidence, discovered_by, confidence, created_at, updated_at
+        ) VALUES (
+          'legacy-rel', 'code-dependency', 'structural', '["source"]', '["target"]',
+          'unidirectional', 'strong', '[]', 'static-analysis', 1.0,
+          '2025-01-01', '2025-01-01'
+        );
+      `);
+      legacy.close();
+
+      dbManager = new DatabaseManager(legacyDbPath, jsonlPath);
+      const columns = new Map(
+        (
+          dbManager.db.prepare('PRAGMA table_info(unified_relationships)').all() as Array<{
+            name: string;
+            type: string;
+            notnull: number;
+          }>
+        ).map((column) => [column.name, column])
+      );
+
+      expect(columns.get('abstraction_from')).toMatchObject({ type: 'TEXT', notnull: 0 });
+      expect(columns.get('abstraction_to')).toMatchObject({ type: 'TEXT', notnull: 0 });
+      expect(columns.get('hierarchy_depth')).toMatchObject({ type: 'INTEGER', notnull: 0 });
+      expect(columns.get('inheritance_chain')).toMatchObject({ type: 'TEXT', notnull: 0 });
+      expect(columns.get('overridden_members')).toMatchObject({ type: 'TEXT', notnull: 0 });
+      expect(dbManager.getUnifiedRelationshipsBySymbol('source')).toHaveLength(1);
     });
 
     it('should create necessary directories if they do not exist', () => {

@@ -35,9 +35,9 @@ export interface RelationshipProjectionOptions {
 /**
  * Queries one immutable canonical graph revision.
  *
- * Edge direction is explicit: `from -> to` means `from` depends on `to`.
- * Therefore dependencies use outgoing edges and change impact follows incoming
- * edges to dependents.
+ * Edge direction is explicit. Dependency-family relations use `from -> to` to
+ * mean that `from` depends on `to`; ownership/module relations may use another
+ * query policy and are excluded from dependency traversal by default.
  * @public
  */
 export class GraphAnalysisService {
@@ -123,8 +123,14 @@ export class GraphAnalysisService {
     const metrics = nodes.map((node) => {
       const outgoing = this.index.getOutgoingEdges(node.id);
       const incoming = this.index.getIncomingEdges(node.id);
-      const dependencies = new Set(outgoing.map((edge) => edge.to));
-      const dependents = new Set(incoming.map((edge) => edge.from));
+      const dependencyOutgoing = outgoing.filter(
+        (edge) => graphEdgeSemantic(edge.kind).queryPolicies.dependency
+      );
+      const dependencyIncoming = incoming.filter(
+        (edge) => graphEdgeSemantic(edge.kind).queryPolicies.dependency
+      );
+      const dependencies = new Set(dependencyOutgoing.map((edge) => edge.to));
+      const dependents = new Set(dependencyIncoming.map((edge) => edge.from));
       const internalDependencies = countNodesByExternal(dependencies, this.index, false);
       const externalDependencies = countNodesByExternal(dependencies, this.index, true);
       const internalDependents = countNodesByExternal(dependents, this.index, false);

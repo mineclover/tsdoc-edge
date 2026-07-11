@@ -1,7 +1,7 @@
 {
   "name": "tsdoc-edge",
   "version": "0.13.0",
-  "description": "TSDoc-based specification documentation tool with type chain analysis and strict convention parsing",
+  "description": "Semantic convention governance and SSOT documentation connectivity for TypeScript",
   "type": "commonjs",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -43,6 +43,8 @@
     "code-analysis",
     "dependency-analysis",
     "relationship-analysis",
+    "convention-governance",
+    "spec-conformance",
     "lsp"
   ],
   "author": "Junwoo Bang",

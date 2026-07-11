@@ -179,6 +179,16 @@ Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.
 
 ---
 
+### [[Convention Pack Check]]
+**Path**: `convention-pack-check.md`
+
+저장된 canonical graph revision에 workspace-installed spec-binding convention pack을 적용하고,
+정확한 spec/policy/rule-set/binding/report pin과 CI exit code를 생성합니다.
+
+**Commands**: `convention check --pack <file>`
+
+---
+
 ## Integration Features (통합 기능)
 
 ### CI/CD Integration
@@ -315,4 +325,3 @@ tsdoc-edge test-impact database-manager
 - [[Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/index.md:348
 - [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:418
 - [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:195
-

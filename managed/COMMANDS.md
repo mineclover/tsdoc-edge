@@ -8,7 +8,7 @@ canonical: true
 
 # [[Commands Index]]
 
-Complete reference of all 55 TSDoc Edge CLI commands organized by category.
+Reference for the main TSDoc Edge CLI commands and command groups.
 
 ## Quick Start
 
@@ -24,6 +24,9 @@ tsdoc-edge health src
 
 # Get work context before editing
 tsdoc-edge work-context <file-path>
+
+# Check a revision-pinned spec-binding convention pack
+tsdoc-edge convention check --pack managed/conventions/core.json
 ```
 
 ---
@@ -183,6 +186,21 @@ Manage specifications.
 | `check-duplicates` | Check duplicate content |
 | `suggest` | Generate improvement suggestions |
 | `improve` | Improve documentation quality |
+
+---
+
+## Convention Governance
+
+Apply authored spec-binding conventions to an exact saved canonical graph revision.
+
+| Command | Description |
+|---------|-------------|
+| `convention check --pack <file>` | Compile a convention pack, resolve exact bindings, apply suppressions, and emit a pinned report/exit code |
+
+Use `--code-revision <id>` to replay a retained canonical revision (the active revision is the
+default), and `--expected-manifest <id>` to enforce the independently approved pack lock in CI.
+
+See [[Convention Pack Check]] for the source contract, limits, and CI exit semantics.
 
 ---
 

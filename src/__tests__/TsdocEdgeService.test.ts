@@ -4,9 +4,9 @@
  * @packageDocumentation
  */
 
-import * as path from 'node:path';
 import * as fs from 'node:fs';
 import * as os from 'node:os';
+import * as path from 'node:path';
 import Database from 'better-sqlite3';
 import { TsdocEdgeService } from '../lsp/service';
 
@@ -19,7 +19,7 @@ describe('TsdocEdgeService', () => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'tsdoc-service-test-'));
     const tsdocDir = path.join(tempDir, '.tsdoc');
     fs.mkdirSync(tsdocDir, { recursive: true });
-    dbPath = path.join(tsdocDir, 'symbols.db');
+    dbPath = path.join(tempDir, '.tsdoc.db');
   });
 
   afterEach(() => {
@@ -126,12 +126,40 @@ describe('TsdocEdgeService', () => {
       db.prepare(`
         INSERT INTO symbols (id, name, type, file_path, line, column, is_exported, is_public, summary, created_at, updated_at, version, jsonl_line)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).run('test-class', 'TestClass', 'class', 'src/test.ts', 10, 1, 1, 1, 'Test class summary', now, now, '1.0.0', 1);
+      `).run(
+        'test-class',
+        'TestClass',
+        'class',
+        'src/test.ts',
+        10,
+        1,
+        1,
+        1,
+        'Test class summary',
+        now,
+        now,
+        '1.0.0',
+        1
+      );
 
       db.prepare(`
         INSERT INTO symbols (id, name, type, file_path, line, column, is_exported, is_public, summary, created_at, updated_at, version, jsonl_line)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).run('test-function', 'testFunction', 'function', 'src/test.ts', 20, 1, 1, 1, 'Test function', now, now, '1.0.0', 2);
+      `).run(
+        'test-function',
+        'testFunction',
+        'function',
+        'src/test.ts',
+        20,
+        1,
+        1,
+        1,
+        'Test function',
+        now,
+        now,
+        '1.0.0',
+        2
+      );
 
       db.prepare(`
         INSERT INTO unified_relationships (from_symbols, to_symbols, type, category, file_path, line)

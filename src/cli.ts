@@ -17,6 +17,7 @@ import {
   CheckDuplicatesCommand,
   CommandRegistry,
   CoreApiCommand,
+  ConventionCommand,
   FixCommand,
   HealthCommand,
   HelpCommand,
@@ -114,7 +115,7 @@ function levenshteinDistance(a: string, b: string): number {
  */
 function findSimilarCommands(input: string, commands: string[], maxDistance = 3): string[] {
   return commands
-    .map(cmd => ({ cmd, distance: levenshteinDistance(input.toLowerCase(), cmd.toLowerCase()) }))
+    .map((cmd) => ({ cmd, distance: levenshteinDistance(input.toLowerCase(), cmd.toLowerCase()) }))
     .filter(({ distance }) => distance <= maxDistance)
     .sort((a, b) => a.distance - b.distance)
     .slice(0, 3)
@@ -161,6 +162,7 @@ async function main(): Promise<void> {
   registry.register(new TaskCommand());
   registry.register(new OntologyCommand());
   registry.register(new DocsCommand());
+  registry.register(new ConventionCommand());
 
   // Register commands - Analysis & tools
   registry.register(new AnalyzeCommand());

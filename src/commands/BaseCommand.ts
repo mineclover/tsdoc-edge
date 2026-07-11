@@ -580,7 +580,8 @@ export abstract class BaseCommand {
   /**
    * Get database path from config or default
    * Reads .tsdoc.config.json and returns the configured database path,
-   * or falls back to .tsdoc/symbols.db for backwards compatibility
+   * defaults to .tsdoc.db, and still opens the historical nested path when it
+   * is the only database present.
    *
    * @returns Absolute path to the database file
    */
@@ -591,15 +592,16 @@ export abstract class BaseCommand {
       try {
         const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
         if (config.paths?.databasePath) {
-          return path.join(process.cwd(), config.paths.databasePath);
+          return path.resolve(process.cwd(), config.paths.databasePath);
         }
       } catch {
         // Ignore config parse errors, use default
       }
     }
 
-    // Default fallback for backwards compatibility
-    return path.join(process.cwd(), '.tsdoc', 'symbols.db');
+    const currentPath = path.join(process.cwd(), '.tsdoc.db');
+    const legacyPath = path.join(process.cwd(), '.tsdoc', 'symbols.db');
+    return fs.existsSync(currentPath) || !fs.existsSync(legacyPath) ? currentPath : legacyPath;
   }
 
   /**

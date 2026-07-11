@@ -5,7 +5,9 @@
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import Database from 'better-sqlite3';
 import { WorkContextCommand } from '../../commands/WorkContextCommand';
+import { CanonicalAliasContext } from '../../indexer';
 import { DatabaseManager } from '../../storage/DatabaseManager';
 
 describe('WorkContextCommand', () => {
@@ -45,6 +47,8 @@ export function testFunc(): void {}
   });
 
   afterEach(() => {
+    jest.restoreAllMocks();
+
     // Restore original cwd
     process.chdir(path.dirname(path.dirname(path.dirname(__dirname))));
 
@@ -90,16 +94,93 @@ export function testFunc(): void {}
       expect(result.message).toContain('Database not found');
     });
 
+    it('returns canonical file context when the legacy database does not exist', async () => {
+      const close = jest.fn();
+      const canonicalContext = {
+        revisionId: 'canonical-only-revision',
+        resolver: { canonicalToLegacy: () => null },
+        nodesInFile: () => [
+          {
+            id: 'src/TestFile.ts#testFunc:function',
+            sourceId: 'src/TestFile.ts#testFunc:function',
+            kind: 'function',
+            name: 'testFunc',
+            file: 'src/TestFile.ts',
+          },
+        ],
+        structuralCounts: () => ({ dependencies: 1, dependents: 2 }),
+        close,
+      } as unknown as CanonicalAliasContext;
+      jest.spyOn(CanonicalAliasContext, 'tryOpen').mockReturnValue(canonicalContext);
+      const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+      const result = await command.execute(['src/TestFile.ts']);
+      const output = log.mock.calls.flat().join('\n');
+
+      expect(result.exitCode).toBe(0);
+      expect(result.message).toBe('Canonical work context generated');
+      expect(output).toContain('src/TestFile.ts#testFunc:function');
+      expect(output).not.toContain('Database not found');
+      expect(close).toHaveBeenCalledTimes(1);
+    });
+
+    it('shows direct canonical symbols in human output when legacy aliases are absent', async () => {
+      const db = new DatabaseManager(dbPath);
+      db.close();
+      const close = jest.fn();
+      const canonicalContext = {
+        revisionId: 'direct-file-revision',
+        resolver: { canonicalToLegacy: () => null },
+        nodesInFile: () => [
+          {
+            id: 'src/TestFile.ts#testFunc:function',
+            sourceId: 'src/TestFile.ts#testFunc:function',
+            kind: 'function',
+            name: 'testFunc',
+            file: 'src/TestFile.ts',
+          },
+        ],
+        structuralCounts: () => ({ dependencies: 1, dependents: 2 }),
+        close,
+      } as unknown as CanonicalAliasContext;
+      jest.spyOn(CanonicalAliasContext, 'tryOpen').mockReturnValue(canonicalContext);
+      const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+      const result = await command.execute(['src/TestFile.ts', '--human']);
+      const output = log.mock.calls.flat().join('\n');
+
+      expect(result.exitCode).toBe(0);
+      expect(output).toContain('Canonical Structural Graph');
+      expect(output).toContain('src/TestFile.ts#testFunc:function');
+      expect(output).toContain('alias/direct file lookup');
+      expect(close).toHaveBeenCalledTimes(1);
+    });
+
     it('should display context when file and database exist', async () => {
       // Create database
       const dbManager = new DatabaseManager(dbPath);
 
       // Insert a test symbol with unique ID
       const uniqueSymbolId = `test-symbol-display-${Date.now()}`;
-      dbManager.db.prepare(`
+      dbManager.db
+        .prepare(`
         INSERT INTO symbols (id, name, type, file_path, line, column, is_exported, is_public, created_at, updated_at, version, jsonl_line)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(uniqueSymbolId, 'testFunc', 'function', 'src/TestFile.ts', 1, 0, 1, 1, '2025-01-01', '2025-01-01', '1.0.0', 1);
+      `)
+        .run(
+          uniqueSymbolId,
+          'testFunc',
+          'function',
+          'src/TestFile.ts',
+          1,
+          0,
+          1,
+          1,
+          '2025-01-01',
+          '2025-01-01',
+          '1.0.0',
+          1
+        );
 
       dbManager.close();
 
@@ -108,8 +189,142 @@ export function testFunc(): void {}
       // Should execute (may or may not succeed depending on environment)
       expect(result).toBeDefined();
       if (result.exitCode === 0) {
-        expect(result.message).toContain('successfully');
+        expect(result.message).toBe('XML context generated');
       }
+    });
+
+    it('migrates a real legacy relationships table before gathering work context', async () => {
+      const current = new DatabaseManager(dbPath, path.join(tempDir, '.tsdoc', 'data'));
+      current.db
+        .prepare(`
+        INSERT INTO symbols (id, name, type, file_path, line, column, is_exported, is_public, created_at, updated_at, version, jsonl_line)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `)
+        .run(
+          'legacy-source',
+          'testFunc',
+          'function',
+          'src/TestFile.ts',
+          1,
+          0,
+          1,
+          1,
+          '2025-01-01',
+          '2025-01-01',
+          '1.0.0',
+          1
+        );
+      current.close();
+
+      const legacy = new Database(dbPath);
+      legacy.exec(`
+        DROP TABLE relationship_symbols;
+        DROP TABLE unified_relationships;
+        CREATE TABLE unified_relationships (
+          id TEXT PRIMARY KEY,
+          type TEXT NOT NULL,
+          category TEXT NOT NULL,
+          from_symbols TEXT NOT NULL,
+          to_symbols TEXT NOT NULL,
+          direction TEXT NOT NULL,
+          strength TEXT NOT NULL,
+          evidence TEXT NOT NULL,
+          discovered_by TEXT NOT NULL,
+          confidence REAL NOT NULL,
+          file_path TEXT,
+          line INTEGER,
+          properties TEXT,
+          created_at TEXT NOT NULL,
+          updated_at TEXT NOT NULL,
+          description TEXT
+        );
+        INSERT INTO unified_relationships (
+          id, type, category, from_symbols, to_symbols, direction, strength,
+          evidence, discovered_by, confidence, file_path, line, created_at, updated_at
+        ) VALUES (
+          'legacy-dependency', 'code-dependency', 'structural',
+          '["legacy-source"]', '["legacy-target"]', 'unidirectional', 'strong',
+          '[]', 'static-analysis', 1.0, 'src/TestFile.ts', 1,
+          '2025-01-01', '2025-01-01'
+        );
+      `);
+      legacy.close();
+
+      const result = await command.execute(['src/TestFile.ts']);
+
+      expect(result).toEqual(expect.objectContaining({ exitCode: 0 }));
+      const migrated = new Database(dbPath, { readonly: true });
+      const columns = new Set(
+        (
+          migrated.prepare('PRAGMA table_info(unified_relationships)').all() as Array<{
+            name: string;
+          }>
+        ).map((column) => column.name)
+      );
+      migrated.close();
+      expect([...columns]).toEqual(
+        expect.arrayContaining([
+          'abstraction_from',
+          'abstraction_to',
+          'hierarchy_depth',
+          'inheritance_chain',
+          'overridden_members',
+        ])
+      );
+    });
+
+    it('adds canonical structural data to default XML and LLM output', async () => {
+      const dbManager = new DatabaseManager(dbPath, path.join(tempDir, '.tsdoc', 'data'));
+      dbManager.db
+        .prepare(`
+        INSERT INTO symbols (id, name, type, file_path, line, column, is_exported, is_public, created_at, updated_at, version, jsonl_line)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `)
+        .run(
+          'legacy-test-func',
+          'testFunc',
+          'function',
+          'src/TestFile.ts',
+          1,
+          0,
+          1,
+          1,
+          '2025-01-01',
+          '2025-01-01',
+          '1.0.0',
+          1
+        );
+      dbManager.close();
+
+      const close = jest.fn();
+      const canonicalContext = {
+        revisionId: 'revision-123',
+        resolver: { canonicalToLegacy: () => 'legacy-test-func' },
+        resolveCanonicalId: (legacyId: string) =>
+          legacyId === 'legacy-test-func' ? 'src/TestFile.ts#testFunc:function' : null,
+        structuralCounts: () => ({ dependencies: 2, dependents: 3 }),
+        nodesInFile: () => [],
+        close,
+      } as unknown as CanonicalAliasContext;
+      jest.spyOn(CanonicalAliasContext, 'tryOpen').mockReturnValue(canonicalContext);
+      const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+      expect((await command.execute(['src/TestFile.ts'])).exitCode).toBe(0);
+      const xml = log.mock.calls.flat().join('\n');
+      expect(xml).toContain('<canonical-structural revision="revision-123">');
+      expect(xml).toContain('canonical-id="src/TestFile.ts#testFunc:function"');
+      expect(xml).toContain('dependencies="2" dependents="3"');
+
+      log.mockClear();
+      expect((await command.execute(['src/TestFile.ts', '--llm'])).exitCode).toBe(0);
+      const markdown = log.mock.calls.flat().join('\n');
+      expect(markdown).toContain('## Canonical Structural Graph');
+      expect(markdown).toContain('`src/TestFile.ts#testFunc:function`');
+      expect(markdown).toContain('dependencies: 2, dependents: 3');
+      expect(markdown.indexOf('## Canonical Structural Graph')).toBeLessThan(
+        markdown.indexOf('## Generation Metadata')
+      );
+      expect(close).toHaveBeenCalledTimes(2);
     });
 
     it('should handle relative file paths', async () => {
@@ -168,21 +383,53 @@ export function testFunc(): void {}
       const depSymbolId = `dep-symbol-${Date.now()}`;
 
       // Insert test symbol
-      dbManager.db.prepare(`
+      dbManager.db
+        .prepare(`
         INSERT INTO symbols (id, name, type, file_path, line, column, is_exported, is_public, created_at, updated_at, version, jsonl_line)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(testSymbolId, 'testFunc', 'function', 'src/TestFile.ts', 1, 0, 1, 1, '2025-01-01', '2025-01-01', '1.0.0', 1);
+      `)
+        .run(
+          testSymbolId,
+          'testFunc',
+          'function',
+          'src/TestFile.ts',
+          1,
+          0,
+          1,
+          1,
+          '2025-01-01',
+          '2025-01-01',
+          '1.0.0',
+          1
+        );
 
       // Insert dependency
-      dbManager.db.prepare(`
+      dbManager.db
+        .prepare(`
         INSERT INTO symbols (id, name, type, file_path, line, column, is_exported, is_public, created_at, updated_at, version, jsonl_line)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-      `).run(depSymbolId, 'DepFunc', 'function', 'src/Dependency.ts', 1, 0, 1, 1, '2025-01-01', '2025-01-01', '1.0.0', 2);
+      `)
+        .run(
+          depSymbolId,
+          'DepFunc',
+          'function',
+          'src/Dependency.ts',
+          1,
+          0,
+          1,
+          1,
+          '2025-01-01',
+          '2025-01-01',
+          '1.0.0',
+          2
+        );
 
-      dbManager.db.prepare(`
+      dbManager.db
+        .prepare(`
         INSERT INTO dependencies (symbol_id, target, type, reason, import_path)
         VALUES (?, ?, ?, ?, ?)
-      `).run(testSymbolId, depSymbolId, 'calls', 'test dependency', './Dependency');
+      `)
+        .run(testSymbolId, depSymbolId, 'calls', 'test dependency', './Dependency');
 
       dbManager.close();
 

@@ -1,8 +1,11 @@
 # TSDoc Edge
 
-**SSOT(Single Source of Truth) Documentation Connectivity Platform**
+**Semantic Convention Governance & SSOT Documentation Connectivity Platform**
 
-TSDoc Edge tracks all symbols in your TypeScript codebase, maps relationships between them, and ensures perfect alignment between code and documentation.
+TSDoc Edge tracks TypeScript symbols and relationships, binds authored specifications to
+code evidence, and checks versioned conventions against an exact canonical graph revision.
+The first convention loop covers spec-binding conformance; naming and formatting rules remain
+separate from this revision-pinned semantic check.
 
 ---
 
@@ -83,6 +86,7 @@ The `work-context` command provides everything you need before modifying code:
 | Impact Analysis | `relationship impact <symbol>` | Change impact assessment |
 | Quality Check | `lint` | Code health, docs, tests, relationships |
 | Documentation | `index-docs managed` | Index `[[Symbol]]` references |
+| Convention Check | `convention check --pack <file>` | Check exact spec bindings with policy and suppressions |
 
 ---
 
@@ -132,6 +136,24 @@ tsdoc-edge validate-docs         # Validate SSOT
 tsdoc-edge update-backlinks      # Update backlinks
 ```
 
+### Convention Governance
+
+```bash
+# Uses the active saved canonical graph revision unless one is pinned
+tsdoc-edge convention check \
+  --pack managed/conventions/core.json \
+  --code-revision <canonical-revision-id> \
+  --expected-manifest convention-pack:<sha256> \
+  --fail-on error \
+  --output .reports/convention.json
+```
+
+The result pins the code, spec, policy, rule-set, evidence, binding-resolution, and report
+identities. Exit code `1` means an unsuppressed finding reached the selected threshold; input or
+revision errors use exit code `2`. Omit `--code-revision` for the current active pointer; supply it
+with `--expected-manifest` for a replayable CI/release input pair. See
+[Convention Pack Check](managed/features/convention-pack-check.md).
+
 ---
 
 ## Configuration
@@ -145,7 +167,7 @@ Create `.tsdoc.config.json`:
     "srcDirs": ["src"]
   },
   "paths": {
-    "databasePath": ".tsdoc/symbols.db"
+    "databasePath": ".tsdoc.db"
   },
   "documentManagement": {
     "managedDirs": ["managed"]
@@ -173,9 +195,10 @@ Create `.tsdoc.config.json`:
 |----------|-------------|
 | [Quick Start](managed/quick-start.md) | 5-minute setup guide |
 | [Usage Scenarios](managed/guides/usage-scenarios.md) | Real-world workflows |
-| [Commands Index](managed/COMMANDS.md) | All 55 CLI commands |
+| [Commands Index](managed/COMMANDS.md) | CLI command reference |
 | [Relationship Guide](managed/guides/relationship-analysis-guide.md) | Dependency analysis |
 | [LSP Integration](managed/features/lsp-integration.md) | IDE integration |
+| [Convention Pack Check](managed/features/convention-pack-check.md) | Revision-pinned spec-binding governance loop |
 
 ---
 
@@ -184,7 +207,8 @@ Create `.tsdoc.config.json`:
 ```
 src/
 ├── analyzer/      # Code analysis (health, coverage)
-├── commands/      # CLI commands (55 commands)
+├── commands/      # CLI command groups and adapters
+├── convention/    # Convention pack compilation and conformance orchestration
 ├── doc-symbol/    # [[Symbol]] system
 ├── graph/         # Symbol graph
 ├── graph-analysis/# Canonical @ttsc/graph queries and projections
@@ -218,7 +242,9 @@ Compiler-resolved structural analysis now uses the canonical graph:
 
 ```bash
 export TSDOC_EDGE_GRAPH_ROUTER_MODULE=/path/to/ttsc-graph-router/dist/artifact-source.js
-tsdoc-edge build src --canonical-graph
+tsdoc-edge build src --canonical-graph \
+  --graph-workspace=my-workspace \
+  --graph-namespace=ttsc:my-workspace
 tsdoc-edge relationship analyze --type=structural
 ```
 
@@ -226,19 +252,36 @@ Build refresh is explicitly opt-in through `--canonical-graph` (or
 `TSDOC_EDGE_CANONICAL_GRAPH=1`); setting the router module alone is only
 configuration and does not change a normal legacy-enrichment build.
 
+The saved graph provenance always includes a convention/spec workspace and graph
+namespace. `--graph-workspace=<id>` and `--graph-namespace=<id>` override
+`TSDOC_EDGE_GRAPH_WORKSPACE` and `TSDOC_EDGE_GRAPH_NAMESPACE`. If neither form is
+set, the workspace defaults to the router repo ID and the namespace defaults to
+`ttsc:<router repo ID>`; the repo ID itself defaults to the project directory name.
+Set the same environment values for the LSP so its saved-file refresh addresses the
+same canonical graph identity as Build:
+
+```bash
+export TSDOC_EDGE_GRAPH_WORKSPACE=my-workspace
+export TSDOC_EDGE_GRAPH_NAMESPACE=ttsc:my-workspace
+```
+
 `ttsc-graph-router.config.json` routes the current repository. The analysis
 reads the router's raw `@ttsc/graph` artifact with `refresh: true`; it does not
 assume a separate `.ttsc/graph.json` file. Artifact contract `1.0.0`, raw/saved-file
 capabilities, producer/router provenance, and the exact `@ttsc/graph` binary
-version are checked before indexing. The complete node/edge snapshot is then
-atomically replaced in `.tsdoc/canonical-graph.db`; canonical IDs are never mixed
-into the legacy symbol tables.
+version are checked before indexing. The complete node/edge snapshot,
+collision-safe legacy aliases, and diagnostics plane are atomically replaced in
+`.tsdoc/canonical-graph.db`; canonical IDs are never mixed into the legacy symbol
+tables. Existing schema-v1 canonical databases remain readable and are promoted
+transactionally on the next refresh.
 
 Build, structural analysis, and LSP saved-file refresh share the same
 `ProjectIndexer -> GraphRepository` boundary. LSP reads canonical impact,
 dependency, symbol, hover, and code-lens data from that revision. Unsaved buffers
-still use the TS5 syntax parser, but remain an in-memory, per-document overlay and
-never write SQLite. Saved-file refreshes are single-flight/coalesced, and a
+still use the TS5 syntax parser, but remain an in-memory canonical `GraphDelta` and
+never write SQLite. Matched symbol identities preserve saved topology; new or
+renamed symbol edges become authoritative after the next saved-file refresh.
+Saved-file refreshes are single-flight/coalesced, and a
 Build-created canonical DB is opened read-only when no router module is configured.
 Set the same `TSDOC_EDGE_GRAPH_ROUTER_MODULE` when starting the LSP to enable
 saved-file whole-project refreshes.
@@ -249,7 +292,7 @@ saved-file whole-project refreshes.
 
 | Metric | Value |
 |--------|-------|
-| CLI Commands | 55 |
+| CLI Commands | See `tsdoc-edge help --all` |
 | Symbols | 6,726 |
 | Relationships | 38,704 |
 | Relationship Types | 13/28 (46%) |

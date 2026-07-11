@@ -67,13 +67,15 @@ The graph-router boundary is pinned to raw artifact contract `1.0.0`. The adapte
 validates its saved-file/raw capability record and complete producer, router,
 cache, project, and tsconfig provenance before `ProjectIndexer` accepts the dump.
 Actual compiler version remains unreported (`null`); the TypeScript 7.0 value is
-a compatibility target, not fabricated compiler provenance. A future diagnostic
-fact plane fails closed until the canonical repository has an explicit diagnostic
-contract.
+a compatibility target, not fabricated compiler provenance. When the router
+advertises `diagnosticsCollected`, numeric compiler codes, source ranges, origin,
+and related node ids are normalized into the versioned diagnostics contract and
+stored in the canonical repository's separate diagnostics plane. Invalid shapes
+fail closed at the adapter boundary.
 
 `GraphRepository` now stores each complete canonical
 `path#qualifiedName:kind` node/edge revision in `.tsdoc/canonical-graph.db`.
-Revision, nodes, edges, and the active pointer change in one SQLite transaction;
+Revision, nodes, edges, aliases, diagnostics, and the active pointer change in one SQLite transaction;
 rollback preserves the old graph, and rename/delete removes stale nodes and
 incident edges together. These tables are separate from legacy symbols and
 relationships. Structural ontology projections therefore remain read-only with
@@ -147,7 +149,7 @@ tsdoc-edge build src
    - Type dependencies: parameter/return types
 
 4. **Storage** via [[DatabaseManager]] (`managed/core-components/DatabaseManager.md`)
-   - Writes symbols to SQLite (`.tsdoc/symbols.db`)
+   - Writes symbols to configured SQLite (`.tsdoc.db` by default)
    - Creates indexes for fast lookups
    - Exports to JSONL (`.tsdoc/registry.jsonl`)
 
@@ -357,7 +359,7 @@ tsdoc-edge work-context src/commands/BuildCommand.ts
     "**/*.spec.ts",
     "**/node_modules/**"
   ],
-  "databasePath": ".tsdoc/symbols.db",
+  "databasePath": ".tsdoc.db",
   "jsonlPath": ".tsdoc"
 }
 ```

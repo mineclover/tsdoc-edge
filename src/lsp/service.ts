@@ -16,14 +16,15 @@ import * as path from 'node:path';
 import Database from 'better-sqlite3';
 import { DiagnosticSeverity, SymbolKind } from 'vscode-languageserver/node';
 import {
+  type CanonicalDiagnostic,
   CanonicalGraphCoordinator,
   type CanonicalGraphCoordinatorDependencies,
   type CanonicalGraphCoordinatorOptions,
   type CanonicalGraphRefreshResult,
+  type CanonicalProjectGraph,
   canonicalGraphOptionsFromEnvironment,
   DEFAULT_CANONICAL_GRAPH_DATABASE,
-  type CanonicalDiagnostic,
-  type CanonicalProjectGraph,
+  parseCanonicalId,
 } from '../indexer';
 import { GraphRepository } from '../storage/GraphRepository';
 import type {
@@ -34,22 +35,25 @@ import type {
   SymbolRow,
   UnifiedRelRow,
 } from '../types/database';
+import { ConfigLoader } from '../utils/ConfigLoader';
 import { CacheManager } from './cache-manager';
+import { CanonicalGraphLspView, canonicalNodeDisplayName } from './canonical-graph-view';
+import { type DiagnosticInfo, mapCanonicalDiagnostic } from './diagnostics';
+import { IncrementalBuilder, type IncrementalExtractResult } from './incremental-builder';
 import {
-  CanonicalGraphLspView,
-  canonicalNodeDisplayName,
-} from './canonical-graph-view';
+  type CodeGraphRevision,
+  EffectiveCodeGraphView,
+  GraphDeltaBuilder,
+  OverlayGraphView,
+} from './overlay';
 import { StatementManager } from './statement-manager';
-import {
-  IncrementalBuilder,
-  type IncrementalExtractResult,
-} from './incremental-builder';
-import { GraphDeltaBuilder, OverlayGraphView } from './overlay';
 import { isTypeScriptSourcePath } from './uri';
 
 interface UnsavedFileOverlay {
   readonly delta: ReturnType<typeof GraphDeltaBuilder.fromExtract>;
   readonly extract: IncrementalExtractResult;
+  readonly content: string;
+  readonly generation: number;
 }
 
 /**
@@ -84,23 +88,12 @@ export interface SymbolSearchResult {
   line: number;
 }
 
-/**
- * Diagnostic information for architectural issues
- *
- * @public
- * @see TsdocEdgeService.getDiagnostics
- */
-export interface DiagnosticInfo {
-  /** Line number (1-based) where the issue is located */
-  line: number;
-  /** Human-readable description of the issue */
-  message: string;
-  /** Severity level (Error, Warning, Information, Hint) */
-  severity: DiagnosticSeverity;
-}
+export type { DiagnosticInfo } from './diagnostics';
 
 /** Optional canonical graph wiring for hosts and focused tests. */
 export interface TsdocEdgeServiceOptions {
+  /** Legacy symbol database override. Relative paths resolve from the workspace root. */
+  readonly legacyDatabasePath?: string;
   /** `false` disables canonical reads and refresh even when environment variables exist. */
   readonly canonicalGraph?: CanonicalGraphCoordinatorOptions | false;
   readonly canonicalGraphDependencies?: CanonicalGraphCoordinatorDependencies;
@@ -132,7 +125,7 @@ const CACHE_NAMES = {
 export class TsdocEdgeService {
   /** Root directory of the workspace */
   private workspaceRoot: string;
-  /** Path to SQLite database (.tsdoc/symbols.db) */
+  /** Path to the configured legacy SQLite database (`.tsdoc.db` by default). */
   private dbPath: string;
   /** SQLite database connection (better-sqlite3, dynamically loaded via require) */
   private db: SqliteDatabase | null = null;
@@ -170,6 +163,15 @@ export class TsdocEdgeService {
   /** Effective canonical graph views for dirty files. */
   private readonly overlayViews = new Map<string, OverlayGraphView>();
 
+  /** Effective workspace graph with every dirty-file delta applied. */
+  private workspaceOverlayView: EffectiveCodeGraphView | null = null;
+
+  /** Monotonic token used to avoid clearing an overlay created after a save began. */
+  private nextOverlayGeneration = 0;
+
+  /** Saved overlay generations awaiting any successful whole-project refresh. */
+  private readonly pendingSavedOverlayGenerations = new Map<string, number>();
+
   /** Maximum symbols to return in impact analysis */
   private static readonly MAX_IMPACT_SYMBOLS = 100;
 
@@ -180,7 +182,7 @@ export class TsdocEdgeService {
    */
   constructor(workspaceRoot: string, options: TsdocEdgeServiceOptions = {}) {
     this.workspaceRoot = path.resolve(workspaceRoot);
-    this.dbPath = path.join(this.workspaceRoot, '.tsdoc', 'symbols.db');
+    this.dbPath = this.resolveLegacyDatabasePath(options.legacyDatabasePath);
 
     // Initialize cache manager with defaults
     this.cacheManager = new CacheManager({
@@ -288,16 +290,13 @@ export class TsdocEdgeService {
 
   /** Refresh or reload the canonical graph after a file save/watch event. */
   async refreshCanonicalGraph(filePath?: string): Promise<CanonicalGraphRefreshResult | null> {
+    if (filePath) this.recordSavedOverlayGeneration(filePath);
     if (this.canonicalCoordinator) {
       const refreshed = await this.canonicalCoordinator.refresh();
       if (refreshed.status === 'committed') {
         const diagnostics = this.canonicalCoordinator.readActiveRevision()?.diagnostics ?? [];
-        this.installCanonicalRevision(
-          refreshed.graph,
-          refreshed.revision.revisionId,
-          diagnostics
-        );
-        if (filePath) this.clearUnsavedOverlay(filePath);
+        this.installCanonicalRevision(refreshed.graph, refreshed.revision.revisionId, diagnostics);
+        this.clearCommittedSaveOverlays();
       }
       return refreshed;
     }
@@ -308,15 +307,14 @@ export class TsdocEdgeService {
 
       const revisionChanged = active.metadata.revisionId !== this.canonicalRevisionId;
       if (revisionChanged || !this.canonicalView) {
-        this.installCanonicalRevision(
-          active.graph,
-          active.metadata.revisionId,
-          active.diagnostics
-        );
-        if (filePath) this.clearUnsavedOverlay(filePath);
+        this.installCanonicalRevision(active.graph, active.metadata.revisionId, active.diagnostics);
       } else {
+        // Diagnostics are an independently replaceable plane and may change
+        // while the content-addressed graph revision remains stable.
+        this.canonicalDiagnostics = active.diagnostics;
         this.invalidateCache();
       }
+      this.clearCommittedSaveOverlays();
       return {
         status: 'committed',
         graph: active.graph,
@@ -337,7 +335,31 @@ export class TsdocEdgeService {
     const resolved = path.resolve(filePath);
     this.unsavedOverlays.delete(resolved);
     this.overlayViews.delete(resolved);
+    this.pendingSavedOverlayGenerations.delete(resolved);
+    this.rebuildWorkspaceOverlayView();
     this.invalidateFileCache(filePath);
+  }
+
+  /** Remember which exact overlay is represented by the file currently on disk. */
+  private recordSavedOverlayGeneration(filePath: string): void {
+    const resolved = path.resolve(filePath);
+    const generation = this.unsavedOverlays.get(resolved)?.generation;
+    if (generation !== undefined) {
+      this.pendingSavedOverlayGenerations.set(resolved, generation);
+    }
+  }
+
+  /** Reconcile all saves covered by a successful whole-project graph refresh. */
+  private clearCommittedSaveOverlays(): void {
+    for (const [filePath, savedGeneration] of [...this.pendingSavedOverlayGenerations.entries()]) {
+      const currentGeneration = this.unsavedOverlays.get(filePath)?.generation;
+      if (currentGeneration === savedGeneration) {
+        this.clearUnsavedOverlay(filePath);
+      } else {
+        // A newer dirty edit is not represented by the committed disk graph.
+        this.pendingSavedOverlayGenerations.delete(filePath);
+      }
+    }
   }
 
   /**
@@ -363,7 +385,7 @@ export class TsdocEdgeService {
       if (content !== undefined) {
         // Process from provided content (unsaved buffer)
         result = this.incrementalBuilder.processContent(filePath, content);
-        this.installUnsavedOverlay(filePath, result);
+        this.installUnsavedOverlay(filePath, content, result);
       } else if (this.isCanonicalGraphEnabled()) {
         // Saved content must use async whole-project refreshCanonicalGraph().
         return null;
@@ -445,7 +467,8 @@ export class TsdocEdgeService {
         options.canonicalGraphDependencies
       );
       const active = this.canonicalCoordinator.readActiveRevision();
-      if (active) this.installCanonicalRevision(active.graph, active.metadata.revisionId, active.diagnostics);
+      if (active)
+        this.installCanonicalRevision(active.graph, active.metadata.revisionId, active.diagnostics);
       return;
     }
 
@@ -458,12 +481,24 @@ export class TsdocEdgeService {
     try {
       this.canonicalRepository = new GraphRepository(databasePath, { readOnly: true });
       const active = this.canonicalRepository.readActiveRevision();
-      if (active) this.installCanonicalRevision(active.graph, active.metadata.revisionId, active.diagnostics);
+      if (active)
+        this.installCanonicalRevision(active.graph, active.metadata.revisionId, active.diagnostics);
     } catch (error) {
       console.error(`Failed to open canonical graph database: ${error}`);
       this.canonicalRepository?.close();
       this.canonicalRepository = null;
     }
+  }
+
+  /** Resolve the legacy database from an explicit option or project config. */
+  private resolveLegacyDatabasePath(explicitPath?: string): string {
+    if (explicitPath) return path.resolve(this.workspaceRoot, explicitPath);
+
+    const loader = new ConfigLoader(this.workspaceRoot);
+    const configuredPath = loader.getConfig().paths.databasePath || '.tsdoc.db';
+    const configPath = loader.getConfigPath();
+    const baseDir = configPath ? path.dirname(configPath) : this.workspaceRoot;
+    return path.resolve(baseDir, configuredPath);
   }
 
   /** Install one immutable revision and invalidate all derived query caches. */
@@ -480,19 +515,26 @@ export class TsdocEdgeService {
   }
 
   /** Build or refresh canonical-id GraphDelta overlays for dirty files. */
-  private installUnsavedOverlay(filePath: string, extract: IncrementalExtractResult): void {
+  private installUnsavedOverlay(
+    filePath: string,
+    content: string,
+    extract: IncrementalExtractResult
+  ): void {
     const resolved = path.resolve(filePath);
     const baseGraph = this.canonicalView?.graph ?? this.emptyCanonicalGraph();
     const baseRevisionId = this.canonicalRevisionId ?? 'uninitialized';
+    const baseRevision = this.codeGraphRevision(baseGraph, baseRevisionId);
     const delta = GraphDeltaBuilder.fromExtract({
       baseGraph,
       baseRevisionId,
       filePath: resolved,
+      content,
       extract,
     });
-    const overlay = { delta, extract };
+    const overlay = { delta, extract, content, generation: ++this.nextOverlayGeneration };
     this.unsavedOverlays.set(resolved, overlay);
-    this.overlayViews.set(resolved, new OverlayGraphView(baseGraph, delta));
+    this.overlayViews.set(resolved, new OverlayGraphView(baseRevision, delta));
+    this.rebuildWorkspaceOverlayView(baseGraph);
   }
 
   private emptyCanonicalGraph(): CanonicalProjectGraph {
@@ -507,22 +549,73 @@ export class TsdocEdgeService {
     };
   }
 
-  private rebuildOverlayViews(graph: ConstructorParameters<typeof CanonicalGraphLspView>[0], revisionId: string): void {
+  private rebuildOverlayViews(
+    graph: ConstructorParameters<typeof CanonicalGraphLspView>[0],
+    revisionId: string
+  ): void {
     this.overlayViews.clear();
+    const baseRevision = this.codeGraphRevision(graph, revisionId);
     for (const [filePath, overlay] of this.unsavedOverlays) {
       const delta = GraphDeltaBuilder.fromExtract({
         baseGraph: graph,
         baseRevisionId: revisionId,
         filePath,
+        content: overlay.content,
         extract: overlay.extract,
       });
-      this.unsavedOverlays.set(filePath, { delta, extract: overlay.extract });
-      this.overlayViews.set(filePath, new OverlayGraphView(graph, delta));
+      this.unsavedOverlays.set(filePath, {
+        delta,
+        extract: overlay.extract,
+        content: overlay.content,
+        generation: overlay.generation,
+      });
+      this.overlayViews.set(filePath, new OverlayGraphView(baseRevision, delta));
     }
+    this.rebuildWorkspaceOverlayView(graph);
+  }
+
+  /** Compose all dirty-file deltas for global name and id based queries. */
+  private rebuildWorkspaceOverlayView(baseGraph?: CanonicalProjectGraph): void {
+    if (this.unsavedOverlays.size === 0) {
+      this.workspaceOverlayView = null;
+      return;
+    }
+
+    const graph = baseGraph ?? this.canonicalView?.graph ?? this.emptyCanonicalGraph();
+    const baseRevision = this.codeGraphRevision(graph, this.canonicalRevisionId ?? 'uninitialized');
+    const overlays = [...this.unsavedOverlays.entries()].sort(([left], [right]) =>
+      compareText(left, right)
+    );
+    this.workspaceOverlayView = new EffectiveCodeGraphView(
+      baseRevision,
+      overlays.map(([, overlay]) => overlay.delta)
+    );
+  }
+
+  private codeGraphRevision(graph: CanonicalProjectGraph, revisionId: string): CodeGraphRevision {
+    return Object.freeze({ revisionId, graph });
+  }
+
+  /** Select the dirty workspace graph when the id belongs to canonical space. */
+  private canonicalQueryView(symbolId?: string): CanonicalGraphLspView | null {
+    if (!this.workspaceOverlayView) return this.canonicalView;
+    const workspaceView = this.workspaceOverlayView.view;
+    if (!symbolId) return workspaceView;
+    if (workspaceView.analysis.index.getNode(symbolId)) {
+      return workspaceView;
+    }
+    return parseCanonicalId(symbolId) ? workspaceView : this.canonicalView;
   }
 
   private getOverlayView(filePath: string): OverlayGraphView | null {
     return this.overlayViews.get(path.resolve(filePath)) ?? null;
+  }
+
+  /** Query a dirty file against the graph containing every active file delta. */
+  private getDirtyQueryView(filePath: string): CanonicalGraphLspView | null {
+    const overlayView = this.getOverlayView(filePath);
+    if (!overlayView) return null;
+    return this.workspaceOverlayView?.view ?? overlayView.view;
   }
 
   /**
@@ -597,12 +690,12 @@ export class TsdocEdgeService {
    * @returns Markdown hover content or null
    */
   getHoverInfo(filePath: string, line: number, character: number): string | null {
-    const overlayView = this.getOverlayView(filePath);
-    if (overlayView) {
-      const symbol = overlayView.view.symbolAtPosition(filePath, line, character);
+    const dirtyQueryView = this.getDirtyQueryView(filePath);
+    if (dirtyQueryView) {
+      const symbol = dirtyQueryView.symbolAtPosition(filePath, line, character);
       if (!symbol) return null;
 
-      const counts = overlayView.view.impactCounts(symbol.node.id);
+      const counts = dirtyQueryView.impactCounts(symbol.node.id);
       let content = `## ${canonicalNodeDisplayName(symbol.node)}\n\n`;
       content += `**Type:** ${symbol.node.kind}\n\n`;
       content += `*Unsaved buffer overlay*\n\n`;
@@ -612,14 +705,15 @@ export class TsdocEdgeService {
       return content;
     }
 
-    const canonical = this.canonicalView?.symbolAtPosition(filePath, line, character);
-    if (canonical && this.canonicalView) {
-      const counts = this.canonicalView.impactCounts(canonical.node.id);
+    const canonicalView = this.canonicalQueryView();
+    const canonical = canonicalView?.symbolAtPosition(filePath, line, character);
+    if (canonical && canonicalView) {
+      const counts = canonicalView.impactCounts(canonical.node.id);
       const edgeKinds = new Set([
-        ...this.canonicalView.analysis.index
+        ...canonicalView.analysis.index
           .getIncomingEdges(canonical.node.id)
           .map((edge) => edge.kind),
-        ...this.canonicalView.analysis.index
+        ...canonicalView.analysis.index
           .getOutgoingEdges(canonical.node.id)
           .map((edge) => edge.kind),
       ]);
@@ -722,54 +816,6 @@ export class TsdocEdgeService {
   }
 
   /**
-   * Get impact counts for a symbol (cached)
-   * Uses indexed JOIN on relationship_symbols table for O(1) lookup
-   */
-  private getImpactCounts(symbolId: string): { downstream: number; upstream: number } {
-    if (this.canonicalView?.analysis.index.getNode(symbolId)) {
-      const counts = this.canonicalView.impactCounts(symbolId);
-      return { downstream: counts.dependents, upstream: counts.dependencies };
-    }
-    // Check cache
-    const cached = this.cacheManager.get<{ downstream: number; upstream: number }>(
-      CACHE_NAMES.IMPACT,
-      symbolId
-    );
-    if (cached) {
-      return cached;
-    }
-
-    // Use JOIN on relationship_symbols for indexed lookup (O(1) instead of O(n) LIKE scan)
-    const downstreamStmt = this.statementManager?.prepare(
-      'downstreamJoin',
-      `
-      SELECT COUNT(DISTINCT rs.relationship_id) as count
-      FROM relationship_symbols rs
-      WHERE rs.symbol_id = ? AND rs.role = 'from'
-    `
-    );
-
-    const upstreamStmt = this.statementManager?.prepare(
-      'upstreamJoin',
-      `
-      SELECT COUNT(DISTINCT rs.relationship_id) as count
-      FROM relationship_symbols rs
-      WHERE rs.symbol_id = ? AND rs.role = 'to'
-    `
-    );
-
-    const downstream = (downstreamStmt?.get(symbolId) as CountRow | undefined)?.count || 0;
-    const upstream = (upstreamStmt?.get(symbolId) as CountRow | undefined)?.count || 0;
-
-    const result = { downstream, upstream };
-
-    // Store in cache
-    this.cacheManager.set(CACHE_NAMES.IMPACT, symbolId, result);
-
-    return result;
-  }
-
-  /**
    * Get code lenses for a file
    * Optimized with batch impact count query
    *
@@ -777,10 +823,10 @@ export class TsdocEdgeService {
    * @returns Array of code lens info
    */
   getCodeLenses(filePath: string): CodeLensInfo[] {
-    const overlayView = this.getOverlayView(filePath);
-    if (overlayView) {
-      return overlayView.view.symbolsInFile(filePath).map(({ node, line }) => {
-        const counts = overlayView.view.impactCounts(node.id);
+    const dirtyQueryView = this.getDirtyQueryView(filePath);
+    if (dirtyQueryView) {
+      return dirtyQueryView.symbolsInFile(filePath).map(({ node, line }) => {
+        const counts = dirtyQueryView.impactCounts(node.id);
         return {
           line,
           title: `↓${counts.dependents} ↑${counts.dependencies}`,
@@ -789,9 +835,10 @@ export class TsdocEdgeService {
       });
     }
 
-    if (this.canonicalView) {
-      return this.canonicalView.symbolsInFile(filePath).flatMap(({ node, line }) => {
-        const counts = this.canonicalView?.impactCounts(node.id);
+    const canonicalView = this.canonicalQueryView();
+    if (canonicalView) {
+      return canonicalView.symbolsInFile(filePath).flatMap(({ node, line }) => {
+        const counts = canonicalView.impactCounts(node.id);
         if (!counts || (counts.dependents === 0 && counts.dependencies === 0)) return [];
         return [
           {
@@ -872,10 +919,11 @@ export class TsdocEdgeService {
     symbolIds: string[]
   ): Map<string, { downstream: number; upstream: number }> {
     const results = new Map<string, { downstream: number; upstream: number }>();
-    if (this.canonicalView) {
+    const canonicalView = this.canonicalQueryView();
+    if (canonicalView) {
       for (const id of symbolIds) {
-        if (!this.canonicalView.analysis.index.getNode(id)) continue;
-        const counts = this.canonicalView.impactCounts(id);
+        if (!canonicalView.analysis.index.getNode(id)) continue;
+        const counts = canonicalView.impactCounts(id);
         results.set(id, {
           downstream: counts.dependents,
           upstream: counts.dependencies,
@@ -1017,12 +1065,16 @@ export class TsdocEdgeService {
   getDiagnostics(filePath: string): DiagnosticInfo[] {
     const overlayView = this.getOverlayView(filePath);
     if (overlayView) {
-      const diagnostics: DiagnosticInfo[] = [];
+      const dirtyQueryView = this.workspaceOverlayView?.view ?? overlayView.view;
+      const diagnostics: DiagnosticInfo[] = [
+        ...this.canonicalDiagnosticsForFile(filePath),
+        ...this.getLegacyArchitecturalDiagnostics(filePath),
+      ];
       for (const diagnostic of overlayView.delta.diagnostics ?? []) {
         diagnostics.push(mapCanonicalDiagnostic(diagnostic));
       }
-      for (const { node, line } of overlayView.view.symbolsInFile(filePath)) {
-        const dependents = overlayView.view.impactCounts(node.id).dependents;
+      for (const { node, line } of dirtyQueryView.symbolsInFile(filePath)) {
+        const dependents = dirtyQueryView.impactCounts(node.id).dependents;
         if (dependents > 10) {
           diagnostics.push({
             line,
@@ -1031,36 +1083,24 @@ export class TsdocEdgeService {
           });
         }
       }
-      return diagnostics;
+      return uniqueDiagnostics(diagnostics);
     }
 
-    if (this.canonicalView) {
-      const canonicalView = this.canonicalView;
-      const relativeFile = path
-        .relative(this.workspaceRoot, path.resolve(filePath))
-        .replace(/\\/g, '/');
-      const canonicalDiagnostics = this.canonicalDiagnostics
-        .filter(
-          (diagnostic) =>
-            !diagnostic.file ||
-            diagnostic.file === relativeFile ||
-            path.resolve(this.workspaceRoot, diagnostic.file) === path.resolve(filePath)
-        )
-        .map((diagnostic) => mapCanonicalDiagnostic(diagnostic));
-      const impactDiagnostics = canonicalView
-        .symbolsInFile(filePath)
-        .flatMap(({ node, line }) => {
-          const dependents = canonicalView.impactCounts(node.id).dependents;
-          return dependents > 10
-            ? [
-                {
-                  line,
-                  message: `High-impact symbol: ${canonicalNodeDisplayName(node)} has ${dependents} dependents`,
-                  severity: DiagnosticSeverity.Information,
-                },
-              ]
-            : [];
-        });
+    const canonicalView = this.canonicalQueryView();
+    if (canonicalView) {
+      const canonicalDiagnostics = this.canonicalDiagnosticsForFile(filePath);
+      const impactDiagnostics = canonicalView.symbolsInFile(filePath).flatMap(({ node, line }) => {
+        const dependents = canonicalView.impactCounts(node.id).dependents;
+        return dependents > 10
+          ? [
+              {
+                line,
+                message: `High-impact symbol: ${canonicalNodeDisplayName(node)} has ${dependents} dependents`,
+                severity: DiagnosticSeverity.Information,
+              },
+            ]
+          : [];
+      });
       return [
         ...canonicalDiagnostics,
         ...impactDiagnostics,
@@ -1156,6 +1196,20 @@ export class TsdocEdgeService {
     }
   }
 
+  /** Project persisted canonical diagnostics for one source file. */
+  private canonicalDiagnosticsForFile(filePath: string): DiagnosticInfo[] {
+    const resolvedFile = path.resolve(filePath);
+    const relativeFile = path.relative(this.workspaceRoot, resolvedFile).replace(/\\/g, '/');
+    return this.canonicalDiagnostics
+      .filter(
+        (diagnostic) =>
+          !diagnostic.file ||
+          diagnostic.file === relativeFile ||
+          path.resolve(this.workspaceRoot, diagnostic.file) === resolvedFile
+      )
+      .map((diagnostic) => mapCanonicalDiagnostic(diagnostic));
+  }
+
   /** Preserve file-scoped legacy enrichment that has no canonical fact-plane equivalent yet. */
   private getLegacyArchitecturalDiagnostics(filePath: string): DiagnosticInfo[] {
     if (!this.db) return [];
@@ -1242,9 +1296,9 @@ export class TsdocEdgeService {
     line: number,
     character = 0
   ): { id: string; name: string; type: string } | null {
-    const overlayView = this.getOverlayView(filePath);
-    if (overlayView) {
-      const symbol = overlayView.view.symbolAtPosition(filePath, line, character);
+    const dirtyQueryView = this.getDirtyQueryView(filePath);
+    if (dirtyQueryView) {
+      const symbol = dirtyQueryView.symbolAtPosition(filePath, line, character);
       return symbol
         ? {
             id: symbol.node.id,
@@ -1254,7 +1308,7 @@ export class TsdocEdgeService {
         : null;
     }
 
-    const canonical = this.canonicalView?.symbolAtPosition(filePath, line, character);
+    const canonical = this.canonicalQueryView()?.symbolAtPosition(filePath, line, character);
     if (canonical) {
       return {
         id: canonical.node.id,
@@ -1305,11 +1359,12 @@ export class TsdocEdgeService {
     maxDepth: number = 3,
     includeSymbols: boolean = true
   ): { downstream: number; upstream: number; symbols: string[] } {
-    if (this.canonicalView?.analysis.index.getNode(symbolId)) {
-      const affected = this.canonicalView
+    const canonicalView = this.canonicalQueryView(symbolId);
+    if (canonicalView?.analysis.index.getNode(symbolId)) {
+      const affected = canonicalView
         .impact(symbolId, maxDepth)
         .slice(0, TsdocEdgeService.MAX_IMPACT_SYMBOLS);
-      const dependencies = this.canonicalView.analysis.dependencies(symbolId, {
+      const dependencies = canonicalView.analysis.dependencies(symbolId, {
         external: 'exclude',
       });
       return {
@@ -1318,6 +1373,7 @@ export class TsdocEdgeService {
         symbols: includeSymbols ? [...affected] : [],
       };
     }
+    if (parseCanonicalId(symbolId)) return { downstream: 0, upstream: 0, symbols: [] };
     if (!this.db) return { downstream: 0, upstream: 0, symbols: [] };
 
     try {
@@ -1340,7 +1396,8 @@ export class TsdocEdgeService {
       const maxSymbols = TsdocEdgeService.MAX_IMPACT_SYMBOLS;
 
       while (queue.length > 0 && visited.size <= maxSymbols) {
-        const current = queue.shift()!;
+        const current = queue.shift();
+        if (!current) break;
         if (current.depth >= maxDepth) continue;
 
         // Find downstream dependencies using indexed lookup
@@ -1394,14 +1451,16 @@ export class TsdocEdgeService {
     symbolId: string,
     limit: number = 10
   ): Array<{ id: string; name: string; type: string; relationshipType: string }> {
-    if (this.canonicalView?.analysis.index.getNode(symbolId)) {
-      return this.canonicalView.related(symbolId, limit).map(({ node, relationshipType }) => ({
+    const canonicalView = this.canonicalQueryView(symbolId);
+    if (canonicalView?.analysis.index.getNode(symbolId)) {
+      return canonicalView.related(symbolId, limit).map(({ node, relationshipType }) => ({
         id: node.id,
         name: canonicalNodeDisplayName(node),
         type: node.kind,
         relationshipType,
       }));
     }
+    if (parseCanonicalId(symbolId)) return [];
     if (!this.db) return [];
 
     try {
@@ -1447,7 +1506,7 @@ export class TsdocEdgeService {
   findSymbolByName(
     name: string
   ): { id: string; name: string; type: string; filePath: string; line: number } | null {
-    const canonical = this.canonicalView?.findByName(name);
+    const canonical = this.canonicalQueryView()?.findByName(name);
     if (canonical) {
       return {
         id: canonical.node.id,
@@ -1556,9 +1615,10 @@ export class TsdocEdgeService {
       string,
       { id: string; name: string; type: string; filePath: string; line: number }
     >();
-    if (this.canonicalView) {
+    const canonicalView = this.canonicalQueryView();
+    if (canonicalView) {
       for (const name of names) {
-        const canonical = this.canonicalView.findByName(name);
+        const canonical = canonicalView.findByName(name);
         if (!canonical) continue;
         results.set(name, {
           id: canonical.node.id,
@@ -1654,6 +1714,8 @@ export class TsdocEdgeService {
   close(): void {
     this.unsavedOverlays.clear();
     this.overlayViews.clear();
+    this.pendingSavedOverlayGenerations.clear();
+    this.workspaceOverlayView = null;
     this.canonicalView = null;
     this.canonicalRevisionId = null;
     this.canonicalDiagnostics = [];
@@ -1679,18 +1741,21 @@ export class TsdocEdgeService {
   }
 }
 
-function mapCanonicalDiagnostic(diagnostic: CanonicalDiagnostic): DiagnosticInfo {
-  const severityByCategory: Record<CanonicalDiagnostic['severity'], DiagnosticSeverity> = {
-    error: DiagnosticSeverity.Error,
-    warning: DiagnosticSeverity.Warning,
-    info: DiagnosticSeverity.Information,
-    hint: DiagnosticSeverity.Hint,
-  };
-  return {
-    line: diagnostic.startLine,
-    message: diagnostic.message,
-    severity: severityByCategory[diagnostic.severity],
-  };
+function uniqueDiagnostics(diagnostics: readonly DiagnosticInfo[]): DiagnosticInfo[] {
+  const byKey = new Map<string, DiagnosticInfo>();
+  for (const diagnostic of diagnostics) {
+    const key = [
+      diagnostic.line,
+      diagnostic.startCol ?? '',
+      diagnostic.endLine ?? '',
+      diagnostic.endCol ?? '',
+      diagnostic.code ?? '',
+      diagnostic.severity,
+      diagnostic.message,
+    ].join('\u0000');
+    if (!byKey.has(key)) byKey.set(key, diagnostic);
+  }
+  return [...byKey.values()];
 }
 
 function compareText(left: string, right: string): number {

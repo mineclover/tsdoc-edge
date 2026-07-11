@@ -113,13 +113,9 @@ export class IncrementalBuilder {
 
     try {
       const content = fs.readFileSync(filePath, 'utf-8');
-      const sourceFile = ts.createSourceFile(
-        filePath,
-        content,
-        ts.ScriptTarget.Latest,
-        true
-      );
+      const sourceFile = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);
 
+      this.collectParseDiagnostics(sourceFile, result);
       this.visitNode(sourceFile, sourceFile, result, filePath);
     } catch (error) {
       result.errors.push(`Parse error: ${error}`);
@@ -142,11 +138,26 @@ export class IncrementalBuilder {
       result.symbols.push(this.createSymbol(node, node.name, 'class', sourceFile, filePath));
 
       // Extract methods and properties
-      node.members.forEach(member => {
+      node.members.forEach((member) => {
         if (ts.isMethodDeclaration(member) && member.name) {
-          result.symbols.push(this.createSymbol(member, member.name, 'method', sourceFile, filePath));
+          result.symbols.push(
+            this.createSymbol(member, member.name, 'method', sourceFile, filePath)
+          );
+        } else if (ts.isConstructorDeclaration(member)) {
+          result.symbols.push(
+            this.createSymbol(member, '__constructor', 'method', sourceFile, filePath)
+          );
+        } else if (
+          (ts.isGetAccessorDeclaration(member) || ts.isSetAccessorDeclaration(member)) &&
+          member.name
+        ) {
+          result.symbols.push(
+            this.createSymbol(member, member.name, 'method', sourceFile, filePath)
+          );
         } else if (ts.isPropertyDeclaration(member) && member.name) {
-          result.symbols.push(this.createSymbol(member, member.name, 'property', sourceFile, filePath));
+          result.symbols.push(
+            this.createSymbol(member, member.name, 'property', sourceFile, filePath)
+          );
         }
       });
     }
@@ -154,6 +165,23 @@ export class IncrementalBuilder {
     // Extract interfaces
     if (ts.isInterfaceDeclaration(node) && node.name) {
       result.symbols.push(this.createSymbol(node, node.name, 'interface', sourceFile, filePath));
+      node.members.forEach((member) => {
+        if (ts.isMethodSignature(member) && member.name) {
+          result.symbols.push(
+            this.createSymbol(member, member.name, 'method', sourceFile, filePath)
+          );
+        } else if (ts.isPropertySignature(member) && member.name) {
+          result.symbols.push(
+            this.createSymbol(member, member.name, 'property', sourceFile, filePath)
+          );
+        }
+      });
+    }
+
+    // Extract enums. Enum members remain producer-owned because the canonical
+    // graph currently exposes the enum declaration as the stable node.
+    if (ts.isEnumDeclaration(node) && node.name) {
+      result.symbols.push(this.createSymbol(node, node.name, 'enum', sourceFile, filePath));
     }
 
     // Extract functions
@@ -168,22 +196,24 @@ export class IncrementalBuilder {
 
     // Extract variables (const/let)
     if (ts.isVariableStatement(node)) {
-      node.declarationList.declarations.forEach(decl => {
+      node.declarationList.declarations.forEach((decl) => {
         if (ts.isIdentifier(decl.name)) {
           const isConst = (node.declarationList.flags & ts.NodeFlags.Const) !== 0;
-          result.symbols.push(this.createSymbol(
-            decl,
-            decl.name,
-            isConst ? 'constant' : 'variable',
-            sourceFile,
-            filePath
-          ));
+          result.symbols.push(
+            this.createSymbol(
+              decl,
+              decl.name,
+              isConst ? 'constant' : 'variable',
+              sourceFile,
+              filePath
+            )
+          );
         }
       });
     }
 
     // Recurse into children
-    ts.forEachChild(node, child => this.visitNode(child, sourceFile, result, filePath));
+    ts.forEachChild(node, (child) => this.visitNode(child, sourceFile, result, filePath));
   }
 
   /**
@@ -191,22 +221,25 @@ export class IncrementalBuilder {
    */
   private createSymbol(
     node: ts.Node,
-    name: ts.Identifier | ts.PropertyName,
+    name: ts.Identifier | ts.PropertyName | string,
     type: string,
     sourceFile: ts.SourceFile,
     filePath: string
   ): ExtractedSymbol {
     const { line, character } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
     const end = sourceFile.getLineAndCharacterOfPosition(node.getEnd());
-    const nameText = ts.isIdentifier(name) ? name.text : name.getText();
+    const nameText =
+      typeof name === 'string' ? name : ts.isIdentifier(name) ? name.text : name.getText();
 
     // Check export status
-    const isExported = this.hasModifier(node, ts.SyntaxKind.ExportKeyword) ||
-                       this.hasModifier(node.parent, ts.SyntaxKind.ExportKeyword);
+    const isExported =
+      this.hasModifier(node, ts.SyntaxKind.ExportKeyword) ||
+      this.hasModifier(node.parent, ts.SyntaxKind.ExportKeyword);
 
     // Check public status (not private/protected)
-    const isPublic = !this.hasModifier(node, ts.SyntaxKind.PrivateKeyword) &&
-                     !this.hasModifier(node, ts.SyntaxKind.ProtectedKeyword);
+    const isPublic =
+      !this.hasModifier(node, ts.SyntaxKind.PrivateKeyword) &&
+      !this.hasModifier(node, ts.SyntaxKind.ProtectedKeyword);
 
     // Extract JSDoc summary
     const summary = this.extractJsDocSummary(node, sourceFile);
@@ -231,13 +264,33 @@ export class IncrementalBuilder {
     };
   }
 
+  /** Collect parser diagnostics that `createSourceFile` reports without throwing. */
+  private collectParseDiagnostics(
+    sourceFile: ts.SourceFile,
+    result: IncrementalExtractResult
+  ): void {
+    const parseDiagnostics = (
+      sourceFile as ts.SourceFile & { parseDiagnostics?: readonly ts.Diagnostic[] }
+    ).parseDiagnostics;
+    for (const diagnostic of parseDiagnostics ?? []) {
+      const position =
+        diagnostic.start === undefined
+          ? null
+          : sourceFile.getLineAndCharacterOfPosition(diagnostic.start);
+      const location = position ? ` at ${position.line + 1}:${position.character + 1}` : '';
+      result.errors.push(
+        `Parse error${location}: ${ts.flattenDiagnosticMessageText(diagnostic.messageText, ' ')}`
+      );
+    }
+  }
+
   /**
    * Check if node has a specific modifier
    */
   private hasModifier(node: ts.Node | undefined, kind: ts.SyntaxKind): boolean {
     if (!node) return false;
     const modifiers = ts.canHaveModifiers(node) ? ts.getModifiers(node) : undefined;
-    return modifiers?.some(m => m.kind === kind) ?? false;
+    return modifiers?.some((m) => m.kind === kind) ?? false;
   }
 
   /**
@@ -255,10 +308,12 @@ export class IncrementalBuilder {
       const text = fullText.slice(comment.pos, comment.end);
       if (text.startsWith('/**')) {
         // Extract first line/paragraph as summary
-        const lines = text.replace(/^\/\*\*/, '').replace(/\*\/$/, '')
+        const lines = text
+          .replace(/^\/\*\*/, '')
+          .replace(/\*\/$/, '')
           .split('\n')
-          .map(l => l.replace(/^\s*\*\s?/, '').trim())
-          .filter(l => l && !l.startsWith('@'));
+          .map((l) => l.replace(/^\s*\*\s?/, '').trim())
+          .filter((l) => l && !l.startsWith('@'));
 
         if (lines.length > 0) {
           return lines[0];
@@ -315,10 +370,10 @@ export class IncrementalBuilder {
           symbol.isPublic ? 1 : 0,
           symbol.summary,
           symbol.declaredType,
-          now,           // created_at
-          now,           // updated_at
-          '0.12.1',      // version
-          -1             // jsonl_line (-1 indicates incremental build)
+          now, // created_at
+          now, // updated_at
+          '0.12.1', // version
+          -1 // jsonl_line (-1 indicates incremental build)
         );
         inserted++;
       }
@@ -400,13 +455,9 @@ export class IncrementalBuilder {
     };
 
     try {
-      const sourceFile = ts.createSourceFile(
-        filePath,
-        content,
-        ts.ScriptTarget.Latest,
-        true
-      );
+      const sourceFile = ts.createSourceFile(filePath, content, ts.ScriptTarget.Latest, true);
 
+      this.collectParseDiagnostics(sourceFile, result);
       this.visitNode(sourceFile, sourceFile, result, filePath);
     } catch (error) {
       result.errors.push(`Parse error: ${error}`);

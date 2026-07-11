@@ -348,7 +348,7 @@ describe('BaseCommand', () => {
 
     it('should return default path when no config exists', () => {
       const dbPath = command.testGetDatabasePath();
-      expect(dbPath).toBe(path.join(tempDir, '.tsdoc', 'symbols.db'));
+      expect(dbPath).toBe(path.join(tempDir, '.tsdoc.db'));
     });
 
     it('should return configured path when config exists', () => {
@@ -373,7 +373,15 @@ describe('BaseCommand', () => {
       );
 
       const dbPath = command.testGetDatabasePath();
-      expect(dbPath).toBe(path.join(tempDir, '.tsdoc', 'symbols.db'));
+      expect(dbPath).toBe(path.join(tempDir, '.tsdoc.db'));
+    });
+
+    it('uses the historical nested database when it is the only existing path', () => {
+      const legacyPath = path.join(tempDir, '.tsdoc', 'symbols.db');
+      fs.mkdirSync(path.dirname(legacyPath), { recursive: true });
+      fs.writeFileSync(legacyPath, '');
+
+      expect(command.testGetDatabasePath()).toBe(legacyPath);
     });
   });
 

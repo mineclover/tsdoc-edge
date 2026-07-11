@@ -5,10 +5,14 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { IncrementalBuilder } from '../lsp/incremental-builder';
+import { ASTSymbolExtractor, type ExtractedSymbol } from '../analyzer/ASTSymbolExtractor';
 import type { CanonicalGraphNode, CanonicalProjectGraph } from './contracts';
 import { generateLegacyId } from './legacy-id';
-import { materializeAliases } from './symbol-alias';
+import {
+  buildLegacyIdentityMap,
+  type LegacySymbolIdentity,
+  materializeAliases,
+} from './symbol-alias';
 
 export interface LegacyParityMismatch {
   readonly filePath: string;
@@ -24,7 +28,7 @@ export interface LegacyParityResult {
 
 /**
  * Verify that TS5 syntax extraction and legacy-id projection agree with a
- * canonical revision for supported top-level declarations.
+ * canonical revision for declarations with an unambiguous legacy identity.
  */
 export function verifyLegacyAstParity(
   graph: CanonicalProjectGraph,
@@ -33,38 +37,48 @@ export function verifyLegacyAstParity(
 ): LegacyParityResult {
   const aliases = materializeAliases(graph);
   const aliasByCanonical = new Map(aliases.map((alias) => [alias.canonicalId, alias]));
-  const builder = new IncrementalBuilder(rootDir, null);
-  const files =
-    filePaths ??
-    [
-      ...new Set(
-        graph.nodes
-          .filter((node) => node.external !== true)
-          .map((node) => node.file ?? node.evidence?.file)
-          .filter((file): file is string => typeof file === 'string')
-      ),
-    ];
+  const identities = buildLegacyIdentityMap(graph);
+  const files = canonicalFiles(graph).sort(compareText);
+  const selectedFiles = filePaths
+    ? new Set(filePaths.map((file) => normalizedRelativeFile(file, rootDir)))
+    : null;
+  const projectedByFile = extractLegacyProjection(files, rootDir);
 
   const mismatches: LegacyParityMismatch[] = [];
   let matched = 0;
 
   for (const relativeFile of files) {
+    const normalizedFile = normalizedRelativeFile(relativeFile, rootDir);
+    if (selectedFiles && !selectedFiles.has(normalizedFile)) continue;
     const absoluteFile = path.isAbsolute(relativeFile)
       ? path.resolve(relativeFile)
       : path.resolve(rootDir, relativeFile);
     if (!fs.existsSync(absoluteFile)) continue;
 
-    const extracted = builder.extractFile(absoluteFile);
-    const savedNodes = graph.nodes.filter((node) => nodeMatchesFile(node, absoluteFile, relativeFile, rootDir));
+    const extracted = projectedByFile.get(normalizedFile) ?? [];
+    const savedNodes = graph.nodes.filter(
+      (node) =>
+        identities.has(node.id) && nodeMatchesFile(node, absoluteFile, relativeFile, rootDir)
+    );
 
     for (const node of savedNodes) {
+      const identity = identities.get(node.id);
+      if (!identity) continue;
       const alias = aliasByCanonical.get(node.id);
-      if (!alias) continue;
+      if (!alias) {
+        mismatches.push({
+          filePath: normalizedFile,
+          canonicalId: node.id,
+          legacyId: generateLegacyId(identity.filePath, identity.symbolName, identity.symbolType),
+          reason: 'legacy projection is ambiguous or lacks a stable collision suffix',
+        });
+        continue;
+      }
 
-      const peer = findExtractedPeer(extracted.symbols, node, absoluteFile, rootDir);
+      const peer = findExtractedPeer(extracted, node, identity);
       if (!peer) {
         mismatches.push({
-          filePath: relativeFile.replace(/\\/g, '/'),
+          filePath: normalizedFile,
           canonicalId: node.id,
           legacyId: alias.legacyId,
           reason: 'syntax extractor did not find a matching declaration',
@@ -72,13 +86,12 @@ export function verifyLegacyAstParity(
         continue;
       }
 
-      const projectedLegacyId = generateLegacyId(absoluteFile, peer.name, peer.type);
-      if (projectedLegacyId !== alias.legacyId) {
+      if (peer.legacyId !== alias.legacyId) {
         mismatches.push({
-          filePath: relativeFile.replace(/\\/g, '/'),
+          filePath: normalizedFile,
           canonicalId: node.id,
           legacyId: alias.legacyId,
-          reason: `legacy projection mismatch: expected ${alias.legacyId}, got ${projectedLegacyId}`,
+          reason: `legacy projection mismatch: expected ${alias.legacyId}, got ${peer.legacyId}`,
         });
         continue;
       }
@@ -90,49 +103,47 @@ export function verifyLegacyAstParity(
   return { matched, mismatches: Object.freeze(mismatches) };
 }
 
+interface ProjectedLegacySymbol {
+  readonly symbol: ExtractedSymbol;
+  readonly legacyId: string;
+}
+
 function findExtractedPeer(
-  symbols: ReturnType<IncrementalBuilder['extractFile']>['symbols'],
+  symbols: readonly ProjectedLegacySymbol[],
   node: CanonicalGraphNode,
-  absoluteFile: string,
-  rootDir: string
-) {
-  const nodeName = node.name ?? node.qualifiedName;
-  if (!nodeName) return null;
-
-  const candidates = symbols.filter((symbol) => {
-    if (symbol.type.toLocaleLowerCase() !== node.kind.toLocaleLowerCase()) return false;
-    if (symbol.name !== nodeName && symbol.name !== nodeName.split('.').at(-1)) return false;
-    return containsNode(node, symbol.line, symbol.column, symbol.endLine, symbol.endColumn);
-  });
-
-  candidates.sort(
-    (left, right) =>
-      rangeSize(left) - rangeSize(right) ||
-      right.line - left.line ||
-      left.name.localeCompare(right.name)
+  identity: LegacySymbolIdentity
+): ProjectedLegacySymbol | null {
+  const candidates = symbols.filter(
+    ({ symbol }) =>
+      symbol.type.toLowerCase() === identity.symbolType &&
+      symbol.name === identity.symbolName &&
+      symbol.line === node.evidence?.startLine
   );
-  return candidates[0] ?? null;
+  return candidates.length === 1 ? candidates[0] : null;
 }
 
-function containsNode(
-  node: CanonicalGraphNode,
-  line: number,
-  column: number,
-  endLine: number,
-  endColumn: number
-): boolean {
-  const evidence = node.evidence;
-  if (!evidence?.startLine) return false;
-  const startLine = evidence.startLine;
-  const nodeEndLine = evidence.endLine ?? startLine;
-  if (line < startLine || endLine > nodeEndLine) return false;
-  if (line === startLine && evidence.startCol !== undefined && column < evidence.startCol) return false;
-  if (endLine === nodeEndLine && evidence.endCol !== undefined && endColumn > evidence.endCol) return false;
-  return true;
-}
-
-function rangeSize(symbol: { line: number; column: number; endLine: number; endColumn: number }): number {
-  return (symbol.endLine - symbol.line) * 1_000_000 + (symbol.endColumn - symbol.column);
+function extractLegacyProjection(
+  files: readonly string[],
+  rootDir: string
+): ReadonlyMap<string, readonly ProjectedLegacySymbol[]> {
+  const extractor = new ASTSymbolExtractor();
+  const seenIds = new Set<string>();
+  const projection = new Map<string, readonly ProjectedLegacySymbol[]>();
+  for (const file of files) {
+    const absoluteFile = path.isAbsolute(file) ? path.resolve(file) : path.resolve(rootDir, file);
+    if (!fs.existsSync(absoluteFile)) continue;
+    const extracted = extractor.extract(absoluteFile, fs.readFileSync(absoluteFile, 'utf8'));
+    const symbols: ProjectedLegacySymbol[] = [];
+    for (const symbol of extracted.symbols) {
+      const base = generateLegacyId(absoluteFile, symbol.name, symbol.type);
+      const legacyId = seenIds.has(base) ? `${base}-L${symbol.line}` : base;
+      if (seenIds.has(legacyId)) continue;
+      seenIds.add(legacyId);
+      symbols.push({ symbol, legacyId });
+    }
+    projection.set(normalizedRelativeFile(file, rootDir), symbols);
+  }
+  return projection;
 }
 
 function nodeMatchesFile(
@@ -145,6 +156,35 @@ function nodeMatchesFile(
   if (!source) return false;
   const normalized = source.replace(/\\/g, '/');
   if (normalized === relativeFile.replace(/\\/g, '/')) return true;
-  const absoluteNodeFile = path.isAbsolute(source) ? path.resolve(source) : path.resolve(rootDir, source);
+  const absoluteNodeFile = path.isAbsolute(source)
+    ? path.resolve(source)
+    : path.resolve(rootDir, source);
   return absoluteNodeFile === absoluteFile;
+}
+
+function canonicalFiles(graph: CanonicalProjectGraph): string[] {
+  return [
+    ...new Set(
+      graph.nodes
+        .filter((node) => node.external !== true)
+        .map((node) => node.file ?? node.evidence?.file)
+        .filter((file): file is string => typeof file === 'string')
+        .map((file) => normalizedRelativeFile(file, graph.rootDir))
+        .filter(
+          (file) =>
+            file !== '..' && !file.startsWith('../') && !/\.(?:test|spec)\.tsx?$/i.test(file)
+        )
+    ),
+  ];
+}
+
+function normalizedRelativeFile(filePath: string, rootDir: string): string {
+  const absolute = path.isAbsolute(filePath)
+    ? path.resolve(filePath)
+    : path.resolve(rootDir, filePath);
+  return path.relative(rootDir, absolute).replace(/\\/g, '/');
+}
+
+function compareText(left: string, right: string): number {
+  return left < right ? -1 : left > right ? 1 : 0;
 }

@@ -35,6 +35,7 @@ describe('GraphRepository', () => {
 
   it('starts empty and creates no legacy symbol or relationship tables', () => {
     expect(repository.readActiveRevision()).toBeNull();
+    expect(repository.readRevision('missing-revision')).toBeNull();
 
     const database = new Database(databasePath, { readonly: true });
     const legacy = database
@@ -70,6 +71,9 @@ describe('GraphRepository', () => {
     const reader = new GraphRepository(databasePath, { readOnly: true });
     try {
       expect(reader.readActiveGraph()).toEqual(graph);
+      const activeRevisionId = reader.readActiveRevision()?.metadata.revisionId;
+      expect(activeRevisionId).toBeDefined();
+      expect(reader.readRevision(activeRevisionId!)?.graph).toEqual(graph);
       expect(() => reader.replaceActiveRevision(graph)).toThrow('read-only repository');
     } finally {
       reader.close();
@@ -171,7 +175,7 @@ describe('GraphRepository', () => {
     expect(third.revisionId).not.toBe(first.revisionId);
   });
 
-  it('reads an early schema-v1 volatile revision id and migrates it on replacement', async () => {
+  it('reads an early volatile revision id and migrates it on replacement', async () => {
     const graph = await projectGraph({
       provenance: {
         adapter: 'fixture-adapter',
@@ -187,29 +191,268 @@ describe('GraphRepository', () => {
     repository.close();
 
     const database = new Database(databasePath);
-    database.pragma('foreign_keys = OFF');
-    database.transaction(() => {
-      database
-        .prepare('UPDATE canonical_graph_state SET active_revision_id = ?')
-        .run(legacyRevisionId);
-      database.prepare('UPDATE canonical_graph_nodes SET revision_id = ?').run(legacyRevisionId);
-      database.prepare('UPDATE canonical_graph_edges SET revision_id = ?').run(legacyRevisionId);
-      database
-        .prepare('UPDATE canonical_graph_revisions SET revision_id = ?')
-        .run(legacyRevisionId);
-    })();
+    rewriteActiveRevisionId(database, legacyRevisionId);
+    insertUntrustedPlanes(database, legacyRevisionId, graph.nodes[0].id, 'volatile');
     database.close();
 
     repository = new GraphRepository(databasePath);
-    expect(repository.readActiveRevision()?.metadata.revisionId).toBe(legacyRevisionId);
+    const legacyActive = repository.readActiveRevision();
+    expect(legacyActive?.metadata.revisionId).toBe(legacyRevisionId);
+    expect(legacyActive?.aliases).toEqual([]);
+    expect(legacyActive?.diagnostics).toEqual([]);
     const migrated = repository.replaceActiveRevision(graph, {
       expectedActiveRevisionId: legacyRevisionId,
     });
     expect(migrated.revisionId).toBe(stable.revisionId);
   });
 
-  it('reconciles rename and delete by fully replacing nodes and incident edges', async () => {
-    repository.replaceActiveRevision(await projectGraph());
+  it('includes provider identity, compiler reporting, and config digest in revision identity', async () => {
+    const graph = await projectGraph({
+      provenance: {
+        adapter: 'tsdoc-edge/provider-snapshot-normalizer',
+        producer: '@ttsc/graph',
+        producerVersion: '0.16.8',
+        providerId: 'tsdoc-edge/ttsc-graph-router',
+        providerVersion: '1.0.0',
+        providerInstanceId: 'workspace-a/ts7',
+        providerContractId: 'tsdoc-edge/semantic-graph-provider',
+        providerContractVersion: '1.0',
+        providerCapabilityDigest: 'capabilities:a',
+        providerConfigDigest: 'config:a',
+        workspaceId: 'workspace-a',
+        graphNamespace: 'ts7',
+        canonicalNormalizerId: 'tsdoc-edge/provider-snapshot-normalizer',
+        canonicalNormalizerVersion: '1.0',
+        compilerVersion: null,
+        compilerVersionReported: false,
+      },
+    });
+    const first = repository.replaceActiveRevision(graph);
+    const changed = await projectGraph({
+      provenance: {
+        ...graph.provenance,
+        providerVersion: '1.1.0',
+        providerConfigDigest: 'config:b',
+        compilerVersion: '7.0.2',
+        compilerVersionReported: true,
+      },
+    });
+    const second = repository.replaceActiveRevision(changed);
+
+    expect(second.contentFingerprint).toBe(first.contentFingerprint);
+    expect(second.revisionId).not.toBe(first.revisionId);
+  });
+
+  it('includes producer and router derived revisions without mutating retained inputs', async () => {
+    const graph = await projectGraph({
+      provenance: {
+        adapter: 'tsdoc-edge/provider-snapshot-normalizer',
+        producer: '@ttsc/graph',
+        producerVersion: '0.16.8',
+        producerDerivedRevisionId: 'producer-derived:a',
+        routerDerivedRevisionId: 'router-derived:a',
+      },
+    });
+    const first = repository.replaceActiveRevision(graph);
+    const changed = await projectGraph({
+      provenance: {
+        ...graph.provenance,
+        producerDerivedRevisionId: 'producer-derived:b',
+        routerDerivedRevisionId: 'router-derived:b',
+      },
+    });
+    const second = repository.replaceActiveRevision(changed);
+
+    expect(second.contentFingerprint).toBe(first.contentFingerprint);
+    expect(second.revisionId).not.toBe(first.revisionId);
+    expect(repository.readRevision(first.revisionId)?.graph.provenance).toMatchObject({
+      producerDerivedRevisionId: 'producer-derived:a',
+      routerDerivedRevisionId: 'router-derived:a',
+    });
+    expect(repository.readRevision(second.revisionId)?.graph.provenance).toMatchObject({
+      producerDerivedRevisionId: 'producer-derived:b',
+      routerDerivedRevisionId: 'router-derived:b',
+    });
+  });
+
+  it('reads a pre-derived-identity revision and promotes it on replacement', async () => {
+    const graph = await projectGraph({
+      provenance: {
+        adapter: 'tsdoc-edge/provider-snapshot-normalizer',
+        producer: '@ttsc/graph',
+        producerVersion: '0.16.8',
+        producerDerivedRevisionId: 'producer-derived:legacy',
+        routerDerivedRevisionId: 'router-derived:legacy',
+      },
+    });
+    const current = repository.replaceActiveRevision(graph);
+    const legacyRevisionId = preDerivedRevisionIdForTest(graph);
+    expect(legacyRevisionId).not.toBe(current.revisionId);
+    repository.close();
+
+    const database = new Database(databasePath);
+    rewriteActiveRevisionId(database, legacyRevisionId);
+    database.close();
+
+    repository = new GraphRepository(databasePath);
+    const legacy = repository.readActiveRevision();
+    expect(legacy).toMatchObject({
+      metadata: { revisionId: legacyRevisionId },
+    });
+    expect(legacy?.graph.provenance.producerDerivedRevisionId).toBeUndefined();
+    expect(legacy?.graph.provenance.routerDerivedRevisionId).toBeUndefined();
+    const promoted = repository.replaceActiveRevision(graph, {
+      expectedActiveRevisionId: legacyRevisionId,
+    });
+    expect(promoted.revisionId).toBe(current.revisionId);
+  });
+
+  it('ignores additive planes on a schema-v2 graph-only envelope before CAS promotion', async () => {
+    const graph = await projectGraph({
+      provenance: {
+        adapter: 'fixture-adapter',
+        producer: '@ttsc/graph',
+        producerVersion: '0.16.8',
+        refreshedAt: '2026-07-11T00:00:00.000Z',
+        routerFingerprint: 'operational-cache-only',
+      },
+    });
+    const stable = repository.replaceActiveRevision(graph);
+    const graphOnlyRevisionId = graphOnlyRevisionIdForTest(graph);
+    expect(graphOnlyRevisionId).not.toBe(stable.revisionId);
+    repository.close();
+
+    const database = new Database(databasePath);
+    rewriteActiveRevisionId(database, graphOnlyRevisionId);
+    insertUntrustedPlanes(database, graphOnlyRevisionId, graph.nodes[0].id, 'graph-only');
+    database.close();
+
+    repository = new GraphRepository(databasePath);
+    const historical = repository.readActiveRevision();
+    expect(historical?.metadata.revisionId).toBe(graphOnlyRevisionId);
+    expect(historical?.aliases).toEqual([]);
+    expect(historical?.diagnostics).toEqual([]);
+
+    const migrated = repository.replaceActiveRevision(graph, {
+      expectedActiveRevisionId: graphOnlyRevisionId,
+    });
+    expect(migrated.revisionId).toBe(stable.revisionId);
+  });
+
+  it('opens a real schema-v1 database read-only and promotes it transactionally to v2', async () => {
+    const graph = await projectGraph({
+      provenance: {
+        adapter: 'fixture-adapter',
+        producer: '@ttsc/graph',
+        producerVersion: '0.16.8',
+        refreshedAt: '2026-07-11T00:00:00.000Z',
+      },
+    });
+    repository.close();
+    fs.rmSync(databasePath, { force: true });
+    const legacyRevisionId = createSchemaV1Repository(databasePath, graph);
+
+    const schemaBefore = readSchema(databasePath);
+    const reader = new GraphRepository(databasePath, { readOnly: true });
+    try {
+      const active = reader.readActiveRevision();
+      expect(active?.metadata.revisionId).toBe(legacyRevisionId);
+      expect(active?.metadata.artifactContract.repositorySchemaVersion).toBe(1);
+      expect(active?.graph).toEqual(graph);
+      expect(active?.aliases).toEqual([]);
+      expect(active?.diagnostics).toEqual([]);
+    } finally {
+      reader.close();
+    }
+    expect(readSchema(databasePath)).toEqual(schemaBefore);
+
+    repository = new GraphRepository(databasePath, {
+      clock: () => new Date('2026-07-11T01:00:00.000Z'),
+    });
+    const forgedAlias = {
+      canonicalId: graph.nodes[0].id,
+      legacyId: 'forged-schema-v1-alias',
+      matchStrategy: 'legacy-projection',
+      confidence: 1,
+      filePath: 'src/forged.ts',
+    } as const;
+    const forgedDiagnostic = {
+      id: 'forged-schema-v1-diagnostic',
+      category: 'router',
+      severity: 'error',
+      message: 'must not cross a schema-v1 envelope',
+      startLine: 1,
+    } as const;
+    const forgedDatabase = new Database(databasePath);
+    forgedDatabase
+      .prepare(
+        `INSERT INTO canonical_symbol_aliases
+          (revision_id, canonical_id, legacy_id, match_strategy, confidence, payload_json)
+         VALUES (?, ?, ?, ?, ?, ?)`
+      )
+      .run(
+        legacyRevisionId,
+        forgedAlias.canonicalId,
+        forgedAlias.legacyId,
+        forgedAlias.matchStrategy,
+        forgedAlias.confidence,
+        JSON.stringify(forgedAlias)
+      );
+    forgedDatabase
+      .prepare(
+        `INSERT INTO canonical_graph_diagnostics
+          (revision_id, ordinal, diagnostic_id, severity, category, file_path, payload_json)
+         VALUES (?, 0, ?, ?, ?, NULL, ?)`
+      )
+      .run(
+        legacyRevisionId,
+        forgedDiagnostic.id,
+        forgedDiagnostic.severity,
+        forgedDiagnostic.category,
+        JSON.stringify(forgedDiagnostic)
+      );
+    forgedDatabase.close();
+
+    const legacyActive = repository.readActiveRevision();
+    expect(legacyActive?.metadata.revisionId).toBe(legacyRevisionId);
+    expect(legacyActive?.aliases).toEqual([]);
+    expect(legacyActive?.diagnostics).toEqual([]);
+
+    const validAlias = {
+      canonicalId: graph.nodes[0].id,
+      legacyId: 'a-class-a',
+      matchStrategy: 'legacy-projection',
+      confidence: 1,
+      filePath: 'src/a.ts',
+    } as const;
+    const validDiagnostic = {
+      id: 'schema-v2-diagnostic',
+      category: 'router',
+      severity: 'warning',
+      message: 'trusted after schema-v2 replacement',
+      startLine: 1,
+    } as const;
+
+    const promoted = repository.replaceActiveRevision(graph, {
+      expectedActiveRevisionId: legacyRevisionId,
+      aliases: [validAlias],
+      diagnostics: [validDiagnostic],
+    });
+    const active = repository.readActiveRevision();
+    expect(promoted.revisionId).not.toBe(legacyRevisionId);
+    expect(active?.metadata.artifactContract.repositorySchemaVersion).toBe(2);
+    expect(active?.metadata.revisionId).toBe(promoted.revisionId);
+    expect(active?.graph).toEqual(graph);
+    expect(active?.aliases).toEqual([validAlias]);
+    expect(active?.diagnostics).toEqual([validDiagnostic]);
+    expect(canonicalTableNames(databasePath)).toEqual(
+      expect.arrayContaining(['canonical_symbol_aliases', 'canonical_graph_diagnostics'])
+    );
+  });
+
+  it('reconciles rename and delete in the active view while retaining history', async () => {
+    const original = await projectGraph();
+    const originalRevision = repository.replaceActiveRevision(original);
     const renamed = await projectGraph({
       nodes: [
         {
@@ -226,6 +469,7 @@ describe('GraphRepository', () => {
     const active = repository.readActiveGraph();
     expect(active?.nodes.map((node) => node.id)).toEqual(['src/renamed.ts#Renamed:class']);
     expect(active?.edges).toEqual([]);
+    expect(repository.readRevision(originalRevision.revisionId)?.graph).toEqual(original);
 
     const database = new Database(databasePath, { readonly: true });
     const counts = database
@@ -238,7 +482,51 @@ describe('GraphRepository', () => {
       .get() as { revisions: number; nodes: number; edges: number };
     database.close();
 
-    expect(counts).toEqual({ revisions: 1, nodes: 1, edges: 0 });
+    expect(counts).toEqual({ revisions: 2, nodes: 3, edges: 1 });
+  });
+
+  it('reactivates a deterministic historical revision idempotently', async () => {
+    const original = await projectGraph();
+    const first = repository.replaceActiveRevision(original);
+    const changed = await projectGraph({
+      nodes: [
+        {
+          id: 'src/changed.ts#Changed:class',
+          kind: 'class',
+          name: 'Changed',
+          file: 'src/changed.ts',
+        },
+      ],
+      edges: [],
+    });
+    const second = repository.replaceActiveRevision(changed, {
+      expectedActiveRevisionId: first.revisionId,
+    });
+
+    repository.close();
+    repository = new GraphRepository(databasePath, {
+      clock: () => new Date('2026-07-11T02:00:00.000Z'),
+    });
+
+    const reactivated = repository.replaceActiveRevision(original, {
+      expectedActiveRevisionId: second.revisionId,
+    });
+    const repeated = repository.replaceActiveRevision(original, {
+      expectedActiveRevisionId: first.revisionId,
+    });
+
+    expect(reactivated).toEqual(first);
+    expect(repeated).toEqual(first);
+    expect(repository.readActiveRevision()?.metadata.revisionId).toBe(first.revisionId);
+    expect(repository.readRevision(first.revisionId)?.graph).toEqual(original);
+    expect(repository.readRevision(second.revisionId)?.graph).toEqual(changed);
+
+    const database = new Database(databasePath, { readonly: true });
+    const revisionCount = database
+      .prepare('SELECT COUNT(*) AS count FROM canonical_graph_revisions')
+      .get() as { count: number };
+    database.close();
+    expect(revisionCount.count).toBe(2);
   });
 
   it('rolls back a failed mid-revision insert and preserves the previous active graph', async () => {
@@ -433,10 +721,12 @@ describe('GraphRepository', () => {
       },
       ...overrides,
     };
-    return (await new ProjectIndexer({ id: 'fixture', load: async () => input }).index({
-      rootDir: tempDir,
-      tsconfigPath: 'tsconfig.ttsc.json',
-    })).graph;
+    return (
+      await new ProjectIndexer({ id: 'fixture', load: async () => input }).index({
+        rootDir: tempDir,
+        tsconfigPath: 'tsconfig.ttsc.json',
+      })
+    ).graph;
   }
 });
 
@@ -475,6 +765,275 @@ function legacyRevisionIdForTest(graph: CanonicalProjectGraph): string {
       })
     )
     .digest('hex');
+}
+
+function graphOnlyRevisionIdForTest(graph: CanonicalProjectGraph): string {
+  const identityProvenance = preDerivedIdentityProvenanceForTest(graph);
+
+  return createHash('sha256')
+    .update(
+      stableJsonForTest({
+        artifactContract: {
+          name: CANONICAL_GRAPH_ARTIFACT_NAME,
+          contractVersion: '1.0',
+          fingerprintAlgorithm: CANONICAL_GRAPH_FINGERPRINT_ALGORITHM,
+          identityScheme: '@ttsc/graph:path#qualifiedName:kind',
+          repositorySchemaVersion: 2,
+        },
+        contentFingerprint: graph.fingerprint,
+        provenance: identityProvenance,
+        rootDir: graph.rootDir,
+        tsconfigPath: graph.tsconfigPath,
+      })
+    )
+    .digest('hex');
+}
+
+function preDerivedRevisionIdForTest(graph: CanonicalProjectGraph): string {
+  return createHash('sha256')
+    .update(
+      stableJsonForTest({
+        aliases: [],
+        artifactContract: {
+          name: CANONICAL_GRAPH_ARTIFACT_NAME,
+          contractVersion: '1.0',
+          fingerprintAlgorithm: CANONICAL_GRAPH_FINGERPRINT_ALGORITHM,
+          identityScheme: '@ttsc/graph:path#qualifiedName:kind',
+          repositorySchemaVersion: 2,
+        },
+        contentFingerprint: graph.fingerprint,
+        diagnostics: [],
+        provenance: preDerivedIdentityProvenanceForTest(graph),
+        rootDir: graph.rootDir,
+        tsconfigPath: graph.tsconfigPath,
+      })
+    )
+    .digest('hex');
+}
+
+function preDerivedIdentityProvenanceForTest(
+  graph: CanonicalProjectGraph
+): Record<string, unknown> {
+  const identityProvenance: Record<string, unknown> = {};
+  for (const key of [
+    'adapter',
+    'producer',
+    'producerVersion',
+    'artifactContractId',
+    'artifactContractVersion',
+    'artifactSchema',
+    'artifactFactPlane',
+    'artifactCapabilities',
+    'routerName',
+    'routerVersion',
+    'providerId',
+    'providerVersion',
+    'providerInstanceId',
+    'providerContractId',
+    'providerContractVersion',
+    'providerCapabilityDigest',
+    'providerConfigDigest',
+    'workspaceId',
+    'graphNamespace',
+    'canonicalNormalizerId',
+    'canonicalNormalizerVersion',
+    'compilerVersion',
+    'compilerVersionReported',
+    'typescriptCompatibilityTarget',
+    'diagnosticsCollected',
+  ] as const) {
+    if (Object.getOwnPropertyDescriptor(graph.provenance, key) !== undefined) {
+      identityProvenance[key] = graph.provenance[key];
+    }
+  }
+  return identityProvenance;
+}
+
+function rewriteActiveRevisionId(database: Database.Database, revisionId: string): void {
+  database.pragma('foreign_keys = OFF');
+  database.transaction(() => {
+    database.prepare('UPDATE canonical_graph_state SET active_revision_id = ?').run(revisionId);
+    database.prepare('UPDATE canonical_graph_nodes SET revision_id = ?').run(revisionId);
+    database.prepare('UPDATE canonical_graph_edges SET revision_id = ?').run(revisionId);
+    database.prepare('UPDATE canonical_symbol_aliases SET revision_id = ?').run(revisionId);
+    database.prepare('UPDATE canonical_graph_diagnostics SET revision_id = ?').run(revisionId);
+    database.prepare('UPDATE canonical_graph_revisions SET revision_id = ?').run(revisionId);
+  })();
+}
+
+function insertUntrustedPlanes(
+  database: Database.Database,
+  revisionId: string,
+  canonicalId: string,
+  suffix: string
+): void {
+  const alias = {
+    canonicalId,
+    legacyId: `untrusted-${suffix}-alias`,
+    matchStrategy: 'legacy-projection',
+    confidence: 1,
+    filePath: `src/${suffix}.ts`,
+  };
+  database
+    .prepare(
+      `INSERT INTO canonical_symbol_aliases
+        (revision_id, canonical_id, legacy_id, match_strategy, confidence, payload_json)
+       VALUES (?, ?, ?, ?, ?, ?)`
+    )
+    .run(
+      revisionId,
+      alias.canonicalId,
+      alias.legacyId,
+      alias.matchStrategy,
+      alias.confidence,
+      JSON.stringify(alias)
+    );
+
+  const diagnostic = {
+    id: `untrusted-${suffix}-diagnostic`,
+    category: 'router',
+    severity: 'error',
+    message: 'historical envelope must not authenticate this plane',
+    startLine: 1,
+  };
+  database
+    .prepare(
+      `INSERT INTO canonical_graph_diagnostics
+        (revision_id, ordinal, diagnostic_id, severity, category, file_path, payload_json)
+       VALUES (?, 0, ?, ?, ?, NULL, ?)`
+    )
+    .run(
+      revisionId,
+      diagnostic.id,
+      diagnostic.severity,
+      diagnostic.category,
+      JSON.stringify(diagnostic)
+    );
+}
+
+function createSchemaV1Repository(databasePath: string, graph: CanonicalProjectGraph): string {
+  const artifactContract = {
+    name: CANONICAL_GRAPH_ARTIFACT_NAME,
+    contractVersion: '1.0',
+    fingerprintAlgorithm: CANONICAL_GRAPH_FINGERPRINT_ALGORITHM,
+    identityScheme: '@ttsc/graph:path#qualifiedName:kind',
+    repositorySchemaVersion: 1,
+  } as const;
+  const revisionId = createHash('sha256')
+    .update(
+      stableJsonForTest({
+        artifactContract,
+        contentFingerprint: graph.fingerprint,
+        provenance: graph.provenance,
+        rootDir: graph.rootDir,
+        tsconfigPath: graph.tsconfigPath,
+      })
+    )
+    .digest('hex');
+  const database = new Database(databasePath);
+  database.pragma('foreign_keys = ON');
+  database.exec(`
+    CREATE TABLE canonical_graph_revisions (
+      revision_id TEXT PRIMARY KEY,
+      content_fingerprint TEXT NOT NULL,
+      contract_version TEXT NOT NULL,
+      root_dir TEXT NOT NULL,
+      tsconfig_path TEXT NOT NULL,
+      provenance_json TEXT NOT NULL,
+      artifact_contract_json TEXT NOT NULL,
+      node_count INTEGER NOT NULL,
+      edge_count INTEGER NOT NULL,
+      stored_at TEXT NOT NULL
+    );
+    CREATE TABLE canonical_graph_nodes (
+      revision_id TEXT NOT NULL,
+      ordinal INTEGER NOT NULL,
+      node_id TEXT NOT NULL,
+      kind TEXT NOT NULL,
+      payload_json TEXT NOT NULL,
+      PRIMARY KEY (revision_id, node_id),
+      UNIQUE (revision_id, ordinal),
+      FOREIGN KEY (revision_id) REFERENCES canonical_graph_revisions(revision_id) ON DELETE CASCADE
+    );
+    CREATE TABLE canonical_graph_edges (
+      revision_id TEXT NOT NULL,
+      ordinal INTEGER NOT NULL,
+      kind TEXT NOT NULL,
+      from_node_id TEXT NOT NULL,
+      to_node_id TEXT NOT NULL,
+      payload_json TEXT NOT NULL,
+      PRIMARY KEY (revision_id, ordinal),
+      UNIQUE (revision_id, kind, from_node_id, to_node_id),
+      FOREIGN KEY (revision_id) REFERENCES canonical_graph_revisions(revision_id) ON DELETE CASCADE,
+      FOREIGN KEY (revision_id, from_node_id) REFERENCES canonical_graph_nodes(revision_id, node_id),
+      FOREIGN KEY (revision_id, to_node_id) REFERENCES canonical_graph_nodes(revision_id, node_id)
+    );
+    CREATE TABLE canonical_graph_state (
+      singleton INTEGER PRIMARY KEY CHECK (singleton = 1),
+      active_revision_id TEXT NOT NULL,
+      FOREIGN KEY (active_revision_id) REFERENCES canonical_graph_revisions(revision_id)
+    );
+  `);
+  database.transaction(() => {
+    database
+      .prepare(
+        `INSERT INTO canonical_graph_revisions (
+          revision_id, content_fingerprint, contract_version, root_dir,
+          tsconfig_path, provenance_json, artifact_contract_json,
+          node_count, edge_count, stored_at
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+      )
+      .run(
+        revisionId,
+        graph.fingerprint,
+        graph.contractVersion,
+        graph.rootDir,
+        graph.tsconfigPath,
+        JSON.stringify(graph.provenance),
+        JSON.stringify(artifactContract),
+        graph.nodes.length,
+        graph.edges.length,
+        '2026-07-11T00:00:00.000Z'
+      );
+    const insertNode = database.prepare(
+      `INSERT INTO canonical_graph_nodes
+        (revision_id, ordinal, node_id, kind, payload_json)
+       VALUES (?, ?, ?, ?, ?)`
+    );
+    graph.nodes.forEach((node, ordinal) =>
+      insertNode.run(revisionId, ordinal, node.id, node.kind, JSON.stringify(node))
+    );
+    const insertEdge = database.prepare(
+      `INSERT INTO canonical_graph_edges
+        (revision_id, ordinal, kind, from_node_id, to_node_id, payload_json)
+       VALUES (?, ?, ?, ?, ?, ?)`
+    );
+    graph.edges.forEach((edge, ordinal) =>
+      insertEdge.run(revisionId, ordinal, edge.kind, edge.from, edge.to, JSON.stringify(edge))
+    );
+    database
+      .prepare('INSERT INTO canonical_graph_state (singleton, active_revision_id) VALUES (1, ?)')
+      .run(revisionId);
+  })();
+  database.close();
+  return revisionId;
+}
+
+function canonicalTableNames(databasePath: string): string[] {
+  const database = new Database(databasePath, { readonly: true, fileMustExist: true });
+  try {
+    return (
+      database
+        .prepare(
+          `SELECT name FROM sqlite_master
+           WHERE type = 'table' AND name LIKE 'canonical_%'
+           ORDER BY name`
+        )
+        .all() as Array<{ name: string }>
+    ).map((row) => row.name);
+  } finally {
+    database.close();
+  }
 }
 
 function stableJsonForTest(value: unknown): string {

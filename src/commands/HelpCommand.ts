@@ -96,6 +96,12 @@ export class HelpCommand extends BaseCommand {
       ],
     },
     {
+      name: 'convention',
+      alias: 'conv',
+      description: 'Revision-pinned spec-binding conventions',
+      subcommands: [{ name: 'check', description: 'Check a convention pack on the saved graph' }],
+    },
+    {
       name: 'ontology',
       alias: 'ont',
       description: 'Ontology management',
@@ -149,12 +155,12 @@ export class HelpCommand extends BaseCommand {
     return this.executeWithErrorHandling(async () => {
       const showAll = this.hasFlag(args, ['--all', '-a']);
       const showTree = this.hasFlag(args, ['--tree', '-t']);
-      const specificCommand = args.find(arg => !arg.startsWith('-'));
+      const specificCommand = args.find((arg) => !arg.startsWith('-'));
 
       // Show help for specific unified command
       if (specificCommand) {
-        const group = this.unifiedCommands.find(g =>
-          g.name === specificCommand || g.alias === specificCommand
+        const group = this.unifiedCommands.find(
+          (g) => g.name === specificCommand || g.alias === specificCommand
         );
         if (group) {
           this.printUnifiedCommandHelp(group);
@@ -167,25 +173,38 @@ export class HelpCommand extends BaseCommand {
 
       // Most important command highlight
       console.log(`${colors.bold}${colors.yellow}★ Key Command:${colors.reset}`);
-      console.log(`  ${colors.green}${colors.bold}tsdoc-edge wc <file>${colors.reset}  ${colors.dim}Shows all context needed before editing a file${colors.reset}`);
+      console.log(
+        `  ${colors.green}${colors.bold}tsdoc-edge wc <file>${colors.reset}  ${colors.dim}Shows all context needed before editing a file${colors.reset}`
+      );
       console.log();
 
       // Quick start
       console.log(`${colors.bold}Quick Start:${colors.reset}`);
       console.log(`  ${colors.cyan}init${colors.reset}           Initialize project`);
-      console.log(`  ${colors.cyan}build src${colors.reset}      Build symbol database ${colors.dim}(alias: b)${colors.reset}`);
+      console.log(
+        `  ${colors.cyan}build src${colors.reset}      Build symbol database ${colors.dim}(alias: b)${colors.reset}`
+      );
       console.log(`  ${colors.cyan}wc <file>${colors.reset}      Get work context before editing`);
       console.log();
 
       // Core standalone commands
       console.log(`${colors.bold}Core Commands:${colors.reset}`);
-      console.log(`  ${colors.cyan}stats${colors.reset}          Show documentation statistics ${colors.dim}(s)${colors.reset}`);
-      console.log(`  ${colors.cyan}health${colors.reset}         Check code health ${colors.dim}(h)${colors.reset}`);
+      console.log(
+        `  ${colors.cyan}stats${colors.reset}          Show documentation statistics ${colors.dim}(s)${colors.reset}`
+      );
+      console.log(
+        `  ${colors.cyan}health${colors.reset}         Check code health ${colors.dim}(h)${colors.reset}`
+      );
       console.log(`  ${colors.cyan}lint${colors.reset}           Lint source code`);
+      console.log(
+        `  ${colors.cyan}convention check${colors.reset} Check a versioned convention pack`
+      );
       console.log();
 
       // Unified commands with subcommand tree
-      console.log(`${colors.bold}Command Groups:${colors.reset} ${colors.dim}(run 'help <group>' for details)${colors.reset}`);
+      console.log(
+        `${colors.bold}Command Groups:${colors.reset} ${colors.dim}(run 'help <group>' for details)${colors.reset}`
+      );
       console.log();
 
       for (const group of this.unifiedCommands) {
@@ -199,11 +218,16 @@ export class HelpCommand extends BaseCommand {
             const sub = group.subcommands[i];
             const isLast = i === group.subcommands.length - 1;
             const prefix = isLast ? '└─' : '├─';
-            console.log(`  ${colors.dim}${prefix}${colors.reset} ${sub.name.padEnd(12)} ${colors.dim}${sub.description}${colors.reset}`);
+            console.log(
+              `  ${colors.dim}${prefix}${colors.reset} ${sub.name.padEnd(12)} ${colors.dim}${sub.description}${colors.reset}`
+            );
           }
         } else {
           // Show top 3 subcommands inline
-          const topSubs = group.subcommands.slice(0, 3).map(s => s.name).join(', ');
+          const topSubs = group.subcommands
+            .slice(0, 3)
+            .map((s) => s.name)
+            .join(', ');
           const moreCount = group.subcommands.length - 3;
           const moreStr = moreCount > 0 ? `, +${moreCount} more` : '';
           console.log(`  ${colors.dim}└─ ${topSubs}${moreStr}${colors.reset}`);
@@ -216,9 +240,13 @@ export class HelpCommand extends BaseCommand {
       } else {
         const totalCount = this.registry?.getAll().length || 0;
         console.log(`${colors.dim}Options:${colors.reset}`);
-        console.log(`  ${colors.dim}help --tree${colors.reset}    Show all subcommands in tree format`);
+        console.log(
+          `  ${colors.dim}help --tree${colors.reset}    Show all subcommands in tree format`
+        );
         console.log(`  ${colors.dim}help --all${colors.reset}     Show all ${totalCount} commands`);
-        console.log(`  ${colors.dim}help <group>${colors.reset}   Show details for a command group`);
+        console.log(
+          `  ${colors.dim}help <group>${colors.reset}   Show details for a command group`
+        );
         console.log();
       }
 
@@ -226,15 +254,24 @@ export class HelpCommand extends BaseCommand {
       console.log(`  ${colors.dim}tsdoc-edge wc src/commands/BuildCommand.ts${colors.reset}`);
       console.log(`  ${colors.dim}tsdoc-edge symbol deps DatabaseManager${colors.reset}`);
       console.log(`  ${colors.dim}tsdoc-edge relationship impact UserService${colors.reset}`);
+      console.log(
+        `  ${colors.dim}tsdoc-edge convention check --pack managed/conventions/core.json${colors.reset}`
+      );
       console.log();
 
       // New user guidance
       console.log(`${colors.bold}New to TSDoc Edge?${colors.reset}`);
-      console.log(`  1. ${colors.cyan}tsdoc-edge init${colors.reset}        Initialize your project`);
+      console.log(
+        `  1. ${colors.cyan}tsdoc-edge init${colors.reset}        Initialize your project`
+      );
       console.log(`  2. ${colors.cyan}tsdoc-edge build src${colors.reset}   Build symbol database`);
-      console.log(`  3. ${colors.cyan}tsdoc-edge wc <file>${colors.reset}   Get context before editing`);
+      console.log(
+        `  3. ${colors.cyan}tsdoc-edge wc <file>${colors.reset}   Get context before editing`
+      );
       console.log();
-      console.log(`  ${colors.dim}Guides: managed/quick-start.md, managed/guides/usage-scenarios.md${colors.reset}`);
+      console.log(
+        `  ${colors.dim}Guides: managed/quick-start.md, managed/guides/usage-scenarios.md${colors.reset}`
+      );
       console.log();
 
       return this.success('Help displayed');
@@ -245,7 +282,9 @@ export class HelpCommand extends BaseCommand {
    * Print help for a specific unified command group
    */
   private printUnifiedCommandHelp(group: UnifiedCommandGroup): void {
-    console.log(`${colors.bold}${group.name}${colors.reset} ${colors.dim}(alias: ${group.alias})${colors.reset}`);
+    console.log(
+      `${colors.bold}${group.name}${colors.reset} ${colors.dim}(alias: ${group.alias})${colors.reset}`
+    );
     console.log(`${colors.dim}${group.description}${colors.reset}`);
     console.log();
 
@@ -268,7 +307,9 @@ export class HelpCommand extends BaseCommand {
     }
     console.log();
 
-    console.log(`${colors.dim}Run 'tsdoc-edge ${group.name} <subcommand> --help' for subcommand details${colors.reset}`);
+    console.log(
+      `${colors.dim}Run 'tsdoc-edge ${group.name} <subcommand> --help' for subcommand details${colors.reset}`
+    );
     console.log();
   }
 
@@ -282,7 +323,7 @@ export class HelpCommand extends BaseCommand {
     console.log();
 
     const commands = this.registry.getAll();
-    const unifiedNames = this.unifiedCommands.map(g => g.name);
+    const unifiedNames = this.unifiedCommands.map((g) => g.name);
 
     // Categorize commands
     const standalone: typeof commands = [];
@@ -324,8 +365,11 @@ export class HelpCommand extends BaseCommand {
       for (const cmd of legacy) {
         const name = cmd.getName();
         const aliases = cmd.getAlias();
-        const aliasStr = aliases.length > 0 ? ` ${colors.dim}(${aliases.join(', ')})${colors.reset}` : '';
-        console.log(`  ${colors.yellow}${name.padEnd(18)}${colors.reset}${aliasStr.padEnd(15)} ${cmd.getDescription()}`);
+        const aliasStr =
+          aliases.length > 0 ? ` ${colors.dim}(${aliases.join(', ')})${colors.reset}` : '';
+        console.log(
+          `  ${colors.yellow}${name.padEnd(18)}${colors.reset}${aliasStr.padEnd(15)} ${cmd.getDescription()}`
+        );
       }
       console.log();
     }
@@ -334,10 +378,17 @@ export class HelpCommand extends BaseCommand {
   /**
    * Print a single command line
    */
-  private printCommandLine(cmd: { getName(): string; getAlias(): string[]; getDescription(): string }): void {
+  private printCommandLine(cmd: {
+    getName(): string;
+    getAlias(): string[];
+    getDescription(): string;
+  }): void {
     const name = cmd.getName();
     const aliases = cmd.getAlias();
-    const aliasStr = aliases.length > 0 ? ` ${colors.dim}(${aliases.join(', ')})${colors.reset}` : '';
-    console.log(`  ${colors.cyan}${name.padEnd(18)}${colors.reset}${aliasStr.padEnd(15)} ${cmd.getDescription()}`);
+    const aliasStr =
+      aliases.length > 0 ? ` ${colors.dim}(${aliases.join(', ')})${colors.reset}` : '';
+    console.log(
+      `  ${colors.cyan}${name.padEnd(18)}${colors.reset}${aliasStr.padEnd(15)} ${cmd.getDescription()}`
+    );
   }
 }

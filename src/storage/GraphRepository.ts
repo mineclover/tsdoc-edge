@@ -22,6 +22,7 @@ import type { CanonicalDiagnostic } from '../indexer/diagnostics-contract';
 import type { SymbolAliasRecord } from '../indexer/symbol-alias';
 
 export const GRAPH_REPOSITORY_SCHEMA_VERSION = 2 as const;
+const LEGACY_GRAPH_REPOSITORY_SCHEMA_VERSION = 1 as const;
 export const CANONICAL_GRAPH_ARTIFACT_NAME = 'tsdoc-edge/canonical-project-graph' as const;
 export const CANONICAL_GRAPH_FINGERPRINT_ALGORITHM = 'sha256/canonical-json-v1' as const;
 
@@ -43,7 +44,21 @@ const REVISION_IDENTITY_PROVENANCE_KEYS = [
   'artifactCapabilities',
   'routerName',
   'routerVersion',
+  'providerId',
+  'providerVersion',
+  'providerInstanceId',
+  'providerContractId',
+  'providerContractVersion',
+  'providerCapabilityDigest',
+  'providerConfigDigest',
+  'workspaceId',
+  'graphNamespace',
+  'canonicalNormalizerId',
+  'canonicalNormalizerVersion',
   'compilerVersion',
+  'compilerVersionReported',
+  'producerDerivedRevisionId',
+  'routerDerivedRevisionId',
   'typescriptCompatibilityTarget',
   'diagnosticsCollected',
 ] as const;
@@ -54,7 +69,9 @@ export interface CanonicalGraphArtifactContract {
   readonly contractVersion: typeof PROJECT_GRAPH_CONTRACT_VERSION;
   readonly fingerprintAlgorithm: typeof CANONICAL_GRAPH_FINGERPRINT_ALGORITHM;
   readonly identityScheme: '@ttsc/graph:path#qualifiedName:kind';
-  readonly repositorySchemaVersion: typeof GRAPH_REPOSITORY_SCHEMA_VERSION;
+  readonly repositorySchemaVersion:
+    | typeof LEGACY_GRAPH_REPOSITORY_SCHEMA_VERSION
+    | typeof GRAPH_REPOSITORY_SCHEMA_VERSION;
 }
 
 /** Durable metadata for one complete canonical graph revision. */
@@ -76,6 +93,15 @@ export interface ActiveCanonicalGraphRevision {
   readonly graph: CanonicalProjectGraph;
   readonly aliases: readonly SymbolAliasRecord[];
   readonly diagnostics: readonly CanonicalDiagnostic[];
+}
+
+const materializedGraphRevisions = new WeakSet<object>();
+
+/** Require the exact process-local object materialized by GraphRepository. */
+export function assertGraphRepositoryRevision(revision: ActiveCanonicalGraphRevision): void {
+  if (!materializedGraphRevisions.has(revision)) {
+    throw new Error('Canonical graph revision was not materialized by GraphRepository');
+  }
 }
 
 export interface GraphRepositoryOptions {
@@ -219,9 +245,10 @@ CREATE INDEX IF NOT EXISTS idx_canonical_graph_diagnostics_file
 /**
  * Stores one canonical graph snapshot independently from all legacy storage.
  *
- * A replacement deletes the previous snapshot and inserts the new revision in
- * one SQLite transaction. The active pointer is written last, so readers see
- * either the complete previous revision or the complete new revision.
+ * Revisions remain available after activation changes. A new revision and the
+ * active pointer are committed in one SQLite transaction, with the pointer
+ * written last so readers see either the complete previous active revision or
+ * the complete new one.
  *
  * @public
  */
@@ -250,15 +277,19 @@ export class GraphRepository {
       this.database.pragma('foreign_keys = ON');
       if (databasePath !== ':memory:') this.database.pragma('journal_mode = WAL');
       this.database.pragma('synchronous = FULL');
-      this.database.exec(SCHEMA_SQL);
+      // Schema-v1 repositories have a valid active graph but no alias or
+      // diagnostics tables. Add the v2 storage plane atomically while leaving
+      // the active v1 envelope untouched; the next guarded replacement
+      // promotes that envelope to v2 without weakening CAS semantics.
+      this.database.transaction(() => this.database.exec(SCHEMA_SQL)).immediate();
     }
   }
 
   /**
    * Atomically replace the complete active revision.
    *
-   * No merge occurs. Nodes and edges absent from `graph` are removed together
-   * with the previous revision, which reconciles deletes and renames.
+   * No merge occurs within a revision. Nodes and edges absent from `graph` are
+   * absent from the new revision, while earlier revisions remain readable.
    */
   replaceActiveRevision(
     graph: CanonicalProjectGraph,
@@ -269,10 +300,11 @@ export class GraphRepository {
     }
     assertCanonicalGraph(graph);
     const artifactContract = artifactContractFor(graph);
-    const revisionId = revisionIdFor(graph, artifactContract);
     const storedAt = this.clock().toISOString();
     const aliases = options.aliases ?? [];
     const diagnostics = options.diagnostics ?? [];
+    assertRevisionPlanes(graph, aliases, diagnostics);
+    const revisionId = revisionIdFor(graph, artifactContract, aliases, diagnostics);
 
     const replace = this.database.transaction(() => {
       if (options.expectedActiveRevisionId !== undefined) {
@@ -288,86 +320,110 @@ export class GraphRepository {
         }
       }
 
-      // Remove the pointer first so the old revision can cascade. This gap is
-      // transaction-local and cannot be observed by another SQLite reader.
-      this.database.prepare('DELETE FROM canonical_graph_state WHERE singleton = 1').run();
-      this.database.prepare('DELETE FROM canonical_graph_revisions').run();
+      const existing = this.database
+        .prepare('SELECT * FROM canonical_graph_revisions WHERE revision_id = ?')
+        .get(revisionId) as RevisionRow | undefined;
 
-      this.database
-        .prepare(
-          `INSERT INTO canonical_graph_revisions (
-            revision_id, content_fingerprint, contract_version, root_dir,
-            tsconfig_path, provenance_json, artifact_contract_json,
-            node_count, edge_count, stored_at
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
-        )
-        .run(
-          revisionId,
-          graph.fingerprint,
-          graph.contractVersion,
-          graph.rootDir,
-          graph.tsconfigPath,
-          stableJson(graph.provenance),
-          stableJson(artifactContract),
-          graph.nodes.length,
-          graph.edges.length,
-          storedAt
+      let persistedAt = storedAt;
+      if (existing) {
+        // Reusing a deterministic revision must not duplicate payload rows or
+        // move its creation time. Materializing it also verifies the complete
+        // stored envelope before it is made active again. Operational
+        // provenance is intentionally mutable because it is excluded from the
+        // semantic revision identity.
+        if (!this.materializeRevision(existing)) {
+          throw new Error(`Canonical graph revision ${revisionId} disappeared during activation`);
+        }
+        persistedAt = existing.stored_at;
+        this.database
+          .prepare(
+            `UPDATE canonical_graph_revisions
+             SET provenance_json = ?
+             WHERE revision_id = ?`
+          )
+          .run(stableJson(graph.provenance), revisionId);
+      } else {
+        this.database
+          .prepare(
+            `INSERT INTO canonical_graph_revisions (
+              revision_id, content_fingerprint, contract_version, root_dir,
+              tsconfig_path, provenance_json, artifact_contract_json,
+              node_count, edge_count, stored_at
+            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
+          )
+          .run(
+            revisionId,
+            graph.fingerprint,
+            graph.contractVersion,
+            graph.rootDir,
+            graph.tsconfigPath,
+            stableJson(graph.provenance),
+            stableJson(artifactContract),
+            graph.nodes.length,
+            graph.edges.length,
+            storedAt
+          );
+
+        const insertNode = this.database.prepare(
+          `INSERT INTO canonical_graph_nodes
+            (revision_id, ordinal, node_id, kind, payload_json)
+           VALUES (?, ?, ?, ?, ?)`
         );
+        graph.nodes.forEach((node, ordinal) => {
+          insertNode.run(revisionId, ordinal, node.id, node.kind, stableJson(node));
+        });
 
-      const insertNode = this.database.prepare(
-        `INSERT INTO canonical_graph_nodes
-          (revision_id, ordinal, node_id, kind, payload_json)
-         VALUES (?, ?, ?, ?, ?)`
-      );
-      graph.nodes.forEach((node, ordinal) => {
-        insertNode.run(revisionId, ordinal, node.id, node.kind, stableJson(node));
-      });
-
-      const insertEdge = this.database.prepare(
-        `INSERT INTO canonical_graph_edges
-          (revision_id, ordinal, kind, from_node_id, to_node_id, payload_json)
-         VALUES (?, ?, ?, ?, ?, ?)`
-      );
-      graph.edges.forEach((edge, ordinal) => {
-        insertEdge.run(revisionId, ordinal, edge.kind, edge.from, edge.to, stableJson(edge));
-      });
-
-      const insertAlias = this.database.prepare(
-        `INSERT INTO canonical_symbol_aliases
-          (revision_id, canonical_id, legacy_id, match_strategy, confidence, payload_json)
-         VALUES (?, ?, ?, ?, ?, ?)`
-      );
-      for (const alias of aliases) {
-        insertAlias.run(
-          revisionId,
-          alias.canonicalId,
-          alias.legacyId,
-          alias.matchStrategy,
-          alias.confidence,
-          stableJson(alias)
+        const insertEdge = this.database.prepare(
+          `INSERT INTO canonical_graph_edges
+            (revision_id, ordinal, kind, from_node_id, to_node_id, payload_json)
+           VALUES (?, ?, ?, ?, ?, ?)`
         );
+        graph.edges.forEach((edge, ordinal) => {
+          insertEdge.run(revisionId, ordinal, edge.kind, edge.from, edge.to, stableJson(edge));
+        });
+
+        const insertAlias = this.database.prepare(
+          `INSERT INTO canonical_symbol_aliases
+            (revision_id, canonical_id, legacy_id, match_strategy, confidence, payload_json)
+           VALUES (?, ?, ?, ?, ?, ?)`
+        );
+        for (const alias of aliases) {
+          insertAlias.run(
+            revisionId,
+            alias.canonicalId,
+            alias.legacyId,
+            alias.matchStrategy,
+            alias.confidence,
+            stableJson(alias)
+          );
+        }
+
+        const insertDiagnostic = this.database.prepare(
+          `INSERT INTO canonical_graph_diagnostics
+            (revision_id, ordinal, diagnostic_id, severity, category, file_path, payload_json)
+           VALUES (?, ?, ?, ?, ?, ?, ?)`
+        );
+        diagnostics.forEach((diagnostic, ordinal) => {
+          insertDiagnostic.run(
+            revisionId,
+            ordinal,
+            diagnostic.id,
+            diagnostic.severity,
+            diagnostic.category,
+            diagnostic.file ?? null,
+            stableJson(diagnostic)
+          );
+        });
       }
-
-      const insertDiagnostic = this.database.prepare(
-        `INSERT INTO canonical_graph_diagnostics
-          (revision_id, ordinal, diagnostic_id, severity, category, file_path, payload_json)
-         VALUES (?, ?, ?, ?, ?, ?, ?)`
-      );
-      diagnostics.forEach((diagnostic, ordinal) => {
-        insertDiagnostic.run(
-          revisionId,
-          ordinal,
-          diagnostic.id,
-          diagnostic.severity,
-          diagnostic.category,
-          diagnostic.file ?? null,
-          stableJson(diagnostic)
-        );
-      });
 
       // The active pointer is deliberately the final write in the revision.
       this.database
-        .prepare('INSERT INTO canonical_graph_state (singleton, active_revision_id) VALUES (1, ?)')
+        .prepare(
+          `INSERT INTO canonical_graph_state (singleton, active_revision_id)
+           VALUES (1, ?)
+           ON CONFLICT(singleton) DO UPDATE
+           SET active_revision_id = excluded.active_revision_id`
+        )
         .run(revisionId);
 
       return freezeMetadata({
@@ -379,7 +435,7 @@ export class GraphRepository {
         provenance: graph.provenance,
         nodeCount: graph.nodes.length,
         edgeCount: graph.edges.length,
-        storedAt,
+        storedAt: persistedAt,
       });
     });
 
@@ -401,88 +457,19 @@ export class GraphRepository {
            WHERE state.singleton = 1`
         )
         .get() as RevisionRow | undefined;
-      if (!row) return null;
+      return row ? this.materializeRevision(row) : null;
+    });
 
-      const nodeRows = this.database
-        .prepare(
-          `SELECT payload_json FROM canonical_graph_nodes
-           WHERE revision_id = ? ORDER BY ordinal`
-        )
-        .all(row.revision_id) as PayloadRow[];
-      const edgeRows = this.database
-        .prepare(
-          `SELECT payload_json FROM canonical_graph_edges
-           WHERE revision_id = ? ORDER BY ordinal`
-        )
-        .all(row.revision_id) as PayloadRow[];
-      const aliasRows = this.database
-        .prepare(
-          `SELECT payload_json FROM canonical_symbol_aliases
-           WHERE revision_id = ? ORDER BY canonical_id`
-        )
-        .all(row.revision_id) as PayloadRow[];
-      const diagnosticRows = this.database
-        .prepare(
-          `SELECT payload_json FROM canonical_graph_diagnostics
-           WHERE revision_id = ? ORDER BY ordinal`
-        )
-        .all(row.revision_id) as PayloadRow[];
+    return read();
+  }
 
-      if (nodeRows.length !== row.node_count || edgeRows.length !== row.edge_count) {
-        throw new Error(`Canonical graph revision ${row.revision_id} has inconsistent row counts`);
-      }
-
-      const nodes = nodeRows.map((value) => parseJson<CanonicalGraphNode>(value.payload_json));
-      const edges = edgeRows.map((value) => parseJson<CanonicalGraphEdge>(value.payload_json));
-      const aliases = aliasRows.map((value) => parseJson<SymbolAliasRecord>(value.payload_json));
-      const diagnostics = diagnosticRows.map((value) =>
-        parseJson<CanonicalDiagnostic>(value.payload_json)
-      );
-      const provenance = parseJson<ProjectGraphProvenance>(row.provenance_json);
-      const artifactContract = parseJson<CanonicalGraphArtifactContract>(
-        row.artifact_contract_json
-      );
-      assertArtifactContract(artifactContract, row.contract_version);
-
-      const graph = deepFreeze({
-        contractVersion: row.contract_version as typeof PROJECT_GRAPH_CONTRACT_VERSION,
-        rootDir: row.root_dir,
-        tsconfigPath: row.tsconfig_path,
-        nodes,
-        edges,
-        provenance,
-        fingerprint: row.content_fingerprint,
-      });
-      assertCanonicalGraph(graph);
-
-      const expectedRevisionId = revisionIdFor(graph, artifactContract);
-      if (expectedRevisionId !== row.revision_id) {
-        // Early schema-v1 builds included volatile refresh/cache provenance in
-        // the revision hash. Accept only that exact legacy envelope so the next
-        // CAS replacement can migrate it to the stable identity without
-        // weakening corruption detection.
-        const legacyRevisionId = legacyRevisionIdFor(graph, artifactContract);
-        if (legacyRevisionId !== row.revision_id) {
-          throw new Error(`Canonical graph revision envelope mismatch: ${row.revision_id}`);
-        }
-      }
-
-      return deepFreeze({
-        metadata: freezeMetadata({
-          revisionId: row.revision_id,
-          contentFingerprint: row.content_fingerprint,
-          artifactContract,
-          rootDir: row.root_dir,
-          tsconfigPath: row.tsconfig_path,
-          provenance,
-          nodeCount: row.node_count,
-          edgeCount: row.edge_count,
-          storedAt: row.stored_at,
-        }),
-        graph,
-        aliases,
-        diagnostics,
-      });
+  /** Read any retained revision by its deterministic identifier. */
+  readRevision(revisionId: string): ActiveCanonicalGraphRevision | null {
+    const read = this.database.transaction(() => {
+      const row = this.database
+        .prepare('SELECT * FROM canonical_graph_revisions WHERE revision_id = ?')
+        .get(revisionId) as RevisionRow | undefined;
+      return row ? this.materializeRevision(row) : null;
     });
 
     return read();
@@ -497,6 +484,153 @@ export class GraphRepository {
   close(): void {
     this.database.close();
   }
+
+  private materializeRevision(row: RevisionRow): ActiveCanonicalGraphRevision {
+    const nodeRows = this.database
+      .prepare(
+        `SELECT payload_json FROM canonical_graph_nodes
+         WHERE revision_id = ? ORDER BY ordinal`
+      )
+      .all(row.revision_id) as PayloadRow[];
+    const edgeRows = this.database
+      .prepare(
+        `SELECT payload_json FROM canonical_graph_edges
+         WHERE revision_id = ? ORDER BY ordinal`
+      )
+      .all(row.revision_id) as PayloadRow[];
+    const artifactContract = parseJson<CanonicalGraphArtifactContract>(row.artifact_contract_json);
+    assertArtifactContract(artifactContract, row.contract_version);
+
+    // A read-only client may open a pristine schema-v1 database. It cannot
+    // initialize v2 tables, so expose the graph with empty additive planes.
+    // Writable clients create those tables in the constructor, but their rows
+    // remain untrusted until a CAS replacement writes a schema-v2 artifact
+    // envelope that includes both planes in revision identity.
+    const trustsAdditivePlanes =
+      artifactContract.repositorySchemaVersion === GRAPH_REPOSITORY_SCHEMA_VERSION;
+    const aliasRows =
+      trustsAdditivePlanes && this.tableExists('canonical_symbol_aliases')
+        ? (this.database
+            .prepare(
+              `SELECT payload_json FROM canonical_symbol_aliases
+               WHERE revision_id = ? ORDER BY canonical_id`
+            )
+            .all(row.revision_id) as PayloadRow[])
+        : [];
+    const diagnosticRows =
+      trustsAdditivePlanes && this.tableExists('canonical_graph_diagnostics')
+        ? (this.database
+            .prepare(
+              `SELECT payload_json FROM canonical_graph_diagnostics
+               WHERE revision_id = ? ORDER BY ordinal`
+            )
+            .all(row.revision_id) as PayloadRow[])
+        : [];
+
+    if (nodeRows.length !== row.node_count || edgeRows.length !== row.edge_count) {
+      throw new Error(`Canonical graph revision ${row.revision_id} has inconsistent row counts`);
+    }
+
+    const nodes = nodeRows.map((value) => parseJson<CanonicalGraphNode>(value.payload_json));
+    const edges = edgeRows.map((value) => parseJson<CanonicalGraphEdge>(value.payload_json));
+    const persistedAliases = aliasRows.map((value) =>
+      parseJson<SymbolAliasRecord>(value.payload_json)
+    );
+    const persistedDiagnostics = diagnosticRows.map((value) =>
+      parseJson<CanonicalDiagnostic>(value.payload_json)
+    );
+    let provenance = parseJson<ProjectGraphProvenance>(row.provenance_json);
+
+    let graph = deepFreeze({
+      contractVersion: row.contract_version as typeof PROJECT_GRAPH_CONTRACT_VERSION,
+      rootDir: row.root_dir,
+      tsconfigPath: row.tsconfig_path,
+      nodes,
+      edges,
+      provenance,
+      fingerprint: row.content_fingerprint,
+    });
+    assertCanonicalGraph(graph);
+
+    let aliases: readonly SymbolAliasRecord[] = persistedAliases;
+    let diagnostics: readonly CanonicalDiagnostic[] = persistedDiagnostics;
+    const expectedRevisionId = revisionIdFor(
+      graph,
+      artifactContract,
+      persistedAliases,
+      persistedDiagnostics
+    );
+    let trustsDerivedRevisionIds = true;
+    if (expectedRevisionId !== row.revision_id) {
+      const preDerivedRevisionId = preDerivedRevisionIdFor(
+        graph,
+        artifactContract,
+        persistedAliases,
+        persistedDiagnostics
+      );
+      if (preDerivedRevisionId === row.revision_id) {
+        // Revisions created before derived provider/router IDs joined semantic
+        // identity remain readable, but those unauthenticated fields must not
+        // influence effective-analysis identity under the legacy revision ID.
+        trustsDerivedRevisionIds = false;
+      } else {
+        // Existing schema-v1/v2 repositories predate additive-plane identity,
+        // and the earliest builds also included volatile provenance. Accept only
+        // those two exact historical graph envelopes. They never authenticated
+        // additive-plane content, so discard any rows attached to them and let
+        // the next CAS replacement write a trusted v2 envelope.
+        const graphOnlyRevisionId = graphOnlyRevisionIdFor(graph, artifactContract);
+        const preDerivedGraphOnlyRevisionId = preDerivedGraphOnlyRevisionIdFor(
+          graph,
+          artifactContract
+        );
+        const volatileRevisionId = volatileRevisionIdFor(graph, artifactContract);
+        if (
+          graphOnlyRevisionId !== row.revision_id &&
+          preDerivedGraphOnlyRevisionId !== row.revision_id &&
+          volatileRevisionId !== row.revision_id
+        ) {
+          throw new Error(`Canonical graph revision envelope mismatch: ${row.revision_id}`);
+        }
+        if (preDerivedGraphOnlyRevisionId === row.revision_id) {
+          trustsDerivedRevisionIds = false;
+        }
+        aliases = [];
+        diagnostics = [];
+      }
+    }
+    if (!trustsDerivedRevisionIds) {
+      provenance = withoutDerivedRevisionIds(provenance);
+      graph = deepFreeze({ ...graph, provenance });
+    }
+
+    const revision = deepFreeze({
+      metadata: freezeMetadata({
+        revisionId: row.revision_id,
+        contentFingerprint: row.content_fingerprint,
+        artifactContract,
+        rootDir: row.root_dir,
+        tsconfigPath: row.tsconfig_path,
+        provenance,
+        nodeCount: row.node_count,
+        edgeCount: row.edge_count,
+        storedAt: row.stored_at,
+      }),
+      graph,
+      aliases,
+      diagnostics,
+    });
+    materializedGraphRevisions.add(revision);
+    return revision;
+  }
+
+  private tableExists(tableName: string): boolean {
+    return Boolean(
+      this.database
+        .prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = ?")
+        .get(tableName)
+    );
+  }
 }
 
 function artifactContractFor(graph: CanonicalProjectGraph): CanonicalGraphArtifactContract {
@@ -510,6 +644,27 @@ function artifactContractFor(graph: CanonicalProjectGraph): CanonicalGraphArtifa
 }
 
 function revisionIdFor(
+  graph: CanonicalProjectGraph,
+  artifactContract: CanonicalGraphArtifactContract,
+  aliases: readonly SymbolAliasRecord[],
+  diagnostics: readonly CanonicalDiagnostic[]
+): string {
+  return createHash('sha256')
+    .update(
+      stableJson({
+        aliases: [...aliases].sort(compareAliases),
+        artifactContract,
+        contentFingerprint: graph.fingerprint,
+        diagnostics,
+        provenance: revisionIdentityProvenance(graph.provenance),
+        rootDir: graph.rootDir,
+        tsconfigPath: graph.tsconfigPath,
+      })
+    )
+    .digest('hex');
+}
+
+function graphOnlyRevisionIdFor(
   graph: CanonicalProjectGraph,
   artifactContract: CanonicalGraphArtifactContract
 ): string {
@@ -526,7 +681,45 @@ function revisionIdFor(
     .digest('hex');
 }
 
-function legacyRevisionIdFor(
+function preDerivedRevisionIdFor(
+  graph: CanonicalProjectGraph,
+  artifactContract: CanonicalGraphArtifactContract,
+  aliases: readonly SymbolAliasRecord[],
+  diagnostics: readonly CanonicalDiagnostic[]
+): string {
+  return createHash('sha256')
+    .update(
+      stableJson({
+        aliases: [...aliases].sort(compareAliases),
+        artifactContract,
+        contentFingerprint: graph.fingerprint,
+        diagnostics,
+        provenance: preDerivedRevisionIdentityProvenance(graph.provenance),
+        rootDir: graph.rootDir,
+        tsconfigPath: graph.tsconfigPath,
+      })
+    )
+    .digest('hex');
+}
+
+function preDerivedGraphOnlyRevisionIdFor(
+  graph: CanonicalProjectGraph,
+  artifactContract: CanonicalGraphArtifactContract
+): string {
+  return createHash('sha256')
+    .update(
+      stableJson({
+        artifactContract,
+        contentFingerprint: graph.fingerprint,
+        provenance: preDerivedRevisionIdentityProvenance(graph.provenance),
+        rootDir: graph.rootDir,
+        tsconfigPath: graph.tsconfigPath,
+      })
+    )
+    .digest('hex');
+}
+
+function volatileRevisionIdFor(
   graph: CanonicalProjectGraph,
   artifactContract: CanonicalGraphArtifactContract
 ): string {
@@ -553,6 +746,24 @@ function revisionIdentityProvenance(
     }
   }
   return identity;
+}
+
+function preDerivedRevisionIdentityProvenance(
+  provenance: Readonly<ProjectGraphProvenance>
+): Record<string, unknown> {
+  const identity = revisionIdentityProvenance(provenance);
+  delete identity.producerDerivedRevisionId;
+  delete identity.routerDerivedRevisionId;
+  return identity;
+}
+
+function withoutDerivedRevisionIds(
+  provenance: Readonly<ProjectGraphProvenance>
+): ProjectGraphProvenance {
+  const sanitized = { ...provenance };
+  delete sanitized.producerDerivedRevisionId;
+  delete sanitized.routerDerivedRevisionId;
+  return sanitized;
 }
 
 function assertCanonicalGraph(graph: CanonicalProjectGraph): void {
@@ -611,9 +822,41 @@ function assertArtifactContract(
     value.contractVersion !== contractVersion ||
     value.fingerprintAlgorithm !== CANONICAL_GRAPH_FINGERPRINT_ALGORITHM ||
     value.identityScheme !== '@ttsc/graph:path#qualifiedName:kind' ||
-    value.repositorySchemaVersion !== GRAPH_REPOSITORY_SCHEMA_VERSION
+    (value.repositorySchemaVersion !== LEGACY_GRAPH_REPOSITORY_SCHEMA_VERSION &&
+      value.repositorySchemaVersion !== GRAPH_REPOSITORY_SCHEMA_VERSION)
   ) {
     throw new Error('Unsupported canonical graph artifact contract');
+  }
+}
+
+function assertRevisionPlanes(
+  graph: CanonicalProjectGraph,
+  aliases: readonly SymbolAliasRecord[],
+  diagnostics: readonly CanonicalDiagnostic[]
+): void {
+  const nodeIds = new Set(graph.nodes.map((node) => node.id));
+  const canonicalIds = new Set<string>();
+  const legacyIds = new Set<string>();
+  for (const alias of aliases) {
+    if (!nodeIds.has(alias.canonicalId)) {
+      throw new Error(`Canonical alias references an unknown node: ${alias.canonicalId}`);
+    }
+    if (canonicalIds.has(alias.canonicalId)) {
+      throw new Error(`Duplicate canonical alias: ${alias.canonicalId}`);
+    }
+    if (legacyIds.has(alias.legacyId)) {
+      throw new Error(`Duplicate legacy alias: ${alias.legacyId}`);
+    }
+    canonicalIds.add(alias.canonicalId);
+    legacyIds.add(alias.legacyId);
+  }
+
+  const diagnosticIds = new Set<string>();
+  for (const diagnostic of diagnostics) {
+    if (diagnosticIds.has(diagnostic.id)) {
+      throw new Error(`Duplicate canonical diagnostic: ${diagnostic.id}`);
+    }
+    diagnosticIds.add(diagnostic.id);
   }
 }
 
@@ -665,6 +908,12 @@ function compareEdges(left: CanonicalGraphEdge, right: CanonicalGraphEdge): numb
     compareText(left.kind, right.kind) ||
     compareText(left.from, right.from) ||
     compareText(left.to, right.to)
+  );
+}
+
+function compareAliases(left: SymbolAliasRecord, right: SymbolAliasRecord): number {
+  return (
+    compareText(left.canonicalId, right.canonicalId) || compareText(left.legacyId, right.legacyId)
   );
 }
 

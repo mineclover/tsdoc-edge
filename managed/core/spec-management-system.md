@@ -366,6 +366,8 @@ interface UnusedDocument {
 
 ## 관련 시스템
 
+- [[Semantic Graph Analysis and Relationship Model]] - 목표 분석·그래프·관계 계약
+- [[Semantic Graph Spec Governance Roadmap]] - compiler evidence 기반 spec graph 확장 계획
 - [[Document Symbol System]] - 문서 심볼 레지스트리
 - [[Parser System]] - Frontmatter 파싱
 - [[Validator System]] - 품질 검증 연동
@@ -389,4 +391,3 @@ interface UnusedDocument {
 ### Referenced By
 
 - [[Validator System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/validator-system.md:175
-

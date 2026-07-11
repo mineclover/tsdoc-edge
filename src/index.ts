@@ -77,9 +77,19 @@ export type {
 export { EnhancedDocExtractor } from './parser/EnhancedDocExtractor';
 // Core exports
 export { TSDocParser } from './parser/TSDocParser';
+// Versioned convention-pack composition and checking
+export * from './convention';
+// Semantic graph provider extension boundary
+export * from './provider';
+// Cross-plane effective analysis boundary
+export * from './semantic-graph';
+// Versioned specification graph contracts
+export * from './spec-graph';
 // Storage exports
 export { DatabaseManager } from './storage/DatabaseManager';
+export * from './storage/AnalysisInputRevisionRepository';
 export * from './storage/GraphRepository';
+export * from './storage/SpecGraphRepository';
 // Type exports
 export type {
   ParsedDocComment,

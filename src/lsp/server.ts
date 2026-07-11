@@ -39,31 +39,32 @@
 
 import * as path from 'node:path';
 import {
-  CodeActionKind,
-  createConnection,
-  DidChangeConfigurationNotification,
-  DidChangeWatchedFilesNotification,
-  FileChangeType,
-  ProposedFeatures,
-  TextDocuments,
-  TextDocumentSyncKind,
   type CodeAction,
+  CodeActionKind,
   type CodeActionParams,
   type CodeLens,
   type CodeLensParams,
+  createConnection,
   type Definition,
   type DefinitionParams,
+  DidChangeConfigurationNotification,
+  DidChangeWatchedFilesNotification,
   type DocumentLink,
   type DocumentLinkParams,
+  FileChangeType,
   type Hover,
   type HoverParams,
   type InitializeParams,
   type InitializeResult,
+  ProposedFeatures,
+  TextDocumentSyncKind,
+  TextDocuments,
+  WatchKind,
   type WorkspaceSymbol,
   type WorkspaceSymbolParams,
-  WatchKind,
 } from 'vscode-languageserver/node';
 import { TextDocument } from 'vscode-languageserver-textdocument';
+import { toLanguageServerDiagnostic } from './diagnostics';
 import { TsdocEdgeService } from './service';
 import {
   filePathFromUri,
@@ -101,15 +102,12 @@ let hasWatchedFilesDynamicRegistration = false;
 connection.onInitialize((params: InitializeParams): InitializeResult => {
   const capabilities = params.capabilities;
 
-  hasConfigurationCapability = !!(
-    capabilities.workspace && !!capabilities.workspace.configuration
-  );
+  hasConfigurationCapability = !!(capabilities.workspace && !!capabilities.workspace.configuration);
   hasWorkspaceFolderCapability = !!(
     capabilities.workspace && !!capabilities.workspace.workspaceFolders
   );
-  hasWatchedFilesDynamicRegistration = !!(
-    capabilities.workspace?.didChangeWatchedFiles?.dynamicRegistration
-  );
+  hasWatchedFilesDynamicRegistration =
+    !!capabilities.workspace?.didChangeWatchedFiles?.dynamicRegistration;
 
   // Initialize TSDoc Edge service
   const workspaceRoot = resolveWorkspaceRoot(
@@ -394,7 +392,12 @@ connection.onDocumentLinks((params: DocumentLinkParams): DocumentLink[] => {
 
   try {
     // Collect all symbol names first, then batch lookup
-    const symbolMatches: Array<{ name: string; index: number; length: number; type: 'ref' | 'see' }> = [];
+    const symbolMatches: Array<{
+      name: string;
+      index: number;
+      length: number;
+      type: 'ref' | 'see';
+    }> = [];
 
     // Find [[Symbol]] patterns
     const symbolRefPattern = /\[\[([^\]]+)\]\]/g;
@@ -421,7 +424,7 @@ connection.onDocumentLinks((params: DocumentLinkParams): DocumentLink[] => {
     if (symbolMatches.length === 0) return [];
 
     // Batch lookup all symbol names at once
-    const uniqueNames = [...new Set(symbolMatches.map(m => m.name))];
+    const uniqueNames = [...new Set(symbolMatches.map((m) => m.name))];
     const symbolLocations = tsdocService.findSymbolsByNames(uniqueNames);
 
     // Build links from matches
@@ -436,9 +439,10 @@ connection.onDocumentLinks((params: DocumentLinkParams): DocumentLink[] => {
         links.push({
           range: { start: startPos, end: endPos },
           target: fileUriFromPath(symbolLocation.filePath, symbolLocation.line),
-          tooltip: match.type === 'ref'
-            ? `Go to ${match.name} (${symbolLocation.type})`
-            : `Go to ${match.name}`,
+          tooltip:
+            match.type === 'ref'
+              ? `Go to ${match.name} (${symbolLocation.type})`
+              : `Go to ${match.name}`,
           data: { symbolId: symbolLocation.id },
         });
       } else if (match.type === 'ref') {
@@ -540,15 +544,7 @@ function publishDiagnosticsForDocument(document: TextDocument): void {
   const diagnostics = tsdocService.getDiagnostics(filePath);
   connection.sendDiagnostics({
     uri: document.uri,
-    diagnostics: diagnostics.map((diagnostic) => ({
-      severity: diagnostic.severity,
-      range: {
-        start: { line: diagnostic.line - 1, character: 0 },
-        end: { line: diagnostic.line - 1, character: Number.MAX_SAFE_INTEGER },
-      },
-      message: diagnostic.message,
-      source: 'tsdoc-edge',
-    })),
+    diagnostics: diagnostics.map((diagnostic) => toLanguageServerDiagnostic(diagnostic)),
   });
 }
 
@@ -575,7 +571,9 @@ documents.onDidChangeContent((change) => {
         try {
           const document = documents.get(change.document.uri) ?? change.document;
           if (result && result.errors.length === 0) {
-            connection.console.log(`Incremental update: ${result.symbols.length} symbols in ${path.basename(filePath)}`);
+            connection.console.log(
+              `Incremental update: ${result.symbols.length} symbols in ${path.basename(filePath)}`
+            );
           }
           publishDiagnosticsForDocument(document);
         } catch (error) {
@@ -600,9 +598,6 @@ documents.onDidSave(async (event) => {
   const filePath = filePathFromUri(event.document.uri);
   if (!filePath || !isTypeScriptSourcePath(filePath)) return;
   clearIncrementalBuildTimer(event.document.uri);
-  // The buffer is now represented by disk. Clear it before any async refresh so
-  // a superseded request cannot leave stale transient state behind.
-  tsdocService.clearUnsavedOverlay(filePath);
 
   if (tsdocService.isCanonicalGraphEnabled()) {
     try {
@@ -624,9 +619,13 @@ documents.onDidSave(async (event) => {
     const result = tsdocService.processFileChange(filePath);
     if (result) {
       if (result.errors.length > 0) {
-        connection.console.warn(`Incremental build errors in ${path.basename(filePath)}: ${result.errors.join(', ')}`);
+        connection.console.warn(
+          `Incremental build errors in ${path.basename(filePath)}: ${result.errors.join(', ')}`
+        );
       } else {
-        connection.console.log(`File saved: updated ${result.symbols.length} symbols in ${path.basename(filePath)}`);
+        connection.console.log(
+          `File saved: updated ${result.symbols.length} symbols in ${path.basename(filePath)}`
+        );
       }
     }
     publishDiagnosticsForOpenDocuments();

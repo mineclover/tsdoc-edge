@@ -12,14 +12,24 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { ConfigManager } from '../config/ConfigManager';
-import { DatabaseManager } from '../storage/DatabaseManager';
 import { EnhancedWorkContextAnalyzer } from '../analyzer/EnhancedWorkContextAnalyzer';
-import { CanonicalAliasContext } from '../indexer';
 import { EntryPointContextAggregator } from '../analyzer/EntryPointContextAggregator';
+import { ConfigManager } from '../config/ConfigManager';
 import { LLMsTextGenerator } from '../generator/LLMsTextGenerator';
 import { XMLContextGenerator } from '../generator/XMLContextGenerator';
+import { CanonicalAliasContext } from '../indexer';
+import { DatabaseManager } from '../storage/DatabaseManager';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
+
+interface CanonicalWorkContext {
+  revisionId: string;
+  symbols: Array<{
+    legacyId?: string;
+    canonicalId: string;
+    dependencies: number;
+    dependents: number;
+  }>;
+}
 
 /**
  * Work Context Command
@@ -84,9 +94,10 @@ export class WorkContextCommand extends BaseCommand {
    * @public
    */
   async execute(args: string[]): Promise<CommandResult> {
-
     if (args.length < 1 || args[0].startsWith('--')) {
-      console.log(`${colors.yellow}Usage:${colors.reset} tsdoc-edge work-context <file-path> [options]`);
+      console.log(
+        `${colors.yellow}Usage:${colors.reset} tsdoc-edge work-context <file-path> [options]`
+      );
       console.log();
       console.log('Options:');
       console.log('  --human            Human-readable format with colors (default: XML)');
@@ -101,7 +112,9 @@ export class WorkContextCommand extends BaseCommand {
       console.log('  tsdoc-edge wc src/commands/BuildCommand.ts --llm');
       console.log('  tsdoc-edge wc src/analyzer/Parser.ts --llm --output context.txt');
       console.log('  tsdoc-edge wc src/commands/BuildCommand.ts --category structural');
-      console.log('  tsdoc-edge wc src/storage/DatabaseManager.ts --category documentation,verification');
+      console.log(
+        '  tsdoc-edge wc src/storage/DatabaseManager.ts --category documentation,verification'
+      );
       console.log();
       console.log('Tip: Use this before editing a file to see all related context');
       return { exitCode: 1, message: 'File path required' };
@@ -114,7 +127,9 @@ export class WorkContextCommand extends BaseCommand {
     const useXmlFormat = !useHumanFormat && !useLlmFormat;
     const outputFile = this.getOptionValue(args, '--output');
     const depth = parseInt(this.getOptionValue(args, '--depth') || '2', 10);
-    const categoryFilter = this.getOptionValue(args, '--category')?.split(',').map((c: string) => c.trim());
+    const categoryFilter = this.getOptionValue(args, '--category')
+      ?.split(',')
+      .map((c: string) => c.trim());
 
     // Resolve absolute path
     const absolutePath = path.resolve(process.cwd(), targetFile);
@@ -132,23 +147,43 @@ export class WorkContextCommand extends BaseCommand {
       console.log();
     }
 
+    let dbManager: DatabaseManager | null = null;
+    let canonicalContext: CanonicalAliasContext | null = null;
     try {
-      const dbCheck = this.checkDatabaseExists();
-      if (dbCheck) return dbCheck;
+      canonicalContext = CanonicalAliasContext.tryOpen(process.cwd());
+      const dbPath = this.getDatabasePath();
+      if (!fs.existsSync(dbPath)) {
+        const canonical = this.gatherCanonicalContext([], canonicalContext, absolutePath);
+        if (canonical) {
+          return this.outputCanonicalOnlyContext(
+            targetFile,
+            canonical,
+            useXmlFormat,
+            useLlmFormat,
+            outputFile
+          );
+        }
+        const dbCheck = this.checkDatabaseExists();
+        if (dbCheck) return dbCheck;
+      }
 
       const config = this.configManager.get();
-      const dbPath = this.getDatabasePath();
 
-      const dbManager = new DatabaseManager(dbPath, config.paths.jsonlDir);
+      dbManager = new DatabaseManager(dbPath, config.paths.jsonlDir);
 
       // Branch: XML format vs LLM format vs Human-readable format
       if (useXmlFormat) {
         // Use compact XML format (optimized for Claude) - no header decoration
         const aggregator = new EntryPointContextAggregator(dbManager);
         const context = aggregator.gatherContext(absolutePath, depth);
+        const canonical = this.gatherCanonicalContext(
+          context.fileSymbols,
+          canonicalContext,
+          absolutePath
+        );
 
         const generator = new XMLContextGenerator();
-        const output = generator.generate(context);
+        const output = this.appendCanonicalXml(generator.generate(context), canonical);
 
         if (outputFile) {
           const outputPath = path.resolve(process.cwd(), outputFile);
@@ -158,7 +193,6 @@ export class WorkContextCommand extends BaseCommand {
           console.log(output);
         }
 
-        dbManager.close();
         return { exitCode: 0, message: 'XML context generated' };
       }
 
@@ -166,9 +200,14 @@ export class WorkContextCommand extends BaseCommand {
         // Use LLM-friendly format
         const aggregator = new EntryPointContextAggregator(dbManager);
         const context = aggregator.gatherContext(absolutePath, depth);
+        const canonical = this.gatherCanonicalContext(
+          context.fileSymbols,
+          canonicalContext,
+          absolutePath
+        );
 
         const generator = new LLMsTextGenerator(dbManager);
-        const output = generator.generate(context);
+        const output = this.appendCanonicalMarkdown(generator.generate(context), canonical);
 
         if (outputFile) {
           // Save to file
@@ -189,16 +228,19 @@ export class WorkContextCommand extends BaseCommand {
           console.log(output);
         }
 
-        dbManager.close();
         return { exitCode: 0, message: 'LLM context generated' };
       }
 
       // Human-readable format (original behavior)
-      const canonicalContext = CanonicalAliasContext.tryOpen(process.cwd());
       const analyzer = new EnhancedWorkContextAnalyzer(dbManager, canonicalContext ?? undefined);
 
       // Analyze file
       const context = analyzer.analyze(absolutePath);
+      const canonical = this.gatherCanonicalContext(
+        context.symbols,
+        canonicalContext,
+        absolutePath
+      );
 
       // Helper function to check if a category should be displayed
       const shouldShowCategory = (category: string): boolean => {
@@ -206,38 +248,53 @@ export class WorkContextCommand extends BaseCommand {
         return categoryFilter.includes(category);
       };
 
-      if (context.symbols.length === 0) {
+      if (context.symbols.length === 0 && !canonical) {
         this.printWarning('No symbols found in this file');
         console.log();
         console.log('This file may not have been indexed. Try rebuilding:');
         console.log('  tsdoc-edge build src --force');
-        dbManager.close();
         return { exitCode: 0, message: 'No symbols found' };
       }
 
       // Display summary
       this.printSection('📊 Summary');
-      console.log(`  ${colors.bold}Symbols:${colors.reset}              ${context.summary.symbolCount}`);
-      console.log(`  ${colors.bold}Relationships:${colors.reset}        ${context.summary.relationshipCount}`);
-      console.log(`  ${colors.bold}Relationship Density:${colors.reset} ${context.summary.density.toFixed(2)}`);
-      console.log(`  ${colors.bold}Test Coverage:${colors.reset}        ${context.summary.testCoverage.toFixed(1)}% (${context.relationships.tests.length} tests)`);
-      console.log(`  ${colors.bold}Documentation:${colors.reset}        ${context.summary.documentationCoverage.toFixed(1)}% (${context.relationships.documentation.length} docs)`);
-      if (context.canonical) {
-        console.log(`  ${colors.bold}Canonical revision:${colors.reset}   ${context.canonical.revisionId.slice(0, 12)}`);
-        console.log(`  ${colors.bold}Canonical aliases:${colors.reset}     ${context.canonical.symbols.length}`);
+      console.log(
+        `  ${colors.bold}Symbols:${colors.reset}              ${context.summary.symbolCount}`
+      );
+      console.log(
+        `  ${colors.bold}Relationships:${colors.reset}        ${context.summary.relationshipCount}`
+      );
+      console.log(
+        `  ${colors.bold}Relationship Density:${colors.reset} ${context.summary.density.toFixed(2)}`
+      );
+      console.log(
+        `  ${colors.bold}Test Coverage:${colors.reset}        ${context.summary.testCoverage.toFixed(1)}% (${context.relationships.tests.length} tests)`
+      );
+      console.log(
+        `  ${colors.bold}Documentation:${colors.reset}        ${context.summary.documentationCoverage.toFixed(1)}% (${context.relationships.documentation.length} docs)`
+      );
+      if (canonical) {
+        console.log(
+          `  ${colors.bold}Canonical revision:${colors.reset}   ${canonical.revisionId.slice(0, 12)}`
+        );
+        console.log(
+          `  ${colors.bold}Canonical symbols:${colors.reset}     ${canonical.symbols.length}`
+        );
       }
       console.log();
 
       // Display symbols
       this.printSection('🔤 Symbols');
-      const exportedSymbols = context.symbols.filter(s => s.isExported);
-      const publicSymbols = context.symbols.filter(s => s.isPublic);
+      const exportedSymbols = context.symbols.filter((s) => s.isExported);
+      const publicSymbols = context.symbols.filter((s) => s.isPublic);
 
-      console.log(`  Total: ${context.symbols.length} (${exportedSymbols.length} exported, ${publicSymbols.length} public)`);
+      console.log(
+        `  Total: ${context.symbols.length} (${exportedSymbols.length} exported, ${publicSymbols.length} public)`
+      );
       console.log();
 
       // Show top symbols
-      context.symbols.slice(0, 10).forEach(symbol => {
+      context.symbols.slice(0, 10).forEach((symbol) => {
         const badges: string[] = [];
         if (symbol.isExported) badges.push('exported');
         if (symbol.isPublic) badges.push('public');
@@ -265,7 +322,9 @@ export class WorkContextCommand extends BaseCommand {
 
         for (const [docRef, symbols] of uniqueDocs) {
           console.log(`  ${colors.cyan}[[${docRef}]]${colors.reset}`);
-          console.log(`    Referenced by: ${symbols.slice(0, 3).join(', ')}${symbols.length > 3 ? ` +${symbols.length - 3}` : ''}`);
+          console.log(
+            `    Referenced by: ${symbols.slice(0, 3).join(', ')}${symbols.length > 3 ? ` +${symbols.length - 3}` : ''}`
+          );
         }
         console.log();
       }
@@ -274,7 +333,9 @@ export class WorkContextCommand extends BaseCommand {
       if (shouldShowCategory('verification')) {
         if (context.relationships.tests.length > 0) {
           this.printSection('✅ Test Coverage');
-          console.log(`  ${context.relationships.tests.length} test cases covering ${context.impact.testFiles.size} test file(s)`);
+          console.log(
+            `  ${context.relationships.tests.length} test cases covering ${context.impact.testFiles.size} test file(s)`
+          );
           console.log();
 
           // Group by symbol
@@ -293,7 +354,7 @@ export class WorkContextCommand extends BaseCommand {
 
           for (const [symbolName, tests] of sortedSymbols) {
             console.log(`  ${colors.green}${symbolName}${colors.reset}: ${tests.length} tests`);
-            tests.slice(0, 3).forEach(testName => {
+            tests.slice(0, 3).forEach((testName) => {
               console.log(`    • ${testName}`);
             });
             if (tests.length > 3) {
@@ -303,11 +364,15 @@ export class WorkContextCommand extends BaseCommand {
 
           console.log();
           console.log(`  ${colors.dim}Test files:${colors.reset}`);
-          Array.from(context.impact.testFiles).slice(0, 3).forEach(testFile => {
-            console.log(`    ${path.relative(process.cwd(), testFile)}`);
-          });
+          Array.from(context.impact.testFiles)
+            .slice(0, 3)
+            .forEach((testFile) => {
+              console.log(`    ${path.relative(process.cwd(), testFile)}`);
+            });
           if (context.impact.testFiles.size > 3) {
-            console.log(`    ${colors.dim}... and ${context.impact.testFiles.size - 3} more${colors.reset}`);
+            console.log(
+              `    ${colors.dim}... and ${context.impact.testFiles.size - 3} more${colors.reset}`
+            );
           }
           console.log();
         } else {
@@ -323,13 +388,15 @@ export class WorkContextCommand extends BaseCommand {
         console.log();
 
         const depFiles = Array.from(context.impact.dependencyFiles).slice(0, 10);
-        depFiles.forEach(depFile => {
+        depFiles.forEach((depFile) => {
           const relativePath = path.relative(process.cwd(), depFile);
           console.log(`  ${colors.blue}${relativePath}${colors.reset}`);
         });
 
         if (context.impact.dependencyFiles.size > 10) {
-          console.log(`  ${colors.dim}... and ${context.impact.dependencyFiles.size - 10} more${colors.reset}`);
+          console.log(
+            `  ${colors.dim}... and ${context.impact.dependencyFiles.size - 10} more${colors.reset}`
+          );
         }
         console.log();
       }
@@ -341,13 +408,15 @@ export class WorkContextCommand extends BaseCommand {
         console.log();
 
         const depFiles = Array.from(context.impact.dependentFiles).slice(0, 10);
-        depFiles.forEach(depFile => {
+        depFiles.forEach((depFile) => {
           const relativePath = path.relative(process.cwd(), depFile);
           console.log(`  ${colors.yellow}${relativePath}${colors.reset}`);
         });
 
         if (context.impact.dependentFiles.size > 10) {
-          console.log(`  ${colors.dim}... and ${context.impact.dependentFiles.size - 10} more${colors.reset}`);
+          console.log(
+            `  ${colors.dim}... and ${context.impact.dependentFiles.size - 10} more${colors.reset}`
+          );
         }
 
         console.log();
@@ -358,7 +427,9 @@ export class WorkContextCommand extends BaseCommand {
       // Semantic Neighbors
       if (context.relationships.semanticNeighbors.length > 0) {
         this.printSection('🌐 Semantic Neighbors');
-        console.log(`  ${context.relationships.semanticNeighbors.length} related symbols (same domain/feature)`);
+        console.log(
+          `  ${context.relationships.semanticNeighbors.length} related symbols (same domain/feature)`
+        );
         console.log();
 
         const neighborsBySymbol = new Map<string, string[]>();
@@ -370,23 +441,31 @@ export class WorkContextCommand extends BaseCommand {
         }
 
         for (const [symbolName, neighbors] of Array.from(neighborsBySymbol.entries()).slice(0, 5)) {
-          console.log(`  ${colors.cyan}${symbolName}${colors.reset} → ${neighbors.slice(0, 3).join(', ')}${neighbors.length > 3 ? ` +${neighbors.length - 3}` : ''}`);
+          console.log(
+            `  ${colors.cyan}${symbolName}${colors.reset} → ${neighbors.slice(0, 3).join(', ')}${neighbors.length > 3 ? ` +${neighbors.length - 3}` : ''}`
+          );
         }
         console.log();
       }
 
       // Canonical structural enrichment (alias hop)
-      if (shouldShowCategory('structural') && context.canonical && context.canonical.symbols.length > 0) {
+      if (
+        shouldShowCategory('structural') &&
+        canonical &&
+        canonical.symbols.length > 0
+      ) {
         this.printSection('🧭 Canonical Structural Graph');
-        console.log(`  Revision ${context.canonical.revisionId.slice(0, 12)} via legacy alias hop`);
+        console.log(`  Revision ${canonical.revisionId.slice(0, 12)} via alias/direct file lookup`);
         console.log();
-        for (const symbol of context.canonical.symbols.slice(0, 10)) {
+        for (const symbol of canonical.symbols.slice(0, 10)) {
           console.log(
-            `  ${colors.cyan}${symbol.canonicalId}${colors.reset} (${symbol.legacyId}) ↓${symbol.dependents} ↑${symbol.dependencies}`
+            `  ${colors.cyan}${symbol.canonicalId}${colors.reset}${symbol.legacyId ? ` (${symbol.legacyId})` : ''} ↓${symbol.dependents} ↑${symbol.dependencies}`
           );
         }
-        if (context.canonical.symbols.length > 10) {
-          console.log(`  ${colors.dim}... and ${context.canonical.symbols.length - 10} more${colors.reset}`);
+        if (canonical.symbols.length > 10) {
+          console.log(
+            `  ${colors.dim}... and ${canonical.symbols.length - 10} more${colors.reset}`
+          );
         }
         console.log();
       }
@@ -395,31 +474,169 @@ export class WorkContextCommand extends BaseCommand {
       this.printSection('💡 Recommendations');
 
       if (context.summary.testCoverage < 80) {
-        console.log(`  ${colors.yellow}•${colors.reset} Low test coverage (${context.summary.testCoverage.toFixed(1)}%) - consider adding tests`);
+        console.log(
+          `  ${colors.yellow}•${colors.reset} Low test coverage (${context.summary.testCoverage.toFixed(1)}%) - consider adding tests`
+        );
       }
 
       if (context.summary.documentationCoverage < 50) {
-        console.log(`  ${colors.yellow}•${colors.reset} Low documentation coverage (${context.summary.documentationCoverage.toFixed(1)}%) - add @doc tags`);
+        console.log(
+          `  ${colors.yellow}•${colors.reset} Low documentation coverage (${context.summary.documentationCoverage.toFixed(1)}%) - add @doc tags`
+        );
       }
 
       if (context.relationships.dependents.length > 20) {
-        console.log(`  ${colors.yellow}•${colors.reset} High impact file (${context.relationships.dependents.length} dependents) - test thoroughly`);
+        console.log(
+          `  ${colors.yellow}•${colors.reset} High impact file (${context.relationships.dependents.length} dependents) - test thoroughly`
+        );
       }
 
       if (context.summary.density < 2.0) {
-        console.log(`  ${colors.yellow}•${colors.reset} Low relationship density (${context.summary.density.toFixed(2)}) - consider adding semantic relationships`);
+        console.log(
+          `  ${colors.yellow}•${colors.reset} Low relationship density (${context.summary.density.toFixed(2)}) - consider adding semantic relationships`
+        );
       }
 
       console.log();
 
-      canonicalContext?.close();
-      dbManager.close();
-
       return { exitCode: 0, message: 'Context displayed' };
     } catch (error) {
-      this.printError(`Failed to analyze file: ${error instanceof Error ? error.message : String(error)}`);
+      this.printError(
+        `Failed to analyze file: ${error instanceof Error ? error.message : String(error)}`
+      );
       return { exitCode: 1, message: 'Analysis failed' };
+    } finally {
+      try {
+        canonicalContext?.close();
+      } finally {
+        dbManager?.close();
+      }
     }
+  }
+
+  private gatherCanonicalContext(
+    symbols: readonly { id: string }[] | undefined,
+    canonicalContext: CanonicalAliasContext | null,
+    absoluteFilePath?: string
+  ): CanonicalWorkContext | null {
+    if (!canonicalContext) return null;
+
+    const canonicalSymbols = new Map<string, CanonicalWorkContext['symbols'][number]>();
+    for (const symbol of symbols ?? []) {
+      const canonicalId = canonicalContext.resolveCanonicalId(symbol.id);
+      if (!canonicalId) continue;
+      const counts = canonicalContext.structuralCounts(canonicalId);
+      if (!counts) continue;
+      canonicalSymbols.set(canonicalId, {
+        legacyId: symbol.id,
+        canonicalId,
+        dependencies: counts.dependencies,
+        dependents: counts.dependents,
+      });
+    }
+
+    if (absoluteFilePath) {
+      for (const node of canonicalContext.nodesInFile(absoluteFilePath)) {
+        const counts = canonicalContext.structuralCounts(node.id);
+        if (!counts) continue;
+        canonicalSymbols.set(node.id, {
+          ...(canonicalContext.resolver.canonicalToLegacy(node.id)
+            ? { legacyId: canonicalContext.resolver.canonicalToLegacy(node.id) ?? undefined }
+            : {}),
+          canonicalId: node.id,
+          dependencies: counts.dependencies,
+          dependents: counts.dependents,
+        });
+      }
+    }
+    if (canonicalSymbols.size === 0) return null;
+
+    return {
+      revisionId: canonicalContext.revisionId,
+      symbols: [...canonicalSymbols.values()].sort((left, right) =>
+        left.canonicalId.localeCompare(right.canonicalId)
+      ),
+    };
+  }
+
+  private appendCanonicalXml(output: string, canonical: CanonicalWorkContext | null): string {
+    if (!canonical) return output;
+    const lines = [
+      `<canonical-structural revision="${this.escapeCanonicalXml(canonical.revisionId)}">`,
+      ...canonical.symbols.map(
+        (symbol) =>
+          `<symbol${symbol.legacyId ? ` legacy-id="${this.escapeCanonicalXml(symbol.legacyId)}"` : ''} canonical-id="${this.escapeCanonicalXml(symbol.canonicalId)}" dependencies="${symbol.dependencies}" dependents="${symbol.dependents}"/>`
+      ),
+      '</canonical-structural>',
+    ];
+    const closingTag = '</work-context>';
+    const closingIndex = output.lastIndexOf(closingTag);
+    if (closingIndex === -1) return `${output}\n${lines.join('\n')}`;
+    return `${output.slice(0, closingIndex)}${lines.join('\n')}\n${output.slice(closingIndex)}`;
+  }
+
+  private appendCanonicalMarkdown(output: string, canonical: CanonicalWorkContext | null): string {
+    if (!canonical) return output;
+    const lines = [
+      '## Canonical Structural Graph',
+      '',
+      `- **Revision**: \`${canonical.revisionId}\``,
+      ...canonical.symbols.map(
+        (symbol) =>
+          `- \`${symbol.canonicalId}\`${symbol.legacyId ? ` (legacy: \`${symbol.legacyId}\`)` : ''} — dependencies: ${symbol.dependencies}, dependents: ${symbol.dependents}`
+      ),
+      '',
+    ];
+    const footer = '---\n\n## Generation Metadata';
+    const footerIndex = output.lastIndexOf(footer);
+    if (footerIndex === -1) return `${output.trimEnd()}\n\n${lines.join('\n')}`;
+    return `${output.slice(0, footerIndex)}${lines.join('\n')}\n${output.slice(footerIndex)}`;
+  }
+
+  private outputCanonicalOnlyContext(
+    targetFile: string,
+    canonical: CanonicalWorkContext,
+    useXmlFormat: boolean,
+    useLlmFormat: boolean,
+    outputFile?: string
+  ): CommandResult {
+    let output: string;
+    if (useXmlFormat) {
+      output = this.appendCanonicalXml(
+        `<work-context file="${this.escapeCanonicalXml(targetFile)}" type="file">\n</work-context>`,
+        canonical
+      );
+    } else if (useLlmFormat) {
+      output = this.appendCanonicalMarkdown(
+        `# Work Context\n\n- **File**: \`${targetFile}\`\n- **Legacy database**: unavailable\n`,
+        canonical
+      );
+    } else {
+      const lines = [
+        `Canonical revision: ${canonical.revisionId}`,
+        ...canonical.symbols.map(
+          (symbol) =>
+            `${symbol.canonicalId} ↓${symbol.dependents} ↑${symbol.dependencies}${symbol.legacyId ? ` (${symbol.legacyId})` : ''}`
+        ),
+      ];
+      output = lines.join('\n');
+    }
+
+    if (outputFile) {
+      fs.writeFileSync(path.resolve(process.cwd(), outputFile), output, 'utf-8');
+    } else {
+      console.log(output);
+    }
+    return { exitCode: 0, message: 'Canonical work context generated' };
+  }
+
+  private escapeCanonicalXml(value: string): string {
+    return value
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;');
   }
 
   /**
@@ -431,7 +648,11 @@ export class WorkContextCommand extends BaseCommand {
    * @returns Option value
    * @private
    */
-  private getOptionValue(args: string[], option: string, defaultValue?: string): string | undefined {
+  private getOptionValue(
+    args: string[],
+    option: string,
+    defaultValue?: string
+  ): string | undefined {
     const index = args.indexOf(option);
     if (index !== -1 && index + 1 < args.length) {
       return args[index + 1];

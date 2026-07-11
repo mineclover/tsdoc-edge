@@ -128,6 +128,8 @@ export class BuildCommand extends BaseCommand {
     --router-module=<path>  Built graph-router artifact-source entrypoint
     --router-config=<path>  Router config (default: ttsc-graph-router.config.json)
     --router-repo=<id>      Router repo id (default: project directory name)
+    --graph-workspace=<id>  Convention/spec workspace id (default: router repo id)
+    --graph-namespace=<id>  Graph namespace (default: ttsc:<router repo id>)
     --graph-tsconfig=<path> Project graph tsconfig (default: tsconfig.ttsc.json)
     --canonical-graph-db=<path> Canonical revision database`;
   }
@@ -1174,6 +1176,10 @@ export class BuildCommand extends BaseCommand {
       repoId:
         this.getOption(args, '--router-repo') ??
         process.env.TSDOC_EDGE_GRAPH_ROUTER_REPO,
+      workspaceId:
+        this.getOption(args, '--graph-workspace') ?? process.env.TSDOC_EDGE_GRAPH_WORKSPACE,
+      graphNamespace:
+        this.getOption(args, '--graph-namespace') ?? process.env.TSDOC_EDGE_GRAPH_NAMESPACE,
       tsconfigPath:
         this.getOption(args, '--graph-tsconfig') ??
         process.env.TSDOC_EDGE_GRAPH_TSCONFIG,
@@ -1207,6 +1213,8 @@ export class BuildCommand extends BaseCommand {
       '--router-module',
       '--router-config',
       '--router-repo',
+      '--graph-workspace',
+      '--graph-namespace',
       '--graph-tsconfig',
       '--canonical-graph-db',
     ]);

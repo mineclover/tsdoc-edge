@@ -30,12 +30,30 @@
  * @see managed/features/lsp-integration.md
  */
 
+export { CacheEntry, CacheManager, CacheManagerOptions } from './cache-manager';
+export { mapCanonicalDiagnostic, toLanguageServerDiagnostic } from './diagnostics';
+export type {
+  CodeGraphRevision,
+  EffectiveCodeGraph,
+  GraphDelta,
+  GraphDeltaEdgeKey,
+  GraphDeltaExtractorIdentity,
+  GraphDeltaIdentityRemap,
+  GraphDeltaRelationshipCoverage,
+} from './overlay';
 export {
-  TsdocEdgeService,
+  applyGraphDelta,
+  composeGraphDeltas,
+  EffectiveCodeGraphView,
+  GRAPH_DELTA_CONTRACT_VERSION,
+  GraphDeltaBuilder,
+  LSP_SYNTAX_GRAPH_DELTA_EXTRACTOR,
+  OverlayGraphView,
+} from './overlay';
+export {
   CodeLensInfo,
-  SymbolSearchResult,
   DiagnosticInfo,
+  SymbolSearchResult,
+  TsdocEdgeService,
 } from './service';
-
-export { CacheManager, CacheEntry, CacheManagerOptions } from './cache-manager';
 export { StatementManager, StatementManagerOptions } from './statement-manager';

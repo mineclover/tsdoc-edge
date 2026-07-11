@@ -153,6 +153,43 @@ tsdoc-edge explore-entrypoint managed/relationships/index.md --detect-orphans
 
 ---
 
+### [[Semantic Graph Spec Governance Roadmap]]
+
+**Path**: `semantic-graph-spec-governance-roadmap.md`
+**Priority**: ⭐⭐⭐ Architecture
+
+복원된 legacy 설계를 비교 기준선으로 사용하고, TS7 canonical graph와 LSP를
+compiler-evidence 기반 spec governance로 확장하는 구현 계획.
+
+**Tracks**:
+
+- Current next: TS7 test compilation → runner-neutral test evidence
+- Legacy/canonical differential baseline
+- ttsc capability와 analyzer 소유권 판정
+- Canonical provider와 Spec Graph 계약
+- LSP-first spec diagnostics와 CodeAction
+- 외부 TypeScript library reference pilot
+
+---
+
+### [[TS7 Test Compilation Lane]]
+
+**Path**: `ts7-test-compilation-lane.md`
+**Priority**: ⭐⭐⭐ Current prerequisite
+
+TypeScript 7로 source와 test를 선컴파일하고 Jest가 JavaScript만 실행하도록 전환하는
+P4.0 구현 절차. `ts-jest` 제거, parity/coverage gate, SWC fallback과 다음 runner-neutral
+evidence adapter handoff를 정의합니다.
+
+**Target Flow**:
+
+1. TS7 no-emit typecheck
+2. TS7 AOT compile to `.test-dist`
+3. Jest JavaScript-only execution
+4. Full parity 후 `ts-jest` 제거
+
+---
+
 ### SELF-IMPROVEMENT-PROCESS
 **Path**: `self-improvement-process.md`
 **Priority**: ⭐ Meta
@@ -192,6 +229,8 @@ tsdoc-edge health managed
 | Safe Dead Code Deletion | Code cleanup | Monthly | High |
 | [[Example - Mermaid Workflow]] | Learning | Once | Example |
 | [[Relationship System Roadmap]] | Planning | Ongoing | Planning |
+| [[Semantic Graph Spec Governance Roadmap]] | Architecture and implementation planning | Ongoing | Critical |
+| [[TS7 Test Compilation Lane]] | TS7 test toolchain cutover | Current prerequisite | Critical |
 | SELF-IMPROVEMENT-PROCESS | Meta | Weekly | Meta |
 
 ### By Role
@@ -203,6 +242,8 @@ tsdoc-edge health managed
 **Architect**:
 - [[Mermaid Entrypoint Workflow]]
 - [[Relationship System Roadmap]]
+- [[Semantic Graph Spec Governance Roadmap]]
+- [[TS7 Test Compilation Lane]]
 
 **Maintainer**:
 - SELF-IMPROVEMENT-PROCESS
@@ -243,4 +284,3 @@ tsdoc-edge health managed
 ### Referenced By
 
 - [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:255
-

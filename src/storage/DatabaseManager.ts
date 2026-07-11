@@ -8,12 +8,12 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import Database from 'better-sqlite3';
+import { and, asc, count, desc, eq, gte, inArray, like, lte, ne, or, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
-import { eq, like, or, and, desc, asc, sql, ne, inArray, gte, lte, count } from 'drizzle-orm';
 import { ConfigManager } from '../config/ConfigManager';
 import type { Symbol } from '../types/graph';
-import type { EnhancedSymbolDoc } from '../types/tags';
 import type { UnifiedRelationship } from '../types/relationships/unified';
+import type { EnhancedSymbolDoc } from '../types/tags';
 import * as schema from './schema';
 
 /**
@@ -110,15 +110,20 @@ export class DatabaseManager {
    * @param jsonlPath - Path to JSONL data directory (optional, defaults to config)
    */
   constructor(dbPath?: string, jsonlPath?: string) {
-    if (dbPath && jsonlPath) {
-      this.dbPath = dbPath;
-      this.jsonlPath = jsonlPath;
-    } else {
+    let resolvedDbPath = dbPath;
+    let resolvedJsonlPath = jsonlPath;
+
+    // Fully explicit construction is used by commands, tests, and embedded
+    // consumers that must not depend on a process-global project config.
+    if (resolvedDbPath === undefined || resolvedJsonlPath === undefined) {
       const configManager = ConfigManager.getInstance();
       const config = configManager.get();
-      this.dbPath = configManager.resolvePath(config.paths.databasePath);
-      this.jsonlPath = configManager.resolvePath(config.paths.jsonlDir);
+      resolvedDbPath ??= configManager.resolvePath(config.paths.databasePath);
+      resolvedJsonlPath ??= configManager.resolvePath(config.paths.jsonlDir);
     }
+
+    this.dbPath = normalizeDatabaseFilePath(resolvedDbPath);
+    this.jsonlPath = resolvedJsonlPath;
 
     const dbDir = path.dirname(this.dbPath);
     if (!fs.existsSync(dbDir)) {
@@ -251,6 +256,7 @@ export class DatabaseManager {
     // Apply nullable, backwards-compatible additions before schema indexes and
     // Drizzle queries reference them.
     this.migrateLegacySymbolColumns();
+    this.migrateLegacyUnifiedRelationshipColumns();
 
     // Split schema into individual statements and execute via Drizzle
     // Remove SQL comments and split by semicolon
@@ -301,6 +307,31 @@ export class DatabaseManager {
     this.db.transaction(() => {
       for (const [name, declaration] of missing) {
         this.db.exec(`ALTER TABLE symbols ADD COLUMN ${name} ${declaration}`);
+      }
+    })();
+  }
+
+  /** Add nullable inheritance columns introduced after the original relationship schema. */
+  private migrateLegacyUnifiedRelationshipColumns(): void {
+    const existing = this.db.prepare('PRAGMA table_info(unified_relationships)').all() as Array<{
+      name: string;
+    }>;
+    if (existing.length === 0) return;
+
+    const names = new Set(existing.map((column) => column.name));
+    const additions: ReadonlyArray<readonly [name: string, declaration: string]> = [
+      ['abstraction_from', 'TEXT'],
+      ['abstraction_to', 'TEXT'],
+      ['hierarchy_depth', 'INTEGER'],
+      ['inheritance_chain', 'TEXT'],
+      ['overridden_members', 'TEXT'],
+    ];
+    const missing = additions.filter(([name]) => !names.has(name));
+    if (missing.length === 0) return;
+
+    this.db.transaction(() => {
+      for (const [name, declaration] of missing) {
+        this.db.exec(`ALTER TABLE unified_relationships ADD COLUMN ${name} ${declaration}`);
       }
     })();
   }
@@ -1758,7 +1789,7 @@ export class DatabaseManager {
       conditions.push(gte(schema.unifiedRelationships.confidence, options.minConfidence));
     }
 
-    let rows;
+    let rows: Array<typeof schema.unifiedRelationships.$inferSelect>;
 
     if (options.symbolId) {
       // Use indexed join table for O(1) lookup when symbolId is specified
@@ -1779,6 +1810,11 @@ export class DatabaseManager {
           filePath: schema.unifiedRelationships.filePath,
           line: schema.unifiedRelationships.line,
           properties: schema.unifiedRelationships.properties,
+          abstractionFrom: schema.unifiedRelationships.abstractionFrom,
+          abstractionTo: schema.unifiedRelationships.abstractionTo,
+          hierarchyDepth: schema.unifiedRelationships.hierarchyDepth,
+          inheritanceChain: schema.unifiedRelationships.inheritanceChain,
+          overriddenMembers: schema.unifiedRelationships.overriddenMembers,
           createdAt: schema.unifiedRelationships.createdAt,
           updatedAt: schema.unifiedRelationships.updatedAt,
           description: schema.unifiedRelationships.description,
@@ -3192,4 +3228,16 @@ export class DatabaseManager {
   deleteAllEntryPoints(): void {
     this.drizzleDb.delete(schema.entryPoints).run();
   }
+}
+
+function normalizeDatabaseFilePath(candidate: string): string {
+  try {
+    if (fs.statSync(candidate).isDirectory()) {
+      return path.join(candidate, '.tsdoc.db');
+    }
+  } catch {
+    // A not-yet-created file path is handled by the constructor below.
+  }
+
+  return candidate.endsWith(path.sep) ? path.join(candidate, '.tsdoc.db') : candidate;
 }

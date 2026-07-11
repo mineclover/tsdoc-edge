@@ -29,6 +29,8 @@ describe('TtscGraphRouterArtifactAdapter', () => {
       expect.objectContaining({
         adapter: 'ttsc-graph-router-artifact',
         producer: '@ttsc/graph',
+        workspaceId: 'project',
+        graphNamespace: 'ttsc:project',
         producerVersion: '0.16.8',
         producerBinaryVersion: 'ttscgraph 0.16.8 (fixture)',
         artifactContractVersion: '1.0.0',
@@ -181,10 +183,14 @@ describe('TtscGraphRouterArtifactAdapter', () => {
     const artifact = validArtifact();
     (artifact.dump as typeof artifact.dump & { diagnostics?: unknown[] }).diagnostics = [
       {
-        message: 'Cannot find name',
+        message: 'Type mismatch',
         severity: 'error',
         file: 'src/index.ts',
-        startLine: 4,
+        line: 4,
+        column: 7,
+        code: 2322,
+        origin: 'tsc',
+        node: 'src/index.ts#value:variable',
       },
     ];
     artifact.capabilities.diagnosticsCollected = true;
@@ -201,10 +207,14 @@ describe('TtscGraphRouterArtifactAdapter', () => {
     const loaded = await adapter.load({ rootDir });
     expect(loaded.diagnostics).toEqual([
       expect.objectContaining({
-        message: 'Cannot find name',
+        message: 'Type mismatch',
         severity: 'error',
         startLine: 4,
+        startCol: 7,
+        code: 2322,
         category: 'compiler',
+        relatedNodeIds: ['src/index.ts#value:variable'],
+        producerFields: { origin: 'tsc' },
       }),
     ]);
     expect(loaded.provenance.diagnosticsCollected).toBe(true);

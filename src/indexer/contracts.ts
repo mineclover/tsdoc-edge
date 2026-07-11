@@ -44,6 +44,10 @@ export interface ProjectGraphSourceEdge extends Record<string, unknown> {
 export interface ProjectGraphProvenance extends Record<string, unknown> {
   adapter: string;
   producer: string;
+  /** Stable workspace scope used by cross-plane spec and convention binding. */
+  workspaceId?: string;
+  /** Stable graph identity namespace within the workspace. */
+  graphNamespace?: string;
   producerVersion?: string;
   artifactContractId?: string;
   artifactContractVersion?: string;
@@ -54,6 +58,11 @@ export interface ProjectGraphProvenance extends Record<string, unknown> {
   routerVersion?: string;
   /** `null` means the producer did not report the actual compiler version. */
   compilerVersion?: string | null;
+  compilerVersionReported?: boolean;
+  /** Producer-owned semantic revision that affects effective-analysis identity. */
+  producerDerivedRevisionId?: string;
+  /** Router-owned semantic revision that affects effective-analysis identity. */
+  routerDerivedRevisionId?: string;
   diagnosticsCollected?: boolean;
   /** Compatibility target, not a claim about tsdoc-edge's local AST runtime. */
   typescriptCompatibilityTarget?: string;

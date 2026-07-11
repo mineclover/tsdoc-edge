@@ -3,10 +3,10 @@
  * @packageDocumentation
  */
 
-import * as path from 'node:path';
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { DEPENDENCY_GRAPH_EDGE_KINDS, graphEdgeSemantic } from '../graph-analysis/edge-semantics';
 import { CanonicalAliasContext } from '../indexer';
-import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
+import { DatabaseManager } from '../storage/DatabaseManager';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /** A symbol affected by a change at a given depth */
 interface ImpactNode {
@@ -102,51 +102,77 @@ Examples:
       const dbManager = new DatabaseManager(dbPath);
       const canonicalContext = CanonicalAliasContext.tryOpen(process.cwd());
 
-      // Resolve symbol by ID or name
+      // Resolve through both the legacy DB and the canonical graph. Canonical
+      // ids remain valid query inputs during the migration away from TS5 data.
       const resolved = this.resolveSymbol(dbManager, symbolId);
+      const canonicalId =
+        canonicalContext?.resolveCanonicalId(resolved?.id ?? symbolId) ??
+        canonicalContext?.resolveCanonicalId(symbolId) ??
+        null;
 
-      if (!resolved) {
+      if (!resolved && !canonicalId) {
         this.printError(`Symbol not found: ${symbolId}`);
         dbManager.close();
         canonicalContext?.close();
         return { success: false, message: 'Symbol not found', exitCode: 1 };
       }
 
-      const { symbol, id: resolvedId } = resolved;
-      const canonicalId = canonicalContext?.resolveCanonicalId(resolvedId) ?? null;
-      this.printHeader(`Impact Analysis: ${symbol.name}`);
+      const resolvedId = resolved?.id;
+      const canonicalNode = canonicalId
+        ? canonicalContext?.analysis.index.getNode(canonicalId)
+        : undefined;
+      const symbolName =
+        resolved?.symbol.name ?? canonicalNode?.qualifiedName ?? canonicalNode?.name ?? symbolId;
+      const symbolType = resolved?.symbol.type ?? canonicalNode?.kind ?? 'canonical';
+      this.printHeader(`Impact Analysis: ${symbolName}`);
 
       console.log();
-      this.printInfo(`Analyzing impact for: ${symbol.name} (${symbol.type})`);
+      this.printInfo(`Analyzing impact for: ${symbolName} (${symbolType})`);
       this.printInfo(`Direction: ${options.direction}, Max depth: ${options.depth}`);
       console.log();
 
       // Perform impact analysis
-      const impactedSymbols = this.analyzeImpact(
-        dbManager,
-        resolvedId,
-        options.depth,
-        options.direction,
-        options.category,
-        options.minConfidence
-      );
+      const impactedSymbols = resolvedId
+        ? this.analyzeImpact(
+            dbManager,
+            resolvedId,
+            options.depth,
+            options.direction,
+            options.category,
+            options.minConfidence
+          )
+        : [];
+      const canonicalImpact =
+        canonicalId && canonicalContext
+          ? this.analyzeCanonicalImpact(
+              canonicalContext,
+              canonicalId,
+              options.depth,
+              options.direction,
+              options.category,
+              options.minConfidence
+            )
+          : [];
 
-      if (impactedSymbols.length === 0) {
+      if (impactedSymbols.length === 0 && canonicalImpact.length === 0) {
         this.printSuccess('No impact found (symbol is isolated)');
-        if (canonicalId && canonicalContext) {
-          const canonicalImpact = canonicalContext.analysis
-            .impact(canonicalId, { maxDepth: options.depth, external: 'boundary' })
-            .affected.map((node) => node.node.id);
-          if (canonicalImpact.length > 0) {
-            console.log();
-            this.printSection('Canonical Structural Impact');
-            this.printInfo(`${canonicalImpact.length} affected canonical nodes via alias hop`);
-          }
-        }
         console.log();
         dbManager.close();
         canonicalContext?.close();
         return this.success('Analysis complete');
+      }
+
+      if (impactedSymbols.length === 0) {
+        this.printCanonicalImpact(canonicalImpact, options.direction);
+        const canonicalDepth = Math.max(...canonicalImpact.map((node) => node.depth));
+        const riskLevel = this.assessRisk(canonicalImpact.length, canonicalDepth);
+        this.printInfo(`Canonical change risk: ${riskLevel}`);
+        console.log();
+        dbManager.close();
+        canonicalContext?.close();
+        return this.success(
+          `Impact analysis complete: ${canonicalImpact.length} canonical symbols affected`
+        );
       }
 
       // Display results
@@ -166,7 +192,9 @@ Examples:
       // Display by depth level
       for (const depth of Array.from(byDepth.keys()).sort((a, b) => a - b)) {
         const nodes = byDepth.get(depth)!;
-        console.log(`  ${this.colors.bold}Depth ${depth}${this.colors.reset} (${nodes.length} symbols)`);
+        console.log(
+          `  ${this.colors.bold}Depth ${depth}${this.colors.reset} (${nodes.length} symbols)`
+        );
         console.log();
 
         // Group by category
@@ -179,18 +207,26 @@ Examples:
         }
 
         for (const [category, categoryNodes] of byCategory.entries()) {
-          console.log(`    ${this.colors.cyan}${category}${this.colors.reset} (${categoryNodes.length})`);
+          console.log(
+            `    ${this.colors.cyan}${category}${this.colors.reset} (${categoryNodes.length})`
+          );
 
           const samplesToShow = Math.min(5, categoryNodes.length);
           for (let i = 0; i < samplesToShow; i++) {
             const node = categoryNodes[i];
             const arrow = options.direction === 'upstream' ? '←' : '→';
-            console.log(`      ${arrow} ${node.symbolId} ${this.colors.dim}(via ${node.relationshipType})${this.colors.reset}`);
-            console.log(`        ${this.colors.dim}Path: ${node.path.join(' → ')}${this.colors.reset}`);
+            console.log(
+              `      ${arrow} ${node.symbolId} ${this.colors.dim}(via ${node.relationshipType})${this.colors.reset}`
+            );
+            console.log(
+              `        ${this.colors.dim}Path: ${node.path.join(' → ')}${this.colors.reset}`
+            );
           }
 
           if (categoryNodes.length > samplesToShow) {
-            console.log(`      ${this.colors.dim}... and ${categoryNodes.length - samplesToShow} more${this.colors.reset}`);
+            console.log(
+              `      ${this.colors.dim}... and ${categoryNodes.length - samplesToShow} more${this.colors.reset}`
+            );
           }
           console.log();
         }
@@ -208,14 +244,22 @@ Examples:
         byType.set(node.relationshipType, (byType.get(node.relationshipType) || 0) + 1);
       }
 
-      console.log(`  Total affected symbols: ${this.colors.cyan}${impactedSymbols.length}${this.colors.reset}`);
-      console.log(`  Maximum depth reached: ${this.colors.cyan}${Math.max(...Array.from(byDepth.keys()))}${this.colors.reset}`);
+      console.log(
+        `  Total affected symbols: ${this.colors.cyan}${impactedSymbols.length}${this.colors.reset}`
+      );
+      console.log(
+        `  Maximum depth reached: ${this.colors.cyan}${Math.max(...Array.from(byDepth.keys()))}${this.colors.reset}`
+      );
       console.log();
 
       console.log(`  ${this.colors.dim}By category:${this.colors.reset}`);
-      for (const [category, count] of Array.from(byCategory.entries()).sort((a, b) => b[1] - a[1])) {
+      for (const [category, count] of Array.from(byCategory.entries()).sort(
+        (a, b) => b[1] - a[1]
+      )) {
         const percentage = ((count / impactedSymbols.length) * 100).toFixed(1);
-        console.log(`    ${category}: ${this.colors.cyan}${count}${this.colors.reset} (${percentage}%)`);
+        console.log(
+          `    ${category}: ${this.colors.cyan}${count}${this.colors.reset} (${percentage}%)`
+        );
       }
       console.log();
 
@@ -229,43 +273,40 @@ Examples:
       }
       console.log();
 
-      if (canonicalId && canonicalContext) {
-        const canonicalImpact = canonicalContext.analysis
-          .impact(canonicalId, { maxDepth: options.depth, external: 'boundary' })
-          .affected.map((node) => node.node.id);
-        if (canonicalImpact.length > 0) {
-          this.printSection('Canonical Structural Impact');
-          this.printInfo(`${canonicalImpact.length} affected canonical nodes via alias hop`);
-          for (const affectedId of canonicalImpact.slice(0, 10)) {
-            console.log(`  → ${affectedId}`);
-          }
-          if (canonicalImpact.length > 10) {
-            console.log(`  ${this.colors.dim}... and ${canonicalImpact.length - 10} more${this.colors.reset}`);
-          }
-          console.log();
-        }
-      }
+      if (canonicalImpact.length > 0) this.printCanonicalImpact(canonicalImpact, options.direction);
 
       // Risk assessment
       this.printSection('Change Risk Assessment');
 
-      const riskLevel = this.assessRisk(impactedSymbols.length, Math.max(...Array.from(byDepth.keys())));
-      const riskColor = riskLevel === 'High' ? this.colors.red
-        : riskLevel === 'Medium' ? this.colors.yellow
-        : this.colors.green;
+      const riskLevel = this.assessRisk(
+        impactedSymbols.length,
+        Math.max(...Array.from(byDepth.keys()))
+      );
+      const riskColor =
+        riskLevel === 'High'
+          ? this.colors.red
+          : riskLevel === 'Medium'
+            ? this.colors.yellow
+            : this.colors.green;
 
       console.log(`  Impact Level: ${riskColor}${riskLevel}${this.colors.reset}`);
       console.log();
 
       if (riskLevel === 'High') {
-        console.log(`  ${this.colors.yellow}⚠${this.colors.reset}  ${this.colors.bold}High-risk change${this.colors.reset}`);
+        console.log(
+          `  ${this.colors.yellow}⚠${this.colors.reset}  ${this.colors.bold}High-risk change${this.colors.reset}`
+        );
         console.log(`     This symbol has wide-reaching impact.`);
         console.log(`     Consider: comprehensive testing, gradual rollout, feature flags`);
       } else if (riskLevel === 'Medium') {
-        console.log(`  ${this.colors.yellow}ℹ${this.colors.reset}  ${this.colors.bold}Medium-risk change${this.colors.reset}`);
+        console.log(
+          `  ${this.colors.yellow}ℹ${this.colors.reset}  ${this.colors.bold}Medium-risk change${this.colors.reset}`
+        );
         console.log(`     Moderate impact. Ensure affected areas are tested.`);
       } else {
-        console.log(`  ${this.colors.green}✓${this.colors.reset}  ${this.colors.bold}Low-risk change${this.colors.reset}`);
+        console.log(
+          `  ${this.colors.green}✓${this.colors.reset}  ${this.colors.bold}Low-risk change${this.colors.reset}`
+        );
         console.log(`     Limited impact. Standard testing should suffice.`);
       }
 
@@ -307,10 +348,10 @@ Examples:
 
       // Filter by category and confidence
       if (category) {
-        relationships = relationships.filter(r => r.category === category);
+        relationships = relationships.filter((r) => r.category === category);
       }
       if (minConfidence !== undefined) {
-        relationships = relationships.filter(r => r.confidence >= minConfidence);
+        relationships = relationships.filter((r) => r.confidence >= minConfidence);
       }
 
       for (const rel of relationships) {
@@ -365,6 +406,89 @@ Examples:
     }
 
     return impactNodes;
+  }
+
+  /** Traverse canonical dependency facts with the same CLI filters as the legacy lane. */
+  private analyzeCanonicalImpact(
+    context: CanonicalAliasContext,
+    startSymbol: string,
+    maxDepth: number,
+    direction: string,
+    category?: string,
+    minConfidence = 0.5
+  ): ImpactNode[] {
+    // Canonical compiler facts have confidence 1.0.
+    if (minConfidence > 1) return [];
+
+    const allowedKinds = new Set(DEPENDENCY_GRAPH_EDGE_KINDS);
+    const visited = new Set([startSymbol]);
+    const queue: Array<{ symbolId: string; depth: number; path: string[] }> = [
+      { symbolId: startSymbol, depth: 0, path: [startSymbol] },
+    ];
+    const result: ImpactNode[] = [];
+
+    for (let cursor = 0; cursor < queue.length; cursor++) {
+      const current = queue[cursor];
+      if (current.depth >= maxDepth) continue;
+
+      const candidates = [
+        ...(direction !== 'upstream'
+          ? context.analysis.index
+              .getIncomingEdges(current.symbolId)
+              .map((edge) => ({ edge, nextId: edge.from }))
+          : []),
+        ...(direction !== 'downstream'
+          ? context.analysis.index
+              .getOutgoingEdges(current.symbolId)
+              .map((edge) => ({ edge, nextId: edge.to }))
+          : []),
+      ].sort(
+        (left, right) =>
+          left.nextId.localeCompare(right.nextId) || left.edge.kind.localeCompare(right.edge.kind)
+      );
+
+      for (const { edge, nextId } of candidates) {
+        if (!allowedKinds.has(edge.kind) || visited.has(nextId)) continue;
+        const semantic = graphEdgeSemantic(edge.kind);
+        const relationshipCategory = semantic.relationshipCategory ?? semantic.category;
+        if (category && relationshipCategory !== category) continue;
+
+        const node = context.analysis.index.getNode(nextId);
+        if (!node) continue;
+        visited.add(nextId);
+        const depth = current.depth + 1;
+        const nextPath = [...current.path, nextId];
+        result.push({
+          symbolId: nextId,
+          depth,
+          path: nextPath,
+          relationshipType: semantic.relationshipType ?? edge.kind,
+          category: relationshipCategory,
+        });
+        if (node.external !== true) {
+          queue.push({ symbolId: nextId, depth, path: nextPath });
+        }
+      }
+    }
+
+    return result.sort(
+      (left, right) => left.depth - right.depth || left.symbolId.localeCompare(right.symbolId)
+    );
+  }
+
+  private printCanonicalImpact(nodes: readonly ImpactNode[], direction: string): void {
+    this.printSection('Canonical Structural Impact');
+    this.printInfo(`${nodes.length} affected canonical nodes`);
+    const arrow = direction === 'upstream' ? '←' : direction === 'both' ? '↔' : '→';
+    for (const node of nodes.slice(0, 10)) {
+      console.log(
+        `  ${arrow} ${node.symbolId} ${this.colors.dim}(depth ${node.depth}, via ${node.relationshipType})${this.colors.reset}`
+      );
+    }
+    if (nodes.length > 10) {
+      console.log(`  ${this.colors.dim}... and ${nodes.length - 10} more${this.colors.reset}`);
+    }
+    console.log();
   }
 
   /**

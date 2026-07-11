@@ -53,8 +53,11 @@ tsdoc-edge build src
 ## Storage
 
 **Dual Storage**:
-1. **SQLite** (`.tsdoc/symbols.db`): 빠른 쿼리
+1. **SQLite** (`.tsdoc.db`, 또는 `paths.databasePath`): legacy enrichment 빠른 쿼리
 2. **JSONL** (`.tsdoc/registry.jsonl`): Git 버전 관리
+
+`--canonical-graph`를 사용하면 compiler-resolved node/edge, alias, diagnostics revision을
+별도 `.tsdoc/canonical-graph.db`에 원자 교체한다.
 
 ## Related
 
@@ -112,4 +115,3 @@ tsdoc-edge build src
 ### Implemented By
 
 - BuildCommand → /Users/junwoobang/workflow/tsdoc-edge/src/commands/BuildCommand.ts:55
-

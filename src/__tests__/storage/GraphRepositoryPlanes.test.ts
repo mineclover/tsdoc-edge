@@ -1,10 +1,10 @@
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
-import { normalizeRouterDiagnostics } from '../../indexer/diagnostics-contract';
-import { materializeAliases } from '../../indexer/symbol-alias';
-import { ProjectIndexer } from '../../indexer/ProjectIndexer';
 import type { ProjectGraphInput } from '../../indexer/contracts';
+import { normalizeRouterDiagnostics } from '../../indexer/diagnostics-contract';
+import { ProjectIndexer } from '../../indexer/ProjectIndexer';
+import { materializeAliases } from '../../indexer/symbol-alias';
 import { GraphRepository } from '../../storage/GraphRepository';
 
 describe('GraphRepository alias and diagnostics planes', () => {
@@ -62,6 +62,37 @@ describe('GraphRepository alias and diagnostics planes', () => {
       }),
     ]);
     expect(active?.graph.fingerprint).toBe(indexed.graph.fingerprint);
+  });
+
+  it('changes revision identity when an additive plane changes', async () => {
+    const repository = new GraphRepository(path.join(tempDir, 'canonical-graph.db'));
+    const indexed = await new ProjectIndexer({
+      id: 'fixture',
+      load: async () => graphInput(tempDir),
+    }).index({ rootDir: tempDir, tsconfigPath: 'tsconfig.ttsc.json' });
+    const aliases = materializeAliases(indexed.graph);
+    const first = repository.replaceActiveRevision(indexed.graph, { aliases });
+    const changedAlias = aliases.map((alias) => ({
+      ...alias,
+      legacyId: `${alias.legacyId}-renamed`,
+    }));
+    const second = repository.replaceActiveRevision(indexed.graph, {
+      aliases: changedAlias,
+    });
+    const diagnostics = normalizeRouterDiagnostics(
+      [{ message: 'Changed diagnostic plane', severity: 'warning', startLine: 1 }],
+      { rootDir: tempDir }
+    );
+    const third = repository.replaceActiveRevision(indexed.graph, {
+      aliases: changedAlias,
+      diagnostics,
+    });
+    repository.close();
+
+    expect(second.revisionId).not.toBe(first.revisionId);
+    expect(third.revisionId).not.toBe(second.revisionId);
+    expect(first.contentFingerprint).toBe(second.contentFingerprint);
+    expect(second.contentFingerprint).toBe(third.contentFingerprint);
   });
 });
 

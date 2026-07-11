@@ -80,8 +80,8 @@ title: `↓${downstream} ↑${upstream}`
 `.tsdoc/canonical-graph.db`가 있으면 symbol lookup, hover, code lens, dependency,
 dependent, impact를 canonical node/edge에서 읽는다. legacy DB는 아직 canonical에 없는
 문서·테스트·endpoint 등 enrichment의 호환 경로다. 파일 단위 순환 의존성과 레이어
-위반 진단은 canonical impact 진단과 병합하되, 심볼 ID 자체는 alias 계약 전까지 섞지
-않는다.
+위반 진단은 canonical impact 진단과 병합한다. revision-scoped alias가 legacy id와
+canonical id 사이를 연결하므로 두 저장소를 직접 복제하지 않는다.
 
 #### 모듈 구조
 - **CacheManager** (`cache-manager.ts`): TTL 기반 캐시 관리, 자동 정리, LRU eviction
@@ -134,9 +134,12 @@ Canonical path:
 - `canonical_graph_nodes` - raw node payload
 - `canonical_graph_edges` - raw edge payload
 - `canonical_graph_state` - active pointer
+- `canonical_symbol_aliases` - collision-safe legacy id ↔ canonical id
+- `canonical_graph_diagnostics` - compiler/router/graph 진단 plane
 
-Revision과 node/edge는 한 transaction으로 교체되고 CAS가 오래된 비동기 refresh를
-막는다. legacy path는 `StatementManager`를 통한 prepared statement caching을 유지한다.
+Revision과 node/edge/alias/diagnostics는 한 transaction으로 교체되고 CAS가 오래된
+비동기 refresh를 막는다. schema-v1 DB는 read-only 조회를 유지하며 다음 write refresh에서
+v2로 승격된다. legacy path는 `StatementManager` prepared statement caching을 유지한다.
 
 Legacy 주요 테이블:
 
@@ -211,7 +214,8 @@ Build가 만든 `.tsdoc/canonical-graph.db`는 router runtime 환경 변수가 �
 schema/WAL 초기화를 하지 않는 read-only connection으로 읽을 수 있다. save/source
 watch event에서 외부 Build가 교체한 revision을 다시 읽지만, 새 revision을 직접 만들려면
 module 설정이 필요하다.
-legacy `.tsdoc/symbols.db`는 enrichment fallback 동안만 사용한다.
+legacy DB는 `.tsdoc.config.json`의 `paths.databasePath`를 따르며 기본값은 `.tsdoc.db`다.
+enrichment fallback 동안만 사용한다.
 
 ## 증분 빌드 (Incremental Build)
 
@@ -226,8 +230,9 @@ single-flight로 직렬화하고 대기 요청을 coalesce한다. generation gua
 1. **서버 초기화**: canonical DB가 있으면 active revision을 읽는다.
 2. **파일 수정 시**: TS5 syntax-only overlay를 즉시 메모리에 만들고, 파일별 1초
    디바운스 후 진단을 publish한다.
-3. **파일 저장 시**: 해당 overlay를 먼저 제거하고 DB write 없이 whole-project canonical
-   refresh를 수행한다.
+3. **파일 저장 시**: 저장 시점의 overlay generation을 캡처하고 DB write 없이 whole-project
+   canonical refresh를 수행한다. refresh 도중 새 편집이 들어오면 새 generation을 보존하고,
+   저장된 generation만 조건부로 제거한다.
 4. **저장 성공 시**: 새 revision을 publish하고 열린 문서 전체 진단을 다시 계산한다.
 5. **파일 생성·변경·삭제 시**: 동적 watched-file registration이 같은 whole-project
    replace를 실행해 stale
@@ -252,10 +257,11 @@ overlay extraction만 담당한다. `processContent()`는 SQLite를 호출하지
 - `refreshCanonicalGraph(filePath?)`: save/delete 후 canonical revision 교체
 - `getUnsavedOverlay(filePath)`: 테스트/host용 overlay 조회
 
-현재 overlay ID는 아직 legacy syntax ID다. dirty file에서는 overlay가 hover, symbol,
-code lens, diagnostics, workspace search를 우선하고 이름·kind가 같은 저장 심볼의 impact만
-canonical peer에서 가져온다. persisted topology 자체에 edge delta로 merge하지는 않으며,
-canonical-id 기반 `GraphDelta`는 후속 parity 단계다.
+overlay는 owner-qualified canonical-id `GraphDelta`다. dirty file에서 hover, symbol,
+code lens, diagnostics, workspace search, impact, related-symbol, definition lookup이 합성된
+workspace view를 사용한다. 저장 symbol과 identity가 일치하면 기존 canonical id와 edge를
+보존하고, 삭제·rename endpoint는 제거한다. TS5 extractor가 아직 새 relationship을 거의
+만들지 않으므로 신규/rename symbol의 topology는 저장 후 whole-project refresh에서 확정한다.
 
 ## 메모리 관리
 
@@ -332,7 +338,7 @@ vscode.commands.registerCommand('tsdoc.showImpactAnalysis', (symbolId, direction
 ## 트러블슈팅
 
 ### 심볼을 찾을 수 없음
-- `.tsdoc/symbols.db` 존재 확인
+- `.tsdoc.config.json`의 `paths.databasePath` 파일 존재 확인 (기본 `.tsdoc.db`)
 - `tsdoc-edge build` 재실행
 - 파일 경로 정규화 (Windows `\` vs Unix `/`) - `service.ts`에서 자동 처리
 

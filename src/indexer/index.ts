@@ -1,6 +1,4 @@
-export {
-  CanonicalAliasContext,
-} from './CanonicalAliasContext';
+export { CanonicalAliasContext } from './CanonicalAliasContext';
 export {
   CanonicalGraphCoordinator,
   type CanonicalGraphCoordinatorDependencies,
@@ -11,34 +9,34 @@ export {
   DEFAULT_GRAPH_ROUTER_CONFIG,
   DEFAULT_GRAPH_TSCONFIG,
 } from './CanonicalGraphCoordinator';
-export * from './contracts';
 export {
+  CANONICAL_ID_SCHEME,
   formatCanonicalId,
   isProvisionalOverlayId,
-  parseCanonicalId,
-  CANONICAL_ID_SCHEME,
   OVERLAY_ID_SUFFIX,
+  parseCanonicalId,
 } from './canonical-id';
+export * from './contracts';
 export {
   CANONICAL_DIAGNOSTICS_CONTRACT_VERSION,
-  normalizeRouterDiagnostics,
   type CanonicalDiagnostic,
   type CanonicalDiagnosticCategory,
   type CanonicalDiagnosticSeverity,
+  normalizeRouterDiagnostics,
 } from './diagnostics-contract';
-export { generateLegacyId, normalizeLegacyKind } from './legacy-id';
 export {
-  verifyLegacyAstParity,
   type LegacyParityMismatch,
   type LegacyParityResult,
+  verifyLegacyAstParity,
 } from './LegacyAstParityAdapter';
+export { generateLegacyId, normalizeLegacyKind } from './legacy-id';
+export { canonicalProjectGraphFingerprint, ProjectIndexer } from './ProjectIndexer';
 export {
+  type AliasMatchStrategy,
   InMemoryAliasResolver,
   materializeAliases,
-  type AliasMatchStrategy,
   type SymbolAliasRecord,
 } from './symbol-alias';
-export { ProjectIndexer } from './ProjectIndexer';
 export {
   TtscGraphRouterArtifactAdapter,
   type TtscGraphRouterArtifactAdapterOptions,

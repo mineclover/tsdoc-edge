@@ -7,16 +7,12 @@ export const CANONICAL_DIAGNOSTICS_CONTRACT_VERSION = '1.0' as const;
 
 export type CanonicalDiagnosticSeverity = 'error' | 'warning' | 'info' | 'hint';
 
-export type CanonicalDiagnosticCategory =
-  | 'compiler'
-  | 'router'
-  | 'graph-integrity'
-  | 'impact';
+export type CanonicalDiagnosticCategory = 'compiler' | 'router' | 'graph-integrity' | 'impact';
 
 /** One diagnostic stored with a canonical graph revision. */
 export interface CanonicalDiagnostic {
   readonly id: string;
-  readonly code?: string;
+  readonly code?: string | number;
   readonly category: CanonicalDiagnosticCategory;
   readonly severity: CanonicalDiagnosticSeverity;
   readonly message: string;
@@ -39,16 +35,19 @@ export function normalizeRouterDiagnostics(
     const record = asRecord(value, `diagnostics[${index}]`);
     const message = requireString(record.message, `diagnostics[${index}].message`);
     const severity = normalizeSeverity(record.severity, `diagnostics[${index}].severity`);
-    const startLine = requirePositiveLine(record.startLine ?? record.line, `diagnostics[${index}].startLine`);
+    const startLine = requirePositiveLine(
+      record.startLine ?? record.line,
+      `diagnostics[${index}].startLine`
+    );
     const file = optionalString(record.file ?? record.filePath);
-    const id =
-      optionalString(record.id) ??
-      stableDiagnosticId({ message, file, startLine, index });
+    const code = optionalDiagnosticCode(record.code, `diagnostics[${index}].code`);
+    const relatedNodeIds = mergeRelatedNodeIds(record.relatedNodeIds, record.node);
+    const id = optionalString(record.id) ?? stableDiagnosticId({ message, file, startLine, index });
 
     diagnostics.push(
       Object.freeze({
         id,
-        ...(optionalString(record.code) ? { code: optionalString(record.code) } : {}),
+        ...(code !== undefined ? { code } : {}),
         category: normalizeCategory(record.category),
         severity,
         message,
@@ -63,9 +62,7 @@ export function normalizeRouterDiagnostics(
         ...(optionalPositiveInt(record.endCol) !== undefined
           ? { endCol: optionalPositiveInt(record.endCol) }
           : {}),
-        ...(optionalStringArray(record.relatedNodeIds)
-          ? { relatedNodeIds: optionalStringArray(record.relatedNodeIds) }
-          : {}),
+        ...(relatedNodeIds ? { relatedNodeIds } : {}),
         ...(copyUnknownFields(record) ? { producerFields: copyUnknownFields(record) } : {}),
       })
     );
@@ -91,6 +88,7 @@ function stableDiagnosticId(parts: {
 }
 
 function normalizeSeverity(value: unknown, field: string): CanonicalDiagnosticSeverity {
+  if (value === undefined) return 'error';
   if (typeof value === 'string') {
     const lower = value.toLowerCase();
     if (lower === 'error' || lower === 'warning' || lower === 'info' || lower === 'hint') {
@@ -106,8 +104,30 @@ function normalizeSeverity(value: unknown, field: string): CanonicalDiagnosticSe
   throw new Error(`${field} must be a supported diagnostic severity`);
 }
 
+function optionalDiagnosticCode(value: unknown, field: string): string | number | undefined {
+  if (value === undefined) return undefined;
+  if (typeof value === 'number' && Number.isInteger(value) && value >= 0) return value;
+  if (typeof value === 'string' && value.trim() !== '') return value;
+  throw new Error(`${field} must be a non-negative integer or non-empty string`);
+}
+
+function mergeRelatedNodeIds(
+  relatedNodeIds: unknown,
+  producerNode: unknown
+): readonly string[] | undefined {
+  const explicit = optionalStringArray(relatedNodeIds) ?? [];
+  const node = optionalString(producerNode);
+  const merged = [...new Set(node ? [...explicit, node] : explicit)].sort(compareText);
+  return merged.length > 0 ? Object.freeze(merged) : undefined;
+}
+
 function normalizeCategory(value: unknown): CanonicalDiagnosticCategory {
-  if (value === 'compiler' || value === 'router' || value === 'graph-integrity' || value === 'impact') {
+  if (
+    value === 'compiler' ||
+    value === 'router' ||
+    value === 'graph-integrity' ||
+    value === 'impact'
+  ) {
     return value;
   }
   return 'compiler';
@@ -129,6 +149,7 @@ function copyUnknownFields(record: Record<string, unknown>): Record<string, unkn
     'endLine',
     'endCol',
     'relatedNodeIds',
+    'node',
   ]);
   const copy: Record<string, unknown> = {};
   for (const [key, value] of Object.entries(record)) {

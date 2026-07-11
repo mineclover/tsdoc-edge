@@ -24,6 +24,8 @@ export interface CanonicalGraphCoordinatorOptions {
   readonly moduleSpecifier?: string;
   readonly configPath?: string;
   readonly repoId?: string;
+  readonly workspaceId?: string;
+  readonly graphNamespace?: string;
   readonly tsconfigPath?: string;
   readonly repositoryPath?: string;
   readonly expectedGraphVersion?: string;
@@ -80,11 +82,14 @@ export class CanonicalGraphCoordinator {
       options.repositoryPath ?? DEFAULT_CANONICAL_GRAPH_DATABASE
     );
 
+    const repoId = options.repoId ?? path.basename(this.rootDir);
     const source =
       dependencies.source ??
       new TtscGraphRouterArtifactAdapter({
         configPath: path.resolve(this.rootDir, options.configPath ?? DEFAULT_GRAPH_ROUTER_CONFIG),
-        repoId: options.repoId ?? path.basename(this.rootDir),
+        repoId,
+        workspaceId: options.workspaceId ?? repoId,
+        graphNamespace: options.graphNamespace ?? `ttsc:${repoId}`,
         moduleSpecifier: options.moduleSpecifier,
         expectedGraphVersion: options.expectedGraphVersion,
         typescriptCompatibilityTarget: options.typescriptCompatibilityTarget,
@@ -169,6 +174,8 @@ export function canonicalGraphOptionsFromEnvironment(
     moduleSpecifier,
     configPath: environment.TSDOC_EDGE_GRAPH_ROUTER_CONFIG,
     repoId: environment.TSDOC_EDGE_GRAPH_ROUTER_REPO,
+    workspaceId: environment.TSDOC_EDGE_GRAPH_WORKSPACE,
+    graphNamespace: environment.TSDOC_EDGE_GRAPH_NAMESPACE,
     tsconfigPath: environment.TSDOC_EDGE_GRAPH_TSCONFIG,
     repositoryPath: environment.TSDOC_EDGE_CANONICAL_GRAPH_DB,
   };

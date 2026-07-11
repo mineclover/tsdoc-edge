@@ -72,6 +72,9 @@ describe('canonical graph analysis', () => {
     expect(
       service.dependencies(IDS.controller, { edgeKinds: ['contains'] }).map(({ edge }) => edge.kind)
     ).toEqual(['contains']);
+    expect(service.degreeMetrics().find(({ node }) => node.id === IDS.controller)).toMatchObject({
+      dependencyCount: 1,
+    });
   });
 
   it('traverses incoming impact cycle-safely and in deterministic depth order', () => {

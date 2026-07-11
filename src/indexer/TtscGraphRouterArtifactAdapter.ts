@@ -6,7 +6,6 @@
 import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import { canonicalFsPath } from './canonical-path';
-import { normalizeRouterDiagnostics } from './diagnostics-contract';
 import type {
   ProjectGraphInput,
   ProjectGraphSource,
@@ -14,6 +13,7 @@ import type {
   ProjectGraphSourceNode,
   ProjectIndexRequest,
 } from './contracts';
+import { normalizeRouterDiagnostics } from './diagnostics-contract';
 
 export const SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSION = '1.0.0' as const;
 
@@ -103,6 +103,10 @@ interface GraphRouterModule {
 export interface TtscGraphRouterArtifactAdapterOptions {
   configPath: string;
   repoId: string;
+  /** Stable cross-plane workspace identity; defaults to the router repo ID. */
+  workspaceId?: string;
+  /** Stable graph namespace; defaults to `ttsc:<repoId>`. */
+  graphNamespace?: string;
   /** Package name, file URL, or absolute path to the built ESM entrypoint. */
   moduleSpecifier?: string;
   /** Requested compatibility gate; it is not compiler-version provenance. */
@@ -128,8 +132,18 @@ export class TtscGraphRouterArtifactAdapter implements ProjectGraphSource {
   private readonly typescriptCompatibilityTarget: string;
   private readonly expectedGraphVersion: string;
   private readonly expectedArtifactContractVersion: string;
+  private readonly workspaceId: string;
+  private readonly graphNamespace: string;
 
   constructor(private readonly options: TtscGraphRouterArtifactAdapterOptions) {
+    if (!options.repoId.trim() || options.repoId !== options.repoId.trim()) {
+      throw new Error('ttsc graph-router repoId must be nonempty canonical text');
+    }
+    this.workspaceId = canonicalIdentity(options.workspaceId ?? options.repoId, 'workspaceId');
+    this.graphNamespace = canonicalIdentity(
+      options.graphNamespace ?? `ttsc:${options.repoId}`,
+      'graphNamespace'
+    );
     this.typescriptCompatibilityTarget = options.typescriptCompatibilityTarget ?? '7.0';
     // This exact producer pin is the current TypeScript 7 stabilization policy.
     // Artifact contract/capability negotiation remains a separate boundary.
@@ -210,6 +224,8 @@ export class TtscGraphRouterArtifactAdapter implements ProjectGraphSource {
       provenance: {
         adapter: this.id,
         producer: loaded.producer.name,
+        workspaceId: this.workspaceId,
+        graphNamespace: this.graphNamespace,
         producerVersion: loaded.producer.version,
         producerBinary: loaded.producer.binary,
         producerBinaryVersion: loaded.producer.binaryVersion,
@@ -356,6 +372,13 @@ export class TtscGraphRouterArtifactAdapter implements ProjectGraphSource {
     assertGraphRouterModule(loaded);
     return loaded;
   }
+}
+
+function canonicalIdentity(value: string, label: string): string {
+  if (!value.trim() || value !== value.trim()) {
+    throw new Error(`ttsc graph-router ${label} must be nonempty canonical text`);
+  }
+  return value;
 }
 
 function moduleSpecifier(value: string | undefined): string {

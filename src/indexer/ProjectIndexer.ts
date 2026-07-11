@@ -9,7 +9,6 @@ import { canonicalFsPath } from './canonical-path';
 import {
   type CanonicalGraphEdge,
   type CanonicalGraphNode,
-  type CanonicalProjectGraph,
   PROJECT_GRAPH_CONTRACT_VERSION,
   type ProjectGraphInput,
   type ProjectGraphSource,
@@ -50,7 +49,7 @@ export class ProjectIndexer {
 
     const nodes = this.assembleNodes(input);
     const edges = this.assembleEdges(input, new Set(nodes.map((node) => node.id)));
-    const fingerprint = createHash('sha256').update(stableJson({ nodes, edges })).digest('hex');
+    const fingerprint = canonicalProjectGraphFingerprint(nodes, edges);
 
     return deepFreeze({
       graph: deepFreeze({
@@ -115,6 +114,14 @@ export class ProjectIndexer {
 
     return Object.freeze(edges.sort(compareEdges));
   }
+}
+
+/** Recompute the canonical content fingerprint for an assembled graph. */
+export function canonicalProjectGraphFingerprint(
+  nodes: readonly CanonicalGraphNode[],
+  edges: readonly CanonicalGraphEdge[]
+): string {
+  return createHash('sha256').update(stableJson({ nodes, edges })).digest('hex');
 }
 
 function requireNonEmpty(value: string, field: string): void {
