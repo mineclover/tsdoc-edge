@@ -125,6 +125,7 @@ export class BuildCommand extends BaseCommand {
     --incremental    Incremental build (only changed files, default)
     --exclude-tests  Exclude test files (.test.ts, .spec.ts) from indexing
     --canonical-graph  Explicitly refresh and persist the canonical ttsc graph revision
+    --canonical-only   Skip the legacy symbol DB pass after the canonical refresh
     --router-module=<path>  Built graph-router artifact-source entrypoint
     --router-config=<path>  Router config (default: ttsc-graph-router.config.json)
     --router-repo=<id>      Router repo id (default: project directory name)
@@ -158,7 +159,16 @@ export class BuildCommand extends BaseCommand {
       // Parse arguments
       const forceRebuild = args.includes('--force');
       const excludeTests = args.includes('--exclude-tests');
+      const canonicalOnly = args.includes('--canonical-only');
       const targetPath = this.firstPositionalArgument(args) || 'src';
+
+      if (
+        canonicalOnly &&
+        !args.includes('--canonical-graph') &&
+        process.env.TSDOC_EDGE_CANONICAL_GRAPH !== '1'
+      ) {
+        return this.failure('--canonical-only requires --canonical-graph', 1);
+      }
 
       this.printHeader('TSDoc Edge - Build Database');
 
@@ -172,13 +182,30 @@ export class BuildCommand extends BaseCommand {
         this.printInfo('Excluding test files from indexing');
       }
 
-      // Validate path
-      if (!fs.existsSync(targetPath)) {
+      // Canonical-only refresh does not consume the legacy source-directory argument.
+      if (!canonicalOnly && !fs.existsSync(targetPath)) {
         this.printError(`Path not found: ${targetPath}`);
         return this.failure(`Path not found: ${targetPath}`);
       }
 
       const canonicalGraph = await this.refreshCanonicalGraph(args);
+
+      if (canonicalOnly) {
+        if (!canonicalGraph) {
+          throw new Error('--canonical-only did not produce a canonical graph revision');
+        }
+        new XmlBuilder(BuildResultSchema)
+          .section('statistics', {
+            canonicalGraphNodes: canonicalGraph.nodeCount,
+            canonicalGraphEdges: canonicalGraph.edgeCount,
+          })
+          .section('paths', { canonicalGraphDatabase: canonicalGraph.databasePath })
+          .section('errors', [])
+          .print();
+        return this.success(
+          `Canonical graph ${canonicalGraph.fingerprint.slice(0, 12)} persisted without legacy enrichment`
+        );
+      }
 
       this.printInfo(`Building database from: ${targetPath}`);
       console.log();

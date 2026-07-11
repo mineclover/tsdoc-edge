@@ -31,8 +31,8 @@ describe('TtscGraphRouterArtifactAdapter', () => {
         producer: '@ttsc/graph',
         workspaceId: 'project',
         graphNamespace: 'ttsc:project',
-        producerVersion: '0.16.8',
-        producerBinaryVersion: 'ttscgraph 0.16.8 (fixture)',
+        producerVersion: '0.18.4',
+        producerBinaryVersion: 'ttscgraph 0.18.4 (fixture)',
         artifactContractVersion: '1.0.0',
         artifactFactPlane: 'raw',
         routerVersion: '0.2.0',
@@ -101,9 +101,9 @@ describe('TtscGraphRouterArtifactAdapter', () => {
     );
   });
 
-  it('keeps the exact @ttsc/graph 0.16.8 pin as the TypeScript 7 stabilization policy', async () => {
+  it('keeps the exact @ttsc/graph 0.18.4 pin as the TypeScript 7 stabilization policy', async () => {
     const artifact = validArtifact();
-    artifact.producer.version = '0.16.9';
+    artifact.producer.version = '0.18.5';
     const adapter = new TtscGraphRouterArtifactAdapter({
       configPath: '/workspace/router.json',
       repoId: 'project',
@@ -115,7 +115,7 @@ describe('TtscGraphRouterArtifactAdapter', () => {
     });
 
     await expect(adapter.load({ rootDir })).rejects.toThrow(
-      'Expected @ttsc/graph 0.16.8, got 0.16.9'
+      'Expected @ttsc/graph 0.18.4, got 0.18.5'
     );
   });
 
@@ -310,7 +310,7 @@ describe('TtscGraphRouterArtifactAdapter', () => {
     [
       'different provenance producer',
       (artifact) => {
-        artifact.provenance.producer = { ...artifact.producer, version: '0.16.9' };
+        artifact.provenance.producer = { ...artifact.producer, version: '0.18.5' };
       },
       'provenance does not match its loaded envelope',
     ],
@@ -387,9 +387,9 @@ describe('TtscGraphRouterArtifactAdapter', () => {
 function validArtifact() {
   const producer = {
     name: '@ttsc/graph',
-    version: '0.16.8',
+    version: '0.18.4',
     binary: '/workspace/ttscgraph',
-    binaryVersion: 'ttscgraph 0.16.8 (fixture)',
+    binaryVersion: 'ttscgraph 0.18.4 (fixture)',
   };
   return {
     repo: { cwd: '/workspace/project', tsconfig: 'tsconfig.json' },

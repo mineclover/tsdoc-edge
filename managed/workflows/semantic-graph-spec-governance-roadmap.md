@@ -75,7 +75,7 @@ legacy differential review는 아직 별도 기능으로 구성되지 않았다.
 
 ### 커밋된 기반
 
-- [x] `ttsc@0.16.8`과 TypeScript Native 7.0.2 build/typecheck lane
+- [x] `ttsc@0.18.4`와 TypeScript Native 7.0.2 build/typecheck lane
 - [x] graph-router raw artifact contract와 adapter 검증
 - [x] TypeScript-version-neutral `CanonicalProjectGraph` 계약
 - [x] deterministic `ProjectIndexer`와 graph fingerprint
@@ -143,7 +143,7 @@ phase 완료 조건으로 계속 추적한다.
 JavaScript만 실행한다.
 
 `npm test`는 TS7 typecheck와 AOT compile을 fail-fast로 실행한 뒤 JavaScript-only Jest를
-실행한다. 기존 lane으로 217 suite/2,978 test parity를 고정하고 module-mock hoisting,
+실행한다. 기존 lane으로 217 suite/2,980 test parity를 고정하고 module-mock hoisting,
 setup/asset/path/source-map/coverage, `maxWorkers=2` 두 회 반복을 검증한 뒤 `ts-jest`와
 parity-only lane을 제거했다. SWC fallback은 사용하지 않았다.
 
@@ -378,9 +378,9 @@ ttsc가 제공하는 세부 사실을 추측하지 않고 artifact, fixture, sou
 | Ownership decision | `superseded`, `retained`, `composed`, `deprecated`, `unsupported` |
 | Fixture | 판정을 재현하는 증거 |
 
-초기 버전 비교는 설치된 `@ttsc/graph 0.16.8` baseline과 local nested source의 0.17.x
-candidate를 분리한다. annotation과 `semanticTags`는 공식 baseline이 아니라
-capability-gated producer extension으로 취급한다.
+현재 안정화 baseline은 설치된 `@ttsc/graph 0.18.4`와 동일 버전의 `ttsc`다. 이전
+0.16.8/0.17.x 비교 기록은 historical differential evidence로만 유지하고, annotation과
+`semanticTags`는 capability-gated producer extension으로 취급한다.
 
 TypeScript 7 compatibility fixture 통과와 compiler provenance 증명은 별도 판정이다.
 Artifact가 compiler version을 보고하지 않으면 compatibility 결과는 유지할 수 있지만
@@ -537,6 +537,7 @@ spec-overlay/evidence/enrichment/policy/rule-set/derived-model digest를 모두 
 - [x] conformance 입력을 service-validated transient `BindingResolutionSet`으로 제한
 - [x] workspace-installed convention pack의 explicit rule/vacuous gate/capability/clock 검증과
   revision-pinned CLI report 구현
+- [x] real graph-router + committed pack + exact replay + exit 0/1/2 최소 운영 PoC
 - [ ] durable `BindingResolutionCache` restore/revalidation protocol
 - [ ] immutable revision pin/retention/GC와 historical input diagnostic 구현
 - [ ] code change → impacted spec query 구현
@@ -664,7 +665,7 @@ compiler-resolved fact와 같은 정확도로 취급하지 않는다.
 
 | 책임 | 현재/제안 위치 |
 | --- | --- |
-| Raw TS7 artifact producer | `@ttsc/graph` |
+| Raw compiler-resolved graph artifact producer; compiler version is separately reported provenance | `@ttsc/graph` |
 | Router/cache/artifact/review projection | `ttsc-ex/packages/ttsc-graph-router` |
 | Raw provider contracts and ttsc saved-lane facade | `src/provider/contracts.ts`, `src/provider/TtscSemanticGraphProvider.ts` |
 | Saved canonical assembly (`ProjectIndexer`) | `src/indexer/` |
@@ -814,14 +815,15 @@ Phase 3 안의 early external canary를 통과하기 전에는 provider ID, delt
 contract를 stable로 표시하지 않는다. Phase 6은 동일 계약의 end-to-end 제품 승인
 gate다.
 
-P4.0 repository wiring이 끝났으므로 다음 product slice는 Phase 4의 runner-neutral evidence
-import와 exact-pin convention check다. Node runtime/release qualification은 병렬 선행 gate로
-남으며 evidence 구현 시작을 막지는 않지만 release 완료를 뜻하지도 않는다.
+P4.0 repository wiring과 최소 exact-pin implementation check가 끝났으므로 다음 product
+slice는 Phase 4의 runner-neutral evidence import를 기존 exact-pin convention check에 연결하는
+것이다. Node runtime/release qualification은 병렬 선행 gate로 남으며 evidence 구현 시작을
+막지는 않지만 release 완료를 뜻하지도 않는다.
 
 ```text
 P4.0  TS7 test compilation lane  [repository wiring complete; runtime qualification pending]
   ↓
-Runner-neutral evidence import and exact-pin convention check
+Runner-neutral evidence import into the exact-pin convention check
   ↓
 Durable convention result history
   ↓
@@ -874,3 +876,8 @@ Saved LSP diagnostics and Explain/Open CodeAction
 - canonical 안정화부터 외부 library pilot까지 gate 기반 Phase를 정의했다.
 - effective composition-before-binding, provider normalization, revisioned evidence/policy와
   early external canary gate를 반영했다.
+- repository build baseline을 `ttsc@0.18.4`로 올리고 artifact producer pin을
+  `@ttsc/graph@0.18.4`로 정렬했다. 실제 saved graph에 source-checkout 최소
+  implementation-binding convention pass/fail/invalid pin/exact replay PoC를 추가했다.
+  artifact의 compilerVersion은 미보고 상태로 보존하며 build lane의 TypeScript 버전으로
+  추론하지 않는다.

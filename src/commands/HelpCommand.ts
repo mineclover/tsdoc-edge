@@ -8,7 +8,7 @@
  * @doc [[HelpCommand]] * @packageDocumentation
  */
 
-import { BaseCommand, colors, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import type { CommandRegistry } from './CommandRegistry';
 
 /**
@@ -255,7 +255,7 @@ export class HelpCommand extends BaseCommand {
       console.log(`  ${colors.dim}tsdoc-edge symbol deps DatabaseManager${colors.reset}`);
       console.log(`  ${colors.dim}tsdoc-edge relationship impact UserService${colors.reset}`);
       console.log(
-        `  ${colors.dim}tsdoc-edge convention check --pack managed/conventions/core.json${colors.reset}`
+        `  ${colors.dim}tsdoc-edge convention check --pack managed/conventions/tsdoc-edge-core.json${colors.reset}`
       );
       console.log();
 

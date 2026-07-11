@@ -141,7 +141,7 @@ tsdoc-edge update-backlinks      # Update backlinks
 ```bash
 # Uses the active saved canonical graph revision unless one is pinned
 tsdoc-edge convention check \
-  --pack managed/conventions/core.json \
+  --pack <path-to-convention-pack.json> \
   --code-revision <canonical-revision-id> \
   --expected-manifest convention-pack:<sha256> \
   --fail-on error \
@@ -151,8 +151,21 @@ tsdoc-edge convention check \
 The result pins the code, spec, policy, rule-set, evidence, binding-resolution, and report
 identities. Exit code `1` means an unsuppressed finding reached the selected threshold; input or
 revision errors use exit code `2`. Omit `--code-revision` for the current active pointer; supply it
-with `--expected-manifest` for a replayable CI/release input pair. See
-[Convention Pack Check](managed/features/convention-pack-check.md).
+with `--expected-manifest` for a replayable CI/release input pair. See the source-checkout
+[Convention Pack Check](https://github.com/junwoobang/tsdoc-edge/blob/master/managed/features/convention-pack-check.md).
+
+To run the source-checkout end-to-end minimum implementation-binding PoC against the real
+graph-router, including exact replay and the `0/1/2` exit canaries:
+
+```bash
+npm run poc:convention
+```
+
+This command requires the built sibling `ttsc-ex` graph-router by default, or an explicit
+`TSDOC_EDGE_GRAPH_ROUTER_MODULE`. The proof command and its authored convention pack are repository
+development assets; the current npm package does not publish `scripts/` or `managed/`. Runner
+evidence and enrichment collectors, general naming/style evaluation, durable report history, and
+convention/spec-conformance LSP diagnostics/CodeAction remain later loops.
 
 ---
 

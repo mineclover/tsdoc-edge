@@ -58,6 +58,8 @@ tsdoc-edge build src
 
 `--canonical-graph`를 사용하면 compiler-resolved node/edge, alias, diagnostics revision을
 별도 `.tsdoc/canonical-graph.db`에 원자 교체한다.
+`--canonical-only`를 함께 사용하면 이 revision만 저장하고 legacy SQLite/JSONL enrichment는
+열거나 수정하지 않는다. 실제 convention PoC와 graph-only CI가 이 경계를 사용한다.
 
 ## Related
 

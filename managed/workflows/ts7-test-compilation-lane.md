@@ -41,7 +41,7 @@ test:run        -> Jest -> compiled JavaScript only
 
 | Surface | 현재 상태 | P4.0 판정 |
 | --- | --- | --- |
-| Production build/typecheck | `ttsc@0.16.8` + TypeScript Native `7.0.2` | 유지 |
+| Production build/typecheck | `ttsc@0.18.4` + TypeScript Native `7.0.2` | 유지 |
 | Test source transform | TS7 AOT emit + emitted-JS `babel-jest` mock hoist | 구현 |
 | Test TS7 project | `tsconfig.test.ttsc.json`이 source/test/setup 전체 포함 | 구현 |
 | Runtime Compiler API | source가 `typescript@5`를 직접 import | 이 루프의 비범위 |
@@ -54,11 +54,11 @@ authority는 이 단일 경로다. 지원 runtime 자체의 qualification은 별
 ### 2026-07-11 implementation evidence
 
 - TS7 native compiler가 전체 source/test project를 no-emit 검사하고 JavaScript로 emit했다.
-- 현재 기준 217 suite/2,978 test가 parity baseline이며 실제 baseline command output을 최종
+- 현재 기준 217 suite/2,980 test가 parity baseline이며 실제 baseline command output을 최종
   authority로 사용한다.
 - emitted CommonJS에 `transform: {}`를 사용하면 static `jest.mock()` suite가 실패했고,
   `babel-jest`를 JavaScript-only mock-hoist transform으로 적용하면 해당 canary가 통과했다.
-- JS-only lane은 217 suite/2,978 test를 in-band에서 통과했고 `maxWorkers=2`도 두 번 연속
+- JS-only lane은 217 suite/2,980 test를 in-band에서 통과했고 `maxWorkers=2`도 두 번 연속
   같은 집합으로 통과했다. 그러나 Node 24에서는 두 실행 방식 모두 후속 native crash가
   재현됐으므로 이 결과는 기능 parity 증거이지 runtime 안정성 증거가 아니다.
 - legacy `workerIdleMemoryLimit`는 `maxWorkers: 1`에서도 child worker를 만들 수 있어 제거했다.
@@ -68,7 +68,7 @@ authority는 이 단일 경로다. 지원 runtime 자체의 qualification은 별
   optional `fsevents` 제거도 이를 해소하지 못했으므로 검증되지 않은 런타임 우회는
   repository에 넣지 않는다.
 - coverage 283개 source의 LCOV `SF:`가 모두 `src/*.ts`이며 `.test-dist` 누출은 0건이다.
-- Node 22 ABI에 맞게 `better-sqlite3`를 재빌드한 환경에서는 전체 217 suite/2,978 test가
+- Node 22 ABI에 맞게 `better-sqlite3`를 재빌드한 환경에서는 전체 217 suite/2,980 test가
   통과했다. 이 결과는 TS7 AOT lane의 기능 증거지만 clean install은 아니므로 지원 runtime
   matrix 완료 증거로 확대 해석하지 않는다. 검증 후 native addon은 현재 Node 24 ABI로
   복원했다.
@@ -76,9 +76,9 @@ authority는 이 단일 경로다. 지원 runtime 자체의 qualification은 별
   `20.x || 22.x || 23.x || 24.x`만 선언한다. Node 18을 유지할지 engines/CI를 올릴지는
   별도 compatibility 결정이며, 이 불일치를 해소하기 전에는 Node 18 gate를 단순 미실행
   상태로 보지 않는다.
-- current `ttsc@0.16.8 --watch`는 resolved `outDir`를 제외하지 않아 self-trigger 위험이 있다.
-  따라서 `npm run test:watch`는 source/config 변경을 감지한 뒤 one-shot compile과 one-shot
-  Jest를 직렬 실행한다. 실제 변경 감지, 재실행과 terminal SIGINT 종료를 smoke했다.
+- `npm run test:watch`는 ttsc persistent watcher의 output-directory 감시 세부 동작에
+  의존하지 않고 source/config 변경 뒤 one-shot compile과 one-shot Jest를 직렬 실행한다.
+  실제 변경 감지, 재실행과 terminal SIGINT 종료를 smoke했다.
 - `.test-dist`는 destructive rebuild output이므로 test/compile/run/watch 전체가 repository lock을
   공유한다. 두 번째 lane은 파일을 지우지 않고 active owner PID와 함께 즉시 실패하며,
   signal/kill 뒤 남은 lock은 다음 시작 시 dead owner를 확인한 후 회수한다. lock token은
@@ -266,8 +266,8 @@ gate를 통과한 경우에만 다른 provider 변경을 별도 결정한다.
 
 ### Checkpoint 5 — Watch lane
 
-1. installed `ttsc@0.16.8`의 persistent watcher는 tsconfig `exclude`/resolved `outDir`를
-   적용하지 않고 project tree를 감시하므로 `.test-dist` emit이 자기 재빌드를 유발할 수 있다.
+1. test watch는 installed ttsc persistent watcher의 resolved `outDir` 처리 방식에 의존하지
+   않는다. compiler 버전 변화가 `.test-dist` 자기 재빌드 위험을 다시 만들지 않게 한다.
 2. 현재 `scripts/run-test-watch.cjs`는 portable polling으로 `src`와 test configuration을
    감시한다.
 3. 변경이 생기면 기존 cycle과 겹치지 않게 one-shot `test:compile`을 완료한 뒤 one-shot
@@ -345,7 +345,7 @@ Cutover 전 rollback은 기본 `npm test`를 그대로 유지하는 것이다. C
 - [x] full suite의 pass/fail/skip 집합이 legacy baseline과 일치한다.
 - [x] module mock, global setup, SQLite schema, fixture/cwd canary가 모두 통과한다.
 - [x] stack trace와 coverage가 원본 TypeScript source로 매핑된다.
-- [x] `maxWorkers=2`에서 동일 217 suite/2,978 test 집합이 두 번 연속 통과했다.
+- [x] `maxWorkers=2`에서 동일 217 suite/2,980 test 집합이 두 번 연속 통과했다.
 - [x] conservative compiled-output watch smoke가 통과한다.
 - [x] incomplete/stale/tampered `.test-dist`는 `test:run` 전에 거부된다.
 - [ ] Node engines/native dependency 계약을 정렬하고 지원 runtime의 worker/in-band 반복

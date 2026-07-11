@@ -144,7 +144,7 @@ is rejected instead of returning a vacuous success.
 
 ```bash
 tsdoc-edge convention check \
-  --pack managed/conventions/core.json \
+  --pack managed/conventions/tsdoc-edge-core.json \
   --fail-on error \
   --output .reports/convention.json
 ```
@@ -153,7 +153,7 @@ For machine-readable stdout:
 
 ```bash
 tsdoc-edge convention check \
-  --pack managed/conventions/core.json \
+  --pack managed/conventions/tsdoc-edge-core.json \
   --json
 ```
 
@@ -165,12 +165,44 @@ as success.
 canonical graph database directory. This keeps SQLite main, WAL, SHM, and journal paths outside the
 report writer's mutation scope.
 
+### Source-checkout operational minimum PoC
+
+The source checkout includes one non-vacuous implementation-binding pack and a real-router proof
+command:
+
+```bash
+npm run poc:convention
+```
+
+The repository build lane uses `ttsc@0.18.4` with TypeScript Native `7.0.2`. The imported graph
+artifact reports `@ttsc/graph@0.18.4` as its producer and uses the sibling built
+`@ttsc-ex/ttsc-graph-router` by default. Its `compilerVersion` is currently unreported, so the PoC
+does not infer compiler provenance from the repository build lane. Set
+`TSDOC_EDGE_GRAPH_ROUTER_MODULE` when the router is installed elsewhere. The command writes a
+PoC-specific router config, cache, graph DB, reports, and logs below
+`.test-results/convention-poc`, then verifies:
+
+- the saved graph contains the exact `ProjectIndexer` class node required by the committed pack;
+- canonical-only refresh leaves the legacy database, its WAL/SHM/journal sidecars, and registry
+  byte-identical;
+- the pack passes with exit `0`;
+- an exact code-revision and manifest replay preserves `checkId`, `reportId`, and `gateId`;
+- a missing implementation produces exit `1` and a `violated` finding;
+- invalid code revision and manifest pins each produce exit `2`.
+
+The generated `summary.json`, reports, graph DB, and command logs are disposable proof artifacts
+and are not an authored SSOT. The committed pack and proof script define the reproducible input.
+They are source-checkout development assets and are not included by the current npm package
+`files` allowlist. Runner evidence and enrichment collectors, general naming/style evaluation,
+durable report history, and convention/spec-conformance LSP diagnostics/CodeAction are explicitly
+outside this minimum PoC.
+
 For a release or protected CI check, lock the exact compiled manifest returned by an earlier JSON
 result:
 
 ```bash
 tsdoc-edge convention check \
-  --pack managed/conventions/core.json \
+  --pack managed/conventions/tsdoc-edge-core.json \
   --code-revision <canonical-revision-id> \
   --expected-manifest convention-pack:<sha256>
 ```
@@ -211,7 +243,7 @@ reproduced:
 
 ```bash
 tsdoc-edge convention check \
-  --pack managed/conventions/core.json \
+  --pack managed/conventions/tsdoc-edge-core.json \
   --suppression-as-of 2029-06-01T00:00:00.000Z
 ```
 

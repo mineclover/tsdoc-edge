@@ -14,7 +14,7 @@ Learn how TSDoc Edge extracts symbols, analyzes relationships, and builds a quer
 
 ## Compiler toolchain
 
-Repository builds, type checks, and watch mode use `ttsc@0.16.8` with the native
+Repository builds, type checks, and watch mode use `ttsc@0.18.4` with the native
 TypeScript `7.0.2` stable compiler:
 
 ```bash
@@ -55,9 +55,7 @@ npm run test:watch     # serial compile/test rerun on source changes
 preserves Jest mock hoisting; external source maps restore stack traces and coverage to
 `src/*.ts`. Standalone `test:run` rejects missing, stale, or modified `.test-dist` output using
 the compile completion manifest. The conservative watch coordinator uses one-shot compile/test
-cycles because
-the installed `ttsc@0.16.8` persistent watcher does not exclude the resolved `.test-dist`
-output directory.
+cycles and does not depend on persistent compiler output-directory watcher semantics.
 
 ## Canonical graph analysis
 
@@ -108,6 +106,14 @@ environment cannot silently change ordinary Build behavior:
 
 ```bash
 tsdoc-edge build src --canonical-graph \
+  --router-module=/path/to/ttsc-graph-router/dist/artifact-source.js
+```
+
+Use `--canonical-only` for a graph-only CI/PoC refresh that must not open or mutate the legacy
+symbol database or registry:
+
+```bash
+tsdoc-edge build src --canonical-graph --canonical-only \
   --router-module=/path/to/ttsc-graph-router/dist/artifact-source.js
 ```
 

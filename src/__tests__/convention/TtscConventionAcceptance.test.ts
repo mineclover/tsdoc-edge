@@ -1,17 +1,17 @@
-import { ConventionCheckService, compileConventionPackSource } from '../../convention';
+import { ConventionCheckService, compileConventionPackFile } from '../../convention';
 import { ProjectIndexer } from '../../indexer/ProjectIndexer';
 import { TtscGraphRouterArtifactAdapter } from '../../indexer/TtscGraphRouterArtifactAdapter';
 import { GraphRepository } from '../../storage/GraphRepository';
 
 describe('TS7 convention acceptance', () => {
   it('checks a router artifact through ProjectIndexer and GraphRepository', async () => {
-    const rootDir = '/workspace/project';
+    const rootDir = process.cwd();
     const adapter = new TtscGraphRouterArtifactAdapter({
       configPath: '/workspace/router.json',
-      repoId: 'project',
+      repoId: 'tsdoc-edge',
       moduleLoader: async () => ({
-        resolveRepoGraphArtifactTarget: () => ({ cwd: rootDir, tsconfig: 'tsconfig.json' }),
-        loadRepoGraphArtifact: async () => routerArtifact(),
+        resolveRepoGraphArtifactTarget: () => ({ cwd: rootDir, tsconfig: 'tsconfig.ttsc.json' }),
+        loadRepoGraphArtifact: async () => routerArtifact(rootDir),
         validateGraphArtifact: () => ({
           ok: true,
           contract: artifactContract(),
@@ -22,7 +22,7 @@ describe('TS7 convention acceptance', () => {
     });
     const indexed = await new ProjectIndexer(adapter).index({
       rootDir,
-      tsconfigPath: 'tsconfig.json',
+      tsconfigPath: 'tsconfig.ttsc.json',
     });
     const repository = new GraphRepository(':memory:');
     try {
@@ -30,65 +30,9 @@ describe('TS7 convention acceptance', () => {
       const revision = repository.readActiveRevision();
       expect(revision).not.toBeNull();
 
-      const pack = compileConventionPackSource(
-        {
-          contractId: 'tsdoc-edge/convention-pack-source',
-          contractVersion: '1.0',
-          packId: '@fixture/conventions/ts7',
-          packVersion: '1.0.0',
-          scope: { kind: 'workspace', workspaceId: 'project' },
-          graphNamespace: 'ttsc:project',
-          capabilities: {
-            factPlane: { minimumStatus: 'complete', version: 'raw' },
-          },
-          spec: {
-            nodes: [
-              {
-                id: 'SPEC-TS7',
-                kind: 'spec',
-                title: 'TS7 conventions',
-                lifecycle: { mode: 'independent', status: 'active' },
-                tags: ['convention-pack'],
-              },
-              {
-                id: 'REQ-ANSWER',
-                kind: 'requirement',
-                title: 'The answer declaration exists',
-                lifecycle: { mode: 'inherited', aggregateSpecId: 'SPEC-TS7' },
-                tags: ['implementation'],
-              },
-            ],
-            bindings: [
-              {
-                id: 'BIND-ANSWER',
-                kind: 'implementation',
-                specNodeId: 'REQ-ANSWER',
-                target: {
-                  type: 'code-node',
-                  workspaceId: 'project',
-                  graphNamespace: 'ttsc:project',
-                  canonicalNodeId: 'src/index.ts#answer:variable',
-                },
-              },
-            ],
-          },
-          policy: {
-            lifecycleGateVersion: '1.0.0',
-            rules: [
-              {
-                id: 'binding.implementation',
-                version: '1.0.0',
-                enabled: true,
-                severity: 'error',
-              },
-            ],
-          },
-        },
-        {
-          file: 'managed/conventions/ts7.json',
-          contentDigest: `sha256:${'1'.repeat(64)}`,
-        }
-      );
+      const pack = compileConventionPackFile('managed/conventions/tsdoc-edge-core.json', {
+        workspaceRoot: rootDir,
+      });
       const result = new ConventionCheckService().run({
         pack,
         codeRevision: revision!,
@@ -96,19 +40,21 @@ describe('TS7 convention acceptance', () => {
         expectedManifestId: pack.manifest.manifestId,
       });
 
-      expect(result.conformance.summary.satisfied).toBe(1);
-      expect(result.bindingDiagnostics).toEqual([]);
-      expect(result.capabilityChecks).toEqual([
-        expect.objectContaining({
-          id: 'factPlane',
-          observedStatus: 'complete',
-          observedVersion: 'raw',
-        }),
+      expect(result.conformance.summary).toMatchObject({
+        total: 1,
+        satisfied: 1,
+        violated: 0,
+        indeterminate: 0,
+      });
+      expect(result.conformance.findings).toEqual([
+        expect.objectContaining({ outcome: 'satisfied' }),
       ]);
+      expect(result.bindingDiagnostics).toEqual([]);
+      expect(result.capabilityChecks).toEqual([]);
       expect(result.codeRevisionId).toBe(revision!.metadata.revisionId);
       expect(indexed.graph.provenance).toMatchObject({
-        workspaceId: 'project',
-        graphNamespace: 'ttsc:project',
+        workspaceId: 'tsdoc-edge',
+        graphNamespace: 'ttsc:tsdoc-edge',
       });
     } finally {
       repository.close();
@@ -116,24 +62,24 @@ describe('TS7 convention acceptance', () => {
   });
 });
 
-function routerArtifact() {
+function routerArtifact(rootDir: string) {
   const producer = {
     name: '@ttsc/graph',
-    version: '0.16.8',
+    version: '0.18.4',
     binary: '/workspace/ttscgraph',
-    binaryVersion: 'ttscgraph 0.16.8 (fixture)',
+    binaryVersion: 'ttscgraph 0.18.4 (fixture)',
   };
   return {
-    repo: { cwd: '/workspace/project', tsconfig: 'tsconfig.json' },
+    repo: { cwd: rootDir, tsconfig: 'tsconfig.ttsc.json' },
     dump: {
-      project: '/workspace/project',
-      tsconfig: 'tsconfig.json',
+      project: rootDir,
+      tsconfig: 'tsconfig.ttsc.json',
       nodes: [
         {
-          id: 'src/index.ts#answer:variable',
-          kind: 'variable',
-          name: 'answer',
-          file: 'src/index.ts',
+          id: 'src/indexer/ProjectIndexer.ts#ProjectIndexer:class',
+          kind: 'class',
+          name: 'ProjectIndexer',
+          file: 'src/indexer/ProjectIndexer.ts',
           external: false,
         },
       ],
@@ -141,9 +87,9 @@ function routerArtifact() {
     },
     producer,
     meta: {
-      repoId: 'project',
-      cwd: '/workspace/project',
-      tsconfig: 'tsconfig.json',
+      repoId: 'tsdoc-edge',
+      cwd: rootDir,
+      tsconfig: 'tsconfig.ttsc.json',
       fingerprint: 'fixture-fingerprint',
       refreshedAt: '2026-07-10T00:00:00.000Z',
       stale: false,
@@ -167,8 +113,8 @@ function routerArtifact() {
       router: { name: '@ttsc-ex/ttsc-graph-router', version: '0.2.0' },
       producer,
       compilerVersion: null,
-      project: '/workspace/project',
-      tsconfig: 'tsconfig.json',
+      project: rootDir,
+      tsconfig: 'tsconfig.ttsc.json',
       cacheFingerprint: 'fixture-fingerprint',
       refreshedAt: '2026-07-10T00:00:00.000Z',
       refreshed: true,

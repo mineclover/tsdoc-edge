@@ -147,7 +147,7 @@ export class TtscGraphRouterArtifactAdapter implements ProjectGraphSource {
     this.typescriptCompatibilityTarget = options.typescriptCompatibilityTarget ?? '7.0';
     // This exact producer pin is the current TypeScript 7 stabilization policy.
     // Artifact contract/capability negotiation remains a separate boundary.
-    this.expectedGraphVersion = options.expectedGraphVersion ?? '0.16.8';
+    this.expectedGraphVersion = options.expectedGraphVersion ?? '0.18.4';
     this.expectedArtifactContractVersion =
       options.expectedArtifactContractVersion ?? SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSION;
     if (!/^7\.0(?:\.|$)/.test(this.typescriptCompatibilityTarget)) {

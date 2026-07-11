@@ -1,0 +1,61 @@
+{
+  "contractId": "tsdoc-edge/convention-pack-source",
+  "contractVersion": "1.0",
+  "packId": "@tsdoc-edge/conventions/core",
+  "packVersion": "1.0.0",
+  "scope": {
+    "kind": "workspace",
+    "workspaceId": "tsdoc-edge"
+  },
+  "graphNamespace": "ttsc:tsdoc-edge",
+  "capabilities": {},
+  "spec": {
+    "nodes": [
+      {
+        "id": "SPEC-TSDOC-EDGE-CORE",
+        "kind": "spec",
+        "title": "TSDoc Edge core architecture",
+        "lifecycle": {
+          "mode": "independent",
+          "status": "active"
+        },
+        "tags": ["convention-pack", "canonical-graph"]
+      },
+      {
+        "id": "REQ-CANONICAL-PROJECT-INDEXER",
+        "kind": "requirement",
+        "title": "ProjectIndexer must remain in the canonical graph",
+        "lifecycle": {
+          "mode": "inherited",
+          "aggregateSpecId": "SPEC-TSDOC-EDGE-CORE"
+        },
+        "tags": ["implementation", "project-indexer"]
+      }
+    ],
+    "bindings": [
+      {
+        "id": "BIND-CANONICAL-PROJECT-INDEXER",
+        "kind": "implementation",
+        "specNodeId": "REQ-CANONICAL-PROJECT-INDEXER",
+        "target": {
+          "type": "code-node",
+          "workspaceId": "tsdoc-edge",
+          "graphNamespace": "ttsc:tsdoc-edge",
+          "canonicalNodeId": "src/indexer/ProjectIndexer.ts#ProjectIndexer:class"
+        }
+      }
+    ]
+  },
+  "policy": {
+    "lifecycleGateVersion": "1.0.0",
+    "rules": [
+      {
+        "id": "binding.implementation",
+        "version": "1.0.0",
+        "enabled": true,
+        "severity": "error"
+      }
+    ],
+    "suppressions": []
+  }
+}

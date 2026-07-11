@@ -24,7 +24,7 @@ export class ConventionCommand extends BaseCommand {
     check       Check one convention pack against a saved graph revision
 
   Example:
-    tsdoc-edge convention check --pack managed/conventions/core.json --json`;
+    tsdoc-edge convention check --pack managed/conventions/tsdoc-edge-core.json --json`;
   }
 
   async execute(args: string[]): Promise<CommandResult> {

@@ -200,6 +200,56 @@ describe('BuildCommand', () => {
       expect(canonicalCoordinatorFactory).not.toHaveBeenCalled();
     });
 
+    it('supports an isolated canonical-only refresh without creating the legacy database', async () => {
+      const routerConfig = path.join(tempDir, 'ttsc-graph-router.config.json');
+      const canonicalDatabase = path.join(tempDir, '.tsdoc/canonical-only.db');
+      fs.writeFileSync(routerConfig, '{}');
+      fs.writeFileSync(path.join(tempDir, 'tsconfig.ttsc.json'), '{}');
+      const source: ProjectGraphSource = {
+        id: 'fixture',
+        load: async () => canonicalGraphInput(tempDir),
+      };
+      const canonicalCoordinatorFactory = jest.fn(
+        (options) => new CanonicalGraphCoordinator(options, { source })
+      );
+      command = new BuildCommand(configManager, { canonicalCoordinatorFactory });
+
+      const result = await (async () => {
+        const originalCwd = process.cwd();
+        process.chdir(tempDir);
+        try {
+          return await command.execute([
+            path.join(tempDir, 'unused-missing-source'),
+            '--canonical-graph',
+            '--canonical-only',
+            '--router-module=fixture-module',
+            `--router-config=${routerConfig}`,
+            '--router-repo=test',
+            '--graph-workspace=test-workspace',
+            '--graph-namespace=test/graph',
+            `--canonical-graph-db=${canonicalDatabase}`,
+          ]);
+        } finally {
+          process.chdir(originalCwd);
+        }
+      })();
+
+      expect(result).toMatchObject({ exitCode: 0 });
+      expect(result.message).toContain('without legacy enrichment');
+      expect(fs.existsSync(canonicalDatabase)).toBe(true);
+      expect(fs.existsSync(path.join(tempDir, 'test.db'))).toBe(false);
+      expect(fs.existsSync(path.join(tempDir, '.tsdoc', 'registry.jsonl'))).toBe(false);
+    });
+
+    it('rejects canonical-only mode without an explicit canonical refresh', async () => {
+      const result = await command.execute([path.join(tempDir, 'src'), '--canonical-only']);
+
+      expect(result).toMatchObject({
+        exitCode: 1,
+        message: '--canonical-only requires --canonical-graph',
+      });
+    });
+
     it('allows an explicit environment switch to activate canonical refresh', async () => {
       const canonicalDatabase = path.join(tempDir, '.tsdoc/environment-canonical-graph.db');
       process.env.TSDOC_EDGE_CANONICAL_GRAPH = '1';

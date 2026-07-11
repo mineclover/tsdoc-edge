@@ -26,7 +26,7 @@ tsdoc-edge health src
 tsdoc-edge work-context <file-path>
 
 # Check a revision-pinned spec-binding convention pack
-tsdoc-edge convention check --pack managed/conventions/core.json
+tsdoc-edge convention check --pack managed/conventions/tsdoc-edge-core.json
 ```
 
 ---

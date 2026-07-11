@@ -75,7 +75,7 @@ normalizer가 v1 assembler에 전달할 때만 `compatibilityTsconfigPath` bridg
 
 첫 호환 목표는 ttsc-ex의 `typescript@7.0.x`, `ttsc`, `@ttsc/graph`, graph-router
 조합이다.
-저장소의 기본 build, typecheck, watch lane은 `ttsc@0.16.8`과 native TypeScript
+저장소의 기본 build, typecheck, watch lane은 `ttsc@0.18.4`와 native TypeScript
 `7.0.2` 정식판을 사용한다. 기존 TypeScript Compiler API 코드는 별도의
 `typescript@5.9.x` 런타임에 남긴다. TypeScript 7은 루트 Compiler API export가
 달라 현재 AST 기반 코드와 `ts-jest`를 동시에 깨뜨리므로, build compiler 전환과
@@ -168,6 +168,10 @@ work-context의 XML/LLM/human 형식과 relationship query/impact에 연결되�
 출력과 대조하므로 accessor처럼 legacy peer가 없는 node를 거짓으로 매핑하지 않으며, fresh
 router 기준 materialized alias parity는 mismatch 0이다. 남은 완료 조건은 이 parity 검증을
 release gate로 승격하고 신규/rename overlay edge를 saved-file refresh 전에도 표현하는 것이다.
+
+`build --canonical-graph --canonical-only`는 같은 coordinator를 사용하되 legacy symbol DB와
+registry를 열지 않는다. `npm run poc:convention`은 이 경계로 실제 router revision을 임시
+DB에 저장하고 committed convention pack의 pass/fail/invalid-pin/exact-replay를 검증한다.
 
 현재 TS5 정리 범위도 구분한다. 별도 legacy build/typecheck/watch lane,
 `ImplementationAnalyzer`, Build의 중복 `InheritanceAnalyzer` pass, 사용되지 않던
