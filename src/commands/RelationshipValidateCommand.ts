@@ -58,7 +58,7 @@ Checks performed:
   • Orphaned relationships (references to non-existent symbols)
   • Duplicate relationships
   • Low confidence relationships
-  • Inconsistent bidirectional relationships
+  • Malformed bidirectional relationship endpoints
 
 Examples:
   tsdoc-edge relationship-validate
@@ -242,13 +242,14 @@ Examples:
     try {
       const relationships = dbManager.getAllRelationshipsForValidation();
 
-      // Collect all unique symbol IDs and track which relationship uses which
+      // Collect materialized code-symbol endpoints and track which relationship uses which.
+      // Some relationship kinds intentionally carry document, test-case, or file identifiers.
       const symbolToRelationships = new Map<string, string[]>();
       for (const rel of relationships) {
         const fromSymbols = JSON.parse(rel.fromSymbols) as string[];
         const toSymbols = JSON.parse(rel.toSymbols) as string[];
 
-        for (const symbolId of [...fromSymbols, ...toSymbols]) {
+        for (const symbolId of this.materializedSymbolEndpoints(rel.type, fromSymbols, toSymbols)) {
           if (!symbolToRelationships.has(symbolId)) {
             symbolToRelationships.set(symbolId, []);
           }
@@ -279,6 +280,29 @@ Examples:
     }
 
     return issues;
+  }
+
+  /**
+   * Return only endpoints that are materialized in the code-symbol table.
+   *
+   * Document references use `doc:` identifiers, test examples use virtual test-case IDs,
+   * and re-exports use a source file path. Those endpoint namespaces are valid but cannot
+   * be resolved through `symbols.id`.
+   */
+  private materializedSymbolEndpoints(
+    relationshipType: string,
+    fromSymbols: readonly string[],
+    toSymbols: readonly string[]
+  ): readonly string[] {
+    switch (relationshipType) {
+      case 'doc-reference':
+        return fromSymbols;
+      case 'test-as-example':
+      case 're-export':
+        return toSymbols;
+      default:
+        return [...fromSymbols, ...toSymbols];
+    }
   }
 
   /**
@@ -329,31 +353,27 @@ Examples:
   }
 
   /**
-   * Check bidirectional relationship consistency
+   * Check that a bidirectional relationship represents both endpoint sets.
+   *
+   * A single `bidirectional` record is canonical; requiring a duplicate reverse row would
+   * falsely report every correctly materialized bidirectional relationship as inconsistent.
    */
   private checkBidirectionalConsistency(dbManager: DatabaseManager): ValidationIssue[] {
     const issues: ValidationIssue[] = [];
 
     try {
-      // Find bidirectional relationships
+      // A bidirectional direction encodes the reverse relation in the same record.
       const bidirectional = dbManager.getBidirectionalRelationships();
 
       for (const rel of bidirectional) {
-        const fromSymbols = JSON.parse(rel.fromSymbols);
-        const toSymbols = JSON.parse(rel.toSymbols);
+        const fromSymbols = JSON.parse(rel.fromSymbols) as string[];
+        const toSymbols = JSON.parse(rel.toSymbols) as string[];
 
-        // Check if reverse relationship exists
-        const hasReverse = dbManager.hasReverseRelationship(
-          rel.type,
-          rel.fromSymbols,
-          rel.toSymbols
-        );
-
-        if (!hasReverse) {
+        if (fromSymbols.length === 0 || toSymbols.length === 0) {
           issues.push({
             type: 'inconsistent',
             severity: 'warning',
-            message: `Bidirectional relationship ${rel.id} missing reverse: ${toSymbols.join(',')} → ${fromSymbols.join(',')}`,
+            message: `Bidirectional relationship ${rel.id} must include endpoints on both sides`,
             relationshipId: rel.id,
           });
         }

@@ -2694,12 +2694,14 @@ export class DatabaseManager {
    */
   getAllRelationshipsForValidation(): Array<{
     id: string;
+    type: string;
     fromSymbols: string;
     toSymbols: string;
   }> {
     return this.drizzleDb
       .select({
         id: schema.unifiedRelationships.id,
+        type: schema.unifiedRelationships.type,
         fromSymbols: schema.unifiedRelationships.fromSymbols,
         toSymbols: schema.unifiedRelationships.toSymbols,
       })
