@@ -23,6 +23,7 @@ import {
   HelpCommand,
   IdCommand,
   ImproveCommand,
+  IndexDocsCommand,
   InitCommand,
   InstallHookCommand,
   ParseCommand,
@@ -38,6 +39,7 @@ import {
   UndocumentedCommand,
   UninstallHookCommand,
   UntestedCommand,
+  UpdateBacklinksCommand,
   UsageCommand,
   ValidateUnifiedCommand,
   VisualizeDepsCommand,
@@ -71,6 +73,8 @@ import { SystemStatusCommand } from './commands/SystemStatusCommand';
 import { TaskCommand } from './commands/TaskCommand';
 import { TestExamplesCommand } from './commands/TestExamplesCommand';
 import { TestRelationshipsCommand } from './commands/TestRelationshipsCommand';
+import { ValidateDocsCommand } from './commands/ValidateDocsCommand';
+import { ValidateSymbolRefsCommand } from './commands/ValidateSymbolRefsCommand';
 import { WhoUsesCommand } from './commands/WhoUsesCommand';
 import { WorkContextCommand } from './commands/WorkContextCommand';
 import { ConfigManager } from './config/ConfigManager';
@@ -163,6 +167,12 @@ async function main(): Promise<void> {
   registry.register(new OntologyCommand());
   registry.register(new DocsCommand());
   registry.register(new ConventionCommand());
+
+  // Preserve published flat command paths while docs/validate groups are the preferred surface.
+  registry.register(new IndexDocsCommand(undefined, undefined, undefined, true));
+  registry.register(new UpdateBacklinksCommand(undefined, undefined, undefined, undefined, true));
+  registry.register(new ValidateDocsCommand(undefined, undefined, true));
+  registry.register(new ValidateSymbolRefsCommand());
 
   // Register commands - Analysis & tools
   registry.register(new AnalyzeCommand());
