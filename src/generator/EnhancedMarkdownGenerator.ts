@@ -87,8 +87,8 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateProblemSolving(doc: EnhancedSymbolDoc): string {
-    // Called only when problemSolving is defined
-    const ps = doc.problemSolving!;
+    const ps = doc.problemSolving;
+    if (!ps) return '';
 
     let md = `## 1. 🎯 Problem Solving\n\n`;
     md += `### What Problem Does This Solve?\n\n`;
@@ -116,8 +116,8 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateFunctionality(doc: EnhancedSymbolDoc): string {
-    // Called only when functionality is defined
-    const func = doc.functionality!;
+    const func = doc.functionality;
+    if (!func) return '';
 
     let md = `## 2. ⚙️ Functionality\n\n`;
 
@@ -175,8 +175,8 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateErrorExperiences(doc: EnhancedSymbolDoc): string {
-    // Called only when errorExperiences is defined
-    const errors = doc.errorExperiences!;
+    const errors = doc.errorExperiences;
+    if (!errors) return '';
 
     let md = `## 3. 🐛 Error Experiences\n\n`;
 
@@ -205,8 +205,8 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateDecisions(doc: EnhancedSymbolDoc): string {
-    // Called only when decisions is defined
-    const decisions = doc.decisions!;
+    const decisions = doc.decisions;
+    if (!decisions) return '';
 
     let md = `## 4. 🔍 Design Decisions\n\n`;
 
@@ -251,8 +251,8 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateDependencies(doc: EnhancedSymbolDoc): string {
-    // Called only when dependencies is defined
-    const deps = doc.dependencies!;
+    const deps = doc.dependencies;
+    if (!deps) return '';
 
     let md = `## 5. 🔗 Dependencies\n\n`;
 
@@ -301,8 +301,8 @@ export class EnhancedMarkdownGenerator {
    * @returns Markdown string
    */
   private generateFuturePlans(doc: EnhancedSymbolDoc): string {
-    // Called only when futurePlans is defined
-    const plans = doc.futurePlans!;
+    const plans = doc.futurePlans;
+    if (!plans) return '';
 
     let md = `## 6. 🚀 Future Plans\n\n`;
 
