@@ -11,7 +11,7 @@ canonical: true
 > TypeScript 7로 source와 test를 함께 선컴파일하고, Jest는 JavaScript만 실행하게 만드는
 > `ts-jest` 제거 선행 루프
 
-**Status**: Repository wiring implemented; Node 24 clean-install matrix pending
+**Status**: Repository wiring implemented; Node 24 clean-install matrix and packed consumer canary wired, native-crash qualification pending
 **Roadmap slot**: P4.0 handoff complete; P4.1 Jest JSON loader wired
 **Primary compiler**: `ttsc` + TypeScript Native 7
 **Test runner**: Jest, JavaScript execution only
@@ -71,7 +71,10 @@ authority는 이 단일 경로다. 지원 runtime 자체의 qualification은 별
 - Node 22 ABI에 맞게 `better-sqlite3`를 재빌드한 환경에서는 전체 217 suite/2,980 test가
   통과했다. 이는 historical functionality evidence일 뿐 현재 release baseline의 qualification은
   아니다. 검증 후 native addon은 현재 Node 24 ABI로 복원했다.
-- package와 CI baseline은 Node `>=24.0.0 <25.0.0`이다. locked
+- package와 CI baseline은 Node `>=24.0.0 <25.0.0`이다. CI의 fresh install은 Node 24에서
+  build/test를 실행하고, release 전에는 packed tarball을 별도 consumer directory에 설치해
+  `init → build → work-context` CLI를 실행한다. 이는 package file set과 installed runtime asset의
+  proof이며, macOS native-crash 해소 또는 worker/in-band 반복 qualification을 대신하지 않는다. locked
   `better-sqlite3@12.4.1`은 Node 24를 지원한다. macOS Node 24 native crash를 재현·해소하고
   clean install worker/in-band matrix를 통과하기 전에는 stable release를 선언하지 않는다.
 - `npm run test:watch`는 ttsc persistent watcher의 output-directory 감시 세부 동작에

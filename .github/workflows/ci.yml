@@ -11,16 +11,17 @@ jobs:
     runs-on: ubuntu-latest
 
     strategy:
+      fail-fast: false
       matrix:
-        node-version: [18.x, 20.x, 22.x]
+        execution: ['--runInBand', '--maxWorkers=2']
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Node.js ${{ matrix.node-version }}
+      - name: Setup Node.js 24
         uses: actions/setup-node@v4
         with:
-          node-version: ${{ matrix.node-version }}
+          node-version: '24.x'
           cache: 'npm'
 
       - name: Install dependencies
@@ -33,7 +34,7 @@ jobs:
         run: npm run build
 
       - name: Test
-        run: npm test
+        run: npm test -- ${{ matrix.execution }}
 
   publish-check:
     runs-on: ubuntu-latest
@@ -45,7 +46,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20.x'
+          node-version: '24.x'
           cache: 'npm'
 
       - name: Install dependencies
@@ -54,5 +55,5 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Check package
-        run: npm pack --dry-run
+      - name: Verify packed external consumer
+        run: npm run verify:package-tarball

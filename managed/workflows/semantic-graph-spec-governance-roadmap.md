@@ -36,7 +36,7 @@ canonical: true
 | Parallel | Node/package release qualification, legacy baseline 첫 vertical slice |
 | Next | LSP protocol-level proof와 client Explain/Open handler |
 | Then | historical Explain/Open, retention GC pin/tombstone |
-| Release | runtime/package qualification과 external canary 전까지 stable release NO-GO |
+| Release | Node 24 clean-install/packed-consumer canary wired; runtime qualification 전 stable release NO-GO |
 | Deferred | 두 번째 runner/provider, generic adapter/DSL, convention distribution registry |
 
 ## 1차 제품 목표 — M1: CLI/CI managed-spec conformance
@@ -180,7 +180,8 @@ Overlay와 binding set은 process-local이다. Conformance finding/report는 der
 | TSDoc enrichment check | `proven` (source-checkout) | workspace source digest → enrichment revision, tag finding/check/gate | general enrichment framework |
 | Durable result history | `proven` (source-checkout) | append-only canonical bundle, retained replay, source/config removal canary, tamper reject | retention GC pin/tombstone, packed external proof |
 | LSP spec experience | `wired` (source-checkout) | exact retained history diagnostic + immutable current Explain/Open CodeAction payload | protocol/client handler proof, historical view |
-| External library pilot | `planned` | self-repository PoC만 존재 | packed early canary와 full pilot |
+| Packed package consumer | `wired` | Node 24 CI에서 fresh tarball install → `init` → `build` → `work-context` | external canonical/provider canary |
+| External library pilot | `planned` | self-repository PoC와 packed package consumer | canonical graph/provider full pilot |
 
 ## 최소 아키텍처 — current와 target
 
