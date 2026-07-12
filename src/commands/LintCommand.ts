@@ -378,7 +378,9 @@ export class LintCommand extends BaseCommand {
     const total = results.length;
 
     // Calculate overall score (weighted average)
-    const scores = results.filter((r) => r.score !== undefined).map((r) => r.score!);
+    const scores = results
+      .filter((result): result is LintResult & { score: number } => result.score !== undefined)
+      .map((result) => result.score);
     const overallScore =
       scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
     const grade = this.getGrade(overallScore);

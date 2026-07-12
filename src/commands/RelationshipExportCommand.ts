@@ -94,14 +94,13 @@ Examples:
         return this.displayHelp();
       }
 
+      const minConfidenceOption = this.getOption(args, '--min-confidence');
       const options = {
         format: (this.getOption(args, '--format') || 'json') as ExportFormat,
         output: this.getOption(args, '--output'),
         category: this.getOption(args, '--category'),
         type: this.getOption(args, '--type'),
-        minConfidence: this.getOption(args, '--min-confidence')
-          ? Number.parseFloat(this.getOption(args, '--min-confidence')!)
-          : undefined,
+        minConfidence: minConfidenceOption ? Number.parseFloat(minConfidenceOption) : undefined,
         layout: this.getOption(args, '--layout') || 'circle',
       };
 

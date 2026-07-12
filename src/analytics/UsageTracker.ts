@@ -141,12 +141,14 @@ export class UsageTracker {
       let events = lines.map((line) => JSON.parse(line) as CommandUsageEvent);
 
       // Apply filters
-      if (options?.startDate) {
-        events = events.filter((e) => new Date(e.timestamp) >= options.startDate!);
+      const startDate = options?.startDate;
+      if (startDate) {
+        events = events.filter((e) => new Date(e.timestamp) >= startDate);
       }
 
-      if (options?.endDate) {
-        events = events.filter((e) => new Date(e.timestamp) <= options.endDate!);
+      const endDate = options?.endDate;
+      if (endDate) {
+        events = events.filter((e) => new Date(e.timestamp) <= endDate);
       }
 
       return events;

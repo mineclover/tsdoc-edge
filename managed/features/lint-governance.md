@@ -34,7 +34,7 @@ and rejects a new warning category or any count above this baseline:
 
 | Rule | Maximum |
 | --- | ---: |
-| `noNonNullAssertion` | 37 |
+| `noNonNullAssertion` | 31 |
 | `noExplicitAny` | 1 |
 | other current warning/info categories | 1–23, enforced by script |
 

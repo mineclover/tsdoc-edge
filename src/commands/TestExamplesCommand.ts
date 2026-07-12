@@ -131,12 +131,14 @@ Examples:
       // Filter examples
       let examples = allExamples;
 
-      if (options.file) {
-        examples = examples.filter((ex) => ex.filePath.includes(options.file!));
+      const fileFilter = options.file;
+      if (fileFilter) {
+        examples = examples.filter((ex) => ex.filePath.includes(fileFilter));
       }
 
-      if (options.minQuality !== undefined) {
-        examples = examples.filter((ex) => ex.quality >= options.minQuality!);
+      const minQuality = options.minQuality;
+      if (minQuality !== undefined) {
+        examples = examples.filter((ex) => ex.quality >= minQuality);
       }
 
       if (options.complexity) {
