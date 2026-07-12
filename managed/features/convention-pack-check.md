@@ -13,8 +13,8 @@ one authored, workspace-installed pack into exact `SpecGraphRevision`, `PolicyRe
 `RuleSetRevision` inputs, resolves its bindings on one saved canonical graph revision, applies
 suppression policy, and returns a revision-pinned conformance report with a CI-usable exit code.
 
-This v1 deliberately means **spec-binding conformance**. It does not claim to evaluate arbitrary
-naming, formatting, layer, or TSDoc-tag predicates.
+This v1 deliberately means **spec-binding conformance** plus the configured P4.2 naming and P4.3
+TSDoc-tag checks. It does not claim arbitrary formatting, layer, or general predicate DSL support.
 
 ## Execution contract
 
@@ -35,7 +35,7 @@ Selected GraphRepository revision + compiled pack
 ```
 
 The transient `EffectiveAnalysisSnapshot` and `BindingResolutionSet` never leave the process.
-The durable JSON result stores their identities and the derived report, not a deserialized object
+The serializable JSON result stores their identities and the derived report, not a deserialized object
 that could bypass the effective-analysis trust boundary.
 Likewise, the public check service accepts only the process-local compiled object emitted by
 `ConventionPackCompiler`; persisted workflows recompile the authored source instead of trusting a
@@ -60,8 +60,28 @@ The default graph database is `.tsdoc/canonical-graph.db`. Override it with `--g
 
 ## Authored pack source
 
-The v1 source is a strict workspace-local JSON document. Source anchors and compiler provenance
+The v1 source is a strict workspace-local JSON document. Source anchors and extractor provenance
 are generated from the pack path and exact file digest; authors do not write compiled revision IDs.
+
+This JSON is the current standalone loop's bootstrap authored input. It owns the canary spec nodes,
+bindings, policy, and rule selection until managed-document extraction is connected; it is not the
+long-term project-spec SSOT. `ConventionPackManifest`, not the source JSON, is the compiled
+composition descriptor.
+
+The P4.4 target makes managed spec documents the only authored source for project spec nodes and
+bindings. The convention source then selects policy/rules and pins or is compiled with that managed
+spec revision. The same spec identity must never be authored independently in both JSON and
+Markdown. Portable convention definitions require a separate namespace and installation contract.
+
+The current compiler records the bootstrap JSON with the existing `managed-document` provenance
+variant. That is compatibility debt, not proof that Markdown extraction occurred. P4.4 must give
+bootstrap convention input and extracted managed documents distinct provenance before both sources
+can participate in one product workflow.
+
+Location-aware naming convention is configured separately in
+`.tsdoc.config.json#specGovernance.naming`. P4.2 provides its deterministic evaluator kernel; the
+next P4.2 commit wires its report and findings into this check/gate without making the JSON bootstrap
+an alternate naming-policy source.
 
 ```json
 {
@@ -272,13 +292,50 @@ analysis result was converted into an exit decision.
 - The pack is an installed workspace instance, not yet a portable registry package.
 - Capability requirements consume standard `{ "status", "version" }` provider capabilities and
   normalize raw graph-router strings as complete exact versions and booleans as complete/unsupported.
-- The pack compiler is JSON-based; managed Markdown extraction is still a separate roadmap item.
-- Evidence and enrichment use canonical-empty revisions in this first CLI slice. Verification and
-  API-surface bindings can therefore detect missing evidence but require a later collector input to
-  become satisfied.
-- Findings are written only when `--output` is supplied; durable report history and `explain` are
-  follow-up product work.
+- The v1 pack compiler is a JSON bootstrap path; P4.4 managed Markdown extraction is the authority
+  transition for project spec nodes and bindings.
+- Evidence defaults to a canonical-empty revision when `--evidence` is omitted. A complete Jest JSON
+  artifact can supply an in-memory revision for verification bindings. When `specGovernance.tsdoc`
+  has rules, the check loads workspace-authored source into an exact `EnrichmentRevision`; bundled
+  library nodes are deliberately excluded.
+- `--history-db <file>` appends a validated P4.5 envelope containing canonical
+  evidence/enrichment/policy/rule-set payloads and the exact check/result identity. It has no latest
+  pointer; exact-ID read revalidates the envelope and rejects tampering. Retained source-based full
+  conformance recompute and `explain` remain follow-up work.
 - LSP diagnostics and CodeAction are not connected to this check yet.
+
+### Jest evidence slice
+
+The implemented slice keeps one user-facing path:
+`tsdoc-edge convention check --pack <pack.json> --evidence <jest.json>`. A single Jest-package-free
+JSON loader will validate the artifact, recover authored TypeScript source
+through adjacent source maps, create an in-memory content-addressed `EvidenceRevision`, and pass it
+to the existing check service. No separate import command, evidence database option, active pointer,
+generic adapter registry, or mapping DSL is part of that slice.
+
+The normalized identity, raw-status mapping, duplicate policy, `subjectFiles`, and provenance
+contract are owned by [[Semantic Graph Analysis and Relationship Model]]. This feature owns the
+optional CLI input, exit behavior, and report/gate handoff.
+
+`ConventionCheckService.run()` accepts one optional `EvidenceRevision`; omission keeps the current
+canonical-empty behavior. The CLI loads the optional artifact and passes the resulting revision to
+that service without persisting it.
+
+Verification keeps structural resolution separate from execution outcome: `passed` is satisfied,
+`failed` is violated, and `skipped` or `unknown` is indeterminate. A missing required verifier or
+subject remains violated unless another required participant is ambiguous or stale; that structural
+state takes precedence and remains indeterminate. P4.5 durable history retains normalized inputs and
+exact pins without changing this evaluator boundary.
+
+Malformed JSON, unsupported runner schema, interrupted/run-exec output, runtime-error suites,
+aggregate count mismatch, workspace escape, unresolved `.test-dist` paths, and
+source-map/source-byte mismatch are input errors with exit `2`; they are not converted to `unknown`.
+The status semantic change bumps the resolver, conformance engine, `binding.verification` rule
+contract, and pack compiler identities to `2.0.0` while keeping the evidence contract and gate
+evaluator versions.
+
+`--output` must not resolve to the same file as `--evidence`; the CLI rejects that input with exit
+`2` before reading or writing either artifact.
 
 ## Related
 

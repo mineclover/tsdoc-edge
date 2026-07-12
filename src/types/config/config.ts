@@ -53,6 +53,12 @@ export interface TsdocEdgeConfig {
    * Document management configuration
    */
   documentManagement?: DocumentManagementConfig;
+
+  /**
+   * Authored project-spec roots and location-aware naming policy.
+   * @remarks P4.2 consumes the naming policy; P4.4 makes the roots executable spec input.
+   */
+  specGovernance?: SpecGovernanceConfig;
 }
 
 /**
@@ -361,6 +367,60 @@ export interface DocumentManagementConfig {
   ignoreCodeBlocks?: boolean;
 }
 
+/** Canonical locations and naming policy for authored project specifications. */
+export interface SpecGovernanceConfig {
+  /** Workspace-relative Markdown roots reserved for authored project specifications. */
+  authoredSpecDirs?: string[];
+  /** Ordered naming rules. The first matching rule wins. */
+  naming?: NamingConventionConfig;
+  /** Ordered TSDoc requirements evaluated against loader-produced enrichment. */
+  tsdoc?: TsdocConventionConfig;
+}
+
+export interface NamingConventionConfig {
+  readonly contractVersion: '1.0';
+  readonly rules: readonly NamingConventionRule[];
+}
+
+/** A location-aware convention for a filename or canonical graph symbol. */
+export interface NamingConventionRule {
+  readonly id: string;
+  /** Workspace-relative POSIX glob, evaluated against the source file location. */
+  readonly path: string;
+  /** Whether path matching treats ASCII case as significant. */
+  readonly pathCase?: 'sensitive' | 'insensitive';
+  readonly target: 'file' | 'symbol';
+  /** Optional canonical node kinds for symbol rules. */
+  readonly kinds?: readonly string[];
+  /** Optional exported/non-exported filter for symbol rules. */
+  readonly exported?: boolean;
+  readonly style: 'pascal' | 'camel' | 'snake' | 'kebab';
+  /** Severity used when this rule produces a convention gate finding. */
+  readonly severity?: 'error' | 'warning' | 'info';
+  /** Preserve acronym runs (for example HTTPServer) or require normalized word casing. */
+  readonly acronym?: 'preserve' | 'normalize';
+  /** Permit one leading underscore before applying the selected case style. */
+  readonly allowLeadingUnderscore?: boolean;
+}
+
+/** A deliberately small first consumer of the immutable TSDoc enrichment plane. */
+export interface TsdocConventionConfig {
+  readonly contractVersion: '1.0';
+  readonly rules: readonly TsdocConventionRule[];
+}
+
+/** Require one or more exact TSDoc block tags for matching canonical symbols. */
+export interface TsdocConventionRule {
+  readonly id: string;
+  /** Workspace-relative POSIX glob, evaluated against the canonical node file. */
+  readonly path: string;
+  readonly pathCase?: 'sensitive' | 'insensitive';
+  readonly kinds?: readonly string[];
+  readonly exported?: boolean;
+  readonly requiredTags: readonly string[];
+  readonly severity?: 'error' | 'warning' | 'info';
+}
+
 /**
  * Default configuration values
  *
@@ -419,6 +479,13 @@ export const DEFAULT_CONFIG: TsdocEdgeConfig = {
     requireFrontmatter: false,
     strictMode: false,
     ignoreCodeBlocks: true,
+  },
+  specGovernance: {
+    authoredSpecDirs: ['managed/specs'],
+    naming: {
+      contractVersion: '1.0',
+      rules: [],
+    },
   },
 };
 

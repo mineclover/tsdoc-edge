@@ -45,6 +45,12 @@ import {
 const CANONICAL_SEMVER =
   /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*)(?:\.(?:0|[1-9]\d*|\d*[A-Za-z-][0-9A-Za-z-]*))*))?(?:\+([0-9A-Za-z-]+(?:\.[0-9A-Za-z-]+)*))?$/;
 const SUPPORTED_RULE_IDS = new Set<string>(Object.values(CONFORMANCE_RULE_IDS));
+const SUPPORTED_RULE_VERSIONS: Readonly<Record<string, string>> = Object.freeze({
+  [CONFORMANCE_RULE_IDS.implementation]: '1.0.0',
+  [CONFORMANCE_RULE_IDS.verification]: '2.0.0',
+  [CONFORMANCE_RULE_IDS.constraint]: '1.0.0',
+  [CONFORMANCE_RULE_IDS.governance]: '1.0.0',
+});
 const materializedConventionPacks = new WeakSet<object>();
 
 export interface ConventionPackSourceContext {
@@ -254,6 +260,11 @@ export function compileConventionPackSource(
     const ruleId = requireText(ruleRecord.id, `convention pack policy rule[${index}] id`);
     if (!SUPPORTED_RULE_IDS.has(ruleId)) {
       throw new Error(`Unsupported convention rule id in v1: ${ruleId}`);
+    }
+    if (ruleRecord.version !== SUPPORTED_RULE_VERSIONS[ruleId]) {
+      throw new Error(
+        `Unsupported convention rule contract: ${ruleId}@${String(ruleRecord.version)}`
+      );
     }
     if (ruleRecord.parameters !== undefined) {
       throw new Error(`Convention rule parameters are not executable in v1: ${ruleId}`);

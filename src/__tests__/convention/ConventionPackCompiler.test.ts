@@ -113,7 +113,7 @@ describe('ConventionPackCompiler', () => {
               source.policy.rules[0],
               {
                 id: 'binding.verification',
-                version: '1.0.0',
+                version: '2.0.0',
                 enabled: true,
                 severity: 'error',
               },

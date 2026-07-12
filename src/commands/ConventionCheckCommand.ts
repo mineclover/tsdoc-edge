@@ -3,12 +3,15 @@
 import { createHash, randomUUID } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { ConfigManager } from '../config/ConfigManager';
 import {
   type ConventionCheckResult,
   ConventionCheckService,
   compileConventionPackFile,
+  loadJestJsonEvidence,
 } from '../convention';
 import { DEFAULT_CANONICAL_GRAPH_DATABASE } from '../indexer';
+import { ConventionCheckHistoryRepository } from '../storage/ConventionCheckHistoryRepository';
 import { GraphRepository } from '../storage/GraphRepository';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
@@ -52,12 +55,14 @@ export class ConventionCheckCommand extends BaseCommand {
     --code-revision <id>          Exact retained code revision (default: active revision)
     --suppression-as-of <time>    RFC3339 clock required by expiring suppressions
     --expected-manifest <id>      Exact convention manifest lock for CI/release checks
+    --evidence <file>             Complete Jest JSON artifact for verification bindings
+    --history-db <file>           Append validated retained inputs and result history
     --fail-on <level>             error|warning|info|never (default: error)
     --json                        Print the complete pinned result as JSON
     --output <file>               Write JSON outside the canonical DB directory
 
   This v1 checks exact implementation/verification/constraint/governance
-  bindings on one saved graph revision. It does not evaluate naming or style rules.`;
+  bindings plus configured naming and TSDoc tag conventions on one saved graph revision.`;
   }
 
   async execute(args: string[]): Promise<CommandResult> {
@@ -91,6 +96,16 @@ export class ConventionCheckCommand extends BaseCommand {
       }
       const graphDatabase = fs.realpathSync(graphDatabaseInput);
       const outputPath = this.getOption(args, '--output');
+      const evidencePath = this.getOption(args, '--evidence');
+      if (
+        outputPath &&
+        evidencePath &&
+        sameFile(path.resolve(process.cwd(), outputPath), path.resolve(process.cwd(), evidencePath))
+      ) {
+        const message = '--output must not overwrite the Jest evidence artifact';
+        this.printError(message);
+        return this.failure(message, 2);
+      }
       if (outputPath) {
         const absoluteOutput = path.resolve(process.cwd(), outputPath);
         const absolutePack = path.resolve(process.cwd(), packPath);
@@ -118,6 +133,13 @@ export class ConventionCheckCommand extends BaseCommand {
       let repository: GraphRepository | undefined;
       try {
         const pack = compileConventionPackFile(packPath, { workspaceRoot: process.cwd() });
+        const evidence = evidencePath
+          ? loadJestJsonEvidence({
+              artifactPath: evidencePath,
+              workspaceRoot: process.cwd(),
+              workspaceId: pack.manifest.scope.workspaceId,
+            })
+          : undefined;
         repository = new GraphRepository(graphDatabase, { readOnly: true });
         const requestedRevisionId = this.getOption(args, '--code-revision');
         const codeRevision = requestedRevisionId
@@ -130,10 +152,14 @@ export class ConventionCheckCommand extends BaseCommand {
           this.printError(message);
           return this.failure(message, 2);
         }
+        const governance = ConfigManager.getInstance(process.cwd()).get().specGovernance;
         const result = new ConventionCheckService().run({
           pack,
           codeRevision,
           workspaceRoot: process.cwd(),
+          ...(evidence ? { evidence } : {}),
+          ...(governance?.naming ? { naming: governance.naming } : {}),
+          ...(governance?.tsdoc ? { tsdoc: governance.tsdoc } : {}),
           ...(this.getOption(args, '--expected-manifest')
             ? { expectedManifestId: this.getOption(args, '--expected-manifest') }
             : {}),
@@ -143,6 +169,10 @@ export class ConventionCheckCommand extends BaseCommand {
         });
         const blocking = blockingFindings(result, failOn);
         const gate = gateDecision(result.checkId, failOn, blocking);
+        const historyDatabase = this.getOption(args, '--history-db');
+        const historyId = historyDatabase
+          ? appendHistory(path.resolve(process.cwd(), historyDatabase), result)
+          : undefined;
         const output: ConventionCheckCommandOutput = Object.freeze({ ...result, gate });
         const json = JSON.stringify(output, null, 2);
         if (outputPath) {
@@ -151,7 +181,7 @@ export class ConventionCheckCommand extends BaseCommand {
           atomicWriteFile(absoluteOutput, `${json}\n`);
         }
         if (this.hasFlag(args, '--json')) console.log(json);
-        else this.printHumanResult(result, gate, outputPath);
+        else this.printHumanResult(result, gate, outputPath, historyId);
 
         if (gate.failed) {
           return {
@@ -180,7 +210,8 @@ export class ConventionCheckCommand extends BaseCommand {
   private printHumanResult(
     result: ConventionCheckResult,
     gate: ConventionGateDecision,
-    outputPath?: string
+    outputPath?: string,
+    historyId?: string
   ): void {
     this.printHeader('Convention Pack Check');
     console.log(
@@ -199,6 +230,8 @@ export class ConventionCheckCommand extends BaseCommand {
       `${colors.bold}Effective view:${colors.reset} ${result.inputStamp.effectiveViewId}`
     );
     console.log(`${colors.bold}Binding set:${colors.reset} ${result.bindingResolutionSetId}`);
+    console.log(`${colors.bold}Naming report:${colors.reset} ${result.naming.reportId}`);
+    console.log(`${colors.bold}TSDoc report:${colors.reset} ${result.tsdoc.reportId}`);
     console.log(`${colors.bold}Report:${colors.reset} ${result.conformance.reportId}`);
     console.log(
       `${colors.bold}Gate:${colors.reset} ${gate.gateId} (${gate.failureThreshold}, ${gate.failed ? 'failed' : 'passed'})`
@@ -232,17 +265,46 @@ export class ConventionCheckCommand extends BaseCommand {
         `Unapplied suppressions: ${result.conformance.unappliedSuppressionIds.join(', ')}`
       );
     }
+    if (result.naming.findings.length > 0) {
+      this.printSection('Naming Findings');
+      for (const finding of result.naming.findings) {
+        console.log(
+          `${findingColor(finding.outcome)}✗ ${finding.ruleId}${colors.reset} ` +
+            `[${finding.severity}] ${finding.file} → ${finding.subject} (expected ${finding.expected})`
+        );
+      }
+    }
+    if (result.tsdoc.findings.length > 0) {
+      this.printSection('TSDoc Findings');
+      for (const finding of result.tsdoc.findings) {
+        console.log(
+          `${findingColor(finding.outcome)}✗ ${finding.ruleId}${colors.reset} ` +
+            `[${finding.severity}] ${finding.file} → ${finding.nodeId} ` +
+            `(missing ${finding.missingTags.map((tag) => `@${tag}`).join(', ')})`
+        );
+      }
+    }
     if (outputPath) this.printInfo(`JSON report written to ${path.resolve(outputPath)}`);
+    if (historyId) this.printInfo(`Retained convention history: ${historyId}`);
   }
+}
+
+type GateFinding =
+  | ConventionCheckResult['conformance']['findings'][number]
+  | ConventionCheckResult['naming']['findings'][number]
+  | ConventionCheckResult['tsdoc']['findings'][number];
+
+function allFindings(result: ConventionCheckResult): readonly GateFinding[] {
+  return [...result.conformance.findings, ...result.naming.findings, ...result.tsdoc.findings];
 }
 
 function blockingFindings(
   result: ConventionCheckResult,
   threshold: ConventionFailureThreshold
-): ConventionCheckResult['conformance']['findings'] {
+): readonly GateFinding[] {
   if (threshold === 'never') return [];
   const minimum = severityRank(threshold);
-  return result.conformance.findings.filter(
+  return allFindings(result).filter(
     (finding) =>
       (finding.outcome === 'violated' || finding.outcome === 'indeterminate') &&
       severityRank(finding.severity) >= minimum
@@ -256,7 +318,7 @@ function severityRank(value: Exclude<ConventionFailureThreshold, 'never'>): numb
 function gateDecision(
   checkId: string,
   failureThreshold: ConventionFailureThreshold,
-  blocking: ConventionCheckResult['conformance']['findings']
+  blocking: readonly GateFinding[]
 ): ConventionGateDecision {
   const blockingFindingIds = Object.freeze(blocking.map((finding) => finding.findingId));
   const identity = JSON.stringify({
@@ -276,6 +338,18 @@ function gateDecision(
     failed: blockingFindingIds.length > 0,
     blockingFindingIds,
   });
+}
+
+function appendHistory(databasePath: string, result: ConventionCheckResult): string {
+  const repository = new ConventionCheckHistoryRepository(databasePath);
+  try {
+    return repository.append({
+      check: result,
+      inputs: result.retainedInputs,
+    }).historyId;
+  } finally {
+    repository.close();
+  }
 }
 
 function findingColor(
@@ -321,6 +395,8 @@ const CONVENTION_VALUE_OPTIONS = new Set([
   '--expected-manifest',
   '--fail-on',
   '--output',
+  '--evidence',
+  '--history-db',
 ]);
 const CONVENTION_BOOLEAN_OPTIONS = new Set(['--json', '--help', '-h']);
 

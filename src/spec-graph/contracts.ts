@@ -219,6 +219,7 @@ export type EndpointRef =
       readonly file?: string;
       readonly testName?: string;
       readonly runner?: string;
+      readonly status?: 'passed' | 'failed' | 'skipped' | 'unknown';
     }
   | {
       readonly type: 'api-surface';

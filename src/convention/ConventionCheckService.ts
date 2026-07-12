@@ -7,6 +7,8 @@ import { RELATION_SEMANTIC_REGISTRY_VERSION } from '../graph-analysis/edge-seman
 import {
   createCanonicalEmptyEnrichmentRevision,
   createCanonicalEmptyEvidenceRevision,
+  type EnrichmentRevision,
+  type EvidenceRevision,
 } from '../semantic-graph/analysis-input-revisions';
 import type { EffectiveAnalysisInputStamp } from '../semantic-graph/contracts';
 import {
@@ -22,6 +24,7 @@ import {
   type ActiveCanonicalGraphRevision,
   assertGraphRepositoryRevision,
 } from '../storage/GraphRepository';
+import type { NamingConventionConfig, TsdocConventionConfig } from '../types/config';
 import {
   assertCompiledConventionPack,
   validateConventionPackManifest,
@@ -31,6 +34,12 @@ import type {
   ConventionCapabilityRequirement,
   ConventionPackManifest,
 } from './contracts';
+import {
+  NamingConventionEvaluator,
+  type NamingConventionReport,
+} from './NamingConventionEvaluator';
+import { TsdocConventionEvaluator, type TsdocConventionReport } from './TsdocConventionEvaluator';
+import { loadTsdocEnrichment } from './TsdocEnrichmentLoader';
 
 export interface ConventionCapabilityCheck {
   readonly id: string;
@@ -43,6 +52,12 @@ export interface ConventionCheckInput {
   readonly pack: CompiledConventionPack;
   readonly codeRevision: ActiveCanonicalGraphRevision;
   readonly workspaceRoot: string;
+  /** Ephemeral evidence collected for this one check invocation. */
+  readonly evidence?: EvidenceRevision;
+  /** Location-aware naming policy selected from workspace configuration. */
+  readonly naming?: NamingConventionConfig;
+  /** Exact tag requirements evaluated from the loader-produced enrichment revision. */
+  readonly tsdoc?: TsdocConventionConfig;
   /** Optional CI/lockfile pin preventing same-version pack replacement. */
   readonly expectedManifestId?: string;
   /** Required whenever the policy contains an expiring suppression. */
@@ -57,9 +72,18 @@ export interface ConventionCheckResult {
   readonly codeRevisionId: string;
   readonly codeGraphFingerprint: string;
   readonly inputStamp: EffectiveAnalysisInputStamp;
+  /** Canonical input payloads retained by P4.5 history; no input is selected implicitly. */
+  readonly retainedInputs: {
+    readonly evidence: EvidenceRevision;
+    readonly enrichment: EnrichmentRevision;
+    readonly policy: CompiledConventionPack['policy'];
+    readonly ruleSet: CompiledConventionPack['ruleSet'];
+  };
   readonly bindingResolutionSetId: string;
   readonly bindingDiagnostics: readonly BindingResolutionDiagnostic[];
   readonly capabilityChecks: readonly ConventionCapabilityCheck[];
+  readonly naming: NamingConventionReport;
+  readonly tsdoc: TsdocConventionReport;
   readonly conformance: ConformanceReport;
 }
 
@@ -98,8 +122,24 @@ export class ConventionCheckService {
     const provider = providerAnalysisIdentityFromGraph(input.codeRevision.graph);
     const capabilityChecks = checkCapabilities(manifest, provider.capabilities);
     const workspaceId = manifest.scope.workspaceId;
-    const evidence = createCanonicalEmptyEvidenceRevision(workspaceId);
-    const enrichment = createCanonicalEmptyEnrichmentRevision(workspaceId);
+    const evidence = input.evidence ?? createCanonicalEmptyEvidenceRevision(workspaceId);
+    const naming = new NamingConventionEvaluator().evaluate(
+      input.codeRevision.graph,
+      input.naming ?? EMPTY_NAMING_CONVENTION_CONFIG,
+      { workspaceRoot: input.workspaceRoot }
+    );
+    const enrichment = input.tsdoc
+      ? loadTsdocEnrichment({
+          workspaceRoot: input.workspaceRoot,
+          workspaceId,
+          graph: input.codeRevision.graph,
+        })
+      : createCanonicalEmptyEnrichmentRevision(workspaceId);
+    const tsdoc = new TsdocConventionEvaluator().evaluate(
+      input.codeRevision.graph,
+      enrichment,
+      input.tsdoc ?? EMPTY_TSDOC_CONVENTION_CONFIG
+    );
     const snapshot = this.analysis.createSnapshot({
       code: {
         viewKind: 'persisted-code-revision',
@@ -114,9 +154,7 @@ export class ConventionCheckService {
       provider,
       relationSemanticRegistryVersion: RELATION_SEMANTIC_REGISTRY_VERSION,
     });
-    const resolver = new ExactBindingResolver({
-      graphNamespace: manifest.graphNamespace,
-    });
+    const resolver = new ExactBindingResolver({ graphNamespace: manifest.graphNamespace });
     const resolutionReport = resolver.resolveWithDiagnostics(snapshot);
     const bindingSet = this.analysis.resolveBindings(snapshot, {
       identity: resolver.identity,
@@ -129,6 +167,7 @@ export class ConventionCheckService {
     });
     const conformance = new ConformanceEngine().evaluate(bindingSet, input.pack.policy, {
       ...(input.suppressionAsOf ? { suppressionAsOf: input.suppressionAsOf } : {}),
+      evidence,
     });
     const checkIdentity = {
       packManifestId: manifest.manifestId,
@@ -136,6 +175,8 @@ export class ConventionCheckService {
       inputStamp: snapshot.stamp,
       bindingResolutionSetId: bindingSet.resolutionSetId,
       conformanceReportId: conformance.reportId,
+      namingReportId: naming.reportId,
+      tsdocReportId: tsdoc.reportId,
       capabilityChecks,
     };
     return Object.freeze({
@@ -146,13 +187,31 @@ export class ConventionCheckService {
       codeRevisionId: input.codeRevision.metadata.revisionId,
       codeGraphFingerprint: input.codeRevision.graph.fingerprint,
       inputStamp: snapshot.stamp,
+      retainedInputs: Object.freeze({
+        evidence,
+        enrichment,
+        policy: input.pack.policy,
+        ruleSet: input.pack.ruleSet,
+      }),
       bindingResolutionSetId: bindingSet.resolutionSetId,
       bindingDiagnostics: resolutionReport.diagnostics,
       capabilityChecks,
+      naming,
+      tsdoc,
       conformance,
     });
   }
 }
+
+const EMPTY_NAMING_CONVENTION_CONFIG: NamingConventionConfig = Object.freeze({
+  contractVersion: '1.0',
+  rules: Object.freeze([]),
+});
+
+const EMPTY_TSDOC_CONVENTION_CONFIG: TsdocConventionConfig = Object.freeze({
+  contractVersion: '1.0',
+  rules: Object.freeze([]),
+});
 
 function validatePackPins(pack: CompiledConventionPack, manifest: ConventionPackManifest): void {
   if (

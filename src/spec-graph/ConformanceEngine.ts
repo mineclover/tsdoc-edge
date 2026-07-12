@@ -7,6 +7,7 @@
  */
 
 import { createHash } from 'node:crypto';
+import type { EvidenceRevision } from '../semantic-graph/analysis-input-revisions';
 import type { BindingResolutionSet } from '../semantic-graph/contracts';
 import { assertValidatedBindingResolutionSet } from '../semantic-graph/EffectiveAnalysisService';
 import type {
@@ -27,7 +28,7 @@ type CodeNodeRef = Extract<EndpointRef, { type: 'code-node' }>;
 type CodeEdgeRef = Extract<EndpointRef, { type: 'code-edge' }>;
 
 export const CONFORMANCE_ENGINE_ID = 'tsdoc-edge/minimal-conformance-engine';
-export const CONFORMANCE_ENGINE_VERSION = '1.0.0';
+export const CONFORMANCE_ENGINE_VERSION = '2.0.0';
 
 export const CONFORMANCE_RULE_IDS: Readonly<Record<SpecBindingKind, string>> = Object.freeze({
   implementation: 'binding.implementation',
@@ -51,6 +52,8 @@ export interface ConformanceEngineIdentity {
 export interface ConformanceEvaluationOptions {
   /** Explicit clock input for expiring suppressions; it is included in report identity. */
   readonly suppressionAsOf?: string;
+  /** Present for product checks so verifier status is rechecked against the exact evidence input. */
+  readonly evidence?: EvidenceRevision;
 }
 
 export interface ConformanceFinding {
@@ -142,7 +145,7 @@ export class ConformanceEngine {
       const rule = ruleDecision(policy, obligationKind);
       const participantDigest = digest(resolution.participants);
       const diagnosticCodes = participantDiagnosticCodes(obligationKind, resolution.participants);
-      const baseOutcome = bindingOutcome(obligationKind, resolution.participants);
+      const baseOutcome = bindingOutcome(obligationKind, resolution.participants, options.evidence);
       const suppression =
         rule.enabled && baseOutcome !== 'satisfied'
           ? matchingSuppression(
@@ -431,12 +434,29 @@ function requiredRoles(kind: SpecBindingKind): readonly ResolvedBindingParticipa
 
 function bindingOutcome(
   kind: SpecBindingKind,
-  participants: readonly ResolvedBindingParticipant[]
+  participants: readonly ResolvedBindingParticipant[],
+  evidence?: EvidenceRevision
 ): Extract<ConformanceOutcome, 'satisfied' | 'violated' | 'indeterminate'> {
   const byRole = new Map(participants.map((participant) => [participant.role, participant]));
   const statuses = requiredRoles(kind).map((role) => byRole.get(role)?.status ?? 'missing');
   if (statuses.includes('ambiguous') || statuses.includes('stale')) return 'indeterminate';
   if (statuses.includes('missing')) return 'violated';
+  if (kind === 'verification') {
+    const verifier = byRole.get('verifier')?.refs[0];
+    if (!verifier || verifier.type !== 'test-evidence') return 'indeterminate';
+    const item = evidence?.items.find(
+      (
+        candidate
+      ): candidate is Extract<EvidenceRevision['items'][number], { kind: 'test-evidence' }> =>
+        candidate.kind === 'test-evidence' && candidate.id === verifier.id
+    );
+    const status = item?.status ?? verifier.status;
+    if (item && verifier.status !== item.status) {
+      throw new Error(`Verification evidence status does not match pinned item: ${verifier.id}`);
+    }
+    if (status === 'failed') return 'violated';
+    if (status === 'skipped' || status === 'unknown') return 'indeterminate';
+  }
   return 'satisfied';
 }
 

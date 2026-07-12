@@ -127,6 +127,11 @@ export class ConfigManager {
         ...defaultConfig.documentManagement,
         ...userConfig.documentManagement,
       },
+      specGovernance: {
+        ...defaultConfig.specGovernance,
+        ...userConfig.specGovernance,
+        naming: userConfig.specGovernance?.naming ?? defaultConfig.specGovernance?.naming,
+      },
     };
   }
 

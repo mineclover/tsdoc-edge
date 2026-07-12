@@ -55,5 +55,68 @@
     "requireFrontmatter": false,
     "strictMode": false,
     "ignoreCodeBlocks": true
+  },
+  "specGovernance": {
+    "authoredSpecDirs": ["managed/specs"],
+    "naming": {
+      "contractVersion": "1.0",
+      "rules": [
+        {
+          "id": "managed-spec-file-kebab",
+          "path": "managed/specs/**/*.md",
+          "pathCase": "sensitive",
+          "target": "file",
+          "style": "kebab",
+          "severity": "error",
+          "acronym": "normalize"
+        },
+        {
+          "id": "managed-spec-artifact-snake",
+          "path": "managed/specs/**/artifacts/**/*.json",
+          "pathCase": "sensitive",
+          "target": "file",
+          "style": "snake",
+          "severity": "error",
+          "acronym": "normalize"
+        },
+        {
+          "id": "public-type-pascal",
+          "path": "src/**/*.ts",
+          "pathCase": "sensitive",
+          "target": "symbol",
+          "kinds": ["class", "interface", "type", "enum"],
+          "exported": true,
+          "style": "pascal",
+          "severity": "warning",
+          "acronym": "preserve"
+        },
+        {
+          "id": "public-value-camel",
+          "path": "src/**/*.ts",
+          "pathCase": "sensitive",
+          "target": "symbol",
+          "kinds": ["function", "variable"],
+          "exported": true,
+          "style": "camel",
+          "severity": "warning",
+          "acronym": "preserve",
+          "allowLeadingUnderscore": false
+        }
+      ]
+    },
+    "tsdoc": {
+      "contractVersion": "1.0",
+      "rules": [
+        {
+          "id": "parser-public-class-tag",
+          "path": "src/parser/TSDocParser.ts",
+          "pathCase": "sensitive",
+          "kinds": ["class"],
+          "exported": true,
+          "requiredTags": ["public"],
+          "severity": "error"
+        }
+      ]
+    }
   }
 }

@@ -28,7 +28,7 @@ import type {
 import { bindingDeclarationDigest, bindingResolutionId } from './identity';
 
 export const EXACT_BINDING_RESOLVER_ID = 'tsdoc-edge/exact-binding-resolver';
-export const EXACT_BINDING_RESOLVER_VERSION = '1.0.0';
+export const EXACT_BINDING_RESOLVER_VERSION = '2.0.0';
 
 type CodeNodeRef = Extract<EndpointRef, { type: 'code-node' }>;
 type CodeEdgeRef = Extract<EndpointRef, { type: 'code-edge' }>;
@@ -65,6 +65,7 @@ export interface IndexedTestEvidence {
   readonly file?: string;
   readonly testName?: string;
   readonly runner?: string;
+  readonly status?: 'passed' | 'failed' | 'skipped' | 'unknown';
 }
 
 export interface IndexedApiSurface {
@@ -135,6 +136,7 @@ export function createAnalysisInputBindingResolverIndex(
         file: item.source.file,
         testName: item.testName,
         runner: item.runner,
+        status: item.status,
       });
     } else {
       apiSurfaces.push({
@@ -464,6 +466,7 @@ function materializeIndexedRef(entry: IndexedEntry): EndpointRef {
       ...(evidence.file ? { file: evidence.file } : {}),
       ...(evidence.testName ? { testName: evidence.testName } : {}),
       ...(evidence.runner ? { runner: evidence.runner } : {}),
+      ...(evidence.status ? { status: evidence.status } : {}),
     });
   }
   if (entry.ref.type === 'api-surface') {

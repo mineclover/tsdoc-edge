@@ -120,6 +120,42 @@ describe('ConfigManager', () => {
       expect(config.project.version).toBe('3.0.0');
     });
 
+    it('preserves authored spec roots and ordered naming conventions', () => {
+      const configManager = ConfigManager.getInstance(testDir);
+
+      configManager.init({
+        specGovernance: {
+          authoredSpecDirs: ['managed/specs'],
+          naming: {
+            contractVersion: '1.0',
+            rules: [
+              {
+                id: 'spec-file-kebab',
+                path: 'managed/specs/**/*.md',
+                target: 'file',
+                style: 'kebab',
+              },
+            ],
+          },
+        },
+      });
+
+      expect(configManager.get().specGovernance).toEqual({
+        authoredSpecDirs: ['managed/specs'],
+        naming: {
+          contractVersion: '1.0',
+          rules: [
+            {
+              id: 'spec-file-kebab',
+              path: 'managed/specs/**/*.md',
+              target: 'file',
+              style: 'kebab',
+            },
+          ],
+        },
+      });
+    });
+
     it('should merge with default config', () => {
       const configManager = ConfigManager.getInstance(testDir);
 
@@ -388,7 +424,9 @@ describe('ConfigManager', () => {
       configManager.update('validation', { minConnectivityScore: -1 });
       result = configManager.validate();
       expect(result.valid).toBe(false);
-      expect(result.errors.some(e => e.includes('minConnectivityScore') && e.includes('out of range'))).toBe(true);
+      expect(
+        result.errors.some((e) => e.includes('minConnectivityScore') && e.includes('out of range'))
+      ).toBe(true);
 
       configManager.update('validation', { minConnectivityScore: 101 });
       result = configManager.validate();
@@ -413,11 +451,11 @@ describe('ConfigManager', () => {
 
       expect(result.valid).toBe(false);
       expect(result.errors.length).toBeGreaterThanOrEqual(5);
-      expect(result.errors.some(e => e.includes('project.name'))).toBe(true);
-      expect(result.errors.some(e => e.includes('project.version'))).toBe(true);
-      expect(result.errors.some(e => e.includes('paths.commentsDir'))).toBe(true);
-      expect(result.errors.some(e => e.includes('paths.databasePath'))).toBe(true);
-      expect(result.errors.some(e => e.includes('paths.jsonlDir'))).toBe(true);
+      expect(result.errors.some((e) => e.includes('project.name'))).toBe(true);
+      expect(result.errors.some((e) => e.includes('project.version'))).toBe(true);
+      expect(result.errors.some((e) => e.includes('paths.commentsDir'))).toBe(true);
+      expect(result.errors.some((e) => e.includes('paths.databasePath'))).toBe(true);
+      expect(result.errors.some((e) => e.includes('paths.jsonlDir'))).toBe(true);
     });
   });
 
@@ -538,7 +576,9 @@ describe('ConfigManager', () => {
 
       const config = configManager.get();
       expect(config.validation?.strictMode).toBe(true);
-      expect(config.validation?.minConnectivityScore).toBe(DEFAULT_CONFIG.validation?.minConnectivityScore);
+      expect(config.validation?.minConnectivityScore).toBe(
+        DEFAULT_CONFIG.validation?.minConnectivityScore
+      );
       expect(config.validation?.rules).toEqual({
         'rule-1': 'error',
         'rule-2': 'warning',

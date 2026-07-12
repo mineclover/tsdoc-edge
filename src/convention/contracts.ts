@@ -23,7 +23,7 @@ export const CONVENTION_PACK_SOURCE_CONTRACT_ID = 'tsdoc-edge/convention-pack-so
 export const CONVENTION_PACK_MANIFEST_CONTRACT_ID = 'tsdoc-edge/convention-pack-manifest' as const;
 export const CONVENTION_PACK_CONTRACT_VERSION = '1.0' as const;
 export const CONVENTION_PACK_COMPILER_ID = 'tsdoc-edge/convention-pack-compiler' as const;
-export const CONVENTION_PACK_COMPILER_VERSION = '1.0.0' as const;
+export const CONVENTION_PACK_COMPILER_VERSION = '2.0.0' as const;
 
 export interface ConventionPackWorkspaceScope {
   readonly kind: 'workspace';

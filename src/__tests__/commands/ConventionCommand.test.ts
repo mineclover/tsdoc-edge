@@ -7,6 +7,7 @@ import {
   type ConventionFailureThreshold,
 } from '../../commands/ConventionCheckCommand';
 import { ConventionCommand } from '../../commands/ConventionCommand';
+import { ConfigManager } from '../../config/ConfigManager';
 import { type ConventionPackSource, compileConventionPackFile } from '../../convention';
 import { canonicalProjectGraphFingerprint } from '../../indexer';
 import { GraphRepository } from '../../storage/GraphRepository';
@@ -41,6 +42,7 @@ describe('ConventionCommand', () => {
   let log: jest.SpyInstance;
 
   beforeEach(() => {
+    ConfigManager.reset();
     workspace = fs.mkdtempSync(path.join(os.tmpdir(), 'tsdoc-convention-command-'));
     process.chdir(workspace);
     graphDatabase = path.join(workspace, '.tsdoc', 'canonical-graph.db');
@@ -52,6 +54,7 @@ describe('ConventionCommand', () => {
   });
 
   afterEach(() => {
+    ConfigManager.reset();
     log.mockRestore();
     process.chdir(originalCwd);
     fs.rmSync(workspace, { recursive: true, force: true });
@@ -126,6 +129,88 @@ describe('ConventionCommand', () => {
     expect(output).toContain('"failureThreshold": "error"');
     expect(output).toContain('"evaluatorVersion": "1.0.0"');
     expect(output).toContain('"failed": false');
+  });
+
+  it('loads an optional complete Jest artifact and refuses to overwrite it as output', async () => {
+    const artifact = path.join(workspace, 'jest.json');
+    fs.writeFileSync(
+      artifact,
+      JSON.stringify({
+        success: true,
+        numPassedTests: 0,
+        numFailedTests: 0,
+        numPendingTests: 0,
+        numTodoTests: 0,
+        numTotalTests: 0,
+        testResults: [],
+      })
+    );
+    const command = new ConventionCheckCommand();
+    const loaded = await command.execute([
+      '--pack',
+      path.relative(workspace, packPath),
+      '--graph-db',
+      graphDatabase,
+      '--evidence',
+      artifact,
+      '--json',
+    ]);
+    const output = capturedJson(log);
+    log.mockClear();
+    const sameFile = await command.execute([
+      '--pack',
+      path.relative(workspace, packPath),
+      '--graph-db',
+      graphDatabase,
+      '--evidence',
+      artifact,
+      '--output',
+      artifact,
+    ]);
+
+    expect(loaded.exitCode).toBe(0);
+    expect(output.inputStamp.evidenceRevisionId).not.toContain('canonical-empty');
+    expect(sameFile.exitCode).toBe(2);
+    expect(sameFile.message).toContain('--output must not overwrite');
+  });
+
+  it('turns an error-severity location-aware naming finding into gate exit 1', async () => {
+    fs.writeFileSync(
+      path.join(workspace, '.tsdoc.config.json'),
+      JSON.stringify({
+        project: { name: 'fixture', version: '1.0.0' },
+        paths: { commentsDir: '.comments', databasePath: '.tsdoc.db', jsonlDir: '.jsonl' },
+        specGovernance: {
+          naming: {
+            contractVersion: '1.0',
+            rules: [
+              {
+                id: 'fixture-class-snake',
+                path: 'src/**/*.ts',
+                target: 'symbol',
+                kinds: ['class'],
+                style: 'snake',
+                severity: 'error',
+              },
+            ],
+          },
+        },
+      })
+    );
+    const result = await new ConventionCheckCommand().execute([
+      '--pack',
+      path.relative(workspace, packPath),
+      '--graph-db',
+      graphDatabase,
+      '--json',
+    ]);
+    const output = capturedJson(log);
+
+    expect(result.exitCode).toBe(1);
+    expect(output.naming.findings).toMatchObject([
+      { ruleId: 'fixture-class-snake', severity: 'error', outcome: 'violated' },
+    ]);
+    expect(output.gate.blockingFindingIds).toContain(output.naming.findings[0]?.findingId);
   });
 
   it('returns exit 1 for an unsuppressed blocking finding', async () => {
