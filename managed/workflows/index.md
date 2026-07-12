@@ -161,14 +161,12 @@ tsdoc-edge explore-entrypoint managed/relationships/index.md --detect-orphans
 복원된 legacy 설계를 비교 기준선으로 사용하고, TS7 canonical graph와 LSP를
 compiler-evidence 기반 spec governance로 확장하는 구현 계획.
 
-**Tracks**:
+**Execution lanes**:
 
-- Current next: runner-neutral test evidence; P4 runtime qualification in parallel
-- Legacy/canonical differential baseline
-- ttsc capability와 analyzer 소유권 판정
-- Canonical provider와 Spec Graph 계약
-- LSP-first spec diagnostics와 CodeAction
-- 외부 TypeScript library reference pilot
+- Product: P4.1 one-command Jest evidence → naming → TSDoc → managed spec → history → LSP
+- Comparison: canonical safety + legacy baseline → capability와 analyzer 소유권 판정
+- Provider: packed early canary → 외부 TypeScript library full pilot
+- Release: Node/package clean-install qualification
 
 ---
 
@@ -179,14 +177,14 @@ compiler-evidence 기반 spec governance로 확장하는 구현 계획.
 
 TypeScript 7로 source와 test를 선컴파일하고 Jest가 JavaScript만 실행하도록 전환하는
 P4.0 구현과 검증 기록. `ts-jest` 제거, parity/coverage gate, safe serial watch와 다음
-runner-neutral evidence adapter handoff를 정의합니다.
+단일 Jest JSON evidence loader handoff를 정의합니다.
 
 **Target Flow**:
 
 1. TS7 no-emit typecheck
 2. TS7 AOT compile to `.test-dist`
 3. Jest JavaScript-only execution
-4. JavaScript-only Jest 실행과 TypeScript source-map coverage
+4. Optional Jest JSON artifact handoff
 
 ---
 

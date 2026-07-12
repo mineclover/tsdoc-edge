@@ -253,9 +253,9 @@ TS7 into `.test-dist` before Jest executes JavaScript; `ts-jest` has been remove
 `build:legacy`, `typecheck:legacy`, and `dev:legacy` lanes have been removed;
 TS5 is a runtime compatibility dependency, not a second build compiler.
 
-The repository test wiring is complete, while the release runtime matrix is still being
-qualified. Node 22 with an ABI-matched native dependency has passed the full suite repeatedly;
-macOS Node 24/V8 13.6 still shows an intermittent Jest GC crash. See
+Node 24 is the declared package and CI baseline, while its release runtime matrix is still being
+qualified. macOS Node 24/V8 13.6 still shows an intermittent Jest GC crash, so this declaration
+does not make the release gate passed. See
 `managed/workflows/ts7-test-compilation-lane.md` for the exact boundary and remaining gate.
 
 Compiler-resolved structural analysis now uses the canonical graph:

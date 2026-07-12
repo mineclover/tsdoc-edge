@@ -11,11 +11,11 @@ canonical: true
 > TypeScript 7로 source와 test를 함께 선컴파일하고, Jest는 JavaScript만 실행하게 만드는
 > `ts-jest` 제거 선행 루프
 
-**Status**: Repository wiring implemented; Node support policy and clean-install matrix pending
-**Roadmap slot**: P4.0, evidence collector 이전
+**Status**: Repository wiring implemented; Node 24 clean-install matrix pending
+**Roadmap slot**: P4.0 handoff complete; P4.1 Jest JSON loader wired
 **Primary compiler**: `ttsc` + TypeScript Native 7
 **Test runner**: Jest, JavaScript execution only
-**Last reviewed**: 2026-07-11
+**Last reviewed**: 2026-07-12
 
 ## 결정
 
@@ -45,7 +45,7 @@ test:run        -> Jest -> compiled JavaScript only
 | Test source transform | TS7 AOT emit + emitted-JS `babel-jest` mock hoist | 구현 |
 | Test TS7 project | `tsconfig.test.ttsc.json`이 source/test/setup 전체 포함 | 구현 |
 | Runtime Compiler API | source가 `typescript@5`를 직접 import | 이 루프의 비범위 |
-| Test evidence | canonical-empty revision만 사용 | 다음 runner-neutral adapter loop |
+| Test evidence | canonical-empty revision만 사용 | 다음 Jest JSON loader loop |
 
 현재 `npm test`는 TS7 no-emit typecheck, deterministic AOT compile, JavaScript-only Jest를
 순서대로 실행한다. 따라서 선택한 지원 runtime 안에서 repository-local test workflow
@@ -69,13 +69,11 @@ authority는 이 단일 경로다. 지원 runtime 자체의 qualification은 별
   repository에 넣지 않는다.
 - coverage 283개 source의 LCOV `SF:`가 모두 `src/*.ts`이며 `.test-dist` 누출은 0건이다.
 - Node 22 ABI에 맞게 `better-sqlite3`를 재빌드한 환경에서는 전체 217 suite/2,980 test가
-  통과했다. 이 결과는 TS7 AOT lane의 기능 증거지만 clean install은 아니므로 지원 runtime
-  matrix 완료 증거로 확대 해석하지 않는다. 검증 후 native addon은 현재 Node 24 ABI로
-  복원했다.
-- package는 현재 Node `>=18`을 선언하지만 locked `better-sqlite3@12.4.1`은
-  `20.x || 22.x || 23.x || 24.x`만 선언한다. Node 18을 유지할지 engines/CI를 올릴지는
-  별도 compatibility 결정이며, 이 불일치를 해소하기 전에는 Node 18 gate를 단순 미실행
-  상태로 보지 않는다.
+  통과했다. 이는 historical functionality evidence일 뿐 현재 release baseline의 qualification은
+  아니다. 검증 후 native addon은 현재 Node 24 ABI로 복원했다.
+- package와 CI baseline은 Node `>=24.0.0 <25.0.0`이다. locked
+  `better-sqlite3@12.4.1`은 Node 24를 지원한다. macOS Node 24 native crash를 재현·해소하고
+  clean install worker/in-band matrix를 통과하기 전에는 stable release를 선언하지 않는다.
 - `npm run test:watch`는 ttsc persistent watcher의 output-directory 감시 세부 동작에
   의존하지 않고 source/config 변경 뒤 one-shot compile과 one-shot Jest를 직렬 실행한다.
   실제 변경 감지, 재실행과 terminal SIGINT 종료를 smoke했다.
@@ -94,13 +92,13 @@ flowchart LR
     SOURCE --> COMPILE["ttsc / TS7 AOT"]
     COMPILE --> DIST[".test-dist JavaScript"]
     DIST --> JEST["Jest JavaScript runner"]
-    JEST --> RESULT["Jest JSON or JUnit artifact"]
-    RESULT -. "next loop" .-> ADAPTER["Runner-neutral adapter"]
+    JEST --> RESULT["Jest JSON artifact"]
+    RESULT -. "next loop" .-> ADAPTER["loadJestJsonEvidence"]
     ADAPTER -.-> EVIDENCE["EvidenceRevision"]
 ```
 
 `.test-dist`는 disposable build output이다. production `dist`와 공유하지 않고 Git에
-추적하지 않는다. Jest 결과 artifact도 evidence 자체가 아니며 다음 loop의 adapter가
+추적하지 않는다. Jest 결과 artifact도 evidence 자체가 아니며 다음 loop의 loader가
 정규화하기 전까지 runner-owned input으로 취급한다.
 
 ## 범위
@@ -114,14 +112,14 @@ flowchart LR
 - source-map과 coverage의 원본 TypeScript 경로 검증
 - legacy/current lane과 TS7 AOT lane의 full-suite parity
 - package scripts와 lockfile cutover, `ts-jest` 제거
-- 다음 evidence adapter가 읽을 runner artifact handoff 정의
+- 다음 evidence loader가 읽을 runner artifact handoff 정의
 
 ### 제외
 
 - Jest에서 Vitest 또는 Node test runner로 이전
 - legacy analyzer와 source transformer의 `typescript@5` runtime 제거
 - LSP 미저장 `GraphDelta` extractor 교체
-- Jest/JUnit/Vitest artifact의 `EvidenceRevision` 변환 구현
+- 후속 JUnit/Vitest loader 구현과 multi-runner abstraction
 - naming/style evaluator와 durable convention report history
 
 ## 구현 파일
@@ -291,23 +289,31 @@ gate를 통과한 경우에만 다른 provider 변경을 별도 결정한다.
    clean-install matrix에서 같은 test gate를 실행한다. `npm pack --dry-run`에는
    `.test-dist`가 포함되지 않아야 한다.
 
-1~5는 2026-07-11 repository wiring cutover에서 완료했다. 6은 Node 18 선언과
-`better-sqlite3@12.4.1` 지원 범위의 불일치 해소를 포함한 release gate이며, 완료 전에는 이
-문서를 platform-wide 완료로 표시하지 않는다.
+1~5는 2026-07-11 repository wiring cutover에서 완료했다. 6은 선택된 Node 24 line에서
+native crash 없이 clean-install worker/in-band matrix를 통과하는 release gate이며, 완료 전에는
+이 문서를 platform-wide 완료로 표시하지 않는다.
 
 ### Checkpoint 7 — Evidence loop handoff
 
-Cutover 이후 canonical test command는 필요할 때 Jest JSON 또는 JUnit artifact를 만든다.
-다음 loop는 다음 경계만 구현한다.
+Cutover 이후 canonical test command는 필요할 때 complete Jest JSON artifact를 만든다. 이
+문서는 runner artifact와 source-map handoff까지만 소유한다.
 
 ```text
-Jest JSON / JUnit / Vitest artifact
-  -> runner-specific, dependency-free adapter
-  -> common EvidenceRevision
+Jest JSON
+  -> loadJestJsonEvidence
+  -> in-memory EvidenceRevision
+  -> convention check
 ```
 
-Adapter는 Jest, Vitest 또는 `ts-jest` package를 import하지 않는다. artifact bytes와 adapter
-config를 fingerprint하고 workspace-relative source identity로 정규화한다.
+Handoff artifact는 run-exec/runtime error와 aggregate count 불일치를 노출하고, emitted test
+file마다 adjacent source map과 `sourcesContent`를 제공해야 한다. 불완전 artifact를 partial pass로
+소비하지 않는다. 기본 `npm test`에는 artifact 생성을 강제하지 않는다.
+
+첫 product slice의 명령은
+`tsdoc-edge convention check --pack <pack.json> --evidence <jest.json>` 하나다. Normalized
+evidence identity, status와 provenance는 [[Semantic Graph Analysis and Relationship Model]],
+CLI/exit/report 동작은 [[Convention Pack Check]], checkpoint와 보류 범위는
+[[Semantic Graph Spec Governance Roadmap]]이 소유한다.
 
 ## SWC fallback decision
 
@@ -348,13 +354,13 @@ Cutover 전 rollback은 기본 `npm test`를 그대로 유지하는 것이다. C
 - [x] `maxWorkers=2`에서 동일 217 suite/2,980 test 집합이 두 번 연속 통과했다.
 - [x] conservative compiled-output watch smoke가 통과한다.
 - [x] incomplete/stale/tampered `.test-dist`는 `test:run` 전에 거부된다.
-- [ ] Node engines/native dependency 계약을 정렬하고 지원 runtime의 worker/in-band 반복
-      clean-install matrix를 native crash 없이 통과한다.
+- [ ] Node 24 engines/native dependency 계약에서 worker/in-band 반복 clean-install matrix를
+      native crash 없이 통과한다.
 - [x] `npm test`가 typecheck → compile → run 순서로 fail-fast 실행된다.
 - [x] `ts-jest`와 parity-only legacy lane이 dependency/config/script에서 제거된다.
 - [x] `.test-dist`와 local result artifact가 clean Git status를 오염시키지 않는다.
 - [x] 잔존 `typescript@5` consumer와 후속 제거 범위가 별도로 기록된다.
-- [x] 다음 evidence adapter의 runner-package-free artifact handoff가 정의됐다.
+- [x] 다음 evidence loader의 runner-package-free artifact handoff가 정의됐다.
 
 ## 구현 후 문서 동기화
 
@@ -365,8 +371,10 @@ P4.0 구현과 같은 변경에서 다음 현재상태 문서를 갱신한다.
 - [[Build Pipeline Guide]]
 - `README.md`
 
-Evidence adapter가 실제로 구현되기 전에는 [[Convention Pack Check]]의 canonical-empty evidence
-제한을 완료형으로 바꾸지 않는다.
+P4.1은 `loadJestJsonEvidence`로 complete Jest JSON artifact를 in-memory evidence revision으로
+변환하며, source-mapped TS7 artifact를 사용한 convention CLI exact replay까지 통과했다.
+`--evidence`를 생략한 convention check만 canonical-empty evidence를 사용하며, retained history와
+다른 runner는 별도 milestone이다.
 
 ## 외부 참고
 

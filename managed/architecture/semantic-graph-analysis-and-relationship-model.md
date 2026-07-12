@@ -15,7 +15,7 @@ canonical: true
 **Reference provider**: `ttsc` + `@ttsc/graph`
 **Compatibility target**: TypeScript 7 semantics; actual compiler version is artifact-reported provenance
 **Related roadmap**: [[Semantic Graph Spec Governance Roadmap]]
-**Last reviewed**: 2026-07-11
+**Last reviewed**: 2026-07-12
 
 ## 결정
 
@@ -180,8 +180,11 @@ artifact가 반복 call-site를 이미 축약했을 가능성이 있으므로 oc
 whole-project refresh를 실행하는 orchestration은 아직 상위 제품 계층의 책임이다.
 
 현재 `CanonicalProjectGraph` v1이 `tsconfigPath`를 요구하므로 normalizer는
-`compatibilityTsconfigPath`를 전환 인자로 받는다. 이 값은 `ProviderSnapshot`에는 없으며,
-canonical envelope v2에서 제거할 compatibility bridge다.
+`compatibilityTsconfigPath`를 전환 인자로 받는다. contract v2 검토에서 `tsconfigPath`가 계속
+필요하면 이 값과 router/provider 설정을 `TypeScriptProviderConfig`의 단일 owner로 병합한다.
+`ProjectIndexer`/normalizer가 별도 설정 source를 author하거나 reconcile하지 않는다. v1 field의
+제거 여부는 packed canary의 migration proof 뒤 결정하며, 필요하면 동일 config에서 파생한
+compatibility field로 유지한다.
 
 TypeScript 7은 semantic compatibility와 fixture의 목표다. Artifact가
 `compilerVersion: null` 또는 `compilerVersionReported: false`를 제공하면 결과는
@@ -362,6 +365,16 @@ ConventionPackSource (authored JSON v1)
          └── exact revision pins
 ```
 
+현재 `ConventionPackSource` JSON은 standalone convention loop를 실행하기 위한 bootstrap
+authored input이다. Spec node와 binding을 포함하지만 project spec의 장기 authored SSOT는
+아니다. Managed-document extraction이 연결되기 전까지만 이 canary 경계를 유지하며, 같은
+spec node와 binding을 JSON과 Markdown에서 동시에 독립 authoring하지 않는다.
+
+목표 상태에서는 managed spec document가 project spec과 binding을 소유한다. Convention
+source는 policy/rule과 compiled spec revision을 조합하거나 managed source에서 생성되고,
+`ConventionPackManifest`가 exact revision을 pin한다. Portable convention definition이 자체
+spec을 제공하려면 project spec과 다른 namespace 및 installation 계약을 먼저 가져야 한다.
+
 현재 v1 source compiler는 source anchor와 provenance를 pack file의 workspace-relative real
 path와 exact byte digest에서 생성한다. Pack symlink가 workspace 밖으로 벗어나면 거부한다.
 Manifest self-hash는 content integrity이며 publisher authenticity가 아니다. 보호된 CI는
@@ -412,7 +425,7 @@ Overlay inputs
     ├── GraphDelta[]
     └── SpecDelta[]
 
-DerivedAnalysisCache (keyed by EffectiveAnalysisStamp)
+Future optional DerivedAnalysisCache (keyed by EffectiveAnalysisStamp)
 ├── derivedRelations
 └── findings
 ```
@@ -871,20 +884,22 @@ interface VerificationClaim {
     runner: string;
     runnerVersion?: string;
     environment?: string;
-    result: 'passed' | 'failed' | 'skipped';
-    executedAt: string;
+    result: 'passed' | 'failed' | 'skipped' | 'unknown';
+    executedAt?: string;
   };
   evidence: readonly SpecEvidence[];
 }
 ```
 
-Execution timestamp는 evidence이며 graph relation identity가 아니다.
+Artifact가 제공한 execution timestamp는 evidence이며 graph relation identity가 아니다.
+Artifact에 timestamp가 없으면 현재 clock으로 채우지 않는다.
 
 ## Policy revision
 
 Policy는 analyzer 내부 상수나 CLI별 설정으로 숨기지 않는다. Managed policy document와
-workspace config가 authored source이고 `PolicyRepository`에는 검증된 compiled revision을
-저장한다.
+workspace config가 authored source이고 현재 shared `AnalysisInputRevisionRepository`에는
+검증된 compiled policy revision을 exact pin으로 저장한다. 별도 `PolicyRepository`는 현재
+구조에 필요하지 않다.
 
 ```typescript
 interface PolicyRevision {
@@ -1218,17 +1233,19 @@ Spec revision identity는 node, internal edge, binding declaration, semantic pro
 포함한다. 사람이 보는 semver/lifecycle version과 repository snapshot revision을
 동일 개념으로 합치지 않는다.
 
-Managed spec document가 authored SSOT다. `SpecGraphRepository`는 document extraction의
-검증된 compiled projection과 revision index이며 사람이 repository row를 직접 편집하지
-않는다. CodeAction도 managed document를 수정한 뒤 새 spec revision을 추출한다.
+목표 상태에서 managed spec document가 project spec과 binding의 유일한 authored SSOT다.
+현재 v1 JSON convention source는 managed-document extraction이 연결되기 전의 bootstrap
+입력이다. `SpecGraphRepository`는 어느 authored source에서 왔든 검증된 compiled projection과
+revision index일 뿐이며 사람이 row를 직접 편집하지 않는다. CodeAction도 repository가 아니라
+managed document를 수정한 뒤 새 spec revision을 추출한다.
 
 ### Evidence와 enrichment revision
 
 Test discovery/execution 결과는 `EvidenceRevision`, TSDoc·document symbol·ownership·endpoint
 index는 `EnrichmentRevision`으로 고정한다. 둘 다 source store의 immutable compiled
-projection이며 effective analysis에 사용된 revision ID가 stamp에 포함된다. Test 실행
-시각은 evidence payload지만 revision identity는 normalized result와 runner provenance로
-계산한다.
+projection이며 effective analysis에 사용된 revision ID가 stamp에 포함된다. Artifact가 제공한
+test 실행 시각은 item/declaration ID에는 포함하지 않지만 evidence revision content와 그
+revision을 소비하는 derived result ID에는 포함한다. 현재 clock으로 누락값을 채우지 않는다.
 
 Evidence 입력은 revision ID만 비교하지 않고 canonical content fingerprint를 재계산해
 검증한다. Evidence/API resolver index는 snapshot에 고정된 동일
@@ -1236,6 +1253,32 @@ Evidence 입력은 revision ID만 비교하지 않고 canonical content fingerpr
 evidence revision과 producer/file/testName/runner metadata가 현재 evidence item과 일치해야
 한다. Verification resolution은 이 revision을 명시적으로 pin하며 stale 또는 forged
 evidence ref는 conformance 전에 거부한다.
+
+Test endpoint의 구조적 해석과 실행 결과는 섞지 않는다. Exact endpoint가 resolve된 뒤
+`passed`는 `satisfied`, `failed`는 `violated`, `skipped`와 `unknown`은 `indeterminate`로
+평가한다. 필수 obligation/verifier/subject 중 하나라도 ambiguous 또는 stale이면 우선
+`indeterminate`다. 그런 participant가 없고 하나라도 missing이면 `violated`다. Status는 endpoint
+ref에 보존하고 snapshot의 exact evidence item과 다시 대조한다.
+
+이 의미 변경은 resolver, conformance engine, `binding.verification` rule contract와 convention
+pack compiler identity를 `2.0.0`으로 올린다. Compiler는 지원하는 `(ruleId, version)` 조합만
+허용한다. `EvidenceRevision` source contract에는 status가 이미 있으므로 `1.0`을 유지하고,
+gate threshold 알고리즘도 바뀌지 않으므로 gate evaluator version은 유지한다.
+
+첫 Jest evidence slice는 artifact에서 `EvidenceRevision`을 메모리로 만들어 check에 직접
+전달한다. 별도 import workflow나 active evidence pointer를 만들지 않는다. 절대 경로를 제거한
+test result, loader version, source-map mapping과 authored source digest로 `sourceFingerprint`를
+만든다. `AnalysisInputRevisionRepository` kernel은 이미 존재하지만 첫 slice의 product path에는
+연결하지 않는다. P4.5 durable history에서 retained input으로 연결해도 effective analysis와
+conformance 계약은 바뀌지 않는다.
+
+Jest raw status는 `pending`/`todo`/`disabled`/`skipped`를 `skipped`, `focused`를 `unknown`으로
+정규화한다. 다른 새 문자열과 incomplete aggregate는 input error다. 동일 authored source와
+full test name의 중복은 순서나 clock으로 구분하지 않고 거부한다. Jest artifact에 subject
+mapping이 없으면 `subjectFiles: []`를 사용한다. Runner version이 미보고면 item provenance의
+producer version은 `unreported`로 두고 설치 dependency에서 추론하지 않는다. Revision
+provenance는 loader ID/version을 별도로 가진다. Artifact clock이 epoch millisecond라면 유효한
+finite value인지 확인한 뒤 UTC RFC3339/ISO string으로 정규화한다.
 
 Spec/evidence/enrichment/policy revision에도 code revision과 같은 pin/retention/GC 원칙을
 적용한다. 하나의 `EffectiveAnalysisStamp`가 참조하는 입력 중 하나만 선택적으로
@@ -1246,13 +1289,11 @@ Spec/evidence/enrichment/policy revision에도 code revision과 같은 pin/reten
 | Store | 저장 대상 | 권위 |
 | --- | --- | --- |
 | `GraphRepository` | canonical code revision, aliases, diagnostics | canonical code projection SSOT |
-| Managed spec documents | spec, obligation, decision, binding declaration | authored spec SSOT |
+| Managed spec documents | spec, obligation, decision, binding declaration | target authored spec SSOT; 현재 v1 bootstrap은 workspace JSON |
 | `SpecGraphRepository` | spec node, internal edge, binding declaration revision | compiled projection/index |
-| `EvidenceStore` | test mapping, execution claim, runner provenance | versioned evidence projection |
-| `EnrichmentRepository` | TSDoc, document symbol, ownership, endpoint index | versioned enrichment projection |
-| `PolicyRepository` | rule, suppression, severity policy revision | compiled policy projection |
-| 향후 `BindingResolutionCache` | effective view별 resolved binding; restore payload는 untrusted이며 snapshot 재검증 필수 | 현재 미구현, 재계산 가능 |
-| `DerivedAnalysisCache` | derived relation, finding, coverage, impact | 재계산 가능 |
+| `AnalysisInputRevisionRepository` | evidence, enrichment, policy exact revision | 구현된 shared store kernel; P4.1 check에는 미연결, P4.5 retained input에 사용 |
+| Process-local effective view | overlay, snapshot, binding resolution set | 비영속 derived value; pinned input에서 재계산 |
+| 향후 append-only result history | check, report, gate envelope와 exact input pin | P4.5 planned derived history; read 시 identity 재검증 |
 | Legacy DB | differential baseline 및 migration 중 enrichment | 신규 kernel SSOT 아님 |
 
 모든 plane을 `unified_relationships` 하나에 다시 합치지 않는다.
