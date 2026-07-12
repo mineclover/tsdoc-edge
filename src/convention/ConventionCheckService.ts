@@ -280,8 +280,12 @@ function validateGraphNamespace(
   const required = manifest.graphNamespace;
   const observed = textValue(codeRevision.graph.provenance.graphNamespace);
   if (required && required !== observed) {
+    const refreshCommand =
+      `tsdoc-edge build src --canonical-graph --graph-namespace=${required} ` +
+      '--router-module=<artifact-source>';
     throw new Error(
-      `Convention pack graph namespace mismatch: expected ${required}, received ${observed ?? '<none>'}`
+      `Convention pack graph namespace mismatch: expected ${required}, received ${observed ?? '<none>'}. ` +
+        `Refresh the canonical graph with: ${refreshCommand}`
     );
   }
 }

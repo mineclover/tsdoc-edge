@@ -247,6 +247,24 @@ describe('ConventionCheckService', () => {
     ).toThrow('graph root mismatch');
   });
 
+  it('explains how to refresh a mismatched graph namespace', () => {
+    const pack = compileConventionPackSource(fixturePackSource(), context);
+    const graph = fixtureGraph();
+
+    expect(() =>
+      new ConventionCheckService().run({
+        pack,
+        workspaceRoot: '/fixture',
+        codeRevision: activeRevision({
+          ...graph,
+          provenance: { ...graph.provenance, graphNamespace: 'fixture/stale' },
+        }),
+      })
+    ).toThrow(
+      'build src --canonical-graph --graph-namespace=fixture/provider --router-module=<artifact-source>'
+    );
+  });
+
   it('accepts only repository-materialized graph revisions and honors a manifest lock', () => {
     const pack = compileConventionPackSource(fixturePackSource(), context);
     const revision = activeRevision();
