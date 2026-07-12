@@ -82,14 +82,22 @@ export class FileReferenceUpdater {
    * @param newPath - New file path (optional, for calculating new text)
    * @returns Array of file references found
    */
-  async findReferences(oldPath: string, baseDir: string, newPath?: string): Promise<FileReference[]> {
+  async findReferences(
+    oldPath: string,
+    baseDir: string,
+    newPath?: string
+  ): Promise<FileReference[]> {
     const references: FileReference[] = [];
 
     // Normalize paths
     const absoluteOldPath = path.isAbsolute(oldPath) ? oldPath : path.resolve(baseDir, oldPath);
     const relativeOldPath = path.relative(baseDir, absoluteOldPath);
 
-    const absoluteNewPath = newPath ? (path.isAbsolute(newPath) ? newPath : path.resolve(baseDir, newPath)) : undefined;
+    const absoluteNewPath = newPath
+      ? path.isAbsolute(newPath)
+        ? newPath
+        : path.resolve(baseDir, newPath)
+      : undefined;
     const relativeNewPath = absoluteNewPath ? path.relative(baseDir, absoluteNewPath) : undefined;
 
     // Get all markdown files
@@ -106,7 +114,11 @@ export class FileReferenceUpdater {
           const lineNum = i + 1;
 
           // Find backlink references: → /path/to/file.md
-          const backlinkMatches = this.findBacklinkReferences(line, relativeOldPath, absoluteOldPath);
+          const backlinkMatches = this.findBacklinkReferences(
+            line,
+            relativeOldPath,
+            absoluteOldPath
+          );
           for (const match of backlinkMatches) {
             const ref: FileReference = {
               file,
@@ -118,7 +130,14 @@ export class FileReferenceUpdater {
               lineContent: line,
             };
             if (newPath && relativeNewPath && absoluteNewPath) {
-              ref.newText = this.calculateNewText(ref, relativeOldPath, relativeNewPath, absoluteOldPath, absoluteNewPath, baseDir);
+              ref.newText = this.calculateNewText(
+                ref,
+                relativeOldPath,
+                relativeNewPath,
+                absoluteOldPath,
+                absoluteNewPath,
+                baseDir
+              );
             }
             references.push(ref);
           }
@@ -136,7 +155,14 @@ export class FileReferenceUpdater {
               lineContent: line,
             };
             if (newPath && relativeNewPath && absoluteNewPath) {
-              ref.newText = this.calculateNewText(ref, relativeOldPath, relativeNewPath, absoluteOldPath, absoluteNewPath, baseDir);
+              ref.newText = this.calculateNewText(
+                ref,
+                relativeOldPath,
+                relativeNewPath,
+                absoluteOldPath,
+                absoluteNewPath,
+                baseDir
+              );
             }
             references.push(ref);
           }
@@ -154,13 +180,24 @@ export class FileReferenceUpdater {
               lineContent: line,
             };
             if (newPath && relativeNewPath && absoluteNewPath) {
-              ref.newText = this.calculateNewText(ref, relativeOldPath, relativeNewPath, absoluteOldPath, absoluteNewPath, baseDir);
+              ref.newText = this.calculateNewText(
+                ref,
+                relativeOldPath,
+                relativeNewPath,
+                absoluteOldPath,
+                absoluteNewPath,
+                baseDir
+              );
             }
             references.push(ref);
           }
 
           // Find markdown links: [text](path)
-          const markdownMatches = this.findMarkdownLinkReferences(line, relativeOldPath, absoluteOldPath);
+          const markdownMatches = this.findMarkdownLinkReferences(
+            line,
+            relativeOldPath,
+            absoluteOldPath
+          );
           for (const match of markdownMatches) {
             const ref: FileReference = {
               file,
@@ -172,7 +209,14 @@ export class FileReferenceUpdater {
               lineContent: line,
             };
             if (newPath && relativeNewPath && absoluteNewPath) {
-              ref.newText = this.calculateNewText(ref, relativeOldPath, relativeNewPath, absoluteOldPath, absoluteNewPath, baseDir);
+              ref.newText = this.calculateNewText(
+                ref,
+                relativeOldPath,
+                relativeNewPath,
+                absoluteOldPath,
+                absoluteNewPath,
+                baseDir
+              );
             }
             references.push(ref);
           }
@@ -214,13 +258,24 @@ export class FileReferenceUpdater {
     }
 
     // Calculate new text for each reference
-    const absoluteOldPath = path.isAbsolute(oldPath) ? oldPath : path.resolve(options.baseDir, oldPath);
-    const absoluteNewPath = path.isAbsolute(newPath) ? newPath : path.resolve(options.baseDir, newPath);
+    const absoluteOldPath = path.isAbsolute(oldPath)
+      ? oldPath
+      : path.resolve(options.baseDir, oldPath);
+    const absoluteNewPath = path.isAbsolute(newPath)
+      ? newPath
+      : path.resolve(options.baseDir, newPath);
     const relativeOldPath = path.relative(options.baseDir, absoluteOldPath);
     const relativeNewPath = path.relative(options.baseDir, absoluteNewPath);
 
     for (const ref of references) {
-      ref.newText = this.calculateNewText(ref, relativeOldPath, relativeNewPath, absoluteOldPath, absoluteNewPath, options.baseDir);
+      ref.newText = this.calculateNewText(
+        ref,
+        relativeOldPath,
+        relativeNewPath,
+        absoluteOldPath,
+        absoluteNewPath,
+        options.baseDir
+      );
     }
 
     // Group references by file
@@ -229,7 +284,7 @@ export class FileReferenceUpdater {
       if (!refsByFile.has(ref.file)) {
         refsByFile.set(ref.file, []);
       }
-      refsByFile.get(ref.file)!.push(ref);
+      refsByFile.get(ref.file)?.push(ref);
     }
 
     // Update each file
@@ -296,11 +351,7 @@ export class FileReferenceUpdater {
     const basename = path.basename(relativeOldPath);
 
     // Pattern: Path: file.md or (file.md) or **Path**: `file.md`
-    const patterns = [
-      /Path:\s*([^\s\)]+\.md)/gi,
-      /\(([^\)]+\.md)\)/g,
-      /`([^`]+\.md)`/g,
-    ];
+    const patterns = [/Path:\s*([^\s)]+\.md)/gi, /\(([^)]+\.md)\)/g, /`([^`]+\.md)`/g];
 
     for (const pattern of patterns) {
       let match;
@@ -325,12 +376,12 @@ export class FileReferenceUpdater {
     line: string,
     currentFile: string,
     targetPath: string,
-    baseDir: string
+    _baseDir: string
   ): Array<{ text: string; column: number }> {
     const matches: Array<{ text: string; column: number }> = [];
 
     // Pattern: ../path/file.md or ./file.md
-    const relativePattern = /(\.\.[\/\\][\w\-\/\\]+\.md|\.[\/\\][\w\-\/\\]+\.md)/g;
+    const relativePattern = /(\.\.[/\\][\w\-/\\]+\.md|\.[/\\][\w\-/\\]+\.md)/g;
     let match;
 
     while ((match = relativePattern.exec(line)) !== null) {
@@ -360,7 +411,7 @@ export class FileReferenceUpdater {
     const matches: Array<{ text: string; column: number }> = [];
 
     // Pattern: [text](path.md)
-    const markdownLinkPattern = /\[([^\]]+)\]\(([^\)]+\.md)\)/g;
+    const markdownLinkPattern = /\[([^\]]+)\]\(([^)]+\.md)\)/g;
     let match;
 
     while ((match = markdownLinkPattern.exec(line)) !== null) {
@@ -383,9 +434,9 @@ export class FileReferenceUpdater {
     ref: FileReference,
     relativeOldPath: string,
     relativeNewPath: string,
-    absoluteOldPath: string,
+    _absoluteOldPath: string,
     absoluteNewPath: string,
-    baseDir: string
+    _baseDir: string
   ): string {
     const basename = path.basename(relativeNewPath);
 
@@ -420,11 +471,8 @@ export class FileReferenceUpdater {
   /**
    * Update references in a single file
    */
-  private async updateFileReferences(
-    file: string,
-    references: FileReference[]
-  ): Promise<number> {
-    let content = fs.readFileSync(file, 'utf-8');
+  private async updateFileReferences(file: string, references: FileReference[]): Promise<number> {
+    const content = fs.readFileSync(file, 'utf-8');
     let updated = 0;
 
     // Sort by line and column (descending) to avoid offset issues

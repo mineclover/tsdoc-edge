@@ -2,9 +2,9 @@
  * Debug why relationship creation rate is low
  */
 
-import { DatabaseManager } from '../src/storage/DatabaseManager';
-import { ConfigManager } from '../src/config/ConfigManager';
 import { TestExampleExtractor } from '../src/analyzer/TestExampleExtractor';
+import { ConfigManager } from '../src/config/ConfigManager';
+import { DatabaseManager } from '../src/storage/DatabaseManager';
 
 async function main() {
   const config = ConfigManager.getInstance().get();
@@ -22,7 +22,7 @@ async function main() {
   console.log(`Total symbols in DB: ${allSymbols.length}\n`);
 
   // Create symbol ID set for quick lookup
-  const symbolIds = new Set(allSymbols.map(s => s.id));
+  const symbolIds = new Set(allSymbols.map((s) => s.id));
 
   // Analyze matching
   let examplesWithMatches = 0;
@@ -58,7 +58,7 @@ async function main() {
   console.log(`Examples without any matches: ${examplesWithoutMatches}`);
   console.log(`Total identified symbols: ${totalIdentified}`);
   console.log(`Total matched symbols: ${totalMatches}`);
-  console.log(`Match rate: ${(totalMatches / totalIdentified * 100).toFixed(1)}%\n`);
+  console.log(`Match rate: ${((totalMatches / totalIdentified) * 100).toFixed(1)}%\n`);
 
   // Show top unmatched symbols
   console.log('🔴 Top 30 Unmatched Symbol Patterns:');
@@ -94,7 +94,7 @@ async function main() {
   console.log('─'.repeat(80));
 
   const sampleSymbols = allSymbols
-    .filter(s => s.type === 'class' || s.type === 'method')
+    .filter((s) => s.type === 'class' || s.type === 'method')
     .slice(0, 20);
 
   for (const symbol of sampleSymbols) {

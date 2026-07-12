@@ -2,12 +2,12 @@
  * CallGraphAnalyzer Tests
  */
 
-import * as ts from 'typescript';
-import * as path from 'node:path';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import * as ts from 'typescript';
 import { CallGraphAnalyzer } from '../../analyzer/CallGraphAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships';
 
 describe('CallGraphAnalyzer', () => {
@@ -136,9 +136,7 @@ describe('CallGraphAnalyzer', () => {
     });
 
     it('should return empty array when graph has no function/method symbols', () => {
-      const graph = createMockGraph([
-        { id: 'class-myclass', name: 'MyClass', type: 'class' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-myclass', name: 'MyClass', type: 'class' }]);
 
       const program = createProgram({
         'MyClass.ts': `
@@ -177,10 +175,7 @@ describe('CallGraphAnalyzer', () => {
       const result = analyzer.analyze();
 
       const callRel = result.find(
-        (r) =>
-          r.type === 'calls' &&
-          r.from === 'func-caller' &&
-          r.to === 'func-helper'
+        (r) => r.type === 'calls' && r.from === 'func-caller' && r.to === 'func-helper'
       );
 
       expect(callRel).toBeDefined();
@@ -213,12 +208,8 @@ describe('CallGraphAnalyzer', () => {
       const analyzer = new CallGraphAnalyzer(graph, program);
       const result = analyzer.analyze();
 
-      const callA = result.find(
-        (r) => r.from === 'func-main' && r.to === 'func-a'
-      );
-      const callB = result.find(
-        (r) => r.from === 'func-main' && r.to === 'func-b'
-      );
+      const callA = result.find((r) => r.from === 'func-main' && r.to === 'func-a');
+      const callB = result.find((r) => r.from === 'func-main' && r.to === 'func-b');
 
       expect(callA).toBeDefined();
       expect(callB).toBeDefined();
@@ -248,9 +239,7 @@ describe('CallGraphAnalyzer', () => {
       const analyzer = new CallGraphAnalyzer(graph, program);
       const result = analyzer.analyze();
 
-      const callRel = result.find(
-        (r) => r.from === 'func-caller' && r.to === 'func-target'
-      );
+      const callRel = result.find((r) => r.from === 'func-caller' && r.to === 'func-target');
 
       expect(callRel).toBeDefined();
       expect(callRel?.properties?.frequency).toBe(5);
@@ -263,7 +252,13 @@ describe('CallGraphAnalyzer', () => {
       const filePath = path.join(tempDir, 'method.ts');
       const graph = createMockGraph([
         { id: 'func-caller', name: 'caller', type: 'function', filePath, line: 9 },
-        { id: 'method-myclass.process', name: 'MyClass.process', type: 'method', filePath, line: 3 },
+        {
+          id: 'method-myclass.process',
+          name: 'MyClass.process',
+          type: 'method',
+          filePath,
+          line: 3,
+        },
       ]);
 
       const program = createProgram({
@@ -284,9 +279,7 @@ describe('CallGraphAnalyzer', () => {
       const result = analyzer.analyze();
 
       const callRel = result.find(
-        (r) =>
-          r.from === 'func-caller' &&
-          r.properties?.callType === 'method'
+        (r) => r.from === 'func-caller' && r.properties?.callType === 'method'
       );
 
       expect(callRel).toBeDefined();
@@ -389,8 +382,20 @@ describe('CallGraphAnalyzer', () => {
       const filePath = path.join(tempDir, 'caller.ts');
       const graph = createMockGraph([
         { id: 'func-caller', name: 'caller', type: 'function', filePath, line: 2 },
-        { id: 'func-imported', name: 'imported', type: 'function', filePath: '/other.ts', isExported: true },
-        { id: 'func-internal', name: 'imported', type: 'function', filePath: '/internal.ts', isExported: false },
+        {
+          id: 'func-imported',
+          name: 'imported',
+          type: 'function',
+          filePath: '/other.ts',
+          isExported: true,
+        },
+        {
+          id: 'func-internal',
+          name: 'imported',
+          type: 'function',
+          filePath: '/internal.ts',
+          isExported: false,
+        },
       ]);
 
       const program = createProgram({
@@ -435,9 +440,7 @@ describe('CallGraphAnalyzer', () => {
       const result = analyzer.analyze();
 
       // Should only have one relationship, but with frequency 3
-      const callRels = result.filter(
-        (r) => r.from === 'func-caller' && r.to === 'func-target'
-      );
+      const callRels = result.filter((r) => r.from === 'func-caller' && r.to === 'func-target');
 
       expect(callRels).toHaveLength(1);
       expect(callRels[0].properties?.frequency).toBe(3);
@@ -670,7 +673,14 @@ describe('CallGraphAnalyzer', () => {
       const graph = createMockGraph([
         { id: 'func-caller', name: 'caller', type: 'function', filePath, line: 5 },
         { id: 'func-local', name: 'local', type: 'function', filePath, line: 2, isExported: false },
-        { id: 'func-exported', name: 'exported', type: 'function', filePath, line: 3, isExported: true },
+        {
+          id: 'func-exported',
+          name: 'exported',
+          type: 'function',
+          filePath,
+          line: 3,
+          isExported: true,
+        },
       ]);
 
       const program = createProgram({
@@ -745,9 +755,7 @@ describe('CallGraphAnalyzer', () => {
       const result = analyzer.analyze();
 
       // Should detect self-call
-      const selfCall = result.find(
-        (r) => r.from === 'func-factorial' && r.to === 'func-factorial'
-      );
+      const selfCall = result.find((r) => r.from === 'func-factorial' && r.to === 'func-factorial');
 
       expect(selfCall).toBeDefined();
     });
@@ -774,12 +782,8 @@ describe('CallGraphAnalyzer', () => {
       const analyzer = new CallGraphAnalyzer(graph, program);
       const result = analyzer.analyze();
 
-      const callInner = result.find(
-        (r) => r.from === 'func-outer' && r.to === 'func-inner'
-      );
-      const callDeep = result.find(
-        (r) => r.from === 'func-outer' && r.to === 'func-deep'
-      );
+      const callInner = result.find((r) => r.from === 'func-outer' && r.to === 'func-inner');
+      const callDeep = result.find((r) => r.from === 'func-outer' && r.to === 'func-deep');
 
       expect(callInner).toBeDefined();
       expect(callDeep).toBeDefined();
@@ -808,9 +812,7 @@ describe('CallGraphAnalyzer', () => {
       const result = analyzer.analyze();
 
       // Should detect the call from caller to helper
-      const callRel = result.find(
-        (r) => r.from === 'method-myclass.caller'
-      );
+      const _callRel = result.find((r) => r.from === 'method-myclass.caller');
 
       // The method call should be detected
       expect(result.length).toBeGreaterThanOrEqual(0);
@@ -836,9 +838,7 @@ describe('CallGraphAnalyzer', () => {
       const analyzer = new CallGraphAnalyzer(graph, program);
       const result = analyzer.analyze();
 
-      const callRel = result.find(
-        (r) => r.from === 'func-caller' && r.to === 'func-target'
-      );
+      const callRel = result.find((r) => r.from === 'func-caller' && r.to === 'func-target');
 
       expect(callRel).toBeDefined();
     });
@@ -903,7 +903,13 @@ describe('CallGraphAnalyzer', () => {
       const filePath = path.join(tempDir, 'qualified.ts');
       const graph = createMockGraph([
         { id: 'func-caller', name: 'caller', type: 'function', filePath, line: 7 },
-        { id: 'method-service.process', name: 'Service.process', type: 'method', filePath, line: 3 },
+        {
+          id: 'method-service.process',
+          name: 'Service.process',
+          type: 'method',
+          filePath,
+          line: 3,
+        },
       ]);
 
       const program = createProgram({
@@ -923,9 +929,7 @@ describe('CallGraphAnalyzer', () => {
       const result = analyzer.analyze();
 
       // Method call should be detected
-      const methodCall = result.find(
-        (r) => r.properties?.callType === 'method'
-      );
+      const methodCall = result.find((r) => r.properties?.callType === 'method');
 
       expect(methodCall).toBeDefined();
     });
@@ -934,7 +938,13 @@ describe('CallGraphAnalyzer', () => {
       const filePath = path.join(tempDir, 'endswith.ts');
       const graph = createMockGraph([
         { id: 'func-caller', name: 'caller', type: 'function', filePath, line: 7 },
-        { id: 'method-module.service.run', name: 'Module.Service.run', type: 'method', filePath, line: 3 },
+        {
+          id: 'method-module.service.run',
+          name: 'Module.Service.run',
+          type: 'method',
+          filePath,
+          line: 3,
+        },
       ]);
 
       const program = createProgram({

@@ -6,8 +6,6 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type { Symbol } from '../types/graph';
-import type { EnhancedSymbolDoc } from '../types/tags';
 
 /**
  * Validation result for a single document
@@ -65,10 +63,7 @@ export class GeneratedDocsValidator {
   /**
    * Required sections for enhanced documentation
    */
-  private readonly requiredSections = [
-    'Problem Solving',
-    'Functionality'
-  ];
+  private readonly requiredSections = ['Problem Solving', 'Functionality'];
 
   /**
    * Optional sections
@@ -77,7 +72,7 @@ export class GeneratedDocsValidator {
     'Error Experiences',
     'Decisions',
     'Dependencies',
-    'Future Plans'
+    'Future Plans',
   ];
 
   /**
@@ -94,7 +89,7 @@ export class GeneratedDocsValidator {
       warnings: [],
       sections: [],
       missingSections: [],
-      hasMetadata: false
+      hasMetadata: false,
     };
 
     if (!fs.existsSync(filePath)) {
@@ -116,7 +111,9 @@ export class GeneratedDocsValidator {
       // Check if symbol name matches filename
       const fileName = path.basename(filePath, '.md');
       if (result.symbolName !== fileName) {
-        result.warnings.push(`Symbol name "${result.symbolName}" does not match filename "${fileName}"`);
+        result.warnings.push(
+          `Symbol name "${result.symbolName}" does not match filename "${fileName}"`
+        );
       }
     }
 
@@ -126,7 +123,7 @@ export class GeneratedDocsValidator {
 
     // Check required sections
     for (const required of this.requiredSections) {
-      const found = detectedSections.some(s => s.includes(required));
+      const found = detectedSections.some((s) => s.includes(required));
       if (!found) {
         result.missingSections.push(required);
         result.isValid = false;
@@ -204,9 +201,9 @@ export class GeneratedDocsValidator {
     withWarnings: number;
     averageSections: number;
   } {
-    const valid = results.filter(r => r.isValid).length;
-    const withErrors = results.filter(r => r.errors.length > 0).length;
-    const withWarnings = results.filter(r => r.warnings.length > 0).length;
+    const valid = results.filter((r) => r.isValid).length;
+    const withErrors = results.filter((r) => r.errors.length > 0).length;
+    const withWarnings = results.filter((r) => r.warnings.length > 0).length;
     const totalSections = results.reduce((sum, r) => sum + r.sections.length, 0);
 
     return {
@@ -215,7 +212,7 @@ export class GeneratedDocsValidator {
       invalid: results.length - valid,
       withErrors,
       withWarnings,
-      averageSections: results.length > 0 ? totalSections / results.length : 0
+      averageSections: results.length > 0 ? totalSections / results.length : 0,
     };
   }
 
@@ -256,14 +253,14 @@ export class GeneratedDocsValidator {
     }
 
     // Required sections (40 points total, 20 each)
-    const requiredFound = this.requiredSections.filter(req =>
-      result.sections.some(s => s.includes(req))
+    const requiredFound = this.requiredSections.filter((req) =>
+      result.sections.some((s) => s.includes(req))
     ).length;
     score += (requiredFound / this.requiredSections.length) * 40;
 
     // Optional sections (30 points total)
-    const optionalFound = this.optionalSections.filter(opt =>
-      result.sections.some(s => s.includes(opt))
+    const optionalFound = this.optionalSections.filter((opt) =>
+      result.sections.some((s) => s.includes(opt))
     ).length;
     score += (optionalFound / this.optionalSections.length) * 30;
 

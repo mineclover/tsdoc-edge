@@ -3,7 +3,6 @@
  * @packageDocumentation
  */
 
-export { UsageTracker } from './UsageTracker';
 export type {
   AnalyticsConfig,
   CommandUsageEvent,
@@ -11,3 +10,4 @@ export type {
   UsageReportOptions,
   UsageStatistics,
 } from '../types/analytics';
+export { UsageTracker } from './UsageTracker';

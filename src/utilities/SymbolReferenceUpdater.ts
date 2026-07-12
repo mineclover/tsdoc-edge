@@ -100,7 +100,11 @@ export class SymbolReferenceUpdater {
    * @param newSymbol - New symbol name (optional, for calculating new text)
    * @returns Array of symbol references found
    */
-  async findReferences(oldSymbol: string, baseDir: string, newSymbol?: string): Promise<SymbolReference[]> {
+  async findReferences(
+    oldSymbol: string,
+    baseDir: string,
+    newSymbol?: string
+  ): Promise<SymbolReference[]> {
     const references: SymbolReference[] = [];
 
     // Get all markdown files
@@ -253,7 +257,7 @@ export class SymbolReferenceUpdater {
       if (!refsByFile.has(ref.file)) {
         refsByFile.set(ref.file, []);
       }
-      refsByFile.get(ref.file)!.push(ref);
+      refsByFile.get(ref.file)?.push(ref);
     }
 
     // Update each file
@@ -292,11 +296,8 @@ export class SymbolReferenceUpdater {
   /**
    * Update references in a single file
    */
-  private async updateFileReferences(
-    file: string,
-    references: SymbolReference[]
-  ): Promise<number> {
-    let content = fs.readFileSync(file, 'utf-8');
+  private async updateFileReferences(file: string, references: SymbolReference[]): Promise<number> {
+    const content = fs.readFileSync(file, 'utf-8');
     let updated = 0;
 
     // Sort by line and column (descending) to avoid offset issues

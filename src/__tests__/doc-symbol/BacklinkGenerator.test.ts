@@ -6,7 +6,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { BacklinkGenerator } from '../../doc-symbol/BacklinkGenerator';
 import { DocumentSymbolRegistry } from '../../doc-symbol/DocumentSymbolRegistry';
-import type { DocumentSymbol, CodeConnection } from '../../types/feature';
+import type { CodeConnection, DocumentSymbol } from '../../types/feature';
 
 describe('BacklinkGenerator', () => {
   let tempDir: string;
@@ -31,7 +31,7 @@ describe('BacklinkGenerator', () => {
   });
 
   beforeEach(() => {
-    tempDir = path.join(process.cwd(), '.test-temp', 'backlink-test-' + Math.random());
+    tempDir = path.join(process.cwd(), '.test-temp', `backlink-test-${Math.random()}`);
     fs.mkdirSync(tempDir, { recursive: true });
     registry = new DocumentSymbolRegistry();
     generator = new BacklinkGenerator(registry);

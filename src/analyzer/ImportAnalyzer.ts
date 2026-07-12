@@ -47,12 +47,7 @@ export class ImportAnalyzer {
    * @returns Analysis result containing all imports
    */
   analyzeImports(sourceCode: string): ImportAnalysisResult {
-    const sourceFile = ts.createSourceFile(
-      'temp.ts',
-      sourceCode,
-      ts.ScriptTarget.Latest,
-      true
-    );
+    const sourceFile = ts.createSourceFile('temp.ts', sourceCode, ts.ScriptTarget.Latest, true);
 
     const imports: ImportedSymbol[] = [];
     const importMap = new Map<string, ImportedSymbol>();
@@ -105,9 +100,7 @@ export class ImportAnalyzer {
       if (ts.isNamedImports(namedBindings)) {
         for (const element of namedBindings.elements) {
           const localName = element.name.text;
-          const exportedName = element.propertyName
-            ? element.propertyName.text
-            : localName;
+          const exportedName = element.propertyName ? element.propertyName.text : localName;
 
           const importedSymbol: ImportedSymbol = {
             localName,

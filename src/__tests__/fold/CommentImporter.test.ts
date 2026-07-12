@@ -283,7 +283,7 @@ export function test(x: number): number {
       // Create importer and parse to get hash
       const tempExporter = new (require('../../fold/CommentExporter').CommentExporter)();
       const comments = tempExporter.extractComments(filePath, sourceCode);
-      const hash = comments[0].contentHash;
+      const _hash = comments[0].contentHash;
 
       const fileState = {
         filePath,

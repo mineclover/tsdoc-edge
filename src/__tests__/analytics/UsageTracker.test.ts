@@ -24,7 +24,7 @@ describe('UsageTracker', () => {
   });
 
   beforeEach(() => {
-    tempDir = path.join(process.cwd(), '.test-temp', 'analytics-test-' + Math.random());
+    tempDir = path.join(process.cwd(), '.test-temp', `analytics-test-${Math.random()}`);
     tracker = new UsageTracker({
       enabled: true,
       storagePath: tempDir,
@@ -45,7 +45,7 @@ describe('UsageTracker', () => {
     });
 
     it('should not create directory if disabled', () => {
-      const disabledDir = path.join(process.cwd(), '.test-temp', 'disabled-test-' + Math.random());
+      const disabledDir = path.join(process.cwd(), '.test-temp', `disabled-test-${Math.random()}`);
       new UsageTracker({ enabled: false, storagePath: disabledDir });
       expect(fs.existsSync(disabledDir)).toBe(false);
     });
@@ -70,7 +70,7 @@ describe('UsageTracker', () => {
 
     it('should record multiple events', () => {
       for (let i = 0; i < 5; i++) {
-        tracker.recordEvent(createEvent({ command: 'cmd-' + i, duration: 100 + i }));
+        tracker.recordEvent(createEvent({ command: `cmd-${i}`, duration: 100 + i }));
       }
       const events = tracker.getEvents();
       expect(events).toHaveLength(5);
@@ -139,7 +139,8 @@ describe('UsageTracker', () => {
     });
 
     it('should limit results', () => {
-      for (let i = 0; i < 10; i++) tracker.recordEvent(createEvent({ command: 'error', success: false }));
+      for (let i = 0; i < 10; i++)
+        tracker.recordEvent(createEvent({ command: 'error', success: false }));
       const errors = tracker.getRecentErrors(5);
       expect(errors).toHaveLength(5);
     });

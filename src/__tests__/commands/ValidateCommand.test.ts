@@ -4,8 +4,8 @@
 
 import * as fs from 'node:fs';
 import { ValidateCommand } from '../../commands/ValidateCommand';
-import { DatabaseManager } from '../../storage/DatabaseManager';
 import { SymbolGraphBuilder } from '../../graph/SymbolGraphBuilder';
+import type { DatabaseManager } from '../../storage/DatabaseManager';
 import { ConnectivityValidator } from '../../validator/ConnectivityValidator';
 
 // Mock modules
@@ -39,7 +39,9 @@ describe('ValidateCommand', () => {
     mockGraphBuilder.addSymbol = jest.fn();
     mockGraphBuilder.addRelationship = jest.fn();
 
-    mockValidator = new ConnectivityValidator(mockGraphBuilder) as jest.Mocked<ConnectivityValidator>;
+    mockValidator = new ConnectivityValidator(
+      mockGraphBuilder
+    ) as jest.Mocked<ConnectivityValidator>;
     mockValidator.generateDetailedReport = jest.fn().mockReturnValue({
       score: 100,
       issues: [],

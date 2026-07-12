@@ -3,8 +3,8 @@
  */
 
 import { IntegrationCoverageCalculator } from '../../analyzer/IntegrationCoverageCalculator';
-import type { SymbolGraph, Symbol, SymbolRelationship } from '../../types/graph';
 import type { VerifiedRelationship } from '../../types/analysis/test-relationships';
+import type { Symbol, SymbolGraph, SymbolRelationship } from '../../types/graph';
 import type { TestMapping } from '../../types/tags';
 
 describe('IntegrationCoverageCalculator', () => {
@@ -135,10 +135,7 @@ describe('IntegrationCoverageCalculator', () => {
       );
 
       const calculator = new IntegrationCoverageCalculator(graph);
-      const verified = [
-        createVerified('A', 'B', 'strong'),
-        createVerified('A', 'C', 'weak'),
-      ];
+      const verified = [createVerified('A', 'B', 'strong'), createVerified('A', 'C', 'weak')];
       const coverage = calculator.calculate(verified);
 
       expect(coverage.byStrength.strong).toBe(1);
@@ -174,15 +171,11 @@ describe('IntegrationCoverageCalculator', () => {
       const coverage = calculator.calculate([]);
 
       // A has tests but no integration
-      const aUnverified = coverage.unverifiedRelationships.find(
-        (r) => r.source === 'A'
-      );
+      const aUnverified = coverage.unverifiedRelationships.find((r) => r.source === 'A');
       expect(aUnverified?.reason).toBe('test-exists-but-no-integration');
 
       // C has no tests
-      const cUnverified = coverage.unverifiedRelationships.find(
-        (r) => r.source === 'C'
-      );
+      const cUnverified = coverage.unverifiedRelationships.find((r) => r.source === 'C');
       expect(cUnverified?.reason).toBe('no-test');
     });
 
@@ -198,9 +191,7 @@ describe('IntegrationCoverageCalculator', () => {
       const calculator = new IntegrationCoverageCalculator(graph);
       const coverage = calculator.calculate([]);
 
-      expect(coverage.unverifiedRelationships[0].suggestion).toContain(
-        'integration test'
-      );
+      expect(coverage.unverifiedRelationships[0].suggestion).toContain('integration test');
     });
   });
 
@@ -297,15 +288,10 @@ describe('IntegrationCoverageCalculator', () => {
       const graph = createMockGraph([], []);
       const calculator = new IntegrationCoverageCalculator(graph);
 
-      const result = calculator.getRelationshipsByTest(
-        'integration/A.test.ts',
-        verified
-      );
+      const result = calculator.getRelationshipsByTest('integration/A.test.ts', verified);
 
       expect(result).toHaveLength(2);
-      expect(result.every((r) => r.verifiedBy === 'integration/A.test.ts')).toBe(
-        true
-      );
+      expect(result.every((r) => r.verifiedBy === 'integration/A.test.ts')).toBe(true);
     });
   });
 

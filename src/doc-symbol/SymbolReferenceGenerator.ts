@@ -5,10 +5,9 @@
  */
 
 import * as fs from 'node:fs';
-import * as path from 'node:path';
-import type { ParsedDocSymbols } from '../types/feature';
-import { SymbolReferenceResolver, type ResolvedSymbolRef } from './SymbolReferenceResolver';
 import type { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
+import type { ParsedDocSymbols } from '../types/feature';
+import { SymbolReferenceResolver } from './SymbolReferenceResolver';
 
 /**
  * Generates and updates Symbol References section in documents
@@ -36,10 +35,7 @@ export class SymbolReferenceGenerator {
     }
 
     // Resolve all references
-    const resolved = this.resolver.resolveMultiple(
-      parsed.symbolFootnoteRefs,
-      parsed.filePath
-    );
+    const resolved = this.resolver.resolveMultiple(parsed.symbolFootnoteRefs, parsed.filePath);
 
     if (resolved.size === 0) {
       return '';
@@ -49,9 +45,7 @@ export class SymbolReferenceGenerator {
     let markdown = '## Symbol References\n\n';
 
     // Sort by identifier for consistent output
-    const sortedEntries = Array.from(resolved.entries()).sort((a, b) =>
-      a[0].localeCompare(b[0])
-    );
+    const sortedEntries = Array.from(resolved.entries()).sort((a, b) => a[0].localeCompare(b[0]));
 
     for (const [identifier, ref] of sortedEntries) {
       markdown += `[^${identifier}]: [${ref.symbolName}](${ref.relativePath}#${ref.anchor})\n`;
@@ -123,12 +117,7 @@ export class SymbolReferenceGenerator {
     if (backlinkMatch) {
       // Insert before Backlinks
       const insertPos = backlinkMatch.index!;
-      return (
-        content.slice(0, insertPos) +
-        newSection +
-        '\n' +
-        content.slice(insertPos)
-      );
+      return `${content.slice(0, insertPos) + newSection}\n${content.slice(insertPos)}`;
     }
 
     // Append to end of document
@@ -189,9 +178,11 @@ export class SymbolReferenceGenerator {
    * @param parsedDocs - Array of parsed documents
    * @returns Statistics
    */
-  batchUpdate(
-    parsedDocs: ParsedDocSymbols[]
-  ): { updated: number; skipped: number; errors: Array<{ file: string; error: string }> } {
+  batchUpdate(parsedDocs: ParsedDocSymbols[]): {
+    updated: number;
+    skipped: number;
+    errors: Array<{ file: string; error: string }>;
+  } {
     let updated = 0;
     let skipped = 0;
     const errors: Array<{ file: string; error: string }> = [];

@@ -3,9 +3,8 @@
  */
 
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 import { IntegrationVerificationAnalyzer } from '../../analyzer/IntegrationVerificationAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships';
 
 // Mock fs module
@@ -83,9 +82,7 @@ describe('IntegrationVerificationAnalyzer', () => {
     });
 
     it('should return empty array when test directory is empty', () => {
-      const graph = createMockGraph([
-        { id: 'class-userservice', name: 'UserService' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-userservice', name: 'UserService' }]);
 
       mockFs.existsSync.mockReturnValue(true);
       mockFs.readdirSync.mockReturnValue([]);
@@ -97,16 +94,12 @@ describe('IntegrationVerificationAnalyzer', () => {
     });
 
     it('should skip test files that cannot be parsed', () => {
-      const graph = createMockGraph([
-        { id: 'class-userservice', name: 'UserService' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-userservice', name: 'UserService' }]);
 
       mockFs.existsSync.mockReturnValue(true);
       mockFs.readdirSync.mockImplementation((dir: any) => {
         if (String(dir).includes('__tests__')) {
-          return [
-            { name: 'broken.test.ts', isFile: () => true, isDirectory: () => false },
-          ] as any;
+          return [{ name: 'broken.test.ts', isFile: () => true, isDirectory: () => false }] as any;
         }
         return [];
       });
@@ -172,9 +165,7 @@ describe('IntegrationVerificationAnalyzer', () => {
       mockFs.existsSync.mockReturnValue(true);
       mockFs.readdirSync.mockImplementation((dir: any) => {
         if (String(dir).includes('__tests__')) {
-          return [
-            { name: 'user.test.ts', isFile: () => true, isDirectory: () => false },
-          ] as any;
+          return [{ name: 'user.test.ts', isFile: () => true, isDirectory: () => false }] as any;
         }
         return [];
       });
@@ -188,7 +179,7 @@ describe('IntegrationVerificationAnalyzer', () => {
 
       // Should not create relationships with test symbols
       const hasTestSymbol = result.some(
-        r => String(r.from).includes('.test.') || String(r.to).includes('.test.')
+        (r) => String(r.from).includes('.test.') || String(r.to).includes('.test.')
       );
       expect(hasTestSymbol).toBe(false);
     });
@@ -210,9 +201,9 @@ describe('IntegrationVerificationAnalyzer', () => {
         return [];
       });
 
-      let callCount = 0;
+      let _callCount = 0;
       mockFs.readFileSync.mockImplementation(() => {
-        callCount++;
+        _callCount++;
         return `
           import { A } from '../A';
           import { B } from '../B';

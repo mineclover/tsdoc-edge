@@ -163,7 +163,14 @@ describe('ImportanceClassifier', () => {
         column: 1,
         isExported: false,
         isPublic: false,
-        tests: [{ symbolName: 'TestedFunc', testFilePath: '/test.test.ts', testName: 'test1', scenarios: [] }],
+        tests: [
+          {
+            symbolName: 'TestedFunc',
+            testFilePath: '/test.test.ts',
+            testName: 'test1',
+            scenarios: [],
+          },
+        ],
         designDecisions: [],
       };
 
@@ -242,7 +249,14 @@ describe('ImportanceClassifier', () => {
         column: 1,
         isExported: true,
         isPublic: true,
-        tests: [{ symbolName: 'CriticalClass', testFilePath: '/test.test.ts', testName: 'test1', scenarios: [] }],
+        tests: [
+          {
+            symbolName: 'CriticalClass',
+            testFilePath: '/test.test.ts',
+            testName: 'test1',
+            scenarios: [],
+          },
+        ],
         designDecisions: [],
       };
 
@@ -309,7 +323,9 @@ describe('ImportanceClassifier', () => {
       const result = classifier.classifyAll(symbols, connectionCounts);
 
       expect(result.get('hub')?.level).toBe('important');
-      expect(result.get('hub')?.reasons.some((r: string) => r.includes('high connectivity'))).toBe(true);
+      expect(result.get('hub')?.reasons.some((r: string) => r.includes('high connectivity'))).toBe(
+        true
+      );
     });
 
     it('should handle empty symbols array', () => {

@@ -112,9 +112,11 @@ describe('CanonicalGraphLspView', () => {
       ],
       provenance: { adapter: 'fixture', producer: '@ttsc/graph' },
     };
-    return (await new ProjectIndexer({ id: 'fixture', load: async () => input }).index({
-      rootDir,
-      tsconfigPath: 'tsconfig.ttsc.json',
-    })).graph;
+    return (
+      await new ProjectIndexer({ id: 'fixture', load: async () => input }).index({
+        rootDir,
+        tsconfigPath: 'tsconfig.ttsc.json',
+      })
+    ).graph;
   }
 });

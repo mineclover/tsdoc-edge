@@ -101,9 +101,7 @@ export class EventFlowAnalyzer {
     const relationships: UnifiedRelationship[] = [];
 
     for (const emission of emissions) {
-      const matchingConsumptions = consumptions.filter(
-        c => c.eventName === emission.eventName
-      );
+      const matchingConsumptions = consumptions.filter((c) => c.eventName === emission.eventName);
 
       for (const consumption of matchingConsumptions) {
         // Skip self-references
@@ -182,12 +180,17 @@ export class EventFlowAnalyzer {
             const objectExpression = expression.expression;
 
             // Emit patterns
-            if (methodName === 'emit' || methodName === 'trigger' || methodName === 'dispatchEvent') {
+            if (
+              methodName === 'emit' ||
+              methodName === 'trigger' ||
+              methodName === 'dispatchEvent'
+            ) {
               const eventName = this.extractEventName(node.arguments[0]);
               if (eventName) {
                 const symbolId = this.findSymbolIdForNode(objectExpression, sourceFile);
                 if (symbolId) {
-                  const line = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
+                  const line =
+                    sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
 
                   emissions.push({
                     symbolId,
@@ -213,7 +216,8 @@ export class EventFlowAnalyzer {
               if (eventName) {
                 const symbolId = this.findSymbolIdForNode(objectExpression, sourceFile);
                 if (symbolId) {
-                  const line = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
+                  const line =
+                    sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
 
                   consumptions.push({
                     symbolId,
@@ -228,7 +232,7 @@ export class EventFlowAnalyzer {
             }
           }
         }
-      } catch (error) {
+      } catch (_error) {
         // Skip nodes that cause errors (e.g., synthetic nodes)
       }
 

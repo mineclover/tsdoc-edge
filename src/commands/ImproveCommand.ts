@@ -3,8 +3,8 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, colors, type CommandResult } from './BaseCommand';
 import { RecursiveImprover } from '../fixer/RecursiveImprover';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * ImproveCommand - Recursive documentation quality improvement
@@ -130,7 +130,9 @@ export class ImproveCommand extends BaseCommand {
       console.log();
       console.log(`   Initial Score: ${colors.cyan}${result.initialScore}/100${colors.reset}`);
       console.log(`   Final Score: ${colors.green}${result.finalScore}/100${colors.reset}`);
-      console.log(`   Improvement: ${colors.green}+${result.finalScore - result.initialScore}${colors.reset} points`);
+      console.log(
+        `   Improvement: ${colors.green}+${result.finalScore - result.initialScore}${colors.reset} points`
+      );
       console.log(`   Iterations: ${result.iterations}`);
       console.log(`   Files Modified: ${result.filesModified}`);
       console.log(`   Symbols Fixed: ${result.symbolsFixed}`);
@@ -139,7 +141,9 @@ export class ImproveCommand extends BaseCommand {
       if (result.finalScore >= targetScore) {
         console.log(`${colors.green}🎉 Target score reached!${colors.reset}`);
       } else {
-        console.log(`${colors.yellow}⚠️  Target score not reached after ${result.iterations} iterations${colors.reset}`);
+        console.log(
+          `${colors.yellow}⚠️  Target score not reached after ${result.iterations} iterations${colors.reset}`
+        );
       }
       console.log();
 

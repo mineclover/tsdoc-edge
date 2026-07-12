@@ -79,7 +79,7 @@ export class TypeDependencyAnalyzer {
     for (const sourceFile of this.program.getSourceFiles()) {
       if (sourceFile.isDeclarationFile) continue;
 
-      const filePath = sourceFile.fileName.replace(/\\/g, '/');
+      const _filePath = sourceFile.fileName.replace(/\\/g, '/');
       const refs = this.extractTypeReferences(sourceFile);
       typeReferences.push(...refs);
     }
@@ -220,7 +220,7 @@ export class TypeDependencyAnalyzer {
       if ('typeParameters' in node && node.typeParameters) {
         const symbolName = this.getSymbolName(node);
         if (symbolName) {
-          for (const typeParam of (node.typeParameters as ts.NodeArray<ts.TypeParameterDeclaration>)) {
+          for (const typeParam of node.typeParameters as ts.NodeArray<ts.TypeParameterDeclaration>) {
             if (typeParam.constraint) {
               const typeRefs = this.extractTypeNames(typeParam.constraint);
               for (const typeRef of typeRefs) {
@@ -390,7 +390,7 @@ export class TypeDependencyAnalyzer {
    */
   private findSymbolByName(symbolName: string): { id: string; name: string } | undefined {
     // First try exact name match using nameIndex (O(1))
-    if (this.graph.nameIndex && this.graph.nameIndex.has(symbolName)) {
+    if (this.graph.nameIndex?.has(symbolName)) {
       const symbolIds = this.graph.nameIndex.get(symbolName);
       if (symbolIds && symbolIds.length > 0) {
         const symbolId = symbolIds[0];

@@ -3,12 +3,12 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { DatabaseManager, type SymbolRow } from '../storage/DatabaseManager';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
-import { ConnectivityValidator } from '../validator/ConnectivityValidator';
-import type { Symbol, SymbolRelationship } from '../types/graph/graph';
+import { DatabaseManager } from '../storage/DatabaseManager';
 import type { SymbolType } from '../types/graph';
+import type { Symbol, SymbolRelationship } from '../types/graph/graph';
+import { ConnectivityValidator } from '../validator/ConnectivityValidator';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /**
  * Command for generating detailed validation reports

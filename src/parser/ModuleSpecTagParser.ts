@@ -9,13 +9,11 @@
 
 import type { ParserContext } from '@microsoft/tsdoc';
 import type {
-  ModuleSpecTags,
-  AlgorithmDoc,
-  ComplexityDoc,
-  SideEffectDoc,
-  MutationDoc,
   IODoc,
+  ModuleSpecTags,
+  MutationDoc,
   ScopeDoc,
+  SideEffectDoc,
 } from '../types/tags/module-spec-tags';
 
 /**
@@ -34,7 +32,7 @@ export class ModuleSpecTagParser {
    * @returns Parsed module spec tags
    * @public
    */
-  parseModuleSpecTags(tsdocContext: ParserContext | null, jsDocText: string): ModuleSpecTags {
+  parseModuleSpecTags(_tsdocContext: ParserContext | null, jsDocText: string): ModuleSpecTags {
     const tags: ModuleSpecTags = {};
 
     if (!jsDocText) {
@@ -54,7 +52,7 @@ export class ModuleSpecTagParser {
           tags.algorithm = { description: algorithmMatch[1] };
         } else {
           // Multi-line algorithm
-          tags.algorithm.description += ' ' + algorithmMatch[1];
+          tags.algorithm.description += ` ${algorithmMatch[1]}`;
         }
       }
 

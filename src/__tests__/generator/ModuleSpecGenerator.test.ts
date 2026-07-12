@@ -6,7 +6,6 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { ModuleSpecGenerator } from '../../generator/ModuleSpecGenerator';
-import type { ModuleSpecResult } from '../../types/spec/module-spec';
 
 describe('ModuleSpecGenerator', () => {
   let generator: ModuleSpecGenerator;
@@ -168,8 +167,8 @@ export function parse(input: string): any {
       const result = generator.generateSpec(testFile, 'parse');
 
       expect(result.spec.context.imports.length).toBeGreaterThan(0);
-      const external = result.spec.context.imports.find(imp => imp.source === 'path');
-      const internal = result.spec.context.imports.find(imp => imp.source === './parser');
+      const external = result.spec.context.imports.find((imp) => imp.source === 'path');
+      const internal = result.spec.context.imports.find((imp) => imp.source === './parser');
       expect(external?.isExternal).toBe(true);
       expect(internal?.isExternal).toBe(false);
     });
@@ -255,7 +254,7 @@ export class Class1 {}
       const results = generator.generateSpecsForFile(testFile);
 
       expect(results.length).toBeGreaterThanOrEqual(3);
-      const names = results.map(r => r.spec.symbolName);
+      const names = results.map((r) => r.spec.symbolName);
       expect(names).toContain('func1');
       expect(names).toContain('func2');
       expect(names).toContain('Class1');
@@ -273,7 +272,7 @@ export function publicFunc(): void {}
 
       const results = generator.generateSpecsForFile(testFile);
 
-      const names = results.map(r => r.spec.symbolName);
+      const names = results.map((r) => r.spec.symbolName);
       expect(names).not.toContain('privateFunc');
       expect(names).toContain('publicFunc');
     });
@@ -393,13 +392,13 @@ export function wellDoc(x: number): number { return x; }
 
       const results = generator.generateSpecsForDirectory(testDir);
 
-      const paths = results.map(r => r.filePath);
-      expect(paths.some(p => p.includes('node_modules'))).toBe(false);
-      expect(paths.some(p => p.includes('.hidden'))).toBe(false);
+      const paths = results.map((r) => r.filePath);
+      expect(paths.some((p) => p.includes('node_modules'))).toBe(false);
+      expect(paths.some((p) => p.includes('.hidden'))).toBe(false);
       // include.ts might or might not be in results depending on filtering
       // Just check that node_modules and .hidden are excluded
       if (results.length > 0) {
-        expect(paths.some(p => p.includes('include.ts'))).toBe(true);
+        expect(paths.some((p) => p.includes('include.ts'))).toBe(true);
       }
     });
 
@@ -420,11 +419,11 @@ export function wellDoc(x: number): number { return x; }
 
       const results = generator.generateSpecsForDirectory(testDir);
 
-      const paths = results.map(r => r.filePath);
-      expect(paths.some(p => p.endsWith('.d.ts'))).toBe(false);
+      const paths = results.map((r) => r.filePath);
+      expect(paths.some((p) => p.endsWith('.d.ts'))).toBe(false);
       // impl.ts might or might not be in results depending on filtering
       if (results.length > 0) {
-        expect(paths.some(p => p.endsWith('impl.ts'))).toBe(true);
+        expect(paths.some((p) => p.endsWith('impl.ts'))).toBe(true);
       }
     });
   });

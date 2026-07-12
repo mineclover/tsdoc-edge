@@ -4,8 +4,8 @@
  */
 
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 import * as os from 'node:os';
+import * as path from 'node:path';
 import type {
   AnalyticsConfig,
   CommandUsageEvent,
@@ -106,7 +106,7 @@ export class UsageTracker {
     }
 
     try {
-      const line = JSON.stringify(event) + '\n';
+      const line = `${JSON.stringify(event)}\n`;
       fs.appendFileSync(this.eventsPath, line, 'utf-8');
       this.eventCount++;
 
@@ -254,7 +254,7 @@ export class UsageTracker {
       if (!dayGroups.has(date)) {
         dayGroups.set(date, []);
       }
-      dayGroups.get(date)!.push(event);
+      dayGroups.get(date)?.push(event);
     }
 
     // Calculate daily summaries
@@ -264,17 +264,14 @@ export class UsageTracker {
       const uniqueCommands = new Set(dayEvents.map((e) => e.command)).size;
       const successCount = dayEvents.filter((e) => e.success).length;
       const successRate = (successCount / dayEvents.length) * 100;
-      const avgDuration =
-        dayEvents.reduce((sum, e) => sum + e.duration, 0) / dayEvents.length;
+      const avgDuration = dayEvents.reduce((sum, e) => sum + e.duration, 0) / dayEvents.length;
 
       // Find top command
       const commandCounts: Record<string, number> = {};
       for (const event of dayEvents) {
         commandCounts[event.command] = (commandCounts[event.command] || 0) + 1;
       }
-      const topCommand = Object.entries(commandCounts).sort(
-        ([, a], [, b]) => b - a
-      )[0][0];
+      const topCommand = Object.entries(commandCounts).sort(([, a], [, b]) => b - a)[0][0];
 
       summaries.push({
         date,
@@ -351,12 +348,10 @@ export class UsageTracker {
 
       // If still too many, keep only latest maxEvents
       const toKeep =
-        filtered.length > this.config.maxEvents
-          ? filtered.slice(-this.config.maxEvents)
-          : filtered;
+        filtered.length > this.config.maxEvents ? filtered.slice(-this.config.maxEvents) : filtered;
 
       // Rewrite file
-      const content = toKeep.map((e) => JSON.stringify(e)).join('\n') + '\n';
+      const content = `${toKeep.map((e) => JSON.stringify(e)).join('\n')}\n`;
       fs.writeFileSync(this.eventsPath, content, 'utf-8');
 
       // Update count after cleanup
@@ -424,13 +419,13 @@ export class UsageTracker {
 
     let report = '';
 
-    report += '═'.repeat(80) + '\n';
+    report += `${'═'.repeat(80)}\n`;
     report += '                     TSDoc Edge - Usage Analytics Report\n';
-    report += '═'.repeat(80) + '\n\n';
+    report += `${'═'.repeat(80)}\n\n`;
 
     // Overview
     report += '📊 OVERVIEW\n';
-    report += '─'.repeat(80) + '\n';
+    report += `${'─'.repeat(80)}\n`;
     report += `Total Commands: ${stats.totalCommands}\n`;
     report += `First Used: ${new Date(stats.firstUsed).toLocaleString()}\n`;
     report += `Last Used: ${new Date(stats.lastUsed).toLocaleString()}\n`;
@@ -438,7 +433,7 @@ export class UsageTracker {
 
     // Top commands
     report += '🏆 TOP COMMANDS\n';
-    report += '─'.repeat(80) + '\n';
+    report += `${'─'.repeat(80)}\n`;
     for (const { command, count, percentage } of topCommands) {
       const bar = '█'.repeat(Math.floor(percentage / 2));
       report += `  ${command.padEnd(20)} ${count.toString().padStart(5)} (${percentage.toFixed(1)}%) ${bar}\n`;
@@ -447,7 +442,7 @@ export class UsageTracker {
 
     // Performance
     report += '⚡ PERFORMANCE\n';
-    report += '─'.repeat(80) + '\n';
+    report += `${'─'.repeat(80)}\n`;
     const sortedByDuration = Object.entries(stats.avgDuration)
       .sort(([, a], [, b]) => b - a)
       .slice(0, 5);
@@ -459,7 +454,7 @@ export class UsageTracker {
 
     // Success rates
     report += '✓ SUCCESS RATES\n';
-    report += '─'.repeat(80) + '\n';
+    report += `${'─'.repeat(80)}\n`;
     const sortedBySuccess = Object.entries(stats.successRate)
       .filter(([cmd]) => stats.commandCounts[cmd] >= 3) // Min 3 uses
       .sort(([, a], [, b]) => a - b)
@@ -474,7 +469,7 @@ export class UsageTracker {
     // Recent errors
     if (recentErrors.length > 0) {
       report += '❌ RECENT ERRORS\n';
-      report += '─'.repeat(80) + '\n';
+      report += `${'─'.repeat(80)}\n`;
       for (const error of recentErrors.slice(0, 5)) {
         const date = new Date(error.timestamp).toLocaleString();
         report += `  ${error.command} (${date})\n`;
@@ -485,7 +480,7 @@ export class UsageTracker {
       report += '\n';
     }
 
-    report += '═'.repeat(80) + '\n';
+    report += `${'═'.repeat(80)}\n`;
 
     return report;
   }

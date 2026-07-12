@@ -8,9 +8,17 @@ import * as path from 'node:path';
 import { InterfaceAnalyzer } from '../analyzer/InterfaceAnalyzer';
 import { InterfaceDependencyMapper } from '../analyzer/InterfaceDependencyMapper';
 import { TypeChainTracer } from '../analyzer/TypeChainTracer';
-import type { TypeChainOptions, TypeChainAnalysisResult, TypeDependencyNode } from '../types/domain/type-chain';
-import type { InterfaceDependency, InterfaceDependencyGraph, InterfaceInfo } from '../types/domain/interface';
-import { BaseCommand, colors, type CommandResult } from './BaseCommand';
+import type {
+  InterfaceDependency,
+  InterfaceDependencyGraph,
+  InterfaceInfo,
+} from '../types/domain/interface';
+import type {
+  TypeChainAnalysisResult,
+  TypeChainOptions,
+  TypeDependencyNode,
+} from '../types/domain/type-chain';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command to analyze type dependency chains
@@ -83,8 +91,8 @@ export class TypeChainCommand extends BaseCommand {
     const targetType = args[1] && !args[1].startsWith('--') ? args[1] : undefined;
 
     // Parse options
-    const maxDepthArg = args.find(a => a.startsWith('--max-depth'));
-    const maxDepth = maxDepthArg ? parseInt(maxDepthArg.split('=')[1] || '10') : 10;
+    const maxDepthArg = args.find((a) => a.startsWith('--max-depth'));
+    const maxDepth = maxDepthArg ? parseInt(maxDepthArg.split('=')[1] || '10', 10) : 10;
 
     const options: TypeChainOptions = {
       maxDepth,
@@ -95,9 +103,13 @@ export class TypeChainCommand extends BaseCommand {
 
     const showTree = args.includes('--tree') || !targetType;
 
-    console.log(`${colors.blue}${colors.bold}═══════════════════════════════════════════════════════════════════${colors.reset}`);
+    console.log(
+      `${colors.blue}${colors.bold}═══════════════════════════════════════════════════════════════════${colors.reset}`
+    );
     console.log(`${colors.blue}${colors.bold}Type Chain Analysis${colors.reset}`);
-    console.log(`${colors.blue}${colors.bold}═══════════════════════════════════════════════════════════════════${colors.reset}`);
+    console.log(
+      `${colors.blue}${colors.bold}═══════════════════════════════════════════════════════════════════${colors.reset}`
+    );
     console.log('');
 
     // Build interface graph
@@ -136,7 +148,9 @@ export class TypeChainCommand extends BaseCommand {
     console.log(`  - Composites: ${stats.composites} (${stats.compositesPercentage.toFixed(1)}%)`);
     console.log(`  - Complete: ${stats.complete} (${stats.completePercentage.toFixed(1)}%)`);
     if (stats.hasCircularDependencies) {
-      console.log(`  - ${colors.yellow}Circular Dependencies: ${stats.circularDependencies}${colors.reset}`);
+      console.log(
+        `  - ${colors.yellow}Circular Dependencies: ${stats.circularDependencies}${colors.reset}`
+      );
     } else {
       console.log(`  - ${colors.green}No Circular Dependencies${colors.reset}`);
     }
@@ -182,7 +196,9 @@ export class TypeChainCommand extends BaseCommand {
    */
   private displayDependencyTree(result: TypeChainAnalysisResult): void {
     console.log(`${colors.cyan}${colors.bold}Dependency Tree: ${result.source}${colors.reset}`);
-    console.log(`${colors.blue}────────────────────────────────────────────────────────────────────${colors.reset}`);
+    console.log(
+      `${colors.blue}────────────────────────────────────────────────────────────────────${colors.reset}`
+    );
     console.log('');
 
     if (result.tree) {
@@ -191,13 +207,17 @@ export class TypeChainCommand extends BaseCommand {
 
     console.log('');
     console.log(`${colors.cyan}${colors.bold}Statistics${colors.reset}`);
-    console.log(`${colors.blue}────────────────────────────────────────────────────────────────────${colors.reset}`);
+    console.log(
+      `${colors.blue}────────────────────────────────────────────────────────────────────${colors.reset}`
+    );
     console.log(`  Total Types: ${colors.cyan}${result.totalTypes}${colors.reset}`);
     console.log(`  Max Depth: ${colors.cyan}${result.maxDepth}${colors.reset}`);
 
     if (result.cycles.length > 0) {
       console.log('');
-      console.log(`${colors.yellow}⚠${colors.reset} Circular Dependencies Detected: ${colors.yellow}${result.cycles.length}${colors.reset}`);
+      console.log(
+        `${colors.yellow}⚠${colors.reset} Circular Dependencies Detected: ${colors.yellow}${result.cycles.length}${colors.reset}`
+      );
       console.log('');
       for (const cycle of result.cycles) {
         console.log(`  ${colors.yellow}○${colors.reset} ${cycle.join(' → ')}`);
@@ -209,14 +229,22 @@ export class TypeChainCommand extends BaseCommand {
    * Display type chains
    */
   private displayTypeChains(result: TypeChainAnalysisResult): void {
-    console.log(`${colors.cyan}${colors.bold}Type Chain: ${result.source} → ${result.target}${colors.reset}`);
-    console.log(`${colors.blue}────────────────────────────────────────────────────────────────────${colors.reset}`);
+    console.log(
+      `${colors.cyan}${colors.bold}Type Chain: ${result.source} → ${result.target}${colors.reset}`
+    );
+    console.log(
+      `${colors.blue}────────────────────────────────────────────────────────────────────${colors.reset}`
+    );
     console.log('');
 
     if (result.chains.length === 0) {
-      console.log(`${colors.yellow}⚠${colors.reset} No path found between ${result.source} and ${result.target}`);
+      console.log(
+        `${colors.yellow}⚠${colors.reset} No path found between ${result.source} and ${result.target}`
+      );
     } else {
-      console.log(`${colors.green}✓${colors.reset} Found ${colors.cyan}${result.chains.length}${colors.reset} path(s)`);
+      console.log(
+        `${colors.green}✓${colors.reset} Found ${colors.cyan}${result.chains.length}${colors.reset} path(s)`
+      );
       console.log('');
 
       for (let i = 0; i < result.chains.length; i++) {
@@ -232,7 +260,9 @@ export class TypeChainCommand extends BaseCommand {
           const via = dep.via ? ` via '${colors.yellow}${dep.via}${colors.reset}'` : '';
 
           console.log(`  ${colors.dim}│${colors.reset}`);
-          console.log(`  ${colors.dim}└─${colors.reset} [${relation}${via}] → ${colors.cyan}${step.to}${colors.reset}`);
+          console.log(
+            `  ${colors.dim}└─${colors.reset} [${relation}${via}] → ${colors.cyan}${step.to}${colors.reset}`
+          );
         }
 
         if (i < result.chains.length - 1) {
@@ -243,7 +273,9 @@ export class TypeChainCommand extends BaseCommand {
 
     if (result.cycles.length > 0) {
       console.log('');
-      console.log(`${colors.yellow}⚠${colors.reset} Circular dependencies detected in paths: ${colors.yellow}${result.cycles.length}${colors.reset}`);
+      console.log(
+        `${colors.yellow}⚠${colors.reset} Circular dependencies detected in paths: ${colors.yellow}${result.cycles.length}${colors.reset}`
+      );
       console.log('');
       for (const cycle of result.cycles) {
         console.log(`  ${colors.yellow}○${colors.reset} ${cycle.join(' → ')}`);
@@ -254,15 +286,24 @@ export class TypeChainCommand extends BaseCommand {
   /**
    * Print tree recursively
    */
-  private printTree(node: TypeDependencyNode, prefix: string, isLast: boolean, visited = new Set<string>()): void {
+  private printTree(
+    node: TypeDependencyNode,
+    prefix: string,
+    isLast: boolean,
+    visited = new Set<string>()
+  ): void {
     const connector = isLast ? '└─' : '├─';
     const typeColor = node.visited ? colors.yellow : colors.cyan;
     const cycleMarker = node.visited ? ` ${colors.yellow}(cycle)${colors.reset}` : '';
 
     if (node.dependency) {
       const relation = this.formatRelation(node.dependency);
-      const via = node.dependency.via ? ` via '${colors.yellow}${node.dependency.via}${colors.reset}'` : '';
-      console.log(`${prefix}${connector} [${relation}${via}] → ${typeColor}${node.typeName}${colors.reset}${cycleMarker}`);
+      const via = node.dependency.via
+        ? ` via '${colors.yellow}${node.dependency.via}${colors.reset}'`
+        : '';
+      console.log(
+        `${prefix}${connector} [${relation}${via}] → ${typeColor}${node.typeName}${colors.reset}${cycleMarker}`
+      );
     } else {
       console.log(`${prefix}${typeColor}${node.typeName}${colors.reset}`);
     }
@@ -374,9 +415,13 @@ export class FindRootTypesCommand extends BaseCommand {
       includeExternal: args.includes('--include-external'),
     };
 
-    console.log(`${colors.blue}${colors.bold}═══════════════════════════════════════════════════════════════════${colors.reset}`);
+    console.log(
+      `${colors.blue}${colors.bold}═══════════════════════════════════════════════════════════════════${colors.reset}`
+    );
     console.log(`${colors.blue}${colors.bold}Root Types Analysis${colors.reset}`);
-    console.log(`${colors.blue}${colors.bold}═══════════════════════════════════════════════════════════════════${colors.reset}`);
+    console.log(
+      `${colors.blue}${colors.bold}═══════════════════════════════════════════════════════════════════${colors.reset}`
+    );
     console.log('');
 
     const { tracer, graph } = this.buildGraph();
@@ -388,7 +433,9 @@ export class FindRootTypesCommand extends BaseCommand {
     console.log(`  - Composites: ${stats.composites} (${stats.compositesPercentage.toFixed(1)}%)`);
     console.log(`  - Complete: ${stats.complete} (${stats.completePercentage.toFixed(1)}%)`);
     if (stats.hasCircularDependencies) {
-      console.log(`  - ${colors.yellow}Circular Dependencies: ${stats.circularDependencies}${colors.reset}`);
+      console.log(
+        `  - ${colors.yellow}Circular Dependencies: ${stats.circularDependencies}${colors.reset}`
+      );
     } else {
       console.log(`  - ${colors.green}No Circular Dependencies${colors.reset}`);
     }
@@ -398,8 +445,12 @@ export class FindRootTypesCommand extends BaseCommand {
     const rootTypes = tracer.findRootTypes(options);
     const leafTypes = tracer.findLeafTypes(options);
 
-    console.log(`${colors.cyan}${colors.bold}Root Types${colors.reset} (no incoming dependencies):`);
-    console.log(`${colors.blue}────────────────────────────────────────────────────────────────────${colors.reset}`);
+    console.log(
+      `${colors.cyan}${colors.bold}Root Types${colors.reset} (no incoming dependencies):`
+    );
+    console.log(
+      `${colors.blue}────────────────────────────────────────────────────────────────────${colors.reset}`
+    );
     console.log('');
 
     if (rootTypes.length === 0) {
@@ -407,13 +458,19 @@ export class FindRootTypesCommand extends BaseCommand {
     } else {
       for (const type of rootTypes) {
         const deps = tracer.getDirectDependencies(type);
-        console.log(`  ${colors.cyan}${type}${colors.reset} ${colors.dim}(${deps.length} dependencies)${colors.reset}`);
+        console.log(
+          `  ${colors.cyan}${type}${colors.reset} ${colors.dim}(${deps.length} dependencies)${colors.reset}`
+        );
       }
     }
 
     console.log('');
-    console.log(`${colors.cyan}${colors.bold}Leaf Types${colors.reset} (no outgoing dependencies):`);
-    console.log(`${colors.blue}────────────────────────────────────────────────────────────────────${colors.reset}`);
+    console.log(
+      `${colors.cyan}${colors.bold}Leaf Types${colors.reset} (no outgoing dependencies):`
+    );
+    console.log(
+      `${colors.blue}────────────────────────────────────────────────────────────────────${colors.reset}`
+    );
     console.log('');
 
     if (leafTypes.length === 0) {
@@ -421,13 +478,17 @@ export class FindRootTypesCommand extends BaseCommand {
     } else {
       for (const type of leafTypes) {
         const reverseDeps = tracer.getReverseDependencies(type);
-        console.log(`  ${colors.cyan}${type}${colors.reset} ${colors.dim}(used by ${reverseDeps.length} types)${colors.reset}`);
+        console.log(
+          `  ${colors.cyan}${type}${colors.reset} ${colors.dim}(used by ${reverseDeps.length} types)${colors.reset}`
+        );
       }
     }
 
     console.log('');
     console.log(`${colors.cyan}${colors.bold}Statistics${colors.reset}`);
-    console.log(`${colors.blue}────────────────────────────────────────────────────────────────────${colors.reset}`);
+    console.log(
+      `${colors.blue}────────────────────────────────────────────────────────────────────${colors.reset}`
+    );
     console.log(`  Total Types: ${colors.cyan}${graph.interfaces.size}${colors.reset}`);
     console.log(`  Root Types: ${colors.cyan}${rootTypes.length}${colors.reset}`);
     console.log(`  Leaf Types: ${colors.cyan}${leafTypes.length}${colors.reset}`);
@@ -533,9 +594,13 @@ export class DetectCircularTypesCommand extends BaseCommand {
       includeExternal: args.includes('--include-external'),
     };
 
-    console.log(`${colors.blue}${colors.bold}═══════════════════════════════════════════════════════════════════${colors.reset}`);
+    console.log(
+      `${colors.blue}${colors.bold}═══════════════════════════════════════════════════════════════════${colors.reset}`
+    );
     console.log(`${colors.blue}${colors.bold}Circular Dependency Detection${colors.reset}`);
-    console.log(`${colors.blue}${colors.bold}═══════════════════════════════════════════════════════════════════${colors.reset}`);
+    console.log(
+      `${colors.blue}${colors.bold}═══════════════════════════════════════════════════════════════════${colors.reset}`
+    );
     console.log('');
 
     const { tracer, graph } = this.buildGraph();
@@ -547,7 +612,9 @@ export class DetectCircularTypesCommand extends BaseCommand {
     console.log(`  - Composites: ${stats.composites} (${stats.compositesPercentage.toFixed(1)}%)`);
     console.log(`  - Complete: ${stats.complete} (${stats.completePercentage.toFixed(1)}%)`);
     if (stats.hasCircularDependencies) {
-      console.log(`  - ${colors.yellow}Circular Dependencies: ${stats.circularDependencies}${colors.reset}`);
+      console.log(
+        `  - ${colors.yellow}Circular Dependencies: ${stats.circularDependencies}${colors.reset}`
+      );
     } else {
       console.log(`  - ${colors.green}No Circular Dependencies${colors.reset}`);
     }
@@ -562,7 +629,9 @@ export class DetectCircularTypesCommand extends BaseCommand {
     if (cycles.length === 0) {
       console.log(`${colors.green}✓${colors.reset} No circular dependencies detected`);
     } else {
-      console.log(`${colors.yellow}⚠${colors.reset} Found ${colors.yellow}${cycles.length}${colors.reset} circular dependencies:`);
+      console.log(
+        `${colors.yellow}⚠${colors.reset} Found ${colors.yellow}${cycles.length}${colors.reset} circular dependencies:`
+      );
       console.log('');
 
       for (let i = 0; i < cycles.length; i++) {
@@ -571,7 +640,9 @@ export class DetectCircularTypesCommand extends BaseCommand {
       }
 
       console.log('');
-      console.log(`${colors.yellow}⚠ Recommendation:${colors.reset} Refactor to remove circular dependencies`);
+      console.log(
+        `${colors.yellow}⚠ Recommendation:${colors.reset} Refactor to remove circular dependencies`
+      );
       console.log(`   - Extract common types to a separate file`);
       console.log(`   - Use dependency inversion principle`);
       console.log(`   - Consider using interfaces to break cycles`);

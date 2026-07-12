@@ -17,7 +17,7 @@
  *   DatabaseConfig ~ DatabaseConnection (naming-pattern)
  */
 
-import type { SymbolGraph, Symbol } from '../types/graph';
+import type { Symbol, SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
@@ -105,7 +105,7 @@ export class NamingPatternRelationAnalyzer {
         if (!symbolsByDomain.has(domain)) {
           symbolsByDomain.set(domain, []);
         }
-        symbolsByDomain.get(domain)!.push(symbol);
+        symbolsByDomain.get(domain)?.push(symbol);
       }
     }
 
@@ -210,8 +210,8 @@ export class NamingPatternRelationAnalyzer {
           lineNumber: site.line,
           snippet: `Shared domain: ${site.domain}`,
           confidence: 0.7,
-          context: `Both symbols belong to ${site.domain} domain`
-        }
+          context: `Both symbols belong to ${site.domain} domain`,
+        },
       ],
       discoveredBy: 'static-analysis',
       confidence: 0.7,
@@ -223,7 +223,7 @@ export class NamingPatternRelationAnalyzer {
       },
       createdAt: timestamp,
       updatedAt: timestamp,
-      description: `${site.symbolA} ~ ${site.symbolB} (${site.domain} domain)`
+      description: `${site.symbolA} ~ ${site.symbolB} (${site.domain} domain)`,
     };
   }
 
@@ -251,7 +251,10 @@ export class NamingPatternRelationAnalyzer {
       }
     }
 
-    const totalSymbolsInDomains = Object.values(domainCounts).reduce((sum, count) => sum + count, 0);
+    const totalSymbolsInDomains = Object.values(domainCounts).reduce(
+      (sum, count) => sum + count,
+      0
+    );
     const averageGroupSize = domains.size > 0 ? totalSymbolsInDomains / domains.size : 0;
 
     return {

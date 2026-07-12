@@ -12,7 +12,7 @@ describe('SpecStatusManager', () => {
   let manager: SpecStatusManager;
 
   beforeEach(() => {
-    tempDir = path.join(process.cwd(), '.test-temp', 'spec-status-test-' + Math.random());
+    tempDir = path.join(process.cwd(), '.test-temp', `spec-status-test-${Math.random()}`);
     fs.mkdirSync(tempDir, { recursive: true });
     manager = new SpecStatusManager();
   });
@@ -132,7 +132,7 @@ Low completeness - minimal content.
       expect(result.valid).toBe(true);
       expect(result.from).toBe('draft');
       expect(result.to).toBe('review');
-      expect(result.checks.every(c => c.passed)).toBe(true);
+      expect(result.checks.every((c) => c.passed)).toBe(true);
     });
 
     it('should reject transition from draft to review with low completeness', () => {
@@ -140,7 +140,7 @@ Low completeness - minimal content.
       const result = manager.validateTransition(filePath, 'review');
 
       expect(result.valid).toBe(false);
-      expect(result.checks.some(c => !c.passed && c.name === 'Completeness Score')).toBe(true);
+      expect(result.checks.some((c) => !c.passed && c.name === 'Completeness Score')).toBe(true);
     });
 
     it('should allow transition from draft to archived without completeness check', () => {
@@ -148,7 +148,9 @@ Low completeness - minimal content.
       const result = manager.validateTransition(filePath, 'archived');
 
       expect(result.valid).toBe(true);
-      expect(result.checks.find(c => c.name === 'Completeness Score')?.message).toContain('No completeness requirements');
+      expect(result.checks.find((c) => c.name === 'Completeness Score')?.message).toContain(
+        'No completeness requirements'
+      );
     });
 
     it('should reject transition from draft to active (not allowed)', () => {
@@ -165,7 +167,7 @@ Low completeness - minimal content.
       const result = manager.validateTransition(filePath, 'approved');
 
       expect(result.valid).toBe(false);
-      expect(result.checks.some(c => c.name === 'Completeness Score' && !c.passed)).toBe(true);
+      expect(result.checks.some((c) => c.name === 'Completeness Score' && !c.passed)).toBe(true);
     });
 
     it('should require replacement field for deprecated status', () => {
@@ -173,7 +175,7 @@ Low completeness - minimal content.
       const result = manager.validateTransition(filePath, 'deprecated');
 
       expect(result.valid).toBe(false);
-      expect(result.checks.some(c => c.name === 'Replacement Document' && !c.passed)).toBe(true);
+      expect(result.checks.some((c) => c.name === 'Replacement Document' && !c.passed)).toBe(true);
     });
 
     it('should allow deprecated transition with replacement field', () => {
@@ -181,7 +183,7 @@ Low completeness - minimal content.
       const result = manager.validateTransition(filePath, 'deprecated');
 
       expect(result.valid).toBe(true);
-      expect(result.checks.find(c => c.name === 'Replacement Document')?.passed).toBe(true);
+      expect(result.checks.find((c) => c.name === 'Replacement Document')?.passed).toBe(true);
     });
 
     it('should reject transition from archived (no allowed transitions)', () => {
@@ -205,7 +207,7 @@ Low completeness - minimal content.
       // Medium completeness has required sections but doesn't meet 80% score
       expect(result.valid).toBe(false);
       // But we can check that the required sections check itself exists
-      expect(result.checks.some(c => c.name === 'Completeness Score')).toBe(true);
+      expect(result.checks.some((c) => c.name === 'Completeness Score')).toBe(true);
     });
   });
 
@@ -299,10 +301,7 @@ Low completeness - minimal content.
     });
 
     it('should handle non-existent files gracefully', () => {
-      const files = [
-        createTestDoc('draft', 'high'),
-        '/non-existent.md',
-      ];
+      const files = [createTestDoc('draft', 'high'), '/non-existent.md'];
 
       const distribution = manager.getStatusDistribution(files);
       expect(distribution.draft).toBe(1);
@@ -334,9 +333,7 @@ Low completeness - minimal content.
     });
 
     it('should identify documents not ready for promotion', () => {
-      const files = [
-        createTestDoc('draft', 'low'),
-      ];
+      const files = [createTestDoc('draft', 'low')];
 
       const promotable = manager.getPromotableDocs(files);
 
@@ -358,9 +355,7 @@ Low completeness - minimal content.
     });
 
     it('should handle non-existent files gracefully', () => {
-      const files = [
-        '/non-existent.md',
-      ];
+      const files = ['/non-existent.md'];
 
       const promotable = manager.getPromotableDocs(files);
       expect(promotable).toHaveLength(0);

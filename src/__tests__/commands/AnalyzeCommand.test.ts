@@ -3,8 +3,8 @@
  */
 
 import * as fs from 'node:fs';
-import { AnalyzeCommand } from '../../commands/AnalyzeCommand';
 import { CodeHealthChecker } from '../../analyzer/CodeHealthChecker';
+import { AnalyzeCommand } from '../../commands/AnalyzeCommand';
 import type { AnalysisReport } from '../../types/analysis';
 
 // Mock fs

@@ -14,12 +14,12 @@
  * - 검증 강도별 통계 제공
  */
 
-import type { SymbolGraph, SymbolRelationship, Symbol } from '../types/graph';
 import type {
-  VerifiedRelationship,
   RelationshipCoverage,
   UnverifiedRelationship,
+  VerifiedRelationship,
 } from '../types/analysis/test-relationships';
+import type { Symbol, SymbolGraph, SymbolRelationship } from '../types/graph';
 
 /**
  * Integration Coverage Calculator
@@ -93,9 +93,8 @@ export class IntegrationCoverageCalculator {
       totalRelationships: allRelationships.length,
       verifiedRelationships: verified.size,
       unverifiedRelationships: unverified,
-      coveragePercentage: allRelationships.length > 0
-        ? (verified.size / allRelationships.length) * 100
-        : 0,
+      coveragePercentage:
+        allRelationships.length > 0 ? (verified.size / allRelationships.length) * 100 : 0,
       verificationMatrix,
       byStrength,
     };
@@ -119,7 +118,7 @@ export class IntegrationCoverageCalculator {
         targetMap.set(vr.target, []);
       }
 
-      targetMap.get(vr.target)!.push(vr);
+      targetMap.get(vr.target)?.push(vr);
     }
 
     return matrix;
@@ -129,9 +128,9 @@ export class IntegrationCoverageCalculator {
    * Determine why a relationship is not verified
    */
   private determineUnverifiedReason(
-    rel: SymbolRelationship,
+    _rel: SymbolRelationship,
     sourceSymbol: Symbol,
-    targetSymbol: Symbol
+    _targetSymbol: Symbol
   ): UnverifiedRelationship['reason'] {
     // Check if source has any tests
     const sourceHasTests = sourceSymbol.tests && sourceSymbol.tests.length > 0;
@@ -148,10 +147,7 @@ export class IntegrationCoverageCalculator {
   /**
    * Generate suggestion for adding integration test
    */
-  private generateSuggestion(
-    sourceSymbol: Symbol,
-    targetSymbol: Symbol
-  ): string {
+  private generateSuggestion(sourceSymbol: Symbol, targetSymbol: Symbol): string {
     const sourceFile = sourceSymbol.filePath;
 
     // Handle cases where filePath might be undefined
@@ -223,7 +219,7 @@ export class IntegrationCoverageCalculator {
     testFilePath: string,
     verifiedRelationships: VerifiedRelationship[]
   ): VerifiedRelationship[] {
-    return verifiedRelationships.filter(vr => vr.verifiedBy === testFilePath);
+    return verifiedRelationships.filter((vr) => vr.verifiedBy === testFilePath);
   }
 
   /**
@@ -259,8 +255,8 @@ export class IntegrationCoverageCalculator {
     }
 
     const unverified = coverage.unverifiedRelationships
-      .filter(ur => ur.source === symbolId)
-      .map(ur => ({ target: ur.target, reason: ur.reason }));
+      .filter((ur) => ur.source === symbolId)
+      .map((ur) => ({ target: ur.target, reason: ur.reason }));
 
     return {
       totalRelationships: verified.length + unverified.length,

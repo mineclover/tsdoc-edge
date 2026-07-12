@@ -115,36 +115,39 @@ describe('RelationshipQueryCommand', () => {
       expect(close).toHaveBeenCalledTimes(1);
     });
 
-    it.each(['src/a.ts#A:class', 'A'])('resolves canonical id or name input directly: %s', async (query) => {
-      const close = jest.fn();
-      const resolveSymbol = jest.fn((value: string) =>
-        value === query
-          ? { status: 'found' as const, query: value, node: { id: 'src/a.ts#A:class' } }
-          : { status: 'missing' as const, query: value }
-      );
-      const canonicalContext = {
-        resolveCanonicalId: () => null,
-        analysis: {
-          resolveSymbol,
-          dependencies: () => [canonicalNeighbor('src/b.ts#B:class', 'calls')],
-          dependents: () => [],
-        },
-        close,
-      } as unknown as CanonicalAliasContext;
-      jest.spyOn(CanonicalAliasContext, 'tryOpen').mockReturnValue(canonicalContext);
-      const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+    it.each(['src/a.ts#A:class', 'A'])(
+      'resolves canonical id or name input directly: %s',
+      async (query) => {
+        const close = jest.fn();
+        const resolveSymbol = jest.fn((value: string) =>
+          value === query
+            ? { status: 'found' as const, query: value, node: { id: 'src/a.ts#A:class' } }
+            : { status: 'missing' as const, query: value }
+        );
+        const canonicalContext = {
+          resolveCanonicalId: () => null,
+          analysis: {
+            resolveSymbol,
+            dependencies: () => [canonicalNeighbor('src/b.ts#B:class', 'calls')],
+            dependents: () => [],
+          },
+          close,
+        } as unknown as CanonicalAliasContext;
+        jest.spyOn(CanonicalAliasContext, 'tryOpen').mockReturnValue(canonicalContext);
+        const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
 
-      const result = await command.execute([query]);
-      const output = log.mock.calls.flat().join('\n');
+        const result = await command.execute([query]);
+        const output = log.mock.calls.flat().join('\n');
 
-      expect(result.exitCode).toBe(0);
-      expect(resolveSymbol).toHaveBeenCalledWith(query);
-      expect(output).toContain('<canonicalId>src/a.ts#A:class</canonicalId>');
-      expect(output).toContain('src/b.ts#B:class');
-      expect(output).toContain('<totalFound>1</totalFound>');
-      expect(output).toContain('<returned>1</returned>');
-      expect(close).toHaveBeenCalledTimes(1);
-    });
+        expect(result.exitCode).toBe(0);
+        expect(resolveSymbol).toHaveBeenCalledWith(query);
+        expect(output).toContain('<canonicalId>src/a.ts#A:class</canonicalId>');
+        expect(output).toContain('src/b.ts#B:class');
+        expect(output).toContain('<totalFound>1</totalFound>');
+        expect(output).toContain('<returned>1</returned>');
+        expect(close).toHaveBeenCalledTimes(1);
+      }
+    );
   });
 });
 

@@ -3,7 +3,6 @@
  */
 
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 import { IndexDocsCommand } from '../../commands/IndexDocsCommand';
 import { DocumentSymbolParser } from '../../doc-symbol/DocumentSymbolParser';
 import { DocumentSymbolRegistry } from '../../doc-symbol/DocumentSymbolRegistry';

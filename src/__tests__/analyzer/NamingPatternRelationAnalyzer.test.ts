@@ -4,7 +4,7 @@
  */
 
 import { NamingPatternRelationAnalyzer } from '../../analyzer/NamingPatternRelationAnalyzer';
-import type { SymbolGraph, Symbol, SymbolType } from '../../types/graph';
+import type { Symbol, SymbolGraph, SymbolType } from '../../types/graph';
 
 // Helper to create test symbols
 const createSymbol = (
@@ -27,7 +27,7 @@ const createSymbol = (
 
 // Helper to create mock symbol graph
 const createMockGraph = (symbols: Symbol[]): SymbolGraph => {
-  const symbolMap = new Map(symbols.map(s => [s.id, s]));
+  const symbolMap = new Map(symbols.map((s) => [s.id, s]));
   return {
     symbols: symbolMap,
     edges: [],
@@ -106,7 +106,7 @@ describe('NamingPatternRelationAnalyzer', () => {
       // Total: 2 relationships
       expect(result.length).toBe(2);
 
-      const domains = result.map(r => r.properties?.domain);
+      const domains = result.map((r) => r.properties?.domain);
       expect(domains).toContain('User');
       expect(domains).toContain('Auth');
     });
@@ -150,9 +150,7 @@ describe('NamingPatternRelationAnalyzer', () => {
       ];
 
       for (const testCase of testCases) {
-        const symbols = testCase.symbols.map((name, i) =>
-          createSymbol(`sym-${i}`, name)
-        );
+        const symbols = testCase.symbols.map((name, i) => createSymbol(`sym-${i}`, name));
         const graph = createMockGraph(symbols);
         const analyzer = new NamingPatternRelationAnalyzer(graph);
 
@@ -266,8 +264,8 @@ describe('NamingPatternRelationAnalyzer', () => {
       // User: 3C2 = 3 relationships, Auth: 2C2 = 1 relationship
       expect(stats.total).toBe(4);
       expect(stats.uniqueDomains).toBe(2);
-      expect(stats.domainCounts['User']).toBe(3);
-      expect(stats.domainCounts['Auth']).toBe(1);
+      expect(stats.domainCounts.User).toBe(3);
+      expect(stats.domainCounts.Auth).toBe(1);
     });
   });
 

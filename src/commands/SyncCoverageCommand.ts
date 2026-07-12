@@ -4,9 +4,8 @@
  */
 
 import * as fs from 'node:fs';
-import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for syncing test coverage data
@@ -116,7 +115,9 @@ export class SyncCoverageCommand extends BaseCommand {
         console.log(`Coverage format: ${colors.cyan}Istanbul/NYC${colors.reset}`);
         console.log(`Total files in coverage: ${colors.green}${fileCount}${colors.reset}`);
         console.log();
-        console.log(`${colors.dim}Note: Full coverage sync requires CoverageSyncer integration${colors.reset}`);
+        console.log(
+          `${colors.dim}Note: Full coverage sync requires CoverageSyncer integration${colors.reset}`
+        );
         console.log();
 
         return this.success();

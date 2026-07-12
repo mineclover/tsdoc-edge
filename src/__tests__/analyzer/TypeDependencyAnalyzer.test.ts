@@ -2,13 +2,12 @@
  * TypeDependencyAnalyzer Tests
  */
 
-import * as ts from 'typescript';
-import * as path from 'node:path';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import * as ts from 'typescript';
 import { TypeDependencyAnalyzer } from '../../analyzer/TypeDependencyAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
-import type { UnifiedRelationship } from '../../types/relationships';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 
 describe('TypeDependencyAnalyzer', () => {
   let tempDir: string;
@@ -24,9 +23,7 @@ describe('TypeDependencyAnalyzer', () => {
   });
 
   // Helper to create mock graph
-  function createMockGraph(
-    symbols: Array<{ id: string; name: string }>
-  ): SymbolGraph {
+  function createMockGraph(symbols: Array<{ id: string; name: string }>): SymbolGraph {
     const symbolsMap = new Map<string, Symbol>();
     const nameIndex = new Map<string, string[]>();
 
@@ -198,10 +195,7 @@ describe('TypeDependencyAnalyzer', () => {
       const result = analyzer.analyze();
 
       const dependency = result.find(
-        (r) =>
-          r.type === 'type-dependency' &&
-          r.from === 'func-getuser' &&
-          r.to === 'type-user'
+        (r) => r.type === 'type-dependency' && r.from === 'func-getuser' && r.to === 'type-user'
       );
 
       expect(dependency).toBeDefined();
@@ -268,10 +262,7 @@ describe('TypeDependencyAnalyzer', () => {
       const result = analyzer.analyze();
 
       const dependency = result.find(
-        (r) =>
-          r.type === 'type-dependency' &&
-          r.from === 'type-userid' &&
-          r.to === 'type-id'
+        (r) => r.type === 'type-dependency' && r.from === 'type-userid' && r.to === 'type-id'
       );
 
       expect(dependency).toBeDefined();
@@ -370,10 +361,7 @@ describe('TypeDependencyAnalyzer', () => {
       const result = analyzer.analyze();
 
       const successDep = result.find(
-        (r) =>
-          r.type === 'type-dependency' &&
-          r.from === 'type-result' &&
-          r.to === 'type-success'
+        (r) => r.type === 'type-dependency' && r.from === 'type-result' && r.to === 'type-success'
       );
 
       expect(successDep).toBeDefined();
@@ -398,10 +386,7 @@ describe('TypeDependencyAnalyzer', () => {
       const result = analyzer.analyze();
 
       const partADep = result.find(
-        (r) =>
-          r.type === 'type-dependency' &&
-          r.from === 'type-combined' &&
-          r.to === 'type-parta'
+        (r) => r.type === 'type-dependency' && r.from === 'type-combined' && r.to === 'type-parta'
       );
 
       expect(partADep).toBeDefined();
@@ -424,10 +409,7 @@ describe('TypeDependencyAnalyzer', () => {
       const result = analyzer.analyze();
 
       const userDep = result.find(
-        (r) =>
-          r.type === 'type-dependency' &&
-          r.from === 'type-userlist' &&
-          r.to === 'type-user'
+        (r) => r.type === 'type-dependency' && r.from === 'type-userlist' && r.to === 'type-user'
       );
 
       expect(userDep).toBeDefined();
@@ -450,10 +432,7 @@ describe('TypeDependencyAnalyzer', () => {
       const result = analyzer.analyze();
 
       const userDep = result.find(
-        (r) =>
-          r.type === 'type-dependency' &&
-          r.from === 'type-promiseuser' &&
-          r.to === 'type-user'
+        (r) => r.type === 'type-dependency' && r.from === 'type-promiseuser' && r.to === 'type-user'
       );
 
       expect(userDep).toBeDefined();
@@ -478,10 +457,7 @@ describe('TypeDependencyAnalyzer', () => {
       const result = analyzer.analyze();
 
       const userDep = result.find(
-        (r) =>
-          r.type === 'type-dependency' &&
-          r.from === 'type-usertuple' &&
-          r.to === 'type-user'
+        (r) => r.type === 'type-dependency' && r.from === 'type-usertuple' && r.to === 'type-user'
       );
 
       expect(userDep).toBeDefined();
@@ -506,17 +482,11 @@ describe('TypeDependencyAnalyzer', () => {
       const result = analyzer.analyze();
 
       const requestDep = result.find(
-        (r) =>
-          r.type === 'type-dependency' &&
-          r.from === 'type-handler' &&
-          r.to === 'type-request'
+        (r) => r.type === 'type-dependency' && r.from === 'type-handler' && r.to === 'type-request'
       );
 
       const responseDep = result.find(
-        (r) =>
-          r.type === 'type-dependency' &&
-          r.from === 'type-handler' &&
-          r.to === 'type-response'
+        (r) => r.type === 'type-dependency' && r.from === 'type-handler' && r.to === 'type-response'
       );
 
       expect(requestDep).toBeDefined();
@@ -526,9 +496,7 @@ describe('TypeDependencyAnalyzer', () => {
 
   describe('analyze - built-in type filtering', () => {
     it('should skip built-in primitive types', () => {
-      const graph = createMockGraph([
-        { id: 'func-process', name: 'process' },
-      ]);
+      const graph = createMockGraph([{ id: 'func-process', name: 'process' }]);
 
       const program = createProgram({
         'process.ts': `
@@ -541,8 +509,7 @@ describe('TypeDependencyAnalyzer', () => {
 
       // Should not create dependencies for string, number, boolean
       const builtInDeps = result.filter(
-        (r) =>
-          r.to === 'string' || r.to === 'number' || r.to === 'boolean'
+        (r) => r.to === 'string' || r.to === 'number' || r.to === 'boolean'
       );
 
       expect(builtInDeps).toHaveLength(0);
@@ -565,17 +532,13 @@ describe('TypeDependencyAnalyzer', () => {
       const result = analyzer.analyze();
 
       // Should not create dependency for Partial but should for User
-      const partialDep = result.find(
-        (r) => r.to === 'Partial'
-      );
+      const partialDep = result.find((r) => r.to === 'Partial');
 
       expect(partialDep).toBeUndefined();
     });
 
     it('should skip Array, Promise, Map, Set types', () => {
-      const graph = createMockGraph([
-        { id: 'func-test', name: 'test' },
-      ]);
+      const graph = createMockGraph([{ id: 'func-test', name: 'test' }]);
 
       const program = createProgram({
         'test.ts': `
@@ -657,9 +620,7 @@ describe('TypeDependencyAnalyzer', () => {
 
       // Check for return type dependency - the method name will be in from field
       const returnDep = result.find(
-        (r) =>
-          r.to === 'type-user' &&
-          r.properties?.context === 'return-type'
+        (r) => r.to === 'type-user' && r.properties?.context === 'return-type'
       );
 
       // Either the return type dependency is found or there are no matching symbols
@@ -775,9 +736,7 @@ describe('TypeDependencyAnalyzer', () => {
 
   describe('findSymbolByName - partial matching', () => {
     it('should find symbols with partial name match', () => {
-      const graph = createMockGraph([
-        { id: 'type-mymodule-userdata', name: 'MyModule.UserData' },
-      ]);
+      const graph = createMockGraph([{ id: 'type-mymodule-userdata', name: 'MyModule.UserData' }]);
 
       const program = createProgram({
         'types.ts': `
@@ -827,9 +786,7 @@ describe('TypeDependencyAnalyzer', () => {
     });
 
     it('should handle anonymous functions', () => {
-      const graph = createMockGraph([
-        { id: 'type-data', name: 'Data' },
-      ]);
+      const graph = createMockGraph([{ id: 'type-data', name: 'Data' }]);
 
       const program = createProgram({
         'types.ts': `

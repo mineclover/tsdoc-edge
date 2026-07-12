@@ -1,5 +1,5 @@
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 
 /**
  * Type of reference found in documentation
@@ -78,7 +78,7 @@ export class ReferenceUpdater {
               type: 'backlink',
               oldText: backlinkMatch[0],
               newText: '', // Will be filled later
-              context: line.trim()
+              context: line.trim(),
             });
           }
         }
@@ -94,7 +94,7 @@ export class ReferenceUpdater {
               type: 'path',
               oldText: pathMatch[0],
               newText: '', // Will be filled later
-              context: line.trim()
+              context: line.trim(),
             });
           }
         }
@@ -113,7 +113,7 @@ export class ReferenceUpdater {
               type: 'markdown-link',
               oldText: match[0],
               newText: '', // Will be filled later
-              context: line.trim()
+              context: line.trim(),
             });
           }
         }
@@ -130,7 +130,7 @@ export class ReferenceUpdater {
                 type: 'relative',
                 oldText: relativePath,
                 newText: '', // Will be filled later
-                context: line.trim()
+                context: line.trim(),
               });
             }
           }
@@ -165,7 +165,7 @@ export class ReferenceUpdater {
       if (!byFile.has(ref.file)) {
         byFile.set(ref.file, []);
       }
-      byFile.get(ref.file)!.push(ref);
+      byFile.get(ref.file)?.push(ref);
     }
 
     // Update each file
@@ -200,17 +200,19 @@ export class ReferenceUpdater {
         }
         return ref.oldText;
 
-      case 'markdown-link':
+      case 'markdown-link': {
         // Calculate relative path from the referencing file to new location
         const refDir = path.dirname(ref.file);
         const newRelativePath = path.relative(refDir, absoluteNewPath);
         return ref.oldText.replace(/\]\([^)]+\.md\)/, `](${newRelativePath})`);
+      }
 
-      case 'relative':
+      case 'relative': {
         // Calculate new relative path
         const refDirRel = path.dirname(ref.file);
         const newRelPath = path.relative(refDirRel, absoluteNewPath);
         return newRelPath;
+      }
 
       default:
         return ref.oldText;

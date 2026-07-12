@@ -9,8 +9,8 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for displaying comprehensive system status
@@ -135,11 +135,14 @@ Options:
     const allSymbols = dbManager.getAllSymbolRows();
 
     const total = allSymbols.length;
-    const documented = allSymbols.filter(s => s.summary && s.summary.trim() !== '').length;
-    const testTotal = allSymbols.filter(s => s.type === 'test-case' || s.type === 'test-suite').length;
+    const documented = allSymbols.filter((s) => s.summary && s.summary.trim() !== '').length;
+    const testTotal = allSymbols.filter(
+      (s) => s.type === 'test-case' || s.type === 'test-suite'
+    ).length;
     const sourceTotal = total - testTotal;
-    const sourceDocumented = allSymbols.filter(s =>
-      s.type !== 'test-case' && s.type !== 'test-suite' && s.summary && s.summary.trim() !== ''
+    const sourceDocumented = allSymbols.filter(
+      (s) =>
+        s.type !== 'test-case' && s.type !== 'test-suite' && s.summary && s.summary.trim() !== ''
     ).length;
 
     // Count by type using Drizzle
@@ -156,7 +159,8 @@ Options:
       coverage: total > 0 ? Math.round((documented / total) * 1000) / 10 : 0,
       sourceTotal,
       sourceDocumented,
-      sourceCoverage: sourceTotal > 0 ? Math.round((sourceDocumented / sourceTotal) * 1000) / 10 : 0,
+      sourceCoverage:
+        sourceTotal > 0 ? Math.round((sourceDocumented / sourceTotal) * 1000) / 10 : 0,
       testTotal,
       byType,
     };
@@ -295,11 +299,11 @@ Options:
     const { symbols, relationships, documents, health } = status;
     console.log(
       `${colors.bold}TSDoc Edge${colors.reset} | ` +
-      `Symbols: ${colors.cyan}${symbols.total.toLocaleString()}${colors.reset} | ` +
-      `Relationships: ${colors.cyan}${relationships.total.toLocaleString()}${colors.reset} | ` +
-      `Types: ${colors.cyan}${relationships.types}${colors.reset} | ` +
-      `Docs: ${colors.cyan}${documents.total}${colors.reset} | ` +
-      `Health: ${this.colorGrade(health.grade)}`
+        `Symbols: ${colors.cyan}${symbols.total.toLocaleString()}${colors.reset} | ` +
+        `Relationships: ${colors.cyan}${relationships.total.toLocaleString()}${colors.reset} | ` +
+        `Types: ${colors.cyan}${relationships.types}${colors.reset} | ` +
+        `Docs: ${colors.cyan}${documents.total}${colors.reset} | ` +
+        `Health: ${this.colorGrade(health.grade)}`
     );
   }
 
@@ -324,23 +328,37 @@ Options:
     // Quick Stats
     this.printSection('Quick Stats');
     console.log(`  Symbols:        ${colors.cyan}${symbols.total.toLocaleString()}${colors.reset}`);
-    console.log(`  Relationships:  ${colors.cyan}${relationships.total.toLocaleString()}${colors.reset}`);
-    console.log(`  Types:          ${colors.cyan}${relationships.types}${colors.reset} (${relationships.categories} categories)`);
+    console.log(
+      `  Relationships:  ${colors.cyan}${relationships.total.toLocaleString()}${colors.reset}`
+    );
+    console.log(
+      `  Types:          ${colors.cyan}${relationships.types}${colors.reset} (${relationships.categories} categories)`
+    );
     console.log(`  Documents:      ${colors.cyan}${documents.total}${colors.reset}`);
-    console.log(`  Graph Density:  ${colors.cyan}${relationships.density}${colors.reset} rels/symbol`);
+    console.log(
+      `  Graph Density:  ${colors.cyan}${relationships.density}${colors.reset} rels/symbol`
+    );
     console.log();
 
     // Symbol Distribution
     this.printSection('Symbol Distribution');
-    console.log(`  ${colors.bold}Overall:${colors.reset}        ${colors.green}${symbols.documented.toLocaleString()}${colors.reset} / ${symbols.total.toLocaleString()} (${symbols.coverage}%)`);
-    console.log(`  ${colors.bold}Source Code:${colors.reset}    ${colors.green}${symbols.sourceDocumented.toLocaleString()}${colors.reset} / ${symbols.sourceTotal.toLocaleString()} (${symbols.sourceCoverage}%)`);
-    console.log(`  ${colors.dim}Test Symbols:   ${symbols.testTotal.toLocaleString()} (${Math.round((symbols.testTotal / symbols.total) * 1000) / 10}% of total)${colors.reset}`);
+    console.log(
+      `  ${colors.bold}Overall:${colors.reset}        ${colors.green}${symbols.documented.toLocaleString()}${colors.reset} / ${symbols.total.toLocaleString()} (${symbols.coverage}%)`
+    );
+    console.log(
+      `  ${colors.bold}Source Code:${colors.reset}    ${colors.green}${symbols.sourceDocumented.toLocaleString()}${colors.reset} / ${symbols.sourceTotal.toLocaleString()} (${symbols.sourceCoverage}%)`
+    );
+    console.log(
+      `  ${colors.dim}Test Symbols:   ${symbols.testTotal.toLocaleString()} (${Math.round((symbols.testTotal / symbols.total) * 1000) / 10}% of total)${colors.reset}`
+    );
     const topTypes = Object.entries(symbols.byType).slice(0, 5);
     if (topTypes.length > 0) {
       console.log(`  Top types:`);
       for (const [type, count] of topTypes) {
         const pct = Math.round((count / symbols.total) * 1000) / 10;
-        console.log(`    ${type}: ${colors.cyan}${count.toLocaleString()}${colors.reset} (${pct}%)`);
+        console.log(
+          `    ${type}: ${colors.cyan}${count.toLocaleString()}${colors.reset} (${pct}%)`
+        );
       }
     }
     console.log();
@@ -351,14 +369,18 @@ Options:
     for (const [category, count] of topCategories) {
       const pct = Math.round((count / relationships.total) * 1000) / 10;
       const bar = this.progressBar(pct, 20);
-      console.log(`  ${category.padEnd(15)} ${bar} ${colors.cyan}${count.toLocaleString()}${colors.reset} (${pct}%)`);
+      console.log(
+        `  ${category.padEnd(15)} ${bar} ${colors.cyan}${count.toLocaleString()}${colors.reset} (${pct}%)`
+      );
     }
     console.log();
 
     // Document Status
     this.printSection('Document Status');
     console.log(`  Total docs:     ${colors.cyan}${documents.total}${colors.reset}`);
-    console.log(`  With [[Symbol]]: ${colors.green}${documents.withSymbols}${colors.reset} (${documents.coverage}%)`);
+    console.log(
+      `  With [[Symbol]]: ${colors.green}${documents.withSymbols}${colors.reset} (${documents.coverage}%)`
+    );
     console.log();
 
     // Validation
@@ -379,11 +401,16 @@ Options:
 
   private colorGrade(grade: string): string {
     switch (grade) {
-      case 'A': return `${colors.green}${colors.bold}${grade}${colors.reset}`;
-      case 'B': return `${colors.green}${grade}${colors.reset}`;
-      case 'C': return `${colors.yellow}${grade}${colors.reset}`;
-      case 'D': return `${colors.yellow}${grade}${colors.reset}`;
-      default: return `${colors.red}${grade}${colors.reset}`;
+      case 'A':
+        return `${colors.green}${colors.bold}${grade}${colors.reset}`;
+      case 'B':
+        return `${colors.green}${grade}${colors.reset}`;
+      case 'C':
+        return `${colors.yellow}${grade}${colors.reset}`;
+      case 'D':
+        return `${colors.yellow}${grade}${colors.reset}`;
+      default:
+        return `${colors.red}${grade}${colors.reset}`;
     }
   }
 

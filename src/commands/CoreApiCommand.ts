@@ -3,11 +3,11 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
-import type { Symbol, SymbolRelationship } from '../types/graph/graph';
+import { DatabaseManager } from '../storage/DatabaseManager';
 import type { SymbolType } from '../types/graph';
+import type { Symbol, SymbolRelationship } from '../types/graph/graph';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for showing core API symbols
@@ -171,12 +171,16 @@ export class CoreApiCommand extends BaseCommand {
           console.log(`${colors.dim}Excluding test files${colors.reset}`);
         }
         console.log(`Total exported: ${colors.green}${exportedSymbols.length}${colors.reset}`);
-        console.log(`Core API size: ${colors.cyan}${coreSymbols.length}${colors.reset} (exported + 1-depth deps)`);
+        console.log(
+          `Core API size: ${colors.cyan}${coreSymbols.length}${colors.reset} (exported + 1-depth deps)`
+        );
         console.log();
 
         this.printSection('Exported Symbols');
         for (const symbol of exportedSymbols) {
-          console.log(`${colors.green}●${colors.reset} ${colors.bold}${symbol.name}${colors.reset} (${symbol.type})`);
+          console.log(
+            `${colors.green}●${colors.reset} ${colors.bold}${symbol.name}${colors.reset} (${symbol.type})`
+          );
           console.log(`  ${symbol.filePath}:${symbol.line}`);
           if (symbol.summary) {
             console.log(`  ${colors.dim}${symbol.summary.substring(0, 80)}...${colors.reset}`);

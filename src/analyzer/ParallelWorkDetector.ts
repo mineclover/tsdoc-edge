@@ -86,10 +86,7 @@ export class ParallelWorkDetector {
    *
    * @public
    */
-  detectParallelWork(
-    workingModules: string[],
-    frozenModules: string[],
-  ): ParallelWorkResult {
+  detectParallelWork(workingModules: string[], frozenModules: string[]): ParallelWorkResult {
     const workingSet = new Set(workingModules);
     const frozenSet = new Set(frozenModules);
 
@@ -122,10 +119,7 @@ export class ParallelWorkDetector {
    *
    * @private
    */
-  private findAvailableModules(
-    workingSet: Set<string>,
-    frozenSet: Set<string>,
-  ): string[] {
+  private findAvailableModules(workingSet: Set<string>, frozenSet: Set<string>): string[] {
     const available: string[] = [];
 
     for (const [symbolId] of this.graph.symbols) {
@@ -161,11 +155,7 @@ export class ParallelWorkDetector {
    *
    * @private
    */
-  private checkConflict(
-    module1: string,
-    module2: string,
-    frozenSet: Set<string>,
-  ): boolean {
+  private checkConflict(module1: string, module2: string, frozenSet: Set<string>): boolean {
     // Rule 1: Direct dependency
     if (this.hasDirectDependency(module1, module2)) {
       return true;
@@ -258,11 +248,7 @@ export class ParallelWorkDetector {
    *
    * @private
    */
-  private hasSharedMutableDependency(
-    m1: string,
-    m2: string,
-    frozenSet: Set<string>,
-  ): boolean {
+  private hasSharedMutableDependency(m1: string, m2: string, frozenSet: Set<string>): boolean {
     const deps1 = this.getDependencies(m1);
     const deps2 = this.getDependencies(m2);
 
@@ -293,21 +279,14 @@ export class ParallelWorkDetector {
    *
    * @private
    */
-  private detectConflicts(
-    workingSet: Set<string>,
-    frozenSet: Set<string>,
-  ): ConflictReport[] {
+  private detectConflicts(workingSet: Set<string>, frozenSet: Set<string>): ConflictReport[] {
     const conflicts: ConflictReport[] = [];
     const workingArray = Array.from(workingSet);
 
     // 작업 중인 모듈들 간 충돌 체크
     for (let i = 0; i < workingArray.length; i++) {
       for (let j = i + 1; j < workingArray.length; j++) {
-        const conflict = this.analyzeConflict(
-          workingArray[i],
-          workingArray[j],
-          frozenSet,
-        );
+        const conflict = this.analyzeConflict(workingArray[i], workingArray[j], frozenSet);
         if (conflict) {
           conflicts.push(conflict);
         }
@@ -327,11 +306,7 @@ export class ParallelWorkDetector {
    *
    * @private
    */
-  private analyzeConflict(
-    m1: string,
-    m2: string,
-    frozenSet: Set<string>,
-  ): ConflictReport | null {
+  private analyzeConflict(m1: string, m2: string, frozenSet: Set<string>): ConflictReport | null {
     // Direct dependency
     if (this.hasDirectDependency(m1, m2)) {
       return {
@@ -398,9 +373,7 @@ export class ParallelWorkDetector {
     if (start === target) return [start];
 
     const visited = new Set<string>();
-    const queue: Array<{ node: string; path: string[] }> = [
-      { node: start, path: [start] },
-    ];
+    const queue: Array<{ node: string; path: string[] }> = [{ node: start, path: [start] }];
     visited.add(start);
 
     while (queue.length > 0) {
@@ -434,10 +407,7 @@ export class ParallelWorkDetector {
    *
    * @private
    */
-  private findParallelZones(
-    availableModules: string[],
-    frozenSet: Set<string>,
-  ): ParallelZone[] {
+  private findParallelZones(availableModules: string[], frozenSet: Set<string>): ParallelZone[] {
     const zones: ParallelZone[] = [];
     const processed = new Set<string>();
 
@@ -487,7 +457,7 @@ export class ParallelWorkDetector {
     // 모든 모듈이 공통으로 의존하는 모듈 찾기
     const allDeps = modules.map((m) => new Set(this.getDependencies(m)));
     const commonDeps = Array.from(allDeps[0]).filter((dep) =>
-      allDeps.every((depSet) => depSet.has(dep)),
+      allDeps.every((depSet) => depSet.has(dep))
     );
 
     return commonDeps;
@@ -502,10 +472,7 @@ export class ParallelWorkDetector {
    *
    * @private
    */
-  private findIsolationBarriers(
-    workingSet: Set<string>,
-    frozenSet: Set<string>,
-  ): string[] {
+  private findIsolationBarriers(workingSet: Set<string>, frozenSet: Set<string>): string[] {
     const barriers: string[] = [];
 
     for (const frozen of frozenSet) {
@@ -548,7 +515,7 @@ export class ParallelWorkDetector {
         if (!candidates.has(dep)) {
           candidates.set(dep, new Set());
         }
-        candidates.get(dep)!.add(module);
+        candidates.get(dep)?.add(module);
       }
     }
 

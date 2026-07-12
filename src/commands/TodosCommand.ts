@@ -3,8 +3,8 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for showing TODO items from plans
@@ -98,8 +98,12 @@ export class TodosCommand extends BaseCommand {
         this.printSection('📊 Database Statistics');
         const stats = dbManager.getStatistics();
         console.log(`   Total Symbols: ${colors.green}${stats.totalSymbols}${colors.reset}`);
-        console.log(`   Total Enhanced Docs: ${colors.green}${stats.totalEnhancedDocs}${colors.reset}`);
-        console.log(`   DB Size: ${colors.green}${(stats.dbSize / 1024).toFixed(2)} KB${colors.reset}`);
+        console.log(
+          `   Total Enhanced Docs: ${colors.green}${stats.totalEnhancedDocs}${colors.reset}`
+        );
+        console.log(
+          `   DB Size: ${colors.green}${(stats.dbSize / 1024).toFixed(2)} KB${colors.reset}`
+        );
         console.log();
 
         // Query future plans (TODO items)
@@ -126,7 +130,11 @@ export class TodosCommand extends BaseCommand {
                     : `${colors.blue}📌`;
 
               const priorityColor =
-                plan.priority === 'high' ? colors.red : plan.priority === 'medium' ? colors.yellow : colors.cyan;
+                plan.priority === 'high'
+                  ? colors.red
+                  : plan.priority === 'medium'
+                    ? colors.yellow
+                    : colors.cyan;
 
               console.log(`${statusIcon} ${colors.bold}[${plan.id}]${colors.reset} ${plan.title}`);
               console.log(`   Status: ${colors.bold}${plan.status}${colors.reset}`);

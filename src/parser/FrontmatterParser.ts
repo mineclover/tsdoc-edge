@@ -140,7 +140,7 @@ export class FrontmatterParser {
    */
   private parseYaml(yamlContent: string): FrontmatterMetadata {
     const metadata: FrontmatterMetadata = {};
-    const lines = yamlContent.split('\n').filter(line => line.trim());
+    const lines = yamlContent.split('\n').filter((line) => line.trim());
 
     for (const line of lines) {
       // Array items
@@ -180,8 +180,8 @@ export class FrontmatterParser {
         const [keyPart, ...itemsPart] = arrayMatch.split('\n');
         const key = keyPart.replace(':', '').trim();
         const items = itemsPart
-          .filter(line => line.trim().startsWith('-'))
-          .map(line => line.trim().slice(1).trim());
+          .filter((line) => line.trim().startsWith('-'))
+          .map((line) => line.trim().slice(1).trim());
         metadata[key] = items;
       }
     }

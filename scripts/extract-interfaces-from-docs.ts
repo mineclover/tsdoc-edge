@@ -65,7 +65,7 @@ function extractInterfaces(content: string, filePath: string): InterfaceBlock[] 
 
 function checkInDatabase(blocks: InterfaceBlock[], db: DatabaseManager): void {
   const allSymbols = db.getAllSymbols();
-  const symbolsByName = new Map(allSymbols.map(s => [s.name, s]));
+  const symbolsByName = new Map(allSymbols.map((s) => [s.name, s]));
 
   for (const block of blocks) {
     const symbol = symbolsByName.get(block.interfaceName);
@@ -89,7 +89,7 @@ console.log('\n=== Extracting Interfaces from Documentation ===\n');
 const allBlocks: InterfaceBlock[] = [];
 
 for (const dir of targetDirs) {
-  const files = fs.readdirSync(dir).filter(f => f.endsWith('.md'));
+  const files = fs.readdirSync(dir).filter((f) => f.endsWith('.md'));
 
   for (const file of files) {
     const filePath = path.join(dir, file);
@@ -105,8 +105,8 @@ for (const dir of targetDirs) {
 checkInDatabase(allBlocks, db);
 
 // Group by existence
-const existsInCode = allBlocks.filter(b => b.existsInCode);
-const notInCode = allBlocks.filter(b => !b.existsInCode);
+const existsInCode = allBlocks.filter((b) => b.existsInCode);
+const notInCode = allBlocks.filter((b) => !b.existsInCode);
 
 console.log(`Total interface/type definitions found: ${allBlocks.length}`);
 console.log(`  Exists in source code: ${existsInCode.length}`);
@@ -119,8 +119,10 @@ if (existsInCode.length > 0) {
     const relPath = path.relative(process.cwd(), block.file);
     console.log(`${relPath}:${block.lineStart}`);
     console.log(`  Interface: ${block.interfaceName}`);
-    console.log(`  Source: ${block.symbolInfo!.filePath}:${block.symbolInfo!.line}`);
-    console.log(`  Lines: ${block.lineStart}-${block.lineEnd} (${block.lineEnd - block.lineStart + 1} lines)`);
+    console.log(`  Source: ${block.symbolInfo?.filePath}:${block.symbolInfo?.line}`);
+    console.log(
+      `  Lines: ${block.lineStart}-${block.lineEnd} (${block.lineEnd - block.lineStart + 1} lines)`
+    );
     console.log('');
   }
 }

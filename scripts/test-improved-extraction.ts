@@ -2,9 +2,9 @@
  * Test improved extraction with detailed analysis
  */
 
-import { DatabaseManager } from '../src/storage/DatabaseManager';
-import { ConfigManager } from '../src/config/ConfigManager';
 import { TestExampleExtractor } from '../src/analyzer/TestExampleExtractor';
+import { ConfigManager } from '../src/config/ConfigManager';
+import { DatabaseManager } from '../src/storage/DatabaseManager';
 
 async function main() {
   const config = ConfigManager.getInstance().get();
@@ -27,7 +27,9 @@ async function main() {
   for (let i = 0; i < Math.min(5, examples.length); i++) {
     const ex = examples[i];
     console.log(`\n${i + 1}. "${ex.description}"`);
-    console.log(`   Quality: ${ex.quality}/10 | Complexity: ${ex.complexity} | Category: ${ex.category}`);
+    console.log(
+      `   Quality: ${ex.quality}/10 | Complexity: ${ex.complexity} | Category: ${ex.category}`
+    );
     console.log(`   Identified symbols (${ex.testedSymbols.length}):`);
 
     // Show first 10 symbols
@@ -65,7 +67,9 @@ async function main() {
 
   for (const [count, frequency] of sortedCounts) {
     const bar = '█'.repeat(Math.floor(frequency / 5));
-    console.log(`  ${count.toString().padStart(3)} symbols: ${frequency.toString().padStart(3)} examples ${bar}`);
+    console.log(
+      `  ${count.toString().padStart(3)} symbols: ${frequency.toString().padStart(3)} examples ${bar}`
+    );
   }
 
   // Create relationships
@@ -74,14 +78,16 @@ async function main() {
 
   const relationships = extractor.createRelationships(examples);
   console.log(`Relationships created: ${relationships.length}`);
-  console.log(`Unique symbols linked: ${new Set(relationships.map(r => r.to)).size}`);
+  console.log(`Unique symbols linked: ${new Set(relationships.map((r) => r.to)).size}`);
   console.log();
 
   // Show sample relationships
   console.log('Sample relationships:');
   for (let i = 0; i < Math.min(10, relationships.length); i++) {
     const rel = relationships[i];
-    console.log(`  ${rel.from} → ${rel.to} (${rel.strength}, quality: ${rel.confidence.toFixed(2)})`);
+    console.log(
+      `  ${rel.from} → ${rel.to} (${rel.strength}, quality: ${rel.confidence.toFixed(2)})`
+    );
   }
 
   dbManager.close();

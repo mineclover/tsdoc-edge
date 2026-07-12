@@ -139,7 +139,10 @@ export class FallbackAnalyzer {
         }
 
         // Pattern 3: Nullish coalescing (??)
-        if (ts.isBinaryExpression(node) && node.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken) {
+        if (
+          ts.isBinaryExpression(node) &&
+          node.operatorToken.kind === ts.SyntaxKind.QuestionQuestionToken
+        ) {
           this.analyzeBinaryExpression(node, sourceFile, sites, 'nullish-coalesce');
         }
 
@@ -147,7 +150,7 @@ export class FallbackAnalyzer {
         if (ts.isConditionalExpression(node)) {
           this.analyzeConditional(node, sourceFile, sites);
         }
-      } catch (error) {
+      } catch (_error) {
         // Skip nodes that cause errors
       }
 
@@ -165,7 +168,11 @@ export class FallbackAnalyzer {
    * @param sites - Array to collect sites
    * @private
    */
-  private analyzeTryCatch(node: ts.TryStatement, sourceFile: ts.SourceFile, sites: FallbackSite[]): void {
+  private analyzeTryCatch(
+    node: ts.TryStatement,
+    sourceFile: ts.SourceFile,
+    sites: FallbackSite[]
+  ): void {
     if (!node.catchClause) return;
 
     // Try to find function calls in try and catch blocks
@@ -189,7 +196,7 @@ export class FallbackAnalyzer {
           fallbackName: fallbackSymbol.name,
           filePath: sourceFile.fileName,
           line,
-          pattern: 'try-catch'
+          pattern: 'try-catch',
         });
       }
     }
@@ -223,7 +230,7 @@ export class FallbackAnalyzer {
         fallbackName: fallbackSymbol.name,
         filePath: sourceFile.fileName,
         line,
-        pattern
+        pattern,
       });
     }
   }
@@ -236,7 +243,11 @@ export class FallbackAnalyzer {
    * @param sites - Array to collect sites
    * @private
    */
-  private analyzeConditional(node: ts.ConditionalExpression, sourceFile: ts.SourceFile, sites: FallbackSite[]): void {
+  private analyzeConditional(
+    node: ts.ConditionalExpression,
+    sourceFile: ts.SourceFile,
+    sites: FallbackSite[]
+  ): void {
     const primarySymbol = this.findSymbolForExpression(node.whenTrue, sourceFile);
     const fallbackSymbol = this.findSymbolForExpression(node.whenFalse, sourceFile);
 
@@ -250,7 +261,7 @@ export class FallbackAnalyzer {
         fallbackName: fallbackSymbol.name,
         filePath: sourceFile.fileName,
         line,
-        pattern: 'conditional'
+        pattern: 'conditional',
       });
     }
   }
@@ -284,7 +295,10 @@ export class FallbackAnalyzer {
    * @returns Symbol or null
    * @private
    */
-  private findSymbolForExpression(expression: ts.Expression, sourceFile: ts.SourceFile): { id: string; name: string } | null {
+  private findSymbolForExpression(
+    expression: ts.Expression,
+    sourceFile: ts.SourceFile
+  ): { id: string; name: string } | null {
     let name: string | null = null;
 
     if (ts.isIdentifier(expression)) {
@@ -336,8 +350,8 @@ export class FallbackAnalyzer {
           lineNumber: site.line,
           snippet: `${site.pattern}: ${site.primaryName} fallback to ${site.fallbackName}`,
           confidence,
-          context: `Fallback pattern detected`
-        }
+          context: `Fallback pattern detected`,
+        },
       ],
       discoveredBy: 'ast-parsing',
       confidence,
@@ -346,11 +360,11 @@ export class FallbackAnalyzer {
       properties: {
         pattern: site.pattern,
         primary: site.primaryName,
-        fallback: site.fallbackName
+        fallback: site.fallbackName,
       },
       createdAt: timestamp,
       updatedAt: timestamp,
-      description: `${site.primaryName} falls back to ${site.fallbackName} (${site.pattern})`
+      description: `${site.primaryName} falls back to ${site.fallbackName} (${site.pattern})`,
     };
   }
 
@@ -369,7 +383,7 @@ export class FallbackAnalyzer {
       'try-catch': 0,
       'logical-or': 0,
       'nullish-coalesce': 0,
-      'conditional': 0
+      conditional: 0,
     };
 
     for (const rel of relationships) {
@@ -381,7 +395,7 @@ export class FallbackAnalyzer {
 
     return {
       totalFallbacks: relationships.length,
-      byPattern
+      byPattern,
     };
   }
 }

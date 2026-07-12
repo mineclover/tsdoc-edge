@@ -5,7 +5,6 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { CodeHealthChecker } from '../../analyzer/CodeHealthChecker';
-import type { AnalysisOptions } from '../../types/analysis';
 
 describe('CodeHealthChecker', () => {
   let checker: CodeHealthChecker;
@@ -373,7 +372,9 @@ class PrivateClass {}
       const resultWithPrivate = checker.analyze({ path: tempDir, includePrivate: true });
       const resultWithoutPrivate = checker.analyze({ path: tempDir, includePrivate: false });
 
-      expect(resultWithPrivate.docScores.length).toBeGreaterThanOrEqual(resultWithoutPrivate.docScores.length);
+      expect(resultWithPrivate.docScores.length).toBeGreaterThanOrEqual(
+        resultWithoutPrivate.docScores.length
+      );
     });
   });
 
@@ -665,11 +666,7 @@ export class Class5 {}
 
       // Create 15 undocumented classes
       for (let i = 0; i < 15; i++) {
-        fs.writeFileSync(
-          path.join(srcDir, `class${i}.ts`),
-          `export class Class${i} {}`,
-          'utf-8'
-        );
+        fs.writeFileSync(path.join(srcDir, `class${i}.ts`), `export class Class${i} {}`, 'utf-8');
       }
 
       const result = checker.analyze({ path: srcDir });
@@ -771,7 +768,9 @@ export class Parent {
       const withChildren = checker.analyze({ path: testFile, includeChildren: true });
       const withoutChildren = checker.analyze({ path: testFile, includeChildren: false });
 
-      expect(withChildren.docScores.length).toBeGreaterThanOrEqual(withoutChildren.docScores.length);
+      expect(withChildren.docScores.length).toBeGreaterThanOrEqual(
+        withoutChildren.docScores.length
+      );
     });
 
     it('should respect includePrivate option', () => {
@@ -825,7 +824,9 @@ export class Documented {}
       });
 
       // Higher threshold should generate more suggestions
-      expect(highThreshold.suggestions.length).toBeGreaterThanOrEqual(lowThreshold.suggestions.length);
+      expect(highThreshold.suggestions.length).toBeGreaterThanOrEqual(
+        lowThreshold.suggestions.length
+      );
     });
   });
 

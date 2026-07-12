@@ -9,7 +9,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, CommandResult, colors } from '../../commands/BaseCommand';
+import { BaseCommand, type CommandResult, colors } from '../../commands/BaseCommand';
 
 // Concrete implementation for testing
 class TestCommand extends BaseCommand {
@@ -69,11 +69,7 @@ class TestCommand extends BaseCommand {
     return this.failure(error, exitCode);
   }
 
-  public testValidateArgs(
-    args: string[],
-    minArgs: number,
-    usage: string
-  ): CommandResult | null {
+  public testValidateArgs(args: string[], minArgs: number, usage: string): CommandResult | null {
     return this.validateArgs(args, minArgs, usage);
   }
 
@@ -337,7 +333,9 @@ describe('BaseCommand', () => {
     let tempDir: string;
 
     beforeEach(() => {
-      tempDir = fs.realpathSync(fs.mkdtempSync(path.join(require('os').tmpdir(), 'tsdoc-test-')));
+      tempDir = fs.realpathSync(
+        fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'tsdoc-test-'))
+      );
       process.chdir(tempDir);
     });
 
@@ -357,20 +355,14 @@ describe('BaseCommand', () => {
           databasePath: 'custom/path/db.sqlite',
         },
       };
-      fs.writeFileSync(
-        path.join(tempDir, '.tsdoc.config.json'),
-        JSON.stringify(config)
-      );
+      fs.writeFileSync(path.join(tempDir, '.tsdoc.config.json'), JSON.stringify(config));
 
       const dbPath = command.testGetDatabasePath();
       expect(dbPath).toBe(path.join(tempDir, 'custom/path/db.sqlite'));
     });
 
     it('should return default path when config is invalid JSON', () => {
-      fs.writeFileSync(
-        path.join(tempDir, '.tsdoc.config.json'),
-        'invalid json'
-      );
+      fs.writeFileSync(path.join(tempDir, '.tsdoc.config.json'), 'invalid json');
 
       const dbPath = command.testGetDatabasePath();
       expect(dbPath).toBe(path.join(tempDir, '.tsdoc.db'));
@@ -390,7 +382,9 @@ describe('BaseCommand', () => {
     let tempDir: string;
 
     beforeEach(() => {
-      tempDir = fs.realpathSync(fs.mkdtempSync(path.join(require('os').tmpdir(), 'tsdoc-test-')));
+      tempDir = fs.realpathSync(
+        fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'tsdoc-test-'))
+      );
       process.chdir(tempDir);
     });
 
@@ -410,10 +404,7 @@ describe('BaseCommand', () => {
           jsonlDir: 'custom/jsonl',
         },
       };
-      fs.writeFileSync(
-        path.join(tempDir, '.tsdoc.config.json'),
-        JSON.stringify(config)
-      );
+      fs.writeFileSync(path.join(tempDir, '.tsdoc.config.json'), JSON.stringify(config));
 
       const jsonlPath = command.testGetJsonlPath();
       expect(jsonlPath).toBe(path.join(tempDir, 'custom/jsonl'));
@@ -425,7 +416,9 @@ describe('BaseCommand', () => {
     let tempDir: string;
 
     beforeEach(() => {
-      tempDir = fs.realpathSync(fs.mkdtempSync(path.join(require('os').tmpdir(), 'tsdoc-test-')));
+      tempDir = fs.realpathSync(
+        fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'tsdoc-test-'))
+      );
       process.chdir(tempDir);
     });
 

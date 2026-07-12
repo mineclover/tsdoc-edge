@@ -3,9 +3,7 @@
     "name": "tsdoc-edge",
     "version": "1.0.0",
     "rootDir": ".",
-    "srcDirs": [
-      "src"
-    ]
+    "srcDirs": ["src"]
   },
   "paths": {
     "commentsDir": ".tsdoc-comments",
@@ -24,12 +22,7 @@
     "strictMode": false,
     "minConnectivityScore": 70,
     "rules": {},
-    "skipCodeImplDirs": [
-      "concepts",
-      "guides",
-      "workflows",
-      "relationships"
-    ]
+    "skipCodeImplDirs": ["concepts", "guides", "workflows", "relationships"]
   },
   "generator": {
     "template": "enhanced",
@@ -45,13 +38,8 @@
   },
   "documentManagement": {
     "enabled": false,
-    "managedDirs": [
-      "docs/managed"
-    ],
-    "excludeDirs": [
-      "docs/examples",
-      "docs/templates"
-    ],
+    "managedDirs": ["docs/managed"],
+    "excludeDirs": ["docs/examples", "docs/templates"],
     "requireFrontmatter": false,
     "strictMode": false,
     "ignoreCodeBlocks": true

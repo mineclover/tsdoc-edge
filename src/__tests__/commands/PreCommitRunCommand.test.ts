@@ -2,8 +2,8 @@
  * Tests for PreCommitRunCommand
  */
 
-import { PreCommitRunCommand } from '../../commands/PreCommitRunCommand';
 import { PreCommitChecker } from '../../analyzer/PreCommitChecker';
+import { PreCommitRunCommand } from '../../commands/PreCommitRunCommand';
 
 jest.mock('../../analyzer/PreCommitChecker');
 
@@ -64,8 +64,20 @@ describe('PreCommitRunCommand', () => {
           failedFiles: 0,
           warningFiles: 0,
           fileResults: [
-            { filePath: 'src/a.ts', passed: true, averageCompleteness: 80, failedSymbols: [], symbolsChecked: 1 },
-            { filePath: 'src/b.ts', passed: true, averageCompleteness: 90, failedSymbols: [], symbolsChecked: 1 },
+            {
+              filePath: 'src/a.ts',
+              passed: true,
+              averageCompleteness: 80,
+              failedSymbols: [],
+              symbolsChecked: 1,
+            },
+            {
+              filePath: 'src/b.ts',
+              passed: true,
+              averageCompleteness: 90,
+              failedSymbols: [],
+              symbolsChecked: 1,
+            },
           ],
           config: {},
         }),
@@ -113,7 +125,13 @@ describe('PreCommitRunCommand', () => {
           failedFiles: 0,
           warningFiles: 1,
           fileResults: [
-            { filePath: 'src/a.ts', passed: true, averageCompleteness: 60, failedSymbols: [], symbolsChecked: 1 },
+            {
+              filePath: 'src/a.ts',
+              passed: true,
+              averageCompleteness: 60,
+              failedSymbols: [],
+              symbolsChecked: 1,
+            },
           ],
           config: {},
         }),

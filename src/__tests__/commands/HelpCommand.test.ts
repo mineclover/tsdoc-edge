@@ -4,16 +4,24 @@
  * @testScenario List commands from registry
  */
 
-import { HelpCommand } from '../../commands/HelpCommand';
-import { CommandRegistry } from '../../commands/CommandRegistry';
 import { BaseCommand, type CommandResult } from '../../commands/BaseCommand';
+import { CommandRegistry } from '../../commands/CommandRegistry';
+import { HelpCommand } from '../../commands/HelpCommand';
 
 // Test command for registry
 class TestCmd extends BaseCommand {
-  getName(): string { return 'test-cmd'; }
-  getDescription(): string { return 'A test command'; }
-  protected getUsage(): string { return 'test-cmd'; }
-  async execute(): Promise<CommandResult> { return { exitCode: 0 }; }
+  getName(): string {
+    return 'test-cmd';
+  }
+  getDescription(): string {
+    return 'A test command';
+  }
+  protected getUsage(): string {
+    return 'test-cmd';
+  }
+  async execute(): Promise<CommandResult> {
+    return { exitCode: 0 };
+  }
 }
 
 describe('HelpCommand', () => {

@@ -87,14 +87,18 @@ Examples:
     this.printHeader('Relationship Analysis System');
 
     console.log();
-    console.log(`  ${this.colors.bold}Complete architectural intelligence through graph analysis${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.bold}Complete architectural intelligence through graph analysis${this.colors.reset}`
+    );
     console.log();
 
     this.printSection('What can you do?');
     console.log(`  ${this.colors.cyan}❓ "What will break if I change this?"${this.colors.reset}`);
     console.log(`     → tsdoc-edge relationship-impact <symbol-id>`);
     console.log();
-    console.log(`  ${this.colors.cyan}❓ "What are the architectural modules?"${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.cyan}❓ "What are the architectural modules?"${this.colors.reset}`
+    );
     console.log(`     → tsdoc-edge relationship-clusters`);
     console.log();
     console.log(`  ${this.colors.cyan}❓ "Which symbols are most critical?"${this.colors.reset}`);
@@ -109,19 +113,35 @@ Examples:
 
     console.log();
     this.printSection('Available Topics');
-    console.log(`  ${this.colors.bold}workflows${this.colors.reset}     - Common workflows (before changes, arch review, refactoring)`);
-    console.log(`  ${this.colors.bold}commands${this.colors.reset}      - Complete command reference`);
-    console.log(`  ${this.colors.bold}metrics${this.colors.reset}       - Understanding graph metrics (degree, betweenness, PageRank)`);
-    console.log(`  ${this.colors.bold}formats${this.colors.reset}       - Export formats (JSON, GraphML, DOT, CSV, Cypher)`);
-    console.log(`  ${this.colors.bold}quick-start${this.colors.reset}   - 2-minute getting started guide`);
+    console.log(
+      `  ${this.colors.bold}workflows${this.colors.reset}     - Common workflows (before changes, arch review, refactoring)`
+    );
+    console.log(
+      `  ${this.colors.bold}commands${this.colors.reset}      - Complete command reference`
+    );
+    console.log(
+      `  ${this.colors.bold}metrics${this.colors.reset}       - Understanding graph metrics (degree, betweenness, PageRank)`
+    );
+    console.log(
+      `  ${this.colors.bold}formats${this.colors.reset}       - Export formats (JSON, GraphML, DOT, CSV, Cypher)`
+    );
+    console.log(
+      `  ${this.colors.bold}quick-start${this.colors.reset}   - 2-minute getting started guide`
+    );
     console.log();
 
-    console.log(`  ${this.colors.dim}Usage: tsdoc-edge relationship-help <topic>${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.dim}Usage: tsdoc-edge relationship-help <topic>${this.colors.reset}`
+    );
     console.log();
 
     this.printSection('Documentation');
-    console.log(`  Full guide: ${this.colors.cyan}docs/relationship-system-guide.md${this.colors.reset}`);
-    console.log(`  Current status: ${this.colors.cyan}tsdoc-edge relationship-stats${this.colors.reset}`);
+    console.log(
+      `  Full guide: ${this.colors.cyan}docs/relationship-system-guide.md${this.colors.reset}`
+    );
+    console.log(
+      `  Current status: ${this.colors.cyan}tsdoc-edge relationship-stats${this.colors.reset}`
+    );
     console.log();
 
     return this.success('Help displayed');
@@ -133,23 +153,39 @@ Examples:
     console.log();
     this.printSection('Step 1: Discover Patterns (30 seconds)');
     console.log(`  ${this.colors.cyan}tsdoc-edge relationship-clusters${this.colors.reset}`);
-    console.log(`  ${this.colors.dim}→ See natural architectural modules in your codebase${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.dim}→ See natural architectural modules in your codebase${this.colors.reset}`
+    );
     console.log();
 
     this.printSection('Step 2: Find Critical Symbols (30 seconds)');
-    console.log(`  ${this.colors.cyan}tsdoc-edge relationship-metrics --top 10${this.colors.reset}`);
-    console.log(`  ${this.colors.dim}→ Identify bottlenecks and critical dependencies${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.cyan}tsdoc-edge relationship-metrics --top 10${this.colors.reset}`
+    );
+    console.log(
+      `  ${this.colors.dim}→ Identify bottlenecks and critical dependencies${this.colors.reset}`
+    );
     console.log();
 
     this.printSection('Step 3: Before Making Changes (1 minute)');
-    console.log(`  ${this.colors.cyan}tsdoc-edge relationship-impact <your-symbol>${this.colors.reset}`);
-    console.log(`  ${this.colors.dim}→ See who will be affected and assess risk${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.cyan}tsdoc-edge relationship-impact <your-symbol>${this.colors.reset}`
+    );
+    console.log(
+      `  ${this.colors.dim}→ See who will be affected and assess risk${this.colors.reset}`
+    );
     console.log();
 
     this.printSection('Next Steps');
-    console.log(`  • Export for visualization: ${this.colors.cyan}tsdoc-edge relationship-help formats${this.colors.reset}`);
-    console.log(`  • Learn workflows: ${this.colors.cyan}tsdoc-edge relationship-help workflows${this.colors.reset}`);
-    console.log(`  • Understand metrics: ${this.colors.cyan}tsdoc-edge relationship-help metrics${this.colors.reset}`);
+    console.log(
+      `  • Export for visualization: ${this.colors.cyan}tsdoc-edge relationship-help formats${this.colors.reset}`
+    );
+    console.log(
+      `  • Learn workflows: ${this.colors.cyan}tsdoc-edge relationship-help workflows${this.colors.reset}`
+    );
+    console.log(
+      `  • Understand metrics: ${this.colors.cyan}tsdoc-edge relationship-help metrics${this.colors.reset}`
+    );
     console.log();
 
     return this.success('Quick start guide displayed');
@@ -171,7 +207,9 @@ Examples:
     console.log(`  ${this.colors.cyan}# Understand connections${this.colors.reset}`);
     console.log(`  tsdoc-edge relationship-query <symbol-id>`);
     console.log();
-    console.log(`  ${this.colors.dim}Risk levels: LOW (<5 affected), MEDIUM (5-19), HIGH (20+)${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.dim}Risk levels: LOW (<5 affected), MEDIUM (5-19), HIGH (20+)${this.colors.reset}`
+    );
     console.log();
 
     this.printSection('2. Architecture Review');
@@ -222,7 +260,9 @@ Examples:
     console.log();
     console.log(`  ${this.colors.bold}relationship-query${this.colors.reset} <symbol-id>`);
     console.log(`    Explore all relationships for a symbol`);
-    console.log(`    ${this.colors.dim}Filters: --category, --type, --direction${this.colors.reset}`);
+    console.log(
+      `    ${this.colors.dim}Filters: --category, --type, --direction${this.colors.reset}`
+    );
     console.log();
     console.log(`  ${this.colors.bold}relationship-path${this.colors.reset} <from> <to>`);
     console.log(`    Find connection paths between symbols`);
@@ -233,26 +273,36 @@ Examples:
     console.log();
     console.log(`  ${this.colors.bold}relationship-impact${this.colors.reset} <symbol-id>`);
     console.log(`    Analyze change impact (who will be affected)`);
-    console.log(`    ${this.colors.dim}Options: --direction (upstream/downstream), --depth${this.colors.reset}`);
+    console.log(
+      `    ${this.colors.dim}Options: --direction (upstream/downstream), --depth${this.colors.reset}`
+    );
     console.log();
     console.log(`  ${this.colors.bold}relationship-metrics${this.colors.reset}`);
     console.log(`    Calculate centrality and importance metrics`);
-    console.log(`    ${this.colors.dim}Metrics: degree, betweenness, pagerank, importance${this.colors.reset}`);
+    console.log(
+      `    ${this.colors.dim}Metrics: degree, betweenness, pagerank, importance${this.colors.reset}`
+    );
     console.log();
     console.log(`  ${this.colors.bold}relationship-clusters${this.colors.reset}`);
     console.log(`    Discover architectural modules`);
-    console.log(`    ${this.colors.dim}Options: --min-size, --category, --detailed${this.colors.reset}`);
+    console.log(
+      `    ${this.colors.dim}Options: --min-size, --category, --detailed${this.colors.reset}`
+    );
     console.log();
 
     this.printSection('Maintenance & Integration');
     console.log();
     console.log(`  ${this.colors.bold}relationship-validate${this.colors.reset}`);
     console.log(`    Check data integrity`);
-    console.log(`    ${this.colors.dim}Options: --fix (auto-repair), --verbose${this.colors.reset}`);
+    console.log(
+      `    ${this.colors.dim}Options: --fix (auto-repair), --verbose${this.colors.reset}`
+    );
     console.log();
     console.log(`  ${this.colors.bold}relationship-export${this.colors.reset}`);
     console.log(`    Export to external formats`);
-    console.log(`    ${this.colors.dim}Formats: json, graphml, dot, csv, cypher${this.colors.reset}`);
+    console.log(
+      `    ${this.colors.dim}Formats: json, graphml, dot, csv, cypher${this.colors.reset}`
+    );
     console.log();
     console.log(`  ${this.colors.bold}relationship-stats${this.colors.reset}`);
     console.log(`    Show implementation progress`);
@@ -272,48 +322,90 @@ Examples:
     this.printSection('Core Metrics');
     console.log();
     console.log(`  ${this.colors.bold}Degree${this.colors.reset} - Total connections (in + out)`);
-    console.log(`    ${this.colors.dim}Use case: Finding hubs (highly connected symbols)${this.colors.reset}`);
-    console.log(`    ${this.colors.dim}High degree = symbol touches many parts of system${this.colors.reset}`);
+    console.log(
+      `    ${this.colors.dim}Use case: Finding hubs (highly connected symbols)${this.colors.reset}`
+    );
+    console.log(
+      `    ${this.colors.dim}High degree = symbol touches many parts of system${this.colors.reset}`
+    );
     console.log();
-    console.log(`  ${this.colors.bold}In-Degree${this.colors.reset} - Number of symbols depending on this`);
+    console.log(
+      `  ${this.colors.bold}In-Degree${this.colors.reset} - Number of symbols depending on this`
+    );
     console.log(`    ${this.colors.dim}Use case: Finding core dependencies${this.colors.reset}`);
-    console.log(`    ${this.colors.dim}High in-degree = many symbols depend on this (must be stable)${this.colors.reset}`);
+    console.log(
+      `    ${this.colors.dim}High in-degree = many symbols depend on this (must be stable)${this.colors.reset}`
+    );
     console.log();
-    console.log(`  ${this.colors.bold}Out-Degree${this.colors.reset} - Number of symbols this depends on`);
+    console.log(
+      `  ${this.colors.bold}Out-Degree${this.colors.reset} - Number of symbols this depends on`
+    );
     console.log(`    ${this.colors.dim}Use case: Finding orchestrators${this.colors.reset}`);
-    console.log(`    ${this.colors.dim}High out-degree = coordinates many components${this.colors.reset}`);
+    console.log(
+      `    ${this.colors.dim}High out-degree = coordinates many components${this.colors.reset}`
+    );
     console.log();
 
     this.printSection('Advanced Metrics');
     console.log();
-    console.log(`  ${this.colors.bold}Betweenness Centrality${this.colors.reset} - Frequency on shortest paths`);
-    console.log(`    ${this.colors.dim}Use case: Finding bottlenecks and bridges${this.colors.reset}`);
-    console.log(`    ${this.colors.dim}High betweenness = information must flow through this symbol${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.bold}Betweenness Centrality${this.colors.reset} - Frequency on shortest paths`
+    );
+    console.log(
+      `    ${this.colors.dim}Use case: Finding bottlenecks and bridges${this.colors.reset}`
+    );
+    console.log(
+      `    ${this.colors.dim}High betweenness = information must flow through this symbol${this.colors.reset}`
+    );
     console.log(`    ${this.colors.dim}Example: API gateway, central router${this.colors.reset}`);
     console.log();
-    console.log(`  ${this.colors.bold}PageRank${this.colors.reset} - Importance based on incoming connection quality`);
+    console.log(
+      `  ${this.colors.bold}PageRank${this.colors.reset} - Importance based on incoming connection quality`
+    );
     console.log(`    ${this.colors.dim}Use case: Finding influential symbols${this.colors.reset}`);
-    console.log(`    ${this.colors.dim}High PageRank = referenced by other important symbols${this.colors.reset}`);
-    console.log(`    ${this.colors.dim}Example: Fundamental interfaces, base classes${this.colors.reset}`);
+    console.log(
+      `    ${this.colors.dim}High PageRank = referenced by other important symbols${this.colors.reset}`
+    );
+    console.log(
+      `    ${this.colors.dim}Example: Fundamental interfaces, base classes${this.colors.reset}`
+    );
     console.log();
 
     this.printSection('Architectural Patterns');
     console.log();
-    console.log(`  ${this.colors.yellow}Critical Hub${this.colors.reset} - High degree + High betweenness`);
-    console.log(`    ${this.colors.dim}→ Architectural bottleneck, changes have wide impact${this.colors.reset}`);
-    console.log(`    ${this.colors.dim}→ Action: Feature flags, extensive testing, careful change management${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.yellow}Critical Hub${this.colors.reset} - High degree + High betweenness`
+    );
+    console.log(
+      `    ${this.colors.dim}→ Architectural bottleneck, changes have wide impact${this.colors.reset}`
+    );
+    console.log(
+      `    ${this.colors.dim}→ Action: Feature flags, extensive testing, careful change management${this.colors.reset}`
+    );
     console.log();
-    console.log(`  ${this.colors.green}Core Component${this.colors.reset} - High in-degree + Low out-degree`);
+    console.log(
+      `  ${this.colors.green}Core Component${this.colors.reset} - High in-degree + Low out-degree`
+    );
     console.log(`    ${this.colors.dim}→ Many symbols depend on this${this.colors.reset}`);
-    console.log(`    ${this.colors.dim}→ Action: Ensure stability, semantic versioning, comprehensive tests${this.colors.reset}`);
+    console.log(
+      `    ${this.colors.dim}→ Action: Ensure stability, semantic versioning, comprehensive tests${this.colors.reset}`
+    );
     console.log();
-    console.log(`  ${this.colors.cyan}Orchestrator${this.colors.reset} - High out-degree + Low in-degree`);
-    console.log(`    ${this.colors.dim}→ Coordinates many components, integration point${this.colors.reset}`);
-    console.log(`    ${this.colors.dim}→ Action: Integration tests, monitor dependencies${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.cyan}Orchestrator${this.colors.reset} - High out-degree + Low in-degree`
+    );
+    console.log(
+      `    ${this.colors.dim}→ Coordinates many components, integration point${this.colors.reset}`
+    );
+    console.log(
+      `    ${this.colors.dim}→ Action: Integration tests, monitor dependencies${this.colors.reset}`
+    );
     console.log();
     console.log(`  ${this.colors.blue}Bridge${this.colors.reset} - High betweenness`);
     console.log(`    ${this.colors.dim}→ Connects different subsystems${this.colors.reset}`);
-    console.log(`    ${this.colors.dim}→ Action: API stability, backward compatibility${this.colors.reset}`);
+    console.log(
+      `    ${this.colors.dim}→ Action: API stability, backward compatibility${this.colors.reset}`
+    );
     console.log();
 
     console.log();
@@ -328,17 +420,27 @@ Examples:
 
     console.log();
     this.printSection('JSON - Programmatic Analysis');
-    console.log(`  ${this.colors.bold}Best for:${this.colors.reset} Custom tools, data science, automation`);
+    console.log(
+      `  ${this.colors.bold}Best for:${this.colors.reset} Custom tools, data science, automation`
+    );
     console.log(`  ${this.colors.bold}Size:${this.colors.reset} Large (14 MB for full export)`);
-    console.log(`  ${this.colors.cyan}tsdoc-edge relationship-export --format json --output data.json${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.cyan}tsdoc-edge relationship-export --format json --output data.json${this.colors.reset}`
+    );
     console.log();
-    console.log(`  ${this.colors.dim}Use with: Python/Pandas, jq, custom scripts${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.dim}Use with: Python/Pandas, jq, custom scripts${this.colors.reset}`
+    );
     console.log();
 
     this.printSection('GraphML - Visual Analysis');
-    console.log(`  ${this.colors.bold}Best for:${this.colors.reset} Interactive graph visualization`);
+    console.log(
+      `  ${this.colors.bold}Best for:${this.colors.reset} Interactive graph visualization`
+    );
     console.log(`  ${this.colors.bold}Tools:${this.colors.reset} Gephi, yEd, Cytoscape`);
-    console.log(`  ${this.colors.cyan}tsdoc-edge relationship-export --format graphml --output graph.graphml${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.cyan}tsdoc-edge relationship-export --format graphml --output graph.graphml${this.colors.reset}`
+    );
     console.log();
     console.log(`  ${this.colors.dim}Gephi workflow:${this.colors.reset}`);
     console.log(`  ${this.colors.dim}1. File → Open → graph.graphml${this.colors.reset}`);
@@ -348,30 +450,50 @@ Examples:
     console.log();
 
     this.printSection('DOT - Documentation Diagrams');
-    console.log(`  ${this.colors.bold}Best for:${this.colors.reset} Architecture documentation, reports`);
+    console.log(
+      `  ${this.colors.bold}Best for:${this.colors.reset} Architecture documentation, reports`
+    );
     console.log(`  ${this.colors.bold}Tool:${this.colors.reset} Graphviz`);
-    console.log(`  ${this.colors.cyan}tsdoc-edge relationship-export --format dot --output graph.dot${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.cyan}tsdoc-edge relationship-export --format dot --output graph.dot${this.colors.reset}`
+    );
     console.log(`  ${this.colors.cyan}dot -Tpng graph.dot -o diagram.png${this.colors.reset}`);
     console.log();
 
     this.printSection('CSV - Spreadsheet Analysis');
-    console.log(`  ${this.colors.bold}Best for:${this.colors.reset} Excel analysis, simple data exploration`);
-    console.log(`  ${this.colors.bold}Tools:${this.colors.reset} Excel, Google Sheets, Python/Pandas`);
-    console.log(`  ${this.colors.cyan}tsdoc-edge relationship-export --format csv --output data.csv${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.bold}Best for:${this.colors.reset} Excel analysis, simple data exploration`
+    );
+    console.log(
+      `  ${this.colors.bold}Tools:${this.colors.reset} Excel, Google Sheets, Python/Pandas`
+    );
+    console.log(
+      `  ${this.colors.cyan}tsdoc-edge relationship-export --format csv --output data.csv${this.colors.reset}`
+    );
     console.log();
 
     this.printSection('Cypher - Graph Database');
-    console.log(`  ${this.colors.bold}Best for:${this.colors.reset} Complex graph queries, pattern matching`);
+    console.log(
+      `  ${this.colors.bold}Best for:${this.colors.reset} Complex graph queries, pattern matching`
+    );
     console.log(`  ${this.colors.bold}Tool:${this.colors.reset} Neo4j`);
-    console.log(`  ${this.colors.cyan}tsdoc-edge relationship-export --format cypher --output import.cypher${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.cyan}tsdoc-edge relationship-export --format cypher --output import.cypher${this.colors.reset}`
+    );
     console.log();
     console.log(`  ${this.colors.dim}Neo4j example queries:${this.colors.reset}`);
-    console.log(`  ${this.colors.dim}MATCH (s:Symbol)-[r:RELATES]->(t) RETURN s,r,t LIMIT 100${this.colors.reset}`);
-    console.log(`  ${this.colors.dim}MATCH (s:Symbol)-[*]->(s) RETURN s  // Find cycles${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.dim}MATCH (s:Symbol)-[r:RELATES]->(t) RETURN s,r,t LIMIT 100${this.colors.reset}`
+    );
+    console.log(
+      `  ${this.colors.dim}MATCH (s:Symbol)-[*]->(s) RETURN s  // Find cycles${this.colors.reset}`
+    );
     console.log();
 
     this.printSection('Tips');
-    console.log(`  • Filter before export: ${this.colors.dim}--category structural --min-confidence 0.8${this.colors.reset}`);
+    console.log(
+      `  • Filter before export: ${this.colors.dim}--category structural --min-confidence 0.8${this.colors.reset}`
+    );
     console.log(`  • Start small: Export one category first to test your workflow`);
     console.log(`  • Structural relationships work best for architecture diagrams`);
     console.log();

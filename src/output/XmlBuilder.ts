@@ -3,7 +3,15 @@
  * @packageDocumentation
  */
 
-import type { OutputSchema, OutputBuilder, SectionData, ArraySchema, ObjectSchema, GroupedArraySchema, GroupedSectionData } from './types';
+import type {
+  ArraySchema,
+  GroupedArraySchema,
+  GroupedSectionData,
+  ObjectSchema,
+  OutputBuilder,
+  OutputSchema,
+  SectionData,
+} from './types';
 
 /**
  * Escape special XML characters
@@ -55,7 +63,9 @@ export class XmlBuilder implements OutputBuilder {
    */
   section(name: string, data: SectionData | GroupedSectionData): this {
     if (!this.schema.sections[name]) {
-      throw new Error(`Unknown section: ${name}. Available: ${Object.keys(this.schema.sections).join(', ')}`);
+      throw new Error(
+        `Unknown section: ${name}. Available: ${Object.keys(this.schema.sections).join(', ')}`
+      );
     }
     this.data.set(name, data);
     return this;
@@ -73,11 +83,29 @@ export class XmlBuilder implements OutputBuilder {
       if (sectionData === undefined) continue;
 
       if (this.isGroupedArraySchema(sectionSchema)) {
-        this.buildGroupedArraySection(lines, sectionName, sectionSchema, sectionData as GroupedSectionData, 1);
+        this.buildGroupedArraySection(
+          lines,
+          sectionName,
+          sectionSchema,
+          sectionData as GroupedSectionData,
+          1
+        );
       } else if (this.isArraySchema(sectionSchema)) {
-        this.buildArraySection(lines, sectionName, sectionSchema, sectionData as Array<Record<string, unknown>>, 1);
+        this.buildArraySection(
+          lines,
+          sectionName,
+          sectionSchema,
+          sectionData as Array<Record<string, unknown>>,
+          1
+        );
       } else {
-        this.buildObjectSection(lines, sectionName, sectionSchema as ObjectSchema, sectionData as Record<string, unknown>, 1);
+        this.buildObjectSection(
+          lines,
+          sectionName,
+          sectionSchema as ObjectSchema,
+          sectionData as Record<string, unknown>,
+          1
+        );
       }
     }
 
@@ -92,11 +120,15 @@ export class XmlBuilder implements OutputBuilder {
     console.log(this.build());
   }
 
-  private isArraySchema(schema: ObjectSchema | ArraySchema | GroupedArraySchema): schema is ArraySchema {
+  private isArraySchema(
+    schema: ObjectSchema | ArraySchema | GroupedArraySchema
+  ): schema is ArraySchema {
     return '_array' in schema && schema._array === true;
   }
 
-  private isGroupedArraySchema(schema: ObjectSchema | ArraySchema | GroupedArraySchema): schema is GroupedArraySchema {
+  private isGroupedArraySchema(
+    schema: ObjectSchema | ArraySchema | GroupedArraySchema
+  ): schema is GroupedArraySchema {
     return '_groupedArray' in schema && schema._groupedArray === true;
   }
 
@@ -226,7 +258,9 @@ export class XmlBuilder implements OutputBuilder {
       if (items.length === 0) continue;
 
       const groupInd = this.indent(level + 1);
-      lines.push(`${groupInd}<${schema._groupTag} ${schema._groupKeyField}="${escapeXml(groupKey)}" count="${items.length}">`);
+      lines.push(
+        `${groupInd}<${schema._groupTag} ${schema._groupKeyField}="${escapeXml(groupKey)}" count="${items.length}">`
+      );
 
       for (let i = 0; i < items.length; i++) {
         const item = items[i];

@@ -13,11 +13,11 @@ import { UsageTracker } from './analytics/UsageTracker';
 import {
   AnalyzeCommand,
   BuildCommand,
-  VisualizeDepsCommand,
   CheckDuplicatesCommand,
   CommandRegistry,
-  CoreApiCommand,
+  type CommandResult,
   ConventionCommand,
+  CoreApiCommand,
   FixCommand,
   HealthCommand,
   HelpCommand,
@@ -31,6 +31,7 @@ import {
   RebuildIndexCommand,
   StatsCommand,
   SuggestCommand,
+  SymbolUnifiedCommand,
   SyncCoverageCommand,
   TodosCommand,
   TreeCommand,
@@ -39,40 +40,39 @@ import {
   UntestedCommand,
   UsageCommand,
   ValidateUnifiedCommand,
-  SymbolUnifiedCommand,
-  type CommandResult,
+  VisualizeDepsCommand,
 } from './commands';
-import { ParallelWorkCommand } from './commands/ParallelWorkCommand';
-import { TestRelationshipsCommand } from './commands/TestRelationshipsCommand';
-import { RelationshipCommand } from './commands/RelationshipCommand';
-import { WorkContextCommand } from './commands/WorkContextCommand';
-import { DesignContextCommand } from './commands/DesignContextCommand';
-import { DocSymbolsCommand } from './commands/DocSymbolsCommand';
-import { SystemStatusCommand } from './commands/SystemStatusCommand';
-import { ExploreEntrypointCommand } from './commands/ExploreEntrypointCommand';
-import { ParseMermaidCommand } from './commands/ParseMermaidCommand';
-import { PromoteSymbolCommand } from './commands/PromoteSymbolCommand';
-import { CoverageReportCommand } from './commands/CoverageReportCommand';
-import { DetectDeadCodeCommand } from './commands/DetectDeadCodeCommand';
-import { MoveCommand } from './commands/MoveCommand';
-import { TestExamplesCommand } from './commands/TestExamplesCommand';
-import { LintCommand } from './commands/LintCommand';
-import { PreCommitRunCommand } from './commands/PreCommitRunCommand';
-import { SpecCommand } from './commands/SpecCommand';
-import { TaskCommand } from './commands/TaskCommand';
-import { OntologyCommand } from './commands/OntologyCommand';
-import { DocsCommand } from './commands/DocsCommand';
-import { CheckLinksCommand } from './commands/CheckLinksCommand';
-import { DepsCommand } from './commands/DepsCommand';
-import { WhoUsesCommand } from './commands/WhoUsesCommand';
-import { OrphansCommand } from './commands/OrphansCommand';
-import { EndpointsCommand } from './commands/EndpointsCommand';
-import { HttpEndpointsCommand } from './commands/HttpEndpointsCommand';
 import { BlocksCommand } from './commands/BlocksCommand';
+import { CheckLinksCommand } from './commands/CheckLinksCommand';
+import { CommonCommand } from './commands/CommonCommand';
+import { CoverageReportCommand } from './commands/CoverageReportCommand';
+import { DepsCommand } from './commands/DepsCommand';
+import { DesignContextCommand } from './commands/DesignContextCommand';
+import { DetectDeadCodeCommand } from './commands/DetectDeadCodeCommand';
+import { DocSymbolsCommand } from './commands/DocSymbolsCommand';
+import { DocsCommand } from './commands/DocsCommand';
+import { EndpointsCommand } from './commands/EndpointsCommand';
+import { ExploreEntrypointCommand } from './commands/ExploreEntrypointCommand';
+import { HttpEndpointsCommand } from './commands/HttpEndpointsCommand';
 import { HubsCommand } from './commands/HubsCommand';
 import { LayersCommand } from './commands/LayersCommand';
-import { CommonCommand } from './commands/CommonCommand';
+import { LintCommand } from './commands/LintCommand';
+import { MoveCommand } from './commands/MoveCommand';
+import { OntologyCommand } from './commands/OntologyCommand';
+import { OrphansCommand } from './commands/OrphansCommand';
+import { ParallelWorkCommand } from './commands/ParallelWorkCommand';
+import { ParseMermaidCommand } from './commands/ParseMermaidCommand';
+import { PreCommitRunCommand } from './commands/PreCommitRunCommand';
+import { PromoteSymbolCommand } from './commands/PromoteSymbolCommand';
+import { RelationshipCommand } from './commands/RelationshipCommand';
 import { RoutesCommand } from './commands/RoutesCommand';
+import { SpecCommand } from './commands/SpecCommand';
+import { SystemStatusCommand } from './commands/SystemStatusCommand';
+import { TaskCommand } from './commands/TaskCommand';
+import { TestExamplesCommand } from './commands/TestExamplesCommand';
+import { TestRelationshipsCommand } from './commands/TestRelationshipsCommand';
+import { WhoUsesCommand } from './commands/WhoUsesCommand';
+import { WorkContextCommand } from './commands/WorkContextCommand';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 

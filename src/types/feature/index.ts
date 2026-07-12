@@ -3,5 +3,5 @@
  * @packageDocumentation
  */
 
-export * from './feature';
 export * from './doc-symbol';
+export * from './feature';

@@ -3,11 +3,11 @@
  */
 
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 import * as os from 'node:os';
-import { TaskManager } from '../../task/TaskManager';
+import * as path from 'node:path';
 import { DatabaseManager } from '../../storage/DatabaseManager';
-import { TaskStatus, TaskPriority, TaskType } from '../../types/task';
+import { TaskManager } from '../../task/TaskManager';
+import { TaskPriority, TaskStatus, TaskType } from '../../types/task';
 
 describe('TaskManager', () => {
   let taskManager: TaskManager;

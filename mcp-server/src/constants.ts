@@ -25,11 +25,7 @@ export const RELATIONSHIP_CATEGORIES = [
 
 export const RELATIONSHIP_STRENGTHS = ['strong', 'medium', 'weak'] as const;
 
-export const RELATIONSHIP_DIRECTIONS = [
-  'unidirectional',
-  'bidirectional',
-  'undirected',
-] as const;
+export const RELATIONSHIP_DIRECTIONS = ['unidirectional', 'bidirectional', 'undirected'] as const;
 
 export const SYMBOL_TYPES = [
   'class',
@@ -45,7 +41,8 @@ export const SYMBOL_TYPES = [
 ] as const;
 
 export const ERROR_MESSAGES = {
-  DATABASE_NOT_FOUND: 'TSDoc Edge database not found. Please run `tsdoc-edge build src` in your project directory first.',
+  DATABASE_NOT_FOUND:
+    'TSDoc Edge database not found. Please run `tsdoc-edge build src` in your project directory first.',
   SYMBOL_NOT_FOUND: 'Symbol not found in database.',
   INVALID_PATH: 'Invalid file path provided.',
   INVALID_LIMIT: 'Limit must be between 1 and 100.',

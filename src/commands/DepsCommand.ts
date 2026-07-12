@@ -5,11 +5,11 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
-import { DatabaseManager } from '../storage/DatabaseManager';
-import { XmlBuilder } from '../output/XmlBuilder';
 import { DepsSchema } from '../output/schemas';
+import { XmlBuilder } from '../output/XmlBuilder';
+import { DatabaseManager } from '../storage/DatabaseManager';
+import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for showing symbol dependencies
@@ -88,10 +88,10 @@ export class DepsCommand extends BaseCommand {
       }
 
       // Parse options
-      const typeFilter = args.find(a => a.startsWith('--type='))?.split('=')[1];
+      const typeFilter = args.find((a) => a.startsWith('--type='))?.split('=')[1];
       const showAll = args.includes('--all');
       const useHuman = args.includes('--human');
-      const filteredArgs = args.filter(a => !a.startsWith('--'));
+      const filteredArgs = args.filter((a) => !a.startsWith('--'));
 
       const id = filteredArgs[0];
       if (!id) {
@@ -100,9 +100,13 @@ export class DepsCommand extends BaseCommand {
         console.log('Examples:');
         console.log(`  ${colors.dim}tsdoc-edge deps DatabaseManager${colors.reset}`);
         console.log(`  ${colors.dim}tsdoc-edge deps BuildCommand${colors.reset}`);
-        console.log(`  ${colors.dim}tsdoc-edge deps class-basecommand${colors.reset}  ${colors.dim}(exact ID)${colors.reset}`);
+        console.log(
+          `  ${colors.dim}tsdoc-edge deps class-basecommand${colors.reset}  ${colors.dim}(exact ID)${colors.reset}`
+        );
         console.log();
-        console.log(`Tip: Use ${colors.cyan}tsdoc-edge stats${colors.reset} to see available symbols`);
+        console.log(
+          `Tip: Use ${colors.cyan}tsdoc-edge stats${colors.reset} to see available symbols`
+        );
         console.log();
         return this.failure('Symbol name required');
       }
@@ -126,7 +130,9 @@ export class DepsCommand extends BaseCommand {
           // Auto-select if first match is exact class/interface match
           const first = matches[0];
           const isExactMatch = first.sourceRef.symbolName.toLowerCase() === id.toLowerCase();
-          const isPrimaryType = ['class', 'interface', 'function', 'type'].includes(first.sourceRef.type || '');
+          const isPrimaryType = ['class', 'interface', 'function', 'type'].includes(
+            first.sourceRef.type || ''
+          );
 
           if (isExactMatch && isPrimaryType) {
             entry = first;
@@ -137,7 +143,9 @@ export class DepsCommand extends BaseCommand {
           } else {
             console.log(`${colors.yellow}Multiple matches found:${colors.reset}`);
             for (const m of matches.slice(0, 10)) {
-              console.log(`  ${colors.cyan}${m.id}${colors.reset} (${m.sourceRef.symbolName}) [${m.sourceRef.type || 'unknown'}]`);
+              console.log(
+                `  ${colors.cyan}${m.id}${colors.reset} (${m.sourceRef.symbolName}) [${m.sourceRef.type || 'unknown'}]`
+              );
             }
             if (matches.length > 10) {
               console.log(`  ... and ${matches.length - 10} more`);
@@ -159,7 +167,12 @@ export class DepsCommand extends BaseCommand {
     });
   }
 
-  private async findDepsFromDatabase(idOrName: string, typeFilter?: string, showAll?: boolean, useHuman?: boolean): Promise<CommandResult> {
+  private async findDepsFromDatabase(
+    idOrName: string,
+    typeFilter?: string,
+    showAll?: boolean,
+    useHuman?: boolean
+  ): Promise<CommandResult> {
     const dbCheck = this.checkDatabaseExists();
     if (dbCheck) {
       this.printError(`Symbol not found: ${idOrName}`);
@@ -182,9 +195,10 @@ export class DepsCommand extends BaseCommand {
           symbol = dbManager.getSymbol(matches[0].id);
         } else if (matches.length > 1) {
           // Auto-select if any match is exact class/interface/function/type match
-          const primaryMatch = matches.find(m =>
-            m.name.toLowerCase() === idOrName.toLowerCase() &&
-            ['class', 'interface', 'function', 'type'].includes(m.type)
+          const primaryMatch = matches.find(
+            (m) =>
+              m.name.toLowerCase() === idOrName.toLowerCase() &&
+              ['class', 'interface', 'function', 'type'].includes(m.type)
           );
 
           if (primaryMatch) {
@@ -215,21 +229,24 @@ export class DepsCommand extends BaseCommand {
       }
 
       // Get relationships from database using Drizzle ORM
-      const queryOptions: { symbolId: string; limit: number; type?: string } = { symbolId: symbol.id, limit: 200 };
+      const queryOptions: { symbolId: string; limit: number; type?: string } = {
+        symbolId: symbol.id,
+        limit: 200,
+      };
       if (typeFilter) {
         queryOptions.type = typeFilter;
       }
       const relationships = dbManager.queryRelationships(queryOptions);
 
       // Filter for outgoing relationships (where this symbol is the source)
-      let outgoing = relationships.filter(rel => {
+      let outgoing = relationships.filter((rel) => {
         const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
-        return fromSymbols.includes(symbol!.id);
+        return fromSymbols.includes(symbol?.id);
       });
 
       // By default, only show code-dependency (unless --all or --type specified)
       if (!showAll && !typeFilter) {
-        outgoing = outgoing.filter(rel => rel.type === 'code-dependency');
+        outgoing = outgoing.filter((rel) => rel.type === 'code-dependency');
       }
 
       // Collect dependency info
@@ -256,9 +273,11 @@ export class DepsCommand extends BaseCommand {
             let signature: string | undefined;
             if (targetRow && (target.type === 'function' || target.type === 'method')) {
               const params = targetRow.parameter_types ? JSON.parse(targetRow.parameter_types) : [];
-              const paramStr = params.map((p: { name: string; type?: string }) =>
-                `${p.name}${p.type ? ': ' + p.type : ''}`
-              ).join(', ');
+              const paramStr = params
+                .map(
+                  (p: { name: string; type?: string }) => `${p.name}${p.type ? `: ${p.type}` : ''}`
+                )
+                .join(', ');
               const returnType = targetRow.declared_type || 'unknown';
               signature = `${target.name}(${paramStr}): ${returnType}`;
             }
@@ -317,16 +336,19 @@ export class DepsCommand extends BaseCommand {
             summary: symbol.summary || undefined,
             exported: symbol.isExported,
           })
-          .section('targets', deps.map(dep => ({
-            name: dep.name,
-            type: dep.type,
-            relation: dep.relType,
-            file: dep.file,
-            line: dep.line,
-            summary: dep.summary,
-            signature: dep.signature,
-            usageContext: dep.usageContext,
-          })))
+          .section(
+            'targets',
+            deps.map((dep) => ({
+              name: dep.name,
+              type: dep.type,
+              relation: dep.relType,
+              file: dep.file,
+              line: dep.line,
+              summary: dep.summary,
+              signature: dep.signature,
+              usageContext: dep.usageContext,
+            }))
+          )
           .print();
       }
 

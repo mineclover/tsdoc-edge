@@ -9,14 +9,14 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { ReferenceUpdater, FileReference } from '../../utilities/ReferenceUpdater';
+import { ReferenceUpdater } from '../../utilities/ReferenceUpdater';
 
 describe('ReferenceUpdater', () => {
   let tempDir: string;
   let managedDir: string;
 
   beforeEach(() => {
-    tempDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'ref-updater-test-'));
+    tempDir = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'ref-updater-test-'));
     managedDir = path.join(tempDir, 'managed');
     fs.mkdirSync(managedDir, { recursive: true });
   });
@@ -102,10 +102,7 @@ describe('ReferenceUpdater', () => {
         const targetPath = path.join(managedDir, 'old-feature.md');
 
         fs.writeFileSync(targetPath, '');
-        fs.writeFileSync(
-          docPath,
-          '[Link1](./old-feature.md) and [Link2](./old-feature.md)'
-        );
+        fs.writeFileSync(docPath, '[Link1](./old-feature.md) and [Link2](./old-feature.md)');
 
         const refs = updater.findReferences('old-feature.md');
 
@@ -238,10 +235,7 @@ describe('ReferenceUpdater', () => {
       const updater = new ReferenceUpdater(managedDir);
       const docPath = path.join(managedDir, 'doc.md');
 
-      fs.writeFileSync(
-        docPath,
-        '→ old-feature.md\nPath: old-feature.md\n`old-feature.md`'
-      );
+      fs.writeFileSync(docPath, '→ old-feature.md\nPath: old-feature.md\n`old-feature.md`');
 
       const refs = updater.findReferences('old-feature.md');
       updater.updateReferences(refs, 'new-feature.md');

@@ -75,12 +75,7 @@ export class ASTSymbolExtractor {
     this.exportedClasses = new Set();
     this.exportedInterfaces = new Set();
 
-    const sourceFile = ts.createSourceFile(
-      filePath,
-      sourceCode,
-      ts.ScriptTarget.Latest,
-      true
-    );
+    const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
 
     this.visitNode(sourceFile, undefined);
 
@@ -123,12 +118,13 @@ export class ASTSymbolExtractor {
       if (ts.isIdentifier(n) && importedNames.has(n.text)) {
         // Check if it's actually used as a type/value, not just a property name
         const parent = n.parent;
-        if (parent && (
-          ts.isNewExpression(parent) ||
-          ts.isCallExpression(parent) ||
-          ts.isPropertyAccessExpression(parent) && parent.expression === n ||
-          ts.isTypeReferenceNode(parent)
-        )) {
+        if (
+          parent &&
+          (ts.isNewExpression(parent) ||
+            ts.isCallExpression(parent) ||
+            (ts.isPropertyAccessExpression(parent) && parent.expression === n) ||
+            ts.isTypeReferenceNode(parent))
+        ) {
           refs.add(n.text);
         }
       }
@@ -343,7 +339,8 @@ export class ASTSymbolExtractor {
    * Extract class symbol
    */
   private extractClassSymbol(node: ts.ClassDeclaration): ExtractedSymbol {
-    const name = node.name!.text;
+    const name = node.name?.text;
+    if (!name) throw new Error('Class declaration must have a name');
     const pos = node.getSourceFile().getLineAndCharacterOfPosition(node.getStart());
 
     // Extract inheritance (extends)
@@ -435,8 +432,12 @@ export class ASTSymbolExtractor {
   /**
    * Extract function symbol
    */
-  private extractFunctionSymbol(node: ts.FunctionDeclaration, parentSymbol?: string): ExtractedSymbol {
-    const name = node.name!.text;
+  private extractFunctionSymbol(
+    node: ts.FunctionDeclaration,
+    parentSymbol?: string
+  ): ExtractedSymbol {
+    const name = node.name?.text;
+    if (!name) throw new Error('Function declaration must have a name');
     const pos = node.getSourceFile().getLineAndCharacterOfPosition(node.getStart());
 
     // Extract function type information
@@ -473,7 +474,8 @@ export class ASTSymbolExtractor {
 
     // Method is exported if parent class/interface is exported and method is public
     const isPublic = !this.hasPrivateModifier(node);
-    const parentIsExported = this.exportedClasses.has(parentSymbol) || this.exportedInterfaces.has(parentSymbol);
+    const parentIsExported =
+      this.exportedClasses.has(parentSymbol) || this.exportedInterfaces.has(parentSymbol);
     const isExported = parentIsExported && isPublic;
 
     return {
@@ -494,7 +496,10 @@ export class ASTSymbolExtractor {
   /**
    * Extract property symbol
    */
-  private extractPropertySymbol(node: ts.PropertyDeclaration, parentSymbol: string): ExtractedSymbol {
+  private extractPropertySymbol(
+    node: ts.PropertyDeclaration,
+    parentSymbol: string
+  ): ExtractedSymbol {
     const name = node.name.getText();
     const pos = node.getSourceFile().getLineAndCharacterOfPosition(node.getStart());
     const fullName = `${parentSymbol}.${name}`;
@@ -507,7 +512,8 @@ export class ASTSymbolExtractor {
 
     // Property is exported if parent class/interface is exported and property is public
     const isPublic = !this.hasPrivateModifier(node);
-    const parentIsExported = this.exportedClasses.has(parentSymbol) || this.exportedInterfaces.has(parentSymbol);
+    const parentIsExported =
+      this.exportedClasses.has(parentSymbol) || this.exportedInterfaces.has(parentSymbol);
     const isExported = parentIsExported && isPublic;
 
     return {
@@ -574,9 +580,7 @@ export class ASTSymbolExtractor {
   private hasExportModifier(node: ts.Node): boolean {
     const modifiers = ts.canHaveModifiers(node) ? ts.getModifiers(node) : undefined;
     if (!modifiers) return false;
-    return modifiers.some(
-      (mod: ts.Modifier) => mod.kind === ts.SyntaxKind.ExportKeyword
-    );
+    return modifiers.some((mod: ts.Modifier) => mod.kind === ts.SyntaxKind.ExportKeyword);
   }
 
   /**
@@ -585,9 +589,7 @@ export class ASTSymbolExtractor {
   private hasPrivateModifier(node: ts.Node): boolean {
     const modifiers = ts.canHaveModifiers(node) ? ts.getModifiers(node) : undefined;
     if (!modifiers) return false;
-    return modifiers.some(
-      (mod: ts.Modifier) => mod.kind === ts.SyntaxKind.PrivateKeyword
-    );
+    return modifiers.some((mod: ts.Modifier) => mod.kind === ts.SyntaxKind.PrivateKeyword);
   }
 
   /**
@@ -596,9 +598,7 @@ export class ASTSymbolExtractor {
   private hasPublicModifier(node: ts.Node): boolean {
     const modifiers = ts.canHaveModifiers(node) ? ts.getModifiers(node) : undefined;
     if (!modifiers) return false;
-    return modifiers.some(
-      (mod: ts.Modifier) => mod.kind === ts.SyntaxKind.PublicKeyword
-    );
+    return modifiers.some((mod: ts.Modifier) => mod.kind === ts.SyntaxKind.PublicKeyword);
   }
 
   /**
@@ -615,9 +615,7 @@ export class ASTSymbolExtractor {
       }
       // Handle complex JSDoc comment structures (array of JSDocText/JSDocLink)
       return (firstJsDoc.comment as ts.NodeArray<ts.JSDocText | ts.JSDocLink>)
-        .map((part: ts.JSDocText | ts.JSDocLink) =>
-          'text' in part ? part.text : ''
-        )
+        .map((part: ts.JSDocText | ts.JSDocLink) => ('text' in part ? part.text : ''))
         .join('')
         .trim();
     }
@@ -642,7 +640,9 @@ export class ASTSymbolExtractor {
       const typeInfo = this.extractTypeInfo(declaration.type);
 
       // Extract constant value
-      const valueInfo = declaration.initializer ? this.extractLiteralValue(declaration.initializer) : null;
+      const valueInfo = declaration.initializer
+        ? this.extractLiteralValue(declaration.initializer)
+        : null;
 
       // Detect if it's a constant (const keyword + UPPER_SNAKE_CASE pattern)
       const isConstantPattern = /^[A-Z][A-Z0-9_]*$/.test(name);
@@ -669,7 +669,9 @@ export class ASTSymbolExtractor {
   /**
    * Extract type information from type node
    */
-  private extractTypeInfo(typeNode?: ts.TypeNode): { declaredType?: string; genericParams?: string[] } | null {
+  private extractTypeInfo(
+    typeNode?: ts.TypeNode
+  ): { declaredType?: string; genericParams?: string[] } | null {
     if (!typeNode) return null;
 
     const declaredType = typeNode.getText();
@@ -691,7 +693,9 @@ export class ASTSymbolExtractor {
   /**
    * Extract literal value from initializer
    */
-  private extractLiteralValue(node: ts.Expression): { value: string; type: string; isPrimitive: boolean } | null {
+  private extractLiteralValue(
+    node: ts.Expression
+  ): { value: string; type: string; isPrimitive: boolean } | null {
     if (ts.isStringLiteral(node)) {
       return { value: node.text, type: 'string', isPrimitive: true };
     }

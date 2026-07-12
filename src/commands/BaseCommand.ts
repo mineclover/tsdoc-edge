@@ -5,10 +5,9 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import type { GroupedSectionData, SectionData } from '../output/types';
 import type { DatabaseManager, SymbolRow } from '../storage/DatabaseManager';
 import type { Symbol } from '../types/graph/graph';
-import { XmlBuilder } from '../output/XmlBuilder';
-import type { SectionData, GroupedSectionData } from '../output/types';
 
 /**
  * Result of symbol resolution
@@ -169,8 +168,12 @@ export abstract class BaseCommand {
    * @returns void
    */
   protected printDeprecationWarning(alternativeCommand: string): void {
-    console.log(`${colors.yellow}⚠ Deprecation Notice:${colors.reset} This command will be removed in a future version.`);
-    console.log(`  ${colors.dim}Use instead:${colors.reset} ${colors.cyan}${alternativeCommand}${colors.reset}`);
+    console.log(
+      `${colors.yellow}⚠ Deprecation Notice:${colors.reset} This command will be removed in a future version.`
+    );
+    console.log(
+      `  ${colors.dim}Use instead:${colors.reset} ${colors.cyan}${alternativeCommand}${colors.reset}`
+    );
     console.log('');
   }
 
@@ -212,11 +215,7 @@ export abstract class BaseCommand {
    * @param usage - Usage message
    * @returns Validation result (null if valid, error result if invalid)
    */
-  protected validateArgs(
-    args: string[],
-    minArgs: number,
-    usage: string
-  ): CommandResult | null {
+  protected validateArgs(args: string[], minArgs: number, usage: string): CommandResult | null {
     if (args.length < minArgs) {
       this.printError(`Not enough arguments`);
       console.log();
@@ -262,7 +261,7 @@ export abstract class BaseCommand {
     }
 
     // Try --flag=value format
-    const equalMatch = args.find(arg => arg.startsWith(`${flag}=`));
+    const equalMatch = args.find((arg) => arg.startsWith(`${flag}=`));
     if (equalMatch) {
       return equalMatch.slice(flag.length + 1);
     }
@@ -291,7 +290,7 @@ export abstract class BaseCommand {
    */
   protected hasFlag(args: string[], flags: string | string[]): boolean {
     const flagList = Array.isArray(flags) ? flags : [flags];
-    return flagList.some(flag => args.includes(flag));
+    return flagList.some((flag) => args.includes(flag));
   }
 
   /**
@@ -306,7 +305,7 @@ export abstract class BaseCommand {
     const value = this.getOption(args, flag);
     if (value === undefined) return defaultValue;
     const num = parseInt(value, 10);
-    return isNaN(num) ? defaultValue : num;
+    return Number.isNaN(num) ? defaultValue : num;
   }
 
   /**
@@ -422,15 +421,15 @@ export abstract class BaseCommand {
   protected displayHelp(): CommandResult {
     this.printHeader(`${this.getName()} - Help`);
 
-    console.log(colors.bold + 'Description:' + colors.reset);
+    console.log(`${colors.bold}Description:${colors.reset}`);
     console.log(`  ${this.getDescription()}`);
     console.log('');
 
-    console.log(colors.bold + 'Usage:' + colors.reset);
+    console.log(`${colors.bold}Usage:${colors.reset}`);
     console.log(`  ${this.getUsage()}`);
     console.log('');
 
-    console.log(colors.bold + 'Options:' + colors.reset);
+    console.log(`${colors.bold}Options:${colors.reset}`);
     console.log(`  ${colors.cyan}--help, -h${colors.reset}     Show this help message`);
     console.log('');
 
@@ -635,7 +634,10 @@ export abstract class BaseCommand {
    * @param symbolIdOrName - Symbol ID or name to look up
    * @returns Resolved symbol or null if not found
    */
-  protected resolveSymbol(dbManager: DatabaseManager, symbolIdOrName: string): ResolvedSymbol | null {
+  protected resolveSymbol(
+    dbManager: DatabaseManager,
+    symbolIdOrName: string
+  ): ResolvedSymbol | null {
     // Try exact ID first
     const exactSymbol = dbManager.getSymbol(symbolIdOrName);
     if (exactSymbol) {
@@ -649,13 +651,16 @@ export abstract class BaseCommand {
     }
 
     // Auto-select if exact name match with primary type
-    const primaryMatch = matches.find(m =>
-      m.name.toLowerCase() === symbolIdOrName.toLowerCase() &&
-      ['class', 'interface', 'function', 'type'].includes(m.type)
+    const primaryMatch = matches.find(
+      (m) =>
+        m.name.toLowerCase() === symbolIdOrName.toLowerCase() &&
+        ['class', 'interface', 'function', 'type'].includes(m.type)
     );
 
     if (primaryMatch) {
-      console.log(`${colors.dim}Selected: ${primaryMatch.name} (${primaryMatch.type})${colors.reset}`);
+      console.log(
+        `${colors.dim}Selected: ${primaryMatch.name} (${primaryMatch.type})${colors.reset}`
+      );
       console.log();
       const symbol = dbManager.getSymbol(primaryMatch.id);
       return symbol ? { symbol: symbol as Symbol, id: primaryMatch.id, autoSelected: true } : null;
@@ -670,11 +675,11 @@ export abstract class BaseCommand {
     // If multiple matches, try to auto-select a class/interface
     // Prefer matches where the search term is at the start of the name
     const searchLower = symbolIdOrName.toLowerCase();
-    const classOrInterfaceMatches = matches.filter(m => ['class', 'interface'].includes(m.type));
+    const classOrInterfaceMatches = matches.filter((m) => ['class', 'interface'].includes(m.type));
 
     if (classOrInterfaceMatches.length > 0) {
       // Prefer match where name starts with the search term
-      const startsWithMatch = classOrInterfaceMatches.find(m =>
+      const startsWithMatch = classOrInterfaceMatches.find((m) =>
         m.name.toLowerCase().startsWith(searchLower)
       );
       const selected = startsWithMatch || classOrInterfaceMatches[0];
@@ -733,11 +738,17 @@ export abstract class BaseCommand {
 
       // Provide suggestions based on file type
       if (filePath.endsWith('.ts') || filePath.endsWith('.tsx')) {
-        console.log(`${colors.dim}Check that the file path is correct and the file exists.${colors.reset}`);
+        console.log(
+          `${colors.dim}Check that the file path is correct and the file exists.${colors.reset}`
+        );
       } else if (filePath.endsWith('.md')) {
-        console.log(`${colors.dim}Check that the markdown file exists in the managed/ directory.${colors.reset}`);
+        console.log(
+          `${colors.dim}Check that the markdown file exists in the managed/ directory.${colors.reset}`
+        );
       } else if (filePath.includes('.tsdoc')) {
-        console.log(`${colors.dim}Run 'tsdoc-edge init' to create the configuration.${colors.reset}`);
+        console.log(
+          `${colors.dim}Run 'tsdoc-edge init' to create the configuration.${colors.reset}`
+        );
       }
       console.log();
 
@@ -774,7 +785,9 @@ export abstract class BaseCommand {
     if (!fs.existsSync(configPath)) {
       this.printError('Configuration file not found');
       console.log();
-      console.log(`${colors.dim}TSDoc Edge requires a configuration file to operate.${colors.reset}`);
+      console.log(
+        `${colors.dim}TSDoc Edge requires a configuration file to operate.${colors.reset}`
+      );
       console.log();
       console.log(`${colors.cyan}To create one, run:${colors.reset}`);
       console.log(`  tsdoc-edge init`);
@@ -805,13 +818,21 @@ export abstract class BaseCommand {
 
     // Provide suggestions for common errors
     if (errorMessage.includes('ENOENT')) {
-      console.log(`${colors.yellow}Hint:${colors.reset} A file or directory was not found. Check the path.`);
+      console.log(
+        `${colors.yellow}Hint:${colors.reset} A file or directory was not found. Check the path.`
+      );
     } else if (errorMessage.includes('EACCES')) {
-      console.log(`${colors.yellow}Hint:${colors.reset} Permission denied. Check file permissions.`);
+      console.log(
+        `${colors.yellow}Hint:${colors.reset} Permission denied. Check file permissions.`
+      );
     } else if (errorMessage.includes('SQLITE')) {
-      console.log(`${colors.yellow}Hint:${colors.reset} Database error. Try running 'tsdoc-edge build src' to rebuild.`);
+      console.log(
+        `${colors.yellow}Hint:${colors.reset} Database error. Try running 'tsdoc-edge build src' to rebuild.`
+      );
     } else if (errorMessage.includes('JSON')) {
-      console.log(`${colors.yellow}Hint:${colors.reset} Invalid JSON. Check for syntax errors in the file.`);
+      console.log(
+        `${colors.yellow}Hint:${colors.reset} Invalid JSON. Check for syntax errors in the file.`
+      );
     }
     console.log();
 

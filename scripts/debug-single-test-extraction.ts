@@ -5,8 +5,8 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';
-import { DatabaseManager } from '../src/storage/DatabaseManager';
 import { ConfigManager } from '../src/config/ConfigManager';
+import { DatabaseManager } from '../src/storage/DatabaseManager';
 
 // Reproduce the exact logic from TestExampleExtractor
 const toKebabCase = (str: string): string => {
@@ -35,7 +35,7 @@ async function main() {
   console.log(`Total symbols in DB: ${allSymbols.length}\n`);
 
   // Filter module symbols
-  const moduleSymbols = allSymbols.filter(s => {
+  const moduleSymbols = allSymbols.filter((s) => {
     const fileName = path.basename(s.filePath, path.extname(s.filePath));
     const fileKebab = toKebabCase(fileName);
     const match = fileKebab === moduleKebab;
@@ -51,8 +51,8 @@ async function main() {
   console.log();
 
   // Look for main class
-  const mainClass = moduleSymbols.find(s =>
-    s.type === 'class' && s.id === `class-${moduleKebab}`
+  const mainClass = moduleSymbols.find(
+    (s) => s.type === 'class' && s.id === `class-${moduleKebab}`
   );
 
   console.log(`Looking for main class: class-${moduleKebab}`);
@@ -68,12 +68,7 @@ async function main() {
 
   // Read test file and parse
   const sourceCode = fs.readFileSync(testFilePath, 'utf-8');
-  const sourceFile = ts.createSourceFile(
-    testFilePath,
-    sourceCode,
-    ts.ScriptTarget.Latest,
-    true
-  );
+  const sourceFile = ts.createSourceFile(testFilePath, sourceCode, ts.ScriptTarget.Latest, true);
 
   // Find first test case
   let firstTest: any = null;
@@ -110,11 +105,13 @@ async function main() {
       if (word.length < 3) continue;
 
       const methodKebab = toKebabCase(word);
-      const methodSymbol = moduleSymbols.find(s =>
-        s.type === 'method' && s.id.includes(`-${methodKebab}`)
+      const methodSymbol = moduleSymbols.find(
+        (s) => s.type === 'method' && s.id.includes(`-${methodKebab}`)
       );
 
-      console.log(`  "${word}" → "${methodKebab}" → ${methodSymbol ? methodSymbol.id : 'not found'}`);
+      console.log(
+        `  "${word}" → "${methodKebab}" → ${methodSymbol ? methodSymbol.id : 'not found'}`
+      );
     }
   }
 

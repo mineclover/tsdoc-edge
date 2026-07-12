@@ -166,7 +166,7 @@ export class DependencyChainAnalyzer {
   analyzeHotspots(topN: number = 20): Hotspot[] {
     const hotspots: Hotspot[] = [];
 
-    for (const [symbolId, symbol] of this.graph.symbols.entries()) {
+    for (const [symbolId, _symbol] of this.graph.symbols.entries()) {
       const outgoing = this.graph.adjacencyList.get(symbolId)?.length || 0;
 
       // Count incoming dependencies
@@ -197,9 +197,7 @@ export class DependencyChainAnalyzer {
     }
 
     // Sort by score descending
-    return hotspots
-      .sort((a, b) => b.score - a.score)
-      .slice(0, topN);
+    return hotspots.sort((a, b) => b.score - a.score).slice(0, topN);
   }
 
   /**
@@ -240,7 +238,7 @@ export class DependencyChainAnalyzer {
       const dependencies = this.graph.adjacencyList.get(currentNode) || [];
 
       // Fan-out: Current node has multiple outgoing edges in the path
-      const outgoingInPath = dependencies.filter(dep => pathSet.has(dep));
+      const outgoingInPath = dependencies.filter((dep) => pathSet.has(dep));
       if (outgoingInPath.length > 1) {
         hasFanOut = true;
       }
@@ -311,7 +309,7 @@ export class DependencyChainAnalyzer {
 
       // Get symbol info for evidence
       const firstSymbol = this.graph.symbols.get(circular.path[0]);
-      const lastSymbol = this.graph.symbols.get(circular.path[circular.path.length - 1]);
+      const _lastSymbol = this.graph.symbols.get(circular.path[circular.path.length - 1]);
 
       const relationship: UnifiedRelationship = {
         id: `circular-dependency-${sortedSymbols.join('-')}`
@@ -381,7 +379,7 @@ export class DependencyChainAnalyzer {
       const length = rel.properties?.cycleLength || 0;
       byLength[length] = (byLength[length] || 0) + 1;
 
-      const involvedSymbols = rel.properties?.involvedSymbols as string[] || [];
+      const involvedSymbols = (rel.properties?.involvedSymbols as string[]) || [];
       for (const sym of involvedSymbols) {
         affectedSymbols.add(sym);
       }

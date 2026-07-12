@@ -22,7 +22,16 @@ export interface SourceRef {
   /**
    * Symbol type (for quick lookup)
    */
-  type?: 'function' | 'class' | 'interface' | 'type' | 'enum' | 'variable' | 'constant' | 'method' | 'property';
+  type?:
+    | 'function'
+    | 'class'
+    | 'interface'
+    | 'type'
+    | 'enum'
+    | 'variable'
+    | 'constant'
+    | 'method'
+    | 'property';
 
   /**
    * Approximate line number (may change)

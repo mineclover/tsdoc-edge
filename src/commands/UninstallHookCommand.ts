@@ -5,7 +5,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, colors, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * UninstallHookCommand - Remove Git pre-commit hook
@@ -76,7 +76,9 @@ export class UninstallHookCommand extends BaseCommand {
 
       const existing = fs.readFileSync(hookPath, 'utf-8');
       if (!existing.includes('tsdoc-edge pre-commit-run')) {
-        console.log(`${colors.yellow}⚠  Hook exists but was not installed by tsdoc-edge${colors.reset}`);
+        console.log(
+          `${colors.yellow}⚠  Hook exists but was not installed by tsdoc-edge${colors.reset}`
+        );
         console.log();
         console.log('Remove manually if needed:');
         console.log(`  ${colors.cyan}rm ${hookPath}${colors.reset}`);

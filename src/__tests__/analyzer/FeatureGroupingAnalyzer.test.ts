@@ -6,11 +6,11 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { FeatureGroupingAnalyzer } from '../../analyzer/FeatureGroupingAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 
 // Helper to create mock symbol graph
 const createMockGraph = (symbols: Symbol[] = []): SymbolGraph => {
-  const symbolMap = new Map(symbols.map(s => [s.id, s]));
+  const symbolMap = new Map(symbols.map((s) => [s.id, s]));
   return {
     symbols: symbolMap,
     edges: [],
@@ -152,11 +152,7 @@ export class PaymentProcessor {}
       const graph = createMockGraph(symbols);
       const analyzer = new FeatureGroupingAnalyzer(graph);
 
-      fs.writeFileSync(
-        path.join(featureDir, 'login.ts'),
-        `export class LoginService {}`,
-        'utf-8'
-      );
+      fs.writeFileSync(path.join(featureDir, 'login.ts'), `export class LoginService {}`, 'utf-8');
 
       fs.writeFileSync(
         path.join(featureDir, 'logout.ts'),

@@ -117,7 +117,7 @@ export class ModuleSpecValidator {
     const score = totalChecks > 0 ? Math.round((passed.length / totalChecks) * 100) : 0;
 
     // Determine if valid
-    const hasErrors = issues.some(i => i.severity === 'error');
+    const hasErrors = issues.some((i) => i.severity === 'error');
     const meetsConfidence = spec.completionConfidence >= this.options.minConfidence;
     const isValid = !hasErrors && meetsConfidence && score >= this.options.minConfidence;
 
@@ -198,7 +198,7 @@ export class ModuleSpecValidator {
 
     // Check parameter descriptions
     const paramsWithDescriptions = input.parameters.filter(
-      p => p.description && p.description !== '-' && !p.description.includes('parameter')
+      (p) => p.description && p.description !== '-' && !p.description.includes('parameter')
     );
 
     if (paramsWithDescriptions.length === input.parameters.length) {
@@ -233,7 +233,10 @@ export class ModuleSpecValidator {
     // Check return description
     if (output.returnType.type === 'void') {
       passed.push('Output is void (not applicable)');
-    } else if (output.returnType.description && !output.returnType.description.startsWith('Returns ')) {
+    } else if (
+      output.returnType.description &&
+      !output.returnType.description.startsWith('Returns ')
+    ) {
       passed.push('Output has return description');
     } else if (this.options.requireReturnDescription) {
       failed.push('Output missing return description');
@@ -325,9 +328,9 @@ export class ModuleSpecValidator {
    */
   private validateEffect(
     spec: ModuleSpecTemplate,
-    issues: ValidationIssue[],
+    _issues: ValidationIssue[],
     passed: string[],
-    failed: string[]
+    _failed: string[]
   ): void {
     const { effect } = spec;
 
@@ -346,7 +349,7 @@ export class ModuleSpecValidator {
     spec: ModuleSpecTemplate,
     issues: ValidationIssue[],
     passed: string[],
-    failed: string[]
+    _failed: string[]
   ): void {
     const { scope } = spec;
 

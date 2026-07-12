@@ -3,7 +3,7 @@
  */
 
 import { CollaborationAnalyzer } from '../../analyzer/CollaborationAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships';
 
 describe('CollaborationAnalyzer', () => {

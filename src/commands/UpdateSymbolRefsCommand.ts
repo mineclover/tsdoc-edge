@@ -5,11 +5,11 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
-import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import { SymbolReferenceGenerator } from '../doc-symbol/SymbolReferenceGenerator';
+import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import type { ParsedDocSymbols } from '../types/feature/doc-symbol';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for updating symbol references in documents

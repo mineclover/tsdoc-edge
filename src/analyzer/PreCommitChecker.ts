@@ -182,12 +182,9 @@ export class PreCommitChecker {
         .split('\n')
         .filter((file) => file.trim() !== '')
         .filter(
-          (file) =>
-            file.endsWith('.ts') &&
-            !file.endsWith('.d.ts') &&
-            !file.endsWith('.test.ts')
+          (file) => file.endsWith('.ts') && !file.endsWith('.d.ts') && !file.endsWith('.test.ts')
         );
-    } catch (error) {
+    } catch (_error) {
       // Not a git repository or git not available
       return [];
     }
@@ -296,9 +293,7 @@ export class PreCommitChecker {
 
     const passedFiles = fileResults.filter((r) => r.passed).length;
     const failedFiles = fileResults.filter((r) => !r.passed).length;
-    const warningFiles = fileResults.filter(
-      (r) => r.passed && r.warningSymbols.length > 0
-    ).length;
+    const warningFiles = fileResults.filter((r) => r.passed && r.warningSymbols.length > 0).length;
 
     return {
       passed: failedFiles === 0,
@@ -323,10 +318,7 @@ export class PreCommitChecker {
    */
   public checkFiles(files: string[]): PreCommitReport {
     const tsFiles = files.filter(
-      (file) =>
-        file.endsWith('.ts') &&
-        !file.endsWith('.d.ts') &&
-        !file.endsWith('.test.ts')
+      (file) => file.endsWith('.ts') && !file.endsWith('.d.ts') && !file.endsWith('.test.ts')
     );
 
     if (tsFiles.length === 0) {
@@ -345,9 +337,7 @@ export class PreCommitChecker {
 
     const passedFiles = fileResults.filter((r) => r.passed).length;
     const failedFiles = fileResults.filter((r) => !r.passed).length;
-    const warningFiles = fileResults.filter(
-      (r) => r.passed && r.warningSymbols.length > 0
-    ).length;
+    const warningFiles = fileResults.filter((r) => r.passed && r.warningSymbols.length > 0).length;
 
     return {
       passed: failedFiles === 0,

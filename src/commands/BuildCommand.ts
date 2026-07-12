@@ -4,36 +4,32 @@
  * @packageDocumentation
  */
 
+import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import * as crypto from 'node:crypto';
-import { ConfigManager } from '../config/ConfigManager';
+import * as ts from 'typescript';
 import { ASTSymbolExtractor } from '../analyzer/ASTSymbolExtractor';
-import { SymbolIdentifierGenerator } from '../analyzer/SymbolIdentifierGenerator';
-import { TestSymbolParser } from '../parser/TestSymbolParser';
-import { TestCoverageAnalyzer } from '../analyzer/TestCoverageAnalyzer';
-import { NamingPatternRelationAnalyzer } from '../analyzer/NamingPatternRelationAnalyzer';
+import { BlockChunkAnalyzer } from '../analyzer/BlockChunkAnalyzer';
+import { DependencyChainAnalyzer } from '../analyzer/DependencyChainAnalyzer';
+import { EndpointDetectionAnalyzer } from '../analyzer/EndpointDetectionAnalyzer';
+import { EntryPointDetector } from '../analyzer/EntryPointDetector';
 import { ExplicitSemanticRelationAnalyzer } from '../analyzer/ExplicitSemanticRelationAnalyzer';
+import { ExposureAnalyzer } from '../analyzer/ExposureAnalyzer';
 import { FeatureGroupingAnalyzer } from '../analyzer/FeatureGroupingAnalyzer';
 import { LayerDependencyAnalyzer } from '../analyzer/LayerDependencyAnalyzer';
-import { DependencyChainAnalyzer } from '../analyzer/DependencyChainAnalyzer';
 import { RelationshipInferenceEngine } from '../analyzer/RelationshipInferenceEngine';
-import { EndpointDetectionAnalyzer } from '../analyzer/EndpointDetectionAnalyzer';
-import { BlockChunkAnalyzer } from '../analyzer/BlockChunkAnalyzer';
-import { ExposureAnalyzer } from '../analyzer/ExposureAnalyzer';
-import { EntryPointDetector } from '../analyzer/EntryPointDetector';
-import {
-  CanonicalGraphCoordinator,
-  type CanonicalGraphCoordinatorOptions,
-} from '../indexer';
+import { SymbolIdentifierGenerator } from '../analyzer/SymbolIdentifierGenerator';
+import { TestCoverageAnalyzer } from '../analyzer/TestCoverageAnalyzer';
+import { ConfigManager } from '../config/ConfigManager';
+import { CanonicalGraphCoordinator, type CanonicalGraphCoordinatorOptions } from '../indexer';
+import { BuildResultSchema } from '../output/schemas';
+import { XmlBuilder } from '../output/XmlBuilder';
+import { TestSymbolParser } from '../parser/TestSymbolParser';
 import { DatabaseManager } from '../storage/DatabaseManager';
-import { BaseCommand, type CommandResult } from './BaseCommand';
-import type { TestSymbol } from '../types/test-symbols';
 import type { SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships/unified';
-import { XmlBuilder } from '../output/XmlBuilder';
-import { BuildResultSchema } from '../output/schemas';
-import * as ts from 'typescript';
+import type { TestSymbol } from '../types/test-symbols';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 export interface BuildCommandDependencies {
   readonly canonicalCoordinatorFactory?: (
@@ -231,943 +227,1044 @@ export class BuildCommand extends BaseCommand {
       // Initialize database
       const dbManager = new DatabaseManager(dbPath, jsonlPath);
       try {
-      const extractor = new ASTSymbolExtractor();
-      const testParser = new TestSymbolParser();
-      const idGenerator = new SymbolIdentifierGenerator(process.cwd());
+        const extractor = new ASTSymbolExtractor();
+        const testParser = new TestSymbolParser();
+        const idGenerator = new SymbolIdentifierGenerator(process.cwd());
 
-      // Find TypeScript files
-      this.printInfo('Scanning TypeScript files...');
-      const startTime = Date.now();
+        // Find TypeScript files
+        this.printInfo('Scanning TypeScript files...');
+        const startTime = Date.now();
 
-      let allFiles = this.findTypeScriptFiles(targetPath);
+        let allFiles = this.findTypeScriptFiles(targetPath);
 
-      // Filter out test files if --exclude-tests is set
-      if (excludeTests) {
-        const originalCount = allFiles.length;
-        allFiles = allFiles.filter(f => !f.endsWith('.test.ts') && !f.endsWith('.spec.ts'));
-        const excluded = originalCount - allFiles.length;
-        if (excluded > 0) {
-          this.printInfo(`Excluded ${excluded} test files`);
-        }
-      }
-
-      // Filter files based on incremental build
-      let files = allFiles;
-      let skippedFiles = 0;
-
-      if (!forceRebuild) {
-        const changedFiles: string[] = [];
-
-        for (const file of allFiles) {
-          if (this.isFileChanged(dbManager, file)) {
-            changedFiles.push(file);
-          } else {
-            skippedFiles++;
+        // Filter out test files if --exclude-tests is set
+        if (excludeTests) {
+          const originalCount = allFiles.length;
+          allFiles = allFiles.filter((f) => !f.endsWith('.test.ts') && !f.endsWith('.spec.ts'));
+          const excluded = originalCount - allFiles.length;
+          if (excluded > 0) {
+            this.printInfo(`Excluded ${excluded} test files`);
           }
         }
 
-        files = changedFiles;
+        // Filter files based on incremental build
+        let files = allFiles;
+        let skippedFiles = 0;
 
-        if (skippedFiles > 0) {
-          this.printSuccess(`Skipped ${skippedFiles} unchanged files (incremental build)`);
+        if (!forceRebuild) {
+          const changedFiles: string[] = [];
+
+          for (const file of allFiles) {
+            if (this.isFileChanged(dbManager, file)) {
+              changedFiles.push(file);
+            } else {
+              skippedFiles++;
+            }
+          }
+
+          files = changedFiles;
+
+          if (skippedFiles > 0) {
+            this.printSuccess(`Skipped ${skippedFiles} unchanged files (incremental build)`);
+          }
         }
-      }
 
-      if (files.length === 0) {
-        this.printSuccess('No files to process - all files are up to date');
-        return this.success(
-          canonicalGraph
-            ? `Canonical graph ${canonicalGraph.fingerprint.slice(0, 12)} persisted; no legacy changes detected`
-            : 'No changes detected'
-        );
-      }
+        if (files.length === 0) {
+          this.printSuccess('No files to process - all files are up to date');
+          return this.success(
+            canonicalGraph
+              ? `Canonical graph ${canonicalGraph.fingerprint.slice(0, 12)} persisted; no legacy changes detected`
+              : 'No changes detected'
+          );
+        }
 
-      this.printInfo(`Processing ${files.length} file(s)...`);
+        this.printInfo(`Processing ${files.length} file(s)...`);
 
-      // Initialize TypeScript program for advanced analyzers
-      const compilerOptions: ts.CompilerOptions = {
-        target: ts.ScriptTarget.ES2020,
-        module: ts.ModuleKind.CommonJS,
-        allowJs: true,
-        checkJs: false,
-        noEmit: true,
-      };
-      const program = ts.createProgram(allFiles, compilerOptions);
+        // Initialize TypeScript program for advanced analyzers
+        const compilerOptions: ts.CompilerOptions = {
+          target: ts.ScriptTarget.ES2020,
+          module: ts.ModuleKind.CommonJS,
+          allowJs: true,
+          checkJs: false,
+          noEmit: true,
+        };
+        const program = ts.createProgram(allFiles, compilerOptions);
 
-      // Initialize new analyzers
-      const endpointAnalyzer = new EndpointDetectionAnalyzer(program);
-      const blockAnalyzer = new BlockChunkAnalyzer(program);
-      const exposureAnalyzer = new ExposureAnalyzer(process.cwd());
-      const entryPointDetector = new EntryPointDetector(program, process.cwd());
+        // Initialize new analyzers
+        const endpointAnalyzer = new EndpointDetectionAnalyzer(program);
+        const blockAnalyzer = new BlockChunkAnalyzer(program);
+        const exposureAnalyzer = new ExposureAnalyzer(process.cwd());
+        const entryPointDetector = new EntryPointDetector(program, process.cwd());
 
-      const result = {
-        filesScanned: 0,
-        symbolsFound: 0,
-        symbolsInserted: 0,
-        symbolsCollisions: 0,
-        relationshipsFound: 0,
-        relationshipsInserted: 0,
-        relationshipsSkipped: 0, // Relationships to external symbols (not errors)
-        endpointsFound: 0,
-        endpointsInserted: 0,
-        blocksFound: 0,
-        blocksInserted: 0,
-        entryPointsFound: 0,
-        entryPointsInserted: 0,
-        exposureAnalyzed: 0,
-        blockDependenciesFound: 0,
-        errors: [] as string[],
-      };
+        const result = {
+          filesScanned: 0,
+          symbolsFound: 0,
+          symbolsInserted: 0,
+          symbolsCollisions: 0,
+          relationshipsFound: 0,
+          relationshipsInserted: 0,
+          relationshipsSkipped: 0, // Relationships to external symbols (not errors)
+          endpointsFound: 0,
+          endpointsInserted: 0,
+          blocksFound: 0,
+          blocksInserted: 0,
+          entryPointsFound: 0,
+          entryPointsInserted: 0,
+          exposureAnalyzed: 0,
+          blockDependenciesFound: 0,
+          errors: [] as string[],
+        };
 
-      // Track seen IDs to detect collisions
-      const seenIds = new Map<string, string>(); // id -> first file path
+        // Track seen IDs to detect collisions
+        const seenIds = new Map<string, string>(); // id -> first file path
 
-      // Prepare JSONL registry (use .tsdoc directly for consistency with other commands)
-      const registryDir = path.join(process.cwd(), '.tsdoc');
-      const registryPath = path.join(registryDir, 'registry.jsonl');
-      // First line is metadata (required by SymbolRegistryManager)
-      const registryLines: string[] = [
-        JSON.stringify({ version: '1.0.0', idGeneratorMode: 'sequential' }),
-      ];
+        // Prepare JSONL registry (use .tsdoc directly for consistency with other commands)
+        const registryDir = path.join(process.cwd(), '.tsdoc');
+        const registryPath = path.join(registryDir, 'registry.jsonl');
+        // First line is metadata (required by SymbolRegistryManager)
+        const registryLines: string[] = [
+          JSON.stringify({ version: '1.0.0', idGeneratorMode: 'sequential' }),
+        ];
 
-      // Global symbol ID mapping for relationship insertion
-      const symbolIdMap = new Map<string, string>();
+        // Global symbol ID mapping for relationship insertion
+        const symbolIdMap = new Map<string, string>();
 
-      // Store all relationships to insert after all symbols are collected
-      const allRelationships: Array<{ type: string; from: string; to: string; filePath: string; description?: string; line?: number }> = [];
+        // Store all relationships to insert after all symbols are collected
+        const allRelationships: Array<{
+          type: string;
+          from: string;
+          to: string;
+          filePath: string;
+          description?: string;
+          line?: number;
+        }> = [];
 
-      // Store doc relationships (symbol -> document)
-      const allDocRelationships: Array<{ symbolId: string; symbolName: string; docRef: string; filePath: string; line: number }> = [];
+        // Store doc relationships (symbol -> document)
+        const allDocRelationships: Array<{
+          symbolId: string;
+          symbolName: string;
+          docRef: string;
+          filePath: string;
+          line: number;
+        }> = [];
 
-      // Collect all test symbols for relationship extraction
-      const allTestSymbols: TestSymbol[] = [];
+        // Collect all test symbols for relationship extraction
+        const allTestSymbols: TestSymbol[] = [];
 
-      // Process each file
-      for (const filePath of files) {
-        try {
-          const content = fs.readFileSync(filePath, 'utf-8');
-          const isTestFile = filePath.endsWith('.test.ts') || filePath.endsWith('.spec.ts');
+        // Process each file
+        for (const filePath of files) {
+          try {
+            const content = fs.readFileSync(filePath, 'utf-8');
+            const isTestFile = filePath.endsWith('.test.ts') || filePath.endsWith('.spec.ts');
 
-          result.filesScanned++;
+            result.filesScanned++;
 
-          if (isTestFile) {
-            // Process test file with TestSymbolParser
-            const testResult = testParser.extract(filePath, content);
-            result.symbolsFound += testResult.testSymbols.length;
+            if (isTestFile) {
+              // Process test file with TestSymbolParser
+              const testResult = testParser.extract(filePath, content);
+              result.symbolsFound += testResult.testSymbols.length;
 
-            // Collect test symbols for relationship extraction
-            allTestSymbols.push(...testResult.testSymbols);
+              // Collect test symbols for relationship extraction
+              allTestSymbols.push(...testResult.testSymbols);
 
-            // Insert test symbols
-            for (const testSymbol of testResult.testSymbols) {
-              // Generate stable identifiers for test symbols
-              const identifiers = idGenerator.generateIdentifiers(
-                filePath,
-                testSymbol.name,
-                testSymbol.type,
-                false, // test symbols are typically not exported
-                undefined
-              );
+              // Insert test symbols
+              for (const testSymbol of testResult.testSymbols) {
+                // Generate stable identifiers for test symbols
+                const identifiers = idGenerator.generateIdentifiers(
+                  filePath,
+                  testSymbol.name,
+                  testSymbol.type,
+                  false, // test symbols are typically not exported
+                  undefined
+                );
 
-              // Use testSymbol.id if already generated, otherwise use identifiers.legacyId
-              const id = testSymbol.id || identifiers.legacyId;
+                // Use testSymbol.id if already generated, otherwise use identifiers.legacyId
+                const id = testSymbol.id || identifiers.legacyId;
 
-              // Check for ID collision
-              if (seenIds.has(id)) {
-                result.symbolsCollisions++;
-                result.errors.push(`ID collision: ${id} (${filePath} vs ${seenIds.get(id)})`);
-                continue; // Skip duplicate
-              }
-              seenIds.set(id, filePath);
+                // Check for ID collision
+                if (seenIds.has(id)) {
+                  result.symbolsCollisions++;
+                  result.errors.push(`ID collision: ${id} (${filePath} vs ${seenIds.get(id)})`);
+                  continue; // Skip duplicate
+                }
+                seenIds.set(id, filePath);
 
-              const fullSymbol = {
-                ...testSymbol,
-                id,
-                uuid: identifiers.uuid,
-                localPath: identifiers.localPath,
-                globalPath: identifiers.globalPath,
-                scope: identifiers.scope,
-                tests: [],
-                designDecisions: [],
-              };
-
-              const success = dbManager.insertSymbol(fullSymbol, 0);
-              if (success) {
-                result.symbolsInserted++;
-
-                // Store mapping for relationship insertion
-                symbolIdMap.set(testSymbol.name, testSymbol.id);
-
-                // Add to JSONL registry
-                const registryEntry = {
-                  id: testSymbol.id,
-                  sourceRef: {
-                    filePath: testSymbol.filePath,
-                    line: testSymbol.line,
-                    column: testSymbol.column,
-                    symbolName: testSymbol.name,
-                    type: testSymbol.type,
-                  },
-                  createdAt: new Date().toISOString(),
-                  updatedAt: new Date().toISOString(),
+                const fullSymbol = {
+                  ...testSymbol,
+                  id,
+                  uuid: identifiers.uuid,
+                  localPath: identifiers.localPath,
+                  globalPath: identifiers.globalPath,
+                  scope: identifiers.scope,
+                  tests: [],
+                  designDecisions: [],
                 };
-                registryLines.push(JSON.stringify(registryEntry));
-              } else {
-                result.errors.push(`Failed to insert test symbol: ${testSymbol.name} in ${filePath}`);
-              }
-            }
 
-            // Handle test extraction errors
-            if (testResult.errors.length > 0) {
-              result.errors.push(...testResult.errors.map(e => `${e.file}:${e.line} ${e.message}`));
-            }
-          } else {
-            // Process implementation file with ASTSymbolExtractor
-            const extractResult = extractor.extract(filePath, content);
+                const success = dbManager.insertSymbol(fullSymbol, 0);
+                if (success) {
+                  result.symbolsInserted++;
 
-            result.symbolsFound += extractResult.symbols.length;
-            result.relationshipsFound += extractResult.relationships.length;
+                  // Store mapping for relationship insertion
+                  symbolIdMap.set(testSymbol.name, testSymbol.id);
 
-            // Collect relationships for later insertion
-            allRelationships.push(...extractResult.relationships);
-
-            // Insert symbols
-            for (const symbol of extractResult.symbols) {
-              // Generate stable identifiers using SymbolIdentifierGenerator
-              const identifiers = idGenerator.generateIdentifiers(
-                filePath,
-                symbol.name,
-                symbol.type,
-                symbol.isExported,
-                symbol.parentSymbol
-              );
-
-              // Use legacy ID for backwards compatibility and primary key
-              let id = identifiers.legacyId;
-
-              // If ID collision within same build, add line number for uniqueness
-              if (seenIds.has(id)) {
-                id = `${id}-L${symbol.line}`;
+                  // Add to JSONL registry
+                  const registryEntry = {
+                    id: testSymbol.id,
+                    sourceRef: {
+                      filePath: testSymbol.filePath,
+                      line: testSymbol.line,
+                      column: testSymbol.column,
+                      symbolName: testSymbol.name,
+                      type: testSymbol.type,
+                    },
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                  };
+                  registryLines.push(JSON.stringify(registryEntry));
+                } else {
+                  result.errors.push(
+                    `Failed to insert test symbol: ${testSymbol.name} in ${filePath}`
+                  );
+                }
               }
 
-            // Check for ID collision (shouldn't happen after adding line number)
-            if (seenIds.has(id)) {
-              result.symbolsCollisions++;
-              result.errors.push(`ID collision: ${id} (${filePath} vs ${seenIds.get(id)})`);
-              continue;
-            }
-            seenIds.set(id, filePath);
-
-            const fullSymbol = {
-              ...symbol,
-              id,
-              uuid: identifiers.uuid,
-              localPath: identifiers.localPath,
-              globalPath: identifiers.globalPath,
-              scope: identifiers.scope,
-              tests: [],
-              designDecisions: [],
-            };
-
-            const success = dbManager.insertSymbol(fullSymbol, 0);
-            if (success) {
-              result.symbolsInserted++;
-
-              // Store mapping for relationship insertion
-              symbolIdMap.set(symbol.name, id);
-
-              // Add to JSONL registry (SymbolRegistryEntry format)
-              const registryEntry = {
-                id,
-                sourceRef: {
-                  filePath: symbol.filePath,
-                  line: symbol.line,
-                  column: symbol.column,
-                  symbolName: symbol.name,
-                  type: symbol.type,
-                },
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
-              };
-              registryLines.push(JSON.stringify(registryEntry));
-
-              // Extract @doc tags for this symbol
-              const docTags = this.extractDocTags(content, symbol.line);
-              for (const docRef of docTags) {
-                allDocRelationships.push({
-                  symbolId: id,
-                  symbolName: symbol.name,
-                  docRef,
-                  filePath: symbol.filePath,
-                  line: symbol.line,
-                });
+              // Handle test extraction errors
+              if (testResult.errors.length > 0) {
+                result.errors.push(
+                  ...testResult.errors.map((e) => `${e.file}:${e.line} ${e.message}`)
+                );
               }
-              } else {
-                result.errors.push(`Failed to insert: ${symbol.name} in ${filePath}`);
-              }
+            } else {
+              // Process implementation file with ASTSymbolExtractor
+              const extractResult = extractor.extract(filePath, content);
 
-              // Analyze exposure for exported symbols
-              if (symbol.isExported) {
-                try {
-                  const exposure = exposureAnalyzer.analyzeSymbol(fullSymbol);
-                  const success = dbManager.updateSymbolExposure(id, {
-                    exposureScope: exposure.exposureScope,
-                    exportPath: exposure.exportPath,
-                    accessibility: exposure.accessibility,
-                    visibilityBoundaries: exposure.visibilityBoundary,
-                  });
-                  if (success) {
-                    result.exposureAnalyzed++;
+              result.symbolsFound += extractResult.symbols.length;
+              result.relationshipsFound += extractResult.relationships.length;
+
+              // Collect relationships for later insertion
+              allRelationships.push(...extractResult.relationships);
+
+              // Insert symbols
+              for (const symbol of extractResult.symbols) {
+                // Generate stable identifiers using SymbolIdentifierGenerator
+                const identifiers = idGenerator.generateIdentifiers(
+                  filePath,
+                  symbol.name,
+                  symbol.type,
+                  symbol.isExported,
+                  symbol.parentSymbol
+                );
+
+                // Use legacy ID for backwards compatibility and primary key
+                let id = identifiers.legacyId;
+
+                // If ID collision within same build, add line number for uniqueness
+                if (seenIds.has(id)) {
+                  id = `${id}-L${symbol.line}`;
+                }
+
+                // Check for ID collision (shouldn't happen after adding line number)
+                if (seenIds.has(id)) {
+                  result.symbolsCollisions++;
+                  result.errors.push(`ID collision: ${id} (${filePath} vs ${seenIds.get(id)})`);
+                  continue;
+                }
+                seenIds.set(id, filePath);
+
+                const fullSymbol = {
+                  ...symbol,
+                  id,
+                  uuid: identifiers.uuid,
+                  localPath: identifiers.localPath,
+                  globalPath: identifiers.globalPath,
+                  scope: identifiers.scope,
+                  tests: [],
+                  designDecisions: [],
+                };
+
+                const success = dbManager.insertSymbol(fullSymbol, 0);
+                if (success) {
+                  result.symbolsInserted++;
+
+                  // Store mapping for relationship insertion
+                  symbolIdMap.set(symbol.name, id);
+
+                  // Add to JSONL registry (SymbolRegistryEntry format)
+                  const registryEntry = {
+                    id,
+                    sourceRef: {
+                      filePath: symbol.filePath,
+                      line: symbol.line,
+                      column: symbol.column,
+                      symbolName: symbol.name,
+                      type: symbol.type,
+                    },
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                  };
+                  registryLines.push(JSON.stringify(registryEntry));
+
+                  // Extract @doc tags for this symbol
+                  const docTags = this.extractDocTags(content, symbol.line);
+                  for (const docRef of docTags) {
+                    allDocRelationships.push({
+                      symbolId: id,
+                      symbolName: symbol.name,
+                      docRef,
+                      filePath: symbol.filePath,
+                      line: symbol.line,
+                    });
                   }
-                } catch (expError) {
-                  // Non-critical, continue
+                } else {
+                  result.errors.push(`Failed to insert: ${symbol.name} in ${filePath}`);
+                }
+
+                // Analyze exposure for exported symbols
+                if (symbol.isExported) {
+                  try {
+                    const exposure = exposureAnalyzer.analyzeSymbol(fullSymbol);
+                    const success = dbManager.updateSymbolExposure(id, {
+                      exposureScope: exposure.exposureScope,
+                      exportPath: exposure.exportPath,
+                      accessibility: exposure.accessibility,
+                      visibilityBoundaries: exposure.visibilityBoundary,
+                    });
+                    if (success) {
+                      result.exposureAnalyzed++;
+                    }
+                  } catch (_expError) {
+                    // Non-critical, continue
+                  }
                 }
               }
-            }
 
-            // Detect HTTP endpoints in this file
-            try {
-              const endpoints = endpointAnalyzer.analyzeFile(filePath);
-              result.endpointsFound += endpoints.length;
+              // Detect HTTP endpoints in this file
+              try {
+                const endpoints = endpointAnalyzer.analyzeFile(filePath);
+                result.endpointsFound += endpoints.length;
 
-              for (const endpoint of endpoints) {
-                const success = dbManager.insertEndpoint({
-                  id: endpoint.id,
-                  method: endpoint.method,
-                  path: endpoint.path,
-                  pathParams: endpoint.pathParams.length > 0 ? JSON.stringify(endpoint.pathParams) : null,
-                  queryParams: endpoint.queryParams ? JSON.stringify(endpoint.queryParams) : null,
-                  handlerSymbolId: endpoint.handlerSymbolId,
-                  controllerSymbolId: endpoint.controllerSymbolId ?? null,
-                  requestType: endpoint.requestType ?? null,
-                  responseType: endpoint.responseType ?? null,
-                  scope: endpoint.scope,
-                  middlewares: endpoint.middlewares.length > 0 ? JSON.stringify(endpoint.middlewares) : null,
-                  filePath: endpoint.filePath,
-                  line: endpoint.line ?? null,
-                  description: endpoint.description ?? null,
-                  createdAt: new Date().toISOString(),
-                  updatedAt: new Date().toISOString(),
-                });
+                for (const endpoint of endpoints) {
+                  const success = dbManager.insertEndpoint({
+                    id: endpoint.id,
+                    method: endpoint.method,
+                    path: endpoint.path,
+                    pathParams:
+                      endpoint.pathParams.length > 0 ? JSON.stringify(endpoint.pathParams) : null,
+                    queryParams: endpoint.queryParams ? JSON.stringify(endpoint.queryParams) : null,
+                    handlerSymbolId: endpoint.handlerSymbolId,
+                    controllerSymbolId: endpoint.controllerSymbolId ?? null,
+                    requestType: endpoint.requestType ?? null,
+                    responseType: endpoint.responseType ?? null,
+                    scope: endpoint.scope,
+                    middlewares:
+                      endpoint.middlewares.length > 0 ? JSON.stringify(endpoint.middlewares) : null,
+                    filePath: endpoint.filePath,
+                    line: endpoint.line ?? null,
+                    description: endpoint.description ?? null,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                  });
 
-                if (success) {
-                  result.endpointsInserted++;
+                  if (success) {
+                    result.endpointsInserted++;
+                  }
                 }
+              } catch (_endpointError) {
+                // Non-critical, continue
               }
-            } catch (endpointError) {
-              // Non-critical, continue
-            }
 
-            // Detect entry points in this file
-            try {
-              const entryPoints = entryPointDetector.analyzeFile(filePath);
-              result.entryPointsFound += entryPoints.length;
+              // Detect entry points in this file
+              try {
+                const entryPoints = entryPointDetector.analyzeFile(filePath);
+                result.entryPointsFound += entryPoints.length;
 
-              for (const ep of entryPoints) {
-                const success = dbManager.insertEntryPoint({
-                  id: ep.id,
-                  type: ep.type,
-                  filePath: ep.filePath,
-                  symbolId: ep.symbolId ?? null,
-                  functionName: ep.functionName ?? null,
-                  line: ep.line,
-                  description: ep.description ?? null,
-                  isAsync: ep.isAsync,
-                  bootstrapOrder: ep.bootstrapOrder ?? null,
-                  dependencies: ep.dependencies.length > 0 ? JSON.stringify(ep.dependencies) : null,
-                  createdAt: new Date().toISOString(),
-                  updatedAt: new Date().toISOString(),
-                });
+                for (const ep of entryPoints) {
+                  const success = dbManager.insertEntryPoint({
+                    id: ep.id,
+                    type: ep.type,
+                    filePath: ep.filePath,
+                    symbolId: ep.symbolId ?? null,
+                    functionName: ep.functionName ?? null,
+                    line: ep.line,
+                    description: ep.description ?? null,
+                    isAsync: ep.isAsync,
+                    bootstrapOrder: ep.bootstrapOrder ?? null,
+                    dependencies:
+                      ep.dependencies.length > 0 ? JSON.stringify(ep.dependencies) : null,
+                    createdAt: new Date().toISOString(),
+                    updatedAt: new Date().toISOString(),
+                  });
 
-                if (success) {
-                  result.entryPointsInserted++;
+                  if (success) {
+                    result.entryPointsInserted++;
+                  }
                 }
+              } catch (_entryPointError) {
+                // Non-critical, continue
               }
-            } catch (entryPointError) {
-              // Non-critical, continue
-            }
 
-            // Analyze code blocks for functions/methods
-            for (const symbol of extractResult.symbols) {
-              if (symbol.type === 'function' || symbol.type === 'method') {
-                try {
-                  const sourceFile = program.getSourceFile(filePath);
-                  if (sourceFile) {
-                    // Find the function/method node
-                    const findNode = (node: ts.Node): ts.FunctionDeclaration | ts.MethodDeclaration | ts.ArrowFunction | null => {
-                      if ((ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node) || ts.isArrowFunction(node))) {
-                        const nodePos = sourceFile.getLineAndCharacterOfPosition(node.getStart());
-                        if (nodePos.line + 1 === symbol.line) {
-                          return node;
+              // Analyze code blocks for functions/methods
+              for (const symbol of extractResult.symbols) {
+                if (symbol.type === 'function' || symbol.type === 'method') {
+                  try {
+                    const sourceFile = program.getSourceFile(filePath);
+                    if (sourceFile) {
+                      // Find the function/method node
+                      const findNode = (
+                        node: ts.Node
+                      ):
+                        | ts.FunctionDeclaration
+                        | ts.MethodDeclaration
+                        | ts.ArrowFunction
+                        | null => {
+                        if (
+                          ts.isFunctionDeclaration(node) ||
+                          ts.isMethodDeclaration(node) ||
+                          ts.isArrowFunction(node)
+                        ) {
+                          const nodePos = sourceFile.getLineAndCharacterOfPosition(node.getStart());
+                          if (nodePos.line + 1 === symbol.line) {
+                            return node;
+                          }
                         }
-                      }
-                      let found: ts.FunctionDeclaration | ts.MethodDeclaration | ts.ArrowFunction | null = null;
-                      ts.forEachChild(node, child => {
-                        if (!found) {
-                          found = findNode(child);
-                        }
-                      });
-                      return found;
-                    };
+                        let found:
+                          | ts.FunctionDeclaration
+                          | ts.MethodDeclaration
+                          | ts.ArrowFunction
+                          | null = null;
+                        ts.forEachChild(node, (child) => {
+                          if (!found) {
+                            found = findNode(child);
+                          }
+                        });
+                        return found;
+                      };
 
-                    const functionNode = findNode(sourceFile);
-                    if (functionNode) {
-                      const symbolId = symbolIdMap.get(symbol.name);
-                      if (symbolId) {
-                        const blockResult = blockAnalyzer.analyzeFunction(functionNode, symbolId, filePath);
-                        result.blocksFound += blockResult.blocks.length;
+                      const functionNode = findNode(sourceFile);
+                      if (functionNode) {
+                        const symbolId = symbolIdMap.get(symbol.name);
+                        if (symbolId) {
+                          const blockResult = blockAnalyzer.analyzeFunction(
+                            functionNode,
+                            symbolId,
+                            filePath
+                          );
+                          result.blocksFound += blockResult.blocks.length;
 
-                        for (const block of blockResult.blocks) {
-                          const success = dbManager.insertCodeBlock({
-                            id: block.id,
-                            symbolId: block.symbolId,
-                            type: block.type,
-                            startLine: block.startLine,
-                            endLine: block.endLine,
-                            purpose: block.purpose ?? null,
-                            dependencies: block.dependencies.length > 0 ? JSON.stringify(block.dependencies) : null,
-                            sideEffects: block.sideEffects.length > 0 ? JSON.stringify(block.sideEffects) : null,
-                            scope: block.scope ?? null,
-                            complexity: block.complexity ?? null,
-                            createdAt: new Date().toISOString(),
-                            updatedAt: new Date().toISOString(),
-                          });
+                          for (const block of blockResult.blocks) {
+                            const success = dbManager.insertCodeBlock({
+                              id: block.id,
+                              symbolId: block.symbolId,
+                              type: block.type,
+                              startLine: block.startLine,
+                              endLine: block.endLine,
+                              purpose: block.purpose ?? null,
+                              dependencies:
+                                block.dependencies.length > 0
+                                  ? JSON.stringify(block.dependencies)
+                                  : null,
+                              sideEffects:
+                                block.sideEffects.length > 0
+                                  ? JSON.stringify(block.sideEffects)
+                                  : null,
+                              scope: block.scope ?? null,
+                              complexity: block.complexity ?? null,
+                              createdAt: new Date().toISOString(),
+                              updatedAt: new Date().toISOString(),
+                            });
 
-                          if (success) {
-                            result.blocksInserted++;
+                            if (success) {
+                              result.blocksInserted++;
 
-                            // Create relationships for block dependencies
-                            result.blockDependenciesFound += block.dependencies.length;
-                            for (const depName of block.dependencies) {
-                              const depSymbolId = symbolIdMap.get(depName);
-                              if (depSymbolId) {
-                                const relId = `block-dep-${block.id}-${depSymbolId}`;
-                                const relSuccess = dbManager.insertUnifiedRelationship({
-                                  id: relId,
-                                  type: 'calls',
-                                  category: 'behavioral',
-                                  fromSymbols: [block.id],
-                                  toSymbols: [depSymbolId],
-                                  direction: 'unidirectional',
-                                  strength: 'medium',
-                                  evidence: [{
-                                    type: 'code',
-                                    source: filePath,
-                                    lineNumber: block.startLine,
+                              // Create relationships for block dependencies
+                              result.blockDependenciesFound += block.dependencies.length;
+                              for (const depName of block.dependencies) {
+                                const depSymbolId = symbolIdMap.get(depName);
+                                if (depSymbolId) {
+                                  const relId = `block-dep-${block.id}-${depSymbolId}`;
+                                  const _relSuccess = dbManager.insertUnifiedRelationship({
+                                    id: relId,
+                                    type: 'calls',
+                                    category: 'behavioral',
+                                    fromSymbols: [block.id],
+                                    toSymbols: [depSymbolId],
+                                    direction: 'unidirectional',
+                                    strength: 'medium',
+                                    evidence: [
+                                      {
+                                        type: 'code',
+                                        source: filePath,
+                                        lineNumber: block.startLine,
+                                        confidence: 0.8,
+                                      },
+                                    ],
+                                    discoveredBy: 'block-analyzer',
                                     confidence: 0.8,
-                                  }],
-                                  discoveredBy: 'block-analyzer',
-                                  confidence: 0.8,
-                                  filePath,
-                                  line: block.startLine,
-                                  properties: {
-                                    relationshipContext: 'block-dependency',
-                                    blockType: block.type,
-                                  },
-                                  description: `Block ${block.id} uses ${depName}`,
-                                });
-                                // Don't count these in main relationships stats
+                                    filePath,
+                                    line: block.startLine,
+                                    properties: {
+                                      relationshipContext: 'block-dependency',
+                                      blockType: block.type,
+                                    },
+                                    description: `Block ${block.id} uses ${depName}`,
+                                  });
+                                  // Don't count these in main relationships stats
+                                }
                               }
                             }
                           }
                         }
                       }
                     }
+                  } catch (_blockError) {
+                    // Non-critical, continue
                   }
-                } catch (blockError) {
-                  // Non-critical, continue
                 }
               }
             }
+          } catch (error) {
+            result.errors.push(`Error scanning ${filePath}: ${error}`);
           }
-        } catch (error) {
-          result.errors.push(`Error scanning ${filePath}: ${error}`);
         }
-      }
 
-      // Insert all relationships after all symbols are collected
-      this.printInfo('Inserting relationships...');
-      let inheritanceRelationshipsInserted = 0;
-      for (const relationship of allRelationships) {
-        try {
-          // Handle re-export relationships specially
-          if (relationship.type === 're-exports') {
+        // Insert all relationships after all symbols are collected
+        this.printInfo('Inserting relationships...');
+        let inheritanceRelationshipsInserted = 0;
+        for (const relationship of allRelationships) {
+          try {
+            // Handle re-export relationships specially
+            if (relationship.type === 're-exports') {
+              const toId = symbolIdMap.get(relationship.to);
+              if (toId) {
+                const unifiedId =
+                  `re-export-${relationship.from.replace(/[^a-z0-9]+/gi, '-')}-${toId}`.toLowerCase();
+                dbManager.insertUnifiedRelationship({
+                  id: unifiedId,
+                  type: 're-export',
+                  category: 'structural',
+                  fromSymbols: [relationship.from],
+                  toSymbols: [toId],
+                  direction: 'unidirectional',
+                  strength: 'medium',
+                  evidence: [
+                    {
+                      type: 'code',
+                      source: relationship.filePath,
+                      confidence: 1.0,
+                    },
+                  ],
+                  discoveredBy: 'static-analysis',
+                  confidence: 1.0,
+                  filePath: relationship.filePath,
+                  line: relationship.line,
+                  description: relationship.description,
+                });
+                result.relationshipsInserted++;
+              }
+              continue;
+            }
+
+            // Get symbol IDs from the map
+            const fromId = symbolIdMap.get(relationship.from);
             const toId = symbolIdMap.get(relationship.to);
-            if (toId) {
-              const unifiedId = `re-export-${relationship.from.replace(/[^a-z0-9]+/gi, '-')}-${toId}`.toLowerCase();
+
+            if (fromId && toId) {
+              // Insert into legacy dependencies table
+              const success = dbManager.insertDependency({
+                symbolId: fromId,
+                target: toId,
+                type: relationship.type,
+                reason: relationship.description || `${relationship.type} relationship`,
+                importPath: relationship.filePath,
+              });
+
+              // Map relationship type to unified relationship type and category
+              let unifiedType = 'code-dependency';
+              let category = 'structural';
+
+              if (relationship.type === 'extends') {
+                unifiedType = 'inheritance';
+                category = 'structural';
+              } else if (relationship.type === 'implements') {
+                unifiedType = 'implementation';
+                category = 'structural';
+              } else if (relationship.type === 'dependsOn') {
+                unifiedType = 'code-dependency';
+                category = 'structural';
+              }
+
+              // Also insert into unified_relationships table
+              const unifiedId = `${unifiedType}-${fromId}-${toId}`
+                .toLowerCase()
+                .replace(/[^a-z0-9]+/g, '-');
               dbManager.insertUnifiedRelationship({
                 id: unifiedId,
-                type: 're-export',
-                category: 'structural',
-                fromSymbols: [relationship.from],
+                type: unifiedType,
+                category: category,
+                fromSymbols: [fromId],
                 toSymbols: [toId],
                 direction: 'unidirectional',
-                strength: 'medium',
-                evidence: [{
-                  type: 'code',
-                  source: relationship.filePath,
-                  confidence: 1.0,
-                }],
+                strength: 'strong',
+                evidence: [
+                  {
+                    type: 'code',
+                    source: relationship.filePath,
+                    confidence: 1.0,
+                  },
+                ],
                 discoveredBy: 'static-analysis',
                 confidence: 1.0,
                 filePath: relationship.filePath,
-                line: relationship.line,
-                description: relationship.description,
+                description:
+                  relationship.description ||
+                  `${relationship.from} ${relationship.type} ${relationship.to}`,
+              });
+
+              if (success) {
+                result.relationshipsInserted++;
+                if (relationship.type === 'extends' || relationship.type === 'implements') {
+                  inheritanceRelationshipsInserted++;
+                }
+              }
+            } else {
+              // Symbol not found in map - likely an external type (e.g., EventEmitter, Promise)
+              // This is expected behavior, not an error
+              result.relationshipsSkipped++;
+            }
+          } catch (_error) {
+            result.errors.push(
+              `Failed to insert relationship: ${relationship.from} -> ${relationship.to}`
+            );
+          }
+        }
+
+        // Extract and insert test relationships
+        if (allTestSymbols.length > 0) {
+          this.printInfo(
+            `Extracting test relationships (${allTestSymbols.length} test symbols)...`
+          );
+          const coverageAnalyzer = new TestCoverageAnalyzer(dbManager);
+          const testRelationships = coverageAnalyzer.analyzeTestCoverage(allTestSymbols);
+
+          // Insert test-coverage relationships
+          for (const testRel of testRelationships.testCoverageRelations) {
+            try {
+              dbManager.insertUnifiedRelationship({
+                id: testRel.id,
+                type: testRel.type,
+                category: testRel.category,
+                fromSymbols: testRel.fromSymbols,
+                toSymbols: testRel.toSymbols,
+                direction: 'unidirectional',
+                strength: testRel.confidence > 0.7 ? 'strong' : 'medium',
+                evidence: [
+                  {
+                    type: 'test',
+                    source: 'test-code-analysis',
+                    confidence: testRel.confidence,
+                  },
+                ],
+                discoveredBy: 'test-parser',
+                confidence: testRel.confidence,
+                description: `Test coverage: ${testRel.metadata.testedMethods?.join(', ') || 'unknown'} (${testRel.metadata.assertionCount || 0} assertions)`,
               });
               result.relationshipsInserted++;
+            } catch (_error) {
+              result.errors.push(`Failed to insert test-coverage relationship: ${testRel.id}`);
             }
-            continue;
           }
 
-          // Get symbol IDs from the map
-          const fromId = symbolIdMap.get(relationship.from);
-          const toId = symbolIdMap.get(relationship.to);
-
-          if (fromId && toId) {
-            // Insert into legacy dependencies table
-            const success = dbManager.insertDependency({
-              symbolId: fromId,
-              target: toId,
-              type: relationship.type,
-              reason: relationship.description || `${relationship.type} relationship`,
-              importPath: relationship.filePath,
-            });
-
-            // Map relationship type to unified relationship type and category
-            let unifiedType = 'code-dependency';
-            let category = 'structural';
-
-            if (relationship.type === 'extends') {
-              unifiedType = 'inheritance';
-              category = 'structural';
-            } else if (relationship.type === 'implements') {
-              unifiedType = 'implementation';
-              category = 'structural';
-            } else if (relationship.type === 'dependsOn') {
-              unifiedType = 'code-dependency';
-              category = 'structural';
-            }
-
-            // Also insert into unified_relationships table
-            const unifiedId = `${unifiedType}-${fromId}-${toId}`.toLowerCase().replace(/[^a-z0-9]+/g, '-');
-            dbManager.insertUnifiedRelationship({
-              id: unifiedId,
-              type: unifiedType,
-              category: category,
-              fromSymbols: [fromId],
-              toSymbols: [toId],
-              direction: 'unidirectional',
-              strength: 'strong',
-              evidence: [{
-                type: 'code',
-                source: relationship.filePath,
+          // Insert contains relationships (test hierarchy)
+          for (const containsRel of testRelationships.containsRelations) {
+            try {
+              dbManager.insertUnifiedRelationship({
+                id: containsRel.id,
+                type: containsRel.type,
+                category: containsRel.category,
+                fromSymbols: containsRel.fromSymbols,
+                toSymbols: containsRel.toSymbols,
+                direction: 'unidirectional',
+                strength: 'strong',
+                evidence: [
+                  {
+                    type: 'structural',
+                    source: 'test-suite-hierarchy',
+                    confidence: 1.0,
+                  },
+                ],
+                discoveredBy: 'test-parser',
                 confidence: 1.0,
-              }],
-              discoveredBy: 'static-analysis',
+                description: `Test hierarchy (nesting level: ${containsRel.metadata.nestingLevel})`,
+              });
+              result.relationshipsInserted++;
+            } catch (_error) {
+              result.errors.push(`Failed to insert contains relationship: ${containsRel.id}`);
+            }
+          }
+
+          // Insert covers-scenario relationships
+          for (const scenarioRel of testRelationships.coversScenarioRelations) {
+            try {
+              dbManager.insertUnifiedRelationship({
+                id: scenarioRel.id,
+                type: scenarioRel.type,
+                category: scenarioRel.category,
+                fromSymbols: scenarioRel.fromSymbols,
+                toSymbols: scenarioRel.toSymbols,
+                direction: 'unidirectional',
+                strength: scenarioRel.confidence > 0.7 ? 'medium' : 'weak',
+                evidence: [
+                  {
+                    type: 'semantic',
+                    source: 'scenario-matching',
+                    confidence: scenarioRel.confidence,
+                  },
+                ],
+                discoveredBy: 'test-parser',
+                confidence: scenarioRel.confidence,
+                description: `Test case covers scenario`,
+              });
+              result.relationshipsInserted++;
+            } catch (_error) {
+              result.errors.push(
+                `Failed to insert covers-scenario relationship: ${scenarioRel.id}`
+              );
+            }
+          }
+
+          // Log coverage stats
+          const stats = testRelationships.coverageStats;
+          this.printSuccess(
+            `Test coverage: ${stats.testCasesWithCoverage}/${stats.totalTestCases} test cases cover ${stats.totalTestedSymbols} symbols`
+          );
+          this.printInfo(`Average assertions per test: ${stats.averageAssertions.toFixed(1)}`);
+          if (stats.totalScenarios > 0) {
+            this.printInfo(
+              `Scenario coverage: ${stats.scenariosWithCoverage}/${stats.totalScenarios} scenarios covered`
+            );
+          }
+        }
+
+        // Insert doc relationships
+        this.printInfo('Inserting document relationships...');
+        let docRelationshipsInserted = 0;
+
+        for (const docRel of allDocRelationships) {
+          try {
+            const relationshipId = `doc-${docRel.symbolId}-${docRel.docRef}`
+              .toLowerCase()
+              .replace(/[^a-z0-9]+/g, '-')
+              .replace(/^-|-$/g, '');
+
+            const success = dbManager.insertUnifiedRelationship({
+              id: relationshipId,
+              type: 'doc-reference',
+              category: 'semantic',
+              fromSymbols: [docRel.symbolId],
+              toSymbols: [`doc:${docRel.docRef}`],
+              direction: 'bidirectional',
+              strength: 'strong', // Doc references are explicit, so strong
+              evidence: [
+                {
+                  type: 'documentation',
+                  source: docRel.filePath,
+                  lineNumber: docRel.line,
+                  confidence: 1.0,
+                },
+              ],
+              discoveredBy: 'documentation',
               confidence: 1.0,
-              filePath: relationship.filePath,
-              description: relationship.description || `${relationship.from} ${relationship.type} ${relationship.to}`,
+              filePath: docRel.filePath,
+              line: docRel.line,
+              properties: {
+                docTag: true,
+                sourceType: 'tsdoc-tag',
+              },
+              description: `${docRel.symbolName} documented in [[${docRel.docRef}]]`,
             });
 
             if (success) {
-              result.relationshipsInserted++;
-              if (relationship.type === 'extends' || relationship.type === 'implements') {
-                inheritanceRelationshipsInserted++;
-              }
+              docRelationshipsInserted++;
             }
-          } else {
-            // Symbol not found in map - likely an external type (e.g., EventEmitter, Promise)
-            // This is expected behavior, not an error
-            result.relationshipsSkipped++;
-          }
-        } catch (error) {
-          result.errors.push(`Failed to insert relationship: ${relationship.from} -> ${relationship.to}`);
-        }
-      }
-
-      // Extract and insert test relationships
-      if (allTestSymbols.length > 0) {
-        this.printInfo(`Extracting test relationships (${allTestSymbols.length} test symbols)...`);
-        const coverageAnalyzer = new TestCoverageAnalyzer(dbManager);
-        const testRelationships = coverageAnalyzer.analyzeTestCoverage(allTestSymbols);
-
-        // Insert test-coverage relationships
-        for (const testRel of testRelationships.testCoverageRelations) {
-          try {
-            dbManager.insertUnifiedRelationship({
-              id: testRel.id,
-              type: testRel.type,
-              category: testRel.category,
-              fromSymbols: testRel.fromSymbols,
-              toSymbols: testRel.toSymbols,
-              direction: 'unidirectional',
-              strength: testRel.confidence > 0.7 ? 'strong' : 'medium',
-              evidence: [{
-                type: 'test',
-                source: 'test-code-analysis',
-                confidence: testRel.confidence,
-              }],
-              discoveredBy: 'test-parser',
-              confidence: testRel.confidence,
-              description: `Test coverage: ${testRel.metadata.testedMethods?.join(', ') || 'unknown'} (${testRel.metadata.assertionCount || 0} assertions)`,
-            });
-            result.relationshipsInserted++;
-          } catch (error) {
-            result.errors.push(`Failed to insert test-coverage relationship: ${testRel.id}`);
+          } catch (_error) {
+            result.errors.push(
+              `Failed to insert doc relationship: ${docRel.symbolName} -> ${docRel.docRef}`
+            );
           }
         }
 
-        // Insert contains relationships (test hierarchy)
-        for (const containsRel of testRelationships.containsRelations) {
-          try {
-            dbManager.insertUnifiedRelationship({
-              id: containsRel.id,
-              type: containsRel.type,
-              category: containsRel.category,
-              fromSymbols: containsRel.fromSymbols,
-              toSymbols: containsRel.toSymbols,
-              direction: 'unidirectional',
-              strength: 'strong',
-              evidence: [{
-                type: 'structural',
-                source: 'test-suite-hierarchy',
-                confidence: 1.0,
-              }],
-              discoveredBy: 'test-parser',
-              confidence: 1.0,
-              description: `Test hierarchy (nesting level: ${containsRel.metadata.nestingLevel})`,
-            });
-            result.relationshipsInserted++;
-          } catch (error) {
-            result.errors.push(`Failed to insert contains relationship: ${containsRel.id}`);
-          }
-        }
+        // Extract semantic relationships
+        this.printInfo('Analyzing semantic relationships...');
+        let semanticRelationshipsInserted = 0;
+        let inferredRelationshipsInserted = 0;
 
-        // Insert covers-scenario relationships
-        for (const scenarioRel of testRelationships.coversScenarioRelations) {
-          try {
-            dbManager.insertUnifiedRelationship({
-              id: scenarioRel.id,
-              type: scenarioRel.type,
-              category: scenarioRel.category,
-              fromSymbols: scenarioRel.fromSymbols,
-              toSymbols: scenarioRel.toSymbols,
-              direction: 'unidirectional',
-              strength: scenarioRel.confidence > 0.7 ? 'medium' : 'weak',
-              evidence: [{
-                type: 'semantic',
-                source: 'scenario-matching',
-                confidence: scenarioRel.confidence,
-              }],
-              discoveredBy: 'test-parser',
-              confidence: scenarioRel.confidence,
-              description: `Test case covers scenario`,
-            });
-            result.relationshipsInserted++;
-          } catch (error) {
-            result.errors.push(`Failed to insert covers-scenario relationship: ${scenarioRel.id}`);
-          }
-        }
-
-        // Log coverage stats
-        const stats = testRelationships.coverageStats;
-        this.printSuccess(`Test coverage: ${stats.testCasesWithCoverage}/${stats.totalTestCases} test cases cover ${stats.totalTestedSymbols} symbols`);
-        this.printInfo(`Average assertions per test: ${stats.averageAssertions.toFixed(1)}`);
-        if (stats.totalScenarios > 0) {
-          this.printInfo(`Scenario coverage: ${stats.scenariosWithCoverage}/${stats.totalScenarios} scenarios covered`);
-        }
-      }
-
-      // Insert doc relationships
-      this.printInfo('Inserting document relationships...');
-      let docRelationshipsInserted = 0;
-
-      for (const docRel of allDocRelationships) {
         try {
-          const relationshipId = `doc-${docRel.symbolId}-${docRel.docRef}`
-            .toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-')
-            .replace(/^-|-$/g, '');
+          // Build SymbolGraph from database for analyzers
+          const allSymbols = dbManager.getAllSymbols();
+          const symbolMap = new Map(allSymbols.map((s) => [s.id, s]));
 
-          const success = dbManager.insertUnifiedRelationship({
-            id: relationshipId,
-            type: 'doc-reference',
-            category: 'semantic',
-            fromSymbols: [docRel.symbolId],
-            toSymbols: [`doc:${docRel.docRef}`],
-            direction: 'bidirectional',
-            strength: 'strong',  // Doc references are explicit, so strong
-            evidence: [{
-              type: 'documentation',
-              source: docRel.filePath,
-              lineNumber: docRel.line,
-              confidence: 1.0,
-            }],
-            discoveredBy: 'documentation',
-            confidence: 1.0,
-            filePath: docRel.filePath,
-            line: docRel.line,
-            properties: {
-              docTag: true,
-              sourceType: 'tsdoc-tag',
-            },
-            description: `${docRel.symbolName} documented in [[${docRel.docRef}]]`,
+          // Build indexes for SymbolGraph
+          const nameIndex = new Map<string, string[]>();
+          const fileIndex = new Map<string, string[]>();
+
+          for (const symbol of allSymbols) {
+            // Name index
+            if (!nameIndex.has(symbol.name)) {
+              nameIndex.set(symbol.name, []);
+            }
+            nameIndex.get(symbol.name)?.push(symbol.id);
+
+            // File index
+            if (!fileIndex.has(symbol.filePath)) {
+              fileIndex.set(symbol.filePath, []);
+            }
+            fileIndex.get(symbol.filePath)?.push(symbol.id);
+          }
+
+          // Get existing relationships from database to populate the graph
+          const existingRels = dbManager.getAllUnifiedRelationships();
+          const relationships = existingRels.map((rel) => ({
+            from: typeof rel.from === 'string' ? rel.from : rel.from[0],
+            to: typeof rel.to === 'string' ? rel.to : rel.to[0],
+            type: rel.type as 'relatedTo' | 'dependsOn' | 'usedBy' | 'implements' | 'extends',
+            filePath: rel.filePath || '',
+            line: rel.line,
+          }));
+
+          // Build adjacency lists
+          const adjacencyList = new Map<string, string[]>();
+          const reverseAdjacencyList = new Map<string, string[]>();
+          for (const rel of relationships) {
+            if (!adjacencyList.has(rel.from)) adjacencyList.set(rel.from, []);
+            adjacencyList.get(rel.from)?.push(rel.to);
+            if (!reverseAdjacencyList.has(rel.to)) reverseAdjacencyList.set(rel.to, []);
+            reverseAdjacencyList.get(rel.to)?.push(rel.from);
+          }
+
+          const symbolGraph: SymbolGraph = {
+            symbols: symbolMap,
+            relationships,
+            nameIndex,
+            fileIndex,
+            adjacencyList,
+            reverseAdjacencyList,
+          };
+
+          // Helper to transform UnifiedRelationship to batch insert format
+          const toBatchFormat = (rel: UnifiedRelationship) => ({
+            id: rel.id,
+            type: rel.type,
+            category: rel.category,
+            fromSymbols: Array.isArray(rel.from) ? rel.from : [rel.from],
+            toSymbols: Array.isArray(rel.to) ? rel.to : [rel.to],
+            direction: rel.direction,
+            strength: rel.strength,
+            evidence: rel.evidence,
+            discoveredBy: rel.discoveredBy,
+            confidence: rel.confidence,
+            filePath: rel.filePath,
+            line: rel.line,
+            properties: rel.properties,
+            description: rel.description,
           });
 
-          if (success) {
-            docRelationshipsInserted++;
-          }
+          // 1. Naming Pattern Relations - DISABLED (produces noise based on name similarity)
+          // const namingAnalyzer = new NamingPatternRelationAnalyzer(symbolGraph);
+          // const namingRelations = namingAnalyzer.analyze();
+          // const namingInserted = dbManager.batchInsertUnifiedRelationships(namingRelations.map(toBatchFormat));
+          // semanticRelationshipsInserted += namingInserted;
+          // const namingStats = namingAnalyzer.getStatistics(namingRelations);
+          // this.printSuccess(`Naming patterns: ${namingInserted} relationships across ${namingStats.uniqueDomains} domains`);
+
+          // 2. Explicit Semantic Relations (@relatedTo tags)
+          const explicitAnalyzer = new ExplicitSemanticRelationAnalyzer();
+          const explicitRelations = explicitAnalyzer.analyze(targetPath);
+          const explicitInserted = dbManager.batchInsertUnifiedRelationships(
+            explicitRelations.map(toBatchFormat)
+          );
+          semanticRelationshipsInserted += explicitInserted;
+
+          const explicitStats = explicitAnalyzer.getStatistics(explicitRelations);
+          this.printSuccess(
+            `Explicit semantic: ${explicitInserted} relationships (${explicitStats.withDescription} with descriptions)`
+          );
+
+          // 3. Feature Grouping Relations
+          const featureAnalyzer = new FeatureGroupingAnalyzer(symbolGraph);
+          const featureRelations = featureAnalyzer.analyze(targetPath);
+          const featureInserted = dbManager.batchInsertUnifiedRelationships(
+            featureRelations.map(toBatchFormat)
+          );
+          semanticRelationshipsInserted += featureInserted;
+
+          const featureStats = featureAnalyzer.getStatistics(featureRelations);
+          this.printSuccess(
+            `Feature grouping: ${featureInserted} relationships across ${featureStats.uniqueFeatures} features`
+          );
+
+          // 4. Layer Dependency Analysis (architectural layer violations)
+          const layerAnalyzer = new LayerDependencyAnalyzer(symbolGraph);
+          const layerRelations = layerAnalyzer.analyze();
+          const layerInserted = dbManager.batchInsertUnifiedRelationships(
+            layerRelations.map(toBatchFormat)
+          );
+          semanticRelationshipsInserted += layerInserted;
+          this.printSuccess(`Layer dependencies: ${layerInserted} relationships`);
+
+          // 5. Circular Dependency Detection
+          const chainAnalyzer = new DependencyChainAnalyzer(symbolGraph);
+          const circularRelations = chainAnalyzer.analyzeCircularDependencies();
+          const circularInserted = dbManager.batchInsertUnifiedRelationships(
+            circularRelations.map(toBatchFormat)
+          );
+          semanticRelationshipsInserted += circularInserted;
+          this.printSuccess(`Circular dependencies: ${circularInserted} detected`);
+
+          // 6. Relationship Inference (generate new relationships from existing ones)
+          this.printInfo('Inferring relationships from existing patterns...');
+          const inferenceEngine = new RelationshipInferenceEngine();
+          const allRelationships = dbManager.getAllUnifiedRelationships();
+          const inferredRelationships = inferenceEngine.infer(allRelationships);
+          inferredRelationshipsInserted = dbManager.batchInsertUnifiedRelationships(
+            inferredRelationships.map(toBatchFormat)
+          );
+
+          const inferenceStats = inferenceEngine.getStatistics(allRelationships);
+          this.printSuccess(
+            `Inferred relationships: ${inferredRelationshipsInserted} total (${inferenceStats.byRule['naming-transitivity'] || 0} naming, ${inferenceStats.byRule['feature-closure'] || 0} feature, ${inferenceStats.byRule['test-coverage-inheritance'] || 0} test)`
+          );
+
+          // 7. Test Example Extraction (extract test cases as documentation examples)
+          this.printInfo('Extracting test examples for documentation...');
+          const { TestExampleExtractor } = await import('../analyzer/TestExampleExtractor.js');
+          const exampleExtractor = new TestExampleExtractor(dbManager);
+          const testExamples = exampleExtractor.extractAllExamples();
+          const exampleRelationships = exampleExtractor.createRelationships(testExamples);
+          const testExamplesInserted = dbManager.batchInsertUnifiedRelationships(
+            exampleRelationships.map(toBatchFormat)
+          );
+
+          const highQualityExamples = testExamples.filter((ex) => ex.quality >= 8);
+          this.printSuccess(
+            `Test examples: ${testExamples.length} total (${highQualityExamples.length} high-quality, ${testExamplesInserted} relationships)`
+          );
         } catch (error) {
-          result.errors.push(`Failed to insert doc relationship: ${docRel.symbolName} -> ${docRel.docRef}`);
-        }
-      }
-
-      // Extract semantic relationships
-      this.printInfo('Analyzing semantic relationships...');
-      let semanticRelationshipsInserted = 0;
-      let inferredRelationshipsInserted = 0;
-
-      try {
-        // Build SymbolGraph from database for analyzers
-        const allSymbols = dbManager.getAllSymbols();
-        const symbolMap = new Map(allSymbols.map(s => [s.id, s]));
-
-        // Build indexes for SymbolGraph
-        const nameIndex = new Map<string, string[]>();
-        const fileIndex = new Map<string, string[]>();
-
-        for (const symbol of allSymbols) {
-          // Name index
-          if (!nameIndex.has(symbol.name)) {
-            nameIndex.set(symbol.name, []);
-          }
-          nameIndex.get(symbol.name)!.push(symbol.id);
-
-          // File index
-          if (!fileIndex.has(symbol.filePath)) {
-            fileIndex.set(symbol.filePath, []);
-          }
-          fileIndex.get(symbol.filePath)!.push(symbol.id);
+          this.printWarning(
+            `Failed to analyze semantic relationships: ${error instanceof Error ? error.message : String(error)}`
+          );
         }
 
-        // Get existing relationships from database to populate the graph
-        const existingRels = dbManager.getAllUnifiedRelationships();
-        const relationships = existingRels.map(rel => ({
-          from: typeof rel.from === 'string' ? rel.from : rel.from[0],
-          to: typeof rel.to === 'string' ? rel.to : rel.to[0],
-          type: rel.type as 'relatedTo' | 'dependsOn' | 'usedBy' | 'implements' | 'extends',
-          filePath: rel.filePath || '',
-          line: rel.line,
-        }));
+        // Create endpoint-handler relationships
+        this.printInfo('Creating endpoint-handler relationships...');
+        let endpointHandlerRelsInserted = 0;
 
-        // Build adjacency lists
-        const adjacencyList = new Map<string, string[]>();
-        const reverseAdjacencyList = new Map<string, string[]>();
-        for (const rel of relationships) {
-          if (!adjacencyList.has(rel.from)) adjacencyList.set(rel.from, []);
-          adjacencyList.get(rel.from)!.push(rel.to);
-          if (!reverseAdjacencyList.has(rel.to)) reverseAdjacencyList.set(rel.to, []);
-          reverseAdjacencyList.get(rel.to)!.push(rel.from);
-        }
-
-        const symbolGraph: SymbolGraph = {
-          symbols: symbolMap,
-          relationships,
-          nameIndex,
-          fileIndex,
-          adjacencyList,
-          reverseAdjacencyList,
-        };
-
-        // Helper to transform UnifiedRelationship to batch insert format
-        const toBatchFormat = (rel: UnifiedRelationship) => ({
-          id: rel.id,
-          type: rel.type,
-          category: rel.category,
-          fromSymbols: Array.isArray(rel.from) ? rel.from : [rel.from],
-          toSymbols: Array.isArray(rel.to) ? rel.to : [rel.to],
-          direction: rel.direction,
-          strength: rel.strength,
-          evidence: rel.evidence,
-          discoveredBy: rel.discoveredBy,
-          confidence: rel.confidence,
-          filePath: rel.filePath,
-          line: rel.line,
-          properties: rel.properties,
-          description: rel.description,
-        });
-
-        // 1. Naming Pattern Relations - DISABLED (produces noise based on name similarity)
-        // const namingAnalyzer = new NamingPatternRelationAnalyzer(symbolGraph);
-        // const namingRelations = namingAnalyzer.analyze();
-        // const namingInserted = dbManager.batchInsertUnifiedRelationships(namingRelations.map(toBatchFormat));
-        // semanticRelationshipsInserted += namingInserted;
-        // const namingStats = namingAnalyzer.getStatistics(namingRelations);
-        // this.printSuccess(`Naming patterns: ${namingInserted} relationships across ${namingStats.uniqueDomains} domains`);
-
-        // 2. Explicit Semantic Relations (@relatedTo tags)
-        const explicitAnalyzer = new ExplicitSemanticRelationAnalyzer();
-        const explicitRelations = explicitAnalyzer.analyze(targetPath);
-        const explicitInserted = dbManager.batchInsertUnifiedRelationships(explicitRelations.map(toBatchFormat));
-        semanticRelationshipsInserted += explicitInserted;
-
-        const explicitStats = explicitAnalyzer.getStatistics(explicitRelations);
-        this.printSuccess(`Explicit semantic: ${explicitInserted} relationships (${explicitStats.withDescription} with descriptions)`);
-
-        // 3. Feature Grouping Relations
-        const featureAnalyzer = new FeatureGroupingAnalyzer(symbolGraph);
-        const featureRelations = featureAnalyzer.analyze(targetPath);
-        const featureInserted = dbManager.batchInsertUnifiedRelationships(featureRelations.map(toBatchFormat));
-        semanticRelationshipsInserted += featureInserted;
-
-        const featureStats = featureAnalyzer.getStatistics(featureRelations);
-        this.printSuccess(`Feature grouping: ${featureInserted} relationships across ${featureStats.uniqueFeatures} features`);
-
-        // 4. Layer Dependency Analysis (architectural layer violations)
-        const layerAnalyzer = new LayerDependencyAnalyzer(symbolGraph);
-        const layerRelations = layerAnalyzer.analyze();
-        const layerInserted = dbManager.batchInsertUnifiedRelationships(layerRelations.map(toBatchFormat));
-        semanticRelationshipsInserted += layerInserted;
-        this.printSuccess(`Layer dependencies: ${layerInserted} relationships`);
-
-        // 5. Circular Dependency Detection
-        const chainAnalyzer = new DependencyChainAnalyzer(symbolGraph);
-        const circularRelations = chainAnalyzer.analyzeCircularDependencies();
-        const circularInserted = dbManager.batchInsertUnifiedRelationships(circularRelations.map(toBatchFormat));
-        semanticRelationshipsInserted += circularInserted;
-        this.printSuccess(`Circular dependencies: ${circularInserted} detected`);
-
-        // 6. Relationship Inference (generate new relationships from existing ones)
-        this.printInfo('Inferring relationships from existing patterns...');
-        const inferenceEngine = new RelationshipInferenceEngine();
-        const allRelationships = dbManager.getAllUnifiedRelationships();
-        const inferredRelationships = inferenceEngine.infer(allRelationships);
-        inferredRelationshipsInserted = dbManager.batchInsertUnifiedRelationships(inferredRelationships.map(toBatchFormat));
-
-        const inferenceStats = inferenceEngine.getStatistics(allRelationships);
-        this.printSuccess(`Inferred relationships: ${inferredRelationshipsInserted} total (${inferenceStats.byRule['naming-transitivity'] || 0} naming, ${inferenceStats.byRule['feature-closure'] || 0} feature, ${inferenceStats.byRule['test-coverage-inheritance'] || 0} test)`);
-
-        // 7. Test Example Extraction (extract test cases as documentation examples)
-        this.printInfo('Extracting test examples for documentation...');
-        const { TestExampleExtractor } = await import('../analyzer/TestExampleExtractor.js');
-        const exampleExtractor = new TestExampleExtractor(dbManager);
-        const testExamples = exampleExtractor.extractAllExamples();
-        const exampleRelationships = exampleExtractor.createRelationships(testExamples);
-        const testExamplesInserted = dbManager.batchInsertUnifiedRelationships(exampleRelationships.map(toBatchFormat));
-
-        const highQualityExamples = testExamples.filter(ex => ex.quality >= 8);
-        this.printSuccess(`Test examples: ${testExamples.length} total (${highQualityExamples.length} high-quality, ${testExamplesInserted} relationships)`);
-
-      } catch (error) {
-        this.printWarning(`Failed to analyze semantic relationships: ${error instanceof Error ? error.message : String(error)}`);
-      }
-
-      // Create endpoint-handler relationships
-      this.printInfo('Creating endpoint-handler relationships...');
-      let endpointHandlerRelsInserted = 0;
-
-      try {
-        const endpoints = dbManager.getAllEndpoints();
-        for (const endpoint of endpoints) {
-          if (endpoint.handlerSymbolId) {
-            const relId = `endpoint-handler-${endpoint.id}`;
-            const success = dbManager.insertUnifiedRelationship({
-              id: relId,
-              type: 'calls', // Endpoint calls/invokes handler
-              category: 'behavioral',
-              fromSymbols: [endpoint.id],
-              toSymbols: [endpoint.handlerSymbolId],
-              direction: 'unidirectional',
-              strength: 'strong',
-              evidence: [{
-                type: 'code',
-                source: endpoint.filePath,
-                lineNumber: endpoint.line || 0,
+        try {
+          const endpoints = dbManager.getAllEndpoints();
+          for (const endpoint of endpoints) {
+            if (endpoint.handlerSymbolId) {
+              const relId = `endpoint-handler-${endpoint.id}`;
+              const success = dbManager.insertUnifiedRelationship({
+                id: relId,
+                type: 'calls', // Endpoint calls/invokes handler
+                category: 'behavioral',
+                fromSymbols: [endpoint.id],
+                toSymbols: [endpoint.handlerSymbolId],
+                direction: 'unidirectional',
+                strength: 'strong',
+                evidence: [
+                  {
+                    type: 'code',
+                    source: endpoint.filePath,
+                    lineNumber: endpoint.line || 0,
+                    confidence: 1.0,
+                  },
+                ],
+                discoveredBy: 'endpoint-analyzer',
                 confidence: 1.0,
-              }],
-              discoveredBy: 'endpoint-analyzer',
-              confidence: 1.0,
-              filePath: endpoint.filePath,
-              line: endpoint.line || undefined,
-              properties: {
-                relationshipContext: 'endpoint-handler',
-                method: endpoint.method,
-                path: endpoint.path,
-                scope: endpoint.scope,
-              },
-              description: `${endpoint.method} ${endpoint.path} → ${endpoint.handlerSymbolId}`,
-            });
+                filePath: endpoint.filePath,
+                line: endpoint.line || undefined,
+                properties: {
+                  relationshipContext: 'endpoint-handler',
+                  method: endpoint.method,
+                  path: endpoint.path,
+                  scope: endpoint.scope,
+                },
+                description: `${endpoint.method} ${endpoint.path} → ${endpoint.handlerSymbolId}`,
+              });
 
-            if (success) {
-              endpointHandlerRelsInserted++;
+              if (success) {
+                endpointHandlerRelsInserted++;
+              }
             }
           }
+
+          if (endpointHandlerRelsInserted > 0) {
+            this.printSuccess(`Endpoint-handler: ${endpointHandlerRelsInserted} relationships`);
+          }
+        } catch (error) {
+          this.printWarning(
+            `Failed to create endpoint-handler relationships: ${error instanceof Error ? error.message : String(error)}`
+          );
         }
 
-        if (endpointHandlerRelsInserted > 0) {
-          this.printSuccess(`Endpoint-handler: ${endpointHandlerRelsInserted} relationships`);
+        const duration = Date.now() - startTime;
+
+        // Write JSONL registry (ensure directory exists)
+        if (!fs.existsSync(registryDir)) {
+          fs.mkdirSync(registryDir, { recursive: true });
         }
-      } catch (error) {
-        this.printWarning(`Failed to create endpoint-handler relationships: ${error instanceof Error ? error.message : String(error)}`);
-      }
+        fs.writeFileSync(registryPath, registryLines.join('\n'), 'utf-8');
 
-      const duration = Date.now() - startTime;
+        // Update sync metadata for processed files (for incremental builds)
+        for (const filePath of files) {
+          this.updateSyncMetadata(dbManager, filePath);
+        }
 
-      // Write JSONL registry (ensure directory exists)
-      if (!fs.existsSync(registryDir)) {
-        fs.mkdirSync(registryDir, { recursive: true });
-      }
-      fs.writeFileSync(registryPath, registryLines.join('\n'), 'utf-8');
+        // Output build result as XML
+        new XmlBuilder(BuildResultSchema)
+          .section('statistics', {
+            filesScanned: result.filesScanned,
+            symbolsFound: result.symbolsFound,
+            symbolsInserted: result.symbolsInserted,
+            symbolsCollisions: result.symbolsCollisions,
+            relationshipsFound: result.relationshipsFound,
+            relationshipsInserted: result.relationshipsInserted,
+            relationshipsSkipped: result.relationshipsSkipped,
+            docRelationships: docRelationshipsInserted,
+            semanticRelationships: semanticRelationshipsInserted,
+            inferredRelationships: inferredRelationshipsInserted,
+            inheritanceRelationships: inheritanceRelationshipsInserted,
+            endpointHandlerRelationships: endpointHandlerRelsInserted,
+            endpointsFound: result.endpointsFound,
+            endpointsInserted: result.endpointsInserted,
+            blocksFound: result.blocksFound,
+            blocksInserted: result.blocksInserted,
+            blockDependenciesFound: result.blockDependenciesFound,
+            entryPointsFound: result.entryPointsFound,
+            entryPointsInserted: result.entryPointsInserted,
+            exposureAnalyzed: result.exposureAnalyzed,
+            durationMs: duration,
+            ...(canonicalGraph
+              ? {
+                  canonicalGraphNodes: canonicalGraph.nodeCount,
+                  canonicalGraphEdges: canonicalGraph.edgeCount,
+                }
+              : {}),
+          })
+          .section('paths', {
+            database: dbPath,
+            registry: registryPath,
+            ...(canonicalGraph ? { canonicalGraphDatabase: canonicalGraph.databasePath } : {}),
+          })
+          .section(
+            'errors',
+            result.errors.map((err) => ({ message: err }))
+          )
+          .print();
 
-      // Update sync metadata for processed files (for incremental builds)
-      for (const filePath of files) {
-        this.updateSyncMetadata(dbManager, filePath);
-      }
-
-      // Output build result as XML
-      new XmlBuilder(BuildResultSchema)
-        .section('statistics', {
-          filesScanned: result.filesScanned,
-          symbolsFound: result.symbolsFound,
-          symbolsInserted: result.symbolsInserted,
-          symbolsCollisions: result.symbolsCollisions,
-          relationshipsFound: result.relationshipsFound,
-          relationshipsInserted: result.relationshipsInserted,
-          relationshipsSkipped: result.relationshipsSkipped,
-          docRelationships: docRelationshipsInserted,
-          semanticRelationships: semanticRelationshipsInserted,
-          inferredRelationships: inferredRelationshipsInserted,
-          inheritanceRelationships: inheritanceRelationshipsInserted,
-          endpointHandlerRelationships: endpointHandlerRelsInserted,
-          endpointsFound: result.endpointsFound,
-          endpointsInserted: result.endpointsInserted,
-          blocksFound: result.blocksFound,
-          blocksInserted: result.blocksInserted,
-          blockDependenciesFound: result.blockDependenciesFound,
-          entryPointsFound: result.entryPointsFound,
-          entryPointsInserted: result.entryPointsInserted,
-          exposureAnalyzed: result.exposureAnalyzed,
-          durationMs: duration,
-          ...(canonicalGraph
-            ? {
-                canonicalGraphNodes: canonicalGraph.nodeCount,
-                canonicalGraphEdges: canonicalGraph.edgeCount,
-              }
-            : {}),
-        })
-        .section('paths', {
-          database: dbPath,
-          registry: registryPath,
-          ...(canonicalGraph
-            ? { canonicalGraphDatabase: canonicalGraph.databasePath }
-            : {}),
-        })
-        .section('errors', result.errors.map(err => ({ message: err })))
-        .print();
-
-      return this.success(
-        `Built database with ${result.symbolsInserted} symbols${canonicalGraph ? ` and canonical graph ${canonicalGraph.fingerprint.slice(0, 12)}` : ''}`
-      );
+        return this.success(
+          `Built database with ${result.symbolsInserted} symbols${canonicalGraph ? ` and canonical graph ${canonicalGraph.fingerprint.slice(0, 12)}` : ''}`
+        );
       } finally {
         dbManager.close();
       }
@@ -1198,21 +1295,16 @@ export class BuildCommand extends BaseCommand {
       rootDir,
       moduleSpecifier,
       configPath:
-        this.getOption(args, '--router-config') ??
-        process.env.TSDOC_EDGE_GRAPH_ROUTER_CONFIG,
-      repoId:
-        this.getOption(args, '--router-repo') ??
-        process.env.TSDOC_EDGE_GRAPH_ROUTER_REPO,
+        this.getOption(args, '--router-config') ?? process.env.TSDOC_EDGE_GRAPH_ROUTER_CONFIG,
+      repoId: this.getOption(args, '--router-repo') ?? process.env.TSDOC_EDGE_GRAPH_ROUTER_REPO,
       workspaceId:
         this.getOption(args, '--graph-workspace') ?? process.env.TSDOC_EDGE_GRAPH_WORKSPACE,
       graphNamespace:
         this.getOption(args, '--graph-namespace') ?? process.env.TSDOC_EDGE_GRAPH_NAMESPACE,
       tsconfigPath:
-        this.getOption(args, '--graph-tsconfig') ??
-        process.env.TSDOC_EDGE_GRAPH_TSCONFIG,
+        this.getOption(args, '--graph-tsconfig') ?? process.env.TSDOC_EDGE_GRAPH_TSCONFIG,
       repositoryPath:
-        this.getOption(args, '--canonical-graph-db') ??
-        process.env.TSDOC_EDGE_CANONICAL_GRAPH_DB,
+        this.getOption(args, '--canonical-graph-db') ?? process.env.TSDOC_EDGE_CANONICAL_GRAPH_DB,
     };
     const coordinator = this.dependencies.canonicalCoordinatorFactory
       ? this.dependencies.canonicalCoordinatorFactory(coordinatorOptions)
@@ -1355,18 +1447,5 @@ export class BuildCommand extends BaseCommand {
     } catch {
       // Silently ignore metadata update errors (non-critical)
     }
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      bold: '\x1b[1m',
-      dim: '\x1b[2m',
-      green: '\x1b[32m',
-      yellow: '\x1b[33m',
-      blue: '\x1b[34m',
-      cyan: '\x1b[36m',
-      red: '\x1b[31m',
-    };
   }
 }

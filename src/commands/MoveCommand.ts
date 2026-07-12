@@ -5,8 +5,8 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { ReferenceUpdater } from '../utilities/ReferenceUpdater';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /**
  * Command to move documentation files and update all references
@@ -63,7 +63,7 @@ Examples:
       return this.displayHelp();
     }
 
-    const [sourcePath, destPath] = args.filter(a => !a.startsWith('--'));
+    const [sourcePath, destPath] = args.filter((a) => !a.startsWith('--'));
 
     if (!sourcePath || !destPath) {
       this.printError('Source and destination paths required');
@@ -74,7 +74,7 @@ Examples:
 
     const managedDir = path.resolve('managed');
     const absSource = path.resolve(managedDir, sourcePath);
-    
+
     let absDest: string;
     if (destPath.endsWith('/')) {
       absDest = path.join(managedDir, destPath, path.basename(absSource));

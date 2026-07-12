@@ -28,7 +28,7 @@ describe('SpecCompletenessValidator', () => {
 
   beforeEach(() => {
     tempDir = fs.realpathSync(
-      fs.mkdtempSync(path.join(require('os').tmpdir(), 'spec-validator-test-'))
+      fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'spec-validator-test-'))
     );
 
     // Create managed directory

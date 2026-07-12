@@ -4,8 +4,8 @@
  * Purpose: Debug why context command doesn't find test-coverage relationships
  */
 
-import { DatabaseManager } from '../src/storage/DatabaseManager';
 import { RelationshipQueryEngine } from '../src/query/RelationshipQueryEngine';
+import { DatabaseManager } from '../src/storage/DatabaseManager';
 
 const db = new DatabaseManager('.tsdoc/symbols.db', '.tsdoc');
 
@@ -20,7 +20,7 @@ const allRels = db.getAllUnifiedRelationships();
 console.log(`\nTotal relationships: ${allRels.length}`);
 
 // Find test-coverage relationships involving DatabaseManager
-const testCoverageRels = allRels.filter(rel => {
+const testCoverageRels = allRels.filter((rel) => {
   if (rel.type !== 'test-coverage') return false;
 
   const from = Array.isArray(rel.from) ? rel.from : [rel.from];

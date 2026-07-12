@@ -550,7 +550,7 @@ describe('DatabaseManager', () => {
         },
       };
 
-      fs.writeFileSync(symbolsPath, JSON.stringify(testRecord) + '\n', 'utf-8');
+      fs.writeFileSync(symbolsPath, `${JSON.stringify(testRecord)}\n`, 'utf-8');
 
       const count = dbManager.importFromJSONL(symbolsPath);
 

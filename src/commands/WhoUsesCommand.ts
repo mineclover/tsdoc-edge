@@ -3,11 +3,11 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { DatabaseManager, type SymbolRow } from '../storage/DatabaseManager';
-import { XmlBuilder } from '../output/XmlBuilder';
 import { WhoUsesSchema } from '../output/schemas';
 import type { GroupedSectionData } from '../output/types';
+import { XmlBuilder } from '../output/XmlBuilder';
+import { DatabaseManager } from '../storage/DatabaseManager';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for showing who uses a symbol (database-driven)
@@ -86,7 +86,7 @@ export class WhoUsesCommand extends BaseCommand {
       }
 
       const useHuman = args.includes('--human');
-      const filteredArgs = args.filter(a => !a.startsWith('--'));
+      const filteredArgs = args.filter((a) => !a.startsWith('--'));
       const symbolName = filteredArgs[0];
       if (!symbolName) {
         this.printError('Usage: tsdoc-edge who-uses <symbol-name>');
@@ -125,9 +125,10 @@ export class WhoUsesCommand extends BaseCommand {
 
         // Auto-select if exact name match with primary type (class, interface, function, type)
         if (symbols.length > 1) {
-          const primaryMatch = symbols.find(s =>
-            s.name.toLowerCase() === symbolName.toLowerCase() &&
-            ['class', 'interface', 'function', 'type'].includes(s.type)
+          const primaryMatch = symbols.find(
+            (s) =>
+              s.name.toLowerCase() === symbolName.toLowerCase() &&
+              ['class', 'interface', 'function', 'type'].includes(s.type)
           );
 
           if (primaryMatch) {
@@ -138,7 +139,9 @@ export class WhoUsesCommand extends BaseCommand {
             symbols = [primaryMatch];
           } else {
             // Show all matches and let user choose
-            console.log(`${colors.cyan}Found ${symbols.length} symbols matching "${symbolName}":${colors.reset}`);
+            console.log(
+              `${colors.cyan}Found ${symbols.length} symbols matching "${symbolName}":${colors.reset}`
+            );
             console.log();
             for (const sym of symbols.slice(0, 15)) {
               console.log(`  • ${sym.name} (${sym.type}) in ${sym.file_path}`);
@@ -158,7 +161,7 @@ export class WhoUsesCommand extends BaseCommand {
           const relationships = dbManager.queryRelationships({ symbolId: symbol.id, limit: 200 });
 
           // Filter for incoming relationships (where this symbol is the target)
-          const incoming = relationships.filter(rel => {
+          const incoming = relationships.filter((rel) => {
             const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
             return toSymbols.includes(symbol.id);
           });
@@ -198,7 +201,9 @@ export class WhoUsesCommand extends BaseCommand {
             console.log(`File: ${symbol.file_path}:${symbol.line}`);
             console.log(`Exported: ${symbol.is_exported ? 'Yes' : 'No'}`);
             if (symbol.summary) {
-              console.log(`Summary: ${symbol.summary.substring(0, 80)}${symbol.summary.length > 80 ? '...' : ''}`);
+              console.log(
+                `Summary: ${symbol.summary.substring(0, 80)}${symbol.summary.length > 80 ? '...' : ''}`
+              );
             }
             console.log();
 
@@ -242,7 +247,7 @@ export class WhoUsesCommand extends BaseCommand {
 
               // For non-symbol refs (like file paths in re-export)
               for (const id of ids) {
-                if (!depSymbols.find(d => d.id === id)) {
+                if (!depSymbols.find((d) => d.id === id)) {
                   items.push({ name: id, type: 'unknown', file: '', line: 0 });
                 }
               }

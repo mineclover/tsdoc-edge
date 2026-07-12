@@ -6,10 +6,10 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type { SymbolGraph } from '../types/graph';
-import type { UnifiedRelationship } from '../types/relationships/unified';
 import { TSDocSymbolParser } from '../doc-symbol/TSDocSymbolParser';
 import type { CodeConnection } from '../types/feature';
+import type { SymbolGraph } from '../types/graph';
+import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
  * Analyzes doc reference relationships (@doc [[Symbol]])
@@ -95,7 +95,7 @@ export class DocReferenceAnalyzer {
       try {
         const fileConnections = this.parser.parseCodeFile(file);
         connections.push(...fileConnections);
-      } catch (error) {
+      } catch (_error) {
         // Skip files that cause parsing errors
       }
     }
@@ -179,8 +179,8 @@ export class DocReferenceAnalyzer {
           lineNumber: connection.line,
           snippet: `@doc [[${connection.docSymbol}${sectionPart}]]`,
           confidence: 1.0,
-          context: `TSDoc @doc tag in ${connection.codeSymbol}`
-        }
+          context: `TSDoc @doc tag in ${connection.codeSymbol}`,
+        },
       ],
       discoveredBy: 'documentation',
       confidence: 1.0,
@@ -193,7 +193,7 @@ export class DocReferenceAnalyzer {
       },
       createdAt: timestamp,
       updatedAt: timestamp,
-      description: `${connection.codeSymbol} → [[${connection.docSymbol}${sectionPart}]]`
+      description: `${connection.codeSymbol} → [[${connection.docSymbol}${sectionPart}]]`,
     };
   }
 
@@ -220,8 +220,8 @@ export class DocReferenceAnalyzer {
       const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
       const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
 
-      fromSymbols.forEach(s => codeSymbols.add(s));
-      toSymbols.forEach(s => docSymbols.add(s));
+      fromSymbols.forEach((s) => codeSymbols.add(s));
+      toSymbols.forEach((s) => docSymbols.add(s));
 
       if (rel.properties?.section) {
         withSection++;

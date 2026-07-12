@@ -3,9 +3,9 @@
  * Identifies improvement opportunities in test-example extraction
  */
 
-import { DatabaseManager } from '../src/storage/DatabaseManager';
-import { ConfigManager } from '../src/config/ConfigManager';
 import { TestExampleExtractor } from '../src/analyzer/TestExampleExtractor';
+import { ConfigManager } from '../src/config/ConfigManager';
+import { DatabaseManager } from '../src/storage/DatabaseManager';
 
 async function main() {
   const config = ConfigManager.getInstance().get();
@@ -40,9 +40,15 @@ async function main() {
     }
   }
 
-  console.log(`Examples with identified symbols: ${examplesWithSymbols} (${(examplesWithSymbols / allExamples.length * 100).toFixed(1)}%)`);
-  console.log(`Examples without symbols: ${examplesWithoutSymbols} (${(examplesWithoutSymbols / allExamples.length * 100).toFixed(1)}%)`);
-  console.log(`Average symbols per example: ${(totalSymbolsIdentified / allExamples.length).toFixed(2)}`);
+  console.log(
+    `Examples with identified symbols: ${examplesWithSymbols} (${((examplesWithSymbols / allExamples.length) * 100).toFixed(1)}%)`
+  );
+  console.log(
+    `Examples without symbols: ${examplesWithoutSymbols} (${((examplesWithoutSymbols / allExamples.length) * 100).toFixed(1)}%)`
+  );
+  console.log(
+    `Average symbols per example: ${(totalSymbolsIdentified / allExamples.length).toFixed(2)}`
+  );
   console.log();
 
   // Show distribution
@@ -58,7 +64,7 @@ async function main() {
   console.log('⚠️  Examples Without Symbol Identification (sample):');
   console.log('─'.repeat(80));
 
-  const noSymbols = allExamples.filter(ex => ex.testedSymbols.length === 0).slice(0, 10);
+  const noSymbols = allExamples.filter((ex) => ex.testedSymbols.length === 0).slice(0, 10);
   for (const example of noSymbols) {
     console.log(`  "${example.description}"`);
     console.log(`  File: ${example.filePath}:${example.line}`);
@@ -79,7 +85,7 @@ async function main() {
   for (let i = 10; i >= 0; i--) {
     const count = qualityBuckets.get(i) || 0;
     const bar = '█'.repeat(Math.floor(count / 20));
-    const pct = (count / allExamples.length * 100).toFixed(1);
+    const pct = ((count / allExamples.length) * 100).toFixed(1);
     console.log(`  Quality ${i}: ${count.toString().padStart(4)} (${pct.padStart(5)}%) ${bar}`);
   }
   console.log();
@@ -88,7 +94,7 @@ async function main() {
   console.log('🔍 Low Quality Examples (quality < 5) - Sample:');
   console.log('─'.repeat(80));
 
-  const lowQuality = allExamples.filter(ex => ex.quality < 5).slice(0, 5);
+  const lowQuality = allExamples.filter((ex) => ex.quality < 5).slice(0, 5);
   if (lowQuality.length === 0) {
     console.log('  ✅ No low quality examples found!\n');
   } else {
@@ -104,19 +110,21 @@ async function main() {
   console.log('─'.repeat(80));
 
   const categoryStats = {
-    'basic-usage': allExamples.filter(ex => ex.category === 'basic-usage'),
-    'advanced-usage': allExamples.filter(ex => ex.category === 'advanced-usage'),
-    'integration': allExamples.filter(ex => ex.category === 'integration'),
-    'edge-case': allExamples.filter(ex => ex.category === 'edge-case'),
+    'basic-usage': allExamples.filter((ex) => ex.category === 'basic-usage'),
+    'advanced-usage': allExamples.filter((ex) => ex.category === 'advanced-usage'),
+    integration: allExamples.filter((ex) => ex.category === 'integration'),
+    'edge-case': allExamples.filter((ex) => ex.category === 'edge-case'),
   };
 
   for (const [category, examples] of Object.entries(categoryStats)) {
     const avgQuality = examples.reduce((sum, ex) => sum + ex.quality, 0) / examples.length;
-    const highQuality = examples.filter(ex => ex.quality >= 8).length;
+    const highQuality = examples.filter((ex) => ex.quality >= 8).length;
 
     console.log(`  ${category.padEnd(15)}: ${examples.length.toString().padStart(4)} examples`);
     console.log(`    Average quality: ${avgQuality.toFixed(2)}`);
-    console.log(`    High quality: ${highQuality} (${(highQuality / examples.length * 100).toFixed(1)}%)`);
+    console.log(
+      `    High quality: ${highQuality} (${((highQuality / examples.length) * 100).toFixed(1)}%)`
+    );
     console.log();
   }
 
@@ -128,14 +136,20 @@ async function main() {
   console.log(`Total relationships created: ${relationships.length}`);
 
   const strengthDist = {
-    strong: relationships.filter(r => r.strength === 'strong').length,
-    medium: relationships.filter(r => r.strength === 'medium').length,
-    weak: relationships.filter(r => r.strength === 'weak').length,
+    strong: relationships.filter((r) => r.strength === 'strong').length,
+    medium: relationships.filter((r) => r.strength === 'medium').length,
+    weak: relationships.filter((r) => r.strength === 'weak').length,
   };
 
-  console.log(`  Strong (quality 8-10): ${strengthDist.strong} (${(strengthDist.strong / relationships.length * 100).toFixed(1)}%)`);
-  console.log(`  Medium (quality 5-7): ${strengthDist.medium} (${(strengthDist.medium / relationships.length * 100).toFixed(1)}%)`);
-  console.log(`  Weak (quality 0-4): ${strengthDist.weak} (${(strengthDist.weak / relationships.length * 100).toFixed(1)}%)`);
+  console.log(
+    `  Strong (quality 8-10): ${strengthDist.strong} (${((strengthDist.strong / relationships.length) * 100).toFixed(1)}%)`
+  );
+  console.log(
+    `  Medium (quality 5-7): ${strengthDist.medium} (${((strengthDist.medium / relationships.length) * 100).toFixed(1)}%)`
+  );
+  console.log(
+    `  Weak (quality 0-4): ${strengthDist.weak} (${((strengthDist.weak / relationships.length) * 100).toFixed(1)}%)`
+  );
   console.log();
 
   // 7. Identify improvement opportunities
@@ -145,11 +159,13 @@ async function main() {
   const improvements: string[] = [];
 
   if (examplesWithoutSymbols > allExamples.length * 0.1) {
-    improvements.push(`❌ ${examplesWithoutSymbols} examples (${(examplesWithoutSymbols / allExamples.length * 100).toFixed(1)}%) have no identified symbols`);
+    improvements.push(
+      `❌ ${examplesWithoutSymbols} examples (${((examplesWithoutSymbols / allExamples.length) * 100).toFixed(1)}%) have no identified symbols`
+    );
     improvements.push('   → Improve symbol identification algorithm');
   }
 
-  const lowQualityCount = allExamples.filter(ex => ex.quality < 5).length;
+  const lowQualityCount = allExamples.filter((ex) => ex.quality < 5).length;
   if (lowQualityCount > 0) {
     improvements.push(`⚠️  ${lowQualityCount} examples have quality < 5`);
     improvements.push('   → Review quality scoring algorithm');

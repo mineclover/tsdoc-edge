@@ -55,12 +55,14 @@ function analyzeCodeTypes(): CodeTypeAnalysis {
 const result = analyzeCodeTypes();
 
 console.log('\n=== Code Type Analysis ===\n');
-console.log(`Total Symbols: ${result.typeCode.count + result.implCode.count + result.testCode.count}`);
+console.log(
+  `Total Symbols: ${result.typeCode.count + result.implCode.count + result.testCode.count}`
+);
 console.log('\n타입 코드 (Type Code):');
 console.log(`  Count: ${result.typeCode.count}`);
 if (result.typeCode.count > 0) {
   console.log('  Examples:');
-  result.typeCode.symbols.slice(0, 5).forEach(s => console.log(`    - ${s}`));
+  result.typeCode.symbols.slice(0, 5).forEach((s) => console.log(`    - ${s}`));
   if (result.typeCode.count > 5) {
     console.log(`    ... and ${result.typeCode.count - 5} more`);
   }
@@ -70,7 +72,7 @@ console.log('\n구현 코드 (Implementation Code):');
 console.log(`  Count: ${result.implCode.count}`);
 if (result.implCode.count > 0) {
   console.log('  Examples:');
-  result.implCode.symbols.slice(0, 5).forEach(s => console.log(`    - ${s}`));
+  result.implCode.symbols.slice(0, 5).forEach((s) => console.log(`    - ${s}`));
   if (result.implCode.count > 5) {
     console.log(`    ... and ${result.implCode.count - 5} more`);
   }
@@ -80,7 +82,7 @@ console.log('\n테스트 코드 (Test Code):');
 console.log(`  Count: ${result.testCode.count}`);
 if (result.testCode.count > 0) {
   console.log('  Examples:');
-  result.testCode.symbols.slice(0, 5).forEach(s => console.log(`    - ${s}`));
+  result.testCode.symbols.slice(0, 5).forEach((s) => console.log(`    - ${s}`));
   if (result.testCode.count > 5) {
     console.log(`    ... and ${result.testCode.count - 5} more`);
   }

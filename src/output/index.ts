@@ -3,15 +3,15 @@
  * @packageDocumentation
  */
 
+export { JsonBuilder } from './JsonBuilder';
+export * from './schemas';
 export * from './types';
 export { XmlBuilder } from './XmlBuilder';
-export { JsonBuilder } from './JsonBuilder';
-export { XmlParser, XmlParseError, SchemaValidationError } from './XmlParser';
-export * from './schemas';
+export { SchemaValidationError, XmlParseError, XmlParser } from './XmlParser';
 
-import type { OutputSchema, OutputBuilder, OutputFormat } from './types';
-import { XmlBuilder } from './XmlBuilder';
 import { JsonBuilder } from './JsonBuilder';
+import type { OutputBuilder, OutputFormat, OutputSchema } from './types';
+import { XmlBuilder } from './XmlBuilder';
 
 /**
  * Create an output builder for the given format

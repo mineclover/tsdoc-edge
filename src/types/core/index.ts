@@ -3,5 +3,5 @@
  * @packageDocumentation
  */
 
-export * from './parse';
 export * from './linking';
+export * from './parse';

@@ -24,7 +24,7 @@ function analyzeInferredRelationships(): InferredRelationshipStats {
   const db = new DatabaseManager('.tsdoc/symbols.db', '.tsdoc');
 
   console.log('📊 Inferred Relationship Analysis\n');
-  console.log('=' .repeat(80));
+  console.log('='.repeat(80));
 
   // Get all relationships where detection method includes "inference"
   const inferredQuery = `
@@ -34,7 +34,7 @@ function analyzeInferredRelationships(): InferredRelationshipStats {
     ORDER BY created_at DESC
   `;
 
-  const inferred = db['db'].prepare(inferredQuery).all() as Array<{
+  const inferred = db.db.prepare(inferredQuery).all() as Array<{
     id: string;
     type: string;
     from_symbols: string;
@@ -65,7 +65,7 @@ function analyzeInferredRelationships(): InferredRelationshipStats {
         const props = JSON.parse(rel.properties);
         const method = props.detectionMethod || 'unknown';
         byMethod[method] = (byMethod[method] || 0) + 1;
-      } catch (e) {
+      } catch (_e) {
         byMethod['parse-error'] = (byMethod['parse-error'] || 0) + 1;
       }
     }
@@ -77,13 +77,13 @@ function analyzeInferredRelationships(): InferredRelationshipStats {
   }
 
   // Sample relationships
-  const samples = inferred.slice(0, 20).map(rel => {
+  const samples = inferred.slice(0, 20).map((rel) => {
     let method = 'unknown';
     if (rel.properties) {
       try {
         const props = JSON.parse(rel.properties);
         method = props.detectionMethod || 'unknown';
-      } catch (e) {
+      } catch (_e) {
         // ignore
       }
     }
@@ -99,13 +99,20 @@ function analyzeInferredRelationships(): InferredRelationshipStats {
 
   console.log('\n📋 Sample Inferred Relationships (first 20):');
   samples.forEach((sample, idx) => {
-    console.log(`  ${(idx + 1).toString().padStart(2)}. ${sample.type.padEnd(25)} ${sample.from.substring(0, 25).padEnd(25)} → ${sample.to.substring(0, 25)} [${sample.confidence}] (${sample.method})`);
+    console.log(
+      `  ${(idx + 1).toString().padStart(2)}. ${sample.type.padEnd(25)} ${sample.from.substring(0, 25).padEnd(25)} → ${sample.to.substring(0, 25)} [${sample.confidence}] (${sample.method})`
+    );
   });
 
   // Check relationship density improvement
-  const totalRels = db['db'].prepare('SELECT COUNT(*) as count FROM unified_relationships').get() as { count: number };
-  const totalSymbols = db['db'].prepare('SELECT COUNT(*) as count FROM symbols').get() as { count: number };
-  const density = totalSymbols.count > 0 ? (totalRels.count / totalSymbols.count).toFixed(2) : '0.00';
+  const totalRels = db.db.prepare('SELECT COUNT(*) as count FROM unified_relationships').get() as {
+    count: number;
+  };
+  const totalSymbols = db.db.prepare('SELECT COUNT(*) as count FROM symbols').get() as {
+    count: number;
+  };
+  const density =
+    totalSymbols.count > 0 ? (totalRels.count / totalSymbols.count).toFixed(2) : '0.00';
 
   console.log('\n📊 Relationship Density:');
   console.log(`  Total relationships: ${totalRels.count}`);
@@ -113,7 +120,7 @@ function analyzeInferredRelationships(): InferredRelationshipStats {
   console.log(`  Density:             ${density} (target: >3.0)`);
   console.log(`  Inferred %:          ${((inferred.length / totalRels.count) * 100).toFixed(1)}%`);
 
-  console.log('\n' + '='.repeat(80));
+  console.log(`\n${'='.repeat(80)}`);
 
   db.close();
 

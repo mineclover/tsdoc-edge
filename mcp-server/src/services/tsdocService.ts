@@ -34,11 +34,11 @@
  * @public
  */
 
-import * as path from 'path';
-import * as fs from 'fs';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import Database from 'better-sqlite3';
-import type { Symbol, Relationship, OntologyStats } from '../types.js';
 import { ERROR_MESSAGES } from '../constants.js';
+import type { OntologyStats, Relationship, Symbol } from '../types.js';
 
 /**
  * Service for direct TSDoc Edge database access
@@ -253,9 +253,11 @@ export class TsDocService {
 
     const db = this.getDb();
 
-    const rows = db.prepare(`
+    const rows = db
+      .prepare(`
       SELECT * FROM unified_relationships
-    `).all() as Array<{
+    `)
+      .all() as Array<{
       id: string;
       type: string;
       category: string;
@@ -268,7 +270,7 @@ export class TsDocService {
       properties: string | null;
     }>;
 
-    const relationships = rows.map(row => ({
+    const relationships = rows.map((row) => ({
       id: row.id,
       type: row.type,
       category: row.category,
@@ -406,9 +408,8 @@ export class TsDocService {
     }
 
     const degreeValues = Array.from(degrees.values());
-    const avgDegree = degreeValues.length > 0
-      ? degreeValues.reduce((a, b) => a + b, 0) / degreeValues.length
-      : 0;
+    const avgDegree =
+      degreeValues.length > 0 ? degreeValues.reduce((a, b) => a + b, 0) / degreeValues.length : 0;
     const maxDegree = degreeValues.length > 0 ? Math.max(...degreeValues) : 0;
     const coverage = totalNodes > 0 ? (degrees.size / totalNodes) * 100 : 0;
 
@@ -497,22 +498,22 @@ export class TsDocService {
 
     // Apply filters
     if (params.type) {
-      relationships = relationships.filter(r => r.type === params.type);
+      relationships = relationships.filter((r) => r.type === params.type);
     }
     if (params.category) {
-      relationships = relationships.filter(r => r.category === params.category);
+      relationships = relationships.filter((r) => r.category === params.category);
     }
     if (params.strength) {
-      relationships = relationships.filter(r => r.strength === params.strength);
+      relationships = relationships.filter((r) => r.strength === params.strength);
     }
     if (params.from) {
-      relationships = relationships.filter(r => {
+      relationships = relationships.filter((r) => {
         const froms = Array.isArray(r.from) ? r.from : [r.from];
         return froms.includes(params.from!);
       });
     }
     if (params.to) {
-      relationships = relationships.filter(r => {
+      relationships = relationships.filter((r) => {
         const tos = Array.isArray(r.to) ? r.to : [r.to];
         return tos.includes(params.to!);
       });
@@ -603,9 +604,8 @@ export class TsDocService {
     // Filter by query if provided
     if (params.query) {
       const query = params.query.toLowerCase();
-      nodes = nodes.filter(node =>
-        node.name.toLowerCase().includes(query) ||
-        node.id.toLowerCase().includes(query)
+      nodes = nodes.filter(
+        (node) => node.name.toLowerCase().includes(query) || node.id.toLowerCase().includes(query)
       );
     }
 
@@ -677,7 +677,8 @@ export class TsDocService {
       : filePath;
 
     // Get symbols in file
-    const symbols = db.prepare('SELECT * FROM symbols WHERE file_path = ?')
+    const symbols = db
+      .prepare('SELECT * FROM symbols WHERE file_path = ?')
       .all(normalizedPath) as Symbol[];
 
     if (symbols.length === 0) {
@@ -685,12 +686,12 @@ export class TsDocService {
     }
 
     // Get relationships for these symbols
-    const symbolIds = symbols.map(s => s.id);
+    const symbolIds = symbols.map((s) => s.id);
     const allRels = this.getAllUnifiedRelationships();
-    const relationships = allRels.filter(rel => {
+    const relationships = allRels.filter((rel) => {
       const froms = Array.isArray(rel.from) ? rel.from : [rel.from];
       const tos = Array.isArray(rel.to) ? rel.to : [rel.to];
-      return froms.some(f => symbolIds.includes(f)) || tos.some(t => symbolIds.includes(t));
+      return froms.some((f) => symbolIds.includes(f)) || tos.some((t) => symbolIds.includes(t));
     });
 
     // Build markdown output
@@ -816,7 +817,7 @@ export class TsDocService {
     let relationships: Relationship[] = [];
 
     if (params.direction === 'outgoing' || params.direction === 'both' || !params.direction) {
-      const outgoing = allRels.filter(rel => {
+      const outgoing = allRels.filter((rel) => {
         const froms = Array.isArray(rel.from) ? rel.from : [rel.from];
         return froms.includes(params.symbolId);
       });
@@ -824,7 +825,7 @@ export class TsDocService {
     }
 
     if (params.direction === 'incoming' || params.direction === 'both' || !params.direction) {
-      const incoming = allRels.filter(rel => {
+      const incoming = allRels.filter((rel) => {
         const tos = Array.isArray(rel.to) ? rel.to : [rel.to];
         return tos.includes(params.symbolId);
       });
@@ -903,7 +904,9 @@ export class TsDocService {
   async getSymbolDetails(symbolId: string): Promise<Symbol | null> {
     const db = this.getDb();
 
-    const symbol = db.prepare('SELECT * FROM symbols WHERE id = ?').get(symbolId) as Symbol | undefined;
+    const symbol = db.prepare('SELECT * FROM symbols WHERE id = ?').get(symbolId) as
+      | Symbol
+      | undefined;
 
     return symbol || null;
   }

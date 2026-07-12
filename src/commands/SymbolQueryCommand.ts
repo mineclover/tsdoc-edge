@@ -11,9 +11,9 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult } from './BaseCommand';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
-import type { DocumentSymbol, ParsedDocSymbols } from '../types/feature';
+import type { ParsedDocSymbols } from '../types/feature';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /**
  * Symbol information with full context
@@ -138,7 +138,6 @@ export class SymbolQueryCommand extends BaseCommand {
           return this.findSimilar(args);
         case 'stats':
           return this.showStats();
-        case 'help':
         default:
           return this.showHelp();
       }
@@ -157,7 +156,7 @@ export class SymbolQueryCommand extends BaseCommand {
         if (parsed) {
           this.indexDocument(parsed);
         }
-      } catch (error) {
+      } catch (_error) {
         // Skip files with errors
       }
     }
@@ -261,7 +260,9 @@ export class SymbolQueryCommand extends BaseCommand {
       console.log(`  ${status} [[${name}]]`);
 
       if (info.primary) {
-        console.log(`     ${this.colors.dim}${this.relativePath(info.primary.filePath)}:${info.primary.line}${this.colors.reset}`);
+        console.log(
+          `     ${this.colors.dim}${this.relativePath(info.primary.filePath)}:${info.primary.line}${this.colors.reset}`
+        );
       } else {
         console.log(`     ${this.colors.red}No primary definition${this.colors.reset}`);
       }
@@ -362,7 +363,9 @@ export class SymbolQueryCommand extends BaseCommand {
 
     // Auxiliaries
     if (info.auxiliaries.length > 0) {
-      console.log(`${this.colors.yellow}Auxiliary Definitions (H${info.auxiliaries[0].level}):${this.colors.reset} ${info.auxiliaries.length}`);
+      console.log(
+        `${this.colors.yellow}Auxiliary Definitions (H${info.auxiliaries[0].level}):${this.colors.reset} ${info.auxiliaries.length}`
+      );
       for (const aux of info.auxiliaries) {
         console.log(`   - ${this.relativePath(aux.filePath)}:${aux.line}`);
       }
@@ -382,7 +385,7 @@ export class SymbolQueryCommand extends BaseCommand {
         if (!byFile.has(ref.filePath)) {
           byFile.set(ref.filePath, []);
         }
-        byFile.get(ref.filePath)!.push(ref);
+        byFile.get(ref.filePath)?.push(ref);
       }
 
       let count = 0;
@@ -397,7 +400,9 @@ export class SymbolQueryCommand extends BaseCommand {
       }
 
       if (info.references.length > maxRefs) {
-        console.log(`   ${this.colors.dim}... and ${info.references.length - maxRefs} more (use --all to show all)${this.colors.reset}`);
+        console.log(
+          `   ${this.colors.dim}... and ${info.references.length - maxRefs} more (use --all to show all)${this.colors.reset}`
+        );
       }
       console.log();
     } else {
@@ -453,7 +458,9 @@ export class SymbolQueryCommand extends BaseCommand {
       console.log(`  📄 ${this.relativePath(filePath)}`);
 
       if (auxs.length > 0) {
-        console.log(`     ${this.colors.yellow}${auxs.length} auxiliary def(s)${this.colors.reset}`);
+        console.log(
+          `     ${this.colors.yellow}${auxs.length} auxiliary def(s)${this.colors.reset}`
+        );
       }
 
       if (refs.length > 0) {
@@ -493,7 +500,9 @@ export class SymbolQueryCommand extends BaseCommand {
       console.log(`  ${status} [[${name}]]`);
 
       if (info.primary) {
-        console.log(`     ${this.colors.dim}${this.relativePath(info.primary.filePath)}:${info.primary.line}${this.colors.reset}`);
+        console.log(
+          `     ${this.colors.dim}${this.relativePath(info.primary.filePath)}:${info.primary.line}${this.colors.reset}`
+        );
       }
 
       console.log();
@@ -524,7 +533,9 @@ export class SymbolQueryCommand extends BaseCommand {
     console.log(`  Without primary: ${this.colors.red}${withoutPrimary}${this.colors.reset}`);
     console.log(`  Total references: ${this.colors.cyan}${totalRefs}${this.colors.reset}`);
     console.log(`  Total auxiliaries: ${this.colors.yellow}${totalAux}${this.colors.reset}`);
-    console.log(`  Avg references per symbol: ${this.colors.cyan}${(totalRefs / this.symbols.size).toFixed(1)}${this.colors.reset}`);
+    console.log(
+      `  Avg references per symbol: ${this.colors.cyan}${(totalRefs / this.symbols.size).toFixed(1)}${this.colors.reset}`
+    );
     console.log();
 
     return this.success();
@@ -608,7 +619,10 @@ export class SymbolQueryCommand extends BaseCommand {
    * Normalize symbol name for comparison
    */
   private normalizeSymbolName(name: string): string {
-    return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    return name
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '');
   }
 
   /**

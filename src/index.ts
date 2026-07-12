@@ -38,6 +38,8 @@ export { TrackableStatsCollector } from './analyzer/TrackableStatsCollector';
 export { TypeChainTracer } from './analyzer/TypeChainTracer';
 // Config exports
 export { ConfigManager } from './config/ConfigManager';
+// Versioned convention-pack composition and checking
+export * from './convention';
 // Document symbol exports ([[]] notation)
 export { BacklinkGenerator } from './doc-symbol/BacklinkGenerator';
 export { DocumentSymbolParser } from './doc-symbol/DocumentSymbolParser';
@@ -77,17 +79,15 @@ export type {
 export { EnhancedDocExtractor } from './parser/EnhancedDocExtractor';
 // Core exports
 export { TSDocParser } from './parser/TSDocParser';
-// Versioned convention-pack composition and checking
-export * from './convention';
 // Semantic graph provider extension boundary
 export * from './provider';
 // Cross-plane effective analysis boundary
 export * from './semantic-graph';
 // Versioned specification graph contracts
 export * from './spec-graph';
+export * from './storage/AnalysisInputRevisionRepository';
 // Storage exports
 export { DatabaseManager } from './storage/DatabaseManager';
-export * from './storage/AnalysisInputRevisionRepository';
 export * from './storage/GraphRepository';
 export * from './storage/SpecGraphRepository';
 // Type exports

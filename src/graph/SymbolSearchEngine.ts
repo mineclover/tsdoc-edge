@@ -169,9 +169,9 @@ export class SymbolSearchEngine {
    */
   findUntested(): Symbol[] {
     const testTypes = ['test-suite', 'test-case', 'test-scenario'];
-    return this.graphBuilder.getAllSymbols().filter(
-      (s) => s.tests.length === 0 && !testTypes.includes(s.type)
-    );
+    return this.graphBuilder
+      .getAllSymbols()
+      .filter((s) => s.tests.length === 0 && !testTypes.includes(s.type));
   }
 
   /**

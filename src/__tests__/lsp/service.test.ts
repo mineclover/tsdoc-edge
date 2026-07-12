@@ -2,10 +2,15 @@
  * TSDoc Edge LSP Service Tests
  */
 
-import { TsdocEdgeService, CodeLensInfo, SymbolSearchResult, DiagnosticInfo } from '../../lsp/service';
-import * as path from 'path';
-import * as fs from 'fs';
-import * as os from 'os';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import {
+  type CodeLensInfo,
+  type DiagnosticInfo,
+  type SymbolSearchResult,
+  TsdocEdgeService,
+} from '../../lsp/service';
 
 describe('TsdocEdgeService', () => {
   let tempDir: string;

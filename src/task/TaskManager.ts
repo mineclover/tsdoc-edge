@@ -6,20 +6,19 @@
  */
 
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 import type { DatabaseManager } from '../storage/DatabaseManager';
 import type * as schema from '../storage/schema';
 import type {
-  Task,
-  TaskStatus,
-  TaskPriority,
-  TaskType,
-  TaskFilter,
-  TaskStats,
-  TaskUpdate,
   ChecklistItem,
+  Task,
+  TaskFilter,
+  TaskPriority,
+  TaskStats,
+  TaskStatus,
+  TaskType,
+  TaskUpdate,
 } from '../types/task';
-import { TaskStatus as TS, TaskPriority as TP, TaskType as TT } from '../types/task';
+import { TaskPriority as TP, TaskStatus as TS, TaskType as TT } from '../types/task';
 
 /**
  * Task Manager
@@ -198,7 +197,7 @@ export class TaskManager {
       [TT.RESEARCH]: 0,
     };
 
-    let completionTimes: number[] = [];
+    const completionTimes: number[] = [];
     let overdueCount = 0;
     const now = new Date();
 

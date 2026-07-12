@@ -3,8 +3,8 @@
  * @packageDocumentation
  */
 
+import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
 /** A cluster of related symbols in the architecture */
 interface Cluster {
@@ -140,7 +140,11 @@ Examples:
         const cluster = displayClusters[i];
         const cohesionBar = '█'.repeat(Math.round(cluster.cohesion * 20));
         const quality =
-          cluster.cohesion > 0.7 ? this.colors.green : cluster.cohesion > 0.5 ? this.colors.yellow : this.colors.red;
+          cluster.cohesion > 0.7
+            ? this.colors.green
+            : cluster.cohesion > 0.5
+              ? this.colors.yellow
+              : this.colors.red;
 
         console.log(`  ${this.colors.bold}Cluster ${i + 1}${this.colors.reset}`);
         console.log(
@@ -250,7 +254,7 @@ Examples:
     let relationships = dbManager.getAllUnifiedRelationships();
 
     if (category) {
-      relationships = relationships.filter(r => r.category === category);
+      relationships = relationships.filter((r) => r.category === category);
     }
 
     const adjacencyMap = new Map<string, Map<string, string>>();
@@ -265,13 +269,13 @@ Examples:
         }
 
         for (const to of toSymbols) {
-          adjacencyMap.get(from)!.set(to, rel.category);
+          adjacencyMap.get(from)?.set(to, rel.category);
 
           // Add reverse for undirected clustering
           if (!adjacencyMap.has(to)) {
             adjacencyMap.set(to, new Map());
           }
-          adjacencyMap.get(to)!.set(from, rel.category);
+          adjacencyMap.get(to)?.set(from, rel.category);
         }
       }
     }
@@ -293,10 +297,7 @@ Examples:
   /**
    * Find clusters using greedy modularity optimization
    */
-  private findClusters(
-    adjacencyMap: Map<string, Map<string, string>>,
-    minSize: number
-  ): Cluster[] {
+  private findClusters(adjacencyMap: Map<string, Map<string, string>>, minSize: number): Cluster[] {
     const symbols = Array.from(adjacencyMap.keys());
     const clusterAssignment = new Map<string, number>();
 
@@ -352,7 +353,7 @@ Examples:
       if (!clusterMap.has(cluster)) {
         clusterMap.set(cluster, []);
       }
-      clusterMap.get(cluster)!.push(symbol);
+      clusterMap.get(cluster)?.push(symbol);
     }
 
     // Calculate metrics for each cluster

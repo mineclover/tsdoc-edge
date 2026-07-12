@@ -3,8 +3,8 @@
  * @packageDocumentation
  */
 
+import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
 /** A relationship validation issue */
 interface ValidationIssue {
@@ -110,7 +110,9 @@ Examples:
             console.log(`  ${this.colors.yellow}⚠${this.colors.reset} ${issue.message}`);
           }
           if (orphanIssues.length > 10) {
-            console.log(`  ${this.colors.dim}... and ${orphanIssues.length - 10} more${this.colors.reset}`);
+            console.log(
+              `  ${this.colors.dim}... and ${orphanIssues.length - 10} more${this.colors.reset}`
+            );
           }
         }
       }
@@ -130,7 +132,9 @@ Examples:
             console.log(`  ${this.colors.yellow}⚠${this.colors.reset} ${issue.message}`);
           }
           if (duplicateIssues.length > 10) {
-            console.log(`  ${this.colors.dim}... and ${duplicateIssues.length - 10} more${this.colors.reset}`);
+            console.log(
+              `  ${this.colors.dim}... and ${duplicateIssues.length - 10} more${this.colors.reset}`
+            );
           }
         }
       }
@@ -150,7 +154,9 @@ Examples:
             console.log(`  ${this.colors.blue}ℹ${this.colors.reset} ${issue.message}`);
           }
           if (confidenceIssues.length > 10) {
-            console.log(`  ${this.colors.dim}... and ${confidenceIssues.length - 10} more${this.colors.reset}`);
+            console.log(
+              `  ${this.colors.dim}... and ${confidenceIssues.length - 10} more${this.colors.reset}`
+            );
           }
         }
       }
@@ -164,13 +170,17 @@ Examples:
       if (consistencyIssues.length === 0) {
         this.printSuccess('All bidirectional relationships are consistent');
       } else {
-        this.printWarning(`Found ${consistencyIssues.length} inconsistent bidirectional relationships`);
+        this.printWarning(
+          `Found ${consistencyIssues.length} inconsistent bidirectional relationships`
+        );
         if (options.verbose) {
           for (const issue of consistencyIssues.slice(0, 10)) {
             console.log(`  ${this.colors.yellow}⚠${this.colors.reset} ${issue.message}`);
           }
           if (consistencyIssues.length > 10) {
-            console.log(`  ${this.colors.dim}... and ${consistencyIssues.length - 10} more${this.colors.reset}`);
+            console.log(
+              `  ${this.colors.dim}... and ${consistencyIssues.length - 10} more${this.colors.reset}`
+            );
           }
         }
       }
@@ -205,7 +215,9 @@ Examples:
         this.printSuccess(`Fixed ${fixed} issue(s)`);
         console.log();
       } else if (issues.length > 0) {
-        console.log(`  ${this.colors.dim}Run with --fix to attempt automatic fixes${this.colors.reset}`);
+        console.log(
+          `  ${this.colors.dim}Run with --fix to attempt automatic fixes${this.colors.reset}`
+        );
         console.log();
       }
 
@@ -240,15 +252,13 @@ Examples:
           if (!symbolToRelationships.has(symbolId)) {
             symbolToRelationships.set(symbolId, []);
           }
-          symbolToRelationships.get(symbolId)!.push(rel.id);
+          symbolToRelationships.get(symbolId)?.push(rel.id);
         }
       }
 
       // Batch lookup all symbols at once
       const uniqueSymbolIds = Array.from(symbolToRelationships.keys());
-      const existingSymbols = new Set(
-        dbManager.getSymbolsByIds(uniqueSymbolIds).map(s => s.id)
-      );
+      const existingSymbols = new Set(dbManager.getSymbolsByIds(uniqueSymbolIds).map((s) => s.id));
 
       // Find missing symbols
       for (const [symbolId, relIds] of symbolToRelationships) {
@@ -374,7 +384,9 @@ Examples:
             fixed++;
           }
         }
-        console.log(`  ${this.colors.green}✓${this.colors.reset} Removed ${fixed} orphaned relationships`);
+        console.log(
+          `  ${this.colors.green}✓${this.colors.reset} Removed ${fixed} orphaned relationships`
+        );
       } catch (error) {
         console.warn('  Failed to remove orphaned relationships:', error);
       }
@@ -383,7 +395,9 @@ Examples:
     // Fix duplicates by keeping only one
     const duplicateGroups = issues.filter((i) => i.type === 'duplicate');
     if (duplicateGroups.length > 0) {
-      console.log(`  ${this.colors.yellow}⚠${this.colors.reset} Duplicate removal requires manual intervention`);
+      console.log(
+        `  ${this.colors.yellow}⚠${this.colors.reset} Duplicate removal requires manual intervention`
+      );
     }
 
     return fixed;

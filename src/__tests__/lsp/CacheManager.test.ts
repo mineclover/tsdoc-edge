@@ -7,7 +7,7 @@
  * @testScenario Cache statistics
  */
 
-import { CacheManager, CacheManagerOptions } from '../../lsp/cache-manager';
+import { CacheManager } from '../../lsp/cache-manager';
 
 describe('CacheManager', () => {
   let cacheManager: CacheManager;
@@ -42,7 +42,7 @@ describe('CacheManager', () => {
     it('should create a new named cache', () => {
       cacheManager.createCache<string>('test');
       const stats = cacheManager.getStats();
-      expect(stats['test']).toBe(0);
+      expect(stats.test).toBe(0);
     });
 
     it('should not overwrite existing cache', () => {
@@ -191,9 +191,7 @@ describe('CacheManager', () => {
     });
 
     it('should handle non-existent cache', () => {
-      expect(() =>
-        cacheManager.deleteMatching('nonexistent', () => true)
-      ).not.toThrow();
+      expect(() => cacheManager.deleteMatching('nonexistent', () => true)).not.toThrow();
     });
   });
 
@@ -245,8 +243,8 @@ describe('CacheManager', () => {
 
       const stats = cacheManager.getStats();
 
-      expect(stats['empty']).toBe(0);
-      expect(stats['filled']).toBe(2);
+      expect(stats.empty).toBe(0);
+      expect(stats.filled).toBe(2);
     });
 
     it('should return empty object for no caches', () => {
@@ -265,7 +263,7 @@ describe('CacheManager', () => {
       cacheManager.set('test', 'key4', 'value4');
 
       const stats = cacheManager.getStats();
-      expect(stats['test']).toBe(3);
+      expect(stats.test).toBe(3);
 
       // Oldest entry should be evicted
       expect(cacheManager.get<string>('test', 'key1')).toBeUndefined();
@@ -280,7 +278,7 @@ describe('CacheManager', () => {
       cacheManager.set('test', 'key1', 'updated'); // Update existing
 
       const stats = cacheManager.getStats();
-      expect(stats['test']).toBe(2);
+      expect(stats.test).toBe(2);
       expect(cacheManager.get<string>('test', 'key1')).toBe('updated');
       expect(cacheManager.get<string>('test', 'key2')).toBe('value2');
     });

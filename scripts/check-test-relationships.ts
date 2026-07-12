@@ -20,7 +20,7 @@ const relTypeQuery = `
   ORDER BY count DESC
 `;
 
-const relTypes = db['db'].prepare(relTypeQuery).all() as Array<{ type: string; count: number }>;
+const relTypes = db.db.prepare(relTypeQuery).all() as Array<{ type: string; count: number }>;
 
 console.log('📊 Relationships by Type:');
 relTypes.forEach(({ type, count }) => {
@@ -37,7 +37,7 @@ const testCoverageQuery = `
 `;
 
 console.log('🧪 Sample Test Coverage Relationships:');
-const testCoverage = db['db'].prepare(testCoverageQuery).all() as Array<any>;
+const testCoverage = db.db.prepare(testCoverageQuery).all() as Array<any>;
 
 if (testCoverage.length === 0) {
   console.log('   No test-coverage relationships found');
@@ -61,7 +61,7 @@ const containsQuery = `
 `;
 
 console.log('📦 Sample Test Hierarchy (contains) Relationships:');
-const contains = db['db'].prepare(containsQuery).all() as Array<any>;
+const contains = db.db.prepare(containsQuery).all() as Array<any>;
 
 if (contains.length === 0) {
   console.log('   No contains relationships found');
@@ -84,7 +84,7 @@ const coverageStatsQuery = `
     (SELECT COUNT(*) FROM unified_relationships WHERE type = 'test-coverage') as coverage_relations
 `;
 
-const stats = db['db'].prepare(coverageStatsQuery).get() as any;
+const stats = db.db.prepare(coverageStatsQuery).get() as any;
 
 console.log('📈 Coverage Statistics:');
 console.log(`   Total test cases: ${stats.total_test_cases}`);
@@ -92,9 +92,10 @@ console.log(`   Test cases with coverage: ${stats.test_cases_with_coverage}`);
 console.log(`   Unique symbols tested: ${stats.symbols_tested}`);
 console.log(`   Total coverage relations: ${stats.coverage_relations}`);
 
-const coveragePercent = stats.total_test_cases > 0
-  ? (stats.test_cases_with_coverage / stats.total_test_cases * 100).toFixed(1)
-  : 0;
+const coveragePercent =
+  stats.total_test_cases > 0
+    ? ((stats.test_cases_with_coverage / stats.total_test_cases) * 100).toFixed(1)
+    : 0;
 console.log(`   Coverage percentage: ${coveragePercent}%`);
 console.log();
 
@@ -115,7 +116,7 @@ const testedSymbolsQuery = `
 `;
 
 console.log('🎯 Most Tested Symbols:');
-const testedSymbols = db['db'].prepare(testedSymbolsQuery).all() as Array<any>;
+const testedSymbols = db.db.prepare(testedSymbolsQuery).all() as Array<any>;
 
 if (testedSymbols.length === 0) {
   console.log('   No tested symbols found');

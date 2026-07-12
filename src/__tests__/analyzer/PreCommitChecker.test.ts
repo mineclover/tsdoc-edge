@@ -231,8 +231,10 @@ export class Moderate {}
       });
       const report = checker.checkFiles([testFile]);
 
-      if (report.fileResults[0].averageCompleteness < 90 &&
-          report.fileResults[0].averageCompleteness > 40) {
+      if (
+        report.fileResults[0].averageCompleteness < 90 &&
+        report.fileResults[0].averageCompleteness > 40
+      ) {
         expect(report.warningFiles).toBeGreaterThan(0);
       }
     });

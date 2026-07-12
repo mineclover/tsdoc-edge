@@ -3,8 +3,8 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for showing documentation statistics
@@ -114,30 +114,44 @@ export class StatsCommand extends BaseCommand {
             console.log(`${colors.yellow}No symbols found in database.${colors.reset}`);
             console.log();
             console.log(`${colors.bold}Getting Started:${colors.reset}`);
-            console.log(`  1. Run ${colors.cyan}tsdoc-edge build src${colors.reset} to build the symbol database`);
-            console.log(`  2. Run ${colors.cyan}tsdoc-edge stats${colors.reset} again to see statistics`);
+            console.log(
+              `  1. Run ${colors.cyan}tsdoc-edge build src${colors.reset} to build the symbol database`
+            );
+            console.log(
+              `  2. Run ${colors.cyan}tsdoc-edge stats${colors.reset} again to see statistics`
+            );
             console.log();
           } else {
             // XML output for empty database
-            this.printOutput('statistics', {
-              database: {
-                totalSymbols: 0,
-                totalEnhancedDocs: 0,
-                dbSizeKB: 0,
+            this.printOutput(
+              'statistics',
+              {
+                database: {
+                  totalSymbols: 0,
+                  totalEnhancedDocs: 0,
+                  dbSizeKB: 0,
+                },
+                message: {
+                  text: 'No symbols found in database. Run tsdoc-edge build src to build the symbol database.',
+                },
               },
-              message: {
-                text: 'No symbols found in database. Run tsdoc-edge build src to build the symbol database.',
-              },
-            }, args);
+              args
+            );
           }
           return this.success();
         }
 
-        const documented = allSymbols.filter(s => s.summary && s.summary.trim() !== '').length;
-        const testTotal = allSymbols.filter(s => s.type === 'test-case' || s.type === 'test-suite').length;
+        const documented = allSymbols.filter((s) => s.summary && s.summary.trim() !== '').length;
+        const testTotal = allSymbols.filter(
+          (s) => s.type === 'test-case' || s.type === 'test-suite'
+        ).length;
         const sourceTotal = total - testTotal;
-        const sourceDocumented = allSymbols.filter(s =>
-          s.type !== 'test-case' && s.type !== 'test-suite' && s.summary && s.summary.trim() !== ''
+        const sourceDocumented = allSymbols.filter(
+          (s) =>
+            s.type !== 'test-case' &&
+            s.type !== 'test-suite' &&
+            s.summary &&
+            s.summary.trim() !== ''
         ).length;
         const coverage = (documented / total) * 100;
         const sourceCoverage = sourceTotal > 0 ? (sourceDocumented / sourceTotal) * 100 : 0;
@@ -150,8 +164,12 @@ export class StatsCommand extends BaseCommand {
 
           this.printSection('📊 Database Statistics');
           console.log(`Total Symbols: ${colors.green}${stats.totalSymbols}${colors.reset}`);
-          console.log(`Total Enhanced Docs: ${colors.green}${stats.totalEnhancedDocs}${colors.reset}`);
-          console.log(`DB Size: ${colors.cyan}${(stats.dbSize / 1024).toFixed(2)} KB${colors.reset}`);
+          console.log(
+            `Total Enhanced Docs: ${colors.green}${stats.totalEnhancedDocs}${colors.reset}`
+          );
+          console.log(
+            `DB Size: ${colors.cyan}${(stats.dbSize / 1024).toFixed(2)} KB${colors.reset}`
+          );
           console.log();
 
           this.printSection('📈 Documentation Coverage');
@@ -159,37 +177,47 @@ export class StatsCommand extends BaseCommand {
           console.log(`  Documented: ${colors.green}${documented}${colors.reset} / ${total}`);
           console.log(`  Coverage: ${colors.bold}${coverage.toFixed(1)}%${colors.reset}`);
           console.log();
-          console.log(`${colors.bold}Source Code Only:${colors.reset} ${colors.dim}(excluding test-case, test-suite)${colors.reset}`);
-          console.log(`  Documented: ${colors.green}${sourceDocumented}${colors.reset} / ${sourceTotal}`);
+          console.log(
+            `${colors.bold}Source Code Only:${colors.reset} ${colors.dim}(excluding test-case, test-suite)${colors.reset}`
+          );
+          console.log(
+            `  Documented: ${colors.green}${sourceDocumented}${colors.reset} / ${sourceTotal}`
+          );
           console.log(`  Coverage: ${colors.bold}${sourceCoverage.toFixed(1)}%${colors.reset}`);
           console.log();
-          console.log(`${colors.dim}Test Symbols: ${testTotal} (${testPercent.toFixed(1)}% of total)${colors.reset}`);
+          console.log(
+            `${colors.dim}Test Symbols: ${testTotal} (${testPercent.toFixed(1)}% of total)${colors.reset}`
+          );
           console.log();
         } else {
           // XML output (default)
-          this.printOutput('statistics', {
-            database: {
-              totalSymbols: stats.totalSymbols,
-              totalEnhancedDocs: stats.totalEnhancedDocs,
-              dbSizeKB: (stats.dbSize / 1024).toFixed(2),
+          this.printOutput(
+            'statistics',
+            {
+              database: {
+                totalSymbols: stats.totalSymbols,
+                totalEnhancedDocs: stats.totalEnhancedDocs,
+                dbSizeKB: (stats.dbSize / 1024).toFixed(2),
+              },
+              coverage: {
+                overall: {
+                  documented,
+                  total,
+                  coveragePercent: coverage.toFixed(1),
+                },
+                source: {
+                  documented: sourceDocumented,
+                  total: sourceTotal,
+                  coveragePercent: sourceCoverage.toFixed(1),
+                },
+                tests: {
+                  total: testTotal,
+                  percentOfTotal: testPercent.toFixed(1),
+                },
+              },
             },
-            coverage: {
-              overall: {
-                documented,
-                total,
-                coveragePercent: coverage.toFixed(1),
-              },
-              source: {
-                documented: sourceDocumented,
-                total: sourceTotal,
-                coveragePercent: sourceCoverage.toFixed(1),
-              },
-              tests: {
-                total: testTotal,
-                percentOfTotal: testPercent.toFixed(1),
-              },
-            },
-          }, args);
+            args
+          );
         }
 
         return this.success();

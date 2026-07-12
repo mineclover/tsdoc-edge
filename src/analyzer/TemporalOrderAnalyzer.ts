@@ -151,14 +151,18 @@ export class TemporalOrderAnalyzer {
         }
 
         // Pattern 5: Async/await chains
-        if (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node) || ts.isArrowFunction(node)) {
-          if (node.modifiers?.some(m => m.kind === ts.SyntaxKind.AsyncKeyword)) {
+        if (
+          ts.isFunctionDeclaration(node) ||
+          ts.isMethodDeclaration(node) ||
+          ts.isArrowFunction(node)
+        ) {
+          if (node.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword)) {
             if (node.body && ts.isBlock(node.body)) {
               this.analyzeAsyncSequence(node.body, sourceFile, sites);
             }
           }
         }
-      } catch (error) {
+      } catch (_error) {
         // Skip nodes that cause errors
       }
 
@@ -176,7 +180,11 @@ export class TemporalOrderAnalyzer {
    * @param sites - Array to collect sites
    * @private
    */
-  private analyzeSequentialCalls(block: ts.Node, sourceFile: ts.SourceFile, sites: TemporalOrderSite[]): void {
+  private analyzeSequentialCalls(
+    block: ts.Node,
+    sourceFile: ts.SourceFile,
+    sites: TemporalOrderSite[]
+  ): void {
     if (!ts.isBlock(block)) return;
 
     const statements = block.statements;
@@ -232,7 +240,7 @@ export class TemporalOrderAnalyzer {
           secondSymbolName: secondSymbol.name,
           filePath: sourceFile.fileName,
           line,
-          pattern: 'sequential-calls'
+          pattern: 'sequential-calls',
         });
       }
     }
@@ -246,7 +254,11 @@ export class TemporalOrderAnalyzer {
    * @param sites - Array to collect sites
    * @private
    */
-  private analyzeLifecyclePattern(node: ts.CallExpression, sourceFile: ts.SourceFile, sites: TemporalOrderSite[]): void {
+  private analyzeLifecyclePattern(
+    node: ts.CallExpression,
+    sourceFile: ts.SourceFile,
+    sites: TemporalOrderSite[]
+  ): void {
     if (!ts.isIdentifier(node.expression)) return;
 
     const methodName = node.expression.text;
@@ -285,7 +297,8 @@ export class TemporalOrderAnalyzer {
               const secondSymbol = this.findSymbolForExpression(second.expression, sourceFile);
 
               if (firstSymbol && secondSymbol && firstSymbol.id !== secondSymbol.id) {
-                const line = sourceFile.getLineAndCharacterOfPosition(first.getStart(sourceFile)).line + 1;
+                const line =
+                  sourceFile.getLineAndCharacterOfPosition(first.getStart(sourceFile)).line + 1;
 
                 sites.push({
                   firstSymbolId: firstSymbol.id,
@@ -294,7 +307,7 @@ export class TemporalOrderAnalyzer {
                   secondSymbolName: secondSymbol.name,
                   filePath: sourceFile.fileName,
                   line,
-                  pattern: 'setup-teardown'
+                  pattern: 'setup-teardown',
                 });
               }
             }
@@ -312,7 +325,11 @@ export class TemporalOrderAnalyzer {
    * @param sites - Array to collect sites
    * @private
    */
-  private analyzePromiseChain(node: ts.CallExpression, sourceFile: ts.SourceFile, sites: TemporalOrderSite[]): void {
+  private analyzePromiseChain(
+    node: ts.CallExpression,
+    sourceFile: ts.SourceFile,
+    sites: TemporalOrderSite[]
+  ): void {
     if (!ts.isPropertyAccessExpression(node.expression)) return;
 
     const promiseSymbol = this.findSymbolForExpression(node.expression.expression, sourceFile);
@@ -331,7 +348,7 @@ export class TemporalOrderAnalyzer {
           secondSymbolName: callbackSymbol.name,
           filePath: sourceFile.fileName,
           line,
-          pattern: 'promise-chain'
+          pattern: 'promise-chain',
         });
       }
     }
@@ -345,7 +362,11 @@ export class TemporalOrderAnalyzer {
    * @param sites - Array to collect sites
    * @private
    */
-  private analyzeConstructorSequence(constructor: ts.ConstructorDeclaration, sourceFile: ts.SourceFile, sites: TemporalOrderSite[]): void {
+  private analyzeConstructorSequence(
+    constructor: ts.ConstructorDeclaration,
+    sourceFile: ts.SourceFile,
+    sites: TemporalOrderSite[]
+  ): void {
     if (!constructor.body) return;
 
     const assignments: { target: string; index: number; node: ts.Node }[] = [];
@@ -356,9 +377,11 @@ export class TemporalOrderAnalyzer {
 
       // this.field = value
       if (ts.isExpressionStatement(stmt) && ts.isBinaryExpression(stmt.expression)) {
-        if (stmt.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
-            ts.isPropertyAccessExpression(stmt.expression.left) &&
-            stmt.expression.left.expression.kind === ts.SyntaxKind.ThisKeyword) {
+        if (
+          stmt.expression.operatorToken.kind === ts.SyntaxKind.EqualsToken &&
+          ts.isPropertyAccessExpression(stmt.expression.left) &&
+          stmt.expression.left.expression.kind === ts.SyntaxKind.ThisKeyword
+        ) {
           const fieldName = stmt.expression.left.name.text;
           assignments.push({ target: fieldName, index: i, node: stmt });
         }
@@ -370,7 +393,8 @@ export class TemporalOrderAnalyzer {
       const first = assignments[i];
       const second = assignments[i + 1];
 
-      const line = sourceFile.getLineAndCharacterOfPosition(first.node.getStart(sourceFile)).line + 1;
+      const line =
+        sourceFile.getLineAndCharacterOfPosition(first.node.getStart(sourceFile)).line + 1;
 
       // Try to resolve these as properties of the containing class
       sites.push({
@@ -380,7 +404,7 @@ export class TemporalOrderAnalyzer {
         secondSymbolName: second.target,
         filePath: sourceFile.fileName,
         line,
-        pattern: 'sequential-calls'
+        pattern: 'sequential-calls',
       });
     }
   }
@@ -393,7 +417,11 @@ export class TemporalOrderAnalyzer {
    * @param sites - Array to collect sites
    * @private
    */
-  private analyzeAsyncSequence(block: ts.Block, sourceFile: ts.SourceFile, sites: TemporalOrderSite[]): void {
+  private analyzeAsyncSequence(
+    block: ts.Block,
+    sourceFile: ts.SourceFile,
+    sites: TemporalOrderSite[]
+  ): void {
     const awaitCalls: { expr: ts.CallExpression; index: number }[] = [];
 
     // Collect await expressions
@@ -417,7 +445,11 @@ export class TemporalOrderAnalyzer {
         }
       }
       // return await functionName()
-      else if (ts.isReturnStatement(stmt) && stmt.expression && ts.isAwaitExpression(stmt.expression)) {
+      else if (
+        ts.isReturnStatement(stmt) &&
+        stmt.expression &&
+        ts.isAwaitExpression(stmt.expression)
+      ) {
         if (ts.isCallExpression(stmt.expression.expression)) {
           awaitCalls.push({ expr: stmt.expression.expression, index: i });
         }
@@ -442,7 +474,7 @@ export class TemporalOrderAnalyzer {
           secondSymbolName: secondSymbol.name,
           filePath: sourceFile.fileName,
           line,
-          pattern: 'sequential-calls'
+          pattern: 'sequential-calls',
         });
       }
     }
@@ -456,7 +488,10 @@ export class TemporalOrderAnalyzer {
    * @returns Symbol or null
    * @private
    */
-  private findSymbolForExpression(expression: ts.Expression, sourceFile: ts.SourceFile): { id: string; name: string } | null {
+  private findSymbolForExpression(
+    expression: ts.Expression,
+    sourceFile: ts.SourceFile
+  ): { id: string; name: string } | null {
     let name: string | null = null;
 
     if (ts.isIdentifier(expression)) {
@@ -476,7 +511,7 @@ export class TemporalOrderAnalyzer {
     if (!name) return null;
 
     // Try nameIndex first for O(1) lookup
-    if (this.graph.nameIndex && this.graph.nameIndex.has(name)) {
+    if (this.graph.nameIndex?.has(name)) {
       const symbolIds = this.graph.nameIndex.get(name);
       if (symbolIds && symbolIds.length > 0) {
         const symbolId = symbolIds[0];
@@ -526,8 +561,8 @@ export class TemporalOrderAnalyzer {
           lineNumber: site.line,
           snippet: `${site.firstSymbolName} → ${site.secondSymbolName}`,
           confidence,
-          context: `Temporal ordering via ${site.pattern}`
-        }
+          context: `Temporal ordering via ${site.pattern}`,
+        },
       ],
       discoveredBy: 'ast-parsing',
       confidence,
@@ -536,11 +571,11 @@ export class TemporalOrderAnalyzer {
       properties: {
         pattern: site.pattern,
         first: site.firstSymbolName,
-        second: site.secondSymbolName
+        second: site.secondSymbolName,
       },
       createdAt: timestamp,
       updatedAt: timestamp,
-      description: `${site.firstSymbolName} must execute before ${site.secondSymbolName} (${site.pattern})`
+      description: `${site.firstSymbolName} must execute before ${site.secondSymbolName} (${site.pattern})`,
     };
   }
 
@@ -557,9 +592,9 @@ export class TemporalOrderAnalyzer {
   } {
     const byPattern: Record<string, number> = {
       'sequential-calls': 0,
-      'lifecycle': 0,
+      lifecycle: 0,
       'promise-chain': 0,
-      'setup-teardown': 0
+      'setup-teardown': 0,
     };
 
     for (const rel of relationships) {
@@ -571,7 +606,7 @@ export class TemporalOrderAnalyzer {
 
     return {
       totalOrders: relationships.length,
-      byPattern
+      byPattern,
     };
   }
 }

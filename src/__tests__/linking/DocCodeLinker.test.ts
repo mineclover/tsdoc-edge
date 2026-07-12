@@ -11,7 +11,7 @@ describe('DocCodeLinker', () => {
   let linker: DocCodeLinker;
 
   beforeEach(() => {
-    tempDir = path.join(process.cwd(), '.test-temp', 'linker-test-' + Math.random());
+    tempDir = path.join(process.cwd(), '.test-temp', `linker-test-${Math.random()}`);
     fs.mkdirSync(tempDir, { recursive: true });
     linker = new DocCodeLinker();
   });
@@ -48,10 +48,7 @@ export class TestClass {
       );
 
       const docFile = path.join(tempDir, 'guide.md');
-      fs.writeFileSync(
-        docFile,
-        `# Guide\n\nSee [TestClass](${codeFile}#TestClass) for details.`
-      );
+      fs.writeFileSync(docFile, `# Guide\n\nSee [TestClass](${codeFile}#TestClass) for details.`);
 
       const index = linker.buildIndex([codeFile], [docFile]);
 
@@ -99,10 +96,7 @@ export class TestClass {
       const docFile = path.join(tempDir, 'readme.md');
       const codeFile = path.join(tempDir, 'src', 'module.ts');
 
-      fs.writeFileSync(
-        docFile,
-        `# README\n\nCheck [Module](${codeFile}#Module) implementation.`
-      );
+      fs.writeFileSync(docFile, `# README\n\nCheck [Module](${codeFile}#Module) implementation.`);
 
       const links = linker.findCodeLinks(docFile);
 
@@ -118,10 +112,7 @@ export class TestClass {
       const docFile = path.join(tempDir, 'api.md');
       const codeFile = path.join(tempDir, 'api.ts');
 
-      fs.writeFileSync(
-        docFile,
-        `See [parse method](${codeFile}#Parser.parse) for details.`
-      );
+      fs.writeFileSync(docFile, `See [parse method](${codeFile}#Parser.parse) for details.`);
 
       const links = linker.findCodeLinks(docFile);
 
@@ -137,10 +128,7 @@ export class TestClass {
 
     it('should ignore links to non-code files', () => {
       const docFile = path.join(tempDir, 'doc.md');
-      fs.writeFileSync(
-        docFile,
-        `[Other doc](other.md) and [Image](image.png)`
-      );
+      fs.writeFileSync(docFile, `[Other doc](other.md) and [Image](image.png)`);
 
       const links = linker.findCodeLinks(docFile);
       expect(links).toHaveLength(0);
@@ -310,7 +298,7 @@ export class TestClass {
       const links = linker.findDocLinks(codeFile);
       expect(links.length).toBeGreaterThanOrEqual(4);
 
-      const symbolNames = links.map(l => l.symbolName);
+      const symbolNames = links.map((l) => l.symbolName);
       expect(symbolNames).toContain('ITest');
       expect(symbolNames).toContain('TTest');
       expect(symbolNames).toContain('testFunc');
@@ -361,10 +349,7 @@ export class Setup {}
 
     it('should reject non-code extensions', () => {
       const docFile = path.join(tempDir, 'test.md');
-      fs.writeFileSync(
-        docFile,
-        '[Link](file.txt) [Link2](file.json) [Link3](file.md)'
-      );
+      fs.writeFileSync(docFile, '[Link](file.txt) [Link2](file.json) [Link3](file.md)');
 
       const links = linker.findCodeLinks(docFile);
       expect(links).toHaveLength(0);

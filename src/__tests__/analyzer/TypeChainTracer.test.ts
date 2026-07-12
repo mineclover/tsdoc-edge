@@ -29,7 +29,11 @@ describe('TypeChainTracer', () => {
     };
   }
 
-  function createMockInterface(name: string, propertyCount: number = 2, methodCount: number = 0): InterfaceInfo {
+  function createMockInterface(
+    name: string,
+    propertyCount: number = 2,
+    methodCount: number = 0
+  ): InterfaceInfo {
     const properties = Array.from({ length: propertyCount }, (_, i) => ({
       name: `prop${i}`,
       type: 'string',
@@ -83,7 +87,13 @@ describe('TypeChainTracer', () => {
   }
 
   function createGraphWithDeps(
-    dependencies: Array<{ from: string; to: string; type?: 'extends' | 'composition' | 'parameter' | 'return' | 'generic'; isExternal?: boolean; dataFlow?: 'input' | 'output' | 'bidirectional' }>
+    dependencies: Array<{
+      from: string;
+      to: string;
+      type?: 'extends' | 'composition' | 'parameter' | 'return' | 'generic';
+      isExternal?: boolean;
+      dataFlow?: 'input' | 'output' | 'bidirectional';
+    }>
   ): InterfaceDependencyGraph {
     const allNames = new Set<string>();
     for (const dep of dependencies) {
@@ -97,7 +107,13 @@ describe('TypeChainTracer', () => {
     }
 
     const deps = dependencies.map((d) =>
-      createMockDependency(d.from, d.to, d.type || 'composition', d.isExternal || false, d.dataFlow || 'output')
+      createMockDependency(
+        d.from,
+        d.to,
+        d.type || 'composition',
+        d.isExternal || false,
+        d.dataFlow || 'output'
+      )
     );
 
     return {
@@ -209,7 +225,7 @@ describe('TypeChainTracer', () => {
     });
 
     it('should limit paths when findAllPaths is false', () => {
-      const resultAll = tracer.findChain('A', 'D', { findAllPaths: true });
+      const _resultAll = tracer.findChain('A', 'D', { findAllPaths: true });
       const resultOne = tracer.findChain('A', 'D', { findAllPaths: false });
       // With findAllPaths: false, may find fewer or equal paths than true
       expect(resultOne.chains.length).toBeGreaterThanOrEqual(0);

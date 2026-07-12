@@ -5,9 +5,9 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for finding orphaned symbols
@@ -111,8 +111,8 @@ export class OrphansCommand extends BaseCommand {
     // Get all symbols and filter to find orphans
     const allSymbols = dbManager.getAllSymbolRows();
     let orphans = allSymbols
-      .filter(s => !usedSymbolIds.has(s.id))
-      .map(s => ({
+      .filter((s) => !usedSymbolIds.has(s.id))
+      .map((s) => ({
         id: s.id,
         name: s.name,
         filePath: s.file_path,
@@ -121,21 +121,20 @@ export class OrphansCommand extends BaseCommand {
 
     // Apply filters
     if (excludeTests) {
-      orphans = orphans.filter(s =>
-        s.type !== 'test-suite' &&
-        s.type !== 'test-case' &&
-        !s.filePath.includes('/__tests__/') &&
-        !s.filePath.endsWith('.test.ts') &&
-        !s.filePath.endsWith('.spec.ts')
+      orphans = orphans.filter(
+        (s) =>
+          s.type !== 'test-suite' &&
+          s.type !== 'test-case' &&
+          !s.filePath.includes('/__tests__/') &&
+          !s.filePath.endsWith('.test.ts') &&
+          !s.filePath.endsWith('.spec.ts')
       );
     }
 
     if (classesOnly) {
-      orphans = orphans.filter(s =>
-        s.type === 'class' ||
-        s.type === 'interface' ||
-        s.type === 'type' ||
-        s.type === 'enum'
+      orphans = orphans.filter(
+        (s) =>
+          s.type === 'class' || s.type === 'interface' || s.type === 'type' || s.type === 'enum'
       );
     }
 
@@ -149,13 +148,11 @@ export class OrphansCommand extends BaseCommand {
     if (!includeMembers && !classesOnly) {
       // Get all class IDs that are NOT orphans (i.e., used classes)
       const usedClassIds = new Set(
-        allSymbols
-          .filter(s => s.type === 'class' && usedSymbolIds.has(s.id))
-          .map(s => s.id)
+        allSymbols.filter((s) => s.type === 'class' && usedSymbolIds.has(s.id)).map((s) => s.id)
       );
 
       // Filter out members whose parent class is used
-      orphans = orphans.filter(orphan => {
+      orphans = orphans.filter((orphan) => {
         // Check if this is a class member (method or property)
         if (orphan.type !== 'method' && orphan.type !== 'property') {
           return true; // Keep non-members
@@ -195,7 +192,7 @@ export class OrphansCommand extends BaseCommand {
       }
 
       const useFast = args.includes('--fast');
-      const useAccurate = args.includes('--accurate') || !useFast; // Default to accurate
+      const _useAccurate = args.includes('--accurate') || !useFast; // Default to accurate
       const excludeTests = args.includes('--exclude-tests');
       const includeMembers = args.includes('--include-members');
       const classesOnly = args.includes('--classes-only');
@@ -228,11 +225,12 @@ export class OrphansCommand extends BaseCommand {
           for (const id of orphanIds) {
             const entry = manager.findById(id);
             if (entry) {
-              if (excludeTests && (
-                entry.sourceRef.filePath.includes('__tests__') ||
-                entry.sourceRef.filePath.endsWith('.test.ts') ||
-                entry.sourceRef.filePath.endsWith('.spec.ts')
-              )) {
+              if (
+                excludeTests &&
+                (entry.sourceRef.filePath.includes('__tests__') ||
+                  entry.sourceRef.filePath.endsWith('.test.ts') ||
+                  entry.sourceRef.filePath.endsWith('.spec.ts'))
+              ) {
                 continue;
               }
 

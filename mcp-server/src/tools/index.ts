@@ -2,17 +2,17 @@
  * MCP Tool implementations for TSDoc Edge
  */
 
-import type { TsDocService } from '../services/tsdocService.js';
-import type {
-  SearchSymbolsInput,
-  GetOntologyStatsInput,
-  ListRelationshipsInput,
-  GetWorkContextInput,
-  GetDesignContextInput,
-  QueryRelationshipsInput,
-  GetSymbolDetailsInput,
-} from '../schemas/index.js';
 import { CHARACTER_LIMIT } from '../constants.js';
+import type {
+  GetDesignContextInput,
+  GetOntologyStatsInput,
+  GetSymbolDetailsInput,
+  GetWorkContextInput,
+  ListRelationshipsInput,
+  QueryRelationshipsInput,
+  SearchSymbolsInput,
+} from '../schemas/index.js';
+import type { TsDocService } from '../services/tsdocService.js';
 
 /**
  * Format response with truncation if needed
@@ -20,23 +20,22 @@ import { CHARACTER_LIMIT } from '../constants.js';
 function formatResponse(content: string, format: 'markdown' | 'json') {
   const truncated = content.length > CHARACTER_LIMIT;
   const displayContent = truncated
-    ? content.substring(0, CHARACTER_LIMIT) + '\n\n[Response truncated due to size limit]'
+    ? `${content.substring(0, CHARACTER_LIMIT)}\n\n[Response truncated due to size limit]`
     : content;
 
   return {
     content: [{ type: 'text' as const, text: displayContent }],
     ...(format === 'json' && !truncated ? { structuredContent: JSON.parse(content) } : {}),
-    ...(truncated ? { isError: false, _meta: { truncated: true, originalLength: content.length } } : {}),
+    ...(truncated
+      ? { isError: false, _meta: { truncated: true, originalLength: content.length } }
+      : {}),
   };
 }
 
 /**
  * Search for symbols in the codebase
  */
-export async function searchSymbolsTool(
-  params: SearchSymbolsInput,
-  service: TsDocService
-) {
+export async function searchSymbolsTool(params: SearchSymbolsInput, service: TsDocService) {
   try {
     const result = await service.searchSymbols({
       query: params.query,
@@ -63,7 +62,8 @@ export async function searchSymbolsTool(
         markdown += `- **ID**: \`${node.id}\`\n`;
         markdown += `- **Type**: ${node.type}\n`;
         if (node.kind) markdown += `- **Kind**: ${node.kind}\n`;
-        if (node.filePath) markdown += `- **Location**: ${node.filePath}${node.line ? `:${node.line}` : ''}\n`;
+        if (node.filePath)
+          markdown += `- **Location**: ${node.filePath}${node.line ? `:${node.line}` : ''}\n`;
         if (node.isExported) markdown += `- **Exported**: Yes\n`;
         if (node.isPublic) markdown += `- **Public**: Yes\n`;
         markdown += `\n`;
@@ -78,7 +78,12 @@ export async function searchSymbolsTool(
     return formatResponse(markdown, 'markdown');
   } catch (error) {
     return {
-      content: [{ type: 'text' as const, text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+      content: [
+        {
+          type: 'text' as const,
+          text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        },
+      ],
       isError: true,
     };
   }
@@ -87,10 +92,7 @@ export async function searchSymbolsTool(
 /**
  * Get ontology statistics
  */
-export async function getOntologyStatsTool(
-  params: GetOntologyStatsInput,
-  service: TsDocService
-) {
+export async function getOntologyStatsTool(params: GetOntologyStatsInput, service: TsDocService) {
   try {
     const stats = await service.getOntologyStats(params.detailed);
 
@@ -133,7 +135,12 @@ export async function getOntologyStatsTool(
     return formatResponse(markdown, 'markdown');
   } catch (error) {
     return {
-      content: [{ type: 'text' as const, text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+      content: [
+        {
+          type: 'text' as const,
+          text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        },
+      ],
       isError: true,
     };
   }
@@ -142,10 +149,7 @@ export async function getOntologyStatsTool(
 /**
  * List relationships
  */
-export async function listRelationshipsTool(
-  params: ListRelationshipsInput,
-  service: TsDocService
-) {
+export async function listRelationshipsTool(params: ListRelationshipsInput, service: TsDocService) {
   try {
     const result = await service.listRelationships({
       type: params.type,
@@ -194,7 +198,12 @@ export async function listRelationshipsTool(
     return formatResponse(markdown, 'markdown');
   } catch (error) {
     return {
-      content: [{ type: 'text' as const, text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+      content: [
+        {
+          type: 'text' as const,
+          text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        },
+      ],
       isError: true,
     };
   }
@@ -203,16 +212,18 @@ export async function listRelationshipsTool(
 /**
  * Get work context for a file
  */
-export async function getWorkContextTool(
-  params: GetWorkContextInput,
-  service: TsDocService
-) {
+export async function getWorkContextTool(params: GetWorkContextInput, service: TsDocService) {
   try {
     const context = await service.getWorkContext(params.filePath, params.depth);
     return formatResponse(context, params.format);
   } catch (error) {
     return {
-      content: [{ type: 'text' as const, text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+      content: [
+        {
+          type: 'text' as const,
+          text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        },
+      ],
       isError: true,
     };
   }
@@ -221,16 +232,18 @@ export async function getWorkContextTool(
 /**
  * Get design context for a file
  */
-export async function getDesignContextTool(
-  params: GetDesignContextInput,
-  service: TsDocService
-) {
+export async function getDesignContextTool(params: GetDesignContextInput, service: TsDocService) {
   try {
     const context = await service.getDesignContext(params.filePath);
     return formatResponse(context, params.format);
   } catch (error) {
     return {
-      content: [{ type: 'text' as const, text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+      content: [
+        {
+          type: 'text' as const,
+          text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        },
+      ],
       isError: true,
     };
   }
@@ -252,7 +265,12 @@ export async function queryRelationshipsTool(
     return formatResponse(result, params.format);
   } catch (error) {
     return {
-      content: [{ type: 'text' as const, text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+      content: [
+        {
+          type: 'text' as const,
+          text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        },
+      ],
       isError: true,
     };
   }
@@ -261,10 +279,7 @@ export async function queryRelationshipsTool(
 /**
  * Get symbol details
  */
-export async function getSymbolDetailsTool(
-  params: GetSymbolDetailsInput,
-  service: TsDocService
-) {
+export async function getSymbolDetailsTool(params: GetSymbolDetailsInput, service: TsDocService) {
   try {
     const symbol = await service.getSymbolDetails(params.symbolId);
 
@@ -285,7 +300,8 @@ export async function getSymbolDetailsTool(
     markdown += `- **ID**: \`${symbol.id}\`\n`;
     markdown += `- **Type**: ${symbol.type}\n`;
     if (symbol.kind) markdown += `- **Kind**: ${symbol.kind}\n`;
-    if (symbol.filePath) markdown += `- **Location**: ${symbol.filePath}${symbol.line ? `:${symbol.line}` : ''}\n`;
+    if (symbol.filePath)
+      markdown += `- **Location**: ${symbol.filePath}${symbol.line ? `:${symbol.line}` : ''}\n`;
     if (symbol.isExported) markdown += `- **Exported**: Yes\n`;
     if (symbol.isPublic) markdown += `- **Public**: Yes\n`;
 
@@ -296,7 +312,12 @@ export async function getSymbolDetailsTool(
     return formatResponse(markdown, 'markdown');
   } catch (error) {
     return {
-      content: [{ type: 'text' as const, text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}` }],
+      content: [
+        {
+          type: 'text' as const,
+          text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        },
+      ],
       isError: true,
     };
   }

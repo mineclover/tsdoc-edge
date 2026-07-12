@@ -46,10 +46,22 @@ export class CodeHealthChecker {
 
   /** Boilerplate methods that don't need documentation */
   private static readonly BOILERPLATE_METHODS = new Set([
-    'getName', 'getDescription', 'getUsage', 'getInstance',
-    'execute', 'constructor', 'toString', 'valueOf',
-    'toJSON', 'clone', 'equals', 'hashCode',
-    'getAlias', 'configManager', 'dbManager', 'db',
+    'getName',
+    'getDescription',
+    'getUsage',
+    'getInstance',
+    'execute',
+    'constructor',
+    'toString',
+    'valueOf',
+    'toJSON',
+    'clone',
+    'equals',
+    'hashCode',
+    'getAlias',
+    'configManager',
+    'dbManager',
+    'db',
   ]);
 
   constructor() {
@@ -228,7 +240,7 @@ export class CodeHealthChecker {
   private findTestFile(sourceFile: string, rootPath: string): string | null {
     const dir = path.dirname(sourceFile);
     const baseName = path.basename(sourceFile, '.ts');
-    const normalizedRoot = rootPath.replace(/\\/g, '/');
+    const _normalizedRoot = rootPath.replace(/\\/g, '/');
 
     // Common test file patterns
     const patterns = [
@@ -259,7 +271,11 @@ export class CodeHealthChecker {
    * @param baseName - Base file name (without extension)
    * @returns Potential test file path
    */
-  private buildTestPathFromRoot(sourceFile: string, rootPath: string, baseName: string): string | null {
+  private buildTestPathFromRoot(
+    sourceFile: string,
+    rootPath: string,
+    baseName: string
+  ): string | null {
     // Normalize paths for comparison
     const normalizedSource = sourceFile.replace(/\\/g, '/');
     const normalizedRoot = rootPath.replace(/\\/g, '/');
@@ -362,7 +378,7 @@ export class CodeHealthChecker {
    */
   private generateSuggestions(
     docScores: DocQualityScore[],
-    testCoverage: TestCoverageInfo[],
+    _testCoverage: TestCoverageInfo[],
     options: AnalysisOptions
   ): ImprovementSuggestion[] {
     const suggestions: ImprovementSuggestion[] = [];
@@ -384,7 +400,11 @@ export class CodeHealthChecker {
       }
 
       // Low quality documentation
-      if (score.qualityScore < minScore && score.isPublic && !this.isBoilerplate(score.symbolName)) {
+      if (
+        score.qualityScore < minScore &&
+        score.isPublic &&
+        !this.isBoilerplate(score.symbolName)
+      ) {
         const priority = this.getPriority(score.qualityScore);
         const effort = score.missing.length > 3 ? 'medium' : 'small';
 

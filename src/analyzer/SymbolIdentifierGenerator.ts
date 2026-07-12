@@ -4,9 +4,9 @@
  * @packageDocumentation
  */
 
+import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { randomUUID } from 'node:crypto';
 import { generateLegacyId } from '../indexer/legacy-id';
 
 /**
@@ -61,7 +61,9 @@ export class SymbolIdentifierGenerator {
     const uuid = randomUUID();
     const localPath = this.generateLocalPath(filePath, symbolName, parentSymbol);
     const scope = this.extractScope(filePath);
-    const globalPath = isExported ? this.generateGlobalPath(filePath, symbolName, scope, parentSymbol) : undefined;
+    const globalPath = isExported
+      ? this.generateGlobalPath(filePath, symbolName, scope, parentSymbol)
+      : undefined;
     const legacyId = generateLegacyId(filePath, symbolName, symbolType);
 
     return { uuid, localPath, globalPath, scope, legacyId };
@@ -86,7 +88,7 @@ export class SymbolIdentifierGenerator {
    * Only for exported symbols
    */
   private generateGlobalPath(
-    filePath: string,
+    _filePath: string,
     symbolName: string,
     scope: string,
     parentSymbol?: string
@@ -127,7 +129,7 @@ export class SymbolIdentifierGenerator {
 
           this.packageCache.set(currentDir, packageInfo);
           return packageInfo.scope;
-        } catch (err) {
+        } catch (_err) {
           // If package.json is invalid, continue up the tree
         }
       }
@@ -199,7 +201,7 @@ export class SymbolIdentifierGenerator {
 
           this.packageCache.set(currentDir, packageInfo);
           return packageInfo;
-        } catch (err) {
+        } catch (_err) {
           // Continue
         }
       }

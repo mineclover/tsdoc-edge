@@ -2,11 +2,11 @@
  * DocReferenceAnalyzer Tests
  */
 
-import * as path from 'node:path';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import { DocReferenceAnalyzer } from '../../analyzer/DocReferenceAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships';
 
 describe('DocReferenceAnalyzer', () => {
@@ -51,10 +51,7 @@ describe('DocReferenceAnalyzer', () => {
   }
 
   // Helper to create TypeScript file with @doc tags
-  function createTsFileWithDocTag(
-    fileName: string,
-    content: string
-  ): string {
+  function createTsFileWithDocTag(fileName: string, content: string): string {
     const filePath = path.join(tempDir, fileName);
     fs.writeFileSync(filePath, content);
     return filePath;
@@ -79,9 +76,7 @@ describe('DocReferenceAnalyzer', () => {
     });
 
     it('should return empty array when no @doc tags found', () => {
-      const graph = createMockGraph([
-        { id: 'class-authservice', name: 'AuthService' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-authservice', name: 'AuthService' }]);
 
       createTsFileWithDocTag(
         'AuthService.ts',
@@ -103,9 +98,7 @@ export class AuthService {
 
     it('should detect @doc [[Symbol]] reference', () => {
       const filePath = path.join(tempDir, 'AuthService.ts');
-      const graph = createMockGraph([
-        { id: 'class-authservice', name: 'AuthService', filePath },
-      ]);
+      const graph = createMockGraph([{ id: 'class-authservice', name: 'AuthService', filePath }]);
 
       createTsFileWithDocTag(
         'AuthService.ts',
@@ -135,9 +128,7 @@ export class AuthService {
 
     it('should detect @doc [[Symbol#Section]] reference with section', () => {
       const filePath = path.join(tempDir, 'UserService.ts');
-      const graph = createMockGraph([
-        { id: 'class-userservice', name: 'UserService', filePath },
-      ]);
+      const graph = createMockGraph([{ id: 'class-userservice', name: 'UserService', filePath }]);
 
       createTsFileWithDocTag(
         'UserService.ts',
@@ -191,9 +182,7 @@ export class MultiDocService {
     });
 
     it('should skip files in node_modules, dist, and build directories', () => {
-      const graph = createMockGraph([
-        { id: 'class-service', name: 'Service' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-service', name: 'Service' }]);
 
       // Create node_modules directory
       const nodeModulesDir = path.join(tempDir, 'node_modules');
@@ -247,9 +236,7 @@ export class Unknown {}
       fs.mkdirSync(subDir);
       const filePath = path.join(subDir, 'DeepService.ts');
 
-      const graph = createMockGraph([
-        { id: 'class-deepservice', name: 'DeepService', filePath },
-      ]);
+      const graph = createMockGraph([{ id: 'class-deepservice', name: 'DeepService', filePath }]);
 
       fs.writeFileSync(
         filePath,

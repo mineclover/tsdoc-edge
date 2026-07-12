@@ -15,12 +15,12 @@
  * - 메서드 호출 체인 감지 (a.method(b))
  */
 
-import * as ts from 'typescript';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import * as ts from 'typescript';
 import type {
-  TestSymbolUsage,
   ImportedSymbol,
+  TestSymbolUsage,
   UsagePattern,
   VerifiedRelationship,
 } from '../types/analysis/test-relationships';
@@ -49,12 +49,7 @@ export class TestRelationshipExtractor {
    */
   extractFromFile(testFilePath: string): TestSymbolUsage {
     const sourceCode = fs.readFileSync(testFilePath, 'utf-8');
-    const sourceFile = ts.createSourceFile(
-      testFilePath,
-      sourceCode,
-      ts.ScriptTarget.Latest,
-      true
-    );
+    const sourceFile = ts.createSourceFile(testFilePath, sourceCode, ts.ScriptTarget.Latest, true);
 
     const importedSymbols = this.extractImports(sourceFile, testFilePath);
     const usagePatterns = this.extractUsagePatterns(sourceFile, importedSymbols);
@@ -140,7 +135,7 @@ export class TestRelationshipExtractor {
     importedSymbols: ImportedSymbol[]
   ): UsagePattern[] {
     const patterns: UsagePattern[] = [];
-    const symbolNames = new Set(importedSymbols.map(s => s.symbolName));
+    const symbolNames = new Set(importedSymbols.map((s) => s.symbolName));
 
     const visit = (node: ts.Node) => {
       // Pattern 1: Constructor calls (new SymbolName())
@@ -148,7 +143,7 @@ export class TestRelationshipExtractor {
         const constructorName = node.expression.getText(sourceFile);
 
         if (symbolNames.has(constructorName)) {
-          const symbolId = importedSymbols.find(s => s.symbolName === constructorName)?.symbolId;
+          const symbolId = importedSymbols.find((s) => s.symbolName === constructorName)?.symbolId;
           if (symbolId) {
             const lineNumber = sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1;
             const codeSnippet = node.getText(sourceFile).substring(0, 100);
@@ -167,13 +162,17 @@ export class TestRelationshipExtractor {
               for (const arg of node.arguments) {
                 if (ts.isNewExpression(arg)) {
                   const argConstructor = arg.expression.getText(sourceFile);
-                  const argSymbolId = importedSymbols.find(s => s.symbolName === argConstructor)?.symbolId;
+                  const argSymbolId = importedSymbols.find(
+                    (s) => s.symbolName === argConstructor
+                  )?.symbolId;
                   if (argSymbolId) {
                     relatedSymbols.push(argSymbolId);
                   }
                 } else if (ts.isIdentifier(arg)) {
                   const argName = arg.text;
-                  const argSymbolId = importedSymbols.find(s => s.symbolName === argName)?.symbolId;
+                  const argSymbolId = importedSymbols.find(
+                    (s) => s.symbolName === argName
+                  )?.symbolId;
                   if (argSymbolId) {
                     relatedSymbols.push(argSymbolId);
                   }
@@ -198,10 +197,10 @@ export class TestRelationshipExtractor {
       if (ts.isCallExpression(node)) {
         if (ts.isPropertyAccessExpression(node.expression)) {
           const objectName = node.expression.expression.getText(sourceFile);
-          const methodName = node.expression.name.text;
+          const _methodName = node.expression.name.text;
 
           // Try to find the symbol for this object
-          const symbolId = importedSymbols.find(s => s.symbolName === objectName)?.symbolId;
+          const symbolId = importedSymbols.find((s) => s.symbolName === objectName)?.symbolId;
 
           if (symbolId) {
             const lineNumber = sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1;
@@ -248,11 +247,13 @@ export class TestRelationshipExtractor {
             target: targetId,
             verifiedBy: usage.testFilePath,
             strength: 'strong',
-            evidence: [{
-              lineNumber: pattern.lineNumber,
-              codeSnippet: pattern.codeSnippet || '',
-              pattern: 'dependency-injection',
-            }],
+            evidence: [
+              {
+                lineNumber: pattern.lineNumber,
+                codeSnippet: pattern.codeSnippet || '',
+                pattern: 'dependency-injection',
+              },
+            ],
           });
         }
       }
@@ -277,11 +278,17 @@ export class TestRelationshipExtractor {
               target,
               verifiedBy: usage.testFilePath,
               strength: 'medium',
-              evidence: [{
-                lineNumber: group[i].lineNumber,
-                codeSnippet: `${group[i].codeSnippet || ''} ... ${group[j].codeSnippet || ''}`.substring(0, 100),
-                pattern: 'co-occurrence',
-              }],
+              evidence: [
+                {
+                  lineNumber: group[i].lineNumber,
+                  codeSnippet:
+                    `${group[i].codeSnippet || ''} ... ${group[j].codeSnippet || ''}`.substring(
+                      0,
+                      100
+                    ),
+                  pattern: 'co-occurrence',
+                },
+              ],
             });
           }
         }
@@ -341,10 +348,10 @@ export class TestRelationshipExtractor {
     const testDir = path.dirname(testFilePath);
     const absolutePath = path.resolve(testDir, moduleSpecifier);
     const possiblePaths = [
-      absolutePath + '.ts',
-      absolutePath + '.tsx',
-      absolutePath + '/index.ts',
-      absolutePath + '/index.tsx',
+      `${absolutePath}.ts`,
+      `${absolutePath}.tsx`,
+      `${absolutePath}/index.ts`,
+      `${absolutePath}/index.tsx`,
     ];
 
     // Try to find symbol in graph by name and file path
@@ -372,6 +379,6 @@ export class TestRelationshipExtractor {
    */
   private isTestFrameworkImport(moduleSpecifier: string): boolean {
     const testFrameworks = ['jest', 'vitest', '@testing-library', 'mocha', 'chai', 'sinon'];
-    return testFrameworks.some(framework => moduleSpecifier.includes(framework));
+    return testFrameworks.some((framework) => moduleSpecifier.includes(framework));
   }
 }

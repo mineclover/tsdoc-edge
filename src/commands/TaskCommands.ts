@@ -4,11 +4,11 @@
  * @responsibility Manage tasks and checklists via CLI
  */
 
-import { BaseCommand, colors, type CommandResult } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { TaskManager } from '../task/TaskManager';
-import { TaskStatus, TaskPriority, TaskType } from '../types/task';
 import type { Task, TaskFilter } from '../types/task';
+import { TaskPriority, TaskStatus, TaskType } from '../types/task';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Task List Command
@@ -286,7 +286,10 @@ Options:
         } else if (arg.startsWith('--due=')) {
           dueDate = arg.split('=')[1];
         } else if (arg.startsWith('--tags=')) {
-          tags = arg.split('=')[1].split(',').map((t) => t.trim());
+          tags = arg
+            .split('=')[1]
+            .split(',')
+            .map((t) => t.trim());
         } else if (arg.startsWith('--estimate=')) {
           estimatedHours = Number.parseFloat(arg.split('=')[1]);
         }
@@ -452,7 +455,7 @@ export class TaskStatsCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
+  async execute(_args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);

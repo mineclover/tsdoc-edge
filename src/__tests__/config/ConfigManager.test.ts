@@ -532,7 +532,7 @@ describe('ConfigManager', () => {
 
         // Restore permissions
         fs.chmodSync(readOnlyDir, 0o755);
-      } catch (error) {
+      } catch (_error) {
         // Skip this test on systems where chmod doesn't work as expected
         fs.chmodSync(readOnlyDir, 0o755);
       }

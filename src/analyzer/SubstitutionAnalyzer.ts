@@ -21,7 +21,7 @@ import type { UnifiedRelationship } from '../types/relationships';
  * Substitution group (classes that can substitute each other)
  */
 interface SubstitutionGroup {
-  baseType: string;        // Interface or base class
+  baseType: string; // Interface or base class
   baseSymbolId: string;
   implementations: {
     symbolId: string;
@@ -69,11 +69,7 @@ export class SubstitutionAnalyzer {
           const impl1 = group.implementations[i];
           const impl2 = group.implementations[j];
 
-          const relationship = this.createSubstitutionRelationship(
-            impl1,
-            impl2,
-            group
-          );
+          const relationship = this.createSubstitutionRelationship(impl1, impl2, group);
 
           relationships.push(relationship);
         }
@@ -110,7 +106,7 @@ export class SubstitutionAnalyzer {
               baseType: baseSymbol.name,
               baseSymbolId,
               implementations: [],
-              relationshipType: 'interface'
+              relationshipType: 'interface',
             });
           }
 
@@ -119,7 +115,7 @@ export class SubstitutionAnalyzer {
             symbolId: symbol.id,
             symbolName: symbol.name,
             filePath: symbol.filePath,
-            line: symbol.line
+            line: symbol.line,
           });
         }
       }
@@ -135,7 +131,7 @@ export class SubstitutionAnalyzer {
               baseType: baseSymbol.name,
               baseSymbolId,
               implementations: [],
-              relationshipType: 'inheritance'
+              relationshipType: 'inheritance',
             });
           }
 
@@ -144,7 +140,7 @@ export class SubstitutionAnalyzer {
             symbolId: symbol.id,
             symbolName: symbol.name,
             filePath: symbol.filePath,
-            line: symbol.line
+            line: symbol.line,
           });
         }
       }
@@ -193,7 +189,7 @@ export class SubstitutionAnalyzer {
           lineNumber: impl1.line,
           snippet: `${impl1.symbolName} ${group.relationshipType === 'interface' ? 'implements' : 'extends'} ${group.baseType}`,
           confidence: 1.0,
-          context: `Implementation of ${group.baseType}`
+          context: `Implementation of ${group.baseType}`,
         },
         {
           type: 'code',
@@ -201,8 +197,8 @@ export class SubstitutionAnalyzer {
           lineNumber: impl2.line,
           snippet: `${impl2.symbolName} ${group.relationshipType === 'interface' ? 'implements' : 'extends'} ${group.baseType}`,
           confidence: 1.0,
-          context: `Implementation of ${group.baseType}`
-        }
+          context: `Implementation of ${group.baseType}`,
+        },
       ],
       discoveredBy: 'static-analysis',
       confidence,
@@ -214,11 +210,11 @@ export class SubstitutionAnalyzer {
         relationshipType: group.relationshipType,
         impl1: impl1.symbolName,
         impl2: impl2.symbolName,
-        totalImplementations: group.implementations.length
+        totalImplementations: group.implementations.length,
       },
       createdAt: timestamp,
       updatedAt: timestamp,
-      description: `${impl1.symbolName} and ${impl2.symbolName} are interchangeable (both ${group.relationshipType === 'interface' ? 'implement' : 'extend'} ${group.baseType})`
+      description: `${impl1.symbolName} and ${impl2.symbolName} are interchangeable (both ${group.relationshipType === 'interface' ? 'implement' : 'extend'} ${group.baseType})`,
     };
   }
 
@@ -263,7 +259,7 @@ export class SubstitutionAnalyzer {
       interfaceBased,
       inheritanceBased,
       baseTypes,
-      averageImplementations
+      averageImplementations,
     };
   }
 }

@@ -5,9 +5,9 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { MissingLinkDetector } from '../analyzer/MissingLinkDetector';
 import { ConfigLoader } from '../utils/ConfigLoader';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for checking broken links

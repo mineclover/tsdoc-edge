@@ -13,7 +13,9 @@ import type { TestCase, TestScenario, TestSuite, TestSymbol } from '../test-symb
  * @public
  */
 export function isTestSymbol(symbol: Symbol): symbol is TestSymbol {
-  return symbol.type === 'test-suite' || symbol.type === 'test-case' || symbol.type === 'test-scenario';
+  return (
+    symbol.type === 'test-suite' || symbol.type === 'test-case' || symbol.type === 'test-scenario'
+  );
 }
 
 /**

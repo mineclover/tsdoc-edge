@@ -505,8 +505,8 @@ describe('IdGenerator', () => {
         charset: 'AB',
       });
 
-      const id1 = generator.generate();
-      const id2 = generator.generate();
+      const _id1 = generator.generate();
+      const _id2 = generator.generate();
       const id3 = generator.generate(); // Triggers length increase
 
       expect(id3.length).toBeGreaterThan(1);
@@ -614,7 +614,7 @@ describe('IdGenerator', () => {
       });
 
       const id1 = generator.generate(); // 0
-      const id10 = generator.generate(); // 1
+      const _id10 = generator.generate(); // 1
 
       for (let i = 2; i < 10; i++) {
         generator.generate();

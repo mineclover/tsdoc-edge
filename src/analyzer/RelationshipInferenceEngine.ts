@@ -110,9 +110,10 @@ export class RelationshipInferenceEngine {
 
     // Calculate average confidence
     const inferred = this.infer(existing);
-    const avgConfidence = inferred.length > 0
-      ? inferred.reduce((sum, r) => sum + r.confidence, 0) / inferred.length
-      : 0;
+    const avgConfidence =
+      inferred.length > 0
+        ? inferred.reduce((sum, r) => sum + r.confidence, 0) / inferred.length
+        : 0;
 
     return {
       totalInferred,
@@ -133,7 +134,7 @@ export class RelationshipInferenceEngine {
       description: 'Infer transitive naming-pattern relationships within domain',
       apply: (relationships) => {
         const inferred: UnifiedRelationship[] = [];
-        const namingRels = relationships.filter(r => r.type === 'naming-pattern-relation');
+        const namingRels = relationships.filter((r) => r.type === 'naming-pattern-relation');
 
         // Group by domain
         const domainMap = new Map<string, UnifiedRelationship[]>();
@@ -143,7 +144,7 @@ export class RelationshipInferenceEngine {
             if (!domainMap.has(domain)) {
               domainMap.set(domain, []);
             }
-            domainMap.get(domain)!.push(rel);
+            domainMap.get(domain)?.push(rel);
           }
         }
 
@@ -165,7 +166,7 @@ export class RelationshipInferenceEngine {
               const to = symbolArray[j];
 
               // Check if already exists
-              const exists = rels.some(r => {
+              const exists = rels.some((r) => {
                 const rFrom = typeof r.from === 'string' ? r.from : r.from[0];
                 const rTo = typeof r.to === 'string' ? r.to : r.to[0];
                 return (rFrom === from && rTo === to) || (rFrom === to && rTo === from);
@@ -181,12 +182,14 @@ export class RelationshipInferenceEngine {
                   direction: 'undirected',
                   strength: 'medium',
                   category: 'semantic',
-                  evidence: [{
-                    type: 'code',
-                    source: 'inference-engine',
-                    confidence: 0.6,
-                    context: `Transitive: ${domain} domain closure`
-                  }],
+                  evidence: [
+                    {
+                      type: 'code',
+                      source: 'inference-engine',
+                      confidence: 0.6,
+                      context: `Transitive: ${domain} domain closure`,
+                    },
+                  ],
                   discoveredBy: 'static-analysis',
                   confidence: 0.6,
                   properties: {
@@ -195,7 +198,7 @@ export class RelationshipInferenceEngine {
                   },
                   createdAt: timestamp,
                   updatedAt: timestamp,
-                  description: `${from} ~ ${to} (${domain} domain, inferred)`
+                  description: `${from} ~ ${to} (${domain} domain, inferred)`,
                 });
               }
             }
@@ -203,7 +206,7 @@ export class RelationshipInferenceEngine {
         }
 
         return inferred;
-      }
+      },
     };
   }
 
@@ -219,7 +222,7 @@ export class RelationshipInferenceEngine {
       description: 'Complete graph within feature boundaries',
       apply: (relationships) => {
         const inferred: UnifiedRelationship[] = [];
-        const featureRels = relationships.filter(r => r.type === 'feature-grouping');
+        const featureRels = relationships.filter((r) => r.type === 'feature-grouping');
 
         // Group by feature
         const featureMap = new Map<string, Set<string>>();
@@ -231,8 +234,8 @@ export class RelationshipInferenceEngine {
             }
             const from = typeof rel.from === 'string' ? rel.from : rel.from[0];
             const to = typeof rel.to === 'string' ? rel.to : rel.to[0];
-            featureMap.get(feature)!.add(from);
-            featureMap.get(feature)!.add(to);
+            featureMap.get(feature)?.add(from);
+            featureMap.get(feature)?.add(to);
           }
         }
 
@@ -245,7 +248,7 @@ export class RelationshipInferenceEngine {
               const to = symbolArray[j];
 
               // Check if already exists
-              const exists = featureRels.some(r => {
+              const exists = featureRels.some((r) => {
                 const rFrom = typeof r.from === 'string' ? r.from : r.from[0];
                 const rTo = typeof r.to === 'string' ? r.to : r.to[0];
                 return (rFrom === from && rTo === to) || (rFrom === to && rTo === from);
@@ -261,12 +264,14 @@ export class RelationshipInferenceEngine {
                   direction: 'undirected',
                   strength: 'medium',
                   category: 'semantic',
-                  evidence: [{
-                    type: 'code',
-                    source: 'inference-engine',
-                    confidence: 0.7,
-                    context: `Feature closure: ${feature}`
-                  }],
+                  evidence: [
+                    {
+                      type: 'code',
+                      source: 'inference-engine',
+                      confidence: 0.7,
+                      context: `Feature closure: ${feature}`,
+                    },
+                  ],
                   discoveredBy: 'static-analysis',
                   confidence: 0.7,
                   properties: {
@@ -275,7 +280,7 @@ export class RelationshipInferenceEngine {
                   },
                   createdAt: timestamp,
                   updatedAt: timestamp,
-                  description: `${from} ~ ${to} (${feature} feature, inferred)`
+                  description: `${from} ~ ${to} (${feature} feature, inferred)`,
                 });
               }
             }
@@ -283,7 +288,7 @@ export class RelationshipInferenceEngine {
         }
 
         return inferred;
-      }
+      },
     };
   }
 
@@ -301,23 +306,25 @@ export class RelationshipInferenceEngine {
         const inferred: UnifiedRelationship[] = [];
 
         // Get contains and test-coverage relationships
-        const contains = relationships.filter(r => r.type === 'contains');
-        const coverage = relationships.filter(r => r.type === 'test-coverage');
+        const contains = relationships.filter((r) => r.type === 'contains');
+        const coverage = relationships.filter((r) => r.type === 'test-coverage');
 
         // For each contains relationship
         for (const containsRel of contains) {
-          const suite = typeof containsRel.from === 'string' ? containsRel.from : containsRel.from[0];
+          const suite =
+            typeof containsRel.from === 'string' ? containsRel.from : containsRel.from[0];
           const testCase = typeof containsRel.to === 'string' ? containsRel.to : containsRel.to[0];
 
           // Find what the test case covers
           for (const coverageRel of coverage) {
-            const coveredTest = typeof coverageRel.from === 'string' ? coverageRel.from : coverageRel.from[0];
+            const coveredTest =
+              typeof coverageRel.from === 'string' ? coverageRel.from : coverageRel.from[0];
 
             if (coveredTest === testCase) {
               const impl = typeof coverageRel.to === 'string' ? coverageRel.to : coverageRel.to[0];
 
               // Check if suite→impl coverage already exists
-              const exists = coverage.some(r => {
+              const exists = coverage.some((r) => {
                 const rFrom = typeof r.from === 'string' ? r.from : r.from[0];
                 const rTo = typeof r.to === 'string' ? r.to : r.to[0];
                 return rFrom === suite && rTo === impl;
@@ -333,12 +340,14 @@ export class RelationshipInferenceEngine {
                   direction: 'unidirectional',
                   strength: 'medium',
                   category: 'verification',
-                  evidence: [{
-                    type: 'test',
-                    source: 'inference-engine',
-                    confidence: 0.8,
-                    context: `Inherited from test case: ${testCase}`
-                  }],
+                  evidence: [
+                    {
+                      type: 'test',
+                      source: 'inference-engine',
+                      confidence: 0.8,
+                      context: `Inherited from test case: ${testCase}`,
+                    },
+                  ],
                   discoveredBy: 'test-analysis',
                   confidence: 0.8,
                   properties: {
@@ -347,7 +356,7 @@ export class RelationshipInferenceEngine {
                   },
                   createdAt: timestamp,
                   updatedAt: timestamp,
-                  description: `${suite} → ${impl} (inherited from ${testCase})`
+                  description: `${suite} → ${impl} (inherited from ${testCase})`,
                 });
               }
             }
@@ -355,7 +364,7 @@ export class RelationshipInferenceEngine {
         }
 
         return inferred;
-      }
+      },
     };
   }
 

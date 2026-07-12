@@ -5,10 +5,9 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { EnhancedDocExtractor, type ExtractedEnhancedDoc } from '../parser/EnhancedDocExtractor';
 import { EnhancedMarkdownGenerator } from '../generator/EnhancedMarkdownGenerator';
-import type { Symbol } from '../types/graph/graph';
+import { EnhancedDocExtractor, type ExtractedEnhancedDoc } from '../parser/EnhancedDocExtractor';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * GenerateDocsCommand - Generate enhanced docs
@@ -159,11 +158,7 @@ export class GenerateDocsCommand extends BaseCommand {
         if (!file.startsWith('.') && file !== 'node_modules') {
           results.push(...this.parseDirectory(filePath));
         }
-      } else if (
-        file.endsWith('.ts') &&
-        !file.endsWith('.test.ts') &&
-        !file.endsWith('.d.ts')
-      ) {
+      } else if (file.endsWith('.ts') && !file.endsWith('.test.ts') && !file.endsWith('.d.ts')) {
         const sourceCode = fs.readFileSync(filePath, 'utf-8');
         const fileResults = this.extractor.extractFromFile(filePath, sourceCode);
         results.push(...fileResults);

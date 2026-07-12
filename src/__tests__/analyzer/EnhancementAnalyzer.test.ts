@@ -2,11 +2,11 @@
  * EnhancementAnalyzer Tests
  */
 
-import * as path from 'node:path';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import { EnhancementAnalyzer } from '../../analyzer/EnhancementAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships';
 
 describe('EnhancementAnalyzer', () => {
@@ -112,10 +112,7 @@ describe('EnhancementAnalyzer', () => {
       const result = analyzer.analyze(tempDir);
 
       const enhancement = result.find(
-        (r) =>
-          r.type === 'enhancement' &&
-          r.from === 'class-cacheddb' &&
-          r.to === 'Database'
+        (r) => r.type === 'enhancement' && r.from === 'class-cacheddb' && r.to === 'Database'
       );
 
       expect(enhancement).toBeDefined();
@@ -124,9 +121,7 @@ describe('EnhancementAnalyzer', () => {
     });
 
     it('should detect @enhances tag in function', () => {
-      const graph = createMockGraph([
-        { id: 'func-loggedhandler', name: 'loggedHandler' },
-      ]);
+      const graph = createMockGraph([{ id: 'func-loggedhandler', name: 'loggedHandler' }]);
 
       writeFiles({
         'src/handler.ts': `
@@ -144,19 +139,14 @@ describe('EnhancementAnalyzer', () => {
       const result = analyzer.analyze(tempDir);
 
       const enhancement = result.find(
-        (r) =>
-          r.type === 'enhancement' &&
-          r.from === 'func-loggedhandler' &&
-          r.to === 'BaseHandler'
+        (r) => r.type === 'enhancement' && r.from === 'func-loggedhandler' && r.to === 'BaseHandler'
       );
 
       expect(enhancement).toBeDefined();
     });
 
     it('should detect @enhances tag in interface', () => {
-      const graph = createMockGraph([
-        { id: 'interface-extendeduser', name: 'ExtendedUser' },
-      ]);
+      const graph = createMockGraph([{ id: 'interface-extendeduser', name: 'ExtendedUser' }]);
 
       writeFiles({
         'src/user.ts': `
@@ -177,18 +167,14 @@ describe('EnhancementAnalyzer', () => {
 
       const enhancement = result.find(
         (r) =>
-          r.type === 'enhancement' &&
-          r.from === 'interface-extendeduser' &&
-          r.to === 'BaseUser'
+          r.type === 'enhancement' && r.from === 'interface-extendeduser' && r.to === 'BaseUser'
       );
 
       expect(enhancement).toBeDefined();
     });
 
     it('should detect @enhances tag in type alias', () => {
-      const graph = createMockGraph([
-        { id: 'type-enhancedconfig', name: 'EnhancedConfig' },
-      ]);
+      const graph = createMockGraph([{ id: 'type-enhancedconfig', name: 'EnhancedConfig' }]);
 
       writeFiles({
         'src/config.ts': `
@@ -206,19 +192,14 @@ describe('EnhancementAnalyzer', () => {
       const result = analyzer.analyze(tempDir);
 
       const enhancement = result.find(
-        (r) =>
-          r.type === 'enhancement' &&
-          r.from === 'type-enhancedconfig' &&
-          r.to === 'BaseConfig'
+        (r) => r.type === 'enhancement' && r.from === 'type-enhancedconfig' && r.to === 'BaseConfig'
       );
 
       expect(enhancement).toBeDefined();
     });
 
     it('should detect @enhances tag in method', () => {
-      const graph = createMockGraph([
-        { id: 'method-process', name: 'process' },
-      ]);
+      const graph = createMockGraph([{ id: 'method-process', name: 'process' }]);
 
       writeFiles({
         'src/processor.ts': `
@@ -248,9 +229,7 @@ describe('EnhancementAnalyzer', () => {
     });
 
     it('should detect @enhances tag in variable declaration', () => {
-      const graph = createMockGraph([
-        { id: 'var-enhancedlogger', name: 'enhancedLogger' },
-      ]);
+      const graph = createMockGraph([{ id: 'var-enhancedlogger', name: 'enhancedLogger' }]);
 
       writeFiles({
         'src/logger.ts': `
@@ -268,10 +247,7 @@ describe('EnhancementAnalyzer', () => {
       const result = analyzer.analyze(tempDir);
 
       const enhancement = result.find(
-        (r) =>
-          r.type === 'enhancement' &&
-          r.from === 'var-enhancedlogger' &&
-          r.to === 'console'
+        (r) => r.type === 'enhancement' && r.from === 'var-enhancedlogger' && r.to === 'console'
       );
 
       expect(enhancement).toBeDefined();
@@ -310,9 +286,7 @@ describe('EnhancementAnalyzer', () => {
 
   describe('analyze - directory traversal', () => {
     it('should traverse nested directories', () => {
-      const graph = createMockGraph([
-        { id: 'class-nested', name: 'NestedEnhanced' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-nested', name: 'NestedEnhanced' }]);
 
       writeFiles({
         'src/deep/nested/enhanced.ts': `
@@ -331,9 +305,7 @@ describe('EnhancementAnalyzer', () => {
     });
 
     it('should skip node_modules directory', () => {
-      const graph = createMockGraph([
-        { id: 'class-npm', name: 'NpmPackage' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-npm', name: 'NpmPackage' }]);
 
       writeFiles({
         'node_modules/package/index.ts': `
@@ -354,9 +326,7 @@ describe('EnhancementAnalyzer', () => {
     });
 
     it('should skip dist directory', () => {
-      const graph = createMockGraph([
-        { id: 'class-dist', name: 'DistClass' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-dist', name: 'DistClass' }]);
 
       writeFiles({
         'dist/compiled.ts': `
@@ -376,9 +346,7 @@ describe('EnhancementAnalyzer', () => {
     });
 
     it('should skip build directory', () => {
-      const graph = createMockGraph([
-        { id: 'class-build', name: 'BuildClass' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-build', name: 'BuildClass' }]);
 
       writeFiles({
         'build/output.ts': `
@@ -530,9 +498,7 @@ describe('EnhancementAnalyzer', () => {
 
   describe('relationship structure', () => {
     it('should create relationships with correct structure', () => {
-      const graph = createMockGraph([
-        { id: 'class-enhanced', name: 'EnhancedService' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-enhanced', name: 'EnhancedService' }]);
 
       writeFiles({
         'src/service.ts': `
@@ -571,9 +537,7 @@ describe('EnhancementAnalyzer', () => {
     });
 
     it('should include file path and line information', () => {
-      const graph = createMockGraph([
-        { id: 'class-enhanced', name: 'EnhancedClass' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-enhanced', name: 'EnhancedClass' }]);
 
       writeFiles({
         'src/enhanced.ts': `
@@ -599,9 +563,7 @@ describe('EnhancementAnalyzer', () => {
     });
 
     it('should include evidence with correct snippet', () => {
-      const graph = createMockGraph([
-        { id: 'class-enhanced', name: 'EnhancedLogger' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-enhanced', name: 'EnhancedLogger' }]);
 
       writeFiles({
         'src/logger.ts': `
@@ -651,9 +613,7 @@ describe('EnhancementAnalyzer', () => {
     });
 
     it('should handle files without @enhances tag', () => {
-      const graph = createMockGraph([
-        { id: 'class-normal', name: 'NormalClass' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-normal', name: 'NormalClass' }]);
 
       writeFiles({
         'src/normal.ts': `
@@ -700,9 +660,7 @@ describe('EnhancementAnalyzer', () => {
     });
 
     it('should handle @enhances with no value', () => {
-      const graph = createMockGraph([
-        { id: 'class-incomplete', name: 'IncompleteEnhanced' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-incomplete', name: 'IncompleteEnhanced' }]);
 
       writeFiles({
         'src/incomplete.ts': `
@@ -722,9 +680,7 @@ describe('EnhancementAnalyzer', () => {
     });
 
     it('should trim whitespace from @enhances value', () => {
-      const graph = createMockGraph([
-        { id: 'class-whitespace', name: 'WhitespaceClass' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-whitespace', name: 'WhitespaceClass' }]);
 
       writeFiles({
         'src/whitespace.ts': `
@@ -763,9 +719,7 @@ describe('EnhancementAnalyzer', () => {
     });
 
     it('should only process .ts files', () => {
-      const graph = createMockGraph([
-        { id: 'class-jsfile', name: 'JsClass' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-jsfile', name: 'JsClass' }]);
 
       writeFiles({
         'src/notts.js': `
@@ -790,9 +744,7 @@ describe('EnhancementAnalyzer', () => {
 
   describe('JSDoc comment handling', () => {
     it('should handle multiline JSDoc comments', () => {
-      const graph = createMockGraph([
-        { id: 'class-multiline', name: 'MultilineDoc' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-multiline', name: 'MultilineDoc' }]);
 
       writeFiles({
         'src/multiline.ts': `
@@ -817,9 +769,7 @@ describe('EnhancementAnalyzer', () => {
     });
 
     it('should handle @enhances alongside other tags', () => {
-      const graph = createMockGraph([
-        { id: 'class-manytags', name: 'ManyTags' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-manytags', name: 'ManyTags' }]);
 
       writeFiles({
         'src/manytags.ts': `

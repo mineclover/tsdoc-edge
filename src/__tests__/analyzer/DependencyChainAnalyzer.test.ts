@@ -23,10 +23,12 @@ describe('DependencyChainAnalyzer', () => {
   }
 
   // Helper to create a mock graph
-  function createMockGraph(options: {
-    symbols?: Array<{ id: string; name: string; filePath?: string; line?: number }>;
-    edges?: Array<{ from: string; to: string }>;
-  } = {}): SymbolGraph {
+  function createMockGraph(
+    options: {
+      symbols?: Array<{ id: string; name: string; filePath?: string; line?: number }>;
+      edges?: Array<{ from: string; to: string }>;
+    } = {}
+  ): SymbolGraph {
     const symbols = new Map<string, any>();
     const adjacencyList = new Map<string, string[]>();
 
@@ -95,7 +97,7 @@ describe('DependencyChainAnalyzer', () => {
       const analyzer = new DependencyChainAnalyzer(graph);
       const chains = analyzer.buildChains('a');
 
-      const circularChain = chains.find(c => c.hasCircular);
+      const circularChain = chains.find((c) => c.hasCircular);
       expect(circularChain).toBeDefined();
       expect(circularChain?.circularPath).toBeDefined();
     });
@@ -121,7 +123,7 @@ describe('DependencyChainAnalyzer', () => {
       const chains = analyzer.buildChains('a', 2);
 
       // With maxDepth 2, should not reach 'e'
-      const allSymbols = chains.flatMap(c => c.path);
+      const allSymbols = chains.flatMap((c) => c.path);
       expect(allSymbols).not.toContain('e');
     });
 
@@ -276,7 +278,7 @@ describe('DependencyChainAnalyzer', () => {
       const analyzer = new DependencyChainAnalyzer(graph);
       const hotspots = analyzer.analyzeHotspots();
 
-      const hotSymbol = hotspots.find(h => h.symbolId === 'hot');
+      const hotSymbol = hotspots.find((h) => h.symbolId === 'hot');
       expect(hotSymbol).toBeDefined();
       expect(hotSymbol!.incomingCount).toBe(3);
       expect(hotSymbol!.outgoingCount).toBe(1);
@@ -339,7 +341,7 @@ describe('DependencyChainAnalyzer', () => {
       const analyzer = new DependencyChainAnalyzer(graph);
       const hotspots = analyzer.analyzeHotspots();
 
-      const criticalSymbol = hotspots.find(h => h.symbolId === 'critical');
+      const criticalSymbol = hotspots.find((h) => h.symbolId === 'critical');
       expect(criticalSymbol?.rank).toBe('critical');
     });
   });
@@ -585,7 +587,7 @@ describe('DependencyChainAnalyzer', () => {
       const analyzer = new DependencyChainAnalyzer(graph);
       const chains = analyzer.buildChains('a');
 
-      const linearChain = chains.find(c => c.chainType === 'linear');
+      const linearChain = chains.find((c) => c.chainType === 'linear');
       expect(linearChain).toBeDefined();
     });
 

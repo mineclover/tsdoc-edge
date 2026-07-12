@@ -17,7 +17,7 @@
  */
 
 import * as ts from 'typescript';
-import type { SymbolGraph, Symbol } from '../types/graph';
+import type { Symbol, SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships';
 
 /**
@@ -149,10 +149,16 @@ export class CompositionAnalyzer {
                 const propertyName = member.name.text;
                 const typeInfo = this.extractTypeInfo(member.type, sourceFile);
 
-                if (typeInfo.typeName && typeInfo.typeName !== 'any' && typeInfo.typeName !== 'unknown') {
+                if (
+                  typeInfo.typeName &&
+                  typeInfo.typeName !== 'any' &&
+                  typeInfo.typeName !== 'unknown'
+                ) {
                   // Skip primitive types
                   if (!this.isPrimitiveType(typeInfo.typeName)) {
-                    const line = sourceFile.getLineAndCharacterOfPosition(member.getStart(sourceFile)).line + 1;
+                    const line =
+                      sourceFile.getLineAndCharacterOfPosition(member.getStart(sourceFile)).line +
+                      1;
 
                     sites.push({
                       composerSymbolId: composerSymbol.id,
@@ -163,15 +169,12 @@ export class CompositionAnalyzer {
                       line,
                       isArray: typeInfo.isArray,
                       isOptional: typeInfo.isOptional,
-                      isUnion: typeInfo.isUnion
+                      isUnion: typeInfo.isUnion,
                     });
                   }
                 }
               }
-            } catch (error) {
-              // Skip members that cause errors (e.g., synthetic nodes)
-              continue;
-            }
+            } catch (_error) {}
           }
         }
       }
@@ -191,7 +194,10 @@ export class CompositionAnalyzer {
    * @returns Type information
    * @private
    */
-  private extractTypeInfo(typeNode: ts.TypeNode, sourceFile: ts.SourceFile): {
+  private extractTypeInfo(
+    typeNode: ts.TypeNode,
+    sourceFile: ts.SourceFile
+  ): {
     typeName: string | null;
     isArray: boolean;
     isOptional: boolean;
@@ -199,7 +205,7 @@ export class CompositionAnalyzer {
   } {
     let typeName: string | null = null;
     let isArray = false;
-    let isOptional = false;
+    const isOptional = false;
     let isUnion = false;
 
     // Handle array types: T[]
@@ -207,7 +213,7 @@ export class CompositionAnalyzer {
       isArray = true;
       return {
         ...this.extractTypeInfo(typeNode.elementType, sourceFile),
-        isArray: true
+        isArray: true,
       };
     }
 
@@ -220,7 +226,7 @@ export class CompositionAnalyzer {
         isArray = true;
         return {
           ...this.extractTypeInfo(typeNode.typeArguments[0], sourceFile),
-          isArray: true
+          isArray: true,
         };
       }
 
@@ -238,7 +244,7 @@ export class CompositionAnalyzer {
             return {
               ...result,
               isUnion: true,
-              isOptional: typeNode.types.some(t => t.kind === ts.SyntaxKind.UndefinedKeyword)
+              isOptional: typeNode.types.some((t) => t.kind === ts.SyntaxKind.UndefinedKeyword),
             };
           }
         }
@@ -264,10 +270,27 @@ export class CompositionAnalyzer {
    */
   private isPrimitiveType(typeName: string): boolean {
     const primitives = [
-      'string', 'number', 'boolean', 'null', 'undefined', 'void',
-      'String', 'Number', 'Boolean', 'Object', 'Function',
-      'Date', 'RegExp', 'Error', 'Map', 'Set', 'WeakMap', 'WeakSet',
-      'Promise', 'Symbol', 'BigInt'
+      'string',
+      'number',
+      'boolean',
+      'null',
+      'undefined',
+      'void',
+      'String',
+      'Number',
+      'Boolean',
+      'Object',
+      'Function',
+      'Date',
+      'RegExp',
+      'Error',
+      'Map',
+      'Set',
+      'WeakMap',
+      'WeakSet',
+      'Promise',
+      'Symbol',
+      'BigInt',
     ];
     return primitives.includes(typeName);
   }
@@ -313,8 +336,8 @@ export class CompositionAnalyzer {
           lineNumber: site.line,
           snippet: `${site.propertyName}: ${site.composedTypeName}${site.isArray ? '[]' : ''}`,
           confidence: 1.0,
-          context: `Property declaration in ${site.composerName}`
-        }
+          context: `Property declaration in ${site.composerName}`,
+        },
       ],
       discoveredBy: 'ast-parsing',
       confidence: 1.0,
@@ -326,11 +349,11 @@ export class CompositionAnalyzer {
         isArray: site.isArray,
         isOptional: site.isOptional,
         isUnion: site.isUnion,
-        composerName: site.composerName
+        composerName: site.composerName,
       },
       createdAt: timestamp,
       updatedAt: timestamp,
-      description: `${site.composerName} has-a ${site.isArray ? 'collection of ' : ''}${site.composedTypeName}`
+      description: `${site.composerName} has-a ${site.isArray ? 'collection of ' : ''}${site.composedTypeName}`,
     };
   }
 }

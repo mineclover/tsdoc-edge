@@ -2,12 +2,12 @@
  * TemporalOrderAnalyzer Tests
  */
 
-import * as ts from 'typescript';
-import * as path from 'node:path';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import * as ts from 'typescript';
 import { TemporalOrderAnalyzer } from '../../analyzer/TemporalOrderAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships';
 
 describe('TemporalOrderAnalyzer', () => {
@@ -196,9 +196,7 @@ describe('TemporalOrderAnalyzer', () => {
 
       const temporalOrder = result.find(
         (r) =>
-          r.type === 'temporal-order' &&
-          r.from === 'func-initialize' &&
-          r.to === 'func-configure'
+          r.type === 'temporal-order' && r.from === 'func-initialize' && r.to === 'func-configure'
       );
 
       expect(temporalOrder).toBeDefined();
@@ -227,10 +225,7 @@ describe('TemporalOrderAnalyzer', () => {
       const result = analyzer.analyze();
 
       const temporalOrder = result.find(
-        (r) =>
-          r.type === 'temporal-order' &&
-          r.from === 'func-getdata' &&
-          r.to === 'func-process'
+        (r) => r.type === 'temporal-order' && r.from === 'func-getdata' && r.to === 'func-process'
       );
 
       expect(temporalOrder).toBeDefined();
@@ -263,9 +258,7 @@ describe('TemporalOrderAnalyzer', () => {
       const result = analyzer.analyze();
 
       // Should deduplicate same pairs
-      const pairs = result.filter(
-        (r) => r.from === 'func-a' && r.to === 'func-b'
-      );
+      const pairs = result.filter((r) => r.from === 'func-a' && r.to === 'func-b');
       expect(pairs).toHaveLength(1);
     });
   });
@@ -294,9 +287,7 @@ describe('TemporalOrderAnalyzer', () => {
 
       const temporalOrder = result.find(
         (r) =>
-          r.type === 'temporal-order' &&
-          r.from === 'func-fetchdata' &&
-          r.to === 'func-savedata'
+          r.type === 'temporal-order' && r.from === 'func-fetchdata' && r.to === 'func-savedata'
       );
 
       expect(temporalOrder).toBeDefined();
@@ -326,9 +317,7 @@ describe('TemporalOrderAnalyzer', () => {
 
       const temporalOrder = result.find(
         (r) =>
-          r.type === 'temporal-order' &&
-          r.from === 'func-fetchuser' &&
-          r.to === 'func-updateuser'
+          r.type === 'temporal-order' && r.from === 'func-fetchuser' && r.to === 'func-updateuser'
       );
 
       expect(temporalOrder).toBeDefined();
@@ -427,9 +416,7 @@ describe('TemporalOrderAnalyzer', () => {
       const result = analyzer.analyze();
 
       const setupOrder = result.find(
-        (r) =>
-          r.type === 'temporal-order' &&
-          r.properties?.pattern === 'setup-teardown'
+        (r) => r.type === 'temporal-order' && r.properties?.pattern === 'setup-teardown'
       );
 
       expect(setupOrder).toBeDefined();
@@ -465,10 +452,8 @@ describe('TemporalOrderAnalyzer', () => {
       const result = analyzer.analyze();
 
       // Constructor field initialization order is detected
-      const constructorOrder = result.find(
-        (r) =>
-          r.type === 'temporal-order' &&
-          r.properties?.pattern === 'sequential-calls'
+      const _constructorOrder = result.find(
+        (r) => r.type === 'temporal-order' && r.properties?.pattern === 'sequential-calls'
       );
 
       // The analyzer creates relationships for property initialization order
@@ -535,7 +520,7 @@ describe('TemporalOrderAnalyzer', () => {
       expect(stats.byPattern['sequential-calls']).toBe(1);
       expect(stats.byPattern['promise-chain']).toBe(1);
       expect(stats.byPattern['setup-teardown']).toBe(1);
-      expect(stats.byPattern['lifecycle']).toBe(0);
+      expect(stats.byPattern.lifecycle).toBe(0);
     });
 
     it('should return zero counts for empty relationships', () => {
@@ -548,7 +533,7 @@ describe('TemporalOrderAnalyzer', () => {
       expect(stats.byPattern['sequential-calls']).toBe(0);
       expect(stats.byPattern['promise-chain']).toBe(0);
       expect(stats.byPattern['setup-teardown']).toBe(0);
-      expect(stats.byPattern['lifecycle']).toBe(0);
+      expect(stats.byPattern.lifecycle).toBe(0);
     });
   });
 
@@ -650,9 +635,7 @@ describe('TemporalOrderAnalyzer', () => {
       const analyzer = new TemporalOrderAnalyzer(graph, program);
       const result = analyzer.analyze();
 
-      const sequentialRel = result.find(
-        (r) => r.properties?.pattern === 'sequential-calls'
-      );
+      const sequentialRel = result.find((r) => r.properties?.pattern === 'sequential-calls');
 
       if (sequentialRel) {
         // Sequential calls should have confidence of 0.7
@@ -779,9 +762,7 @@ describe('TemporalOrderAnalyzer', () => {
       const analyzer = new TemporalOrderAnalyzer(graph, program);
       const result = analyzer.analyze();
 
-      const temporalOrder = result.find(
-        (r) => r.from === 'func-load' && r.to === 'func-save'
-      );
+      const temporalOrder = result.find((r) => r.from === 'func-load' && r.to === 'func-save');
 
       expect(temporalOrder).toBeDefined();
     });
@@ -837,12 +818,8 @@ describe('TemporalOrderAnalyzer', () => {
       const analyzer = new TemporalOrderAnalyzer(graph, program);
       const result = analyzer.analyze();
 
-      const abOrder = result.find(
-        (r) => r.from === 'func-a' && r.to === 'func-b'
-      );
-      const bcOrder = result.find(
-        (r) => r.from === 'func-b' && r.to === 'func-c'
-      );
+      const abOrder = result.find((r) => r.from === 'func-a' && r.to === 'func-b');
+      const bcOrder = result.find((r) => r.from === 'func-b' && r.to === 'func-c');
 
       expect(abOrder).toBeDefined();
       expect(bcOrder).toBeDefined();

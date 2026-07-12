@@ -26,7 +26,7 @@ const typeQuery = `
   ORDER BY count DESC
 `;
 
-const typeStats = db['db'].prepare(typeQuery).all() as Array<{ type: string; count: number }>;
+const typeStats = db.db.prepare(typeQuery).all() as Array<{ type: string; count: number }>;
 
 console.log('📋 Symbols by Type:');
 typeStats.forEach(({ type, count }) => {
@@ -57,7 +57,11 @@ const testScenariosQuery = `
 `;
 
 console.log('🧪 Sample Test Suites:');
-const testSuites = db['db'].prepare(testSuitesQuery).all() as Array<{ id: string; name: string; filePath: string }>;
+const testSuites = db.db.prepare(testSuitesQuery).all() as Array<{
+  id: string;
+  name: string;
+  filePath: string;
+}>;
 testSuites.forEach(({ id, name, filePath }) => {
   console.log(`   ${id}`);
   console.log(`      Name: ${name}`);
@@ -66,7 +70,11 @@ testSuites.forEach(({ id, name, filePath }) => {
 });
 
 console.log('🧪 Sample Test Cases:');
-const testCases = db['db'].prepare(testCasesQuery).all() as Array<{ id: string; name: string; filePath: string }>;
+const testCases = db.db.prepare(testCasesQuery).all() as Array<{
+  id: string;
+  name: string;
+  filePath: string;
+}>;
 testCases.forEach(({ id, name, filePath }) => {
   console.log(`   ${id}`);
   console.log(`      Name: ${name}`);
@@ -75,7 +83,11 @@ testCases.forEach(({ id, name, filePath }) => {
 });
 
 console.log('🧪 Sample Test Scenarios:');
-const testScenarios = db['db'].prepare(testScenariosQuery).all() as Array<{ id: string; name: string; filePath: string }>;
+const testScenarios = db.db.prepare(testScenariosQuery).all() as Array<{
+  id: string;
+  name: string;
+  filePath: string;
+}>;
 testScenarios.forEach(({ id, name, filePath }) => {
   console.log(`   ${id}`);
   console.log(`      Name: ${name}`);
@@ -92,7 +104,11 @@ const specificFileQuery = `
 `;
 
 console.log('📁 Symbols in DatabaseManager.test.ts:');
-const specificSymbols = db['db'].prepare(specificFileQuery).all() as Array<{ id: string; name: string; type: string }>;
+const specificSymbols = db.db.prepare(specificFileQuery).all() as Array<{
+  id: string;
+  name: string;
+  type: string;
+}>;
 console.log(`   Found ${specificSymbols.length} symbols`);
 specificSymbols.slice(0, 10).forEach(({ id, name, type }) => {
   console.log(`   [${type.padEnd(15)}] ${name}`);

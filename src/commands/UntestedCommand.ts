@@ -3,12 +3,12 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, colors, type CommandResult } from './BaseCommand';
-import { DatabaseManager, type SymbolRow } from '../storage/DatabaseManager';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { SymbolSearchEngine } from '../graph/SymbolSearchEngine';
-import type { Symbol } from '../types/graph/graph';
+import { DatabaseManager } from '../storage/DatabaseManager';
 import type { SymbolType } from '../types/graph';
+import type { Symbol } from '../types/graph/graph';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * UntestedCommand - Find symbols without test coverage
@@ -110,10 +110,11 @@ export class UntestedCommand extends BaseCommand {
 
         // Filter out test files if requested
         if (excludeTests) {
-          untested = untested.filter(s =>
-            !s.filePath.includes('__tests__') &&
-            !s.filePath.includes('.test.') &&
-            !s.filePath.includes('.spec.')
+          untested = untested.filter(
+            (s) =>
+              !s.filePath.includes('__tests__') &&
+              !s.filePath.includes('.test.') &&
+              !s.filePath.includes('.spec.')
           );
         }
 
@@ -125,7 +126,9 @@ export class UntestedCommand extends BaseCommand {
           console.log();
 
           for (const symbol of untested) {
-            console.log(`${colors.bold}${symbol.id}${colors.reset} → ${symbol.name} (${symbol.type})`);
+            console.log(
+              `${colors.bold}${symbol.id}${colors.reset} → ${symbol.name} (${symbol.type})`
+            );
             console.log(`  Location: ${symbol.filePath}:${symbol.line}`);
             console.log();
           }

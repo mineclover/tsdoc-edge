@@ -5,8 +5,8 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, colors, type CommandResult } from './BaseCommand';
 import { PreCommitChecker } from '../analyzer/PreCommitChecker';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * PreCommitRunCommand - Execute pre-commit documentation checks
@@ -64,11 +64,11 @@ export class PreCommitRunCommand extends BaseCommand {
 
       const checkAll = args.includes('--all');
       const strict = args.includes('--strict');
-      let threshold: number | undefined;
+      let _threshold: number | undefined;
 
       for (const arg of args) {
         if (arg.startsWith('--threshold=')) {
-          threshold = Number.parseInt(arg.split('=')[1], 10);
+          _threshold = Number.parseInt(arg.split('=')[1], 10);
         }
       }
 
@@ -104,18 +104,23 @@ export class PreCommitRunCommand extends BaseCommand {
             ? `${colors.green}✓${colors.reset}`
             : `${colors.red}✗${colors.reset}`;
 
-          const scoreColor = file.averageCompleteness >= 70
-            ? colors.green
-            : file.averageCompleteness >= 50
-              ? colors.yellow
-              : colors.red;
+          const scoreColor =
+            file.averageCompleteness >= 70
+              ? colors.green
+              : file.averageCompleteness >= 50
+                ? colors.yellow
+                : colors.red;
 
-          console.log(`${status} ${file.filePath} ${scoreColor}(${file.averageCompleteness}%)${colors.reset}`);
+          console.log(
+            `${status} ${file.filePath} ${scoreColor}(${file.averageCompleteness}%)${colors.reset}`
+          );
 
           if (!file.passed) {
             hasFailures = true;
             for (const symbol of file.failedSymbols) {
-              console.log(`  ${colors.red}✗${colors.reset} ${symbol.name}: ${symbol.completeness}%`);
+              console.log(
+                `  ${colors.red}✗${colors.reset} ${symbol.name}: ${symbol.completeness}%`
+              );
             }
           } else if (file.averageCompleteness < 70) {
             hasWarnings = true;
@@ -127,9 +132,13 @@ export class PreCommitRunCommand extends BaseCommand {
         console.log(`  Files: ${report.fileResults.length}`);
         console.log(`  Passed: ${colors.green}${report.passedFiles}${colors.reset}`);
         console.log(`  Failed: ${colors.red}${report.failedFiles}${colors.reset}`);
-        const avgScore = report.fileResults.length > 0
-          ? Math.round(report.fileResults.reduce((sum, f) => sum + f.averageCompleteness, 0) / report.fileResults.length)
-          : 0;
+        const avgScore =
+          report.fileResults.length > 0
+            ? Math.round(
+                report.fileResults.reduce((sum, f) => sum + f.averageCompleteness, 0) /
+                  report.fileResults.length
+              )
+            : 0;
         console.log(`  Average: ${avgScore}%`);
         console.log();
 
@@ -143,7 +152,9 @@ export class PreCommitRunCommand extends BaseCommand {
         }
 
         if (strict && hasWarnings) {
-          console.log(`${colors.yellow}! Pre-commit passed with warnings (strict mode)${colors.reset}`);
+          console.log(
+            `${colors.yellow}! Pre-commit passed with warnings (strict mode)${colors.reset}`
+          );
           return {
             exitCode: 1,
             message: 'Pre-commit passed with warnings (strict mode)',

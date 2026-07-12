@@ -17,7 +17,7 @@ describe('UnusedDocumentDetector', () => {
   beforeEach(() => {
     detector = new UnusedDocumentDetector();
     tempDir = fs.realpathSync(
-      fs.mkdtempSync(path.join(require('os').tmpdir(), 'unused-detector-test-'))
+      fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'unused-detector-test-'))
     );
   });
 

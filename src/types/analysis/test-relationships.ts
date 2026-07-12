@@ -41,7 +41,12 @@ export interface UsagePattern {
   /** Line number of usage */
   lineNumber: number;
   /** Type of usage */
-  usageType: 'import' | 'instantiation' | 'method-call' | 'dependency-injection' | 'property-access';
+  usageType:
+    | 'import'
+    | 'instantiation'
+    | 'method-call'
+    | 'dependency-injection'
+    | 'property-access';
   /** Code snippet */
   codeSnippet?: string;
   /** Related symbols (for dependency injection, method calls) */

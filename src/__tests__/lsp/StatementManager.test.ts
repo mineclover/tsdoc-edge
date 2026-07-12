@@ -7,31 +7,32 @@
  * @testScenario Cache statistics
  */
 
-import { StatementManager, StatementManagerOptions } from '../../lsp/statement-manager';
+import { StatementManager } from '../../lsp/statement-manager';
 import type { SqliteDatabase } from '../../types/database';
 
 describe('StatementManager', () => {
   // Mock database with required SqliteDatabase properties
-  const createMockDb = (): SqliteDatabase => ({
-    memory: false,
-    readonly: false,
-    name: 'test.db',
-    open: true,
-    inTransaction: false,
-    prepare: jest.fn((sql: string) => ({
-      database: {} as SqliteDatabase,
-      source: sql,
-      reader: true,
-      readonly: true,
-      get: jest.fn(),
-      all: jest.fn(),
-      run: jest.fn(),
-      iterate: jest.fn(),
-    })),
-    exec: jest.fn().mockReturnThis(),
-    close: jest.fn().mockReturnThis(),
-    transaction: jest.fn((fn) => fn),
-  } as unknown as SqliteDatabase);
+  const createMockDb = (): SqliteDatabase =>
+    ({
+      memory: false,
+      readonly: false,
+      name: 'test.db',
+      open: true,
+      inTransaction: false,
+      prepare: jest.fn((sql: string) => ({
+        database: {} as SqliteDatabase,
+        source: sql,
+        reader: true,
+        readonly: true,
+        get: jest.fn(),
+        all: jest.fn(),
+        run: jest.fn(),
+        iterate: jest.fn(),
+      })),
+      exec: jest.fn().mockReturnThis(),
+      close: jest.fn().mockReturnThis(),
+      transaction: jest.fn((fn) => fn),
+    }) as unknown as SqliteDatabase;
 
   describe('constructor', () => {
     it('should create manager with default options', () => {

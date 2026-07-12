@@ -3,8 +3,7 @@
  */
 
 import { IODependencyAnalyzer } from '../../analyzer/IODependencyAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
-import type { UnifiedRelationship } from '../../types/relationships';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 
 describe('IODependencyAnalyzer', () => {
   // Helper to create mock graph
@@ -128,9 +127,7 @@ describe('IODependencyAnalyzer', () => {
 
       const ioDep = result.find(
         (r) =>
-          r.type === 'io-dependency' &&
-          r.from === 'func-getuser' &&
-          r.to === 'func-processuser'
+          r.type === 'io-dependency' && r.from === 'func-getuser' && r.to === 'func-processuser'
       );
 
       expect(ioDep).toBeDefined();
@@ -157,9 +154,7 @@ describe('IODependencyAnalyzer', () => {
       const analyzer = new IODependencyAnalyzer(graph);
       const result = analyzer.analyze();
 
-      const ioDep = result.find(
-        (r) => r.properties?.dataType === 'OrderData'
-      );
+      const ioDep = result.find((r) => r.properties?.dataType === 'OrderData');
 
       expect(ioDep).toBeDefined();
     });
@@ -183,9 +178,7 @@ describe('IODependencyAnalyzer', () => {
       const analyzer = new IODependencyAnalyzer(graph);
       const result = analyzer.analyze();
 
-      const ioDep = result.find(
-        (r) => r.properties?.dataType === 'TaskInfo'
-      );
+      const ioDep = result.find((r) => r.properties?.dataType === 'TaskInfo');
 
       expect(ioDep).toBeDefined();
     });
@@ -209,9 +202,7 @@ describe('IODependencyAnalyzer', () => {
       const analyzer = new IODependencyAnalyzer(graph);
       const result = analyzer.analyze();
 
-      const ioDep = result.find(
-        (r) => r.properties?.dataType === 'OrderResult'
-      );
+      const ioDep = result.find((r) => r.properties?.dataType === 'OrderResult');
 
       expect(ioDep).toBeDefined();
     });
@@ -235,9 +226,7 @@ describe('IODependencyAnalyzer', () => {
       const analyzer = new IODependencyAnalyzer(graph);
       const result = analyzer.analyze();
 
-      const ioDep = result.find(
-        (r) => r.properties?.dataType === 'ConfigData'
-      );
+      const ioDep = result.find((r) => r.properties?.dataType === 'ConfigData');
 
       expect(ioDep).toBeDefined();
     });
@@ -352,9 +341,7 @@ describe('IODependencyAnalyzer', () => {
       const analyzer = new IODependencyAnalyzer(graph);
       const result = analyzer.analyze();
 
-      const selfRef = result.find(
-        (r) => r.from === r.to
-      );
+      const selfRef = result.find((r) => r.from === r.to);
 
       expect(selfRef).toBeUndefined();
     });
@@ -645,9 +632,7 @@ describe('IODependencyAnalyzer', () => {
       const result = analyzer.analyze();
 
       const ioDep = result.find(
-        (r) =>
-          r.from === 'method-getdata' &&
-          r.to === 'method-processdata'
+        (r) => r.from === 'method-getdata' && r.to === 'method-processdata'
       );
 
       expect(ioDep).toBeDefined();

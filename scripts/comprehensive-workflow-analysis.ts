@@ -3,10 +3,10 @@
  * Tests all documentation query and generation workflows
  */
 
-import { DatabaseManager } from '../src/storage/DatabaseManager';
-import { ConfigManager } from '../src/config/ConfigManager';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { ConfigManager } from '../src/config/ConfigManager';
+import { DatabaseManager } from '../src/storage/DatabaseManager';
 
 interface WorkflowTest {
   name: string;
@@ -40,10 +40,10 @@ async function main() {
           details: {
             symbols: symbols.length,
             relationships: relationships.length,
-            density: (relationships.length / symbols.length).toFixed(2)
-          }
+            density: (relationships.length / symbols.length).toFixed(2),
+          },
         };
-      }
+      },
     },
 
     // 2. Symbol Retrieval by ID
@@ -65,10 +65,10 @@ async function main() {
             location: `${symbol.filePath}:${symbol.line}`,
             hasSummary: !!symbol.summary,
             hasContract: !!symbol.contract,
-            hasResponsibility: !!symbol.responsibility
-          }
+            hasResponsibility: !!symbol.responsibility,
+          },
         };
-      }
+      },
     },
 
     // 3. Relationship Query
@@ -76,7 +76,7 @@ async function main() {
       name: '3. Relationship Query for Symbol',
       test: async () => {
         const allRels = db.getAllUnifiedRelationships();
-        const symbolRels = allRels.filter(r => {
+        const symbolRels = allRels.filter((r) => {
           const from = Array.isArray(r.from) ? r.from : [r.from];
           const to = Array.isArray(r.to) ? r.to : [r.to];
           return from.includes('class-databasemanager') || to.includes('class-databasemanager');
@@ -101,10 +101,10 @@ async function main() {
             topTypes: Object.entries(byType)
               .sort((a, b) => b[1] - a[1])
               .slice(0, 5)
-              .map(([type, count]) => `${type}:${count}`)
-          }
+              .map(([type, count]) => `${type}:${count}`),
+          },
         };
-      }
+      },
     },
 
     // 4. Test-as-Example Relationships
@@ -112,14 +112,14 @@ async function main() {
       name: '4. Test-as-Example Relationship Query',
       test: async () => {
         const allRels = db.getAllUnifiedRelationships();
-        const testExampleRels = allRels.filter(r => r.type === 'test-as-example');
+        const testExampleRels = allRels.filter((r) => r.type === 'test-as-example');
 
         if (testExampleRels.length === 0) {
           return { success: false, message: 'No test-as-example relationships found' };
         }
 
         // Find examples for DatabaseManager
-        const dmExamples = testExampleRels.filter(r => {
+        const dmExamples = testExampleRels.filter((r) => {
           const to = Array.isArray(r.to) ? r.to : [r.to];
           return to.includes('class-databasemanager');
         });
@@ -130,14 +130,14 @@ async function main() {
           details: {
             total: testExampleRels.length,
             forDatabaseManager: dmExamples.length,
-            sampleExamples: dmExamples.slice(0, 3).map(r => ({
+            sampleExamples: dmExamples.slice(0, 3).map((r) => ({
               from: r.from,
               quality: r.confidence,
-              category: r.properties?.exampleCategory
-            }))
-          }
+              category: r.properties?.exampleCategory,
+            })),
+          },
         };
-      }
+      },
     },
 
     // 5. Symbol Search
@@ -155,10 +155,10 @@ async function main() {
           message: `Found ${results.length} symbols matching 'Database'`,
           details: {
             count: results.length,
-            topResults: results.slice(0, 5)
-          }
+            topResults: results.slice(0, 5),
+          },
         };
-      }
+      },
     },
 
     // 6. Document Symbols
@@ -198,10 +198,10 @@ async function main() {
           message: `Found ${mdCount} markdown files in managed/`,
           details: {
             markdownFiles: mdCount,
-            path: managedPath
-          }
+            path: managedPath,
+          },
         };
-      }
+      },
     },
 
     // 7. Relationship Type Coverage
@@ -229,11 +229,11 @@ async function main() {
           'covers-scenario',
           'inheritance',
           'feature-grouping',
-          'explicit-semantic-relation'
+          'explicit-semantic-relation',
         ];
 
-        const missingTypes = expectedTypes.filter(t => !types.includes(t));
-        const unexpectedTypes = types.filter(t => !expectedTypes.includes(t));
+        const missingTypes = expectedTypes.filter((t) => !types.includes(t));
+        const unexpectedTypes = types.filter((t) => !expectedTypes.includes(t));
 
         return {
           success: missingTypes.length === 0,
@@ -242,10 +242,10 @@ async function main() {
             foundTypes: types,
             typeCount,
             missingTypes,
-            unexpectedTypes: unexpectedTypes.length > 0 ? unexpectedTypes : undefined
-          }
+            unexpectedTypes: unexpectedTypes.length > 0 ? unexpectedTypes : undefined,
+          },
         };
-      }
+      },
     },
 
     // 8. SSOT Compliance (doc-reference)
@@ -253,18 +253,18 @@ async function main() {
       name: '8. SSOT Compliance (doc-reference bidirectional)',
       test: async () => {
         const allRels = db.getAllUnifiedRelationships();
-        const docRefs = allRels.filter(r => r.type === 'doc-reference');
+        const docRefs = allRels.filter((r) => r.type === 'doc-reference');
 
         if (docRefs.length === 0) {
           return { success: false, message: 'No doc-reference relationships found' };
         }
 
         // Check bidirectionality
-        const codeToDoc = docRefs.filter(r => {
+        const codeToDoc = docRefs.filter((r) => {
           const from = Array.isArray(r.from) ? r.from[0] : r.from;
           return !from.startsWith('doc:');
         });
-        const docToCode = docRefs.filter(r => {
+        const docToCode = docRefs.filter((r) => {
           const from = Array.isArray(r.from) ? r.from[0] : r.from;
           return from.startsWith('doc:');
         });
@@ -276,10 +276,10 @@ async function main() {
             total: docRefs.length,
             codeToDoc: codeToDoc.length,
             docToCode: docToCode.length,
-            bidirectional: codeToDoc.length > 0 && docToCode.length > 0
-          }
+            bidirectional: codeToDoc.length > 0 && docToCode.length > 0,
+          },
         };
-      }
+      },
     },
 
     // 9. Relationship Density by Category
@@ -294,18 +294,17 @@ async function main() {
           categoryCount[cat] = (categoryCount[cat] || 0) + 1;
         }
 
-        const categories = Object.entries(categoryCount)
-          .sort((a, b) => b[1] - a[1]);
+        const categories = Object.entries(categoryCount).sort((a, b) => b[1] - a[1]);
 
         return {
           success: true,
           message: `Found ${categories.length} relationship categories`,
           details: {
             categories: Object.fromEntries(categories),
-            top3: categories.slice(0, 3).map(([cat, count]) => `${cat}:${count}`)
-          }
+            top3: categories.slice(0, 3).map(([cat, count]) => `${cat}:${count}`),
+          },
         };
-      }
+      },
     },
 
     // 10. Inference Engine Results
@@ -315,10 +314,11 @@ async function main() {
         const allRels = db.getAllUnifiedRelationships();
 
         // Inferred relationships have specific properties
-        const inferred = allRels.filter(r =>
-          r.properties?.inferred === true ||
-          r.description?.includes('inferred') ||
-          r.description?.includes('Inferred')
+        const inferred = allRels.filter(
+          (r) =>
+            r.properties?.inferred === true ||
+            r.description?.includes('inferred') ||
+            r.description?.includes('Inferred')
         );
 
         return {
@@ -326,15 +326,18 @@ async function main() {
           message: `Found ${inferred.length} potentially inferred relationships`,
           details: {
             inferredCount: inferred.length,
-            percentage: ((inferred.length / allRels.length) * 100).toFixed(1) + '%',
-            byType: inferred.reduce((acc, r) => {
-              acc[r.type] = (acc[r.type] || 0) + 1;
-              return acc;
-            }, {} as Record<string, number>)
-          }
+            percentage: `${((inferred.length / allRels.length) * 100).toFixed(1)}%`,
+            byType: inferred.reduce(
+              (acc, r) => {
+                acc[r.type] = (acc[r.type] || 0) + 1;
+                return acc;
+              },
+              {} as Record<string, number>
+            ),
+          },
         };
-      }
-    }
+      },
+    },
   ];
 
   // Run all tests
@@ -367,7 +370,7 @@ async function main() {
   }
 
   // Summary
-  console.log('\n' + '='.repeat(80));
+  console.log(`\n${'='.repeat(80)}`);
   console.log('\n📊 Test Summary');
   console.log('-'.repeat(80));
   console.log(`Total tests: ${tests.length}`);

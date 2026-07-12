@@ -4,9 +4,8 @@
  * @responsibility Manage specification document version tracking and comparison
  */
 
-import * as fs from 'node:fs';
-import * as path from 'node:path';
 import { execSync } from 'node:child_process';
+import * as fs from 'node:fs';
 
 /**
  * Version bump type
@@ -61,10 +60,10 @@ export class SpecVersionManager {
 
     try {
       // Get git log for this file
-      const gitLog = execSync(
-        `git log --follow --format="%H|%ai|%an|%s" -- "${filePath}"`,
-        { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'ignore'] }
-      ).trim();
+      const gitLog = execSync(`git log --follow --format="%H|%ai|%an|%s" -- "${filePath}"`, {
+        encoding: 'utf-8',
+        stdio: ['pipe', 'pipe', 'ignore'],
+      }).trim();
 
       if (!gitLog) {
         return [];
@@ -88,7 +87,7 @@ export class SpecVersionManager {
           });
         }
       }
-    } catch (error) {
+    } catch (_error) {
       // Not a git repository or git not available
       console.warn('Git is not available or file is not tracked');
 
@@ -201,7 +200,10 @@ export class SpecVersionManager {
   /**
    * Analyze changes between two versions
    */
-  private analyzeChanges(fromContent: string, toContent: string): {
+  private analyzeChanges(
+    fromContent: string,
+    toContent: string
+  ): {
     added: string[];
     removed: string[];
     modified: string[];
@@ -301,17 +303,11 @@ export class SpecVersionManager {
 
     // Update frontmatter
     let content = fs.readFileSync(filePath, 'utf-8');
-    content = content.replace(
-      /^version:\s*.+$/m,
-      `version: ${newVersion}`
-    );
+    content = content.replace(/^version:\s*.+$/m, `version: ${newVersion}`);
 
     // Update lastUpdated
     const today = new Date().toISOString().split('T')[0];
-    content = content.replace(
-      /^lastUpdated:\s*.+$/m,
-      `lastUpdated: ${today}`
-    );
+    content = content.replace(/^lastUpdated:\s*.+$/m, `lastUpdated: ${today}`);
 
     fs.writeFileSync(filePath, content, 'utf-8');
 
@@ -324,7 +320,7 @@ export class SpecVersionManager {
   private calculateNewVersion(current: string, bumpType: VersionBumpType): string {
     const parts = current.split('.').map(Number);
 
-    if (parts.length !== 3 || parts.some(isNaN)) {
+    if (parts.length !== 3 || parts.some(Number.isNaN)) {
       throw new Error(`Invalid version format: ${current}. Expected format: X.Y.Z`);
     }
 

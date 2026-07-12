@@ -2,10 +2,10 @@
  * Tests for GeneratedDocsValidator
  */
 
-import { GeneratedDocsValidator } from '../../validator/GeneratedDocsValidator';
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 import * as os from 'node:os';
+import * as path from 'node:path';
+import { GeneratedDocsValidator } from '../../validator/GeneratedDocsValidator';
 
 describe('GeneratedDocsValidator', () => {
   let validator: GeneratedDocsValidator;
@@ -23,14 +23,17 @@ describe('GeneratedDocsValidator', () => {
   describe('validate', () => {
     it('should validate a well-formed document', () => {
       const docPath = path.join(tempDir, 'TestSymbol.md');
-      fs.writeFileSync(docPath, `# TestSymbol
+      fs.writeFileSync(
+        docPath,
+        `# TestSymbol
 
 ## Problem Solving
 This is a test.
 
 ## Functionality
 Does stuff.
-`);
+`
+      );
 
       const result = validator.validate(docPath);
 
@@ -39,10 +42,13 @@ Does stuff.
 
     it('should extract symbol name from H1', () => {
       const docPath = path.join(tempDir, 'MySymbol.md');
-      fs.writeFileSync(docPath, `# MySymbol
+      fs.writeFileSync(
+        docPath,
+        `# MySymbol
 
 Some content.
-`);
+`
+      );
 
       const result = validator.validate(docPath);
 
@@ -51,7 +57,9 @@ Some content.
 
     it('should detect document sections', () => {
       const docPath = path.join(tempDir, 'Symbol.md');
-      fs.writeFileSync(docPath, `# Symbol
+      fs.writeFileSync(
+        docPath,
+        `# Symbol
 
 ## Problem Solving
 Problem here.
@@ -61,7 +69,8 @@ Function here.
 
 ## Decisions
 Decision here.
-`);
+`
+      );
 
       const result = validator.validate(docPath);
 

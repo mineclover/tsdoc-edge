@@ -5,8 +5,8 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, colors, type CommandResult } from './BaseCommand';
 import { CodeHealthChecker } from '../analyzer/CodeHealthChecker';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * FixCommand - Automatically fix documentation issues

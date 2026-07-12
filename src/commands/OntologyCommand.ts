@@ -5,8 +5,8 @@
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { OntologyStatsCommand } from './OntologyStatsCommand';
 import { OntologyListCommand } from './OntologyListCommand';
+import { OntologyStatsCommand } from './OntologyStatsCommand';
 
 const SUBCOMMANDS = {
   stats: { command: OntologyStatsCommand, description: 'Show ontology statistics' },

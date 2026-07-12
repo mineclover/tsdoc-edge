@@ -5,8 +5,8 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { SpecCompletenessValidator } from '../spec/SpecCompletenessValidator';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * ValidateSpecCommand - Validate specifications
@@ -103,8 +103,12 @@ export class ValidateSpecCommand extends BaseCommand {
       console.log(`Incomplete: ${colors.yellow}${summary.incomplete}${colors.reset}`);
       console.log();
       console.log(`${colors.bold}Score Breakdown:${colors.reset}`);
-      console.log(`  Design Score:         ${this.colorizeScore(avgDesign)}${avgDesign}%${colors.reset}`);
-      console.log(`  Implementation Score: ${this.colorizeScore(avgImpl)}${avgImpl}%${colors.reset}`);
+      console.log(
+        `  Design Score:         ${this.colorizeScore(avgDesign)}${avgDesign}%${colors.reset}`
+      );
+      console.log(
+        `  Implementation Score: ${this.colorizeScore(avgImpl)}${avgImpl}%${colors.reset}`
+      );
       console.log(
         `  Total issues: ${summary.totalIssues > 0 ? colors.yellow : colors.green}${summary.totalIssues}${colors.reset}`
       );
@@ -115,9 +119,7 @@ export class ValidateSpecCommand extends BaseCommand {
         this.printSection('Complete Specifications');
         for (const result of completeSpecs.slice(0, 5)) {
           const fileName = path.basename(result.filePath);
-          console.log(
-            `${colors.green}✅${colors.reset} ${fileName}`
-          );
+          console.log(`${colors.green}✅${colors.reset} ${fileName}`);
           console.log(
             `   Design: ${this.colorizeScore(result.designScore)}${result.designScore}%${colors.reset}  Implementation: ${this.colorizeScore(result.implementationScore)}${result.implementationScore}%${colors.reset}`
           );
@@ -133,9 +135,7 @@ export class ValidateSpecCommand extends BaseCommand {
         this.printSection('Incomplete Specifications');
         for (const result of incompleteSpecs.slice(0, 5)) {
           const fileName = path.basename(result.filePath);
-          console.log(
-            `${colors.yellow}⚠️${colors.reset} ${fileName}`
-          );
+          console.log(`${colors.yellow}⚠️${colors.reset} ${fileName}`);
           console.log(
             `   Design: ${this.colorizeScore(result.designScore)}${result.designScore}%${colors.reset}  Implementation: ${this.colorizeScore(result.implementationScore)}${result.implementationScore}%${colors.reset}`
           );

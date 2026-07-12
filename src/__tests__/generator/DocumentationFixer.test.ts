@@ -430,7 +430,7 @@ export function compute(x: number, y: number): number {
       fs.writeFileSync(testFile, sourceCode, 'utf-8');
 
       const scores = analyzer.analyzeFile(testFile, sourceCode);
-      const result = fixer.fixFile(testFile, scores, { minScore: 0, addParams: true });
+      const _result = fixer.fixFile(testFile, scores, { minScore: 0, addParams: true });
 
       const fixedCode = fs.readFileSync(testFile, 'utf-8');
       expect(fixedCode).toContain('Existing summary');

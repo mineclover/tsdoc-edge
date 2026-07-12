@@ -186,7 +186,7 @@ Examples:
         if (!byDepth.has(node.depth)) {
           byDepth.set(node.depth, []);
         }
-        byDepth.get(node.depth)!.push(node);
+        byDepth.get(node.depth)?.push(node);
       }
 
       // Display by depth level
@@ -203,7 +203,7 @@ Examples:
           if (!byCategory.has(node.category)) {
             byCategory.set(node.category, []);
           }
-          byCategory.get(node.category)!.push(node);
+          byCategory.get(node.category)?.push(node);
         }
 
         for (const [category, categoryNodes] of byCategory.entries()) {

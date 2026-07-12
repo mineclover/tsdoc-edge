@@ -11,9 +11,9 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult } from './BaseCommand';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import type { ParsedDocSymbols } from '../types/feature';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /**
  * Fix suggestion
@@ -158,7 +158,7 @@ export class SymbolFixCommand extends BaseCommand {
             this.symbols.set(parsed.primary.name, existing);
           }
         }
-      } catch (error) {
+      } catch (_error) {
         // Skip files with errors
       }
     }
@@ -180,16 +180,17 @@ export class SymbolFixCommand extends BaseCommand {
         const duplicates = docs.slice(1);
 
         for (const dup of duplicates) {
-          if (dup.primary) {
+          const duplicatePrimary = dup.primary;
+          if (duplicatePrimary) {
             suggestions.push({
               type: 'duplicate-h1',
               severity: 'manual',
               symbolName,
               filePath: dup.filePath,
-              line: dup.primary.line,
+              line: duplicatePrimary.line,
               issue: `Duplicate H1 definition (canonical is in ${canonical.filePath})`,
               suggestion: `Convert to H2 auxiliary definition`,
-              autoFix: () => this.convertH1ToH2(dup.filePath, dup.primary!.line, symbolName),
+              autoFix: () => this.convertH1ToH2(dup.filePath, duplicatePrimary.line, symbolName),
             });
           }
         }
@@ -215,9 +216,9 @@ export class SymbolFixCommand extends BaseCommand {
 
           // Suggest merging (prefer one with more docs)
           const [keep, remove] = docs1.length >= docs2.length ? [sym1, sym2] : [sym2, sym1];
-          const removeDoc = this.symbols.get(remove)![0];
+          const removeDoc = this.symbols.get(remove)?.[0];
 
-          if (removeDoc.primary) {
+          if (removeDoc?.primary) {
             suggestions.push({
               type: 'typo',
               severity: 'review',
@@ -255,13 +256,17 @@ export class SymbolFixCommand extends BaseCommand {
 
     for (const [type, list] of byType.entries()) {
       console.log();
-      console.log(`${this.colors.bold}${this.formatType(type)}:${this.colors.reset} ${list.length}`);
+      console.log(
+        `${this.colors.bold}${this.formatType(type)}:${this.colors.reset} ${list.length}`
+      );
       console.log();
 
       for (const suggestion of list.slice(0, 10)) {
         const icon = this.getSeverityIcon(suggestion.severity);
         console.log(`  ${icon} [[${suggestion.symbolName}]]`);
-        console.log(`     ${this.colors.dim}${this.relativePath(suggestion.filePath)}:${suggestion.line}${this.colors.reset}`);
+        console.log(
+          `     ${this.colors.dim}${this.relativePath(suggestion.filePath)}:${suggestion.line}${this.colors.reset}`
+        );
         console.log(`     ${this.colors.red}Issue:${this.colors.reset} ${suggestion.issue}`);
         console.log(`     ${this.colors.green}Fix:${this.colors.reset} ${suggestion.suggestion}`);
         console.log();
@@ -300,11 +305,16 @@ export class SymbolFixCommand extends BaseCommand {
 
     for (const suggestion of autoFixable) {
       try {
-        suggestion.autoFix!();
-        console.log(`${this.colors.green}✓${this.colors.reset} Fixed [[${suggestion.symbolName}]] in ${this.relativePath(suggestion.filePath)}`);
+        if (!suggestion.autoFix) continue;
+        suggestion.autoFix();
+        console.log(
+          `${this.colors.green}✓${this.colors.reset} Fixed [[${suggestion.symbolName}]] in ${this.relativePath(suggestion.filePath)}`
+        );
         fixed++;
       } catch (error) {
-        console.log(`${this.colors.red}✗${this.colors.reset} Failed to fix [[${suggestion.symbolName}]]: ${error}`);
+        console.log(
+          `${this.colors.red}✗${this.colors.reset} Failed to fix [[${suggestion.symbolName}]]: ${error}`
+        );
         failed++;
       }
     }
@@ -344,11 +354,11 @@ export class SymbolFixCommand extends BaseCommand {
    */
   private formatType(type: string): string {
     const map: Record<string, string> = {
-      'typo': '🔤 Possible Typos',
+      typo: '🔤 Possible Typos',
       'duplicate-h1': '📋 Duplicate H1 Definitions',
       'missing-primary': '❌ Missing Primary Definitions',
       'orphaned-aux': '🔗 Orphaned Auxiliaries',
-      'formatting': '✨ Formatting Issues',
+      formatting: '✨ Formatting Issues',
     };
     return map[type] || type;
   }
@@ -358,9 +368,9 @@ export class SymbolFixCommand extends BaseCommand {
    */
   private getSeverityIcon(severity: string): string {
     const map: Record<string, string> = {
-      'auto': '🤖',
-      'manual': '👤',
-      'review': '👀',
+      auto: '🤖',
+      manual: '👤',
+      review: '👀',
     };
     return map[severity] || '?';
   }
@@ -400,7 +410,10 @@ export class SymbolFixCommand extends BaseCommand {
    * Normalize symbol name
    */
   private normalizeSymbolName(name: string): string {
-    return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+    return name
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '');
   }
 
   /**

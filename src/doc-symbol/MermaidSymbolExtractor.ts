@@ -117,7 +117,7 @@ export class MermaidSymbolExtractor {
    * @returns Extraction result with symbols, relationships, and suggestions
    * @public
    */
-  extract(content: string, filePath: string): MermaidExtractionResult {
+  extract(content: string, _filePath: string): MermaidExtractionResult {
     const result: MermaidExtractionResult = {
       metadata: {
         diagramType: 'unknown',
@@ -130,15 +130,17 @@ export class MermaidSymbolExtractor {
     };
 
     // Parse diagram type and orientation
-    const diagramMatch = content.match(/^(graph|flowchart|classDiagram|sequenceDiagram)\s+(TB|LR|RL|BT)?/m);
+    const diagramMatch = content.match(
+      /^(graph|flowchart|classDiagram|sequenceDiagram)\s+(TB|LR|RL|BT)?/m
+    );
     if (diagramMatch) {
       result.metadata.diagramType = diagramMatch[1];
       result.metadata.orientation = diagramMatch[2];
     }
 
     // Parse subgraphs
-    const subgraphRegex = /subgraph\s+"([^"]+)"/g;
-    let subgraphMatch;
+    const _subgraphRegex = /subgraph\s+"([^"]+)"/g;
+    let _subgraphMatch;
     let currentSubgraph: string | undefined;
 
     const lines = content.split('\n');
@@ -173,7 +175,7 @@ export class MermaidSymbolExtractor {
         const symbol = this.parseNodeLabel(nodeId, label, currentSubgraph);
 
         // Skip if we already have this node
-        if (result.symbols.some(s => s.nodeId === nodeId)) continue;
+        if (result.symbols.some((s) => s.nodeId === nodeId)) continue;
 
         result.symbols.push(symbol);
         // Only add to symbolReferences if valid symbol name exists and looks like a real symbol
@@ -187,7 +189,9 @@ export class MermaidSymbolExtractor {
       // Parse relationships: A --> B, A -.-> B, A ==> B
       // Also handles: A["Label"] --> B["Label"]
       // Node IDs can be uppercase, lowercase, numbers, underscores, hyphens
-      const relMatch = trimmed.match(/^([A-Za-z0-9_-]+)(?:\["[^\]"]*"\])?\s*(-->|\.\.->|-\.->|==>|<-->)\s*([A-Za-z0-9_-]+)/);
+      const relMatch = trimmed.match(
+        /^([A-Za-z0-9_-]+)(?:\["[^\]"]*"\])?\s*(-->|\.\.->|-\.->|==>|<-->)\s*([A-Za-z0-9_-]+)/
+      );
       if (relMatch) {
         const from = relMatch[1];
         const edgeType = this.parseEdgeType(relMatch[2]);
@@ -204,7 +208,9 @@ export class MermaidSymbolExtractor {
       // Parse relationships with labels: A -->|"label"| B
       // Also handles: A["Label"] -->|"edge label"| B["Label"]
       // Node IDs can be uppercase, lowercase, numbers, underscores, hyphens
-      const relLabelMatch = trimmed.match(/^([A-Za-z0-9_-]+)(?:\["[^\]"]*"\])?\s*(-->|\.\.->|-\.->|==>)\|"([^"]+)"\|\s*([A-Za-z0-9_-]+)/);
+      const relLabelMatch = trimmed.match(
+        /^([A-Za-z0-9_-]+)(?:\["[^\]"]*"\])?\s*(-->|\.\.->|-\.->|==>)\|"([^"]+)"\|\s*([A-Za-z0-9_-]+)/
+      );
       if (relLabelMatch) {
         const from = relLabelMatch[1];
         const edgeType = this.parseEdgeType(relLabelMatch[2]);
@@ -239,7 +245,10 @@ export class MermaidSymbolExtractor {
   private parseNodeLabel(nodeId: string, label: string, subgraph?: string): MermaidSymbol {
     // Remove HTML tags for parsing
     const cleanLabel = label.replace(/<br\/?>/g, '\n').replace(/<[^>]+>/g, '');
-    const lines = cleanLabel.split('\n').map(l => l.trim()).filter(l => l);
+    const lines = cleanLabel
+      .split('\n')
+      .map((l) => l.trim())
+      .filter((l) => l);
 
     // First line is usually the symbol name
     let symbolName = lines[0] || nodeId;
@@ -249,13 +258,13 @@ export class MermaidSymbolExtractor {
       // Relationship types
       'code-dependency': 'Code Dependency',
       'io-dependency': 'IO Dependency',
-      'I/O Dependency': 'IO Dependency',  // Handle slash variant
-      'inheritance': 'Inheritance',
+      'I/O Dependency': 'IO Dependency', // Handle slash variant
+      inheritance: 'Inheritance',
       'interface-impl': 'Interface Implementation',
-      'calls': 'Call Relationships',
-      'callback': 'Callback Pattern',
-      'composition': 'Composition Relationship',
-      'circular': 'Circular Dependency',
+      calls: 'Call Relationships',
+      callback: 'Callback Pattern',
+      composition: 'Composition Relationship',
+      circular: 'Circular Dependency',
       'event-flow': 'Event Flow',
       'type-dependency': 'Type Dependency',
       'generic-constraint': 'Generic Constraint',
@@ -263,8 +272,8 @@ export class MermaidSymbolExtractor {
       'module-boundary': 'Module Boundary',
       'test-coverage': 'Test Coverage',
       'doc-reference': 'Documentation Reference',
-      'enhancement': 'Enhancement',
-      'Function Calls': 'Call Relationships',  // Alias for calls
+      enhancement: 'Enhancement',
+      'Function Calls': 'Call Relationships', // Alias for calls
       // Common command/workflow patterns
       'work-context': 'WorkContextCommand',
     };
@@ -276,8 +285,9 @@ export class MermaidSymbolExtractor {
       // Clean up symbol name - if it starts with lowercase and has hyphens,
       // it's likely a data label not a symbol reference.
       // Convert to Title Case to match actual symbol names
-      symbolName = symbolName.split('-')
-        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      symbolName = symbolName
+        .split('-')
+        .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
         .join(' ');
     }
 
@@ -293,126 +303,126 @@ export class MermaidSymbolExtractor {
       /^TODO:/,
       /^Note:/,
       /^Filter:/,
-      /^\d+%$/,  // Pure percentages
-      /^\d+\.\s+/,  // Numbered lists (1., 2., etc.)
-      /^✅\s*/,  // Just checkmark
-      /^❌\s*/,  // Just X mark
-      /^🧪\s*/,  // Test tube emoji
-      /^🟢|^🔴|^🟡/,  // Colored circles
-      /[\u{1F300}-\u{1F9FF}]/u,  // Contains any emoji
-      /^Before:\s*/i,  // Before: prefixes
-      /^After:\s*/i,   // After: prefixes
-      /^Added:\s*/i,   // Added: prefixes
-      /^IDE:\s*/,      // IDE: labels
-      /^Editor:\s*/,   // Editor: labels
-      /^Reverse:\s*/,  // Reverse: labels
-      /\s+from\s+/i,   // Algorithm descriptions (DFS from each node)
-      /\s*\+\s*/,      // Contains plus signs (Code + Data + Behavior)
-      /\s*=\s*\?/,     // Query patterns (target = ?)
-      /^(Target|Confidence|Priority|Impact|Effort)$/,  // Single property names
-      /^I\/O\s+/,      // I/O prefix
-      /Deps$/i,        // Ends with Deps (I/O Deps, Code Deps)
-      /Detect$/i,      // Ends with Detect (Circular Detect)
-      /^⚠️\s*/,        // Warning emoji prefix
-      /^→\s*/,         // Arrow prefix
-      /Test\[/,        // TypeScript type syntax (Test[)
-      /Usage\[/,       // TypeScript type syntax (Usage[)
-      /Symbol\[/,      // TypeScript type syntax (Symbol[)
-      /DocRef\[/,      // TypeScript type syntax (DocRef[)
-      /Dep\[/,         // TypeScript type syntax (Dep[)
-      /^usedBy:/,      // usedBy: prefix
-      /^tests:/,       // tests: prefix
-      /^symbols:/,     // symbols: prefix
-      /^dependencies:/,// dependencies: prefix
+      /^\d+%$/, // Pure percentages
+      /^\d+\.\s+/, // Numbered lists (1., 2., etc.)
+      /^✅\s*/, // Just checkmark
+      /^❌\s*/, // Just X mark
+      /^🧪\s*/, // Test tube emoji
+      /^🟢|^🔴|^🟡/, // Colored circles
+      /[\u{1F300}-\u{1F9FF}]/u, // Contains any emoji
+      /^Before:\s*/i, // Before: prefixes
+      /^After:\s*/i, // After: prefixes
+      /^Added:\s*/i, // Added: prefixes
+      /^IDE:\s*/, // IDE: labels
+      /^Editor:\s*/, // Editor: labels
+      /^Reverse:\s*/, // Reverse: labels
+      /\s+from\s+/i, // Algorithm descriptions (DFS from each node)
+      /\s*\+\s*/, // Contains plus signs (Code + Data + Behavior)
+      /\s*=\s*\?/, // Query patterns (target = ?)
+      /^(Target|Confidence|Priority|Impact|Effort)$/, // Single property names
+      /^I\/O\s+/, // I/O prefix
+      /Deps$/i, // Ends with Deps (I/O Deps, Code Deps)
+      /Detect$/i, // Ends with Detect (Circular Detect)
+      /^⚠️\s*/, // Warning emoji prefix
+      /^→\s*/, // Arrow prefix
+      /Test\[/, // TypeScript type syntax (Test[)
+      /Usage\[/, // TypeScript type syntax (Usage[)
+      /Symbol\[/, // TypeScript type syntax (Symbol[)
+      /DocRef\[/, // TypeScript type syntax (DocRef[)
+      /Dep\[/, // TypeScript type syntax (Dep[)
+      /^usedBy:/, // usedBy: prefix
+      /^tests:/, // tests: prefix
+      /^symbols:/, // symbols: prefix
+      /^dependencies:/, // dependencies: prefix
       /^relatedDocs:/, // relatedDocs: prefix
-      /^path:/,        // path: prefix
-      /^canonical:/,   // canonical: prefix
-      /[\uAC00-\uD7AF]/,  // Contains Korean characters
-      /_id$/,          // Ends with _id (symbol_id, etc.)
-      /^[a-z][a-zA-Z]+By$/,  // camelCase ending in By (uniqueBy, etc.)
-      /^(get|find|display|execute|gather)[A-Z]/,  // Function names (getAll, findDoc, etc.)
-      /^fs:/,          // fs: prefix
-      /\s*\/\s*/,      // Contains slash (deps / who-uses)
-      /\s*\*\s*/,      // Contains asterisk (analyze-*)
-      /🆕/,            // New feature emoji
-      /^[A-Z][a-z]+:\s*/,  // Label patterns (Linter:, Test:, Extract:, Result:)
-      /^Confidence:\s*/,   // Confidence: prefix
-      /\.(mmd|db|jsonl|md|ts|js)$/,  // File extensions
-      /^\(/,           // Starts with parenthesis (file paths)
-      /[≥≤]/,          // Comparison operators
-      /^(Return|Parameter|Import|Extends)\s+(Type|Keyword|Statements?)$/,  // Type keywords
-      /\s+Types?$/,    // Ends with Type or Types
-      /\s+(Analysis|Detection|Drift|Coverage|Tests)$/,  // Analysis categories
-      /^(Create|Define|Parse|Generate|Extract|Follow|Find)\s+/,  // Workflow verbs
-      /^(Code|Doc|Test)\s+/i,  // Category prefixes
-      /Patterns?$/,    // Ends with Pattern/Patterns
-      /^L\d+[A-Z]$/,   // Labels like L2C, L3B
-      /Product$/,      // Ends with Product (Cartesian Product)
-      /Chains$/,       // Ends with Chains
-      /Hotspots?$/,    // Ends with Hotspot/Hotspots
-      /^(Graph|Relationship)\s+/,  // System prefixes
-      /^[A-Z]$/,       // Single uppercase letter (A, B, C, D - node IDs)
-      /^[A-Z]{2,4}$/,  // Short uppercase abbreviations (CD, TEST, FS, PATH, EWE, GC, UB)
-      /^L\d+[A-Z]$/,   // Labels with numbers (L1A, L2A, L2B, L3A, etc.)
-      /^--/,           // CLI flags (--detect-orphans)
-      /\[0\]?$/,       // Array index (args[0)
-      /^(Structural|Behavioral|Architectural|Data Flow)$/,  // Category names
-      /^(Add to|Archive|Delete|Promote|Show|Scan)\s+/,  // Workflow/action verbs
-      /^(Read|Write|Resolve|Check|Query|Group|Build)\s+/i,  // Process verbs
-      /\s+(file|table|path|symbols?|content|exists)$/i,  // Technical suffixes
-      /^(Orphaned|All)\s+/,  // Status prefixes
-      /Stats$/,        // Ends with Stats
-      /Workflow$/,     // Ends with Workflow
-      /Taxonomy$/,     // Ends with Taxonomy
-      /Roadmap$/,      // Ends with Roadmap
-      /^(FS|PATH|CommandResult)$/,  // Technical constants/types
-      /Validation$/,   // Ends with Validation
-      /Resolved$/,     // Ends with Resolved
-      /Issue$/,        // Ends with Issue (Docs Issue, Tests Issue, etc.)
-      /Bonus$/,        // Ends with Bonus (Coverage Bonus)
-      /^(Fix|Add|Rebuild|Visualize|Explore)\s+/,  // Action verbs
-      /^(Documentation|Architecture|Evidence|Type Safety)$/,  // Abstract concepts
-      /\s+interface$/i,  // Ends with interface (WorkContext interface)
-      /^(Auto|Missing)\s+/,  // Automation prefixes
-      /^(Dependency|Type)\s+(Graph|System)$/,  // System concepts
-      /Analyzer$/,     // Ends with Analyzer (as standalone workflow step)
-      /Fixer$/,        // Ends with Fixer
-      /Generator$/,    // Ends with Generator
-      /^[A-Z][A-Z-]+[A-Z]$/,  // All caps with hyphens (EXAMPLE-WORKFLOW, FINAL-SUMMARY)
-      /^(Backlinks|Archive|Delete|Validate)\s*$/,  // Workflow actions
-      /\s+Quality$/,   // Ends with Quality
-      /\s+Health$/,    // Ends with Health
-      /^(Command|Symbol)\s+(Registry|Graph|Validation)$/,  // System components
-      /Detector$/,     // Ends with Detector
-      /Resolver$/,     // Ends with Resolver
-      /^Base\s+/,      // Starts with Base
-      /^Enhanced\s+/,  // Starts with Enhanced
-      /^TypeScript\s+/,  // TypeScript AST, etc.
-      /^Mermaid\s+/,   // Mermaid Validation Workflow, etc.
-      /^(Analyzers?|Visualize)\s*$/,  // Plural categories or action verbs alone
-      /^Type\s*$/,     // Just "Type" alone
-      /Chain$/,        // Ends with Chain (Reliability Chain, Dependency Chain Analysis)
-      /\s+Framework$/,  // Ends with Framework (Module Spec Framework)
-      /^Enhanced[A-Z][a-z]+System$/,  // EnhancedDocumentationSystem pattern
-      /^Symbol\s+(Link|Reference|Validation)/,  // Symbol subsystems
-      /^Work\s+Context\s+/,  // Work Context variations
-      /^(Implementation|Relationship)\s+/,  // Planning/system prefixes
-      /^Dependency\s+(Chain|Graph)\s/,  // Dependency subsystems
-      /^Test\s+Coverage\s/,  // Test Coverage Analysis
-      /^Documentation\s+(Reference|Quality)/,  // Documentation subsystems
-      /^AST\s+/,  // AST Parsing, etc.
-      /^Validate\s+Symbol\s+Refs$/,  // Validate Symbol Refs (action)
-      /^Code\s+Health$/,  // Code Health (abstract)
-      /^Symbol\s+(Graph|Validation)\s*$/,  // Symbol subsystems standalone
-      /^Backlinks\s*$/,  // Backlinks standalone
-      /Planned$/i,  // Ends with Planned (planned features)
-      /^(Id|Improve|SpecStatus|SpecHistory|Plans|Todos|CoreApi|WithoutResponsibility|WithoutContract|Scan|FindDoc|FindMethod|FindUnusedDocs)Command$/,  // Planned commands
+      /^path:/, // path: prefix
+      /^canonical:/, // canonical: prefix
+      /[\uAC00-\uD7AF]/, // Contains Korean characters
+      /_id$/, // Ends with _id (symbol_id, etc.)
+      /^[a-z][a-zA-Z]+By$/, // camelCase ending in By (uniqueBy, etc.)
+      /^(get|find|display|execute|gather)[A-Z]/, // Function names (getAll, findDoc, etc.)
+      /^fs:/, // fs: prefix
+      /\s*\/\s*/, // Contains slash (deps / who-uses)
+      /\s*\*\s*/, // Contains asterisk (analyze-*)
+      /🆕/, // New feature emoji
+      /^[A-Z][a-z]+:\s*/, // Label patterns (Linter:, Test:, Extract:, Result:)
+      /^Confidence:\s*/, // Confidence: prefix
+      /\.(mmd|db|jsonl|md|ts|js)$/, // File extensions
+      /^\(/, // Starts with parenthesis (file paths)
+      /[≥≤]/, // Comparison operators
+      /^(Return|Parameter|Import|Extends)\s+(Type|Keyword|Statements?)$/, // Type keywords
+      /\s+Types?$/, // Ends with Type or Types
+      /\s+(Analysis|Detection|Drift|Coverage|Tests)$/, // Analysis categories
+      /^(Create|Define|Parse|Generate|Extract|Follow|Find)\s+/, // Workflow verbs
+      /^(Code|Doc|Test)\s+/i, // Category prefixes
+      /Patterns?$/, // Ends with Pattern/Patterns
+      /^L\d+[A-Z]$/, // Labels like L2C, L3B
+      /Product$/, // Ends with Product (Cartesian Product)
+      /Chains$/, // Ends with Chains
+      /Hotspots?$/, // Ends with Hotspot/Hotspots
+      /^(Graph|Relationship)\s+/, // System prefixes
+      /^[A-Z]$/, // Single uppercase letter (A, B, C, D - node IDs)
+      /^[A-Z]{2,4}$/, // Short uppercase abbreviations (CD, TEST, FS, PATH, EWE, GC, UB)
+      /^L\d+[A-Z]$/, // Labels with numbers (L1A, L2A, L2B, L3A, etc.)
+      /^--/, // CLI flags (--detect-orphans)
+      /\[0\]?$/, // Array index (args[0)
+      /^(Structural|Behavioral|Architectural|Data Flow)$/, // Category names
+      /^(Add to|Archive|Delete|Promote|Show|Scan)\s+/, // Workflow/action verbs
+      /^(Read|Write|Resolve|Check|Query|Group|Build)\s+/i, // Process verbs
+      /\s+(file|table|path|symbols?|content|exists)$/i, // Technical suffixes
+      /^(Orphaned|All)\s+/, // Status prefixes
+      /Stats$/, // Ends with Stats
+      /Workflow$/, // Ends with Workflow
+      /Taxonomy$/, // Ends with Taxonomy
+      /Roadmap$/, // Ends with Roadmap
+      /^(FS|PATH|CommandResult)$/, // Technical constants/types
+      /Validation$/, // Ends with Validation
+      /Resolved$/, // Ends with Resolved
+      /Issue$/, // Ends with Issue (Docs Issue, Tests Issue, etc.)
+      /Bonus$/, // Ends with Bonus (Coverage Bonus)
+      /^(Fix|Add|Rebuild|Visualize|Explore)\s+/, // Action verbs
+      /^(Documentation|Architecture|Evidence|Type Safety)$/, // Abstract concepts
+      /\s+interface$/i, // Ends with interface (WorkContext interface)
+      /^(Auto|Missing)\s+/, // Automation prefixes
+      /^(Dependency|Type)\s+(Graph|System)$/, // System concepts
+      /Analyzer$/, // Ends with Analyzer (as standalone workflow step)
+      /Fixer$/, // Ends with Fixer
+      /Generator$/, // Ends with Generator
+      /^[A-Z][A-Z-]+[A-Z]$/, // All caps with hyphens (EXAMPLE-WORKFLOW, FINAL-SUMMARY)
+      /^(Backlinks|Archive|Delete|Validate)\s*$/, // Workflow actions
+      /\s+Quality$/, // Ends with Quality
+      /\s+Health$/, // Ends with Health
+      /^(Command|Symbol)\s+(Registry|Graph|Validation)$/, // System components
+      /Detector$/, // Ends with Detector
+      /Resolver$/, // Ends with Resolver
+      /^Base\s+/, // Starts with Base
+      /^Enhanced\s+/, // Starts with Enhanced
+      /^TypeScript\s+/, // TypeScript AST, etc.
+      /^Mermaid\s+/, // Mermaid Validation Workflow, etc.
+      /^(Analyzers?|Visualize)\s*$/, // Plural categories or action verbs alone
+      /^Type\s*$/, // Just "Type" alone
+      /Chain$/, // Ends with Chain (Reliability Chain, Dependency Chain Analysis)
+      /\s+Framework$/, // Ends with Framework (Module Spec Framework)
+      /^Enhanced[A-Z][a-z]+System$/, // EnhancedDocumentationSystem pattern
+      /^Symbol\s+(Link|Reference|Validation)/, // Symbol subsystems
+      /^Work\s+Context\s+/, // Work Context variations
+      /^(Implementation|Relationship)\s+/, // Planning/system prefixes
+      /^Dependency\s+(Chain|Graph)\s/, // Dependency subsystems
+      /^Test\s+Coverage\s/, // Test Coverage Analysis
+      /^Documentation\s+(Reference|Quality)/, // Documentation subsystems
+      /^AST\s+/, // AST Parsing, etc.
+      /^Validate\s+Symbol\s+Refs$/, // Validate Symbol Refs (action)
+      /^Code\s+Health$/, // Code Health (abstract)
+      /^Symbol\s+(Graph|Validation)\s*$/, // Symbol subsystems standalone
+      /^Backlinks\s*$/, // Backlinks standalone
+      /Planned$/i, // Ends with Planned (planned features)
+      /^(Id|Improve|SpecStatus|SpecHistory|Plans|Todos|CoreApi|WithoutResponsibility|WithoutContract|Scan|FindDoc|FindMethod|FindUnusedDocs)Command$/, // Planned commands
     ];
 
-    const isNonSymbol = nonSymbolPatterns.some(pattern => pattern.test(symbolName));
+    const isNonSymbol = nonSymbolPatterns.some((pattern) => pattern.test(symbolName));
     if (isNonSymbol) {
       // This is data/text, not a symbol reference - check nodeId
-      const isNodeIdNonSymbol = nonSymbolPatterns.some(pattern => pattern.test(nodeId));
+      const isNodeIdNonSymbol = nonSymbolPatterns.some((pattern) => pattern.test(nodeId));
       if (!isNodeIdNonSymbol) {
         // Use nodeId as fallback if it's a valid symbol
         symbolName = nodeId;
@@ -423,7 +433,7 @@ export class MermaidSymbolExtractor {
     }
 
     // Detect status from emoji/symbol
-    let status: MermaidSymbol['status'] = undefined;
+    let status: MermaidSymbol['status'];
     if (label.includes('✅') || label.includes('IMPLEMENTED')) {
       status = 'implemented';
     } else if (label.includes('❌') || label.includes('NOT YET')) {
@@ -433,7 +443,7 @@ export class MermaidSymbolExtractor {
     }
 
     // Extract metrics (e.g., "1,968 rels")
-    let metrics: MermaidSymbol['metrics'] = undefined;
+    let metrics: MermaidSymbol['metrics'];
     for (const line of lines) {
       const metricMatch = line.match(/([\d,]+)\s+(\w+)/);
       if (metricMatch) {
@@ -592,8 +602,8 @@ ${symbol.metrics?.count ? `\n## Statistics\n\n**Current Count**: ${symbol.metric
       return '';
     }
 
-    const outgoing = this.currentRelationships.filter(r => r.from === symbol.nodeId);
-    const incoming = this.currentRelationships.filter(r => r.to === symbol.nodeId);
+    const outgoing = this.currentRelationships.filter((r) => r.from === symbol.nodeId);
+    const incoming = this.currentRelationships.filter((r) => r.to === symbol.nodeId);
 
     if (outgoing.length === 0 && incoming.length === 0) {
       return '';
@@ -638,7 +648,7 @@ ${symbol.metrics?.count ? `\n## Statistics\n\n**Current Count**: ${symbol.metric
    * Find symbol by node ID
    */
   private findSymbolByNodeId(nodeId: string): MermaidSymbol | undefined {
-    return this.currentSymbols?.find(s => s.nodeId === nodeId);
+    return this.currentSymbols?.find((s) => s.nodeId === nodeId);
   }
 
   /**

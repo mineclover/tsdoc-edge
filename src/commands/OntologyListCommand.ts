@@ -7,9 +7,8 @@
  * @solves Provides detailed listing of instances with filtering options
  */
 
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
-import type { UnifiedRelationship } from '../types/relationships';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /** Options for filtering ontology element listings */
 interface ListOptions {
@@ -209,7 +208,7 @@ Examples:
     }
 
     const symbolRows = dbManager.querySymbols(queryOptions);
-    const nodes = symbolRows.map(row => ({
+    const nodes = symbolRows.map((row) => ({
       id: row.id,
       name: row.name,
       type: row.type,
@@ -226,19 +225,27 @@ Examples:
     const total = dbManager.countSymbols(countOptions);
 
     if (options.format === 'json') {
-      console.log(JSON.stringify({
-        total,
-        limit: options.limit,
-        offset: options.offset,
-        nodes,
-      }, null, 2));
+      console.log(
+        JSON.stringify(
+          {
+            total,
+            limit: options.limit,
+            offset: options.offset,
+            nodes,
+          },
+          null,
+          2
+        )
+      );
       return;
     }
 
     if (options.format === 'csv') {
       console.log('id,name,type,kind,filePath,line');
       for (const node of nodes) {
-        console.log(`"${node.id}","${node.name}","${node.type}","${node.kind || ''}","${node.filePath || ''}","${node.line || ''}"`);
+        console.log(
+          `"${node.id}","${node.name}","${node.type}","${node.kind || ''}","${node.filePath || ''}","${node.line || ''}"`
+        );
       }
       return;
     }
@@ -247,7 +254,9 @@ Examples:
     const title = options.name ? `Nodes of type: ${options.name}` : 'All Nodes';
     this.printHeader(title);
 
-    console.log(`${colors.dim}Total: ${total.toLocaleString()} | Showing: ${nodes.length} (offset: ${options.offset})${colors.reset}`);
+    console.log(
+      `${colors.dim}Total: ${total.toLocaleString()} | Showing: ${nodes.length} (offset: ${options.offset})${colors.reset}`
+    );
     console.log();
 
     if (nodes.length === 0) {
@@ -256,10 +265,16 @@ Examples:
     }
 
     for (const node of nodes) {
-      console.log(`${colors.cyan}${node.name}${colors.reset} ${colors.dim}(${node.id})${colors.reset}`);
-      console.log(`  Type: ${colors.yellow}${node.type}${colors.reset}${node.kind ? ` | Kind: ${colors.yellow}${node.kind}${colors.reset}` : ''}`);
+      console.log(
+        `${colors.cyan}${node.name}${colors.reset} ${colors.dim}(${node.id})${colors.reset}`
+      );
+      console.log(
+        `  Type: ${colors.yellow}${node.type}${colors.reset}${node.kind ? ` | Kind: ${colors.yellow}${node.kind}${colors.reset}` : ''}`
+      );
       if (node.filePath) {
-        console.log(`  Location: ${colors.blue}${node.filePath}${node.line ? `:${node.line}` : ''}${colors.reset}`);
+        console.log(
+          `  Location: ${colors.blue}${node.filePath}${node.line ? `:${node.line}` : ''}${colors.reset}`
+        );
       }
       console.log();
     }
@@ -267,7 +282,9 @@ Examples:
     // Pagination info
     if (total > (options.offset || 0) + nodes.length) {
       const nextOffset = (options.offset || 0) + (options.limit || 50);
-      console.log(`${colors.dim}More results available. Use --offset ${nextOffset} to see next page${colors.reset}`);
+      console.log(
+        `${colors.dim}More results available. Use --offset ${nextOffset} to see next page${colors.reset}`
+      );
     }
   }
 
@@ -276,13 +293,13 @@ Examples:
 
     // Apply filters
     if (options.name) {
-      relationships = relationships.filter(r => r.type === options.name);
+      relationships = relationships.filter((r) => r.type === options.name);
     }
     if (options.category) {
-      relationships = relationships.filter(r => r.category === options.category);
+      relationships = relationships.filter((r) => r.category === options.category);
     }
     if (options.strength) {
-      relationships = relationships.filter(r => r.strength === options.strength);
+      relationships = relationships.filter((r) => r.strength === options.strength);
     }
 
     const total = relationships.length;
@@ -293,12 +310,18 @@ Examples:
     relationships = relationships.slice(offset, offset + limit);
 
     if (options.format === 'json') {
-      console.log(JSON.stringify({
-        total,
-        limit: options.limit,
-        offset: options.offset,
-        relationships,
-      }, null, 2));
+      console.log(
+        JSON.stringify(
+          {
+            total,
+            limit: options.limit,
+            offset: options.offset,
+            relationships,
+          },
+          null,
+          2
+        )
+      );
       return;
     }
 
@@ -310,7 +333,9 @@ Examples:
         const from = froms.join(';');
         const to = tos.join(';');
         const inferred = rel.properties?.inferred === true ? 'true' : 'false';
-        console.log(`"${rel.id}","${rel.type}","${rel.category}","${rel.direction}","${rel.strength}","${from}","${to}",${rel.confidence},${inferred}`);
+        console.log(
+          `"${rel.id}","${rel.type}","${rel.category}","${rel.direction}","${rel.strength}","${from}","${to}",${rel.confidence},${inferred}`
+        );
       }
       return;
     }
@@ -323,7 +348,9 @@ Examples:
 
     this.printHeader(title);
 
-    console.log(`${colors.dim}Total: ${total.toLocaleString()} | Showing: ${relationships.length} (offset: ${offset})${colors.reset}`);
+    console.log(
+      `${colors.dim}Total: ${total.toLocaleString()} | Showing: ${relationships.length} (offset: ${offset})${colors.reset}`
+    );
     console.log();
 
     if (relationships.length === 0) {
@@ -336,13 +363,18 @@ Examples:
       const tos = Array.isArray(rel.to) ? rel.to : [rel.to];
 
       const icon = this.getCategoryIcon(rel.category);
-      const strengthIcon = rel.strength === 'strong' ? '💪' : rel.strength === 'medium' ? '👍' : '👌';
-      const directionIcon = rel.direction === 'unidirectional' ? '→' : rel.direction === 'bidirectional' ? '↔' : '—';
-      const inferredBadge = rel.properties?.inferred === true ? `${colors.yellow}[INFERRED]${colors.reset}` : '';
+      const strengthIcon =
+        rel.strength === 'strong' ? '💪' : rel.strength === 'medium' ? '👍' : '👌';
+      const directionIcon =
+        rel.direction === 'unidirectional' ? '→' : rel.direction === 'bidirectional' ? '↔' : '—';
+      const inferredBadge =
+        rel.properties?.inferred === true ? `${colors.yellow}[INFERRED]${colors.reset}` : '';
 
       console.log(`${icon} ${colors.cyan}${rel.type}${colors.reset} ${inferredBadge}`);
       console.log(`  ${colors.dim}${rel.id}${colors.reset}`);
-      console.log(`  Category: ${colors.yellow}${rel.category}${colors.reset} | Strength: ${strengthIcon} ${rel.strength} | Direction: ${directionIcon} ${rel.direction}`);
+      console.log(
+        `  Category: ${colors.yellow}${rel.category}${colors.reset} | Strength: ${strengthIcon} ${rel.strength} | Direction: ${directionIcon} ${rel.direction}`
+      );
       console.log(`  From: ${colors.blue}${froms.join(', ')}${colors.reset}`);
       console.log(`  To:   ${colors.green}${tos.join(', ')}${colors.reset}`);
       console.log(`  Confidence: ${this.formatConfidence(rel.confidence)}`);
@@ -357,23 +389,25 @@ Examples:
     // Pagination info
     if (total > offset + relationships.length) {
       const nextOffset = offset + limit;
-      console.log(`${colors.dim}More results available. Use --offset ${nextOffset} to see next page${colors.reset}`);
+      console.log(
+        `${colors.dim}More results available. Use --offset ${nextOffset} to see next page${colors.reset}`
+      );
     }
   }
 
   private getCategoryIcon(category: string): string {
     const icons: Record<string, string> = {
-      'structural': '🏗️',
+      structural: '🏗️',
       'data-flow': '📊',
-      'behavioral': '⚙️',
-      'temporal': '⏱️',
-      'semantic': '💡',
-      'quality': '✨',
-      'verification': '✅',
-      'organizational': '📁',
-      'testing': '🧪',
-      'alternative': '🔀',
-      'constraint': '🔒',
+      behavioral: '⚙️',
+      temporal: '⏱️',
+      semantic: '💡',
+      quality: '✨',
+      verification: '✅',
+      organizational: '📁',
+      testing: '🧪',
+      alternative: '🔀',
+      constraint: '🔒',
     };
     return icons[category] || '🔗';
   }

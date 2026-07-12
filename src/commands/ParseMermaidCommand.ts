@@ -6,8 +6,13 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import {
+  type MermaidExtractionResult,
+  type MermaidRelationship,
+  type MermaidSymbol,
+  MermaidSymbolExtractor,
+} from '../doc-symbol/MermaidSymbolExtractor';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { MermaidSymbolExtractor, type MermaidExtractionResult, type MermaidSymbol, type MermaidRelationship } from '../doc-symbol/MermaidSymbolExtractor';
 
 /**
  * Parse Mermaid Command - Mermaid 다이어그램 파싱 및 문서 생성
@@ -68,9 +73,13 @@ export class ParseMermaidCommand extends BaseCommand {
         this.printError('Mermaid file required: parse-mermaid <file.mmd>');
         console.log();
         console.log('Examples:');
-        console.log('  tsdoc-edge parse-mermaid managed/architecture/diagrams/dependency-meta-structure.mmd');
+        console.log(
+          '  tsdoc-edge parse-mermaid managed/architecture/diagrams/dependency-meta-structure.mmd'
+        );
         console.log('  tsdoc-edge parse-mermaid diagram.mmd --generate-docs');
-        console.log('  tsdoc-edge parse-mermaid diagram.mmd --generate-docs --output docs/relationships');
+        console.log(
+          '  tsdoc-edge parse-mermaid diagram.mmd --generate-docs --output docs/relationships'
+        );
         return this.failure('Missing file path');
       }
 
@@ -125,29 +134,41 @@ export class ParseMermaidCommand extends BaseCommand {
         }
 
         if (canonicalConflicts.length > 0) {
-          console.log(`  ${this.colors.yellow}⚠️  Canonical symbols exist (${canonicalConflicts.length}):${this.colors.reset}`);
-          canonicalConflicts.slice(0, 5).forEach(c => {
+          console.log(
+            `  ${this.colors.yellow}⚠️  Canonical symbols exist (${canonicalConflicts.length}):${this.colors.reset}`
+          );
+          canonicalConflicts.slice(0, 5).forEach((c) => {
             console.log(`    ${this.colors.dim}${c}${this.colors.reset}`);
           });
           if (canonicalConflicts.length > 5) {
-            console.log(`    ${this.colors.dim}... and ${canonicalConflicts.length - 5} more${this.colors.reset}`);
+            console.log(
+              `    ${this.colors.dim}... and ${canonicalConflicts.length - 5} more${this.colors.reset}`
+            );
           }
-          console.log(`  ${this.colors.cyan}💡 H2 reference docs will be generated (not canonical H1)${this.colors.reset}`);
+          console.log(
+            `  ${this.colors.cyan}💡 H2 reference docs will be generated (not canonical H1)${this.colors.reset}`
+          );
           console.log();
         }
 
         if (existingFiles.length > 0) {
-          console.log(`  ${this.colors.yellow}⚠️  Files will be overwritten (${existingFiles.length}):${this.colors.reset}`);
-          existingFiles.slice(0, 5).forEach(f => {
+          console.log(
+            `  ${this.colors.yellow}⚠️  Files will be overwritten (${existingFiles.length}):${this.colors.reset}`
+          );
+          existingFiles.slice(0, 5).forEach((f) => {
             console.log(`    ${this.colors.dim}${f}${this.colors.reset}`);
           });
           if (existingFiles.length > 5) {
-            console.log(`    ${this.colors.dim}... and ${existingFiles.length - 5} more${this.colors.reset}`);
+            console.log(
+              `    ${this.colors.dim}... and ${existingFiles.length - 5} more${this.colors.reset}`
+            );
           }
 
           if (!args.includes('--force')) {
             console.log();
-            console.log(`  ${this.colors.cyan}💡 Use --force to overwrite existing files${this.colors.reset}`);
+            console.log(
+              `  ${this.colors.cyan}💡 Use --force to overwrite existing files${this.colors.reset}`
+            );
             this.printWarning('Skipping generation (use --force to overwrite)');
             return this.success('Check complete');
           }
@@ -174,7 +195,9 @@ export class ParseMermaidCommand extends BaseCommand {
           } else {
             fs.writeFileSync(docPath, suggestion.skeleton, 'utf-8');
             const action = fs.existsSync(docPath) ? 'updated' : 'created';
-            console.log(`  ${this.colors.green}✓${this.colors.reset} ${suggestion.filename} (${action} as H2 reference)`);
+            console.log(
+              `  ${this.colors.green}✓${this.colors.reset} ${suggestion.filename} (${action} as H2 reference)`
+            );
             generated++;
           }
         }
@@ -197,7 +220,9 @@ export class ParseMermaidCommand extends BaseCommand {
 
       console.log();
 
-      return this.success(`Parsed ${result.symbols.length} symbols, ${result.relationships.length} relationships`);
+      return this.success(
+        `Parsed ${result.symbols.length} symbols, ${result.relationships.length} relationships`
+      );
     });
   }
 
@@ -206,10 +231,14 @@ export class ParseMermaidCommand extends BaseCommand {
     this.printSection('Diagram Metadata');
     console.log(`  Type: ${this.colors.cyan}${result.metadata.diagramType}${this.colors.reset}`);
     if (result.metadata.orientation) {
-      console.log(`  Orientation: ${this.colors.cyan}${result.metadata.orientation}${this.colors.reset}`);
+      console.log(
+        `  Orientation: ${this.colors.cyan}${result.metadata.orientation}${this.colors.reset}`
+      );
     }
     if (result.metadata.subgraphs.length > 0) {
-      console.log(`  Subgraphs: ${this.colors.cyan}${result.metadata.subgraphs.length}${this.colors.reset}`);
+      console.log(
+        `  Subgraphs: ${this.colors.cyan}${result.metadata.subgraphs.length}${this.colors.reset}`
+      );
       result.metadata.subgraphs.forEach((sg) => {
         console.log(`    • ${sg.title}`);
       });
@@ -223,13 +252,20 @@ export class ParseMermaidCommand extends BaseCommand {
 
     // Group by status
     const implemented = result.symbols.filter((s: MermaidSymbol) => s.status === 'implemented');
-    const notImplemented = result.symbols.filter((s: MermaidSymbol) => s.status === 'not-implemented');
+    const notImplemented = result.symbols.filter(
+      (s: MermaidSymbol) => s.status === 'not-implemented'
+    );
     const partial = result.symbols.filter((s: MermaidSymbol) => s.status === 'partial');
 
     if (implemented.length > 0) {
-      console.log(`  ${this.colors.green}✅ Implemented (${implemented.length}):${this.colors.reset}`);
+      console.log(
+        `  ${this.colors.green}✅ Implemented (${implemented.length}):${this.colors.reset}`
+      );
       implemented.forEach((s: MermaidSymbol) => {
-        const metrics = s.metrics && s.metrics.count !== undefined ? ` (${s.metrics.count.toLocaleString()} ${s.metrics.unit})` : '';
+        const metrics =
+          s.metrics && s.metrics.count !== undefined
+            ? ` (${s.metrics.count.toLocaleString()} ${s.metrics.unit})`
+            : '';
         console.log(`    • [[${s.symbolName}]]${metrics}`);
       });
       console.log();
@@ -244,7 +280,9 @@ export class ParseMermaidCommand extends BaseCommand {
     }
 
     if (notImplemented.length > 0) {
-      console.log(`  ${this.colors.dim}❌ Not Implemented (${notImplemented.length}):${this.colors.reset}`);
+      console.log(
+        `  ${this.colors.dim}❌ Not Implemented (${notImplemented.length}):${this.colors.reset}`
+      );
       notImplemented.forEach((s: MermaidSymbol) => {
         console.log(`    ${this.colors.dim}• [[${s.symbolName}]]${this.colors.reset}`);
       });
@@ -253,11 +291,14 @@ export class ParseMermaidCommand extends BaseCommand {
 
     // Relationships
     this.printSection('Relationships');
-    console.log(`  Total edges: ${this.colors.cyan}${result.relationships.length}${this.colors.reset}`);
+    console.log(
+      `  Total edges: ${this.colors.cyan}${result.relationships.length}${this.colors.reset}`
+    );
 
     const byType = {
       solid: result.relationships.filter((r: MermaidRelationship) => r.edgeType === 'solid').length,
-      dotted: result.relationships.filter((r: MermaidRelationship) => r.edgeType === 'dotted').length,
+      dotted: result.relationships.filter((r: MermaidRelationship) => r.edgeType === 'dotted')
+        .length,
       thick: result.relationships.filter((r: MermaidRelationship) => r.edgeType === 'thick').length,
     };
 
@@ -281,7 +322,9 @@ export class ParseMermaidCommand extends BaseCommand {
         console.log(`    • ${doc.filename} for [[${doc.symbolName}]]`);
       });
       if (result.suggestedDocs.length > 5) {
-        console.log(`    ${this.colors.dim}... and ${result.suggestedDocs.length - 5} more${this.colors.reset}`);
+        console.log(
+          `    ${this.colors.dim}... and ${result.suggestedDocs.length - 5} more${this.colors.reset}`
+        );
       }
     }
   }

@@ -5,13 +5,13 @@
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { SymbolQueryCommand } from './SymbolQueryCommand';
-import { SymbolFixCommand } from './SymbolFixCommand';
-import { SymbolRenameCommand } from './SymbolRenameCommand';
 import { DepsCommand } from './DepsCommand';
-import { WhoUsesCommand } from './WhoUsesCommand';
-import { OrphansCommand } from './OrphansCommand';
 import { FindMethodCommand } from './FindMethodCommand';
+import { OrphansCommand } from './OrphansCommand';
+import { SymbolFixCommand } from './SymbolFixCommand';
+import { SymbolQueryCommand } from './SymbolQueryCommand';
+import { SymbolRenameCommand } from './SymbolRenameCommand';
+import { WhoUsesCommand } from './WhoUsesCommand';
 
 const SUBCOMMANDS = {
   query: { command: SymbolQueryCommand, description: 'Query symbol information' },

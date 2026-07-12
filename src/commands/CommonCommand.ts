@@ -4,9 +4,9 @@
  */
 
 import Database from 'better-sqlite3';
-import { BaseCommand, type CommandResult } from './BaseCommand';
-import { XmlBuilder } from '../output/XmlBuilder';
 import { CommonSchema } from '../output/schemas';
+import { XmlBuilder } from '../output/XmlBuilder';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 export class CommonCommand extends BaseCommand {
   getName(): string {
@@ -23,7 +23,7 @@ export class CommonCommand extends BaseCommand {
 
   async execute(args: string[]): Promise<CommandResult> {
     const useXml = !args.includes('--human');
-    const targets = args.filter(a => !a.startsWith('--'));
+    const targets = args.filter((a) => !a.startsWith('--'));
 
     if (targets.length < 2) {
       console.log('Usage: tsdoc-edge common <file1|symbol1> <file2|symbol2> [...]');
@@ -52,7 +52,7 @@ export class CommonCommand extends BaseCommand {
       // 공통 의존성 찾기
       const allDeps = Array.from(targetDeps.values());
       const commonDeps = allDeps.reduce((acc, deps) => {
-        return new Set([...acc].filter(d => deps.has(d)));
+        return new Set([...acc].filter((d) => deps.has(d)));
       });
 
       // 공통 의존성의 상세 정보 조회
@@ -60,7 +60,10 @@ export class CommonCommand extends BaseCommand {
       if (commonIds.length === 0) {
         if (useXml) {
           new XmlBuilder(CommonSchema)
-            .section('targets', targets.map(t => ({ value: t })))
+            .section(
+              'targets',
+              targets.map((t) => ({ value: t }))
+            )
             .section('dependencies', [])
             .print();
         } else {
@@ -90,13 +93,19 @@ export class CommonCommand extends BaseCommand {
 
       if (useXml) {
         new XmlBuilder(CommonSchema)
-          .section('targets', targets.map(t => ({ value: t })))
-          .section('dependencies', results.map(row => ({
-            name: row.name,
-            type: row.type,
-            refs: row.total_refs,
-            file: row.file_path,
-          })))
+          .section(
+            'targets',
+            targets.map((t) => ({ value: t }))
+          )
+          .section(
+            'dependencies',
+            results.map((row) => ({
+              name: row.name,
+              type: row.type,
+              refs: row.total_refs,
+              file: row.file_path,
+            }))
+          )
           .print();
       } else {
         console.log(`\nCommon dependencies of: ${targets.join(', ')}\n`);
@@ -125,12 +134,12 @@ export class CommonCommand extends BaseCommand {
       // 파일의 모든 심볼 ID 조회
       const query = `SELECT id FROM symbols WHERE file_path LIKE ?`;
       const rows = db.prepare(query).all(`%${target}%`) as Array<{ id: string }>;
-      symbolIds = rows.map(r => r.id);
+      symbolIds = rows.map((r) => r.id);
     } else {
       // 심볼 이름으로 ID 조회
       const query = `SELECT id FROM symbols WHERE name LIKE ?`;
       const rows = db.prepare(query).all(`%${target}%`) as Array<{ id: string }>;
-      symbolIds = rows.map(r => r.id);
+      symbolIds = rows.map((r) => r.id);
     }
 
     if (symbolIds.length === 0) {
@@ -149,6 +158,6 @@ export class CommonCommand extends BaseCommand {
     `;
 
     const deps = db.prepare(depsQuery).all(...symbolIds) as Array<{ symbol_id: string }>;
-    return new Set(deps.map(d => d.symbol_id));
+    return new Set(deps.map((d) => d.symbol_id));
   }
 }

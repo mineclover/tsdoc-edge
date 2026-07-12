@@ -5,8 +5,8 @@
  */
 
 import * as fs from 'node:fs';
-import type { Symbol } from '../types/graph';
 import type { StatsHistory, StatsHistoryEntry, TrackableStatistics } from '../types/analysis';
+import type { Symbol } from '../types/graph';
 
 /**
  * Manages statistics history persistence

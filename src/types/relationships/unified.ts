@@ -27,43 +27,43 @@
  */
 export type RelationshipType =
   // 1. Structural (Code Space)
-  | 'code-dependency'     // A imports B
-  | 'inheritance'         // A extends B
-  | 'implementation'      // A implements I (interface-impl in docs)
+  | 'code-dependency' // A imports B
+  | 'inheritance' // A extends B
+  | 'implementation' // A implements I (interface-impl in docs)
   // 2. Data Flow
-  | 'io-dependency'       // A's output feeds B's input
-  | 'event-flow'          // A emits events consumed by B
+  | 'io-dependency' // A's output feeds B's input
+  | 'event-flow' // A emits events consumed by B
   // 3. Behavioral
-  | 'calls'               // A calls function/method B
-  | 'callback'            // A registers B as callback (callback-pattern in docs)
-  | 'collaboration'       // A collaborates with B to achieve goal
-  | 'composition'         // Feature = A + B + C (composition-relationship in docs)
-  | 'temporal-order'      // A must execute before B
+  | 'calls' // A calls function/method B
+  | 'callback' // A registers B as callback (callback-pattern in docs)
+  | 'collaboration' // A collaborates with B to achieve goal
+  | 'composition' // Feature = A + B + C (composition-relationship in docs)
+  | 'temporal-order' // A must execute before B
   // 4. Alternative
-  | 'substitution'        // A OR B can be used (same interface)
-  | 'fallback'            // Try A, if fails use B
+  | 'substitution' // A OR B can be used (same interface)
+  | 'fallback' // Try A, if fails use B
   // 5. Constraint
-  | 'co-requirement'      // A requires B to be present
+  | 'co-requirement' // A requires B to be present
   | 'circular-dependency' // A → B → A (detected cycle)
   // 6. Semantic (Meta Space)
   | 'conceptual-relation' // @deprecated Use naming-pattern-relation or explicit-semantic-relation
   | 'naming-pattern-relation' // Symbols share domain prefix (UserService ~ UserRepository)
   | 'explicit-semantic-relation' // Developer-declared via @relatedTo tag
-  | 'feature-grouping'    // A, B, C belong to same feature (file structure)
-  | 'doc-reference'       // Documentation references symbol
-  | 'enhancement'         // A enhances B
+  | 'feature-grouping' // A, B, C belong to same feature (file structure)
+  | 'doc-reference' // Documentation references symbol
+  | 'enhancement' // A enhances B
   // 7. Verification & Testing
-  | 'test-coverage'       // Test file tests implementation symbol
+  | 'test-coverage' // Test file tests implementation symbol
   | 'integration-verification' // A↔B connection verified by test
-  | 'contains'            // Test suite contains test case/suite
-  | 'covers-scenario'     // Test case covers test scenario
-  | 'test-as-example'     // Test case serves as documentation example
+  | 'contains' // Test suite contains test case/suite
+  | 'covers-scenario' // Test case covers test scenario
+  | 'test-as-example' // Test case serves as documentation example
   // 8. Type System
-  | 'type-dependency'     // Parameter/return type dependencies
-  | 'generic-constraint'  // T extends U
+  | 'type-dependency' // Parameter/return type dependencies
+  | 'generic-constraint' // T extends U
   // 9. Architectural
-  | 'layer-dependency'    // Controller → Service layer violation
-  | 'module-boundary'     // Cross-package dependencies;
+  | 'layer-dependency' // Controller → Service layer violation
+  | 'module-boundary'; // Cross-package dependencies;
 
 /**
  * Relationship category
@@ -72,47 +72,47 @@ export type RelationshipType =
  * Total: 10 categories covering all relationship dimensions
  */
 export type RelationshipCategory =
-  | 'structural'      // Code structure (imports, inheritance)
-  | 'data-flow'       // Data movement (I/O, events)
-  | 'behavioral'      // Runtime behavior (calls, callbacks)
-  | 'alternative'     // Substitutability (fallback, substitution)
-  | 'constraint'      // Restrictions (co-requirement, circular-dependency)
-  | 'semantic'        // Conceptual (naming-pattern, explicit-semantic, feature-grouping)
-  | 'verification'    // Test verification (test-coverage, integration-verification)
-  | 'testing'         // Test structure (contains, covers-scenario)
-  | 'type-system'     // Type relationships (type-dependency, generic-constraint)
-  | 'architectural'   // Architecture (layer-dependency, module-boundary)
-  | 'quality';        // Code quality (circular-dependency)
+  | 'structural' // Code structure (imports, inheritance)
+  | 'data-flow' // Data movement (I/O, events)
+  | 'behavioral' // Runtime behavior (calls, callbacks)
+  | 'alternative' // Substitutability (fallback, substitution)
+  | 'constraint' // Restrictions (co-requirement, circular-dependency)
+  | 'semantic' // Conceptual (naming-pattern, explicit-semantic, feature-grouping)
+  | 'verification' // Test verification (test-coverage, integration-verification)
+  | 'testing' // Test structure (contains, covers-scenario)
+  | 'type-system' // Type relationships (type-dependency, generic-constraint)
+  | 'architectural' // Architecture (layer-dependency, module-boundary)
+  | 'quality'; // Code quality (circular-dependency)
 
 /**
  * Relationship direction
  * @public
  */
 export type RelationshipDirection =
-  | 'unidirectional'  // A → B
-  | 'bidirectional'   // A ↔ B
-  | 'undirected';     // A — B (no direction)
+  | 'unidirectional' // A → B
+  | 'bidirectional' // A ↔ B
+  | 'undirected'; // A — B (no direction)
 
 /**
  * Relationship strength
  * @public
  */
 export type RelationshipStrength =
-  | 'strong'   // Direct, explicit connection
-  | 'medium'   // Indirect or inferred connection
-  | 'weak';    // Loose or potential connection
+  | 'strong' // Direct, explicit connection
+  | 'medium' // Indirect or inferred connection
+  | 'weak'; // Loose or potential connection
 
 /**
  * How relationship was discovered
  * @public
  */
 export type DiscoveryMethod =
-  | 'static-analysis'   // AST parsing
-  | 'ast-parsing'       // TypeScript compiler API
-  | 'test-analysis'     // Test file analysis
-  | 'documentation'     // TSDoc tags, markdown
-  | 'runtime-trace'     // Execution traces
-  | 'type-inference';   // Type system analysis
+  | 'static-analysis' // AST parsing
+  | 'ast-parsing' // TypeScript compiler API
+  | 'test-analysis' // Test file analysis
+  | 'documentation' // TSDoc tags, markdown
+  | 'runtime-trace' // Execution traces
+  | 'type-inference'; // Type system analysis
 
 /**
  * Evidence supporting a relationship

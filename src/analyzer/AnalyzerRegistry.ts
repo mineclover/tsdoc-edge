@@ -258,7 +258,7 @@ export class AnalyzerRegistry {
       if (!byCategory.has(metadata.category)) {
         byCategory.set(metadata.category, []);
       }
-      byCategory.get(metadata.category)!.push(metadata);
+      byCategory.get(metadata.category)?.push(metadata);
     }
 
     return byCategory;

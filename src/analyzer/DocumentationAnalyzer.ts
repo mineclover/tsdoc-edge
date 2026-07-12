@@ -289,7 +289,20 @@ export class DocumentationAnalyzer {
     if (ts.isTypeReferenceNode(typeNode)) {
       const typeName = typeNode.typeName.getText();
       // Utility types are self-documenting
-      const utilityTypes = ['Pick', 'Omit', 'Partial', 'Required', 'Readonly', 'Record', 'Exclude', 'Extract', 'NonNullable', 'ReturnType', 'Parameters', 'InstanceType'];
+      const utilityTypes = [
+        'Pick',
+        'Omit',
+        'Partial',
+        'Required',
+        'Readonly',
+        'Record',
+        'Exclude',
+        'Extract',
+        'NonNullable',
+        'ReturnType',
+        'Parameters',
+        'InstanceType',
+      ];
       if (utilityTypes.includes(typeName)) {
         return true;
       }
@@ -312,14 +325,15 @@ export class DocumentationAnalyzer {
     // Union/Intersection of simple types
     if (ts.isUnionTypeNode(typeNode) || ts.isIntersectionTypeNode(typeNode)) {
       // Check if all members are type references or simple types
-      const allSimple = typeNode.types.every(t =>
-        ts.isTypeReferenceNode(t) ||
-        ts.isLiteralTypeNode(t) ||
-        t.kind === ts.SyntaxKind.StringKeyword ||
-        t.kind === ts.SyntaxKind.NumberKeyword ||
-        t.kind === ts.SyntaxKind.BooleanKeyword ||
-        t.kind === ts.SyntaxKind.NullKeyword ||
-        t.kind === ts.SyntaxKind.UndefinedKeyword
+      const allSimple = typeNode.types.every(
+        (t) =>
+          ts.isTypeReferenceNode(t) ||
+          ts.isLiteralTypeNode(t) ||
+          t.kind === ts.SyntaxKind.StringKeyword ||
+          t.kind === ts.SyntaxKind.NumberKeyword ||
+          t.kind === ts.SyntaxKind.BooleanKeyword ||
+          t.kind === ts.SyntaxKind.NullKeyword ||
+          t.kind === ts.SyntaxKind.UndefinedKeyword
       );
       if (allSimple) {
         return true;
@@ -465,7 +479,9 @@ export class DocumentationAnalyzer {
       // Filter out empty or invalid param names from documented params
       const documentedParams = docComment.params.blocks
         .map((b) => b.parameterName)
-        .filter((name) => name && name.trim().length > 0 && /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(name));
+        .filter(
+          (name) => name && name.trim().length > 0 && /^[a-zA-Z_$][a-zA-Z0-9_$]*$/.test(name)
+        );
 
       // Check for missing params (in signature but not documented)
       for (const paramName of actualParamNames) {

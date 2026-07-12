@@ -3,9 +3,7 @@
     "name": "tsdoc-edge-test",
     "version": "1.0.0",
     "rootDir": ".",
-    "srcDirs": [
-      "src"
-    ]
+    "srcDirs": ["src"]
   },
   "paths": {
     "commentsDir": ".tsdoc-comments",
@@ -31,13 +29,8 @@
   "preCommit": {},
   "documentManagement": {
     "enabled": true,
-    "managedDirs": [
-      "managed-test"
-    ],
-    "excludeDirs": [
-      "examples",
-      "archive"
-    ],
+    "managedDirs": ["managed-test"],
+    "excludeDirs": ["examples", "archive"],
     "requireFrontmatter": false,
     "strictMode": false,
     "ignoreCodeBlocks": true

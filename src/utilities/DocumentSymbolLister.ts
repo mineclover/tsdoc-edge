@@ -99,7 +99,7 @@ export class DocumentSymbolLister {
       if (!byCategory.has(symbol.category)) {
         byCategory.set(symbol.category, []);
       }
-      byCategory.get(symbol.category)!.push(symbol);
+      byCategory.get(symbol.category)?.push(symbol);
     }
 
     return byCategory;
@@ -154,7 +154,7 @@ export class DocumentSymbolLister {
         h1Line: h1Match.line,
         referenceCount,
       };
-    } catch (error) {
+    } catch (_error) {
       // Skip files that can't be read
       return null;
     }

@@ -98,12 +98,7 @@
       "label": "Relationship: Export to Gephi",
       "type": "shell",
       "command": "node",
-      "args": [
-        "dist/cli.js",
-        "relationship-export",
-        "--format",
-        "graphml"
-      ],
+      "args": ["dist/cli.js", "relationship-export", "--format", "graphml"],
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",
@@ -114,14 +109,7 @@
       "label": "Relationship: Export to Graphviz",
       "type": "shell",
       "command": "node",
-      "args": [
-        "dist/cli.js",
-        "relationship-export",
-        "--format",
-        "dot",
-        "--category",
-        "structural"
-      ],
+      "args": ["dist/cli.js", "relationship-export", "--format", "dot", "--category", "structural"],
       "problemMatcher": [],
       "presentation": {
         "reveal": "always",

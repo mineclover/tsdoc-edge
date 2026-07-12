@@ -34,10 +34,7 @@
  * console.log(report.summary);
  * \`\`\`
  */
-export function processUserData(
-  userData: UserData,
-  options: ProcessingOptions
-): ProcessedReport {
+export function processUserData(_userData: UserData, _options: ProcessingOptions): ProcessedReport {
   // Implementation...
   return {} as ProcessedReport;
 }

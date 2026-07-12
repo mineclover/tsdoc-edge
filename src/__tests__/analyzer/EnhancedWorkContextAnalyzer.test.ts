@@ -13,7 +13,7 @@ const createMockDb = (
   symbols: Symbol[] = [],
   relationships: UnifiedRelationship[] = []
 ): DatabaseManager => {
-  const symbolMap = new Map(symbols.map(s => [s.id, s]));
+  const symbolMap = new Map(symbols.map((s) => [s.id, s]));
 
   return {
     getAllSymbols: jest.fn(() => symbols),
@@ -83,8 +83,8 @@ describe('EnhancedWorkContextAnalyzer', () => {
       const result = analyzer.analyze('src/services/UserService.ts');
 
       expect(result.symbols).toHaveLength(2);
-      expect(result.symbols.map(s => s.name)).toContain('UserService');
-      expect(result.symbols.map(s => s.name)).toContain('getUser');
+      expect(result.symbols.map((s) => s.name)).toContain('UserService');
+      expect(result.symbols.map((s) => s.name)).toContain('getUser');
       expect(result.summary.symbolCount).toBe(2);
     });
 
@@ -178,7 +178,12 @@ describe('EnhancedWorkContextAnalyzer', () => {
       const symbols = [
         createSymbol('class-user-service', 'UserService', 'src/services/UserService.ts'),
         createSymbol('method-get-user', 'getUser', 'src/services/UserService.ts', 'method'),
-        createSymbol('test-user-service', 'UserServiceTest', 'src/__tests__/UserService.test.ts', 'test-suite'),
+        createSymbol(
+          'test-user-service',
+          'UserServiceTest',
+          'src/__tests__/UserService.test.ts',
+          'test-suite'
+        ),
       ];
       const mockDb = createMockDb(symbols);
       const analyzer = new EnhancedWorkContextAnalyzer(mockDb);
@@ -190,9 +195,7 @@ describe('EnhancedWorkContextAnalyzer', () => {
     });
 
     it('should track test files', () => {
-      const symbols = [
-        createSymbol('class-a', 'ClassA', 'src/ClassA.ts'),
-      ];
+      const symbols = [createSymbol('class-a', 'ClassA', 'src/ClassA.ts')];
       const mockDb = createMockDb(symbols);
       const analyzer = new EnhancedWorkContextAnalyzer(mockDb);
 
@@ -218,9 +221,7 @@ describe('EnhancedWorkContextAnalyzer', () => {
     });
 
     it('should track documentation files', () => {
-      const symbols = [
-        createSymbol('class-a', 'ClassA', 'src/ClassA.ts'),
-      ];
+      const symbols = [createSymbol('class-a', 'ClassA', 'src/ClassA.ts')];
       const mockDb = createMockDb(symbols);
       const analyzer = new EnhancedWorkContextAnalyzer(mockDb);
 
@@ -233,9 +234,7 @@ describe('EnhancedWorkContextAnalyzer', () => {
 
   describe('analyze - path normalization', () => {
     it('should handle both absolute and relative paths', () => {
-      const symbols = [
-        createSymbol('class-a', 'ClassA', 'src/ClassA.ts'),
-      ];
+      const symbols = [createSymbol('class-a', 'ClassA', 'src/ClassA.ts')];
       const mockDb = createMockDb(symbols);
       const analyzer = new EnhancedWorkContextAnalyzer(mockDb);
 
@@ -244,7 +243,7 @@ describe('EnhancedWorkContextAnalyzer', () => {
       expect(result1.symbols.length).toBe(1);
 
       // Using full path (would need process.cwd() to work correctly in real scenario)
-      const result2 = analyzer.analyze(process.cwd() + '/src/ClassA.ts');
+      const result2 = analyzer.analyze(`${process.cwd()}/src/ClassA.ts`);
       // May or may not match depending on path normalization
       expect(result2).toBeDefined();
     });

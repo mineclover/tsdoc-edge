@@ -48,7 +48,7 @@ export class UserService {}
       const report = detector.analyze(tempDir);
 
       expect(report.brokenLinks).toBeGreaterThan(0);
-      const depLink = report.links.find(l => l.linkType === 'dependency');
+      const depLink = report.links.find((l) => l.linkType === 'dependency');
       expect(depLink).toBeDefined();
       expect(depLink?.target).toBe('NonExistentModule');
     });
@@ -106,7 +106,7 @@ export class Main {}
       const report = detector.analyze(tempDir);
 
       const brokenDepLinks = report.links.filter(
-        l => l.linkType === 'dependency' && l.target === 'Dependency'
+        (l) => l.linkType === 'dependency' && l.target === 'Dependency'
       );
       expect(brokenDepLinks.length).toBe(0);
     });
@@ -129,7 +129,7 @@ export class FileService {}
 
       const report = detector.analyze(tempDir);
 
-      const fsLinks = report.links.filter(l => l.target === 'fs');
+      const fsLinks = report.links.filter((l) => l.target === 'fs');
       expect(fsLinks.length).toBe(0);
     });
 
@@ -161,7 +161,7 @@ export class Client {}
 
       const report = detector.analyze(tempDir);
 
-      const brokenLink = report.links.find(l => l.target === 'UserServic');
+      const brokenLink = report.links.find((l) => l.target === 'UserServic');
       expect(brokenLink).toBeDefined();
       expect(brokenLink?.suggestedFix).toBeDefined();
       expect(brokenLink?.suggestedFix).toContain('UserService');
@@ -300,7 +300,7 @@ export class TestClass {}
 
       const report = detector.analyze(tempDir);
 
-      const testFileLinks = report.links.filter(l => l.sourceFile.endsWith('.test.ts'));
+      const testFileLinks = report.links.filter((l) => l.sourceFile.endsWith('.test.ts'));
       expect(testFileLinks.length).toBe(0);
     });
   });
@@ -344,8 +344,8 @@ export class Example {}
       detector.analyze(tempDir);
       const registry = detector.getSymbolRegistry();
 
-      const hasSimpleKey = Array.from(registry.keys()).some(k => k === 'Example');
-      const hasQualifiedKey = Array.from(registry.keys()).some(k => k.includes('@'));
+      const hasSimpleKey = Array.from(registry.keys()).some((k) => k === 'Example');
+      const hasQualifiedKey = Array.from(registry.keys()).some((k) => k.includes('@'));
 
       expect(hasSimpleKey || hasQualifiedKey).toBe(true);
     });
@@ -370,7 +370,7 @@ export class FileHandler {}
 
       const report = detector.analyze(tempDir);
 
-      const nodeFsLinks = report.links.filter(l => l.target === 'node:fs');
+      const nodeFsLinks = report.links.filter((l) => l.target === 'node:fs');
       expect(nodeFsLinks.length).toBe(0);
     });
 
@@ -392,7 +392,7 @@ export class Parser {}
 
       const report = detector.analyze(tempDir);
 
-      const tsLinks = report.links.filter(l => l.target === 'typescript');
+      const tsLinks = report.links.filter((l) => l.target === 'typescript');
       expect(tsLinks.length).toBe(0);
     });
   });
@@ -466,7 +466,7 @@ export class Independent {}
 
       const report = detector.analyze(tempDir);
 
-      const independentLinks = report.links.filter(l => l.sourceSymbol === 'Independent');
+      const independentLinks = report.links.filter((l) => l.sourceSymbol === 'Independent');
       expect(independentLinks.length).toBe(0);
     });
 
@@ -492,12 +492,7 @@ export class Special {}
     });
 
     it('should handle very long file paths', () => {
-      const longPath = path.join(
-        tempDir,
-        'a'.repeat(50),
-        'b'.repeat(50),
-        'c'.repeat(50)
-      );
+      const longPath = path.join(tempDir, 'a'.repeat(50), 'b'.repeat(50), 'c'.repeat(50));
       fs.mkdirSync(longPath, { recursive: true });
 
       const testFile = path.join(longPath, 'long.ts');

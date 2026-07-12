@@ -114,7 +114,7 @@ Output includes:
 
       // Run all checks
       const impactCmd = new RelationshipImpactCommand();
-      const metricsCmd = new RelationshipMetricsCommand();
+      const _metricsCmd = new RelationshipMetricsCommand();
       const queryCmd = new RelationshipQueryCommand();
 
       // 1. Impact Analysis
@@ -128,7 +128,9 @@ Output includes:
       // 2. Centrality Check
       this.printSection('2. Centrality Check');
       console.log();
-      console.log(`  ${this.colors.dim}Checking if this symbol is architecturally critical...${this.colors.reset}`);
+      console.log(
+        `  ${this.colors.dim}Checking if this symbol is architecturally critical...${this.colors.reset}`
+      );
       console.log();
 
       // Run metrics to see where this symbol ranks
@@ -137,8 +139,12 @@ Output includes:
 
       if (metricsResult.isCritical) {
         this.printWarning(`This symbol is in TOP ${metricsResult.rank} most critical symbols!`);
-        console.log(`  Importance Score: ${this.colors.cyan}${metricsResult.importance.toFixed(4)}${this.colors.reset}`);
-        console.log(`  Degree: ${this.colors.cyan}${metricsResult.degree}${this.colors.reset} connections`);
+        console.log(
+          `  Importance Score: ${this.colors.cyan}${metricsResult.importance.toFixed(4)}${this.colors.reset}`
+        );
+        console.log(
+          `  Degree: ${this.colors.cyan}${metricsResult.degree}${this.colors.reset} connections`
+        );
         console.log(`  Pattern: ${this.colors.yellow}${metricsResult.pattern}${this.colors.reset}`);
       } else {
         this.printSuccess('Not in top critical symbols');
@@ -166,16 +172,24 @@ Output includes:
         console.log(`  ${this.colors.red}⚠️  HIGH RISK CHANGE${this.colors.reset}`);
         console.log();
         console.log(`  This symbol is architecturally critical. Recommended actions:`);
-        console.log(`  ${this.colors.yellow}✓${this.colors.reset} Write comprehensive tests before changing`);
+        console.log(
+          `  ${this.colors.yellow}✓${this.colors.reset} Write comprehensive tests before changing`
+        );
         console.log(`  ${this.colors.yellow}✓${this.colors.reset} Review with senior team member`);
-        console.log(`  ${this.colors.yellow}✓${this.colors.reset} Consider feature flag for gradual rollout`);
-        console.log(`  ${this.colors.yellow}✓${this.colors.reset} Update documentation after changes`);
+        console.log(
+          `  ${this.colors.yellow}✓${this.colors.reset} Consider feature flag for gradual rollout`
+        );
+        console.log(
+          `  ${this.colors.yellow}✓${this.colors.reset} Update documentation after changes`
+        );
         console.log(`  ${this.colors.yellow}✓${this.colors.reset} Monitor closely in production`);
       } else {
         console.log(`  ${this.colors.green}✓ NORMAL RISK CHANGE${this.colors.reset}`);
         console.log();
         console.log(`  This symbol has normal connectivity. Standard workflow:`);
-        console.log(`  ${this.colors.green}✓${this.colors.reset} Follow standard testing practices`);
+        console.log(
+          `  ${this.colors.green}✓${this.colors.reset} Follow standard testing practices`
+        );
         console.log(`  ${this.colors.green}✓${this.colors.reset} Standard code review process`);
         console.log(`  ${this.colors.green}✓${this.colors.reset} Deploy with normal confidence`);
       }
@@ -189,13 +203,16 @@ Output includes:
   /**
    * Execute in JSON mode for automation
    */
-  private async executeJsonMode(symbolId: string, options: RelationshipCheckOptions): Promise<CommandResult> {
+  private async executeJsonMode(
+    symbolId: string,
+    options: RelationshipCheckOptions
+  ): Promise<CommandResult> {
     try {
       const impactCmd = new RelationshipImpactCommand();
       const metricsInfo = await this.getCentralityInfo(symbolId);
 
       // Get impact data
-      const impactResult = await impactCmd.execute([
+      const _impactResult = await impactCmd.execute([
         symbolId,
         '--depth',
         options.depth.toString(),
@@ -236,9 +253,7 @@ Output includes:
   /**
    * Get centrality information for a symbol
    */
-  private async getCentralityInfo(
-    symbolId: string
-  ): Promise<{
+  private async getCentralityInfo(_symbolId: string): Promise<{
     isCritical: boolean;
     rank: number;
     importance: number;

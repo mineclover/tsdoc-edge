@@ -2,12 +2,12 @@
  * FallbackAnalyzer Tests
  */
 
-import * as ts from 'typescript';
-import * as path from 'node:path';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import * as ts from 'typescript';
 import { FallbackAnalyzer } from '../../analyzer/FallbackAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships';
 
 describe('FallbackAnalyzer', () => {
@@ -33,13 +33,12 @@ describe('FallbackAnalyzer', () => {
   }
 
   // Helper to create mock graph
-  function createMockGraph(symbols: Array<{ id: string; name: string; type?: Symbol['type'] }>): SymbolGraph {
+  function createMockGraph(
+    symbols: Array<{ id: string; name: string; type?: Symbol['type'] }>
+  ): SymbolGraph {
     const symbolsMap = new Map<string, Symbol>();
     for (const s of symbols) {
-      symbolsMap.set(
-        s.id,
-        createMockSymbol(s.id, s.name, s.type || 'function')
-      );
+      symbolsMap.set(s.id, createMockSymbol(s.id, s.name, s.type || 'function'));
     }
 
     return {
@@ -116,9 +115,7 @@ describe('FallbackAnalyzer', () => {
     });
 
     it('should return empty array when no fallback patterns found', () => {
-      const graph = createMockGraph([
-        { id: 'function-simple', name: 'simpleFunction' },
-      ]);
+      const graph = createMockGraph([{ id: 'function-simple', name: 'simpleFunction' }]);
 
       const program = createProgram({
         'test.ts': `
@@ -285,16 +282,12 @@ describe('FallbackAnalyzer', () => {
       const result = analyzer.analyze();
 
       // Should deduplicate same pairs
-      const uniquePairs = new Set(
-        result.map((r) => `${r.from}->${r.to}`)
-      );
+      const uniquePairs = new Set(result.map((r) => `${r.from}->${r.to}`));
       expect(uniquePairs.size).toBe(result.length);
     });
 
     it('should not create relationship when symbols are the same', () => {
-      const graph = createMockGraph([
-        { id: 'function-same', name: 'sameFunc' },
-      ]);
+      const graph = createMockGraph([{ id: 'function-same', name: 'sameFunc' }]);
 
       const program = createProgram({
         'test.ts': `
@@ -374,7 +367,7 @@ describe('FallbackAnalyzer', () => {
       const result = analyzer.analyze();
 
       if (result.length > 0) {
-        const tryCatchRel = result.find(r => r.properties?.pattern === 'try-catch');
+        const tryCatchRel = result.find((r) => r.properties?.pattern === 'try-catch');
         if (tryCatchRel) {
           expect(tryCatchRel.confidence).toBe(0.9);
         }
@@ -399,7 +392,7 @@ describe('FallbackAnalyzer', () => {
       const result = analyzer.analyze();
 
       if (result.length > 0) {
-        const orRel = result.find(r => r.properties?.pattern === 'logical-or');
+        const orRel = result.find((r) => r.properties?.pattern === 'logical-or');
         if (orRel) {
           expect(orRel.confidence).toBe(0.7);
         }
@@ -464,7 +457,7 @@ describe('FallbackAnalyzer', () => {
       expect(stats.byPattern['try-catch']).toBe(0);
       expect(stats.byPattern['logical-or']).toBe(0);
       expect(stats.byPattern['nullish-coalesce']).toBe(0);
-      expect(stats.byPattern['conditional']).toBe(0);
+      expect(stats.byPattern.conditional).toBe(0);
     });
 
     it('should calculate statistics correctly', () => {
@@ -484,7 +477,7 @@ describe('FallbackAnalyzer', () => {
       expect(stats.byPattern['try-catch']).toBe(2);
       expect(stats.byPattern['logical-or']).toBe(1);
       expect(stats.byPattern['nullish-coalesce']).toBe(1);
-      expect(stats.byPattern['conditional']).toBe(0);
+      expect(stats.byPattern.conditional).toBe(0);
     });
   });
 
@@ -587,9 +580,7 @@ describe('FallbackAnalyzer', () => {
     });
 
     it('should handle try without catch', () => {
-      const graph = createMockGraph([
-        { id: 'function-risky', name: 'risky' },
-      ]);
+      const graph = createMockGraph([{ id: 'function-risky', name: 'risky' }]);
 
       const program = createProgram({
         'test.ts': `

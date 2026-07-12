@@ -10,9 +10,9 @@
  * @packageDocumentation
  */
 
-import * as ts from 'typescript';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import * as ts from 'typescript';
 
 export enum EntryPointType {
   CLI = 'cli',
@@ -59,7 +59,11 @@ export class EntryPointDetector {
   private config: EntryPointDetectionConfig;
   private projectRoot: string;
 
-  constructor(program: ts.Program, projectRoot: string, config: Partial<EntryPointDetectionConfig> = {}) {
+  constructor(
+    program: ts.Program,
+    projectRoot: string,
+    config: Partial<EntryPointDetectionConfig> = {}
+  ) {
     this.program = program;
     this.projectRoot = projectRoot;
     this.config = { ...DEFAULT_CONFIG, ...config };
@@ -133,7 +137,8 @@ export class EntryPointDetector {
         const functionName = node.name.text;
         if (this.isMainFunctionName(functionName)) {
           const line = sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1;
-          const isAsync = node.modifiers?.some(m => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
+          const isAsync =
+            node.modifiers?.some((m) => m.kind === ts.SyntaxKind.AsyncKeyword) ?? false;
 
           entryPoints.push({
             id: this.generateId(filePath, functionName),
@@ -154,11 +159,17 @@ export class EntryPointDetector {
           if (ts.isIdentifier(declaration.name)) {
             const varName = declaration.name.text;
             if (this.isMainFunctionName(varName) && declaration.initializer) {
-              if (ts.isArrowFunction(declaration.initializer) || ts.isFunctionExpression(declaration.initializer)) {
+              if (
+                ts.isArrowFunction(declaration.initializer) ||
+                ts.isFunctionExpression(declaration.initializer)
+              ) {
                 const line = sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1;
                 const isAsync =
                   (ts.isArrowFunction(declaration.initializer) &&
-                  declaration.initializer.modifiers?.some(m => m.kind === ts.SyntaxKind.AsyncKeyword)) ?? false;
+                    declaration.initializer.modifiers?.some(
+                      (m) => m.kind === ts.SyntaxKind.AsyncKeyword
+                    )) ??
+                  false;
 
                 entryPoints.push({
                   id: this.generateId(filePath, varName),
@@ -226,9 +237,10 @@ export class EntryPointDetector {
    * Check if function name matches main function pattern
    */
   private isMainFunctionName(name: string): boolean {
-    return this.config.mainFunctionPatterns.some(pattern =>
-      name.toLowerCase() === pattern.toLowerCase() ||
-      name.toLowerCase().startsWith(pattern.toLowerCase())
+    return this.config.mainFunctionPatterns.some(
+      (pattern) =>
+        name.toLowerCase() === pattern.toLowerCase() ||
+        name.toLowerCase().startsWith(pattern.toLowerCase())
     );
   }
 

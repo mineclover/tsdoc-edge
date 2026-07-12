@@ -5,10 +5,10 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
+import { ConfigManager } from '../config/ConfigManager';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import { DocumentSymbolRegistry } from '../doc-symbol/DocumentSymbolRegistry';
-import { ConfigManager } from '../config/ConfigManager';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for validating document symbols
@@ -112,7 +112,7 @@ export class ValidateDocsCommand extends BaseCommand {
           if (parsed) {
             registry.registerDocument(parsed);
           }
-        } catch (error) {
+        } catch (_error) {
           // Errors will be shown in validation
         }
       }
@@ -123,12 +123,12 @@ export class ValidateDocsCommand extends BaseCommand {
         try {
           const indexData = JSON.parse(fs.readFileSync(indexPath, 'utf-8'));
           const codeConnections = indexData.registryData?.codeConnections || [];
-          for (const [symbolName, connections] of codeConnections) {
+          for (const [_symbolName, connections] of codeConnections) {
             for (const conn of connections) {
               registry.registerCodeConnection(conn);
             }
           }
-        } catch (e) {
+        } catch (_e) {
           // Ignore errors loading index
         }
       }
@@ -211,7 +211,7 @@ export class ValidateDocsCommand extends BaseCommand {
 
       if (stat.isDirectory()) {
         // Skip excluded directories
-        if (excludeDirs && excludeDirs.includes(entry)) {
+        if (excludeDirs?.includes(entry)) {
           continue;
         }
         files.push(...this.findMarkdownFiles(fullPath, excludeDirs || []));

@@ -4,9 +4,9 @@
  */
 
 import Database from 'better-sqlite3';
-import { BaseCommand, type CommandResult } from './BaseCommand';
-import { XmlBuilder } from '../output/XmlBuilder';
 import { EndpointsSchema } from '../output/schemas';
+import { XmlBuilder } from '../output/XmlBuilder';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 export class EndpointsCommand extends BaseCommand {
   getName(): string {
@@ -23,7 +23,7 @@ export class EndpointsCommand extends BaseCommand {
 
   async execute(args: string[]): Promise<CommandResult> {
     const useXml = !args.includes('--human');
-    const filterPath = args.find(a => !a.startsWith('--')) || '';
+    const filterPath = args.find((a) => !a.startsWith('--')) || '';
 
     const dbCheck = this.checkDatabaseExists();
     if (dbCheck) return dbCheck;
@@ -41,7 +41,11 @@ export class EndpointsCommand extends BaseCommand {
         ORDER BY file_path, type
       `;
 
-      const results = db.prepare(query).all() as Array<{ name: string; type: string; file_path: string }>;
+      const results = db.prepare(query).all() as Array<{
+        name: string;
+        type: string;
+        file_path: string;
+      }>;
 
       if (useXml) {
         // Group by file
@@ -54,12 +58,10 @@ export class EndpointsCommand extends BaseCommand {
 
         const filesData = Array.from(byFile.entries()).map(([filePath, symbols]) => ({
           path: filePath,
-          symbols: symbols.map(sym => ({ type: sym.type, name: sym.name })),
+          symbols: symbols.map((sym) => ({ type: sym.type, name: sym.name })),
         }));
 
-        new XmlBuilder(EndpointsSchema)
-          .section('files', filesData)
-          .print();
+        new XmlBuilder(EndpointsSchema).section('files', filesData).print();
       } else {
         console.log(`\nExported Symbols: ${results.length}\n`);
         let currentFile = '';

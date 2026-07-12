@@ -6,8 +6,12 @@
  */
 
 import * as fs from 'node:fs';
+import {
+  DatabaseManager,
+  type SymbolRow,
+  type UnifiedRelationshipRow,
+} from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager, type UnifiedRelationshipRow, type SymbolRow } from '../storage/DatabaseManager';
 
 /** Supported export formats for relationship data */
 type ExportFormat = 'json' | 'graphml' | 'dot' | 'csv' | 'cypher' | 'gephi';
@@ -122,14 +126,14 @@ Examples:
 
       // Apply filters
       if (options.category) {
-        allRels = allRels.filter(r => r.category === options.category);
+        allRels = allRels.filter((r) => r.category === options.category);
       }
       if (options.type) {
-        allRels = allRels.filter(r => r.type === options.type);
+        allRels = allRels.filter((r) => r.type === options.type);
       }
       if (options.minConfidence !== undefined) {
         const minConf = options.minConfidence;
-        allRels = allRels.filter(r => r.confidence >= minConf);
+        allRels = allRels.filter((r) => r.confidence >= minConf);
       }
 
       const relationships = allRels;
@@ -177,14 +181,19 @@ Examples:
 
       dbManager.close();
 
-      return this.success(`Exported ${relationships.length} relationships in ${options.format} format`);
+      return this.success(
+        `Exported ${relationships.length} relationships in ${options.format} format`
+      );
     });
   }
 
   /**
    * Export to JSON format
    */
-  private exportJSON(relationships: UnifiedRelationshipRow[], symbolMap: Map<string, SymbolRow>): string {
+  private exportJSON(
+    relationships: UnifiedRelationshipRow[],
+    symbolMap: Map<string, SymbolRow>
+  ): string {
     const data = {
       metadata: {
         exportDate: new Date().toISOString(),
@@ -217,7 +226,10 @@ Examples:
   /**
    * Export to GraphML format
    */
-  private exportGraphML(relationships: UnifiedRelationshipRow[], symbolMap: Map<string, SymbolRow>): string {
+  private exportGraphML(
+    relationships: UnifiedRelationshipRow[],
+    symbolMap: Map<string, SymbolRow>
+  ): string {
     let xml = `<?xml version="1.0" encoding="UTF-8"?>
 <graphml xmlns="http://graphml.graphdrawing.org/xmlns"
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -286,7 +298,10 @@ Examples:
   /**
    * Export to Graphviz DOT format
    */
-  private exportDOT(relationships: UnifiedRelationshipRow[], symbolMap: Map<string, SymbolRow>): string {
+  private exportDOT(
+    relationships: UnifiedRelationshipRow[],
+    symbolMap: Map<string, SymbolRow>
+  ): string {
     let dot = `digraph relationships {
   // Graph settings
   rankdir=LR;
@@ -339,7 +354,8 @@ Examples:
    * Export to CSV format
    */
   private exportCSV(relationships: UnifiedRelationshipRow[]): string {
-    const header = 'id,type,category,from_symbols,to_symbols,direction,strength,confidence,description\n';
+    const header =
+      'id,type,category,from_symbols,to_symbols,direction,strength,confidence,description\n';
 
     const rows = relationships.map((r) => {
       const from = JSON.parse(r.from_symbols).join('|');
@@ -355,7 +371,10 @@ Examples:
   /**
    * Export to Neo4j Cypher statements
    */
-  private exportCypher(relationships: UnifiedRelationshipRow[], symbolMap: Map<string, SymbolRow>): string {
+  private exportCypher(
+    relationships: UnifiedRelationshipRow[],
+    symbolMap: Map<string, SymbolRow>
+  ): string {
     let cypher = `// TSDoc Edge Relationship Export - Neo4j Cypher
 // Generated: ${new Date().toISOString()}
 
@@ -426,7 +445,11 @@ CREATE INDEX symbol_type IF NOT EXISTS FOR (s:Symbol) ON (s.type);
    * Export to Gephi Lite SDK format
    * Based on @gephi/gephi-lite-sdk GraphDataset structure
    */
-  private exportGephi(relationships: UnifiedRelationshipRow[], symbolMap: Map<string, SymbolRow>, layout: string): string {
+  private exportGephi(
+    relationships: UnifiedRelationshipRow[],
+    symbolMap: Map<string, SymbolRow>,
+    layout: string
+  ): string {
     // Build node data
     const nodeData: Record<string, Record<string, unknown>> = {};
     const nodeLayout: Record<string, { x: number; y: number }> = {};
@@ -472,7 +495,8 @@ CREATE INDEX symbol_type IF NOT EXISTS FOR (s:Symbol) ON (s.type);
                 confidence: rel.confidence,
                 direction: rel.direction,
                 strength: rel.strength,
-                weight: (rel as unknown as Record<string, unknown>).weight as number | undefined || 1,
+                weight:
+                  ((rel as unknown as Record<string, unknown>).weight as number | undefined) || 1,
               };
 
               edges.push({
@@ -484,7 +508,7 @@ CREATE INDEX symbol_type IF NOT EXISTS FOR (s:Symbol) ON (s.type);
             }
           }
         }
-      } catch (error) {
+      } catch (_error) {
         // Skip invalid relationships
       }
     }
@@ -576,8 +600,8 @@ CREATE INDEX symbol_type IF NOT EXISTS FOR (s:Symbol) ON (s.type);
     const row = Math.floor(index / cols);
     const col = index % cols;
     return {
-      x: col * 100 - (cols * 50),
-      y: row * 100 - (Math.ceil(total / cols) * 50),
+      x: col * 100 - cols * 50,
+      y: row * 100 - Math.ceil(total / cols) * 50,
     };
   }
 
@@ -591,18 +615,5 @@ CREATE INDEX symbol_type IF NOT EXISTS FOR (s:Symbol) ON (s.type);
       .replace(/>/g, '&gt;')
       .replace(/"/g, '&quot;')
       .replace(/'/g, '&apos;');
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      bold: '\x1b[1m',
-      dim: '\x1b[2m',
-      green: '\x1b[32m',
-      yellow: '\x1b[33m',
-      blue: '\x1b[34m',
-      cyan: '\x1b[36m',
-      red: '\x1b[31m',
-    };
   }
 }

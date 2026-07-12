@@ -5,10 +5,10 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
 import { TSDocParser } from '../parser/TSDocParser';
+import { DatabaseManager } from '../storage/DatabaseManager';
 import type { Symbol } from '../types/graph/graph';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Coverage statistics for a symbol category
@@ -139,9 +139,7 @@ export class CoverageReportCommand extends BaseCommand {
       }
 
       // 2. Filter if requested
-      const symbols = filterPublic
-        ? allSymbols.filter((s) => this.isPublicAPI(s))
-        : allSymbols;
+      const symbols = filterPublic ? allSymbols.filter((s) => this.isPublicAPI(s)) : allSymbols;
 
       // 3. Check coverage
       const report = hierarchical
@@ -168,7 +166,7 @@ export class CoverageReportCommand extends BaseCommand {
   private async getAllSymbols(): Promise<Symbol[]> {
     try {
       return await this.db.getAllSymbols();
-    } catch (error) {
+    } catch (_error) {
       // If database doesn't exist or method not available, return empty
       return [];
     }
@@ -254,7 +252,7 @@ export class CoverageReportCommand extends BaseCommand {
       }
 
       return false;
-    } catch (error) {
+    } catch (_error) {
       // If parsing fails, assume no doc tag
       return false;
     }
@@ -410,7 +408,7 @@ export class CoverageReportCommand extends BaseCommand {
       }
 
       return files;
-    } catch (error) {
+    } catch (_error) {
       return [];
     }
   }
@@ -424,16 +422,20 @@ export class CoverageReportCommand extends BaseCommand {
     // Overall coverage
     this.printSection(hierarchical ? 'Overall Coverage (Hierarchical)' : 'Overall Coverage');
     console.log(`  Total symbols: ${overall.total}`);
-    console.log(`  Documented (${hierarchical ? 'file-level' : '@doc tag'}): ${overall.documented}`);
+    console.log(
+      `  Documented (${hierarchical ? 'file-level' : '@doc tag'}): ${overall.documented}`
+    );
 
-    const coverageColor = overall.coverage >= 50 ? colors.green : overall.coverage >= 30 ? colors.yellow : colors.red;
+    const coverageColor =
+      overall.coverage >= 50 ? colors.green : overall.coverage >= 30 ? colors.yellow : colors.red;
     console.log(`  Coverage: ${coverageColor}${overall.coverage.toFixed(1)}%${colors.reset}`);
     console.log();
 
     // By category
     this.printSection('Coverage by Category');
     for (const [category, stats] of Object.entries(byCategory)) {
-      const catColor = stats.coverage >= 80 ? colors.green : stats.coverage >= 50 ? colors.yellow : colors.red;
+      const catColor =
+        stats.coverage >= 80 ? colors.green : stats.coverage >= 50 ? colors.yellow : colors.red;
       console.log(
         `  ${category.padEnd(15)}: ${stats.documented.toString().padStart(3)} / ${stats.total.toString().padStart(3)} (${catColor}${stats.coverage.toFixed(1)}%${colors.reset})`
       );

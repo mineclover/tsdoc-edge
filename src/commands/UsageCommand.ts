@@ -175,7 +175,9 @@ export class UsageCommand extends BaseCommand {
 
     for (const error of errors) {
       const date = new Date(error.timestamp).toLocaleString();
-      console.log(`${this.colors.red}✗${this.colors.reset} ${this.colors.bold}${error.command}${this.colors.reset} (${date})`);
+      console.log(
+        `${this.colors.red}✗${this.colors.reset} ${this.colors.bold}${error.command}${this.colors.reset} (${date})`
+      );
       console.log(`  ${this.colors.dim}${error.cwd}${this.colors.reset}`);
 
       if (error.error) {

@@ -11,8 +11,8 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { CanonicalAliasContext } from '../indexer/CanonicalAliasContext';
-import type { DatabaseManager } from '../storage/DatabaseManager';
 import { RelationshipQueryEngine } from '../query/RelationshipQueryEngine';
+import type { DatabaseManager } from '../storage/DatabaseManager';
 import type { Symbol } from '../types/graph';
 
 /**
@@ -45,7 +45,12 @@ export interface EnhancedWorkContext {
     dependents: Array<{ symbolId: string; symbolName: string; depId: string; depName: string }>;
 
     /** Semantic neighbors (same domain/feature) */
-    semanticNeighbors: Array<{ symbolId: string; symbolName: string; neighborId: string; neighborName: string }>;
+    semanticNeighbors: Array<{
+      symbolId: string;
+      symbolName: string;
+      neighborId: string;
+      neighborName: string;
+    }>;
   };
 
   /** Summary statistics */
@@ -148,8 +153,8 @@ export class EnhancedWorkContextAnalyzer {
     const relativePath = path.relative(cwd, filePath);
 
     // Try both absolute and relative paths
-    const fileSymbols = allSymbols.filter(s =>
-      s.filePath === filePath || s.filePath === relativePath
+    const fileSymbols = allSymbols.filter(
+      (s) => s.filePath === filePath || s.filePath === relativePath
     );
 
     // Initialize context
@@ -273,21 +278,18 @@ export class EnhancedWorkContextAnalyzer {
 
     // Calculate summary statistics
     context.summary.relationshipCount = context.relationships.total;
-    context.summary.density = fileSymbols.length > 0
-      ? context.relationships.total / fileSymbols.length
-      : 0;
+    context.summary.density =
+      fileSymbols.length > 0 ? context.relationships.total / fileSymbols.length : 0;
 
     // Test coverage: percentage of symbols with tests
-    const symbolsWithTests = new Set(context.relationships.tests.map(t => t.symbolId));
-    context.summary.testCoverage = fileSymbols.length > 0
-      ? (symbolsWithTests.size / fileSymbols.length) * 100
-      : 0;
+    const symbolsWithTests = new Set(context.relationships.tests.map((t) => t.symbolId));
+    context.summary.testCoverage =
+      fileSymbols.length > 0 ? (symbolsWithTests.size / fileSymbols.length) * 100 : 0;
 
     // Documentation coverage: percentage of symbols with docs
-    const symbolsWithDocs = new Set(context.relationships.documentation.map(d => d.symbolId));
-    context.summary.documentationCoverage = fileSymbols.length > 0
-      ? (symbolsWithDocs.size / fileSymbols.length) * 100
-      : 0;
+    const symbolsWithDocs = new Set(context.relationships.documentation.map((d) => d.symbolId));
+    context.summary.documentationCoverage =
+      fileSymbols.length > 0 ? (symbolsWithDocs.size / fileSymbols.length) * 100 : 0;
 
     if (this.canonicalContext) {
       const canonicalSymbols: NonNullable<EnhancedWorkContext['canonical']>['symbols'] = [];
@@ -332,7 +334,7 @@ export class EnhancedWorkContextAnalyzer {
 
       // If this symbol is in 'to', then 'from' symbols depend on it
       if (to.includes(symbolId)) {
-        dependents.push(...from.filter(f => f !== symbolId));
+        dependents.push(...from.filter((f) => f !== symbolId));
       }
     }
 

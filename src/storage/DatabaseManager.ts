@@ -8,7 +8,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import Database from 'better-sqlite3';
-import { and, asc, count, desc, eq, gte, inArray, like, lte, ne, or, sql } from 'drizzle-orm';
+import { and, asc, count, desc, eq, gte, inArray, like, lte, or, sql } from 'drizzle-orm';
 import { drizzle } from 'drizzle-orm/better-sqlite3';
 import { ConfigManager } from '../config/ConfigManager';
 import type { Symbol } from '../types/graph';
@@ -821,9 +821,7 @@ export class DatabaseManager {
           this.insertEnhancedDoc(doc, i);
           count++;
         }
-      } catch {
-        continue;
-      }
+      } catch {}
     }
 
     return count;
@@ -1576,7 +1574,7 @@ export class DatabaseManager {
       if (!toSymbolsByRelId.has(relationshipId)) {
         toSymbolsByRelId.set(relationshipId, []);
       }
-      toSymbolsByRelId.get(relationshipId)!.push(symbolId);
+      toSymbolsByRelId.get(relationshipId)?.push(symbolId);
     }
 
     // Generate edges
@@ -2557,7 +2555,7 @@ export class DatabaseManager {
         .where(
           or(
             sql`LOWER(${schema.symbols.name}) = ${lowerName}`,
-            sql`LOWER(${schema.symbols.name}) LIKE ${lowerName + '.%'}`
+            sql`LOWER(${schema.symbols.name}) LIKE ${`${lowerName}.%`}`
           )
         )
         .all();
@@ -2568,7 +2566,7 @@ export class DatabaseManager {
       rows = this.drizzleDb
         .select()
         .from(schema.symbols)
-        .where(sql`LOWER(${schema.symbols.name}) LIKE ${'%' + name.toLowerCase() + '%'}`)
+        .where(sql`LOWER(${schema.symbols.name}) LIKE ${`%${name.toLowerCase()}%`}`)
         .orderBy(sql`LENGTH(${schema.symbols.name})`)
         .limit(20)
         .all();
@@ -2617,7 +2615,7 @@ export class DatabaseManager {
           or(eq(schema.symbols.type, 'method'), eq(schema.symbols.type, 'function')),
           or(
             sql`LOWER(${schema.symbols.name}) = ${lowerName}`,
-            sql`LOWER(${schema.symbols.name}) LIKE ${'%.' + lowerName}`
+            sql`LOWER(${schema.symbols.name}) LIKE ${`%.${lowerName}`}`
           )
         )
       )

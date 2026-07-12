@@ -5,8 +5,8 @@
  * @testScenario List all commands
  */
 
-import { CommandRegistry } from '../../commands/CommandRegistry';
 import { BaseCommand, type CommandResult } from '../../commands/BaseCommand';
+import { CommandRegistry } from '../../commands/CommandRegistry';
 
 // Create a concrete test command
 class TestCommand extends BaseCommand {
@@ -35,7 +35,7 @@ class TestCommand extends BaseCommand {
     return `tsdoc-edge ${this._name}`;
   }
 
-  async execute(args: string[]): Promise<CommandResult> {
+  async execute(_args: string[]): Promise<CommandResult> {
     return this.success();
   }
 }

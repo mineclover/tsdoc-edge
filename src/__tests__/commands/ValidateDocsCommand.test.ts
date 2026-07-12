@@ -29,7 +29,7 @@ describe('ValidateDocsCommand', () => {
   beforeEach(() => {
     consoleSpy = jest.spyOn(console, 'log').mockImplementation();
     tempDir = fs.realpathSync(
-      fs.mkdtempSync(path.join(require('os').tmpdir(), 'validate-docs-test-'))
+      fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'validate-docs-test-'))
     );
   });
 

@@ -2,12 +2,12 @@
  * ConstraintAnalyzer Tests
  */
 
-import * as ts from 'typescript';
-import * as path from 'node:path';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import * as ts from 'typescript';
 import { ConstraintAnalyzer } from '../../analyzer/ConstraintAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships';
 
 describe('ConstraintAnalyzer', () => {
@@ -24,9 +24,7 @@ describe('ConstraintAnalyzer', () => {
   });
 
   // Helper to create mock graph
-  function createMockGraph(
-    symbols: Array<{ id: string; name: string }>
-  ): SymbolGraph {
+  function createMockGraph(symbols: Array<{ id: string; name: string }>): SymbolGraph {
     const symbolsMap = new Map<string, Symbol>();
     const nameIndex = new Map<string, string[]>();
 
@@ -194,9 +192,7 @@ describe('ConstraintAnalyzer', () => {
     });
 
     it('should skip test files', () => {
-      const graph = createMockGraph([
-        { id: 'class-test', name: 'TestClass' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-test', name: 'TestClass' }]);
 
       const program = createProgram({
         'test.test.ts': `
@@ -279,7 +275,7 @@ describe('ConstraintAnalyzer', () => {
       const analyzer = new ConstraintAnalyzer(graph, tempDir, program);
       const result = analyzer.analyze();
 
-      const relationship = result.find(r => r.type === 'co-requirement');
+      const relationship = result.find((r) => r.type === 'co-requirement');
 
       if (relationship) {
         expect(relationship).toMatchObject({
@@ -355,7 +351,7 @@ describe('ConstraintAnalyzer', () => {
 
       const stats = analyzer.getStatistics([relationship]);
 
-      expect(stats.bySource['unknown']).toBe(1);
+      expect(stats.bySource.unknown).toBe(1);
     });
   });
 

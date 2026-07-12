@@ -4,16 +4,15 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { execSync } from 'node:child_process';
-import { SpecVersionManager } from '../../spec/SpecVersionManager';
 import type { VersionBumpType } from '../../spec/SpecVersionManager';
+import { SpecVersionManager } from '../../spec/SpecVersionManager';
 
 describe('SpecVersionManager', () => {
   let tempDir: string;
   let manager: SpecVersionManager;
 
   beforeEach(() => {
-    tempDir = path.join(process.cwd(), '.test-temp', 'spec-version-test-' + Math.random());
+    tempDir = path.join(process.cwd(), '.test-temp', `spec-version-test-${Math.random()}`);
     fs.mkdirSync(tempDir, { recursive: true });
     manager = new SpecVersionManager();
   });
@@ -71,11 +70,15 @@ Usage section content.
 
     it('should return null for document without version', () => {
       const filePath = path.join(tempDir, 'no-version.md');
-      fs.writeFileSync(filePath, `---
+      fs.writeFileSync(
+        filePath,
+        `---
 status: draft
 ---
 
-# Test`, 'utf-8');
+# Test`,
+        'utf-8'
+      );
 
       const version = manager.getCurrentVersion(filePath);
       expect(version).toBeNull();
@@ -83,11 +86,15 @@ status: draft
 
     it('should handle version with quotes', () => {
       const filePath = path.join(tempDir, 'quoted-version.md');
-      fs.writeFileSync(filePath, `---
+      fs.writeFileSync(
+        filePath,
+        `---
 version: "2.0.0"
 ---
 
-# Test`, 'utf-8');
+# Test`,
+        'utf-8'
+      );
 
       const version = manager.getCurrentVersion(filePath);
       expect(version).toBe('"2.0.0"');
@@ -95,11 +102,15 @@ version: "2.0.0"
 
     it('should handle version with spaces', () => {
       const filePath = path.join(tempDir, 'spaced-version.md');
-      fs.writeFileSync(filePath, `---
+      fs.writeFileSync(
+        filePath,
+        `---
 version:   1.0.0
 ---
 
-# Test`, 'utf-8');
+# Test`,
+        'utf-8'
+      );
 
       const version = manager.getCurrentVersion(filePath);
       expect(version).toBe('1.0.0');
@@ -151,11 +162,15 @@ version:   1.0.0
 
     it('should throw error for missing version', () => {
       const filePath = path.join(tempDir, 'no-version.md');
-      fs.writeFileSync(filePath, `---
+      fs.writeFileSync(
+        filePath,
+        `---
 status: draft
 ---
 
-# Test`, 'utf-8');
+# Test`,
+        'utf-8'
+      );
 
       expect(() => {
         manager.bump(filePath, 'patch');
@@ -164,11 +179,15 @@ status: draft
 
     it('should throw error for invalid version format', () => {
       const filePath = path.join(tempDir, 'bad-version.md');
-      fs.writeFileSync(filePath, `---
+      fs.writeFileSync(
+        filePath,
+        `---
 version: not-a-version
 ---
 
-# Test`, 'utf-8');
+# Test`,
+        'utf-8'
+      );
 
       expect(() => {
         manager.bump(filePath, 'patch');
@@ -177,11 +196,15 @@ version: not-a-version
 
     it('should handle version with only two parts', () => {
       const filePath = path.join(tempDir, 'two-part-version.md');
-      fs.writeFileSync(filePath, `---
+      fs.writeFileSync(
+        filePath,
+        `---
 version: 1.0
 ---
 
-# Test`, 'utf-8');
+# Test`,
+        'utf-8'
+      );
 
       expect(() => {
         manager.bump(filePath, 'patch');
@@ -254,11 +277,15 @@ version: 1.0
 
     it('should show no history message when no versions', () => {
       const filePath = path.join(tempDir, 'no-version.md');
-      fs.writeFileSync(filePath, `---
+      fs.writeFileSync(
+        filePath,
+        `---
 status: draft
 ---
 
-# Test`, 'utf-8');
+# Test`,
+        'utf-8'
+      );
 
       const changelog = manager.generateChangelog(filePath);
       expect(changelog).toContain('No version history available');
@@ -314,14 +341,18 @@ status: draft
   describe('frontmatter handling', () => {
     it('should preserve other frontmatter fields when bumping', () => {
       const filePath = path.join(tempDir, 'rich-frontmatter.md');
-      fs.writeFileSync(filePath, `---
+      fs.writeFileSync(
+        filePath,
+        `---
 version: 1.0.0
 status: active
 author: Test Author
 tags: [test, spec]
 ---
 
-# Test`, 'utf-8');
+# Test`,
+        'utf-8'
+      );
 
       manager.bump(filePath, 'patch');
       const content = fs.readFileSync(filePath, 'utf-8');
@@ -334,14 +365,18 @@ tags: [test, spec]
 
     it('should handle multiline frontmatter values', () => {
       const filePath = path.join(tempDir, 'multiline.md');
-      fs.writeFileSync(filePath, `---
+      fs.writeFileSync(
+        filePath,
+        `---
 version: 1.0.0
 description: |
   This is a
   multiline description
 ---
 
-# Test`, 'utf-8');
+# Test`,
+        'utf-8'
+      );
 
       const version = manager.getCurrentVersion(filePath);
       expect(version).toBe('1.0.0');
@@ -359,9 +394,13 @@ description: |
 
     it('should handle document with only frontmatter', () => {
       const filePath = path.join(tempDir, 'only-frontmatter.md');
-      fs.writeFileSync(filePath, `---
+      fs.writeFileSync(
+        filePath,
+        `---
 version: 1.0.0
----`, 'utf-8');
+---`,
+        'utf-8'
+      );
 
       const version = manager.getCurrentVersion(filePath);
       expect(version).toBe('1.0.0');
@@ -369,11 +408,15 @@ version: 1.0.0
 
     it('should handle document with malformed frontmatter', () => {
       const filePath = path.join(tempDir, 'malformed.md');
-      fs.writeFileSync(filePath, `---
+      fs.writeFileSync(
+        filePath,
+        `---
 version 1.0.0
 ---
 
-# Test`, 'utf-8');
+# Test`,
+        'utf-8'
+      );
 
       const version = manager.getCurrentVersion(filePath);
       expect(version).toBeNull();
@@ -381,9 +424,13 @@ version 1.0.0
 
     it('should handle document with no frontmatter delimiter', () => {
       const filePath = path.join(tempDir, 'no-delimiter.md');
-      fs.writeFileSync(filePath, `version: 1.0.0
+      fs.writeFileSync(
+        filePath,
+        `version: 1.0.0
 
-# Test`, 'utf-8');
+# Test`,
+        'utf-8'
+      );
 
       const version = manager.getCurrentVersion(filePath);
       // The regex actually matches "version: X.Y.Z" anywhere in the file

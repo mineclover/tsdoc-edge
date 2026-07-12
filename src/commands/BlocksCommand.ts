@@ -4,10 +4,10 @@
  */
 
 import Database from 'better-sqlite3';
-import { BaseCommand, type CommandResult } from './BaseCommand';
-import { XmlBuilder } from '../output/XmlBuilder';
 import type { OutputSchema } from '../output/types';
 import { arrayOf } from '../output/types';
+import { XmlBuilder } from '../output/XmlBuilder';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 const BlocksSchema: OutputSchema = {
   root: 'code-blocks',
@@ -59,7 +59,7 @@ export class BlocksCommand extends BaseCommand {
     }
 
     const symbolId = args[0];
-    const typeFilter = args.find(a => a.startsWith('--type='))?.split('=')[1];
+    const typeFilter = args.find((a) => a.startsWith('--type='))?.split('=')[1];
 
     const dbCheck = this.checkDatabaseExists();
     if (dbCheck) return dbCheck;
@@ -69,11 +69,13 @@ export class BlocksCommand extends BaseCommand {
 
     try {
       // Get symbol info
-      const symbol = db.prepare(`
+      const symbol = db
+        .prepare(`
         SELECT id, name, type, file_path as file
         FROM symbols
         WHERE id = ?
-      `).get(symbolId) as { id: string; name: string; type: string; file: string } | undefined;
+      `)
+        .get(symbolId) as { id: string; name: string; type: string; file: string } | undefined;
 
       if (!symbol) {
         db.close();
@@ -129,7 +131,8 @@ export class BlocksCommand extends BaseCommand {
       // Calculate statistics
       const totalBlocks = blocks.length;
       const totalLines = blocks.reduce((sum, b) => sum + (b.endLine - b.startLine + 1), 0);
-      const averageComplexity = blocks.reduce((sum, b) => sum + (b.complexity || 0), 0) / totalBlocks;
+      const averageComplexity =
+        blocks.reduce((sum, b) => sum + (b.complexity || 0), 0) / totalBlocks;
 
       const byType: Record<string, number> = {};
       for (const block of blocks) {
@@ -137,7 +140,7 @@ export class BlocksCommand extends BaseCommand {
       }
 
       // Format blocks for output
-      const formattedBlocks = blocks.map(b => ({
+      const formattedBlocks = blocks.map((b) => ({
         id: b.id,
         type: b.type,
         startLine: b.startLine,

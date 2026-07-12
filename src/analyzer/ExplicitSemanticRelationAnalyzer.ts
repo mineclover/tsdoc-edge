@@ -139,7 +139,8 @@ export class ExplicitSemanticRelationAnalyzer {
               if (tag.tagName.text === 'relatedTo') {
                 const relationInfo = this.parseRelatedToTag(tag);
                 if (relationInfo) {
-                  const line = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
+                  const line =
+                    sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
                   sites.push({
                     sourceSymbol,
                     targetSymbol: relationInfo.target,
@@ -152,7 +153,7 @@ export class ExplicitSemanticRelationAnalyzer {
             }
           }
         }
-      } catch (error) {
+      } catch (_error) {
         // Skip nodes that cause errors
       }
 
@@ -234,9 +235,7 @@ export class ExplicitSemanticRelationAnalyzer {
       if (typeof tag.comment === 'string') return tag.comment;
       if (Array.isArray(tag.comment)) {
         return tag.comment
-          .map((part: ts.JSDocText | ts.JSDocLink) =>
-            'text' in part ? part.text : ''
-          )
+          .map((part: ts.JSDocText | ts.JSDocLink) => ('text' in part ? part.text : ''))
           .join('');
       }
     }
@@ -260,7 +259,9 @@ export class ExplicitSemanticRelationAnalyzer {
         const fullPath = path.join(currentDir, entry.name);
         if (entry.isDirectory()) {
           // Skip common build/dependency directories
-          if (!['node_modules', 'dist', 'build', '.git', '.tsdoc', 'coverage'].includes(entry.name)) {
+          if (
+            !['node_modules', 'dist', 'build', '.git', '.tsdoc', 'coverage'].includes(entry.name)
+          ) {
             traverse(fullPath);
           }
         } else if (entry.isFile() && entry.name.endsWith('.ts') && !entry.name.endsWith('.d.ts')) {
@@ -304,8 +305,8 @@ export class ExplicitSemanticRelationAnalyzer {
           lineNumber: site.line,
           snippet: `@relatedTo ${site.targetSymbol}${site.description ? ` - ${site.description}` : ''}`,
           confidence: 1.0,
-          context: 'Explicit developer-declared relationship'
-        }
+          context: 'Explicit developer-declared relationship',
+        },
       ],
       discoveredBy: 'documentation',
       confidence: 1.0, // Explicit tags have highest confidence
@@ -317,7 +318,7 @@ export class ExplicitSemanticRelationAnalyzer {
       },
       createdAt: timestamp,
       updatedAt: timestamp,
-      description
+      description,
     };
   }
 

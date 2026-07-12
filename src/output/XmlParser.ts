@@ -3,7 +3,14 @@
  * @packageDocumentation
  */
 
-import type { OutputSchema, ArraySchema, ObjectSchema, GroupedArraySchema, SectionData, GroupedSectionData } from './types';
+import type {
+  ArraySchema,
+  GroupedArraySchema,
+  GroupedSectionData,
+  ObjectSchema,
+  OutputSchema,
+  SectionData,
+} from './types';
 
 /**
  * Error thrown when XML parsing fails
@@ -130,7 +137,10 @@ function parseXmlToTree(xml: string): XmlElement | null {
 
     while (i < remaining.length) {
       if (remaining.startsWith(`<${childTag}`, i)) {
-        if (remaining[i + childTag.length + 1] === '/' || remaining.substring(i).match(new RegExp(`^<${childTag}[^>]*/>`))) {
+        if (
+          remaining[i + childTag.length + 1] === '/' ||
+          remaining.substring(i).match(new RegExp(`^<${childTag}[^>]*/>`))
+        ) {
           // Self-closing, find end
           const selfCloseEnd = remaining.indexOf('/>', i);
           if (depth === 0) {
@@ -255,11 +265,15 @@ export class XmlParser {
     return { valid: errors.length === 0, errors };
   }
 
-  private isArraySchema(schema: ObjectSchema | ArraySchema | GroupedArraySchema): schema is ArraySchema {
+  private isArraySchema(
+    schema: ObjectSchema | ArraySchema | GroupedArraySchema
+  ): schema is ArraySchema {
     return '_array' in schema && schema._array === true;
   }
 
-  private isGroupedArraySchema(schema: ObjectSchema | ArraySchema | GroupedArraySchema): schema is GroupedArraySchema {
+  private isGroupedArraySchema(
+    schema: ObjectSchema | ArraySchema | GroupedArraySchema
+  ): schema is GroupedArraySchema {
     return '_groupedArray' in schema && schema._groupedArray === true;
   }
 
@@ -355,7 +369,6 @@ export class XmlParser {
         return Number(value);
       case 'boolean':
         return value === 'true' || value === '1';
-      case 'string':
       default:
         return value;
     }

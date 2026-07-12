@@ -11,7 +11,7 @@
  * @packageDocumentation
  */
 
-import { EventEmitter } from 'events';
+import { EventEmitter } from 'node:events';
 
 // ============================================================================
 // 1. EVENT-FLOW: EventEmitter patterns
@@ -163,7 +163,8 @@ export namespace ModuleA {
    * Client class
    */
   export class Client {
-    constructor(config: Config) {}
+    constructor(_config: Config) {}
+
     /**
      * fetch method
      * @returns Returns Promise<void>
@@ -261,7 +262,7 @@ export class UserEntityRepository extends Repository<User> {
    * @returns Returns User | undefined
    */
   findByEmail(email: string): User | undefined {
-    return this.findAll().find(u => u.email === email);
+    return this.findAll().find((u) => u.email === email);
   }
 }
 

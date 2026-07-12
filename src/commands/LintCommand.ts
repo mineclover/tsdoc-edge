@@ -3,9 +3,9 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, colors, type CommandResult } from './BaseCommand';
 import { CodeHealthChecker } from '../analyzer/CodeHealthChecker';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Result of a single lint check category
@@ -197,20 +197,20 @@ export class LintCommand extends BaseCommand {
     const allSymbols = db.getAllSymbolRows();
 
     // Exclude test symbols and fixture/demo files from documentation requirements
-    const implSymbols = allSymbols.filter((s) =>
-      s.type !== 'test-case' &&
-      s.type !== 'test-suite' &&
-      s.type !== 'test-scenario' &&
-      !s.file_path?.includes('__tests__') &&
-      !s.file_path?.includes('/demo/') &&
-      !s.file_path?.includes('/fixtures/') &&
-      !s.file_path?.includes('/examples/')
+    const implSymbols = allSymbols.filter(
+      (s) =>
+        s.type !== 'test-case' &&
+        s.type !== 'test-suite' &&
+        s.type !== 'test-scenario' &&
+        !s.file_path?.includes('__tests__') &&
+        !s.file_path?.includes('/demo/') &&
+        !s.file_path?.includes('/fixtures/') &&
+        !s.file_path?.includes('/examples/')
     );
 
     const documented = implSymbols.filter((s) => s.summary);
-    const coverage = implSymbols.length > 0
-      ? Math.round((documented.length / implSymbols.length) * 100)
-      : 0;
+    const coverage =
+      implSymbols.length > 0 ? Math.round((documented.length / implSymbols.length) * 100) : 0;
 
     if (coverage < 50) {
       issues.push(`Documentation coverage critically low: ${coverage}%`);
@@ -225,14 +225,19 @@ export class LintCommand extends BaseCommand {
 
     // Calculate undocumented ratio
     const exportedPublic = implSymbols.filter((s) => s.is_public === 1 && s.is_exported === 1);
-    const undocRatio = exportedPublic.length > 0
-      ? Math.round((undocumentedPublic.length / exportedPublic.length) * 100)
-      : 0;
+    const undocRatio =
+      exportedPublic.length > 0
+        ? Math.round((undocumentedPublic.length / exportedPublic.length) * 100)
+        : 0;
 
     if (undocRatio > 50) {
-      issues.push(`${undocRatio}% of exported symbols undocumented (${undocumentedPublic.length}/${exportedPublic.length})`);
+      issues.push(
+        `${undocRatio}% of exported symbols undocumented (${undocumentedPublic.length}/${exportedPublic.length})`
+      );
     } else if (undocRatio > 30) {
-      warnings.push(`${undocRatio}% of exported symbols undocumented (${undocumentedPublic.length}/${exportedPublic.length})`);
+      warnings.push(
+        `${undocRatio}% of exported symbols undocumented (${undocumentedPublic.length}/${exportedPublic.length})`
+      );
     }
 
     return {
@@ -252,19 +257,21 @@ export class LintCommand extends BaseCommand {
     const allRelationships = db.getAllUnifiedRelationships();
 
     // Exclude test symbols and fixture/demo files for accurate metrics
-    const implSymbols = allSymbols.filter((s) =>
-      s.type !== 'test-case' &&
-      s.type !== 'test-suite' &&
-      s.type !== 'test-scenario' &&
-      !s.file_path?.includes('__tests__') &&
-      !s.file_path?.includes('/demo/') &&
-      !s.file_path?.includes('/fixtures/') &&
-      !s.file_path?.includes('/examples/')
+    const implSymbols = allSymbols.filter(
+      (s) =>
+        s.type !== 'test-case' &&
+        s.type !== 'test-suite' &&
+        s.type !== 'test-scenario' &&
+        !s.file_path?.includes('__tests__') &&
+        !s.file_path?.includes('/demo/') &&
+        !s.file_path?.includes('/fixtures/') &&
+        !s.file_path?.includes('/examples/')
     );
 
-    const density = implSymbols.length > 0
-      ? Math.round((allRelationships.length / implSymbols.length) * 100) / 100
-      : 0;
+    const density =
+      implSymbols.length > 0
+        ? Math.round((allRelationships.length / implSymbols.length) * 100) / 100
+        : 0;
 
     // Check for orphaned symbols (no relationships) - excluding test symbols
     const symbolsWithRels = new Set<string>();
@@ -277,22 +284,23 @@ export class LintCommand extends BaseCommand {
 
     // Only count orphans from top-level implementation symbols (exclude methods/properties)
     // Methods and properties inherit connectivity from their parent class
-    const topLevelSymbols = implSymbols.filter((s) =>
-      s.type !== 'method' && s.type !== 'property'
-    );
+    const topLevelSymbols = implSymbols.filter((s) => s.type !== 'method' && s.type !== 'property');
     const orphanedCount = topLevelSymbols.filter((s) => !symbolsWithRels.has(s.id)).length;
-    const orphanRatio = topLevelSymbols.length > 0
-      ? Math.round((orphanedCount / topLevelSymbols.length) * 100)
-      : 0;
+    const orphanRatio =
+      topLevelSymbols.length > 0 ? Math.round((orphanedCount / topLevelSymbols.length) * 100) : 0;
 
     // Calculate score based on connected ratio (inverse of orphan ratio)
     const connectedRatio = 100 - orphanRatio;
     const score = Math.round(connectedRatio);
 
     if (orphanRatio > 30) {
-      issues.push(`${orphanRatio}% of top-level symbols are orphans (${orphanedCount}/${topLevelSymbols.length})`);
+      issues.push(
+        `${orphanRatio}% of top-level symbols are orphans (${orphanedCount}/${topLevelSymbols.length})`
+      );
     } else if (orphanRatio > 15) {
-      warnings.push(`${orphanRatio}% of top-level symbols are orphans (${orphanedCount}/${topLevelSymbols.length})`);
+      warnings.push(
+        `${orphanRatio}% of top-level symbols are orphans (${orphanedCount}/${topLevelSymbols.length})`
+      );
     }
 
     if (density < 3) {
@@ -313,16 +321,11 @@ export class LintCommand extends BaseCommand {
     const warnings: string[] = [];
 
     const allSymbols = db.getAllSymbolRows();
-    const testSymbols = allSymbols.filter((s) =>
-      s.type === 'test-case' || s.type === 'test-suite'
-    );
-    const implSymbols = allSymbols.filter((s) =>
-      s.type !== 'test-case' && s.type !== 'test-suite'
-    );
+    const testSymbols = allSymbols.filter((s) => s.type === 'test-case' || s.type === 'test-suite');
+    const implSymbols = allSymbols.filter((s) => s.type !== 'test-case' && s.type !== 'test-suite');
 
-    const testRatio = implSymbols.length > 0
-      ? Math.round((testSymbols.length / implSymbols.length) * 100)
-      : 0;
+    const testRatio =
+      implSymbols.length > 0 ? Math.round((testSymbols.length / implSymbols.length) * 100) : 0;
 
     if (testRatio < 20) {
       issues.push(`Test coverage critically low: ${testRatio}% test-to-impl ratio`);
@@ -340,20 +343,25 @@ export class LintCommand extends BaseCommand {
   }
 
   private printResults(results: LintResult[]): void {
-    console.log(`${colors.bold}Results${colors.reset} ${colors.dim}(excluding test-case/test-suite)${colors.reset}`);
+    console.log(
+      `${colors.bold}Results${colors.reset} ${colors.dim}(excluding test-case/test-suite)${colors.reset}`
+    );
     console.log();
 
     for (const result of results) {
       const status = result.passed
         ? `${colors.green}✓${colors.reset}`
         : `${colors.red}✗${colors.reset}`;
-      const scoreColor = result.score && result.score >= 80
-        ? colors.green
-        : result.score && result.score >= 60
-          ? colors.yellow
-          : colors.red;
+      const scoreColor =
+        result.score && result.score >= 80
+          ? colors.green
+          : result.score && result.score >= 60
+            ? colors.yellow
+            : colors.red;
 
-      console.log(`${status} ${colors.bold}${result.category}${colors.reset}${result.score !== undefined ? ` ${scoreColor}(${result.score}/100)${colors.reset}` : ''}`);
+      console.log(
+        `${status} ${colors.bold}${result.category}${colors.reset}${result.score !== undefined ? ` ${scoreColor}(${result.score}/100)${colors.reset}` : ''}`
+      );
 
       for (const issue of result.issues) {
         console.log(`  ${colors.red}✗${colors.reset} ${issue}`);
@@ -371,11 +379,11 @@ export class LintCommand extends BaseCommand {
 
     // Calculate overall score (weighted average)
     const scores = results.filter((r) => r.score !== undefined).map((r) => r.score!);
-    const overallScore = scores.length > 0
-      ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length)
-      : 0;
+    const overallScore =
+      scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
     const grade = this.getGrade(overallScore);
-    const gradeColor = overallScore >= 80 ? colors.green : overallScore >= 60 ? colors.yellow : colors.red;
+    const gradeColor =
+      overallScore >= 80 ? colors.green : overallScore >= 60 ? colors.yellow : colors.red;
 
     console.log(`${colors.bold}Summary${colors.reset}`);
     console.log(`  Overall: ${gradeColor}${grade} (${overallScore}/100)${colors.reset}`);

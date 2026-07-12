@@ -11,7 +11,7 @@ describe('TSDocSymbolParser', () => {
   let parser: TSDocSymbolParser;
 
   beforeEach(() => {
-    tempDir = path.join(process.cwd(), '.test-temp', 'tsdoc-parser-test-' + Math.random());
+    tempDir = path.join(process.cwd(), '.test-temp', `tsdoc-parser-test-${Math.random()}`);
     fs.mkdirSync(tempDir, { recursive: true });
     parser = new TSDocSymbolParser();
   });

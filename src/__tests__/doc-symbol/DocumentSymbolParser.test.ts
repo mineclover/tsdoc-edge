@@ -29,7 +29,7 @@ describe('DocumentSymbolParser', () => {
 
   beforeEach(() => {
     tempDir = fs.realpathSync(
-      fs.mkdtempSync(path.join(require('os').tmpdir(), 'doc-parser-test-'))
+      fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'doc-parser-test-'))
     );
     // Create managed directory
     const managedDir = path.join(tempDir, 'managed');
@@ -191,7 +191,7 @@ Description here.`
         const filePath = path.join(tempDir, 'outside.md');
         fs.writeFileSync(filePath, '# [[Symbol]]');
 
-        const result = parser.parse(filePath);
+        const _result = parser.parse(filePath);
 
         // Depends on isManagedDocument implementation
         // May return null or the parsed result

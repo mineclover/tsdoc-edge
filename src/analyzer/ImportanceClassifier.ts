@@ -4,8 +4,8 @@
  * @responsibility Determine importance level of symbols for tracking
  */
 
-import type { Symbol } from '../types/graph';
 import type { ImportanceCriteria, ImportanceLevel } from '../types/analysis';
+import type { Symbol } from '../types/graph';
 
 /**
  * Classifies symbols by their importance level

@@ -2,13 +2,12 @@
  * TestRelationshipExtractor Tests
  */
 
-import * as ts from 'typescript';
-import * as path from 'node:path';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import { TestRelationshipExtractor } from '../../analyzer/TestRelationshipExtractor';
-import type { SymbolGraph, Symbol } from '../../types/graph';
-import type { TestSymbolUsage, UsagePattern } from '../../types/analysis/test-relationships';
+import type { TestSymbolUsage } from '../../types/analysis/test-relationships';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 
 describe('TestRelationshipExtractor', () => {
   // Helper to create mock graph
@@ -231,7 +230,9 @@ describe('Integration', () => {
       const result = extractor.extractFromFile(testFilePath);
 
       // Check for dependency injection pattern
-      const diPatterns = result.usagePatterns.filter((p) => p.usageType === 'dependency-injection');
+      const _diPatterns = result.usagePatterns.filter(
+        (p) => p.usageType === 'dependency-injection'
+      );
       // The DI pattern detection depends on AST structure
       // At minimum we should have instantiation patterns
       const allPatterns = result.usagePatterns;

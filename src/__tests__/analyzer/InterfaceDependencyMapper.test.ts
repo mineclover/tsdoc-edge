@@ -22,8 +22,12 @@ describe('InterfaceDependencyMapper', () => {
   describe('buildDependencyGraph', () => {
     it('should build graph from simple interfaces', () => {
       const interfaces: InterfaceInfo[] = [
-        createInterface('User', [{ name: 'id', type: 'string', isOptional: false, isReadonly: false }]),
-        createInterface('Post', [{ name: 'author', type: 'User', isOptional: false, isReadonly: false }]),
+        createInterface('User', [
+          { name: 'id', type: 'string', isOptional: false, isReadonly: false },
+        ]),
+        createInterface('Post', [
+          { name: 'author', type: 'User', isOptional: false, isReadonly: false },
+        ]),
       ];
 
       const graph = mapper.buildDependencyGraph(interfaces);
@@ -41,7 +45,7 @@ describe('InterfaceDependencyMapper', () => {
       const graph = mapper.buildDependencyGraph(interfaces);
 
       const extendsDep = graph.dependencies.find(
-        d => d.from === 'Derived' && d.to === 'Base' && d.dependencyType === 'extends'
+        (d) => d.from === 'Derived' && d.to === 'Base' && d.dependencyType === 'extends'
       );
 
       expect(extendsDep).toBeDefined();
@@ -59,7 +63,7 @@ describe('InterfaceDependencyMapper', () => {
       const graph = mapper.buildDependencyGraph(interfaces);
 
       const compositionDep = graph.dependencies.find(
-        d => d.from === 'User' && d.to === 'Address' && d.dependencyType === 'composition'
+        (d) => d.from === 'User' && d.to === 'Address' && d.dependencyType === 'composition'
       );
 
       expect(compositionDep).toBeDefined();
@@ -71,19 +75,24 @@ describe('InterfaceDependencyMapper', () => {
     it('should detect parameter dependencies from methods', () => {
       const interfaces: InterfaceInfo[] = [
         createInterface('User', []),
-        createInterface('UserService', [], [], [
-          {
-            name: 'createUser',
-            parameters: [{ name: 'data', type: 'User', isOptional: false }],
-            returnType: 'void',
-          },
-        ]),
+        createInterface(
+          'UserService',
+          [],
+          [],
+          [
+            {
+              name: 'createUser',
+              parameters: [{ name: 'data', type: 'User', isOptional: false }],
+              returnType: 'void',
+            },
+          ]
+        ),
       ];
 
       const graph = mapper.buildDependencyGraph(interfaces);
 
       const paramDep = graph.dependencies.find(
-        d => d.from === 'UserService' && d.to === 'User' && d.dependencyType === 'parameter'
+        (d) => d.from === 'UserService' && d.to === 'User' && d.dependencyType === 'parameter'
       );
 
       expect(paramDep).toBeDefined();
@@ -95,19 +104,24 @@ describe('InterfaceDependencyMapper', () => {
     it('should detect return type dependencies from methods', () => {
       const interfaces: InterfaceInfo[] = [
         createInterface('User', []),
-        createInterface('UserService', [], [], [
-          {
-            name: 'getUser',
-            parameters: [{ name: 'id', type: 'string', isOptional: false }],
-            returnType: 'User',
-          },
-        ]),
+        createInterface(
+          'UserService',
+          [],
+          [],
+          [
+            {
+              name: 'getUser',
+              parameters: [{ name: 'id', type: 'string', isOptional: false }],
+              returnType: 'User',
+            },
+          ]
+        ),
       ];
 
       const graph = mapper.buildDependencyGraph(interfaces);
 
       const returnDep = graph.dependencies.find(
-        d => d.from === 'UserService' && d.to === 'User' && d.dependencyType === 'return'
+        (d) => d.from === 'UserService' && d.to === 'User' && d.dependencyType === 'return'
       );
 
       expect(returnDep).toBeDefined();
@@ -125,9 +139,7 @@ describe('InterfaceDependencyMapper', () => {
 
       const graph = mapper.buildDependencyGraph(interfaces);
 
-      const arrayDep = graph.dependencies.find(
-        d => d.from === 'Collection' && d.to === 'Item'
-      );
+      const arrayDep = graph.dependencies.find((d) => d.from === 'Collection' && d.to === 'Item');
 
       expect(arrayDep).toBeDefined();
       expect(arrayDep?.typeRelation).toBe('array');
@@ -144,9 +156,9 @@ describe('InterfaceDependencyMapper', () => {
 
       const graph = mapper.buildDependencyGraph(interfaces);
 
-      const deps = graph.dependencies.filter(d => d.from === 'Auth');
-      const userDep = deps.find(d => d.to === 'User');
-      const adminDep = deps.find(d => d.to === 'Admin');
+      const deps = graph.dependencies.filter((d) => d.from === 'Auth');
+      const userDep = deps.find((d) => d.to === 'User');
+      const adminDep = deps.find((d) => d.to === 'Admin');
 
       expect(userDep).toBeDefined();
       expect(adminDep).toBeDefined();
@@ -165,9 +177,9 @@ describe('InterfaceDependencyMapper', () => {
 
       const graph = mapper.buildDependencyGraph(interfaces);
 
-      const deps = graph.dependencies.filter(d => d.from === 'Entity');
-      const namedDep = deps.find(d => d.to === 'Named');
-      const datedDep = deps.find(d => d.to === 'Dated');
+      const deps = graph.dependencies.filter((d) => d.from === 'Entity');
+      const namedDep = deps.find((d) => d.to === 'Named');
+      const datedDep = deps.find((d) => d.to === 'Dated');
 
       expect(namedDep).toBeDefined();
       expect(datedDep).toBeDefined();
@@ -185,9 +197,7 @@ describe('InterfaceDependencyMapper', () => {
 
       const graph = mapper.buildDependencyGraph(interfaces);
 
-      const genericDep = graph.dependencies.find(
-        d => d.from === 'Response' && d.to === 'User'
-      );
+      const genericDep = graph.dependencies.find((d) => d.from === 'Response' && d.to === 'User');
 
       expect(genericDep).toBeDefined();
       expect(genericDep?.typeRelation).toBe('generic-param');
@@ -201,13 +211,11 @@ describe('InterfaceDependencyMapper', () => {
         ]),
       ];
 
-      const importMap = new Map([
-        ['Database', { source: 'external-lib', isTypeOnly: true }],
-      ]);
+      const importMap = new Map([['Database', { source: 'external-lib', isTypeOnly: true }]]);
 
       const graph = mapper.buildDependencyGraph(interfaces, importMap);
 
-      const externalDep = graph.dependencies.find(d => d.to === 'Database');
+      const externalDep = graph.dependencies.find((d) => d.to === 'Database');
 
       expect(externalDep).toBeDefined();
       expect(externalDep?.isExternal).toBe(true);
@@ -293,12 +301,8 @@ describe('InterfaceDependencyMapper', () => {
   describe('findCircularDependencies', () => {
     it('should detect simple circular dependency', () => {
       const interfaces: InterfaceInfo[] = [
-        createInterface('A', [
-          { name: 'b', type: 'B', isOptional: false, isReadonly: false },
-        ]),
-        createInterface('B', [
-          { name: 'a', type: 'A', isOptional: false, isReadonly: false },
-        ]),
+        createInterface('A', [{ name: 'b', type: 'B', isOptional: false, isReadonly: false }]),
+        createInterface('B', [{ name: 'a', type: 'A', isOptional: false, isReadonly: false }]),
       ];
 
       const graph = mapper.buildDependencyGraph(interfaces);
@@ -309,15 +313,9 @@ describe('InterfaceDependencyMapper', () => {
 
     it('should detect three-way circular dependency', () => {
       const interfaces: InterfaceInfo[] = [
-        createInterface('A', [
-          { name: 'b', type: 'B', isOptional: false, isReadonly: false },
-        ]),
-        createInterface('B', [
-          { name: 'c', type: 'C', isOptional: false, isReadonly: false },
-        ]),
-        createInterface('C', [
-          { name: 'a', type: 'A', isOptional: false, isReadonly: false },
-        ]),
+        createInterface('A', [{ name: 'b', type: 'B', isOptional: false, isReadonly: false }]),
+        createInterface('B', [{ name: 'c', type: 'C', isOptional: false, isReadonly: false }]),
+        createInterface('C', [{ name: 'a', type: 'A', isOptional: false, isReadonly: false }]),
       ];
 
       const graph = mapper.buildDependencyGraph(interfaces);
@@ -405,9 +403,7 @@ describe('InterfaceDependencyMapper', () => {
     });
 
     it('should return zero for isolated interface', () => {
-      const interfaces: InterfaceInfo[] = [
-        createInterface('Isolated', []),
-      ];
+      const interfaces: InterfaceInfo[] = [createInterface('Isolated', [])];
 
       const graph = mapper.buildDependencyGraph(interfaces);
       const metrics = mapper.calculateMetrics('Isolated', graph);
@@ -430,13 +426,11 @@ describe('InterfaceDependencyMapper', () => {
       const graph = mapper.buildDependencyGraph(interfaces);
       const deps = mapper.getDependencies('Service', graph);
 
-      expect(deps.some(d => d.to === 'User')).toBe(true);
+      expect(deps.some((d) => d.to === 'User')).toBe(true);
     });
 
     it('should handle type parameters in generics', () => {
-      const interfaces: InterfaceInfo[] = [
-        createInterface('Result', [], [], [], ['T', 'E']),
-      ];
+      const interfaces: InterfaceInfo[] = [createInterface('Result', [], [], [], ['T', 'E'])];
 
       const graph = mapper.buildDependencyGraph(interfaces);
 
@@ -469,7 +463,7 @@ describe('InterfaceDependencyMapper', () => {
       const graph = mapper.buildDependencyGraph(interfaces);
       const deps = mapper.getDependencies('Post', graph);
 
-      expect(deps.filter(d => d.to === 'User').length).toBe(2);
+      expect(deps.filter((d) => d.to === 'User').length).toBe(2);
     });
   });
 });

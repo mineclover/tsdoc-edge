@@ -14,8 +14,6 @@
  * - Detect paired features that always appear together
  */
 
-import * as fs from 'node:fs';
-import * as path from 'node:path';
 import * as ts from 'typescript';
 import type { SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships';
@@ -127,7 +125,7 @@ export class ConstraintAnalyzer {
             secondMap.set(second, []);
           }
 
-          secondMap.get(second)!.push({
+          secondMap.get(second)?.push({
             file: filePath,
             line: Math.min(imports[i].line, imports[j].line),
           });
@@ -167,7 +165,7 @@ export class ConstraintAnalyzer {
    */
   private extractImports(
     sourceFile: ts.SourceFile,
-    filePath: string
+    _filePath: string
   ): Array<{ symbol: string; line: number }> {
     const imports: Array<{ symbol: string; line: number }> = [];
 
@@ -176,7 +174,7 @@ export class ConstraintAnalyzer {
         // import { A, B } from 'module'
         if (ts.isImportDeclaration(node)) {
           const clause = node.importClause;
-          if (clause && clause.namedBindings) {
+          if (clause?.namedBindings) {
             if (ts.isNamedImports(clause.namedBindings)) {
               for (const element of clause.namedBindings.elements) {
                 try {
@@ -192,17 +190,14 @@ export class ConstraintAnalyzer {
                   if (symbolId) {
                     imports.push({ symbol: symbolId, line });
                   }
-                } catch (error) {
-                  // Skip this import element on error
-                  continue;
-                }
+                } catch (_error) {}
               }
             }
           }
         }
 
         ts.forEachChild(node, visit);
-      } catch (error) {
+      } catch (_error) {
         // Skip this node on error
         return;
       }

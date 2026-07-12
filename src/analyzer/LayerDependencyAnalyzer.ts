@@ -4,7 +4,7 @@
  * @responsibility Analyze architectural layer dependencies
  */
 
-import type { SymbolGraph, Symbol } from '../types/graph';
+import type { Symbol, SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
@@ -223,8 +223,8 @@ export class LayerDependencyAnalyzer {
           lineNumber: 0,
           snippet: `${dep.fromLayer} → ${dep.toLayer}`,
           confidence: 0.8,
-          context: isViolation ? 'Layer violation detected' : 'Cross-layer dependency'
-        }
+          context: isViolation ? 'Layer violation detected' : 'Cross-layer dependency',
+        },
       ],
       discoveredBy: 'static-analysis',
       confidence: 0.8,
@@ -239,7 +239,7 @@ export class LayerDependencyAnalyzer {
       updatedAt: timestamp,
       description: isViolation
         ? `VIOLATION: ${dep.fromLayer} → ${dep.toLayer} (${dep.from} → ${dep.to})`
-        : `${dep.fromLayer} → ${dep.toLayer} (${dep.from} → ${dep.to})`
+        : `${dep.fromLayer} → ${dep.toLayer} (${dep.from} → ${dep.to})`,
     };
   }
 
@@ -430,7 +430,9 @@ export class LayerDependencyAnalyzer {
           lineNumber: 0,
           snippet: `${dep.fromModule} → ${dep.toModule}`,
           confidence: 0.9,
-          context: isProblematic ? 'Cross-module dependency (review recommended)' : 'Cross-module dependency',
+          context: isProblematic
+            ? 'Cross-module dependency (review recommended)'
+            : 'Cross-module dependency',
         },
       ],
       discoveredBy: 'static-analysis',
@@ -444,8 +446,7 @@ export class LayerDependencyAnalyzer {
       },
       createdAt: timestamp,
       updatedAt: timestamp,
-      description: `${dep.fromModule} → ${dep.toModule}` +
-        (isProblematic ? ' (review recommended)' : ''),
+      description: `${dep.fromModule} → ${dep.toModule}${isProblematic ? ' (review recommended)' : ''}`,
     };
   }
 
@@ -461,12 +462,12 @@ export class LayerDependencyAnalyzer {
     // Define allowed dependencies (module A can depend on module B)
     const allowedDeps: Record<string, string[]> = {
       // Common patterns - features can use core, but not other features
-      'commands': ['analyzer', 'graph', 'storage', 'types', 'parser', 'validator'],
-      'analyzer': ['graph', 'storage', 'types', 'parser'],
-      'graph': ['storage', 'types'],
-      'storage': ['types'],
-      'validator': ['graph', 'types', 'storage'],
-      'parser': ['types'],
+      commands: ['analyzer', 'graph', 'storage', 'types', 'parser', 'validator'],
+      analyzer: ['graph', 'storage', 'types', 'parser'],
+      graph: ['storage', 'types'],
+      storage: ['types'],
+      validator: ['graph', 'types', 'storage'],
+      parser: ['types'],
     };
 
     // If we have specific rules for the source module

@@ -3,14 +3,14 @@
  * @packageDocumentation
  */
 
+import * as path from 'node:path';
+import { ParallelWorkDetector } from '../analyzer/ParallelWorkDetector';
+import { ConfigManager } from '../config/ConfigManager';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { DatabaseManager } from '../storage/DatabaseManager';
-import { ConfigManager } from '../config/ConfigManager';
-import { ParallelWorkDetector } from '../analyzer/ParallelWorkDetector';
-import { BaseCommand, type CommandResult } from './BaseCommand';
 import type { SymbolType } from '../types/graph';
 import type { SymbolRelationship } from '../types/tags';
-import * as path from 'node:path';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /**
  * Parallel Work Command
@@ -176,16 +176,16 @@ export class ParallelWorkCommand extends BaseCommand {
    */
   private displayFullReport(
     result: ReturnType<ParallelWorkDetector['detectParallelWork']>,
-    options: { working: string[]; frozen: string[] },
+    options: { working: string[]; frozen: string[] }
   ): void {
     // Working & Frozen summary
     this.printSection('Configuration');
     console.log(
-      `  Working modules (${options.working.length}): ${this.colors.yellow}${options.working.join(', ')}${this.colors.reset}`,
+      `  Working modules (${options.working.length}): ${this.colors.yellow}${options.working.join(', ')}${this.colors.reset}`
     );
     if (options.frozen.length > 0) {
       console.log(
-        `  Frozen modules (${options.frozen.length}): ${this.colors.cyan}${options.frozen.join(', ')}${this.colors.reset}`,
+        `  Frozen modules (${options.frozen.length}): ${this.colors.cyan}${options.frozen.join(', ')}${this.colors.reset}`
       );
     }
     console.log();
@@ -201,7 +201,7 @@ export class ParallelWorkCommand extends BaseCommand {
       });
       if (result.availableModules.length > 10) {
         console.log(
-          `  ${this.colors.dim}... and ${result.availableModules.length - 10} more${this.colors.reset}`,
+          `  ${this.colors.dim}... and ${result.availableModules.length - 10} more${this.colors.reset}`
         );
       }
     }
@@ -217,9 +217,13 @@ export class ParallelWorkCommand extends BaseCommand {
             : conflict.conflictType === 'transitive'
               ? '🔄'
               : '🔗';
-        console.log(`  ${icon} ${this.colors.red}${conflict.module1}${this.colors.reset} ↔ ${this.colors.red}${conflict.module2}${this.colors.reset}`);
+        console.log(
+          `  ${icon} ${this.colors.red}${conflict.module1}${this.colors.reset} ↔ ${this.colors.red}${conflict.module2}${this.colors.reset}`
+        );
         console.log(`     Type: ${this.colors.yellow}${conflict.conflictType}${this.colors.reset}`);
-        console.log(`     Path: ${this.colors.dim}${conflict.path.join(' → ')}${this.colors.reset}`);
+        console.log(
+          `     Path: ${this.colors.dim}${conflict.path.join(' → ')}${this.colors.reset}`
+        );
         console.log();
       });
     } else {
@@ -234,18 +238,20 @@ export class ParallelWorkCommand extends BaseCommand {
         if (zone.modules.length === 1) return; // Skip single-module zones
 
         console.log(
-          `  ${this.colors.cyan}${zone.id}${this.colors.reset}: ${zone.modules.length} modules can work in parallel`,
+          `  ${this.colors.cyan}${zone.id}${this.colors.reset}: ${zone.modules.length} modules can work in parallel`
         );
         zone.modules.slice(0, 5).forEach((module) => {
           console.log(`    • ${module}`);
         });
         if (zone.modules.length > 5) {
-          console.log(`    ${this.colors.dim}... and ${zone.modules.length - 5} more${this.colors.reset}`);
+          console.log(
+            `    ${this.colors.dim}... and ${zone.modules.length - 5} more${this.colors.reset}`
+          );
         }
 
         if (zone.isolationBarrier.length > 0) {
           console.log(
-            `    ${this.colors.dim}Isolation barrier: ${zone.isolationBarrier.join(', ')}${this.colors.reset}`,
+            `    ${this.colors.dim}Isolation barrier: ${zone.isolationBarrier.join(', ')}${this.colors.reset}`
           );
         }
         console.log();
@@ -256,7 +262,7 @@ export class ParallelWorkCommand extends BaseCommand {
     if (result.isolationBarriers.length > 0) {
       this.printSection(`Isolation Barriers (${result.isolationBarriers.length})`);
       console.log(
-        `  ${this.colors.dim}Modules acting as barriers between working modules:${this.colors.reset}`,
+        `  ${this.colors.dim}Modules acting as barriers between working modules:${this.colors.reset}`
       );
       result.isolationBarriers.forEach((barrier) => {
         console.log(`  ${this.colors.cyan}⚪${this.colors.reset} ${barrier}`);
@@ -268,7 +274,9 @@ export class ParallelWorkCommand extends BaseCommand {
   /**
    * Display conflicts only
    */
-  private displayConflicts(conflicts: ReturnType<ParallelWorkDetector['detectParallelWork']>['conflicts']): void {
+  private displayConflicts(
+    conflicts: ReturnType<ParallelWorkDetector['detectParallelWork']>['conflicts']
+  ): void {
     this.printSection(`Conflict Analysis (${conflicts.length} conflicts)`);
 
     if (conflicts.length === 0) {
@@ -279,7 +287,7 @@ export class ParallelWorkCommand extends BaseCommand {
     conflicts.forEach((conflict, index) => {
       console.log(`\n${this.colors.bold}Conflict ${index + 1}:${this.colors.reset}`);
       console.log(
-        `  ${this.colors.red}${conflict.module1}${this.colors.reset} ↔ ${this.colors.red}${conflict.module2}${this.colors.reset}`,
+        `  ${this.colors.red}${conflict.module1}${this.colors.reset} ↔ ${this.colors.red}${conflict.module2}${this.colors.reset}`
       );
       console.log(`  Type: ${this.colors.yellow}${conflict.conflictType}${this.colors.reset}`);
       console.log(`  Path: ${this.colors.dim}${conflict.path.join(' → ')}${this.colors.reset}`);
@@ -316,16 +324,22 @@ export class ParallelWorkCommand extends BaseCommand {
       return;
     }
 
-    console.log(`  ${this.colors.dim}Modules that can act as stable interfaces:${this.colors.reset}\n`);
+    console.log(
+      `  ${this.colors.dim}Modules that can act as stable interfaces:${this.colors.reset}\n`
+    );
 
     suggestions.forEach((suggestion, index) => {
       console.log(`  ${this.colors.cyan}${index + 1}. ${suggestion.barrier}${this.colors.reset}`);
-      console.log(`     Isolates: ${this.colors.green}${suggestion.score} modules${this.colors.reset}`);
+      console.log(
+        `     Isolates: ${this.colors.green}${suggestion.score} modules${this.colors.reset}`
+      );
       console.log(`     Modules: ${suggestion.isolatedModules.join(', ')}`);
       console.log();
     });
 
-    console.log(`  ${this.colors.dim}💡 Tip: Freeze these modules to enable parallel development${this.colors.reset}`);
+    console.log(
+      `  ${this.colors.dim}💡 Tip: Freeze these modules to enable parallel development${this.colors.reset}`
+    );
   }
 
   private get colors() {

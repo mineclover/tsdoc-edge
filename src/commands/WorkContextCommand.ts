@@ -317,7 +317,7 @@ export class WorkContextCommand extends BaseCommand {
           if (!uniqueDocs.has(doc.docRef)) {
             uniqueDocs.set(doc.docRef, []);
           }
-          uniqueDocs.get(doc.docRef)!.push(doc.symbolName);
+          uniqueDocs.get(doc.docRef)?.push(doc.symbolName);
         }
 
         for (const [docRef, symbols] of uniqueDocs) {
@@ -344,7 +344,7 @@ export class WorkContextCommand extends BaseCommand {
             if (!testsBySymbol.has(test.symbolName)) {
               testsBySymbol.set(test.symbolName, []);
             }
-            testsBySymbol.get(test.symbolName)!.push(test.testName);
+            testsBySymbol.get(test.symbolName)?.push(test.testName);
           }
 
           // Show top tested symbols
@@ -437,7 +437,7 @@ export class WorkContextCommand extends BaseCommand {
           if (!neighborsBySymbol.has(neighbor.symbolName)) {
             neighborsBySymbol.set(neighbor.symbolName, []);
           }
-          neighborsBySymbol.get(neighbor.symbolName)!.push(neighbor.neighborName);
+          neighborsBySymbol.get(neighbor.symbolName)?.push(neighbor.neighborName);
         }
 
         for (const [symbolName, neighbors] of Array.from(neighborsBySymbol.entries()).slice(0, 5)) {
@@ -449,11 +449,7 @@ export class WorkContextCommand extends BaseCommand {
       }
 
       // Canonical structural enrichment (alias hop)
-      if (
-        shouldShowCategory('structural') &&
-        canonical &&
-        canonical.symbols.length > 0
-      ) {
+      if (shouldShowCategory('structural') && canonical && canonical.symbols.length > 0) {
         this.printSection('🧭 Canonical Structural Graph');
         console.log(`  Revision ${canonical.revisionId.slice(0, 12)} via alias/direct file lookup`);
         console.log();

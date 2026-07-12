@@ -12,7 +12,7 @@ import { InitCommand } from '../../commands/InitCommand';
 let configExists = false;
 let configPath = '';
 let savedConfig: any = null;
-const mockInit = jest.fn((config: any, force: boolean) => {
+const mockInit = jest.fn((config: any, _force: boolean) => {
   savedConfig = config;
   configExists = true;
 });

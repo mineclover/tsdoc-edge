@@ -7,7 +7,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';
-import type { SymbolGraph, Symbol } from '../types/graph';
+import type { Symbol, SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
@@ -96,7 +96,7 @@ export class CoRequirementAnalyzer {
         const content = fs.readFileSync(file, 'utf-8');
         const sourceFile = ts.createSourceFile(file, content, ts.ScriptTarget.Latest, true);
         this.extractCoRequirementsFromFile(sourceFile, file, sites);
-      } catch (error) {
+      } catch (_error) {
         // Skip files that cause errors
       }
     }
@@ -128,7 +128,8 @@ export class CoRequirementAnalyzer {
               if (tag.tagName.text === 'requires') {
                 const requiredSymbol = this.getTagComment(tag);
                 if (requiredSymbol) {
-                  const line = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
+                  const line =
+                    sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
                   sites.push({
                     requirer: symbolName,
                     required: requiredSymbol.trim(),
@@ -140,7 +141,7 @@ export class CoRequirementAnalyzer {
             }
           }
         }
-      } catch (error) {
+      } catch (_error) {
         // Skip nodes that cause errors
       }
 
@@ -177,9 +178,7 @@ export class CoRequirementAnalyzer {
       if (typeof tag.comment === 'string') return tag.comment;
       if (Array.isArray(tag.comment)) {
         return tag.comment
-          .map((part: ts.JSDocText | ts.JSDocLink) =>
-            'text' in part ? part.text : ''
-          )
+          .map((part: ts.JSDocText | ts.JSDocLink) => ('text' in part ? part.text : ''))
           .join('');
       }
     }
@@ -242,8 +241,8 @@ export class CoRequirementAnalyzer {
           lineNumber: site.line,
           snippet: `@requires ${site.required}`,
           confidence: 1.0,
-          context: `${site.requirer} requires ${site.required}`
-        }
+          context: `${site.requirer} requires ${site.required}`,
+        },
       ],
       discoveredBy: 'documentation',
       confidence: 1.0,
@@ -255,7 +254,7 @@ export class CoRequirementAnalyzer {
       },
       createdAt: timestamp,
       updatedAt: timestamp,
-      description: `${site.requirer} requires ${site.required}`
+      description: `${site.requirer} requires ${site.required}`,
     };
   }
 
@@ -290,8 +289,8 @@ export class CoRequirementAnalyzer {
     for (const rel of relationships) {
       const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
       const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
-      fromSymbols.forEach(s => requirers.add(s));
-      toSymbols.forEach(s => required.add(s));
+      fromSymbols.forEach((s) => requirers.add(s));
+      toSymbols.forEach((s) => required.add(s));
     }
 
     return {

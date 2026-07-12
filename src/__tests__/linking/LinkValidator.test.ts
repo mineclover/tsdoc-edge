@@ -17,7 +17,7 @@ describe('LinkValidator', () => {
   let validator: LinkValidator;
 
   beforeEach(() => {
-    tempDir = path.join(process.cwd(), '.test-temp', 'validator-test-' + Math.random());
+    tempDir = path.join(process.cwd(), '.test-temp', `validator-test-${Math.random()}`);
     projectRoot = tempDir;
     fs.mkdirSync(tempDir, { recursive: true });
 
@@ -121,10 +121,7 @@ export class Broken {}
 
       fs.writeFileSync(code1, 'export class A {}');
       fs.writeFileSync(code2, 'export class B {}');
-      fs.writeFileSync(
-        docFile,
-        `[A](${code1}#A) and [B](${code2}#B)`
-      );
+      fs.writeFileSync(docFile, `[A](${code1}#A) and [B](${code2}#B)`);
 
       const results = validator.validateDocument(docFile);
 
@@ -171,7 +168,7 @@ export class Test {}
       const results = validator.validateCodeFile(codeFile);
 
       expect(results).toHaveLength(2);
-      expect(results.every(r => r.type === 'valid')).toBe(true);
+      expect(results.every((r) => r.type === 'valid')).toBe(true);
     });
 
     it('should detect missing documents', () => {
@@ -363,10 +360,7 @@ export class MyClass {
 
     it('should validate document sections', () => {
       const docFile = path.join(tempDir, 'doc.md');
-      fs.writeFileSync(
-        docFile,
-        `# Title\n\n## Installation\n\nContent here.`
-      );
+      fs.writeFileSync(docFile, `# Title\n\n## Installation\n\nContent here.`);
 
       const link: DocLink = {
         codePath: path.join(tempDir, 'code.ts'),

@@ -110,7 +110,10 @@ export class AlternativesAnalyzer {
     if (!this.program || !this.checker) return [];
 
     const substitutions: Substitution[] = [];
-    const implementationsByInterface = new Map<string, Array<{ symbolId: string; filePath: string; line: number }>>();
+    const implementationsByInterface = new Map<
+      string,
+      Array<{ symbolId: string; filePath: string; line: number }>
+    >();
 
     // Find all class implementations
     for (const sourceFile of this.program.getSourceFiles()) {
@@ -163,7 +166,10 @@ export class AlternativesAnalyzer {
   private extractImplementations(
     sourceFile: ts.SourceFile,
     filePath: string,
-    implementationsByInterface: Map<string, Array<{ symbolId: string; filePath: string; line: number }>>
+    implementationsByInterface: Map<
+      string,
+      Array<{ symbolId: string; filePath: string; line: number }>
+    >
   ): void {
     const visit = (node: ts.Node): void => {
       try {
@@ -183,7 +189,7 @@ export class AlternativesAnalyzer {
                   }
 
                   const line = sourceFile.getLineAndCharacterOfPosition(node.getStart()).line + 1;
-                  implementationsByInterface.get(interfaceName)!.push({
+                  implementationsByInterface.get(interfaceName)?.push({
                     symbolId,
                     filePath,
                     line,
@@ -195,7 +201,7 @@ export class AlternativesAnalyzer {
         }
 
         ts.forEachChild(node, visit);
-      } catch (error) {
+      } catch (_error) {
         // Skip this node on error
         return;
       }
@@ -331,7 +337,7 @@ export class AlternativesAnalyzer {
         }
 
         ts.forEachChild(node, visit);
-      } catch (error) {
+      } catch (_error) {
         // Skip this node on error
         return;
       }
@@ -387,7 +393,10 @@ export class AlternativesAnalyzer {
    * @returns Symbol ID or null
    * @private
    */
-  private findSymbolInExpression(expression: ts.Expression, sourceFile: ts.SourceFile): string | null {
+  private findSymbolInExpression(
+    expression: ts.Expression,
+    sourceFile: ts.SourceFile
+  ): string | null {
     if (ts.isIdentifier(expression)) {
       return this.findSymbolByName(expression.text);
     }
@@ -476,7 +485,8 @@ export class AlternativesAnalyzer {
       from: fb.primary,
       to: fb.fallback,
       direction: 'unidirectional',
-      strength: fb.pattern === 'try-catch' || fb.pattern === 'null-coalescing' ? 'strong' : 'medium',
+      strength:
+        fb.pattern === 'try-catch' || fb.pattern === 'null-coalescing' ? 'strong' : 'medium',
       evidence: [
         {
           type: 'code',

@@ -5,12 +5,9 @@
  */
 
 import * as fs from 'node:fs';
-import type {
-  SpecRequirements,
-  SpecCompletenessResult,
-} from '../types/spec';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import type { ParsedDocSymbols } from '../types/feature';
+import type { SpecCompletenessResult, SpecRequirements } from '../types/spec';
 
 /**
  * Section name mapping for multi-language support
@@ -18,7 +15,7 @@ import type { ParsedDocSymbols } from '../types/feature';
  */
 const SECTION_MAPPINGS: Record<string, string[]> = {
   // Overview/Purpose
-  '개요': ['개요', 'Overview', 'Purpose', '목적'],
+  개요: ['개요', 'Overview', 'Purpose', '목적'],
   // Core Concepts
   '핵심 개념': ['핵심 개념', 'Core Concepts', 'Key Concepts', 'Structure', '구조'],
   // Deliverables/Output
@@ -30,7 +27,7 @@ const SECTION_MAPPINGS: Record<string, string[]> = {
   // Related Features
   '관련 기능': ['관련 기능', 'Related Features', 'Related Concepts', '관련 개념'],
   // Guide
-  '가이드': ['가이드', 'Guide', 'Guidelines', 'Best Practices', 'Design Decisions', '설계 결정'],
+  가이드: ['가이드', 'Guide', 'Guidelines', 'Best Practices', 'Design Decisions', '설계 결정'],
 };
 
 /**
@@ -234,7 +231,7 @@ export class SpecCompletenessValidator {
 
     // Normalize extracted sections
     const normalizedSections = sections
-      .map(s => this.normalizeSectionName(s))
+      .map((s) => this.normalizeSectionName(s))
       .filter((s): s is string => s !== null);
 
     for (const required of this.requirements.requiredSections) {
@@ -269,7 +266,7 @@ export class SpecCompletenessValidator {
 
     // Normalize extracted sections
     const normalizedSections = sections
-      .map(s => this.normalizeSectionName(s))
+      .map((s) => this.normalizeSectionName(s))
       .filter((s): s is string => s !== null);
 
     for (const recommended of this.requirements.recommendedSections) {
@@ -280,9 +277,10 @@ export class SpecCompletenessValidator {
       }
     }
 
-    const score = this.requirements.recommendedSections.length > 0
-      ? (found.length / this.requirements.recommendedSections.length) * 100
-      : 100;
+    const score =
+      this.requirements.recommendedSections.length > 0
+        ? (found.length / this.requirements.recommendedSections.length) * 100
+        : 100;
 
     return { score, found, missing };
   }
@@ -301,7 +299,7 @@ export class SpecCompletenessValidator {
     // - Under "## Usage Scenarios" or "## 사용 시나리오" section
     const scenarioPatterns = [
       /^###\s+(시나리오|Scenario)\s+\d+/gm,
-      /^###\s+\d+\.\s+.+/gm,  // Numbered subsections under scenarios
+      /^###\s+\d+\.\s+.+/gm, // Numbered subsections under scenarios
     ];
 
     let count = 0;
@@ -318,7 +316,9 @@ export class SpecCompletenessValidator {
       // Count numbered subsections after this section
       const sectionIndex = content.indexOf(usageSectionMatch[0]);
       const nextSection = content.slice(sectionIndex).match(/\n##\s+/);
-      const sectionEnd = nextSection ? sectionIndex + content.slice(sectionIndex).indexOf(nextSection[0]) : content.length;
+      const sectionEnd = nextSection
+        ? sectionIndex + content.slice(sectionIndex).indexOf(nextSection[0])
+        : content.length;
       const sectionContent = content.slice(sectionIndex, sectionEnd);
       const numberedItems = sectionContent.match(/^###\s+\d+\./gm);
       count = numberedItems ? numberedItems.length : 0;
@@ -326,7 +326,8 @@ export class SpecCompletenessValidator {
 
     const score = Math.min((count / this.requirements.minScenarios) * 100, 100);
 
-    const issues: Array<{ type: 'insufficient_scenarios'; message: string; severity: 'warning' }> = [];
+    const issues: Array<{ type: 'insufficient_scenarios'; message: string; severity: 'warning' }> =
+      [];
     if (count < this.requirements.minScenarios) {
       issues.push({
         type: 'insufficient_scenarios',
@@ -346,9 +347,7 @@ export class SpecCompletenessValidator {
     count: number;
     issues: Array<{ type: 'insufficient_refs'; message: string; severity: 'warning' }>;
   } {
-    const count = parsed
-      ? parsed.codeReferences.length + parsed.symbolFootnoteRefs.length
-      : 0;
+    const count = parsed ? parsed.codeReferences.length + parsed.symbolFootnoteRefs.length : 0;
 
     const score = Math.min((count / this.requirements.minCodeReferences) * 100, 100);
 
@@ -378,7 +377,8 @@ export class SpecCompletenessValidator {
 
     const score = Math.min((count / this.requirements.minExamples) * 100, 100);
 
-    const issues: Array<{ type: 'insufficient_examples'; message: string; severity: 'warning' }> = [];
+    const issues: Array<{ type: 'insufficient_examples'; message: string; severity: 'warning' }> =
+      [];
     if (count < this.requirements.minExamples) {
       issues.push({
         type: 'insufficient_examples',
@@ -425,9 +425,7 @@ export class SpecCompletenessValidator {
   }): number {
     // Structure is most important (50%), scenarios (30%), concept network (20%)
     const score =
-      breakdown.structure * 0.5 +
-      breakdown.scenarios * 0.3 +
-      breakdown.conceptReferences * 0.2;
+      breakdown.structure * 0.5 + breakdown.scenarios * 0.3 + breakdown.conceptReferences * 0.2;
 
     return Math.round(score);
   }
@@ -440,9 +438,7 @@ export class SpecCompletenessValidator {
     examples: number;
   }): number {
     // Code references are more important (70%) than examples (30%)
-    const score =
-      breakdown.codeReferences * 0.7 +
-      breakdown.examples * 0.3;
+    const score = breakdown.codeReferences * 0.7 + breakdown.examples * 0.3;
 
     return Math.round(score);
   }

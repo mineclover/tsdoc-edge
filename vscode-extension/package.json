@@ -7,11 +7,7 @@
   "engines": {
     "vscode": "^1.85.0"
   },
-  "categories": [
-    "Programming Languages",
-    "Linters",
-    "Other"
-  ],
+  "categories": ["Programming Languages", "Linters", "Other"],
   "activationEvents": [
     "onLanguage:typescript",
     "onLanguage:typescriptreact",

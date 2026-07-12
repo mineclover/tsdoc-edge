@@ -4,7 +4,7 @@
  */
 
 import { InsightDocGenerator } from '../../generator/InsightDocGenerator';
-import { SymbolGraphBuilder } from '../../graph/SymbolGraphBuilder';
+import type { SymbolGraphBuilder } from '../../graph/SymbolGraphBuilder';
 import type { Symbol } from '../../types/graph';
 
 describe('InsightDocGenerator', () => {
@@ -139,13 +139,8 @@ describe('InsightDocGenerator', () => {
 
     it('should include dependency counts when enabled', () => {
       const symbol = createMockSymbol({ name: 'Test', id: 'test-id' });
-      mockGraphBuilder.getDependencies.mockReturnValue([
-        'dep1',
-        'dep2',
-      ]);
-      mockGraphBuilder.getDependents.mockReturnValue([
-        'user1',
-      ]);
+      mockGraphBuilder.getDependencies.mockReturnValue(['dep1', 'dep2']);
+      mockGraphBuilder.getDependents.mockReturnValue(['user1']);
 
       const symbolsByDepth = new Map<number, Symbol[]>();
       symbolsByDepth.set(0, [symbol]);

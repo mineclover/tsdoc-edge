@@ -2,12 +2,12 @@
  * CallbackAnalyzer Tests
  */
 
-import * as ts from 'typescript';
-import * as path from 'node:path';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import * as ts from 'typescript';
 import { CallbackAnalyzer } from '../../analyzer/CallbackAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships';
 
 describe('CallbackAnalyzer', () => {
@@ -138,10 +138,7 @@ describe('CallbackAnalyzer', () => {
       const result = analyzer.analyze();
 
       const callback = result.find(
-        (r) =>
-          r.type === 'callback' &&
-          r.from === 'func-process' &&
-          r.to === 'func-handler'
+        (r) => r.type === 'callback' && r.from === 'func-process' && r.to === 'func-handler'
       );
 
       expect(callback).toBeDefined();
@@ -197,10 +194,7 @@ describe('CallbackAnalyzer', () => {
       const result = analyzer.analyze();
 
       const callbacks = result.filter(
-        (r) =>
-          r.type === 'callback' &&
-          r.from === 'func-caller' &&
-          r.to === 'func-cb'
+        (r) => r.type === 'callback' && r.from === 'func-caller' && r.to === 'func-cb'
       );
 
       expect(callbacks).toHaveLength(1);
@@ -229,11 +223,7 @@ describe('CallbackAnalyzer', () => {
       const result = analyzer.analyze();
 
       // The callback is detected as the identifier is passed to the then method
-      const callback = result.find(
-        (r) =>
-          r.type === 'callback' &&
-          r.to === 'func-success'
-      );
+      const callback = result.find((r) => r.type === 'callback' && r.to === 'func-success');
 
       expect(callback).toBeDefined();
       // Pattern is 'parameter' because the analyzer first processes the call expression
@@ -259,11 +249,7 @@ describe('CallbackAnalyzer', () => {
       const analyzer = new CallbackAnalyzer(graph, program);
       const result = analyzer.analyze();
 
-      const callback = result.find(
-        (r) =>
-          r.type === 'callback' &&
-          r.to === 'func-error'
-      );
+      const callback = result.find((r) => r.type === 'callback' && r.to === 'func-error');
 
       expect(callback).toBeDefined();
       // Same as above - pattern is 'parameter'
@@ -322,9 +308,7 @@ describe('CallbackAnalyzer', () => {
       const result = analyzer.analyze();
 
       // No async-await callback should be detected since unknownCaller is not in graph
-      const asyncCallbacks = result.filter(
-        (r) => r.properties?.pattern === 'async-await'
-      );
+      const asyncCallbacks = result.filter((r) => r.properties?.pattern === 'async-await');
 
       expect(asyncCallbacks).toHaveLength(0);
     });
@@ -457,7 +441,7 @@ describe('CallbackAnalyzer', () => {
       const stats = analyzer.getStatistics(relationships);
 
       expect(stats.totalCallbacks).toBe(2);
-      expect(stats.byPattern['parameter']).toBe(2);
+      expect(stats.byPattern.parameter).toBe(2);
       expect(stats.uniqueCallers).toBe(2);
       expect(stats.uniqueCallbacks).toBe(2);
     });
@@ -508,7 +492,7 @@ describe('CallbackAnalyzer', () => {
       const stats = analyzer.getStatistics(relationships);
 
       expect(stats.totalCallbacks).toBe(4);
-      expect(stats.byPattern['parameter']).toBe(2);
+      expect(stats.byPattern.parameter).toBe(2);
       expect(stats.byPattern['promise-then']).toBe(1);
       expect(stats.byPattern['async-await']).toBe(1);
       expect(stats.uniqueCallers).toBe(4);
@@ -587,10 +571,7 @@ describe('CallbackAnalyzer', () => {
       const result = analyzer.analyze();
 
       const callback = result.find(
-        (r) =>
-          r.type === 'callback' &&
-          r.from === 'func-outer' &&
-          r.to === 'func-inner'
+        (r) => r.type === 'callback' && r.from === 'func-outer' && r.to === 'func-inner'
       );
 
       expect(callback).toBeDefined();

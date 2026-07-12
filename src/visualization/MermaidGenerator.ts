@@ -42,7 +42,9 @@ export class MermaidGenerator {
         if (!depSymbol) continue;
 
         // Add edge
-        lines.push(`  ${this.sanitizeId(currentId)}["${this.formatLabel(symbol.name)}"] --> ${this.sanitizeId(depId)}["${this.formatLabel(depSymbol.name)}"]`);
+        lines.push(
+          `  ${this.sanitizeId(currentId)}["${this.formatLabel(symbol.name)}"] --> ${this.sanitizeId(depId)}["${this.formatLabel(depSymbol.name)}"]`
+        );
 
         traverse(depId, depth + 1);
       }
@@ -51,7 +53,9 @@ export class MermaidGenerator {
     traverse(symbolId, 0);
 
     if (lines.length === 1) {
-      lines.push(`  ${this.sanitizeId(symbolId)}["${this.formatLabel(this.graph.symbols.get(symbolId)?.name || symbolId)}"]`);
+      lines.push(
+        `  ${this.sanitizeId(symbolId)}["${this.formatLabel(this.graph.symbols.get(symbolId)?.name || symbolId)}"]`
+      );
     }
 
     return lines.join('\n');
@@ -89,7 +93,9 @@ export class MermaidGenerator {
       for (const depId of incoming) {
         const depSymbol = this.graph.symbols.get(depId);
         if (!depSymbol) continue;
-        lines.push(`  ${this.sanitizeId(depId)}["${this.formatLabel(depSymbol.name)}"] --> ${this.sanitizeId(hotspot.symbolId)}`);
+        lines.push(
+          `  ${this.sanitizeId(depId)}["${this.formatLabel(depSymbol.name)}"] --> ${this.sanitizeId(hotspot.symbolId)}`
+        );
       }
 
       // Show some outgoing dependencies
@@ -97,7 +103,9 @@ export class MermaidGenerator {
       for (const depId of outgoing) {
         const depSymbol = this.graph.symbols.get(depId);
         if (!depSymbol) continue;
-        lines.push(`  ${this.sanitizeId(hotspot.symbolId)} --> ${this.sanitizeId(depId)}["${this.formatLabel(depSymbol.name)}"]`);
+        lines.push(
+          `  ${this.sanitizeId(hotspot.symbolId)} --> ${this.sanitizeId(depId)}["${this.formatLabel(depSymbol.name)}"]`
+        );
       }
     }
 
@@ -131,7 +139,9 @@ export class MermaidGenerator {
       const fromLabel = this.formatLabel(fromSymbol.name);
       const toLabel = this.formatLabel(toSymbol.name);
 
-      lines.push(`  ${this.sanitizeId(fromId)}["${fromLabel}"] -->|"${i + 1}"| ${this.sanitizeId(toId)}["${toLabel}"]`);
+      lines.push(
+        `  ${this.sanitizeId(fromId)}["${fromLabel}"] -->|"${i + 1}"| ${this.sanitizeId(toId)}["${toLabel}"]`
+      );
     }
 
     // Style circular nodes
@@ -171,7 +181,9 @@ export class MermaidGenerator {
           // Check if it's an inheritance relationship
           // This is simplified - in production, check relationship type
           if (relSymbol.type === 'class' || relSymbol.type === 'interface') {
-            lines.push(`  ${this.sanitizeId(relId)}["${this.formatLabel(relSymbol.name)}"] -.->|extends| ${this.sanitizeId(currentId)}["${this.formatLabel(symbol.name)}"]`);
+            lines.push(
+              `  ${this.sanitizeId(relId)}["${this.formatLabel(relSymbol.name)}"] -.->|extends| ${this.sanitizeId(currentId)}["${this.formatLabel(symbol.name)}"]`
+            );
             traverse(relId);
           }
         }

@@ -11,7 +11,7 @@ describe('SpecContentSimilarityChecker', () => {
   let checker: SpecContentSimilarityChecker;
 
   beforeEach(() => {
-    tempDir = path.join(process.cwd(), '.test-temp', 'spec-similarity-test-' + Math.random());
+    tempDir = path.join(process.cwd(), '.test-temp', `spec-similarity-test-${Math.random()}`);
     fs.mkdirSync(tempDir, { recursive: true });
     checker = new SpecContentSimilarityChecker();
   });
@@ -22,10 +22,7 @@ describe('SpecContentSimilarityChecker', () => {
     }
   });
 
-  const createTestDoc = (
-    name: string,
-    sections: { name: string; content: string }[]
-  ): string => {
+  const createTestDoc = (name: string, sections: { name: string; content: string }[]): string => {
     const filePath = path.join(tempDir, `${name}.md`);
 
     let content = `---
@@ -104,19 +101,36 @@ status: draft
 
     it('should suggest cross-reference for moderate similarity', () => {
       const file1 = createTestDoc('doc1', [
-        { name: 'Authentication', content: 'User login flow with email and password validation rules secure access control session management token generation' },
-        { name: 'Session', content: 'Session management using cookies and tokens authentication bearer jwt refresh' },
+        {
+          name: 'Authentication',
+          content:
+            'User login flow with email and password validation rules secure access control session management token generation',
+        },
+        {
+          name: 'Session',
+          content: 'Session management using cookies and tokens authentication bearer jwt refresh',
+        },
       ]);
 
       const file2 = createTestDoc('doc2', [
-        { name: 'Authentication', content: 'User authentication process with email password secure login validation flow' },
-        { name: 'Storage', content: 'Session data stored in Redis cache tokens cookies management' },
+        {
+          name: 'Authentication',
+          content: 'User authentication process with email password secure login validation flow',
+        },
+        {
+          name: 'Storage',
+          content: 'Session data stored in Redis cache tokens cookies management',
+        },
       ]);
 
       const result = checker.checkPair(file1, file2);
 
       // Test passes if similarity is in expected range and suggestion matches
-      if (result.similarity > 0.3 && result.similarity <= 0.7 && result.overlappingSections.length >= 2) {
+      if (
+        result.similarity > 0.3 &&
+        result.similarity <= 0.7 &&
+        result.overlappingSections.length >= 2
+      ) {
         expect(result.suggestion).toBe('cross-reference');
       } else {
         // Otherwise just verify the result is valid
@@ -125,9 +139,7 @@ status: draft
     });
 
     it('should throw error for non-existent file', () => {
-      const file1 = createTestDoc('doc1', [
-        { name: 'Test', content: 'Test content' },
-      ]);
+      const file1 = createTestDoc('doc1', [{ name: 'Test', content: 'Test content' }]);
 
       expect(() => {
         checker.checkPair(file1, '/non-existent.md');
@@ -148,13 +160,9 @@ status: draft
     });
 
     it('should calculate similarity scores between 0 and 1', () => {
-      const file1 = createTestDoc('doc1', [
-        { name: 'Section A', content: 'Content A' },
-      ]);
+      const file1 = createTestDoc('doc1', [{ name: 'Section A', content: 'Content A' }]);
 
-      const file2 = createTestDoc('doc2', [
-        { name: 'Section B', content: 'Content B' },
-      ]);
+      const file2 = createTestDoc('doc2', [{ name: 'Section B', content: 'Content B' }]);
 
       const result = checker.checkPair(file1, file2);
 
@@ -181,13 +189,9 @@ status: draft
     });
 
     it('should include reason in suggestion', () => {
-      const file1 = createTestDoc('doc1', [
-        { name: 'Overview', content: 'Test content' },
-      ]);
+      const file1 = createTestDoc('doc1', [{ name: 'Overview', content: 'Test content' }]);
 
-      const file2 = createTestDoc('doc2', [
-        { name: 'Overview', content: 'Different content' },
-      ]);
+      const file2 = createTestDoc('doc2', [{ name: 'Overview', content: 'Different content' }]);
 
       const result = checker.checkPair(file1, file2);
 
@@ -202,12 +206,8 @@ status: draft
         createTestDoc('doc1', [
           { name: 'Overview', content: 'Authentication system implementation.' },
         ]),
-        createTestDoc('doc2', [
-          { name: 'Overview', content: 'Authentication system design.' },
-        ]),
-        createTestDoc('doc3', [
-          { name: 'Overview', content: 'Database schema design.' },
-        ]),
+        createTestDoc('doc2', [{ name: 'Overview', content: 'Authentication system design.' }]),
+        createTestDoc('doc3', [{ name: 'Overview', content: 'Database schema design.' }]),
       ];
 
       const results = checker.checkMultiple(files);
@@ -226,9 +226,7 @@ status: draft
         createTestDoc('doc2', [
           { name: 'Test', content: 'authentication user login password secure access' },
         ]),
-        createTestDoc('doc3', [
-          { name: 'Test', content: 'database schema table column index' },
-        ]),
+        createTestDoc('doc3', [{ name: 'Test', content: 'database schema table column index' }]),
       ];
 
       const results = checker.checkMultiple(files);
@@ -246,9 +244,7 @@ status: draft
         createTestDoc('doc2', [
           { name: 'Test', content: 'Entirely different content about topic B' },
         ]),
-        createTestDoc('doc3', [
-          { name: 'Test', content: 'Distinct content about topic C' },
-        ]),
+        createTestDoc('doc3', [{ name: 'Test', content: 'Distinct content about topic C' }]),
       ];
 
       const results = checker.checkMultiple(files);
@@ -264,9 +260,7 @@ status: draft
     });
 
     it('should handle single file', () => {
-      const file = createTestDoc('doc1', [
-        { name: 'Test', content: 'Test content' },
-      ]);
+      const file = createTestDoc('doc1', [{ name: 'Test', content: 'Test content' }]);
 
       const results = checker.checkMultiple([file]);
       expect(results).toEqual([]);
@@ -278,12 +272,8 @@ status: draft
       });
 
       const files = [
-        createTestDoc('doc1', [
-          { name: 'Test', content: 'authentication user system' },
-        ]),
-        createTestDoc('doc2', [
-          { name: 'Test', content: 'authentication user' },
-        ]),
+        createTestDoc('doc1', [{ name: 'Test', content: 'authentication user system' }]),
+        createTestDoc('doc2', [{ name: 'Test', content: 'authentication user' }]),
       ];
 
       const results = customChecker.checkMultiple(files);
@@ -332,19 +322,42 @@ status: draft
 
     it('should count suggestions correctly', () => {
       const file1 = createTestDoc('doc1', [
-        { name: 'Overview', content: 'authentication system user login password token secure access control validation session' },
-        { name: 'Implementation', content: 'jwt tokens bcrypt hashing database storage redis cache session management' },
-        { name: 'Security', content: 'encryption ssl tls certificate authentication authorization role permission' },
+        {
+          name: 'Overview',
+          content:
+            'authentication system user login password token secure access control validation session',
+        },
+        {
+          name: 'Implementation',
+          content: 'jwt tokens bcrypt hashing database storage redis cache session management',
+        },
+        {
+          name: 'Security',
+          content: 'encryption ssl tls certificate authentication authorization role permission',
+        },
       ]);
 
       const file2 = createTestDoc('doc2', [
-        { name: 'Overview', content: 'authentication system user login password token secure access control validation session' },
-        { name: 'Implementation', content: 'jwt tokens bcrypt hashing database storage redis cache session management' },
-        { name: 'Security', content: 'encryption ssl tls certificate authentication authorization role permission' },
+        {
+          name: 'Overview',
+          content:
+            'authentication system user login password token secure access control validation session',
+        },
+        {
+          name: 'Implementation',
+          content: 'jwt tokens bcrypt hashing database storage redis cache session management',
+        },
+        {
+          name: 'Security',
+          content: 'encryption ssl tls certificate authentication authorization role permission',
+        },
       ]);
 
       const file3 = createTestDoc('doc3', [
-        { name: 'Overview', content: 'frontend react component state props hooks context provider consumer reducer' },
+        {
+          name: 'Overview',
+          content: 'frontend react component state props hooks context provider consumer reducer',
+        },
       ]);
 
       const results = checker.checkMultiple([file1, file2, file3]);
@@ -355,13 +368,9 @@ status: draft
     });
 
     it('should calculate average similarity correctly', () => {
-      const file1 = createTestDoc('doc1', [
-        { name: 'Test', content: 'content one two three' },
-      ]);
+      const file1 = createTestDoc('doc1', [{ name: 'Test', content: 'content one two three' }]);
 
-      const file2 = createTestDoc('doc2', [
-        { name: 'Test', content: 'content one two' },
-      ]);
+      const file2 = createTestDoc('doc2', [{ name: 'Test', content: 'content one two' }]);
 
       const results = checker.checkMultiple([file1, file2]);
       const summary = checker.getSummary(results);
@@ -373,13 +382,9 @@ status: draft
     });
 
     it('should round average similarity to 2 decimal places', () => {
-      const file1 = createTestDoc('doc1', [
-        { name: 'Test', content: 'test content similarity' },
-      ]);
+      const file1 = createTestDoc('doc1', [{ name: 'Test', content: 'test content similarity' }]);
 
-      const file2 = createTestDoc('doc2', [
-        { name: 'Test', content: 'test content' },
-      ]);
+      const file2 = createTestDoc('doc2', [{ name: 'Test', content: 'test content' }]);
 
       const results = checker.checkMultiple([file1, file2]);
       const summary = checker.getSummary(results);
@@ -401,9 +406,7 @@ status: draft
         { name: 'Test', content: 'moderate similarity content' },
       ]);
 
-      const file2 = createTestDoc('doc2', [
-        { name: 'Test', content: 'moderate similarity' },
-      ]);
+      const file2 = createTestDoc('doc2', [{ name: 'Test', content: 'moderate similarity' }]);
 
       const result = customChecker.checkPair(file1, file2);
       // Result behavior depends on actual similarity
@@ -415,13 +418,9 @@ status: draft
         highSimilarityThreshold: 0.9,
       });
 
-      const file1 = createTestDoc('doc1', [
-        { name: 'Test', content: 'test' },
-      ]);
+      const file1 = createTestDoc('doc1', [{ name: 'Test', content: 'test' }]);
 
-      const file2 = createTestDoc('doc2', [
-        { name: 'Test', content: 'different' },
-      ]);
+      const file2 = createTestDoc('doc2', [{ name: 'Test', content: 'different' }]);
 
       const result = customChecker.checkPair(file1, file2);
       // With very high threshold, merge should be rare
@@ -431,13 +430,9 @@ status: draft
     it('should use default thresholds when not provided', () => {
       const defaultChecker = new SpecContentSimilarityChecker();
 
-      const file1 = createTestDoc('doc1', [
-        { name: 'Test', content: 'content' },
-      ]);
+      const file1 = createTestDoc('doc1', [{ name: 'Test', content: 'content' }]);
 
-      const file2 = createTestDoc('doc2', [
-        { name: 'Test', content: 'content' },
-      ]);
+      const file2 = createTestDoc('doc2', [{ name: 'Test', content: 'content' }]);
 
       const result = defaultChecker.checkPair(file1, file2);
       expect(result).toBeDefined();
@@ -447,7 +442,10 @@ status: draft
   describe('text processing', () => {
     it('should ignore code blocks in similarity calculation', () => {
       const file1 = createTestDoc('doc1', [
-        { name: 'Test', content: 'authentication system ```typescript\nconst code = "test";\n``` user management' },
+        {
+          name: 'Test',
+          content: 'authentication system ```typescript\nconst code = "test";\n``` user management',
+        },
       ]);
 
       const file2 = createTestDoc('doc2', [
@@ -486,7 +484,10 @@ status: draft
 
     it('should ignore markdown links in similarity calculation', () => {
       const file1 = createTestDoc('doc1', [
-        { name: 'Test', content: 'See [documentation](https://example.com) for authentication details' },
+        {
+          name: 'Test',
+          content: 'See [documentation](https://example.com) for authentication details',
+        },
       ]);
 
       const file2 = createTestDoc('doc2', [
@@ -498,26 +499,18 @@ status: draft
     });
 
     it('should handle Korean text', () => {
-      const file1 = createTestDoc('doc1', [
-        { name: 'Test', content: '사용자 인증 시스템 구현' },
-      ]);
+      const file1 = createTestDoc('doc1', [{ name: 'Test', content: '사용자 인증 시스템 구현' }]);
 
-      const file2 = createTestDoc('doc2', [
-        { name: 'Test', content: '사용자 인증 시스템' },
-      ]);
+      const file2 = createTestDoc('doc2', [{ name: 'Test', content: '사용자 인증 시스템' }]);
 
       const result = checker.checkPair(file1, file2);
       expect(result.similarity).toBeGreaterThan(0);
     });
 
     it('should be case-insensitive', () => {
-      const file1 = createTestDoc('doc1', [
-        { name: 'Test', content: 'AUTHENTICATION SYSTEM' },
-      ]);
+      const file1 = createTestDoc('doc1', [{ name: 'Test', content: 'AUTHENTICATION SYSTEM' }]);
 
-      const file2 = createTestDoc('doc2', [
-        { name: 'Test', content: 'authentication system' },
-      ]);
+      const file2 = createTestDoc('doc2', [{ name: 'Test', content: 'authentication system' }]);
 
       const result = checker.checkPair(file1, file2);
       expect(result.similarity).toBeGreaterThan(0.5);
@@ -538,13 +531,9 @@ status: draft
     });
 
     it('should handle empty text', () => {
-      const file1 = createTestDoc('doc1', [
-        { name: 'Empty', content: '' },
-      ]);
+      const file1 = createTestDoc('doc1', [{ name: 'Empty', content: '' }]);
 
-      const file2 = createTestDoc('doc2', [
-        { name: 'Empty', content: '' },
-      ]);
+      const file2 = createTestDoc('doc2', [{ name: 'Empty', content: '' }]);
 
       const result = checker.checkPair(file1, file2);
       expect(result.similarity).toBeGreaterThanOrEqual(0);

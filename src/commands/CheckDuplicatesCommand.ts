@@ -5,8 +5,8 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { SpecContentSimilarityChecker } from '../spec/SpecContentSimilarityChecker';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Helper function to recursively find markdown files
@@ -150,11 +150,15 @@ export class CheckDuplicatesCommand extends BaseCommand {
         `Pairs analyzed: ${colors.cyan}${(markdownFiles.length * (markdownFiles.length - 1)) / 2}${colors.reset}`
       );
       console.log(`Similar pairs found: ${colors.cyan}${summary.totalPairs}${colors.reset}`);
-      console.log(`Average similarity: ${colors.cyan}${(summary.averageSimilarity * 100).toFixed(1)}%${colors.reset}`);
+      console.log(
+        `Average similarity: ${colors.cyan}${(summary.averageSimilarity * 100).toFixed(1)}%${colors.reset}`
+      );
       console.log();
       console.log(`${colors.bold}Suggestions:${colors.reset}`);
       console.log(`  Merge: ${colors.red}${summary.mergeSuggestions}${colors.reset}`);
-      console.log(`  Cross-reference: ${colors.yellow}${summary.crossRefSuggestions}${colors.reset}`);
+      console.log(
+        `  Cross-reference: ${colors.yellow}${summary.crossRefSuggestions}${colors.reset}`
+      );
       console.log(`  Keep separate: ${colors.green}${summary.keepSeparate}${colors.reset}`);
       console.log();
 
@@ -210,7 +214,9 @@ export class CheckDuplicatesCommand extends BaseCommand {
 
       // Exit with warning if merge suggestions exist
       if (mergeSuggestions.length > 0) {
-        this.printError(`Found ${mergeSuggestions.length} pair(s) with high similarity that should be merged`);
+        this.printError(
+          `Found ${mergeSuggestions.length} pair(s) with high similarity that should be merged`
+        );
         console.log();
         return this.failure(`Found ${mergeSuggestions.length} pairs with high similarity`);
       }

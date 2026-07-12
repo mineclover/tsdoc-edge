@@ -8,12 +8,12 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import {
+  type RelationshipExtractionResult,
   TestCoverageAnalyzer,
   type TestRelationship,
-  type RelationshipExtractionResult,
 } from '../../analyzer/TestCoverageAnalyzer';
 import { DatabaseManager } from '../../storage/DatabaseManager';
-import type { TestCase, TestSuite, TestScenario, TestSymbol } from '../../types/test-symbols';
+import type { TestCase, TestScenario, TestSuite } from '../../types/test-symbols';
 
 describe('TestCoverageAnalyzer', () => {
   let analyzer: TestCoverageAnalyzer;

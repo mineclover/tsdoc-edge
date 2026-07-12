@@ -60,7 +60,7 @@ graph TB
 
       const result = extractor.extract(mermaid, 'test.mmd');
 
-      const node = result.symbols.find(s => s.nodeId === 'A');
+      const node = result.symbols.find((s) => s.nodeId === 'A');
       expect(node).toBeDefined();
     });
 

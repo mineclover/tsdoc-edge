@@ -9,7 +9,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { IncrementalBuilder, IncrementalExtractResult } from '../../lsp/incremental-builder';
+import { IncrementalBuilder } from '../../lsp/incremental-builder';
 import type { SqliteDatabase } from '../../types/database';
 
 describe('IncrementalBuilder', () => {
@@ -17,30 +17,31 @@ describe('IncrementalBuilder', () => {
   let builder: IncrementalBuilder;
 
   // Mock database with required SqliteDatabase properties
-  const createMockDb = (): SqliteDatabase => ({
-    memory: false,
-    readonly: false,
-    name: 'test.db',
-    open: true,
-    inTransaction: false,
-    prepare: jest.fn(() => ({
-      database: {} as SqliteDatabase,
-      source: '',
-      reader: true,
-      readonly: true,
-      run: jest.fn(() => ({ changes: 1, lastInsertRowid: 1 })),
-      get: jest.fn(),
-      all: jest.fn(),
-      iterate: jest.fn(),
-    })),
-    exec: jest.fn().mockReturnThis(),
-    close: jest.fn().mockReturnThis(),
-    transaction: jest.fn((fn) => fn),
-  } as unknown as SqliteDatabase);
+  const createMockDb = (): SqliteDatabase =>
+    ({
+      memory: false,
+      readonly: false,
+      name: 'test.db',
+      open: true,
+      inTransaction: false,
+      prepare: jest.fn(() => ({
+        database: {} as SqliteDatabase,
+        source: '',
+        reader: true,
+        readonly: true,
+        run: jest.fn(() => ({ changes: 1, lastInsertRowid: 1 })),
+        get: jest.fn(),
+        all: jest.fn(),
+        iterate: jest.fn(),
+      })),
+      exec: jest.fn().mockReturnThis(),
+      close: jest.fn().mockReturnThis(),
+      transaction: jest.fn((fn) => fn),
+    }) as unknown as SqliteDatabase;
 
   beforeEach(() => {
     tempDir = fs.realpathSync(
-      fs.mkdtempSync(path.join(require('os').tmpdir(), 'inc-builder-test-'))
+      fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'inc-builder-test-'))
     );
     builder = new IncrementalBuilder(tempDir, createMockDb());
   });

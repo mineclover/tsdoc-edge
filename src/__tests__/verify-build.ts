@@ -3,9 +3,9 @@
  * Tests using DatabaseManager methods instead of raw SQL
  */
 
-import { DatabaseManager } from '../storage/DatabaseManager';
 import * as path from 'node:path';
 import Database from 'better-sqlite3';
+import { DatabaseManager } from '../storage/DatabaseManager';
 
 interface SymbolRow {
   id: string;
@@ -47,7 +47,7 @@ for (const [type, count] of Object.entries(epStats.byType)) {
 
 if (allEntryPoints.length > 0) {
   console.log('\n   Samples:');
-  allEntryPoints.slice(0, 3).forEach(ep => {
+  allEntryPoints.slice(0, 3).forEach((ep) => {
     console.log(`     - ${ep.type}: ${ep.functionName || 'N/A'} (${ep.filePath}:${ep.line})`);
   });
 }
@@ -69,25 +69,26 @@ for (const [type, count] of Object.entries(relsByType)) {
 }
 
 // Test inheritance relationships specifically
-const inheritanceRels = allRels.filter(r =>
-  r.type === 'inheritance' || r.type === 'implementation'
+const inheritanceRels = allRels.filter(
+  (r) => r.type === 'inheritance' || r.type === 'implementation'
 );
 console.log(`\n   Inheritance relationships: ${inheritanceRels.length}`);
 
 if (inheritanceRels.length > 0) {
   console.log('   Samples:');
-  inheritanceRels.slice(0, 3).forEach(rel => {
+  inheritanceRels.slice(0, 3).forEach((rel) => {
     const from = Array.isArray(rel.from) ? rel.from[0] : rel.from;
     const to = Array.isArray(rel.to) ? rel.to[0] : rel.to;
-    const inheritanceType = typeof rel.properties === 'string'
-      ? JSON.parse(rel.properties).inheritanceType
-      : rel.properties?.inheritanceType;
+    const inheritanceType =
+      typeof rel.properties === 'string'
+        ? JSON.parse(rel.properties).inheritanceType
+        : rel.properties?.inheritanceType;
     console.log(`     - ${from} ${inheritanceType || rel.type} ${to}`);
   });
 }
 
 // Test endpoint-handler relationships
-const endpointHandlerRels = allRels.filter(r => {
+const endpointHandlerRels = allRels.filter((r) => {
   if (r.type !== 'calls') return false;
   if (typeof r.properties !== 'object' || r.properties === null) return false;
   const props = typeof r.properties === 'string' ? JSON.parse(r.properties) : r.properties;
@@ -97,7 +98,7 @@ console.log(`\n   Endpoint-handler relationships: ${endpointHandlerRels.length}`
 
 if (endpointHandlerRels.length > 0) {
   console.log('   Samples:');
-  endpointHandlerRels.slice(0, 3).forEach(rel => {
+  endpointHandlerRels.slice(0, 3).forEach((rel) => {
     const props = typeof rel.properties === 'string' ? JSON.parse(rel.properties) : rel.properties;
     const to = Array.isArray(rel.to) ? rel.to[0] : rel.to;
     console.log(`     - ${props?.method} ${props?.path} → ${to}`);
@@ -105,7 +106,7 @@ if (endpointHandlerRels.length > 0) {
 }
 
 // Test block-dependency relationships
-const blockDependencyRels = allRels.filter(r => {
+const blockDependencyRels = allRels.filter((r) => {
   if (r.type !== 'calls') return false;
   if (typeof r.properties !== 'object' || r.properties === null) return false;
   const props = typeof r.properties === 'string' ? JSON.parse(r.properties) : r.properties;
@@ -115,7 +116,7 @@ console.log(`\n   Block-dependency relationships: ${blockDependencyRels.length}`
 
 if (blockDependencyRels.length > 0) {
   console.log('   Samples:');
-  blockDependencyRels.slice(0, 3).forEach(rel => {
+  blockDependencyRels.slice(0, 3).forEach((rel) => {
     const props = typeof rel.properties === 'string' ? JSON.parse(rel.properties) : rel.properties;
     const from = Array.isArray(rel.from) ? rel.from[0] : rel.from;
     const to = Array.isArray(rel.to) ? rel.to[0] : rel.to;
@@ -130,7 +131,7 @@ console.log(`   Total: ${allEndpoints.length}`);
 
 if (allEndpoints.length > 0) {
   console.log('   Samples:');
-  allEndpoints.slice(0, 3).forEach(ep => {
+  allEndpoints.slice(0, 3).forEach((ep) => {
     console.log(`     - ${ep.method} ${ep.path} (handler: ${ep.handlerSymbolId || 'N/A'})`);
   });
 }
@@ -140,7 +141,7 @@ console.log('\n4. Exposure Analysis:');
 // Query raw symbols with exposure info using better-sqlite3
 const db = new Database(dbPath, { readonly: true });
 const symbolsRaw = db.prepare('SELECT * FROM symbols').all() as SymbolRow[];
-const symbolsWithExposure = symbolsRaw.filter(s => s.exposure_level !== null);
+const symbolsWithExposure = symbolsRaw.filter((s) => s.exposure_level !== null);
 console.log(`   Total symbols: ${symbolsRaw.length}`);
 console.log(`   Symbols with exposure info: ${symbolsWithExposure.length}`);
 
@@ -158,9 +159,13 @@ if (symbolsWithExposure.length > 0) {
   }
 
   console.log('\n   Samples:');
-  symbolsWithExposure.slice(0, 3).forEach(symbol => {
-    const scope: ExposureScope | null = symbol.exposure_scope ? JSON.parse(symbol.exposure_scope) : null;
-    console.log(`     - ${symbol.name} (${symbol.type}): ${symbol.exposure_level}, export path: ${symbol.export_path || 'N/A'}`);
+  symbolsWithExposure.slice(0, 3).forEach((symbol) => {
+    const scope: ExposureScope | null = symbol.exposure_scope
+      ? JSON.parse(symbol.exposure_scope)
+      : null;
+    console.log(
+      `     - ${symbol.name} (${symbol.type}): ${symbol.exposure_level}, export path: ${symbol.export_path || 'N/A'}`
+    );
     if (scope) {
       console.log(`       boundaries: ${scope.boundaries?.join(', ') || 'none'}`);
     }

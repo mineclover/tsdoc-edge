@@ -3,8 +3,8 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for rebuilding FTS5 search indexes
@@ -94,7 +94,9 @@ export class RebuildIndexCommand extends BaseCommand {
       try {
         // Get counts before rebuild
         const statsBefore = dbManager.getStatistics();
-        console.log(`${colors.cyan}📊 Symbols in database: ${statsBefore.totalSymbols}${colors.reset}`);
+        console.log(
+          `${colors.cyan}📊 Symbols in database: ${statsBefore.totalSymbols}${colors.reset}`
+        );
         console.log();
 
         // Rebuild FTS5 indexes
@@ -111,8 +113,12 @@ export class RebuildIndexCommand extends BaseCommand {
         console.log();
 
         this.printSection('📊 Rebuild Results');
-        console.log(`Symbols FTS index: ${colors.green}${result.symbolsFts}${colors.reset} entries`);
-        console.log(`Enhanced docs FTS index: ${colors.green}${result.enhancedDocsFts}${colors.reset} entries`);
+        console.log(
+          `Symbols FTS index: ${colors.green}${result.symbolsFts}${colors.reset} entries`
+        );
+        console.log(
+          `Enhanced docs FTS index: ${colors.green}${result.enhancedDocsFts}${colors.reset} entries`
+        );
         console.log(`Duration: ${colors.cyan}${duration}ms${colors.reset}`);
         console.log();
 
@@ -120,7 +126,9 @@ export class RebuildIndexCommand extends BaseCommand {
         if (result.symbolsFts === statsBefore.totalSymbols) {
           this.printSuccess('✅ Index counts match database counts');
         } else {
-          this.printWarning(`⚠️  Warning: Symbol count mismatch (DB: ${statsBefore.totalSymbols}, FTS: ${result.symbolsFts})`);
+          this.printWarning(
+            `⚠️  Warning: Symbol count mismatch (DB: ${statsBefore.totalSymbols}, FTS: ${result.symbolsFts})`
+          );
         }
         console.log();
 
@@ -132,7 +140,9 @@ export class RebuildIndexCommand extends BaseCommand {
           const testName = testSymbols[0].name;
           try {
             const searchResults = dbManager.searchSymbols(testName);
-            this.printSuccess(`✅ Search test passed (query: "${testName}", results: ${searchResults.length})`);
+            this.printSuccess(
+              `✅ Search test passed (query: "${testName}", results: ${searchResults.length})`
+            );
           } catch (error) {
             this.printError(`❌ Search test failed: ${error}`);
             return this.failure('Search functionality not working after rebuild');

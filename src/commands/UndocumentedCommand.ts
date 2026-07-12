@@ -3,12 +3,12 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { DatabaseManager, type SymbolRow } from '../storage/DatabaseManager';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { SymbolSearchEngine } from '../graph/SymbolSearchEngine';
-import type { Symbol } from '../types/graph/graph';
+import { DatabaseManager } from '../storage/DatabaseManager';
 import type { SymbolType } from '../types/graph';
+import type { Symbol } from '../types/graph/graph';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for finding undocumented symbols
@@ -137,10 +137,11 @@ export class UndocumentedCommand extends BaseCommand {
 
         // Filter out test files if requested
         if (excludeTests) {
-          undocumented = undocumented.filter(s =>
-            !s.filePath.includes('__tests__') &&
-            !s.filePath.includes('.test.') &&
-            !s.filePath.includes('.spec.')
+          undocumented = undocumented.filter(
+            (s) =>
+              !s.filePath.includes('__tests__') &&
+              !s.filePath.includes('.test.') &&
+              !s.filePath.includes('.spec.')
           );
         }
 
@@ -148,11 +149,15 @@ export class UndocumentedCommand extends BaseCommand {
           this.printSuccess('All symbols are documented!');
           console.log();
         } else {
-          console.log(`${colors.yellow}Found ${undocumented.length} undocumented symbols:${colors.reset}`);
+          console.log(
+            `${colors.yellow}Found ${undocumented.length} undocumented symbols:${colors.reset}`
+          );
           console.log();
 
           for (const symbol of undocumented) {
-            console.log(`${colors.bold}${symbol.id}${colors.reset} → ${symbol.name} (${symbol.type})`);
+            console.log(
+              `${colors.bold}${symbol.id}${colors.reset} → ${symbol.name} (${symbol.type})`
+            );
             console.log(`  Location: ${symbol.filePath}:${symbol.line}`);
             console.log();
           }

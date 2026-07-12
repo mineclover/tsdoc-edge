@@ -3,11 +3,7 @@
  * @packageDocumentation
  */
 
-import type {
-  InterfaceDependency,
-  InterfaceDependencyGraph,
-  InterfaceInfo,
-} from '../types/domain/interface';
+import type { InterfaceDependency, InterfaceDependencyGraph } from '../types/domain/interface';
 import type {
   TypeChain,
   TypeChainAnalysisResult,
@@ -43,7 +39,7 @@ export class TypeChainTracer {
       if (!map.has(dep.from)) {
         map.set(dep.from, []);
       }
-      map.get(dep.from)!.push(dep);
+      map.get(dep.from)?.push(dep);
     }
 
     return map;
@@ -58,12 +54,16 @@ export class TypeChainTracer {
    * @returns Type chain analysis result
    * @public
    */
-  findChain(source: string, target: string, options: TypeChainOptions = {}): TypeChainAnalysisResult {
+  findChain(
+    source: string,
+    target: string,
+    options: TypeChainOptions = {}
+  ): TypeChainAnalysisResult {
     const maxDepth = options.maxDepth ?? 10;
     const findAllPaths = options.findAllPaths ?? true;
     const chains: TypeChain[] = [];
     const cycles: string[][] = [];
-    const visited = new Set<string>();
+    const _visited = new Set<string>();
     const currentPath: string[] = [];
 
     const dfs = (current: string, depth: number, steps: TypeChainStep[]): void => {
@@ -153,7 +153,11 @@ export class TypeChainTracer {
     let totalTypes = 0;
     let actualMaxDepth = 0;
 
-    const buildNode = (typeName: string, depth: number, dependency?: InterfaceDependency): TypeDependencyNode => {
+    const buildNode = (
+      typeName: string,
+      depth: number,
+      dependency?: InterfaceDependency
+    ): TypeDependencyNode => {
       totalTypes++;
       actualMaxDepth = Math.max(actualMaxDepth, depth);
 
@@ -379,7 +383,9 @@ export class TypeChainTracer {
    */
   getGraphStatistics(options: TypeChainOptions = {}) {
     const allTypes = Array.from(this.graph.interfaces.keys());
-    const filteredDeps = this.graph.dependencies.filter((dep) => this.shouldFollowDependency(dep, options));
+    const filteredDeps = this.graph.dependencies.filter((dep) =>
+      this.shouldFollowDependency(dep, options)
+    );
 
     // Count composite types (types with dependencies)
     const compositesSet = new Set<string>();
@@ -436,7 +442,17 @@ export class TypeChainTracer {
 
     // Filter primitives
     if (!options.includePrimitives) {
-      const primitives = ['string', 'number', 'boolean', 'void', 'any', 'unknown', 'never', 'null', 'undefined'];
+      const primitives = [
+        'string',
+        'number',
+        'boolean',
+        'void',
+        'any',
+        'unknown',
+        'never',
+        'null',
+        'undefined',
+      ];
       if (primitives.includes(dep.to.toLowerCase())) {
         return false;
       }

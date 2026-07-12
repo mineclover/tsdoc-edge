@@ -10,9 +10,9 @@
  * Philosophy: **Test Code > Generic Examples**
  */
 
-import * as ts from 'typescript';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import * as ts from 'typescript';
 import type { DatabaseManager } from '../storage/DatabaseManager';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 
@@ -92,11 +92,11 @@ export class TestExampleExtractor {
    * @param testFilePattern - Glob pattern for test files (default: "**\/*.test.ts")
    * @returns Array of test examples
    */
-  extractAllExamples(testFilePattern = '**/*.test.ts'): TestExample[] {
+  extractAllExamples(_testFilePattern = '**/*.test.ts'): TestExample[] {
     const allSymbols = this.getAllSymbolsCached();
     const testFiles = allSymbols
-      .filter(s => s.filePath.includes('.test.ts') || s.filePath.includes('__tests__'))
-      .map(s => s.filePath);
+      .filter((s) => s.filePath.includes('.test.ts') || s.filePath.includes('__tests__'))
+      .map((s) => s.filePath);
 
     const uniqueTestFiles = Array.from(new Set(testFiles));
     const examples: TestExample[] = [];
@@ -121,12 +121,7 @@ export class TestExampleExtractor {
     }
 
     const sourceCode = fs.readFileSync(testFilePath, 'utf-8');
-    const sourceFile = ts.createSourceFile(
-      testFilePath,
-      sourceCode,
-      ts.ScriptTarget.Latest,
-      true
-    );
+    const sourceFile = ts.createSourceFile(testFilePath, sourceCode, ts.ScriptTarget.Latest, true);
 
     const examples: TestExample[] = [];
     const testedModuleName = this.inferTestedModule(testFilePath);
@@ -243,7 +238,12 @@ export class TestExampleExtractor {
 
     // Analyze test case - pass full source and description for better symbol identification
     const fullSource = sourceFile.text;
-    const testedSymbols = this.identifyTestedSymbols(fullSource, testedModuleName, code, description);
+    const testedSymbols = this.identifyTestedSymbols(
+      fullSource,
+      testedModuleName,
+      code,
+      description
+    );
     const complexity = this.assessComplexity(code);
     const category = this.categorizeExample(description, code);
     const quality = this.assessQuality(code, description, complexity);
@@ -293,7 +293,7 @@ export class TestExampleExtractor {
     const moduleKebab = this.toKebabCase(moduleName);
 
     // Get all symbols from the tested module (for reference)
-    const moduleSymbols = allSymbols.filter(s => {
+    const moduleSymbols = allSymbols.filter((s) => {
       const fileName = path.basename(s.filePath, path.extname(s.filePath));
       const fileKebab = this.toKebabCase(fileName);
       return fileKebab === moduleKebab;
@@ -302,24 +302,24 @@ export class TestExampleExtractor {
     // Strategy 1: ALWAYS include the main class/interface being tested
     // Try multiple variations because symbol IDs might have inconsistent formats
     const moduleKebabNoHyphen = moduleKebab.replace(/-/g, '');
-    const mainClass = moduleSymbols.find(s =>
-      s.type === 'class' && (
-        s.id === `class-${moduleKebab}` ||           // class-database-manager
-        s.id === `class-${moduleKebabNoHyphen}` ||  // class-databasemanager
-        s.id.startsWith('class-') && s.id.includes(moduleName.toLowerCase())
-      )
+    const mainClass = moduleSymbols.find(
+      (s) =>
+        s.type === 'class' &&
+        (s.id === `class-${moduleKebab}` || // class-database-manager
+          s.id === `class-${moduleKebabNoHyphen}` || // class-databasemanager
+          (s.id.startsWith('class-') && s.id.includes(moduleName.toLowerCase())))
     );
 
     if (mainClass) {
       symbols.push(mainClass.id);
     } else {
       // Try to find main interface
-      const mainInterface = moduleSymbols.find(s =>
-        s.type === 'interface' && (
-          s.id === `interface-${moduleKebab}` ||
-          s.id === `interface-${moduleKebabNoHyphen}` ||
-          s.id.startsWith('interface-') && s.id.includes(moduleName.toLowerCase())
-        )
+      const mainInterface = moduleSymbols.find(
+        (s) =>
+          s.type === 'interface' &&
+          (s.id === `interface-${moduleKebab}` ||
+            s.id === `interface-${moduleKebabNoHyphen}` ||
+            (s.id.startsWith('interface-') && s.id.includes(moduleName.toLowerCase())))
       );
       if (mainInterface) {
         symbols.push(mainInterface.id);
@@ -334,8 +334,8 @@ export class TestExampleExtractor {
 
       // Try to find method by name
       const methodKebab = this.toKebabCase(word);
-      const methodSymbol = moduleSymbols.find(s =>
-        s.type === 'method' && s.id.includes(`-${methodKebab}`)
+      const methodSymbol = moduleSymbols.find(
+        (s) => s.type === 'method' && s.id.includes(`-${methodKebab}`)
       );
 
       if (methodSymbol && !symbols.includes(methodSymbol.id)) {
@@ -348,16 +348,20 @@ export class TestExampleExtractor {
     const importPattern = /import\s+\{([^}]+)\}\s+from/g;
     let match;
     while ((match = importPattern.exec(fullSource)) !== null) {
-      const imports = match[1].split(',').map(s => s.trim());
+      const imports = match[1].split(',').map((s) => s.trim());
       for (const importName of imports) {
         // Clean up "type X as Y" patterns
-        const cleanName = importName.split(' as ')[0].replace(/^type\s+/, '').trim();
+        const cleanName = importName
+          .split(' as ')[0]
+          .replace(/^type\s+/, '')
+          .trim();
         const kebab = this.toKebabCase(cleanName);
 
         // Find matching class or interface
-        const matchingSymbol = allSymbols.find(s =>
-          (s.type === 'class' || s.type === 'interface' || s.type === 'type') &&
-          s.id.includes(kebab)
+        const matchingSymbol = allSymbols.find(
+          (s) =>
+            (s.type === 'class' || s.type === 'interface' || s.type === 'type') &&
+            s.id.includes(kebab)
         );
 
         if (matchingSymbol && !symbols.includes(matchingSymbol.id)) {
@@ -383,8 +387,8 @@ export class TestExampleExtractor {
       const methodKebab = this.toKebabCase(methodName);
 
       // Look for method in the module
-      const methodSymbol = moduleSymbols.find(s =>
-        s.type === 'method' && s.id.endsWith(`-${methodKebab}`)
+      const methodSymbol = moduleSymbols.find(
+        (s) => s.type === 'method' && s.id.endsWith(`-${methodKebab}`)
       );
 
       if (methodSymbol && !symbols.includes(methodSymbol.id)) {

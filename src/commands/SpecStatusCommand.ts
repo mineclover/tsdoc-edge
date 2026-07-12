@@ -5,9 +5,9 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { SpecStatusManager } from '../spec/SpecStatusManager';
 import type { SpecStatus } from '../types/spec';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Helper function to recursively find markdown files
@@ -122,9 +122,15 @@ export class SpecStatusCommand extends BaseCommand {
 
       if (!subcommand) {
         this.printError('Usage:');
-        this.printInfo('  tsdoc-edge spec-status show <file>           - Show current status and allowed transitions');
-        this.printInfo('  tsdoc-edge spec-status promote <file> <status> - Promote document to new status');
-        this.printInfo('  tsdoc-edge spec-status list-ready [dir]      - List documents ready for promotion');
+        this.printInfo(
+          '  tsdoc-edge spec-status show <file>           - Show current status and allowed transitions'
+        );
+        this.printInfo(
+          '  tsdoc-edge spec-status promote <file> <status> - Promote document to new status'
+        );
+        this.printInfo(
+          '  tsdoc-edge spec-status list-ready [dir]      - List documents ready for promotion'
+        );
         this.printInfo('  tsdoc-edge spec-status stats [dir]           - Show status distribution');
         console.log();
         return this.failure('Subcommand required');
@@ -170,7 +176,7 @@ export class SpecStatusCommand extends BaseCommand {
         } else {
           for (const status of allowed) {
             const validation = manager.validateTransition(filePath, status);
-            const icon = validation.valid ? colors.green + '✅' : colors.yellow + '⚠️';
+            const icon = validation.valid ? `${colors.green}✅` : `${colors.yellow}⚠️`;
             console.log(`  ${icon} ${status}${colors.reset}`);
 
             if (!validation.valid) {
@@ -213,7 +219,7 @@ export class SpecStatusCommand extends BaseCommand {
 
         this.printSection('Validation Checks');
         for (const check of validation.checks) {
-          const icon = check.passed ? colors.green + '✅' : colors.red + '❌';
+          const icon = check.passed ? `${colors.green}✅` : `${colors.red}❌`;
           console.log(`${icon} ${check.name}${colors.reset}`);
           console.log(`   ${colors.dim}${check.message}${colors.reset}`);
         }
@@ -305,9 +311,7 @@ export class SpecStatusCommand extends BaseCommand {
         }
         console.log();
         return this.success();
-      }
-
-      else {
+      } else {
         this.printError(`Unknown subcommand: ${subcommand}`);
         this.printInfo('Valid subcommands: show, promote, list-ready, stats');
         console.log();

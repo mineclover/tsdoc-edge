@@ -6,19 +6,16 @@
  * @responsibility Extract EnhancedSymbolDoc from TypeScript files using AST + TSDoc
  */
 
+import { type ParserContext, TSDocParser } from '@microsoft/tsdoc';
 import * as ts from 'typescript';
-import { TSDocParser, type ParserContext } from '@microsoft/tsdoc';
+import type { Symbol } from '../types/graph';
 import type {
-  BaseSymbolDoc,
-  EnhancedSymbolDoc,
-  ProblemSolving,
-  Functionality,
-  ErrorExperience,
   DecisionRecord,
   DependencySpec,
+  EnhancedSymbolDoc,
+  ErrorExperience,
   FuturePlan,
 } from '../types/tags';
-import type { Symbol } from '../types/graph';
 
 /**
  * Extraction options
@@ -109,12 +106,7 @@ export class EnhancedDocExtractor {
    * ```
    */
   extractFromFile(filePath: string, sourceCode: string): ExtractedEnhancedDoc[] {
-    const sourceFile = ts.createSourceFile(
-      filePath,
-      sourceCode,
-      ts.ScriptTarget.Latest,
-      true
-    );
+    const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
 
     const results: ExtractedEnhancedDoc[] = [];
 
@@ -134,7 +126,7 @@ export class EnhancedDocExtractor {
 
       // Mark if we're inside a class
       const insideClass = ts.isClassDeclaration(node);
-      ts.forEachChild(node, child => visit(child, insideClass));
+      ts.forEachChild(node, (child) => visit(child, insideClass));
     };
 
     visit(sourceFile);
@@ -175,19 +167,13 @@ export class EnhancedDocExtractor {
     }
 
     // Parse TSDoc
-    const tsdocContext = jsDocComment
-      ? this.tsdocParser.parseString(jsDocComment)
-      : null;
+    const tsdocContext = jsDocComment ? this.tsdocParser.parseString(jsDocComment) : null;
 
     // Extract symbol info
     const symbol = this.extractSymbolInfo(node, sourceFile, filePath, name);
 
     // Extract enhanced doc
-    const doc = this.extractEnhancedDoc(
-      tsdocContext,
-      symbol,
-      jsDocComment || ''
-    );
+    const doc = this.extractEnhancedDoc(tsdocContext, symbol, jsDocComment || '');
 
     // Calculate completeness
     const { completeness, missing } = this.calculateCompleteness(doc);
@@ -259,9 +245,8 @@ export class EnhancedDocExtractor {
     let hasExportKeyword = false;
     if (ts.canHaveModifiers(node)) {
       const modifiers = ts.getModifiers(node);
-      hasExportKeyword = modifiers?.some(
-        (mod: ts.Modifier) => mod.kind === ts.SyntaxKind.ExportKeyword
-      ) || false;
+      hasExportKeyword =
+        modifiers?.some((mod: ts.Modifier) => mod.kind === ts.SyntaxKind.ExportKeyword) || false;
     }
 
     let type: Symbol['type'] = 'function';
@@ -272,9 +257,7 @@ export class EnhancedDocExtractor {
     else if (ts.isVariableStatement(node)) type = 'variable';
     else if (ts.isMethodDeclaration(node)) type = 'method';
 
-    const id = this.options.autoGenerateIds
-      ? `${name.toLowerCase()}-${Date.now()}`
-      : name;
+    const id = this.options.autoGenerateIds ? `${name.toLowerCase()}-${Date.now()}` : name;
 
     return {
       id,
@@ -368,7 +351,11 @@ export class EnhancedDocExtractor {
 
     for (const line of lines) {
       // Remove leading *, whitespace, and trailing */
-      let trimmed = line.trim().replace(/^\*\s*/, '').replace(/\*\/$/, '').trim();
+      const trimmed = line
+        .trim()
+        .replace(/^\*\s*/, '')
+        .replace(/\*\/$/, '')
+        .trim();
 
       // Check for @tag
       const tagMatch = trimmed.match(/^@(\w+)\s*(.*)/);
@@ -382,7 +369,7 @@ export class EnhancedDocExtractor {
         currentValue = tagMatch[2];
       } else if (currentTag && trimmed) {
         // Continue multiline tag
-        currentValue += ' ' + trimmed;
+        currentValue += ` ${trimmed}`;
       }
     }
 
@@ -405,8 +392,8 @@ export class EnhancedDocExtractor {
   private parseList(str: string): string[] {
     return str
       .split(/[,;]/)
-      .map(s => s.trim())
-      .filter(s => s.length > 0);
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
   }
 
   /**

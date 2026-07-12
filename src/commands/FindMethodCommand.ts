@@ -5,10 +5,10 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import type { SymbolRegistryEntry } from '../types/registry';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for finding methods by qualified name
@@ -105,7 +105,9 @@ export class FindMethodCommand extends BaseCommand {
       }
 
       const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
-      const manager = this.manager || (fs.existsSync(registryPath) ? new SymbolRegistryManager(registryPath) : null);
+      const manager =
+        this.manager ||
+        (fs.existsSync(registryPath) ? new SymbolRegistryManager(registryPath) : null);
 
       this.printHeader(`Search: ${query}`);
 
@@ -127,7 +129,10 @@ export class FindMethodCommand extends BaseCommand {
     });
   }
 
-  private displayRegistryEntry(entry: SymbolRegistryEntry, manager: SymbolRegistryManager): CommandResult {
+  private displayRegistryEntry(
+    entry: SymbolRegistryEntry,
+    manager: SymbolRegistryManager
+  ): CommandResult {
     const displayName = entry.sourceRef.qualifiedName || entry.sourceRef.symbolName || entry.id;
     console.log(`${colors.bold}${entry.id}${colors.reset} → ${displayName}`);
     console.log();
@@ -138,7 +143,8 @@ export class FindMethodCommand extends BaseCommand {
 
     if (entry.sourceRef.memberOf) {
       const parent = manager.findById(entry.sourceRef.memberOf);
-      const parentName = parent?.sourceRef.qualifiedName || parent?.sourceRef.symbolName || parent?.id;
+      const parentName =
+        parent?.sourceRef.qualifiedName || parent?.sourceRef.symbolName || parent?.id;
       console.log(`Parent:     ${entry.sourceRef.memberOf} (${parentName || 'unknown'})`);
     }
 
@@ -168,7 +174,10 @@ export class FindMethodCommand extends BaseCommand {
     return this.success();
   }
 
-  private displayRegistryResults(results: SymbolRegistryEntry[], manager: SymbolRegistryManager): CommandResult {
+  private displayRegistryResults(
+    results: SymbolRegistryEntry[],
+    manager: SymbolRegistryManager
+  ): CommandResult {
     if (results.length === 1) {
       return this.displayRegistryEntry(results[0], manager);
     }
@@ -177,7 +186,8 @@ export class FindMethodCommand extends BaseCommand {
     console.log();
 
     for (const result of results) {
-      const displayName = result.sourceRef.qualifiedName || result.sourceRef.symbolName || result.id;
+      const displayName =
+        result.sourceRef.qualifiedName || result.sourceRef.symbolName || result.id;
       console.log(`${colors.bold}${result.id}${colors.reset} → ${displayName}`);
       console.log(`  File: ${result.sourceRef.filePath}:${result.sourceRef.line || '?'}`);
       console.log(`  Type: ${result.sourceRef.type}`);
@@ -207,9 +217,7 @@ export class FindMethodCommand extends BaseCommand {
         const allMatches = dbManager.findSymbolsByNamePattern(query);
 
         // Filter to only methods and functions
-        methodMatches = allMatches.filter(s =>
-          ['method', 'function'].includes(s.type)
-        );
+        methodMatches = allMatches.filter((s) => ['method', 'function'].includes(s.type));
 
         // If still no methods, show all matching symbols
         if (methodMatches.length === 0 && allMatches.length > 0) {
@@ -243,14 +251,18 @@ export class FindMethodCommand extends BaseCommand {
           console.log(`Type:       ${symbol.type}`);
           console.log(`Exported:   ${symbol.isExported ? 'Yes' : 'No'}`);
           if (symbol.summary) {
-            console.log(`Summary:    ${symbol.summary.substring(0, 80)}${symbol.summary.length > 80 ? '...' : ''}`);
+            console.log(
+              `Summary:    ${symbol.summary.substring(0, 80)}${symbol.summary.length > 80 ? '...' : ''}`
+            );
           }
           console.log();
         }
         return this.success();
       }
 
-      console.log(`Found ${colors.bold}${methodMatches.length}${colors.reset} matching methods/functions:`);
+      console.log(
+        `Found ${colors.bold}${methodMatches.length}${colors.reset} matching methods/functions:`
+      );
       console.log();
 
       for (const match of methodMatches.slice(0, 20)) {

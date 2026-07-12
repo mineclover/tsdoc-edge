@@ -23,7 +23,7 @@ const publicSymbolsQuery = `
   ORDER BY type, name
 `;
 
-const publicSymbols = db['db'].prepare(publicSymbolsQuery).all() as Array<{
+const publicSymbols = db.db.prepare(publicSymbolsQuery).all() as Array<{
   id: string;
   name: string;
   type: string;
@@ -32,15 +32,15 @@ const publicSymbols = db['db'].prepare(publicSymbolsQuery).all() as Array<{
 }>;
 
 console.log(`📊 Total public symbols: ${publicSymbols.length}`);
-console.log(`   Classes: ${publicSymbols.filter(s => s.type === 'class').length}`);
-console.log(`   Functions: ${publicSymbols.filter(s => s.type === 'function').length}`);
-console.log(`   Interfaces: ${publicSymbols.filter(s => s.type === 'interface').length}`);
+console.log(`   Classes: ${publicSymbols.filter((s) => s.type === 'class').length}`);
+console.log(`   Functions: ${publicSymbols.filter((s) => s.type === 'function').length}`);
+console.log(`   Interfaces: ${publicSymbols.filter((s) => s.type === 'interface').length}`);
 console.log();
 
 // Check which symbols have test coverage
 const untestedSymbols: typeof publicSymbols = [];
 const testedSymbols: Array<{
-  symbol: typeof publicSymbols[0];
+  symbol: (typeof publicSymbols)[0];
   testCount: number;
   tests: string[];
 }> = [];
@@ -55,7 +55,7 @@ for (const symbol of publicSymbols) {
     AND r.to_symbols LIKE '%' || ? || '%'
   `;
 
-  const coverage = db['db'].prepare(coverageQuery).all(symbol.id) as Array<{
+  const coverage = db.db.prepare(coverageQuery).all(symbol.id) as Array<{
     id: string;
     from_symbols: string;
     test_name: string;
@@ -67,19 +67,22 @@ for (const symbol of publicSymbols) {
     testedSymbols.push({
       symbol,
       testCount: coverage.length,
-      tests: coverage.map(c => c.test_name),
+      tests: coverage.map((c) => c.test_name),
     });
   }
 }
 
 // Calculate coverage percentage
-const coveragePercent = publicSymbols.length > 0
-  ? ((testedSymbols.length / publicSymbols.length) * 100).toFixed(1)
-  : '0.0';
+const coveragePercent =
+  publicSymbols.length > 0
+    ? ((testedSymbols.length / publicSymbols.length) * 100).toFixed(1)
+    : '0.0';
 
 console.log('📈 Coverage Summary:');
 console.log(`   Tested: ${testedSymbols.length} (${coveragePercent}%)`);
-console.log(`   Untested: ${untestedSymbols.length} (${(100 - parseFloat(coveragePercent)).toFixed(1)}%)`);
+console.log(
+  `   Untested: ${untestedSymbols.length} (${(100 - parseFloat(coveragePercent)).toFixed(1)}%)`
+);
 console.log();
 
 // Show tested symbols
@@ -97,9 +100,9 @@ if (testedSymbols.length > 0) {
 }
 
 // Group by type (do this before showing results)
-const untestedClasses = untestedSymbols.filter(s => s.type === 'class');
-const untestedFunctions = untestedSymbols.filter(s => s.type === 'function');
-const untestedInterfaces = untestedSymbols.filter(s => s.type === 'interface');
+const untestedClasses = untestedSymbols.filter((s) => s.type === 'class');
+const untestedFunctions = untestedSymbols.filter((s) => s.type === 'function');
+const untestedInterfaces = untestedSymbols.filter((s) => s.type === 'interface');
 
 // Show untested symbols by priority
 if (untestedSymbols.length > 0) {

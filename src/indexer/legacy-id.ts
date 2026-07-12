@@ -10,11 +10,7 @@ import * as path from 'node:path';
  *
  * Format: `filename-type-symbolname`
  */
-export function generateLegacyId(
-  filePath: string,
-  symbolName: string,
-  symbolType: string
-): string {
+export function generateLegacyId(filePath: string, symbolName: string, symbolType: string): string {
   const fileBase = path
     .basename(filePath, path.extname(filePath))
     .toLowerCase()

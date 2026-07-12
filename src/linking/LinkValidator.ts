@@ -27,11 +27,7 @@ export class LinkValidator {
   private symbolExtractor: ASTSymbolExtractor;
   private projectRoot: string;
 
-  constructor(
-    linker: DocCodeLinker,
-    symbolExtractor: ASTSymbolExtractor,
-    projectRoot: string
-  ) {
+  constructor(linker: DocCodeLinker, symbolExtractor: ASTSymbolExtractor, projectRoot: string) {
     this.linker = linker;
     this.symbolExtractor = symbolExtractor;
     this.projectRoot = projectRoot;
@@ -113,9 +109,7 @@ export class LinkValidator {
         type: 'broken',
         link,
         issue: `File not found: ${link.targetFile}`,
-        suggestion: suggestion
-          ? `Did you mean: ${suggestion}?`
-          : 'File does not exist',
+        suggestion: suggestion ? `Did you mean: ${suggestion}?` : 'File does not exist',
       };
     }
 
@@ -207,7 +201,7 @@ export class LinkValidator {
    */
   private checkSectionExists(content: string, section: string): boolean {
     // Convert section to heading format
-    const heading = section.toLowerCase().replace(/[^a-z0-9-]/g, '-');
+    const _heading = section.toLowerCase().replace(/[^a-z0-9-]/g, '-');
 
     // Check for heading
     const headingRegex = new RegExp(`^#+\\s+.*${section}`, 'mi');

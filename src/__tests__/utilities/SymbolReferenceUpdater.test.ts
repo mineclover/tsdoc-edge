@@ -13,8 +13,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import {
   SymbolReferenceUpdater,
-  SymbolReference,
-  SymbolUpdateOptions,
+  type SymbolUpdateOptions,
 } from '../../utilities/SymbolReferenceUpdater';
 
 describe('SymbolReferenceUpdater', () => {
@@ -23,7 +22,7 @@ describe('SymbolReferenceUpdater', () => {
 
   beforeEach(() => {
     updater = new SymbolReferenceUpdater();
-    tempDir = fs.mkdtempSync(path.join(require('os').tmpdir(), 'symbol-ref-test-'));
+    tempDir = fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'symbol-ref-test-'));
   });
 
   afterEach(() => {
@@ -104,10 +103,7 @@ describe('SymbolReferenceUpdater', () => {
 
       it('should find references across multiple lines', async () => {
         const docPath = path.join(tempDir, 'doc.md');
-        fs.writeFileSync(
-          docPath,
-          'Line 1 [[OldSymbol]]\nLine 2\nLine 3 [[OldSymbol]]'
-        );
+        fs.writeFileSync(docPath, 'Line 1 [[OldSymbol]]\nLine 2\nLine 3 [[OldSymbol]]');
 
         const refs = await updater.findReferences('OldSymbol', tempDir);
 
@@ -209,11 +205,7 @@ describe('SymbolReferenceUpdater', () => {
           dryRun: true,
         };
 
-        const result = await updater.updateReferences(
-          'OldSymbol',
-          'NewSymbol',
-          options
-        );
+        const result = await updater.updateReferences('OldSymbol', 'NewSymbol', options);
 
         expect(result.totalReferences).toBe(2);
         expect(result.h1Count).toBe(1);
@@ -234,11 +226,7 @@ describe('SymbolReferenceUpdater', () => {
           dryRun: false,
         };
 
-        const result = await updater.updateReferences(
-          'OldSymbol',
-          'NewSymbol',
-          options
-        );
+        const result = await updater.updateReferences('OldSymbol', 'NewSymbol', options);
 
         expect(result.updated).toBe(1);
 
@@ -263,21 +251,14 @@ describe('SymbolReferenceUpdater', () => {
 
       it('should update multiple reference types', async () => {
         const docPath = path.join(tempDir, 'doc.md');
-        fs.writeFileSync(
-          docPath,
-          '# [[OldSymbol]]\n\nSee [[OldSymbol]] and [[OldSymbol]]'
-        );
+        fs.writeFileSync(docPath, '# [[OldSymbol]]\n\nSee [[OldSymbol]] and [[OldSymbol]]');
 
         const options: SymbolUpdateOptions = {
           baseDir: tempDir,
           dryRun: false,
         };
 
-        const result = await updater.updateReferences(
-          'OldSymbol',
-          'NewSymbol',
-          options
-        );
+        const result = await updater.updateReferences('OldSymbol', 'NewSymbol', options);
 
         expect(result.updated).toBe(3);
         expect(result.filesModified).toContain(docPath);
@@ -334,11 +315,7 @@ describe('SymbolReferenceUpdater', () => {
           dryRun: true,
         };
 
-        const result = await updater.updateReferences(
-          'OldSymbol',
-          'NewSymbol',
-          options
-        );
+        const result = await updater.updateReferences('OldSymbol', 'NewSymbol', options);
 
         expect(result.h1Count).toBe(1);
         expect(result.h2Count).toBe(1);
@@ -359,11 +336,7 @@ describe('SymbolReferenceUpdater', () => {
           dryRun: false,
         };
 
-        const result = await updater.updateReferences(
-          'OldSymbol',
-          'NewSymbol',
-          options
-        );
+        const result = await updater.updateReferences('OldSymbol', 'NewSymbol', options);
 
         fs.chmodSync(docPath, 0o644);
 

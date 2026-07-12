@@ -147,7 +147,7 @@ describe('DepthTraverser', () => {
       });
 
       expect(result.totalSymbols).toBe(3);
-      const depth1Ids = result.symbolsByDepth.get(1)?.map(s => s.id) || [];
+      const depth1Ids = result.symbolsByDepth.get(1)?.map((s) => s.id) || [];
       expect(depth1Ids).toContain('B');
       expect(depth1Ids).toContain('C');
     });
@@ -167,7 +167,7 @@ describe('DepthTraverser', () => {
       });
 
       expect(result.totalSymbols).toBe(2);
-      const depth1Ids = result.symbolsByDepth.get(1)?.map(s => s.id) || [];
+      const depth1Ids = result.symbolsByDepth.get(1)?.map((s) => s.id) || [];
       expect(depth1Ids).toContain('C');
       expect(depth1Ids).not.toContain('B');
     });

@@ -11,9 +11,9 @@
  */
 
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { ConfigManager } from '../config/ConfigManager';
-import { DocumentSymbolLister, type DocumentSymbol } from '../utilities/DocumentSymbolLister';
+import { type DocumentSymbol, DocumentSymbolLister } from '../utilities/DocumentSymbolLister';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Document Symbols Command
@@ -107,11 +107,13 @@ Examples:
     }
 
     const useLlmFormat = args.includes('--llm');
-    const categoryFilter = this.getOptionValue(args, '--category')?.split(',').map((c: string) => c.trim());
+    const categoryFilter = this.getOptionValue(args, '--category')
+      ?.split(',')
+      .map((c: string) => c.trim());
     const searchQuery = this.getOptionValue(args, '--search')?.toLowerCase();
 
     try {
-      const config = this.configManager.get();
+      const _config = this.configManager.get();
       const managedDir = path.resolve(process.cwd(), 'managed');
 
       const lister = new DocumentSymbolLister(managedDir);
@@ -119,15 +121,16 @@ Examples:
 
       // Filter by category
       if (categoryFilter && categoryFilter.length > 0) {
-        symbols = symbols.filter(s => categoryFilter.includes(s.category));
+        symbols = symbols.filter((s) => categoryFilter.includes(s.category));
       }
 
       // Filter by search query
       if (searchQuery) {
-        symbols = symbols.filter(s =>
-          s.name.toLowerCase().includes(searchQuery) ||
-          s.summary.toLowerCase().includes(searchQuery) ||
-          s.category.toLowerCase().includes(searchQuery)
+        symbols = symbols.filter(
+          (s) =>
+            s.name.toLowerCase().includes(searchQuery) ||
+            s.summary.toLowerCase().includes(searchQuery) ||
+            s.category.toLowerCase().includes(searchQuery)
         );
       }
 
@@ -141,7 +144,9 @@ Examples:
 
       return { exitCode: 0, message: `Found ${symbols.length} document symbols` };
     } catch (error) {
-      this.printError(`Failed to list document symbols: ${error instanceof Error ? error.message : String(error)}`);
+      this.printError(
+        `Failed to list document symbols: ${error instanceof Error ? error.message : String(error)}`
+      );
       return { exitCode: 1, message: 'Failed to list document symbols' };
     }
   }
@@ -170,7 +175,7 @@ Examples:
       if (!byCategory.has(symbol.category)) {
         byCategory.set(symbol.category, []);
       }
-      byCategory.get(symbol.category)!.push(symbol);
+      byCategory.get(symbol.category)?.push(symbol);
     }
 
     // Sort categories
@@ -189,17 +194,21 @@ Examples:
     // Display by category
     for (const [category, categorySymbols] of sortedCategories) {
       const icon = this.getCategoryIcon(category);
-      console.log(`${colors.bold}${icon} ${this.capitalize(category)}${colors.reset} ${colors.dim}(${categorySymbols.length})${colors.reset}`);
+      console.log(
+        `${colors.bold}${icon} ${this.capitalize(category)}${colors.reset} ${colors.dim}(${categorySymbols.length})${colors.reset}`
+      );
       console.log();
 
       for (const symbol of categorySymbols) {
-        console.log(`  ${colors.cyan}•${colors.reset} ${colors.bold}[[${symbol.name}]]${colors.reset}`);
+        console.log(
+          `  ${colors.cyan}•${colors.reset} ${colors.bold}[[${symbol.name}]]${colors.reset}`
+        );
 
         // Truncate summary if too long
         const maxSummaryLength = 80;
         let summary = symbol.summary;
         if (summary.length > maxSummaryLength) {
-          summary = summary.substring(0, maxSummaryLength) + '...';
+          summary = `${summary.substring(0, maxSummaryLength)}...`;
         }
 
         console.log(`    ${colors.dim}${summary}${colors.reset}`);
@@ -210,7 +219,9 @@ Examples:
 
     // Summary
     console.log(`${colors.dim}${'─'.repeat(80)}${colors.reset}`);
-    console.log(`${colors.bold}Total:${colors.reset} ${symbols.length} document symbols across ${byCategory.size} categories`);
+    console.log(
+      `${colors.bold}Total:${colors.reset} ${symbols.length} document symbols across ${byCategory.size} categories`
+    );
     console.log();
   }
 
@@ -227,7 +238,7 @@ Examples:
     output += `> **Total Symbols**: ${symbols.length}\n`;
 
     // List categories
-    const categories = new Set(symbols.map(s => s.category));
+    const categories = new Set(symbols.map((s) => s.category));
     output += `> **Categories**: ${Array.from(categories).sort().join(', ')}\n\n`;
     output += `---\n\n`;
 
@@ -241,7 +252,7 @@ Examples:
       if (!byCategory.has(symbol.category)) {
         byCategory.set(symbol.category, []);
       }
-      byCategory.get(symbol.category)!.push(symbol);
+      byCategory.get(symbol.category)?.push(symbol);
     }
 
     // Sort categories
@@ -293,12 +304,12 @@ Examples:
    */
   private getCategoryIcon(category: string): string {
     const icons: Record<string, string> = {
-      'architecture': '🏗️',
-      'features': '⚙️',
-      'workflows': '🔄',
-      'concepts': '💡',
-      'commands': '⌨️',
-      'root': '📁',
+      architecture: '🏗️',
+      features: '⚙️',
+      workflows: '🔄',
+      concepts: '💡',
+      commands: '⌨️',
+      root: '📁',
     };
 
     return icons[category] || '📄';
@@ -316,7 +327,11 @@ Examples:
    * Get option value from args
    * @private
    */
-  private getOptionValue(args: string[], option: string, defaultValue?: string): string | undefined {
+  private getOptionValue(
+    args: string[],
+    option: string,
+    defaultValue?: string
+  ): string | undefined {
     const index = args.indexOf(option);
     if (index !== -1 && index + 1 < args.length) {
       return args[index + 1];

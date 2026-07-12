@@ -182,26 +182,20 @@ export class CoverageParser {
 
       // Aggregate totals
       const sCount = Object.keys(fileData.s || {}).length;
-      const sCovered = Object.values(fileData.s || {}).filter(
-        (count: number) => count > 0
-      ).length;
+      const sCovered = Object.values(fileData.s || {}).filter((count: number) => count > 0).length;
 
       const fCount = Object.keys(fileData.f || {}).length;
-      const fCovered = Object.values(fileData.f || {}).filter(
-        (count: number) => count > 0
-      ).length;
+      const fCovered = Object.values(fileData.f || {}).filter((count: number) => count > 0).length;
 
       const bCount = Object.keys(fileData.b || {}).length;
-      const bCovered = Object.values(fileData.b || {}).filter(
-        (branches: number[]) => branches.some((b: number) => b > 0)
+      const bCovered = Object.values(fileData.b || {}).filter((branches: number[]) =>
+        branches.some((b: number) => b > 0)
       ).length;
 
       // Line coverage
       const lineMap = this.getLineMap(fileData);
       const lCount = lineMap.size;
-      const lCovered = Array.from(lineMap.values()).filter(
-        covered => covered
-      ).length;
+      const lCovered = Array.from(lineMap.values()).filter((covered) => covered).length;
 
       totalStatements += sCount;
       coveredStatements += sCovered;
@@ -231,30 +225,27 @@ export class CoverageParser {
 
     // Statement coverage
     const sCount = Object.keys(fileData.s || {}).length;
-    const sCovered = Object.values(fileData.s || {}).filter(
-      (count: number) => count > 0
-    ).length;
+    const sCovered = Object.values(fileData.s || {}).filter((count: number) => count > 0).length;
     const statementCoverage = sCount > 0 ? (sCovered / sCount) * 100 : 0;
 
     // Function coverage
     const fCount = Object.keys(fileData.f || {}).length;
-    const fCovered = Object.values(fileData.f || {}).filter(
-      (count: number) => count > 0
-    ).length;
+    const fCovered = Object.values(fileData.f || {}).filter((count: number) => count > 0).length;
     const functionCoverage = fCount > 0 ? (fCovered / fCount) * 100 : 0;
 
     // Branch coverage
     const bCount = Object.keys(fileData.b || {}).length;
-    const bCovered = Object.values(fileData.b || {}).filter(
-      (branches: number[]) => branches.some((b: number) => b > 0)
+    const bCovered = Object.values(fileData.b || {}).filter((branches: number[]) =>
+      branches.some((b: number) => b > 0)
     ).length;
     const branchCoverage = bCount > 0 ? (bCovered / bCount) * 100 : 0;
 
     // Line coverage
     const lineMap = this.getLineMap(fileData);
-    const lineCoverage = lineMap.size > 0
-      ? (Array.from(lineMap.values()).filter(c => c).length / lineMap.size) * 100
-      : 0;
+    const lineCoverage =
+      lineMap.size > 0
+        ? (Array.from(lineMap.values()).filter((c) => c).length / lineMap.size) * 100
+        : 0;
 
     const coveredLines: number[] = [];
     const uncoveredLines: number[] = [];
@@ -371,10 +362,7 @@ export class CoverageParser {
    * @param functionName - Function name
    * @returns Function coverage or null
    */
-  getFunctionCoverage(
-    fileCoverage: FileCoverage,
-    functionName: string
-  ): FunctionCoverage | null {
-    return fileCoverage.functions.find(f => f.name === functionName) || null;
+  getFunctionCoverage(fileCoverage: FileCoverage, functionName: string): FunctionCoverage | null {
+    return fileCoverage.functions.find((f) => f.name === functionName) || null;
   }
 }

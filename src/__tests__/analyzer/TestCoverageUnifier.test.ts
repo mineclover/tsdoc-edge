@@ -2,9 +2,9 @@
  * TestCoverageUnifier Tests
  */
 
-import type { Database, Statement } from 'better-sqlite3';
+import type { Database } from 'better-sqlite3';
 import { TestCoverageUnifier } from '../../analyzer/TestCoverageUnifier';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships';
 
 describe('TestCoverageUnifier', () => {

@@ -40,7 +40,7 @@ function findDatabaseDuplicates(db: DatabaseManager): DuplicateSymbol[] {
     if (!byName.has(symbol.name)) {
       byName.set(symbol.name, []);
     }
-    byName.get(symbol.name)!.push(symbol);
+    byName.get(symbol.name)?.push(symbol);
   }
 
   const duplicates: DuplicateSymbol[] = [];
@@ -49,7 +49,7 @@ function findDatabaseDuplicates(db: DatabaseManager): DuplicateSymbol[] {
     if (symbols.length > 1) {
       duplicates.push({
         name,
-        occurrences: symbols.map(s => ({
+        occurrences: symbols.map((s) => ({
           id: s.id,
           filePath: s.filePath,
           line: s.line,
@@ -63,7 +63,10 @@ function findDatabaseDuplicates(db: DatabaseManager): DuplicateSymbol[] {
 }
 
 // Extract interface definitions from markdown
-function extractInterfaceDefinitions(content: string, filePath: string): Array<{ name: string; line: number; content: string }> {
+function extractInterfaceDefinitions(
+  content: string,
+  _filePath: string
+): Array<{ name: string; line: number; content: string }> {
   const lines = content.split('\n');
   const definitions: Array<{ name: string; line: number; content: string }> = [];
 
@@ -119,7 +122,7 @@ function findCodeBlockDuplicates(baseDir: string): CodeBlockDuplicate[] {
           if (!allDefinitions.has(def.name)) {
             allDefinitions.set(def.name, []);
           }
-          allDefinitions.get(def.name)!.push({
+          allDefinitions.get(def.name)?.push({
             file: fullPath,
             line: def.line,
             content: def.content,

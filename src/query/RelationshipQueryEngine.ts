@@ -11,7 +11,11 @@
  */
 
 import type { DatabaseManager } from '../storage/DatabaseManager';
-import type { UnifiedRelationship, RelationshipType, RelationshipCategory } from '../types/relationships/unified';
+import type {
+  RelationshipCategory,
+  RelationshipType,
+  UnifiedRelationship,
+} from '../types/relationships/unified';
 
 /**
  * Query options for relationship traversal
@@ -119,7 +123,7 @@ export class RelationshipQueryEngine {
     const filtered = this.filterRelationships(allRelationships, options);
 
     // Find direct relationships
-    const direct = filtered.filter(rel => {
+    const direct = filtered.filter((rel) => {
       const from = Array.isArray(rel.from) ? rel.from : [rel.from];
       const to = Array.isArray(rel.to) ? rel.to : [rel.to];
       return from.includes(symbolId) || to.includes(symbolId);
@@ -130,18 +134,18 @@ export class RelationshipQueryEngine {
     for (const rel of direct) {
       const from = Array.isArray(rel.from) ? rel.from : [rel.from];
       const to = Array.isArray(rel.to) ? rel.to : [rel.to];
-      [...from, ...to].forEach(s => {
+      [...from, ...to].forEach((s) => {
         if (s !== symbolId) directSymbols.add(s);
       });
     }
 
-    const indirect = filtered.filter(rel => {
+    const indirect = filtered.filter((rel) => {
       const from = Array.isArray(rel.from) ? rel.from : [rel.from];
       const to = Array.isArray(rel.to) ? rel.to : [rel.to];
       const symbols = [...from, ...to];
 
       // Must connect to a direct neighbor but not include the original symbol
-      return symbols.some(s => directSymbols.has(s)) && !symbols.includes(symbolId);
+      return symbols.some((s) => directSymbols.has(s)) && !symbols.includes(symbolId);
     });
 
     // Group by type
@@ -161,7 +165,7 @@ export class RelationshipQueryEngine {
         related.push(...from);
       }
 
-      related.forEach(r => {
+      related.forEach((r) => {
         if (r !== symbolId && !byType[rel.type].includes(r)) {
           byType[rel.type].push(r);
         }
@@ -185,7 +189,7 @@ export class RelationshipQueryEngine {
         related.push(...from);
       }
 
-      related.forEach(r => {
+      related.forEach((r) => {
         if (r !== symbolId && !byCategory[rel.category].includes(r)) {
           byCategory[rel.category].push(r);
         }
@@ -194,10 +198,7 @@ export class RelationshipQueryEngine {
 
     // Extract specific relationship types
     const documentation = byType['doc-reference'] || [];
-    const tests = [
-      ...(byType['test-coverage'] || []),
-      ...(byType['contains'] || []),
-    ];
+    const tests = [...(byType['test-coverage'] || []), ...(byType.contains || [])];
     const dependencies = byType['code-dependency'] || [];
     const semanticNeighbors = [
       ...(byType['naming-pattern-relation'] || []),
@@ -245,7 +246,7 @@ export class RelationshipQueryEngine {
     for (const rel of context.direct) {
       const from = Array.isArray(rel.from) ? rel.from : [rel.from];
       const to = Array.isArray(rel.to) ? rel.to : [rel.to];
-      [...from, ...to].forEach(s => {
+      [...from, ...to].forEach((s) => {
         if (s !== symbolId) related.add(s);
       });
     }
@@ -356,22 +357,26 @@ export class RelationshipQueryEngine {
 
     // Filter by types
     if (options.types && options.types.length > 0) {
-      filtered = filtered.filter(rel => options.types!.includes(rel.type as RelationshipType));
+      filtered = filtered.filter((rel) => options.types?.includes(rel.type as RelationshipType));
     }
 
     // Filter by categories
     if (options.categories && options.categories.length > 0) {
-      filtered = filtered.filter(rel => options.categories!.includes(rel.category as RelationshipCategory));
+      filtered = filtered.filter((rel) =>
+        options.categories?.includes(rel.category as RelationshipCategory)
+      );
     }
 
     // Filter by confidence
     if (options.minConfidence !== undefined) {
-      filtered = filtered.filter(rel => rel.confidence >= options.minConfidence!);
+      filtered = filtered.filter((rel) => rel.confidence >= options.minConfidence!);
     }
 
     // Exclude types
     if (options.excludeTypes && options.excludeTypes.length > 0) {
-      filtered = filtered.filter(rel => !options.excludeTypes!.includes(rel.type as RelationshipType));
+      filtered = filtered.filter(
+        (rel) => !options.excludeTypes?.includes(rel.type as RelationshipType)
+      );
     }
 
     return filtered;

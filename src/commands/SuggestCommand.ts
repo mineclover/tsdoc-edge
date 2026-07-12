@@ -4,9 +4,8 @@
  */
 
 import * as fs from 'node:fs';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { CodeHealthChecker } from '../analyzer/CodeHealthChecker';
-import type { AnalysisReport } from '../types/analysis';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * SuggestCommand - Generate improvement suggestions

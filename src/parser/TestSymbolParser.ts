@@ -9,13 +9,13 @@
 import * as ts from 'typescript';
 import type {
   TestCase,
+  TestCoverageMetadata,
   TestExtractionOptions,
   TestExtractionResult,
   TestScenario,
   TestSuite,
   TestSymbol,
 } from '../types/test-symbols';
-import type { TestCoverageMetadata } from '../types/test-symbols';
 
 /**
  * Context for tracking nested describe blocks
@@ -82,12 +82,7 @@ export class TestSymbolParser {
 
     try {
       // Parse source file
-      const sourceFile = ts.createSourceFile(
-        filePath,
-        sourceCode,
-        ts.ScriptTarget.Latest,
-        true
-      );
+      const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
 
       // Extract test scenarios from JSDoc
       if (opts.extractScenarios) {
@@ -233,7 +228,8 @@ export class TestSymbolParser {
       return;
     }
 
-    const parentId = this.suiteStack.length > 0 ? this.suiteStack[this.suiteStack.length - 1].id : null;
+    const parentId =
+      this.suiteStack.length > 0 ? this.suiteStack[this.suiteStack.length - 1].id : null;
 
     // Generate suite ID
     const suiteId = this.generateTestId(suiteName, parentId, 'test-suite');
@@ -296,10 +292,7 @@ export class TestSymbolParser {
   /**
    * Extract test case from it() or test() call
    */
-  private extractTestCase(
-    node: ts.CallExpression,
-    options: Required<TestExtractionOptions>
-  ): void {
+  private extractTestCase(node: ts.CallExpression, options: Required<TestExtractionOptions>): void {
     // Get test name from first argument
     const testName = this.extractStringArgument(node, 0);
     if (!testName) {
@@ -311,7 +304,8 @@ export class TestSymbolParser {
       return;
     }
 
-    const parentId = this.suiteStack.length > 0 ? this.suiteStack[this.suiteStack.length - 1].id : null;
+    const parentId =
+      this.suiteStack.length > 0 ? this.suiteStack[this.suiteStack.length - 1].id : null;
 
     // Generate test case ID
     const testCaseId = this.generateTestId(testName, parentId, 'test-case');
@@ -359,7 +353,7 @@ export class TestSymbolParser {
   /**
    * Extract test scenarios from JSDoc @testScenario tags
    */
-  private extractTestScenarios(sourceFile: ts.SourceFile, sourceCode: string): void {
+  private extractTestScenarios(sourceFile: ts.SourceFile, _sourceCode: string): void {
     // Find JSDoc comments at the top of the file
     const firstStatement = sourceFile.statements[0];
     if (!firstStatement) return;
@@ -383,11 +377,7 @@ export class TestSymbolParser {
         const scenarioDescription = match[1].trim();
 
         // Generate scenario ID
-        const scenarioId = this.generateTestId(
-          scenarioDescription,
-          null,
-          'test-scenario'
-        );
+        const scenarioId = this.generateTestId(scenarioDescription, null, 'test-scenario');
 
         // Get line number
         const line = sourceFile.getLineAndCharacterOfPosition(range.pos).line + 1;
@@ -519,9 +509,7 @@ export class TestSymbolParser {
       .replace(/\.ts$/, '');
 
     // Include parent directory if not __tests__ to avoid collisions
-    const prefix = parentDir && parentDir !== '__tests__'
-      ? this.toKebabCase(parentDir) + '-'
-      : '';
+    const prefix = parentDir && parentDir !== '__tests__' ? `${this.toKebabCase(parentDir)}-` : '';
     return prefix + this.toKebabCase(baseName);
   }
 

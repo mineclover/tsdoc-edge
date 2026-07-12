@@ -8,9 +8,11 @@ console.log('🔍 Checking implementation symbols\n');
 const names = ['FileScanner', 'DatabaseManager', 'SymbolRegistryManager'];
 
 for (const name of names) {
-  const result = db['db'].prepare(
-    "SELECT id, name, type, file_path FROM symbols WHERE name = ? AND type IN ('class', 'interface', 'function') LIMIT 1"
-  ).get(name) as any;
+  const result = db.db
+    .prepare(
+      "SELECT id, name, type, file_path FROM symbols WHERE name = ? AND type IN ('class', 'interface', 'function') LIMIT 1"
+    )
+    .get(name) as any;
 
   if (result) {
     console.log(`✓ ${name}`);

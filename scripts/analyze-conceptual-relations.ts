@@ -36,7 +36,7 @@ function analyzeConceptualRelations(): MigrationAnalysis {
   const db = new DatabaseManager('.tsdoc/symbols.db', '.tsdoc');
 
   console.log('📊 Conceptual Relation Migration Analysis\n');
-  console.log('=' .repeat(80));
+  console.log('='.repeat(80));
 
   // Get all conceptual-relation entries
   const query = `
@@ -45,7 +45,7 @@ function analyzeConceptualRelations(): MigrationAnalysis {
     WHERE type = 'conceptual-relation'
   `;
 
-  const relations = db['db'].prepare(query).all() as Array<{
+  const relations = db.db.prepare(query).all() as Array<{
     id: string;
     from_symbols: string;
     to_symbols: string;
@@ -109,37 +109,45 @@ function analyzeConceptualRelations(): MigrationAnalysis {
   }
 
   console.log('\n📊 Migration Pattern Distribution:');
-  console.log(`  naming-pattern-relation:     ${analysis.statistics.namingPatternCount.toString().padStart(4)} (${((analysis.statistics.namingPatternCount / relations.length) * 100).toFixed(1)}%)`);
-  console.log(`  feature-grouping:            ${analysis.statistics.featureGroupingCount.toString().padStart(4)} (${((analysis.statistics.featureGroupingCount / relations.length) * 100).toFixed(1)}%)`);
-  console.log(`  explicit-semantic-relation:  ${analysis.statistics.explicitSemanticCount.toString().padStart(4)} (${((analysis.statistics.explicitSemanticCount / relations.length) * 100).toFixed(1)}%)`);
-  console.log(`  unknown (needs review):      ${analysis.statistics.unknownCount.toString().padStart(4)} (${((analysis.statistics.unknownCount / relations.length) * 100).toFixed(1)}%)`);
+  console.log(
+    `  naming-pattern-relation:     ${analysis.statistics.namingPatternCount.toString().padStart(4)} (${((analysis.statistics.namingPatternCount / relations.length) * 100).toFixed(1)}%)`
+  );
+  console.log(
+    `  feature-grouping:            ${analysis.statistics.featureGroupingCount.toString().padStart(4)} (${((analysis.statistics.featureGroupingCount / relations.length) * 100).toFixed(1)}%)`
+  );
+  console.log(
+    `  explicit-semantic-relation:  ${analysis.statistics.explicitSemanticCount.toString().padStart(4)} (${((analysis.statistics.explicitSemanticCount / relations.length) * 100).toFixed(1)}%)`
+  );
+  console.log(
+    `  unknown (needs review):      ${analysis.statistics.unknownCount.toString().padStart(4)} (${((analysis.statistics.unknownCount / relations.length) * 100).toFixed(1)}%)`
+  );
 
   // Show samples
   console.log('\n📋 Sample Naming Pattern Relations (first 5):');
   analysis.byPattern.namingPattern.slice(0, 5).forEach((rel, idx) => {
-    console.log(`  ${(idx + 1)}. ${rel.from[0]} ↔ ${rel.to[0]}`);
+    console.log(`  ${idx + 1}. ${rel.from[0]} ↔ ${rel.to[0]}`);
     if (rel.properties.domain) console.log(`     Domain: ${rel.properties.domain}`);
   });
 
   console.log('\n📋 Sample Feature Grouping Relations (first 5):');
   analysis.byPattern.featureGrouping.slice(0, 5).forEach((rel, idx) => {
-    console.log(`  ${(idx + 1)}. ${rel.from[0]} ↔ ${rel.to[0]}`);
+    console.log(`  ${idx + 1}. ${rel.from[0]} ↔ ${rel.to[0]}`);
     if (rel.properties.feature) console.log(`     Feature: ${rel.properties.feature}`);
   });
 
   console.log('\n📋 Sample Explicit Semantic Relations (first 5):');
   analysis.byPattern.explicitSemantic.slice(0, 5).forEach((rel, idx) => {
-    console.log(`  ${(idx + 1)}. ${rel.from[0]} ↔ ${rel.to[0]}`);
+    console.log(`  ${idx + 1}. ${rel.from[0]} ↔ ${rel.to[0]}`);
     if (rel.description) console.log(`     Description: ${rel.description}`);
   });
 
   console.log('\n📋 Unknown Pattern Relations (first 10):');
   analysis.byPattern.unknown.slice(0, 10).forEach((rel, idx) => {
-    console.log(`  ${(idx + 1)}. ${rel.from[0]} ↔ ${rel.to[0]}`);
+    console.log(`  ${idx + 1}. ${rel.from[0]} ↔ ${rel.to[0]}`);
     console.log(`     Properties: ${JSON.stringify(rel.properties)}`);
   });
 
-  console.log('\n' + '='.repeat(80));
+  console.log(`\n${'='.repeat(80)}`);
 
   db.close();
 

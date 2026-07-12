@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import { graphEdgeSemantic, type GraphNeighbor } from '../graph-analysis';
+import { type GraphNeighbor, graphEdgeSemantic } from '../graph-analysis';
 import { CanonicalAliasContext } from '../indexer';
 import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
@@ -213,7 +213,7 @@ Examples:
           if (!byCategory.has(rel.category)) {
             byCategory.set(rel.category, []);
           }
-          byCategory.get(rel.category)!.push(rel);
+          byCategory.get(rel.category)?.push(rel);
         }
 
         // Build statistics by type

@@ -73,9 +73,6 @@ export class CacheManager {
   /** Track if manager is disposed */
   private disposed = false;
 
-  /** Last activity timestamp for idle detection */
-  private lastActivityTime: number = Date.now();
-
   /** Track if cleanup already ran since last activity */
   private cleanedSinceLastActivity = false;
 
@@ -125,8 +122,6 @@ export class CacheManager {
       return undefined;
     }
 
-    // Track activity
-    this.lastActivityTime = now;
     this.cleanedSinceLastActivity = false;
 
     return entry.value;
@@ -158,8 +153,6 @@ export class CacheManager {
       timestamp: now,
     });
 
-    // Track activity
-    this.lastActivityTime = now;
     this.cleanedSinceLastActivity = false;
   }
 

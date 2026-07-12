@@ -5,9 +5,9 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult } from './BaseCommand';
-import { XmlBuilder } from '../output/XmlBuilder';
 import { RoutesSchema } from '../output/schemas';
+import { XmlBuilder } from '../output/XmlBuilder';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 interface RouteEndpoint {
   method: string;
@@ -32,18 +32,21 @@ export class RoutesCommand extends BaseCommand {
 
   async execute(args: string[]): Promise<CommandResult> {
     const useXml = !args.includes('--human');
-    const targetDir = args.find(a => !a.startsWith('--')) || 'packages';
+    const targetDir = args.find((a) => !a.startsWith('--')) || 'packages';
 
     const routes = this.extractRoutes(targetDir);
 
     if (useXml) {
       new XmlBuilder(RoutesSchema)
-        .section('endpoints', routes.map(route => ({
-          method: route.method,
-          path: route.path,
-          file: route.file,
-          line: route.line,
-        })))
+        .section(
+          'endpoints',
+          routes.map((route) => ({
+            method: route.method,
+            path: route.path,
+            file: route.file,
+            line: route.line,
+          }))
+        )
         .print();
     } else {
       console.log(`\nHTTP Routes (${routes.length}):\n`);

@@ -5,8 +5,8 @@
  */
 
 import * as path from 'node:path';
-import type { SymbolFootnoteRef } from '../types/feature';
 import type { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
+import type { SymbolFootnoteRef } from '../types/feature';
 import type { SymbolRegistryEntry } from '../types/registry';
 
 /**
@@ -69,9 +69,7 @@ export class SymbolReferenceResolver {
       }
 
       // If multiple matches, prefer exact match
-      entry = matches.find(
-        (e) => e.sourceRef.symbolName === ref.identifier
-      ) || matches[0];
+      entry = matches.find((e) => e.sourceRef.symbolName === ref.identifier) || matches[0];
     }
 
     if (!entry) {
@@ -99,10 +97,7 @@ export class SymbolReferenceResolver {
    * @param docPath - Path to document containing the references
    * @returns Map of identifier to resolved reference
    */
-  resolveMultiple(
-    refs: SymbolFootnoteRef[],
-    docPath: string
-  ): Map<string, ResolvedSymbolRef> {
+  resolveMultiple(refs: SymbolFootnoteRef[], docPath: string): Map<string, ResolvedSymbolRef> {
     const resolved = new Map<string, ResolvedSymbolRef>();
 
     // Deduplicate by identifier

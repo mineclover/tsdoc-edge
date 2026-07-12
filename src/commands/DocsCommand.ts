@@ -5,13 +5,13 @@
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
+import { CheckLinksCommand } from './CheckLinksCommand';
+import { FindUnusedDocsCommand } from './FindUnusedDocsCommand';
+import { GenerateDocsCommand } from './GenerateDocsCommand';
 import { IndexDocsCommand } from './IndexDocsCommand';
 import { UpdateBacklinksCommand } from './UpdateBacklinksCommand';
-import { CheckLinksCommand } from './CheckLinksCommand';
 import { UpdateSymbolRefsCommand } from './UpdateSymbolRefsCommand';
-import { GenerateDocsCommand } from './GenerateDocsCommand';
 import { ValidateDocsCommand } from './ValidateDocsCommand';
-import { FindUnusedDocsCommand } from './FindUnusedDocsCommand';
 
 const SUBCOMMANDS = {
   index: { command: IndexDocsCommand, description: 'Index document symbols from markdown' },

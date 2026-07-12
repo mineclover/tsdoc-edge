@@ -7,32 +7,36 @@
  * @solves Automatically extract module specs from TypeScript source code
  */
 
-import * as ts from 'typescript';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { ParserContext } from '@microsoft/tsdoc';
-import { TSDocParser } from '../parser/TSDocParser';
-import { ASTSymbolExtractor, type ExtractedSymbol, type ExtractionResult } from '../analyzer/ASTSymbolExtractor';
+import * as ts from 'typescript';
+import {
+  ASTSymbolExtractor,
+  type ExtractedSymbol,
+  type ExtractionResult,
+} from '../analyzer/ASTSymbolExtractor';
 import { EnhancedDocExtractor, type ExtractedEnhancedDoc } from '../parser/EnhancedDocExtractor';
 import { ModuleSpecTagParser } from '../parser/ModuleSpecTagParser';
-import type { ModuleSpecTags } from '../types/tags/module-spec-tags';
+import { TSDocParser } from '../parser/TSDocParser';
 import type {
-  ModuleSpecTemplate,
-  ModuleSpecResult,
-  ModulePurpose,
-  ModuleInput,
-  ModuleOutput,
+  DependencySpec,
+  FailureCase,
+  ImportSpec,
   ModuleContext,
-  ModuleLogic,
   ModuleEffect,
+  ModuleInput,
+  ModuleLogic,
+  ModuleOutput,
+  ModulePurpose,
   ModuleScope,
+  ModuleSpecResult,
+  ModuleSpecTemplate,
   ParamSpec,
   ReturnSpec,
-  FailureCase,
-  DependencySpec,
-  ImportSpec,
   SideEffectSpec,
 } from '../types/spec/module-spec';
+import type { ModuleSpecTags } from '../types/tags/module-spec-tags';
 
 /**
  * Generator options
@@ -93,12 +97,7 @@ export class ModuleSpecGenerator {
    */
   generateSpec(filePath: string, symbolName: string): ModuleSpecResult {
     const sourceCode = fs.readFileSync(filePath, 'utf-8');
-    const sourceFile = ts.createSourceFile(
-      filePath,
-      sourceCode,
-      ts.ScriptTarget.Latest,
-      true
-    );
+    const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
 
     const node = this.findSymbolNode(sourceFile, symbolName);
     if (!node) {
@@ -123,12 +122,7 @@ export class ModuleSpecGenerator {
    */
   generateSpecsForFile(filePath: string): ModuleSpecResult[] {
     const sourceCode = fs.readFileSync(filePath, 'utf-8');
-    const sourceFile = ts.createSourceFile(
-      filePath,
-      sourceCode,
-      ts.ScriptTarget.Latest,
-      true
-    );
+    const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
 
     const results: ModuleSpecResult[] = [];
     const symbols = this.findAllPublicSymbols(sourceFile);
@@ -138,10 +132,7 @@ export class ModuleSpecGenerator {
         const spec = this.generateSpecFromNode(node, sourceFile, filePath, name);
         const metadata = this.analyzeCompletion(spec);
         results.push({ spec, ...metadata });
-      } catch (error) {
-        // Skip symbols that fail to generate
-        continue;
-      }
+      } catch (_error) {}
     }
 
     return results;
@@ -182,21 +173,18 @@ export class ModuleSpecGenerator {
 
             // Filter by confidence
             if (minConfidence > 0) {
-              results = results.filter(r => r.confidence >= minConfidence);
+              results = results.filter((r) => r.confidence >= minConfidence);
             }
 
             // Filter private symbols
             if (!includePrivate) {
-              results = results.filter(r => r.spec.scope.isPublicAPI);
+              results = results.filter((r) => r.spec.scope.isPublicAPI);
             }
 
             if (results.length > 0) {
               allResults.push({ filePath: fullPath, results });
             }
-          } catch (error) {
-            // Skip files that fail to process
-            continue;
-          }
+          } catch (_error) {}
         }
       }
     };
@@ -307,7 +295,13 @@ export class ModuleSpecGenerator {
       purpose: this.extractPurpose(tsdocContext, customTags, enhancedDoc),
       input: this.extractInput(node, tsdocContext, customTags),
       output: this.extractOutput(node, tsdocContext, customTags, enhancedDoc),
-      context: this.extractContext(filePath, sourceCode, customTags, astResult.imports, enhancedDoc),
+      context: this.extractContext(
+        filePath,
+        sourceCode,
+        customTags,
+        astResult.imports,
+        enhancedDoc
+      ),
       logic: this.extractLogic(node, sourceFile, customTags, enhancedDoc, specTags),
       effect: this.extractEffect(node, sourceFile, customTags, specTags),
       scope: this.extractScope(node, astSymbol, customTags, specTags),
@@ -335,24 +329,24 @@ export class ModuleSpecGenerator {
 
     // From @problem tag
     if (customTags.has('problem')) {
-      purpose.problem = customTags.get('problem')![0] || '';
+      purpose.problem = customTags.get('problem')?.[0] || '';
     } else if (enhancedDoc?.doc.problemSolving?.description) {
       purpose.problem = enhancedDoc.doc.problemSolving.description;
     }
 
     // From @responsibility tag
     if (customTags.has('responsibility')) {
-      purpose.responsibility = customTags.get('responsibility')![0] || '';
+      purpose.responsibility = customTags.get('responsibility')?.[0] || '';
     }
 
     // From @solves tag
     if (customTags.has('solves')) {
-      purpose.solution = customTags.get('solves')![0] || '';
+      purpose.solution = customTags.get('solves')?.[0] || '';
     }
 
     // From @context tag
     if (customTags.has('context')) {
-      purpose.context = customTags.get('context')![0];
+      purpose.context = customTags.get('context')?.[0];
     }
 
     // Fallback: use summary
@@ -488,7 +482,7 @@ export class ModuleSpecGenerator {
    * Confidence: 85%
    */
   private extractContext(
-    filePath: string,
+    _filePath: string,
     sourceCode: string,
     customTags: Map<string, string[]>,
     imports: ExtractionResult['imports'],
@@ -554,7 +548,7 @@ export class ModuleSpecGenerator {
    */
   private extractLogic(
     node: ts.Node,
-    sourceFile: ts.SourceFile,
+    _sourceFile: ts.SourceFile,
     customTags: Map<string, string[]>,
     enhancedDoc: ExtractedEnhancedDoc | undefined,
     specTags: ModuleSpecTags
@@ -574,7 +568,7 @@ export class ModuleSpecGenerator {
     if (specTags.algorithm) {
       algorithm = specTags.algorithm.description;
       if (specTags.algorithm.steps) {
-        algorithm += '\n\nSteps:\n' + specTags.algorithm.steps.map((s, i) => `${i + 1}. ${s}`).join('\n');
+        algorithm += `\n\nSteps:\n${specTags.algorithm.steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}`;
       }
     } else if (this.options.includeTodos) {
       // Provide more helpful default based on symbol kind
@@ -609,7 +603,7 @@ export class ModuleSpecGenerator {
   private extractEffect(
     node: ts.Node,
     sourceFile: ts.SourceFile,
-    customTags: Map<string, string[]>,
+    _customTags: Map<string, string[]>,
     specTags: ModuleSpecTags
   ): ModuleEffect {
     const sideEffects: SideEffectSpec[] = [];
@@ -623,11 +617,11 @@ export class ModuleSpecGenerator {
     }
 
     if (specTags.mutations && specTags.mutations.length > 0) {
-      mutations.push(...specTags.mutations.map(m => `${m.target} - ${m.description}`));
+      mutations.push(...specTags.mutations.map((m) => `${m.target} - ${m.description}`));
     }
 
     if (specTags.io && specTags.io.length > 0) {
-      io.push(...specTags.io.map(i => `${i.type}: ${i.description}`));
+      io.push(...specTags.io.map((i) => `${i.type}: ${i.description}`));
     }
 
     // PRIORITY 2: Fallback to heuristic detection if no tags
@@ -692,7 +686,7 @@ export class ModuleSpecGenerator {
    */
   private extractScope(
     node: ts.Node,
-    astSymbol: ExtractedSymbol | undefined,
+    _astSymbol: ExtractedSymbol | undefined,
     customTags: Map<string, string[]>,
     specTags: ModuleSpecTags
   ): ModuleScope {
@@ -788,7 +782,7 @@ export class ModuleSpecGenerator {
 
     // Calculate confidence
     const totalSections = 7;
-    const completedSections = autoCompleted.filter(s => !s.includes('partial')).length;
+    const completedSections = autoCompleted.filter((s) => !s.includes('partial')).length;
     const confidence = Math.round((completedSections / totalSections) * 100);
 
     spec.completionConfidence = confidence;
@@ -886,7 +880,7 @@ export class ModuleSpecGenerator {
         if (!tags.has(tagName)) {
           tags.set(tagName, []);
         }
-        tags.get(tagName)!.push(tagValue.trim());
+        tags.get(tagName)?.push(tagValue.trim());
         continue;
       }
 
@@ -898,7 +892,7 @@ export class ModuleSpecGenerator {
           tags.set(tagName, []);
         }
         // Add empty string to indicate tag presence
-        tags.get(tagName)!.push('');
+        tags.get(tagName)?.push('');
       }
     }
 
@@ -957,12 +951,14 @@ export class ModuleSpecGenerator {
    * Generate type signature
    */
   private generateTypeSignature(node: ts.FunctionDeclaration | ts.MethodDeclaration): string {
-    const params = node.parameters.map(p => {
-      const name = p.name.getText();
-      const type = p.type ? p.type.getText() : 'any';
-      const optional = p.questionToken ? '?' : '';
-      return `${name}${optional}: ${type}`;
-    }).join(', ');
+    const params = node.parameters
+      .map((p) => {
+        const name = p.name.getText();
+        const type = p.type ? p.type.getText() : 'any';
+        const optional = p.questionToken ? '?' : '';
+        return `${name}${optional}: ${type}`;
+      })
+      .join(', ');
 
     const returnType = node.type ? node.type.getText() : 'void';
     return `(${params}) => ${returnType}`;

@@ -164,95 +164,95 @@ export class CallbackAnalyzer {
 
             for (const arg of node.arguments) {
               // Check if argument is a function or identifier referring to a function
-              if (
-                ts.isArrowFunction(arg) ||
-                ts.isFunctionExpression(arg) ||
-                ts.isIdentifier(arg)
-              ) {
+              if (ts.isArrowFunction(arg) || ts.isFunctionExpression(arg) || ts.isIdentifier(arg)) {
                 const callbackSymbolId = this.findSymbolIdForExpression(arg, sourceFile);
 
                 if (callbackSymbolId && callbackSymbolId !== callerSymbolId) {
-                  const line = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
+                  const line =
+                    sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
 
-                usages.push({
-                  callerSymbolId,
-                  callerName,
-                  callbackSymbolId,
-                  callbackName: this.getSymbolName(callbackSymbolId),
-                  filePath,
-                  line,
-                  pattern: 'parameter',
-                });
+                  usages.push({
+                    callerSymbolId,
+                    callerName,
+                    callbackSymbolId,
+                    callbackName: this.getSymbolName(callbackSymbolId),
+                    filePath,
+                    line,
+                    pattern: 'parameter',
+                  });
+                }
+              }
+            }
+          }
+
+          // Pattern 2: Promise.then(callback) / Promise.catch(callback)
+          const expression = node.expression;
+          if (ts.isPropertyAccessExpression(expression) && expression.name) {
+            const methodName = expression.name.text;
+
+            if (methodName === 'then' || methodName === 'catch') {
+              const promiseSymbolId = this.findSymbolIdForExpression(
+                expression.expression,
+                sourceFile
+              );
+
+              if (promiseSymbolId && node.arguments.length > 0) {
+                const callbackArg = node.arguments[0];
+                const callbackSymbolId = this.findSymbolIdForExpression(callbackArg, sourceFile);
+
+                if (callbackSymbolId && callbackSymbolId !== promiseSymbolId) {
+                  const line =
+                    sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
+                  const pattern: 'promise-then' | 'promise-catch' =
+                    methodName === 'then' ? 'promise-then' : 'promise-catch';
+
+                  usages.push({
+                    callerSymbolId: promiseSymbolId,
+                    callerName: this.getSymbolName(promiseSymbolId),
+                    callbackSymbolId,
+                    callbackName: this.getSymbolName(callbackSymbolId),
+                    filePath,
+                    line,
+                    pattern,
+                  });
+                }
               }
             }
           }
         }
 
-        // Pattern 2: Promise.then(callback) / Promise.catch(callback)
-        const expression = node.expression;
-        if (ts.isPropertyAccessExpression(expression) && expression.name) {
-          const methodName = expression.name.text;
+        // Pattern 3: await asyncFunction()
+        if (ts.isAwaitExpression(node)) {
+          const expression = node.expression;
 
-          if (methodName === 'then' || methodName === 'catch') {
-            const promiseSymbolId = this.findSymbolIdForExpression(
+          if (ts.isCallExpression(expression)) {
+            const asyncFunctionSymbolId = this.findSymbolIdForExpression(
               expression.expression,
               sourceFile
             );
 
-            if (promiseSymbolId && node.arguments.length > 0) {
-              const callbackArg = node.arguments[0];
-              const callbackSymbolId = this.findSymbolIdForExpression(callbackArg, sourceFile);
+            if (asyncFunctionSymbolId) {
+              // Find the enclosing function that contains this await
+              const enclosingSymbolId = this.findEnclosingFunctionSymbol(node, sourceFile);
 
-              if (callbackSymbolId && callbackSymbolId !== promiseSymbolId) {
-                const line = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
-                const pattern: 'promise-then' | 'promise-catch' = methodName === 'then' ? 'promise-then' : 'promise-catch';
+              if (enclosingSymbolId && enclosingSymbolId !== asyncFunctionSymbolId) {
+                const line =
+                  sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
 
                 usages.push({
-                  callerSymbolId: promiseSymbolId,
-                  callerName: this.getSymbolName(promiseSymbolId),
-                  callbackSymbolId,
-                  callbackName: this.getSymbolName(callbackSymbolId),
+                  callerSymbolId: enclosingSymbolId,
+                  callerName: this.getSymbolName(enclosingSymbolId),
+                  callbackSymbolId: asyncFunctionSymbolId,
+                  callbackName: this.getSymbolName(asyncFunctionSymbolId),
                   filePath,
                   line,
-                  pattern,
+                  pattern: 'async-await',
                 });
               }
             }
           }
         }
-      }
-
-      // Pattern 3: await asyncFunction()
-      if (ts.isAwaitExpression(node)) {
-        const expression = node.expression;
-
-        if (ts.isCallExpression(expression)) {
-          const asyncFunctionSymbolId = this.findSymbolIdForExpression(
-            expression.expression,
-            sourceFile
-          );
-
-          if (asyncFunctionSymbolId) {
-            // Find the enclosing function that contains this await
-            const enclosingSymbolId = this.findEnclosingFunctionSymbol(node, sourceFile);
-
-            if (enclosingSymbolId && enclosingSymbolId !== asyncFunctionSymbolId) {
-              const line = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
-
-              usages.push({
-                callerSymbolId: enclosingSymbolId,
-                callerName: this.getSymbolName(enclosingSymbolId),
-                callbackSymbolId: asyncFunctionSymbolId,
-                callbackName: this.getSymbolName(asyncFunctionSymbolId),
-                filePath,
-                line,
-                pattern: 'async-await',
-              });
-            }
-          }
-        }
-      }
-      } catch (error) {
+      } catch (_error) {
         // Skip nodes that cause errors (e.g., synthetic nodes)
       }
 

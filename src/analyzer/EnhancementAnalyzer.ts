@@ -7,7 +7,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';
-import type { SymbolGraph, Symbol } from '../types/graph';
+import type { Symbol, SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
@@ -101,15 +101,10 @@ export class EnhancementAnalyzer {
     for (const file of files) {
       try {
         const content = fs.readFileSync(file, 'utf-8');
-        const sourceFile = ts.createSourceFile(
-          file,
-          content,
-          ts.ScriptTarget.Latest,
-          true
-        );
+        const sourceFile = ts.createSourceFile(file, content, ts.ScriptTarget.Latest, true);
 
         this.extractEnhancementsFromFile(sourceFile, file, sites);
-      } catch (error) {
+      } catch (_error) {
         // Skip files that cause parsing errors
       }
     }
@@ -144,7 +139,8 @@ export class EnhancementAnalyzer {
                 const enhancedSymbol = this.getTagComment(tag);
 
                 if (enhancedSymbol) {
-                  const line = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
+                  const line =
+                    sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
                   sites.push({
                     enhancerSymbol: symbolName,
                     enhancedSymbol: enhancedSymbol.trim(),
@@ -156,7 +152,7 @@ export class EnhancementAnalyzer {
             }
           }
         }
-      } catch (error) {
+      } catch (_error) {
         // Skip nodes that cause errors
       }
 
@@ -213,9 +209,7 @@ export class EnhancementAnalyzer {
       // Handle array of comment parts
       if (Array.isArray(tag.comment)) {
         return tag.comment
-          .map((part: ts.JSDocText | ts.JSDocLink) =>
-            'text' in part ? part.text : ''
-          )
+          .map((part: ts.JSDocText | ts.JSDocLink) => ('text' in part ? part.text : ''))
           .join('');
       }
     }
@@ -287,8 +281,8 @@ export class EnhancementAnalyzer {
           lineNumber: site.line,
           snippet: `@enhances ${site.enhancedSymbol}`,
           confidence: 1.0,
-          context: `TSDoc @enhances tag in ${site.enhancerSymbol}`
-        }
+          context: `TSDoc @enhances tag in ${site.enhancerSymbol}`,
+        },
       ],
       discoveredBy: 'documentation',
       confidence: 1.0,
@@ -300,7 +294,7 @@ export class EnhancementAnalyzer {
       },
       createdAt: timestamp,
       updatedAt: timestamp,
-      description: `${site.enhancerSymbol} enhances ${site.enhancedSymbol}`
+      description: `${site.enhancerSymbol} enhances ${site.enhancedSymbol}`,
     };
   }
 
@@ -340,8 +334,8 @@ export class EnhancementAnalyzer {
       const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
       const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
 
-      fromSymbols.forEach(s => enhancers.add(s));
-      toSymbols.forEach(s => enhanced.add(s));
+      fromSymbols.forEach((s) => enhancers.add(s));
+      toSymbols.forEach((s) => enhanced.add(s));
 
       if (rel.filePath) {
         byFile[rel.filePath] = (byFile[rel.filePath] || 0) + 1;

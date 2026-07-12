@@ -10,10 +10,10 @@
  * @doc [[TestExamplesCommand]]
  */
 
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
+import { type TestExample, TestExampleExtractor } from '../analyzer/TestExampleExtractor';
 import { ConfigManager } from '../config/ConfigManager';
 import { DatabaseManager } from '../storage/DatabaseManager';
-import { TestExampleExtractor, type TestExample } from '../analyzer/TestExampleExtractor';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Test Examples Command
@@ -116,7 +116,7 @@ Examples:
       const dbCheck = this.checkDatabaseExists();
       if (dbCheck) return dbCheck;
 
-      const config = this.configManager.get();
+      const _config = this.configManager.get();
       const dbPath = this.getDatabasePath();
       const jsonlPath = this.getJsonlPath();
       const dbManager = new DatabaseManager(dbPath, jsonlPath);
@@ -132,19 +132,19 @@ Examples:
       let examples = allExamples;
 
       if (options.file) {
-        examples = examples.filter(ex => ex.filePath.includes(options.file!));
+        examples = examples.filter((ex) => ex.filePath.includes(options.file!));
       }
 
       if (options.minQuality !== undefined) {
-        examples = examples.filter(ex => ex.quality >= options.minQuality!);
+        examples = examples.filter((ex) => ex.quality >= options.minQuality!);
       }
 
       if (options.complexity) {
-        examples = examples.filter(ex => ex.complexity === options.complexity);
+        examples = examples.filter((ex) => ex.complexity === options.complexity);
       }
 
       if (options.category) {
-        examples = examples.filter(ex => ex.category === options.category);
+        examples = examples.filter((ex) => ex.category === options.category);
       }
 
       // Sort by quality
@@ -177,7 +177,7 @@ Examples:
       console.log(`  ${colors.bold}Category Distribution:${colors.reset}`);
       console.log(`    Basic Usage:    ${categoryDistribution['basic-usage']} examples`);
       console.log(`    Advanced Usage: ${categoryDistribution['advanced-usage']} examples`);
-      console.log(`    Integration:    ${categoryDistribution['integration']} examples`);
+      console.log(`    Integration:    ${categoryDistribution.integration} examples`);
       console.log(`    Edge Cases:     ${categoryDistribution['edge-case']} examples`);
       console.log();
 
@@ -207,31 +207,43 @@ Examples:
       this.printSection('💡 Recommendations');
       console.log();
 
-      const highQualityExamples = examples.filter(ex => ex.quality >= 8);
+      const highQualityExamples = examples.filter((ex) => ex.quality >= 8);
       if (highQualityExamples.length > 0) {
-        console.log(`  ${colors.green}✓${colors.reset} ${highQualityExamples.length} high-quality examples ready for documentation`);
+        console.log(
+          `  ${colors.green}✓${colors.reset} ${highQualityExamples.length} high-quality examples ready for documentation`
+        );
       }
 
-      const simpleExamples = examples.filter(ex => ex.complexity === 'simple');
+      const simpleExamples = examples.filter((ex) => ex.complexity === 'simple');
       if (simpleExamples.length > 0) {
-        console.log(`  ${colors.green}✓${colors.reset} ${simpleExamples.length} simple examples great for getting started`);
+        console.log(
+          `  ${colors.green}✓${colors.reset} ${simpleExamples.length} simple examples great for getting started`
+        );
       }
 
-      const basicUsageExamples = examples.filter(ex => ex.category === 'basic-usage');
+      const basicUsageExamples = examples.filter((ex) => ex.category === 'basic-usage');
       if (basicUsageExamples.length > 0) {
-        console.log(`  ${colors.green}✓${colors.reset} ${basicUsageExamples.length} basic usage examples for API documentation`);
+        console.log(
+          `  ${colors.green}✓${colors.reset} ${basicUsageExamples.length} basic usage examples for API documentation`
+        );
       }
 
       console.log();
-      console.log(`  ${colors.cyan}Tip:${colors.reset} Use --min-quality 8 to see only high-quality examples`);
-      console.log(`  ${colors.cyan}Tip:${colors.reset} Use --complexity simple to see beginner-friendly examples`);
+      console.log(
+        `  ${colors.cyan}Tip:${colors.reset} Use --min-quality 8 to see only high-quality examples`
+      );
+      console.log(
+        `  ${colors.cyan}Tip:${colors.reset} Use --complexity simple to see beginner-friendly examples`
+      );
       console.log();
 
       dbManager.close();
 
       return { exitCode: 0, message: 'Examples extracted' };
     } catch (error) {
-      this.printError(`Failed to extract examples: ${error instanceof Error ? error.message : String(error)}`);
+      this.printError(
+        `Failed to extract examples: ${error instanceof Error ? error.message : String(error)}`
+      );
       return { exitCode: 1, message: 'Extraction failed' };
     }
   }
@@ -241,13 +253,19 @@ Examples:
    * @private
    */
   private displayExample(example: TestExample, index: number): void {
-    const qualityColor = example.quality >= 8 ? colors.green : example.quality >= 5 ? colors.yellow : colors.red;
-    const complexityBadge = example.complexity === 'simple' ? '🟢' : example.complexity === 'medium' ? '🟡' : '🔴';
+    const qualityColor =
+      example.quality >= 8 ? colors.green : example.quality >= 5 ? colors.yellow : colors.red;
+    const complexityBadge =
+      example.complexity === 'simple' ? '🟢' : example.complexity === 'medium' ? '🟡' : '🔴';
 
     console.log(`  ${colors.bold}${index}.${colors.reset} ${example.description}`);
-    console.log(`     ${colors.dim}Quality:${colors.reset} ${qualityColor}${example.quality}/10${colors.reset} | ${colors.dim}Complexity:${colors.reset} ${complexityBadge} ${example.complexity} | ${colors.dim}Category:${colors.reset} ${example.category}`);
+    console.log(
+      `     ${colors.dim}Quality:${colors.reset} ${qualityColor}${example.quality}/10${colors.reset} | ${colors.dim}Complexity:${colors.reset} ${complexityBadge} ${example.complexity} | ${colors.dim}Category:${colors.reset} ${example.category}`
+    );
     console.log(`     ${colors.dim}File:${colors.reset} ${example.filePath}:${example.line}`);
-    console.log(`     ${colors.dim}Tests:${colors.reset} ${example.testedSymbols.slice(0, 3).join(', ')}${example.testedSymbols.length > 3 ? ` +${example.testedSymbols.length - 3}` : ''}`);
+    console.log(
+      `     ${colors.dim}Tests:${colors.reset} ${example.testedSymbols.slice(0, 3).join(', ')}${example.testedSymbols.length > 3 ? ` +${example.testedSymbols.length - 3}` : ''}`
+    );
     console.log();
   }
 
@@ -255,11 +273,15 @@ Examples:
    * Get quality distribution
    * @private
    */
-  private getQualityDistribution(examples: TestExample[]): { high: number; medium: number; low: number } {
+  private getQualityDistribution(examples: TestExample[]): {
+    high: number;
+    medium: number;
+    low: number;
+  } {
     return {
-      high: examples.filter(ex => ex.quality >= 8).length,
-      medium: examples.filter(ex => ex.quality >= 5 && ex.quality < 8).length,
-      low: examples.filter(ex => ex.quality < 5).length,
+      high: examples.filter((ex) => ex.quality >= 8).length,
+      medium: examples.filter((ex) => ex.quality >= 5 && ex.quality < 8).length,
+      low: examples.filter((ex) => ex.quality < 5).length,
     };
   }
 
@@ -269,9 +291,9 @@ Examples:
    */
   private getComplexityDistribution(examples: TestExample[]): Record<string, number> {
     return {
-      simple: examples.filter(ex => ex.complexity === 'simple').length,
-      medium: examples.filter(ex => ex.complexity === 'medium').length,
-      complex: examples.filter(ex => ex.complexity === 'complex').length,
+      simple: examples.filter((ex) => ex.complexity === 'simple').length,
+      medium: examples.filter((ex) => ex.complexity === 'medium').length,
+      complex: examples.filter((ex) => ex.complexity === 'complex').length,
     };
   }
 
@@ -281,10 +303,10 @@ Examples:
    */
   private getCategoryDistribution(examples: TestExample[]): Record<string, number> {
     return {
-      'basic-usage': examples.filter(ex => ex.category === 'basic-usage').length,
-      'advanced-usage': examples.filter(ex => ex.category === 'advanced-usage').length,
-      'integration': examples.filter(ex => ex.category === 'integration').length,
-      'edge-case': examples.filter(ex => ex.category === 'edge-case').length,
+      'basic-usage': examples.filter((ex) => ex.category === 'basic-usage').length,
+      'advanced-usage': examples.filter((ex) => ex.category === 'advanced-usage').length,
+      integration: examples.filter((ex) => ex.category === 'integration').length,
+      'edge-case': examples.filter((ex) => ex.category === 'edge-case').length,
     };
   }
 

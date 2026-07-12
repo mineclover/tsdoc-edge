@@ -3,7 +3,7 @@
  * @public
  */
 
-import { RelatedDocsGenerator, type RelatedDocEntry } from '../../generator/RelatedDocsGenerator';
+import { type RelatedDocEntry, RelatedDocsGenerator } from '../../generator/RelatedDocsGenerator';
 import type { Symbol } from '../../types/graph';
 
 describe('RelatedDocsGenerator', () => {
@@ -302,9 +302,7 @@ describe('RelatedDocsGenerator', () => {
 
     it('should handle multiple reasons in single entry', () => {
       const targetSymbol = createMockSymbol();
-      const related = [
-        createRelatedEntry(createMockSymbol(), 0.8, 'Dependency, Similar'),
-      ];
+      const related = [createRelatedEntry(createMockSymbol(), 0.8, 'Dependency, Similar')];
 
       const result = generator.generateSummaryReport(targetSymbol, related);
 
@@ -353,20 +351,22 @@ describe('RelatedDocsGenerator', () => {
               filePath: '/test.ts',
               preconditions: [],
               postconditions: [],
-              invariants: []
+              invariants: [],
             },
             responsibility: {
               symbolName: 'Test',
               description: 'Test',
               shouldDo: ['Do something'],
-              shouldNotDo: ['Avoid something']
+              shouldNotDo: ['Avoid something'],
             },
-            tests: [{
-              symbolName: 'Test',
-              testFilePath: '/test.ts',
-              testName: 'test',
-              scenarios: []
-            }],
+            tests: [
+              {
+                symbolName: 'Test',
+                testFilePath: '/test.ts',
+                testName: 'test',
+                scenarios: [],
+              },
+            ],
           }),
           0.8,
           'Test'
@@ -385,9 +385,7 @@ describe('RelatedDocsGenerator', () => {
 
     it('should handle zero documented symbols', () => {
       const targetSymbol = createMockSymbol();
-      const related = [
-        createRelatedEntry(createMockSymbol({ summary: undefined }), 0.5, 'Test'),
-      ];
+      const related = [createRelatedEntry(createMockSymbol({ summary: undefined }), 0.5, 'Test')];
 
       const result = generator.generateSummaryReport(targetSymbol, related);
 
@@ -461,9 +459,7 @@ describe('RelatedDocsGenerator', () => {
 
     it('should handle exact 70% relevance threshold', () => {
       const targetSymbol = createMockSymbol();
-      const related = [
-        createRelatedEntry(createMockSymbol({ name: 'Exactly70' }), 0.7, 'Test'),
-      ];
+      const related = [createRelatedEntry(createMockSymbol({ name: 'Exactly70' }), 0.7, 'Test')];
 
       const result = generator.generateSummaryReport(targetSymbol, related);
 
@@ -473,9 +469,7 @@ describe('RelatedDocsGenerator', () => {
 
     it('should handle relevance just below threshold', () => {
       const targetSymbol = createMockSymbol();
-      const related = [
-        createRelatedEntry(createMockSymbol({ name: 'Below70' }), 0.69, 'Test'),
-      ];
+      const related = [createRelatedEntry(createMockSymbol({ name: 'Below70' }), 0.69, 'Test')];
 
       const result = generator.generateSummaryReport(targetSymbol, related);
 
@@ -507,9 +501,7 @@ describe('RelatedDocsGenerator', () => {
 
     it('should handle zero relevance', () => {
       const targetSymbol = createMockSymbol();
-      const related = [
-        createRelatedEntry(createMockSymbol({ name: 'ZeroRel' }), 0, 'Test'),
-      ];
+      const related = [createRelatedEntry(createMockSymbol({ name: 'ZeroRel' }), 0, 'Test')];
 
       const result = generator.generateRelatedDocs(targetSymbol, related);
 
@@ -518,9 +510,7 @@ describe('RelatedDocsGenerator', () => {
 
     it('should handle 100% relevance', () => {
       const targetSymbol = createMockSymbol();
-      const related = [
-        createRelatedEntry(createMockSymbol({ name: 'Perfect' }), 1.0, 'Test'),
-      ];
+      const related = [createRelatedEntry(createMockSymbol({ name: 'Perfect' }), 1.0, 'Test')];
 
       const result = generator.generateRelatedDocs(targetSymbol, related);
 

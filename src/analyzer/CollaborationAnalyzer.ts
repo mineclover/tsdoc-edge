@@ -26,7 +26,11 @@ interface CollaborationPattern {
   symbolB: string;
   nameA: string;
   nameB: string;
-  evidenceType: 'bidirectional-dependency' | 'mutual-calls' | 'mutual-composition' | 'shared-context';
+  evidenceType:
+    | 'bidirectional-dependency'
+    | 'mutual-calls'
+    | 'mutual-composition'
+    | 'shared-context';
   filePathA: string;
   filePathB: string;
   lineA: number;
@@ -100,7 +104,7 @@ export class CollaborationAnalyzer {
         if (!dependencies.has(rel.from)) {
           dependencies.set(rel.from, new Set());
         }
-        dependencies.get(rel.from)!.add(rel.to);
+        dependencies.get(rel.from)?.add(rel.to);
       }
     }
 
@@ -108,7 +112,7 @@ export class CollaborationAnalyzer {
     for (const [symbolA, depsA] of dependencies.entries()) {
       for (const symbolB of depsA) {
         const depsB = dependencies.get(symbolB);
-        if (depsB && depsB.has(symbolA)) {
+        if (depsB?.has(symbolA)) {
           // Bidirectional dependency found
           const symA = this.graph.symbols.get(symbolA);
           const symB = this.graph.symbols.get(symbolB);
@@ -123,7 +127,7 @@ export class CollaborationAnalyzer {
               filePathA: symA.filePath,
               filePathB: symB.filePath,
               lineA: symA.line,
-              lineB: symB.line
+              lineB: symB.line,
             });
           }
         }
@@ -141,20 +145,20 @@ export class CollaborationAnalyzer {
     const calls = new Map<string, Set<string>>();
 
     // Build call map from relationships (relatedTo is the closest we have)
-    const callRels = this.graph.relationships.filter(r => r.type === 'relatedTo');
+    const callRels = this.graph.relationships.filter((r) => r.type === 'relatedTo');
 
     for (const rel of callRels) {
       if (!calls.has(rel.from)) {
         calls.set(rel.from, new Set());
       }
-      calls.get(rel.from)!.add(rel.to);
+      calls.get(rel.from)?.add(rel.to);
     }
 
     // Find mutual calls
     for (const [symbolA, callsFromA] of calls.entries()) {
       for (const symbolB of callsFromA) {
         const callsFromB = calls.get(symbolB);
-        if (callsFromB && callsFromB.has(symbolA)) {
+        if (callsFromB?.has(symbolA)) {
           // Mutual calls found
           const symA = this.graph.symbols.get(symbolA);
           const symB = this.graph.symbols.get(symbolB);
@@ -169,7 +173,7 @@ export class CollaborationAnalyzer {
               filePathA: symA.filePath,
               filePathB: symB.filePath,
               lineA: symA.line,
-              lineB: symB.line
+              lineB: symB.line,
             });
           }
         }
@@ -194,7 +198,7 @@ export class CollaborationAnalyzer {
         if (!compositions.has(rel.from)) {
           compositions.set(rel.from, new Set());
         }
-        compositions.get(rel.from)!.add(rel.to);
+        compositions.get(rel.from)?.add(rel.to);
       }
     }
 
@@ -202,7 +206,7 @@ export class CollaborationAnalyzer {
     for (const [symbolA, compsA] of compositions.entries()) {
       for (const symbolB of compsA) {
         const compsB = compositions.get(symbolB);
-        if (compsB && compsB.has(symbolA)) {
+        if (compsB?.has(symbolA)) {
           const symA = this.graph.symbols.get(symbolA);
           const symB = this.graph.symbols.get(symbolB);
 
@@ -216,7 +220,7 @@ export class CollaborationAnalyzer {
               filePathA: symA.filePath,
               filePathB: symB.filePath,
               lineA: symA.line,
-              lineB: symB.line
+              lineB: symB.line,
             });
           }
         }
@@ -239,7 +243,7 @@ export class CollaborationAnalyzer {
       'bidirectional-dependency': 0.9,
       'mutual-calls': 0.85,
       'mutual-composition': 0.8,
-      'shared-context': 0.7
+      'shared-context': 0.7,
     };
 
     const confidence = confidenceMap[pattern.evidenceType];
@@ -262,7 +266,7 @@ export class CollaborationAnalyzer {
           lineNumber: pattern.lineA,
           snippet: `${pattern.nameA} ↔ ${pattern.nameB}`,
           confidence,
-          context: `Collaboration via ${pattern.evidenceType}`
+          context: `Collaboration via ${pattern.evidenceType}`,
         },
         {
           type: 'code',
@@ -270,8 +274,8 @@ export class CollaborationAnalyzer {
           lineNumber: pattern.lineB,
           snippet: `${pattern.nameB} ↔ ${pattern.nameA}`,
           confidence,
-          context: `Mutual relationship`
-        }
+          context: `Mutual relationship`,
+        },
       ],
       discoveredBy: 'static-analysis',
       confidence,
@@ -281,11 +285,11 @@ export class CollaborationAnalyzer {
         evidenceType: pattern.evidenceType,
         participantA: pattern.nameA,
         participantB: pattern.nameB,
-        bidirectional: true
+        bidirectional: true,
       },
       createdAt: timestamp,
       updatedAt: timestamp,
-      description: `${pattern.nameA} and ${pattern.nameB} collaborate (${pattern.evidenceType})`
+      description: `${pattern.nameA} and ${pattern.nameB} collaborate (${pattern.evidenceType})`,
     };
   }
 
@@ -305,7 +309,7 @@ export class CollaborationAnalyzer {
       'bidirectional-dependency': 0,
       'mutual-calls': 0,
       'mutual-composition': 0,
-      'shared-context': 0
+      'shared-context': 0,
     };
 
     const collaborators = new Set<string>();
@@ -318,14 +322,14 @@ export class CollaborationAnalyzer {
 
       // Count unique collaborators
       if (Array.isArray(rel.from)) {
-        rel.from.forEach(id => collaborators.add(id));
+        rel.from.forEach((id) => collaborators.add(id));
       }
     }
 
     return {
       totalCollaborations: relationships.length,
       byEvidenceType,
-      uniqueCollaborators: collaborators.size
+      uniqueCollaborators: collaborators.size,
     };
   }
 }

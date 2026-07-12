@@ -19,14 +19,18 @@ function getRelationshipStats(): RelationshipStats {
   const db = new DatabaseManager('.tsdoc/symbols.db', '.tsdoc');
 
   console.log('📊 Relationship Statistics Dashboard\n');
-  console.log('=' .repeat(80));
+  console.log('='.repeat(80));
 
   // Total relationships
-  const totalQuery = db['db'].prepare('SELECT COUNT(*) as count FROM unified_relationships').get() as { count: number };
+  const totalQuery = db.db.prepare('SELECT COUNT(*) as count FROM unified_relationships').get() as {
+    count: number;
+  };
   const total = totalQuery.count;
 
   // Total symbols
-  const symbolQuery = db['db'].prepare('SELECT COUNT(*) as count FROM symbols').get() as { count: number };
+  const symbolQuery = db.db.prepare('SELECT COUNT(*) as count FROM symbols').get() as {
+    count: number;
+  };
   const totalSymbols = symbolQuery.count;
 
   // Density
@@ -35,16 +39,20 @@ function getRelationshipStats(): RelationshipStats {
   console.log(`\n📈 Overall Metrics:`);
   console.log(`  Total Relationships:  ${total.toLocaleString()}`);
   console.log(`  Total Symbols:        ${totalSymbols.toLocaleString()}`);
-  console.log(`  Relationship Density: ${density.toFixed(2)} ${density >= 3.0 ? '✅' : '⚠️'}  (target: 3.0)`);
+  console.log(
+    `  Relationship Density: ${density.toFixed(2)} ${density >= 3.0 ? '✅' : '⚠️'}  (target: 3.0)`
+  );
   console.log(`  Average per Symbol:   ${(total / totalSymbols).toFixed(1)} relationships`);
 
   // By type
-  const byTypeQuery = db['db'].prepare(`
+  const byTypeQuery = db.db
+    .prepare(`
     SELECT type, COUNT(*) as count
     FROM unified_relationships
     GROUP BY type
     ORDER BY count DESC
-  `).all() as Array<{ type: string; count: number }>;
+  `)
+    .all() as Array<{ type: string; count: number }>;
 
   const byType: Record<string, number> = {};
   for (const row of byTypeQuery) {
@@ -53,19 +61,23 @@ function getRelationshipStats(): RelationshipStats {
 
   console.log(`\n📊 Breakdown by Type:`);
   console.log(`  ${'Type'.padEnd(35)} ${'Count'.padStart(7)}  ${'%'.padStart(6)}`);
-  console.log('  ' + '-'.repeat(50));
+  console.log(`  ${'-'.repeat(50)}`);
   for (const row of byTypeQuery) {
     const percentage = ((row.count / total) * 100).toFixed(1);
-    console.log(`  ${row.type.padEnd(35)} ${row.count.toString().padStart(7)}  ${percentage.padStart(5)}%`);
+    console.log(
+      `  ${row.type.padEnd(35)} ${row.count.toString().padStart(7)}  ${percentage.padStart(5)}%`
+    );
   }
 
   // By category
-  const byCategoryQuery = db['db'].prepare(`
+  const byCategoryQuery = db.db
+    .prepare(`
     SELECT category, COUNT(*) as count
     FROM unified_relationships
     GROUP BY category
     ORDER BY count DESC
-  `).all() as Array<{ category: string; count: number }>;
+  `)
+    .all() as Array<{ category: string; count: number }>;
 
   const byCategory: Record<string, number> = {};
   for (const row of byCategoryQuery) {
@@ -74,18 +86,22 @@ function getRelationshipStats(): RelationshipStats {
 
   console.log(`\n📊 Breakdown by Category:`);
   console.log(`  ${'Category'.padEnd(20)} ${'Count'.padStart(7)}  ${'%'.padStart(6)}`);
-  console.log('  ' + '-'.repeat(35));
+  console.log(`  ${'-'.repeat(35)}`);
   for (const row of byCategoryQuery) {
     const percentage = ((row.count / total) * 100).toFixed(1);
-    console.log(`  ${row.category.padEnd(20)} ${row.count.toString().padStart(7)}  ${percentage.padStart(5)}%`);
+    console.log(
+      `  ${row.category.padEnd(20)} ${row.count.toString().padStart(7)}  ${percentage.padStart(5)}%`
+    );
   }
 
   // Inferred relationships
-  const inferredQuery = db['db'].prepare(`
+  const inferredQuery = db.db
+    .prepare(`
     SELECT COUNT(*) as count
     FROM unified_relationships
     WHERE properties LIKE '%inference%'
-  `).get() as { count: number };
+  `)
+    .get() as { count: number };
   const inferredCount = inferredQuery.count;
 
   console.log(`\n🔮 Inferred Relationships:`);
@@ -93,12 +109,19 @@ function getRelationshipStats(): RelationshipStats {
   console.log(`  Percentage: ${((inferredCount / total) * 100).toFixed(1)}%`);
 
   // Semantic relationships (new types)
-  const semanticTypes = ['naming-pattern-relation', 'explicit-semantic-relation', 'feature-grouping', 'doc-reference'];
-  const semanticQuery = db['db'].prepare(`
+  const semanticTypes = [
+    'naming-pattern-relation',
+    'explicit-semantic-relation',
+    'feature-grouping',
+    'doc-reference',
+  ];
+  const semanticQuery = db.db
+    .prepare(`
     SELECT COUNT(*) as count
     FROM unified_relationships
     WHERE type IN (${semanticTypes.map(() => '?').join(',')})
-  `).get(...semanticTypes) as { count: number };
+  `)
+    .get(...semanticTypes) as { count: number };
   const semanticCount = semanticQuery.count;
 
   console.log(`\n✨ Semantic Relationships:`);
@@ -108,30 +131,44 @@ function getRelationshipStats(): RelationshipStats {
 
   // Quality check
   console.log(`\n📋 Quality Metrics:`);
-  const testCoverageQuery = db['db'].prepare(`
+  const testCoverageQuery = db.db
+    .prepare(`
     SELECT COUNT(*) as count FROM unified_relationships WHERE type = 'test-coverage'
-  `).get() as { count: number };
+  `)
+    .get() as { count: number };
   const testCoverage = testCoverageQuery.count;
-  const codeDependencyQuery = db['db'].prepare(`
+  const codeDependencyQuery = db.db
+    .prepare(`
     SELECT COUNT(*) as count FROM unified_relationships WHERE type = 'code-dependency'
-  `).get() as { count: number };
+  `)
+    .get() as { count: number };
   const codeDependency = codeDependencyQuery.count;
 
-  console.log(`  Test Coverage:      ${testCoverage.toLocaleString()} (${((testCoverage / total) * 100).toFixed(1)}%)`);
-  console.log(`  Code Dependencies:  ${codeDependency.toLocaleString()} (${((codeDependency / total) * 100).toFixed(1)}%)`);
-  console.log(`  Semantic Relations: ${semanticCount.toLocaleString()} (${((semanticCount / total) * 100).toFixed(1)}%)`);
+  console.log(
+    `  Test Coverage:      ${testCoverage.toLocaleString()} (${((testCoverage / total) * 100).toFixed(1)}%)`
+  );
+  console.log(
+    `  Code Dependencies:  ${codeDependency.toLocaleString()} (${((codeDependency / total) * 100).toFixed(1)}%)`
+  );
+  console.log(
+    `  Semantic Relations: ${semanticCount.toLocaleString()} (${((semanticCount / total) * 100).toFixed(1)}%)`
+  );
 
   // SSOT compliance
-  const docRefQuery = db['db'].prepare(`
+  const docRefQuery = db.db
+    .prepare(`
     SELECT COUNT(*) as count FROM unified_relationships WHERE type = 'doc-reference'
-  `).get() as { count: number };
+  `)
+    .get() as { count: number };
   const docRefCount = docRefQuery.count;
 
   console.log(`\n📄 SSOT Compliance:`);
-  console.log(`  Code ↔ Doc Links:   ${docRefCount.toLocaleString()} (${((docRefCount / total) * 100).toFixed(1)}%)`);
+  console.log(
+    `  Code ↔ Doc Links:   ${docRefCount.toLocaleString()} (${((docRefCount / total) * 100).toFixed(1)}%)`
+  );
   console.log(`  Status:             ${docRefCount > 0 ? '✅ Active' : '⚠️  No links'}`);
 
-  console.log('\n' + '=' .repeat(80));
+  console.log(`\n${'='.repeat(80)}`);
 
   db.close();
 

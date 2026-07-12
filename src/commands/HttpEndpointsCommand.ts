@@ -4,10 +4,10 @@
  */
 
 import Database from 'better-sqlite3';
-import { BaseCommand, type CommandResult } from './BaseCommand';
-import { XmlBuilder } from '../output/XmlBuilder';
 import type { OutputSchema } from '../output/types';
 import { arrayOf } from '../output/types';
+import { XmlBuilder } from '../output/XmlBuilder';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 const HttpEndpointsSchema: OutputSchema = {
   root: 'http-endpoints',
@@ -43,9 +43,9 @@ export class HttpEndpointsCommand extends BaseCommand {
   }
 
   async execute(args: string[]): Promise<CommandResult> {
-    const methodFilter = args.find(a => a.startsWith('--method='))?.split('=')[1];
-    const scopeFilter = args.find(a => a.startsWith('--scope='))?.split('=')[1];
-    const pathFilter = args.find(a => a.startsWith('--path='))?.split('=')[1];
+    const methodFilter = args.find((a) => a.startsWith('--method='))?.split('=')[1];
+    const scopeFilter = args.find((a) => a.startsWith('--scope='))?.split('=')[1];
+    const pathFilter = args.find((a) => a.startsWith('--path='))?.split('=')[1];
 
     const dbCheck = this.checkDatabaseExists();
     if (dbCheck) return dbCheck;

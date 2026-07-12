@@ -5,14 +5,14 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
-import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
-import { MermaidGenerator } from '../visualization/MermaidGenerator';
 import { DependencyChainAnalyzer } from '../analyzer/DependencyChainAnalyzer';
 import { ConfigManager } from '../config/ConfigManager';
+import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
+import { DatabaseManager } from '../storage/DatabaseManager';
 import type { SymbolType } from '../types/graph';
 import type { SymbolRelationship } from '../types/tags';
+import { MermaidGenerator } from '../visualization/MermaidGenerator';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /**
  * Command for visualizing dependencies with Mermaid diagrams
@@ -186,7 +186,11 @@ export class VisualizeDepsCommand extends BaseCommand {
             console.log();
 
             // Save to file
-            const outputPath = path.join(process.cwd(), diagramsDir, `circular-${circularIndex + 1}.mmd`);
+            const outputPath = path.join(
+              process.cwd(),
+              diagramsDir,
+              `circular-${circularIndex + 1}.mmd`
+            );
             fs.mkdirSync(path.dirname(outputPath), { recursive: true });
             fs.writeFileSync(outputPath, diagram, 'utf-8');
 
@@ -219,7 +223,11 @@ export class VisualizeDepsCommand extends BaseCommand {
           console.log();
 
           // Save to file
-          const outputPath = path.join(process.cwd(), diagramsDir, `hierarchy-${resolvedClass}.mmd`);
+          const outputPath = path.join(
+            process.cwd(),
+            diagramsDir,
+            `hierarchy-${resolvedClass}.mmd`
+          );
           fs.mkdirSync(path.dirname(outputPath), { recursive: true });
           fs.writeFileSync(outputPath, diagram, 'utf-8');
 
@@ -243,8 +251,6 @@ export class VisualizeDepsCommand extends BaseCommand {
           this.printSuccess(`Saved to ${outputPath}`);
           break;
         }
-
-        case 'help':
         default: {
           this.printSection('Available Visualizations');
           console.log('  visualize tree <symbol-id>       - Dependency tree for a symbol');
@@ -263,18 +269,5 @@ export class VisualizeDepsCommand extends BaseCommand {
 
       return this.success('Visualization complete');
     });
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      bold: '\x1b[1m',
-      dim: '\x1b[2m',
-      green: '\x1b[32m',
-      yellow: '\x1b[33m',
-      blue: '\x1b[34m',
-      cyan: '\x1b[36m',
-      red: '\x1b[31m',
-    };
   }
 }

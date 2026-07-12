@@ -39,14 +39,14 @@ export enum BlockType {
  * Side effect types
  */
 export type SideEffectType =
-  | 'io'              // File I/O
-  | 'state-mutation'  // In-memory state change
-  | 'network'         // Network call (HTTP, WebSocket, etc.)
-  | 'filesystem'      // File system operation
-  | 'database'        // Database operation
-  | 'cache'           // Cache operation
-  | 'event'           // Event emission
-  | 'logging';        // Logging/tracing
+  | 'io' // File I/O
+  | 'state-mutation' // In-memory state change
+  | 'network' // Network call (HTTP, WebSocket, etc.)
+  | 'filesystem' // File system operation
+  | 'database' // Database operation
+  | 'cache' // Cache operation
+  | 'event' // Event emission
+  | 'logging'; // Logging/tracing
 
 /**
  * Side effect representation

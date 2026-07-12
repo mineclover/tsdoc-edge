@@ -3,7 +3,7 @@
  */
 
 import { SubstitutionAnalyzer } from '../../analyzer/SubstitutionAnalyzer';
-import type { SymbolGraph, Symbol, SymbolRelationship } from '../../types/graph';
+import type { Symbol, SymbolGraph, SymbolRelationship } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships';
 
 describe('SubstitutionAnalyzer', () => {
@@ -39,10 +39,7 @@ describe('SubstitutionAnalyzer', () => {
   }
 
   // Helper to create implements relationship
-  function createImplementsRelationship(
-    from: string,
-    to: string
-  ): SymbolRelationship {
+  function createImplementsRelationship(from: string, to: string): SymbolRelationship {
     return {
       type: 'implements',
       from,
@@ -52,10 +49,7 @@ describe('SubstitutionAnalyzer', () => {
   }
 
   // Helper to create extends relationship
-  function createExtendsRelationship(
-    from: string,
-    to: string
-  ): SymbolRelationship {
+  function createExtendsRelationship(from: string, to: string): SymbolRelationship {
     return {
       type: 'extends',
       from,

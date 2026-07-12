@@ -161,7 +161,7 @@ if (results.length > 20) {
 console.log('\nCode blocks by directory:\n');
 const byDir = new Map<string, number>();
 for (const result of results) {
-  const dir = path.dirname(result.file).replace(process.cwd() + '/', '');
+  const dir = path.dirname(result.file).replace(`${process.cwd()}/`, '');
   byDir.set(dir, (byDir.get(dir) || 0) + result.blocks.length);
 }
 

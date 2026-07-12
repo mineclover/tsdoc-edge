@@ -3,7 +3,7 @@
  */
 
 import { LayerDependencyAnalyzer } from '../../analyzer/LayerDependencyAnalyzer';
-import type { SymbolGraph, Symbol, SymbolRelationship } from '../../types/graph';
+import type { Symbol, SymbolGraph, SymbolRelationship } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships';
 
 describe('LayerDependencyAnalyzer', () => {
@@ -92,7 +92,11 @@ describe('LayerDependencyAnalyzer', () => {
 
     it('should return empty array when no relationships exist', () => {
       const graph = createMockGraph([
-        { id: 'controller-1', name: 'UserController', filePath: 'src/controllers/UserController.ts' },
+        {
+          id: 'controller-1',
+          name: 'UserController',
+          filePath: 'src/controllers/UserController.ts',
+        },
         { id: 'service-1', name: 'UserService', filePath: 'src/services/UserService.ts' },
       ]);
 
@@ -677,7 +681,11 @@ describe('LayerDependencyAnalyzer', () => {
     it('should detect cross-module dependencies in src/modules/', () => {
       const graph = createMockGraph(
         [
-          { id: 'auth-ctrl', name: 'AuthController', filePath: 'src/modules/auth/AuthController.ts' },
+          {
+            id: 'auth-ctrl',
+            name: 'AuthController',
+            filePath: 'src/modules/auth/AuthController.ts',
+          },
           { id: 'user-svc', name: 'UserService', filePath: 'src/modules/user/UserService.ts' },
         ],
         [{ from: 'auth-ctrl', to: 'user-svc' }]
@@ -696,7 +704,11 @@ describe('LayerDependencyAnalyzer', () => {
       const graph = createMockGraph(
         [
           { id: 'cart-svc', name: 'CartService', filePath: 'src/features/cart/CartService.ts' },
-          { id: 'product-svc', name: 'ProductService', filePath: 'src/features/product/ProductService.ts' },
+          {
+            id: 'product-svc',
+            name: 'ProductService',
+            filePath: 'src/features/product/ProductService.ts',
+          },
         ],
         [{ from: 'cart-svc', to: 'product-svc' }]
       );
@@ -894,10 +906,23 @@ describe('LayerDependencyAnalyzer', () => {
     it('should truncate long relationship IDs', () => {
       const graph = createMockGraph(
         [
-          { id: 'a-very-long-symbol-id-that-exceeds-normal-length', name: 'A', filePath: 'src/modules/auth/A.ts' },
-          { id: 'another-very-long-symbol-id-that-also-exceeds-length', name: 'B', filePath: 'src/modules/user/B.ts' },
+          {
+            id: 'a-very-long-symbol-id-that-exceeds-normal-length',
+            name: 'A',
+            filePath: 'src/modules/auth/A.ts',
+          },
+          {
+            id: 'another-very-long-symbol-id-that-also-exceeds-length',
+            name: 'B',
+            filePath: 'src/modules/user/B.ts',
+          },
         ],
-        [{ from: 'a-very-long-symbol-id-that-exceeds-normal-length', to: 'another-very-long-symbol-id-that-also-exceeds-length' }]
+        [
+          {
+            from: 'a-very-long-symbol-id-that-exceeds-normal-length',
+            to: 'another-very-long-symbol-id-that-also-exceeds-length',
+          },
+        ]
       );
 
       const analyzer = new LayerDependencyAnalyzer(graph);
@@ -1031,16 +1056,14 @@ describe('LayerDependencyAnalyzer', () => {
 
       expect(stats.totalBoundaries).toBe(1);
       expect(stats.byModulePair['unknown → unknown']).toBe(1);
-      expect(stats.byBoundaryType['unknown']).toBe(1);
+      expect(stats.byBoundaryType.unknown).toBe(1);
     });
   });
 
   describe('edge cases', () => {
     it('should handle missing from symbol', () => {
       const graph = createMockGraph(
-        [
-          { id: 'svc', name: 'UserService', filePath: 'src/services/UserService.ts' },
-        ],
+        [{ id: 'svc', name: 'UserService', filePath: 'src/services/UserService.ts' }],
         [{ from: 'nonexistent', to: 'svc' }]
       );
 
@@ -1052,9 +1075,7 @@ describe('LayerDependencyAnalyzer', () => {
 
     it('should handle missing to symbol', () => {
       const graph = createMockGraph(
-        [
-          { id: 'ctrl', name: 'UserController', filePath: 'src/controllers/UserController.ts' },
-        ],
+        [{ id: 'ctrl', name: 'UserController', filePath: 'src/controllers/UserController.ts' }],
         [{ from: 'ctrl', to: 'nonexistent' }]
       );
 

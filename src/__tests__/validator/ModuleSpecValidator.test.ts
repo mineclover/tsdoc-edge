@@ -2,8 +2,8 @@
  * ModuleSpecValidator Tests
  */
 
-import { ModuleSpecValidator, type ValidationOptions } from '../../validator/ModuleSpecValidator';
 import type { ModuleSpecTemplate } from '../../types/spec/module-spec';
+import { ModuleSpecValidator, type ValidationOptions } from '../../validator/ModuleSpecValidator';
 
 describe('ModuleSpecValidator', () => {
   // Helper to create a valid spec template
@@ -31,10 +31,18 @@ describe('ModuleSpecValidator', () => {
         returnType: { type: 'boolean', description: 'True if valid' },
         postconditions: ['Returns true for valid input'],
         successCases: ['Valid input returns true'],
-        failureCases: [{ condition: 'Empty input', errorType: 'ValidationError', description: 'Throws on empty' }],
+        failureCases: [
+          {
+            condition: 'Empty input',
+            errorType: 'ValidationError',
+            description: 'Throws on empty',
+          },
+        ],
       },
       context: {
-        dependencies: [{ name: 'validator', type: 'module', purpose: 'Core validation', critical: true }],
+        dependencies: [
+          { name: 'validator', type: 'module', purpose: 'Core validation', critical: true },
+        ],
         imports: [{ source: './validator', symbols: ['validate'], isExternal: false }],
         environment: [],
         requirements: [],
@@ -97,7 +105,7 @@ describe('ModuleSpecValidator', () => {
 
       expect(result.isValid).toBe(true);
       expect(result.score).toBeGreaterThan(70);
-      expect(result.issues.filter(i => i.severity === 'error')).toHaveLength(0);
+      expect(result.issues.filter((i) => i.severity === 'error')).toHaveLength(0);
       expect(result.passed.length).toBeGreaterThan(0);
     });
 
@@ -106,7 +114,7 @@ describe('ModuleSpecValidator', () => {
       const result = validator.validate(spec);
 
       expect(result.isValid).toBe(false);
-      expect(result.issues.some(i => i.message.includes('confidence'))).toBe(true);
+      expect(result.issues.some((i) => i.message.includes('confidence'))).toBe(true);
     });
 
     it('should report missing problem description', () => {
@@ -120,7 +128,9 @@ describe('ModuleSpecValidator', () => {
       const result = validator.validate(spec);
 
       expect(result.failed).toContain('Purpose missing problem');
-      expect(result.issues.some(i => i.section === 'Purpose' && i.severity === 'error')).toBe(true);
+      expect(result.issues.some((i) => i.section === 'Purpose' && i.severity === 'error')).toBe(
+        true
+      );
     });
 
     it('should report missing responsibility', () => {
@@ -146,7 +156,9 @@ describe('ModuleSpecValidator', () => {
       });
       const result = validator.validate(spec);
 
-      expect(result.issues.some(i => i.section === 'Purpose' && i.severity === 'info')).toBe(true);
+      expect(result.issues.some((i) => i.section === 'Purpose' && i.severity === 'info')).toBe(
+        true
+      );
     });
   });
 
@@ -184,14 +196,23 @@ describe('ModuleSpecValidator', () => {
       });
       const result = validator.validate(spec);
 
-      expect(result.issues.some(i => i.section === 'Input' && i.message.includes('missing descriptions'))).toBe(true);
+      expect(
+        result.issues.some(
+          (i) => i.section === 'Input' && i.message.includes('missing descriptions')
+        )
+      ).toBe(true);
     });
 
     it('should pass when all parameters have descriptions', () => {
       const spec = createValidSpec({
         input: {
           parameters: [
-            { name: 'input', type: 'string', description: 'The input value to validate', optional: false },
+            {
+              name: 'input',
+              type: 'string',
+              description: 'The input value to validate',
+              optional: false,
+            },
           ],
           preconditions: [],
           constraints: [],
@@ -236,7 +257,11 @@ describe('ModuleSpecValidator', () => {
       });
       const result = validator.validate(spec);
 
-      expect(result.issues.some(i => i.section === 'Output' && i.message.includes('meaningful description'))).toBe(true);
+      expect(
+        result.issues.some(
+          (i) => i.section === 'Output' && i.message.includes('meaningful description')
+        )
+      ).toBe(true);
     });
 
     it('should pass when output has postconditions', () => {
@@ -335,7 +360,9 @@ describe('ModuleSpecValidator', () => {
       });
       const result = validator.validate(spec);
 
-      expect(result.issues.some(i => i.section === 'Logic' && i.message.includes('No features'))).toBe(true);
+      expect(
+        result.issues.some((i) => i.section === 'Logic' && i.message.includes('No features'))
+      ).toBe(true);
     });
 
     it('should pass when algorithm is described', () => {
@@ -367,7 +394,7 @@ describe('ModuleSpecValidator', () => {
       });
       const result = validator.validate(spec);
 
-      expect(result.issues.some(i => i.section === 'Logic' && i.severity === 'error')).toBe(true);
+      expect(result.issues.some((i) => i.section === 'Logic' && i.severity === 'error')).toBe(true);
     });
   });
 
@@ -430,7 +457,7 @@ describe('ModuleSpecValidator', () => {
       });
       const result = validator.validate(spec);
 
-      expect(result.issues.some(i => i.section === 'Scope' && i.severity === 'info')).toBe(true);
+      expect(result.issues.some((i) => i.section === 'Scope' && i.severity === 'info')).toBe(true);
     });
 
     it('should pass when exposed API exists', () => {
@@ -452,14 +479,16 @@ describe('ModuleSpecValidator', () => {
       const spec = createValidSpec({ completionConfidence: 80 });
       const result = validator.validate(spec);
 
-      expect(result.passed.some(p => p.includes('Completion confidence meets threshold'))).toBe(true);
+      expect(result.passed.some((p) => p.includes('Completion confidence meets threshold'))).toBe(
+        true
+      );
     });
 
     it('should fail when confidence is below threshold', () => {
       const spec = createValidSpec({ completionConfidence: 50 });
       const result = validator.validate(spec);
 
-      expect(result.failed.some(f => f.includes('Low completion confidence'))).toBe(true);
+      expect(result.failed.some((f) => f.includes('Low completion confidence'))).toBe(true);
     });
 
     it('should pass when no manual review needed', () => {
@@ -473,7 +502,11 @@ describe('ModuleSpecValidator', () => {
       const spec = createValidSpec({ manualReviewNeeded: ['algorithm', 'side-effects'] });
       const result = validator.validate(spec);
 
-      expect(result.issues.some(i => i.section === 'Metadata' && i.message.includes('Manual review needed'))).toBe(true);
+      expect(
+        result.issues.some(
+          (i) => i.section === 'Metadata' && i.message.includes('Manual review needed')
+        )
+      ).toBe(true);
     });
 
     it('should warn for manual review in strict mode', () => {
@@ -481,7 +514,9 @@ describe('ModuleSpecValidator', () => {
       const spec = createValidSpec({ manualReviewNeeded: ['algorithm'] });
       const result = validator.validate(spec);
 
-      expect(result.issues.some(i => i.section === 'Metadata' && i.severity === 'warning')).toBe(true);
+      expect(result.issues.some((i) => i.section === 'Metadata' && i.severity === 'warning')).toBe(
+        true
+      );
     });
   });
 
@@ -513,11 +548,21 @@ describe('ModuleSpecValidator', () => {
         filePath: 'test.ts',
         purpose: { problem: '', responsibility: '', solution: '' },
         input: { parameters: [], preconditions: [], constraints: [] },
-        output: { returnType: { type: 'void' }, postconditions: [], successCases: [], failureCases: [] },
+        output: {
+          returnType: { type: 'void' },
+          postconditions: [],
+          successCases: [],
+          failureCases: [],
+        },
         context: { dependencies: [], imports: [], environment: [], requirements: [] },
         logic: { features: [], algorithm: '' },
         effect: { sideEffects: [], mutations: [], io: [] },
-        scope: { visibility: 'private', exposedAPI: [], accessLevel: 'private', isPublicAPI: false },
+        scope: {
+          visibility: 'private',
+          exposedAPI: [],
+          accessLevel: 'private',
+          isPublicAPI: false,
+        },
         completionConfidence: 0,
         manualReviewNeeded: [],
         generatedAt: new Date().toISOString(),

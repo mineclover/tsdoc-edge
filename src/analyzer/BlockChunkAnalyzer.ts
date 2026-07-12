@@ -13,37 +13,19 @@
 
 import * as ts from 'typescript';
 import {
-  type CodeBlock,
-  BlockType,
-  type BlockScope,
-  type SideEffect,
-  type SideEffectType,
   type BlockAnalysisResult,
-  type BlockDependency,
+  type BlockScope,
+  BlockType,
   type ChunkingStrategy,
+  type CodeBlock,
+  type SideEffect,
 } from '../types/blocks';
 
 /**
  * Block chunking analyzer
  */
 export class BlockChunkAnalyzer {
-  private program: ts.Program;
-  private strategy: ChunkingStrategy;
-
-  constructor(
-    program: ts.Program,
-    strategy: Partial<ChunkingStrategy> = {},
-  ) {
-    this.program = program;
-    this.strategy = {
-      minBlockSize: 1,
-      maxBlockSize: 50,
-      mergeSmallBlocks: true,
-      splitLargeBlocks: false,
-      detectionRules: [],
-      ...strategy,
-    };
-  }
+  constructor(_program: ts.Program, _strategy: Partial<ChunkingStrategy> = {}) {}
 
   /**
    * Analyze function for code blocks
@@ -51,7 +33,7 @@ export class BlockChunkAnalyzer {
   analyzeFunction(
     functionNode: ts.FunctionDeclaration | ts.MethodDeclaration | ts.ArrowFunction,
     symbolId: string,
-    filePath: string,
+    _filePath: string
   ): BlockAnalysisResult {
     const blocks: CodeBlock[] = [];
     const warnings: string[] = [];
@@ -78,10 +60,11 @@ export class BlockChunkAnalyzer {
         const stmtGroup = statementBlocks[i];
         if (stmtGroup.length === 0) continue;
 
-        const startLine = sourceFile.getLineAndCharacterOfPosition(stmtGroup[0].getStart()).line + 1;
-        const endLine = sourceFile.getLineAndCharacterOfPosition(
-          stmtGroup[stmtGroup.length - 1].getEnd(),
-        ).line + 1;
+        const startLine =
+          sourceFile.getLineAndCharacterOfPosition(stmtGroup[0].getStart()).line + 1;
+        const endLine =
+          sourceFile.getLineAndCharacterOfPosition(stmtGroup[stmtGroup.length - 1].getEnd()).line +
+          1;
 
         const blockType = this.inferBlockType(stmtGroup);
         const dependencies = this.extractDependencies(stmtGroup);
@@ -106,7 +89,8 @@ export class BlockChunkAnalyzer {
       }
     } else {
       // Single expression body (arrow function)
-      const startLine = sourceFile.getLineAndCharacterOfPosition(functionNode.body.getStart()).line + 1;
+      const startLine =
+        sourceFile.getLineAndCharacterOfPosition(functionNode.body.getStart()).line + 1;
       const endLine = sourceFile.getLineAndCharacterOfPosition(functionNode.body.getEnd()).line + 1;
 
       // Treat expression body as a statement for analysis
@@ -130,7 +114,8 @@ export class BlockChunkAnalyzer {
     }
 
     // Calculate coverage
-    const functionStart = sourceFile.getLineAndCharacterOfPosition(functionNode.getStart()).line + 1;
+    const functionStart =
+      sourceFile.getLineAndCharacterOfPosition(functionNode.getStart()).line + 1;
     const functionEnd = sourceFile.getLineAndCharacterOfPosition(functionNode.getEnd()).line + 1;
     const totalLines = functionEnd - functionStart + 1;
     const coveredLines = blocks.reduce((sum, b) => sum + (b.endLine - b.startLine + 1), 0);
@@ -216,12 +201,16 @@ export class BlockChunkAnalyzer {
     }
 
     // Check for conditionals
-    if (statements.some(s => ts.isIfStatement(s) || ts.isSwitchStatement(s))) {
+    if (statements.some((s) => ts.isIfStatement(s) || ts.isSwitchStatement(s))) {
       return BlockType.CONDITIONAL;
     }
 
     // Check for loops
-    if (statements.some(s => ts.isForStatement(s) || ts.isWhileStatement(s) || ts.isForOfStatement(s))) {
+    if (
+      statements.some(
+        (s) => ts.isForStatement(s) || ts.isWhileStatement(s) || ts.isForOfStatement(s)
+      )
+    ) {
       return BlockType.LOOP;
     }
 
@@ -240,7 +229,7 @@ export class BlockChunkAnalyzer {
         text.includes('check') ||
         text.includes('isValid') ||
         text.includes('throw new Error') ||
-        text.includes('throw new') && text.includes('Error') ||
+        (text.includes('throw new') && text.includes('Error')) ||
         (ts.isIfStatement(stmt) && text.includes('!')) ||
         text.includes('.test(') || // Regex test
         text.includes('.match(')
@@ -331,10 +320,11 @@ export class BlockChunkAnalyzer {
    * Check for error handling pattern
    */
   private hasErrorHandlingPattern(statements: ts.Statement[]): boolean {
-    return statements.some(s =>
-      ts.isTryStatement(s) ||
-      ts.isCatchClause(s) ||
-      (ts.isIfStatement(s) && s.getText().includes('error'))
+    return statements.some(
+      (s) =>
+        ts.isTryStatement(s) ||
+        ts.isCatchClause(s) ||
+        (ts.isIfStatement(s) && s.getText().includes('error'))
     );
   }
 
@@ -368,7 +358,7 @@ export class BlockChunkAnalyzer {
     for (const stmt of statements) {
       const text = stmt.getText();
       if (
-        text.includes('.get(') && (text.includes('http') || text.includes('fetch')) ||
+        (text.includes('.get(') && (text.includes('http') || text.includes('fetch'))) ||
         text.includes('.post(') ||
         text.includes('.put(') ||
         text.includes('.delete(') ||
@@ -528,8 +518,10 @@ export class BlockChunkAnalyzer {
 
       // Logical operators
       if (ts.isBinaryExpression(node)) {
-        if (node.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken ||
-            node.operatorToken.kind === ts.SyntaxKind.BarBarToken) {
+        if (
+          node.operatorToken.kind === ts.SyntaxKind.AmpersandAmpersandToken ||
+          node.operatorToken.kind === ts.SyntaxKind.BarBarToken
+        ) {
           complexity++;
         }
       }
@@ -548,7 +540,10 @@ export class BlockChunkAnalyzer {
    * Generate purpose description
    */
   private generatePurpose(blockType: BlockType, statements: ts.Statement[]): string {
-    const text = statements.map(s => s.getText()).join(' ').substring(0, 100);
+    const text = statements
+      .map((s) => s.getText())
+      .join(' ')
+      .substring(0, 100);
 
     switch (blockType) {
       case 'validation':

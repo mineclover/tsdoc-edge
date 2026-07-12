@@ -163,13 +163,14 @@ export class BehavioralAnalyzer {
           const expr = node.expression;
 
           // Check if it's a property access on 'this'
-          if (expr.expression.kind === ts.SyntaxKind.ThisKeyword ||
-              (ts.isPropertyAccessExpression(expr.expression) &&
-               expr.expression.expression.kind === ts.SyntaxKind.ThisKeyword)) {
-
+          if (
+            expr.expression.kind === ts.SyntaxKind.ThisKeyword ||
+            (ts.isPropertyAccessExpression(expr.expression) &&
+              expr.expression.expression.kind === ts.SyntaxKind.ThisKeyword)
+          ) {
             // Get the current class
             const classNode = this.findParentClass(node);
-            if (classNode && classNode.name) {
+            if (classNode?.name) {
               const className = classNode.name.text;
               const classSymbol = this.findSymbolByName(className);
 
@@ -197,7 +198,7 @@ export class BehavioralAnalyzer {
         // Pattern 2: Constructor dependency injection (collaboration indicator)
         if (ts.isConstructorDeclaration(node)) {
           const classNode = this.findParentClass(node);
-          if (classNode && classNode.name) {
+          if (classNode?.name) {
             const className = classNode.name.text;
             const classSymbol = this.findSymbolByName(className);
 
@@ -227,7 +228,7 @@ export class BehavioralAnalyzer {
         }
 
         ts.forEachChild(node, visit);
-      } catch (error) {
+      } catch (_error) {
         // Skip this node on error
         return;
       }
@@ -318,7 +319,7 @@ export class BehavioralAnalyzer {
         }
 
         ts.forEachChild(node, visit);
-      } catch (error) {
+      } catch (_error) {
         // Skip this node on error
         return;
       }
@@ -454,7 +455,7 @@ export class BehavioralAnalyzer {
         }
 
         ts.forEachChild(node, visit);
-      } catch (error) {
+      } catch (_error) {
         // Skip this node on error
         return;
       }

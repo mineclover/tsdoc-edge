@@ -4,8 +4,8 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type { DetectableStats, ImportanceCriteria, TrackableStatistics } from '../../types/analysis';
 import { StatsHistoryManager } from '../../analyzer/StatsHistoryManager';
+import type { TrackableStatistics } from '../../types/analysis';
 
 describe('StatsHistoryManager', () => {
   let manager: StatsHistoryManager;
@@ -231,9 +231,42 @@ describe('StatsHistoryManager', () => {
     it('should organize symbol IDs by importance', () => {
       const historyPath = path.join(tempDir, 'symbols.json');
       const mockSymbols = [
-        { id: 'sym-1', name: 'PublicAPI', type: 'class' as const, filePath: 'src/api.ts', line: 1, column: 0, isExported: true, isPublic: true, tests: [], designDecisions: [] },
-        { id: 'sym-2', name: 'Service', type: 'class' as const, filePath: 'src/service.ts', line: 1, column: 0, isExported: true, isPublic: false, tests: [], designDecisions: [] },
-        { id: 'sym-3', name: 'Helper', type: 'function' as const, filePath: 'src/helper.ts', line: 1, column: 0, isExported: false, isPublic: false, tests: [], designDecisions: [] },
+        {
+          id: 'sym-1',
+          name: 'PublicAPI',
+          type: 'class' as const,
+          filePath: 'src/api.ts',
+          line: 1,
+          column: 0,
+          isExported: true,
+          isPublic: true,
+          tests: [],
+          designDecisions: [],
+        },
+        {
+          id: 'sym-2',
+          name: 'Service',
+          type: 'class' as const,
+          filePath: 'src/service.ts',
+          line: 1,
+          column: 0,
+          isExported: true,
+          isPublic: false,
+          tests: [],
+          designDecisions: [],
+        },
+        {
+          id: 'sym-3',
+          name: 'Helper',
+          type: 'function' as const,
+          filePath: 'src/helper.ts',
+          line: 1,
+          column: 0,
+          isExported: false,
+          isPublic: false,
+          tests: [],
+          designDecisions: [],
+        },
       ];
 
       const stats: TrackableStatistics = {
@@ -521,7 +554,12 @@ describe('StatsHistoryManager', () => {
         const stats: TrackableStatistics = {
           timestamp: new Date(now - (9 - i) * 1000).toISOString(),
           projectPath: '/project',
-          overall: { total: 100, documented: 30 + i * 10, undocumented: 70 - i * 10, rate: 30 + i * 10 },
+          overall: {
+            total: 100,
+            documented: 30 + i * 10,
+            undocumented: 70 - i * 10,
+            rate: 30 + i * 10,
+          },
           byImportance: {
             critical: { total: 50, documented: 50, undocumented: 0, rate: 100 },
             important: { total: 30, documented: 30, undocumented: 0, rate: 100 },
@@ -547,7 +585,12 @@ describe('StatsHistoryManager', () => {
         const stats: TrackableStatistics = {
           timestamp: new Date(now - (9 - i) * 1000).toISOString(),
           projectPath: '/project',
-          overall: { total: 100, documented: 90 - i * 10, undocumented: 10 + i * 10, rate: 90 - i * 10 },
+          overall: {
+            total: 100,
+            documented: 90 - i * 10,
+            undocumented: 10 + i * 10,
+            rate: 90 - i * 10,
+          },
           byImportance: {
             critical: { total: 50, documented: 50, undocumented: 0, rate: 100 },
             important: { total: 30, documented: 30, undocumented: 0, rate: 100 },

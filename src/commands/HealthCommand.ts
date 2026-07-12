@@ -4,9 +4,9 @@
  */
 
 import * as fs from 'node:fs';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { CodeHealthChecker } from '../analyzer/CodeHealthChecker';
 import type { AnalysisReport, CodeHealthMetrics } from '../types/analysis';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for checking code health
@@ -92,7 +92,7 @@ export class HealthCommand extends BaseCommand {
       }
 
       // Filter out flags to get positional arguments
-      const positionalArgs = args.filter(arg => !arg.startsWith('--'));
+      const positionalArgs = args.filter((arg) => !arg.startsWith('--'));
       const targetPath = positionalArgs[0] || 'src';
 
       if (!fs.existsSync(targetPath)) {
@@ -139,29 +139,35 @@ export class HealthCommand extends BaseCommand {
           recommendations.push(`Urgent action required: ${this.getHealthFocus(metrics)}`);
         }
 
-        this.printOutput('health', {
-          target: {
-            path: targetPath,
+        this.printOutput(
+          'health',
+          {
+            target: {
+              path: targetPath,
+            },
+            overall: {
+              healthScore,
+              healthGrade,
+              maxScore: 100,
+            },
+            breakdown: {
+              documentationQuality: docScore,
+              testCoverage: testScore,
+            },
+            recommendations: recommendations.map((text) => ({ text })),
+            statistics: {
+              totalSymbols: metrics.totalSymbols,
+              documented: metrics.documentedSymbols,
+              documentedPercent: Math.round(
+                (metrics.documentedSymbols / metrics.totalSymbols) * 100
+              ),
+              filesWithTests: metrics.filesWithTests,
+              totalFiles: metrics.totalFiles,
+              filesNeedingAttention: report.filesNeedingAttention.length,
+            },
           },
-          overall: {
-            healthScore,
-            healthGrade,
-            maxScore: 100,
-          },
-          breakdown: {
-            documentationQuality: docScore,
-            testCoverage: testScore,
-          },
-          recommendations: recommendations.map((text) => ({ text })),
-          statistics: {
-            totalSymbols: metrics.totalSymbols,
-            documented: metrics.documentedSymbols,
-            documentedPercent: Math.round((metrics.documentedSymbols / metrics.totalSymbols) * 100),
-            filesWithTests: metrics.filesWithTests,
-            totalFiles: metrics.totalFiles,
-            filesNeedingAttention: report.filesNeedingAttention.length,
-          },
-        }, args);
+          args
+        );
       }
 
       return this.success();
@@ -205,9 +211,7 @@ export class HealthCommand extends BaseCommand {
       console.log(`   ${colors.yellow}!${colors.reset} Focus on: ${this.getHealthFocus(metrics)}`);
     } else if (healthScore >= 40) {
       console.log(`   ${colors.yellow}⚠${colors.reset} Your codebase health needs attention.`);
-      console.log(
-        `   ${colors.yellow}⚠${colors.reset} Priority: ${this.getHealthFocus(metrics)}`
-      );
+      console.log(`   ${colors.yellow}⚠${colors.reset} Priority: ${this.getHealthFocus(metrics)}`);
     } else {
       console.log(`   ${colors.red}❌${colors.reset} Your codebase health is critical.`);
       console.log(

@@ -2,8 +2,8 @@
  * Tests for TrackableStatsCollector
  */
 
-import type { Symbol } from '../../types/graph';
 import { TrackableStatsCollector } from '../../analyzer/TrackableStatsCollector';
+import type { Symbol } from '../../types/graph';
 
 describe('TrackableStatsCollector', () => {
   let collector: TrackableStatsCollector;
@@ -557,7 +557,7 @@ describe('TrackableStatsCollector', () => {
       const stats = collector.collect('/project', symbols, new Map());
       const summary = collector.summarize(stats);
 
-      expect(summary).toMatch(/[✅⚠️❌]/);
+      expect(summary).toMatch(/(?:✅|⚠️|❌)/);
     });
 
     it('should show document count by importance level', () => {

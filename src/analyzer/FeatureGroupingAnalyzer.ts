@@ -7,7 +7,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';
-import type { SymbolGraph, Symbol } from '../types/graph';
+import type { Symbol, SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
@@ -104,7 +104,7 @@ export class FeatureGroupingAnalyzer {
         const content = fs.readFileSync(file, 'utf-8');
         const sourceFile = ts.createSourceFile(file, content, ts.ScriptTarget.Latest, true);
         this.extractFeatureTagsFromFile(sourceFile, file, groups);
-      } catch (error) {
+      } catch (_error) {
         // Skip files that cause errors
       }
     }
@@ -141,7 +141,9 @@ export class FeatureGroupingAnalyzer {
                   if (featureName) {
                     const normalizedName = featureName.trim();
                     if (!groups.has(normalizedName)) {
-                      const line = sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
+                      const line =
+                        sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line +
+                        1;
                       groups.set(normalizedName, {
                         featureName: normalizedName,
                         members: [],
@@ -149,14 +151,14 @@ export class FeatureGroupingAnalyzer {
                         line,
                       });
                     }
-                    groups.get(normalizedName)!.members.push(symbol.id);
+                    groups.get(normalizedName)?.members.push(symbol.id);
                   }
                 }
               }
             }
           }
         }
-      } catch (error) {
+      } catch (_error) {
         // Skip nodes that cause errors
       }
 
@@ -173,9 +175,9 @@ export class FeatureGroupingAnalyzer {
    * @returns Array of feature groups
    * @private
    */
-  private detectFeatureDirectories(rootDir: string): FeatureGroup[] {
+  private detectFeatureDirectories(_rootDir: string): FeatureGroup[] {
     const groups: FeatureGroup[] = [];
-    const featurePattern = /features?[\/\\]([^\/\\]+)/i;
+    const featurePattern = /features?[/\\]([^/\\]+)/i;
 
     // Group symbols by feature directory
     const featureMap = new Map<string, string[]>();
@@ -187,7 +189,7 @@ export class FeatureGroupingAnalyzer {
         if (!featureMap.has(featureName)) {
           featureMap.set(featureName, []);
         }
-        featureMap.get(featureName)!.push(symbol.id);
+        featureMap.get(featureName)?.push(symbol.id);
       }
     }
 
@@ -241,8 +243,8 @@ export class FeatureGroupingAnalyzer {
               lineNumber: group.line,
               snippet: `@feature ${group.featureName}`,
               confidence: 0.8,
-              context: `Both symbols belong to feature: ${group.featureName}`
-            }
+              context: `Both symbols belong to feature: ${group.featureName}`,
+            },
           ],
           discoveredBy: 'documentation',
           confidence: 0.8,
@@ -254,7 +256,7 @@ export class FeatureGroupingAnalyzer {
           },
           createdAt: timestamp,
           updatedAt: timestamp,
-          description: `Feature ${group.featureName}: ${group.members[i]} ∈ ${group.members[j]}`
+          description: `Feature ${group.featureName}: ${group.members[i]} ∈ ${group.members[j]}`,
         });
       }
     }
@@ -303,9 +305,7 @@ export class FeatureGroupingAnalyzer {
       if (typeof tag.comment === 'string') return tag.comment;
       if (Array.isArray(tag.comment)) {
         return tag.comment
-          .map((part: ts.JSDocText | ts.JSDocLink) =>
-            'text' in part ? part.text : ''
-          )
+          .map((part: ts.JSDocText | ts.JSDocLink) => ('text' in part ? part.text : ''))
           .join('');
       }
     }

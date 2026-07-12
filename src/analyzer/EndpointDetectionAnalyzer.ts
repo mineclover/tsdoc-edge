@@ -9,15 +9,9 @@
  * @packageDocumentation
  */
 
-import * as ts from 'typescript';
 import * as path from 'node:path';
-import type {
-  HTTPEndpoint,
-  HTTPMethod,
-  EndpointScope,
-  DetectedEndpoint,
-  RoutePattern,
-} from '../types/endpoints';
+import * as ts from 'typescript';
+import type { DetectedEndpoint, EndpointScope, HTTPMethod } from '../types/endpoints';
 
 /**
  * Configuration for endpoint detection
@@ -36,10 +30,7 @@ export class EndpointDetectionAnalyzer {
   private program: ts.Program;
   private config: EndpointDetectionConfig;
 
-  constructor(
-    program: ts.Program,
-    config: Partial<EndpointDetectionConfig> = {},
-  ) {
+  constructor(program: ts.Program, config: Partial<EndpointDetectionConfig> = {}) {
     this.program = program;
     this.config = {
       frameworks: ['express', 'fastify', 'hono'],
@@ -78,7 +69,7 @@ export class EndpointDetectionAnalyzer {
         break;
     }
 
-    return endpoints.filter(e => e.confidence >= this.config.minConfidence);
+    return endpoints.filter((e) => e.confidence >= this.config.minConfidence);
   }
 
   /**
@@ -140,7 +131,7 @@ export class EndpointDetectionAnalyzer {
    */
   private parseExpressCall(
     node: ts.CallExpression,
-    sourceFile: ts.SourceFile,
+    sourceFile: ts.SourceFile
   ): DetectedEndpoint | null {
     // Check if it's a method call on app or router
     if (!ts.isPropertyAccessExpression(node.expression)) {
@@ -243,7 +234,7 @@ export class EndpointDetectionAnalyzer {
    */
   private parseFastifyCall(
     node: ts.CallExpression,
-    sourceFile: ts.SourceFile,
+    sourceFile: ts.SourceFile
   ): DetectedEndpoint | null {
     if (!ts.isPropertyAccessExpression(node.expression)) {
       return null;
@@ -289,9 +280,11 @@ export class EndpointDetectionAnalyzer {
       const optionsArg = args[1];
       if (ts.isObjectLiteralExpression(optionsArg)) {
         for (const prop of optionsArg.properties) {
-          if (ts.isPropertyAssignment(prop) &&
-              ts.isIdentifier(prop.name) &&
-              prop.name.text === 'schema') {
+          if (
+            ts.isPropertyAssignment(prop) &&
+            ts.isIdentifier(prop.name) &&
+            prop.name.text === 'schema'
+          ) {
             // Schema object - could extract request/response types
             // Simplified for now
           }
@@ -351,7 +344,7 @@ export class EndpointDetectionAnalyzer {
    */
   private parseHonoCall(
     node: ts.CallExpression,
-    sourceFile: ts.SourceFile,
+    sourceFile: ts.SourceFile
   ): DetectedEndpoint | null {
     if (!ts.isPropertyAccessExpression(node.expression)) {
       return null;
@@ -470,7 +463,7 @@ export class EndpointDetectionAnalyzer {
    */
   private extractHandlerSymbolId(
     handlerNode: ts.Expression,
-    sourceFile: ts.SourceFile,
+    sourceFile: ts.SourceFile
   ): string | null {
     // If it's an identifier, use its name
     if (ts.isIdentifier(handlerNode)) {
@@ -505,7 +498,7 @@ export class EndpointDetectionAnalyzer {
   private inferEndpointScope(
     routePath: string,
     sourceFile: ts.SourceFile,
-    node: ts.Node,
+    node: ts.Node
   ): EndpointScope {
     // Check path patterns
     if (routePath.startsWith('/api/admin') || routePath.includes('/admin/')) {

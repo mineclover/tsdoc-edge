@@ -4,6 +4,7 @@
  * @responsibility Manage document symbols and enforce SSOT
  */
 
+import { ConfigManager } from '../config/ConfigManager';
 import type {
   CodeConnection,
   DocSymbolError,
@@ -12,7 +13,6 @@ import type {
   DocumentSymbol,
   ParsedDocSymbols,
 } from '../types/feature';
-import { ConfigManager } from '../config/ConfigManager';
 
 /**
  * Registry for document symbols with SSOT enforcement

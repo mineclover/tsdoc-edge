@@ -3,9 +3,9 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import type { Symbol } from '../types/graph/graph';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Dead code detection result
@@ -108,7 +108,8 @@ export class DetectDeadCodeCommand extends BaseCommand {
       // Filter by confidence
       const filtered = deadCode.filter((dc) => {
         if (confidenceFilter === 'high') return dc.confidence === 'high';
-        if (confidenceFilter === 'medium') return dc.confidence === 'high' || dc.confidence === 'medium';
+        if (confidenceFilter === 'medium')
+          return dc.confidence === 'high' || dc.confidence === 'medium';
         return true; // all
       });
 
@@ -137,7 +138,7 @@ export class DetectDeadCodeCommand extends BaseCommand {
   private async getAllSymbols(): Promise<Symbol[]> {
     try {
       return await this.db.getAllSymbols();
-    } catch (error) {
+    } catch (_error) {
       return [];
     }
   }
@@ -282,7 +283,7 @@ export class DetectDeadCodeCommand extends BaseCommand {
   private async getIncomingCalls(symbolId: string): Promise<number> {
     try {
       return this.db.countIncomingCalls(symbolId);
-    } catch (error) {
+    } catch (_error) {
       return 0;
     }
   }
@@ -299,7 +300,7 @@ export class DetectDeadCodeCommand extends BaseCommand {
       // - inheritance: extends/implements
       // - type-dependency: type annotations
       return this.db.countIncomingReferences(symbolId);
-    } catch (error) {
+    } catch (_error) {
       return 0;
     }
   }
@@ -314,7 +315,7 @@ export class DetectDeadCodeCommand extends BaseCommand {
       if (callerFilePaths.length === 0) return false;
 
       return callerFilePaths.every((filePath) => this.isTestFile(filePath));
-    } catch (error) {
+    } catch (_error) {
       return false;
     }
   }
@@ -334,7 +335,9 @@ export class DetectDeadCodeCommand extends BaseCommand {
     this.printSection('Summary');
     console.log(`Total dead code candidates: ${colors.yellow}${deadCode.length}${colors.reset}`);
     console.log(`  High confidence: ${colors.red}${byConfidence.high.length}${colors.reset}`);
-    console.log(`  Medium confidence: ${colors.yellow}${byConfidence.medium.length}${colors.reset}`);
+    console.log(
+      `  Medium confidence: ${colors.yellow}${byConfidence.medium.length}${colors.reset}`
+    );
     console.log(`  Low confidence: ${colors.dim}${byConfidence.low.length}${colors.reset}`);
     console.log();
 
@@ -344,7 +347,9 @@ export class DetectDeadCodeCommand extends BaseCommand {
       const toShow = showAll ? byConfidence.high : byConfidence.high.slice(0, 20);
       for (const dc of toShow) {
         console.log(`  ${colors.red}✗${colors.reset} ${dc.symbol.name} (${dc.symbol.type})`);
-        console.log(`    ${colors.dim}${dc.symbol.filePath}:${dc.symbol.line || '?'}${colors.reset}`);
+        console.log(
+          `    ${colors.dim}${dc.symbol.filePath}:${dc.symbol.line || '?'}${colors.reset}`
+        );
         console.log(`    Reason: ${dc.reason}`);
         if (showAll) {
           dc.recommendations.forEach((rec) => {
@@ -355,7 +360,9 @@ export class DetectDeadCodeCommand extends BaseCommand {
       }
 
       if (!showAll && byConfidence.high.length > 20) {
-        console.log(`  ${colors.dim}... and ${byConfidence.high.length - 20} more (use --all to see all)${colors.reset}`);
+        console.log(
+          `  ${colors.dim}... and ${byConfidence.high.length - 20} more (use --all to see all)${colors.reset}`
+        );
         console.log();
       }
     }
@@ -372,7 +379,9 @@ export class DetectDeadCodeCommand extends BaseCommand {
       }
 
       if (!showAll && byConfidence.medium.length > 10) {
-        console.log(`  ${colors.dim}... and ${byConfidence.medium.length - 10} more (use --all)${colors.reset}`);
+        console.log(
+          `  ${colors.dim}... and ${byConfidence.medium.length - 10} more (use --all)${colors.reset}`
+        );
         console.log();
       }
     }

@@ -5,14 +5,7 @@
  * @responsibility Format ModuleSpecTemplate into markdown documents
  */
 
-import type {
-  ModuleSpecTemplate,
-  ParamSpec,
-  FailureCase,
-  DependencySpec,
-  ImportSpec,
-  SideEffectSpec,
-} from '../types/spec/module-spec';
+import type { ModuleSpecTemplate } from '../types/spec/module-spec';
 
 /**
  * Formatter options
@@ -155,7 +148,9 @@ export class ModuleSpecMarkdownFormatter {
       lines.push(`**Responsibility:**  \n${purpose.responsibility}`);
       lines.push('');
     } else if (this.options.includeTodos) {
-      lines.push('**Responsibility:**  \n> Add @responsibility tag to describe the main responsibility');
+      lines.push(
+        '**Responsibility:**  \n> Add @responsibility tag to describe the main responsibility'
+      );
       lines.push('');
     }
 
@@ -192,7 +187,9 @@ export class ModuleSpecMarkdownFormatter {
         const optional = param.optional ? 'Yes' : 'No';
         const defaultVal = param.defaultValue || '-';
         const desc = param.description || '-';
-        lines.push(`| \`${param.name}\` | \`${param.type}\` | ${optional} | \`${defaultVal}\` | ${desc} |`);
+        lines.push(
+          `| \`${param.name}\` | \`${param.type}\` | ${optional} | \`${defaultVal}\` | ${desc} |`
+        );
       }
       lines.push('');
     } else {

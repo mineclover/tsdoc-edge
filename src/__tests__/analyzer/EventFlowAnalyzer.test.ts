@@ -2,12 +2,12 @@
  * EventFlowAnalyzer Tests
  */
 
-import * as ts from 'typescript';
-import * as path from 'node:path';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import * as ts from 'typescript';
 import { EventFlowAnalyzer } from '../../analyzer/EventFlowAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships';
 
 describe('EventFlowAnalyzer', () => {
@@ -170,9 +170,7 @@ describe('EventFlowAnalyzer', () => {
       const result = analyzer.analyze();
 
       const eventFlowRel = result.find(
-        (r) =>
-          r.type === 'event-flow' &&
-          r.properties?.eventName === 'data-ready'
+        (r) => r.type === 'event-flow' && r.properties?.eventName === 'data-ready'
       );
 
       expect(eventFlowRel).toBeDefined();
@@ -203,9 +201,7 @@ describe('EventFlowAnalyzer', () => {
       const analyzer = new EventFlowAnalyzer(graph, program);
       const result = analyzer.analyze();
 
-      const eventFlowRel = result.find(
-        (r) => r.properties?.eventName === 'single-event'
-      );
+      const eventFlowRel = result.find((r) => r.properties?.eventName === 'single-event');
 
       expect(eventFlowRel).toBeDefined();
     });
@@ -233,9 +229,7 @@ describe('EventFlowAnalyzer', () => {
       const analyzer = new EventFlowAnalyzer(graph, program);
       const result = analyzer.analyze();
 
-      const eventFlowRel = result.find(
-        (r) => r.properties?.eventName === 'my-event'
-      );
+      const eventFlowRel = result.find((r) => r.properties?.eventName === 'my-event');
 
       expect(eventFlowRel).toBeDefined();
     });
@@ -267,8 +261,7 @@ describe('EventFlowAnalyzer', () => {
 
       const eventFlowRel = result.find(
         (r) =>
-          r.properties?.eventName === 'click' &&
-          r.properties?.producerPattern === 'dispatchEvent'
+          r.properties?.eventName === 'click' && r.properties?.producerPattern === 'dispatchEvent'
       );
 
       expect(eventFlowRel).toBeDefined();
@@ -300,9 +293,7 @@ describe('EventFlowAnalyzer', () => {
       const analyzer = new EventFlowAnalyzer(graph, program);
       const result = analyzer.analyze();
 
-      const eventFlowRel = result.find(
-        (r) => r.properties?.eventName === 'message'
-      );
+      const eventFlowRel = result.find((r) => r.properties?.eventName === 'message');
 
       expect(eventFlowRel).toBeDefined();
     });
@@ -330,9 +321,7 @@ describe('EventFlowAnalyzer', () => {
       const analyzer = new EventFlowAnalyzer(graph, program);
       const result = analyzer.analyze();
 
-      const eventFlowRel = result.find(
-        (r) => r.properties?.eventName === 'notification'
-      );
+      const eventFlowRel = result.find((r) => r.properties?.eventName === 'notification');
 
       expect(eventFlowRel).toBeDefined();
     });
@@ -361,9 +350,7 @@ describe('EventFlowAnalyzer', () => {
       const result = analyzer.analyze();
 
       // Self-references should be filtered out
-      const selfRef = result.find(
-        (r) => r.from === r.to
-      );
+      const selfRef = result.find((r) => r.from === r.to);
 
       expect(selfRef).toBeUndefined();
     });
@@ -424,9 +411,7 @@ describe('EventFlowAnalyzer', () => {
       const analyzer = new EventFlowAnalyzer(graph, program);
       const result = analyzer.analyze();
 
-      const broadcastRels = result.filter(
-        (r) => r.properties?.eventName === 'broadcast'
-      );
+      const broadcastRels = result.filter((r) => r.properties?.eventName === 'broadcast');
 
       expect(broadcastRels.length).toBe(2);
     });
@@ -460,9 +445,7 @@ describe('EventFlowAnalyzer', () => {
       const analyzer = new EventFlowAnalyzer(graph, program);
       const result = analyzer.analyze();
 
-      const sharedEventRels = result.filter(
-        (r) => r.properties?.eventName === 'shared-event'
-      );
+      const sharedEventRels = result.filter((r) => r.properties?.eventName === 'shared-event');
 
       expect(sharedEventRels.length).toBe(2);
     });
@@ -492,9 +475,7 @@ describe('EventFlowAnalyzer', () => {
       const analyzer = new EventFlowAnalyzer(graph, program);
       const result = analyzer.analyze();
 
-      const eventRel = result.find(
-        (r) => r.properties?.eventName === 'double-quoted-event'
-      );
+      const eventRel = result.find((r) => r.properties?.eventName === 'double-quoted-event');
 
       expect(eventRel).toBeDefined();
     });
@@ -525,9 +506,7 @@ describe('EventFlowAnalyzer', () => {
       const result = analyzer.analyze();
 
       // Identifier event names are captured as the identifier text
-      const eventRel = result.find(
-        (r) => r.properties?.eventName === 'EVENT_NAME'
-      );
+      const eventRel = result.find((r) => r.properties?.eventName === 'EVENT_NAME');
 
       expect(eventRel).toBeDefined();
     });
@@ -586,9 +565,7 @@ describe('EventFlowAnalyzer', () => {
 
       // The class context detection works when the enclosing class name is found in the graph
       // If MyClass is found, it will match with mylistener's on('class-event')
-      const classEventRel = result.find(
-        (r) => r.properties?.eventName === 'class-event'
-      );
+      const classEventRel = result.find((r) => r.properties?.eventName === 'class-event');
 
       // This tests that at minimum the analyzer doesn't crash on this.emit patterns
       // The actual matching depends on whether the graph contains the class
@@ -851,7 +828,7 @@ describe('EventFlowAnalyzer', () => {
     });
 
     it('should handle symbols not in graph', () => {
-      const unknownFile = path.join(tempDir, 'unknown.ts');
+      const _unknownFile = path.join(tempDir, 'unknown.ts');
 
       const graph = createMockGraph([]); // Empty graph
 

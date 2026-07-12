@@ -80,9 +80,10 @@ describe('RelationshipInferenceEngine', () => {
       const result = engine.infer(existing);
 
       // Should not infer User-Order relationship
-      const crossDomain = result.filter(r =>
-        (r.from === 'UserService' && r.to === 'OrderService') ||
-        (r.from === 'OrderService' && r.to === 'UserService')
+      const crossDomain = result.filter(
+        (r) =>
+          (r.from === 'UserService' && r.to === 'OrderService') ||
+          (r.from === 'OrderService' && r.to === 'UserService')
       );
       expect(crossDomain.length).toBe(0);
     });
@@ -118,8 +119,9 @@ describe('RelationshipInferenceEngine', () => {
       // Inferred relationships should not duplicate existing ones
       for (const inferred of result) {
         const exists = existing.some(
-          e => (e.from === inferred.from && e.to === inferred.to) ||
-               (e.from === inferred.to && e.to === inferred.from)
+          (e) =>
+            (e.from === inferred.from && e.to === inferred.to) ||
+            (e.from === inferred.to && e.to === inferred.from)
         );
         expect(exists).toBe(false);
       }

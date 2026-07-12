@@ -17,7 +17,7 @@
  */
 
 import * as ts from 'typescript';
-import type { SymbolGraph, Symbol } from '../types/graph';
+import type { Symbol, SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships';
 
 /**
@@ -183,13 +183,12 @@ export class CallGraphAnalyzer {
     const callSites: CallSite[] = [];
 
     // Extract all call sites
-    for (const [symbolId, symbol] of this.graph.symbols.entries()) {
+    for (const [_symbolId, symbol] of this.graph.symbols.entries()) {
       if (symbol.type === 'function' || symbol.type === 'method') {
         const sites = this.extractCallSites(symbol);
         callSites.push(...sites);
       }
     }
-
 
     // Build call frequency map
     const callFrequency = new Map<string, number>();
@@ -259,7 +258,7 @@ export class CallGraphAnalyzer {
    */
   private findSymbolNode(sourceFile: ts.SourceFile, symbol: Symbol): ts.Node | null {
     let foundNode: ts.Node | null = null;
-    let candidatesByName: ts.Node[] = [];
+    const candidatesByName: ts.Node[] = [];
 
     // Extract method name from "ClassName.methodName" format
     const symbolMethodName = symbol.name.includes('.')
@@ -294,7 +293,7 @@ export class CallGraphAnalyzer {
                 // Any name match is a candidate
                 candidatesByName.push(node);
               }
-            } catch (error) {
+            } catch (_error) {
               // Skip problematic nodes
             }
           }
@@ -302,7 +301,7 @@ export class CallGraphAnalyzer {
 
         // Recursively visit children (important for class members!)
         node.forEachChild(visitor);
-      } catch (error) {
+      } catch (_error) {
         // Skip problematic nodes
       }
     };
@@ -358,9 +357,9 @@ export class CallGraphAnalyzer {
         objectName: targetInfo.objectName,
         filePath: caller.filePath,
         line: pos.line + 1,
-        callType: targetInfo.callType
+        callType: targetInfo.callType,
       };
-    } catch (error) {
+    } catch (_error) {
       // Silently skip problematic call sites
       return null;
     }
@@ -369,7 +368,11 @@ export class CallGraphAnalyzer {
   /**
    * Extract target name from call expression
    */
-  private extractTargetName(node: ts.CallExpression): { name: string; callType: 'direct' | 'method' | 'constructor' | 'unknown'; objectName?: string } | null {
+  private extractTargetName(node: ts.CallExpression): {
+    name: string;
+    callType: 'direct' | 'method' | 'constructor' | 'unknown';
+    objectName?: string;
+  } | null {
     try {
       if (ts.isIdentifier(node.expression)) {
         // Direct call: foo()
@@ -382,12 +385,14 @@ export class CallGraphAnalyzer {
 
         return {
           name,
-          callType: 'direct'
+          callType: 'direct',
         };
       } else if (ts.isPropertyAccessExpression(node.expression)) {
         // Method call: obj.method()
         const methodName = ts.isIdentifier(node.expression.name) ? node.expression.name.text : null;
-        const objectName = ts.isIdentifier(node.expression.expression) ? node.expression.expression.text : null;
+        const objectName = ts.isIdentifier(node.expression.expression)
+          ? node.expression.expression.text
+          : null;
 
         if (!methodName) return null;
 
@@ -399,10 +404,10 @@ export class CallGraphAnalyzer {
         return {
           name: methodName,
           callType: 'method',
-          objectName: objectName || undefined
+          objectName: objectName || undefined,
         };
       }
-    } catch (error) {
+    } catch (_error) {
       // Skip problematic expressions
     }
 
@@ -414,10 +419,22 @@ export class CallGraphAnalyzer {
    */
   private isBuiltInGlobal(name: string): boolean {
     const builtins = [
-      'require', 'import', 'export',
-      'parseInt', 'parseFloat', 'isNaN', 'isFinite',
-      'encodeURI', 'decodeURI', 'encodeURIComponent', 'decodeURIComponent',
-      'eval', 'setTimeout', 'setInterval', 'clearTimeout', 'clearInterval'
+      'require',
+      'import',
+      'export',
+      'parseInt',
+      'parseFloat',
+      'isNaN',
+      'isFinite',
+      'encodeURI',
+      'decodeURI',
+      'encodeURIComponent',
+      'decodeURIComponent',
+      'eval',
+      'setTimeout',
+      'setInterval',
+      'clearTimeout',
+      'clearInterval',
     ];
     return builtins.includes(name);
   }
@@ -427,12 +444,34 @@ export class CallGraphAnalyzer {
    */
   private isBuiltInObject(name: string): boolean {
     const builtins = [
-      'Object', 'Array', 'String', 'Number', 'Boolean', 'Date', 'RegExp',
-      'Math', 'JSON', 'Promise', 'Set', 'Map', 'WeakSet', 'WeakMap',
-      'Symbol', 'Proxy', 'Reflect',
-      'console', 'process', 'Buffer',
-      'Error', 'TypeError', 'ReferenceError', 'SyntaxError',
-      'Intl', 'globalThis', 'window', 'document'
+      'Object',
+      'Array',
+      'String',
+      'Number',
+      'Boolean',
+      'Date',
+      'RegExp',
+      'Math',
+      'JSON',
+      'Promise',
+      'Set',
+      'Map',
+      'WeakSet',
+      'WeakMap',
+      'Symbol',
+      'Proxy',
+      'Reflect',
+      'console',
+      'process',
+      'Buffer',
+      'Error',
+      'TypeError',
+      'ReferenceError',
+      'SyntaxError',
+      'Intl',
+      'globalThis',
+      'window',
+      'document',
     ];
     return builtins.includes(name);
   }
@@ -440,7 +479,11 @@ export class CallGraphAnalyzer {
   /**
    * Resolve call target to a symbol using indexed lookups (O(1) instead of O(n))
    */
-  private resolveCallTarget(targetName: string, callerFilePath: string, objectName?: string): Symbol | undefined {
+  private resolveCallTarget(
+    targetName: string,
+    callerFilePath: string,
+    objectName?: string
+  ): Symbol | undefined {
     const normalizedPath = callerFilePath.replace(/\\/g, '/');
 
     // 1. Check symbols in the same file first (highest priority)
@@ -449,16 +492,16 @@ export class CallGraphAnalyzer {
       // For methods, try to match ClassName.methodName
       if (objectName) {
         const fullName = `${objectName}.${targetName}`;
-        const match = fileSymbols.find(s => s.name === fullName);
+        const match = fileSymbols.find((s) => s.name === fullName);
         if (match) return match;
       }
 
       // Direct name match in same file
-      const directMatch = fileSymbols.find(s => s.name === targetName);
+      const directMatch = fileSymbols.find((s) => s.name === targetName);
       if (directMatch) return directMatch;
 
       // Method name without class prefix
-      const methodMatch = fileSymbols.find(s => s.name.endsWith(`.${targetName}`));
+      const methodMatch = fileSymbols.find((s) => s.name.endsWith(`.${targetName}`));
       if (methodMatch) return methodMatch;
     }
 
@@ -521,14 +564,16 @@ export class CallGraphAnalyzer {
       to: targetSymbol.id,
       direction: 'unidirectional',
       strength,
-      evidence: [{
-        type: 'code',
-        source: site.filePath,
-        lineNumber: site.line,
-        snippet: `${site.callerName}() calls ${targetSymbol.name}()`,
-        confidence,
-        context: `Call type: ${site.callType}, Frequency: ${frequency}`
-      }],
+      evidence: [
+        {
+          type: 'code',
+          source: site.filePath,
+          lineNumber: site.line,
+          snippet: `${site.callerName}() calls ${targetSymbol.name}()`,
+          confidence,
+          context: `Call type: ${site.callType}, Frequency: ${frequency}`,
+        },
+      ],
       discoveredBy: 'static-analysis',
       confidence,
       filePath: site.filePath,
@@ -537,11 +582,11 @@ export class CallGraphAnalyzer {
         callType: site.callType,
         frequency,
         targetName: targetSymbol.name,
-        callerName: site.callerName
+        callerName: site.callerName,
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      description: `${site.callerName} calls ${targetSymbol.name} (${frequency}x)`
+      description: `${site.callerName} calls ${targetSymbol.name} (${frequency}x)`,
     };
   }
 
@@ -551,7 +596,7 @@ export class CallGraphAnalyzer {
   private calculateConfidence(
     site: CallSite,
     targetSymbol: Symbol,
-    callerSymbol?: Symbol
+    _callerSymbol?: Symbol
   ): number {
     let confidence = 0.9; // Base confidence (direct AST analysis)
 
@@ -637,7 +682,7 @@ export class CallGraphAnalyzer {
       uniqueCallers: callers.size,
       uniqueCallees: callees.size,
       avgCallsPerFunction: callers.size > 0 ? relationships.length / callers.size : 0,
-      mostCalledFunctions: mostCalled
+      mostCalledFunctions: mostCalled,
     };
   }
 }

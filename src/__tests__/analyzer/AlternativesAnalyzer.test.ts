@@ -2,12 +2,12 @@
  * AlternativesAnalyzer Tests
  */
 
-import * as ts from 'typescript';
-import * as path from 'node:path';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import * as ts from 'typescript';
 import { AlternativesAnalyzer } from '../../analyzer/AlternativesAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships';
 
 describe('AlternativesAnalyzer', () => {
@@ -24,9 +24,7 @@ describe('AlternativesAnalyzer', () => {
   });
 
   // Helper to create mock graph
-  function createMockGraph(
-    symbols: Array<{ id: string; name: string }>
-  ): SymbolGraph {
+  function createMockGraph(symbols: Array<{ id: string; name: string }>): SymbolGraph {
     const symbolsMap = new Map<string, Symbol>();
     const nameIndex = new Map<string, string[]>();
 
@@ -160,9 +158,7 @@ describe('AlternativesAnalyzer', () => {
     });
 
     it('should not detect substitution for single implementation', () => {
-      const graph = createMockGraph([
-        { id: 'class-single', name: 'SingleImpl' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-single', name: 'SingleImpl' }]);
 
       const program = createProgram({
         'IService.ts': `
@@ -245,10 +241,7 @@ describe('AlternativesAnalyzer', () => {
       const result = analyzer.analyze();
 
       const fallback = result.find(
-        (r) =>
-          r.type === 'fallback' &&
-          r.from === 'func-primary' &&
-          r.to === 'func-fallback'
+        (r) => r.type === 'fallback' && r.from === 'func-primary' && r.to === 'func-fallback'
       );
 
       expect(fallback).toBeDefined();
@@ -275,10 +268,7 @@ describe('AlternativesAnalyzer', () => {
       const result = analyzer.analyze();
 
       const fallback = result.find(
-        (r) =>
-          r.type === 'fallback' &&
-          r.from === 'var-primary' &&
-          r.to === 'var-fallback'
+        (r) => r.type === 'fallback' && r.from === 'var-primary' && r.to === 'var-fallback'
       );
 
       expect(fallback).toBeDefined();
@@ -304,10 +294,7 @@ describe('AlternativesAnalyzer', () => {
       const result = analyzer.analyze();
 
       const fallback = result.find(
-        (r) =>
-          r.type === 'fallback' &&
-          r.from === 'var-first' &&
-          r.to === 'var-second'
+        (r) => r.type === 'fallback' && r.from === 'var-first' && r.to === 'var-second'
       );
 
       expect(fallback).toBeDefined();
@@ -340,10 +327,7 @@ describe('AlternativesAnalyzer', () => {
       const result = analyzer.analyze();
 
       const fallback = result.find(
-        (r) =>
-          r.type === 'fallback' &&
-          r.from === 'func-option-a' &&
-          r.to === 'func-option-b'
+        (r) => r.type === 'fallback' && r.from === 'func-option-a' && r.to === 'func-option-b'
       );
 
       expect(fallback).toBeDefined();
@@ -352,9 +336,7 @@ describe('AlternativesAnalyzer', () => {
     });
 
     it('should not detect fallback when same symbol used in both branches', () => {
-      const graph = createMockGraph([
-        { id: 'func-same', name: 'sameMethod' },
-      ]);
+      const graph = createMockGraph([{ id: 'func-same', name: 'sameMethod' }]);
 
       const program = createProgram({
         'same.ts': `
@@ -516,7 +498,7 @@ describe('AlternativesAnalyzer', () => {
       expect(stats.fallbacks).toBe(3);
       expect(stats.byPattern['try-catch']).toBe(1);
       expect(stats.byPattern['null-coalescing']).toBe(1);
-      expect(stats.byPattern['conditional']).toBe(1);
+      expect(stats.byPattern.conditional).toBe(1);
     });
 
     it('should calculate statistics correctly for mixed relationships', () => {

@@ -4,9 +4,9 @@
  */
 
 import Database from 'better-sqlite3';
-import { BaseCommand, type CommandResult } from './BaseCommand';
-import { XmlBuilder } from '../output/XmlBuilder';
 import { LayersSchema } from '../output/schemas';
+import { XmlBuilder } from '../output/XmlBuilder';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 export class LayersCommand extends BaseCommand {
   getName(): string {
@@ -51,15 +51,22 @@ export class LayersCommand extends BaseCommand {
         ORDER BY deps DESC
       `;
 
-      const results = db.prepare(query).all() as Array<{ from_pkg: string; to_pkg: string; deps: number }>;
+      const results = db.prepare(query).all() as Array<{
+        from_pkg: string;
+        to_pkg: string;
+        deps: number;
+      }>;
 
       if (useXml) {
         new XmlBuilder(LayersSchema)
-          .section('dependencies', results.map(row => ({
-            from: row.from_pkg,
-            to: row.to_pkg,
-            count: row.deps,
-          })))
+          .section(
+            'dependencies',
+            results.map((row) => ({
+              from: row.from_pkg,
+              to: row.to_pkg,
+              count: row.deps,
+            }))
+          )
           .print();
       } else {
         console.log('\nPackage Dependencies:\n');

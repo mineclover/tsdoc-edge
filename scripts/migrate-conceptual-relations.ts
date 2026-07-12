@@ -26,7 +26,7 @@ function migrateConceptualRelations(dryRun: boolean = true): MigrationResult {
   const db = new DatabaseManager('.tsdoc/symbols.db', '.tsdoc');
 
   console.log('🔄 Conceptual Relation Migration\n');
-  console.log('=' .repeat(80));
+  console.log('='.repeat(80));
   console.log(`Mode: ${dryRun ? '🔍 DRY RUN (no changes)' : '✏️  LIVE MIGRATION'}\n`);
 
   const result: MigrationResult = {
@@ -46,7 +46,7 @@ function migrateConceptualRelations(dryRun: boolean = true): MigrationResult {
     WHERE type = 'conceptual-relation'
   `;
 
-  const relations = db['db'].prepare(query).all() as Array<{
+  const relations = db.db.prepare(query).all() as Array<{
     id: string;
     category: string;
     from_symbols: string;
@@ -120,7 +120,7 @@ function migrateConceptualRelations(dryRun: boolean = true): MigrationResult {
         });
 
         // Delete old conceptual-relation entry
-        const deleteStmt = db['db'].prepare(`
+        const deleteStmt = db.db.prepare(`
           DELETE FROM unified_relationships
           WHERE id = ?
         `);
@@ -130,9 +130,10 @@ function migrateConceptualRelations(dryRun: boolean = true): MigrationResult {
 
       // Log progress every 100 entries
       if ((result.migrated.docReference + result.migrated.explicitSemantic) % 100 === 0) {
-        console.log(`  Processed ${result.migrated.docReference + result.migrated.explicitSemantic}/${relations.length}...`);
+        console.log(
+          `  Processed ${result.migrated.docReference + result.migrated.explicitSemantic}/${relations.length}...`
+        );
       }
-
     } catch (error) {
       const errorMsg = `Failed to migrate ${rel.id}: ${error instanceof Error ? error.message : String(error)}`;
       result.errors.push(errorMsg);
@@ -140,11 +141,15 @@ function migrateConceptualRelations(dryRun: boolean = true): MigrationResult {
     }
   }
 
-  console.log('\n' + '='.repeat(80));
+  console.log(`\n${'='.repeat(80)}`);
   console.log('\n📊 Migration Results:\n');
   console.log(`  Total entries:              ${result.total}`);
-  console.log(`  → doc-reference:            ${result.migrated.docReference} (${((result.migrated.docReference / result.total) * 100).toFixed(1)}%)`);
-  console.log(`  → explicit-semantic:        ${result.migrated.explicitSemantic} (${((result.migrated.explicitSemantic / result.total) * 100).toFixed(1)}%)`);
+  console.log(
+    `  → doc-reference:            ${result.migrated.docReference} (${((result.migrated.docReference / result.total) * 100).toFixed(1)}%)`
+  );
+  console.log(
+    `  → explicit-semantic:        ${result.migrated.explicitSemantic} (${((result.migrated.explicitSemantic / result.total) * 100).toFixed(1)}%)`
+  );
   console.log(`  Deleted (old entries):      ${result.deleted}`);
   console.log(`  Errors:                     ${result.errors.length}`);
 
@@ -165,10 +170,12 @@ function migrateConceptualRelations(dryRun: boolean = true): MigrationResult {
     console.log('\n✅ Migration complete!');
     console.log('\n   Next steps:');
     console.log('   1. Rebuild database: tsdoc-edge build src --force');
-    console.log('   2. Verify relationships: npx ts-node scripts/analyze-inferred-relationships.ts');
+    console.log(
+      '   2. Verify relationships: npx ts-node scripts/analyze-inferred-relationships.ts'
+    );
   }
 
-  console.log('\n' + '='.repeat(80));
+  console.log(`\n${'='.repeat(80)}`);
 
   db.close();
 

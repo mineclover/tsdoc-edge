@@ -5,8 +5,8 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { UnusedDocumentDetector } from '../spec/UnusedDocumentDetector';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for finding unused documents
@@ -117,7 +117,9 @@ export class FindUnusedDocsCommand extends BaseCommand {
         return this.success();
       }
 
-      console.log(`Average days since modified: ${colors.cyan}${summary.averageDaysSinceModified}${colors.reset}`);
+      console.log(
+        `Average days since modified: ${colors.cyan}${summary.averageDaysSinceModified}${colors.reset}`
+      );
       console.log();
 
       console.log(`${colors.bold}By Reason:${colors.reset}`);
@@ -149,11 +151,15 @@ export class FindUnusedDocsCommand extends BaseCommand {
       // Print delete suggestions
       if (byAction.delete.length > 0) {
         this.printSection('Suggested: Delete');
-        console.log(`${colors.dim}These documents are stale drafts with no references${colors.reset}`);
+        console.log(
+          `${colors.dim}These documents are stale drafts with no references${colors.reset}`
+        );
         console.log();
         for (const result of byAction.delete.slice(0, 10)) {
           console.log(`${colors.red}🗑${colors.reset}  ${result.filePath}`);
-          console.log(`   ${colors.dim}${result.reason} (${result.daysSinceModified} days old)${colors.reset}`);
+          console.log(
+            `   ${colors.dim}${result.reason} (${result.daysSinceModified} days old)${colors.reset}`
+          );
           console.log();
         }
         if (byAction.delete.length > 10) {
@@ -169,7 +175,9 @@ export class FindUnusedDocsCommand extends BaseCommand {
         console.log();
         for (const result of byAction.archive.slice(0, 10)) {
           console.log(`${colors.yellow}📦${colors.reset} ${result.filePath}`);
-          console.log(`   ${colors.dim}${result.reason} (${result.daysSinceModified} days old)${colors.reset}`);
+          console.log(
+            `   ${colors.dim}${result.reason} (${result.daysSinceModified} days old)${colors.reset}`
+          );
           console.log();
         }
         if (byAction.archive.length > 10) {

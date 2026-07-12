@@ -2,13 +2,12 @@
  * EntryPointContextAggregator Tests
  */
 
-import * as path from 'node:path';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
-import { EntryPointContextAggregator, UnifiedContext } from '../../analyzer/EntryPointContextAggregator';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import { EntryPointContextAggregator } from '../../analyzer/EntryPointContextAggregator';
 import { DatabaseManager } from '../../storage/DatabaseManager';
 import type { Symbol } from '../../types/graph';
-import type { UnifiedRelationship } from '../../types/relationships/unified';
 
 describe('EntryPointContextAggregator', () => {
   let tempDir: string;

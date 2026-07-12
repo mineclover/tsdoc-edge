@@ -5,11 +5,11 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import { DocumentSymbolRegistry } from '../doc-symbol/DocumentSymbolRegistry';
 import { TSDocSymbolParser } from '../doc-symbol/TSDocSymbolParser';
 import type { CodeConnection } from '../types/feature';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for indexing document symbols
@@ -150,7 +150,7 @@ export class IndexDocsCommand extends BaseCommand {
           registry.import(indexData.registryData);
           this.printInfo('Loaded existing index');
         }
-      } catch (error) {
+      } catch (_error) {
         this.printWarning('Could not load existing index, creating new one');
       }
     }

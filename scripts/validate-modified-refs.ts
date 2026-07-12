@@ -60,7 +60,7 @@ function extractSymbolRefs(content: string): SymbolRef[] {
 
 const db = new DatabaseManager();
 const allSymbols = db.getAllSymbols();
-const symbolsByName = new Map(allSymbols.map(s => [s.name, s]));
+const symbolsByName = new Map(allSymbols.map((s) => [s.name, s]));
 
 console.log('\n=== Validating Modified Type Documentation Files ===\n');
 console.log(`Database contains ${allSymbols.length} symbols\n`);
@@ -92,7 +92,9 @@ for (const file of modifiedFiles) {
           codeType = 'impl';
         }
 
-        console.log(`✓ ${ref.symbol} (${symbol.type}, ${codeType}) - ${symbol.filePath}:${symbol.line}`);
+        console.log(
+          `✓ ${ref.symbol} (${symbol.type}, ${codeType}) - ${symbol.filePath}:${symbol.line}`
+        );
       } else {
         missingRefs++;
         issues.push({ file, symbol: ref.symbol, line: ref.line });

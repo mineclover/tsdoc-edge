@@ -52,7 +52,9 @@ if (packageJson.bin) {
     entryPointFiles.add(packageJson.bin.replace(/^dist\//, 'src/').replace(/\.js$/, '.ts'));
   } else {
     for (const binPath of Object.values(packageJson.bin)) {
-      entryPointFiles.add((binPath as string).replace(/^\.\/dist\//, 'src/').replace(/\.js$/, '.ts'));
+      entryPointFiles.add(
+        (binPath as string).replace(/^\.\/dist\//, 'src/').replace(/\.js$/, '.ts')
+      );
     }
   }
 }
@@ -98,11 +100,13 @@ console.log();
 
 // Find files that are never imported
 const importedFiles = new Set<string>();
-const dependencies = dbManager.db.prepare(`
+const dependencies = dbManager.db
+  .prepare(`
   SELECT DISTINCT s.file_path
   FROM symbols s
   JOIN dependencies d ON s.id = d.target
-`).all() as Array<{ file_path: string }>;
+`)
+  .all() as Array<{ file_path: string }>;
 
 for (const dep of dependencies) {
   importedFiles.add(dep.file_path);
@@ -203,7 +207,12 @@ if (orphanCategories.typeOnlyFiles.length === 0) {
   for (const file of orphanCategories.typeOnlyFiles) {
     const symbols = fileSymbols.get(file) || [];
     console.log(`   📄 ${file}`);
-    console.log(`      Types: ${symbols.map((s) => s.name).slice(0, 3).join(', ')}${symbols.length > 3 ? '...' : ''}`);
+    console.log(
+      `      Types: ${symbols
+        .map((s) => s.name)
+        .slice(0, 3)
+        .join(', ')}${symbols.length > 3 ? '...' : ''}`
+    );
   }
 }
 console.log();
@@ -259,9 +268,9 @@ const usedFiles = orphanCategories.entryPoints.length + orphanCategories.reachab
 const coveragePercentage = ((usedFiles / fileSymbols.size) * 100).toFixed(1);
 console.log(`   Entry Point Coverage: ${coveragePercentage}%`);
 
-const orphanPercentage = (
-  (orphanCategories.trueOrphans.length / fileSymbols.size) * 100
-).toFixed(1);
+const orphanPercentage = ((orphanCategories.trueOrphans.length / fileSymbols.size) * 100).toFixed(
+  1
+);
 console.log(`   True Orphan Rate: ${orphanPercentage}%`);
 
 dbManager.close();

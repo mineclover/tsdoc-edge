@@ -3,17 +3,21 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { IntegrationCoverageCalculator } from '../analyzer/IntegrationCoverageCalculator';
+import { TestRelationshipExtractor } from '../analyzer/TestRelationshipExtractor';
+import { ConfigManager } from '../config/ConfigManager';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { DatabaseManager } from '../storage/DatabaseManager';
-import { ConfigManager } from '../config/ConfigManager';
-import { TestRelationshipExtractor } from '../analyzer/TestRelationshipExtractor';
-import { IntegrationCoverageCalculator } from '../analyzer/IntegrationCoverageCalculator';
-import type { VerifiedRelationship, TestRelationshipAnalysis, RelationshipCoverage } from '../types/analysis/test-relationships';
-import type { SymbolType, SymbolGraph } from '../types/graph';
+import type {
+  RelationshipCoverage,
+  TestRelationshipAnalysis,
+  VerifiedRelationship,
+} from '../types/analysis/test-relationships';
+import type { SymbolGraph, SymbolType } from '../types/graph';
 import type { SymbolRelationship } from '../types/tags';
-import * as path from 'node:path';
-import * as fs from 'node:fs';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /**
  * Test Relationships Command
@@ -117,7 +121,9 @@ export class TestRelationshipsCommand extends BaseCommand {
       const graph = graphBuilder.getGraph();
       dbManager.close();
 
-      this.printSuccess(`Graph loaded: ${graph.symbols.size} symbols, ${graph.relationships.length} relationships`);
+      this.printSuccess(
+        `Graph loaded: ${graph.symbols.size} symbols, ${graph.relationships.length} relationships`
+      );
       console.log();
 
       // Find test files
@@ -141,10 +147,7 @@ export class TestRelationshipsCommand extends BaseCommand {
             testFilesWithIntegrations++;
             allVerified.push(...relationships);
           }
-        } catch (error) {
-          // Skip files that fail to parse
-          continue;
-        }
+        } catch (_error) {}
       }
 
       this.printSuccess(`Extracted ${allVerified.length} verified relationships`);
@@ -214,8 +217,12 @@ export class TestRelationshipsCommand extends BaseCommand {
           if (entry.name === 'node_modules') continue;
           findTestFilesRecursive(fullPath);
         } else if (entry.isFile()) {
-          if (entry.name.endsWith('.test.ts') || entry.name.endsWith('.spec.ts') ||
-              entry.name.endsWith('.test.tsx') || entry.name.endsWith('.spec.tsx')) {
+          if (
+            entry.name.endsWith('.test.ts') ||
+            entry.name.endsWith('.spec.ts') ||
+            entry.name.endsWith('.test.tsx') ||
+            entry.name.endsWith('.spec.tsx')
+          ) {
             testFiles.push(fullPath);
           }
         }
@@ -241,15 +248,25 @@ export class TestRelationshipsCommand extends BaseCommand {
     console.log(`  Test Files with Integrations: ${analysis.testFilesWithIntegrations}`);
     console.log();
     console.log(`  Total Relationships:       ${coverage.totalRelationships}`);
-    console.log(`  ${this.colors.green}✓ Verified:${this.colors.reset}                ${coverage.verifiedRelationships}  (${coverage.coveragePercentage.toFixed(1)}%)`);
-    console.log(`  ${this.colors.red}✗ Unverified:${this.colors.reset}              ${coverage.unverifiedRelationships.length}  (${(100 - coverage.coveragePercentage).toFixed(1)}%)`);
+    console.log(
+      `  ${this.colors.green}✓ Verified:${this.colors.reset}                ${coverage.verifiedRelationships}  (${coverage.coveragePercentage.toFixed(1)}%)`
+    );
+    console.log(
+      `  ${this.colors.red}✗ Unverified:${this.colors.reset}              ${coverage.unverifiedRelationships.length}  (${(100 - coverage.coveragePercentage).toFixed(1)}%)`
+    );
     console.log();
 
     // Verification breakdown
     this.printSection('Verification Breakdown');
-    console.log(`  ${this.colors.green}Strong (actual usage):${this.colors.reset}    ${coverage.byStrength.strong}  (${((coverage.byStrength.strong / coverage.verifiedRelationships) * 100).toFixed(1)}%)`);
-    console.log(`  ${this.colors.yellow}Medium (co-usage):${this.colors.reset}        ${coverage.byStrength.medium}  (${((coverage.byStrength.medium / coverage.verifiedRelationships) * 100).toFixed(1)}%)`);
-    console.log(`  ${this.colors.dim}Weak (import only):${this.colors.reset}       ${coverage.byStrength.weak}  (${((coverage.byStrength.weak / coverage.verifiedRelationships) * 100).toFixed(1)}%)`);
+    console.log(
+      `  ${this.colors.green}Strong (actual usage):${this.colors.reset}    ${coverage.byStrength.strong}  (${((coverage.byStrength.strong / coverage.verifiedRelationships) * 100).toFixed(1)}%)`
+    );
+    console.log(
+      `  ${this.colors.yellow}Medium (co-usage):${this.colors.reset}        ${coverage.byStrength.medium}  (${((coverage.byStrength.medium / coverage.verifiedRelationships) * 100).toFixed(1)}%)`
+    );
+    console.log(
+      `  ${this.colors.dim}Weak (import only):${this.colors.reset}       ${coverage.byStrength.weak}  (${((coverage.byStrength.weak / coverage.verifiedRelationships) * 100).toFixed(1)}%)`
+    );
     console.log();
 
     // Top unverified
@@ -258,10 +275,14 @@ export class TestRelationshipsCommand extends BaseCommand {
 
       for (let i = 0; i < topUnverified.length; i++) {
         const ur = topUnverified[i];
-        console.log(`  ${this.colors.red}${i + 1}. ${ur.sourceName} → ${ur.targetName}${this.colors.reset}`);
+        console.log(
+          `  ${this.colors.red}${i + 1}. ${ur.sourceName} → ${ur.targetName}${this.colors.reset}`
+        );
         console.log(`     Reason: ${this.colors.yellow}${ur.reason}${this.colors.reset}`);
         if (ur.suggestion) {
-          console.log(`     ${this.colors.dim}Suggestion: ${ur.suggestion.split('\n')[0]}${this.colors.reset}`);
+          console.log(
+            `     ${this.colors.dim}Suggestion: ${ur.suggestion.split('\n')[0]}${this.colors.reset}`
+          );
         }
         console.log();
       }
@@ -313,19 +334,24 @@ export class TestRelationshipsCommand extends BaseCommand {
         const targetSymbol = graph.symbols.get(vr.target);
         const targetName = targetSymbol?.name || vr.target;
 
-        const strengthColor = vr.strength === 'strong'
-          ? this.colors.green
-          : vr.strength === 'medium'
-            ? this.colors.yellow
-            : this.colors.dim;
+        const strengthColor =
+          vr.strength === 'strong'
+            ? this.colors.green
+            : vr.strength === 'medium'
+              ? this.colors.yellow
+              : this.colors.dim;
 
         console.log(`  ${this.colors.green}✓${this.colors.reset} ${moduleName} → ${targetName}`);
         console.log(`    Strength: ${strengthColor}${vr.strength}${this.colors.reset}`);
 
         // Find evidence
-        const evidence = allVerified.find(av => av.source === symbolId && av.target === vr.target);
+        const evidence = allVerified.find(
+          (av) => av.source === symbolId && av.target === vr.target
+        );
         if (evidence) {
-          console.log(`    Verified by: ${this.colors.dim}${evidence.verifiedBy}:${evidence.evidence[0]?.lineNumber}${this.colors.reset}`);
+          console.log(
+            `    Verified by: ${this.colors.dim}${evidence.verifiedBy}:${evidence.evidence[0]?.lineNumber}${this.colors.reset}`
+          );
         }
         console.log();
       }

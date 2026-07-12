@@ -7,29 +7,28 @@
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
-import { TsDocService } from './services/tsdocService.js';
 import { SERVER_NAME, SERVER_VERSION } from './constants.js';
-
 // Import tool schemas
 import {
-  SearchSymbolsSchema,
-  GetOntologyStatsSchema,
-  ListRelationshipsSchema,
-  GetWorkContextSchema,
   GetDesignContextSchema,
-  QueryRelationshipsSchema,
+  GetOntologyStatsSchema,
   GetSymbolDetailsSchema,
+  GetWorkContextSchema,
+  ListRelationshipsSchema,
+  QueryRelationshipsSchema,
+  SearchSymbolsSchema,
 } from './schemas/index.js';
+import { TsDocService } from './services/tsdocService.js';
 
 // Import tool implementations
 import {
-  searchSymbolsTool,
-  getOntologyStatsTool,
-  listRelationshipsTool,
-  getWorkContextTool,
   getDesignContextTool,
-  queryRelationshipsTool,
+  getOntologyStatsTool,
   getSymbolDetailsTool,
+  getWorkContextTool,
+  listRelationshipsTool,
+  queryRelationshipsTool,
+  searchSymbolsTool,
 } from './tools/index.js';
 
 async function main() {
@@ -83,7 +82,8 @@ async function main() {
         openWorldHint: false,
       },
     },
-    async (params: unknown) => getOntologyStatsTool(GetOntologyStatsSchema.parse(params), tsdocService)
+    async (params: unknown) =>
+      getOntologyStatsTool(GetOntologyStatsSchema.parse(params), tsdocService)
   );
 
   // 3. List Relationships Tool
@@ -100,7 +100,8 @@ async function main() {
         openWorldHint: false,
       },
     },
-    async (params: unknown) => listRelationshipsTool(ListRelationshipsSchema.parse(params), tsdocService)
+    async (params: unknown) =>
+      listRelationshipsTool(ListRelationshipsSchema.parse(params), tsdocService)
   );
 
   // 4. Get Work Context Tool
@@ -108,7 +109,8 @@ async function main() {
     'tsdoc_get_work_context',
     {
       title: 'Get Work Context',
-      description: 'Get comprehensive work context for a file including relationships, tests, and documentation',
+      description:
+        'Get comprehensive work context for a file including relationships, tests, and documentation',
       inputSchema: GetWorkContextSchema,
       annotations: {
         readOnlyHint: true,
@@ -134,7 +136,8 @@ async function main() {
         openWorldHint: false,
       },
     },
-    async (params: unknown) => getDesignContextTool(GetDesignContextSchema.parse(params), tsdocService)
+    async (params: unknown) =>
+      getDesignContextTool(GetDesignContextSchema.parse(params), tsdocService)
   );
 
   // 6. Query Relationships Tool
@@ -151,7 +154,8 @@ async function main() {
         openWorldHint: false,
       },
     },
-    async (params: unknown) => queryRelationshipsTool(QueryRelationshipsSchema.parse(params), tsdocService)
+    async (params: unknown) =>
+      queryRelationshipsTool(QueryRelationshipsSchema.parse(params), tsdocService)
   );
 
   // 7. Get Symbol Details Tool
@@ -168,7 +172,8 @@ async function main() {
         openWorldHint: false,
       },
     },
-    async (params: unknown) => getSymbolDetailsTool(GetSymbolDetailsSchema.parse(params), tsdocService)
+    async (params: unknown) =>
+      getSymbolDetailsTool(GetSymbolDetailsSchema.parse(params), tsdocService)
   );
 
   // Connect to stdio transport

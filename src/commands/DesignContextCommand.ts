@@ -14,13 +14,10 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager, type SymbolRow } from '../storage/DatabaseManager';
-import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
-import { TSDocParser } from '../parser/TSDocParser';
-import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
-import type { Symbol } from '../types/graph/graph';
+import { DatabaseManager } from '../storage/DatabaseManager';
 import type { SymbolType } from '../types/graph';
+import type { Symbol } from '../types/graph/graph';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /** Context information for a file being worked on */
 interface WorkContext {
@@ -228,7 +225,7 @@ export class DesignContextCommand extends BaseCommand {
     // 1. Get symbols from this file (using Drizzle ORM)
     const allSymbols = dbManager.querySymbols({ filePath: relativePath });
 
-    context.symbols = allSymbols.map(row => ({
+    context.symbols = allSymbols.map((row) => ({
       id: row.id,
       name: row.name,
       type: row.type as SymbolType,
@@ -244,7 +241,7 @@ export class DesignContextCommand extends BaseCommand {
     }));
 
     // Extract symbol IDs for batch queries
-    const symbolIds = context.symbols.map(s => s.id);
+    const symbolIds = context.symbols.map((s) => s.id);
 
     // 2. Parse file for @doc tags (related documents)
     try {
@@ -267,7 +264,7 @@ export class DesignContextCommand extends BaseCommand {
           });
         }
       });
-    } catch (error) {
+    } catch (_error) {
       // Continue even if parsing fails
     }
 
@@ -277,10 +274,10 @@ export class DesignContextCommand extends BaseCommand {
 
       // Query unified_relationships for structural/behavioral relationships
       const allRels = dbManager.getAllUnifiedRelationships();
-      const dependencyRels = allRels.filter(rel => {
+      const dependencyRels = allRels.filter((rel) => {
         if (rel.category !== 'structural' && rel.category !== 'behavioral') return false;
         const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
-        return fromSymbols.some(s => symbolIdSet.has(s));
+        return fromSymbols.some((s) => symbolIdSet.has(s));
       });
 
       // Extract target symbol IDs
@@ -293,10 +290,11 @@ export class DesignContextCommand extends BaseCommand {
       }
 
       if (targetIds.size > 0) {
-        const dependencyRows = dbManager.getSymbolsByIds(Array.from(targetIds))
-          .filter(row => row.file_path !== relativePath);
+        const dependencyRows = dbManager
+          .getSymbolsByIds(Array.from(targetIds))
+          .filter((row) => row.file_path !== relativePath);
 
-        context.dependencies = dependencyRows.map(row => ({
+        context.dependencies = dependencyRows.map((row) => ({
           name: row.name,
           type: row.type,
           filePath: row.file_path,
@@ -308,14 +306,14 @@ export class DesignContextCommand extends BaseCommand {
     if (symbolIds.length > 0) {
       const symbolIdSet = new Set(symbolIds);
       const allTestMappings = dbManager.getAllTestMappings();
-      const relevantMappings = allTestMappings.filter(m => symbolIdSet.has(m.symbolId));
+      const relevantMappings = allTestMappings.filter((m) => symbolIdSet.has(m.symbolId));
 
       const testPaths = new Set<string>();
       for (const mapping of relevantMappings) {
         testPaths.add(mapping.testFilePath);
       }
 
-      context.tests = Array.from(testPaths).map(testPath => ({
+      context.tests = Array.from(testPaths).map((testPath) => ({
         path: testPath,
         type: testPath.includes('integration') ? 'integration' : 'unit',
       }));
@@ -327,10 +325,10 @@ export class DesignContextCommand extends BaseCommand {
 
       // Query unified_relationships where this file's symbols are targets
       const allRels = dbManager.getAllUnifiedRelationships();
-      const usedByRels = allRels.filter(rel => {
+      const usedByRels = allRels.filter((rel) => {
         if (rel.category !== 'structural' && rel.category !== 'behavioral') return false;
         const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
-        return toSymbols.some(s => symbolIdSet.has(s));
+        return toSymbols.some((s) => symbolIdSet.has(s));
       });
 
       // Extract source symbol IDs
@@ -343,10 +341,11 @@ export class DesignContextCommand extends BaseCommand {
       }
 
       if (sourceIds.size > 0) {
-        const usedByRows = dbManager.getSymbolsByIds(Array.from(sourceIds))
-          .filter(row => row.file_path !== relativePath);
+        const usedByRows = dbManager
+          .getSymbolsByIds(Array.from(sourceIds))
+          .filter((row) => row.file_path !== relativePath);
 
-        context.usedBy = usedByRows.map(row => ({
+        context.usedBy = usedByRows.map((row) => ({
           name: row.name,
           filePath: row.file_path,
           type: row.type,
@@ -357,13 +356,13 @@ export class DesignContextCommand extends BaseCommand {
     // 6-8. Get contracts, decisions, and error patterns (using Drizzle ORM)
     if (symbolIds.length > 0) {
       // Create symbol lookup map for O(1) access
-      const symbolMap = new Map(context.symbols.map(s => [s.id, s]));
+      const symbolMap = new Map(context.symbols.map((s) => [s.id, s]));
       const symbolIdSet = new Set(symbolIds);
 
       // 6. Get contracts (preconditions, postconditions, invariants)
       try {
         const allContracts = dbManager.getAllContracts();
-        const contracts = allContracts.filter(c => symbolIdSet.has(c.symbolId));
+        const contracts = allContracts.filter((c) => symbolIdSet.has(c.symbolId));
 
         for (const contract of contracts) {
           const symbol = symbolMap.get(contract.symbolId);
@@ -385,7 +384,7 @@ export class DesignContextCommand extends BaseCommand {
       try {
         const allDecisions = dbManager.getAllDecisionRecords();
         const decisions = allDecisions
-          .filter(d => d.symbolId && symbolIdSet.has(d.symbolId))
+          .filter((d) => d.symbolId && symbolIdSet.has(d.symbolId))
           .sort((a, b) => b.date.localeCompare(a.date));
 
         for (const decision of decisions) {
@@ -406,7 +405,7 @@ export class DesignContextCommand extends BaseCommand {
       // 8. Get error patterns
       try {
         const allErrors = dbManager.getAllErrorExperiences();
-        const errors = allErrors.filter(e => symbolIdSet.has(e.symbolId));
+        const errors = allErrors.filter((e) => symbolIdSet.has(e.symbolId));
 
         for (const error of errors) {
           const symbol = symbolMap.get(error.symbolId);
@@ -425,11 +424,12 @@ export class DesignContextCommand extends BaseCommand {
       // 9. Get unified relationships (17 relationship types) - Using Drizzle ORM
       try {
         const allRels = dbManager.getAllUnifiedRelationships();
-        const relevantRels = allRels.filter(rel => {
+        const relevantRels = allRels.filter((rel) => {
           const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
           const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
-          return fromSymbols.some(s => symbolIdSet.has(s)) ||
-                 toSymbols.some(s => symbolIdSet.has(s));
+          return (
+            fromSymbols.some((s) => symbolIdSet.has(s)) || toSymbols.some((s) => symbolIdSet.has(s))
+          );
         });
 
         // Process relationships
@@ -465,8 +465,8 @@ export class DesignContextCommand extends BaseCommand {
     // Get all subdirectories in managed/
     const entries = fs.readdirSync(managedPath, { withFileTypes: true });
     const managedDirs = entries
-      .filter(e => e.isDirectory())
-      .map(e => path.join('managed', e.name));
+      .filter((e) => e.isDirectory())
+      .map((e) => path.join('managed', e.name));
 
     // Also check root managed/ directory
     managedDirs.unshift('managed');
@@ -484,9 +484,7 @@ export class DesignContextCommand extends BaseCommand {
           if (h1Match && h1Match[1] === symbolRef) {
             return path.relative(process.cwd(), file);
           }
-        } catch {
-          continue;
-        }
+        } catch {}
       }
     }
 
@@ -513,18 +511,6 @@ export class DesignContextCommand extends BaseCommand {
     }
 
     return files;
-  }
-
-  private uniqueBy<T>(array: T[], key: keyof T): T[] {
-    const seen = new Set();
-    return array.filter(item => {
-      const value = item[key];
-      if (seen.has(value)) {
-        return false;
-      }
-      seen.add(value);
-      return true;
-    });
   }
 
   /**
@@ -709,11 +695,12 @@ export class DesignContextCommand extends BaseCommand {
     if (context.relationships.length > 0) {
       output += `## Relationship Statistics\n\n`;
 
-      const explicitRels = context.relationships.filter(r => !r.properties?.inferred);
-      const inferredRels = context.relationships.filter(r => r.properties?.inferred === true);
-      const density = context.symbols.length > 0
-        ? (context.relationships.length / context.symbols.length).toFixed(2)
-        : '0.00';
+      const explicitRels = context.relationships.filter((r) => !r.properties?.inferred);
+      const inferredRels = context.relationships.filter((r) => r.properties?.inferred === true);
+      const density =
+        context.symbols.length > 0
+          ? (context.relationships.length / context.symbols.length).toFixed(2)
+          : '0.00';
 
       output += `- **Total Relationships**: ${context.relationships.length}\n`;
       output += `- **Relationship Density**: ${density} (relationships per symbol)\n`;
@@ -731,9 +718,9 @@ export class DesignContextCommand extends BaseCommand {
       output += `\n`;
 
       // Group by strength
-      const strongCount = context.relationships.filter(r => r.strength === 'strong').length;
-      const mediumCount = context.relationships.filter(r => r.strength === 'medium').length;
-      const weakCount = context.relationships.filter(r => r.strength === 'weak').length;
+      const strongCount = context.relationships.filter((r) => r.strength === 'strong').length;
+      const mediumCount = context.relationships.filter((r) => r.strength === 'medium').length;
+      const weakCount = context.relationships.filter((r) => r.strength === 'weak').length;
 
       output += `**By Strength**:\n\n`;
       output += `- **Strong**: ${strongCount} (${((strongCount / context.relationships.length) * 100).toFixed(1)}%)\n`;
@@ -745,25 +732,36 @@ export class DesignContextCommand extends BaseCommand {
     output += `## Recommendations\n\n`;
     const recommendations: string[] = [];
 
-    const density = context.symbols.length > 0 ? context.relationships.length / context.symbols.length : 0;
+    const density =
+      context.symbols.length > 0 ? context.relationships.length / context.symbols.length : 0;
 
     if (density >= 5.0) {
-      recommendations.push(`✓ High relationship density (${density.toFixed(2)}) - code is well connected`);
+      recommendations.push(
+        `✓ High relationship density (${density.toFixed(2)}) - code is well connected`
+      );
     } else if (density < 2.0) {
-      recommendations.push(`• Low relationship density (${density.toFixed(2)}) - consider adding more relationships`);
+      recommendations.push(
+        `• Low relationship density (${density.toFixed(2)}) - consider adding more relationships`
+      );
     }
 
     if (context.tests.length === 0) {
       recommendations.push(`• No test coverage - add tests in \`src/__tests__/\``);
     }
 
-    const inferredCount = context.relationships.filter(r => r.properties?.inferred === true).length;
+    const inferredCount = context.relationships.filter(
+      (r) => r.properties?.inferred === true
+    ).length;
     if (inferredCount > 0 && inferredCount > context.relationships.length * 0.3) {
-      recommendations.push(`• ${inferredCount} inferred relationships (${((inferredCount / context.relationships.length) * 100).toFixed(1)}%) - consider explicit documentation`);
+      recommendations.push(
+        `• ${inferredCount} inferred relationships (${((inferredCount / context.relationships.length) * 100).toFixed(1)}%) - consider explicit documentation`
+      );
     }
 
-    if (context.contracts.length === 0 && context.symbols.some(s => s.isPublic)) {
-      recommendations.push(`• No contract specifications - consider adding @precondition/@postcondition tags`);
+    if (context.contracts.length === 0 && context.symbols.some((s) => s.isPublic)) {
+      recommendations.push(
+        `• No contract specifications - consider adding @precondition/@postcondition tags`
+      );
     }
 
     if (context.decisions.length === 0 && context.relationships.length > 10) {
@@ -771,11 +769,15 @@ export class DesignContextCommand extends BaseCommand {
     }
 
     if (context.usedBy.length > 10) {
-      recommendations.push(`⚠️ High impact (${context.usedBy.length} files) - test carefully when making changes`);
+      recommendations.push(
+        `⚠️ High impact (${context.usedBy.length} files) - test carefully when making changes`
+      );
     }
 
     if (context.errorPatterns.length > 0) {
-      recommendations.push(`✓ ${context.errorPatterns.length} known pitfalls documented - review before working on this file`);
+      recommendations.push(
+        `✓ ${context.errorPatterns.length} known pitfalls documented - review before working on this file`
+      );
     }
 
     if (recommendations.length > 0) {
@@ -811,15 +813,24 @@ export class DesignContextCommand extends BaseCommand {
 
     // 1. Related Documents
     console.log(colors.bold + divider + colors.reset);
-    console.log(colors.blue + '📚 관련 문서' + colors.reset + colors.dim + ` (${context.relatedDocs.length}개)` + colors.reset);
+    console.log(
+      colors.blue +
+        '📚 관련 문서' +
+        colors.reset +
+        colors.dim +
+        ` (${context.relatedDocs.length}개)` +
+        colors.reset
+    );
     console.log(colors.bold + divider + colors.reset);
 
     if (context.relatedDocs.length > 0) {
       for (const doc of context.relatedDocs) {
         const isFound = doc.path !== '(not found)';
-        const statusIcon = isFound ? colors.green + '✅' : colors.yellow + '❌';
+        const statusIcon = isFound ? `${colors.green}✅` : `${colors.yellow}❌`;
 
-        console.log(`  ${colors.cyan}•${colors.reset} ${colors.bold}[[${doc.symbolRef}]]${colors.reset} ${statusIcon}${colors.reset}`);
+        console.log(
+          `  ${colors.cyan}•${colors.reset} ${colors.bold}[[${doc.symbolRef}]]${colors.reset} ${statusIcon}${colors.reset}`
+        );
 
         if (isFound) {
           console.log(`    ${colors.dim}→ ${doc.path}${colors.reset}`);
@@ -827,7 +838,9 @@ export class DesignContextCommand extends BaseCommand {
           console.log(`    ${colors.yellow}→ Not found${colors.reset}`);
           console.log(`    ${colors.dim}   Searched in: managed/*/${colors.reset}`);
           if (doc.sourceFile && doc.sourceLine) {
-            console.log(`    ${colors.dim}   Referenced in: ${doc.sourceFile}:${doc.sourceLine}${colors.reset}`);
+            console.log(
+              `    ${colors.dim}   Referenced in: ${doc.sourceFile}:${doc.sourceLine}${colors.reset}`
+            );
           }
           console.log(`    ${colors.blue}   💡 Create document or remove @doc tag${colors.reset}`);
         }
@@ -840,7 +853,14 @@ export class DesignContextCommand extends BaseCommand {
 
     // 2. Dependencies (Types this file uses)
     console.log(colors.bold + divider + colors.reset);
-    console.log(colors.blue + '🔗 의존 타입' + colors.reset + colors.dim + ` (${context.dependencies.length}개)` + colors.reset);
+    console.log(
+      colors.blue +
+        '🔗 의존 타입' +
+        colors.reset +
+        colors.dim +
+        ` (${context.dependencies.length}개)` +
+        colors.reset
+    );
     console.log(colors.bold + divider + colors.reset);
 
     if (context.dependencies.length > 0) {
@@ -853,14 +873,18 @@ export class DesignContextCommand extends BaseCommand {
 
         const absoluteDepPath = path.resolve(process.cwd(), dep.filePath);
         const exists = fs.existsSync(absoluteDepPath);
-        const statusIcon = exists ? colors.green + '✅' : colors.yellow + '❌';
+        const statusIcon = exists ? `${colors.green}✅` : `${colors.yellow}❌`;
 
-        console.log(`  ${colors.cyan}${dep.name.padEnd(20)}${colors.reset} ${statusIcon}${colors.reset}`);
+        console.log(
+          `  ${colors.cyan}${dep.name.padEnd(20)}${colors.reset} ${statusIcon}${colors.reset}`
+        );
         console.log(`    ${colors.dim}→ ${dep.filePath}${colors.reset}`);
 
         if (!exists) {
           missingCount++;
-          console.log(`    ${colors.yellow}   File missing - dependency may be stale${colors.reset}`);
+          console.log(
+            `    ${colors.yellow}   File missing - dependency may be stale${colors.reset}`
+          );
           console.log(`    ${colors.blue}   💡 Run: tsdoc-edge build src${colors.reset}`);
         }
 
@@ -869,12 +893,16 @@ export class DesignContextCommand extends BaseCommand {
 
       if (context.dependencies.length > displayLimit) {
         console.log();
-        console.log(`  ${colors.dim}... ${context.dependencies.length - displayLimit} more (use --all to show all)${colors.reset}`);
+        console.log(
+          `  ${colors.dim}... ${context.dependencies.length - displayLimit} more (use --all to show all)${colors.reset}`
+        );
       }
 
       if (missingCount > 0) {
         console.log();
-        console.log(`  ${colors.yellow}⚠️  ${missingCount} missing dependencies detected${colors.reset}`);
+        console.log(
+          `  ${colors.yellow}⚠️  ${missingCount} missing dependencies detected${colors.reset}`
+        );
       }
     } else {
       console.log(`  ${colors.dim}No dependencies found${colors.reset}`);
@@ -883,7 +911,14 @@ export class DesignContextCommand extends BaseCommand {
 
     // 3. Tests
     console.log(colors.bold + divider + colors.reset);
-    console.log(colors.blue + '🧪 테스트' + colors.reset + colors.dim + ` (${context.tests.length}개)` + colors.reset);
+    console.log(
+      colors.blue +
+        '🧪 테스트' +
+        colors.reset +
+        colors.dim +
+        ` (${context.tests.length}개)` +
+        colors.reset
+    );
     console.log(colors.bold + divider + colors.reset);
 
     if (context.tests.length > 0) {
@@ -898,8 +933,12 @@ export class DesignContextCommand extends BaseCommand {
 
         if (!exists) {
           missingTests++;
-          console.log(`    ${colors.yellow}   File missing - test mapping exists but file deleted${colors.reset}`);
-          console.log(`    ${colors.blue}   💡 Run: tsdoc-edge build src to update test mappings${colors.reset}`);
+          console.log(
+            `    ${colors.yellow}   File missing - test mapping exists but file deleted${colors.reset}`
+          );
+          console.log(
+            `    ${colors.blue}   💡 Run: tsdoc-edge build src to update test mappings${colors.reset}`
+          );
         } else if (test.coverage !== undefined) {
           console.log(`     ${colors.dim}→ 커버리지: ${test.coverage}%${colors.reset}`);
         }
@@ -913,13 +952,22 @@ export class DesignContextCommand extends BaseCommand {
     } else {
       console.log(`  ${colors.yellow}❌ No tests found for this file${colors.reset}`);
       console.log(`  ${colors.blue}   💡 Create test file in src/__tests__/${colors.reset}`);
-      console.log(`  ${colors.blue}   💡 Run: tsdoc-edge untested to see all untested symbols${colors.reset}`);
+      console.log(
+        `  ${colors.blue}   💡 Run: tsdoc-edge untested to see all untested symbols${colors.reset}`
+      );
       console.log();
     }
 
     // 4. Impact (Used By)
     console.log(colors.bold + divider + colors.reset);
-    console.log(colors.blue + '⚠️  영향 범위' + colors.reset + colors.dim + ` (${context.usedBy.length}개 파일이 이 파일 사용)` + colors.reset);
+    console.log(
+      colors.blue +
+        '⚠️  영향 범위' +
+        colors.reset +
+        colors.dim +
+        ` (${context.usedBy.length}개 파일이 이 파일 사용)` +
+        colors.reset
+    );
     console.log(colors.bold + divider + colors.reset);
 
     if (context.usedBy.length > 0) {
@@ -927,24 +975,39 @@ export class DesignContextCommand extends BaseCommand {
       const toDisplay = context.usedBy.slice(0, displayLimit);
 
       for (const usage of toDisplay) {
-        console.log(`  ${colors.cyan}${usage.name.padEnd(20)}${colors.reset} ${colors.dim}→ ${usage.filePath}${colors.reset}`);
+        console.log(
+          `  ${colors.cyan}${usage.name.padEnd(20)}${colors.reset} ${colors.dim}→ ${usage.filePath}${colors.reset}`
+        );
       }
 
       if (context.usedBy.length > displayLimit) {
-        console.log(`  ${colors.dim}... ${context.usedBy.length - displayLimit} more${colors.reset}`);
+        console.log(
+          `  ${colors.dim}... ${context.usedBy.length - displayLimit} more${colors.reset}`
+        );
       }
 
       console.log();
-      console.log(`  ${colors.yellow}⚠️  수정 시 위 ${context.usedBy.length}개 파일 영향 받음${colors.reset}`);
+      console.log(
+        `  ${colors.yellow}⚠️  수정 시 위 ${context.usedBy.length}개 파일 영향 받음${colors.reset}`
+      );
     } else {
-      console.log(`  ${colors.green}✓${colors.reset} ${colors.dim}No files depend on this file${colors.reset}`);
+      console.log(
+        `  ${colors.green}✓${colors.reset} ${colors.dim}No files depend on this file${colors.reset}`
+      );
     }
     console.log();
 
     // 5. Contracts (Preconditions, Postconditions, Invariants)
     if (context.contracts.length > 0) {
       console.log(colors.bold + divider + colors.reset);
-      console.log(colors.blue + '📜 계약 (Contracts)' + colors.reset + colors.dim + ` (${context.contracts.length}개)` + colors.reset);
+      console.log(
+        colors.blue +
+          '📜 계약 (Contracts)' +
+          colors.reset +
+          colors.dim +
+          ` (${context.contracts.length}개)` +
+          colors.reset
+      );
       console.log(colors.bold + divider + colors.reset);
 
       for (const contract of context.contracts) {
@@ -981,15 +1044,27 @@ export class DesignContextCommand extends BaseCommand {
     // 6. Design Decisions
     if (context.decisions.length > 0) {
       console.log(colors.bold + divider + colors.reset);
-      console.log(colors.blue + '🎯 설계 결정 (Design Decisions)' + colors.reset + colors.dim + ` (${context.decisions.length}개)` + colors.reset);
+      console.log(
+        colors.blue +
+          '🎯 설계 결정 (Design Decisions)' +
+          colors.reset +
+          colors.dim +
+          ` (${context.decisions.length}개)` +
+          colors.reset
+      );
       console.log(colors.bold + divider + colors.reset);
 
       for (const decision of context.decisions) {
-        const statusIcon = decision.status === 'active' ? colors.green + '✅' :
-                          decision.status === 'deprecated' ? colors.yellow + '⚠️' :
-                          colors.dim + '📋';
+        const statusIcon =
+          decision.status === 'active'
+            ? `${colors.green}✅`
+            : decision.status === 'deprecated'
+              ? `${colors.yellow}⚠️`
+              : `${colors.dim}📋`;
 
-        console.log(`  ${statusIcon}${colors.reset} ${colors.bold}${decision.title}${colors.reset}`);
+        console.log(
+          `  ${statusIcon}${colors.reset} ${colors.bold}${decision.title}${colors.reset}`
+        );
         if (decision.symbolName) {
           console.log(`    ${colors.dim}Symbol: ${decision.symbolName}${colors.reset}`);
         }
@@ -1003,11 +1078,20 @@ export class DesignContextCommand extends BaseCommand {
     // 7. Error Patterns
     if (context.errorPatterns.length > 0) {
       console.log(colors.bold + divider + colors.reset);
-      console.log(colors.blue + '⚠️  일반적인 함정 (Common Pitfalls)' + colors.reset + colors.dim + ` (${context.errorPatterns.length}개)` + colors.reset);
+      console.log(
+        colors.blue +
+          '⚠️  일반적인 함정 (Common Pitfalls)' +
+          colors.reset +
+          colors.dim +
+          ` (${context.errorPatterns.length}개)` +
+          colors.reset
+      );
       console.log(colors.bold + divider + colors.reset);
 
       for (const error of context.errorPatterns) {
-        console.log(`  ${colors.yellow}❌${colors.reset} ${colors.bold}${error.errorType}${colors.reset} ${colors.dim}(${error.symbolName})${colors.reset}`);
+        console.log(
+          `  ${colors.yellow}❌${colors.reset} ${colors.bold}${error.errorType}${colors.reset} ${colors.dim}(${error.symbolName})${colors.reset}`
+        );
         console.log(`    ${colors.yellow}Error:${colors.reset} ${error.message}`);
         console.log(`    ${colors.green}Solution:${colors.reset} ${error.solution}`);
         if (error.prevention) {
@@ -1020,22 +1104,36 @@ export class DesignContextCommand extends BaseCommand {
     // 8. Unified Relationships (17 relationship types)
     if (context.relationships.length > 0) {
       console.log(colors.bold + divider + colors.reset);
-      console.log(colors.blue + '🔗 통합 관계 (Unified Relationships)' + colors.reset + colors.dim + ` (${context.relationships.length}개)` + colors.reset);
+      console.log(
+        colors.blue +
+          '🔗 통합 관계 (Unified Relationships)' +
+          colors.reset +
+          colors.dim +
+          ` (${context.relationships.length}개)` +
+          colors.reset
+      );
       console.log(colors.bold + divider + colors.reset);
 
       // Calculate relationship statistics
-      const explicitRels = context.relationships.filter(r => !r.properties?.inferred);
-      const inferredRels = context.relationships.filter(r => r.properties?.inferred === true);
-      const density = context.symbols.length > 0 ? (context.relationships.length / context.symbols.length).toFixed(2) : '0.00';
+      const explicitRels = context.relationships.filter((r) => !r.properties?.inferred);
+      const inferredRels = context.relationships.filter((r) => r.properties?.inferred === true);
+      const density =
+        context.symbols.length > 0
+          ? (context.relationships.length / context.symbols.length).toFixed(2)
+          : '0.00';
 
-      const strongCount = context.relationships.filter(r => r.strength === 'strong').length;
-      const mediumCount = context.relationships.filter(r => r.strength === 'medium').length;
-      const weakCount = context.relationships.filter(r => r.strength === 'weak').length;
+      const strongCount = context.relationships.filter((r) => r.strength === 'strong').length;
+      const mediumCount = context.relationships.filter((r) => r.strength === 'medium').length;
+      const weakCount = context.relationships.filter((r) => r.strength === 'weak').length;
 
       // Display statistics
       console.log(`  ${colors.bold}통계:${colors.reset}`);
-      console.log(`    총 관계: ${colors.cyan}${context.relationships.length}개${colors.reset} | 관계 밀도: ${colors.cyan}${density}${colors.reset} (관계/심볼)`);
-      console.log(`    명시적: ${colors.green}${explicitRels.length}개${colors.reset} (${((explicitRels.length / context.relationships.length) * 100).toFixed(1)}%) | 추론: ${colors.yellow}${inferredRels.length}개${colors.reset} (${((inferredRels.length / context.relationships.length) * 100).toFixed(1)}%)`);
+      console.log(
+        `    총 관계: ${colors.cyan}${context.relationships.length}개${colors.reset} | 관계 밀도: ${colors.cyan}${density}${colors.reset} (관계/심볼)`
+      );
+      console.log(
+        `    명시적: ${colors.green}${explicitRels.length}개${colors.reset} (${((explicitRels.length / context.relationships.length) * 100).toFixed(1)}%) | 추론: ${colors.yellow}${inferredRels.length}개${colors.reset} (${((inferredRels.length / context.relationships.length) * 100).toFixed(1)}%)`
+      );
       console.log();
 
       // Group relationships by category
@@ -1043,27 +1141,41 @@ export class DesignContextCommand extends BaseCommand {
 
       // Display category distribution
       console.log(`  ${colors.bold}카테고리별:${colors.reset}`);
-      const sortedCategories = Object.entries(relationshipsByCategory).sort((a, b) => b[1].length - a[1].length);
+      const sortedCategories = Object.entries(relationshipsByCategory).sort(
+        (a, b) => b[1].length - a[1].length
+      );
       for (const [category, rels] of sortedCategories.slice(0, 5)) {
         const percentage = ((rels.length / context.relationships.length) * 100).toFixed(1);
         const categoryIcon = this.getCategoryIcon(category);
-        console.log(`    ${categoryIcon}  ${category.padEnd(15)}: ${colors.cyan}${rels.length}개${colors.reset} (${percentage}%)`);
+        console.log(
+          `    ${categoryIcon}  ${category.padEnd(15)}: ${colors.cyan}${rels.length}개${colors.reset} (${percentage}%)`
+        );
       }
       if (sortedCategories.length > 5) {
-        console.log(`    ${colors.dim}... and ${sortedCategories.length - 5} more categories${colors.reset}`);
+        console.log(
+          `    ${colors.dim}... and ${sortedCategories.length - 5} more categories${colors.reset}`
+        );
       }
       console.log();
 
       // Display strength distribution
       console.log(`  ${colors.bold}강도 분포:${colors.reset}`);
-      console.log(`    ${colors.green}●●● strong:${colors.reset}   ${strongCount}개 (${((strongCount / context.relationships.length) * 100).toFixed(1)}%)`);
-      console.log(`    ${colors.yellow}●●○ medium:${colors.reset}   ${mediumCount}개 (${((mediumCount / context.relationships.length) * 100).toFixed(1)}%)`);
-      console.log(`    ${colors.dim}●○○ weak:${colors.reset}     ${weakCount}개 (${((weakCount / context.relationships.length) * 100).toFixed(1)}%)`);
+      console.log(
+        `    ${colors.green}●●● strong:${colors.reset}   ${strongCount}개 (${((strongCount / context.relationships.length) * 100).toFixed(1)}%)`
+      );
+      console.log(
+        `    ${colors.yellow}●●○ medium:${colors.reset}   ${mediumCount}개 (${((mediumCount / context.relationships.length) * 100).toFixed(1)}%)`
+      );
+      console.log(
+        `    ${colors.dim}●○○ weak:${colors.reset}     ${weakCount}개 (${((weakCount / context.relationships.length) * 100).toFixed(1)}%)`
+      );
       console.log();
 
       for (const [category, rels] of Object.entries(relationshipsByCategory)) {
         const icon = this.getCategoryIcon(category);
-        console.log(`\n  ${icon} ${colors.bold}${category.toUpperCase()}${colors.reset} ${colors.dim}(${rels.length}개)${colors.reset}`);
+        console.log(
+          `\n  ${icon} ${colors.bold}${category.toUpperCase()}${colors.reset} ${colors.dim}(${rels.length}개)${colors.reset}`
+        );
         console.log();
 
         // Display limit per category
@@ -1072,23 +1184,31 @@ export class DesignContextCommand extends BaseCommand {
 
         for (const rel of displayRels) {
           // Strength indicator
-          const strengthIcon = rel.strength === 'strong' ? colors.green + '●●●' :
-                              rel.strength === 'medium' ? colors.yellow + '●●○' :
-                              colors.dim + '●○○';
+          const strengthIcon =
+            rel.strength === 'strong'
+              ? `${colors.green}●●●`
+              : rel.strength === 'medium'
+                ? `${colors.yellow}●●○`
+                : `${colors.dim}●○○`;
 
           // Direction indicator
-          const directionIcon = rel.direction === 'bidirectional' ? '↔️' :
-                               rel.direction === 'unidirectional' ? '→' :
-                               '—';
+          const directionIcon =
+            rel.direction === 'bidirectional'
+              ? '↔️'
+              : rel.direction === 'unidirectional'
+                ? '→'
+                : '—';
 
-          console.log(`    ${strengthIcon}${colors.reset} ${colors.cyan}${rel.type}${colors.reset} ${directionIcon}`);
+          console.log(
+            `    ${strengthIcon}${colors.reset} ${colors.cyan}${rel.type}${colors.reset} ${directionIcon}`
+          );
 
           // From → To symbols
           const fromSymbolNames = rel.fromSymbols
-            .map(id => context.symbols.find(s => s.id === id)?.name || id.split('-').pop())
+            .map((id) => context.symbols.find((s) => s.id === id)?.name || id.split('-').pop())
             .join(', ');
           const toSymbolNames = rel.toSymbols
-            .map(id => context.symbols.find(s => s.id === id)?.name || id.split('-').pop())
+            .map((id) => context.symbols.find((s) => s.id === id)?.name || id.split('-').pop())
             .join(', ');
 
           console.log(`      ${colors.dim}From:${colors.reset} ${fromSymbolNames}`);
@@ -1096,10 +1216,15 @@ export class DesignContextCommand extends BaseCommand {
 
           // Confidence
           const confidencePercent = Math.round(rel.confidence * 100);
-          const confidenceColor = rel.confidence >= 0.8 ? colors.green :
-                                  rel.confidence >= 0.5 ? colors.yellow :
-                                  colors.dim;
-          console.log(`      ${colors.dim}Confidence:${colors.reset} ${confidenceColor}${confidencePercent}%${colors.reset}`);
+          const confidenceColor =
+            rel.confidence >= 0.8
+              ? colors.green
+              : rel.confidence >= 0.5
+                ? colors.yellow
+                : colors.dim;
+          console.log(
+            `      ${colors.dim}Confidence:${colors.reset} ${confidenceColor}${confidencePercent}%${colors.reset}`
+          );
 
           // Description
           if (rel.description) {
@@ -1118,14 +1243,16 @@ export class DesignContextCommand extends BaseCommand {
         }
 
         if (rels.length > displayLimit) {
-          console.log(`    ${colors.dim}... ${rels.length - displayLimit} more ${category} relationships${colors.reset}`);
+          console.log(
+            `    ${colors.dim}... ${rels.length - displayLimit} more ${category} relationships${colors.reset}`
+          );
         }
       }
     }
 
     // Summary
     console.log(colors.bold + divider + colors.reset);
-    console.log(colors.bold + '📊 요약' + colors.reset);
+    console.log(`${colors.bold}📊 요약${colors.reset}`);
     console.log(colors.bold + divider + colors.reset);
     console.log(`  심볼: ${colors.cyan}${context.symbols.length}개${colors.reset}`);
     console.log(`  문서: ${colors.cyan}${context.relatedDocs.length}개${colors.reset}`);
@@ -1140,35 +1267,48 @@ export class DesignContextCommand extends BaseCommand {
 
     // Actionable recommendations
     console.log(colors.bold + divider + colors.reset);
-    console.log(colors.bold + '💡 권장사항' + colors.reset);
+    console.log(`${colors.bold}💡 권장사항${colors.reset}`);
     console.log(colors.bold + divider + colors.reset);
 
     const recommendations: string[] = [];
 
     // Calculate relationship density
-    const density = context.symbols.length > 0 ? context.relationships.length / context.symbols.length : 0;
+    const density =
+      context.symbols.length > 0 ? context.relationships.length / context.symbols.length : 0;
 
     // Relationship density recommendation
     if (density >= 5.0) {
-      recommendations.push(`${colors.green}✓${colors.reset} 관계 밀도 높음 (${density.toFixed(2)}) - 코드가 잘 연결됨`);
+      recommendations.push(
+        `${colors.green}✓${colors.reset} 관계 밀도 높음 (${density.toFixed(2)}) - 코드가 잘 연결됨`
+      );
     } else if (density < 2.0) {
-      recommendations.push(`${colors.yellow}•${colors.reset} 관계 밀도 낮음 (${density.toFixed(2)}) - 관계 추가 권장`);
+      recommendations.push(
+        `${colors.yellow}•${colors.reset} 관계 밀도 낮음 (${density.toFixed(2)}) - 관계 추가 권장`
+      );
     }
 
     // Test coverage recommendation
     if (context.tests.length === 0) {
-      recommendations.push(`${colors.yellow}•${colors.reset} 테스트 커버리지 0% - 테스트 추가 필요`);
+      recommendations.push(
+        `${colors.yellow}•${colors.reset} 테스트 커버리지 0% - 테스트 추가 필요`
+      );
     }
 
     // Inferred relationships recommendation
-    const inferredCount = context.relationships.filter(r => r.properties?.inferred === true).length;
+    const inferredCount = context.relationships.filter(
+      (r) => r.properties?.inferred === true
+    ).length;
     if (inferredCount > 0 && inferredCount > context.relationships.length * 0.3) {
-      recommendations.push(`${colors.yellow}•${colors.reset} 추론 관계 ${inferredCount}개 (${((inferredCount / context.relationships.length) * 100).toFixed(1)}%) - 명시적 문서화 권장`);
+      recommendations.push(
+        `${colors.yellow}•${colors.reset} 추론 관계 ${inferredCount}개 (${((inferredCount / context.relationships.length) * 100).toFixed(1)}%) - 명시적 문서화 권장`
+      );
     }
 
     // Contracts recommendation
-    if (context.contracts.length === 0 && context.symbols.some(s => s.isPublic)) {
-      recommendations.push(`${colors.yellow}•${colors.reset} 계약 명세 없음 - @precondition/@postcondition 추가 고려`);
+    if (context.contracts.length === 0 && context.symbols.some((s) => s.isPublic)) {
+      recommendations.push(
+        `${colors.yellow}•${colors.reset} 계약 명세 없음 - @precondition/@postcondition 추가 고려`
+      );
     }
 
     // Design decisions recommendation
@@ -1178,43 +1318,52 @@ export class DesignContextCommand extends BaseCommand {
 
     // High impact warning
     if (context.usedBy.length > 10) {
-      recommendations.push(`${colors.yellow}⚠${colors.reset}  높은 영향도 (${context.usedBy.length}개 파일) - 변경 시 신중히 테스트`);
+      recommendations.push(
+        `${colors.yellow}⚠${colors.reset}  높은 영향도 (${context.usedBy.length}개 파일) - 변경 시 신중히 테스트`
+      );
     }
 
     // Error patterns recommendation
     if (context.errorPatterns.length > 0) {
-      recommendations.push(`${colors.green}✓${colors.reset} ${context.errorPatterns.length}개 알려진 함정 문서화됨 - 참고하여 작업`);
+      recommendations.push(
+        `${colors.green}✓${colors.reset} ${context.errorPatterns.length}개 알려진 함정 문서화됨 - 참고하여 작업`
+      );
     }
 
     if (recommendations.length > 0) {
-      recommendations.forEach(rec => console.log(`  ${rec}`));
+      recommendations.forEach((rec) => console.log(`  ${rec}`));
     } else {
-      console.log(`  ${colors.green}✓${colors.reset} ${colors.dim}권장사항 없음 - 코드 상태 양호${colors.reset}`);
+      console.log(
+        `  ${colors.green}✓${colors.reset} ${colors.dim}권장사항 없음 - 코드 상태 양호${colors.reset}`
+      );
     }
     console.log();
   }
 
   private groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
-    return array.reduce((groups, item) => {
-      const groupKey = String(item[key]);
-      if (!groups[groupKey]) {
-        groups[groupKey] = [];
-      }
-      groups[groupKey].push(item);
-      return groups;
-    }, {} as Record<string, T[]>);
+    return array.reduce(
+      (groups, item) => {
+        const groupKey = String(item[key]);
+        if (!groups[groupKey]) {
+          groups[groupKey] = [];
+        }
+        groups[groupKey].push(item);
+        return groups;
+      },
+      {} as Record<string, T[]>
+    );
   }
 
   private getCategoryIcon(category: string): string {
     const categoryIcons: Record<string, string> = {
-      'structural': '🏗️',
+      structural: '🏗️',
       'data-flow': '📊',
-      'behavioral': '⚙️',
-      'temporal': '⏱️',
-      'semantic': '💡',
-      'quality': '✨',
-      'verification': '✅',
-      'organizational': '📁',
+      behavioral: '⚙️',
+      temporal: '⏱️',
+      semantic: '💡',
+      quality: '✨',
+      verification: '✅',
+      organizational: '📁',
     };
     return categoryIcons[category] || '🔗';
   }

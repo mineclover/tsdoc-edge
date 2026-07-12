@@ -3,8 +3,8 @@
  */
 
 import * as fs from 'node:fs';
-import { LintCommand } from '../../commands/LintCommand';
 import { CodeHealthChecker } from '../../analyzer/CodeHealthChecker';
+import { LintCommand } from '../../commands/LintCommand';
 import { DatabaseManager } from '../../storage/DatabaseManager';
 
 jest.mock('node:fs');
@@ -78,9 +78,7 @@ describe('LintCommand', () => {
 
       await command.execute(['--json']);
 
-      const jsonOutput = consoleSpy.mock.calls.find((call) =>
-        call[0]?.includes('"results"')
-      );
+      const jsonOutput = consoleSpy.mock.calls.find((call) => call[0]?.includes('"results"'));
       expect(jsonOutput).toBeDefined();
 
       consoleSpy.mockRestore();

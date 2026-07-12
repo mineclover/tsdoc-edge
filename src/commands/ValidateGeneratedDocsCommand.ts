@@ -3,10 +3,13 @@
  * @packageDocumentation
  */
 
-import * as path from 'node:path';
 import * as fs from 'node:fs';
+import * as path from 'node:path';
+import {
+  type DocValidationResult,
+  GeneratedDocsValidator,
+} from '../validator/GeneratedDocsValidator';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { GeneratedDocsValidator, type DocValidationResult } from '../validator/GeneratedDocsValidator';
 
 /**
  * Command to validate generated markdown documentation
@@ -130,14 +133,22 @@ export class ValidateGeneratedDocsCommand extends BaseCommand {
       this.printSection('Summary');
       console.log(`  Total documents: ${colors.cyan}${summary.total}${colors.reset}`);
       console.log(`  Valid: ${colors.green}${summary.valid}${colors.reset}`);
-      console.log(`  Invalid: ${summary.invalid > 0 ? colors.red : colors.dim}${summary.invalid}${colors.reset}`);
-      console.log(`  With errors: ${summary.withErrors > 0 ? colors.red : colors.dim}${summary.withErrors}${colors.reset}`);
-      console.log(`  With warnings: ${summary.withWarnings > 0 ? colors.yellow : colors.dim}${summary.withWarnings}${colors.reset}`);
-      console.log(`  Avg sections: ${colors.cyan}${summary.averageSections.toFixed(1)}${colors.reset}`);
+      console.log(
+        `  Invalid: ${summary.invalid > 0 ? colors.red : colors.dim}${summary.invalid}${colors.reset}`
+      );
+      console.log(
+        `  With errors: ${summary.withErrors > 0 ? colors.red : colors.dim}${summary.withErrors}${colors.reset}`
+      );
+      console.log(
+        `  With warnings: ${summary.withWarnings > 0 ? colors.yellow : colors.dim}${summary.withWarnings}${colors.reset}`
+      );
+      console.log(
+        `  Avg sections: ${colors.cyan}${summary.averageSections.toFixed(1)}${colors.reset}`
+      );
       console.log();
 
       // Show invalid documents
-      const invalid = results.filter(r => !r.isValid);
+      const invalid = results.filter((r) => !r.isValid);
       if (invalid.length > 0) {
         this.printSection('Invalid Documents');
         for (const result of invalid) {
@@ -151,7 +162,9 @@ export class ValidateGeneratedDocsCommand extends BaseCommand {
           }
 
           if (result.missingSections.length > 0) {
-            console.log(`     ${colors.yellow}Missing sections${colors.reset}: ${result.missingSections.join(', ')}`);
+            console.log(
+              `     ${colors.yellow}Missing sections${colors.reset}: ${result.missingSections.join(', ')}`
+            );
           }
 
           console.log();
@@ -159,7 +172,7 @@ export class ValidateGeneratedDocsCommand extends BaseCommand {
       }
 
       // Show warnings
-      const withWarnings = results.filter(r => r.warnings.length > 0);
+      const withWarnings = results.filter((r) => r.warnings.length > 0);
       if (withWarnings.length > 0 && withWarnings.length <= 10) {
         this.printSection('Documents with Warnings');
         for (const result of withWarnings) {

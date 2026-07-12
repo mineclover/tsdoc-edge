@@ -2,11 +2,11 @@
  * CoRequirementAnalyzer Tests
  */
 
-import * as path from 'node:path';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import { CoRequirementAnalyzer } from '../../analyzer/CoRequirementAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships';
 
 describe('CoRequirementAnalyzer', () => {
@@ -51,10 +51,7 @@ describe('CoRequirementAnalyzer', () => {
   }
 
   // Helper to create TypeScript file with @requires tags
-  function createTsFileWithRequires(
-    fileName: string,
-    content: string
-  ): string {
+  function createTsFileWithRequires(fileName: string, content: string): string {
     const filePath = path.join(tempDir, fileName);
     fs.writeFileSync(filePath, content);
     return filePath;
@@ -79,9 +76,7 @@ describe('CoRequirementAnalyzer', () => {
     });
 
     it('should return empty array when no @requires tags found', () => {
-      const graph = createMockGraph([
-        { id: 'class-dbmanager', name: 'DatabaseManager' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-dbmanager', name: 'DatabaseManager' }]);
 
       createTsFileWithRequires(
         'DatabaseManager.ts',
@@ -167,9 +162,7 @@ export class ServiceManager {
 
     it('should detect @requires in function declarations', () => {
       const filePath = path.join(tempDir, 'utils.ts');
-      const graph = createMockGraph([
-        { id: 'function-initialize', name: 'initialize', filePath },
-      ]);
+      const graph = createMockGraph([{ id: 'function-initialize', name: 'initialize', filePath }]);
 
       createTsFileWithRequires(
         'utils.ts',
@@ -192,9 +185,7 @@ export function initialize(): void {}
 
     it('should detect @requires in interface declarations', () => {
       const filePath = path.join(tempDir, 'interfaces.ts');
-      const graph = createMockGraph([
-        { id: 'interface-idatabase', name: 'IDatabase', filePath },
-      ]);
+      const graph = createMockGraph([{ id: 'interface-idatabase', name: 'IDatabase', filePath }]);
 
       createTsFileWithRequires(
         'interfaces.ts',
@@ -218,9 +209,7 @@ export interface IDatabase {
 
     it('should detect @requires in type alias declarations', () => {
       const filePath = path.join(tempDir, 'types.ts');
-      const graph = createMockGraph([
-        { id: 'type-config', name: 'Config', filePath },
-      ]);
+      const graph = createMockGraph([{ id: 'type-config', name: 'Config', filePath }]);
 
       createTsFileWithRequires(
         'types.ts',
@@ -243,9 +232,7 @@ export type Config = {
     });
 
     it('should skip files in node_modules, dist, and build directories', () => {
-      const graph = createMockGraph([
-        { id: 'class-service', name: 'Service' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-service', name: 'Service' }]);
 
       // Create dist directory
       const distDir = path.join(tempDir, 'dist');
@@ -299,9 +286,7 @@ export class Unknown {}
       fs.mkdirSync(subDir);
       const filePath = path.join(subDir, 'DeepService.ts');
 
-      const graph = createMockGraph([
-        { id: 'class-deepservice', name: 'DeepService', filePath },
-      ]);
+      const graph = createMockGraph([{ id: 'class-deepservice', name: 'DeepService', filePath }]);
 
       fs.writeFileSync(
         filePath,
@@ -322,9 +307,7 @@ export class DeepService {}
 
     it('should include correct evidence in relationships', () => {
       const filePath = path.join(tempDir, 'TestService.ts');
-      const graph = createMockGraph([
-        { id: 'class-testservice', name: 'TestService', filePath },
-      ]);
+      const graph = createMockGraph([{ id: 'class-testservice', name: 'TestService', filePath }]);
 
       createTsFileWithRequires(
         'TestService.ts',
@@ -350,9 +333,7 @@ export class TestService {}
     });
 
     it('should handle files with parsing errors gracefully', () => {
-      const graph = createMockGraph([
-        { id: 'class-valid', name: 'ValidClass' },
-      ]);
+      const _graph = createMockGraph([{ id: 'class-valid', name: 'ValidClass' }]);
 
       // Create a valid file
       const validPath = path.join(tempDir, 'ValidClass.ts');
@@ -449,10 +430,7 @@ export class Invalid {{{ // syntax error
   });
 
   // Helper to create mock co-requirement relationship
-  function createMockCoRequirement(
-    from: string,
-    to: string
-  ): UnifiedRelationship {
+  function createMockCoRequirement(from: string, to: string): UnifiedRelationship {
     return {
       id: `co-requirement-${from}-${to}`,
       type: 'co-requirement',

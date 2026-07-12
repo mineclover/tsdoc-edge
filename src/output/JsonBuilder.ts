@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import type { OutputSchema, OutputBuilder, SectionData } from './types';
+import type { OutputBuilder, OutputSchema, SectionData } from './types';
 
 /**
  * JSON Builder for structured output
@@ -41,7 +41,9 @@ export class JsonBuilder implements OutputBuilder {
    */
   section(name: string, data: SectionData): this {
     if (!this.schema.sections[name]) {
-      throw new Error(`Unknown section: ${name}. Available: ${Object.keys(this.schema.sections).join(', ')}`);
+      throw new Error(
+        `Unknown section: ${name}. Available: ${Object.keys(this.schema.sections).join(', ')}`
+      );
     }
     this.data.set(name, data);
     return this;

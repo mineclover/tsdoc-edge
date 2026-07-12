@@ -2,8 +2,8 @@
  * ConfigLoader tests
  */
 
-import * as fs from 'fs';
-import * as path from 'path';
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { CONFIG_FILE_NAME, DEFAULT_CONFIG } from '../../types/config';
 import { ConfigLoader } from '../../utils/ConfigLoader';
 
@@ -400,7 +400,7 @@ describe('ConfigLoader', () => {
 
         // Restore permissions
         fs.chmodSync(configPath, 0o644);
-      } catch (error) {
+      } catch (_error) {
         // Skip on systems where chmod doesn't work as expected
         fs.chmodSync(configPath, 0o644);
       }

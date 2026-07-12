@@ -33,7 +33,7 @@ describe('DesignContextCommand', () => {
   beforeEach(() => {
     consoleSpy = jest.spyOn(console, 'log').mockImplementation();
     tempDir = fs.realpathSync(
-      fs.mkdtempSync(path.join(require('os').tmpdir(), 'design-context-test-'))
+      fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'design-context-test-'))
     );
   });
 

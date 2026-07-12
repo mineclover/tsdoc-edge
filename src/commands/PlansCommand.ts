@@ -3,9 +3,9 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import type { FuturePlan } from '../types/tags';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for showing future plans
@@ -147,7 +147,11 @@ export class PlansCommand extends BaseCommand {
                   : `${colors.blue}📌`;
 
           const priorityColor =
-            plan.priority === 'high' ? colors.red : plan.priority === 'medium' ? colors.yellow : colors.cyan;
+            plan.priority === 'high'
+              ? colors.red
+              : plan.priority === 'medium'
+                ? colors.yellow
+                : colors.cyan;
 
           console.log(`${statusIcon} ${colors.bold}${plan.id}${colors.reset} - ${plan.title}`);
           console.log(`   Symbol: ${symbolId}`);
@@ -158,7 +162,9 @@ export class PlansCommand extends BaseCommand {
           }
 
           if (plan.targetSymbol) {
-            console.log(`   Target: ${plan.targetSymbol}${plan.targetMethod ? `#${plan.targetMethod}` : ''}`);
+            console.log(
+              `   Target: ${plan.targetSymbol}${plan.targetMethod ? `#${plan.targetMethod}` : ''}`
+            );
           }
 
           if (plan.implementedBy) {
@@ -169,7 +175,9 @@ export class PlansCommand extends BaseCommand {
             console.log(`   Milestone: ${colors.cyan}${plan.targetMilestone}${colors.reset}`);
           }
 
-          console.log(`   ${plan.description.substring(0, 100)}${plan.description.length > 100 ? '...' : ''}`);
+          console.log(
+            `   ${plan.description.substring(0, 100)}${plan.description.length > 100 ? '...' : ''}`
+          );
           console.log();
         }
 

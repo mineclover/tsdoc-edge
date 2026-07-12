@@ -11,8 +11,8 @@
  */
 
 import * as readline from 'node:readline';
+import { type SymbolReference, SymbolReferenceUpdater } from '../utilities/SymbolReferenceUpdater';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
-import { SymbolReferenceUpdater, type SymbolReference } from '../utilities/SymbolReferenceUpdater';
 
 /**
  * Symbol rename validation result
@@ -171,10 +171,16 @@ export class SymbolRenameCommand extends BaseCommand {
       // Step 2: Find references
       console.log();
       this.printInfo('Step 2: Finding all references...');
-      const references = await this.updater.findReferences(validation.oldSymbol, baseDir, validation.newSymbol);
+      const references = await this.updater.findReferences(
+        validation.oldSymbol,
+        baseDir,
+        validation.newSymbol
+      );
 
       console.log();
-      this.printSuccess(`Found ${references.length} references in ${new Set(references.map(r => r.file)).size} files`);
+      this.printSuccess(
+        `Found ${references.length} references in ${new Set(references.map((r) => r.file)).size} files`
+      );
 
       // Count by type
       const h1Refs = references.filter((r) => r.type === 'h1-primary');
@@ -215,16 +221,22 @@ export class SymbolRenameCommand extends BaseCommand {
       console.log();
       this.printInfo('Step 4: Applying changes...');
 
-      const updateResult = await this.updater.updateReferences(validation.oldSymbol, validation.newSymbol, {
-        baseDir,
-        dryRun: false,
-        updateH1: true,
-        updateH2: true,
-        updateH3: true,
-        updateInline: true,
-      });
+      const updateResult = await this.updater.updateReferences(
+        validation.oldSymbol,
+        validation.newSymbol,
+        {
+          baseDir,
+          dryRun: false,
+          updateH1: true,
+          updateH2: true,
+          updateH3: true,
+          updateInline: true,
+        }
+      );
 
-      console.log(`  ${colors.green}✓${colors.reset} Updated ${updateResult.updated} references in ${updateResult.filesModified.length} files`);
+      console.log(
+        `  ${colors.green}✓${colors.reset} Updated ${updateResult.updated} references in ${updateResult.filesModified.length} files`
+      );
       console.log(`    - H1 Primary: ${updateResult.h1Count}`);
       console.log(`    - H2 Auxiliary: ${updateResult.h2Count}`);
       console.log(`    - H3 Sub-auxiliary: ${updateResult.h3Count}`);
@@ -243,8 +255,12 @@ export class SymbolRenameCommand extends BaseCommand {
       this.printSuccess('Symbol rename complete!');
       console.log();
       console.log(`Next steps:`);
-      console.log(`  1. Run ${colors.cyan}tsdoc-edge update-backlinks ${baseDir}${colors.reset} to regenerate backlinks`);
-      console.log(`  2. Run ${colors.cyan}tsdoc-edge validate-symbol-refs ${baseDir}${colors.reset} to verify integrity`);
+      console.log(
+        `  1. Run ${colors.cyan}tsdoc-edge update-backlinks ${baseDir}${colors.reset} to regenerate backlinks`
+      );
+      console.log(
+        `  2. Run ${colors.cyan}tsdoc-edge validate-symbol-refs ${baseDir}${colors.reset} to verify integrity`
+      );
 
       return this.success();
     });
@@ -285,7 +301,9 @@ export class SymbolRenameCommand extends BaseCommand {
     if (h1Count === 0) {
       errors.push(`Symbol "[[${oldSymbol}]]" has no H1 primary definition - cannot rename`);
     } else if (h1Count > 1) {
-      errors.push(`Symbol "[[${oldSymbol}]]" has ${h1Count} H1 primary definitions - SSOT violation`);
+      errors.push(
+        `Symbol "[[${oldSymbol}]]" has ${h1Count} H1 primary definitions - SSOT violation`
+      );
     }
 
     // Check if new symbol already exists
@@ -326,7 +344,7 @@ export class SymbolRenameCommand extends BaseCommand {
       if (!refsByFile.has(ref.file)) {
         refsByFile.set(ref.file, []);
       }
-      refsByFile.get(ref.file)!.push(ref);
+      refsByFile.get(ref.file)?.push(ref);
     }
 
     // Show symbol change
@@ -358,7 +376,9 @@ export class SymbolRenameCommand extends BaseCommand {
       if (h1.length > 0) {
         console.log(`     ${colors.green}H1 Primary:${colors.reset} ${h1.length} reference(s)`);
         for (const ref of h1.slice(0, 2)) {
-          console.log(`       Line ${ref.line}: ${colors.red}${ref.oldText}${colors.reset} → ${colors.green}${ref.newText}${colors.reset}`);
+          console.log(
+            `       Line ${ref.line}: ${colors.red}${ref.oldText}${colors.reset} → ${colors.green}${ref.newText}${colors.reset}`
+          );
         }
       }
 
@@ -367,7 +387,9 @@ export class SymbolRenameCommand extends BaseCommand {
       }
 
       if (h3.length > 0) {
-        console.log(`     ${colors.blue}H3 Sub-auxiliary:${colors.reset} ${h3.length} reference(s)`);
+        console.log(
+          `     ${colors.blue}H3 Sub-auxiliary:${colors.reset} ${h3.length} reference(s)`
+        );
       }
 
       if (inline.length > 0) {

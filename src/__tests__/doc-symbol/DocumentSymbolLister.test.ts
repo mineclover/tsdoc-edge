@@ -3,8 +3,8 @@
  */
 
 import * as fs from 'node:fs';
-import * as path from 'node:path';
 import * as os from 'node:os';
+import * as path from 'node:path';
 import { DocumentSymbolLister } from '../../utilities/DocumentSymbolLister';
 
 describe('DocumentSymbolLister', () => {
@@ -66,7 +66,7 @@ describe('DocumentSymbolLister', () => {
       const symbols = lister.listAllSymbols();
 
       expect(symbols).toHaveLength(2);
-      const names = symbols.map(s => s.name);
+      const names = symbols.map((s) => s.name);
       expect(names).toContain('Authentication');
       expect(names).toContain('SSOT');
     });
@@ -118,11 +118,14 @@ describe('DocumentSymbolLister', () => {
 
   describe('summary extraction', () => {
     it('should extract first paragraph as summary', () => {
-      createManagedFile('test.md', `# [[TestSymbol]]
+      createManagedFile(
+        'test.md',
+        `# [[TestSymbol]]
 
 This is the first paragraph of the summary.
 
-This is the second paragraph.`);
+This is the second paragraph.`
+      );
 
       const lister = new DocumentSymbolLister(tempDir);
       const symbols = lister.listAllSymbols();
@@ -131,13 +134,16 @@ This is the second paragraph.`);
     });
 
     it('should extract multi-line first paragraph', () => {
-      createManagedFile('test.md', `# [[TestSymbol]]
+      createManagedFile(
+        'test.md',
+        `# [[TestSymbol]]
 
 First line of summary.
 Second line of summary.
 Third line of summary.
 
-Next paragraph.`);
+Next paragraph.`
+      );
 
       const lister = new DocumentSymbolLister(tempDir);
       const symbols = lister.listAllSymbols();
@@ -148,13 +154,16 @@ Next paragraph.`);
     });
 
     it('should limit summary to 3 lines', () => {
-      createManagedFile('test.md', `# [[TestSymbol]]
+      createManagedFile(
+        'test.md',
+        `# [[TestSymbol]]
 
 Line 1
 Line 2
 Line 3
 Line 4
-Line 5`);
+Line 5`
+      );
 
       const lister = new DocumentSymbolLister(tempDir);
       const symbols = lister.listAllSymbols();
@@ -164,13 +173,16 @@ Line 5`);
     });
 
     it('should stop at next heading', () => {
-      createManagedFile('test.md', `# [[TestSymbol]]
+      createManagedFile(
+        'test.md',
+        `# [[TestSymbol]]
 
 Summary before heading.
 
 ## Section Heading
 
-Not in summary.`);
+Not in summary.`
+      );
 
       const lister = new DocumentSymbolLister(tempDir);
       const symbols = lister.listAllSymbols();
@@ -180,13 +192,16 @@ Not in summary.`);
     });
 
     it('should stop at horizontal rule', () => {
-      createManagedFile('test.md', `# [[TestSymbol]]
+      createManagedFile(
+        'test.md',
+        `# [[TestSymbol]]
 
 Summary before rule.
 
 ---
 
-After rule.`);
+After rule.`
+      );
 
       const lister = new DocumentSymbolLister(tempDir);
       const symbols = lister.listAllSymbols();
@@ -195,12 +210,15 @@ After rule.`);
     });
 
     it('should skip metadata blocks but keep regular blockquotes', () => {
-      createManagedFile('test.md', `# [[TestSymbol]]
+      createManagedFile(
+        'test.md',
+        `# [[TestSymbol]]
 
 > **Status**: Draft
 > **Category**: Test
 
-> This is the actual summary blockquote.`);
+> This is the actual summary blockquote.`
+      );
 
       const lister = new DocumentSymbolLister(tempDir);
       const symbols = lister.listAllSymbols();
@@ -209,9 +227,12 @@ After rule.`);
     });
 
     it('should return default message when no summary', () => {
-      createManagedFile('test.md', `# [[TestSymbol]]
+      createManagedFile(
+        'test.md',
+        `# [[TestSymbol]]
 
-## Immediate Section`);
+## Immediate Section`
+      );
 
       const lister = new DocumentSymbolLister(tempDir);
       const symbols = lister.listAllSymbols();
@@ -222,11 +243,14 @@ After rule.`);
 
   describe('reference counting', () => {
     it('should count [[Symbol]] references', () => {
-      createManagedFile('test.md', `# [[MainSymbol]]
+      createManagedFile(
+        'test.md',
+        `# [[MainSymbol]]
 
 This references [[OtherSymbol]] and [[AnotherSymbol]].
 
-See also [[OtherSymbol]] again.`);
+See also [[OtherSymbol]] again.`
+      );
 
       const lister = new DocumentSymbolLister(tempDir);
       const symbols = lister.listAllSymbols();
@@ -236,9 +260,12 @@ See also [[OtherSymbol]] again.`);
     });
 
     it('should return 0 for files with only H1 symbol', () => {
-      createManagedFile('test.md', `# [[OnlySymbol]]
+      createManagedFile(
+        'test.md',
+        `# [[OnlySymbol]]
 
-No other references here.`);
+No other references here.`
+      );
 
       const lister = new DocumentSymbolLister(tempDir);
       const symbols = lister.listAllSymbols();
@@ -249,13 +276,16 @@ No other references here.`);
 
   describe('h1Line', () => {
     it('should record line number of H1', () => {
-      createManagedFile('test.md', `---
+      createManagedFile(
+        'test.md',
+        `---
 frontmatter: here
 ---
 
 # [[TestSymbol]]
 
-Content.`);
+Content.`
+      );
 
       const lister = new DocumentSymbolLister(tempDir);
       const symbols = lister.listAllSymbols();
@@ -306,13 +336,16 @@ Content.`);
     });
 
     it('should handle multiple H1 headers - use first one', () => {
-      createManagedFile('test.md', `# [[FirstSymbol]]
+      createManagedFile(
+        'test.md',
+        `# [[FirstSymbol]]
 
 Content.
 
 # [[SecondSymbol]]
 
-More content.`);
+More content.`
+      );
 
       const lister = new DocumentSymbolLister(tempDir);
       const symbols = lister.listAllSymbols();

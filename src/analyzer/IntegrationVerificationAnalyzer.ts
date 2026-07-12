@@ -68,10 +68,7 @@ export class IntegrationVerificationAnalyzer {
             relationships.push(relationship);
           }
         }
-      } catch (error) {
-        // Skip files that can't be parsed
-        continue;
-      }
+      } catch (_error) {}
     }
 
     // Deduplicate relationships
@@ -93,7 +90,10 @@ export class IntegrationVerificationAnalyzer {
         const fullPath = path.join(dir, entry.name);
         if (entry.isDirectory()) {
           walkDir(fullPath);
-        } else if (entry.isFile() && (entry.name.endsWith('.test.ts') || entry.name.endsWith('.spec.ts'))) {
+        } else if (
+          entry.isFile() &&
+          (entry.name.endsWith('.test.ts') || entry.name.endsWith('.spec.ts'))
+        ) {
           testFiles.push(fullPath);
         }
       }

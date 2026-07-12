@@ -24,7 +24,7 @@ const scenariosQuery = `
   ORDER BY file_path, name
 `;
 
-const scenarios = db['db'].prepare(scenariosQuery).all() as Array<{
+const scenarios = db.db.prepare(scenariosQuery).all() as Array<{
   id: string;
   name: string;
   file_path: string;
@@ -34,7 +34,7 @@ console.log(`📊 Total scenarios: ${scenarios.length}\n`);
 
 // For each scenario, check if it has covers-scenario relationships
 const uncoveredScenarios: typeof scenarios = [];
-const coveredScenarios: Array<typeof scenarios[0] & { testCount: number }> = [];
+const coveredScenarios: Array<(typeof scenarios)[0] & { testCount: number }> = [];
 
 for (const scenario of scenarios) {
   // to_symbols is stored as JSON array: ["scenario-id"]
@@ -45,7 +45,7 @@ for (const scenario of scenarios) {
     AND to_symbols LIKE ?
   `;
 
-  const result = db['db'].prepare(relationQuery).get(`%${scenario.id}%`) as { count: number };
+  const result = db.db.prepare(relationQuery).get(`%${scenario.id}%`) as { count: number };
 
   if (result.count === 0) {
     uncoveredScenarios.push(scenario);
@@ -54,8 +54,12 @@ for (const scenario of scenarios) {
   }
 }
 
-console.log(`✅ Covered scenarios: ${coveredScenarios.length} (${((coveredScenarios.length / scenarios.length) * 100).toFixed(1)}%)`);
-console.log(`❌ Uncovered scenarios: ${uncoveredScenarios.length} (${((uncoveredScenarios.length / scenarios.length) * 100).toFixed(1)}%)\n`);
+console.log(
+  `✅ Covered scenarios: ${coveredScenarios.length} (${((coveredScenarios.length / scenarios.length) * 100).toFixed(1)}%)`
+);
+console.log(
+  `❌ Uncovered scenarios: ${uncoveredScenarios.length} (${((uncoveredScenarios.length / scenarios.length) * 100).toFixed(1)}%)\n`
+);
 
 // Show covered scenarios
 if (coveredScenarios.length > 0) {
@@ -86,22 +90,23 @@ if (uncoveredScenarios.length > 0) {
       LIMIT 5
     `;
 
-    const testCases = db['db'].prepare(testCasesQuery).all(scenario.file_path) as Array<{
+    const testCases = db.db.prepare(testCasesQuery).all(scenario.file_path) as Array<{
       name: string;
     }>;
 
     if (testCases.length > 0) {
       console.log(`   Test cases in file:`);
-      testCases.forEach(tc => {
+      testCases.forEach((tc) => {
         console.log(`     - ${tc.name}`);
       });
 
       // Analyze why it didn't match
-      const scenarioWords = scenario.name.toLowerCase()
+      const scenarioWords = scenario.name
+        .toLowerCase()
         .replace(/[^a-z0-9]+/g, ' ')
         .trim()
         .split(' ')
-        .filter(w => w.length > 3);
+        .filter((w) => w.length > 3);
 
       console.log(`   Key words: ${scenarioWords.join(', ')}`);
     } else {
@@ -121,14 +126,14 @@ for (const scenario of scenarios) {
   if (!fileGroups.has(scenario.file_path)) {
     fileGroups.set(scenario.file_path, []);
   }
-  fileGroups.get(scenario.file_path)!.push(scenario);
+  fileGroups.get(scenario.file_path)?.push(scenario);
 }
 
 console.log(`   Files with scenarios: ${fileGroups.size}`);
 
 for (const [filePath, fileScenarios] of fileGroups.entries()) {
   const shortPath = filePath.replace('src/__tests__/', '');
-  const covered = fileScenarios.filter(s => coveredScenarios.some(cs => cs.id === s.id)).length;
+  const covered = fileScenarios.filter((s) => coveredScenarios.some((cs) => cs.id === s.id)).length;
   const total = fileScenarios.length;
   const percentage = ((covered / total) * 100).toFixed(0);
 

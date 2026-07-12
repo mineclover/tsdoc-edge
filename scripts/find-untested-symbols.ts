@@ -28,7 +28,7 @@ const publicSymbolsQuery = `
   ORDER BY type, name
 `;
 
-const publicSymbols = db['db'].prepare(publicSymbolsQuery).all() as Array<{
+const publicSymbols = db.db.prepare(publicSymbolsQuery).all() as Array<{
   id: string;
   name: string;
   type: string;
@@ -39,7 +39,7 @@ const publicSymbols = db['db'].prepare(publicSymbolsQuery).all() as Array<{
 
 // Find untested symbols
 const untestedSymbols: Array<{
-  symbol: typeof publicSymbols[0];
+  symbol: (typeof publicSymbols)[0];
   priority: number;
   reason: string[];
 }> = [];
@@ -53,7 +53,7 @@ for (const symbol of publicSymbols) {
     AND to_symbols LIKE '%' || ? || '%'
   `;
 
-  const coverage = db['db'].prepare(coverageQuery).get(symbol.id) as { count: number };
+  const coverage = db.db.prepare(coverageQuery).get(symbol.id) as { count: number };
 
   if (coverage.count === 0) {
     // Calculate priority score (higher = more important to test)
@@ -117,7 +117,9 @@ untestedSymbols.sort((a, b) => b.priority - a.priority);
 console.log('📊 Summary:');
 console.log(`   Total public symbols: ${publicSymbols.length}`);
 console.log(`   Untested symbols: ${untestedSymbols.length}`);
-console.log(`   Coverage: ${((1 - untestedSymbols.length / publicSymbols.length) * 100).toFixed(1)}%`);
+console.log(
+  `   Coverage: ${((1 - untestedSymbols.length / publicSymbols.length) * 100).toFixed(1)}%`
+);
 console.log();
 
 // Show top priority untested symbols
@@ -127,7 +129,9 @@ console.log();
 const topPriority = untestedSymbols.slice(0, 30);
 topPriority.forEach(({ symbol, priority, reason }, index) => {
   const shortPath = symbol.file_path.replace('src/', '');
-  console.log(`${(index + 1).toString().padStart(2)}. ${symbol.name.padEnd(35)} [Priority: ${priority}]`);
+  console.log(
+    `${(index + 1).toString().padStart(2)}. ${symbol.name.padEnd(35)} [Priority: ${priority}]`
+  );
   console.log(`    Type: ${symbol.type.padEnd(10)} File: ${shortPath}`);
   console.log(`    Reasons: ${reason.join(', ')}`);
   console.log();
@@ -145,7 +149,7 @@ for (const item of untestedSymbols) {
   if (!moduleGroups.has(module)) {
     moduleGroups.set(module, []);
   }
-  moduleGroups.get(module)!.push(item);
+  moduleGroups.get(module)?.push(item);
 }
 
 const sortedModules = Array.from(moduleGroups.entries()).sort((a, b) => {
@@ -155,8 +159,12 @@ const sortedModules = Array.from(moduleGroups.entries()).sort((a, b) => {
 });
 
 for (const [module, items] of sortedModules) {
-  const avgPriority = (items.reduce((sum, item) => sum + item.priority, 0) / items.length).toFixed(1);
-  console.log(`   ${module.padEnd(20)} ${items.length.toString().padStart(3)} symbols (avg priority: ${avgPriority})`);
+  const avgPriority = (items.reduce((sum, item) => sum + item.priority, 0) / items.length).toFixed(
+    1
+  );
+  console.log(
+    `   ${module.padEnd(20)} ${items.length.toString().padStart(3)} symbols (avg priority: ${avgPriority})`
+  );
 }
 console.log();
 
@@ -165,7 +173,7 @@ console.log('💡 Recommendations:');
 console.log();
 
 if (topPriority.length > 0) {
-  const topClass = topPriority.find(item => item.symbol.type === 'class');
+  const topClass = topPriority.find((item) => item.symbol.type === 'class');
   if (topClass) {
     console.log(`   1. Start with: ${topClass.symbol.name}`);
     console.log(`      → ${topClass.symbol.file_path}`);
@@ -174,14 +182,18 @@ if (topPriority.length > 0) {
   }
 }
 
-const storageSymbols = untestedSymbols.filter(item => item.symbol.file_path.includes('/storage/'));
+const storageSymbols = untestedSymbols.filter((item) =>
+  item.symbol.file_path.includes('/storage/')
+);
 if (storageSymbols.length > 0) {
   console.log(`   2. Focus on storage module (${storageSymbols.length} untested symbols)`);
   console.log(`      → Critical for data persistence`);
   console.log();
 }
 
-const analyzerSymbols = untestedSymbols.filter(item => item.symbol.file_path.includes('/analyzer/'));
+const analyzerSymbols = untestedSymbols.filter((item) =>
+  item.symbol.file_path.includes('/analyzer/')
+);
 if (analyzerSymbols.length > 0) {
   console.log(`   3. Focus on analyzer module (${analyzerSymbols.length} untested symbols)`);
   console.log(`      → Critical for code analysis accuracy`);

@@ -3,8 +3,8 @@
  * @packageDocumentation
  */
 
+import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
 /** Graph metrics for a symbol */
 interface SymbolMetrics {
@@ -158,18 +158,35 @@ Examples:
         console.log(`     ID: ${this.colors.dim}${symbol.symbolId}${this.colors.reset}`);
 
         if (options.detailed) {
-          console.log(`     Degree: ${this.colors.cyan}${symbol.degree}${this.colors.reset} (in: ${symbol.inDegree}, out: ${symbol.outDegree})`);
-          console.log(`     Betweenness: ${this.colors.cyan}${symbol.betweenness.toFixed(4)}${this.colors.reset}`);
-          console.log(`     PageRank: ${this.colors.cyan}${symbol.pageRank.toFixed(6)}${this.colors.reset}`);
-          console.log(`     Importance: ${this.colors.cyan}${symbol.importance.toFixed(2)}${this.colors.reset}`);
-          console.log(`     ${this.colors.dim}${this.interpretMetrics(symbol)}${this.colors.reset}`);
+          console.log(
+            `     Degree: ${this.colors.cyan}${symbol.degree}${this.colors.reset} (in: ${symbol.inDegree}, out: ${symbol.outDegree})`
+          );
+          console.log(
+            `     Betweenness: ${this.colors.cyan}${symbol.betweenness.toFixed(4)}${this.colors.reset}`
+          );
+          console.log(
+            `     PageRank: ${this.colors.cyan}${symbol.pageRank.toFixed(6)}${this.colors.reset}`
+          );
+          console.log(
+            `     Importance: ${this.colors.cyan}${symbol.importance.toFixed(2)}${this.colors.reset}`
+          );
+          console.log(
+            `     ${this.colors.dim}${this.interpretMetrics(symbol)}${this.colors.reset}`
+          );
         } else {
           const metricValue = symbol[options.metric];
-          const displayValue = typeof metricValue === 'number'
-            ? (metricValue < 1 ? metricValue.toFixed(6) : metricValue.toFixed(2))
-            : metricValue;
-          console.log(`     ${this.capitalize(options.metric)}: ${this.colors.cyan}${displayValue}${this.colors.reset}`);
-          console.log(`     ${this.colors.dim}${this.interpretMetrics(symbol)}${this.colors.reset}`);
+          const displayValue =
+            typeof metricValue === 'number'
+              ? metricValue < 1
+                ? metricValue.toFixed(6)
+                : metricValue.toFixed(2)
+              : metricValue;
+          console.log(
+            `     ${this.capitalize(options.metric)}: ${this.colors.cyan}${displayValue}${this.colors.reset}`
+          );
+          console.log(
+            `     ${this.colors.dim}${this.interpretMetrics(symbol)}${this.colors.reset}`
+          );
         }
 
         console.log();
@@ -185,8 +202,12 @@ Examples:
 
       console.log(`  Total symbols: ${this.colors.cyan}${metrics.length}${this.colors.reset}`);
       console.log(`  Total relationships: ${this.colors.cyan}${totalEdges}${this.colors.reset}`);
-      console.log(`  Average degree: ${this.colors.cyan}${avgDegree.toFixed(2)}${this.colors.reset}`);
-      console.log(`  Average betweenness: ${this.colors.cyan}${avgBetweenness.toFixed(4)}${this.colors.reset}`);
+      console.log(
+        `  Average degree: ${this.colors.cyan}${avgDegree.toFixed(2)}${this.colors.reset}`
+      );
+      console.log(
+        `  Average betweenness: ${this.colors.cyan}${avgBetweenness.toFixed(4)}${this.colors.reset}`
+      );
       console.log();
 
       // Distribution
@@ -195,9 +216,15 @@ Examples:
       const isolates = metrics.filter((m) => m.degree === 0).length;
 
       console.log(`  ${this.colors.dim}Distribution:${this.colors.reset}`);
-      console.log(`    Hubs (2x avg degree): ${this.colors.cyan}${hubs}${this.colors.reset} symbols`);
-      console.log(`    Bridges (2x avg betweenness): ${this.colors.cyan}${bridges}${this.colors.reset} symbols`);
-      console.log(`    Isolated symbols: ${this.colors.cyan}${isolates}${this.colors.reset} symbols`);
+      console.log(
+        `    Hubs (2x avg degree): ${this.colors.cyan}${hubs}${this.colors.reset} symbols`
+      );
+      console.log(
+        `    Bridges (2x avg betweenness): ${this.colors.cyan}${bridges}${this.colors.reset} symbols`
+      );
+      console.log(
+        `    Isolated symbols: ${this.colors.cyan}${isolates}${this.colors.reset} symbols`
+      );
       console.log();
 
       // Recommendations
@@ -205,10 +232,16 @@ Examples:
 
       const criticalHubs = metrics.filter((m) => m.degree > 50 && m.betweenness > 0.01);
       if (criticalHubs.length > 0) {
-        this.printWarning(`${criticalHubs.length} critical hub(s) with high degree and betweenness`);
-        console.log(`  ${this.colors.dim}These are architectural bottlenecks - changes will have wide impact${this.colors.reset}`);
+        this.printWarning(
+          `${criticalHubs.length} critical hub(s) with high degree and betweenness`
+        );
+        console.log(
+          `  ${this.colors.dim}These are architectural bottlenecks - changes will have wide impact${this.colors.reset}`
+        );
         for (const hub of criticalHubs.slice(0, 5)) {
-          console.log(`    • ${hub.symbolName} (degree: ${hub.degree}, betweenness: ${hub.betweenness.toFixed(4)})`);
+          console.log(
+            `    • ${hub.symbolName} (degree: ${hub.degree}, betweenness: ${hub.betweenness.toFixed(4)})`
+          );
         }
         console.log();
       }
@@ -216,7 +249,9 @@ Examples:
       const coreComponents = metrics.filter((m) => m.inDegree > 20 && m.outDegree < 10);
       if (coreComponents.length > 0) {
         this.printInfo(`${coreComponents.length} core component(s) with many dependents`);
-        console.log(`  ${this.colors.dim}These should be stable - many symbols depend on them${this.colors.reset}`);
+        console.log(
+          `  ${this.colors.dim}These should be stable - many symbols depend on them${this.colors.reset}`
+        );
         for (const core of coreComponents.slice(0, 3)) {
           console.log(`    • ${core.symbolName} (in: ${core.inDegree}, out: ${core.outDegree})`);
         }
@@ -262,8 +297,8 @@ Examples:
       if (!outgoing.has(fromSymbolId)) outgoing.set(fromSymbolId, new Set());
       if (!incoming.has(toSymbolId)) incoming.set(toSymbolId, new Set());
 
-      outgoing.get(fromSymbolId)!.add(toSymbolId);
-      incoming.get(toSymbolId)!.add(fromSymbolId);
+      outgoing.get(fromSymbolId)?.add(toSymbolId);
+      incoming.get(toSymbolId)?.add(fromSymbolId);
     }
 
     return { outgoing, incoming, symbolNames };
@@ -363,7 +398,10 @@ Examples:
           }
 
           if (distances.get(neighbor) === currentDist + 1) {
-            pathCounts.set(neighbor, (pathCounts.get(neighbor) || 0) + (pathCounts.get(current) || 0));
+            pathCounts.set(
+              neighbor,
+              (pathCounts.get(neighbor) || 0) + (pathCounts.get(current) || 0)
+            );
           }
         }
       }

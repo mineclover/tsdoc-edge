@@ -15,7 +15,7 @@
  * - Calculate confidence scores
  */
 
-import type { SymbolGraph, Symbol } from '../types/graph';
+import type { Symbol, SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships';
 
 /**
@@ -57,11 +57,7 @@ export class IODependencyAnalyzer {
           // Don't relate a symbol to itself
           if (producer.symbolId === consumer.symbolId) continue;
 
-          const relationship = this.createIODependency(
-            producer,
-            consumer,
-            typeName
-          );
+          const relationship = this.createIODependency(producer, consumer, typeName);
 
           relationships.push(relationship);
         }
@@ -78,8 +74,14 @@ export class IODependencyAnalyzer {
     producers: Map<string, Array<{ symbolId: string; symbolName: string; returnType: string }>>;
     consumers: Map<string, Array<{ symbolId: string; symbolName: string; paramType: string }>>;
   } {
-    const producers = new Map<string, Array<{ symbolId: string; symbolName: string; returnType: string }>>();
-    const consumers = new Map<string, Array<{ symbolId: string; symbolName: string; paramType: string }>>();
+    const producers = new Map<
+      string,
+      Array<{ symbolId: string; symbolName: string; returnType: string }>
+    >();
+    const consumers = new Map<
+      string,
+      Array<{ symbolId: string; symbolName: string; paramType: string }>
+    >();
 
     // Single pass through all symbols
     for (const [symbolId, symbol] of this.graph.symbols.entries()) {
@@ -94,10 +96,10 @@ export class IODependencyAnalyzer {
         if (!producers.has(returnType)) {
           producers.set(returnType, []);
         }
-        producers.get(returnType)!.push({
+        producers.get(returnType)?.push({
           symbolId,
           symbolName: symbol.name,
-          returnType
+          returnType,
         });
       }
 
@@ -108,10 +110,10 @@ export class IODependencyAnalyzer {
           if (!consumers.has(paramType)) {
             consumers.set(paramType, []);
           }
-          consumers.get(paramType)!.push({
+          consumers.get(paramType)?.push({
             symbolId,
             symbolName: symbol.name,
-            paramType
+            paramType,
           });
         }
       }
@@ -119,7 +121,6 @@ export class IODependencyAnalyzer {
 
     return { producers, consumers };
   }
-
 
   /**
    * Create I/O dependency relationship
@@ -142,14 +143,16 @@ export class IODependencyAnalyzer {
       to: consumer.symbolId,
       direction: 'unidirectional',
       strength: confidence > 0.8 ? 'strong' : confidence > 0.5 ? 'medium' : 'weak',
-      evidence: [{
-        type: 'type-signature',
-        source: producerSymbol?.filePath || '',
-        lineNumber: producerSymbol?.line,
-        snippet: `${producer.symbolName}() returns ${dataType}`,
-        confidence: confidence,
-        context: `Consumed by ${consumer.symbolName}()`
-      }],
+      evidence: [
+        {
+          type: 'type-signature',
+          source: producerSymbol?.filePath || '',
+          lineNumber: producerSymbol?.line,
+          snippet: `${producer.symbolName}() returns ${dataType}`,
+          confidence: confidence,
+          context: `Consumed by ${consumer.symbolName}()`,
+        },
+      ],
       discoveredBy: 'type-inference',
       confidence,
       filePath: producerSymbol?.filePath,
@@ -157,11 +160,11 @@ export class IODependencyAnalyzer {
       properties: {
         dataType,
         producerMethod: producer.symbolName,
-        consumerMethod: consumer.symbolName
+        consumerMethod: consumer.symbolName,
       },
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
-      description: `${producer.symbolName} produces ${dataType} consumed by ${consumer.symbolName}`
+      description: `${producer.symbolName} produces ${dataType} consumed by ${consumer.symbolName}`,
     };
   }
 
@@ -230,8 +233,18 @@ export class IODependencyAnalyzer {
    */
   private isPrimitiveType(typeName: string): boolean {
     const primitives = new Set([
-      'string', 'number', 'boolean', 'void', 'any', 'unknown', 'never',
-      'null', 'undefined', 'object', 'Array', 'Promise'
+      'string',
+      'number',
+      'boolean',
+      'void',
+      'any',
+      'unknown',
+      'never',
+      'null',
+      'undefined',
+      'object',
+      'Array',
+      'Promise',
     ]);
 
     // Remove generic parameters

@@ -9,7 +9,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { TestExampleExtractor, TestExample } from '../../analyzer/TestExampleExtractor';
+import { type TestExample, TestExampleExtractor } from '../../analyzer/TestExampleExtractor';
 
 describe('TestExampleExtractor', () => {
   let tempDir: string;
@@ -22,7 +22,7 @@ describe('TestExampleExtractor', () => {
 
   beforeEach(() => {
     tempDir = fs.realpathSync(
-      fs.mkdtempSync(path.join(require('os').tmpdir(), 'test-extractor-test-'))
+      fs.mkdtempSync(path.join(require('node:os').tmpdir(), 'test-extractor-test-'))
     );
   });
 
@@ -393,9 +393,7 @@ describe('TestExampleExtractor', () => {
 });`
       );
 
-      const symbols = [
-        { id: 'test-1', name: 'test', type: 'function', filePath: testFile },
-      ];
+      const symbols = [{ id: 'test-1', name: 'test', type: 'function', filePath: testFile }];
       const db = createMockDb(symbols);
       const extractor = new TestExampleExtractor(db as any);
 

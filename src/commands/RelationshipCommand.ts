@@ -4,20 +4,24 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, type CommandResult } from './BaseCommand';
-import { RelationshipQueryCommand } from './RelationshipQueryCommand';
-import { RelationshipImpactCommand } from './RelationshipImpactCommand';
-import { RelationshipPathCommand } from './RelationshipPathCommand';
-import { RelationshipClustersCommand } from './RelationshipClustersCommand';
-import { RelationshipMetricsCommand } from './RelationshipMetricsCommand';
-import { RelationshipValidateCommand } from './RelationshipValidateCommand';
-import { RelationshipExportCommand } from './RelationshipExportCommand';
-import { RelationshipStatsCommand } from './RelationshipStatsCommand';
-import { RelationshipCheckCommand } from './RelationshipCheckCommand';
-import { RelationshipVisualizeCommand } from './RelationshipVisualizeCommand';
-import { RelationshipHelpCommand } from './RelationshipHelpCommand';
 import { AnalyzeRelationshipsCommand } from './AnalyzeRelationshipsCommand';
-import { TypeChainCommand, DetectCircularTypesCommand, FindRootTypesCommand } from './TypeChainCommand';
+import { BaseCommand, type CommandResult } from './BaseCommand';
+import { RelationshipCheckCommand } from './RelationshipCheckCommand';
+import { RelationshipClustersCommand } from './RelationshipClustersCommand';
+import { RelationshipExportCommand } from './RelationshipExportCommand';
+import { RelationshipHelpCommand } from './RelationshipHelpCommand';
+import { RelationshipImpactCommand } from './RelationshipImpactCommand';
+import { RelationshipMetricsCommand } from './RelationshipMetricsCommand';
+import { RelationshipPathCommand } from './RelationshipPathCommand';
+import { RelationshipQueryCommand } from './RelationshipQueryCommand';
+import { RelationshipStatsCommand } from './RelationshipStatsCommand';
+import { RelationshipValidateCommand } from './RelationshipValidateCommand';
+import { RelationshipVisualizeCommand } from './RelationshipVisualizeCommand';
+import {
+  DetectCircularTypesCommand,
+  FindRootTypesCommand,
+  TypeChainCommand,
+} from './TypeChainCommand';
 
 const SUBCOMMANDS = {
   query: { command: RelationshipQueryCommand, description: 'Query relationships for a symbol' },

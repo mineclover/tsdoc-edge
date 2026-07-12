@@ -2,12 +2,12 @@
  * BehavioralAnalyzer Tests
  */
 
-import * as ts from 'typescript';
-import * as path from 'node:path';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import * as ts from 'typescript';
 import { BehavioralAnalyzer } from '../../analyzer/BehavioralAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 import type { UnifiedRelationship } from '../../types/relationships';
 
 describe('BehavioralAnalyzer', () => {
@@ -141,10 +141,7 @@ describe('BehavioralAnalyzer', () => {
       const result = analyzer.analyze();
 
       const collaboration = result.find(
-        (r) =>
-          r.type === 'collaboration' &&
-          r.from === 'class-service' &&
-          r.to === 'class-repo'
+        (r) => r.type === 'collaboration' && r.from === 'class-service' && r.to === 'class-repo'
       );
 
       expect(collaboration).toBeDefined();
@@ -201,9 +198,7 @@ describe('BehavioralAnalyzer', () => {
       const result = analyzer.analyze();
 
       const composition = result.find(
-        (r) =>
-          r.type === 'composition' &&
-          r.from === 'class-container'
+        (r) => r.type === 'composition' && r.from === 'class-container'
       );
 
       expect(composition).toBeDefined();
@@ -305,10 +300,7 @@ describe('BehavioralAnalyzer', () => {
       const result = analyzer.analyze();
 
       const temporalOrder = result.find(
-        (r) =>
-          r.type === 'temporal-order' &&
-          r.from === 'func-step-a' &&
-          r.to === 'func-step-b'
+        (r) => r.type === 'temporal-order' && r.from === 'func-step-a' && r.to === 'func-step-b'
       );
 
       expect(temporalOrder).toBeDefined();
@@ -426,8 +418,8 @@ describe('BehavioralAnalyzer', () => {
       expect(stats.collaborations).toBe(2);
       expect(stats.compositions).toBe(0);
       expect(stats.temporalOrders).toBe(0);
-      expect(stats.byPattern['delegation']).toBe(1);
-      expect(stats.byPattern['general']).toBe(1);
+      expect(stats.byPattern.delegation).toBe(1);
+      expect(stats.byPattern.general).toBe(1);
     });
 
     it('should calculate statistics correctly for compositions', () => {
@@ -445,7 +437,7 @@ describe('BehavioralAnalyzer', () => {
       expect(stats.collaborations).toBe(0);
       expect(stats.compositions).toBe(2);
       expect(stats.temporalOrders).toBe(0);
-      expect(stats.byPattern['composition']).toBe(2);
+      expect(stats.byPattern.composition).toBe(2);
     });
 
     it('should calculate statistics correctly for temporal orders', () => {
@@ -464,7 +456,7 @@ describe('BehavioralAnalyzer', () => {
       expect(stats.collaborations).toBe(0);
       expect(stats.compositions).toBe(0);
       expect(stats.temporalOrders).toBe(3);
-      expect(stats.byPattern['lifecycle']).toBe(2);
+      expect(stats.byPattern.lifecycle).toBe(2);
       expect(stats.byPattern['sequential-call']).toBe(1);
     });
 
@@ -512,10 +504,7 @@ describe('BehavioralAnalyzer', () => {
   }
 
   // Helper to create mock composition relationship
-  function createMockCompositionRelationship(
-    whole: string,
-    parts: string[]
-  ): UnifiedRelationship {
+  function createMockCompositionRelationship(whole: string, parts: string[]): UnifiedRelationship {
     return {
       id: `composition-${whole}-${parts.join('-')}`.toLowerCase(),
       type: 'composition',

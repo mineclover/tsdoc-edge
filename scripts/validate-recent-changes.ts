@@ -44,7 +44,7 @@ function extractSymbolRefs(content: string): SymbolRef[] {
 
 const db = new DatabaseManager();
 const allSymbols = db.getAllSymbols();
-const symbolsByName = new Map(allSymbols.map(s => [s.name, s]));
+const symbolsByName = new Map(allSymbols.map((s) => [s.name, s]));
 
 console.log('\n=== Validating Recently Modified Documentation ===\n');
 console.log(`Total symbols in database: ${allSymbols.length}\n`);
@@ -67,9 +67,11 @@ for (const file of modifiedFiles) {
 
         if (symbol) {
           foundRefs++;
-          const codeType = symbol.filePath.includes('/types/') ? 'type' :
-                          symbol.filePath.includes('__tests__') || symbol.filePath.includes('.test.') ? 'test' :
-                          'impl';
+          const codeType = symbol.filePath.includes('/types/')
+            ? 'type'
+            : symbol.filePath.includes('__tests__') || symbol.filePath.includes('.test.')
+              ? 'test'
+              : 'impl';
           console.log(`  ✓ [[${ref.symbol}]] → ${symbol.filePath}:${symbol.line} (${codeType})`);
         } else {
           missingRefs++;

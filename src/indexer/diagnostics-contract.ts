@@ -28,7 +28,7 @@ export interface CanonicalDiagnostic {
 /** Normalize router dump diagnostics into the canonical plane. */
 export function normalizeRouterDiagnostics(
   values: readonly unknown[],
-  options: { rootDir: string } = { rootDir: process.cwd() }
+  _options: { rootDir: string } = { rootDir: process.cwd() }
 ): readonly CanonicalDiagnostic[] {
   const diagnostics: CanonicalDiagnostic[] = [];
   values.forEach((value, index) => {

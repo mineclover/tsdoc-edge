@@ -16,6 +16,8 @@ export type {
   ImprovementSuggestion,
   TestCoverageInfo,
 } from './analysis/quality';
+// Analytics types - usage tracking
+export * from './analytics';
 // Configuration types
 export * from './config';
 // Export TSDocEdgeConfig (duplicate name compatibility)
@@ -35,16 +37,14 @@ export * from './domain';
 export * from './feature';
 // Graph types - symbols, relationships, connectivity
 export * from './graph';
+export * from './guards/test-symbol-guards';
 // Registry types - symbol registration
 export * from './registry';
+// Specification types - spec management
+export * from './spec';
 // State management types - comment folding
 export * from './state';
 // TSDoc tag types - base and enhanced
 export * from './tags';
-// Specification types - spec management
-export * from './spec';
-// Analytics types - usage tracking
-export * from './analytics';
 // Test symbol types - test suites, cases, scenarios
 export * from './test-symbols';
-export * from './guards/test-symbol-guards';

@@ -6,12 +6,12 @@
  * @packageDocumentation
  */
 
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { CoverageParser } from '../src/analyzer/CoverageParser';
 import { ConfigManager } from '../src/config/ConfigManager';
 import { TSDocParser } from '../src/parser/TSDocParser';
 import { DatabaseManager } from '../src/storage/DatabaseManager';
-import * as fs from 'node:fs';
-import * as path from 'node:path';
 
 /**
  * Test results interface
@@ -38,7 +38,7 @@ function test(name: string, fn: () => void | Promise<void>) {
       results.push({
         name,
         passed: true,
-        expectedError: errorMessage
+        expectedError: errorMessage,
       });
     }
   };
@@ -57,7 +57,7 @@ function testSuccess(name: string, fn: () => void | Promise<void>) {
       results.push({
         name,
         passed: false,
-        error: errorMessage
+        error: errorMessage,
       });
     }
   };
@@ -65,7 +65,7 @@ function testSuccess(name: string, fn: () => void | Promise<void>) {
 
 async function runTests() {
   console.log('🧪 TSDoc Edge - Error Handling Test Suite\n');
-  console.log('=' .repeat(60));
+  console.log('='.repeat(60));
   console.log('\n📋 Testing Production Error Scenarios\n');
 
   // ========================================
@@ -101,12 +101,12 @@ async function runTests() {
         b: { '0': [1, 0] },
         statementMap: {
           '0': { start: { line: 1, column: 0 }, end: { line: 1, column: 10 } },
-          '1': { start: { line: 2, column: 0 }, end: { line: 2, column: 10 } }
+          '1': { start: { line: 2, column: 0 }, end: { line: 2, column: 10 } },
         },
         fnMap: {
-          '0': { name: 'test', decl: { start: { line: 1 } }, loc: { start: { line: 1 } } }
-        }
-      }
+          '0': { name: 'test', decl: { start: { line: 1 } }, loc: { start: { line: 1 } } },
+        },
+      },
     };
     fs.writeFileSync(tempFile, JSON.stringify(validCoverage));
     try {
@@ -166,8 +166,8 @@ async function runTests() {
       paths: {
         commentsDir: '.comments',
         databasePath: '.tsdoc.db',
-        jsonlDir: 'data'
-      }
+        jsonlDir: 'data',
+      },
     };
     fs.writeFileSync(configPath, JSON.stringify(validConfig));
     try {
@@ -253,19 +253,22 @@ export function validFunction(foo: string): string {
     const tempDb = path.join(__dirname, 'temp-db-test.db');
     const db = new DatabaseManager(tempDb, './temp-jsonl');
     try {
-      db.insertSymbol({
-        id: 'test-001',
-        name: 'TestSymbol',
-        type: 'function',
-        filePath: '/test.ts',
-        line: 1,
-        column: 0,
-        isExported: true,
-        isPublic: true,
-        summary: 'Test symbol',
-        tests: [],
-        designDecisions: []
-      }, 0);
+      db.insertSymbol(
+        {
+          id: 'test-001',
+          name: 'TestSymbol',
+          type: 'function',
+          filePath: '/test.ts',
+          line: 1,
+          column: 0,
+          isExported: true,
+          isPublic: true,
+          summary: 'Test symbol',
+          tests: [],
+          designDecisions: [],
+        },
+        0
+      );
 
       const symbol = db.getSymbol('test-001');
       if (!symbol) {
@@ -288,18 +291,21 @@ export function validFunction(foo: string): string {
     const db = new DatabaseManager(tempDb, './temp-jsonl');
     try {
       // Symbol with minimal required fields
-      db.insertSymbol({
-        id: 'minimal-001',
-        name: 'MinimalSymbol',
-        type: 'function',
-        filePath: '/test.ts',
-        line: 1,
-        column: 0,
-        isExported: true,
-        isPublic: true,
-        tests: [],
-        designDecisions: []
-      }, 0);
+      db.insertSymbol(
+        {
+          id: 'minimal-001',
+          name: 'MinimalSymbol',
+          type: 'function',
+          filePath: '/test.ts',
+          line: 1,
+          column: 0,
+          isExported: true,
+          isPublic: true,
+          tests: [],
+          designDecisions: [],
+        },
+        0
+      );
 
       const symbol = db.getSymbol('minimal-001');
       if (!symbol) {
@@ -325,7 +331,7 @@ export function validFunction(foo: string): string {
       functions: 0,
       branches: 0,
       lines: 0,
-      files: new Map()
+      files: new Map(),
     };
 
     const result = parser.findFile(summary, '/test.ts');
@@ -345,7 +351,7 @@ export function validFunction(foo: string): string {
   // ========================================
   // Print Results
   // ========================================
-  console.log('\n' + '='.repeat(60));
+  console.log(`\n${'='.repeat(60)}`);
   console.log('\n📊 Test Results Summary\n');
 
   let passed = 0;
@@ -370,7 +376,7 @@ export function validFunction(foo: string): string {
     }
   }
 
-  console.log('\n' + '='.repeat(60));
+  console.log(`\n${'='.repeat(60)}`);
   console.log(`\n✅ Passed: ${passed}/${results.length}`);
   console.log(`❌ Failed: ${failed}/${results.length}`);
   console.log(`📈 Success Rate: ${((passed / results.length) * 100).toFixed(1)}%\n`);
@@ -385,7 +391,7 @@ export function validFunction(foo: string): string {
 }
 
 // Run tests
-runTests().catch(error => {
+runTests().catch((error) => {
   console.error('❌ Test suite failed:', error);
   process.exit(1);
 });

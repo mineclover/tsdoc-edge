@@ -7,8 +7,7 @@
  * @testScenario Get unresolved references
  */
 
-import * as path from 'node:path';
-import { SymbolReferenceResolver, ResolvedSymbolRef } from '../../doc-symbol/SymbolReferenceResolver';
+import { SymbolReferenceResolver } from '../../doc-symbol/SymbolReferenceResolver';
 import type { SymbolFootnoteRef } from '../../types/feature';
 
 describe('SymbolReferenceResolver', () => {
@@ -17,9 +16,7 @@ describe('SymbolReferenceResolver', () => {
     findById: jest.fn((id: string) => entries.find((e) => e.id === id)),
     search: jest.fn((name: string) =>
       entries.filter(
-        (e) =>
-          e.sourceRef.symbolName.includes(name) ||
-          e.sourceRef.symbolName === name
+        (e) => e.sourceRef.symbolName.includes(name) || e.sourceRef.symbolName === name
       )
     ),
   });

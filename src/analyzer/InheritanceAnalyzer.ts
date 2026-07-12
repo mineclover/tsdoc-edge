@@ -11,20 +11,19 @@
  */
 
 import * as ts from 'typescript';
-import type { Symbol, SymbolRelationship } from '../types/graph/graph';
+import type { Symbol } from '../types/graph/graph';
 import type {
-  InheritanceDirection,
-  AbstractionLevel,
-  InheritanceType,
-  InheritanceRelationship,
-  OverriddenMember,
-  SignatureChange,
-  InheritanceChain,
-  ChainNode,
-  ChainIssue,
-  InheritanceHierarchy,
-  HierarchyNode,
   AbstractionDetection,
+  AbstractionLevel,
+  ChainIssue,
+  ChainNode,
+  HierarchyNode,
+  InheritanceChain,
+  InheritanceDirection,
+  InheritanceHierarchy,
+  InheritanceRelationship,
+  InheritanceType,
+  OverriddenMember,
 } from '../types/inheritance';
 
 /**
@@ -79,7 +78,7 @@ export class InheritanceAnalyzer {
    */
   private analyzeClassInheritance(
     node: ts.ClassDeclaration,
-    symbol: Symbol,
+    symbol: Symbol
   ): InheritanceRelationship[] {
     const relationships: InheritanceRelationship[] = [];
 
@@ -93,12 +92,7 @@ export class InheritanceAnalyzer {
         for (const type of clause.types) {
           const baseClass = this.resolveTypeReference(type);
           if (baseClass) {
-            const rel = this.createInheritanceRelationship(
-              symbol,
-              baseClass,
-              'extends',
-              node,
-            );
+            const rel = this.createInheritanceRelationship(symbol, baseClass, 'extends', node);
             relationships.push(rel);
           }
         }
@@ -107,12 +101,7 @@ export class InheritanceAnalyzer {
         for (const type of clause.types) {
           const iface = this.resolveTypeReference(type);
           if (iface) {
-            const rel = this.createInheritanceRelationship(
-              symbol,
-              iface,
-              'implements',
-              node,
-            );
+            const rel = this.createInheritanceRelationship(symbol, iface, 'implements', node);
             relationships.push(rel);
           }
         }
@@ -127,7 +116,7 @@ export class InheritanceAnalyzer {
    */
   private analyzeInterfaceInheritance(
     node: ts.InterfaceDeclaration,
-    symbol: Symbol,
+    symbol: Symbol
   ): InheritanceRelationship[] {
     const relationships: InheritanceRelationship[] = [];
 
@@ -144,7 +133,7 @@ export class InheritanceAnalyzer {
               symbol,
               parentInterface,
               'extends',
-              node,
+              node
             );
             relationships.push(rel);
           }
@@ -162,7 +151,7 @@ export class InheritanceAnalyzer {
     childSymbol: Symbol,
     parentSymbol: Symbol,
     type: InheritanceType,
-    node: ts.Node,
+    _node: ts.Node
   ): InheritanceRelationship {
     const childAbstraction = this.detectAbstractionLevel(childSymbol);
     const parentAbstraction = this.detectAbstractionLevel(parentSymbol);
@@ -181,7 +170,7 @@ export class InheritanceAnalyzer {
         to: parentAbstraction.level,
       },
       hierarchyDepth: 0, // Direct inheritance
-      inheritanceChain: chain.chain.map(n => n.symbolName),
+      inheritanceChain: chain.chain.map((n) => n.symbolName),
       overriddenMembers,
       filePath: childSymbol.filePath,
       line: childSymbol.line,
@@ -205,9 +194,8 @@ export class InheritanceAnalyzer {
     }
 
     // Check for abstract keyword (from name or summary)
-    const hasAbstractKeyword = symbol.name.includes('Abstract') ||
-                               symbol.summary?.includes('abstract') ||
-                               false;
+    const hasAbstractKeyword =
+      symbol.name.includes('Abstract') || symbol.summary?.includes('abstract') || false;
 
     if (hasAbstractKeyword) {
       level = 'abstract' as AbstractionLevel;
@@ -223,9 +211,10 @@ export class InheritanceAnalyzer {
     }
 
     // Mixin detection (heuristic)
-    const isMixin = symbol.name.endsWith('Mixin') ||
-                    symbol.name.startsWith('with') ||
-                    symbol.summary?.includes('mixin');
+    const isMixin =
+      symbol.name.endsWith('Mixin') ||
+      symbol.name.startsWith('with') ||
+      symbol.summary?.includes('mixin');
 
     if (isMixin) {
       level = 'mixin' as AbstractionLevel;
@@ -312,10 +301,7 @@ export class InheritanceAnalyzer {
   /**
    * Detect overridden members
    */
-  private detectOverriddenMembers(
-    childSymbol: Symbol,
-    parentSymbol: Symbol,
-  ): OverriddenMember[] {
+  private detectOverriddenMembers(_childSymbol: Symbol, _parentSymbol: Symbol): OverriddenMember[] {
     const overridden: OverriddenMember[] = [];
 
     // Simplified - in production, use TypeScript API to compare members
@@ -335,7 +321,7 @@ export class InheritanceAnalyzer {
     }
 
     const abstraction = this.detectAbstractionLevel(rootSymbol);
-    const children = this.findDirectChildren(rootSymbolId);
+    const _children = this.findDirectChildren(rootSymbolId);
 
     let totalDescendants = 0;
     let maxDepth = 0;
@@ -424,8 +410,10 @@ export class InheritanceAnalyzer {
       if (found) return;
 
       // Check if this node matches the symbol
-      if ((ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) &&
-          node.name?.getText() === symbol.name) {
+      if (
+        (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) &&
+        node.name?.getText() === symbol.name
+      ) {
         const nodePos = sourceFile.getLineAndCharacterOfPosition(node.getStart());
         if (nodePos.line + 1 === symbol.line) {
           found = node;

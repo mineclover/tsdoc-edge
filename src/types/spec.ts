@@ -123,7 +123,11 @@ export interface SpecCompletenessResult {
 
   /** Issues found */
   issues: Array<{
-    type: 'missing_section' | 'insufficient_scenarios' | 'insufficient_refs' | 'insufficient_examples';
+    type:
+      | 'missing_section'
+      | 'insufficient_scenarios'
+      | 'insufficient_refs'
+      | 'insufficient_examples';
     message: string;
     severity: 'error' | 'warning';
   }>;

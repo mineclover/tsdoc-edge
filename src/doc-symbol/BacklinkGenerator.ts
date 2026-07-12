@@ -153,10 +153,11 @@ export class BacklinkGenerator {
     let updated: string;
     if (section) {
       // Replace existing section
-      updated = content.substring(0, section.start) + backlinksMarkdown + content.substring(section.end);
+      updated =
+        content.substring(0, section.start) + backlinksMarkdown + content.substring(section.end);
     } else {
       // Append to end
-      updated = content.trim() + '\n\n' + backlinksMarkdown;
+      updated = `${content.trim()}\n\n${backlinksMarkdown}`;
     }
 
     fs.writeFileSync(filePath, updated, 'utf-8');
@@ -183,9 +184,7 @@ export class BacklinkGenerator {
     const afterSection = content.substring(start + match[0].length);
     const nextH1Match = afterSection.match(/^# /m);
 
-    const end = nextH1Match
-      ? start + match[0].length + nextH1Match.index!
-      : content.length;
+    const end = nextH1Match ? start + match[0].length + nextH1Match.index! : content.length;
 
     return { start, end };
   }
@@ -199,7 +198,7 @@ export class BacklinkGenerator {
       return content;
     }
 
-    return content.substring(0, section.start).trim() + '\n';
+    return `${content.substring(0, section.start).trim()}\n`;
   }
 
   /**

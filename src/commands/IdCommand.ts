@@ -4,10 +4,10 @@
  */
 
 import * as path from 'node:path';
-import { BaseCommand, colors, type CommandResult } from './BaseCommand';
-import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import type { ImplementationSymbolType } from '../types/graph';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * IdCommand - Complete symbol ID management
@@ -110,7 +110,7 @@ export class IdCommand extends BaseCommand {
 
   private async handleNew(manager: SymbolRegistryManager, args: string[]): Promise<CommandResult> {
     // Filter out subcommand and flags
-    const positionalArgs = args.slice(1).filter(arg => !arg.startsWith('--'));
+    const positionalArgs = args.slice(1).filter((arg) => !arg.startsWith('--'));
     const filePath = positionalArgs[0];
     const symbolName = positionalArgs[1];
 
@@ -165,7 +165,9 @@ export class IdCommand extends BaseCommand {
       console.log(`${colors.green}✅ ID generated:${colors.reset}`);
       console.log();
       console.log(`  ID: ${colors.bold}${id}${colors.reset}`);
-      console.log(`  Qualified Name: ${colors.bold}${entry?.sourceRef.qualifiedName}${colors.reset}`);
+      console.log(
+        `  Qualified Name: ${colors.bold}${entry?.sourceRef.qualifiedName}${colors.reset}`
+      );
       console.log(`  File: ${filePath}`);
       console.log();
       console.log('Add this to your TSDoc comment:');
@@ -173,18 +175,22 @@ export class IdCommand extends BaseCommand {
       console.log();
     } else {
       // XML output
-      this.printOutput('id-new', {
-        result: {
-          id,
-          qualifiedName: entry?.sourceRef.qualifiedName || '',
-          filePath,
-          symbolName,
-          type: type || 'unknown',
+      this.printOutput(
+        'id-new',
+        {
+          result: {
+            id,
+            qualifiedName: entry?.sourceRef.qualifiedName || '',
+            filePath,
+            symbolName,
+            type: type || 'unknown',
+          },
+          usage: {
+            tsdocTag: `@id ${id}`,
+          },
         },
-        usage: {
-          tsdocTag: `@id ${id}`,
-        },
-      }, args);
+        args
+      );
     }
 
     return { exitCode: 0, message: `ID generated: ${id}` };
@@ -205,7 +211,9 @@ export class IdCommand extends BaseCommand {
       console.log();
 
       for (const entry of entries) {
-        console.log(`${colors.bold}${entry.id}${colors.reset} → ${entry.sourceRef.filePath}:${entry.sourceRef.symbolName}`);
+        console.log(
+          `${colors.bold}${entry.id}${colors.reset} → ${entry.sourceRef.filePath}:${entry.sourceRef.symbolName}`
+        );
         if (entry.tags && entry.tags.length > 0) {
           console.log(`  Tags: ${entry.tags.join(', ')}`);
         }
@@ -213,19 +221,23 @@ export class IdCommand extends BaseCommand {
       }
     } else {
       // XML output
-      this.printOutput('id-list', {
-        source: {
-          type: 'registry',
-          totalEntries: entries.length,
+      this.printOutput(
+        'id-list',
+        {
+          source: {
+            type: 'registry',
+            totalEntries: entries.length,
+          },
+          entries: entries.map((entry) => ({
+            id: entry.id,
+            filePath: entry.sourceRef.filePath,
+            symbolName: entry.sourceRef.symbolName,
+            qualifiedName: entry.sourceRef.qualifiedName,
+            tags: entry.tags?.join(', ') || '',
+          })),
         },
-        entries: entries.map(entry => ({
-          id: entry.id,
-          filePath: entry.sourceRef.filePath,
-          symbolName: entry.sourceRef.symbolName,
-          qualifiedName: entry.sourceRef.qualifiedName,
-          tags: entry.tags?.join(', ') || '',
-        })),
-      }, args);
+        args
+      );
     }
 
     return { exitCode: 0, message: `Listed ${entries.length} entries` };
@@ -252,10 +264,16 @@ export class IdCommand extends BaseCommand {
       if (this.hasFlag(args, '--human')) {
         // Original color output
         console.log(`${colors.bold}Symbols from Database${colors.reset}`);
-        console.log(`Showing: ${colors.green}${symbols.length}${colors.reset} of ${colors.cyan}${total}${colors.reset}`);
+        console.log(
+          `Showing: ${colors.green}${symbols.length}${colors.reset} of ${colors.cyan}${total}${colors.reset}`
+        );
         console.log();
-        console.log(`${colors.dim}Note: Short ID registry is empty. Showing database symbols instead.${colors.reset}`);
-        console.log(`${colors.dim}Use ${colors.cyan}tsdoc-edge id new <file> <symbol>${colors.reset}${colors.dim} to register short IDs.${colors.reset}`);
+        console.log(
+          `${colors.dim}Note: Short ID registry is empty. Showing database symbols instead.${colors.reset}`
+        );
+        console.log(
+          `${colors.dim}Use ${colors.cyan}tsdoc-edge id new <file> <symbol>${colors.reset}${colors.dim} to register short IDs.${colors.reset}`
+        );
         console.log();
 
         for (const symbol of symbols) {
@@ -271,23 +289,27 @@ export class IdCommand extends BaseCommand {
         }
       } else {
         // XML output
-        this.printOutput('id-list', {
-          source: {
-            type: 'database',
-            showing: symbols.length,
-            total,
+        this.printOutput(
+          'id-list',
+          {
+            source: {
+              type: 'database',
+              showing: symbols.length,
+              total,
+            },
+            note: {
+              text: 'Short ID registry is empty. Showing database symbols instead.',
+            },
+            symbols: symbols.map((symbol) => ({
+              id: symbol.id,
+              name: symbol.name,
+              type: symbol.type,
+              filePath: symbol.file_path,
+              line: symbol.line,
+            })),
           },
-          note: {
-            text: 'Short ID registry is empty. Showing database symbols instead.',
-          },
-          symbols: symbols.map(symbol => ({
-            id: symbol.id,
-            name: symbol.name,
-            type: symbol.type,
-            filePath: symbol.file_path,
-            line: symbol.line,
-          })),
-        }, args);
+          args
+        );
       }
 
       return { exitCode: 0, message: `Listed ${symbols.length} symbols from database` };
@@ -298,7 +320,7 @@ export class IdCommand extends BaseCommand {
 
   private async handleFind(manager: SymbolRegistryManager, args: string[]): Promise<CommandResult> {
     // Filter out subcommand and flags
-    const positionalArgs = args.slice(1).filter(arg => !arg.startsWith('--'));
+    const positionalArgs = args.slice(1).filter((arg) => !arg.startsWith('--'));
     const id = positionalArgs[0];
 
     if (!id) {
@@ -324,20 +346,24 @@ export class IdCommand extends BaseCommand {
         console.log();
       } else {
         // XML output
-        this.printOutput('id-find', {
-          source: {
-            type: 'registry',
+        this.printOutput(
+          'id-find',
+          {
+            source: {
+              type: 'registry',
+            },
+            symbol: {
+              id: entry.id,
+              filePath: entry.sourceRef.filePath,
+              symbolName: entry.sourceRef.symbolName,
+              qualifiedName: entry.sourceRef.qualifiedName,
+              type: entry.sourceRef.type || 'unknown',
+              createdAt: entry.createdAt,
+              updatedAt: entry.updatedAt,
+            },
           },
-          symbol: {
-            id: entry.id,
-            filePath: entry.sourceRef.filePath,
-            symbolName: entry.sourceRef.symbolName,
-            qualifiedName: entry.sourceRef.qualifiedName,
-            type: entry.sourceRef.type || 'unknown',
-            createdAt: entry.createdAt,
-            updatedAt: entry.updatedAt,
-          },
-        }, args);
+          args
+        );
       }
       return { exitCode: 0, message: `Found ID: ${id}` };
     }
@@ -371,25 +397,31 @@ export class IdCommand extends BaseCommand {
           console.log(`File: ${symbol.filePath}:${symbol.line}`);
           console.log(`Exported: ${symbol.isExported ? 'Yes' : 'No'}`);
           if (symbol.summary) {
-            console.log(`Summary: ${symbol.summary.substring(0, 80)}${symbol.summary.length > 80 ? '...' : ''}`);
+            console.log(
+              `Summary: ${symbol.summary.substring(0, 80)}${symbol.summary.length > 80 ? '...' : ''}`
+            );
           }
           console.log();
         } else {
           // XML output
-          this.printOutput('id-find', {
-            source: {
-              type: 'database',
+          this.printOutput(
+            'id-find',
+            {
+              source: {
+                type: 'database',
+              },
+              symbol: {
+                id: symbol.id,
+                name: symbol.name,
+                type: symbol.type,
+                filePath: symbol.filePath,
+                line: symbol.line,
+                exported: symbol.isExported ? 'yes' : 'no',
+                summary: symbol.summary || '',
+              },
             },
-            symbol: {
-              id: symbol.id,
-              name: symbol.name,
-              type: symbol.type,
-              filePath: symbol.filePath,
-              line: symbol.line,
-              exported: symbol.isExported ? 'yes' : 'no',
-              summary: symbol.summary || '',
-            },
-          }, args);
+            args
+          );
         }
         return { exitCode: 0, message: `Found symbol: ${idOrName}` };
       }
@@ -416,20 +448,24 @@ export class IdCommand extends BaseCommand {
           }
         } else {
           // XML output
-          this.printOutput('id-find', {
-            source: {
-              type: 'database-search',
-              query: idOrName,
-              totalMatches: matches.length,
+          this.printOutput(
+            'id-find',
+            {
+              source: {
+                type: 'database-search',
+                query: idOrName,
+                totalMatches: matches.length,
+              },
+              matches: matches.slice(0, 10).map((match) => ({
+                id: match.id,
+                name: match.name,
+                type: match.type,
+                filePath: match.file_path,
+                line: match.line,
+              })),
             },
-            matches: matches.slice(0, 10).map(match => ({
-              id: match.id,
-              name: match.name,
-              type: match.type,
-              filePath: match.file_path,
-              line: match.line,
-            })),
-          }, args);
+            args
+          );
         }
         return { exitCode: 0, message: `Found ${matches.length} matches` };
       }
@@ -438,8 +474,12 @@ export class IdCommand extends BaseCommand {
       console.log();
       console.log('Tips:');
       console.log(`  ${colors.dim}• Use symbol name (e.g., DatabaseManager)${colors.reset}`);
-      console.log(`  ${colors.dim}• Use full ID (e.g., databasemanager-class-databasemanager)${colors.reset}`);
-      console.log(`  ${colors.dim}• Run ${colors.cyan}tsdoc-edge id list${colors.reset}${colors.dim} to see available symbols${colors.reset}`);
+      console.log(
+        `  ${colors.dim}• Use full ID (e.g., databasemanager-class-databasemanager)${colors.reset}`
+      );
+      console.log(
+        `  ${colors.dim}• Run ${colors.cyan}tsdoc-edge id list${colors.reset}${colors.dim} to see available symbols${colors.reset}`
+      );
       console.log();
       return { exitCode: 1, message: `Symbol not found: ${idOrName}` };
     } finally {
@@ -447,7 +487,10 @@ export class IdCommand extends BaseCommand {
     }
   }
 
-  private async handleStats(manager: SymbolRegistryManager, args: string[]): Promise<CommandResult> {
+  private async handleStats(
+    manager: SymbolRegistryManager,
+    args: string[]
+  ): Promise<CommandResult> {
     const stats = manager.getStats();
 
     if (this.hasFlag(args, '--human')) {
@@ -467,20 +510,24 @@ export class IdCommand extends BaseCommand {
       console.log();
     } else {
       // XML output
-      this.printOutput('id-stats', {
-        registry: {
-          totalEntries: stats.totalEntries,
-          fileCount: stats.fileCount,
-          tagCount: stats.tagCount,
+      this.printOutput(
+        'id-stats',
+        {
+          registry: {
+            totalEntries: stats.totalEntries,
+            fileCount: stats.fileCount,
+            tagCount: stats.tagCount,
+          },
+          idGenerator: {
+            mode: stats.idStats.mode,
+            length: stats.idStats.length,
+            used: stats.idStats.used,
+            capacity: stats.idStats.capacity,
+            utilizationPercent: stats.idStats.utilization.toFixed(2),
+          },
         },
-        idGenerator: {
-          mode: stats.idStats.mode,
-          length: stats.idStats.length,
-          used: stats.idStats.used,
-          capacity: stats.idStats.capacity,
-          utilizationPercent: stats.idStats.utilization.toFixed(2),
-        },
-      }, args);
+        args
+      );
     }
 
     return { exitCode: 0, message: 'Statistics displayed' };

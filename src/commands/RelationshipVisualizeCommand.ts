@@ -4,8 +4,12 @@
  */
 
 import * as fs from 'node:fs';
+import {
+  DatabaseManager,
+  type SymbolRow,
+  type UnifiedRelationshipRow,
+} from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager, type UnifiedRelationshipRow, type SymbolRow } from '../storage/DatabaseManager';
 
 interface VisualizeOptions {
   format: string;
@@ -120,14 +124,7 @@ Examples:
       const visited = new Set<string>();
       const relationships: UnifiedRelationshipRow[] = [];
 
-      this.collectRelationships(
-        dbManager,
-        resolvedId,
-        options,
-        0,
-        visited,
-        relationships
-      );
+      this.collectRelationships(dbManager, resolvedId, options, 0, visited, relationships);
 
       console.log(`Collected ${relationships.length} relationships\n`);
 
@@ -178,14 +175,14 @@ Examples:
 
     // Apply filters
     if (options.type) {
-      rels = rels.filter(r => r.type === options.type);
+      rels = rels.filter((r) => r.type === options.type);
     }
     if (options.category) {
-      rels = rels.filter(r => r.category === options.category);
+      rels = rels.filter((r) => r.category === options.category);
     }
 
     // Convert to row format for compatibility
-    const relRows = rels.map(r => ({
+    const relRows = rels.map((r) => ({
       id: r.id,
       type: r.type,
       category: r.category,
@@ -209,7 +206,7 @@ Examples:
       const relRow = relRows[i];
 
       // Check if already added
-      if (relationships.some(r => r.id === rel.id)) {
+      if (relationships.some((r) => r.id === rel.id)) {
         continue;
       }
 
@@ -230,7 +227,14 @@ Examples:
       if (options.direction === 'both' || options.direction === 'to') {
         for (const fromId of fromSymbols) {
           if (fromId && fromId !== symbolId) {
-            this.collectRelationships(dbManager, fromId, options, depth + 1, visited, relationships);
+            this.collectRelationships(
+              dbManager,
+              fromId,
+              options,
+              depth + 1,
+              visited,
+              relationships
+            );
           }
         }
       }
@@ -240,7 +244,11 @@ Examples:
   /**
    * Generate Mermaid diagram
    */
-  private generateMermaidDiagram(symbol: SymbolRow, relationships: UnifiedRelationshipRow[], options: VisualizeOptions): string {
+  private generateMermaidDiagram(
+    symbol: SymbolRow,
+    relationships: UnifiedRelationshipRow[],
+    options: VisualizeOptions
+  ): string {
     const lines: string[] = [];
 
     // Header
@@ -320,7 +328,11 @@ Examples:
   /**
    * Generate DOT diagram (GraphViz)
    */
-  private generateDotDiagram(symbol: SymbolRow, relationships: UnifiedRelationshipRow[], options: VisualizeOptions): string {
+  private generateDotDiagram(
+    symbol: SymbolRow,
+    relationships: UnifiedRelationshipRow[],
+    _options: VisualizeOptions
+  ): string {
     const lines: string[] = [];
 
     lines.push('digraph G {');
@@ -413,12 +425,12 @@ Examples:
   private getEdgeLabel(type: string): string {
     const labels: Record<string, string> = {
       'code-dependency': 'imports',
-      'calls': 'calls',
-      'composition': 'has-a',
-      'inheritance': 'extends',
+      calls: 'calls',
+      composition: 'has-a',
+      inheritance: 'extends',
       'io-dependency': 'produces/consumes',
       'test-coverage': 'tested by',
-      'collaboration': 'collaborates',
+      collaboration: 'collaborates',
     };
 
     return labels[type] || type;
@@ -433,7 +445,7 @@ Examples:
     if (parts.length > 1) {
       return parts
         .slice(1)
-        .map(p => p.charAt(0).toUpperCase() + p.slice(1))
+        .map((p) => p.charAt(0).toUpperCase() + p.slice(1))
         .join('');
     }
     return id;
@@ -452,5 +464,4 @@ Examples:
   private sanitizeName(name: string): string {
     return name.replace(/"/g, '\\"');
   }
-
 }

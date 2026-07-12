@@ -3,8 +3,8 @@
  * Tests the TsdocEdgeService with actual database
  */
 
+import * as path from 'node:path';
 import { TsdocEdgeService } from '../src/lsp/service';
-import * as path from 'path';
 
 const workspaceRoot = process.cwd();
 console.log('='.repeat(60));
@@ -48,11 +48,7 @@ const hoverTests = [
 ];
 
 for (const test of hoverTests) {
-  const hover = service.getHoverInfo(
-    path.join(workspaceRoot, test.file),
-    test.line,
-    test.char
-  );
+  const hover = service.getHoverInfo(path.join(workspaceRoot, test.file), test.line, test.char);
   console.log(`\n${test.file}:${test.line}:`);
   if (hover) {
     // Show first 500 chars
@@ -102,10 +98,7 @@ const positionTests = [
 ];
 
 for (const test of positionTests) {
-  const symbol = service.getSymbolAtPosition(
-    path.join(workspaceRoot, test.file),
-    test.line
-  );
+  const symbol = service.getSymbolAtPosition(path.join(workspaceRoot, test.file), test.line);
   console.log(`\n${test.file}:${test.line}:`);
   if (symbol) {
     console.log(`  ID: ${symbol.id}`);
@@ -119,7 +112,11 @@ for (const test of positionTests) {
 // Test 6: NEW - Impact Analysis
 console.log('\n\n## Impact Analysis Test (NEW)');
 console.log('-'.repeat(40));
-const impactTests = ['class-buildcommand', 'class-tsdocedgeservice', 'class-dependencychainanalyzer'];
+const impactTests = [
+  'class-buildcommand',
+  'class-tsdocedgeservice',
+  'class-dependencychainanalyzer',
+];
 
 for (const symbolId of impactTests) {
   const impact = service.getImpactAnalysis(symbolId, 3);
@@ -127,7 +124,9 @@ for (const symbolId of impactTests) {
   console.log(`  Downstream: ${impact.downstream} symbols`);
   console.log(`  Upstream: ${impact.upstream} symbols`);
   if (impact.symbols.length > 0) {
-    console.log(`  Affected: ${impact.symbols.slice(0, 5).join(', ')}${impact.symbols.length > 5 ? '...' : ''}`);
+    console.log(
+      `  Affected: ${impact.symbols.slice(0, 5).join(', ')}${impact.symbols.length > 5 ? '...' : ''}`
+    );
   }
 }
 
@@ -147,7 +146,12 @@ for (const symbolId of relatedTests) {
 // Test 8: NEW - Find Symbol By Name
 console.log('\n\n## Find Symbol By Name Test (NEW)');
 console.log('-'.repeat(40));
-const nameTests = ['BuildCommand', 'TsdocEdgeService', 'DependencyChainAnalyzer', 'NonExistentSymbol'];
+const nameTests = [
+  'BuildCommand',
+  'TsdocEdgeService',
+  'DependencyChainAnalyzer',
+  'NonExistentSymbol',
+];
 
 for (const name of nameTests) {
   const symbol = service.findSymbolByName(name);

@@ -5,11 +5,11 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
+import { BacklinkGenerator } from '../doc-symbol/BacklinkGenerator';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import { DocumentSymbolRegistry } from '../doc-symbol/DocumentSymbolRegistry';
 import { TSDocSymbolParser } from '../doc-symbol/TSDocSymbolParser';
-import { BacklinkGenerator } from '../doc-symbol/BacklinkGenerator';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for updating backlinks in documents

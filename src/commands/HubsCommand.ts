@@ -4,9 +4,9 @@
  */
 
 import Database from 'better-sqlite3';
-import { BaseCommand, type CommandResult } from './BaseCommand';
-import { XmlBuilder } from '../output/XmlBuilder';
 import { HubsSchema } from '../output/schemas';
+import { XmlBuilder } from '../output/XmlBuilder';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 export class HubsCommand extends BaseCommand {
   getName(): string {
@@ -23,7 +23,7 @@ export class HubsCommand extends BaseCommand {
 
   async execute(args: string[]): Promise<CommandResult> {
     const useXml = !args.includes('--human');
-    const minRefs = parseInt(args.find(a => /^\d+$/.test(a)) || '2', 10);
+    const minRefs = parseInt(args.find((a) => /^\d+$/.test(a)) || '2', 10);
 
     const dbCheck = this.checkDatabaseExists();
     if (dbCheck) return dbCheck;
@@ -43,16 +43,24 @@ export class HubsCommand extends BaseCommand {
         ORDER BY refs DESC
       `;
 
-      const results = db.prepare(query).all() as Array<{ name: string; type: string; file_path: string; refs: number }>;
+      const results = db.prepare(query).all() as Array<{
+        name: string;
+        type: string;
+        file_path: string;
+        refs: number;
+      }>;
 
       if (useXml) {
         new XmlBuilder(HubsSchema)
-          .section('symbols', results.map(row => ({
-            name: row.name,
-            type: row.type,
-            refs: row.refs,
-            file: row.file_path,
-          })))
+          .section(
+            'symbols',
+            results.map((row) => ({
+              name: row.name,
+              type: row.type,
+              refs: row.refs,
+              file: row.file_path,
+            }))
+          )
           .print();
       } else {
         console.log(`\nHub Symbols (refs >= ${minRefs}):\n`);

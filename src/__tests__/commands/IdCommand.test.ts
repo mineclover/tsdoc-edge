@@ -68,7 +68,7 @@ describe('IdCommand', () => {
     });
 
     it('should show usage when no subcommand provided', async () => {
-      const result = await command.execute([]);
+      const _result = await command.execute([]);
 
       expect(consoleSpy).toHaveBeenCalled();
     });

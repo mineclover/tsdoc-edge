@@ -2,13 +2,12 @@
  * CompositionAnalyzer Tests
  */
 
-import * as ts from 'typescript';
-import * as path from 'node:path';
-import * as os from 'node:os';
 import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import * as ts from 'typescript';
 import { CompositionAnalyzer } from '../../analyzer/CompositionAnalyzer';
-import type { SymbolGraph, Symbol } from '../../types/graph';
-import type { UnifiedRelationship } from '../../types/relationships';
+import type { Symbol, SymbolGraph } from '../../types/graph';
 
 describe('CompositionAnalyzer', () => {
   // Helper to create mock symbol
@@ -33,13 +32,12 @@ describe('CompositionAnalyzer', () => {
   }
 
   // Helper to create mock graph
-  function createMockGraph(symbols: Array<{ id: string; name: string; type?: Symbol['type'] }>): SymbolGraph {
+  function createMockGraph(
+    symbols: Array<{ id: string; name: string; type?: Symbol['type'] }>
+  ): SymbolGraph {
     const symbolsMap = new Map<string, Symbol>();
     for (const s of symbols) {
-      symbolsMap.set(
-        s.id,
-        createMockSymbol(s.id, s.name, s.type || 'class')
-      );
+      symbolsMap.set(s.id, createMockSymbol(s.id, s.name, s.type || 'class'));
     }
 
     return {
@@ -188,9 +186,7 @@ describe('CompositionAnalyzer', () => {
     });
 
     it('should skip declaration files', () => {
-      const graph = createMockGraph([
-        { id: 'class-test', name: 'TestClass' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-test', name: 'TestClass' }]);
       const program = createProgram({
         'test.d.ts': `
           interface ITest {}
@@ -204,9 +200,7 @@ describe('CompositionAnalyzer', () => {
     });
 
     it('should skip primitive types', () => {
-      const graph = createMockGraph([
-        { id: 'class-simple', name: 'SimpleClass' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-simple', name: 'SimpleClass' }]);
 
       const program = createProgram({
         'test.ts': `
@@ -226,9 +220,7 @@ describe('CompositionAnalyzer', () => {
     });
 
     it('should skip builtin types like Date, Map, Set', () => {
-      const graph = createMockGraph([
-        { id: 'class-withbuiltins', name: 'WithBuiltins' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-withbuiltins', name: 'WithBuiltins' }]);
 
       const program = createProgram({
         'test.ts': `
@@ -453,9 +445,7 @@ describe('CompositionAnalyzer', () => {
 
   describe('edge cases', () => {
     it('should handle empty class', () => {
-      const graph = createMockGraph([
-        { id: 'class-empty', name: 'EmptyClass' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-empty', name: 'EmptyClass' }]);
 
       const program = createProgram({
         'test.ts': `
@@ -470,9 +460,7 @@ describe('CompositionAnalyzer', () => {
     });
 
     it('should handle class with methods only', () => {
-      const graph = createMockGraph([
-        { id: 'class-methods', name: 'MethodsOnly' },
-      ]);
+      const graph = createMockGraph([{ id: 'class-methods', name: 'MethodsOnly' }]);
 
       const program = createProgram({
         'test.ts': `

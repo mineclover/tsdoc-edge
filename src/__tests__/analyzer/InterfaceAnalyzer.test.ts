@@ -455,10 +455,7 @@ export interface UserEntity {
         'utf-8'
       );
 
-      const results = noDomainAnalyzer.analyzeFile(
-        testFile,
-        fs.readFileSync(testFile, 'utf-8')
-      );
+      const results = noDomainAnalyzer.analyzeFile(testFile, fs.readFileSync(testFile, 'utf-8'));
 
       expect(results[0].domain).toBeUndefined();
       expect(results[0].domainRole).toBeUndefined();

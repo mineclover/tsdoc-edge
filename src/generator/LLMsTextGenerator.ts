@@ -169,7 +169,7 @@ export class LLMsTextGenerator {
     deps += `This symbol depends on ${context.dependencies.length} other symbol(s):\n\n`;
 
     // Group by relationship type
-    const grouped = this.groupBy(context.dependencies, d => d.relationship);
+    const grouped = this.groupBy(context.dependencies, (d) => d.relationship);
 
     for (const [relType, items] of Object.entries(grouped)) {
       deps += `### ${relType}\n\n`;
@@ -255,7 +255,7 @@ export class LLMsTextGenerator {
     related += `Found ${context.relatedSymbols.length} related symbol(s):\n\n`;
 
     // Group by strength
-    const byStrength = this.groupBy(context.relatedSymbols, s => s.strength);
+    const byStrength = this.groupBy(context.relatedSymbols, (s) => s.strength);
 
     const strengthOrder: Array<'strong' | 'medium' | 'weak'> = ['strong', 'medium', 'weak'];
 
@@ -371,11 +371,14 @@ export class LLMsTextGenerator {
    * Helper to group array by key
    */
   private groupBy<T>(array: T[], keyFn: (item: T) => string): Record<string, T[]> {
-    return array.reduce((acc, item) => {
-      const key = keyFn(item);
-      if (!acc[key]) acc[key] = [];
-      acc[key].push(item);
-      return acc;
-    }, {} as Record<string, T[]>);
+    return array.reduce(
+      (acc, item) => {
+        const key = keyFn(item);
+        if (!acc[key]) acc[key] = [];
+        acc[key].push(item);
+        return acc;
+      },
+      {} as Record<string, T[]>
+    );
   }
 }

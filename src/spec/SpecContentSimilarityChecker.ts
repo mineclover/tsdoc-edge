@@ -216,15 +216,51 @@ export class SpecContentSimilarityChecker {
 
     // Filter out very short words and common words
     const stopWords = new Set([
-      'the', 'a', 'an', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for',
-      'of', 'with', 'by', 'from', 'as', 'is', 'was', 'are', 'be', 'been',
-      '을', '를', '이', '가', '은', '는', '의', '에', '에서', '로', '으로',
-      '와', '과', '도', '만', '까지', '부터', '하다', '되다', '있다', '없다',
+      'the',
+      'a',
+      'an',
+      'and',
+      'or',
+      'but',
+      'in',
+      'on',
+      'at',
+      'to',
+      'for',
+      'of',
+      'with',
+      'by',
+      'from',
+      'as',
+      'is',
+      'was',
+      'are',
+      'be',
+      'been',
+      '을',
+      '를',
+      '이',
+      '가',
+      '은',
+      '는',
+      '의',
+      '에',
+      '에서',
+      '로',
+      '으로',
+      '와',
+      '과',
+      '도',
+      '만',
+      '까지',
+      '부터',
+      '하다',
+      '되다',
+      '있다',
+      '없다',
     ]);
 
-    return new Set(
-      words.filter((word) => word.length > 2 && !stopWords.has(word))
-    );
+    return new Set(words.filter((word) => word.length > 2 && !stopWords.has(word)));
   }
 
   /**
@@ -233,8 +269,8 @@ export class SpecContentSimilarityChecker {
   private determineSuggestion(
     similarity: number,
     overlappingCount: number,
-    doc1: DocumentContent,
-    doc2: DocumentContent
+    _doc1: DocumentContent,
+    _doc2: DocumentContent
   ): { suggestion: 'merge' | 'cross-reference' | 'keep-separate'; reason: string } {
     // Very high similarity with multiple overlapping sections -> merge
     if (similarity > this.highSimilarityThreshold && overlappingCount >= 3) {
@@ -281,9 +317,8 @@ export class SpecContentSimilarityChecker {
     const crossRefSuggestions = results.filter((r) => r.suggestion === 'cross-reference').length;
     const keepSeparate = results.filter((r) => r.suggestion === 'keep-separate').length;
 
-    const averageSimilarity = results.length > 0
-      ? results.reduce((sum, r) => sum + r.similarity, 0) / results.length
-      : 0;
+    const averageSimilarity =
+      results.length > 0 ? results.reduce((sum, r) => sum + r.similarity, 0) / results.length : 0;
 
     return {
       totalPairs: results.length,

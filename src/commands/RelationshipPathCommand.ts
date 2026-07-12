@@ -5,8 +5,8 @@
  * @packageDocumentation
  */
 
+import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
 
 /** A node in a relationship path */
 interface PathNode {
@@ -196,7 +196,9 @@ Examples:
         const pathData = displayPaths[i];
         const strengthBar = '█'.repeat(Math.round(pathData.strength * 10));
 
-        console.log(`  ${this.colors.bold}Path ${i + 1}${this.colors.reset} (length: ${pathData.length}, strength: ${strengthBar})`);
+        console.log(
+          `  ${this.colors.bold}Path ${i + 1}${this.colors.reset} (length: ${pathData.length}, strength: ${strengthBar})`
+        );
         console.log();
 
         for (let j = 0; j < pathData.nodes.length; j++) {
@@ -206,7 +208,9 @@ Examples:
             console.log(`    ${this.colors.cyan}${node.symbolId}${this.colors.reset}`);
           } else {
             const prevNode = pathData.nodes[j - 1];
-            console.log(`      ${this.colors.dim}↓ ${prevNode.relationshipType} (${prevNode.category})${this.colors.reset}`);
+            console.log(
+              `      ${this.colors.dim}↓ ${prevNode.relationshipType} (${prevNode.category})${this.colors.reset}`
+            );
             console.log(`    ${this.colors.cyan}${node.symbolId}${this.colors.reset}`);
           }
         }
@@ -224,7 +228,9 @@ Examples:
       console.log(`  Total paths found: ${this.colors.cyan}${paths.length}${this.colors.reset}`);
       console.log(`  Shortest path: ${this.colors.cyan}${shortestLength}${this.colors.reset} hops`);
       console.log(`  Longest path: ${this.colors.cyan}${longestLength}${this.colors.reset} hops`);
-      console.log(`  Average length: ${this.colors.cyan}${avgLength.toFixed(1)}${this.colors.reset} hops`);
+      console.log(
+        `  Average length: ${this.colors.cyan}${avgLength.toFixed(1)}${this.colors.reset} hops`
+      );
       console.log(`  Build time: ${this.colors.cyan}${buildTime}ms${this.colors.reset}`);
       console.log(`  Search time: ${this.colors.cyan}${searchTime}ms${this.colors.reset}`);
       console.log();
@@ -241,15 +247,21 @@ Examples:
 
       if (categoryCount.size > 0) {
         console.log(`  ${this.colors.dim}Categories used:${this.colors.reset}`);
-        for (const [category, count] of Array.from(categoryCount.entries()).sort((a, b) => b[1] - a[1])) {
-          console.log(`    ${category}: ${this.colors.cyan}${count}${this.colors.reset} connections`);
+        for (const [category, count] of Array.from(categoryCount.entries()).sort(
+          (a, b) => b[1] - a[1]
+        )) {
+          console.log(
+            `    ${category}: ${this.colors.cyan}${count}${this.colors.reset} connections`
+          );
         }
         console.log();
       }
 
       dbManager.close();
 
-      return this.success(`Found ${paths.length} path(s) between ${fromResolved.symbol.name} and ${toResolved.symbol.name}`);
+      return this.success(
+        `Found ${paths.length} path(s) between ${fromResolved.symbol.name} and ${toResolved.symbol.name}`
+      );
     });
   }
 
@@ -266,7 +278,7 @@ Examples:
     let relationships = dbManager.getAllUnifiedRelationships();
 
     if (category) {
-      relationships = relationships.filter(r => r.category === category);
+      relationships = relationships.filter((r) => r.category === category);
     }
 
     for (const rel of relationships) {
@@ -284,17 +296,14 @@ Examples:
           for (const to of toSymbols) {
             if (!to) continue;
 
-            adjacency.get(from)!.push({
+            adjacency.get(from)?.push({
               to,
               type: rel.type,
               category: rel.category,
             });
           }
         }
-      } catch (error) {
-        // Skip malformed relationships
-        continue;
-      }
+      } catch (_error) {}
     }
 
     return adjacency;
@@ -303,9 +312,7 @@ Examples:
   /**
    * Build reverse adjacency list for backward search
    */
-  private buildReverseAdjacency(
-    forward: Map<string, GraphEdge[]>
-  ): Map<string, GraphEdge[]> {
+  private buildReverseAdjacency(forward: Map<string, GraphEdge[]>): Map<string, GraphEdge[]> {
     const reverse = new Map<string, GraphEdge[]>();
 
     for (const [from, edges] of forward.entries()) {
@@ -314,7 +321,7 @@ Examples:
           reverse.set(edge.to, []);
         }
 
-        reverse.get(edge.to)!.push({
+        reverse.get(edge.to)?.push({
           to: from,
           type: edge.type,
           category: edge.category,
@@ -331,7 +338,7 @@ Examples:
    */
   private findPathsBidirectional(
     forward: Map<string, GraphEdge[]>,
-    reverse: Map<string, GraphEdge[]>,
+    _reverse: Map<string, GraphEdge[]>,
     fromSymbol: string,
     toSymbol: string,
     maxLength: number
@@ -349,11 +356,13 @@ Examples:
       symbolId: string;
       path: PathNode[];
       visited: Set<string>;
-    }> = [{
-      symbolId: fromSymbol,
-      path: [{ symbolId: fromSymbol, relationshipType: '', category: '' }],
-      visited: new Set([fromSymbol]),
-    }];
+    }> = [
+      {
+        symbolId: fromSymbol,
+        path: [{ symbolId: fromSymbol, relationshipType: '', category: '' }],
+        visited: new Set([fromSymbol]),
+      },
+    ];
 
     let iterations = 0;
     const maxIterations = 50000; // Safety limit
@@ -423,44 +432,14 @@ Examples:
     // Deduplicate paths
     const uniquePaths = new Map<string, SymbolPath>();
     for (const pathData of allPaths) {
-      const key = pathData.nodes.map(n => n.symbolId).join('→');
-      if (!uniquePaths.has(key) || uniquePaths.get(key)!.strength < pathData.strength) {
+      const key = pathData.nodes.map((n) => n.symbolId).join('→');
+      const existing = uniquePaths.get(key);
+      if (!existing || existing.strength < pathData.strength) {
         uniquePaths.set(key, pathData);
       }
     }
 
     return Array.from(uniquePaths.values());
-  }
-
-  /**
-   * Merge forward and backward paths at meeting point
-   */
-  private mergePaths(forward: PathNode[], backward: PathNode[]): PathNode[] {
-    // Forward path is from source to meeting point
-    // Backward path is from target to meeting point
-    // We need to reverse the backward path and connect them
-
-    const forwardPart = forward.slice(0, -1); // Remove meeting point from forward
-    const backwardPart = backward.slice(0, -1).reverse(); // Reverse and remove meeting point
-
-    // Update relationship info for backward part
-    const reversedBackward = backwardPart.map((node, i) => {
-      if (i < backwardPart.length - 1) {
-        return {
-          symbolId: node.symbolId,
-          relationshipType: backwardPart[i + 1].relationshipType,
-          category: backwardPart[i + 1].category,
-        };
-      }
-      return node;
-    });
-
-    // Combine: forward + meeting point + reversed backward
-    return [
-      ...forwardPart,
-      forward[forward.length - 1], // Meeting point
-      ...reversedBackward,
-    ];
   }
 
   /**

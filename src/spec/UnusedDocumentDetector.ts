@@ -6,7 +6,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type { UnusedDocument, SpecStatus } from '../types/spec';
+import type { SpecStatus, UnusedDocument } from '../types/spec';
 
 /**
  * Thresholds for determining stale documents (in days)
@@ -128,10 +128,7 @@ export class UnusedDocumentDetector {
     }
 
     // Check 2: Deprecated and stale (3+ months deprecated)
-    if (
-      status === 'deprecated' &&
-      daysSinceModified > STALE_THRESHOLDS.DEPRECATED_STALE_DAYS
-    ) {
+    if (status === 'deprecated' && daysSinceModified > STALE_THRESHOLDS.DEPRECATED_STALE_DAYS) {
       return {
         filePath,
         reason: 'deprecated',
@@ -162,10 +159,7 @@ export class UnusedDocumentDetector {
     }
 
     // Check 4: Stale review (2+ months in review)
-    if (
-      status === 'review' &&
-      daysSinceModified > STALE_THRESHOLDS.REVIEW_STALE_DAYS
-    ) {
+    if (status === 'review' && daysSinceModified > STALE_THRESHOLDS.REVIEW_STALE_DAYS) {
       return {
         filePath,
         reason: 'no-references',

@@ -36,7 +36,7 @@ function validateFile(filePath: string, db: DatabaseManager): ValidationResult {
   const content = fs.readFileSync(filePath, 'utf-8');
   const refs = extractSymbolReferences(content);
   const allSymbols = db.getAllSymbols();
-  const symbolNames = new Set(allSymbols.map(s => s.name));
+  const symbolNames = new Set(allSymbols.map((s) => s.name));
 
   const result: ValidationResult = {
     file: filePath,
@@ -117,8 +117,10 @@ if (issueFiles.length > 0) {
   for (const issue of issueFiles.slice(0, 10)) {
     const relPath = path.relative(process.cwd(), issue.file);
     console.log(`  ${relPath}:`);
-    console.log(`    Total refs: ${issue.totalRefs}, Found: ${issue.foundRefs}, Missing: ${issue.missingRefs.length}`);
-    issue.missingRefs.slice(0, 3).forEach(ref => {
+    console.log(
+      `    Total refs: ${issue.totalRefs}, Found: ${issue.foundRefs}, Missing: ${issue.missingRefs.length}`
+    );
+    issue.missingRefs.slice(0, 3).forEach((ref) => {
       console.log(`      - [[${ref.symbol}]] at line ${ref.line}`);
     });
     if (issue.missingRefs.length > 3) {

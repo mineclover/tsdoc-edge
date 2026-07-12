@@ -136,7 +136,7 @@ export class DatabaseManager {}
 
       expect(result.length).toBe(3);
 
-      const targets = result.map(r => r.to);
+      const targets = result.map((r) => r.to);
       expect(targets).toContain('DatabaseConfig');
       expect(targets).toContain('ConnectionPool');
       expect(targets).toContain('QueryExecutor');

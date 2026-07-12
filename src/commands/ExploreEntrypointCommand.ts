@@ -10,10 +10,9 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult } from './BaseCommand';
-import { DatabaseManager } from '../storage/DatabaseManager';
-import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import { MermaidSymbolExtractor } from '../doc-symbol/MermaidSymbolExtractor';
+import { DatabaseManager } from '../storage/DatabaseManager';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /** Result of exploring an entrypoint file and its dependencies */
 interface EntrypointExploration {
@@ -145,7 +144,7 @@ export class ExploreEntrypointCommand extends BaseCommand {
   }
 
   private async exploreFromEntrypoint(
-    absolutePath: string,
+    _absolutePath: string,
     relativePath: string,
     dbManager: DatabaseManager,
     detectOrphans: boolean
@@ -219,7 +218,7 @@ export class ExploreEntrypointCommand extends BaseCommand {
         // Extract implementation references (file:line format)
         const implRefs = this.extractImplementationReferences(content, symbolRef);
         for (const implRef of implRefs) {
-          const [filePath, lineStr] = implRef.split(':');
+          const [filePath, _lineStr] = implRef.split(':');
           if (filePath.startsWith('src/')) {
             exploration.discoveredFiles.add(filePath);
 
@@ -257,8 +256,9 @@ export class ExploreEntrypointCommand extends BaseCommand {
 
     // Detect orphans if requested
     if (detectOrphans) {
-      exploration.orphanedSymbols = allSymbolIds
-        .filter((id) => !exploration.discoveredSymbols.has(id));
+      exploration.orphanedSymbols = allSymbolIds.filter(
+        (id) => !exploration.discoveredSymbols.has(id)
+      );
 
       exploration.orphanedFiles = Array.from(allFiles).filter(
         (f) => !exploration.discoveredFiles.has(f)
@@ -332,7 +332,7 @@ export class ExploreEntrypointCommand extends BaseCommand {
    * Extract implementation file references
    * Format: `src/analyzer/Foo.ts:123` or `**Implementation**: src/...`
    */
-  private extractImplementationReferences(content: string, symbolRef: string): string[] {
+  private extractImplementationReferences(content: string, _symbolRef: string): string[] {
     const refs: string[] = [];
 
     // Match: **Implementation**: `path/to/file.ts:line`
@@ -446,23 +446,37 @@ export class ExploreEntrypointCommand extends BaseCommand {
     const { statistics } = exploration;
 
     this.printSection('Exploration Statistics');
-    console.log(`  Documentation files traversed: ${this.colors.cyan}${exploration.discoveredDocs.size}${this.colors.reset}`);
-    console.log(`  Symbols discovered: ${this.colors.cyan}${statistics.discoveredSymbols}${this.colors.reset} / ${statistics.totalSymbolsInDb}`);
-    console.log(`  Symbol coverage: ${this.colors.green}${statistics.coveragePercentage.toFixed(1)}%${this.colors.reset}`);
-    console.log(`  Files discovered: ${this.colors.cyan}${statistics.discoveredFiles}${this.colors.reset} / ${statistics.totalFilesInDb}`);
-    console.log(`  File coverage: ${this.colors.green}${statistics.fileCoveragePercentage.toFixed(1)}%${this.colors.reset}`);
+    console.log(
+      `  Documentation files traversed: ${this.colors.cyan}${exploration.discoveredDocs.size}${this.colors.reset}`
+    );
+    console.log(
+      `  Symbols discovered: ${this.colors.cyan}${statistics.discoveredSymbols}${this.colors.reset} / ${statistics.totalSymbolsInDb}`
+    );
+    console.log(
+      `  Symbol coverage: ${this.colors.green}${statistics.coveragePercentage.toFixed(1)}%${this.colors.reset}`
+    );
+    console.log(
+      `  Files discovered: ${this.colors.cyan}${statistics.discoveredFiles}${this.colors.reset} / ${statistics.totalFilesInDb}`
+    );
+    console.log(
+      `  File coverage: ${this.colors.green}${statistics.fileCoveragePercentage.toFixed(1)}%${this.colors.reset}`
+    );
     console.log();
 
     if (showOrphans) {
       this.printSection('Orphaned Code Detection');
 
       if (exploration.orphanedFiles.length > 0) {
-        console.log(`  ${this.colors.yellow}⚠ Orphaned Files (${exploration.orphanedFiles.length}):${this.colors.reset}`);
+        console.log(
+          `  ${this.colors.yellow}⚠ Orphaned Files (${exploration.orphanedFiles.length}):${this.colors.reset}`
+        );
         exploration.orphanedFiles.slice(0, 10).forEach((file) => {
           console.log(`    ${this.colors.dim}${file}${this.colors.reset}`);
         });
         if (exploration.orphanedFiles.length > 10) {
-          console.log(`    ${this.colors.dim}... and ${exploration.orphanedFiles.length - 10} more${this.colors.reset}`);
+          console.log(
+            `    ${this.colors.dim}... and ${exploration.orphanedFiles.length - 10} more${this.colors.reset}`
+          );
         }
         console.log();
       } else {
@@ -471,12 +485,16 @@ export class ExploreEntrypointCommand extends BaseCommand {
       }
 
       if (exploration.orphanedSymbols.length > 0) {
-        console.log(`  ${this.colors.yellow}⚠ Orphaned Symbols (${exploration.orphanedSymbols.length}):${this.colors.reset}`);
+        console.log(
+          `  ${this.colors.yellow}⚠ Orphaned Symbols (${exploration.orphanedSymbols.length}):${this.colors.reset}`
+        );
         exploration.orphanedSymbols.slice(0, 10).forEach((symbol) => {
           console.log(`    ${this.colors.dim}${symbol}${this.colors.reset}`);
         });
         if (exploration.orphanedSymbols.length > 10) {
-          console.log(`    ${this.colors.dim}... and ${exploration.orphanedSymbols.length - 10} more${this.colors.reset}`);
+          console.log(
+            `    ${this.colors.dim}... and ${exploration.orphanedSymbols.length - 10} more${this.colors.reset}`
+          );
         }
         console.log();
       } else {
@@ -486,10 +504,14 @@ export class ExploreEntrypointCommand extends BaseCommand {
     }
 
     this.printSection('Next Steps');
-    console.log(`  • Navigate documentation: Follow [[Symbol]] links in ${exploration.entrypointPath}`);
+    console.log(
+      `  • Navigate documentation: Follow [[Symbol]] links in ${exploration.entrypointPath}`
+    );
     console.log(`  • View work context: tsdoc-edge work-context <file-path>`);
     if (!showOrphans) {
-      console.log(`  • Detect orphans: tsdoc-edge explore-entrypoint ${exploration.entrypointPath} --detect-orphans`);
+      console.log(
+        `  • Detect orphans: tsdoc-edge explore-entrypoint ${exploration.entrypointPath} --detect-orphans`
+      );
     }
     console.log();
   }

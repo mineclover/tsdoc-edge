@@ -5,7 +5,12 @@
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { TaskListCommand, TaskAddCommand, TaskUpdateCommand, TaskStatsCommand } from './TaskCommands';
+import {
+  TaskAddCommand,
+  TaskListCommand,
+  TaskStatsCommand,
+  TaskUpdateCommand,
+} from './TaskCommands';
 
 const SUBCOMMANDS = {
   list: { command: TaskListCommand, description: 'List tasks with filters' },

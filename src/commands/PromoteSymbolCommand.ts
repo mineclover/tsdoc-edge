@@ -109,7 +109,7 @@ export class PromoteSymbolCommand extends BaseCommand {
         console.log();
         console.log('Available H2 sections in file:');
         const allH2 = this.findAllH2Sections(lines);
-        allH2.forEach(s => {
+        allH2.forEach((s) => {
           console.log(`  • [[${s.symbolName}]]`);
         });
         return this.failure('H2 not found');
@@ -159,12 +159,7 @@ export class PromoteSymbolCommand extends BaseCommand {
       // Update source file (replace H2 with inline reference)
       this.printSection('Updating Source File');
 
-      const updatedContent = this.replaceH2WithReference(
-        lines,
-        h2Section,
-        symbolName,
-        targetPath
-      );
+      const updatedContent = this.replaceH2WithReference(lines, h2Section, symbolName, targetPath);
 
       fs.writeFileSync(sourceFile, updatedContent, 'utf-8');
       this.printSuccess(`Updated: ${sourceFile}`);
@@ -173,7 +168,9 @@ export class PromoteSymbolCommand extends BaseCommand {
 
       // Summary
       this.printSection('Promotion Summary');
-      console.log(`  ${this.colors.green}✓${this.colors.reset} Canonical H1 created: ${targetPath}`);
+      console.log(
+        `  ${this.colors.green}✓${this.colors.reset} Canonical H1 created: ${targetPath}`
+      );
       console.log(`  ${this.colors.green}✓${this.colors.reset} Source file updated: ${sourceFile}`);
       console.log(`  ${this.colors.green}✓${this.colors.reset} Symbol: [[${symbolName}]]`);
       console.log();
@@ -215,7 +212,10 @@ export class PromoteSymbolCommand extends BaseCommand {
       }
     }
 
-    const content = lines.slice(startLine + 1, endLine).join('\n').trim();
+    const content = lines
+      .slice(startLine + 1, endLine)
+      .join('\n')
+      .trim();
 
     return {
       symbolName,
@@ -246,12 +246,10 @@ export class PromoteSymbolCommand extends BaseCommand {
    * Generate filename from symbol name
    */
   private generateFilename(symbolName: string): string {
-    return (
-      symbolName
-        .toLowerCase()
-        .replace(/\s+/g, '-')
-        .replace(/[^a-z0-9-]/g, '') + '.md'
-    );
+    return `${symbolName
+      .toLowerCase()
+      .replace(/\s+/g, '-')
+      .replace(/[^a-z0-9-]/g, '')}.md`;
   }
 
   /**

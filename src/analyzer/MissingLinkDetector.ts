@@ -23,9 +23,8 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { EnhancedDocExtractor, type ExtractedEnhancedDoc } from '../parser/EnhancedDocExtractor';
-import type { EnhancedSymbolDoc } from '../types/tags';
-import { ConfigLoader } from '../utils/ConfigLoader';
 import type { LinkCheckConfig } from '../types/config';
+import type { ConfigLoader } from '../utils/ConfigLoader';
 
 /**
  * Types of links that can be broken
@@ -161,13 +160,13 @@ export class MissingLinkDetector {
       if (!byType.has(link.linkType)) {
         byType.set(link.linkType, []);
       }
-      byType.get(link.linkType)!.push(link);
+      byType.get(link.linkType)?.push(link);
 
       // Group by file
       if (!byFile.has(link.sourceFile)) {
         byFile.set(link.sourceFile, []);
       }
-      byFile.get(link.sourceFile)!.push(link);
+      byFile.get(link.sourceFile)?.push(link);
     }
 
     return {
@@ -236,7 +235,9 @@ export class MissingLinkDetector {
         if (dep.type === 'symbol' || dep.type === 'module') {
           // Check if symbol exists
           if (!this.symbolRegistry.has(dep.target)) {
-            const similar = this.config.enableSuggestions ? this.findSimilarSymbols(dep.target) : [];
+            const similar = this.config.enableSuggestions
+              ? this.findSimilarSymbols(dep.target)
+              : [];
 
             brokenLinks.push({
               sourceSymbol: doc.symbol.name,

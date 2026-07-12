@@ -7,8 +7,8 @@
  * @solves Provides hierarchical view of nodes, relationships, and their distribution
  */
 
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /** Statistics about the ontology knowledge graph */
 interface OntologyStats {
@@ -182,9 +182,8 @@ Options:
     }
 
     const degreeValues = Array.from(degrees.values());
-    const avgDegree = degreeValues.length > 0
-      ? degreeValues.reduce((a, b) => a + b, 0) / degreeValues.length
-      : 0;
+    const avgDegree =
+      degreeValues.length > 0 ? degreeValues.reduce((a, b) => a + b, 0) / degreeValues.length : 0;
     const maxDegree = degreeValues.length > 0 ? Math.max(...degreeValues) : 0;
 
     // Calculate coverage (percentage of nodes with at least one relationship)
@@ -218,59 +217,84 @@ Options:
 
     // Overall metrics
     console.log(`${colors.bold}${colors.cyan}Graph Overview${colors.reset}`);
-    console.log(`  Total Nodes (Symbols):     ${colors.yellow}${stats.nodes.total.toLocaleString()}${colors.reset}`);
-    console.log(`  Total Relationships:       ${colors.yellow}${stats.relationships.total.toLocaleString()}${colors.reset}`);
-    console.log(`  Graph Density:             ${colors.yellow}${stats.metrics.density.toFixed(2)}${colors.reset} (relationships/node)`);
-    console.log(`  Average Node Degree:       ${colors.yellow}${stats.metrics.avgDegree.toFixed(2)}${colors.reset}`);
-    console.log(`  Maximum Node Degree:       ${colors.yellow}${stats.metrics.maxDegree}${colors.reset}`);
-    console.log(`  Coverage:                  ${colors.yellow}${stats.metrics.coverage.toFixed(1)}%${colors.reset} (nodes with ≥1 relationship)`);
+    console.log(
+      `  Total Nodes (Symbols):     ${colors.yellow}${stats.nodes.total.toLocaleString()}${colors.reset}`
+    );
+    console.log(
+      `  Total Relationships:       ${colors.yellow}${stats.relationships.total.toLocaleString()}${colors.reset}`
+    );
+    console.log(
+      `  Graph Density:             ${colors.yellow}${stats.metrics.density.toFixed(2)}${colors.reset} (relationships/node)`
+    );
+    console.log(
+      `  Average Node Degree:       ${colors.yellow}${stats.metrics.avgDegree.toFixed(2)}${colors.reset}`
+    );
+    console.log(
+      `  Maximum Node Degree:       ${colors.yellow}${stats.metrics.maxDegree}${colors.reset}`
+    );
+    console.log(
+      `  Coverage:                  ${colors.yellow}${stats.metrics.coverage.toFixed(1)}%${colors.reset} (nodes with ≥1 relationship)`
+    );
     console.log();
 
     // Relationship breakdown
     console.log(`${colors.bold}${colors.cyan}Relationship Composition${colors.reset}`);
-    console.log(`  Explicit:                  ${colors.green}${stats.relationships.explicit.toLocaleString()}${colors.reset} (${((stats.relationships.explicit / stats.relationships.total) * 100).toFixed(1)}%)`);
-    console.log(`  Inferred:                  ${colors.yellow}${stats.relationships.inferred.toLocaleString()}${colors.reset} (${((stats.relationships.inferred / stats.relationships.total) * 100).toFixed(1)}%)`);
+    console.log(
+      `  Explicit:                  ${colors.green}${stats.relationships.explicit.toLocaleString()}${colors.reset} (${((stats.relationships.explicit / stats.relationships.total) * 100).toFixed(1)}%)`
+    );
+    console.log(
+      `  Inferred:                  ${colors.yellow}${stats.relationships.inferred.toLocaleString()}${colors.reset} (${((stats.relationships.inferred / stats.relationships.total) * 100).toFixed(1)}%)`
+    );
     console.log();
 
     // Nodes by type
     console.log(`${colors.bold}${colors.cyan}Node Distribution by Type${colors.reset}`);
-    const sortedNodeTypes = Array.from(stats.nodes.byType.entries())
-      .sort((a, b) => b[1] - a[1]);
+    const sortedNodeTypes = Array.from(stats.nodes.byType.entries()).sort((a, b) => b[1] - a[1]);
 
     const topNodeTypes = detailed ? sortedNodeTypes : sortedNodeTypes.slice(0, 10);
     for (const [type, count] of topNodeTypes) {
       const percentage = ((count / stats.nodes.total) * 100).toFixed(1);
       const bar = this.createBar(count, stats.nodes.total, 30);
-      console.log(`  ${type.padEnd(25)} ${bar} ${colors.cyan}${count.toLocaleString().padStart(6)}${colors.reset} (${percentage}%)`);
+      console.log(
+        `  ${type.padEnd(25)} ${bar} ${colors.cyan}${count.toLocaleString().padStart(6)}${colors.reset} (${percentage}%)`
+      );
     }
     if (!detailed && sortedNodeTypes.length > 10) {
-      console.log(`  ${colors.dim}... and ${sortedNodeTypes.length - 10} more types${colors.reset}`);
+      console.log(
+        `  ${colors.dim}... and ${sortedNodeTypes.length - 10} more types${colors.reset}`
+      );
     }
     console.log();
 
     // Relationships by category
     console.log(`${colors.bold}${colors.cyan}Relationships by Category${colors.reset}`);
-    const sortedCategories = Array.from(stats.relationships.byCategory.entries())
-      .sort((a, b) => b[1] - a[1]);
+    const sortedCategories = Array.from(stats.relationships.byCategory.entries()).sort(
+      (a, b) => b[1] - a[1]
+    );
 
     for (const [category, count] of sortedCategories) {
       const percentage = ((count / stats.relationships.total) * 100).toFixed(1);
       const bar = this.createBar(count, stats.relationships.total, 30);
       const icon = this.getCategoryIcon(category);
-      console.log(`  ${icon} ${category.padEnd(20)} ${bar} ${colors.cyan}${count.toLocaleString().padStart(6)}${colors.reset} (${percentage}%)`);
+      console.log(
+        `  ${icon} ${category.padEnd(20)} ${bar} ${colors.cyan}${count.toLocaleString().padStart(6)}${colors.reset} (${percentage}%)`
+      );
     }
     console.log();
 
     // Relationships by type
     console.log(`${colors.bold}${colors.cyan}Relationships by Type${colors.reset}`);
-    const sortedRelTypes = Array.from(stats.relationships.byType.entries())
-      .sort((a, b) => b[1] - a[1]);
+    const sortedRelTypes = Array.from(stats.relationships.byType.entries()).sort(
+      (a, b) => b[1] - a[1]
+    );
 
     const topRelTypes = detailed ? sortedRelTypes : sortedRelTypes.slice(0, 15);
     for (const [type, count] of topRelTypes) {
       const percentage = ((count / stats.relationships.total) * 100).toFixed(1);
       const bar = this.createBar(count, stats.relationships.total, 30);
-      console.log(`  ${type.padEnd(30)} ${bar} ${colors.cyan}${count.toLocaleString().padStart(6)}${colors.reset} (${percentage}%)`);
+      console.log(
+        `  ${type.padEnd(30)} ${bar} ${colors.cyan}${count.toLocaleString().padStart(6)}${colors.reset} (${percentage}%)`
+      );
     }
     if (!detailed && sortedRelTypes.length > 15) {
       console.log(`  ${colors.dim}... and ${sortedRelTypes.length - 15} more types${colors.reset}`);
@@ -282,10 +306,15 @@ Options:
     const strengthOrder = ['strong', 'medium', 'weak'];
     for (const strength of strengthOrder) {
       const count = stats.relationships.byStrength.get(strength) || 0;
-      const percentage = stats.relationships.total > 0 ? ((count / stats.relationships.total) * 100).toFixed(1) : '0.0';
+      const percentage =
+        stats.relationships.total > 0
+          ? ((count / stats.relationships.total) * 100).toFixed(1)
+          : '0.0';
       const bar = this.createBar(count, stats.relationships.total, 30);
       const icon = strength === 'strong' ? '💪' : strength === 'medium' ? '👍' : '👌';
-      console.log(`  ${icon} ${strength.padEnd(20)} ${bar} ${colors.cyan}${count.toLocaleString().padStart(6)}${colors.reset} (${percentage}%)`);
+      console.log(
+        `  ${icon} ${strength.padEnd(20)} ${bar} ${colors.cyan}${count.toLocaleString().padStart(6)}${colors.reset} (${percentage}%)`
+      );
     }
     console.log();
 
@@ -294,10 +323,15 @@ Options:
     const directionOrder = ['unidirectional', 'bidirectional', 'undirected'];
     for (const direction of directionOrder) {
       const count = stats.relationships.byDirection.get(direction) || 0;
-      const percentage = stats.relationships.total > 0 ? ((count / stats.relationships.total) * 100).toFixed(1) : '0.0';
+      const percentage =
+        stats.relationships.total > 0
+          ? ((count / stats.relationships.total) * 100).toFixed(1)
+          : '0.0';
       const bar = this.createBar(count, stats.relationships.total, 30);
       const icon = direction === 'unidirectional' ? '→' : direction === 'bidirectional' ? '↔' : '—';
-      console.log(`  ${icon} ${direction.padEnd(20)} ${bar} ${colors.cyan}${count.toLocaleString().padStart(6)}${colors.reset} (${percentage}%)`);
+      console.log(
+        `  ${icon} ${direction.padEnd(20)} ${bar} ${colors.cyan}${count.toLocaleString().padStart(6)}${colors.reset} (${percentage}%)`
+      );
     }
   }
 
@@ -345,8 +379,9 @@ Options:
 
     // Relationship categories subgraph
     console.log('    subgraph Rels["Relationship Categories"]');
-    const categories = Array.from(stats.relationships.byCategory.entries())
-      .sort((a, b) => b[1] - a[1]);
+    const categories = Array.from(stats.relationships.byCategory.entries()).sort(
+      (a, b) => b[1] - a[1]
+    );
 
     for (const [category, count] of categories) {
       const catId = `C_${category.replace(/[^a-zA-Z0-9]/g, '_')}`;
@@ -370,13 +405,23 @@ Options:
     console.log('  classDef relClass fill:#fff3e0,stroke:#e65100,stroke-width:2px;');
     console.log('  classDef metricClass fill:#f3e5f5,stroke:#4a148c,stroke-width:2px;');
     console.log();
-    console.log('  class ' + topNodeTypes.map(([type]) => `N_${type.replace(/[^a-zA-Z0-9]/g, '_')}`).join(',') + ' nodeClass;');
-    console.log('  class ' + categories.map(([cat]) => `C_${cat.replace(/[^a-zA-Z0-9]/g, '_')}`).join(',') + ' relClass;');
+    console.log(
+      '  class ' +
+        topNodeTypes.map(([type]) => `N_${type.replace(/[^a-zA-Z0-9]/g, '_')}`).join(',') +
+        ' nodeClass;'
+    );
+    console.log(
+      '  class ' +
+        categories.map(([cat]) => `C_${cat.replace(/[^a-zA-Z0-9]/g, '_')}`).join(',') +
+        ' relClass;'
+    );
     console.log('  class M_density,M_coverage,M_degree metricClass;');
 
     console.log('```');
     console.log();
-    console.log(`${colors.dim}Tip: Copy the Mermaid diagram to https://mermaid.live for interactive visualization${colors.reset}`);
+    console.log(
+      `${colors.dim}Tip: Copy the Mermaid diagram to https://mermaid.live for interactive visualization${colors.reset}`
+    );
   }
 
   private createBar(value: number, max: number, width: number): string {
@@ -387,17 +432,17 @@ Options:
 
   private getCategoryIcon(category: string): string {
     const icons: Record<string, string> = {
-      'structural': '🏗️',
+      structural: '🏗️',
       'data-flow': '📊',
-      'behavioral': '⚙️',
-      'temporal': '⏱️',
-      'semantic': '💡',
-      'quality': '✨',
-      'verification': '✅',
-      'organizational': '📁',
-      'testing': '🧪',
-      'alternative': '🔀',
-      'constraint': '🔒',
+      behavioral: '⚙️',
+      temporal: '⏱️',
+      semantic: '💡',
+      quality: '✨',
+      verification: '✅',
+      organizational: '📁',
+      testing: '🧪',
+      alternative: '🔀',
+      constraint: '🔒',
     };
     return icons[category] || '🔗';
   }

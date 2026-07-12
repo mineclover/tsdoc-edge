@@ -31,7 +31,7 @@ describe('SymbolReferenceGenerator', () => {
   });
 
   beforeEach(() => {
-    tempDir = path.join(process.cwd(), '.test-temp', 'symref-test-' + Math.random());
+    tempDir = path.join(process.cwd(), '.test-temp', `symref-test-${Math.random()}`);
     fs.mkdirSync(tempDir, { recursive: true });
 
     registryPath = path.join(tempDir, 'registry.jsonl');
@@ -124,9 +124,7 @@ describe('SymbolReferenceGenerator', () => {
 
       const parsed = createParsedDoc({
         filePath: path.join(tempDir, 'test.md'),
-        symbolFootnoteRefs: [
-          createSymbolRef({ identifier: 'TestClass', isIdRef: false }),
-        ],
+        symbolFootnoteRefs: [createSymbolRef({ identifier: 'TestClass', isIdRef: false })],
       });
 
       const markdown = generator.generateSymbolReferences(parsed);

@@ -4,8 +4,8 @@
  */
 
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { ConfigManager } from '../config/ConfigManager';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * InitCommand - Initialize TSDoc Edge

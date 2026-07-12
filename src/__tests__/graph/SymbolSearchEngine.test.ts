@@ -2,8 +2,8 @@
  * Tests for SymbolSearchEngine
  */
 
-import { SymbolSearchEngine } from '../../graph/SymbolSearchEngine';
 import { SymbolGraphBuilder } from '../../graph/SymbolGraphBuilder';
+import { SymbolSearchEngine } from '../../graph/SymbolSearchEngine';
 import type { Symbol } from '../../types/graph';
 
 describe('SymbolSearchEngine', () => {
@@ -81,8 +81,18 @@ describe('SymbolSearchEngine', () => {
     }
 
     // Add relationships
-    graphBuilder.addRelationship({ from: 'test-001', to: 'test-004', type: 'dependsOn', filePath: 'src/services/UserService.ts' });
-    graphBuilder.addRelationship({ from: 'test-002', to: 'test-001', type: 'dependsOn', filePath: 'src/services/AuthService.ts' });
+    graphBuilder.addRelationship({
+      from: 'test-001',
+      to: 'test-004',
+      type: 'dependsOn',
+      filePath: 'src/services/UserService.ts',
+    });
+    graphBuilder.addRelationship({
+      from: 'test-002',
+      to: 'test-001',
+      type: 'dependsOn',
+      filePath: 'src/services/AuthService.ts',
+    });
   });
 
   describe('constructor', () => {

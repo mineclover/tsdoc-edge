@@ -4,8 +4,8 @@
  */
 
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command to query inferred relationships
@@ -82,7 +82,7 @@ export class QueryInferredCommand extends BaseCommand {
         const allRels = dbManager.getAllUnifiedRelationships();
 
         // Filter inferred relationships
-        const inferredRels = allRels.filter(r => r.properties?.inferred === true);
+        const inferredRels = allRels.filter((r) => r.properties?.inferred === true);
 
         if (inferredRels.length === 0) {
           this.printWarning('No inferred relationships found');
@@ -93,7 +93,7 @@ export class QueryInferredCommand extends BaseCommand {
         // Optional type filter
         const typeFilter = args[0];
         const filteredRels = typeFilter
-          ? inferredRels.filter(r => r.type === typeFilter)
+          ? inferredRels.filter((r) => r.type === typeFilter)
           : inferredRels;
 
         if (typeFilter && filteredRels.length === 0) {
@@ -105,11 +105,17 @@ export class QueryInferredCommand extends BaseCommand {
         // Statistics
         this.printSection('Overview');
         console.log(`  Total relationships: ${colors.cyan}${allRels.length}${colors.reset}`);
-        console.log(`  Inferred relationships: ${colors.cyan}${inferredRels.length}${colors.reset}`);
-        console.log(`  Percentage: ${colors.cyan}${((inferredRels.length / allRels.length) * 100).toFixed(2)}%${colors.reset}`);
+        console.log(
+          `  Inferred relationships: ${colors.cyan}${inferredRels.length}${colors.reset}`
+        );
+        console.log(
+          `  Percentage: ${colors.cyan}${((inferredRels.length / allRels.length) * 100).toFixed(2)}%${colors.reset}`
+        );
 
         if (typeFilter) {
-          console.log(`  Filtered (${typeFilter}): ${colors.cyan}${filteredRels.length}${colors.reset}`);
+          console.log(
+            `  Filtered (${typeFilter}): ${colors.cyan}${filteredRels.length}${colors.reset}`
+          );
         }
         console.log();
 
@@ -174,9 +180,13 @@ export class QueryInferredCommand extends BaseCommand {
             const from = Array.isArray(rel.from) ? rel.from[0] : rel.from;
             const to = Array.isArray(rel.to) ? rel.to[0] : rel.to;
             const direction = rel.properties?.direction || 'unknown';
-            const reverseOf = rel.properties?.reverseOf ? ` (reverse of ${rel.properties.reverseOf.substring(0, 20)}...)` : '';
+            const reverseOf = rel.properties?.reverseOf
+              ? ` (reverse of ${rel.properties.reverseOf.substring(0, 20)}...)`
+              : '';
 
-            console.log(`  ${colors.cyan}${from}${colors.reset} → ${colors.green}${to}${colors.reset}`);
+            console.log(
+              `  ${colors.cyan}${from}${colors.reset} → ${colors.green}${to}${colors.reset}`
+            );
             console.log(`    Type: ${rel.type}, Direction: ${direction}${reverseOf}`);
             if (rel.description) {
               console.log(`    ${colors.dim}${rel.description}${colors.reset}`);
@@ -185,7 +195,9 @@ export class QueryInferredCommand extends BaseCommand {
           console.log();
         }
 
-        this.printSuccess(`Found ${filteredRels.length} inferred relationship${filteredRels.length !== 1 ? 's' : ''}`);
+        this.printSuccess(
+          `Found ${filteredRels.length} inferred relationship${filteredRels.length !== 1 ? 's' : ''}`
+        );
         console.log();
 
         return this.success();

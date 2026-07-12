@@ -4,8 +4,8 @@
  * @responsibility Collect and organize statistics for tracking
  */
 
-import type { Symbol } from '../types/graph';
 import type { DetectableStats, ImportanceCriteria, TrackableStatistics } from '../types/analysis';
+import type { Symbol } from '../types/graph';
 import { ImportanceClassifier } from './ImportanceClassifier';
 
 /**

@@ -10,21 +10,19 @@
  * @packageDocumentation
  */
 
-import * as ts from 'typescript';
-import * as path from 'node:path';
 import * as fs from 'node:fs';
-import type { Symbol } from '../types/graph/graph';
+import * as path from 'node:path';
 import type {
-  ScopeLevel,
   Accessibility,
-  ExposureScope,
-  VisibilityBoundary,
-  SymbolExposure,
-  ExportAnalysis,
-  PackageExportConfig,
-  BarrelFile,
   BarrelExport,
+  BarrelFile,
+  ExposureScope,
+  PackageExportConfig,
+  ScopeLevel,
+  SymbolExposure,
+  VisibilityBoundary,
 } from '../types/exposure';
+import type { Symbol } from '../types/graph/graph';
 
 /**
  * Analyzes symbol exposure and visibility
@@ -126,10 +124,7 @@ export class ExposureAnalyzer {
   /**
    * Infer visibility boundary
    */
-  private inferVisibilityBoundary(
-    symbol: Symbol,
-    scopeLevel: ScopeLevel,
-  ): VisibilityBoundary {
+  private inferVisibilityBoundary(symbol: Symbol, scopeLevel: ScopeLevel): VisibilityBoundary {
     const boundary: VisibilityBoundary = {
       canBeImportedBy: [],
       restrictedTo: undefined,
@@ -233,7 +228,7 @@ export class ExposureAnalyzer {
     const indexPath = path.join(dir, 'index.ts');
     if (fs.existsSync(indexPath)) {
       const barrel = this.analyzeBarrelFile(indexPath);
-      if (barrel.exports.some(exp => exp.symbolName === symbolName)) {
+      if (barrel.exports.some((exp) => exp.symbolName === symbolName)) {
         return indexPath;
       }
     }
@@ -246,7 +241,7 @@ export class ExposureAnalyzer {
       const parentIndexPath = path.join(currentDir, 'index.ts');
       if (fs.existsSync(parentIndexPath)) {
         const barrel = this.analyzeBarrelFile(parentIndexPath);
-        if (barrel.exports.some(exp => exp.symbolName === symbolName)) {
+        if (barrel.exports.some((exp) => exp.symbolName === symbolName)) {
           return parentIndexPath;
         }
       }
@@ -267,13 +262,14 @@ export class ExposureAnalyzer {
 
     const exports: BarrelExport[] = [];
     const packageRoot = this.findPackageRoot(barrelPath);
-    const isMain = path.basename(barrelPath) === 'index.ts' &&
-                   path.dirname(barrelPath) === packageRoot;
+    const isMain =
+      path.basename(barrelPath) === 'index.ts' && path.dirname(barrelPath) === packageRoot;
 
     // Parse file to extract exports
     // Simplified - in production, use TypeScript Compiler API
     const content = fs.readFileSync(barrelPath, 'utf-8');
-    const exportRegex = /export\s+(?:\*\s+as\s+(\w+)\s+from|{([^}]+)}\s+from|(\w+)\s+from)\s+['"]([^'"]+)['"]/g;
+    const exportRegex =
+      /export\s+(?:\*\s+as\s+(\w+)\s+from|{([^}]+)}\s+from|(\w+)\s+from)\s+['"]([^'"]+)['"]/g;
 
     let match: RegExpExecArray | null;
     while ((match = exportRegex.exec(content)) !== null) {
@@ -286,9 +282,9 @@ export class ExposureAnalyzer {
           exportType: 'namespace',
         });
       } else if (namedExports) {
-        const names = namedExports.split(',').map(n => n.trim());
+        const names = namedExports.split(',').map((n) => n.trim());
         for (const name of names) {
-          const [originalName, alias] = name.split(' as ').map(s => s.trim());
+          const [originalName, alias] = name.split(' as ').map((s) => s.trim());
           exports.push({
             symbolName: originalName,
             sourcePath: this.resolveImportPath(barrelPath, sourcePath),
@@ -320,8 +316,7 @@ export class ExposureAnalyzer {
    */
   private isMainBarrel(barrelPath: string): boolean {
     const packageRoot = this.findPackageRoot(barrelPath);
-    return path.basename(barrelPath) === 'index.ts' &&
-           path.dirname(barrelPath) === packageRoot;
+    return path.basename(barrelPath) === 'index.ts' && path.dirname(barrelPath) === packageRoot;
   }
 
   /**
@@ -369,7 +364,7 @@ export class ExposureAnalyzer {
     const relativePath = path.relative(packageConfig.packageRoot, symbol.filePath);
 
     // Check exports map
-    for (const [exportPath, target] of Object.entries(packageConfig.exports)) {
+    for (const [_exportPath, target] of Object.entries(packageConfig.exports)) {
       const targetPath = typeof target === 'string' ? target : target.import || target.default;
       if (targetPath && relativePath.startsWith(targetPath.replace('./', ''))) {
         return true;
@@ -384,7 +379,7 @@ export class ExposureAnalyzer {
    */
   private resolvePackageExportPath(
     symbol: Symbol,
-    packageConfig: PackageExportConfig,
+    packageConfig: PackageExportConfig
   ): string | undefined {
     const relativePath = path.relative(packageConfig.packageRoot, symbol.filePath);
 

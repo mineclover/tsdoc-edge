@@ -8,16 +8,16 @@
 
 import * as fs from 'node:fs';
 import type { DatabaseManager } from '../storage/DatabaseManager';
-import type { TestCase, TestSuite, TestSymbol } from '../types/test-symbols';
 import type { Symbol, SymbolType } from '../types/graph/graph';
-import { ImportAnalyzer, type ImportAnalysisResult } from './ImportAnalyzer';
+import type { TestCase, TestSuite, TestSymbol } from '../types/test-symbols';
+import { type ImportAnalysisResult, ImportAnalyzer } from './ImportAnalyzer';
 
 /**
  * Test relationship types
  */
 export type TestRelationType =
-  | 'test-coverage'    // test-case → implementation symbol
-  | 'contains'         // test-suite → child suite/case
+  | 'test-coverage' // test-case → implementation symbol
+  | 'contains' // test-suite → child suite/case
   | 'covers-scenario'; // test-case → test-scenario
 
 /**
@@ -100,10 +100,7 @@ export class TestCoverageAnalyzer {
 
       // Strategy 1: Use testedSymbols from test code (variable names)
       if (testCase.testedSymbols.length > 0) {
-        const symbolMatches = this.matchTestedSymbols(
-          testCase.testedSymbols,
-          testCase.filePath
-        );
+        const symbolMatches = this.matchTestedSymbols(testCase.testedSymbols, testCase.filePath);
         matchedSymbols.push(...symbolMatches);
       }
 
@@ -112,9 +109,7 @@ export class TestCoverageAnalyzer {
       matchedSymbols.push(...importedSymbols);
 
       // Remove duplicates
-      const uniqueMatched = Array.from(
-        new Map(matchedSymbols.map(s => [s.id, s])).values()
-      );
+      const uniqueMatched = Array.from(new Map(matchedSymbols.map((s) => [s.id, s])).values());
 
       if (uniqueMatched.length > 0) {
         testCasesWithCoverage++;
@@ -122,9 +117,11 @@ export class TestCoverageAnalyzer {
         for (const implSymbol of uniqueMatched) {
           testedSymbolsSet.add(implSymbol.id);
 
-          const relationId = 'test-coverage-' + testCase.id + '-' + implSymbol.id
-            .toLowerCase()
-            .replace(/[^a-z0-9-]/g, '-');
+          const relationId =
+            'test-coverage-' +
+            testCase.id +
+            '-' +
+            implSymbol.id.toLowerCase().replace(/[^a-z0-9-]/g, '-');
 
           testCoverageRelations.push({
             id: relationId,
@@ -151,7 +148,7 @@ export class TestCoverageAnalyzer {
     for (const testSuite of testSuites) {
       // Suite → Child Suites
       for (const childSuiteId of testSuite.childSuites) {
-        const relationId = ('contains-' + testSuite.id + '-' + childSuiteId)
+        const relationId = `contains-${testSuite.id}-${childSuiteId}`
           .toLowerCase()
           .replace(/[^a-z0-9-]/g, '-');
 
@@ -170,7 +167,7 @@ export class TestCoverageAnalyzer {
 
       // Suite → Test Cases
       for (const testCaseId of testSuite.testCases) {
-        const relationId = ('contains-' + testSuite.id + '-' + testCaseId)
+        const relationId = `contains-${testSuite.id}-${testCaseId}`
           .toLowerCase()
           .replace(/[^a-z0-9-]/g, '-');
 
@@ -194,7 +191,7 @@ export class TestCoverageAnalyzer {
       const scenarioCases = this.matchTestCasesToScenario(scenario, testCases);
 
       for (const testCase of scenarioCases) {
-        const relationId = ('covers-scenario-' + testCase.id + '-' + scenario.id)
+        const relationId = `covers-scenario-${testCase.id}-${scenario.id}`
           .toLowerCase()
           .replace(/[^a-z0-9-]/g, '-');
 
@@ -213,9 +210,7 @@ export class TestCoverageAnalyzer {
     }
 
     // Calculate stats
-    const averageAssertions = casesWithAssertions > 0
-      ? totalAssertions / casesWithAssertions
-      : 0;
+    const averageAssertions = casesWithAssertions > 0 ? totalAssertions / casesWithAssertions : 0;
 
     return {
       testCoverageRelations,
@@ -243,7 +238,7 @@ export class TestCoverageAnalyzer {
     const matches: TestCase[] = [];
 
     // Only match test cases in the same file
-    const casesInSameFile = testCases.filter(tc => tc.filePath === scenario.filePath);
+    const casesInSameFile = testCases.filter((tc) => tc.filePath === scenario.filePath);
 
     for (const testCase of casesInSameFile) {
       // Check semantic similarity between scenario name and test case name
@@ -264,10 +259,18 @@ export class TestCoverageAnalyzer {
    */
   private isSemanticallyRelated(scenarioName: string, testCaseName: string): boolean {
     // Normalize strings for comparison
-    const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    const normalize = (str: string) =>
+      str
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
 
-    const scenarioWords = normalize(scenarioName).split(' ').filter(w => w.length > 2); // Lower threshold to 2
-    const testWords = normalize(testCaseName).split(' ').filter(w => w.length > 2);
+    const scenarioWords = normalize(scenarioName)
+      .split(' ')
+      .filter((w) => w.length > 2); // Lower threshold to 2
+    const testWords = normalize(testCaseName)
+      .split(' ')
+      .filter((w) => w.length > 2);
 
     // Strategy 1: Exact word matches
     let exactMatches = 0;
@@ -288,8 +291,10 @@ export class TestCoverageAnalyzer {
       for (const scenarioWord of scenarioWords) {
         // Check if one word is a prefix of another (at least 4 chars)
         if (testWord.length >= 4 && scenarioWord.length >= 4) {
-          if (testWord.startsWith(scenarioWord.slice(0, 4)) ||
-              scenarioWord.startsWith(testWord.slice(0, 4))) {
+          if (
+            testWord.startsWith(scenarioWord.slice(0, 4)) ||
+            scenarioWord.startsWith(testWord.slice(0, 4))
+          ) {
             stemMatches++;
             break;
           }
@@ -309,7 +314,11 @@ export class TestCoverageAnalyzer {
    * @returns Confidence score (0-1)
    */
   private calculateScenarioMatchConfidence(testCase: TestCase, scenario: TestSymbol): number {
-    const normalize = (str: string) => str.toLowerCase().replace(/[^a-z0-9]+/g, ' ').trim();
+    const normalize = (str: string) =>
+      str
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, ' ')
+        .trim();
 
     const scenarioWords = new Set(normalize(scenario.name).split(' '));
     const testWords = normalize(testCase.name).split(' ');
@@ -333,7 +342,7 @@ export class TestCoverageAnalyzer {
     const wordOverlap = matchCount / totalWords;
 
     // Higher confidence if more words match
-    return Math.min(0.5 + (wordOverlap * 0.5), 1.0);
+    return Math.min(0.5 + wordOverlap * 0.5, 1.0);
   }
 
   /**
@@ -355,7 +364,7 @@ export class TestCoverageAnalyzer {
     }
 
     // Get all non-type-only imports
-    const nonTypeImports = importInfo.imports.filter(imp => !imp.isTypeOnly);
+    const nonTypeImports = importInfo.imports.filter((imp) => !imp.isTypeOnly);
 
     for (const imp of nonTypeImports) {
       // Skip node modules (test frameworks, utilities)
@@ -434,10 +443,7 @@ export class TestCoverageAnalyzer {
    * @param testFilePath - Test file path for context
    * @returns Matched implementation symbols
    */
-  private matchTestedSymbols(
-    testedSymbols: string[],
-    testFilePath: string
-  ): Symbol[] {
+  private matchTestedSymbols(testedSymbols: string[], testFilePath: string): Symbol[] {
     const matched: Symbol[] = [];
     const matchedIds = new Set<string>(); // Prevent duplicates
 
@@ -500,7 +506,7 @@ export class TestCoverageAnalyzer {
       this.importCache.set(testFilePath, result);
 
       return result;
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   }
@@ -530,19 +536,19 @@ export class TestCoverageAnalyzer {
     // Try to find symbol by ID in database
     for (const symbolId of potentialIds) {
       // Try with class- prefix (e.g., 'class-filescanner')
-      let symbol = this.findSymbolById('class-' + symbolId);
+      let symbol = this.findSymbolById(`class-${symbolId}`);
       if (symbol) {
         return symbol;
       }
 
       // Try with interface- prefix
-      symbol = this.findSymbolById('interface-' + symbolId);
+      symbol = this.findSymbolById(`interface-${symbolId}`);
       if (symbol) {
         return symbol;
       }
 
       // Try with function- prefix
-      symbol = this.findSymbolById('function-' + symbolId);
+      symbol = this.findSymbolById(`function-${symbolId}`);
       if (symbol) {
         return symbol;
       }
@@ -556,7 +562,7 @@ export class TestCoverageAnalyzer {
       // Try by name (PascalCase)
       const pascalName = symbolId
         .split('-')
-        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
         .join('');
       symbol = this.findSymbolByName(pascalName, null);
       if (symbol) {
@@ -582,7 +588,7 @@ export class TestCoverageAnalyzer {
       }
 
       return null;
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   }
@@ -639,23 +645,23 @@ export class TestCoverageAnalyzer {
    */
   private expandAbbreviations(name: string): string {
     const abbreviations: Record<string, string> = {
-      'db': 'database',
-      'mgr': 'manager',
-      'cfg': 'config',
-      'ctx': 'context',
-      'repo': 'repository',
-      'svc': 'service',
-      'util': 'utility',
-      'validator': 'validator',
-      'parser': 'parser',
-      'extractor': 'extractor',
+      db: 'database',
+      mgr: 'manager',
+      cfg: 'config',
+      ctx: 'context',
+      repo: 'repository',
+      svc: 'service',
+      util: 'utility',
+      validator: 'validator',
+      parser: 'parser',
+      extractor: 'extractor',
     };
 
     let expanded = name;
     for (const [abbr, full] of Object.entries(abbreviations)) {
-      const regex = new RegExp('^' + abbr + '([A-Z]|$)', 'i');
+      const regex = new RegExp(`^${abbr}([A-Z]|$)`, 'i');
       if (regex.test(expanded)) {
-        expanded = expanded.replace(regex, full + '$1');
+        expanded = expanded.replace(regex, `${full}$1`);
         break;
       }
     }
@@ -683,7 +689,7 @@ export class TestCoverageAnalyzer {
       }
 
       return null;
-    } catch (error) {
+    } catch (_error) {
       return null;
     }
   }

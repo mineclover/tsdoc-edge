@@ -3,8 +3,8 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DatabaseManager, type SymbolRow } from '../storage/DatabaseManager';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * TreeNode interface for hierarchy tree
@@ -124,7 +124,7 @@ Examples:
         // Filter by path if provided
         let symbols = allSymbols;
         if (filterPath) {
-          symbols = allSymbols.filter(s => s.file_path.includes(filterPath));
+          symbols = allSymbols.filter((s) => s.file_path.includes(filterPath));
           console.log(`${colors.dim}Filtering by path: ${filterPath}${colors.reset}`);
           console.log();
 
@@ -204,15 +204,15 @@ Examples:
 
     const roots: TreeNode[] = [];
 
-    for (const [filePath, fileSymbols] of byFile.entries()) {
+    for (const [_filePath, fileSymbols] of byFile.entries()) {
       // Separate classes/interfaces from methods/properties
-      const containers = fileSymbols.filter(s =>
+      const containers = fileSymbols.filter((s) =>
         ['class', 'interface', 'type', 'enum'].includes(s.type)
       );
-      const members = fileSymbols.filter(s =>
+      const members = fileSymbols.filter((s) =>
         ['method', 'property', 'getter', 'setter'].includes(s.type)
       );
-      const standalone = fileSymbols.filter(s =>
+      const standalone = fileSymbols.filter((s) =>
         ['function', 'variable', 'constant'].includes(s.type)
       );
 
@@ -228,9 +228,7 @@ Examples:
         };
 
         // Find members that belong to this container (by name prefix)
-        const containerMembers = members.filter(m =>
-          m.name.startsWith(`${container.name}.`)
-        );
+        const containerMembers = members.filter((m) => m.name.startsWith(`${container.name}.`));
 
         for (const member of containerMembers) {
           containerNode.children.push({

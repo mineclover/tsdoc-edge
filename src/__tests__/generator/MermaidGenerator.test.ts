@@ -2,16 +2,18 @@
  * MermaidGenerator Tests
  */
 
-import { MermaidGenerator } from '../../visualization/MermaidGenerator';
-import type { SymbolGraph } from '../../types/graph';
 import type { CircularDependency, Hotspot } from '../../analyzer/DependencyChainAnalyzer';
+import type { SymbolGraph } from '../../types/graph';
+import { MermaidGenerator } from '../../visualization/MermaidGenerator';
 
 describe('MermaidGenerator', () => {
   // Helper to create a mock graph
-  function createMockGraph(options: {
-    symbols?: Array<{ id: string; name: string; type: string; filePath: string }>;
-    edges?: Array<{ from: string; to: string }>;
-  } = {}): SymbolGraph {
+  function createMockGraph(
+    options: {
+      symbols?: Array<{ id: string; name: string; type: string; filePath: string }>;
+      edges?: Array<{ from: string; to: string }>;
+    } = {}
+  ): SymbolGraph {
     const symbols = new Map<string, any>();
     const adjacencyList = new Map<string, string[]>();
 
@@ -94,9 +96,7 @@ describe('MermaidGenerator', () => {
 
     it('should handle symbol with no dependencies', () => {
       const graph = createMockGraph({
-        symbols: [
-          { id: 'alone', name: 'AloneClass', type: 'class', filePath: 'alone.ts' },
-        ],
+        symbols: [{ id: 'alone', name: 'AloneClass', type: 'class', filePath: 'alone.ts' }],
         edges: [],
       });
 
@@ -138,7 +138,12 @@ describe('MermaidGenerator', () => {
     it('should truncate long names', () => {
       const graph = createMockGraph({
         symbols: [
-          { id: 'long', name: 'ThisIsAVeryLongClassNameThatShouldBeTruncated', type: 'class', filePath: 'long.ts' },
+          {
+            id: 'long',
+            name: 'ThisIsAVeryLongClassNameThatShouldBeTruncated',
+            type: 'class',
+            filePath: 'long.ts',
+          },
         ],
         edges: [],
       });
@@ -157,9 +162,7 @@ describe('MermaidGenerator', () => {
           { id: 'hot', name: 'HotClass', type: 'class', filePath: 'hot.ts' },
           { id: 'dep1', name: 'Dep1', type: 'class', filePath: 'dep1.ts' },
         ],
-        edges: [
-          { from: 'dep1', to: 'hot' },
-        ],
+        edges: [{ from: 'dep1', to: 'hot' }],
       });
 
       const hotspots: Hotspot[] = [
@@ -313,9 +316,7 @@ describe('MermaidGenerator', () => {
           { id: 'base', name: 'BaseClass', type: 'class', filePath: 'base.ts' },
           { id: 'child', name: 'ChildClass', type: 'class', filePath: 'child.ts' },
         ],
-        edges: [
-          { from: 'child', to: 'base' },
-        ],
+        edges: [{ from: 'child', to: 'base' }],
       });
 
       const generator = new MermaidGenerator(graph);
@@ -345,9 +346,7 @@ describe('MermaidGenerator', () => {
           { id: 'parent', name: 'Parent', type: 'class', filePath: 'parent.ts' },
           { id: 'child', name: 'Child', type: 'class', filePath: 'child.ts' },
         ],
-        edges: [
-          { from: 'child', to: 'parent' },
-        ],
+        edges: [{ from: 'child', to: 'parent' }],
       });
 
       const generator = new MermaidGenerator(graph);
@@ -362,9 +361,7 @@ describe('MermaidGenerator', () => {
           { id: 'iface', name: 'IService', type: 'interface', filePath: 'iface.ts' },
           { id: 'impl', name: 'ServiceImpl', type: 'class', filePath: 'impl.ts' },
         ],
-        edges: [
-          { from: 'impl', to: 'iface' },
-        ],
+        edges: [{ from: 'impl', to: 'iface' }],
       });
 
       const generator = new MermaidGenerator(graph);
@@ -381,9 +378,7 @@ describe('MermaidGenerator', () => {
           { id: 'a1', name: 'A1', type: 'class', filePath: 'src/moduleA.ts' },
           { id: 'b1', name: 'B1', type: 'class', filePath: 'src/moduleB.ts' },
         ],
-        edges: [
-          { from: 'a1', to: 'b1' },
-        ],
+        edges: [{ from: 'a1', to: 'b1' }],
       });
 
       const generator = new MermaidGenerator(graph);
@@ -421,9 +416,7 @@ describe('MermaidGenerator', () => {
           { id: 'a1', name: 'A1', type: 'class', filePath: 'same.ts' },
           { id: 'a2', name: 'A2', type: 'class', filePath: 'same.ts' },
         ],
-        edges: [
-          { from: 'a1', to: 'a2' },
-        ],
+        edges: [{ from: 'a1', to: 'a2' }],
       });
 
       const generator = new MermaidGenerator(graph);
@@ -439,9 +432,7 @@ describe('MermaidGenerator', () => {
           { id: 'a', name: 'A', type: 'class', filePath: 'src/deeply/nested/file.ts' },
           { id: 'b', name: 'B', type: 'class', filePath: 'src/other/module.ts' },
         ],
-        edges: [
-          { from: 'a', to: 'b' },
-        ],
+        edges: [{ from: 'a', to: 'b' }],
       });
 
       const generator = new MermaidGenerator(graph);

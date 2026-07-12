@@ -53,10 +53,7 @@ export class SpecStatusManager {
    * @param targetStatus - Target status to transition to
    * @returns Transition validation result
    */
-  validateTransition(
-    filePath: string,
-    targetStatus: SpecStatus
-  ): SpecStatusTransition {
+  validateTransition(filePath: string, targetStatus: SpecStatus): SpecStatusTransition {
     if (!fs.existsSync(filePath)) {
       throw new Error(`File not found: ${filePath}`);
     }
@@ -117,7 +114,8 @@ export class SpecStatusManager {
     // Check 3: Required sections for approved/active status
     if (targetStatus === 'approved' || targetStatus === 'active') {
       const completeness = this.validator.validate(filePath);
-      const hasAllRequired = completeness.breakdown.design.structure.requiredSections.missing.length === 0;
+      const hasAllRequired =
+        completeness.breakdown.design.structure.requiredSections.missing.length === 0;
 
       checks.push({
         name: 'Required Sections',
@@ -210,7 +208,14 @@ export class SpecStatusManager {
       return 'draft';
     }
 
-    const validStatuses: SpecStatus[] = ['draft', 'review', 'approved', 'active', 'deprecated', 'archived'];
+    const validStatuses: SpecStatus[] = [
+      'draft',
+      'review',
+      'approved',
+      'active',
+      'deprecated',
+      'archived',
+    ];
     const status = statusMatch[1];
 
     if (!validStatuses.includes(status as SpecStatus)) {
@@ -245,10 +250,7 @@ ${content}`;
     let newFrontmatter: string;
     if (statusMatch) {
       // Update existing status
-      newFrontmatter = frontmatter.replace(
-        /status:\s*["']?\w+["']?/,
-        `status: ${newStatus}`
-      );
+      newFrontmatter = frontmatter.replace(/status:\s*["']?\w+["']?/, `status: ${newStatus}`);
     } else {
       // Add status field
       newFrontmatter = `${frontmatter}\nstatus: ${newStatus}`;
@@ -264,10 +266,7 @@ ${content}`;
       newFrontmatter = `${newFrontmatter}\nlastUpdated: ${new Date().toISOString().split('T')[0]}`;
     }
 
-    const newContent = content.replace(
-      /^---\n[\s\S]*?\n---/,
-      `---\n${newFrontmatter}\n---`
-    );
+    const newContent = content.replace(/^---\n[\s\S]*?\n---/, `---\n${newFrontmatter}\n---`);
 
     fs.writeFileSync(filePath, newContent, 'utf-8');
   }

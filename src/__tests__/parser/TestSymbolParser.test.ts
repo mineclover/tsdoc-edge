@@ -321,7 +321,9 @@ describe('TestCamelCase', () => {
       const result = parser.extract('test.ts', sourceCode);
 
       expect(result.testSuites[0].id).toBe('test-test-camel-case-test-suite');
-      expect(result.testCases[0].id).toBe('test-test-camel-case-should-do-something-nice-test-case');
+      expect(result.testCases[0].id).toBe(
+        'test-test-camel-case-should-do-something-nice-test-case'
+      );
     });
 
     it('should handle special characters in names', () => {
@@ -334,7 +336,9 @@ describe('Test @special #chars!', () => {
       const result = parser.extract('test.ts', sourceCode);
 
       expect(result.testSuites[0].id).toBe('test-test-special-chars-test-suite');
-      expect(result.testCases[0].id).toBe('test-test-special-chars-should-handle-symbols-more-test-case');
+      expect(result.testCases[0].id).toBe(
+        'test-test-special-chars-should-handle-symbols-more-test-case'
+      );
     });
   });
 

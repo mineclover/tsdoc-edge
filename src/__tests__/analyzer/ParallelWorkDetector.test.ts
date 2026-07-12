@@ -7,10 +7,7 @@ import type { SymbolGraph } from '../../types/graph/graph';
 
 describe('ParallelWorkDetector', () => {
   // Helper to create mock graph
-  function createMockGraph(
-    symbols: string[],
-    adjacencyList: Map<string, string[]>
-  ): SymbolGraph {
+  function createMockGraph(symbols: string[], adjacencyList: Map<string, string[]>): SymbolGraph {
     const symbolsMap = new Map();
     for (const id of symbols) {
       symbolsMap.set(id, {
@@ -52,10 +49,7 @@ describe('ParallelWorkDetector', () => {
 
     it('should detect direct dependency conflicts', () => {
       // A -> B
-      const graph = createMockGraph(
-        ['A', 'B'],
-        new Map([['A', ['B']]])
-      );
+      const graph = createMockGraph(['A', 'B'], new Map([['A', ['B']]]));
 
       const detector = new ParallelWorkDetector(graph);
       const result = detector.detectParallelWork(['A', 'B'], []);
@@ -148,10 +142,7 @@ describe('ParallelWorkDetector', () => {
   describe('parallel zones', () => {
     it('should identify parallel zones correctly', () => {
       // Independent modules: A, B, C (no dependencies)
-      const graph = createMockGraph(
-        ['A', 'B', 'C'],
-        new Map()
-      );
+      const graph = createMockGraph(['A', 'B', 'C'], new Map());
 
       const detector = new ParallelWorkDetector(graph);
       const result = detector.detectParallelWork([], []);
@@ -162,16 +153,13 @@ describe('ParallelWorkDetector', () => {
 
     it('should create separate zones for conflicting modules', () => {
       // A -> B (conflict), C independent
-      const graph = createMockGraph(
-        ['A', 'B', 'C'],
-        new Map([['A', ['B']]])
-      );
+      const graph = createMockGraph(['A', 'B', 'C'], new Map([['A', ['B']]]));
 
       const detector = new ParallelWorkDetector(graph);
       const result = detector.detectParallelWork([], []);
 
       // C should be in a zone that can work in parallel
-      const cZone = result.parallelZones.find(z => z.modules.includes('C'));
+      const cZone = result.parallelZones.find((z) => z.modules.includes('C'));
       expect(cZone).toBeDefined();
     });
   });
