@@ -129,7 +129,8 @@ export class CallGraphAnalyzer {
 
       // Index by method suffix (e.g., "methodName" from "ClassName.methodName")
       if (symbol.name.includes('.')) {
-        const methodName = symbol.name.split('.').pop()!;
+        const methodName = symbol.name.split('.').pop();
+        if (!methodName) continue;
         const byMethodName = this.symbolsByName.get(methodName) || [];
         byMethodName.push(symbol);
         this.symbolsByName.set(methodName, byMethodName);

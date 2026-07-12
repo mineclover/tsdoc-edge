@@ -107,7 +107,10 @@ function parseXmlToTree(xml: string): XmlElement | null {
   }
 
   // Get inner content
-  const openTagEnd = trimmed.indexOf('>', match.index!) + 1;
+  const matchIndex = match.index;
+  if (matchIndex === undefined)
+    throw new XmlParseError(`Missing opening tag position for <${tag}>`);
+  const openTagEnd = trimmed.indexOf('>', matchIndex) + 1;
   const innerContent = trimmed.substring(openTagEnd, closeIndex).trim();
 
   // Check if it's text content or child elements

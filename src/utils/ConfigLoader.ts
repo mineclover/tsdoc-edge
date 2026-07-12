@@ -160,7 +160,9 @@ export class ConfigLoader {
    * @returns Link check configuration
    */
   public getLinkCheckConfig(): LinkCheckConfig {
-    return this.config.linkCheck || DEFAULT_CONFIG.linkCheck!;
+    const defaultLinkCheck = DEFAULT_CONFIG.linkCheck;
+    if (!defaultLinkCheck) throw new Error('Default link check configuration is unavailable');
+    return this.config.linkCheck ?? defaultLinkCheck;
   }
 
   /**

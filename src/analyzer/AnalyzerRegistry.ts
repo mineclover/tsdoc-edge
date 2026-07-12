@@ -398,8 +398,11 @@ export class AnalyzerRegistry {
       case 'temporal-order':
         return new TemporalOrderAnalyzer(graph, program).analyze();
 
-      case 'tests':
-        return new TestCoverageUnifier(graph, ctx.dbManager ?? ctx.db!).analyze();
+      case 'tests': {
+        const dbManager = ctx.dbManager ?? ctx.db;
+        if (!dbManager) return [];
+        return new TestCoverageUnifier(graph, dbManager).analyze();
+      }
 
       case 'types':
         return new TypeDependencyAnalyzer(graph, program).analyze();

@@ -280,7 +280,8 @@ export class RelationshipQueryEngine {
     visited.set(symbolId, 0);
 
     while (queue.length > 0) {
-      const current = queue.shift()!;
+      const current = queue.shift();
+      if (!current) continue;
 
       if (current.depth >= maxDepth) continue;
 
@@ -322,7 +323,8 @@ export class RelationshipQueryEngine {
     visited.add(fromId);
 
     while (queue.length > 0) {
-      const current = queue.shift()!;
+      const current = queue.shift();
+      if (!current) continue;
 
       if (current.symbol === toId) {
         return current.path;
@@ -368,8 +370,9 @@ export class RelationshipQueryEngine {
     }
 
     // Filter by confidence
-    if (options.minConfidence !== undefined) {
-      filtered = filtered.filter((rel) => rel.confidence >= options.minConfidence!);
+    const minConfidence = options.minConfidence;
+    if (minConfidence !== undefined) {
+      filtered = filtered.filter((rel) => rel.confidence >= minConfidence);
     }
 
     // Exclude types
