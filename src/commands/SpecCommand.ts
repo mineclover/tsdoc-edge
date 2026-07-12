@@ -5,10 +5,11 @@
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
-import { SpecStatusCommand } from './SpecStatusCommand';
-import { SpecHistoryCommand } from './SpecHistoryCommand';
-import { SpecDiffCommand } from './SpecDiffCommand';
 import { SpecBumpCommand } from './SpecBumpCommand';
+import { SpecDiffCommand } from './SpecDiffCommand';
+import { SpecExtractCommand } from './SpecExtractCommand';
+import { SpecHistoryCommand } from './SpecHistoryCommand';
+import { SpecStatusCommand } from './SpecStatusCommand';
 import { ValidateSpecCommand } from './ValidateSpecCommand';
 
 const SUBCOMMANDS = {
@@ -17,6 +18,10 @@ const SUBCOMMANDS = {
   diff: { command: SpecDiffCommand, description: 'Compare specification versions' },
   bump: { command: SpecBumpCommand, description: 'Bump specification version' },
   validate: { command: ValidateSpecCommand, description: 'Validate specifications' },
+  extract: {
+    command: SpecExtractCommand,
+    description: 'Compile managed project specs into SpecGraph',
+  },
 } as const;
 
 type SubcommandName = keyof typeof SUBCOMMANDS;

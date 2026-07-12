@@ -20,6 +20,25 @@ Spec Management System은 문서 명세(Specification)의 생명주기를 관리
 
 ---
 
+## Project spec authoring root
+
+Project-level requirement, binding, and convention specifications are authored under
+`managed/specs/`. The roadmap is an execution record, while architecture/feature documents define
+contracts and user behavior. A compiled `SpecGraphRevision`, database row, report, or history entry
+is always derived and is never edited as a second spec source.
+
+The configured root is `.tsdoc.config.json#specGovernance.authoredSpecDirs`. Its companion
+`specGovernance.naming` policy makes file/symbol casing location-aware rather than imposing one
+global spelling rule. The root index defines the current document convention.
+
+P4.4 compiles `type: project-spec` documents under this root with `tsdoc-edge spec extract`. The
+extractor requires an H1 checkpoint and one explicit `tsdoc-spec` declaration block, then writes a
+derived `SpecGraphRevision` through `SpecGraphRepository`. The committed convention JSON remains a
+separate bootstrap canary and must not duplicate a managed-spec identity; policy/rule authoring has
+not yet moved from that bootstrap into managed documents.
+
+---
+
 ## Module Specification
 
 ### Purpose
