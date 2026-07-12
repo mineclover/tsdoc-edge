@@ -71,7 +71,7 @@ async function main() {
   const sourceFile = ts.createSourceFile(testFilePath, sourceCode, ts.ScriptTarget.Latest, true);
 
   // Find first test case
-  let firstTest: any = null;
+  let firstTest: ts.CallExpression | null = null;
   const visit = (node: ts.Node) => {
     if (
       ts.isCallExpression(node) &&

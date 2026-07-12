@@ -11,7 +11,7 @@ interface MigrationCandidate {
   id: string;
   from: string[];
   to: string[];
-  properties: any;
+  properties: Record<string, unknown>;
   filePath?: string;
   description?: string;
 }
@@ -78,7 +78,7 @@ function analyzeConceptualRelations(): MigrationAnalysis {
       id: rel.id,
       from: JSON.parse(rel.from_symbols),
       to: JSON.parse(rel.to_symbols),
-      properties: rel.properties ? JSON.parse(rel.properties) : {},
+      properties: rel.properties ? (JSON.parse(rel.properties) as Record<string, unknown>) : {},
       filePath: rel.file_path || undefined,
       description: rel.description || undefined,
     };

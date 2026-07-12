@@ -35,7 +35,7 @@ and rejects a new warning category or any count above this baseline:
 | Rule | Maximum |
 | --- | ---: |
 | `noNonNullAssertion` | 37 |
-| `noExplicitAny` | 13 |
+| `noExplicitAny` | 1 |
 | other current warning/info categories | 1–23, enforced by script |
 
 Reducing the budget is encouraged and does not require a migration exception. Increasing it needs a

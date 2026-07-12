@@ -61,8 +61,14 @@ const samples = db.db
 `)
   .all();
 
+interface DocReferenceRow {
+  id: string;
+  from_symbols: string;
+  to_symbols: string;
+}
+
 console.log(`\nSample doc-reference entries: ${samples.length}`);
-samples.forEach((s: any, idx) => {
+samples.forEach((s: DocReferenceRow, idx) => {
   console.log(`  ${idx + 1}. ${s.id}`);
   console.log(`     from: ${s.from_symbols}`);
   console.log(`     to: ${s.to_symbols}`);

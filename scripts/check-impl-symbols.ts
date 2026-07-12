@@ -7,12 +7,19 @@ console.log('🔍 Checking implementation symbols\n');
 
 const names = ['FileScanner', 'DatabaseManager', 'SymbolRegistryManager'];
 
+interface ImplementationSymbolRow {
+  id: string;
+  name: string;
+  type: string;
+  file_path: string;
+}
+
 for (const name of names) {
   const result = db.db
     .prepare(
       "SELECT id, name, type, file_path FROM symbols WHERE name = ? AND type IN ('class', 'interface', 'function') LIMIT 1"
     )
-    .get(name) as any;
+    .get(name) as ImplementationSymbolRow | undefined;
 
   if (result) {
     console.log(`✓ ${name}`);

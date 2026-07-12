@@ -10,7 +10,7 @@ import { DatabaseManager } from '../src/storage/DatabaseManager';
 
 interface WorkflowTest {
   name: string;
-  test: () => Promise<{ success: boolean; message: string; details?: any }>;
+  test: () => Promise<{ success: boolean; message: string; details?: unknown }>;
 }
 
 async function main() {

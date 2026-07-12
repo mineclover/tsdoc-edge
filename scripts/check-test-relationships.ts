@@ -10,6 +10,29 @@ const jsonlPath = '.tsdoc';
 
 const db = new DatabaseManager(dbPath, jsonlPath);
 
+interface RelationshipSampleRow {
+  id: string;
+  from_symbols: string;
+  to_symbols: string;
+  confidence: number;
+  description: string | null;
+}
+
+interface CoverageStatsRow {
+  total_test_cases: number;
+  test_cases_with_coverage: number;
+  symbols_tested: number;
+  coverage_relations: number;
+}
+
+interface TestedSymbolRow {
+  id: string;
+  name: string;
+  type: string;
+  file_path: string;
+  test_count: number;
+}
+
 console.log('🔗 Test Relationship Analysis\n');
 
 // Query relationship statistics
@@ -37,7 +60,7 @@ const testCoverageQuery = `
 `;
 
 console.log('🧪 Sample Test Coverage Relationships:');
-const testCoverage = db.db.prepare(testCoverageQuery).all() as Array<any>;
+const testCoverage = db.db.prepare(testCoverageQuery).all() as RelationshipSampleRow[];
 
 if (testCoverage.length === 0) {
   console.log('   No test-coverage relationships found');
@@ -61,7 +84,7 @@ const containsQuery = `
 `;
 
 console.log('📦 Sample Test Hierarchy (contains) Relationships:');
-const contains = db.db.prepare(containsQuery).all() as Array<any>;
+const contains = db.db.prepare(containsQuery).all() as RelationshipSampleRow[];
 
 if (contains.length === 0) {
   console.log('   No contains relationships found');
@@ -84,7 +107,7 @@ const coverageStatsQuery = `
     (SELECT COUNT(*) FROM unified_relationships WHERE type = 'test-coverage') as coverage_relations
 `;
 
-const stats = db.db.prepare(coverageStatsQuery).get() as any;
+const stats = db.db.prepare(coverageStatsQuery).get() as CoverageStatsRow;
 
 console.log('📈 Coverage Statistics:');
 console.log(`   Total test cases: ${stats.total_test_cases}`);
@@ -116,7 +139,7 @@ const testedSymbolsQuery = `
 `;
 
 console.log('🎯 Most Tested Symbols:');
-const testedSymbols = db.db.prepare(testedSymbolsQuery).all() as Array<any>;
+const testedSymbols = db.db.prepare(testedSymbolsQuery).all() as TestedSymbolRow[];
 
 if (testedSymbols.length === 0) {
   console.log('   No tested symbols found');

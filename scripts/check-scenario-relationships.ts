@@ -3,6 +3,11 @@ import { DatabaseManager } from '../src/storage/DatabaseManager';
 
 const db = new DatabaseManager('.tsdoc/symbols.db', '.tsdoc');
 
+interface RelationshipPathRow {
+  from_symbols: string;
+  to_symbols: string;
+}
+
 console.log('🔍 Checking covers-scenario relationships\n');
 
 const query = "SELECT COUNT(*) as count FROM unified_relationships WHERE type = 'covers-scenario'";
@@ -20,7 +25,7 @@ allTypes.forEach((row) => {
 if (result.count > 0) {
   console.log('\nSample covers-scenario relationships:');
   const sampleQuery = "SELECT * FROM unified_relationships WHERE type = 'covers-scenario' LIMIT 5";
-  const samples = db.db.prepare(sampleQuery).all() as Array<any>;
+  const samples = db.db.prepare(sampleQuery).all() as RelationshipPathRow[];
   samples.forEach((rel) => {
     console.log(`  ${rel.from_symbols} → ${rel.to_symbols}`);
   });

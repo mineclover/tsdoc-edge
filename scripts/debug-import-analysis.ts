@@ -14,6 +14,12 @@ const jsonlPath = '.tsdoc';
 const db = new DatabaseManager(dbPath, jsonlPath);
 const importAnalyzer = new ImportAnalyzer();
 
+interface SymbolLookupRow {
+  id: string;
+  name: string;
+  type: string;
+}
+
 console.log('🔍 Import Analysis Debug\n');
 
 // Check FileScanner test file
@@ -47,7 +53,7 @@ if (fs.existsSync(testFile)) {
     // Check if symbols exist in database
     for (const symbolId of ids) {
       const symbolQuery = `SELECT id, name, type FROM symbols WHERE id = ? LIMIT 1`;
-      const symbol = db.db.prepare(symbolQuery).get(symbolId) as any;
+      const symbol = db.db.prepare(symbolQuery).get(symbolId) as SymbolLookupRow | undefined;
       if (symbol) {
         console.log(`      ✓ Found in DB: ${symbol.name} (${symbol.type})`);
       }
@@ -58,7 +64,7 @@ if (fs.existsSync(testFile)) {
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
         .join('');
       const nameQuery = `SELECT id, name, type FROM symbols WHERE name = ? LIMIT 1`;
-      const byName = db.db.prepare(nameQuery).get(pascalName) as any;
+      const byName = db.db.prepare(nameQuery).get(pascalName) as SymbolLookupRow | undefined;
       if (byName) {
         console.log(`      ✓ Found by name: ${byName.id} (${byName.type})`);
       }
