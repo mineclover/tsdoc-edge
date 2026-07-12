@@ -2,7 +2,11 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import Database from 'better-sqlite3';
-import { ConventionCheckService, compileConventionPackSource } from '../../convention';
+import {
+  ConventionCheckService,
+  compileConventionPackSource,
+  evaluateConventionGate,
+} from '../../convention';
 import {
   createCanonicalEmptyEnrichmentRevision,
   createCanonicalEmptyEvidenceRevision,
@@ -33,17 +37,35 @@ describe('ConventionCheckHistoryRepository', () => {
       });
       const evidence = createCanonicalEmptyEvidenceRevision('fixture-workspace');
       const enrichment = createCanonicalEmptyEnrichmentRevision('fixture-workspace');
+      const replay = {
+        pack,
+        evaluationConfig: check.retainedEvaluationConfig,
+        gate: evaluateConventionGate(check, 'error'),
+      };
       const stored = history.append({
         check,
         inputs: { evidence, enrichment, policy: pack.policy, ruleSet: pack.ruleSet },
+        ...replay,
       });
       historyId = stored.historyId;
 
       expect(history.read(stored.historyId)).toEqual(stored);
+      const retained = history.read(stored.historyId)!;
+      const replayed = new ConventionCheckService().run({
+        pack: retained.pack,
+        codeRevision: graphRepository.readRevision(retained.check.codeRevisionId)!,
+        workspaceRoot: '/fixture',
+        evidence: retained.inputs.evidence,
+        enrichment: retained.inputs.enrichment,
+        naming: retained.evaluationConfig.naming,
+        tsdoc: retained.evaluationConfig.tsdoc,
+      });
+      expect(replayed.checkId).toBe(check.checkId);
       expect(
         history.append({
           check,
           inputs: { evidence, enrichment, policy: pack.policy, ruleSet: pack.ruleSet },
+          ...replay,
         })
       ).toEqual(stored);
       expect(() =>
@@ -55,8 +77,17 @@ describe('ConventionCheckHistoryRepository', () => {
             policy: pack.policy,
             ruleSet: pack.ruleSet,
           },
+          ...replay,
         })
       ).toThrow('must be canonical');
+      expect(() =>
+        history.append({
+          check,
+          inputs: { evidence, enrichment, policy: pack.policy, ruleSet: pack.ruleSet },
+          ...replay,
+          gate: { ...replay.gate, gateId: 'forged' },
+        })
+      ).toThrow('inputs do not match');
     } finally {
       history.close();
       graphRepository.close();

@@ -170,15 +170,15 @@ Overlay와 binding set은 process-local이다. Conformance finding/report는 der
 | Legacy baseline/differential | `planned` | narrow AST parity helper만 존재 | versioned `work-context` fixture와 comparator |
 | Public provider boundary | `kernel` | ttsc provider, snapshot/delta normalizer | coordinator wiring과 packed early canary |
 | Spec repository | `kernel` | immutable CAS/history repository | production caller |
-| Managed-doc extraction | `planned` | authored authority 결정만 존재 | extractor, binding syntax와 caller |
-| Convention loop | `proven` (implementation binding) | saved graph, exact replay, exit 0/1/2 PoC | verification/naming/enrichment |
+| Managed-doc extraction | `proven` (source-checkout) | explicit `tsdoc-spec` → `SpecGraphRevision`, `spec extract`, duplicate/provenance test | managed spec을 convention runtime source로 승격 |
+| Convention loop | `proven` (source-checkout) | implementation/verification/naming/TSDoc, saved graph, exit 0/1/2 PoC | packed external proof |
 | P4.0 TS7 test lane | `proven` (repository-local) | TS7 typecheck → AOT → JavaScript Jest parity | Node/package release qualification |
 | Evidence revision/store | `kernel` | revision, exact store, resolver index | retained-input product wiring |
 | Jest evidence check | `proven` (source-checkout) | source-mapped TS7 Jest artifact → CLI check/replay, status and input-error canaries | retained-input history |
 | Naming evaluator | `proven` (source-checkout) | location-aware Pascal/camel/snake/kebab evaluator, typed config, CLI exit/replay canaries | policy migration from warning to error |
 | Enrichment revision/store | `kernel` | revision factory와 shared exact store | retained-input product wiring |
-| TSDoc enrichment check | `planned` | loader/consumer 없음 | loader와 첫 consuming rule |
-| Durable result history | `planned` | transient check result만 존재 | retained input과 append-only result store |
+| TSDoc enrichment check | `proven` (source-checkout) | workspace source digest → enrichment revision, tag finding/check/gate | general enrichment framework |
+| Durable result history | `proven` (source-checkout) | append-only canonical bundle, retained replay, source/config removal canary, tamper reject | retention GC pin/tombstone, packed external proof |
 | LSP spec experience | `planned` | structural canonical/overlay LSP만 존재 | saved diagnostics와 read-only actions |
 | External library pilot | `planned` | self-repository PoC만 존재 | packed early canary와 full pilot |
 
@@ -461,11 +461,7 @@ interface ConventionReplayBundle {
   workspaceId: string;
   code: { revisionId: string; graphFingerprint: string };
   spec: { revisionId: string; contentFingerprint: string };
-  compiledPack: {
-    manifest: ConventionPackManifest;
-    policy: PolicyRevision;
-    ruleSet: RuleSetRevision;
-  };
+  compiledPack: CompiledConventionPack;
   inputs: {
     evidence: EvidenceRevision;
     enrichment: EnrichmentRevision;
@@ -474,8 +470,8 @@ interface ConventionReplayBundle {
     naming: NamingConventionConfig;
     tsdoc: TsdocConventionConfig;
     suppressionAsOf?: string;
-    failureThreshold: ConventionFailureThreshold;
   };
+  gate: ConventionGateDecision;
   expected: {
     effectiveStamp: EffectiveAnalysisInputStamp;
     checkId: string;
@@ -488,10 +484,10 @@ interface ConventionReplayBundle {
 ```
 
 `compiledPack`에는 source JSON을 다시 해석해 현재 파일을 선택하지 않는다. 저장된 manifest,
-policy, rule-set와 `SpecGraphRepository`의 exact spec revision을 canonical factory로 재검증해
-process-local trusted compiled pack을 재구성한다. `GraphRepository`도 active pointer가 아니라
-bundle의 `code.revisionId`를 exact lookup하고 graph fingerprint를 재검증한다. 둘 중 하나라도
-없으면 `historical-input-missing` input error(exit `2`)이며 latest revision으로 대체하지 않는다.
+spec, policy, rule-set을 canonical factory로 재검증해 process-local trusted compiled pack을
+재구성한다. `GraphRepository`도 active pointer가 아니라 bundle의 `code.revisionId`를 exact
+lookup하고 graph fingerprint를 재검증한다. code revision이 없으면
+`historical-input-missing` input error(exit `2`)이며 latest revision으로 대체하지 않는다.
 
 Replay는 retained evidence/enrichment와 retained naming/TSDoc config를 `ConventionCheckService`에
 명시 전달한다. 따라서 현재 `.tsdoc.config.json`, 현재 managed Markdown, 현재 pack file이나 현재
@@ -500,10 +496,11 @@ expected ID가 일치할 때만 `reproduced`다. 과거 gate가 pass면 replay e
 exit `1`, input missing/tamper/ID divergence는 exit `2`다. serialized binding resolution, finding,
 report는 비교용 evidence일 뿐 trusted execution input이 아니다.
 
-저장은 하나의 history SQLite transaction에서 input revision rows, replay bundle, result envelope와
-code/spec retention pin을 함께 append한다. 동일 `historyId`의 byte-identical 재요청은 idempotent
-read, 다른 payload는 collision error다. retention GC는 history pin이 있는 code/spec/input revision을
-제거하지 않으며, 삭제가 필요한 경우에는 tombstone과 `historical-input-missing`을 남긴다.
+저장은 하나의 history SQLite transaction에서 canonical input payload, replay bundle과 result
+envelope를 함께 append한다. 동일 `historyId`의 byte-identical 재요청은 idempotent read, 다른
+payload는 collision error다. history-aware code/spec retention pin과 GC tombstone은 다음 retention
+lane이며, 현재 replay는 missing code revision을 fallback 없이 `historical-input-missing`으로
+반환한다.
 
 Closeout proof는 다음을 요구한다.
 

@@ -5,6 +5,9 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import Database from 'better-sqlite3';
 import type { ConventionCheckResult } from '../convention/ConventionCheckService';
+import { type ConventionGateDecision, evaluateConventionGate } from '../convention/ConventionGate';
+import { restoreCompiledConventionPack } from '../convention/ConventionPackCompiler';
+import type { CompiledConventionPack } from '../convention/contracts';
 import {
   createEnrichmentRevision,
   createEvidenceRevision,
@@ -15,8 +18,9 @@ import type { RuleSetRevision } from '../semantic-graph/contracts';
 import { createRuleSetRevision } from '../semantic-graph/EffectiveAnalysisService';
 import type { PolicyRevision } from '../spec-graph/contracts';
 import { createPolicyRevision } from '../spec-graph/identity';
+import type { NamingConventionConfig, TsdocConventionConfig } from '../types/config';
 
-export const CONVENTION_CHECK_HISTORY_CONTRACT_VERSION = '1.0' as const;
+export const CONVENTION_CHECK_HISTORY_CONTRACT_VERSION = '2.0' as const;
 export const CONVENTION_CHECK_HISTORY_SCHEMA_VERSION = 1 as const;
 
 export interface RetainedConventionCheckInputs {
@@ -26,13 +30,22 @@ export interface RetainedConventionCheckInputs {
   readonly ruleSet: RuleSetRevision;
 }
 
+export type RetainedConventionGate = ConventionGateDecision;
+
 /** One self-validating append-only envelope; code/spec are retained by their own repositories. */
 export interface RetainedConventionCheck {
   readonly contractVersion: typeof CONVENTION_CHECK_HISTORY_CONTRACT_VERSION;
   readonly historyId: string;
   readonly workspaceId: string;
   readonly check: ConventionCheckResult;
+  readonly pack: CompiledConventionPack;
   readonly inputs: RetainedConventionCheckInputs;
+  readonly evaluationConfig: {
+    readonly naming: NamingConventionConfig;
+    readonly tsdoc: TsdocConventionConfig;
+    readonly suppressionAsOf?: string;
+  };
+  readonly gate: RetainedConventionGate;
 }
 
 export interface ConventionCheckHistoryRepositoryOptions {
@@ -92,10 +105,13 @@ export class ConventionCheckHistoryRepository {
   append(input: {
     readonly check: ConventionCheckResult;
     readonly inputs: RetainedConventionCheckInputs;
+    readonly pack: CompiledConventionPack;
+    readonly evaluationConfig: RetainedConventionCheck['evaluationConfig'];
+    readonly gate: RetainedConventionGate;
   }): RetainedConventionCheck {
     if (this.readOnly)
       throw new Error('Cannot append convention check history in a read-only repository');
-    const entry = canonicalEntry(input.check, input.inputs);
+    const entry = canonicalEntry(input);
     const write = this.database.transaction(() => {
       const existing = this.select(entry.historyId);
       if (existing) {
@@ -149,7 +165,7 @@ function materialize(row: HistoryRow): RetainedConventionCheck {
   let canonical: RetainedConventionCheck;
   try {
     parsed = JSON.parse(row.payload_json) as RetainedConventionCheck;
-    canonical = canonicalEntry(parsed.check, parsed.inputs);
+    canonical = canonicalEntry(parsed);
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
     throw new Error(`Convention check history envelope mismatch: ${row.history_id} (${detail})`);
@@ -164,13 +180,20 @@ function materialize(row: HistoryRow): RetainedConventionCheck {
   if (stableJson(parsed) !== stableJson(canonical)) {
     throw new Error(`Convention check history payload is not canonical: ${row.history_id}`);
   }
-  return immutableJson(canonical);
+  return Object.freeze({
+    ...immutableJson(canonical),
+    pack: restoreCompiledConventionPack(canonical.pack),
+  });
 }
 
-function canonicalEntry(
-  check: ConventionCheckResult,
-  inputs: RetainedConventionCheckInputs
-): RetainedConventionCheck {
+function canonicalEntry(input: {
+  readonly check: ConventionCheckResult;
+  readonly inputs: RetainedConventionCheckInputs;
+  readonly pack: CompiledConventionPack;
+  readonly evaluationConfig: RetainedConventionCheck['evaluationConfig'];
+  readonly gate: RetainedConventionGate;
+}): RetainedConventionCheck {
+  const { check, inputs } = input;
   const workspaceId = requiredText(check.pack.scope.workspaceId, 'convention check workspaceId');
   const evidence = createEvidenceRevision({
     workspaceId: inputs.evidence.workspaceId,
@@ -190,6 +213,8 @@ function canonicalEntry(
     provenance: inputs.policy.provenance,
   });
   const ruleSet = createRuleSetRevision({ analyzerVersions: inputs.ruleSet.analyzerVersions });
+  const pack = restoreCompiledConventionPack(input.pack);
+  const gate = evaluateConventionGate(check, input.gate.failureThreshold);
   if (
     stableJson(evidence) !== stableJson(inputs.evidence) ||
     stableJson(enrichment) !== stableJson(inputs.enrichment) ||
@@ -210,7 +235,11 @@ function canonicalEntry(
     check.inputStamp.ruleSetRevisionId !== ruleSet.revisionId ||
     check.inputStamp.ruleSetDigest !== ruleSet.contentFingerprint ||
     check.pack.policy.revisionId !== policy.revisionId ||
-    check.pack.ruleSet.revisionId !== ruleSet.revisionId
+    check.pack.ruleSet.revisionId !== ruleSet.revisionId ||
+    stableJson(check.pack) !== stableJson(pack.manifest) ||
+    stableJson(check.retainedPack) !== stableJson(pack) ||
+    stableJson(check.retainedEvaluationConfig) !== stableJson(input.evaluationConfig) ||
+    stableJson(gate) !== stableJson(input.gate)
   ) {
     throw new Error('Convention check history inputs do not match the effective analysis stamp');
   }
@@ -224,13 +253,19 @@ function canonicalEntry(
       policyRevisionId: policy.revisionId,
       ruleSetRevisionId: ruleSet.revisionId,
     },
+    packManifestId: pack.manifest.manifestId,
+    evaluationConfig: input.evaluationConfig,
+    gate,
   })}`;
   return immutableJson({
     contractVersion: CONVENTION_CHECK_HISTORY_CONTRACT_VERSION,
     historyId,
     workspaceId,
     check,
+    pack,
     inputs: { evidence, enrichment, policy, ruleSet },
+    evaluationConfig: input.evaluationConfig,
+    gate,
   });
 }
 

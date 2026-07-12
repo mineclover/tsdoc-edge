@@ -1,6 +1,7 @@
 import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
+import Database from 'better-sqlite3';
 import {
   ConventionCheckCommand,
   type ConventionCheckCommandOutput,
@@ -129,6 +130,48 @@ describe('ConventionCommand', () => {
     expect(output).toContain('"failureThreshold": "error"');
     expect(output).toContain('"evaluatorVersion": "1.0.0"');
     expect(output).toContain('"failed": false');
+  });
+
+  it('recomputes a retained check without reading the current pack or config', async () => {
+    const historyPath = path.join(workspace, '.tsdoc', 'history.db');
+    const command = new ConventionCheckCommand();
+    const initial = await command.execute([
+      '--pack',
+      path.relative(workspace, packPath),
+      '--graph-db',
+      graphDatabase,
+      '--history-db',
+      historyPath,
+      '--json',
+    ]);
+    const initialOutput = capturedJson(log);
+    log.mockClear();
+    const database = new Database(historyPath, { readonly: true });
+    const historyId = (
+      database.prepare('SELECT history_id FROM convention_check_history').get() as {
+        history_id: string;
+      }
+    ).history_id;
+    database.close();
+    fs.unlinkSync(packPath);
+    fs.writeFileSync(path.join(workspace, '.tsdoc.config.json'), '{"project":{"name":"changed"}}');
+
+    const replay = await command.execute([
+      '--replay',
+      historyId,
+      '--history-db',
+      historyPath,
+      '--graph-db',
+      graphDatabase,
+      '--json',
+    ]);
+    const replayOutput = capturedJson(log);
+
+    expect(initial.exitCode).toBe(0);
+    expect(replay.exitCode).toBe(0);
+    expect(replayOutput.checkId).toBe(initialOutput.checkId);
+    expect(replayOutput.conformance.reportId).toBe(initialOutput.conformance.reportId);
+    expect(replayOutput.gate.gateId).toBe(initialOutput.gate.gateId);
   });
 
   it('loads an optional complete Jest artifact and refuses to overwrite it as output', async () => {

@@ -335,5 +335,22 @@ function compareText(left: string, right: string): number {
 }
 
 function digest(value: unknown): string {
-  return createHash('sha256').update(JSON.stringify(value)).digest('hex');
+  return createHash('sha256').update(stableJson(value)).digest('hex');
+}
+
+function stableJson(value: unknown): string {
+  return JSON.stringify(canonicalize(value));
+}
+
+function canonicalize(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(canonicalize);
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(
+      Object.entries(value as Record<string, unknown>)
+        .filter(([, entry]) => entry !== undefined)
+        .sort(([left], [right]) => compareText(left, right))
+        .map(([key, entry]) => [key, canonicalize(entry)])
+    );
+  }
+  return value;
 }

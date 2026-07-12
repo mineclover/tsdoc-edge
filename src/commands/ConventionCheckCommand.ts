@@ -1,13 +1,16 @@
 /** CLI adapter for the revision-pinned spec-binding convention loop. */
 
-import { createHash, randomUUID } from 'node:crypto';
+import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { ConfigManager } from '../config/ConfigManager';
 import {
   type ConventionCheckResult,
   ConventionCheckService,
+  type ConventionFailureThreshold,
+  type ConventionGateDecision,
   compileConventionPackFile,
+  evaluateConventionGate,
   loadJestJsonEvidence,
 } from '../convention';
 import { DEFAULT_CANONICAL_GRAPH_DATABASE } from '../indexer';
@@ -15,20 +18,7 @@ import { ConventionCheckHistoryRepository } from '../storage/ConventionCheckHist
 import { GraphRepository } from '../storage/GraphRepository';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
-export type ConventionFailureThreshold = 'error' | 'warning' | 'info' | 'never';
-export const CONVENTION_GATE_CONTRACT_VERSION = '1.0' as const;
-export const CONVENTION_GATE_EVALUATOR_ID = 'tsdoc-edge/convention-gate' as const;
-export const CONVENTION_GATE_EVALUATOR_VERSION = '1.0.0' as const;
-
-export interface ConventionGateDecision {
-  readonly contractVersion: typeof CONVENTION_GATE_CONTRACT_VERSION;
-  readonly evaluatorId: typeof CONVENTION_GATE_EVALUATOR_ID;
-  readonly evaluatorVersion: typeof CONVENTION_GATE_EVALUATOR_VERSION;
-  readonly gateId: string;
-  readonly failureThreshold: ConventionFailureThreshold;
-  readonly failed: boolean;
-  readonly blockingFindingIds: readonly string[];
-}
+export type { ConventionFailureThreshold, ConventionGateDecision } from '../convention';
 
 export type ConventionCheckCommandOutput = ConventionCheckResult & {
   readonly gate: ConventionGateDecision;
@@ -45,10 +35,11 @@ export class ConventionCheckCommand extends BaseCommand {
   }
 
   protected getUsage(): string {
-    return `tsdoc-edge convention check --pack <file> [options]
+    return `tsdoc-edge convention check (--pack <file> | --replay <history-id>) [options]
 
   Required:
     --pack <file>                 Workspace-local convention pack JSON
+    --replay <history-id>          Recompute one retained check from --history-db
 
   Options:
     --graph-db <file>             Canonical graph DB (default: .tsdoc/canonical-graph.db)
@@ -56,7 +47,7 @@ export class ConventionCheckCommand extends BaseCommand {
     --suppression-as-of <time>    RFC3339 clock required by expiring suppressions
     --expected-manifest <id>      Exact convention manifest lock for CI/release checks
     --evidence <file>             Complete Jest JSON artifact for verification bindings
-    --history-db <file>           Append validated retained inputs and result history
+    --history-db <file>           Append history, or required store for --replay
     --fail-on <level>             error|warning|info|never (default: error)
     --json                        Print the complete pinned result as JSON
     --output <file>               Write JSON outside the canonical DB directory
@@ -74,9 +65,14 @@ export class ConventionCheckCommand extends BaseCommand {
       }
       if (this.hasHelpFlag(args)) return this.displayHelp();
       const packPath = this.getOption(args, '--pack');
-      if (!packPath) {
-        this.printError('--pack <file> is required');
-        return this.failure('--pack <file> is required', 2);
+      const replayId = this.getOption(args, '--replay');
+      if (!packPath && !replayId) {
+        this.printError('--pack <file> or --replay <history-id> is required');
+        return this.failure('Convention input is required', 2);
+      }
+      if (packPath && replayId) {
+        this.printError('--pack and --replay cannot be combined');
+        return this.failure('Ambiguous convention input', 2);
       }
       const failOn = this.failureThreshold(args);
       if (!failOn) {
@@ -97,6 +93,24 @@ export class ConventionCheckCommand extends BaseCommand {
       const graphDatabase = fs.realpathSync(graphDatabaseInput);
       const outputPath = this.getOption(args, '--output');
       const evidencePath = this.getOption(args, '--evidence');
+      const historyDatabase = this.getOption(args, '--history-db');
+      if (replayId && !historyDatabase) {
+        this.printError('--replay requires --history-db <file>');
+        return this.failure('Retained history database is required', 2);
+      }
+      if (
+        replayId &&
+        [
+          '--code-revision',
+          '--evidence',
+          '--expected-manifest',
+          '--suppression-as-of',
+          '--fail-on',
+        ].some((option) => this.getOption(args, option) !== undefined)
+      ) {
+        this.printError('--replay selects all execution inputs from retained history');
+        return this.failure('Replay input override is not allowed', 2);
+      }
       if (
         outputPath &&
         evidencePath &&
@@ -108,7 +122,7 @@ export class ConventionCheckCommand extends BaseCommand {
       }
       if (outputPath) {
         const absoluteOutput = path.resolve(process.cwd(), outputPath);
-        const absolutePack = path.resolve(process.cwd(), packPath);
+        const absolutePack = packPath ? path.resolve(process.cwd(), packPath) : undefined;
         const protectedGraphPaths = [
           graphDatabaseInput,
           graphDatabase,
@@ -121,7 +135,7 @@ export class ConventionCheckCommand extends BaseCommand {
         if (
           sameFile(path.dirname(absoluteOutput), path.dirname(graphDatabase)) ||
           protectedGraphPaths.some((protectedPath) => sameFile(absoluteOutput, protectedPath)) ||
-          sameFile(absoluteOutput, absolutePack)
+          (absolutePack !== undefined && sameFile(absoluteOutput, absolutePack))
         ) {
           const message =
             '--output must be outside the canonical graph DB directory and must not overwrite the convention pack';
@@ -132,6 +146,12 @@ export class ConventionCheckCommand extends BaseCommand {
 
       let repository: GraphRepository | undefined;
       try {
+        if (replayId) {
+          if (!historyDatabase) return this.failure('Retained history database is required', 2);
+          repository = new GraphRepository(graphDatabase, { readOnly: true });
+          return this.replay(replayId, historyDatabase, repository, args, outputPath);
+        }
+        if (!packPath) return this.failure('Convention pack is required', 2);
         const pack = compileConventionPackFile(packPath, { workspaceRoot: process.cwd() });
         const evidence = evidencePath
           ? loadJestJsonEvidence({
@@ -167,11 +187,9 @@ export class ConventionCheckCommand extends BaseCommand {
             ? { suppressionAsOf: this.getOption(args, '--suppression-as-of') }
             : {}),
         });
-        const blocking = blockingFindings(result, failOn);
-        const gate = gateDecision(result.checkId, failOn, blocking);
-        const historyDatabase = this.getOption(args, '--history-db');
+        const gate = evaluateConventionGate(result, failOn);
         const historyId = historyDatabase
-          ? appendHistory(path.resolve(process.cwd(), historyDatabase), result)
+          ? appendHistory(path.resolve(process.cwd(), historyDatabase), result, gate)
           : undefined;
         const output: ConventionCheckCommandOutput = Object.freeze({ ...result, gate });
         const json = JSON.stringify(output, null, 2);
@@ -198,6 +216,64 @@ export class ConventionCheckCommand extends BaseCommand {
         repository?.close();
       }
     });
+  }
+
+  private replay(
+    historyId: string,
+    historyDatabase: string,
+    graphRepository: GraphRepository,
+    args: readonly string[],
+    outputPath?: string
+  ): CommandResult {
+    const history = new ConventionCheckHistoryRepository(
+      path.resolve(process.cwd(), historyDatabase),
+      {
+        readOnly: true,
+      }
+    );
+    try {
+      const retained = history.read(historyId);
+      if (!retained) return this.failure(`Retained convention history not found: ${historyId}`, 2);
+      const codeRevision = graphRepository.readRevision(retained.check.codeRevisionId);
+      if (!codeRevision) {
+        return this.failure(
+          `historical-input-missing: code revision ${retained.check.codeRevisionId}`,
+          2
+        );
+      }
+      const result = new ConventionCheckService().run({
+        pack: retained.pack,
+        codeRevision,
+        workspaceRoot: process.cwd(),
+        evidence: retained.inputs.evidence,
+        enrichment: retained.inputs.enrichment,
+        naming: retained.evaluationConfig.naming,
+        tsdoc: retained.evaluationConfig.tsdoc,
+        ...(retained.evaluationConfig.suppressionAsOf
+          ? { suppressionAsOf: retained.evaluationConfig.suppressionAsOf }
+          : {}),
+      });
+      const gate = evaluateConventionGate(result, retained.gate.failureThreshold);
+      if (
+        result.checkId !== retained.check.checkId ||
+        result.conformance.reportId !== retained.check.conformance.reportId ||
+        result.naming.reportId !== retained.check.naming.reportId ||
+        result.tsdoc.reportId !== retained.check.tsdoc.reportId ||
+        gate.gateId !== retained.gate.gateId
+      ) {
+        return this.failure(`Retained replay diverged: ${historyId}`, 2);
+      }
+      const output: ConventionCheckCommandOutput = Object.freeze({ ...result, gate });
+      const json = JSON.stringify(output, null, 2);
+      if (outputPath) atomicWriteFile(path.resolve(process.cwd(), outputPath), `${json}\n`);
+      if (this.hasFlag([...args], '--json')) console.log(json);
+      else this.printHumanResult(result, gate, outputPath, historyId);
+      return gate.failed
+        ? { exitCode: 1, message: `Retained convention replay reproduced ${historyId}` }
+        : this.success(`Retained convention replay reproduced: ${historyId}`);
+    } finally {
+      history.close();
+    }
   }
 
   private failureThreshold(args: string[]): ConventionFailureThreshold | null {
@@ -289,63 +365,19 @@ export class ConventionCheckCommand extends BaseCommand {
   }
 }
 
-type GateFinding =
-  | ConventionCheckResult['conformance']['findings'][number]
-  | ConventionCheckResult['naming']['findings'][number]
-  | ConventionCheckResult['tsdoc']['findings'][number];
-
-function allFindings(result: ConventionCheckResult): readonly GateFinding[] {
-  return [...result.conformance.findings, ...result.naming.findings, ...result.tsdoc.findings];
-}
-
-function blockingFindings(
+function appendHistory(
+  databasePath: string,
   result: ConventionCheckResult,
-  threshold: ConventionFailureThreshold
-): readonly GateFinding[] {
-  if (threshold === 'never') return [];
-  const minimum = severityRank(threshold);
-  return allFindings(result).filter(
-    (finding) =>
-      (finding.outcome === 'violated' || finding.outcome === 'indeterminate') &&
-      severityRank(finding.severity) >= minimum
-  );
-}
-
-function severityRank(value: Exclude<ConventionFailureThreshold, 'never'>): number {
-  return value === 'error' ? 3 : value === 'warning' ? 2 : 1;
-}
-
-function gateDecision(
-  checkId: string,
-  failureThreshold: ConventionFailureThreshold,
-  blocking: readonly GateFinding[]
-): ConventionGateDecision {
-  const blockingFindingIds = Object.freeze(blocking.map((finding) => finding.findingId));
-  const identity = JSON.stringify({
-    contractVersion: CONVENTION_GATE_CONTRACT_VERSION,
-    evaluatorId: CONVENTION_GATE_EVALUATOR_ID,
-    evaluatorVersion: CONVENTION_GATE_EVALUATOR_VERSION,
-    checkId,
-    failureThreshold,
-    blockingFindingIds,
-  });
-  return Object.freeze({
-    contractVersion: CONVENTION_GATE_CONTRACT_VERSION,
-    evaluatorId: CONVENTION_GATE_EVALUATOR_ID,
-    evaluatorVersion: CONVENTION_GATE_EVALUATOR_VERSION,
-    gateId: `convention-gate:${createHash('sha256').update(identity).digest('hex')}`,
-    failureThreshold,
-    failed: blockingFindingIds.length > 0,
-    blockingFindingIds,
-  });
-}
-
-function appendHistory(databasePath: string, result: ConventionCheckResult): string {
+  gate: ConventionGateDecision
+): string {
   const repository = new ConventionCheckHistoryRepository(databasePath);
   try {
     return repository.append({
       check: result,
       inputs: result.retainedInputs,
+      pack: result.retainedPack,
+      evaluationConfig: result.retainedEvaluationConfig,
+      gate,
     }).historyId;
   } finally {
     repository.close();
@@ -397,6 +429,7 @@ const CONVENTION_VALUE_OPTIONS = new Set([
   '--output',
   '--evidence',
   '--history-db',
+  '--replay',
 ]);
 const CONVENTION_BOOLEAN_OPTIONS = new Set(['--json', '--help', '-h']);
 

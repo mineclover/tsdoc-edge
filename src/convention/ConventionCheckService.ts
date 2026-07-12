@@ -54,6 +54,8 @@ export interface ConventionCheckInput {
   readonly workspaceRoot: string;
   /** Ephemeral evidence collected for this one check invocation. */
   readonly evidence?: EvidenceRevision;
+  /** Exact enrichment selected by retained replay; never recompute from current files when supplied. */
+  readonly enrichment?: EnrichmentRevision;
   /** Location-aware naming policy selected from workspace configuration. */
   readonly naming?: NamingConventionConfig;
   /** Exact tag requirements evaluated from the loader-produced enrichment revision. */
@@ -79,6 +81,14 @@ export interface ConventionCheckResult {
     readonly policy: CompiledConventionPack['policy'];
     readonly ruleSet: CompiledConventionPack['ruleSet'];
   };
+  /** Configuration is an analysis input and is retained for historical replay. */
+  readonly retainedEvaluationConfig: {
+    readonly naming: NamingConventionConfig;
+    readonly tsdoc: TsdocConventionConfig;
+    readonly suppressionAsOf?: string;
+  };
+  /** Canonical compiled pack required to re-run a retained check. */
+  readonly retainedPack: CompiledConventionPack;
   readonly bindingResolutionSetId: string;
   readonly bindingDiagnostics: readonly BindingResolutionDiagnostic[];
   readonly capabilityChecks: readonly ConventionCapabilityCheck[];
@@ -123,22 +133,26 @@ export class ConventionCheckService {
     const capabilityChecks = checkCapabilities(manifest, provider.capabilities);
     const workspaceId = manifest.scope.workspaceId;
     const evidence = input.evidence ?? createCanonicalEmptyEvidenceRevision(workspaceId);
+    const namingConfig = input.naming ?? EMPTY_NAMING_CONVENTION_CONFIG;
+    const tsdocConfig = input.tsdoc ?? EMPTY_TSDOC_CONVENTION_CONFIG;
     const naming = new NamingConventionEvaluator().evaluate(
       input.codeRevision.graph,
-      input.naming ?? EMPTY_NAMING_CONVENTION_CONFIG,
+      namingConfig,
       { workspaceRoot: input.workspaceRoot }
     );
-    const enrichment = input.tsdoc
-      ? loadTsdocEnrichment({
-          workspaceRoot: input.workspaceRoot,
-          workspaceId,
-          graph: input.codeRevision.graph,
-        })
-      : createCanonicalEmptyEnrichmentRevision(workspaceId);
+    const enrichment = input.enrichment
+      ? input.enrichment
+      : input.tsdoc
+        ? loadTsdocEnrichment({
+            workspaceRoot: input.workspaceRoot,
+            workspaceId,
+            graph: input.codeRevision.graph,
+          })
+        : createCanonicalEmptyEnrichmentRevision(workspaceId);
     const tsdoc = new TsdocConventionEvaluator().evaluate(
       input.codeRevision.graph,
       enrichment,
-      input.tsdoc ?? EMPTY_TSDOC_CONVENTION_CONFIG
+      tsdocConfig
     );
     const snapshot = this.analysis.createSnapshot({
       code: {
@@ -193,6 +207,12 @@ export class ConventionCheckService {
         policy: input.pack.policy,
         ruleSet: input.pack.ruleSet,
       }),
+      retainedEvaluationConfig: Object.freeze({
+        naming: namingConfig,
+        tsdoc: tsdocConfig,
+        ...(input.suppressionAsOf ? { suppressionAsOf: input.suppressionAsOf } : {}),
+      }),
+      retainedPack: input.pack,
       bindingResolutionSetId: bindingSet.resolutionSetId,
       bindingDiagnostics: resolutionReport.diagnostics,
       capabilityChecks,

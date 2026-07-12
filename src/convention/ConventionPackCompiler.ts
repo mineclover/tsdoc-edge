@@ -71,6 +71,49 @@ export function assertCompiledConventionPack(pack: CompiledConventionPack): void
   }
 }
 
+/**
+ * Revalidate a retained compiled projection before replaying it in this process.
+ * History never trusts a deserialized pack merely because it has familiar IDs.
+ */
+export function restoreCompiledConventionPack(value: unknown): CompiledConventionPack {
+  const candidate = strictJsonClone(
+    value,
+    'retained compiled convention pack'
+  ) as CompiledConventionPack;
+  const manifest = validateConventionPackManifest(candidate.manifest);
+  const spec = createSpecGraphRevision({
+    workspaceId: candidate.spec.workspaceId,
+    nodes: candidate.spec.nodes,
+    edges: candidate.spec.edges,
+    bindings: candidate.spec.bindings,
+    provenance: candidate.spec.provenance,
+  });
+  const policy = createPolicyRevision({
+    relationSemanticRegistryVersion: candidate.policy.relationSemanticRegistryVersion,
+    lifecycleGateVersion: candidate.policy.lifecycleGateVersion,
+    rules: candidate.policy.rules,
+    suppressions: candidate.policy.suppressions,
+    provenance: candidate.policy.provenance,
+  });
+  const ruleSet = createRuleSetRevision({ analyzerVersions: candidate.ruleSet.analyzerVersions });
+  if (
+    stableJson(spec) !== stableJson(candidate.spec) ||
+    stableJson(policy) !== stableJson(candidate.policy) ||
+    stableJson(ruleSet) !== stableJson(candidate.ruleSet) ||
+    manifest.spec.revisionId !== spec.revisionId ||
+    manifest.spec.contentFingerprint !== spec.contentFingerprint ||
+    manifest.policy.revisionId !== policy.revisionId ||
+    manifest.policy.contentDigest !== policy.contentDigest ||
+    manifest.ruleSet.revisionId !== ruleSet.revisionId ||
+    manifest.ruleSet.contentFingerprint !== ruleSet.contentFingerprint
+  ) {
+    throw new Error('Retained compiled convention pack is not canonical');
+  }
+  const restored = Object.freeze({ manifest, spec, policy, ruleSet });
+  materializedConventionPacks.add(restored);
+  return restored;
+}
+
 /** Read and compile one workspace-local JSON convention pack. */
 export function compileConventionPackFile(
   filePath: string,
