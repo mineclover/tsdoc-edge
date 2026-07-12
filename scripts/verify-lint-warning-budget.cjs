@@ -10,12 +10,12 @@ const projectRoot = path.resolve(__dirname, '..');
 const npx = process.platform === 'win32' ? 'npx.cmd' : 'npx';
 
 const maximumBySeverity = {
-  warning: 35,
+  warning: 31,
   information: 25,
 };
 
 const maximumByCategory = {
-  'lint/style/noNonNullAssertion': 31,
+  'lint/style/noNonNullAssertion': 27,
   'lint/suspicious/noExplicitAny': 1,
   'lint/correctness/noUnusedFunctionParameters': 1,
   'lint/correctness/noUnusedVariables': 1,

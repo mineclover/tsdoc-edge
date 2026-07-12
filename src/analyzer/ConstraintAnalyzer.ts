@@ -116,16 +116,19 @@ export class ConstraintAnalyzer {
           // Sort to create consistent key
           const [first, second] = symbolA < symbolB ? [symbolA, symbolB] : [symbolB, symbolA];
 
-          if (!importPairs.has(first)) {
-            importPairs.set(first, new Map());
+          let secondMap = importPairs.get(first);
+          if (!secondMap) {
+            secondMap = new Map();
+            importPairs.set(first, secondMap);
           }
 
-          const secondMap = importPairs.get(first)!;
-          if (!secondMap.has(second)) {
-            secondMap.set(second, []);
+          let evidence = secondMap.get(second);
+          if (!evidence) {
+            evidence = [];
+            secondMap.set(second, evidence);
           }
 
-          secondMap.get(second)?.push({
+          evidence.push({
             file: filePath,
             line: Math.min(imports[i].line, imports[j].line),
           });

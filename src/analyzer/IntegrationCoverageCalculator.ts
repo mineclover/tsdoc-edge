@@ -109,16 +109,19 @@ export class IntegrationCoverageCalculator {
     const matrix = new Map<string, Map<string, VerifiedRelationship[]>>();
 
     for (const vr of verified) {
-      if (!matrix.has(vr.source)) {
-        matrix.set(vr.source, new Map());
+      let targetMap = matrix.get(vr.source);
+      if (!targetMap) {
+        targetMap = new Map();
+        matrix.set(vr.source, targetMap);
       }
 
-      const targetMap = matrix.get(vr.source)!;
-      if (!targetMap.has(vr.target)) {
-        targetMap.set(vr.target, []);
+      let relationships = targetMap.get(vr.target);
+      if (!relationships) {
+        relationships = [];
+        targetMap.set(vr.target, relationships);
       }
 
-      targetMap.get(vr.target)?.push(vr);
+      relationships.push(vr);
     }
 
     return matrix;

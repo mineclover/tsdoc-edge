@@ -28,7 +28,6 @@ interface CompositionSite {
   composerName: string;
   propertyName: string;
   composedTypeName: string;
-  composedSymbolId?: string;
   filePath: string;
   line: number;
   isArray: boolean;
@@ -109,9 +108,7 @@ export class CompositionAnalyzer {
     for (const site of compositionSites) {
       const composedSymbol = this.findSymbolByName(site.composedTypeName);
       if (composedSymbol) {
-        site.composedSymbolId = composedSymbol.id;
-
-        const relationship = this.createRelationship(site);
+        const relationship = this.createRelationship(site, composedSymbol.id);
         relationships.push(relationship);
       }
     }
@@ -318,14 +315,14 @@ export class CompositionAnalyzer {
    * @returns Unified relationship
    * @private
    */
-  private createRelationship(site: CompositionSite): UnifiedRelationship {
+  private createRelationship(site: CompositionSite, composedSymbolId: string): UnifiedRelationship {
     const timestamp = new Date().toISOString();
 
     return {
-      id: `composition-${site.composerSymbolId}-${site.composedSymbolId}-${site.propertyName}`,
+      id: `composition-${site.composerSymbolId}-${composedSymbolId}-${site.propertyName}`,
       type: 'composition',
       from: site.composerSymbolId,
-      to: site.composedSymbolId!,
+      to: composedSymbolId,
       direction: 'unidirectional',
       strength: 'strong',
       category: 'behavioral',

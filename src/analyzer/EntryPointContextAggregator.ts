@@ -378,7 +378,11 @@ export class EntryPointContextAggregator {
     const queue: Array<{ id: string; level: number }> = [{ id: symbolId, level: 0 }];
 
     while (queue.length > 0) {
-      const { id, level } = queue.shift()!;
+      const current = queue.shift();
+      if (!current) {
+        continue;
+      }
+      const { id, level } = current;
 
       if (visited.has(id) || level >= depth) continue;
       visited.add(id);
