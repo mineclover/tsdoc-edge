@@ -123,6 +123,9 @@ export class ConventionCheckCommand extends BaseCommand {
       if (outputPath) {
         const absoluteOutput = path.resolve(process.cwd(), outputPath);
         const absolutePack = packPath ? path.resolve(process.cwd(), packPath) : undefined;
+        const absoluteHistory = historyDatabase
+          ? path.resolve(process.cwd(), historyDatabase)
+          : undefined;
         const protectedGraphPaths = [
           graphDatabaseInput,
           graphDatabase,
@@ -132,13 +135,22 @@ export class ConventionCheckCommand extends BaseCommand {
             `${database}-journal`,
           ]),
         ];
+        const protectedHistoryPaths = absoluteHistory
+          ? [
+              absoluteHistory,
+              `${absoluteHistory}-wal`,
+              `${absoluteHistory}-shm`,
+              `${absoluteHistory}-journal`,
+            ]
+          : [];
         if (
           sameFile(path.dirname(absoluteOutput), path.dirname(graphDatabase)) ||
           protectedGraphPaths.some((protectedPath) => sameFile(absoluteOutput, protectedPath)) ||
+          protectedHistoryPaths.some((protectedPath) => sameFile(absoluteOutput, protectedPath)) ||
           (absolutePack !== undefined && sameFile(absoluteOutput, absolutePack))
         ) {
           const message =
-            '--output must be outside the canonical graph DB directory and must not overwrite the convention pack';
+            '--output must not overwrite a canonical graph/history database, its sidecars, or the convention pack';
           this.printError(message);
           return this.failure(message, 2);
         }

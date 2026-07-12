@@ -32,10 +32,10 @@ canonical: true
 
 | 구분 | 현재 위치 |
 | --- | --- |
-| Now | P4.3 TSDoc loader와 consuming rule 하나 |
+| Now | P4 source-checkout stabilization과 saved LSP diagnostics 준비 |
 | Parallel | Node/package release qualification, legacy baseline 첫 vertical slice |
-| Next | P4.4 managed-spec wiring |
-| Then | saved LSP diagnostics, P4.5 history |
+| Next | saved LSP diagnostics와 current Explain/Open |
+| Then | historical Explain/Open, retention GC pin/tombstone |
 | Release | runtime/package qualification과 external canary 전까지 stable release NO-GO |
 | Deferred | 두 번째 runner/provider, generic adapter/DSL, convention distribution registry |
 
@@ -55,9 +55,9 @@ M1 완료에는 다음이 필요하다.
   code/evidence revision은 바꾸지 않는다.
 - CLI와 CI가 saved canonical graph에서 같은 pass/fail과 exact replay를 재현한다.
 
-M1은 saved LSP diagnostics, retained result history, external packed pilot, Node 24 release
-qualification, legacy production cleanup을 포함하지 않는다. 이들은 M1 이후의 promotion 또는
-parallel release/comparison gate다.
+M1 source-checkout scope는 P4.5 retained result history/replay까지 확장됐지만, saved LSP
+diagnostics, external packed pilot, Node 24 release qualification, legacy production cleanup은
+여전히 promotion 또는 parallel release/comparison gate다.
 
 P4.4 시작 전 계획 리뷰는 managed spec의 file layout, document-level identity와
 machine-readable binding declaration schema를 결정한다. 그 정의는 roadmap에 쓰지 않고
@@ -209,7 +209,7 @@ flowchart LR
     EFFECTIVE --> CHECK["Binding / evaluator"]
     CHECK --> CLI["CLI / CI"]
     CHECK -. "planned" .-> LSP["LSP"]
-    CHECK -. "P4.5" .-> HISTORY["Durable history"]
+    CHECK --> HISTORY["Durable history / replay"]
 ```
 
 ### 결합 불변식

@@ -174,6 +174,24 @@ describe('ConventionCommand', () => {
     expect(replayOutput.gate.gateId).toBe(initialOutput.gate.gateId);
   });
 
+  it('refuses to overwrite the retained history database with JSON output', async () => {
+    const historyPath = path.join(workspace, '.tsdoc', 'history.db');
+    const result = await new ConventionCheckCommand().execute([
+      '--pack',
+      path.relative(workspace, packPath),
+      '--graph-db',
+      graphDatabase,
+      '--history-db',
+      historyPath,
+      '--output',
+      historyPath,
+    ]);
+
+    expect(result.exitCode).toBe(2);
+    expect(result.message).toContain('--output must not overwrite');
+    expect(fs.existsSync(historyPath)).toBe(false);
+  });
+
   it('loads an optional complete Jest artifact and refuses to overwrite it as output', async () => {
     const artifact = path.join(workspace, 'jest.json');
     fs.writeFileSync(

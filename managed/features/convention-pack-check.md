@@ -213,9 +213,9 @@ PoC-specific router config, cache, graph DB, reports, and logs below
 The generated `summary.json`, reports, graph DB, and command logs are disposable proof artifacts
 and are not an authored SSOT. The committed pack and proof script define the reproducible input.
 They are source-checkout development assets and are not included by the current npm package
-`files` allowlist. Runner evidence and enrichment collectors, general naming/style evaluation,
-durable report history, and convention/spec-conformance LSP diagnostics/CodeAction are explicitly
-outside this minimum PoC.
+`files` allowlist. Generic runner/enrichment adapters and convention/spec-conformance
+LSP diagnostics/CodeAction are explicitly outside this minimum PoC. P4.1 Jest evidence, P4.2 naming,
+P4.3 TSDoc and P4.5 retained history/replay are source-checkout product slices, not package proof.
 
 For a release or protected CI check, lock the exact compiled manifest returned by an earlier JSON
 result:
@@ -299,9 +299,10 @@ analysis result was converted into an exit decision.
   has rules, the check loads workspace-authored source into an exact `EnrichmentRevision`; bundled
   library nodes are deliberately excluded.
 - `--history-db <file>` appends a validated P4.5 envelope containing canonical
-  evidence/enrichment/policy/rule-set payloads and the exact check/result identity. It has no latest
-  pointer; exact-ID read revalidates the envelope and rejects tampering. Retained source-based full
-  conformance recompute and `explain` remain follow-up work.
+  compiled-pack/evidence/enrichment/policy/rule-set payloads, evaluation config and exact
+  check/result/gate identity. `--replay <history-id>` re-runs conformance from only that retained
+  bundle and the exact graph revision; it neither reads the current pack/config nor falls back to
+  the active graph. Tamper, missing input and ID divergence are exit `2`. `explain` remains follow-up.
 - LSP diagnostics and CodeAction are not connected to this check yet.
 
 ### Jest evidence slice
