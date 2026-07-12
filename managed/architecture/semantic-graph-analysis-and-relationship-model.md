@@ -1293,7 +1293,7 @@ Spec/evidence/enrichment/policy revision에도 code revision과 같은 pin/reten
 | `SpecGraphRepository` | spec node, internal edge, binding declaration revision | compiled projection/index |
 | `AnalysisInputRevisionRepository` | evidence, enrichment, policy exact revision | 구현된 shared store kernel; P4.1 check에는 미연결, P4.5 retained input에 사용 |
 | Process-local effective view | overlay, snapshot, binding resolution set | 비영속 derived value; pinned input에서 재계산 |
-| 향후 append-only result history | check, report, gate envelope와 exact input pin | P4.5 planned derived history; read 시 identity 재검증 |
+| append-only result history | replay bundle, check/report/gate envelope와 exact input pin | P4.5 precursor는 wired; complete는 retained bundle에서 resolver/conformance를 재계산 |
 | Legacy DB | differential baseline 및 migration 중 enrichment | 신규 kernel SSOT 아님 |
 
 모든 plane을 `unified_relationships` 하나에 다시 합치지 않는다.

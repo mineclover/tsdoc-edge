@@ -448,6 +448,74 @@ P4.5는 report JSON만 복사하는 기능이 아니다. 다음을 함께 보존
 
 Binding resolution은 serialized object를 신뢰하지 않고 retained input에서 재계산한다.
 
+### P4.5 closeout design — retained replay bundle
+
+현재 `--history-db`는 canonical envelope append와 read-time tamper/collision rejection을
+제공하는 `wired` precursor다. P4.5 complete는 그 stored `ConventionCheckResult`를 결과로
+반환하는 것이 아니라, 아래 `ConventionReplayBundle`로 새 check를 실행해 ID를 비교하는 것이다.
+
+```typescript
+interface ConventionReplayBundle {
+  contractVersion: '1.0';
+  historyId: string;
+  workspaceId: string;
+  code: { revisionId: string; graphFingerprint: string };
+  spec: { revisionId: string; contentFingerprint: string };
+  compiledPack: {
+    manifest: ConventionPackManifest;
+    policy: PolicyRevision;
+    ruleSet: RuleSetRevision;
+  };
+  inputs: {
+    evidence: EvidenceRevision;
+    enrichment: EnrichmentRevision;
+  };
+  evaluationConfig: {
+    naming: NamingConventionConfig;
+    tsdoc: TsdocConventionConfig;
+    suppressionAsOf?: string;
+    failureThreshold: ConventionFailureThreshold;
+  };
+  expected: {
+    effectiveStamp: EffectiveAnalysisInputStamp;
+    checkId: string;
+    conformanceReportId: string;
+    namingReportId: string;
+    tsdocReportId: string;
+    gateId: string;
+  };
+}
+```
+
+`compiledPack`에는 source JSON을 다시 해석해 현재 파일을 선택하지 않는다. 저장된 manifest,
+policy, rule-set와 `SpecGraphRepository`의 exact spec revision을 canonical factory로 재검증해
+process-local trusted compiled pack을 재구성한다. `GraphRepository`도 active pointer가 아니라
+bundle의 `code.revisionId`를 exact lookup하고 graph fingerprint를 재검증한다. 둘 중 하나라도
+없으면 `historical-input-missing` input error(exit `2`)이며 latest revision으로 대체하지 않는다.
+
+Replay는 retained evidence/enrichment와 retained naming/TSDoc config를 `ConventionCheckService`에
+명시 전달한다. 따라서 현재 `.tsdoc.config.json`, 현재 managed Markdown, 현재 pack file이나 현재
+clock은 결과에 개입하지 않는다. service는 새 binding resolution과 conformance를 계산하고, 모든
+expected ID가 일치할 때만 `reproduced`다. 과거 gate가 pass면 replay exit `0`, 과거 gate가 fail이면
+exit `1`, input missing/tamper/ID divergence는 exit `2`다. serialized binding resolution, finding,
+report는 비교용 evidence일 뿐 trusted execution input이 아니다.
+
+저장은 하나의 history SQLite transaction에서 input revision rows, replay bundle, result envelope와
+code/spec retention pin을 함께 append한다. 동일 `historyId`의 byte-identical 재요청은 idempotent
+read, 다른 payload는 collision error다. retention GC는 history pin이 있는 code/spec/input revision을
+제거하지 않으며, 삭제가 필요한 경우에는 tombstone과 `historical-input-missing`을 남긴다.
+
+Closeout proof는 다음을 요구한다.
+
+- pass와 fail history 각각이 active pointer/config/source 변경 뒤에도 같은 check/report/gate ID로
+  재계산된다.
+- retained source payload, code/spec/input pin, expected ID 각각의 one-byte/one-field tamper가 exit
+  `2`로 거부된다.
+- exact code/spec/input revision 하나를 제거한 fixture가 fallback 없이
+  `historical-input-missing`을 반환한다.
+- same bundle append는 row를 추가하지 않고, same history ID의 다른 bundle은 collision으로 거부된다.
+- historical replay는 current CLI/CI check와 동일한 gate evaluator version을 명시적으로 비교한다.
+
 ## Provider와 external pilot
 
 현재 `CanonicalProjectGraph` v1은 `tsconfigPath`를 필수로 가진다. contract v2 검토에서는
