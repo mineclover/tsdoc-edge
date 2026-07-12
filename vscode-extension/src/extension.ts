@@ -196,25 +196,26 @@ export function deactivate(): Thenable<void> | undefined {
 function savedConventionFindingPayload(value: unknown): SavedConventionFindingPayload | undefined {
   if (!value || typeof value !== 'object') return undefined;
   const payload = value as Record<string, unknown>;
+  const { historyId, checkId, findingId, sourceFile, sourceLine } = payload;
   if (
     payload.kind !== 'saved-convention-finding' ||
-    typeof payload.checkId !== 'string' ||
-    typeof payload.findingId !== 'string' ||
-    typeof payload.sourceFile !== 'string' ||
-    typeof payload.sourceLine !== 'number' ||
-    !Number.isSafeInteger(payload.sourceLine) ||
-    payload.sourceLine < 1
+    !nonEmptyText(checkId) ||
+    !nonEmptyText(findingId) ||
+    !nonEmptyText(sourceFile) ||
+    typeof sourceLine !== 'number' ||
+    !Number.isSafeInteger(sourceLine) ||
+    sourceLine < 1
   ) {
     return undefined;
   }
-  if (payload.historyId !== undefined && typeof payload.historyId !== 'string') return undefined;
+  if (historyId !== undefined && !nonEmptyText(historyId)) return undefined;
   return {
     kind: 'saved-convention-finding',
-    ...(typeof payload.historyId === 'string' ? { historyId: payload.historyId } : {}),
-    checkId: payload.checkId,
-    findingId: payload.findingId,
-    sourceFile: payload.sourceFile,
-    sourceLine: payload.sourceLine,
+    ...(typeof historyId === 'string' ? { historyId } : {}),
+    checkId,
+    findingId,
+    sourceFile,
+    sourceLine,
   };
 }
 
@@ -226,11 +227,15 @@ async function workspaceSourceUri(sourceFile: string): Promise<vscode.Uri | unde
     if (relative.startsWith('..') || path.isAbsolute(relative)) continue;
     const uri = vscode.Uri.file(candidate);
     try {
-      await vscode.workspace.fs.stat(uri);
-      return uri;
+      const stat = await vscode.workspace.fs.stat(uri);
+      if ((stat.type & vscode.FileType.File) === vscode.FileType.File) return uri;
     } catch {
       // A multi-root workspace may contain the same relative path in a later folder.
     }
   }
   return undefined;
+}
+
+function nonEmptyText(value: unknown): value is string {
+  return typeof value === 'string' && value.trim().length > 0;
 }
