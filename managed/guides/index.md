@@ -232,7 +232,7 @@ All 19 relationship types are implemented (100%):
 - [[IO Dependency]] - 22,131 relationships (31.2%)
 - [[Feature Grouping]] - 21,645 relationships (30.5%)
 - [[Test Coverage]] - 8,248 relationships (11.6%)
-- [[Calls]] - 3,433 relationships (4.8%)
+- [[Call Relationships]] - 3,433 relationships (4.8%)
 
 ---
 
@@ -403,7 +403,7 @@ tsdoc-edge parse-mermaid <diagram>
 - [[AnalysisFeatures]] (`../features/analysis-features.md`)
 - [[ValidationFeatures]] (`../features/validation-features.md`)
 - [[SymbolGraphFeatures]] (`../features/symbol-graph.md`)
-- [[DocumentSymbolSystem]] (`../concepts/document-symbol-system.md`)
+- [[Document Symbol System]] (`../concepts/document-symbol-system.md`)
 - [[AutoIndexing]] (`../features/auto-indexing.md`)
 
 **Relationships**:
@@ -452,4 +452,3 @@ tsdoc-edge parse-mermaid <diagram>
 - [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:108
 - [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:148
 - [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:197
-

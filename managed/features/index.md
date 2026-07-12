@@ -51,7 +51,7 @@ tsdoc-edge work-context <file-path>    # 파일 작업 전 컨텍스트 확인
 
 ---
 
-### [[DocumentSymbolSystem]]
+### [[Document Symbol System]]
 **Path**: `../concepts/document-symbol-system.md`
 
 Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.

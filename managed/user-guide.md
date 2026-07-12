@@ -235,7 +235,7 @@ TypeScript Source
   CLI Commands (74) → Analysis & Reports
 ```
 
-**Details**: [[Implementation Roadmap]] | [[Dependency Meta-Structure]]
+**Details**: [[Relationship System Roadmap]] | [[Relationship Types]]
 
 ---
 
@@ -269,8 +269,8 @@ tsdoc-edge validate-symbol-refs   # Find broken refs
 
 ### Relationship System
 - [[Relationship Types]] - 19 types, 8 categories
-- [[Implementation Roadmap]] - Progress tracking
-- [[Dependency Meta-Structure]] - Meta architecture
+- [[Relationship System Roadmap]] - Progress tracking
+- [[Relationship Types]] - Meta architecture
 
 ### Guides
 - [[Build Pipeline Guide]] - Build process
