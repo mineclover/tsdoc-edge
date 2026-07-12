@@ -52,6 +52,31 @@
   },
   "overrides": [
     {
+      "includes": [
+        "src/convention/**/*.ts",
+        "src/semantic-graph/**/*.ts",
+        "src/spec-graph/**/*.ts",
+        "src/lsp/**/*.ts",
+        "src/indexer/**/*.ts",
+        "src/storage/GraphRepository.ts",
+        "src/storage/SpecGraphRepository.ts",
+        "src/storage/AnalysisInputRevisionRepository.ts",
+        "src/storage/ConventionCheckHistoryRepository.ts"
+      ],
+      "linter": {
+        "rules": {
+          "suspicious": {
+            "noExplicitAny": "error",
+            "noAssignInExpressions": "error",
+            "noImplicitAnyLet": "error"
+          },
+          "style": {
+            "noNonNullAssertion": "error"
+          }
+        }
+      }
+    },
+    {
       "includes": ["demo/**/*.ts", "src/__tests__/**/*.ts", "examples/**/*.ts"],
       "linter": {
         "rules": {

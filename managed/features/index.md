@@ -189,6 +189,15 @@ Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.
 
 ---
 
+### [[Lint Governance]]
+**Path**: `lint-governance.md`
+
+Biome severity tiers, legacy warning budget, and strict canonical-kernel quality gate.
+
+**Commands**: `lint`, `lint:budget`, `lint:governance`
+
+---
+
 ## Integration Features (통합 기능)
 
 ### CI/CD Integration
