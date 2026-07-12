@@ -151,7 +151,7 @@ export interface Symbol {
       lineCoverage?: number;
       statementCoverage?: number;
     };
-    [key: string]: any;
+    [key: string]: unknown;
   };
 }
 

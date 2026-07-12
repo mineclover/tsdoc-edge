@@ -52,7 +52,7 @@ export interface FrontmatterMetadata {
   /**
    * Additional custom fields
    */
-  [key: string]: any;
+  [key: string]: unknown;
 }
 
 /**

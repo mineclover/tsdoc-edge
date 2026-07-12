@@ -35,11 +35,17 @@ and rejects a new warning category or any count above this baseline:
 | Rule | Maximum |
 | --- | ---: |
 | `noNonNullAssertion` | 37 |
-| `noExplicitAny` | 15 |
+| `noExplicitAny` | 13 |
 | other current warning/info categories | 1–23, enforced by script |
 
 Reducing the budget is encouraged and does not require a migration exception. Increasing it needs a
 reviewed rule/contract decision and this document must be updated in the same commit.
+
+`UnifiedRelationship.properties` is the one remaining production `any`. It is a legacy dynamic
+property bus consumed by many relation analyzers with incompatible shapes. Replacing it with
+`unknown` before defining relation-kind-specific property maps would only move unsound casts into
+every consumer. Its migration must introduce discriminated property contracts and validators as a
+separate semantic-relationship checkpoint; it is not a local lint suppression.
 
 ## Commands and CI contract
 
