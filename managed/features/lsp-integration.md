@@ -210,6 +210,31 @@ tsdoc-edge build src --canonical-graph
 node dist/lsp/server.js
 ```
 
+### Saved convention diagnostics
+
+P4 current slice는 `specGovernance.lspSavedHistory`가 지정한 하나의 retained convention check를
+read-only로 투영한다. LSP는 latest history를 찾거나 현재 pack/config를 다시 컴파일하지 않는다.
+
+```json
+{
+  "specGovernance": {
+    "lspSavedHistory": {
+      "databasePath": ".tsdoc/convention-history.db",
+      "historyId": "convention-history:<exact-id>"
+    }
+  }
+}
+```
+
+history envelope, compiled pack, evidence/enrichment와 gate는 read-time에 검증된다. retained
+check의 `codeRevisionId`가 active canonical graph revision과 정확히 같을 때만 implementation,
+naming, TSDoc finding을 file diagnostic으로 보인다. revision이 다르거나 history가 없거나
+tampered이면 diagnostic을 현재 결과처럼 보이지 않으며, active/latest fallback도 하지 않는다.
+Dirty overlay에는 saved convention finding을 섞지 않는다.
+
+이 slice는 saved diagnostic 표시만 제공한다. current Explain/Open action과 historical
+Explain/Open, mutating CodeAction은 별도 gate다.
+
 Build가 만든 `.tsdoc/canonical-graph.db`는 router runtime 환경 변수가 없는 LSP에서도
 schema/WAL 초기화를 하지 않는 read-only connection으로 읽을 수 있다. save/source
 watch event에서 외부 Build가 교체한 revision을 다시 읽지만, 새 revision을 직접 만들려면

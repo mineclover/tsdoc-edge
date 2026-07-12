@@ -4,8 +4,8 @@
 
 import * as fs from 'fs';
 import * as path from 'path';
+import { CONFIG_FILE_NAME, DEFAULT_CONFIG } from '../../types/config';
 import { ConfigLoader } from '../../utils/ConfigLoader';
-import { DEFAULT_CONFIG, CONFIG_FILE_NAME } from '../../types/config';
 
 describe('ConfigLoader', () => {
   const testDir = path.join(__dirname, '__test_config__');
@@ -87,6 +87,37 @@ describe('ConfigLoader', () => {
       // Default values
       expect(config.project.version).toBe(DEFAULT_CONFIG.project.version);
       expect(config.paths).toEqual(DEFAULT_CONFIG.paths);
+    });
+
+    it('preserves spec governance for LSP and CLI consumers', () => {
+      fs.writeFileSync(
+        configPath,
+        JSON.stringify({
+          specGovernance: {
+            authoredSpecDirs: ['managed/specs'],
+            naming: {
+              contractVersion: '1.0',
+              rules: [
+                { id: 'spec-kebab', path: 'managed/specs/**/*.md', target: 'file', style: 'kebab' },
+              ],
+            },
+            tsdoc: {
+              contractVersion: '1.0',
+              rules: [{ id: 'public', path: 'src/**/*.ts', requiredTags: ['public'] }],
+            },
+          },
+          documentManagement: { enabled: true, managedDirs: ['managed'] },
+        })
+      );
+
+      const config = new ConfigLoader(testDir).getConfig();
+
+      expect(config.specGovernance).toMatchObject({
+        authoredSpecDirs: ['managed/specs'],
+        naming: { rules: [{ id: 'spec-kebab' }] },
+        tsdoc: { rules: [{ id: 'public' }] },
+      });
+      expect(config.documentManagement).toMatchObject({ enabled: true, managedDirs: ['managed'] });
     });
 
     it('should handle invalid JSON gracefully', () => {

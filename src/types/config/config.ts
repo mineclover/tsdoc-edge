@@ -375,6 +375,14 @@ export interface SpecGovernanceConfig {
   naming?: NamingConventionConfig;
   /** Ordered TSDoc requirements evaluated against loader-produced enrichment. */
   tsdoc?: TsdocConventionConfig;
+  /** Exact retained convention check selected for saved LSP diagnostics. */
+  lspSavedHistory?: SavedConventionHistoryConfig;
+}
+
+/** LSP never infers a latest record; it opens this exact retained history ID. */
+export interface SavedConventionHistoryConfig {
+  readonly databasePath: string;
+  readonly historyId: string;
 }
 
 export interface NamingConventionConfig {

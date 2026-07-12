@@ -32,9 +32,9 @@ canonical: true
 
 | 구분 | 현재 위치 |
 | --- | --- |
-| Now | P4 source-checkout stabilization과 saved LSP diagnostics 준비 |
+| Now | saved LSP convention diagnostics 첫 vertical slice |
 | Parallel | Node/package release qualification, legacy baseline 첫 vertical slice |
-| Next | saved LSP diagnostics와 current Explain/Open |
+| Next | current Explain/Open과 LSP protocol-level proof |
 | Then | historical Explain/Open, retention GC pin/tombstone |
 | Release | runtime/package qualification과 external canary 전까지 stable release NO-GO |
 | Deferred | 두 번째 runner/provider, generic adapter/DSL, convention distribution registry |
@@ -179,7 +179,7 @@ Overlay와 binding set은 process-local이다. Conformance finding/report는 der
 | Enrichment revision/store | `kernel` | revision factory와 shared exact store | retained-input product wiring |
 | TSDoc enrichment check | `proven` (source-checkout) | workspace source digest → enrichment revision, tag finding/check/gate | general enrichment framework |
 | Durable result history | `proven` (source-checkout) | append-only canonical bundle, retained replay, source/config removal canary, tamper reject | retention GC pin/tombstone, packed external proof |
-| LSP spec experience | `planned` | structural canonical/overlay LSP만 존재 | saved diagnostics와 read-only actions |
+| LSP spec experience | `wired` (source-checkout) | exact retained history → active canonical revision match의 saved convention diagnostics | current Explain/Open, protocol-level proof |
 | External library pilot | `planned` | self-repository PoC만 존재 | packed early canary와 full pilot |
 
 ## 최소 아키텍처 — current와 target
@@ -545,7 +545,7 @@ owner 판정을 따라 legacy 구현을 제거하거나 canonical enrichment로 
 
 | 승격 | 필수 gate |
 | --- | --- |
-| Saved LSP spec diagnostics | P4.1~P4.4 source-checkout proof |
+| Saved LSP spec diagnostics | P4.1~P4.5 source-checkout proof + exact history-config/active-revision match |
 | Historical Explain/Open | P4.5 durable history |
 | Provider stable | packed early canary + release qualification |
 | External full pilot | provider stable + saved LSP checkpoint + P4.1~P4.5 proof |

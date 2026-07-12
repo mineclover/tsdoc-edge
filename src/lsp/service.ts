@@ -15,6 +15,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import Database from 'better-sqlite3';
 import { DiagnosticSeverity, SymbolKind } from 'vscode-languageserver/node';
+import type { ConventionCheckResult } from '../convention/ConventionCheckService';
 import {
   type CanonicalDiagnostic,
   CanonicalGraphCoordinator,
@@ -26,6 +27,7 @@ import {
   DEFAULT_CANONICAL_GRAPH_DATABASE,
   parseCanonicalId,
 } from '../indexer';
+import { ConventionCheckHistoryRepository } from '../storage/ConventionCheckHistoryRepository';
 import { GraphRepository } from '../storage/GraphRepository';
 import type {
   CountRow,
@@ -38,6 +40,7 @@ import type {
 import { ConfigLoader } from '../utils/ConfigLoader';
 import { CacheManager } from './cache-manager';
 import { CanonicalGraphLspView, canonicalNodeDisplayName } from './canonical-graph-view';
+import { conventionDiagnosticsForFile } from './convention-diagnostics';
 import { type DiagnosticInfo, mapCanonicalDiagnostic } from './diagnostics';
 import { IncrementalBuilder, type IncrementalExtractResult } from './incremental-builder';
 import {
@@ -97,6 +100,8 @@ export interface TsdocEdgeServiceOptions {
   /** `false` disables canonical reads and refresh even when environment variables exist. */
   readonly canonicalGraph?: CanonicalGraphCoordinatorOptions | false;
   readonly canonicalGraphDependencies?: CanonicalGraphCoordinatorDependencies;
+  /** Explicit saved check injection for hosts and focused tests. */
+  readonly savedConventionCheck?: ConventionCheckResult;
 }
 
 /** Cache names used by the service */
@@ -157,6 +162,9 @@ export class TsdocEdgeService {
   /** Compiler/router diagnostics for the active canonical revision. */
   private canonicalDiagnostics: readonly CanonicalDiagnostic[] = [];
 
+  /** One exact retained convention result selected for saved-file diagnostics. */
+  private savedConventionCheck: ConventionCheckResult | null = null;
+
   /** TS5 syntax-only results for unsaved buffers; never persisted. */
   private readonly unsavedOverlays = new Map<string, UnsavedFileOverlay>();
 
@@ -198,6 +206,7 @@ export class TsdocEdgeService {
     this.cacheManager.createCache(CACHE_NAMES.IMPACT);
 
     this.initCanonicalGraph(options);
+    this.initSavedConventionCheck(options);
     this.initDatabase();
   }
 
@@ -487,6 +496,37 @@ export class TsdocEdgeService {
       console.error(`Failed to open canonical graph database: ${error}`);
       this.canonicalRepository?.close();
       this.canonicalRepository = null;
+    }
+  }
+
+  /** Load one explicitly configured retained result; this never selects a latest history row. */
+  private initSavedConventionCheck(options: TsdocEdgeServiceOptions): void {
+    if (options.savedConventionCheck) {
+      this.savedConventionCheck = options.savedConventionCheck;
+      return;
+    }
+    const loader = new ConfigLoader(this.workspaceRoot);
+    const savedHistory = loader.getConfig().specGovernance?.lspSavedHistory;
+    if (!savedHistory) return;
+    try {
+      const repository = new ConventionCheckHistoryRepository(
+        loader.resolvePath(savedHistory.databasePath),
+        { readOnly: true }
+      );
+      try {
+        const retained = repository.read(savedHistory.historyId);
+        if (!retained) {
+          console.warn(`Saved convention history not found: ${savedHistory.historyId}`);
+          return;
+        }
+        this.savedConventionCheck = retained.check;
+      } finally {
+        repository.close();
+      }
+    } catch (error) {
+      console.warn(
+        `Failed to load saved convention history ${savedHistory.historyId}: ${String(error)}`
+      );
     }
   }
 
@@ -1103,6 +1143,7 @@ export class TsdocEdgeService {
       });
       return [
         ...canonicalDiagnostics,
+        ...this.savedConventionDiagnosticsForFile(filePath),
         ...impactDiagnostics,
         ...this.getLegacyArchitecturalDiagnostics(filePath),
       ];
@@ -1208,6 +1249,19 @@ export class TsdocEdgeService {
           path.resolve(this.workspaceRoot, diagnostic.file) === resolvedFile
       )
       .map((diagnostic) => mapCanonicalDiagnostic(diagnostic));
+  }
+
+  /** Only project a retained result when it pins the active saved canonical revision. */
+  private savedConventionDiagnosticsForFile(filePath: string): DiagnosticInfo[] {
+    if (
+      !this.savedConventionCheck ||
+      this.savedConventionCheck.codeRevisionId !== this.canonicalRevisionId
+    ) {
+      return [];
+    }
+    return [
+      ...conventionDiagnosticsForFile(this.savedConventionCheck, this.workspaceRoot, filePath),
+    ];
   }
 
   /** Preserve file-scoped legacy enrichment that has no canonical fact-plane equivalent yet. */

@@ -10,10 +10,10 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import {
-  TsdocEdgeConfig,
-  DEFAULT_CONFIG,
   CONFIG_FILE_NAME,
-  LinkCheckConfig,
+  DEFAULT_CONFIG,
+  type LinkCheckConfig,
+  type TsdocEdgeConfig,
 } from '../types/config';
 
 /**
@@ -57,7 +57,7 @@ export class ConfigLoader {
       console.warn(
         `Failed to load config from ${configPath}: ${
           error instanceof Error ? error.message : String(error)
-        }`,
+        }`
       );
       return DEFAULT_CONFIG;
     }
@@ -131,6 +131,16 @@ export class ConfigLoader {
       linkCheck: {
         ...DEFAULT_CONFIG.linkCheck,
         ...userConfig.linkCheck,
+      },
+      documentManagement: {
+        ...DEFAULT_CONFIG.documentManagement,
+        ...userConfig.documentManagement,
+      },
+      specGovernance: {
+        ...DEFAULT_CONFIG.specGovernance,
+        ...userConfig.specGovernance,
+        naming: userConfig.specGovernance?.naming ?? DEFAULT_CONFIG.specGovernance?.naming,
+        tsdoc: userConfig.specGovernance?.tsdoc ?? DEFAULT_CONFIG.specGovernance?.tsdoc,
       },
     };
   }
