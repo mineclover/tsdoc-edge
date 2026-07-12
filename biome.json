@@ -58,6 +58,7 @@
         "src/spec-graph/**/*.ts",
         "src/lsp/**/*.ts",
         "src/indexer/**/*.ts",
+        "mcp-server/src/**/*.ts",
         "src/storage/GraphRepository.ts",
         "src/storage/SpecGraphRepository.ts",
         "src/storage/AnalysisInputRevisionRepository.ts",

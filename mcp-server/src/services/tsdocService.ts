@@ -506,16 +506,18 @@ export class TsDocService {
     if (params.strength) {
       relationships = relationships.filter((r) => r.strength === params.strength);
     }
-    if (params.from) {
+    const from = params.from;
+    if (from) {
       relationships = relationships.filter((r) => {
         const froms = Array.isArray(r.from) ? r.from : [r.from];
-        return froms.includes(params.from!);
+        return froms.includes(from);
       });
     }
-    if (params.to) {
+    const to = params.to;
+    if (to) {
       relationships = relationships.filter((r) => {
         const tos = Array.isArray(r.to) ? r.to : [r.to];
-        return tos.includes(params.to!);
+        return tos.includes(to);
       });
     }
 
@@ -590,7 +592,7 @@ export class TsDocService {
     const db = this.getDb();
 
     let sql = 'SELECT * FROM symbols';
-    const sqlParams: any[] = [];
+    const sqlParams: string[] = [];
 
     if (params.type) {
       sql += ' WHERE type = ?';

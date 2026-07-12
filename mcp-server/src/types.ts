@@ -23,7 +23,7 @@ export interface Relationship {
   to: string | string[];
   confidence: number;
   description?: string;
-  properties?: Record<string, any>;
+  properties?: Record<string, unknown>;
 }
 
 export interface OntologyStats {

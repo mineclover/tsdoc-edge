@@ -22,9 +22,10 @@ typecheck does not permit new lint debt.
 | Legacy application, scripts, MCP server | `noExplicitAny`, `noNonNullAssertion` remain warnings during migration | Existing behavior is preserved while each touched subsystem removes debt deliberately. |
 | Tests, demos, examples | Test-specific exceptions only where the fixture requires them | Fixtures may model loose input, but production policy is not weakened. |
 
-The canonical kernel currently includes `src/convention`, `src/semantic-graph`, `src/spec-graph`,
-`src/lsp`, `src/indexer`, and the four immutable revision repositories. Adding a new canonical
-kernel directory requires adding it to `biome.json` and `lint:governance` in the same change.
+The strict surface currently includes `src/convention`, `src/semantic-graph`, `src/spec-graph`,
+`src/lsp`, `src/indexer`, `mcp-server/src`, and the four immutable revision repositories. Adding a
+new canonical or integration directory requires adding it to `biome.json` and `lint:governance` in
+the same change.
 
 ## Migration budget
 
@@ -33,8 +34,8 @@ and rejects a new warning category or any count above this baseline:
 
 | Rule | Maximum |
 | --- | ---: |
-| `noNonNullAssertion` | 52 |
-| `noExplicitAny` | 17 |
+| `noNonNullAssertion` | 50 |
+| `noExplicitAny` | 15 |
 | other current warning/info categories | 1–23, enforced by script |
 
 Reducing the budget is encouraged and does not require a migration exception. Increasing it needs a

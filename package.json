@@ -27,7 +27,7 @@
     "verify:package-tarball": "node scripts/verify-package-tarball.cjs",
     "lint": "biome check . && npm run lint:budget && npm run lint:governance",
     "lint:budget": "node scripts/verify-lint-warning-budget.cjs",
-    "lint:governance": "biome check src/convention src/semantic-graph src/spec-graph src/lsp src/indexer src/storage/GraphRepository.ts src/storage/SpecGraphRepository.ts src/storage/AnalysisInputRevisionRepository.ts src/storage/ConventionCheckHistoryRepository.ts --error-on-warnings",
+    "lint:governance": "biome check src/convention src/semantic-graph src/spec-graph src/lsp src/indexer mcp-server/src src/storage/GraphRepository.ts src/storage/SpecGraphRepository.ts src/storage/AnalysisInputRevisionRepository.ts src/storage/ConventionCheckHistoryRepository.ts --error-on-warnings",
     "format": "biome format --write .",
     "check": "biome check --write .",
     "prepublishOnly": "npm run build",
