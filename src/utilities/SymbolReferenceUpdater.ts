@@ -179,8 +179,7 @@ export class SymbolReferenceUpdater {
 
           // Find inline references: [[Symbol]]
           const inlinePattern = /\[\[(.+?)\]\]/g;
-          let match;
-          while ((match = inlinePattern.exec(line)) !== null) {
+          for (const match of line.matchAll(inlinePattern)) {
             if (match[1] === oldSymbol) {
               references.push({
                 file,

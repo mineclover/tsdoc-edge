@@ -5,7 +5,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { PreCommitChecker } from '../analyzer/PreCommitChecker';
+import { PreCommitChecker, type PreCommitReport } from '../analyzer/PreCommitChecker';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
@@ -78,7 +78,7 @@ export class PreCommitRunCommand extends BaseCommand {
       const checker = new PreCommitChecker();
 
       try {
-        let report;
+        let report: PreCommitReport;
         if (checkAll) {
           // Get all TypeScript files in src/
           const allFiles = this.getAllTsFiles('src');

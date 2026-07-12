@@ -91,8 +91,7 @@ function parseXmlToTree(xml: string): XmlElement | null {
   // Parse attributes
   const attributes: Record<string, string> = {};
   const attrRegex = /([\w-]+)="([^"]*)"/g;
-  let attrMatch;
-  while ((attrMatch = attrRegex.exec(attrString)) !== null) {
+  for (const attrMatch of attrString.matchAll(attrRegex)) {
     attributes[attrMatch[1]] = unescapeXml(attrMatch[2]);
   }
 

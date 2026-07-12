@@ -17,8 +17,9 @@ typecheck does not permit new lint debt.
 | Surface | Policy | Reason |
 | --- | --- | --- |
 | All files | Biome recommended errors, parsing, formatting | Deterministic repository baseline; CI blocks violations. |
-| Canonical governance kernel | `noExplicitAny`, `noAssignInExpressions`, `noImplicitAnyLet`, `noNonNullAssertion` are errors | New revision-pinned analysis code must not inherit legacy trust shortcuts. |
-| Legacy application, scripts, MCP server | The same four rules remain warnings during migration | Existing behavior is preserved while each touched subsystem removes debt deliberately. |
+| All TypeScript code | `noAssignInExpressions`, `noImplicitAnyLet` are errors | Regex/extraction loops use `matchAll()` or an explicit typed step. |
+| Canonical governance kernel | `noExplicitAny`, `noNonNullAssertion` are errors | New revision-pinned analysis code must not inherit legacy trust shortcuts. |
+| Legacy application, scripts, MCP server | `noExplicitAny`, `noNonNullAssertion` remain warnings during migration | Existing behavior is preserved while each touched subsystem removes debt deliberately. |
 | Tests, demos, examples | Test-specific exceptions only where the fixture requires them | Fixtures may model loose input, but production policy is not weakened. |
 
 The canonical kernel currently includes `src/convention`, `src/semantic-graph`, `src/spec-graph`,
@@ -34,8 +35,6 @@ and rejects a new warning category or any count above this baseline:
 | --- | ---: |
 | `noNonNullAssertion` | 52 |
 | `noExplicitAny` | 17 |
-| `noAssignInExpressions` | 29 |
-| `noImplicitAnyLet` | 20 |
 | other current warning/info categories | 1–23, enforced by script |
 
 Reducing the budget is encouraged and does not require a migration exception. Increasing it needs a

@@ -325,9 +325,7 @@ export class FileReferenceUpdater {
 
     // Pattern: → /path/to/file.md or → path/to/file.md
     const backlinkPattern = /→\s+(\/)?([^\s]+\.md)/g;
-    let match;
-
-    while ((match = backlinkPattern.exec(line)) !== null) {
+    for (const match of line.matchAll(backlinkPattern)) {
       const foundPath = match[2];
       if (foundPath === relativeOldPath || foundPath === path.basename(absoluteOldPath)) {
         matches.push({
@@ -354,8 +352,7 @@ export class FileReferenceUpdater {
     const patterns = [/Path:\s*([^\s)]+\.md)/gi, /\(([^)]+\.md)\)/g, /`([^`]+\.md)`/g];
 
     for (const pattern of patterns) {
-      let match;
-      while ((match = pattern.exec(line)) !== null) {
+      for (const match of line.matchAll(pattern)) {
         const foundPath = match[1];
         if (foundPath === basename || foundPath === relativeOldPath) {
           matches.push({
@@ -382,9 +379,7 @@ export class FileReferenceUpdater {
 
     // Pattern: ../path/file.md or ./file.md
     const relativePattern = /(\.\.[/\\][\w\-/\\]+\.md|\.[/\\][\w\-/\\]+\.md)/g;
-    let match;
-
-    while ((match = relativePattern.exec(line)) !== null) {
+    for (const match of line.matchAll(relativePattern)) {
       const relativePath = match[1];
       const currentDir = path.dirname(currentFile);
       const resolvedPath = path.resolve(currentDir, relativePath);
@@ -412,9 +407,7 @@ export class FileReferenceUpdater {
 
     // Pattern: [text](path.md)
     const markdownLinkPattern = /\[([^\]]+)\]\(([^)]+\.md)\)/g;
-    let match;
-
-    while ((match = markdownLinkPattern.exec(line)) !== null) {
+    for (const match of line.matchAll(markdownLinkPattern)) {
       const linkPath = match[2];
       if (linkPath === relativeOldPath || linkPath === path.basename(absoluteOldPath)) {
         matches.push({

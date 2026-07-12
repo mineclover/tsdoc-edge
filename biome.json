@@ -21,8 +21,8 @@
       "recommended": true,
       "suspicious": {
         "noExplicitAny": "warn",
-        "noAssignInExpressions": "warn",
-        "noImplicitAnyLet": "warn",
+        "noAssignInExpressions": "error",
+        "noImplicitAnyLet": "error",
         "useIterableCallbackReturn": "off",
         "noShadowRestrictedNames": "off"
       },

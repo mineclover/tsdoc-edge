@@ -271,8 +271,7 @@ export class ExposureAnalyzer {
     const exportRegex =
       /export\s+(?:\*\s+as\s+(\w+)\s+from|{([^}]+)}\s+from|(\w+)\s+from)\s+['"]([^'"]+)['"]/g;
 
-    let match: RegExpExecArray | null;
-    while ((match = exportRegex.exec(content)) !== null) {
+    for (const match of content.matchAll(exportRegex)) {
       const [, namespaceExport, namedExports, defaultExport, sourcePath] = match;
 
       if (namespaceExport) {

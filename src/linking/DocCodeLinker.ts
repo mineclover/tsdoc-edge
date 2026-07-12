@@ -102,12 +102,10 @@ export class DocCodeLinker {
     const lines = content.split('\n');
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      let match: RegExpExecArray | null;
-
       // Reset lastIndex for each line
       linkRegex.lastIndex = 0;
 
-      while ((match = linkRegex.exec(line)) !== null) {
+      for (const match of line.matchAll(linkRegex)) {
         const [, text, target] = match;
 
         // Split path and anchor

@@ -45,8 +45,7 @@ function extractSymbolRefs(content: string): SymbolRef[] {
 
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
-    let match;
-    while ((match = pattern.exec(line)) !== null) {
+    for (const match of line.matchAll(pattern)) {
       refs.push({
         symbol: match[1],
         line: i + 1,

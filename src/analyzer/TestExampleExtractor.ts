@@ -346,8 +346,7 @@ export class TestExampleExtractor {
     // Strategy 3: Parse imports to find what's actually being tested
     // Pattern: import { ClassName } from '...'
     const importPattern = /import\s+\{([^}]+)\}\s+from/g;
-    let match;
-    while ((match = importPattern.exec(fullSource)) !== null) {
+    for (const match of fullSource.matchAll(importPattern)) {
       const imports = match[1].split(',').map((s) => s.trim());
       for (const importName of imports) {
         // Clean up "type X as Y" patterns
@@ -375,7 +374,7 @@ export class TestExampleExtractor {
     const methodCallPattern = /\.([a-z][a-zA-Z0-9_]*)\s*\(/g;
     const calledMethods = new Set<string>();
 
-    while ((match = methodCallPattern.exec(testCode)) !== null) {
+    for (const match of testCode.matchAll(methodCallPattern)) {
       const methodName = match[1];
       if (!this.isCommonTestKeyword(methodName)) {
         calledMethods.add(methodName);

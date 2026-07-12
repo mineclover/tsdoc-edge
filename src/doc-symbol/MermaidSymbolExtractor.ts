@@ -139,8 +139,6 @@ export class MermaidSymbolExtractor {
     }
 
     // Parse subgraphs
-    const _subgraphRegex = /subgraph\s+"([^"]+)"/g;
-    let _subgraphMatch;
     let currentSubgraph: string | undefined;
 
     const lines = content.split('\n');
@@ -162,9 +160,8 @@ export class MermaidSymbolExtractor {
       // Node IDs can be uppercase, lowercase, numbers, underscores, hyphens
       // Use global regex to find ALL node definitions on a line (e.g., A["x"] --> B["y"])
       const nodeRegex = /([A-Za-z0-9_-]+)\["?([^\]"]+)"?\]/g;
-      let nodeMatch;
       const seenNodes = new Set<string>();
-      while ((nodeMatch = nodeRegex.exec(trimmed)) !== null) {
+      for (const nodeMatch of trimmed.matchAll(nodeRegex)) {
         const nodeId = nodeMatch[1];
         const label = nodeMatch[2];
 

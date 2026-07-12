@@ -101,8 +101,7 @@ export class ReferenceUpdater {
 
         // Check for markdown links: [text](../path/file.md)
         const markdownLinkRegex = /\[([^\]]+)\]\(([^)]+\.md)\)/g;
-        let match;
-        while ((match = markdownLinkRegex.exec(line)) !== null) {
+        for (const match of line.matchAll(markdownLinkRegex)) {
           const referencedPath = match[2];
           const resolvedPath = path.resolve(path.dirname(file), referencedPath);
 

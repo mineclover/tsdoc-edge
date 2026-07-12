@@ -430,9 +430,7 @@ export class EndpointDetectionAnalyzer {
   private extractPathParams(routePath: string): string[] {
     const params: string[] = [];
     const paramRegex = /:(\w+)/g;
-    let match: RegExpExecArray | null;
-
-    while ((match = paramRegex.exec(routePath)) !== null) {
+    for (const match of routePath.matchAll(paramRegex)) {
       params.push(match[1]);
     }
 

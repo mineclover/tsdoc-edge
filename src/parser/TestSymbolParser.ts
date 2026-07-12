@@ -371,9 +371,7 @@ export class TestSymbolParser {
 
       // Extract @testScenario tags
       const scenarioRegex = /@testScenario\s+(.+)/g;
-      let match;
-
-      while ((match = scenarioRegex.exec(commentText)) !== null) {
+      for (const match of commentText.matchAll(scenarioRegex)) {
         const scenarioDescription = match[1].trim();
 
         // Generate scenario ID

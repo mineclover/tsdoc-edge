@@ -81,8 +81,7 @@ export class RoutesCommand extends BaseCommand {
 
         for (const pattern of routePatterns) {
           pattern.lastIndex = 0;
-          let match;
-          while ((match = pattern.exec(line)) !== null) {
+          for (const match of line.matchAll(pattern)) {
             if (match[2]) {
               // app.get('/path') style
               routes.push({

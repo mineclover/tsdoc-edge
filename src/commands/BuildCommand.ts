@@ -1395,9 +1395,7 @@ export class BuildCommand extends BaseCommand {
 
       // Match @doc [[Symbol]] pattern
       const docTagRegex = /@doc\s+\[\[([^\]]+)\]\]/g;
-      let match;
-
-      while ((match = docTagRegex.exec(line)) !== null) {
+      for (const match of line.matchAll(docTagRegex)) {
         const docRef = match[1].trim();
         if (docRef && !docTags.includes(docRef)) {
           docTags.push(docRef);

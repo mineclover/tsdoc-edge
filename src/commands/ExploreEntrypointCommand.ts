@@ -274,9 +274,7 @@ export class ExploreEntrypointCommand extends BaseCommand {
   private extractSymbolReferences(content: string): string[] {
     const regex = /\[\[([^\]]+)\]\]/g;
     const matches: string[] = [];
-    let match;
-
-    while ((match = regex.exec(content)) !== null) {
+    for (const match of content.matchAll(regex)) {
       matches.push(match[1]);
     }
 
@@ -337,27 +335,26 @@ export class ExploreEntrypointCommand extends BaseCommand {
 
     // Match: **Implementation**: `path/to/file.ts:line`
     const implRegex = /\*\*Impl(?:ementation)?\*\*:?\s*`([^`]+)`/g;
-    let match;
-    while ((match = implRegex.exec(content)) !== null) {
+    for (const match of content.matchAll(implRegex)) {
       refs.push(match[1]);
     }
 
     // Match: **File**: `path/to/file.ts`
     const fileRegex = /\*\*File\*\*:?\s*`([^`]+)`/g;
-    while ((match = fileRegex.exec(content)) !== null) {
+    for (const match of content.matchAll(fileRegex)) {
       refs.push(match[1]);
     }
 
     // Match: **Implementation**: [[SymbolName]] (`path/to/file.ts`)
     const symbolImplRegex = /\*\*Impl(?:ementation)?\*\*:?\s*\[\[([^\]]+)\]\]\s*\(`([^`]+)`\)/g;
-    while ((match = symbolImplRegex.exec(content)) !== null) {
+    for (const match of content.matchAll(symbolImplRegex)) {
       refs.push(match[2]); // Extract path from parentheses
     }
 
     // Match: **Command**: [[CommandName]] (`tsdoc-edge command`)
     // This allows extracting command implementation from command references
     const commandRegex = /\*\*Command\*\*:?\s*\[\[([^\]]+)\]\]/g;
-    while ((match = commandRegex.exec(content)) !== null) {
+    for (const match of content.matchAll(commandRegex)) {
       // Convert command symbol to file path
       const commandSymbol = match[1];
       const commandFile = this.symbolToCommandFile(commandSymbol);
@@ -369,7 +366,7 @@ export class ExploreEntrypointCommand extends BaseCommand {
     // Match: **[[CommandName]]** - `tsdoc-edge command`
     // New format from feature docs
     const commandFormatRegex = /\*\*\[\[([^\]]+Command)\]\]\*\*/g;
-    while ((match = commandFormatRegex.exec(content)) !== null) {
+    for (const match of content.matchAll(commandFormatRegex)) {
       const commandSymbol = match[1];
       const commandFile = this.symbolToCommandFile(commandSymbol);
       if (commandFile) {

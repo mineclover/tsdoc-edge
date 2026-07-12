@@ -136,9 +136,7 @@ export class DocumentSymbolParser {
 
     // Match [[Symbol]] or [[Symbol#Section]]
     const regex = /\[\[([^\]#]+)(?:#([^\]]+))?\]\]/g;
-    let match: RegExpExecArray | null;
-
-    while ((match = regex.exec(line)) !== null) {
+    for (const match of line.matchAll(regex)) {
       const symbolName = match[1].trim();
       const section = match[2]?.trim();
 
@@ -167,9 +165,7 @@ export class DocumentSymbolParser {
 
     // Match [text](path), [text](path#Symbol), or [text](path#Symbol.member)
     const regex = /\[([^\]]+)\]\(([^)]+)\)/g;
-    let match: RegExpExecArray | null;
-
-    while ((match = regex.exec(line)) !== null) {
+    for (const match of line.matchAll(regex)) {
       const [, text, target] = match;
 
       // Parse target: path#Symbol.member
@@ -212,9 +208,7 @@ export class DocumentSymbolParser {
     // Match [^identifier] where identifier is sym-XXX or any other identifier
     // But exclude footnote definitions like [^identifier]:
     const regex = /\[\^([^\]]+)\](?!:)/g;
-    let match: RegExpExecArray | null;
-
-    while ((match = regex.exec(line)) !== null) {
+    for (const match of line.matchAll(regex)) {
       const identifier = match[1].trim();
 
       // Check if it's an ID reference (sym-XXX pattern)

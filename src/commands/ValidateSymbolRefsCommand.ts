@@ -388,8 +388,7 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
 
       // Extract all [[Symbol]] references in the line (excluding inline code)
       const refRegex = /\[\[([^\]]+)\]\]/g;
-      let match;
-      while ((match = refRegex.exec(lineWithoutInlineCode)) !== null) {
+      for (const match of lineWithoutInlineCode.matchAll(refRegex)) {
         const symbolName = match[1];
 
         // Apply same filters as Mermaid extraction
