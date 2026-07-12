@@ -5,11 +5,21 @@ import { DiagnosticSeverity } from 'vscode-languageserver/node';
 import type { ConventionCheckResult } from '../convention/ConventionCheckService';
 import type { DiagnosticInfo } from './diagnostics';
 
+export interface SavedConventionDiagnosticData {
+  readonly kind: 'saved-convention-finding';
+  readonly historyId?: string;
+  readonly checkId: string;
+  readonly findingId: string;
+  readonly sourceFile: string;
+  readonly sourceLine: number;
+}
+
 /** Only non-satisfied convention outcomes become saved editor diagnostics. */
 export function conventionDiagnosticsForFile(
   result: ConventionCheckResult,
   workspaceRoot: string,
-  filePath: string
+  filePath: string,
+  historyId?: string
 ): readonly DiagnosticInfo[] {
   const normalized = relative(workspaceRoot, filePath);
   const bindings = new Map(
@@ -20,12 +30,14 @@ export function conventionDiagnosticsForFile(
     if (finding.outcome === 'satisfied' || finding.outcome === 'disabled') continue;
     const binding = bindings.get(finding.declarationId);
     if (!binding || binding.source.file !== normalized) continue;
+    const line = binding.source.range?.startLine ?? 1;
     diagnostics.push({
-      line: binding.source.range?.startLine ?? 1,
+      line,
       ...(binding.source.range?.startColumn ? { startCol: binding.source.range.startColumn } : {}),
       code: `convention/${finding.ruleId}`,
       message: `Convention ${finding.outcome}: ${finding.ruleId} (${finding.declarationId})`,
       severity: severity(finding.severity),
+      data: findingData(result.checkId, finding.findingId, binding.source.file, line, historyId),
     });
   }
   for (const finding of result.naming.findings) {
@@ -35,6 +47,7 @@ export function conventionDiagnosticsForFile(
       code: `convention/${finding.ruleId}`,
       message: `Naming convention: ${finding.subject} must use ${finding.expected}`,
       severity: severity(finding.severity),
+      data: findingData(result.checkId, finding.findingId, finding.file, 1, historyId),
     });
   }
   for (const finding of result.tsdoc.findings) {
@@ -44,9 +57,27 @@ export function conventionDiagnosticsForFile(
       code: `convention/${finding.ruleId}`,
       message: `TSDoc convention: ${finding.nodeId} is missing ${finding.missingTags.map((tag) => `@${tag}`).join(', ')}`,
       severity: severity(finding.severity),
+      data: findingData(result.checkId, finding.findingId, finding.file, 1, historyId),
     });
   }
   return Object.freeze(diagnostics.sort(compareDiagnostics));
+}
+
+function findingData(
+  checkId: string,
+  findingId: string,
+  sourceFile: string,
+  sourceLine: number,
+  historyId?: string
+): SavedConventionDiagnosticData {
+  return Object.freeze({
+    kind: 'saved-convention-finding',
+    ...(historyId ? { historyId } : {}),
+    checkId,
+    findingId,
+    sourceFile,
+    sourceLine,
+  });
 }
 
 function relative(root: string, filePath: string): string {

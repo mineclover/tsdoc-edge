@@ -21,6 +21,8 @@ export interface DiagnosticInfo {
   readonly endCol?: number;
   /** Stable compiler, router, or lint diagnostic code. */
   readonly code?: string | number;
+  /** Opaque, immutable metadata used by client CodeActions. */
+  readonly data?: unknown;
   /** Human-readable description of the issue. */
   readonly message: string;
   /** LSP severity level. */
@@ -72,5 +74,6 @@ export function toLanguageServerDiagnostic(
     message: diagnostic.message,
     source,
     ...(diagnostic.code !== undefined ? { code: diagnostic.code } : {}),
+    ...(diagnostic.data !== undefined ? { data: diagnostic.data } : {}),
   };
 }

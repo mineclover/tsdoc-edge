@@ -53,4 +53,24 @@ describe('LSP diagnostic boundary', () => {
     });
     expect(diagnostic).not.toHaveProperty('code');
   });
+
+  it('passes immutable saved-finding metadata through to the LSP client', () => {
+    const data = {
+      kind: 'saved-convention-finding',
+      historyId: 'convention-history:fixture',
+      checkId: 'convention-check:fixture',
+      findingId: 'conformance-finding:fixture',
+      sourceFile: 'managed/specs/fixture.md',
+      sourceLine: 12,
+    };
+
+    expect(
+      toLanguageServerDiagnostic({
+        line: 12,
+        message: 'Convention violated',
+        severity: DiagnosticSeverity.Error,
+        data,
+      }).data
+    ).toEqual(data);
+  });
 });

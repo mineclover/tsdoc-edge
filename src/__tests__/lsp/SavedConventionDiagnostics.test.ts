@@ -61,6 +61,12 @@ describe('saved convention LSP diagnostics', () => {
           code: 'convention/binding.implementation',
           severity: 1,
           message: expect.stringContaining('BIND-SERVICE'),
+          data: expect.objectContaining({
+            kind: 'saved-convention-finding',
+            historyId: retained.historyId,
+            checkId: check.checkId,
+            sourceFile: 'managed/conventions/core.json',
+          }),
         }),
       ]);
 

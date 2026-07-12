@@ -34,7 +34,7 @@ canonical: true
 | --- | --- |
 | Now | saved LSP convention diagnostics 첫 vertical slice |
 | Parallel | Node/package release qualification, legacy baseline 첫 vertical slice |
-| Next | current Explain/Open과 LSP protocol-level proof |
+| Next | LSP protocol-level proof와 client Explain/Open handler |
 | Then | historical Explain/Open, retention GC pin/tombstone |
 | Release | runtime/package qualification과 external canary 전까지 stable release NO-GO |
 | Deferred | 두 번째 runner/provider, generic adapter/DSL, convention distribution registry |
@@ -179,7 +179,7 @@ Overlay와 binding set은 process-local이다. Conformance finding/report는 der
 | Enrichment revision/store | `kernel` | revision factory와 shared exact store | retained-input product wiring |
 | TSDoc enrichment check | `proven` (source-checkout) | workspace source digest → enrichment revision, tag finding/check/gate | general enrichment framework |
 | Durable result history | `proven` (source-checkout) | append-only canonical bundle, retained replay, source/config removal canary, tamper reject | retention GC pin/tombstone, packed external proof |
-| LSP spec experience | `wired` (source-checkout) | exact retained history → active canonical revision match의 saved convention diagnostics | current Explain/Open, protocol-level proof |
+| LSP spec experience | `wired` (source-checkout) | exact retained history diagnostic + immutable current Explain/Open CodeAction payload | protocol/client handler proof, historical view |
 | External library pilot | `planned` | self-repository PoC만 존재 | packed early canary와 full pilot |
 
 ## 최소 아키텍처 — current와 target

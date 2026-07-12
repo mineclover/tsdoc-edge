@@ -165,6 +165,9 @@ export class TsdocEdgeService {
   /** One exact retained convention result selected for saved-file diagnostics. */
   private savedConventionCheck: ConventionCheckResult | null = null;
 
+  /** Exact retained history record supplying saved convention diagnostics. */
+  private savedConventionHistoryId: string | undefined;
+
   /** TS5 syntax-only results for unsaved buffers; never persisted. */
   private readonly unsavedOverlays = new Map<string, UnsavedFileOverlay>();
 
@@ -520,6 +523,7 @@ export class TsdocEdgeService {
           return;
         }
         this.savedConventionCheck = retained.check;
+        this.savedConventionHistoryId = retained.historyId;
       } finally {
         repository.close();
       }
@@ -1260,7 +1264,12 @@ export class TsdocEdgeService {
       return [];
     }
     return [
-      ...conventionDiagnosticsForFile(this.savedConventionCheck, this.workspaceRoot, filePath),
+      ...conventionDiagnosticsForFile(
+        this.savedConventionCheck,
+        this.workspaceRoot,
+        filePath,
+        this.savedConventionHistoryId
+      ),
     ];
   }
 

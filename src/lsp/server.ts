@@ -370,6 +370,30 @@ connection.onCodeAction((params: CodeActionParams): CodeAction[] => {
             },
           });
         }
+
+        const savedConvention = savedConventionDiagnosticData(diagnostic.data);
+        if (savedConvention) {
+          actions.push({
+            title: '📖 Explain Saved Convention Finding',
+            kind: CodeActionKind.QuickFix,
+            diagnostics: [diagnostic],
+            command: {
+              title: 'Explain Saved Convention Finding',
+              command: 'tsdoc.explainSavedConventionFinding',
+              arguments: [savedConvention],
+            },
+          });
+          actions.push({
+            title: '↗ Open Saved Convention Source',
+            kind: CodeActionKind.RefactorExtract,
+            diagnostics: [diagnostic],
+            command: {
+              title: 'Open Saved Convention Source',
+              command: 'tsdoc.openSavedConventionSource',
+              arguments: [savedConvention],
+            },
+          });
+        }
       }
     }
 
@@ -379,6 +403,38 @@ connection.onCodeAction((params: CodeActionParams): CodeAction[] => {
     return [];
   }
 });
+
+function savedConventionDiagnosticData(value: unknown):
+  | {
+      readonly kind: 'saved-convention-finding';
+      readonly historyId?: string;
+      readonly checkId: string;
+      readonly findingId: string;
+      readonly sourceFile: string;
+      readonly sourceLine: number;
+    }
+  | undefined {
+  if (!value || typeof value !== 'object') return undefined;
+  const data = value as Record<string, unknown>;
+  if (
+    data.kind !== 'saved-convention-finding' ||
+    typeof data.checkId !== 'string' ||
+    typeof data.findingId !== 'string' ||
+    typeof data.sourceFile !== 'string' ||
+    typeof data.sourceLine !== 'number'
+  ) {
+    return undefined;
+  }
+  if (data.historyId !== undefined && typeof data.historyId !== 'string') return undefined;
+  return data as {
+    readonly kind: 'saved-convention-finding';
+    readonly historyId?: string;
+    readonly checkId: string;
+    readonly findingId: string;
+    readonly sourceFile: string;
+    readonly sourceLine: number;
+  };
+}
 
 // Document Link provider - [[Symbol]] references
 // Optimized with batch lookup to reduce DB queries

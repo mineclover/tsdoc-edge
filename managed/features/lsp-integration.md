@@ -233,7 +233,26 @@ tampered이면 diagnostic을 현재 결과처럼 보이지 않으며, active/lat
 Dirty overlay에는 saved convention finding을 섞지 않는다.
 
 이 slice는 saved diagnostic 표시만 제공한다. current Explain/Open action과 historical
-Explain/Open, mutating CodeAction은 별도 gate다.
+Explain/Open은 다음 immutable payload를 client extension으로 전달하는 read-only CodeAction
+contract까지 제공한다.
+
+```ts
+{
+  kind: 'saved-convention-finding',
+  historyId: 'convention-history:<exact-id>',
+  checkId: 'convention-check:<exact-id>',
+  findingId: 'conformance-finding:<exact-id>',
+  sourceFile: 'managed/specs/...',
+  sourceLine: 42
+}
+```
+
+- `tsdoc.explainSavedConventionFinding`: payload의 retained identity와 finding을 표시한다.
+- `tsdoc.openSavedConventionSource`: payload의 source file/line으로 read-only 이동한다.
+
+LSP server는 이 command를 실행하거나 내용을 수정하지 않는다. client extension이 command handler를
+제공하며, payload에 없는 active/latest history를 추가로 조회해서는 안 된다. historical
+Explain/Open과 mutating CodeAction은 별도 gate다.
 
 Build가 만든 `.tsdoc/canonical-graph.db`는 router runtime 환경 변수가 없는 LSP에서도
 schema/WAL 초기화를 하지 않는 read-only connection으로 읽을 수 있다. save/source
