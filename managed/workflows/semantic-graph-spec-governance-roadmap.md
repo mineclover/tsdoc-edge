@@ -442,7 +442,7 @@ P4.5는 report JSON만 복사하는 기능이 아니다. 다음을 함께 보존
 
 - normalized evidence/enrichment/policy/rule-set canonical payload 또는 이를 byte-identical하게
   재생성할 immutable authored source와 compiled manifest
-- 기존 repository의 code/spec exact pin과 retention
+- 기존 repository에서 exact lookup할 code/spec revision ID; history-aware retention pin/GC는 다음 lane
 - `EffectiveAnalysisStamp`
 - check/report/gate identity
 - exact-ID lookup 시 canonical envelope 재검증
@@ -451,9 +451,10 @@ Binding resolution은 serialized object를 신뢰하지 않고 retained input에
 
 ### P4.5 closeout design — retained replay bundle
 
-현재 `--history-db`는 canonical envelope append와 read-time tamper/collision rejection을
-제공하는 `wired` precursor다. P4.5 complete는 그 stored `ConventionCheckResult`를 결과로
-반환하는 것이 아니라, 아래 `ConventionReplayBundle`로 새 check를 실행해 ID를 비교하는 것이다.
+현재 `--history-db`는 canonical envelope append, read-time tamper/collision rejection과 retained
+bundle로의 full recompute를 제공한다. replay는 stored `ConventionCheckResult`를 그대로 반환하지
+않고, 아래 `ConventionReplayBundle`로 새 check를 실행해 ID를 비교한다. 이 proof는 source-checkout
+범위이며, history-aware revision retention/GC와 historical UI는 별도 promotion lane이다.
 
 ```typescript
 interface ConventionReplayBundle {
@@ -503,16 +504,14 @@ payload는 collision error다. history-aware code/spec retention pin과 GC tombs
 lane이며, 현재 replay는 missing code revision을 fallback 없이 `historical-input-missing`으로
 반환한다.
 
-Closeout proof는 다음을 요구한다.
+Source-checkout proof는 retained pack/config source를 삭제한 뒤에도 exact check/report/gate ID를
+recompute하고, canonical envelope tamper 및 non-canonical append를 거부한다. 동일 bundle append는
+idempotent이며 다른 canonical payload는 collision으로 거부한다. CLI replay는 missing code revision을
+latest fallback 없이 `historical-input-missing` exit `2`로 처리한다.
 
-- pass와 fail history 각각이 active pointer/config/source 변경 뒤에도 같은 check/report/gate ID로
-  재계산된다.
-- retained source payload, code/spec/input pin, expected ID 각각의 one-byte/one-field tamper가 exit
-  `2`로 거부된다.
-- exact code/spec/input revision 하나를 제거한 fixture가 fallback 없이
-  `historical-input-missing`을 반환한다.
-- same bundle append는 row를 추가하지 않고, same history ID의 다른 bundle은 collision으로 거부된다.
-- historical replay는 current CLI/CI check와 동일한 gate evaluator version을 명시적으로 비교한다.
+다음 retention promotion gate는 history-aware code/spec/input pin을 repository GC에 연결하고,
+unpinned inactive revision의 tombstone을 유지하는 것이다. 이를 통과하기 전에는 packed external
+replay와 historical UI를 source-checkout proof로 확대 해석하지 않는다.
 
 ## Provider와 external pilot
 
@@ -673,9 +672,9 @@ coverage 주장은 완료 gate로 사용하지 않는다.
 - P4.4 `type: project-spec` Markdown의 explicit `tsdoc-spec` block을 `SpecGraphRevision`과
   binding으로 컴파일하고, `spec extract`가 derived repository revision으로 원자 승격한다.
 - P4.5 `--history-db`는 evidence/enrichment/policy/rule-set canonical payload와 exact
-  check/stamp를 append-only envelope으로 보존한다. read-time canonical envelope 검증과
-  tamper/collision rejection은 구현됐고, retained source에서의 full conformance recompute와
-  historical Explain/Open UI는 별도 P4.5 closeout/LSP-history gate로 남는다.
+  check/stamp를 append-only envelope으로 보존하고, retained bundle로 full conformance를 recompute한다.
+  read-time canonical envelope 검증과 tamper/collision rejection도 구현됐다. history-aware
+  retention GC/tombstone과 historical Explain/Open UI는 별도 promotion/LSP-history gate로 남는다.
 - Node 24를 package/CI baseline으로 선택하고, clean-install matrix와 native-crash 해소 전의
   stable release NO-GO를 명시했다.
 - legacy production path는 C2와 external pilot 뒤 제거 또는 canonical enrichment 이관이라는
