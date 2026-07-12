@@ -4,16 +4,25 @@
  * @description LSP client for TSDoc Edge integration
  */
 
-import * as path from 'path';
+import * as path from 'node:path';
 import * as vscode from 'vscode';
 import {
   LanguageClient,
-  LanguageClientOptions,
-  ServerOptions,
+  type LanguageClientOptions,
+  type ServerOptions,
   TransportKind,
 } from 'vscode-languageclient/node';
 
 let client: LanguageClient;
+
+interface SavedConventionFindingPayload {
+  readonly kind: 'saved-convention-finding';
+  readonly historyId?: string;
+  readonly checkId: string;
+  readonly findingId: string;
+  readonly sourceFile: string;
+  readonly sourceLine: number;
+}
 
 export function activate(context: vscode.ExtensionContext) {
   // Get configuration
@@ -25,9 +34,7 @@ export function activate(context: vscode.ExtensionContext) {
   }
 
   // Server module path
-  const serverModule = context.asAbsolutePath(
-    path.join('..', 'dist', 'lsp', 'server.js')
-  );
+  const serverModule = context.asAbsolutePath(path.join('..', 'dist', 'lsp', 'server.js'));
 
   // If the extension is being run in debug mode, use the debug server options
   const debugOptions = { execArgv: ['--nolazy', '--inspect=6009'] };
@@ -56,12 +63,7 @@ export function activate(context: vscode.ExtensionContext) {
   };
 
   // Create the language client
-  client = new LanguageClient(
-    'tsdocEdge',
-    'TSDoc Edge',
-    serverOptions,
-    clientOptions
-  );
+  client = new LanguageClient('tsdocEdge', 'TSDoc Edge', serverOptions, clientOptions);
 
   // Register commands
   const showImpactCommand = vscode.commands.registerCommand(
@@ -94,39 +96,89 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  const workContextCommand = vscode.commands.registerCommand(
-    'tsdoc-edge.workContext',
-    async () => {
-      const editor = vscode.window.activeTextEditor;
-      if (!editor) {
-        vscode.window.showErrorMessage('No active editor');
+  const workContextCommand = vscode.commands.registerCommand('tsdoc-edge.workContext', async () => {
+    const editor = vscode.window.activeTextEditor;
+    if (!editor) {
+      vscode.window.showErrorMessage('No active editor');
+      return;
+    }
+
+    const filePath = editor.document.uri.fsPath;
+
+    // Run tsdoc-edge work-context command
+    const terminal = vscode.window.createTerminal('TSDoc Edge');
+    terminal.sendText(`npx tsdoc-edge work-context "${filePath}"`);
+    terminal.show();
+  });
+
+  const refreshCommand = vscode.commands.registerCommand('tsdoc-edge.refreshAnalysis', async () => {
+    vscode.window.showInformationMessage('Refreshing TSDoc Edge analysis...');
+
+    // Run tsdoc-edge build command
+    const terminal = vscode.window.createTerminal('TSDoc Edge');
+    terminal.sendText('npx tsdoc-edge build src');
+    terminal.show();
+  });
+
+  const savedConventionOutput = vscode.window.createOutputChannel('TSDoc Edge Convention Finding');
+  const explainSavedConventionFindingCommand = vscode.commands.registerCommand(
+    'tsdoc.explainSavedConventionFinding',
+    (value: unknown) => {
+      const finding = savedConventionFindingPayload(value);
+      if (!finding) {
+        vscode.window.showErrorMessage('TSDoc Edge received an invalid saved convention finding.');
         return;
       }
-
-      const filePath = editor.document.uri.fsPath;
-
-      // Run tsdoc-edge work-context command
-      const terminal = vscode.window.createTerminal('TSDoc Edge');
-      terminal.sendText(`npx tsdoc-edge work-context "${filePath}"`);
-      terminal.show();
+      savedConventionOutput.clear();
+      savedConventionOutput.appendLine('Saved convention finding');
+      savedConventionOutput.appendLine('='.repeat(50));
+      savedConventionOutput.appendLine(`History: ${finding.historyId ?? '<unretained>'}`);
+      savedConventionOutput.appendLine(`Check: ${finding.checkId}`);
+      savedConventionOutput.appendLine(`Finding: ${finding.findingId}`);
+      savedConventionOutput.appendLine(`Source: ${finding.sourceFile}:${finding.sourceLine}`);
+      savedConventionOutput.appendLine('');
+      savedConventionOutput.appendLine(
+        'This view is read-only and is pinned to the identity provided by the language server.'
+      );
+      savedConventionOutput.show(true);
     }
   );
 
-  const refreshCommand = vscode.commands.registerCommand(
-    'tsdoc-edge.refreshAnalysis',
-    async () => {
-      vscode.window.showInformationMessage('Refreshing TSDoc Edge analysis...');
-
-      // Run tsdoc-edge build command
-      const terminal = vscode.window.createTerminal('TSDoc Edge');
-      terminal.sendText('npx tsdoc-edge build src');
-      terminal.show();
+  const openSavedConventionSourceCommand = vscode.commands.registerCommand(
+    'tsdoc.openSavedConventionSource',
+    async (value: unknown) => {
+      const finding = savedConventionFindingPayload(value);
+      if (!finding) {
+        vscode.window.showErrorMessage('TSDoc Edge received an invalid saved convention finding.');
+        return;
+      }
+      const uri = await workspaceSourceUri(finding.sourceFile);
+      if (!uri) {
+        vscode.window.showErrorMessage(
+          `Saved convention source is not available in this workspace: ${finding.sourceFile}`
+        );
+        return;
+      }
+      const document = await vscode.workspace.openTextDocument(uri);
+      const position = new vscode.Position(
+        Math.min(finding.sourceLine - 1, document.lineCount - 1),
+        0
+      );
+      const editor = await vscode.window.showTextDocument(document, { preview: true });
+      editor.selection = new vscode.Selection(position, position);
+      editor.revealRange(
+        new vscode.Range(position, position),
+        vscode.TextEditorRevealType.InCenter
+      );
     }
   );
 
   context.subscriptions.push(showImpactCommand);
   context.subscriptions.push(workContextCommand);
   context.subscriptions.push(refreshCommand);
+  context.subscriptions.push(savedConventionOutput);
+  context.subscriptions.push(explainSavedConventionFindingCommand);
+  context.subscriptions.push(openSavedConventionSourceCommand);
 
   // Start the client
   client.start();
@@ -139,4 +191,46 @@ export function deactivate(): Thenable<void> | undefined {
     return undefined;
   }
   return client.stop();
+}
+
+function savedConventionFindingPayload(value: unknown): SavedConventionFindingPayload | undefined {
+  if (!value || typeof value !== 'object') return undefined;
+  const payload = value as Record<string, unknown>;
+  if (
+    payload.kind !== 'saved-convention-finding' ||
+    typeof payload.checkId !== 'string' ||
+    typeof payload.findingId !== 'string' ||
+    typeof payload.sourceFile !== 'string' ||
+    typeof payload.sourceLine !== 'number' ||
+    !Number.isSafeInteger(payload.sourceLine) ||
+    payload.sourceLine < 1
+  ) {
+    return undefined;
+  }
+  if (payload.historyId !== undefined && typeof payload.historyId !== 'string') return undefined;
+  return {
+    kind: 'saved-convention-finding',
+    ...(typeof payload.historyId === 'string' ? { historyId: payload.historyId } : {}),
+    checkId: payload.checkId,
+    findingId: payload.findingId,
+    sourceFile: payload.sourceFile,
+    sourceLine: payload.sourceLine,
+  };
+}
+
+async function workspaceSourceUri(sourceFile: string): Promise<vscode.Uri | undefined> {
+  if (path.isAbsolute(sourceFile)) return undefined;
+  for (const folder of vscode.workspace.workspaceFolders ?? []) {
+    const candidate = path.resolve(folder.uri.fsPath, sourceFile);
+    const relative = path.relative(folder.uri.fsPath, candidate);
+    if (relative.startsWith('..') || path.isAbsolute(relative)) continue;
+    const uri = vscode.Uri.file(candidate);
+    try {
+      await vscode.workspace.fs.stat(uri);
+      return uri;
+    } catch {
+      // A multi-root workspace may contain the same relative path in a later folder.
+    }
+  }
+  return undefined;
 }

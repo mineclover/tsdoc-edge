@@ -32,9 +32,9 @@ canonical: true
 
 | 구분 | 현재 위치 |
 | --- | --- |
-| Now | saved LSP convention diagnostics 첫 vertical slice |
+| Now | current saved LSP diagnostics와 Explain/Open handler |
 | Parallel | Node/package release qualification, legacy baseline 첫 vertical slice |
-| Next | LSP protocol-level proof와 client Explain/Open handler |
+| Next | LSP protocol-level integration proof와 historical Explain/Open |
 | Then | historical Explain/Open, retention GC pin/tombstone |
 | Release | Node 24 clean-install/packed-consumer canary wired; runtime qualification 전 stable release NO-GO |
 | Deferred | 두 번째 runner/provider, generic adapter/DSL, convention distribution registry |
@@ -179,7 +179,7 @@ Overlay와 binding set은 process-local이다. Conformance finding/report는 der
 | Enrichment revision/store | `kernel` | revision factory와 shared exact store | retained-input product wiring |
 | TSDoc enrichment check | `proven` (source-checkout) | workspace source digest → enrichment revision, tag finding/check/gate | general enrichment framework |
 | Durable result history | `proven` (source-checkout) | append-only canonical bundle, retained replay, source/config removal canary, tamper reject | retention GC pin/tombstone, packed external proof |
-| LSP spec experience | `wired` (source-checkout) | exact retained history diagnostic + immutable current Explain/Open CodeAction payload | protocol/client handler proof, historical view |
+| LSP spec experience | `wired` (source-checkout) | exact retained history diagnostic + immutable current Explain/Open CodeAction/client handler | VS Code protocol integration proof, historical view |
 | Packed package consumer | `wired` | Node 24 CI에서 fresh tarball install → `init` → `build` → `work-context` | external canonical/provider canary |
 | External library pilot | `planned` | self-repository PoC와 packed package consumer | canonical graph/provider full pilot |
 
