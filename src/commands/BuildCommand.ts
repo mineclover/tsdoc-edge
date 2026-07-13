@@ -21,7 +21,11 @@ import { RelationshipInferenceEngine } from '../analyzer/RelationshipInferenceEn
 import { SymbolIdentifierGenerator } from '../analyzer/SymbolIdentifierGenerator';
 import { TestCoverageAnalyzer } from '../analyzer/TestCoverageAnalyzer';
 import { ConfigManager } from '../config/ConfigManager';
-import { CanonicalGraphCoordinator, type CanonicalGraphCoordinatorOptions } from '../indexer';
+import {
+  CanonicalGraphCoordinator,
+  type CanonicalGraphCoordinatorOptions,
+  DEFAULT_GRAPH_TSCONFIG,
+} from '../indexer';
 import { BuildResultSchema } from '../output/schemas';
 import { XmlBuilder } from '../output/XmlBuilder';
 import { TestSymbolParser } from '../parser/TestSymbolParser';
@@ -1408,15 +1412,29 @@ export class BuildCommand extends BaseCommand {
     const coordinatorOptions: CanonicalGraphCoordinatorOptions = {
       rootDir,
       moduleSpecifier,
-      configPath:
-        this.getOption(args, '--router-config') ?? process.env.TSDOC_EDGE_GRAPH_ROUTER_CONFIG,
-      repoId: this.getOption(args, '--router-repo') ?? process.env.TSDOC_EDGE_GRAPH_ROUTER_REPO,
       workspaceId:
         this.getOption(args, '--graph-workspace') ?? process.env.TSDOC_EDGE_GRAPH_WORKSPACE,
       graphNamespace:
         this.getOption(args, '--graph-namespace') ?? process.env.TSDOC_EDGE_GRAPH_NAMESPACE,
-      tsconfigPath:
-        this.getOption(args, '--graph-tsconfig') ?? process.env.TSDOC_EDGE_GRAPH_TSCONFIG,
+      typescript: {
+        tsconfigPath:
+          this.getOption(args, '--graph-tsconfig') ??
+          process.env.TSDOC_EDGE_GRAPH_TSCONFIG ??
+          DEFAULT_GRAPH_TSCONFIG,
+        ...((this.getOption(args, '--router-config') ?? process.env.TSDOC_EDGE_GRAPH_ROUTER_CONFIG)
+          ? {
+              routerConfigPath:
+                this.getOption(args, '--router-config') ??
+                process.env.TSDOC_EDGE_GRAPH_ROUTER_CONFIG,
+            }
+          : {}),
+        ...((this.getOption(args, '--router-repo') ?? process.env.TSDOC_EDGE_GRAPH_ROUTER_REPO)
+          ? {
+              routerRepoId:
+                this.getOption(args, '--router-repo') ?? process.env.TSDOC_EDGE_GRAPH_ROUTER_REPO,
+            }
+          : {}),
+      },
       repositoryPath:
         this.getOption(args, '--canonical-graph-db') ?? process.env.TSDOC_EDGE_CANONICAL_GRAPH_DB,
     };

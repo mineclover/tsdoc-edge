@@ -5,12 +5,17 @@
 
 import * as path from 'node:path';
 import {
+  ProviderProjectIndexer,
+  ProviderSnapshotNormalizer,
+  TtscSemanticGraphProvider,
+  type TypeScriptProviderConfig,
+} from '../provider';
+import {
   type ActiveCanonicalGraphRevision,
   GraphRepository,
   GraphRepositoryConflictError,
 } from '../storage/GraphRepository';
 import type { CanonicalProjectGraph, ProjectGraphSource } from './contracts';
-import { ProjectIndexer } from './ProjectIndexer';
 import { materializeAliases } from './symbol-alias';
 import { TtscGraphRouterArtifactAdapter } from './TtscGraphRouterArtifactAdapter';
 
@@ -22,11 +27,13 @@ export const DEFAULT_GRAPH_TSCONFIG = 'tsconfig.ttsc.json' as const;
 export interface CanonicalGraphCoordinatorOptions {
   readonly rootDir: string;
   readonly moduleSpecifier?: string;
-  readonly configPath?: string;
-  readonly repoId?: string;
   readonly workspaceId?: string;
   readonly graphNamespace?: string;
-  readonly tsconfigPath?: string;
+  /**
+   * The only owner of TypeScript-specific configuration for this lane.
+   * `CanonicalProjectGraph.tsconfigPath` is a v1 compatibility projection.
+   */
+  readonly typescript?: TypeScriptProviderConfig;
   readonly repositoryPath?: string;
   readonly expectedGraphVersion?: string;
   readonly typescriptCompatibilityTarget?: string;
@@ -62,10 +69,11 @@ export type CanonicalGraphRefreshResult =
  */
 export class CanonicalGraphCoordinator {
   readonly rootDir: string;
-  readonly tsconfigPath: string;
+  readonly typescript: TypeScriptProviderConfig;
   readonly repositoryPath: string;
 
-  private readonly indexer: ProjectIndexer;
+  private readonly indexer: ProviderProjectIndexer;
+  private readonly workspaceId: string;
   private readonly repository: GraphRepository;
   private readonly ownsRepository: boolean;
   private requestedGeneration = 0;
@@ -76,25 +84,52 @@ export class CanonicalGraphCoordinator {
     dependencies: CanonicalGraphCoordinatorDependencies = {}
   ) {
     this.rootDir = path.resolve(options.rootDir);
-    this.tsconfigPath = options.tsconfigPath ?? DEFAULT_GRAPH_TSCONFIG;
+    this.typescript = Object.freeze({
+      tsconfigPath: options.typescript?.tsconfigPath ?? DEFAULT_GRAPH_TSCONFIG,
+      ...(options.typescript?.routerConfigPath
+        ? { routerConfigPath: options.typescript.routerConfigPath }
+        : {}),
+      ...(options.typescript?.routerRepoId
+        ? { routerRepoId: options.typescript.routerRepoId }
+        : {}),
+    });
     this.repositoryPath = path.resolve(
       this.rootDir,
       options.repositoryPath ?? DEFAULT_CANONICAL_GRAPH_DATABASE
     );
 
-    const repoId = options.repoId ?? path.basename(this.rootDir);
+    const repoId = this.typescript.routerRepoId ?? path.basename(this.rootDir);
+    this.workspaceId = options.workspaceId ?? repoId;
+    const graphNamespace = options.graphNamespace ?? `ttsc:${repoId}`;
     const source =
       dependencies.source ??
       new TtscGraphRouterArtifactAdapter({
-        configPath: path.resolve(this.rootDir, options.configPath ?? DEFAULT_GRAPH_ROUTER_CONFIG),
+        configPath: path.resolve(
+          this.rootDir,
+          this.typescript.routerConfigPath ?? DEFAULT_GRAPH_ROUTER_CONFIG
+        ),
         repoId,
-        workspaceId: options.workspaceId ?? repoId,
-        graphNamespace: options.graphNamespace ?? `ttsc:${repoId}`,
+        workspaceId: this.workspaceId,
+        graphNamespace,
         moduleSpecifier: options.moduleSpecifier,
         expectedGraphVersion: options.expectedGraphVersion,
         typescriptCompatibilityTarget: options.typescriptCompatibilityTarget,
       });
-    this.indexer = new ProjectIndexer(source);
+    const provider = new TtscSemanticGraphProvider({
+      source,
+      providerVersion: '1.0.0',
+      providerInstanceId: `ttsc-graph-router:${repoId}`,
+      graphNamespace,
+      typescript: this.typescript,
+    });
+    this.indexer = new ProviderProjectIndexer(
+      provider,
+      new ProviderSnapshotNormalizer({
+        rootDir: this.rootDir,
+        compatibilityTsconfigPath: this.typescript.tsconfigPath,
+        expectedWorkspaceId: this.workspaceId,
+      })
+    );
     this.repository = dependencies.repository ?? new GraphRepository(this.repositoryPath);
     this.ownsRepository = dependencies.repository === undefined;
   }
@@ -121,8 +156,8 @@ export class CanonicalGraphCoordinator {
       }
       const expectedRevisionId = this.repository.readActiveRevision()?.metadata.revisionId ?? null;
       const indexed = await this.indexer.index({
+        workspaceId: this.workspaceId,
         rootDir: this.rootDir,
-        tsconfigPath: this.tsconfigPath,
         refresh: true,
       });
       const graph = indexed.graph;
@@ -172,11 +207,17 @@ export function canonicalGraphOptionsFromEnvironment(
   return {
     rootDir,
     moduleSpecifier,
-    configPath: environment.TSDOC_EDGE_GRAPH_ROUTER_CONFIG,
-    repoId: environment.TSDOC_EDGE_GRAPH_ROUTER_REPO,
     workspaceId: environment.TSDOC_EDGE_GRAPH_WORKSPACE,
     graphNamespace: environment.TSDOC_EDGE_GRAPH_NAMESPACE,
-    tsconfigPath: environment.TSDOC_EDGE_GRAPH_TSCONFIG,
+    typescript: {
+      tsconfigPath: environment.TSDOC_EDGE_GRAPH_TSCONFIG ?? DEFAULT_GRAPH_TSCONFIG,
+      ...(environment.TSDOC_EDGE_GRAPH_ROUTER_CONFIG
+        ? { routerConfigPath: environment.TSDOC_EDGE_GRAPH_ROUTER_CONFIG }
+        : {}),
+      ...(environment.TSDOC_EDGE_GRAPH_ROUTER_REPO
+        ? { routerRepoId: environment.TSDOC_EDGE_GRAPH_ROUTER_REPO }
+        : {}),
+    },
     repositoryPath: environment.TSDOC_EDGE_CANONICAL_GRAPH_DB,
   };
 }

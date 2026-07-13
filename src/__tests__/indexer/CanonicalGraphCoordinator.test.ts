@@ -31,6 +31,35 @@ describe('CanonicalGraphCoordinator', () => {
     coordinator.close();
   });
 
+  it('uses TypeScriptProviderConfig as the sole tsconfig owner across the provider bridge', async () => {
+    let receivedTsconfigPath: string | undefined;
+    const source: ProjectGraphSource = {
+      id: 'capturing-fixture',
+      load: async (request) => {
+        receivedTsconfigPath = request.tsconfigPath;
+        return {
+          ...graphInput('Configured'),
+          tsconfigPath: path.resolve(tempDir, request.tsconfigPath ?? 'missing.tsconfig.json'),
+        };
+      },
+    };
+    const coordinator = new CanonicalGraphCoordinator(
+      {
+        rootDir: tempDir,
+        typescript: { tsconfigPath: 'config/project.tsconfig.json' },
+      },
+      { source }
+    );
+
+    await expect(coordinator.refresh()).resolves.toMatchObject({ status: 'committed' });
+    expect(receivedTsconfigPath).toBe('config/project.tsconfig.json');
+    expect(coordinator.typescript).toEqual({ tsconfigPath: 'config/project.tsconfig.json' });
+    expect(coordinator.readActiveRevision()?.graph.tsconfigPath).toBe(
+      path.join(tempDir, 'config/project.tsconfig.json')
+    );
+    coordinator.close();
+  });
+
   it('does not let an older in-process refresh overwrite a newer request', async () => {
     const first = deferred<ProjectGraphInput>();
     const second = deferred<ProjectGraphInput>();

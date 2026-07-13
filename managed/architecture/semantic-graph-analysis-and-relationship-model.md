@@ -160,6 +160,7 @@ interface ProviderDelta {
 interface TypeScriptProviderConfig {
   tsconfigPath: string;
   routerConfigPath?: string;
+  routerRepoId?: string;
 }
 ```
 
@@ -180,11 +181,11 @@ artifact가 반복 call-site를 이미 축약했을 가능성이 있으므로 oc
 whole-project refresh를 실행하는 orchestration은 아직 상위 제품 계층의 책임이다.
 
 현재 `CanonicalProjectGraph` v1이 `tsconfigPath`를 요구하므로 normalizer는
-`compatibilityTsconfigPath`를 전환 인자로 받는다. contract v2 검토에서 `tsconfigPath`가 계속
-필요하면 이 값과 router/provider 설정을 `TypeScriptProviderConfig`의 단일 owner로 병합한다.
-`ProjectIndexer`/normalizer가 별도 설정 source를 author하거나 reconcile하지 않는다. v1 field의
-제거 여부는 packed canary의 migration proof 뒤 결정하며, 필요하면 동일 config에서 파생한
-compatibility field로 유지한다.
+`compatibilityTsconfigPath`를 전환 인자로 받는다. `CanonicalGraphCoordinator`는
+`TypeScriptProviderConfig`를 한 번 만들고 같은 값을 `TtscSemanticGraphProvider`와 normalizer에
+전달한다. 즉 router/provider/normalizer가 독립적인 경로를 author하거나 reconcile하지 않으며, v1
+field는 그 단일 config에서 파생한다. v1 field의 제거 여부는 packed canary의 migration proof 뒤
+결정하며, 필요하면 동일 config에서 파생한 compatibility field로 유지한다.
 
 TypeScript 7은 semantic compatibility와 fixture의 목표다. Artifact가
 `compilerVersion: null` 또는 `compilerVersionReported: false`를 제공하면 결과는

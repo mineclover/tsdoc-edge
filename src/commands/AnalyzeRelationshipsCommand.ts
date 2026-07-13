@@ -371,10 +371,12 @@ Examples:
     this.printInfo(`Loading canonical @ttsc/graph artifact for ${options.repoId}...`);
     const coordinator = new CanonicalGraphCoordinator({
       rootDir: process.cwd(),
-      configPath: options.configPath,
-      repoId: options.repoId,
       moduleSpecifier: options.moduleSpecifier,
-      tsconfigPath: options.tsconfigPath,
+      typescript: {
+        tsconfigPath: options.tsconfigPath,
+        routerConfigPath: options.configPath,
+        routerRepoId: options.repoId,
+      },
       repositoryPath: options.repositoryPath,
     });
     try {

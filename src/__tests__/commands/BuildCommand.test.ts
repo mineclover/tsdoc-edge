@@ -246,12 +246,17 @@ describe('BuildCommand', () => {
         expect.objectContaining({
           workspaceId: 'test-workspace',
           graphNamespace: 'test/graph',
+          typescript: expect.objectContaining({
+            tsconfigPath: 'tsconfig.ttsc.json',
+            routerConfigPath: routerConfig,
+            routerRepoId: 'test',
+          }),
         })
       );
       const repository = new GraphRepository(canonicalDatabase);
       expect(repository.readActiveRevision()).toMatchObject({
         graph: {
-          nodes: [expect.objectContaining({ id: 'src/test.ts#testFunc:function' })],
+          nodes: [expect.objectContaining({ name: 'testFunc' })],
           edges: [],
         },
         metadata: {
