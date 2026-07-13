@@ -32,8 +32,8 @@ canonical: true
 
 | 구분 | 현재 위치 |
 | --- | --- |
-| Now | registry-independent packed early canary |
-| Next | external TypeScript library full pilot |
+| Now | external TypeScript library의 saved CLI/CI pilot |
+| Next | pilot의 LSP navigation proof (현재 보류)와 release qualification |
 | Deferred | historical Explain/Open, retention GC pin/tombstone, LSP 확장 작업 |
 | Parallel | Node/package release qualification, legacy baseline 첫 vertical slice |
 | Release | Node 24 clean-install/packed-consumer canary wired; runtime qualification 전 stable release NO-GO |
@@ -67,10 +67,14 @@ adapter를 직접 persistence에 연결하지 않고 `TtscSemanticGraphProvider`
 `ProviderSnapshotNormalizer` → `ProviderProjectIndexer`으로 연결한다. `tsconfigPath`는
 `TypeScriptProviderConfig`에서 한 번만 설정하고 v1 canonical field는 그 config에서 파생한다.
 
-다음 구현 순서는 registry-independent packed early canary → 외부 TypeScript library full pilot이다.
 source-checkout canary는 7,611 nodes / 18,948 edges를 provider 경로로 저장했고, namespaced node ID에
-absolute path가 없음을 확인했다. 이 순서를 닫기 전에는 새 LSP command, history picker, mutating
-CodeAction을 추가하지 않는다.
+absolute path가 없음을 확인했다. registry-independent packed early canary도 fresh temporary consumer에
+`tsdoc-edge`와 `@ttsc-ex/ttsc-graph-router` tarball을 함께 설치해 같은 결과를 재현했다. router의
+relative `es-git` dependency는 tarball에서 깨졌으므로 bundle dependency로 포함한다.
+
+다음 구현 순서는 외부 TypeScript library의 saved CLI/CI pilot이다. pilot의 LSP navigation proof는
+명시적으로 보류하며, 이 순서를 닫기 전에는 새 LSP command, history picker, mutating CodeAction을
+추가하지 않는다.
 
 P4.4 시작 전 계획 리뷰는 managed spec의 file layout, document-level identity와
 machine-readable binding declaration schema를 결정한다. 그 정의는 roadmap에 쓰지 않고
