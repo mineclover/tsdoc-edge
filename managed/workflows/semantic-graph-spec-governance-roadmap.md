@@ -32,10 +32,10 @@ canonical: true
 
 | 구분 | 현재 위치 |
 | --- | --- |
-| Now | protocol-level proof를 통과한 current saved LSP diagnostics와 Explain/Open handler |
+| Now | `ttsc` provider coordinator wiring과 packed early canary |
+| Next | external TypeScript library full pilot과 `tsconfigPath` 단일 owner 검증 |
+| Deferred | historical Explain/Open, retention GC pin/tombstone, LSP 확장 작업 |
 | Parallel | Node/package release qualification, legacy baseline 첫 vertical slice |
-| Next | historical Explain/Open과 retention GC pin/tombstone |
-| Then | historical Explain/Open, retention GC pin/tombstone |
 | Release | Node 24 clean-install/packed-consumer canary wired; runtime qualification 전 stable release NO-GO |
 | Deferred | 두 번째 runner/provider, generic adapter/DSL, convention distribution registry |
 
@@ -58,6 +58,14 @@ M1 완료에는 다음이 필요하다.
 M1 source-checkout scope는 P4.5 retained result history/replay까지 확장됐지만, saved LSP
 diagnostics, external packed pilot, Node 24 release qualification, legacy production cleanup은
 여전히 promotion 또는 parallel release/comparison gate다.
+
+### 2026-07-13 실행 우선순위 — `ttsc` 먼저
+
+LSP-current의 source-checkout proof는 보존하되 historical Explain/Open, retention UI와 추가 LSP
+연동은 `ttsc` provider 경계가 stable해질 때까지 보류한다. 다음 구현 순서는 provider coordinator
+wiring → registry-independent packed early canary → 외부 TypeScript library full pilot →
+`TypeScriptProviderConfig` 단일 owner에서의 `tsconfigPath` compatibility/migration proof다.
+이 순서를 닫기 전에는 새 LSP command, history picker, mutating CodeAction을 추가하지 않는다.
 
 P4.4 시작 전 계획 리뷰는 managed spec의 file layout, document-level identity와
 machine-readable binding declaration schema를 결정한다. 그 정의는 roadmap에 쓰지 않고
