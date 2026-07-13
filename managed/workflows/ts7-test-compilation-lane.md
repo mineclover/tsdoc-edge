@@ -69,6 +69,13 @@ authority는 이 단일 경로다. 지원 runtime 자체의 qualification은 별
   `ClearStaleLeftTrimmedPointerVisitor` mark-compact GC SIGSEGV가 재현됐다. `--no-compact`와
   optional `fsevents` 제거도 이를 해소하지 못했으므로 검증되지 않은 런타임 우회는
   repository에 넣지 않는다.
+- 2026-07-13에 공식 Node 24 배포 목록과 대조한 Node 24.18.0(현행 최신 LTS)에서도
+  `npm test -- --runInBand`가 같은 V8 GC `SIGSEGV`로 종료됐다. `NODE_OPTIONS=--jitless`는
+  5분 동안 11 suite를 crash 없이 진행했지만 full-suite qualification에는 비현실적으로 느려
+  중단했다. 이는 JIT/GC 계층의 진단 신호일 뿐 지원 runtime 또는 CI 기본값으로 채택하지 않는다.
+- `--no-opt`는 `NODE_OPTIONS`로 허용되지 않아 현재 multi-process test lane 전체에 단순히 전달할
+  수 없다. test launcher의 exec 인자를 바꾸어 우회하는 작업은 upstream runtime fix와 별도
+  performance/support ADR 없이는 진행하지 않는다.
 - coverage 283개 source의 LCOV `SF:`가 모두 `src/*.ts`이며 `.test-dist` 누출은 0건이다.
 - Node 22 ABI에 맞게 `better-sqlite3`를 재빌드한 환경에서는 전체 217 suite/2,980 test가
   통과했다. 이는 historical functionality evidence일 뿐 현재 release baseline의 qualification은
