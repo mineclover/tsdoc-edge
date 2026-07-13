@@ -69,8 +69,9 @@ adapter를 직접 persistence에 연결하지 않고 `TtscSemanticGraphProvider`
 
 source-checkout canary는 7,611 nodes / 18,948 edges를 provider 경로로 저장했고, namespaced node ID에
 absolute path가 없음을 확인했다. registry-independent packed early canary도 fresh temporary consumer에
-`tsdoc-edge`와 `@ttsc-ex/ttsc-graph-router` tarball을 함께 설치해 같은 결과를 재현했다. router의
-relative `es-git` dependency는 tarball에서 깨졌으므로 bundle dependency로 포함한다.
+`tsdoc-edge`와 `@ttsc-ex/ttsc-graph-router` tarball을 함께 설치해 같은 saved snapshot identity와
+canonical graph를 재현한다. router의 relative `es-git` dependency는 tarball에서 깨졌으므로 bundle
+dependency로 포함한다.
 
 다음 구현 순서는 외부 TypeScript library의 saved CLI/CI pilot이다. pilot의 LSP navigation proof는
 명시적으로 보류하며, 이 순서를 닫기 전에는 새 LSP command, history picker, mutating CodeAction을
@@ -542,10 +543,14 @@ compatibility와 migration을 함께 version한다.
 ### Packed early canary
 
 - 다른 workspace에서도 namespaced canonical ID 충돌이 없음
-- clean packed install에서 snapshot과 one-file delta 생성
+- clean packed install에서 saved snapshot과 canonical graph를 생성하고 source/packed 간 exact identity를 비교
 - source occurrence와 package export surface 보존
 - repository-specific absolute module/binary 경로가 identity에 없음
 - unreported compiler version을 TS7-proven으로 표시하지 않음
+
+현재 `ttsc` provider는 incremental delta capability를 `unsupported`로 선언한다. 따라서 one-file
+delta는 이 canary의 통과 조건이 아니며, provider가 해당 capability를 구현한 뒤 별도 delta canary로
+승격한다. 그 전의 save 처리는 whole-project refresh만 사용한다.
 
 ### External full pilot
 

@@ -18,10 +18,9 @@ canonical: true
 @ttsc/graph (compiler-resolved producer, TypeScript 7.0 compatibility target)
   -> ttsc-graph-router raw artifact/cache boundary
   -> TtscGraphRouterArtifactAdapter
-     |-> ProjectIndexer (production saved-file v1)
-     `-> TtscSemanticGraphProvider (raw ProviderSnapshot, partial occurrence capability)
-         -> ProviderSnapshotNormalizer (workspace/namespace identity + fact topology)
-         -> ProviderProjectIndexer (provider canary compatibility projection)
+  -> TtscSemanticGraphProvider (raw ProviderSnapshot, partial occurrence capability)
+      -> ProviderSnapshotNormalizer (workspace/namespace identity + fact topology)
+      -> ProviderProjectIndexer (the only saved-file canonical projection)
   -> GraphRepository (single persisted graph)
   -> BuildCommand / LSP / work-context
 ```
@@ -52,20 +51,19 @@ graph-router를 TypeScript 파서로 재구현하지 않는다. 컴파일러 사
 기존 random UUID와 `filename-type-name` legacy id는 전환 기간의 alias일 뿐,
 배치/LSP 동등성 판단 키로 사용하지 않는다.
 
-현재 production saved refresh는 아직 adapter가 `ProjectGraphSource`를 통해
-`ProjectIndexer`로 직접 들어가는 v1 경로도 유지한다. 이 경로에서는 producer의
-`path#qualifiedName:kind`가 canonical ID와 `sourceId`를 겸하고 edge가
-`(kind, from, to)` compatibility topology로 저장된다. 새 `src/provider/` 경계는 이
-가정을 제거하기 위한 additive canary이며, Build/LSP cutover 전까지 두 경로의
-differential parity가 필요하다.
+현재 production saved refresh는 coordinator가 provider → normalizer →
+`ProviderProjectIndexer`를 통해서만 canonical graph를 만든다. 내부의 `ProjectIndexer`는
+normalizer가 만든 compatibility projection을 최종 조립할 뿐, raw adapter가 persistence로
+직접 진입하는 별도 production 경로는 없다. producer의 `path#qualifiedName:kind`는
+provider-local identity이고, persisted canonical ID는 workspace/namespace가 포함된
+normalizer 결과다.
 
-직접 v1 경로도 convention/spec plane과의 결합을 위해 `workspaceId`와
+provider canonical 경로는 convention/spec plane과의 결합을 위해 `workspaceId`와
 `graphNamespace`를 graph provenance에 저장한다. 기본값은 각각 router `repoId`와
 `ttsc:<repoId>`이며, `repoId` 자체의 기본값은 프로젝트 루트 디렉터리명이다.
 Build에서는 `--graph-workspace=<id>`와 `--graph-namespace=<id>`가
 `TSDOC_EDGE_GRAPH_WORKSPACE`와 `TSDOC_EDGE_GRAPH_NAMESPACE`보다 우선한다. LSP의
-saved-file refresh는 같은 coordinator를 사용하되 환경변수로 같은 값을 받아, Build가
-만든 revision과 동일한 workspace/namespace identity를 유지한다.
+saved-file refresh 연결은 이 ttsc provider handoff 범위 밖의 후속 작업이다.
 
 `CanonicalProjectGraph` v1의 `tsconfigPath` 필수 필드도 같은 compatibility debt다.
 공통 `ProviderSnapshot`에는 tsconfig가 없고 TypeScript provider config에만 존재하며,
