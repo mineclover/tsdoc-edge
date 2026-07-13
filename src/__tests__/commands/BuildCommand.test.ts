@@ -135,6 +135,84 @@ describe('BuildCommand', () => {
       expect(result.exitCode).toBe(0); // Build completes even with errors
     });
 
+    it('resolves @relatedTo names locally before a unique exported global symbol', async () => {
+      const srcDir = path.join(tempDir, 'src');
+      fs.writeFileSync(
+        path.join(srcDir, 'local.ts'),
+        `
+          class LocalTarget {}
+          /** @relatedTo LocalTarget */
+          export class LocalSource {}
+        `,
+        'utf-8'
+      );
+      fs.writeFileSync(
+        path.join(srcDir, 'global-target.ts'),
+        'export class GlobalTarget {}',
+        'utf-8'
+      );
+      fs.writeFileSync(
+        path.join(srcDir, 'global-source.ts'),
+        `
+          /** @relatedTo GlobalTarget */
+          export class GlobalSource {}
+
+          /** @relatedTo MissingTarget */
+          export class UnresolvedSource {}
+        `,
+        'utf-8'
+      );
+      const staleDb = new DatabaseManager(path.join(tempDir, 'test.db'));
+      staleDb.insertUnifiedRelationship({
+        id: 'explicit-semantic-unresolvedsource-missingtarget',
+        type: 'explicit-semantic-relation',
+        category: 'semantic',
+        fromSymbols: ['unresolvedsource-class-unresolvedsource'],
+        toSymbols: ['MissingTarget'],
+        direction: 'undirected',
+        strength: 'medium',
+        evidence: [{ type: 'documentation', source: 'src/global-source.ts', confidence: 1 }],
+        discoveredBy: 'documentation',
+        confidence: 1,
+      });
+      staleDb.close();
+      const log = jest.spyOn(console, 'log').mockImplementation();
+
+      const result = await command.execute([srcDir]);
+
+      expect(result.exitCode).toBe(0);
+      const dbManager = new DatabaseManager(path.join(tempDir, 'test.db'));
+      const symbolsByName = new Map(
+        dbManager.getAllSymbols().map((symbol) => [symbol.name, symbol])
+      );
+      const explicitRelations = dbManager
+        .getAllUnifiedRelationships()
+        .filter((relationship) => relationship.type === 'explicit-semantic-relation');
+      dbManager.close();
+
+      expect(explicitRelations).toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({
+            from: [symbolsByName.get('LocalSource')?.id],
+            to: [symbolsByName.get('LocalTarget')?.id],
+          }),
+          expect.objectContaining({
+            from: [symbolsByName.get('GlobalSource')?.id],
+            to: [symbolsByName.get('GlobalTarget')?.id],
+          }),
+        ])
+      );
+      expect(explicitRelations).toHaveLength(2);
+      expect(explicitRelations).not.toEqual(
+        expect.arrayContaining([
+          expect.objectContaining({ id: 'explicit-semantic-unresolvedsource-missingtarget' }),
+        ])
+      );
+      expect(log.mock.calls.flat().join('\n')).toContain(
+        'unresolved target symbol &quot;MissingTarget&quot;'
+      );
+    });
+
     it('persists the canonical graph through ProjectIndexer before legacy enrichment', async () => {
       const routerConfig = path.join(tempDir, 'ttsc-graph-router.config.json');
       const canonicalDatabase = path.join(tempDir, '.tsdoc/canonical-graph.db');

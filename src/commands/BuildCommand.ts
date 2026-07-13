@@ -26,7 +26,7 @@ import { BuildResultSchema } from '../output/schemas';
 import { XmlBuilder } from '../output/XmlBuilder';
 import { TestSymbolParser } from '../parser/TestSymbolParser';
 import { DatabaseManager } from '../storage/DatabaseManager';
-import type { SymbolGraph } from '../types/graph';
+import type { Symbol, SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 import type { TestSymbol } from '../types/test-symbols';
 import { BaseCommand, type CommandResult } from './BaseCommand';
@@ -35,6 +35,11 @@ export interface BuildCommandDependencies {
   readonly canonicalCoordinatorFactory?: (
     options: CanonicalGraphCoordinatorOptions
   ) => CanonicalGraphCoordinator;
+}
+
+interface ExplicitSemanticResolution {
+  relationship?: UnifiedRelationship;
+  diagnostic?: string;
 }
 
 /**
@@ -1079,8 +1084,26 @@ export class BuildCommand extends BaseCommand {
           // 2. Explicit Semantic Relations (@relatedTo tags)
           const explicitAnalyzer = new ExplicitSemanticRelationAnalyzer();
           const explicitRelations = explicitAnalyzer.analyze(targetPath);
+          const resolvedExplicitRelations: UnifiedRelationship[] = [];
+
+          for (const relation of explicitRelations) {
+            const resolution = this.resolveExplicitSemanticRelation(relation, symbolGraph);
+            if (resolution.relationship) {
+              resolvedExplicitRelations.push(resolution.relationship);
+              continue;
+            }
+
+            // Remove a previously persisted raw-name relation with the same stable ID.
+            // Otherwise an unresolved tag would remain in the database after a later rebuild.
+            dbManager.deleteRelationship(relation.id);
+            result.relationshipsSkipped++;
+            result.errors.push(
+              `[explicit-semantic-resolution] ${resolution.diagnostic ?? `Unable to resolve ${relation.id}`}`
+            );
+          }
+
           const explicitInserted = dbManager.batchInsertUnifiedRelationships(
-            explicitRelations.map(toBatchFormat)
+            resolvedExplicitRelations.map(toBatchFormat)
           );
           semanticRelationshipsInserted += explicitInserted;
 
@@ -1269,6 +1292,97 @@ export class BuildCommand extends BaseCommand {
         dbManager.close();
       }
     });
+  }
+
+  /** Resolve raw @relatedTo names into safe, materialized symbol IDs before persistence. */
+  private resolveExplicitSemanticRelation(
+    relationship: UnifiedRelationship,
+    graph: SymbolGraph
+  ): ExplicitSemanticResolution {
+    const sourceName = Array.isArray(relationship.from) ? relationship.from[0] : relationship.from;
+    const targetName = Array.isArray(relationship.to) ? relationship.to[0] : relationship.to;
+
+    if (!sourceName || !targetName || !relationship.filePath) {
+      return {
+        diagnostic: `Relationship ${relationship.id} is missing a source, target, or file path`,
+      };
+    }
+
+    const source = this.resolveExplicitSemanticEndpoint(
+      sourceName,
+      relationship.filePath,
+      graph,
+      false
+    );
+    if (!source.symbol) {
+      return { diagnostic: `${relationship.id}: ${source.diagnostic}` };
+    }
+
+    const target = this.resolveExplicitSemanticEndpoint(
+      targetName,
+      relationship.filePath,
+      graph,
+      true
+    );
+    if (!target.symbol) {
+      return { diagnostic: `${relationship.id}: ${target.diagnostic}` };
+    }
+
+    return {
+      relationship: {
+        ...relationship,
+        from: source.symbol.id,
+        to: target.symbol.id,
+        properties: {
+          ...relationship.properties,
+          endpointResolution: {
+            source: source.scope,
+            target: target.scope,
+          },
+        },
+      },
+    };
+  }
+
+  /** Resolve a @relatedTo endpoint by local declaration first, then a unique exported symbol. */
+  private resolveExplicitSemanticEndpoint(
+    name: string,
+    sourceFilePath: string,
+    graph: SymbolGraph,
+    allowGlobalPublic: boolean
+  ): { symbol?: Symbol; scope?: 'same-file' | 'global-public'; diagnostic?: string } {
+    const localCandidates = Array.from(graph.symbols.values()).filter(
+      (symbol) =>
+        symbol.name === name && symbol.filePath === sourceFilePath && !this.isTestSymbol(symbol)
+    );
+    if (localCandidates.length === 1) {
+      return { symbol: localCandidates[0], scope: 'same-file' };
+    }
+    if (localCandidates.length > 1) {
+      return { diagnostic: `ambiguous same-file symbol "${name}" in ${sourceFilePath}` };
+    }
+    if (!allowGlobalPublic) {
+      return { diagnostic: `unresolved source symbol "${name}" in ${sourceFilePath}` };
+    }
+
+    const globalCandidates = (graph.nameIndex.get(name) ?? [])
+      .map((id) => graph.symbols.get(id))
+      .filter((symbol): symbol is Symbol => {
+        if (!symbol) return false;
+        return symbol.isExported && !this.isTestSymbol(symbol);
+      });
+    if (globalCandidates.length === 1) {
+      return { symbol: globalCandidates[0], scope: 'global-public' };
+    }
+    if (globalCandidates.length > 1) {
+      return { diagnostic: `ambiguous exported symbol "${name}"` };
+    }
+
+    return { diagnostic: `unresolved target symbol "${name}"` };
+  }
+
+  private isTestSymbol(symbol: Symbol): boolean {
+    return ['test-suite', 'test-case', 'test-scenario'].includes(symbol.type);
   }
 
   /** Refresh the canonical graph before legacy per-file hash short-circuiting. */

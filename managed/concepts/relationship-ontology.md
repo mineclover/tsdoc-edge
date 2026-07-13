@@ -350,7 +350,7 @@ SymbolGraph ~ SymbolRegistry (Symbol domain)
 
 ---
 
-### 8. explicit-semantic-relation (8 relationships) ✨ NEW
+### 8. explicit-semantic-relation
 
 **Definition**: Developer-declared semantic relationships via `@relatedTo` TSDoc tags.
 
@@ -359,11 +359,12 @@ SymbolGraph ~ SymbolRegistry (Symbol domain)
 **Category**: `semantic`
 
 **Implementation**:
-- **Primary**: `src/analyzer/ExplicitSemanticRelationAnalyzer.ts:295`
+- **Raw discovery**: `src/analyzer/ExplicitSemanticRelationAnalyzer.ts`
+- **Persistence and endpoint resolution**: `src/commands/BuildCommand.ts`
   ```typescript
   type: 'explicit-semantic-relation',
-  from: sourceSymbol,
-  to: targetSymbol,
+  from: resolvedSourceSymbolId,
+  to: resolvedTargetSymbolId,
   direction: 'undirected',
   strength: 'medium',
   confidence: 1.0  // Explicit declaration
@@ -400,10 +401,22 @@ FileScanner ~ ConfigLoader (explicit-semantic)
 - `@relatedTo SymbolName` - Simple reference
 - `@relatedTo SymbolName - Description` - With relationship context
 
-**Statistics**:
-- Total relationships: 8
-- With descriptions: 0
-- Without descriptions: 8
+**Endpoint Resolution Contract**:
+
+`ExplicitSemanticRelationAnalyzer` preserves the source and target names as authored facts. Before
+the relationship is persisted, `BuildCommand` resolves them deterministically:
+
+1. The source declaration must resolve to exactly one non-test symbol in the declaring file.
+2. The target first resolves to exactly one non-test symbol in that same file.
+3. If no local target exists, it may resolve only to exactly one exported non-test symbol across
+   the project.
+4. An ambiguous or unresolved endpoint is not persisted. The build result records an
+   `[explicit-semantic-resolution]` diagnostic instead, so a common name can never silently bind
+   to an unrelated symbol.
+
+Use `tsdoc-edge build src --force` after changing `@relatedTo` tags, then
+`tsdoc-edge relationship validate` to verify that persisted relationships contain only
+materialized code-symbol endpoints.
 
 ---
 
