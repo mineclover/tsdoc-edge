@@ -263,6 +263,15 @@ LSP server는 이 command를 실행하거나 내용을 수정하지 않는다. c
 제공하며, payload에 없는 active/latest history를 추가로 조회해서는 안 된다. client는 workspace 밖의
 path와 malformed payload를 거부한다. historical Explain/Open과 mutating CodeAction은 별도 gate다.
 
+### Historical Explain/Open — exact-ID slice
+
+첫 historical slice는 history 목록, latest 선택, graph 활성 revision 비교를 하지 않는다. Command
+Palette가 `historyId`와 `findingId`를 모두 요구해 `tsdoc/historicalConventionFinding` request로 보내면,
+server는 `lspSavedHistory.databasePath`의 read-only repository에서 **그 history ID만** envelope 검증 후
+finding과 compiled binding/TSDoc/naming source anchor를 반환한다. ID가 없거나 finding이 없거나 envelope가
+tampered이면 결과를 만들지 않고 error를 반환한다. extension은 받은 immutable response만 output/open에
+사용한다. retention pin/GC·tombstone과 history picker는 다음 slice다.
+
 Build가 만든 `.tsdoc/canonical-graph.db`는 router runtime 환경 변수가 없는 LSP에서도
 schema/WAL 초기화를 하지 않는 read-only connection으로 읽을 수 있다. save/source
 watch event에서 외부 Build가 교체한 revision을 다시 읽지만, 새 revision을 직접 만들려면
