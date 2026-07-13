@@ -1,6 +1,7 @@
 /** SemanticGraphProvider facade for the current ttsc graph-router source. */
 
 import { createHash } from 'node:crypto';
+import * as path from 'node:path';
 import type {
   ProjectGraphEvidence,
   ProjectGraphInput,
@@ -104,7 +105,7 @@ export class TtscSemanticGraphProvider implements SemanticGraphProvider {
           right.providerDiagnosticId ?? stableDigest(right)
         )
       );
-    const provenance = provenanceFromInput(loaded, this.options.typescript);
+    const provenance = provenanceFromInput(loaded, this.options.typescript, input.rootDir);
     this.lastProvenance = provenance;
     const snapshotId = `provider-snapshot:${stableDigest({
       workspaceId: input.workspaceId,
@@ -114,7 +115,7 @@ export class TtscSemanticGraphProvider implements SemanticGraphProvider {
       nodes,
       facts,
       diagnostics,
-      provenance,
+      provenance: snapshotIdentityProvenance(provenance),
     })}`;
     return deepFreeze({
       contractId: SEMANTIC_GRAPH_PROVIDER_CONTRACT_ID,
@@ -258,7 +259,8 @@ function toProviderDiagnostic(diagnostic: CanonicalDiagnostic): ProviderDiagnost
 
 function provenanceFromInput(
   input: ProjectGraphInput,
-  config: TypeScriptProviderConfig
+  config: TypeScriptProviderConfig,
+  rootDir: string
 ): ProviderProvenance {
   const compilerVersion =
     typeof input.provenance.compilerVersion === 'string' && input.provenance.compilerVersion.trim()
@@ -289,17 +291,34 @@ function provenanceFromInput(
     ...(typeof input.provenance.routerFingerprint === 'string'
       ? { artifactFingerprint: input.provenance.routerFingerprint }
       : {}),
-    providerConfigDigest: providerConfigDigest(config),
+    providerConfigDigest: providerConfigDigest(config, rootDir),
     producerFields: clone(input.provenance),
   });
 }
 
-function providerConfigDigest(config: TypeScriptProviderConfig): string {
+/** Keep host-local router locations out of saved snapshot identity. */
+function snapshotIdentityProvenance(
+  provenance: ProviderProvenance
+): Omit<ProviderProvenance, 'artifactFingerprint' | 'producerFields'> {
+  const {
+    artifactFingerprint: _artifactFingerprint,
+    producerFields: _producerFields,
+    ...identity
+  } = provenance;
+  return identity;
+}
+
+function providerConfigDigest(config: TypeScriptProviderConfig, rootDir?: string): string {
   return stableDigest({
-    tsconfigPath: config.tsconfigPath,
-    routerConfigPath: config.routerConfigPath ?? null,
+    tsconfigPath: rootDir ? portableConfigPath(rootDir, config.tsconfigPath) : config.tsconfigPath,
     routerRepoId: config.routerRepoId ?? null,
   });
+}
+
+function portableConfigPath(rootDir: string, configPath: string): string {
+  const resolvedRoot = path.resolve(rootDir);
+  const resolvedConfig = path.resolve(resolvedRoot, configPath);
+  return path.relative(resolvedRoot, resolvedConfig).split(path.sep).join('/') || '.';
 }
 
 function unknownFields(

@@ -172,6 +172,67 @@ describe('TtscSemanticGraphProvider', () => {
     expect(firstIndex.graph.fingerprint).toBe(secondIndex.graph.fingerprint);
   });
 
+  test('keeps saved snapshot identity portable across router binary and config locations', async () => {
+    const roots = [
+      path.resolve('tmp/provider-portable-source'),
+      path.resolve('tmp/provider-portable-pack'),
+    ];
+    const providers = roots.map(
+      (rootDir, index) =>
+        new TtscSemanticGraphProvider({
+          source: {
+            id: 'portable-router',
+            async load(request) {
+              return {
+                rootDir: request.rootDir,
+                tsconfigPath: path.join(request.rootDir, 'tsconfig.json'),
+                nodes: [
+                  {
+                    id: 'src/index.ts#answer:variable',
+                    kind: 'variable',
+                    name: 'answer',
+                    file: 'src/index.ts',
+                  },
+                ],
+                edges: [],
+                provenance: {
+                  adapter: 'ttsc-graph-router-artifact',
+                  producer: '@ttsc/graph',
+                  producerVersion: '0.18.4',
+                  compilerVersion: null,
+                  producerBinary: path.join(rootDir, 'node_modules/.bin/ttscgraph'),
+                  routerConfigPath: path.join(rootDir, 'router.config.json'),
+                  routerFingerprint: `host-specific-cache-${index}`,
+                },
+              };
+            },
+          },
+          providerVersion: '1.0.0',
+          providerInstanceId: 'ttsc-graph-router:portable',
+          graphNamespace: 'ttsc:portable',
+          typescript: {
+            tsconfigPath: path.join(rootDir, 'tsconfig.json'),
+            routerConfigPath: path.join(rootDir, 'router.config.json'),
+            routerRepoId: 'portable',
+          },
+        })
+    );
+
+    const snapshots = await Promise.all(
+      providers.map((provider, index) =>
+        provider.snapshot({ workspaceId: 'portable-workspace', rootDir: roots[index] })
+      )
+    );
+
+    expect(snapshots[0].snapshotId).toBe(snapshots[1].snapshotId);
+    expect(snapshots[0].provenance.providerConfigDigest).toBe(
+      snapshots[1].provenance.providerConfigDigest
+    );
+    expect(snapshots[0].provenance.producerFields?.producerBinary).not.toBe(
+      snapshots[1].provenance.producerFields?.producerBinary
+    );
+  });
+
   test('pins a defensive snapshot copy and rejects request scope mismatches', async () => {
     const rootDir = path.resolve('tmp/provider-project-indexer-boundary');
     const mutableSnapshot = JSON.parse(JSON.stringify(snapshotFixture())) as ProviderSnapshot;
