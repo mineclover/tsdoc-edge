@@ -608,12 +608,27 @@ function publishDiagnosticsForOpenDocuments(): void {
   for (const document of documents.all()) publishDiagnosticsForDocument(document);
 }
 
+// Opening a managed spec/pack document has no text change event. Publish its
+// retained saved finding immediately; TypeScript documents receive the same
+// saved projection before any later incremental overlay processing.
+documents.onDidOpen((event) => {
+  publishDiagnosticsForDocument(event.document);
+});
+
 // Document change handlers - trigger diagnostics and incremental builds
 documents.onDidChangeContent((change) => {
   if (!tsdocService) return;
 
   const filePath = filePathFromUri(change.document.uri);
-  if (!filePath || !isTypeScriptSourcePath(filePath)) return;
+  if (!filePath) return;
+
+  // Managed spec/pack documents have no incremental code overlay, but they can
+  // carry an exact saved convention finding. Publish that read-only projection
+  // when the client opens or edits the document instead of silently dropping it.
+  if (!isTypeScriptSourcePath(filePath)) {
+    publishDiagnosticsForDocument(change.document);
+    return;
+  }
 
   try {
     // Debounced incremental build for unsaved content
