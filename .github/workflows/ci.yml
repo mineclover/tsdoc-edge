@@ -8,12 +8,14 @@ on:
 
 jobs:
   test:
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
 
     strategy:
       fail-fast: false
       matrix:
+        os: [ubuntu-latest, macos-latest]
         execution: ['--runInBand', '--maxWorkers=2']
+        attempt: [1, 2]
 
     steps:
       - uses: actions/checkout@v4
@@ -33,7 +35,7 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Test
+      - name: Test (${{ matrix.execution }}, attempt ${{ matrix.attempt }})
         run: npm test -- ${{ matrix.execution }}
 
   publish-check:
