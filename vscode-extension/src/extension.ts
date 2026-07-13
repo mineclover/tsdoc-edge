@@ -56,6 +56,10 @@ export function activate(context: vscode.ExtensionContext) {
       { scheme: 'file', language: 'typescriptreact' },
       { scheme: 'file', language: 'javascript' },
       { scheme: 'file', language: 'javascriptreact' },
+      // Saved convention findings can be anchored in managed spec/pack documents.
+      { scheme: 'file', language: 'json' },
+      { scheme: 'file', language: 'jsonc' },
+      { scheme: 'file', language: 'markdown' },
     ],
     synchronize: {
       fileEvents: vscode.workspace.createFileSystemWatcher('**/*.{ts,tsx,js,jsx}'),

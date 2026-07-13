@@ -238,7 +238,9 @@ contract를 사용한다.
 
 managed spec/pack처럼 TypeScript overlay 대상이 아닌 문서도 open/change 시 saved diagnostic을
 즉시 publish한다. 이 경로는 incremental graph update를 수행하지 않으며 retained finding의 read-only
-projection만 제공한다. `SavedConventionProtocol.test.ts`는 실제 `--stdio` server subprocess에
+projection만 제공한다. VS Code extension은 JSON, JSONC와 Markdown managed document에도 LSP를
+활성화하지만 source watcher는 TypeScript/JavaScript graph refresh 범위에 그대로 둔다.
+`SavedConventionProtocol.test.ts`는 실제 `--stdio` server subprocess에
 initialize → `didOpen` → `publishDiagnostics` → `textDocument/codeAction`을 보내 finding identity와
 Explain/Open command payload를 검증한다.
 
