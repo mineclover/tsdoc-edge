@@ -19,7 +19,7 @@ const workflows = Object.fromEntries(
 const packageJson = JSON.parse(fs.readFileSync(path.join(projectRoot, 'package.json'), 'utf8'));
 
 const matrix = {
-  operatingSystems: ['ubuntu-latest', 'macos-15'],
+  operatingSystems: ['ubuntu-latest', 'macos-15-intel'],
   executionModes: ['--runInBand', '--maxWorkers=2'],
   attempts: [1, 2],
 };
@@ -127,8 +127,8 @@ console.log(
 
 function validateWorkflowContract(workflow, label) {
   assert(
-    workflow.includes('os: [ubuntu-latest, macos-15]'),
-    `${label} workflow must cover Ubuntu and pinned macOS 15`
+    workflow.includes('os: [ubuntu-latest, macos-15-intel]'),
+    `${label} workflow must cover Ubuntu and pinned macOS 15 Intel`
   );
   assert(
     workflow.includes("execution: ['--runInBand', '--maxWorkers=2']"),

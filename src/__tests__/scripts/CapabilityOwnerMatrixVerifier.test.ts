@@ -77,7 +77,7 @@ function runVerifier(arguments_: string[]): childProcess.SpawnSyncReturns<string
 
 function createRun(): RunEvidence {
   const jobs: Array<{ name: string; status: string; conclusion: string }> = [];
-  for (const operatingSystem of ['ubuntu-latest', 'macos-15']) {
+  for (const operatingSystem of ['ubuntu-latest', 'macos-15-intel']) {
     for (const execution of ['--runInBand', '--maxWorkers=2']) {
       for (const attempt of [1, 2]) {
         jobs.push({

@@ -17,7 +17,7 @@ describe('release matrix verifier', () => {
 
   it('rejects an incomplete matrix', () => {
     const run = createRun();
-    run.jobs = run.jobs.filter((job) => !job.name.includes('macos-15, --maxWorkers=2, 2'));
+    run.jobs = run.jobs.filter((job) => !job.name.includes('macos-15-intel, --maxWorkers=2, 2'));
 
     expect(() => validateRun(run, 'candidate-sha')).toThrow('Expected 8 test jobs');
   });
@@ -37,7 +37,7 @@ describe('release matrix verifier', () => {
 
 function createRun(): RunEvidence {
   const jobs: Array<{ name: string; status: string; conclusion: string }> = [];
-  for (const operatingSystem of ['ubuntu-latest', 'macos-15']) {
+  for (const operatingSystem of ['ubuntu-latest', 'macos-15-intel']) {
     for (const execution of ['--runInBand', '--maxWorkers=2']) {
       for (const attempt of [1, 2]) {
         jobs.push({

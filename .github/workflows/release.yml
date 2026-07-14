@@ -12,7 +12,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-15]
+        os: [ubuntu-latest, macos-15-intel]
         execution: ['--runInBand', '--maxWorkers=2']
         attempt: [1, 2]
 
@@ -55,7 +55,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-15]
+        os: [ubuntu-latest, macos-15-intel]
 
     steps:
       - uses: actions/checkout@v4
