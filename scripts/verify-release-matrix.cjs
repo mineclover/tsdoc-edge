@@ -10,7 +10,7 @@ const path = require('node:path');
 const projectRoot = path.resolve(__dirname, '..');
 const defaultRepository = 'mineclover/tsdoc-edge';
 const expectedWorkflow = 'CI';
-const expectedOperatingSystems = ['ubuntu-latest', 'macos-latest'];
+const expectedOperatingSystems = ['ubuntu-latest', 'macos-15'];
 const expectedExecutions = ['--runInBand', '--maxWorkers=2'];
 const expectedAttempts = [1, 2];
 
