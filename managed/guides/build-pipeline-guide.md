@@ -134,6 +134,11 @@ database. This closes the packed public-library POC. CI/release qualification al
 builds the `ttsc-ex` graph provider before running the same packed canary; the actual Node/OS matrix
 result remains a release gate.
 
+The CI/release checkout uses the private provider's immutable ref. Configure a fine-grained
+read-only token for `mineclover/ttsc-ex` as the `TTSC_EX_READ_TOKEN` repository secret before
+running the external qualification workflow; the default `tsdoc-edge` `GITHUB_TOKEN` cannot read
+another private repository.
+
 The self-repository CLI/library parity pilot is available after a canonical graph has been built:
 
 ```bash

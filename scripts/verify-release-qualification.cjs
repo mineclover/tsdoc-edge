@@ -165,6 +165,7 @@ function validateWorkflowContract(workflow, label) {
   );
   assert(
     workflow.includes('repository: mineclover/ttsc-ex') &&
+      workflow.includes('token: $' + '{{ secrets.TTSC_EX_READ_TOKEN }}') &&
       workflow.includes(`ref: ${ttscProviderRef}`) &&
       workflow.includes('working-directory: ttsc-ex') &&
       workflow.includes('npm run graph:router:build') &&

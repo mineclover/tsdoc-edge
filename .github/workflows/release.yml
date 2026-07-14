@@ -64,6 +64,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: mineclover/ttsc-ex
+          token: ${{ secrets.TTSC_EX_READ_TOKEN }}
           ref: 00af8c163bd9fbe8b726a8b3a6252450f50d6274
           path: ttsc-ex
           submodules: recursive
