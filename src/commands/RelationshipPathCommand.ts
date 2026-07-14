@@ -370,7 +370,9 @@ Examples:
     while (queue.length > 0 && iterations < maxIterations && allPaths.length < maxPaths) {
       iterations++;
 
-      const { symbolId, path, visited } = queue.shift()!;
+      const current = queue.shift();
+      if (!current) break;
+      const { symbolId, path, visited } = current;
 
       // Check if we've reached the target
       if (symbolId === toSymbol && path.length > 1) {

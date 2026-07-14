@@ -4,6 +4,7 @@ type: feature
 category: feature
 status: active
 canonical: true
+source: src/commands/DetectDeadCodeCommand.ts
 ---
 
 # [[Dead Code Detection]]
@@ -88,7 +89,7 @@ Review each candidate:
 git rm src/old-utility.ts
 
 # Rebuild and test
-npm test
+npm test -- --runInBand
 ```
 
 ### 4. Monitoring
@@ -188,4 +189,3 @@ tsdoc-edge orphans --diff origin/main
 ### Referenced By
 
 - [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:125
-

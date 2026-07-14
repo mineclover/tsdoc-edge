@@ -62,7 +62,7 @@ Some text SymbolName here
    b. Check for H2+: ## [[Symbol]], ### [[Symbol]]
    c. Check for inline: [[Symbol]]
    d. Extract symbol names
-6. Extract source file path from **Source**: pattern
+6. Extract source file path from frontmatter `source` or **Source**: pattern
 7. Extract code references [text](path#Symbol)
 8. Extract footnote references [^sym-XXX]
 9. Return ParsedDocSymbols
@@ -309,4 +309,3 @@ describe('DocumentSymbolParser', () => {
 - [[SpecCompletenessValidator]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:63
 - SpecContentSimilarityChecker → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:76
 - [[UnusedDocumentDetector]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:80
-

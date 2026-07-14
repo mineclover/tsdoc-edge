@@ -14,6 +14,7 @@ import type { CanonicalAliasContext } from '../indexer/CanonicalAliasContext';
 import { RelationshipQueryEngine } from '../query/RelationshipQueryEngine';
 import type { DatabaseManager } from '../storage/DatabaseManager';
 import type { Symbol } from '../types/graph';
+import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
  * Enhanced work context for a file
@@ -118,10 +119,12 @@ export class EnhancedWorkContextAnalyzer {
   private db: DatabaseManager;
   private queryEngine: RelationshipQueryEngine;
   private readonly canonicalContext?: CanonicalAliasContext;
+  private readonly relationshipSnapshot: readonly UnifiedRelationship[];
 
   constructor(db: DatabaseManager, canonicalContext?: CanonicalAliasContext) {
     this.db = db;
-    this.queryEngine = new RelationshipQueryEngine(db);
+    this.relationshipSnapshot = db.getAllUnifiedRelationships();
+    this.queryEngine = new RelationshipQueryEngine(db, this.relationshipSnapshot);
     this.canonicalContext = canonicalContext;
   }
 
@@ -147,6 +150,7 @@ export class EnhancedWorkContextAnalyzer {
   analyze(filePath: string): EnhancedWorkContext {
     // Get all symbols in this file
     const allSymbols = this.db.getAllSymbols();
+    const symbolsById = new Map(allSymbols.map((symbol) => [symbol.id, symbol]));
 
     // Normalize path: try both absolute and relative
     const cwd = process.cwd();
@@ -211,7 +215,7 @@ export class EnhancedWorkContextAnalyzer {
 
       // Tests
       for (const testId of symbolContext.tests) {
-        const testSymbol = this.db.getSymbol(testId);
+        const testSymbol = symbolsById.get(testId);
         if (testSymbol) {
           context.relationships.tests.push({
             symbolId: symbol.id,
@@ -227,7 +231,7 @@ export class EnhancedWorkContextAnalyzer {
 
       // Dependencies
       for (const depId of symbolContext.dependencies) {
-        const depSymbol = this.db.getSymbol(depId);
+        const depSymbol = symbolsById.get(depId);
         if (depSymbol) {
           context.relationships.dependencies.push({
             symbolId: symbol.id,
@@ -246,7 +250,7 @@ export class EnhancedWorkContextAnalyzer {
       // Find dependents (symbols that depend on this symbol)
       const dependents = this.findDependents(symbol.id);
       for (const depId of dependents) {
-        const depSymbol = this.db.getSymbol(depId);
+        const depSymbol = symbolsById.get(depId);
         if (depSymbol) {
           context.relationships.dependents.push({
             symbolId: symbol.id,
@@ -264,7 +268,7 @@ export class EnhancedWorkContextAnalyzer {
 
       // Semantic neighbors
       for (const neighborId of symbolContext.semanticNeighbors) {
-        const neighborSymbol = this.db.getSymbol(neighborId);
+        const neighborSymbol = symbolsById.get(neighborId);
         if (neighborSymbol) {
           context.relationships.semanticNeighbors.push({
             symbolId: symbol.id,
@@ -323,10 +327,9 @@ export class EnhancedWorkContextAnalyzer {
    * @private
    */
   private findDependents(symbolId: string): string[] {
-    const allRels = this.db.getAllUnifiedRelationships();
     const dependents: string[] = [];
 
-    for (const rel of allRels) {
+    for (const rel of this.relationshipSnapshot) {
       if (rel.type !== 'code-dependency') continue;
 
       const from = Array.isArray(rel.from) ? rel.from : [rel.from];

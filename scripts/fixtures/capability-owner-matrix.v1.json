@@ -1,0 +1,250 @@
+{
+  "contractId": "tsdoc-edge/capability-owner-matrix",
+  "contractVersion": "1.0",
+  "matrixId": "tsdoc-edge-c2-owner-matrix-v1",
+  "status": "candidate",
+  "scope": "ttsc-centered saved graph and work-context product path",
+  "ownerDecisions": ["superseded", "retained", "composed", "deprecated", "unsupported"],
+  "evidenceContracts": {
+    "ttscProviderPackedCanary": {
+      "source": "scripts/verify-ttsc-provider-tarball.cjs",
+      "contractId": "tsdoc-edge/ttsc-provider-packed-canary",
+      "contractVersion": "1.6",
+      "requiredProof": [
+        "canonicalWorkContext",
+        "structuralAnalysis",
+        "canonicalGraphInspection",
+        "specGraphInspection",
+        "managedSpecExtraction",
+        "evidenceLoaded",
+        "tsdocEnrichment",
+        "graphLint",
+        "publicLibraryPilot",
+        "retentionLifecycle",
+        "coverageReportInspection",
+        "coverageBaseline",
+        "coverageBaselineInspection",
+        "legacyStateUnchanged"
+      ]
+    }
+  },
+  "capabilities": [
+    {
+      "capabilityId": "structural-topology",
+      "evidenceContractRefs": ["ttscProviderPackedCanary"],
+      "producerDeclaration": {
+        "source": "scripts/verify-ttsc-provider-tarball.cjs",
+        "assertion": "packed ttsc graph-router provider produces canonical nodes and edges"
+      },
+      "rawObservation": {
+        "source": "scripts/fixtures/work-context-differential.v1.json",
+        "locator": "canonical.nodes and canonical.edges",
+        "assertion": "4 canonical nodes and 1 canonical calls edge are preserved"
+      },
+      "routerDerivedStructure": {
+        "source": "scripts/prove-graph-lint-convention.cjs",
+        "assertion": "upstream ttsc graph-lint report is projected without reimplementing traversal"
+      },
+      "canonicalMapping": {
+        "source": "src/indexer/ProjectIndexer.ts",
+        "assertion": "provider output is normalized into a namespaced canonical graph revision"
+      },
+      "legacyParity": {
+        "source": "scripts/verify-work-context-differential.cjs",
+        "result": "4 matched symbols, 0 AST mismatches; legacy does not expose compiler edge kinds"
+      },
+      "fixture": {
+        "source": "scripts/fixtures/work-context-differential.v1.json",
+        "fixtureId": "work-context-simple-v1"
+      },
+      "fixtureSet": [
+        {
+          "source": "scripts/fixtures/work-context-differential.v1.json",
+          "fixtureId": "work-context-simple-v1"
+        },
+        {
+          "source": "scripts/fixtures/work-context-differential.v2.json",
+          "fixtureId": "work-context-broader-v2"
+        }
+      ],
+      "failureCanary": {
+        "source": "scripts/verify-capability-owner-matrix.cjs",
+        "mutation": "remove rawObservation",
+        "expectedError": "structural-topology lacks rawObservation.source"
+      },
+      "failureCanaries": [
+        {
+          "source": "scripts/verify-capability-owner-matrix.cjs",
+          "mutation": "remove fixtureSet",
+          "expectedError": "structural-topology requires at least two fixtures"
+        },
+        {
+          "source": "scripts/verify-capability-owner-matrix.cjs",
+          "mutation": "remove evidenceContractRefs",
+          "expectedError": "structural-topology lacks evidence contract refs"
+        }
+      ],
+      "ownerDecision": "superseded",
+      "decisionNote": "ttsc canonical graph owns structural topology; legacy structural output stays only as a compatibility comparison until release matrix proof"
+    },
+    {
+      "capabilityId": "symbol-identity-position",
+      "evidenceContractRefs": ["ttscProviderPackedCanary"],
+      "producerDeclaration": {
+        "source": "scripts/verify-ttsc-provider-tarball.cjs",
+        "assertion": "packed provider preserves compiler symbol identity and source evidence"
+      },
+      "rawObservation": {
+        "source": "scripts/fixtures/work-context-differential.v1.json",
+        "locator": "canonical.nodes[].id and canonical.nodes[].evidence",
+        "assertion": "namespaced IDs and line/column evidence are explicit for every fixture symbol"
+      },
+      "routerDerivedStructure": {
+        "source": "src/provider/ProviderSnapshotNormalizer.ts",
+        "assertion": "provider identities are normalized before repository persistence"
+      },
+      "canonicalMapping": {
+        "source": "src/storage/GraphRepository.ts",
+        "assertion": "one immutable revision stores canonical node identity and source evidence"
+      },
+      "legacyParity": {
+        "source": "scripts/verify-work-context-differential.cjs",
+        "result": "legacy primary name and 4 matched symbols align; canonical IDs remain compiler-only"
+      },
+      "fixture": {
+        "source": "scripts/fixtures/work-context-differential.v1.json",
+        "fixtureId": "work-context-simple-v1"
+      },
+      "fixtureSet": [
+        {
+          "source": "scripts/fixtures/work-context-differential.v1.json",
+          "fixtureId": "work-context-simple-v1"
+        },
+        {
+          "source": "scripts/fixtures/work-context-differential.v2.json",
+          "fixtureId": "work-context-broader-v2"
+        }
+      ],
+      "failureCanary": {
+        "source": "scripts/verify-capability-owner-matrix.cjs",
+        "mutation": "remove canonicalMapping",
+        "expectedError": "symbol-identity-position lacks canonicalMapping.source"
+      },
+      "failureCanaries": [
+        {
+          "source": "scripts/verify-capability-owner-matrix.cjs",
+          "mutation": "remove fixtureSet",
+          "expectedError": "symbol-identity-position requires at least two fixtures"
+        }
+      ],
+      "ownerDecision": "superseded",
+      "decisionNote": "canonical provider identity and position are authoritative; legacy name matching is retained as differential evidence"
+    },
+    {
+      "capabilityId": "documentation-test-enrichment",
+      "evidenceContractRefs": ["ttscProviderPackedCanary"],
+      "producerDeclaration": {
+        "source": "src/convention/TsdocEnrichmentLoader.ts",
+        "assertion": "TSDoc Edge owns source-authored documentation enrichment as an exact revision"
+      },
+      "rawObservation": {
+        "source": "src/semantic-graph/analysis-input-revisions.ts",
+        "locator": "EnrichmentRevision and EvidenceRevision",
+        "assertion": "enrichment and test evidence are separate content-addressed input planes"
+      },
+      "routerDerivedStructure": {
+        "source": "src/semantic-graph/EffectiveAnalysisService.ts",
+        "assertion": "canonical graph subjects are combined with enrichment/evidence without mutating code graph"
+      },
+      "canonicalMapping": {
+        "source": "src/convention/ConventionCheckService.ts",
+        "assertion": "TSDoc and verification findings use the same revision-pinned convention result"
+      },
+      "legacyParity": {
+        "source": "scripts/verify-work-context-differential.cjs",
+        "result": "compiler-only view intentionally lacks legacy documentation/test enrichment"
+      },
+      "fixture": {
+        "source": "scripts/verify-ttsc-library-self.cjs",
+        "fixtureId": "tsdoc-edge-library-self-pilot"
+      },
+      "fixtureSet": [
+        {
+          "source": "scripts/fixtures/work-context-differential.v1.json",
+          "fixtureId": "work-context-simple-v1"
+        },
+        {
+          "source": "scripts/fixtures/work-context-differential.v2.json",
+          "fixtureId": "work-context-broader-v2"
+        }
+      ],
+      "failureCanary": {
+        "source": "scripts/verify-capability-owner-matrix.cjs",
+        "mutation": "remove legacyParity",
+        "expectedError": "documentation-test-enrichment lacks legacyParity.source"
+      },
+      "failureCanaries": [
+        {
+          "source": "scripts/verify-capability-owner-matrix.cjs",
+          "mutation": "remove fixtureSet",
+          "expectedError": "documentation-test-enrichment requires at least two fixtures"
+        }
+      ],
+      "ownerDecision": "retained",
+      "decisionNote": "documentation and test meaning is product enrichment, not a ttsc compiler fact; no legacy analyzer removal follows from canonical topology proof"
+    },
+    {
+      "capabilityId": "work-context-output",
+      "evidenceContractRefs": ["ttscProviderPackedCanary"],
+      "producerDeclaration": {
+        "source": "src/commands/WorkContextCommand.ts",
+        "assertion": "work-context exposes a saved context view for the selected file"
+      },
+      "rawObservation": {
+        "source": "scripts/verify-work-context-differential.cjs",
+        "locator": "comparison.exact and comparison.normalized",
+        "assertion": "canonical-only and legacy-only views are independently observable without mutation"
+      },
+      "routerDerivedStructure": {
+        "source": "src/analyzer/EnhancedWorkContextAnalyzer.ts",
+        "assertion": "canonical structural graph and legacy enrichment are assembled as separate sections"
+      },
+      "canonicalMapping": {
+        "source": "src/commands/WorkContextCommand.ts",
+        "assertion": "the command selects saved canonical revision when available and preserves legacy fallback semantics"
+      },
+      "legacyParity": {
+        "source": "scripts/verify-work-context-differential.cjs",
+        "result": "canonical IDs/structural graph and legacy primary/enrichment are complementary, not exact equivalents"
+      },
+      "fixture": {
+        "source": "scripts/fixtures/work-context-differential.v1.json",
+        "fixtureId": "work-context-simple-v1"
+      },
+      "fixtureSet": [
+        {
+          "source": "scripts/fixtures/work-context-differential.v1.json",
+          "fixtureId": "work-context-simple-v1"
+        },
+        {
+          "source": "scripts/fixtures/work-context-differential.v2.json",
+          "fixtureId": "work-context-broader-v2"
+        }
+      ],
+      "failureCanary": {
+        "source": "scripts/verify-capability-owner-matrix.cjs",
+        "mutation": "remove routerDerivedStructure",
+        "expectedError": "work-context-output lacks routerDerivedStructure.source"
+      },
+      "failureCanaries": [
+        {
+          "source": "scripts/verify-capability-owner-matrix.cjs",
+          "mutation": "remove fixtureSet",
+          "expectedError": "work-context-output requires at least two fixtures"
+        }
+      ],
+      "ownerDecision": "composed",
+      "decisionNote": "the product output composes ttsc structural facts with TSDoc Edge documentation/test enrichment; all-surface equivalence remains deferred with LSP"
+    }
+  ]
+}

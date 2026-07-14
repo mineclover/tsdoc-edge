@@ -2,13 +2,17 @@
 title: Codebase Health Report
 type: feature
 category: feature
-status: active
-canonical: true
+status: historical
+canonical: false
+codeImplementation: not-applicable
 ---
 
 # [[Codebase Health Report]]
 
 Comprehensive health assessment of TSDoc Edge codebase - structure quality, documentation coverage, and improvement recommendations.
+
+> **Historical report**: 이 문서의 날짜와 수치는 당시 snapshot이다. 현재 coverage/health
+> 메트릭의 정의와 baseline은 [[Coverage Metrics Contract]]를 기준으로 한다.
 
 ## Purpose
 
@@ -437,4 +441,3 @@ TSDoc Edge 코드베이스는 **전반적으로 건강한 상태**입니다:
 - [[Phase Commands Refactoring Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:10
 - [[Phase Commands Refactoring Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:216
 - [[Phase Commands Refactoring Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:274
-

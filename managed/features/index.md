@@ -4,12 +4,17 @@ type: index
 category: features
 status: active
 canonical: true
-lastUpdated: 2025-12-28
+lastUpdated: 2026-07-14
+codeImplementation: not-applicable
 ---
 
 # [[Features Index]]
 
 > TSDoc Edge 기능 카탈로그 - 모든 기능의 진입점
+
+> 아래 규모·건강도 수치는 historical catalog snapshot이다. 현재 ttsc canonical graph,
+> convention gate와 release qualification 상태는 [[Semantic Graph Spec Governance Roadmap]]와
+> [[Coverage Metrics Contract]]를 기준으로 확인한다.
 
 ## Project Status
 
@@ -80,10 +85,18 @@ Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.
 
 **Commands**: `analyze`, `health`, `stats`, `undocumented`, `untested`
 
+### [[Coverage Metrics Contract]]
+**Path**: `coverage-metrics-contract.md`
+
+커버리지라는 이름으로 관리되는 문서화·실행·심볼 테스트·통합 검증·health score·canonical
+graph policy 메트릭의 정의와 현재 구현 상태를 관리하는 기준 문서.
+
+**Key rule**: `coverage-report`는 테스트 실행률이 아니라 `documentation.symbol`을 측정한다.
+
 ---
 
 ### Dependency Analysis
-**Path**: `DependencyAnalysis.md` (planned)
+**Path**: `DependencyAnalysis.md` (source-backed)
 
 심볼 의존성 분석 및 관계 탐색.
 
@@ -98,7 +111,7 @@ Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.
 ---
 
 ### Impact Analysis
-**Path**: `ImpactAnalysis.md` (planned)
+**Path**: `ImpactAnalysis.md` (source-backed)
 
 코드 변경의 영향 범위 평가.
 
@@ -113,7 +126,7 @@ Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.
 ---
 
 ### Dead Code Detection
-**Path**: `DeadCodeDetection.md` (planned)
+**Path**: `DeadCodeDetection.md` (source-backed)
 
 미사용 코드 탐지 및 제거 전략.
 
@@ -185,7 +198,8 @@ Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.
 저장된 canonical graph revision에 workspace-installed spec-binding convention pack을 적용하고,
 정확한 spec/policy/rule-set/binding/report pin과 CI exit code를 생성합니다.
 
-**Commands**: `convention check --pack <file>`
+**Commands**: `convention check --pack <file>`, `convention inputs list|read`,
+`convention retention list|pin|unpin|gc`
 
 ---
 
@@ -201,7 +215,7 @@ Biome severity tiers, legacy warning budget, and strict canonical-kernel quality
 ## Integration Features (통합 기능)
 
 ### CI/CD Integration
-**Path**: `CICDIntegration.md` (planned)
+**Path**: `CICDIntegration.md` (workflow-backed)
 
 CI/CD 파이프라인 통합 및 품질 게이트.
 

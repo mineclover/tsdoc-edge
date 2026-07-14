@@ -78,7 +78,7 @@ TSDoc Edge currently tracks **10 active relationship types** totaling **19,998 r
   from: coverage.symbolId,  // test symbol
   to: implementationSymbolId  // implementation symbol
   ```
-- **Secondary**: `src/commands/AnalyzeTestsCommand.ts:125`
+- **Secondary**: `src/commands/TestRelationshipsCommand.ts`
 
 **Test Files**:
 - `src/__tests__/analyzer/TestCoverageAnalyzer.test.ts`

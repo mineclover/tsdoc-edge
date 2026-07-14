@@ -78,6 +78,30 @@ describe('SpecGraphRepository', () => {
     expect(SPEC_GRAPH_REPOSITORY_SCHEMA_VERSION).toBe(1);
   });
 
+  it('lists retained revision metadata with an explicit active marker', () => {
+    const firstRevision = fixtureRevision('first');
+    const secondRevision = fixtureRevision('second');
+    repository.replaceActiveRevision(firstRevision);
+    repository.replaceActiveRevision(secondRevision);
+
+    const summaries = repository.listRevisionSummaries();
+
+    expect(summaries.map((summary) => summary.revisionId)).toEqual([
+      secondRevision.revisionId,
+      firstRevision.revisionId,
+    ]);
+    expect(summaries.map((summary) => summary.active)).toEqual([true, false]);
+    expect(summaries[0]).toMatchObject({
+      workspaceId: 'fixture-workspace',
+      nodeCount: 2,
+      edgeCount: 1,
+      bindingCount: 0,
+      repositorySchemaVersion: 1,
+    });
+    expect(Object.isFrozen(summaries)).toBe(true);
+    expect(Object.isFrozen(summaries[0])).toBe(true);
+  });
+
   it('reactivates an existing deterministic revision without rewriting it', () => {
     const firstRevision = fixtureRevision('first');
     const secondRevision = fixtureRevision('second');

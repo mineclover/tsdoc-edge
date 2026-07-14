@@ -130,4 +130,50 @@ describe('NamingConventionEvaluator', () => {
       fs.rmSync(root, { recursive: true, force: true });
     }
   });
+
+  it('supports explicit constant and PascalCase exceptions before promoting value rules', () => {
+    const baseGraph = graph();
+    const report = new NamingConventionEvaluator().evaluate(
+      {
+        ...baseGraph,
+        nodes: [
+          ...baseGraph.nodes,
+          {
+            id: 'src/domain/constants.ts#PUBLIC_CONSTANT:variable',
+            sourceId: 'src/domain/constants.ts#PUBLIC_CONSTANT:variable',
+            kind: 'variable',
+            name: 'PUBLIC_CONSTANT',
+            file: 'src/domain/constants.ts',
+            exported: true,
+          },
+          {
+            id: 'src/domain/schemas.ts#UserSchema:variable',
+            sourceId: 'src/domain/schemas.ts#UserSchema:variable',
+            kind: 'variable',
+            name: 'UserSchema',
+            file: 'src/domain/schemas.ts',
+            exported: true,
+          },
+        ],
+      },
+      {
+        contractVersion: '1.0',
+        rules: [
+          {
+            id: 'public-values',
+            path: 'src/**/*.ts',
+            target: 'symbol',
+            kinds: ['variable'],
+            exported: true,
+            style: 'camel',
+            severity: 'error',
+            allowConstantCase: true,
+            allowPascalCase: true,
+          },
+        ],
+      }
+    );
+
+    expect(report.findings).toEqual([]);
+  });
 });

@@ -4,6 +4,7 @@ type: index
 category: infrastructure
 status: active
 canonical: true
+codeImplementation: not-applicable
 ---
 
 # [[Core Components]]

@@ -205,9 +205,12 @@ jobs:
   validate-specs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
       - name: Install dependencies
-        run: npm install
+        run: npm ci
       - name: Validate specifications
         run: tsdoc-edge validate-spec managed
 ```
@@ -406,4 +409,3 @@ tsdoc-edge validate-spec managed | grep "⚠️" -A 1
 - ModuleSpecTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/ModuleSpecTypes.md:177
 - ModuleSpecValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:142
 - [[SpecCompletenessValidator]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:61
-

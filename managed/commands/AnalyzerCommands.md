@@ -49,15 +49,15 @@ tsdoc-edge analyze-io [path] [options]
 **Source**: `src/commands/AnalyzeIOCommand.ts`
 **Relationship**: [[IO Dependency]]
 
-### analyze-tests
+### test-relationships
 
 Analyze test coverage relationships.
 
 ```bash
-tsdoc-edge analyze-tests [path] [options]
+tsdoc-edge test-relationships [path] [options]
 ```
 
-**Source**: `src/commands/AnalyzeTestsCommand.ts`
+**Source**: `src/commands/TestRelationshipsCommand.ts`
 **Relationship**: [[Test Coverage]]
 
 ### analyze-chains
@@ -254,4 +254,3 @@ tsdoc-edge analyze-all [path] [options]
 - [[Analyzers & Extractors]] - Analyzer implementations
 - [[Relationship Types]] - Relationship definitions
 - [[Relationship Analysis Guide]] - Usage guide
-

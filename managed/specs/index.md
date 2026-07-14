@@ -4,6 +4,7 @@ type: spec-index
 category: specifications
 status: active
 canonical: true
+source: src/spec-graph/ManagedSpecExtractor.ts
 ---
 
 # [[AuthoredProjectSpecifications]]
@@ -26,6 +27,17 @@ for the policy/rule composition that has not yet moved into managed authoring.
 `SpecGraphRepository`, result history, report JSON, and database rows are derived projections. They
 must not be edited as alternate spec sources.
 
+Operators can inspect the derived projection without running extraction or opening a writer:
+
+```bash
+tsdoc-edge spec graph status --spec-db .tsdoc/spec-graph.db --json
+tsdoc-edge spec graph list --spec-db .tsdoc/spec-graph.db --json
+tsdoc-edge spec graph read --spec-db .tsdoc/spec-graph.db --revision-id <revision-id> --json
+```
+
+The commands expose active/retained revision metadata and exact payloads read-only; managed Markdown
+remains the only authored source.
+
 ## Authoring convention
 
 - File paths are workspace-relative and use kebab-case: `managed/specs/<area>/<spec-name>.md`.
@@ -41,9 +53,11 @@ The P4.2 `NamingConventionEvaluator` evaluates this typed policy deterministical
 graph nodes and configured workspace files. Convention check/report/gate wiring consumes the same
 report, so authors change the config rather than duplicating naming rules in individual specs.
 
-New `managed/specs/` filename rules are error-severity from their first use. Existing source-symbol
-rules begin as warnings so the current corpus can be migrated with observed findings; promote a rule
-to error only after its location has an explicit migration proof.
+New `managed/specs/` filename rules and the current source-symbol rules are error-severity. The
+source-value policy explicitly permits UPPER_SNAKE_CASE constants and PascalCase schema values so
+the rule describes the repository's actual public API convention instead of suppressing findings.
+The current canonical graph evaluates 1,014 subjects with zero naming findings; this is the naming
+policy migration proof for the source checkout.
 
 The P4.4 extraction syntax is versioned by `ManagedSpecExtractor@1.0.0`. Its explicit declaration
 can contain `requirements`, `edges`, and `bindings`; duplicate IDs, malformed selectors, and source
@@ -65,4 +79,5 @@ managed/specs/
 - [[Semantic Graph Spec Governance Roadmap]]
 - [[Semantic Graph Analysis and Relationship Model]]
 - [[Spec Management System]]
+- [[SpecCommands]]
 - [[Convention Pack Check]]

@@ -5,6 +5,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { createRequire } = require('node:module');
 const { spawn } = require('node:child_process');
+const { spawnManaged, terminateManaged } = require('./process-group.cjs');
 
 function packageJson(specifier) {
   const file = require.resolve(`${specifier}/package.json`);
@@ -68,7 +69,7 @@ function main() {
     }
   }
 
-  const child = spawn(process.execPath, [resolveTtscLauncher(), ...args], {
+  const child = spawnManaged(spawn, process.execPath, [resolveTtscLauncher(), ...args], {
     cwd: process.cwd(),
     env,
     stdio: 'inherit',
@@ -79,10 +80,12 @@ function main() {
     SIGTERM: 143,
     SIGKILL: 137,
   };
+  let cancelTermination = () => {};
   const forwardSignal = (signal) => {
     forwardedSignal = signal;
     if (child.exitCode === null && child.signalCode === null) {
-      child.kill(signal);
+      cancelTermination();
+      cancelTermination = terminateManaged(child, signal);
     }
   };
   const onSigint = () => forwardSignal('SIGINT');
@@ -100,6 +103,7 @@ function main() {
       return;
     }
     settled = true;
+    cancelTermination();
     removeSignalHandlers();
     process.exitCode = exitCode;
   };

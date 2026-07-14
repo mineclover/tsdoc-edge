@@ -60,7 +60,29 @@ export function conventionDiagnosticsForFile(
       data: findingData(result.checkId, finding.findingId, finding.file, 1, historyId),
     });
   }
+  for (const finding of result.graphLint.findings) {
+    const source = graphLintSource(finding.seed);
+    if (!source || source.file !== normalized) continue;
+    diagnostics.push({
+      line: source.line,
+      ...(source.startCol ? { startCol: source.startCol } : {}),
+      code: `convention/${finding.ruleId}`,
+      message: `Graph-lint convention: ${finding.message}`,
+      severity: severity(finding.severity),
+      data: findingData(result.checkId, finding.findingId, source.file, source.line, historyId),
+    });
+  }
   return Object.freeze(diagnostics.sort(compareDiagnostics));
+}
+
+function graphLintSource(
+  seed: Readonly<Record<string, unknown>> | undefined
+): { file: string; line: number; startCol?: number } | undefined {
+  if (!seed || typeof seed.file !== 'string' || !seed.file) return undefined;
+  const line = typeof seed.startLine === 'number' && seed.startLine > 0 ? seed.startLine : 1;
+  const startCol =
+    typeof seed.startCol === 'number' && seed.startCol > 0 ? seed.startCol : undefined;
+  return { file: seed.file, line, ...(startCol ? { startCol } : {}) };
 }
 
 function findingData(

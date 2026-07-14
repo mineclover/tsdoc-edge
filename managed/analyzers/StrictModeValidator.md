@@ -8,6 +8,8 @@ canonical: true
 
 # [[StrictModeValidator]]
 
+**Source**: `src/validator/StrictModeValidator.ts`
+
 > **Validates enhanced documentation compliance** with 6-category strict mode requirements
 
 ## Purpose
@@ -372,4 +374,3 @@ console.log(`Average compliance: ${avgScore.toFixed(2)}%`);
 - ProblemSolving → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ProblemSolving.md:47
 - EnhancedTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/EnhancedTagTypes.md:161
 - ConventionValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/ConventionValidator.md:181
-

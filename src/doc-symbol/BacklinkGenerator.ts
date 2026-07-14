@@ -183,8 +183,9 @@ export class BacklinkGenerator {
     // Find next H1 or end of file
     const afterSection = content.substring(start + match[0].length);
     const nextH1Match = afterSection.match(/^# /m);
+    const nextH1Index = nextH1Match?.index;
 
-    const end = nextH1Match ? start + match[0].length + nextH1Match.index! : content.length;
+    const end = nextH1Index === undefined ? content.length : start + match[0].length + nextH1Index;
 
     return { start, end };
   }

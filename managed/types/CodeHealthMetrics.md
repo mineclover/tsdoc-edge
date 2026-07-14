@@ -64,6 +64,11 @@ Per-file test coverage:
 
 See implementation: TestCoverageInfo
 
+**Metric contract**: [[Coverage Metrics Contract]] / `test.symbol` and `quality.health`.
+
+`TestCoverageInfo`의 `estimatedCoverage`는 파일·심볼 관계 기반 추정값이다. Istanbul 실행률과
+동일하지 않으며, canonical graph baseline이나 convention gate 입력으로 사용하지 않는다.
+
 **Key Properties**:
 - `sourceFile`: Source file path
 - `testFile`: Test file path (optional)
@@ -86,14 +91,20 @@ See implementation: CodeHealthMetrics
 - `filesWithTests`: Files with tests
 - `filesWithoutTests`: Files without tests
 - `avgQualityScore`: Average quality score
-- `overallHealthScore`: Overall health score (0-100)
+- `healthScore`: Overall health score (0-100)
+
+`CodeHealthMetrics`의 health score는 문서화·품질·테스트 관련 값을 합산한 요약 score다.
+독립된 실행 커버리지 percentage 또는 canonical graph coverage의 대체값이 아니다.
 
 ### Health Score Calculation
 
-Weighted average of:
-- Documentation coverage: 40%
-- Documentation quality: 30%
-- Test coverage: 30%
+The current `CodeHealthChecker` calculates:
+
+- Documentation quality (`avgQualityScore`): 60%
+- Test-file presence ratio (`filesWithTests / total source files`): 40%
+
+`documentedSymbols`, `fullyDocumentedSymbols`, and `estimatedCoverage` remain report fields;
+they are not independent execution-coverage inputs to the formula.
 
 **Grades:**
 - 90-100: Excellent
@@ -142,4 +153,3 @@ tsdoc-edge validate
 - [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:91
 - [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:121
 - CodeHealthMetrics → /Users/junwoobang/workflow/tsdoc-edge/managed/types/CodeHealthMetrics.md:70
-

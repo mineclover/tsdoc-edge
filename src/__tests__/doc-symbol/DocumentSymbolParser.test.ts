@@ -178,6 +178,40 @@ Description here.`
 
         expect(result?.sourceFilePath).toBe('src/components/Main.ts');
       });
+
+      it('should extract source file path from frontmatter', () => {
+        const filePath = path.join(tempDir, 'managed', 'feature.md');
+        fs.writeFileSync(
+          filePath,
+          `---
+source: src/components/Frontmatter.ts
+---
+# [[Main]]
+
+Description here.`
+        );
+
+        const result = parser.parse(filePath);
+
+        expect(result?.sourceFilePath).toBe('src/components/Frontmatter.ts');
+      });
+
+      it('should preserve an explicit non-applicable code implementation disposition', () => {
+        const filePath = path.join(tempDir, 'managed', 'concept.md');
+        fs.writeFileSync(
+          filePath,
+          `---
+codeImplementation: not-applicable
+---
+# [[Concept]]
+
+This document intentionally has no single implementation owner.`
+        );
+
+        const result = parser.parse(filePath);
+
+        expect(result?.primary?.codeImplementation).toBe('not-applicable');
+      });
     });
 
     describe('error handling', () => {

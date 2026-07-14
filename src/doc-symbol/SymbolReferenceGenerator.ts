@@ -116,7 +116,7 @@ export class SymbolReferenceGenerator {
 
     if (backlinkMatch) {
       // Insert before Backlinks
-      const insertPos = backlinkMatch.index!;
+      const insertPos = backlinkMatch.index ?? 0;
       return `${content.slice(0, insertPos) + newSection}\n${content.slice(insertPos)}`;
     }
 

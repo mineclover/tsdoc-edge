@@ -177,14 +177,18 @@ export class TypeChainCommand extends BaseCommand {
       const result = tracer.buildDependencyTree(sourceType, options);
       this.displayDependencyTree(result);
     } else {
+      if (!targetType) {
+        return this.failure('Target type is required unless --tree is used');
+      }
+
       // Check if target exists
-      if (!graph.interfaces.has(targetType!)) {
+      if (!graph.interfaces.has(targetType)) {
         this.printError(`Target type not found: ${targetType}`);
         return this.failure('Target type not found');
       }
 
       // Find chain
-      const result = tracer.findChain(sourceType, targetType!, options);
+      const result = tracer.findChain(sourceType, targetType, options);
       this.displayTypeChains(result);
     }
 
@@ -603,7 +607,7 @@ export class DetectCircularTypesCommand extends BaseCommand {
     );
     console.log('');
 
-    const { tracer, graph } = this.buildGraph();
+    const { tracer } = this.buildGraph();
 
     // Show statistics
     const stats = tracer.getGraphStatistics(options);

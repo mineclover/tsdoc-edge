@@ -4,6 +4,7 @@ type: feature
 category: feature
 status: active
 canonical: true
+source: src/analyzer/DependencyChainAnalyzer.ts
 ---
 
 # [[Dependency Analysis]]
@@ -258,4 +259,3 @@ tsdoc-edge validate-architecture \
 
 - [[UsedByCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UsedByCommand.md:88
 - [[Impact Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/ImpactAnalysis.md:150
-

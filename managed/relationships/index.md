@@ -14,6 +14,8 @@ Master index for all 31 relationship types tracked by TSDoc Edge across 9 catego
 
 > **SSOT**: Master index for all relationship types tracked by TSDoc Edge
 > **Source**: Dependency Meta-Structure (`managed/architecture/diagrams/dependency-meta-structure.mmd`)
+> **Metric note**: 관계 수·coverage·완료율은 historical snapshot일 수 있다. 현재 coverage
+> metric의 의미와 evidence 규칙은 [[Coverage Metrics Contract]]를 따른다.
 
 ## Usage
 
@@ -25,10 +27,15 @@ tsdoc-edge explore-entrypoint managed/relationships/index.md --detect-orphans
 tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-structure.mmd
 ```
 
-## Status: 13/28 Implemented (46%)
+## Legacy relationship inventory
+
+`13/28 Implemented (46%)`은 legacy relationship inventory의 historical snapshot이며,
+현재 ttsc canonical graph의 coverage나 owner 판정이 아니다. 현재 graph/provider 상태와
+legacy analyzer의 유지·대체·조합 여부는 [[Semantic Graph Spec Governance Roadmap]]의 C2
+matrix와 [[Coverage Metrics Contract]]를 따른다.
 
 **Version**: 2.2
-**Last Updated**: 2025-12-28
+**Last Updated**: 2026-07-14
 **Source**: `src/types/relationships/unified.ts`
 
 ## 1. Code Space (구조적)
@@ -107,9 +114,9 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 
 ## 4. Meta Space (인지적)
 
-### [[Test Coverage]] ✅
+### [[Test Coverage]] ⚠️ Partial (legacy relationship path)
 - **Pattern**: `*.test.ts` → implementation
-- **Impl**: [[TestRelationshipAnalyzer]] (`src/analyzer/TestRelationshipAnalyzer.ts`)
+- **Impl**: [[TestCoverageAnalyzer]] (`src/analyzer/TestCoverageAnalyzer.ts`)
 - **Cmd**: TestRelationshipsCommand (`src/commands/TestRelationshipsCommand.ts`)
 - **Storage**: DatabaseManager (`src/storage/DatabaseManager.ts`)
 - **Analysis**: [[TestCoverageAnalyzer]] (`src/analyzer/TestCoverageAnalyzer.ts`)
@@ -163,7 +170,11 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/dependency-meta-stru
 - **Query**: Returns all circular dependency chains
 - **Doc**: [circular.md](./circular.md)
 
-## Roadmap
+## Historical Roadmap Snapshot
+
+The phase completion rows below preserve the former relationship inventory. They are not a
+current implementation claim for the `ttsc` canonical graph lane; verify current support from the
+source and [[Coverage Metrics Contract]].
 
 **Phase 1 (10/10 ✅)**: code-dependency, inheritance, implementation, io-dependency, pipeline, calls, test-coverage, type-dependency, generic-constraint, circular-dependency
 
@@ -249,4 +260,3 @@ sqlite3 .tsdoc/symbols.db "SELECT type, COUNT(*) FROM unified_relationships GROU
 - Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:133
 - Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:182
 - Workflows Index → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:198
-

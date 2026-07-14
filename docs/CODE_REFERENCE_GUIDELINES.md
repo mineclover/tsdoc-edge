@@ -1,4 +1,4 @@
-# Code Reference Guidelines
+# [[CODE_REFERENCE_GUIDELINES]] Code Reference Guidelines
 
 > **SSOT Principle**: Code definitions exist only in source files. Documentation references code through symbols.
 
@@ -46,7 +46,7 @@ This document describes how documentation files reference code implementations i
 **Examples**:
 ```markdown
 This component uses [[DatabaseManager]] for persistence.
-See [[SymbolGraph]] for the underlying data structure.
+See [[SymbolGraphBuilder]] for the underlying data structure.
 Implements the [[ModuleSpec]] framework.
 ```
 
@@ -221,7 +221,7 @@ All code is classified into 3 categories for dependency analysis:
 
 **Reference Pattern**:
 ```markdown
-See implementation: [[SymbolGraph]]
+See implementation: [[SymbolGraphBuilder]]
 
 **Properties**:
 - `symbols`: Map of all symbols (indexed by ID)

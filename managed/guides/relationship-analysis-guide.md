@@ -483,7 +483,8 @@ tsdoc-edge validate-docs managed
 - [[Call Relationships]] (`managed/relationships/CALLS.md`)
 - [[IO Dependency]] (`managed/relationships/IO-DEPENDENCY.md`)
 - [[Pipeline]] (`managed/relationships/PIPELINE.md`)
-- [[Test Coverage]] (`managed/relationships/TEST-COVERAGE.md`)
+- [[Test Coverage]] (`managed/relationships/test-coverage.md`)
+- [[Coverage Metrics Contract]] (`managed/features/coverage-metrics-contract.md`)
 
 **Analyzers**:
 - [[ASTSymbolExtractor]] (`managed/analyzers/ASTSymbolExtractor.md`)
@@ -517,4 +518,3 @@ tsdoc-edge validate-docs managed
 - [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:116
 - [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:138
 - [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:188
-

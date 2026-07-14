@@ -174,7 +174,8 @@ export class ExploreEntrypointCommand extends BaseCommand {
 
     // BFS traversal through [[Symbol]] references
     while (queue.length > 0) {
-      const currentDoc = queue.shift()!;
+      const currentDoc = queue.shift();
+      if (!currentDoc) break;
       if (processedDocs.has(currentDoc)) continue;
       processedDocs.add(currentDoc);
 

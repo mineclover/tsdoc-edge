@@ -1,4 +1,4 @@
-# Code Type Classification System
+# [[CODE_TYPE_CLASSIFICATION]] Code Type Classification System
 
 This document describes the three-way code classification system used in TSDoc Edge documentation.
 

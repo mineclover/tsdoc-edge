@@ -8,6 +8,7 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
 import { SpecBumpCommand } from './SpecBumpCommand';
 import { SpecDiffCommand } from './SpecDiffCommand';
 import { SpecExtractCommand } from './SpecExtractCommand';
+import { SpecGraphCommand } from './SpecGraphCommand';
 import { SpecHistoryCommand } from './SpecHistoryCommand';
 import { SpecStatusCommand } from './SpecStatusCommand';
 import { ValidateSpecCommand } from './ValidateSpecCommand';
@@ -21,6 +22,10 @@ const SUBCOMMANDS = {
   extract: {
     command: SpecExtractCommand,
     description: 'Compile managed project specs into SpecGraph',
+  },
+  graph: {
+    command: SpecGraphCommand,
+    description: 'Inspect saved SpecGraph revisions read-only',
   },
 } as const;
 
@@ -41,12 +46,21 @@ export class SpecCommand extends BaseCommand {
   }
 
   /**
+   * getAlias method
+   * @returns Short alias for specification operations
+   * @public
+   */
+  getAlias(): string[] {
+    return ['sp'];
+  }
+
+  /**
    * getDescription method
    * @returns Returns string
    * @public
    */
   getDescription(): string {
-    return 'Unified spec operations (status|history|diff|bump|validate)';
+    return 'Unified spec operations (status|history|diff|bump|validate|extract|graph)';
   }
 
   /**

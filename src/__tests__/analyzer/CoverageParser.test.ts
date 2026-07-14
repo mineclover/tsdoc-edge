@@ -62,6 +62,61 @@ describe('CoverageParser', () => {
       expect(summary.files.size).toBe(1);
     });
 
+    it('should retain a stable source identity and metric counts', () => {
+      const coverageFile = path.join(tempDir, 'coverage-final.json');
+      const coverageData = {
+        '/project/src/math.ts': {
+          path: '/project/src/math.ts',
+          statementMap: {
+            0: { start: { line: 1, column: 0 }, end: { line: 1, column: 10 } },
+            1: { start: { line: 2, column: 0 }, end: { line: 2, column: 10 } },
+          },
+          fnMap: {
+            0: {
+              name: 'add',
+              decl: { start: { line: 1, column: 0 }, end: { line: 1, column: 3 } },
+            },
+          },
+          s: { 0: 1, 1: 0 },
+          f: { 0: 1 },
+          b: { 0: [1, 0] },
+        },
+      };
+
+      fs.writeFileSync(coverageFile, JSON.stringify(coverageData), 'utf-8');
+      const first = parser.parseWithIdentity(coverageFile, {
+        capturedAt: '2026-07-14T00:00:00.000Z',
+      });
+      const second = parser.parseWithIdentity(coverageFile, {
+        capturedAt: '2026-07-15T00:00:00.000Z',
+      });
+
+      expect(first.source.sourceIdentity).toBe(second.source.sourceIdentity);
+      expect(first.source.sourceDigest).toBe(second.source.sourceDigest);
+      expect(first.source.capturedAt).not.toBe(second.source.capturedAt);
+      expect(first.summary.totals.lines).toEqual({ covered: 1, total: 2 });
+      expect(first.metrics.map((metric) => metric.metricId)).toEqual([
+        'execution.line',
+        'execution.function',
+        'execution.branch',
+      ]);
+      expect(first.metrics[0]?.value).toMatchObject({ numerator: 1, denominator: 2, ratio: 0.5 });
+      expect(first.fileMetrics).toHaveLength(1);
+      expect(first.fileMetrics[0]?.filePath).toBe('/project/src/math.ts');
+      expect(first.fileMetrics[0]?.metrics[0]?.value).toMatchObject({
+        numerator: 1,
+        denominator: 2,
+        ratio: 0.5,
+      });
+      expect(first.fileMetrics[0]?.functions?.[0]).toMatchObject({
+        name: 'add',
+        startLine: 1,
+        endLine: 1,
+        covered: true,
+        count: 1,
+      });
+    });
+
     it('should throw on non-existent file', () => {
       const nonExistent = path.join(tempDir, 'does-not-exist.json');
       expect(() => parser.parse(nonExistent)).toThrow('Coverage file not found');

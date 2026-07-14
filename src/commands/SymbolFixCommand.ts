@@ -211,8 +211,9 @@ export class SymbolFixCommand extends BaseCommand {
         );
 
         if (distance <= 2 && distance > 0) {
-          const docs1 = this.symbols.get(sym1)!;
-          const docs2 = this.symbols.get(sym2)!;
+          const docs1 = this.symbols.get(sym1);
+          const docs2 = this.symbols.get(sym2);
+          if (!docs1 || !docs2) continue;
 
           // Suggest merging (prefer one with more docs)
           const [keep, remove] = docs1.length >= docs2.length ? [sym1, sym2] : [sym2, sym1];

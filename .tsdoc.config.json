@@ -75,7 +75,7 @@
           "kinds": ["class", "interface", "type", "enum"],
           "exported": true,
           "style": "pascal",
-          "severity": "warning",
+          "severity": "error",
           "acronym": "preserve"
         },
         {
@@ -86,9 +86,11 @@
           "kinds": ["function", "variable"],
           "exported": true,
           "style": "camel",
-          "severity": "warning",
+          "severity": "error",
           "acronym": "preserve",
-          "allowLeadingUnderscore": false
+          "allowLeadingUnderscore": false,
+          "allowConstantCase": true,
+          "allowPascalCase": true
         }
       ]
     },

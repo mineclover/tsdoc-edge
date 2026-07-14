@@ -26,10 +26,13 @@ import {
   type CanonicalGraphCoordinatorOptions,
   DEFAULT_GRAPH_TSCONFIG,
 } from '../indexer';
+import { projectTestCoverageToCanonicalNodes } from '../metrics/CanonicalCoverageProjection';
+import { createCoverageSourceIdentity } from '../metrics/CoverageMetricContract';
 import { BuildResultSchema } from '../output/schemas';
 import { XmlBuilder } from '../output/XmlBuilder';
 import { TestSymbolParser } from '../parser/TestSymbolParser';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { GraphRepository } from '../storage/GraphRepository';
 import type { Symbol, SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 import type { TestSymbol } from '../types/test-symbols';
@@ -44,6 +47,17 @@ export interface BuildCommandDependencies {
 interface ExplicitSemanticResolution {
   relationship?: UnifiedRelationship;
   diagnostic?: string;
+}
+
+interface CanonicalTestCoverageSummary {
+  readonly reportId: string;
+  readonly graphRevisionId: string;
+  readonly graphFingerprint: string;
+  readonly matchedSymbols: number;
+  readonly uncoveredSymbols: number;
+  readonly unmatchedRelationTargets: number;
+  readonly evidenceStatus: 'inferred';
+  readonly gate: 'report-only';
 }
 
 /**
@@ -194,6 +208,7 @@ export class BuildCommand extends BaseCommand {
       }
 
       const canonicalGraph = await this.refreshCanonicalGraph(args);
+      let canonicalTestCoverageSummary: CanonicalTestCoverageSummary | undefined;
 
       if (canonicalOnly) {
         if (!canonicalGraph) {
@@ -952,6 +967,57 @@ export class BuildCommand extends BaseCommand {
               `Scenario coverage: ${stats.scenariosWithCoverage}/${stats.totalScenarios} scenarios covered`
             );
           }
+
+          if (canonicalGraph) {
+            const graphRepository = new GraphRepository(canonicalGraph.databasePath, {
+              readOnly: true,
+            });
+            try {
+              const activeRevision = graphRepository.readActiveRevision();
+              if (!activeRevision) {
+                throw new Error('Canonical graph database has no active revision');
+              }
+              const source = createCoverageSourceIdentity(
+                path.join(process.cwd(), '.tsdoc', 'test-relationship-report'),
+                JSON.stringify({
+                  totalTestCases: stats.totalTestCases,
+                  relationships: testRelationships.testCoverageRelations,
+                }),
+                {
+                  adapterId: 'tsdoc-edge/test-coverage-analyzer',
+                  inputKind: 'legacy-database',
+                  reportFormat: 'test-relationships',
+                  workspaceId: activeRevision.graph.provenance.workspaceId,
+                }
+              );
+              const projection = projectTestCoverageToCanonicalNodes(
+                {
+                  reportId: `test-symbol:${source.sourceIdentity}`,
+                  source,
+                  totalTestCases: stats.totalTestCases,
+                  relationships: testRelationships.testCoverageRelations,
+                  aliases: activeRevision.aliases,
+                },
+                activeRevision.graph,
+                { graphRevisionId: activeRevision.metadata.revisionId }
+              );
+              canonicalTestCoverageSummary = {
+                reportId: projection.reportId,
+                graphRevisionId: projection.graphRevisionId,
+                graphFingerprint: projection.graphFingerprint,
+                matchedSymbols: projection.matchedSymbols.length,
+                uncoveredSymbols: projection.uncoveredSymbols.length,
+                unmatchedRelationTargets: projection.unmatchedRelationTargets.length,
+                evidenceStatus: 'inferred',
+                gate: 'report-only',
+              };
+              this.printInfo(
+                `Canonical test.symbol projection: ${projection.matchedSymbols.length} matched, ${projection.uncoveredSymbols.length} uncovered`
+              );
+            } finally {
+              graphRepository.close();
+            }
+          }
         }
 
         // Insert doc relationships
@@ -1248,7 +1314,7 @@ export class BuildCommand extends BaseCommand {
         }
 
         // Output build result as XML
-        new XmlBuilder(BuildResultSchema)
+        const buildOutput = new XmlBuilder(BuildResultSchema)
           .section('statistics', {
             filesScanned: result.filesScanned,
             symbolsFound: result.symbolsFound,
@@ -1277,12 +1343,33 @@ export class BuildCommand extends BaseCommand {
                   canonicalGraphEdges: canonicalGraph.edgeCount,
                 }
               : {}),
+            ...(canonicalTestCoverageSummary
+              ? {
+                  canonicalTestCoverageMatched: canonicalTestCoverageSummary.matchedSymbols,
+                  canonicalTestCoverageUncovered: canonicalTestCoverageSummary.uncoveredSymbols,
+                  canonicalTestCoverageUnmatchedTargets:
+                    canonicalTestCoverageSummary.unmatchedRelationTargets,
+                }
+              : {}),
           })
           .section('paths', {
             database: dbPath,
             registry: registryPath,
             ...(canonicalGraph ? { canonicalGraphDatabase: canonicalGraph.databasePath } : {}),
-          })
+          });
+        if (canonicalTestCoverageSummary) {
+          buildOutput.section('canonicalTestCoverage', {
+            reportId: canonicalTestCoverageSummary.reportId,
+            graphRevisionId: canonicalTestCoverageSummary.graphRevisionId,
+            graphFingerprint: canonicalTestCoverageSummary.graphFingerprint,
+            matchedSymbols: canonicalTestCoverageSummary.matchedSymbols,
+            uncoveredSymbols: canonicalTestCoverageSummary.uncoveredSymbols,
+            unmatchedRelationTargets: canonicalTestCoverageSummary.unmatchedRelationTargets,
+            evidenceStatus: canonicalTestCoverageSummary.evidenceStatus,
+            gate: canonicalTestCoverageSummary.gate,
+          });
+        }
+        buildOutput
           .section(
             'errors',
             result.errors.map((err) => ({ message: err }))

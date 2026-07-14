@@ -2,16 +2,25 @@
 title: Integration Verification
 type: relationship
 category: verification
-status: planned
+status: partial
 canonical: true
 phase: 3
 ---
 
 # [[Integration Verification]]
 
-> **Type**: `integration-verification` | **Status**: 📋 Phase 3 (Not Implemented)
+> **Type**: `integration-verification` | **Status**: ⚠️ Partial (legacy analyzer, not canonical graph)
 
 Track integration points verified by integration tests.
+
+**Metric contract**: [[Coverage Metrics Contract]] / `test.integration`.
+
+이 문서의 coverage 예시는 설계·계획 데이터다. 실제 실행 결과를 현재 baseline으로 사용하려면
+테스트 실행 evidence와 source identity를 계약 형식으로 먼저 기록해야 한다.
+
+**Implementation**: `src/analyzer/IntegrationVerificationAnalyzer.ts`.
+현재 analyzer는 legacy `SymbolGraph`와 test-file discovery를 사용하며 canonical graph revision,
+실행 결과 evidence, persisted metric report를 제공하지 않는다.
 
 ## Definition
 
@@ -438,7 +447,7 @@ describe('User Management Integration', () => {
 
 ## Related
 
-- [[Test Coverage]] (`TEST-COVERAGE.md`): Unit test coverage
+- [[Test Coverage]] (`test-coverage.md`): Unit test relationship coverage
 - [[Call Relationships]] (`CALLS.md`): Call relationships
 - [[Code Dependency]] (`code-dependency.md`): Dependency verification
 - [[Collaboration]] (`collaboration.md`): Collaboration validation

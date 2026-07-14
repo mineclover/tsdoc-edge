@@ -83,11 +83,10 @@ tsdoc-edge work-context src/analyzer/CallGraphAnalyzer.ts
 - [[IODependencyAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:19
 - [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:24
 - ReliabilityChecker → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ReliabilityChecker.md:21
-- [[TestRelationshipAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/TestRelationshipAnalyzer.md:23
+- [[TestCoverageAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:23
 - [[Module Specification Framework]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/module-specification-framework.md:230
 - [[Impact Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/ImpactAnalysis.md:101
 - [[Impact Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/ImpactAnalysis.md:152
 - [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:78
 - [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:185
 - [[Work Context Workflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/work-context-workflow.md:6
-

@@ -4,9 +4,15 @@ type: feature
 category: feature
 status: active
 canonical: true
+source: src/lsp/server.ts
 ---
 
 # [[LSP Integration]]
+
+현재 구현 범위는 saved canonical graph와 read-only unsaved effective overlay를 소비하는 LSP
+경로다. GraphDelta/EffectiveCodeGraphView 합성은 source-checkout 회귀 테스트로 검증됐으며,
+ttsc graph-lint/spec contract를 미저장 overlay에 다시 평가하는 경로와 파일을 수정하는
+CodeAction은 별도 gate로 보류한다.
 
 ## 요약
 - **목적**: VS Code 등 LSP 클라이언트에서 TSDoc Edge 분석 결과를 실시간으로 활용
@@ -324,6 +330,10 @@ code lens, diagnostics, workspace search, impact, related-symbol, definition loo
 workspace view를 사용한다. 저장 symbol과 identity가 일치하면 기존 canonical id와 edge를
 보존하고, 삭제·rename endpoint는 제거한다. TS5 extractor가 아직 새 relationship을 거의
 만들지 않으므로 신규/rename symbol의 topology는 저장 후 whole-project refresh에서 확정한다.
+
+이 overlay 경로는 LSP navigation/impact/diagnostic query의 현재 read-only 계약이다. 같은
+ttsc graph-lint/spec rule을 overlay graph에 적용해 convention finding을 재계산하는 것과
+mutating CodeAction, unsaved spec authoring은 현재 제품 범위에 포함하지 않는다.
 
 ## 메모리 관리
 

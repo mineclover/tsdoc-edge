@@ -96,9 +96,11 @@ export interface RelationshipContext {
  */
 export class RelationshipQueryEngine {
   private db: DatabaseManager;
+  private readonly relationshipSnapshot?: readonly UnifiedRelationship[];
 
-  constructor(db: DatabaseManager) {
+  constructor(db: DatabaseManager, relationshipSnapshot?: readonly UnifiedRelationship[]) {
     this.db = db;
+    this.relationshipSnapshot = relationshipSnapshot;
   }
 
   /**
@@ -117,7 +119,7 @@ export class RelationshipQueryEngine {
    * ```
    */
   getContext(symbolId: string, options: RelationshipQueryOptions = {}): RelationshipContext {
-    const allRelationships = this.db.getAllUnifiedRelationships();
+    const allRelationships = this.relationshipSnapshot ?? this.db.getAllUnifiedRelationships();
 
     // Filter relationships
     const filtered = this.filterRelationships(allRelationships, options);
@@ -352,10 +354,10 @@ export class RelationshipQueryEngine {
    * @private
    */
   private filterRelationships(
-    relationships: UnifiedRelationship[],
+    relationships: readonly UnifiedRelationship[],
     options: RelationshipQueryOptions
-  ): UnifiedRelationship[] {
-    let filtered = relationships;
+  ): readonly UnifiedRelationship[] {
+    let filtered: readonly UnifiedRelationship[] = relationships;
 
     // Filter by types
     if (options.types && options.types.length > 0) {

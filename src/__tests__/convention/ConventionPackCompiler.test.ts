@@ -8,6 +8,7 @@ import {
   compileConventionPackSource,
   validateConventionPackManifest,
 } from '../../convention';
+import { createSpecGraphRevision } from '../../spec-graph';
 import { fixturePackSource } from './fixtures';
 
 const context = {
@@ -36,6 +37,33 @@ describe('ConventionPackCompiler', () => {
     expect(left.manifest.ruleSet.revisionId).toBe(left.ruleSet.revisionId);
     expect(left.spec.provenance.extractorId).toBe(CONVENTION_PACK_COMPILER_ID);
     expect(Object.isFrozen(left.manifest)).toBe(true);
+  });
+
+  it('uses an exact managed spec revision and rejects duplicate JSON authoring', () => {
+    const bootstrap = compileConventionPackSource(fixturePackSource(), context);
+    const managedSpec = createSpecGraphRevision({
+      workspaceId: bootstrap.spec.workspaceId,
+      nodes: bootstrap.spec.nodes,
+      edges: bootstrap.spec.edges,
+      bindings: bootstrap.spec.bindings,
+      provenance: {
+        source: 'managed-document',
+        extractorId: 'tsdoc-edge/managed-spec-extractor',
+        extractorVersion: '1.0.0',
+        authoredSourceFingerprint: `sha256:${'1'.repeat(64)}`,
+      },
+    });
+    const policyOnly: ConventionPackSource = {
+      ...fixturePackSource(),
+      spec: { nodes: [], edges: [], bindings: [] },
+    };
+
+    const compiled = compileConventionPackSource(policyOnly, { ...context, managedSpec });
+    expect(compiled.spec).toEqual(managedSpec);
+    expect(compiled.spec.provenance.extractorId).toBe('tsdoc-edge/managed-spec-extractor');
+    expect(() =>
+      compileConventionPackSource(fixturePackSource(), { ...context, managedSpec })
+    ).toThrow('duplicate JSON authoring');
   });
 
   it('rejects unknown source fields and noncanonical versions', () => {

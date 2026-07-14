@@ -4,6 +4,7 @@ type: feature
 category: feature
 status: active
 canonical: true
+source: src/commands/RelationshipImpactCommand.ts
 ---
 
 # [[Impact Analysis]]
@@ -305,4 +306,3 @@ Break large impacts into smaller steps:
 - [[Dead Code Detection]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DeadCodeDetection.md:117
 - [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:119
 - [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:136
-

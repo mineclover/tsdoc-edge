@@ -4,6 +4,7 @@ type: architecture
 category: core
 status: active
 canonical: true
+codeImplementation: not-applicable
 ---
 
 # [[Semantic Graph Analysis and Relationship Model]]
@@ -11,11 +12,11 @@ canonical: true
 > TSDoc Edge가 최종적으로 수행할 분석 방식, revision 기반 그래프 구조, 관계 방향과
 > 저장 경계를 정의하는 목표 아키텍처 계약
 
-**Status**: Target contract for implementation
+**Status**: Internal ttsc saved-lane contract implemented; LSP read-only effective overlay implemented; ttsc parity and mutating CodeAction deferred
 **Reference provider**: `ttsc` + `@ttsc/graph`
 **Compatibility target**: TypeScript 7 semantics; actual compiler version is artifact-reported provenance
 **Related roadmap**: [[Semantic Graph Spec Governance Roadmap]]
-**Last reviewed**: 2026-07-12
+**Last reviewed**: 2026-07-14
 
 ## 결정
 
@@ -1290,9 +1291,9 @@ Spec/evidence/enrichment/policy revision에도 code revision과 같은 pin/reten
 | Store | 저장 대상 | 권위 |
 | --- | --- | --- |
 | `GraphRepository` | canonical code revision, aliases, diagnostics | canonical code projection SSOT |
-| Managed spec documents | spec, obligation, decision, binding declaration | target authored spec SSOT; 현재 v1 bootstrap은 workspace JSON |
+| Managed spec documents | spec, obligation, decision, binding declaration | authored project-spec SSOT; `spec extract` projection source |
 | `SpecGraphRepository` | spec node, internal edge, binding declaration revision | compiled projection/index |
-| `AnalysisInputRevisionRepository` | evidence, enrichment, policy exact revision | 구현된 shared store kernel; P4.1 check에는 미연결, P4.5 retained input에 사용 |
+| `AnalysisInputRevisionRepository` | evidence, enrichment, policy exact revision | convention check의 선택적 exact-pin store와 retained replay input |
 | Process-local effective view | overlay, snapshot, binding resolution set | 비영속 derived value; pinned input에서 재계산 |
 | append-only result history | replay bundle, check/report/gate envelope와 exact input pin | P4.5 retained bundle recompute는 source-checkout proven; cross-repository retention pin/GC는 별도 promotion lane |
 | Legacy DB | differential baseline 및 migration 중 enrichment | 신규 kernel SSOT 아님 |

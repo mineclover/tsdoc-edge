@@ -4,6 +4,7 @@ type: architecture
 category: core
 status: active
 canonical: true
+source: src/indexer/ProjectIndexer.ts
 ---
 
 # [[ProjectIndexer]]

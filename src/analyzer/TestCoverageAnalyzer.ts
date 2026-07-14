@@ -489,8 +489,9 @@ export class TestCoverageAnalyzer {
    */
   private getImportAnalysis(testFilePath: string): ImportAnalysisResult | null {
     // Check cache first
-    if (this.importCache.has(testFilePath)) {
-      return this.importCache.get(testFilePath)!;
+    const cached = this.importCache.get(testFilePath);
+    if (cached) {
+      return cached;
     }
 
     // Read and analyze file

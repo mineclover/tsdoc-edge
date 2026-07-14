@@ -282,9 +282,11 @@ jobs:
   docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
-      - run: npm install
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+      - run: npm ci
       - run: npx tsdoc-edge build src
       - run: npx tsdoc-edge validate-docs
       - run: npx tsdoc-edge system-status --compact

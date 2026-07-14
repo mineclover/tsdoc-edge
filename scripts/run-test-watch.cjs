@@ -4,6 +4,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
+const { spawnManaged, terminateManaged } = require('./process-group.cjs');
 const { acquireTestLaneLock } = require('./test-lane-lock.cjs');
 
 const projectRoot = path.resolve(__dirname, '..');
@@ -22,6 +23,7 @@ const watchedFiles = [
   'scripts/normalize-jest-arguments.cjs',
   'scripts/run-test-js.cjs',
   'scripts/run-ttsc.cjs',
+  'scripts/process-group.cjs',
   'scripts/test-dist-manifest.cjs',
   'scripts/test-lane-lock.cjs',
 ].map((file) => path.join(projectRoot, file));
@@ -43,6 +45,7 @@ let stopped = false;
 let fingerprint = '';
 let laneLock;
 let resolveShutdown;
+let cancelTermination = () => {};
 const shutdown = new Promise((resolve) => {
   resolveShutdown = resolve;
 });
@@ -93,7 +96,7 @@ function createFingerprint() {
 
 function runChild(command, args) {
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args, {
+    const child = spawnManaged(spawn, command, args, {
       cwd: projectRoot,
       env: childEnvironment,
       stdio: 'inherit',
@@ -105,6 +108,7 @@ function runChild(command, args) {
         return;
       }
       settled = true;
+      cancelTermination();
       if (activeChild === child) {
         activeChild = undefined;
       }
@@ -165,7 +169,8 @@ function failWatch(error) {
     clearInterval(pollTimer);
   }
   if (activeChild && activeChild.exitCode === null && activeChild.signalCode === null) {
-    activeChild.kill('SIGTERM');
+    cancelTermination();
+    cancelTermination = terminateManaged(activeChild, 'SIGTERM');
   }
   completeShutdownIfIdle();
 }
@@ -201,7 +206,8 @@ function stop(signal) {
     clearInterval(pollTimer);
   }
   if (activeChild && activeChild.exitCode === null && activeChild.signalCode === null) {
-    activeChild.kill(signal);
+    cancelTermination();
+    cancelTermination = terminateManaged(activeChild, signal);
   }
   process.exitCode = signalExitCodes[signal];
   completeShutdownIfIdle();

@@ -24,7 +24,7 @@ describe('ConfigLoader', () => {
       fs.unlinkSync(configPath);
     }
     if (fs.existsSync(testDir)) {
-      fs.rmdirSync(testDir);
+      fs.rmSync(testDir, { recursive: true });
     }
   });
 
@@ -252,8 +252,8 @@ describe('ConfigLoader', () => {
       expect(loader.getConfigPath()).toBe(configPath);
 
       // Clean up
-      fs.rmdirSync(path.join(testDir, 'sub', 'nested'));
-      fs.rmdirSync(path.join(testDir, 'sub'));
+      fs.rmSync(path.join(testDir, 'sub', 'nested'), { recursive: true });
+      fs.rmSync(path.join(testDir, 'sub'), { recursive: true });
     });
 
     it('should stop searching after maximum depth', () => {
@@ -528,7 +528,7 @@ describe('ConfigLoader', () => {
       expect(loader.getConfigPath()).toBe(configPath);
       expect(loader.getConfig().project.name).toBe('parent-config');
 
-      fs.rmdirSync(childDir);
+      fs.rmSync(childDir, { recursive: true });
     });
 
     it('should find config multiple levels up', () => {
@@ -541,7 +541,7 @@ describe('ConfigLoader', () => {
       expect(loader.hasConfigFile()).toBe(true);
       expect(loader.getConfig().project.name).toBe('root-config');
 
-      fs.rmdirSync(path.join(testDir, 'a'), { recursive: true });
+      fs.rmSync(path.join(testDir, 'a'), { recursive: true });
     });
 
     it('should stop at first config file found', () => {
@@ -558,7 +558,7 @@ describe('ConfigLoader', () => {
       expect(loader.getConfigPath()).toBe(childConfigPath);
 
       fs.unlinkSync(childConfigPath);
-      fs.rmdirSync(childDir);
+      fs.rmSync(childDir, { recursive: true });
     });
 
     it('should handle root directory without config', () => {
@@ -682,7 +682,7 @@ describe('ConfigLoader', () => {
         expect(configPath).toBeNull();
       }
 
-      fs.rmdirSync(path.join(testDir, 'very'), { recursive: true });
+      fs.rmSync(path.join(testDir, 'very'), { recursive: true });
     });
 
     it('should return true when config exists', () => {

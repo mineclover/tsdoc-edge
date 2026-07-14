@@ -28,12 +28,86 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Typecheck
+        run: npm run typecheck
+
+      - name: Build
+        run: npm run build
+
+      - name: Verify runtime contract
+        run: npm run verify:runtime-contract
+
       - name: Test (${{ matrix.execution }}, attempt ${{ matrix.attempt }})
         run: npm test -- ${{ matrix.execution }}
 
+      - name: Upload test runtime diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-test-runtime-diagnostics-${{ matrix.os }}-${{ matrix.attempt }}-${{ matrix.execution == '--runInBand' && 'in-band' || 'workers-2' }}
+          path: .test-results/
+          if-no-files-found: ignore
+
+  packed-consumer-qualification:
+    runs-on: ${{ matrix.os }}
+    needs: runtime-qualification
+
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Checkout ttsc graph provider
+        uses: actions/checkout@v4
+        with:
+          repository: mineclover/ttsc-ex
+          ref: 00af8c163bd9fbe8b726a8b3a6252450f50d6274
+          path: ttsc-ex
+          submodules: recursive
+
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install ttsc graph provider dependencies
+        working-directory: ttsc-ex
+        run: npm ci
+
+      - name: Build ttsc graph provider
+        working-directory: ttsc-ex
+        run: npm run graph:router:build
+
+      - name: Build
+        run: npm run build
+
+      - name: Validate managed documentation
+        run: npm run verify:document-validation
+
+      - name: Verify C2 capability owner evidence
+        run: npm run verify:c2-capability-matrix
+
+      - name: Verify canonical graph safety
+        run: npm run verify:canonical-safety
+
+      - name: Verify packed external consumer
+        run: npm run verify:package-tarball
+
+      - name: Verify packed ttsc provider consumer
+        env:
+          TSDOC_EDGE_TTSC_ROUTER_DIR: ${{ github.workspace }}/ttsc-ex/packages/ttsc-graph-router
+        run: npm run verify:ttsc-provider-tarball
+
   release:
     runs-on: ubuntu-latest
-    needs: runtime-qualification
+    needs: [runtime-qualification, packed-consumer-qualification]
 
     steps:
       - uses: actions/checkout@v4
@@ -51,11 +125,40 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Verify release qualification wiring
+        run: npm run verify:release-qualification
+
+      - name: Verify platform toolchain
+        run: npm run verify:platform-toolchain
+
+      - name: Lint
+        run: npm run lint
+
+      - name: Validate managed documentation
+        run: npm run verify:document-validation
+
       - name: Test
-        run: npm test
+        run: npm test -- --runInBand
+
+      - name: Upload release test runtime diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: release-final-test-runtime-diagnostics
+          path: .test-results/
+          if-no-files-found: ignore
 
       - name: Verify packed external consumer
         run: npm run verify:package-tarball
+
+      - name: Verify C1 differential fixtures
+        run: npm run verify:work-context-differential
+
+      - name: Verify broader differential fixture
+        run: npm run verify:work-context-differential:broader
+
+      - name: Verify C2 capability owner evidence
+        run: npm run verify:c2-capability-matrix
 
       - name: Publish to npm
         run: npm publish

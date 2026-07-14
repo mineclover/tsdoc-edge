@@ -30,6 +30,8 @@ See ParsedDocSymbols implementation in source code.
 - **Required**: No
 - **Purpose**: Primary definition (H1 `# [[Symbol]]`)
 - **Note**: Should exist for managed docs (SSOT)
+- **Disposition**: Its optional `codeImplementation` field is `required` by default and may be
+  `not-applicable` when the document has no single implementation owner.
 
 ### auxiliaries
 - **Type**: `DocumentSymbol[]`
@@ -54,7 +56,7 @@ See ParsedDocSymbols implementation in source code.
 ### sourceFilePath
 - **Type**: `string`
 - **Required**: No
-- **Purpose**: Source file path from `**Source**: \`path\`` pattern
+- **Purpose**: Source file path from frontmatter `source` or `**Source**: \`path\`` pattern
 
 ## Usage
 
@@ -126,4 +128,3 @@ Uses [[DatabaseManager]] for sessions.
 - SymbolFootnoteRef → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:20
 - SymbolFootnoteRef → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:24
 - DocumentSymbol → /Users/junwoobang/workflow/tsdoc-edge/managed/types/DocumentSymbol.md:44
-

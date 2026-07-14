@@ -11,17 +11,31 @@ import {
   type ConventionGateDecision,
   compileConventionPackFile,
   evaluateConventionGate,
+  evaluateTtscGraphLintFile,
   loadJestJsonEvidence,
+  parseCoverageMetricThresholds,
 } from '../convention';
 import { DEFAULT_CANONICAL_GRAPH_DATABASE } from '../indexer';
+import type { CoverageMetricGateRequest } from '../metrics/CoverageMetricGate';
+import { AnalysisInputRevisionRepository } from '../storage/AnalysisInputRevisionRepository';
 import { ConventionCheckHistoryRepository } from '../storage/ConventionCheckHistoryRepository';
+import { CoverageMetricReportRepository } from '../storage/CoverageMetricReportRepository';
 import { GraphRepository } from '../storage/GraphRepository';
+import { SpecGraphRepository } from '../storage/SpecGraphRepository';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 export type { ConventionFailureThreshold, ConventionGateDecision } from '../convention';
 
 export type ConventionCheckCommandOutput = ConventionCheckResult & {
   readonly gate: ConventionGateDecision;
+  readonly inputRevisionStore?: {
+    readonly databasePath: string;
+    readonly pins: readonly {
+      readonly plane: 'evidence' | 'enrichment' | 'policy';
+      readonly workspaceId: string;
+      readonly revisionId: string;
+    }[];
+  };
 };
 
 /** Check one authored convention pack against a saved canonical graph revision. */
@@ -46,14 +60,22 @@ export class ConventionCheckCommand extends BaseCommand {
     --code-revision <id>          Exact retained code revision (default: active revision)
     --suppression-as-of <time>    RFC3339 clock required by expiring suppressions
     --expected-manifest <id>      Exact convention manifest lock for CI/release checks
+    --spec-db <file>              Use the active managed SpecGraph revision for spec/bindings
+    --coverage-report-db <file>  Source-identified coverage report DB
+    --coverage-report-id <id>    Bind one coverage report to this check
+    --coverage-gate <level>      report-only|warning|error (default: report-only)
+    --coverage-thresholds <list> metric.id=0.8,other.metric=0.9 (fraction)
     --evidence <file>             Complete Jest JSON artifact for verification bindings
+    --input-revisions-db <file>  Store exact evidence/enrichment/policy revisions
+    --graph-lint-rules <file>     Upstream ttsc graph-lint rules JSON
     --history-db <file>           Append history, or required store for --replay
     --fail-on <level>             error|warning|info|never (default: error)
     --json                        Print the complete pinned result as JSON
     --output <file>               Write JSON outside the canonical DB directory
 
   This v1 checks exact implementation/verification/constraint/governance
-  bindings plus configured naming and TSDoc tag conventions on one saved graph revision.`;
+  bindings plus configured naming, TSDoc tag, and optional ttsc graph-lint rules
+  on one saved graph revision.`;
   }
 
   async execute(args: string[]): Promise<CommandResult> {
@@ -93,7 +115,29 @@ export class ConventionCheckCommand extends BaseCommand {
       const graphDatabase = fs.realpathSync(graphDatabaseInput);
       const outputPath = this.getOption(args, '--output');
       const evidencePath = this.getOption(args, '--evidence');
+      const inputRevisionsDatabase = this.getOption(args, '--input-revisions-db');
       const historyDatabase = this.getOption(args, '--history-db');
+      const specDatabase = this.getOption(args, '--spec-db');
+      const coverageReportDatabase = this.getOption(args, '--coverage-report-db');
+      const coverageReportId = this.getOption(args, '--coverage-report-id');
+      const coverageGate = this.getOption(args, '--coverage-gate');
+      const coverageThresholdsInput = this.getOption(args, '--coverage-thresholds');
+      if (coverageGate && !isCoverageMetricGateRequest(coverageGate)) {
+        this.printError('--coverage-gate must be report-only, warning, or error');
+        return this.failure('Invalid coverage metric gate', 2);
+      }
+      if (coverageGate && !coverageReportId) {
+        this.printError('--coverage-gate requires --coverage-report-id');
+        return this.failure('Coverage report is required for coverage gate', 2);
+      }
+      if (coverageReportDatabase && !coverageReportId) {
+        this.printError('--coverage-report-db requires --coverage-report-id');
+        return this.failure('Coverage report ID is required', 2);
+      }
+      if (coverageThresholdsInput && !coverageReportId) {
+        this.printError('--coverage-thresholds requires --coverage-report-id');
+        return this.failure('Coverage report is required for coverage thresholds', 2);
+      }
       if (replayId && !historyDatabase) {
         this.printError('--replay requires --history-db <file>');
         return this.failure('Retained history database is required', 2);
@@ -104,8 +148,15 @@ export class ConventionCheckCommand extends BaseCommand {
           '--code-revision',
           '--evidence',
           '--expected-manifest',
+          '--spec-db',
+          '--coverage-report-db',
+          '--coverage-report-id',
+          '--coverage-gate',
+          '--coverage-thresholds',
           '--suppression-as-of',
           '--fail-on',
+          '--graph-lint-rules',
+          '--input-revisions-db',
         ].some((option) => this.getOption(args, option) !== undefined)
       ) {
         this.printError('--replay selects all execution inputs from retained history');
@@ -126,6 +177,15 @@ export class ConventionCheckCommand extends BaseCommand {
         const absoluteHistory = historyDatabase
           ? path.resolve(process.cwd(), historyDatabase)
           : undefined;
+        const absoluteSpec = specDatabase ? path.resolve(process.cwd(), specDatabase) : undefined;
+        const absoluteCoverageReport = coverageReportDatabase
+          ? path.resolve(process.cwd(), coverageReportDatabase)
+          : coverageReportId
+            ? path.resolve(process.cwd(), '.tsdoc/coverage-metrics.db')
+            : undefined;
+        const absoluteInputRevisions = inputRevisionsDatabase
+          ? path.resolve(process.cwd(), inputRevisionsDatabase)
+          : undefined;
         const protectedGraphPaths = [
           graphDatabaseInput,
           graphDatabase,
@@ -143,20 +203,46 @@ export class ConventionCheckCommand extends BaseCommand {
               `${absoluteHistory}-journal`,
             ]
           : [];
+        const protectedSpecPaths = absoluteSpec
+          ? [absoluteSpec, `${absoluteSpec}-wal`, `${absoluteSpec}-shm`, `${absoluteSpec}-journal`]
+          : [];
+        const protectedCoveragePaths = absoluteCoverageReport
+          ? [
+              absoluteCoverageReport,
+              `${absoluteCoverageReport}-wal`,
+              `${absoluteCoverageReport}-shm`,
+              `${absoluteCoverageReport}-journal`,
+            ]
+          : [];
+        const protectedInputRevisionPaths = absoluteInputRevisions
+          ? [
+              absoluteInputRevisions,
+              `${absoluteInputRevisions}-wal`,
+              `${absoluteInputRevisions}-shm`,
+              `${absoluteInputRevisions}-journal`,
+            ]
+          : [];
         if (
           sameFile(path.dirname(absoluteOutput), path.dirname(graphDatabase)) ||
           protectedGraphPaths.some((protectedPath) => sameFile(absoluteOutput, protectedPath)) ||
           protectedHistoryPaths.some((protectedPath) => sameFile(absoluteOutput, protectedPath)) ||
+          protectedSpecPaths.some((protectedPath) => sameFile(absoluteOutput, protectedPath)) ||
+          protectedCoveragePaths.some((protectedPath) => sameFile(absoluteOutput, protectedPath)) ||
+          protectedInputRevisionPaths.some((protectedPath) =>
+            sameFile(absoluteOutput, protectedPath)
+          ) ||
           (absolutePack !== undefined && sameFile(absoluteOutput, absolutePack))
         ) {
           const message =
-            '--output must not overwrite a canonical graph/history database, its sidecars, or the convention pack';
+            '--output must not overwrite a canonical graph/spec/coverage/history/input-revision database, its sidecars, or the convention pack';
           this.printError(message);
           return this.failure(message, 2);
         }
       }
 
       let repository: GraphRepository | undefined;
+      let specRepository: SpecGraphRepository | undefined;
+      let coverageRepository: CoverageMetricReportRepository | undefined;
       try {
         if (replayId) {
           if (!historyDatabase) return this.failure('Retained history database is required', 2);
@@ -164,7 +250,22 @@ export class ConventionCheckCommand extends BaseCommand {
           return this.replay(replayId, historyDatabase, repository, args, outputPath);
         }
         if (!packPath) return this.failure('Convention pack is required', 2);
-        const pack = compileConventionPackFile(packPath, { workspaceRoot: process.cwd() });
+        const managedSpec = specDatabase
+          ? (() => {
+              specRepository = new SpecGraphRepository(path.resolve(process.cwd(), specDatabase), {
+                readOnly: true,
+              });
+              const active = specRepository.readActiveRevision();
+              if (!active) {
+                throw new Error(`Managed spec database has no active revision: ${specDatabase}`);
+              }
+              return active;
+            })()
+          : undefined;
+        const pack = compileConventionPackFile(packPath, {
+          workspaceRoot: process.cwd(),
+          ...(managedSpec ? { managedSpec } : {}),
+        });
         const evidence = evidencePath
           ? loadJestJsonEvidence({
               artifactPath: evidencePath,
@@ -184,7 +285,45 @@ export class ConventionCheckCommand extends BaseCommand {
           this.printError(message);
           return this.failure(message, 2);
         }
+        const coverage = coverageReportId
+          ? (() => {
+              const databasePath = path.resolve(
+                process.cwd(),
+                coverageReportDatabase ?? '.tsdoc/coverage-metrics.db'
+              );
+              coverageRepository = new CoverageMetricReportRepository(databasePath, {
+                readOnly: true,
+              });
+              const report = coverageRepository.readReport({
+                workspaceId: pack.manifest.scope.workspaceId,
+                reportId: coverageReportId,
+              });
+              if (!report) {
+                throw new Error(
+                  `Coverage metric report not found: ${pack.manifest.scope.workspaceId}/${coverageReportId}`
+                );
+              }
+              return {
+                reportId: report.reportId,
+                graphRevisionId: codeRevision.metadata.revisionId,
+                graphFingerprint: codeRevision.graph.fingerprint,
+                requestedGate: (coverageGate ?? 'report-only') as CoverageMetricGateRequest,
+                metrics: report.metrics,
+                ...(coverageThresholdsInput
+                  ? { thresholds: parseCoverageMetricThresholds(coverageThresholdsInput) }
+                  : {}),
+              };
+            })()
+          : undefined;
         const governance = ConfigManager.getInstance(process.cwd()).get().specGovernance;
+        const graphLintRulesPath = this.getOption(args, '--graph-lint-rules');
+        const graphLint = graphLintRulesPath
+          ? await evaluateTtscGraphLintFile({
+              workspaceRoot: process.cwd(),
+              graph: codeRevision.graph,
+              filePath: graphLintRulesPath,
+            })
+          : undefined;
         const result = new ConventionCheckService().run({
           pack,
           codeRevision,
@@ -192,6 +331,8 @@ export class ConventionCheckCommand extends BaseCommand {
           ...(evidence ? { evidence } : {}),
           ...(governance?.naming ? { naming: governance.naming } : {}),
           ...(governance?.tsdoc ? { tsdoc: governance.tsdoc } : {}),
+          ...(graphLint ? { graphLint } : {}),
+          ...(coverage ? { coverage } : {}),
           ...(this.getOption(args, '--expected-manifest')
             ? { expectedManifestId: this.getOption(args, '--expected-manifest') }
             : {}),
@@ -200,10 +341,21 @@ export class ConventionCheckCommand extends BaseCommand {
             : {}),
         });
         const gate = evaluateConventionGate(result, failOn);
+        const inputRevisionStore = inputRevisionsDatabase
+          ? persistInputRevisions(
+              path.resolve(process.cwd(), inputRevisionsDatabase),
+              result,
+              codeRevision.graph.rootDir
+            )
+          : undefined;
         const historyId = historyDatabase
           ? appendHistory(path.resolve(process.cwd(), historyDatabase), result, gate)
           : undefined;
-        const output: ConventionCheckCommandOutput = Object.freeze({ ...result, gate });
+        const output: ConventionCheckCommandOutput = Object.freeze({
+          ...result,
+          gate,
+          ...(inputRevisionStore ? { inputRevisionStore } : {}),
+        });
         const json = JSON.stringify(output, null, 2);
         if (outputPath) {
           const absoluteOutput = path.resolve(process.cwd(), outputPath);
@@ -226,6 +378,8 @@ export class ConventionCheckCommand extends BaseCommand {
         return this.failure(normalized, 2);
       } finally {
         repository?.close();
+        specRepository?.close();
+        coverageRepository?.close();
       }
     });
   }
@@ -261,6 +415,19 @@ export class ConventionCheckCommand extends BaseCommand {
         enrichment: retained.inputs.enrichment,
         naming: retained.evaluationConfig.naming,
         tsdoc: retained.evaluationConfig.tsdoc,
+        graphLint: retained.check.graphLint,
+        ...(retained.check.coverage
+          ? {
+              coverage: {
+                reportId: retained.check.coverage.reportId,
+                graphRevisionId: retained.check.coverage.graphRevisionId,
+                graphFingerprint: retained.check.coverage.graphFingerprint,
+                requestedGate: retained.check.coverage.requestedGate,
+                metrics: retained.check.coverage.metrics.map(({ metric }) => metric),
+                thresholds: retained.check.coverage.thresholds,
+              },
+            }
+          : {}),
         ...(retained.evaluationConfig.suppressionAsOf
           ? { suppressionAsOf: retained.evaluationConfig.suppressionAsOf }
           : {}),
@@ -271,7 +438,11 @@ export class ConventionCheckCommand extends BaseCommand {
         result.conformance.reportId !== retained.check.conformance.reportId ||
         result.naming.reportId !== retained.check.naming.reportId ||
         result.tsdoc.reportId !== retained.check.tsdoc.reportId ||
-        gate.gateId !== retained.gate.gateId
+        gate.gateId !== retained.gate.gateId ||
+        result.coverage?.reportId !== retained.check.coverage?.reportId ||
+        result.coverage?.requestedGate !== retained.check.coverage?.requestedGate ||
+        JSON.stringify(result.coverage?.thresholds) !==
+          JSON.stringify(retained.check.coverage?.thresholds)
       ) {
         return this.failure(`Retained replay diverged: ${historyId}`, 2);
       }
@@ -320,6 +491,13 @@ export class ConventionCheckCommand extends BaseCommand {
     console.log(`${colors.bold}Binding set:${colors.reset} ${result.bindingResolutionSetId}`);
     console.log(`${colors.bold}Naming report:${colors.reset} ${result.naming.reportId}`);
     console.log(`${colors.bold}TSDoc report:${colors.reset} ${result.tsdoc.reportId}`);
+    console.log(`${colors.bold}Graph-lint report:${colors.reset} ${result.graphLint.reportId}`);
+    if (result.coverage) {
+      console.log(
+        `${colors.bold}Coverage report:${colors.reset} ${result.coverage.reportId} ` +
+          `(${result.coverage.requestedGate}, ${result.coverage.findings.length} finding(s))`
+      );
+    }
     console.log(`${colors.bold}Report:${colors.reset} ${result.conformance.reportId}`);
     console.log(
       `${colors.bold}Gate:${colors.reset} ${gate.gateId} (${gate.failureThreshold}, ${gate.failed ? 'failed' : 'passed'})`
@@ -369,6 +547,15 @@ export class ConventionCheckCommand extends BaseCommand {
           `${findingColor(finding.outcome)}✗ ${finding.ruleId}${colors.reset} ` +
             `[${finding.severity}] ${finding.file} → ${finding.nodeId} ` +
             `(missing ${finding.missingTags.map((tag) => `@${tag}`).join(', ')})`
+        );
+      }
+    }
+    if (result.graphLint.findings.length > 0) {
+      this.printSection('Graph-lint Findings');
+      for (const finding of result.graphLint.findings) {
+        console.log(
+          `${findingColor(finding.outcome)}✗ ${finding.ruleId}${colors.reset} ` +
+            `[${finding.severity}] ${finding.message}`
         );
       }
     }
@@ -431,16 +618,64 @@ function canonicalPathIdentity(value: string): string {
   return path.join(fs.realpathSync(existingAncestor), ...suffix);
 }
 
+function isCoverageMetricGateRequest(value: string): value is CoverageMetricGateRequest {
+  return value === 'report-only' || value === 'warning' || value === 'error';
+}
+
+function persistInputRevisions(
+  databasePath: string,
+  result: ConventionCheckResult,
+  graphRoot: string
+): NonNullable<ConventionCheckCommandOutput['inputRevisionStore']> {
+  const repository = new AnalysisInputRevisionRepository(databasePath);
+  const workspaceId = result.pack.scope.workspaceId;
+  const pins = [
+    {
+      plane: 'evidence' as const,
+      workspaceId,
+      revisionId: result.retainedInputs.evidence.revisionId,
+    },
+    {
+      plane: 'enrichment' as const,
+      workspaceId,
+      revisionId: result.retainedInputs.enrichment.revisionId,
+    },
+    {
+      plane: 'policy' as const,
+      workspaceId,
+      revisionId: result.retainedInputs.policy.revisionId,
+    },
+  ];
+  try {
+    repository.storeRevision(pins[0], result.retainedInputs.evidence);
+    repository.storeRevision(pins[1], result.retainedInputs.enrichment);
+    repository.storeRevision(pins[2], result.retainedInputs.policy);
+    return Object.freeze({
+      databasePath: path.relative(graphRoot, databasePath).split(path.sep).join('/') || '.',
+      pins: Object.freeze(pins),
+    });
+  } finally {
+    repository.close();
+  }
+}
+
 const CONVENTION_VALUE_OPTIONS = new Set([
   '--pack',
   '--graph-db',
   '--code-revision',
   '--suppression-as-of',
   '--expected-manifest',
+  '--spec-db',
+  '--coverage-report-db',
+  '--coverage-report-id',
+  '--coverage-gate',
+  '--coverage-thresholds',
   '--fail-on',
   '--output',
   '--evidence',
+  '--graph-lint-rules',
   '--history-db',
+  '--input-revisions-db',
   '--replay',
 ]);
 const CONVENTION_BOOLEAN_OPTIONS = new Set(['--json', '--help', '-h']);

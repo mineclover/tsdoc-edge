@@ -4,6 +4,7 @@ type: index
 category: primary-types
 status: active
 canonical: true
+codeImplementation: not-applicable
 ---
 
 # [[Primary Types Index]]
@@ -15,6 +16,10 @@ canonical: true
 TSDoc Edge 시스템의 주요 타입 정의를 카테고리별로 정리한 인덱스입니다. 이 타입들은 CLI 명령어, 분석 결과, 문서 구조 등을 정의합니다.
 
 **총 19개 primary 타입**
+
+Canonical primary type links: [[EnhancedSymbolDoc]], [[BaseSymbolDoc]], [[ParsedDocSymbols]],
+[[SymbolFootnoteRef]], [[MermaidExtractionResult]], [[MermaidSymbol]], [[MermaidRelationship]],
+[[DependencySpec]], [[FuturePlan]], [[ProblemSolving]], [[DecisionRecord]], [[ErrorExperience]]
 
 ---
 
@@ -79,7 +84,7 @@ TSDoc Edge의 전체 설정을 정의하는 타입.
 
 ## Documentation Types (문서 타입)
 
-### EnhancedSymbolDoc
+### [[EnhancedSymbolDoc]]
 **Path**: `EnhancedSymbolDoc.md`
 **Priority**: ⭐⭐⭐ Critical
 
@@ -97,7 +102,7 @@ TSDoc Edge의 전체 설정을 정의하는 타입.
 
 ---
 
-### BaseSymbolDoc
+### [[BaseSymbolDoc]]
 **Path**: `BaseSymbolDoc.md`
 **Priority**: ⭐⭐ High
 
@@ -114,7 +119,7 @@ TSDoc Edge의 전체 설정을 정의하는 타입.
 
 ---
 
-### ParsedDocSymbols
+### [[ParsedDocSymbols]]
 **Path**: `ParsedDocSymbols.md`
 **Priority**: ⭐⭐ High
 
@@ -129,7 +134,7 @@ TSDoc Edge의 전체 설정을 정의하는 타입.
 
 ---
 
-### SymbolFootnoteRef
+### [[SymbolFootnoteRef]]
 **Path**: `SymbolFootnoteRef.md`
 **Priority**: ⭐ Medium
 
@@ -141,7 +146,7 @@ TSDoc Edge의 전체 설정을 정의하는 타입.
 
 ## Mermaid Types (다이어그램 타입)
 
-### MermaidExtractionResult
+### [[MermaidExtractionResult]]
 **Path**: `MermaidExtractionResult.md`
 **Priority**: ⭐⭐ High
 
@@ -158,7 +163,7 @@ Mermaid 다이어그램 파싱 결과 타입.
 
 ---
 
-### MermaidSymbol
+### [[MermaidSymbol]]
 **Path**: `MermaidSymbol.md`
 **Priority**: ⭐⭐ High
 
@@ -174,7 +179,7 @@ Mermaid 다이어그램 노드 → 심볼 변환 타입.
 
 ---
 
-### MermaidRelationship
+### [[MermaidRelationship]]
 **Path**: `MermaidRelationship.md`
 **Priority**: ⭐⭐ High
 
@@ -247,7 +252,7 @@ AST 파싱 및 심볼 추출 결과 타입.
 
 ## Specification Types (명세 타입)
 
-### DependencySpec
+### [[DependencySpec]]
 **Path**: `DependencySpec.md`
 **Priority**: ⭐⭐ High
 
@@ -280,7 +285,7 @@ AST 파싱 및 심볼 추출 결과 타입.
 
 ---
 
-### FuturePlan
+### [[FuturePlan]]
 **Path**: `FuturePlan.md`
 **Priority**: ⭐ Medium
 
@@ -296,7 +301,7 @@ AST 파싱 및 심볼 추출 결과 타입.
 
 ---
 
-### ProblemSolving
+### [[ProblemSolving]]
 **Path**: `ProblemSolving.md`
 **Priority**: ⭐ Medium
 
@@ -312,7 +317,7 @@ AST 파싱 및 심볼 추출 결과 타입.
 
 ---
 
-### DecisionRecord
+### [[DecisionRecord]]
 **Path**: `DecisionRecord.md`
 **Priority**: ⭐ Medium
 
@@ -328,7 +333,7 @@ AST 파싱 및 심볼 추출 결과 타입.
 
 ---
 
-### ErrorExperience
+### [[ErrorExperience]]
 **Path**: `ErrorExperience.md`
 **Priority**: ⭐ Medium
 
@@ -453,4 +458,3 @@ Uses: DependencySpec, Functionality, FuturePlan, ProblemSolving, DecisionRecord,
 
 - [[Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/index.md:346
 - [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:416
-

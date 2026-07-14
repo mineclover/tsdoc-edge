@@ -135,20 +135,29 @@ describe('LSP canonical graph refresh boundary', () => {
     await service.refreshCanonicalGraph();
     expect(service.enableIncrementalMode()).toBe(true);
 
+    const savedRunId = service.findSymbolByName('A.run')?.id;
+    const savedBId = service.findSymbolByName('B')?.id;
+    expect(savedRunId).toBeTruthy();
+    expect(savedBId).toBeTruthy();
+    const workspaceId = path.basename(tempDir);
+    expect(savedRunId).toBe(
+      `@workspace/${encodeURIComponent(workspaceId)}/graph/ttsc%3A${encodeURIComponent(workspaceId)}/src/a.ts#A.run:method`
+    );
+
     const filePath = path.join(tempDir, 'src/a.ts');
     service.processFileChange(filePath, 'export class A {\n  run(): B { return new B(); }\n}\n');
 
-    expect(service.getSymbolAtPosition(filePath, 2, 3)?.id).toBe('src/a.ts#A.run:method');
-    expect(service.getImpactAnalysis('src/b.ts#B:class', 2)).toEqual({
+    expect(service.getSymbolAtPosition(filePath, 2, 3)?.id).toBe(savedRunId);
+    expect(service.getImpactAnalysis(savedBId!, 2)).toEqual({
       downstream: 1,
       upstream: 0,
-      symbols: ['src/a.ts#A.run:method'],
+      symbols: [savedRunId],
     });
-    expect(service.getRelatedSymbols('src/a.ts#A.run:method')).toEqual([
-      expect.objectContaining({ id: 'src/b.ts#B:class', relationshipType: 'calls' }),
+    expect(service.getRelatedSymbols(savedRunId!)).toEqual([
+      expect.objectContaining({ id: savedBId, relationshipType: 'calls' }),
     ]);
     expect(service.findSymbolByName('A.run')).toEqual(
-      expect.objectContaining({ id: 'src/a.ts#A.run:method', line: 2 })
+      expect.objectContaining({ id: savedRunId, line: 2 })
     );
   });
 
@@ -165,6 +174,9 @@ describe('LSP canonical graph refresh boundary', () => {
     await service.refreshCanonicalGraph();
     expect(service.enableIncrementalMode()).toBe(true);
 
+    const savedRunId = service.findSymbolByName('A.run')?.id;
+    expect(savedRunId).toBeTruthy();
+
     const aPath = path.join(tempDir, 'src/a.ts');
     const bPath = path.join(tempDir, 'src/b.ts');
     service.processFileChange(aPath, 'export class A {\n  run(): B { return new B(); }\n}\n');
@@ -172,11 +184,9 @@ describe('LSP canonical graph refresh boundary', () => {
 
     expect(service.getHoverInfo(aPath, 2, 3)).toContain('**Dependencies:** 0');
     expect(service.getCodeLenses(aPath)).toEqual(
-      expect.arrayContaining([
-        expect.objectContaining({ symbolId: 'src/a.ts#A.run:method', title: '↓0 ↑0' }),
-      ])
+      expect.arrayContaining([expect.objectContaining({ symbolId: savedRunId, title: '↓0 ↑0' })])
     );
-    expect(service.getRelatedSymbols('src/a.ts#A.run:method')).toEqual([]);
+    expect(service.getRelatedSymbols(savedRunId!)).toEqual([]);
   });
 
   it('does not clear a newer edit that arrives while a save refresh is running', async () => {

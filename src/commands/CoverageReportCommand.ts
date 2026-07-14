@@ -5,8 +5,20 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { ConfigManager } from '../config/ConfigManager';
+import {
+  type CanonicalDocumentationCoverageProjection,
+  projectDocumentationCoverageToCanonicalNodes,
+} from '../metrics/CanonicalCoverageProjection';
+import { createCoverageSourceIdentity } from '../metrics/CoverageMetricContract';
 import { TSDocParser } from '../parser/TSDocParser';
+import {
+  CoverageMetricReportRepository,
+  type CoverageMetricReportRevision,
+} from '../storage/CoverageMetricReportRepository';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { GraphRepository } from '../storage/GraphRepository';
+import type { DocQualityScore } from '../types/analysis';
 import type { Symbol } from '../types/graph/graph';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
@@ -36,6 +48,7 @@ interface CoverageReport {
     filePath: string;
     priority: 'high' | 'medium' | 'low';
   }>;
+  canonicalProjection?: CanonicalDocumentationCoverageProjection;
 }
 
 /**
@@ -67,12 +80,13 @@ interface CoverageReport {
  * @doc [[Coverage Report Command]]
  */
 export class CoverageReportCommand extends BaseCommand {
-  private db: DatabaseManager;
+  private db?: DatabaseManager;
+  private ownsDatabase = false;
   private parser: TSDocParser;
 
   constructor(db?: DatabaseManager) {
     super();
-    this.db = db || new DatabaseManager();
+    this.db = db;
     this.parser = new TSDocParser();
   }
 
@@ -91,7 +105,7 @@ export class CoverageReportCommand extends BaseCommand {
    * @public
    */
   getDescription(): string {
-    return 'Report @doc tag coverage for SSOT validation';
+    return 'Report @doc coverage or inspect persisted coverage metrics';
   }
 
   /**
@@ -100,12 +114,16 @@ export class CoverageReportCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge coverage-report [options]
+    return `tsdoc-edge coverage-report [list|read] [options]
 
   Options:
-    --json               Output as JSON
-    --filter=public      Show only public symbols
-    --hierarchical       Group by file hierarchy`;
+  --json               Output as JSON
+  --filter=public      Show only public symbols
+  --hierarchical       Group by file hierarchy
+  --canonical-graph-db <file>  Project documentation evidence to active ttsc graph revision
+  --workspace <id>     Workspace identity for persisted report inspection
+  --report-db <file>   Report DB for persisted report inspection (default: .tsdoc/coverage-metrics.db)
+  --report-id <id>     Exact report identity for read`;
   }
 
   /**
@@ -124,40 +142,135 @@ export class CoverageReportCommand extends BaseCommand {
       const jsonOutput = args.includes('--json');
       const filterPublic = args.includes('--filter=public');
       const hierarchical = args.includes('--hierarchical');
+      const canonicalGraphDatabase = this.getOption(args, '--canonical-graph-db');
+      const positionalArguments = this.getPositionalArgs(args);
+      const invalid = validateArguments(args, positionalArguments);
+      if (invalid) return this.failure(invalid, 2);
+      const operation = positionalArguments[0];
+
+      if (operation === 'list' || operation === 'read') {
+        return this.inspectStoredReports(operation, args);
+      }
+      if (operation) {
+        return this.failure(`Unknown coverage-report operation: ${operation}`, 2);
+      }
 
       if (!jsonOutput) {
         this.printHeader('SSOT Coverage Report');
       }
 
-      // 1. Get all symbols from DB
-      const allSymbols = await this.getAllSymbols();
+      try {
+        // 1. Get all symbols from DB
+        const allSymbols = await this.getAllSymbols();
 
-      if (allSymbols.length === 0) {
-        this.printError('No symbols found in database');
-        this.printInfo('Run: tsdoc-edge build src');
-        return this.failure('No symbols in database');
+        if (allSymbols.length === 0) {
+          this.printError('No symbols found in database');
+          this.printInfo('Run: tsdoc-edge build src');
+          return this.failure('No symbols in database');
+        }
+
+        // 2. Filter if requested
+        const symbols = filterPublic ? allSymbols.filter((s) => this.isPublicAPI(s)) : allSymbols;
+
+        // 3. Check coverage
+        const report = hierarchical
+          ? await this.generateHierarchicalReport(symbols)
+          : await this.generateReport(symbols);
+
+        const canonicalProjection = canonicalGraphDatabase
+          ? await this.generateCanonicalProjection(symbols, canonicalGraphDatabase)
+          : undefined;
+        const outputReport = canonicalProjection ? { ...report, canonicalProjection } : report;
+
+        // 4. Output
+        if (jsonOutput) {
+          console.log(JSON.stringify(outputReport, null, 2));
+        } else {
+          this.displayReport(report, hierarchical);
+          if (canonicalProjection) this.displayCanonicalProjection(canonicalProjection);
+        }
+
+        return this.success();
+      } finally {
+        this.closeOwnedDatabase();
       }
-
-      // 2. Filter if requested
-      const symbols = filterPublic ? allSymbols.filter((s) => this.isPublicAPI(s)) : allSymbols;
-
-      // 3. Check coverage
-      const report = hierarchical
-        ? await this.generateHierarchicalReport(symbols)
-        : await this.generateReport(symbols);
-
-      // 4. Output
-      if (jsonOutput) {
-        console.log(JSON.stringify(report, null, 2));
-      } else {
-        this.displayReport(report, hierarchical);
-      }
-
-      // Close database connection
-      this.db.close();
-
-      return this.success();
     });
+  }
+
+  private async inspectStoredReports(
+    operation: 'list' | 'read',
+    args: string[]
+  ): Promise<CommandResult> {
+    const config = ConfigManager.getInstance(process.cwd()).get();
+    const workspaceId =
+      this.getOption(args, '--workspace') ?? config.project?.name ?? path.basename(process.cwd());
+    const reportDatabasePath = path.resolve(
+      process.cwd(),
+      this.getOption(args, '--report-db') ?? '.tsdoc/coverage-metrics.db'
+    );
+    if (!fs.existsSync(reportDatabasePath)) {
+      const message = `Coverage report database not found: ${reportDatabasePath}`;
+      return this.operatorFailure(message, 2);
+    }
+    const reports = new CoverageMetricReportRepository(reportDatabasePath, { readOnly: true });
+    try {
+      if (operation === 'list') {
+        const pins = reports.listReportPins(workspaceId);
+        this.printStoredReportOutput(
+          {
+            operation,
+            workspaceId,
+            reportDatabasePath: relativeDatabasePath(reportDatabasePath),
+            pins,
+          },
+          args
+        );
+        return this.success(`Coverage reports listed: ${pins.length}`);
+      }
+
+      const reportId = this.getOption(args, '--report-id');
+      if (!reportId) return this.failure('--report-id is required for read', 2);
+      const report = reports.readReport({ workspaceId, reportId });
+      if (!report) return this.failure(`Coverage report not found: ${workspaceId}/${reportId}`, 2);
+      this.printStoredReportOutput(
+        {
+          operation,
+          workspaceId,
+          reportDatabasePath: relativeDatabasePath(reportDatabasePath),
+          report,
+        },
+        args
+      );
+      return this.success(`Coverage report read: ${report.reportId}`);
+    } finally {
+      reports.close();
+    }
+  }
+
+  private printStoredReportOutput(value: unknown, args: readonly string[]): void {
+    if (this.hasFlag([...args], '--json')) {
+      console.log(JSON.stringify(value, null, 2));
+      return;
+    }
+    const output = value as {
+      operation: string;
+      reportDatabasePath: string;
+      pins?: readonly unknown[];
+      report?: CoverageMetricReportRevision;
+    };
+    this.printHeader('Coverage Report');
+    console.log(`${colors.bold}Operation:${colors.reset} ${output.operation}`);
+    console.log(`${colors.bold}Database:${colors.reset} ${output.reportDatabasePath}`);
+    if (output.pins) {
+      console.log(`${colors.bold}Reports:${colors.reset} ${output.pins.length}`);
+      return;
+    }
+    if (output.report) {
+      console.log(`${colors.bold}Report:${colors.reset} ${output.report.reportId}`);
+      console.log(`${colors.bold}Source:${colors.reset} ${output.report.source.sourceIdentity}`);
+      console.log(`${colors.bold}Metrics:${colors.reset} ${output.report.metrics.length}`);
+      console.log(`${colors.bold}File metrics:${colors.reset} ${output.report.fileMetrics.length}`);
+    }
   }
 
   /**
@@ -165,11 +278,89 @@ export class CoverageReportCommand extends BaseCommand {
    */
   private async getAllSymbols(): Promise<Symbol[]> {
     try {
-      return await this.db.getAllSymbols();
+      return await this.getDatabase().getAllSymbols();
     } catch (_error) {
       // If database doesn't exist or method not available, return empty
       return [];
     }
+  }
+
+  private getDatabase(): DatabaseManager {
+    if (!this.db) {
+      this.db = new DatabaseManager();
+      this.ownsDatabase = true;
+    }
+    return this.db;
+  }
+
+  private closeOwnedDatabase(): void {
+    if (!this.ownsDatabase || !this.db) return;
+    this.db.close();
+    this.db = undefined;
+    this.ownsDatabase = false;
+  }
+
+  /** Build a canonical documentation projection from the selected graph revision. */
+  private async generateCanonicalProjection(
+    symbols: Symbol[],
+    graphDatabasePath: string
+  ): Promise<CanonicalDocumentationCoverageProjection> {
+    const repository = new GraphRepository(path.resolve(process.cwd(), graphDatabasePath), {
+      readOnly: true,
+    });
+    try {
+      const activeRevision = repository.readActiveRevision();
+      if (!activeRevision) {
+        throw new Error('Canonical graph database has no active revision');
+      }
+      const scores = await this.collectDocumentationScores(symbols);
+      const source = createCoverageSourceIdentity(
+        path.join(process.cwd(), '.tsdoc', 'coverage-report'),
+        JSON.stringify(scores),
+        {
+          adapterId: 'tsdoc-edge/coverage-report',
+          inputKind: 'legacy-database',
+          reportFormat: 'tsdoc-doc-tags',
+          workspaceId: activeRevision.graph.provenance.workspaceId,
+        }
+      );
+      return projectDocumentationCoverageToCanonicalNodes(
+        {
+          reportId: `documentation-report:${source.sourceIdentity}`,
+          source,
+          scores,
+        },
+        activeRevision.graph,
+        { graphRevisionId: activeRevision.metadata.revisionId }
+      );
+    } finally {
+      repository.close();
+    }
+  }
+
+  /** Collect the legacy @doc signal in the score shape expected by projection. */
+  private async collectDocumentationScores(symbols: Symbol[]): Promise<DocQualityScore[]> {
+    const scores: DocQualityScore[] = [];
+    for (const symbol of symbols) {
+      scores.push({
+        symbolId: symbol.id,
+        symbolName: symbol.name,
+        symbolType: symbol.type,
+        filePath: symbol.filePath,
+        line: symbol.line,
+        isPublic: symbol.isPublic,
+        hasDoc: await this.hasDocTag(symbol),
+        hasSummary: false,
+        hasCompleteParams: false,
+        hasReturns: false,
+        hasExamples: false,
+        hasCustomTags: false,
+        qualityScore: 0,
+        missing: [],
+        children: [],
+      });
+    }
+    return scores;
   }
 
   /**
@@ -496,4 +687,66 @@ export class CoverageReportCommand extends BaseCommand {
     }
     console.log();
   }
+
+  /** Display canonical projection identity and matching summary. */
+  private displayCanonicalProjection(projection: CanonicalDocumentationCoverageProjection): void {
+    this.printSection('✅ Canonical Graph Projection');
+    console.log(`Graph revision: ${colors.cyan}${projection.graphRevisionId}${colors.reset}`);
+    console.log(`Graph fingerprint: ${colors.cyan}${projection.graphFingerprint}${colors.reset}`);
+    console.log(`Documentation scores matched: ${projection.matchedScores.length}`);
+    console.log(`Unmatched scores: ${projection.unmatchedScores.length}`);
+    console.log(`Unmatched graph nodes: ${projection.unmatchedNodes.length}`);
+    console.log(`${colors.dim}Projection policy: report-only${colors.reset}`);
+  }
+}
+
+function relativeDatabasePath(databasePath: string): string {
+  return path.relative(process.cwd(), databasePath).split(path.sep).join('/') || '.';
+}
+
+const VALUE_OPTIONS = new Set([
+  '--canonical-graph-db',
+  '--workspace',
+  '--report-db',
+  '--report-id',
+]);
+const BOOLEAN_OPTIONS = new Set(['--json', '--hierarchical', '--help', '-h']);
+
+function validateArguments(
+  args: readonly string[],
+  positionalArguments: readonly string[]
+): string | undefined {
+  if (positionalArguments.length > 1) {
+    return `Unexpected coverage-report argument: ${positionalArguments[1]}`;
+  }
+
+  const seen = new Set<string>();
+  for (let index = 0; index < args.length; index += 1) {
+    const argument = args[index];
+    if (!argument.startsWith('-')) continue;
+    if (argument === '--filter=public') {
+      if (seen.has('--filter')) return 'Duplicate coverage-report option: --filter';
+      seen.add('--filter');
+      continue;
+    }
+    if (BOOLEAN_OPTIONS.has(argument)) {
+      const name = argument === '-h' ? '--help' : argument;
+      if (seen.has(name)) return `Duplicate coverage-report option: ${name}`;
+      seen.add(name);
+      continue;
+    }
+
+    const [optionName, inlineValue] = argument.split('=', 2);
+    if (!VALUE_OPTIONS.has(optionName)) {
+      return `Unknown coverage-report option: ${optionName}`;
+    }
+    if (seen.has(optionName)) return `Duplicate coverage-report option: ${optionName}`;
+    const value = inlineValue ?? args[index + 1];
+    if (!value || (!inlineValue && value.startsWith('-'))) {
+      return `Coverage-report option requires a value: ${optionName}`;
+    }
+    seen.add(optionName);
+    if (inlineValue === undefined) index += 1;
+  }
+  return undefined;
 }

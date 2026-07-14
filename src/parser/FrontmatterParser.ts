@@ -40,6 +40,13 @@ export interface FrontmatterMetadata {
   category?: 'feature' | 'guide' | 'design' | 'reference';
 
   /**
+   * Whether the document requires a code implementation connection.
+   * `not-applicable` is an explicit disposition for indexes, guides, and
+   * design documents that intentionally have no single implementation owner.
+   */
+  codeImplementation?: 'required' | 'not-applicable';
+
+  /**
    * Classification tags
    */
   tags?: string[];
@@ -214,6 +221,18 @@ export class FrontmatterParser {
       if (metadata.tsdoc && !['managed', 'example'].includes(metadata.tsdoc)) {
         errors.push(`Invalid tsdoc value: ${metadata.tsdoc} (expected "managed" or "example")`);
       }
+    }
+
+    const codeImplementation = (metadata as Record<string, unknown>).codeImplementation;
+    if (
+      codeImplementation !== undefined &&
+      codeImplementation !== 'required' &&
+      codeImplementation !== 'not-applicable'
+    ) {
+      errors.push(
+        `Invalid codeImplementation value: ${String(codeImplementation)} ` +
+          '(expected "required" or "not-applicable")'
+      );
     }
 
     return {

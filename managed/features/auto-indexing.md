@@ -4,6 +4,7 @@ version: 1.0.0
 status: active
 primary: AutoIndexing
 category: feature
+source: src/commands/IndexDocsCommand.ts
 tags:
   - automation
   - workflow
@@ -322,4 +323,3 @@ chmod +x .git/hooks/pre-commit
 - DocumentSymbolSystem → /Users/junwoobang/workflow/tsdoc-edge/managed/features/document-symbol-system.md:102
 - [[Features Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/index.md:204
 - [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:355
-

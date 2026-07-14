@@ -106,4 +106,93 @@ describe('ConventionCheckHistoryRepository', () => {
       fs.rmSync(root, { recursive: true, force: true });
     }
   });
+
+  it('protects pinned history and tombstones unpinned payloads during retention GC', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'convention-history-retention-'));
+    const historyPath = path.join(root, 'history.db');
+    const graphRepository = new GraphRepository(':memory:');
+    const history = new ConventionCheckHistoryRepository(historyPath, {
+      clock: () => new Date('2026-01-01T00:00:00.000Z'),
+    });
+    try {
+      const pack = compileConventionPackSource(fixturePackSource(), context);
+      graphRepository.replaceActiveRevision(fixtureGraph());
+      const check = new ConventionCheckService().run({
+        pack,
+        codeRevision: graphRepository.readActiveRevision()!,
+        workspaceRoot: '/fixture',
+      });
+      const evidence = createCanonicalEmptyEvidenceRevision('fixture-workspace');
+      const enrichment = createCanonicalEmptyEnrichmentRevision('fixture-workspace');
+      const stored = history.append({
+        check,
+        inputs: { evidence, enrichment, policy: pack.policy, ruleSet: pack.ruleSet },
+        pack,
+        evaluationConfig: check.retainedEvaluationConfig,
+        gate: evaluateConventionGate(check, 'error'),
+      });
+      const pin = history.pin(stored.historyId, 'release proof');
+      expect(pin.reason).toBe('release proof');
+      expect(history.listSummaries({ before: '2026-02-01T00:00:00.000Z' })).toMatchObject([
+        { historyId: stored.historyId, pinned: true },
+      ]);
+
+      const protectedRun = history.collectGarbage({
+        before: '2026-02-01T00:00:00.000Z',
+        reason: 'first pass',
+      });
+      expect(protectedRun.tombstoned).toEqual([]);
+      expect(protectedRun.skippedPinned).toHaveLength(1);
+      expect(history.read(stored.historyId)).toEqual(stored);
+
+      expect(history.unpin(stored.historyId)).toBe(true);
+      expect(history.listSummaries({ before: '2026-02-01T00:00:00.000Z' })).toMatchObject([
+        { historyId: stored.historyId, pinned: false },
+      ]);
+      const collected = history.collectGarbage({
+        before: '2026-02-01T00:00:00.000Z',
+        reason: 'release retention window',
+      });
+      expect(collected.tombstoned).toMatchObject([
+        { historyId: stored.historyId, reason: 'release retention window' },
+      ]);
+      expect(() => history.read(stored.historyId)).toThrow('is tombstoned');
+      expect(history.readTombstone(stored.historyId)).toMatchObject({
+        historyId: stored.historyId,
+        payloadDigest: expect.stringMatching(/^sha256:/),
+      });
+      expect(history.listSummaries()).toEqual([]);
+    } finally {
+      history.close();
+      graphRepository.close();
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
+
+  it('keeps read-only access compatible with pre-retention history databases', () => {
+    const root = fs.mkdtempSync(path.join(os.tmpdir(), 'convention-history-legacy-'));
+    const historyPath = path.join(root, 'history.db');
+    const database = new Database(historyPath);
+    database.exec(`
+      CREATE TABLE convention_check_history (
+        history_id TEXT PRIMARY KEY,
+        workspace_id TEXT NOT NULL,
+        check_id TEXT NOT NULL,
+        contract_version TEXT NOT NULL,
+        schema_version INTEGER NOT NULL,
+        payload_json TEXT NOT NULL
+      )
+    `);
+    database.close();
+
+    const readonly = new ConventionCheckHistoryRepository(historyPath, { readOnly: true });
+    try {
+      expect(readonly.read('missing')).toBeNull();
+      expect(readonly.listSummaries()).toEqual([]);
+      expect(readonly.readTombstone('missing')).toBeNull();
+    } finally {
+      readonly.close();
+      fs.rmSync(root, { recursive: true, force: true });
+    }
+  });
 });

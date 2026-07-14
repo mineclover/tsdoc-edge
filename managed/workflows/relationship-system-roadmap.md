@@ -2,11 +2,14 @@
 title: relationship-system-roadmap
 type: workflow
 category: workflows
-status: active
-canonical: true
+status: historical
+canonical: false
 ---
 
 # [[Relationship System Roadmap]]
+
+> Historical roadmap retained for relationship implementation context. Current metric definitions
+> and canonical graph status are maintained in [[Coverage Metrics Contract]].
 
 Implementation roadmap for TSDoc Edge's 19 relationship types across 6 categories, tracking progress from 37% to 100% completion.
 
@@ -24,6 +27,10 @@ TSDoc Edge의 연결 분류 시스템은 **19가지 relationship types**를 정�
 **semantic 카테고리**: **100% 완성** ✅
 
 본 로드맵의 Phase 1-7이 완료되었으며, 통합 분석 명령어(analyze-all)가 추가되었습니다.
+
+> **Metric status**: 이 문서의 관계 수·진척률·Quality Metrics 표는 당시 계획과 historical
+> snapshot이다. 현재 coverage 메트릭의 정의와 baseline으로 사용하지 않는다. 현재 메트릭
+> 명칭과 evidence 규칙은 [[Coverage Metrics Contract]]를 기준으로 한다.
 
 ---
 
@@ -364,6 +371,11 @@ if (process.env.NODE_ENV === 'production') {
 
 ## Metrics & KPIs
 
+이 절은 relationship-system roadmap의 historical planning KPI를 보존한다. `coverage`라는
+표현이 나오는 값은 `relationship.type` 또는 계획 수치로 해석하며, 실행률·심볼 테스트율·
+문서화율과 합산하지 않는다. 최신 측정 결과를 추가할 때는 [[Coverage Metrics Contract]]의
+metric ID와 input identity를 함께 기록한다.
+
 ### Implementation Progress
 
 | Milestone | Date | Progress | Types Completed | Notes |
@@ -566,4 +578,3 @@ Target (3 months):
 
 - [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:155
 - [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:166
-

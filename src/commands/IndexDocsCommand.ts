@@ -260,7 +260,7 @@ export class IndexDocsCommand extends BaseCommand {
         totalAux += parsed.auxiliaries.length;
         totalRefs += parsed.references.length;
 
-        // Create code connection from **Source**: pattern
+        // Create a code connection from frontmatter source or **Source**: pattern
         if (parsed.sourceFilePath && parsed.primary) {
           const conn: CodeConnection = {
             codeSymbol: parsed.primary.name,

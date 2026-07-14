@@ -117,6 +117,54 @@ tsdoc-edge build src --canonical-graph --canonical-only \
   --router-module=/path/to/ttsc-graph-router/dist/artifact-source.js
 ```
 
+The packed external saved CLI/CI pilot is available as a repeatable release-style canary:
+
+```bash
+npm run poc:ttsc-core
+```
+
+이미 현재 `dist`를 빌드한 상태라면 `npm run verify:ttsc-external-pilot`만 실행해도 된다.
+
+It installs fresh `tsdoc-edge` and graph-router tarballs into two temporary consumers, then proves
+that each consumer can build the saved canonical graph, run canonical structural analysis, produce
+canonical-only `work-context`, extract a managed spec binding, load source-mapped Jest evidence,
+load TSDoc enrichment, pass a revision-pinned convention check, and reproduce the same result
+through the packed `dist/index` public library API without creating or mutating the legacy symbol
+database. This closes the packed public-library POC. CI/release qualification also checks out and
+builds the `ttsc-ex` graph provider before running the same packed canary; the actual Node/OS matrix
+result remains a release gate.
+
+The self-repository CLI/library parity pilot is available after a canonical graph has been built:
+
+```bash
+npm run verify:ttsc-library-self
+```
+
+It uses `managed/conventions/tsdoc-edge-core.json` and the active `.tsdoc/canonical-graph.db`,
+then confirms that the CLI and the public library API produce identical check/gate identities
+without mutating the graph, registry, or legacy symbol databases.
+
+The runner-level preflight for the remaining release matrix is:
+
+```bash
+npm run verify:runtime-contract
+```
+
+It checks the declared Node 24 engine, a real `better-sqlite3` native query, and the packed file
+set. The cross-OS/worker-mode matrix still must pass in CI before stable release.
+
+The first read-only legacy differential slice is available as a versioned fixture:
+
+```bash
+npm run verify:work-context-differential
+```
+
+It restores one legacy Build database and one canonical graph in a temporary workspace, compares
+`work-context` in legacy-only and compiler-only modes, runs the legacy AST parity adapter, and
+verifies that both database planes and the registry remain byte-for-byte unchanged. This is
+intentionally a narrow C1 baseline; compiler-only output does not claim to reproduce legacy
+documentation/test enrichment, and broader capability ownership remains a later C2 gate.
+
 The legacy symbol/document/test enrichment remains available during migration,
 but the redundant second `InheritanceAnalyzer` pass has been removed. Canonical
 topology and legacy enrichment are separate data planes rather than mixed IDs.

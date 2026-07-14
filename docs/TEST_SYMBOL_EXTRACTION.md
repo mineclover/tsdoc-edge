@@ -1,6 +1,9 @@
-# Test Symbol Extraction Strategy
+# [[TEST_SYMBOL_EXTRACTION]] Test Symbol Extraction Strategy
 
 > **Purpose**: Define how test code is parsed and indexed as symbols in the TSDoc Edge system
+> **Metric status**: This document contains design history and dated measurements. The current
+> metric names, evidence rules, and baseline policy are defined in
+> `managed/features/coverage-metrics-contract.md`.
 
 ## Overview
 
@@ -386,7 +389,7 @@ function generateTestId(
 
 ## Relationships
 
-### 1. Test Coverage (`test-coverage`)
+### 1. Symbol Test Relationship Coverage (`test.symbol` / `test-coverage`)
 
 **From**: Test case → Implementation symbol
 
@@ -433,7 +436,7 @@ test('should insert symbol', () => {
 }
 ```
 
-### 3. Scenario Coverage (`covers-scenario`)
+### 3. Scenario Relationship Coverage (`test.scenario` / `covers-scenario`)
 
 **From**: Test case → Test scenario
 
@@ -734,7 +737,7 @@ describe('DatabaseManager', () => {
 - Document Relationships: 465
 - Implementation Relationships: 3,144
 
-### Coverage Analysis
+### Historical Coverage Analysis
 
 **Public Symbol Coverage**: **20.7% (103/498 symbols)**
 - Tested Classes: 103
@@ -808,9 +811,9 @@ describe('DatabaseManager', () => {
 ## Related Documentation
 
 - [[FileScanner]] - File discovery and filtering
-- [[TSDoc Symbol Parser]] - Implementation code parsing
+- [[DocumentSymbolParser]] - `[[Symbol]]` syntax parser
 - [[Symbol]] - Base symbol type
-- [[SymbolGraph]] - Symbol relationship graph
+- [[SymbolGraphBuilder]] - Symbol relationship graph builder
 - [[CODE_REFERENCE_GUIDELINES]] - How documentation references code
 
 ---

@@ -44,6 +44,17 @@ export interface AnalysisInputRevisionRepositoryOptions {
   readonly readOnly?: boolean;
 }
 
+/** Read-only metadata projection used by operator tooling. */
+export interface AnalysisInputRevisionSummary {
+  readonly plane: StoredAnalysisInputPlane;
+  readonly workspaceId: string;
+  readonly revisionId: string;
+  readonly contractVersion: string;
+  readonly contentFingerprint: string;
+  readonly repositorySchemaVersion: number;
+  readonly storedAt: string;
+}
+
 interface RevisionRow {
   plane: StoredAnalysisInputPlane;
   workspace_id: string;
@@ -163,6 +174,45 @@ export class AnalysisInputRevisionRepository {
       return row ? (this.materializeRevision(row) as AnalysisInputRevisionByPlane[Plane]) : null;
     });
     return read();
+  }
+
+  /** List immutable revision pins without selecting or creating an active pointer. */
+  listRevisionPins(
+    options: { readonly plane?: StoredAnalysisInputPlane; readonly workspaceId?: string } = {}
+  ): readonly AnalysisInputRevisionSummary[] {
+    if (options.workspaceId !== undefined) {
+      requiredText(options.workspaceId, 'analysis input revision list workspaceId');
+    }
+    const rows = this.database
+      .prepare(
+        `SELECT plane, workspace_id, revision_id, contract_version, content_fingerprint,
+                repository_schema_version, stored_at
+         FROM analysis_input_revisions
+         WHERE (? IS NULL OR plane = ?)
+           AND (? IS NULL OR workspace_id = ?)
+         ORDER BY workspace_id,
+                  CASE plane WHEN 'evidence' THEN 0 WHEN 'enrichment' THEN 1 ELSE 2 END,
+                  stored_at, revision_id`
+      )
+      .all(
+        options.plane ?? null,
+        options.plane ?? null,
+        options.workspaceId ?? null,
+        options.workspaceId ?? null
+      ) as RevisionRow[];
+    return Object.freeze(
+      rows.map((row) =>
+        Object.freeze({
+          plane: row.plane,
+          workspaceId: row.workspace_id,
+          revisionId: row.revision_id,
+          contractVersion: row.contract_version,
+          contentFingerprint: row.content_fingerprint,
+          repositorySchemaVersion: row.repository_schema_version,
+          storedAt: row.stored_at,
+        })
+      )
+    );
   }
 
   /** Close this repository connection. */

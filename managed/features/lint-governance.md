@@ -4,6 +4,7 @@ type: feature
 category: governance
 status: active
 canonical: true
+source: src/commands/LintCommand.ts
 ---
 
 # [[Lint Governance]]
@@ -34,18 +35,19 @@ and rejects a new warning category or any count above this baseline:
 
 | Rule | Maximum |
 | --- | ---: |
-| `noNonNullAssertion` | 27 |
-| `noExplicitAny` | 1 |
-| other current warning/info categories | 1–23, enforced by script |
+| `noNonNullAssertion` | 0 |
+| `noExplicitAny` | 0 |
+| other current info categories | 1–23, enforced by script |
 
 Reducing the budget is encouraged and does not require a migration exception. Increasing it needs a
 reviewed rule/contract decision and this document must be updated in the same commit.
 
-`UnifiedRelationship.properties` is the one remaining production `any`. It is a legacy dynamic
-property bus consumed by many relation analyzers with incompatible shapes. Replacing it with
-`unknown` before defining relation-kind-specific property maps would only move unsound casts into
-every consumer. Its migration must introduce discriminated property contracts and validators as a
-separate semantic-relationship checkpoint; it is not a local lint suppression.
+`UnifiedRelationship.properties` now uses the explicit `RelationshipProperties` contract from
+`src/types/relationships/unified.ts`. Known analyzer fields are typed, values are restricted to
+JSON-compatible primitives/arrays/objects, and opaque provider metadata remains `unknown` at the
+extension boundary. This removes the legacy `any` without changing the persisted relationship
+payload format; future relation-kind-specific maps can narrow the contract further when a concrete
+semantic relationship requires it.
 
 ## Commands and CI contract
 

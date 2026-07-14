@@ -58,7 +58,9 @@ See implementation: ParsedDocSymbols
 - `references`: Inline refs
 - `codeReferences`: Links to code
 - `symbolFootnoteRefs`: Symbol footnote references
-- `sourceFilePath`: From **Source**: pattern (optional)
+- `sourceFilePath`: From frontmatter `source` or **Source**: pattern (optional)
+- `codeImplementation`: Frontmatter disposition; defaults to `required` and may be
+  `not-applicable` for documents without a single implementation owner.
 
 ## Code Reference
 
@@ -120,4 +122,3 @@ Special footnote references:
 - DocumentSymbol → /Users/junwoobang/workflow/tsdoc-edge/managed/types/DocumentSymbol.md:31
 - FeatureTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/FeatureTypes.md:98
 - IdGenerator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/IdGenerator.md:79
-

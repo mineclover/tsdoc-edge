@@ -16,21 +16,38 @@ jobs:
     runs-on: ubuntu-latest
     
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '24.x'
           
       - name: Install dependencies
         run: npm ci
+
+      - name: Typecheck
+        run: npm run typecheck
         
       - name: Build
         run: npm run build
+
+      - name: Verify runtime contract
+        run: npm run verify:runtime-contract
+
+      - name: Validate managed documentation
+        run: npm run verify:document-validation
         
       - name: Run TSDoc Spec Test
         run: npx ts-node demo/tsdoc-spec-test.ts
         
       - name: Run Unit Tests
-        run: npm test
+        run: npm test -- --runInBand
+
+      - name: Upload test runtime diagnostics
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: tsdoc-spec-test-runtime-diagnostics
+          path: .test-results/
+          if-no-files-found: ignore

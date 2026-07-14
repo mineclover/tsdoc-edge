@@ -317,10 +317,13 @@ jobs:
   check:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
       - name: Build database
         run: |
-          npm install
+          npm ci
           npm run build
           node dist/cli.js build src
       - name: Check critical changes

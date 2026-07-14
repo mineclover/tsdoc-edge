@@ -44,8 +44,9 @@ export class InheritanceAnalyzer {
    */
   analyzeSymbol(symbol: Symbol): InheritanceRelationship[] {
     // Check cache
-    if (this.inheritanceCache.has(symbol.id)) {
-      return this.inheritanceCache.get(symbol.id)!;
+    const cached = this.inheritanceCache.get(symbol.id);
+    if (cached) {
+      return cached;
     }
 
     const relationships: InheritanceRelationship[] = [];

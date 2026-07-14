@@ -386,8 +386,10 @@ Examples:
       pathCounts.set(source, 1);
 
       while (queue.length > 0) {
-        const current = queue.shift()!;
-        const currentDist = distances.get(current)!;
+        const current = queue.shift();
+        if (!current) break;
+        const currentDist = distances.get(current);
+        if (currentDist === undefined) continue;
         const neighbors = outgoing.get(current) || new Set();
 
         for (const neighbor of neighbors) {

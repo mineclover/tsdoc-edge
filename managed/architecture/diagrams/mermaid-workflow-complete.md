@@ -10,6 +10,10 @@ created-at: 2025-11-08
 
 > **Visual representation of the entire .mmd → explore → promote → validate cycle**
 
+> **Historical examples**: Coverage percentages and relationship counts in this document are
+> workflow examples, not current baselines. Use [[Coverage Metrics Contract]] for current metric
+> definitions and evidence rules.
+
 ```mermaid
 graph TB
     subgraph "Phase 1: Design & Planning"

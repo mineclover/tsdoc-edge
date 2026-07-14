@@ -167,6 +167,12 @@ function validateConfig(config: NamingConventionConfig): void {
     if (rule.acronym && rule.acronym !== 'preserve' && rule.acronym !== 'normalize') {
       throw new Error(`Naming rule ${rule.id} has an invalid acronym policy`);
     }
+    if (rule.allowConstantCase !== undefined && typeof rule.allowConstantCase !== 'boolean') {
+      throw new Error(`Naming rule ${rule.id} has an invalid allowConstantCase policy`);
+    }
+    if (rule.allowPascalCase !== undefined && typeof rule.allowPascalCase !== 'boolean') {
+      throw new Error(`Naming rule ${rule.id} has an invalid allowPascalCase policy`);
+    }
   }
 }
 
@@ -296,6 +302,10 @@ function globMatches(
 function matchesStyle(subject: string, rule: NamingConventionRule): boolean {
   const bare = rule.allowLeadingUnderscore && subject.startsWith('_') ? subject.slice(1) : subject;
   if (!bare || (!rule.allowLeadingUnderscore && subject.startsWith('_'))) return false;
+  if (rule.allowConstantCase && /^[A-Z][A-Z0-9]*(?:_[A-Z0-9]+)*$/.test(bare)) return true;
+  if (rule.allowPascalCase && rule.style === 'camel' && /^[A-Z][A-Za-z0-9]*$/.test(bare)) {
+    return true;
+  }
   const base =
     rule.style === 'pascal'
       ? /^[A-Z][A-Za-z0-9]*$/

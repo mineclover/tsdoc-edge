@@ -71,7 +71,7 @@ lastUpdated: 2025-01-15
   - 연결성 점수 계산
 
 ### Strict Mode Validation
-- StrictModeValidator[^sym-003] - 엄격 모드 규칙
+- [[StrictModeValidator]] - 엄격 모드 규칙
   - Public API 필수 문서화
   - Critical 심볼 계약 필수
   - Importance 기반 필터링
@@ -204,8 +204,10 @@ jobs:
   validate:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
       - name: Install
         run: npm ci
       - name: Validate Documentation
@@ -455,4 +457,3 @@ cycle_rate = symbols_in_cycles / total_symbols
 
 - ConnectivityValidator (Connectivity) → /Users/junwoobang/workflow/tsdoc-edge/src/validator/ConnectivityValidator.ts:43
 - StrictModeValidator (StrictMode) → /Users/junwoobang/workflow/tsdoc-edge/src/validator/StrictModeValidator.ts:32
-

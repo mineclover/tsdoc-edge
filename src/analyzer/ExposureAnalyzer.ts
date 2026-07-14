@@ -256,8 +256,9 @@ export class ExposureAnalyzer {
    */
   private analyzeBarrelFile(barrelPath: string): BarrelFile {
     // Check cache
-    if (this.barrelFilesCache.has(barrelPath)) {
-      return this.barrelFilesCache.get(barrelPath)!;
+    const cached = this.barrelFilesCache.get(barrelPath);
+    if (cached) {
+      return cached;
     }
 
     const exports: BarrelExport[] = [];

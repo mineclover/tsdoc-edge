@@ -5,6 +5,7 @@ category: meta
 status: active
 canonical: true
 entrypoint: true
+codeImplementation: not-applicable
 ---
 
 # [[TSDoc Edge Documentation]]
@@ -12,6 +13,9 @@ entrypoint: true
 Complete documentation index for TSDoc Edge, the SSOT platform for tracking symbols, relationships, and dependencies in TypeScript codebases.
 
 > **SSOT Platform**: Track every symbol, relationship, and dependency in your TypeScript codebase
+
+> **Metric note**: This index contains dated documentation snapshots and example counts. Do not
+> use its coverage or health numbers as a current baseline; use [[Coverage Metrics Contract]].
 
 ## Quick Start
 
@@ -35,12 +39,14 @@ tsdoc-edge explore-entrypoint managed/relationships/index.md --detect-orphans
 
 ## Core Documentation
 
-### [[Relationship Types]] - Master Index
+### [[Relationship Types]] - Legacy Master Index
 **Path**: `managed/relationships/index.md`
 
-The single source of truth for all 17 relationship types tracked by TSDoc Edge.
+Historical inventory of the legacy relationship types tracked by TSDoc Edge. The current source
+of truth for ttsc canonical graph, convention gates and release status is
+[[Semantic Graph Spec Governance Roadmap]] plus [[Coverage Metrics Contract]].
 
-**Current Status**: 13/28 types implemented (46%)
+**Historical snapshot**: 13/28 types implemented (46%)
 - [[Code Dependency]] (`managed/relationships/CODE-DEPENDENCY.md`) - 1,968 relationships
   - Extractor: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`)
   - Commands: [[BuildCommand]] (`src/commands/BuildCommand.ts`)
@@ -56,7 +62,7 @@ The single source of truth for all 17 relationship types tracked by TSDoc Edge.
 - [[Inheritance]] (`managed/relationships/INHERITANCE.md`)
   - Extractor: [[ASTSymbolExtractor]] (`src/analyzer/ASTSymbolExtractor.ts`)
   - Storage: [[DatabaseManager]] (`src/storage/DatabaseManager.ts`)
-- [[Test Coverage]] (`managed/relationships/TEST-COVERAGE.md`)
+- [[Test Coverage]] (`managed/relationships/test-coverage.md`)
   - Analyzer: [[TestCoverageAnalyzer]] (`src/analyzer/TestCoverageAnalyzer.ts`)
   - Command: [[TestRelationshipsCommand]] (`src/commands/TestRelationshipsCommand.ts`)
 - And 4 more: [[Type Dependency]], [[Generic Constraint]], [[Interface Implementation]], [[Circular Dependency]]
@@ -68,6 +74,7 @@ Complete reference organized by category with **new LLM-friendly features**:
 
 - **Core Workflow** (8):
   - [[BuildCommand]] - Extract all symbols: `tsdoc-edge build src`
+  - [[Examples]] - Feature and workflow examples
   - [[WorkContextCommand]] - Get file context: `tsdoc-edge work-context <file>`
     - ✨ NEW: `--category` filter (documentation, structural, verification)
   - [[ExploreEntrypointCommand]] - Explore from docs: `tsdoc-edge explore-entrypoint <doc>`
@@ -88,7 +95,7 @@ Complete reference organized by category with **new LLM-friendly features**:
   - [[AnalyzeIOCommand]] - I/O dependency analysis
   - [[AnalyzeChainsCommand]] - Dependency chains
   - [[AnalyzeTypesCommand]] - Type dependencies
-  - [[AnalyzeTestsCommand]] - Test coverage mapping
+  - [[TestRelationshipsCommand]] - Test coverage mapping
   - [[DetectCircularTypesCommand]] - Circular dependency detection
 
 - **Query & Analysis** (11):
@@ -348,15 +355,20 @@ Core TypeScript interfaces used across the system:
 
 ### By Topic
 
-**Relationships**:
-- [[Relationship Types]] (`relationships/index.md`): All 17 types (SSOT) - 9.9% coverage
+**Coverage & Quality Metrics**:
+- [[Coverage Metrics Contract]] (`features/coverage-metrics-contract.md`) - 커버리지 메트릭의
+  정의, 소유자, evidence 수준, canonical graph 연계 상태
+
+**Relationships (historical inventory)**:
+- [[Relationship Types]] (`relationships/index.md`): Legacy relationship inventory; not the
+  current ttsc canonical graph status
 - Dependency Meta-Structure (`architecture/diagrams/dependency-meta-structure.mmd`): Visual taxonomy
 - Implemented (10/17):
   - [[Code Dependency]] (`relationships/CODE-DEPENDENCY.md`) - 1,968 relationships
   - [[IO Dependency]] (`relationships/IO-DEPENDENCY.md`) - 6,705 relationships
   - [[Call Relationships]] (`relationships/CALLS.md`) - 1,511 relationships
   - [[Pipeline]] (`relationships/PIPELINE.md`) - 25,809 chains
-  - [[Test Coverage]] (`relationships/TEST-COVERAGE.md`)
+  - [[Test Coverage]] (`relationships/test-coverage.md`)
   - [[Type Dependency]] (`relationships/TYPE-DEPENDENCY.md`)
   - [[Generic Constraint]] (`relationships/GENERIC-CONSTRAINT.md`)
   - [[Inheritance]] (`relationships/INHERITANCE.md`) - 57 relationships
@@ -374,10 +386,10 @@ Core TypeScript interfaces used across the system:
 
 ## Statistics
 
-**Current Status** (Dec 2025):
+**Historical catalog snapshot (Dec 2025):**
 - **Total Symbols**: 6,726
 - **Total Relationships**: 38,704
-- **Relationship Types**: 13/28 implemented (46%)
+- **Relationship Types**: 13/28 in the legacy inventory (46%)
 - **CLI Commands**: 67
 - **Test Cases**: 2,885 (100% passing)
 - **Health Score**: 74/100 (B)

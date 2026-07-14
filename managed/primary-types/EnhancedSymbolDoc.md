@@ -4,6 +4,7 @@ type: primary-type
 category: documentation
 status: active
 canonical: true
+source: src/types/tags/enhanced.ts
 ---
 
 # [[EnhancedSymbolDoc]]
@@ -533,4 +534,3 @@ console.log(validator.generateReport(result));
 - ProblemSolving → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ProblemSolving.md:37
 - ProblemSolving → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ProblemSolving.md:53
 - EnhancedTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/EnhancedTagTypes.md:121
-

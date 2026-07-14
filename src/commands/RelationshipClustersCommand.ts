@@ -316,7 +316,8 @@ Examples:
       iteration++;
 
       for (const symbol of symbols) {
-        const currentCluster = clusterAssignment.get(symbol)!;
+        const currentCluster = clusterAssignment.get(symbol);
+        if (currentCluster === undefined) continue;
         const neighbors = adjacencyMap.get(symbol) || new Map();
 
         if (neighbors.size === 0) continue;
@@ -324,7 +325,8 @@ Examples:
         // Count neighbors in each cluster
         const clusterScores = new Map<number, number>();
         for (const neighbor of neighbors.keys()) {
-          const neighborCluster = clusterAssignment.get(neighbor)!;
+          const neighborCluster = clusterAssignment.get(neighbor);
+          if (neighborCluster === undefined) continue;
           clusterScores.set(neighborCluster, (clusterScores.get(neighborCluster) || 0) + 1);
         }
 

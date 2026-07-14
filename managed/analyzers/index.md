@@ -157,10 +157,12 @@ Core components that power relationship detection, symbol extraction, and qualit
 
 ### Testing & Coverage
 
-**[[TestRelationshipAnalyzer]]** (`src/analyzer/TestRelationshipAnalyzer.ts`)
+**[[TestCoverageAnalyzer]]** (`src/analyzer/TestCoverageAnalyzer.ts`)
 - Test → implementation mapping
 - Coverage relationship tracking
 - Test gap detection
+
+Metric scope: [[Coverage Metrics Contract]] / `test.symbol` and `test.scenario`.
 
 **IntegrationCoverageCalculator** (`src/analyzer/IntegrationCoverageCalculator.ts`)
 - Integration test coverage
@@ -172,13 +174,12 @@ Core components that power relationship detection, symbol extraction, and qualit
 - Multiple format support
 - Coverage data extraction
 
-**CoverageSyncAdapter** (`src/analyzer/CoverageSyncAdapter.ts`)
-- Sync coverage data with symbol graph
-- Coverage relationship creation
+**SyncCoverageCommand** (`src/commands/SyncCoverageCommand.ts`)
+- Read and validate Istanbul/NYC coverage input
+- Full symbol/canonical graph synchronization is not implemented
 
-**[[Analyzers & Extractors]]** (`src/analyzer/IstanbulCoverageAdapter.ts`)
-- Istanbul format adapter
-- Coverage data normalization
+Istanbul data normalization is owned by `CoverageParser`; see [[Coverage Metrics Contract]] for
+the `execution.*` boundary.
 
 ---
 
@@ -223,11 +224,11 @@ tsdoc-edge analyze-io
 ```bash
 # Health report
 tsdoc-edge health src
-# Uses: CodeHealthChecker → DocumentationAnalyzer + TestCoverageAnalyzer
+# Uses: CodeHealthChecker → DocumentationAnalyzer + file-based test presence signal
 
 # Coverage analysis
 tsdoc-edge test-relationships
-# Uses: TestRelationshipAnalyzer + TestCoverageAnalyzer
+# Uses: TestRelationshipsCommand + TestCoverageAnalyzer
 ```
 
 ### 3. Validation
@@ -325,4 +326,3 @@ Storage (SQLite + JSONL)
 - Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:183
 - [[Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/index.md:349
 - [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:417
-

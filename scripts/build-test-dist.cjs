@@ -4,6 +4,7 @@
 const fs = require('node:fs');
 const path = require('node:path');
 const { spawn } = require('node:child_process');
+const { spawnManaged, terminateManaged } = require('./process-group.cjs');
 const { createTestInputDigest, writeTestDistManifest } = require('./test-dist-manifest.cjs');
 const { acquireTestLaneLock } = require('./test-lane-lock.cjs');
 
@@ -16,6 +17,7 @@ let activeChild;
 let childEnvironment = process.env;
 let forwardedSignal;
 let laneLock;
+let cancelTermination = () => {};
 
 function removeOutputDirectory() {
   if (
@@ -29,7 +31,7 @@ function removeOutputDirectory() {
 
 function compile() {
   return new Promise((resolve, reject) => {
-    const child = spawn(process.execPath, [compilerLauncher, '-p', testProject], {
+    const child = spawnManaged(spawn, process.execPath, [compilerLauncher, '-p', testProject], {
       cwd: projectRoot,
       env: childEnvironment,
       stdio: 'inherit',
@@ -41,6 +43,7 @@ function compile() {
         return;
       }
       settled = true;
+      cancelTermination();
       if (activeChild === child) {
         activeChild = undefined;
       }
@@ -63,7 +66,8 @@ function copyRuntimeAssets() {
 function forwardSignal(signal) {
   forwardedSignal = signal;
   if (activeChild && activeChild.exitCode === null && activeChild.signalCode === null) {
-    activeChild.kill(signal);
+    cancelTermination();
+    cancelTermination = terminateManaged(activeChild, signal);
   }
 }
 

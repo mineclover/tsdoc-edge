@@ -84,6 +84,32 @@ describe('GraphRepository', () => {
     expect(sidecars.map(sidecarState)).toEqual(sidecarsBefore);
   });
 
+  it('lists retained revision metadata with an explicit active marker', async () => {
+    const firstGraph = await projectGraph();
+    const first = repository.replaceActiveRevision(firstGraph);
+    const secondGraph = await projectGraph({
+      nodes: [{ id: 'src/c.ts#C:class', kind: 'class', name: 'C', file: 'src/c.ts' }],
+      edges: [],
+    });
+    const second = repository.replaceActiveRevision(secondGraph);
+
+    const summaries = repository.listRevisionSummaries();
+
+    expect(summaries.map((summary) => summary.revisionId)).toEqual([
+      second.revisionId,
+      first.revisionId,
+    ]);
+    expect(summaries.map((summary) => summary.active)).toEqual([true, false]);
+    expect(summaries[0]).toMatchObject({
+      contentFingerprint: secondGraph.fingerprint,
+      nodeCount: 1,
+      edgeCount: 0,
+      rootDir: tempDir,
+    });
+    expect(Object.isFrozen(summaries)).toBe(true);
+    expect(Object.isFrozen(summaries[0])).toBe(true);
+  });
+
   it('atomically stores and reads a complete active revision with its envelope', async () => {
     const graph = await projectGraph();
     const written = repository.replaceActiveRevision(graph);

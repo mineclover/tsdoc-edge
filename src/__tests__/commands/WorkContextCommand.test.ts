@@ -156,6 +156,39 @@ export function testFunc(): void {}
       expect(close).toHaveBeenCalledTimes(1);
     });
 
+    it('writes human-readable output to --output instead of stdout', async () => {
+      const dbManager = new DatabaseManager(dbPath);
+      dbManager.db
+        .prepare(`
+        INSERT INTO symbols (id, name, type, file_path, line, column, is_exported, is_public, created_at, updated_at, version, jsonl_line)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `)
+        .run(
+          'human-output-symbol',
+          'testFunc',
+          'function',
+          'src/TestFile.ts',
+          1,
+          0,
+          1,
+          1,
+          '2025-01-01',
+          '2025-01-01',
+          '1.0.0',
+          1
+        );
+      dbManager.close();
+
+      const outputPath = path.join(tempDir, 'context.txt');
+      const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+      const result = await command.execute(['src/TestFile.ts', '--human', '--output', outputPath]);
+
+      expect(result.exitCode).toBe(0);
+      expect(fs.readFileSync(outputPath, 'utf-8')).toContain('Work Context: TestFile.ts');
+      expect(log).not.toHaveBeenCalledWith(expect.stringContaining('Work Context: TestFile.ts'));
+    });
+
     it('should display context when file and database exist', async () => {
       // Create database
       const dbManager = new DatabaseManager(dbPath);

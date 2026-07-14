@@ -4,6 +4,7 @@ type: reference
 category: cli
 status: active
 canonical: true
+codeImplementation: not-applicable
 ---
 
 # [[Commands Index]]
@@ -50,6 +51,8 @@ Essential commands for daily usage.
 | `validate` | Generate validation report |
 | `help` | Show help message |
 
+The `help` command is implemented and maintained by [[HelpCommand]].
+
 ---
 
 ## Relationship Analysis (25 commands)
@@ -61,7 +64,7 @@ Essential commands for daily usage.
 | `analyze-calls` | Function call relationships | [[Call Relationships]] |
 | `analyze-types` | Type dependencies | [[Type Dependency]] |
 | `analyze-io` | I/O data flow | [[IO Dependency]] |
-| `analyze-tests` | Test coverage | [[Test Coverage]] |
+| [[AnalyzeTestsCommand]] (`analyze-tests`) | Test coverage | [[Test Coverage]] |
 | `analyze-chains` | Dependency chains | [[Pipeline]] |
 
 ### Behavioral Analyzers
@@ -151,6 +154,8 @@ Find and explore symbols.
 
 Manage documentation.
 
+The legacy utility command grouping is documented in [[UtilityCommands]].
+
 | Command | Description |
 |---------|-------------|
 | `index-docs` | Index document symbols |
@@ -172,9 +177,11 @@ Manage documentation.
 
 ---
 
-## Specification (8 commands)
+## Specification (10 commands)
 
 Manage specifications.
+
+The specification lifecycle command grouping is documented in [[SpecCommands]].
 
 | Command | Description |
 |---------|-------------|
@@ -183,6 +190,8 @@ Manage specifications.
 | `spec-history` | Show version history |
 | `spec-diff` | Compare versions |
 | `spec-bump` | Bump version |
+| `spec extract` | Compile authored managed specs into a saved SpecGraph revision |
+| `spec graph status\|list\|read` | Inspect saved managed SpecGraph revisions read-only |
 | `check-duplicates` | Check duplicate content |
 | `suggest` | Generate improvement suggestions |
 | `improve` | Improve documentation quality |
@@ -196,15 +205,34 @@ Apply authored spec-binding conventions to an exact saved canonical graph revisi
 | Command | Description |
 |---------|-------------|
 | `convention check --pack <file>` | Compile a convention pack, resolve exact bindings, apply suppressions, and emit a pinned report/exit code |
+| `convention inputs <list\|read>` | Read-only inspection of exact evidence, enrichment, and policy revision pins |
+| `convention retention <list\|pin\|unpin\|gc>` | Inspect exact retained histories, protect them with pins, or tombstone unpinned records before a cutoff |
 
 Use `--code-revision <id>` to replay a retained canonical revision (the active revision is the
 default), and `--expected-manifest <id>` to enforce the independently approved pack lock in CI.
 
 See [[Convention Pack Check]] for the source contract, limits, and CI exit semantics.
 
+## Canonical Graph Operations
+
+| Command | Description |
+|---------|-------------|
+| `canonical-graph status` | Show the active ttsc revision and retained count read-only |
+| `canonical-graph list` | List retained revision metadata and provenance read-only |
+| `canonical-graph read` | Read one exact retained graph revision by ID |
+
+The default database is `.tsdoc/canonical-graph.db`; use `--graph-db` to override it and
+`--json` for automation. These commands never create or update the active pointer.
+
+Retention GC requires an explicit RFC3339 `--before` cutoff. `--dry-run` opens the history database
+read-only; pinned records are visible in the candidate projection and are never tombstoned. A
+tombstone keeps the history ID, workspace/check identity, payload digest, reason and timestamp, but
+removes the retained payload. Exact replay then fails closed instead of falling back to another
+history record.
+
 ---
 
-## Code Quality (10 commands)
+## Code Quality (11 commands)
 
 Analyze code quality.
 
@@ -215,8 +243,9 @@ Analyze code quality.
 | `parallel-work` | Detect parallel development zones |
 | `without-responsibility` | Find missing @responsibility |
 | `without-contract` | Find missing contracts |
-| `coverage-report` | Coverage reporting |
+| `coverage-report [list\|read]` | Generate or inspect persisted coverage reports |
 | `sync-coverage` | Sync Istanbul coverage data |
+| `coverage-baseline save\|compare\|list\|read` | Save, compare, and inspect immutable coverage baselines |
 | `test-relationships` | Analyze test relationships |
 | `test-examples` | Extract test examples |
 | `fix` | Auto-fix common issues |

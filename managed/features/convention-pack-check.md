@@ -4,6 +4,7 @@ type: feature
 category: governance
 status: active
 canonical: true
+source: src/convention/ConventionCheckService.ts
 ---
 
 # [[Convention Pack Check]]
@@ -15,6 +16,13 @@ suppression policy, and returns a revision-pinned conformance report with a CI-u
 
 This v1 deliberately means **spec-binding conformance** plus the configured P4.2 naming and P4.3
 TSDoc-tag checks. It does not claim arbitrary formatting, layer, or general predicate DSL support.
+
+An explicit `--graph-lint-rules <file>` option adds the upstream `ttsc graph-lint` evaluator as a
+separate graph-quality plane in the same report and gate. TSDoc Edge adapts the canonical graph to
+the upstream dump contract and normalizes its rule results/findings; graph traversal and matcher
+semantics remain owned by `ttsc graph-router`. The evaluator module must be the graph-router
+package root exporting `buildGraphLintRules`, not its `artifact-source` subpath. Without the
+option, the result contains an empty graph-lint report so the convention result shape stays stable.
 
 ## Execution contract
 
@@ -31,7 +39,9 @@ Selected GraphRepository revision + compiled pack
   -> ExactBindingResolver.resolveWithDiagnostics
   -> EffectiveAnalysisService.resolveBindings
   -> ConformanceEngine.evaluate
-  -> ConventionCheckResult
+  -> optional ttsc graph-lint evaluation
+  -> optional source-identified coverage report + gate-eligibility evaluation
+  -> ConventionCheckResult + ConventionGate
 ```
 
 The transient `EffectiveAnalysisSnapshot` and `BindingResolutionSet` never leave the process.
@@ -63,25 +73,42 @@ The default graph database is `.tsdoc/canonical-graph.db`. Override it with `--g
 The v1 source is a strict workspace-local JSON document. Source anchors and extractor provenance
 are generated from the pack path and exact file digest; authors do not write compiled revision IDs.
 
-This JSON is the current standalone loop's bootstrap authored input. It owns the canary spec nodes,
-bindings, policy, and rule selection until managed-document extraction is connected; it is not the
-long-term project-spec SSOT. `ConventionPackManifest`, not the source JSON, is the compiled
-composition descriptor.
+This JSON remains a standalone/bootstrap authored input for portable convention fixtures. It may own
+canary spec nodes, bindings, policy, and rule selection, but it is not the authored project-spec
+SSOT when managed-document mode is selected. `ConventionPackManifest`, not the source JSON, is the
+compiled composition descriptor.
 
 The P4.4 target makes managed spec documents the only authored source for project spec nodes and
 bindings. The convention source then selects policy/rules and pins or is compiled with that managed
 spec revision. The same spec identity must never be authored independently in both JSON and
 Markdown. Portable convention definitions require a separate namespace and installation contract.
 
-The current compiler records the bootstrap JSON with the existing `managed-document` provenance
-variant. That is compatibility debt, not proof that Markdown extraction occurred. P4.4 must give
-bootstrap convention input and extracted managed documents distinct provenance before both sources
-can participate in one product workflow.
+Standalone bootstrap packs retain their own source provenance. Managed-document mode records the
+`managed-spec-extractor` provenance and rejects duplicate JSON spec authoring, so bootstrap input and
+extracted managed documents cannot silently participate as two authored SSOTs.
+
+The managed-spec runtime path is now available as an explicit product workflow. Keep the pack JSON
+as a policy-only source with empty `spec.nodes`, `spec.edges`, and `spec.bindings`, extract the
+configured Markdown documents, and pass the exact active SpecGraph revision to the check:
+
+```bash
+tsdoc-edge spec extract --spec-db .tsdoc/spec-graph.db
+tsdoc-edge convention check \
+  --pack managed/conventions/tsdoc-edge-core-policy.json \
+  --spec-db .tsdoc/spec-graph.db \
+  --graph-db .tsdoc/canonical-graph.db \
+  --json
+```
+
+`--spec-db` is an explicit input pin, not an implicit fallback. The compiler rejects a managed-mode
+pack that contains any JSON spec node, edge, or binding, and rejects a workspace mismatch between the
+pack scope and the extracted revision. The resulting manifest retains the managed revision identity
+and `managed-spec-extractor` provenance while policy and rule selection remain owned by the pack
+JSON. A replayed history uses the retained compiled pack and does not reread the current spec DB.
 
 Location-aware naming convention is configured separately in
-`.tsdoc.config.json#specGovernance.naming`. P4.2 provides its deterministic evaluator kernel; the
-next P4.2 commit wires its report and findings into this check/gate without making the JSON bootstrap
-an alternate naming-policy source.
+`.tsdoc.config.json#specGovernance.naming`. Its deterministic report and findings are evaluated by
+this check/gate without making the JSON bootstrap an alternate naming-policy source.
 
 ```json
 {
@@ -165,9 +192,15 @@ is rejected instead of returning a vacuous success.
 ```bash
 tsdoc-edge convention check \
   --pack managed/conventions/tsdoc-edge-core.json \
+  --graph-lint-rules managed/conventions/tsdoc-edge-graph-lint.json \
   --fail-on error \
   --output .reports/convention.json
 ```
+
+Set `TSDOC_EDGE_GRAPH_LINT_MODULE` to the built graph-router package root when it is not available
+at the default sibling checkout path. Graph-lint violations use the same `--fail-on` threshold as
+binding, naming, and TSDoc findings. Seeded violations with file anchors are also projected into
+saved file-scoped LSP diagnostics.
 
 For machine-readable stdout:
 
@@ -181,9 +214,76 @@ tsdoc-edge convention check \
 findings participate in the selected threshold; ambiguity or stale evidence is not silently treated
 as success.
 
+### Coverage metric gate
+
+An immutable, source-identified coverage report can be bound to the same saved canonical graph
+revision:
+
+```bash
+tsdoc-edge convention check \
+  --pack managed/conventions/tsdoc-edge-core-policy.json \
+  --spec-db .tsdoc/spec-graph.db \
+  --coverage-report-db .tsdoc/coverage-metrics.db \
+  --coverage-report-id coverage-report:<source-identity> \
+  --coverage-gate error \
+  --coverage-thresholds execution.line=0.8 \
+  --graph-db .tsdoc/canonical-graph.db \
+  --json
+```
+
+`report-only`, `warning`, and `error` select the requested evidence gate. `--coverage-thresholds`
+accepts a comma-separated `metric.id=fraction` list and evaluates only the explicitly named metrics.
+Direct evidence with graph identity may produce a `violated` finding when it is below the minimum;
+inferred, estimated, historical, or planned evidence remains an `indeterminate` finding. The report
+ID, graph identity, thresholds, metric decisions, and findings are retained in history, so replay
+does not reread the coverage database.
+
 `--output` uses an atomic same-directory rename for the report itself and must point outside the
 canonical graph database directory. This keeps SQLite main, WAL, SHM, and journal paths outside the
 report writer's mutation scope.
+
+### Exact input revision store
+
+For an operator-owned source-checkout database, `--input-revisions-db <file>` stores the exact
+evidence, enrichment, and policy revisions emitted by this check:
+
+```bash
+tsdoc-edge convention check \
+  --pack managed/conventions/tsdoc-edge-core-policy.json \
+  --spec-db .tsdoc/spec-graph.db \
+  --input-revisions-db .tsdoc/analysis-inputs.db \
+  --json
+```
+
+The database has no active pointer. Each row is addressed by the complete
+`plane + workspaceId + revisionId` pin, and an existing identity collision fails closed. The JSON
+result exposes the stored database path and the three pins under `inputRevisionStore`; retained
+history remains the replay authority and continues to retain its own input payloads. This option
+is an explicit persistence aid for inspection and downstream tooling, not an implicit input source
+for `--replay` or a second producer of the canonical graph.
+
+The output report cannot overwrite this database or its SQLite sidecars. If the store write fails,
+history append is not attempted for that invocation.
+
+The pointer-free store is read through the same convention command group:
+
+```bash
+tsdoc-edge convention inputs list \
+  --input-revisions-db .tsdoc/analysis-inputs.db \
+  --workspace acme-platform \
+  --json
+
+tsdoc-edge convention inputs read \
+  --input-revisions-db .tsdoc/analysis-inputs.db \
+  --plane evidence \
+  --workspace acme-platform \
+  --revision-id evidence-revision:<sha256> \
+  --json
+```
+
+`list` is metadata-only and `read` requires the complete plane/workspace/revision pin. Both
+operations open the database read-only; neither creates an active pointer or changes retained
+history.
 
 ### Source-checkout operational minimum PoC
 
@@ -279,6 +379,7 @@ The JSON result includes:
 - effective analysis view ID
 - binding resolution set ID and resolution diagnostics
 - conformance report and finding IDs
+- optional coverage report identity, graph pin, metric decisions, and gate findings
 - exact suppression evaluation clock when supplied
 - versioned gate evaluator identity, gate ID, selected failure threshold, blocking finding IDs, and
   final pass/fail decision
@@ -292,8 +393,9 @@ analysis result was converted into an exit decision.
 - The pack is an installed workspace instance, not yet a portable registry package.
 - Capability requirements consume standard `{ "status", "version" }` provider capabilities and
   normalize raw graph-router strings as complete exact versions and booleans as complete/unsupported.
-- The v1 pack compiler is a JSON bootstrap path; P4.4 managed Markdown extraction is the authority
-  transition for project spec nodes and bindings.
+- The v1 pack compiler still supports the JSON bootstrap path for compatibility. The managed runtime
+  path is the authority for project spec nodes and bindings when `--spec-db` is supplied; its policy
+  pack must leave the JSON spec arrays empty.
 - Evidence defaults to a canonical-empty revision when `--evidence` is omitted. A complete Jest JSON
   artifact can supply an in-memory revision for verification bindings. When `specGovernance.tsdoc`
   has rules, the check loads workspace-authored source into an exact `EnrichmentRevision`; bundled
@@ -303,7 +405,24 @@ analysis result was converted into an exit decision.
   check/result/gate identity. `--replay <history-id>` re-runs conformance from only that retained
   bundle and the exact graph revision; it neither reads the current pack/config nor falls back to
   the active graph. Tamper, missing input and ID divergence are exit `2`. `explain` remains follow-up.
-- LSP diagnostics and CodeAction are not connected to this check yet.
+- `convention retention` is the operator path for retained-result lifecycle. `list` exposes the
+  current view, `pin`/`unpin` protect an exact history ID, and `gc` requires an explicit RFC3339
+  cutoff. `gc --dry-run` is read-only. GC skips pinned rows and writes a versioned tombstone with
+  the original payload digest before deleting the payload; replay of a tombstoned ID fails closed.
+  Legacy history databases remain readable, but rows without the retention timestamp are not
+  eligible for automatic collection until they are rewritten by a future migration.
+- `--coverage-report-id <id>` reads one immutable source-identified report from
+  `CoverageMetricReportRepository`. Coverage gate findings are included in the normal convention
+  gate; the report is retained for replay.
+- `--input-revisions-db <file>` optionally persists the exact evidence, enrichment, and policy
+  revisions for operator inspection. It has no active pointer and is not read by retained replay;
+  the durable history envelope remains the historical authority. `convention inputs list|read`
+  provides read-only exact inspection of this auxiliary store.
+- Saved LSP diagnostics and read-only Explain/Open CodeActions project the retained convention result,
+  including graph-lint findings, when the exact canonical revision matches. Unsaved TypeScript buffers
+  already use the read-only effective overlay for navigation and impact actions, but evaluating the
+  ttsc graph-lint/spec contract against that overlay and mutating CodeAction remain deferred; CLI/CI
+  graph-lint and convention gate execution are implemented.
 
 ### Jest evidence slice
 
@@ -318,7 +437,7 @@ The normalized identity, raw-status mapping, duplicate policy, `subjectFiles`, a
 contract are owned by [[Semantic Graph Analysis and Relationship Model]]. This feature owns the
 optional CLI input, exit behavior, and report/gate handoff.
 
-`ConventionCheckService.run()` accepts one optional `EvidenceRevision`; omission keeps the current
+[[ConventionCheck]] is the authored managed-spec checkpoint for this flow. `ConventionCheckService.run()` accepts one optional `EvidenceRevision`; omission keeps the current
 canonical-empty behavior. The CLI loads the optional artifact and passes the resulting revision to
 that service without persisting it.
 

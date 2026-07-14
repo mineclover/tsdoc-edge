@@ -17,7 +17,7 @@ qualification remains pending until that matrix is green
 **Roadmap slot**: P4.0 handoff complete; P4.1 Jest JSON loader wired
 **Primary compiler**: `ttsc` + TypeScript Native 7
 **Test runner**: Jest, JavaScript execution only
-**Last reviewed**: 2026-07-12
+**Last reviewed**: 2026-07-14
 
 ## 결정
 
@@ -56,13 +56,13 @@ authority는 이 단일 경로다. 지원 runtime 자체의 qualification은 별
 ### 2026-07-11 implementation evidence
 
 - TS7 native compiler가 전체 source/test project를 no-emit 검사하고 JavaScript로 emit했다.
-- 현재 기준 217 suite/2,980 test가 parity baseline이며 실제 baseline command output을 최종
-  authority로 사용한다.
+- 2026-07-11 당시 emitted test surface는 232 suites/3,056 tests였으며 실제 command output을 최종 authority로
+  사용한다.
 - emitted CommonJS에 `transform: {}`를 사용하면 static `jest.mock()` suite가 실패했고,
   `babel-jest`를 JavaScript-only mock-hoist transform으로 적용하면 해당 canary가 통과했다.
-- JS-only lane은 217 suite/2,980 test를 in-band에서 통과했고 `maxWorkers=2`도 두 번 연속
-  같은 집합으로 통과했다. 그러나 Node 24에서는 두 실행 방식 모두 후속 native crash가
-  재현됐으므로 이 결과는 기능 parity 증거이지 runtime 안정성 증거가 아니다.
+- 당시 JS-only lane은 source-checkout에서 두 실행 방식 모두 232 suites/3,056 tests를 통과한
+  실행이 있었지만, 반복 실행에서 in-band와 `maxWorkers=2` 모두 native `SIGSEGV`가 재현됐다.
+  따라서 단일 green run은 기능 parity 증거일 뿐 runtime 안정성 증거가 아니다.
 - legacy `workerIdleMemoryLimit`는 `maxWorkers: 1`에서도 child worker를 만들 수 있어 제거했다.
   authoritative 기본은 실제 직렬 실행이며 `maxWorkers=2`는 별도 stress gate다.
 - macOS의 Node 24.14/24.18(V8 13.6)에서는 worker와 in-band 실행 모두에서 간헐적인
@@ -77,9 +77,9 @@ authority는 이 단일 경로다. 지원 runtime 자체의 qualification은 별
   수 없다. test launcher의 exec 인자를 바꾸어 우회하는 작업은 upstream runtime fix와 별도
   performance/support ADR 없이는 진행하지 않는다.
 - coverage 283개 source의 LCOV `SF:`가 모두 `src/*.ts`이며 `.test-dist` 누출은 0건이다.
-- Node 22 ABI에 맞게 `better-sqlite3`를 재빌드한 환경에서는 전체 217 suite/2,980 test가
-  통과했다. 이는 historical functionality evidence일 뿐 현재 release baseline의 qualification은
-  아니다. 검증 후 native addon은 현재 Node 24 ABI로 복원했다.
+- Node 22 ABI에 맞게 `better-sqlite3`를 재빌드한 환경에서 전체 suite가 통과한 기록은
+  historical functionality evidence일 뿐 현재 release baseline의 qualification은 아니다.
+  검증 후 native addon은 현재 Node 24 ABI로 복원했다.
 - package와 CI baseline은 Node `>=24.0.0 <25.0.0`이다. PR CI와 tag-release workflow는 clean
   `npm ci` 뒤 Ubuntu/macOS 각각에서 `--runInBand`와 `--maxWorkers=2`를 두 번씩 실행한다.
   tag release는 이 matrix가 모두 통과해야 publish job을 시작한다. release 전에는 packed tarball을
@@ -98,6 +98,11 @@ authority는 이 단일 경로다. 지원 runtime 자체의 qualification은 별
   compile coordinator에만 전달하고 Jest/test subprocess에서는 제거한다.
 - 성공한 compile은 source/config input digest와 emitted output digest/count를 completion
   manifest에 기록한다. `test:run`은 manifest가 없거나 stale/partial이면 Jest를 시작하지 않는다.
+- `test:run`이 Jest를 non-zero exit 또는 native signal로 종료하면 `.test-results/`에
+  `tsdoc-edge/test-runtime-failure` envelope를 남긴다. envelope에는 exact Jest command,
+  exit/signal, Node/V8/ABI와 재실행 명령이 포함되며 PR/release workflow가 이를 artifact로
+  보존한다. 이는 runtime workaround가 아니라 native-crash 원인과 runner 환경을 분리하기 위한
+  진단 경로다.
 
 ## 목표 흐름
 
@@ -145,6 +150,7 @@ flowchart LR
 | `scripts/build-test-dist.cjs` | `.test-dist` 정리, ttsc 실행, runtime asset 복사 |
 | `scripts/run-test-lane.cjs` | typecheck → compile → Jest orchestration과 CLI 인자 전달 |
 | `scripts/run-test-js.cjs` | compiled output runner와 lane lock |
+| `scripts/process-group.cjs` | orchestration boundary의 process group과 bounded signal escalation |
 | `scripts/run-test-watch.cjs` | source/config polling 뒤 compile → Jest 직렬 재실행 |
 | `scripts/test-dist-manifest.cjs` | input/output digest와 completion manifest 검증 |
 | `scripts/test-lane-lock.cjs` | compile부터 Jest 종료까지 shared output의 single-writer 보장 |
@@ -290,7 +296,8 @@ gate를 통과한 경우에만 다른 provider 변경을 별도 결정한다.
 6. 향후 ttsc watcher가 resolved `outDir`를 제외하면 persistent compiler + `jest --watchAll`
    구조를 다시 검토한다. 현재 경로는 TS5나 SWC로 fallback하지 않는다.
 7. PID-targeted CI termination에서 nested native child까지 bounded escalation하는 process-group
-   처리는 clean-install CI job과 함께 남은 release hardening으로 추적한다.
+   처리는 `scripts/process-group.cjs`와 orchestration smoke로 구현했다. clean-install CI job의
+   실제 native-crash-free matrix qualification은 별도 release gate로 남긴다.
 
 ### Checkpoint 6 — Cutover
 
@@ -366,11 +373,29 @@ Cutover 전 rollback은 기본 `npm test`를 그대로 유지하는 것이다. C
 - [x] full suite의 pass/fail/skip 집합이 legacy baseline과 일치한다.
 - [x] module mock, global setup, SQLite schema, fixture/cwd canary가 모두 통과한다.
 - [x] stack trace와 coverage가 원본 TypeScript source로 매핑된다.
-- [x] `maxWorkers=2`에서 동일 217 suite/2,980 test 집합이 두 번 연속 통과했다.
+- [x] `--runInBand`와 `maxWorkers=2`에서 동일 236 suite/3,080 test 집합이 각각 두 번 연속
+      native crash 없이 통과한다.
+- [x] 최신 로컬 15-step release preflight는 Jest `silent`와 `workerIdleMemoryLimit: 256MB`
+      설정, parser source 연결과 document disposition 계약 변경 뒤 in-band/worker-2 각각
+      236 suites/3,080 tests를 통과했다. contract `1.2` evidence는
+      `.test-results/release-preflight-35241.json`에
+      저장됐지만, 이는 local
+      macOS arm64의 단일 실행 증거다. 외부 Ubuntu/macOS × 두 실행 방식 × 두 반복 matrix와
+      clean-install native-crash-free 반복 조건은 아직 실행되지 않았다.
+- [x] `npm run verify:release-preflight-repeat`가 동일 local runtime에서 두 preflight
+      envelope를 연속으로 통과했다. 최신 summary는
+      `.test-results/release-preflight-repeat-1783991103596-69830.json`이며, 이는 local
+      macOS arm64 proof다. 외부 Ubuntu/macOS × 두 실행 방식 × 두 반복 matrix는 별도 gate다.
 - [x] conservative compiled-output watch smoke가 통과한다.
 - [x] incomplete/stale/tampered `.test-dist`는 `test:run` 전에 거부된다.
+- [x] ttsc/Jest nested child는 orchestration process group을 공유하고 SIGINT/SIGTERM 뒤 bounded
+  `SIGKILL` escalation으로 고아 프로세스를 남기지 않는다.
 - [ ] Node 24 engines/native dependency 계약에서 worker/in-band 반복 clean-install matrix를
       native crash 없이 통과한다.
+- [ ] `npm run verify:external-release-matrix -- --run-id <run-id> --sha <candidate-sha>`가
+      8개 matrix job과 `publish-check`를 모두 성공으로 판정한다.
+- [ ] 외부 matrix evidence를 전달한 `verify:c2-capability-matrix`가
+      `ownerPromotionEligible: true`를 산출한다.
 - [x] `npm test`가 typecheck → compile → run 순서로 fail-fast 실행된다.
 - [x] `ts-jest`와 parity-only legacy lane이 dependency/config/script에서 제거된다.
 - [x] `.test-dist`와 local result artifact가 clean Git status를 오염시키지 않는다.

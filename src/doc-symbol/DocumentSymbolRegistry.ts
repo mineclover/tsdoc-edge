@@ -42,6 +42,7 @@ import type {
  */
 export class DocumentSymbolRegistry {
   private definitions: Map<string, DocumentSymbol> = new Map();
+  private externalDefinitions: Set<string> = new Set();
   private auxiliaries: Map<string, DocumentSymbol[]> = new Map();
   private references: Map<string, DocumentSymbol[]> = new Map();
   private codeConnections: Map<string, CodeConnection[]> = new Map();
@@ -68,6 +69,23 @@ export class DocumentSymbolRegistry {
     for (const ref of symbols.references) {
       this.registerReference(ref);
     }
+  }
+
+  /**
+   * Register a primary definition owned by another document tree.
+   *
+   * Cross-tree validation uses this for canonical definitions from `managed/`
+   * while validating references in `docs/`. The external document's own
+   * references and warnings stay outside the target validation scope.
+   *
+   * @param symbol - Canonical primary definition to make resolvable
+   * @returns void
+   * @public
+   */
+  registerKnownPrimaryDefinition(symbol: DocumentSymbol): void {
+    if (this.definitions.has(symbol.name)) return;
+    this.definitions.set(symbol.name, symbol);
+    this.externalDefinitions.add(symbol.name);
   }
 
   /**
@@ -211,6 +229,7 @@ export class DocumentSymbolRegistry {
 
     // Check for unused definitions
     for (const [name, definition] of this.definitions.entries()) {
+      if (this.externalDefinitions.has(name)) continue;
       const refs = this.references.get(name) || [];
       const codeConns = this.codeConnections.get(name) || [];
 
@@ -245,9 +264,10 @@ export class DocumentSymbolRegistry {
     const skipCodeImplDirs = config.validation?.skipCodeImplDirs || [];
 
     for (const [name, definition] of this.definitions.entries()) {
+      if (this.externalDefinitions.has(name)) continue;
       const codeConns = this.codeConnections.get(name) || [];
 
-      if (codeConns.length === 0) {
+      if (codeConns.length === 0 && definition.codeImplementation !== 'not-applicable') {
         // Skip warning if file is in a skipCodeImplDirs directory
         const pathParts = definition.filePath.split('/');
         const isSkipped = skipCodeImplDirs.some((dir) => pathParts.includes(dir));

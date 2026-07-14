@@ -4,6 +4,7 @@ type: index
 category: utilities
 status: active
 canonical: true
+codeImplementation: not-applicable
 ---
 
 # [[Utilities Index]]
@@ -15,6 +16,9 @@ canonical: true
 TSDoc Edge 시스템의 유틸리티 모듈을 기능별로 정리한 인덱스입니다. 각 유틸리티는 특정 기능(그래프 구축, 검증, 생성 등)을 캡슐화합니다.
 
 **총 18개 유틸리티**
+
+Canonical utility links: [[SymbolSearchEngine]], [[ConnectivityValidator]], [[MermaidGenerator]],
+[[IdGenerator]], [[UsageTracker]], [[FileScanner]], [[ConfigLoader]]
 
 ---
 
@@ -39,7 +43,7 @@ TSDoc Edge 시스템의 유틸리티 모듈을 기능별로 정리한 인덱스�
 
 ---
 
-### SymbolSearchEngine
+### [[SymbolSearchEngine]]
 **Path**: `SymbolSearchEngine.md`
 **Priority**: ⭐⭐⭐ Critical
 
@@ -81,7 +85,7 @@ TSDoc Edge 시스템의 유틸리티 모듈을 기능별로 정리한 인덱스�
 
 ---
 
-### ConnectivityValidator
+### [[ConnectivityValidator]]
 **Path**: `ConnectivityValidator.md`
 **Priority**: ⭐⭐ High
 
@@ -203,7 +207,7 @@ TSDoc Edge 시스템의 유틸리티 모듈을 기능별로 정리한 인덱스�
 
 ## Generator Utilities (생성 관련)
 
-### MermaidGenerator
+### [[MermaidGenerator]]
 **Path**: `MermaidGenerator.md`
 **Priority**: ⭐⭐ High
 
@@ -221,7 +225,7 @@ Mermaid 다이어그램 생성 유틸리티.
 
 ---
 
-### IdGenerator
+### [[IdGenerator]]
 **Path**: `IdGenerator.md`
 **Priority**: ⭐⭐ High
 
@@ -278,7 +282,7 @@ Mermaid 다이어그램 생성 유틸리티.
 
 ---
 
-### UsageTracker
+### [[UsageTracker]]
 **Path**: `UsageTracker.md`
 **Priority**: ⭐ Medium
 
@@ -296,7 +300,7 @@ Mermaid 다이어그램 생성 유틸리티.
 
 ## Scanning Utilities (스캔 관련)
 
-### FileScanner
+### [[FileScanner]]
 **Path**: `FileScanner.md`
 **Priority**: ⭐⭐⭐ Critical
 
@@ -314,7 +318,7 @@ Mermaid 다이어그램 생성 유틸리티.
 
 ## Configuration Utilities (설정 관련)
 
-### ConfigLoader
+### [[ConfigLoader]]
 **Path**: `ConfigLoader.md`
 **Priority**: ⭐⭐⭐ Critical
 
@@ -467,4 +471,3 @@ DatabaseManager
 
 - [[Primary Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/index.md:402
 - [[Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/index.md:347
-

@@ -1,0 +1,40 @@
+{
+  "rules": [
+    {
+      "id": "canonical-indexer-index-must-assemble-nodes",
+      "description": "Canonical indexing must assemble nodes from the provider snapshot.",
+      "severity": "error",
+      "seed": {
+        "ids": ["src/indexer/ProjectIndexer.ts#ProjectIndexer.index:method"]
+      },
+      "requireWithin": {
+        "depth": 1,
+        "direction": "forward",
+        "match": {
+          "ids": ["src/indexer/ProjectIndexer.ts#ProjectIndexer.assembleNodes:method"]
+        }
+      },
+      "traversal": {
+        "edgeKinds": ["calls"]
+      }
+    },
+    {
+      "id": "canonical-indexer-index-must-assemble-edges",
+      "description": "Canonical indexing must assemble graph edges from the provider snapshot.",
+      "severity": "error",
+      "seed": {
+        "ids": ["src/indexer/ProjectIndexer.ts#ProjectIndexer.index:method"]
+      },
+      "requireWithin": {
+        "depth": 1,
+        "direction": "forward",
+        "match": {
+          "ids": ["src/indexer/ProjectIndexer.ts#ProjectIndexer.assembleEdges:method"]
+        }
+      },
+      "traversal": {
+        "edgeKinds": ["calls"]
+      }
+    }
+  ]
+}

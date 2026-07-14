@@ -138,6 +138,74 @@ export interface RelationshipEvidence {
   context?: string;
 }
 
+/** JSON-compatible values used by relationship-specific metadata. */
+export type RelationshipPropertyValue =
+  | string
+  | number
+  | boolean
+  | null
+  | RelationshipPropertyValue[]
+  | { readonly [key: string]: RelationshipPropertyValue | undefined }
+  | Readonly<Record<string, unknown>>;
+
+/**
+ * Type-specific relationship metadata.
+ *
+ * The index signature keeps the legacy 28-type relationship surface
+ * forward-compatible while the known fields provide compiler-checked
+ * contracts to current analyzers and query consumers.
+ */
+export interface RelationshipProperties {
+  readonly [key: string]: RelationshipPropertyValue | undefined;
+  readonly baseType?: string;
+  readonly boundaryType?: string;
+  readonly callType?: string;
+  readonly composedType?: string;
+  readonly composerName?: string;
+  readonly consumerPattern?: string;
+  readonly context?: string;
+  readonly cycleLength?: number;
+  readonly cyclePath?: string[];
+  readonly dataType?: string;
+  readonly detectionMethod?: string;
+  readonly direction?: string;
+  readonly domain?: string;
+  readonly eventName?: string;
+  readonly evidenceType?: string;
+  readonly fallback?: string;
+  readonly feature?: string;
+  readonly featureName?: string;
+  readonly frequency?: number;
+  readonly fromLayer?: string;
+  readonly fromModule?: string;
+  readonly groupSize?: number;
+  readonly inferred?: boolean;
+  readonly inheritanceType?: string;
+  readonly involvedSymbols?: string[];
+  readonly isArray?: boolean;
+  readonly isProblematic?: boolean;
+  readonly isViolation?: boolean;
+  readonly partCount?: number;
+  readonly participantA?: string;
+  readonly participantB?: string;
+  readonly pattern?: string;
+  readonly primary?: string;
+  readonly producerPattern?: string;
+  readonly propertyName?: string;
+  readonly relationDescription?: string;
+  readonly relationshipType?: string;
+  readonly reverseOf?: string;
+  readonly riskLevel?: string;
+  readonly section?: string;
+  readonly targetName?: string;
+  readonly testFile?: string;
+  readonly testName?: string;
+  readonly toLayer?: string;
+  readonly toModule?: string;
+  readonly totalImplementations?: number;
+  readonly verificationStrength?: number | string;
+}
+
 /**
  * Unified Relationship
  * Represents any type of connection between symbols
@@ -201,7 +269,7 @@ export interface UnifiedRelationship {
    * - collaboration: { role: 'payment-processor' }
    * - feature-grouping: { featureName: 'Authentication' }
    */
-  properties: Record<string, any>;
+  properties: RelationshipProperties;
 
   // ===== Metadata =====
   /** Creation timestamp */

@@ -110,7 +110,7 @@ const specificSymbols = db.db.prepare(specificFileQuery).all() as Array<{
   type: string;
 }>;
 console.log(`   Found ${specificSymbols.length} symbols`);
-specificSymbols.slice(0, 10).forEach(({ id, name, type }) => {
+specificSymbols.slice(0, 10).forEach(({ name, type }) => {
   console.log(`   [${type.padEnd(15)}] ${name}`);
 });
 

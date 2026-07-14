@@ -51,6 +51,10 @@ Work Context: UserService.ts
   • 2 test files cover this code
 ```
 
+The `Test Coverage` line in this illustrative output refers to test-to-symbol relationship
+coverage. It is not Istanbul line/function/branch execution coverage; see the
+[Coverage Metrics Contract](managed/features/coverage-metrics-contract.md).
+
 Now you know exactly what you're touching before making any changes.
 
 ---
@@ -87,6 +91,11 @@ The `work-context` command provides everything you need before modifying code:
 | Quality Check | `lint` | Code health, docs, tests, relationships |
 | Documentation | `index-docs managed` | Index `[[Symbol]]` references |
 | Convention Check | `convention check --pack <file>` | Check exact spec bindings with policy and suppressions |
+| Convention Inputs | `convention inputs list|read` | Inspect exact evidence, enrichment, and policy pins read-only |
+| Canonical Graph | `canonical-graph status|list|read` | Inspect saved ttsc graph revisions and provenance read-only |
+| Spec Graph | `spec graph status|list|read` | Inspect saved managed SpecGraph revisions read-only |
+| Coverage Report | `coverage-report list|read` | Inspect persisted source-identified coverage reports read-only |
+| Coverage Baseline | `coverage-baseline save|compare|list|read` | Persist, compare, and inspect immutable metric baselines |
 
 ---
 
@@ -96,7 +105,7 @@ The `work-context` command provides everything you need before modifying code:
 Every function, class, interface is tracked as a node with relationships:
 - **code-dependency**: Import/usage relationships
 - **io-dependency**: Data flow (parameters, returns)
-- **test-coverage**: Test file relationships
+- **test-coverage**: Test file → implementation relationships
 - **calls**: Function call graph
 
 ### Document Symbols
@@ -160,6 +169,22 @@ graph-router, including exact replay and the `0/1/2` exit canaries:
 ```bash
 npm run poc:convention
 ```
+
+To apply explicit upstream `ttsc graph-lint` rules to the same convention gate:
+
+```bash
+export TSDOC_EDGE_GRAPH_LINT_MODULE=/path/to/ttsc-graph-router/dist/index.js
+tsdoc-edge convention check \
+  --pack managed/conventions/tsdoc-edge-core.json \
+  --graph-lint-rules managed/conventions/tsdoc-edge-graph-lint.json \
+  --fail-on error
+npm run poc:graph-lint
+```
+
+The configured module must be the graph-router package root, which exports
+`buildGraphLintRules`; `artifact-source` is the raw graph artifact adapter and does not provide
+the lint evaluator. Graph-lint findings are projected into the convention report and gate without
+duplicating the upstream traversal algorithm.
 
 This command requires the built sibling `ttsc-ex` graph-router by default, or an explicit
 `TSDOC_EDGE_GRAPH_ROUTER_MODULE`. The proof command and its authored convention pack are repository
@@ -294,6 +319,17 @@ collision-safe legacy aliases, and diagnostics plane are atomically replaced in
 `.tsdoc/canonical-graph.db`; canonical IDs are never mixed into the legacy symbol
 tables. Existing schema-v1 canonical databases remain readable and are promoted
 transactionally on the next refresh.
+
+Operators can inspect the saved graph without loading the router or opening a writer:
+
+```bash
+tsdoc-edge canonical-graph status --graph-db .tsdoc/canonical-graph.db --json
+tsdoc-edge canonical-graph list --graph-db .tsdoc/canonical-graph.db --json
+tsdoc-edge canonical-graph read --graph-db .tsdoc/canonical-graph.db --revision-id <revision-id> --json
+```
+
+These operations expose the active marker, retained revision metadata, provenance, and exact
+graph payload while keeping the SQLite database read-only.
 
 Build, structural analysis, and LSP saved-file refresh share the same
 `ProjectIndexer -> GraphRepository` boundary. LSP reads canonical impact,

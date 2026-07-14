@@ -4,6 +4,7 @@ type: index
 category: architecture
 status: active
 canonical: true
+codeImplementation: not-applicable
 ---
 
 # [[Core Systems]]

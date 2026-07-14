@@ -6,6 +6,7 @@ status: active
 canonical: true
 entrypoint: true
 updated: 2025-12-27
+codeImplementation: not-applicable
 ---
 
 # [[TSDoc Edge User Guide]]

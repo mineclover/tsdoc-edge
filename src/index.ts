@@ -14,7 +14,7 @@ import { ConventionValidator } from './validator/ConventionValidator';
 export { CallGraphAnalyzer } from './analyzer/CallGraphAnalyzer';
 // Analyzer exports
 export { CodeHealthChecker } from './analyzer/CodeHealthChecker';
-export { CoverageParser } from './analyzer/CoverageParser';
+export { type CoverageParseResult, CoverageParser } from './analyzer/CoverageParser';
 export { DependencyChainAnalyzer } from './analyzer/DependencyChainAnalyzer';
 export { DocumentationAnalyzer } from './analyzer/DocumentationAnalyzer';
 export { ImportanceClassifier } from './analyzer/ImportanceClassifier';
@@ -71,6 +71,10 @@ export * from './indexer';
 // Linking exports
 export { DocCodeLinker } from './linking/DocCodeLinker';
 export { LinkValidator } from './linking/LinkValidator';
+export * from './metrics/CanonicalCoverageProjection';
+export * from './metrics/CoverageMetricBaseline';
+export * from './metrics/CoverageMetricContract';
+export * from './metrics/CoverageMetricGate';
 export type {
   ExtractedEnhancedDoc,
   ExtractionOptions,
@@ -86,6 +90,8 @@ export * from './semantic-graph';
 // Versioned specification graph contracts
 export * from './spec-graph';
 export * from './storage/AnalysisInputRevisionRepository';
+export * from './storage/CoverageMetricBaselineRepository';
+export * from './storage/CoverageMetricReportRepository';
 // Storage exports
 export { DatabaseManager } from './storage/DatabaseManager';
 export * from './storage/GraphRepository';

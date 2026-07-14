@@ -35,6 +35,21 @@ export interface SpecGraphRepositoryReplaceOptions {
   readonly expectedActiveRevisionId?: string | null;
 }
 
+/** Read-only operator projection for one retained specification graph revision. */
+export interface SpecGraphRevisionSummary {
+  readonly revisionId: string;
+  readonly contentFingerprint: string;
+  readonly contractVersion: string;
+  readonly workspaceId: string;
+  readonly repositorySchemaVersion: number;
+  readonly nodeCount: number;
+  readonly edgeCount: number;
+  readonly bindingCount: number;
+  readonly provenance: SpecGraphRevision['provenance'];
+  readonly storedAt: string;
+  readonly active: boolean;
+}
+
 /** Raised when another process changes the active spec revision first. */
 export class SpecGraphRepositoryConflictError extends Error {
   constructor(
@@ -216,6 +231,41 @@ export class SpecGraphRepository {
       return row ? this.materializeRevision(row) : null;
     });
     return read();
+  }
+
+  /** List retained revision metadata without changing the active pointer. */
+  listRevisionSummaries(): readonly SpecGraphRevisionSummary[] {
+    const read = this.database.transaction(() => {
+      const rows = this.database
+        .prepare(
+          `SELECT revision.*, state.active_revision_id AS current_active_revision_id
+           FROM spec_graph_revisions AS revision
+           LEFT JOIN spec_graph_state AS state ON state.singleton = 1
+           ORDER BY CASE
+                      WHEN revision.revision_id = state.active_revision_id THEN 0
+                      ELSE 1
+                    END,
+                    revision.stored_at, revision.revision_id`
+        )
+        .all() as Array<RevisionRow & { current_active_revision_id?: string }>;
+      return rows.map((row) => {
+        const revision = this.materializeRevision(row);
+        return deepFreeze({
+          revisionId: revision.revisionId,
+          contentFingerprint: revision.contentFingerprint,
+          contractVersion: revision.contractVersion,
+          workspaceId: revision.workspaceId,
+          repositorySchemaVersion: row.repository_schema_version,
+          nodeCount: revision.nodes.length,
+          edgeCount: revision.edges.length,
+          bindingCount: revision.bindings.length,
+          provenance: revision.provenance,
+          storedAt: row.stored_at,
+          active: row.revision_id === row.current_active_revision_id,
+        });
+      });
+    });
+    return deepFreeze(read());
   }
 
   /** Close the isolated SQLite connection. */

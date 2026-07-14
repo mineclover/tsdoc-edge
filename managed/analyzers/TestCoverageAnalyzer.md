@@ -14,6 +14,11 @@ canonical: true
 
 Analyze test coverage patterns and gaps.
 
+**Metric contract**: [[Coverage Metrics Contract]] / `test.symbol` and `test.scenario`.
+
+이 analyzer의 결과는 테스트 케이스와 구현 심볼의 관계 추정이다. Istanbul line/function/branch
+실행률이 아니며, 현재 canonical `ttsc` graph metric으로 저장되지 않는다.
+
 ## Analysis
 
 Measures:

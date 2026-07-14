@@ -219,7 +219,11 @@ export class SymbolQueryCommand extends BaseCommand {
         references: [],
       });
     }
-    return this.symbols.get(name)!;
+    const symbol = this.symbols.get(name);
+    if (!symbol) {
+      throw new Error(`Unable to create symbol: ${name}`);
+    }
+    return symbol;
   }
 
   /**
@@ -494,7 +498,8 @@ export class SymbolQueryCommand extends BaseCommand {
     }
 
     for (const name of similar) {
-      const info = this.symbols.get(name)!;
+      const info = this.symbols.get(name);
+      if (!info) continue;
       const status = info.primary ? '✅' : '❌';
 
       console.log(`  ${status} [[${name}]]`);

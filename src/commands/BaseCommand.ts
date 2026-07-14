@@ -208,6 +208,23 @@ export abstract class BaseCommand {
   }
 
   /**
+   * Create an operator-facing failure and print its message to stderr.
+   *
+   * Read-only inspection commands use this path so missing persisted state and
+   * invalid operator pins are visible in a terminal while retaining the
+   * structured {@link CommandResult} contract for callers and tests.
+   *
+   * @param error - Error object or message
+   * @param exitCode - Exit code (default: 1)
+   * @returns Error result
+   */
+  protected operatorFailure(error: Error | string, exitCode = 1): CommandResult {
+    const errorObj = typeof error === 'string' ? new Error(error) : error;
+    console.error(errorObj.message);
+    return this.failure(errorObj, exitCode);
+  }
+
+  /**
    * Validate required arguments
    *
    * @param args - Command arguments

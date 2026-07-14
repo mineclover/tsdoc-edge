@@ -8,660 +8,262 @@ canonical: true
 
 # [[Semantic Graph Spec Governance Roadmap]]
 
-> 복원된 legacy 동작을 비교 기준선으로 유지하고, TypeScript 7 canonical graph를
-> 구현 증거로 사용해 spec, code, test의 정합성을 검증하는 실행 로드맵
+> TypeScript 7 canonical graph를 구현 증거로 사용해 spec, code, test의 정합성을 검증하는
+> 현재 실행 로드맵. 완료 checkpoint는 [[Semantic Graph Spec Governance Completed Work]],
+> 날짜별 변경은 [[Semantic Graph Spec Governance Changelog]]에서 관리한다.
 
-**Status**: Active implementation and stabilization
+**Status**: Active implementation and release qualification
 **Reference provider**: `ttsc` + `@ttsc/graph`
 **Compatibility target**: TypeScript 7 semantics
 **Primary consumers**: CLI, LSP, CI, `work-context`
-**Last reviewed**: 2026-07-12
+**Last reviewed**: 2026-07-14
 
-이 문서는 다음 항목의 실행 SSOT다.
-
-- 유지할 제품 결정과 비목표
-- 현재 maturity와 병렬 lane
-- 지금 구현할 checkpoint와 완료 gate
-- release 또는 다음 phase를 막는 join gate
-
-상세 graph 계약은 [[Semantic Graph Analysis and Relationship Model]], CLI 동작은
-[[Convention Pack Check]], test lane은 [[TS7 Test Compilation Lane]], LSP 동작은
-[[LSP Integration]], indexing/provider 경계는 [[ProjectIndexer]]가 소유한다.
+이 문서는 아직 해야 할 일, 보류 항목, release blocker와 각 항목의 다음 proof만 소유한다.
+완료된 구현 설명과 과거 결정은 이 문서에 다시 복사하지 않는다.
 
 ## 한 화면 상태
 
-| 구분 | 현재 위치 |
+| 구분 | 현재 상태 |
 | --- | --- |
-| Now | external TypeScript library의 saved CLI/CI pilot |
-| Next | pilot의 LSP navigation proof (현재 보류)와 release qualification |
-| Deferred | historical Explain/Open, retention GC pin/tombstone, LSP 확장 작업 |
-| Parallel | Node/package release qualification, legacy baseline 첫 vertical slice |
-| Release | Node 24 clean-install/packed-consumer canary wired; runtime qualification 전 stable release NO-GO |
-| Deferred | 두 번째 runner/provider, generic adapter/DSL, convention distribution registry |
+| Now | Node 24 Ubuntu/macOS 실제 release qualification과 C2 capability owner matrix |
+| Next | 실제 GitHub matrix 결과에 따른 stable release 판정 |
+| Active | external release qualification, C2 owner evidence 수집 |
+| Deferred | ttsc graph-lint/spec parity for unsaved LSP, mutating CodeAction/unsaved spec authoring, historical Explain/Open |
+| Release | workflow wiring 완료; 실제 runtime/packed matrix 통과 전 stable release NO-GO |
+| No-go | 두 번째 runner/provider, generic adapter/DSL, convention distribution registry |
 
-## 1차 제품 목표 — M1: CLI/CI managed-spec conformance
+## 제품 목표와 비목표
 
-M1은 project가 작성한 spec, code, test evidence와 TSDoc enrichment를 하나의 saved
-CLI/CI check에서 정확한 revision pin으로 검증하는 첫 사용자 가치다. P4.1까지의 evidence
-입력 위에 P4.2 naming, P4.3 TSDoc, P4.4 managed-spec vertical slice를 순서대로 닫는다.
+M1은 [[AuthoredProjectSpecifications]]를 포함한 project가 작성한 spec, code, test evidence와 TSDoc enrichment를 하나의 saved CLI/CI
+check에서 정확한 revision pin으로 검증하는 것이다. 모든 input은 같은 check/report/gate
+identity에 들어가야 하며, managed document가 project spec/binding의 authored SSOT가 된다.
 
-M1 완료에는 다음이 필요하다.
-
-- naming, TSDoc, implementation/verification binding finding이 동일 check/report/gate identity에
-  들어간다.
-- project spec/binding의 authored SSOT가 managed document가 되고, JSON bootstrap과 duplicate
-  authoring하지 않는다.
-- managed source 변경은 해당 `SpecGraphRevision`과 derived finding만 결정적으로 바꾸며,
-  code/evidence revision은 바꾸지 않는다.
-- CLI와 CI가 saved canonical graph에서 같은 pass/fail과 exact replay를 재현한다.
-
-M1 source-checkout scope는 P4.5 retained result history/replay까지 확장됐지만, saved LSP
-diagnostics, external packed pilot, Node 24 release qualification, legacy production cleanup은
-여전히 promotion 또는 parallel release/comparison gate다.
-
-### 2026-07-13 실행 우선순위 — `ttsc` 먼저
-
-LSP-current의 source-checkout proof는 보존하되 historical Explain/Open, retention UI와 추가 LSP
-연동은 `ttsc` provider 경계가 stable해질 때까지 보류한다. provider coordinator는 이제 raw router
-adapter를 직접 persistence에 연결하지 않고 `TtscSemanticGraphProvider` →
-`ProviderSnapshotNormalizer` → `ProviderProjectIndexer`으로 연결한다. `tsconfigPath`는
-`TypeScriptProviderConfig`에서 한 번만 설정하고 v1 canonical field는 그 config에서 파생한다.
-
-source-checkout canary는 7,611 nodes / 18,948 edges를 provider 경로로 저장했고, namespaced node ID에
-absolute path가 없음을 확인했다. registry-independent packed early canary도 fresh temporary consumer에
-`tsdoc-edge`와 `@ttsc-ex/ttsc-graph-router` tarball을 함께 설치해 같은 saved snapshot identity와
-canonical graph를 재현한다. router의 relative `es-git` dependency는 tarball에서 깨졌으므로 bundle
-dependency로 포함한다.
-
-다음 구현 순서는 외부 TypeScript library의 saved CLI/CI pilot이다. pilot의 LSP navigation proof는
-명시적으로 보류하며, 이 순서를 닫기 전에는 새 LSP command, history picker, mutating CodeAction을
-추가하지 않는다.
-
-P4.4 시작 전 계획 리뷰는 managed spec의 file layout, document-level identity와
-machine-readable binding declaration schema를 결정한다. 그 정의는 roadmap에 쓰지 않고
-`managed/`의 canonical spec document와 extraction contract에 기록한다.
-
-## 제품 정의
-
-> Compiler-resolved semantic graph를 구현 증거로 사용해 spec, code, test의 연결과
-> 정합성을 CLI, CI, LSP에서 같은 규칙으로 지속 검증한다.
-
-이를 위해 다음 결정을 유지한다.
-
-1. 복원된 legacy AST/LSP/SQLite 동작은 read-only differential baseline이다. Production
-   SSOT나 canonical graph와의 영구 dual-write 경로가 아니다.
-2. `@ttsc/graph`와 graph-router는 compiler fact와 artifact 실행 경계를 소유한다.
-   Provider는 raw snapshot/delta를 내고 `ProjectIndexer`와 normalizer가 canonical
-   identity, revision과 `GraphDelta`를 만든다.
-3. 저장 파일은 하나의 canonical code revision으로 읽는다. 미저장 편집은 별도
-   persisted graph가 아니라 in-memory `GraphDelta`로 합성한다.
-4. code, spec, evidence, enrichment, policy와 overlay는 의미와 revision이 다른 plane이다.
-   이를 다시 하나의 무구분 relationship table로 합치지 않는다.
-5. `EffectiveAnalysisService`가 모든 exact input을 합성한 뒤 binding과 evaluator를
-   실행한다. Saved view에서 binding한 뒤 overlay를 덧붙이지 않는다.
-6. LSP는 canonical/effective view의 소비자다. 별도 저장 그래프 producer가 아니다.
-7. TypeScript 외 provider와 distribution registry는 external TypeScript pilot로 현재
-   계약의 portability를 증명한 뒤 도입한다.
-8. compiler version은 artifact provenance가 보고할 때만 표시한다. Build dependency
-   버전으로 실행 provenance를 추론하지 않는다.
-9. legacy production path는 C2 capability/owner 판정과 external full pilot 뒤 제거하거나
-   canonical enrichment로 재배치한다. legacy는 그 전까지 read-only differential baseline일 뿐
-   새 production 기능의 영구 owner가 아니다.
-
-## 범위와 비범위
-
-### 목표
-
-- legacy 사용자 결과를 재현 가능한 fixture로 복원하고 canonical 결과와 비교한다.
-- analyzer별 capability owner를 `superseded`, `retained`, `composed`,
-  `deprecated`, `unsupported` 중 하나로 결정한다.
-- saved canonical revision과 unsaved `GraphDelta`가 같은 query 의미를 제공한다.
-- managed spec, code, test evidence를 양방향으로 연결하고 revision-bound conformance를
-  계산한다.
-- 같은 input에서 같은 graph, finding, report와 gate identity를 재현한다.
-- 외부 TypeScript library에서 install, index, CLI, LSP와 CI workflow를 증명한다.
-
-### 비목표
+유지할 비목표:
 
 - legacy와 canonical graph의 영구 이중 SSOT
 - graph-router 안의 spec lifecycle 또는 TSDoc parser 재구현
 - 첫 release의 모든 언어, framework와 test runner 지원
-- TS5 Compiler API consumer의 일괄 제거
-- plane마다 별도 database/class를 먼저 만드는 물리적 분리
-- external canary 전의 provider SDK 또는 convention distribution registry
+- C2 판정 전 TS5 Compiler API consumer 일괄 제거
+- LSP를 별도 graph producer로 유지하는 dual-write 경로
 
-## 작성 권위와 derived projection
+## 핵심 설계 결정
 
-현재 bootstrap 입력과 목표 authored SSOT를 구분한다.
-
-| 관심사 | 현재/목표 작성 권위 | Derived projection | 편집 규칙 |
-| --- | --- | --- | --- |
-| Compiler fact | provider artifact | `ProviderSnapshot` → canonical `GraphRepository` revision | DB row 직접 편집 금지 |
-| Project spec/binding | 목표: managed spec documents | `SpecGraphRevision`, `SpecGraphRepository` | managed document를 수정한 뒤 재추출 |
-| Convention bootstrap | v1 workspace-local JSON | compiled spec/policy/rules + manifest | P4.4 전까지 canary 입력 |
-| Test evidence | runner artifact | `EvidenceRevision` | P4.1은 in-memory, P4.5에서 retained input |
-| TSDoc enrichment | authored TypeScript/TSDoc | `EnrichmentRevision` | canonical code identity를 변경하지 않음 |
-| Policy/rule | convention source | `PolicyRevision`, `RuleSetRevision` | exact version과 digest로 pin |
-| Unsaved edit | editor buffer | in-memory `GraphDelta` | canonical DB에 저장하지 않음 |
-| Result/history | validated analysis inputs | finding/report/gate envelope | authored SSOT가 아니며 immutable ID로 조회 |
-
-현재 v1 JSON pack은 spec node와 binding을 포함하는 operational bootstrap source다.
-`ConventionPackManifest`만 compiled composition descriptor다. Managed document extraction이
-연결된 뒤 project spec과 binding의 유일한 authored SSOT는 managed document가 된다.
-같은 spec node를 Markdown과 JSON에서 동시에 독립 authoring하지 않는다. 그때 convention
-source는 policy/rule과 compiled spec revision을 조합하거나 managed source에서 생성한다.
-
-Portable convention definition이 자체 spec을 필요로 하는 경우 project spec과 다른
-namespace와 installation 계약을 먼저 정의한다. Silent merge나 remote overwrite는 허용하지
-않는다.
-
-Plane은 의미, authority와 revision 경계다. Plane마다 별도 repository를 만들어야 한다는
-배치 규칙은 아니다. 현재 물리 저장 kernel은 다음 세 가지다.
-
-- `GraphRepository`: canonical code projection
-- `SpecGraphRepository`: compiled spec projection
-- `AnalysisInputRevisionRepository`: evidence, enrichment, policy exact revisions
-
-Overlay와 binding set은 process-local이다. Conformance finding/report는 derived result다.
-
-## Maturity 어휘
-
-모든 상태는 다음 네 단계 중 하나로 기록한다.
-
-| 상태 | 의미 |
-| --- | --- |
-| `planned` | 문서와 의도만 있고 실행 가능한 kernel이 없다 |
-| `kernel` | 계약, 순수 로직과 focused test가 있으나 제품 경로에 연결되지 않았다 |
-| `wired` | CLI/LSP/build 같은 실제 caller에서 도달하지만 대표 proof가 남았다 |
-| `proven` | real artifact/checkout과 실패 canary, replay gate를 반복 통과했다 |
-
-`proven`에는 범위를 붙인다. Source-checkout proof를 packed external proof로 확대 해석하지
-않는다. 모호한 “구현됨” 대신 상태, proof와 남은 gate를 함께 기록한다.
+1. `ttsc` provider는 raw snapshot/delta와 compiler fact를 소유한다.
+2. `ProviderSnapshotNormalizer`와 `ProjectIndexer`가 canonical identity와 revision을 만든다.
+3. `GraphRepository`는 canonical code revision만 저장하며 legacy symbol DB와 분리된다.
+4. code, spec, evidence, enrichment, policy와 overlay는 서로 다른 의미·revision plane이다.
+5. `EffectiveAnalysisService`가 exact input을 합성한 뒤 binding/evaluator를 실행한다.
+6. LSP는 canonical/effective view의 consumer이며 저장 graph producer가 아니다.
+7. compiler version은 provider provenance가 보고할 때만 기록하고 dependency 버전으로 추정하지 않는다.
+8. legacy production path는 C2 owner 판정과 external full pilot 전까지 제거하지 않는다.
 
 ## 현재 capability 상태
 
 | Surface | Maturity | 현재 증거 | 다음 gate |
 | --- | --- | --- | --- |
-| Saved canonical graph | `proven` (source-checkout) | real router → indexer → repository와 convention PoC | packed external proof |
-| GraphDelta workspace view | `wired` | content-addressed delta와 dirty/save composition | fact/topology v2 smoke |
-| All-surface structural equivalence gate | `planned` | 일부 surface만 연결 | position/name/ID/impact equivalence |
-| Legacy baseline/differential | `planned` | narrow AST parity helper만 존재 | versioned `work-context` fixture와 comparator |
-| Public provider boundary | `kernel` | ttsc provider, snapshot/delta normalizer | coordinator wiring과 packed early canary |
-| Spec repository | `kernel` | immutable CAS/history repository | production caller |
-| Managed-doc extraction | `proven` (source-checkout) | explicit `tsdoc-spec` → `SpecGraphRevision`, `spec extract`, duplicate/provenance test | managed spec을 convention runtime source로 승격 |
-| Convention loop | `proven` (source-checkout) | implementation/verification/naming/TSDoc, saved graph, exit 0/1/2 PoC | packed external proof |
-| P4.0 TS7 test lane | `proven` (repository-local) | TS7 typecheck → AOT → JavaScript Jest parity | Node/package release qualification |
-| Evidence revision/store | `kernel` | revision, exact store, resolver index | retained-input product wiring |
-| Jest evidence check | `proven` (source-checkout) | source-mapped TS7 Jest artifact → CLI check/replay, status and input-error canaries | retained-input history |
-| Naming evaluator | `proven` (source-checkout) | location-aware Pascal/camel/snake/kebab evaluator, typed config, CLI exit/replay canaries | policy migration from warning to error |
-| Enrichment revision/store | `kernel` | revision factory와 shared exact store | retained-input product wiring |
-| TSDoc enrichment check | `proven` (source-checkout) | workspace source digest → enrichment revision, tag finding/check/gate | general enrichment framework |
-| Durable result history | `proven` (source-checkout) | append-only canonical bundle, retained replay, source/config removal canary, tamper reject | retention GC pin/tombstone, packed external proof |
-| LSP spec experience | `proven` (source-checkout) | exact retained history diagnostic + managed document `--stdio` protocol diagnostic/CodeAction proof | historical view |
-| Packed package consumer | `wired` | Node 24 CI에서 fresh tarball install → `init` → `build` → `work-context` | external canonical/provider canary |
-| External library pilot | `planned` | self-repository PoC와 packed package consumer | canonical graph/provider full pilot |
+| Saved canonical graph | `proven` (source-checkout) | router → indexer → repository + `canonical-graph status|list|read` | release matrix |
+| GraphDelta workspace view | `proven` (read-only) | content-addressed delta, multi-file effective composition, dirty/save generation guards와 LSP query 회귀 테스트 | ttsc graph-lint/spec parity smoke |
+| All-surface structural equivalence | `deferred` | CLI/CI saved path 우선, LSP 비교 보류 | LSP 재개 후 position/name/ID/impact equivalence |
+| Legacy baseline/differential | `proven` (C1 + broader fixtures) | versioned work-context comparator, parity 4/0 and 6/0, DB 불변 | C2 owner 판정 |
+| Public provider boundary | `proven` (packed early canary) | provider snapshot/delta, packed canonical pilot, revision inspection | release matrix |
+| Spec repository | `proven` (source-checkout) | `spec extract` + `spec graph status|list|read` + `convention check --spec-db` | release matrix |
+| Managed-doc extraction | `proven` (source-checkout) | `spec extract` + policy-only pack + duplicate/provenance gate | release matrix |
+| Convention loop | `proven` (packed core fixture) | implementation/verification/naming/TSDoc/evidence check | release matrix |
+| Coverage metric report/baseline gate | `proven` (source-checkout) | immutable report list/read, baseline save/compare/list/read, direct-evidence convention gate | release matrix |
+| Evidence revision/store | `proven` (source-checkout) | `convention check --input-revisions-db` + read-only `convention inputs list|read` | retention policy review / release matrix |
+| Jest evidence check | `proven` (source-checkout) | source-mapped artifact와 status/exit canary | Node/OS release qualification |
+| Naming evaluator | `proven` (source-checkout) | location-aware evaluator, replay canary와 1,014/0 migration proof | Node/OS release qualification |
+| Enrichment revision/store | `proven` (source-checkout) | TSDoc enrichment와 exact store/read-only inspection | 승인된 추가 provider가 생길 때만 별도 checkpoint |
+| Durable result history | `proven` (source-checkout) | append-only bundle, retained replay와 pin/tombstone GC | Node/OS release qualification |
+| LSP spec experience | `proven` (source-checkout) | saved diagnostic/graph-lint projection, managed-doc action, effective overlay query path | ttsc parity와 historical view |
+| Packed package consumer | `proven` (packed canary) | fresh install/init/build/work-context | release matrix |
+| External library pilot | `proven` (packed + self) | CLI/public API parity, report/baseline list/read, retention lifecycle, persisted state 불변 | release matrix |
 
-## 최소 아키텍처 — current와 target
+완료 proof의 상세와 정확한 명령은 [[Semantic Graph Spec Governance Completed Work]]에 있다.
 
-```mermaid
-flowchart LR
-    LEGACY["Legacy fixture"] --> DIFF["Differential review"]
-    ROUTER["ttsc graph artifact"] --> INDEXER["Current ProjectIndexer path"]
-    ROUTER -. "provider target" .-> PROVIDER["Provider snapshot"]
-    PROVIDER -.-> INDEXER
-    INDEXER --> CODE["Canonical code revision"]
-    CODE --> DIFF
+## Active backlog
 
-    BOOT["Current v1 JSON bootstrap"] --> SPEC["Compiled spec revision"]
-    DOC["Managed spec documents"] -. "P4.4 target" .-> SPEC
-    TEST["Jest artifact"] -. "P4.1" .-> EVIDENCE["EvidenceRevision"]
-    TSDOC["TSDoc source"] -. "P4.3" .-> ENRICH["EnrichmentRevision"]
-    PACK["Convention policy / rules"] --> POLICY["Policy / RuleSet revisions"]
-    BUFFER["Unsaved buffer"] --> DELTA["GraphDelta"]
+### R1 — Node/OS release qualification
 
-    CODE --> EFFECTIVE["EffectiveAnalysisService"]
-    SPEC --> EFFECTIVE
-    EVIDENCE -. "product wiring" .-> EFFECTIVE
-    ENRICH -. "product wiring" .-> EFFECTIVE
-    POLICY --> EFFECTIVE
-    DELTA -. "composition target" .-> EFFECTIVE
-    EFFECTIVE --> CHECK["Binding / evaluator"]
-    CHECK --> CLI["CLI / CI"]
-    CHECK -. "planned" .-> LSP["LSP"]
-    CHECK --> HISTORY["Durable history / replay"]
+`release.yml`은 다음 순서로 publish를 차단한다.
+
+1. Ubuntu/macOS × Node 24에서 runtime contract와 `typecheck`를 실행한다.
+2. `--runInBand`와 `--maxWorkers=2`, 두 번의 반복 test를 실행한다.
+3. 별도 Ubuntu/macOS job에서 clean build와 fresh packed-consumer canary를 실행한다.
+4. publish job에서도 platform toolchain/lint와 qualified in-band smoke test를 재확인한다.
+5. 모든 matrix와 publish preflight가 통과한 뒤에만 publish를 시작한다.
+
+로컬에서 재현할 수 있는 preflight는 다음과 같다.
+
+```bash
+npm run verify:release-preflight
+npm run verify:release-preflight-repeat
 ```
 
-### 결합 불변식
+이 명령은 성공/실패 모두 `.test-results/release-preflight-<pid>.json`에 contract `1.2`
+단계별 envelope를 저장한다. 다른 경로가 필요하면
+`TSDOC_EDGE_RELEASE_PREFLIGHT_OUTPUT=/path/to/evidence.json`으로 지정할 수 있다. 실패
+envelope는 `failedStep`, exit code와 완료된 단계까지 보존하며, 이 artifact도 외부 runner
+matrix 통과를 대체하지 않는다.
 
-- Canonical code node를 spec/evidence store에 복제하지 않는다.
-- 모든 cross-plane reference는 workspace, revision과 provenance를 exact-pin한다.
-- Provider가 제공하지 않는 capability를 추론으로 위장하지 않는다.
-- Overlay는 저장하지 않고 save 성공 후 새 whole-project revision으로 대체한다.
-- Binding과 evaluator는 composed effective view 이후에만 실행한다.
-- Serialized binding set은 신뢰해 복원하지 않고 pinned input에서 재계산한다.
-- Derived cache나 history는 authored/code/spec SSOT가 될 수 없다.
+저장된 envelope는 다음 read-only inspector로 재실행 없이 검증할 수 있다. 인자를 생략하면
+가장 최근 파일을 선택하며, 운영 handoff에서는 `--path`로 exact 파일을 고정한다.
+evidence를 저장하지 못하면 preflight도 성공하지 않으며, 이 스크립트는 호출 위치와 무관하게
+repository root에서 각 단계를 실행한다.
 
-## 병렬 실행 lane
-
-```text
-Comparison  C0 canonical safety + C1 legacy restore -> C2 capability/ownership decision
-Product     P4.0 TS7 lane -> P4.1 evidence -> P4.2 naming -> P4.3 TSDoc
-                       -> P4.4 managed spec -> saved LSP diagnostics
-                       -> P4.5 history -> historical Explain/Open
-Provider    provider kernel -> packed early canary -> external full pilot
-Release     Node/package clean-install qualification
+```bash
+npm run verify:release-preflight-envelope
+npm run verify:release-preflight-envelope -- --path .test-results/release-preflight-41285.json
 ```
 
-이 lane은 waterfall 구현 순서가 아니라 promotion gate다.
+외부 qualification은 현재 CI의 `workflow_dispatch`로 선택한 branch를 기준으로 수동 실행할 수
+있다. 이 진입점도 push/PR matrix와 같은 Ubuntu/macOS × in-band/worker-2 × 2회 계약을
+사용하지만, 실제 runner 결과가 저장되기 전에는 release proof로 간주하지 않는다.
 
-- Comparison lane은 P4.1을 막지 않지만 legacy analyzer 제거를 막는다.
-- Release lane은 repository-local P4.x 구현을 막지 않지만 stable release와 external full
-  pilot을 막는다.
-- Managed-spec wiring은 saved LSP diagnostics의 선행 gate다. Durable history는 historical
-  Explain/Open의 선행 gate다.
-- Provider contract는 packed early canary 전까지 experimental이다.
-- Product checkpoint 1~2개마다 comparison vertical slice 하나를 닫는다.
-
-## Checkpoint 계획 리뷰와 커밋 단위
-
-각 Product/LSP checkpoint는 구현을 시작하기 전에 짧은 계획 리뷰를 통과한다. 리뷰의 목적은
-새 backlog를 만드는 것이 아니라, 이번 vertical slice의 authored SSOT, contract version,
-영향받는 caller, proof와 명시적 비범위를 다시 고정하는 것이다.
-
-1. 이 roadmap, 해당 contract 문서, 직전 handoff를 읽고 현재 maturity와 다음 join gate를
-   대조한다.
-2. 변경할 plane/revision identity, CLI/LSP entrypoint, fixture와 실패 canary를 한 checkpoint
-   단위로 적는다. contract나 실행 순서가 바뀌면 이 roadmap과 관련 feature 문서를 먼저
-   갱신한다.
-3. 구현 중 발견한 독립 concern은 같은 커밋에 섞지 않는다. 다음 checkpoint 또는 병렬 lane으로
-   route하고, 현재 checkpoint의 proof가 끝난 뒤에만 promotion한다.
-4. closeout 때 staged file 목록, focused proof, broad regression, generated artifact 제외와
-   `git diff --check`를 검토한다. 계획 리뷰 자체가 source-of-truth 변경을 만들지 않으면
-   빈 문서 커밋을 만들지 않는다.
-
-커밋은 checkpoint 전체를 하나로 뭉치지 않고 아래의 독립 review/proof 단위로 나눈다. 제목은
-예시이며, 실제 변경이 inseparable하면 인접 단위를 하나의 커밋으로 합칠 수 있다. 반대로
-문서만의 순서·authority 변경은 구현 커밋과 분리한다.
-
-| Checkpoint | 계획 리뷰 초점 | 권장 커밋 단위 |
-| --- | --- | --- |
-| P4.2 naming | canonical node selector, finding identity, policy/rule version | `feat(naming): add canonical naming evaluator and tests` → `feat(convention): wire naming evaluator into check/gate` → `docs(roadmap): record P4.2 proof` |
-| P4.3 TSDoc | authored source digest, enrichment revision pin, 첫 소비 rule | `feat(enrichment): load TSDoc into revision` → `feat(convention): evaluate first enrichment rule` → `docs(roadmap): record P4.3 proof` |
-| P4.4 managed spec | Markdown authority 전환, JSON bootstrap coexistence/duplicate rejection | `feat(spec): extract managed spec revision and bindings` → `feat(convention): select managed spec inputs and guard provenance` → `docs(roadmap): record P4.4 authority transition proof` |
-| LSP-current | saved diagnostic projection과 CLI finding identity 일치, read-only action | `feat(lsp): project saved conformance diagnostics` → `feat(lsp): add current Explain/Open actions` → `docs(lsp): record saved-view proof` |
-| P4.5 history | retained input envelope, immutable result record, read-time canonical revalidation | `feat(history): retain exact analysis inputs` → `feat(history): add validated result history and replay` → `feat(cli): expose exact-id history lookup` → `docs(roadmap): record P4.5 replay/tamper proof` |
-| LSP-history | retained pin replay, historical/current view 분리 | `feat(lsp): add historical Explain/Open replay` → `docs(lsp): record historical proof` |
-| Comparison/Provider/Release lane | product checkpoint와 분리된 promotion gate | `test(comparison): add one differential vertical slice`, `test(provider): add packed canary`, `chore(runtime): declare Node 24 baseline`, `ci(release): add clean-install qualification`처럼 lane별로 별도 커밋 |
-
-P4.0/P4.1은 이미 source-checkout proof를 닫은 checkpoint다. 이후 수정은 해당 checkpoint를
-재개하는 broad commit이 아니라, 수정한 contract와 proof 범위에 맞는 위 단위로 route한다.
-
-### Comparison lane
-
-#### C0 — Canonical safety
-
-- 실제 schema-v1 fixture의 guarded read/promotion
-- alias collision/ambiguity와 revision identity proof
-- legacy DB를 변경하지 않는 canonical refresh
-- GraphDelta stale/rebase/save lifecycle과 CLI/LSP saved-view equivalence
-
-현재 여러 kernel과 caller가 있으므로 미구현 목록이 아니라 product proof backlog로
-관리한다.
-
-#### C1 — Legacy baseline
-
-첫 vertical slice는 `work-context` 하나로 제한한다.
-
-```text
-versioned source fixture
-  -> restored legacy output
-  -> canonical output
-  -> exact/normalized/legacy-only/compiler-only comparison
-  -> limitation과 owner 결정
+```bash
+gh workflow run CI --repo mineclover/tsdoc-edge --ref <branch>
+gh run watch --repo mineclover/tsdoc-edge <run-id> --exit-status
+npm run verify:external-release-matrix -- --run-id <run-id> --sha <candidate-sha>
 ```
 
-Baseline runner는 read-only이며 canonical/legacy production DB를 변경하지 않는다. 알려진
-false positive/negative도 삭제하지 않고 limitation으로 기록한다.
+`verify:external-release-matrix`는 8개 test matrix job과 `publish-check`의 완료·성공 상태,
+workflow 이름과 candidate SHA를 read-only로 확인한다. 현재 원격에 남아 있는 과거 CI run은
+실패 상태이므로 release evidence로 인정하지 않는다.
 
-#### C2 — Capability와 owner 판정
+개별 단계만 재실행할 때는 다음 명령을 사용한다.
 
-각 capability는 producer declaration, raw observation, router-derived structure, canonical
-mapping, legacy parity와 fixture를 가진다. 결과는 다음 중 하나다.
+```bash
+npm run verify:runtime-contract
+npm run verify:platform-toolchain
+npm run verify:document-validation
+npm run verify:canonical-safety
+npm run verify:release-qualification
+npm run typecheck
+npm run build
+npm run verify:package-tarball
+```
 
-- `superseded`: compiler fact가 더 정확하므로 legacy production path 제거 후보
-- `retained`: TSDoc Edge 고유의 spec/document 기능
+로컬 proof는 GitHub runner matrix 통과를 대체하지 않는다. 현재 source-checkout의 최신
+`verify:release-preflight`는 contract `1.2`의 14/15 단계를 통과한 뒤 worker-2에서
+`EnhancedDocExtractor.test.js`의 간헐 macOS arm64 Node 24 SIGSEGV로 중단됐으며, 실패
+evidence는 `.test-results/release-preflight-82408.json`이다. 같은 시점의 in-band와 worker-2
+단독 재실행은 각각 240 suites/3,093 tests를 통과했다.
+
+로컬 반복 운영 명령 `npm run verify:release-preflight-repeat`는 각 시도의 envelope를
+검증하고 crash를 숨기지 않는다. 최신 기본 2회 반복은 두 attempt 모두 contract `1.2`의
+15/15 단계와 in-band/worker-2 각각 236 suites/3,080 tests를 통과했다. repeat summary는
+`.test-results/release-preflight-repeat-1783991103596-69830.json`이며, 각 attempt의 exact
+envelope도 함께 보존한다. 따라서 남은 R1 gate는 외부
+Ubuntu/macOS × in-band/worker-2 × 2회 clean-install matrix와 native-crash-free 결과이며,
+stable release와 C2 owner 승격은 그 결과 전까지 보류한다. 과거 실행 상세는
+[[Semantic Graph Spec Governance Changelog]]와 [[Semantic Graph Spec Governance Completed Work]]에만 기록한다.
+
+### C2 — Capability owner matrix
+
+C1 fixture만으로 legacy analyzer 제거를 확대하지 않는다. capability별로 아래 envelope를
+versioned artifact로 채운 뒤 owner를 판정한다.
+
+현재 source-checkout candidate는
+[`capability-owner-matrix.v1.json`](../../scripts/fixtures/capability-owner-matrix.v1.json)이며,
+각 capability의 required evidence와 의도적 누락 failure canary를 다음 명령으로 검증한다.
+
+```bash
+npm run verify:c2-capability-matrix
+```
+
+외부 matrix가 통과한 뒤에만 C2 owner 승격 가능성을 함께 확인할 수 있다. 이 명령은 fixture나
+production state를 변경하지 않고 `ownerPromotionEligible: true`를 산출한다.
+
+```bash
+npm run verify:c2-capability-matrix -- \
+  --external-matrix-run-id <run-id> --external-matrix-sha <candidate-sha>
+```
+
+검증 결과는 4개 capability, 2개 versioned fixture와 9개 failure canary를 모두 확인하며,
+matrix 자체나 production state를 변경하지 않는다. 또한 각 capability가 packed ttsc provider
+canary contract `tsdoc-edge/ttsc-provider-packed-canary@1.6`를 참조하고, canary source가
+동일한 contract ID/version과 요구 proof key를 선언하는지 정적으로 확인한다. 이는 source-checkout
+계약 연결 검증이며 실제 외부 runner 실행 결과를 대체하지 않는다. 두 fixture는 기존 4-symbol class/method
+slice와 6-symbol interface/class/function slice이며, 각각 differential comparator로 parity와
+read-only state 불변까지 실행한다.
+
+이 candidate는 canonical topology/identity의 owner 방향을 `superseded`, enrichment를
+`retained`, work-context 결과를 `composed`로 기록한다. `status: candidate`이므로 실제
+Ubuntu/macOS release matrix proof 전에는 legacy production removal을 승격하지 않는다.
+broader fixture와 9개 failure canary의 source-checkout proof는 완료됐지만, 외부 runner
+재현성까지 포함한 owner 승격은 아직 남아 있다.
+
+| Required evidence | 내용 |
+| --- | --- |
+| Producer declaration | provider/legacy producer가 주장하는 capability와 version |
+| Raw observation | 원본 artifact 또는 legacy output의 보존된 관찰 |
+| Router-derived structure | router가 계산한 node/edge/diagnostic 구조 |
+| Canonical mapping | canonical ID, evidence, revision과 mapping 결과 |
+| Legacy parity | exact/normalized 차이, false positive/negative |
+| Fixture | 재현 가능한 source와 expected output |
+| Owner decision | `superseded` / `retained` / `composed` / `deprecated` / `unsupported` |
+
+첫 확장 대상은 structural topology, symbol identity/position, documentation/test enrichment,
+work-context output이다. owner가 `retained` 또는 `composed`라는 것은 의미 owner를 뜻하며,
+legacy production implementation을 영구 보존한다는 뜻이 아니다.
+
+완료 gate:
+
+- capability마다 최소 2개 versioned fixture와 실패 canary가 있다.
+- canonical fact와 legacy enrichment의 차이가 limitation으로 기록된다.
+- C2 결과가 없는 analyzer는 production removal 대상에서 제외된다.
+- owner 판정 후 canonical/enrichment owner와 migration proof를 별도로 만든다.
+
+### P4 — Remaining product wiring
+
+- 현재 제품 범위의 TSDoc enrichment provider와 revision/store wiring은 완료로 본다.
+- 추가 enrichment provider가 실제 제품 요구로 승인될 때만 typed contract와 별도 checkpoint를
+  추가한다. generic adapter/DSL과 provider registry는 no-go로 유지한다.
+
+## C0/C1/C2 경계
+
+### C0 — Canonical safety boundary
+
+- schema-v1, alias/revision identity와 canonical refresh rollback/non-mutation은
+  `verify:canonical-safety` source-checkout proof로 처리됐다.
+검증 명령은 `npm run verify:canonical-safety`다. 남은 C0 backlog는 다음 하나다.
+
+- ttsc graph-lint/spec input과 unsaved effective overlay의 동일 사양 평가
+
+### C1 — 완료된 첫 baseline
+
+`work-context`를 대상으로 versioned source fixture → restored legacy output → canonical output
+→ exact/normalized legacy-only/compiler-only comparison을 통과했다. 기존 4-symbol fixture와
+broader 6-symbol fixture 모두 parity 및 DB 불변 proof를 가지며, 상세는 완료 문서로 이동했다.
+active scope에는 C2 owner 판정만 남긴다.
+
+### C2 — 현재 owner 판정
+
+- `superseded`: compiler fact가 더 정확해 legacy production path 제거 후보
+- `retained`: TSDoc Edge 고유 spec/document 기능
 - `composed`: compiler fact와 enrichment/spec 의미가 모두 필요
 - `deprecated`: 중복 또는 제품 가치가 낮아 migration 후 제거
 - `unsupported`: provider capability가 없어 limitation/backlog로 유지
 
-C2 판정 전에는 legacy analyzer 제거를 확대하지 않는다. C2의 `retained`와 `composed`는
-기능 의미를 보존한다는 뜻이지 legacy production implementation을 보존한다는 뜻이 아니다.
-판정 후에는 canonical/enrichment owner로 이관하고, legacy 경로는 read-only comparator를
-제외하고 제거한다.
-
-## Active slice — P4.1 Jest evidence
-
-`loadJestJsonEvidence`와 `--evidence` CLI wiring은 source-checkout proof까지 통과했다. 이
-slice는 in-memory input만 사용하며, durable retention은 P4.5 gate로 남는다.
-
-### 사용자 경로
-
-```bash
-tsdoc-edge convention check --pack <pack.json> --evidence <jest.json>
-```
-
-```text
-Jest JSON
-  -> loadJestJsonEvidence
-  -> in-memory EvidenceRevision
-  -> ConventionCheckService
-  -> report / gate
-```
-
-CLI는 optional artifact를 load해 service에 넘긴다. `ConventionCheckService.run()`은 optional
-`EvidenceRevision`을 받고, 생략 시 현재 canonical-empty revision을 사용한다.
-
-### 판정
-
-구조적 resolution과 test 실행 결과를 분리한다.
-
-| Structural result | Test status | Conformance |
-| --- | --- | --- |
-| exact resolved | `passed` | `satisfied` |
-| exact resolved | `failed` | `violated` |
-| exact resolved | `skipped` / `unknown` | `indeterminate` |
-| any required participant ambiguous / stale | 무관 | `indeterminate` |
-| otherwise, any required participant missing | 무관 | `violated` |
-
-Mixed structural state에서는 ambiguous/stale를 먼저 적용한다. 그런 participant가 없을 때만
-missing을 `violated`로 평가한다.
-
-Status는 test-evidence endpoint에 보존하고 pinned evidence item과 다시 대조한다. 이 의미
-변경으로 resolver, conformance engine과 convention pack compiler version은 `2.0.0`으로
-올린다. `binding.verification` rule contract도 `2.0.0`으로 올리고 compiler는 지원하는
-`(ruleId, version)`만 허용한다. Evidence contract와 gate evaluator version은 유지한다.
-
-### Loader 경계
-
-`loadJestJsonEvidence({ artifactPath, workspaceRoot, workspaceId })` 하나만 추가한다.
-
-- Jest와 `ts-jest` package를 runtime import하지 않는다.
-- adjacent source map으로 `.test-dist/**/*.js`를 authored `src/**/*.ts(x)`로 복원한다.
-- `sourcesContent`와 실제 source bytes가 다르거나 workspace 밖이면 거부한다.
-- 모든 identity path는 workspace-relative POSIX path다.
-- Item ID는 authored source file과 Jest full test name만 사용한다.
-- 같은 artifact에 이 identity가 중복되면 ordinal을 붙이지 않고 exit `2`로 거부한다.
-- status, duration과 artifact가 제공한 clock은 revision content지만 item ID는 아니다.
-- 현재 clock은 넣지 않는다.
-- Epoch millisecond clock은 유효성을 검사한 뒤 UTC RFC3339/ISO string으로 정규화한다.
-- Jest가 subject mapping을 제공하지 않으므로 `subjectFiles: []`로 고정하고 추론하지 않는다.
-- `pending`/`todo`/`disabled`/`skipped`는 `skipped`, `focused`는 `unknown`으로 정규화한다.
-  그 밖의 새 status 문자열은 unsupported schema로 exit `2`다.
-- 정규화한 test result, loader version, source-map mapping과 authored source digest로
-  `sourceFingerprint`를 만든다.
-- Artifact가 Jest version을 제공하지 않으면 설치 dependency에서 추론하지 않고
-  `unreported`로 남긴다.
-- Item provenance는 `producerId: jest`와 reported/unreported runner version, revision
-  provenance는 loader ID/version을 가진다.
-- malformed JSON, unsupported schema, interrupted/run-exec error, runtime-error suite, aggregate
-  count mismatch, path escape, unmapped `.test-dist`와 source mismatch는 `unknown`으로 바꾸지
-  않고 exit `2`로 거부한다.
-- `--output`은 evidence artifact와 같은 파일을 가리킬 수 없다. Same-file이면 읽기 전에
-  exit `2`로 거부한다.
-
-Evidence status, normalized identity와 provenance의 상세 계약은
-[[Semantic Graph Analysis and Relationship Model]]이 소유한다. 이 roadmap은 checkpoint와
-완료 gate만 소유한다.
-
-### 보류
-
-- 별도 evidence import 명령과 product DB wiring
-- active/latest evidence pointer
-- generic adapter interface/registry와 mapping DSL
-- JUnit/Vitest 또는 두 번째 runner
-- shard/retry/flaky aggregation
-
-`AnalysisInputRevisionRepository` kernel은 이미 존재하지만 P4.1 product path에는 연결하지
-않는다. 같은 artifact가 있을 때 deterministic recomputation이 가능한 단계이며 historical
-retention을 주장하지 않는다. Loader output의 repository store/read 호환성은 focused test로
-검증할 수 있지만 제품 persistence로 분류하지 않는다.
-
-### 완료 gate
-
-- 실제 TS7 AOT Jest JSON의 passed case가 default gate exit `0`
-- failed는 `violated`, skipped/unknown은 `indeterminate`, missing verifier/subject는 `violated`
-- blocking finding은 default gate exit `1`
-- malformed/schema/source-map/path/pin 오류는 exit `2`
-- 동일 normalized evidence, exact code/spec/enrichment/policy/rule-set input, explicit
-  `suppressionAsOf`와 failure threshold에서 evidence/check/report/gate ID가 동일
-- evidence source anchor에 `.test-dist`와 절대 checkout path가 없음
-- canonical/legacy DB, WAL/SHM/journal과 registry sidecar가 byte-for-byte 불변
-- Jest runner package runtime import가 없음
-- `--output`과 `--evidence` same-file canary가 exit `2`
-- compiler v2로 바뀐 manifest lock과 implementation PoC expected IDs가 함께 갱신됨
-
-Node runtime/package clean-install qualification은 병렬 release gate이며 P4.1 구현 자체를
-막지 않는다.
-
-## Product checkpoint
-
-| Checkpoint | 한 기능 | 완료 증거 | 명시적 비범위 |
-| --- | --- | --- | --- |
-| P4.0 | TS7 typecheck → AOT → JavaScript-only Jest | parity, source-map/coverage, no `ts-jest` | production TS5 consumer 제거 |
-| P4.1 | Jest evidence 한 입력 | 위 status/exit/replay/path/DB gate | import DB, second runner |
-| P4.2 | canonical node를 읽는 naming evaluator 하나 | pass/fail과 deterministic finding/report/gate ID | DSL, registry, formatter, autofix |
-| P4.3 | TSDoc loader와 consuming rule 하나 | `EnrichmentRevision` exact pin, source digest 변화, code graph 불변 | 범용 enrichment framework |
-| P4.4 | managed document → SpecGraph/binding 한 vertical slice | code/evidence 불변, spec과 derived IDs의 결정적 변경, duplicate/provenance gate | LSP authoring 전체 |
-| LSP-current | saved diagnostics와 current Explain/Open | CLI와 같은 stamp/finding/diagnostic | historical lookup, mutating action |
-| P4.5 | retained input + validated append-only result history | exact-ID lookup/replay, tamper/collision reject | latest를 실행 input으로 선택 |
-| LSP-history | historical Explain/Open | retained pin으로 동일 finding 재계산 | mutating CodeAction, unsaved spec authoring |
-
-P4.5는 report JSON만 복사하는 기능이 아니다. 다음을 함께 보존한다.
-
-- normalized evidence/enrichment/policy/rule-set canonical payload 또는 이를 byte-identical하게
-  재생성할 immutable authored source와 compiled manifest
-- 기존 repository에서 exact lookup할 code/spec revision ID; history-aware retention pin/GC는 다음 lane
-- `EffectiveAnalysisStamp`
-- check/report/gate identity
-- exact-ID lookup 시 canonical envelope 재검증
-
-Binding resolution은 serialized object를 신뢰하지 않고 retained input에서 재계산한다.
-
-### P4.5 closeout design — retained replay bundle
-
-현재 `--history-db`는 canonical envelope append, read-time tamper/collision rejection과 retained
-bundle로의 full recompute를 제공한다. replay는 stored `ConventionCheckResult`를 그대로 반환하지
-않고, 아래 `ConventionReplayBundle`로 새 check를 실행해 ID를 비교한다. 이 proof는 source-checkout
-범위이며, history-aware revision retention/GC와 historical UI는 별도 promotion lane이다.
-
-```typescript
-interface ConventionReplayBundle {
-  contractVersion: '1.0';
-  historyId: string;
-  workspaceId: string;
-  code: { revisionId: string; graphFingerprint: string };
-  spec: { revisionId: string; contentFingerprint: string };
-  compiledPack: CompiledConventionPack;
-  inputs: {
-    evidence: EvidenceRevision;
-    enrichment: EnrichmentRevision;
-  };
-  evaluationConfig: {
-    naming: NamingConventionConfig;
-    tsdoc: TsdocConventionConfig;
-    suppressionAsOf?: string;
-  };
-  gate: ConventionGateDecision;
-  expected: {
-    effectiveStamp: EffectiveAnalysisInputStamp;
-    checkId: string;
-    conformanceReportId: string;
-    namingReportId: string;
-    tsdocReportId: string;
-    gateId: string;
-  };
-}
-```
-
-`compiledPack`에는 source JSON을 다시 해석해 현재 파일을 선택하지 않는다. 저장된 manifest,
-spec, policy, rule-set을 canonical factory로 재검증해 process-local trusted compiled pack을
-재구성한다. `GraphRepository`도 active pointer가 아니라 bundle의 `code.revisionId`를 exact
-lookup하고 graph fingerprint를 재검증한다. code revision이 없으면
-`historical-input-missing` input error(exit `2`)이며 latest revision으로 대체하지 않는다.
-
-Replay는 retained evidence/enrichment와 retained naming/TSDoc config를 `ConventionCheckService`에
-명시 전달한다. 따라서 현재 `.tsdoc.config.json`, 현재 managed Markdown, 현재 pack file이나 현재
-clock은 결과에 개입하지 않는다. service는 새 binding resolution과 conformance를 계산하고, 모든
-expected ID가 일치할 때만 `reproduced`다. 과거 gate가 pass면 replay exit `0`, 과거 gate가 fail이면
-exit `1`, input missing/tamper/ID divergence는 exit `2`다. serialized binding resolution, finding,
-report는 비교용 evidence일 뿐 trusted execution input이 아니다.
-
-저장은 하나의 history SQLite transaction에서 canonical input payload, replay bundle과 result
-envelope를 함께 append한다. 동일 `historyId`의 byte-identical 재요청은 idempotent read, 다른
-payload는 collision error다. history-aware code/spec retention pin과 GC tombstone은 다음 retention
-lane이며, 현재 replay는 missing code revision을 fallback 없이 `historical-input-missing`으로
-반환한다.
-
-Source-checkout proof는 retained pack/config source를 삭제한 뒤에도 exact check/report/gate ID를
-recompute하고, canonical envelope tamper 및 non-canonical append를 거부한다. 동일 bundle append는
-idempotent이며 다른 canonical payload는 collision으로 거부한다. CLI replay는 missing code revision을
-latest fallback 없이 `historical-input-missing` exit `2`로 처리한다.
-
-다음 retention promotion gate는 history-aware code/spec/input pin을 repository GC에 연결하고,
-unpinned inactive revision의 tombstone을 유지하는 것이다. 이를 통과하기 전에는 packed external
-replay와 historical UI를 source-checkout proof로 확대 해석하지 않는다.
-
-## Provider와 external pilot
-
-현재 `CanonicalProjectGraph` v1은 `tsconfigPath`를 필수로 가진다. contract v2 검토에서는
-`tsconfigPath`가 계속 필요하면 `TypeScriptProviderConfig`의 단일 owner로 유지하고, router,
-provider, normalizer가 각각 독립적인 경로를 설정하거나 reconcile하지 않게 병합한다.
-v1 compatibility field는 그 단일 config에서 파생한다. packed canary가 이를 증명하기 전에는
-canonical envelope에서 제거한다고 가정하지 않으며, config의 위치를 바꾸는 경우에는
-compatibility와 migration을 함께 version한다.
-
-### Packed early canary
-
-- 다른 workspace에서도 namespaced canonical ID 충돌이 없음
-- clean packed install에서 saved snapshot과 canonical graph를 생성하고 source/packed 간 exact identity를 비교
-- source occurrence와 package export surface 보존
-- repository-specific absolute module/binary 경로가 identity에 없음
-- unreported compiler version을 TS7-proven으로 표시하지 않음
-
-현재 `ttsc` provider는 incremental delta capability를 `unsupported`로 선언한다. 따라서 one-file
-delta는 이 canary의 통과 조건이 아니며, provider가 해당 capability를 구현한 뒤 별도 delta canary로
-승격한다. 그 전의 save 처리는 whole-project refresh만 사용한다.
-
-### External full pilot
-
-- public API와 test가 있는 TypeScript library 사용
-- install → index → managed spec binding → evidence/enrichment check
-- LSP code ↔ spec ↔ test 탐색
-- save 후 CLI/CI가 같은 violation 재현
-- Node/OS support matrix에서 packed dependency smoke
-
-두 번째 provider와 legacy production cleanup은 이 full pilot 뒤에만 진행한다. cleanup은 C2의
-owner 판정을 따라 legacy 구현을 제거하거나 canonical enrichment로 이관하는 작업이다.
-
-## Join gate
-
-| 승격 | 필수 gate |
-| --- | --- |
-| Saved LSP spec diagnostics | P4.1~P4.5 source-checkout proof + exact history-config/active-revision match |
-| Historical Explain/Open | P4.5 durable history |
-| Provider stable | packed early canary + release qualification |
-| External full pilot | provider stable + saved LSP checkpoint + P4.1~P4.5 proof |
-| Legacy production retirement | C2 ownership decision + external full pilot |
-| Convention distribution registry | registry-independent packed install canary, authored ownership, portable/install split, publisher authenticity와 lock/upgrade/rollback |
-
-### Portable convention distribution의 범위
-
-현재 pack은 workspace-local JSON bootstrap이다. Portable distribution은 이를 다른 workspace에
-그대로 복사하거나 remote package가 project spec을 덮어쓰게 만드는 기능이 아니다. 목적은
-재사용 가능한 convention policy/rule과 선택적 portable spec을 **명시적으로 설치**하고, 각
-project가 자신의 managed spec과 exact composition을 재현하게 만드는 것이다.
-
-설치 모델에는 세 identity가 분리되어야 한다.
-
-1. **Published package identity**: publisher, package name, immutable version과 content digest.
-   digest는 내려받은 bytes의 integrity만 증명한다.
-2. **Project authored identity**: workspace ID와 local managed-spec revision. 이것은 registry나
-   package가 수정할 수 없다.
-3. **Installed composition/lock identity**: 위 package pin, local spec revision, provider
-   capability와 compiled manifest를 묶은 workspace-local lock. CI와 replay는 이 lock을
-   읽으며 floating `latest`나 active remote state를 읽지 않는다.
-
-Portable package가 자체 spec을 제공하면 local project spec과 다른 declared namespace를 써야
-한다. 설치는 namespace collision, capability, contract version과 publisher trust를 검증한 뒤에만
-local composition을 생성한다. 동일 ID를 silent merge하지 않고, remote update가 local authored
-document를 overwrite하지 않으며, upgrade와 rollback은 새 exact lock을 만드는 별도 action이다.
-
-Publisher authenticity는 content digest가 아니라 검증 가능한 publisher identity와 trust root로
-증명해야 한다. 구체적인 signing/registry protocol은 registry implementation ADR에서 선택하되,
-그 선택 전에도 installer가 요구할 불변식은 `publisher identity → signed package metadata →
-immutable digest → local lock` 체인과 trust/revocation 검증이다.
-
-따라서 registry 도입 전 gate는 registry-independent packed install canary다. 빈 외부 workspace에
-pack을 설치해 namespace/authority guard, lock replay, tampered digest·untrusted publisher reject,
-upgrade/rollback을 증명한 뒤에만 registry catalog와 publisher workflow를 추가한다.
-
-## Release qualification
-
-Repository-local P4.0/P4.1 proof와 package release 가능성을 구분한다.
-
-- Node 24 line(`>=24 <25`)과 native dependency 지원 범위를 정렬
-- Node 24/지원 OS clean install, build, typecheck와 worker/in-band 반복 test matrix
-- provider/router package `files`, `prepack`, version compatibility 계약
-- local `file:` dependency와 source-checkout-only binary resolution 제거
-- absolute path 없이 packed external canary 재현
-
-macOS Node 24 native crash가 간헐적으로 재현된 상태이므로, 이 gate를 통과하기 전에는
-repository-local proof를 stable release로 표시하지 않는다.
-
-## 검증 원칙
-
-각 checkpoint는 test 수가 아니라 versioned input과 proof path를 남긴다.
-
-```bash
-npm run typecheck
-npm run build
-npm test -- --runInBand
-npm run poc:convention
-```
-
-P4.0 세부 test 명령과 rollback은 [[TS7 Test Compilation Lane]], convention exit/report
-계약은 [[Convention Pack Check]]가 소유한다. External proof는 packed artifact와 clean
-temporary project를 사용한다.
-
-`100%` 지표에는 versioned inventory라는 분모와 proof command가 있어야 한다. 분모 없는
-coverage 주장은 완료 gate로 사용하지 않는다.
-
-## 최종 promotion 조건
-
-1. Legacy behavior와 limitation이 versioned baseline으로 재현되고 capability owner가
-   결정된다.
-2. Canonical saved graph와 GraphDelta가 provenance, exact identity와 replay gate를 통과한다.
-3. Managed docs가 project spec/binding의 유일한 authored SSOT이고 모든 repository/history가
-   derived projection으로 재생성 가능하다.
-4. Evidence, enrichment, naming과 spec binding이 같은 check/report/gate pipeline을 사용한다.
-5. CLI, CI와 LSP가 같은 saved `EffectiveAnalysisStamp`와 finding을 표시한다.
-6. Retained input으로 과거 conformance를 exact lookup/recompute할 수 있다.
-7. External TypeScript library가 repository-specific 예외 없이 install, index, LSP와 CI
-   workflow를 통과한다.
-8. Legacy production path는 C2 결과에 따라 제거되거나 enrichment로 재배치된다.
-
-## 핵심 위험
-
-| 위험 | 대응 |
-| --- | --- |
-| Managed docs와 JSON pack의 dual authored spec | P4.4에서 managed docs로 authority 전환, duplicate authoring 거부 |
-| Kernel을 product proof로 오인 | maturity와 proof 범위를 함께 기록 |
-| Legacy 비교가 product backlog에 밀림 | P4 checkpoint 1~2개마다 comparison slice 하나 완료 |
-| Provider 일반화를 너무 빨리 고정 | packed early canary와 external full pilot 전 experimental 유지 |
-| Status가 structural resolution에서 유실 | endpoint에 보존하고 pinned evidence와 재검증 |
-| History가 검증되지 않은 blob store가 됨 | immutable envelope, exact pin, read-time canonical 검증 |
-| Overlay와 saved view가 섞임 | compose-before-bind와 stale/rebase gate |
-| Runtime/package 지원이 재현되지 않음 | clean-install matrix 전 stable release 금지 |
+## 보류 및 명시적 no-go
+
+- historical Explain/Open과 LSP history picker
+- retention GC의 UI promotion
+- mutating CodeAction과 unsaved spec authoring
+- 두 번째 test runner/provider와 generic adapter/DSL
+- convention distribution registry
+- C2와 external full pilot 전 legacy analyzer 제거
+
+## Release promotion 조건
+
+1. 실제 Node 24 Ubuntu/macOS runtime/typecheck/test/packed matrix 통과
+2. canonical saved graph와 ttsc provider input이 provenance, exact identity와 replay gate 통과
+3. managed docs가 project spec/binding의 유일한 authored SSOT
+4. evidence, enrichment, naming과 spec binding이 같은 check/report/gate pipeline 사용
+5. CLI와 CI가 같은 saved `EffectiveAnalysisStamp`와 finding 표시; LSP extension은 별도 재개 gate
+6. retained input으로 과거 conformance exact lookup/recompute 가능
+7. external TypeScript library가 repository-specific 예외 없이 install/index/CI workflow 통과
+8. C2 결과에 따른 legacy production path 제거 또는 canonical enrichment 이관
 
 ## 관련 문서와 소유권
 
@@ -669,44 +271,10 @@ coverage 주장은 완료 gate로 사용하지 않는다.
 | --- | --- |
 | [[Semantic Graph Analysis and Relationship Model]] | graph/spec/evidence identity, relation, direction과 revision 계약 |
 | [[ProjectIndexer]] | router/provider/indexer/package 경계와 canonical projection |
-| [[Convention Pack Check]] | current v1 pack, CLI, report/gate와 P4 evidence handoff |
-| [[TS7 Test Compilation Lane]] | P4.0 test pipeline, parity, runtime qualification과 rollback |
-| [[LSP Integration]] | saved/unsaved view, diagnostics와 CodeAction surface |
+| [[Convention Pack Check]] | pack, CLI, report/gate와 evidence handoff |
+| [[TS7 Test Compilation Lane]] | test pipeline, parity, runtime qualification과 rollback |
+| [[LSP Integration]] | saved/unsaved view, diagnostics와 CodeAction |
 | [[Spec Management System]] | managed document lifecycle와 completeness |
-| [[Work Context Workflow]] | legacy/canonical comparison의 첫 사용자 vertical slice |
-
-## 변경 기록
-
-### 2026-07-12
-
-- Roadmap을 architecture spec과 세부 구현 목록에서 실행 SSOT 중심으로 축약했다.
-- 선형 Phase를 Comparison, Product, Provider, Release 병렬 lane과 join gate로 바꿨다.
-- 상태를 `planned → kernel → wired → proven`으로 통일했다.
-- Current JSON bootstrap source와 target managed-document spec SSOT를 분리했다.
-- P4.1을 one-command in-memory evidence loop로 고정하고 전체 status/exit/replay gate를
-  추가했다.
-- P4.2 location-aware naming evaluator를 config, convention check/gate와 source-checkout
-  proof까지 연결했다. 기존 source symbol rule은 warning으로 시작하고, 새 managed spec
-  location은 error-severity convention으로 관리한다.
-- P4.3 TSDoc loader를 workspace-authored canonical node에만 투영하고, configured public-tag
-  rule을 same check/report/gate path에 연결했다. source digest 변화는 enrichment revision을
-  바꾸지만 code graph는 바꾸지 않는다.
-- P4.4 `type: project-spec` Markdown의 explicit `tsdoc-spec` block을 `SpecGraphRevision`과
-  binding으로 컴파일하고, `spec extract`가 derived repository revision으로 원자 승격한다.
-- P4.5 `--history-db`는 evidence/enrichment/policy/rule-set canonical payload와 exact
-  check/stamp를 append-only envelope으로 보존하고, retained bundle로 full conformance를 recompute한다.
-  read-time canonical envelope 검증과 tamper/collision rejection도 구현됐다. history-aware
-  retention GC/tombstone과 historical Explain/Open UI는 별도 promotion/LSP-history gate로 남는다.
-- Node 24를 package/CI baseline으로 선택하고, clean-install matrix와 native-crash 해소 전의
-  stable release NO-GO를 명시했다.
-- legacy production path는 C2와 external pilot 뒤 제거 또는 canonical enrichment 이관이라는
-  cleanup 방향으로 고정했다.
-- `tsconfigPath`는 필요 시 TypeScript provider의 단일 설정 owner에 남기고, v2에서 중복
-  설정 책임을 병합 검토하도록 결정했다.
-- portable convention distribution의 package, project, lock identity와 trust/install gate를
-  구체화했다.
-- 각 checkpoint의 사전 계획 리뷰, independent proof 기준의 커밋 단위, closeout staged-set
-  검토 규칙을 실행 계획에 추가했다.
-- Managed-spec wiring을 P4.4, durable history를 P4.5로 배치했다.
-- Current saved LSP diagnostics와 P4.5 historical Explain/Open의 gate를 분리했다.
-- Convention distribution registry를 external install canary 이후로 미뤘다.
+| [[Work Context Workflow]] | legacy/canonical comparison vertical slice |
+| [[Semantic Graph Spec Governance Completed Work]] | 완료 checkpoint와 proof |
+| [[Semantic Graph Spec Governance Changelog]] | 날짜별 결정과 변경 |

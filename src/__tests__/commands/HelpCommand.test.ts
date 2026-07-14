@@ -7,6 +7,8 @@
 import { BaseCommand, type CommandResult } from '../../commands/BaseCommand';
 import { CommandRegistry } from '../../commands/CommandRegistry';
 import { HelpCommand } from '../../commands/HelpCommand';
+import { OntologyCommand } from '../../commands/OntologyCommand';
+import { SpecCommand } from '../../commands/SpecCommand';
 
 // Test command for registry
 class TestCmd extends BaseCommand {
@@ -89,6 +91,27 @@ describe('HelpCommand', () => {
       const logOutput = consoleSpy.mock.calls.flat().join('\n');
       expect(logOutput).toContain('init');
       expect(logOutput).toContain('build');
+    });
+
+    it('should expose ttsc operator surfaces and current group subcommands', async () => {
+      command = new HelpCommand();
+
+      await command.execute(['--tree']);
+
+      const logOutput = consoleSpy.mock.calls.flat().join('\n');
+      expect(logOutput).toContain('canonical-graph status');
+      expect(logOutput).toContain('coverage-report list');
+      expect(logOutput).toContain('coverage-baseline compare');
+      expect(logOutput).toContain('inputs');
+      expect(logOutput).toContain('retention');
+      expect(logOutput).toContain('extract');
+      expect(logOutput).toContain('graph');
+      expect(logOutput).toContain('stats');
+    });
+
+    it('keeps documented group aliases registered by the command implementations', () => {
+      expect(new SpecCommand().getAlias()).toEqual(['sp']);
+      expect(new OntologyCommand().getAlias()).toEqual(['ont']);
     });
   });
 });

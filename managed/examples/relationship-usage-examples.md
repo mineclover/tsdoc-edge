@@ -4,6 +4,7 @@ type: component
 category: examples
 status: active
 canonical: true
+codeImplementation: not-applicable
 ---
 
 # [[Relationship Usage Examples]]

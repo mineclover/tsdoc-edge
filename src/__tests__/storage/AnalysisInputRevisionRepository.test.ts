@@ -52,6 +52,15 @@ describe('AnalysisInputRevisionRepository', () => {
     expect(repository.readRevision(pin('policy', 'workspace', policy.revisionId))).toEqual(policy);
     expect(repository.readRevision(pin('enrichment', 'workspace', evidence.revisionId))).toBeNull();
 
+    expect(repository.listRevisionPins()).toEqual([
+      expect.objectContaining({ plane: 'evidence', workspaceId: 'workspace' }),
+      expect.objectContaining({ plane: 'enrichment', workspaceId: 'workspace' }),
+      expect.objectContaining({ plane: 'policy', workspaceId: 'workspace' }),
+    ]);
+    expect(repository.listRevisionPins({ plane: 'policy', workspaceId: 'workspace' })).toEqual([
+      expect.objectContaining({ plane: 'policy', workspaceId: 'workspace' }),
+    ]);
+
     const database = new Database(databasePath, { readonly: true });
     const tables = database
       .prepare(
@@ -158,6 +167,23 @@ describe('AnalysisInputRevisionRepository', () => {
     const missingPath = path.join(tempDir, 'missing', 'analysis-inputs.db');
     expect(() => new AnalysisInputRevisionRepository(missingPath, { readOnly: true })).toThrow();
     expect(fs.existsSync(path.dirname(missingPath))).toBe(false);
+  });
+
+  it('lists revision metadata without creating an active pointer', () => {
+    const evidence = createCanonicalEmptyEvidenceRevision('workspace');
+    repository.storeRevision(pin('evidence', 'workspace', evidence.revisionId), evidence);
+    repository.close();
+
+    repository = new AnalysisInputRevisionRepository(databasePath, { readOnly: true });
+    expect(repository.listRevisionPins({ workspaceId: 'other' })).toEqual([]);
+    const database = new Database(databasePath, { readonly: true });
+    const stateTables = database
+      .prepare(
+        "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'analysis_input_state'"
+      )
+      .all();
+    database.close();
+    expect(stateTables).toEqual([]);
   });
 });
 

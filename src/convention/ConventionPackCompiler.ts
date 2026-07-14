@@ -19,6 +19,7 @@ import type {
   PolicySuppression,
   SpecBindingDeclaration,
   SpecGraphProvenance,
+  SpecGraphRevision,
   SpecNode,
   SpecProvenance,
   SpecSourceAnchor,
@@ -58,10 +59,14 @@ export interface ConventionPackSourceContext {
   readonly file: string;
   /** Digest of the exact authored bytes. */
   readonly contentDigest: string;
+  /** Optional canonical projection supplied by managed-spec extraction. */
+  readonly managedSpec?: SpecGraphRevision;
 }
 
 export interface CompileConventionPackFileOptions {
   readonly workspaceRoot?: string;
+  /** Use an exact managed SpecGraph revision instead of JSON spec declarations. */
+  readonly managedSpec?: SpecGraphRevision;
 }
 
 /** Require the exact process-local object emitted by the convention compiler. */
@@ -147,6 +152,7 @@ export function compileConventionPackFile(
   return compileConventionPackSource(parsed, {
     file: relativePath,
     contentDigest: `sha256:${digestText(sourceText)}`,
+    ...(options.managedSpec ? { managedSpec: options.managedSpec } : {}),
   });
 }
 
@@ -230,62 +236,77 @@ export function compileConventionPackSource(
   const nodeSources = requireArray(specSource.nodes, 'convention pack spec nodes');
   const edgeSources = requireArray(specSource.edges ?? [], 'convention pack spec edges');
   const bindingSources = requireArray(specSource.bindings, 'convention pack spec bindings');
-  if (bindingSources.length === 0) {
-    throw new Error('Convention pack must contain at least one spec binding');
-  }
+  let spec: SpecGraphRevision;
+  if (context.managedSpec) {
+    if (nodeSources.length > 0 || edgeSources.length > 0 || bindingSources.length > 0) {
+      throw new Error(
+        'Managed convention packs must leave spec.nodes, spec.edges, and spec.bindings empty; duplicate JSON authoring is not allowed'
+      );
+    }
+    if (context.managedSpec.workspaceId !== scope.workspaceId) {
+      throw new Error(
+        `Managed spec workspace mismatch: expected ${scope.workspaceId}, received ${context.managedSpec.workspaceId}`
+      );
+    }
+    spec = context.managedSpec;
+  } else {
+    if (bindingSources.length === 0) {
+      throw new Error('Convention pack must contain at least one spec binding');
+    }
 
-  const nodes = nodeSources.map((value, index) => {
-    const node = requireRecord(value, `convention pack spec node[${index}]`);
-    assertAllowedKeys(
-      node,
-      ['id', 'kind', 'title', 'lifecycle', 'tags'],
-      `convention pack spec node[${index}]`
-    );
-    const id = requireText(node.id, `convention pack spec node[${index}] id`);
-    return { ...node, source: anchor(id) } as unknown as SpecNode;
-  });
-  const edges = edgeSources.map((value, index) => {
-    const edge = requireRecord(value, `convention pack spec edge[${index}]`);
-    assertAllowedKeys(
-      edge,
-      ['kind', 'from', 'to', 'semanticQualifier'],
-      `convention pack spec edge[${index}]`
-    );
-    const from = requireText(edge.from, `convention pack spec edge[${index}] from`);
-    const to = requireText(edge.to, `convention pack spec edge[${index}] to`);
-    return createSpecEdge({
-      kind: edge.kind as Parameters<typeof createSpecEdge>[0]['kind'],
-      from,
-      to,
-      ...(edge.semanticQualifier === undefined
-        ? {}
-        : {
-            semanticQualifier: requireText(
-              edge.semanticQualifier,
-              `convention pack spec edge[${index}] semanticQualifier`
-            ),
-          }),
-      evidence: [{ source: anchor(`${from}->${to}`) }],
-      provenance: itemProvenance,
+    const nodes = nodeSources.map((value, index) => {
+      const node = requireRecord(value, `convention pack spec node[${index}]`);
+      assertAllowedKeys(
+        node,
+        ['id', 'kind', 'title', 'lifecycle', 'tags'],
+        `convention pack spec node[${index}]`
+      );
+      const id = requireText(node.id, `convention pack spec node[${index}] id`);
+      return { ...node, source: anchor(id) } as unknown as SpecNode;
     });
-  });
-  const bindings = bindingSources.map((value, index) => {
-    const binding = requireRecord(value, `convention pack binding[${index}]`);
-    assertBindingSourceShape(binding, index);
-    const id = requireText(binding.id, `convention pack binding[${index}] id`);
-    return {
-      ...binding,
-      source: anchor(id),
-      provenance: itemProvenance,
-    } as unknown as SpecBindingDeclaration;
-  });
-  const spec = createSpecGraphRevision({
-    workspaceId: scope.workspaceId,
-    nodes,
-    edges,
-    bindings,
-    provenance: graphProvenance,
-  });
+    const edges = edgeSources.map((value, index) => {
+      const edge = requireRecord(value, `convention pack spec edge[${index}]`);
+      assertAllowedKeys(
+        edge,
+        ['kind', 'from', 'to', 'semanticQualifier'],
+        `convention pack spec edge[${index}]`
+      );
+      const from = requireText(edge.from, `convention pack spec edge[${index}] from`);
+      const to = requireText(edge.to, `convention pack spec edge[${index}] to`);
+      return createSpecEdge({
+        kind: edge.kind as Parameters<typeof createSpecEdge>[0]['kind'],
+        from,
+        to,
+        ...(edge.semanticQualifier === undefined
+          ? {}
+          : {
+              semanticQualifier: requireText(
+                edge.semanticQualifier,
+                `convention pack spec edge[${index}] semanticQualifier`
+              ),
+            }),
+        evidence: [{ source: anchor(`${from}->${to}`) }],
+        provenance: itemProvenance,
+      });
+    });
+    const bindings = bindingSources.map((value, index) => {
+      const binding = requireRecord(value, `convention pack binding[${index}]`);
+      assertBindingSourceShape(binding, index);
+      const id = requireText(binding.id, `convention pack binding[${index}] id`);
+      return {
+        ...binding,
+        source: anchor(id),
+        provenance: itemProvenance,
+      } as unknown as SpecBindingDeclaration;
+    });
+    spec = createSpecGraphRevision({
+      workspaceId: scope.workspaceId,
+      nodes,
+      edges,
+      bindings,
+      provenance: graphProvenance,
+    });
+  }
 
   const policySource = requireRecord(normalized.policy, 'convention pack policy');
   assertAllowedKeys(
@@ -338,7 +359,7 @@ export function compileConventionPackSource(
       sourceFingerprint: context.contentDigest,
     },
   });
-  validateExecutablePolicy(bindings, policy.rules, policy.suppressions);
+  validateExecutablePolicy(spec.bindings, policy.rules, policy.suppressions);
 
   const ruleSet = createRuleSetRevision({
     analyzerVersions: {

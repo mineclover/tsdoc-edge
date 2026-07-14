@@ -45,10 +45,12 @@ export class HelpCommand extends BaseCommand {
       description: 'Symbol operations',
       subcommands: [
         { name: 'query', description: 'Query symbol information' },
+        { name: 'fix', description: 'Fix symbol issues' },
+        { name: 'rename', description: 'Rename symbols across codebase' },
         { name: 'deps', description: 'Show dependencies (what this uses)' },
         { name: 'who-uses', description: 'Show reverse dependencies (what uses this)' },
         { name: 'orphans', description: 'Find symbols without dependents' },
-        { name: 'search', description: 'Search symbols by pattern' },
+        { name: 'find-method', description: 'Find methods by name' },
       ],
     },
     {
@@ -60,7 +62,17 @@ export class HelpCommand extends BaseCommand {
         { name: 'impact', description: 'Analyze change impact' },
         { name: 'path', description: 'Find dependency path between symbols' },
         { name: 'clusters', description: 'Find architectural modules' },
+        { name: 'metrics', description: 'Calculate importance metrics' },
+        { name: 'validate', description: 'Check data integrity' },
         { name: 'export', description: 'Export relationship graph' },
+        { name: 'stats', description: 'Show statistics' },
+        { name: 'check', description: 'Check relationships' },
+        { name: 'visualize', description: 'Visualize relationships' },
+        { name: 'analyze', description: 'Run relationship analyzers' },
+        { name: 'type-chain', description: 'Show type dependency chain' },
+        { name: 'cycles', description: 'Detect circular dependencies' },
+        { name: 'roots', description: 'Find root types' },
+        { name: 'help', description: 'Interactive guide' },
       ],
     },
     {
@@ -69,6 +81,7 @@ export class HelpCommand extends BaseCommand {
       description: 'Validation commands',
       subcommands: [
         { name: 'docs', description: 'Validate documentation files' },
+        { name: 'generated', description: 'Validate generated docs' },
         { name: 'connectivity', description: 'Check symbol connectivity' },
         { name: 'refs', description: 'Validate symbol references' },
         { name: 'spec', description: 'Validate specification files' },
@@ -81,8 +94,11 @@ export class HelpCommand extends BaseCommand {
       subcommands: [
         { name: 'index', description: 'Index documentation files' },
         { name: 'backlinks', description: 'Update backlinks' },
+        { name: 'check-links', description: 'Check for broken links' },
+        { name: 'update-refs', description: 'Update code symbol references' },
         { name: 'generate', description: 'Generate documentation' },
-        { name: 'unused', description: 'Find unused documentation' },
+        { name: 'validate', description: 'Validate documentation' },
+        { name: 'find-unused', description: 'Find unused documentation' },
       ],
     },
     {
@@ -91,23 +107,31 @@ export class HelpCommand extends BaseCommand {
       description: 'Specification management',
       subcommands: [
         { name: 'status', description: 'Show spec status' },
+        { name: 'history', description: 'Show specification version history' },
+        { name: 'diff', description: 'Compare specification versions' },
+        { name: 'bump', description: 'Bump specification version' },
         { name: 'validate', description: 'Validate specifications' },
-        { name: 'list', description: 'List all specifications' },
+        { name: 'extract', description: 'Compile managed project specs into SpecGraph' },
+        { name: 'graph', description: 'Inspect saved SpecGraph revisions read-only' },
       ],
     },
     {
       name: 'convention',
       alias: 'conv',
       description: 'Revision-pinned spec-binding conventions',
-      subcommands: [{ name: 'check', description: 'Check a convention pack on the saved graph' }],
+      subcommands: [
+        { name: 'check', description: 'Check a convention pack on the saved graph' },
+        { name: 'inputs', description: 'Inspect exact evidence and enrichment revisions' },
+        { name: 'retention', description: 'Manage retained history pins and GC' },
+      ],
     },
     {
       name: 'ontology',
       alias: 'ont',
       description: 'Ontology management',
       subcommands: [
-        { name: 'status', description: 'Show ontology status' },
-        { name: 'validate', description: 'Validate ontology' },
+        { name: 'stats', description: 'Show ontology statistics' },
+        { name: 'list', description: 'List ontology elements' },
       ],
     },
   ];
@@ -198,6 +222,15 @@ export class HelpCommand extends BaseCommand {
       console.log(`  ${colors.cyan}lint${colors.reset}           Lint source code`);
       console.log(
         `  ${colors.cyan}convention check${colors.reset} Check a versioned convention pack`
+      );
+      console.log(
+        `  ${colors.cyan}canonical-graph status${colors.reset} Inspect the active ttsc graph revision`
+      );
+      console.log(
+        `  ${colors.cyan}coverage-report list${colors.reset} Inspect persisted coverage reports`
+      );
+      console.log(
+        `  ${colors.cyan}coverage-baseline compare${colors.reset} Compare a coverage baseline`
       );
       console.log();
 

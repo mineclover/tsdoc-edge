@@ -4,6 +4,7 @@ version: 2.1.0
 status: active
 primary: CoreFeatures
 category: feature
+codeImplementation: not-applicable
 tags:
   - catalog
   - index
@@ -390,7 +391,7 @@ tsdoc-edge find-doc <symbol>            # 심볼 찾기
 ### 시스템 상태
 ```bash
 tsdoc-edge system-status                # 전체 시스템 상태
-tsdoc-edge coverage-report              # 테스트 커버리지 리포트
+tsdoc-edge coverage-report              # 문서화(@doc) 커버리지 리포트
 ```
 
 ---
@@ -453,4 +454,3 @@ tsdoc-edge coverage-report              # 테스트 커버리지 리포트
 
 - [[Features Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/index.md:8
 - [[Features Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/index.md:226
-

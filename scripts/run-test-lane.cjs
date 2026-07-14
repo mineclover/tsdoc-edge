@@ -3,6 +3,7 @@
 
 const path = require('node:path');
 const { spawn } = require('node:child_process');
+const { spawnManaged, terminateManaged } = require('./process-group.cjs');
 const { acquireTestLaneLock } = require('./test-lane-lock.cjs');
 
 const projectRoot = path.resolve(__dirname, '..');
@@ -16,11 +17,12 @@ let activeChild;
 let childEnvironment = process.env;
 let forwardedSignal;
 let laneLock;
+let cancelTermination = () => {};
 
 function run(label, command, args) {
   console.log(`\n[test:ts7] ${label}`);
   return new Promise((resolve, reject) => {
-    const child = spawn(command, args, {
+    const child = spawnManaged(spawn, command, args, {
       cwd: projectRoot,
       env: childEnvironment,
       stdio: 'inherit',
@@ -32,6 +34,7 @@ function run(label, command, args) {
         return;
       }
       settled = true;
+      cancelTermination();
       if (activeChild === child) {
         activeChild = undefined;
       }
@@ -47,7 +50,8 @@ function run(label, command, args) {
 function forwardSignal(signal) {
   forwardedSignal = signal;
   if (activeChild && activeChild.exitCode === null && activeChild.signalCode === null) {
-    activeChild.kill(signal);
+    cancelTermination();
+    cancelTermination = terminateManaged(activeChild, signal);
   }
 }
 

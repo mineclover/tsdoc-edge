@@ -29,6 +29,11 @@ import {
   assertCompiledConventionPack,
   validateConventionPackManifest,
 } from './ConventionPackCompiler';
+import {
+  type CoverageMetricPolicyInput,
+  type CoverageMetricPolicyReport,
+  evaluateCoverageMetricPolicy,
+} from './CoverageMetricPolicy';
 import type {
   CompiledConventionPack,
   ConventionCapabilityRequirement,
@@ -40,6 +45,7 @@ import {
 } from './NamingConventionEvaluator';
 import { TsdocConventionEvaluator, type TsdocConventionReport } from './TsdocConventionEvaluator';
 import { loadTsdocEnrichment } from './TsdocEnrichmentLoader';
+import { emptyGraphLintReport, type GraphLintReport } from './TtscGraphLintAdapter';
 
 export interface ConventionCapabilityCheck {
   readonly id: string;
@@ -60,6 +66,10 @@ export interface ConventionCheckInput {
   readonly naming?: NamingConventionConfig;
   /** Exact tag requirements evaluated from the loader-produced enrichment revision. */
   readonly tsdoc?: TsdocConventionConfig;
+  /** Optional upstream ttsc graph-lint result projected into this check. */
+  readonly graphLint?: GraphLintReport;
+  /** Optional source-identified coverage report bound to this code revision. */
+  readonly coverage?: CoverageMetricPolicyInput;
   /** Optional CI/lockfile pin preventing same-version pack replacement. */
   readonly expectedManifestId?: string;
   /** Required whenever the policy contains an expiring suppression. */
@@ -94,6 +104,8 @@ export interface ConventionCheckResult {
   readonly capabilityChecks: readonly ConventionCapabilityCheck[];
   readonly naming: NamingConventionReport;
   readonly tsdoc: TsdocConventionReport;
+  readonly graphLint: GraphLintReport;
+  readonly coverage?: CoverageMetricPolicyReport;
   readonly conformance: ConformanceReport;
 }
 
@@ -154,6 +166,8 @@ export class ConventionCheckService {
       enrichment,
       tsdocConfig
     );
+    const graphLint = input.graphLint ?? emptyGraphLintReport(input.codeRevision.graph.fingerprint);
+    const coverage = input.coverage ? evaluateCoverageMetricPolicy(input.coverage) : undefined;
     const snapshot = this.analysis.createSnapshot({
       code: {
         viewKind: 'persisted-code-revision',
@@ -191,6 +205,18 @@ export class ConventionCheckService {
       conformanceReportId: conformance.reportId,
       namingReportId: naming.reportId,
       tsdocReportId: tsdoc.reportId,
+      graphLintReportId: graphLint.reportId,
+      ...(coverage
+        ? {
+            coverage: {
+              reportId: coverage.reportId,
+              graphRevisionId: coverage.graphRevisionId,
+              graphFingerprint: coverage.graphFingerprint,
+              requestedGate: coverage.requestedGate,
+              metrics: coverage.metrics.map(({ metric }) => metric),
+            },
+          }
+        : {}),
       capabilityChecks,
     };
     return Object.freeze({
@@ -218,6 +244,8 @@ export class ConventionCheckService {
       capabilityChecks,
       naming,
       tsdoc,
+      graphLint,
+      ...(coverage ? { coverage } : {}),
       conformance,
     });
   }

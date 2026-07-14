@@ -8,6 +8,15 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import {
+  type CoverageFunctionEvidence,
+  type CoverageMetricFileResult,
+  type CoverageMetricResult,
+  type CoverageSourceIdentity,
+  type CoverageSourceIdentityOptions,
+  createCoverageMetricResult,
+  createCoverageSourceIdentity,
+} from '../metrics/CoverageMetricContract';
 
 /**
  * Istanbul coverage format - raw data structure
@@ -61,6 +70,13 @@ export interface FileCoverage {
   uncoveredLines: number[];
   /** Function-level coverage */
   functions: FunctionCoverage[];
+  /** Raw covered/total counts for file-scoped metric projection */
+  totals: {
+    statements: { covered: number; total: number };
+    functions: { covered: number; total: number };
+    branches: { covered: number; total: number };
+    lines: { covered: number; total: number };
+  };
 }
 
 /**
@@ -76,6 +92,14 @@ export interface FunctionCoverage {
   covered: boolean;
   /** Call count */
   count: number;
+  /** Declaration start line */
+  startLine: number;
+  /** Declaration start column */
+  startColumn?: number;
+  /** Declaration end line */
+  endLine?: number;
+  /** Declaration end column */
+  endColumn?: number;
 }
 
 /**
@@ -95,6 +119,21 @@ export interface CoverageSummary {
   lines: number;
   /** Per-file coverage */
   files: Map<string, FileCoverage>;
+  /** Raw covered/total counts required for reproducible metric results */
+  totals: {
+    statements: { covered: number; total: number };
+    functions: { covered: number; total: number };
+    branches: { covered: number; total: number };
+    lines: { covered: number; total: number };
+  };
+}
+
+/** Parsed Istanbul report plus its stable source identity and metric projections. */
+export interface CoverageParseResult {
+  readonly summary: CoverageSummary;
+  readonly source: CoverageSourceIdentity;
+  readonly metrics: readonly CoverageMetricResult[];
+  readonly fileMetrics: readonly CoverageMetricFileResult[];
 }
 
 /**
@@ -141,6 +180,20 @@ export class CoverageParser {
    * @throws Error if file doesn't exist or is invalid JSON
    */
   parse(coveragePath: string): CoverageSummary {
+    return this.parseWithIdentity(coveragePath).summary;
+  }
+
+  /**
+   * Parse a report while retaining source identity and numerator/denominator metrics.
+   *
+   * @param coveragePath - Path to coverage-final.json
+   * @param identityOptions - Adapter and workspace identity options
+   * @returns Parsed report with source identity and execution metrics
+   */
+  parseWithIdentity(
+    coveragePath: string,
+    identityOptions: CoverageSourceIdentityOptions = {}
+  ): CoverageParseResult {
     if (!fs.existsSync(coveragePath)) {
       throw new Error(`Coverage file not found: ${coveragePath}`);
     }
@@ -154,7 +207,69 @@ export class CoverageParser {
       throw new Error(`Invalid JSON in coverage file: ${error}`);
     }
 
-    return this.parseData(data);
+    const summary = this.parseData(data);
+    const source = createCoverageSourceIdentity(coveragePath, content, identityOptions);
+
+    return {
+      summary,
+      source,
+      metrics: [
+        createCoverageMetricResult(
+          source,
+          'execution.line',
+          summary.totals.lines.covered,
+          summary.totals.lines.total
+        ),
+        createCoverageMetricResult(
+          source,
+          'execution.function',
+          summary.totals.functions.covered,
+          summary.totals.functions.total
+        ),
+        createCoverageMetricResult(
+          source,
+          'execution.branch',
+          summary.totals.branches.covered,
+          summary.totals.branches.total
+        ),
+      ],
+      fileMetrics: Array.from(summary.files.values())
+        .sort((left, right) => left.path.localeCompare(right.path))
+        .map((file) => ({
+          filePath: file.path,
+          metrics: [
+            createCoverageMetricResult(
+              source,
+              'execution.line',
+              file.totals.lines.covered,
+              file.totals.lines.total
+            ),
+            createCoverageMetricResult(
+              source,
+              'execution.function',
+              file.totals.functions.covered,
+              file.totals.functions.total
+            ),
+            createCoverageMetricResult(
+              source,
+              'execution.branch',
+              file.totals.branches.covered,
+              file.totals.branches.total
+            ),
+          ],
+          functions: file.functions.map(
+            (fn): CoverageFunctionEvidence => ({
+              name: fn.name,
+              startLine: fn.startLine,
+              ...(fn.startColumn === undefined ? {} : { startColumn: fn.startColumn }),
+              ...(fn.endLine === undefined ? {} : { endLine: fn.endLine }),
+              ...(fn.endColumn === undefined ? {} : { endColumn: fn.endColumn }),
+              covered: fn.covered,
+              count: fn.count,
+            })
+          ),
+        })),
+    };
   }
 
   /**
@@ -214,6 +329,12 @@ export class CoverageParser {
       branches: totalBranches > 0 ? (coveredBranches / totalBranches) * 100 : 0,
       lines: totalLines > 0 ? (coveredLines / totalLines) * 100 : 0,
       files,
+      totals: {
+        statements: { covered: coveredStatements, total: totalStatements },
+        functions: { covered: coveredFunctions, total: totalFunctions },
+        branches: { covered: coveredBranches, total: totalBranches },
+        lines: { covered: coveredLines, total: totalLines },
+      },
     };
   }
 
@@ -246,6 +367,7 @@ export class CoverageParser {
       lineMap.size > 0
         ? (Array.from(lineMap.values()).filter((c) => c).length / lineMap.size) * 100
         : 0;
+    const lineCovered = Array.from(lineMap.values()).filter((covered) => covered).length;
 
     const coveredLines: number[] = [];
     const uncoveredLines: number[] = [];
@@ -269,6 +391,12 @@ export class CoverageParser {
       coveredLines,
       uncoveredLines,
       functions,
+      totals: {
+        statements: { covered: sCovered, total: sCount },
+        functions: { covered: fCovered, total: fCount },
+        branches: { covered: bCovered, total: bCount },
+        lines: { covered: lineCovered, total: lineMap.size },
+      },
     };
   }
 
@@ -306,12 +434,17 @@ export class CoverageParser {
     for (const key in fnMap) {
       const fn = fnMap[key];
       const count = f[key] || 0;
+      const range = fn.decl ?? fn.loc;
 
       functions.push({
         name: fn.name || '(anonymous)',
         line: fn.decl?.start?.line || fn.loc?.start?.line || 0,
         covered: count > 0,
         count,
+        startLine: range?.start.line ?? 0,
+        ...(range?.start.column === undefined ? {} : { startColumn: range.start.column }),
+        ...(range?.end.line === undefined ? {} : { endLine: range.end.line }),
+        ...(range?.end.column === undefined ? {} : { endColumn: range.end.column }),
       });
     }
 
@@ -327,15 +460,13 @@ export class CoverageParser {
    */
   findFile(summary: CoverageSummary, filePath: string): FileCoverage | null {
     // Try exact match first
-    if (summary.files.has(filePath)) {
-      return summary.files.get(filePath)!;
-    }
+    const exactMatch = summary.files.get(filePath);
+    if (exactMatch) return exactMatch;
 
     // Try normalized path
     const normalized = path.normalize(filePath);
-    if (summary.files.has(normalized)) {
-      return summary.files.get(normalized)!;
-    }
+    const normalizedMatch = summary.files.get(normalized);
+    if (normalizedMatch) return normalizedMatch;
 
     // Try basename match
     const basename = path.basename(filePath);

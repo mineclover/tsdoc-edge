@@ -30,6 +30,15 @@ export class OntologyCommand extends BaseCommand {
   }
 
   /**
+   * getAlias method
+   * @returns Short alias for ontology operations
+   * @public
+   */
+  getAlias(): string[] {
+    return ['ont'];
+  }
+
+  /**
    * getDescription method
    * @returns Returns string
    * @public

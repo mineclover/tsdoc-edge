@@ -1,0 +1,88 @@
+{
+  "contractId": "tsdoc-edge/work-context-differential-fixture",
+  "contractVersion": "1.0",
+  "fixtureId": "work-context-broader-v2",
+  "targetFile": "src/service.ts",
+  "sourceFiles": {
+    "src/service.ts": "export interface Task {}\n\nexport class Service {\n  run(): void {}\n}\n\nexport class Worker {\n  process(): void {\n    new Service().run();\n  }\n}\n\nexport function createService(): Service {\n  return new Service();\n}\n"
+  },
+  "canonical": {
+    "nodes": [
+      {
+        "id": "src/service.ts#Task:interface",
+        "kind": "interface",
+        "name": "Task",
+        "qualifiedName": "Task",
+        "file": "src/service.ts",
+        "exported": true,
+        "evidence": { "file": "src/service.ts", "startLine": 1, "startCol": 1, "endLine": 1 }
+      },
+      {
+        "id": "src/service.ts#Service:class",
+        "kind": "class",
+        "name": "Service",
+        "qualifiedName": "Service",
+        "file": "src/service.ts",
+        "exported": true,
+        "evidence": { "file": "src/service.ts", "startLine": 3, "startCol": 1, "endLine": 5 }
+      },
+      {
+        "id": "src/service.ts#Service.run:method",
+        "kind": "method",
+        "name": "run",
+        "qualifiedName": "Service.run",
+        "file": "src/service.ts",
+        "exported": true,
+        "evidence": { "file": "src/service.ts", "startLine": 4, "startCol": 3, "endLine": 4 }
+      },
+      {
+        "id": "src/service.ts#Worker:class",
+        "kind": "class",
+        "name": "Worker",
+        "qualifiedName": "Worker",
+        "file": "src/service.ts",
+        "exported": true,
+        "evidence": { "file": "src/service.ts", "startLine": 7, "startCol": 1, "endLine": 11 }
+      },
+      {
+        "id": "src/service.ts#Worker.process:method",
+        "kind": "method",
+        "name": "process",
+        "qualifiedName": "Worker.process",
+        "file": "src/service.ts",
+        "exported": true,
+        "evidence": { "file": "src/service.ts", "startLine": 8, "startCol": 3, "endLine": 10 }
+      },
+      {
+        "id": "src/service.ts#createService:function",
+        "kind": "function",
+        "name": "createService",
+        "qualifiedName": "createService",
+        "file": "src/service.ts",
+        "exported": true,
+        "evidence": { "file": "src/service.ts", "startLine": 13, "startCol": 1, "endLine": 15 }
+      }
+    ],
+    "edges": [
+      {
+        "kind": "calls",
+        "from": "src/service.ts#Worker.process:method",
+        "to": "src/service.ts#Service.run:method",
+        "evidence": { "file": "src/service.ts", "startLine": 9, "endLine": 9 }
+      }
+    ]
+  },
+  "expected": {
+    "canonicalIds": [
+      "src/service.ts#Service:class",
+      "src/service.ts#Service.run:method",
+      "src/service.ts#Task:interface",
+      "src/service.ts#Worker:class",
+      "src/service.ts#Worker.process:method",
+      "src/service.ts#createService:function"
+    ],
+    "legacyPrimarySymbol": "Task",
+    "legacyPrimaryType": "interface",
+    "legacyMatchedSymbols": 6
+  }
+}

@@ -494,8 +494,9 @@ export class ModuleSpecGenerator {
     const requirements: string[] = customTags.get('requirement') || [];
 
     // Extract from @depends tags
-    if (customTags.has('depends')) {
-      for (const dep of customTags.get('depends')!) {
+    const dependencyTags = customTags.get('depends');
+    if (dependencyTags) {
+      for (const dep of dependencyTags) {
         dependencies.push({
           name: dep,
           type: 'module',
@@ -558,8 +559,9 @@ export class ModuleSpecGenerator {
     const operations: string[] = [];
 
     // Extract from @functionality tag
-    if (customTags.has('functionality')) {
-      features.push(...customTags.get('functionality')!);
+    const functionalityTags = customTags.get('functionality');
+    if (functionalityTags) {
+      features.push(...functionalityTags);
     } else if (enhancedDoc?.doc.functionality?.mainFeatures) {
       features.push(...enhancedDoc.doc.functionality.mainFeatures);
     }

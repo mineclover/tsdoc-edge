@@ -409,6 +409,10 @@ export interface NamingConventionRule {
   readonly acronym?: 'preserve' | 'normalize';
   /** Permit one leading underscore before applying the selected case style. */
   readonly allowLeadingUnderscore?: boolean;
+  /** Permit conventional exported UPPER_SNAKE_CASE constants when the primary style is camel. */
+  readonly allowConstantCase?: boolean;
+  /** Permit PascalCase value names such as schema objects when the primary style is camel. */
+  readonly allowPascalCase?: boolean;
 }
 
 /** A deliberately small first consumer of the immutable TSDoc enrichment plane. */

@@ -111,11 +111,25 @@ export class ValidateDocsCommand extends BaseCommand {
           const parsed = parser.parse(filePath);
           if (parsed) {
             registry.registerDocument(parsed);
+
+            // Keep source connections deterministic on a clean checkout. The
+            // optional document-symbol index can still contribute @doc links,
+            // but validation must not depend on a generated ignored artifact.
+            if (parsed.primary && parsed.sourceFilePath) {
+              registry.registerCodeConnection({
+                codeSymbol: parsed.primary.name,
+                filePath: parsed.sourceFilePath,
+                line: 1,
+                docSymbol: parsed.primary.name,
+              });
+            }
           }
         } catch (_error) {
           // Errors will be shown in validation
         }
       }
+
+      this.preloadCanonicalDefinitions(docsPath, parser, registry);
 
       // Load code connections from index file if available
       const indexPath = path.resolve(process.cwd(), '.tsdoc/doc-symbols.json');
@@ -221,5 +235,28 @@ export class ValidateDocsCommand extends BaseCommand {
     }
 
     return files;
+  }
+
+  /**
+   * Make managed canonical symbols resolvable while validating legacy docs.
+   * The managed documents themselves are not added to the target validation
+   * scope, so their references and warnings do not leak into this report.
+   */
+  private preloadCanonicalDefinitions(
+    docsPath: string,
+    parser: DocumentSymbolParser,
+    registry: DocumentSymbolRegistry
+  ): void {
+    const managedPath = path.resolve(process.cwd(), 'managed');
+    if (path.resolve(docsPath) === managedPath || !fs.existsSync(managedPath)) return;
+
+    for (const filePath of this.findMarkdownFiles(managedPath)) {
+      try {
+        const parsed = parser.parse(filePath);
+        if (parsed?.primary) registry.registerKnownPrimaryDefinition(parsed.primary);
+      } catch (_error) {
+        // The target validation should remain scoped to its requested tree.
+      }
+    }
   }
 }

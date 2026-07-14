@@ -61,6 +61,26 @@ tsdoc-edge build src
 `--canonical-only`를 함께 사용하면 이 revision만 저장하고 legacy SQLite/JSONL enrichment는
 열거나 수정하지 않는다. 실제 convention PoC와 graph-only CI가 이 경계를 사용한다.
 
+legacy build에서 테스트 심볼 관계가 추출되고 `--canonical-graph`가 활성화된 경우에는
+`test.symbol` projection 요약도 build XML에 포함된다. 이 요약은 active graph revision의
+`graphRevisionId`·`graphFingerprint`, matched/uncovered symbol 수, 미매칭 관계 대상 수를
+보존하며 현재 `inferred`·`report-only` 정책이다.
+
+## Canonical graph operator inspection
+
+저장된 ttsc graph revision은 writer/router를 다시 실행하지 않고 read-only로 확인할 수 있다.
+
+```bash
+tsdoc-edge canonical-graph status --graph-db .tsdoc/canonical-graph.db --json
+tsdoc-edge canonical-graph list --graph-db .tsdoc/canonical-graph.db --json
+tsdoc-edge canonical-graph read --graph-db .tsdoc/canonical-graph.db \
+  --revision-id <revision-id> --json
+```
+
+`status`는 active revision과 retained 개수를, `list`는 revision별 provenance/count를,
+`read`는 exact revision의 graph/alias/diagnostic envelope를 반환한다. 세 명령 모두 active
+pointer를 생성하거나 변경하지 않는다.
+
 ## Related
 
 - [[ASTSymbolExtractor]]: AST 파싱 및 심볼 추출

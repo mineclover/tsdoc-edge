@@ -128,11 +128,12 @@ Some text [[NonExistentSymbol]] here
 
 ```markdown
 # [[FeatureName]]
-(No **Source**: path)
+(No `source:` or **Source**: path)
 ```
 
 **Warning**: `no_code_impl`
-**Fix**: Add source path or mark as doc-only concept
+**Fix**: Add `source:` for an implementation document, or explicitly set
+`codeImplementation: not-applicable` for a document with no single implementation owner.
 
 ## API Methods
 
@@ -209,6 +210,10 @@ interface DocSymbolWarning {
   count?: number;
 }
 ```
+
+The primary document symbol preserves the optional `codeImplementation` disposition from
+frontmatter. `required` is the default; `not-applicable` is an explicit document-level decision,
+not a global validator bypass.
 
 ## Usage
 
@@ -386,4 +391,3 @@ describe('DocumentSymbolRegistry', () => {
 - [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:118
 - [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:278
 - DocumentSymbol → /Users/junwoobang/workflow/tsdoc-edge/managed/types/DocumentSymbol.md:100
-

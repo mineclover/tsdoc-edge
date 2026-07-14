@@ -97,9 +97,9 @@ See implementation: RelationshipEvidence
 
 ## Usage in Analysis
 
-### AnalyzeTestsCommand
+### TestRelationshipsCommand
 ```bash
-tsdoc-edge analyze-tests
+tsdoc-edge test-relationships
 # Finds all test-production symbol relationships
 ```
 
@@ -112,7 +112,7 @@ tsdoc-edge test-relationships src/services/UserService.ts
 ### CoverageReportCommand
 ```bash
 tsdoc-edge coverage-report --hierarchical
-# Includes test coverage in metrics
+# Reports documentation.symbol coverage; it does not include Istanbul execution coverage
 ```
 
 ## Symbol Count
@@ -121,6 +121,6 @@ tsdoc-edge coverage-report --hierarchical
 
 ## Related
 
-- [[AnalyzeTestsCommand]]: Analyze test relationships
+- [[TestRelationshipsCommand]]: Analyze test relationships
 - [[TestRelationshipsCommand]]: Show test coverage
 - [[CoverageReportCommand]]: Coverage metrics

@@ -132,24 +132,33 @@ tsdoc-edge explore-entrypoint managed/relationships/index.md --detect-orphans
 
 ## System Workflows
 
+### [[Coverage Metrics Contract]]
+**Path**: `../features/coverage-metrics-contract.md`
+**Priority**: ⭐⭐ Governance
+
+커버리지 메트릭의 의미, 데이터 소스, evidence 수준, canonical graph 연계 상태를 확인하는
+기준 문서. 커버리지 수치를 추가하거나 baseline으로 고정하기 전에 먼저 이 계약을 확인한다.
+
+### [[Document Validation Warning Policy]]
+**Path**: `document-validation-warning-policy.md`
+**Priority**: ⭐⭐ Governance
+
+`validate-docs managed` warning의 baseline, 허용 범위, 다음 정리 기준을 관리한다.
+상세 처리 규칙은 [[Document Validation Warning Policy]]를 따른다.
+
 ### [[Relationship System Roadmap]]
 **Path**: `relationship-system-roadmap.md`
-**Priority**: ⭐ Planning
+**Priority**: 📚 Historical reference
 
-17가지 관계 타입 시스템의 개발 로드맵.
+기존 legacy 관계 타입 시스템의 historical 구현 맥락을 보존하는 문서다. 현재 ttsc 중심
+canonical graph, spec governance와 release qualification은
+[[Semantic Graph Spec Governance Roadmap]]이 소유한다.
 
-**Status**: Planning/Design document
+**Status**: Historical; not an active backlog
 
-**Tracks**:
-- ✅ Implemented relationships (10/17)
-- 🚧 In progress relationships
-- 📋 Planned relationships
-- 🎯 Implementation priorities
-
-**Phases**:
-- Phase 1: Code relationships (Done)
-- Phase 2: Behavioral relationships (In progress)
-- Phase 3: Semantic relationships (Planned)
+**Historical scope**:
+- 당시 relationship type 구현률과 legacy analyzer 계획
+- 현재 미완료 표시는 active backlog가 아니라 당시 기록의 일부
 
 ---
 
@@ -158,12 +167,14 @@ tsdoc-edge explore-entrypoint managed/relationships/index.md --detect-orphans
 **Path**: `semantic-graph-spec-governance-roadmap.md`
 **Priority**: ⭐⭐⭐ Architecture
 
-복원된 legacy 설계를 비교 기준선으로 사용하고, TS7 canonical graph와 LSP를
-compiler-evidence 기반 spec governance로 확장하는 구현 계획.
+복원된 legacy 설계를 비교 기준선으로 사용하고, `ttsc` canonical graph와
+compiler-evidence 기반 spec governance를 운영하는 현재 구현·release 계획. LSP 동등 사양
+확장은 별도 재개 gate로 보류한다.
 
 **Execution lanes**:
 
-- Product: P4.1 one-command Jest evidence → naming → TSDoc → managed spec → history → LSP
+- Product: P4.1 one-command Jest evidence → naming → TSDoc → managed spec → history
+  (LSP 동등 사양 확장은 deferred)
 - Comparison: canonical safety + legacy baseline → capability와 analyzer 소유권 판정
 - Provider: packed early canary → 외부 TypeScript library full pilot
 - Release: Node/package clean-install qualification
@@ -226,7 +237,7 @@ tsdoc-edge health managed
 | [[Mermaid Entrypoint Workflow]] | System exploration | Weekly | High |
 | Safe Dead Code Deletion | Code cleanup | Monthly | High |
 | [[Example - Mermaid Workflow]] | Learning | Once | Example |
-| [[Relationship System Roadmap]] | Planning | Ongoing | Planning |
+| [[Relationship System Roadmap]] | Historical reference | No active work | Reference only |
 | [[Semantic Graph Spec Governance Roadmap]] | Architecture and implementation planning | Ongoing | Critical |
 | [[TS7 Test Compilation Lane]] | TS7 test toolchain cutover | Current prerequisite | Critical |
 | SELF-IMPROVEMENT-PROCESS | Meta | Weekly | Meta |

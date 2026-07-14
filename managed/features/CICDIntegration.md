@@ -4,6 +4,7 @@ type: feature
 category: feature
 status: active
 canonical: true
+codeImplementation: not-applicable
 ---
 
 # [[CI/CD Integration]]
@@ -73,15 +74,15 @@ jobs:
   doc-quality:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: Setup Node
-        uses: actions/setup-node@v3
+        uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '24.x'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci
 
       - name: Build TSDoc Edge
         run: npm run build
@@ -116,12 +117,17 @@ jobs:
   doc-diff:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0  # Full history for comparison
 
-      - name: Setup
-        run: npm install && npm run build
+      - name: Setup Node.js 24
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
+
+      - name: Install and build
+        run: npm ci && npm run build
 
       - name: Check main branch stats
         run: |
@@ -173,9 +179,9 @@ stages:
 
 doc-quality:
   stage: quality
-  image: node:18
+  image: node:24
   script:
-    - npm install
+    - npm ci
     - npm run build
     - npx tsdoc-edge init
     - npx tsdoc-edge build src
@@ -195,7 +201,7 @@ pipeline {
   stages {
     stage('Doc Quality') {
       steps {
-        sh 'npm install'
+        sh 'npm ci'
         sh 'npm run build'
         sh 'npx tsdoc-edge init'
         sh 'npx tsdoc-edge build src'
@@ -294,4 +300,3 @@ Cache TSDoc database between runs:
 ### Referenced By
 
 - [[Dead Code Detection]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DeadCodeDetection.md:118
-

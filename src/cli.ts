@@ -13,11 +13,13 @@ import { UsageTracker } from './analytics/UsageTracker';
 import {
   AnalyzeCommand,
   BuildCommand,
+  CanonicalGraphCommand,
   CheckDuplicatesCommand,
   CommandRegistry,
   type CommandResult,
   ConventionCommand,
   CoreApiCommand,
+  CoverageBaselineCommand,
   FixCommand,
   HealthCommand,
   HelpCommand,
@@ -152,6 +154,7 @@ async function main(): Promise<void> {
 
   // Register commands - Core workflow
   registry.register(new BuildCommand());
+  registry.register(new CanonicalGraphCommand());
   registry.register(new WorkContextCommand());
   registry.register(new DesignContextCommand());
   registry.register(new HealthCommand());
@@ -202,6 +205,7 @@ async function main(): Promise<void> {
   registry.register(new ParseMermaidCommand());
   registry.register(new PromoteSymbolCommand());
   registry.register(new CoverageReportCommand());
+  registry.register(new CoverageBaselineCommand());
   registry.register(new DetectDeadCodeCommand());
   registry.register(new QueryInferredCommand());
   registry.register(new MoveCommand());

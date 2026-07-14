@@ -21,7 +21,9 @@ export interface ConventionGateDecision {
 type GateFinding =
   | ConventionCheckResult['conformance']['findings'][number]
   | ConventionCheckResult['naming']['findings'][number]
-  | ConventionCheckResult['tsdoc']['findings'][number];
+  | ConventionCheckResult['tsdoc']['findings'][number]
+  | ConventionCheckResult['graphLint']['findings'][number]
+  | NonNullable<ConventionCheckResult['coverage']>['findings'][number];
 
 /** Return all findings that block the selected threshold. */
 export function blockingConventionFindings(
@@ -34,6 +36,8 @@ export function blockingConventionFindings(
     ...result.conformance.findings,
     ...result.naming.findings,
     ...result.tsdoc.findings,
+    ...result.graphLint.findings,
+    ...(result.coverage?.findings ?? []),
   ].filter(
     (finding) =>
       (finding.outcome === 'violated' || finding.outcome === 'indeterminate') &&

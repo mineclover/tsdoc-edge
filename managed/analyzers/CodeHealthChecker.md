@@ -13,6 +13,11 @@ source: src/analyzer/CodeHealthChecker.ts
 
 Generate comprehensive health reports with improvement suggestions by combining documentation quality and test coverage.
 
+**Metric contract**: [[Coverage Metrics Contract]] / `quality.health`.
+
+이 analyzer의 test 값은 Istanbul 실행률이 아니다. 현재 구현은 소스 파일에 대응하는 테스트
+파일 존재 비율을 사용하고, `TestCoverageAnalyzer` 연동은 API 변경으로 비활성화되어 있다.
+
 ## Purpose
 
 **Problem**: Developers struggle to assess overall code quality and prioritize improvements
@@ -40,7 +45,7 @@ generateSuggestions(metrics: CodeHealthMetrics): ImprovementSuggestion[]
 
 **Formula**:
 ```typescript
-healthScore = (docQuality * 0.5) + (testCoverage * 0.5)
+healthScore = (avgDocumentationQuality * 0.6) + (filesWithTestsRatio * 0.4)
 ```
 
 **Doc Quality** (0-100):
@@ -48,10 +53,11 @@ healthScore = (docQuality * 0.5) + (testCoverage * 0.5)
 - Symbol documentation rate
 - Documentation freshness
 
-**Test Coverage** (0-100):
-- Line coverage
-- Branch coverage
-- Symbol coverage
+**Test presence ratio** (0-100):
+- `filesWithTests / (filesWithTests + filesWithoutTests) * 100`
+- Test files are discovered using common filename and `__tests__` path conventions.
+- `TestCoverageInfo.estimatedCoverage` is an inferred file/symbol estimate and is not used as
+  Istanbul line, branch, or function coverage.
 
 ### 2. Improvement Suggestions
 
@@ -81,10 +87,9 @@ type SuggestionType =
 ### 4. Test Coverage Analysis
 
 **Uses**: [[TestCoverageAnalyzer]] (`src/analyzer/TestCoverageAnalyzer.ts`)
-- Parses coverage reports (Istanbul, NYC)
-- Tracks symbol-level coverage
-- Identifies untested code paths
-- Calculates coverage percentages
+- The current `CodeHealthChecker` does not invoke this analyzer because its API changed.
+- Symbol-level test relationships are produced by the build/test relationship path instead.
+- Istanbul parsing is owned by `CoverageParser`, not this health analyzer.
 
 ## Data Structures
 
@@ -187,15 +192,15 @@ tsdoc-edge health src --include-private
       "total": 150,
       "completeness": 0.8
     },
-    "testCoverage": {
-      "score": 71,
-      "lineCoverage": 0.75,
-      "branchCoverage": 0.68,
-      "symbolCoverage": 0.71
-    },
+    "totalFiles": 20,
     "totalSymbols": 150,
+    "publicSymbols": 120,
     "documentedSymbols": 120,
-    "testedSymbols": 107
+    "fullyDocumentedSymbols": 107,
+    "filesWithTests": 14,
+    "filesWithoutTests": 6,
+    "avgQualityScore": 85,
+    "healthScore": 78
   },
   "suggestions": [
     {
@@ -269,8 +274,8 @@ tsdoc-edge health src --include-private
 - ✅ Single score simplifies tracking
 - ⚠️ May oversimplify complex quality issues
 
-**Decision**: Equal weighting (50/50) for doc and tests
-**Rationale**: Both are equally important for code quality
+**Decision**: Documentation quality 60%, test-file presence 40%
+**Rationale**: The current implementation has reliable documentation scores but only a coarse test-file presence signal.
 **Consequences**:
 - ✅ Balanced focus on documentation and testing
 - ⚠️ May not reflect project-specific priorities
@@ -336,4 +341,3 @@ tsdoc-edge health src --include-private
 - Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:369
 - [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:272
 - AnalysisReport → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/AnalysisReport.md:91
-

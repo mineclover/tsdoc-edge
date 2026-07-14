@@ -2,13 +2,17 @@
 title: TestRelationshipAnalyzer
 type: analyzer
 category: core-components
-status: active
-canonical: true
+status: historical
+canonical: false
 ---
 
 # [[TestRelationshipAnalyzer]]
 
 **Source**: `src/analyzer/TestRelationshipAnalyzer.ts`
+
+> **Historical document**: 현재 checkout에는 위 source 파일이 없다. 현재 테스트-심볼 관계
+> 추출의 구현 소유자는 `src/analyzer/TestCoverageAnalyzer.ts`이며 metric ID는
+> [[Coverage Metrics Contract]] / `test.symbol`이다.
 
 ## Purpose
 

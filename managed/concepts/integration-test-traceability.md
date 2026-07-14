@@ -543,8 +543,8 @@ Please add integration tests before committing.
 
 **Status**: Design Phase
 **Implementation**: [[TestRelationshipsCommand]] (`src/commands/TestRelationshipsCommand.ts`)
-**Related Commands**: [[AnalyzeTestsCommand]], [[ParallelWorkCommand]]
-**Next Steps**: Implement TestRelationshipExtractor
+**Related Commands**: [[TestRelationshipsCommand]], [[ParallelWorkCommand]]
+**Next Steps**: Add canonical node and execution evidence to the existing legacy analyzer path
 **Priority**: High (병렬 개발 안전성에 핵심)
 **Last Updated**: 2025-11-08
 
@@ -560,4 +560,3 @@ Please add integration tests before committing.
 - [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:247
 - [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:347
 - [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:375
-

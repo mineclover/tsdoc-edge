@@ -82,7 +82,8 @@ Comprehensive guide to analyzing all 19 relationship types tracked by TSDoc Edge
 - [[Call Relationships]] (`../relationships/CALLS.md`) - Function call detection
 - [[IO Dependency]] (`../relationships/IO-DEPENDENCY.md`) - Data flow analysis
 - [[Pipeline]] (`../relationships/PIPELINE.md`) - Multi-step processing chains
-- [[Test Coverage]] (`../relationships/TEST-COVERAGE.md`) - Test relationship tracking
+- [[Test Coverage]] (`../relationships/test-coverage.md`) - Test relationship tracking
+- [[Coverage Metrics Contract]] (`../features/coverage-metrics-contract.md`) - Coverage metric definitions
 
 **Relationship Categories**:
 1. **Code Space**: [[Code Dependency]], [[Inheritance]], [[Interface Implementation]]

@@ -14,6 +14,22 @@ canonical: true
 
 Specification commands help manage versioned documentation with proper lifecycle tracking.
 
+The current grouped surface is `tsdoc-edge spec`. It keeps the legacy flat commands available
+while making managed-spec extraction and saved SpecGraph inspection explicit:
+
+```bash
+tsdoc-edge spec extract --workspace-root . --spec-db .tsdoc/spec-graph.db
+tsdoc-edge spec graph status --spec-db .tsdoc/spec-graph.db --json
+tsdoc-edge spec graph list --spec-db .tsdoc/spec-graph.db --json
+tsdoc-edge spec graph read --spec-db .tsdoc/spec-graph.db --revision-id <revision-id> --json
+```
+
+`spec extract` is the only writer for the derived SpecGraph projection; the Markdown files under
+`managed/specs/` remain the authored SSOT. The `spec graph` operations are read-only.
+
+**Sources**: `src/commands/SpecCommand.ts`, `src/commands/SpecExtractCommand.ts`,
+`src/commands/SpecGraphCommand.ts`
+
 ## Version Management
 
 ### spec-bump
@@ -80,4 +96,3 @@ tsdoc-edge validate-spec <file> [options]
 
 - [[ValidationFeatures]] - Documentation validation
 - [[Guides & Tutorials]] - Specification workflow guides
-

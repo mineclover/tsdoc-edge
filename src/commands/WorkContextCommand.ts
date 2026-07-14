@@ -12,6 +12,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { format } from 'node:util';
 import { EnhancedWorkContextAnalyzer } from '../analyzer/EnhancedWorkContextAnalyzer';
 import { EntryPointContextAggregator } from '../analyzer/EntryPointContextAggregator';
 import { ConfigManager } from '../config/ConfigManager';
@@ -59,6 +60,8 @@ export class WorkContextCommand extends BaseCommand {
    * @public
    */
   protected configManager = ConfigManager.getInstance();
+  private capturedHumanOutput: string[] | null = null;
+  private capturedHumanOutputFile: string | null = null;
 
   /**
    * getName method
@@ -130,6 +133,20 @@ export class WorkContextCommand extends BaseCommand {
     const categoryFilter = this.getOptionValue(args, '--category')
       ?.split(',')
       .map((c: string) => c.trim());
+
+    const humanOutputPath =
+      useHumanFormat && outputFile ? path.resolve(process.cwd(), outputFile) : null;
+    const originalConsoleLog = humanOutputPath ? console.log : null;
+    if (originalConsoleLog && humanOutputPath) {
+      this.capturedHumanOutput = [];
+      this.capturedHumanOutputFile = humanOutputPath;
+      console.log = ((...values: unknown[]) => {
+        this.capturedHumanOutput?.push(format(...values));
+      }) as typeof console.log;
+    } else {
+      this.capturedHumanOutput = null;
+      this.capturedHumanOutputFile = null;
+    }
 
     // Resolve absolute path
     const absolutePath = path.resolve(process.cwd(), targetFile);
@@ -506,6 +523,18 @@ export class WorkContextCommand extends BaseCommand {
         canonicalContext?.close();
       } finally {
         dbManager?.close();
+        if (originalConsoleLog) {
+          console.log = originalConsoleLog;
+          if (this.capturedHumanOutputFile && this.capturedHumanOutput) {
+            fs.writeFileSync(
+              this.capturedHumanOutputFile,
+              `${this.capturedHumanOutput.join('\n')}\n`,
+              'utf-8'
+            );
+          }
+        }
+        this.capturedHumanOutput = null;
+        this.capturedHumanOutputFile = null;
       }
     }
   }

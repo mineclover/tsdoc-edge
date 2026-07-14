@@ -4,17 +4,21 @@ type: feature
 category: feature
 status: active
 canonical: true
+codeImplementation: not-applicable
 ---
 
 # [[Analyzer Status]]
 
-Current status of all relationship analyzers in TSDoc Edge - which are active, relationship counts, and activation blockers.
+Legacy relationship analyzer inventory retained for compatibility and C2 owner comparison.
+It is not the current ttsc canonical graph coverage report or an active implementation backlog.
 
 ## Purpose
 
-Current status of all relationship analyzers in TSDoc Edge, showing which analyzers are active, how many relationships they detect, and why some analyzers cannot be activated.
+The tables below record the legacy analyzer surface, its historical counts, and activation
+limitations. Current structural ownership, enrichment ownership, and release status are defined by
+[[Semantic Graph Spec Governance Roadmap]] and [[Coverage Metrics Contract]].
 
-**Last Updated**: 2025-12-26
+**Snapshot**: 2025-12-26 (legacy analyzer inventory)
 
 ## Active Analyzers (16 types)
 
@@ -128,7 +132,7 @@ Current status of all relationship analyzers in TSDoc Edge, showing which analyz
 
 ---
 
-## Inactive Analyzers (8 types)
+## Legacy Inactive Analyzers (8 types)
 
 ### ❌ Implementation
 - **Analyzer**: `ImplementationAnalyzer`
@@ -316,4 +320,3 @@ tsdoc-edge build src
 
 - [[Codebase Health Report]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/codebase-health-report.md:136
 - [[Codebase Health Report]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/codebase-health-report.md:343
-

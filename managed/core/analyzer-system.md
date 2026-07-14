@@ -168,7 +168,6 @@ Analyzer System은 코드 구조, 행위, 데이터 흐름, 테스트 커버리�
 
 // TestCoverageAnalyzer - 테스트-구현 매핑
 // TestRelationshipExtractor - 테스트 관계 추출
-// TestRelationshipAnalyzer - 테스트 분석
 // TestCoverageUnifier - 커버리지 통합
 // TestExampleExtractor - 테스트를 예제로
 // IntegrationCoverageCalculator - 통합 테스트 커버리지
@@ -202,9 +201,8 @@ Analyzer System은 코드 구조, 행위, 데이터 흐름, 테스트 커버리�
  * @functionality 커버리지 파싱, 통계 수집
  */
 
-// CoverageParser - LCOV, Istanbul 파싱
-// IstanbulCoverageAdapter - Istanbul 연동
-// CoverageSyncAdapter - 커버리지 동기화
+// CoverageParser - Istanbul 파싱
+// IntegrationCoverageCalculator - 통합 coverage 계산 보조
 // TrackableStatsCollector - 추적 가능 통계
 // StatsHistoryManager - 통계 이력
 // StatsComparator - 통계 비교
@@ -212,6 +210,9 @@ Analyzer System은 코드 구조, 행위, 데이터 흐름, 테스트 커버리�
 ```
 
 **Source**: `src/analyzer/` (Coverage*, Stats*, Importance*)
+
+Metric definitions and evidence boundaries: [[Coverage Metrics Contract]]. `CoverageParser` is an
+Istanbul input parser; it does not by itself create canonical graph coverage.
 
 ---
 
@@ -465,4 +466,3 @@ violations.forEach(v => {
 - [[Symbol Graph System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/symbol-graph.md:32
 - [[Symbol Graph System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/symbol-graph.md:120
 - [[Validator System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/validator-system.md:174
-

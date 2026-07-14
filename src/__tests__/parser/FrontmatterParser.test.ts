@@ -90,6 +90,20 @@ purpose: demonstration
       expect(result.valid).toBe(false);
       expect(result.errors).toContain('Missing required field: tsdoc');
     });
+
+    it('should reject an invalid code implementation disposition', () => {
+      const metadata = {
+        tsdoc: 'managed' as const,
+        codeImplementation: 'sometimes',
+      } as never;
+
+      const result = parser.validate(metadata, false);
+
+      expect(result.valid).toBe(false);
+      expect(result.errors).toContain(
+        'Invalid codeImplementation value: sometimes (expected "required" or "not-applicable")'
+      );
+    });
   });
 
   describe('stringify', () => {

@@ -14,6 +14,13 @@ canonical: true
 
 Report real SSOT (Single Source of Truth) coverage based on `@doc` tags in source code. Measures actual code→docs links rather than docs→docs navigation completeness.
 
+**Metric contract**: [[Coverage Metrics Contract]] / `documentation.symbol`.
+
+이 명령의 coverage는 테스트 실행률(`execution.line|function|branch`)이나 테스트-심볼 관계
+(`test.symbol`)를 의미하지 않는다. 기본 출력은 legacy `DatabaseManager`의 심볼 목록과
+소스 `@doc` 태그를 사용한다. `--canonical-graph-db`를 지정하면 활성 ttsc graph revision에
+`documentation.symbol` projection을 추가하고, revision·fingerprint·미매칭 수를 함께 출력한다.
+
 ## Problem
 
 The explore-entrypoint metric shows misleading coverage (9.2%) because it only measures docs→docs navigation, not actual code documentation status.
@@ -33,7 +40,27 @@ tsdoc-edge coverage-report --hierarchical --json
 
 # Basic coverage summary
 tsdoc-edge coverage-report
+
+# Add canonical documentation.symbol projection
+tsdoc-edge coverage-report --canonical-graph-db .tsdoc/canonical-graph.db
+
+# JSON report with canonical projection
+tsdoc-edge coverage-report --json --canonical-graph-db .tsdoc/canonical-graph.db
+
+# Inspect persisted source-identified reports without mutation
+tsdoc-edge coverage-report list \
+  --workspace <workspace-id> \
+  --report-db .tsdoc/coverage-metrics.db --json
+
+tsdoc-edge coverage-report read \
+  --workspace <workspace-id> \
+  --report-id <coverage-report-id> \
+  --report-db .tsdoc/coverage-metrics.db --json
 ```
+
+`list|read`는 `SyncCoverageCommand`가 저장한 immutable report를 read-only로 확인한다.
+`list`는 workspace별 report pin만 반환하고, `read`는 exact source identity와 metric/file metric
+payload를 반환한다. 두 연산 모두 report DB나 active pointer를 변경하지 않는다.
 
 ## Report Structure
 
@@ -236,6 +263,7 @@ echo "Coverage: $coverage%" > coverage-badge.txt
 
 ## Related
 
+- [[Coverage Metrics Contract]]: Metric ID, evidence, baseline, and migration rules
 - [[BuildCommand]]: Populates symbol database
 - [[IndexDocsCommand]]: Indexes documentation symbols
 - [[ValidateDocsCommand]]: Validates documentation quality
@@ -258,4 +286,3 @@ echo "Coverage: $coverage%" > coverage-badge.txt
 - [[UntestedCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UntestedCommand.md:132
 - [[ValidateSpecCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateSpecCommand.md:146
 - TestRelationships → /Users/junwoobang/workflow/tsdoc-edge/managed/types/TestRelationships.md:109
-

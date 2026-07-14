@@ -191,7 +191,8 @@ Examples:
 
       // Display by depth level
       for (const depth of Array.from(byDepth.keys()).sort((a, b) => a - b)) {
-        const nodes = byDepth.get(depth)!;
+        const nodes = byDepth.get(depth);
+        if (!nodes) continue;
         console.log(
           `  ${this.colors.bold}Depth ${depth}${this.colors.reset} (${nodes.length} symbols)`
         );
@@ -339,7 +340,8 @@ Examples:
     visited.add(startSymbol);
 
     while (queue.length > 0) {
-      const current = queue.shift()!;
+      const current = queue.shift();
+      if (!current) break;
 
       if (current.depth >= maxDepth) continue;
 

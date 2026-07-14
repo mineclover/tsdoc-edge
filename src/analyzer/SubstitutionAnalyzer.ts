@@ -110,7 +110,8 @@ export class SubstitutionAnalyzer {
             });
           }
 
-          const group = interfaceMap.get(baseSymbolId)!;
+          const group = interfaceMap.get(baseSymbolId);
+          if (!group) continue;
           group.implementations.push({
             symbolId: symbol.id,
             symbolName: symbol.name,
@@ -135,7 +136,8 @@ export class SubstitutionAnalyzer {
             });
           }
 
-          const group = baseClassMap.get(baseSymbolId)!;
+          const group = baseClassMap.get(baseSymbolId);
+          if (!group) continue;
           group.implementations.push({
             symbolId: symbol.id,
             symbolName: symbol.name,

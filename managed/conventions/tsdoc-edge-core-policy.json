@@ -1,0 +1,29 @@
+{
+  "contractId": "tsdoc-edge/convention-pack-source",
+  "contractVersion": "1.0",
+  "packId": "@tsdoc-edge/conventions/core-managed",
+  "packVersion": "1.0.0",
+  "scope": {
+    "kind": "workspace",
+    "workspaceId": "tsdoc-edge"
+  },
+  "graphNamespace": "ttsc:tsdoc-edge",
+  "capabilities": {},
+  "spec": {
+    "nodes": [],
+    "edges": [],
+    "bindings": []
+  },
+  "policy": {
+    "lifecycleGateVersion": "1.0.0",
+    "rules": [
+      {
+        "id": "binding.implementation",
+        "version": "1.0.0",
+        "enabled": true,
+        "severity": "error"
+      }
+    ],
+    "suppressions": []
+  }
+}

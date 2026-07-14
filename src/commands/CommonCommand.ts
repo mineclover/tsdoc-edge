@@ -51,9 +51,15 @@ export class CommonCommand extends BaseCommand {
 
       // 공통 의존성 찾기
       const allDeps = Array.from(targetDeps.values());
-      const commonDeps = allDeps.reduce((acc, deps) => {
-        return new Set([...acc].filter((d) => deps.has(d)));
-      });
+      const commonDeps = allDeps.reduce(
+        (acc, deps) => {
+          for (const dependency of acc) {
+            if (!deps.has(dependency)) acc.delete(dependency);
+          }
+          return acc;
+        },
+        new Set(allDeps[0] ?? [])
+      );
 
       // 공통 의존성의 상세 정보 조회
       const commonIds = Array.from(commonDeps);

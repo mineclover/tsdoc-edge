@@ -9,6 +9,9 @@
  */
 export type DocumentSymbolType = 'primary' | 'auxiliary' | 'reference';
 
+/** Explicit disposition for a document's code implementation connection. */
+export type CodeImplementationDisposition = 'required' | 'not-applicable';
+
 /**
  * Document symbol definition
  * @public
@@ -34,6 +37,9 @@ export interface DocumentSymbol {
 
   /** Section name (for #Section references) */
   section?: string;
+
+  /** Explicit frontmatter disposition for code implementation validation. */
+  codeImplementation?: CodeImplementationDisposition;
 }
 
 /**
@@ -59,7 +65,7 @@ export interface ParsedDocSymbols {
   /** Symbol footnote references ([^sym-XXX] or [^SymbolName]) */
   symbolFootnoteRefs: SymbolFootnoteRef[];
 
-  /** Source file path (from **Source**: pattern) */
+  /** Source file path from frontmatter `source` or a **Source**: pattern */
   sourceFilePath?: string;
 }
 

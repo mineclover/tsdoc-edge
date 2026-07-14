@@ -54,7 +54,10 @@ export class DocumentSymbolParser {
     }
 
     // Extract source file path BEFORE removing code blocks (to preserve backticks)
-    let sourceFilePath: string | undefined;
+    let sourceFilePath =
+      typeof metadata.source === 'string' && metadata.source.trim().length > 0
+        ? metadata.source.trim()
+        : undefined;
     const sourceMatch = body.match(/\*\*Source\*\*:\s*`([^`]+)`/);
     if (sourceMatch) {
       sourceFilePath = sourceMatch[1];
@@ -114,6 +117,10 @@ export class DocumentSymbolParser {
       // Check for symbol footnote references [^sym-XXX] or [^SymbolName]
       const footnoteRefs = this.extractSymbolFootnoteReferences(line, lineNum);
       result.symbolFootnoteRefs.push(...footnoteRefs);
+    }
+
+    if (result.primary && metadata.codeImplementation === 'not-applicable') {
+      result.primary.codeImplementation = 'not-applicable';
     }
 
     return result;

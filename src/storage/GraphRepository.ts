@@ -87,6 +87,11 @@ export interface CanonicalGraphRevisionMetadata {
   readonly storedAt: string;
 }
 
+/** Read-only operator projection for one retained canonical graph revision. */
+export interface CanonicalGraphRevisionSummary extends CanonicalGraphRevisionMetadata {
+  readonly active: boolean;
+}
+
 /** One transactionally consistent active revision read. */
 export interface ActiveCanonicalGraphRevision {
   readonly metadata: CanonicalGraphRevisionMetadata;
@@ -473,6 +478,32 @@ export class GraphRepository {
     });
 
     return read();
+  }
+
+  /** List retained revision metadata without changing the active pointer. */
+  listRevisionSummaries(): readonly CanonicalGraphRevisionSummary[] {
+    const read = this.database.transaction(() => {
+      const rows = this.database
+        .prepare(
+          `SELECT revision.*, state.active_revision_id AS current_active_revision_id
+           FROM canonical_graph_revisions AS revision
+           LEFT JOIN canonical_graph_state AS state ON state.singleton = 1
+           ORDER BY CASE
+                      WHEN revision.revision_id = state.active_revision_id THEN 0
+                      ELSE 1
+                    END,
+                    revision.stored_at, revision.revision_id`
+        )
+        .all() as Array<RevisionRow & { current_active_revision_id?: string }>;
+      return rows.map((row) => {
+        const revision = this.materializeRevision(row);
+        return deepFreeze({
+          ...revision.metadata,
+          active: row.revision_id === row.current_active_revision_id,
+        });
+      });
+    });
+    return deepFreeze(read());
   }
 
   /** Read only the active graph, or `null` before the first replacement. */

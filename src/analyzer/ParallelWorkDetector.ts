@@ -220,7 +220,8 @@ export class ParallelWorkDetector {
     visited.add(start);
 
     while (queue.length > 0) {
-      const current = queue.shift()!;
+      const current = queue.shift();
+      if (current === undefined) break;
       const deps = this.graph.adjacencyList.get(current) || [];
 
       for (const depId of deps) {
@@ -377,7 +378,9 @@ export class ParallelWorkDetector {
     visited.add(start);
 
     while (queue.length > 0) {
-      const { node: current, path } = queue.shift()!;
+      const currentEntry = queue.shift();
+      if (!currentEntry) break;
+      const { node: current, path } = currentEntry;
       const deps = this.graph.adjacencyList.get(current) || [];
 
       for (const depId of deps) {

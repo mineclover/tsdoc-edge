@@ -99,6 +99,10 @@ lastUpdated: 2025-01-15
 - [TestCoverageAnalyzer](../../src/analyzer/TestCoverageAnalyzer.ts#TestCoverageAnalyzer) - 테스트 커버리지
   - @testScenario 태그 기반 매핑
   - 미테스트 심볼 탐지
+
+이 절의 테스트 커버리지는 실행률이 아니라 `test.symbol`/`test.scenario` 관계 추정이다. 실행
+커버리지, 문서화 커버리지, health score의 정의는 [[Coverage Metrics Contract]]에서 분리해
+관리한다.
 ### AST Analysis
 - [ASTSymbolExtractor](../../src/analyzer/ASTSymbolExtractor.ts#ASTSymbolExtractor) - AST 심볼 추출
   - 클래스, 인터페이스, 함수, 타입 추출
@@ -400,8 +404,10 @@ jobs:
   check-docs:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24.x'
 
       - name: Install
         run: npm ci
@@ -471,4 +477,3 @@ jobs:
 
 - CodeHealthChecker (Health) → /Users/junwoobang/workflow/tsdoc-edge/src/analyzer/CodeHealthChecker.ts:42
 - DocumentationAnalyzer (Quality) → /Users/junwoobang/workflow/tsdoc-edge/src/analyzer/DocumentationAnalyzer.ts:18
-
