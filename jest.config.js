@@ -26,8 +26,6 @@ module.exports = {
   // Command-oriented tests can emit very large stdout volumes; keep release
   // lanes focused on assertions and avoid Node 24 worker crashes from log pressure.
   silent: true,
-  // Recycle long-lived workers before native compiler/database state accumulates.
-  workerIdleMemoryLimit: '256MB',
   clearMocks: true,
   restoreMocks: true,
   setupFilesAfterEnv: ['<rootDir>/.test-dist/__tests__/setup.js'],
