@@ -12,10 +12,7 @@ const os = require('node:os');
 const path = require('node:path');
 
 const projectRoot = path.resolve(__dirname, '..');
-const routerRoot = path.resolve(
-  process.env.TSDOC_EDGE_TTSC_ROUTER_DIR ??
-    path.join(projectRoot, '..', 'ttsc-ex', 'packages', 'ttsc-graph-router')
-);
+const routerRoot = resolveRouterRoot();
 const tempRoot = fs.mkdtempSync(path.join(os.tmpdir(), 'tsdoc-edge-ttsc-provider-'));
 const packageDirectory = path.join(tempRoot, 'packages');
 const fixtureRoot = path.join(tempRoot, 'fixture');
@@ -193,6 +190,20 @@ function createFixture(root) {
       'fixture',
     ],
     root
+  );
+}
+
+function resolveRouterRoot() {
+  if (process.env.TSDOC_EDGE_TTSC_ROUTER_DIR) {
+    return path.resolve(process.env.TSDOC_EDGE_TTSC_ROUTER_DIR);
+  }
+  const candidates = [
+    path.join(projectRoot, '..', 'ttsc-graph-router'),
+    path.join(projectRoot, '..', 'ttsc-ex', 'packages', 'ttsc-graph-router'),
+  ];
+  return (
+    candidates.find((candidate) => fs.existsSync(path.join(candidate, 'package.json'))) ??
+    candidates[0]
   );
 }
 

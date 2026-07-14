@@ -131,13 +131,12 @@ canonical-only `work-context`, extract a managed spec binding, load source-mappe
 load TSDoc enrichment, pass a revision-pinned convention check, and reproduce the same result
 through the packed `dist/index` public library API without creating or mutating the legacy symbol
 database. This closes the packed public-library POC. CI/release qualification also checks out and
-builds the `ttsc-ex` graph provider before running the same packed canary; the actual Node/OS matrix
+builds the standalone `ttsc-graph-router` provider before running the same packed canary; the actual Node/OS matrix
 result remains a release gate.
 
-The CI/release checkout uses the private provider's immutable ref. Configure a fine-grained
-read-only token for `mineclover/ttsc-ex` as the `TTSC_EX_READ_TOKEN` repository secret before
-running the external qualification workflow; the default `tsdoc-edge` `GITHUB_TOKEN` cannot read
-another private repository.
+The CI/release checkout currently uses an immutable provider ref. If that provider repository is
+private, configure a fine-grained read-only token for it as the repository secret expected by the
+workflow; the default `tsdoc-edge` `GITHUB_TOKEN` cannot read another private repository.
 
 The self-repository CLI/library parity pilot is available after a canonical graph has been built:
 

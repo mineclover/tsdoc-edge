@@ -186,7 +186,8 @@ The configured module must be the graph-router package root, which exports
 the lint evaluator. Graph-lint findings are projected into the convention report and gate without
 duplicating the upstream traversal algorithm.
 
-This command requires the built sibling `ttsc-ex` graph-router by default, or an explicit
+This command requires the built sibling `ttsc-graph-router` by default, falls back to the legacy
+`ttsc-ex/packages/ttsc-graph-router` layout, or accepts an explicit
 `TSDOC_EDGE_GRAPH_ROUTER_MODULE`. The proof command and its authored convention pack are repository
 development assets; the current npm package does not publish `scripts/` or `managed/`. Runner
 evidence and enrichment collectors, general naming/style evaluation, durable report history, and

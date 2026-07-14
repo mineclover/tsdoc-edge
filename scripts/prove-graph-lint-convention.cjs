@@ -9,14 +9,20 @@ const os = require('node:os');
 const path = require('node:path');
 
 const projectRoot = path.resolve(__dirname, '..');
-const routerModule = path.resolve(
-  process.env.TSDOC_EDGE_GRAPH_LINT_MODULE ??
-    path.join(projectRoot, '..', 'ttsc-ex', 'packages', 'ttsc-graph-router', 'dist', 'index.js')
-);
+const routerModule = resolveRouterModule();
 const cli = path.join(projectRoot, 'dist', 'cli.js');
 const pack = path.join(projectRoot, 'managed', 'conventions', 'tsdoc-edge-core.json');
 const rules = path.join(projectRoot, 'managed', 'conventions', 'tsdoc-edge-graph-lint.json');
 const report = path.join(os.tmpdir(), `tsdoc-edge-graph-lint-${process.pid}-${Date.now()}.json`);
+
+function resolveRouterModule() {
+  const candidates = [
+    process.env.TSDOC_EDGE_GRAPH_LINT_MODULE,
+    path.join(projectRoot, '..', 'ttsc-graph-router', 'dist', 'index.js'),
+    path.join(projectRoot, '..', 'ttsc-ex', 'packages', 'ttsc-graph-router', 'dist', 'index.js'),
+  ].filter(Boolean);
+  return path.resolve(candidates.find((candidate) => fs.existsSync(candidate)) ?? candidates[0]);
+}
 
 try {
   for (const [file, label] of [

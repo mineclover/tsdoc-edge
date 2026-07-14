@@ -146,6 +146,7 @@ function main() {
 function resolveRouterModule() {
   const candidates = [
     process.env.TSDOC_EDGE_GRAPH_ROUTER_MODULE,
+    path.resolve(projectRoot, '..', 'ttsc-graph-router', 'dist', 'artifact-source.js'),
     path.resolve(
       projectRoot,
       '..',
