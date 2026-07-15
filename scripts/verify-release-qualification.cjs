@@ -7,7 +7,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 
 const projectRoot = path.resolve(__dirname, '..');
-const ttscProviderRef = '00af8c163bd9fbe8b726a8b3a6252450f50d6274';
+const ttscProviderRef = '5b2a805ebaf2ebd5aba61e1ae000da9a8f8e6590';
 const workflowPaths = {
   ci: path.join(projectRoot, '.github', 'workflows', 'ci.yml'),
   release: path.join(projectRoot, '.github', 'workflows', 'release.yml'),

@@ -65,7 +65,7 @@ jobs:
         with:
           repository: mineclover/ttsc-ex
           token: ${{ secrets.TTSC_EX_READ_TOKEN }}
-          ref: 00af8c163bd9fbe8b726a8b3a6252450f50d6274
+          ref: 5b2a805ebaf2ebd5aba61e1ae000da9a8f8e6590
           path: ttsc-ex
           submodules: recursive
 
