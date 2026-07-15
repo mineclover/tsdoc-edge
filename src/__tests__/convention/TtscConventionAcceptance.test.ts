@@ -109,7 +109,7 @@ function routerArtifact(rootDir: string) {
       unknownFields: 'preserved',
     },
     provenance: {
-      contractVersion: '1.0.0',
+      contractVersion: '1.1.0',
       router: { name: '@ttsc-ex/ttsc-graph-router', version: '0.2.0' },
       producer,
       compilerVersion: null,
@@ -125,7 +125,7 @@ function routerArtifact(rootDir: string) {
 function artifactContract() {
   return {
     id: '@ttsc-ex/ttsc-graph-router/raw-graph-artifact' as const,
-    version: '1.0.0',
+    version: '1.1.0',
     schema: '@ttsc/graph/ITtscGraphDump' as const,
     factPlane: 'raw' as const,
   };

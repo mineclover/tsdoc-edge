@@ -79,7 +79,7 @@ repo id is the current directory name. Override them with `--router-config` and
 `--router-repo`. The module path is explicit until the private graph-router
 package has an installable distribution contract.
 
-The graph-router boundary is pinned to raw artifact contract `1.0.0`. The adapter
+The graph-router boundary is pinned to raw artifact contract `1.1.0`. The adapter
 validates its saved-file/raw capability record and complete producer, router,
 cache, project, and tsconfig provenance before `ProjectIndexer` accepts the dump.
 Actual compiler version remains unreported (`null`); the TypeScript 7.0 value is

@@ -86,7 +86,7 @@ Test transformer는 [[TS7 Test Compilation Lane]] P4.0에서 별도로 정리했
 analyzer·문서 변환기·LSP syntax overlay가 직접 사용하는 `typescript@5.9.x` runtime
 제거를 의미하지 않는다.
 
-graph-router raw artifact contract `1.0.0`은 raw fact plane, saved-file snapshot,
+graph-router raw artifact contract `1.1.0`은 raw fact plane, saved-file snapshot,
 합성 구조 없음, unsaved buffer 없음, one-based evidence, unknown field 보존을
 명시한다. adapter는 계약 version/capability와 producer·router·cache·project·tsconfig
 provenance를 모두 검증한다. `typescriptCompatibilityTarget: "7.0"`은 전환 정책이지
@@ -142,7 +142,7 @@ context는 delta digest에 참여하며 apply 시 persisted base provenance와 e
 
 | 단계 | 상태 | 산출물 |
 | --- | --- | --- |
-| Raw artifact API | 구현 | graph-router contract `1.0.0` / capability / provenance |
+| Raw artifact API | 구현 | graph-router contract `1.1.0` / capability / provenance |
 | Repository ttsc compiler lane | 구현 | `scripts/run-ttsc.cjs` / `tsconfig.ttsc.json` |
 | TS7 test compilation lane | wiring cutover; runtime qualification pending | `tsconfig.test.ttsc.json` / `.test-dist` / JavaScript-only Jest |
 | TS-version-neutral contract | 구현 | `src/indexer/contracts.ts` |
