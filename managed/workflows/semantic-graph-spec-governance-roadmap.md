@@ -26,9 +26,9 @@ canonical: true
 | 구분 | 현재 상태 |
 | --- | --- |
 | Now | Node 24 Ubuntu/macOS 실제 release qualification과 C2 capability owner matrix |
-| Next | 실제 GitHub matrix 결과에 따른 stable release 판정 |
+| Next | mutating CodeAction contract → validator → protocol acceptance matrix → stable release 판정 |
 | Active | external release qualification, C2 owner evidence 수집 |
-| Deferred | ttsc graph-lint/spec parity for unsaved LSP, mutating CodeAction/unsaved spec authoring, historical Explain/Open |
+| Deferred | ttsc graph-lint/spec parity for unsaved LSP, mutating CodeAction implementation/unsaved spec authoring, historical Explain/Open |
 | Release | workflow wiring 완료; 실제 runtime/packed matrix 통과 전 stable release NO-GO |
 | No-go | 두 번째 runner/provider, generic adapter/DSL, convention distribution registry |
 

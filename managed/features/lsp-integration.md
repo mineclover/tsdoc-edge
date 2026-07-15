@@ -269,6 +269,40 @@ LSP server는 이 command를 실행하거나 내용을 수정하지 않는다. c
 제공하며, payload에 없는 active/latest history를 추가로 조회해서는 안 된다. client는 workspace 밖의
 path와 malformed payload를 거부한다. historical Explain/Open과 mutating CodeAction은 별도 gate다.
 
+### Mutating CodeAction contract — next gate
+
+lint와 convention은 canonical code/spec의 보조 진단 계층이다. LSP CodeAction은 lint를 다시
+실행해 결과를 만들거나 unsaved overlay에 `ttsc graph-lint/spec`를 재적용하지 않는다. 현재
+지원하는 Explain/Open action은 retained saved finding의 immutable identity를 소비하는
+read-only action으로 유지한다.
+
+파일을 수정하는 action은 retained finding이 검증된 fix plan을 제공하는 경우에만 허용한다.
+fix plan과 action response는 다음 계약을 따른다.
+
+1. **Identity pin**: `historyId`(있는 경우), `checkId`, `findingId`, `codeRevisionId`와
+   source content digest를 함께 고정한다. 서버가 active/latest history나 다른 revision으로
+   대체하지 않는다.
+2. **Version guard**: 열린 문서는 현재 LSP document version과 plan의 expected version이
+   일치해야 한다. 닫힌 문서는 workspace 내부의 on-disk content digest가 일치해야 한다.
+   불일치하면 mutating action을 반환하지 않고 read-only 설명 action만 제공한다.
+3. **Atomic multi-file edit**: 여러 파일 edit는 하나의 `WorkspaceEdit` transaction으로
+   반환한다. 모든 파일의 identity, scope, version/digest 검증이 성공할 때만 edit를
+   반환하며 일부 파일만 적용 가능한 partial edit는 금지한다.
+4. **Stale rejection**: finding revision, source digest, document version, 또는 fix plan
+   contract version 중 하나라도 현재 상태와 다르면 action을 stale로 거부한다. 재계산이나
+   자동 재기반화(rebase)는 하지 않는다.
+5. **Workspace scope**: 모든 URI는 workspace root 내부의 canonical path여야 하며,
+   workspace 밖의 경로, symlink escape, malformed URI, plan에 없는 파일은 거부한다.
+   client가 보낸 diagnostic data만으로 대상 파일이나 edit를 신뢰하지 않는다.
+6. **Conflict policy**: 한 파일의 겹치는 edit, 파일 간 identity 충돌, 중복 edit는
+   deterministic conflict로 거부한다. edit 순서와 action id는 stable해야 한다.
+
+따라서 mutating action이 없는 lint finding도 정상 상태다. 그 경우에는 diagnostic과
+Explain/Open만 제공한다. 이 계약의 acceptance matrix는 same-file fix, multi-file atomic
+fix, version mismatch, stale revision, outside-workspace path, symlink escape, overlapping
+edit, malformed plan을 포함한다. unsaved overlay의 lint/spec 재평가와 unsaved spec authoring은
+이 계약의 대상이 아니며 계속 별도 보류 범위로 둔다.
+
 ### Historical Explain/Open — exact-ID slice
 
 첫 historical slice는 history 목록, latest 선택, graph 활성 revision 비교를 하지 않는다. Command
