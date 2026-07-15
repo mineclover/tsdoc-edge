@@ -15,7 +15,7 @@ import type {
 } from './contracts';
 import { normalizeRouterDiagnostics } from './diagnostics-contract';
 
-export const SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSION = '1.0.0' as const;
+export const SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSION = '1.1.0' as const;
 
 interface RouterArtifactContract {
   id: string;

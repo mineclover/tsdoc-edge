@@ -33,7 +33,7 @@ describe('TtscGraphRouterArtifactAdapter', () => {
         graphNamespace: 'ttsc:project',
         producerVersion: '0.18.4',
         producerBinaryVersion: 'ttscgraph 0.18.4 (fixture)',
-        artifactContractVersion: '1.0.0',
+        artifactContractVersion: '1.1.0',
         artifactFactPlane: 'raw',
         routerVersion: '0.2.0',
         typescriptCompatibilityTarget: '7.0',
@@ -175,7 +175,7 @@ describe('TtscGraphRouterArtifactAdapter', () => {
     });
 
     await expect(adapter.load({ rootDir })).rejects.toThrow(
-      'Expected ttsc graph artifact contract 1.0.0, got 2.0.0'
+      'Expected ttsc graph artifact contract 1.1.0, got 2.0.0'
     );
   });
 
@@ -433,7 +433,7 @@ function validArtifact() {
       futureCapability: 'preserved',
     },
     provenance: {
-      contractVersion: '1.0.0',
+      contractVersion: '1.1.0',
       router: {
         name: '@ttsc-ex/ttsc-graph-router' as const,
         version: '0.2.0',
@@ -452,7 +452,7 @@ function validArtifact() {
 function artifactContract() {
   return {
     id: '@ttsc-ex/ttsc-graph-router/raw-graph-artifact' as const,
-    version: '1.0.0',
+    version: '1.1.0',
     schema: '@ttsc/graph/ITtscGraphDump' as const,
     factPlane: 'raw' as const,
   };
