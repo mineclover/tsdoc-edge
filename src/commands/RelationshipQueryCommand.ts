@@ -99,7 +99,9 @@ Examples:
         canonicalContext = CanonicalAliasContext.tryOpen(process.cwd());
 
         // Resolve symbol name to ID if needed
-        const resolved = this.resolveSymbol(dbManager, symbolId);
+        const resolved = this.resolveSymbol(dbManager, symbolId, {
+          quiet: !this.hasFlag(args, '--human'),
+        });
         if (resolved) {
           symbolId = resolved.id;
         }

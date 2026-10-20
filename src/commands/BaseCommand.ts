@@ -491,7 +491,7 @@ export abstract class BaseCommand {
     lines.push(`<${rootTag}>`);
 
     for (const [sectionName, sectionData] of Object.entries(sections)) {
-      lines.push(...this.buildXmlSection(sectionName, sectionData, 1));
+      this.appendLines(lines, this.buildXmlSection(sectionName, sectionData, 1));
     }
 
     lines.push(`</${rootTag}>`);
@@ -516,7 +516,7 @@ export abstract class BaseCommand {
       data.forEach((item, index) => {
         lines.push(`${indentStr}  <item index="${index + 1}">`);
         for (const [key, value] of Object.entries(item as Record<string, unknown>)) {
-          lines.push(...this.buildXmlField(key, value, indent + 2));
+          this.appendLines(lines, this.buildXmlField(key, value, indent + 2));
         }
         lines.push(`${indentStr}  </item>`);
       });
@@ -537,7 +537,7 @@ export abstract class BaseCommand {
           items.forEach((item, index) => {
             lines.push(`${indentStr}    <item index="${index + 1}">`);
             for (const [key, value] of Object.entries(item)) {
-              lines.push(...this.buildXmlField(key, value, indent + 3));
+              this.appendLines(lines, this.buildXmlField(key, value, indent + 3));
             }
             lines.push(`${indentStr}    </item>`);
           });
@@ -548,7 +548,7 @@ export abstract class BaseCommand {
         // Object section
         lines.push(`${indentStr}<${name}>`);
         for (const [key, value] of entries) {
-          lines.push(...this.buildXmlField(key, value, indent + 1));
+          this.appendLines(lines, this.buildXmlField(key, value, indent + 1));
         }
         lines.push(`${indentStr}</${name}>`);
       }
@@ -575,6 +575,17 @@ export abstract class BaseCommand {
       return this.buildXmlSection(key, value as Array<Record<string, unknown>>, indent);
     }
     return [`${'  '.repeat(indent)}<${key}>${this.escapeXml(value)}</${key}>`];
+  }
+
+  /**
+   * Append lines without spreading them into push(): a spread of ~125k+ elements overflows the
+   * call stack, and large reports (every issue of a validation run) reach that size.
+   * @private
+   */
+  private appendLines(target: string[], source: readonly string[]): void {
+    for (const line of source) {
+      target.push(line);
+    }
   }
 
   private isPlainRecord(value: unknown): value is Record<string, unknown> {
@@ -653,11 +664,13 @@ export abstract class BaseCommand {
    *
    * @param dbManager - Database manager instance
    * @param symbolIdOrName - Symbol ID or name to look up
+   * @param options - `quiet` suppresses the "Selected: ..." note so XML output stays well-formed
    * @returns Resolved symbol or null if not found
    */
   protected resolveSymbol(
     dbManager: DatabaseManager,
-    symbolIdOrName: string
+    symbolIdOrName: string,
+    options: { quiet?: boolean } = {}
   ): ResolvedSymbol | null {
     // Try exact ID first
     const exactSymbol = dbManager.getSymbol(symbolIdOrName);
@@ -679,10 +692,12 @@ export abstract class BaseCommand {
     );
 
     if (primaryMatch) {
-      console.log(
-        `${colors.dim}Selected: ${primaryMatch.name} (${primaryMatch.type})${colors.reset}`
-      );
-      console.log();
+      if (!options.quiet) {
+        console.log(
+          `${colors.dim}Selected: ${primaryMatch.name} (${primaryMatch.type})${colors.reset}`
+        );
+        console.log();
+      }
       const symbol = dbManager.getSymbol(primaryMatch.id);
       return symbol ? { symbol: symbol as Symbol, id: primaryMatch.id, autoSelected: true } : null;
     }
@@ -705,8 +720,10 @@ export abstract class BaseCommand {
       );
       const selected = startsWithMatch || classOrInterfaceMatches[0];
 
-      console.log(`${colors.dim}Selected: ${selected.name} (${selected.type})${colors.reset}`);
-      console.log();
+      if (!options.quiet) {
+        console.log(`${colors.dim}Selected: ${selected.name} (${selected.type})${colors.reset}`);
+        console.log();
+      }
       const symbol = dbManager.getSymbol(selected.id);
       return symbol ? { symbol: symbol as Symbol, id: selected.id, autoSelected: true } : null;
     }

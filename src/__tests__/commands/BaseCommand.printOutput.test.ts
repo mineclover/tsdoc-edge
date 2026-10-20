@@ -127,6 +127,15 @@ describe('BaseCommand.printOutput', () => {
     expect(xml).toContain('<text>a &lt; b &amp;&amp; &quot;c&quot; &gt; &apos;d&apos;</text>');
   });
 
+  it('prints sections far larger than the call stack allows spreading', () => {
+    const items = Array.from({ length: 150_000 }, (_unused, index) => ({ value: index }));
+
+    const xml = capture(() => command.emit('report', { items }));
+
+    expect(xml.startsWith('<report>\n  <items count="150000">')).toBe(true);
+    expect(xml.endsWith('  </items>\n</report>')).toBe(true);
+  });
+
   it('prints nothing when --human is requested', () => {
     const xml = capture(() => command.emit('report', { summary: { total: 1 } }, ['--human']));
 
