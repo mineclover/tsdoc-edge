@@ -21,6 +21,7 @@ All notable changes to TSDoc Edge will be documented in this file.
 - Large XML reports no longer fail with "Maximum call stack size exceeded".
 - Output piped into another process is no longer truncated by `process.exit`, and a closed pipe no longer crashes the CLI.
 - `resolveSymbol` accepts `{ quiet }` so the "Selected: ..." note cannot end up inside XML output.
+- `orphans`, `parallel-work` and `test-relationships` no longer crash with `ENOENT: mkdir ''`: `DatabaseManager` treats an empty JSONL path as "no JSONL directory" and `exportToJSONL()` fails with an explicit message in that case.
 
 ## [0.13.0] - 2025-12-28
 
