@@ -107,7 +107,9 @@ export class DatabaseManager {
   /**
    * Create a new DatabaseManager
    * @param dbPath - Path to SQLite database file (optional, defaults to config)
-   * @param jsonlPath - Path to JSONL data directory (optional, defaults to config)
+   * @param jsonlPath - Path to JSONL data directory (optional, defaults to config).
+   *   Pass an empty string for consumers that only read the database: no JSONL
+   *   directory is created and {@link DatabaseManager.exportToJSONL} refuses to run.
    */
   constructor(dbPath?: string, jsonlPath?: string) {
     let resolvedDbPath = dbPath;
@@ -130,7 +132,8 @@ export class DatabaseManager {
       fs.mkdirSync(dbDir, { recursive: true });
     }
 
-    if (!fs.existsSync(this.jsonlPath)) {
+    // An empty path means "no JSONL directory": mkdir('') would throw ENOENT.
+    if (this.jsonlPath !== '' && !fs.existsSync(this.jsonlPath)) {
       fs.mkdirSync(this.jsonlPath, { recursive: true });
     }
 
@@ -726,6 +729,12 @@ export class DatabaseManager {
    * Export all data to JSONL format
    */
   exportToJSONL(): string {
+    if (this.jsonlPath === '') {
+      throw new Error(
+        'Cannot export to JSONL: this DatabaseManager was created without a JSONL directory'
+      );
+    }
+
     if (!fs.existsSync(this.jsonlPath)) {
       fs.mkdirSync(this.jsonlPath, { recursive: true });
     }

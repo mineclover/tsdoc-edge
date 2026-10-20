@@ -50,6 +50,20 @@ describe('DatabaseManager', () => {
       expect(dbManager.db).toBeDefined();
     });
 
+    it('accepts an empty JSONL path for read-only consumers without creating any directory', () => {
+      const readOnlyDbPath = path.join(tempDir, 'read-only', 'ro.db');
+      const entriesBefore = fs.readdirSync(process.cwd()).sort();
+
+      const readOnlyManager = new DatabaseManager(readOnlyDbPath, '');
+      try {
+        expect(fs.existsSync(readOnlyDbPath)).toBe(true);
+        expect(fs.readdirSync(process.cwd()).sort()).toEqual(entriesBefore);
+        expect(fs.readdirSync(path.dirname(readOnlyDbPath))).toEqual(['ro.db']);
+      } finally {
+        readOnlyManager.close();
+      }
+    });
+
     it('honors an explicit database path when the JSONL path is omitted', () => {
       dbManager.close();
       const explicitDbPath = path.join(tempDir, 'explicit.db');
@@ -528,6 +542,15 @@ describe('DatabaseManager', () => {
       const content = fs.readFileSync(exportPath, 'utf-8');
       expect(content).toContain('test-011');
       expect(content).toContain('ExportTest');
+    });
+
+    it('refuses to export when the manager was created without a JSONL directory', () => {
+      const readOnlyManager = new DatabaseManager(path.join(tempDir, 'no-jsonl.db'), '');
+      try {
+        expect(() => readOnlyManager.exportToJSONL()).toThrow(/without a JSONL directory/);
+      } finally {
+        readOnlyManager.close();
+      }
     });
   });
 
