@@ -7,6 +7,14 @@ import { GraphService, type SymbolMetrics } from '../graph/GraphService';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 
+/** Everything one metrics run computed, independent of how it is printed */
+interface MetricsReport {
+  options: { top: number; category?: string; metric: keyof SymbolMetrics; detailed: boolean };
+  /** All symbols, sorted by the selected metric */
+  metrics: SymbolMetrics[];
+  topSymbols: SymbolMetrics[];
+}
+
 /**
  * Command for calculating graph metrics to identify key symbols
  * @doc [[RelationshipMetricsCommand]]
@@ -47,6 +55,7 @@ Options:
   --category <cat>      Only consider relationships in this category
   --metric <metric>     Sort by: degree, betweenness, pagerank, importance (default: importance)
   --detailed            Show detailed metrics for each symbol
+  --human               Output in human-readable format (default: XML)
 
 Metrics:
   Degree       - Total connections (in + out)
@@ -103,21 +112,17 @@ Examples:
         return { success: false, message: 'Invalid metric', exitCode: 1 };
       }
 
-      this.printHeader('Symbol Importance Analysis');
+      const isHuman = this.hasFlag(args, '--human');
+      if (isHuman) {
+        this.printHeader('Symbol Importance Analysis');
+      }
 
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
-      console.log();
-      this.printInfo('Building relationship graph...');
-
       const graph = new GraphService(dbManager);
       const metrics = graph.calculateMetrics({ category: options.category });
-
-      this.printInfo(`Analyzing ${metrics.length} symbols...`);
-      console.log();
-
-      this.printInfo('Calculating centrality metrics...');
+      dbManager.close();
 
       // Sort by selected metric
       metrics.sort((a, b) => {
@@ -129,126 +134,189 @@ Examples:
         return 0;
       });
 
-      const topSymbols = metrics.slice(0, options.top);
-
-      console.log();
-
-      // Display results
-      this.printSection(`Top ${topSymbols.length} Symbols by ${this.capitalize(options.metric)}`);
-      console.log();
-
-      for (let i = 0; i < topSymbols.length; i++) {
-        const symbol = topSymbols[i];
-        const rank = i + 1;
-
-        console.log(`  ${this.colors.bold}${rank}. ${symbol.symbolName}${this.colors.reset}`);
-        console.log(`     ID: ${this.colors.dim}${symbol.symbolId}${this.colors.reset}`);
-
-        if (options.detailed) {
-          console.log(
-            `     Degree: ${this.colors.cyan}${symbol.degree}${this.colors.reset} (in: ${symbol.inDegree}, out: ${symbol.outDegree})`
-          );
-          console.log(
-            `     Betweenness: ${this.colors.cyan}${symbol.betweenness.toFixed(4)}${this.colors.reset}`
-          );
-          console.log(
-            `     PageRank: ${this.colors.cyan}${symbol.pageRank.toFixed(6)}${this.colors.reset}`
-          );
-          console.log(
-            `     Importance: ${this.colors.cyan}${symbol.importance.toFixed(2)}${this.colors.reset}`
-          );
-          console.log(
-            `     ${this.colors.dim}${graph.interpretMetrics(symbol)}${this.colors.reset}`
-          );
-        } else {
-          const metricValue = symbol[options.metric];
-          const displayValue =
-            typeof metricValue === 'number'
-              ? metricValue < 1
-                ? metricValue.toFixed(6)
-                : metricValue.toFixed(2)
-              : metricValue;
-          console.log(
-            `     ${this.capitalize(options.metric)}: ${this.colors.cyan}${displayValue}${this.colors.reset}`
-          );
-          console.log(
-            `     ${this.colors.dim}${graph.interpretMetrics(symbol)}${this.colors.reset}`
-          );
-        }
-
-        console.log();
+      const report: MetricsReport = {
+        options,
+        metrics,
+        topSymbols: metrics.slice(0, options.top),
+      };
+      if (isHuman) {
+        this.printHuman(report, graph);
+      } else {
+        this.printXml(report, graph);
       }
-
-      // Overall statistics
-      console.log();
-      this.printSection('Graph Statistics');
-
-      const avgDegree = metrics.reduce((sum, m) => sum + m.degree, 0) / metrics.length;
-      const avgBetweenness = metrics.reduce((sum, m) => sum + m.betweenness, 0) / metrics.length;
-      const totalEdges = metrics.reduce((sum, m) => sum + m.outDegree, 0);
-
-      console.log(`  Total symbols: ${this.colors.cyan}${metrics.length}${this.colors.reset}`);
-      console.log(`  Total relationships: ${this.colors.cyan}${totalEdges}${this.colors.reset}`);
-      console.log(
-        `  Average degree: ${this.colors.cyan}${avgDegree.toFixed(2)}${this.colors.reset}`
-      );
-      console.log(
-        `  Average betweenness: ${this.colors.cyan}${avgBetweenness.toFixed(4)}${this.colors.reset}`
-      );
-      console.log();
-
-      // Distribution
-      const hubs = metrics.filter((m) => m.degree > avgDegree * 2).length;
-      const bridges = metrics.filter((m) => m.betweenness > avgBetweenness * 2).length;
-      const isolates = metrics.filter((m) => m.degree === 0).length;
-
-      console.log(`  ${this.colors.dim}Distribution:${this.colors.reset}`);
-      console.log(
-        `    Hubs (2x avg degree): ${this.colors.cyan}${hubs}${this.colors.reset} symbols`
-      );
-      console.log(
-        `    Bridges (2x avg betweenness): ${this.colors.cyan}${bridges}${this.colors.reset} symbols`
-      );
-      console.log(
-        `    Isolated symbols: ${this.colors.cyan}${isolates}${this.colors.reset} symbols`
-      );
-      console.log();
-
-      // Recommendations
-      this.printSection('Architectural Insights');
-
-      const criticalHubs = metrics.filter((m) => m.degree > 50 && m.betweenness > 0.01);
-      if (criticalHubs.length > 0) {
-        this.printWarning(
-          `${criticalHubs.length} critical hub(s) with high degree and betweenness`
-        );
-        console.log(
-          `  ${this.colors.dim}These are architectural bottlenecks - changes will have wide impact${this.colors.reset}`
-        );
-        for (const hub of criticalHubs.slice(0, 5)) {
-          console.log(
-            `    • ${hub.symbolName} (degree: ${hub.degree}, betweenness: ${hub.betweenness.toFixed(4)})`
-          );
-        }
-        console.log();
-      }
-
-      const coreComponents = metrics.filter((m) => m.inDegree > 20 && m.outDegree < 10);
-      if (coreComponents.length > 0) {
-        this.printInfo(`${coreComponents.length} core component(s) with many dependents`);
-        console.log(
-          `  ${this.colors.dim}These should be stable - many symbols depend on them${this.colors.reset}`
-        );
-        for (const core of coreComponents.slice(0, 3)) {
-          console.log(`    • ${core.symbolName} (in: ${core.inDegree}, out: ${core.outDegree})`);
-        }
-        console.log();
-      }
-
-      dbManager.close();
 
       return this.success(`Analyzed ${metrics.length} symbols`);
     });
+  }
+
+  /** Print the colored terminal report. */
+  private printHuman(report: MetricsReport, graph: GraphService): void {
+    const { options, metrics, topSymbols } = report;
+
+    console.log();
+    this.printInfo('Building relationship graph...');
+    this.printInfo(`Analyzing ${metrics.length} symbols...`);
+    console.log();
+
+    this.printInfo('Calculating centrality metrics...');
+
+    console.log();
+
+    // Display results
+    this.printSection(`Top ${topSymbols.length} Symbols by ${this.capitalize(options.metric)}`);
+    console.log();
+
+    for (let i = 0; i < topSymbols.length; i++) {
+      const symbol = topSymbols[i];
+      const rank = i + 1;
+
+      console.log(`  ${this.colors.bold}${rank}. ${symbol.symbolName}${this.colors.reset}`);
+      console.log(`     ID: ${this.colors.dim}${symbol.symbolId}${this.colors.reset}`);
+
+      if (options.detailed) {
+        console.log(
+          `     Degree: ${this.colors.cyan}${symbol.degree}${this.colors.reset} (in: ${symbol.inDegree}, out: ${symbol.outDegree})`
+        );
+        console.log(
+          `     Betweenness: ${this.colors.cyan}${symbol.betweenness.toFixed(4)}${this.colors.reset}`
+        );
+        console.log(
+          `     PageRank: ${this.colors.cyan}${symbol.pageRank.toFixed(6)}${this.colors.reset}`
+        );
+        console.log(
+          `     Importance: ${this.colors.cyan}${symbol.importance.toFixed(2)}${this.colors.reset}`
+        );
+        console.log(`     ${this.colors.dim}${graph.interpretMetrics(symbol)}${this.colors.reset}`);
+      } else {
+        const metricValue = symbol[options.metric];
+        const displayValue =
+          typeof metricValue === 'number'
+            ? metricValue < 1
+              ? metricValue.toFixed(6)
+              : metricValue.toFixed(2)
+            : metricValue;
+        console.log(
+          `     ${this.capitalize(options.metric)}: ${this.colors.cyan}${displayValue}${this.colors.reset}`
+        );
+        console.log(`     ${this.colors.dim}${graph.interpretMetrics(symbol)}${this.colors.reset}`);
+      }
+
+      console.log();
+    }
+
+    // Overall statistics
+    console.log();
+    this.printSection('Graph Statistics');
+
+    const avgDegree = metrics.reduce((sum, m) => sum + m.degree, 0) / metrics.length;
+    const avgBetweenness = metrics.reduce((sum, m) => sum + m.betweenness, 0) / metrics.length;
+    const totalEdges = metrics.reduce((sum, m) => sum + m.outDegree, 0);
+
+    console.log(`  Total symbols: ${this.colors.cyan}${metrics.length}${this.colors.reset}`);
+    console.log(`  Total relationships: ${this.colors.cyan}${totalEdges}${this.colors.reset}`);
+    console.log(`  Average degree: ${this.colors.cyan}${avgDegree.toFixed(2)}${this.colors.reset}`);
+    console.log(
+      `  Average betweenness: ${this.colors.cyan}${avgBetweenness.toFixed(4)}${this.colors.reset}`
+    );
+    console.log();
+
+    // Distribution
+    const hubs = metrics.filter((m) => m.degree > avgDegree * 2).length;
+    const bridges = metrics.filter((m) => m.betweenness > avgBetweenness * 2).length;
+    const isolates = metrics.filter((m) => m.degree === 0).length;
+
+    console.log(`  ${this.colors.dim}Distribution:${this.colors.reset}`);
+    console.log(`    Hubs (2x avg degree): ${this.colors.cyan}${hubs}${this.colors.reset} symbols`);
+    console.log(
+      `    Bridges (2x avg betweenness): ${this.colors.cyan}${bridges}${this.colors.reset} symbols`
+    );
+    console.log(`    Isolated symbols: ${this.colors.cyan}${isolates}${this.colors.reset} symbols`);
+    console.log();
+
+    // Recommendations
+    this.printSection('Architectural Insights');
+
+    const criticalHubs = metrics.filter((m) => m.degree > 50 && m.betweenness > 0.01);
+    if (criticalHubs.length > 0) {
+      this.printWarning(`${criticalHubs.length} critical hub(s) with high degree and betweenness`);
+      console.log(
+        `  ${this.colors.dim}These are architectural bottlenecks - changes will have wide impact${this.colors.reset}`
+      );
+      for (const hub of criticalHubs.slice(0, 5)) {
+        console.log(
+          `    • ${hub.symbolName} (degree: ${hub.degree}, betweenness: ${hub.betweenness.toFixed(4)})`
+        );
+      }
+      console.log();
+    }
+
+    const coreComponents = metrics.filter((m) => m.inDegree > 20 && m.outDegree < 10);
+    if (coreComponents.length > 0) {
+      this.printInfo(`${coreComponents.length} core component(s) with many dependents`);
+      console.log(
+        `  ${this.colors.dim}These should be stable - many symbols depend on them${this.colors.reset}`
+      );
+      for (const core of coreComponents.slice(0, 3)) {
+        console.log(`    • ${core.symbolName} (in: ${core.inDegree}, out: ${core.outDegree})`);
+      }
+      console.log();
+    }
+  }
+
+  /** Print the machine-readable XML report. */
+  private printXml(report: MetricsReport, graph: GraphService): void {
+    const { options, metrics, topSymbols } = report;
+
+    const avgDegree = metrics.reduce((sum, m) => sum + m.degree, 0) / metrics.length;
+    const avgBetweenness = metrics.reduce((sum, m) => sum + m.betweenness, 0) / metrics.length;
+    const criticalHubs = metrics.filter((m) => m.degree > 50 && m.betweenness > 0.01);
+    const coreComponents = metrics.filter((m) => m.inDegree > 20 && m.outDegree < 10);
+
+    this.printOutput(
+      'relationship-metrics',
+      {
+        query: {
+          top: options.top,
+          metric: options.metric,
+          detailed: options.detailed,
+          ...(options.category ? { category: options.category } : {}),
+        },
+        summary: {
+          totalSymbols: metrics.length,
+          totalRelationships: metrics.reduce((sum, m) => sum + m.outDegree, 0),
+          averageDegree: avgDegree.toFixed(2),
+          averageBetweenness: avgBetweenness.toFixed(4),
+          hubs: metrics.filter((m) => m.degree > avgDegree * 2).length,
+          bridges: metrics.filter((m) => m.betweenness > avgBetweenness * 2).length,
+          isolatedSymbols: metrics.filter((m) => m.degree === 0).length,
+          criticalHubs: criticalHubs.length,
+          coreComponents: coreComponents.length,
+        },
+        symbols: topSymbols.map((symbol, index) => ({
+          rank: index + 1,
+          symbolId: symbol.symbolId,
+          symbolName: symbol.symbolName,
+          degree: symbol.degree,
+          inDegree: symbol.inDegree,
+          outDegree: symbol.outDegree,
+          betweenness: symbol.betweenness.toFixed(4),
+          pageRank: symbol.pageRank.toFixed(6),
+          importance: symbol.importance.toFixed(2),
+          interpretation: graph.interpretMetrics(symbol),
+        })),
+        criticalHubSamples: criticalHubs.slice(0, 5).map((hub) => ({
+          symbolName: hub.symbolName,
+          degree: hub.degree,
+          betweenness: hub.betweenness.toFixed(4),
+        })),
+        coreComponentSamples: coreComponents.slice(0, 3).map((core) => ({
+          symbolName: core.symbolName,
+          inDegree: core.inDegree,
+          outDegree: core.outDegree,
+        })),
+      },
+      []
+    );
   }
 
   private capitalize(str: string): string {
