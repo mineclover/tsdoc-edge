@@ -2,6 +2,26 @@
 
 All notable changes to TSDoc Edge will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- **XML is the default CLI output**: 79 commands now print one XML document; the previous colored terminal report is available with `--human` (see `XML_OUTPUT_MIGRATION.md` for the root tag of each command). Scripts that parse the old text output must pass `--human`. Setup and help commands (`init`, `install-hook`, `uninstall-hook`, `help`) and the `--json` convention/spec-extract commands are unchanged. The git hook written by `install-hook` now runs `pre-commit-run --human`.
+- **`relationship-path`** no longer prints the unused "Reverse graph built" progress line.
+
+### Performance
+- **Lazy command loading**: `cli.ts` no longer imports and instantiates every command. Commands are declared by name and aliases in `src/commands/command-loader.ts` and their modules load on first use (`--version` about 290 ms to about 35 ms).
+- `tsdoc-edge --version` no longer creates `.tsdoc.db` and `docs/` in the current directory.
+
+### Refactored
+- **GraphService** (`src/graph/GraphService.ts`) holds the impact, path, cluster and centrality analysis shared by `relationship impact|path|clusters|metrics`.
+- **BuildService** (`src/service/BuildService.ts`) holds the database construction workflow; `BuildCommand` shrinks from about 1,580 to 370 lines.
+- `BaseCommand.printOutput` renders nested objects and arrays of objects.
+
+### Fixed
+- Large XML reports no longer fail with "Maximum call stack size exceeded".
+- Output piped into another process is no longer truncated by `process.exit`, and a closed pipe no longer crashes the CLI.
+- `resolveSymbol` accepts `{ quiet }` so the "Selected: ..." note cannot end up inside XML output.
+
 ## [0.13.0] - 2025-12-28
 
 ### Added
