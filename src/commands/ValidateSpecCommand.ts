@@ -43,7 +43,12 @@ export class ValidateSpecCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge validate-spec [docs-directory]\n\n  Default: managed';
+    return `tsdoc-edge validate-spec [docs-directory] [options]
+
+  Default: managed
+
+  Options:
+    --human          Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -68,7 +73,8 @@ export class ValidateSpecCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const docsDir = args[0] || 'managed';
+      const isHuman = this.hasFlag(args, '--human');
+      const docsDir = args.filter((arg) => arg !== '--human')[0] || 'managed';
       const docsPath = path.resolve(process.cwd(), docsDir);
 
       if (!fs.existsSync(docsPath)) {
@@ -76,12 +82,33 @@ export class ValidateSpecCommand extends BaseCommand {
         return this.failure(`Path not found: ${docsPath}`);
       }
 
-      this.printHeader('Validating Specification Completeness');
+      if (isHuman) {
+        this.printHeader('Validating Specification Completeness');
+      }
 
       const markdownFiles = this.findMarkdownFiles(docsPath);
 
       if (markdownFiles.length === 0) {
-        this.printWarning('No markdown files found');
+        if (isHuman) {
+          this.printWarning('No markdown files found');
+        } else {
+          this.printOutput(
+            'spec-validation',
+            {
+              summary: {
+                target: path.relative(process.cwd(), docsPath) || '.',
+                total: 0,
+                complete: 0,
+                incomplete: 0,
+                totalIssues: 0,
+                averageDesignScore: 0,
+                averageImplementationScore: 0,
+              },
+              specs: [],
+            },
+            args
+          );
+        }
         return this.success();
       }
 
@@ -97,53 +124,78 @@ export class ValidateSpecCommand extends BaseCommand {
         results.reduce((sum, r) => sum + r.implementationScore, 0) / results.length
       );
 
-      this.printSection('Summary');
-      console.log(`Total specifications: ${colors.cyan}${summary.total}${colors.reset}`);
-      console.log(`Complete: ${colors.green}${summary.complete}${colors.reset}`);
-      console.log(`Incomplete: ${colors.yellow}${summary.incomplete}${colors.reset}`);
-      console.log();
-      console.log(`${colors.bold}Score Breakdown:${colors.reset}`);
-      console.log(
-        `  Design Score:         ${this.colorizeScore(avgDesign)}${avgDesign}%${colors.reset}`
-      );
-      console.log(
-        `  Implementation Score: ${this.colorizeScore(avgImpl)}${avgImpl}%${colors.reset}`
-      );
-      console.log(
-        `  Total issues: ${summary.totalIssues > 0 ? colors.yellow : colors.green}${summary.totalIssues}${colors.reset}`
-      );
-      console.log();
-
-      const completeSpecs = results.filter((r) => r.isComplete);
-      if (completeSpecs.length > 0) {
-        this.printSection('Complete Specifications');
-        for (const result of completeSpecs.slice(0, 5)) {
-          const fileName = path.basename(result.filePath);
-          console.log(`${colors.green}✅${colors.reset} ${fileName}`);
-          console.log(
-            `   Design: ${this.colorizeScore(result.designScore)}${result.designScore}%${colors.reset}  Implementation: ${this.colorizeScore(result.implementationScore)}${result.implementationScore}%${colors.reset}`
-          );
-        }
-        if (completeSpecs.length > 5) {
-          console.log(`... and ${completeSpecs.length - 5} more`);
-        }
+      if (isHuman) {
+        this.printSection('Summary');
+        console.log(`Total specifications: ${colors.cyan}${summary.total}${colors.reset}`);
+        console.log(`Complete: ${colors.green}${summary.complete}${colors.reset}`);
+        console.log(`Incomplete: ${colors.yellow}${summary.incomplete}${colors.reset}`);
         console.log();
-      }
-
-      const incompleteSpecs = results.filter((r) => !r.isComplete);
-      if (incompleteSpecs.length > 0) {
-        this.printSection('Incomplete Specifications');
-        for (const result of incompleteSpecs.slice(0, 5)) {
-          const fileName = path.basename(result.filePath);
-          console.log(`${colors.yellow}⚠️${colors.reset} ${fileName}`);
-          console.log(
-            `   Design: ${this.colorizeScore(result.designScore)}${result.designScore}%${colors.reset}  Implementation: ${this.colorizeScore(result.implementationScore)}${result.implementationScore}%${colors.reset}`
-          );
-        }
-        if (incompleteSpecs.length > 5) {
-          console.log(`... and ${incompleteSpecs.length - 5} more`);
-        }
+        console.log(`${colors.bold}Score Breakdown:${colors.reset}`);
+        console.log(
+          `  Design Score:         ${this.colorizeScore(avgDesign)}${avgDesign}%${colors.reset}`
+        );
+        console.log(
+          `  Implementation Score: ${this.colorizeScore(avgImpl)}${avgImpl}%${colors.reset}`
+        );
+        console.log(
+          `  Total issues: ${summary.totalIssues > 0 ? colors.yellow : colors.green}${summary.totalIssues}${colors.reset}`
+        );
         console.log();
+
+        const completeSpecs = results.filter((r) => r.isComplete);
+        if (completeSpecs.length > 0) {
+          this.printSection('Complete Specifications');
+          for (const result of completeSpecs.slice(0, 5)) {
+            const fileName = path.basename(result.filePath);
+            console.log(`${colors.green}✅${colors.reset} ${fileName}`);
+            console.log(
+              `   Design: ${this.colorizeScore(result.designScore)}${result.designScore}%${colors.reset}  Implementation: ${this.colorizeScore(result.implementationScore)}${result.implementationScore}%${colors.reset}`
+            );
+          }
+          if (completeSpecs.length > 5) {
+            console.log(`... and ${completeSpecs.length - 5} more`);
+          }
+          console.log();
+        }
+
+        const incompleteSpecs = results.filter((r) => !r.isComplete);
+        if (incompleteSpecs.length > 0) {
+          this.printSection('Incomplete Specifications');
+          for (const result of incompleteSpecs.slice(0, 5)) {
+            const fileName = path.basename(result.filePath);
+            console.log(`${colors.yellow}⚠️${colors.reset} ${fileName}`);
+            console.log(
+              `   Design: ${this.colorizeScore(result.designScore)}${result.designScore}%${colors.reset}  Implementation: ${this.colorizeScore(result.implementationScore)}${result.implementationScore}%${colors.reset}`
+            );
+          }
+          if (incompleteSpecs.length > 5) {
+            console.log(`... and ${incompleteSpecs.length - 5} more`);
+          }
+          console.log();
+        }
+      } else {
+        this.printOutput(
+          'spec-validation',
+          {
+            summary: {
+              target: path.relative(process.cwd(), docsPath) || '.',
+              total: summary.total,
+              complete: summary.complete,
+              incomplete: summary.incomplete,
+              totalIssues: summary.totalIssues,
+              averageDesignScore: avgDesign,
+              averageImplementationScore: avgImpl,
+            },
+            specs: results.map((r) => ({
+              file: path.relative(process.cwd(), r.filePath),
+              isComplete: r.isComplete,
+              designScore: r.designScore,
+              implementationScore: r.implementationScore,
+              issueCount: r.issues.length,
+            })),
+          },
+          args
+        );
       }
 
       if (summary.incomplete > 0) {

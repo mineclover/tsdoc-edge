@@ -83,8 +83,9 @@ export class OntologyStatsCommand extends BaseCommand {
     return `tsdoc-edge ontology-stats [options]
 
 Options:
+  --human           Output in human-readable format (default: XML)
   --mermaid         Generate Mermaid diagram of ontology model
-  --detailed        Show detailed breakdown of all types
+  --detailed        Show detailed breakdown of all types (--human only; XML always lists every type)
   --json            Output as JSON`;
   }
 
@@ -100,6 +101,7 @@ Options:
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
       const showMermaid = args.includes('--mermaid');
       const detailed = args.includes('--detailed');
       const jsonOutput = args.includes('--json');
@@ -112,13 +114,15 @@ Options:
 
       if (jsonOutput) {
         this.outputJSON(stats);
-      } else {
+      } else if (isHuman) {
         this.outputText(stats, detailed);
 
         if (showMermaid) {
           console.log();
           this.outputMermaid(stats);
         }
+      } else {
+        this.outputXml(stats, showMermaid, args);
       }
 
       dbManager.close();
@@ -356,67 +360,137 @@ Options:
     console.log(JSON.stringify(output, null, 2));
   }
 
-  private outputMermaid(stats: OntologyStats): void {
-    console.log(`${colors.bold}${colors.cyan}Ontology Model Diagram${colors.reset}`);
-    console.log();
-    console.log('```mermaid');
-    console.log('graph TB');
-    console.log('  subgraph Ontology["TSDoc Edge Ontology Model"]');
-    console.log();
+  private outputXml(stats: OntologyStats, showMermaid: boolean, args: string[]): void {
+    const percent = (count: number, whole: number): number =>
+      whole > 0 ? Number(((count / whole) * 100).toFixed(1)) : 0;
+    // Count distribution as items; with `order`, every listed name appears (zero counts included)
+    const distribution = (
+      key: string,
+      counts: Map<string, number>,
+      whole: number,
+      order?: string[]
+    ): Array<Record<string, string | number>> => {
+      const entries: Array<[string, number]> = order
+        ? order.map((name) => [name, counts.get(name) || 0])
+        : Array.from(counts.entries()).sort((a, b) => b[1] - a[1]);
+      return entries.map(([name, count]) => ({
+        [key]: name,
+        count,
+        percent: percent(count, whole),
+      }));
+    };
+
+    const { nodes, relationships, metrics } = stats;
+
+    this.printOutput(
+      'ontology-statistics',
+      {
+        summary: {
+          totalNodes: nodes.total,
+          totalRelationships: relationships.total,
+          density: Number(metrics.density.toFixed(2)),
+          avgDegree: Number(metrics.avgDegree.toFixed(2)),
+          maxDegree: metrics.maxDegree,
+          coverage: Number(metrics.coverage.toFixed(1)),
+          explicitRelationships: relationships.explicit,
+          explicitPercent: percent(relationships.explicit, relationships.total),
+          inferredRelationships: relationships.inferred,
+          inferredPercent: percent(relationships.inferred, relationships.total),
+        },
+        nodeTypes: distribution('type', nodes.byType, nodes.total),
+        relationshipCategories: distribution(
+          'category',
+          relationships.byCategory,
+          relationships.total
+        ),
+        relationshipTypes: distribution('type', relationships.byType, relationships.total),
+        relationshipStrengths: distribution(
+          'strength',
+          relationships.byStrength,
+          relationships.total,
+          ['strong', 'medium', 'weak']
+        ),
+        relationshipDirections: distribution(
+          'direction',
+          relationships.byDirection,
+          relationships.total,
+          ['unidirectional', 'bidirectional', 'undirected']
+        ),
+        ...(showMermaid ? { mermaid: { diagram: this.buildMermaidLines(stats).join('\n') } } : {}),
+      },
+      args
+    );
+  }
+
+  private buildMermaidLines(stats: OntologyStats): string[] {
+    const lines: string[] = [];
+    lines.push('graph TB');
+    lines.push('  subgraph Ontology["TSDoc Edge Ontology Model"]');
+    lines.push('');
 
     // Node types subgraph
-    console.log('    subgraph Nodes["Node Types"]');
+    lines.push('    subgraph Nodes["Node Types"]');
     const topNodeTypes = Array.from(stats.nodes.byType.entries())
       .sort((a, b) => b[1] - a[1])
       .slice(0, 8);
 
     for (const [type, count] of topNodeTypes) {
       const nodeId = `N_${type.replace(/[^a-zA-Z0-9]/g, '_')}`;
-      console.log(`      ${nodeId}["${type}<br/>${count.toLocaleString()} nodes"]`);
+      lines.push(`      ${nodeId}["${type}<br/>${count.toLocaleString()} nodes"]`);
     }
-    console.log('    end');
-    console.log();
+    lines.push('    end');
+    lines.push('');
 
     // Relationship categories subgraph
-    console.log('    subgraph Rels["Relationship Categories"]');
+    lines.push('    subgraph Rels["Relationship Categories"]');
     const categories = Array.from(stats.relationships.byCategory.entries()).sort(
       (a, b) => b[1] - a[1]
     );
 
     for (const [category, count] of categories) {
       const catId = `C_${category.replace(/[^a-zA-Z0-9]/g, '_')}`;
-      console.log(`      ${catId}["${category}<br/>${count.toLocaleString()} rels"]`);
+      lines.push(`      ${catId}["${category}<br/>${count.toLocaleString()} rels"]`);
     }
-    console.log('    end');
-    console.log();
+    lines.push('    end');
+    lines.push('');
 
     // Metrics subgraph
-    console.log('    subgraph Metrics["Graph Metrics"]');
-    console.log(`      M_density["Density: ${stats.metrics.density.toFixed(2)}"]`);
-    console.log(`      M_coverage["Coverage: ${stats.metrics.coverage.toFixed(1)}%"]`);
-    console.log(`      M_degree["Avg Degree: ${stats.metrics.avgDegree.toFixed(2)}"]`);
-    console.log('    end');
+    lines.push('    subgraph Metrics["Graph Metrics"]');
+    lines.push(`      M_density["Density: ${stats.metrics.density.toFixed(2)}"]`);
+    lines.push(`      M_coverage["Coverage: ${stats.metrics.coverage.toFixed(1)}%"]`);
+    lines.push(`      M_degree["Avg Degree: ${stats.metrics.avgDegree.toFixed(2)}"]`);
+    lines.push('    end');
 
-    console.log('  end');
-    console.log();
+    lines.push('  end');
+    lines.push('');
 
     // Styling
-    console.log('  classDef nodeClass fill:#e1f5ff,stroke:#01579b,stroke-width:2px;');
-    console.log('  classDef relClass fill:#fff3e0,stroke:#e65100,stroke-width:2px;');
-    console.log('  classDef metricClass fill:#f3e5f5,stroke:#4a148c,stroke-width:2px;');
-    console.log();
-    console.log(
+    lines.push('  classDef nodeClass fill:#e1f5ff,stroke:#01579b,stroke-width:2px;');
+    lines.push('  classDef relClass fill:#fff3e0,stroke:#e65100,stroke-width:2px;');
+    lines.push('  classDef metricClass fill:#f3e5f5,stroke:#4a148c,stroke-width:2px;');
+    lines.push('');
+    lines.push(
       '  class ' +
         topNodeTypes.map(([type]) => `N_${type.replace(/[^a-zA-Z0-9]/g, '_')}`).join(',') +
         ' nodeClass;'
     );
-    console.log(
+    lines.push(
       '  class ' +
         categories.map(([cat]) => `C_${cat.replace(/[^a-zA-Z0-9]/g, '_')}`).join(',') +
         ' relClass;'
     );
-    console.log('  class M_density,M_coverage,M_degree metricClass;');
+    lines.push('  class M_density,M_coverage,M_degree metricClass;');
 
+    return lines;
+  }
+
+  private outputMermaid(stats: OntologyStats): void {
+    console.log(`${colors.bold}${colors.cyan}Ontology Model Diagram${colors.reset}`);
+    console.log();
+    console.log('```mermaid');
+    for (const line of this.buildMermaidLines(stats)) {
+      console.log(line);
+    }
     console.log('```');
     console.log();
     console.log(

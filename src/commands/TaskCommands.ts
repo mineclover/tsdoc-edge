@@ -11,6 +11,14 @@ import { TaskPriority, TaskStatus, TaskType } from '../types/task';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
+ * Drop undefined fields so that absent values are omitted from XML instead of
+ * rendering as empty elements.
+ */
+function definedFields(fields: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(fields).filter(([, value]) => value !== undefined));
+}
+
+/**
  * Task List Command
  * @doc [[TaskCommands]]
  * @public
@@ -48,6 +56,7 @@ Options:
   --type=<type>          Filter by type (feature|bug|docs|refactor|test|research)
   --assigned-to=<name>   Filter by assignee
   --overdue              Show only overdue tasks
+  --human                Output in human-readable format (default: XML)
   --json                 Output as JSON`;
   }
 
@@ -67,6 +76,7 @@ Options:
       const dbManager = new DatabaseManager(dbPath);
       const taskManager = new TaskManager(dbManager);
 
+      const isHuman = this.hasFlag(args, '--human');
       const filter: TaskFilter = {};
       let outputJson = false;
       let showOverdue = false;
@@ -96,6 +106,22 @@ Options:
 
       if (outputJson) {
         console.log(JSON.stringify(tasks, null, 2));
+      } else if (!isHuman) {
+        this.printOutput(
+          'task-list',
+          {
+            summary: definedFields({
+              total: tasks.length,
+              status: filter.status,
+              priority: filter.priority,
+              type: filter.type,
+              assignedTo: filter.assignedTo,
+              overdueOnly: showOverdue,
+            }),
+            tasks: tasks.map((task) => this.toListItem(task)),
+          },
+          args
+        );
       } else {
         this.printHeader('Task List');
         console.log();
@@ -115,6 +141,23 @@ Options:
 
       dbManager.close();
       return this.success();
+    });
+  }
+
+  private toListItem(task: Task): Record<string, unknown> {
+    return definedFields({
+      id: task.id,
+      title: task.title,
+      status: task.status,
+      priority: task.priority,
+      type: task.type,
+      description: task.description || undefined,
+      assignedTo: task.assignedTo || undefined,
+      dueDate: task.dueDate || undefined,
+      overdue: task.dueDate
+        ? new Date(task.dueDate) < new Date() && task.status !== TaskStatus.DONE
+        : undefined,
+      tags: task.tags && task.tags.length > 0 ? task.tags : undefined,
     });
   }
 
@@ -235,7 +278,8 @@ Options:
   --file=<path>          Related file path
   --due=<date>           Due date (YYYY-MM-DD)
   --tags=<tag1,tag2>     Comma-separated tags
-  --estimate=<hours>     Estimated hours`;
+  --estimate=<hours>     Estimated hours
+  --human                Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -246,11 +290,14 @@ Options:
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
-      if (this.hasHelpFlag(args) || args.length === 0) {
+      const isHuman = this.hasFlag(args, '--human');
+      const positional = args.filter((arg) => arg !== '--human');
+
+      if (this.hasHelpFlag(args) || positional.length === 0) {
         return this.displayHelp();
       }
 
-      const title = args[0];
+      const title = positional[0];
       if (!title) {
         this.printError('Task title is required');
         return this.failure('Missing title');
@@ -270,7 +317,7 @@ Options:
       let tags: string[] | undefined;
       let estimatedHours: number | undefined;
 
-      for (const arg of args.slice(1)) {
+      for (const arg of positional.slice(1)) {
         if (arg.startsWith('--description=')) {
           description = arg.split('=')[1];
         } else if (arg.startsWith('--priority=')) {
@@ -309,14 +356,37 @@ Options:
         estimatedHours,
       });
 
-      this.printHeader('Task Created');
-      console.log();
-      console.log(`  ID: ${colors.cyan}${task.id}${colors.reset}`);
-      console.log(`  Title: ${task.title}`);
-      console.log(`  Status: ${task.status}`);
-      console.log(`  Priority: ${colors.yellow}${task.priority}${colors.reset}`);
-      console.log(`  Type: ${task.type}`);
-      console.log();
+      if (isHuman) {
+        this.printHeader('Task Created');
+        console.log();
+        console.log(`  ID: ${colors.cyan}${task.id}${colors.reset}`);
+        console.log(`  Title: ${task.title}`);
+        console.log(`  Status: ${task.status}`);
+        console.log(`  Priority: ${colors.yellow}${task.priority}${colors.reset}`);
+        console.log(`  Type: ${task.type}`);
+        console.log();
+      } else {
+        this.printOutput(
+          'task-created',
+          {
+            task: definedFields({
+              id: task.id,
+              title: task.title,
+              status: task.status,
+              priority: task.priority,
+              type: task.type,
+              description: task.description || undefined,
+              assignedTo: task.assignedTo || undefined,
+              symbolId: task.symbolId || undefined,
+              filePath: task.filePath || undefined,
+              dueDate: task.dueDate || undefined,
+              tags: task.tags && task.tags.length > 0 ? task.tags : undefined,
+              estimatedHours: task.estimatedHours,
+            }),
+          },
+          args
+        );
+      }
 
       dbManager.close();
       return this.success();
@@ -362,7 +432,8 @@ Options:
   --description=<text>    New description
   --assigned-to=<name>    Change assignee
   --due=<date>            Change due date
-  --actual=<hours>        Set actual hours spent`;
+  --actual=<hours>        Set actual hours spent
+  --human                 Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -373,11 +444,14 @@ Options:
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
-      if (this.hasHelpFlag(args) || args.length === 0) {
+      const isHuman = this.hasFlag(args, '--human');
+      const positional = args.filter((arg) => arg !== '--human');
+
+      if (this.hasHelpFlag(args) || positional.length === 0) {
         return this.displayHelp();
       }
 
-      const taskId = args[0];
+      const taskId = positional[0];
 
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
@@ -392,7 +466,7 @@ Options:
 
       const updates: Record<string, unknown> = {};
 
-      for (const arg of args.slice(1)) {
+      for (const arg of positional.slice(1)) {
         if (arg.startsWith('--status=')) {
           updates.status = arg.split('=')[1] as TaskStatus;
         } else if (arg.startsWith('--priority=')) {
@@ -412,12 +486,41 @@ Options:
 
       const updated = taskManager.updateTask(taskId, updates);
 
-      if (updated) {
-        this.printSuccess(`Task ${taskId} updated`);
-        console.log();
-        console.log(`  Title: ${updated.title}`);
-        console.log(`  Status: ${colors.cyan}${updated.status}${colors.reset}`);
-        console.log();
+      if (isHuman) {
+        if (updated) {
+          this.printSuccess(`Task ${taskId} updated`);
+          console.log();
+          console.log(`  Title: ${updated.title}`);
+          console.log(`  Status: ${colors.cyan}${updated.status}${colors.reset}`);
+          console.log();
+        }
+      } else {
+        this.printOutput(
+          'task-updated',
+          {
+            summary: {
+              id: taskId,
+              updated: Boolean(updated),
+              updatedFields: Object.keys(updates).join(','),
+            },
+            ...(updated
+              ? {
+                  task: definedFields({
+                    id: updated.id,
+                    title: updated.title,
+                    status: updated.status,
+                    priority: updated.priority,
+                    type: updated.type,
+                    description: updated.description || undefined,
+                    assignedTo: updated.assignedTo || undefined,
+                    dueDate: updated.dueDate || undefined,
+                    actualHours: updated.actualHours,
+                  }),
+                }
+              : {}),
+          },
+          args
+        );
       }
 
       dbManager.close();
@@ -450,59 +553,97 @@ export class TaskStatsCommand extends BaseCommand {
   }
 
   /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
+  protected getUsage(): string {
+    return `tsdoc-edge task-stats [options]
+
+Options:
+  --human                Output in human-readable format (default: XML)`;
+  }
+
+  /**
    * execute method
    * @param args - args parameter
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(_args: string[]): Promise<CommandResult> {
+  async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
+
+      const isHuman = this.hasFlag(args, '--human');
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
       const taskManager = new TaskManager(dbManager);
 
       const stats = taskManager.getStatistics();
 
-      this.printHeader('Task Statistics');
-      console.log();
+      if (isHuman) {
+        this.printHeader('Task Statistics');
+        console.log();
 
-      console.log(`  Total Tasks: ${colors.cyan}${stats.total}${colors.reset}`);
-      console.log(
-        `  Completion Rate: ${colors.green}${stats.completionRate.toFixed(1)}%${colors.reset}`
-      );
-      console.log(
-        `  Avg Completion Time: ${colors.blue}${stats.avgCompletionTime.toFixed(1)}h${colors.reset}`
-      );
+        console.log(`  Total Tasks: ${colors.cyan}${stats.total}${colors.reset}`);
+        console.log(
+          `  Completion Rate: ${colors.green}${stats.completionRate.toFixed(1)}%${colors.reset}`
+        );
+        console.log(
+          `  Avg Completion Time: ${colors.blue}${stats.avgCompletionTime.toFixed(1)}h${colors.reset}`
+        );
 
-      if (stats.overdueCount > 0) {
-        console.log(`  Overdue: ${colors.red}${stats.overdueCount}${colors.reset}`);
-      }
-
-      console.log();
-      this.printSection('By Status');
-      for (const [status, count] of Object.entries(stats.byStatus)) {
-        if (count > 0) {
-          console.log(`  ${status.padEnd(15)} ${String(count).padStart(4)}`);
+        if (stats.overdueCount > 0) {
+          console.log(`  Overdue: ${colors.red}${stats.overdueCount}${colors.reset}`);
         }
-      }
 
-      console.log();
-      this.printSection('By Priority');
-      for (const [priority, count] of Object.entries(stats.byPriority)) {
-        if (count > 0) {
-          console.log(`  ${priority.padEnd(15)} ${String(count).padStart(4)}`);
+        console.log();
+        this.printSection('By Status');
+        for (const [status, count] of Object.entries(stats.byStatus)) {
+          if (count > 0) {
+            console.log(`  ${status.padEnd(15)} ${String(count).padStart(4)}`);
+          }
         }
-      }
 
-      console.log();
-      this.printSection('By Type');
-      for (const [type, count] of Object.entries(stats.byType)) {
-        if (count > 0) {
-          console.log(`  ${type.padEnd(15)} ${String(count).padStart(4)}`);
+        console.log();
+        this.printSection('By Priority');
+        for (const [priority, count] of Object.entries(stats.byPriority)) {
+          if (count > 0) {
+            console.log(`  ${priority.padEnd(15)} ${String(count).padStart(4)}`);
+          }
         }
-      }
 
-      console.log();
+        console.log();
+        this.printSection('By Type');
+        for (const [type, count] of Object.entries(stats.byType)) {
+          if (count > 0) {
+            console.log(`  ${type.padEnd(15)} ${String(count).padStart(4)}`);
+          }
+        }
+
+        console.log();
+      } else {
+        const distribution = (key: string, counts: Record<string, number>) =>
+          Object.entries(counts).map(([name, count]) => ({ [key]: name, count }));
+
+        this.printOutput(
+          'task-statistics',
+          {
+            summary: {
+              total: stats.total,
+              completionRate: Number(stats.completionRate.toFixed(1)),
+              avgCompletionTimeHours: Number(stats.avgCompletionTime.toFixed(1)),
+              overdueCount: stats.overdueCount,
+            },
+            byStatus: distribution('status', stats.byStatus),
+            byPriority: distribution('priority', stats.byPriority),
+            byType: distribution('type', stats.byType),
+          },
+          args
+        );
+      }
 
       dbManager.close();
       return this.success();

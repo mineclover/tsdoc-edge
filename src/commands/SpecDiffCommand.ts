@@ -68,9 +68,12 @@ export class SpecDiffCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge spec-diff <file> <from-version> <to-version>
+    return `tsdoc-edge spec-diff <file> <from-version> <to-version> [options]
 
-  Example: tsdoc-edge spec-diff managed/features/validation.md 1.0.0 2.0.0`;
+  Example: tsdoc-edge spec-diff managed/features/validation.md 1.0.0 2.0.0
+
+  Options:
+    --human          Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -86,9 +89,11 @@ export class SpecDiffCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const target = args[0];
-      const fromVersion = args[1];
-      const toVersion = args[2];
+      const isHuman = this.hasFlag(args, '--human');
+      const positional = args.filter((arg) => arg !== '--human');
+      const target = positional[0];
+      const fromVersion = positional[1];
+      const toVersion = positional[2];
 
       if (!target || !fromVersion || !toVersion) {
         this.printError('Usage: tsdoc-edge spec-diff <file> <from-version> <to-version>');
@@ -109,38 +114,59 @@ export class SpecDiffCommand extends BaseCommand {
 
       const diff = manager.diff(filePath, fromVersion, toVersion);
 
-      this.printHeader('Specification Version Comparison');
-      console.log(`File: ${colors.cyan}${path.relative(process.cwd(), filePath)}${colors.reset}`);
-      console.log(`From: ${colors.yellow}v${diff.from}${colors.reset}`);
-      console.log(`To:   ${colors.green}v${diff.to}${colors.reset}`);
-      console.log();
-
-      this.printSection('Summary');
-      console.log(diff.summary);
-      console.log();
-
-      if (diff.changes.added.length > 0) {
-        this.printSection('Added Sections');
-        for (const section of diff.changes.added) {
-          console.log(`${colors.green}+ ${section}${colors.reset}`);
-        }
+      if (isHuman) {
+        this.printHeader('Specification Version Comparison');
+        console.log(`File: ${colors.cyan}${path.relative(process.cwd(), filePath)}${colors.reset}`);
+        console.log(`From: ${colors.yellow}v${diff.from}${colors.reset}`);
+        console.log(`To:   ${colors.green}v${diff.to}${colors.reset}`);
         console.log();
-      }
 
-      if (diff.changes.removed.length > 0) {
-        this.printSection('Removed Sections');
-        for (const section of diff.changes.removed) {
-          console.log(`${colors.red}- ${section}${colors.reset}`);
-        }
+        this.printSection('Summary');
+        console.log(diff.summary);
         console.log();
-      }
 
-      if (diff.changes.modified.length > 0) {
-        this.printSection('Modified Content');
-        for (const section of diff.changes.modified) {
-          console.log(`${colors.yellow}~ ${section}${colors.reset}`);
+        if (diff.changes.added.length > 0) {
+          this.printSection('Added Sections');
+          for (const section of diff.changes.added) {
+            console.log(`${colors.green}+ ${section}${colors.reset}`);
+          }
+          console.log();
         }
-        console.log();
+
+        if (diff.changes.removed.length > 0) {
+          this.printSection('Removed Sections');
+          for (const section of diff.changes.removed) {
+            console.log(`${colors.red}- ${section}${colors.reset}`);
+          }
+          console.log();
+        }
+
+        if (diff.changes.modified.length > 0) {
+          this.printSection('Modified Content');
+          for (const section of diff.changes.modified) {
+            console.log(`${colors.yellow}~ ${section}${colors.reset}`);
+          }
+          console.log();
+        }
+      } else {
+        this.printOutput(
+          'spec-diff',
+          {
+            summary: {
+              file: path.relative(process.cwd(), filePath),
+              from: diff.from,
+              to: diff.to,
+              overallSummary: diff.summary,
+              addedCount: diff.changes.added.length,
+              removedCount: diff.changes.removed.length,
+              modifiedCount: diff.changes.modified.length,
+            },
+            added: diff.changes.added.map((section) => ({ section })),
+            removed: diff.changes.removed.map((section) => ({ section })),
+            modified: diff.changes.modified.map((section) => ({ section })),
+          },
+          args
+        );
       }
 
       return this.success();

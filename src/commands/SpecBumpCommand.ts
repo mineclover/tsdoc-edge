@@ -68,10 +68,13 @@ export class SpecBumpCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge spec-bump <file> <bump-type>
+    return `tsdoc-edge spec-bump <file> <bump-type> [options]
 
   Bump types: major, minor, patch
-  Example: tsdoc-edge spec-bump managed/features/validation.md minor`;
+  Example: tsdoc-edge spec-bump managed/features/validation.md minor
+
+  Options:
+    --human          Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -87,8 +90,10 @@ export class SpecBumpCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const target = args[0];
-      const bumpType = args[1] as 'major' | 'minor' | 'patch' | undefined;
+      const isHuman = this.hasFlag(args, '--human');
+      const positional = args.filter((arg) => arg !== '--human');
+      const target = positional[0];
+      const bumpType = positional[1] as 'major' | 'minor' | 'patch' | undefined;
 
       if (!target) {
         this.printError('Usage: tsdoc-edge spec-bump <file> <bump-type>');
@@ -117,14 +122,30 @@ export class SpecBumpCommand extends BaseCommand {
       const oldVersion = manager.getCurrentVersion(filePath);
       const newVersion = manager.bump(filePath, bumpType);
 
-      this.printHeader('Version Bumped');
-      console.log(`File: ${colors.cyan}${path.relative(process.cwd(), filePath)}${colors.reset}`);
-      console.log(`Old version: ${colors.yellow}${oldVersion}${colors.reset}`);
-      console.log(`New version: ${colors.green}${newVersion}${colors.reset}`);
-      console.log(`Bump type:   ${colors.blue}${bumpType}${colors.reset}`);
-      console.log();
-      this.printSuccess('Version updated successfully');
-      console.log();
+      if (isHuman) {
+        this.printHeader('Version Bumped');
+        console.log(`File: ${colors.cyan}${path.relative(process.cwd(), filePath)}${colors.reset}`);
+        console.log(`Old version: ${colors.yellow}${oldVersion}${colors.reset}`);
+        console.log(`New version: ${colors.green}${newVersion}${colors.reset}`);
+        console.log(`Bump type:   ${colors.blue}${bumpType}${colors.reset}`);
+        console.log();
+        this.printSuccess('Version updated successfully');
+        console.log();
+      } else {
+        this.printOutput(
+          'spec-bump',
+          {
+            summary: {
+              file: path.relative(process.cwd(), filePath),
+              bumpType,
+              oldVersion,
+              newVersion,
+              updated: true,
+            },
+          },
+          args
+        );
+      }
 
       return this.success();
     });

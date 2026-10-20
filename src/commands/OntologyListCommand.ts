@@ -24,9 +24,12 @@ interface ListOptions {
   limit?: number;
   /** Offset for pagination */
   offset?: number;
-  /** Output format */
-  format?: 'table' | 'json' | 'csv';
+  /** Output format requested with --format (unset: XML, or table with --human) */
+  format?: 'table' | 'json' | 'csv' | 'xml';
 }
+
+/** Rendering a listing can produce */
+type ListFormat = 'table' | 'json' | 'csv' | 'xml';
 
 /**
  * Command for listing ontology element instances
@@ -84,7 +87,8 @@ Options:
   --strength <level>    Filter relationships by strength (strong, medium, weak)
   --limit <n>           Limit number of results (default: 50)
   --offset <n>          Skip first n results (default: 0)
-  --format <fmt>        Output format: table, json, csv (default: table)
+  --format <fmt>        Output format: xml, table, json, csv (default: xml)
+  --human               Output in human-readable table format (default: XML)
 
 Examples:
   # List all class nodes
@@ -100,7 +104,10 @@ Examples:
   tsdoc-edge ontology-list --strength strong --limit 20 --offset 0
 
   # Export to CSV
-  tsdoc-edge ontology-list --rels code-dependency --format csv`;
+  tsdoc-edge ontology-list --rels code-dependency --format csv
+
+  # Human-readable table
+  tsdoc-edge ontology-list --nodes class --human`;
   }
 
   /**
@@ -134,9 +141,9 @@ Examples:
       const dbManager = new DatabaseManager(dbPath);
 
       if (options.type === 'node') {
-        await this.listNodes(dbManager, options);
+        await this.listNodes(dbManager, options, args);
       } else {
-        await this.listRelationships(dbManager, options);
+        await this.listRelationships(dbManager, options, args);
       }
 
       dbManager.close();
@@ -149,7 +156,6 @@ Examples:
     const options: ListOptions = {
       limit: 50,
       offset: 0,
-      format: 'table',
     };
 
     for (let i = 0; i < args.length; i++) {
@@ -178,7 +184,7 @@ Examples:
         options.offset = parseInt(args[i + 1], 10);
         i++;
       } else if (arg === '--format' && args[i + 1]) {
-        options.format = args[i + 1] as 'table' | 'json' | 'csv';
+        options.format = args[i + 1] as ListFormat;
         i++;
       }
     }
@@ -186,7 +192,24 @@ Examples:
     return options;
   }
 
-  private async listNodes(dbManager: DatabaseManager, options: ListOptions): Promise<void> {
+  /**
+   * Resolve the rendering for a listing.
+   *
+   * Machine formats requested with --format (json, csv) win; the human table is used for
+   * --human or --format table; everything else (including no --format) renders XML.
+   */
+  private resolveFormat(options: ListOptions, args: string[]): ListFormat {
+    if (options.format === 'json' || options.format === 'csv') return options.format;
+    if (this.hasFlag(args, '--human') || options.format === 'table') return 'table';
+    return 'xml';
+  }
+
+  private async listNodes(
+    dbManager: DatabaseManager,
+    options: ListOptions,
+    args: string[]
+  ): Promise<void> {
+    const format = this.resolveFormat(options, args);
     // Query symbols using Drizzle ORM
     const queryOptions: {
       type?: string;
@@ -224,7 +247,7 @@ Examples:
     }
     const total = dbManager.countSymbols(countOptions);
 
-    if (options.format === 'json') {
+    if (format === 'json') {
       console.log(
         JSON.stringify(
           {
@@ -240,7 +263,7 @@ Examples:
       return;
     }
 
-    if (options.format === 'csv') {
+    if (format === 'csv') {
       console.log('id,name,type,kind,filePath,line');
       for (const node of nodes) {
         console.log(
@@ -250,6 +273,49 @@ Examples:
       return;
     }
 
+    if (format === 'table') {
+      this.printNodeTable(nodes, total, options);
+      return;
+    }
+
+    const offset = options.offset || 0;
+    const hasMore = total > offset + nodes.length;
+    this.printOutput(
+      'ontology-node-list',
+      {
+        summary: {
+          nodeType: options.name,
+          total,
+          limit: options.limit,
+          offset,
+          count: nodes.length,
+          hasMore,
+          ...(hasMore ? { nextOffset: offset + (options.limit || 50) } : {}),
+        },
+        nodes: nodes.map((node) => ({
+          id: node.id,
+          name: node.name,
+          type: node.type,
+          filePath: node.filePath,
+          line: node.line,
+        })),
+      },
+      args
+    );
+  }
+
+  private printNodeTable(
+    nodes: Array<{
+      id: string;
+      name: string;
+      type: string;
+      kind?: string;
+      filePath?: string | null;
+      line?: number | null;
+    }>,
+    total: number,
+    options: ListOptions
+  ): void {
     // Table format
     const title = options.name ? `Nodes of type: ${options.name}` : 'All Nodes';
     this.printHeader(title);
@@ -288,7 +354,12 @@ Examples:
     }
   }
 
-  private async listRelationships(dbManager: DatabaseManager, options: ListOptions): Promise<void> {
+  private async listRelationships(
+    dbManager: DatabaseManager,
+    options: ListOptions,
+    args: string[]
+  ): Promise<void> {
+    const format = this.resolveFormat(options, args);
     let relationships = dbManager.getAllUnifiedRelationships();
 
     // Apply filters
@@ -309,7 +380,7 @@ Examples:
     const limit = options.limit || 50;
     relationships = relationships.slice(offset, offset + limit);
 
-    if (options.format === 'json') {
+    if (format === 'json') {
       console.log(
         JSON.stringify(
           {
@@ -325,7 +396,7 @@ Examples:
       return;
     }
 
-    if (options.format === 'csv') {
+    if (format === 'csv') {
       console.log('id,type,category,direction,strength,from,to,confidence,inferred');
       for (const rel of relationships) {
         const froms = Array.isArray(rel.from) ? rel.from : [rel.from];
@@ -340,6 +411,50 @@ Examples:
       return;
     }
 
+    if (format === 'table') {
+      this.printRelationshipTable(relationships, total, offset, limit, options);
+      return;
+    }
+
+    const hasMore = total > offset + relationships.length;
+    this.printOutput(
+      'ontology-relationship-list',
+      {
+        summary: {
+          ...(options.name ? { filterType: options.name } : {}),
+          ...(options.category ? { filterCategory: options.category } : {}),
+          ...(options.strength ? { filterStrength: options.strength } : {}),
+          total,
+          limit,
+          offset,
+          count: relationships.length,
+          hasMore,
+          ...(hasMore ? { nextOffset: offset + limit } : {}),
+        },
+        relationships: relationships.map((rel) => ({
+          id: rel.id,
+          type: rel.type,
+          category: rel.category,
+          direction: rel.direction,
+          strength: rel.strength,
+          from: Array.isArray(rel.from) ? rel.from : [rel.from],
+          to: Array.isArray(rel.to) ? rel.to : [rel.to],
+          confidence: rel.confidence,
+          inferred: rel.properties?.inferred === true,
+          ...(rel.description ? { description: rel.description } : {}),
+        })),
+      },
+      args
+    );
+  }
+
+  private printRelationshipTable(
+    relationships: ReturnType<DatabaseManager['getAllUnifiedRelationships']>,
+    total: number,
+    offset: number,
+    limit: number,
+    options: ListOptions
+  ): void {
     // Table format
     let title = 'Relationships';
     if (options.name) title = `Relationships of type: ${options.name}`;

@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { SpecBumpCommand } from './SpecBumpCommand';
 import { SpecDiffCommand } from './SpecDiffCommand';
 import { SpecExtractCommand } from './SpecExtractCommand';
@@ -64,6 +64,9 @@ export class SpecCommand extends BaseCommand {
 Subcommands:
 ${subcommandList}
 
+Options:
+  --human       Output in human-readable format (default: XML)
+
 Examples:
   tsdoc-edge spec status show managed/features/work-context.md
   tsdoc-edge spec history managed/features/work-context.md
@@ -95,7 +98,7 @@ Use 'tsdoc-edge spec <subcommand> --help' for subcommand details.`;
         console.log();
         console.log('Available subcommands:');
         for (const [name, { description }] of Object.entries(SUBCOMMANDS)) {
-          console.log(`  ${this.colors.cyan}${name.padEnd(10)}${this.colors.reset} ${description}`);
+          console.log(`  ${colors.cyan}${name.padEnd(10)}${colors.reset} ${description}`);
         }
         console.log();
         return this.failure(`Unknown subcommand: ${subcommandName}`);
@@ -105,12 +108,5 @@ Use 'tsdoc-edge spec <subcommand> --help' for subcommand details.`;
       const subcommand = new CommandClass();
       return subcommand.execute(subcommandArgs);
     });
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      cyan: '\x1b[36m',
-    };
   }
 }

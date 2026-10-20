@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import {
   TaskAddCommand,
   TaskListCommand,
@@ -59,6 +59,9 @@ export class TaskCommand extends BaseCommand {
 Subcommands:
 ${subcommandList}
 
+Options:
+  --human       Output in human-readable format (default: XML)
+
 Examples:
   tsdoc-edge task list --status=todo
   tsdoc-edge task add "Fix bug" --priority=high
@@ -89,7 +92,7 @@ Use 'tsdoc-edge task <subcommand> --help' for subcommand details.`;
         console.log();
         console.log('Available subcommands:');
         for (const [name, { description }] of Object.entries(SUBCOMMANDS)) {
-          console.log(`  ${this.colors.cyan}${name.padEnd(8)}${this.colors.reset} ${description}`);
+          console.log(`  ${colors.cyan}${name.padEnd(8)}${colors.reset} ${description}`);
         }
         console.log();
         return this.failure(`Unknown subcommand: ${subcommandName}`);
@@ -99,12 +102,5 @@ Use 'tsdoc-edge task <subcommand> --help' for subcommand details.`;
       const subcommand = new CommandClass();
       return subcommand.execute(subcommandArgs);
     });
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      cyan: '\x1b[36m',
-    };
   }
 }

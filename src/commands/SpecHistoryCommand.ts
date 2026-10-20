@@ -68,7 +68,10 @@ export class SpecHistoryCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge spec-history <file-path>';
+    return `tsdoc-edge spec-history <file-path> [options]
+
+  Options:
+    --human          Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -84,7 +87,8 @@ export class SpecHistoryCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const target = args[0];
+      const isHuman = this.hasFlag(args, '--human');
+      const target = args.filter((arg) => arg !== '--human')[0];
 
       if (!target) {
         this.printError('Usage: tsdoc-edge spec-history <file>');
@@ -103,24 +107,44 @@ export class SpecHistoryCommand extends BaseCommand {
       const manager = this.manager || new SpecVersionManager();
       const history = manager.getHistory(filePath);
 
-      if (history.length === 0) {
-        console.log(`${colors.yellow}No version history found${colors.reset}`);
+      if (isHuman) {
+        if (history.length === 0) {
+          console.log(`${colors.yellow}No version history found${colors.reset}`);
+          console.log();
+          return this.success();
+        }
+
+        this.printHeader('Specification Version History');
+        console.log(`File: ${colors.cyan}${path.relative(process.cwd(), filePath)}${colors.reset}`);
         console.log();
-        return this.success();
-      }
 
-      this.printHeader('Specification Version History');
-      console.log(`File: ${colors.cyan}${path.relative(process.cwd(), filePath)}${colors.reset}`);
-      console.log();
+        this.printSection(`${history.length} versions found`);
 
-      this.printSection(`${history.length} versions found`);
-
-      for (const entry of history) {
-        console.log(`${colors.green}v${entry.version}${colors.reset} (${entry.date})`);
-        console.log(`  ${colors.dim}Commit:  ${entry.commit}${colors.reset}`);
-        console.log(`  ${colors.dim}Author:  ${entry.author}${colors.reset}`);
-        console.log(`  ${colors.dim}Message: ${entry.message}${colors.reset}`);
-        console.log();
+        for (const entry of history) {
+          console.log(`${colors.green}v${entry.version}${colors.reset} (${entry.date})`);
+          console.log(`  ${colors.dim}Commit:  ${entry.commit}${colors.reset}`);
+          console.log(`  ${colors.dim}Author:  ${entry.author}${colors.reset}`);
+          console.log(`  ${colors.dim}Message: ${entry.message}${colors.reset}`);
+          console.log();
+        }
+      } else {
+        this.printOutput(
+          'spec-history',
+          {
+            summary: {
+              file: path.relative(process.cwd(), filePath),
+              versionCount: history.length,
+            },
+            versions: history.map((entry) => ({
+              version: entry.version,
+              date: entry.date,
+              commit: entry.commit,
+              author: entry.author,
+              message: entry.message,
+            })),
+          },
+          args
+        );
       }
 
       return this.success();
