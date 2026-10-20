@@ -516,7 +516,7 @@ export abstract class BaseCommand {
       data.forEach((item, index) => {
         lines.push(`${indentStr}  <item index="${index + 1}">`);
         for (const [key, value] of Object.entries(item as Record<string, unknown>)) {
-          lines.push(`${indentStr}    <${key}>${this.escapeXml(value)}</${key}>`);
+          lines.push(...this.buildXmlField(key, value, indent + 2));
         }
         lines.push(`${indentStr}  </item>`);
       });
@@ -531,11 +531,13 @@ export abstract class BaseCommand {
         lines.push(`${indentStr}<${name} count="${entries.length}">`);
         for (const [groupName, groupItems] of entries) {
           const items = groupItems as Array<Record<string, unknown>>;
-          lines.push(`${indentStr}  <group name="${groupName}" count="${items.length}">`);
+          lines.push(
+            `${indentStr}  <group name="${this.escapeXml(groupName)}" count="${items.length}">`
+          );
           items.forEach((item, index) => {
             lines.push(`${indentStr}    <item index="${index + 1}">`);
             for (const [key, value] of Object.entries(item)) {
-              lines.push(`${indentStr}      <${key}>${this.escapeXml(value)}</${key}>`);
+              lines.push(...this.buildXmlField(key, value, indent + 3));
             }
             lines.push(`${indentStr}    </item>`);
           });
@@ -546,18 +548,37 @@ export abstract class BaseCommand {
         // Object section
         lines.push(`${indentStr}<${name}>`);
         for (const [key, value] of entries) {
-          if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
-            // Nested object
-            lines.push(...this.buildXmlSection(key, value as Record<string, unknown>, indent + 1));
-          } else {
-            lines.push(`${indentStr}  <${key}>${this.escapeXml(value)}</${key}>`);
-          }
+          lines.push(...this.buildXmlField(key, value, indent + 1));
         }
         lines.push(`${indentStr}</${name}>`);
       }
     }
 
     return lines;
+  }
+
+  /**
+   * Build a single XML field: nested objects and non-empty arrays of objects become nested
+   * sections, everything else (primitives, arrays of primitives, empty arrays) is a leaf
+   * element holding the escaped string form.
+   * @private
+   */
+  private buildXmlField(key: string, value: unknown, indent: number): string[] {
+    if (this.isPlainRecord(value)) {
+      return this.buildXmlSection(key, value, indent);
+    }
+    if (
+      Array.isArray(value) &&
+      value.length > 0 &&
+      value.every((item) => this.isPlainRecord(item))
+    ) {
+      return this.buildXmlSection(key, value as Array<Record<string, unknown>>, indent);
+    }
+    return [`${'  '.repeat(indent)}<${key}>${this.escapeXml(value)}</${key}>`];
+  }
+
+  private isPlainRecord(value: unknown): value is Record<string, unknown> {
+    return typeof value === 'object' && value !== null && !Array.isArray(value);
   }
 
   /**
