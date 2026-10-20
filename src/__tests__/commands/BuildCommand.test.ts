@@ -12,6 +12,7 @@ import {
   type ProjectGraphInput,
   type ProjectGraphSource,
 } from '../../indexer';
+import { BuildService } from '../../service/BuildService';
 import { DatabaseManager } from '../../storage/DatabaseManager';
 import { GraphRepository } from '../../storage/GraphRepository';
 
@@ -368,10 +369,11 @@ describe('BuildCommand', () => {
 
     it('closes the legacy database when scanning fails after initialization', async () => {
       const close = jest.spyOn(DatabaseManager.prototype, 'close');
-      const privateCommand = command as unknown as {
+      // The scan lives in BuildService, which the command delegates to after opening the database.
+      const privateService = BuildService.prototype as unknown as {
         findTypeScriptFiles(targetPath: string): string[];
       };
-      jest.spyOn(privateCommand, 'findTypeScriptFiles').mockImplementation(() => {
+      jest.spyOn(privateService, 'findTypeScriptFiles').mockImplementation(() => {
         throw new Error('fixture scan failure');
       });
 
