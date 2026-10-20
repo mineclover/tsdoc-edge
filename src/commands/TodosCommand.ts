@@ -4,6 +4,7 @@
  */
 
 import { DatabaseManager } from '../storage/DatabaseManager';
+import type { FuturePlan } from '../types/tags';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
@@ -67,7 +68,10 @@ export class TodosCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge todos';
+    return `tsdoc-edge todos [options]
+
+  Options:
+    --human    Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -83,7 +87,11 @@ export class TodosCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      this.printHeader('TSDoc Edge - TODO List');
+      const isHuman = this.hasFlag(args, '--human');
+
+      if (isHuman) {
+        this.printHeader('TSDoc Edge - TODO List');
+      }
 
       if (!this.dbManager) {
         const dbCheck = this.checkDatabaseExists();
@@ -95,6 +103,11 @@ export class TodosCommand extends BaseCommand {
       const dbManager = this.dbManager || new DatabaseManager(dbPath, jsonlPath);
 
       try {
+        if (!isHuman) {
+          this.printTodosXml(dbManager, args);
+          return this.success();
+        }
+
         this.printSection('📊 Database Statistics');
         const stats = dbManager.getStatistics();
         console.log(`   Total Symbols: ${colors.green}${stats.totalSymbols}${colors.reset}`);
@@ -166,5 +179,45 @@ export class TodosCommand extends BaseCommand {
         }
       }
     });
+  }
+
+  /**
+   * Print statistics and TODO items as an XML document (default output mode)
+   */
+  private printTodosXml(dbManager: DatabaseManager, args: string[]): void {
+    const stats = dbManager.getStatistics();
+    const results = dbManager.getAllEnhancedDocsWithPlans();
+
+    const todoList: Array<Record<string, unknown>> = [];
+    for (const row of results) {
+      const plans: FuturePlan[] = JSON.parse(row.futurePlans || '[]');
+      for (const plan of plans) {
+        todoList.push({
+          id: plan.id,
+          title: plan.title,
+          symbolId: row.symbolId,
+          status: plan.status,
+          priority: plan.priority ?? '',
+          milestone: plan.targetMilestone ?? '',
+          effort: plan.estimatedEffort ?? '',
+          description: plan.description,
+          completedAt: plan.completedAt ?? '',
+        });
+      }
+    }
+
+    this.printOutput(
+      'todos',
+      {
+        statistics: {
+          totalSymbols: stats.totalSymbols,
+          totalEnhancedDocs: stats.totalEnhancedDocs,
+          dbSizeKB: (stats.dbSize / 1024).toFixed(2),
+        },
+        todoList,
+        summary: { total: todoList.length },
+      },
+      args
+    );
   }
 }

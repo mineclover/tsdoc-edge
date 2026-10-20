@@ -12,7 +12,20 @@ import {
   type MermaidSymbol,
   MermaidSymbolExtractor,
 } from '../doc-symbol/MermaidSymbolExtractor';
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
+
+/** Outcome of the --generate-docs check/generation phase */
+interface GenerationReport {
+  outputDir: string;
+  /** True when existing files blocked generation (they need --force) */
+  aborted: boolean;
+  createdDirectory: boolean;
+  canonicalConflicts: Array<{ filename: string; symbolName: string }>;
+  existingFiles: string[];
+  files: Array<{ filename: string; action: 'created' | 'updated' }>;
+  generated: number;
+  skipped: number;
+}
 
 /**
  * Parse Mermaid Command - Mermaid 다이어그램 파싱 및 문서 생성
@@ -48,6 +61,7 @@ export class ParseMermaidCommand extends BaseCommand {
     return `tsdoc-edge parse-mermaid <file.mmd> [options]
 
   Options:
+    --human              Output in human-readable format (default: XML)
     --generate-docs      Generate documentation files
     --output=DIR         Output directory (default: managed/relationships)`;
   }
@@ -65,7 +79,9 @@ export class ParseMermaidCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const mmdPath = args[0];
+      const isHuman = this.hasFlag(args, '--human');
+      // The --human flag is not the diagram path
+      const mmdPath = args.find((arg) => arg !== '--human');
       const shouldGenerate = args.includes('--generate-docs');
       const outputDir = this.extractFlag(args, '--output') || 'managed/relationships';
 
@@ -96,9 +112,11 @@ export class ParseMermaidCommand extends BaseCommand {
         return this.failure('Invalid file type');
       }
 
-      this.printHeader(`Parse Mermaid: ${path.basename(mmdPath)}`);
-      console.log(`📊 ${mmdPath}`);
-      console.log();
+      if (isHuman) {
+        this.printHeader(`Parse Mermaid: ${path.basename(mmdPath)}`);
+        console.log(`📊 ${mmdPath}`);
+        console.log();
+      }
 
       // Read and parse
       const content = fs.readFileSync(absolutePath, 'utf-8');
@@ -106,119 +124,31 @@ export class ParseMermaidCommand extends BaseCommand {
       const result = extractor.extract(content, mmdPath);
 
       // Display results
-      this.displayParseResults(result);
+      if (isHuman) {
+        this.displayParseResults(result);
+      }
 
       // Check existing files (H2 generation is safe, only warn if canonical H1 exists)
+      let generation: GenerationReport | undefined;
       if (shouldGenerate) {
-        console.log();
-        this.printSection('Checking Existing Documentation');
+        generation = this.generateDocs(result, outputDir, args.includes('--force'), isHuman);
 
-        const existingH1Symbols = this.scanExistingH1Symbols(outputDir);
-        const canonicalConflicts: string[] = [];
-        const existingFiles: string[] = [];
-
-        for (const suggestion of result.suggestedDocs) {
-          const docPath = path.join(outputDir, suggestion.filename);
-
-          // Check if canonical H1 definition exists
-          if (existingH1Symbols.has(suggestion.symbolName)) {
-            canonicalConflicts.push(
-              `${suggestion.filename} - canonical [[${suggestion.symbolName}]] already exists`
-            );
+        if (generation.aborted) {
+          if (!isHuman) {
+            this.printParseXml(mmdPath, result, generation, args);
           }
-
-          // Check if file exists (will be overwritten in H2 mode)
-          if (fs.existsSync(docPath)) {
-            existingFiles.push(suggestion.filename);
-          }
+          return this.success('Check complete');
         }
-
-        if (canonicalConflicts.length > 0) {
-          console.log(
-            `  ${this.colors.yellow}⚠️  Canonical symbols exist (${canonicalConflicts.length}):${this.colors.reset}`
-          );
-          canonicalConflicts.slice(0, 5).forEach((c) => {
-            console.log(`    ${this.colors.dim}${c}${this.colors.reset}`);
-          });
-          if (canonicalConflicts.length > 5) {
-            console.log(
-              `    ${this.colors.dim}... and ${canonicalConflicts.length - 5} more${this.colors.reset}`
-            );
-          }
-          console.log(
-            `  ${this.colors.cyan}💡 H2 reference docs will be generated (not canonical H1)${this.colors.reset}`
-          );
-          console.log();
-        }
-
-        if (existingFiles.length > 0) {
-          console.log(
-            `  ${this.colors.yellow}⚠️  Files will be overwritten (${existingFiles.length}):${this.colors.reset}`
-          );
-          existingFiles.slice(0, 5).forEach((f) => {
-            console.log(`    ${this.colors.dim}${f}${this.colors.reset}`);
-          });
-          if (existingFiles.length > 5) {
-            console.log(
-              `    ${this.colors.dim}... and ${existingFiles.length - 5} more${this.colors.reset}`
-            );
-          }
-
-          if (!args.includes('--force')) {
-            console.log();
-            console.log(
-              `  ${this.colors.cyan}💡 Use --force to overwrite existing files${this.colors.reset}`
-            );
-            this.printWarning('Skipping generation (use --force to overwrite)');
-            return this.success('Check complete');
-          }
-        }
-
-        console.log();
-        this.printSection('Generating H2 Reference Documentation');
-
-        const outputDirAbs = path.resolve(process.cwd(), outputDir);
-        if (!fs.existsSync(outputDirAbs)) {
-          fs.mkdirSync(outputDirAbs, { recursive: true });
-          this.printInfo(`Created directory: ${outputDir}`);
-        }
-
-        let generated = 0;
-        let skipped = 0;
-
-        for (const suggestion of result.suggestedDocs) {
-          const docPath = path.join(outputDirAbs, suggestion.filename);
-
-          // In H2 mode, we can safely overwrite (if --force) or skip
-          if (fs.existsSync(docPath) && !args.includes('--force')) {
-            skipped++;
-          } else {
-            fs.writeFileSync(docPath, suggestion.skeleton, 'utf-8');
-            const action = fs.existsSync(docPath) ? 'updated' : 'created';
-            console.log(
-              `  ${this.colors.green}✓${this.colors.reset} ${suggestion.filename} (${action} as H2 reference)`
-            );
-            generated++;
-          }
-        }
-
-        console.log();
-        this.printSuccess(`Generated ${generated} documents, skipped ${skipped}`);
-
-        if (generated > 0) {
-          console.log();
-          console.log('Next steps:');
-          console.log(`  1. Review generated docs in ${outputDir}/`);
-          console.log('  2. Fill in TODO sections with implementation details');
-          console.log('  3. Add [[Symbol]] references to related docs');
-          console.log('  4. Run: tsdoc-edge validate-symbol-refs');
-        }
-      } else {
+      } else if (isHuman) {
         console.log();
         console.log('💡 Tip: Use --generate-docs to create documentation skeletons');
       }
 
-      console.log();
+      if (isHuman) {
+        console.log();
+      } else {
+        this.printParseXml(mmdPath, result, generation, args);
+      }
 
       return this.success(
         `Parsed ${result.symbols.length} symbols, ${result.relationships.length} relationships`
@@ -226,19 +156,226 @@ export class ParseMermaidCommand extends BaseCommand {
     });
   }
 
+  /**
+   * Check for existing documentation and generate H2 reference docs for the suggested symbols.
+   * Writes files in both output modes; terminal output is only printed in human mode.
+   */
+  private generateDocs(
+    result: MermaidExtractionResult,
+    outputDir: string,
+    force: boolean,
+    isHuman: boolean
+  ): GenerationReport {
+    if (isHuman) {
+      console.log();
+      this.printSection('Checking Existing Documentation');
+    }
+
+    const existingH1Symbols = this.scanExistingH1Symbols(outputDir);
+    const canonicalConflicts: GenerationReport['canonicalConflicts'] = [];
+    const existingFiles: string[] = [];
+
+    for (const suggestion of result.suggestedDocs) {
+      const docPath = path.join(outputDir, suggestion.filename);
+
+      // Check if canonical H1 definition exists
+      if (existingH1Symbols.has(suggestion.symbolName)) {
+        canonicalConflicts.push({
+          filename: suggestion.filename,
+          symbolName: suggestion.symbolName,
+        });
+      }
+
+      // Check if file exists (will be overwritten in H2 mode)
+      if (fs.existsSync(docPath)) {
+        existingFiles.push(suggestion.filename);
+      }
+    }
+
+    const report: GenerationReport = {
+      outputDir,
+      aborted: false,
+      createdDirectory: false,
+      canonicalConflicts,
+      existingFiles,
+      files: [],
+      generated: 0,
+      skipped: 0,
+    };
+
+    if (canonicalConflicts.length > 0 && isHuman) {
+      console.log(
+        `  ${colors.yellow}⚠️  Canonical symbols exist (${canonicalConflicts.length}):${colors.reset}`
+      );
+      canonicalConflicts.slice(0, 5).forEach((c) => {
+        console.log(
+          `    ${colors.dim}${c.filename} - canonical [[${c.symbolName}]] already exists${colors.reset}`
+        );
+      });
+      if (canonicalConflicts.length > 5) {
+        console.log(
+          `    ${colors.dim}... and ${canonicalConflicts.length - 5} more${colors.reset}`
+        );
+      }
+      console.log(
+        `  ${colors.cyan}💡 H2 reference docs will be generated (not canonical H1)${colors.reset}`
+      );
+      console.log();
+    }
+
+    if (existingFiles.length > 0) {
+      if (isHuman) {
+        console.log(
+          `  ${colors.yellow}⚠️  Files will be overwritten (${existingFiles.length}):${colors.reset}`
+        );
+        existingFiles.slice(0, 5).forEach((f) => {
+          console.log(`    ${colors.dim}${f}${colors.reset}`);
+        });
+        if (existingFiles.length > 5) {
+          console.log(`    ${colors.dim}... and ${existingFiles.length - 5} more${colors.reset}`);
+        }
+      }
+
+      if (!force) {
+        if (isHuman) {
+          console.log();
+          console.log(`  ${colors.cyan}💡 Use --force to overwrite existing files${colors.reset}`);
+          this.printWarning('Skipping generation (use --force to overwrite)');
+        }
+        report.aborted = true;
+        return report;
+      }
+    }
+
+    if (isHuman) {
+      console.log();
+      this.printSection('Generating H2 Reference Documentation');
+    }
+
+    const outputDirAbs = path.resolve(process.cwd(), outputDir);
+    if (!fs.existsSync(outputDirAbs)) {
+      fs.mkdirSync(outputDirAbs, { recursive: true });
+      report.createdDirectory = true;
+      if (isHuman) this.printInfo(`Created directory: ${outputDir}`);
+    }
+
+    for (const suggestion of result.suggestedDocs) {
+      const docPath = path.join(outputDirAbs, suggestion.filename);
+
+      // In H2 mode, we can safely overwrite (if --force) or skip
+      const existedBefore = fs.existsSync(docPath);
+      if (existedBefore && !force) {
+        report.skipped++;
+      } else {
+        fs.writeFileSync(docPath, suggestion.skeleton, 'utf-8');
+        report.files.push({
+          filename: suggestion.filename,
+          action: existedBefore ? 'updated' : 'created',
+        });
+        if (isHuman) {
+          // The terminal wording is evaluated after the write, as it always has been
+          const action = fs.existsSync(docPath) ? 'updated' : 'created';
+          console.log(
+            `  ${colors.green}✓${colors.reset} ${suggestion.filename} (${action} as H2 reference)`
+          );
+        }
+        report.generated++;
+      }
+    }
+
+    if (isHuman) {
+      console.log();
+      this.printSuccess(`Generated ${report.generated} documents, skipped ${report.skipped}`);
+
+      if (report.generated > 0) {
+        console.log();
+        console.log('Next steps:');
+        console.log(`  1. Review generated docs in ${outputDir}/`);
+        console.log('  2. Fill in TODO sections with implementation details');
+        console.log('  3. Add [[Symbol]] references to related docs');
+        console.log('  4. Run: tsdoc-edge validate-symbol-refs');
+      }
+    }
+
+    return report;
+  }
+
+  /**
+   * Print parse results (and generation results, when requested) as an XML document
+   */
+  private printParseXml(
+    mmdPath: string,
+    result: MermaidExtractionResult,
+    generation: GenerationReport | undefined,
+    args: string[]
+  ): void {
+    const countEdges = (edgeType: MermaidRelationship['edgeType']) =>
+      result.relationships.filter((r: MermaidRelationship) => r.edgeType === edgeType).length;
+
+    this.printOutput(
+      'mermaid-parse',
+      {
+        summary: {
+          file: mmdPath,
+          diagramType: result.metadata.diagramType,
+          orientation: result.metadata.orientation ?? '',
+          subgraphCount: result.metadata.subgraphs.length,
+          symbolCount: result.symbols.length,
+          relationshipCount: result.relationships.length,
+          solidEdges: countEdges('solid'),
+          dottedEdges: countEdges('dotted'),
+          thickEdges: countEdges('thick'),
+          suggestedDocCount: result.suggestedDocs.length,
+          generateDocs: generation !== undefined,
+        },
+        subgraphs: result.metadata.subgraphs.map((sg) => ({ id: sg.id, title: sg.title })),
+        symbols: result.symbols.map((symbol: MermaidSymbol) => ({
+          name: symbol.symbolName,
+          nodeId: symbol.nodeId,
+          status: symbol.status ?? '',
+          typeHint: symbol.typeHint ?? '',
+          subgraph: symbol.subgraph ?? '',
+          metricsCount: symbol.metrics?.count ?? '',
+          metricsUnit: symbol.metrics?.unit ?? '',
+        })),
+        relationships: result.relationships.map((rel: MermaidRelationship) => ({
+          from: rel.from,
+          to: rel.to,
+          type: rel.edgeType,
+          label: rel.label ?? '',
+        })),
+        suggestedDocs: result.suggestedDocs.map((doc) => ({
+          filename: doc.filename,
+          symbolName: doc.symbolName,
+        })),
+        ...(generation
+          ? {
+              generation: {
+                outputDir: generation.outputDir,
+                aborted: generation.aborted,
+                createdDirectory: generation.createdDirectory,
+                generatedCount: generation.generated,
+                skippedCount: generation.skipped,
+                canonicalConflicts: generation.canonicalConflicts,
+                existingFiles: generation.existingFiles.map((filename) => ({ filename })),
+                files: generation.files,
+              },
+            }
+          : {}),
+      },
+      args
+    );
+  }
+
   private displayParseResults(result: MermaidExtractionResult): void {
     // Metadata
     this.printSection('Diagram Metadata');
-    console.log(`  Type: ${this.colors.cyan}${result.metadata.diagramType}${this.colors.reset}`);
+    console.log(`  Type: ${colors.cyan}${result.metadata.diagramType}${colors.reset}`);
     if (result.metadata.orientation) {
-      console.log(
-        `  Orientation: ${this.colors.cyan}${result.metadata.orientation}${this.colors.reset}`
-      );
+      console.log(`  Orientation: ${colors.cyan}${result.metadata.orientation}${colors.reset}`);
     }
     if (result.metadata.subgraphs.length > 0) {
-      console.log(
-        `  Subgraphs: ${this.colors.cyan}${result.metadata.subgraphs.length}${this.colors.reset}`
-      );
+      console.log(`  Subgraphs: ${colors.cyan}${result.metadata.subgraphs.length}${colors.reset}`);
       result.metadata.subgraphs.forEach((sg) => {
         console.log(`    • ${sg.title}`);
       });
@@ -247,7 +384,7 @@ export class ParseMermaidCommand extends BaseCommand {
 
     // Symbols
     this.printSection('Extracted Symbols');
-    console.log(`  Total: ${this.colors.cyan}${result.symbols.length}${this.colors.reset}`);
+    console.log(`  Total: ${colors.cyan}${result.symbols.length}${colors.reset}`);
     console.log();
 
     // Group by status
@@ -258,9 +395,7 @@ export class ParseMermaidCommand extends BaseCommand {
     const partial = result.symbols.filter((s: MermaidSymbol) => s.status === 'partial');
 
     if (implemented.length > 0) {
-      console.log(
-        `  ${this.colors.green}✅ Implemented (${implemented.length}):${this.colors.reset}`
-      );
+      console.log(`  ${colors.green}✅ Implemented (${implemented.length}):${colors.reset}`);
       implemented.forEach((s: MermaidSymbol) => {
         const metrics =
           s.metrics && s.metrics.count !== undefined
@@ -272,7 +407,7 @@ export class ParseMermaidCommand extends BaseCommand {
     }
 
     if (partial.length > 0) {
-      console.log(`  ${this.colors.yellow}⚠️  Partial (${partial.length}):${this.colors.reset}`);
+      console.log(`  ${colors.yellow}⚠️  Partial (${partial.length}):${colors.reset}`);
       partial.forEach((s: MermaidSymbol) => {
         console.log(`    • [[${s.symbolName}]]`);
       });
@@ -280,20 +415,16 @@ export class ParseMermaidCommand extends BaseCommand {
     }
 
     if (notImplemented.length > 0) {
-      console.log(
-        `  ${this.colors.dim}❌ Not Implemented (${notImplemented.length}):${this.colors.reset}`
-      );
+      console.log(`  ${colors.dim}❌ Not Implemented (${notImplemented.length}):${colors.reset}`);
       notImplemented.forEach((s: MermaidSymbol) => {
-        console.log(`    ${this.colors.dim}• [[${s.symbolName}]]${this.colors.reset}`);
+        console.log(`    ${colors.dim}• [[${s.symbolName}]]${colors.reset}`);
       });
       console.log();
     }
 
     // Relationships
     this.printSection('Relationships');
-    console.log(
-      `  Total edges: ${this.colors.cyan}${result.relationships.length}${this.colors.reset}`
-    );
+    console.log(`  Total edges: ${colors.cyan}${result.relationships.length}${colors.reset}`);
 
     const byType = {
       solid: result.relationships.filter((r: MermaidRelationship) => r.edgeType === 'solid').length,
@@ -303,13 +434,13 @@ export class ParseMermaidCommand extends BaseCommand {
     };
 
     if (byType.solid > 0) {
-      console.log(`    Solid (→): ${this.colors.cyan}${byType.solid}${this.colors.reset}`);
+      console.log(`    Solid (→): ${colors.cyan}${byType.solid}${colors.reset}`);
     }
     if (byType.dotted > 0) {
-      console.log(`    Dotted (⋯→): ${this.colors.cyan}${byType.dotted}${this.colors.reset}`);
+      console.log(`    Dotted (⋯→): ${colors.cyan}${byType.dotted}${colors.reset}`);
     }
     if (byType.thick > 0) {
-      console.log(`    Thick (⟹): ${this.colors.cyan}${byType.thick}${this.colors.reset}`);
+      console.log(`    Thick (⟹): ${colors.cyan}${byType.thick}${colors.reset}`);
     }
     console.log();
 
@@ -323,7 +454,7 @@ export class ParseMermaidCommand extends BaseCommand {
       });
       if (result.suggestedDocs.length > 5) {
         console.log(
-          `    ${this.colors.dim}... and ${result.suggestedDocs.length - 5} more${this.colors.reset}`
+          `    ${colors.dim}... and ${result.suggestedDocs.length - 5} more${colors.reset}`
         );
       }
     }
@@ -364,18 +495,5 @@ export class ParseMermaidCommand extends BaseCommand {
       return args[index + 1];
     }
     return undefined;
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      bold: '\x1b[1m',
-      dim: '\x1b[2m',
-      green: '\x1b[32m',
-      yellow: '\x1b[33m',
-      blue: '\x1b[34m',
-      cyan: '\x1b[36m',
-      red: '\x1b[31m',
-    };
   }
 }

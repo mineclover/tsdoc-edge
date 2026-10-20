@@ -12,7 +12,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { MermaidSymbolExtractor } from '../doc-symbol/MermaidSymbolExtractor';
 import { DatabaseManager } from '../storage/DatabaseManager';
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /** Result of exploring an entrypoint file and its dependencies */
 interface EntrypointExploration {
@@ -72,6 +72,7 @@ export class ExploreEntrypointCommand extends BaseCommand {
     return `tsdoc-edge explore-entrypoint <doc-path> [options]
 
   Options:
+    --human              Output in human-readable format (default: XML)
     --detect-orphans     Find unreferenced code`;
   }
 
@@ -88,7 +89,9 @@ export class ExploreEntrypointCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const entrypointPath = args[0];
+      const isHuman = this.hasFlag(args, '--human');
+      // The --human flag is not the entrypoint path
+      const entrypointPath = args.find((arg) => arg !== '--human');
 
       if (!entrypointPath) {
         this.printError('Entrypoint path required: explore-entrypoint <doc-path>');
@@ -114,9 +117,11 @@ export class ExploreEntrypointCommand extends BaseCommand {
         return this.failure('Invalid file type');
       }
 
-      this.printHeader(`Explore Entrypoint: ${path.basename(entrypointPath)}`);
-      console.log(`📍 ${entrypointPath}`);
-      console.log();
+      if (isHuman) {
+        this.printHeader(`Explore Entrypoint: ${path.basename(entrypointPath)}`);
+        console.log(`📍 ${entrypointPath}`);
+        console.log();
+      }
 
       // Load database
       const dbCheck = this.checkDatabaseExists();
@@ -135,7 +140,11 @@ export class ExploreEntrypointCommand extends BaseCommand {
       );
 
       // Display results
-      this.displayExploration(exploration, detectOrphans);
+      if (isHuman) {
+        this.displayExploration(exploration, detectOrphans);
+      } else {
+        this.printExplorationXml(exploration, detectOrphans, args);
+      }
 
       dbManager.close();
 
@@ -437,6 +446,48 @@ export class ExploreEntrypointCommand extends BaseCommand {
   }
 
   /**
+   * Print exploration results as an XML document (default output mode)
+   */
+  private printExplorationXml(
+    exploration: EntrypointExploration,
+    detectOrphans: boolean,
+    args: string[]
+  ): void {
+    const { statistics } = exploration;
+    // An empty database yields 0/0 = NaN; report that as no coverage
+    const formatPercent = (value: number) => (Number.isFinite(value) ? value.toFixed(1) : '0.0');
+
+    this.printOutput(
+      'entrypoint-exploration',
+      {
+        summary: {
+          entrypoint: exploration.entrypointPath,
+          detectOrphans,
+          docsTraversed: exploration.discoveredDocs.size,
+          symbolsDiscovered: statistics.discoveredSymbols,
+          totalSymbolsInDb: statistics.totalSymbolsInDb,
+          symbolCoveragePercent: formatPercent(statistics.coveragePercentage),
+          filesDiscovered: statistics.discoveredFiles,
+          totalFilesInDb: statistics.totalFilesInDb,
+          fileCoveragePercent: formatPercent(statistics.fileCoveragePercentage),
+        },
+        discoveredDocs: Array.from(exploration.discoveredDocs).map((doc) => ({ path: doc })),
+        ...(detectOrphans
+          ? {
+              orphans: {
+                orphanedFileCount: exploration.orphanedFiles.length,
+                orphanedSymbolCount: exploration.orphanedSymbols.length,
+                orphanedFiles: exploration.orphanedFiles.map((file) => ({ path: file })),
+                orphanedSymbols: exploration.orphanedSymbols.map((id) => ({ id })),
+              },
+            }
+          : {}),
+      },
+      args
+    );
+  }
+
+  /**
    * Display exploration results
    */
   private displayExploration(exploration: EntrypointExploration, showOrphans: boolean): void {
@@ -444,19 +495,19 @@ export class ExploreEntrypointCommand extends BaseCommand {
 
     this.printSection('Exploration Statistics');
     console.log(
-      `  Documentation files traversed: ${this.colors.cyan}${exploration.discoveredDocs.size}${this.colors.reset}`
+      `  Documentation files traversed: ${colors.cyan}${exploration.discoveredDocs.size}${colors.reset}`
     );
     console.log(
-      `  Symbols discovered: ${this.colors.cyan}${statistics.discoveredSymbols}${this.colors.reset} / ${statistics.totalSymbolsInDb}`
+      `  Symbols discovered: ${colors.cyan}${statistics.discoveredSymbols}${colors.reset} / ${statistics.totalSymbolsInDb}`
     );
     console.log(
-      `  Symbol coverage: ${this.colors.green}${statistics.coveragePercentage.toFixed(1)}%${this.colors.reset}`
+      `  Symbol coverage: ${colors.green}${statistics.coveragePercentage.toFixed(1)}%${colors.reset}`
     );
     console.log(
-      `  Files discovered: ${this.colors.cyan}${statistics.discoveredFiles}${this.colors.reset} / ${statistics.totalFilesInDb}`
+      `  Files discovered: ${colors.cyan}${statistics.discoveredFiles}${colors.reset} / ${statistics.totalFilesInDb}`
     );
     console.log(
-      `  File coverage: ${this.colors.green}${statistics.fileCoveragePercentage.toFixed(1)}%${this.colors.reset}`
+      `  File coverage: ${colors.green}${statistics.fileCoveragePercentage.toFixed(1)}%${colors.reset}`
     );
     console.log();
 
@@ -465,37 +516,37 @@ export class ExploreEntrypointCommand extends BaseCommand {
 
       if (exploration.orphanedFiles.length > 0) {
         console.log(
-          `  ${this.colors.yellow}⚠ Orphaned Files (${exploration.orphanedFiles.length}):${this.colors.reset}`
+          `  ${colors.yellow}⚠ Orphaned Files (${exploration.orphanedFiles.length}):${colors.reset}`
         );
         exploration.orphanedFiles.slice(0, 10).forEach((file) => {
-          console.log(`    ${this.colors.dim}${file}${this.colors.reset}`);
+          console.log(`    ${colors.dim}${file}${colors.reset}`);
         });
         if (exploration.orphanedFiles.length > 10) {
           console.log(
-            `    ${this.colors.dim}... and ${exploration.orphanedFiles.length - 10} more${this.colors.reset}`
+            `    ${colors.dim}... and ${exploration.orphanedFiles.length - 10} more${colors.reset}`
           );
         }
         console.log();
       } else {
-        console.log(`  ${this.colors.green}✓ No orphaned files found${this.colors.reset}`);
+        console.log(`  ${colors.green}✓ No orphaned files found${colors.reset}`);
         console.log();
       }
 
       if (exploration.orphanedSymbols.length > 0) {
         console.log(
-          `  ${this.colors.yellow}⚠ Orphaned Symbols (${exploration.orphanedSymbols.length}):${this.colors.reset}`
+          `  ${colors.yellow}⚠ Orphaned Symbols (${exploration.orphanedSymbols.length}):${colors.reset}`
         );
         exploration.orphanedSymbols.slice(0, 10).forEach((symbol) => {
-          console.log(`    ${this.colors.dim}${symbol}${this.colors.reset}`);
+          console.log(`    ${colors.dim}${symbol}${colors.reset}`);
         });
         if (exploration.orphanedSymbols.length > 10) {
           console.log(
-            `    ${this.colors.dim}... and ${exploration.orphanedSymbols.length - 10} more${this.colors.reset}`
+            `    ${colors.dim}... and ${exploration.orphanedSymbols.length - 10} more${colors.reset}`
           );
         }
         console.log();
       } else {
-        console.log(`  ${this.colors.green}✓ No orphaned symbols found${this.colors.reset}`);
+        console.log(`  ${colors.green}✓ No orphaned symbols found${colors.reset}`);
         console.log();
       }
     }
@@ -511,18 +562,5 @@ export class ExploreEntrypointCommand extends BaseCommand {
       );
     }
     console.log();
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      bold: '\x1b[1m',
-      dim: '\x1b[2m',
-      green: '\x1b[32m',
-      yellow: '\x1b[33m',
-      blue: '\x1b[34m',
-      cyan: '\x1b[36m',
-      red: '\x1b[31m',
-    };
   }
 }

@@ -44,14 +44,17 @@ export class VisualizeDepsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge visualize <subcommand> [symbol]
+    return `tsdoc-edge visualize <subcommand> [symbol] [options]
 
   Subcommands:
     tree <symbol>        Dependency tree for a symbol
     hotspots             Top hotspots diagram
     circular [index]     Circular dependency diagram
     hierarchy <class>    Class hierarchy diagram
-    modules [max]        Module dependency diagram`;
+    modules [max]        Module dependency diagram
+
+  Options:
+    --human              Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -67,10 +70,15 @@ export class VisualizeDepsCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const subcommand = args[0] || 'help';
-      const targetSymbol = args[1];
+      const isHuman = this.hasFlag(args, '--human');
+      // The --human flag is not a subcommand or a target
+      const positionalArgs = args.filter((arg) => arg !== '--human');
+      const subcommand = positionalArgs[0] || 'help';
+      const targetSymbol = positionalArgs[1];
 
-      this.printHeader('TSDoc Edge - Dependency Visualization');
+      if (isHuman) {
+        this.printHeader('TSDoc Edge - Dependency Visualization');
+      }
 
       const config = ConfigManager.getInstance();
       const diagramsDir = config.get().paths?.diagramsDir || '.tsdoc/diagrams';
@@ -79,7 +87,7 @@ export class VisualizeDepsCommand extends BaseCommand {
       const dbManager = new DatabaseManager(dbPath);
 
       // Load graph from database
-      this.printInfo('Loading dependency graph...');
+      if (isHuman) this.printInfo('Loading dependency graph...');
       const graphBuilder = new SymbolGraphBuilder();
       const { symbols: symbolRows, dependencies: depRows } = dbManager.getGraphData();
 
@@ -112,7 +120,7 @@ export class VisualizeDepsCommand extends BaseCommand {
       const graph = graphBuilder.getGraph();
       const generator = new MermaidGenerator(graph);
 
-      console.log();
+      if (isHuman) console.log();
 
       switch (subcommand) {
         case 'tree': {
@@ -123,7 +131,7 @@ export class VisualizeDepsCommand extends BaseCommand {
 
           // Resolve symbol name to ID if needed
           let resolvedSymbol = targetSymbol;
-          const resolved = this.resolveSymbol(dbManager, targetSymbol);
+          const resolved = this.resolveSymbol(dbManager, targetSymbol, { quiet: !isHuman });
           if (resolved) {
             resolvedSymbol = resolved.id;
           } else if (!graph.symbols.has(targetSymbol)) {
@@ -132,46 +140,49 @@ export class VisualizeDepsCommand extends BaseCommand {
             return this.failure('Symbol not found');
           }
 
-          this.printSection(`Dependency Tree: ${resolvedSymbol}`);
+          if (isHuman) this.printSection(`Dependency Tree: ${resolvedSymbol}`);
           const diagram = generator.generateDependencyTree(resolvedSymbol);
-          console.log();
-          console.log(diagram);
-          console.log();
-
-          // Save to file
-          const outputPath = path.join(process.cwd(), diagramsDir, `tree-${resolvedSymbol}.mmd`);
-          fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-          fs.writeFileSync(outputPath, diagram, 'utf-8');
-
-          this.printSuccess(`Saved to ${outputPath}`);
+          this.saveDiagram({
+            diagram,
+            outputPath: path.join(process.cwd(), diagramsDir, `tree-${resolvedSymbol}.mmd`),
+            subcommand,
+            target: resolvedSymbol,
+            isHuman,
+            args,
+          });
           break;
         }
 
         case 'hotspots': {
-          this.printSection('Hotspot Diagram');
+          if (isHuman) this.printSection('Hotspot Diagram');
           const analyzer = new DependencyChainAnalyzer(graph);
           const hotspots = analyzer.analyzeHotspots(10);
           const diagram = generator.generateHotspotDiagram(hotspots);
-          console.log();
-          console.log(diagram);
-          console.log();
-
-          // Save to file
-          const outputPath = path.join(process.cwd(), diagramsDir, 'hotspots.mmd');
-          fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-          fs.writeFileSync(outputPath, diagram, 'utf-8');
-
-          this.printSuccess(`Saved to ${outputPath}`);
+          this.saveDiagram({
+            diagram,
+            outputPath: path.join(process.cwd(), diagramsDir, 'hotspots.mmd'),
+            subcommand,
+            isHuman,
+            args,
+          });
           break;
         }
 
         case 'circular': {
-          this.printSection('Circular Dependencies');
+          if (isHuman) this.printSection('Circular Dependencies');
           const analyzer = new DependencyChainAnalyzer(graph);
           const circulars = analyzer.detectCircularDependencies();
 
           if (circulars.length === 0) {
-            this.printSuccess('No circular dependencies found!');
+            if (isHuman) {
+              this.printSuccess('No circular dependencies found!');
+            } else {
+              this.printOutput(
+                'dependency-visualization',
+                { summary: { subcommand, circularCount: 0 } },
+                args
+              );
+            }
           } else {
             const circularIndex = targetSymbol ? parseInt(targetSymbol, 10) - 1 : 0;
             if (circularIndex >= circulars.length) {
@@ -181,20 +192,19 @@ export class VisualizeDepsCommand extends BaseCommand {
 
             const circular = circulars[circularIndex];
             const diagram = generator.generateCircularDiagram(circular);
-            console.log();
-            console.log(diagram);
-            console.log();
-
-            // Save to file
-            const outputPath = path.join(
-              process.cwd(),
-              diagramsDir,
-              `circular-${circularIndex + 1}.mmd`
-            );
-            fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-            fs.writeFileSync(outputPath, diagram, 'utf-8');
-
-            this.printSuccess(`Saved to ${outputPath}`);
+            this.saveDiagram({
+              diagram,
+              outputPath: path.join(
+                process.cwd(),
+                diagramsDir,
+                `circular-${circularIndex + 1}.mmd`
+              ),
+              subcommand,
+              target: String(circularIndex + 1),
+              extra: { circularCount: circulars.length },
+              isHuman,
+              args,
+            });
           }
           break;
         }
@@ -207,7 +217,9 @@ export class VisualizeDepsCommand extends BaseCommand {
 
           // Resolve symbol name to ID if needed
           let resolvedClass = targetSymbol;
-          const resolvedHierarchy = this.resolveSymbol(dbManager, targetSymbol);
+          const resolvedHierarchy = this.resolveSymbol(dbManager, targetSymbol, {
+            quiet: !isHuman,
+          });
           if (resolvedHierarchy) {
             resolvedClass = resolvedHierarchy.id;
           } else if (!graph.symbols.has(targetSymbol)) {
@@ -216,51 +228,69 @@ export class VisualizeDepsCommand extends BaseCommand {
             return this.failure('Symbol not found');
           }
 
-          this.printSection(`Class Hierarchy: ${resolvedClass}`);
+          if (isHuman) this.printSection(`Class Hierarchy: ${resolvedClass}`);
           const diagram = generator.generateClassHierarchy(resolvedClass);
-          console.log();
-          console.log(diagram);
-          console.log();
-
-          // Save to file
-          const outputPath = path.join(
-            process.cwd(),
-            diagramsDir,
-            `hierarchy-${resolvedClass}.mmd`
-          );
-          fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-          fs.writeFileSync(outputPath, diagram, 'utf-8');
-
-          this.printSuccess(`Saved to ${outputPath}`);
+          this.saveDiagram({
+            diagram,
+            outputPath: path.join(process.cwd(), diagramsDir, `hierarchy-${resolvedClass}.mmd`),
+            subcommand,
+            target: resolvedClass,
+            isHuman,
+            args,
+          });
           break;
         }
 
         case 'modules': {
-          this.printSection('Module Dependencies');
+          if (isHuman) this.printSection('Module Dependencies');
           const maxFiles = targetSymbol ? parseInt(targetSymbol, 10) : 10;
           const diagram = generator.generateModuleDiagram(maxFiles);
-          console.log();
-          console.log(diagram);
-          console.log();
-
-          // Save to file
-          const outputPath = path.join(process.cwd(), diagramsDir, 'modules.mmd');
-          fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-          fs.writeFileSync(outputPath, diagram, 'utf-8');
-
-          this.printSuccess(`Saved to ${outputPath}`);
+          this.saveDiagram({
+            diagram,
+            outputPath: path.join(process.cwd(), diagramsDir, 'modules.mmd'),
+            subcommand,
+            target: String(maxFiles),
+            isHuman,
+            args,
+          });
           break;
         }
         default: {
-          this.printSection('Available Visualizations');
-          console.log('  visualize tree <symbol-id>       - Dependency tree for a symbol');
-          console.log('  visualize hotspots               - Top hotspots diagram');
-          console.log('  visualize circular [index]       - Circular dependency diagram');
-          console.log('  visualize hierarchy <class-id>   - Class hierarchy diagram');
-          console.log('  visualize modules [max]          - Module dependency diagram');
-          console.log();
-          console.log(`All diagrams are saved to ${diagramsDir}/`);
-          console.log();
+          if (isHuman) {
+            this.printSection('Available Visualizations');
+            console.log('  visualize tree <symbol-id>       - Dependency tree for a symbol');
+            console.log('  visualize hotspots               - Top hotspots diagram');
+            console.log('  visualize circular [index]       - Circular dependency diagram');
+            console.log('  visualize hierarchy <class-id>   - Class hierarchy diagram');
+            console.log('  visualize modules [max]          - Module dependency diagram');
+            console.log();
+            console.log(`All diagrams are saved to ${diagramsDir}/`);
+            console.log();
+          } else {
+            this.printOutput(
+              'available-visualizations',
+              {
+                summary: { diagramsDir },
+                visualizations: [
+                  {
+                    command: 'visualize tree <symbol-id>',
+                    description: 'Dependency tree for a symbol',
+                  },
+                  { command: 'visualize hotspots', description: 'Top hotspots diagram' },
+                  {
+                    command: 'visualize circular [index]',
+                    description: 'Circular dependency diagram',
+                  },
+                  {
+                    command: 'visualize hierarchy <class-id>',
+                    description: 'Class hierarchy diagram',
+                  },
+                  { command: 'visualize modules [max]', description: 'Module dependency diagram' },
+                ],
+              },
+              args
+            );
+          }
           break;
         }
       }
@@ -269,5 +299,51 @@ export class VisualizeDepsCommand extends BaseCommand {
 
       return this.success('Visualization complete');
     });
+  }
+
+  /**
+   * Save a generated diagram under the diagrams directory and report it.
+   * Human mode prints the diagram and the saved path; the default mode prints an XML document
+   * carrying the diagram text. The file is written in both modes.
+   */
+  private saveDiagram(options: {
+    diagram: string;
+    outputPath: string;
+    subcommand: string;
+    target?: string;
+    extra?: Record<string, unknown>;
+    isHuman: boolean;
+    args: string[];
+  }): void {
+    const { diagram, outputPath, subcommand, target, extra, isHuman, args } = options;
+
+    if (isHuman) {
+      console.log();
+      console.log(diagram);
+      console.log();
+    }
+
+    // Save to file
+    fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+    fs.writeFileSync(outputPath, diagram, 'utf-8');
+
+    if (isHuman) {
+      this.printSuccess(`Saved to ${outputPath}`);
+      return;
+    }
+
+    this.printOutput(
+      'dependency-visualization',
+      {
+        summary: {
+          subcommand,
+          ...(target !== undefined ? { target } : {}),
+          ...extra,
+          outputPath: path.relative(process.cwd(), outputPath),
+        },
+        diagram: { format: 'mermaid', code: diagram },
+      },
+      args
+    );
   }
 }

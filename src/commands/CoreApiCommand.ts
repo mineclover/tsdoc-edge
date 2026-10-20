@@ -72,6 +72,7 @@ export class CoreApiCommand extends BaseCommand {
     return `tsdoc-edge core-api [options]
 
   Options:
+    --human          Output in human-readable format (default: XML)
     --exclude-tests  Exclude symbols from test files (__tests__, .test.ts, .spec.ts)`;
   }
 
@@ -88,6 +89,7 @@ export class CoreApiCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
       const excludeTests = args.includes('--exclude-tests');
 
       if (!this.dbManager) {
@@ -165,6 +167,38 @@ export class CoreApiCommand extends BaseCommand {
 
         // Get core symbols
         const coreSymbols = allSymbols.filter((s) => coreSymbolIds.has(s.id));
+
+        if (!isHuman) {
+          this.printOutput(
+            'core-api',
+            {
+              summary: {
+                totalExported: exportedSymbols.length,
+                coreApiSize: coreSymbols.length,
+                excludeTests,
+              },
+              exportedSymbols: exportedSymbols.map((s) => ({
+                id: s.id,
+                name: s.name,
+                type: s.type,
+                file: s.filePath,
+                line: s.line,
+                summary: s.summary ?? '',
+              })),
+              coreDependencies: coreSymbols
+                .filter((s) => !s.isExported)
+                .map((s) => ({
+                  id: s.id,
+                  name: s.name,
+                  type: s.type,
+                  file: s.filePath,
+                  line: s.line,
+                })),
+            },
+            args
+          );
+          return this.success();
+        }
 
         this.printHeader('Core API Symbols');
         if (excludeTests) {

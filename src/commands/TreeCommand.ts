@@ -78,12 +78,15 @@ export class TreeCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge tree [path-filter]
+    return `tsdoc-edge tree [path-filter] [options]
 
 Examples:
   tsdoc-edge tree                      Show all symbols
   tsdoc-edge tree src/commands         Filter by path
-  tsdoc-edge tree DatabaseManager      Filter by name pattern`;
+  tsdoc-edge tree DatabaseManager      Filter by name pattern
+
+Options:
+  --human          Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -99,8 +102,10 @@ Examples:
         return this.displayHelp();
       }
 
-      // Parse filter path from args
-      const filterPath = args[0];
+      const isHuman = this.hasFlag(args, '--human');
+
+      // Parse filter path from args (the --human flag is not a filter)
+      const filterPath = args.find((arg) => arg !== '--human');
 
       const dbCheck = this.checkDatabaseExists();
       if (dbCheck) return dbCheck;
@@ -110,14 +115,20 @@ Examples:
       const dbManager = this.dbManager || new DatabaseManager(dbPath, jsonlPath);
 
       try {
-        this.printHeader('Symbol Hierarchy Tree');
+        if (isHuman) {
+          this.printHeader('Symbol Hierarchy Tree');
+        }
 
         // Get symbols from database using Drizzle ORM
         const allSymbols = dbManager.getAllSymbolRows();
 
         if (allSymbols.length === 0) {
-          console.log(`${colors.yellow}No symbols found in database${colors.reset}`);
-          console.log();
+          if (isHuman) {
+            console.log(`${colors.yellow}No symbols found in database${colors.reset}`);
+            console.log();
+          } else {
+            this.printXml([], 0, filterPath, args);
+          }
           return this.success();
         }
 
@@ -125,18 +136,31 @@ Examples:
         let symbols = allSymbols;
         if (filterPath) {
           symbols = allSymbols.filter((s) => s.file_path.includes(filterPath));
-          console.log(`${colors.dim}Filtering by path: ${filterPath}${colors.reset}`);
-          console.log();
+          if (isHuman) {
+            console.log(`${colors.dim}Filtering by path: ${filterPath}${colors.reset}`);
+            console.log();
+          }
 
           if (symbols.length === 0) {
-            console.log(`${colors.yellow}No symbols found matching: ${filterPath}${colors.reset}`);
-            console.log();
+            if (isHuman) {
+              console.log(
+                `${colors.yellow}No symbols found matching: ${filterPath}${colors.reset}`
+              );
+              console.log();
+            } else {
+              this.printXml([], 0, filterPath, args);
+            }
             return this.success();
           }
         }
 
         // Build hierarchy tree from symbols
         const hierarchy = this.buildHierarchy(symbols);
+
+        if (!isHuman) {
+          this.printXml(hierarchy, symbols.length, filterPath, args);
+          return this.success();
+        }
 
         // Print tree
         const printNode = (node: TreeNode, prefix: string = '', isLast: boolean = true) => {
@@ -187,6 +211,35 @@ Examples:
         }
       }
     });
+  }
+
+  /**
+   * Emit the hierarchy as an XML document (default output mode)
+   */
+  private printXml(
+    hierarchy: TreeNode[],
+    totalSymbols: number,
+    filterPath: string | undefined,
+    args: string[]
+  ): void {
+    const toXmlNode = (node: TreeNode): Record<string, unknown> => ({
+      id: node.id,
+      name: node.name,
+      type: node.type,
+      filePath: node.filePath,
+      line: node.line,
+      // Leaf nodes omit `children`: a non-empty array renders as a nested section.
+      ...(node.children.length > 0 ? { children: node.children.map(toXmlNode) } : {}),
+    });
+
+    this.printOutput(
+      'symbol-tree',
+      {
+        summary: { totalSymbols, filter: filterPath ?? null },
+        tree: hierarchy.map(toXmlNode),
+      },
+      args
+    );
   }
 
   /**

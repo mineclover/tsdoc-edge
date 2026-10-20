@@ -67,10 +67,11 @@ export class PlansCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge plans [--status=<status>]
+    return `tsdoc-edge plans [options]
 
   Options:
-    --status=<status>  Filter by status (planned, in-progress, completed, cancelled)`;
+    --status=<status>  Filter by status (planned, in-progress, completed, cancelled)
+    --human            Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -86,9 +87,12 @@ export class PlansCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const status = args[0]; // Optional: --status=planned
+      const isHuman = this.hasFlag(args, '--human');
+      const status = args.find((arg) => arg.startsWith('--status=')); // Optional: --status=planned
 
-      this.printHeader('Future Plans');
+      if (isHuman) {
+        this.printHeader('Future Plans');
+      }
 
       if (!this.dbManager) {
         const dbCheck = this.checkDatabaseExists();
@@ -114,8 +118,9 @@ export class PlansCommand extends BaseCommand {
 
         // Filter by status if provided
         let filteredPlans = allPlans;
-        if (status?.startsWith('--status=')) {
-          const statusValue = status.split('=')[1];
+        let statusValue: string | undefined;
+        if (status) {
+          statusValue = status.split('=')[1];
           filteredPlans = allPlans.filter(({ plan }) => plan.status === statusValue);
         }
 
@@ -126,6 +131,29 @@ export class PlansCommand extends BaseCommand {
           const bPriority = priorityOrder[b.plan.priority as keyof typeof priorityOrder] ?? 2;
           return aPriority - bPriority;
         });
+
+        if (!isHuman) {
+          this.printOutput(
+            'future-plans',
+            {
+              summary: { count: filteredPlans.length, statusFilter: statusValue ?? null },
+              plans: filteredPlans.map(({ plan, symbolId }) => ({
+                id: plan.id,
+                title: plan.title,
+                symbolId,
+                status: plan.status,
+                priority: plan.priority ?? '',
+                targetSymbol: plan.targetSymbol ?? '',
+                targetMethod: plan.targetMethod ?? '',
+                implementedBy: plan.implementedBy ?? '',
+                milestone: plan.targetMilestone ?? '',
+                description: plan.description,
+              })),
+            },
+            args
+          );
+          return this.success();
+        }
 
         if (filteredPlans.length === 0) {
           this.printSuccess('No future plans found');
