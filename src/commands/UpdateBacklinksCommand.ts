@@ -74,7 +74,7 @@ export class UpdateBacklinksCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge update-backlinks [docs-directory]\n\n  Default: docs';
+    return 'tsdoc-edge update-backlinks [docs-directory] [options]\n\n  Default: docs\n\n  Options:\n    --human          Output in human-readable format (default: XML)';
   }
 
   /**
@@ -90,12 +90,14 @@ export class UpdateBacklinksCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
+
       // Deprecation warning (only when called directly as legacy command)
-      if (this.showDeprecationWarning) {
+      if (this.showDeprecationWarning && isHuman) {
         this.printDeprecationWarning('tsdoc-edge docs backlinks');
       }
 
-      const target = args[0];
+      const target = args.find((arg) => !arg.startsWith('-'));
       const docsDir = target || 'docs';
       const docsPath = path.resolve(process.cwd(), docsDir);
 
@@ -104,13 +106,14 @@ export class UpdateBacklinksCommand extends BaseCommand {
         return this.failure(`Path not found: ${docsPath}`);
       }
 
-      this.printHeader('Updating Backlinks');
+      if (isHuman) this.printHeader('Updating Backlinks');
 
       const markdownFiles = this.findMarkdownFiles(docsPath);
       const docParser = this.docParser || new DocumentSymbolParser();
       const registry = this.registry || new DocumentSymbolRegistry();
 
       // Parse all documents
+      const parseErrors: Array<{ file: string; message: string }> = [];
       for (const filePath of markdownFiles) {
         try {
           const parsed = docParser.parse(filePath);
@@ -118,9 +121,9 @@ export class UpdateBacklinksCommand extends BaseCommand {
             registry.registerDocument(parsed);
           }
         } catch (error) {
-          this.printError(
-            `Error parsing ${filePath}: ${error instanceof Error ? error.message : String(error)}`
-          );
+          const message = error instanceof Error ? error.message : String(error);
+          parseErrors.push({ file: filePath, message });
+          if (isHuman) this.printError(`Error parsing ${filePath}: ${message}`);
         }
       }
 
@@ -140,26 +143,50 @@ export class UpdateBacklinksCommand extends BaseCommand {
       const generator = this.generator || new BacklinkGenerator(registry);
       const updated = generator.updateAllBacklinks();
 
-      this.printSection('Updated');
-      for (const filePath of updated) {
+      // Resolve each updated file back to its primary symbol and backlink count
+      const updatedDocs = updated.map((filePath) => {
         const symbolName = Array.from(registry.getAllSymbolNames()).find(
           (name) => registry.getDefinition(name)?.filePath === filePath
         );
+        const backlinks = symbolName
+          ? registry.getReferences(symbolName).length +
+            registry.getCodeConnections(symbolName).length
+          : undefined;
+        return { filePath, symbolName, backlinks };
+      });
 
-        if (symbolName) {
-          const refs = registry.getReferences(symbolName);
-          const conns = registry.getCodeConnections(symbolName);
-          const total = refs.length + conns.length;
-
-          console.log(
-            `${colors.green}✅${colors.reset} ${filePath} (${colors.cyan}${total}${colors.reset} backlinks)`
-          );
+      if (isHuman) {
+        this.printSection('Updated');
+        for (const { filePath, symbolName, backlinks } of updatedDocs) {
+          if (symbolName) {
+            console.log(
+              `${colors.green}✅${colors.reset} ${filePath} (${colors.cyan}${backlinks}${colors.reset} backlinks)`
+            );
+          }
         }
-      }
 
-      console.log();
-      this.printSuccess(`Total: ${updated.length} documents updated`);
-      console.log();
+        console.log();
+        this.printSuccess(`Total: ${updated.length} documents updated`);
+        console.log();
+      } else {
+        this.printOutput(
+          'update-backlinks',
+          {
+            summary: {
+              docsDir,
+              documentsScanned: markdownFiles.length,
+              documentsUpdated: updated.length,
+            },
+            updatedFiles: updatedDocs.map(({ filePath, symbolName, backlinks }) => ({
+              path: filePath,
+              symbol: symbolName ?? '',
+              backlinkCount: backlinks ?? null,
+            })),
+            parseErrors,
+          },
+          args
+        );
+      }
 
       return this.success();
     });

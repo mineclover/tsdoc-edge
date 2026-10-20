@@ -12,7 +12,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { MermaidSymbolExtractor } from '../doc-symbol/MermaidSymbolExtractor';
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Symbol definition in a document
@@ -51,6 +51,18 @@ interface ValidationIssue {
   message: string;
   suggestion?: string;
   cycle?: string[]; // For circular dependencies
+}
+
+/**
+ * Outcome of one automatic fix attempt
+ */
+interface FixAction {
+  action: 'created' | 'skipped-existing' | 'manual-fix-needed';
+  symbolName: string;
+  /** Created/skipped document path, or the file containing the broken reference */
+  file: string;
+  line?: number;
+  suggestion?: string;
 }
 
 /**
@@ -101,7 +113,13 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge validate-symbol-refs [docs-directory]\n\n  Default: managed\n  Options: --fix   Fix detected issues automatically';
+    return `tsdoc-edge validate-symbol-refs [docs-directory] [options]
+
+  Default: managed
+
+  Options:
+    --fix            Fix detected issues automatically
+    --human          Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -117,45 +135,107 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const docsDir = args[0] || 'managed';
+      const isHuman = this.hasFlag(args, '--human');
+      const docsDir = args.find((arg) => !arg.startsWith('-')) || 'managed';
       const fixMode = args.includes('--fix');
 
-      this.printHeader('Validate Symbol References');
-      console.log(`📁 Scanning: ${docsDir}`);
-      console.log();
+      if (isHuman) {
+        this.printHeader('Validate Symbol References');
+        console.log(`📁 Scanning: ${docsDir}`);
+        console.log();
+
+        this.printInfo('Building symbol registry...');
+      }
 
       // Build symbol registry
-      this.printInfo('Building symbol registry...');
       const registry = this.buildSymbolRegistry(docsDir);
+      const errorCount = registry.issues.filter((i) => i.severity === 'error').length;
 
-      // Display statistics
-      this.displayStatistics(registry);
+      if (isHuman) {
+        // Display statistics
+        this.displayStatistics(registry);
 
-      // Display issues
-      if (registry.issues.length > 0) {
+        // Display issues
+        if (registry.issues.length > 0) {
+          console.log();
+          this.displayIssues(registry, fixMode);
+        }
+
+        // Fix mode
+        if (fixMode && registry.issues.length > 0) {
+          console.log();
+          this.printSection('Fixing Issues');
+          const { fixed } = this.fixIssues(registry, (action) => this.displayFixAction(action));
+          this.printSuccess(`Fixed ${fixed} issues`);
+        }
+
         console.log();
-        this.displayIssues(registry, fixMode);
+      } else {
+        const fixes =
+          fixMode && registry.issues.length > 0
+            ? this.fixIssues(registry)
+            : { fixed: 0, actions: [] };
+        this.printXml(args, docsDir, registry, fixMode, fixes);
       }
 
-      // Fix mode
-      if (fixMode && registry.issues.length > 0) {
-        console.log();
-        this.printSection('Fixing Issues');
-        const fixed = this.fixIssues(registry);
-        this.printSuccess(`Fixed ${fixed} issues`);
-      }
-
-      console.log();
-
-      const hasErrors = registry.issues.some((i) => i.severity === 'error');
-      if (hasErrors) {
-        return this.failure(
-          `Found ${registry.issues.filter((i) => i.severity === 'error').length} errors`
-        );
+      if (errorCount > 0) {
+        return this.failure(`Found ${errorCount} errors`);
       }
 
       return this.success('All symbol references are valid');
     });
+  }
+
+  /**
+   * Print the default XML document
+   */
+  private printXml(
+    args: string[],
+    docsDir: string,
+    registry: SymbolRegistry,
+    fixMode: boolean,
+    fixes: { fixed: number; actions: FixAction[] }
+  ): void {
+    const errorCount = registry.issues.filter((i) => i.severity === 'error').length;
+    const warningCount = registry.issues.filter((i) => i.severity === 'warning').length;
+
+    this.printOutput(
+      'symbol-reference-validation',
+      {
+        summary: {
+          docsDir,
+          uniqueSymbols: registry.statistics.uniqueSymbols,
+          totalDefinitions: registry.statistics.totalDefinitions,
+          totalReferences: registry.statistics.totalReferences,
+          duplicates: registry.statistics.duplicates,
+          brokenReferences: registry.statistics.brokenReferences,
+          circularDependencies: registry.statistics.circularDependencies,
+          errorCount,
+          warningCount,
+          isValid: errorCount === 0,
+          fixMode,
+          ...(fixMode ? { fixedCount: fixes.fixed } : {}),
+        },
+        issues: registry.issues.map((issue) => ({
+          type: issue.type,
+          severity: issue.severity,
+          symbol: issue.symbolName,
+          file: issue.filePath,
+          ...(issue.lineNumber ? { line: issue.lineNumber } : {}),
+          message: issue.message,
+          ...(issue.suggestion ? { suggestion: issue.suggestion } : {}),
+          ...(issue.cycle ? { cycle: issue.cycle.map((file) => ({ file })) } : {}),
+        })),
+        fixes: fixes.actions.map((fix) => ({
+          action: fix.action,
+          symbol: fix.symbolName,
+          file: fix.file,
+          ...(fix.line !== undefined ? { line: fix.line } : {}),
+          ...(fix.suggestion ? { suggestion: fix.suggestion } : {}),
+        })),
+      },
+      args
+    );
   }
 
   /**
@@ -823,37 +903,35 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
     this.printSection('Symbol Registry Statistics');
 
     console.log(
-      `  Unique symbols: ${this.colors.cyan}${registry.statistics.uniqueSymbols}${this.colors.reset}`
+      `  Unique symbols: ${colors.cyan}${registry.statistics.uniqueSymbols}${colors.reset}`
     );
     console.log(
-      `  Total definitions: ${this.colors.cyan}${registry.statistics.totalDefinitions}${this.colors.reset}`
+      `  Total definitions: ${colors.cyan}${registry.statistics.totalDefinitions}${colors.reset}`
     );
     console.log(
-      `  Total references: ${this.colors.cyan}${registry.statistics.totalReferences}${this.colors.reset}`
+      `  Total references: ${colors.cyan}${registry.statistics.totalReferences}${colors.reset}`
     );
 
     if (registry.statistics.duplicates > 0) {
-      console.log(
-        `  Duplicates: ${this.colors.yellow}${registry.statistics.duplicates}${this.colors.reset}`
-      );
+      console.log(`  Duplicates: ${colors.yellow}${registry.statistics.duplicates}${colors.reset}`);
     } else {
-      console.log(`  Duplicates: ${this.colors.green}0${this.colors.reset}`);
+      console.log(`  Duplicates: ${colors.green}0${colors.reset}`);
     }
 
     if (registry.statistics.brokenReferences > 0) {
       console.log(
-        `  Broken references: ${this.colors.red}${registry.statistics.brokenReferences}${this.colors.reset}`
+        `  Broken references: ${colors.red}${registry.statistics.brokenReferences}${colors.reset}`
       );
     } else {
-      console.log(`  Broken references: ${this.colors.green}0${this.colors.reset}`);
+      console.log(`  Broken references: ${colors.green}0${colors.reset}`);
     }
 
     if (registry.statistics.circularDependencies > 0) {
       console.log(
-        `  Circular dependencies: ${this.colors.yellow}${registry.statistics.circularDependencies}${this.colors.reset}`
+        `  Circular dependencies: ${colors.yellow}${registry.statistics.circularDependencies}${colors.reset}`
       );
     } else {
-      console.log(`  Circular dependencies: ${this.colors.green}0${this.colors.reset}`);
+      console.log(`  Circular dependencies: ${colors.green}0${colors.reset}`);
     }
   }
 
@@ -867,59 +945,67 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
     const warnings = registry.issues.filter((i) => i.severity === 'warning');
 
     if (errors.length > 0) {
-      console.log(`  ${this.colors.red}❌ Errors (${errors.length}):${this.colors.reset}`);
+      console.log(`  ${colors.red}❌ Errors (${errors.length}):${colors.reset}`);
       console.log();
       errors.forEach((issue, idx) => {
-        console.log(`  ${idx + 1}. ${this.colors.bold}${issue.message}${this.colors.reset}`);
+        console.log(`  ${idx + 1}. ${colors.bold}${issue.message}${colors.reset}`);
         console.log(`     Symbol: [[${issue.symbolName}]]`);
         console.log(
           `     File: ${issue.filePath}${issue.lineNumber ? `:${issue.lineNumber}` : ''}`
         );
         if (issue.suggestion) {
-          console.log(`     ${this.colors.cyan}💡 ${issue.suggestion}${this.colors.reset}`);
+          console.log(`     ${colors.cyan}💡 ${issue.suggestion}${colors.reset}`);
         }
         console.log();
       });
     }
 
     if (warnings.length > 0) {
-      console.log(`  ${this.colors.yellow}⚠️  Warnings (${warnings.length}):${this.colors.reset}`);
+      console.log(`  ${colors.yellow}⚠️  Warnings (${warnings.length}):${colors.reset}`);
       console.log();
       warnings.forEach((issue, idx) => {
         console.log(`  ${idx + 1}. ${issue.message}`);
         console.log(`     Symbol: [[${issue.symbolName}]]`);
         if (issue.type === 'circular-dependency' && issue.cycle) {
-          console.log(`     ${this.colors.yellow}Cycle:${this.colors.reset}`);
+          console.log(`     ${colors.yellow}Cycle:${colors.reset}`);
           for (let i = 0; i < issue.cycle.length - 1; i++) {
             const _isLast = i === issue.cycle.length - 2;
             console.log(`       ${i + 1}. ${issue.cycle[i]}`);
-            console.log(`          ${this.colors.dim}↓${this.colors.reset}`);
+            console.log(`          ${colors.dim}↓${colors.reset}`);
           }
-          console.log(
-            `       ${this.colors.yellow}(returns to ${issue.cycle[0]})${this.colors.reset}`
-          );
+          console.log(`       ${colors.yellow}(returns to ${issue.cycle[0]})${colors.reset}`);
         } else {
           console.log(`     File: ${issue.filePath}`);
         }
         if (issue.suggestion) {
-          console.log(`     ${this.colors.cyan}💡 ${issue.suggestion}${this.colors.reset}`);
+          console.log(`     ${colors.cyan}💡 ${issue.suggestion}${colors.reset}`);
         }
         console.log();
       });
     }
 
     if (!showFix && (errors.length > 0 || warnings.length > 0)) {
-      console.log(
-        `  ${this.colors.dim}Run with --fix to automatically fix some issues${this.colors.reset}`
-      );
+      console.log(`  ${colors.dim}Run with --fix to automatically fix some issues${colors.reset}`);
     }
   }
 
   /**
    * Fix issues automatically (where possible)
+   *
+   * @param registry - Registry whose issues should be fixed
+   * @param onAction - Called as each fix attempt completes (used for streaming human output)
+   * @returns Number of created documents and every attempted action
    */
-  private fixIssues(registry: SymbolRegistry): number {
+  private fixIssues(
+    registry: SymbolRegistry,
+    onAction?: (action: FixAction) => void
+  ): { fixed: number; actions: FixAction[] } {
     let fixed = 0;
+    const actions: FixAction[] = [];
+    const record = (action: FixAction): void => {
+      actions.push(action);
+      onAction?.(action);
+    };
 
     for (const issue of registry.issues) {
       if (issue.type === 'ambiguous-reference' && issue.severity === 'warning') {
@@ -937,12 +1023,10 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
         if (!fs.existsSync(targetPath)) {
           const skeletonContent = this.generateSkeletonDocument(issue.symbolName);
           fs.writeFileSync(targetPath, skeletonContent);
-          console.log(`  ${this.colors.green}✓${this.colors.reset} Created: ${targetPath}`);
+          record({ action: 'created', symbolName: issue.symbolName, file: targetPath });
           fixed++;
         } else {
-          console.log(
-            `  ${this.colors.yellow}⚠${this.colors.reset} Skipped (exists): ${targetPath}`
-          );
+          record({ action: 'skipped-existing', symbolName: issue.symbolName, file: targetPath });
         }
       } else if (
         issue.type === 'broken-reference' &&
@@ -950,14 +1034,37 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
         issue.suggestion?.startsWith('Did you mean')
       ) {
         // Log suggestion but don't auto-fix broken references (needs manual review)
-        console.log(
-          `  ${this.colors.yellow}⚠${this.colors.reset} Manual fix needed: ${issue.filePath}:${issue.lineNumber}`
-        );
-        console.log(`     ${this.colors.cyan}${issue.suggestion}${this.colors.reset}`);
+        record({
+          action: 'manual-fix-needed',
+          symbolName: issue.symbolName,
+          file: issue.filePath,
+          line: issue.lineNumber,
+          suggestion: issue.suggestion,
+        });
       }
     }
 
-    return fixed;
+    return { fixed, actions };
+  }
+
+  /**
+   * Display one fix attempt (--human)
+   */
+  private displayFixAction(action: FixAction): void {
+    switch (action.action) {
+      case 'created':
+        console.log(`  ${colors.green}✓${colors.reset} Created: ${action.file}`);
+        break;
+      case 'skipped-existing':
+        console.log(`  ${colors.yellow}⚠${colors.reset} Skipped (exists): ${action.file}`);
+        break;
+      case 'manual-fix-needed':
+        console.log(
+          `  ${colors.yellow}⚠${colors.reset} Manual fix needed: ${action.file}:${action.line}`
+        );
+        console.log(`     ${colors.cyan}${action.suggestion}${colors.reset}`);
+        break;
+    }
   }
 
   /**
@@ -986,18 +1093,5 @@ export class ValidateSymbolRefsCommand extends BaseCommand {
 ---
 *Generated: ${timestamp}*
 `;
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      bold: '\x1b[1m',
-      dim: '\x1b[2m',
-      green: '\x1b[32m',
-      yellow: '\x1b[33m',
-      blue: '\x1b[34m',
-      cyan: '\x1b[36m',
-      red: '\x1b[31m',
-    };
   }
 }

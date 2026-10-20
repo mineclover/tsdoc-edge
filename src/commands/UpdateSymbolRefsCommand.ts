@@ -72,7 +72,7 @@ export class UpdateSymbolRefsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge update-symbol-refs [docs-directory]\n\n  Default: managed';
+    return 'tsdoc-edge update-symbol-refs [docs-directory] [options]\n\n  Default: managed\n\n  Options:\n    --human          Output in human-readable format (default: XML)';
   }
 
   /**
@@ -88,7 +88,8 @@ export class UpdateSymbolRefsCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const target = args[0];
+      const isHuman = this.hasFlag(args, '--human');
+      const target = args.find((arg) => !arg.startsWith('-'));
       const docsDir = target || 'managed';
       const docsPath = path.resolve(process.cwd(), docsDir);
 
@@ -97,7 +98,7 @@ export class UpdateSymbolRefsCommand extends BaseCommand {
         return this.failure(`Path not found: ${docsPath}`);
       }
 
-      this.printHeader('Updating Symbol References');
+      if (isHuman) this.printHeader('Updating Symbol References');
 
       // Check if symbol registry exists
       const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
@@ -114,6 +115,7 @@ export class UpdateSymbolRefsCommand extends BaseCommand {
 
       // Parse all documents
       const parsedDocs: ParsedDocSymbols[] = [];
+      const parseErrors: Array<{ file: string; message: string }> = [];
       for (const filePath of markdownFiles) {
         try {
           const parsed = parser.parse(filePath);
@@ -121,20 +123,42 @@ export class UpdateSymbolRefsCommand extends BaseCommand {
             parsedDocs.push(parsed);
           }
         } catch (error) {
-          this.printError(
-            `Error parsing ${filePath}: ${error instanceof Error ? error.message : String(error)}`
-          );
+          const message = error instanceof Error ? error.message : String(error);
+          parseErrors.push({ file: filePath, message });
+          if (isHuman) this.printError(`Error parsing ${filePath}: ${message}`);
         }
       }
 
       if (parsedDocs.length === 0) {
-        this.printWarning('No symbol footnote references found');
-        console.log();
+        if (isHuman) {
+          this.printWarning('No symbol footnote references found');
+          console.log();
+        } else {
+          this.printSymbolRefsXml(args, {
+            docsDir,
+            parsedDocs,
+            result: { updated: 0, skipped: 0, errors: [] },
+            unresolved: [],
+            parseErrors,
+          });
+        }
         return this.success();
       }
 
       // Update documents
       const result = generator.batchUpdate(parsedDocs);
+
+      // Check for unresolved references
+      const unresolved = parsedDocs.map((parsed) => ({
+        file: parsed.filePath,
+        references: generator.getUnresolved(parsed),
+      }));
+      const totalUnresolved = unresolved.reduce((sum, doc) => sum + doc.references.length, 0);
+
+      if (!isHuman) {
+        this.printSymbolRefsXml(args, { docsDir, parsedDocs, result, unresolved, parseErrors });
+        return this.success();
+      }
 
       // Print results
       if (result.updated > 0) {
@@ -157,19 +181,15 @@ export class UpdateSymbolRefsCommand extends BaseCommand {
         console.log();
       }
 
-      // Check for unresolved references
-      let totalUnresolved = 0;
-      for (const parsed of parsedDocs) {
-        const unresolved = generator.getUnresolved(parsed);
-        if (unresolved.length > 0) {
-          if (totalUnresolved === 0) {
-            this.printSection('Unresolved References');
-          }
-          console.log(`${colors.yellow}⚠️  ${parsed.filePath}${colors.reset}`);
-          for (const u of unresolved) {
-            console.log(`   Line ${u.line}: [^${u.identifier}]`);
-          }
-          totalUnresolved += unresolved.length;
+      // Unresolved references
+      if (totalUnresolved > 0) {
+        this.printSection('Unresolved References');
+      }
+      for (const doc of unresolved) {
+        if (doc.references.length === 0) continue;
+        console.log(`${colors.yellow}⚠️  ${doc.file}${colors.reset}`);
+        for (const u of doc.references) {
+          console.log(`   Line ${u.line}: [^${u.identifier}]`);
         }
       }
 
@@ -189,6 +209,46 @@ export class UpdateSymbolRefsCommand extends BaseCommand {
 
       return this.success();
     });
+  }
+
+  /**
+   * Print the default XML document
+   */
+  private printSymbolRefsXml(
+    args: string[],
+    data: {
+      docsDir: string;
+      parsedDocs: ParsedDocSymbols[];
+      result: { updated: number; skipped: number; errors: Array<{ file: string; error: string }> };
+      unresolved: Array<{ file: string; references: Array<{ identifier: string; line: number }> }>;
+      parseErrors: Array<{ file: string; message: string }>;
+    }
+  ): void {
+    const unresolvedItems = data.unresolved.flatMap((doc) =>
+      doc.references.map((ref) => ({ file: doc.file, line: ref.line, identifier: ref.identifier }))
+    );
+
+    this.printOutput(
+      'update-symbol-refs',
+      {
+        summary: {
+          docsDir: data.docsDir,
+          documentsProcessed: data.parsedDocs.length,
+          documentsUpdated: data.result.updated,
+          documentsSkipped: data.result.skipped,
+          unresolvedReferences: unresolvedItems.length,
+          updateErrors: data.result.errors.length,
+        },
+        documents: data.parsedDocs.map((parsed) => ({
+          path: parsed.filePath,
+          uniqueRefs: new Set(parsed.symbolFootnoteRefs.map((r) => r.identifier)).size,
+        })),
+        unresolved: unresolvedItems,
+        errors: data.result.errors.map((e) => ({ file: e.file, message: e.error })),
+        parseErrors: data.parseErrors,
+      },
+      args
+    );
   }
 
   /**

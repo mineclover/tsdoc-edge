@@ -73,9 +73,12 @@ export class ParseCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge parse <source-path>
+    return `tsdoc-edge parse <source-path> [options]
 
-  source-path can be a file or directory`;
+  source-path can be a file or directory
+
+  Options:
+    --human          Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -91,7 +94,8 @@ export class ParseCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const sourcePath = args[0];
+      const isHuman = this.hasFlag(args, '--human');
+      const sourcePath = args.find((arg) => !arg.startsWith('-'));
 
       if (!sourcePath) {
         this.printError('Source path required');
@@ -111,9 +115,11 @@ export class ParseCommand extends BaseCommand {
         return this.failure(`Source path not found: ${sourcePath}`);
       }
 
-      this.printHeader('TSDoc Edge - Parse Enhanced Docs');
-      console.log(`Parsing: ${colors.cyan}${sourcePath}${colors.reset}`);
-      console.log();
+      if (isHuman) {
+        this.printHeader('TSDoc Edge - Parse Enhanced Docs');
+        console.log(`Parsing: ${colors.cyan}${sourcePath}${colors.reset}`);
+        console.log();
+      }
 
       const stats = fs.statSync(sourcePath);
       let allResults: ExtractedEnhancedDoc[] = [];
@@ -126,53 +132,95 @@ export class ParseCommand extends BaseCommand {
       }
 
       if (allResults.length === 0) {
-        this.printWarning('No enhanced documentation found');
-        console.log();
-        console.log('Add custom TSDoc tags to your code:');
-        console.log(
-          `  ${colors.dim}@problem, @functionality, @errorExp, @decision, @dependency, @plan${colors.reset}`
-        );
-        console.log();
+        if (isHuman) {
+          this.printWarning('No enhanced documentation found');
+          console.log();
+          console.log('Add custom TSDoc tags to your code:');
+          console.log(
+            `  ${colors.dim}@problem, @functionality, @errorExp, @decision, @dependency, @plan${colors.reset}`
+          );
+          console.log();
+        } else {
+          this.printParseXml(args, sourcePath, []);
+        }
         return this.success();
       }
 
-      this.printSection('📊 Extraction Results');
-      console.log(`   Total Symbols: ${colors.cyan}${allResults.length}${colors.reset}`);
-      console.log();
+      // Symbols by completeness (highest first)
+      const byCompleteness = [...allResults].sort((a, b) => b.completeness - a.completeness);
 
-      // Show symbols by completeness
-      const byCompleteness = allResults.sort((a, b) => b.completeness - a.completeness);
-
-      this.printSection('📋 Symbols by Completeness');
-      for (const result of byCompleteness) {
-        const relPath = path.relative(process.cwd(), result.symbol.filePath);
-        const completenessColor =
-          result.completeness >= 70
-            ? colors.green
-            : result.completeness >= 40
-              ? colors.yellow
-              : colors.red;
-        console.log(`   ${colors.cyan}${result.symbol.name}${colors.reset}`);
-        console.log(`     ${relPath}:${result.symbol.line}`);
-        console.log(
-          `     Completeness: ${completenessColor}${result.completeness}%${colors.reset}`
-        );
-        if (result.missing.length > 0) {
-          console.log(`     Missing: ${colors.dim}${result.missing.join(', ')}${colors.reset}`);
-        }
-        console.log();
+      if (isHuman) {
+        this.printHumanResults(byCompleteness);
+      } else {
+        this.printParseXml(args, sourcePath, byCompleteness);
       }
-
-      // Calculate average completeness
-      const avgCompleteness = Math.round(
-        allResults.reduce((sum, r) => sum + r.completeness, 0) / allResults.length
-      );
-
-      this.printSuccess(`Average Completeness: ${avgCompleteness}%`);
-      console.log();
 
       return this.success();
     });
+  }
+
+  /**
+   * Print the colored terminal report (--human)
+   * @param results - Results already ordered by completeness (descending)
+   */
+  private printHumanResults(results: ExtractedEnhancedDoc[]): void {
+    this.printSection('📊 Extraction Results');
+    console.log(`   Total Symbols: ${colors.cyan}${results.length}${colors.reset}`);
+    console.log();
+
+    this.printSection('📋 Symbols by Completeness');
+    for (const result of results) {
+      const relPath = path.relative(process.cwd(), result.symbol.filePath);
+      const completenessColor =
+        result.completeness >= 70
+          ? colors.green
+          : result.completeness >= 40
+            ? colors.yellow
+            : colors.red;
+      console.log(`   ${colors.cyan}${result.symbol.name}${colors.reset}`);
+      console.log(`     ${relPath}:${result.symbol.line}`);
+      console.log(`     Completeness: ${completenessColor}${result.completeness}%${colors.reset}`);
+      if (result.missing.length > 0) {
+        console.log(`     Missing: ${colors.dim}${result.missing.join(', ')}${colors.reset}`);
+      }
+      console.log();
+    }
+
+    this.printSuccess(`Average Completeness: ${this.averageCompleteness(results)}%`);
+    console.log();
+  }
+
+  /**
+   * Rounded average completeness across results (0 when there are none)
+   */
+  private averageCompleteness(results: ExtractedEnhancedDoc[]): number {
+    if (results.length === 0) return 0;
+    return Math.round(results.reduce((sum, r) => sum + r.completeness, 0) / results.length);
+  }
+
+  /**
+   * Print the default XML document
+   * @param results - Results already ordered by completeness (descending)
+   */
+  private printParseXml(args: string[], sourcePath: string, results: ExtractedEnhancedDoc[]): void {
+    this.printOutput(
+      'parse-results',
+      {
+        summary: {
+          sourcePath,
+          totalSymbols: results.length,
+          averageCompleteness: this.averageCompleteness(results),
+        },
+        symbols: results.map((result) => ({
+          name: result.symbol.name,
+          filePath: path.relative(process.cwd(), result.symbol.filePath),
+          line: result.symbol.line,
+          completeness: result.completeness,
+          missing: result.missing,
+        })),
+      },
+      args
+    );
   }
 
   /**

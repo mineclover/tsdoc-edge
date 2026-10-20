@@ -71,7 +71,7 @@ export class ValidateDocsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge validate-docs [docs-directory]\n\n  Default: docs';
+    return 'tsdoc-edge validate-docs [docs-directory] [options]\n\n  Default: docs\n\n  Options:\n    --human          Output in human-readable format (default: XML)';
   }
 
   /**
@@ -87,12 +87,14 @@ export class ValidateDocsCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
+
       // Deprecation warning (only when called directly as legacy command)
-      if (this.showDeprecationWarning) {
+      if (this.showDeprecationWarning && isHuman) {
         this.printDeprecationWarning('tsdoc-edge validate docs');
       }
 
-      const docsDir = args[0] || 'docs';
+      const docsDir = args.find((arg) => !arg.startsWith('-')) || 'docs';
       const docsPath = path.resolve(process.cwd(), docsDir);
 
       if (!fs.existsSync(docsPath)) {
@@ -100,7 +102,7 @@ export class ValidateDocsCommand extends BaseCommand {
         return this.failure(`Directory not found: ${docsPath}`);
       }
 
-      this.printHeader('Validating Document Symbols');
+      if (isHuman) this.printHeader('Validating Document Symbols');
 
       const markdownFiles = this.findMarkdownFiles(docsPath);
       const parser = this.parser || new DocumentSymbolParser();
@@ -136,60 +138,105 @@ export class ValidateDocsCommand extends BaseCommand {
       // Validate
       const validation = registry.validate();
 
-      // Print errors
-      if (validation.errors.length > 0) {
-        this.printSection('Errors');
-        for (const error of validation.errors) {
-          console.log(`${colors.red}❌ ${error.type}${colors.reset}`);
-          console.log(`   Symbol: [[${error.symbolName}]]`);
-          console.log(`   File: ${error.filePath}:${error.line}`);
-          console.log(`   ${error.message}`);
-          if (error.conflictWith) {
-            console.log(
-              `   Conflicts with: ${error.conflictWith.filePath}:${error.conflictWith.line}`
-            );
-          }
-          console.log();
-        }
-      }
-
-      // Print warnings
-      if (validation.warnings.length > 0) {
-        this.printSection('Warnings');
-        for (const warning of validation.warnings) {
-          console.log(`${colors.yellow}⚠️  ${warning.type}${colors.reset}`);
-          console.log(`   Symbol: [[${warning.symbolName}]]`);
-          console.log(`   File: ${warning.filePath}`);
-          console.log(`   ${warning.message}`);
-          if (warning.count !== undefined) {
-            console.log(`   Count: ${warning.count}`);
-          }
-          console.log();
-        }
-      }
-
-      // Summary
-      this.printSection('Summary');
       const stats = registry.getStatistics();
-      console.log(`Total definitions: ${colors.green}${stats.totalDefinitions}${colors.reset}`);
-      console.log(
-        `Errors: ${validation.errors.length > 0 ? colors.red : colors.green}${validation.errors.length}${colors.reset}`
-      );
-      console.log(
-        `Warnings: ${validation.warnings.length > 0 ? colors.yellow : colors.green}${validation.warnings.length}${colors.reset}`
-      );
-      console.log();
 
-      if (validation.valid) {
-        this.printSuccess('All document symbols are valid');
-      } else {
-        this.printError('Validation failed');
-        return this.failure('Validation failed');
+      if (isHuman) {
+        this.printHumanReport(validation, stats);
+        if (validation.valid) {
+          this.printSuccess('All document symbols are valid');
+        } else {
+          this.printError('Validation failed');
+          return this.failure('Validation failed');
+        }
+
+        console.log();
+        return this.success();
       }
 
-      console.log();
-      return this.success();
+      this.printOutput(
+        'validate-docs',
+        {
+          summary: {
+            docsDir,
+            isValid: validation.valid,
+            totalDefinitions: stats.totalDefinitions,
+            errorCount: validation.errors.length,
+            warningCount: validation.warnings.length,
+          },
+          errors: validation.errors.map((error) => ({
+            type: error.type,
+            symbol: error.symbolName,
+            file: error.filePath,
+            line: error.line,
+            message: error.message,
+            ...(error.conflictWith
+              ? { conflictsWith: `${error.conflictWith.filePath}:${error.conflictWith.line}` }
+              : {}),
+          })),
+          warnings: validation.warnings.map((warning) => ({
+            type: warning.type,
+            symbol: warning.symbolName,
+            file: warning.filePath,
+            message: warning.message,
+            ...(warning.count !== undefined ? { count: warning.count } : {}),
+          })),
+        },
+        args
+      );
+
+      return validation.valid ? this.success() : this.failure('Validation failed');
     });
+  }
+
+  /**
+   * Print the colored terminal report (--human)
+   */
+  private printHumanReport(
+    validation: ReturnType<DocumentSymbolRegistry['validate']>,
+    stats: ReturnType<DocumentSymbolRegistry['getStatistics']>
+  ): void {
+    // Print errors
+    if (validation.errors.length > 0) {
+      this.printSection('Errors');
+      for (const error of validation.errors) {
+        console.log(`${colors.red}❌ ${error.type}${colors.reset}`);
+        console.log(`   Symbol: [[${error.symbolName}]]`);
+        console.log(`   File: ${error.filePath}:${error.line}`);
+        console.log(`   ${error.message}`);
+        if (error.conflictWith) {
+          console.log(
+            `   Conflicts with: ${error.conflictWith.filePath}:${error.conflictWith.line}`
+          );
+        }
+        console.log();
+      }
+    }
+
+    // Print warnings
+    if (validation.warnings.length > 0) {
+      this.printSection('Warnings');
+      for (const warning of validation.warnings) {
+        console.log(`${colors.yellow}⚠️  ${warning.type}${colors.reset}`);
+        console.log(`   Symbol: [[${warning.symbolName}]]`);
+        console.log(`   File: ${warning.filePath}`);
+        console.log(`   ${warning.message}`);
+        if (warning.count !== undefined) {
+          console.log(`   Count: ${warning.count}`);
+        }
+        console.log();
+      }
+    }
+
+    // Summary
+    this.printSection('Summary');
+    console.log(`Total definitions: ${colors.green}${stats.totalDefinitions}${colors.reset}`);
+    console.log(
+      `Errors: ${validation.errors.length > 0 ? colors.red : colors.green}${validation.errors.length}${colors.reset}`
+    );
+    console.log(
+      `Warnings: ${validation.warnings.length > 0 ? colors.yellow : colors.green}${validation.warnings.length}${colors.reset}`
+    );
+    console.log();
   }
 
   /**

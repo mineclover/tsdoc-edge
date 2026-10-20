@@ -64,7 +64,10 @@ export class RebuildIndexCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge rebuild-index';
+    return `tsdoc-edge rebuild-index [options]
+
+  Options:
+    --human          Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -80,7 +83,11 @@ export class RebuildIndexCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      this.printHeader('TSDoc Edge - Rebuild FTS5 Index');
+      const isHuman = this.hasFlag(args, '--human');
+
+      if (isHuman) {
+        this.printHeader('TSDoc Edge - Rebuild FTS5 Index');
+      }
 
       if (!this.dbManager) {
         const dbCheck = this.checkDatabaseExists();
@@ -94,64 +101,101 @@ export class RebuildIndexCommand extends BaseCommand {
       try {
         // Get counts before rebuild
         const statsBefore = dbManager.getStatistics();
-        console.log(
-          `${colors.cyan}📊 Symbols in database: ${statsBefore.totalSymbols}${colors.reset}`
-        );
-        console.log();
+        if (isHuman) {
+          console.log(
+            `${colors.cyan}📊 Symbols in database: ${statsBefore.totalSymbols}${colors.reset}`
+          );
+          console.log();
 
-        // Rebuild FTS5 indexes
-        this.printSection('🔨 Rebuilding FTS5 Indexes');
-        console.log('This may take a moment...');
-        console.log();
+          // Rebuild FTS5 indexes
+          this.printSection('🔨 Rebuilding FTS5 Indexes');
+          console.log('This may take a moment...');
+          console.log();
+        }
 
         const startTime = Date.now();
         const result = dbManager.rebuildFTS5Index();
         const duration = Date.now() - startTime;
 
         // Display results
-        this.printSuccess('✅ FTS5 indexes rebuilt successfully!');
-        console.log();
+        if (isHuman) {
+          this.printSuccess('✅ FTS5 indexes rebuilt successfully!');
+          console.log();
 
-        this.printSection('📊 Rebuild Results');
-        console.log(
-          `Symbols FTS index: ${colors.green}${result.symbolsFts}${colors.reset} entries`
-        );
-        console.log(
-          `Enhanced docs FTS index: ${colors.green}${result.enhancedDocsFts}${colors.reset} entries`
-        );
-        console.log(`Duration: ${colors.cyan}${duration}ms${colors.reset}`);
-        console.log();
+          this.printSection('📊 Rebuild Results');
+          console.log(
+            `Symbols FTS index: ${colors.green}${result.symbolsFts}${colors.reset} entries`
+          );
+          console.log(
+            `Enhanced docs FTS index: ${colors.green}${result.enhancedDocsFts}${colors.reset} entries`
+          );
+          console.log(`Duration: ${colors.cyan}${duration}ms${colors.reset}`);
+          console.log();
+        }
 
         // Verify
-        if (result.symbolsFts === statsBefore.totalSymbols) {
-          this.printSuccess('✅ Index counts match database counts');
-        } else {
-          this.printWarning(
-            `⚠️  Warning: Symbol count mismatch (DB: ${statsBefore.totalSymbols}, FTS: ${result.symbolsFts})`
-          );
+        const countsMatch = result.symbolsFts === statsBefore.totalSymbols;
+        if (isHuman) {
+          if (countsMatch) {
+            this.printSuccess('✅ Index counts match database counts');
+          } else {
+            this.printWarning(
+              `⚠️  Warning: Symbol count mismatch (DB: ${statsBefore.totalSymbols}, FTS: ${result.symbolsFts})`
+            );
+          }
+          console.log();
+
+          this.printSection('🧪 Testing Search Functionality');
         }
-        console.log();
 
         // Test search using Drizzle
-        this.printSection('🧪 Testing Search Functionality');
         const testSymbols = dbManager.querySymbols({ limit: 1 });
+        let searchTest: { query: string; resultCount: number } | undefined;
 
         if (testSymbols.length > 0) {
           const testName = testSymbols[0].name;
           try {
             const searchResults = dbManager.searchSymbols(testName);
-            this.printSuccess(
-              `✅ Search test passed (query: "${testName}", results: ${searchResults.length})`
-            );
+            searchTest = { query: testName, resultCount: searchResults.length };
+            if (isHuman) {
+              this.printSuccess(
+                `✅ Search test passed (query: "${testName}", results: ${searchResults.length})`
+              );
+            }
           } catch (error) {
             this.printError(`❌ Search test failed: ${error}`);
             return this.failure('Search functionality not working after rebuild');
           }
         }
-        console.log();
 
-        this.printSuccess('✨ FTS5 index rebuild complete!');
-        console.log();
+        if (isHuman) {
+          console.log();
+
+          this.printSuccess('✨ FTS5 index rebuild complete!');
+          console.log();
+        } else {
+          this.printOutput(
+            'rebuild-results',
+            {
+              summary: {
+                symbolsInDatabase: statsBefore.totalSymbols,
+                symbolsFtsEntries: result.symbolsFts,
+                enhancedDocsFtsEntries: result.enhancedDocsFts,
+                countsMatch,
+                durationMs: duration,
+              },
+              searchTest: searchTest
+                ? {
+                    ran: true,
+                    passed: true,
+                    query: searchTest.query,
+                    resultCount: searchTest.resultCount,
+                  }
+                : { ran: false },
+            },
+            args
+          );
+        }
 
         return this.success();
       } finally {

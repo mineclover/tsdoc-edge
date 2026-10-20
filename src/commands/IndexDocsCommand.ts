@@ -77,6 +77,7 @@ export class IndexDocsCommand extends BaseCommand {
   Default directory: docs
 
   Options:
+    --human       Output in human-readable format (default: XML)
     --file=PATH   Index a single file incrementally`;
   }
 
@@ -93,8 +94,10 @@ export class IndexDocsCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
+
       // Deprecation warning (only when called directly as legacy command)
-      if (this.showDeprecationWarning) {
+      if (this.showDeprecationWarning && isHuman) {
         this.printDeprecationWarning('tsdoc-edge docs index');
       }
 
@@ -116,11 +119,11 @@ export class IndexDocsCommand extends BaseCommand {
 
       // Check if incremental update (single file)
       if (targetFile) {
-        return await this.incrementalUpdate(targetFile, outputDir, outputPath);
+        return await this.incrementalUpdate(targetFile, outputDir, outputPath, args);
       }
 
       // Full scan mode
-      return await this.fullScan(docsDir, outputDir, outputPath);
+      return await this.fullScan(docsDir, outputDir, outputPath, args);
     });
   }
 
@@ -130,8 +133,10 @@ export class IndexDocsCommand extends BaseCommand {
   private async incrementalUpdate(
     targetFile: string,
     outputDir: string,
-    outputPath: string
+    outputPath: string,
+    args: string[]
   ): Promise<CommandResult> {
+    const isHuman = this.hasFlag(args, '--human');
     const targetPath = path.resolve(process.cwd(), targetFile);
 
     if (!fs.existsSync(targetPath)) {
@@ -139,47 +144,75 @@ export class IndexDocsCommand extends BaseCommand {
       return this.failure(`File not found: ${targetPath}`);
     }
 
-    this.printHeader(`Updating Index for ${path.basename(targetPath)}`);
+    if (isHuman) this.printHeader(`Updating Index for ${path.basename(targetPath)}`);
 
     // Load existing index
     const registry = this.registry || new DocumentSymbolRegistry();
+    let existingIndex: 'loaded' | 'unreadable' | 'none' = 'none';
     if (fs.existsSync(outputPath)) {
       try {
         const indexData = JSON.parse(fs.readFileSync(outputPath, 'utf-8'));
         if (indexData.registryData) {
           registry.import(indexData.registryData);
-          this.printInfo('Loaded existing index');
+          existingIndex = 'loaded';
+          if (isHuman) this.printInfo('Loaded existing index');
         }
       } catch (_error) {
-        this.printWarning('Could not load existing index, creating new one');
+        existingIndex = 'unreadable';
+        if (isHuman) this.printWarning('Could not load existing index, creating new one');
       }
     }
 
     // Unregister old data from this file
     registry.unregisterFile(targetPath);
-    this.printInfo(`Removed old symbols from ${path.basename(targetPath)}`);
+    if (isHuman) this.printInfo(`Removed old symbols from ${path.basename(targetPath)}`);
 
     // Parse and register new data
     const parser = this.docParser || new DocumentSymbolParser();
+    let primaryName: string | undefined;
+    let auxiliaryCount = 0;
+    let referenceCount = 0;
     try {
       const parsed = parser.parse(targetPath);
 
       if (!parsed) {
-        this.printWarning(`Skipped ${path.basename(targetPath)} (not a managed document)`);
+        if (isHuman) {
+          this.printWarning(`Skipped ${path.basename(targetPath)} (not a managed document)`);
+        } else {
+          this.printOutput(
+            'index-update',
+            {
+              summary: {
+                mode: 'incremental',
+                file: targetFile,
+                status: 'skipped',
+                reason: 'not a managed document',
+                existingIndex,
+              },
+            },
+            args
+          );
+        }
         return this.success();
       }
 
       registry.registerDocument(parsed);
-      this.printSuccess(`Updated symbols from ${path.basename(targetPath)}`);
+      primaryName = parsed.primary?.name;
+      auxiliaryCount = parsed.auxiliaries.length;
+      referenceCount = parsed.references.length;
 
-      if (parsed.primary) {
-        console.log(`  Primary: ${colors.green}[[${parsed.primary.name}]]${colors.reset}`);
-      }
-      if (parsed.auxiliaries.length > 0) {
-        console.log(`  Auxiliaries: ${colors.cyan}${parsed.auxiliaries.length}${colors.reset}`);
-      }
-      if (parsed.references.length > 0) {
-        console.log(`  References: ${colors.cyan}${parsed.references.length}${colors.reset}`);
+      if (isHuman) {
+        this.printSuccess(`Updated symbols from ${path.basename(targetPath)}`);
+
+        if (parsed.primary) {
+          console.log(`  Primary: ${colors.green}[[${parsed.primary.name}]]${colors.reset}`);
+        }
+        if (parsed.auxiliaries.length > 0) {
+          console.log(`  Auxiliaries: ${colors.cyan}${parsed.auxiliaries.length}${colors.reset}`);
+        }
+        if (parsed.references.length > 0) {
+          console.log(`  References: ${colors.cyan}${parsed.references.length}${colors.reset}`);
+        }
       }
     } catch (error) {
       this.printError(
@@ -209,8 +242,28 @@ export class IndexDocsCommand extends BaseCommand {
       'utf-8'
     );
 
-    console.log();
-    this.printSuccess(`Index updated: ${outputPath}`);
+    if (isHuman) {
+      console.log();
+      this.printSuccess(`Index updated: ${outputPath}`);
+    } else {
+      this.printOutput(
+        'index-update',
+        {
+          summary: {
+            mode: 'incremental',
+            file: targetFile,
+            status: 'indexed',
+            existingIndex,
+            primary: primaryName ?? '',
+            auxiliaries: auxiliaryCount,
+            references: referenceCount,
+            outputPath,
+          },
+          registry: this.registryCounts(stats),
+        },
+        args
+      );
+    }
     return this.success();
   }
 
@@ -220,8 +273,10 @@ export class IndexDocsCommand extends BaseCommand {
   private async fullScan(
     docsDir: string,
     outputDir: string,
-    outputPath: string
+    outputPath: string,
+    args: string[]
   ): Promise<CommandResult> {
+    const isHuman = this.hasFlag(args, '--human');
     const docsPath = path.resolve(process.cwd(), docsDir);
 
     if (!fs.existsSync(docsPath)) {
@@ -229,12 +284,14 @@ export class IndexDocsCommand extends BaseCommand {
       return this.failure(`Directory not found: ${docsPath}`);
     }
 
-    this.printHeader('Indexing Document Symbols');
+    if (isHuman) this.printHeader('Indexing Document Symbols');
 
     // Find all markdown files
     const markdownFiles = this.findMarkdownFiles(docsPath);
-    console.log(`Found ${colors.green}${markdownFiles.length}${colors.reset} markdown files`);
-    console.log();
+    if (isHuman) {
+      console.log(`Found ${colors.green}${markdownFiles.length}${colors.reset} markdown files`);
+      console.log();
+    }
 
     // Parse documents
     const parser = this.docParser || new DocumentSymbolParser();
@@ -244,6 +301,7 @@ export class IndexDocsCommand extends BaseCommand {
     let totalAux = 0;
     let totalRefs = 0;
     let totalSourceConns = 0;
+    const parseErrors: Array<{ file: string; message: string }> = [];
 
     for (const filePath of markdownFiles) {
       try {
@@ -272,9 +330,9 @@ export class IndexDocsCommand extends BaseCommand {
           totalSourceConns++;
         }
       } catch (error) {
-        this.printError(
-          `Error parsing ${filePath}: ${error instanceof Error ? error.message : String(error)}`
-        );
+        const message = error instanceof Error ? error.message : String(error);
+        parseErrors.push({ file: filePath, message });
+        if (isHuman) this.printError(`Error parsing ${filePath}: ${message}`);
       }
     }
 
@@ -293,15 +351,17 @@ export class IndexDocsCommand extends BaseCommand {
     }
 
     // Print summary
-    this.printSection('Summary');
-    console.log(`Documents scanned: ${colors.green}${markdownFiles.length}${colors.reset}`);
-    console.log(`Primary definitions: ${colors.green}${totalPrimary}${colors.reset}`);
-    console.log(`Auxiliary definitions: ${colors.cyan}${totalAux}${colors.reset}`);
-    console.log(`References: ${colors.cyan}${totalRefs}${colors.reset}`);
-    console.log(
-      `Code connections: ${colors.cyan}${totalCodeConns + totalSourceConns}${colors.reset} (${totalCodeConns} from @doc, ${totalSourceConns} from Source:)`
-    );
-    console.log();
+    if (isHuman) {
+      this.printSection('Summary');
+      console.log(`Documents scanned: ${colors.green}${markdownFiles.length}${colors.reset}`);
+      console.log(`Primary definitions: ${colors.green}${totalPrimary}${colors.reset}`);
+      console.log(`Auxiliary definitions: ${colors.cyan}${totalAux}${colors.reset}`);
+      console.log(`References: ${colors.cyan}${totalRefs}${colors.reset}`);
+      console.log(
+        `Code connections: ${colors.cyan}${totalCodeConns + totalSourceConns}${colors.reset} (${totalCodeConns} from @doc, ${totalSourceConns} from Source:)`
+      );
+      console.log();
+    }
 
     // Save to file
     if (!fs.existsSync(outputDir)) {
@@ -325,10 +385,45 @@ export class IndexDocsCommand extends BaseCommand {
       'utf-8'
     );
 
-    this.printSuccess(`Index created: ${outputPath}`);
-    console.log();
+    if (isHuman) {
+      this.printSuccess(`Index created: ${outputPath}`);
+      console.log();
+    } else {
+      this.printOutput(
+        'index-results',
+        {
+          summary: {
+            mode: 'full',
+            docsDir,
+            documentsScanned: markdownFiles.length,
+            primaryDefinitions: totalPrimary,
+            auxiliaryDefinitions: totalAux,
+            references: totalRefs,
+            codeConnections: totalCodeConns + totalSourceConns,
+            codeConnectionsFromDocTags: totalCodeConns,
+            codeConnectionsFromSource: totalSourceConns,
+            outputPath,
+          },
+          registry: this.registryCounts(stats),
+          parseErrors,
+        },
+        args
+      );
+    }
 
     return this.success();
+  }
+
+  /**
+   * Registry totals reported in the XML documents
+   */
+  private registryCounts(stats: ReturnType<DocumentSymbolRegistry['getStatistics']>) {
+    return {
+      totalDefinitions: stats.totalDefinitions,
+      totalAuxiliaries: stats.totalAuxiliaries,
+      totalReferences: stats.totalReferences,
+      totalCodeConnections: stats.totalCodeConnections,
+    };
   }
 
   /**

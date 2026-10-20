@@ -54,9 +54,12 @@ export class GenerateDocsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge generate-docs <source-path> [output-dir]
+    return `tsdoc-edge generate-docs <source-path> [output-dir] [options]
 
-  Default output-dir: ./docs/generated`;
+  Default output-dir: ./docs/generated
+
+  Options:
+    --human          Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -72,8 +75,10 @@ export class GenerateDocsCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const sourcePath = args[0];
-      const outputDir = args[1] || './docs/generated';
+      const isHuman = this.hasFlag(args, '--human');
+      const positionalArgs = args.filter((arg) => !arg.startsWith('-'));
+      const sourcePath = positionalArgs[0];
+      const outputDir = positionalArgs[1] || './docs/generated';
 
       if (!sourcePath) {
         this.printError('Source path required');
@@ -96,10 +101,12 @@ export class GenerateDocsCommand extends BaseCommand {
         return this.failure(`Source path not found: ${sourcePath}`);
       }
 
-      this.printHeader('TSDoc Edge - Generate Docs');
-      console.log(`Generating docs from: ${colors.cyan}${sourcePath}${colors.reset}`);
-      console.log(`Output directory: ${colors.cyan}${outputDir}${colors.reset}`);
-      console.log();
+      if (isHuman) {
+        this.printHeader('TSDoc Edge - Generate Docs');
+        console.log(`Generating docs from: ${colors.cyan}${sourcePath}${colors.reset}`);
+        console.log(`Output directory: ${colors.cyan}${outputDir}${colors.reset}`);
+        console.log();
+      }
 
       const stats = fs.statSync(sourcePath);
       let allResults: ExtractedEnhancedDoc[] = [];
@@ -112,7 +119,11 @@ export class GenerateDocsCommand extends BaseCommand {
       }
 
       if (allResults.length === 0) {
-        this.printWarning('No enhanced documentation found');
+        if (isHuman) {
+          this.printWarning('No enhanced documentation found');
+        } else {
+          this.printGenerateXml(args, sourcePath, outputDir, 0, []);
+        }
         return this.success();
       }
 
@@ -120,9 +131,10 @@ export class GenerateDocsCommand extends BaseCommand {
         fs.mkdirSync(outputDir, { recursive: true });
       }
 
-      this.printSection('📝 Generating Markdown Files');
+      if (isHuman) this.printSection('📝 Generating Markdown Files');
 
       let generated = 0;
+      const generatedFiles: Array<{ symbol: string; path: string }> = [];
       for (const result of allResults) {
         if (result.completeness < 10) continue;
 
@@ -134,16 +146,44 @@ export class GenerateDocsCommand extends BaseCommand {
         generated++;
 
         const relPath = path.relative(process.cwd(), outputPath);
-        this.printSuccess(`${result.symbol.name}`);
-        console.log(`     ${colors.dim}→ ${relPath}${colors.reset}`);
+        generatedFiles.push({ symbol: result.symbol.name, path: relPath });
+
+        if (isHuman) {
+          this.printSuccess(`${result.symbol.name}`);
+          console.log(`     ${colors.dim}→ ${relPath}${colors.reset}`);
+        }
       }
 
-      console.log();
-      this.printSuccess(`Generated ${generated} markdown file(s)`);
-      console.log();
+      if (isHuman) {
+        console.log();
+        this.printSuccess(`Generated ${generated} markdown file(s)`);
+        console.log();
+      } else {
+        this.printGenerateXml(args, sourcePath, outputDir, generated, generatedFiles);
+      }
 
       return this.success();
     });
+  }
+
+  /**
+   * Print the default XML document
+   */
+  private printGenerateXml(
+    args: string[],
+    sourcePath: string,
+    outputDir: string,
+    totalGenerated: number,
+    files: Array<{ symbol: string; path: string }>
+  ): void {
+    this.printOutput(
+      'generate-docs',
+      {
+        summary: { sourcePath, outputDir, totalGenerated },
+        files,
+      },
+      args
+    );
   }
 
   private parseDirectory(dir: string): ExtractedEnhancedDoc[] {

@@ -14,8 +14,12 @@ jest.mock('../../doc-symbol/DocumentSymbolParser');
 jest.mock('../../doc-symbol/DocumentSymbolRegistry');
 jest.mock('../../doc-symbol/TSDocSymbolParser');
 
+const ANSI = '\x1b[';
+
 describe('IndexDocsCommand', () => {
   let command: IndexDocsCommand;
+  let consoleSpy: jest.SpyInstance;
+  const output = (): string => consoleSpy.mock.calls.map((call) => call.join(' ')).join('\n');
   let mockDocParser: jest.Mocked<DocumentSymbolParser>;
   let mockRegistry: jest.Mocked<DocumentSymbolRegistry>;
   let mockTsdocParser: jest.Mocked<TSDocSymbolParser>;
@@ -27,6 +31,7 @@ describe('IndexDocsCommand', () => {
 
   beforeEach(() => {
     jest.clearAllMocks();
+    consoleSpy = jest.spyOn(console, 'log').mockImplementation();
 
     // Create mock instances
     mockDocParser = new DocumentSymbolParser() as jest.Mocked<DocumentSymbolParser>;
@@ -37,6 +42,7 @@ describe('IndexDocsCommand', () => {
     mockRegistry.registerDocument = jest.fn();
     mockRegistry.getStatistics = jest.fn().mockReturnValue({
       totalDefinitions: 0,
+      totalAuxiliaries: 0,
       totalReferences: 0,
       totalCodeConnections: 0,
     });
@@ -52,6 +58,10 @@ describe('IndexDocsCommand', () => {
     mockFsStat.mockReturnValue({ isDirectory: () => false });
     mockFsWriteFile.mockReturnValue(undefined);
     mockFsMkdir.mockReturnValue(undefined);
+  });
+
+  afterEach(() => {
+    consoleSpy.mockRestore();
   });
 
   describe('execute', () => {
@@ -114,6 +124,111 @@ describe('IndexDocsCommand', () => {
 
       expect(result.exitCode).toBe(0);
       expect(mockRegistry.registerDocument).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('XML output (default)', () => {
+    it('should report a full scan as an XML document', async () => {
+      mockFsReaddir.mockReturnValue(['a.md']);
+      mockDocParser.parse = jest.fn().mockReturnValue({
+        filePath: 'a.md',
+        primary: { name: 'Alpha', line: 1 },
+        auxiliaries: [{ name: 'Aux', line: 3 }],
+        references: [{ name: 'Beta', line: 5 }],
+      });
+      mockRegistry.registerCodeConnection = jest.fn();
+
+      const result = await command.execute(['docs']);
+      const out = output();
+
+      expect(result.exitCode).toBe(0);
+      expect(out.startsWith('<index-results>')).toBe(true);
+      expect(out.trimEnd().endsWith('</index-results>')).toBe(true);
+      expect(out).toContain('<mode>full</mode>');
+      expect(out).toContain('<documentsScanned>1</documentsScanned>');
+      expect(out).toContain('<primaryDefinitions>1</primaryDefinitions>');
+      expect(out).toContain('<auxiliaryDefinitions>1</auxiliaryDefinitions>');
+      expect(out).toContain('<references>1</references>');
+      expect(out).not.toContain(ANSI);
+      expect(mockFsWriteFile).toHaveBeenCalled();
+    });
+
+    it('should report an incremental update as an XML document', async () => {
+      mockDocParser.parse = jest.fn().mockReturnValue({
+        filePath: 'test.md',
+        primary: { name: 'TestSymbol', line: 1 },
+        auxiliaries: [],
+        references: [{ name: 'Other', line: 2 }],
+      });
+
+      const result = await command.execute(['--file=test.md']);
+      const out = output();
+
+      expect(result.exitCode).toBe(0);
+      expect(out).toContain('<index-update>');
+      expect(out).toContain('<mode>incremental</mode>');
+      expect(out).toContain('<status>indexed</status>');
+      expect(out).toContain('<primary>TestSymbol</primary>');
+      expect(out).not.toContain(ANSI);
+    });
+
+    it('should report a skipped non-managed document without writing the index', async () => {
+      mockDocParser.parse = jest.fn().mockReturnValue(null);
+
+      const result = await command.execute(['--file=test.md']);
+      const out = output();
+
+      expect(result.exitCode).toBe(0);
+      expect(out).toContain('<status>skipped</status>');
+      expect(mockFsWriteFile).not.toHaveBeenCalled();
+    });
+
+    it('should not print the deprecation warning for legacy invocations', async () => {
+      const legacy = new IndexDocsCommand(mockDocParser, mockTsdocParser, mockRegistry, true);
+
+      await legacy.execute(['docs']);
+      const out = output();
+
+      expect(out).not.toContain('Deprecation');
+      expect(out).toContain('<index-results>');
+    });
+  });
+
+  describe('--human output', () => {
+    it('should keep the colored full scan summary', async () => {
+      const result = await command.execute(['docs', '--human']);
+      const out = output();
+
+      expect(result.exitCode).toBe(0);
+      expect(out).toContain('Indexing Document Symbols');
+      expect(out).toContain('Documents scanned');
+      expect(out).toContain('Index created');
+      expect(out).toContain(ANSI);
+      expect(out).not.toContain('<index-results>');
+    });
+
+    it('should keep the incremental update messages', async () => {
+      mockDocParser.parse = jest.fn().mockReturnValue({
+        filePath: 'test.md',
+        primary: { name: 'TestSymbol', line: 1 },
+        auxiliaries: [],
+        references: [],
+      });
+
+      await command.execute(['--file=test.md', '--human']);
+      const out = output();
+
+      expect(out).toContain('Updated symbols from test.md');
+      expect(out).toContain('[[TestSymbol]]');
+      expect(out).toContain('Index updated');
+    });
+
+    it('should keep the deprecation warning for legacy invocations', async () => {
+      const legacy = new IndexDocsCommand(mockDocParser, mockTsdocParser, mockRegistry, true);
+
+      await legacy.execute(['docs', '--human']);
+
+      expect(output()).toContain('Deprecation Notice');
     });
   });
 });

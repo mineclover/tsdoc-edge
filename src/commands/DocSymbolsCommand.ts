@@ -86,6 +86,7 @@ Options:
   --category <cat>   Filter by category (features, concepts, workflows, etc.)
   --search <query>   Search by keyword in name or summary
   --llm              Generate LLM-friendly project glossary format
+  --human            Output in human-readable format (default: XML)
 
 Examples:
   tsdoc-edge doc-symbols                    List all symbols
@@ -107,6 +108,7 @@ Examples:
     }
 
     const useLlmFormat = args.includes('--llm');
+    const isHuman = this.hasFlag(args, '--human');
     const categoryFilter = this.getOptionValue(args, '--category')
       ?.split(',')
       .map((c: string) => c.trim());
@@ -138,8 +140,10 @@ Examples:
       if (useLlmFormat) {
         const output = this.generateLlmOutput(symbols);
         console.log(output);
-      } else {
+      } else if (isHuman) {
         this.displayHumanReadable(symbols);
+      } else {
+        this.printSymbolsXml(args, symbols, categoryFilter, searchQuery);
       }
 
       return { exitCode: 0, message: `Found ${symbols.length} document symbols` };
@@ -169,27 +173,8 @@ Examples:
       return;
     }
 
-    // Group by category
-    const byCategory = new Map<string, DocumentSymbol[]>();
-    for (const symbol of symbols) {
-      if (!byCategory.has(symbol.category)) {
-        byCategory.set(symbol.category, []);
-      }
-      byCategory.get(symbol.category)?.push(symbol);
-    }
-
-    // Sort categories
-    const sortedCategories = Array.from(byCategory.entries()).sort((a, b) => {
-      // Priority order
-      const order = ['architecture', 'features', 'workflows', 'concepts'];
-      const aIndex = order.indexOf(a[0]);
-      const bIndex = order.indexOf(b[0]);
-
-      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
-      if (aIndex !== -1) return -1;
-      if (bIndex !== -1) return 1;
-      return a[0].localeCompare(b[0]);
-    });
+    // Group by category, sorted by priority
+    const sortedCategories = this.groupByCategory(symbols);
 
     // Display by category
     for (const [category, categorySymbols] of sortedCategories) {
@@ -220,9 +205,76 @@ Examples:
     // Summary
     console.log(`${colors.dim}${'─'.repeat(80)}${colors.reset}`);
     console.log(
-      `${colors.bold}Total:${colors.reset} ${symbols.length} document symbols across ${byCategory.size} categories`
+      `${colors.bold}Total:${colors.reset} ${symbols.length} document symbols across ${sortedCategories.length} categories`
     );
     console.log();
+  }
+
+  /**
+   * Print the default XML document
+   * @private
+   */
+  private printSymbolsXml(
+    args: string[],
+    symbols: DocumentSymbol[],
+    categoryFilter: string[] | undefined,
+    searchQuery: string | undefined
+  ): void {
+    const categories = this.groupByCategory(symbols);
+
+    this.printOutput(
+      'document-symbols',
+      {
+        summary: {
+          totalSymbols: symbols.length,
+          totalCategories: categories.length,
+          ...(categoryFilter && categoryFilter.length > 0
+            ? { categoryFilter: categoryFilter.join(',') }
+            : {}),
+          ...(searchQuery ? { searchQuery } : {}),
+        },
+        categories: categories.map(([name, categorySymbols]) => ({
+          name,
+          count: categorySymbols.length,
+        })),
+        symbols: categories.flatMap(([, categorySymbols]) =>
+          categorySymbols.map((symbol) => ({
+            name: symbol.name,
+            category: symbol.category,
+            filePath: symbol.filePath,
+            summary: symbol.summary,
+            referenceCount: symbol.referenceCount,
+          }))
+        ),
+      },
+      args
+    );
+  }
+
+  /**
+   * Group symbols by category, with categories in display priority order
+   * @private
+   */
+  private groupByCategory(symbols: DocumentSymbol[]): Array<[string, DocumentSymbol[]]> {
+    const byCategory = new Map<string, DocumentSymbol[]>();
+    for (const symbol of symbols) {
+      if (!byCategory.has(symbol.category)) {
+        byCategory.set(symbol.category, []);
+      }
+      byCategory.get(symbol.category)?.push(symbol);
+    }
+
+    // Priority order
+    const order = ['architecture', 'features', 'workflows', 'concepts'];
+    return Array.from(byCategory.entries()).sort((a, b) => {
+      const aIndex = order.indexOf(a[0]);
+      const bIndex = order.indexOf(b[0]);
+
+      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
+      if (aIndex !== -1) return -1;
+      if (bIndex !== -1) return 1;
+      return a[0].localeCompare(b[0]);
+    });
   }
 
   /**
@@ -246,26 +298,8 @@ Examples:
     output += `This glossary contains ${symbols.length} explicitly defined document symbols that represent the core concepts of TSDoc Edge. `;
     output += `Each symbol has exactly one authoritative definition (SSOT principle) and represents an intentionally managed project concept.\n\n`;
 
-    // Group by category
-    const byCategory = new Map<string, DocumentSymbol[]>();
-    for (const symbol of symbols) {
-      if (!byCategory.has(symbol.category)) {
-        byCategory.set(symbol.category, []);
-      }
-      byCategory.get(symbol.category)?.push(symbol);
-    }
-
-    // Sort categories
-    const sortedCategories = Array.from(byCategory.entries()).sort((a, b) => {
-      const order = ['architecture', 'features', 'workflows', 'concepts'];
-      const aIndex = order.indexOf(a[0]);
-      const bIndex = order.indexOf(b[0]);
-
-      if (aIndex !== -1 && bIndex !== -1) return aIndex - bIndex;
-      if (aIndex !== -1) return -1;
-      if (bIndex !== -1) return 1;
-      return a[0].localeCompare(b[0]);
-    });
+    // Group by category, sorted by priority
+    const sortedCategories = this.groupByCategory(symbols);
 
     // Generate sections by category
     for (const [category, categorySymbols] of sortedCategories) {

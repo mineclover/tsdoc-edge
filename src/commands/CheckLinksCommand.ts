@@ -5,7 +5,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { MissingLinkDetector } from '../analyzer/MissingLinkDetector';
+import { MissingLinkDetector, type MissingLinkReport } from '../analyzer/MissingLinkDetector';
 import { ConfigLoader } from '../utils/ConfigLoader';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
@@ -69,7 +69,7 @@ export class CheckLinksCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge check-links [docs-directory]\n\n  Default: docs';
+    return 'tsdoc-edge check-links [docs-directory] [options]\n\n  Default: docs\n\n  Options:\n    --human          Output in human-readable format (default: XML)';
   }
 
   /**
@@ -85,7 +85,8 @@ export class CheckLinksCommand extends BaseCommand {
     }
 
     return this.executeWithErrorHandling(async () => {
-      const sourcePath = args[0] || 'src';
+      const isHuman = this.hasFlag(args, '--human');
+      const sourcePath = args.find((arg) => !arg.startsWith('-')) || 'src';
 
       if (!fs.existsSync(sourcePath)) {
         this.printError(`Source path not found: ${sourcePath}`);
@@ -96,79 +97,140 @@ export class CheckLinksCommand extends BaseCommand {
         return this.failure(`Source path not found: ${sourcePath}`);
       }
 
-      this.printHeader('TSDoc Edge - Check Links');
-      console.log(`Analyzing links in: ${colors.cyan}${sourcePath}${colors.reset}`);
-      console.log();
+      if (isHuman) {
+        this.printHeader('TSDoc Edge - Check Links');
+        console.log(`Analyzing links in: ${colors.cyan}${sourcePath}${colors.reset}`);
+        console.log();
+      }
 
       // Load configuration
       const configLoader = this.configLoader || new ConfigLoader();
       const linkCheckConfig = configLoader.getLinkCheckConfig();
 
       // Show config info if using a config file
-      if (configLoader.hasConfigFile()) {
+      if (isHuman && configLoader.hasConfigFile()) {
         console.log(`${colors.dim}Using config: ${configLoader.getConfigPath()}${colors.reset}`);
         console.log();
       }
 
       // Create detector and analyze
-      this.printSection('🔍 Scanning Documentation');
+      if (isHuman) this.printSection('🔍 Scanning Documentation');
       const detector = this.detector || new MissingLinkDetector(configLoader);
       const report = detector.analyze(sourcePath);
 
-      console.log(`   Total Links Checked: ${colors.green}${report.totalLinks}${colors.reset}`);
-      console.log(
-        `   Broken Links: ${report.brokenLinks > 0 ? colors.red : colors.green}${report.brokenLinks}${colors.reset}`
-      );
-      console.log();
-
-      if (report.brokenLinks === 0) {
-        this.printSuccess('All links are valid!');
-        console.log();
-        return this.success();
+      if (isHuman) {
+        this.printHumanReport(report);
+      } else {
+        this.printLinkCheckXml(
+          args,
+          sourcePath,
+          report,
+          configLoader,
+          linkCheckConfig.failOnBroken === true
+        );
       }
-
-      // Show broken links by type
-      this.printSection('❌ Broken Links by Type');
-      for (const [type, links] of report.byType.entries()) {
-        console.log(`   ${type}: ${colors.red}${links.length}${colors.reset}`);
-      }
-      console.log();
-
-      // Show broken links by file
-      this.printSection('📁 Broken Links by File');
-      for (const [file, links] of report.byFile.entries()) {
-        const relPath = path.relative(process.cwd(), file);
-        console.log(`   ${relPath}: ${colors.red}${links.length}${colors.reset}`);
-      }
-      console.log();
-
-      // Show detailed broken links
-      this.printSection('🔗 Broken Link Details');
-      for (const link of report.links.slice(0, 20)) {
-        const relPath = path.relative(process.cwd(), link.sourceFile);
-        console.log(`   ${colors.yellow}${link.linkType}${colors.reset}: ${link.target}`);
-        console.log(`     in ${relPath}:${link.line} (${link.sourceSymbol})`);
-        console.log(`     ${colors.dim}${link.reason}${colors.reset}`);
-        if (link.suggestedFix) {
-          console.log(`     ${colors.cyan}💡 ${link.suggestedFix}${colors.reset}`);
-        }
-        console.log();
-      }
-
-      if (report.links.length > 20) {
-        console.log(`   ... and ${report.links.length - 20} more broken links`);
-        console.log();
-      }
-
-      this.printError(`Found ${report.brokenLinks} broken link(s)`);
-      console.log();
 
       // Exit with error code if configured
-      if (linkCheckConfig.failOnBroken) {
+      if (report.brokenLinks > 0 && linkCheckConfig.failOnBroken) {
         return this.failure(`Found ${report.brokenLinks} broken links`);
       }
 
       return this.success();
     });
+  }
+
+  /**
+   * Print the colored terminal report (--human)
+   */
+  private printHumanReport(report: MissingLinkReport): void {
+    console.log(`   Total Links Checked: ${colors.green}${report.totalLinks}${colors.reset}`);
+    console.log(
+      `   Broken Links: ${report.brokenLinks > 0 ? colors.red : colors.green}${report.brokenLinks}${colors.reset}`
+    );
+    console.log();
+
+    if (report.brokenLinks === 0) {
+      this.printSuccess('All links are valid!');
+      console.log();
+      return;
+    }
+
+    // Show broken links by type
+    this.printSection('❌ Broken Links by Type');
+    for (const [type, links] of report.byType.entries()) {
+      console.log(`   ${type}: ${colors.red}${links.length}${colors.reset}`);
+    }
+    console.log();
+
+    // Show broken links by file
+    this.printSection('📁 Broken Links by File');
+    for (const [file, links] of report.byFile.entries()) {
+      const relPath = path.relative(process.cwd(), file);
+      console.log(`   ${relPath}: ${colors.red}${links.length}${colors.reset}`);
+    }
+    console.log();
+
+    // Show detailed broken links
+    this.printSection('🔗 Broken Link Details');
+    for (const link of report.links.slice(0, 20)) {
+      const relPath = path.relative(process.cwd(), link.sourceFile);
+      console.log(`   ${colors.yellow}${link.linkType}${colors.reset}: ${link.target}`);
+      console.log(`     in ${relPath}:${link.line} (${link.sourceSymbol})`);
+      console.log(`     ${colors.dim}${link.reason}${colors.reset}`);
+      if (link.suggestedFix) {
+        console.log(`     ${colors.cyan}💡 ${link.suggestedFix}${colors.reset}`);
+      }
+      console.log();
+    }
+
+    if (report.links.length > 20) {
+      console.log(`   ... and ${report.links.length - 20} more broken links`);
+      console.log();
+    }
+
+    this.printError(`Found ${report.brokenLinks} broken link(s)`);
+    console.log();
+  }
+
+  /**
+   * Print the default XML document (lists every broken link, not just the first 20)
+   */
+  private printLinkCheckXml(
+    args: string[],
+    sourcePath: string,
+    report: MissingLinkReport,
+    configLoader: ConfigLoader,
+    failOnBroken: boolean
+  ): void {
+    this.printOutput(
+      'link-check',
+      {
+        summary: {
+          sourcePath,
+          ...(configLoader.hasConfigFile() ? { configFile: configLoader.getConfigPath() } : {}),
+          totalLinks: report.totalLinks,
+          brokenLinks: report.brokenLinks,
+          failOnBroken,
+        },
+        byType: Array.from(report.byType.entries()).map(([type, links]) => ({
+          type,
+          count: links.length,
+        })),
+        byFile: Array.from(report.byFile.entries()).map(([file, links]) => ({
+          file: path.relative(process.cwd(), file),
+          count: links.length,
+        })),
+        links: report.links.map((link) => ({
+          type: link.linkType,
+          target: link.target,
+          file: path.relative(process.cwd(), link.sourceFile),
+          line: link.line,
+          symbol: link.sourceSymbol,
+          reason: link.reason,
+          ...(link.suggestedFix ? { suggestedFix: link.suggestedFix } : {}),
+        })),
+      },
+      args
+    );
   }
 }
