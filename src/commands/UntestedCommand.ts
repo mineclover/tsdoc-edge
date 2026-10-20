@@ -50,6 +50,7 @@ export class UntestedCommand extends BaseCommand {
     return `tsdoc-edge untested [options]
 
   Options:
+    --human          Output in human-readable format (default: XML)
     --exclude-tests  Exclude symbols from test files (__tests__, .test.ts, .spec.ts)`;
   }
 
@@ -66,13 +67,16 @@ export class UntestedCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(_args, '--human');
       const excludeTests = _args.includes('--exclude-tests');
 
-      console.log(`${colors.bold}Untested Symbols${colors.reset}`);
-      if (excludeTests) {
-        console.log(`${colors.dim}Excluding test files${colors.reset}`);
+      if (isHuman) {
+        console.log(`${colors.bold}Untested Symbols${colors.reset}`);
+        if (excludeTests) {
+          console.log(`${colors.dim}Excluding test files${colors.reset}`);
+        }
+        console.log();
       }
-      console.log();
 
       if (!this.dbManager) {
         const dbCheck = this.checkDatabaseExists();
@@ -118,20 +122,27 @@ export class UntestedCommand extends BaseCommand {
           );
         }
 
-        if (untested.length === 0) {
-          console.log(`${colors.green}✅ All symbols have tests!${colors.reset}`);
-          console.log();
+        if (isHuman) {
+          this.printHumanReport(untested);
         } else {
-          console.log(`${colors.yellow}Found ${untested.length} untested symbols:${colors.reset}`);
-          console.log();
-
-          for (const symbol of untested) {
-            console.log(
-              `${colors.bold}${symbol.id}${colors.reset} → ${symbol.name} (${symbol.type})`
-            );
-            console.log(`  Location: ${symbol.filePath}:${symbol.line}`);
-            console.log();
-          }
+          this.printOutput(
+            'untested-symbols',
+            {
+              summary: {
+                totalFound: untested.length,
+                excludeTests,
+              },
+              symbols: untested.map((s) => ({
+                id: s.id,
+                name: s.name,
+                type: s.type,
+                filePath: s.filePath,
+                line: s.line,
+                column: s.column,
+              })),
+            },
+            _args
+          );
         }
 
         return {
@@ -144,5 +155,26 @@ export class UntestedCommand extends BaseCommand {
         }
       }
     });
+  }
+
+  /**
+   * Print the colored terminal report (`--human`)
+   * @private
+   */
+  private printHumanReport(untested: Symbol[]): void {
+    if (untested.length === 0) {
+      console.log(`${colors.green}✅ All symbols have tests!${colors.reset}`);
+      console.log();
+      return;
+    }
+
+    console.log(`${colors.yellow}Found ${untested.length} untested symbols:${colors.reset}`);
+    console.log();
+
+    for (const symbol of untested) {
+      console.log(`${colors.bold}${symbol.id}${colors.reset} → ${symbol.name} (${symbol.type})`);
+      console.log(`  Location: ${symbol.filePath}:${symbol.line}`);
+      console.log();
+    }
   }
 }

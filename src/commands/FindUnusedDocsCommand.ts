@@ -6,6 +6,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { UnusedDocumentDetector } from '../spec/UnusedDocumentDetector';
+import type { UnusedDocument } from '../types/spec';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
@@ -70,7 +71,12 @@ export class FindUnusedDocsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge find-unused-docs [docs-directory]\n\n  Default: managed';
+    return `tsdoc-edge find-unused-docs [docs-directory] [options]
+
+  Default: managed
+
+  Options:
+    --human          Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -86,12 +92,15 @@ export class FindUnusedDocsCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
+
       // Deprecation warning (only when called directly as legacy command)
-      if (this.showDeprecationWarning) {
+      if (this.showDeprecationWarning && isHuman) {
         this.printDeprecationWarning('tsdoc-edge docs unused');
       }
 
-      const target = args[0];
+      // `--human` is a boolean flag, so it must not be mistaken for the directory argument
+      const target = args.filter((arg) => arg !== '--human')[0];
       const dir = target || 'managed';
       const dirPath = path.resolve(process.cwd(), dir);
 
@@ -101,92 +110,133 @@ export class FindUnusedDocsCommand extends BaseCommand {
         return this.failure(`Directory not found: ${dirPath}`);
       }
 
-      this.printHeader('Finding Unused Documents');
+      if (isHuman) {
+        this.printHeader('Finding Unused Documents');
+      }
 
       const detector = this.detector || new UnusedDocumentDetector();
       const results = detector.detect(dirPath);
       const summary = detector.getSummary(results);
 
-      // Print summary
-      this.printSection('Summary');
-      console.log(`Total unused/stale documents: ${colors.cyan}${summary.total}${colors.reset}`);
-
-      if (summary.total === 0) {
-        this.printSuccess('No unused or stale documents found');
-        console.log();
-        return this.success();
-      }
-
-      console.log(
-        `Average days since modified: ${colors.cyan}${summary.averageDaysSinceModified}${colors.reset}`
-      );
-      console.log();
-
-      console.log(`${colors.bold}By Reason:${colors.reset}`);
-      for (const [reason, count] of Object.entries(summary.byReason)) {
-        console.log(`  ${reason}: ${count}`);
-      }
-      console.log();
-
-      console.log(`${colors.bold}By Suggested Action:${colors.reset}`);
-      for (const [action, count] of Object.entries(summary.byAction)) {
-        const actionColor =
-          action === 'delete' ? colors.red : action === 'archive' ? colors.yellow : colors.blue;
-        console.log(`  ${actionColor}${action}${colors.reset}: ${count}`);
-      }
-      console.log();
-
-      // Group by suggested action
-      const byAction: Record<string, typeof results> = {
-        delete: [],
-        archive: [],
-        review: [],
-        complete: [],
-      };
-
-      for (const result of results) {
-        byAction[result.suggestedAction].push(result);
-      }
-
-      // Print delete suggestions
-      if (byAction.delete.length > 0) {
-        this.printSection('Suggested: Delete');
-        console.log(
-          `${colors.dim}These documents are stale drafts with no references${colors.reset}`
+      if (isHuman) {
+        this.printHumanReport(results, summary);
+      } else {
+        this.printOutput(
+          'unused-documents',
+          {
+            summary: {
+              path: dir,
+              totalFound: summary.total,
+              averageDaysSinceModified: summary.averageDaysSinceModified,
+            },
+            reasons: Object.entries(summary.byReason).map(([reason, count]) => ({
+              reason,
+              count,
+            })),
+            actions: Object.entries(summary.byAction).map(([action, count]) => ({
+              action,
+              count,
+            })),
+            documents: results.map((r) => ({
+              filePath: r.filePath,
+              reason: r.reason,
+              suggestedAction: r.suggestedAction,
+              daysSinceModified: r.daysSinceModified,
+            })),
+          },
+          args
         );
-        console.log();
-        for (const result of byAction.delete.slice(0, 10)) {
-          console.log(`${colors.red}🗑${colors.reset}  ${result.filePath}`);
-          console.log(
-            `   ${colors.dim}${result.reason} (${result.daysSinceModified} days old)${colors.reset}`
-          );
-          console.log();
-        }
-        if (byAction.delete.length > 10) {
-          console.log(`${colors.dim}... and ${byAction.delete.length - 10} more${colors.reset}`);
-          console.log();
-        }
-      }
-
-      // Print archive suggestions
-      if (byAction.archive.length > 0) {
-        this.printSection('Suggested: Archive');
-        console.log(`${colors.dim}These documents are old but may have value${colors.reset}`);
-        console.log();
-        for (const result of byAction.archive.slice(0, 10)) {
-          console.log(`${colors.yellow}📦${colors.reset} ${result.filePath}`);
-          console.log(
-            `   ${colors.dim}${result.reason} (${result.daysSinceModified} days old)${colors.reset}`
-          );
-          console.log();
-        }
-        if (byAction.archive.length > 10) {
-          console.log(`${colors.dim}... and ${byAction.archive.length - 10} more${colors.reset}`);
-          console.log();
-        }
       }
 
       return this.success();
     });
+  }
+
+  /**
+   * Print the colored terminal report (`--human`)
+   * @private
+   */
+  private printHumanReport(
+    results: UnusedDocument[],
+    summary: ReturnType<UnusedDocumentDetector['getSummary']>
+  ): void {
+    // Print summary
+    this.printSection('Summary');
+    console.log(`Total unused/stale documents: ${colors.cyan}${summary.total}${colors.reset}`);
+
+    if (summary.total === 0) {
+      this.printSuccess('No unused or stale documents found');
+      console.log();
+      return;
+    }
+
+    console.log(
+      `Average days since modified: ${colors.cyan}${summary.averageDaysSinceModified}${colors.reset}`
+    );
+    console.log();
+
+    console.log(`${colors.bold}By Reason:${colors.reset}`);
+    for (const [reason, count] of Object.entries(summary.byReason)) {
+      console.log(`  ${reason}: ${count}`);
+    }
+    console.log();
+
+    console.log(`${colors.bold}By Suggested Action:${colors.reset}`);
+    for (const [action, count] of Object.entries(summary.byAction)) {
+      const actionColor =
+        action === 'delete' ? colors.red : action === 'archive' ? colors.yellow : colors.blue;
+      console.log(`  ${actionColor}${action}${colors.reset}: ${count}`);
+    }
+    console.log();
+
+    // Group by suggested action
+    const byAction: Record<string, typeof results> = {
+      delete: [],
+      archive: [],
+      review: [],
+      complete: [],
+    };
+
+    for (const result of results) {
+      byAction[result.suggestedAction].push(result);
+    }
+
+    // Print delete suggestions
+    if (byAction.delete.length > 0) {
+      this.printSection('Suggested: Delete');
+      console.log(
+        `${colors.dim}These documents are stale drafts with no references${colors.reset}`
+      );
+      console.log();
+      for (const result of byAction.delete.slice(0, 10)) {
+        console.log(`${colors.red}🗑${colors.reset}  ${result.filePath}`);
+        console.log(
+          `   ${colors.dim}${result.reason} (${result.daysSinceModified} days old)${colors.reset}`
+        );
+        console.log();
+      }
+      if (byAction.delete.length > 10) {
+        console.log(`${colors.dim}... and ${byAction.delete.length - 10} more${colors.reset}`);
+        console.log();
+      }
+    }
+
+    // Print archive suggestions
+    if (byAction.archive.length > 0) {
+      this.printSection('Suggested: Archive');
+      console.log(`${colors.dim}These documents are old but may have value${colors.reset}`);
+      console.log();
+      for (const result of byAction.archive.slice(0, 10)) {
+        console.log(`${colors.yellow}📦${colors.reset} ${result.filePath}`);
+        console.log(
+          `   ${colors.dim}${result.reason} (${result.daysSinceModified} days old)${colors.reset}`
+        );
+        console.log();
+      }
+      if (byAction.archive.length > 10) {
+        console.log(`${colors.dim}... and ${byAction.archive.length - 10} more${colors.reset}`);
+        console.log();
+      }
+    }
   }
 }

@@ -76,7 +76,7 @@ export class DetectDeadCodeCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge detect-dead-code [options]\n\n  Options:\n    --all              Show all candidates (including low confidence)\n    --confidence=LEVEL Filter by confidence (high/medium/low)';
+    return 'tsdoc-edge detect-dead-code [options]\n\n  Options:\n    --human            Output in human-readable format (default: XML)\n    --all              Show all candidates (including low confidence)\n    --confidence=LEVEL Filter by confidence (high/medium/low)';
   }
 
   /**
@@ -92,15 +92,20 @@ export class DetectDeadCodeCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
       const showAll = args.includes('--all');
       const confidenceFilter = this.getConfidenceFilter(args);
 
-      this.printHeader('Dead Code Detection');
+      if (isHuman) {
+        this.printHeader('Dead Code Detection');
+      }
 
       // Get all symbols
       const allSymbols = await this.getAllSymbols();
-      this.printInfo(`Analyzing ${allSymbols.length} symbols...`);
-      console.log();
+      if (isHuman) {
+        this.printInfo(`Analyzing ${allSymbols.length} symbols...`);
+        console.log();
+      }
 
       // Detect dead code
       const deadCode = await this.detectDeadCode(allSymbols);
@@ -113,8 +118,34 @@ export class DetectDeadCodeCommand extends BaseCommand {
         return true; // all
       });
 
-      // Display results
-      this.displayResults(filtered, showAll);
+      if (isHuman) {
+        // Display results
+        this.displayResults(filtered, showAll);
+      } else {
+        this.printOutput(
+          'dead-code-detection',
+          {
+            summary: {
+              totalSymbolsAnalyzed: allSymbols.length,
+              totalCandidates: filtered.length,
+              highConfidence: filtered.filter((dc) => dc.confidence === 'high').length,
+              mediumConfidence: filtered.filter((dc) => dc.confidence === 'medium').length,
+              lowConfidence: filtered.filter((dc) => dc.confidence === 'low').length,
+              confidenceFilter,
+            },
+            candidates: filtered.map((dc) => ({
+              name: dc.symbol.name,
+              type: dc.symbol.type,
+              filePath: dc.symbol.filePath,
+              line: dc.symbol.line,
+              reason: dc.reason,
+              confidence: dc.confidence,
+              recommendations: dc.recommendations.map((text) => ({ text })),
+            })),
+          },
+          args
+        );
+      }
 
       // Close database connection
       this.db.close();

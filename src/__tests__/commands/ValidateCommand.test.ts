@@ -75,11 +75,84 @@ describe('ValidateCommand', () => {
     it('should generate validation report', async () => {
       mockFsExists.mockReturnValue(true);
 
-      const result = await command.execute([]);
+      const result = await command.execute(['--human']);
 
       expect(result.exitCode).toBe(0);
       expect(mockValidator.generateDetailedReport).toHaveBeenCalled();
       expect(mockValidator.formatDetailedReport).toHaveBeenCalled();
+    });
+
+    describe('output format', () => {
+      let consoleSpy: jest.SpyInstance;
+      const output = () => consoleSpy.mock.calls.map((call) => call.join(' ')).join('\n');
+
+      const issue = {
+        symbolId: 'svc-method-run',
+        symbolName: 'Service.run',
+        symbolType: 'method',
+        filePath: 'src/svc.ts',
+        line: 12,
+        issueType: 'missing-documentation',
+        severity: 'error',
+        message: "Symbol 'Service.run' <needs> docs & more",
+        missingItems: ['summary', '@param input'],
+      };
+
+      beforeEach(() => {
+        consoleSpy = jest.spyOn(console, 'log').mockImplementation();
+        mockFsExists.mockReturnValue(true);
+        mockValidator.generateDetailedReport = jest.fn().mockReturnValue({
+          timestamp: '2026-01-02T03:04:05.000Z',
+          totalSymbols: 4,
+          totalIssues: 1,
+          issuesBySeverity: { error: 1, warning: 0, info: 0 },
+          issuesByFile: new Map(),
+          issuesByType: new Map([['missing-documentation', [issue]]]),
+          allIssues: [issue],
+          completionPercentage: 41.666,
+          summary: {
+            documented: 3,
+            undocumented: 1,
+            tested: 2,
+            untested: 2,
+            withResponsibility: 1,
+            withoutResponsibility: 3,
+            withContract: 0,
+            withoutContract: 4,
+          },
+        });
+      });
+
+      afterEach(() => {
+        consoleSpy.mockRestore();
+      });
+
+      it('prints an XML document by default', async () => {
+        const result = await command.execute([]);
+
+        expect(result.exitCode).toBe(0);
+        expect(output().startsWith('<validation-report>')).toBe(true);
+        expect(output()).toContain('<totalIssues>1</totalIssues>');
+        expect(output()).toContain('<completionPercentage>41.67</completionPercentage>');
+        expect(output()).toContain('<errors>1</errors>');
+        expect(output()).toContain('<documented>3</documented>');
+        expect(output()).toContain('<issueType>missing-documentation</issueType>');
+        expect(output()).toContain('<count>1</count>');
+        expect(output()).toContain('<symbolId>svc-method-run</symbolId>');
+        expect(output()).toContain('<missingItems>summary,@param input</missingItems>');
+        expect(output()).toContain('&lt;needs&gt; docs &amp; more');
+        expect(output()).not.toContain('suggestedFix');
+        expect(output()).not.toContain('\x1b[');
+        expect(mockValidator.formatDetailedReport).not.toHaveBeenCalled();
+      });
+
+      it('prints the formatted text report with --human', async () => {
+        await command.execute(['--human']);
+
+        expect(output()).toContain('Detailed Validation Report');
+        expect(output()).toContain('Validation Report');
+        expect(output()).not.toContain('<validation-report>');
+      });
     });
 
     it('should handle validation errors gracefully', async () => {

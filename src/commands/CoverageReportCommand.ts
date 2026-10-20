@@ -10,6 +10,9 @@ import { DatabaseManager } from '../storage/DatabaseManager';
 import type { Symbol } from '../types/graph/graph';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
+/** High-priority symbols listed in the default XML (same cut as the `--human` report) */
+const HIGH_PRIORITY_LIMIT = 20;
+
 /**
  * Coverage statistics for a symbol category
  */
@@ -103,7 +106,8 @@ export class CoverageReportCommand extends BaseCommand {
     return `tsdoc-edge coverage-report [options]
 
   Options:
-    --json               Output as JSON
+    --human              Output in human-readable format (default: XML)
+    --json               Output as JSON (takes precedence over XML)
     --filter=public      Show only public symbols
     --hierarchical       Group by file hierarchy`;
   }
@@ -121,11 +125,12 @@ export class CoverageReportCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
       const jsonOutput = args.includes('--json');
       const filterPublic = args.includes('--filter=public');
       const hierarchical = args.includes('--hierarchical');
 
-      if (!jsonOutput) {
+      if (isHuman && !jsonOutput) {
         this.printHeader('SSOT Coverage Report');
       }
 
@@ -149,8 +154,45 @@ export class CoverageReportCommand extends BaseCommand {
       // 4. Output
       if (jsonOutput) {
         console.log(JSON.stringify(report, null, 2));
-      } else {
+      } else if (isHuman) {
         this.displayReport(report, hierarchical);
+      } else {
+        const { overall, byCategory, undocumentedSymbols } = report;
+        const countByPriority = (priority: 'high' | 'medium' | 'low') =>
+          undocumentedSymbols.filter((s) => s.priority === priority).length;
+
+        // Like the human report, list only the top high-priority symbols; `--json` has them all
+        this.printOutput(
+          'coverage-report',
+          {
+            summary: {
+              total: overall.total,
+              documented: overall.documented,
+              coverage: Number(overall.coverage.toFixed(1)),
+              mode: hierarchical ? 'hierarchical' : 'doc-tag',
+              filterPublic,
+              targetMet: overall.coverage >= 50,
+              highPriorityUndocumented: countByPriority('high'),
+              mediumPriorityUndocumented: countByPriority('medium'),
+              lowPriorityUndocumented: countByPriority('low'),
+            },
+            categories: Object.entries(byCategory).map(([name, stats]) => ({
+              name,
+              total: stats.total,
+              documented: stats.documented,
+              coverage: Number(stats.coverage.toFixed(1)),
+            })),
+            highPriority: undocumentedSymbols
+              .filter((s) => s.priority === 'high')
+              .slice(0, HIGH_PRIORITY_LIMIT)
+              .map((s) => ({
+                name: s.name,
+                type: s.type,
+                filePath: s.filePath,
+              })),
+          },
+          args
+        );
       }
 
       // Close database connection

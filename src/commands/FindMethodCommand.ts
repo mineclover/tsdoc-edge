@@ -5,10 +5,40 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { DatabaseManager } from '../storage/DatabaseManager';
+import { DatabaseManager, type SymbolRow } from '../storage/DatabaseManager';
 import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import type { SymbolRegistryEntry } from '../types/registry';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
+
+/**
+ * Per-invocation search state shared by the display helpers
+ */
+interface SearchContext {
+  query: string;
+  isHuman: boolean;
+  args: string[];
+}
+
+/**
+ * Drop `undefined` fields: the XML writer renders them as empty elements, which would be
+ * indistinguishable from an intentionally empty value.
+ */
+function definedFields(fields: Record<string, unknown>): Record<string, unknown> {
+  return Object.fromEntries(Object.entries(fields).filter(([, value]) => value !== undefined));
+}
+
+/**
+ * Map a database symbol row to an XML search match
+ */
+function toSearchMatch(row: SymbolRow): Record<string, unknown> {
+  return {
+    id: row.id,
+    name: row.name,
+    filePath: row.file_path,
+    line: row.line,
+    type: row.type,
+  };
+}
 
 /**
  * Command for finding methods by qualified name
@@ -70,7 +100,10 @@ export class FindMethodCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge find-method <qualified-name>
+    return `tsdoc-edge find-method <qualified-name> [options]
+
+  Options:
+    --human          Output in human-readable format (default: XML)
 
   Examples:
     tsdoc-edge find-method DataProcessor#loadCSV
@@ -91,7 +124,9 @@ export class FindMethodCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const query = args[0];
+      const isHuman = this.hasFlag(args, '--human');
+      // `--human` is a boolean flag, so it must not be mistaken for the query
+      const query = args.filter((arg) => arg !== '--human')[0];
 
       if (!query) {
         this.printError('Usage: tsdoc-edge find-method <qualified-name>');
@@ -109,31 +144,67 @@ export class FindMethodCommand extends BaseCommand {
         this.manager ||
         (fs.existsSync(registryPath) ? new SymbolRegistryManager(registryPath) : null);
 
-      this.printHeader(`Search: ${query}`);
+      if (isHuman) {
+        this.printHeader(`Search: ${query}`);
+      }
+
+      const ctx: SearchContext = { query, isHuman, args };
 
       // Try registry first if available
       if (manager) {
         const entry = manager.findByQualifiedName(query);
         if (entry) {
-          return this.displayRegistryEntry(entry, manager);
+          return this.displayRegistryEntry(entry, manager, ctx);
         }
 
         const results = manager.search(query);
         if (results.length > 0) {
-          return this.displayRegistryResults(results, manager);
+          return this.displayRegistryResults(results, manager, ctx);
         }
       }
 
       // Fall back to database search
-      return this.findFromDatabase(query);
+      return this.findFromDatabase(ctx);
     });
   }
 
   private displayRegistryEntry(
     entry: SymbolRegistryEntry,
-    manager: SymbolRegistryManager
+    manager: SymbolRegistryManager,
+    ctx: SearchContext
   ): CommandResult {
     const displayName = entry.sourceRef.qualifiedName || entry.sourceRef.symbolName || entry.id;
+
+    if (!ctx.isHuman) {
+      const parent = entry.sourceRef.memberOf
+        ? manager.findById(entry.sourceRef.memberOf)
+        : undefined;
+
+      this.printSearchXml(ctx, 'registry', 'symbols', [
+        definedFields({
+          id: entry.id,
+          name: displayName,
+          filePath: entry.sourceRef.filePath,
+          line: entry.sourceRef.line,
+          type: entry.sourceRef.type,
+          depth: entry.sourceRef.depth,
+          parent: entry.sourceRef.memberOf,
+          parentName: parent
+            ? parent.sourceRef.qualifiedName || parent.sourceRef.symbolName || parent.id
+            : undefined,
+          memberType: entry.sourceRef.memberType,
+          createdAt: entry.createdAt,
+          updatedAt: entry.updatedAt,
+          tags: entry.tags,
+          children: manager.getChildren(entry.id).map((child) => ({
+            id: child.id,
+            name: child.sourceRef.qualifiedName || child.sourceRef.symbolName || child.id,
+          })),
+        }),
+      ]);
+      return this.success();
+    }
+
     console.log(`${colors.bold}${entry.id}${colors.reset} → ${displayName}`);
     console.log();
     console.log(`File:       ${entry.sourceRef.filePath}`);
@@ -176,10 +247,29 @@ export class FindMethodCommand extends BaseCommand {
 
   private displayRegistryResults(
     results: SymbolRegistryEntry[],
-    manager: SymbolRegistryManager
+    manager: SymbolRegistryManager,
+    ctx: SearchContext
   ): CommandResult {
     if (results.length === 1) {
-      return this.displayRegistryEntry(results[0], manager);
+      return this.displayRegistryEntry(results[0], manager, ctx);
+    }
+
+    if (!ctx.isHuman) {
+      this.printSearchXml(
+        ctx,
+        'registry',
+        'symbols',
+        results.map((result) =>
+          definedFields({
+            id: result.id,
+            name: result.sourceRef.qualifiedName || result.sourceRef.symbolName || result.id,
+            filePath: result.sourceRef.filePath,
+            line: result.sourceRef.line,
+            type: result.sourceRef.type,
+          })
+        )
+      );
+      return this.success();
     }
 
     console.log(`Found ${colors.bold}${results.length}${colors.reset} matching symbols:`);
@@ -196,7 +286,8 @@ export class FindMethodCommand extends BaseCommand {
     return this.success();
   }
 
-  private async findFromDatabase(query: string): Promise<CommandResult> {
+  private async findFromDatabase(ctx: SearchContext): Promise<CommandResult> {
+    const { query } = ctx;
     const dbCheck = this.checkDatabaseExists();
     if (dbCheck) {
       console.log(`${colors.yellow}No symbols found${colors.reset}`);
@@ -221,6 +312,11 @@ export class FindMethodCommand extends BaseCommand {
 
         // If still no methods, show all matching symbols
         if (methodMatches.length === 0 && allMatches.length > 0) {
+          if (!ctx.isHuman) {
+            this.printSearchXml(ctx, 'database', 'symbols', allMatches.map(toSearchMatch));
+            return this.success();
+          }
+
           console.log(`Found ${colors.bold}${allMatches.length}${colors.reset} matching symbols:`);
           console.log();
 
@@ -235,6 +331,11 @@ export class FindMethodCommand extends BaseCommand {
       }
 
       if (methodMatches.length === 0) {
+        if (!ctx.isHuman) {
+          this.printSearchXml(ctx, 'database', 'methods', []);
+          return this.success();
+        }
+
         console.log(`${colors.yellow}No methods found${colors.reset}`);
         console.log();
         return this.success();
@@ -243,6 +344,27 @@ export class FindMethodCommand extends BaseCommand {
       if (methodMatches.length === 1) {
         const match = methodMatches[0];
         const symbol = dbManager.getSymbol(match.id);
+        if (!ctx.isHuman) {
+          this.printSearchXml(
+            ctx,
+            'database',
+            'methods',
+            symbol
+              ? [
+                  definedFields({
+                    id: symbol.id,
+                    name: symbol.name,
+                    filePath: symbol.filePath,
+                    line: symbol.line,
+                    type: symbol.type,
+                    exported: symbol.isExported,
+                    summary: symbol.summary,
+                  }),
+                ]
+              : []
+          );
+          return this.success();
+        }
         if (symbol) {
           console.log(`${colors.bold}${symbol.id}${colors.reset} → ${symbol.name}`);
           console.log();
@@ -257,6 +379,11 @@ export class FindMethodCommand extends BaseCommand {
           }
           console.log();
         }
+        return this.success();
+      }
+
+      if (!ctx.isHuman) {
+        this.printSearchXml(ctx, 'database', 'methods', methodMatches.map(toSearchMatch));
         return this.success();
       }
 
@@ -281,5 +408,35 @@ export class FindMethodCommand extends BaseCommand {
     } finally {
       dbManager.close();
     }
+  }
+
+  /**
+   * Print the default XML document. One root tag for every outcome so consumers
+   * need not branch on the shape: `summary` says where the matches came from and
+   * `matches` is empty when nothing was found.
+   *
+   * @param source - Where the matches came from
+   * @param scope - Whether the matches are restricted to methods/functions
+   * @private
+   */
+  private printSearchXml(
+    ctx: SearchContext,
+    source: 'registry' | 'database',
+    scope: 'methods' | 'symbols',
+    matches: Array<Record<string, unknown>>
+  ): void {
+    this.printOutput(
+      'method-search',
+      {
+        summary: {
+          query: ctx.query,
+          source,
+          scope,
+          totalMatches: matches.length,
+        },
+        matches,
+      },
+      ctx.args
+    );
   }
 }

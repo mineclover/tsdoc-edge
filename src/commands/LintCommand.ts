@@ -57,9 +57,10 @@ export class LintCommand extends BaseCommand {
     return `tsdoc-edge lint [options]
 
   Options:
+    --human        Output in human-readable format (default: XML)
     --fix          Auto-fix issues where possible
     --strict       Fail on warnings too
-    --json         Output as JSON
+    --json         Output as JSON (takes precedence over XML)
     --ci           CI mode (exit code based on results)`;
   }
 
@@ -75,12 +76,15 @@ export class LintCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
       const strict = args.includes('--strict');
       const json = args.includes('--json');
       const ci = args.includes('--ci');
 
-      console.log(`${colors.bold}TSDoc Edge - Code Quality Check${colors.reset}`);
-      console.log();
+      if (isHuman) {
+        console.log(`${colors.bold}TSDoc Edge - Code Quality Check${colors.reset}`);
+        console.log();
+      }
 
       const dbCheck = this.checkDatabaseExists();
       if (dbCheck) return dbCheck;
@@ -95,41 +99,76 @@ export class LintCommand extends BaseCommand {
 
       try {
         // 1. Code Health Check
-        console.log(`${colors.cyan}[1/4] Checking code health...${colors.reset}`);
+        if (isHuman) {
+          console.log(`${colors.cyan}[1/4] Checking code health...${colors.reset}`);
+        }
         const healthResult = this.checkHealth();
         results.push(healthResult);
         totalIssues += healthResult.issues.length;
         totalWarnings += healthResult.warnings.length;
 
         // 2. Documentation Coverage
-        console.log(`${colors.cyan}[2/4] Checking documentation coverage...${colors.reset}`);
+        if (isHuman) {
+          console.log(`${colors.cyan}[2/4] Checking documentation coverage...${colors.reset}`);
+        }
         const docResult = this.checkDocumentation(db);
         results.push(docResult);
         totalIssues += docResult.issues.length;
         totalWarnings += docResult.warnings.length;
 
         // 3. Relationship Density
-        console.log(`${colors.cyan}[3/4] Checking relationship density...${colors.reset}`);
+        if (isHuman) {
+          console.log(`${colors.cyan}[3/4] Checking relationship density...${colors.reset}`);
+        }
         const relResult = this.checkRelationships(db);
         results.push(relResult);
         totalIssues += relResult.issues.length;
         totalWarnings += relResult.warnings.length;
 
         // 4. Test Coverage
-        console.log(`${colors.cyan}[4/4] Checking test coverage...${colors.reset}`);
+        if (isHuman) {
+          console.log(`${colors.cyan}[4/4] Checking test coverage...${colors.reset}`);
+        }
         const testResult = this.checkTestCoverage(db);
         results.push(testResult);
         totalIssues += testResult.issues.length;
         totalWarnings += testResult.warnings.length;
 
-        console.log();
+        if (isHuman) {
+          console.log();
+        }
 
         // Output results
         if (json) {
           console.log(JSON.stringify({ results, totalIssues, totalWarnings }, null, 2));
-        } else {
+        } else if (isHuman) {
           this.printResults(results);
           this.printSummary(results, totalIssues, totalWarnings);
+        } else {
+          const overallScore = this.getOverallScore(results);
+
+          this.printOutput(
+            'lint-report',
+            {
+              summary: {
+                overallScore,
+                grade: this.getGrade(overallScore),
+                passedChecks: results.filter((r) => r.passed).length,
+                totalChecks: results.length,
+                totalIssues,
+                totalWarnings,
+                status: this.getStatus(totalIssues, totalWarnings),
+              },
+              checks: results.map((r) => ({
+                category: r.category,
+                passed: r.passed,
+                ...(r.score !== undefined ? { score: r.score } : {}),
+                issues: r.issues.map((message) => ({ message })),
+                warnings: r.warnings.map((message) => ({ message })),
+              })),
+            },
+            args
+          );
         }
 
         // Determine exit code
@@ -377,12 +416,7 @@ export class LintCommand extends BaseCommand {
     const passed = results.filter((r) => r.passed).length;
     const total = results.length;
 
-    // Calculate overall score (weighted average)
-    const scores = results
-      .filter((result): result is LintResult & { score: number } => result.score !== undefined)
-      .map((result) => result.score);
-    const overallScore =
-      scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+    const overallScore = this.getOverallScore(results);
     const grade = this.getGrade(overallScore);
     const gradeColor =
       overallScore >= 80 ? colors.green : overallScore >= 60 ? colors.yellow : colors.red;
@@ -401,6 +435,28 @@ export class LintCommand extends BaseCommand {
     } else {
       console.log(`${colors.red}✗ Quality checks failed${colors.reset}`);
     }
+  }
+
+  /**
+   * Overall score: rounded average of the per-check scores
+   */
+  private getOverallScore(results: LintResult[]): number {
+    const scores = results
+      .filter((result): result is LintResult & { score: number } => result.score !== undefined)
+      .map((result) => result.score);
+    return scores.length > 0 ? Math.round(scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+  }
+
+  /**
+   * Overall status, matching the closing line of the human report
+   */
+  private getStatus(
+    issues: number,
+    warnings: number
+  ): 'passed' | 'passed-with-warnings' | 'failed' {
+    if (issues === 0 && warnings === 0) return 'passed';
+    if (issues === 0) return 'passed-with-warnings';
+    return 'failed';
   }
 
   private getGrade(score: number): string {

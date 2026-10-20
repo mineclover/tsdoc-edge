@@ -10,6 +10,16 @@ import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
+ * Orphaned symbol as reported by both detection modes
+ */
+interface OrphanedSymbol {
+  id: string;
+  name: string;
+  filePath: string;
+  type: string;
+}
+
+/**
  * Command for finding orphaned symbols
  *
  * @public
@@ -72,6 +82,7 @@ export class OrphansCommand extends BaseCommand {
     return `tsdoc-edge orphans [options]
 
   Options:
+    --human          Output in human-readable format (default: XML)
     --accurate       Use database relationships for accurate detection (recommended)
     --fast           Use registry for fast detection (may have false positives)
     --exclude-tests  Exclude test files from results
@@ -89,7 +100,7 @@ export class OrphansCommand extends BaseCommand {
     excludeTests: boolean,
     includeMembers: boolean,
     classesOnly: boolean
-  ): Array<{ id: string; name: string; filePath: string; type: string }> {
+  ): OrphanedSymbol[] {
     const dbPath = this.getDatabasePath();
 
     if (!fs.existsSync(dbPath)) {
@@ -191,18 +202,28 @@ export class OrphansCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
       const useFast = args.includes('--fast');
       const _useAccurate = args.includes('--accurate') || !useFast; // Default to accurate
       const excludeTests = args.includes('--exclude-tests');
       const includeMembers = args.includes('--include-members');
       const classesOnly = args.includes('--classes-only');
 
-      this.printHeader('Orphaned Symbols');
+      if (isHuman) {
+        this.printHeader('Orphaned Symbols');
+      }
+
+      let orphans: OrphanedSymbol[] = [];
+      // Count shown on the human "Found N orphaned symbols" line. Fast mode reports the
+      // registry total before the --exclude-tests filter, as it always has.
+      let foundCount = 0;
 
       if (useFast) {
-        this.printWarning('Using fast mode (registry-based) - may have false positives');
-        this.printInfo('For accurate results, use --accurate or run without flags');
-        console.log();
+        if (isHuman) {
+          this.printWarning('Using fast mode (registry-based) - may have false positives');
+          this.printInfo('For accurate results, use --accurate or run without flags');
+          console.log();
+        }
 
         const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
 
@@ -214,70 +235,106 @@ export class OrphansCommand extends BaseCommand {
 
         const manager = this.manager || new SymbolRegistryManager(registryPath);
         const orphanIds = manager.findOrphans();
+        foundCount = orphanIds.length;
 
-        if (orphanIds.length === 0) {
-          this.printSuccess('No orphaned symbols found');
-          console.log();
-        } else {
-          console.log(`${colors.yellow}Found ${orphanIds.length} orphaned symbols:${colors.reset}`);
-          console.log();
+        for (const id of orphanIds) {
+          const entry = manager.findById(id);
+          if (!entry) continue;
 
-          for (const id of orphanIds) {
-            const entry = manager.findById(id);
-            if (entry) {
-              if (
-                excludeTests &&
-                (entry.sourceRef.filePath.includes('__tests__') ||
-                  entry.sourceRef.filePath.endsWith('.test.ts') ||
-                  entry.sourceRef.filePath.endsWith('.spec.ts'))
-              ) {
-                continue;
-              }
-
-              console.log(`${colors.bold}${id}${colors.reset} → ${entry.sourceRef.symbolName}`);
-              console.log(`  Location: ${entry.sourceRef.filePath}`);
-              console.log();
-            }
+          if (
+            excludeTests &&
+            (entry.sourceRef.filePath.includes('__tests__') ||
+              entry.sourceRef.filePath.endsWith('.test.ts') ||
+              entry.sourceRef.filePath.endsWith('.spec.ts'))
+          ) {
+            continue;
           }
+
+          orphans.push({
+            id,
+            name: entry.sourceRef.symbolName,
+            filePath: entry.sourceRef.filePath,
+            type: entry.sourceRef.type ?? 'unknown',
+          });
         }
       } else {
         // Accurate mode (default)
-        this.printSuccess('Using accurate mode (database-based)');
-        if (excludeTests) {
-          this.printInfo('Excluding test files from results');
+        if (isHuman) {
+          this.printSuccess('Using accurate mode (database-based)');
+          if (excludeTests) {
+            this.printInfo('Excluding test files from results');
+          }
+          if (classesOnly) {
+            this.printInfo('Showing only class-level symbols');
+          } else if (!includeMembers) {
+            this.printInfo('Excluding members of used classes (use --include-members to show all)');
+          }
+          console.log();
         }
-        if (classesOnly) {
-          this.printInfo('Showing only class-level symbols');
-        } else if (!includeMembers) {
-          this.printInfo('Excluding members of used classes (use --include-members to show all)');
-        }
-        console.log();
 
         try {
-          const orphans = this.findOrphansFromDatabase(excludeTests, includeMembers, classesOnly);
-
-          if (orphans.length === 0) {
-            this.printSuccess('No orphaned symbols found');
-            console.log();
-          } else {
-            console.log(`${colors.yellow}Found ${orphans.length} orphaned symbols:${colors.reset}`);
-            console.log();
-
-            for (const orphan of orphans) {
-              console.log(`${colors.bold}${orphan.id}${colors.reset} → ${orphan.name}`);
-              console.log(`  Type: ${orphan.type}`);
-              console.log(`  Location: ${orphan.filePath}`);
-              console.log();
-            }
-          }
+          orphans = this.findOrphansFromDatabase(excludeTests, includeMembers, classesOnly);
+          foundCount = orphans.length;
         } catch (error) {
           this.printError(`Error finding orphans: ${error}`);
           return this.failure(String(error));
         }
       }
 
+      if (isHuman) {
+        this.printHumanReport(orphans, foundCount, !useFast);
+      } else {
+        this.printOutput(
+          'orphans',
+          {
+            summary: {
+              totalFound: orphans.length,
+              mode: useFast ? 'fast' : 'accurate',
+              excludeTests,
+              includeMembers,
+              classesOnly,
+            },
+            symbols: orphans.map((o) => ({
+              id: o.id,
+              name: o.name,
+              type: o.type,
+              filePath: o.filePath,
+            })),
+          },
+          args
+        );
+      }
+
       return this.success();
     });
+  }
+
+  /**
+   * Print the colored terminal report (`--human`)
+   *
+   * @param orphans - Orphans to list
+   * @param foundCount - Number shown on the "Found N orphaned symbols" line
+   * @param showType - Whether to print the symbol type line (accurate mode only)
+   * @private
+   */
+  private printHumanReport(orphans: OrphanedSymbol[], foundCount: number, showType: boolean): void {
+    if (foundCount === 0) {
+      this.printSuccess('No orphaned symbols found');
+      console.log();
+      return;
+    }
+
+    console.log(`${colors.yellow}Found ${foundCount} orphaned symbols:${colors.reset}`);
+    console.log();
+
+    for (const orphan of orphans) {
+      console.log(`${colors.bold}${orphan.id}${colors.reset} → ${orphan.name}`);
+      if (showType) {
+        console.log(`  Type: ${orphan.type}`);
+      }
+      console.log(`  Location: ${orphan.filePath}`);
+      console.log();
+    }
   }
 }
 

@@ -69,7 +69,12 @@ export class ValidateCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge validate\n\n  Reads from: configured database path (.tsdoc.config.json)';
+    return `tsdoc-edge validate [options]
+
+  Options:
+    --human          Output in human-readable format (default: XML)
+
+  Reads from: configured database path (.tsdoc.config.json)`;
   }
 
   /**
@@ -85,7 +90,11 @@ export class ValidateCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      this.printHeader('Detailed Validation Report');
+      const isHuman = this.hasFlag(args, '--human');
+
+      if (isHuman) {
+        this.printHeader('Detailed Validation Report');
+      }
 
       if (!this.dbManager) {
         const dbCheck = this.checkDatabaseExists();
@@ -132,9 +141,55 @@ export class ValidateCommand extends BaseCommand {
         // Create validator and generate detailed report
         const validator = this.validator || new ConnectivityValidator(graphBuilder);
         const report = validator.generateDetailedReport();
-        const formattedReport = validator.formatDetailedReport(report);
 
-        console.log(formattedReport);
+        if (isHuman) {
+          const formattedReport = validator.formatDetailedReport(report);
+
+          console.log(formattedReport);
+        } else {
+          const issuesByType = Array.from(report.issuesByType.entries())
+            .map(([issueType, issues]) => ({ issueType, count: issues.length }))
+            .sort((a, b) => b.count - a.count);
+
+          this.printOutput(
+            'validation-report',
+            {
+              summary: {
+                timestamp: report.timestamp,
+                totalSymbols: report.totalSymbols,
+                totalIssues: report.totalIssues,
+                completionPercentage: Number(report.completionPercentage.toFixed(2)),
+                errors: report.issuesBySeverity.error,
+                warnings: report.issuesBySeverity.warning,
+                info: report.issuesBySeverity.info,
+              },
+              metrics: {
+                documented: report.summary.documented,
+                undocumented: report.summary.undocumented,
+                tested: report.summary.tested,
+                untested: report.summary.untested,
+                withResponsibility: report.summary.withResponsibility,
+                withoutResponsibility: report.summary.withoutResponsibility,
+                withContract: report.summary.withContract,
+                withoutContract: report.summary.withoutContract,
+              },
+              issuesByType,
+              issues: report.allIssues.map((issue) => ({
+                symbolId: issue.symbolId,
+                symbolName: issue.symbolName,
+                symbolType: issue.symbolType,
+                filePath: issue.filePath,
+                line: issue.line,
+                issueType: issue.issueType,
+                severity: issue.severity,
+                message: issue.message,
+                ...(issue.missingItems !== undefined ? { missingItems: issue.missingItems } : {}),
+                ...(issue.suggestedFix !== undefined ? { suggestedFix: issue.suggestedFix } : {}),
+              })),
+            },
+            args
+          );
+        }
 
         return this.success();
       } catch (error) {

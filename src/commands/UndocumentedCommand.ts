@@ -73,6 +73,7 @@ export class UndocumentedCommand extends BaseCommand {
     return `tsdoc-edge undocumented [options]
 
   Options:
+    --human          Output in human-readable format (default: XML)
     --exclude-tests  Exclude symbols from test files (__tests__, .test.ts, .spec.ts)`;
   }
 
@@ -89,13 +90,16 @@ export class UndocumentedCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
       const excludeTests = args.includes('--exclude-tests');
 
-      this.printHeader('Undocumented Symbols');
+      if (isHuman) {
+        this.printHeader('Undocumented Symbols');
 
-      if (excludeTests) {
-        console.log(`${colors.dim}Excluding test files${colors.reset}`);
-        console.log();
+        if (excludeTests) {
+          console.log(`${colors.dim}Excluding test files${colors.reset}`);
+          console.log();
+        }
       }
 
       if (!this.dbManager) {
@@ -145,22 +149,27 @@ export class UndocumentedCommand extends BaseCommand {
           );
         }
 
-        if (undocumented.length === 0) {
-          this.printSuccess('All symbols are documented!');
-          console.log();
+        if (isHuman) {
+          this.printHumanReport(undocumented);
         } else {
-          console.log(
-            `${colors.yellow}Found ${undocumented.length} undocumented symbols:${colors.reset}`
+          this.printOutput(
+            'undocumented-symbols',
+            {
+              summary: {
+                totalFound: undocumented.length,
+                excludeTests,
+              },
+              symbols: undocumented.map((s) => ({
+                id: s.id,
+                name: s.name,
+                type: s.type,
+                filePath: s.filePath,
+                line: s.line,
+                column: s.column,
+              })),
+            },
+            args
           );
-          console.log();
-
-          for (const symbol of undocumented) {
-            console.log(
-              `${colors.bold}${symbol.id}${colors.reset} → ${symbol.name} (${symbol.type})`
-            );
-            console.log(`  Location: ${symbol.filePath}:${symbol.line}`);
-            console.log();
-          }
         }
 
         return this.success();
@@ -170,6 +179,29 @@ export class UndocumentedCommand extends BaseCommand {
         }
       }
     });
+  }
+
+  /**
+   * Print the colored terminal report (`--human`)
+   * @private
+   */
+  private printHumanReport(undocumented: Symbol[]): void {
+    if (undocumented.length === 0) {
+      this.printSuccess('All symbols are documented!');
+      console.log();
+      return;
+    }
+
+    console.log(
+      `${colors.yellow}Found ${undocumented.length} undocumented symbols:${colors.reset}`
+    );
+    console.log();
+
+    for (const symbol of undocumented) {
+      console.log(`${colors.bold}${symbol.id}${colors.reset} → ${symbol.name} (${symbol.type})`);
+      console.log(`  Location: ${symbol.filePath}:${symbol.line}`);
+      console.log();
+    }
   }
 }
 

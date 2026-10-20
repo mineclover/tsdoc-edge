@@ -6,7 +6,11 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { SpecContentSimilarityChecker } from '../spec/SpecContentSimilarityChecker';
+import type { ContentSimilarity } from '../types/spec';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
+
+/** Aggregate numbers returned by `SpecContentSimilarityChecker.getSummary` */
+type SimilaritySummary = ReturnType<SpecContentSimilarityChecker['getSummary']>;
 
 /**
  * Helper function to recursively find markdown files
@@ -97,7 +101,12 @@ export class CheckDuplicatesCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge check-duplicates [docs-directory]\n\n  Default: managed';
+    return `tsdoc-edge check-duplicates [docs-directory] [options]
+
+  Default: managed
+
+  Options:
+    --human          Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -113,7 +122,9 @@ export class CheckDuplicatesCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const target = args[0];
+      const isHuman = this.hasFlag(args, '--human');
+      // `--human` is a boolean flag, so it must not be mistaken for the directory argument
+      const target = args.filter((arg) => arg !== '--human')[0];
       const docsDir = target || 'managed';
       const docsPath = path.resolve(process.cwd(), docsDir);
 
@@ -123,19 +134,37 @@ export class CheckDuplicatesCommand extends BaseCommand {
         return this.failure(`Path not found: ${docsPath}`);
       }
 
-      this.printHeader('Checking Content Similarity');
+      if (isHuman) {
+        this.printHeader('Checking Content Similarity');
+      }
 
       const markdownFiles = findMarkdownFiles(docsPath);
 
       if (markdownFiles.length === 0) {
-        console.log(`${colors.yellow}No markdown files found${colors.reset}`);
-        console.log();
+        if (isHuman) {
+          console.log(`${colors.yellow}No markdown files found${colors.reset}`);
+          console.log();
+        } else {
+          this.printSimilarityXml(args, docsDir, markdownFiles.length, 'no-documents', []);
+        }
         return this.success();
       }
 
       if (markdownFiles.length < 2) {
-        console.log(`${colors.yellow}Need at least 2 files to check for duplicates${colors.reset}`);
-        console.log();
+        if (isHuman) {
+          console.log(
+            `${colors.yellow}Need at least 2 files to check for duplicates${colors.reset}`
+          );
+          console.log();
+        } else {
+          this.printSimilarityXml(
+            args,
+            docsDir,
+            markdownFiles.length,
+            'insufficient-documents',
+            []
+          );
+        }
         return this.success();
       }
 
@@ -143,85 +172,147 @@ export class CheckDuplicatesCommand extends BaseCommand {
       const results = checker.checkMultiple(markdownFiles);
       const summary = checker.getSummary(results);
 
-      // Print summary
-      this.printSection('Summary');
-      console.log(`Total documents: ${colors.cyan}${markdownFiles.length}${colors.reset}`);
-      console.log(
-        `Pairs analyzed: ${colors.cyan}${(markdownFiles.length * (markdownFiles.length - 1)) / 2}${colors.reset}`
-      );
-      console.log(`Similar pairs found: ${colors.cyan}${summary.totalPairs}${colors.reset}`);
-      console.log(
-        `Average similarity: ${colors.cyan}${(summary.averageSimilarity * 100).toFixed(1)}%${colors.reset}`
-      );
-      console.log();
-      console.log(`${colors.bold}Suggestions:${colors.reset}`);
-      console.log(`  Merge: ${colors.red}${summary.mergeSuggestions}${colors.reset}`);
-      console.log(
-        `  Cross-reference: ${colors.yellow}${summary.crossRefSuggestions}${colors.reset}`
-      );
-      console.log(`  Keep separate: ${colors.green}${summary.keepSeparate}${colors.reset}`);
-      console.log();
-
-      if (results.length === 0) {
-        this.printSuccess('No significant content similarity detected');
-        console.log();
-        return this.success();
-      }
-
-      // Print merge suggestions
-      const mergeSuggestions = results.filter((r) => r.suggestion === 'merge');
-      if (mergeSuggestions.length > 0) {
-        this.printSection('Merge Suggestions (High Similarity)');
-        for (const result of mergeSuggestions) {
-          console.log(
-            `${colors.red}🔴${colors.reset} ${colors.bold}Similarity: ${(result.similarity * 100).toFixed(1)}%${colors.reset}`
-          );
-          console.log(`   File 1: ${result.file1}`);
-          console.log(`   File 2: ${result.file2}`);
-          console.log(`   ${colors.dim}${result.reason}${colors.reset}`);
-
-          if (result.overlappingSections.length > 0) {
-            console.log(`   ${colors.bold}Overlapping sections:${colors.reset}`);
-            for (const section of result.overlappingSections) {
-              console.log(`     - ${section.section} (${(section.similarity * 100).toFixed(1)}%)`);
-            }
-          }
-          console.log();
-        }
-      }
-
-      // Print cross-reference suggestions
-      const crossRefSuggestions = results.filter((r) => r.suggestion === 'cross-reference');
-      if (crossRefSuggestions.length > 0) {
-        this.printSection('Cross-Reference Suggestions (Moderate Similarity)');
-        for (const result of crossRefSuggestions) {
-          console.log(
-            `${colors.yellow}🟡${colors.reset} ${colors.bold}Similarity: ${(result.similarity * 100).toFixed(1)}%${colors.reset}`
-          );
-          console.log(`   File 1: ${result.file1}`);
-          console.log(`   File 2: ${result.file2}`);
-          console.log(`   ${colors.dim}${result.reason}${colors.reset}`);
-
-          if (result.overlappingSections.length > 0) {
-            console.log(`   ${colors.bold}Overlapping sections:${colors.reset}`);
-            for (const section of result.overlappingSections) {
-              console.log(`     - ${section.section} (${(section.similarity * 100).toFixed(1)}%)`);
-            }
-          }
-          console.log();
-        }
+      if (isHuman) {
+        this.printHumanReport(markdownFiles.length, results, summary);
+      } else {
+        this.printSimilarityXml(args, docsDir, markdownFiles.length, 'analyzed', results, summary);
       }
 
       // Exit with warning if merge suggestions exist
-      if (mergeSuggestions.length > 0) {
-        this.printError(
-          `Found ${mergeSuggestions.length} pair(s) with high similarity that should be merged`
-        );
-        console.log();
-        return this.failure(`Found ${mergeSuggestions.length} pairs with high similarity`);
+      const mergeCount = results.filter((r) => r.suggestion === 'merge').length;
+      if (mergeCount > 0) {
+        if (isHuman) {
+          this.printError(`Found ${mergeCount} pair(s) with high similarity that should be merged`);
+          console.log();
+        }
+        return this.failure(`Found ${mergeCount} pairs with high similarity`);
       }
 
       return this.success();
     });
+  }
+
+  /**
+   * Print the colored terminal report (`--human`)
+   * @private
+   */
+  private printHumanReport(
+    totalDocuments: number,
+    results: ContentSimilarity[],
+    summary: SimilaritySummary
+  ): void {
+    // Print summary
+    this.printSection('Summary');
+    console.log(`Total documents: ${colors.cyan}${totalDocuments}${colors.reset}`);
+    console.log(
+      `Pairs analyzed: ${colors.cyan}${(totalDocuments * (totalDocuments - 1)) / 2}${colors.reset}`
+    );
+    console.log(`Similar pairs found: ${colors.cyan}${summary.totalPairs}${colors.reset}`);
+    console.log(
+      `Average similarity: ${colors.cyan}${(summary.averageSimilarity * 100).toFixed(1)}%${colors.reset}`
+    );
+    console.log();
+    console.log(`${colors.bold}Suggestions:${colors.reset}`);
+    console.log(`  Merge: ${colors.red}${summary.mergeSuggestions}${colors.reset}`);
+    console.log(`  Cross-reference: ${colors.yellow}${summary.crossRefSuggestions}${colors.reset}`);
+    console.log(`  Keep separate: ${colors.green}${summary.keepSeparate}${colors.reset}`);
+    console.log();
+
+    if (results.length === 0) {
+      this.printSuccess('No significant content similarity detected');
+      console.log();
+      return;
+    }
+
+    // Print merge suggestions
+    const mergeSuggestions = results.filter((r) => r.suggestion === 'merge');
+    if (mergeSuggestions.length > 0) {
+      this.printSection('Merge Suggestions (High Similarity)');
+      for (const result of mergeSuggestions) {
+        console.log(
+          `${colors.red}🔴${colors.reset} ${colors.bold}Similarity: ${(result.similarity * 100).toFixed(1)}%${colors.reset}`
+        );
+        console.log(`   File 1: ${result.file1}`);
+        console.log(`   File 2: ${result.file2}`);
+        console.log(`   ${colors.dim}${result.reason}${colors.reset}`);
+
+        if (result.overlappingSections.length > 0) {
+          console.log(`   ${colors.bold}Overlapping sections:${colors.reset}`);
+          for (const section of result.overlappingSections) {
+            console.log(`     - ${section.section} (${(section.similarity * 100).toFixed(1)}%)`);
+          }
+        }
+        console.log();
+      }
+    }
+
+    // Print cross-reference suggestions
+    const crossRefSuggestions = results.filter((r) => r.suggestion === 'cross-reference');
+    if (crossRefSuggestions.length > 0) {
+      this.printSection('Cross-Reference Suggestions (Moderate Similarity)');
+      for (const result of crossRefSuggestions) {
+        console.log(
+          `${colors.yellow}🟡${colors.reset} ${colors.bold}Similarity: ${(result.similarity * 100).toFixed(1)}%${colors.reset}`
+        );
+        console.log(`   File 1: ${result.file1}`);
+        console.log(`   File 2: ${result.file2}`);
+        console.log(`   ${colors.dim}${result.reason}${colors.reset}`);
+
+        if (result.overlappingSections.length > 0) {
+          console.log(`   ${colors.bold}Overlapping sections:${colors.reset}`);
+          for (const section of result.overlappingSections) {
+            console.log(`     - ${section.section} (${(section.similarity * 100).toFixed(1)}%)`);
+          }
+        }
+        console.log();
+      }
+    }
+  }
+
+  /**
+   * Print the default XML document
+   *
+   * @param status - Why the analysis ran or was skipped (fewer than 2 documents)
+   * @private
+   */
+  private printSimilarityXml(
+    args: string[],
+    docsDir: string,
+    totalDocuments: number,
+    status: 'no-documents' | 'insufficient-documents' | 'analyzed',
+    results: ContentSimilarity[],
+    summary?: SimilaritySummary
+  ): void {
+    this.printOutput(
+      'content-similarity',
+      {
+        summary: {
+          path: docsDir,
+          status,
+          totalDocuments,
+          pairsAnalyzed: (totalDocuments * (totalDocuments - 1)) / 2,
+          similarPairsFound: summary?.totalPairs ?? 0,
+          averageSimilarity: Number(((summary?.averageSimilarity ?? 0) * 100).toFixed(1)),
+          mergeSuggestions: summary?.mergeSuggestions ?? 0,
+          crossRefSuggestions: summary?.crossRefSuggestions ?? 0,
+          keepSeparate: summary?.keepSeparate ?? 0,
+        },
+        // Like the human report, list only pairs that call for action; the summary counts the rest
+        pairs: results
+          .filter((r) => r.suggestion !== 'keep-separate')
+          .map((r) => ({
+            file1: path.relative(process.cwd(), r.file1),
+            file2: path.relative(process.cwd(), r.file2),
+            similarity: Number((r.similarity * 100).toFixed(1)),
+            suggestion: r.suggestion,
+            reason: r.reason,
+            overlappingSections: r.overlappingSections.map((section) => ({
+              section: section.section,
+              similarity: Number((section.similarity * 100).toFixed(1)),
+            })),
+          })),
+      },
+      args
+    );
   }
 }
