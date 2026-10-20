@@ -3,19 +3,10 @@
  * @packageDocumentation
  */
 
-import { DEPENDENCY_GRAPH_EDGE_KINDS, graphEdgeSemantic } from '../graph-analysis/edge-semantics';
+import { GraphService, type ImpactNode, type ImpactOptions } from '../graph/GraphService';
 import { CanonicalAliasContext } from '../indexer';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-
-/** A symbol affected by a change at a given depth */
-interface ImpactNode {
-  symbolId: string;
-  depth: number;
-  path: string[];
-  relationshipType: string;
-  category: string;
-}
 
 /**
  * Command for analyzing change impact through relationships
@@ -91,7 +82,7 @@ Examples:
       }
 
       const symbolId = args[0];
-      const options = {
+      const options: ImpactOptions = {
         depth: Number.parseInt(this.getOption(args, '--depth') || '3', 10),
         direction: this.getOption(args, '--direction') || 'downstream',
         category: this.getOption(args, '--category'),
@@ -100,6 +91,7 @@ Examples:
 
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
+      const graph = new GraphService(dbManager);
       const canonicalContext = CanonicalAliasContext.tryOpen(process.cwd());
 
       // Resolve through both the legacy DB and the canonical graph. Canonical
@@ -132,26 +124,10 @@ Examples:
       console.log();
 
       // Perform impact analysis
-      const impactedSymbols = resolvedId
-        ? this.analyzeImpact(
-            dbManager,
-            resolvedId,
-            options.depth,
-            options.direction,
-            options.category,
-            options.minConfidence
-          )
-        : [];
+      const impactedSymbols = resolvedId ? graph.analyzeImpact(resolvedId, options) : [];
       const canonicalImpact =
         canonicalId && canonicalContext
-          ? this.analyzeCanonicalImpact(
-              canonicalContext,
-              canonicalId,
-              options.depth,
-              options.direction,
-              options.category,
-              options.minConfidence
-            )
+          ? graph.analyzeCanonicalImpact(canonicalContext, canonicalId, options)
           : [];
 
       if (impactedSymbols.length === 0 && canonicalImpact.length === 0) {
@@ -165,7 +141,7 @@ Examples:
       if (impactedSymbols.length === 0) {
         this.printCanonicalImpact(canonicalImpact, options.direction);
         const canonicalDepth = Math.max(...canonicalImpact.map((node) => node.depth));
-        const riskLevel = this.assessRisk(canonicalImpact.length, canonicalDepth);
+        const riskLevel = graph.assessRisk(canonicalImpact.length, canonicalDepth);
         this.printInfo(`Canonical change risk: ${riskLevel}`);
         console.log();
         dbManager.close();
@@ -278,7 +254,7 @@ Examples:
       // Risk assessment
       this.printSection('Change Risk Assessment');
 
-      const riskLevel = this.assessRisk(
+      const riskLevel = graph.assessRisk(
         impactedSymbols.length,
         Math.max(...Array.from(byDepth.keys()))
       );
@@ -319,163 +295,6 @@ Examples:
     });
   }
 
-  /**
-   * Analyze impact using BFS traversal
-   */
-  private analyzeImpact(
-    dbManager: DatabaseManager,
-    startSymbol: string,
-    maxDepth: number,
-    direction: string,
-    category?: string,
-    minConfidence?: number
-  ): ImpactNode[] {
-    const visited = new Set<string>();
-    const impactNodes: ImpactNode[] = [];
-    const queue: Array<{ symbolId: string; depth: number; path: string[] }> = [
-      { symbolId: startSymbol, depth: 0, path: [startSymbol] },
-    ];
-
-    visited.add(startSymbol);
-
-    while (queue.length > 0) {
-      const current = queue.shift()!;
-
-      if (current.depth >= maxDepth) continue;
-
-      // Use Drizzle ORM to query relationships
-      let relationships = dbManager.getUnifiedRelationshipsBySymbol(current.symbolId);
-
-      // Filter by category and confidence
-      if (category) {
-        relationships = relationships.filter((r) => r.category === category);
-      }
-      if (minConfidence !== undefined) {
-        relationships = relationships.filter((r) => r.confidence >= minConfidence);
-      }
-
-      for (const rel of relationships) {
-        const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
-        const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
-
-        // Find the next symbol in the chain
-        let nextSymbols: string[] = [];
-
-        if (direction === 'downstream') {
-          // Who uses current symbol
-          if (fromSymbols.includes(current.symbolId)) {
-            nextSymbols = toSymbols;
-          }
-        } else if (direction === 'upstream') {
-          // What current symbol uses
-          if (toSymbols.includes(current.symbolId)) {
-            nextSymbols = fromSymbols;
-          }
-        } else {
-          // Both directions
-          if (fromSymbols.includes(current.symbolId)) {
-            nextSymbols.push(...toSymbols);
-          }
-          if (toSymbols.includes(current.symbolId)) {
-            nextSymbols.push(...fromSymbols);
-          }
-        }
-
-        for (const nextSymbol of nextSymbols) {
-          if (!visited.has(nextSymbol) && nextSymbol !== startSymbol) {
-            visited.add(nextSymbol);
-
-            const newPath = [...current.path, nextSymbol];
-
-            impactNodes.push({
-              symbolId: nextSymbol,
-              depth: current.depth + 1,
-              path: newPath,
-              relationshipType: rel.type,
-              category: rel.category,
-            });
-
-            queue.push({
-              symbolId: nextSymbol,
-              depth: current.depth + 1,
-              path: newPath,
-            });
-          }
-        }
-      }
-    }
-
-    return impactNodes;
-  }
-
-  /** Traverse canonical dependency facts with the same CLI filters as the legacy lane. */
-  private analyzeCanonicalImpact(
-    context: CanonicalAliasContext,
-    startSymbol: string,
-    maxDepth: number,
-    direction: string,
-    category?: string,
-    minConfidence = 0.5
-  ): ImpactNode[] {
-    // Canonical compiler facts have confidence 1.0.
-    if (minConfidence > 1) return [];
-
-    const allowedKinds = new Set(DEPENDENCY_GRAPH_EDGE_KINDS);
-    const visited = new Set([startSymbol]);
-    const queue: Array<{ symbolId: string; depth: number; path: string[] }> = [
-      { symbolId: startSymbol, depth: 0, path: [startSymbol] },
-    ];
-    const result: ImpactNode[] = [];
-
-    for (let cursor = 0; cursor < queue.length; cursor++) {
-      const current = queue[cursor];
-      if (current.depth >= maxDepth) continue;
-
-      const candidates = [
-        ...(direction !== 'upstream'
-          ? context.analysis.index
-              .getIncomingEdges(current.symbolId)
-              .map((edge) => ({ edge, nextId: edge.from }))
-          : []),
-        ...(direction !== 'downstream'
-          ? context.analysis.index
-              .getOutgoingEdges(current.symbolId)
-              .map((edge) => ({ edge, nextId: edge.to }))
-          : []),
-      ].sort(
-        (left, right) =>
-          left.nextId.localeCompare(right.nextId) || left.edge.kind.localeCompare(right.edge.kind)
-      );
-
-      for (const { edge, nextId } of candidates) {
-        if (!allowedKinds.has(edge.kind) || visited.has(nextId)) continue;
-        const semantic = graphEdgeSemantic(edge.kind);
-        const relationshipCategory = semantic.relationshipCategory ?? semantic.category;
-        if (category && relationshipCategory !== category) continue;
-
-        const node = context.analysis.index.getNode(nextId);
-        if (!node) continue;
-        visited.add(nextId);
-        const depth = current.depth + 1;
-        const nextPath = [...current.path, nextId];
-        result.push({
-          symbolId: nextId,
-          depth,
-          path: nextPath,
-          relationshipType: semantic.relationshipType ?? edge.kind,
-          category: relationshipCategory,
-        });
-        if (node.external !== true) {
-          queue.push({ symbolId: nextId, depth, path: nextPath });
-        }
-      }
-    }
-
-    return result.sort(
-      (left, right) => left.depth - right.depth || left.symbolId.localeCompare(right.symbolId)
-    );
-  }
-
   private printCanonicalImpact(nodes: readonly ImpactNode[], direction: string): void {
     this.printSection('Canonical Structural Impact');
     this.printInfo(`${nodes.length} affected canonical nodes`);
@@ -489,16 +308,6 @@ Examples:
       console.log(`  ${this.colors.dim}... and ${nodes.length - 10} more${this.colors.reset}`);
     }
     console.log();
-  }
-
-  /**
-   * Assess risk level based on impact
-   */
-  private assessRisk(impactCount: number, maxDepth: number): 'Low' | 'Medium' | 'High' {
-    if (impactCount === 0) return 'Low';
-    if (impactCount >= 20 || maxDepth >= 4) return 'High';
-    if (impactCount >= 5 || maxDepth >= 2) return 'Medium';
-    return 'Low';
   }
 
   private get colors() {

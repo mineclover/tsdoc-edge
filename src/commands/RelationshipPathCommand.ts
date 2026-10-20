@@ -5,29 +5,9 @@
  * @packageDocumentation
  */
 
+import { GraphService } from '../graph/GraphService';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-
-/** A node in a relationship path */
-interface PathNode {
-  symbolId: string;
-  relationshipType: string;
-  category: string;
-}
-
-/** A path between two symbols through relationships */
-interface SymbolPath {
-  nodes: PathNode[];
-  length: number;
-  strength: number;
-}
-
-/** An edge in the relationship graph */
-interface GraphEdge {
-  to: string;
-  type: string;
-  category: string;
-}
 
 /**
  * Optimized command for finding paths between symbols
@@ -137,30 +117,26 @@ Examples:
       console.log();
       this.printInfo(`Building relationship graph...`);
 
-      // Build adjacency list once
-      const startBuild = Date.now();
-      const adjacency = this.buildAdjacencyList(dbManager, options.category);
-      const buildTime = Date.now() - startBuild;
-      this.printInfo(`Graph built in ${buildTime}ms (${adjacency.size} nodes)`);
+      const search = new GraphService(dbManager).findPaths(resolvedFromSymbol, resolvedToSymbol, {
+        maxLength: options.maxLength,
+        category: options.category,
+      });
+      const { paths, buildTimeMs: buildTime, searchTimeMs: searchTime } = search;
+
+      this.printInfo(`Graph built in ${buildTime}ms (${search.nodeCount} nodes)`);
 
       console.log();
       this.printInfo(`Searching for paths (max length: ${options.maxLength})...`);
-      const startSearch = Date.now();
 
-      // Build reverse adjacency for bidirectional search
-      const reverseAdjacency = this.buildReverseAdjacency(adjacency);
-      this.printInfo(`Reverse graph built`);
+      if (search.iterationLimitReached) {
+        console.warn(
+          `  Warning: Search terminated after ${GraphService.MAX_PATH_ITERATIONS} iterations`
+        );
+      }
+      if (search.pathLimitReached) {
+        console.warn(`  Warning: Path limit reached (${GraphService.MAX_PATHS} paths found)`);
+      }
 
-      // Find paths using bidirectional BFS
-      const paths = this.findPathsBidirectional(
-        adjacency,
-        reverseAdjacency,
-        resolvedFromSymbol,
-        resolvedToSymbol,
-        options.maxLength
-      );
-
-      const searchTime = Date.now() - startSearch;
       this.printInfo(`Search completed in ${searchTime}ms`);
       console.log();
 
@@ -263,192 +239,6 @@ Examples:
         `Found ${paths.length} path(s) between ${fromResolved.symbol.name} and ${toResolved.symbol.name}`
       );
     });
-  }
-
-  /**
-   * Build both forward and reverse adjacency lists from database (one-time operation)
-   */
-  private buildAdjacencyList(
-    dbManager: DatabaseManager,
-    category?: string
-  ): Map<string, GraphEdge[]> {
-    const adjacency = new Map<string, GraphEdge[]>();
-
-    // Use Drizzle ORM to query all relationships
-    let relationships = dbManager.getAllUnifiedRelationships();
-
-    if (category) {
-      relationships = relationships.filter((r) => r.category === category);
-    }
-
-    for (const rel of relationships) {
-      try {
-        const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
-        const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
-
-        for (const from of fromSymbols) {
-          if (!from) continue;
-
-          if (!adjacency.has(from)) {
-            adjacency.set(from, []);
-          }
-
-          for (const to of toSymbols) {
-            if (!to) continue;
-
-            adjacency.get(from)?.push({
-              to,
-              type: rel.type,
-              category: rel.category,
-            });
-          }
-        }
-      } catch (_error) {}
-    }
-
-    return adjacency;
-  }
-
-  /**
-   * Build reverse adjacency list for backward search
-   */
-  private buildReverseAdjacency(forward: Map<string, GraphEdge[]>): Map<string, GraphEdge[]> {
-    const reverse = new Map<string, GraphEdge[]>();
-
-    for (const [from, edges] of forward.entries()) {
-      for (const edge of edges) {
-        if (!reverse.has(edge.to)) {
-          reverse.set(edge.to, []);
-        }
-
-        reverse.get(edge.to)?.push({
-          to: from,
-          type: edge.type,
-          category: edge.category,
-        });
-      }
-    }
-
-    return reverse;
-  }
-
-  /**
-   * Find paths using memory-efficient BFS
-   * Limited to finding up to 100 paths to avoid memory issues
-   */
-  private findPathsBidirectional(
-    forward: Map<string, GraphEdge[]>,
-    _reverse: Map<string, GraphEdge[]>,
-    fromSymbol: string,
-    toSymbol: string,
-    maxLength: number
-  ): SymbolPath[] {
-    const allPaths: SymbolPath[] = [];
-    const maxPaths = 100; // Limit total paths to prevent memory issues
-
-    // Early termination checks
-    if (!forward.has(fromSymbol) && fromSymbol !== toSymbol) {
-      return [];
-    }
-
-    // Simple BFS with path tracking (memory-limited)
-    const queue: Array<{
-      symbolId: string;
-      path: PathNode[];
-      visited: Set<string>;
-    }> = [
-      {
-        symbolId: fromSymbol,
-        path: [{ symbolId: fromSymbol, relationshipType: '', category: '' }],
-        visited: new Set([fromSymbol]),
-      },
-    ];
-
-    let iterations = 0;
-    const maxIterations = 50000; // Safety limit
-
-    while (queue.length > 0 && iterations < maxIterations && allPaths.length < maxPaths) {
-      iterations++;
-
-      const { symbolId, path, visited } = queue.shift()!;
-
-      // Check if we've reached the target
-      if (symbolId === toSymbol && path.length > 1) {
-        const strength = this.calculatePathStrength(path);
-        allPaths.push({
-          nodes: path,
-          length: path.length - 1,
-          strength,
-        });
-
-        // Continue searching for more paths
-        continue;
-      }
-
-      // Don't expand if we've reached max length
-      if (path.length > maxLength) continue;
-
-      // Get neighbors from adjacency list (O(1) lookup)
-      const neighbors = forward.get(symbolId);
-      if (!neighbors) continue;
-
-      for (const edge of neighbors) {
-        // Avoid cycles (except allow reaching target)
-        if (visited.has(edge.to) && edge.to !== toSymbol) continue;
-
-        const newPath = [
-          ...path.slice(0, -1),
-          {
-            symbolId: path[path.length - 1].symbolId,
-            relationshipType: edge.type,
-            category: edge.category,
-          },
-          {
-            symbolId: edge.to,
-            relationshipType: '',
-            category: '',
-          },
-        ];
-
-        const newVisited = new Set(visited);
-        newVisited.add(edge.to);
-
-        queue.push({
-          symbolId: edge.to,
-          path: newPath,
-          visited: newVisited,
-        });
-      }
-    }
-
-    if (iterations >= maxIterations) {
-      console.warn(`  Warning: Search terminated after ${maxIterations} iterations`);
-    }
-
-    if (allPaths.length >= maxPaths) {
-      console.warn(`  Warning: Path limit reached (${maxPaths} paths found)`);
-    }
-
-    // Deduplicate paths
-    const uniquePaths = new Map<string, SymbolPath>();
-    for (const pathData of allPaths) {
-      const key = pathData.nodes.map((n) => n.symbolId).join('→');
-      const existing = uniquePaths.get(key);
-      if (!existing || existing.strength < pathData.strength) {
-        uniquePaths.set(key, pathData);
-      }
-    }
-
-    return Array.from(uniquePaths.values());
-  }
-
-  /**
-   * Calculate path strength based on relationship confidence
-   */
-  private calculatePathStrength(path: PathNode[]): number {
-    if (path.length <= 1) return 1.0;
-    // Shorter paths = stronger connection
-    return 1.0 / path.length;
   }
 
   private get colors() {

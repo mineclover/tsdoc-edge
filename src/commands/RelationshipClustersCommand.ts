@@ -3,19 +3,9 @@
  * @packageDocumentation
  */
 
+import { GraphService } from '../graph/GraphService';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-
-/** A cluster of related symbols in the architecture */
-interface Cluster {
-  /** Cluster identifier */
-  id: number;
-  symbols: string[];
-  internalEdges: number;
-  externalEdges: number;
-  cohesion: number;
-  dominantCategory: string;
-}
 
 /**
  * Command for finding architectural clusters using community detection
@@ -103,16 +93,17 @@ Examples:
       console.log();
       this.printInfo('Building symbol graph...');
 
-      // Build adjacency map
-      const adjacencyMap = this.buildAdjacencyMap(dbManager, options.category);
-      const symbols = Array.from(adjacencyMap.keys());
+      // Build the relationship graph and find clusters using greedy modularity
+      const analysis = new GraphService(dbManager).findClusters({
+        minSize: options.minSize,
+        category: options.category,
+      });
+      const { clusters } = analysis;
 
-      this.printInfo(`Graph: ${symbols.length} symbols, ${this.countEdges(adjacencyMap)} edges`);
+      this.printInfo(`Graph: ${analysis.symbolCount} symbols, ${analysis.edgeCount} edges`);
       console.log();
 
-      // Find clusters using greedy modularity
       this.printInfo('Running community detection...');
-      const clusters = this.findClusters(adjacencyMap, options.minSize);
 
       this.printInfo(`Found ${clusters.length} clusters`);
       console.log();
@@ -194,7 +185,7 @@ Examples:
 
       console.log(`  Total clusters: ${this.colors.cyan}${clusters.length}${this.colors.reset}`);
       console.log(
-        `  Total symbols clustered: ${this.colors.cyan}${totalSymbols}${this.colors.reset} / ${symbols.length}`
+        `  Total symbols clustered: ${this.colors.cyan}${totalSymbols}${this.colors.reset} / ${analysis.symbolCount}`
       );
       console.log(
         `  Average cluster size: ${this.colors.cyan}${avgSize.toFixed(1)}${this.colors.reset} symbols`
@@ -241,172 +232,6 @@ Examples:
 
       return this.success(`Found ${clusters.length} architectural clusters`);
     });
-  }
-
-  /**
-   * Build adjacency map from relationships
-   */
-  private buildAdjacencyMap(
-    dbManager: DatabaseManager,
-    category?: string
-  ): Map<string, Map<string, string>> {
-    // Use Drizzle ORM to query relationships
-    let relationships = dbManager.getAllUnifiedRelationships();
-
-    if (category) {
-      relationships = relationships.filter((r) => r.category === category);
-    }
-
-    const adjacencyMap = new Map<string, Map<string, string>>();
-
-    for (const rel of relationships) {
-      const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
-      const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
-
-      for (const from of fromSymbols) {
-        if (!adjacencyMap.has(from)) {
-          adjacencyMap.set(from, new Map());
-        }
-
-        for (const to of toSymbols) {
-          adjacencyMap.get(from)?.set(to, rel.category);
-
-          // Add reverse for undirected clustering
-          if (!adjacencyMap.has(to)) {
-            adjacencyMap.set(to, new Map());
-          }
-          adjacencyMap.get(to)?.set(from, rel.category);
-        }
-      }
-    }
-
-    return adjacencyMap;
-  }
-
-  /**
-   * Count total edges in graph
-   */
-  private countEdges(adjacencyMap: Map<string, Map<string, string>>): number {
-    let total = 0;
-    for (const neighbors of adjacencyMap.values()) {
-      total += neighbors.size;
-    }
-    return Math.floor(total / 2); // Divide by 2 for undirected
-  }
-
-  /**
-   * Find clusters using greedy modularity optimization
-   */
-  private findClusters(adjacencyMap: Map<string, Map<string, string>>, minSize: number): Cluster[] {
-    const symbols = Array.from(adjacencyMap.keys());
-    const clusterAssignment = new Map<string, number>();
-
-    // Initialize: each symbol in its own cluster
-    for (let i = 0; i < symbols.length; i++) {
-      clusterAssignment.set(symbols[i], i);
-    }
-
-    // Greedy merging based on shared neighbors
-    let changed = true;
-    let iteration = 0;
-    const maxIterations = 10;
-
-    while (changed && iteration < maxIterations) {
-      changed = false;
-      iteration++;
-
-      for (const symbol of symbols) {
-        const currentCluster = clusterAssignment.get(symbol)!;
-        const neighbors = adjacencyMap.get(symbol) || new Map();
-
-        if (neighbors.size === 0) continue;
-
-        // Count neighbors in each cluster
-        const clusterScores = new Map<number, number>();
-        for (const neighbor of neighbors.keys()) {
-          const neighborCluster = clusterAssignment.get(neighbor)!;
-          clusterScores.set(neighborCluster, (clusterScores.get(neighborCluster) || 0) + 1);
-        }
-
-        // Find best cluster (most neighbors)
-        let bestCluster = currentCluster;
-        let bestScore = clusterScores.get(currentCluster) || 0;
-
-        for (const [cluster, score] of clusterScores.entries()) {
-          if (score > bestScore) {
-            bestCluster = cluster;
-            bestScore = score;
-          }
-        }
-
-        // Move if beneficial
-        if (bestCluster !== currentCluster) {
-          clusterAssignment.set(symbol, bestCluster);
-          changed = true;
-        }
-      }
-    }
-
-    // Build cluster objects
-    const clusterMap = new Map<number, string[]>();
-    for (const [symbol, cluster] of clusterAssignment.entries()) {
-      if (!clusterMap.has(cluster)) {
-        clusterMap.set(cluster, []);
-      }
-      clusterMap.get(cluster)?.push(symbol);
-    }
-
-    // Calculate metrics for each cluster
-    const clusters: Cluster[] = [];
-
-    for (const [id, clusterSymbols] of clusterMap.entries()) {
-      if (clusterSymbols.length < minSize) continue;
-
-      const symbolSet = new Set(clusterSymbols);
-      let internalEdges = 0;
-      let externalEdges = 0;
-      const categoryCount = new Map<string, number>();
-
-      for (const symbol of clusterSymbols) {
-        const neighbors = adjacencyMap.get(symbol) || new Map();
-
-        for (const [neighbor, category] of neighbors.entries()) {
-          if (symbolSet.has(neighbor)) {
-            internalEdges++;
-            categoryCount.set(category, (categoryCount.get(category) || 0) + 1);
-          } else {
-            externalEdges++;
-          }
-        }
-      }
-
-      // Divide by 2 for undirected edges
-      internalEdges = Math.floor(internalEdges / 2);
-
-      const cohesion =
-        internalEdges + externalEdges > 0 ? internalEdges / (internalEdges + externalEdges) : 0;
-
-      // Find dominant category
-      let dominantCategory = 'mixed';
-      let maxCount = 0;
-      for (const [category, count] of categoryCount.entries()) {
-        if (count > maxCount) {
-          maxCount = count;
-          dominantCategory = category;
-        }
-      }
-
-      clusters.push({
-        id,
-        symbols: clusterSymbols,
-        internalEdges,
-        externalEdges,
-        cohesion,
-        dominantCategory,
-      });
-    }
-
-    return clusters;
   }
 
   private get colors() {

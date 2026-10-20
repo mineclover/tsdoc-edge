@@ -3,20 +3,9 @@
  * @packageDocumentation
  */
 
+import { GraphService, type SymbolMetrics } from '../graph/GraphService';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
-
-/** Graph metrics for a symbol */
-interface SymbolMetrics {
-  symbolId: string;
-  symbolName: string;
-  degree: number;
-  inDegree: number;
-  outDegree: number;
-  betweenness: number;
-  pageRank: number;
-  importance: number;
-}
 
 /**
  * Command for calculating graph metrics to identify key symbols
@@ -122,15 +111,13 @@ Examples:
       console.log();
       this.printInfo('Building relationship graph...');
 
-      // Build adjacency lists
-      const { outgoing, incoming, symbolNames } = this.buildGraph(dbManager, options.category);
+      const graph = new GraphService(dbManager);
+      const metrics = graph.calculateMetrics({ category: options.category });
 
-      this.printInfo(`Analyzing ${symbolNames.size} symbols...`);
+      this.printInfo(`Analyzing ${metrics.length} symbols...`);
       console.log();
 
-      // Calculate all metrics
       this.printInfo('Calculating centrality metrics...');
-      const metrics = this.calculateMetrics(outgoing, incoming, symbolNames);
 
       // Sort by selected metric
       metrics.sort((a, b) => {
@@ -171,7 +158,7 @@ Examples:
             `     Importance: ${this.colors.cyan}${symbol.importance.toFixed(2)}${this.colors.reset}`
           );
           console.log(
-            `     ${this.colors.dim}${this.interpretMetrics(symbol)}${this.colors.reset}`
+            `     ${this.colors.dim}${graph.interpretMetrics(symbol)}${this.colors.reset}`
           );
         } else {
           const metricValue = symbol[options.metric];
@@ -185,7 +172,7 @@ Examples:
             `     ${this.capitalize(options.metric)}: ${this.colors.cyan}${displayValue}${this.colors.reset}`
           );
           console.log(
-            `     ${this.colors.dim}${this.interpretMetrics(symbol)}${this.colors.reset}`
+            `     ${this.colors.dim}${graph.interpretMetrics(symbol)}${this.colors.reset}`
           );
         }
 
@@ -262,247 +249,6 @@ Examples:
 
       return this.success(`Analyzed ${metrics.length} symbols`);
     });
-  }
-
-  /**
-   * Build directed graph from relationships
-   * Uses getRelationshipEdges for efficient edge retrieval (avoids JSON.parse)
-   */
-  private buildGraph(
-    dbManager: DatabaseManager,
-    category?: string
-  ): {
-    outgoing: Map<string, Set<string>>;
-    incoming: Map<string, Set<string>>;
-    symbolNames: Map<string, string>;
-  } {
-    const outgoing = new Map<string, Set<string>>();
-    const incoming = new Map<string, Set<string>>();
-    const symbolNames = new Map<string, string>();
-
-    // Get all symbol names using Drizzle
-    const symbols = dbManager.getAllSymbolRows();
-    for (const symbol of symbols) {
-      symbolNames.set(symbol.id, symbol.name);
-      outgoing.set(symbol.id, new Set());
-      incoming.set(symbol.id, new Set());
-    }
-
-    // Get edges directly from join table (no JSON.parse needed)
-    const edges = dbManager.getRelationshipEdges(category);
-
-    // Build adjacency lists from pre-computed edges
-    for (const { fromSymbolId, toSymbolId } of edges) {
-      // Handle symbols not in the known set (external dependencies)
-      if (!outgoing.has(fromSymbolId)) outgoing.set(fromSymbolId, new Set());
-      if (!incoming.has(toSymbolId)) incoming.set(toSymbolId, new Set());
-
-      outgoing.get(fromSymbolId)?.add(toSymbolId);
-      incoming.get(toSymbolId)?.add(fromSymbolId);
-    }
-
-    return { outgoing, incoming, symbolNames };
-  }
-
-  /**
-   * Calculate all centrality metrics
-   */
-  private calculateMetrics(
-    outgoing: Map<string, Set<string>>,
-    incoming: Map<string, Set<string>>,
-    symbolNames: Map<string, string>
-  ): SymbolMetrics[] {
-    const symbols = Array.from(symbolNames.keys());
-    const metrics: SymbolMetrics[] = [];
-
-    // Calculate degree metrics
-    for (const symbolId of symbols) {
-      const outDegree = outgoing.get(symbolId)?.size || 0;
-      const inDegree = incoming.get(symbolId)?.size || 0;
-      const degree = outDegree + inDegree;
-
-      metrics.push({
-        symbolId,
-        symbolName: symbolNames.get(symbolId) || symbolId,
-        degree,
-        inDegree,
-        outDegree,
-        betweenness: 0,
-        pageRank: 0,
-        importance: 0,
-      });
-    }
-
-    // Calculate betweenness centrality (approximate using random sampling)
-    const betweennessMap = this.calculateBetweenness(outgoing, symbols);
-    for (const metric of metrics) {
-      metric.betweenness = betweennessMap.get(metric.symbolId) || 0;
-    }
-
-    // Calculate PageRank
-    const pageRankMap = this.calculatePageRank(outgoing, incoming, symbols);
-    for (const metric of metrics) {
-      metric.pageRank = pageRankMap.get(metric.symbolId) || 0;
-    }
-
-    // Calculate composite importance score
-    const maxDegree = Math.max(...metrics.map((m) => m.degree), 1);
-    const maxBetweenness = Math.max(...metrics.map((m) => m.betweenness), 1);
-    const maxPageRank = Math.max(...metrics.map((m) => m.pageRank), 1);
-
-    for (const metric of metrics) {
-      metric.importance =
-        (metric.degree / maxDegree) * 0.4 +
-        (metric.betweenness / maxBetweenness) * 0.3 +
-        (metric.pageRank / maxPageRank) * 0.3;
-    }
-
-    return metrics;
-  }
-
-  /**
-   * Calculate betweenness centrality using random sampling
-   */
-  private calculateBetweenness(
-    outgoing: Map<string, Set<string>>,
-    symbols: string[]
-  ): Map<string, number> {
-    const betweenness = new Map<string, number>();
-    for (const symbol of symbols) {
-      betweenness.set(symbol, 0);
-    }
-
-    // Sample random paths (limit for performance)
-    const sampleSize = Math.min(symbols.length, 200);
-    const sampledSources = symbols.slice(0, sampleSize);
-
-    for (const source of sampledSources) {
-      // BFS from source
-      const distances = new Map<string, number>();
-      const pathCounts = new Map<string, number>();
-      const queue: string[] = [source];
-
-      distances.set(source, 0);
-      pathCounts.set(source, 1);
-
-      while (queue.length > 0) {
-        const current = queue.shift()!;
-        const currentDist = distances.get(current)!;
-        const neighbors = outgoing.get(current) || new Set();
-
-        for (const neighbor of neighbors) {
-          if (!distances.has(neighbor)) {
-            distances.set(neighbor, currentDist + 1);
-            pathCounts.set(neighbor, 0);
-            queue.push(neighbor);
-          }
-
-          if (distances.get(neighbor) === currentDist + 1) {
-            pathCounts.set(
-              neighbor,
-              (pathCounts.get(neighbor) || 0) + (pathCounts.get(current) || 0)
-            );
-          }
-        }
-      }
-
-      // Count paths through each node
-      for (const [symbol, count] of pathCounts.entries()) {
-        if (symbol !== source && count > 0) {
-          betweenness.set(symbol, (betweenness.get(symbol) || 0) + count);
-        }
-      }
-    }
-
-    // Normalize
-    const total = symbols.length * (symbols.length - 1);
-    if (total > 0) {
-      for (const [symbol, value] of betweenness.entries()) {
-        betweenness.set(symbol, value / total);
-      }
-    }
-
-    return betweenness;
-  }
-
-  /**
-   * Calculate PageRank
-   */
-  private calculatePageRank(
-    outgoing: Map<string, Set<string>>,
-    incoming: Map<string, Set<string>>,
-    symbols: string[]
-  ): Map<string, number> {
-    const dampingFactor = 0.85;
-    const iterations = 20;
-    const n = symbols.length;
-
-    const pageRank = new Map<string, number>();
-    const newPageRank = new Map<string, number>();
-
-    // Initialize
-    for (const symbol of symbols) {
-      pageRank.set(symbol, 1.0 / n);
-    }
-
-    // Iterate
-    for (let iter = 0; iter < iterations; iter++) {
-      for (const symbol of symbols) {
-        let sum = 0;
-        const incomingSymbols = incoming.get(symbol) || new Set();
-
-        for (const incoming_symbol of incomingSymbols) {
-          const outDegree = outgoing.get(incoming_symbol)?.size || 1;
-          sum += (pageRank.get(incoming_symbol) || 0) / outDegree;
-        }
-
-        newPageRank.set(symbol, (1 - dampingFactor) / n + dampingFactor * sum);
-      }
-
-      // Update
-      for (const symbol of symbols) {
-        pageRank.set(symbol, newPageRank.get(symbol) || 0);
-      }
-    }
-
-    return pageRank;
-  }
-
-  /**
-   * Interpret metrics to provide insights
-   */
-  private interpretMetrics(metrics: SymbolMetrics): string {
-    const { inDegree, outDegree, betweenness, degree } = metrics;
-
-    if (degree > 50 && betweenness > 0.01) {
-      return 'Critical hub - architectural bottleneck';
-    }
-
-    if (inDegree > 20 && outDegree < 10) {
-      return 'Core dependency - many symbols depend on this';
-    }
-
-    if (outDegree > 20 && inDegree < 10) {
-      return 'Orchestrator - coordinates many components';
-    }
-
-    if (betweenness > 0.01) {
-      return 'Bridge - connects different parts of the system';
-    }
-
-    if (degree > 20) {
-      return 'Hub - highly connected symbol';
-    }
-
-    if (inDegree > outDegree * 2) {
-      return 'Widely used - stable interface recommended';
-    }
-
-    if (outDegree > inDegree * 2) {
-      return 'Integration point - depends on many symbols';
-    }
-
-    return 'Standard component';
   }
 
   private capitalize(str: string): string {
