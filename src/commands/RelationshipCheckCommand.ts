@@ -3,7 +3,7 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { RelationshipImpactCommand } from './RelationshipImpactCommand';
 import { RelationshipMetricsCommand } from './RelationshipMetricsCommand';
 import { RelationshipQueryCommand } from './RelationshipQueryCommand';
@@ -60,11 +60,15 @@ This is the command you should run before modifying any symbol.
 Options:
   --depth <n>           Impact analysis depth (default: 3)
   --category <cat>      Only analyze specific category
+  --human               Output in human-readable format (default: XML)
   --json                Output as JSON for automation
 
 Examples:
   # Before modifying BuildCommand
   tsdoc-edge relationship-check class-buildcommand
+
+  # Human-readable report
+  tsdoc-edge relationship-check class-buildcommand --human
 
   # Quick check with JSON output
   tsdoc-edge relationship-check class-buildcommand --json
@@ -92,21 +96,29 @@ Output includes:
         return this.displayHelp();
       }
 
-      if (args.length === 0) {
+      // --human is a mode switch, never the symbol ID
+      const isHuman = this.hasFlag(args, '--human');
+      const commandArgs = args.filter((arg) => arg !== '--human');
+
+      if (commandArgs.length === 0) {
         this.printError('Symbol ID required');
         console.log();
         return this.displayHelp();
       }
 
-      const symbolId = args[0];
+      const symbolId = commandArgs[0];
       const options = {
-        depth: Number.parseInt(this.getOption(args, '--depth') || '3', 10),
-        category: this.getOption(args, '--category'),
-        json: args.includes('--json'),
+        depth: Number.parseInt(this.getOption(commandArgs, '--depth') || '3', 10),
+        category: this.getOption(commandArgs, '--category'),
+        json: commandArgs.includes('--json'),
       };
 
       if (options.json) {
         return this.executeJsonMode(symbolId, options);
+      }
+
+      if (!isHuman) {
+        return this.executeXmlMode(symbolId, options, args);
       }
 
       this.printHeader(`Safety Check: ${symbolId}`);
@@ -120,7 +132,7 @@ Output includes:
       // 1. Impact Analysis
       this.printSection('1. Impact Analysis');
       console.log();
-      await impactCmd.execute([symbolId, '--depth', options.depth.toString()]);
+      await impactCmd.execute([symbolId, '--depth', options.depth.toString(), '--human']);
 
       console.log();
       console.log();
@@ -129,7 +141,7 @@ Output includes:
       this.printSection('2. Centrality Check');
       console.log();
       console.log(
-        `  ${this.colors.dim}Checking if this symbol is architecturally critical...${this.colors.reset}`
+        `  ${colors.dim}Checking if this symbol is architecturally critical...${colors.reset}`
       );
       console.log();
 
@@ -140,15 +152,13 @@ Output includes:
       if (metricsResult.isCritical) {
         this.printWarning(`This symbol is in TOP ${metricsResult.rank} most critical symbols!`);
         console.log(
-          `  Importance Score: ${this.colors.cyan}${metricsResult.importance.toFixed(4)}${this.colors.reset}`
+          `  Importance Score: ${colors.cyan}${metricsResult.importance.toFixed(4)}${colors.reset}`
         );
-        console.log(
-          `  Degree: ${this.colors.cyan}${metricsResult.degree}${this.colors.reset} connections`
-        );
-        console.log(`  Pattern: ${this.colors.yellow}${metricsResult.pattern}${this.colors.reset}`);
+        console.log(`  Degree: ${colors.cyan}${metricsResult.degree}${colors.reset} connections`);
+        console.log(`  Pattern: ${colors.yellow}${metricsResult.pattern}${colors.reset}`);
       } else {
         this.printSuccess('Not in top critical symbols');
-        console.log(`  ${this.colors.dim}This symbol has normal connectivity${this.colors.reset}`);
+        console.log(`  ${colors.dim}This symbol has normal connectivity${colors.reset}`);
       }
 
       console.log();
@@ -157,7 +167,7 @@ Output includes:
       // 3. Connection Overview
       this.printSection('3. Connection Overview');
       console.log();
-      await queryCmd.execute([symbolId, '--limit', '5']);
+      await queryCmd.execute([symbolId, '--limit', '5', '--human']);
 
       console.log();
       console.log();
@@ -169,35 +179,77 @@ Output includes:
       const risk = metricsResult.isCritical ? 'HIGH' : 'NORMAL';
 
       if (risk === 'HIGH') {
-        console.log(`  ${this.colors.red}⚠️  HIGH RISK CHANGE${this.colors.reset}`);
+        console.log(`  ${colors.red}⚠️  HIGH RISK CHANGE${colors.reset}`);
         console.log();
         console.log(`  This symbol is architecturally critical. Recommended actions:`);
-        console.log(
-          `  ${this.colors.yellow}✓${this.colors.reset} Write comprehensive tests before changing`
-        );
-        console.log(`  ${this.colors.yellow}✓${this.colors.reset} Review with senior team member`);
-        console.log(
-          `  ${this.colors.yellow}✓${this.colors.reset} Consider feature flag for gradual rollout`
-        );
-        console.log(
-          `  ${this.colors.yellow}✓${this.colors.reset} Update documentation after changes`
-        );
-        console.log(`  ${this.colors.yellow}✓${this.colors.reset} Monitor closely in production`);
+        console.log(`  ${colors.yellow}✓${colors.reset} Write comprehensive tests before changing`);
+        console.log(`  ${colors.yellow}✓${colors.reset} Review with senior team member`);
+        console.log(`  ${colors.yellow}✓${colors.reset} Consider feature flag for gradual rollout`);
+        console.log(`  ${colors.yellow}✓${colors.reset} Update documentation after changes`);
+        console.log(`  ${colors.yellow}✓${colors.reset} Monitor closely in production`);
       } else {
-        console.log(`  ${this.colors.green}✓ NORMAL RISK CHANGE${this.colors.reset}`);
+        console.log(`  ${colors.green}✓ NORMAL RISK CHANGE${colors.reset}`);
         console.log();
         console.log(`  This symbol has normal connectivity. Standard workflow:`);
-        console.log(
-          `  ${this.colors.green}✓${this.colors.reset} Follow standard testing practices`
-        );
-        console.log(`  ${this.colors.green}✓${this.colors.reset} Standard code review process`);
-        console.log(`  ${this.colors.green}✓${this.colors.reset} Deploy with normal confidence`);
+        console.log(`  ${colors.green}✓${colors.reset} Follow standard testing practices`);
+        console.log(`  ${colors.green}✓${colors.reset} Standard code review process`);
+        console.log(`  ${colors.green}✓${colors.reset} Deploy with normal confidence`);
       }
 
       console.log();
 
       return this.success(`Safety check complete for ${symbolId}`);
     });
+  }
+
+  /**
+   * Execute in default XML mode: risk verdict, centrality and recommendations.
+   * The impact and connection sub-reports are separate documents emitted by
+   * `relationship impact` / `relationship query`.
+   */
+  private async executeXmlMode(
+    symbolId: string,
+    options: RelationshipCheckOptions,
+    args: string[]
+  ): Promise<CommandResult> {
+    const centrality = await this.getCentralityInfo(symbolId);
+    const risk = centrality.isCritical ? 'HIGH' : 'NORMAL';
+    const recommendations = centrality.isCritical
+      ? [
+          'Write comprehensive tests before changing',
+          'Review with senior team member',
+          'Consider feature flag for gradual rollout',
+          'Update documentation after changes',
+          'Monitor closely in production',
+        ]
+      : [
+          'Follow standard testing practices',
+          'Standard code review process',
+          'Deploy with normal confidence',
+        ];
+
+    this.printOutput(
+      'relationship-check',
+      {
+        summary: {
+          symbolId,
+          depth: options.depth,
+          ...(options.category !== undefined ? { category: options.category } : {}),
+          risk,
+        },
+        centrality: {
+          isCritical: centrality.isCritical,
+          rank: centrality.rank,
+          importance: Number(centrality.importance.toFixed(4)),
+          degree: centrality.degree,
+          pattern: centrality.pattern,
+        },
+        recommendations: recommendations.map((text) => ({ text })),
+      },
+      args
+    );
+
+    return this.success(`Safety check complete for ${symbolId}`);
   }
 
   /**
@@ -216,6 +268,7 @@ Output includes:
         symbolId,
         '--depth',
         options.depth.toString(),
+        '--human',
       ]);
 
       const result = {
@@ -270,19 +323,6 @@ Output includes:
       importance: 0.1,
       degree: 10,
       pattern: 'Standard component',
-    };
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      bold: '\x1b[1m',
-      dim: '\x1b[2m',
-      green: '\x1b[32m',
-      yellow: '\x1b[33m',
-      blue: '\x1b[34m',
-      cyan: '\x1b[36m',
-      red: '\x1b[31m',
     };
   }
 }

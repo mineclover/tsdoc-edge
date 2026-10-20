@@ -61,6 +61,10 @@ Options:
   --direction <dir>     Direction: from, to, both (default: both)
   --output <file>       Save to file (default: stdout)
   --style <style>       Diagram style: graph, flowchart (default: graph)
+  --human               Output in human-readable format (default: XML)
+
+Without --output the diagram itself is printed to stdout. With --output the diagram
+is saved and an XML summary is printed (or text with --human).
 
 Examples:
   tsdoc-edge relationship-visualize class-databasemanager
@@ -82,32 +86,38 @@ Examples:
         return this.displayHelp();
       }
 
-      if (args.length === 0) {
+      // --human is a mode switch, never the symbol ID
+      const isHuman = this.hasFlag(args, '--human');
+      const commandArgs = args.filter((arg) => arg !== '--human');
+
+      if (commandArgs.length === 0) {
         this.printError('Symbol ID required');
         console.log();
         return this.displayHelp();
       }
 
-      const symbolId = args[0];
+      const symbolId = commandArgs[0];
 
       // Parse options
       const options = {
-        format: this.getOption(args, '--format') || 'mermaid',
-        type: this.getOption(args, '--type'),
-        category: this.getOption(args, '--category'),
-        depth: Number.parseInt(this.getOption(args, '--depth') || '2', 10),
-        direction: this.getOption(args, '--direction') || 'both',
-        output: this.getOption(args, '--output'),
-        style: this.getOption(args, '--style') || 'graph',
+        format: this.getOption(commandArgs, '--format') || 'mermaid',
+        type: this.getOption(commandArgs, '--type'),
+        category: this.getOption(commandArgs, '--category'),
+        depth: Number.parseInt(this.getOption(commandArgs, '--depth') || '2', 10),
+        direction: this.getOption(commandArgs, '--direction') || 'both',
+        output: this.getOption(commandArgs, '--output'),
+        style: this.getOption(commandArgs, '--style') || 'graph',
       };
 
-      this.printHeader(`Relationship Visualization: ${symbolId}`);
+      if (isHuman) {
+        this.printHeader(`Relationship Visualization: ${symbolId}`);
+      }
 
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
       // Resolve symbol by ID or name
-      const resolved = this.resolveSymbol(dbManager, symbolId);
+      const resolved = this.resolveSymbol(dbManager, symbolId, { quiet: !isHuman });
 
       if (!resolved) {
         this.printError(`Symbol not found: ${symbolId}`);
@@ -117,8 +127,12 @@ Examples:
 
       const { symbol, id: resolvedId } = resolved;
       const symbolRow = symbol as SymbolRow;
-      console.log(`Symbol: ${symbolRow.name} (${symbolRow.type})`);
-      console.log(`Format: ${options.format}, Style: ${options.style}, Depth: ${options.depth}\n`);
+      if (isHuman) {
+        console.log(`Symbol: ${symbolRow.name} (${symbolRow.type})`);
+        console.log(
+          `Format: ${options.format}, Style: ${options.style}, Depth: ${options.depth}\n`
+        );
+      }
 
       // Collect relationships
       const visited = new Set<string>();
@@ -126,7 +140,9 @@ Examples:
 
       this.collectRelationships(dbManager, resolvedId, options, 0, visited, relationships);
 
-      console.log(`Collected ${relationships.length} relationships\n`);
+      if (isHuman) {
+        console.log(`Collected ${relationships.length} relationships\n`);
+      }
 
       // Generate diagram
       let diagram = '';
@@ -140,10 +156,33 @@ Examples:
         return this.failure('Unsupported format');
       }
 
-      // Output
+      // Output: the diagram goes to the file or, without --output, to stdout as-is.
+      // Only the surrounding report is switched by --human / XML.
       if (options.output) {
         fs.writeFileSync(options.output, diagram, 'utf-8');
-        this.printSuccess(`Diagram saved to: ${options.output}`);
+        if (isHuman) {
+          this.printSuccess(`Diagram saved to: ${options.output}`);
+        } else {
+          this.printOutput(
+            'relationship-visualization',
+            {
+              summary: {
+                symbolId: resolvedId,
+                symbolName: symbolRow.name,
+                symbolType: symbolRow.type,
+                format: options.format,
+                style: options.style,
+                depth: options.depth,
+                direction: options.direction,
+                ...(options.type !== undefined ? { type: options.type } : {}),
+                ...(options.category !== undefined ? { category: options.category } : {}),
+                totalRelationships: relationships.length,
+                outputFile: options.output,
+              },
+            },
+            args
+          );
+        }
       } else {
         console.log(diagram);
       }

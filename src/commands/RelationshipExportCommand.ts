@@ -56,6 +56,10 @@ Options:
   --type <type>         Filter by relationship type
   --min-confidence <n>  Minimum confidence level (0-1)
   --layout <layout>     Layout algorithm for gephi: circle, grid, random (default: circle)
+  --human               Output in human-readable format (default: XML)
+
+Without --output the exported content itself is printed to stdout. With --output the
+file is written and an XML summary of the export is printed (or text with --human).
 
 Formats:
   json     - JSON format (for programmatic processing)
@@ -94,6 +98,7 @@ Examples:
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
       const minConfidenceOption = this.getOption(args, '--min-confidence');
       const options = {
         format: (this.getOption(args, '--format') || 'json') as ExportFormat,
@@ -112,14 +117,18 @@ Examples:
         return { success: false, message: 'Invalid format', exitCode: 1 };
       }
 
-      this.printHeader(`Export Relationships (${options.format.toUpperCase()})`);
+      if (isHuman) {
+        this.printHeader(`Export Relationships (${options.format.toUpperCase()})`);
+      }
 
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
 
       // Use Drizzle ORM to query relationships
-      console.log();
-      this.printInfo('Querying relationships...');
+      if (isHuman) {
+        console.log();
+        this.printInfo('Querying relationships...');
+      }
 
       let allRels = dbManager.getAllUnifiedRelationshipRows();
 
@@ -137,8 +146,10 @@ Examples:
 
       const relationships = allRels;
 
-      this.printInfo(`Found ${relationships.length} relationships`);
-      console.log();
+      if (isHuman) {
+        this.printInfo(`Found ${relationships.length} relationships`);
+        console.log();
+      }
 
       // Get symbols for context
       const symbols = dbManager.getAllSymbolRows();
@@ -167,16 +178,41 @@ Examples:
           break;
       }
 
-      // Output
+      // Output: the exported content goes to the file or, without --output, to stdout
+      // as-is. Only the surrounding report is switched by --human / XML.
       if (options.output) {
         fs.writeFileSync(options.output, content, 'utf-8');
-        this.printSuccess(`Exported to: ${options.output}`);
-        this.printInfo(`Size: ${(content.length / 1024).toFixed(2)} KB`);
+        if (isHuman) {
+          this.printSuccess(`Exported to: ${options.output}`);
+          this.printInfo(`Size: ${(content.length / 1024).toFixed(2)} KB`);
+        } else {
+          this.printOutput(
+            'relationship-export',
+            {
+              summary: {
+                format: options.format,
+                outputFile: options.output,
+                totalRelationships: relationships.length,
+                totalSymbols: symbolMap.size,
+                sizeKB: Number((content.length / 1024).toFixed(2)),
+                ...(options.category !== undefined ? { category: options.category } : {}),
+                ...(options.type !== undefined ? { type: options.type } : {}),
+                ...(options.minConfidence !== undefined
+                  ? { minConfidence: options.minConfidence }
+                  : {}),
+                ...(options.format === 'gephi' ? { layout: options.layout } : {}),
+              },
+            },
+            args
+          );
+        }
       } else {
         console.log(content);
       }
 
-      console.log();
+      if (isHuman) {
+        console.log();
+      }
 
       dbManager.close();
 

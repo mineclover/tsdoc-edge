@@ -2,9 +2,13 @@
  * Tests for AnalyzeRelationshipsCommand
  */
 
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
 import type { AnalyzerContext } from '../../analyzer/types';
 import { AnalyzeRelationshipsCommand } from '../../commands/AnalyzeRelationshipsCommand';
 import type { DatabaseManager } from '../../storage/DatabaseManager';
+import { seedRelationshipDatabase } from '../fixtures/relationship-db';
 
 describe('AnalyzeRelationshipsCommand', () => {
   let command: AnalyzeRelationshipsCommand;
@@ -35,9 +39,75 @@ describe('AnalyzeRelationshipsCommand', () => {
       expect(logSpy).toHaveBeenCalledWith(expect.stringContaining('--router-module'));
     });
 
-    it('should list analyzers with --list flag', async () => {
+    it('should list analyzers as XML by default', async () => {
+      const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
       const result = await command.execute(['--list']);
+      const xml = log.mock.calls.flat().join('\n');
+
       expect(result.exitCode).toBe(0);
+      expect(xml.startsWith('<analyzer-list>')).toBe(true);
+      expect(xml).toContain('<type>calls</type>');
+      expect(xml).toContain('<category>behavioral</category>');
+      expect(xml).not.toContain('\x1b[');
+    });
+
+    it('should list analyzers as colored text with --list --human', async () => {
+      const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+      const result = await command.execute(['--list', '--human']);
+      const text = log.mock.calls.flat().join('\n');
+
+      expect(result.exitCode).toBe(0);
+      expect(text).toContain('Available Analyzer Types');
+      expect(text).toContain('requires:');
+      expect(text).toContain('\x1b[');
+      expect(text).not.toContain('<analyzer-list>');
+    });
+
+    describe('with a project database', () => {
+      let tempDir: string;
+      const originalCwd = process.cwd();
+
+      beforeEach(() => {
+        tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'analyze-relationships-'));
+        process.chdir(tempDir);
+        seedRelationshipDatabase(tempDir);
+      });
+
+      afterEach(() => {
+        process.chdir(originalCwd);
+        fs.rmSync(tempDir, { recursive: true, force: true });
+      });
+
+      it('should report a single analyzer run as XML by default', async () => {
+        const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+        const result = await command.execute(['--type=substitution']);
+        const xml = log.mock.calls.flat().join('\n');
+
+        expect(result.exitCode).toBe(0);
+        expect(xml.startsWith('<relationship-analysis>')).toBe(true);
+        expect(xml).toContain('<analyzerType>substitution</analyzerType>');
+        expect(xml).toContain('<status>analyzed</status>');
+        expect(xml).toContain('<samples count="0">');
+        expect(xml).not.toContain('Loading legacy dependency graph');
+        expect(xml).not.toContain('\x1b[');
+      });
+
+      it('should keep the colored progress output with --human', async () => {
+        const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+        const result = await command.execute(['--type=substitution', '--human']);
+        const text = log.mock.calls.flat().join('\n');
+
+        expect(result.exitCode).toBe(0);
+        expect(text).toContain('TSDoc Edge - Relationship Analysis');
+        expect(text).toContain('Found 0 relationships');
+        expect(text).toContain('Total relationships:');
+        expect(text).toContain('\x1b[');
+        expect(text).not.toContain('<relationship-analysis>');
+      });
     });
 
     it('should fail structural analysis when the graph-router module is missing', async () => {

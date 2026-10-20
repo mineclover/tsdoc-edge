@@ -11,10 +11,11 @@ import type { AnalyzerContext, AnalyzerType } from '../analyzer/types';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { GraphAnalysisService } from '../graph-analysis';
 import { CanonicalGraphCoordinator } from '../indexer';
+import type { SectionData } from '../output/types';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import type { SymbolType } from '../types/graph';
 import type { SymbolRelationship } from '../types/tags';
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 interface GraphRouterCliOptions {
   configPath: string;
@@ -24,12 +25,33 @@ interface GraphRouterCliOptions {
   repositoryPath?: string;
 }
 
+/** Outcome of one analyzer run, reported in the XML document. */
+type AnalyzerRunResult = {
+  category: string;
+  type: string;
+  name: string;
+  status: 'analyzed' | 'skipped' | 'error';
+  relationships: number;
+  persistence: 'legacy-db' | 'read-only';
+  /** Only present when the relationships were written to the legacy database */
+  saved?: number;
+};
+
+/** Canonical graph facts printed by the structural analyzer's graph load. */
+type CanonicalGraphSummary = {
+  fingerprint: string;
+  nodes: number;
+  edges: number;
+  revision: string;
+};
+
 /**
  * Unified command for all relationship analysis
  * @public
  */
 export class AnalyzeRelationshipsCommand extends BaseCommand {
   private registry: AnalyzerRegistry;
+  private canonicalGraphSummary?: CanonicalGraphSummary;
 
   constructor() {
     super();
@@ -73,6 +95,7 @@ Options:
   --router-module=<path>  Built graph-router artifact-source entrypoint
   --graph-tsconfig=<path> Project graph tsconfig (default: tsconfig.ttsc.json)
   --canonical-graph-db=<path> Canonical revision database
+  --human           Output in human-readable format (default: XML)
 
 Examples:
   tsdoc-edge relationship analyze --type=calls
@@ -96,6 +119,7 @@ Examples:
       }
 
       // Parse arguments
+      const isHuman = this.hasFlag(args, '--human');
       const listFlag = args.includes('--list');
       const typeArg = args.find((a) => a.startsWith('--type='));
       const srcArg = args.find((a) => a.startsWith('--src='));
@@ -103,7 +127,7 @@ Examples:
 
       // --list: show available types
       if (listFlag) {
-        return this.listAnalyzers();
+        return this.listAnalyzers(args);
       }
 
       // Require --type
@@ -114,7 +138,7 @@ Examples:
         for (const type of this.registry.getTypes()) {
           const metadata = this.registry.getMetadata(type);
           console.log(
-            `  ${this.colors.cyan}${type.padEnd(20)}${this.colors.reset} ${metadata?.description || ''}`
+            `  ${colors.cyan}${type.padEnd(20)}${colors.reset} ${metadata?.description || ''}`
           );
         }
         console.log();
@@ -135,45 +159,69 @@ Examples:
       const selectedTypes = analyzerType === 'all' ? validTypes : [analyzerType as AnalyzerType];
       const routerOptions = this.parseGraphRouterOptions(args);
 
-      this.printHeader('TSDoc Edge - Relationship Analysis');
+      if (isHuman) {
+        this.printHeader('TSDoc Edge - Relationship Analysis');
+      }
 
       // Load context
-      const context = await this.buildContext(srcDir, selectedTypes, routerOptions);
+      this.canonicalGraphSummary = undefined;
+      const context = await this.buildContext(srcDir, selectedTypes, routerOptions, isHuman);
       try {
         let totalRelationships = 0;
+        const results: AnalyzerRunResult[] = [];
+        const samples: Array<{ type: string; description: string }> = [];
+        let omittedSamples = 0;
 
         if (analyzerType === 'all') {
           // Run all analyzers
-          this.printSection('Running All Analyzers');
+          if (isHuman) this.printSection('Running All Analyzers');
           const byCategory = this.registry.getMetadataByCategory();
 
           for (const [category, metadataList] of byCategory) {
-            console.log();
-            console.log(`${this.colors.bold}Category: ${category}${this.colors.reset}`);
+            if (isHuman) {
+              console.log();
+              console.log(`${colors.bold}Category: ${category}${colors.reset}`);
+            }
 
             for (const metadata of metadataList) {
+              const persistence = metadata.persistence === 'read-only' ? 'read-only' : 'legacy-db';
               try {
                 const hasRequired = metadata.requires.every(
                   (req) => context[req as keyof AnalyzerContext]
                 );
                 if (!hasRequired) {
-                  console.log(
-                    `  ${this.colors.dim}${metadata.name}: skipped (missing requirements)${this.colors.reset}`
-                  );
+                  if (isHuman) {
+                    console.log(
+                      `  ${colors.dim}${metadata.name}: skipped (missing requirements)${colors.reset}`
+                    );
+                  }
+                  results.push({
+                    category,
+                    type: metadata.type,
+                    name: metadata.name,
+                    status: 'skipped',
+                    relationships: 0,
+                    persistence,
+                  });
                   continue;
                 }
 
                 const rels = this.registry.analyze(metadata.type as AnalyzerType, context);
-                console.log(
-                  `  ${this.colors.green}${metadata.name}${this.colors.reset}: ${rels.length} relationships`
-                );
-
-                if (metadata.persistence === 'read-only') {
+                if (isHuman) {
                   console.log(
-                    `  ${this.colors.dim}${metadata.name}: canonical snapshot persisted; legacy relationship projection remains read-only${this.colors.reset}`
+                    `  ${colors.green}${metadata.name}${colors.reset}: ${rels.length} relationships`
                   );
+                }
+
+                let saved: number | undefined;
+                if (metadata.persistence === 'read-only') {
+                  if (isHuman) {
+                    console.log(
+                      `  ${colors.dim}${metadata.name}: canonical snapshot persisted; legacy relationship projection remains read-only${colors.reset}`
+                    );
+                  }
                 } else {
-                  this.saveRelationships(
+                  saved = this.saveRelationships(
                     this.requireDatabase(context),
                     rels,
                     metadata.type,
@@ -181,8 +229,25 @@ Examples:
                   );
                 }
                 totalRelationships += rels.length;
+                results.push({
+                  category,
+                  type: metadata.type,
+                  name: metadata.name,
+                  status: 'analyzed',
+                  relationships: rels.length,
+                  persistence,
+                  ...(saved !== undefined ? { saved } : {}),
+                });
               } catch {
-                console.log(`  ${this.colors.red}${metadata.name}: error${this.colors.reset}`);
+                if (isHuman) console.log(`  ${colors.red}${metadata.name}: error${colors.reset}`);
+                results.push({
+                  category,
+                  type: metadata.type,
+                  name: metadata.name,
+                  status: 'error',
+                  relationships: 0,
+                  persistence,
+                });
               }
             }
           }
@@ -190,52 +255,78 @@ Examples:
           // Run specific analyzer
           const metadata = this.registry.getMetadata(analyzerType as AnalyzerType);
           if (!metadata) throw new Error(`Unknown analyzer type: ${analyzerType}`);
-          this.printSection(`${metadata.name} Analysis`);
+          if (isHuman) this.printSection(`${metadata.name} Analysis`);
 
           const rels = this.registry.analyze(analyzerType as AnalyzerType, context);
-          this.printInfo(`Found ${rels.length} relationships`);
+          if (isHuman) this.printInfo(`Found ${rels.length} relationships`);
 
+          let saved: number | undefined;
           if (rels.length > 0) {
             // Show sample
-            console.log();
-            console.log(`${this.colors.dim}Sample relationships:${this.colors.reset}`);
+            if (isHuman) {
+              console.log();
+              console.log(`${colors.dim}Sample relationships:${colors.reset}`);
+            }
             for (const rel of rels.slice(0, 5)) {
-              console.log(
-                `  ${this.colors.blue}${rel.type}${this.colors.reset}: ${rel.description}`
-              );
+              if (isHuman) {
+                console.log(`  ${colors.blue}${rel.type}${colors.reset}: ${rel.description}`);
+              }
+              samples.push({ type: rel.type, description: rel.description ?? '' });
             }
             if (rels.length > 5) {
-              console.log(
-                `  ${this.colors.dim}... and ${rels.length - 5} more${this.colors.reset}`
-              );
+              omittedSamples = rels.length - 5;
+              if (isHuman) {
+                console.log(`  ${colors.dim}... and ${rels.length - 5} more${colors.reset}`);
+              }
             }
 
-            console.log();
+            if (isHuman) console.log();
             if (metadata.persistence === 'read-only') {
-              this.printInfo(
-                'Canonical snapshot persisted; legacy relationship projection remains read-only'
-              );
+              if (isHuman) {
+                this.printInfo(
+                  'Canonical snapshot persisted; legacy relationship projection remains read-only'
+                );
+              }
             } else {
-              this.printInfo('Saving to database...');
-              const saved = this.saveRelationships(
+              if (isHuman) this.printInfo('Saving to database...');
+              saved = this.saveRelationships(
                 this.requireDatabase(context),
                 rels,
                 metadata.type,
                 metadata.category
               );
-              this.printSuccess(`Saved ${saved} relationships`);
+              if (isHuman) this.printSuccess(`Saved ${saved} relationships`);
             }
           }
 
           totalRelationships = rels.length;
+          results.push({
+            category: metadata.category,
+            type: metadata.type,
+            name: metadata.name,
+            status: 'analyzed',
+            relationships: rels.length,
+            persistence: metadata.persistence === 'read-only' ? 'read-only' : 'legacy-db',
+            ...(saved !== undefined ? { saved } : {}),
+          });
         }
 
-        console.log();
-        this.printSection('Summary');
-        console.log(
-          `  Total relationships: ${this.colors.cyan}${totalRelationships}${this.colors.reset}`
-        );
-        console.log();
+        if (isHuman) {
+          console.log();
+          this.printSection('Summary');
+          console.log(`  Total relationships: ${colors.cyan}${totalRelationships}${colors.reset}`);
+          console.log();
+        } else {
+          const sections: Record<string, SectionData> = {
+            summary: { analyzerType, srcDir, totalRelationships, omittedSamples },
+          };
+          if (this.canonicalGraphSummary) {
+            sections.canonicalGraph = this.canonicalGraphSummary;
+          }
+          sections.results = results;
+          sections.samples = samples;
+          this.printOutput('relationship-analysis', sections, args);
+        }
 
         return this.success(`Analyzed ${totalRelationships} relationships`);
       } finally {
@@ -244,23 +335,40 @@ Examples:
     });
   }
 
-  private listAnalyzers(): CommandResult {
-    this.printHeader('Available Analyzer Types');
-    console.log();
-
+  private listAnalyzers(args: string[]): CommandResult {
     const byCategory = this.registry.getMetadataByCategory();
 
-    for (const [category, metadataList] of byCategory) {
-      console.log(`${this.colors.bold}${category}${this.colors.reset}`);
-      for (const metadata of metadataList) {
-        console.log(
-          `  ${this.colors.cyan}${metadata.type.padEnd(20)}${this.colors.reset} ${metadata.description}`
-        );
-        console.log(
-          `    ${this.colors.dim}requires: ${metadata.requires.join(', ')}${this.colors.reset}`
-        );
-      }
+    if (this.hasFlag(args, '--human')) {
+      this.printHeader('Available Analyzer Types');
       console.log();
+
+      for (const [category, metadataList] of byCategory) {
+        console.log(`${colors.bold}${category}${colors.reset}`);
+        for (const metadata of metadataList) {
+          console.log(
+            `  ${colors.cyan}${metadata.type.padEnd(20)}${colors.reset} ${metadata.description}`
+          );
+          console.log(`    ${colors.dim}requires: ${metadata.requires.join(', ')}${colors.reset}`);
+        }
+        console.log();
+      }
+    } else {
+      const analyzers = [...byCategory].flatMap(([category, metadataList]) =>
+        metadataList.map((metadata) => ({
+          category,
+          type: metadata.type,
+          description: metadata.description,
+          requires: metadata.requires.join(','),
+        }))
+      );
+      this.printOutput(
+        'analyzer-list',
+        {
+          summary: { totalAnalyzers: analyzers.length, totalCategories: byCategory.size },
+          analyzers,
+        },
+        args
+      );
     }
 
     return this.success(`Listed ${this.registry.getTypes().length} analyzer types`);
@@ -269,7 +377,8 @@ Examples:
   private async buildContext(
     srcDir: string,
     analyzerTypes: readonly AnalyzerType[],
-    routerOptions: GraphRouterCliOptions
+    routerOptions: GraphRouterCliOptions,
+    isHuman = true
   ): Promise<AnalyzerContext> {
     const requirements = new Set(
       analyzerTypes.flatMap((type) => this.registry.getMetadata(type)?.requires ?? [])
@@ -295,15 +404,15 @@ Examples:
     try {
       if (requirements.has('graph')) {
         if (!dbManager) throw new Error('Legacy graph analysis requires the symbol database');
-        context.graph = this.loadLegacyGraph(dbManager);
+        context.graph = this.loadLegacyGraph(dbManager, isHuman);
       }
 
       if (requirements.has('program')) {
-        context.program = this.buildLegacyProgram(srcDir);
+        context.program = this.buildLegacyProgram(srcDir, isHuman);
       }
 
       if (requirements.has('graphAnalysis') && routerOptions.moduleSpecifier) {
-        context.graphAnalysis = await this.loadCanonicalGraphAnalysis(routerOptions);
+        context.graphAnalysis = await this.loadCanonicalGraphAnalysis(routerOptions, isHuman);
       }
 
       return context;
@@ -313,8 +422,8 @@ Examples:
     }
   }
 
-  private loadLegacyGraph(dbManager: DatabaseManager) {
-    this.printInfo('Loading legacy dependency graph...');
+  private loadLegacyGraph(dbManager: DatabaseManager, isHuman: boolean) {
+    if (isHuman) this.printInfo('Loading legacy dependency graph...');
     const graphBuilder = new SymbolGraphBuilder();
     const { symbols: symbolRows, dependencies: depRows } = dbManager.getGraphData();
 
@@ -352,8 +461,8 @@ Examples:
     return graphBuilder.getGraph();
   }
 
-  private buildLegacyProgram(srcDir: string) {
-    this.printInfo('Building legacy TypeScript Compiler API program...');
+  private buildLegacyProgram(srcDir: string, isHuman: boolean) {
+    if (isHuman) this.printInfo('Building legacy TypeScript Compiler API program...');
     // Keep TS5 loading out of graph-only analysis. Syntax analyzers still use it.
     const ts = require('typescript') as typeof import('typescript');
     const files = this.findTypeScriptFiles(srcDir);
@@ -366,9 +475,12 @@ Examples:
   }
 
   private async loadCanonicalGraphAnalysis(
-    options: GraphRouterCliOptions
+    options: GraphRouterCliOptions,
+    isHuman: boolean
   ): Promise<GraphAnalysisService> {
-    this.printInfo(`Loading canonical @ttsc/graph artifact for ${options.repoId}...`);
+    if (isHuman) {
+      this.printInfo(`Loading canonical @ttsc/graph artifact for ${options.repoId}...`);
+    }
     const coordinator = new CanonicalGraphCoordinator({
       rootDir: process.cwd(),
       moduleSpecifier: options.moduleSpecifier,
@@ -384,9 +496,17 @@ Examples:
       if (result.status !== 'committed') {
         throw new Error('Canonical graph refresh was superseded unexpectedly');
       }
-      this.printInfo(
-        `Canonical graph ${result.graph.fingerprint.slice(0, 12)}: ${result.graph.nodes.length} nodes, ${result.graph.edges.length} edges; revision ${result.revision.revisionId.slice(0, 12)} persisted`
-      );
+      this.canonicalGraphSummary = {
+        fingerprint: result.graph.fingerprint.slice(0, 12),
+        nodes: result.graph.nodes.length,
+        edges: result.graph.edges.length,
+        revision: result.revision.revisionId.slice(0, 12),
+      };
+      if (isHuman) {
+        this.printInfo(
+          `Canonical graph ${this.canonicalGraphSummary.fingerprint}: ${this.canonicalGraphSummary.nodes} nodes, ${this.canonicalGraphSummary.edges} edges; revision ${this.canonicalGraphSummary.revision} persisted`
+        );
+      }
       return new GraphAnalysisService(result.graph);
     } finally {
       coordinator.close();
@@ -493,18 +613,5 @@ Examples:
     }
 
     return files;
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      bold: '\x1b[1m',
-      dim: '\x1b[2m',
-      green: '\x1b[32m',
-      yellow: '\x1b[33m',
-      blue: '\x1b[34m',
-      cyan: '\x1b[36m',
-      red: '\x1b[31m',
-    };
   }
 }

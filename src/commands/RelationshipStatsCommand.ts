@@ -4,7 +4,7 @@
  */
 
 import { DatabaseManager } from '../storage/DatabaseManager';
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Command for showing relationship statistics and implementation progress
@@ -36,7 +36,7 @@ export class RelationshipStatsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge relationship-stats [options]\n\n  Options:\n    --detailed    Show detailed breakdown by type';
+    return 'tsdoc-edge relationship-stats [options]\n\n  Options:\n    --detailed    Show detailed breakdown by type\n    --human       Output in human-readable format (default: XML)';
   }
 
   /**
@@ -52,9 +52,12 @@ export class RelationshipStatsCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
       const detailed = args.includes('--detailed');
 
-      this.printHeader('TSDoc Edge - Relationship Statistics');
+      if (isHuman) {
+        this.printHeader('TSDoc Edge - Relationship Statistics');
+      }
 
       const dbCheck = this.checkDatabaseExists();
       if (dbCheck) return dbCheck;
@@ -84,31 +87,11 @@ export class RelationshipStatsCommand extends BaseCommand {
         count: row.count,
       }));
 
-      console.log();
-
-      // Overall statistics
-      this.printSection('Overall Statistics');
-      console.log(`  Total symbols: ${this.colors.cyan}${totalSymbolsCount}${this.colors.reset}`);
-
       const totalRelationships = byType.reduce((sum, row) => sum + row.count, 0);
-      console.log(
-        `  Total relationships: ${this.colors.cyan}${totalRelationships}${this.colors.reset}`
-      );
 
       // Get inferred vs explicit breakdown (allRels already fetched above)
       const inferredCount = allRels.filter((r) => r.properties?.inferred === true).length;
       const explicitCount = totalRelationships - inferredCount;
-
-      console.log(
-        `  Explicit relationships: ${this.colors.green}${explicitCount}${this.colors.reset}`
-      );
-      console.log(
-        `  Inferred relationships: ${this.colors.yellow}${inferredCount}${this.colors.reset} (${((inferredCount / totalRelationships) * 100).toFixed(1)}%)`
-      );
-      console.log();
-
-      // Category breakdown
-      this.printSection('Relationships by Category');
 
       const categoryOrder = [
         'structural',
@@ -121,20 +104,6 @@ export class RelationshipStatsCommand extends BaseCommand {
       ];
 
       const categoryMap = new Map(byCategory.map((c) => [c.category, c.count]));
-
-      for (const category of categoryOrder) {
-        const count = categoryMap.get(category) || 0;
-        const icon = count > 0 ? `${this.colors.green}✓` : `${this.colors.dim}○`;
-        const countDisplay = count > 0 ? this.colors.cyan + count : `${this.colors.dim}0`;
-
-        console.log(
-          `  ${icon}${this.colors.reset} ${category.padEnd(15)} ${countDisplay}${this.colors.reset}`
-        );
-      }
-      console.log();
-
-      // Implementation progress
-      this.printSection('Implementation Progress');
 
       // Define all relationship types by category (28 types across 10 categories)
       const allTypes = {
@@ -158,83 +127,165 @@ export class RelationshipStatsCommand extends BaseCommand {
 
       const implementedTypes = new Set(byType.map((r) => r.type));
 
+      // Implementation progress per category
       let totalTypes = 0;
       let implementedCount = 0;
+      const progress: Array<{ category: string; implemented: number; total: number }> = [];
 
       for (const [category, types] of Object.entries(allTypes)) {
         totalTypes += types.length;
         const implemented = types.filter((t) => implementedTypes.has(t)).length;
         implementedCount += implemented;
-
-        const percentage = types.length > 0 ? Math.round((implemented / types.length) * 100) : 0;
-        const progressBar = this.createProgressBar(percentage, 20);
-
-        console.log(
-          `  ${category.padEnd(15)} ${progressBar} ${percentage}% (${implemented}/${types.length})`
-        );
+        progress.push({ category, implemented, total: types.length });
       }
 
       const overallPercentage = Math.round((implementedCount / totalTypes) * 100);
-      console.log();
-      console.log(
-        `  ${this.colors.bold}Overall Progress:${this.colors.reset} ${this.colors.cyan}${overallPercentage}%${this.colors.reset} (${implementedCount}/${totalTypes} types)`
-      );
-      console.log();
-
-      // Detailed breakdown
-      if (detailed) {
-        this.printSection('Detailed Breakdown by Type');
-
-        for (const [category, types] of Object.entries(allTypes)) {
-          console.log();
-          console.log(`  ${this.colors.bold}${category}:${this.colors.reset}`);
-
-          for (const type of types) {
-            const row = byType.find((r) => r.type === type);
-            const count = row ? row.count : 0;
-            const status = count > 0 ? `${this.colors.green}✓` : `${this.colors.red}✗`;
-            const countDisplay = count > 0 ? this.colors.cyan + count : `${this.colors.dim}-`;
-
-            console.log(
-              `    ${status}${this.colors.reset} ${type.padEnd(30)} ${countDisplay}${this.colors.reset}`
-            );
-          }
-        }
-        console.log();
-      }
 
       // Missing types
-      const missingTypes: string[] = [];
-      for (const [category, types] of Object.entries(allTypes)) {
-        for (const type of types) {
-          if (!implementedTypes.has(type)) {
-            missingTypes.push(`${category}:${type}`);
-          }
-        }
-      }
+      const missingTypes = Object.entries(allTypes).flatMap(([category, types]) =>
+        types.filter((type) => !implementedTypes.has(type)).map((type) => ({ category, type }))
+      );
 
-      if (missingTypes.length > 0) {
-        this.printSection('Missing Relationship Types');
+      if (isHuman) {
+        console.log();
+
+        // Overall statistics
+        this.printSection('Overall Statistics');
+        console.log(`  Total symbols: ${colors.cyan}${totalSymbolsCount}${colors.reset}`);
+        console.log(`  Total relationships: ${colors.cyan}${totalRelationships}${colors.reset}`);
+        console.log(`  Explicit relationships: ${colors.green}${explicitCount}${colors.reset}`);
         console.log(
-          `  ${this.colors.yellow}${missingTypes.length} types not yet implemented:${this.colors.reset}`
+          `  Inferred relationships: ${colors.yellow}${inferredCount}${colors.reset} (${((inferredCount / totalRelationships) * 100).toFixed(1)}%)`
         );
         console.log();
 
-        missingTypes.forEach((missing) => {
-          console.log(`    ${this.colors.dim}• ${missing}${this.colors.reset}`);
-        });
-        console.log();
-      }
+        // Category breakdown
+        this.printSection('Relationships by Category');
 
-      // Recommendations
-      this.printSection('Next Steps');
-      console.log(
-        `  ${this.colors.blue}ℹ${this.colors.reset} Run ${this.colors.cyan}tsdoc-edge relationship-stats --detailed${this.colors.reset} for full breakdown`
-      );
-      console.log(
-        `  ${this.colors.blue}ℹ${this.colors.reset} See ${this.colors.cyan}managed/workflows/relationship-system-roadmap.md${this.colors.reset} for implementation plan`
-      );
-      console.log();
+        for (const category of categoryOrder) {
+          const count = categoryMap.get(category) || 0;
+          const icon = count > 0 ? `${colors.green}✓` : `${colors.dim}○`;
+          const countDisplay = count > 0 ? colors.cyan + count : `${colors.dim}0`;
+
+          console.log(
+            `  ${icon}${colors.reset} ${category.padEnd(15)} ${countDisplay}${colors.reset}`
+          );
+        }
+        console.log();
+
+        // Implementation progress
+        this.printSection('Implementation Progress');
+
+        for (const { category, implemented, total } of progress) {
+          const percentage = total > 0 ? Math.round((implemented / total) * 100) : 0;
+          const progressBar = this.createProgressBar(percentage, 20);
+
+          console.log(
+            `  ${category.padEnd(15)} ${progressBar} ${percentage}% (${implemented}/${total})`
+          );
+        }
+
+        console.log();
+        console.log(
+          `  ${colors.bold}Overall Progress:${colors.reset} ${colors.cyan}${overallPercentage}%${colors.reset} (${implementedCount}/${totalTypes} types)`
+        );
+        console.log();
+
+        // Detailed breakdown
+        if (detailed) {
+          this.printSection('Detailed Breakdown by Type');
+
+          for (const [category, types] of Object.entries(allTypes)) {
+            console.log();
+            console.log(`  ${colors.bold}${category}:${colors.reset}`);
+
+            for (const type of types) {
+              const row = byType.find((r) => r.type === type);
+              const count = row ? row.count : 0;
+              const status = count > 0 ? `${colors.green}✓` : `${colors.red}✗`;
+              const countDisplay = count > 0 ? colors.cyan + count : `${colors.dim}-`;
+
+              console.log(
+                `    ${status}${colors.reset} ${type.padEnd(30)} ${countDisplay}${colors.reset}`
+              );
+            }
+          }
+          console.log();
+        }
+
+        if (missingTypes.length > 0) {
+          this.printSection('Missing Relationship Types');
+          console.log(
+            `  ${colors.yellow}${missingTypes.length} types not yet implemented:${colors.reset}`
+          );
+          console.log();
+
+          missingTypes.forEach(({ category, type }) => {
+            console.log(`    ${colors.dim}• ${category}:${type}${colors.reset}`);
+          });
+          console.log();
+        }
+
+        // Recommendations
+        this.printSection('Next Steps');
+        console.log(
+          `  ${colors.blue}ℹ${colors.reset} Run ${colors.cyan}tsdoc-edge relationship-stats --detailed${colors.reset} for full breakdown`
+        );
+        console.log(
+          `  ${colors.blue}ℹ${colors.reset} See ${colors.cyan}managed/workflows/relationship-system-roadmap.md${colors.reset} for implementation plan`
+        );
+        console.log();
+      } else {
+        // Categories shown by the text report first (fixed order, zero-filled), then any other
+        // category present in the database.
+        const extraCategories = byCategory
+          .map((c) => c.category)
+          .filter((category) => !categoryOrder.includes(category))
+          .sort();
+        const categories = [...categoryOrder, ...extraCategories].map((category) => ({
+          name: category,
+          count: categoryMap.get(category) || 0,
+        }));
+
+        this.printOutput(
+          'relationship-stats',
+          {
+            summary: {
+              totalSymbols: totalSymbolsCount,
+              totalRelationships,
+              explicitRelationships: explicitCount,
+              inferredRelationships: inferredCount,
+              inferredPercent:
+                totalRelationships > 0
+                  ? Number(((inferredCount / totalRelationships) * 100).toFixed(1))
+                  : 0,
+              implementedTypes: implementedCount,
+              totalTypes,
+              overallProgressPercent: overallPercentage,
+              detailed,
+            },
+            categories,
+            implementationProgress: progress.map(({ category, implemented, total }) => ({
+              category,
+              implementedTypes: implemented,
+              totalTypes: total,
+              percent: total > 0 ? Math.round((implemented / total) * 100) : 0,
+            })),
+            ...(detailed
+              ? {
+                  typeBreakdown: Object.entries(allTypes).flatMap(([category, types]) =>
+                    types.map((type) => {
+                      const count = byType.find((r) => r.type === type)?.count ?? 0;
+                      return { category, type, count, implemented: count > 0 };
+                    })
+                  ),
+                }
+              : {}),
+            missingTypes,
+          },
+          args
+        );
+      }
 
       dbManager.close();
 
@@ -248,22 +299,9 @@ export class RelationshipStatsCommand extends BaseCommand {
     const filled = Math.round((percentage / 100) * width);
     const empty = width - filled;
 
-    const filledBar = this.colors.green + '█'.repeat(filled);
-    const emptyBar = this.colors.dim + '░'.repeat(empty);
+    const filledBar = colors.green + '█'.repeat(filled);
+    const emptyBar = colors.dim + '░'.repeat(empty);
 
-    return filledBar + emptyBar + this.colors.reset;
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      bold: '\x1b[1m',
-      dim: '\x1b[2m',
-      green: '\x1b[32m',
-      yellow: '\x1b[33m',
-      blue: '\x1b[34m',
-      cyan: '\x1b[36m',
-      red: '\x1b[31m',
-    };
+    return filledBar + emptyBar + colors.reset;
   }
 }

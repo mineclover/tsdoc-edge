@@ -5,7 +5,7 @@
  */
 
 import { AnalyzeRelationshipsCommand } from './AnalyzeRelationshipsCommand';
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { RelationshipCheckCommand } from './RelationshipCheckCommand';
 import { RelationshipClustersCommand } from './RelationshipClustersCommand';
 import { RelationshipExportCommand } from './RelationshipExportCommand';
@@ -91,6 +91,9 @@ export class RelationshipCommand extends BaseCommand {
 Subcommands:
 ${subcommandList}
 
+Options:
+  --human          Output in human-readable format (default: XML); passed to the subcommand
+
 Examples:
   tsdoc-edge relationship query <symbol-id>
   tsdoc-edge relationship impact <symbol-id> --depth 5
@@ -100,6 +103,7 @@ Examples:
   tsdoc-edge relationship type-chain TypeA TypeB
   tsdoc-edge relationship cycles
   tsdoc-edge relationship roots
+  tsdoc-edge relationship stats --human
 
 Use 'tsdoc-edge relationship <subcommand> --help' for subcommand details.`;
   }
@@ -126,7 +130,7 @@ Use 'tsdoc-edge relationship <subcommand> --help' for subcommand details.`;
         console.log();
         console.log('Available subcommands:');
         for (const [name, { description }] of Object.entries(SUBCOMMANDS)) {
-          console.log(`  ${this.colors.cyan}${name.padEnd(12)}${this.colors.reset} ${description}`);
+          console.log(`  ${colors.cyan}${name.padEnd(12)}${colors.reset} ${description}`);
         }
         console.log();
         return this.failure(`Unknown subcommand: ${subcommandName}`);
@@ -137,12 +141,5 @@ Use 'tsdoc-edge relationship <subcommand> --help' for subcommand details.`;
       const subcommand = new CommandClass();
       return subcommand.execute(subcommandArgs);
     });
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      cyan: '\x1b[36m',
-    };
   }
 }
