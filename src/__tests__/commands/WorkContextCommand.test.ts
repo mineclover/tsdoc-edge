@@ -439,6 +439,46 @@ export function testFunc(): void {}
       expect(result).toBeDefined();
     });
 
+    it('prints a plain XML document by default and the colored report only with --human', async () => {
+      const dbManager = new DatabaseManager(dbPath, path.join(tempDir, '.tsdoc', 'data'));
+      dbManager.db
+        .prepare(`
+        INSERT INTO symbols (id, name, type, file_path, line, column, is_exported, is_public, created_at, updated_at, version, jsonl_line)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+      `)
+        .run(
+          'xml-mode-symbol',
+          'testFunc',
+          'function',
+          'src/TestFile.ts',
+          1,
+          0,
+          1,
+          1,
+          '2025-01-01',
+          '2025-01-01',
+          '1.0.0',
+          1
+        );
+      dbManager.close();
+
+      const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+      expect((await command.execute(['src/TestFile.ts'])).exitCode).toBe(0);
+      const xml = log.mock.calls.flat().join('\n');
+      expect(xml.startsWith('<work-context')).toBe(true);
+      expect(xml.trimEnd().endsWith('</work-context>')).toBe(true);
+      expect(xml).toContain('<symbol name="testFunc" type="function">');
+      expect(xml).not.toContain('\x1b[');
+
+      log.mockClear();
+      expect((await command.execute(['src/TestFile.ts', '--human'])).exitCode).toBe(0);
+      const human = log.mock.calls.flat().join('\n');
+      expect(human).toContain('Work Context: TestFile.ts');
+      expect(human).toContain('\x1b[');
+      expect(human).not.toContain('<work-context');
+    });
+
     it('should handle files with no symbols', async () => {
       // Create database
       const dbManager = new DatabaseManager(dbPath);

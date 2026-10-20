@@ -88,6 +88,16 @@ interface WorkContext {
   }>;
 }
 
+/** Actionable hint derived from a file's work context (shared by the human and XML outputs) */
+interface Recommendation {
+  /** Whether the hint is positive news or something to act on */
+  tone: 'good' | 'warning';
+  /** Leading marker used by the human output */
+  marker: '✓' | '•' | '⚠';
+  /** Plain-text message (no colors) */
+  message: string;
+}
+
 /**
  * Design Context Command - 설계 의사결정 추적을 위한 컨텍스트 제공
  *
@@ -132,7 +142,11 @@ export class DesignContextCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge design-context <file-path>';
+    return `tsdoc-edge design-context <file-path> [options]
+
+Options:
+  --human    Output in human-readable format (default: XML)
+  --llm      Generate LLM-friendly output (LLMs.txt format)`;
   }
 
   /**
@@ -149,7 +163,8 @@ export class DesignContextCommand extends BaseCommand {
       }
 
       const useLlmFormat = args.includes('--llm');
-      const targetFile = args[0];
+      const isHuman = this.hasFlag(args, '--human');
+      const targetFile = args.find((arg) => !arg.startsWith('-'));
 
       if (!targetFile) {
         this.printError('File path required');
@@ -173,9 +188,12 @@ export class DesignContextCommand extends BaseCommand {
         return this.failure('File not found');
       }
 
-      this.printHeader(`Work Context: ${path.basename(targetFile)}`);
-      console.log(`📄 ${targetFile}`);
-      console.log();
+      // Banner is part of the human and LLM text outputs; the default XML document stays clean
+      if (isHuman || useLlmFormat) {
+        this.printHeader(`Work Context: ${path.basename(targetFile)}`);
+        console.log(`📄 ${targetFile}`);
+        console.log();
+      }
 
       // Load database
       const dbCheck = this.checkDatabaseExists();
@@ -186,15 +204,18 @@ export class DesignContextCommand extends BaseCommand {
       try {
         const context = await this.gatherContext(absolutePath, targetFile, dbManager);
 
-        // Branch: LLM format vs Human-readable format
+        // Branch: LLM format vs Human-readable format vs XML (default)
         if (useLlmFormat) {
           const output = this.generateLlmOutput(context);
           console.log(output);
           return this.success('Context generated in LLM format');
         }
 
-        // Display context
-        this.displayContext(context);
+        if (isHuman) {
+          this.displayContext(context);
+        } else {
+          this.printXmlContext(context, args);
+        }
 
         return this.success('Context gathered successfully');
       } finally {
@@ -1270,7 +1291,29 @@ export class DesignContextCommand extends BaseCommand {
     console.log(`${colors.bold}💡 권장사항${colors.reset}`);
     console.log(colors.bold + divider + colors.reset);
 
-    const recommendations: string[] = [];
+    const recommendations = this.collectRecommendations(context);
+
+    if (recommendations.length > 0) {
+      for (const rec of recommendations) {
+        const color = rec.tone === 'good' ? colors.green : colors.yellow;
+        // The warning sign is double-width in most terminals, so it gets one extra space
+        const gap = rec.marker === '⚠' ? '  ' : ' ';
+        console.log(`  ${color}${rec.marker}${colors.reset}${gap}${rec.message}`);
+      }
+    } else {
+      console.log(
+        `  ${colors.green}✓${colors.reset} ${colors.dim}권장사항 없음 - 코드 상태 양호${colors.reset}`
+      );
+    }
+    console.log();
+  }
+
+  /**
+   * Derive actionable recommendations from the context
+   * @private
+   */
+  private collectRecommendations(context: WorkContext): Recommendation[] {
+    const recommendations: Recommendation[] = [];
 
     // Calculate relationship density
     const density =
@@ -1278,20 +1321,26 @@ export class DesignContextCommand extends BaseCommand {
 
     // Relationship density recommendation
     if (density >= 5.0) {
-      recommendations.push(
-        `${colors.green}✓${colors.reset} 관계 밀도 높음 (${density.toFixed(2)}) - 코드가 잘 연결됨`
-      );
+      recommendations.push({
+        tone: 'good',
+        marker: '✓',
+        message: `관계 밀도 높음 (${density.toFixed(2)}) - 코드가 잘 연결됨`,
+      });
     } else if (density < 2.0) {
-      recommendations.push(
-        `${colors.yellow}•${colors.reset} 관계 밀도 낮음 (${density.toFixed(2)}) - 관계 추가 권장`
-      );
+      recommendations.push({
+        tone: 'warning',
+        marker: '•',
+        message: `관계 밀도 낮음 (${density.toFixed(2)}) - 관계 추가 권장`,
+      });
     }
 
     // Test coverage recommendation
     if (context.tests.length === 0) {
-      recommendations.push(
-        `${colors.yellow}•${colors.reset} 테스트 커버리지 0% - 테스트 추가 필요`
-      );
+      recommendations.push({
+        tone: 'warning',
+        marker: '•',
+        message: '테스트 커버리지 0% - 테스트 추가 필요',
+      });
     }
 
     // Inferred relationships recommendation
@@ -1299,45 +1348,206 @@ export class DesignContextCommand extends BaseCommand {
       (r) => r.properties?.inferred === true
     ).length;
     if (inferredCount > 0 && inferredCount > context.relationships.length * 0.3) {
-      recommendations.push(
-        `${colors.yellow}•${colors.reset} 추론 관계 ${inferredCount}개 (${((inferredCount / context.relationships.length) * 100).toFixed(1)}%) - 명시적 문서화 권장`
-      );
+      recommendations.push({
+        tone: 'warning',
+        marker: '•',
+        message: `추론 관계 ${inferredCount}개 (${((inferredCount / context.relationships.length) * 100).toFixed(1)}%) - 명시적 문서화 권장`,
+      });
     }
 
     // Contracts recommendation
     if (context.contracts.length === 0 && context.symbols.some((s) => s.isPublic)) {
-      recommendations.push(
-        `${colors.yellow}•${colors.reset} 계약 명세 없음 - @precondition/@postcondition 추가 고려`
-      );
+      recommendations.push({
+        tone: 'warning',
+        marker: '•',
+        message: '계약 명세 없음 - @precondition/@postcondition 추가 고려',
+      });
     }
 
     // Design decisions recommendation
     if (context.decisions.length === 0 && context.relationships.length > 10) {
-      recommendations.push(`${colors.yellow}•${colors.reset} 설계 결정 기록 없음 - ADR 작성 권장`);
+      recommendations.push({
+        tone: 'warning',
+        marker: '•',
+        message: '설계 결정 기록 없음 - ADR 작성 권장',
+      });
     }
 
     // High impact warning
     if (context.usedBy.length > 10) {
-      recommendations.push(
-        `${colors.yellow}⚠${colors.reset}  높은 영향도 (${context.usedBy.length}개 파일) - 변경 시 신중히 테스트`
-      );
+      recommendations.push({
+        tone: 'warning',
+        marker: '⚠',
+        message: `높은 영향도 (${context.usedBy.length}개 파일) - 변경 시 신중히 테스트`,
+      });
     }
 
     // Error patterns recommendation
     if (context.errorPatterns.length > 0) {
-      recommendations.push(
-        `${colors.green}✓${colors.reset} ${context.errorPatterns.length}개 알려진 함정 문서화됨 - 참고하여 작업`
-      );
+      recommendations.push({
+        tone: 'good',
+        marker: '✓',
+        message: `${context.errorPatterns.length}개 알려진 함정 문서화됨 - 참고하여 작업`,
+      });
     }
 
-    if (recommendations.length > 0) {
-      recommendations.forEach((rec) => console.log(`  ${rec}`));
-    } else {
-      console.log(
-        `  ${colors.green}✓${colors.reset} ${colors.dim}권장사항 없음 - 코드 상태 양호${colors.reset}`
-      );
-    }
-    console.log();
+    return recommendations;
+  }
+
+  /**
+   * Print the design context as an XML document (default output)
+   *
+   * Carries the same facts as the human output. Lists that the human output truncates for
+   * readability (dependencies, impact) are complete here; relationship records stay sampled
+   * (first 5 per category) because only the statistics scale with large files.
+   * @private
+   */
+  private printXmlContext(context: WorkContext, args: string[]): void {
+    const relationshipTotal = context.relationships.length;
+    const percentOfRelationships = (count: number): number =>
+      relationshipTotal > 0 ? Number(((count / relationshipTotal) * 100).toFixed(1)) : 0;
+
+    const explicitCount = context.relationships.filter((r) => !r.properties?.inferred).length;
+    const inferredCount = context.relationships.filter(
+      (r) => r.properties?.inferred === true
+    ).length;
+    const strengthCount = (strength: 'strong' | 'medium' | 'weak'): number =>
+      context.relationships.filter((r) => r.strength === strength).length;
+
+    const relationshipsByCategory = this.groupBy(context.relationships, 'category');
+    const sortedCategories = Object.entries(relationshipsByCategory).sort(
+      (a, b) => b[1].length - a[1].length
+    );
+
+    const symbolNames = (ids: string[]): string =>
+      ids
+        .map((id) => context.symbols.find((s) => s.id === id)?.name || id.split('-').pop())
+        .join(', ');
+
+    const sampledRelationships = Object.entries(relationshipsByCategory).flatMap(
+      ([category, rels]) =>
+        rels.slice(0, 5).map((rel) => ({
+          category,
+          type: rel.type,
+          strength: rel.strength,
+          direction: rel.direction,
+          confidencePercent: Math.round(rel.confidence * 100),
+          from: symbolNames(rel.fromSymbols),
+          to: symbolNames(rel.toSymbols),
+          description: rel.description ?? '',
+          properties:
+            rel.properties && Object.keys(rel.properties).length > 0
+              ? Object.entries(rel.properties)
+                  .map(([k, v]) => `${k}=${JSON.stringify(v)}`)
+                  .join(', ')
+              : '',
+        }))
+    );
+
+    const density =
+      context.symbols.length > 0
+        ? Number((context.relationships.length / context.symbols.length).toFixed(2))
+        : 0;
+
+    this.printOutput(
+      'design-context',
+      {
+        summary: {
+          filePath: context.filePath,
+          symbolCount: context.symbols.length,
+          docCount: context.relatedDocs.length,
+          dependencyCount: context.dependencies.length,
+          testCount: context.tests.length,
+          usedByCount: context.usedBy.length,
+          contractCount: context.contracts.length,
+          decisionCount: context.decisions.length,
+          errorPatternCount: context.errorPatterns.length,
+          relationshipCount: relationshipTotal,
+        },
+        symbols: context.symbols.map((symbol) => ({
+          name: symbol.name,
+          type: symbol.type,
+          line: symbol.line,
+          isExported: symbol.isExported,
+          isPublic: symbol.isPublic,
+          summary: symbol.summary ?? '',
+        })),
+        docs: context.relatedDocs.map((doc) => {
+          const found = doc.path !== '(not found)';
+          return {
+            symbolRef: doc.symbolRef,
+            found,
+            path: found ? doc.path : '',
+            sourceFile: doc.sourceFile ?? '',
+            sourceLine: doc.sourceLine ?? '',
+          };
+        }),
+        dependencies: context.dependencies.map((dep) => ({
+          name: dep.name,
+          type: dep.type,
+          filePath: dep.filePath,
+          exists: fs.existsSync(path.resolve(process.cwd(), dep.filePath)),
+        })),
+        tests: context.tests.map((test) => ({
+          path: test.path,
+          type: test.type,
+          exists: fs.existsSync(path.resolve(process.cwd(), test.path)),
+          coverage: test.coverage ?? '',
+        })),
+        usedBy: context.usedBy.map((usage) => ({
+          name: usage.name,
+          type: usage.type,
+          filePath: usage.filePath,
+        })),
+        contracts: context.contracts.map((contract) => ({
+          symbolName: contract.symbolName,
+          description: contract.description,
+          preconditions: contract.preconditions.map((text) => ({ text })),
+          postconditions: contract.postconditions.map((text) => ({ text })),
+          invariants: contract.invariants.map((text) => ({ text })),
+        })),
+        decisions: context.decisions.map((decision) => ({
+          title: decision.title,
+          symbolName: decision.symbolName ?? '',
+          status: decision.status,
+          date: decision.date,
+          decision: decision.decision,
+          rationale: decision.rationale,
+        })),
+        errorPatterns: context.errorPatterns.map((error) => ({
+          errorType: error.errorType,
+          symbolName: error.symbolName,
+          message: error.message,
+          solution: error.solution,
+          prevention: error.prevention ?? '',
+        })),
+        relationshipStats: {
+          total: relationshipTotal,
+          density,
+          explicit: explicitCount,
+          explicitPercent: percentOfRelationships(explicitCount),
+          inferred: inferredCount,
+          inferredPercent: percentOfRelationships(inferredCount),
+          strong: strengthCount('strong'),
+          strongPercent: percentOfRelationships(strengthCount('strong')),
+          medium: strengthCount('medium'),
+          mediumPercent: percentOfRelationships(strengthCount('medium')),
+          weak: strengthCount('weak'),
+          weakPercent: percentOfRelationships(strengthCount('weak')),
+        },
+        relationshipCategories: sortedCategories.map(([category, rels]) => ({
+          category,
+          count: rels.length,
+          percent: percentOfRelationships(rels.length),
+        })),
+        relationships: sampledRelationships,
+        recommendations: this.collectRecommendations(context).map((rec) => ({
+          tone: rec.tone,
+          message: rec.message,
+        })),
+      },
+      args
+    );
   }
 
   private groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {

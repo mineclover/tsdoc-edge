@@ -94,7 +94,7 @@ export class InstallHookCommand extends BaseCommand {
         console.log(`${colors.yellow}⚠  Pre-commit hook already exists${colors.reset}`);
         console.log();
         console.log('To preserve existing hook, add this to your pre-commit script:');
-        console.log(`  ${colors.cyan}tsdoc-edge pre-commit-run${colors.reset}`);
+        console.log(`  ${colors.cyan}tsdoc-edge pre-commit-run --human${colors.reset}`);
         console.log();
         return { exitCode: 1, message: 'Hook already exists' };
       }
@@ -104,7 +104,7 @@ export class InstallHookCommand extends BaseCommand {
 # TSDoc Edge pre-commit hook
 # Auto-generated - do not edit manually
 
-npx tsdoc-edge pre-commit-run
+npx tsdoc-edge pre-commit-run --human
 exit $?
 `;
 

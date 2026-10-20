@@ -15,6 +15,15 @@ import { ConfigManager } from '../config/ConfigManager';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
+/** Parsed command-line options */
+interface TestExamplesOptions {
+  file?: string;
+  minQuality?: number;
+  complexity?: 'simple' | 'medium' | 'complex';
+  category?: 'basic-usage' | 'advanced-usage' | 'integration' | 'edge-case';
+  limit?: number;
+}
+
 /**
  * Test Examples Command
  *
@@ -79,11 +88,12 @@ export class TestExamplesCommand extends BaseCommand {
     return `tsdoc-edge test-examples [options]
 
 Options:
+  --human              Output in human-readable format (default: XML)
   --file <name>        Filter by test file name
   --min-quality <n>    Minimum quality score (0-10)
   --complexity <level> Filter by complexity: simple, medium, complex
   --category <cat>     Filter by category: basic-usage, advanced-usage, integration, edge-case
-  --limit <n>          Maximum examples to show (default: 20)
+  --limit <n>          Maximum examples to list in XML output (default: 20)
 
 Examples:
   tsdoc-edge tex                           Show top examples
@@ -104,13 +114,17 @@ Examples:
       return this.displayHelp();
     }
 
+    const isHuman = this.hasFlag(args, '--human');
+
     // Parse options
     const options = this.parseOptions(args);
 
-    console.log();
-    this.printHeader('Test Examples - Living Documentation');
-    console.log('Extract test cases to use as documentation examples');
-    console.log();
+    if (isHuman) {
+      console.log();
+      this.printHeader('Test Examples - Living Documentation');
+      console.log('Extract test cases to use as documentation examples');
+      console.log();
+    }
 
     try {
       const dbCheck = this.checkDatabaseExists();
@@ -123,8 +137,10 @@ Examples:
       const extractor = new TestExampleExtractor(dbManager);
 
       // Extract examples
-      this.printInfo('Extracting test examples...');
-      console.log();
+      if (isHuman) {
+        this.printInfo('Extracting test examples...');
+        console.log();
+      }
 
       const allExamples = extractor.extractAllExamples();
 
@@ -151,6 +167,14 @@ Examples:
 
       // Sort by quality
       examples.sort((a, b) => b.quality - a.quality);
+
+      if (!isHuman) {
+        this.printXmlOutput(allExamples, examples, options, args);
+        dbManager.close();
+        return examples.length === 0
+          ? { exitCode: 0, message: 'No examples found' }
+          : { exitCode: 0, message: 'Examples extracted' };
+      }
 
       // Display summary
       this.printSection('📊 Summary');
@@ -251,6 +275,72 @@ Examples:
   }
 
   /**
+   * Print the examples report as an XML document (default output)
+   * @private
+   */
+  private printXmlOutput(
+    allExamples: TestExample[],
+    examples: TestExample[],
+    options: TestExamplesOptions,
+    args: string[]
+  ): void {
+    const limit = options.limit !== undefined && options.limit > 0 ? options.limit : 20;
+    const shown = examples.slice(0, limit);
+    const qualityDistribution = this.getQualityDistribution(allExamples);
+    const complexityDistribution = this.getComplexityDistribution(allExamples);
+    const categoryDistribution = this.getCategoryDistribution(allExamples);
+
+    this.printOutput(
+      'test-examples',
+      {
+        summary: {
+          totalExamples: allExamples.length,
+          filteredExamples: examples.length,
+          shownExamples: shown.length,
+          limit,
+          // Only the filters that were actually given appear in the document
+          ...(options.file !== undefined ? { fileFilter: options.file } : {}),
+          ...(options.minQuality !== undefined ? { minQuality: options.minQuality } : {}),
+          ...(options.complexity !== undefined ? { complexityFilter: options.complexity } : {}),
+          ...(options.category !== undefined ? { categoryFilter: options.category } : {}),
+        },
+        qualityDistribution: {
+          high: qualityDistribution.high,
+          medium: qualityDistribution.medium,
+          low: qualityDistribution.low,
+        },
+        complexityDistribution: {
+          simple: complexityDistribution.simple,
+          medium: complexityDistribution.medium,
+          complex: complexityDistribution.complex,
+        },
+        categoryDistribution: {
+          basicUsage: categoryDistribution['basic-usage'],
+          advancedUsage: categoryDistribution['advanced-usage'],
+          integration: categoryDistribution.integration,
+          edgeCase: categoryDistribution['edge-case'],
+        },
+        recommendations: {
+          highQualityExamples: examples.filter((ex) => ex.quality >= 8).length,
+          simpleExamples: examples.filter((ex) => ex.complexity === 'simple').length,
+          basicUsageExamples: examples.filter((ex) => ex.category === 'basic-usage').length,
+        },
+        examples: shown.map((example, index) => ({
+          rank: index + 1,
+          description: example.description,
+          quality: example.quality,
+          complexity: example.complexity,
+          category: example.category,
+          file: example.filePath,
+          line: example.line,
+          testedSymbols: example.testedSymbols.map((name) => ({ name })),
+        })),
+      },
+      args
+    );
+  }
+
+  /**
    * Display a single example
    * @private
    */
@@ -316,12 +406,7 @@ Examples:
    * Parse command options
    * @private
    */
-  private parseOptions(args: string[]): {
-    file?: string;
-    minQuality?: number;
-    complexity?: 'simple' | 'medium' | 'complex';
-    category?: 'basic-usage' | 'advanced-usage' | 'integration' | 'edge-case';
-  } {
+  private parseOptions(args: string[]): TestExamplesOptions {
     const options: Record<string, unknown> = {};
 
     for (let i = 0; i < args.length; i++) {
@@ -338,6 +423,9 @@ Examples:
         i++;
       } else if (arg === '--category' && args[i + 1]) {
         options.category = args[i + 1];
+        i++;
+      } else if (arg === '--limit' && args[i + 1]) {
+        options.limit = parseInt(args[i + 1], 10);
         i++;
       }
     }

@@ -66,7 +66,12 @@ export class SyncCoverageCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge sync-coverage [coverage-file]\n\n  Default: coverage/coverage-final.json';
+    return `tsdoc-edge sync-coverage [coverage-file] [options]
+
+  Default: coverage/coverage-final.json
+
+  Options:
+    --human    Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -82,7 +87,9 @@ export class SyncCoverageCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const coveragePath = args[0] || 'coverage/coverage-final.json';
+      const isHuman = this.hasFlag(args, '--human');
+      const coveragePath =
+        args.find((arg) => !arg.startsWith('-')) || 'coverage/coverage-final.json';
 
       if (!fs.existsSync(coveragePath)) {
         this.printError(`Coverage file not found: ${coveragePath}`);
@@ -93,9 +100,11 @@ export class SyncCoverageCommand extends BaseCommand {
         return this.failure(`Coverage file not found: ${coveragePath}`);
       }
 
-      this.printHeader('Sync Test Coverage');
-      console.log(`Coverage file: ${colors.cyan}${coveragePath}${colors.reset}`);
-      console.log();
+      if (isHuman) {
+        this.printHeader('Sync Test Coverage');
+        console.log(`Coverage file: ${colors.cyan}${coveragePath}${colors.reset}`);
+        console.log();
+      }
 
       if (!this.dbManager) {
         const dbCheck = this.checkDatabaseExists();
@@ -111,14 +120,30 @@ export class SyncCoverageCommand extends BaseCommand {
         const coverageData = JSON.parse(fs.readFileSync(coveragePath, 'utf-8'));
         const fileCount = Object.keys(coverageData).length;
 
-        this.printSection('✅ Coverage File Read');
-        console.log(`Coverage format: ${colors.cyan}Istanbul/NYC${colors.reset}`);
-        console.log(`Total files in coverage: ${colors.green}${fileCount}${colors.reset}`);
-        console.log();
-        console.log(
-          `${colors.dim}Note: Full coverage sync requires CoverageSyncer integration${colors.reset}`
-        );
-        console.log();
+        if (isHuman) {
+          this.printSection('✅ Coverage File Read');
+          console.log(`Coverage format: ${colors.cyan}Istanbul/NYC${colors.reset}`);
+          console.log(`Total files in coverage: ${colors.green}${fileCount}${colors.reset}`);
+          console.log();
+          console.log(
+            `${colors.dim}Note: Full coverage sync requires CoverageSyncer integration${colors.reset}`
+          );
+          console.log();
+        } else {
+          this.printOutput(
+            'sync-coverage',
+            {
+              coverage: {
+                file: coveragePath,
+                format: 'Istanbul/NYC',
+                fileCount,
+                synced: false,
+                note: 'Full coverage sync requires CoverageSyncer integration',
+              },
+            },
+            args
+          );
+        }
 
         return this.success();
       } finally {

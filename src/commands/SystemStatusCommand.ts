@@ -62,8 +62,9 @@ export class SystemStatusCommand extends BaseCommand {
     return `tsdoc-edge system-status [options]
 
 Options:
+  --human   Output in human-readable format (default: XML)
   --json    Output as JSON
-  --compact Compact single-line output`;
+  --compact Compact summary (one line with --human)`;
   }
 
   /**
@@ -78,6 +79,7 @@ Options:
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
       const jsonOutput = args.includes('--json');
       const compact = args.includes('--compact');
 
@@ -91,10 +93,14 @@ Options:
 
         if (jsonOutput) {
           console.log(JSON.stringify(status, null, 2));
-        } else if (compact) {
+        } else if (isHuman && compact) {
           this.outputCompact(status);
-        } else {
+        } else if (isHuman) {
           this.outputFull(status);
+        } else if (compact) {
+          this.outputCompactXml(status, args);
+        } else {
+          this.outputXml(status, args);
         }
 
         return this.success();
@@ -293,6 +299,86 @@ Options:
     else grade = 'F';
 
     return { score, grade, factors };
+  }
+
+  /** Percentage of `count` in `total`, rounded to one decimal (matches the human output) */
+  private percentOf(count: number, total: number): number {
+    if (total === 0) return 0;
+    return Math.round((count / total) * 1000) / 10;
+  }
+
+  private outputXml(status: SystemStatus, args: string[]): void {
+    const { symbols, relationships, documents, validation, health } = status;
+
+    this.printOutput(
+      'system-status',
+      {
+        overview: {
+          timestamp: status.timestamp,
+          healthScore: health.score,
+          healthGrade: health.grade,
+          symbolCount: symbols.total,
+          relationshipCount: relationships.total,
+          relationshipTypeCount: relationships.types,
+          relationshipCategoryCount: relationships.categories,
+          documentCount: documents.total,
+          graphDensity: relationships.density,
+        },
+        healthFactors: health.factors.map((description) => ({ description })),
+        symbols: {
+          total: symbols.total,
+          documented: symbols.documented,
+          undocumented: symbols.undocumented,
+          coverage: symbols.coverage,
+          sourceTotal: symbols.sourceTotal,
+          sourceDocumented: symbols.sourceDocumented,
+          sourceCoverage: symbols.sourceCoverage,
+          testTotal: symbols.testTotal,
+          testPercent: this.percentOf(symbols.testTotal, symbols.total),
+        },
+        symbolTypes: Object.entries(symbols.byType).map(([type, count]) => ({
+          type,
+          count,
+          percent: this.percentOf(count, symbols.total),
+        })),
+        relationshipCategories: Object.entries(relationships.byCategory).map(
+          ([category, count]) => ({
+            category,
+            count,
+            percent: this.percentOf(count, relationships.total),
+          })
+        ),
+        documents: {
+          total: documents.total,
+          withSymbols: documents.withSymbols,
+          coverage: documents.coverage,
+        },
+        validation: {
+          errors: validation.errors,
+          warnings: validation.warnings,
+        },
+        validationIssues: validation.issues.map((description) => ({ description })),
+      },
+      args
+    );
+  }
+
+  private outputCompactXml(status: SystemStatus, args: string[]): void {
+    const { symbols, relationships, documents, health } = status;
+
+    this.printOutput(
+      'system-status',
+      {
+        summary: {
+          symbolCount: symbols.total,
+          relationshipCount: relationships.total,
+          relationshipTypeCount: relationships.types,
+          documentCount: documents.total,
+          healthGrade: health.grade,
+        },
+      },
+      args
+    );
   }
 
   private outputCompact(status: SystemStatus): void {

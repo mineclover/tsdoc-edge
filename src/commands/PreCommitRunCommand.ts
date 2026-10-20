@@ -45,6 +45,7 @@ export class PreCommitRunCommand extends BaseCommand {
     return `tsdoc-edge pre-commit-run [options]
 
   Options:
+    --human        Output in human-readable format (default: XML)
     --all          Check all files, not just staged
     --strict       Fail on warnings too
     --threshold=N  Override quality threshold (default: from config)`;
@@ -62,6 +63,7 @@ export class PreCommitRunCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
       const checkAll = args.includes('--all');
       const strict = args.includes('--strict');
       let _threshold: number | undefined;
@@ -72,8 +74,10 @@ export class PreCommitRunCommand extends BaseCommand {
         }
       }
 
-      console.log(`${colors.bold}TSDoc Edge - Pre-commit Check${colors.reset}`);
-      console.log();
+      if (isHuman) {
+        console.log(`${colors.bold}TSDoc Edge - Pre-commit Check${colors.reset}`);
+        console.log();
+      }
 
       const checker = new PreCommitChecker();
 
@@ -89,15 +93,43 @@ export class PreCommitRunCommand extends BaseCommand {
 
         // Print results
         if (report.fileResults.length === 0) {
-          console.log(`${colors.dim}No TypeScript files to check${colors.reset}`);
-          return { exitCode: 0, message: 'No files to check' };
+          const result = { exitCode: 0, message: 'No files to check' };
+          if (isHuman) {
+            console.log(`${colors.dim}No TypeScript files to check${colors.reset}`);
+          } else {
+            this.printXmlReport(report, strict, result, args);
+          }
+          return result;
+        }
+
+        // The exit code depends only on the report, never on the output mode
+        const hasFailures = report.fileResults.some((file) => !file.passed);
+        const hasWarnings = report.fileResults.some(
+          (file) => file.passed && file.averageCompleteness < 70
+        );
+
+        let result: CommandResult;
+        if (hasFailures) {
+          result = {
+            exitCode: 1,
+            message: `Pre-commit failed: ${report.failedFiles} file(s) below threshold`,
+          };
+        } else if (strict && hasWarnings) {
+          result = {
+            exitCode: 1,
+            message: 'Pre-commit passed with warnings (strict mode)',
+          };
+        } else {
+          result = { exitCode: 0, message: 'Pre-commit check passed' };
+        }
+
+        if (!isHuman) {
+          this.printXmlReport(report, strict, result, args);
+          return result;
         }
 
         console.log(`${colors.cyan}Checked ${report.fileResults.length} file(s)${colors.reset}`);
         console.log();
-
-        let hasFailures = false;
-        let hasWarnings = false;
 
         for (const file of report.fileResults) {
           const status = file.passed
@@ -116,14 +148,11 @@ export class PreCommitRunCommand extends BaseCommand {
           );
 
           if (!file.passed) {
-            hasFailures = true;
             for (const symbol of file.failedSymbols) {
               console.log(
                 `  ${colors.red}✗${colors.reset} ${symbol.name}: ${symbol.completeness}%`
               );
             }
-          } else if (file.averageCompleteness < 70) {
-            hasWarnings = true;
           }
         }
 
@@ -132,46 +161,88 @@ export class PreCommitRunCommand extends BaseCommand {
         console.log(`  Files: ${report.fileResults.length}`);
         console.log(`  Passed: ${colors.green}${report.passedFiles}${colors.reset}`);
         console.log(`  Failed: ${colors.red}${report.failedFiles}${colors.reset}`);
-        const avgScore =
-          report.fileResults.length > 0
-            ? Math.round(
-                report.fileResults.reduce((sum, f) => sum + f.averageCompleteness, 0) /
-                  report.fileResults.length
-              )
-            : 0;
-        console.log(`  Average: ${avgScore}%`);
+        console.log(`  Average: ${this.averageScore(report)}%`);
         console.log();
 
         if (hasFailures) {
           console.log(`${colors.red}✗ Pre-commit check failed${colors.reset}`);
           console.log(`${colors.dim}Run 'tsdoc-edge fix' to auto-fix issues${colors.reset}`);
-          return {
-            exitCode: 1,
-            message: `Pre-commit failed: ${report.failedFiles} file(s) below threshold`,
-          };
-        }
-
-        if (strict && hasWarnings) {
+        } else if (strict && hasWarnings) {
           console.log(
             `${colors.yellow}! Pre-commit passed with warnings (strict mode)${colors.reset}`
           );
-          return {
-            exitCode: 1,
-            message: 'Pre-commit passed with warnings (strict mode)',
-          };
+        } else {
+          console.log(`${colors.green}✓ Pre-commit check passed${colors.reset}`);
         }
-
-        console.log(`${colors.green}✓ Pre-commit check passed${colors.reset}`);
-        return { exitCode: 0, message: 'Pre-commit check passed' };
+        return result;
       } catch (error) {
         // Handle case where no staged files
         if (error instanceof Error && error.message.includes('No staged')) {
-          console.log(`${colors.dim}No staged TypeScript files to check${colors.reset}`);
-          return { exitCode: 0, message: 'No staged files' };
+          const result = { exitCode: 0, message: 'No staged files' };
+          if (isHuman) {
+            console.log(`${colors.dim}No staged TypeScript files to check${colors.reset}`);
+          } else {
+            this.printXmlReport(null, strict, result, args);
+          }
+          return result;
         }
         throw error;
       }
     });
+  }
+
+  /** Average completeness over all checked files, rounded to a whole percent */
+  private averageScore(report: PreCommitReport): number {
+    return report.fileResults.length > 0
+      ? Math.round(
+          report.fileResults.reduce((sum, f) => sum + f.averageCompleteness, 0) /
+            report.fileResults.length
+        )
+      : 0;
+  }
+
+  /**
+   * Print the pre-commit report as an XML document (default output)
+   *
+   * @param report - Checker report, or null when there are no staged files
+   * @param strict - Whether strict mode (fail on warnings) is active
+   * @param result - Result the command is about to return (exit code and message)
+   * @param args - Command arguments
+   */
+  private printXmlReport(
+    report: PreCommitReport | null,
+    strict: boolean,
+    result: CommandResult,
+    args: string[]
+  ): void {
+    const fileResults = report?.fileResults ?? [];
+
+    this.printOutput(
+      'pre-commit-results',
+      {
+        summary: {
+          totalFiles: fileResults.length,
+          passedFiles: report?.passedFiles ?? 0,
+          failedFiles: report?.failedFiles ?? 0,
+          averageScore: report ? this.averageScore(report) : 0,
+          strict,
+          status: result.exitCode === 0 ? 'passed' : 'failed',
+          exitCode: result.exitCode,
+          message: result.message ?? '',
+        },
+        files: fileResults.map((file) => ({
+          path: file.filePath,
+          passed: file.passed,
+          score: file.averageCompleteness,
+          failedSymbols: file.failedSymbols.map((symbol) => ({
+            name: symbol.name,
+            completeness: symbol.completeness,
+            line: symbol.line,
+          })),
+        })),
+      },
+      args
+    );
   }
 
   private getAllTsFiles(dir: string): string[] {
