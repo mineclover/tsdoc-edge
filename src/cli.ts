@@ -15,6 +15,7 @@ import { CommandRegistry } from './commands/CommandRegistry';
 import { registerAllCommands } from './commands/command-loader';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
+import { exitAfterFlush } from './utils/exitAfterFlush';
 
 /**
  * Calculate Levenshtein distance between two strings
@@ -103,7 +104,8 @@ async function main(): Promise<void> {
   if (commandName === '--version' || commandName === '-v' || commandName === 'version') {
     const version = require('../package.json').version;
     console.log(`tsdoc-edge v${version}`);
-    process.exit(0);
+    exitAfterFlush(0);
+    return;
   }
 
   // Track command execution
@@ -172,11 +174,11 @@ async function main(): Promise<void> {
   usageTracker.recordEvent(event);
 
   // Exit with appropriate code
-  process.exit(result.exitCode);
+  exitAfterFlush(result.exitCode);
 }
 
 // Run main function
 main().catch((error) => {
   console.error('\x1b[31m✗ Fatal error:\x1b[0m', error);
-  process.exit(1);
+  exitAfterFlush(1);
 });
