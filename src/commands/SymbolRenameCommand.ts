@@ -95,6 +95,7 @@ export class SymbolRenameCommand extends BaseCommand {
     new-symbol  New symbol name (without [[ ]])
 
   Options:
+    --human     Output in human-readable format (default: XML)
     --dry-run   Preview changes without applying
     --yes, -y   Auto-confirm all changes
     --base-dir=DIR  Base directory (default: managed)
@@ -124,6 +125,7 @@ export class SymbolRenameCommand extends BaseCommand {
         throw new Error('Missing required arguments: old-symbol and new-symbol');
       }
 
+      const isHuman = this.hasFlag(args, '--human');
       const oldSymbol = nonFlagArgs[0];
       const newSymbol = nonFlagArgs[1];
       const dryRun = args.includes('--dry-run');
@@ -131,15 +133,17 @@ export class SymbolRenameCommand extends BaseCommand {
       const baseDirArg = args.find((arg) => arg.startsWith('--base-dir='));
       const baseDir = baseDirArg ? baseDirArg.split('=')[1] : 'managed';
 
-      this.printHeader('Rename Symbol');
+      if (isHuman) {
+        this.printHeader('Rename Symbol');
 
-      if (dryRun) {
-        this.printInfo('Running in dry-run mode (no changes will be made)');
-        console.log();
+        if (dryRun) {
+          this.printInfo('Running in dry-run mode (no changes will be made)');
+          console.log();
+        }
+
+        // Step 1: Validate
+        this.printInfo('Step 1: Validating symbol rename...');
       }
-
-      // Step 1: Validate
-      this.printInfo('Step 1: Validating symbol rename...');
       const validation = await this.validate(oldSymbol, newSymbol, baseDir);
 
       if (validation.errors.length > 0) {
@@ -151,60 +155,77 @@ export class SymbolRenameCommand extends BaseCommand {
         return this.failure('Validation failed');
       }
 
-      if (validation.warnings.length > 0) {
-        console.log();
-        this.printWarning('Warnings:');
-        for (const warning of validation.warnings) {
-          console.log(`  ${colors.yellow}⚠${colors.reset} ${warning}`);
+      if (isHuman) {
+        if (validation.warnings.length > 0) {
+          console.log();
+          this.printWarning('Warnings:');
+          for (const warning of validation.warnings) {
+            console.log(`  ${colors.yellow}⚠${colors.reset} ${warning}`);
+          }
+          console.log();
         }
+
         console.log();
+        this.printSuccess('Validation passed');
+        console.log(`  Old Symbol: ${colors.cyan}[[${validation.oldSymbol}]]${colors.reset}`);
+        console.log(`  New Symbol: ${colors.cyan}[[${validation.newSymbol}]]${colors.reset}`);
+        console.log(
+          `  H1 Primary Definitions: ${colors.green}${validation.h1Count}${colors.reset}`
+        );
+        console.log(`  H2 Auxiliary Definitions: ${validation.h2Count}`);
+        console.log(`  Total References: ${validation.totalRefs}`);
+
+        // Step 2: Find references
+        console.log();
+        this.printInfo('Step 2: Finding all references...');
       }
-
-      console.log();
-      this.printSuccess('Validation passed');
-      console.log(`  Old Symbol: ${colors.cyan}[[${validation.oldSymbol}]]${colors.reset}`);
-      console.log(`  New Symbol: ${colors.cyan}[[${validation.newSymbol}]]${colors.reset}`);
-      console.log(`  H1 Primary Definitions: ${colors.green}${validation.h1Count}${colors.reset}`);
-      console.log(`  H2 Auxiliary Definitions: ${validation.h2Count}`);
-      console.log(`  Total References: ${validation.totalRefs}`);
-
-      // Step 2: Find references
-      console.log();
-      this.printInfo('Step 2: Finding all references...');
       const references = await this.updater.findReferences(
         validation.oldSymbol,
         baseDir,
         validation.newSymbol
       );
 
-      console.log();
-      this.printSuccess(
-        `Found ${references.length} references in ${new Set(references.map((r) => r.file)).size} files`
-      );
-
-      // Count by type
-      const h1Refs = references.filter((r) => r.type === 'h1-primary');
-      const h2Refs = references.filter((r) => r.type === 'h2-auxiliary');
-      const h3Refs = references.filter((r) => r.type === 'h3-sub-auxiliary');
-      const inlineRefs = references.filter((r) => r.type === 'inline');
-
-      console.log(`  H1 Primary: ${h1Refs.length}`);
-      console.log(`  H2 Auxiliary: ${h2Refs.length}`);
-      console.log(`  H3 Sub-auxiliary: ${h3Refs.length}`);
-      console.log(`  Inline: ${inlineRefs.length}`);
-
-      // Step 3: Preview changes
-      if (references.length > 0) {
+      if (isHuman) {
         console.log();
-        this.printInfo('Step 3: Preview of changes');
-        console.log();
-        this.previewChanges(validation, references, baseDir);
+        this.printSuccess(
+          `Found ${references.length} references in ${new Set(references.map((r) => r.file)).size} files`
+        );
+
+        // Count by type
+        const h1Refs = references.filter((r) => r.type === 'h1-primary');
+        const h2Refs = references.filter((r) => r.type === 'h2-auxiliary');
+        const h3Refs = references.filter((r) => r.type === 'h3-sub-auxiliary');
+        const inlineRefs = references.filter((r) => r.type === 'inline');
+
+        console.log(`  H1 Primary: ${h1Refs.length}`);
+        console.log(`  H2 Auxiliary: ${h2Refs.length}`);
+        console.log(`  H3 Sub-auxiliary: ${h3Refs.length}`);
+        console.log(`  Inline: ${inlineRefs.length}`);
+
+        // Step 3: Preview changes
+        if (references.length > 0) {
+          console.log();
+          this.printInfo('Step 3: Preview of changes');
+          console.log();
+          this.previewChanges(validation, references, baseDir);
+        }
       }
 
       // Step 4: Confirm
       if (!dryRun && !autoConfirm) {
-        console.log();
-        const confirmed = await this.confirm('Proceed with symbol rename?');
+        let confirmed: boolean;
+        if (isHuman) {
+          console.log();
+          confirmed = await this.confirm('Proceed with symbol rename?');
+        } else {
+          // Keep stdout a clean XML document: prompt on stderr, with the summary the
+          // human view would have shown before asking
+          const fileCount = new Set(references.map((r) => r.file)).size;
+          confirmed = await this.confirm(
+            `Rename [[${validation.oldSymbol}]] to [[${validation.newSymbol}]] (${references.length} references in ${fileCount} files)?`,
+            process.stderr
+          );
+        }
         if (!confirmed) {
           this.printWarning('Operation cancelled');
           return this.failure('Operation cancelled by user');
@@ -212,14 +233,24 @@ export class SymbolRenameCommand extends BaseCommand {
       }
 
       if (dryRun) {
-        console.log();
-        this.printInfo('Dry-run complete (no changes made)');
+        if (isHuman) {
+          console.log();
+          this.printInfo('Dry-run complete (no changes made)');
+        } else {
+          this.printOutput(
+            'symbol-rename',
+            this.buildXmlSections('dry-run', validation, references, baseDir, true),
+            args
+          );
+        }
         return this.success();
       }
 
       // Step 5: Apply changes
-      console.log();
-      this.printInfo('Step 4: Applying changes...');
+      if (isHuman) {
+        console.log();
+        this.printInfo('Step 4: Applying changes...');
+      }
 
       const updateResult = await this.updater.updateReferences(
         validation.oldSymbol,
@@ -233,6 +264,26 @@ export class SymbolRenameCommand extends BaseCommand {
           updateInline: true,
         }
       );
+
+      if (!isHuman) {
+        this.printOutput(
+          'symbol-rename',
+          {
+            ...this.buildXmlSections('renamed', validation, references, baseDir, false),
+            update: {
+              updated: updateResult.updated,
+              h1Count: updateResult.h1Count,
+              h2Count: updateResult.h2Count,
+              h3Count: updateResult.h3Count,
+              inlineCount: updateResult.inlineCount,
+            },
+            filesModified: updateResult.filesModified.map((file) => ({ path: file })),
+            errors: updateResult.errors.map(({ file, error }) => ({ file, error })),
+          },
+          args
+        );
+        return this.success();
+      }
 
       console.log(
         `  ${colors.green}✓${colors.reset} Updated ${updateResult.updated} references in ${updateResult.filesModified.length} files`
@@ -264,6 +315,62 @@ export class SymbolRenameCommand extends BaseCommand {
 
       return this.success();
     });
+  }
+
+  /**
+   * Build the XML sections shared by the dry-run and applied reports
+   */
+  private buildXmlSections(
+    status: 'dry-run' | 'renamed',
+    validation: RenameValidation,
+    references: SymbolReference[],
+    baseDir: string,
+    dryRun: boolean
+  ): Record<string, Record<string, unknown> | Array<Record<string, unknown>>> {
+    const byFile = new Map<string, SymbolReference[]>();
+    for (const ref of references) {
+      const group = byFile.get(ref.file) ?? [];
+      group.push(ref);
+      byFile.set(ref.file, group);
+    }
+    const countOf = (refs: SymbolReference[], type: SymbolReference['type']) =>
+      refs.filter((r) => r.type === type).length;
+
+    return {
+      summary: {
+        status,
+        oldSymbol: validation.oldSymbol,
+        newSymbol: validation.newSymbol,
+        baseDir,
+        dryRun,
+        h1Definitions: validation.h1Count,
+        h2Definitions: validation.h2Count,
+        totalReferences: validation.totalRefs,
+        referenceCount: references.length,
+        fileCount: byFile.size,
+      },
+      referenceTypes: {
+        h1Primary: countOf(references, 'h1-primary'),
+        h2Auxiliary: countOf(references, 'h2-auxiliary'),
+        h3SubAuxiliary: countOf(references, 'h3-sub-auxiliary'),
+        inline: countOf(references, 'inline'),
+      },
+      warnings: validation.warnings.map((message) => ({ message })),
+      files: Array.from(byFile, ([file, refs]) => ({
+        path: file,
+        h1Count: countOf(refs, 'h1-primary'),
+        h2Count: countOf(refs, 'h2-auxiliary'),
+        h3Count: countOf(refs, 'h3-sub-auxiliary'),
+        inlineCount: countOf(refs, 'inline'),
+      })),
+      references: references.map((ref) => ({
+        file: ref.file,
+        line: ref.line,
+        type: ref.type,
+        oldText: ref.oldText,
+        newText: ref.newText,
+      })),
+    };
   }
 
   /**
@@ -410,10 +517,13 @@ export class SymbolRenameCommand extends BaseCommand {
   /**
    * Confirm action with user
    */
-  private async confirm(message: string): Promise<boolean> {
+  private async confirm(
+    message: string,
+    output: NodeJS.WritableStream = process.stdout
+  ): Promise<boolean> {
     const rl = readline.createInterface({
       input: process.stdin,
-      output: process.stdout,
+      output,
     });
 
     return new Promise((resolve) => {

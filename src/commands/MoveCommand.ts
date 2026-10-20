@@ -42,6 +42,7 @@ export class MoveCommand extends BaseCommand {
 Move a documentation file and automatically update all references to it.
 
 Options:
+  --human      Output in human-readable format (default: XML)
   --dry-run    Show what would be changed without making changes
   --yes        Skip confirmation prompt
 
@@ -63,6 +64,7 @@ Examples:
       return this.displayHelp();
     }
 
+    const isHuman = this.hasFlag(args, '--human');
     const [sourcePath, destPath] = args.filter((a) => !a.startsWith('--'));
 
     if (!sourcePath || !destPath) {
@@ -92,12 +94,44 @@ Examples:
 
     // Find and update references
     const updater = new ReferenceUpdater(managedDir);
-    const refs = updater.findReferences(path.relative(managedDir, absSource));
+    const sourceRel = path.relative(managedDir, absSource);
+    const destRel = path.relative(managedDir, absDest);
+    const refs = updater.findReferences(sourceRel);
 
-    console.log(`Found ${refs.length} references`);
+    if (isHuman) {
+      console.log(`Found ${refs.length} references`);
+    }
 
-    updater.updateReferences(refs, path.relative(managedDir, absDest));
+    updater.updateReferences(refs, destRel);
     fs.renameSync(absSource, absDest);
+
+    if (!isHuman) {
+      const refsByFile = new Map<string, number>();
+      for (const ref of refs) {
+        refsByFile.set(ref.file, (refsByFile.get(ref.file) ?? 0) + 1);
+      }
+
+      this.printOutput(
+        'move-file',
+        {
+          summary: {
+            status: 'moved',
+            source: sourceRel,
+            destination: destRel,
+            referenceCount: refs.length,
+            filesUpdated: refsByFile.size,
+          },
+          references: refs.map((ref) => ({
+            file: path.relative(managedDir, ref.file),
+            line: ref.line,
+            type: ref.type,
+            oldText: ref.oldText,
+            newText: ref.newText,
+          })),
+        },
+        args
+      );
+    }
 
     return { exitCode: 0, message: 'Move completed' };
   }

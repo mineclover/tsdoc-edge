@@ -120,4 +120,70 @@ describe('AnalyzeCommand', () => {
       expect(result.error?.message).toBe('Analysis failed');
     });
   });
+
+  describe('output format', () => {
+    const capture = async (args: string[]): Promise<{ output: string; exitCode: number }> => {
+      mockFsExists.mockReturnValue(true);
+      const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const result = await command.execute(args);
+      return {
+        output: log.mock.calls.map((call) => call.join(' ')).join('\n'),
+        exitCode: result.exitCode,
+      };
+    };
+
+    it('prints only an XML document by default', async () => {
+      const { output, exitCode } = await capture(['src']);
+
+      expect(exitCode).toBe(0);
+      expect(output.startsWith('<code-analysis>')).toBe(true);
+      expect(output.endsWith('</code-analysis>')).toBe(true);
+      expect(output).toContain('<targetPath>src</targetPath>');
+      expect(output).toContain('<totalFiles>10</totalFiles>');
+      expect(output).toContain('<documentedPercent>80</documentedPercent>');
+      expect(output).toContain('<healthScore>80</healthScore>');
+      expect(output).not.toContain('\x1b[');
+    });
+
+    it('lists top issues and files needing attention in the XML document', async () => {
+      const report = mockChecker.analyze({} as never);
+      mockChecker.analyze = jest.fn().mockReturnValue({
+        ...report,
+        topIssues: [
+          {
+            symbolName: 'Foo',
+            qualityScore: 42,
+            filePath: 'src/foo.ts',
+            line: 7,
+            missing: ['summary', 'params'],
+          },
+        ],
+        filesNeedingAttention: ['src/foo.ts'],
+      });
+
+      const { output } = await capture(['src']);
+
+      expect(output).toContain('<topIssues count="1">');
+      expect(output).toContain('<symbolName>Foo</symbolName>');
+      expect(output).toContain('<missing>summary, params</missing>');
+      expect(output).toContain('<filesNeedingAttention count="1">');
+      expect(output).toContain('<path>src/foo.ts</path>');
+    });
+
+    it('treats --human before the path as a flag and analyzes the default directory', async () => {
+      const { output } = await capture(['--human']);
+
+      expect(mockChecker.analyze).toHaveBeenCalledWith(expect.objectContaining({ path: 'src' }));
+      expect(output).toContain('Overall Metrics');
+    });
+
+    it('prints the colored report with --human', async () => {
+      const { output } = await capture(['src', '--human']);
+
+      expect(output).toContain('TSDoc Edge - Code Analysis');
+      expect(output).toContain('Overall Metrics');
+      expect(output).toContain('\x1b[');
+      expect(output).not.toContain('<code-analysis>');
+    });
+  });
 });

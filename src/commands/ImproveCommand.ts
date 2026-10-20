@@ -62,6 +62,7 @@ export class ImproveCommand extends BaseCommand {
     return `tsdoc-edge improve [options]
 
   Options:
+    --human              Output in human-readable format (default: XML)
     --target=N           Target quality score (default: 80)
     --max-iterations=N   Maximum iterations (default: 10)
     --dry-run            Preview changes without modifying files
@@ -81,6 +82,7 @@ export class ImproveCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
       let targetScore = 80;
       let maxIterations = 10;
       let dryRun = false;
@@ -99,58 +101,101 @@ export class ImproveCommand extends BaseCommand {
         }
       }
 
-      console.log(`${colors.bold}TSDoc Edge - Recursive Improvement${colors.reset}`);
-      console.log();
-      console.log(`${colors.cyan}Target score: ${targetScore}/100${colors.reset}`);
-      console.log(`${colors.cyan}Max iterations: ${maxIterations}${colors.reset}`);
-      console.log(`${colors.cyan}Dry run: ${dryRun}${colors.reset}`);
-      console.log();
+      if (isHuman) {
+        console.log(`${colors.bold}TSDoc Edge - Recursive Improvement${colors.reset}`);
+        console.log();
+        console.log(`${colors.cyan}Target score: ${targetScore}/100${colors.reset}`);
+        console.log(`${colors.cyan}Max iterations: ${maxIterations}${colors.reset}`);
+        console.log(`${colors.cyan}Dry run: ${dryRun}${colors.reset}`);
+        console.log();
+      }
 
       const improver = this.improver || new RecursiveImprover();
 
-      console.log(`${colors.bold}🚀 Starting Recursive Improvement...${colors.reset}`);
-      console.log();
+      if (isHuman) {
+        console.log(`${colors.bold}🚀 Starting Recursive Improvement...${colors.reset}`);
+        console.log();
+      }
 
-      const result = improver.improve({
-        targetScore,
-        maxIterations,
-        dryRun,
-        verbose,
-        fixOptions: {
-          addSummary: true,
-          addParams: true,
-          addReturns: true,
-          addExamples: false,
-          addCustomTags: true,
-        },
-      });
+      const runImprover = () =>
+        improver.improve({
+          targetScore,
+          maxIterations,
+          dryRun,
+          verbose,
+          fixOptions: {
+            addSummary: true,
+            addParams: true,
+            addReturns: true,
+            addExamples: false,
+            addCustomTags: true,
+          },
+        });
+      // --verbose progress is plain text: keep it off stdout so the XML document stays well-formed
+      const result = isHuman ? runImprover() : this.withLogsOnStderr(runImprover);
 
-      console.log();
-      console.log(`${colors.bold}📊 Results${colors.reset}`);
-      console.log();
-      console.log(`   Initial Score: ${colors.cyan}${result.initialScore}/100${colors.reset}`);
-      console.log(`   Final Score: ${colors.green}${result.finalScore}/100${colors.reset}`);
-      console.log(
-        `   Improvement: ${colors.green}+${result.finalScore - result.initialScore}${colors.reset} points`
-      );
-      console.log(`   Iterations: ${result.iterations}`);
-      console.log(`   Files Modified: ${result.filesModified}`);
-      console.log(`   Symbols Fixed: ${result.symbolsFixed}`);
-      console.log();
-
-      if (result.finalScore >= targetScore) {
-        console.log(`${colors.green}🎉 Target score reached!${colors.reset}`);
-      } else {
+      if (isHuman) {
+        console.log();
+        console.log(`${colors.bold}📊 Results${colors.reset}`);
+        console.log();
+        console.log(`   Initial Score: ${colors.cyan}${result.initialScore}/100${colors.reset}`);
+        console.log(`   Final Score: ${colors.green}${result.finalScore}/100${colors.reset}`);
         console.log(
-          `${colors.yellow}⚠️  Target score not reached after ${result.iterations} iterations${colors.reset}`
+          `   Improvement: ${colors.green}+${result.finalScore - result.initialScore}${colors.reset} points`
+        );
+        console.log(`   Iterations: ${result.iterations}`);
+        console.log(`   Files Modified: ${result.filesModified}`);
+        console.log(`   Symbols Fixed: ${result.symbolsFixed}`);
+        console.log();
+
+        if (result.finalScore >= targetScore) {
+          console.log(`${colors.green}🎉 Target score reached!${colors.reset}`);
+        } else {
+          console.log(
+            `${colors.yellow}⚠️  Target score not reached after ${result.iterations} iterations${colors.reset}`
+          );
+        }
+        console.log();
+      } else {
+        this.printOutput(
+          'recursive-improvement',
+          {
+            summary: {
+              targetScore,
+              maxIterations,
+              dryRun,
+              targetReached: result.finalScore >= targetScore,
+            },
+            results: {
+              initialScore: result.initialScore,
+              finalScore: result.finalScore,
+              improvement: result.finalScore - result.initialScore,
+              iterations: result.iterations,
+              filesModified: result.filesModified,
+              symbolsFixed: result.symbolsFixed,
+            },
+          },
+          args
         );
       }
-      console.log();
 
       return {
         exitCode: result.finalScore >= targetScore ? 0 : 1,
         message: `Improved from ${result.initialScore} to ${result.finalScore}`,
       };
     });
+  }
+
+  /**
+   * Run `fn` with console.log redirected to stderr
+   */
+  private withLogsOnStderr<T>(fn: () => T): T {
+    const originalLog = console.log;
+    console.log = (...parts: unknown[]) => console.error(...parts);
+    try {
+      return fn();
+    } finally {
+      console.log = originalLog;
+    }
   }
 }

@@ -71,6 +71,7 @@ export class AnalyzeCommand extends BaseCommand {
   Default directory: src
 
   Options:
+    --human            Output in human-readable format (default: XML)
     --no-children      Don't analyze child symbols
     --include-private  Include private symbols
     --min-score=N      Minimum quality score (default: 70)`;
@@ -89,7 +90,9 @@ export class AnalyzeCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      let targetPath = args[0] || 'src';
+      const isHuman = this.hasFlag(args, '--human');
+      // Option flags may come first, so the default is only replaced by a positional path below
+      let targetPath = 'src';
       let includeChildren = true;
       let includePrivate = false;
       let minQualityScore = 70;
@@ -107,18 +110,22 @@ export class AnalyzeCommand extends BaseCommand {
         }
       }
 
-      this.printHeader('TSDoc Edge - Code Analysis');
+      if (isHuman) {
+        this.printHeader('TSDoc Edge - Code Analysis');
+      }
 
       if (!fs.existsSync(targetPath)) {
         this.printError(`Path not found: ${targetPath}`);
         return this.failure(`Path not found: ${targetPath}`);
       }
 
-      this.printInfo(`Analyzing: ${targetPath}`);
-      this.printInfo(`Include children: ${includeChildren}`);
-      this.printInfo(`Include private: ${includePrivate}`);
-      this.printInfo(`Min quality score: ${minQualityScore}`);
-      console.log();
+      if (isHuman) {
+        this.printInfo(`Analyzing: ${targetPath}`);
+        this.printInfo(`Include children: ${includeChildren}`);
+        this.printInfo(`Include private: ${includePrivate}`);
+        this.printInfo(`Min quality score: ${minQualityScore}`);
+        console.log();
+      }
 
       const report = this.checker.analyze({
         path: targetPath,
@@ -128,10 +135,66 @@ export class AnalyzeCommand extends BaseCommand {
         generateSuggestions: false,
       });
 
-      this.printAnalysisReport(report);
+      if (isHuman) {
+        this.printAnalysisReport(report);
+      } else {
+        this.printAnalysisXml(
+          report,
+          { targetPath, includeChildren, includePrivate, minQualityScore },
+          args
+        );
+      }
 
       return this.success();
     });
+  }
+
+  /**
+   * Print analysis report as XML (default output)
+   */
+  private printAnalysisXml(
+    report: AnalysisReport,
+    options: {
+      targetPath: string;
+      includeChildren: boolean;
+      includePrivate: boolean;
+      minQualityScore: number;
+    },
+    args: string[]
+  ): void {
+    const { metrics } = report;
+    const percent = (part: number, whole: number): number =>
+      whole > 0 ? Math.round((part / whole) * 100) : 0;
+
+    this.printOutput(
+      'code-analysis',
+      {
+        summary: { ...options },
+        metrics: {
+          totalFiles: metrics.totalFiles,
+          totalSymbols: metrics.totalSymbols,
+          publicSymbols: metrics.publicSymbols,
+          documentedSymbols: metrics.documentedSymbols,
+          documentedPercent: percent(metrics.documentedSymbols, metrics.totalSymbols),
+          fullyDocumentedSymbols: metrics.fullyDocumentedSymbols,
+          fullyDocumentedPercent: percent(metrics.fullyDocumentedSymbols, metrics.totalSymbols),
+          filesWithTests: metrics.filesWithTests,
+          filesWithoutTests: metrics.filesWithoutTests,
+          testCoveragePercent: percent(metrics.filesWithTests, metrics.totalFiles),
+          avgQualityScore: metrics.avgQualityScore,
+          healthScore: metrics.healthScore,
+        },
+        topIssues: report.topIssues.slice(0, 10).map((issue) => ({
+          symbolName: issue.symbolName,
+          qualityScore: issue.qualityScore,
+          filePath: issue.filePath,
+          line: issue.line,
+          missing: issue.missing.join(', '),
+        })),
+        filesNeedingAttention: report.filesNeedingAttention.map((file) => ({ path: file })),
+      },
+      args
+    );
   }
 
   /**

@@ -13,7 +13,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import type { ParsedDocSymbols } from '../types/feature';
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Symbol information with full context
@@ -98,7 +98,10 @@ export class SymbolQueryCommand extends BaseCommand {
     info <symbol>     Show detailed symbol information
     backlinks <symbol> Show documents that reference the symbol
     similar <symbol>  Find symbols with similar names
-    stats             Show symbol statistics`;
+    stats             Show symbol statistics
+
+  Options:
+    --human           Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -114,15 +117,20 @@ export class SymbolQueryCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const isHuman = this.hasFlag(args, '--human');
       const docsDir = this.findDocsDir(args);
       const subcommand = args.find((arg) => !arg.startsWith('--')) || 'help';
 
-      this.printHeader('Symbol Query');
+      if (isHuman) {
+        this.printHeader('Symbol Query');
+        this.printInfo('Building symbol index...');
+      }
 
       // Build symbol index
-      this.printInfo('Building symbol index...');
-      await this.buildIndex(docsDir);
-      console.log();
+      await this.buildIndex(docsDir, isHuman);
+      if (isHuman) {
+        console.log();
+      }
 
       // Execute subcommand
       switch (subcommand) {
@@ -137,7 +145,7 @@ export class SymbolQueryCommand extends BaseCommand {
         case 'similar':
           return this.findSimilar(args);
         case 'stats':
-          return this.showStats();
+          return this.showStats(args);
         default:
           return this.showHelp();
       }
@@ -147,7 +155,7 @@ export class SymbolQueryCommand extends BaseCommand {
   /**
    * Build symbol index from documentation
    */
-  private async buildIndex(docsDir: string): Promise<void> {
+  private async buildIndex(docsDir: string, verbose: boolean): Promise<void> {
     const files = this.findMarkdownFiles(docsDir);
 
     for (const filePath of files) {
@@ -161,7 +169,9 @@ export class SymbolQueryCommand extends BaseCommand {
       }
     }
 
-    this.printSuccess(`Indexed ${this.symbols.size} symbols from ${files.length} documents`);
+    if (verbose) {
+      this.printSuccess(`Indexed ${this.symbols.size} symbols from ${files.length} documents`);
+    }
   }
 
   /**
@@ -226,10 +236,13 @@ export class SymbolQueryCommand extends BaseCommand {
    * List all symbols
    */
   private listSymbols(args: string[]): CommandResult {
+    const isHuman = this.hasFlag(args, '--human');
     const showAll = args.includes('--all');
     const pattern = args.find((arg) => arg.startsWith('--pattern='))?.split('=')[1];
 
-    this.printSection('Symbol List');
+    if (isHuman) {
+      this.printSection('Symbol List');
+    }
 
     let symbols = Array.from(this.symbols.entries());
 
@@ -247,6 +260,28 @@ export class SymbolQueryCommand extends BaseCommand {
     // Sort by name
     symbols.sort(([a], [b]) => a.localeCompare(b));
 
+    if (!isHuman) {
+      this.printOutput(
+        'symbol-list',
+        {
+          summary: {
+            totalCount: symbols.length,
+            ...(pattern ? { pattern } : {}),
+            showAll,
+          },
+          symbols: symbols.map(([name, info]) => ({
+            name,
+            hasPrimary: Boolean(info.primary),
+            ...this.primaryLocation(info.primary),
+            refCount: info.references.length,
+            auxCount: info.auxiliaries.length,
+          })),
+        },
+        args
+      );
+      return this.success();
+    }
+
     if (symbols.length === 0) {
       this.printWarning('No symbols found');
       return this.success();
@@ -261,17 +296,17 @@ export class SymbolQueryCommand extends BaseCommand {
 
       if (info.primary) {
         console.log(
-          `     ${this.colors.dim}${this.relativePath(info.primary.filePath)}:${info.primary.line}${this.colors.reset}`
+          `     ${colors.dim}${this.relativePath(info.primary.filePath)}:${info.primary.line}${colors.reset}`
         );
       } else {
-        console.log(`     ${this.colors.red}No primary definition${this.colors.reset}`);
+        console.log(`     ${colors.red}No primary definition${colors.reset}`);
       }
 
-      console.log(`     ${this.colors.dim}${refCount} refs, ${auxCount} aux${this.colors.reset}`);
+      console.log(`     ${colors.dim}${refCount} refs, ${auxCount} aux${colors.reset}`);
       console.log();
     }
 
-    console.log(`${this.colors.dim}Total: ${symbols.length} symbols${this.colors.reset}`);
+    console.log(`${colors.dim}Total: ${symbols.length} symbols${colors.reset}`);
     console.log();
 
     return this.success();
@@ -288,10 +323,32 @@ export class SymbolQueryCommand extends BaseCommand {
       return this.failure('Missing search query');
     }
 
-    this.printSection(`Search: "${query}"`);
+    const isHuman = this.hasFlag(args, '--human');
+    if (isHuman) {
+      this.printSection(`Search: "${query}"`);
+    }
 
     const regex = new RegExp(query, 'i');
     const matches = Array.from(this.symbols.entries()).filter(([name]) => regex.test(name));
+
+    if (!isHuman) {
+      this.printOutput(
+        'symbol-search',
+        {
+          summary: {
+            query,
+            matchCount: matches.length,
+          },
+          matches: matches.map(([name, info]) => ({
+            name,
+            hasPrimary: Boolean(info.primary),
+            ...this.primaryLocation(info.primary),
+          })),
+        },
+        args
+      );
+      return this.success();
+    }
 
     if (matches.length === 0) {
       this.printWarning('No matches found');
@@ -309,7 +366,7 @@ export class SymbolQueryCommand extends BaseCommand {
       console.log();
     }
 
-    console.log(`${this.colors.dim}Found ${matches.length} matches${this.colors.reset}`);
+    console.log(`${colors.dim}Found ${matches.length} matches${colors.reset}`);
     console.log();
 
     return this.success();
@@ -319,6 +376,7 @@ export class SymbolQueryCommand extends BaseCommand {
    * Show detailed symbol information
    */
   private showSymbolInfo(args: string[]): CommandResult {
+    const isHuman = this.hasFlag(args, '--human');
     const symbolName = args.find((arg) => !arg.startsWith('--') && arg !== 'info');
 
     if (!symbolName) {
@@ -344,27 +402,66 @@ export class SymbolQueryCommand extends BaseCommand {
       return this.failure('Symbol not found');
     }
 
+    if (!isHuman) {
+      // Mirror the human view: first 10 references unless --all is given
+      const maxRefs = args.includes('--all') ? info.references.length : 10;
+      const shownRefs = this.takeReferencesGroupedByFile(info.references, maxRefs);
+
+      this.printOutput(
+        'symbol-info',
+        {
+          details: {
+            name: info.name,
+            hasPrimary: Boolean(info.primary),
+            ...(info.primary
+              ? {
+                  primaryFile: this.relativePath(info.primary.filePath),
+                  primaryLine: info.primary.line,
+                  primaryContent: info.primary.content,
+                }
+              : {}),
+            ...(info.sourceFilePath ? { sourceFile: info.sourceFilePath } : {}),
+            auxiliaryCount: info.auxiliaries.length,
+            referenceCount: info.references.length,
+            shownReferenceCount: shownRefs.length,
+          },
+          auxiliaries: info.auxiliaries.map((aux) => ({
+            filePath: this.relativePath(aux.filePath),
+            line: aux.line,
+            level: aux.level,
+          })),
+          references: shownRefs.map((ref) => ({
+            filePath: this.relativePath(ref.filePath),
+            line: ref.line,
+            context: ref.context,
+          })),
+        },
+        args
+      );
+      return this.success();
+    }
+
     this.printSection(`Symbol: [[${info.name}]]`);
 
     // Primary definition
     if (info.primary) {
-      console.log(`${this.colors.green}✅ Primary Definition (H1):${this.colors.reset}`);
+      console.log(`${colors.green}✅ Primary Definition (H1):${colors.reset}`);
       console.log(`   File: ${this.relativePath(info.primary.filePath)}:${info.primary.line}`);
       if (info.sourceFilePath) {
-        console.log(`   Source: ${this.colors.cyan}${info.sourceFilePath}${this.colors.reset}`);
+        console.log(`   Source: ${colors.cyan}${info.sourceFilePath}${colors.reset}`);
       }
       console.log();
-      console.log(`   ${this.colors.dim}${info.primary.content}${this.colors.reset}`);
+      console.log(`   ${colors.dim}${info.primary.content}${colors.reset}`);
       console.log();
     } else {
-      console.log(`${this.colors.red}❌ No primary definition${this.colors.reset}`);
+      console.log(`${colors.red}❌ No primary definition${colors.reset}`);
       console.log();
     }
 
     // Auxiliaries
     if (info.auxiliaries.length > 0) {
       console.log(
-        `${this.colors.yellow}Auxiliary Definitions (H${info.auxiliaries[0].level}):${this.colors.reset} ${info.auxiliaries.length}`
+        `${colors.yellow}Auxiliary Definitions (H${info.auxiliaries[0].level}):${colors.reset} ${info.auxiliaries.length}`
       );
       for (const aux of info.auxiliaries) {
         console.log(`   - ${this.relativePath(aux.filePath)}:${aux.line}`);
@@ -377,7 +474,7 @@ export class SymbolQueryCommand extends BaseCommand {
       const showAll = args.includes('--all');
       const maxRefs = showAll ? info.references.length : 10;
 
-      console.log(`${this.colors.cyan}References:${this.colors.reset} ${info.references.length}`);
+      console.log(`${colors.cyan}References:${colors.reset} ${info.references.length}`);
 
       // Group by file
       const byFile = new Map<string, typeof info.references>();
@@ -391,7 +488,7 @@ export class SymbolQueryCommand extends BaseCommand {
       let count = 0;
       for (const [filePath, refs] of byFile.entries()) {
         if (count >= maxRefs) break;
-        console.log(`   ${this.colors.dim}${this.relativePath(filePath)}${this.colors.reset}`);
+        console.log(`   ${colors.dim}${this.relativePath(filePath)}${colors.reset}`);
         for (const ref of refs) {
           if (count >= maxRefs) break;
           console.log(`      L${ref.line}: ${ref.context.substring(0, 80)}...`);
@@ -401,12 +498,12 @@ export class SymbolQueryCommand extends BaseCommand {
 
       if (info.references.length > maxRefs) {
         console.log(
-          `   ${this.colors.dim}... and ${info.references.length - maxRefs} more (use --all to show all)${this.colors.reset}`
+          `   ${colors.dim}... and ${info.references.length - maxRefs} more (use --all to show all)${colors.reset}`
         );
       }
       console.log();
     } else {
-      console.log(`${this.colors.yellow}⚠️  No references found${this.colors.reset}`);
+      console.log(`${colors.yellow}⚠️  No references found${colors.reset}`);
       console.log();
     }
 
@@ -417,6 +514,7 @@ export class SymbolQueryCommand extends BaseCommand {
    * Show backlinks (documents that reference this symbol)
    */
   private showBacklinks(args: string[]): CommandResult {
+    const isHuman = this.hasFlag(args, '--human');
     const symbolName = args.find((arg) => !arg.startsWith('--') && arg !== 'backlinks');
 
     if (!symbolName) {
@@ -431,7 +529,9 @@ export class SymbolQueryCommand extends BaseCommand {
       return this.failure('Symbol not found');
     }
 
-    this.printSection(`Backlinks: [[${symbolName}]]`);
+    if (isHuman) {
+      this.printSection(`Backlinks: [[${symbolName}]]`);
+    }
 
     // Collect all files that reference this symbol
     const files = new Set<string>();
@@ -442,6 +542,27 @@ export class SymbolQueryCommand extends BaseCommand {
 
     for (const aux of info.auxiliaries) {
       files.add(aux.filePath);
+    }
+
+    if (!isHuman) {
+      this.printOutput(
+        'symbol-backlinks',
+        {
+          summary: {
+            symbolName,
+            documentCount: files.size,
+          },
+          documents: Array.from(files)
+            .sort()
+            .map((filePath) => ({
+              path: this.relativePath(filePath),
+              auxiliaryCount: info.auxiliaries.filter((a) => a.filePath === filePath).length,
+              referenceCount: info.references.filter((r) => r.filePath === filePath).length,
+            })),
+        },
+        args
+      );
+      return this.success();
     }
 
     if (files.size === 0) {
@@ -458,13 +579,11 @@ export class SymbolQueryCommand extends BaseCommand {
       console.log(`  📄 ${this.relativePath(filePath)}`);
 
       if (auxs.length > 0) {
-        console.log(
-          `     ${this.colors.yellow}${auxs.length} auxiliary def(s)${this.colors.reset}`
-        );
+        console.log(`     ${colors.yellow}${auxs.length} auxiliary def(s)${colors.reset}`);
       }
 
       if (refs.length > 0) {
-        console.log(`     ${this.colors.cyan}${refs.length} reference(s)${this.colors.reset}`);
+        console.log(`     ${colors.cyan}${refs.length} reference(s)${colors.reset}`);
       }
 
       console.log();
@@ -477,6 +596,7 @@ export class SymbolQueryCommand extends BaseCommand {
    * Find similar symbols
    */
   private findSimilar(args: string[]): CommandResult {
+    const isHuman = this.hasFlag(args, '--human');
     const symbolName = args.find((arg) => !arg.startsWith('--') && arg !== 'similar');
 
     if (!symbolName) {
@@ -484,9 +604,33 @@ export class SymbolQueryCommand extends BaseCommand {
       return this.failure('Missing symbol name');
     }
 
-    this.printSection(`Similar to: "${symbolName}"`);
+    if (isHuman) {
+      this.printSection(`Similar to: "${symbolName}"`);
+    }
 
     const similar = this.findSimilarSymbols(symbolName, 10);
+
+    if (!isHuman) {
+      this.printOutput(
+        'similar-symbols',
+        {
+          summary: {
+            target: symbolName,
+            foundCount: similar.length,
+          },
+          similar: similar.map((name) => {
+            const primary = this.symbols.get(name)?.primary;
+            return {
+              name,
+              hasPrimary: Boolean(primary),
+              ...this.primaryLocation(primary),
+            };
+          }),
+        },
+        args
+      );
+      return this.success();
+    }
 
     if (similar.length === 0) {
       this.printWarning('No similar symbols found');
@@ -501,7 +645,7 @@ export class SymbolQueryCommand extends BaseCommand {
 
       if (info.primary) {
         console.log(
-          `     ${this.colors.dim}${this.relativePath(info.primary.filePath)}:${info.primary.line}${this.colors.reset}`
+          `     ${colors.dim}${this.relativePath(info.primary.filePath)}:${info.primary.line}${colors.reset}`
         );
       }
 
@@ -514,8 +658,11 @@ export class SymbolQueryCommand extends BaseCommand {
   /**
    * Show statistics
    */
-  private showStats(): CommandResult {
-    this.printSection('Symbol Statistics');
+  private showStats(args: string[]): CommandResult {
+    const isHuman = this.hasFlag(args, '--human');
+    if (isHuman) {
+      this.printSection('Symbol Statistics');
+    }
 
     const withPrimary = Array.from(this.symbols.values()).filter((info) => info.primary).length;
     const withoutPrimary = this.symbols.size - withPrimary;
@@ -528,13 +675,32 @@ export class SymbolQueryCommand extends BaseCommand {
       totalAux += info.auxiliaries.length;
     }
 
-    console.log(`  Total symbols: ${this.colors.cyan}${this.symbols.size}${this.colors.reset}`);
-    console.log(`  With primary: ${this.colors.green}${withPrimary}${this.colors.reset}`);
-    console.log(`  Without primary: ${this.colors.red}${withoutPrimary}${this.colors.reset}`);
-    console.log(`  Total references: ${this.colors.cyan}${totalRefs}${this.colors.reset}`);
-    console.log(`  Total auxiliaries: ${this.colors.yellow}${totalAux}${this.colors.reset}`);
+    if (!isHuman) {
+      this.printOutput(
+        'symbol-statistics',
+        {
+          summary: {
+            totalSymbols: this.symbols.size,
+            withPrimary,
+            withoutPrimary,
+            totalReferences: totalRefs,
+            totalAuxiliaries: totalAux,
+            avgReferencesPerSymbol:
+              this.symbols.size > 0 ? (totalRefs / this.symbols.size).toFixed(1) : '0.0',
+          },
+        },
+        args
+      );
+      return this.success();
+    }
+
+    console.log(`  Total symbols: ${colors.cyan}${this.symbols.size}${colors.reset}`);
+    console.log(`  With primary: ${colors.green}${withPrimary}${colors.reset}`);
+    console.log(`  Without primary: ${colors.red}${withoutPrimary}${colors.reset}`);
+    console.log(`  Total references: ${colors.cyan}${totalRefs}${colors.reset}`);
+    console.log(`  Total auxiliaries: ${colors.yellow}${totalAux}${colors.reset}`);
     console.log(
-      `  Avg references per symbol: ${this.colors.cyan}${(totalRefs / this.symbols.size).toFixed(1)}${this.colors.reset}`
+      `  Avg references per symbol: ${colors.cyan}${(totalRefs / this.symbols.size).toFixed(1)}${colors.reset}`
     );
     console.log();
 
@@ -571,6 +737,30 @@ export class SymbolQueryCommand extends BaseCommand {
     console.log();
 
     return this.success();
+  }
+
+  /**
+   * Relative location of a primary definition for XML output (empty when there is none)
+   */
+  private primaryLocation(primary: SymbolInfo['primary']): { filePath?: string; line?: number } {
+    return primary ? { filePath: this.relativePath(primary.filePath), line: primary.line } : {};
+  }
+
+  /**
+   * Take up to `limit` references, walking them file by file in first-seen order
+   * (the same traversal the human view uses).
+   */
+  private takeReferencesGroupedByFile(
+    references: SymbolInfo['references'],
+    limit: number
+  ): SymbolInfo['references'] {
+    const byFile = new Map<string, SymbolInfo['references']>();
+    for (const ref of references) {
+      const group = byFile.get(ref.filePath) ?? [];
+      group.push(ref);
+      byFile.set(ref.filePath, group);
+    }
+    return Array.from(byFile.values()).flat().slice(0, limit);
   }
 
   /**
@@ -727,18 +917,5 @@ export class SymbolQueryCommand extends BaseCommand {
    */
   private relativePath(filePath: string): string {
     return path.relative(process.cwd(), filePath);
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      bold: '\x1b[1m',
-      dim: '\x1b[2m',
-      green: '\x1b[32m',
-      yellow: '\x1b[33m',
-      blue: '\x1b[34m',
-      cyan: '\x1b[36m',
-      red: '\x1b[31m',
-    };
   }
 }

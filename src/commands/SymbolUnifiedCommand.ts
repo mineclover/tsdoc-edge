@@ -4,7 +4,7 @@
  * @packageDocumentation
  */
 
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 import { DepsCommand } from './DepsCommand';
 import { FindMethodCommand } from './FindMethodCommand';
 import { OrphansCommand } from './OrphansCommand';
@@ -73,6 +73,9 @@ export class SymbolUnifiedCommand extends BaseCommand {
 Subcommands:
 ${subcommandList}
 
+Options:
+  --human      Output in human-readable format (default: XML)
+
 Examples:
   tsdoc-edge symbol query <symbol-id>
   tsdoc-edge symbol deps <symbol-name>
@@ -91,20 +94,24 @@ Use 'tsdoc-edge symbol <subcommand> --help' for subcommand details.`;
    */
   async execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
+      // --human is a shared output flag that may precede the subcommand name
+      const nameIndex = args.findIndex((arg) => arg !== '--human');
+
       // Only show unified help if no args or first arg is help flag
-      if (args.length === 0 || args[0] === '--help' || args[0] === '-h') {
+      if (nameIndex === -1 || args[nameIndex] === '--help' || args[nameIndex] === '-h') {
         return this.displayHelp();
       }
 
-      const subcommandName = args[0] as SubcommandName;
-      const subcommandArgs = args.slice(1);
+      const subcommandName = args[nameIndex] as SubcommandName;
+      // Pass every other argument (including --human) through to the subcommand
+      const subcommandArgs = [...args.slice(0, nameIndex), ...args.slice(nameIndex + 1)];
 
       if (!(subcommandName in SUBCOMMANDS)) {
         this.printError(`Unknown subcommand: ${subcommandName}`);
         console.log();
         console.log('Available subcommands:');
         for (const [name, { description }] of Object.entries(SUBCOMMANDS)) {
-          console.log(`  ${this.colors.cyan}${name.padEnd(10)}${this.colors.reset} ${description}`);
+          console.log(`  ${colors.cyan}${name.padEnd(10)}${colors.reset} ${description}`);
         }
         console.log();
         return this.failure(`Unknown subcommand: ${subcommandName}`);
@@ -114,12 +121,5 @@ Use 'tsdoc-edge symbol <subcommand> --help' for subcommand details.`;
       const subcommand = new CommandClass();
       return subcommand.execute(subcommandArgs);
     });
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      cyan: '\x1b[36m',
-    };
   }
 }

@@ -13,7 +13,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import type { ParsedDocSymbols } from '../types/feature';
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Fix suggestion
@@ -86,6 +86,7 @@ export class SymbolFixCommand extends BaseCommand {
   Default directory: managed
 
   Options:
+    --human        Output in human-readable format (default: XML)
     --dry-run      Preview changes without applying
     --yes, -y      Auto-confirm all fixes
     --type=TYPE    Fix only specific type (typo/duplicate-h1/missing-primary/orphaned-aux/formatting)`;
@@ -104,25 +105,35 @@ export class SymbolFixCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const docsDir = args[0] || 'managed';
+      const isHuman = this.hasFlag(args, '--human');
+      const docsDir = args.find((arg) => !arg.startsWith('-')) || 'managed';
       const dryRun = args.includes('--dry-run');
       const autoConfirm = args.includes('--yes') || args.includes('-y');
       const fixType = args.find((arg) => arg.startsWith('--type='))?.split('=')[1];
 
-      this.printHeader('Symbol Fix');
+      if (isHuman) {
+        this.printHeader('Symbol Fix');
 
-      if (dryRun) {
-        this.printInfo('Running in dry-run mode (no changes will be made)');
-        console.log();
+        if (dryRun) {
+          this.printInfo('Running in dry-run mode (no changes will be made)');
+          console.log();
+        }
+
+        this.printInfo('Analyzing symbols...');
       }
 
       // Build symbol index
-      this.printInfo('Analyzing symbols...');
-      await this.buildIndex(docsDir);
-      console.log();
+      await this.buildIndex(docsDir, isHuman);
+      if (isHuman) {
+        console.log();
+      }
 
       // Detect issues
       const suggestions = this.detectIssues(fixType);
+
+      if (!isHuman) {
+        return this.reportXml(suggestions, { dryRun, autoConfirm, fixType }, args);
+      }
 
       if (suggestions.length === 0) {
         this.printSuccess('No fixable issues found!');
@@ -145,7 +156,7 @@ export class SymbolFixCommand extends BaseCommand {
   /**
    * Build symbol index
    */
-  private async buildIndex(docsDir: string): Promise<void> {
+  private async buildIndex(docsDir: string, verbose: boolean): Promise<void> {
     const files = this.findMarkdownFiles(docsDir);
 
     for (const filePath of files) {
@@ -163,7 +174,9 @@ export class SymbolFixCommand extends BaseCommand {
       }
     }
 
-    this.printSuccess(`Analyzed ${this.symbols.size} symbols from ${files.length} documents`);
+    if (verbose) {
+      this.printSuccess(`Analyzed ${this.symbols.size} symbols from ${files.length} documents`);
+    }
   }
 
   /**
@@ -256,24 +269,22 @@ export class SymbolFixCommand extends BaseCommand {
 
     for (const [type, list] of byType.entries()) {
       console.log();
-      console.log(
-        `${this.colors.bold}${this.formatType(type)}:${this.colors.reset} ${list.length}`
-      );
+      console.log(`${colors.bold}${this.formatType(type)}:${colors.reset} ${list.length}`);
       console.log();
 
       for (const suggestion of list.slice(0, 10)) {
         const icon = this.getSeverityIcon(suggestion.severity);
         console.log(`  ${icon} [[${suggestion.symbolName}]]`);
         console.log(
-          `     ${this.colors.dim}${this.relativePath(suggestion.filePath)}:${suggestion.line}${this.colors.reset}`
+          `     ${colors.dim}${this.relativePath(suggestion.filePath)}:${suggestion.line}${colors.reset}`
         );
-        console.log(`     ${this.colors.red}Issue:${this.colors.reset} ${suggestion.issue}`);
-        console.log(`     ${this.colors.green}Fix:${this.colors.reset} ${suggestion.suggestion}`);
+        console.log(`     ${colors.red}Issue:${colors.reset} ${suggestion.issue}`);
+        console.log(`     ${colors.green}Fix:${colors.reset} ${suggestion.suggestion}`);
         console.log();
       }
 
       if (list.length > 10) {
-        console.log(`  ${this.colors.dim}... and ${list.length - 10} more${this.colors.reset}`);
+        console.log(`  ${colors.dim}... and ${list.length - 10} more${colors.reset}`);
         console.log();
       }
     }
@@ -300,20 +311,20 @@ export class SymbolFixCommand extends BaseCommand {
       return this.failure('User confirmation required');
     }
 
+    const outcomes = this.runAutoFixes(autoFixable);
+
     let fixed = 0;
     let failed = 0;
 
-    for (const suggestion of autoFixable) {
-      try {
-        if (!suggestion.autoFix) continue;
-        suggestion.autoFix();
+    for (const { suggestion, error } of outcomes) {
+      if (error === undefined) {
         console.log(
-          `${this.colors.green}✓${this.colors.reset} Fixed [[${suggestion.symbolName}]] in ${this.relativePath(suggestion.filePath)}`
+          `${colors.green}✓${colors.reset} Fixed [[${suggestion.symbolName}]] in ${this.relativePath(suggestion.filePath)}`
         );
         fixed++;
-      } catch (error) {
+      } else {
         console.log(
-          `${this.colors.red}✗${this.colors.reset} Failed to fix [[${suggestion.symbolName}]]: ${error}`
+          `${colors.red}✗${colors.reset} Failed to fix [[${suggestion.symbolName}]]: ${error}`
         );
         failed++;
       }
@@ -328,6 +339,89 @@ export class SymbolFixCommand extends BaseCommand {
     }
 
     return this.success();
+  }
+
+  /**
+   * Run the automatic fixes (the only place that modifies files) and report each outcome
+   */
+  private runAutoFixes(
+    autoFixable: FixSuggestion[]
+  ): Array<{ suggestion: FixSuggestion; error?: unknown }> {
+    const outcomes: Array<{ suggestion: FixSuggestion; error?: unknown }> = [];
+
+    for (const suggestion of autoFixable) {
+      try {
+        if (!suggestion.autoFix) continue;
+        suggestion.autoFix();
+        outcomes.push({ suggestion });
+      } catch (error) {
+        outcomes.push({ suggestion, error });
+      }
+    }
+
+    return outcomes;
+  }
+
+  /**
+   * Emit the XML report (default output) and apply auto-fixes exactly like the human flow
+   */
+  private reportXml(
+    suggestions: FixSuggestion[],
+    options: { dryRun: boolean; autoConfirm: boolean; fixType?: string },
+    args: string[]
+  ): CommandResult {
+    const { dryRun, autoConfirm, fixType } = options;
+    const autoFixable = suggestions.filter((s) => s.severity === 'auto' && s.autoFix);
+
+    let outcomes: Array<{ suggestion: FixSuggestion; error?: unknown }> = [];
+
+    if (!dryRun && autoFixable.length > 0) {
+      if (!autoConfirm) {
+        this.printWarning('This will modify your files. Use --yes to confirm.');
+        return this.failure('User confirmation required');
+      }
+      outcomes = this.runAutoFixes(autoFixable);
+    }
+
+    const failed = outcomes.filter((o) => o.error !== undefined).length;
+    const typeCounts = new Map<string, number>();
+    for (const suggestion of suggestions) {
+      typeCounts.set(suggestion.type, (typeCounts.get(suggestion.type) ?? 0) + 1);
+    }
+
+    this.printOutput(
+      'symbol-fix',
+      {
+        summary: {
+          totalIssues: suggestions.length,
+          autoFixable: autoFixable.length,
+          dryRun,
+          autoConfirm,
+          ...(fixType ? { typeFilter: fixType } : {}),
+          fixed: outcomes.length - failed,
+          failed,
+        },
+        types: Array.from(typeCounts, ([type, count]) => ({ type, count })),
+        issues: suggestions.map((s) => ({
+          type: s.type,
+          severity: s.severity,
+          symbolName: s.symbolName,
+          filePath: this.relativePath(s.filePath),
+          line: s.line,
+          issue: s.issue,
+          suggestion: s.suggestion,
+        })),
+        fixes: outcomes.map(({ suggestion, error }) => ({
+          symbolName: suggestion.symbolName,
+          filePath: this.relativePath(suggestion.filePath),
+          status: error === undefined ? 'fixed' : 'failed',
+          ...(error === undefined ? {} : { error: String(error) }),
+        })),
+      },
+      args
+    );
+
+    return failed > 0 ? this.failure(`${failed} fixes failed`) : this.success();
   }
 
   /**
@@ -447,18 +541,5 @@ export class SymbolFixCommand extends BaseCommand {
    */
   private relativePath(filePath: string): string {
     return path.relative(process.cwd(), filePath);
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      bold: '\x1b[1m',
-      dim: '\x1b[2m',
-      green: '\x1b[32m',
-      yellow: '\x1b[33m',
-      blue: '\x1b[34m',
-      cyan: '\x1b[36m',
-      red: '\x1b[31m',
-    };
   }
 }

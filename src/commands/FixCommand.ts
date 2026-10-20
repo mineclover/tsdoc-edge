@@ -53,6 +53,7 @@ export class FixCommand extends BaseCommand {
 
   Default: src
   Options:
+    --human           Output in human-readable format (default: XML)
     --dry-run         Preview changes without modifying files
     --min-score=N     Minimum quality score threshold (default: 70)`;
   }
@@ -70,7 +71,9 @@ export class FixCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      let targetPath = args[0] || 'src';
+      const isHuman = this.hasFlag(args, '--human');
+      // Option flags may come first, so the default is only replaced by a positional path below
+      let targetPath = 'src';
       let dryRun = false;
       let minScore = 70;
 
@@ -85,8 +88,10 @@ export class FixCommand extends BaseCommand {
         }
       }
 
-      console.log(`${colors.bold}TSDoc Edge - Fix Documentation${colors.reset}`);
-      console.log();
+      if (isHuman) {
+        console.log(`${colors.bold}TSDoc Edge - Fix Documentation${colors.reset}`);
+        console.log();
+      }
 
       if (!fs.existsSync(targetPath)) {
         console.log(`${colors.red}❌ Path not found: ${targetPath}${colors.reset}`);
@@ -97,14 +102,16 @@ export class FixCommand extends BaseCommand {
         };
       }
 
-      console.log(`${colors.cyan}Fixing: ${targetPath}${colors.reset}`);
-      console.log(`${colors.cyan}Min score: ${minScore}${colors.reset}`);
-      console.log(`${colors.cyan}Dry run: ${dryRun}${colors.reset}`);
-      console.log();
+      if (isHuman) {
+        console.log(`${colors.cyan}Fixing: ${targetPath}${colors.reset}`);
+        console.log(`${colors.cyan}Min score: ${minScore}${colors.reset}`);
+        console.log(`${colors.cyan}Dry run: ${dryRun}${colors.reset}`);
+        console.log();
 
-      // Analyze first
-      console.log(`${colors.bold}📊 Analyzing...${colors.reset}`);
-      console.log();
+        // Analyze first
+        console.log(`${colors.bold}📊 Analyzing...${colors.reset}`);
+        console.log();
+      }
       const checker = this.checker || new CodeHealthChecker();
 
       const report = checker.analyze({
@@ -115,13 +122,34 @@ export class FixCommand extends BaseCommand {
         generateSuggestions: false,
       });
 
-      console.log(`   Found ${report.docScores.length} symbols`);
       const needsFixing = report.docScores.filter((s) => s.qualityScore < minScore && s.isPublic);
-      console.log(`   ${needsFixing.length} need fixing (quality < ${minScore})`);
-      console.log();
+      if (isHuman) {
+        console.log(`   Found ${report.docScores.length} symbols`);
+        console.log(`   ${needsFixing.length} need fixing (quality < ${minScore})`);
+        console.log();
+      }
 
       if (needsFixing.length === 0) {
-        console.log(`${colors.green}✓ All documentation meets quality standards!${colors.reset}`);
+        if (isHuman) {
+          console.log(`${colors.green}✓ All documentation meets quality standards!${colors.reset}`);
+        } else {
+          this.printOutput(
+            'doc-fix',
+            {
+              summary: {
+                targetPath,
+                minScore,
+                dryRun,
+                symbolsAnalyzed: report.docScores.length,
+                symbolsNeedingFix: 0,
+                fileCount: 0,
+                symbolsFixed: 0,
+              },
+              files: [],
+            },
+            args
+          );
+        }
         return {
           exitCode: 0,
           message: 'All documentation meets quality standards',
@@ -137,16 +165,21 @@ export class FixCommand extends BaseCommand {
         byFile.get(score.filePath)?.push(score);
       }
 
-      console.log(`${colors.bold}🔧 Fixing Files...${colors.reset}`);
-      console.log();
+      if (isHuman) {
+        console.log(`${colors.bold}🔧 Fixing Files...${colors.reset}`);
+        console.log();
+      }
 
       // Import DocumentationFixer dynamically
       const { DocumentationFixer } = await import('../fixer/DocumentationFixer.js');
       const fixer = new DocumentationFixer();
 
       let totalFixed = 0;
+      const fileResults: Array<Record<string, unknown>> = [];
       for (const [filePath, scores] of byFile.entries()) {
-        console.log(`   ${path.basename(filePath)} (${scores.length} symbols)...`);
+        if (isHuman) {
+          console.log(`   ${path.basename(filePath)} (${scores.length} symbols)...`);
+        }
 
         const result = fixer.fixFile(filePath, scores, {
           addSummary: true,
@@ -159,24 +192,70 @@ export class FixCommand extends BaseCommand {
         });
 
         if (result.error) {
-          console.log(`      ${colors.red}✗ Error: ${result.error}${colors.reset}`);
+          if (isHuman) {
+            console.log(`      ${colors.red}✗ Error: ${result.error}${colors.reset}`);
+          }
+          fileResults.push({
+            path: filePath,
+            symbolCount: scores.length,
+            status: 'error',
+            symbolsFixed: 0,
+            error: result.error,
+          });
         } else if (result.modified) {
-          console.log(`      ${colors.green}✓ Fixed ${result.symbolsFixed} symbols${colors.reset}`);
+          if (isHuman) {
+            console.log(
+              `      ${colors.green}✓ Fixed ${result.symbolsFixed} symbols${colors.reset}`
+            );
+          }
           totalFixed += result.symbolsFixed;
+          fileResults.push({
+            path: filePath,
+            symbolCount: scores.length,
+            status: 'modified',
+            symbolsFixed: result.symbolsFixed,
+          });
         } else {
-          console.log(`      ${colors.yellow}- No changes needed${colors.reset}`);
+          if (isHuman) {
+            console.log(`      ${colors.yellow}- No changes needed${colors.reset}`);
+          }
+          fileResults.push({
+            path: filePath,
+            symbolCount: scores.length,
+            status: 'unchanged',
+            symbolsFixed: 0,
+          });
         }
       }
 
-      console.log();
-      if (dryRun) {
-        console.log(`${colors.cyan}Dry run complete. No files were modified.${colors.reset}`);
+      if (isHuman) {
+        console.log();
+        if (dryRun) {
+          console.log(`${colors.cyan}Dry run complete. No files were modified.${colors.reset}`);
+        } else {
+          console.log(
+            `${colors.green}✓ Fixed ${totalFixed} symbols in ${byFile.size} files${colors.reset}`
+          );
+        }
+        console.log();
       } else {
-        console.log(
-          `${colors.green}✓ Fixed ${totalFixed} symbols in ${byFile.size} files${colors.reset}`
+        this.printOutput(
+          'doc-fix',
+          {
+            summary: {
+              targetPath,
+              minScore,
+              dryRun,
+              symbolsAnalyzed: report.docScores.length,
+              symbolsNeedingFix: needsFixing.length,
+              fileCount: byFile.size,
+              symbolsFixed: totalFixed,
+            },
+            files: fileResults,
+          },
+          args
         );
       }
-      console.log();
 
       return {
         exitCode: 0,

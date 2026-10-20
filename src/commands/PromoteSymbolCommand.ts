@@ -11,7 +11,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /** Parsed H2 section from a document */
 interface H2Section {
@@ -53,9 +53,12 @@ export class PromoteSymbolCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge promote-symbol <source-file> <symbol-name> [target-dir]
+    return `tsdoc-edge promote-symbol <source-file> <symbol-name> [target-dir] [options]
 
-  Default target-dir: managed/relationships`;
+  Default target-dir: managed/relationships
+
+  Options:
+    --human    Output in human-readable format (default: XML)`;
   }
 
   /**
@@ -71,9 +74,11 @@ export class PromoteSymbolCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const sourceFile = args[0];
-      const symbolName = args[1];
-      const targetDir = args[2] || 'managed/relationships';
+      const isHuman = this.hasFlag(args, '--human');
+      const positionalArgs = args.filter((arg) => !arg.startsWith('--'));
+      const sourceFile = positionalArgs[0];
+      const symbolName = positionalArgs[1];
+      const targetDir = positionalArgs[2] || 'managed/relationships';
 
       if (!sourceFile || !symbolName) {
         this.printError('Usage: promote-symbol <source-file> <symbol-name> [target-dir]');
@@ -85,10 +90,12 @@ export class PromoteSymbolCommand extends BaseCommand {
         return this.failure('Missing arguments');
       }
 
-      this.printHeader(`Promote Symbol: ${symbolName}`);
-      console.log(`📄 Source: ${sourceFile}`);
-      console.log(`📁 Target: ${targetDir}/`);
-      console.log();
+      if (isHuman) {
+        this.printHeader(`Promote Symbol: ${symbolName}`);
+        console.log(`📄 Source: ${sourceFile}`);
+        console.log(`📁 Target: ${targetDir}/`);
+        console.log();
+      }
 
       // Check source file exists
       if (!fs.existsSync(sourceFile)) {
@@ -101,7 +108,9 @@ export class PromoteSymbolCommand extends BaseCommand {
       const lines = content.split('\n');
 
       // Find H2 section
-      this.printInfo('Searching for H2 section...');
+      if (isHuman) {
+        this.printInfo('Searching for H2 section...');
+      }
       const h2Section = this.findH2Section(lines, symbolName);
 
       if (!h2Section) {
@@ -115,11 +124,15 @@ export class PromoteSymbolCommand extends BaseCommand {
         return this.failure('H2 not found');
       }
 
-      this.printSuccess(`Found ## [[${symbolName}]] at line ${h2Section.startLine}`);
-      console.log();
+      if (isHuman) {
+        this.printSuccess(`Found ## [[${symbolName}]] at line ${h2Section.startLine}`);
+        console.log();
+      }
 
       // Check for existing canonical H1
-      this.printInfo('Checking for existing canonical definition...');
+      if (isHuman) {
+        this.printInfo('Checking for existing canonical definition...');
+      }
       const targetFilename = this.generateFilename(symbolName);
       const targetPath = path.join(targetDir, targetFilename);
 
@@ -137,7 +150,9 @@ export class PromoteSymbolCommand extends BaseCommand {
       const sourceFrontmatter = this.extractFrontmatter(content);
 
       // Create canonical H1 file
-      this.printSection('Creating Canonical H1 File');
+      if (isHuman) {
+        this.printSection('Creating Canonical H1 File');
+      }
 
       const canonicalContent = this.generateCanonicalDocument(
         symbolName,
@@ -147,39 +162,68 @@ export class PromoteSymbolCommand extends BaseCommand {
       );
 
       // Ensure target directory exists
+      let createdDirectory = false;
       if (!fs.existsSync(targetDir)) {
         fs.mkdirSync(targetDir, { recursive: true });
-        this.printInfo(`Created directory: ${targetDir}`);
+        createdDirectory = true;
+        if (isHuman) {
+          this.printInfo(`Created directory: ${targetDir}`);
+        }
       }
 
       fs.writeFileSync(targetPath, canonicalContent, 'utf-8');
-      this.printSuccess(`Created: ${targetPath}`);
-      console.log();
+      if (isHuman) {
+        this.printSuccess(`Created: ${targetPath}`);
+        console.log();
+      }
 
       // Update source file (replace H2 with inline reference)
-      this.printSection('Updating Source File');
+      if (isHuman) {
+        this.printSection('Updating Source File');
+      }
 
       const updatedContent = this.replaceH2WithReference(lines, h2Section, symbolName, targetPath);
 
       fs.writeFileSync(sourceFile, updatedContent, 'utf-8');
-      this.printSuccess(`Updated: ${sourceFile}`);
-      console.log(`  Replaced H2 section with inline reference to [[${symbolName}]]`);
-      console.log();
 
-      // Summary
-      this.printSection('Promotion Summary');
-      console.log(
-        `  ${this.colors.green}✓${this.colors.reset} Canonical H1 created: ${targetPath}`
-      );
-      console.log(`  ${this.colors.green}✓${this.colors.reset} Source file updated: ${sourceFile}`);
-      console.log(`  ${this.colors.green}✓${this.colors.reset} Symbol: [[${symbolName}]]`);
-      console.log();
+      if (isHuman) {
+        this.printSuccess(`Updated: ${sourceFile}`);
+        console.log(`  Replaced H2 section with inline reference to [[${symbolName}]]`);
+        console.log();
 
-      console.log('Next steps:');
-      console.log(`  1. Review canonical file: ${targetPath}`);
-      console.log('  2. Fill in TODO sections with implementation details');
-      console.log('  3. Validate: tsdoc-edge validate-symbol-refs managed');
-      console.log();
+        // Summary
+        this.printSection('Promotion Summary');
+        console.log(`  ${colors.green}✓${colors.reset} Canonical H1 created: ${targetPath}`);
+        console.log(`  ${colors.green}✓${colors.reset} Source file updated: ${sourceFile}`);
+        console.log(`  ${colors.green}✓${colors.reset} Symbol: [[${symbolName}]]`);
+        console.log();
+
+        console.log('Next steps:');
+        console.log(`  1. Review canonical file: ${targetPath}`);
+        console.log('  2. Fill in TODO sections with implementation details');
+        console.log('  3. Validate: tsdoc-edge validate-symbol-refs managed');
+        console.log();
+      } else {
+        this.printOutput(
+          'promote-symbol',
+          {
+            summary: {
+              status: 'promoted',
+              symbolName,
+              sourceFile,
+              targetDir,
+              targetPath,
+              h2StartLine: h2Section.startLine,
+              createdDirectory,
+            },
+            filesModified: [
+              { path: targetPath, action: 'created' },
+              { path: sourceFile, action: 'updated' },
+            ],
+          },
+          args
+        );
+      }
 
       return this.success(`Promoted [[${symbolName}]] to canonical H1`);
     });
@@ -327,18 +371,5 @@ ${h2Content}
     ];
 
     return [...beforeSection, ...reference, ...afterSection].join('\n');
-  }
-
-  private get colors() {
-    return {
-      reset: '\x1b[0m',
-      bold: '\x1b[1m',
-      dim: '\x1b[2m',
-      green: '\x1b[32m',
-      yellow: '\x1b[33m',
-      blue: '\x1b[34m',
-      cyan: '\x1b[36m',
-      red: '\x1b[31m',
-    };
   }
 }

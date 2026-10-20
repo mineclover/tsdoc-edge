@@ -5,6 +5,7 @@
 
 import * as path from 'node:path';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import type { UnifiedRelationship } from '../types/relationships/unified';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
@@ -55,7 +56,7 @@ export class QueryInferredCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge query-inferred [relationship-type]\n\n  Examples:\n    tsdoc-edge query-inferred              # All inferred relationships\n    tsdoc-edge query-inferred doc-reference  # Only doc-reference';
+    return 'tsdoc-edge query-inferred [relationship-type] [options]\n\n  Options:\n    --human    Output in human-readable format (default: XML)\n\n  Examples:\n    tsdoc-edge query-inferred              # All inferred relationships\n    tsdoc-edge query-inferred doc-reference  # Only doc-reference';
   }
 
   /**
@@ -71,7 +72,13 @@ export class QueryInferredCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      this.printHeader('TSDoc Edge - Inferred Relationships');
+      const isHuman = this.hasFlag(args, '--human');
+      // Optional relationship type filter (first non-flag argument)
+      const typeFilter = args.find((arg) => !arg.startsWith('-'));
+
+      if (isHuman) {
+        this.printHeader('TSDoc Edge - Inferred Relationships');
+      }
 
       const dbPath = this.getDatabasePath();
       const jsonlPath = path.join(process.cwd(), '.tsdoc', 'data');
@@ -84,17 +91,20 @@ export class QueryInferredCommand extends BaseCommand {
         // Filter inferred relationships
         const inferredRels = allRels.filter((r) => r.properties?.inferred === true);
 
+        const filteredRels = typeFilter
+          ? inferredRels.filter((r) => r.type === typeFilter)
+          : inferredRels;
+
+        if (!isHuman) {
+          this.printXml(allRels.length, inferredRels, filteredRels, typeFilter, args);
+          return this.success();
+        }
+
         if (inferredRels.length === 0) {
           this.printWarning('No inferred relationships found');
           console.log();
           return this.success();
         }
-
-        // Optional type filter
-        const typeFilter = args[0];
-        const filteredRels = typeFilter
-          ? inferredRels.filter((r) => r.type === typeFilter)
-          : inferredRels;
 
         if (typeFilter && filteredRels.length === 0) {
           this.printWarning(`No inferred relationships found for type: ${typeFilter}`);
@@ -205,5 +215,59 @@ export class QueryInferredCommand extends BaseCommand {
         dbManager.close();
       }
     });
+  }
+
+  /**
+   * Print the inferred relationship statistics as XML (default output)
+   */
+  private printXml(
+    totalCount: number,
+    inferredRels: UnifiedRelationship[],
+    filteredRels: UnifiedRelationship[],
+    typeFilter: string | undefined,
+    args: string[]
+  ): void {
+    const countBy = (
+      rels: UnifiedRelationship[],
+      keyOf: (rel: UnifiedRelationship) => string
+    ): Array<[string, number]> => {
+      const counts = new Map<string, number>();
+      for (const rel of rels) {
+        const key = keyOf(rel);
+        counts.set(key, (counts.get(key) ?? 0) + 1);
+      }
+      return Array.from(counts).sort((a, b) => b[1] - a[1]);
+    };
+
+    this.printOutput(
+      'inferred-relationships',
+      {
+        overview: {
+          totalRelationships: totalCount,
+          inferredRelationships: inferredRels.length,
+          percentage:
+            totalCount > 0 ? ((inferredRels.length / totalCount) * 100).toFixed(2) : '0.00',
+          ...(typeFilter ? { typeFilter } : {}),
+          filteredRelationships: filteredRels.length,
+        },
+        byType: countBy(inferredRels, (rel) => rel.type).map(([type, count]) => ({ type, count })),
+        byDirection: countBy(filteredRels, (rel) => rel.properties?.direction || 'unknown').map(
+          ([direction, count]) => ({ direction, count })
+        ),
+        byDiscovery: countBy(filteredRels, (rel) => rel.discoveredBy).map(([method, count]) => ({
+          method,
+          count,
+        })),
+        samples: filteredRels.slice(0, 10).map((rel) => ({
+          from: Array.isArray(rel.from) ? rel.from[0] : rel.from,
+          to: Array.isArray(rel.to) ? rel.to[0] : rel.to,
+          type: rel.type,
+          direction: rel.properties?.direction || 'unknown',
+          ...(rel.properties?.reverseOf ? { reverseOf: rel.properties.reverseOf } : {}),
+          ...(rel.description ? { description: rel.description } : {}),
+        })),
+      },
+      args
+    );
   }
 }
