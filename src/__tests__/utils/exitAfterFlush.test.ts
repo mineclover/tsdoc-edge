@@ -4,7 +4,12 @@
  * @testScenario A broken stream never blocks the exit
  */
 
-import { exitAfterFlush, flushStandardStreams } from '../../utils/exitAfterFlush';
+import { EventEmitter } from 'node:events';
+import {
+  exitAfterFlush,
+  type FlushableStream,
+  flushStandardStreams,
+} from '../../utils/exitAfterFlush';
 
 /** A stream whose write callback fires only when `drain()` is called. */
 function slowStream() {
@@ -53,6 +58,17 @@ describe('exitAfterFlush', () => {
     };
 
     await expect(flushStandardStreams([broken])).resolves.toBeUndefined();
+  });
+
+  it('absorbs the asynchronous error of a closed pipe', async () => {
+    const closedPipe = new EventEmitter() as EventEmitter & FlushableStream;
+    closedPipe.write = () => {
+      // A real socket reports EPIPE as an 'error' event and may never call the callback.
+      setImmediate(() => closedPipe.emit('error', new Error('write EPIPE')));
+      return false;
+    };
+
+    await expect(flushStandardStreams([closedPipe])).resolves.toBeUndefined();
   });
 
   it('exits with the code once output has drained', async () => {

@@ -6,13 +6,16 @@
 /** The part of a writable stream needed to wait for its queue to drain. */
 export interface FlushableStream {
   write(chunk: string, callback: () => void): unknown;
+  /** Present on real streams; used to absorb the asynchronous EPIPE of a closed pipe. */
+  once?(event: 'error', listener: () => void): unknown;
 }
 
 /**
  * Resolve once everything already written to the streams has been handed to the OS.
  *
  * Writing an empty chunk queues behind pending writes, so its callback fires only after they
- * are flushed. A stream that cannot be flushed (closed pipe) never blocks the exit.
+ * are flushed. A stream that cannot be flushed (closed pipe, EPIPE) never blocks the exit and
+ * never turns the error into an unhandled 'error' event.
  *
  * @param streams - Streams to drain; defaults to stdout and stderr
  */
@@ -24,6 +27,7 @@ export function flushStandardStreams(
       (stream) =>
         new Promise<void>((resolve) => {
           try {
+            stream.once?.('error', () => resolve());
             stream.write('', () => resolve());
           } catch {
             resolve();
