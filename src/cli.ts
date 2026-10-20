@@ -10,73 +10,9 @@
  */
 
 import { UsageTracker } from './analytics/UsageTracker';
-import {
-  AnalyzeCommand,
-  BuildCommand,
-  CheckDuplicatesCommand,
-  CommandRegistry,
-  type CommandResult,
-  ConventionCommand,
-  CoreApiCommand,
-  FixCommand,
-  HealthCommand,
-  HelpCommand,
-  IdCommand,
-  ImproveCommand,
-  IndexDocsCommand,
-  InitCommand,
-  InstallHookCommand,
-  ParseCommand,
-  PlansCommand,
-  QueryInferredCommand,
-  RebuildIndexCommand,
-  StatsCommand,
-  SuggestCommand,
-  SymbolUnifiedCommand,
-  SyncCoverageCommand,
-  TodosCommand,
-  TreeCommand,
-  UndocumentedCommand,
-  UninstallHookCommand,
-  UntestedCommand,
-  UpdateBacklinksCommand,
-  UsageCommand,
-  ValidateUnifiedCommand,
-  VisualizeDepsCommand,
-} from './commands';
-import { BlocksCommand } from './commands/BlocksCommand';
-import { CheckLinksCommand } from './commands/CheckLinksCommand';
-import { CommonCommand } from './commands/CommonCommand';
-import { CoverageReportCommand } from './commands/CoverageReportCommand';
-import { DepsCommand } from './commands/DepsCommand';
-import { DesignContextCommand } from './commands/DesignContextCommand';
-import { DetectDeadCodeCommand } from './commands/DetectDeadCodeCommand';
-import { DocSymbolsCommand } from './commands/DocSymbolsCommand';
-import { DocsCommand } from './commands/DocsCommand';
-import { EndpointsCommand } from './commands/EndpointsCommand';
-import { ExploreEntrypointCommand } from './commands/ExploreEntrypointCommand';
-import { HttpEndpointsCommand } from './commands/HttpEndpointsCommand';
-import { HubsCommand } from './commands/HubsCommand';
-import { LayersCommand } from './commands/LayersCommand';
-import { LintCommand } from './commands/LintCommand';
-import { MoveCommand } from './commands/MoveCommand';
-import { OntologyCommand } from './commands/OntologyCommand';
-import { OrphansCommand } from './commands/OrphansCommand';
-import { ParallelWorkCommand } from './commands/ParallelWorkCommand';
-import { ParseMermaidCommand } from './commands/ParseMermaidCommand';
-import { PreCommitRunCommand } from './commands/PreCommitRunCommand';
-import { PromoteSymbolCommand } from './commands/PromoteSymbolCommand';
-import { RelationshipCommand } from './commands/RelationshipCommand';
-import { RoutesCommand } from './commands/RoutesCommand';
-import { SpecCommand } from './commands/SpecCommand';
-import { SystemStatusCommand } from './commands/SystemStatusCommand';
-import { TaskCommand } from './commands/TaskCommand';
-import { TestExamplesCommand } from './commands/TestExamplesCommand';
-import { TestRelationshipsCommand } from './commands/TestRelationshipsCommand';
-import { ValidateDocsCommand } from './commands/ValidateDocsCommand';
-import { ValidateSymbolRefsCommand } from './commands/ValidateSymbolRefsCommand';
-import { WhoUsesCommand } from './commands/WhoUsesCommand';
-import { WorkContextCommand } from './commands/WorkContextCommand';
+import type { CommandResult } from './commands/BaseCommand';
+import { CommandRegistry } from './commands/CommandRegistry';
+import { registerAllCommands } from './commands/command-loader';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
@@ -150,87 +86,8 @@ async function main(): Promise<void> {
   const usageTracker = new UsageTracker();
   const registry = new CommandRegistry();
 
-  // Register commands - Core workflow
-  registry.register(new BuildCommand());
-  registry.register(new WorkContextCommand());
-  registry.register(new DesignContextCommand());
-  registry.register(new HealthCommand());
-  registry.register(new StatsCommand());
-  registry.register(new InitCommand());
-
-  // Register commands - Unified commands
-  registry.register(new ValidateUnifiedCommand());
-  registry.register(new SymbolUnifiedCommand());
-  registry.register(new RelationshipCommand());
-  registry.register(new SpecCommand());
-  registry.register(new TaskCommand());
-  registry.register(new OntologyCommand());
-  registry.register(new DocsCommand());
-  registry.register(new ConventionCommand());
-
-  // Preserve published flat command paths while docs/validate groups are the preferred surface.
-  registry.register(new IndexDocsCommand(undefined, undefined, undefined, true));
-  registry.register(new UpdateBacklinksCommand(undefined, undefined, undefined, undefined, true));
-  registry.register(new ValidateDocsCommand(undefined, undefined, true));
-  registry.register(new ValidateSymbolRefsCommand());
-
-  // Register commands - Analysis & tools
-  registry.register(new AnalyzeCommand());
-  registry.register(new SuggestCommand());
-  registry.register(new FixCommand());
-  registry.register(new ImproveCommand());
-  registry.register(new LintCommand());
-
-  // Register commands - Code exploration
-  registry.register(new ParseCommand());
-  registry.register(new TreeCommand());
-  registry.register(new UndocumentedCommand());
-  registry.register(new UntestedCommand());
-  registry.register(new CoreApiCommand());
-  registry.register(new DocSymbolsCommand());
-  registry.register(new PlansCommand());
-  registry.register(new TodosCommand());
-
-  // Register commands - Specialized
-  registry.register(new VisualizeDepsCommand());
-  registry.register(new CheckDuplicatesCommand());
-  registry.register(new ParallelWorkCommand());
-  registry.register(new TestRelationshipsCommand());
-  registry.register(new SystemStatusCommand());
-  registry.register(new TestExamplesCommand());
-  registry.register(new ExploreEntrypointCommand());
-  registry.register(new ParseMermaidCommand());
-  registry.register(new PromoteSymbolCommand());
-  registry.register(new CoverageReportCommand());
-  registry.register(new DetectDeadCodeCommand());
-  registry.register(new QueryInferredCommand());
-  registry.register(new MoveCommand());
-  registry.register(new SyncCoverageCommand());
-  registry.register(new RebuildIndexCommand());
-  registry.register(new IdCommand());
-
-  // Register commands - Utility
-  registry.register(new UsageCommand());
-  registry.register(new InstallHookCommand());
-  registry.register(new UninstallHookCommand());
-
-  // Standalone utility commands
-  registry.register(new CheckLinksCommand());
-  registry.register(new DepsCommand());
-  registry.register(new WhoUsesCommand());
-  registry.register(new OrphansCommand());
-  registry.register(new PreCommitRunCommand());
-
-  // Analysis commands
-  registry.register(new EndpointsCommand());
-  registry.register(new HttpEndpointsCommand());
-  registry.register(new BlocksCommand());
-  registry.register(new HubsCommand());
-  registry.register(new LayersCommand());
-  registry.register(new CommonCommand());
-  registry.register(new RoutesCommand());
-
-  registry.register(new HelpCommand(registry));
+  // Commands are declared in command-loader and only loaded when first requested.
+  registerAllCommands(registry);
 
   // Get command
   let commandName = args[0] || 'help';

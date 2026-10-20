@@ -169,6 +169,66 @@ describe('CommandRegistry', () => {
     });
   });
 
+  describe('registerLazy', () => {
+    it('should not build the command until it is requested', () => {
+      const factory = jest.fn(() => new TestCommand('lazy', ['l']));
+      registry.registerLazy('lazy', ['l'], factory);
+
+      expect(registry.has('lazy')).toBe(true);
+      expect(registry.has('l')).toBe(true);
+      expect(registry.getNames()).toEqual(['lazy', 'l']);
+      expect(registry.count()).toBe(2);
+      expect(factory).not.toHaveBeenCalled();
+    });
+
+    it('should build once and share the instance across name and aliases', () => {
+      const factory = jest.fn(() => new TestCommand('lazy', ['l']));
+      registry.registerLazy('lazy', ['l'], factory);
+
+      const byName = registry.get('lazy');
+      const byAlias = registry.get('l');
+
+      expect(byName).toBeDefined();
+      expect(byAlias).toBe(byName);
+      expect(factory).toHaveBeenCalledTimes(1);
+    });
+
+    it('should only build the requested command', () => {
+      const first = jest.fn(() => new TestCommand('first'));
+      const second = jest.fn(() => new TestCommand('second'));
+      registry.registerLazy('first', [], first);
+      registry.registerLazy('second', [], second);
+
+      registry.get('second');
+
+      expect(first).not.toHaveBeenCalled();
+      expect(second).toHaveBeenCalledTimes(1);
+    });
+
+    it('should let a later registration win for a shared alias', () => {
+      const early = new TestCommand('early', ['shared']);
+      const late = new TestCommand('late', ['shared']);
+      registry.register(early);
+      registry.registerLazy('late', ['shared'], () => late);
+
+      expect(registry.get('shared')).toBe(late);
+      expect(registry.get('early')).toBe(early);
+    });
+
+    it('should build every lazy command exactly once in getAll', () => {
+      const factory = jest.fn(() => new TestCommand('lazy', ['l']));
+      registry.registerLazy('lazy', ['l'], factory);
+      registry.register(new TestCommand('eager'));
+
+      const first = registry.getAll();
+      const second = registry.getAll();
+
+      expect(first.map((command) => command.getName())).toEqual(['lazy', 'eager']);
+      expect(second).toEqual(first);
+      expect(factory).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('count', () => {
     it('should return 0 when empty', () => {
       expect(registry.count()).toBe(0);
