@@ -8,9 +8,13 @@ const path = require('node:path');
 const childProcess = require('node:child_process');
 
 const projectRoot = path.resolve(__dirname, '..');
-const matrixPath = path.join(__dirname, 'fixtures', 'capability-owner-matrix.v1.json');
+const defaultMatrixPath = path.join(__dirname, 'fixtures', 'capability-owner-matrix.v1.json');
+const parsedArguments = parseArguments(process.argv.slice(2));
+const matrixPath = parsedArguments.matrixPath
+  ? path.resolve(process.cwd(), parsedArguments.matrixPath)
+  : defaultMatrixPath;
 const matrix = JSON.parse(fs.readFileSync(matrixPath, 'utf8'));
-const externalMatrixEvidence = verifyExternalMatrix(parseArguments(process.argv.slice(2)));
+const externalMatrixEvidence = verifyExternalMatrix(parsedArguments);
 const allowedDecisions = new Set(matrix.ownerDecisions);
 const requiredEvidence = [
   'producerDeclaration',
@@ -28,6 +32,24 @@ const fixtureIds = new Set(
 validateMatrix(matrix);
 
 let failureCanariesPassed = 0;
+if (matrix.status === 'promoted') {
+  const corruptedPromoted = JSON.parse(JSON.stringify(matrix));
+  delete corruptedPromoted.promotionEvidence;
+  let rejectedPromoted = false;
+  try {
+    validateMatrix(corruptedPromoted);
+  } catch (error) {
+    rejectedPromoted =
+      error instanceof Error &&
+      error.message === 'Promoted capability owner matrix requires promotionEvidence';
+  }
+  assert(
+    rejectedPromoted,
+    'promoted matrix missing promotionEvidence was not rejected as expected'
+  );
+  failureCanariesPassed += 1;
+}
+
 for (const capability of matrix.capabilities) {
   const canaries = [
     capability.failureCanary,
@@ -83,7 +105,8 @@ console.log(
       decisions: Object.fromEntries(
         matrix.capabilities.map((capability) => [capability.capabilityId, capability.ownerDecision])
       ),
-      ownerPromotionEligible: externalMatrixEvidence !== undefined,
+      ownerPromotionEligible: matrix.status === 'promoted' || externalMatrixEvidence !== undefined,
+      ...(matrix.promotionEvidence ? { promotionEvidence: matrix.promotionEvidence } : {}),
       ...(externalMatrixEvidence ? { externalMatrixEvidence } : {}),
       productionMutation: false,
     },
@@ -97,23 +120,31 @@ function assert(condition, message) {
 }
 
 function parseArguments(arguments_) {
-  const options = { runId: undefined, inputPath: undefined, expectedSha: undefined };
+  const options = {
+    matrixPath: undefined,
+    runId: undefined,
+    inputPath: undefined,
+    expectedSha: undefined,
+  };
   for (let index = 0; index < arguments_.length; index += 1) {
     const argument = arguments_[index];
     if (
+      argument === '--matrix' ||
       argument === '--external-matrix-run-id' ||
       argument === '--external-matrix-input' ||
       argument === '--external-matrix-sha'
     ) {
       const value = arguments_[index + 1];
       if (!value || value.startsWith('--')) throw new Error(`${argument} requires a value`);
+      if (argument === '--matrix') options.matrixPath = value;
       if (argument === '--external-matrix-run-id') options.runId = value;
       if (argument === '--external-matrix-input') options.inputPath = value;
       if (argument === '--external-matrix-sha') options.expectedSha = value;
       index += 1;
       continue;
     }
-    if (argument.startsWith('--external-matrix-run-id='))
+    if (argument.startsWith('--matrix=')) options.matrixPath = argument.slice('--matrix='.length);
+    else if (argument.startsWith('--external-matrix-run-id='))
       options.runId = argument.slice('--external-matrix-run-id='.length);
     else if (argument.startsWith('--external-matrix-input='))
       options.inputPath = argument.slice('--external-matrix-input='.length);
@@ -165,6 +196,15 @@ function validateMatrix(candidate) {
   );
   assert(candidate.contractVersion === '1.0', 'Unsupported matrix contract version');
   assert(
+    candidate.status === 'candidate' || candidate.status === 'promoted',
+    `Unsupported matrix status: ${String(candidate.status)}`
+  );
+  if (candidate.status === 'promoted') {
+    validatePromotionEvidence(candidate.promotionEvidence);
+  } else if (candidate.promotionEvidence !== undefined) {
+    validatePromotionEvidence(candidate.promotionEvidence);
+  }
+  assert(
     Array.isArray(candidate.capabilities) && candidate.capabilities.length === 4,
     'Expected 4 C2 capabilities'
   );
@@ -190,7 +230,7 @@ function validateMatrix(candidate) {
       Array.isArray(capability.fixtureSet) && capability.fixtureSet.length >= 2,
       `${capability.capabilityId} requires at least two fixtures`
     );
-    const fixtureIds = new Set();
+    const localFixtureIds = new Set();
     for (const fixture of capability.fixtureSet) {
       assert(
         fixture && typeof fixture.source === 'string',
@@ -201,10 +241,10 @@ function validateMatrix(candidate) {
         `${capability.capabilityId} has an invalid fixture ID`
       );
       assert(
-        !fixtureIds.has(fixture.fixtureId),
+        !localFixtureIds.has(fixture.fixtureId),
         `${capability.capabilityId} has duplicate fixture`
       );
-      fixtureIds.add(fixture.fixtureId);
+      localFixtureIds.add(fixture.fixtureId);
       assert(
         fs.existsSync(path.join(projectRoot, fixture.source)),
         `${capability.capabilityId} references missing fixture ${fixture.source}`
@@ -229,6 +269,47 @@ function validateMatrix(candidate) {
       );
     }
   }
+}
+
+function validatePromotionEvidence(evidence) {
+  assert(
+    evidence && typeof evidence === 'object',
+    'Promoted capability owner matrix requires promotionEvidence'
+  );
+  assert(
+    evidence.contractId === 'tsdoc-edge/release-matrix-evidence',
+    'Unexpected promotionEvidence contractId'
+  );
+  assert(evidence.contractVersion === '1.0', 'Unsupported promotionEvidence contractVersion');
+  assert(evidence.status === 'passed', 'promotionEvidence status must be passed');
+  assert(
+    typeof evidence.runId === 'string' && /^[0-9]+$/.test(evidence.runId),
+    'promotionEvidence runId must be a numeric string'
+  );
+  assert(
+    typeof evidence.url === 'string' && evidence.url.startsWith('https://github.com/'),
+    'promotionEvidence url must be a GitHub Actions run URL'
+  );
+  assert(
+    evidence.repository === 'mineclover/tsdoc-edge',
+    'Unexpected promotionEvidence repository'
+  );
+  assert(evidence.workflowName === 'CI', 'promotionEvidence workflowName must be CI');
+  assert(
+    typeof evidence.headSha === 'string' && /^[0-9a-f]{40}$/.test(evidence.headSha),
+    'promotionEvidence headSha must be a 40-character lowercase SHA'
+  );
+  assert(
+    evidence.matrix &&
+      JSON.stringify(evidence.matrix.operatingSystems) ===
+        JSON.stringify(['ubuntu-latest', 'macos-15-intel']) &&
+      JSON.stringify(evidence.matrix.executionModes) ===
+        JSON.stringify(['--runInBand', '--maxWorkers=2']) &&
+      JSON.stringify(evidence.matrix.attempts) === JSON.stringify([1, 2]) &&
+      evidence.matrix.testJobCount === 8,
+    'promotionEvidence matrix shape does not match qualified release matrix'
+  );
+  assert(evidence.publishCheck === 'passed', 'promotionEvidence publishCheck must be passed');
 }
 
 function validateEvidenceContracts(contracts) {

@@ -2,9 +2,26 @@
   "contractId": "tsdoc-edge/capability-owner-matrix",
   "contractVersion": "1.0",
   "matrixId": "tsdoc-edge-c2-owner-matrix-v1",
-  "status": "candidate",
+  "status": "promoted",
   "scope": "ttsc-centered saved graph and work-context product path",
   "ownerDecisions": ["superseded", "retained", "composed", "deprecated", "unsupported"],
+  "promotionEvidence": {
+    "contractId": "tsdoc-edge/release-matrix-evidence",
+    "contractVersion": "1.0",
+    "status": "passed",
+    "runId": "29381030071",
+    "url": "https://github.com/mineclover/tsdoc-edge/actions/runs/29381030071",
+    "repository": "mineclover/tsdoc-edge",
+    "workflowName": "CI",
+    "headSha": "72921c748b0cd8c70d66466c9421a8d295bbdd1a",
+    "matrix": {
+      "operatingSystems": ["ubuntu-latest", "macos-15-intel"],
+      "executionModes": ["--runInBand", "--maxWorkers=2"],
+      "attempts": [1, 2],
+      "testJobCount": 8
+    },
+    "publishCheck": "passed"
+  },
   "evidenceContracts": {
     "ttscProviderPackedCanary": {
       "source": "scripts/verify-ttsc-provider-tarball.cjs",
@@ -85,7 +102,7 @@
         }
       ],
       "ownerDecision": "superseded",
-      "decisionNote": "ttsc canonical graph owns structural topology; legacy structural output stays only as a compatibility comparison until release matrix proof"
+      "decisionNote": "ttsc canonical graph is the promoted owner of structural topology; legacy structural output remains read-only differential compatibility until phased analyzer retirement"
     },
     {
       "capabilityId": "symbol-identity-position",
