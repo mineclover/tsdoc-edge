@@ -232,8 +232,8 @@ describe('RelationshipInferenceEngine', () => {
     });
   });
 
-  describe('performance', () => {
-    it('should handle moderate number of relationships', () => {
+  describe('scale behavior', () => {
+    it('should infer complete, unique domain relationships from 100 inputs', () => {
       const existing: UnifiedRelationship[] = [];
 
       // Create 100 relationships
@@ -245,13 +245,21 @@ describe('RelationshipInferenceEngine', () => {
         );
       }
 
-      const startTime = Date.now();
       const result = engine.infer(existing);
-      const endTime = Date.now();
+      const domains = Array.from({ length: 10 }, (_, i) => `Domain${i}`);
+      const domainCounts = Object.fromEntries(
+        domains.map((domain) => [
+          domain,
+          result.filter((relationship) => relationship.properties?.domain === domain).length,
+        ])
+      );
 
-      // Should complete in reasonable time (< 5 seconds)
-      expect(endTime - startTime).toBeLessThan(5000);
-      expect(Array.isArray(result)).toBe(true);
+      expect(result).toHaveLength(450);
+      expect(new Set(result.map((relationship) => relationship.id)).size).toBe(450);
+      expect(result.every((relationship) => relationship.type === 'naming-pattern-relation')).toBe(
+        true
+      );
+      expect(domainCounts).toEqual(Object.fromEntries(domains.map((domain) => [domain, 45])));
     });
   });
 });

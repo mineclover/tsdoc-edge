@@ -11,6 +11,34 @@ canonical: true
 [[Semantic Graph Spec Governance Roadmap]]의 날짜별 결정과 변경 기록이다. 완료 checkpoint의
 proof와 남은 gate는 [[Semantic Graph Spec Governance Completed Work]]에서 관리한다.
 
+## 2026-10-31
+
+- 외부 GitHub Actions CI run `29381030071`(`feature/ttsc-c2-promotion`, SHA
+  `72921c748b0cd8c70d66466c9421a8d295bbdd1a`)이 Ubuntu(`ubuntu-latest`)·macOS(`macos-15-intel`) ×
+  `--runInBand`/`--maxWorkers=2` × 2회 반복 8개 matrix job과 `publish-check`를 모두 통과한 증거를
+  바탕으로 `scripts/fixtures/capability-owner-matrix.v1.json`을 `status: promoted`로 승격하고
+  `promotionEvidence`를 고정했다. `verify-capability-owner-matrix.cjs`에 `--matrix` 옵션,
+  `promoted` 상태의 `promotionEvidence` 필수 검증과 10번째 failure canary를 추가해
+  `ownerPromotionEligible: true` 및 회귀 테스트를 닫았다. `superseded` 레거시 구조 분석기의 물리적
+  제거는 소비자 전환 단위별 후속 슬라이스로 분리 유지한다.
+- [[LSP Integration]]에 정의된 mutating CodeAction 계약(`1.0`)을 `src/lsp/mutating-code-action.ts`의
+  fail-closed validator(`validateRetainedConventionFixPlan`,
+  `resolveSavedConventionMutatingActions`)와 `TsdocEdgeService`/`server.ts`
+  `textDocument/codeAction` 경로에 구현했다. `historyId`/`checkId`/`findingId`/`codeRevisionId`/
+  `sourceContentDigest` pin, 열린 문서 `expectedVersion` + content digest, 닫힌 문서 on-disk digest,
+  원자적 multi-file `WorkspaceEdit`, canonical workspace 경계 및 symlink escape 차단,
+  overlap/duplicate 편집 거부, 위조된 client diagnostic 거부를 강제하며, 실제 `dist/lsp/server.js --stdio`
+  서브프로세스 기반 8-시나리오 프로토콜 acceptance matrix(`MutatingCodeActionProtocol.test.ts`)와
+  단위 검증(`MutatingCodeActionValidator.test.ts`)을 통과했다.
+- `NamingPatternRelationAnalyzer`, `RelationshipInferenceEngine`, `TypeChainTracer`,
+  `SymbolSearchEngine` 테스트의 러너 부하 민감 wall-clock 타이밍 단언을 결정론적 동작·선형 결과
+  검증으로 정리했다.
+- 전체 TS7 AOT in-band 스위트(`242 suites / 3,109 tests passed`), `typecheck`, `lint`(0 warnings /
+  25 infos, governance `--error-on-warnings`), `verify:document-validation`(`Errors: 0`,
+  `Warnings: 33`), `verify:canonical-safety`, C1/C2 검증(`status: promoted`,
+  `ownerPromotionEligible: true`, 10 failure canaries)과 원격 GitHub release matrix 대조를 모두
+  재확인했다.
+
 ## 2026-07-12
 
 - roadmap을 architecture spec과 세부 구현 목록에서 실행 SSOT 중심으로 축약했다.

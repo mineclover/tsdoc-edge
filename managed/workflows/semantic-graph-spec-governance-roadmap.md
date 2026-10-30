@@ -12,11 +12,11 @@ canonical: true
 > 현재 실행 로드맵. 완료 checkpoint는 [[Semantic Graph Spec Governance Completed Work]],
 > 날짜별 변경은 [[Semantic Graph Spec Governance Changelog]]에서 관리한다.
 
-**Status**: Active implementation and release qualification
+**Status**: Release-qualified on `feature/ttsc-c2-promotion` (`status: promoted` C2 matrix + mutating CodeAction gate complete)
 **Reference provider**: `ttsc` + `@ttsc/graph`
 **Compatibility target**: TypeScript 7 semantics
 **Primary consumers**: CLI, LSP, CI, `work-context`
-**Last reviewed**: 2026-07-14
+**Last reviewed**: 2026-10-31
 
 이 문서는 아직 해야 할 일, 보류 항목, release blocker와 각 항목의 다음 proof만 소유한다.
 완료된 구현 설명과 과거 결정은 이 문서에 다시 복사하지 않는다.
@@ -25,11 +25,11 @@ canonical: true
 
 | 구분 | 현재 상태 |
 | --- | --- |
-| Now | Node 24 Ubuntu/macOS 실제 release qualification과 C2 capability owner matrix |
-| Next | mutating CodeAction contract → validator → protocol acceptance matrix → stable release 판정 |
-| Active | external release qualification, C2 owner evidence 수집 |
-| Deferred | ttsc graph-lint/spec parity for unsaved LSP, mutating CodeAction implementation/unsaved spec authoring, historical Explain/Open |
-| Release | workflow wiring 완료; 실제 runtime/packed matrix 통과 전 stable release NO-GO |
+| Now | C2 owner 승격(`promoted`) 및 mutating CodeAction validator·프로토콜 acceptance matrix 완료 |
+| Next | 원격 `master` 통합 후 후보 SHA 기준 external release matrix 재확인 및 stable tag release 판정 |
+| Active | C2 owner 판정에 따른 `superseded` legacy 구조 분석기 단계적 은퇴 계획 |
+| Deferred | ttsc graph-lint/spec parity for unsaved LSP, unsaved spec authoring, historical Explain/Open |
+| Release | `feature/ttsc-c2-promotion` 외부 8-job matrix + `publish-check` 통과(`29381030071`); 통합 SHA tag 전 최종 확인 |
 | No-go | 두 번째 runner/provider, generic adapter/DSL, convention distribution registry |
 
 ## 제품 목표와 비목표
@@ -64,7 +64,7 @@ identity에 들어가야 하며, managed document가 project spec/binding의 aut
 | Saved canonical graph | `proven` (source-checkout) | router → indexer → repository + `canonical-graph status|list|read` | release matrix |
 | GraphDelta workspace view | `proven` (read-only) | content-addressed delta, multi-file effective composition, dirty/save generation guards와 LSP query 회귀 테스트 | ttsc graph-lint/spec parity smoke |
 | All-surface structural equivalence | `deferred` | CLI/CI saved path 우선, LSP 비교 보류 | LSP 재개 후 position/name/ID/impact equivalence |
-| Legacy baseline/differential | `proven` (C1 + broader fixtures) | versioned work-context comparator, parity 4/0 and 6/0, DB 불변 | C2 owner 판정 |
+| Legacy baseline/differential | `proven` (C1 + C2 promoted) | versioned work-context comparator, parity 4/0 and 6/0, DB 불변, C2 owner `promoted` | 단계별 legacy 구조 분석기 은퇴 |
 | Public provider boundary | `proven` (packed early canary) | provider snapshot/delta, packed canonical pilot, revision inspection | release matrix |
 | Spec repository | `proven` (source-checkout) | `spec extract` + `spec graph status|list|read` + `convention check --spec-db` | release matrix |
 | Managed-doc extraction | `proven` (source-checkout) | `spec extract` + policy-only pack + duplicate/provenance gate | release matrix |
@@ -75,7 +75,7 @@ identity에 들어가야 하며, managed document가 project spec/binding의 aut
 | Naming evaluator | `proven` (source-checkout) | location-aware evaluator, replay canary와 1,014/0 migration proof | Node/OS release qualification |
 | Enrichment revision/store | `proven` (source-checkout) | TSDoc enrichment와 exact store/read-only inspection | 승인된 추가 provider가 생길 때만 별도 checkpoint |
 | Durable result history | `proven` (source-checkout) | append-only bundle, retained replay와 pin/tombstone GC | Node/OS release qualification |
-| LSP spec experience | `proven` (source-checkout) | saved diagnostic/graph-lint projection, managed-doc action, effective overlay query path | ttsc parity와 historical view |
+| LSP spec experience | `proven` (source-checkout) | saved diagnostic/graph-lint projection, managed-doc action, validated mutating CodeAction(8-case stdio matrix), effective overlay query path | ttsc unsaved parity와 historical view |
 | Packed package consumer | `proven` (packed canary) | fresh install/init/build/work-context | release matrix |
 | External library pilot | `proven` (packed + self) | CLI/public API parity, report/baseline list/read, retention lifecycle, persisted state 불변 | release matrix |
 
@@ -127,8 +127,10 @@ npm run verify:external-release-matrix -- --run-id <run-id> --sha <candidate-sha
 ```
 
 `verify:external-release-matrix`는 8개 test matrix job과 `publish-check`의 완료·성공 상태,
-workflow 이름과 candidate SHA를 read-only로 확인한다. 현재 원격에 남아 있는 과거 CI run은
-실패 상태이므로 release evidence로 인정하지 않는다.
+workflow 이름과 candidate SHA를 read-only로 확인한다. `feature/ttsc-c2-promotion` 브랜치의
+run `29381030071`(SHA `72921c748b0cd8c70d66466c9421a8d295bbdd1a`)은 Ubuntu(`ubuntu-latest`)와
+macOS(`macos-15-intel`) × `--runInBand`/`--maxWorkers=2` × 2회 반복 8개 job과 `publish-check`를
+모두 통과했다. 최종 tag release 직전에는 통합된 release candidate SHA로 동일 명령을 다시 확인한다.
 
 개별 단계만 재실행할 때는 다음 명령을 사용한다.
 
@@ -153,9 +155,10 @@ evidence는 `.test-results/release-preflight-82408.json`이다. 같은 시점의
 검증하고 crash를 숨기지 않는다. 최신 기본 2회 반복은 두 attempt 모두 contract `1.2`의
 15/15 단계와 in-band/worker-2 각각 236 suites/3,080 tests를 통과했다. repeat summary는
 `.test-results/release-preflight-repeat-1783991103596-69830.json`이며, 각 attempt의 exact
-envelope도 함께 보존한다. 따라서 남은 R1 gate는 외부
-Ubuntu/macOS × in-band/worker-2 × 2회 clean-install matrix와 native-crash-free 결과이며,
-stable release와 C2 owner 승격은 그 결과 전까지 보류한다. 과거 실행 상세는
+envelope도 함께 보존한다. `feature/ttsc-c2-promotion` 브랜치 후보 SHA(`72921c748b0cd8c70d66466c9421a8d295bbdd1a`)의
+외부 Ubuntu/macOS × in-band/worker-2 × 2회 clean-install matrix와 `publish-check`는 run
+`29381030071`로 통과해 C2 owner 승격(`status: promoted`) 조건을 닫았으며, 남은 R1 gate는 최종
+통합 release candidate SHA에 대한 동일 외부 matrix 재확인이다. 과거 실행 상세는
 [[Semantic Graph Spec Governance Changelog]]와 [[Semantic Graph Spec Governance Completed Work]]에만 기록한다.
 
 ### C2 — Capability owner matrix
@@ -163,35 +166,33 @@ stable release와 C2 owner 승격은 그 결과 전까지 보류한다. 과거 �
 C1 fixture만으로 legacy analyzer 제거를 확대하지 않는다. capability별로 아래 envelope를
 versioned artifact로 채운 뒤 owner를 판정한다.
 
-현재 source-checkout candidate는
+현재 승격된 매트릭스는
 [`capability-owner-matrix.v1.json`](../../scripts/fixtures/capability-owner-matrix.v1.json)이며,
-각 capability의 required evidence와 의도적 누락 failure canary를 다음 명령으로 검증한다.
+외부 GitHub release matrix 통과 증거(`runId: 29381030071`, `headSha: 72921c748b0cd8c70d66466c9421a8d295bbdd1a`)를
+`promotionEvidence`로 고정해 `status: promoted` 및 `ownerPromotionEligible: true`로 검증된다.
+각 capability의 required evidence와 10개 의도적 누락 failure canary를 다음 명령으로 검증한다.
 
 ```bash
 npm run verify:c2-capability-matrix
 ```
 
-외부 matrix가 통과한 뒤에만 C2 owner 승격 가능성을 함께 확인할 수 있다. 이 명령은 fixture나
-production state를 변경하지 않고 `ownerPromotionEligible: true`를 산출한다.
+새로운 후보 CI run에 대해서도 동일 명령으로 외부 matrix 증거를 추가 대조할 수 있다.
 
 ```bash
 npm run verify:c2-capability-matrix -- \
   --external-matrix-run-id <run-id> --external-matrix-sha <candidate-sha>
 ```
 
-검증 결과는 4개 capability, 2개 versioned fixture와 9개 failure canary를 모두 확인하며,
+검증 결과는 4개 capability, 2개 versioned fixture와 10개 failure canary를 모두 확인하며,
 matrix 자체나 production state를 변경하지 않는다. 또한 각 capability가 packed ttsc provider
 canary contract `tsdoc-edge/ttsc-provider-packed-canary@1.6`를 참조하고, canary source가
-동일한 contract ID/version과 요구 proof key를 선언하는지 정적으로 확인한다. 이는 source-checkout
-계약 연결 검증이며 실제 외부 runner 실행 결과를 대체하지 않는다. 두 fixture는 기존 4-symbol class/method
+동일한 contract ID/version과 요구 proof key를 선언하는지 정적으로 확인한다. 두 fixture는 기존 4-symbol class/method
 slice와 6-symbol interface/class/function slice이며, 각각 differential comparator로 parity와
 read-only state 불변까지 실행한다.
 
-이 candidate는 canonical topology/identity의 owner 방향을 `superseded`, enrichment를
-`retained`, work-context 결과를 `composed`로 기록한다. `status: candidate`이므로 실제
-Ubuntu/macOS release matrix proof 전에는 legacy production removal을 승격하지 않는다.
-broader fixture와 9개 failure canary의 source-checkout proof는 완료됐지만, 외부 runner
-재현성까지 포함한 owner 승격은 아직 남아 있다.
+이 매트릭스는 canonical topology/identity의 owner를 `superseded`, enrichment를
+`retained`, work-context 결과를 `composed`로 확정(`status: promoted`)한다. 향후 `superseded`
+레거시 구조 분석기 제거는 각 소비자의 canonical 전환 단위별로 별도 슬라이스에서 수행한다.
 
 | Required evidence | 내용 |
 | --- | --- |
@@ -249,10 +250,10 @@ active scope에는 C2 owner 판정만 남긴다.
 
 - historical Explain/Open과 LSP history picker
 - retention GC의 UI promotion
-- mutating CodeAction과 unsaved spec authoring
+- unsaved overlay의 `ttsc graph-lint/spec` 재평가와 unsaved spec authoring
 - 두 번째 test runner/provider와 generic adapter/DSL
 - convention distribution registry
-- C2와 external full pilot 전 legacy analyzer 제거
+- C2 결과에 없는 legacy enrichment analyzer의 임의 제거
 
 ## Release promotion 조건
 

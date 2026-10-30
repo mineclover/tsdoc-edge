@@ -11,13 +11,14 @@ canonical: true
 > TypeScript 7로 source와 test를 함께 선컴파일하고, Jest는 JavaScript만 실행하게 만드는
 > `ts-jest` 제거 선행 루프
 
-**Status**: Repository wiring implemented; Node 24 clean-install matrix now requires two
-in-band and two worker runs on both Ubuntu and macOS for PR and tag-release workflows; native-crash
-qualification remains pending until that matrix is green
+**Status**: Qualified on `feature/ttsc-c2-promotion` — Node 24 clean-install Ubuntu/macOS ×
+in-band/worker-2 × 2-attempt matrix and `publish-check` passed (`runId: 29381030071`,
+`headSha: 72921c748b0cd8c70d66466c9421a8d295bbdd1a`); re-verify external matrix on final
+integrated release candidate SHA before stable tag release
 **Roadmap slot**: P4.0 handoff complete; P4.1 Jest JSON loader wired
 **Primary compiler**: `ttsc` + TypeScript Native 7
 **Test runner**: Jest, JavaScript execution only
-**Last reviewed**: 2026-07-14
+**Last reviewed**: 2026-10-31
 
 ## 결정
 
@@ -390,12 +391,13 @@ Cutover 전 rollback은 기본 `npm test`를 그대로 유지하는 것이다. C
 - [x] incomplete/stale/tampered `.test-dist`는 `test:run` 전에 거부된다.
 - [x] ttsc/Jest nested child는 orchestration process group을 공유하고 SIGINT/SIGTERM 뒤 bounded
   `SIGKILL` escalation으로 고아 프로세스를 남기지 않는다.
-- [ ] Node 24 engines/native dependency 계약에서 worker/in-band 반복 clean-install matrix를
-      native crash 없이 통과한다.
-- [ ] `npm run verify:external-release-matrix -- --run-id <run-id> --sha <candidate-sha>`가
-      8개 matrix job과 `publish-check`를 모두 성공으로 판정한다.
-- [ ] 외부 matrix evidence를 전달한 `verify:c2-capability-matrix`가
-      `ownerPromotionEligible: true`를 산출한다.
+- [x] Node 24 engines/native dependency 계약에서 worker/in-band 반복 clean-install matrix를
+      native crash 없이 통과한다 (`feature/ttsc-c2-promotion` CI run `29381030071`,
+      SHA `72921c748b0cd8c70d66466c9421a8d295bbdd1a`).
+- [x] `npm run verify:external-release-matrix -- --run-id <run-id> --sha <candidate-sha>`가
+      8개 matrix job과 `publish-check`를 모두 성공으로 판정한다 (`--run-id 29381030071 --sha 72921c748b0cd8c70d66466c9421a8d295bbdd1a`).
+- [x] 외부 matrix evidence를 전달한 `verify:c2-capability-matrix`가
+      `ownerPromotionEligible: true`를 산출하며 `capability-owner-matrix.v1.json`이 `status: promoted`로 고정됐다.
 - [x] `npm test`가 typecheck → compile → run 순서로 fail-fast 실행된다.
 - [x] `ts-jest`와 parity-only legacy lane이 dependency/config/script에서 제거된다.
 - [x] `.test-dist`와 local result artifact가 clean Git status를 오염시키지 않는다.

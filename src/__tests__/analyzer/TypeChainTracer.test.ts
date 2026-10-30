@@ -1040,8 +1040,8 @@ describe('TypeChainTracer', () => {
     });
   });
 
-  describe('performance - large graphs', () => {
-    it('should handle graph with 100+ types', () => {
+  describe('large graph behavior', () => {
+    it('should identify the exact boundaries of a 100-edge chain', () => {
       const deps = Array.from({ length: 100 }, (_, i) => ({
         from: `T${i}`,
         to: `T${i + 1}`,
@@ -1050,13 +1050,13 @@ describe('TypeChainTracer', () => {
       tracer = new TypeChainTracer(graph);
 
       const roots = tracer.findRootTypes();
-      expect(roots.length).toBeGreaterThan(0);
+      expect(roots).toEqual(['T0']);
 
       const leaves = tracer.findLeafTypes();
-      expect(leaves.length).toBeGreaterThan(0);
+      expect(leaves).toEqual(['T100']);
     });
 
-    it('should handle highly connected graphs', () => {
+    it('should identify the exact boundaries of a highly connected graph', () => {
       const deps = [];
       for (let i = 0; i < 20; i++) {
         for (let j = i + 1; j < 20; j++) {
@@ -1067,7 +1067,10 @@ describe('TypeChainTracer', () => {
       tracer = new TypeChainTracer(graph);
 
       const roots = tracer.findRootTypes();
-      expect(roots.length).toBeGreaterThan(0);
+      const leaves = tracer.findLeafTypes();
+
+      expect(roots).toEqual(['T0']);
+      expect(leaves).toEqual(['T19']);
     });
   });
 
@@ -1164,7 +1167,7 @@ describe('TypeChainTracer', () => {
       expect(statsWithoutExternal.averageDependencies).toBeCloseTo(0.33, 2);
     });
 
-    it('should handle large graphs efficiently', () => {
+    it('should report complete statistics for large graphs', () => {
       const deps = [];
       for (let i = 0; i < 100; i++) {
         deps.push({ from: `Type${i}`, to: `Type${i + 1}`, type: 'composition' as const });
@@ -1172,14 +1175,13 @@ describe('TypeChainTracer', () => {
       const graph = createGraphWithDeps(deps);
       tracer = new TypeChainTracer(graph);
 
-      const start = Date.now();
       const stats = tracer.getGraphStatistics();
-      const duration = Date.now() - start;
 
       expect(stats.totalTypes).toBe(101);
       expect(stats.composites).toBe(100);
       expect(stats.complete).toBe(1);
-      expect(duration).toBeLessThan(1000); // Should complete in less than 1s
+      expect(stats.totalDependencies).toBe(100);
+      expect(stats.hasCircularDependencies).toBe(false);
     });
   });
 });

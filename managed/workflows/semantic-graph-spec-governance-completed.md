@@ -33,11 +33,13 @@ Node/OS release matrix 통과를 서로 확대 해석하지 않는다.
 | Coverage baseline inspection | `proven` (source-checkout) | Node/OS release qualification |
 | Coverage metric contract and gate | `proven` (source-checkout) | Node/OS release qualification |
 | LSP saved spec experience | `proven` (source-checkout) | historical view |
-| LSP effective code overlay | `proven` (source-checkout) | ttsc graph-lint/spec parity와 mutating CodeAction은 별도 gate |
+| LSP effective code overlay | `proven` (source-checkout) | ttsc graph-lint/spec unsaved parity는 별도 gate |
+| LSP mutating CodeAction | `proven` (source-checkout, 8-case `--stdio` matrix) | historical Explain/Open과 unsaved authoring은 별도 gate |
 | ttsc provider/canonical graph early canary | `proven` (packed early canary) | Node/OS release qualification |
 | Packed external saved CLI/CI pilot | `proven` (core fixture) | Node/OS release matrix |
 | External library public API pilot | `proven` (packed + self repository) | Node/OS release matrix |
-| C1 legacy baseline | `proven` (versioned fixtures) | C2 owner 판정 |
+| C1 legacy baseline | `proven` (versioned fixtures) | C2 owner 판정 완료 |
+| C2 capability owner matrix | `proven` (`promoted`, `runId: 29381030071`) | `superseded` legacy 구조 분석기 단계적 은퇴 |
 | C0 canonical safety proof | `proven` (source-checkout) | GraphDelta는 LSP 재개 후, 나머지는 Node/OS release matrix |
 | ttsc test process-group hardening | `proven` (source-checkout) | clean-install native-crash-free matrix |
 | Release preflight envelope inspector | `proven` (source-checkout) | external matrix and native-crash-free matrix |
@@ -185,18 +187,26 @@ npm run verify:release-preflight-envelope
 `GraphDelta`와 `EffectiveCodeGraphView`가 saved canonical revision 위에 dirty 파일 하나 이상을
 결정론적으로 합성한다. LSP service는 이 effective view를 hover, code lens, workspace search,
 impact, related-symbol, definition과 overlay diagnostics에 사용하며, save generation guard는
-새 편집이 진행 중일 때 이전 refresh가 overlay를 지우지 못하게 한다. 현재 CodeAction은 이
-read-only query 결과와 retained saved convention finding의 Explain/Open payload만 제공한다.
-ttsc graph-lint/spec contract를 미저장 view에서 재평가하거나 source를 수정하는 action은
-보류한다.
+새 편집이 진행 중일 때 이전 refresh가 overlay를 지우지 못하게 한다.
+
+CodeAction은 이 read-only query 결과와 retained saved convention finding의 Explain/Open payload에
+더해, revision-pinned `RetainedConventionFixPlan` 계약(`1.0`)을 통과한 fail-closed mutating
+`WorkspaceEdit`(`quickfix`)를 제공한다. `validateRetainedConventionFixPlan`과
+`resolveSavedConventionMutatingActions`는 `historyId` / `checkId` / `findingId` / `codeRevisionId` /
+`sourceContentDigest` pin, 열린 문서 `expectedVersion` + content digest, 닫힌 문서 on-disk digest,
+원자적 multi-file `WorkspaceEdit`, canonical workspace 경계 및 symlink escape 차단, overlap/duplicate
+편집 거부와 서버 소유 diagnostic anchor 대조를 모두 강제한다. ttsc graph-lint/spec contract를
+미저장 view에서 재평가하는 unsaved parity는 계속 별도 gate로 남긴다.
 
 검증 범위:
 
 ```bash
-npm run test:run -- --runInBand \\
-  src/__tests__/lsp/GraphDelta.test.ts \\
-  src/__tests__/lsp/LspCanonicalGraphRefresh.test.ts \\
-  src/__tests__/lsp/SavedConventionProtocol.test.ts
+npm run test:run -- --runInBand \
+  src/__tests__/lsp/GraphDelta.test.ts \
+  src/__tests__/lsp/LspCanonicalGraphRefresh.test.ts \
+  src/__tests__/lsp/SavedConventionProtocol.test.ts \
+  src/__tests__/lsp/MutatingCodeActionValidator.test.ts \
+  src/__tests__/lsp/MutatingCodeActionProtocol.test.ts
 ```
 
 ### C1 — legacy baseline
@@ -215,11 +225,27 @@ fixture와 limitation은 [work-context differential fixture](../../scripts/fixtu
 runner([verify-work-context-differential.cjs](../../scripts/verify-work-context-differential.cjs))에
 고정한다.
 
+### C2 — capability owner matrix promotion
+
+[`capability-owner-matrix.v1.json`](../../scripts/fixtures/capability-owner-matrix.v1.json)은
+외부 GitHub Actions release matrix 통과 증거(`runId: 29381030071`,
+`headSha: 72921c748b0cd8c70d66466c9421a8d295bbdd1a`, Ubuntu/macOS × `--runInBand`/`--maxWorkers=2` ×
+2회 반복 8개 job + `publish-check`)를 `promotionEvidence`로 고정해 `status: promoted` 및
+`ownerPromotionEligible: true`로 승격됐다. `verify:c2-capability-matrix`는 4개 capability(`structural-topology`,
+`symbol-identity-position`, `documentation-test-enrichment`, `work-context-output`), 2개 differential
+fixture, packed provider canary contract `1.6` 정적 대조와 `promotionEvidence` 누락 거부를 포함한
+10개 failure canary를 검증한다.
+
+```bash
+npm run verify:c2-capability-matrix
+npm run test:run -- --runInBand src/__tests__/scripts/CapabilityOwnerMatrixVerifier.test.ts
+```
+
 ## 보존된 limitation
 
 - legacy `work-context`는 canonical ID와 compiler edge kind를 노출하지 않는다.
 - compiler-only `work-context`는 legacy documentation/test enrichment를 재현하지 않는다.
-- LSP navigation과 historical Explain/Open은 아직 별도 gate다.
+- LSP 미저장 ttsc graph-lint/spec parity와 historical Explain/Open은 아직 별도 gate다.
 - C1 fixture만으로 모든 legacy analyzer의 owner를 판정하지 않는다.
 
 위 limitation은 삭제하지 않고 [[Semantic Graph Spec Governance Roadmap]]의 C2 backlog에서

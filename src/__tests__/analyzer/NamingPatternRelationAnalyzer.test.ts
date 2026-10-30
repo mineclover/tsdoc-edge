@@ -269,8 +269,8 @@ describe('NamingPatternRelationAnalyzer', () => {
     });
   });
 
-  describe('large scale', () => {
-    it('should handle many symbols efficiently', () => {
+  describe('scale behavior', () => {
+    it('should create every pairwise domain relationship for many symbols', () => {
       const domainPrefixes = ['User', 'Order', 'Payment', 'Product', 'Customer'];
       const suffixes = ['Service', 'Repository', 'Controller', 'Handler', 'Validator'];
 
@@ -285,17 +285,25 @@ describe('NamingPatternRelationAnalyzer', () => {
       const graph = createMockGraph(symbols);
       const analyzer = new NamingPatternRelationAnalyzer(graph);
 
-      const startTime = Date.now();
       const result = analyzer.analyze();
-      const endTime = Date.now();
+      const domainCounts = Object.fromEntries(
+        domainPrefixes.map((domain) => [
+          domain,
+          result.filter((relationship) => relationship.properties?.domain === domain).length,
+        ])
+      );
 
       // 5 domains × 5 symbols each = 25 symbols
       // Each domain has 5C2 = 10 relationships
       // Total: 5 × 10 = 50 relationships
-      expect(result.length).toBe(50);
-
-      // Should complete in reasonable time (< 1 second)
-      expect(endTime - startTime).toBeLessThan(1000);
+      expect(result).toHaveLength(50);
+      expect(new Set(result.map((relationship) => relationship.id)).size).toBe(50);
+      expect(result.every((relationship) => relationship.type === 'naming-pattern-relation')).toBe(
+        true
+      );
+      expect(domainCounts).toEqual(
+        Object.fromEntries(domainPrefixes.map((domain) => [domain, 10]))
+      );
     });
   });
 });

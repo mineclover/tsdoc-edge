@@ -10,9 +10,10 @@ source: src/lsp/server.ts
 # [[LSP Integration]]
 
 현재 구현 범위는 saved canonical graph와 read-only unsaved effective overlay를 소비하는 LSP
-경로다. GraphDelta/EffectiveCodeGraphView 합성은 source-checkout 회귀 테스트로 검증됐으며,
-ttsc graph-lint/spec contract를 미저장 overlay에 다시 평가하는 경로와 파일을 수정하는
-CodeAction은 별도 gate로 보류한다.
+경로다. GraphDelta/EffectiveCodeGraphView 합성과 retained finding 기반 mutating CodeAction
+validator·프로토콜 acceptance matrix는 source-checkout 회귀 테스트로 검증됐으며,
+ttsc graph-lint/spec contract를 미저장 overlay에 다시 평가하는 경로와 미저장 spec authoring은
+별도 gate로 보류한다.
 
 ## 요약
 - **목적**: VS Code 등 LSP 클라이언트에서 TSDoc Edge 분석 결과를 실시간으로 활용
@@ -269,7 +270,7 @@ LSP server는 이 command를 실행하거나 내용을 수정하지 않는다. c
 제공하며, payload에 없는 active/latest history를 추가로 조회해서는 안 된다. client는 workspace 밖의
 path와 malformed payload를 거부한다. historical Explain/Open과 mutating CodeAction은 별도 gate다.
 
-### Mutating CodeAction contract — next gate
+### Mutating CodeAction contract — implemented
 
 lint와 convention은 canonical code/spec의 보조 진단 계층이다. LSP CodeAction은 lint를 다시
 실행해 결과를 만들거나 unsaved overlay에 `ttsc graph-lint/spec`를 재적용하지 않는다. 현재
@@ -277,7 +278,8 @@ lint와 convention은 canonical code/spec의 보조 진단 계층이다. LSP Cod
 read-only action으로 유지한다.
 
 파일을 수정하는 action은 retained finding이 검증된 fix plan을 제공하는 경우에만 허용한다.
-fix plan과 action response는 다음 계약을 따른다.
+`specGovernance.lspSavedHistory.fixPlansPath`가 지정한 workspace 내부 JSON bundle(`contractVersion: "1.0"`)을
+`src/lsp/mutating-code-action.ts`가 fail-closed로 검증하며, fix plan과 action response는 다음 계약을 따른다.
 
 1. **Identity pin**: `historyId`(있는 경우), `checkId`, `findingId`, `codeRevisionId`와
    source content digest를 함께 고정한다. 서버가 active/latest history나 다른 revision으로
@@ -298,9 +300,10 @@ fix plan과 action response는 다음 계약을 따른다.
    deterministic conflict로 거부한다. edit 순서와 action id는 stable해야 한다.
 
 따라서 mutating action이 없는 lint finding도 정상 상태다. 그 경우에는 diagnostic과
-Explain/Open만 제공한다. 이 계약의 acceptance matrix는 same-file fix, multi-file atomic
-fix, version mismatch, stale revision, outside-workspace path, symlink escape, overlapping
-edit, malformed plan을 포함한다. unsaved overlay의 lint/spec 재평가와 unsaved spec authoring은
+Explain/Open만 제공한다. `MutatingCodeActionValidator.test.ts`와 실제 `--stdio` 서버를 구동하는
+`MutatingCodeActionProtocol.test.ts`가 same-file fix, multi-file atomic fix, version mismatch,
+stale revision, outside-workspace path, symlink escape, overlapping edit, malformed plan 8개
+acceptance matrix를 검증한다. unsaved overlay의 lint/spec 재평가와 unsaved spec authoring은
 이 계약의 대상이 아니며 계속 별도 보류 범위로 둔다.
 
 ### Historical Explain/Open — exact-ID slice
