@@ -40,9 +40,19 @@ import type {
 import { ConfigLoader } from '../utils/ConfigLoader';
 import { CacheManager } from './cache-manager';
 import { CanonicalGraphLspView, canonicalNodeDisplayName } from './canonical-graph-view';
-import { conventionDiagnosticsForFile } from './convention-diagnostics';
+import {
+  conventionDiagnosticsForFile,
+  type SavedConventionDiagnosticData,
+} from './convention-diagnostics';
 import { type DiagnosticInfo, mapCanonicalDiagnostic } from './diagnostics';
 import { IncrementalBuilder, type IncrementalExtractResult } from './incremental-builder';
+import {
+  loadConventionFixPlanBundleFile,
+  type OpenLspDocumentSnapshot,
+  type ResolvedSavedConventionMutatingActions,
+  resolveSavedConventionMutatingActions,
+  type ValidatedMutatingCodeAction,
+} from './mutating-code-action';
 import {
   type CodeGraphRevision,
   EffectiveCodeGraphView,
@@ -102,6 +112,10 @@ export interface TsdocEdgeServiceOptions {
   readonly canonicalGraphDependencies?: CanonicalGraphCoordinatorDependencies;
   /** Explicit saved check injection for hosts and focused tests. */
   readonly savedConventionCheck?: ConventionCheckResult;
+  /** Optional explicit history ID paired with `savedConventionCheck`. */
+  readonly savedConventionHistoryId?: string;
+  /** Optional candidate fix plans paired with `savedConventionCheck`. */
+  readonly savedConventionFixPlans?: readonly unknown[];
 }
 
 /** Cache names used by the service */
@@ -167,6 +181,9 @@ export class TsdocEdgeService {
 
   /** Exact retained history record supplying saved convention diagnostics. */
   private savedConventionHistoryId: string | undefined;
+
+  /** Raw retained fix-plan candidates validated fail-closed on each CodeAction request. */
+  private savedConventionFixPlans: readonly unknown[] = [];
 
   /** TS5 syntax-only results for unsaved buffers; never persisted. */
   private readonly unsavedOverlays = new Map<string, UnsavedFileOverlay>();
@@ -506,6 +523,10 @@ export class TsdocEdgeService {
   private initSavedConventionCheck(options: TsdocEdgeServiceOptions): void {
     if (options.savedConventionCheck) {
       this.savedConventionCheck = options.savedConventionCheck;
+      this.savedConventionHistoryId = options.savedConventionHistoryId;
+      this.savedConventionFixPlans = options.savedConventionFixPlans
+        ? Object.freeze([...options.savedConventionFixPlans])
+        : [];
       return;
     }
     const loader = new ConfigLoader(this.workspaceRoot);
@@ -526,6 +547,22 @@ export class TsdocEdgeService {
         this.savedConventionHistoryId = retained.historyId;
       } finally {
         repository.close();
+      }
+      if (options.savedConventionFixPlans) {
+        this.savedConventionFixPlans = Object.freeze([...options.savedConventionFixPlans]);
+      } else if (savedHistory.fixPlansPath !== undefined) {
+        const loadedPlans = loadConventionFixPlanBundleFile(
+          this.workspaceRoot,
+          savedHistory.fixPlansPath
+        );
+        if (!loadedPlans.ok) {
+          console.warn(
+            `Failed to load saved convention fix plans (${loadedPlans.reason}): ${loadedPlans.detail}`
+          );
+          this.savedConventionFixPlans = [];
+        } else {
+          this.savedConventionFixPlans = loadedPlans.rawPlans;
+        }
       }
     } catch (error) {
       console.warn(
@@ -1253,6 +1290,45 @@ export class TsdocEdgeService {
           path.resolve(this.workspaceRoot, diagnostic.file) === resolvedFile
       )
       .map((diagnostic) => mapCanonicalDiagnostic(diagnostic));
+  }
+
+  /**
+   * Resolve validated atomic mutating CodeActions for one saved convention diagnostic.
+   *
+   * @param options - Request document URI, diagnostic identity, and open document snapshots
+   * @returns Validated mutating actions and deterministic rejections
+   * @public
+   */
+  public inspectSavedConventionMutatingActions(options: {
+    readonly requestUri: string;
+    readonly diagnosticData: SavedConventionDiagnosticData;
+    readonly openDocuments: readonly OpenLspDocumentSnapshot[];
+  }): ResolvedSavedConventionMutatingActions {
+    return resolveSavedConventionMutatingActions({
+      workspaceRoot: this.workspaceRoot,
+      requestUri: options.requestUri,
+      activeCodeRevisionId: this.canonicalRevisionId,
+      savedCheck: this.savedConventionCheck,
+      ...(this.savedConventionHistoryId ? { savedHistoryId: this.savedConventionHistoryId } : {}),
+      diagnosticData: options.diagnosticData,
+      rawPlans: this.savedConventionFixPlans,
+      openDocuments: options.openDocuments,
+    });
+  }
+
+  /**
+   * Return validated atomic mutating CodeActions for one saved convention diagnostic.
+   *
+   * @param options - Request document URI, diagnostic identity, and open document snapshots
+   * @returns Accepted mutating actions (empty when no valid fix plan exists)
+   * @public
+   */
+  public getSavedConventionMutatingActions(options: {
+    readonly requestUri: string;
+    readonly diagnosticData: SavedConventionDiagnosticData;
+    readonly openDocuments: readonly OpenLspDocumentSnapshot[];
+  }): readonly ValidatedMutatingCodeAction[] {
+    return this.inspectSavedConventionMutatingActions(options).actions;
   }
 
   /** Only project a retained result when it pins the active saved canonical revision. */

@@ -393,6 +393,25 @@ connection.onCodeAction((params: CodeActionParams): CodeAction[] => {
               arguments: [savedConvention],
             },
           });
+          const openSnapshots = documents.all().map((openDoc) => ({
+            uri: openDoc.uri,
+            version: openDoc.version,
+            text: openDoc.getText(),
+          }));
+          const mutatingActions = tsdocService.getSavedConventionMutatingActions({
+            requestUri: params.textDocument.uri,
+            diagnosticData: savedConvention,
+            openDocuments: openSnapshots,
+          });
+          for (const mutating of mutatingActions) {
+            actions.push({
+              title: mutating.title,
+              kind: CodeActionKind.QuickFix,
+              diagnostics: [diagnostic],
+              edit: mutating.edit,
+              data: mutating.data,
+            });
+          }
         }
       }
     }

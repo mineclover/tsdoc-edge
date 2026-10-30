@@ -383,6 +383,8 @@ export interface SpecGovernanceConfig {
 export interface SavedConventionHistoryConfig {
   readonly databasePath: string;
   readonly historyId: string;
+  /** Optional workspace-relative JSON file holding retained convention fix plans. */
+  readonly fixPlansPath?: string;
 }
 
 export interface NamingConventionConfig {

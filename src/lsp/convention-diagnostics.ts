@@ -5,6 +5,11 @@ import { DiagnosticSeverity } from 'vscode-languageserver/node';
 import type { ConventionCheckResult } from '../convention/ConventionCheckService';
 import type { DiagnosticInfo } from './diagnostics';
 
+/**
+ * Immutable identity attached to saved convention LSP diagnostics.
+ *
+ * @public
+ */
 export interface SavedConventionDiagnosticData {
   readonly kind: 'saved-convention-finding';
   readonly historyId?: string;
@@ -14,7 +19,87 @@ export interface SavedConventionDiagnosticData {
   readonly sourceLine: number;
 }
 
-/** Only non-satisfied convention outcomes become saved editor diagnostics. */
+/**
+ * Authoritative workspace-relative source anchor of one saved convention finding.
+ *
+ * @public
+ */
+export interface SavedConventionFindingAnchor {
+  readonly findingId: string;
+  readonly ruleId: string;
+  readonly sourceFile: string;
+  readonly sourceLine: number;
+}
+
+/**
+ * Look up the authoritative source anchor for a finding ID inside a saved convention check.
+ *
+ * @param result - Retained convention check result owned by the server
+ * @param findingId - Exact finding ID to resolve
+ * @returns Authoritative finding anchor when present and active, otherwise `undefined`
+ * @public
+ */
+export function findSavedConventionFindingAnchor(
+  result: ConventionCheckResult,
+  findingId: string
+): SavedConventionFindingAnchor | undefined {
+  const bindings = new Map(
+    result.retainedPack.spec.bindings.map((binding) => [binding.id, binding])
+  );
+  for (const finding of result.conformance.findings) {
+    if (finding.outcome === 'satisfied' || finding.outcome === 'disabled') continue;
+    if (finding.findingId !== findingId) continue;
+    const binding = bindings.get(finding.declarationId);
+    if (!binding) return undefined;
+    return Object.freeze({
+      findingId: finding.findingId,
+      ruleId: finding.ruleId,
+      sourceFile: binding.source.file,
+      sourceLine: binding.source.range?.startLine ?? 1,
+    });
+  }
+  for (const finding of result.naming.findings) {
+    if (finding.findingId !== findingId) continue;
+    return Object.freeze({
+      findingId: finding.findingId,
+      ruleId: finding.ruleId,
+      sourceFile: finding.file,
+      sourceLine: 1,
+    });
+  }
+  for (const finding of result.tsdoc.findings) {
+    if (finding.findingId !== findingId) continue;
+    return Object.freeze({
+      findingId: finding.findingId,
+      ruleId: finding.ruleId,
+      sourceFile: finding.file,
+      sourceLine: 1,
+    });
+  }
+  for (const finding of result.graphLint.findings) {
+    if (finding.findingId !== findingId) continue;
+    const source = graphLintSource(finding.seed);
+    if (!source) return undefined;
+    return Object.freeze({
+      findingId: finding.findingId,
+      ruleId: finding.ruleId,
+      sourceFile: source.file,
+      sourceLine: source.line,
+    });
+  }
+  return undefined;
+}
+
+/**
+ * Only non-satisfied convention outcomes become saved editor diagnostics.
+ *
+ * @param result - Retained convention check result
+ * @param workspaceRoot - Workspace root directory
+ * @param filePath - File path being diagnosed
+ * @param historyId - Optional retained history ID
+ * @returns Sorted immutable diagnostic projections for `filePath`
+ * @public
+ */
 export function conventionDiagnosticsForFile(
   result: ConventionCheckResult,
   workspaceRoot: string,

@@ -31,7 +31,42 @@
  */
 
 export { CacheEntry, CacheManager, CacheManagerOptions } from './cache-manager';
+export type {
+  SavedConventionDiagnosticData,
+  SavedConventionFindingAnchor,
+} from './convention-diagnostics';
+export {
+  conventionDiagnosticsForFile,
+  findSavedConventionFindingAnchor,
+} from './convention-diagnostics';
 export { mapCanonicalDiagnostic, toLanguageServerDiagnostic } from './diagnostics';
+export type {
+  ConventionFixFileTarget,
+  ConventionFixPlanBundle,
+  ConventionFixPlanBundleParseResult,
+  ConventionFixPosition,
+  ConventionFixRange,
+  ConventionFixTextEdit,
+  MutatingCodeActionData,
+  MutatingCodeActionRejectionReason,
+  MutatingFixPlanRejection,
+  MutatingFixPlanValidationResult,
+  OpenLspDocumentSnapshot,
+  ResolvedSavedConventionMutatingActions,
+  ResolveSavedConventionMutatingActionsOptions,
+  RetainedConventionFixPlan,
+  ValidatedMutatingCodeAction,
+  ValidateRetainedConventionFixPlanOptions,
+} from './mutating-code-action';
+export {
+  CONVENTION_FIX_PLAN_BUNDLE_CONTRACT_VERSION,
+  CONVENTION_FIX_PLAN_CONTRACT_VERSION,
+  computeSourceContentDigest,
+  loadConventionFixPlanBundleFile,
+  parseConventionFixPlanBundle,
+  resolveSavedConventionMutatingActions,
+  validateRetainedConventionFixPlan,
+} from './mutating-code-action';
 export type {
   CodeGraphRevision,
   EffectiveCodeGraph,
