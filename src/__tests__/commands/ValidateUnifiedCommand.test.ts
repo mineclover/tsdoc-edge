@@ -26,5 +26,10 @@ describe('ValidateUnifiedCommand', () => {
       const result = await command.execute(['--help']);
       expect(result.exitCode).toBe(0);
     });
+
+    it('should route tsdoc subcommand with help flag', async () => {
+      const result = await command.execute(['tsdoc', '--help']);
+      expect(result.exitCode).toBe(0);
+    });
   });
 });

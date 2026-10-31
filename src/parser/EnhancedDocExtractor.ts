@@ -6,7 +6,7 @@
  * @responsibility Extract EnhancedSymbolDoc from TypeScript files using AST + TSDoc
  */
 
-import { type ParserContext, TSDocParser } from '@microsoft/tsdoc';
+import type { ParserContext } from '@microsoft/tsdoc';
 import * as ts from 'typescript';
 import type { Symbol } from '../types/graph';
 import type {
@@ -16,6 +16,7 @@ import type {
   ErrorExperience,
   FuturePlan,
 } from '../types/tags';
+import { TSDocParser } from './TSDocParser';
 
 /**
  * Extraction options

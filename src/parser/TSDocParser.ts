@@ -95,6 +95,21 @@ export const TSDOC_EDGE_CUSTOM_TAGS: CustomTagSpec[] = [
   { tagName: '@plan', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
   { tagName: '@overlay', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
   { tagName: '@ttsc', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+
+  // Common documentation & JSDoc compatibility tags
+  { tagName: '@private', syntaxKind: TSDocTagSyntaxKind.ModifierTag, allowMultiple: false },
+  { tagName: '@description', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@template', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@module', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@todo', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@default', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@useCase', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@performance', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@priority', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@version', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@symbol', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@updated', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@changelog', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
 ];
 
 /**

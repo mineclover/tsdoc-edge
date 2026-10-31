@@ -3,7 +3,7 @@
  * @public
  */
 
-import { TSDocParser } from '@microsoft/tsdoc';
+import { TSDocParser } from '../../parser/TSDocParser';
 import type { ParsedDocComment } from '../../types';
 import { ConventionValidator } from '../../validator/ConventionValidator';
 
@@ -439,8 +439,7 @@ describe('ConventionValidator', () => {
 
       // Should have: summary(40) + public(10) + params(10) + returns(10) +
       // responsibility(10) + contract(10) + example(5) + testedBy(5) = 100
-      // But some custom tags might not be recognized by default TSDocParser
-      expect(score).toBeGreaterThanOrEqual(50); // Lowered expectation
+      expect(score).toBe(100);
       expect(hasParams).toBe(true);
       expect(hasReturns).toBe(true);
     });

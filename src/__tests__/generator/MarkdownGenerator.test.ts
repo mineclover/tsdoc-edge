@@ -85,6 +85,35 @@ describe('MarkdownGenerator', () => {
 
       expect(result).not.toContain('Validation Issues');
     });
+
+    it('should render custom blocks when present', () => {
+      const mockComment: ParsedDocComment = {
+        symbolName: 'customFunction',
+        filePath: '/test/file.ts',
+        docComment: {
+          summarySection: { nodes: [] },
+          params: { blocks: [] },
+          returnsBlock: null,
+          remarksBlock: null,
+          modifierTagSet: { nodes: [] },
+          customBlocks: [
+            {
+              blockTag: { tagName: '@responsibility' },
+              content: {
+                nodes: [{ kind: DocNodeKind.PlainText, text: 'Handle custom logic' }],
+              },
+            },
+          ],
+        } as unknown as DocComment,
+        validationResults: [],
+        isValid: true,
+      };
+
+      const result = generator.generateForComment(mockComment);
+
+      expect(result).toContain('### Responsibility');
+      expect(result).toContain('Handle custom logic');
+    });
   });
 
   describe('generateForComments', () => {

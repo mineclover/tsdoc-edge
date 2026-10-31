@@ -43,6 +43,7 @@ import {
   UntestedCommand,
   UpdateBacklinksCommand,
   UsageCommand,
+  ValidateTsdocCommand,
   ValidateUnifiedCommand,
   VisualizeDepsCommand,
 } from './commands';
@@ -189,6 +190,7 @@ async function main(): Promise<void> {
   registry.register(new UpdateBacklinksCommand(undefined, undefined, undefined, undefined, true));
   registry.register(new ValidateDocsCommand(undefined, undefined, true));
   registry.register(new ValidateSymbolRefsCommand());
+  registry.register(new ValidateTsdocCommand());
 
   // Preserve published flat command paths for relationship operations
   registry.register(new RelationshipImpactCommand());

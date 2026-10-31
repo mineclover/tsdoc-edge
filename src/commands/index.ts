@@ -69,6 +69,7 @@ export { UntestedCommand } from './UntestedCommand';
 export { UpdateBacklinksCommand } from './UpdateBacklinksCommand';
 export { UpdateSymbolRefsCommand } from './UpdateSymbolRefsCommand';
 export { UsageCommand } from './UsageCommand';
+export { ValidateTsdocCommand } from './ValidateTsdocCommand';
 export { ValidateUnifiedCommand } from './ValidateUnifiedCommand';
 export { VisualizeDepsCommand } from './VisualizeDepsCommand';
 export { WhoUsesCommand } from './WhoUsesCommand';

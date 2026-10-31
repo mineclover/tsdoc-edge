@@ -4,8 +4,8 @@
  * @responsibility Analyze TSDoc quality including child symbols
  */
 
-import { TSDocParser } from '@microsoft/tsdoc';
 import * as ts from 'typescript';
+import { TSDocParser } from '../parser/TSDocParser';
 import type { DocQualityScore } from '../types/analysis';
 
 /**

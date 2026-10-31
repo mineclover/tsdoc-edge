@@ -85,6 +85,18 @@ export class MarkdownGenerator {
       markdown += `${remarks}\n\n`;
     }
 
+    // Add custom blocks (responsibility, contract, decision, etc.)
+    if (comment.docComment.customBlocks && comment.docComment.customBlocks.length > 0) {
+      for (const block of comment.docComment.customBlocks) {
+        const tagName = block.blockTag.tagName;
+        const title = tagName.replace(/^@/, '').replace(/^[a-z]/, (c) => c.toUpperCase());
+        const content = this.renderDocNodes(block.content.nodes);
+        if (content.trim()) {
+          markdown += `### ${title}\n\n${content}\n\n`;
+        }
+      }
+    }
+
     // Add validation issues if any
     if (comment.validationResults.length > 0) {
       markdown += `### Validation Issues\n\n`;

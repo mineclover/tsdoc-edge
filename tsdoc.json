@@ -241,6 +241,61 @@
       "tagName": "@ttsc",
       "syntaxKind": "block",
       "allowMultiple": true
+    },
+    {
+      "tagName": "@private",
+      "syntaxKind": "modifier"
+    },
+    {
+      "tagName": "@description",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@template",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@module",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@todo",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@default",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@useCase",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@performance",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@priority",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@version",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@symbol",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@updated",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@changelog",
+      "syntaxKind": "block"
     }
   ]
 }

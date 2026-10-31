@@ -10,6 +10,7 @@ import { ValidateDocsCommand } from './ValidateDocsCommand';
 import { ValidateGeneratedDocsCommand } from './ValidateGeneratedDocsCommand';
 import { ValidateSpecCommand } from './ValidateSpecCommand';
 import { ValidateSymbolRefsCommand } from './ValidateSymbolRefsCommand';
+import { ValidateTsdocCommand } from './ValidateTsdocCommand';
 
 const SUBCOMMANDS = {
   connectivity: { command: ValidateCommand, description: 'Validate symbol connectivity' },
@@ -17,6 +18,10 @@ const SUBCOMMANDS = {
   generated: { command: ValidateGeneratedDocsCommand, description: 'Validate generated docs' },
   spec: { command: ValidateSpecCommand, description: 'Validate specification files' },
   refs: { command: ValidateSymbolRefsCommand, description: 'Validate symbol references' },
+  tsdoc: {
+    command: ValidateTsdocCommand,
+    description: 'Validate TSDoc syntax and tsdoc.json configuration',
+  },
 } as const;
 
 /** Available validation subcommand names */
@@ -51,7 +56,7 @@ export class ValidateUnifiedCommand extends BaseCommand {
    * @public
    */
   getDescription(): string {
-    return 'Unified validation (connectivity|docs|generated|spec|refs)';
+    return 'Unified validation (connectivity|docs|generated|spec|refs|tsdoc)';
   }
 
   /**
@@ -75,6 +80,7 @@ Examples:
   tsdoc-edge val generated
   tsdoc-edge val spec <spec-file>
   tsdoc-edge val refs
+  tsdoc-edge val tsdoc
 
 Use 'tsdoc-edge val <subcommand> --help' for subcommand details.`;
   }
