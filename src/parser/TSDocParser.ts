@@ -3,6 +3,8 @@
  * @packageDocumentation
  */
 
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import {
   TSDocParser as MicrosoftTSDocParser,
   type ParserContext,
@@ -12,6 +14,111 @@ import {
 } from '@microsoft/tsdoc';
 import * as ts from 'typescript';
 import type { ParsedDocComment, ParseResult } from '../types';
+
+/**
+ * Custom tag specification for TSDoc Edge
+ */
+export interface CustomTagSpec {
+  tagName: string;
+  syntaxKind?: TSDocTagSyntaxKind;
+  allowMultiple?: boolean;
+}
+
+/**
+ * Complete list of custom TSDoc tags used by TSDoc Edge
+ */
+export const TSDOC_EDGE_CUSTOM_TAGS: CustomTagSpec[] = [
+  // Core & Link tags
+  { tagName: '@doc', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@id', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@contract', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@precondition', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@postcondition', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@invariant', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@responsibility', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@problem', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@solves', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@context', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+
+  // Dependency & Relationship tags
+  { tagName: '@depends', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@dependsOn', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@uses', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@usedBy', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@relatedTo', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@implements', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@extends', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@depType', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@depReason', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+
+  // Architecture & Design Decision tags
+  { tagName: '@decision', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@designDecision', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@rationale', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@consequences', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@architecture', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@pattern', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@requirement', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@issue', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+
+  // Module Specification Framework (7 aspects)
+  { tagName: '@functionality', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@algorithm', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@complexity', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@sideEffect', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@mutates', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@io', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@scope', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@purpose', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@input', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@output', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@logic', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@reads', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@writes', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+
+  // Testing tags
+  { tagName: '@testedBy', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@testScenario', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@coverage', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@fixture', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+
+  // Quality & Lifecycle tags
+  { tagName: '@deadcode', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  {
+    tagName: '@deprecatedInFavorOf',
+    syntaxKind: TSDocTagSyntaxKind.BlockTag,
+    allowMultiple: false,
+  },
+  { tagName: '@enhances', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@requires', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@feature', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@plan', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@overlay', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@ttsc', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+];
+
+/**
+ * Generate standard tsdoc.json configuration object compliant with Microsoft schema
+ * @returns JSON-serializable tsdoc.json object
+ * @public
+ */
+export function generateTsdocJson(): {
+  $schema: string;
+  tagDefinitions: Array<{
+    tagName: string;
+    syntaxKind: 'block' | 'modifier';
+    allowMultiple?: boolean;
+  }>;
+} {
+  return {
+    $schema: 'https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json',
+    tagDefinitions: TSDOC_EDGE_CUSTOM_TAGS.map((tag) => ({
+      tagName: tag.tagName,
+      syntaxKind: tag.syntaxKind === TSDocTagSyntaxKind.ModifierTag ? 'modifier' : 'block',
+      ...(tag.allowMultiple ? { allowMultiple: true } : {}),
+    })),
+  };
+}
 
 // TypeScript compiler API internal types
 /**
@@ -58,166 +165,69 @@ export class TSDocParser {
    *
    * @public
    */
-  constructor() {
+  constructor(customConfigPath?: string) {
     // Create TSDoc configuration with custom tags
     this.configuration = new TSDocConfiguration();
 
-    // Define custom tags
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@id',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: false,
-      })
-    );
+    // Register all standard TSDoc Edge custom tags
+    for (const tagSpec of TSDOC_EDGE_CUSTOM_TAGS) {
+      if (this.configuration.tryGetTagDefinition(tagSpec.tagName) === undefined) {
+        this.configuration.addTagDefinition(
+          new TSDocTagDefinition({
+            tagName: tagSpec.tagName,
+            syntaxKind: tagSpec.syntaxKind ?? TSDocTagSyntaxKind.BlockTag,
+            allowMultiple: tagSpec.allowMultiple ?? false,
+          })
+        );
+      }
+    }
 
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@contract',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: false,
-      })
-    );
-
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@precondition',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: true,
-      })
-    );
-
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@postcondition',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: true,
-      })
-    );
-
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@responsibility',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: false,
-      })
-    );
-
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@problem',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: false,
-      })
-    );
-
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@solves',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: false,
-      })
-    );
-
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@context',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: false,
-      })
-    );
-
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@depends',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: true,
-      })
-    );
-
-    // Dependency tags
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@uses',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: true,
-      })
-    );
-
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@usedBy',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: true,
-      })
-    );
-
-    // Module specification tags
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@functionality',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: false,
-      })
-    );
-
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@algorithm',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: false,
-      })
-    );
-
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@complexity',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: false,
-      })
-    );
-
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@sideEffect',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: true,
-      })
-    );
-
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@mutates',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: true,
-      })
-    );
-
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@io',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: true,
-      })
-    );
-
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@scope',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: false,
-      })
-    );
-
-    this.configuration.addTagDefinition(
-      new TSDocTagDefinition({
-        tagName: '@deadcode',
-        syntaxKind: TSDocTagSyntaxKind.BlockTag,
-        allowMultiple: false,
-      })
-    );
+    // Load any custom tags from tsdoc.json if present
+    this.loadFromTsdocConfigFile(customConfigPath);
 
     this.parser = new MicrosoftTSDocParser(this.configuration);
+  }
+
+  /**
+   * Load custom tag definitions from tsdoc.json file if present
+   */
+  private loadFromTsdocConfigFile(customConfigPath?: string): void {
+    const configPath = customConfigPath || path.join(process.cwd(), 'tsdoc.json');
+    if (!fs.existsSync(configPath)) return;
+
+    try {
+      const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+      if (Array.isArray(config.tagDefinitions)) {
+        for (const def of config.tagDefinitions) {
+          if (!def.tagName) continue;
+          const tagName = def.tagName.startsWith('@') ? def.tagName : `@${def.tagName}`;
+          if (this.configuration.tryGetTagDefinition(tagName) !== undefined) continue;
+
+          let syntaxKind = TSDocTagSyntaxKind.BlockTag;
+          if (def.syntaxKind === 'modifier') {
+            syntaxKind = TSDocTagSyntaxKind.ModifierTag;
+          }
+
+          this.configuration.addTagDefinition(
+            new TSDocTagDefinition({
+              tagName,
+              syntaxKind,
+              allowMultiple: Boolean(def.allowMultiple),
+            })
+          );
+        }
+      }
+    } catch {
+      // Ignore invalid tsdoc.json, defaults are already loaded
+    }
+  }
+
+  /**
+   * Get the underlying Microsoft TSDocConfiguration
+   * @public
+   */
+  getConfiguration(): TSDocConfiguration {
+    return this.configuration;
   }
 
   /**

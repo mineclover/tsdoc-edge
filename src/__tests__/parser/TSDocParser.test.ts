@@ -2,7 +2,10 @@
  * Tests for TSDocParser
  */
 
-import { TSDocParser } from '../../parser/TSDocParser';
+import * as fs from 'node:fs';
+import * as os from 'node:os';
+import * as path from 'node:path';
+import { generateTsdocJson, TSDocParser } from '../../parser/TSDocParser';
 
 describe('TSDocParser', () => {
   let parser: TSDocParser;
@@ -212,5 +215,51 @@ function testFunc(): void {
     expect(result.filePath).toBe('test.ts');
     // Parser should still extract the comment even if it has invalid tags
     expect(result.comments.length).toBeGreaterThanOrEqual(0);
+  });
+
+  it('should parse custom TSDoc Edge tags without undefined-tag warnings', () => {
+    const comment = `/**
+ * Complex symbol
+ * @doc [[MyDoc]]
+ * @contract Validates inputs
+ * @responsibility Data transformation
+ * @decision Use pipeline
+ * @rationale High throughput
+ * @consequences Moderate memory
+ * @depends DatabaseManager
+ * @deadcode reason="deprecated" confidence="high"
+ * @public
+ */`;
+    const ctx = parser.parseString(comment);
+    const undefinedTagErrors = ctx.log.messages.filter(
+      (m) => m.messageId === 'tsdoc-undefined-tag'
+    );
+    expect(undefinedTagErrors).toHaveLength(0);
+  });
+
+  it('should generate official tsdoc.json schema compliant configuration', () => {
+    const tsdocJson = generateTsdocJson();
+    expect(tsdocJson.$schema).toContain('tsdoc.schema.json');
+    expect(tsdocJson.tagDefinitions.length).toBeGreaterThanOrEqual(40);
+    expect(tsdocJson.tagDefinitions.some((t) => t.tagName === '@deadcode')).toBe(true);
+    expect(tsdocJson.tagDefinitions.some((t) => t.tagName === '@doc')).toBe(true);
+    expect(tsdocJson.tagDefinitions.some((t) => t.tagName === '@decision')).toBe(true);
+  });
+
+  it('should load custom tags from custom tsdoc.json path', () => {
+    const tempConfigPath = path.join(os.tmpdir(), `tsdoc-test-${Date.now()}.json`);
+    fs.writeFileSync(
+      tempConfigPath,
+      JSON.stringify({
+        tagDefinitions: [{ tagName: '@projectCustomTag', syntaxKind: 'block' }],
+      }),
+      'utf-8'
+    );
+
+    const customParser = new TSDocParser(tempConfigPath);
+    const tagDef = customParser.getConfiguration().tryGetTagDefinition('@projectCustomTag');
+    expect(tagDef).toBeDefined();
+
+    fs.unlinkSync(tempConfigPath);
   });
 });

@@ -3,8 +3,10 @@
  * @packageDocumentation
  */
 
+import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { ConfigManager } from '../config/ConfigManager';
+import { generateTsdocJson } from '../parser/TSDocParser';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
@@ -113,10 +115,25 @@ export class InitCommand extends BaseCommand {
       this.printSuccess('Directories created successfully!');
       console.log();
 
+      // Generate standard tsdoc.json for official TSDoc ecosystem integration
+      const tsdocJsonPath = path.join(process.cwd(), 'tsdoc.json');
+      if (!fs.existsSync(tsdocJsonPath) || hasForce) {
+        fs.writeFileSync(
+          tsdocJsonPath,
+          `${JSON.stringify(generateTsdocJson(), null, 2)}\n`,
+          'utf-8'
+        );
+        this.printSuccess('Created tsdoc.json (official Microsoft TSDoc configuration)');
+        console.log();
+      }
+
       console.log('Next steps:');
       console.log('  1. Customize your configuration in .tsdoc.config.json');
       console.log('  2. Build database: tsdoc-edge build src');
       console.log('  3. Validate your project: tsdoc-edge validate');
+      console.log(
+        '  4. Official TSDoc config tsdoc.json generated for VS Code / ESLint compatibility'
+      );
       console.log();
 
       return this.success();

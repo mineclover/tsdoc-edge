@@ -1,0 +1,246 @@
+{
+  "$schema": "https://developer.microsoft.com/json-schemas/tsdoc/v0/tsdoc.schema.json",
+  "tagDefinitions": [
+    {
+      "tagName": "@doc",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@id",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@contract",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@precondition",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@postcondition",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@invariant",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@responsibility",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@problem",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@solves",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@context",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@depends",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@dependsOn",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@uses",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@usedBy",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@relatedTo",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@implements",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@extends",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@depType",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@depReason",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@decision",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@designDecision",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@rationale",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@consequences",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@architecture",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@pattern",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@requirement",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@issue",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@functionality",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@algorithm",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@complexity",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@sideEffect",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@mutates",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@io",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@scope",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@purpose",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@input",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@output",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@logic",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@reads",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@writes",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@testedBy",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@testScenario",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@coverage",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@fixture",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@deadcode",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@deprecatedInFavorOf",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@enhances",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@requires",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@feature",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@plan",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@overlay",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    },
+    {
+      "tagName": "@ttsc",
+      "syntaxKind": "block",
+      "allowMultiple": true
+    }
+  ]
+}
