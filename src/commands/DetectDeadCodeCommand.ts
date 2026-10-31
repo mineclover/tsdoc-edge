@@ -144,6 +144,11 @@ export class DetectDeadCodeCommand extends BaseCommand {
           this.printHeader('Dead Code Detection');
         }
 
+        if (targetPath && !fs.existsSync(targetPath)) {
+          this.printError(`Target path does not exist: ${targetPath}`);
+          return this.failure(`Target path does not exist: ${targetPath}`);
+        }
+
         const allSymbols = await this.getAllSymbols();
         if (!isJson) {
           this.printInfo(`Analyzing ${allSymbols.length} indexed symbols...`);
@@ -165,10 +170,17 @@ export class DetectDeadCodeCommand extends BaseCommand {
         });
 
         if (targetPath) {
-          const normalizedTarget = targetPath.replace(/\\/g, '/');
-          filtered = filtered.filter((dc) =>
-            dc.symbol.filePath.replace(/\\/g, '/').includes(normalizedTarget)
-          );
+          const normalizedTarget = this.normalizeSearchPath(targetPath);
+          filtered = filtered.filter((dc) => {
+            const symPath = this.normalizeSearchPath(dc.symbol.filePath);
+            return (
+              symPath === normalizedTarget ||
+              symPath.startsWith(
+                normalizedTarget.endsWith('/') ? normalizedTarget : `${normalizedTarget}/`
+              ) ||
+              symPath.includes(normalizedTarget)
+            );
+          });
         }
 
         if (typeFilter) {
@@ -219,11 +231,23 @@ export class DetectDeadCodeCommand extends BaseCommand {
   }
 
   /**
+   * Normalize search path for consistent matching across relative, ./, and absolute paths
+   */
+  private normalizeSearchPath(rawPath: string): string {
+    let normalized = rawPath.replace(/\\/g, '/');
+    if (path.isAbsolute(normalized)) {
+      normalized = path.relative(process.cwd(), normalized).replace(/\\/g, '/');
+    }
+    return normalized.replace(/^\.\//, '').trim();
+  }
+
+  /**
    * Search and report existing tagged dead code symbols
    */
   private executeTaggedSearch(targetPath: string | undefined, isJson: boolean): CommandResult {
     const searchRoot = targetPath || 'src';
     if (!fs.existsSync(searchRoot)) {
+      this.printError(`Target path does not exist: ${searchRoot}`);
       return this.failure(`Target path does not exist: ${searchRoot}`);
     }
 

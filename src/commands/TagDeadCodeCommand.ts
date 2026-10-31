@@ -33,6 +33,15 @@ export class TagDeadCodeCommand extends BaseCommand {
   }
 
   /**
+   * getAliases method
+   * @returns Returns array of aliases
+   * @public
+   */
+  getAliases(): string[] {
+    return ['tag-deadcode'];
+  }
+
+  /**
    * getDescription method
    * @returns Returns string
    * @public
@@ -64,6 +73,10 @@ export class TagDeadCodeCommand extends BaseCommand {
    * @public
    */
   async execute(args: string[]): Promise<CommandResult> {
+    if (this.hasHelpFlag(args)) {
+      return this.displayHelp();
+    }
+
     // If neither --tag nor --untag is specified, default to --tag
     const forwardedArgs = [...args];
     if (!forwardedArgs.includes('--tag') && !forwardedArgs.includes('--untag')) {

@@ -122,6 +122,33 @@ describe('DeadCodeTagger', () => {
       expect(modifiedCode).toContain(' */');
     });
 
+    it('should properly expand and tag single-line JSDoc comments', () => {
+      const filePath = path.join(tempDir, 'single-line.ts');
+      const initialCode = '/** Single line helper description */\nexport const helper = 42;\n';
+      fs.writeFileSync(filePath, initialCode, 'utf-8');
+
+      const results = tagger.tagSymbolsInFile(
+        filePath,
+        [
+          {
+            name: 'helper',
+            line: 2,
+            type: 'constant',
+            reason: 'unused-export',
+            confidence: 'high',
+          },
+        ],
+        { dryRun: false }
+      );
+
+      expect(results[0].action).toBe('tagged');
+      const modifiedCode = fs.readFileSync(filePath, 'utf-8');
+      expect(modifiedCode).toContain('/**\n * Single line helper description\n');
+      expect(modifiedCode).toContain(' * @deprecated Unused dead code: unused-export.');
+      expect(modifiedCode).toContain(' * @deadcode reason="unused-export" confidence="high"');
+      expect(modifiedCode).toContain(' */\nexport const helper = 42;');
+    });
+
     it('should not duplicate tags if already tagged', () => {
       const filePath = path.join(tempDir, 'already-tagged.ts');
       const initialCode = [

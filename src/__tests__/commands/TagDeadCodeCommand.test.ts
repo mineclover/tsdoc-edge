@@ -28,6 +28,10 @@ describe('TagDeadCodeCommand', () => {
     it('should return command description', () => {
       expect(command.getDescription()).toContain('Annotate');
     });
+
+    it('should return command aliases', () => {
+      expect(command.getAliases()).toContain('tag-deadcode');
+    });
   });
 
   describe('execute', () => {

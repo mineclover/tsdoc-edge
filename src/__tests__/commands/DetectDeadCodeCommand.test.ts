@@ -211,6 +211,26 @@ describe('DetectDeadCodeCommand', () => {
       expect(postContent).not.toContain('@deadcode');
     });
 
+    it('should fail fast if target path does not exist', async () => {
+      const result = await command.execute(['non-existent-target-file.ts']);
+      expect(result.exitCode).toBe(1);
+      expect(result.message).toContain('Target path does not exist');
+    });
+
+    it('should match target file whether passed with ./, relative, or absolute path', async () => {
+      const absPath = path.join(tempDir, 'IsolatedHelper.ts');
+      const resultAbs = await command.execute([absPath, '--json', '--all']);
+      expect(resultAbs.exitCode).toBe(0);
+
+      const relPath = path.relative(process.cwd(), absPath);
+      const resultRel = await command.execute([relPath, '--json', '--all']);
+      expect(resultRel.exitCode).toBe(0);
+
+      const dotRelPath = `./${relPath}`;
+      const resultDot = await command.execute([dotRelPath, '--json', '--all']);
+      expect(resultDot.exitCode).toBe(0);
+    });
+
     it('should safely close database connection in finally block', async () => {
       await command.execute(['--all']);
       expect(mockDb.close).toHaveBeenCalledTimes(1);

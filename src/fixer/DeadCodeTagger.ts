@@ -640,23 +640,44 @@ export class DeadCodeTagger {
 
     if (target.jsDoc) {
       const sourceFile = ts.createSourceFile('temp.ts', sourceText, ts.ScriptTarget.Latest, true);
+      const startLine = sourceFile.getLineAndCharacterOfPosition(target.jsDoc.getStart()).line;
       const endLine = sourceFile.getLineAndCharacterOfPosition(target.jsDoc.getEnd()).line;
-      const lineText = lines[endLine];
-      const closeIdx = lineText.indexOf('*/');
+      const startText = lines[startLine];
+      const endText = lines[endLine];
 
-      if (closeIdx !== -1) {
-        // Line ends with */
-        const indentBeforeAsterisk = lineText.substring(0, closeIdx);
-        const prefix = indentBeforeAsterisk.endsWith(' ')
-          ? `${indentBeforeAsterisk}* `
-          : `${indentBeforeAsterisk} * `;
+      // Handle single-line comment: /** comment */
+      if (startLine === endLine && startText.includes('/**') && startText.includes('*/')) {
+        const indent = startText.substring(0, startText.search(/\S|$/));
+        const commentBody = startText
+          .replace(/^\s*\/\*\*\s*/, '')
+          .replace(/\s*\*\/\s*.*$/, '')
+          .trim();
 
-        const tagLines = tagsToAdd.map((t) => `${prefix}${t}`);
-        lines.splice(endLine, 0, ...tagLines);
+        const replacementLines = [`${indent}/**`];
+        if (commentBody.length > 0) {
+          replacementLines.push(`${indent} * ${commentBody}`);
+        }
+        for (const tag of tagsToAdd) {
+          replacementLines.push(`${indent} * ${tag}`);
+        }
+        replacementLines.push(`${indent} */`);
+
+        lines.splice(startLine, 1, ...replacementLines);
       } else {
-        // Multi-line fallback: insert before line
-        const tagLines = tagsToAdd.map((t) => ` * ${t}`);
-        lines.splice(endLine, 0, ...tagLines);
+        // Multi-line comment: insert tags before closing */
+        const closeIdx = endText.indexOf('*/');
+        if (closeIdx !== -1) {
+          const indentBeforeAsterisk = endText.substring(0, closeIdx);
+          const prefix = indentBeforeAsterisk.endsWith(' ')
+            ? `${indentBeforeAsterisk}* `
+            : `${indentBeforeAsterisk} * `;
+
+          const tagLines = tagsToAdd.map((t) => `${prefix}${t}`);
+          lines.splice(endLine, 0, ...tagLines);
+        } else {
+          const tagLines = tagsToAdd.map((t) => ` * ${t}`);
+          lines.splice(endLine, 0, ...tagLines);
+        }
       }
     } else {
       // Create a brand new JSDoc comment
