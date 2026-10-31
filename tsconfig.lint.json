@@ -1,0 +1,7 @@
+{
+  "extends": "./tsconfig.ttsc.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "plugins": [{ "transform": "@ttsc/lint", "configFile": "./lint.config.mjs" }]
+  }
+}

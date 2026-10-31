@@ -45,7 +45,7 @@
     "verify:work-context-differential": "node scripts/verify-work-context-differential.cjs",
     "verify:work-context-differential:broader": "node scripts/verify-work-context-differential.cjs --fixture=scripts/fixtures/work-context-differential.v2.json",
     "verify:c2-capability-matrix": "node scripts/verify-capability-owner-matrix.cjs",
-    "lint": "biome check . && npm run lint:budget && npm run lint:governance && npm run ttsc:check",
+    "lint": "biome check . && npm run lint:budget && npm run lint:governance && npm run lint:ttsc",
     "lint:budget": "node scripts/verify-lint-warning-budget.cjs",
     "lint:governance": "biome check src/convention src/semantic-graph src/spec-graph src/lsp src/indexer mcp-server/src src/storage/GraphRepository.ts src/storage/SpecGraphRepository.ts src/storage/AnalysisInputRevisionRepository.ts src/storage/ConventionCheckHistoryRepository.ts --error-on-warnings",
     "format": "biome format --write .",
@@ -60,7 +60,8 @@
     "rel:help": "node dist/cli.js relationship-help",
     "safety:check": "./scripts/relationship/check-symbol-safety.sh",
     "report:weekly": "./scripts/relationship/weekly-report.sh .reports",
-    "git:check-critical": "./scripts/relationship/find-critical-changes.sh"
+    "git:check-critical": "./scripts/relationship/find-critical-changes.sh",
+    "lint:ttsc": "node scripts/verify-ttsc-lint-baseline.cjs"
   },
   "keywords": [
     "tsdoc",
@@ -92,6 +93,7 @@
     "@babel/core": "7.28.5",
     "@biomejs/biome": "2.3.2",
     "@mermaid-js/mermaid-cli": "^11.12.0",
+    "@ttsc/lint": "0.18.4",
     "@types/better-sqlite3": "^7.6.13",
     "@types/jest": "^29.5.14",
     "@types/node": "^20.19.24",

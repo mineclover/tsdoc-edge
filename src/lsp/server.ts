@@ -148,7 +148,11 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
 
 connection.onInitialized(() => {
   if (hasConfigurationCapability) {
-    connection.client.register(DidChangeConfigurationNotification.type, undefined);
+    void connection.client
+      .register(DidChangeConfigurationNotification.type, undefined)
+      .catch((error: unknown) =>
+        connection.console.error(`Configuration registration failed: ${String(error)}`)
+      );
   }
 
   if (hasWorkspaceFolderCapability) {
@@ -617,7 +621,7 @@ function publishDiagnosticsForDocument(document: TextDocument): void {
   if (!filePath) return;
 
   const diagnostics = tsdocService.getDiagnostics(filePath);
-  connection.sendDiagnostics({
+  void connection.sendDiagnostics({
     uri: document.uri,
     diagnostics: diagnostics.map((diagnostic) => toLanguageServerDiagnostic(diagnostic)),
   });
@@ -770,7 +774,7 @@ documents.onDidClose((event) => {
   const filePath = filePathFromUri(event.document.uri);
   if (!filePath) return;
   tsdocService.clearUnsavedOverlay(filePath);
-  connection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
+  void connection.sendDiagnostics({ uri: event.document.uri, diagnostics: [] });
 });
 
 // Shutdown handler - cleanup resources
