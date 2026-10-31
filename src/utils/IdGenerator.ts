@@ -87,10 +87,6 @@ export class IdGenerator {
    */
   private generateRandom(): string {
     let result = '';
-    /**
-     * i
-     * @public
-     */
     for (let i = 0; i < this.length; i++) {
       const randomIndex = Math.floor(Math.random() * this.charset.length);
       result += this.charset[randomIndex];
@@ -115,10 +111,6 @@ export class IdGenerator {
    * @returns void - No return value
    */
   registerExisting(ids: string[]): void {
-    /**
-     * id
-     * @public
-     */
     for (const id of ids) {
       this.usedIds.add(id);
 
@@ -142,10 +134,6 @@ export class IdGenerator {
       return false;
     }
 
-    /**
-     * char
-     * @public
-     */
     for (const char of id) {
       if (!this.charset.includes(char)) {
         return false;
@@ -173,13 +161,7 @@ export class IdGenerator {
 
   /**
    * Get statistics
-   * @returns Returns {
-    mode: string;
-    length: number;
-    used: number;
-    capacity: number;
-    utilization: number;
-  }
+   * @returns Summary with mode, length, used, capacity, utilization
    */
   getStats(): {
     mode: string;

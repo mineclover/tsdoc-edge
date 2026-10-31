@@ -71,10 +71,6 @@ export class CommentStateManager {
         try {
           const fileState = this.importer.parseMarkdown(markdownPath);
           this.storage.files[fileState.filePath] = fileState;
-          /**
-           * error
-           * @public
-           */
         } catch (error) {
           console.error(`Error loading ${markdownPath}:`, error);
         }
@@ -91,10 +87,6 @@ export class CommentStateManager {
   private walkDir(dir: string, callback: (filePath: string) => void): void {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
 
-    /**
-     * entry
-     * @public
-     */
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
 
@@ -147,10 +139,6 @@ export class CommentStateManager {
 
           const fileState = this.storage.files[filePath];
           commentsExported += fileState.comments.length;
-          /**
-           * error
-           * @public
-           */
         } catch (error) {
           console.error(`Error exporting ${filePath}:`, error);
         }
@@ -196,10 +184,6 @@ export class CommentStateManager {
     let filesUpdated = 0;
     let commentsUpdated = 0;
 
-    /**
-     * filePath
-     * @public
-     */
     for (const filePath in this.storage.files) {
       try {
         const updated = this.importFile(filePath, overwrite);
@@ -208,10 +192,6 @@ export class CommentStateManager {
 
         const fileState = this.storage.files[filePath];
         commentsUpdated += fileState.comments.length;
-        /**
-         * error
-         * @public
-         */
       } catch (error) {
         errors.push(`Error importing ${filePath}: ${error}`);
       }
@@ -241,10 +221,6 @@ export class CommentStateManager {
 
     const fileState = this.storage.files[filePath];
 
-    /**
-     * comment
-     * @public
-     */
     for (const comment of fileState.comments) {
       if (this.shouldCollapse(comment, options)) {
         comment.status = 'collapsed';
@@ -307,10 +283,6 @@ export class CommentStateManager {
       throw new Error(`File not in storage: ${filePath}`);
     }
 
-    /**
-     * comment
-     * @public
-     */
     for (const comment of fileState.comments) {
       if (this.shouldExpand(comment, options)) {
         comment.status = 'expanded';

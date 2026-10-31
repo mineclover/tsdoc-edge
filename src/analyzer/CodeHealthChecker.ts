@@ -102,10 +102,6 @@ export class CodeHealthChecker {
 
     // Analyze documentation
     const allDocScores: DocQualityScore[] = [];
-    /**
-     * file
-     * @public
-     */
     for (const file of sourceFiles) {
       const sourceCode = fs.readFileSync(file, 'utf-8');
       const scores = this.docAnalyzer.analyzeFile(file, sourceCode, includeChildren);
@@ -299,10 +295,6 @@ export class CodeHealthChecker {
    * @param docScores - Documentation quality scores
    */
   private updateSymbolCounts(testCoverage: TestCoverageInfo[], docScores: DocQualityScore[]): void {
-    /**
-     * coverage
-     * @public
-     */
     for (const coverage of testCoverage) {
       const symbolCount = docScores.filter((s) => s.filePath === coverage.sourceFile).length;
       coverage.symbolCount = symbolCount;
@@ -423,10 +415,6 @@ export class CodeHealthChecker {
     // Test coverage suggestions
     // const filesWithoutTests = this.testAnalyzer.getFilesWithoutTests(testCoverage);
     const filesWithoutTests: string[] = [];
-    /**
-     * file
-     * @public
-     */
     for (const file of filesWithoutTests) {
       const symbolCount = docScores.filter((s) => s.filePath === file).length;
       const effort = symbolCount > 10 ? 'large' : symbolCount > 5 ? 'medium' : 'small';
@@ -511,10 +499,6 @@ export class CodeHealthChecker {
 
     // Files with low documentation scores
     const fileScores = new Map<string, number[]>();
-    /**
-     * score
-     * @public
-     */
     for (const score of docScores) {
       if (!fileScores.has(score.filePath)) {
         fileScores.set(score.filePath, []);
@@ -534,10 +518,6 @@ export class CodeHealthChecker {
     }
 
     // Files without tests
-    /**
-     * coverage
-     * @public
-     */
     for (const coverage of testCoverage) {
       if (!coverage.hasTest) {
         files.add(coverage.sourceFile);

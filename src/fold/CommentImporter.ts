@@ -51,10 +51,6 @@ export class CommentImporter {
     let inCollapsedComment = false;
     let commentBuffer: string[] = [];
 
-    /**
-     * i
-     * @public
-     */
     for (let i = 4; i < lines.length; i++) {
       const line = lines[i];
 
@@ -238,10 +234,6 @@ export class CommentImporter {
     const visit = (node: ts.Node) => {
       const jsDocComments = (node as NodeWithJSDoc).jsDoc;
       if (jsDocComments && jsDocComments.length > 0) {
-        /**
-         * jsDoc
-         * @public
-         */
         for (const jsDoc of jsDocComments) {
           const fullText = jsDoc.getFullText();
           const symbolName = this.getSymbolName(node);
@@ -316,10 +308,6 @@ export class CommentImporter {
 
     // Build replacement map: hash -> replacement text
     const replacementMap = new Map<string, string>();
-    /**
-     * comment
-     * @public
-     */
     for (const comment of fileState.comments) {
       const replacement =
         comment.status === 'collapsed' ? comment.collapsedComment : comment.fullComment;
@@ -349,10 +337,6 @@ export class CommentImporter {
 
     // Apply replacements
     const result = [...lines];
-    /**
-     * range
-     * @public
-     */
     for (const range of replaceRanges) {
       // Remove old comment lines (1-based line numbers)
       result.splice(range.start - 1, range.end - range.start + 1, range.replacement);

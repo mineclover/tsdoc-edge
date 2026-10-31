@@ -8,6 +8,15 @@ import * as fs from 'node:fs';
 import * as ts from 'typescript';
 import type { DocQualityScore } from '../types/analysis';
 
+/** One planned edit: insert a new block, append tags to a multi-line block, or rewrite a one-line block. */
+interface DocFix {
+  start: number;
+  end: number;
+  replacement: string;
+  isAppend?: boolean;
+  isRewrite?: boolean;
+}
+
 /**
  * Options for fixing documentation
  */
@@ -59,18 +68,6 @@ export class DocumentationFixer {
    * @public
    */
   fixFile(filePath: string, scores: DocQualityScore[], options: FixOptions = {}): FixResult {
-    /**
-     * {
-     *       addSummary = true,
-     *       addParams = true,
-     *       addReturns = true,
-     *       addExamples = false,
-     *       addCustomTags = false,
-     *       dryRun = false,
-     *       minScore = 70,
-     *     }
-     * @public
-     */
     const {
       addSummary = true,
       addParams = true,
@@ -99,13 +96,8 @@ export class DocumentationFixer {
       }
 
       // Build fixes
-      const fixes: Array<{ start: number; end: number; replacement: string; isAppend?: boolean }> =
-        [];
+      const fixes: DocFix[] = [];
 
-      /**
-       * score
-       * @public
-       */
       for (const score of needsFixing) {
         const fix = this.generateFix(sourceFile, score, {
           addSummary,
@@ -132,16 +124,15 @@ export class DocumentationFixer {
       const lines = sourceCode.split('\n');
       fixes.sort((a, b) => b.start - a.start);
 
-      /**
-       * fix
-       * @public
-       */
       for (const fix of fixes) {
         const startLine = this.getLineNumber(sourceCode, fix.start);
         const endLine = this.getLineNumber(sourceCode, fix.end);
 
-        if (fix.isAppend) {
-          // Append to existing JSDoc (insert before closing */)
+        if (fix.isRewrite) {
+          // Replace a one-line JSDoc with its multi-line form
+          lines.splice(startLine, 1, fix.replacement);
+        } else if (fix.isAppend) {
+          // Append to existing multi-line JSDoc (insert before the closing */ line)
           lines.splice(endLine, 0, fix.replacement);
         } else {
           // Insert new comment before the declaration
@@ -153,6 +144,18 @@ export class DocumentationFixer {
 
       const newContent = lines.join('\n');
 
+      // Invariant: a documentation fix must never make the file less parseable.
+      const before = parseDiagnosticCount(filePath, sourceCode);
+      const after = parseDiagnosticCount(filePath, newContent);
+      if (after > before) {
+        return {
+          filePath,
+          symbolsFixed: 0,
+          modified: false,
+          error: `Refused: fixes would introduce ${after - before} syntax error(s)`,
+        };
+      }
+
       if (!dryRun) {
         fs.writeFileSync(filePath, newContent, 'utf-8');
       }
@@ -162,10 +165,6 @@ export class DocumentationFixer {
         symbolsFixed: fixes.length,
         modified: true,
       };
-      /**
-       * error
-       * @public
-       */
     } catch (error) {
       return {
         filePath,
@@ -194,10 +193,10 @@ export class DocumentationFixer {
       addExamples: boolean;
       addCustomTags: boolean;
     }
-  ): { start: number; end: number; replacement: string; isAppend?: boolean } | null {
+  ): DocFix | null {
     // Find the node at the line
     const node = this.findNodeAtLine(sourceFile, score.line - 1);
-    if (!node) {
+    if (!node || !isDocumentableDeclaration(node)) {
       return null;
     }
 
@@ -214,10 +213,6 @@ export class DocumentationFixer {
       // Parameters
       if (options.addParams) {
         const params = this.extractParameters(node);
-        /**
-         * param
-         * @public
-         */
         for (const param of params) {
           parts.push(`@param ${param.name} - ${param.description}`);
         }
@@ -253,10 +248,6 @@ export class DocumentationFixer {
 
     // If documentation exists but is incomplete, add missing parts
     // Parse missing items from score.missing
-    /**
-     * missing
-     * @public
-     */
     for (const missing of score.missing) {
       if (missing === 'summary' && options.addSummary) {
         // Can't easily add summary to existing doc, skip for now
@@ -300,8 +291,34 @@ export class DocumentationFixer {
 
     // Get indentation from the JSDoc start
     const { line: startLine } = sourceFile.getLineAndCharacterOfPosition(jsDocComment.getStart());
+    const { line: endLine } = sourceFile.getLineAndCharacterOfPosition(jsDocComment.end);
     const sourceLines = sourceFile.getFullText().split('\n');
     const indent = this.getIndentation(sourceLines[startLine]);
+
+    // A single-line `/** summary */` has no closing line to insert before: inserting there puts
+    // tag lines outside the comment. Rewrite it as a multi-line block instead.
+    if (startLine === endLine) {
+      const docText = jsDocComment.getText();
+      if (sourceLines[startLine].trim() !== docText.trim()) {
+        return null; // the comment shares its line with code; leave it untouched
+      }
+      const summary = docText
+        .replace(/^\/\*\*\s*/, '')
+        .replace(/\s*\*\/$/, '')
+        .trim();
+      const replacement = [
+        `${indent}/**`,
+        ...(summary ? [`${indent} * ${summary}`] : []),
+        ...parts.map((p) => `${indent} * ${p}`),
+        `${indent} */`,
+      ].join('\n');
+      return {
+        start: jsDocComment.getStart(),
+        end: jsDocComment.end,
+        replacement,
+        isRewrite: true,
+      };
+    }
 
     // Format the new tags with proper indentation
     const formattedParts = parts.map((p) => `${indent} * ${p}`).join('\n');
@@ -348,20 +365,19 @@ export class DocumentationFixer {
   private findNodeAtLine(sourceFile: ts.SourceFile, line: number): ts.Node | null {
     let result: ts.Node | null = null;
 
+    // Prefer the outermost documentable declaration starting on the line. Non-declaration
+    // nodes on that line (statements, the SourceFile itself) are descended through, never returned.
     const visit = (node: ts.Node) => {
+      if (result) return;
       const { line: nodeLine } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
-      if (nodeLine === line) {
-        // Skip catch clause variables (error parameters)
-        if (ts.isVariableDeclaration(node) && node.parent && ts.isCatchClause(node.parent)) {
-          return;
-        }
+      if (nodeLine === line && isDocumentableDeclaration(node)) {
         result = node;
         return;
       }
       ts.forEachChild(node, visit);
     };
 
-    visit(sourceFile);
+    ts.forEachChild(sourceFile, visit);
     return result;
   }
 
@@ -435,7 +451,13 @@ export class DocumentationFixer {
    * @returns Description
    */
   private generateReturnsDescription(returnType: string): string {
-    return `Returns ${returnType}`;
+    // Object-literal or multi-line types would be emitted verbatim into the comment, where
+    // TSDoc parses `{` as a malformed inline tag. Describe them instead of copying them.
+    const compact = returnType.replace(/\s+/g, ' ').trim();
+    if (compact.includes('{') || compact.includes('}') || compact.length > 60) {
+      return 'Result object';
+    }
+    return `Returns ${compact.replace(/>/g, '\\>')}`;
   }
 
   /**
@@ -476,4 +498,57 @@ export class DocumentationFixer {
     ];
     return formatted.join('\n');
   }
+}
+
+/**
+ * Whether the fixer may attach a doc comment to this node.
+ *
+ * Statements (`for`, `try/catch`, destructuring) and function-local variables are never API
+ * surface; inserting JSDoc there produced statement-level noise in earlier fixer runs.
+ *
+ * @param node - Node resolved from an analyzer line number
+ * @returns True for declarations that carry API documentation
+ */
+/**
+ * Count syntax (parse) diagnostics for a source text.
+ *
+ * @param fileName - File name used for script-kind detection
+ * @param text - Source text
+ * @returns Number of parse diagnostics
+ */
+function parseDiagnosticCount(fileName: string, text: string): number {
+  const sourceFile = ts.createSourceFile(fileName, text, ts.ScriptTarget.Latest, true);
+  return (
+    (sourceFile as ts.SourceFile & { parseDiagnostics?: readonly ts.Diagnostic[] }).parseDiagnostics
+      ?.length ?? 0
+  );
+}
+
+export function isDocumentableDeclaration(node: ts.Node): boolean {
+  if (
+    ts.isFunctionDeclaration(node) ||
+    ts.isClassDeclaration(node) ||
+    ts.isInterfaceDeclaration(node) ||
+    ts.isMethodDeclaration(node) ||
+    ts.isPropertyDeclaration(node) ||
+    ts.isPropertySignature(node) ||
+    ts.isMethodSignature(node) ||
+    ts.isTypeAliasDeclaration(node) ||
+    ts.isEnumDeclaration(node) ||
+    ts.isConstructorDeclaration(node) ||
+    ts.isGetAccessorDeclaration(node) ||
+    ts.isSetAccessorDeclaration(node)
+  ) {
+    return true;
+  }
+  const statement = ts.isVariableStatement(node)
+    ? node
+    : ts.isVariableDeclaration(node) && ts.isVariableDeclarationList(node.parent)
+      ? node.parent.parent
+      : undefined;
+  if (!statement || !ts.isVariableStatement(statement)) return false;
+  const container = statement.parent;
+  if (!container || !(ts.isSourceFile(container) || ts.isModuleBlock(container))) return false;
+  // Destructuring statements have no single documentable name.
+  return statement.declarationList.declarations.every((decl) => ts.isIdentifier(decl.name));
 }

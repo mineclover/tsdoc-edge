@@ -78,17 +78,6 @@ export class RecursiveImprover {
    * @public
    */
   improve(options: RecursiveImproveOptions = {}): RecursiveImproveResult {
-    /**
-     * {
-     *       targetScore = 80,
-     *       maxIterations = 10,
-     *       entryPoints = this.getEntryPoints(),
-     *       fixOptions = {},
-     *       dryRun = false,
-     *       verbose = false,
-     *     }
-     * @public
-     */
     const {
       targetScore = 80,
       maxIterations = 10,
@@ -141,10 +130,6 @@ export class RecursiveImprover {
 
       // Group by file
       const byFile = new Map<string, typeof needsFixing>();
-      /**
-       * score
-       * @public
-       */
       for (const score of needsFixing) {
         if (!byFile.has(score.filePath)) {
           byFile.set(score.filePath, []);
@@ -239,10 +224,6 @@ export class RecursiveImprover {
     const allPaths = new Set<string>();
 
     // Add entry points
-    /**
-     * entry
-     * @public
-     */
     for (const entry of entryPoints) {
       const resolved = this.configManager.resolvePath(entry);
       if (fs.existsSync(resolved)) {
@@ -256,10 +237,6 @@ export class RecursiveImprover {
     }
 
     // Add all source directories
-    /**
-     * srcDir
-     * @public
-     */
     for (const srcDir of srcDirs) {
       const resolved = this.configManager.resolvePath(srcDir);
       if (fs.existsSync(resolved)) {
@@ -279,10 +256,6 @@ export class RecursiveImprover {
   private walkDirectory(dir: string, files: Set<string>): void {
     const entries = fs.readdirSync(dir, { withFileTypes: true });
 
-    /**
-     * entry
-     * @public
-     */
     for (const entry of entries) {
       const fullPath = path.join(dir, entry.name);
 

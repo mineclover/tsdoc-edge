@@ -111,10 +111,6 @@ export class ConnectivityValidator {
 
     const relationships = this.graphBuilder.getGraph().relationships;
 
-    /**
-     * rel
-     * @public
-     */
     for (const rel of relationships) {
       const fromSymbol = this.graphBuilder.getSymbol(rel.from);
       const toSymbol = this.graphBuilder.getSymbol(rel.to);
@@ -261,10 +257,6 @@ export class ConnectivityValidator {
 
     if (analysis.undocumented.length > 0) {
       report += `### Undocumented Symbols (${analysis.undocumented.length})\n`;
-      /**
-       * sym
-       * @public
-       */
       for (const sym of analysis.undocumented.slice(0, 10)) {
         report += `- ${sym.name} (${sym.filePath}:${sym.line})\n`;
       }
@@ -276,10 +268,6 @@ export class ConnectivityValidator {
 
     if (analysis.untested.length > 0) {
       report += `### Untested Symbols (${analysis.untested.length})\n`;
-      /**
-       * sym
-       * @public
-       */
       for (const sym of analysis.untested.slice(0, 10)) {
         report += `- ${sym.name} (${sym.filePath}:${sym.line})\n`;
       }
@@ -291,10 +279,6 @@ export class ConnectivityValidator {
 
     if (analysis.circularDependencies.length > 0) {
       report += `### Circular Dependencies (${analysis.circularDependencies.length})\n`;
-      /**
-       * cycle
-       * @public
-       */
       for (const cycle of analysis.circularDependencies.slice(0, 5)) {
         report += `- ${cycle.join(' -> ')}\n`;
       }
@@ -306,10 +290,6 @@ export class ConnectivityValidator {
 
     if (analysis.brokenLinks.length > 0) {
       report += `### Broken Links (${analysis.brokenLinks.length})\n`;
-      /**
-       * link
-       * @public
-       */
       for (const link of analysis.brokenLinks.slice(0, 10)) {
         report += `- ${link.from} -> ${link.to} (${link.type})\n`;
       }
@@ -335,10 +315,6 @@ export class ConnectivityValidator {
     const allIssues: DetailedValidationIssue[] = [];
 
     // Collect all issues from all symbols
-    /**
-     * symbol
-     * @public
-     */
     for (const symbol of allSymbols) {
       const issues = this.extractDetailedIssues(symbol);
       allIssues.push(...issues);
@@ -354,10 +330,6 @@ export class ConnectivityValidator {
       }
     >();
 
-    /**
-     * issue
-     * @public
-     */
     for (const issue of allIssues) {
       const existing = issuesByFile.get(issue.filePath);
       if (existing) {
@@ -374,10 +346,6 @@ export class ConnectivityValidator {
 
     // Group issues by type
     const issuesByType = new Map<string, DetailedValidationIssue[]>();
-    /**
-     * issue
-     * @public
-     */
     for (const issue of allIssues) {
       const existing = issuesByType.get(issue.issueType);
       if (existing) {
@@ -598,19 +566,11 @@ export class ConnectivityValidator {
       (a, b) => b.issueCount - a.issueCount
     );
 
-    /**
-     * fileGroup
-     * @public
-     */
     for (const fileGroup of sortedFiles) {
       output += `\n📄 ${fileGroup.filePath} (${fileGroup.issueCount} issues)\n`;
 
       // Group by symbol within file
       const issuesBySymbol = new Map<string, DetailedValidationIssue[]>();
-      /**
-       * issue
-       * @public
-       */
       for (const issue of fileGroup.issues) {
         const existing = issuesBySymbol.get(issue.symbolName);
         if (existing) {
@@ -634,10 +594,6 @@ export class ConnectivityValidator {
           return severityOrder[a.severity] - severityOrder[b.severity];
         });
 
-        /**
-         * issue
-         * @public
-         */
         for (const issue of sortedIssues) {
           const icon =
             issue.severity === 'error' ? '❌' : issue.severity === 'warning' ? '⚠️ ' : 'ℹ️ ';

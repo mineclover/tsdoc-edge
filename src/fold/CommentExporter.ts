@@ -58,10 +58,6 @@ export class CommentExporter {
     const jsDocComments = (node as NodeWithJSDoc).jsDoc;
 
     if (jsDocComments && jsDocComments.length > 0) {
-      /**
-       * jsDoc
-       * @public
-       */
       for (const jsDoc of jsDocComments) {
         const fullText = jsDoc.getFullText();
         const symbolName = this.getSymbolName(node);
@@ -140,10 +136,6 @@ export class CommentExporter {
     const lines = fullComment.split('\n');
     let summary = '';
 
-    /**
-     * i
-     * @public
-     */
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i].trim();
 
@@ -207,10 +199,6 @@ export class CommentExporter {
     let markdown = `# ${fileState.filePath}\n\n`;
     markdown += `Last Updated: ${fileState.lastUpdated}\n\n`;
 
-    /**
-     * i
-     * @public
-     */
     for (let i = 0; i < fileState.comments.length; i++) {
       const comment = fileState.comments[i];
       markdown += `## Comment ${i + 1}: ${comment.symbol}\n\n`;

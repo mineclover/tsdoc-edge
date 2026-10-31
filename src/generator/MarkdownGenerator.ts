@@ -59,10 +59,6 @@ export class MarkdownGenerator {
     // Add parameters
     if (comment.docComment.params.blocks.length > 0) {
       markdown += `### Parameters\n\n`;
-      /**
-       * param
-       * @public
-       */
       for (const param of comment.docComment.params.blocks) {
         const paramName = param.parameterName;
         const paramDesc = this.renderDocNodes(param.content.nodes);
@@ -100,10 +96,6 @@ export class MarkdownGenerator {
     // Add validation issues if any
     if (comment.validationResults.length > 0) {
       markdown += `### Validation Issues\n\n`;
-      /**
-       * result
-       * @public
-       */
       for (const result of comment.validationResults) {
         const icon = result.severity === 'error' ? '❌' : '⚠️';
         markdown += `${icon} **${result.severity.toUpperCase()}**: ${result.message}\n`;
@@ -124,10 +116,6 @@ export class MarkdownGenerator {
   generateForComments(comments: ParsedDocComment[]): string {
     let markdown = '# API Documentation\n\n';
 
-    /**
-     * comment
-     * @public
-     */
     for (const comment of comments) {
       markdown += this.generateForComment(comment);
       markdown += '---\n\n';
@@ -145,10 +133,6 @@ export class MarkdownGenerator {
   private renderDocNodes(nodes: ReadonlyArray<DocNode>): string {
     let result = '';
 
-    /**
-     * node
-     * @public
-     */
     for (const node of nodes) {
       switch (node.kind) {
         case DocNodeKind.PlainText:

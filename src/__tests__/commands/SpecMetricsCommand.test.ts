@@ -39,7 +39,7 @@ describe('SpecMetricsCommand', () => {
     expect(parsed.healthScore).toBeDefined();
     expect(parsed.documentQuality).toBeDefined();
     expect(parsed.lifecycle).toBeDefined();
-    expect(parsed.graphConformance).toBeDefined();
+    expect(parsed.specGraph.conformanceEvaluated).toBe(false);
     expect(parsed.module7Aspects).toBeDefined();
     expect(parsed.codeConnectivity).toBeDefined();
 
@@ -51,7 +51,9 @@ describe('SpecMetricsCommand', () => {
     const result = await command.execute(['--dir', 'managed/specs']);
 
     expect(result.exitCode).toBe(0);
-    expect(consoleSpy).toHaveBeenCalledWith(expect.stringContaining('Specification Metrics'));
+    expect(consoleSpy).toHaveBeenCalledWith(
+      expect.stringContaining('Specification Metrics (managed/specs)')
+    );
     consoleSpy.mockRestore();
   });
 });

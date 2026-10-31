@@ -57,7 +57,7 @@ lastUpdated: 2025-01-15
 ## 핵심 산출물
 
 ### Convention Validation
-- ConventionValidator[^sym-005] - 프로젝트 컨벤션 검증
+- ConventionValidator[^ConventionValidator] - 프로젝트 컨벤션 검증
   - 필수 태그 확인
   - 포맷 규칙 검증
   - `@param` 타입 일치 확인
@@ -414,7 +414,7 @@ cycle_rate = symbols_in_cycles / total_symbols
 
 ## 가이드
 [^sym-003]: [StrictModeValidator](../../src/validator/StrictModeValidator.ts#StrictModeValidator)
-[^sym-005]: [ConventionValidator](../../src/validator/ConventionValidator.ts#ConventionValidator)
+[^ConventionValidator]: [ConventionValidator](../../src/validator/ConventionValidator.ts#ConventionValidator)
 
 
 ---

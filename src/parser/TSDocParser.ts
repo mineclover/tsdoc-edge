@@ -272,10 +272,6 @@ export class TSDocParser {
       const sourceFile = ts.createSourceFile(filePath, sourceCode, ts.ScriptTarget.Latest, true);
 
       this.visitNode(sourceFile, filePath, comments, errors);
-      /**
-       * error
-       * @public
-       */
     } catch (error) {
       errors.push(error as Error);
     }
@@ -305,10 +301,6 @@ export class TSDocParser {
     const jsDocComments = (node as NodeWithJSDoc).jsDoc;
 
     if (jsDocComments && jsDocComments.length > 0) {
-      /**
-       * jsDoc
-       * @public
-       */
       for (const jsDoc of jsDocComments) {
         try {
           // Get the full JSDoc text including /** and */
@@ -324,10 +316,6 @@ export class TSDocParser {
             validationResults: [], // Will be filled by validator
             isValid: true, // Will be updated by validator
           });
-          /**
-           * error
-           * @public
-           */
         } catch (error) {
           errors.push(error as Error);
         }

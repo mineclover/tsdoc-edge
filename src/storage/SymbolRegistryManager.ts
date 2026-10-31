@@ -85,10 +85,6 @@ export class SymbolRegistryManager {
 
     // Rest are entries
     const entries: SymbolRegistryEntry[] = [];
-    /**
-     * i
-     * @public
-     */
     for (let i = 1; i < lines.length; i++) {
       entries.push(JSON.parse(lines[i]));
     }
@@ -124,10 +120,6 @@ export class SymbolRegistryManager {
     lines.push(JSON.stringify(metadata));
 
     // Following lines: one entry per line
-    /**
-     * entry
-     * @public
-     */
     for (const entry of this.registry.entries) {
       lines.push(JSON.stringify(entry));
     }
@@ -420,16 +412,8 @@ export class SymbolRegistryManager {
   getUsedBy(id: string): Array<{ fromId: string; reason: string; type?: string }> {
     const usedBy: Array<{ fromId: string; reason: string; type?: string }> = [];
 
-    /**
-     * entry
-     * @public
-     */
     for (const entry of this.registry.entries) {
       if (entry.uses) {
-        /**
-         * dep
-         * @public
-         */
         for (const dep of entry.uses) {
           if (dep.targetId === id) {
             usedBy.push({
@@ -452,10 +436,6 @@ export class SymbolRegistryManager {
   getDependencyGraph(): Map<string, string[]> {
     const graph = new Map<string, string[]>();
 
-    /**
-     * entry
-     * @public
-     */
     for (const entry of this.registry.entries) {
       const deps = entry.uses?.map((d) => d.targetId) || [];
       graph.set(entry.id, deps);
@@ -471,10 +451,6 @@ export class SymbolRegistryManager {
   findOrphans(): string[] {
     const orphans: string[] = [];
 
-    /**
-     * entry
-     * @public
-     */
     for (const entry of this.registry.entries) {
       const hasDeps = (entry.uses?.length || 0) > 0;
       const isUsed = this.getUsedBy(entry.id).length > 0;
@@ -518,10 +494,6 @@ export class SymbolRegistryManager {
   }> {
     const nameMap = new Map<string, SymbolRegistryEntry[]>();
 
-    /**
-     * entry
-     * @public
-     */
     for (const entry of this.registry.entries) {
       const qn = entry.sourceRef.qualifiedName;
       if (!qn) continue;
@@ -564,10 +536,6 @@ export class SymbolRegistryManager {
     const descendants: SymbolRegistryEntry[] = [];
     const children = this.getChildren(parentId);
 
-    /**
-     * child
-     * @public
-     */
     for (const child of children) {
       descendants.push(child);
       // Recursively get grandchildren
@@ -709,10 +677,6 @@ export class SymbolRegistryManager {
 
       const entry = this.findById(symbolId);
       if (entry?.uses) {
-        /**
-         * dep
-         * @public
-         */
         for (const dep of entry.uses) {
           const depId = dep.targetId;
           if (!visited.has(depId)) {
@@ -730,10 +694,6 @@ export class SymbolRegistryManager {
       recursionStack.delete(symbolId);
     };
 
-    /**
-     * entry
-     * @public
-     */
     for (const entry of this.registry.entries) {
       if (!visited.has(entry.id)) {
         dfs(entry.id, []);
@@ -780,10 +740,6 @@ export class SymbolRegistryManager {
 
     // Check for duplicate IDs
     const idSet = new Set<string>();
-    /**
-     * entry
-     * @public
-     */
     for (const entry of this.registry.entries) {
       if (idSet.has(entry.id)) {
         errors.push(`Duplicate ID found: ${entry.id}`);
@@ -793,10 +749,6 @@ export class SymbolRegistryManager {
 
     // Check for duplicate qualified names
     const duplicateQNames = this.findDuplicateQualifiedNames();
-    /**
-     * dup
-     * @public
-     */
     for (const dup of duplicateQNames) {
       warnings.push(
         `Duplicate qualified name: ${dup.qualifiedName} (IDs: ${dup.entries.map((e) => e.id).join(', ')})`
@@ -805,10 +757,6 @@ export class SymbolRegistryManager {
 
     // Check for orphaned parent references
     const allIds = new Set(this.registry.entries.map((e) => e.id));
-    /**
-     * entry
-     * @public
-     */
     for (const entry of this.registry.entries) {
       if (entry.sourceRef.memberOf && !allIds.has(entry.sourceRef.memberOf)) {
         warnings.push(
@@ -819,10 +767,6 @@ export class SymbolRegistryManager {
 
     // Check for circular parent references (hierarchy cycle)
     // This is a data integrity issue but may occur during refactoring
-    /**
-     * entry
-     * @public
-     */
     for (const entry of this.registry.entries) {
       const visited = new Set<string>();
       let current = entry;
@@ -843,25 +787,13 @@ export class SymbolRegistryManager {
     // Check for circular dependency references (uses cycle)
     // This is common in real codebases (e.g., A imports B, B imports A)
     const depCycles = this.detectDependencyCycles();
-    /**
-     * cycle
-     * @public
-     */
     for (const cycle of depCycles) {
       warnings.push(`Circular dependency detected: ${cycle.join(' → ')}`);
     }
 
     // Check for invalid dependency references
-    /**
-     * entry
-     * @public
-     */
     for (const entry of this.registry.entries) {
       if (entry.uses) {
-        /**
-         * dep
-         * @public
-         */
         for (const dep of entry.uses) {
           if (!allIds.has(dep.targetId)) {
             warnings.push(
@@ -881,15 +813,7 @@ export class SymbolRegistryManager {
 
   /**
    * Get statistics
-   * @returns Returns {
-    totalEntries: number;
-    idStats: ReturnType<IdGenerator['getStats']>;
-    fileCount: number;
-    tagCount: number;
-    totalDependencies: number;
-    orphanCount: number;
-    duplicateQualifiedNames: number;
-  }
+   * @returns Summary with totalEntries, idStats, fileCount, tagCount, totalDependencies, orphanCount, duplicateQualifiedNames
    */
   getStats(): {
     totalEntries: number;

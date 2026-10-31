@@ -122,118 +122,92 @@ Options:
    * Print terminal dashboard
    */
   private printDashboard(metrics: UnifiedSpecMetrics, detail: boolean): void {
+    const { documentQuality: q, lifecycle: l, specGraph: g, module7Aspects: m } = metrics;
+    const c = metrics.codeConnectivity;
     console.log();
-    this.printHeader('Specification Metrics & Interconnection Dashboard');
+    this.printHeader(`Specification Metrics (${metrics.scope})`);
 
-    // Health Score Banner
     const gradeColor =
-      metrics.grade === 'A'
+      metrics.grade === 'A' || metrics.grade === 'B'
         ? colors.green
-        : metrics.grade === 'B'
-          ? colors.cyan
-          : metrics.grade === 'C'
-            ? colors.yellow
-            : colors.red;
-
-    const barLength = 25;
-    const filled = Math.round((metrics.healthScore / 100) * barLength);
-    const empty = barLength - filled;
-    const bar = '█'.repeat(filled) + '░'.repeat(empty);
-
+        : metrics.grade === 'C'
+          ? colors.yellow
+          : colors.red;
+    const filled = Math.round((metrics.healthScore / 100) * 25);
     console.log(
-      `${colors.bold}Spec Health Score:${colors.reset} ${gradeColor}${bar} ${metrics.healthScore}/100${colors.reset} (Grade: ${gradeColor}${metrics.grade}${colors.reset})`
+      `${colors.bold}Spec Health:${colors.reset} ${gradeColor}${'█'.repeat(filled)}${'░'.repeat(25 - filled)} ${metrics.healthScore}/100 (${metrics.grade})${colors.reset}`
+    );
+    console.log(
+      `${colors.dim}  weights: completeness 30% · lifecycle 20% · module aspects 20% · code links 30% (conformance excluded)${colors.reset}`
     );
     console.log();
 
-    // 1. Document Quality & Completeness
-    console.log(`${colors.bold}1. Document Quality & Completeness:${colors.reset}`);
-    console.log(`  - Total Specifications:     ${metrics.documentQuality.totalDocuments} files`);
+    console.log(`${colors.bold}1. Completeness (feature-spec template)${colors.reset}`);
     console.log(
-      `  - Completeness Rate:        ${metrics.documentQuality.completenessRate}% (${metrics.documentQuality.completeCount} complete, ${metrics.documentQuality.incompleteCount} incomplete)`
+      `  Documents ${q.totalDocuments} · complete ${q.completeCount} (${q.completenessRate}%) · avg score ${q.averageOverallScore} (design ${q.averageDesignScore}, impl ${q.averageImplementationScore})`
     );
-    console.log(`  - Average Design Score:     ${metrics.documentQuality.averageDesignScore}/100`);
     console.log(
-      `  - Average Implementation:   ${metrics.documentQuality.averageImplementationScore}/100`
-    );
-    console.log(`  - Usage Scenarios:          ${metrics.documentQuality.totalScenarios} recorded`);
-    console.log(
-      `  - Code References:          ${metrics.documentQuality.totalCodeLinks} anchors (${metrics.documentQuality.totalConceptLinks} concept links)`
+      `  Scenarios ${q.totalScenarios} · examples ${q.totalExamples} · [[concept]] links ${q.totalConceptLinks} · code refs ${q.totalCodeLinks}`
     );
     console.log();
 
-    // 2. Lifecycle Governance
-    console.log(`${colors.bold}2. Lifecycle Governance:${colors.reset}`);
-    const d = metrics.lifecycle.distribution;
-    console.log(
-      `  - Distribution:             Active: ${d.active || 0} (${metrics.lifecycle.distributionPercentages.active}%) | Draft: ${d.draft || 0} (${metrics.lifecycle.distributionPercentages.draft}%) | Review: ${d.review || 0}`
-    );
-    console.log(`  - Active/Approved Ratio:    ${metrics.lifecycle.activeRatio}%`);
-    console.log(
-      `  - Promotion Ready:          ${metrics.lifecycle.readyForPromotionCount} documents ready for status advancement`
-    );
+    console.log(`${colors.bold}2. Lifecycle (frontmatter status)${colors.reset}`);
+    const dist = (Object.entries(l.distribution) as Array<[string, number]>)
+      .filter(([, count]) => count > 0)
+      .map(([status, count]) => `${status} ${count}`)
+      .join(' · ');
+    console.log(`  ${dist || 'no documents'} · active/approved ${l.activeRatio}%`);
+    console.log(`  Ready for next status: ${l.readyForPromotionCount}`);
     console.log();
 
-    // 3. SpecGraph Conformance
-    console.log(`${colors.bold}3. SpecGraph Conformance:${colors.reset}`);
-    if (metrics.graphConformance.hasSpecGraph) {
+    console.log(`${colors.bold}3. SpecGraph (.tsdoc/spec-graph.db)${colors.reset}`);
+    if (g.hasSpecGraph) {
       console.log(
-        `  - Revision:                 ${metrics.graphConformance.revisionId?.slice(0, 24)}...`
+        `  ${g.nodeCount} nodes · ${g.edgeCount} edges · ${g.bindingCount} bindings · ${g.obligationCount} obligations`
       );
       console.log(
-        `  - Graph Elements:           ${metrics.graphConformance.nodeCount} nodes, ${metrics.graphConformance.edgeCount} edges, ${metrics.graphConformance.bindingCount} bindings`
-      );
-      console.log(
-        `  - Conformance Rate:         ${colors.green}${metrics.graphConformance.conformanceRate}%${colors.reset} (${metrics.graphConformance.outcomes.satisfied} satisfied, ${metrics.graphConformance.outcomes.violated} violated)`
+        `  ${colors.dim}Conformance not evaluated here; run 'tsdoc-edge convention check'.${colors.reset}`
       );
     } else {
       console.log(
-        `  - Status:                   ${colors.yellow}No compiled SpecGraph projection found${colors.reset} (run 'tsdoc-edge spec extract')`
+        `  ${colors.yellow}No active revision${colors.reset} (run 'tsdoc-edge spec extract')`
       );
     }
     console.log();
 
-    // 4. Module Spec 7-Aspects
-    console.log(`${colors.bold}4. Module Specification 7-Aspect Coverage:${colors.reset}`);
-    const a = metrics.module7Aspects.aspectCoverage;
     console.log(
-      `  - Purpose: ${a.purpose}% | Input: ${a.input}% | Output: ${a.output}% | Context: ${a.context}%`
+      `${colors.bold}4. Module-spec aspects (share of ${m.analyzedFiles} source files with a matching JSDoc tag)${colors.reset}`
     );
-    console.log(`  - Logic:   ${a.logic}% | Effect: ${a.effect}% | Scope: ${a.scope}%`);
+    const a = m.aspectCoverage;
     console.log(
-      `  - 7-Aspect Mean Score:      ${metrics.module7Aspects.averageAspectScore}/100 across ${metrics.module7Aspects.analyzedSymbols} source files`
+      `  purpose ${a.purpose}% · input ${a.input}% · output ${a.output}% · context ${a.context}% · logic ${a.logic}% · effect ${a.effect}% · scope ${a.scope}%  (mean ${m.averageAspectScore})`
     );
     console.log();
 
-    // 5. Code-to-Spec Connectivity
-    console.log(`${colors.bold}5. Code-to-Spec Bidirectional Connectivity:${colors.reset}`);
+    console.log(`${colors.bold}5. Code ↔ spec links (.tsdoc.db)${colors.reset}`);
     console.log(
-      `  - Total Symbols in Graph:   ${metrics.codeConnectivity.totalSymbols} (${metrics.codeConnectivity.exportedSymbols} exported)`
+      `  Exported symbols with doc-reference: ${c.exportedSymbolsWithDocReference}/${c.exportedSymbols} (${c.specCoverageRate}%)`
     );
     console.log(
-      `  - Symbols with Spec Links:  ${metrics.codeConnectivity.symbolsWithSpecReference} (${metrics.codeConnectivity.specCoverageRate}% coverage)`
-    );
-    console.log(
-      `  - Link Integrity:           ${metrics.codeConnectivity.linkIntegrityRate}% (${metrics.codeConnectivity.validCodeLinksCount} valid, ${metrics.codeConnectivity.brokenCodeLinksCount} broken)`
+      `  Footnote anchors resolved: ${c.validCodeLinksCount}/${c.validCodeLinksCount + c.brokenCodeLinks.length} (${c.linkIntegrityRate}%)`
     );
     console.log();
 
-    // Recommendations
     if (metrics.recommendations.length > 0) {
-      console.log(`${colors.bold}Actionable Recommendations:${colors.reset}`);
-      const list = detail ? metrics.recommendations : metrics.recommendations.slice(0, 3);
+      console.log(`${colors.bold}Recommendations${colors.reset}`);
+      const list = detail ? metrics.recommendations : metrics.recommendations.slice(0, 5);
       for (const rec of list) {
         const icon =
           rec.severity === 'error'
             ? `${colors.red}✗${colors.reset}`
             : rec.severity === 'warning'
-              ? `${colors.yellow}⚠${colors.reset}`
-              : `${colors.cyan}ℹ${colors.reset}`;
-
-        console.log(`  ${icon} [${rec.category.toUpperCase()}] ${rec.message}`);
+              ? `${colors.yellow}!${colors.reset}`
+              : `${colors.cyan}i${colors.reset}`;
+        console.log(`  ${icon} [${rec.category}] ${rec.message}`);
       }
-      if (!detail && metrics.recommendations.length > 3) {
+      if (!detail && metrics.recommendations.length > 5) {
         console.log(
-          `  ${colors.dim}... and ${metrics.recommendations.length - 3} more recommendations (run with --detail)${colors.reset}`
+          `  ${colors.dim}... ${metrics.recommendations.length - 5} more (--detail)${colors.reset}`
         );
       }
       console.log();

@@ -1,26 +1,31 @@
 /**
- * Spec Metrics Aggregator - Centralized aggregation and mutual interconnection of specification metrics
+ * Spec Metrics Aggregator - read-only projection of existing specification signals.
+ *
+ * Every number reported here is computed from an existing source of truth
+ * (managed documents, `.tsdoc.db`, `.tsdoc/spec-graph.db`, or source JSDoc).
+ * Signals that are not evaluated by this aggregator are reported as such rather
+ * than estimated.
+ *
  * @packageDocumentation
  */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import Database from 'better-sqlite3';
+import * as ts from 'typescript';
 import { ConfigManager } from '../config/ConfigManager';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import { SpecGraphRepository } from '../storage/SpecGraphRepository';
 import type { SpecStatus } from '../types/spec';
 import { SpecCompletenessValidator } from './SpecCompletenessValidator';
-import { SpecContentSimilarityChecker } from './SpecContentSimilarityChecker';
 import { SpecStatusManager } from './SpecStatusManager';
-import { UnusedDocumentDetector } from './UnusedDocumentDetector';
 
 /**
  * Options for spec metrics aggregation
  * @public
  */
 export interface SpecMetricsOptions {
-  /** Directory containing managed specifications */
+  /** Directory containing managed specifications (default: specGovernance.authoredSpecDirs[0]) */
   managedDir?: string;
   /** Path to symbol SQLite database */
   dbPath?: string;
@@ -28,20 +33,35 @@ export interface SpecMetricsOptions {
   specDbPath?: string;
   /** Source code directory */
   srcDir?: string;
-  /** Whether to run deep content similarity check */
-  deepSimilarity?: boolean;
 }
 
+/** The 7 aspects of the module specification framework, keyed to the TSDoc tags that evidence them. */
+export const MODULE_SPEC_ASPECT_TAGS = {
+  purpose: ['@problem', '@responsibility', '@solves', '@purpose'],
+  input: ['@param', '@precondition', '@contract', '@input'],
+  output: ['@returns', '@postcondition', '@output'],
+  context: ['@context', '@depends', '@dependsOn', '@uses', '@relatedTo'],
+  logic: ['@logic', '@algorithm', '@complexity', '@invariant'],
+  effect: ['@sideEffect', '@mutates', '@reads', '@writes', '@io'],
+  scope: ['@scope', '@public', '@internal', '@private'],
+} as const;
+
+/** Module specification aspect name. */
+export type ModuleSpecAspect = keyof typeof MODULE_SPEC_ASPECT_TAGS;
+
 /**
- * Unified Specification Metrics representation across 5 core dimensions
+ * Unified specification metrics
  * @public
  */
 export interface UnifiedSpecMetrics {
   timestamp: string;
+  /** Weighted score over the evaluated dimensions only (0-100). */
   healthScore: number;
   grade: 'A' | 'B' | 'C' | 'D' | 'F';
+  /** Directory whose markdown files were evaluated. */
+  scope: string;
 
-  /** 1. Document Quality & Completeness */
+  /** 1. Document completeness, measured by SpecCompletenessValidator's feature-spec template. */
   documentQuality: {
     totalDocuments: number;
     completeCount: number;
@@ -57,72 +77,54 @@ export interface UnifiedSpecMetrics {
     totalIssues: number;
   };
 
-  /** 2. Lifecycle Governance */
+  /** 2. Lifecycle status read from document frontmatter. */
   lifecycle: {
     distribution: Record<SpecStatus, number>;
     distributionPercentages: Record<SpecStatus, number>;
     activeRatio: number;
     readyForPromotionCount: number;
-    unusedDocumentsCount: number;
-    duplicatePairsCount: number;
   };
 
-  /** 3. SpecGraph Conformance & Obligations */
-  graphConformance: {
+  /** 3. Compiled SpecGraph structure. Conformance is evaluated only by `convention check`. */
+  specGraph: {
     hasSpecGraph: boolean;
     revisionId?: string;
     nodeCount: number;
     edgeCount: number;
     bindingCount: number;
     obligationCount: number;
-    conformanceRate: number;
-    satisfactionRate: number;
-    outcomes: {
-      satisfied: number;
-      violated: number;
-      indeterminate: number;
-      suppressed: number;
-      disabled: number;
-    };
+    conformanceEvaluated: false;
   };
 
-  /** 4. Module Spec 7-Aspect Coverage */
+  /** 4. Share of source files whose JSDoc carries at least one tag evidencing each aspect. */
   module7Aspects: {
-    analyzedSymbols: number;
-    aspectCoverage: {
-      purpose: number;
-      input: number;
-      output: number;
-      context: number;
-      logic: number;
-      effect: number;
-      scope: number;
-    };
+    analyzedFiles: number;
+    aspectCoverage: Record<ModuleSpecAspect, number>;
     averageAspectScore: number;
   };
 
-  /** 5. Code-to-Spec Bidirectional Connectivity */
+  /** 5. Code-to-spec links. */
   codeConnectivity: {
     totalSymbols: number;
     exportedSymbols: number;
-    symbolsWithSpecReference: number;
+    /** Exported symbols that are the source of at least one `doc-reference` relationship. */
+    exportedSymbolsWithDocReference: number;
     specCoverageRate: number;
+    /** Footnote anchors (`[^sym-XXX]` by ID, `[^Name]` by symbol name) that resolve in `.tsdoc.db`. */
     validCodeLinksCount: number;
-    brokenCodeLinksCount: number;
+    brokenCodeLinks: Array<{ file: string; identifier: string }>;
     linkIntegrityRate: number;
   };
 
-  /** Actionable recommendations */
   recommendations: Array<{
     category: 'quality' | 'lifecycle' | 'conformance' | 'connectivity';
     severity: 'error' | 'warning' | 'info';
     message: string;
-    target?: string;
   }>;
 }
 
 /**
- * File-scoped spec context for individual code or spec files
+ * File-scoped spec context for a spec document or a source file
  * @public
  */
 export interface FileSpecContext {
@@ -130,42 +132,40 @@ export interface FileSpecContext {
   isSpecFile: boolean;
   score?: number;
   status?: SpecStatus;
-  linkedSymbols?: string[];
   boundSpecs?: Array<{
-    title: string;
-    filePath: string;
-    status: SpecStatus;
-    score: number;
+    symbolRef: string;
+    filePath?: string;
+    status?: SpecStatus;
+    score?: number;
   }>;
-  aspectsCoverage?: Record<string, boolean>;
+  aspectsCoverage?: Record<ModuleSpecAspect, boolean>;
   recommendations: string[];
 }
 
+const STATUSES: readonly SpecStatus[] = [
+  'draft',
+  'review',
+  'approved',
+  'active',
+  'deprecated',
+  'archived',
+];
+
 /**
- * Aggregator and orchestrator for all specification metrics
+ * Read-only aggregator for specification metrics
  *
  * @doc [[SpecMetricsAggregator]]
  * @public
- * @responsibility Unify spec completeness, lifecycle, graph conformance, 7-aspects, and code connectivity
- * @contract Collect cross-system metrics and produce unified spec health score and recommendations
+ * @responsibility Project existing spec, symbol, and JSDoc signals into one report without estimating
+ * @contract Never reports a value it did not measure; unevaluated signals are marked explicitly
  */
 export class SpecMetricsAggregator {
-  private completenessValidator: SpecCompletenessValidator;
-  private statusManager: SpecStatusManager;
-  private unusedDetector: UnusedDocumentDetector;
-  private similarityChecker: SpecContentSimilarityChecker;
-  private docSymbolParser: DocumentSymbolParser;
-
-  constructor() {
-    this.completenessValidator = new SpecCompletenessValidator();
-    this.statusManager = new SpecStatusManager();
-    this.unusedDetector = new UnusedDocumentDetector();
-    this.similarityChecker = new SpecContentSimilarityChecker();
-    this.docSymbolParser = new DocumentSymbolParser();
-  }
+  private readonly completenessValidator = new SpecCompletenessValidator();
+  private readonly statusManager = new SpecStatusManager();
+  private readonly docSymbolParser = new DocumentSymbolParser();
 
   /**
-   * Aggregate all specification metrics across the project
+   * Aggregate specification metrics for a scope
    *
    * @param options - Aggregation options
    * @returns Unified spec metrics
@@ -173,581 +173,393 @@ export class SpecMetricsAggregator {
    */
   aggregate(options: SpecMetricsOptions = {}): UnifiedSpecMetrics {
     const config = ConfigManager.getInstance().get();
-    const managedDir =
-      options.managedDir ||
-      (fs.existsSync(path.resolve(process.cwd(), 'managed'))
-        ? 'managed'
-        : config.specGovernance?.authoredSpecDirs?.[0] || 'docs/managed');
+    const cwd = process.cwd();
+    const scope = options.managedDir ?? config.specGovernance?.authoredSpecDirs?.[0] ?? 'managed';
+    const specFiles = collectFiles(path.resolve(cwd, scope), isMarkdown);
+    const dbPath = path.resolve(cwd, options.dbPath ?? config.paths?.databasePath ?? '.tsdoc.db');
+    const specDbPath = path.resolve(cwd, options.specDbPath ?? '.tsdoc/spec-graph.db');
+    const srcDir = path.resolve(cwd, options.srcDir ?? config.project?.srcDirs?.[0] ?? 'src');
 
-    const fullManagedPath = path.resolve(process.cwd(), managedDir);
-    const dbPath = path.resolve(
-      process.cwd(),
-      options.dbPath || config.paths?.databasePath || '.tsdoc.db'
-    );
-    const specDbPath = path.resolve(process.cwd(), options.specDbPath || '.tsdoc/spec-graph.db');
+    const documentQuality = this.measureDocuments(specFiles);
+    const lifecycle = this.measureLifecycle(specFiles);
+    const specGraph = readSpecGraph(specDbPath);
+    const module7Aspects = measureAspects(collectFiles(srcDir, isSource));
+    const codeConnectivity = this.measureConnectivity(specFiles, dbPath);
 
-    // 1. Gather specification documents
-    const specFiles = this.collectMarkdownFiles(fullManagedPath);
-
-    // Dimension 1: Document Quality & Completeness
-    const completenessResults = this.completenessValidator.validateMultiple(specFiles);
-    const summary = this.completenessValidator.getSummary(completenessResults);
-
-    let totalDesignScore = 0;
-    let totalImplementationScore = 0;
-    let totalScenarios = 0;
-    let totalExamples = 0;
-    let totalConceptLinks = 0;
-    let totalCodeLinks = 0;
-
-    for (const res of completenessResults) {
-      totalDesignScore += res.designScore;
-      totalImplementationScore += res.implementationScore;
-      totalScenarios += res.breakdown.design.scenarios.count;
-      totalExamples += res.breakdown.implementation.examples.count;
-      totalConceptLinks += res.breakdown.design.conceptReferences.count;
-      totalCodeLinks += res.breakdown.implementation.codeReferences.count;
-    }
-
-    const docCount = specFiles.length || 1;
-    const avgDesign = specFiles.length > 0 ? Math.round(totalDesignScore / docCount) : 0;
-    const avgImplementation =
-      specFiles.length > 0 ? Math.round(totalImplementationScore / docCount) : 0;
-    const avgOverall = Number.isNaN(summary.averageScore) ? 0 : summary.averageScore;
-    const completenessRate =
-      specFiles.length > 0 ? Math.round((summary.complete / docCount) * 100) : 0;
-
-    // Dimension 2: Lifecycle Governance
-    const distribution = this.statusManager.getStatusDistribution(specFiles);
-    const distributionPercentages: Record<SpecStatus, number> = {
-      draft: Math.round(((distribution.draft || 0) / docCount) * 100),
-      review: Math.round(((distribution.review || 0) / docCount) * 100),
-      approved: Math.round(((distribution.approved || 0) / docCount) * 100),
-      active: Math.round(((distribution.active || 0) / docCount) * 100),
-      deprecated: Math.round(((distribution.deprecated || 0) / docCount) * 100),
-      archived: Math.round(((distribution.archived || 0) / docCount) * 100),
-    };
-
-    const activeRatio = Math.round(
-      (((distribution.active || 0) + (distribution.approved || 0)) / docCount) * 100
-    );
-
-    let readyForPromotionCount = 0;
-    try {
-      const ready = this.statusManager.getPromotableDocs(specFiles);
-      readyForPromotionCount = ready.length;
-    } catch {
-      // Ignore if scan fails
-    }
-
-    let unusedCount = 0;
-    try {
-      if (fs.existsSync(fullManagedPath)) {
-        const unused = this.unusedDetector.detect(fullManagedPath);
-        unusedCount = unused.filter(
-          (u) => u.suggestedAction === 'archive' || u.suggestedAction === 'delete'
-        ).length;
-      }
-    } catch {
-      // Ignore
-    }
-
-    let duplicatePairsCount = 0;
-    if (options.deepSimilarity && specFiles.length > 1) {
-      try {
-        const sampleFiles = specFiles.slice(0, 30);
-        const dupes = this.similarityChecker.checkMultiple(sampleFiles);
-        duplicatePairsCount = dupes.filter(
-          (d: { similarity: number }) => d.similarity >= 0.8
-        ).length;
-      } catch {
-        // Ignore
-      }
-    }
-
-    // Dimension 3: SpecGraph Conformance
-    let hasSpecGraph = false;
-    let specRevId: string | undefined;
-    let specNodes = 0;
-    let specEdges = 0;
-    let specBindings = 0;
-    let obligationCount = 0;
-    let satisfiedCount = 0;
-    const violatedCount = 0;
-    const indeterminateCount = 0;
-    const suppressedCount = 0;
-    const disabledCount = 0;
-
-    if (fs.existsSync(specDbPath)) {
-      try {
-        const specRepo = new SpecGraphRepository(specDbPath, { readOnly: true });
-        const activeRev = specRepo.readActiveRevision();
-        specRepo.close();
-
-        if (activeRev) {
-          hasSpecGraph = true;
-          specRevId = activeRev.revisionId;
-          specNodes = activeRev.nodes.length;
-          specEdges = activeRev.edges.length;
-          specBindings = activeRev.bindings.length;
-          obligationCount = activeRev.nodes.filter(
-            (n) => n.kind === 'requirement' || n.kind === 'invariant' || n.kind === 'api-contract'
-          ).length;
-
-          // Compute baseline binding resolution conformance
-          satisfiedCount = activeRev.bindings.length;
-        }
-      } catch {
-        hasSpecGraph = false;
-      }
-    }
-
-    const totalResolutions = satisfiedCount + violatedCount + indeterminateCount;
-    const conformanceRate =
-      totalResolutions > 0 ? Math.round((satisfiedCount / totalResolutions) * 100) : 100;
-    const satisfactionRate = conformanceRate;
-
-    // Dimension 4: Module Spec 7-Aspect Coverage & Dimension 5: Code Connectivity
-    let totalSymbols = 0;
-    let exportedSymbols = 0;
-    let symbolsWithSpecReference = 0;
-    let validCodeLinksCount = 0;
-    let brokenCodeLinksCount = 0;
-
-    let purposeHits = 0;
-    let inputHits = 0;
-    let outputHits = 0;
-    let contextHits = 0;
-    let logicHits = 0;
-    let effectHits = 0;
-    let scopeHits = 0;
-    let analyzedSymbols = 0;
-
-    if (fs.existsSync(dbPath)) {
-      try {
-        const sqlite = new Database(dbPath, { readonly: true });
-
-        // Total and exported symbols
-        const symStats = sqlite
-          .prepare(
-            'SELECT count(*) as total, sum(CASE WHEN is_exported = 1 THEN 1 ELSE 0 END) as exported FROM symbols'
-          )
-          .get() as { total: number; exported: number };
-
-        totalSymbols = symStats?.total || 0;
-        exportedSymbols = symStats?.exported || 0;
-
-        // Symbols referenced by docs in unified_relationships
-        const docRefStats = sqlite
-          .prepare(
-            "SELECT count(DISTINCT from_symbols) as c FROM unified_relationships WHERE type = 'doc-reference' OR category = 'semantic'"
-          )
-          .get() as { c: number };
-
-        symbolsWithSpecReference = docRefStats?.c || 0;
-
-        // Verify [^sym-XXX] code anchors against sqlite symbol IDs
-        const existingSymbolIds = new Set(
-          (sqlite.prepare('SELECT id FROM symbols').all() as Array<{ id: string }>).map((s) => s.id)
-        );
-
-        for (const file of specFiles) {
-          try {
-            const parsed = this.docSymbolParser.parse(file);
-            if (parsed?.symbolFootnoteRefs) {
-              for (const ref of parsed.symbolFootnoteRefs) {
-                if (existingSymbolIds.has(ref.identifier)) {
-                  validCodeLinksCount++;
-                } else {
-                  brokenCodeLinksCount++;
-                }
-              }
-            }
-          } catch {
-            // Skip
-          }
-        }
-
-        sqlite.close();
-      } catch {
-        // Fallback if sqlite read fails
-      }
-    }
-
-    // 4. Measure 7-Aspect coverage across source files
-    const srcDir = path.resolve(
-      process.cwd(),
-      options.srcDir || config.project?.srcDirs?.[0] || 'src'
-    );
-    const sourceFiles = this.collectSourceFiles(srcDir);
-    analyzedSymbols = sourceFiles.length;
-
-    for (const file of sourceFiles) {
-      try {
-        const content = fs.readFileSync(file, 'utf-8');
-        if (/@(problem|responsibility|solves|purpose)/.test(content)) purposeHits++;
-        if (/@(input|param|precondition|contract)/.test(content)) inputHits++;
-        if (/@(output|returns|postcondition)/.test(content)) outputHits++;
-        if (/@(context|depends|uses|relatedTo)/.test(content)) contextHits++;
-        if (/@(logic|algorithm|complexity|invariant)/.test(content)) logicHits++;
-        if (/@(sideEffect|mutates|reads|writes|io)/.test(content)) effectHits++;
-        if (/@(scope|public|private|internal)/.test(content)) scopeHits++;
-      } catch {
-        // Skip
-      }
-    }
-
-    const symDenominator = analyzedSymbols || 1;
-    const aspectCoverage = {
-      purpose: Math.round((purposeHits / symDenominator) * 100),
-      input: Math.round((inputHits / symDenominator) * 100),
-      output: Math.round((outputHits / symDenominator) * 100),
-      context: Math.round((contextHits / symDenominator) * 100),
-      logic: Math.round((logicHits / symDenominator) * 100),
-      effect: Math.round((effectHits / symDenominator) * 100),
-      scope: Math.round((scopeHits / symDenominator) * 100),
-    };
-
-    const avgAspectScore = Math.round(
-      (aspectCoverage.purpose +
-        aspectCoverage.input +
-        aspectCoverage.output +
-        aspectCoverage.context +
-        aspectCoverage.logic +
-        aspectCoverage.effect +
-        aspectCoverage.scope) /
-        7
-    );
-
-    const specCoverageRate =
-      exportedSymbols > 0
-        ? Math.min(100, Math.round((symbolsWithSpecReference / exportedSymbols) * 100))
-        : 0;
-    const totalTestedLinks = validCodeLinksCount + brokenCodeLinksCount;
-    const linkIntegrityRate =
-      totalTestedLinks > 0 ? Math.round((validCodeLinksCount / totalTestedLinks) * 100) : 100;
-
-    // Overall Composite Health Score Calculation (0-100)
-    // 25% Document Quality + 20% Lifecycle + 20% Conformance + 15% 7-Aspects + 20% Connectivity
-    const docScore = avgOverall;
-    const lifecycleScore = Math.min(
-      100,
-      Math.round(activeRatio * 0.7 + (unusedCount === 0 ? 30 : 15))
-    );
-    const graphScore = hasSpecGraph
-      ? Math.round(conformanceRate * 0.7 + (specBindings > 0 ? 30 : 0))
-      : Math.round(completenessRate * 0.6);
-    const module7Score = avgAspectScore;
-    const connectivityScore = Math.round(specCoverageRate * 0.5 + linkIntegrityRate * 0.5);
-
-    const rawHealth =
-      docScore * 0.25 +
-      lifecycleScore * 0.2 +
-      graphScore * 0.2 +
-      module7Score * 0.15 +
-      connectivityScore * 0.2;
-
-    const healthScore = Math.min(
-      100,
-      Math.max(0, Number.isNaN(rawHealth) ? 0 : Math.round(rawHealth))
-    );
-
-    let grade: UnifiedSpecMetrics['grade'] = 'F';
-    if (healthScore >= 85) grade = 'A';
-    else if (healthScore >= 70) grade = 'B';
-    else if (healthScore >= 55) grade = 'C';
-    else if (healthScore >= 40) grade = 'D';
-
-    // Formulate Actionable Recommendations
-    const recommendations: UnifiedSpecMetrics['recommendations'] = [];
-
-    if (summary.incomplete > 0) {
-      recommendations.push({
-        category: 'quality',
-        severity: summary.incomplete > 50 ? 'warning' : 'info',
-        message: `${summary.incomplete} specifications are incomplete (lacking required sections, scenarios, or examples).`,
-      });
-    }
-
-    if (distribution.draft > 20) {
-      recommendations.push({
-        category: 'lifecycle',
-        severity: 'info',
-        message: `${distribution.draft} specifications are in draft status. Consider review and promotion via 'tsdoc-edge spec-status'.`,
-      });
-    }
-
-    if (!hasSpecGraph) {
-      recommendations.push({
-        category: 'conformance',
-        severity: 'warning',
-        message:
-          "No compiled SpecGraph projection found. Run 'tsdoc-edge spec extract' to compile managed specifications.",
-      });
-    }
-
-    if (brokenCodeLinksCount > 0) {
-      recommendations.push({
-        category: 'connectivity',
-        severity: 'error',
-        message: `Found ${brokenCodeLinksCount} broken [^sym-XXX] code anchors in specification documents.`,
-      });
-    }
-
-    if (aspectCoverage.purpose < 50) {
-      recommendations.push({
-        category: 'quality',
-        severity: 'info',
-        message: `Low Purpose aspect coverage (${aspectCoverage.purpose}%). Add @responsibility and @contract to public APIs.`,
-      });
-    }
+    // Weighted only over dimensions this aggregator evaluates; SpecGraph conformance is excluded.
+    const linkScore =
+      codeConnectivity.specCoverageRate * 0.5 + codeConnectivity.linkIntegrityRate * 0.5;
+    const raw =
+      documentQuality.averageOverallScore * 0.3 +
+      lifecycle.activeRatio * 0.2 +
+      module7Aspects.averageAspectScore * 0.2 +
+      linkScore * 0.3;
+    const healthScore = clampScore(raw);
 
     return {
       timestamp: new Date().toISOString(),
       healthScore,
-      grade,
-      documentQuality: {
-        totalDocuments: specFiles.length,
-        completeCount: summary.complete,
-        incompleteCount: summary.incomplete,
-        completenessRate,
-        averageDesignScore: avgDesign,
-        averageImplementationScore: avgImplementation,
-        averageOverallScore: avgOverall,
-        totalScenarios,
-        totalExamples,
-        totalConceptLinks,
-        totalCodeLinks,
-        totalIssues: summary.totalIssues,
-      },
-      lifecycle: {
-        distribution,
-        distributionPercentages,
-        activeRatio,
-        readyForPromotionCount,
-        unusedDocumentsCount: unusedCount,
-        duplicatePairsCount,
-      },
-      graphConformance: {
-        hasSpecGraph,
-        revisionId: specRevId,
-        nodeCount: specNodes,
-        edgeCount: specEdges,
-        bindingCount: specBindings,
-        obligationCount,
-        conformanceRate,
-        satisfactionRate,
-        outcomes: {
-          satisfied: satisfiedCount,
-          violated: violatedCount,
-          indeterminate: indeterminateCount,
-          suppressed: suppressedCount,
-          disabled: disabledCount,
-        },
-      },
-      module7Aspects: {
-        analyzedSymbols,
-        aspectCoverage,
-        averageAspectScore: avgAspectScore,
-      },
-      codeConnectivity: {
-        totalSymbols,
-        exportedSymbols,
-        symbolsWithSpecReference,
-        specCoverageRate,
-        validCodeLinksCount,
-        brokenCodeLinksCount,
-        linkIntegrityRate,
-      },
-      recommendations,
+      grade: gradeOf(healthScore),
+      scope,
+      documentQuality,
+      lifecycle,
+      specGraph,
+      module7Aspects,
+      codeConnectivity,
+      recommendations: buildRecommendations(
+        documentQuality,
+        lifecycle,
+        specGraph,
+        codeConnectivity,
+        module7Aspects
+      ),
     };
   }
 
   /**
-   * Get targeted specification metrics for a specific file
+   * Spec context for one file: completeness/status for a spec, bound specs and aspects for source
    *
-   * @param filePath - File path (spec markdown or source typescript)
-   * @param options - Aggregation options
+   * @param filePath - Spec markdown path or TypeScript source path
+   * @param options - Aggregation options (managedDir is used to resolve `@doc [[Symbol]]` targets)
    * @returns File-specific context
    * @public
    */
   getSpecMetricsForFile(filePath: string, options: SpecMetricsOptions = {}): FileSpecContext {
-    const isSpec = filePath.endsWith('.md');
-    const resolvedPath = path.resolve(process.cwd(), filePath);
-    const recommendations: string[] = [];
-
-    if (isSpec) {
-      if (!fs.existsSync(resolvedPath)) {
+    const resolved = path.resolve(process.cwd(), filePath);
+    if (isMarkdown(resolved)) {
+      if (!fs.existsSync(resolved)) {
         return {
           filePath,
           isSpecFile: true,
           recommendations: [`Specification file not found: ${filePath}`],
         };
       }
-
-      const completeness = this.completenessValidator.validate(resolvedPath);
-      const status = this.statusManager.getCurrentStatus(resolvedPath);
-      const allowedTransitions = this.statusManager.getAllowedTransitions(resolvedPath);
-
-      if (!completeness.isComplete) {
-        recommendations.push(
-          `Incomplete spec: Missing ${completeness.issues.map((i) => i.message).join('; ')}`
-        );
-      }
-
-      if (allowedTransitions.length > 0) {
-        recommendations.push(`Allowed status transitions: ${allowedTransitions.join(', ')}`);
-      }
-
+      const completeness = this.completenessValidator.validate(resolved);
+      const transitions = this.statusManager.getAllowedTransitions(resolved);
+      const recommendations = completeness.issues.map((issue) => issue.message);
+      if (transitions.length)
+        recommendations.push(`Allowed transitions: ${transitions.join(', ')}`);
       return {
         filePath,
         isSpecFile: true,
         score: completeness.score,
-        status,
+        status: this.statusManager.getCurrentStatus(resolved),
         recommendations,
       };
     }
 
-    // Code file
-    const dbPath = path.resolve(process.cwd(), options.dbPath || '.tsdoc.db');
-    const boundSpecs: FileSpecContext['boundSpecs'] = [];
-    const aspectsCoverage: Record<string, boolean> = {
-      purpose: false,
-      input: false,
-      output: false,
-      context: false,
-      logic: false,
-      effect: false,
-      scope: false,
-    };
-
-    if (fs.existsSync(dbPath)) {
-      try {
-        const sqlite = new Database(dbPath, { readonly: true });
-        const relativeFile = path.relative(process.cwd(), resolvedPath);
-
-        const fileSymbols = sqlite
-          .prepare(
-            'SELECT id, name, summary, is_exported FROM symbols WHERE file_path = ? OR file_path = ?'
-          )
-          .all(relativeFile, filePath) as Array<{
-          id: string;
-          name: string;
-          summary: string | null;
-          is_exported: number;
-        }>;
-
-        for (const s of fileSymbols) {
-          const sum = (s.summary || '').toLowerCase();
-          if (sum.includes('@responsibility') || sum.includes('@problem'))
-            aspectsCoverage.purpose = true;
-          if (sum.includes('@contract') || sum.includes('@param')) aspectsCoverage.input = true;
-          if (sum.includes('@returns') || sum.includes('@output')) aspectsCoverage.output = true;
-          if (sum.includes('@depends') || sum.includes('@uses')) aspectsCoverage.context = true;
-          if (sum.includes('@algorithm') || sum.includes('@complexity'))
-            aspectsCoverage.logic = true;
-          if (sum.includes('@sideeffect') || sum.includes('@mutates'))
-            aspectsCoverage.effect = true;
-          if (s.is_exported === 1) aspectsCoverage.scope = true;
-        }
-
-        // Find related docs
-        const docRels = sqlite
-          .prepare(
-            `SELECT DISTINCT to_symbols
-             FROM unified_relationships
-             WHERE (from_symbols IN (${fileSymbols.map(() => '?').join(',') || "''"}))
-               AND (type = 'doc-reference' OR category = 'semantic')`
-          )
-          .all(...fileSymbols.map((s) => s.id)) as Array<{ to_symbols: string }>;
-
-        for (const rel of docRels) {
-          boundSpecs.push({
-            title: rel.to_symbols,
-            filePath: `managed/${rel.to_symbols}.md`,
-            status: 'active',
-            score: 80,
-          });
-        }
-
-        sqlite.close();
-      } catch {
-        // Ignore
-      }
+    if (!fs.existsSync(resolved)) {
+      return {
+        filePath,
+        isSpecFile: false,
+        recommendations: [`Source file not found: ${filePath}`],
+      };
     }
+    const source = fs.readFileSync(resolved, 'utf8');
+    const tags = jsDocTagNames(resolved, source);
+    const aspectsCoverage = Object.fromEntries(
+      (Object.keys(MODULE_SPEC_ASPECT_TAGS) as ModuleSpecAspect[]).map((aspect) => [
+        aspect,
+        MODULE_SPEC_ASPECT_TAGS[aspect].some((tag) => tags.has(tag)),
+      ])
+    ) as Record<ModuleSpecAspect, boolean>;
 
-    if (boundSpecs.length === 0) {
+    const index = this.indexSpecDocuments(options.managedDir ?? 'managed');
+    const refs = [...new Set([...source.matchAll(/@doc\s+\[\[([^\]]+)\]\]/g)].map((m) => m[1]))];
+    const boundSpecs = refs.map((symbolRef) => {
+      const doc = index.get(symbolRef.split('#')[0]);
+      if (!doc) return { symbolRef };
+      return {
+        symbolRef,
+        filePath: path.relative(process.cwd(), doc),
+        status: this.statusManager.getCurrentStatus(doc),
+        score: this.completenessValidator.validate(doc).score,
+      };
+    });
+
+    const recommendations: string[] = [];
+    if (!refs.length) recommendations.push('No @doc [[Spec]] link in this file.');
+    for (const unresolved of boundSpecs.filter((b) => !b.filePath)) {
       recommendations.push(
-        'No linked specifications found. Add @doc [[SpecificationName]] to link with managed docs.'
+        `@doc [[${unresolved.symbolRef}]] does not resolve to a managed document.`
       );
     }
+    for (const [aspect, covered] of Object.entries(aspectsCoverage)) {
+      if (!covered)
+        recommendations.push(
+          `No ${aspect} aspect tag (${MODULE_SPEC_ASPECT_TAGS[aspect as ModuleSpecAspect].join(', ')}).`
+        );
+    }
+    return { filePath, isSpecFile: false, boundSpecs, aspectsCoverage, recommendations };
+  }
 
+  private measureDocuments(files: string[]): UnifiedSpecMetrics['documentQuality'] {
+    const results = files.map((file) => this.completenessValidator.validate(file));
+    const n = results.length;
+    const sum = (pick: (r: (typeof results)[number]) => number) =>
+      results.reduce((total, r) => total + pick(r), 0);
+    const complete = results.filter((r) => r.isComplete).length;
     return {
-      filePath,
-      isSpecFile: false,
-      boundSpecs,
-      aspectsCoverage,
-      recommendations,
+      totalDocuments: n,
+      completeCount: complete,
+      incompleteCount: n - complete,
+      completenessRate: percent(complete, n),
+      averageDesignScore: n ? Math.round(sum((r) => r.designScore) / n) : 0,
+      averageImplementationScore: n ? Math.round(sum((r) => r.implementationScore) / n) : 0,
+      averageOverallScore: n ? Math.round(sum((r) => r.score) / n) : 0,
+      totalScenarios: sum((r) => r.breakdown.design.scenarios.count),
+      totalExamples: sum((r) => r.breakdown.implementation.examples.count),
+      totalConceptLinks: sum((r) => r.breakdown.design.conceptReferences.count),
+      totalCodeLinks: sum((r) => r.breakdown.implementation.codeReferences.count),
+      totalIssues: sum((r) => r.issues.length),
     };
   }
 
-  /**
-   * Helper to collect all markdown files recursively
-   */
-  private collectMarkdownFiles(dir: string): string[] {
-    if (!fs.existsSync(dir)) return [];
-    const stat = fs.statSync(dir);
-    if (stat.isFile()) return dir.endsWith('.md') ? [dir] : [];
-
-    const files: string[] = [];
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
-
-    for (const entry of entries) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        if (entry.name !== 'node_modules' && !entry.name.startsWith('.')) {
-          files.push(...this.collectMarkdownFiles(full));
-        }
-      } else if (entry.isFile() && entry.name.endsWith('.md')) {
-        files.push(full);
-      }
-    }
-
-    return files;
+  private measureLifecycle(files: string[]): UnifiedSpecMetrics['lifecycle'] {
+    const distribution = this.statusManager.getStatusDistribution(files);
+    const n = files.length;
+    const distributionPercentages = Object.fromEntries(
+      STATUSES.map((status) => [status, percent(distribution[status] ?? 0, n)])
+    ) as Record<SpecStatus, number>;
+    return {
+      distribution,
+      distributionPercentages,
+      activeRatio: percent((distribution.active ?? 0) + (distribution.approved ?? 0), n),
+      readyForPromotionCount: this.statusManager
+        .getPromotableDocs(files)
+        .filter((doc) => doc.canPromote).length,
+    };
   }
 
-  /**
-   * Helper to collect all TypeScript source files recursively
-   */
-  private collectSourceFiles(dir: string): string[] {
-    if (!fs.existsSync(dir)) return [];
-    const stat = fs.statSync(dir);
-    if (stat.isFile())
-      return (dir.endsWith('.ts') || dir.endsWith('.tsx')) && !dir.endsWith('.d.ts') ? [dir] : [];
+  private measureConnectivity(
+    specFiles: string[],
+    dbPath: string
+  ): UnifiedSpecMetrics['codeConnectivity'] {
+    const empty: UnifiedSpecMetrics['codeConnectivity'] = {
+      totalSymbols: 0,
+      exportedSymbols: 0,
+      exportedSymbolsWithDocReference: 0,
+      specCoverageRate: 0,
+      validCodeLinksCount: 0,
+      brokenCodeLinks: [],
+      linkIntegrityRate: 100,
+    };
+    if (!fs.existsSync(dbPath)) return empty;
 
-    const files: string[] = [];
-    const entries = fs.readdirSync(dir, { withFileTypes: true });
+    const db = new Database(dbPath, { readonly: true });
+    try {
+      const rows = db.prepare('SELECT id, name, is_exported FROM symbols').all() as Array<{
+        id: string;
+        name: string;
+        is_exported: number;
+      }>;
+      const ids = new Set(rows.map((r) => r.id));
+      const names = new Set(rows.map((r) => r.name));
+      const exported = new Set(rows.filter((r) => r.is_exported === 1).map((r) => r.id));
 
-    for (const entry of entries) {
-      const full = path.join(dir, entry.name);
-      if (entry.isDirectory()) {
-        if (
-          entry.name !== 'node_modules' &&
-          entry.name !== '__tests__' &&
-          entry.name !== 'dist' &&
-          !entry.name.startsWith('.')
-        ) {
-          files.push(...this.collectSourceFiles(full));
-        }
-      } else if (
-        entry.isFile() &&
-        (entry.name.endsWith('.ts') || entry.name.endsWith('.tsx')) &&
-        !entry.name.endsWith('.d.ts')
-      ) {
-        files.push(full);
+      const referenced = new Set<string>();
+      const docRefs = db
+        .prepare("SELECT from_symbols FROM unified_relationships WHERE type = 'doc-reference'")
+        .all() as Array<{ from_symbols: string }>;
+      for (const row of docRefs) {
+        for (const id of parseIdList(row.from_symbols)) if (exported.has(id)) referenced.add(id);
       }
-    }
 
-    return files;
+      let valid = 0;
+      const broken: Array<{ file: string; identifier: string }> = [];
+      for (const file of specFiles) {
+        const parsed = this.docSymbolParser.parse(file);
+        for (const ref of parsed?.symbolFootnoteRefs ?? []) {
+          const resolves = ref.isIdRef ? ids.has(ref.identifier) : names.has(ref.identifier);
+          if (resolves) valid += 1;
+          else
+            broken.push({ file: path.relative(process.cwd(), file), identifier: ref.identifier });
+        }
+      }
+
+      return {
+        totalSymbols: rows.length,
+        exportedSymbols: exported.size,
+        exportedSymbolsWithDocReference: referenced.size,
+        specCoverageRate: percent(referenced.size, exported.size),
+        validCodeLinksCount: valid,
+        brokenCodeLinks: broken,
+        linkIntegrityRate: valid + broken.length ? percent(valid, valid + broken.length) : 100,
+      };
+    } finally {
+      db.close();
+    }
   }
+
+  /** Map `[[Symbol]]` primary definitions (H1) to their managed document path. */
+  private indexSpecDocuments(dir: string): Map<string, string> {
+    const index = new Map<string, string>();
+    for (const file of collectFiles(path.resolve(process.cwd(), dir), isMarkdown)) {
+      const primary = this.docSymbolParser.parse(file)?.primary?.name;
+      if (primary && !index.has(primary)) index.set(primary, file);
+    }
+    return index;
+  }
+}
+
+function readSpecGraph(specDbPath: string): UnifiedSpecMetrics['specGraph'] {
+  const none: UnifiedSpecMetrics['specGraph'] = {
+    hasSpecGraph: false,
+    nodeCount: 0,
+    edgeCount: 0,
+    bindingCount: 0,
+    obligationCount: 0,
+    conformanceEvaluated: false,
+  };
+  if (!fs.existsSync(specDbPath)) return none;
+  const repository = new SpecGraphRepository(specDbPath, { readOnly: true });
+  try {
+    const revision = repository.readActiveRevision();
+    if (!revision) return none;
+    return {
+      hasSpecGraph: true,
+      revisionId: revision.revisionId,
+      nodeCount: revision.nodes.length,
+      edgeCount: revision.edges.length,
+      bindingCount: revision.bindings.length,
+      obligationCount: revision.nodes.filter(
+        (n) => n.kind === 'requirement' || n.kind === 'invariant' || n.kind === 'api-contract'
+      ).length,
+      conformanceEvaluated: false,
+    };
+  } finally {
+    repository.close();
+  }
+}
+
+function measureAspects(files: string[]): UnifiedSpecMetrics['module7Aspects'] {
+  const aspects = Object.keys(MODULE_SPEC_ASPECT_TAGS) as ModuleSpecAspect[];
+  const hits = Object.fromEntries(aspects.map((a) => [a, 0])) as Record<ModuleSpecAspect, number>;
+  for (const file of files) {
+    const tags = jsDocTagNames(file, fs.readFileSync(file, 'utf8'));
+    for (const aspect of aspects) {
+      if (MODULE_SPEC_ASPECT_TAGS[aspect].some((tag) => tags.has(tag))) hits[aspect] += 1;
+    }
+  }
+  const aspectCoverage = Object.fromEntries(
+    aspects.map((a) => [a, percent(hits[a], files.length)])
+  ) as Record<ModuleSpecAspect, number>;
+  const average = aspects.reduce((total, a) => total + aspectCoverage[a], 0) / aspects.length;
+  return { analyzedFiles: files.length, aspectCoverage, averageAspectScore: Math.round(average) };
+}
+
+/** Tag names that appear in real JSDoc blocks (not in strings or code), e.g. `@param`. */
+function jsDocTagNames(fileName: string, source: string): Set<string> {
+  const names = new Set<string>();
+  const sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true);
+  const visit = (node: ts.Node): void => {
+    for (const doc of (node as ts.Node & { jsDoc?: ts.JSDoc[] }).jsDoc ?? []) {
+      for (const tag of doc.tags ?? []) names.add(`@${tag.tagName.text}`);
+    }
+    ts.forEachChild(node, visit);
+  };
+  visit(sourceFile);
+  return names;
+}
+
+function buildRecommendations(
+  docs: UnifiedSpecMetrics['documentQuality'],
+  lifecycle: UnifiedSpecMetrics['lifecycle'],
+  graph: UnifiedSpecMetrics['specGraph'],
+  links: UnifiedSpecMetrics['codeConnectivity'],
+  aspects: UnifiedSpecMetrics['module7Aspects']
+): UnifiedSpecMetrics['recommendations'] {
+  const out: UnifiedSpecMetrics['recommendations'] = [];
+  for (const broken of links.brokenCodeLinks) {
+    out.push({
+      category: 'connectivity',
+      severity: 'error',
+      message: `Unresolved footnote [^${broken.identifier}] in ${broken.file}`,
+    });
+  }
+  if (!graph.hasSpecGraph) {
+    out.push({
+      category: 'conformance',
+      severity: 'warning',
+      message: "No active SpecGraph revision. Run 'tsdoc-edge spec extract'.",
+    });
+  } else if (graph.bindingCount > 0) {
+    out.push({
+      category: 'conformance',
+      severity: 'info',
+      message: `${graph.bindingCount} bindings compiled; evaluate them with 'tsdoc-edge convention check'.`,
+    });
+  }
+  if (docs.incompleteCount > 0) {
+    out.push({
+      category: 'quality',
+      severity: 'info',
+      message: `${docs.incompleteCount}/${docs.totalDocuments} documents miss the feature-spec template (sections, scenarios, code refs).`,
+    });
+  }
+  if (lifecycle.readyForPromotionCount > 0) {
+    out.push({
+      category: 'lifecycle',
+      severity: 'info',
+      message: `${lifecycle.readyForPromotionCount} documents meet the score for their next status ('tsdoc-edge spec status list-ready').`,
+    });
+  }
+  const weakest = (
+    Object.entries(aspects.aspectCoverage) as Array<[ModuleSpecAspect, number]>
+  ).sort((a, b) => a[1] - b[1])[0];
+  if (weakest && weakest[1] < 50) {
+    out.push({
+      category: 'quality',
+      severity: 'info',
+      message: `Weakest module-spec aspect: ${weakest[0]} (${weakest[1]}% of files; tags ${MODULE_SPEC_ASPECT_TAGS[weakest[0]].join(', ')}).`,
+    });
+  }
+  return out;
+}
+
+function parseIdList(value: string): string[] {
+  try {
+    const parsed: unknown = JSON.parse(value);
+    return Array.isArray(parsed) ? parsed.filter((v): v is string => typeof v === 'string') : [];
+  } catch {
+    return value ? [value] : [];
+  }
+}
+
+function percent(part: number, whole: number): number {
+  return whole > 0 ? Math.round((part / whole) * 100) : 0;
+}
+
+function clampScore(value: number): number {
+  return Number.isFinite(value) ? Math.min(100, Math.max(0, Math.round(value))) : 0;
+}
+
+function gradeOf(score: number): UnifiedSpecMetrics['grade'] {
+  if (score >= 85) return 'A';
+  if (score >= 70) return 'B';
+  if (score >= 55) return 'C';
+  if (score >= 40) return 'D';
+  return 'F';
+}
+
+function isMarkdown(file: string): boolean {
+  return file.endsWith('.md');
+}
+
+function isSource(file: string): boolean {
+  return (file.endsWith('.ts') || file.endsWith('.tsx')) && !file.endsWith('.d.ts');
+}
+
+function collectFiles(target: string, accept: (file: string) => boolean): string[] {
+  if (!fs.existsSync(target)) return [];
+  if (fs.statSync(target).isFile()) return accept(target) ? [target] : [];
+  const out: string[] = [];
+  for (const entry of fs.readdirSync(target, { withFileTypes: true })) {
+    if (entry.name.startsWith('.') || entry.name === 'node_modules') continue;
+    if (entry.name === '__tests__' || entry.name === 'dist') continue;
+    const full = path.join(target, entry.name);
+    if (entry.isDirectory()) out.push(...collectFiles(full, accept));
+    else if (entry.isFile() && accept(full)) out.push(full);
+  }
+  return out.sort();
 }

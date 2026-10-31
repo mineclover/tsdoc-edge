@@ -298,13 +298,7 @@ export class SpecContentSimilarityChecker {
   /**
    * Get summary statistics
    * @param results - results parameter
-   * @returns Returns {
-    totalPairs: number;
-    mergeSuggestions: number;
-    crossRefSuggestions: number;
-    keepSeparate: number;
-    averageSimilarity: number;
-  }
+   * @returns Summary with totalPairs, mergeSuggestions, crossRefSuggestions, keepSeparate, averageSimilarity
    */
   getSummary(results: ContentSimilarity[]): {
     totalPairs: number;

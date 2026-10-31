@@ -183,10 +183,6 @@ export class DocumentationAnalyzer {
     parentScore: DocQualityScore
   ): void {
     if (ts.isClassDeclaration(node) || ts.isInterfaceDeclaration(node)) {
-      /**
-       * member
-       * @public
-       */
       for (const member of node.members) {
         const childScore = this.analyzeNode(member, sourceFile, parentScore.symbolName);
         if (childScore) {
@@ -211,7 +207,7 @@ export class DocumentationAnalyzer {
       ts.isPropertyDeclaration(node) ||
       ts.isTypeAliasDeclaration(node) ||
       ts.isEnumDeclaration(node) ||
-      ts.isVariableDeclaration(node)
+      (ts.isVariableDeclaration(node) && isModuleScopeVariable(node))
     );
   }
 
@@ -355,10 +351,6 @@ export class DocumentationAnalyzer {
     if (ts.canHaveModifiers(node)) {
       const modifiers = ts.getModifiers(node);
       if (modifiers) {
-        /**
-         * modifier
-         * @public
-         */
         for (const modifier of modifiers) {
           if (modifier.kind === ts.SyntaxKind.PrivateKeyword) {
             return false;
@@ -384,10 +376,6 @@ export class DocumentationAnalyzer {
     if (ts.canHaveModifiers(checkNode)) {
       const modifiers = ts.getModifiers(checkNode);
       if (modifiers) {
-        /**
-         * modifier
-         * @public
-         */
         for (const modifier of modifiers) {
           if (modifier.kind === ts.SyntaxKind.ExportKeyword) {
             hasExport = true;
@@ -397,13 +385,19 @@ export class DocumentationAnalyzer {
       }
     }
 
-    // For variables, require explicit export to be considered public
-    // For other declarations (functions, classes, etc.), default to public
-    if (ts.isVariableDeclaration(node)) {
-      return hasExport;
+    // Class/interface members: public unless marked private/protected or ECMAScript-private,
+    // and only when the containing declaration is itself exported.
+    const container = node.parent;
+    if (container && (ts.isClassLike(container) || ts.isInterfaceDeclaration(container))) {
+      const memberModifiers = ts.canHaveModifiers(node) ? (ts.getModifiers(node) ?? []) : [];
+      if (memberModifiers.some((m) => m.kind === ts.SyntaxKind.ProtectedKeyword)) return false;
+      const name = (node as ts.NamedDeclaration).name;
+      if (name && ts.isPrivateIdentifier(name)) return false;
+      return this.isPublicSymbol(container, container.name?.getText() ?? '');
     }
 
-    return hasExport || true;
+    // Top-level declarations are public API only when exported.
+    return hasExport;
   }
 
   /**
@@ -674,4 +668,22 @@ export class DocumentationAnalyzer {
 
     return Math.min(100, score);
   }
+}
+
+/**
+ * Whether a variable declaration is a module-level binding that can carry API documentation.
+ *
+ * Loop bindings (`for (const x of ...)`), catch bindings, and function-local variables are
+ * implementation details; documenting them produces statement-level JSDoc noise.
+ *
+ * @param node - Variable declaration to classify
+ * @returns True when the declaration belongs to a top-level or namespace-level variable statement
+ */
+export function isModuleScopeVariable(node: ts.VariableDeclaration): boolean {
+  const list = node.parent;
+  if (!list || !ts.isVariableDeclarationList(list)) return false;
+  const statement = list.parent;
+  if (!statement || !ts.isVariableStatement(statement)) return false;
+  const container = statement.parent;
+  return !!container && (ts.isSourceFile(container) || ts.isModuleBlock(container));
 }

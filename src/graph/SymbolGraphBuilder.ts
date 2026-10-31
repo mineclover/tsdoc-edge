@@ -185,10 +185,6 @@ export class SymbolGraphBuilder {
       path.push(symbolId);
 
       const dependencies = this.getDependencies(symbolId);
-      /**
-       * depId
-       * @public
-       */
       for (const depId of dependencies) {
         if (!visited.has(depId)) {
           dfs(depId, [...path]);
@@ -204,10 +200,6 @@ export class SymbolGraphBuilder {
       recursionStack.delete(symbolId);
     };
 
-    /**
-     * symbolId
-     * @public
-     */
     for (const symbolId of this.graph.symbols.keys()) {
       if (!visited.has(symbolId)) {
         dfs(symbolId, []);
@@ -265,10 +257,6 @@ export class SymbolGraphBuilder {
     let maxDeps = 0;
     let orphaned = 0;
 
-    /**
-     * symbolId
-     * @public
-     */
     for (const symbolId of this.graph.symbols.keys()) {
       const deps = this.getDependencies(symbolId).length;
       const dependents = this.getDependents(symbolId).length;

@@ -262,10 +262,6 @@ export class SymbolSearchEngine {
       visited.add(currentId);
       const deps = this.graphBuilder.getDependencies(currentId);
 
-      /**
-       * depId
-       * @public
-       */
       for (const depId of deps) {
         dfs(depId, [...path, currentId]);
       }
@@ -278,10 +274,6 @@ export class SymbolSearchEngine {
       .getAllSymbols()
       .filter((s) => s.isExported && this.graphBuilder.getDependents(s.id).length === 0);
 
-    /**
-     * root
-     * @public
-     */
     for (const root of roots) {
       dfs(root.id, []);
     }

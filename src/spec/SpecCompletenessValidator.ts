@@ -468,13 +468,7 @@ export class SpecCompletenessValidator {
   /**
    * Get summary statistics for multiple documents
    * @param results - results parameter
-   * @returns Returns {
-    total: number;
-    complete: number;
-    incomplete: number;
-    averageScore: number;
-    totalIssues: number;
-  }
+   * @returns Summary with total, complete, incomplete, averageScore, totalIssues
    */
   getSummary(results: SpecCompletenessResult[]): {
     total: number;

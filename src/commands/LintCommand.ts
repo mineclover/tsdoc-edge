@@ -131,7 +131,7 @@ export class LintCommand extends BaseCommand {
         totalWarnings += testResult.warnings.length;
 
         // 5. Specification Conformance & Completeness
-        console.log(`${colors.cyan}[5/5] Checking specification conformance...${colors.reset}`);
+        console.log(`${colors.cyan}[5/5] Checking specification health...${colors.reset}`);
         const specResult = this.checkSpecification(dbPath);
         results.push(specResult);
         totalIssues += specResult.issues.length;
@@ -436,26 +436,26 @@ export class LintCommand extends BaseCommand {
         );
       }
 
-      if (metrics.codeConnectivity.brokenCodeLinksCount > 0) {
-        warnings.push(
-          `Broken code reference links in specifications: ${metrics.codeConnectivity.brokenCodeLinksCount}`
-        );
+      for (const broken of metrics.codeConnectivity.brokenCodeLinks.slice(0, 5)) {
+        warnings.push(`Unresolved footnote [^${broken.identifier}] in ${broken.file}`);
       }
 
       return {
-        category: 'Specification Conformance',
+        category: 'Specification Health',
         passed: issues.length === 0,
         score: metrics.healthScore,
         issues,
         warnings,
       };
-    } catch {
+    } catch (error) {
+      // Report the failure instead of passing silently; no score is fabricated.
       return {
-        category: 'Specification Conformance',
+        category: 'Specification Health',
         passed: true,
-        score: 100,
         issues: [],
-        warnings: [],
+        warnings: [
+          `Spec metrics not evaluated: ${error instanceof Error ? error.message : String(error)}`,
+        ],
       };
     }
   }

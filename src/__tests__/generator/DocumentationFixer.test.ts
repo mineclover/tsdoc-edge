@@ -29,6 +29,58 @@ describe('DocumentationFixer', () => {
   });
 
   describe('fixFile', () => {
+    it('never inserts statement-level JSDoc for loop, catch, or destructuring bindings', () => {
+      const testFile = path.join(tempDir, 'statements.ts');
+      const sourceCode = `export function run(items: string[], options: { a?: number } = {}): number {
+  const { a = 1 } = options;
+  let total = a;
+  for (const item of items) {
+    total += item.length;
+  }
+  try {
+    total += 1;
+  } catch (error) {
+    total -= 1;
+  }
+  return total;
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      // The analyzer must not report function-local bindings as documentable symbols.
+      expect(scores.map((s) => s.symbolName).sort()).toEqual(['run']);
+
+      // Even if a stale score points at a statement line, the fixer must refuse it.
+      const forLine = sourceCode.split('\n').findIndex((l) => l.includes('for (')) + 1;
+      fixer.fixFile(
+        testFile,
+        [{ ...scores[0], symbolName: 'item', line: forLine, hasDoc: false, qualityScore: 0 }],
+        { minScore: 100, addCustomTags: true }
+      );
+      const fixed = fs.readFileSync(testFile, 'utf-8');
+      expect(fixed).not.toMatch(/\/\*\*\s*\n\s*\*\s*item\s*\n/);
+      expect(fixed.indexOf('for (')).toBe(sourceCode.indexOf('for ('));
+    });
+
+    it('describes object-literal return types instead of copying braces into TSDoc', () => {
+      const testFile = path.join(tempDir, 'returns.ts');
+      const sourceCode = `export function stats(): {
+  total: number;
+  used: number;
+} {
+  return { total: 1, used: 0 };
+}
+`;
+      fs.writeFileSync(testFile, sourceCode, 'utf-8');
+
+      const scores = analyzer.analyzeFile(testFile, sourceCode);
+      fixer.fixFile(testFile, scores, { minScore: 100 });
+      const fixed = fs.readFileSync(testFile, 'utf-8');
+      expect(fixed).toContain('@returns Result object');
+      expect(fixed).not.toContain('@returns Returns {');
+    });
+
     it('should add documentation to undocumented function', () => {
       const testFile = path.join(tempDir, 'test.ts');
       const sourceCode = `export function multiply(x: number, y: number): number {

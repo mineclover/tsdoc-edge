@@ -180,10 +180,6 @@ export class ConfigManager {
       const content = JSON.stringify(config, null, 2);
       fs.writeFileSync(this.configPath, content, 'utf-8');
       this.config = config;
-      /**
-       * error
-       * @public
-       */
     } catch (error) {
       throw new Error(`Failed to save config to ${this.configPath}: ${error}`);
     }
@@ -257,10 +253,6 @@ export class ConfigManager {
       Boolean
     ) as string[];
 
-    /**
-     * dir
-     * @public
-     */
     for (const dir of dirsToCreate) {
       const absolutePath = this.resolvePath(dir);
       if (!fs.existsSync(absolutePath)) {
