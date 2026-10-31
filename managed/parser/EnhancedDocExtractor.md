@@ -450,12 +450,7 @@ export class BuildCommand extends BaseCommand {
 
 ## Backlinks
 
-### Referenced By
+### Implemented By
 
-- StrictModeValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/StrictModeValidator.md:241
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:103
-- ModuleSpecTagParser → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/ModuleSpecTagParser.md:24
-- [[TSDocParser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/TSDocParser.md:23
-- EnhancedSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:141
-- EnhancedTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/EnhancedTagTypes.md:160
+- ExtractionOptions → src/parser/EnhancedDocExtractor.ts:25
 

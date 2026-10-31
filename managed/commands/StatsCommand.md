@@ -258,23 +258,17 @@ fi
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:79
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:277
-- [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:116
-- [[CI/CD Integration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/CICDIntegration.md:80
-- [[CI/CD Integration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/CICDIntegration.md:102
-- [[Dead Code Detection]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DeadCodeDetection.md:78
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:154
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:31
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:45
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:238
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:338
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:246
-- TrackableStatistics → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TrackableStatistics.md:84
-- TrackableStatistics → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TrackableStatistics.md:89
-- UsageTracker → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/UsageTracker.md:85
+- [[TSDoc Edge Documentation]] → managed/README.md:106
+- [[DatabaseManager]] → managed/core-components/DatabaseManager.md:291
+- [[CI/CD Integration]] → managed/features/CICDIntegration.md:247
+- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:107
+- [[AnalysisFeatures]] → managed/features/analysis-features.md:253
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:49
+- [[Guides & Tutorials]] → managed/guides/index.md:280
+- [[TrackableStatistics]] → managed/primary-types/TrackableStatistics.md:106
+- [[UsageTracker]] → managed/utilities/UsageTracker.md:118
 
 ### Implemented By
 
-- StatsCommand → /Users/junwoobang/workflow/tsdoc-edge/src/commands/StatsCommand.ts:37
+- StatsCommand → src/commands/StatsCommand.ts:37
 

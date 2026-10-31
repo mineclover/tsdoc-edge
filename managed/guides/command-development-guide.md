@@ -809,7 +809,8 @@ Examples:
 
 ### Referenced By
 
-- [[Analyzer Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:269
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:20
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:331
+- [[Commands Index]] → managed/COMMANDS.md:313
+- [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:1000
+- [[Guides & Tutorials]] → managed/guides/index.md:34
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:219
 

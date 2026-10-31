@@ -562,7 +562,7 @@ const confidence = evidence.reduce((sum, ev) => sum + ev.confidence, 0) / eviden
 
 ### Referenced By
 
-- [[Unified Relationship Taxonomy]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:387
-- Analyzer Development Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:95
-- UnifiedRelationships → /Users/junwoobang/workflow/tsdoc-edge/managed/types/UnifiedRelationships.md:109
+- [[Unified Relationship Taxonomy]] → managed/concepts/unified-relationship-taxonomy.md:499
+- [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:365
+- [[UnifiedRelationships]] → managed/types/UnifiedRelationships.md:126
 

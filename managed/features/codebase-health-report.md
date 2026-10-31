@@ -438,6 +438,7 @@ TSDoc Edge 코드베이스는 **전반적으로 건강한 상태**입니다:
 
 ### Referenced By
 
-- [[Phase Commands Refactoring Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:10
-- [[Phase Commands Refactoring Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:216
-- [[Phase Commands Refactoring Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/phase-commands-refactoring-guide.md:274
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:271
+- [[Phase Commands Refactoring Guide]] → managed/features/phase-commands-refactoring-guide.md:19
+- [[Usage Scenarios]] → managed/guides/usage-scenarios.md:205
+

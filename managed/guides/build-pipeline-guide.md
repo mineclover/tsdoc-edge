@@ -561,11 +561,13 @@ tsdoc-edge validate-docs managed
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:101
-- [[Analyzer Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:270
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:12
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:292
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:335
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:38
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:128
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:187
+- [[TSDoc Edge Documentation]] → managed/README.md:141
+- [[ProjectIndexer]] → managed/architecture/project-indexer.md:192
+- [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:1001
+- [[Guides & Tutorials]] → managed/guides/index.md:26
+- [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:499
+- [[Usage Scenarios]] → managed/guides/usage-scenarios.md:43
+- [[Quick Start Guide]] → managed/quick-start.md:62
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:50
+- [[TS7 Test Compilation Lane]] → managed/workflows/ts7-test-compilation-lane.md:413
+

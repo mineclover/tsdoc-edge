@@ -318,5 +318,5 @@ tsdoc-edge build src
 
 ### Referenced By
 
-- [[Codebase Health Report]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/codebase-health-report.md:136
-- [[Codebase Health Report]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/codebase-health-report.md:343
+- [[Codebase Health Report]] → managed/features/codebase-health-report.md:158
+

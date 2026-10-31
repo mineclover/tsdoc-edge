@@ -35,6 +35,10 @@ Detect and suggest parallel work opportunities.
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:264
-- [[Integration Test Traceability]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/integration-test-traceability.md:159
+- [[TSDoc Edge Documentation]] → managed/README.md:314
+- [[Integration Test Traceability]] → managed/concepts/integration-test-traceability.md:546
+
+### Implemented By
+
+- ParallelWorkCommand → src/commands/ParallelWorkCommand.ts:33
 

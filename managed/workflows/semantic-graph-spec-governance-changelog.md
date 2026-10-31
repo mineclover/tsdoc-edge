@@ -33,8 +33,9 @@ proof와 남은 gate는 [[Semantic Graph Spec Governance Completed Work]]에서 
 - `NamingPatternRelationAnalyzer`, `RelationshipInferenceEngine`, `TypeChainTracer`,
   `SymbolSearchEngine` 테스트의 러너 부하 민감 wall-clock 타이밍 단언을 결정론적 동작·선형 결과
   검증으로 정리했다.
-- 전체 TS7 AOT in-band 스위트(`242 suites / 3,109 tests passed`), `typecheck`, `lint`(0 warnings /
-  25 infos, governance `--error-on-warnings`), `verify:document-validation`(`Errors: 0`,
+- 팀워크 기능 테스트 및 보완을 통해 12개 flat `relationship-*` CLI 명령어를 등록하고, `BaseCommand` 불리언 옵션 파싱 결함(위치 인자 삼킴)을 수정했으며, 관계 명령어 전반에 SQLite 리소스 `finally` 해제 처리를 적용했다. 문서 심볼 파서의 frontmatter 라인 오프셋과 코드 블록 배제, 역링크 중복 제거 및 상대 경로 정규화를 완료하고 5개 회귀 스위트와 2개 실증 스크립트를 추가하여 전체 스위트를 247 suites / 3,260 tests passed로 확장했다.
+- 전체 TS7 AOT in-band 스위트(`247 suites / 3,260 tests passed`), `typecheck`, `lint`(0 warnings /
+  24 infos, governance `--error-on-warnings`), `verify:document-validation`(`Errors: 0`,
   `Warnings: 33`), `verify:canonical-safety`, C1/C2 검증(`status: promoted`,
   `ownerPromotionEligible: true`, 10 failure canaries)과 원격 GitHub release matrix 대조를 모두
   재확인했다.
@@ -348,3 +349,17 @@ proof와 남은 gate는 [[Semantic Graph Spec Governance Completed Work]]에서 
   공통 `operatorFailure` 경계로 보내 exit 2와 stderr 메시지를 함께 보장했다.
 - `convention inputs`의 exact evidence/enrichment/policy pin 조회와 `convention retention`의
   list/pin/dry-run/unpin/GC command lifecycle에 command-level 회귀 테스트를 추가했다.
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:13
+
+### Implemented By
+
+- Semantic Graph Spec Governance Changelog → 와 동일한 code connection 입력으로 처리하고, parser 회귀 테스트를 추가했다.
+  재인덱싱 후 단일 owner가 명확한 :1
+

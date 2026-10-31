@@ -282,7 +282,13 @@ echo "Coverage: $coverage%" > coverage-badge.txt
 
 ### Referenced By
 
-- [[DetectDeadCodeCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:61
-- [[UntestedCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UntestedCommand.md:132
-- [[ValidateSpecCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateSpecCommand.md:146
-- TestRelationships → /Users/junwoobang/workflow/tsdoc-edge/managed/types/TestRelationships.md:109
+- [[DetectDeadCodeCommand]] → managed/commands/DetectDeadCodeCommand.md:78
+- [[UntestedCommand]] → managed/commands/UntestedCommand.md:199
+- [[ValidateSpecCommand]] → managed/commands/ValidateSpecCommand.md:321
+- [[Coverage Metrics Contract]] → managed/features/coverage-metrics-contract.md:276
+- [[TestRelationships]] → managed/types/TestRelationships.md:126
+
+### Implemented By
+
+- CoverageReportCommand → src/commands/CoverageReportCommand.ts:1
+

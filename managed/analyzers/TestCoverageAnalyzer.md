@@ -41,14 +41,17 @@ Measures:
 
 ### Referenced By
 
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:40
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:262
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:20
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:62
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:119
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:212
-- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:93
-- AnalysisFeatures → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:144
-- AnalysisFeatures → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:201
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:280
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:100
+- [[TSDoc Edge Documentation]] → managed/README.md:66
+- [[CodeHealthChecker]] → managed/analyzers/CodeHealthChecker.md:33
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:101
+- [[TestRelationshipsCommand]] → managed/commands/TestRelationshipsCommand.md:34
+- [[AnalysisFeatures]] → managed/features/analysis-features.md:243
+- [[Coverage Metrics Contract]] → managed/features/coverage-metrics-contract.md:278
+- [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:427
+- [[Relationship Types]] → managed/relationships/index.md:119
+- [[Test Coverage]] → managed/relationships/test-coverage.md:15
+
+### Implemented By
+
+- TestCoverageAnalyzer → src/analyzer/TestCoverageAnalyzer.ts:65
+

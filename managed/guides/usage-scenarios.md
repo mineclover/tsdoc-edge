@@ -514,3 +514,17 @@ tsdoc-edge system-status
 ---
 
 **Last Updated**: 2025-12-26
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Guides & Tutorials]] → managed/guides/index.md:28
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:177
+
+### Implemented By
+
+- Usage Scenarios → src/path/to/implementation.ts:1
+

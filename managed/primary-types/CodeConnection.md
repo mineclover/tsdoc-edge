@@ -50,6 +50,9 @@ const connections: CodeConnection[] = parser.parseCodeFile('src/file.ts');
 
 ### Referenced By
 
-- [[CodeConnection]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/CodeConnection.md:11
-- [[CodeReference]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/CodeReference.md:28
+- [[CodeReference]] → managed/primary-types/CodeReference.md:36
+
+### Implemented By
+
+- CodeConnection → src/types/feature/doc-symbol.ts:1
 

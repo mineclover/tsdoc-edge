@@ -515,22 +515,9 @@ console.log(validator.generateReport(result));
 
 ### Referenced By
 
-- StrictModeValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/StrictModeValidator.md:240
-- [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:127
-- EnhancedDocExtractor → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:207
-- BaseSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:22
-- BaseSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:32
-- DecisionRecord → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/DecisionRecord.md:27
-- DecisionRecord → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/DecisionRecord.md:39
-- DependencySpec → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/DependencySpec.md:24
-- DependencySpec → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/DependencySpec.md:36
-- EnhancedSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:25
-- ErrorExperience → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ErrorExperience.md:25
-- ErrorExperience → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ErrorExperience.md:37
-- [[Functionality]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/Functionality.md:44
-- [[Functionality]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/Functionality.md:60
-- FuturePlan → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/FuturePlan.md:26
-- FuturePlan → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/FuturePlan.md:38
-- ProblemSolving → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ProblemSolving.md:37
-- ProblemSolving → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ProblemSolving.md:53
-- EnhancedTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/EnhancedTagTypes.md:121
+- [[Primary Types Index]] → managed/primary-types/index.md:20
+
+### Implemented By
+
+- EnhancedSymbolDoc → src/types/tags/enhanced.ts:1
+

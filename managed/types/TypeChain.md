@@ -130,5 +130,9 @@ tsdoc-edge analyze-chains
 
 ### Referenced By
 
-- TypeChain → /Users/junwoobang/workflow/tsdoc-edge/managed/types/TypeChain.md:22
+- [[Types Index]] → managed/types/index.md:20
+
+### Implemented By
+
+- TypeChain → src/types/domain/type-chain.ts:1
 

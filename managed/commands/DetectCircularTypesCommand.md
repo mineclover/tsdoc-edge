@@ -91,14 +91,15 @@ Uses DFS (Depth-First Search) to detect cycles:
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:72
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:304
-- [[FindRootTypesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/FindRootTypesCommand.md:82
-- [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:89
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:203
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:153
-- [[Circular Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/CIRCULAR.md:8
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:144
-- TypeChain → /Users/junwoobang/workflow/tsdoc-edge/managed/types/TypeChain.md:70
-- MermaidGenerator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/MermaidGenerator.md:92
+- [[TSDoc Edge Documentation]] → managed/README.md:99
+- [[FindRootTypesCommand]] → managed/commands/FindRootTypesCommand.md:123
+- [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:159
+- [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:282
+- [[ValidationFeatures]] → managed/features/validation-features.md:278
+- [[TypeChain]] → managed/types/TypeChain.md:124
+- [[MermaidGenerator]] → managed/utilities/MermaidGenerator.md:135
+
+### Implemented By
+
+- DetectCircularTypesCommand → src/commands/TypeChainCommand.ts:1
 

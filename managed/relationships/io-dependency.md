@@ -75,30 +75,21 @@ tsdoc-edge analyze-pipeline
 
 ### Referenced By
 
-- Commands Index → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:72
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:27
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:108
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:313
-- [[IODependencyAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:18
-- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:253
-- AnalyzeIOCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/AnalyzeIOCommand.md:22
-- BuildCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/BuildCommand.md:38
-- [[Unified Relationship Taxonomy]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:389
-- Build Pipeline Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:87
-- Build Pipeline Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:253
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:33
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:59
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:65
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:200
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:361
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:76
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:294
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:321
-- [[Callback Pattern]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/CALLBACK.md:142
-- [[Call Relationships]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/CALLS.md:37
-- [[Relationship Standard Format]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:224
-- [[Code Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/code-dependency.md:35
-- [[Integration Verification]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/integration-verification.md:159
-- [[Temporal Order]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/temporal-order.md:184
-- [[Temporal Order]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/temporal-order.md:218
+- [[Commands Index]] → managed/COMMANDS.md:66
+- [[TSDoc Edge Documentation]] → managed/README.md:53
+- [[IODependencyAnalyzer]] → managed/analyzers/IODependencyAnalyzer.md:26
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:297
+- [[AnalyzeIOCommand]] → managed/commands/AnalyzeIOCommand.md:30
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:50
+- [[BuildCommand]] → managed/commands/BuildCommand.md:48
+- [[Unified Relationship Taxonomy]] → managed/concepts/unified-relationship-taxonomy.md:501
+- [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:279
+- [[Guides & Tutorials]] → managed/guides/index.md:47
+- [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:111
+- [[Callback Pattern]] → managed/relationships/callback.md:317
+- [[Call Relationships]] → managed/relationships/calls.md:54
+- [[Code Dependency]] → managed/relationships/code-dependency.md:55
+- [[Integration Verification]] → managed/relationships/integration-verification.md:373
+- [[Relationship Standard Format]] → managed/relationships/standard-format.md:499
+- [[Temporal Order]] → managed/relationships/temporal-order.md:322
 

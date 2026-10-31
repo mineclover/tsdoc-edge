@@ -71,3 +71,17 @@ frontmatter `source`와 본문 `**Source**:`를 모두 code connection 입력으
 단일 구현 owner가 없는 문서는 `codeImplementation: not-applicable`을 명시한다. 현재 남은
 warning은 링크 허브의 `many_references` 33건이며, 새 warning 증가만 다음 cleanup에서
 선별한다.
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Workflows Index]] → managed/workflows/index.md:147
+
+### Implemented By
+
+- Document Validation Warning Policy → 를 모두 code connection 입력으로 사용하고,
+단일 구현 owner가 없는 문서는 :1
+

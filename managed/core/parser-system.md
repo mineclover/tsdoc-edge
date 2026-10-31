@@ -373,11 +373,16 @@ console.log(`${result.cases.length}개 테스트 케이스`);
 
 ### Referenced By
 
-- [[Analyzer System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/analyzer-system.md:233
-- [[Spec Management System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/spec-management-system.md:186
-- [[Storage System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/storage-system.md:149
-- [[Symbol Graph System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/symbol-graph.md:30
-- [[Symbol Graph System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/symbol-graph.md:118
-- [[Validator System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/validator-system.md:32
-- [[Validator System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/validator-system.md:173
+- [[Code Generation]] → managed/code-generation/index.md:131
+- [[Analyzer System]] → managed/core/analyzer-system.md:442
+- [[Document Symbol System]] → managed/core/doc-symbol-system.md:391
+- [[Spec Management System]] → managed/core/spec-management-system.md:391
+- [[Storage System]] → managed/core/storage-system.md:329
+- [[Symbol Graph System]] → managed/core/symbol-graph.md:38
+- [[Validator System]] → managed/core/validator-system.md:40
+- [[Parser Components]] → managed/parser/index.md:117
+
+### Implemented By
+
+- Parser System → src/parser/TSDocParser.ts:1
 

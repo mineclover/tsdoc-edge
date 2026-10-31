@@ -105,18 +105,22 @@ export class MyCommand extends BaseCommand {
 
 ### Referenced By
 
-- [[DepsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/DepsCommand.md:46
-- [[FindRootTypesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/FindRootTypesCommand.md:38
-- [[OrphansCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/OrphansCommand.md:44
-- [[StatsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/StatsCommand.md:50
-- [[SymbolFixCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolFixCommand.md:181
-- [[SymbolQueryCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolQueryCommand.md:130
-- [[UndocumentedCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UndocumentedCommand.md:46
-- [[UntestedCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UntestedCommand.md:50
-- [[UsedByCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UsedByCommand.md:40
-- [[WhoUsesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WhoUsesCommand.md:47
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:11
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:23
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:333
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:93
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:44
+- [[CommandRegistry]] → managed/commands/CommandRegistry.md:29
+- [[DepsCommand]] → managed/commands/DepsCommand.md:65
+- [[FindRootTypesCommand]] → managed/commands/FindRootTypesCommand.md:74
+- [[OrphansCommand]] → managed/commands/OrphansCommand.md:69
+- [[StatsCommand]] → managed/commands/StatsCommand.md:98
+- [[SymbolFixCommand]] → managed/commands/SymbolFixCommand.md:327
+- [[SymbolQueryCommand]] → managed/commands/SymbolQueryCommand.md:187
+- [[UndocumentedCommand]] → managed/commands/UndocumentedCommand.md:76
+- [[UntestedCommand]] → managed/commands/UntestedCommand.md:78
+- [[UsedByCommand]] → managed/commands/UsedByCommand.md:65
+- [[WhoUsesCommand]] → managed/commands/WhoUsesCommand.md:73
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:18
+- [[Guides & Tutorials]] → managed/guides/index.md:118
+
+### Implemented By
+
+- BaseCommand → src/commands/BaseCommand.ts:1
 

@@ -316,10 +316,12 @@ chmod +x .git/hooks/pre-commit
 
 ### Referenced By
 
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:246
-- [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:148
-- [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:291
-- DocumentSymbolSystem → /Users/junwoobang/workflow/tsdoc-edge/managed/features/document-symbol-system.md:92
-- DocumentSymbolSystem → /Users/junwoobang/workflow/tsdoc-edge/managed/features/document-symbol-system.md:102
-- [[Features Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/index.md:204
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:355
+- [[TSDoc Edge Documentation]] → managed/README.md:295
+- [[CoreFeatures]] → managed/features/core-features-catalog.md:183
+- [[Features Index]] → managed/features/index.md:287
+- [[Guides & Tutorials]] → managed/guides/index.md:408
+
+### Implemented By
+
+- AutoIndexing → src/commands/IndexDocsCommand.ts:1
+

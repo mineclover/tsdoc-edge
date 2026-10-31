@@ -172,3 +172,16 @@ tsdoc-edge detect-dead-code
 - [[AnalyzeIOCommand]]: IO analysis
 - [[AnalyzeChainsCommand]]: Transformation chains
 - [[DetectDeadCodeCommand]]: Dead code detection
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Types Index]] → managed/types/index.md:23
+
+### Implemented By
+
+- DataFlowTypes → src/types/domain/data-flow.ts:1
+

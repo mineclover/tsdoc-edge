@@ -51,9 +51,9 @@ const result: MermaidExtractionResult = extractor.extract(content, path);
 
 ### Referenced By
 
-- [[Mermaid Symbol Extractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/MermaidSymbolExtractor.md:46
-- MermaidExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidExtractionResult.md:11
-- MermaidRelationship → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidRelationship.md:23
-- MermaidRelationship → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidRelationship.md:27
-- MermaidSymbol → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidSymbol.md:32
+- [[Primary Types Index]] → managed/primary-types/index.md:21
+
+### Implemented By
+
+- MermaidExtractionResult → src/doc-symbol/MermaidSymbolExtractor.ts:1
 

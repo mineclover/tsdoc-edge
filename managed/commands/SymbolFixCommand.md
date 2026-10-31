@@ -390,7 +390,9 @@ tsdoc-edge symbol-fix managed --dry-run
 
 ### Referenced By
 
-- [[SymbolQueryCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolQueryCommand.md:123
-- [[SymbolQueryCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolQueryCommand.md:153
-- [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:91
-- [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:144
+- [[SymbolQueryCommand]] → managed/commands/SymbolQueryCommand.md:180
+
+### Implemented By
+
+- SymbolFixCommand → src/commands/SymbolFixCommand.ts:51
+

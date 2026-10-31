@@ -35,6 +35,10 @@ Shows:
 
 ### Referenced By
 
-- [[AnalyticsTypes]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/AnalyticsTypes.md:105
-- UsageTracker → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/UsageTracker.md:83
+- [[AnalyticsTypes]] → managed/types/AnalyticsTypes.md:136
+- [[UsageTracker]] → managed/utilities/UsageTracker.md:116
+
+### Implemented By
+
+- UsageCommand → src/commands/UsageCommand.ts:35
 

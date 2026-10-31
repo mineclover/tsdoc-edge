@@ -113,8 +113,8 @@ const checker = new SpecContentSimilarityChecker({
 
 ## Backlinks
 
-### Referenced By
+### Implemented By
 
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:141
-- SpecTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/SpecTypes.md:192
+- SpecContentSimilarityChecker → src/spec/SpecContentSimilarityChecker.ts:1
+- DocumentSection → src/spec/SpecContentSimilarityChecker.ts:15
 

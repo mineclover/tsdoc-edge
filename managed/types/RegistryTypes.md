@@ -180,3 +180,16 @@ const changed = registry.filter(e =>
 - [[SymbolRegistryManager]]: Registry implementation
 - [[DatabaseManager]]: JSONL sync
 - [[Symbol]]: Full symbol type
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Types Index]] → managed/types/index.md:23
+
+### Implemented By
+
+- RegistryTypes → src/types/registry/registry.ts:1
+

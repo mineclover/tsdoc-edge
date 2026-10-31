@@ -382,9 +382,12 @@ if (configManager.exists()) {
 
 ### Referenced By
 
-- [[CLI Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/CLI-COMMANDS.md:121
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:60
-- TsdocEdgeConfig → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:91
-- TsdocEdgeConfig → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:96
-- ConfigLoader → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/ConfigLoader.md:92
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:39
+- [[CoreWorkflow]] → managed/features/core-workflow.md:72
+- [[TsdocEdgeConfig]] → managed/primary-types/TsdocEdgeConfig.md:108
+- [[ConfigLoader]] → managed/utilities/ConfigLoader.md:137
+
+### Implemented By
+
+- InitCommand → src/commands/Phase4Commands.ts:153:1
 

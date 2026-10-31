@@ -419,12 +419,9 @@ This framework is inspired by:
 
 ### Referenced By
 
-- StrictModeValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/StrictModeValidator.md:55
-- StrictModeValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/StrictModeValidator.md:237
-- [[ValidateSpecCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateSpecCommand.md:7
-- [[ValidateSpecCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateSpecCommand.md:152
-- [[ValidateSpecCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateSpecCommand.md:180
-- [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:224
-- [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:241
-- EnhancedDocExtractor → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:208
+- [[StrictModeValidator]] → managed/analyzers/StrictModeValidator.md:109
+- [[ValidateSpecCommand]] → managed/commands/ValidateSpecCommand.md:15
+- [[Concepts Index]] → managed/concepts/index.md:250
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:264
+- [[EnhancedDocExtractor]] → managed/parser/EnhancedDocExtractor.md:413
 

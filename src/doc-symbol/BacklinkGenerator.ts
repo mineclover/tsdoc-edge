@@ -5,6 +5,7 @@
  */
 
 import * as fs from 'node:fs';
+import * as path from 'node:path';
 import type { Backlink } from '../types/feature';
 import type { DocumentSymbolRegistry } from './DocumentSymbolRegistry';
 
@@ -46,27 +47,60 @@ export class BacklinkGenerator {
     const docBacklinks = backlinks.filter((b) => b.type === 'document');
     const codeBacklinks = backlinks.filter((b) => b.type === 'code');
 
-    // Document references
-    if (docBacklinks.length > 0) {
-      markdown += '### Referenced By\n\n';
-      for (const link of docBacklinks) {
-        const sectionPart = link.section ? `#${link.section}` : '';
-        markdown += `- [[${link.source}]]${sectionPart} → ${link.filePath}:${link.line}\n`;
-      }
-      markdown += '\n';
-    }
-
-    // Code implementations
-    if (codeBacklinks.length > 0) {
-      markdown += '### Implemented By\n\n';
-      for (const link of codeBacklinks) {
-        const sectionPart = link.section ? ` (${link.section})` : '';
-        markdown += `- ${link.source}${sectionPart} → ${link.filePath}:${link.line}\n`;
-      }
-      markdown += '\n';
-    }
+    markdown += this.formatDocumentBacklinks(docBacklinks);
+    markdown += this.formatCodeBacklinks(codeBacklinks);
 
     return markdown;
+  }
+
+  /**
+   * Format document backlinks section
+   *
+   * @param links - Document backlinks
+   * @returns Formatted markdown section
+   */
+  private formatDocumentBacklinks(links: Backlink[]): string {
+    if (links.length === 0) {
+      return '';
+    }
+
+    let markdown = '### Referenced By\n\n';
+    for (const link of links) {
+      const sectionPart = link.section ? `#${link.section}` : '';
+      const relPath = this.formatPath(link.filePath);
+      markdown += `- [[${link.source}]]${sectionPart} → ${relPath}:${link.line}\n`;
+    }
+    markdown += '\n';
+    return markdown;
+  }
+
+  /**
+   * Format code backlinks section
+   *
+   * @param links - Code backlinks
+   * @returns Formatted markdown section
+   */
+  private formatCodeBacklinks(links: Backlink[]): string {
+    if (links.length === 0) {
+      return '';
+    }
+
+    let markdown = '### Implemented By\n\n';
+    for (const link of links) {
+      const sectionPart = link.section ? ` (${link.section})` : '';
+      const relPath = this.formatPath(link.filePath);
+      markdown += `- ${link.source}${sectionPart} → ${relPath}:${link.line}\n`;
+    }
+    markdown += '\n';
+    return markdown;
+  }
+
+  /**
+   * Normalize file path relative to project root
+   */
+  private formatPath(filePath: string): string {
+    const rel = path.isAbsolute(filePath) ? path.relative(process.cwd(), filePath) : filePath;
+    return rel.replace(/\\/g, '/');
   }
 
   /**
@@ -77,6 +111,7 @@ export class BacklinkGenerator {
    */
   private collectBacklinks(symbolName: string): Backlink[] {
     const backlinks: Backlink[] = [];
+    const seenFiles = new Set<string>();
 
     // Document references
     const refs = this.registry.getReferences(symbolName);
@@ -84,6 +119,15 @@ export class BacklinkGenerator {
       // Find the primary definition that contains this reference
       const refDef = this.findContainingDefinition(ref.filePath);
       if (refDef) {
+        // Prevent self-references
+        if (refDef.name === symbolName) {
+          continue;
+        }
+        // Deduplicate references per source document
+        if (seenFiles.has(ref.filePath)) {
+          continue;
+        }
+        seenFiles.add(ref.filePath);
         backlinks.push({
           type: 'document',
           source: refDef.name,
@@ -96,7 +140,16 @@ export class BacklinkGenerator {
 
     // Code connections
     const connections = this.registry.getCodeConnections(symbolName);
+    const seenConnections = new Map<string, (typeof connections)[number]>();
     for (const conn of connections) {
+      const normPath = this.formatPath(conn.filePath);
+      const key = `${conn.codeSymbol}:${normPath}`;
+      const existing = seenConnections.get(key);
+      if (!existing || (existing.line === 1 && conn.line > 1)) {
+        seenConnections.set(key, conn);
+      }
+    }
+    for (const conn of seenConnections.values()) {
       backlinks.push({
         type: 'code',
         source: conn.codeSymbol,
@@ -130,9 +183,9 @@ export class BacklinkGenerator {
    *
    * @param filePath - Document path
    * @param symbolName - Symbol name
-   * @returns void - No return value
+   * @returns boolean - True if file content was modified and written to disk
    */
-  updateBacklinksSection(filePath: string, symbolName: string): void {
+  updateBacklinksSection(filePath: string, symbolName: string): boolean {
     if (!fs.existsSync(filePath)) {
       throw new Error(`File not found: ${filePath}`);
     }
@@ -140,27 +193,28 @@ export class BacklinkGenerator {
     const content = fs.readFileSync(filePath, 'utf-8');
     const backlinksMarkdown = this.generateBacklinks(symbolName);
 
+    let updated: string;
     // If no backlinks, remove section if exists
     if (!backlinksMarkdown) {
-      const updated = this.removeBacklinksSection(content);
-      fs.writeFileSync(filePath, updated, 'utf-8');
-      return;
-    }
-
-    // Find existing backlinks section
-    const section = this.findBacklinksSection(content);
-
-    let updated: string;
-    if (section) {
-      // Replace existing section
-      updated =
-        content.substring(0, section.start) + backlinksMarkdown + content.substring(section.end);
+      updated = this.removeBacklinksSection(content);
     } else {
-      // Append to end
-      updated = `${content.trim()}\n\n${backlinksMarkdown}`;
+      // Find existing backlinks section
+      const section = this.findBacklinksSection(content);
+      if (section) {
+        // Replace existing section
+        updated =
+          content.substring(0, section.start) + backlinksMarkdown + content.substring(section.end);
+      } else {
+        // Append to end
+        updated = `${content.trim()}\n\n${backlinksMarkdown}`;
+      }
     }
 
-    fs.writeFileSync(filePath, updated, 'utf-8');
+    if (updated !== content) {
+      fs.writeFileSync(filePath, updated, 'utf-8');
+      return true;
+    }
+    return false;
   }
 
   /**
@@ -180,12 +234,13 @@ export class BacklinkGenerator {
 
     const start = match.index;
 
-    // Find next H1 or end of file
+    // Find next section boundary (equal or higher level heading H1/H2, or horizontal rule ---) or end of file
     const afterSection = content.substring(start + match[0].length);
-    const nextH1Match = afterSection.match(/^# /m);
-    const nextH1Index = nextH1Match?.index;
+    const nextSectionMatch = afterSection.match(/^(?:---|#{1,2}\s+)/m);
+    const nextSectionIndex = nextSectionMatch?.index;
 
-    const end = nextH1Index === undefined ? content.length : start + match[0].length + nextH1Index;
+    const end =
+      nextSectionIndex === undefined ? content.length : start + match[0].length + nextSectionIndex;
 
     return { start, end };
   }
@@ -199,7 +254,12 @@ export class BacklinkGenerator {
       return content;
     }
 
-    return `${content.substring(0, section.start).trim()}\n`;
+    const before = content.substring(0, section.start).trimEnd();
+    const after = content.substring(section.end).trimStart();
+    if (after) {
+      return `${before}\n\n${after}\n`;
+    }
+    return `${before}\n`;
   }
 
   /**

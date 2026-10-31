@@ -148,5 +148,9 @@ tsdoc-edge find-roots
 
 ### Referenced By
 
-- [[DetectCircularTypesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/DetectCircularTypesCommand.md:50
+- [[DetectCircularTypesCommand]] → managed/commands/DetectCircularTypesCommand.md:80
+
+### Implemented By
+
+- FindRootTypesCommand → src/commands/TypeChainCommand.ts:1
 

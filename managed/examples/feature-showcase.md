@@ -282,4 +282,9 @@ Files Needing Attention: 55
 
 ### Referenced By
 
-*이 섹션은 `tsdoc-edge update-backlinks` 실행 시 자동 업데이트됩니다.*
+- [[Examples]] → managed/examples/index.md:21
+
+### Implemented By
+
+- Feature Showcase → src/commands/BuildCommand.ts:1
+

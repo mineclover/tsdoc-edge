@@ -97,7 +97,23 @@ export class WorkContextCommand extends BaseCommand {
    * @public
    */
   async execute(args: string[]): Promise<CommandResult> {
-    if (args.length < 1 || args[0].startsWith('--')) {
+    const valuedOptions = new Set(['--output', '--depth', '--category']);
+    const positionalArgs: string[] = [];
+    for (let i = 0; i < args.length; i++) {
+      const arg = args[i];
+      if (arg.startsWith('--')) {
+        if (!arg.includes('=') && valuedOptions.has(arg)) {
+          if (i + 1 < args.length && !args[i + 1].startsWith('--')) {
+            i++;
+          }
+        }
+      } else {
+        positionalArgs.push(arg);
+      }
+    }
+    const targetFile = positionalArgs[0];
+
+    if (!targetFile) {
       console.log(
         `${colors.yellow}Usage:${colors.reset} tsdoc-edge work-context <file-path> [options]`
       );
@@ -123,13 +139,12 @@ export class WorkContextCommand extends BaseCommand {
       return { exitCode: 1, message: 'File path required' };
     }
 
-    const targetFile = args[0];
     const useHumanFormat = args.includes('--human');
     const useLlmFormat = args.includes('--llm');
     // Default to XML format unless --human or --llm is specified
     const useXmlFormat = !useHumanFormat && !useLlmFormat;
     const outputFile = this.getOptionValue(args, '--output');
-    const depth = parseInt(this.getOptionValue(args, '--depth') || '2', 10);
+    const depth = Number.parseInt(this.getOptionValue(args, '--depth') || '2', 10);
     const categoryFilter = this.getOptionValue(args, '--category')
       ?.split(',')
       .map((c: string) => c.trim());
@@ -678,10 +693,6 @@ export class WorkContextCommand extends BaseCommand {
     option: string,
     defaultValue?: string
   ): string | undefined {
-    const index = args.indexOf(option);
-    if (index !== -1 && index + 1 < args.length) {
-      return args[index + 1];
-    }
-    return defaultValue;
+    return this.getOption(args, option) ?? defaultValue;
   }
 }

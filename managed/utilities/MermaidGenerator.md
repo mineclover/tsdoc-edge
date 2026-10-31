@@ -133,3 +133,16 @@ tsdoc-edge detect-circular-types
 - [[VisualizeDepsCommand]]: CLI visualization
 - DependencyChainAnalyzer: Detect patterns
 - [[DetectCircularTypesCommand]]: Find cycles
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Utilities Index]] → managed/utilities/index.md:20
+
+### Implemented By
+
+- MermaidGenerator → src/visualization/MermaidGenerator.ts:1
+

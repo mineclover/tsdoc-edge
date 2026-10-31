@@ -134,16 +134,7 @@ console.log(`Critical symbols documented: ${criticalStats.documented}/${critical
 
 ## Backlinks
 
-### Referenced By
-
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:276
-- StatsComparator → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/StatsComparator.md:22
-- StatsHistoryManager → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/StatsHistoryManager.md:21
-- TrackableStatsCollector → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/TrackableStatsCollector.md:22
-- [[UsageCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UsageCommand.md:22
-- TrackableStatistics → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TrackableStatistics.md:23
-
 ### Implemented By
 
-- TrackableStatistics → /Users/junwoobang/workflow/tsdoc-edge/src/types/analysis/statistics.ts:171
+- TrackableStatistics → src/types/analysis/statistics.ts:171
 

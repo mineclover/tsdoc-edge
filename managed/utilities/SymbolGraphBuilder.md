@@ -162,59 +162,31 @@ const impacted = builder.getDependents('user-repository');
 
 ### Referenced By
 
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:180
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:235
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:241
-- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:112
-- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:196
-- [[CallGraphAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:210
-- ImportanceClassifier → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ImportanceClassifier.md:22
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:256
-- [[BuildCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/BuildCommand.md:52
-- [[FindRootTypesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/FindRootTypesCommand.md:37
-- [[TreeCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/TreeCommand.md:121
-- [[UndocumentedCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UndocumentedCommand.md:44
-- [[UntestedCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UntestedCommand.md:49
-- [[WhoUsesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WhoUsesCommand.md:46
-- [[WhoUsesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WhoUsesCommand.md:116
-- [[WorkContextCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WorkContextCommand.md:51
-- [[WorkContextCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WorkContextCommand.md:58
-- DatabaseManager → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:189
-- DepthTraverser → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DepthTraverser.md:118
-- DepthTraverser → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DepthTraverser.md:150
-- SymbolRegistryManager → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/SymbolRegistryManager.md:222
-- [[QueryCommands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/QueryCommands.md:84
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:145
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:167
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:180
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:187
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:222
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:85
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:128
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:29
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:53
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:66
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:78
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:133
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:142
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:150
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:159
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:170
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:192
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:200
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:110
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:227
-- ExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ExtractionResult.md:77
-- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:145
-- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:184
-- [[Relationship Standard Format]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:222
-- [[Code Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/code-dependency.md:38
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:34
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:147
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:177
-- [[Symbol]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/Symbol.md:82
-- ConnectivityValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/ConnectivityValidator.md:120
-- [[SymbolGraphBuilder]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:95
-- SymbolSearchEngine → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:103
-- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:398
+- [[TSDoc Edge Documentation]] → managed/README.md:229
+- [[BuildCommand]] → managed/commands/BuildCommand.md:87
+- [[FindRootTypesCommand]] → managed/commands/FindRootTypesCommand.md:73
+- [[TreeCommand]] → managed/commands/TreeCommand.md:294
+- [[UndocumentedCommand]] → managed/commands/UndocumentedCommand.md:74
+- [[UntestedCommand]] → managed/commands/UntestedCommand.md:77
+- [[WhoUsesCommand]] → managed/commands/WhoUsesCommand.md:72
+- [[WorkContextCommand]] → managed/commands/WorkContextCommand.md:61
+- [[DatabaseManager]] → managed/core-components/DatabaseManager.md:364
+- [[DepthTraverser]] → managed/core-components/DepthTraverser.md:277
+- [[SymbolRegistryManager]] → managed/core-components/SymbolRegistryManager.md:474
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:80
+- [[AnalysisFeatures]] → managed/features/analysis-features.md:244
+- [[CoreWorkflow]] → managed/features/core-workflow.md:97
+- [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:63
+- [[ValidationFeatures]] → managed/features/validation-features.md:235
+- [[Guides & Tutorials]] → managed/guides/index.md:261
+- [[ExtractionResult]] → managed/primary-types/ExtractionResult.md:105
+- [[Quick Start Guide]] → managed/quick-start.md:262
+- [[Symbol]] → managed/types/Symbol.md:90
+- [[ConnectivityValidator]] → managed/utilities/ConnectivityValidator.md:172
+- [[SymbolSearchEngine]] → managed/utilities/SymbolSearchEngine.md:168
+- [[Utilities Index]] → managed/utilities/index.md:429
+
+### Implemented By
+
+- SymbolGraphBuilder → src/graph/SymbolGraphBuilder.ts:1
 

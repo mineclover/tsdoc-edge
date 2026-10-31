@@ -279,3 +279,25 @@ active scope에는 C2 owner 판정만 남긴다.
 | [[Work Context Workflow]] | legacy/canonical comparison vertical slice |
 | [[Semantic Graph Spec Governance Completed Work]] | 완료 checkpoint와 proof |
 | [[Semantic Graph Spec Governance Changelog]] | 날짜별 결정과 변경 |
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → managed/README.md:47
+- [[ProjectIndexer]] → managed/architecture/project-indexer.md:190
+- [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:18
+- [[Spec Management System]] → managed/core/spec-management-system.md:389
+- [[Analyzer Status]] → managed/features/analyzer-status.md:19
+- [[Convention Pack Check]] → managed/features/convention-pack-check.md:463
+- [[Features Index]] → managed/features/index.md:16
+- [[Relationship Types]] → managed/relationships/index.md:34
+- [[ConventionCheck]] → managed/specs/conventions/convention-check.md:71
+- [[AuthoredProjectSpecifications]] → managed/specs/index.md:79
+- [[Workflows Index]] → managed/workflows/index.md:155
+- [[Semantic Graph Spec Governance Changelog]] → managed/workflows/semantic-graph-spec-governance-changelog.md:11
+- [[Semantic Graph Spec Governance Completed Work]] → managed/workflows/semantic-graph-spec-governance-completed.md:11
+- [[TS7 Test Compilation Lane]] → managed/workflows/ts7-test-compilation-lane.md:339
+

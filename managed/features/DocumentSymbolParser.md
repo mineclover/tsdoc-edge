@@ -293,19 +293,20 @@ describe('DocumentSymbolParser', () => {
 
 ### Referenced By
 
-- [[IndexDocsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/IndexDocsCommand.md:57
-- [[SymbolFixCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolFixCommand.md:179
-- [[SymbolQueryCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolQueryCommand.md:129
-- [[SymbolQueryCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolQueryCommand.md:155
-- [[WorkContextCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WorkContextCommand.md:52
-- Document Symbol System → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:31
-- [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:126
-- [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:146
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:84
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:93
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:117
-- DocumentSymbol → /Users/junwoobang/workflow/tsdoc-edge/managed/types/DocumentSymbol.md:99
-- [[DocCodeLinker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/DocCodeLinker.md:52
-- [[SpecCompletenessValidator]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:63
-- SpecContentSimilarityChecker → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:76
-- [[UnusedDocumentDetector]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:80
+- [[IndexDocsCommand]] → managed/commands/IndexDocsCommand.md:77
+- [[SymbolFixCommand]] → managed/commands/SymbolFixCommand.md:325
+- [[SymbolQueryCommand]] → managed/commands/SymbolQueryCommand.md:186
+- [[WorkContextCommand]] → managed/commands/WorkContextCommand.md:62
+- [[DocumentSymbolRegistry]] → managed/features/DocumentSymbolRegistry.md:296
+- [[CoreWorkflow]] → managed/features/core-workflow.md:96
+- [[ValidationFeatures]] → managed/features/validation-features.md:242
+- [[DocumentSymbol]] → managed/types/DocumentSymbol.md:109
+- [[DocCodeLinker]] → managed/utilities/DocCodeLinker.md:67
+- [[SpecCompletenessValidator]] → managed/utilities/SpecCompletenessValidator.md:77
+- [[SpecContentSimilarityChecker]] → managed/utilities/SpecContentSimilarityChecker.md:110
+- [[UnusedDocumentDetector]] → managed/utilities/UnusedDocumentDetector.md:103
+
+### Implemented By
+
+- DocumentSymbolParser → src/doc-symbol/DocumentSymbolParser.ts:1
+

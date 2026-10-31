@@ -316,13 +316,23 @@ Storage (SQLite + JSONL)
 
 ### Referenced By
 
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:188
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:220
-- Analyzer Status → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analyzer-status.md:283
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:208
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:365
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:283
-- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:144
-- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:183
-- [[Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/index.md:349
-- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:417
+- [[TSDoc Edge Documentation]] → managed/README.md:176
+- [[Code Generation]] → managed/code-generation/index.md:130
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:254
+- [[ParallelWorkCommand]] → managed/commands/ParallelWorkCommand.md:29
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:84
+- [[Core Systems]] → managed/core/index.md:43
+- [[Analyzer Status]] → managed/features/analyzer-status.md:306
+- [[ValidationFeatures]] → managed/features/validation-features.md:258
+- [[Guides & Tutorials]] → managed/guides/index.md:242
+- [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:430
+- [[Parser Components]] → managed/parser/index.md:118
+- [[Quick Start Guide]] → managed/quick-start.md:261
+- [[Types Index]] → managed/types/index.md:380
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:282
+- [[Utilities Index]] → managed/utilities/index.md:463
+
+### Implemented By
+
+- Analyzers & Extractors → src/analyzer/ASTSymbolExtractor.ts:1
+

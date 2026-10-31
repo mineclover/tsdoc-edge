@@ -128,7 +128,7 @@ export class SpecGraphRepository {
     if (!this.readOnly) {
       this.database.pragma('foreign_keys = ON');
       if (databasePath !== ':memory:') this.database.pragma('journal_mode = WAL');
-      this.database.pragma('synchronous = FULL');
+      this.database.pragma('synchronous = NORMAL');
       this.database.transaction(() => this.database.exec(SCHEMA_SQL)).immediate();
     }
   }

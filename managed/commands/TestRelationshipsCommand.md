@@ -40,11 +40,14 @@ Analyze and display test-to-code relationships.
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:41
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:261
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:97
-- [[UntestedCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UntestedCommand.md:131
-- [[Integration Test Traceability]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/integration-test-traceability.md:158
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:98
-- TestRelationships → /Users/junwoobang/workflow/tsdoc-edge/managed/types/TestRelationships.md:108
-- [[UnifiedRelationships]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/UnifiedRelationships.md:147
+- [[TSDoc Edge Documentation]] → managed/README.md:67
+- [[AnalyzeTestsCommand]] → managed/commands/AnalyzeTestsCommand.md:14
+- [[UntestedCommand]] → managed/commands/UntestedCommand.md:198
+- [[Integration Test Traceability]] → managed/concepts/integration-test-traceability.md:545
+- [[TestRelationships]] → managed/types/TestRelationships.md:124
+- [[UnifiedRelationships]] → managed/types/UnifiedRelationships.md:205
+
+### Implemented By
+
+- TestRelationshipsCommand → src/commands/TestRelationshipsCommand.ts:40
+

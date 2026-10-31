@@ -211,6 +211,11 @@ interface RelationshipGraph {
 
 ### Referenced By
 
-- [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:128
-- [[Analyzer Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:261
+- [[DatabaseManager]] → managed/core-components/DatabaseManager.md:303
+- [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:353
+- [[Guides & Tutorials]] → managed/guides/index.md:160
+
+### Implemented By
+
+- UnifiedRelationships → src/types/relationships/unified.ts:1
 

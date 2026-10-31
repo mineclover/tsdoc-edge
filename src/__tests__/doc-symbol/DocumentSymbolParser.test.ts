@@ -289,5 +289,215 @@ Line 4
         expect(result?.filePath).toBe(filePath);
       });
     });
+
+    describe('frontmatter line offset', () => {
+      it('should report exact 1-indexed line numbers matching file when frontmatter is present', () => {
+        const filePath = path.join(tempDir, 'managed', 'frontmatter-lines.md');
+        fs.writeFileSync(
+          filePath,
+          `---
+tsdoc: managed
+category: feature
+version: 1.0.0
+---
+
+# [[PrimaryWithFrontmatter]]
+
+Line 8 content.
+See [[InlineRefOne]] here.
+
+## [[AuxWithFrontmatter]]
+
+Line 14 content.
+See [[InlineRefTwo]] and [MyCode](src/MyCode.ts#Method).
+[^sym-001] footnote ref.`
+        );
+
+        const result = parser.parse(filePath);
+
+        expect(result).not.toBeNull();
+        // Frontmatter is lines 1-5 (---, tsdoc, category, version, ---)
+        // Line 6 is blank
+        // Line 7 is # [[PrimaryWithFrontmatter]]
+        expect(result?.primary?.name).toBe('PrimaryWithFrontmatter');
+        expect(result?.primary?.line).toBe(7);
+
+        // Line 10: See [[InlineRefOne]] here.
+        const ref1 = result?.references.find((r) => r.name === 'InlineRefOne');
+        expect(ref1).toBeDefined();
+        expect(ref1?.line).toBe(10);
+
+        // Line 12: ## [[AuxWithFrontmatter]]
+        const aux = result?.auxiliaries.find((a) => a.name === 'AuxWithFrontmatter');
+        expect(aux).toBeDefined();
+        expect(aux?.line).toBe(12);
+
+        // Line 15: See [[InlineRefTwo]] and [MyCode](src/MyCode.ts#Method).
+        const ref2 = result?.references.find((r) => r.name === 'InlineRefTwo');
+        expect(ref2).toBeDefined();
+        expect(ref2?.line).toBe(15);
+
+        const codeRef = result?.codeReferences.find((c) => c.text === 'MyCode');
+        expect(codeRef).toBeDefined();
+        expect(codeRef?.line).toBe(15);
+
+        // Line 16: [^sym-001] footnote ref.
+        const footnoteRef = result?.symbolFootnoteRefs.find((f) => f.identifier === 'sym-001');
+        expect(footnoteRef).toBeDefined();
+        expect(footnoteRef?.line).toBe(16);
+      });
+
+      it('should calculate correct line numbers with 0 frontmatter lines', () => {
+        const filePath = path.join(tempDir, 'managed', 'no-frontmatter.md');
+        fs.writeFileSync(
+          filePath,
+          `# [[DirectPrimary]]
+
+Line 3
+See [[DirectRef]]`
+        );
+
+        const result = parser.parse(filePath);
+
+        expect(result?.primary?.line).toBe(1);
+        expect(result?.references[0]?.line).toBe(4);
+      });
+    });
+
+    describe('code block line preservation', () => {
+      it('should preserve downstream line numbers across multiline code blocks and ignore code block references', () => {
+        const filePath = path.join(tempDir, 'managed', 'code-blocks.md');
+        fs.writeFileSync(
+          filePath,
+          `# [[CodeBlockDoc]]
+
+Line 3: intro text.
+
+\`\`\`typescript
+// Inside code block: [[ShouldNotBeExtracted]]
+function example() {
+  const x = 1;
+  const y = 2;
+  return x + y;
+}
+\`\`\`
+
+Line 14: after code block.
+Reference [[DownstreamRef]] is here.
+
+## [[AuxAfterCodeBlock]]`
+        );
+
+        const result = parser.parse(filePath);
+
+        expect(result).not.toBeNull();
+        expect(result?.primary?.line).toBe(1);
+
+        // Symbols inside code block should NOT be extracted
+        expect(result?.references.some((r) => r.name === 'ShouldNotBeExtracted')).toBe(false);
+
+        // Line 15: Reference [[DownstreamRef]] is here.
+        const ref = result?.references.find((r) => r.name === 'DownstreamRef');
+        expect(ref).toBeDefined();
+        expect(ref?.line).toBe(15);
+
+        // Line 17: ## [[AuxAfterCodeBlock]]
+        const aux = result?.auxiliaries.find((a) => a.name === 'AuxAfterCodeBlock');
+        expect(aux).toBeDefined();
+        expect(aux?.line).toBe(17);
+      });
+
+      it('should preserve line numbers with both frontmatter AND code blocks combined', () => {
+        const filePath = path.join(tempDir, 'managed', 'combined-offset.md');
+        fs.writeFileSync(
+          filePath,
+          `---
+tsdoc: managed
+version: 1.0.0
+---
+# [[CombinedDoc]]
+
+\`\`\`json
+{
+  "key": "value",
+  "nested": true
+}
+\`\`\`
+
+See [[CombinedRef]].`
+        );
+
+        const result = parser.parse(filePath);
+
+        expect(result?.primary?.line).toBe(5);
+        const ref = result?.references.find((r) => r.name === 'CombinedRef');
+        expect(ref).toBeDefined();
+        expect(ref?.line).toBe(14);
+      });
+    });
+
+    describe('ignore backlinks section', () => {
+      it('should ignore wiki-link references inside ## Backlinks section', () => {
+        const filePath = path.join(tempDir, 'managed', 'with-backlinks.md');
+        fs.writeFileSync(
+          filePath,
+          `# [[MyTargetDoc]]
+
+Here is a normal reference to [[ValidReference]].
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[BacklinkCallerA]] → managed/caller-a.md:10
+- [[BacklinkCallerB]]#Section → managed/caller-b.md:25
+
+### Implemented By
+
+- CodeCaller → src/CodeCaller.ts:50`
+        );
+
+        const result = parser.parse(filePath);
+
+        expect(result).not.toBeNull();
+        // Valid reference should be extracted
+        expect(result?.references.some((r) => r.name === 'ValidReference')).toBe(true);
+
+        // Backlink references MUST NOT be extracted
+        expect(result?.references.some((r) => r.name === 'BacklinkCallerA')).toBe(false);
+        expect(result?.references.some((r) => r.name === 'BacklinkCallerB')).toBe(false);
+        expect(result?.references).toHaveLength(1);
+      });
+
+      it('should resume parsing if another H2 section appears after ## Backlinks', () => {
+        const filePath = path.join(tempDir, 'managed', 'backlinks-middle.md');
+        fs.writeFileSync(
+          filePath,
+          `# [[MiddleBacklinksDoc]]
+
+Reference before: [[RefBefore]].
+
+## Backlinks
+
+### Referenced By
+
+- [[IgnoredInBacklinks]] → managed/ignored.md:12
+
+## Related Topics
+
+Reference after: [[RefAfter]].`
+        );
+
+        const result = parser.parse(filePath);
+
+        expect(result).not.toBeNull();
+        expect(result?.references.some((r) => r.name === 'RefBefore')).toBe(true);
+        expect(result?.references.some((r) => r.name === 'IgnoredInBacklinks')).toBe(false);
+        expect(result?.references.some((r) => r.name === 'RefAfter')).toBe(true);
+        expect(result?.references).toHaveLength(2);
+      });
+    });
   });
 });

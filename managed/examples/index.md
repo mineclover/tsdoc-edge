@@ -32,3 +32,12 @@ Examples of relationship detection and analysis.
 - [[Quick Start Guide]] - Getting started guide
 - [[Features Index]] - Feature documentation
 - [[Workflows Index]] - Workflow guides
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → managed/README.md:77
+

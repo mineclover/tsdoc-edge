@@ -41,10 +41,7 @@ interface TypeChain {
 
 ## Backlinks
 
-### Referenced By
+### Implemented By
 
-- [[TypeDependencyAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:90
-- TypeChainCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/TypeChainCommand.md:21
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:199
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:207
-- ValidationFeatures → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:158
+- TypeChainTracer → src/analyzer/TypeChainTracer.ts:23
+

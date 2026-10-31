@@ -103,6 +103,16 @@ export class DatabaseManager {
   private drizzleDb: ReturnType<typeof drizzle>;
   private dbPath: string;
   private jsonlPath: string;
+  private symbolCache: Map<string, Symbol | null> = new Map();
+  private symbolsByFileCache: Map<string, Symbol[]> = new Map();
+  private relationshipsBySymbolCache: Map<string, UnifiedRelationship[]> = new Map();
+
+  /** Invalidate in-memory query caches */
+  public invalidateCache(): void {
+    this.symbolCache.clear();
+    this.symbolsByFileCache.clear();
+    this.relationshipsBySymbolCache.clear();
+  }
 
   /**
    * Create a new DatabaseManager
@@ -135,6 +145,13 @@ export class DatabaseManager {
     }
 
     this.db = new Database(this.dbPath);
+    try {
+      this.db.pragma('cache_size = -64000');
+      this.db.pragma('temp_store = MEMORY');
+      this.db.pragma('mmap_size = 268435456');
+    } catch {
+      // Ignore pragma failures on constrained environments or read-only files
+    }
     this.drizzleDb = drizzle(this.db, { schema });
     this.initializeSchema();
   }
@@ -245,6 +262,7 @@ export class DatabaseManager {
     });
 
     insertAll();
+    this.invalidateCache();
     return inserted;
   }
 
@@ -455,6 +473,7 @@ export class DatabaseManager {
           },
         })
         .run();
+      this.invalidateCache();
       return true;
     } catch {
       return false;
@@ -489,6 +508,7 @@ export class DatabaseManager {
         })
         .where(eq(schema.symbols.id, symbolId))
         .run();
+      this.invalidateCache();
       return true;
     } catch (error) {
       console.error('Failed to update symbol exposure:', error);
@@ -534,6 +554,7 @@ export class DatabaseManager {
           },
         })
         .run();
+      this.invalidateCache();
       return true;
     } catch {
       return false;
@@ -567,6 +588,7 @@ export class DatabaseManager {
           importPath: dependency.importPath ?? null,
         })
         .run();
+      this.invalidateCache();
       return true;
     } catch {
       return false;
@@ -623,11 +645,17 @@ export class DatabaseManager {
    * @returns Symbol object or null if not found
    */
   getSymbol(id: string): Symbol | null {
+    if (this.symbolCache.has(id)) {
+      return this.symbolCache.get(id) ?? null;
+    }
     const row = this.drizzleDb.select().from(schema.symbols).where(eq(schema.symbols.id, id)).get();
 
-    if (!row) return null;
+    if (!row) {
+      this.symbolCache.set(id, null);
+      return null;
+    }
 
-    return {
+    const result: Symbol = {
       id: row.id,
       uuid: row.uuid ?? undefined,
       localPath: row.localPath ?? undefined,
@@ -644,6 +672,8 @@ export class DatabaseManager {
       tests: [],
       designDecisions: [],
     };
+    this.symbolCache.set(id, result);
+    return result;
   }
 
   /**
@@ -652,13 +682,16 @@ export class DatabaseManager {
    * @returns Array of symbols in the file
    */
   getSymbolsByFile(filePath: string): Symbol[] {
+    const cached = this.symbolsByFileCache.get(filePath);
+    if (cached) return cached;
+
     const rows = this.drizzleDb
       .select()
       .from(schema.symbols)
       .where(eq(schema.symbols.filePath, filePath))
       .all();
 
-    return rows.map((row) => ({
+    const result = rows.map((row) => ({
       id: row.id,
       name: row.name,
       type: row.type as Symbol['type'],
@@ -671,6 +704,8 @@ export class DatabaseManager {
       tests: [],
       designDecisions: [],
     }));
+    this.symbolsByFileCache.set(filePath, result);
+    return result;
   }
 
   /**
@@ -1036,6 +1071,9 @@ export class DatabaseManager {
    * @returns Array of relationships involving the symbol
    */
   getUnifiedRelationshipsBySymbol(symbolId: string): UnifiedRelationship[] {
+    const cached = this.relationshipsBySymbolCache.get(symbolId);
+    if (cached) return cached;
+
     const rows = this.drizzleDb
       .selectDistinct({
         id: schema.unifiedRelationships.id,
@@ -1063,7 +1101,7 @@ export class DatabaseManager {
       .where(eq(schema.relationshipSymbols.symbolId, symbolId))
       .all();
 
-    return rows.map((row) => ({
+    const result = rows.map((row) => ({
       id: row.id,
       type: row.type as UnifiedRelationship['type'],
       category: row.category as UnifiedRelationship['category'],
@@ -1081,6 +1119,8 @@ export class DatabaseManager {
       updatedAt: row.updatedAt,
       description: row.description ?? undefined,
     }));
+    this.relationshipsBySymbolCache.set(symbolId, result);
+    return result;
   }
 
   /**
@@ -1906,6 +1946,7 @@ export class DatabaseManager {
         .delete(schema.unifiedRelationships)
         .where(eq(schema.unifiedRelationships.id, id))
         .run();
+      this.invalidateCache();
       return true;
     } catch {
       return false;
@@ -1918,6 +1959,7 @@ export class DatabaseManager {
   clearAllRelationships(): number {
     const count = this.countRelationships();
     this.drizzleDb.delete(schema.unifiedRelationships).run();
+    this.invalidateCache();
     return count;
   }
 
@@ -1971,6 +2013,7 @@ export class DatabaseManager {
           coverage: mapping.coverage ? JSON.stringify(mapping.coverage) : null,
         })
         .run();
+      this.invalidateCache();
       return true;
     } catch {
       return false;
@@ -2296,6 +2339,7 @@ export class DatabaseManager {
     this.drizzleDb.delete(schema.dependencies).run();
     this.drizzleDb.delete(schema.enhancedDocs).run();
     this.drizzleDb.delete(schema.symbols).run();
+    this.invalidateCache();
   }
 
   /**
@@ -2308,6 +2352,7 @@ export class DatabaseManager {
       .delete(schema.symbols)
       .where(eq(schema.symbols.filePath, filePath))
       .run();
+    this.invalidateCache();
     return result.changes;
   }
 
@@ -2984,6 +3029,7 @@ export class DatabaseManager {
           },
         })
         .run();
+      this.invalidateCache();
       return true;
     } catch (error) {
       console.error('Failed to insert endpoint:', error);
@@ -3105,6 +3151,7 @@ export class DatabaseManager {
           },
         })
         .run();
+      this.invalidateCache();
       return true;
     } catch (error) {
       console.error('Failed to insert code block:', error);
@@ -3172,6 +3219,7 @@ export class DatabaseManager {
           },
         })
         .run();
+      this.invalidateCache();
       return true;
     } catch (error) {
       console.error('Failed to insert entry point:', error);

@@ -56,3 +56,6 @@ docs/generated/
 # Temporary files
 tmp/
 *.backup*
+
+# Agent workspaces
+.agents/

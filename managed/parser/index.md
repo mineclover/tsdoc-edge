@@ -117,3 +117,18 @@ const symbols = docParser.parse(markdownFile);
 - [[Parser System]] - Parser system architecture
 - [[Analyzers & Extractors]] - Analysis that uses parsed data
 - [[Document Symbol System]] - Symbol reference system
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → managed/README.md:195
+- [[CoreWorkflow]] → managed/features/core-workflow.md:106
+- [[ValidationFeatures]] → managed/features/validation-features.md:250
+
+### Implemented By
+
+- Parser Components → src/parser/TSDocParser.ts:1
+

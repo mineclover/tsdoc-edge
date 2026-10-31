@@ -35,11 +35,11 @@ Analyze type dependencies and usage.
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:70
-- [[DetectDeadCodeCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/DetectDeadCodeCommand.md:63
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:153
-- [[Generic Constraint]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/GENERIC-CONSTRAINT.md:9
-- [[Type Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/TYPE-DEPENDENCY.md:9
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:117
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:125
+- [[TSDoc Edge Documentation]] → managed/README.md:97
+- [[DetectDeadCodeCommand]] → managed/commands/DetectDeadCodeCommand.md:80
+- [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:232
+
+### Implemented By
+
+- AnalyzeTypesCommand → src/commands/AnalyzeTypesCommand.ts:1
 

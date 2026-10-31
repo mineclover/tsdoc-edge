@@ -357,7 +357,8 @@ interface SubstitutionMetrics {
 
 ### Referenced By
 
-- [[Fallback]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/fallback.md:106
-- [[Mutual Exclusion]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/mutual-exclusion.md:106
-- [[Mutual Exclusion]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/mutual-exclusion.md:123
+- [[Commands Index]] → managed/COMMANDS.md:83
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:130
+- [[Fallback]] → managed/relationships/fallback.md:212
+- [[Mutual Exclusion]] → managed/relationships/mutual-exclusion.md:215
 

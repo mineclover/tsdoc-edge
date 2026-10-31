@@ -144,3 +144,16 @@ tsdoc-edge find-doc user-service
 - DocumentSymbol: Document symbol system
 - [[IndexDocsCommand]]: Document indexing
 - FindDocCommand: Feature search
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Types Index]] → managed/types/index.md:22
+
+### Implemented By
+
+- FeatureTypes → src/types/feature/feature.ts:1
+

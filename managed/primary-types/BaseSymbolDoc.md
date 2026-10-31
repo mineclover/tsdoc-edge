@@ -52,7 +52,9 @@ Extended by EnhancedSymbolDoc which adds:
 
 ### Referenced By
 
-- BaseSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:11
-- EnhancedSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:27
-- EnhancedSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:130
+- [[Primary Types Index]] → managed/primary-types/index.md:20
+
+### Implemented By
+
+- BaseSymbolDoc → src/types/tags/enhanced.ts:1
 

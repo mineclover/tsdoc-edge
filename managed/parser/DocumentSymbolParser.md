@@ -145,7 +145,10 @@ Calls [[SessionCleaner]] to invalidate tokens.
 
 ### Referenced By
 
-- FrontmatterParser → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/FrontmatterParser.md:22
-- [[Mermaid Symbol Extractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/MermaidSymbolExtractor.md:85
-- ParsedDocSymbols → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:58
+- [[Mermaid Symbol Extractor]] → managed/parser/MermaidSymbolExtractor.md:130
+- [[ParsedDocSymbols]] → managed/primary-types/ParsedDocSymbols.md:63
+
+### Implemented By
+
+- Document Symbol Parser → src/doc-symbol/DocumentSymbolParser.ts:1
 

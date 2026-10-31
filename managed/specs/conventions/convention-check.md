@@ -69,3 +69,16 @@ only from this document's explicit declaration block; prose never creates a requ
 
 - [[Convention Pack Check]]
 - [[Semantic Graph Spec Governance Roadmap]]
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Convention Pack Check]] → managed/features/convention-pack-check.md:440
+
+### Implemented By
+
+- ConventionCheck → src/convention/ConventionCheckService.ts:1
+

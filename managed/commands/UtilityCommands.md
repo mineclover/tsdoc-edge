@@ -377,3 +377,16 @@ tsdoc-edge uninstall-hook
 
 - [[Commands Index]] - All commands by category
 - [[CLI Commands]] - Alphabetical command reference
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Commands Index]] → managed/COMMANDS.md:157
+
+### Implemented By
+
+- UtilityCommands → src/commands/ContextCommand.ts:1
+

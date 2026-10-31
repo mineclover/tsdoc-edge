@@ -264,3 +264,16 @@ Maps to framework sections:
 - ModuleSpecTypes: 7-part framework
 - ModuleSpecTagParser: Parses these tags
 - ModuleSpecValidator: Validates completeness
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Types Index]] → managed/types/index.md:22
+
+### Implemented By
+
+- ModuleSpecTagTypes → src/types/tags/module-spec-tags.ts:1
+

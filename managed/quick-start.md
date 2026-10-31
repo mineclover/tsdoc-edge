@@ -344,4 +344,10 @@ tsdoc-edge analyze-pipeline
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:10
+- [[Commands Index]] → managed/COMMANDS.md:314
+- [[TSDoc Edge Documentation]] → managed/README.md:22
+- [[Examples]] → managed/examples/index.md:32
+- [[Guides & Tutorials]] → managed/guides/index.md:21
+- [[Usage Scenarios]] → managed/guides/usage-scenarios.md:42
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:26
+

@@ -456,5 +456,7 @@ Uses: DependencySpec, Functionality, FuturePlan, ProblemSolving, DecisionRecord,
 
 ### Referenced By
 
-- [[Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/index.md:346
-- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:416
+- [[TSDoc Edge Documentation]] → managed/README.md:181
+- [[Types Index]] → managed/types/index.md:377
+- [[Utilities Index]] → managed/utilities/index.md:462
+

@@ -69,6 +69,6 @@ Related: [[OrderProcessor]], [[PaymentGateway]]
 
 ### Referenced By
 
-- [[Conceptual Relation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/conceptual-relation.md:133
-- [[Conceptual Relation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/conceptual-relation.md:156
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:219
+- [[Conceptual Relation]] → managed/relationships/conceptual-relation.md:255
 

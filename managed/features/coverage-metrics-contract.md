@@ -280,3 +280,35 @@ canonical graph 입력을 기준선에 포함하려면 `--graph-revision`과
 - [[CodeHealthMetrics]]: `quality.health` summary
 - [[Relationship System Roadmap]]: relationship implementation history; not a current metric baseline
 - [[Convention Pack Check]]: `graph.policy` gate integration
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → managed/README.md:18
+- [[CodeHealthChecker]] → managed/analyzers/CodeHealthChecker.md:16
+- [[TestCoverageAnalyzer]] → managed/analyzers/TestCoverageAnalyzer.md:17
+- [[TestRelationshipAnalyzer]] → managed/analyzers/TestRelationshipAnalyzer.md:15
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:165
+- [[AnalyzeTestsCommand]] → managed/commands/AnalyzeTestsCommand.md:15
+- [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:17
+- [[TestRelationshipsCommand]] → managed/commands/TestRelationshipsCommand.md:17
+- [[Analyzer System]] → managed/core/analyzer-system.md:214
+- [[AnalysisFeatures]] → managed/features/analysis-features.md:104
+- [[Analyzer Status]] → managed/features/analyzer-status.md:19
+- [[Codebase Health Report]] → managed/features/codebase-health-report.md:15
+- [[Features Index]] → managed/features/index.md:17
+- [[Guides & Tutorials]] → managed/guides/index.md:86
+- [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:487
+- [[Relationship Types]] → managed/relationships/index.md:18
+- [[Integration Verification]] → managed/relationships/integration-verification.md:16
+- [[Test Coverage]] → managed/relationships/test-coverage.md:18
+- [[CodeHealthMetrics]] → managed/types/CodeHealthMetrics.md:67
+- [[Relationship System Roadmap]] → managed/workflows/relationship-system-roadmap.md:12
+
+### Implemented By
+
+- Coverage Metrics Contract → src/convention/CoverageMetricPolicy.ts:1
+

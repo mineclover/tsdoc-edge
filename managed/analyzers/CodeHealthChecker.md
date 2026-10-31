@@ -322,22 +322,20 @@ tsdoc-edge health src --include-private
 
 ### Referenced By
 
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:212
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:236
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:272
-- [[DocumentationAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:74
-- [[DocumentationAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:122
-- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:91
-- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:97
-- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:220
-- [[AnalyzeCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/AnalyzeCommand.md:18
-- [[HealthCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/HealthCommand.md:18
-- AnalysisFeatures → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:143
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:113
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:120
-- Analyzer Development Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:21
-- Analyzer Development Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:258
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:216
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:369
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:272
-- AnalysisReport → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/AnalysisReport.md:91
+- [[TSDoc Edge Documentation]] → managed/README.md:261
+- [[DocumentationAnalyzer]] → managed/analyzers/DocumentationAnalyzer.md:147
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:99
+- [[AnalyzeCommand]] → managed/commands/AnalyzeCommand.md:26
+- [[HealthCommand]] → managed/commands/HealthCommand.md:26
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:60
+- [[AnalysisFeatures]] → managed/features/analysis-features.md:242
+- [[CoreWorkflow]] → managed/features/core-workflow.md:125
+- [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:28
+- [[Guides & Tutorials]] → managed/guides/index.md:250
+- [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:419
+- [[AnalysisReport]] → managed/primary-types/AnalysisReport.md:113
+
+### Implemented By
+
+- CodeHealthChecker → src/analyzer/CodeHealthChecker.ts:1
+

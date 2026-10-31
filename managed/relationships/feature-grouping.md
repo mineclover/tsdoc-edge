@@ -454,9 +454,8 @@ class CheckoutFeature {}
 
 ### Referenced By
 
-- [[Co-Requirement]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/co-requirement.md:151
-- [[Conceptual Relation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/conceptual-relation.md:132
-- [[Conceptual Relation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/conceptual-relation.md:155
-- [[Mutual Exclusion]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/mutual-exclusion.md:107
-- [[Mutual Exclusion]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/mutual-exclusion.md:124
+- [[Guides & Tutorials]] → managed/guides/index.md:234
+- [[Co-Requirement]] → managed/relationships/co-requirement.md:295
+- [[Conceptual Relation]] → managed/relationships/conceptual-relation.md:254
+- [[Mutual Exclusion]] → managed/relationships/mutual-exclusion.md:216
 

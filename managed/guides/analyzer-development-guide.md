@@ -1013,6 +1013,6 @@ export class CompositionAnalyzer {
 
 ### Referenced By
 
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:21
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:333
+- [[Guides & Tutorials]] → managed/guides/index.md:35
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:218
 

@@ -408,4 +408,30 @@ symbols.forEach(sym => {
 ---
 
 ## Backlinks
-<!-- 이 섹션은 자동 생성됩니다 -->
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → managed/README.md:292
+- [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1461
+- [[Code Generation]] → managed/code-generation/index.md:132
+- [[CheckLinksCommand]] → managed/commands/CheckLinksCommand.md:29
+- [[ExploreEntrypointCommand]] → managed/commands/ExploreEntrypointCommand.md:31
+- [[IndexDocsCommand]] → managed/commands/IndexDocsCommand.md:79
+- [[PromoteSymbolCommand]] → managed/commands/PromoteSymbolCommand.md:30
+- [[UpdateBacklinksCommand]] → managed/commands/UpdateBacklinksCommand.md:26
+- [[UpdateSymbolRefsCommand]] → managed/commands/UpdateSymbolRefsCommand.md:29
+- [[ValidateSymbolRefsCommand]] → managed/commands/ValidateSymbolRefsCommand.md:30
+- [[Concepts Index]] → managed/concepts/index.md:249
+- [[SSOT]] → managed/concepts/ssot.md:70
+- [[Spec Management System]] → managed/core/spec-management-system.md:60
+- [[Storage System]] → managed/core/storage-system.md:331
+- [[Guides & Tutorials]] → managed/guides/index.md:407
+- [[Usage Scenarios]] → managed/guides/usage-scenarios.md:163
+- [[Parser Components]] → managed/parser/index.md:119
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:146
+- [[Work Context Workflow]] → managed/workflows/work-context-workflow.md:759
+
+### Implemented By
+
+- Document Symbol System → src/doc-symbol/DocumentSymbolParser.ts:1
+

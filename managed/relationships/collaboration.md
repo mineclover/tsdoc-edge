@@ -364,7 +364,8 @@ interface CollaborationMetrics {
 
 ### Referenced By
 
-- [[Integration Verification]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/integration-verification.md:158
-- [[Integration Verification]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/integration-verification.md:188
-- [[Temporal Order]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/temporal-order.md:220
+- [[Commands Index]] → managed/COMMANDS.md:74
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:85
+- [[Integration Verification]] → managed/relationships/integration-verification.md:372
+- [[Temporal Order]] → managed/relationships/temporal-order.md:358
 

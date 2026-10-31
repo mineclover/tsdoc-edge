@@ -295,11 +295,15 @@ tsdoc-edge validate-docs managed 2>&1 | grep "missing_primary"
 
 ### Referenced By
 
-- [[SymbolFixCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolFixCommand.md:205
-- [[SymbolQueryCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolQueryCommand.md:152
-- [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:141
-- [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:222
-- [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:237
-- [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:148
-- [[Relationship System Roadmap]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:404
+- [[SymbolFixCommand]] → managed/commands/SymbolFixCommand.md:382
+- [[SymbolQueryCommand]] → managed/commands/SymbolQueryCommand.md:250
+- [[Concepts Index]] → managed/concepts/index.md:248
+- [[SSOT]] → managed/concepts/ssot.md:69
+- [[DocumentSymbolParser]] → managed/features/DocumentSymbolParser.md:281
+- [[DocumentSymbolRegistry]] → managed/features/DocumentSymbolRegistry.md:373
+- [[Relationship System Roadmap]] → managed/workflows/relationship-system-roadmap.md:535
+
+### Implemented By
+
+- Symbol Reference System → src/commands/BuildCommand.ts:1
 

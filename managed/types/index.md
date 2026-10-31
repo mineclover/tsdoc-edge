@@ -385,5 +385,7 @@ Uses: DocumentSymbol, FeatureTypes, LinkingTypes
 
 ### Referenced By
 
-- [[Primary Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/index.md:401
-- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:415
+- [[TSDoc Edge Documentation]] → managed/README.md:180
+- [[Primary Types Index]] → managed/primary-types/index.md:448
+- [[Utilities Index]] → managed/utilities/index.md:461
+

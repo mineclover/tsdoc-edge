@@ -36,10 +36,13 @@ Explore entrypoint and discover connected symbols.
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:53
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:122
-- [[ParseMermaidCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ParseMermaidCommand.md:40
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:88
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:180
-- [[Mermaid Symbol Extractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/MermaidSymbolExtractor.md:63
+- [[TSDoc Edge Documentation]] → managed/README.md:80
+- [[ParseMermaidCommand]] → managed/commands/ParseMermaidCommand.md:50
+- [[CoreWorkflow]] → managed/features/core-workflow.md:100
+- [[Guides & Tutorials]] → managed/guides/index.md:215
+- [[Mermaid Symbol Extractor]] → managed/parser/MermaidSymbolExtractor.md:81
+
+### Implemented By
+
+- ExploreEntrypointCommand → src/commands/ExploreEntrypointCommand.ts:47
 

@@ -89,146 +89,151 @@ Examples:
 
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
+      try {
+        console.log();
+        this.printInfo('Running validation checks...');
+        console.log();
 
-      console.log();
-      this.printInfo('Running validation checks...');
-      console.log();
+        const issues: ValidationIssue[] = [];
 
-      const issues: ValidationIssue[] = [];
+        // Check 1: Orphaned relationships
+        this.printSection('1. Checking for Orphaned Relationships');
+        const orphanIssues = this.checkOrphanedRelationships(dbManager);
+        issues.push(...orphanIssues);
 
-      // Check 1: Orphaned relationships
-      this.printSection('1. Checking for Orphaned Relationships');
-      const orphanIssues = this.checkOrphanedRelationships(dbManager);
-      issues.push(...orphanIssues);
-
-      if (orphanIssues.length === 0) {
-        this.printSuccess('No orphaned relationships found');
-      } else {
-        this.printWarning(`Found ${orphanIssues.length} orphaned relationships`);
-        if (options.verbose) {
-          for (const issue of orphanIssues.slice(0, 10)) {
-            console.log(`  ${this.colors.yellow}⚠${this.colors.reset} ${issue.message}`);
-          }
-          if (orphanIssues.length > 10) {
-            console.log(
-              `  ${this.colors.dim}... and ${orphanIssues.length - 10} more${this.colors.reset}`
-            );
+        if (orphanIssues.length === 0) {
+          this.printSuccess('No orphaned relationships found');
+        } else {
+          this.printWarning(`Found ${orphanIssues.length} orphaned relationships`);
+          if (options.verbose) {
+            for (const issue of orphanIssues.slice(0, 10)) {
+              console.log(`  ${this.colors.yellow}⚠${this.colors.reset} ${issue.message}`);
+            }
+            if (orphanIssues.length > 10) {
+              console.log(
+                `  ${this.colors.dim}... and ${orphanIssues.length - 10} more${this.colors.reset}`
+              );
+            }
           }
         }
-      }
-      console.log();
+        console.log();
 
-      // Check 2: Duplicate relationships
-      this.printSection('2. Checking for Duplicate Relationships');
-      const duplicateIssues = this.checkDuplicateRelationships(dbManager);
-      issues.push(...duplicateIssues);
+        // Check 2: Duplicate relationships
+        this.printSection('2. Checking for Duplicate Relationships');
+        const duplicateIssues = this.checkDuplicateRelationships(dbManager);
+        issues.push(...duplicateIssues);
 
-      if (duplicateIssues.length === 0) {
-        this.printSuccess('No duplicate relationships found');
-      } else {
-        this.printWarning(`Found ${duplicateIssues.length} duplicate relationships`);
-        if (options.verbose) {
-          for (const issue of duplicateIssues.slice(0, 10)) {
-            console.log(`  ${this.colors.yellow}⚠${this.colors.reset} ${issue.message}`);
-          }
-          if (duplicateIssues.length > 10) {
-            console.log(
-              `  ${this.colors.dim}... and ${duplicateIssues.length - 10} more${this.colors.reset}`
-            );
+        if (duplicateIssues.length === 0) {
+          this.printSuccess('No duplicate relationships found');
+        } else {
+          this.printWarning(`Found ${duplicateIssues.length} duplicate relationships`);
+          if (options.verbose) {
+            for (const issue of duplicateIssues.slice(0, 10)) {
+              console.log(`  ${this.colors.yellow}⚠${this.colors.reset} ${issue.message}`);
+            }
+            if (duplicateIssues.length > 10) {
+              console.log(
+                `  ${this.colors.dim}... and ${duplicateIssues.length - 10} more${this.colors.reset}`
+              );
+            }
           }
         }
-      }
-      console.log();
+        console.log();
 
-      // Check 3: Low confidence relationships
-      this.printSection('3. Checking Confidence Levels');
-      const confidenceIssues = this.checkLowConfidence(dbManager, options.minConfidence);
-      issues.push(...confidenceIssues);
+        // Check 3: Low confidence relationships
+        this.printSection('3. Checking Confidence Levels');
+        const confidenceIssues = this.checkLowConfidence(dbManager, options.minConfidence);
+        issues.push(...confidenceIssues);
 
-      if (confidenceIssues.length === 0) {
-        this.printSuccess(`All relationships meet confidence threshold (${options.minConfidence})`);
-      } else {
-        this.printInfo(`Found ${confidenceIssues.length} relationships below confidence threshold`);
-        if (options.verbose) {
-          for (const issue of confidenceIssues.slice(0, 10)) {
-            console.log(`  ${this.colors.blue}ℹ${this.colors.reset} ${issue.message}`);
-          }
-          if (confidenceIssues.length > 10) {
-            console.log(
-              `  ${this.colors.dim}... and ${confidenceIssues.length - 10} more${this.colors.reset}`
-            );
-          }
-        }
-      }
-      console.log();
-
-      // Check 4: Consistency checks
-      this.printSection('4. Checking Bidirectional Consistency');
-      const consistencyIssues = this.checkBidirectionalConsistency(dbManager);
-      issues.push(...consistencyIssues);
-
-      if (consistencyIssues.length === 0) {
-        this.printSuccess('All bidirectional relationships are consistent');
-      } else {
-        this.printWarning(
-          `Found ${consistencyIssues.length} inconsistent bidirectional relationships`
-        );
-        if (options.verbose) {
-          for (const issue of consistencyIssues.slice(0, 10)) {
-            console.log(`  ${this.colors.yellow}⚠${this.colors.reset} ${issue.message}`);
-          }
-          if (consistencyIssues.length > 10) {
-            console.log(
-              `  ${this.colors.dim}... and ${consistencyIssues.length - 10} more${this.colors.reset}`
-            );
+        if (confidenceIssues.length === 0) {
+          this.printSuccess(
+            `All relationships meet confidence threshold (${options.minConfidence})`
+          );
+        } else {
+          this.printInfo(
+            `Found ${confidenceIssues.length} relationships below confidence threshold`
+          );
+          if (options.verbose) {
+            for (const issue of confidenceIssues.slice(0, 10)) {
+              console.log(`  ${this.colors.blue}ℹ${this.colors.reset} ${issue.message}`);
+            }
+            if (confidenceIssues.length > 10) {
+              console.log(
+                `  ${this.colors.dim}... and ${confidenceIssues.length - 10} more${this.colors.reset}`
+              );
+            }
           }
         }
-      }
-      console.log();
-
-      // Summary
-      console.log();
-      this.printSection('Validation Summary');
-
-      const errors = issues.filter((i) => i.severity === 'error').length;
-      const warnings = issues.filter((i) => i.severity === 'warning').length;
-      const infos = issues.filter((i) => i.severity === 'info').length;
-
-      console.log(`  Total issues: ${this.colors.cyan}${issues.length}${this.colors.reset}`);
-      if (errors > 0) {
-        console.log(`  ${this.colors.red}✗ Errors: ${errors}${this.colors.reset}`);
-      }
-      if (warnings > 0) {
-        console.log(`  ${this.colors.yellow}⚠ Warnings: ${warnings}${this.colors.reset}`);
-      }
-      if (infos > 0) {
-        console.log(`  ${this.colors.blue}ℹ Info: ${infos}${this.colors.reset}`);
-      }
-      console.log();
-
-      // Fix issues if requested
-      if (options.fix && issues.length > 0) {
         console.log();
-        this.printInfo('Attempting to fix issues...');
-        const fixed = this.fixIssues(dbManager, issues);
+
+        // Check 4: Consistency checks
+        this.printSection('4. Checking Bidirectional Consistency');
+        const consistencyIssues = this.checkBidirectionalConsistency(dbManager);
+        issues.push(...consistencyIssues);
+
+        if (consistencyIssues.length === 0) {
+          this.printSuccess('All bidirectional relationships are consistent');
+        } else {
+          this.printWarning(
+            `Found ${consistencyIssues.length} inconsistent bidirectional relationships`
+          );
+          if (options.verbose) {
+            for (const issue of consistencyIssues.slice(0, 10)) {
+              console.log(`  ${this.colors.yellow}⚠${this.colors.reset} ${issue.message}`);
+            }
+            if (consistencyIssues.length > 10) {
+              console.log(
+                `  ${this.colors.dim}... and ${consistencyIssues.length - 10} more${this.colors.reset}`
+              );
+            }
+          }
+        }
         console.log();
-        this.printSuccess(`Fixed ${fixed} issue(s)`);
+
+        // Summary
         console.log();
-      } else if (issues.length > 0) {
-        console.log(
-          `  ${this.colors.dim}Run with --fix to attempt automatic fixes${this.colors.reset}`
-        );
+        this.printSection('Validation Summary');
+
+        const errors = issues.filter((i) => i.severity === 'error').length;
+        const warnings = issues.filter((i) => i.severity === 'warning').length;
+        const infos = issues.filter((i) => i.severity === 'info').length;
+
+        console.log(`  Total issues: ${this.colors.cyan}${issues.length}${this.colors.reset}`);
+        if (errors > 0) {
+          console.log(`  ${this.colors.red}✗ Errors: ${errors}${this.colors.reset}`);
+        }
+        if (warnings > 0) {
+          console.log(`  ${this.colors.yellow}⚠ Warnings: ${warnings}${this.colors.reset}`);
+        }
+        if (infos > 0) {
+          console.log(`  ${this.colors.blue}ℹ Info: ${infos}${this.colors.reset}`);
+        }
         console.log();
+
+        // Fix issues if requested
+        if (options.fix && issues.length > 0) {
+          console.log();
+          this.printInfo('Attempting to fix issues...');
+          const fixed = this.fixIssues(dbManager, issues);
+          console.log();
+          this.printSuccess(`Fixed ${fixed} issue(s)`);
+          console.log();
+        } else if (issues.length > 0) {
+          console.log(
+            `  ${this.colors.dim}Run with --fix to attempt automatic fixes${this.colors.reset}`
+          );
+          console.log();
+        }
+
+        const exitCode = errors > 0 ? 1 : 0;
+        return {
+          success: exitCode === 0,
+          message: `Validation complete: ${issues.length} issue(s) found`,
+          exitCode,
+        };
+      } finally {
+        dbManager.close();
       }
-
-      dbManager.close();
-
-      const exitCode = errors > 0 ? 1 : 0;
-      return {
-        success: exitCode === 0,
-        message: `Validation complete: ${issues.length} issue(s) found`,
-        exitCode,
-      };
     });
   }
 

@@ -123,5 +123,9 @@ tsdoc-edge config set analytics.enabled false
 
 ### Referenced By
 
-- [[AnalyticsTypes]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/AnalyticsTypes.md:104
+- [[Utilities Index]] → managed/utilities/index.md:21
+
+### Implemented By
+
+- UsageTracker → src/analytics/UsageTracker.ts:1
 

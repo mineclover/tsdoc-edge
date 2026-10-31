@@ -123,19 +123,7 @@ if (report.metrics.overallScore < 70) {
 
 ## Backlinks
 
-### Referenced By
-
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:270
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:81
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:120
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:123
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:215
-- [[SuggestCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SuggestCommand.md:187
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:114
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:381
-- AnalysisReport → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/AnalysisReport.md:23
-
 ### Implemented By
 
-- AnalysisReport → /Users/junwoobang/workflow/tsdoc-edge/src/types/analysis/quality.ts:109
+- AnalysisReport → src/types/analysis/quality.ts:113
 

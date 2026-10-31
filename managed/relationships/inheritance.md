@@ -22,16 +22,11 @@ Track class inheritance hierarchies (`extends`, `implements`).
 
 ### Referenced By
 
-- Commands Index → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:17
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:36
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:319
-- ASTSymbolExtractor → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:103
-- ASTSymbolExtractor → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:181
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:64
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:297
-- [[Composition Relationship]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/COMPOSITION.md:109
-- [[Composition Relationship]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/COMPOSITION.md:117
-- [[Code Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/code-dependency.md:36
-- [[Substitution]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/substitution.md:137
-- [[Substitution]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/substitution.md:167
+- [[TSDoc Edge Documentation]] → managed/README.md:62
+- [[ASTSymbolExtractor]] → managed/analyzers/ASTSymbolExtractor.md:175
+- [[Guides & Tutorials]] → managed/guides/index.md:89
+- [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:444
+- [[Code Dependency]] → managed/relationships/code-dependency.md:56
+- [[Composition Relationship]] → managed/relationships/composition.md:212
+- [[Substitution]] → managed/relationships/substitution.md:274
 

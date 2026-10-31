@@ -87,5 +87,9 @@ Returns:
 
 ### Referenced By
 
-- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:400
+- [[Utilities Index]] → managed/utilities/index.md:21
+
+### Implemented By
+
+- FileScanner → src/scanner/FileScanner.ts:1
 

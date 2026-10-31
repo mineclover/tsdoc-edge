@@ -384,72 +384,27 @@ tsdoc-edge import-registry
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:38
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:102
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:174
-- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:113
-- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:197
-- [[CallGraphAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:211
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:223
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:257
-- [[BuildCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/BuildCommand.md:53
-- [[StatsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/StatsCommand.md:46
-- [[UndocumentedCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UndocumentedCommand.md:43
-- [[UntestedCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UntestedCommand.md:48
-- [[UsedByCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UsedByCommand.md:94
-- [[WhoUsesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WhoUsesCommand.md:45
-- [[WhoUsesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WhoUsesCommand.md:115
-- [[WorkContextCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WorkContextCommand.md:50
-- [[Unified Relationship Taxonomy]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:392
-- [[SymbolRegistryManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/SymbolRegistryManager.md:220
-- [[QueryCommands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/QueryCommands.md:83
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:152
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:174
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:181
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:195
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:202
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:209
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:216
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:75
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:86
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:95
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:130
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:136
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:35
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:45
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:124
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:134
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:143
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:160
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:242
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:111
-- [[Build Pipeline Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:39
-- [[Build Pipeline Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:131
-- [[Build Pipeline Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:248
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:34
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:222
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:372
-- EnhancedSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:144
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:33
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:145
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:184
-- [[Call Relationships]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/CALLS.md:20
-- [[Relationship Standard Format]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:221
-- [[Code Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/code-dependency.md:19
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:25
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:33
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:41
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:51
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:59
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:66
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:75
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:83
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:90
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:99
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:118
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:126
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:146
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:178
-- [[IO Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/io-dependency.md:20
-- RegistryTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/RegistryTypes.md:122
+- [[TSDoc Edge Documentation]] → managed/README.md:64
+- [[ProjectIndexer]] → managed/architecture/project-indexer.md:195
+- [[BuildCommand]] → managed/commands/BuildCommand.md:88
+- [[StatsCommand]] → managed/commands/StatsCommand.md:94
+- [[UndocumentedCommand]] → managed/commands/UndocumentedCommand.md:73
+- [[UntestedCommand]] → managed/commands/UntestedCommand.md:76
+- [[UsedByCommand]] → managed/commands/UsedByCommand.md:129
+- [[WhoUsesCommand]] → managed/commands/WhoUsesCommand.md:71
+- [[WorkContextCommand]] → managed/commands/WorkContextCommand.md:60
+- [[Unified Relationship Taxonomy]] → managed/concepts/unified-relationship-taxonomy.md:504
+- [[SymbolRegistryManager]] → managed/core-components/SymbolRegistryManager.md:472
+- [[Core Components]] → managed/core-components/index.md:24
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:30
+- [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:227
+- [[Guides & Tutorials]] → managed/guides/index.md:48
+- [[EnhancedSymbolDoc]] → managed/primary-types/EnhancedSymbolDoc.md:332
+- [[Quick Start Guide]] → managed/quick-start.md:53
+- [[RegistryTypes]] → managed/types/RegistryTypes.md:181
+
+### Implemented By
+
+- DatabaseManager → src/storage/DatabaseManager.ts:1
+- SymbolRow → src/storage/DatabaseManager.ts:38
 

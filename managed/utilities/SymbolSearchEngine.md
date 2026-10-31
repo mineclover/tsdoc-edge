@@ -175,17 +175,9 @@ const dead = engine.search({
 
 ### Referenced By
 
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:181
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:242
-- [[UndocumentedCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UndocumentedCommand.md:45
-- [[UndocumentedCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UndocumentedCommand.md:118
-- DatabaseManager → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:190
-- DepthTraverser → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DepthTraverser.md:119
-- DepthTraverser → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DepthTraverser.md:153
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:58
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:110
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:231
-- ConnectivityValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/ConnectivityValidator.md:121
-- [[SymbolGraphBuilder]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:96
-- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:402
+- [[Utilities Index]] → managed/utilities/index.md:20
+
+### Implemented By
+
+- SymbolSearchEngine → src/graph/SymbolSearchEngine.ts:1
 

@@ -34,15 +34,18 @@ Validate documentation completeness and quality.
 
 ### Referenced By
 
-- [[CLI Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/CLI-COMMANDS.md:227
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:84
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:239
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:103
-- [[CoverageReportCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/CoverageReportCommand.md:112
-- [[ValidateSpecCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateSpecCommand.md:143
-- [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:119
-- [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:149
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:113
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:276
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:260
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:25
+- [[TSDoc Edge Documentation]] → managed/README.md:112
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:111
+- [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:269
+- [[ValidateSpecCommand]] → managed/commands/ValidateSpecCommand.md:318
+- [[DocumentSymbolParser]] → managed/features/DocumentSymbolParser.md:184
+- [[DocumentSymbolRegistry]] → managed/features/DocumentSymbolRegistry.md:289
+- [[ValidationFeatures]] → managed/features/validation-features.md:238
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:727
+- [[Guides & Tutorials]] → managed/guides/index.md:294
+
+### Implemented By
+
+- ValidateDocsCommand → src/commands/ValidateDocsCommand.ts:1
 

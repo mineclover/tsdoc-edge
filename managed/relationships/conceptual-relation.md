@@ -343,5 +343,5 @@ interface ConceptualMetrics {
 
 ### Referenced By
 
-- [[Feature Grouping]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/feature-grouping.md:173
+- [[Feature Grouping]] → managed/relationships/feature-grouping.md:435
 

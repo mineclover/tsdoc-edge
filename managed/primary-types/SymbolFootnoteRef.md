@@ -42,6 +42,9 @@ Part of ParsedDocSymbols as the `symbolFootnoteRefs` array field.
 
 ### Referenced By
 
-- ParsedDocSymbols → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:60
-- SymbolFootnoteRef → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:11
+- [[Primary Types Index]] → managed/primary-types/index.md:21
+
+### Implemented By
+
+- SymbolFootnoteRef → src/types/feature/doc-symbol.ts:1
 

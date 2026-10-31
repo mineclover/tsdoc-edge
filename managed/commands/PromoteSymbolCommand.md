@@ -35,10 +35,10 @@ Promote auxiliary symbols to primary definitions.
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:86
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:122
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:297
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:365
-- [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:92
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:179
+- [[TSDoc Edge Documentation]] → managed/README.md:114
+- [[Guides & Tutorials]] → managed/guides/index.md:214
+
+### Implemented By
+
+- PromoteSymbolCommand → src/commands/PromoteSymbolCommand.ts:31
 

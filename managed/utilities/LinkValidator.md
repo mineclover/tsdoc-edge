@@ -83,6 +83,10 @@ Returns:
 
 ### Referenced By
 
-- LinkingTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/LinkingTypes.md:114
-- [[DocCodeLinker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/DocCodeLinker.md:51
+- [[LinkingTypes]] → managed/types/LinkingTypes.md:154
+- [[DocCodeLinker]] → managed/utilities/DocCodeLinker.md:66
+
+### Implemented By
+
+- LinkValidator → src/linking/LinkValidator.ts:1
 

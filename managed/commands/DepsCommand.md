@@ -166,29 +166,22 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:75
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:287
-- [[OrphansCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/OrphansCommand.md:126
-- [[TreeCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/TreeCommand.md:120
-- [[UsedByCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UsedByCommand.md:83
-- [[WhoUsesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WhoUsesCommand.md:113
-- [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:114
-- [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:194
-- [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:85
-- [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:137
-- [[Impact Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/ImpactAnalysis.md:98
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:169
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:173
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:62
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:236
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:340
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:103
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:247
-- [[Code Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/code-dependency.md:25
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:26
-- InterfaceTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/InterfaceTypes.md:110
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:28
+- [[TSDoc Edge Documentation]] → managed/README.md:102
+- [[OrphansCommand]] → managed/commands/OrphansCommand.md:179
+- [[TreeCommand]] → managed/commands/TreeCommand.md:293
+- [[UsedByCommand]] → managed/commands/UsedByCommand.md:118
+- [[WhoUsesCommand]] → managed/commands/WhoUsesCommand.md:168
+- [[DatabaseManager]] → managed/core-components/DatabaseManager.md:289
+- [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:155
+- [[Impact Analysis]] → managed/features/ImpactAnalysis.md:199
+- [[AnalysisFeatures]] → managed/features/analysis-features.md:268
+- [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:252
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:153
+- [[Guides & Tutorials]] → managed/guides/index.md:138
+- [[InterfaceTypes]] → managed/types/InterfaceTypes.md:146
 
 ### Implemented By
 
-- DepsCommand → /Users/junwoobang/workflow/tsdoc-edge/src/commands/DepsCommand.ts:39
+- DepsCommand → src/commands/DepsCommand.ts:42
 

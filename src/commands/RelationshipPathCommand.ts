@@ -94,174 +94,180 @@ Examples:
         return this.displayHelp();
       }
 
-      if (args.length < 2) {
+      const positionalArgs = this.getPositionalArgs(args, [
+        '--max-length',
+        '--limit',
+        '--category',
+      ]);
+
+      if (positionalArgs.length < 2) {
         this.printError('Two symbol IDs required: <from-symbol> <to-symbol>');
         console.log();
         return this.displayHelp();
       }
 
-      const fromSymbol = args[0];
-      const toSymbol = args[1];
+      const fromSymbol = positionalArgs[0];
+      const toSymbol = positionalArgs[1];
 
       const options = {
         maxLength: Number.parseInt(this.getOption(args, '--max-length') || '5', 10),
         limit: Number.parseInt(this.getOption(args, '--limit') || '10', 10),
         category: this.getOption(args, '--category'),
-        shortestOnly: args.includes('--shortest-only'),
+        shortestOnly: this.hasFlag(args, '--shortest-only'),
       };
 
       this.printHeader(`Paths: ${fromSymbol} → ${toSymbol}`);
 
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
+      try {
+        // Resolve both symbols by ID or name
+        const fromResolved = this.resolveSymbol(dbManager, fromSymbol);
+        const toResolved = this.resolveSymbol(dbManager, toSymbol);
 
-      // Resolve both symbols by ID or name
-      const fromResolved = this.resolveSymbol(dbManager, fromSymbol);
-      const toResolved = this.resolveSymbol(dbManager, toSymbol);
+        if (!fromResolved) {
+          this.printError(`Source symbol not found: ${fromSymbol}`);
+          return { success: false, message: 'Source symbol not found', exitCode: 1 };
+        }
 
-      if (!fromResolved) {
-        this.printError(`Source symbol not found: ${fromSymbol}`);
-        dbManager.close();
-        return { success: false, message: 'Source symbol not found', exitCode: 1 };
-      }
+        if (!toResolved) {
+          this.printError(`Target symbol not found: ${toSymbol}`);
+          return { success: false, message: 'Target symbol not found', exitCode: 1 };
+        }
 
-      if (!toResolved) {
-        this.printError(`Target symbol not found: ${toSymbol}`);
-        dbManager.close();
-        return { success: false, message: 'Target symbol not found', exitCode: 1 };
-      }
+        const resolvedFromSymbol = fromResolved.id;
+        const resolvedToSymbol = toResolved.id;
 
-      const resolvedFromSymbol = fromResolved.id;
-      const resolvedToSymbol = toResolved.id;
-
-      console.log();
-      this.printInfo(`Building relationship graph...`);
-
-      // Build adjacency list once
-      const startBuild = Date.now();
-      const adjacency = this.buildAdjacencyList(dbManager, options.category);
-      const buildTime = Date.now() - startBuild;
-      this.printInfo(`Graph built in ${buildTime}ms (${adjacency.size} nodes)`);
-
-      console.log();
-      this.printInfo(`Searching for paths (max length: ${options.maxLength})...`);
-      const startSearch = Date.now();
-
-      // Build reverse adjacency for bidirectional search
-      const reverseAdjacency = this.buildReverseAdjacency(adjacency);
-      this.printInfo(`Reverse graph built`);
-
-      // Find paths using bidirectional BFS
-      const paths = this.findPathsBidirectional(
-        adjacency,
-        reverseAdjacency,
-        resolvedFromSymbol,
-        resolvedToSymbol,
-        options.maxLength
-      );
-
-      const searchTime = Date.now() - startSearch;
-      this.printInfo(`Search completed in ${searchTime}ms`);
-      console.log();
-
-      if (paths.length === 0) {
-        this.printInfo('No paths found between these symbols');
         console.log();
-        dbManager.close();
-        return this.success('Search complete');
-      }
+        this.printInfo(`Building relationship graph...`);
 
-      // Sort paths by length and strength
-      paths.sort((a, b) => {
-        if (a.length !== b.length) return a.length - b.length;
-        return b.strength - a.strength;
-      });
+        // Build adjacency list once
+        const startBuild = Date.now();
+        const adjacency = this.buildAdjacencyList(dbManager, options.category);
+        const buildTime = Date.now() - startBuild;
+        this.printInfo(`Graph built in ${buildTime}ms (${adjacency.size} nodes)`);
 
-      // Filter if shortest only
-      let displayPaths = paths;
-      if (options.shortestOnly && paths.length > 0) {
-        const shortestLength = paths[0].length;
-        displayPaths = paths.filter((p) => p.length === shortestLength);
-      }
+        console.log();
+        this.printInfo(`Searching for paths (max length: ${options.maxLength})...`);
+        const startSearch = Date.now();
 
-      // Limit number of paths
-      displayPaths = displayPaths.slice(0, options.limit);
+        // Build reverse adjacency for bidirectional search
+        const reverseAdjacency = this.buildReverseAdjacency(adjacency);
+        this.printInfo(`Reverse graph built`);
 
-      // Display results
-      this.printSection('Connection Paths');
-      this.printInfo(`Found ${paths.length} path(s), showing ${displayPaths.length}`);
-      console.log();
-
-      for (let i = 0; i < displayPaths.length; i++) {
-        const pathData = displayPaths[i];
-        const strengthBar = '█'.repeat(Math.round(pathData.strength * 10));
-
-        console.log(
-          `  ${this.colors.bold}Path ${i + 1}${this.colors.reset} (length: ${pathData.length}, strength: ${strengthBar})`
+        // Find paths using bidirectional BFS
+        const paths = this.findPathsBidirectional(
+          adjacency,
+          reverseAdjacency,
+          resolvedFromSymbol,
+          resolvedToSymbol,
+          options.maxLength
         );
+
+        const searchTime = Date.now() - startSearch;
+        this.printInfo(`Search completed in ${searchTime}ms`);
         console.log();
 
-        for (let j = 0; j < pathData.nodes.length; j++) {
-          const node = pathData.nodes[j];
-
-          if (j === 0) {
-            console.log(`    ${this.colors.cyan}${node.symbolId}${this.colors.reset}`);
-          } else {
-            const prevNode = pathData.nodes[j - 1];
-            console.log(
-              `      ${this.colors.dim}↓ ${prevNode.relationshipType} (${prevNode.category})${this.colors.reset}`
-            );
-            console.log(`    ${this.colors.cyan}${node.symbolId}${this.colors.reset}`);
-          }
+        if (paths.length === 0) {
+          this.printInfo('No paths found between these symbols');
+          console.log();
+          return this.success('Search complete');
         }
+
+        // Sort paths by length and strength
+        paths.sort((a, b) => {
+          if (a.length !== b.length) return a.length - b.length;
+          return b.strength - a.strength;
+        });
+
+        // Filter if shortest only
+        let displayPaths = paths;
+        if (options.shortestOnly && paths.length > 0) {
+          const shortestLength = paths[0].length;
+          displayPaths = paths.filter((p) => p.length === shortestLength);
+        }
+
+        // Limit number of paths
+        displayPaths = displayPaths.slice(0, options.limit);
+
+        // Display results
+        this.printSection('Connection Paths');
+        this.printInfo(`Found ${paths.length} path(s), showing ${displayPaths.length}`);
         console.log();
-      }
 
-      // Statistics
-      console.log();
-      this.printSection('Path Statistics');
+        for (let i = 0; i < displayPaths.length; i++) {
+          const pathData = displayPaths[i];
+          const strengthBar = '█'.repeat(Math.round(pathData.strength * 10));
 
-      const avgLength = paths.reduce((sum, p) => sum + p.length, 0) / paths.length;
-      const shortestLength = paths[0].length;
-      const longestLength = paths[paths.length - 1].length;
-
-      console.log(`  Total paths found: ${this.colors.cyan}${paths.length}${this.colors.reset}`);
-      console.log(`  Shortest path: ${this.colors.cyan}${shortestLength}${this.colors.reset} hops`);
-      console.log(`  Longest path: ${this.colors.cyan}${longestLength}${this.colors.reset} hops`);
-      console.log(
-        `  Average length: ${this.colors.cyan}${avgLength.toFixed(1)}${this.colors.reset} hops`
-      );
-      console.log(`  Build time: ${this.colors.cyan}${buildTime}ms${this.colors.reset}`);
-      console.log(`  Search time: ${this.colors.cyan}${searchTime}ms${this.colors.reset}`);
-      console.log();
-
-      // Analyze path categories
-      const categoryCount = new Map<string, number>();
-      for (const pathData of paths) {
-        for (const node of pathData.nodes) {
-          if (node.category) {
-            categoryCount.set(node.category, (categoryCount.get(node.category) || 0) + 1);
-          }
-        }
-      }
-
-      if (categoryCount.size > 0) {
-        console.log(`  ${this.colors.dim}Categories used:${this.colors.reset}`);
-        for (const [category, count] of Array.from(categoryCount.entries()).sort(
-          (a, b) => b[1] - a[1]
-        )) {
           console.log(
-            `    ${category}: ${this.colors.cyan}${count}${this.colors.reset} connections`
+            `  ${this.colors.bold}Path ${i + 1}${this.colors.reset} (length: ${pathData.length}, strength: ${strengthBar})`
           );
+          console.log();
+
+          for (let j = 0; j < pathData.nodes.length; j++) {
+            const node = pathData.nodes[j];
+
+            if (j === 0) {
+              console.log(`    ${this.colors.cyan}${node.symbolId}${this.colors.reset}`);
+            } else {
+              const prevNode = pathData.nodes[j - 1];
+              console.log(
+                `      ${this.colors.dim}↓ ${prevNode.relationshipType} (${prevNode.category})${this.colors.reset}`
+              );
+              console.log(`    ${this.colors.cyan}${node.symbolId}${this.colors.reset}`);
+            }
+          }
+          console.log();
         }
+
+        // Statistics
         console.log();
+        this.printSection('Path Statistics');
+
+        const avgLength = paths.reduce((sum, p) => sum + p.length, 0) / paths.length;
+        const shortestLength = paths[0].length;
+        const longestLength = paths[paths.length - 1].length;
+
+        console.log(`  Total paths found: ${this.colors.cyan}${paths.length}${this.colors.reset}`);
+        console.log(
+          `  Shortest path: ${this.colors.cyan}${shortestLength}${this.colors.reset} hops`
+        );
+        console.log(`  Longest path: ${this.colors.cyan}${longestLength}${this.colors.reset} hops`);
+        console.log(
+          `  Average length: ${this.colors.cyan}${avgLength.toFixed(1)}${this.colors.reset} hops`
+        );
+        console.log(`  Build time: ${this.colors.cyan}${buildTime}ms${this.colors.reset}`);
+        console.log(`  Search time: ${this.colors.cyan}${searchTime}ms${this.colors.reset}`);
+        console.log();
+
+        // Analyze path categories
+        const categoryCount = new Map<string, number>();
+        for (const pathData of paths) {
+          for (const node of pathData.nodes) {
+            if (node.category) {
+              categoryCount.set(node.category, (categoryCount.get(node.category) || 0) + 1);
+            }
+          }
+        }
+
+        if (categoryCount.size > 0) {
+          console.log(`  ${this.colors.dim}Categories used:${this.colors.reset}`);
+          for (const [category, count] of Array.from(categoryCount.entries()).sort(
+            (a, b) => b[1] - a[1]
+          )) {
+            console.log(
+              `    ${category}: ${this.colors.cyan}${count}${this.colors.reset} connections`
+            );
+          }
+          console.log();
+        }
+
+        return this.success(
+          `Found ${paths.length} path(s) between ${fromResolved.symbol.name} and ${toResolved.symbol.name}`
+        );
+      } finally {
+        dbManager.close();
       }
-
-      dbManager.close();
-
-      return this.success(
-        `Found ${paths.length} path(s) between ${fromResolved.symbol.name} and ${toResolved.symbol.name}`
-      );
     });
   }
 

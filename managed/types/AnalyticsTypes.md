@@ -135,3 +135,12 @@ const report = tracker.generateReport({
 - UsageTracker: Analytics implementation
 - [[UsageCommand]]: Display usage stats
 - ConfigManager: Analytics configuration
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- AnalyticsTypes → src/types/analytics/index.ts:1
+

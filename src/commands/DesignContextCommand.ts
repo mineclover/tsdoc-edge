@@ -148,8 +148,8 @@ export class DesignContextCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const useLlmFormat = args.includes('--llm');
-      const targetFile = args[0];
+      const useLlmFormat = this.hasFlag(args, '--llm');
+      const targetFile = this.getPositionalArgs(args)[0];
 
       if (!targetFile) {
         this.printError('File path required');

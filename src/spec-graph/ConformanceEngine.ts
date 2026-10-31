@@ -22,7 +22,12 @@ import type {
   ResolvedSpecBinding,
   SpecBindingKind,
 } from './contracts';
-import { bindingResolutionId, createPolicyRevision, normalizeRfc3339Timestamp } from './identity';
+import {
+  bindingResolutionId,
+  createPolicyRevision,
+  matchesNodeIdentity,
+  normalizeRfc3339Timestamp,
+} from './identity';
 
 type CodeNodeRef = Extract<EndpointRef, { type: 'code-node' }>;
 type CodeEdgeRef = Extract<EndpointRef, { type: 'code-edge' }>;
@@ -561,7 +566,7 @@ function exactCodeNodeIdentityMatch(selector: CodeNodeSelector, ref: CodeNodeRef
   if (selector.canonicalNodeId === undefined && selector.providerNodeId === undefined) return false;
   return (
     matchesOptional(selector.graphNamespace, ref.graphNamespace) &&
-    matchesOptional(selector.canonicalNodeId, ref.id) &&
+    matchesNodeIdentity(selector.canonicalNodeId, ref.id, ref.providerNodeId) &&
     matchesOptional(selector.providerNodeId, ref.providerNodeId)
   );
 }
@@ -599,7 +604,7 @@ function exactEdgeNodeIdentityMatch(
     selector.canonicalNodeId !== undefined &&
     selector.workspaceId === ref.workspaceId &&
     matchesOptional(selector.graphNamespace, ref.graphNamespace) &&
-    selector.canonicalNodeId === endpointId
+    matchesNodeIdentity(selector.canonicalNodeId, endpointId)
   );
 }
 

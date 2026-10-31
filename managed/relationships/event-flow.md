@@ -122,8 +122,8 @@ tsdoc-edge analyze-events --trace user:created
 
 ### Referenced By
 
-- [[Callback Pattern]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/CALLBACK.md:134
-- [[Callback Pattern]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/CALLBACK.md:140
-- [[Collaboration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/collaboration.md:133
-- [[Collaboration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/collaboration.md:163
+- [[Commands Index]] → managed/COMMANDS.md:93
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:186
+- [[Callback Pattern]] → managed/relationships/callback.md:309
+- [[Collaboration]] → managed/relationships/collaboration.md:308
 

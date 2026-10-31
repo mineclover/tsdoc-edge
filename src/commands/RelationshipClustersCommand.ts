@@ -99,147 +99,149 @@ Examples:
 
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
-
-      console.log();
-      this.printInfo('Building symbol graph...');
-
-      // Build adjacency map
-      const adjacencyMap = this.buildAdjacencyMap(dbManager, options.category);
-      const symbols = Array.from(adjacencyMap.keys());
-
-      this.printInfo(`Graph: ${symbols.length} symbols, ${this.countEdges(adjacencyMap)} edges`);
-      console.log();
-
-      // Find clusters using greedy modularity
-      this.printInfo('Running community detection...');
-      const clusters = this.findClusters(adjacencyMap, options.minSize);
-
-      this.printInfo(`Found ${clusters.length} clusters`);
-      console.log();
-
-      if (clusters.length === 0) {
-        console.log('  No clusters found meeting the criteria.');
+      try {
         console.log();
-        dbManager.close();
-        return this.success('Analysis complete');
-      }
+        this.printInfo('Building symbol graph...');
 
-      // Sort by cohesion
-      clusters.sort((a, b) => b.cohesion - a.cohesion);
+        // Build adjacency map
+        const adjacencyMap = this.buildAdjacencyMap(dbManager, options.category);
+        const symbols = Array.from(adjacencyMap.keys());
 
-      // Display clusters
-      this.printSection('Architectural Clusters');
-      console.log(
-        `  ${this.colors.dim}Showing top ${Math.min(options.maxClusters, clusters.length)} clusters sorted by cohesion${this.colors.reset}`
-      );
-      console.log();
+        this.printInfo(`Graph: ${symbols.length} symbols, ${this.countEdges(adjacencyMap)} edges`);
+        console.log();
 
-      const displayClusters = clusters.slice(0, options.maxClusters);
+        // Find clusters using greedy modularity
+        this.printInfo('Running community detection...');
+        const clusters = this.findClusters(adjacencyMap, options.minSize);
 
-      for (let i = 0; i < displayClusters.length; i++) {
-        const cluster = displayClusters[i];
-        const cohesionBar = '█'.repeat(Math.round(cluster.cohesion * 20));
-        const quality =
-          cluster.cohesion > 0.7
-            ? this.colors.green
-            : cluster.cohesion > 0.5
-              ? this.colors.yellow
-              : this.colors.red;
+        this.printInfo(`Found ${clusters.length} clusters`);
+        console.log();
 
-        console.log(`  ${this.colors.bold}Cluster ${i + 1}${this.colors.reset}`);
-        console.log(
-          `    Size: ${this.colors.cyan}${cluster.symbols.length}${this.colors.reset} symbols`
-        );
-        console.log(
-          `    Internal edges: ${this.colors.cyan}${cluster.internalEdges}${this.colors.reset}`
-        );
-        console.log(
-          `    External edges: ${this.colors.cyan}${cluster.externalEdges}${this.colors.reset}`
-        );
-        console.log(
-          `    Cohesion: ${quality}${cohesionBar}${this.colors.reset} ${(cluster.cohesion * 100).toFixed(1)}%`
-        );
-        console.log(
-          `    Dominant category: ${this.colors.cyan}${cluster.dominantCategory}${this.colors.reset}`
-        );
-
-        if (options.detailed) {
-          console.log(`    ${this.colors.dim}Symbols:${this.colors.reset}`);
-          const sortedSymbols = [...cluster.symbols].sort();
-          for (const symbol of sortedSymbols.slice(0, 20)) {
-            console.log(`      ${this.colors.dim}• ${symbol}${this.colors.reset}`);
-          }
-          if (cluster.symbols.length > 20) {
-            console.log(
-              `      ${this.colors.dim}... and ${cluster.symbols.length - 20} more${this.colors.reset}`
-            );
-          }
-        } else {
-          // Show sample symbols
-          const samples = cluster.symbols.slice(0, 3);
-          console.log(`    ${this.colors.dim}Sample: ${samples.join(', ')}...${this.colors.reset}`);
+        if (clusters.length === 0) {
+          console.log('  No clusters found meeting the criteria.');
+          console.log();
+          return this.success('Analysis complete');
         }
 
-        console.log();
-      }
+        // Sort by cohesion
+        clusters.sort((a, b) => b.cohesion - a.cohesion);
 
-      // Overall statistics
-      console.log();
-      this.printSection('Cluster Statistics');
-
-      const totalSymbols = clusters.reduce((sum, c) => sum + c.symbols.length, 0);
-      const avgSize = totalSymbols / clusters.length;
-      const avgCohesion = clusters.reduce((sum, c) => sum + c.cohesion, 0) / clusters.length;
-      const highCohesion = clusters.filter((c) => c.cohesion > 0.7).length;
-
-      console.log(`  Total clusters: ${this.colors.cyan}${clusters.length}${this.colors.reset}`);
-      console.log(
-        `  Total symbols clustered: ${this.colors.cyan}${totalSymbols}${this.colors.reset} / ${symbols.length}`
-      );
-      console.log(
-        `  Average cluster size: ${this.colors.cyan}${avgSize.toFixed(1)}${this.colors.reset} symbols`
-      );
-      console.log(
-        `  Average cohesion: ${this.colors.cyan}${(avgCohesion * 100).toFixed(1)}%${this.colors.reset}`
-      );
-      console.log(
-        `  High cohesion (>70%): ${this.colors.cyan}${highCohesion}${this.colors.reset} clusters`
-      );
-      console.log();
-
-      // Category distribution
-      const categoryCount = new Map<string, number>();
-      for (const cluster of clusters) {
-        categoryCount.set(
-          cluster.dominantCategory,
-          (categoryCount.get(cluster.dominantCategory) || 0) + 1
+        // Display clusters
+        this.printSection('Architectural Clusters');
+        console.log(
+          `  ${this.colors.dim}Showing top ${Math.min(options.maxClusters, clusters.length)} clusters sorted by cohesion${this.colors.reset}`
         );
-      }
+        console.log();
 
-      console.log(`  ${this.colors.dim}Clusters by dominant category:${this.colors.reset}`);
-      for (const [category, count] of Array.from(categoryCount.entries()).sort(
-        (a, b) => b[1] - a[1]
-      )) {
-        console.log(`    ${category}: ${this.colors.cyan}${count}${this.colors.reset} clusters`);
-      }
-      console.log();
+        const displayClusters = clusters.slice(0, options.maxClusters);
 
-      // Recommendations
-      const lowCohesion = clusters.filter((c) => c.cohesion < 0.5);
-      if (lowCohesion.length > 0) {
-        this.printSection('Recommendations');
-        this.printWarning(
-          `${lowCohesion.length} cluster(s) have low cohesion (<50%), suggesting weak architectural boundaries`
+        for (let i = 0; i < displayClusters.length; i++) {
+          const cluster = displayClusters[i];
+          const cohesionBar = '█'.repeat(Math.round(cluster.cohesion * 20));
+          const quality =
+            cluster.cohesion > 0.7
+              ? this.colors.green
+              : cluster.cohesion > 0.5
+                ? this.colors.yellow
+                : this.colors.red;
+
+          console.log(`  ${this.colors.bold}Cluster ${i + 1}${this.colors.reset}`);
+          console.log(
+            `    Size: ${this.colors.cyan}${cluster.symbols.length}${this.colors.reset} symbols`
+          );
+          console.log(
+            `    Internal edges: ${this.colors.cyan}${cluster.internalEdges}${this.colors.reset}`
+          );
+          console.log(
+            `    External edges: ${this.colors.cyan}${cluster.externalEdges}${this.colors.reset}`
+          );
+          console.log(
+            `    Cohesion: ${quality}${cohesionBar}${this.colors.reset} ${(cluster.cohesion * 100).toFixed(1)}%`
+          );
+          console.log(
+            `    Dominant category: ${this.colors.cyan}${cluster.dominantCategory}${this.colors.reset}`
+          );
+
+          if (options.detailed) {
+            console.log(`    ${this.colors.dim}Symbols:${this.colors.reset}`);
+            const sortedSymbols = [...cluster.symbols].sort();
+            for (const symbol of sortedSymbols.slice(0, 20)) {
+              console.log(`      ${this.colors.dim}• ${symbol}${this.colors.reset}`);
+            }
+            if (cluster.symbols.length > 20) {
+              console.log(
+                `      ${this.colors.dim}... and ${cluster.symbols.length - 20} more${this.colors.reset}`
+              );
+            }
+          } else {
+            // Show sample symbols
+            const samples = cluster.symbols.slice(0, 3);
+            console.log(
+              `    ${this.colors.dim}Sample: ${samples.join(', ')}...${this.colors.reset}`
+            );
+          }
+
+          console.log();
+        }
+
+        // Overall statistics
+        console.log();
+        this.printSection('Cluster Statistics');
+
+        const totalSymbols = clusters.reduce((sum, c) => sum + c.symbols.length, 0);
+        const avgSize = totalSymbols / clusters.length;
+        const avgCohesion = clusters.reduce((sum, c) => sum + c.cohesion, 0) / clusters.length;
+        const highCohesion = clusters.filter((c) => c.cohesion > 0.7).length;
+
+        console.log(`  Total clusters: ${this.colors.cyan}${clusters.length}${this.colors.reset}`);
+        console.log(
+          `  Total symbols clustered: ${this.colors.cyan}${totalSymbols}${this.colors.reset} / ${symbols.length}`
         );
         console.log(
-          `  ${this.colors.dim}Consider refactoring to improve modularity${this.colors.reset}`
+          `  Average cluster size: ${this.colors.cyan}${avgSize.toFixed(1)}${this.colors.reset} symbols`
+        );
+        console.log(
+          `  Average cohesion: ${this.colors.cyan}${(avgCohesion * 100).toFixed(1)}%${this.colors.reset}`
+        );
+        console.log(
+          `  High cohesion (>70%): ${this.colors.cyan}${highCohesion}${this.colors.reset} clusters`
         );
         console.log();
+
+        // Category distribution
+        const categoryCount = new Map<string, number>();
+        for (const cluster of clusters) {
+          categoryCount.set(
+            cluster.dominantCategory,
+            (categoryCount.get(cluster.dominantCategory) || 0) + 1
+          );
+        }
+
+        console.log(`  ${this.colors.dim}Clusters by dominant category:${this.colors.reset}`);
+        for (const [category, count] of Array.from(categoryCount.entries()).sort(
+          (a, b) => b[1] - a[1]
+        )) {
+          console.log(`    ${category}: ${this.colors.cyan}${count}${this.colors.reset} clusters`);
+        }
+        console.log();
+
+        // Recommendations
+        const lowCohesion = clusters.filter((c) => c.cohesion < 0.5);
+        if (lowCohesion.length > 0) {
+          this.printSection('Recommendations');
+          this.printWarning(
+            `${lowCohesion.length} cluster(s) have low cohesion (<50%), suggesting weak architectural boundaries`
+          );
+          console.log(
+            `  ${this.colors.dim}Consider refactoring to improve modularity${this.colors.reset}`
+          );
+          console.log();
+        }
+
+        return this.success(`Found ${clusters.length} architectural clusters`);
+      } finally {
+        dbManager.close();
       }
-
-      dbManager.close();
-
-      return this.success(`Found ${clusters.length} architectural clusters`);
     });
   }
 

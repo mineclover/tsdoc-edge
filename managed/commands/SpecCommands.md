@@ -96,3 +96,17 @@ tsdoc-edge validate-spec <file> [options]
 
 - [[ValidationFeatures]] - Documentation validation
 - [[Guides & Tutorials]] - Specification workflow guides
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Commands Index]] → managed/COMMANDS.md:184
+- [[AuthoredProjectSpecifications]] → managed/specs/index.md:82
+
+### Implemented By
+
+- SpecCommands → src/commands/SpecBumpCommand.ts:1
+

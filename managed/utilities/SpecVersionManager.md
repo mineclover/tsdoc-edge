@@ -103,7 +103,7 @@ tsdoc-edge spec-bump managed/features/work-context.md --minor
 
 ## Backlinks
 
-### Referenced By
+### Implemented By
 
-- SpecStatusManager → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SpecStatusManager.md:67
+- SpecVersionManager → src/spec/SpecVersionManager.ts:47
 

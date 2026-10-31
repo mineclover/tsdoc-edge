@@ -1425,3 +1425,14 @@ The current relationship ontology is **focused but imbalanced**, with heavy emph
 - Immediately valuable for developers
 
 This will result in a more **precise, intuitive, and developer-friendly** ontology optimized for SSOT documentation completeness without imposing subjective architectural constraints.
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → managed/README.md:312
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:263
+- [[Relationship Usage Examples]] → managed/examples/relationship-usage-examples.md:525
+

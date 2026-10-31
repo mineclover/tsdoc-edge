@@ -401,7 +401,9 @@ tsdoc-edge analyze --callback-depth
 
 ### Referenced By
 
-- [[CallGraphAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:204
-- [[Unified Relationship Taxonomy]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:391
-- [[Event Flow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/event-flow.md:51
+- [[Commands Index]] → managed/COMMANDS.md:92
+- [[CallGraphAnalyzer]] → managed/analyzers/CallGraphAnalyzer.md:408
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:175
+- [[Unified Relationship Taxonomy]] → managed/concepts/unified-relationship-taxonomy.md:503
+- [[Event Flow]] → managed/relationships/event-flow.md:109
 

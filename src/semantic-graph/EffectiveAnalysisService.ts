@@ -19,6 +19,7 @@ import {
   bindingResolutionId,
   createPolicyRevision,
   createSpecGraphRevision,
+  matchesNodeIdentity,
 } from '../spec-graph/identity';
 import { createEnrichmentRevision, createEvidenceRevision } from './analysis-input-revisions';
 import type {
@@ -452,7 +453,12 @@ function currentEndpointMatchesSelector(
       if (ref.type !== 'code-node') return false;
       if (ref.graphNamespace !== effectiveGraphNamespace(snapshot)) return false;
       if (selector.graphNamespace && selector.graphNamespace !== ref.graphNamespace) return false;
-      if (selector.canonicalNodeId && selector.canonicalNodeId !== ref.id) return false;
+      if (
+        selector.canonicalNodeId &&
+        !matchesNodeIdentity(selector.canonicalNodeId, ref.id, ref.providerNodeId)
+      ) {
+        return false;
+      }
       const node = snapshot.code.graph.nodes.find((candidate) => candidate.id === ref.id);
       if (!node) return false;
       const providerNodeId = stringValue(node.providerNodeId) ?? node.sourceId;

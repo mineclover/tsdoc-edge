@@ -48,6 +48,10 @@ export class DocumentSymbolParser {
     // Parse frontmatter
     const { metadata, body } = this.frontmatterParser.parse(content);
 
+    // Calculate frontmatter line count to offset 1-indexed line numbers
+    const frontmatterLines = (content.slice(0, content.length - body.length).match(/\n/g) || [])
+      .length;
+
     // Check if document is managed
     if (!this.isManagedDocument(filePath, metadata)) {
       return null;
@@ -80,9 +84,23 @@ export class DocumentSymbolParser {
       sourceFilePath,
     };
 
+    let inBacklinksSection = false;
+
     for (let i = 0; i < lines.length; i++) {
       const line = lines[i];
-      const lineNum = i + 1;
+      const lineNum = frontmatterLines + i + 1;
+
+      // Check for Backlinks section boundary
+      if (/^\s*##?\s+Backlinks\b/i.test(line)) {
+        inBacklinksSection = true;
+        continue;
+      }
+      if (inBacklinksSection && /^\s*#{1,2}\s+/i.test(line)) {
+        inBacklinksSection = false;
+      }
+      if (inBacklinksSection) {
+        continue;
+      }
 
       // Check for heading with [[]]
       const headingMatch = line.match(/^(#+)\s+\[\[([^\]]+)\]\]/);
@@ -306,11 +324,17 @@ export class DocumentSymbolParser {
    * This prevents example code from being treated as actual references
    */
   private removeCodeBlocks(content: string): string {
-    // Remove fenced code blocks (``` ... ```)
-    let result = content.replace(/```[\s\S]*?```/g, '');
+    // Replace fenced code blocks (``` ... ```) with matching newlines to preserve line numbering
+    let result = content.replace(
+      /(?:^|\n)[ \t]*`{3,}[^\n]*\n[\s\S]*?\n[ \t]*`{3,}(?=\n|$)/g,
+      (match) => {
+        const newlineCount = (match.match(/\n/g) || []).length;
+        return '\n'.repeat(newlineCount);
+      }
+    );
 
-    // Remove inline code (`...`)
-    result = result.replace(/`[^`]+`/g, '');
+    // Remove inline code (`...`), which does not cross newlines
+    result = result.replace(/`[^`\n]+`/g, '');
 
     return result;
   }

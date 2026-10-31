@@ -279,11 +279,15 @@ if (cycles.length > 0) {
 
 ### Referenced By
 
-- [[Analyzer System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/analyzer-system.md:33
-- [[Analyzer System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/analyzer-system.md:232
-- [[Parser System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/parser-system.md:34
-- [[Parser System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/parser-system.md:179
-- [[Storage System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/storage-system.md:148
-- [[Validator System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/validator-system.md:31
-- [[Validator System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/validator-system.md:172
+- [[ProjectIndexer]] → managed/architecture/project-indexer.md:194
+- [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1459
+- [[Analyzer System]] → managed/core/analyzer-system.md:41
+- [[Document Symbol System]] → managed/core/doc-symbol-system.md:392
+- [[Parser System]] → managed/core/parser-system.md:42
+- [[Storage System]] → managed/core/storage-system.md:328
+- [[Validator System]] → managed/core/validator-system.md:39
+
+### Implemented By
+
+- Symbol Graph System → src/graph/SymbolGraphBuilder.ts:1
 

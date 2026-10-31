@@ -246,17 +246,22 @@ sqlite3 .tsdoc/symbols.db "SELECT type, COUNT(*) FROM unified_relationships GROU
 
 ### Referenced By
 
-- CLI Commands → /Users/junwoobang/workflow/tsdoc-edge/managed/CLI-COMMANDS.md:292
-- Commands Index → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:281
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:309
-- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:250
-- Concepts Index → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:257
-- Analyzer Status → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analyzer-status.md:282
-- Features Index → /Users/junwoobang/workflow/tsdoc-edge/managed/features/index.md:224
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:192
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:358
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:12
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:318
-- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:133
-- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:182
-- Workflows Index → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:198
+- [[Commands Index]] → managed/COMMANDS.md:307
+- [[TSDoc Edge Documentation]] → managed/README.md:178
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:294
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:255
+- [[RelationshipCommands]] → managed/commands/RelationshipCommands.md:167
+- [[Concepts Index]] → managed/concepts/index.md:283
+- [[Analyzer Status]] → managed/features/analyzer-status.md:305
+- [[Features Index]] → managed/features/index.md:336
+- [[Guides & Tutorials]] → managed/guides/index.md:227
+- [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:19
+- [[Usage Scenarios]] → managed/guides/usage-scenarios.md:250
+- [[Quick Start Guide]] → managed/quick-start.md:250
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:27
+- [[Workflows Index]] → managed/workflows/index.md:287
+
+### Implemented By
+
+- Relationship Types → src/types/relationships/unified.ts:1
+

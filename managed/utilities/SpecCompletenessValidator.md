@@ -82,11 +82,13 @@ console.log(`Missing: ${result.missingSections.join(', ')}`);
 
 ### Referenced By
 
-- [[ValidateSpecCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateSpecCommand.md:137
-- [[ValidateSpecCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateSpecCommand.md:150
-- [[ValidateSpecCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateSpecCommand.md:181
-- [[Module Specification Framework]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/module-specification-framework.md:221
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:165
-- SpecTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/SpecTypes.md:189
-- SpecStatusManager → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SpecStatusManager.md:65
+- [[ValidateSpecCommand]] → managed/commands/ValidateSpecCommand.md:308
+- [[Module Specification Framework]] → managed/concepts/module-specification-framework.md:392
+- [[ValidationFeatures]] → managed/features/validation-features.md:290
+- [[SpecTypes]] → managed/types/SpecTypes.md:227
+- [[SpecStatusManager]] → managed/utilities/SpecStatusManager.md:93
+
+### Implemented By
+
+- SpecCompletenessValidator → src/spec/SpecCompletenessValidator.ts:51
 

@@ -38,6 +38,9 @@ export {
   type SymbolAliasRecord,
 } from './symbol-alias';
 export {
+  SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSION,
+  SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSIONS,
+  type SupportedTtscGraphArtifactContractVersion,
   TtscGraphRouterArtifactAdapter,
   type TtscGraphRouterArtifactAdapterOptions,
 } from './TtscGraphRouterArtifactAdapter';

@@ -34,9 +34,12 @@ Check validity of all [[Symbol]] links.
 
 ### Referenced By
 
-- [[CLI Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/CLI-COMMANDS.md:65
-- [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:93
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:129
-- LinkingTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/LinkingTypes.md:115
-- [[LinkValidator]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/LinkValidator.md:63
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:24
+- [[ValidationFeatures]] → managed/features/validation-features.md:254
+- [[LinkingTypes]] → managed/types/LinkingTypes.md:155
+- [[LinkValidator]] → managed/utilities/LinkValidator.md:77
+
+### Implemented By
+
+- CheckLinksCommand → src/commands/CheckLinksCommand.ts:1
 

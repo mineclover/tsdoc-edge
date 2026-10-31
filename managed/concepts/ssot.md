@@ -75,3 +75,7 @@ tsdoc-edge validate-symbol-refs managed --check-duplicates
 
 ### Referenced By
 
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:84
+- [[WorkContextCommand]] → managed/commands/WorkContextCommand.md:67
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:31
+

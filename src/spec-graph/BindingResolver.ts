@@ -25,7 +25,7 @@ import type {
   SpecNodeSelector,
   TestEvidenceSelector,
 } from './contracts';
-import { bindingDeclarationDigest, bindingResolutionId } from './identity';
+import { bindingDeclarationDigest, bindingResolutionId, matchesNodeIdentity } from './identity';
 
 export const EXACT_BINDING_RESOLVER_ID = 'tsdoc-edge/exact-binding-resolver';
 export const EXACT_BINDING_RESOLVER_VERSION = '2.0.0';
@@ -520,7 +520,7 @@ function codeNodeMatches(selector: CodeNodeSelector, entry: IndexedCodeNode): bo
     entry.ref.workspaceId === selector.workspaceId &&
     matchesOptional(selector.providerId, entry.providerId) &&
     matchesOptional(selector.graphNamespace, entry.ref.graphNamespace) &&
-    matchesOptional(selector.canonicalNodeId, entry.ref.id) &&
+    matchesNodeIdentity(selector.canonicalNodeId, entry.ref.id, entry.ref.providerNodeId) &&
     matchesOptional(selector.providerNodeId, entry.ref.providerNodeId) &&
     matchesOptional(selector.packageName, entry.packageName) &&
     matchesOptional(selector.packageVersion, entry.packageVersion) &&
@@ -556,7 +556,7 @@ function edgeEndpointMatches(
 ): boolean {
   if (selector.workspaceId !== edgeRef.workspaceId) return false;
   if (!matchesOptional(selector.graphNamespace, edgeRef.graphNamespace)) return false;
-  if (!matchesOptional(selector.canonicalNodeId, endpointId)) return false;
+  if (!matchesNodeIdentity(selector.canonicalNodeId, endpointId)) return false;
   const needsMetadata =
     selector.providerId !== undefined ||
     selector.providerNodeId !== undefined ||

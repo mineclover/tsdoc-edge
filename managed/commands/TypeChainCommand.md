@@ -35,13 +35,15 @@ Trace and display type chains (A → B → C).
 
 ### Referenced By
 
-- [[DetectCircularTypesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/DetectCircularTypesCommand.md:49
-- [[FindRootTypesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/FindRootTypesCommand.md:81
-- DepthTraverser → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DepthTraverser.md:117
-- DepthTraverser → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DepthTraverser.md:152
-- [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:88
-- [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:139
-- [[Impact Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/ImpactAnalysis.md:100
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:195
-- TypeChain → /Users/junwoobang/workflow/tsdoc-edge/managed/types/TypeChain.md:69
+- [[DetectCircularTypesCommand]] → managed/commands/DetectCircularTypesCommand.md:79
+- [[FindRootTypesCommand]] → managed/commands/FindRootTypesCommand.md:122
+- [[DepthTraverser]] → managed/core-components/DepthTraverser.md:276
+- [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:158
+- [[Impact Analysis]] → managed/features/ImpactAnalysis.md:201
+- [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:274
+- [[TypeChain]] → managed/types/TypeChain.md:123
+
+### Implemented By
+
+- TypeChainCommand → src/commands/TypeChainCommand.ts:29
 

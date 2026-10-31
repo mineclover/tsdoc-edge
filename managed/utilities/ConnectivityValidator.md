@@ -179,7 +179,9 @@ tsdoc-edge check-links
 
 ### Referenced By
 
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:238
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:129
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:109
+- [[Utilities Index]] → managed/utilities/index.md:20
+
+### Implemented By
+
+- ConnectivityValidator → src/validator/ConnectivityValidator.ts:1
 

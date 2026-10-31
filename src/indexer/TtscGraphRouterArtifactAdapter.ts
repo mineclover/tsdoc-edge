@@ -16,6 +16,9 @@ import type {
 import { normalizeRouterDiagnostics } from './diagnostics-contract';
 
 export const SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSION = '1.1.0' as const;
+export const SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSIONS = ['1.0.0', '1.1.0'] as const;
+export type SupportedTtscGraphArtifactContractVersion =
+  (typeof SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSIONS)[number];
 
 interface RouterArtifactContract {
   id: string;
@@ -283,7 +286,13 @@ export class TtscGraphRouterArtifactAdapter implements ProjectGraphSource {
     ) {
       throw new Error('Unsupported ttsc graph artifact contract identity');
     }
-    if (contract.version !== this.expectedArtifactContractVersion) {
+    const isSupportedContractVersion =
+      contract.version === this.expectedArtifactContractVersion ||
+      (!this.options.expectedArtifactContractVersion &&
+        SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSIONS.includes(
+          contract.version as SupportedTtscGraphArtifactContractVersion
+        ));
+    if (!isSupportedContractVersion) {
       throw new Error(
         `Expected ttsc graph artifact contract ${this.expectedArtifactContractVersion}, got ${contract.version}`
       );

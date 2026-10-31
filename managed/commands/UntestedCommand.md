@@ -236,12 +236,13 @@ Low Priority:
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:303
-- [[UndocumentedCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UndocumentedCommand.md:115
-- [[CI/CD Integration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/CICDIntegration.md:79
-- [[CI/CD Integration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/CICDIntegration.md:101
-- [[Dead Code Detection]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DeadCodeDetection.md:77
-- [[Dead Code Detection]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DeadCodeDetection.md:116
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:197
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:101
+- [[TSDoc Edge Documentation]] → managed/README.md:353
+- [[UndocumentedCommand]] → managed/commands/UndocumentedCommand.md:177
+- [[CI/CD Integration]] → managed/features/CICDIntegration.md:246
+- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:106
+- [[AnalysisFeatures]] → managed/features/analysis-features.md:296
+
+### Implemented By
+
+- UntestedCommand → src/commands/UntestedCommand.ts:22
 

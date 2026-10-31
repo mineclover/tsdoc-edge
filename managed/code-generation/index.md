@@ -130,3 +130,17 @@ const spec = specGenerator.generate(moduleAnalysis);
 - [[Analyzers & Extractors]] - Analysis that feeds generation
 - [[Parser System]] - Parsing that provides input data
 - [[Document Symbol System]] - Symbol linking in generated docs
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → managed/README.md:196
+- [[EnhancedSymbolDoc]] → managed/primary-types/EnhancedSymbolDoc.md:331
+
+### Implemented By
+
+- Code Generation → src/generator/CommentExporter.ts:1
+

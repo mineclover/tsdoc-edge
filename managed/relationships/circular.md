@@ -22,9 +22,6 @@ Detect circular dependencies (`A → B → A`).
 
 ### Referenced By
 
-- Commands Index → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:90
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:42
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:321
-- DependencyChainAnalyzer → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:23
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:69
+- [[TSDoc Edge Documentation]] → managed/README.md:68
+- [[Guides & Tutorials]] → managed/guides/index.md:94
 

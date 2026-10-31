@@ -525,20 +525,17 @@ Features:
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:182
-- [[DepsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/DepsCommand.md:45
-- [[DepsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/DepsCommand.md:105
-- [[OrphansCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/OrphansCommand.md:43
-- [[OrphansCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/OrphansCommand.md:129
-- [[UsedByCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UsedByCommand.md:39
-- [[UsedByCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UsedByCommand.md:93
-- [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:123
-- [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:186
-- [[QueryCommands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/QueryCommands.md:82
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:177
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:184
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:149
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:179
-- RegistryTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/RegistryTypes.md:121
-- [[Symbol]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/Symbol.md:83
+- [[TSDoc Edge Documentation]] → managed/README.md:231
+- [[DepsCommand]] → managed/commands/DepsCommand.md:64
+- [[OrphansCommand]] → managed/commands/OrphansCommand.md:68
+- [[UsedByCommand]] → managed/commands/UsedByCommand.md:64
+- [[DatabaseManager]] → managed/core-components/DatabaseManager.md:298
+- [[Core Components]] → managed/core-components/index.md:30
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:30
+- [[RegistryTypes]] → managed/types/RegistryTypes.md:180
+- [[Symbol]] → managed/types/Symbol.md:91
+
+### Implemented By
+
+- SymbolRegistryManager → src/storage/SymbolRegistryManager.ts:34
 

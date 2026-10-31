@@ -34,22 +34,24 @@ Validate codebase and documentation integrity.
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:239
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:292
-- StrictModeValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/StrictModeValidator.md:239
-- [[InitCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/InitCommand.md:135
-- [[StatsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/StatsCommand.md:141
-- [[UndocumentedCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UndocumentedCommand.md:117
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:124
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:105
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:287
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:259
-- TsdocEdgeConfig → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:92
-- TsdocEdgeConfig → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:100
-- CodeHealthMetrics → /Users/junwoobang/workflow/tsdoc-edge/managed/types/CodeHealthMetrics.md:116
-- CustomTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/CustomTagTypes.md:148
-- ParseTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/ParseTypes.md:102
-- ConnectivityValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/ConnectivityValidator.md:122
-- ConventionValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/ConventionValidator.md:182
-- ModuleSpecValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:143
+- [[TSDoc Edge Documentation]] → managed/README.md:288
+- [[StrictModeValidator]] → managed/analyzers/StrictModeValidator.md:339
+- [[InitCommand]] → managed/commands/InitCommand.md:344
+- [[StatsCommand]] → managed/commands/StatsCommand.md:228
+- [[UndocumentedCommand]] → managed/commands/UndocumentedCommand.md:179
+- [[CoreWorkflow]] → managed/features/core-workflow.md:136
+- [[ValidationFeatures]] → managed/features/validation-features.md:230
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:738
+- [[Guides & Tutorials]] → managed/guides/index.md:293
+- [[TsdocEdgeConfig]] → managed/primary-types/TsdocEdgeConfig.md:109
+- [[CodeHealthMetrics]] → managed/types/CodeHealthMetrics.md:144
+- [[CustomTagTypes]] → managed/types/CustomTagTypes.md:261
+- [[ParseTypes]] → managed/types/ParseTypes.md:139
+- [[ConnectivityValidator]] → managed/utilities/ConnectivityValidator.md:174
+- [[ConventionValidator]] → managed/utilities/ConventionValidator.md:239
+- [[ModuleSpecValidator]] → managed/utilities/ModuleSpecValidator.md:180
+
+### Implemented By
+
+- ValidateCommand → src/commands/ValidateCommand.ts:39
 

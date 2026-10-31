@@ -153,3 +153,16 @@ See implementation: FixResult
 - [[DocCodeLinker]]: Creates link index
 - [[LinkValidator]]: Validates and fixes links
 - [[CheckLinksCommand]]: CLI validation
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Types Index]] → managed/types/index.md:22
+
+### Implemented By
+
+- LinkingTypes → src/types/core/linking.ts:1
+

@@ -94,46 +94,26 @@ pointer를 생성하거나 변경하지 않는다.
 
 ### Referenced By
 
-- [[CLI Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/CLI-COMMANDS.md:44
-- [[CLI Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/CLI-COMMANDS.md:290
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:26
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:50
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:198
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:232
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:274
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:291
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:325
-- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:100
-- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:185
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:22
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:217
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:246
-- [[CoverageReportCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/CoverageReportCommand.md:110
-- [[InitCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/InitCommand.md:134
-- [[Module Specification Framework]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/module-specification-framework.md:228
-- [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:113
-- [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:193
-- [[SymbolRegistryManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/SymbolRegistryManager.md:223
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:68
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:118
-- [[Build Pipeline Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:16
-- [[Build Pipeline Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:238
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:262
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:339
-- [[Document Symbol Parser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/DocumentSymbolParser.md:69
-- ExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ExtractionResult.md:78
-- ExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ExtractionResult.md:82
-- ExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ExtractionResult.md:94
-- TsdocEdgeConfig → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TsdocEdgeConfig.md:104
-- [[Inheritance]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/INHERITANCE.md:9
-- [[Interface Implementation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:9
-- [[Code Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/code-dependency.md:15
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:24
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:32
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:40
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:184
-- FileScanner → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/FileScanner.md:74
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:16
+- [[TSDoc Edge Documentation]] → managed/README.md:52
+- [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:267
+- [[InitCommand]] → managed/commands/InitCommand.md:343
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:101
+- [[Module Specification Framework]] → managed/concepts/module-specification-framework.md:399
+- [[DatabaseManager]] → managed/core-components/DatabaseManager.md:288
+- [[SymbolRegistryManager]] → managed/core-components/SymbolRegistryManager.md:475
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:30
+- [[Relationship Usage Examples]] → managed/examples/relationship-usage-examples.md:527
+- [[CoreWorkflow]] → managed/features/core-workflow.md:80
+- [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:197
+- [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:202
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:713
+- [[Document Symbol Parser]] → managed/parser/DocumentSymbolParser.md:87
+- [[ExtractionResult]] → managed/primary-types/ExtractionResult.md:106
+- [[TsdocEdgeConfig]] → managed/primary-types/TsdocEdgeConfig.md:121
+- [[FileScanner]] → managed/utilities/FileScanner.md:82
 
 ### Implemented By
 
-- BuildCommand → /Users/junwoobang/workflow/tsdoc-edge/src/commands/BuildCommand.ts:55
+- BuildCommand → src/commands/BuildCommand.ts:95
+

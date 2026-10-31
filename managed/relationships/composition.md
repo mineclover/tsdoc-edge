@@ -294,5 +294,13 @@ tsdoc-edge deps Engine --reverse --type=composition
 
 ### Referenced By
 
-- [[Unified Relationship Taxonomy]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/unified-relationship-taxonomy.md:390
+- [[Commands Index]] → managed/COMMANDS.md:75
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:96
+- [[Unified Relationship Taxonomy]] → managed/concepts/unified-relationship-taxonomy.md:502
+- [[Co-Requirement]] → managed/relationships/co-requirement.md:243
+- [[Collaboration]] → managed/relationships/collaboration.md:306
+- [[Conceptual Relation]] → managed/relationships/conceptual-relation.md:327
+- [[Feature Grouping]] → managed/relationships/feature-grouping.md:349
+- [[Substitution]] → managed/relationships/substitution.md:341
+- [[Temporal Order]] → managed/relationships/temporal-order.md:324
 

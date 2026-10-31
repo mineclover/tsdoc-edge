@@ -43,6 +43,7 @@ Node/OS release matrix 통과를 서로 확대 해석하지 않는다.
 | C0 canonical safety proof | `proven` (source-checkout) | GraphDelta는 LSP 재개 후, 나머지는 Node/OS release matrix |
 | ttsc test process-group hardening | `proven` (source-checkout) | clean-install native-crash-free matrix |
 | Release preflight envelope inspector | `proven` (source-checkout) | external matrix and native-crash-free matrix |
+| CLI routing parity and doc-symbol hardening | `proven` (source-checkout, 247 suites / 3,260 tests) | Node/OS release qualification |
 
 ## Checkpoint proof
 
@@ -251,3 +252,13 @@ npm run test:run -- --runInBand src/__tests__/scripts/CapabilityOwnerMatrixVerif
 위 limitation은 삭제하지 않고 [[Semantic Graph Spec Governance Roadmap]]의 C2 backlog에서
 capability별로 `superseded`, `retained`, `composed`, `deprecated`, `unsupported` 중 하나로
 판정한다.
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Semantic Graph Spec Governance Changelog]] → managed/workflows/semantic-graph-spec-governance-changelog.md:12
+- [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:12
+

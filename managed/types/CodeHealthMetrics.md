@@ -149,7 +149,10 @@ tsdoc-edge validate
 
 ### Referenced By
 
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:85
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:91
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:121
-- CodeHealthMetrics → /Users/junwoobang/workflow/tsdoc-edge/managed/types/CodeHealthMetrics.md:70
+- [[Coverage Metrics Contract]] → managed/features/coverage-metrics-contract.md:280
+- [[Types Index]] → managed/types/index.md:22
+
+### Implemented By
+
+- CodeHealthMetrics → src/types/analysis/quality.ts:1
+

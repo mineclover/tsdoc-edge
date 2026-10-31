@@ -229,6 +229,7 @@ try {
 
 ### Referenced By
 
-- [[Substitution]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/substitution.md:131
-- [[Substitution]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/substitution.md:165
+- [[Commands Index]] → managed/COMMANDS.md:84
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:141
+- [[Substitution]] → managed/relationships/substitution.md:268
 

@@ -510,11 +510,12 @@ tsdoc-edge validate-docs managed
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:107
-- [[Analyzer Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:271
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:13
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:305
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:54
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:116
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:138
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:188
+- [[TSDoc Edge Documentation]] → managed/README.md:147
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:256
+- [[RelationshipCommands]] → managed/commands/RelationshipCommands.md:168
+- [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:1002
+- [[Guides & Tutorials]] → managed/guides/index.md:27
+- [[Usage Scenarios]] → managed/guides/usage-scenarios.md:122
+- [[Quick Start Guide]] → managed/quick-start.md:91
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:95
+

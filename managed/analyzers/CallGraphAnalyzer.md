@@ -490,29 +490,21 @@ console.log(`saveSymbols is called by ${callers.length} functions`);
 
 ### Referenced By
 
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:34
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:103
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:200
-- ASTSymbolExtractor → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:189
-- DataFlowAnalyzer → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DataFlowAnalyzer.md:20
-- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:218
-- AnalyzeCallsCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/AnalyzeCallsCommand.md:21
-- [[Phase Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/Phase7Commands.md:22
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:132
-- Analyzer Development Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:21
-- Analyzer Development Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:33
-- Analyzer Development Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:55
-- Analyzer Development Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:256
-- Build Pipeline Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:57
-- Build Pipeline Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:121
-- Build Pipeline Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:244
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:134
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:214
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:367
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:118
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:264
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:327
-- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:47
-- [[Call Relationships]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/CALLS.md:10
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:73
+- [[TSDoc Edge Documentation]] → managed/README.md:60
+- [[ASTSymbolExtractor]] → managed/analyzers/ASTSymbolExtractor.md:296
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:262
+- [[AnalyzeCallsCommand]] → managed/commands/AnalyzeCallsCommand.md:29
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:72
+- [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:211
+- [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:28
+- [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:247
+- [[Guides & Tutorials]] → managed/guides/index.md:169
+- [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:168
+- [[Quick Start Guide]] → managed/quick-start.md:80
+- [[Call Relationships]] → managed/relationships/calls.md:18
+- [[Relationship Types]] → managed/relationships/index.md:95
+
+### Implemented By
+
+- CallGraphAnalyzer → src/analyzer/CallGraphAnalyzer.ts:45
 

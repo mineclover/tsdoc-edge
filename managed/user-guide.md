@@ -307,3 +307,13 @@ tsdoc-edge validate-symbol-refs   # Find broken refs
 - [[Quick Start Guide]] - 5-minute start
 - [[Guides & Tutorials]] - All guides
 - [[Workflows Index]] - All workflows
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Guides & Tutorials]] → managed/guides/index.md:20
+- [[Usage Scenarios]] → managed/guides/usage-scenarios.md:508
+

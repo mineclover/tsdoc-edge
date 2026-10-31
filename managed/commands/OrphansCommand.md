@@ -202,19 +202,17 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:77
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:301
-- [[DepsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/DepsCommand.md:106
-- [[UsedByCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UsedByCommand.md:85
-- [[CI/CD Integration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/CICDIntegration.md:82
-- [[Dead Code Detection]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DeadCodeDetection.md:76
-- [[Dead Code Detection]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DeadCodeDetection.md:115
-- [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:90
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:183
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:145
-- [[Code Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/code-dependency.md:27
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:30
+- [[TSDoc Edge Documentation]] → managed/README.md:104
+- [[DepsCommand]] → managed/commands/DepsCommand.md:148
+- [[UsedByCommand]] → managed/commands/UsedByCommand.md:120
+- [[CI/CD Integration]] → managed/features/CICDIntegration.md:249
+- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:105
+- [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:160
+- [[AnalysisFeatures]] → managed/features/analysis-features.md:282
+- [[ValidationFeatures]] → managed/features/validation-features.md:270
 
 ### Implemented By
 
-- OrphansCommand → /Users/junwoobang/workflow/tsdoc-edge/src/commands/OrphansCommand.ts:40
+- OrphansCommand → src/commands/OrphansCommand.ts:40
 

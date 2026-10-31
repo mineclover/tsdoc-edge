@@ -34,8 +34,13 @@ Central registry for all CLI commands.
 
 ### Referenced By
 
-- [[BaseCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/BaseCommand.md:45
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:12
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:334
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:94
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:43
+- [[BaseCommand]] → managed/commands/BaseCommand.md:99
+- [[HelpCommand]] → managed/commands/HelpCommand.md:29
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:19
+- [[Guides & Tutorials]] → managed/guides/index.md:119
+
+### Implemented By
+
+- CommandRegistry → src/commands/CommandRegistry.ts:34
 

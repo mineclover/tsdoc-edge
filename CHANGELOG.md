@@ -2,6 +2,36 @@
 
 All notable changes to TSDoc Edge will be documented in this file.
 
+## [0.14.0] - 2026-10-31
+
+### Added
+- **C2 Capability Matrix Promotion**: Promoted native `ttsc` graph router and canonical semantic graph pipeline to C2 (`status: promoted`, `ownerPromotionEligible: true`).
+- **Flat Relationship CLI Commands**: Direct registration and exposure of all 12 flat `relationship-*` commands in `src/cli.ts` & `src/commands/index.ts` (`relationship-query`, `relationship-impact`, `relationship-clusters`, `relationship-metrics`, `relationship-path`, `relationship-check`, `relationship-stats`, `relationship-validate`, `relationship-export`, `relationship-visualize`, `relationship-ontology`, `relationship-types`).
+- **Native Tooling Pipeline**: Added `ttsc check`, `ttsc fix`, and `ttsc format` npm scripts integrated with native TypeScript-Go compiler (`ttsc 0.18.4`).
+- **Comprehensive Regression & Stress Tests**: Added 5 dedicated test suites and 2 empirical testing harnesses (`RelationshipResourceCleanup.test.ts`, `FlatRelationshipCommandsRegistration.test.ts`, `RelationshipEmpiricalStress.test.ts`, `BacklinkEmpiricalStress.test.ts`, `ValidateDocsCommand.integration.test.ts`, `test-adversarial-cli-fuzzing.cjs`, `test-empirical-backlinks.cjs`). Total test suite expanded to 247 test suites and 3,260 passing tests.
+
+### Changed
+- **CLI Option Parsing Hardening**: Fixed boolean flag parsing in `BaseCommand.ts` using `DEFAULT_VALUED_OPTIONS` so boolean switches (`--llm`, `--json`, `--verbose`) do not consume positional file path arguments, and leading flags (`wc --llm <path>`) are parsed reliably.
+- **Resource Management & Database Safety**: Wrapped SQLite connection handles and transaction lifecycles in `try ... finally` blocks across all 11 relationship CLI command handlers to guarantee clean resource release without memory/descriptor leaks.
+- **Document Linking & Symbol Parsing**:
+  - Corrected YAML frontmatter line offset calculations in `DocumentSymbolParser.ts` ensuring accurate line number attribution.
+  - Excluded fenced code blocks (```) from document symbol extraction to eliminate false-positive symbol declarations.
+  - Filtered out self-referencing document links in `BacklinkGenerator.ts` and deduplicated backlink references per document.
+  - Normalized target file paths to POSIX-style relative paths in `UpdateBacklinksCommand.ts`.
+- **Canonical Node Identity Resolution**: Implemented flexible identity matching (`matchesNodeIdentity`) in `src/spec-graph/identity.ts` for exact, provider-relative, and suffix matches across `BindingResolver`, `ConformanceEngine`, and `EffectiveAnalysisService`.
+- **TypeScript & Lint Configuration**: Upgraded `tsconfig.json` module resolution to `Node16` and consolidated Biome lint pipeline (`biome check . && npm run lint:budget && npm run lint:governance && npm run ttsc:check`) maintaining 0 errors and 0 warnings.
+
+### Performance
+- **Query Caching**: Integrated LRU in-memory query caching in `DatabaseManager.ts` for repeat symbol and dependency lookups.
+- **SQLite Concurrency & I/O Tuning**: Configured WAL journal mode and `NORMAL` synchronous pragma with expanded cache sizes in canonical `GraphRepository` and `SpecGraphRepository`.
+
+### Dependencies
+- Updated `@microsoft/tsdoc` to `^0.17.1`
+- Updated `drizzle-orm` to `^0.45.4`
+- Updated `drizzle-kit` to `^0.31.11`
+- Updated `@gephi/gephi-lite-sdk` to `^1.1.0`
+- Updated `vscode-languageserver-textdocument` to `^1.0.16`
+
 ## [0.13.0] - 2025-12-28
 
 ### Added

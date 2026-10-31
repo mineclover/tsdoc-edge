@@ -188,4 +188,9 @@ tsdoc-edge orphans --diff origin/main
 
 ### Referenced By
 
-- [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:125
+- [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:228
+
+### Implemented By
+
+- Dead Code Detection → src/commands/DetectDeadCodeCommand.ts:1
+

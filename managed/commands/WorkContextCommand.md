@@ -73,20 +73,15 @@ tsdoc-edge work-context src/analyzer/CallGraphAnalyzer.ts
 
 ### Referenced By
 
-- [[CLI Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/CLI-COMMANDS.md:283
-- [[CLI Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/CLI-COMMANDS.md:291
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:51
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:119
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:286
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:325
-- [[CallGraphAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:214
-- [[IODependencyAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/IODependencyAnalyzer.md:19
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ParallelWorkDetector.md:24
-- ReliabilityChecker → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ReliabilityChecker.md:21
-- [[TestCoverageAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:23
-- [[Module Specification Framework]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/module-specification-framework.md:230
-- [[Impact Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/ImpactAnalysis.md:101
-- [[Impact Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/ImpactAnalysis.md:152
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:78
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:185
-- [[Work Context Workflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/work-context-workflow.md:6
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:38
+- [[TSDoc Edge Documentation]] → managed/README.md:78
+- [[QueryCommands]] → managed/commands/QueryCommands.md:94
+- [[Module Specification Framework]] → managed/concepts/module-specification-framework.md:401
+- [[Impact Analysis]] → managed/features/ImpactAnalysis.md:202
+- [[CoreWorkflow]] → managed/features/core-workflow.md:90
+- [[Work Context Workflow]] → managed/workflows/work-context-workflow.md:14
+
+### Implemented By
+
+- WorkContextCommand → src/commands/WorkContextCommand.ts:1
+

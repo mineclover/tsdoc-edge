@@ -1480,3 +1480,18 @@ interface ConformanceReport {
 - exact binding resolver와 revision-bound minimal conformance engine을 구현했다.
 - evidence/enrichment typed revision과 evidence/enrichment/policy exact-pin repository를
   구현했다.
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ProjectIndexer]] → managed/architecture/project-indexer.md:189
+- [[Spec Management System]] → managed/core/spec-management-system.md:388
+- [[Convention Pack Check]] → managed/features/convention-pack-check.md:437
+- [[AuthoredProjectSpecifications]] → managed/specs/index.md:80
+- [[Semantic Graph Spec Governance Completed Work]] → managed/workflows/semantic-graph-spec-governance-completed.md:134
+- [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:273
+- [[TS7 Test Compilation Lane]] → managed/workflows/ts7-test-compilation-lane.md:337
+

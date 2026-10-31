@@ -576,5 +576,8 @@ Target (3 months):
 
 ### Referenced By
 
-- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:155
-- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:166
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:268
+- [[Coverage Metrics Contract]] → managed/features/coverage-metrics-contract.md:281
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:239
+- [[Workflows Index]] → managed/workflows/index.md:240
+

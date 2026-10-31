@@ -73,8 +73,13 @@ Examples:
         return this.displayHelp();
       }
 
-      // Filter out flags to get positional arguments
-      const positionalArgs = args.filter((arg) => !arg.startsWith('--'));
+      // Extract positional arguments by skipping valued options and flags
+      const positionalArgs = this.getPositionalArgs(args, [
+        '--type',
+        '--category',
+        '--direction',
+        '--limit',
+      ]);
       if (positionalArgs.length === 0) {
         this.printError('Symbol ID required');
         console.log();

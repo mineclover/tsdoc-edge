@@ -32,15 +32,15 @@ canonical: true
 
 ### Referenced By
 
-- [[CLI Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/CLI-COMMANDS.md:178
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:88
-- [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:88
-- [[Parser Components]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/BacklinkGenerator.md:22
-- [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:122
-- [[AutoIndexing]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/auto-indexing.md:52
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:94
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:275
-- [[Document Symbol Parser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/DocumentSymbolParser.md:72
-- [[Doc Reference]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/doc-reference.md:41
-- [[LinkValidator]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/LinkValidator.md:64
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:23
+- [[TSDoc Edge Documentation]] → managed/README.md:116
+- [[DocumentSymbolRegistry]] → managed/features/DocumentSymbolRegistry.md:292
+- [[AutoIndexing]] → managed/features/auto-indexing.md:72
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:254
+- [[Document Symbol Parser]] → managed/parser/DocumentSymbolParser.md:90
+- [[LinkValidator]] → managed/utilities/LinkValidator.md:78
+
+### Implemented By
+
+- UpdateBacklinksCommand → src/commands/UpdateBacklinksCommand.ts:1
 

@@ -92,17 +92,19 @@ Output includes:
         return this.displayHelp();
       }
 
-      if (args.length === 0) {
+      const positionalArgs = this.getPositionalArgs(args, ['--depth', '--category']);
+      const symbolId = positionalArgs[0];
+
+      if (!symbolId) {
         this.printError('Symbol ID required');
         console.log();
         return this.displayHelp();
       }
 
-      const symbolId = args[0];
       const options = {
         depth: Number.parseInt(this.getOption(args, '--depth') || '3', 10),
         category: this.getOption(args, '--category'),
-        json: args.includes('--json'),
+        json: this.hasFlag(args, '--json'),
       };
 
       if (options.json) {

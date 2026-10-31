@@ -21,9 +21,7 @@ Track generic type constraints (`T extends U`).
 
 ### Referenced By
 
-- Commands Index → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:84
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:42
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:318
-- [[TypeDependencyAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:91
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:68
+- [[TSDoc Edge Documentation]] → managed/README.md:68
+- [[TypeDependencyAnalyzer]] → managed/analyzers/TypeDependencyAnalyzer.md:150
+- [[Guides & Tutorials]] → managed/guides/index.md:93
 

@@ -77,110 +77,145 @@ export class VisualizeDepsCommand extends BaseCommand {
 
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
+      try {
+        // Load graph from database
+        this.printInfo('Loading dependency graph...');
+        const graphBuilder = new SymbolGraphBuilder();
+        const { symbols: symbolRows, dependencies: depRows } = dbManager.getGraphData();
 
-      // Load graph from database
-      this.printInfo('Loading dependency graph...');
-      const graphBuilder = new SymbolGraphBuilder();
-      const { symbols: symbolRows, dependencies: depRows } = dbManager.getGraphData();
-
-      for (const row of symbolRows) {
-        graphBuilder.addSymbol({
-          id: row.id,
-          name: row.name,
-          type: row.type as SymbolType,
-          filePath: row.file_path,
-          line: row.line,
-          column: row.column,
-          isExported: Boolean(row.is_exported),
-          isPublic: Boolean(row.is_public),
-          summary: row.summary ?? undefined,
-          tests: [],
-          designDecisions: [],
-          metadata: {},
-        });
-      }
-
-      for (const rel of depRows) {
-        graphBuilder.addRelationship({
-          from: rel.symbol_id,
-          to: rel.target,
-          type: (rel.type || 'dependsOn') as SymbolRelationship['type'],
-          filePath: rel.import_path || '',
-        });
-      }
-
-      const graph = graphBuilder.getGraph();
-      const generator = new MermaidGenerator(graph);
-
-      console.log();
-
-      switch (subcommand) {
-        case 'tree': {
-          if (!targetSymbol) {
-            this.printError('Symbol ID required: visualize tree <symbol-id>');
-            return this.failure('Missing symbol ID');
-          }
-
-          // Resolve symbol name to ID if needed
-          let resolvedSymbol = targetSymbol;
-          const resolved = this.resolveSymbol(dbManager, targetSymbol);
-          if (resolved) {
-            resolvedSymbol = resolved.id;
-          } else if (!graph.symbols.has(targetSymbol)) {
-            this.printError(`Symbol not found: ${targetSymbol}`);
-            dbManager.close();
-            return this.failure('Symbol not found');
-          }
-
-          this.printSection(`Dependency Tree: ${resolvedSymbol}`);
-          const diagram = generator.generateDependencyTree(resolvedSymbol);
-          console.log();
-          console.log(diagram);
-          console.log();
-
-          // Save to file
-          const outputPath = path.join(process.cwd(), diagramsDir, `tree-${resolvedSymbol}.mmd`);
-          fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-          fs.writeFileSync(outputPath, diagram, 'utf-8');
-
-          this.printSuccess(`Saved to ${outputPath}`);
-          break;
+        for (const row of symbolRows) {
+          graphBuilder.addSymbol({
+            id: row.id,
+            name: row.name,
+            type: row.type as SymbolType,
+            filePath: row.file_path,
+            line: row.line,
+            column: row.column,
+            isExported: Boolean(row.is_exported),
+            isPublic: Boolean(row.is_public),
+            summary: row.summary ?? undefined,
+            tests: [],
+            designDecisions: [],
+            metadata: {},
+          });
         }
 
-        case 'hotspots': {
-          this.printSection('Hotspot Diagram');
-          const analyzer = new DependencyChainAnalyzer(graph);
-          const hotspots = analyzer.analyzeHotspots(10);
-          const diagram = generator.generateHotspotDiagram(hotspots);
-          console.log();
-          console.log(diagram);
-          console.log();
-
-          // Save to file
-          const outputPath = path.join(process.cwd(), diagramsDir, 'hotspots.mmd');
-          fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-          fs.writeFileSync(outputPath, diagram, 'utf-8');
-
-          this.printSuccess(`Saved to ${outputPath}`);
-          break;
+        for (const rel of depRows) {
+          graphBuilder.addRelationship({
+            from: rel.symbol_id,
+            to: rel.target,
+            type: (rel.type || 'dependsOn') as SymbolRelationship['type'],
+            filePath: rel.import_path || '',
+          });
         }
 
-        case 'circular': {
-          this.printSection('Circular Dependencies');
-          const analyzer = new DependencyChainAnalyzer(graph);
-          const circulars = analyzer.detectCircularDependencies();
+        const graph = graphBuilder.getGraph();
+        const generator = new MermaidGenerator(graph);
 
-          if (circulars.length === 0) {
-            this.printSuccess('No circular dependencies found!');
-          } else {
-            const circularIndex = targetSymbol ? parseInt(targetSymbol, 10) - 1 : 0;
-            if (circularIndex >= circulars.length) {
-              this.printError(`Circular dependency #${circularIndex + 1} not found`);
-              return this.failure('Invalid circular index');
+        console.log();
+
+        switch (subcommand) {
+          case 'tree': {
+            if (!targetSymbol) {
+              this.printError('Symbol ID required: visualize tree <symbol-id>');
+              return this.failure('Missing symbol ID');
             }
 
-            const circular = circulars[circularIndex];
-            const diagram = generator.generateCircularDiagram(circular);
+            // Resolve symbol name to ID if needed
+            let resolvedSymbol = targetSymbol;
+            const resolved = this.resolveSymbol(dbManager, targetSymbol);
+            if (resolved) {
+              resolvedSymbol = resolved.id;
+            } else if (!graph.symbols.has(targetSymbol)) {
+              this.printError(`Symbol not found: ${targetSymbol}`);
+              return this.failure('Symbol not found');
+            }
+
+            this.printSection(`Dependency Tree: ${resolvedSymbol}`);
+            const diagram = generator.generateDependencyTree(resolvedSymbol);
+            console.log();
+            console.log(diagram);
+            console.log();
+
+            // Save to file
+            const outputPath = path.join(process.cwd(), diagramsDir, `tree-${resolvedSymbol}.mmd`);
+            fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+            fs.writeFileSync(outputPath, diagram, 'utf-8');
+
+            this.printSuccess(`Saved to ${outputPath}`);
+            break;
+          }
+
+          case 'hotspots': {
+            this.printSection('Hotspot Diagram');
+            const analyzer = new DependencyChainAnalyzer(graph);
+            const hotspots = analyzer.analyzeHotspots(10);
+            const diagram = generator.generateHotspotDiagram(hotspots);
+            console.log();
+            console.log(diagram);
+            console.log();
+
+            // Save to file
+            const outputPath = path.join(process.cwd(), diagramsDir, 'hotspots.mmd');
+            fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+            fs.writeFileSync(outputPath, diagram, 'utf-8');
+
+            this.printSuccess(`Saved to ${outputPath}`);
+            break;
+          }
+
+          case 'circular': {
+            this.printSection('Circular Dependencies');
+            const analyzer = new DependencyChainAnalyzer(graph);
+            const circulars = analyzer.detectCircularDependencies();
+
+            if (circulars.length === 0) {
+              this.printSuccess('No circular dependencies found!');
+            } else {
+              const circularIndex = targetSymbol ? parseInt(targetSymbol, 10) - 1 : 0;
+              if (circularIndex >= circulars.length) {
+                this.printError(`Circular dependency #${circularIndex + 1} not found`);
+                return this.failure('Invalid circular index');
+              }
+
+              const circular = circulars[circularIndex];
+              const diagram = generator.generateCircularDiagram(circular);
+              console.log();
+              console.log(diagram);
+              console.log();
+
+              // Save to file
+              const outputPath = path.join(
+                process.cwd(),
+                diagramsDir,
+                `circular-${circularIndex + 1}.mmd`
+              );
+              fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+              fs.writeFileSync(outputPath, diagram, 'utf-8');
+
+              this.printSuccess(`Saved to ${outputPath}`);
+            }
+            break;
+          }
+
+          case 'hierarchy': {
+            if (!targetSymbol) {
+              this.printError('Class ID required: visualize hierarchy <class-id>');
+              return this.failure('Missing class ID');
+            }
+
+            // Resolve symbol name to ID if needed
+            let resolvedClass = targetSymbol;
+            const resolvedHierarchy = this.resolveSymbol(dbManager, targetSymbol);
+            if (resolvedHierarchy) {
+              resolvedClass = resolvedHierarchy.id;
+            } else if (!graph.symbols.has(targetSymbol)) {
+              this.printError(`Symbol not found: ${targetSymbol}`);
+              return this.failure('Symbol not found');
+            }
+
+            this.printSection(`Class Hierarchy: ${resolvedClass}`);
+            const diagram = generator.generateClassHierarchy(resolvedClass);
             console.log();
             console.log(diagram);
             console.log();
@@ -189,85 +224,49 @@ export class VisualizeDepsCommand extends BaseCommand {
             const outputPath = path.join(
               process.cwd(),
               diagramsDir,
-              `circular-${circularIndex + 1}.mmd`
+              `hierarchy-${resolvedClass}.mmd`
             );
             fs.mkdirSync(path.dirname(outputPath), { recursive: true });
             fs.writeFileSync(outputPath, diagram, 'utf-8');
 
             this.printSuccess(`Saved to ${outputPath}`);
-          }
-          break;
-        }
-
-        case 'hierarchy': {
-          if (!targetSymbol) {
-            this.printError('Class ID required: visualize hierarchy <class-id>');
-            return this.failure('Missing class ID');
+            break;
           }
 
-          // Resolve symbol name to ID if needed
-          let resolvedClass = targetSymbol;
-          const resolvedHierarchy = this.resolveSymbol(dbManager, targetSymbol);
-          if (resolvedHierarchy) {
-            resolvedClass = resolvedHierarchy.id;
-          } else if (!graph.symbols.has(targetSymbol)) {
-            this.printError(`Symbol not found: ${targetSymbol}`);
-            dbManager.close();
-            return this.failure('Symbol not found');
+          case 'modules': {
+            this.printSection('Module Dependencies');
+            const maxFiles = targetSymbol ? parseInt(targetSymbol, 10) : 10;
+            const diagram = generator.generateModuleDiagram(maxFiles);
+            console.log();
+            console.log(diagram);
+            console.log();
+
+            // Save to file
+            const outputPath = path.join(process.cwd(), diagramsDir, 'modules.mmd');
+            fs.mkdirSync(path.dirname(outputPath), { recursive: true });
+            fs.writeFileSync(outputPath, diagram, 'utf-8');
+
+            this.printSuccess(`Saved to ${outputPath}`);
+            break;
           }
-
-          this.printSection(`Class Hierarchy: ${resolvedClass}`);
-          const diagram = generator.generateClassHierarchy(resolvedClass);
-          console.log();
-          console.log(diagram);
-          console.log();
-
-          // Save to file
-          const outputPath = path.join(
-            process.cwd(),
-            diagramsDir,
-            `hierarchy-${resolvedClass}.mmd`
-          );
-          fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-          fs.writeFileSync(outputPath, diagram, 'utf-8');
-
-          this.printSuccess(`Saved to ${outputPath}`);
-          break;
+          default: {
+            this.printSection('Available Visualizations');
+            console.log('  visualize tree <symbol-id>       - Dependency tree for a symbol');
+            console.log('  visualize hotspots               - Top hotspots diagram');
+            console.log('  visualize circular [index]       - Circular dependency diagram');
+            console.log('  visualize hierarchy <class-id>   - Class hierarchy diagram');
+            console.log('  visualize modules [max]          - Module dependency diagram');
+            console.log();
+            console.log(`All diagrams are saved to ${diagramsDir}/`);
+            console.log();
+            break;
+          }
         }
 
-        case 'modules': {
-          this.printSection('Module Dependencies');
-          const maxFiles = targetSymbol ? parseInt(targetSymbol, 10) : 10;
-          const diagram = generator.generateModuleDiagram(maxFiles);
-          console.log();
-          console.log(diagram);
-          console.log();
-
-          // Save to file
-          const outputPath = path.join(process.cwd(), diagramsDir, 'modules.mmd');
-          fs.mkdirSync(path.dirname(outputPath), { recursive: true });
-          fs.writeFileSync(outputPath, diagram, 'utf-8');
-
-          this.printSuccess(`Saved to ${outputPath}`);
-          break;
-        }
-        default: {
-          this.printSection('Available Visualizations');
-          console.log('  visualize tree <symbol-id>       - Dependency tree for a symbol');
-          console.log('  visualize hotspots               - Top hotspots diagram');
-          console.log('  visualize circular [index]       - Circular dependency diagram');
-          console.log('  visualize hierarchy <class-id>   - Class hierarchy diagram');
-          console.log('  visualize modules [max]          - Module dependency diagram');
-          console.log();
-          console.log(`All diagrams are saved to ${diagramsDir}/`);
-          console.log();
-          break;
-        }
+        return this.success('Visualization complete');
+      } finally {
+        dbManager.close();
       }
-
-      dbManager.close();
-
-      return this.success('Visualization complete');
     });
   }
 }

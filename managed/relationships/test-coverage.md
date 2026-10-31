@@ -28,15 +28,17 @@ canonical graph 기반 metric으로 승격하려면 canonical node ID와 revisio
 
 ### Referenced By
 
-- Commands Index → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:78
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:39
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:108
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:316
-- [[TestCoverageAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/TestCoverageAnalyzer.md:22
-- TestRelationshipsCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:22
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:61
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:67
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:323
-- [[Call Relationships]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/CALLS.md:38
-- [[Integration Verification]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/integration-verification.md:162
-- [[Integration Verification]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/integration-verification.md:185
+- [[Commands Index]] → managed/COMMANDS.md:67
+- [[TSDoc Edge Documentation]] → managed/README.md:65
+- [[TestCoverageAnalyzer]] → managed/analyzers/TestCoverageAnalyzer.md:35
+- [[TestRelationshipAnalyzer]] → managed/analyzers/TestRelationshipAnalyzer.md:40
+- [[AnalyzeTestsCommand]] → managed/commands/AnalyzeTestsCommand.md:35
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:61
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:48
+- [[TestRelationshipsCommand]] → managed/commands/TestRelationshipsCommand.md:35
+- [[Coverage Metrics Contract]] → managed/features/coverage-metrics-contract.md:277
+- [[Guides & Tutorials]] → managed/guides/index.md:85
+- [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:486
+- [[Call Relationships]] → managed/relationships/calls.md:55
+- [[Integration Verification]] → managed/relationships/integration-verification.md:376
+

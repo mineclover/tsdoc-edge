@@ -100,3 +100,18 @@ System-level management and validation.
 - [[CLI Commands]] - Full command reference
 - [[BuildCommand]] - Core build command
 - [[AnalyzeCommand]] - Main analysis entry point
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Commands Index]] → managed/COMMANDS.md:297
+- [[TSDoc Edge Documentation]] → managed/README.md:108
+- [[QueryCommands]] → managed/commands/QueryCommands.md:92
+
+### Implemented By
+
+- Phase Commands → src/commands/Phase4Commands.ts:1
+

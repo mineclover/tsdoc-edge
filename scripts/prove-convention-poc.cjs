@@ -251,7 +251,12 @@ function readCanonicalProof() {
   try {
     const active = repository.readActiveRevision();
     if (!active) throw new Error('Canonical PoC database has no active revision');
-    const node = active.graph.nodes.find((candidate) => candidate.id === projectIndexerNodeId);
+    const node = active.graph.nodes.find(
+      (candidate) =>
+        candidate.id === projectIndexerNodeId ||
+        candidate.providerNodeId === projectIndexerNodeId ||
+        candidate.id.endsWith(`/${projectIndexerNodeId}`)
+    );
     if (!node) throw new Error(`Canonical PoC graph is missing ${projectIndexerNodeId}`);
     if (active.graph.provenance.graphNamespace !== 'ttsc:tsdoc-edge') {
       throw new Error('Canonical PoC graph namespace does not match the committed pack');

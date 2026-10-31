@@ -138,3 +138,16 @@ tsdoc-edge validate
 - [[TSDocParser]]: Parser implementation
 - [[ValidateCommand]]: CLI validation
 - ModuleSpecTagParser: Custom tag parsing
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Types Index]] → managed/types/index.md:20
+
+### Implemented By
+
+- ParseTypes → src/types/core/parse.ts:1
+

@@ -102,6 +102,26 @@ class TestCommand extends BaseCommand {
   public testCheckDatabaseExists(): CommandResult | null {
     return this.checkDatabaseExists();
   }
+
+  public testGetOption(args: string[], flag: string | string[]): string | undefined {
+    return this.getOption(args, flag);
+  }
+
+  public testGetNumericOption(
+    args: string[],
+    flag: string | string[],
+    defaultValue: number
+  ): number {
+    return this.getNumericOption(args, flag, defaultValue);
+  }
+
+  public testHasFlag(args: string[], flags: string | string[]): boolean {
+    return this.hasFlag(args, flags);
+  }
+
+  public testGetPositionalArgs(args: string[], valuedOptions?: Iterable<string>): string[] {
+    return this.getPositionalArgs(args, valuedOptions);
+  }
 }
 
 describe('BaseCommand', () => {
@@ -454,6 +474,91 @@ describe('BaseCommand', () => {
       expect(colors.blue).toBe('\x1b[34m');
       expect(colors.cyan).toBe('\x1b[36m');
       expect(colors.red).toBe('\x1b[31m');
+    });
+  });
+
+  describe('option and argument parsing utilities', () => {
+    describe('getOption', () => {
+      it('retrieves value when flag and value are separate tokens', () => {
+        expect(command.testGetOption(['--format', 'json'], '--format')).toBe('json');
+      });
+
+      it('retrieves value when using --flag=value format', () => {
+        expect(command.testGetOption(['--format=json'], '--format')).toBe('json');
+      });
+
+      it('supports an array of flag aliases', () => {
+        expect(command.testGetOption(['-f', 'json'], ['--format', '-f'])).toBe('json');
+        expect(command.testGetOption(['-f=json'], ['--format', '-f'])).toBe('json');
+      });
+
+      it('returns undefined when option is missing', () => {
+        expect(command.testGetOption(['--other', 'val'], '--format')).toBeUndefined();
+      });
+
+      it('returns undefined when flag is followed by another flag', () => {
+        expect(command.testGetOption(['--format', '--verbose'], '--format')).toBeUndefined();
+      });
+    });
+
+    describe('getNumericOption', () => {
+      it('returns parsed integer from option', () => {
+        expect(command.testGetNumericOption(['--depth', '5'], '--depth', 2)).toBe(5);
+        expect(command.testGetNumericOption(['--depth=5'], '--depth', 2)).toBe(5);
+      });
+
+      it('returns defaultValue when option is missing or invalid', () => {
+        expect(command.testGetNumericOption([], '--depth', 2)).toBe(2);
+        expect(command.testGetNumericOption(['--depth', 'not-a-number'], '--depth', 2)).toBe(2);
+      });
+    });
+
+    describe('hasFlag', () => {
+      it('returns true when boolean flag is present', () => {
+        expect(command.testHasFlag(['--verbose'], '--verbose')).toBe(true);
+        expect(command.testHasFlag(['-v'], ['--verbose', '-v'])).toBe(true);
+      });
+
+      it('returns false when flag is absent', () => {
+        expect(command.testHasFlag(['--quiet'], '--verbose')).toBe(false);
+      });
+    });
+
+    describe('getPositionalArgs', () => {
+      it('extracts positional arguments without flags', () => {
+        expect(command.testGetPositionalArgs(['arg1', 'arg2'])).toEqual(['arg1', 'arg2']);
+      });
+
+      it('does not swallow positional arguments after boolean flags', () => {
+        expect(command.testGetPositionalArgs(['--verbose', 'file.ts'])).toEqual(['file.ts']);
+        expect(command.testGetPositionalArgs(['--json', 'list'])).toEqual(['list']);
+      });
+
+      it('skips valued options and their values when specified', () => {
+        expect(command.testGetPositionalArgs(['--depth', '3', 'file.ts'], ['--depth'])).toEqual([
+          'file.ts',
+        ]);
+      });
+
+      it('handles self-contained --flag=value options correctly', () => {
+        expect(command.testGetPositionalArgs(['--depth=3', 'file.ts'], ['--depth'])).toEqual([
+          'file.ts',
+        ]);
+      });
+
+      it('uses DEFAULT_VALUED_OPTIONS when valuedOptions is omitted', () => {
+        expect(command.testGetPositionalArgs(['--workspace', 'ws-name', 'file.json'])).toEqual([
+          'file.json',
+        ]);
+        expect(command.testGetPositionalArgs(['--format', 'json', 'symId'])).toEqual(['symId']);
+      });
+
+      it('respects the "--" argument terminator', () => {
+        expect(command.testGetPositionalArgs(['--', '--not-a-flag', 'file.ts'])).toEqual([
+          '--not-a-flag',
+          'file.ts',
+        ]);
+      });
     });
   });
 });

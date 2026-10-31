@@ -46,6 +46,7 @@ import {
   ValidateUnifiedCommand,
   VisualizeDepsCommand,
 } from './commands';
+import { AnalyzeRelationshipsCommand } from './commands/AnalyzeRelationshipsCommand';
 import { BlocksCommand } from './commands/BlocksCommand';
 import { CheckLinksCommand } from './commands/CheckLinksCommand';
 import { CommonCommand } from './commands/CommonCommand';
@@ -68,7 +69,18 @@ import { ParallelWorkCommand } from './commands/ParallelWorkCommand';
 import { ParseMermaidCommand } from './commands/ParseMermaidCommand';
 import { PreCommitRunCommand } from './commands/PreCommitRunCommand';
 import { PromoteSymbolCommand } from './commands/PromoteSymbolCommand';
+import { RelationshipCheckCommand } from './commands/RelationshipCheckCommand';
+import { RelationshipClustersCommand } from './commands/RelationshipClustersCommand';
 import { RelationshipCommand } from './commands/RelationshipCommand';
+import { RelationshipExportCommand } from './commands/RelationshipExportCommand';
+import { RelationshipHelpCommand } from './commands/RelationshipHelpCommand';
+import { RelationshipImpactCommand } from './commands/RelationshipImpactCommand';
+import { RelationshipMetricsCommand } from './commands/RelationshipMetricsCommand';
+import { RelationshipPathCommand } from './commands/RelationshipPathCommand';
+import { RelationshipQueryCommand } from './commands/RelationshipQueryCommand';
+import { RelationshipStatsCommand } from './commands/RelationshipStatsCommand';
+import { RelationshipValidateCommand } from './commands/RelationshipValidateCommand';
+import { RelationshipVisualizeCommand } from './commands/RelationshipVisualizeCommand';
 import { RoutesCommand } from './commands/RoutesCommand';
 import { SpecCommand } from './commands/SpecCommand';
 import { SystemStatusCommand } from './commands/SystemStatusCommand';
@@ -176,6 +188,20 @@ async function main(): Promise<void> {
   registry.register(new UpdateBacklinksCommand(undefined, undefined, undefined, undefined, true));
   registry.register(new ValidateDocsCommand(undefined, undefined, true));
   registry.register(new ValidateSymbolRefsCommand());
+
+  // Preserve published flat command paths for relationship operations
+  registry.register(new RelationshipImpactCommand());
+  registry.register(new RelationshipMetricsCommand());
+  registry.register(new RelationshipClustersCommand());
+  registry.register(new RelationshipCheckCommand());
+  registry.register(new RelationshipValidateCommand());
+  registry.register(new RelationshipExportCommand());
+  registry.register(new RelationshipStatsCommand());
+  registry.register(new RelationshipQueryCommand());
+  registry.register(new RelationshipPathCommand());
+  registry.register(new RelationshipVisualizeCommand());
+  registry.register(new RelationshipHelpCommand());
+  registry.register(new AnalyzeRelationshipsCommand());
 
   // Register commands - Analysis & tools
   registry.register(new AnalyzeCommand());

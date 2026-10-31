@@ -374,10 +374,9 @@ describe('DepthTraverser', () => {
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:242
-- [[TreeCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/TreeCommand.md:122
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:71
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:169
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:191
-- [[SymbolGraphBuilder]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SymbolGraphBuilder.md:97
+- [[Core Components]] → managed/core-components/index.md:27
+
+### Implemented By
+
+- DepthTraverser → src/graph/DepthTraverser.ts:1
 

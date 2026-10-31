@@ -34,5 +34,10 @@ Visualize dependency graphs.
 
 ### Referenced By
 
-- MermaidGenerator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/MermaidGenerator.md:90
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:35
+- [[MermaidGenerator]] → managed/utilities/MermaidGenerator.md:133
+
+### Implemented By
+
+- VisualizeDepsCommand → src/commands/VisualizeDepsCommand.ts:22
 

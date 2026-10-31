@@ -449,3 +449,12 @@ To add documentation:
 **Project**: TSDoc Edge - SSOT Documentation & Relationship Platform
 **Version**: 0.12.1
 **Last Updated**: 2025-12-28
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:267
+

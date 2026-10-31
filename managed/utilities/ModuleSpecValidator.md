@@ -183,11 +183,7 @@ tsdoc-edge validate-spec --strict
 
 ## Backlinks
 
-### Referenced By
+### Implemented By
 
-- [[ValidateSpecCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateSpecCommand.md:151
-- [[Module Specification Framework]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/module-specification-framework.md:222
-- ModuleSpecTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:150
-- ModuleSpecTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/ModuleSpecTypes.md:176
-- ConventionValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/ConventionValidator.md:180
+- ModuleSpecValidator → src/validator/ModuleSpecValidator.ts:64
 

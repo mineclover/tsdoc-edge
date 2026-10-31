@@ -82,13 +82,22 @@ Examples:
         return this.displayHelp();
       }
 
-      if (args.length === 0) {
+      const positionalArgs = this.getPositionalArgs(args, [
+        '--format',
+        '--type',
+        '--category',
+        '--depth',
+        '--direction',
+        '--output',
+        '--style',
+      ]);
+      const symbolId = positionalArgs[0];
+
+      if (!symbolId) {
         this.printError('Symbol ID required');
         console.log();
         return this.displayHelp();
       }
-
-      const symbolId = args[0];
 
       // Parse options
       const options = {
@@ -105,51 +114,53 @@ Examples:
 
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
+      try {
+        // Resolve symbol by ID or name
+        const resolved = this.resolveSymbol(dbManager, symbolId);
 
-      // Resolve symbol by ID or name
-      const resolved = this.resolveSymbol(dbManager, symbolId);
+        if (!resolved) {
+          this.printError(`Symbol not found: ${symbolId}`);
+          return this.failure('Symbol not found');
+        }
 
-      if (!resolved) {
-        this.printError(`Symbol not found: ${symbolId}`);
+        const { symbol, id: resolvedId } = resolved;
+        const symbolRow = symbol as SymbolRow;
+        console.log(`Symbol: ${symbolRow.name} (${symbolRow.type})`);
+        console.log(
+          `Format: ${options.format}, Style: ${options.style}, Depth: ${options.depth}\n`
+        );
+
+        // Collect relationships
+        const visited = new Set<string>();
+        const relationships: UnifiedRelationshipRow[] = [];
+
+        this.collectRelationships(dbManager, resolvedId, options, 0, visited, relationships);
+
+        console.log(`Collected ${relationships.length} relationships\n`);
+
+        // Generate diagram
+        let diagram = '';
+        if (options.format === 'mermaid') {
+          diagram = this.generateMermaidDiagram(symbolRow, relationships, options);
+        } else if (options.format === 'dot') {
+          diagram = this.generateDotDiagram(symbolRow, relationships, options);
+        } else {
+          this.printError(`Unsupported format: ${options.format}`);
+          return this.failure('Unsupported format');
+        }
+
+        // Output
+        if (options.output) {
+          fs.writeFileSync(options.output, diagram, 'utf-8');
+          this.printSuccess(`Diagram saved to: ${options.output}`);
+        } else {
+          console.log(diagram);
+        }
+
+        return this.success();
+      } finally {
         dbManager.close();
-        return this.failure('Symbol not found');
       }
-
-      const { symbol, id: resolvedId } = resolved;
-      const symbolRow = symbol as SymbolRow;
-      console.log(`Symbol: ${symbolRow.name} (${symbolRow.type})`);
-      console.log(`Format: ${options.format}, Style: ${options.style}, Depth: ${options.depth}\n`);
-
-      // Collect relationships
-      const visited = new Set<string>();
-      const relationships: UnifiedRelationshipRow[] = [];
-
-      this.collectRelationships(dbManager, resolvedId, options, 0, visited, relationships);
-
-      console.log(`Collected ${relationships.length} relationships\n`);
-
-      // Generate diagram
-      let diagram = '';
-      if (options.format === 'mermaid') {
-        diagram = this.generateMermaidDiagram(symbolRow, relationships, options);
-      } else if (options.format === 'dot') {
-        diagram = this.generateDotDiagram(symbolRow, relationships, options);
-      } else {
-        this.printError(`Unsupported format: ${options.format}`);
-        dbManager.close();
-        return this.failure('Unsupported format');
-      }
-
-      // Output
-      if (options.output) {
-        fs.writeFileSync(options.output, diagram, 'utf-8');
-        this.printSuccess(`Diagram saved to: ${options.output}`);
-      } else {
-        console.log(diagram);
-      }
-
-      dbManager.close();
-      return this.success();
     });
   }
 

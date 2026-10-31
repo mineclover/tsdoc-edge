@@ -782,23 +782,22 @@ done
 
 ### Referenced By
 
-- [[Commands Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:282
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:118
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:328
-- [[CoverageReportCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/CoverageReportCommand.md:114
-- [[UsedByCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UsedByCommand.md:90
-- [[Codebase Health Report]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/codebase-health-report.md:344
-- [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:19
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:14
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:294
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:68
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:136
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:189
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:188
-- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:151
-- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:161
-- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:177
-- [[Mermaid Entrypoint Workflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:282
-- [[Mermaid Entrypoint Workflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/mermaid-entrypoint-workflow.md:301
-- [[Relationship System Roadmap]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:402
+- [[Commands Index]] → managed/COMMANDS.md:315
+- [[TSDoc Edge Documentation]] → managed/README.md:158
+- [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1462
+- [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:271
+- [[UsedByCommand]] → managed/commands/UsedByCommand.md:125
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:267
+- [[Relationship Usage Examples]] → managed/examples/relationship-usage-examples.md:526
+- [[Codebase Health Report]] → managed/features/codebase-health-report.md:425
+- [[CoreFeatures]] → managed/features/core-features-catalog.md:34
+- [[Guides & Tutorials]] → managed/guides/index.md:22
+- [[Usage Scenarios]] → managed/guides/usage-scenarios.md:83
+- [[Quick Start Guide]] → managed/quick-start.md:129
+- [[Relationship Types]] → managed/relationships/index.md:232
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:71
+- [[Workflows Index]] → managed/workflows/index.md:236
+- [[Mermaid Entrypoint Workflow]] → managed/workflows/mermaid-entrypoint-workflow.md:611
+- [[Relationship System Roadmap]] → managed/workflows/relationship-system-roadmap.md:533
+- [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:279
 

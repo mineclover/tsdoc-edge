@@ -452,5 +452,5 @@ tsdoc-edge coverage-report              # 문서화(@doc) 커버리지 리포트
 
 ### Referenced By
 
-- [[Features Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/index.md:8
-- [[Features Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/index.md:226
+- [[Features Index]] → managed/features/index.md:34
+

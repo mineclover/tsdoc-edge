@@ -259,3 +259,16 @@ export class UserService { }
 - [[TSDocParser]]: Parses custom tags
 - ModuleSpecTagParser: Extracts tag values
 - [[ValidateCommand]]: Validates tag presence
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Types Index]] → managed/types/index.md:21
+
+### Implemented By
+
+- CustomTagTypes → src/types/tags/base.ts:1
+

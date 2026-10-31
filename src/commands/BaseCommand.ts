@@ -262,25 +262,29 @@ export abstract class BaseCommand {
    * Supports both --flag value and --flag=value formats
    *
    * @param args - Command arguments
-   * @param flag - Flag name (e.g., '--format')
+   * @param flag - Flag name or array of flag aliases (e.g., '--format' or ['--format', '-f'])
    * @returns Option value or undefined
    *
    * @example
    * // Both formats work:
    * getOption(['--format', 'json'], '--format') // 'json'
    * getOption(['--format=json'], '--format')    // 'json'
+   * getOption(['-f', 'json'], ['--format', '-f']) // 'json'
    */
-  protected getOption(args: string[], flag: string): string | undefined {
-    // Try --flag value format
-    const index = args.indexOf(flag);
-    if (index !== -1 && index + 1 < args.length && !args[index + 1].startsWith('-')) {
-      return args[index + 1];
-    }
+  protected getOption(args: string[], flag: string | string[]): string | undefined {
+    const flagList = Array.isArray(flag) ? flag : [flag];
+    for (const f of flagList) {
+      // Try --flag value format
+      const index = args.indexOf(f);
+      if (index !== -1 && index + 1 < args.length && !args[index + 1].startsWith('-')) {
+        return args[index + 1];
+      }
 
-    // Try --flag=value format
-    const equalMatch = args.find((arg) => arg.startsWith(`${flag}=`));
-    if (equalMatch) {
-      return equalMatch.slice(flag.length + 1);
+      // Try --flag=value format
+      const equalMatch = args.find((arg) => arg.startsWith(`${f}=`));
+      if (equalMatch) {
+        return equalMatch.slice(f.length + 1);
+      }
     }
 
     return undefined;
@@ -290,11 +294,15 @@ export abstract class BaseCommand {
    * Get option value with default fallback
    *
    * @param args - Command arguments
-   * @param flag - Flag name
+   * @param flag - Flag name or array of flag aliases
    * @param defaultValue - Default value if not specified
    * @returns Option value or default
    */
-  protected getOptionWithDefault(args: string[], flag: string, defaultValue: string): string {
+  protected getOptionWithDefault(
+    args: string[],
+    flag: string | string[],
+    defaultValue: string
+  ): string {
     return this.getOption(args, flag) ?? defaultValue;
   }
 
@@ -314,32 +322,96 @@ export abstract class BaseCommand {
    * Get numeric option value
    *
    * @param args - Command arguments
-   * @param flag - Flag name
+   * @param flag - Flag name or array of flag aliases
    * @param defaultValue - Default value if not specified or invalid
    * @returns Numeric value or default
    */
-  protected getNumericOption(args: string[], flag: string, defaultValue: number): number {
+  protected getNumericOption(
+    args: string[],
+    flag: string | string[],
+    defaultValue: number
+  ): number {
     const value = this.getOption(args, flag);
     if (value === undefined) return defaultValue;
-    const num = parseInt(value, 10);
+    const num = Number.parseInt(value, 10);
     return Number.isNaN(num) ? defaultValue : num;
   }
+
+  /**
+   * Default set of options known to accept a value across CLI commands.
+   */
+  protected static readonly DEFAULT_VALUED_OPTIONS: ReadonlySet<string> = new Set([
+    '--output',
+    '-o',
+    '--depth',
+    '--direction',
+    '--category',
+    '--min-confidence',
+    '--type',
+    '--limit',
+    '--top',
+    '--metric',
+    '--min-size',
+    '--max-clusters',
+    '--max-length',
+    '--format',
+    '-f',
+    '--workspace',
+    '--report-db',
+    '--report-id',
+    '--canonical-graph-db',
+    '--graph-db',
+    '--input-revisions-db',
+    '--history-db',
+    '--spec-db',
+    '--coverage-report-db',
+    '--coverage-report-id',
+    '--coverage-gate',
+    '--coverage-thresholds',
+    '--code-revision',
+    '--graph-lint-rules',
+    '--expected-manifest',
+    '--suppression-as-of',
+    '--fail-on',
+    '--pack',
+    '--replay',
+    '--history-id',
+    '--before',
+    '--reason',
+    '--target',
+    '--source',
+    '--config',
+    '-c',
+    '--style',
+    '--layout',
+  ]);
 
   /**
    * Get all positional arguments (non-flag arguments)
    *
    * @param args - Command arguments
+   * @param valuedOptions - Optional iterable of options that consume a following value
    * @returns Array of positional arguments
    */
-  protected getPositionalArgs(args: string[]): string[] {
+  protected getPositionalArgs(args: string[], valuedOptions?: Iterable<string>): string[] {
+    const valued = valuedOptions ? new Set(valuedOptions) : BaseCommand.DEFAULT_VALUED_OPTIONS;
     const result: string[] = [];
     let i = 0;
     while (i < args.length) {
       const arg = args[i];
+      if (arg === '--') {
+        result.push(...args.slice(i + 1));
+        break;
+      }
       if (arg.startsWith('-')) {
-        // Skip flag and its value if it has one
-        if (!arg.includes('=') && i + 1 < args.length && !args[i + 1].startsWith('-')) {
-          i += 2;
+        if (arg.includes('=')) {
+          i++;
+        } else if (valued.has(arg)) {
+          if (i + 1 < args.length && !args[i + 1].startsWith('-')) {
+            i += 2;
+          } else {
+            i++;
+          }
         } else {
           i++;
         }

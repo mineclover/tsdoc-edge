@@ -292,4 +292,8 @@ tsdoc-edge health managed
 
 ### Referenced By
 
-- [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:255
+- [[TSDoc Edge Documentation]] → managed/README.md:188
+- [[Concepts Index]] → managed/concepts/index.md:281
+- [[Examples]] → managed/examples/index.md:34
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:29
+

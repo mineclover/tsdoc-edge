@@ -36,15 +36,16 @@ Extracts:
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:233
-- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:108
-- [[DocumentationAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:123
-- [[ParseCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ParseCommand.md:21
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:74
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:83
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:104
-- EnhancedDocExtractor → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/EnhancedDocExtractor.md:205
-- CustomTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/CustomTagTypes.md:146
-- ParseTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/ParseTypes.md:101
-- FileScanner → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/FileScanner.md:72
+- [[TSDoc Edge Documentation]] → managed/README.md:282
+- [[ASTSymbolExtractor]] → managed/analyzers/ASTSymbolExtractor.md:180
+- [[DocumentationAnalyzer]] → managed/analyzers/DocumentationAnalyzer.md:298
+- [[ParseCommand]] → managed/commands/ParseCommand.md:29
+- [[EnhancedDocExtractor]] → managed/parser/EnhancedDocExtractor.md:410
+- [[CustomTagTypes]] → managed/types/CustomTagTypes.md:259
+- [[ParseTypes]] → managed/types/ParseTypes.md:138
+
+### Implemented By
+
+- TSDocParser → src/parser/TSDocParser.ts:1
+- NodeWithJSDoc → src/parser/TSDocParser.ts:22
 

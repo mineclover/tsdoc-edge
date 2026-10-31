@@ -394,18 +394,19 @@ tsdoc-edge tree
 
 ### Referenced By
 
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:240
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:257
-- [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:81
-- [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:286
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:142
-- [[Features Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/index.md:199
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:207
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:353
+- [[TSDoc Edge Documentation]] → managed/README.md:289
+- [[RelationshipCommands]] → managed/commands/RelationshipCommands.md:169
+- [[AnalysisFeatures]] → managed/features/analysis-features.md:433
+- [[CoreFeatures]] → managed/features/core-features-catalog.md:102
+- [[CoreWorkflow]] → managed/features/core-workflow.md:154
+- [[Features Index]] → managed/features/index.md:282
+- [[LSP Integration]] → managed/features/lsp-integration.md:472
+- [[ValidationFeatures]] → managed/features/validation-features.md:411
+- [[Guides & Tutorials]] → managed/guides/index.md:406
 
 ### Implemented By
 
-- DepthTraverser (Traversal) → /Users/junwoobang/workflow/tsdoc-edge/src/graph/DepthTraverser.ts:64
-- SymbolGraphBuilder (Builder) → /Users/junwoobang/workflow/tsdoc-edge/src/graph/SymbolGraphBuilder.ts:41
-- SymbolSearchEngine (Search) → /Users/junwoobang/workflow/tsdoc-edge/src/graph/SymbolSearchEngine.ts:44
+- DepthTraverser (Traversal) → src/graph/DepthTraverser.ts:64
+- SymbolGraphBuilder (Builder) → src/graph/SymbolGraphBuilder.ts:41
+- SymbolSearchEngine (Search) → src/graph/SymbolSearchEngine.ts:44
 

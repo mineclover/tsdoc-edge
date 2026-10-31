@@ -108,6 +108,10 @@ tsdoc-edge find-unused-docs managed --safe-only
 
 ### Referenced By
 
-- SpecTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/SpecTypes.md:191
-- SpecContentSimilarityChecker → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SpecContentSimilarityChecker.md:75
+- [[SpecTypes]] → managed/types/SpecTypes.md:229
+- [[SpecContentSimilarityChecker]] → managed/utilities/SpecContentSimilarityChecker.md:109
+
+### Implemented By
+
+- UnusedDocumentDetector → src/spec/UnusedDocumentDetector.ts:27
 

@@ -142,11 +142,13 @@ graph TD
 
 ### Referenced By
 
-- [[ParseMermaidCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ParseMermaidCommand.md:39
-- [[Document Symbol Parser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/DocumentSymbolParser.md:85
-- MermaidExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidExtractionResult.md:22
-- MermaidExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidExtractionResult.md:28
-- MermaidRelationship → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidRelationship.md:28
-- MermaidSymbol → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidSymbol.md:25
-- MermaidSymbol → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidSymbol.md:31
+- [[ParseMermaidCommand]] → managed/commands/ParseMermaidCommand.md:49
+- [[Document Symbol Parser]] → managed/parser/DocumentSymbolParser.md:133
+- [[MermaidExtractionResult]] → managed/primary-types/MermaidExtractionResult.md:30
+- [[MermaidRelationship]] → managed/primary-types/MermaidRelationship.md:36
+- [[MermaidSymbol]] → managed/primary-types/MermaidSymbol.md:33
+
+### Implemented By
+
+- Mermaid Symbol Extractor → src/doc-symbol/MermaidSymbolExtractor.ts:1
 

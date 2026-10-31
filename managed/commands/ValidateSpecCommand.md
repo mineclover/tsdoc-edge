@@ -400,12 +400,14 @@ tsdoc-edge validate-spec managed | grep "⚠️" -A 1
 
 ### Referenced By
 
-- [[CLI Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/CLI-COMMANDS.md:255
-- [[Module Specification Framework]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/module-specification-framework.md:155
-- [[Module Specification Framework]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/module-specification-framework.md:220
-- [[Module Specification Framework]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/module-specification-framework.md:229
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:161
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:289
-- ModuleSpecTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/ModuleSpecTypes.md:177
-- ModuleSpecValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/ModuleSpecValidator.md:142
-- [[SpecCompletenessValidator]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:61
+- [[Module Specification Framework]] → managed/concepts/module-specification-framework.md:391
+- [[ValidationFeatures]] → managed/features/validation-features.md:286
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:740
+- [[ModuleSpecTypes]] → managed/types/ModuleSpecTypes.md:219
+- [[ModuleSpecValidator]] → managed/utilities/ModuleSpecValidator.md:179
+- [[SpecCompletenessValidator]] → managed/utilities/SpecCompletenessValidator.md:75
+
+### Implemented By
+
+- ValidateSpecCommand → src/commands/Phase4Commands.ts:349:1
+

@@ -581,11 +581,9 @@ db.queryRelationships({
 
 ### Referenced By
 
-- [[CallGraphAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CallGraphAnalyzer.md:212
-- [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:225
-- [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:242
-- [[Callback Pattern]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/CALLBACK.md:203
-- [[Composition Relationship]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/COMPOSITION.md:178
-- [[Relationship Standard Format]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/STANDARD-FORMAT.md:220
-- [[Relationship System Roadmap]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/relationship-system-roadmap.md:401
+- [[CallGraphAnalyzer]] → managed/analyzers/CallGraphAnalyzer.md:416
+- [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1460
+- [[Concepts Index]] → managed/concepts/index.md:251
+- [[Relationship Standard Format]] → managed/relationships/standard-format.md:495
+- [[Relationship System Roadmap]] → managed/workflows/relationship-system-roadmap.md:532
 

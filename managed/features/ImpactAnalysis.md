@@ -302,7 +302,11 @@ Break large impacts into smaller steps:
 
 ### Referenced By
 
-- [[UsedByCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UsedByCommand.md:89
-- [[Dead Code Detection]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DeadCodeDetection.md:117
-- [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:119
-- [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:136
+- [[UsedByCommand]] → managed/commands/UsedByCommand.md:124
+- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:176
+- [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:222
+
+### Implemented By
+
+- Impact Analysis → src/commands/RelationshipImpactCommand.ts:1
+

@@ -81,3 +81,16 @@ managed/specs/
 - [[Spec Management System]]
 - [[SpecCommands]]
 - [[Convention Pack Check]]
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:37
+
+### Implemented By
+
+- AuthoredProjectSpecifications → src/spec-graph/ManagedSpecExtractor.ts:1
+

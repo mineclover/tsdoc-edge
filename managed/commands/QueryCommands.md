@@ -92,3 +92,18 @@ Find untested code.
 - [[Phase Commands]]: Dependencies and usage queries
 - [[Phase Commands]]: Statistics and reporting
 - [[WorkContextCommand]]: Comprehensive file context
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:246
+- [[Impact Analysis]] → managed/features/ImpactAnalysis.md:291
+- [[Features Index]] → managed/features/index.md:283
+
+### Implemented By
+
+- QueryCommands → src/commands/Phase5Commands.ts:1
+

@@ -409,4 +409,13 @@ interface UnusedDocument {
 
 ### Referenced By
 
-- [[Validator System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/validator-system.md:175
+- [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1458
+- [[Validator System]] → managed/core/validator-system.md:340
+- [[Convention Pack Check]] → managed/features/convention-pack-check.md:464
+- [[AuthoredProjectSpecifications]] → managed/specs/index.md:81
+- [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:278
+
+### Implemented By
+
+- Spec Management System → src/spec/SpecCompletenessValidator.ts:1
+

@@ -32,18 +32,22 @@ canonical: true
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:216
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:271
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:208
-- [[DocumentationAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:76
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:73
-- [[SuggestCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SuggestCommand.md:191
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:147
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:109
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:245
-- AnalysisReport → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/AnalysisReport.md:73
-- AnalysisReport → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/AnalysisReport.md:81
-- TrackableStatistics → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TrackableStatistics.md:94
-- CodeHealthMetrics → /Users/junwoobang/workflow/tsdoc-edge/managed/types/CodeHealthMetrics.md:115
-- InterfaceTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/InterfaceTypes.md:109
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:17
+- [[TSDoc Edge Documentation]] → managed/README.md:265
+- [[CodeHealthChecker]] → managed/analyzers/CodeHealthChecker.md:301
+- [[DocumentationAnalyzer]] → managed/analyzers/DocumentationAnalyzer.md:149
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:81
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:102
+- [[SuggestCommand]] → managed/commands/SuggestCommand.md:484
+- [[AnalysisFeatures]] → managed/features/analysis-features.md:246
+- [[CoreWorkflow]] → managed/features/core-workflow.md:121
+- [[Guides & Tutorials]] → managed/guides/index.md:279
+- [[AnalysisReport]] → managed/primary-types/AnalysisReport.md:95
+- [[TrackableStatistics]] → managed/primary-types/TrackableStatistics.md:116
+- [[CodeHealthMetrics]] → managed/types/CodeHealthMetrics.md:143
+- [[InterfaceTypes]] → managed/types/InterfaceTypes.md:145
+
+### Implemented By
+
+- AnalyzeCommand → src/commands/AnalyzeCommand.ts:37
 

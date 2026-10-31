@@ -118,13 +118,9 @@ Uses [[DatabaseManager]] for sessions.
 
 ### Referenced By
 
-- [[DocumentSymbolParser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolParser.md:45
-- [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:128
-- [[Document Symbol Parser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/DocumentSymbolParser.md:56
-- [[Document Symbol Parser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/DocumentSymbolParser.md:87
-- [[CodeReference]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/CodeReference.md:23
-- [[CodeReference]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/CodeReference.md:27
-- ParsedDocSymbols → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:11
-- SymbolFootnoteRef → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:20
-- SymbolFootnoteRef → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/SymbolFootnoteRef.md:24
-- DocumentSymbol → /Users/junwoobang/workflow/tsdoc-edge/managed/types/DocumentSymbol.md:44
+- [[Primary Types Index]] → managed/primary-types/index.md:20
+
+### Implemented By
+
+- ParsedDocSymbols → src/types/feature/doc-symbol.ts:1
+

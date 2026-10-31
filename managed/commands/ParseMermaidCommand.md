@@ -61,11 +61,11 @@ Displays extracted information:
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:85
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:122
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:296
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:362
-- [[Parser Components]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/MermaidSymbolExtractor.md:22
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:178
-- [[Mermaid Symbol Extractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/MermaidSymbolExtractor.md:64
+- [[TSDoc Edge Documentation]] → managed/README.md:113
+- [[Guides & Tutorials]] → managed/guides/index.md:213
+- [[Mermaid Symbol Extractor]] → managed/parser/MermaidSymbolExtractor.md:82
+
+### Implemented By
+
+- ParseMermaidCommand → src/commands/ParseMermaidCommand.ts:23
 

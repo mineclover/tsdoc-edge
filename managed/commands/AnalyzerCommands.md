@@ -254,3 +254,16 @@ tsdoc-edge analyze-all [path] [options]
 - [[Analyzers & Extractors]] - Analyzer implementations
 - [[Relationship Types]] - Relationship definitions
 - [[Relationship Analysis Guide]] - Usage guide
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:34
+
+### Implemented By
+
+- AnalyzerCommands → src/commands/AnalyzeCallsCommand.ts:1
+

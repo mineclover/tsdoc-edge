@@ -34,3 +34,13 @@ In-memory symbol registry for fast lookups. See [[SymbolRegistryManager]].
 - [[Core Systems]] - System-level architecture
 - [[Storage System]] - Storage infrastructure details
 - [[Features Index]] - Feature documentation
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → managed/README.md:194
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:283
+

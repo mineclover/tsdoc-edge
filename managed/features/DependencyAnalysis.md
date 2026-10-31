@@ -257,5 +257,10 @@ tsdoc-edge validate-architecture \
 
 ### Referenced By
 
-- [[UsedByCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/UsedByCommand.md:88
-- [[Impact Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/ImpactAnalysis.md:150
+- [[UsedByCommand]] → managed/commands/UsedByCommand.md:123
+- [[Impact Analysis]] → managed/features/ImpactAnalysis.md:288
+
+### Implemented By
+
+- Dependency Analysis → src/analyzer/DependencyChainAnalyzer.ts:1
+

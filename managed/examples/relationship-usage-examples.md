@@ -525,3 +525,12 @@ db.close();
 - [[Relationship Ontology]] - Complete type definitions
 - [[Work Context Workflow]] - Using relationships for context
 - [[BuildCommand]] - How relationships are extracted
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Examples]] → managed/examples/index.md:26
+

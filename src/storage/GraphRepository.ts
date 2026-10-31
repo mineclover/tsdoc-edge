@@ -281,7 +281,7 @@ export class GraphRepository {
     if (!this.readOnly) {
       this.database.pragma('foreign_keys = ON');
       if (databasePath !== ':memory:') this.database.pragma('journal_mode = WAL');
-      this.database.pragma('synchronous = FULL');
+      this.database.pragma('synchronous = NORMAL');
       // Schema-v1 repositories have a valid active graph but no alias or
       // diagnostics tables. Add the v2 storage plane atomically while leaving
       // the active v1 envelope untouched; the next guarded replacement

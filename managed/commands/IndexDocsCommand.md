@@ -84,18 +84,21 @@ Related: [[Concept#Section]]
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:83
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:247
-- [[CoverageReportCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/CoverageReportCommand.md:111
-- [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:87
-- [[Symbol Reference System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/symbol-reference-system.md:170
-- [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:120
-- [[AutoIndexing]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/auto-indexing.md:46
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:82
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:274
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:105
-- [[Document Symbol Parser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/DocumentSymbolParser.md:71
-- DocumentSymbol → /Users/junwoobang/workflow/tsdoc-edge/managed/types/DocumentSymbol.md:101
-- FeatureTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/FeatureTypes.md:99
-- [[DocCodeLinker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/DocCodeLinker.md:53
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:22
+- [[TSDoc Edge Documentation]] → managed/README.md:111
+- [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:268
+- [[Symbol Reference System]] → managed/concepts/symbol-reference-system.md:290
+- [[DocumentSymbolParser]] → managed/features/DocumentSymbolParser.md:183
+- [[DocumentSymbolRegistry]] → managed/features/DocumentSymbolRegistry.md:290
+- [[AutoIndexing]] → managed/features/auto-indexing.md:66
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:217
+- [[Guides & Tutorials]] → managed/guides/index.md:140
+- [[Document Symbol Parser]] → managed/parser/DocumentSymbolParser.md:89
+- [[DocumentSymbol]] → managed/types/DocumentSymbol.md:111
+- [[FeatureTypes]] → managed/types/FeatureTypes.md:145
+- [[DocCodeLinker]] → managed/utilities/DocCodeLinker.md:68
+
+### Implemented By
+
+- IndexDocsCommand → src/commands/IndexDocsCommand.ts:41
 

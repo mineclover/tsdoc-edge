@@ -224,8 +224,9 @@ tsdoc-edge improve src/services/UserService.ts
 
 ### Referenced By
 
-- [[ValidateSpecCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateSpecCommand.md:182
-- [[Module Specification Framework]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/module-specification-framework.md:223
-- EnhancedTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/EnhancedTagTypes.md:159
-- ModuleSpecTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/ModuleSpecTagTypes.md:148
+- [[Types Index]] → managed/types/index.md:21
+
+### Implemented By
+
+- ModuleSpecTypes → src/types/spec/module-spec.ts:1
 

@@ -1003,3 +1003,21 @@ function canonicalJson(value: unknown, ancestors: Set<object>, path: string): un
 function compareText(left: string, right: string): number {
   return left < right ? -1 : left > right ? 1 : 0;
 }
+
+/**
+ * Test whether a code node identity selector matches a canonical or provider node id.
+ * Supports exact canonical match, provider-relative match, and trailing path match.
+ * @public
+ */
+export function matchesNodeIdentity(
+  expected: string | undefined,
+  canonicalId: string,
+  providerNodeId?: string
+): boolean {
+  if (expected === undefined) return true;
+  return (
+    expected === canonicalId ||
+    (providerNodeId !== undefined && expected === providerNodeId) ||
+    canonicalId.endsWith(`/${expected}`)
+  );
+}

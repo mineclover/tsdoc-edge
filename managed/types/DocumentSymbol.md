@@ -116,9 +116,9 @@ Special footnote references:
 
 ### Referenced By
 
-- [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:127
-- [[Document Symbol Parser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/DocumentSymbolParser.md:86
-- ParsedDocSymbols → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:57
-- DocumentSymbol → /Users/junwoobang/workflow/tsdoc-edge/managed/types/DocumentSymbol.md:31
-- FeatureTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/FeatureTypes.md:98
-- IdGenerator → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/IdGenerator.md:79
+- [[Types Index]] → managed/types/index.md:20
+
+### Implemented By
+
+- DocumentSymbol → src/types/feature/doc-symbol.ts:1
+

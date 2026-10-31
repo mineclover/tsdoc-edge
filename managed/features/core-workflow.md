@@ -177,25 +177,24 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 
 ### Referenced By
 
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:231
-- [[BuildCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/BuildCommand.md:54
-- [[ExploreEntrypointCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ExploreEntrypointCommand.md:22
-- [[WorkContextCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WorkContextCommand.md:56
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:256
-- [[AutoIndexing]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/auto-indexing.md:165
-- [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:32
-- [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:280
-- DocumentSymbolSystem → /Users/junwoobang/workflow/tsdoc-edge/managed/features/document-symbol-system.md:103
-- [[Features Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/index.md:194
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:248
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:208
-- [[Build Pipeline Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:257
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:343
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:296
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:350
-- [[Work Context Workflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/work-context-workflow.md:373
+- [[TSDoc Edge Documentation]] → managed/README.md:280
+- [[BuildCommand]] → managed/commands/BuildCommand.md:89
+- [[ExploreEntrypointCommand]] → managed/commands/ExploreEntrypointCommand.md:30
+- [[WorkContextCommand]] → managed/commands/WorkContextCommand.md:66
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:31
+- [[AnalysisFeatures]] → managed/features/analysis-features.md:432
+- [[AutoIndexing]] → managed/features/auto-indexing.md:296
+- [[CoreFeatures]] → managed/features/core-features-catalog.md:47
+- [[Features Index]] → managed/features/index.md:277
+- [[LSP Integration]] → managed/features/lsp-integration.md:474
+- [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:378
+- [[ValidationFeatures]] → managed/features/validation-features.md:412
+- [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:549
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:794
+- [[Guides & Tutorials]] → managed/guides/index.md:349
+- [[Work Context Workflow]] → managed/workflows/work-context-workflow.md:760
 
 ### Implemented By
 
-- TSDocEdge → /Users/junwoobang/workflow/tsdoc-edge/src/index.ts:147
+- TSDocEdge → src/index.ts:155
 

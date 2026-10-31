@@ -256,7 +256,7 @@ if (violations.length > 0) {
 
 ### Referenced By
 
-- [[Co-Requirement]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/co-requirement.md:115
-- [[Co-Requirement]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/co-requirement.md:120
-- [[Co-Requirement]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/co-requirement.md:148
+- [[Commands Index]] → managed/COMMANDS.md:91
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:164
+- [[Co-Requirement]] → managed/relationships/co-requirement.md:242
 

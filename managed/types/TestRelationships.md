@@ -124,3 +124,16 @@ tsdoc-edge coverage-report --hierarchical
 - [[TestRelationshipsCommand]]: Analyze test relationships
 - [[TestRelationshipsCommand]]: Show test coverage
 - [[CoverageReportCommand]]: Coverage metrics
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Types Index]] → managed/types/index.md:20
+
+### Implemented By
+
+- TestRelationships → src/types/analysis/test-relationships.ts:1
+

@@ -55,8 +55,9 @@ const symbols: MermaidSymbol[] = result.symbols;
 
 ### Referenced By
 
-- [[Mermaid Symbol Extractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/MermaidSymbolExtractor.md:50
-- [[Mermaid Symbol Extractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/MermaidSymbolExtractor.md:87
-- MermaidExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidExtractionResult.md:29
-- MermaidSymbol → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidSymbol.md:11
+- [[Primary Types Index]] → managed/primary-types/index.md:21
+
+### Implemented By
+
+- MermaidSymbol → src/doc-symbol/MermaidSymbolExtractor.ts:1
 

@@ -230,3 +230,12 @@ Alert if any operation:
 - **Problem**: Individual tests showed false (passed: true but stats wrong)
 - **Solution**: Parse [RESULT] tag as success indicator
 - **Impact**: Accurate HTML report generation
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Features Index]] → managed/features/index.md:262
+

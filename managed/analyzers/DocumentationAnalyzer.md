@@ -311,14 +311,13 @@ scores.forEach(score => {
 
 ### Referenced By
 
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:20
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:54
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:118
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:211
-- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:87
-- [[AnalyzeCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/AnalyzeCommand.md:19
-- [[SuggestCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SuggestCommand.md:189
-- AnalysisFeatures → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:144
-- AnalysisFeatures → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:166
-- AnalysisFeatures → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:194
+- [[CodeHealthChecker]] → managed/analyzers/CodeHealthChecker.md:33
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:95
+- [[AnalyzeCommand]] → managed/commands/AnalyzeCommand.md:27
+- [[SuggestCommand]] → managed/commands/SuggestCommand.md:482
+- [[AnalysisFeatures]] → managed/features/analysis-features.md:243
+
+### Implemented By
+
+- DocumentationAnalyzer → src/analyzer/DocumentationAnalyzer.ts:1
 

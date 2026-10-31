@@ -122,5 +122,9 @@ const tempId = tempIdGen.generate(); // "x7k"
 
 ### Referenced By
 
-- SymbolRegistryManager → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/SymbolRegistryManager.md:221
+- [[Utilities Index]] → managed/utilities/index.md:21
+
+### Implemented By
+
+- IdGenerator → src/utils/IdGenerator.ts:1
 

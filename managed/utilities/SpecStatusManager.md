@@ -98,10 +98,7 @@ completeness: 85%
 
 ## Backlinks
 
-### Referenced By
+### Implemented By
 
-- SpecTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/SpecTypes.md:190
-- [[SpecCompletenessValidator]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SpecCompletenessValidator.md:62
-- SpecVersionManager → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SpecVersionManager.md:54
-- [[UnusedDocumentDetector]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/UnusedDocumentDetector.md:79
+- SpecStatusManager → src/spec/SpecStatusManager.ts:42
 

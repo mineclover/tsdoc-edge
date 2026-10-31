@@ -315,37 +315,20 @@ tsdoc-edge parse src/commands/BuildCommand.ts
 
 ### Referenced By
 
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:25
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:37
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:102
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:194
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:233
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:275
-- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:217
-- BuildCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/BuildCommand.md:51
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:73
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:38
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:123
-- Build Pipeline Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:27
-- Build Pipeline Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:116
-- Build Pipeline Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:243
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:265
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:32
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:213
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:366
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:25
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:260
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:326
-- ExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ExtractionResult.md:76
-- ExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ExtractionResult.md:93
-- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:31
-- [[Inheritance]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/INHERITANCE.md:8
-- [[Interface Implementation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/INTERFACE-IMPL.md:8
-- [[Code Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/code-dependency.md:10
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:23
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:31
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:39
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:180
-- [[Symbol]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/Symbol.md:84
-- FileScanner → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/FileScanner.md:73
+- [[TSDoc Edge Documentation]] → managed/README.md:51
+- [[BuildCommand]] → managed/commands/BuildCommand.md:86
+- [[CoreWorkflow]] → managed/features/core-workflow.md:85
+- [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:72
+- [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:215
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:716
+- [[Guides & Tutorials]] → managed/guides/index.md:46
+- [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:41
+- [[ExtractionResult]] → managed/primary-types/ExtractionResult.md:104
+- [[Quick Start Guide]] → managed/quick-start.md:51
+- [[Symbol]] → managed/types/Symbol.md:92
+- [[FileScanner]] → managed/utilities/FileScanner.md:81
+
+### Implemented By
+
+- ASTSymbolExtractor → src/analyzer/ASTSymbolExtractor.ts:1
 

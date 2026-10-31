@@ -5,6 +5,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { ConfigManager } from '../config/ConfigManager';
 import { BacklinkGenerator } from '../doc-symbol/BacklinkGenerator';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import { DocumentSymbolRegistry } from '../doc-symbol/DocumentSymbolRegistry';
@@ -74,7 +75,7 @@ export class UpdateBacklinksCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge update-backlinks [docs-directory]\n\n  Default: docs';
+    return 'tsdoc-edge update-backlinks [docs-directory]\n\n  Default: managed (if exists), otherwise docs';
   }
 
   /**
@@ -95,8 +96,7 @@ export class UpdateBacklinksCommand extends BaseCommand {
         this.printDeprecationWarning('tsdoc-edge docs backlinks');
       }
 
-      const target = args[0];
-      const docsDir = target || 'docs';
+      const docsDir = this.resolveDocsDir(args);
       const docsPath = path.resolve(process.cwd(), docsDir);
 
       if (!fs.existsSync(docsPath)) {
@@ -116,6 +116,18 @@ export class UpdateBacklinksCommand extends BaseCommand {
           const parsed = docParser.parse(filePath);
           if (parsed) {
             registry.registerDocument(parsed);
+
+            // Keep source connections deterministic on a clean checkout.
+            // Matches IndexDocsCommand and ValidateDocsCommand so that
+            // ### Implemented By sections are generated for documents with source annotations.
+            if (parsed.primary && parsed.sourceFilePath) {
+              registry.registerCodeConnection({
+                codeSymbol: parsed.primary.name,
+                filePath: parsed.sourceFilePath,
+                line: 1,
+                docSymbol: parsed.primary.name,
+              });
+            }
           }
         } catch (error) {
           this.printError(
@@ -163,6 +175,43 @@ export class UpdateBacklinksCommand extends BaseCommand {
 
       return this.success();
     });
+  }
+
+  /**
+   * Resolve documentation directory.
+   * Priority:
+   * 1. Explicit target passed in CLI argument (first non-flag argument)
+   * 2. Configured managedDirs if an existing directory is found on disk
+   * 3. 'managed' if process.cwd()/managed exists
+   * 4. Fallback to 'docs'
+   */
+  private resolveDocsDir(args: string[]): string {
+    const target = args.find((arg) => !arg.startsWith('--'));
+    if (target) {
+      return target;
+    }
+
+    try {
+      const config = ConfigManager.getInstance().get();
+      const managedDirs = config.documentManagement?.managedDirs;
+      if (Array.isArray(managedDirs)) {
+        for (const dir of managedDirs) {
+          const resolved = path.resolve(process.cwd(), dir);
+          if (fs.existsSync(resolved)) {
+            return dir;
+          }
+        }
+      }
+    } catch {
+      // Ignore config loading errors and fall back to filesystem checks
+    }
+
+    const defaultManaged = path.resolve(process.cwd(), 'managed');
+    if (fs.existsSync(defaultManaged)) {
+      return 'managed';
+    }
+
+    return 'docs';
   }
 
   /**

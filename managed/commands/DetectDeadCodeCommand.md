@@ -85,7 +85,11 @@ Warns about:
 
 ### Referenced By
 
-- [[CoverageReportCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/CoverageReportCommand.md:113
-- [[OrphansCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/OrphansCommand.md:128
-- DataFlowTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/DataFlowTypes.md:127
+- [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:270
+- [[OrphansCommand]] → managed/commands/OrphansCommand.md:181
+- [[DataFlowTypes]] → managed/types/DataFlowTypes.md:174
+
+### Implemented By
+
+- DetectDeadCodeCommand → src/commands/DetectDeadCodeCommand.ts:47
 

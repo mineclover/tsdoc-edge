@@ -116,73 +116,74 @@ Examples:
 
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
+      try {
+        // Use Drizzle ORM to query relationships
+        console.log();
+        this.printInfo('Querying relationships...');
 
-      // Use Drizzle ORM to query relationships
-      console.log();
-      this.printInfo('Querying relationships...');
+        let allRels = dbManager.getAllUnifiedRelationshipRows();
 
-      let allRels = dbManager.getAllUnifiedRelationshipRows();
+        // Apply filters
+        if (options.category) {
+          allRels = allRels.filter((r) => r.category === options.category);
+        }
+        if (options.type) {
+          allRels = allRels.filter((r) => r.type === options.type);
+        }
+        if (options.minConfidence !== undefined) {
+          const minConf = options.minConfidence;
+          allRels = allRels.filter((r) => r.confidence >= minConf);
+        }
 
-      // Apply filters
-      if (options.category) {
-        allRels = allRels.filter((r) => r.category === options.category);
+        const relationships = allRels;
+
+        this.printInfo(`Found ${relationships.length} relationships`);
+        console.log();
+
+        // Get symbols for context
+        const symbols = dbManager.getAllSymbolRows();
+        const symbolMap = new Map(symbols.map((s) => [s.id, s]));
+
+        // Export based on format
+        let content: string;
+        switch (options.format) {
+          case 'json':
+            content = this.exportJSON(relationships, symbolMap);
+            break;
+          case 'graphml':
+            content = this.exportGraphML(relationships, symbolMap);
+            break;
+          case 'dot':
+            content = this.exportDOT(relationships, symbolMap);
+            break;
+          case 'csv':
+            content = this.exportCSV(relationships);
+            break;
+          case 'cypher':
+            content = this.exportCypher(relationships, symbolMap);
+            break;
+          case 'gephi':
+            content = this.exportGephi(relationships, symbolMap, options.layout);
+            break;
+        }
+
+        // Output
+        if (options.output) {
+          fs.writeFileSync(options.output, content, 'utf-8');
+          this.printSuccess(`Exported to: ${options.output}`);
+          this.printInfo(`Size: ${(content.length / 1024).toFixed(2)} KB`);
+        } else {
+          console.log(content);
+        }
+
+        console.log();
+
+        return this.success(
+          `Exported ${relationships.length} relationships in ${options.format} format`
+        );
+      } finally {
+        dbManager.close();
       }
-      if (options.type) {
-        allRels = allRels.filter((r) => r.type === options.type);
-      }
-      if (options.minConfidence !== undefined) {
-        const minConf = options.minConfidence;
-        allRels = allRels.filter((r) => r.confidence >= minConf);
-      }
-
-      const relationships = allRels;
-
-      this.printInfo(`Found ${relationships.length} relationships`);
-      console.log();
-
-      // Get symbols for context
-      const symbols = dbManager.getAllSymbolRows();
-      const symbolMap = new Map(symbols.map((s) => [s.id, s]));
-
-      // Export based on format
-      let content: string;
-      switch (options.format) {
-        case 'json':
-          content = this.exportJSON(relationships, symbolMap);
-          break;
-        case 'graphml':
-          content = this.exportGraphML(relationships, symbolMap);
-          break;
-        case 'dot':
-          content = this.exportDOT(relationships, symbolMap);
-          break;
-        case 'csv':
-          content = this.exportCSV(relationships);
-          break;
-        case 'cypher':
-          content = this.exportCypher(relationships, symbolMap);
-          break;
-        case 'gephi':
-          content = this.exportGephi(relationships, symbolMap, options.layout);
-          break;
-      }
-
-      // Output
-      if (options.output) {
-        fs.writeFileSync(options.output, content, 'utf-8');
-        this.printSuccess(`Exported to: ${options.output}`);
-        this.printInfo(`Size: ${(content.length / 1024).toFixed(2)} KB`);
-      } else {
-        console.log(content);
-      }
-
-      console.log();
-
-      dbManager.close();
-
-      return this.success(
-        `Exported ${relationships.length} relationships in ${options.format} format`
-      );
     });
   }
 

@@ -148,6 +148,55 @@ describe('RelationshipQueryCommand', () => {
         expect(close).toHaveBeenCalledTimes(1);
       }
     );
+
+    it('correctly extracts symbol ID when valued options precede it (e.g. --type calls <symbol>)', async () => {
+      const dbManager = new DatabaseManager(path.join(tempDir, '.tsdoc', 'symbols.db'));
+      dbManager.close();
+
+      const close = jest.fn();
+      const canonicalContext = {
+        resolveCanonicalId: (legacyId: string) =>
+          legacyId === 'legacy-id' ? 'src/a.ts#A:class' : null,
+        analysis: {
+          dependencies: () => [],
+          dependents: () => [],
+        },
+        close,
+      } as unknown as CanonicalAliasContext;
+      jest.spyOn(CanonicalAliasContext, 'tryOpen').mockReturnValue(canonicalContext);
+      jest.spyOn(console, 'log').mockImplementation();
+
+      const result = await command.execute(['--type', 'calls', 'legacy-id']);
+      expect(result.exitCode).toBe(0);
+      expect(close).toHaveBeenCalledTimes(1);
+    });
+
+    it('supports --type=calls syntax before symbol ID', async () => {
+      const dbManager = new DatabaseManager(path.join(tempDir, '.tsdoc', 'symbols.db'));
+      dbManager.close();
+
+      const close = jest.fn();
+      const canonicalContext = {
+        resolveCanonicalId: (legacyId: string) =>
+          legacyId === 'legacy-id' ? 'src/a.ts#A:class' : null,
+        analysis: {
+          dependencies: () => [],
+          dependents: () => [],
+        },
+        close,
+      } as unknown as CanonicalAliasContext;
+      jest.spyOn(CanonicalAliasContext, 'tryOpen').mockReturnValue(canonicalContext);
+      jest.spyOn(console, 'log').mockImplementation();
+
+      const result = await command.execute(['--type=calls', 'legacy-id']);
+      expect(result.exitCode).toBe(0);
+      expect(close).toHaveBeenCalledTimes(1);
+    });
+
+    it('requires symbol ID when options passed without symbol', async () => {
+      const result = await command.execute(['--type', 'calls']);
+      expect(result.exitCode).toBe(0); // displayHelp exits with 0
+    });
   });
 });
 

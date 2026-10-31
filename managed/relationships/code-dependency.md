@@ -63,38 +63,21 @@ tsdoc-edge orphans
 
 ### Referenced By
 
-- Commands Index → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:17
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:24
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:108
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:312
-- ASTSymbolExtractor → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:102
-- ASTSymbolExtractor → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:180
-- DependencyChainAnalyzer → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DependencyChainAnalyzer.md:22
-- DependencyResolver → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DependencyResolver.md:22
-- DomainStructureAnalyzer → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DomainStructureAnalyzer.md:22
-- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:251
-- BuildCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/BuildCommand.md:35
-- VisualizeDepsCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/VisualizeDepsCommand.md:21
-- Build Pipeline Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:251
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:33
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:57
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:64
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:199
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:359
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:27
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:295
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:319
-- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:32
-- [[Call Relationships]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/CALLS.md:40
-- [[Composition Relationship]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/COMPOSITION.md:112
-- [[Composition Relationship]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/COMPOSITION.md:118
-- [[Co-Requirement]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/co-requirement.md:117
-- [[Co-Requirement]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/co-requirement.md:150
-- [[Collaboration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/collaboration.md:137
-- [[Collaboration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/collaboration.md:165
-- [[Feature Grouping]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/feature-grouping.md:142
-- [[Integration Verification]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/integration-verification.md:157
-- [[Integration Verification]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/integration-verification.md:187
-- [[IO Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/io-dependency.md:50
-- [[Temporal Order]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/temporal-order.md:189
+- [[TSDoc Edge Documentation]] → managed/README.md:50
+- [[ASTSymbolExtractor]] → managed/analyzers/ASTSymbolExtractor.md:174
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:295
+- [[BuildCommand]] → managed/commands/BuildCommand.md:45
+- [[VisualizeDepsCommand]] → managed/commands/VisualizeDepsCommand.md:29
+- [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:543
+- [[Guides & Tutorials]] → managed/guides/index.md:47
+- [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:43
+- [[Quick Start Guide]] → managed/quick-start.md:52
+- [[Call Relationships]] → managed/relationships/calls.md:57
+- [[Co-Requirement]] → managed/relationships/co-requirement.md:244
+- [[Collaboration]] → managed/relationships/collaboration.md:312
+- [[Composition Relationship]] → managed/relationships/composition.md:215
+- [[Feature Grouping]] → managed/relationships/feature-grouping.md:347
+- [[Integration Verification]] → managed/relationships/integration-verification.md:371
+- [[IO Dependency]] → managed/relationships/io-dependency.md:67
+- [[Temporal Order]] → managed/relationships/temporal-order.md:327
 

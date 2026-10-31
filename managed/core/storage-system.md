@@ -347,10 +347,14 @@ registry.save();
 
 ### Referenced By
 
-- [[Analyzer System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/analyzer-system.md:34
-- [[Analyzer System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/analyzer-system.md:234
-- [[Parser System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/parser-system.md:181
-- [[Spec Management System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/spec-management-system.md:188
-- [[Symbol Graph System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/symbol-graph.md:31
-- [[Symbol Graph System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/symbol-graph.md:119
+- [[Analyzer System]] → managed/core/analyzer-system.md:42
+- [[Document Symbol System]] → managed/core/doc-symbol-system.md:393
+- [[Parser System]] → managed/core/parser-system.md:357
+- [[Spec Management System]] → managed/core/spec-management-system.md:393
+- [[Symbol Graph System]] → managed/core/symbol-graph.md:39
+- [[Core Components]] → managed/core-components/index.md:35
+
+### Implemented By
+
+- Storage System → src/storage/DatabaseManager.ts:1
 

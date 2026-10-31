@@ -22,13 +22,9 @@ Track interface implementation (`class A implements I`).
 
 ### Referenced By
 
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:42
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:320
-- ASTSymbolExtractor → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:104
-- ASTSymbolExtractor → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:182
-- InterfaceAnalyzer → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:19
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:64
-- [[Composition Relationship]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/COMPOSITION.md:110
-- [[Substitution]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/substitution.md:136
-- [[Substitution]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/substitution.md:166
+- [[TSDoc Edge Documentation]] → managed/README.md:68
+- [[ASTSymbolExtractor]] → managed/analyzers/ASTSymbolExtractor.md:176
+- [[Guides & Tutorials]] → managed/guides/index.md:89
+- [[Composition Relationship]] → managed/relationships/composition.md:213
+- [[Substitution]] → managed/relationships/substitution.md:273
 

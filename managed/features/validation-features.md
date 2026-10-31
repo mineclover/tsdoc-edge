@@ -431,29 +431,22 @@ cycle_rate = symbols_in_cycles / total_symbols
 
 ### Referenced By
 
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:93
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:237
-- [[DocumentationAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:125
-- StrictModeValidator → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/StrictModeValidator.md:238
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:261
-- [[ValidateCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateCommand.md:21
-- [[ValidateDocsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateDocsCommand.md:21
-- [[AnalysisFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/analysis-features.md:258
-- [[AutoIndexing]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/auto-indexing.md:164
-- [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:105
-- [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:295
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:141
-- DocumentSymbolSystem → /Users/junwoobang/workflow/tsdoc-edge/managed/features/document-symbol-system.md:104
-- [[Features Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/index.md:201
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:247
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:263
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:352
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:332
-- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:135
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:193
-- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/DocumentationFixer.md:22
+- [[TSDoc Edge Documentation]] → managed/README.md:133
+- [[SpecCommands]] → managed/commands/SpecCommands.md:97
+- [[ValidateCommand]] → managed/commands/ValidateCommand.md:29
+- [[ValidateDocsCommand]] → managed/commands/ValidateDocsCommand.md:29
+- [[AnalysisFeatures]] → managed/features/analysis-features.md:434
+- [[AutoIndexing]] → managed/features/auto-indexing.md:295
+- [[CoreFeatures]] → managed/features/core-features-catalog.md:131
+- [[CoreWorkflow]] → managed/features/core-workflow.md:153
+- [[Features Index]] → managed/features/index.md:284
+- [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:377
+- [[Guides & Tutorials]] → managed/guides/index.md:297
+- [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:496
+- [[Quick Start Guide]] → managed/quick-start.md:252
 
 ### Implemented By
 
-- ConnectivityValidator (Connectivity) → /Users/junwoobang/workflow/tsdoc-edge/src/validator/ConnectivityValidator.ts:43
-- StrictModeValidator (StrictMode) → /Users/junwoobang/workflow/tsdoc-edge/src/validator/StrictModeValidator.ts:32
+- ConnectivityValidator (Connectivity) → src/validator/ConnectivityValidator.ts:43
+- StrictModeValidator (StrictMode) → src/validator/StrictModeValidator.ts:33
+

@@ -27,3 +27,16 @@ Display help information for CLI commands.
 ## Related
 
 - [[CommandRegistry]]: Command lookup
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Commands Index]] → managed/COMMANDS.md:54
+
+### Implemented By
+
+- HelpCommand → src/commands/HelpCommand.ts:1
+

@@ -46,8 +46,9 @@ Part of MermaidExtractionResult as the `relationships` array field.
 
 ### Referenced By
 
-- [[Mermaid Symbol Extractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/MermaidSymbolExtractor.md:51
-- MermaidExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidExtractionResult.md:30
-- MermaidRelationship → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidRelationship.md:11
-- MermaidSymbol → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/MermaidSymbol.md:33
+- [[Primary Types Index]] → managed/primary-types/index.md:21
+
+### Implemented By
+
+- MermaidRelationship → src/doc-symbol/MermaidSymbolExtractor.ts:1
 

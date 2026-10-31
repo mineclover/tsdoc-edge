@@ -281,3 +281,14 @@ tsdoc-edge analyze-parallel --task-list tasks.json
 - **[[Workflows Index]]** (`/managed/workflows/index.md`) - Practical workflows
 - **[[Guides & Tutorials]]** (`/managed/guides/index.md`) - Learning resources
 - **[[Relationship Types]]** (`/managed/relationships/index.md`) - Relationship system
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → managed/README.md:186
+- [[Core Systems]] → managed/core/index.md:45
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:31
+

@@ -381,7 +381,5 @@ File coverage: 92.3% ✓
 
 ### Referenced By
 
-- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:154
-- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:170
-- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:179
+- [[Workflows Index]] → managed/workflows/index.md:239
 

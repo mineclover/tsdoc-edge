@@ -131,16 +131,7 @@ Source Code → [TSDocParser] → ExtractionResult
 
 ## Backlinks
 
-### Referenced By
-
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:273
-- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:82
-- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:111
-- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:193
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:380
-- ExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ExtractionResult.md:23
-
 ### Implemented By
 
-- ExtractionResult → /Users/junwoobang/workflow/tsdoc-edge/src/analyzer/ASTSymbolExtractor.ts:36
+- ExtractionResult → src/analyzer/ASTSymbolExtractor.ts:36
 

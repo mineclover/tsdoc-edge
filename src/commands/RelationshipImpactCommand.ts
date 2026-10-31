@@ -84,13 +84,20 @@ Examples:
         return this.displayHelp();
       }
 
-      if (args.length === 0) {
+      const positionalArgs = this.getPositionalArgs(args, [
+        '--depth',
+        '--direction',
+        '--category',
+        '--min-confidence',
+      ]);
+      const symbolId = positionalArgs[0];
+
+      if (!symbolId) {
         this.printError('Symbol ID required');
         console.log();
         return this.displayHelp();
       }
 
-      const symbolId = args[0];
       const options = {
         depth: Number.parseInt(this.getOption(args, '--depth') || '3', 10),
         direction: this.getOption(args, '--direction') || 'downstream',
@@ -100,223 +107,225 @@ Examples:
 
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
-      const canonicalContext = CanonicalAliasContext.tryOpen(process.cwd());
+      let canonicalContext: CanonicalAliasContext | null = null;
 
-      // Resolve through both the legacy DB and the canonical graph. Canonical
-      // ids remain valid query inputs during the migration away from TS5 data.
-      const resolved = this.resolveSymbol(dbManager, symbolId);
-      const canonicalId =
-        canonicalContext?.resolveCanonicalId(resolved?.id ?? symbolId) ??
-        canonicalContext?.resolveCanonicalId(symbolId) ??
-        null;
+      try {
+        canonicalContext = CanonicalAliasContext.tryOpen(process.cwd());
 
-      if (!resolved && !canonicalId) {
-        this.printError(`Symbol not found: ${symbolId}`);
-        dbManager.close();
-        canonicalContext?.close();
-        return { success: false, message: 'Symbol not found', exitCode: 1 };
-      }
+        // Resolve through both the legacy DB and the canonical graph. Canonical
+        // ids remain valid query inputs during the migration away from TS5 data.
+        const resolved = this.resolveSymbol(dbManager, symbolId);
+        const canonicalId =
+          canonicalContext?.resolveCanonicalId(resolved?.id ?? symbolId) ??
+          canonicalContext?.resolveCanonicalId(symbolId) ??
+          null;
 
-      const resolvedId = resolved?.id;
-      const canonicalNode = canonicalId
-        ? canonicalContext?.analysis.index.getNode(canonicalId)
-        : undefined;
-      const symbolName =
-        resolved?.symbol.name ?? canonicalNode?.qualifiedName ?? canonicalNode?.name ?? symbolId;
-      const symbolType = resolved?.symbol.type ?? canonicalNode?.kind ?? 'canonical';
-      this.printHeader(`Impact Analysis: ${symbolName}`);
+        if (!resolved && !canonicalId) {
+          this.printError(`Symbol not found: ${symbolId}`);
+          return { success: false, message: 'Symbol not found', exitCode: 1 };
+        }
 
-      console.log();
-      this.printInfo(`Analyzing impact for: ${symbolName} (${symbolType})`);
-      this.printInfo(`Direction: ${options.direction}, Max depth: ${options.depth}`);
-      console.log();
+        const resolvedId = resolved?.id;
+        const canonicalNode = canonicalId
+          ? canonicalContext?.analysis.index.getNode(canonicalId)
+          : undefined;
+        const symbolName =
+          resolved?.symbol.name ?? canonicalNode?.qualifiedName ?? canonicalNode?.name ?? symbolId;
+        const symbolType = resolved?.symbol.type ?? canonicalNode?.kind ?? 'canonical';
+        this.printHeader(`Impact Analysis: ${symbolName}`);
 
-      // Perform impact analysis
-      const impactedSymbols = resolvedId
-        ? this.analyzeImpact(
-            dbManager,
-            resolvedId,
-            options.depth,
-            options.direction,
-            options.category,
-            options.minConfidence
-          )
-        : [];
-      const canonicalImpact =
-        canonicalId && canonicalContext
-          ? this.analyzeCanonicalImpact(
-              canonicalContext,
-              canonicalId,
+        console.log();
+        this.printInfo(`Analyzing impact for: ${symbolName} (${symbolType})`);
+        this.printInfo(`Direction: ${options.direction}, Max depth: ${options.depth}`);
+        console.log();
+
+        // Perform impact analysis
+        const impactedSymbols = resolvedId
+          ? this.analyzeImpact(
+              dbManager,
+              resolvedId,
               options.depth,
               options.direction,
               options.category,
               options.minConfidence
             )
           : [];
+        const canonicalImpact =
+          canonicalId && canonicalContext
+            ? this.analyzeCanonicalImpact(
+                canonicalContext,
+                canonicalId,
+                options.depth,
+                options.direction,
+                options.category,
+                options.minConfidence
+              )
+            : [];
 
-      if (impactedSymbols.length === 0 && canonicalImpact.length === 0) {
-        this.printSuccess('No impact found (symbol is isolated)');
-        console.log();
-        dbManager.close();
-        canonicalContext?.close();
-        return this.success('Analysis complete');
-      }
-
-      if (impactedSymbols.length === 0) {
-        this.printCanonicalImpact(canonicalImpact, options.direction);
-        const canonicalDepth = Math.max(...canonicalImpact.map((node) => node.depth));
-        const riskLevel = this.assessRisk(canonicalImpact.length, canonicalDepth);
-        this.printInfo(`Canonical change risk: ${riskLevel}`);
-        console.log();
-        dbManager.close();
-        canonicalContext?.close();
-        return this.success(
-          `Impact analysis complete: ${canonicalImpact.length} canonical symbols affected`
-        );
-      }
-
-      // Display results
-      this.printSection('Impact Analysis Results');
-      this.printInfo(`Found ${impactedSymbols.length} affected symbols`);
-      console.log();
-
-      // Group by depth
-      const byDepth = new Map<number, ImpactNode[]>();
-      for (const node of impactedSymbols) {
-        if (!byDepth.has(node.depth)) {
-          byDepth.set(node.depth, []);
-        }
-        byDepth.get(node.depth)?.push(node);
-      }
-
-      // Display by depth level
-      for (const depth of Array.from(byDepth.keys()).sort((a, b) => a - b)) {
-        const nodes = byDepth.get(depth);
-        if (!nodes) continue;
-        console.log(
-          `  ${this.colors.bold}Depth ${depth}${this.colors.reset} (${nodes.length} symbols)`
-        );
-        console.log();
-
-        // Group by category
-        const byCategory = new Map<string, ImpactNode[]>();
-        for (const node of nodes) {
-          if (!byCategory.has(node.category)) {
-            byCategory.set(node.category, []);
-          }
-          byCategory.get(node.category)?.push(node);
-        }
-
-        for (const [category, categoryNodes] of byCategory.entries()) {
-          console.log(
-            `    ${this.colors.cyan}${category}${this.colors.reset} (${categoryNodes.length})`
-          );
-
-          const samplesToShow = Math.min(5, categoryNodes.length);
-          for (let i = 0; i < samplesToShow; i++) {
-            const node = categoryNodes[i];
-            const arrow = options.direction === 'upstream' ? '←' : '→';
-            console.log(
-              `      ${arrow} ${node.symbolId} ${this.colors.dim}(via ${node.relationshipType})${this.colors.reset}`
-            );
-            console.log(
-              `        ${this.colors.dim}Path: ${node.path.join(' → ')}${this.colors.reset}`
-            );
-          }
-
-          if (categoryNodes.length > samplesToShow) {
-            console.log(
-              `      ${this.colors.dim}... and ${categoryNodes.length - samplesToShow} more${this.colors.reset}`
-            );
-          }
+        if (impactedSymbols.length === 0 && canonicalImpact.length === 0) {
+          this.printSuccess('No impact found (symbol is isolated)');
           console.log();
+          return this.success('Analysis complete');
+        }
+
+        if (impactedSymbols.length === 0) {
+          this.printCanonicalImpact(canonicalImpact, options.direction);
+          const canonicalDepth = Math.max(...canonicalImpact.map((node) => node.depth));
+          const riskLevel = this.assessRisk(canonicalImpact.length, canonicalDepth);
+          this.printInfo(`Canonical change risk: ${riskLevel}`);
+          console.log();
+          return this.success(
+            `Impact analysis complete: ${canonicalImpact.length} canonical symbols affected`
+          );
+        }
+
+        // Display results
+        this.printSection('Impact Analysis Results');
+        this.printInfo(`Found ${impactedSymbols.length} affected symbols`);
+        console.log();
+
+        // Group by depth
+        const byDepth = new Map<number, ImpactNode[]>();
+        for (const node of impactedSymbols) {
+          if (!byDepth.has(node.depth)) {
+            byDepth.set(node.depth, []);
+          }
+          byDepth.get(node.depth)?.push(node);
+        }
+
+        // Display by depth level
+        for (const depth of Array.from(byDepth.keys()).sort((a, b) => a - b)) {
+          const nodes = byDepth.get(depth);
+          if (!nodes) continue;
+          console.log(
+            `  ${this.colors.bold}Depth ${depth}${this.colors.reset} (${nodes.length} symbols)`
+          );
+          console.log();
+
+          // Group by category
+          const byCategory = new Map<string, ImpactNode[]>();
+          for (const node of nodes) {
+            if (!byCategory.has(node.category)) {
+              byCategory.set(node.category, []);
+            }
+            byCategory.get(node.category)?.push(node);
+          }
+
+          for (const [category, categoryNodes] of byCategory.entries()) {
+            console.log(
+              `    ${this.colors.cyan}${category}${this.colors.reset} (${categoryNodes.length})`
+            );
+
+            const samplesToShow = Math.min(5, categoryNodes.length);
+            for (let i = 0; i < samplesToShow; i++) {
+              const node = categoryNodes[i];
+              const arrow = options.direction === 'upstream' ? '←' : '→';
+              console.log(
+                `      ${arrow} ${node.symbolId} ${this.colors.dim}(via ${node.relationshipType})${this.colors.reset}`
+              );
+              console.log(
+                `        ${this.colors.dim}Path: ${node.path.join(' → ')}${this.colors.reset}`
+              );
+            }
+
+            if (categoryNodes.length > samplesToShow) {
+              console.log(
+                `      ${this.colors.dim}... and ${categoryNodes.length - samplesToShow} more${this.colors.reset}`
+              );
+            }
+            console.log();
+          }
+        }
+
+        // Statistics
+        console.log();
+        this.printSection('Impact Statistics');
+
+        const byCategory = new Map<string, number>();
+        const byType = new Map<string, number>();
+
+        for (const node of impactedSymbols) {
+          byCategory.set(node.category, (byCategory.get(node.category) || 0) + 1);
+          byType.set(node.relationshipType, (byType.get(node.relationshipType) || 0) + 1);
+        }
+
+        console.log(
+          `  Total affected symbols: ${this.colors.cyan}${impactedSymbols.length}${this.colors.reset}`
+        );
+        console.log(
+          `  Maximum depth reached: ${this.colors.cyan}${Math.max(...Array.from(byDepth.keys()))}${this.colors.reset}`
+        );
+        console.log();
+
+        console.log(`  ${this.colors.dim}By category:${this.colors.reset}`);
+        for (const [category, count] of Array.from(byCategory.entries()).sort(
+          (a, b) => b[1] - a[1]
+        )) {
+          const percentage = ((count / impactedSymbols.length) * 100).toFixed(1);
+          console.log(
+            `    ${category}: ${this.colors.cyan}${count}${this.colors.reset} (${percentage}%)`
+          );
+        }
+        console.log();
+
+        console.log(`  ${this.colors.dim}Top relationship types:${this.colors.reset}`);
+        const topTypes = Array.from(byType.entries())
+          .sort((a, b) => b[1] - a[1])
+          .slice(0, 5);
+
+        for (const [type, count] of topTypes) {
+          console.log(`    ${type}: ${this.colors.cyan}${count}${this.colors.reset}`);
+        }
+        console.log();
+
+        if (canonicalImpact.length > 0)
+          this.printCanonicalImpact(canonicalImpact, options.direction);
+
+        // Risk assessment
+        this.printSection('Change Risk Assessment');
+
+        const riskLevel = this.assessRisk(
+          impactedSymbols.length,
+          Math.max(...Array.from(byDepth.keys()))
+        );
+        const riskColor =
+          riskLevel === 'High'
+            ? this.colors.red
+            : riskLevel === 'Medium'
+              ? this.colors.yellow
+              : this.colors.green;
+
+        console.log(`  Impact Level: ${riskColor}${riskLevel}${this.colors.reset}`);
+        console.log();
+
+        if (riskLevel === 'High') {
+          console.log(
+            `  ${this.colors.yellow}⚠${this.colors.reset}  ${this.colors.bold}High-risk change${this.colors.reset}`
+          );
+          console.log(`     This symbol has wide-reaching impact.`);
+          console.log(`     Consider: comprehensive testing, gradual rollout, feature flags`);
+        } else if (riskLevel === 'Medium') {
+          console.log(
+            `  ${this.colors.yellow}ℹ${this.colors.reset}  ${this.colors.bold}Medium-risk change${this.colors.reset}`
+          );
+          console.log(`     Moderate impact. Ensure affected areas are tested.`);
+        } else {
+          console.log(
+            `  ${this.colors.green}✓${this.colors.reset}  ${this.colors.bold}Low-risk change${this.colors.reset}`
+          );
+          console.log(`     Limited impact. Standard testing should suffice.`);
+        }
+
+        console.log();
+
+        return this.success(`Impact analysis complete: ${impactedSymbols.length} symbols affected`);
+      } finally {
+        try {
+          canonicalContext?.close();
+        } finally {
+          dbManager.close();
         }
       }
-
-      // Statistics
-      console.log();
-      this.printSection('Impact Statistics');
-
-      const byCategory = new Map<string, number>();
-      const byType = new Map<string, number>();
-
-      for (const node of impactedSymbols) {
-        byCategory.set(node.category, (byCategory.get(node.category) || 0) + 1);
-        byType.set(node.relationshipType, (byType.get(node.relationshipType) || 0) + 1);
-      }
-
-      console.log(
-        `  Total affected symbols: ${this.colors.cyan}${impactedSymbols.length}${this.colors.reset}`
-      );
-      console.log(
-        `  Maximum depth reached: ${this.colors.cyan}${Math.max(...Array.from(byDepth.keys()))}${this.colors.reset}`
-      );
-      console.log();
-
-      console.log(`  ${this.colors.dim}By category:${this.colors.reset}`);
-      for (const [category, count] of Array.from(byCategory.entries()).sort(
-        (a, b) => b[1] - a[1]
-      )) {
-        const percentage = ((count / impactedSymbols.length) * 100).toFixed(1);
-        console.log(
-          `    ${category}: ${this.colors.cyan}${count}${this.colors.reset} (${percentage}%)`
-        );
-      }
-      console.log();
-
-      console.log(`  ${this.colors.dim}Top relationship types:${this.colors.reset}`);
-      const topTypes = Array.from(byType.entries())
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5);
-
-      for (const [type, count] of topTypes) {
-        console.log(`    ${type}: ${this.colors.cyan}${count}${this.colors.reset}`);
-      }
-      console.log();
-
-      if (canonicalImpact.length > 0) this.printCanonicalImpact(canonicalImpact, options.direction);
-
-      // Risk assessment
-      this.printSection('Change Risk Assessment');
-
-      const riskLevel = this.assessRisk(
-        impactedSymbols.length,
-        Math.max(...Array.from(byDepth.keys()))
-      );
-      const riskColor =
-        riskLevel === 'High'
-          ? this.colors.red
-          : riskLevel === 'Medium'
-            ? this.colors.yellow
-            : this.colors.green;
-
-      console.log(`  Impact Level: ${riskColor}${riskLevel}${this.colors.reset}`);
-      console.log();
-
-      if (riskLevel === 'High') {
-        console.log(
-          `  ${this.colors.yellow}⚠${this.colors.reset}  ${this.colors.bold}High-risk change${this.colors.reset}`
-        );
-        console.log(`     This symbol has wide-reaching impact.`);
-        console.log(`     Consider: comprehensive testing, gradual rollout, feature flags`);
-      } else if (riskLevel === 'Medium') {
-        console.log(
-          `  ${this.colors.yellow}ℹ${this.colors.reset}  ${this.colors.bold}Medium-risk change${this.colors.reset}`
-        );
-        console.log(`     Moderate impact. Ensure affected areas are tested.`);
-      } else {
-        console.log(
-          `  ${this.colors.green}✓${this.colors.reset}  ${this.colors.bold}Low-risk change${this.colors.reset}`
-        );
-        console.log(`     Limited impact. Standard testing should suffice.`);
-      }
-
-      console.log();
-
-      dbManager.close();
-      canonicalContext?.close();
-
-      return this.success(`Impact analysis complete: ${impactedSymbols.length} symbols affected`);
     });
   }
 

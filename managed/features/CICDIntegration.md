@@ -299,4 +299,5 @@ Cache TSDoc database between runs:
 
 ### Referenced By
 
-- [[Dead Code Detection]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DeadCodeDetection.md:118
+- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:177
+

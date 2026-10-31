@@ -142,6 +142,9 @@ loader.reload();
 
 ### Referenced By
 
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:134
-- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:399
+- [[Utilities Index]] → managed/utilities/index.md:21
+
+### Implemented By
+
+- ConfigLoader → src/utils/ConfigLoader.ts:1
 

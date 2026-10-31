@@ -193,3 +193,18 @@ legacy id에서 canonical id로 이동한다. alias와 diagnostics 내용도 rev
 - [[LSP Integration]]
 - [[Symbol Graph System]]
 - [[DatabaseManager]]
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1456
+- [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:274
+- [[TS7 Test Compilation Lane]] → managed/workflows/ts7-test-compilation-lane.md:412
+
+### Implemented By
+
+- ProjectIndexer → src/indexer/ProjectIndexer.ts:1
+

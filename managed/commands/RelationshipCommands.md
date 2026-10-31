@@ -168,3 +168,15 @@ tsdoc-edge relationship-help
 - [[Relationship Analysis Guide]] - How to use relationship analysis
 - [[SymbolGraphFeatures]] - Symbol graph system
 
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:33
+
+### Implemented By
+
+- RelationshipCommands → src/commands/RelationshipQueryCommand.ts:1
+

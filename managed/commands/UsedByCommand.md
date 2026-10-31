@@ -196,15 +196,13 @@ tsdoc-edge used-by symbol-extractor
 
 ### Referenced By
 
-- [[DepsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/DepsCommand.md:104
-- [[WhoUsesCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/WhoUsesCommand.md:114
-- [[Dead Code Detection]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DeadCodeDetection.md:79
-- [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:86
-- [[Dependency Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DependencyAnalysis.md:138
-- [[Impact Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/ImpactAnalysis.md:97
-- [[Impact Analysis]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/ImpactAnalysis.md:151
+- [[DepsCommand]] → managed/commands/DepsCommand.md:146
+- [[WhoUsesCommand]] → managed/commands/WhoUsesCommand.md:169
+- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:108
+- [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:156
+- [[Impact Analysis]] → managed/features/ImpactAnalysis.md:198
 
 ### Implemented By
 
-- UsedByCommand → /Users/junwoobang/workflow/tsdoc-edge/src/commands/UsedByCommand.ts:39
+- UsedByCommand → src/commands/Phase5Commands.ts:1
 

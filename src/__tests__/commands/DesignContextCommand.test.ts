@@ -21,6 +21,7 @@ jest.mock('../../config/ConfigManager', () => ({
         },
         documentManagement: { ignoreCodeBlocks: true },
       })),
+      resolvePath: jest.fn((p: string) => p),
     })),
   },
 }));
@@ -83,6 +84,43 @@ describe('DesignContextCommand', () => {
       command = new DesignContextCommand();
       const result = await command.execute(['/nonexistent/file.ts']);
 
+      expect(result.exitCode).not.toBe(0);
+    });
+
+    it('supports --llm flag placed before file path', async () => {
+      const testFile = path.join(tempDir, 'test.ts');
+      fs.writeFileSync(testFile, 'export class A {}');
+
+      command = new DesignContextCommand();
+      jest.spyOn(command as any, 'checkDatabaseExists').mockReturnValue(null);
+      const dbPath = path.join(tempDir, 'symbols.db');
+      jest.spyOn(command as any, 'getDatabasePath').mockReturnValue(dbPath);
+      // initialize empty db
+      const { DatabaseManager } = require('../../storage/DatabaseManager');
+      const db = new DatabaseManager(dbPath);
+      db.close();
+
+      jest.spyOn(command as any, 'gatherContext').mockResolvedValue({
+        filePath: 'test.ts',
+        symbols: [],
+        relatedDocs: [],
+        dependencies: [],
+        typeFlows: [],
+        tests: [],
+        usedBy: [],
+        contracts: [],
+        decisions: [],
+        errorPatterns: [],
+        relationships: [],
+      });
+
+      const result = await command.execute(['--llm', testFile]);
+      expect(result.exitCode).toBe(0);
+    });
+
+    it('returns failure when --llm provided without file path', async () => {
+      command = new DesignContextCommand();
+      const result = await command.execute(['--llm']);
       expect(result.exitCode).not.toBe(0);
     });
   });

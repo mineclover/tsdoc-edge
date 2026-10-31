@@ -635,12 +635,10 @@ tsdoc-edge parse-mermaid <path> --generate-docs
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:121
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:318
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:92
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:143
-- [[Example - Mermaid Workflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:194
-- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:152
-- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:165
-- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:182
+- [[TSDoc Edge Documentation]] → managed/README.md:161
+- [[Guides & Tutorials]] → managed/guides/index.md:371
+- [[Quick Start Guide]] → managed/quick-start.md:180
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:217
+- [[Example - Mermaid Workflow]] → managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:368
+- [[Workflows Index]] → managed/workflows/index.md:237
 

@@ -46,9 +46,12 @@ Part of ParsedDocSymbols as the `codeReferences` array field.
 
 ### Referenced By
 
-- [[Document Symbol Parser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/DocumentSymbolParser.md:63
-- [[CodeConnection]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/CodeConnection.md:29
-- [[CodeReference]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/CodeReference.md:11
-- ParsedDocSymbols → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ParsedDocSymbols.md:59
-- DocumentSymbol → /Users/junwoobang/workflow/tsdoc-edge/managed/types/DocumentSymbol.md:59
+- [[Document Symbol Parser]] → managed/parser/DocumentSymbolParser.md:81
+- [[CodeConnection]] → managed/primary-types/CodeConnection.md:40
+- [[ParsedDocSymbols]] → managed/primary-types/ParsedDocSymbols.md:107
+- [[DocumentSymbol]] → managed/types/DocumentSymbol.md:69
+
+### Implemented By
+
+- CodeReference → src/types/feature/doc-symbol.ts:1
 

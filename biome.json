@@ -81,6 +81,9 @@
       "includes": ["demo/**/*.ts", "src/__tests__/**/*.ts", "examples/**/*.ts"],
       "linter": {
         "rules": {
+          "complexity": {
+            "noUselessConstructor": "off"
+          },
           "suspicious": {
             "noExplicitAny": "off",
             "noShadowRestrictedNames": "off",

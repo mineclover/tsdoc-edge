@@ -310,6 +310,7 @@ interface CoRequirementMetrics {
 
 ### Referenced By
 
-- [[Mutual Exclusion]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/mutual-exclusion.md:105
-- [[Mutual Exclusion]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/mutual-exclusion.md:122
+- [[Commands Index]] → managed/COMMANDS.md:91
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:164
+- [[Mutual Exclusion]] → managed/relationships/mutual-exclusion.md:214
 

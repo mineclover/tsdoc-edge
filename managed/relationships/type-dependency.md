@@ -21,23 +21,19 @@ Track type-level dependencies (parameter/return types, type aliases).
 
 ### Referenced By
 
-- Commands Index → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:84
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:42
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:317
-- InterfaceAnalyzer → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/InterfaceAnalyzer.md:20
-- InterfaceDependencyMapper → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/InterfaceDependencyMapper.md:23
-- TypeChainTracer → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/TypeChainTracer.md:23
-- TypeChainTracer → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/TypeChainTracer.md:24
-- [[TypeDependencyAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/TypeDependencyAnalyzer.md:89
-- AnalyzeTypesCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/AnalyzeTypesCommand.md:22
-- BuildCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/BuildCommand.md:37
-- Phase4Commands → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/Phase4Commands.md:21
-- TypeChainCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/TypeChainCommand.md:22
-- Guides & Tutorials → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:68
-- [[Composition Relationship]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/COMPOSITION.md:119
-- [[Code Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/code-dependency.md:37
-- [[Collaboration]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/collaboration.md:138
-- [[IO Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/io-dependency.md:52
-- [[Substitution]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/substitution.md:138
-- [[Substitution]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/substitution.md:168
+- [[Commands Index]] → managed/COMMANDS.md:65
+- [[TSDoc Edge Documentation]] → managed/README.md:68
+- [[TypeChainTracer]] → managed/analyzers/TypeChainTracer.md:37
+- [[TypeDependencyAnalyzer]] → managed/analyzers/TypeDependencyAnalyzer.md:148
+- [[AnalyzeTypesCommand]] → managed/commands/AnalyzeTypesCommand.md:30
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:39
+- [[BuildCommand]] → managed/commands/BuildCommand.md:47
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:35
+- [[TypeChainCommand]] → managed/commands/TypeChainCommand.md:30
+- [[Guides & Tutorials]] → managed/guides/index.md:93
+- [[Code Dependency]] → managed/relationships/code-dependency.md:57
+- [[Collaboration]] → managed/relationships/collaboration.md:313
+- [[Composition Relationship]] → managed/relationships/composition.md:222
+- [[IO Dependency]] → managed/relationships/io-dependency.md:69
+- [[Substitution]] → managed/relationships/substitution.md:275
 

@@ -97,43 +97,29 @@ Convention: kebab-case from file path + symbol name
 
 ### Referenced By
 
-- [[Commands Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:46
-- [[Commands Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/COMMANDS.md:117
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:87
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:243
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:298
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:364
-- [[ASTSymbolExtractor]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/ASTSymbolExtractor.md:67
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:100
-- [[CheckLinksCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/CheckLinksCommand.md:7
-- [[ExploreEntrypointCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ExploreEntrypointCommand.md:12
-- [[ValidateSymbolRefsCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/ValidateSymbolRefsCommand.md:7
-- [[Analyzer System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/analyzer-system.md:154
-- [[Spec Management System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/spec-management-system.md:97
-- [[DatabaseManager]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core-components/DatabaseManager.md:126
-- [[DocumentSymbolParser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolParser.md:102
-- [[DocumentSymbolParser]]#Section → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolParser.md:102
-- [[DocumentSymbolParser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolParser.md:106
-- [[DocumentSymbolParser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolParser.md:106
-- [[DocumentSymbolParser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolParser.md:106
-- SymbolReferenceGenerator → /Users/junwoobang/workflow/tsdoc-edge/managed/features/SymbolReferenceGenerator.md:12
-- SymbolReferenceResolver → /Users/junwoobang/workflow/tsdoc-edge/managed/features/SymbolReferenceResolver.md:7
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:96
-- [[Analyzer Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:262
-- [[Document Symbol Parser]] → /Users/junwoobang/workflow/tsdoc-edge/managed/parser/DocumentSymbolParser.md:62
-- TrackableStatistics → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TrackableStatistics.md:33
-- InterfaceTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/InterfaceTypes.md:108
-- RegistryTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/RegistryTypes.md:123
-- [[Symbol]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/Symbol.md:24
-- SymbolSearchEngine → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/SymbolSearchEngine.md:104
-- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:86
-- [[Example - Mermaid Workflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:50
+- [[Commands Index]] → managed/COMMANDS.md:164
+- [[TSDoc Edge Documentation]] → managed/README.md:115
+- [[ASTSymbolExtractor]] → managed/analyzers/ASTSymbolExtractor.md:124
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:108
+- [[CheckLinksCommand]] → managed/commands/CheckLinksCommand.md:15
+- [[ExploreEntrypointCommand]] → managed/commands/ExploreEntrypointCommand.md:20
+- [[ValidateSymbolRefsCommand]] → managed/commands/ValidateSymbolRefsCommand.md:15
+- [[Analyzer System]] → managed/core/analyzer-system.md:269
+- [[Spec Management System]] → managed/core/spec-management-system.md:177
+- [[DatabaseManager]] → managed/core-components/DatabaseManager.md:301
+- [[CoreWorkflow]] → managed/features/core-workflow.md:108
+- [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:993
+- [[Document Symbol Parser]] → managed/parser/DocumentSymbolParser.md:80
+- [[TrackableStatistics]] → managed/primary-types/TrackableStatistics.md:41
+- [[InterfaceTypes]] → managed/types/InterfaceTypes.md:144
+- [[RegistryTypes]] → managed/types/RegistryTypes.md:182
+- [[SymbolSearchEngine]] → managed/utilities/SymbolSearchEngine.md:169
+- [[Utilities Index]] → managed/utilities/index.md:97
+- [[Example - Mermaid Workflow]] → managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:124
 
 ### Implemented By
 
-- DocReferenceAnalyzer → /Users/junwoobang/workflow/tsdoc-edge/src/analyzer/DocReferenceAnalyzer.ts:49
-- DocReferenceAnalyzer (Section) → /Users/junwoobang/workflow/tsdoc-edge/src/analyzer/DocReferenceAnalyzer.ts:49
-- AnalyzeDocReferenceCommand → /Users/junwoobang/workflow/tsdoc-edge/src/commands/AnalyzeDocReferenceCommand.ts:21
-- TSDocSymbolParser → /Users/junwoobang/workflow/tsdoc-edge/src/doc-symbol/TSDocSymbolParser.ts:17
-- Symbol → /Users/junwoobang/workflow/tsdoc-edge/src/types/graph/graph.ts:44
+- Symbol → src/types/graph/graph.ts:44
+- DocReferenceAnalyzer → src/analyzer/DocReferenceAnalyzer.ts:49
+- TSDocSymbolParser → src/doc-symbol/TSDocSymbolParser.ts:17
 

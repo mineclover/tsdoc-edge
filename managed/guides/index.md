@@ -445,11 +445,11 @@ tsdoc-edge parse-mermaid <diagram>
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:14
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:97
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:113
-- [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:256
-- [[Features Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/index.md:225
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:108
-- [[Quick Start Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:148
-- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:197
+- [[TSDoc Edge Documentation]] → managed/README.md:38
+- [[SpecCommands]] → managed/commands/SpecCommands.md:98
+- [[Concepts Index]] → managed/concepts/index.md:282
+- [[Features Index]] → managed/features/index.md:337
+- [[Quick Start Guide]] → managed/quick-start.md:213
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:30
+- [[Workflows Index]] → managed/workflows/index.md:286
+

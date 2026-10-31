@@ -228,3 +228,16 @@ tsdoc-edge find-unused-docs managed
 - SpecStatusManager: Manages status transitions
 - [[UnusedDocumentDetector]]: Finds orphaned docs
 - SpecContentSimilarityChecker: Detects duplicates
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Types Index]] → managed/types/index.md:22
+
+### Implemented By
+
+- SpecTypes → src/types/spec.ts:1
+

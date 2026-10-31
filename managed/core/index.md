@@ -43,3 +43,13 @@ Documentation and code validation infrastructure.
 - [[Analyzers & Extractors]] - Concrete analyzer implementations
 - [[Features Index]] - Feature-level documentation
 - [[Concepts Index]] - Design concepts and principles
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → managed/README.md:193
+- [[Core Components]] → managed/core-components/index.md:34
+

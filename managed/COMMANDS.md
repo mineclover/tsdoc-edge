@@ -313,3 +313,21 @@ See [[Relationship Types]] for all 25 relationship type definitions.
 - [[CLI Command Development Guide]] - How to create new commands
 - [[Quick Start Guide]] - Getting started tutorial
 - [[Work Context Workflow]] - work-context command guide
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → managed/README.md:177
+- [[UtilityCommands]] → managed/commands/UtilityCommands.md:378
+- [[Guides & Tutorials]] → managed/guides/index.md:350
+- [[Usage Scenarios]] → managed/guides/usage-scenarios.md:511
+- [[Primary Types Index]] → managed/primary-types/index.md:451
+- [[Quick Start Guide]] → managed/quick-start.md:323
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:28
+- [[Example - Mermaid Workflow]] → managed/workflows/EXAMPLE-MERMAID-WORKFLOW.md:369
+- [[Workflows Index]] → managed/workflows/index.md:285
+- [[Mermaid Entrypoint Workflow]] → managed/workflows/mermaid-entrypoint-workflow.md:630
+

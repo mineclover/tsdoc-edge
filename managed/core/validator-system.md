@@ -358,8 +358,13 @@ issues.forEach(issue => {
 
 ### Referenced By
 
-- [[Analyzer System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/analyzer-system.md:235
-- [[Parser System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/parser-system.md:180
-- [[Spec Management System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/spec-management-system.md:187
-- [[Symbol Graph System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/core/symbol-graph.md:121
+- [[Analyzer System]] → managed/core/analyzer-system.md:444
+- [[Document Symbol System]] → managed/core/doc-symbol-system.md:394
+- [[Parser System]] → managed/core/parser-system.md:356
+- [[Spec Management System]] → managed/core/spec-management-system.md:392
+- [[Symbol Graph System]] → managed/core/symbol-graph.md:262
+
+### Implemented By
+
+- Validator System → src/validator/ConnectivityValidator.ts:1
 

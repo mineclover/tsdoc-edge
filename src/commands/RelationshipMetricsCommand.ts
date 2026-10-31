@@ -118,149 +118,150 @@ Examples:
 
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
+      try {
+        console.log();
+        this.printInfo('Building relationship graph...');
 
-      console.log();
-      this.printInfo('Building relationship graph...');
+        // Build adjacency lists
+        const { outgoing, incoming, symbolNames } = this.buildGraph(dbManager, options.category);
 
-      // Build adjacency lists
-      const { outgoing, incoming, symbolNames } = this.buildGraph(dbManager, options.category);
+        this.printInfo(`Analyzing ${symbolNames.size} symbols...`);
+        console.log();
 
-      this.printInfo(`Analyzing ${symbolNames.size} symbols...`);
-      console.log();
+        // Calculate all metrics
+        this.printInfo('Calculating centrality metrics...');
+        const metrics = this.calculateMetrics(outgoing, incoming, symbolNames);
 
-      // Calculate all metrics
-      this.printInfo('Calculating centrality metrics...');
-      const metrics = this.calculateMetrics(outgoing, incoming, symbolNames);
+        // Sort by selected metric
+        metrics.sort((a, b) => {
+          const aVal = a[options.metric];
+          const bVal = b[options.metric];
+          if (typeof aVal === 'number' && typeof bVal === 'number') {
+            return bVal - aVal;
+          }
+          return 0;
+        });
 
-      // Sort by selected metric
-      metrics.sort((a, b) => {
-        const aVal = a[options.metric];
-        const bVal = b[options.metric];
-        if (typeof aVal === 'number' && typeof bVal === 'number') {
-          return bVal - aVal;
-        }
-        return 0;
-      });
-
-      const topSymbols = metrics.slice(0, options.top);
-
-      console.log();
-
-      // Display results
-      this.printSection(`Top ${topSymbols.length} Symbols by ${this.capitalize(options.metric)}`);
-      console.log();
-
-      for (let i = 0; i < topSymbols.length; i++) {
-        const symbol = topSymbols[i];
-        const rank = i + 1;
-
-        console.log(`  ${this.colors.bold}${rank}. ${symbol.symbolName}${this.colors.reset}`);
-        console.log(`     ID: ${this.colors.dim}${symbol.symbolId}${this.colors.reset}`);
-
-        if (options.detailed) {
-          console.log(
-            `     Degree: ${this.colors.cyan}${symbol.degree}${this.colors.reset} (in: ${symbol.inDegree}, out: ${symbol.outDegree})`
-          );
-          console.log(
-            `     Betweenness: ${this.colors.cyan}${symbol.betweenness.toFixed(4)}${this.colors.reset}`
-          );
-          console.log(
-            `     PageRank: ${this.colors.cyan}${symbol.pageRank.toFixed(6)}${this.colors.reset}`
-          );
-          console.log(
-            `     Importance: ${this.colors.cyan}${symbol.importance.toFixed(2)}${this.colors.reset}`
-          );
-          console.log(
-            `     ${this.colors.dim}${this.interpretMetrics(symbol)}${this.colors.reset}`
-          );
-        } else {
-          const metricValue = symbol[options.metric];
-          const displayValue =
-            typeof metricValue === 'number'
-              ? metricValue < 1
-                ? metricValue.toFixed(6)
-                : metricValue.toFixed(2)
-              : metricValue;
-          console.log(
-            `     ${this.capitalize(options.metric)}: ${this.colors.cyan}${displayValue}${this.colors.reset}`
-          );
-          console.log(
-            `     ${this.colors.dim}${this.interpretMetrics(symbol)}${this.colors.reset}`
-          );
-        }
+        const topSymbols = metrics.slice(0, options.top);
 
         console.log();
-      }
 
-      // Overall statistics
-      console.log();
-      this.printSection('Graph Statistics');
+        // Display results
+        this.printSection(`Top ${topSymbols.length} Symbols by ${this.capitalize(options.metric)}`);
+        console.log();
 
-      const avgDegree = metrics.reduce((sum, m) => sum + m.degree, 0) / metrics.length;
-      const avgBetweenness = metrics.reduce((sum, m) => sum + m.betweenness, 0) / metrics.length;
-      const totalEdges = metrics.reduce((sum, m) => sum + m.outDegree, 0);
+        for (let i = 0; i < topSymbols.length; i++) {
+          const symbol = topSymbols[i];
+          const rank = i + 1;
 
-      console.log(`  Total symbols: ${this.colors.cyan}${metrics.length}${this.colors.reset}`);
-      console.log(`  Total relationships: ${this.colors.cyan}${totalEdges}${this.colors.reset}`);
-      console.log(
-        `  Average degree: ${this.colors.cyan}${avgDegree.toFixed(2)}${this.colors.reset}`
-      );
-      console.log(
-        `  Average betweenness: ${this.colors.cyan}${avgBetweenness.toFixed(4)}${this.colors.reset}`
-      );
-      console.log();
+          console.log(`  ${this.colors.bold}${rank}. ${symbol.symbolName}${this.colors.reset}`);
+          console.log(`     ID: ${this.colors.dim}${symbol.symbolId}${this.colors.reset}`);
 
-      // Distribution
-      const hubs = metrics.filter((m) => m.degree > avgDegree * 2).length;
-      const bridges = metrics.filter((m) => m.betweenness > avgBetweenness * 2).length;
-      const isolates = metrics.filter((m) => m.degree === 0).length;
+          if (options.detailed) {
+            console.log(
+              `     Degree: ${this.colors.cyan}${symbol.degree}${this.colors.reset} (in: ${symbol.inDegree}, out: ${symbol.outDegree})`
+            );
+            console.log(
+              `     Betweenness: ${this.colors.cyan}${symbol.betweenness.toFixed(4)}${this.colors.reset}`
+            );
+            console.log(
+              `     PageRank: ${this.colors.cyan}${symbol.pageRank.toFixed(6)}${this.colors.reset}`
+            );
+            console.log(
+              `     Importance: ${this.colors.cyan}${symbol.importance.toFixed(2)}${this.colors.reset}`
+            );
+            console.log(
+              `     ${this.colors.dim}${this.interpretMetrics(symbol)}${this.colors.reset}`
+            );
+          } else {
+            const metricValue = symbol[options.metric];
+            const displayValue =
+              typeof metricValue === 'number'
+                ? metricValue < 1
+                  ? metricValue.toFixed(6)
+                  : metricValue.toFixed(2)
+                : metricValue;
+            console.log(
+              `     ${this.capitalize(options.metric)}: ${this.colors.cyan}${displayValue}${this.colors.reset}`
+            );
+            console.log(
+              `     ${this.colors.dim}${this.interpretMetrics(symbol)}${this.colors.reset}`
+            );
+          }
 
-      console.log(`  ${this.colors.dim}Distribution:${this.colors.reset}`);
-      console.log(
-        `    Hubs (2x avg degree): ${this.colors.cyan}${hubs}${this.colors.reset} symbols`
-      );
-      console.log(
-        `    Bridges (2x avg betweenness): ${this.colors.cyan}${bridges}${this.colors.reset} symbols`
-      );
-      console.log(
-        `    Isolated symbols: ${this.colors.cyan}${isolates}${this.colors.reset} symbols`
-      );
-      console.log();
+          console.log();
+        }
 
-      // Recommendations
-      this.printSection('Architectural Insights');
+        // Overall statistics
+        console.log();
+        this.printSection('Graph Statistics');
 
-      const criticalHubs = metrics.filter((m) => m.degree > 50 && m.betweenness > 0.01);
-      if (criticalHubs.length > 0) {
-        this.printWarning(
-          `${criticalHubs.length} critical hub(s) with high degree and betweenness`
+        const avgDegree = metrics.reduce((sum, m) => sum + m.degree, 0) / metrics.length;
+        const avgBetweenness = metrics.reduce((sum, m) => sum + m.betweenness, 0) / metrics.length;
+        const totalEdges = metrics.reduce((sum, m) => sum + m.outDegree, 0);
+
+        console.log(`  Total symbols: ${this.colors.cyan}${metrics.length}${this.colors.reset}`);
+        console.log(`  Total relationships: ${this.colors.cyan}${totalEdges}${this.colors.reset}`);
+        console.log(
+          `  Average degree: ${this.colors.cyan}${avgDegree.toFixed(2)}${this.colors.reset}`
         );
         console.log(
-          `  ${this.colors.dim}These are architectural bottlenecks - changes will have wide impact${this.colors.reset}`
+          `  Average betweenness: ${this.colors.cyan}${avgBetweenness.toFixed(4)}${this.colors.reset}`
         );
-        for (const hub of criticalHubs.slice(0, 5)) {
-          console.log(
-            `    • ${hub.symbolName} (degree: ${hub.degree}, betweenness: ${hub.betweenness.toFixed(4)})`
-          );
-        }
         console.log();
-      }
 
-      const coreComponents = metrics.filter((m) => m.inDegree > 20 && m.outDegree < 10);
-      if (coreComponents.length > 0) {
-        this.printInfo(`${coreComponents.length} core component(s) with many dependents`);
+        // Distribution
+        const hubs = metrics.filter((m) => m.degree > avgDegree * 2).length;
+        const bridges = metrics.filter((m) => m.betweenness > avgBetweenness * 2).length;
+        const isolates = metrics.filter((m) => m.degree === 0).length;
+
+        console.log(`  ${this.colors.dim}Distribution:${this.colors.reset}`);
         console.log(
-          `  ${this.colors.dim}These should be stable - many symbols depend on them${this.colors.reset}`
+          `    Hubs (2x avg degree): ${this.colors.cyan}${hubs}${this.colors.reset} symbols`
         );
-        for (const core of coreComponents.slice(0, 3)) {
-          console.log(`    • ${core.symbolName} (in: ${core.inDegree}, out: ${core.outDegree})`);
-        }
+        console.log(
+          `    Bridges (2x avg betweenness): ${this.colors.cyan}${bridges}${this.colors.reset} symbols`
+        );
+        console.log(
+          `    Isolated symbols: ${this.colors.cyan}${isolates}${this.colors.reset} symbols`
+        );
         console.log();
+
+        // Recommendations
+        this.printSection('Architectural Insights');
+
+        const criticalHubs = metrics.filter((m) => m.degree > 50 && m.betweenness > 0.01);
+        if (criticalHubs.length > 0) {
+          this.printWarning(
+            `${criticalHubs.length} critical hub(s) with high degree and betweenness`
+          );
+          console.log(
+            `  ${this.colors.dim}These are architectural bottlenecks - changes will have wide impact${this.colors.reset}`
+          );
+          for (const hub of criticalHubs.slice(0, 5)) {
+            console.log(
+              `    • ${hub.symbolName} (degree: ${hub.degree}, betweenness: ${hub.betweenness.toFixed(4)})`
+            );
+          }
+          console.log();
+        }
+
+        const coreComponents = metrics.filter((m) => m.inDegree > 20 && m.outDegree < 10);
+        if (coreComponents.length > 0) {
+          this.printInfo(`${coreComponents.length} core component(s) with many dependents`);
+          console.log(
+            `  ${this.colors.dim}These should be stable - many symbols depend on them${this.colors.reset}`
+          );
+          for (const core of coreComponents.slice(0, 3)) {
+            console.log(`    • ${core.symbolName} (in: ${core.inDegree}, out: ${core.outDegree})`);
+          }
+          console.log();
+        }
+
+        return this.success(`Analyzed ${metrics.length} symbols`);
+      } finally {
+        dbManager.close();
       }
-
-      dbManager.close();
-
-      return this.success(`Analyzed ${metrics.length} symbols`);
     });
   }
 

@@ -472,3 +472,21 @@ vscode.commands.registerCommand('tsdoc.showImpactAnalysis', (symbolId, direction
 - [[SymbolGraphFeatures]] - Dependency graph data
 - [[AnalysisFeatures]] - Code health metrics
 - [[CoreWorkflow]] - Build pipeline integration
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → managed/README.md:179
+- [[ProjectIndexer]] → managed/architecture/project-indexer.md:193
+- [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1457
+- [[Convention Pack Check]] → managed/features/convention-pack-check.md:465
+- [[Semantic Graph Spec Governance Changelog]] → managed/workflows/semantic-graph-spec-governance-changelog.md:24
+- [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:277
+
+### Implemented By
+
+- LSP Integration → src/lsp/server.ts:1
+

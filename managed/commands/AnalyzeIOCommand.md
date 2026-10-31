@@ -35,16 +35,14 @@ Analyze file I/O dependencies.
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:29
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:68
-- [[TSDoc Edge Documentation]] → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:210
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:56
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:219
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:136
-- [[Analyzer Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/analyzer-development-guide.md:266
-- [[Build Pipeline Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:240
-- [[CLI Command Development Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/command-development-guide.md:250
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:50
-- [[IO Dependency]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/io-dependency.md:15
-- DataFlowTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/DataFlowTypes.md:125
+- [[TSDoc Edge Documentation]] → managed/README.md:55
+- [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:215
+- [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:997
+- [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:532
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:701
+- [[DataFlowTypes]] → managed/types/DataFlowTypes.md:172
+
+### Implemented By
+
+- AnalyzeIOCommand → src/commands/AnalyzeIOCommand.ts:1
 

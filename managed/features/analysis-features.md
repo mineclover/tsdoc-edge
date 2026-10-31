@@ -447,33 +447,24 @@ jobs:
 
 ### Referenced By
 
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:93
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:234
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:115
-- [[CodeHealthChecker]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/CodeHealthChecker.md:218
-- [[DocumentationAnalyzer]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/DocumentationAnalyzer.md:124
-- [[Analyzers & Extractors]] → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:260
-- InsightDocGenerator → /Users/junwoobang/workflow/tsdoc-edge/managed/code-generation/InsightDocGenerator.md:22
-- [[Phase Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/Phase6Commands.md:22
-- [[SuggestCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SuggestCommand.md:192
-- [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:50
-- [[CoreFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-features-catalog.md:285
-- [[CoreWorkflow]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/core-workflow.md:140
-- [[Features Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/index.md:196
-- [[SymbolGraphFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/symbol-graph.md:246
-- [[ValidationFeatures]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/validation-features.md:206
-- [[Build Pipeline Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/build-pipeline-guide.md:258
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:250
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:307
-- [[Guides & Tutorials]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/index.md:351
-- [[Relationship Analysis Guide]] → /Users/junwoobang/workflow/tsdoc-edge/managed/guides/relationship-analysis-guide.md:331
-- AnalysisReport → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/AnalysisReport.md:71
-- TrackableStatistics → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/TrackableStatistics.md:85
-- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:84
-- Quick Start Guide → /Users/junwoobang/workflow/tsdoc-edge/managed/quick-start.md:134
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:192
+- [[TSDoc Edge Documentation]] → managed/README.md:133
+- [[Phase Commands]] → managed/commands/PhaseCommands.md:60
+- [[SuggestCommand]] → managed/commands/SuggestCommand.md:485
+- [[CoreFeatures]] → managed/features/core-features-catalog.md:65
+- [[CoreWorkflow]] → managed/features/core-workflow.md:152
+- [[Features Index]] → managed/features/index.md:279
+- [[LSP Integration]] → managed/features/lsp-integration.md:473
+- [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:376
+- [[ValidationFeatures]] → managed/features/validation-features.md:410
+- [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:550
+- [[Guides & Tutorials]] → managed/guides/index.md:284
+- [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:495
+- [[AnalysisReport]] → managed/primary-types/AnalysisReport.md:93
+- [[TrackableStatistics]] → managed/primary-types/TrackableStatistics.md:107
+- [[Quick Start Guide]] → managed/quick-start.md:163
 
 ### Implemented By
 
-- CodeHealthChecker (Health) → /Users/junwoobang/workflow/tsdoc-edge/src/analyzer/CodeHealthChecker.ts:42
-- DocumentationAnalyzer (Quality) → /Users/junwoobang/workflow/tsdoc-edge/src/analyzer/DocumentationAnalyzer.ts:18
+- CodeHealthChecker (Health) → src/analyzer/CodeHealthChecker.ts:42
+- DocumentationAnalyzer (Quality) → src/analyzer/DocumentationAnalyzer.ts:18
+

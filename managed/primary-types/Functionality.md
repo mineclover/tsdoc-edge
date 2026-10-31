@@ -115,16 +115,16 @@ Part of StrictModeValidator scoring:
 
 ### Referenced By
 
-- BaseSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/BaseSymbolDoc.md:34
-- DecisionRecord → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/DecisionRecord.md:41
-- DependencySpec → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/DependencySpec.md:38
-- EnhancedSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:42
-- EnhancedSymbolDoc → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/EnhancedSymbolDoc.md:132
-- ErrorExperience → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ErrorExperience.md:39
-- [[Functionality]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/Functionality.md:11
-- FuturePlan → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/FuturePlan.md:40
-- ProblemSolving → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/ProblemSolving.md:54
-- EnhancedTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/EnhancedTagTypes.md:29
-- EnhancedTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/EnhancedTagTypes.md:39
-- EnhancedTagTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/EnhancedTagTypes.md:44
+- [[BaseSymbolDoc]] → managed/primary-types/BaseSymbolDoc.md:42
+- [[DecisionRecord]] → managed/primary-types/DecisionRecord.md:49
+- [[DependencySpec]] → managed/primary-types/DependencySpec.md:46
+- [[EnhancedSymbolDoc]] → managed/primary-types/EnhancedSymbolDoc.md:57
+- [[ErrorExperience]] → managed/primary-types/ErrorExperience.md:47
+- [[FuturePlan]] → managed/primary-types/FuturePlan.md:48
+- [[ProblemSolving]] → managed/primary-types/ProblemSolving.md:69
+- [[EnhancedTagTypes]] → managed/types/EnhancedTagTypes.md:44
+
+### Implemented By
+
+- Functionality → src/types/tags/enhanced.ts:1
 

@@ -34,6 +34,9 @@ Update symbol references in documentation.
 
 ### Referenced By
 
-- [[CLI Commands]] → /Users/junwoobang/workflow/tsdoc-edge/managed/CLI-COMMANDS.md:200
-- [[AutoIndexing]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/auto-indexing.md:62
+- [[AutoIndexing]] → managed/features/auto-indexing.md:82
+
+### Implemented By
+
+- UpdateSymbolRefsCommand → src/commands/UpdateSymbolRefsCommand.ts:1
 

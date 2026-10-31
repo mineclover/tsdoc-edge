@@ -469,5 +469,7 @@ DatabaseManager
 
 ### Referenced By
 
-- [[Primary Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/index.md:402
-- [[Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/index.md:347
+- [[TSDoc Edge Documentation]] → managed/README.md:182
+- [[Primary Types Index]] → managed/primary-types/index.md:449
+- [[Types Index]] → managed/types/index.md:378
+

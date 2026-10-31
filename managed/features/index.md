@@ -343,8 +343,14 @@ tsdoc-edge test-impact database-manager
 
 ### Referenced By
 
-- [[Concepts Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/index.md:254
-- [[Primary Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/primary-types/index.md:403
-- [[Types Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/types/index.md:348
-- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:418
-- [[Workflows Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/workflows/index.md:195
+- [[TSDoc Edge Documentation]] → managed/README.md:179
+- [[Concepts Index]] → managed/concepts/index.md:280
+- [[Core Systems]] → managed/core/index.md:44
+- [[Core Components]] → managed/core-components/index.md:36
+- [[Examples]] → managed/examples/index.md:33
+- [[Primary Types Index]] → managed/primary-types/index.md:450
+- [[Types Index]] → managed/types/index.md:379
+- [[TSDoc Edge User Guide]] → managed/user-guide.md:284
+- [[Utilities Index]] → managed/utilities/index.md:464
+- [[Workflows Index]] → managed/workflows/index.md:284
+

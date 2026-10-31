@@ -407,6 +407,63 @@ export function testFunc(): void {}
       expect(result.message?.toLowerCase()).toContain('file');
     });
 
+    it('supports flags placed before positional file path (e.g. wc --llm <file>)', async () => {
+      const dbManager = new DatabaseManager(dbPath);
+      dbManager.close();
+
+      const canonicalContext = {
+        revisionId: 'canonical-revision',
+        symbols: [],
+        nodesInFile: () => [],
+        close: jest.fn(),
+      };
+      jest.spyOn(CanonicalAliasContext, 'tryOpen').mockReturnValue(canonicalContext as any);
+      jest.spyOn(console, 'log').mockImplementation();
+
+      const result = await command.execute(['--llm', testFile]);
+      expect(result.exitCode).toBe(0);
+    });
+
+    it('supports valued options with = syntax (e.g. wc --depth=3 <file>)', async () => {
+      const dbManager = new DatabaseManager(dbPath);
+      dbManager.close();
+
+      const canonicalContext = {
+        revisionId: 'canonical-revision',
+        symbols: [],
+        nodesInFile: () => [],
+        close: jest.fn(),
+      };
+      jest.spyOn(CanonicalAliasContext, 'tryOpen').mockReturnValue(canonicalContext as any);
+      jest.spyOn(console, 'log').mockImplementation();
+
+      const result = await command.execute(['--depth=3', testFile]);
+      expect(result.exitCode).toBe(0);
+    });
+
+    it('supports valued options before file path (e.g. wc --depth 3 <file>)', async () => {
+      const dbManager = new DatabaseManager(dbPath);
+      dbManager.close();
+
+      const canonicalContext = {
+        revisionId: 'canonical-revision',
+        symbols: [],
+        nodesInFile: () => [],
+        close: jest.fn(),
+      };
+      jest.spyOn(CanonicalAliasContext, 'tryOpen').mockReturnValue(canonicalContext as any);
+      jest.spyOn(console, 'log').mockImplementation();
+
+      const result = await command.execute(['--depth', '3', testFile]);
+      expect(result.exitCode).toBe(0);
+    });
+
+    it('returns file path required error when flags provided without file path', async () => {
+      const result = await command.execute(['--llm']);
+      expect(result.exitCode).toBe(1);
+      expect(result.message?.toLowerCase()).toContain('file path');
+    });
+
     it('should gather context with dependencies', async () => {
       // Create database with dependencies
       const dbManager = new DatabaseManager(dbPath);

@@ -46,9 +46,9 @@ interface TestCoverage {
 
 ### Referenced By
 
-- TestRelationshipExtractor → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/TestRelationshipExtractor.md:22
-- Analyzers & Extractors → /Users/junwoobang/workflow/tsdoc-edge/managed/analyzers/index.md:152
-- AnalyzeTestsCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/AnalyzeTestsCommand.md:21
-- TestRelationshipsCommand → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/TestRelationshipsCommand.md:21
-- [[Test Coverage]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/TEST-COVERAGE.md:8
-- [[Relationship Types]] → /Users/junwoobang/workflow/tsdoc-edge/managed/relationships/index.md:97
+- [[AnalyzeTestsCommand]] → managed/commands/AnalyzeTestsCommand.md:34
+
+### Implemented By
+
+- TestRelationshipAnalyzer → src/analyzer/TestRelationshipAnalyzer.ts:1
+

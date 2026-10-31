@@ -144,3 +144,16 @@ tsdoc-edge deps UserService
 - [[Symbol]]: Base symbol type
 - [[AnalyzeCommand]]: Domain analysis
 - [[DepsCommand]]: Dependency analysis
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Types Index]] → managed/types/index.md:23
+
+### Implemented By
+
+- InterfaceTypes → src/types/domain/interface.ts:1
+

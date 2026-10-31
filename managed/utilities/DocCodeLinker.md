@@ -73,7 +73,11 @@ const symbols = index.docToSymbol.get('managed/services.md');
 
 ### Referenced By
 
-- LinkingTypes → /Users/junwoobang/workflow/tsdoc-edge/managed/types/LinkingTypes.md:113
-- [[LinkValidator]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/LinkValidator.md:62
-- [[Utilities Index]] → /Users/junwoobang/workflow/tsdoc-edge/managed/utilities/index.md:401
+- [[LinkingTypes]] → managed/types/LinkingTypes.md:153
+- [[LinkValidator]] → managed/utilities/LinkValidator.md:76
+- [[Utilities Index]] → managed/utilities/index.md:432
+
+### Implemented By
+
+- DocCodeLinker → src/linking/DocCodeLinker.ts:1
 

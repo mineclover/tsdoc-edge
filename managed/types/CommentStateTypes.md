@@ -186,3 +186,16 @@ contentHash = sha256(fullComment);
 - CommentStateManager: Manages state
 - CommentExporter: Exports to markdown
 - CommentImporter: Imports from markdown
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Types Index]] → managed/types/index.md:21
+
+### Implemented By
+
+- CommentStateTypes → src/types/state/comment.ts:1
+

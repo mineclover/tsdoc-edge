@@ -422,3 +422,15 @@ P4.1은 `loadJestJsonEvidence`로 complete Jest JSON artifact를 in-memory evide
 
 - [Jest code transformation](https://jestjs.io/docs/29.7/code-transformation)
 - [SWC Jest fallback](https://swc.rs/docs/usage/jest)
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ProjectIndexer]] → managed/architecture/project-indexer.md:83
+- [[Workflows Index]] → managed/workflows/index.md:242
+- [[Semantic Graph Spec Governance Completed Work]] → managed/workflows/semantic-graph-spec-governance-completed.md:55
+- [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:276
+

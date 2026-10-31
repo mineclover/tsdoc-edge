@@ -259,8 +259,11 @@ tsdoc-edge symbol-query managed info "BuildCommand"
 
 ### Referenced By
 
-- [[SymbolFixCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolFixCommand.md:180
-- [[SymbolFixCommand]] → /Users/junwoobang/workflow/tsdoc-edge/managed/commands/SymbolFixCommand.md:206
-- [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:90
-- [[Document Symbol System]] → /Users/junwoobang/workflow/tsdoc-edge/managed/concepts/document-symbol-system.md:143
-- [[DocumentSymbolRegistry]] → /Users/junwoobang/workflow/tsdoc-edge/managed/features/DocumentSymbolRegistry.md:121
+- [[SymbolFixCommand]] → managed/commands/SymbolFixCommand.md:326
+- [[DocumentSymbolParser]] → managed/features/DocumentSymbolParser.md:185
+- [[DocumentSymbolRegistry]] → managed/features/DocumentSymbolRegistry.md:291
+
+### Implemented By
+
+- SymbolQueryCommand → src/commands/SymbolQueryCommand.ts:60
+

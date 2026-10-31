@@ -71,3 +71,16 @@ typecheck and the affected test lane.
    assignment-in-condition loops into observable steps.
 4. When a warning is removed, leave the budget unchanged or lower it; never compensate with an
    unrelated new warning.
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Document Validation Warning Policy]] → managed/workflows/document-validation-warning-policy.md:13
+
+### Implemented By
+
+- Lint Governance → src/commands/LintCommand.ts:1
+

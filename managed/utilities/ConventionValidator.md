@@ -242,7 +242,7 @@ tsdoc-edge validate --strict --json > report.json
 
 ## Backlinks
 
-### Referenced By
+### Implemented By
 
-- TSDoc Edge Documentation → /Users/junwoobang/workflow/tsdoc-edge/managed/README.md:238
+- ConventionValidator → src/validator/ConventionValidator.ts:32
 
