@@ -287,7 +287,7 @@ export class CoverageReportCommand extends BaseCommand {
 
   private getDatabase(): DatabaseManager {
     if (!this.db) {
-      this.db = new DatabaseManager();
+      this.db = new DatabaseManager(this.getDatabasePath(), this.getJsonlPath());
       this.ownsDatabase = true;
     }
     return this.db;

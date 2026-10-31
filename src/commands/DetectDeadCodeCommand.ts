@@ -50,7 +50,7 @@ export class DetectDeadCodeCommand extends BaseCommand {
 
   constructor(db?: DatabaseManager, tagger?: DeadCodeTagger) {
     super();
-    this.db = db || new DatabaseManager();
+    this.db = db || new DatabaseManager(this.getDatabasePath(), this.getJsonlPath());
     this.tagger = tagger || new DeadCodeTagger();
   }
 

@@ -783,6 +783,9 @@ export class TsdocEdgeService {
       content += `---\n\n### Impact Analysis\n\n`;
       content += `- **Dependents:** ${counts.dependents}\n`;
       content += `- **Dependencies:** ${counts.dependencies}\n`;
+      if (counts.dependents === 0 && counts.dependencies === 0) {
+        content += `\n> ⚠️ **Unreferenced Symbol**: No dependents or dependencies detected.\n`;
+      }
       return content;
     }
 
@@ -803,6 +806,9 @@ export class TsdocEdgeService {
       content += `---\n\n### Impact Analysis\n\n`;
       content += `- **Dependents:** ${counts.dependents}\n`;
       content += `- **Dependencies:** ${counts.dependencies}\n`;
+      if (counts.dependents === 0 && counts.dependencies === 0) {
+        content += `\n> ⚠️ **Unreferenced Symbol**: No dependents or dependencies detected.\n`;
+      }
       if (edgeKinds.size > 0) {
         content += `\n**Raw graph edge kinds:** ${[...edgeKinds].sort().join(', ')}\n`;
       }
@@ -866,6 +872,9 @@ export class TsdocEdgeService {
       content += `### Impact Analysis\n\n`;
       content += `- **Downstream:** ${downstreamCount} dependents\n`;
       content += `- **Upstream:** ${upstreamCount} dependencies\n`;
+      if (downstreamCount === 0 && upstreamCount === 0) {
+        content += `\n> ⚠️ **Unreferenced Symbol**: No downstream or upstream relationships detected.\n`;
+      }
 
       // Get relationship types using indexed JOIN
       const relTypesStmt = this.statementManager?.prepare(

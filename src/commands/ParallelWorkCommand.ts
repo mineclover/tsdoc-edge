@@ -3,9 +3,7 @@
  * @packageDocumentation
  */
 
-import * as path from 'node:path';
 import { ParallelWorkDetector } from '../analyzer/ParallelWorkDetector';
-import { ConfigManager } from '../config/ConfigManager';
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import type { SymbolType } from '../types/graph';
@@ -86,9 +84,8 @@ export class ParallelWorkCommand extends BaseCommand {
       }
 
       // Load graph
-      const config = ConfigManager.getInstance().get();
-      const dbPath = path.join(process.cwd(), config.paths.databasePath || '.tsdoc/symbols.db');
-      const dbManager = new DatabaseManager(dbPath, '');
+      const dbPath = this.getDatabasePath();
+      const dbManager = new DatabaseManager(dbPath, this.getJsonlPath());
 
       this.printInfo('Building dependency graph...');
       const graphBuilder = new SymbolGraphBuilder();

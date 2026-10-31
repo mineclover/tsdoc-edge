@@ -85,8 +85,8 @@ export class TestRelationshipsCommand extends BaseCommand {
 
       // Load graph
       const config = ConfigManager.getInstance().get();
-      const dbPath = path.join(process.cwd(), config.paths.databasePath || '.tsdoc/symbols.db');
-      const dbManager = new DatabaseManager(dbPath, '');
+      const dbPath = this.getDatabasePath();
+      const dbManager = new DatabaseManager(dbPath, this.getJsonlPath());
 
       this.printInfo('Building dependency graph...');
       const graphBuilder = new SymbolGraphBuilder();

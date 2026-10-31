@@ -96,86 +96,88 @@ export class OrphansCommand extends BaseCommand {
       throw new Error('Database not found. Run: tsdoc-edge build src');
     }
 
-    const dbManager = new DatabaseManager(dbPath, '');
+    const dbManager = new DatabaseManager(dbPath, this.getJsonlPath());
 
-    // Build set of all "to" symbol IDs from relationships using Drizzle ORM
-    const allRels = dbManager.getAllUnifiedRelationships();
-    const usedSymbolIds = new Set<string>();
-    for (const rel of allRels) {
-      const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
-      for (const to of toSymbols) {
-        if (to) usedSymbolIds.add(to);
+    try {
+      // Build set of all "to" symbol IDs from relationships using Drizzle ORM
+      const allRels = dbManager.getAllUnifiedRelationships();
+      const usedSymbolIds = new Set<string>();
+      for (const rel of allRels) {
+        const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
+        for (const to of toSymbols) {
+          if (to) usedSymbolIds.add(to);
+        }
       }
-    }
 
-    // Get all symbols and filter to find orphans
-    const allSymbols = dbManager.getAllSymbolRows();
-    let orphans = allSymbols
-      .filter((s) => !usedSymbolIds.has(s.id))
-      .map((s) => ({
-        id: s.id,
-        name: s.name,
-        filePath: s.file_path,
-        type: s.type,
-      }));
+      // Get all symbols and filter to find orphans
+      const allSymbols = dbManager.getAllSymbolRows();
+      let orphans = allSymbols
+        .filter((s) => !usedSymbolIds.has(s.id))
+        .map((s) => ({
+          id: s.id,
+          name: s.name,
+          filePath: s.file_path,
+          type: s.type,
+        }));
 
-    // Apply filters
-    if (excludeTests) {
-      orphans = orphans.filter(
-        (s) =>
-          s.type !== 'test-suite' &&
-          s.type !== 'test-case' &&
-          !s.filePath.includes('/__tests__/') &&
-          !s.filePath.endsWith('.test.ts') &&
-          !s.filePath.endsWith('.spec.ts')
-      );
-    }
+      // Apply filters
+      if (excludeTests) {
+        orphans = orphans.filter(
+          (s) =>
+            s.type !== 'test-suite' &&
+            s.type !== 'test-case' &&
+            !s.filePath.includes('/__tests__/') &&
+            !s.filePath.endsWith('.test.ts') &&
+            !s.filePath.endsWith('.spec.ts')
+        );
+      }
 
-    if (classesOnly) {
-      orphans = orphans.filter(
-        (s) =>
-          s.type === 'class' || s.type === 'interface' || s.type === 'type' || s.type === 'enum'
-      );
-    }
+      if (classesOnly) {
+        orphans = orphans.filter(
+          (s) =>
+            s.type === 'class' || s.type === 'interface' || s.type === 'type' || s.type === 'enum'
+        );
+      }
 
-    // Sort by file path and name
-    orphans.sort((a, b) => {
-      const fileCompare = a.filePath.localeCompare(b.filePath);
-      return fileCompare !== 0 ? fileCompare : a.name.localeCompare(b.name);
-    });
-
-    // Filter out members of used classes (unless includeMembers is true)
-    if (!includeMembers && !classesOnly) {
-      // Get all class IDs that are NOT orphans (i.e., used classes)
-      const usedClassIds = new Set(
-        allSymbols.filter((s) => s.type === 'class' && usedSymbolIds.has(s.id)).map((s) => s.id)
-      );
-
-      // Filter out members whose parent class is used
-      orphans = orphans.filter((orphan) => {
-        // Check if this is a class member (method or property)
-        if (orphan.type !== 'method' && orphan.type !== 'property') {
-          return true; // Keep non-members
-        }
-
-        // Extract class name from member ID
-        // ID format: "method-classname-methodname" or "property-classname-propname"
-        const parts = orphan.id.split('-');
-        if (parts.length < 3) {
-          return true; // Keep if we can't determine parent class
-        }
-
-        const className = parts[1];
-        const classId = `class-${className}`;
-
-        // If parent class is used, filter out this member
-        return !usedClassIds.has(classId);
+      // Sort by file path and name
+      orphans.sort((a, b) => {
+        const fileCompare = a.filePath.localeCompare(b.filePath);
+        return fileCompare !== 0 ? fileCompare : a.name.localeCompare(b.name);
       });
+
+      // Filter out members of used classes (unless includeMembers is true)
+      if (!includeMembers && !classesOnly) {
+        // Get all class IDs that are NOT orphans (i.e., used classes)
+        const usedClassIds = new Set(
+          allSymbols.filter((s) => s.type === 'class' && usedSymbolIds.has(s.id)).map((s) => s.id)
+        );
+
+        // Filter out members whose parent class is used
+        orphans = orphans.filter((orphan) => {
+          // Check if this is a class member (method or property)
+          if (orphan.type !== 'method' && orphan.type !== 'property') {
+            return true; // Keep non-members
+          }
+
+          // Extract class name from member ID
+          // ID format: "method-classname-methodname" or "property-classname-propname"
+          const parts = orphan.id.split('-');
+          if (parts.length < 3) {
+            return true; // Keep if we can't determine parent class
+          }
+
+          const className = parts[1];
+          const classId = `class-${className}`;
+
+          // If parent class is used, filter out this member
+          return !usedClassIds.has(classId);
+        });
+      }
+
+      return orphans;
+    } finally {
+      dbManager.close();
     }
-
-    dbManager.close();
-
-    return orphans;
   }
 
   /**
