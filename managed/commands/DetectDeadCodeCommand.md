@@ -12,69 +12,85 @@ canonical: true
 
 ## Purpose
 
-Detect unused code (dead code) by analyzing call graphs and dependency relationships.
+Detect and tag unused code (dead code) by analyzing call graphs, dependency relationships, and intra-file references.
 
 ## Detection Strategy
 
-Uses three metrics to identify dead code:
+Uses multi-signal metrics to identify dead code:
 - **Incoming calls**: Symbols never called by other code
-- **Incoming dependencies**: Symbols never imported/referenced
-- **Entry point awareness**: Excludes commands, CLI, exports
+- **Incoming dependencies**: Symbols never imported or referenced
+- **Intra-file reference count**: Identifies symbols never referenced even inside their declaring file
+- **True application entry points**: Excludes `src/index.ts`, `src/cli.ts`, `src/lsp/server.ts`, `mcp-server/src/index.ts`, and CLI command classes
 
 ## Confidence Levels
 
-### High Confidence (Safe to Delete)
+### High Confidence (Safe to Delete / Tag)
 - 0 incoming calls AND 0 incoming dependencies
+- Intra-file reference count $\le 1$ (only declaration itself)
 - Not an entry point or test file
 - Completely isolated from codebase
 
-### Medium Confidence (Likely Unused)
-- 0 incoming calls but some dependencies exist
-- May be imported but never actually used
-- Needs manual verification
+### Medium Confidence (Unused Export / Review Required)
+- 0 external incoming calls or dependencies
+- Exported from declaring module, but never imported by any other module
+- Review before deletion or remove export keyword
 
 ### Low Confidence (Test Only)
 - Only used in test files
-- May be necessary for testing infrastructure
-- Review before deletion
+- May be extracted to test utilities or test fixtures
+
+## Self-Tagging & Exploration Capabilities
+
+TSDoc Edge provides automated self-tagging with `@deprecated` and `@deadcode`:
+- **Automated annotation**: Inserts or appends `@deprecated` and `@deadcode` TSDoc tags directly above symbol declarations
+- **Dry-run verification**: Previews all tagging or untagging actions without modifying files
+- **Tag search & audit**: Discovers all symbols already tagged across the repository
+- **Reversal**: Cleans up tags via `--untag` when code is revived
 
 ## Usage
 
 ```bash
-# Show only high-confidence dead code
-tsdoc-edge detect-dead-code --high
+# Explore high-confidence dead code
+tsdoc-edge detect-dead-code
 
-# Show high and medium confidence
-tsdoc-edge detect-dead-code --medium
+# Explore scoped to a specific directory or file
+tsdoc-edge detect-dead-code src/analyzer --type interface
 
-# Show all candidates
-tsdoc-edge detect-dead-code --all
+# Search already tagged dead code symbols
+tsdoc-edge detect-dead-code --tagged
+
+# Preview tagging dead code in dry-run mode
+tsdoc-edge detect-dead-code src/analyzer --tag --dry-run
+
+# Automatically tag dead code in source files
+tsdoc-edge detect-dead-code src/analyzer --tag
+
+# Remove dead code tags
+tsdoc-edge detect-dead-code src/analyzer --untag
+
+# Output structured JSON
+tsdoc-edge detect-dead-code --json
 ```
 
-## Output
+## Options
 
-For each dead code symbol:
-- Symbol name and type
-- File location
-- Confidence level
-- Deletion recommendations
-- Safety warnings
-
-## Safety Checks
-
-Automatically excludes:
-- Entry points (commands, CLI, main exports)
-- Test files
-- Public API contracts
-
-Warns about:
-- Dynamic usage (reflection, eval)
-- Runtime configuration
-- Plugin systems
-- Conditional imports
+- `--all`: Show all dead code candidates (including low confidence)
+- `--high`: Show only high confidence candidates (default)
+- `--medium`: Show medium and high confidence candidates
+- `--confidence=LEVEL`: Filter by confidence (`high`, `medium`, `low`, `all`)
+- `--path=PATH`: Filter candidates by file or directory path
+- `--type=TYPE`: Filter by symbol type (`function`, `class`, `interface`, `type`, `constant`, `variable`)
+- `--tagged`: Search and list symbols already tagged with `@deadcode` or `@deprecated`
+- `--tag`, `--apply-tag`: Automatically annotate dead code in source files
+- `--dry-run`: Preview tagging actions without modifying files
+- `--untag`: Remove dead code tags
+- `--json`: Output results in JSON format
+- `--summary`: Show aggregated breakdown of dead code candidates
 
 ## Related
 
+- [[TagDeadCodeCommand]]: Dedicated command for tagging dead code
+- [[OrphansCommand]]: Finds unreferenced symbols
 - [[CoverageReportCommand]]: Identifies undocumented code
 - [[AnalyzeCallsCommand]]: Call graph analysis
 - [[AnalyzeTypesCommand]]: Type dependency analysis
@@ -87,9 +103,11 @@ Warns about:
 
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:270
 - [[OrphansCommand]] → managed/commands/OrphansCommand.md:181
+- [[TagDeadCodeCommand]] → managed/commands/TagDeadCodeCommand.md:43
+- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:105
 - [[DataFlowTypes]] → managed/types/DataFlowTypes.md:174
 
 ### Implemented By
 
-- DetectDeadCodeCommand → src/commands/DetectDeadCodeCommand.ts:47
+- DetectDeadCodeCommand → src/commands/DetectDeadCodeCommand.ts:46
 

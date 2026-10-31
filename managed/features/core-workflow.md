@@ -196,5 +196,5 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 
 ### Implemented By
 
-- TSDocEdge → src/index.ts:155
+- TSDocEdge → src/index.ts:161
 

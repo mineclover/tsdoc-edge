@@ -60,6 +60,7 @@ export { StatsCommand } from './StatsCommand';
 export { SuggestCommand } from './SuggestCommand';
 export { SymbolUnifiedCommand } from './SymbolUnifiedCommand';
 export { SyncCoverageCommand } from './SyncCoverageCommand';
+export { TagDeadCodeCommand } from './TagDeadCodeCommand';
 export { TodosCommand } from './TodosCommand';
 export { TreeCommand } from './TreeCommand';
 export { UndocumentedCommand } from './UndocumentedCommand';

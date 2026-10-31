@@ -204,13 +204,40 @@ export class SymbolSearchEngine {
 
   /**
    * Find symbols by tag or annotation
-   * @param _tag - Tag to search for (e.g., "deprecated", "internal")
+   * @param tag - Tag to search for (e.g., "deprecated", "deadcode", "internal")
    * @returns Symbols with the tag
    */
-  findByTag(_tag: string): Symbol[] {
-    // This would require parsing tag information from the doc comments
-    // For now, return empty array - to be implemented with enhanced parser
-    return [];
+  findByTag(tag: string): Symbol[] {
+    const rawTag = tag.startsWith('@') ? tag.slice(1).toLowerCase() : tag.toLowerCase();
+    const tagPattern = new RegExp(`@${rawTag}\\b`, 'i');
+
+    return this.graphBuilder.getAllSymbols().filter((s) => {
+      // 1. Check metadata tags array
+      const tags = (s.metadata as { tags?: string[] } | undefined)?.tags;
+      if (Array.isArray(tags)) {
+        if (
+          tags.some(
+            (t) =>
+              typeof t === 'string' &&
+              (t.toLowerCase() === rawTag || t.toLowerCase() === `@${rawTag}`)
+          )
+        ) {
+          return true;
+        }
+      }
+
+      // 2. Check summary for tag annotation
+      if (s.summary && tagPattern.test(s.summary)) {
+        return true;
+      }
+
+      // 3. Check designDecisions or contract/responsibility text if present
+      if (s.designDecisions?.some((d) => tagPattern.test(d))) {
+        return true;
+      }
+
+      return false;
+    });
   }
 
   /**

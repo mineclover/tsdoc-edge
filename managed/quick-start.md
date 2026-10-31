@@ -344,7 +344,7 @@ tsdoc-edge analyze-pipeline
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:314
+- [[Commands Index]] → managed/COMMANDS.md:315
 - [[TSDoc Edge Documentation]] → managed/README.md:22
 - [[Examples]] → managed/examples/index.md:32
 - [[Guides & Tutorials]] → managed/guides/index.md:21

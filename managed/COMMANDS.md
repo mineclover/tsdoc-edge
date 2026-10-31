@@ -238,7 +238,8 @@ Analyze code quality.
 
 | Command | Description |
 |---------|-------------|
-| `detect-dead-code` | Find unused code |
+| `detect-dead-code` | Find and tag unused dead code |
+| `tag-dead-code` | Annotate unused dead code in source files with @deprecated and @deadcode tags |
 | `detect-cycles` | Detect circular dependencies |
 | `parallel-work` | Detect parallel development zones |
 | `without-responsibility` | Find missing @responsibility |

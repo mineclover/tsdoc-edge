@@ -198,7 +198,7 @@ tsdoc-edge used-by symbol-extractor
 
 - [[DepsCommand]] → managed/commands/DepsCommand.md:146
 - [[WhoUsesCommand]] → managed/commands/WhoUsesCommand.md:169
-- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:108
+- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:110
 - [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:156
 - [[Impact Analysis]] → managed/features/ImpactAnalysis.md:198
 

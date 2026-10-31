@@ -474,7 +474,7 @@ evaluator versions.
 - [[Coverage Metrics Contract]] → managed/features/coverage-metrics-contract.md:282
 - [[ConventionCheck]] → managed/specs/conventions/convention-check.md:70
 - [[AuthoredProjectSpecifications]] → managed/specs/index.md:83
-- [[Semantic Graph Spec Governance Completed Work]] → managed/workflows/semantic-graph-spec-governance-completed.md:133
+- [[Semantic Graph Spec Governance Completed Work]] → managed/workflows/semantic-graph-spec-governance-completed.md:134
 - [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:275
 - [[TS7 Test Compilation Lane]] → managed/workflows/ts7-test-compilation-lane.md:338
 

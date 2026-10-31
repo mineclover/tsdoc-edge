@@ -38,6 +38,7 @@ export const CUSTOM_TAGS = {
   VERSION: '@version',
   SINCE: '@since',
   DEPRECATED_IN_FAVOR_OF: '@deprecatedInFavorOf',
+  DEAD_CODE: '@deadcode',
 } as const;
 
 /**

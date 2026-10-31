@@ -46,6 +46,12 @@ export { DocumentSymbolParser } from './doc-symbol/DocumentSymbolParser';
 export { DocumentSymbolRegistry } from './doc-symbol/DocumentSymbolRegistry';
 export { TSDocSymbolParser } from './doc-symbol/TSDocSymbolParser';
 // Fixer exports
+export {
+  DeadCodeTagger,
+  type DeadCodeTagOptions,
+  type TaggedDeadCodeSymbol,
+  type TagResult,
+} from './fixer/DeadCodeTagger';
 export { DocumentationFixer } from './fixer/DocumentationFixer';
 export { RecursiveImprover } from './fixer/RecursiveImprover';
 // Fold/Unfold exports

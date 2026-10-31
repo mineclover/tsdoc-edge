@@ -809,7 +809,7 @@ Examples:
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:313
+- [[Commands Index]] → managed/COMMANDS.md:314
 - [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:1000
 - [[Guides & Tutorials]] → managed/guides/index.md:34
 - [[TSDoc Edge User Guide]] → managed/user-guide.md:219

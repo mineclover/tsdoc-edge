@@ -345,6 +345,84 @@ describe('SymbolSearchEngine', () => {
         expect(orphans.length).toBeGreaterThanOrEqual(0);
       });
     });
+
+    describe('findByTag', () => {
+      it('should find symbols by @deprecated and @deadcode tags', () => {
+        const testBuilder = new SymbolGraphBuilder();
+
+        testBuilder.addSymbol({
+          id: 'sym-deprecated',
+          name: 'DeprecatedClass',
+          type: 'class',
+          filePath: 'src/legacy/Old.ts',
+          line: 10,
+          column: 0,
+          isExported: true,
+          isPublic: true,
+          summary: '@deprecated Use NewClass instead',
+          tests: [],
+          designDecisions: [],
+        });
+
+        testBuilder.addSymbol({
+          id: 'sym-deadcode',
+          name: 'DeadHelper',
+          type: 'function',
+          filePath: 'src/util/Dead.ts',
+          line: 5,
+          column: 0,
+          isExported: false,
+          isPublic: false,
+          summary: '@deadcode reason="isolated" confidence="high"',
+          tests: [],
+          designDecisions: [],
+        });
+
+        testBuilder.addSymbol({
+          id: 'sym-metadata-tag',
+          name: 'MetadataTagged',
+          type: 'interface',
+          filePath: 'src/types/Tagged.ts',
+          line: 1,
+          column: 0,
+          isExported: true,
+          isPublic: true,
+          tests: [],
+          designDecisions: [],
+          metadata: {
+            tags: ['deprecated', 'customTag'],
+          },
+        });
+
+        testBuilder.addSymbol({
+          id: 'sym-active',
+          name: 'ActiveService',
+          type: 'class',
+          filePath: 'src/services/Active.ts',
+          line: 20,
+          column: 0,
+          isExported: true,
+          isPublic: true,
+          summary: 'Active production service',
+          tests: [],
+          designDecisions: [],
+        });
+
+        const engine = new SymbolSearchEngine(testBuilder);
+
+        const deprecatedSymbols = engine.findByTag('deprecated');
+        expect(deprecatedSymbols.map((s) => s.id)).toEqual(
+          expect.arrayContaining(['sym-deprecated', 'sym-metadata-tag'])
+        );
+        expect(deprecatedSymbols.map((s) => s.id)).not.toContain('sym-active');
+
+        const deadcodeSymbols = engine.findByTag('@deadcode');
+        expect(deadcodeSymbols.map((s) => s.id)).toEqual(['sym-deadcode']);
+
+        const nonExistent = engine.findByTag('nonExistentTag');
+        expect(nonExistent).toHaveLength(0);
+      });
+    });
   });
 
   describe('scale behavior', () => {

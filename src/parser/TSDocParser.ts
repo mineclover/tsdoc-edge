@@ -209,6 +209,14 @@ export class TSDocParser {
       })
     );
 
+    this.configuration.addTagDefinition(
+      new TSDocTagDefinition({
+        tagName: '@deadcode',
+        syntaxKind: TSDocTagSyntaxKind.BlockTag,
+        allowMultiple: false,
+      })
+    );
+
     this.parser = new MicrosoftTSDocParser(this.configuration);
   }
 

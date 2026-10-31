@@ -303,7 +303,7 @@ Break large impacts into smaller steps:
 ### Referenced By
 
 - [[UsedByCommand]] → managed/commands/UsedByCommand.md:124
-- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:176
+- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:178
 - [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:222
 
 ### Implemented By

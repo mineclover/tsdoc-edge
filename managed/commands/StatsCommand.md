@@ -261,7 +261,7 @@ fi
 - [[TSDoc Edge Documentation]] → managed/README.md:106
 - [[DatabaseManager]] → managed/core-components/DatabaseManager.md:291
 - [[CI/CD Integration]] → managed/features/CICDIntegration.md:247
-- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:107
+- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:109
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:253
 - [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:49
 - [[Guides & Tutorials]] → managed/guides/index.md:280

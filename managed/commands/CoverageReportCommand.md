@@ -282,7 +282,7 @@ echo "Coverage: $coverage%" > coverage-badge.txt
 
 ### Referenced By
 
-- [[DetectDeadCodeCommand]] → managed/commands/DetectDeadCodeCommand.md:78
+- [[DetectDeadCodeCommand]] → managed/commands/DetectDeadCodeCommand.md:94
 - [[UntestedCommand]] → managed/commands/UntestedCommand.md:199
 - [[ValidateSpecCommand]] → managed/commands/ValidateSpecCommand.md:321
 - [[Coverage Metrics Contract]] → managed/features/coverage-metrics-contract.md:276

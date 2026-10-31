@@ -205,9 +205,10 @@ Source: `src/commands/Phase5Commands.ts`
 - [[CLI Commands]] → managed/CLI-COMMANDS.md:30
 - [[TSDoc Edge Documentation]] → managed/README.md:104
 - [[DepsCommand]] → managed/commands/DepsCommand.md:148
+- [[DetectDeadCodeCommand]] → managed/commands/DetectDeadCodeCommand.md:93
 - [[UsedByCommand]] → managed/commands/UsedByCommand.md:120
 - [[CI/CD Integration]] → managed/features/CICDIntegration.md:249
-- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:105
+- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:107
 - [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:160
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:282
 - [[ValidationFeatures]] → managed/features/validation-features.md:270

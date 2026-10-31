@@ -140,7 +140,7 @@ export class DatabaseManager {
       fs.mkdirSync(dbDir, { recursive: true });
     }
 
-    if (!fs.existsSync(this.jsonlPath)) {
+    if (this.jsonlPath && this.jsonlPath.trim() !== '' && !fs.existsSync(this.jsonlPath)) {
       fs.mkdirSync(this.jsonlPath, { recursive: true });
     }
 
@@ -761,7 +761,7 @@ export class DatabaseManager {
    * Export all data to JSONL format
    */
   exportToJSONL(): string {
-    if (!fs.existsSync(this.jsonlPath)) {
+    if (this.jsonlPath && this.jsonlPath.trim() !== '' && !fs.existsSync(this.jsonlPath)) {
       fs.mkdirSync(this.jsonlPath, { recursive: true });
     }
 

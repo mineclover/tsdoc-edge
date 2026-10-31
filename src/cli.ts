@@ -84,6 +84,7 @@ import { RelationshipVisualizeCommand } from './commands/RelationshipVisualizeCo
 import { RoutesCommand } from './commands/RoutesCommand';
 import { SpecCommand } from './commands/SpecCommand';
 import { SystemStatusCommand } from './commands/SystemStatusCommand';
+import { TagDeadCodeCommand } from './commands/TagDeadCodeCommand';
 import { TaskCommand } from './commands/TaskCommand';
 import { TestExamplesCommand } from './commands/TestExamplesCommand';
 import { TestRelationshipsCommand } from './commands/TestRelationshipsCommand';
@@ -233,6 +234,7 @@ async function main(): Promise<void> {
   registry.register(new CoverageReportCommand());
   registry.register(new CoverageBaselineCommand());
   registry.register(new DetectDeadCodeCommand());
+  registry.register(new TagDeadCodeCommand());
   registry.register(new QueryInferredCommand());
   registry.register(new MoveCommand());
   registry.register(new SyncCoverageCommand());

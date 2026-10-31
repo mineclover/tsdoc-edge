@@ -239,7 +239,7 @@ Low Priority:
 - [[TSDoc Edge Documentation]] → managed/README.md:353
 - [[UndocumentedCommand]] → managed/commands/UndocumentedCommand.md:177
 - [[CI/CD Integration]] → managed/features/CICDIntegration.md:246
-- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:106
+- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:108
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:296
 
 ### Implemented By

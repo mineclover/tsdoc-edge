@@ -384,6 +384,8 @@ export abstract class BaseCommand {
     '-c',
     '--style',
     '--layout',
+    '--confidence',
+    '--path',
   ]);
 
   /**
