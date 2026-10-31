@@ -375,6 +375,14 @@ export class BuildCommand extends BaseCommand {
         // Collect all test symbols for relationship extraction
         const allTestSymbols: TestSymbol[] = [];
 
+        // Prune symbols and relationships for files that no longer exist on disk
+        const pruneResult = dbManager.pruneMissingFiles(process.cwd());
+        if (pruneResult.removedFiles.length > 0) {
+          this.printInfo(
+            `Pruned ${pruneResult.removedSymbols} stale symbols from ${pruneResult.removedFiles.length} deleted file(s)`
+          );
+        }
+
         // Process each file
         for (const filePath of files) {
           try {
@@ -382,6 +390,9 @@ export class BuildCommand extends BaseCommand {
             const isTestFile = filePath.endsWith('.test.ts') || filePath.endsWith('.spec.ts');
 
             result.filesScanned++;
+
+            // Clean previous symbols from this file to avoid stale/renamed leftovers
+            dbManager.deleteSymbolsByFile(filePath);
 
             if (isTestFile) {
               // Process test file with TestSymbolParser

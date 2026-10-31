@@ -25,7 +25,13 @@ import {
  * Block chunking analyzer
  */
 export class BlockChunkAnalyzer {
-  constructor(_program: ts.Program, _strategy: Partial<ChunkingStrategy> = {}) {}
+  protected program: ts.Program;
+  protected strategy: Partial<ChunkingStrategy>;
+
+  constructor(program: ts.Program, strategy: Partial<ChunkingStrategy> = {}) {
+    this.program = program;
+    this.strategy = strategy;
+  }
 
   /**
    * Analyze function for code blocks

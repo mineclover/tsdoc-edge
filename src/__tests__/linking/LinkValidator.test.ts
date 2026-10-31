@@ -9,6 +9,18 @@ import { DocCodeLinker } from '../../linking/DocCodeLinker';
 import { LinkValidator } from '../../linking/LinkValidator';
 import type { CodeLink, DocLink } from '../../types/core';
 
+interface LinkValidatorInternal {
+  validateCodeLink(link: CodeLink): any;
+  validateDocLink(link: DocLink): any;
+  levenshteinDistance(a: string, b: string): number;
+  findSimilarFile(file: string): string | undefined;
+  findSimilarSymbol(name: string, candidates: string[]): string | undefined;
+  checkSectionExists(content: string, section: string): boolean;
+}
+
+const asInternal = (v: LinkValidator): LinkValidatorInternal =>
+  v as unknown as LinkValidatorInternal;
+
 describe('LinkValidator', () => {
   let tempDir: string;
   let projectRoot: string;
@@ -214,7 +226,7 @@ export class Test {}
         targetSymbol: 'Target',
       };
 
-      const result = validator['validateCodeLink'](link);
+      const result = asInternal(validator).validateCodeLink(link);
 
       expect(result.type).toBe('valid');
       expect(result.link).toBe(link);
@@ -228,7 +240,7 @@ export class Test {}
         targetFile: path.join(tempDir, 'missing.ts'),
       };
 
-      const result = validator['validateCodeLink'](link);
+      const result = asInternal(validator).validateCodeLink(link);
 
       expect(result.type).toBe('broken');
       expect(result.issue).toContain('File not found');
@@ -246,7 +258,7 @@ export class Test {}
         targetSymbol: 'WrongClass',
       };
 
-      const result = validator['validateCodeLink'](link);
+      const result = asInternal(validator).validateCodeLink(link);
 
       expect(result.type).toBe('broken');
       expect(result.issue).toContain('Symbol not found');
@@ -264,7 +276,7 @@ export class Test {}
         targetSymbol: 'Parsr', // Typo
       };
 
-      const result = validator['validateCodeLink'](link);
+      const result = asInternal(validator).validateCodeLink(link);
 
       expect(result.type).toBe('broken');
       expect(result.suggestion).toContain('Parser');
@@ -290,7 +302,7 @@ export class MyClass {
         targetMember: 'myMethod',
       };
 
-      const result = validator['validateCodeLink'](link);
+      const result = asInternal(validator).validateCodeLink(link);
 
       // This test might need adjustment based on actual implementation
       // The current implementation has limited member validation
@@ -317,7 +329,7 @@ export class MyClass {
         targetMember: 'fakeMethod',
       };
 
-      const result = validator['validateCodeLink'](link);
+      const result = asInternal(validator).validateCodeLink(link);
 
       // Member validation might be limited in current implementation
       // Adjust expectation based on actual behavior
@@ -338,7 +350,7 @@ export class MyClass {
         targetDoc: docFile,
       };
 
-      const result = validator['validateDocLink'](link);
+      const result = asInternal(validator).validateDocLink(link);
 
       expect(result.type).toBe('valid');
     });
@@ -352,7 +364,7 @@ export class MyClass {
         targetDoc: path.join(tempDir, 'missing.md'),
       };
 
-      const result = validator['validateDocLink'](link);
+      const result = asInternal(validator).validateDocLink(link);
 
       expect(result.type).toBe('broken');
       expect(result.issue).toContain('Document not found');
@@ -371,7 +383,7 @@ export class MyClass {
         targetSection: 'Installation',
       };
 
-      const result = validator['validateDocLink'](link);
+      const result = asInternal(validator).validateDocLink(link);
 
       expect(result.type).toBe('valid');
     });
@@ -389,7 +401,7 @@ export class MyClass {
         targetSection: 'MissingSection',
       };
 
-      const result = validator['validateDocLink'](link);
+      const result = asInternal(validator).validateDocLink(link);
 
       expect(result.type).toBe('broken');
       expect(result.issue).toContain('Section not found');
@@ -512,13 +524,13 @@ export class Test {}
 
   describe('levenshteinDistance', () => {
     it('should calculate edit distance correctly', () => {
-      const distance1 = validator['levenshteinDistance']('kitten', 'sitting');
+      const distance1 = asInternal(validator).levenshteinDistance('kitten', 'sitting');
       expect(distance1).toBe(3);
 
-      const distance2 = validator['levenshteinDistance']('parser', 'parsr');
+      const distance2 = asInternal(validator).levenshteinDistance('parser', 'parsr');
       expect(distance2).toBe(1);
 
-      const distance3 = validator['levenshteinDistance']('test', 'test');
+      const distance3 = asInternal(validator).levenshteinDistance('test', 'test');
       expect(distance3).toBe(0);
     });
   });
@@ -528,14 +540,14 @@ export class Test {}
       fs.mkdirSync(path.join(tempDir, 'src'), { recursive: true });
       fs.writeFileSync(path.join(tempDir, 'src', 'parser.ts'), '');
 
-      const similar = validator['findSimilarFile']('src/parsr.ts');
+      const similar = asInternal(validator).findSimilarFile('src/parsr.ts');
 
       expect(similar).toBeDefined();
       expect(similar).toContain('parser.ts');
     });
 
     it('should return undefined for non-existent directory', () => {
-      const similar = validator['findSimilarFile']('missing/dir/file.ts');
+      const similar = asInternal(validator).findSimilarFile('missing/dir/file.ts');
       expect(similar).toBeUndefined();
     });
 
@@ -543,7 +555,7 @@ export class Test {}
       fs.mkdirSync(path.join(tempDir, 'dir'), { recursive: true });
       fs.writeFileSync(path.join(tempDir, 'dir', 'completely-different.ts'), '');
 
-      const similar = validator['findSimilarFile']('dir/test.ts');
+      const similar = asInternal(validator).findSimilarFile('dir/test.ts');
 
       // Should not suggest if distance is too large
       expect(similar).toBeUndefined();
@@ -553,20 +565,20 @@ export class Test {}
   describe('findSimilarSymbol', () => {
     it('should find similar symbol names', () => {
       const candidates = ['Parser', 'Validator', 'Generator'];
-      const similar = validator['findSimilarSymbol']('Parsr', candidates);
+      const similar = asInternal(validator).findSimilarSymbol('Parsr', candidates);
 
       expect(similar).toBe('Parser');
     });
 
     it('should return undefined if no close matches', () => {
       const candidates = ['CompletelyDifferent', 'AnotherOne'];
-      const similar = validator['findSimilarSymbol']('Test', candidates);
+      const similar = asInternal(validator).findSimilarSymbol('Test', candidates);
 
       expect(similar).toBeUndefined();
     });
 
     it('should return undefined for empty candidates', () => {
-      const similar = validator['findSimilarSymbol']('Test', []);
+      const similar = asInternal(validator).findSimilarSymbol('Test', []);
       expect(similar).toBeUndefined();
     });
   });
@@ -579,8 +591,8 @@ export class Test {}
 ### Details
 `;
 
-      const exists1 = validator['checkSectionExists'](content, 'Installation');
-      const exists2 = validator['checkSectionExists'](content, 'Details');
+      const exists1 = asInternal(validator).checkSectionExists(content, 'Installation');
+      const exists2 = asInternal(validator).checkSectionExists(content, 'Details');
 
       expect(exists1).toBe(true);
       expect(exists2).toBe(true);
@@ -588,14 +600,14 @@ export class Test {}
 
     it('should return false for missing sections', () => {
       const content = '# Title\n\n## Section One';
-      const exists = validator['checkSectionExists'](content, 'Missing');
+      const exists = asInternal(validator).checkSectionExists(content, 'Missing');
 
       expect(exists).toBe(false);
     });
 
     it('should be case-insensitive', () => {
       const content = '## Installation Guide';
-      const exists = validator['checkSectionExists'](content, 'installation');
+      const exists = asInternal(validator).checkSectionExists(content, 'installation');
 
       expect(exists).toBe(true);
     });

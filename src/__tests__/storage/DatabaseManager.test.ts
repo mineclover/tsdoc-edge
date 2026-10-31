@@ -560,4 +560,67 @@ describe('DatabaseManager', () => {
       expect(retrieved?.name).toBe('ImportTest');
     });
   });
+
+  describe('pruneMissingFiles and deleteSymbolsByFile', () => {
+    it('should delete symbols by file path', () => {
+      const sym1: Symbol = {
+        id: 'sym-del-1',
+        name: 'DeleteMe',
+        type: 'function',
+        filePath: 'src/to-delete.ts',
+        line: 1,
+        column: 1,
+        isExported: true,
+        isPublic: true,
+        tests: [],
+        designDecisions: [],
+      };
+      dbManager.insertSymbol(sym1, 1);
+      expect(dbManager.getSymbol('sym-del-1')).toBeDefined();
+
+      const deleted = dbManager.deleteSymbolsByFile('src/to-delete.ts');
+      expect(deleted).toBe(1);
+      expect(dbManager.getSymbol('sym-del-1')).toBeNull();
+    });
+
+    it('should prune symbols for files that do not exist on disk', () => {
+      const missingFilePath = path.join(tempDir, 'non-existent-file.ts');
+      const existingFilePath = path.join(tempDir, 'real-file.ts');
+      fs.writeFileSync(existingFilePath, 'export const a = 1;');
+
+      const missingSym: Symbol = {
+        id: 'sym-missing',
+        name: 'MissingFileSymbol',
+        type: 'function',
+        filePath: missingFilePath,
+        line: 1,
+        column: 1,
+        isExported: true,
+        isPublic: true,
+        tests: [],
+        designDecisions: [],
+      };
+      const existingSym: Symbol = {
+        id: 'sym-existing',
+        name: 'ExistingFileSymbol',
+        type: 'function',
+        filePath: existingFilePath,
+        line: 1,
+        column: 1,
+        isExported: true,
+        isPublic: true,
+        tests: [],
+        designDecisions: [],
+      };
+
+      dbManager.insertSymbol(missingSym, 1);
+      dbManager.insertSymbol(existingSym, 2);
+
+      const result = dbManager.pruneMissingFiles(tempDir);
+      expect(result.removedSymbols).toBe(1);
+      expect(result.removedFiles).toContain(missingFilePath);
+      expect(dbManager.getSymbol('sym-missing')).toBeNull();
+      expect(dbManager.getSymbol('sym-existing')).toBeDefined();
+    });
+  });
 });

@@ -99,11 +99,3 @@ export type AnalyzerType =
   | 'temporal-order'
   | 'tests'
   | 'types';
-
-/**
- * Analyzer registry entry
- */
-export interface AnalyzerEntry {
-  metadata: AnalyzerMetadata;
-  factory: (context: AnalyzerContext) => RelationshipAnalyzer;
-}

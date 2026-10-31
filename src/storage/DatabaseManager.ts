@@ -2352,8 +2352,53 @@ export class DatabaseManager {
       .delete(schema.symbols)
       .where(eq(schema.symbols.filePath, filePath))
       .run();
+
+    // Also remove relationships originating from this file
+    this.drizzleDb
+      .delete(schema.unifiedRelationships)
+      .where(eq(schema.unifiedRelationships.filePath, filePath))
+      .run();
+
     this.invalidateCache();
     return result.changes;
+  }
+
+  /**
+   * Prune symbols and relationships for files that no longer exist on disk.
+   *
+   * @param projectRoot - Root directory of the project
+   * @returns Object containing count of removed symbols and list of removed files
+   * @public
+   */
+  pruneMissingFiles(projectRoot: string = process.cwd()): {
+    removedSymbols: number;
+    removedFiles: string[];
+  } {
+    const rows = this.drizzleDb
+      .select({ filePath: schema.symbols.filePath })
+      .from(schema.symbols)
+      .all();
+
+    const uniqueFiles = new Set<string>();
+    for (const row of rows) {
+      if (row.filePath) {
+        uniqueFiles.add(row.filePath);
+      }
+    }
+
+    const removedFiles: string[] = [];
+    let removedSymbols = 0;
+
+    for (const filePath of uniqueFiles) {
+      const fullPath = path.isAbsolute(filePath) ? filePath : path.resolve(projectRoot, filePath);
+      if (!fs.existsSync(fullPath)) {
+        const deleted = this.deleteSymbolsByFile(filePath);
+        removedSymbols += deleted;
+        removedFiles.push(filePath);
+      }
+    }
+
+    return { removedSymbols, removedFiles };
   }
 
   /**
