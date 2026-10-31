@@ -49,6 +49,7 @@ import {
   type DefinitionParams,
   DidChangeConfigurationNotification,
   DidChangeWatchedFilesNotification,
+  type DidChangeWatchedFilesParams,
   type DocumentLink,
   type DocumentLinkParams,
   FileChangeType,
@@ -728,7 +729,14 @@ documents.onDidSave(async (event) => {
 
 // File deletes and rename-away events require the same whole-project replacement
 // so removed nodes and incident edges disappear in one transaction.
-connection.onDidChangeWatchedFiles(async (event) => {
+connection.onDidChangeWatchedFiles((event) => {
+  // The LSP handler contract is void; run the async refresh detached and log any rejection.
+  handleWatchedFileChanges(event).catch((error: unknown) => {
+    connection.console.error(`Watched-file handling failed: ${String(error)}`);
+  });
+});
+
+async function handleWatchedFileChanges(event: DidChangeWatchedFilesParams): Promise<void> {
   if (!tsdocService) return;
   const changes = event.changes.flatMap((change) => {
     const filePath = filePathFromUri(change.uri);
@@ -764,7 +772,7 @@ connection.onDidChangeWatchedFiles(async (event) => {
   } catch (error) {
     connection.console.error(`Graph refresh failed after watched-file change: ${error}`);
   }
-});
+}
 
 // Handle file close - cleanup
 documents.onDidClose((event) => {

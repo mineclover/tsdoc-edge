@@ -35,7 +35,7 @@ export interface DeadCodeSymbol {
  * @functionality
  * - Multi-signal analysis: Call graph, dependency graph, intra-file usage
  * - Accurate entry point identification: Distinguishes true application roots from arbitrary internal exports
- * - Self-tagging: Automatically annotates dead code with @deprecated and @deadcode TSDoc tags
+ * - Self-tagging: Automatically annotates dead code with `@deprecated` and `@deadcode` TSDoc tags
  * - Tag exploration: Search and inspect symbols already marked as dead code or deprecated
  * - Dry-run support: Safely preview tagging and untagging changes
  *

@@ -182,13 +182,13 @@ function createProtocolHarness(): ProtocolHarness {
         rootUri: pathToFileURL(root).href,
         capabilities: {},
       });
-      connection.sendNotification('initialized', {});
+      await connection.sendNotification('initialized', {});
 
       return {
         connection,
         async openAndGetDiagnostic(version = 1, text = primaryContent) {
           const nextDiagnostics = diagnosticsFrom(connection);
-          connection.sendNotification('textDocument/didOpen', {
+          await connection.sendNotification('textDocument/didOpen', {
             textDocument: {
               uri: primaryUri,
               languageId: 'json',

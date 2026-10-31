@@ -106,9 +106,9 @@ describe('saved convention LSP protocol', () => {
         rootUri: pathToFileURL(root).href,
         capabilities: {},
       });
-      connection.sendNotification('initialized', {});
+      await connection.sendNotification('initialized', {});
       const diagnosticsPromise = diagnosticsFrom(connection);
-      connection.sendNotification('textDocument/didOpen', {
+      await connection.sendNotification('textDocument/didOpen', {
         textDocument: { uri: documentUri, languageId: 'json', version: 1, text: '{}\n' },
       });
       const published = await diagnosticsPromise;

@@ -1,13 +1,12 @@
 {
   "typescript/await-thenable": 2,
   "typescript/no-base-to-string": 17,
-  "typescript/no-deprecated": 554,
-  "typescript/no-floating-promises": 23,
+  "typescript/no-deprecated": 180,
   "typescript/no-unnecessary-condition": 263,
   "typescript/no-unnecessary-type-assertion": 92,
   "typescript/no-unsafe-argument": 54,
-  "typescript/no-unsafe-assignment": 9,
-  "typescript/require-await": 216,
+  "typescript/no-unsafe-assignment": 133,
+  "typescript/require-await": 109,
   "typescript/restrict-plus-operands": 2,
-  "typescript/switch-exhaustiveness-check": 2
+  "typescript/switch-exhaustiveness-check": 6
 }

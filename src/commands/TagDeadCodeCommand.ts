@@ -12,7 +12,7 @@ import { DetectDeadCodeCommand } from './DetectDeadCodeCommand';
  *
  * @doc [[TagDeadCodeCommand]]
  * @public
- * @responsibility Provide dedicated entry point for tagging dead code with @deprecated and @deadcode
+ * @responsibility Provide dedicated entry point for tagging dead code with `@deprecated` and `@deadcode`
  * @contract Analyzes dead code candidates and inserts TSDoc tags directly into source files
  */
 export class TagDeadCodeCommand extends BaseCommand {

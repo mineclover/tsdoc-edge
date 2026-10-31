@@ -23,19 +23,24 @@ const ANSI = /\x1b\[[0-9;]*m/g;
 const DIAGNOSTIC =
   /^(?<file>.+?):\d+:\d+ - (?<severity>error|warning) TS\d+: (?:\[(?<rule>[^\]]+)\] )?/;
 
-/** Count diagnostics per lint rule; TypeScript diagnostics (no rule) are collected separately. */
+/** Count warning diagnostics per lint rule; error-level lint or TS diagnostics are collected separately. */
 function parseTtscLintOutput(output) {
   const rules = {};
   const typeErrors = [];
+  const lintErrors = [];
   for (const raw of output.split(/\r?\n/)) {
     const line = raw.replace(ANSI, '');
     const match = DIAGNOSTIC.exec(line);
     if (!match) continue;
     const { rule, severity } = match.groups;
-    if (rule) rules[rule] = (rules[rule] ?? 0) + 1;
-    else if (severity === 'error') typeErrors.push(line);
+    if (rule) {
+      if (severity === 'error') lintErrors.push(line);
+      else rules[rule] = (rules[rule] ?? 0) + 1;
+    } else if (severity === 'error') {
+      typeErrors.push(line);
+    }
   }
-  return { rules: sortKeys(rules), typeErrors };
+  return { rules: sortKeys(rules), typeErrors, lintErrors };
 }
 
 /** Rules whose count increased versus the baseline (new rules count from zero). */
@@ -66,12 +71,22 @@ function main() {
     process.exit(1);
   }
 
-  const { rules, typeErrors } = parseTtscLintOutput(output);
+  const { rules, typeErrors, lintErrors } = parseTtscLintOutput(output);
   if (typeErrors.length > 0) {
     console.error(
       `TypeScript errors (${typeErrors.length}):\n${typeErrors.slice(0, 20).join('\n')}`
     );
     process.exit(1);
+  }
+  if (lintErrors.length > 0) {
+    console.error(
+      `Enforced @ttsc/lint errors (${lintErrors.length}):\n${lintErrors.slice(0, 20).join('\n')}`
+    );
+    process.exit(1);
+  }
+  if (result.status !== 0) {
+    console.error(output);
+    process.exit(result.status ?? 1);
   }
 
   const total = Object.values(rules).reduce((sum, count) => sum + count, 0);

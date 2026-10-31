@@ -1,62 +1,48 @@
 /**
- * `@ttsc/lint` configuration.
+ * `@ttsc/lint` enforced build & LSP configuration (`0.34.3`).
  *
- * Scope: only what Biome cannot check. Biome owns syntax/style lint and formatting
- * (`npm run lint`, `npm run format`); this config adds type-aware rules that need
- * the TypeScript checker, plus native TSDoc checks. No `format` block, so
- * `ttsc format` stays inert and does not fight Biome.
+ * Auto-discovered by `ttsc` during `npm run build`, `npm run typecheck`,
+ * `npm test`, and `ttscserver` editor sessions. Only clean, zero-backlog
+ * rules live here at `error` severity so ordinary builds and test runs fail
+ * immediately on regressions without printing backlog warning noise.
  *
- * Plain ESM (not .ts) because @ttsc/lint type-checks .ts configs in an isolated
- * project without @types/node.
+ * Scope boundary: Biome owns formatting and syntax/style lint (`npm run lint`,
+ * `npm run format`); no `format` block is declared here so `ttsc format` stays
+ * inert. `tsdoc.json` is loaded natively by `tsdoc-edge/tsdoc-config` via
+ * `@ttsc/lint` 0.34's `ProjectInputReader` (with automatic `ttscserver` file
+ * watch invalidation and JSDoc `@tag` autocomplete hints).
  *
- * Phase 0 (measurement): every rule is `warn`; `npm run lint:ttsc` reports
- * without failing. Rules graduate to `error` per family once clean.
+ * Backlog `warn` rules are layered in `lint.ratchet.config.mjs` (used by
+ * `tsconfig.lint.json` / `npm run lint:ttsc`) and graduate here once they
+ * reach zero findings.
  */
-import { readFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
-import { StandardTags } from '@microsoft/tsdoc';
 
 const require = createRequire(import.meta.url);
-const tsdocJson = JSON.parse(readFileSync(new URL('./tsdoc.json', import.meta.url), 'utf8'));
 const tsdocEdgeRules = require('./tools/ttsc-tsdoc/index.cjs');
-
-/** Allowed TSDoc tags: @microsoft/tsdoc standard tags + tsdoc.json definitions (SSOT). */
-const tsdocTags = [
-  ...StandardTags.allDefinitions.map((definition) => definition.tagName),
-  ...tsdocJson.tagDefinitions.map((definition) => definition.tagName),
-];
 
 /** @type {import('@ttsc/lint').ITtscLintConfig} */
 export default {
   ignores: ['src/__tests__/fixtures/**'],
   plugins: { 'tsdoc-edge': tsdocEdgeRules },
   rules: {
-    // Native TSDoc tag check driven by tsdoc.json. Replaces jsdoc/check-tag-names,
-    // whose fixed JSDoc vocabulary rejects TSDoc standard and project tags.
-    'tsdoc-edge/check-tag-names': ['warn', { tags: tsdocTags }],
+    // Native TSDoc SSOT: ProjectRule + ProjectInputRule + HintRule reading tsdoc.json,
+    // paired with parser-aware file tag validation.
+    'tsdoc-edge/tsdoc-config': 'error',
+    'tsdoc-edge/check-tag-names': 'error',
 
-    // Promise safety (type-aware)
-    'typescript/no-floating-promises': 'warn',
-    'typescript/no-misused-promises': 'warn',
-    'typescript/await-thenable': 'warn',
-    'typescript/require-await': 'warn',
+    // Promise safety (type-aware; 0 findings across src/ and src/__tests__/)
+    'typescript/no-floating-promises': 'error',
+    'typescript/no-misused-promises': 'error',
 
-    // Checker-backed correctness (type-aware)
-    'typescript/no-unnecessary-type-assertion': 'warn',
-    'typescript/no-unnecessary-condition': 'warn',
-    'typescript/switch-exhaustiveness-check': 'warn',
-    'typescript/no-deprecated': 'warn',
-    'typescript/no-base-to-string': 'warn',
-    'typescript/restrict-plus-operands': 'warn',
-    'typescript/no-unsafe-argument': 'warn',
-    'typescript/no-unsafe-assignment': 'warn',
-    'typescript/no-unsafe-return': 'warn',
+    // Checker-backed return safety (0 findings across src/ and src/__tests__/)
+    'typescript/no-unsafe-return': 'error',
 
-    // JSDoc structure (native subset; full grammar stays in `validate-tsdoc`)
-    'jsdoc/tsdoc-syntax': 'warn',
-    'jsdoc/require-param-name': 'warn',
-    'jsdoc/require-param-description': 'warn',
-    'jsdoc/require-returns-description': 'warn',
-    'jsdoc/empty-tags': 'warn',
+    // TSDoc / JSDoc structural invariants (0 findings across src/ and src/__tests__/)
+    'jsdoc/tsdoc-syntax': 'error',
+    'jsdoc/require-param-name': 'error',
+    'jsdoc/require-param-description': 'error',
+    'jsdoc/require-returns-description': 'error',
+    'jsdoc/empty-tags': 'error',
   },
 };

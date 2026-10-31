@@ -17,7 +17,7 @@ export interface DeadCodeTagOptions {
   reason?: string;
   /** Confidence level */
   confidence?: 'high' | 'medium' | 'low';
-  /** Whether to add standard @deprecated tag (default: true) */
+  /** Whether to add the standard `@deprecated` tag (default: true) */
   addDeprecated?: boolean;
   /** Whether to add custom @deadcode tag (default: true) */
   addDeadcode?: boolean;
