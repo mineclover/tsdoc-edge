@@ -32,6 +32,7 @@ import {
   PlansCommand,
   QueryInferredCommand,
   RebuildIndexCommand,
+  SpecMetricsCommand,
   StatsCommand,
   SuggestCommand,
   SymbolUnifiedCommand,
@@ -180,6 +181,7 @@ async function main(): Promise<void> {
   registry.register(new SymbolUnifiedCommand());
   registry.register(new RelationshipCommand());
   registry.register(new SpecCommand());
+  registry.register(new SpecMetricsCommand());
   registry.register(new TaskCommand());
   registry.register(new OntologyCommand());
   registry.register(new DocsCommand());

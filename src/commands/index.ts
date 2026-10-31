@@ -55,6 +55,7 @@ export { SpecBumpCommand } from './SpecBumpCommand';
 export { SpecDiffCommand } from './SpecDiffCommand';
 export { SpecGraphCommand } from './SpecGraphCommand';
 export { SpecHistoryCommand } from './SpecHistoryCommand';
+export { SpecMetricsCommand } from './SpecMetricsCommand';
 export { SpecStatusCommand } from './SpecStatusCommand';
 export { StatsCommand } from './StatsCommand';
 export { SuggestCommand } from './SuggestCommand';

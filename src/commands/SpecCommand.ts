@@ -10,6 +10,7 @@ import { SpecDiffCommand } from './SpecDiffCommand';
 import { SpecExtractCommand } from './SpecExtractCommand';
 import { SpecGraphCommand } from './SpecGraphCommand';
 import { SpecHistoryCommand } from './SpecHistoryCommand';
+import { SpecMetricsCommand } from './SpecMetricsCommand';
 import { SpecStatusCommand } from './SpecStatusCommand';
 import { ValidateSpecCommand } from './ValidateSpecCommand';
 
@@ -19,6 +20,7 @@ const SUBCOMMANDS = {
   diff: { command: SpecDiffCommand, description: 'Compare specification versions' },
   bump: { command: SpecBumpCommand, description: 'Bump specification version' },
   validate: { command: ValidateSpecCommand, description: 'Validate specifications' },
+  metrics: { command: SpecMetricsCommand, description: 'Display specification metrics dashboard' },
   extract: {
     command: SpecExtractCommand,
     description: 'Compile managed project specs into SpecGraph',
@@ -60,7 +62,7 @@ export class SpecCommand extends BaseCommand {
    * @public
    */
   getDescription(): string {
-    return 'Unified spec operations (status|history|diff|bump|validate|extract|graph)';
+    return 'Unified spec operations (status|history|diff|bump|validate|metrics|extract|graph)';
   }
 
   /**
@@ -84,6 +86,7 @@ Examples:
   tsdoc-edge spec diff v1.0 v2.0 managed/features/work-context.md
   tsdoc-edge spec bump managed/features/work-context.md --minor
   tsdoc-edge spec validate managed
+  tsdoc-edge spec metrics
 
 Use 'tsdoc-edge spec <subcommand> --help' for subcommand details.`;
   }

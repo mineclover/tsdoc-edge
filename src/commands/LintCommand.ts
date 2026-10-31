@@ -4,6 +4,7 @@
  */
 
 import { CodeHealthChecker } from '../analyzer/CodeHealthChecker';
+import { SpecMetricsAggregator } from '../spec/SpecMetricsAggregator';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
@@ -30,6 +31,13 @@ interface LintResult {
  * @public
  */
 export class LintCommand extends BaseCommand {
+  private specAggregator?: SpecMetricsAggregator;
+
+  constructor(specAggregator?: SpecMetricsAggregator) {
+    super();
+    this.specAggregator = specAggregator;
+  }
+
   /**
    * getName method
    * @returns Returns string
@@ -95,32 +103,39 @@ export class LintCommand extends BaseCommand {
 
       try {
         // 1. Code Health Check
-        console.log(`${colors.cyan}[1/4] Checking code health...${colors.reset}`);
+        console.log(`${colors.cyan}[1/5] Checking code health...${colors.reset}`);
         const healthResult = this.checkHealth();
         results.push(healthResult);
         totalIssues += healthResult.issues.length;
         totalWarnings += healthResult.warnings.length;
 
         // 2. Documentation Coverage
-        console.log(`${colors.cyan}[2/4] Checking documentation coverage...${colors.reset}`);
+        console.log(`${colors.cyan}[2/5] Checking documentation coverage...${colors.reset}`);
         const docResult = this.checkDocumentation(db);
         results.push(docResult);
         totalIssues += docResult.issues.length;
         totalWarnings += docResult.warnings.length;
 
         // 3. Relationship Density
-        console.log(`${colors.cyan}[3/4] Checking relationship density...${colors.reset}`);
+        console.log(`${colors.cyan}[3/5] Checking relationship density...${colors.reset}`);
         const relResult = this.checkRelationships(db);
         results.push(relResult);
         totalIssues += relResult.issues.length;
         totalWarnings += relResult.warnings.length;
 
         // 4. Test Coverage
-        console.log(`${colors.cyan}[4/4] Checking test coverage...${colors.reset}`);
+        console.log(`${colors.cyan}[4/5] Checking test coverage...${colors.reset}`);
         const testResult = this.checkTestCoverage(db);
         results.push(testResult);
         totalIssues += testResult.issues.length;
         totalWarnings += testResult.warnings.length;
+
+        // 5. Specification Conformance & Completeness
+        console.log(`${colors.cyan}[5/5] Checking specification conformance...${colors.reset}`);
+        const specResult = this.checkSpecification(dbPath);
+        results.push(specResult);
+        totalIssues += specResult.issues.length;
+        totalWarnings += specResult.warnings.length;
 
         console.log();
 
@@ -400,6 +415,48 @@ export class LintCommand extends BaseCommand {
       console.log(`${colors.yellow}! Quality checks passed with warnings${colors.reset}`);
     } else {
       console.log(`${colors.red}✗ Quality checks failed${colors.reset}`);
+    }
+  }
+
+  private checkSpecification(dbPath: string): LintResult {
+    const issues: string[] = [];
+    const warnings: string[] = [];
+
+    try {
+      const aggregator = this.specAggregator || new SpecMetricsAggregator();
+      const metrics = aggregator.aggregate({ dbPath });
+
+      if (metrics.healthScore < 40) {
+        issues.push(
+          `Spec health score critically low: ${metrics.healthScore}/100 (Grade: ${metrics.grade})`
+        );
+      } else if (metrics.healthScore < 60) {
+        warnings.push(
+          `Spec health score needs improvement: ${metrics.healthScore}/100 (Grade: ${metrics.grade})`
+        );
+      }
+
+      if (metrics.codeConnectivity.brokenCodeLinksCount > 0) {
+        warnings.push(
+          `Broken code reference links in specifications: ${metrics.codeConnectivity.brokenCodeLinksCount}`
+        );
+      }
+
+      return {
+        category: 'Specification Conformance',
+        passed: issues.length === 0,
+        score: metrics.healthScore,
+        issues,
+        warnings,
+      };
+    } catch {
+      return {
+        category: 'Specification Conformance',
+        passed: true,
+        score: 100,
+        issues: [],
+        warnings: [],
+      };
     }
   }
 

@@ -192,8 +192,9 @@ export class SpecStatusManager {
 
   /**
    * Get current status from document frontmatter
+   * @public
    */
-  private getCurrentStatus(filePath: string): SpecStatus {
+  getCurrentStatus(filePath: string): SpecStatus {
     const content = fs.readFileSync(filePath, 'utf-8');
     const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
 

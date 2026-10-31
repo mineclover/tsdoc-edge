@@ -14,6 +14,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { SpecMetricsAggregator } from '../spec/SpecMetricsAggregator';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import type { SymbolType } from '../types/graph';
 import type { Symbol } from '../types/graph/graph';
@@ -30,6 +31,8 @@ interface WorkContext {
     symbolRef: string;
     sourceFile?: string;
     sourceLine?: number;
+    specScore?: number;
+    specStatus?: string;
   }>;
   dependencies: Array<{
     name: string;
@@ -250,17 +253,34 @@ export class DesignContextCommand extends BaseCommand {
 
       // Simple regex to find @doc tags
       const docTagRegex = /@doc\s+\[\[([^\]]+)\]\]/g;
+      const specAggregator = new SpecMetricsAggregator();
 
       lines.forEach((line, index) => {
         const matches = line.matchAll(docTagRegex);
         for (const match of matches) {
           const symbolRef = match[1];
+          const docPath = this.findDocumentPath(symbolRef);
+          let specScore: number | undefined;
+          let specStatus: string | undefined;
+
+          if (docPath && docPath !== '(not found)' && fs.existsSync(docPath)) {
+            try {
+              const specMetrics = specAggregator.getSpecMetricsForFile(docPath);
+              specScore = specMetrics.score;
+              specStatus = specMetrics.status;
+            } catch {
+              // Ignore
+            }
+          }
+
           context.relatedDocs.push({
             title: symbolRef,
-            path: this.findDocumentPath(symbolRef),
+            path: docPath,
             symbolRef,
             sourceFile: relativePath,
             sourceLine: index + 1,
+            specScore,
+            specStatus,
           });
         }
       });
@@ -827,9 +847,12 @@ export class DesignContextCommand extends BaseCommand {
       for (const doc of context.relatedDocs) {
         const isFound = doc.path !== '(not found)';
         const statusIcon = isFound ? `${colors.green}✅` : `${colors.yellow}❌`;
+        const specMeta = doc.specStatus
+          ? ` ${colors.dim}[${doc.specStatus.toUpperCase()}${doc.specScore !== undefined ? `, Score: ${doc.specScore}%` : ''}]${colors.reset}`
+          : '';
 
         console.log(
-          `  ${colors.cyan}•${colors.reset} ${colors.bold}[[${doc.symbolRef}]]${colors.reset} ${statusIcon}${colors.reset}`
+          `  ${colors.cyan}•${colors.reset} ${colors.bold}[[${doc.symbolRef}]]${colors.reset} ${statusIcon}${specMeta}`
         );
 
         if (isFound) {
