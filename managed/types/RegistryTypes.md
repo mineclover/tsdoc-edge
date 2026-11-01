@@ -192,4 +192,8 @@ const changed = registry.filter(e =>
 ### Implemented By
 
 - RegistryTypes → src/types/registry/registry.ts:1
+- SourceRef → src/types/registry/registry.ts:16
+- DependencyRelation → src/types/registry/registry.ts:90
+- SymbolRegistryEntry → src/types/registry/registry.ts:113
+- SymbolRegistry → src/types/registry/registry.ts:160
 

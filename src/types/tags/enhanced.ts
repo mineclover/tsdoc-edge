@@ -1,11 +1,18 @@
 /**
  * Enhanced documentation tags for Strict Mode
+ *
  * @packageDocumentation
+ * @doc [[EnhancedTagTypes]]
+ * @doc [[ModuleSpecTagTypes]]
  * @responsibility Define extended documentation structure for comprehensive symbol documentation
+ * @context 6-category strict-mode symbol documentation schema (problem solving, functionality, error experiences, decisions, dependencies, future plans)
+ * @functionality Defines ProblemSolving, Functionality, ErrorExperience, DecisionRecord, DependencySpec, FuturePlan, BaseSymbolDoc, EnhancedSymbolDoc, and StrictModeValidation interfaces
  */
 
 /**
  * Problem solving documentation
+ * @doc [[EnhancedTagTypes]]
+ * @doc [[ModuleSpecTagTypes]]
  * @public
  */
 export interface ProblemSolving {
@@ -32,6 +39,8 @@ export interface ProblemSolving {
 
 /**
  * Functionality documentation
+ * @doc [[EnhancedTagTypes]]
+ * @doc [[ModuleSpecTagTypes]]
  * @public
  */
 export interface Functionality {
@@ -65,6 +74,8 @@ export interface Functionality {
 
 /**
  * Error experience documentation
+ * @doc [[EnhancedTagTypes]]
+ * @doc [[ModuleSpecTagTypes]]
  * @public
  */
 export interface ErrorExperience {
@@ -106,6 +117,8 @@ export interface ErrorExperience {
 
 /**
  * Decision record
+ * @doc [[EnhancedTagTypes]]
+ * @doc [[ModuleSpecTagTypes]]
  * @public
  */
 export interface DecisionRecord {
@@ -160,6 +173,8 @@ export interface DecisionRecord {
 
 /**
  * Dependency specification (enhanced)
+ * @doc [[EnhancedTagTypes]]
+ * @doc [[ModuleSpecTagTypes]]
  * @public
  */
 export interface DependencySpec {
@@ -196,6 +211,8 @@ export interface DependencySpec {
 
 /**
  * Future plan documentation
+ * @doc [[EnhancedTagTypes]]
+ * @doc [[ModuleSpecTagTypes]]
  * @public
  */
 export interface FuturePlan {
@@ -281,6 +298,8 @@ export interface FuturePlan {
 /**
  * Base symbol documentation
  * Contains minimal required fields for any symbol documentation
+ * @doc [[EnhancedTagTypes]]
+ * @doc [[ModuleSpecTagTypes]]
  * @public
  */
 export interface BaseSymbolDoc {
@@ -312,6 +331,8 @@ export interface BaseSymbolDoc {
  * For Strict Mode compliance on public APIs, all 6 categories should be present.
  * For incremental documentation, categories can be added progressively.
  *
+ * @doc [[EnhancedTagTypes]]
+ * @doc [[ModuleSpecTagTypes]]
  * @public
  */
 export interface EnhancedSymbolDoc extends BaseSymbolDoc {
@@ -354,6 +375,8 @@ export interface EnhancedSymbolDoc extends BaseSymbolDoc {
 
 /**
  * Strict mode validation result
+ * @doc [[EnhancedTagTypes]]
+ * @doc [[ModuleSpecTagTypes]]
  * @public
  */
 export interface StrictModeValidation {

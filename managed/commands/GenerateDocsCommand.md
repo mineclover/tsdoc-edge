@@ -21,5 +21,5 @@ Generates Markdown API and enhanced 6-category symbol documentation from annotat
 
 ### Implemented By
 
-- GenerateDocsCommand → src/commands/GenerateDocsCommand.ts:18
+- GenerateDocsCommand → src/commands/GenerateDocsCommand.ts:27
 

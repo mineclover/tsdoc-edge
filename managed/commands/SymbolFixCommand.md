@@ -17,7 +17,7 @@ Automatically detect and fix common symbol reference issues in documentation. Pr
 ## Usage
 
 ```bash
-tsdoc-edge symbol-fix <docs-dir> [options]
+tsdoc-edge symbol fix <docs-dir> [options]
 ```
 
 ### Options
@@ -30,13 +30,13 @@ tsdoc-edge symbol-fix <docs-dir> [options]
 
 ```bash
 # Preview fixes (safe, no changes)
-tsdoc-edge symbol-fix managed --dry-run
+tsdoc-edge symbol fix managed --dry-run
 
 # Apply auto-fixable issues
-tsdoc-edge symbol-fix managed --yes
+tsdoc-edge symbol fix managed --yes
 
 # Fix only duplicate H1 issues
-tsdoc-edge symbol-fix managed --type=duplicate-h1 --yes
+tsdoc-edge symbol fix managed --type=duplicate-h1 --yes
 ```
 
 ## Issue Types
@@ -64,7 +64,7 @@ tsdoc-edge symbol-fix managed --type=duplicate-h1 --yes
 
 **Example**:
 ```bash
-tsdoc-edge symbol-fix managed --type=duplicate-h1 --dry-run
+tsdoc-edge symbol fix managed --type=duplicate-h1 --dry-run
 ```
 
 ### 2. Possible Typos (typo)
@@ -93,7 +93,7 @@ if (distance <= 2 && distance > 0) {
 
 **Example**:
 ```bash
-tsdoc-edge symbol-fix managed --type=typo --dry-run
+tsdoc-edge symbol fix managed --type=typo --dry-run
 ```
 
 ### 3. Missing Primary (missing_primary)
@@ -204,7 +204,7 @@ This feature does X...
 ### Dry-Run Mode
 
 ```bash
-tsdoc-edge symbol-fix managed --dry-run
+tsdoc-edge symbol fix managed --dry-run
 ```
 
 - No files modified
@@ -214,7 +214,7 @@ tsdoc-edge symbol-fix managed --dry-run
 ### Confirmation Required
 
 ```bash
-tsdoc-edge symbol-fix managed
+tsdoc-edge symbol fix managed
 # Prompt: This will modify your files. Use --yes to confirm.
 ```
 
@@ -308,16 +308,16 @@ convertH1ToH2(filePath, line, symbolName) {
 
 ```bash
 # 1. Validate and identify issues
-tsdoc-edge validate-symbol-refs managed
+tsdoc-edge validate refs managed
 
 # 2. Preview auto-fixes
-tsdoc-edge symbol-fix managed --dry-run
+tsdoc-edge symbol fix managed --dry-run
 
 # 3. Apply fixes
-tsdoc-edge symbol-fix managed --yes
+tsdoc-edge symbol fix managed --yes
 
 # 4. Re-validate
-tsdoc-edge validate-symbol-refs managed
+tsdoc-edge validate refs managed
 ```
 
 ### Depends On
@@ -338,27 +338,27 @@ tsdoc-edge validate-symbol-refs managed
 
 ```bash
 # Step 1: Find duplicates
-tsdoc-edge validate-symbol-refs managed 2>&1 | grep "duplicate"
+tsdoc-edge validate refs managed 2>&1 | grep "duplicate"
 
 # Step 2: Preview fix
-tsdoc-edge symbol-fix managed --type=duplicate-h1 --dry-run
+tsdoc-edge symbol fix managed --type=duplicate-h1 --dry-run
 
 # Step 3: Review which should be canonical
 # (Manually check files)
 
 # Step 4: Apply fix
-tsdoc-edge symbol-fix managed --type=duplicate-h1 --yes
+tsdoc-edge symbol fix managed --type=duplicate-h1 --yes
 ```
 
 ### Review Potential Typos
 
 ```bash
 # Step 1: Find typos
-tsdoc-edge symbol-fix managed --type=typo --dry-run
+tsdoc-edge symbol fix managed --type=typo --dry-run
 
 # Step 2: For each flagged symbol
-tsdoc-edge symbol-query managed info "Symbol1"
-tsdoc-edge symbol-query managed info "Symbol2"
+tsdoc-edge symbol query managed info "Symbol1"
+tsdoc-edge symbol query managed info "Symbol2"
 
 # Step 3: If typo, rename manually
 # If intentional, ignore
@@ -374,7 +374,7 @@ npm test -- SymbolFixCommand.test.ts
 ./scripts/test-symbol-fix.sh
 
 # Manual testing (safe)
-tsdoc-edge symbol-fix managed --dry-run
+tsdoc-edge symbol fix managed --dry-run
 ```
 
 ## See Also
@@ -394,5 +394,5 @@ tsdoc-edge symbol-fix managed --dry-run
 
 ### Implemented By
 
-- SymbolFixCommand → src/commands/SymbolFixCommand.ts:51
+- SymbolFixCommand → src/commands/SymbolFixCommand.ts:56
 

@@ -1,6 +1,13 @@
 /**
  * Find Unused Docs Command - Find unused and stale documents
+ *
  * @packageDocumentation
+ * @doc [[FindUnusedDocsCommand]]
+ * @doc [[CLI Commands]]
+ * @context Stale and unreferenced documentation audit via `tsdoc-edge docs find-unused`
+ * @functionality Evaluates managed Markdown documents with `UnusedDocumentDetector` and reports archival, review, or deletion candidates
+ * @sideEffect console: Writes unused document diagnostics and action recommendations to stdout
+ * @sideEffect filesystem: Scans managed Markdown files and file timestamps on disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -15,7 +22,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @responsibility Find stale and unused documentation
  * @contract Scans documents, detects unused/stale, suggests actions
  * @doc [[FindUnusedDocsCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#find-unused-docs]]
+ * @sideEffect console: Writes unused document reports to stdout; scans managed Markdown files
  *
  * @problem Documentation accumulates over time, some becomes obsolete
  * @solves Identifies unused documents and suggests deletion/archival
@@ -66,7 +75,12 @@ export class FindUnusedDocsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge find-unused-docs [docs-directory]\n\n  Default: managed';
+    return `tsdoc-edge docs find-unused [docs-directory] [--json]
+
+  Options:
+    --json    Output structured JSON report
+
+  Default: managed`;
   }
 
   /**
@@ -82,26 +96,59 @@ export class FindUnusedDocsCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const flagError = this.validateAllowedFlags(args, ['--json'], []);
+      if (flagError) return flagError;
+
       // Deprecation warning (only when called directly as legacy command)
       if (this.showDeprecationWarning) {
-        this.printDeprecationWarning('tsdoc-edge docs unused');
+        this.printDeprecationWarning('tsdoc-edge docs find-unused');
       }
 
-      const target = args[0];
-      const dir = target || 'managed';
+      const jsonMode = this.hasFlag(args, '--json');
+      const positional = this.getPositionalArgs(args, []);
+      if (positional.length > 1) {
+        const msg = `Unexpected argument: ${positional[1]}`;
+        this.printError(msg);
+        return this.failure(msg, 2);
+      }
+
+      const dir = positional[0] || 'managed';
       const dirPath = path.resolve(process.cwd(), dir);
 
       if (!fs.existsSync(dirPath)) {
-        this.printError(`Directory not found: ${dirPath}`);
-        console.log();
-        return this.failure(`Directory not found: ${dirPath}`);
+        const msg = `Directory not found: ${dirPath}`;
+        if (jsonMode) {
+          console.log(JSON.stringify({ error: msg }, null, 2));
+        } else {
+          this.printError(msg);
+          console.log();
+        }
+        return this.failure(msg);
       }
-
-      this.printHeader('Finding Unused Documents');
 
       const detector = this.detector || new UnusedDocumentDetector();
       const results = detector.detect(dirPath);
       const summary = detector.getSummary(results);
+
+      if (jsonMode) {
+        console.log(
+          JSON.stringify(
+            {
+              directory: path.relative(process.cwd(), dirPath) || '.',
+              summary,
+              documents: results.map((item) => ({
+                ...item,
+                relativePath: path.relative(process.cwd(), item.filePath) || item.filePath,
+              })),
+            },
+            null,
+            2
+          )
+        );
+        return this.success();
+      }
+
+      this.printHeader('Finding Unused Documents');
 
       // Print summary
       this.printSection('Summary');
@@ -133,7 +180,7 @@ export class FindUnusedDocsCommand extends BaseCommand {
       console.log();
 
       // Group by suggested action
-      const byAction: Record<string, typeof results> = {
+      const byAction: Record<'delete' | 'archive' | 'review' | 'complete', typeof results> = {
         delete: [],
         archive: [],
         review: [],
@@ -144,40 +191,59 @@ export class FindUnusedDocsCommand extends BaseCommand {
         byAction[result.suggestedAction].push(result);
       }
 
-      // Print delete suggestions
-      if (byAction.delete.length > 0) {
-        this.printSection('Suggested: Delete');
-        console.log(
-          `${colors.dim}These documents are stale drafts with no references${colors.reset}`
-        );
-        console.log();
-        for (const result of byAction.delete.slice(0, 10)) {
-          console.log(`${colors.red}🗑${colors.reset}  ${result.filePath}`);
-          console.log(
-            `   ${colors.dim}${result.reason} (${result.daysSinceModified} days old)${colors.reset}`
-          );
-          console.log();
-        }
-        if (byAction.delete.length > 10) {
-          console.log(`${colors.dim}... and ${byAction.delete.length - 10} more${colors.reset}`);
-          console.log();
-        }
-      }
+      const sections: Array<{
+        key: 'delete' | 'archive' | 'review' | 'complete';
+        title: string;
+        subtitle: string;
+        icon: string;
+        color: string;
+      }> = [
+        {
+          key: 'delete',
+          title: 'Suggested: Delete',
+          subtitle: 'These documents are stale drafts with no references',
+          icon: '🗑 ',
+          color: colors.red,
+        },
+        {
+          key: 'archive',
+          title: 'Suggested: Archive',
+          subtitle: 'These documents are deprecated and old but may have historical value',
+          icon: '📦',
+          color: colors.yellow,
+        },
+        {
+          key: 'review',
+          title: 'Suggested: Review',
+          subtitle: 'These documents have no incoming references or have lingered in review',
+          icon: '🔍',
+          color: colors.blue,
+        },
+        {
+          key: 'complete',
+          title: 'Suggested: Complete Code Connections',
+          subtitle: 'These active technical specs currently have zero code connections',
+          icon: '🔗',
+          color: colors.cyan,
+        },
+      ];
 
-      // Print archive suggestions
-      if (byAction.archive.length > 0) {
-        this.printSection('Suggested: Archive');
-        console.log(`${colors.dim}These documents are old but may have value${colors.reset}`);
+      for (const section of sections) {
+        const items = byAction[section.key];
+        if (items.length === 0) continue;
+        this.printSection(section.title);
+        console.log(`${colors.dim}${section.subtitle}${colors.reset}`);
         console.log();
-        for (const result of byAction.archive.slice(0, 10)) {
-          console.log(`${colors.yellow}📦${colors.reset} ${result.filePath}`);
+        for (const result of items.slice(0, 10)) {
+          const displayPath = path.relative(process.cwd(), result.filePath) || result.filePath;
+          console.log(`${section.color}${section.icon}${colors.reset} ${displayPath}`);
           console.log(
-            `   ${colors.dim}${result.reason} (${result.daysSinceModified} days old)${colors.reset}`
+            `   ${colors.dim}${result.reason} (${result.daysSinceModified} days old, refs=${result.referenceCount}, code=${result.codeConnectionCount})${colors.reset}`
           );
           console.log();
         }
-        if (byAction.archive.length > 10) {
-          console.log(`${colors.dim}... and ${byAction.archive.length - 10} more${colors.reset}`);
+        if (items.length > 10) {
+          console.log(`${colors.dim}... and ${items.length - 10} more${colors.reset}`);
           console.log();
         }
       }

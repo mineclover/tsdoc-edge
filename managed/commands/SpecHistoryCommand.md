@@ -21,5 +21,5 @@ Displays the version and status transition history of a specification document f
 
 ### Implemented By
 
-- SpecHistoryCommand → src/commands/SpecHistoryCommand.ts:35
+- SpecHistoryCommand → src/commands/SpecHistoryCommand.ts:44
 

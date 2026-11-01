@@ -101,7 +101,7 @@ active revision을 항상 보존하면서 오래된 revision을 정리하며, �
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:267
 - [[InitCommand]] → managed/commands/InitCommand.md:343
 - [[Phase Commands]] → managed/commands/PhaseCommands.md:101
-- [[SyncCommand]] → managed/commands/SyncCommand.md:23
+- [[SyncCommand]] → managed/commands/SyncCommand.md:25
 - [[Module Specification Framework]] → managed/concepts/module-specification-framework.md:399
 - [[DatabaseManager]] → managed/core-components/DatabaseManager.md:288
 - [[SymbolRegistryManager]] → managed/core-components/SymbolRegistryManager.md:475
@@ -118,5 +118,6 @@ active revision을 항상 보존하면서 오래된 revision을 정리하며, �
 
 ### Implemented By
 
-- BuildCommand → src/commands/BuildCommand.ts:94
+- BuildCommand → src/commands/BuildCommand.ts:107
+- BuildCommandDependencies → src/commands/BuildCommand.ts:55
 

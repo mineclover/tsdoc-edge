@@ -303,10 +303,18 @@ canonical graph 입력을 기준선에 포함하려면 `--graph-revision`과
 - [[Relationship Types]] → managed/relationships/index.md:18
 - [[Integration Verification]] → managed/relationships/integration-verification.md:16
 - [[Test Coverage]] → managed/relationships/test-coverage.md:18
+- [[LspAndCoverageSurfaceSpecification]] → managed/specs/domains/lsp-and-coverage-surface-spec.md:201
 - [[CodeHealthMetrics]] → managed/types/CodeHealthMetrics.md:67
 - [[Relationship System Roadmap]] → managed/workflows/relationship-system-roadmap.md:12
 
 ### Implemented By
 
 - Coverage Metrics Contract → src/convention/CoverageMetricPolicy.ts:1
+- CoverageBaselineCommand → src/commands/CoverageBaselineCommand.ts:31
+- CoverageReportCommand → src/commands/CoverageReportCommand.ts:88
+- COVERAGE_METRIC_REPORT_REPOSITORY_SCHEMA_VERSION → src/storage/CoverageMetricReportRepository.ts:32
+- CoverageMetricReportPin → src/storage/CoverageMetricReportRepository.ts:42
+- CoverageMetricReportRevision → src/storage/CoverageMetricReportRepository.ts:55
+- CoverageMetricReportRepositoryOptions → src/storage/CoverageMetricReportRepository.ts:71
+- CoverageMetricReportRepository → src/storage/CoverageMetricReportRepository.ts:111
 

@@ -1,6 +1,13 @@
 /**
  * Init Command - Initialize TSDoc Edge configuration
+ *
  * @packageDocumentation
+ * @doc [[InitCommand]]
+ * @doc [[CLI Commands]]
+ * @context Workspace bootstrap command (`tsdoc-edge init`) creating `.tsdoc.config.json`, `tsdoc.json`, and managed directories
+ * @functionality Generates default project configuration and Microsoft `tsdoc.json` custom tag definitions with `--force` and `--dry-run` support
+ * @sideEffect console: Writes initialization steps and dry-run previews to stdout
+ * @sideEffect filesystem: Creates `.tsdoc.config.json`, `tsdoc.json`, and workspace directories on disk unless `--dry-run` is active
  */
 
 import * as fs from 'node:fs';
@@ -13,7 +20,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * InitCommand - Initialize TSDoc Edge
  * @public
  * @doc [[InitCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#init]]
+ * @sideEffect filesystem: Writes `.tsdoc.config.json`, `tsdoc.json`, and managed directories; writes CLI status to stdout
  */
 export class InitCommand extends BaseCommand {
   /**
@@ -142,10 +151,10 @@ export class InitCommand extends BaseCommand {
 
       console.log('Next steps:');
       console.log('  1. Customize your configuration in .tsdoc.config.json');
-      console.log('  2. Build database: tsdoc-edge build src');
+      console.log('  2. Synchronize workspace SSOT: tsdoc-edge sync');
       console.log('  3. Validate your project: tsdoc-edge validate');
       console.log(
-        '  4. Official TSDoc config tsdoc.json generated for VS Code / ESLint compatibility'
+        '  4. Official TSDoc config tsdoc.json generated for VS Code / @ttsc/lint compatibility'
       );
       console.log();
 
@@ -153,10 +162,3 @@ export class InitCommand extends BaseCommand {
     });
   }
 }
-
-/**
- * IdNewCommand - Generate new symbol ID
- * @public
- * @doc [[IdNewCommand]]
- * @doc [[CLI Commands#id-new]]
- */

@@ -47,6 +47,7 @@ interface EventConsumption {
 /**
  * Event Flow Analyzer
  *
+ * @doc [[EventFlowAnalyzer]]
  * @public
  * @responsibility Detect and analyze event-flow relationships
  */

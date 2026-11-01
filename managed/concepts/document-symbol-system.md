@@ -88,16 +88,16 @@ See [[Reference]]          # Inline: Reference (unlimited)
 
 ```bash
 # 1. Index documentation
-tsdoc-edge index-docs managed
+tsdoc-edge docs index managed
 
 # 2. Validate symbol references
-tsdoc-edge validate-symbol-refs managed
+tsdoc-edge validate refs managed
 
 # 3. Update backlinks
-tsdoc-edge update-backlinks managed
+tsdoc-edge docs backlinks managed
 
 # 4. Fix common issues
-tsdoc-edge symbol-fix managed --dry-run
+tsdoc-edge symbol fix managed --dry-run
 ```
 
 ## Features
@@ -115,7 +115,7 @@ tsdoc-edge symbol-fix managed --dry-run
 - [[Work Context Workflow]]: Context gathering example
 ```
 
-**Auto-generated**: Updated by `update-backlinks` command.
+**Auto-generated**: Updated by `docs backlinks` command.
 
 ### Symbol Promotion
 
@@ -131,12 +131,12 @@ This command does X...
 This command does X...
 ```
 
-**Command**: `tsdoc-edge promote-symbol managed "NewCommand"`
+**Command**: `tsdoc-edge symbol promote managed "NewCommand"`
 
 ### Duplicate Detection
 
 ```bash
-tsdoc-edge validate-symbol-refs managed
+tsdoc-edge validate refs managed
 ```
 
 **Output**:
@@ -145,13 +145,13 @@ tsdoc-edge validate-symbol-refs managed
   1. managed/commands/BuildCommand.md:1
   2. managed/COMMANDS.md:45 (DUPLICATE)
 
-💡 Use symbol-fix to convert duplicate to H2 auxiliary
+💡 Use symbol fix to convert duplicate to H2 auxiliary
 ```
 
 ### Similarity Search
 
 ```bash
-tsdoc-edge symbol-query managed similar "BuildCmd"
+tsdoc-edge symbol query managed similar "BuildCmd"
 ```
 
 **Output**:
@@ -219,36 +219,36 @@ Symbols stored in two formats:
 echo "# [[MyFeature]]\n\nFeature description..." > managed/features/MyFeature.md
 
 # 2. Index
-tsdoc-edge index-docs managed
+tsdoc-edge docs index managed
 
 # 3. Verify
-tsdoc-edge symbol-query managed info "MyFeature"
+tsdoc-edge symbol query managed info "MyFeature"
 ```
 
 ### Fix Duplicate Symbols
 
 ```bash
 # 1. Find duplicates
-tsdoc-edge validate-symbol-refs managed | grep "Duplicate"
+tsdoc-edge validate refs managed | grep "Duplicate"
 
 # 2. Preview fix
-tsdoc-edge symbol-fix managed --type=duplicate-h1 --dry-run
+tsdoc-edge symbol fix managed --type=duplicate-h1 --dry-run
 
 # 3. Apply fix
-tsdoc-edge symbol-fix managed --type=duplicate-h1 --yes
+tsdoc-edge symbol fix managed --type=duplicate-h1 --yes
 ```
 
 ### Explore Symbol Graph
 
 ```bash
 # Find all backlinks to a symbol
-tsdoc-edge symbol-query managed backlinks "BuildCommand"
+tsdoc-edge symbol query managed backlinks "BuildCommand"
 
 # Find similar symbols
-tsdoc-edge symbol-query managed similar "BuildCmd"
+tsdoc-edge symbol query managed similar "BuildCmd"
 
 # Get symbol statistics
-tsdoc-edge symbol-query managed stats
+tsdoc-edge symbol query managed stats
 ```
 
 ## Benefits

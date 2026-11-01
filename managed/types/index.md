@@ -389,3 +389,56 @@ Uses: DocumentSymbol, FeatureTypes, LinkingTypes
 - [[Primary Types Index]] → managed/primary-types/index.md:448
 - [[Utilities Index]] → managed/utilities/index.md:461
 
+### Implemented By
+
+- BlockType → src/types/blocks/index.ts:15
+- SideEffectType → src/types/blocks/index.ts:49
+- SideEffect → src/types/blocks/index.ts:64
+- BlockScope → src/types/blocks/index.ts:83
+- CodeBlock → src/types/blocks/index.ts:90
+- BlockAnalysisResult → src/types/blocks/index.ts:127
+- BlockDependency → src/types/blocks/index.ts:149
+- ChunkingStrategy → src/types/blocks/index.ts:168
+- BlockDetectionRule → src/types/blocks/index.ts:190
+- SqliteTransactionFunction → src/types/database.ts:18
+- SqliteDatabase → src/types/database.ts:25
+- SqliteStatement → src/types/database.ts:68
+- SqliteRunResult → src/types/database.ts:112
+- SymbolRow → src/types/database.ts:124
+- RelationshipRow → src/types/database.ts:142
+- CountRow → src/types/database.ts:157
+- RelTypeCountRow → src/types/database.ts:166
+- UnifiedRelRow → src/types/database.ts:176
+- HighImpactRow → src/types/database.ts:191
+- HTTPMethod → src/types/endpoints/index.ts:15
+- EndpointScope → src/types/endpoints/index.ts:22
+- HTTPEndpoint → src/types/endpoints/index.ts:38
+- DetectedEndpoint → src/types/endpoints/index.ts:87
+- RoutePattern → src/types/endpoints/index.ts:103
+- ScopeLevel → src/types/exposure/index.ts:15
+- Accessibility → src/types/exposure/index.ts:33
+- ExposureScope → src/types/exposure/index.ts:49
+- VisibilityBoundary → src/types/exposure/index.ts:65
+- SymbolExposure → src/types/exposure/index.ts:81
+- ExportAnalysis → src/types/exposure/index.ts:103
+- PackageExportConfig → src/types/exposure/index.ts:131
+- PackageExportMap → src/types/exposure/index.ts:156
+- BarrelFile → src/types/exposure/index.ts:175
+- BarrelExport → src/types/exposure/index.ts:191
+- isTestSymbol → src/types/guards/test-symbol-guards.ts:20
+- isTestSuite → src/types/guards/test-symbol-guards.ts:33
+- isTestCase → src/types/guards/test-symbol-guards.ts:44
+- isTestScenario → src/types/guards/test-symbol-guards.ts:55
+- isImplementationSymbol → src/types/guards/test-symbol-guards.ts:66
+- filterTestSymbols → src/types/guards/test-symbol-guards.ts:77
+- filterImplementationSymbols → src/types/guards/test-symbol-guards.ts:88
+- groupSymbolsByCategory → src/types/guards/test-symbol-guards.ts:99
+- BaseTestSymbol → src/types/test-symbols.ts:19
+- TestSuite → src/types/test-symbols.ts:50
+- TestCase → src/types/test-symbols.ts:85
+- TestScenario → src/types/test-symbols.ts:121
+- TestSymbol → src/types/test-symbols.ts:143
+- TestCoverageMetadata → src/types/test-symbols.ts:150
+- TestExtractionResult → src/types/test-symbols.ts:178
+- TestExtractionOptions → src/types/test-symbols.ts:219
+

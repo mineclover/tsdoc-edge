@@ -1,6 +1,12 @@
 /**
  * FixCommand - Automatically fix documentation issues
+ *
  * @packageDocumentation
+ * @doc [[FixCommand]]
+ * @context Automated TSDoc repair subcommand invoked via `tsdoc-edge docs fix`
+ * @functionality Analyzes TypeScript files with `CodeHealthChecker` and inserts missing TSDoc summary, `@param`, and `@returns` stubs (with `--dry-run` preview support)
+ * @sideEffect console: Writes detected TSDoc issues and fix counts to stdout
+ * @sideEffect filesystem: Reads TypeScript source files and writes inserted TSDoc comments unless `--dry-run` is active
  */
 
 import * as fs from 'node:fs';
@@ -20,6 +26,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * Supports dry-run mode for preview without modifications.
  *
  * @doc [[FixCommand]]
+ * @sideEffect filesystem: Reads and updates TypeScript TSDoc comments on disk; writes CLI progress to stdout
  * @public
  */
 export class FixCommand extends BaseCommand {

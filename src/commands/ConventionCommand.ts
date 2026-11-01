@@ -1,11 +1,26 @@
-/** Unified command group for convention-pack operations. */
+/**
+ * Unified command group for convention-pack operations.
+ *
+ * @packageDocumentation
+ * @doc [[Convention Pack Check]]
+ * @doc [[ConventionCheck]]
+ * @context Top-level `convention` unified command group in the 20-command CLI surface
+ * @functionality Dispatches `check`, `inputs`, and `retention` subcommands with fail-closed unknown subcommand handling
+ * @sideEffect console: Writes CLI help and unknown-subcommand diagnostics via `BaseCommand`
+ */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import { ConventionCheckCommand } from './ConventionCheckCommand';
 import { ConventionInputsCommand } from './ConventionInputsCommand';
 import { ConventionRetentionCommand } from './ConventionRetentionCommand';
 
-/** Route convention subcommands without widening the v1 capability claim. */
+/**
+ * Route convention subcommands without widening the v1 capability claim.
+ *
+ * @doc [[Convention Pack Check]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export class ConventionCommand extends BaseCommand {
   getName(): string {
     return 'convention';

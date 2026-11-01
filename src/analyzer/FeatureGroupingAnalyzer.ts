@@ -1,7 +1,9 @@
 /**
  * Feature Grouping Analyzer
+ *
  * @packageDocumentation
  * @responsibility Analyze feature grouping relationships
+ * @sideEffect filesystem: Recursively scans workspace directories and reads TypeScript source files for `@feature` tags (read)
  */
 
 import * as fs from 'node:fs';
@@ -28,6 +30,7 @@ interface FeatureGroup {
  * @doc [[FeatureGroupingAnalyzer]]
  * @public
  * @responsibility Detect symbols belonging to same feature
+ * @sideEffect filesystem: Recursively scans workspace directories and reads TypeScript source files for `@feature` tags (read)
  *
  * Pattern: A, B, C belong to feature X
  * - Feature cohesion

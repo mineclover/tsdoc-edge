@@ -1,6 +1,10 @@
 /**
  * XML Parser for Output Schema
+ *
  * @packageDocumentation
+ * @doc [[Code Generation]]
+ * @context Schema-aware recursive-descent XML parser and validator reversing `XmlBuilder` output into typed section records
+ * @functionality Parses structured XML trees, coerces primitive attributes/elements per `OutputSchema`, converts XML to JSON, and validates schema conformance
  */
 
 import type {
@@ -14,6 +18,9 @@ import type {
 
 /**
  * Error thrown when XML parsing fails
+ *
+ * @doc [[Code Generation]]
+ * @public
  */
 export class XmlParseError extends Error {
   constructor(
@@ -29,6 +36,9 @@ export class XmlParseError extends Error {
 
 /**
  * Error thrown when schema validation fails
+ *
+ * @doc [[Code Generation]]
+ * @public
  */
 export class SchemaValidationError extends Error {
   constructor(
@@ -44,6 +54,9 @@ export class SchemaValidationError extends Error {
 
 /**
  * Parsed data structure
+ *
+ * @doc [[Code Generation]]
+ * @public
  */
 export interface ParsedData {
   [sectionName: string]: SectionData | GroupedSectionData;
@@ -189,6 +202,9 @@ function parseXmlToTree(xml: string): XmlElement | null {
  * const data = parser.parse(xmlString);
  * const json = parser.toJson(xmlString, { pretty: true });
  * ```
+ *
+ * @doc [[Code Generation]]
+ * @public
  */
 export class XmlParser {
   private schema: OutputSchema;

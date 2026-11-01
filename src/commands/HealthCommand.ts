@@ -1,6 +1,12 @@
 /**
  * Health command - Check code health and generate report
+ *
  * @packageDocumentation
+ * @doc [[HealthCommand]]
+ * @context Top-level `health` command for rapid codebase quality and documentation health assessment
+ * @functionality Evaluates target source directories via `CodeHealthChecker`, computes letter grades, and emits human, XML, or file reports
+ * @sideEffect console: Writes formatted health grades, metrics, and recommendations to stdout
+ * @sideEffect filesystem: Scans source files and writes optional `--output` health reports on disk
  */
 
 import * as fs from 'node:fs';
@@ -15,6 +21,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @public
  * @responsibility Check code health and generate health report
  * @contract Execute health check and return formatted health report
+ * @sideEffect console: Writes formatted health report to stdout; scans source files and writes optional `--output` file
  *
  * @problem Developers need quick overview of codebase health status
  * @solves Provides concise health report with grade, recommendations, and key metrics

@@ -26,7 +26,7 @@ Find all symbols that use a given symbol by searching the database by name, enab
 
 **Command Syntax:**
 ```bash
-tsdoc-edge who-uses <symbol-name>
+tsdoc-edge symbol who-uses <symbol-name>
 ```
 
 **Parameters:**
@@ -148,25 +148,25 @@ graph TD
 ## Scope
 
 **Public API:**
-- Command name: `who-uses`
+- Command name: `symbol who-uses`
 - Exported from Phase5Commands
 
 **Usage:**
 ```bash
 # Find who uses a symbol by name
-tsdoc-edge who-uses UserService
+tsdoc-edge symbol who-uses UserService
 
 # Prefix matching
-tsdoc-edge who-uses User
+tsdoc-edge symbol who-uses User
 
 # With help flag
-tsdoc-edge who-uses --help
+tsdoc-edge symbol who-uses --help
 ```
 
 ## Related
 
 - [[DepsCommand]]: Show what a symbol depends on
-- [[UsedByCommand]]: Registry-based reverse dependencies by ID
+- [[WhoUsesCommand]]: Registry-based reverse dependencies by ID
 - [[DatabaseManager]]: Symbol database and queries
 - [[SymbolGraphBuilder]]: Dependency graph construction
 
@@ -194,10 +194,10 @@ Source: `src/commands/Phase5Commands.ts`
 - [[TSDoc Edge Documentation]] → managed/README.md:103
 - [[DepsCommand]] → managed/commands/DepsCommand.md:145
 - [[OrphansCommand]] → managed/commands/OrphansCommand.md:180
-- [[UsedByCommand]] → managed/commands/UsedByCommand.md:69
 - [[DatabaseManager]] → managed/core-components/DatabaseManager.md:290
-- [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:157
-- [[Impact Analysis]] → managed/features/ImpactAnalysis.md:200
+- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:110
+- [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:156
+- [[Impact Analysis]] → managed/features/ImpactAnalysis.md:198
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:275
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:259
 - [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:684
@@ -205,5 +205,5 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Implemented By
 
-- WhoUsesCommand → src/commands/WhoUsesCommand.ts:16
+- WhoUsesCommand → src/commands/WhoUsesCommand.ts:26
 

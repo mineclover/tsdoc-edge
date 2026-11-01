@@ -1,6 +1,13 @@
 /**
  * Tree Command - Show symbol hierarchy tree
+ *
  * @packageDocumentation
+ * @doc [[TreeCommand]]
+ * @doc [[CLI Commands]]
+ * @context Hierarchical symbol tree visualization via `tsdoc-edge symbol tree`
+ * @functionality Loads symbol parent-child rows from `.tsdoc.db` and renders ASCII hierarchy trees grouped by file
+ * @sideEffect console: Writes formatted ASCII symbol hierarchy trees to stdout
+ * @sideEffect database: Reads symbol rows from `DatabaseManager` (read)
  */
 
 import { DatabaseManager, type SymbolRow } from '../storage/DatabaseManager';
@@ -25,7 +32,9 @@ interface TreeNode {
  * @responsibility Display hierarchical symbol tree
  * @contract Reads registry, builds hierarchy, renders tree view
  * @doc [[TreeCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#tree]]
+ * @sideEffect console: Writes ASCII symbol hierarchy tree to stdout; reads `.tsdoc.db`
  *
  * @problem Need to visualize symbol hierarchies (classes, methods, etc.)
  * @solves Displays tree structure of symbol relationships

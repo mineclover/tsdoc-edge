@@ -310,23 +310,23 @@ tsdoc-edge parse <file>
 
 **Analyze Relationships**:
 ```bash
-tsdoc-edge analyze-calls
-tsdoc-edge analyze-io
-tsdoc-edge analyze-pipeline
+tsdoc-edge relationship analyze --type=calls
+tsdoc-edge relationship analyze --type=io
+tsdoc-edge relationship analyze --type=chains
 ```
 
 **Query**:
 ```bash
-tsdoc-edge deps <symbol>
-tsdoc-edge who-uses <symbol>
-tsdoc-edge search <query>
+tsdoc-edge symbol deps <symbol>
+tsdoc-edge symbol who-uses <symbol>
+tsdoc-edge symbol query <query>
 ```
 
 **Quality**:
 ```bash
 tsdoc-edge health <path>
-tsdoc-edge validate
-tsdoc-edge detect-circular-types
+tsdoc-edge validate docs managed
+tsdoc-edge relationship cycles
 ```
 
 **Documentation**:
@@ -448,7 +448,7 @@ tsdoc-edge parse-mermaid <diagram>
 - [[TSDoc Edge Documentation]] → managed/README.md:38
 - [[SpecCommands]] → managed/commands/SpecCommands.md:110
 - [[Concepts Index]] → managed/concepts/index.md:282
-- [[Features Index]] → managed/features/index.md:337
+- [[Features Index]] → managed/features/index.md:351
 - [[Quick Start Guide]] → managed/quick-start.md:213
 - [[TSDoc Edge User Guide]] → managed/user-guide.md:30
 - [[Workflows Index]] → managed/workflows/index.md:286

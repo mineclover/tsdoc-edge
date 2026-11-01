@@ -2,7 +2,12 @@
  * Optimized Relationship Path Command
  *
  * @doc [[RelationshipPathCommand]]
+ * @doc [[RelationshipCommands]]
  * @packageDocumentation
+ * @context Shortest-path and multi-hop relationship discovery via `tsdoc-edge relationship path`
+ * @functionality Runs bounded BFS path search between source and target symbols across canonical `@ttsc/graph` and `.tsdoc.db`
+ * @sideEffect console: Writes discovered relationship paths or `--json` output to stdout
+ * @sideEffect database: Reads canonical `@ttsc/graph` and `DatabaseManager` SQLite repositories (read)
  */
 
 import * as fs from 'node:fs';
@@ -38,6 +43,9 @@ const CONTAINER_KINDS = new Set(['class', 'interface', 'enum', 'namespace', 'mod
 
 /**
  * Optimized command for finding paths between symbols across Canonical `@ttsc/graph` and Enrichment DB.
+ *
+ * @doc [[RelationshipPathCommand]]
+ * @sideEffect console: Writes discovered symbol paths to stdout; reads SQLite repositories
  * @public
  */
 export class RelationshipPathCommand extends BaseCommand {

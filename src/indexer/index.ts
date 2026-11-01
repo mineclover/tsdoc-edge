@@ -1,3 +1,13 @@
+/**
+ * Public barrel exports for canonical project graph indexing, alias materialization, and router adapters.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @context Entry surface for `src/indexer` consumed by CLI sync/build flows, storage repositories, and LSP services.
+ * @functionality Re-exports canonical graph contracts, `ProjectIndexer`, `CanonicalGraphCoordinator`, router artifact adapters, diagnostics normalization, and legacy alias utilities.
+ * @packageDocumentation
+ */
+
 export { CanonicalAliasContext } from './CanonicalAliasContext';
 export {
   CanonicalGraphCoordinator,

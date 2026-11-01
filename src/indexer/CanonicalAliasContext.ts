@@ -1,5 +1,12 @@
 /**
  * Read-only alias hop context for legacy query consumers.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @context Read-only bridge enabling legacy CLI and analyzer surfaces to hop from legacy symbol IDs to active canonical `@ttsc/graph` revisions.
+ * @functionality Opens the persisted canonical graph repository in read-only mode, resolves legacy or canonical symbol queries, computes internal structural dependency counts, and lists canonical nodes per file.
+ * @sideEffect filesystem: Checks whether the canonical graph SQLite database file exists on disk.
+ * @sideEffect database: Opens the canonical graph SQLite repository in read-only mode to read the active revision and alias table.
  * @packageDocumentation
  */
 
@@ -11,7 +18,13 @@ import { DEFAULT_CANONICAL_GRAPH_DATABASE } from './CanonicalGraphCoordinator';
 import type { CanonicalGraphNode, CanonicalProjectGraph } from './contracts';
 import { InMemoryAliasResolver } from './symbol-alias';
 
-/** Active canonical revision plus alias resolver for legacy-to-canonical hops. */
+/**
+ * Active canonical revision plus alias resolver for legacy-to-canonical hops.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export class CanonicalAliasContext {
   readonly resolver: InMemoryAliasResolver;
   readonly analysis: GraphAnalysisService;

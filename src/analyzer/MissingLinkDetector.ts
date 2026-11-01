@@ -9,6 +9,7 @@
  * @context Documentation quality requires valid cross-references
  *
  * @functionality Link validation, Reference checking, Broken link reporting
+ * @sideEffect filesystem: Traverses target directories and reads TypeScript source files for enhanced documentation link checks (read)
  *
  * @decision Check references at analysis time, not write time
  * @rationale Symbols may be added/removed over time
@@ -83,6 +84,8 @@ export interface MissingLinkReport {
  * @context Need to maintain documentation quality as codebase evolves
  *
  * @functionality Reference validation, Symbol existence checking, File existence checking, Report generation
+ * @doc [[MissingLinkDetector]]
+ * @sideEffect filesystem: Traverses target directories and reads TypeScript source files for enhanced documentation link checks (read)
  *
  * @decision Check multiple reference types (dependencies, symbols, files)
  * @rationale Comprehensive validation catches more issues

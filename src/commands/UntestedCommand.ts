@@ -1,6 +1,12 @@
 /**
  * UntestedCommand - Find symbols without test coverage
+ *
  * @packageDocumentation
+ * @doc [[UntestedCommand]]
+ * @context Test coverage gap discovery via `tsdoc-edge symbol untested`
+ * @functionality Loads symbol and test relationships from `.tsdoc.db` and lists untested symbols via `SymbolSearchEngine`
+ * @sideEffect console: Writes untested symbol listings to stdout
+ * @sideEffect database: Reads symbol and test coverage data from `DatabaseManager` (read)
  */
 
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
@@ -17,6 +23,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * Helps identify gaps in test coverage and improve code quality.
  *
  * @doc [[UntestedCommand]]
+ * @sideEffect console: Writes untested symbol reports to stdout; reads `.tsdoc.db`
  * @public
  */
 export class UntestedCommand extends BaseCommand {

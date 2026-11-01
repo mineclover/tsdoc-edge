@@ -21,5 +21,5 @@ Detects interchangeable implementation (`substitution`) and error-recovery (`fal
 
 ### Implemented By
 
-- AlternativesAnalyzer → src/analyzer/AlternativesAnalyzer.ts:1
+- AlternativesAnalyzer → src/analyzer/AlternativesAnalyzer.ts:56
 

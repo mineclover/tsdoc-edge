@@ -3,6 +3,11 @@
  *
  * Providers expose producer identities and JSON-shaped facts. They never
  * allocate canonical graph ids or return persisted graph revisions.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @context Public extension contract defining the raw semantic graph provider boundary prior to canonical normalization and persistence.
+ * @functionality Declares provider identity, capability descriptors, raw node/fact/diagnostic records, whole-project `ProviderSnapshot` envelopes, single-document `ProviderDelta` payloads, and the `SemanticGraphProvider` interface.
  * @packageDocumentation
  */
 
@@ -12,10 +17,31 @@ import type {
   CanonicalDiagnosticSeverity,
 } from '../indexer/diagnostics-contract';
 
+/**
+ * Canonical contract identifier for `SemanticGraphProvider` payloads.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export const SEMANTIC_GRAPH_PROVIDER_CONTRACT_ID = 'tsdoc-edge/semantic-graph-provider' as const;
+
+/**
+ * Contract version identifier for `SemanticGraphProvider` payloads.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export const SEMANTIC_GRAPH_PROVIDER_CONTRACT_VERSION = '1.0' as const;
 
-/** Stable provider implementation and configured-instance identity. */
+/**
+ * Stable provider implementation and configured-instance identity.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProviderIdentity {
   readonly providerId: string;
   readonly providerVersion: string;
@@ -24,19 +50,44 @@ export interface ProviderIdentity {
   readonly contractVersion: typeof SEMANTIC_GRAPH_PROVIDER_CONTRACT_VERSION;
 }
 
+/**
+ * Completeness status reported for a negotiated provider capability.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export type ProviderCapabilityStatus = 'unsupported' | 'partial' | 'complete';
 
-/** One negotiated provider capability. */
+/**
+ * One negotiated provider capability.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProviderCapability {
   readonly status: ProviderCapabilityStatus;
   readonly version?: string;
   readonly details?: Readonly<Record<string, unknown>>;
 }
 
-/** Extensible capability map whose values have explicit completeness. */
+/**
+ * Extensible capability map whose values have explicit completeness.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export type GraphCapabilities = Readonly<Record<string, ProviderCapability>>;
 
-/** Raw provider node. `providerNodeId` is unique only within the provider instance. */
+/**
+ * Raw provider node. `providerNodeId` is unique only within the provider instance.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProviderNode {
   readonly providerNodeId: string;
   readonly kind: string;
@@ -49,7 +100,13 @@ export interface ProviderNode {
   readonly producerFields?: Readonly<Record<string, unknown>>;
 }
 
-/** One observed provider fact; repeated call sites remain separate occurrences. */
+/**
+ * One observed provider fact; repeated call sites remain separate occurrences.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProviderFactOccurrence {
   /** Stable provider-local identity required for incremental removal/replacement. */
   readonly providerFactId: string;
@@ -64,7 +121,13 @@ export interface ProviderFactOccurrence {
   readonly producerFields?: Readonly<Record<string, unknown>>;
 }
 
-/** Raw diagnostic before canonical node ids are assigned. */
+/**
+ * Raw diagnostic before canonical node ids are assigned.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProviderDiagnostic {
   readonly providerDiagnosticId?: string;
   readonly code?: string | number;
@@ -76,7 +139,13 @@ export interface ProviderDiagnostic {
   readonly producerFields?: Readonly<Record<string, unknown>>;
 }
 
-/** Provenance reported by the provider without compatibility inference. */
+/**
+ * Provenance reported by the provider without compatibility inference.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProviderProvenance {
   readonly producer: string;
   readonly producerVersion?: string;
@@ -90,7 +159,13 @@ export interface ProviderProvenance {
   readonly producerFields?: Readonly<Record<string, unknown>>;
 }
 
-/** Whole-project raw fact snapshot returned by a provider. */
+/**
+ * Whole-project raw fact snapshot returned by a provider.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProviderSnapshot {
   readonly contractId: typeof SEMANTIC_GRAPH_PROVIDER_CONTRACT_ID;
   readonly contractVersion: typeof SEMANTIC_GRAPH_PROVIDER_CONTRACT_VERSION;
@@ -105,9 +180,22 @@ export interface ProviderSnapshot {
   readonly provenance: ProviderProvenance;
 }
 
+/**
+ * Cause classification for a provider-local node identity remap operation.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export type ProviderIdentityRemapReason = 'rename' | 'move' | 'delete';
 
-/** Raw change set; every identifier remains in the provider namespace. */
+/**
+ * Raw change set; every identifier remains in the provider namespace.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export type ProviderChange =
   | { readonly type: 'node-upsert'; readonly node: ProviderNode }
   | { readonly type: 'node-remove'; readonly providerNodeId: string }
@@ -123,7 +211,13 @@ export type ProviderChange =
       readonly reason: ProviderIdentityRemapReason;
     };
 
-/** One unsaved-document raw delta based on an exact provider snapshot. */
+/**
+ * One unsaved-document raw delta based on an exact provider snapshot.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProviderDelta {
   readonly contractId: typeof SEMANTIC_GRAPH_PROVIDER_CONTRACT_ID;
   readonly contractVersion: typeof SEMANTIC_GRAPH_PROVIDER_CONTRACT_VERSION;
@@ -139,28 +233,52 @@ export interface ProviderDelta {
   readonly capabilities: GraphCapabilities;
 }
 
-/** Provider-neutral whole-project request. */
+/**
+ * Provider-neutral whole-project request.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProviderProjectInput {
   readonly workspaceId: string;
   readonly rootDir: string;
   readonly refresh?: boolean;
 }
 
-/** Provider-neutral dirty-document request. */
+/**
+ * Provider-neutral dirty-document request.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProviderDocumentInput extends ProviderProjectInput {
   readonly baseSnapshotId: string;
   readonly filePath: string;
   readonly content: string;
 }
 
-/** TypeScript-only configuration kept outside the canonical graph contract. */
+/**
+ * TypeScript-only configuration kept outside the canonical graph contract.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface TypeScriptProviderConfig {
   readonly tsconfigPath: string;
   readonly routerConfigPath?: string;
   readonly routerRepoId?: string;
 }
 
-/** Public provider extension boundary. */
+/**
+ * Public provider extension boundary.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface SemanticGraphProvider {
   identity(): ProviderIdentity;
   capabilities(): GraphCapabilities;

@@ -1,6 +1,10 @@
 /**
  * Command registry for CLI command management
+ *
  * @packageDocumentation
+ * @doc [[CommandRegistry]]
+ * @context Centralized in-memory command registry for the TSDoc Edge CLI surface
+ * @functionality Registers `BaseCommand` instances under primary names and aliases and provides O(1) command lookup and enumeration
  */
 
 import type { BaseCommand } from './BaseCommand';

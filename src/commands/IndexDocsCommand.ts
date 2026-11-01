@@ -1,6 +1,13 @@
 /**
  * Index-docs command - Index document symbols
+ *
  * @packageDocumentation
+ * @doc [[IndexDocsCommand]]
+ * @doc [[Document Symbol System]]
+ * @context Managed Markdown `[[Symbol]]` checkpoint indexing via `tsdoc-edge docs index` and `tsdoc-edge sync`
+ * @functionality Scans Markdown documents and TypeScript `@doc` tags to build and persist `.tsdoc/doc-symbols.json` in full or incremental (`--file`) mode
+ * @sideEffect console: Writes indexing statistics and validation warnings to stdout
+ * @sideEffect filesystem: Reads Markdown and TypeScript files and writes `.tsdoc/doc-symbols.json`
  */
 
 import * as fs from 'node:fs';
@@ -15,9 +22,11 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * Command for indexing document symbols
  *
  * @doc [[IndexDocsCommand]]
+ * @doc [[Document Symbol System]]
  * @public
  * @responsibility Index document symbols from markdown files
  * @contract Parse markdown files, extract [[Symbol]] definitions and references
+ * @sideEffect filesystem: Reads Markdown and TypeScript files and writes `.tsdoc/doc-symbols.json`; writes CLI summary to stdout
  *
  * @problem Need to track all document symbols and their relationships
  * @solves Scans markdown and code files, builds symbol registry with definitions and references

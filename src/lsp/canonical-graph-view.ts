@@ -1,23 +1,48 @@
 /**
  * LSP-oriented read projection over one canonical graph revision.
+ *
  * @packageDocumentation
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @context Pure read-only LSP query projection over a canonical `@ttsc/graph` project snapshot
+ * @functionality Position-to-symbol lookup, file symbol listing, directional impact counts, neighbor lookup, and workspace search
  */
 
 import * as path from 'node:path';
 import { GraphAnalysisService } from '../graph-analysis';
 import type { CanonicalGraphNode, CanonicalProjectGraph } from '../indexer';
 
+/**
+ * Resolved canonical graph node paired with its workspace file path and one-based start line.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export interface CanonicalLspSymbolLocation {
   readonly node: CanonicalGraphNode;
   readonly filePath: string;
   readonly line: number;
 }
 
+/**
+ * Neighboring canonical graph symbol annotated with its edge relationship kind.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export interface CanonicalLspRelatedSymbol extends CanonicalLspSymbolLocation {
   readonly relationshipType: string;
 }
 
-/** Read-only canonical graph queries needed by the LSP surface. */
+/**
+ * Read-only canonical graph queries needed by the LSP surface.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export class CanonicalGraphLspView {
   readonly analysis: GraphAnalysisService;
 
@@ -121,6 +146,13 @@ export class CanonicalGraphLspView {
   }
 }
 
+/**
+ * Return the human-readable display name for a canonical graph node.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export function canonicalNodeDisplayName(node: CanonicalGraphNode): string {
   return displayName(node);
 }

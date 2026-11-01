@@ -156,4 +156,7 @@ tsdoc-edge find-doc user-service
 ### Implemented By
 
 - FeatureTypes → src/types/feature/feature.ts:1
+- FeatureDocument → src/types/feature/feature.ts:16
+- SymbolReference → src/types/feature/feature.ts:74
+- FeatureIndex → src/types/feature/feature.ts:96
 

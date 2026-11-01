@@ -265,4 +265,15 @@ Maps to framework sections:
 ### Implemented By
 
 - ModuleSpecTagTypes → src/types/tags/module-spec-tags.ts:1
+- ModuleSpecTagParser → src/parser/ModuleSpecTagParser.ts:34
+- ProblemSolving → src/types/tags/enhanced.ts:18
+- Functionality → src/types/tags/enhanced.ts:46
+- ErrorExperience → src/types/tags/enhanced.ts:81
+- DecisionRecord → src/types/tags/enhanced.ts:124
+- DependencySpec → src/types/tags/enhanced.ts:180
+- FuturePlan → src/types/tags/enhanced.ts:218
+- BaseSymbolDoc → src/types/tags/enhanced.ts:305
+- EnhancedSymbolDoc → src/types/tags/enhanced.ts:338
+- StrictModeValidation → src/types/tags/enhanced.ts:382
+- ModuleSpecTags → src/types/tags/module-spec-tags.ts:83
 

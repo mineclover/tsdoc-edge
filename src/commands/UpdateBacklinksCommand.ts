@@ -1,6 +1,13 @@
 /**
  * Update-backlinks command - Update backlinks in document files
+ *
  * @packageDocumentation
+ * @doc [[UpdateBacklinksCommand]]
+ * @doc [[CLI Commands]]
+ * @context Bidirectional Markdown backlink synchronization via `tsdoc-edge docs backlinks` and `tsdoc-edge sync`
+ * @functionality Parses `[[Symbol]]` references across Markdown and `@doc` tags in TypeScript code and regenerates backlink sections (or checks/previews via `--check`/`--dry-run`)
+ * @sideEffect console: Writes backlink update summaries and drift diagnostics to stdout
+ * @sideEffect filesystem: Reads Markdown and TypeScript files and writes updated backlink blocks to managed Markdown files in write mode
  */
 
 import * as fs from 'node:fs';
@@ -19,7 +26,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @responsibility Update backlinks in all managed documents
  * @contract Parse documents, generate backlinks, update files
  * @doc [[UpdateBacklinksCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#update-backlinks]]
+ * @sideEffect filesystem: Reads Markdown and TypeScript files and updates backlink sections in managed docs; logs to stdout
  *
  * @problem Document backlinks become outdated as references change
  * @solves Automatically regenerates backlinks in all documents

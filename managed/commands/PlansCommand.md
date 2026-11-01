@@ -21,5 +21,5 @@ Lists structured engineering backlog plans extracted from `@privateRemarks` and 
 
 ### Implemented By
 
-- PlansCommand → src/commands/PlansCommand.ts:34
+- PlansCommand → src/commands/PlansCommand.ts:43
 

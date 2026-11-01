@@ -184,4 +184,10 @@ tsdoc-edge detect-dead-code
 ### Implemented By
 
 - DataFlowTypes → src/types/domain/data-flow.ts:1
+- DTOPattern → src/types/domain/data-flow.ts:17
+- DTOClassification → src/types/domain/data-flow.ts:32
+- TransformationStep → src/types/domain/data-flow.ts:64
+- DataTransformationChain → src/types/domain/data-flow.ts:96
+- TransformationPath → src/types/domain/data-flow.ts:143
+- DataFlowAnalysisResult → src/types/domain/data-flow.ts:180
 

@@ -21,5 +21,5 @@ Unifies static test-to-symbol AST links with runtime coverage reports into `test
 
 ### Implemented By
 
-- TestCoverageUnifier → src/analyzer/TestCoverageUnifier.ts:1
+- TestCoverageUnifier → src/analyzer/TestCoverageUnifier.ts:43
 

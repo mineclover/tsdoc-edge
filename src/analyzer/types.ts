@@ -1,7 +1,11 @@
 /**
  * Unified Analyzer Types
  * Common interfaces for all relationship analyzers
+ *
  * @packageDocumentation
+ * @doc [[Analyzer System]]
+ * @context Shared plugin contract (`AnalyzerContext`, `RelationshipAnalyzer`, `AnalyzerMetadata`, `AnalyzerType`) unifying all relationship analyzers
+ * @functionality Defines execution context dependencies, analyzer interface, registration metadata, and the union of supported analyzer keys
  */
 
 import type { Database } from 'better-sqlite3';
@@ -14,6 +18,9 @@ import type { UnifiedRelationship } from '../types/relationships';
 /**
  * Context provided to all analyzers
  * Contains all possible dependencies an analyzer might need
+ *
+ * @doc [[Analyzer System]]
+ * @public
  */
 export interface AnalyzerContext {
   /** Legacy DB-backed symbol graph (optional during canonical graph cutover) */
@@ -32,6 +39,9 @@ export interface AnalyzerContext {
 
 /**
  * Common interface for all relationship analyzers
+ *
+ * @doc [[Analyzer System]]
+ * @public
  */
 export interface RelationshipAnalyzer {
   /** Analyzer name for display */
@@ -53,6 +63,9 @@ export interface RelationshipAnalyzer {
 
 /**
  * Analyzer metadata for registration
+ *
+ * @doc [[Analyzer System]]
+ * @public
  */
 export interface AnalyzerMetadata {
   type: string;
@@ -76,6 +89,9 @@ export interface AnalyzerMetadata {
 
 /**
  * All analyzer types supported
+ *
+ * @doc [[Analyzer System]]
+ * @public
  */
 export type AnalyzerType =
   | 'alternatives'

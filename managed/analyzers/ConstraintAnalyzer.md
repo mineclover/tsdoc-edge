@@ -21,5 +21,5 @@ Analyzes mutual-exclusion and co-requirement architectural constraints across sy
 
 ### Implemented By
 
-- ConstraintAnalyzer → src/analyzer/ConstraintAnalyzer.ts:1
+- ConstraintAnalyzer → src/analyzer/ConstraintAnalyzer.ts:40
 

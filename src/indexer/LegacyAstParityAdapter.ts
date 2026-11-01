@@ -1,5 +1,11 @@
 /**
  * Legacy AST extractor parity against canonical graph revisions.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @context Migration parity verifier ensuring TypeScript AST syntax extraction and legacy symbol ID generation agree with canonical `@ttsc/graph` symbol aliases.
+ * @functionality Extracts legacy declaration projections from workspace source files, cross-checks them against materialized canonical-to-legacy aliases, and reports matched counts and discrepancies.
+ * @sideEffect filesystem: Reads workspace TypeScript source files from disk to compare syntax-extracted legacy symbol IDs against canonical graph aliases.
  * @packageDocumentation
  */
 
@@ -14,6 +20,12 @@ import {
   materializeAliases,
 } from './symbol-alias';
 
+/**
+ * Discrepancy detected between a canonical graph node's alias and syntax-extracted legacy identity.
+ *
+ * @doc [[ProjectIndexer]]
+ * @public
+ */
 export interface LegacyParityMismatch {
   readonly filePath: string;
   readonly canonicalId: string;
@@ -21,6 +33,12 @@ export interface LegacyParityMismatch {
   readonly reason: string;
 }
 
+/**
+ * Aggregate parity verification summary comparing canonical aliases against syntax extraction.
+ *
+ * @doc [[ProjectIndexer]]
+ * @public
+ */
 export interface LegacyParityResult {
   readonly matched: number;
   readonly mismatches: readonly LegacyParityMismatch[];
@@ -29,6 +47,10 @@ export interface LegacyParityResult {
 /**
  * Verify that TS5 syntax extraction and legacy-id projection agree with a
  * canonical revision for declarations with an unambiguous legacy identity.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
  */
 export function verifyLegacyAstParity(
   graph: CanonicalProjectGraph,

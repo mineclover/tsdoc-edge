@@ -1,7 +1,13 @@
 /**
  * Documentation fixer - automatically improves TSDoc comments
+ *
  * @packageDocumentation
+ * @doc [[FixCommand]]
+ * @doc [[Dead Code Detection]]
  * @responsibility Automatically add or improve TSDoc comments based on analysis
+ * @context AST-guided TSDoc remediation engine driven by `DocQualityScore` findings from `DocumentationAnalyzer`
+ * @functionality Synthesizes missing TSDoc blocks or appends missing `@param`, `@returns`, `@example`, `@responsibility`, and `@contract` tags
+ * @sideEffect filesystem: Reads TypeScript source files and writes synthesized TSDoc comment edits back to disk (read/write)
  */
 
 import * as fs from 'node:fs';
@@ -20,6 +26,10 @@ interface DocFix {
 
 /**
  * Options for fixing documentation
+ *
+ * @doc [[FixCommand]]
+ * @doc [[Dead Code Detection]]
+ * @public
  */
 export interface FixOptions {
   /** Add missing summaries */
@@ -40,6 +50,10 @@ export interface FixOptions {
 
 /**
  * Result of fixing a file
+ *
+ * @doc [[FixCommand]]
+ * @doc [[Dead Code Detection]]
+ * @public
  */
 export interface FixResult {
   /** File path */
@@ -55,8 +69,13 @@ export interface FixResult {
 /**
  * Fixes documentation issues automatically
  *
+ * @doc [[FixCommand]]
+ * @doc [[Dead Code Detection]]
  * @public
  * @responsibility Generate and insert missing TSDoc comments
+ * @context Consumes `DocQualityScore` assessments and patches under-documented TypeScript declarations
+ * @functionality Plans reverse-offset AST comment insertions/rewrites and supports dry-run previews
+ * @sideEffect filesystem: Reads TypeScript source files and writes synthesized TSDoc comment edits back to disk (read/write)
  */
 export class DocumentationFixer {
   private readonly tsdocParser = new TSDocParser();

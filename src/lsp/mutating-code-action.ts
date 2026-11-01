@@ -3,6 +3,11 @@
  * retained convention findings.
  *
  * @packageDocumentation
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @context Fail-closed validation boundary ensuring mutating LSP `WorkspaceEdit` CodeActions apply only when revision, workspace confinement, open buffer version, and SHA-256 content digests match
+ * @functionality Fix-plan bundle loading, SHA-256 digest verification, symlink/workspace confinement checks, and conflict-free CodeAction resolution
+ * @sideEffect filesystem: Resolves workspace realpaths and reads fix-plan bundle and target source files from disk (read)
  */
 
 import { createHash } from 'node:crypto';
@@ -81,6 +86,8 @@ export interface ConventionFixFileTarget {
 /**
  * Retained fix plan bound to one exact convention finding and canonical code revision.
  *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
  * @public
  */
 export interface RetainedConventionFixPlan {
@@ -149,6 +156,8 @@ export interface MutatingCodeActionData {
 /**
  * Validated atomic mutating CodeAction ready to return over LSP.
  *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
  * @public
  */
 export interface ValidatedMutatingCodeAction {
@@ -233,6 +242,8 @@ export interface ResolveSavedConventionMutatingActionsOptions {
 /**
  * Accepted mutating CodeActions and deterministic rejections for one CodeAction query.
  *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
  * @public
  */
 export interface ResolvedSavedConventionMutatingActions {
@@ -263,6 +274,8 @@ interface RejectedWorkspacePath {
  *
  * @param content - UTF-8 string or raw file buffer
  * @returns Canonical `sha256:<64-hex>` digest
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
  * @public
  */
 export function computeSourceContentDigest(content: string | Buffer): string {
@@ -274,6 +287,8 @@ export function computeSourceContentDigest(content: string | Buffer): string {
  *
  * @param raw - Parsed JSON value
  * @returns Raw candidate plans or a fail-closed rejection
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
  * @public
  */
 export function parseConventionFixPlanBundle(raw: unknown): ConventionFixPlanBundleParseResult {
@@ -319,6 +334,9 @@ function isUnknownArray(value: unknown): value is readonly unknown[] {
  * @param workspaceRoot - Workspace root directory
  * @param configuredPath - Workspace-relative path to the fix-plan bundle JSON
  * @returns Parsed raw plans or a fail-closed rejection
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @sideEffect filesystem: Resolves workspace realpath and reads the JSON fix-plan bundle from disk (read)
  * @public
  */
 export function loadConventionFixPlanBundleFile(
@@ -373,6 +391,9 @@ export function loadConventionFixPlanBundleFile(
  *
  * @param options - Validation context and candidate raw fix plan
  * @returns Accepted atomic `ValidatedMutatingCodeAction` or deterministic rejection
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @sideEffect filesystem: Verifies workspace realpaths and reads non-open target files to verify SHA-256 content digests (read)
  * @public
  */
 export function validateRetainedConventionFixPlan(
@@ -613,6 +634,9 @@ export function validateRetainedConventionFixPlan(
  *
  * @param options - Server-owned retained state, open document snapshots, and candidate plans
  * @returns Deterministically ordered actions and recorded rejections
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @sideEffect filesystem: Verifies workspace realpaths and target file content digests during plan validation (read)
  * @public
  */
 export function resolveSavedConventionMutatingActions(

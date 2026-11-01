@@ -21,5 +21,5 @@ Extracts module and symbol `code-dependency` edges from TypeScript `import` and 
 
 ### Implemented By
 
-- ImportAnalyzer → src/analyzer/ImportAnalyzer.ts:1
+- ImportAnalyzer → src/analyzer/ImportAnalyzer.ts:45
 

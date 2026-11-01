@@ -1,7 +1,13 @@
 /**
  * Unified Spec Command
  * Routes to appropriate spec subcommand
+ *
  * @packageDocumentation
+ * @doc [[SpecCommands]]
+ * @doc [[AuthoredProjectSpecifications]]
+ * @context Unified `spec` command group in the 20-command CLI surface
+ * @functionality Dispatches `extract`, `graph`, `metrics`, `validate`, `duplicates`, `status`, `history`, `diff`, and `bump` specification lifecycle subcommands
+ * @sideEffect console: Writes subcommand routing errors and usage listings to stdout
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
@@ -40,6 +46,9 @@ type SubcommandName = keyof typeof SUBCOMMANDS;
 
 /**
  * Unified command for all spec operations
+ *
+ * @doc [[SpecCommands]]
+ * @doc [[AuthoredProjectSpecifications]]
  * @public
  */
 export class SpecCommand extends BaseCommand {

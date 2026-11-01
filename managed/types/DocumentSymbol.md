@@ -120,5 +120,16 @@ Special footnote references:
 
 ### Implemented By
 
-- DocumentSymbol → src/types/feature/doc-symbol.ts:1
+- DocumentSymbol → src/types/feature/doc-symbol.ts:29
+- DocumentSymbolType → src/types/feature/doc-symbol.ts:15
+- CodeImplementationDisposition → src/types/feature/doc-symbol.ts:22
+- ParsedDocSymbols → src/types/feature/doc-symbol.ts:60
+- CodeReference → src/types/feature/doc-symbol.ts:88
+- SymbolFootnoteRef → src/types/feature/doc-symbol.ts:111
+- CodeConnection → src/types/feature/doc-symbol.ts:127
+- DocumentSymbolRegistry → src/types/feature/doc-symbol.ts:149
+- Backlink → src/types/feature/doc-symbol.ts:168
+- DocSymbolValidation → src/types/feature/doc-symbol.ts:190
+- DocSymbolError → src/types/feature/doc-symbol.ts:206
+- DocSymbolWarning → src/types/feature/doc-symbol.ts:234
 

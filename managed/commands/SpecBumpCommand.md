@@ -21,5 +21,5 @@ Increments the semantic version (`major`, `minor`, or `patch`) recorded in a spe
 
 ### Implemented By
 
-- SpecBumpCommand → src/commands/SpecBumpCommand.ts:35
+- SpecBumpCommand → src/commands/SpecBumpCommand.ts:44
 

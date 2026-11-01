@@ -13,6 +13,8 @@
  * - Extract test coverage from test_mappings table
  * - Create test-coverage relationships
  * - Support unit test tracking
+ *
+ * @sideEffect database: Queries `test_mappings` and `symbols` tables in SQLite via `DatabaseManager` or raw `Database` (read)
  */
 
 import type { Database } from 'better-sqlite3';
@@ -33,8 +35,10 @@ interface TestCoverage {
 /**
  * Test Coverage Unifier
  *
+ * @doc [[TestCoverageUnifier]]
  * @public
  * @responsibility Unify test coverage data into unified relationships
+ * @sideEffect database: Queries `test_mappings` and `symbols` tables in SQLite via `DatabaseManager` or raw `Database` (read)
  */
 export class TestCoverageUnifier {
   private graph: SymbolGraph;

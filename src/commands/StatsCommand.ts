@@ -1,6 +1,13 @@
 /**
  * Stats Command - Show documentation and SSOT graph statistics
+ *
  * @packageDocumentation
+ * @doc [[StatsCommand]]
+ * @doc [[CLI Commands]]
+ * @context Top-level `stats` command reporting documentation coverage and 3-plane SSOT graph statistics
+ * @functionality Queries symbol database, canonical `@ttsc/graph`, and `SpecGraph` snapshots and formats human, `--json`, or `--xml` reports
+ * @sideEffect console: Writes formatted statistics to stdout
+ * @sideEffect database: Reads `.tsdoc.db`, `.tsdoc/canonical-graph.db`, and `.tsdoc/spec-graph.db` (read)
  */
 
 import { DatabaseManager } from '../storage/DatabaseManager';
@@ -14,7 +21,9 @@ import { readCanonicalGraphSnapshot, readSpecGraphSnapshot } from './canonicalRe
  * @responsibility Display comprehensive documentation statistics
  * @contract Analyzes database, computes stats, supports human (default), JSON, and XML output
  * @doc [[StatsCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#stats]]
+ * @sideEffect console: Writes formatted CLI statistics to stdout; reads SQLite repositories
  *
  * @problem Need to track documentation quality metrics over time
  * @solves Collects and displays stats with human-readable default output and machine formats

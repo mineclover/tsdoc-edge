@@ -1,11 +1,16 @@
 /**
  * Feature document types
+ *
  * @packageDocumentation
+ * @doc [[FeatureTypes]]
  * @responsibility Define structure for feature documentation
+ * @context Authored feature document metadata, symbol reference positions, and feature index persistence
+ * @functionality Defines FeatureDocument, SymbolReference, and FeatureIndex contracts
  */
 
 /**
  * Feature document metadata
+ * @doc [[FeatureTypes]]
  * @public
  */
 export interface FeatureDocument {
@@ -63,6 +68,7 @@ export interface FeatureDocument {
 /**
  * Symbol reference in feature document
  * Syntax: `{symbolId}` or `{@link SymbolName}` / `[[Checkpoint]]`
+ * @doc [[FeatureTypes]]
  * @public
  */
 export interface SymbolReference {
@@ -84,6 +90,7 @@ export interface SymbolReference {
 
 /**
  * Feature document index
+ * @doc [[FeatureTypes]]
  * @public
  */
 export interface FeatureIndex {

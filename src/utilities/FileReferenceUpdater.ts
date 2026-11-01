@@ -2,8 +2,13 @@
  * File Reference Updater - Update file path references across documentation
  *
  * @packageDocumentation
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
  * @responsibility Find and update all references to a file path
  * @contract Scan documents, find references, update safely
+ * @context Documentation refactoring utility updating backlinks, relative paths, and Markdown links when managed files move
+ * @functionality Scans Markdown trees for backlink/path/relative/link occurrences, previews dry-run diffs, and rewrites modified files
+ * @sideEffect filesystem: Recursively scans and rewrites Markdown files when updating moved file path references (read/write)
  */
 
 import * as fs from 'node:fs';
@@ -11,11 +16,19 @@ import * as path from 'node:path';
 
 /**
  * Type of file reference
+ *
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
+ * @public
  */
 export type ReferenceType = 'backlink' | 'path' | 'relative' | 'markdown-link';
 
 /**
  * File reference information
+ *
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
+ * @public
  */
 export interface FileReference {
   /** File containing the reference */
@@ -36,6 +49,10 @@ export interface FileReference {
 
 /**
  * Reference update options
+ *
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
+ * @public
  */
 export interface UpdateOptions {
   /** Base directory for scanning */
@@ -54,6 +71,10 @@ export interface UpdateOptions {
 
 /**
  * Update result
+ *
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
+ * @public
  */
 export interface UpdateResult {
   /** Total references found */
@@ -71,6 +92,9 @@ export interface UpdateResult {
  *
  * Finds and updates all references to a file path across documentation
  *
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
+ * @sideEffect filesystem: Recursively scans and rewrites Markdown files when updating moved file path references (read/write)
  * @public
  */
 export class FileReferenceUpdater {

@@ -2,12 +2,17 @@
  * TSDoc Edge Service
  *
  * @packageDocumentation
+ * @doc [[LspAndCoverageSurfaceSpecification]]
  * @doc [[LSP Integration]]
  *
  * @responsibility Provide TSDoc Edge data to LSP server
  *
  * @problem LSP server needs access to TSDoc Edge analysis
  * @solves Bridge between LSP protocol and TSDoc Edge database
+ * @context Coordinates canonical `@ttsc/graph` snapshots, unsaved buffer overlays, retained convention history, and legacy SQLite fallbacks for LSP queries
+ * @functionality Hover rendering, CodeLens impact metrics, diagnostic projection, document links, definition lookup, and mutating CodeAction resolution
+ * @sideEffect database: Reads and updates SQLite symbol and convention history databases (read/write)
+ * @sideEffect filesystem: Reads workspace configuration, source files, and fix-plan bundles from disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -71,6 +76,8 @@ interface UnsavedFileOverlay {
 /**
  * Code Lens information for displaying impact counts on symbols
  *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
  * @public
  * @see TsdocEdgeService.getCodeLenses
  */
@@ -86,6 +93,8 @@ export interface CodeLensInfo {
 /**
  * Symbol search result from workspace symbol query
  *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
  * @public
  * @see TsdocEdgeService.searchSymbols
  */
@@ -102,7 +111,13 @@ export interface SymbolSearchResult {
 
 export type { DiagnosticInfo } from './diagnostics';
 
-/** Optional canonical graph wiring for hosts and focused tests. */
+/**
+ * Optional canonical graph wiring for hosts and focused tests.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export interface TsdocEdgeServiceOptions {
   /** Legacy symbol database override. Relative paths resolve from the workspace root. */
   readonly legacyDatabasePath?: string;
@@ -131,6 +146,10 @@ const CACHE_NAMES = {
  * Provides real-time access to symbol analysis, impact assessment, and
  * architectural diagnostics for LSP clients (VS Code, Vim, Emacs, etc.)
  *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @sideEffect database: Reads and updates SQLite symbol and convention history databases (read/write)
+ * @sideEffect filesystem: Reads workspace configuration, source files, and fix-plan bundles from disk (read)
  * @public
  * @example
  * ```typescript

@@ -1,6 +1,13 @@
 /**
  * Spec History Command - Show specification version history
+ *
  * @packageDocumentation
+ * @doc [[SpecHistoryCommand]]
+ * @doc [[CLI Commands]]
+ * @context Git-backed specification version history lookup via `tsdoc-edge spec history`
+ * @functionality Retrieves chronological version and commit metadata for a specification file via `SpecVersionManager`
+ * @sideEffect console: Writes chronological version history entries to stdout
+ * @sideEffect filesystem: Verifies specification file existence and queries Git history via `SpecVersionManager` (read)
  */
 
 import * as fs from 'node:fs';
@@ -15,7 +22,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @responsibility Display version history from Git
  * @contract Reads Git history, shows versions with metadata
  * @doc [[SpecHistoryCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#spec-history]]
+ * @sideEffect console: Writes specification version history to stdout; reads Git history and file metadata
  *
  * @problem Need to track document evolution over time
  * @solves Shows all versions with commit info

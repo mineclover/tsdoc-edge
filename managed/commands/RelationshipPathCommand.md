@@ -21,5 +21,5 @@ Finds shortest and filtered dependency connection paths between two symbols in t
 
 ### Implemented By
 
-- RelationshipPathCommand → src/commands/RelationshipPathCommand.ts:1
+- RelationshipPathCommand → src/commands/RelationshipPathCommand.ts:51
 

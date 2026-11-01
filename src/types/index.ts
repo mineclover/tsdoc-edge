@@ -4,6 +4,9 @@
  * All types are re-exported from their domain-specific modules for backward compatibility.
  *
  * @packageDocumentation
+ * @doc [[Types Index]]
+ * @context Root barrel module aggregating all TSDoc Edge domain type definitions
+ * @functionality Re-exports analysis, analytics, config, core, domain, feature, graph, guard, registry, spec, state, tag, and test-symbol contracts
  */
 
 // Analysis types - quality, coverage, health

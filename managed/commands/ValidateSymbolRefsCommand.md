@@ -48,5 +48,5 @@ Checks:
 
 ### Implemented By
 
-- ValidateSymbolRefsCommand → src/commands/ValidateSymbolRefsCommand.ts:79
+- ValidateSymbolRefsCommand → src/commands/ValidateSymbolRefsCommand.ts:84
 

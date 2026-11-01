@@ -6,8 +6,13 @@
  *
  * @packageDocumentation
  * @internal
-
- * @doc [[statement-manager]] */
+ * @doc [[statement-manager]]
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @context Prepared SQLite statement cache preventing unbounded handle growth in LSP database queries
+ * @functionality Named SQLite statement preparation, LRU statement eviction, one-off query preparation, and handle disposal
+ * @sideEffect database: Prepares and caches SQLite statements on the active database connection (read)
+ */
 
 import type { SqliteDatabase, SqliteStatement } from '../types/database';
 
@@ -24,6 +29,10 @@ interface StatementEntry {
 
 /**
  * Configuration options for StatementManager
+ *
+ * @doc [[statement-manager]]
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
  * @internal
  */
 export interface StatementManagerOptions {
@@ -45,6 +54,10 @@ export interface StatementManagerOptions {
  * stmtManager.dispose();
  * ```
  *
+ * @doc [[statement-manager]]
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @sideEffect database: Prepares SQLite query statements on the underlying connection (read)
  * @internal
  */
 export class StatementManager {

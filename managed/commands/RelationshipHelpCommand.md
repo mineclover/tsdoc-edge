@@ -21,5 +21,5 @@ Displays interactive usage guidance and workflow recipes for the relationship an
 
 ### Implemented By
 
-- RelationshipHelpCommand → src/commands/RelationshipHelpCommand.ts:13
+- RelationshipHelpCommand → src/commands/RelationshipHelpCommand.ts:20
 

@@ -1,12 +1,17 @@
 /**
  * Core parsing types for TSDoc Edge
+ *
  * @packageDocumentation
+ * @doc [[ParseTypes]]
+ * @context Core TSDoc comment parsing and convention validation payload structures
+ * @functionality Defines ParsedDocComment, ValidationResult, and ParseResult contracts
  */
 
 import type { DocComment } from '@microsoft/tsdoc';
 
 /**
  * Represents a parsed TSDoc comment with validation results
+ * @doc [[ParseTypes]]
  * @public
  */
 export interface ParsedDocComment {
@@ -38,6 +43,7 @@ export interface ParsedDocComment {
 
 /**
  * Validation result for a single rule
+ * @doc [[ParseTypes]]
  * @public
  */
 export interface ValidationResult {
@@ -67,6 +73,7 @@ export interface ValidationResult {
 
 /**
  * Result of parsing a source file
+ * @doc [[ParseTypes]]
  * @public
  */
 export interface ParseResult {

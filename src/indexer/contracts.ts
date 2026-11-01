@@ -4,14 +4,31 @@
  * Compiler-specific AST objects must not cross this boundary. Graph sources
  * provide JSON-shaped facts and ProjectIndexer assembles the canonical graph.
  *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @context TypeScript-version-neutral data contract boundary between external `@ttsc/graph` producers and `ProjectIndexer`.
+ * @functionality Defines canonical source nodes, edges, provenance metadata, indexing requests, and deterministic `CanonicalProjectGraph` revision structures.
  * @packageDocumentation
  */
 
 import type { CanonicalDiagnostic } from './diagnostics-contract';
 
+/**
+ * Contract version identifier for canonical project graph payloads.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export const PROJECT_GRAPH_CONTRACT_VERSION = '1.0' as const;
 
-/** Source location supplied by a graph producer. */
+/**
+ * Source location supplied by a graph producer.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProjectGraphEvidence extends Record<string, unknown> {
   file?: string;
   startLine?: number;
@@ -20,7 +37,13 @@ export interface ProjectGraphEvidence extends Record<string, unknown> {
   endCol?: number;
 }
 
-/** Raw node supplied by a project graph source. */
+/**
+ * Raw node supplied by a project graph source.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProjectGraphSourceNode extends Record<string, unknown> {
   id: string;
   kind: string;
@@ -32,7 +55,13 @@ export interface ProjectGraphSourceNode extends Record<string, unknown> {
   evidence?: ProjectGraphEvidence;
 }
 
-/** Raw edge supplied by a project graph source. */
+/**
+ * Raw edge supplied by a project graph source.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProjectGraphSourceEdge extends Record<string, unknown> {
   kind: string;
   from: string;
@@ -40,7 +69,13 @@ export interface ProjectGraphSourceEdge extends Record<string, unknown> {
   evidence?: ProjectGraphEvidence;
 }
 
-/** Provenance retained with every graph revision. */
+/**
+ * Provenance retained with every graph revision.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProjectGraphProvenance extends Record<string, unknown> {
   adapter: string;
   producer: string;
@@ -68,7 +103,13 @@ export interface ProjectGraphProvenance extends Record<string, unknown> {
   typescriptCompatibilityTarget?: string;
 }
 
-/** Unassembled graph facts returned by an adapter. */
+/**
+ * Unassembled graph facts returned by an adapter.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProjectGraphInput {
   rootDir: string;
   tsconfigPath: string;
@@ -79,7 +120,13 @@ export interface ProjectGraphInput {
   diagnostics?: readonly CanonicalDiagnostic[];
 }
 
-/** Request shared by batch and saved-file indexing flows. */
+/**
+ * Request shared by batch and saved-file indexing flows.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProjectIndexRequest {
   rootDir: string;
   tsconfigPath?: string;
@@ -89,25 +136,55 @@ export interface ProjectIndexRequest {
   contentOverrides?: ReadonlyMap<string, string>;
 }
 
-/** Adapter that supplies whole-project graph facts. */
+/**
+ * Adapter that supplies whole-project graph facts.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProjectGraphSource {
   readonly id: string;
   load(request: ProjectIndexRequest): Promise<ProjectGraphInput>;
 }
 
-/** Canonical node. The producer id is currently the canonical equality key. */
+/**
+ * Canonical node. The producer id is currently the canonical equality key.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export type CanonicalGraphNode = Readonly<ProjectGraphSourceNode & { sourceId: string }>;
 
-/** Canonical edge with lossless producer kind and evidence. */
+/**
+ * Canonical edge with lossless producer kind and evidence.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export type CanonicalGraphEdge = Readonly<ProjectGraphSourceEdge>;
 
-/** Result of assembling one canonical graph revision. */
+/**
+ * Result of assembling one canonical graph revision.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProjectIndexResult {
   readonly graph: CanonicalProjectGraph;
   readonly diagnostics: readonly CanonicalDiagnostic[];
 }
 
-/** Deterministic graph revision consumed by persistence, CLI, and LSP. */
+/**
+ * Deterministic graph revision consumed by persistence, CLI, and LSP.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface CanonicalProjectGraph {
   readonly contractVersion: typeof PROJECT_GRAPH_CONTRACT_VERSION;
   readonly rootDir: string;

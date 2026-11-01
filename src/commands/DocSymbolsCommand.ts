@@ -1,11 +1,14 @@
 /**
  * Document Symbols Command - List explicitly defined project concepts
  * @packageDocumentation
- * @responsibility Display all document symbols (H1 [[Symbol]] definitions) from managed/
+ * @responsibility Display all document symbols (H1 `[[Symbol]]` definitions) from `managed/`
  *
  * @problem Too many auto-generated code symbols, hard to see core project concepts
  * @solves Lists only explicitly documented symbols that represent intentional project concepts
  * @context Project glossary / term dictionary for onboarding and AI context
+ * @functionality Lists H1 `[[Symbol]]` project checkpoints from `managed/` with category filtering, keyword search, and `--llm` glossary formatting
+ * @sideEffect console: Writes formatted checkpoint glossary tables or `--llm` output to stdout
+ * @sideEffect filesystem: Reads managed Markdown files via `DocumentSymbolLister` (read)
  *
  * @doc [[DocSymbolsCommand]]
  */
@@ -21,6 +24,8 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * Lists all explicitly defined document symbols from managed/ directory.
  * Shows project's core concepts, not auto-generated code symbols.
  *
+ * @doc [[DocSymbolsCommand]]
+ * @sideEffect console: Writes document symbol glossary to stdout; reads managed Markdown files
  * @public
  * @example
  * ```bash

@@ -4,17 +4,26 @@
  * @packageDocumentation
  * @responsibility Validate module specifications for completeness and quality
  * @doc [[ModuleSpecValidator]]
+ * @doc [[Validator System]]
+ * @context 7-part module specification completeness and confidence scoring
+ * @functionality Evaluates Purpose, Input, Output, Context, Logic, Effect, Scope, and Metadata specification sections against quality rules
  */
 
 import type { ModuleSpecTemplate } from '../types/spec/module-spec';
 
 /**
  * Validation rule severity
+ * @doc [[ModuleSpecValidator]]
+ * @doc [[Validator System]]
+ * @public
  */
 export type ValidationSeverity = 'error' | 'warning' | 'info';
 
 /**
  * Validation issue
+ * @doc [[ModuleSpecValidator]]
+ * @doc [[Validator System]]
+ * @public
  */
 export interface ValidationIssue {
   section: string;
@@ -25,6 +34,9 @@ export interface ValidationIssue {
 
 /**
  * Validation result
+ * @doc [[ModuleSpecValidator]]
+ * @doc [[Validator System]]
+ * @public
  */
 export interface ModuleSpecValidationResult {
   isValid: boolean;
@@ -36,6 +48,9 @@ export interface ModuleSpecValidationResult {
 
 /**
  * Validation options
+ * @doc [[ModuleSpecValidator]]
+ * @doc [[Validator System]]
+ * @public
  */
 export interface ValidationOptions {
   /** Minimum required confidence */
@@ -58,8 +73,11 @@ export interface ValidationOptions {
  * Module specification validator
  *
  * @doc [[ModuleSpecValidator]]
+ * @doc [[Validator System]]
  * @public
  * @responsibility Validate module specifications against quality criteria
+ * @context Enforces 7-part module specification completeness thresholds and strict-mode TODO checks
+ * @functionality Validates all 7 specification sections plus completion confidence metadata and computes 0-100 quality scores
  */
 export class ModuleSpecValidator {
   private options: Required<ValidationOptions>;

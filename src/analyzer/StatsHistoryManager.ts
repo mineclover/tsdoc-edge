@@ -1,7 +1,12 @@
 /**
  * Manages statistics history storage and retrieval
+ *
  * @packageDocumentation
+ * @doc [[StatsHistoryManager]]
  * @responsibility Persist and retrieve statistics history
+ * @context Persists rolling snapshots (up to 50 entries) of `TrackableStatistics` in `.tsdoc-stats-history.json`
+ * @functionality Loads JSON history snapshots, prepends bounded entries, compares historical deltas, and saves history to disk
+ * @sideEffect filesystem: Reads and writes `.tsdoc-stats-history.json` snapshot files on disk (read/write)
  */
 
 import * as fs from 'node:fs';
@@ -12,6 +17,7 @@ import type { Symbol } from '../types/graph';
  * Manages statistics history persistence
  *
  * @doc [[StatsHistoryManager]]
+ * @sideEffect filesystem: Reads and writes `.tsdoc-stats-history.json` snapshot files on disk (read/write)
  * @public
  */
 export class StatsHistoryManager {

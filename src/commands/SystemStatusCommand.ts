@@ -1,10 +1,15 @@
 /**
  * System Status Command - Comprehensive 3-Layer SSOT system overview
  * @packageDocumentation
+ * @doc [[SystemStatusCommand]]
  *
  * @responsibility Show complete system status across Enrichment DB, Canonical `@ttsc/graph`, SpecGraph, and Managed Docs
  * @problem Users need to run multiple commands to understand system state
  * @solves Single command providing comprehensive 3-plane SSOT system overview
+ * @context Top-level `system-status` (`status`, `ss`) diagnostic dashboard
+ * @functionality Aggregates enrichment symbol DB metrics, canonical `@ttsc/graph` and `SpecGraph` revision snapshots, managed doc health, and composite health score
+ * @sideEffect console: Writes formatted 3-plane SSOT dashboard or `--json`/`--xml` output to stdout
+ * @sideEffect database: Reads `.tsdoc.db`, `.tsdoc/canonical-graph.db`, and `.tsdoc/spec-graph.db` in read-only mode (read)
  */
 
 import * as fs from 'node:fs';
@@ -22,6 +27,7 @@ import {
  * Command for displaying comprehensive system status across all 3 SSOT planes.
  *
  * @doc [[SystemStatusCommand]]
+ * @sideEffect console: Writes formatted system status overview to stdout; reads SQLite repositories and filesystem metadata
  * @public
  */
 export class SystemStatusCommand extends BaseCommand {

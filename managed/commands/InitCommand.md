@@ -172,7 +172,7 @@ vi .tsdoc.config.json
 tsdoc-edge build src
 
 # 4. Validate project
-tsdoc-edge validate
+tsdoc-edge validate connectivity
 ```
 
 ### Add to Existing Project
@@ -185,7 +185,7 @@ tsdoc-edge init --force
 tsdoc-edge build src
 
 # 3. Generate documentation
-tsdoc-edge index-docs managed
+tsdoc-edge docs index managed
 ```
 
 ## Implementation Details
@@ -390,5 +390,5 @@ if (configManager.exists()) {
 ### Implemented By
 
 - InitCommand → src/commands/Phase4Commands.ts:153:1
-- InitCommand → src/commands/InitCommand.ts:18
+- InitCommand → src/commands/InitCommand.ts:27
 

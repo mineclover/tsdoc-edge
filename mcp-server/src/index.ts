@@ -3,6 +3,13 @@
  * TSDoc Edge MCP Server
  *
  * Provides LLM access to codebase knowledge graph through Model Context Protocol
+ *
+ * @packageDocumentation
+ * @doc [[MCP Integration]]
+ * @context Executable Model Context Protocol stdio server exposing read-only `tsdoc-edge` graph, work-context, design-context, impact, and spec-binding tools
+ * @functionality Bootstraps `TsDocService`, registers 9 read-only MCP tools with Zod input schemas, and serves requests over `StdioServerTransport`
+ * @sideEffect process: Exchanges Model Context Protocol JSON-RPC messages over stdio transport and exits on fatal startup errors (io)
+ * @sideEffect database: Opens read-only SQLite symbol, canonical graph, and spec graph databases via `TsDocService` (read)
  */
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';

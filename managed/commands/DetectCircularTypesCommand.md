@@ -101,5 +101,5 @@ Uses DFS (Depth-First Search) to detect cycles:
 
 ### Implemented By
 
-- DetectCircularTypesCommand → src/commands/TypeChainCommand.ts:1
+- DetectCircularTypesCommand → src/commands/TypeChainCommand.ts:567
 

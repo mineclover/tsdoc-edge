@@ -2,12 +2,16 @@
  * Symbol Reference Updater - Update symbol references across documentation
  *
  * @packageDocumentation
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
  * @responsibility Find and update all references to a documentation symbol
  * @contract Scan documents, find symbol references, update safely
  *
  * @problem Symbol names need to be changed but references are scattered across many files
- * @solves Automatically finds and updates all [[Symbol]] references
+ * @solves Automatically finds and updates all `[[Symbol]]` references
  * @context TSDoc Edge SSOT documentation system
+ * @functionality Scans H1/H2/H3 heading definitions and inline `[[Symbol]]` mentions, validates SSOT uniqueness, and rewrites Markdown files
+ * @sideEffect filesystem: Recursively reads and rewrites Markdown files when renaming `[[Symbol]]` checkpoints (read/write)
  */
 
 import * as fs from 'node:fs';
@@ -15,11 +19,19 @@ import * as path from 'node:path';
 
 /**
  * Type of symbol reference
+ *
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
+ * @public
  */
 export type SymbolReferenceType = 'h1-primary' | 'h2-auxiliary' | 'h3-sub-auxiliary' | 'inline';
 
 /**
  * Symbol reference information
+ *
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
+ * @public
  */
 export interface SymbolReference {
   /** File containing the reference */
@@ -44,6 +56,10 @@ export interface SymbolReference {
 
 /**
  * Symbol update options
+ *
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
+ * @public
  */
 export interface SymbolUpdateOptions {
   /** Base directory for scanning */
@@ -62,6 +78,10 @@ export interface SymbolUpdateOptions {
 
 /**
  * Symbol update result
+ *
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
+ * @public
  */
 export interface SymbolUpdateResult {
   /** Total references found */
@@ -87,9 +107,12 @@ export interface SymbolUpdateResult {
  *
  * Finds and updates all references to a documentation symbol
  *
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
  * @public
  * @responsibility Update symbol names across documentation
  * @contract Maintain SSOT principle (exactly 1 H1 definition)
+ * @sideEffect filesystem: Recursively reads and rewrites Markdown files when renaming `[[Symbol]]` checkpoints (read/write)
  */
 export class SymbolReferenceUpdater {
   /**

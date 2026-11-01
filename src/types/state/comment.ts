@@ -1,11 +1,16 @@
 /**
  * Type definitions for comment fold/unfold system
+ *
  * @packageDocumentation
+ * @doc [[CommentStateTypes]]
+ * @context Persistent TSDoc comment collapse, expand, import, and export state management
+ * @functionality Defines CommentStatus, CommentLocation, CommentState, FileCommentState, StateStorage, CollapseOptions, ExpandOptions, ExportResult, ImportResult, and FileStatusSummary contracts
  */
 
 /**
  * Comment state (expanded or collapsed)
  *
+ * @doc [[CommentStateTypes]]
  * @public
  */
 export type CommentStatus = 'expanded' | 'collapsed';
@@ -13,6 +18,7 @@ export type CommentStatus = 'expanded' | 'collapsed';
 /**
  * Location of a comment in source code
  *
+ * @doc [[CommentStateTypes]]
  * @public
  */
 export interface CommentLocation {
@@ -40,6 +46,7 @@ export interface CommentLocation {
 /**
  * State of a single comment
  *
+ * @doc [[CommentStateTypes]]
  * @public
  */
 export interface CommentState {
@@ -88,6 +95,7 @@ export interface CommentState {
 /**
  * State storage for a single file
  *
+ * @doc [[CommentStateTypes]]
  * @public
  */
 export interface FileCommentState {
@@ -110,6 +118,7 @@ export interface FileCommentState {
 /**
  * Complete state storage for all files
  *
+ * @doc [[CommentStateTypes]]
  * @public
  */
 export interface StateStorage {
@@ -134,6 +143,7 @@ export interface StateStorage {
 /**
  * Options for collapsing comments
  *
+ * @doc [[CommentStateTypes]]
  * @public
  */
 export interface CollapseOptions {
@@ -161,6 +171,7 @@ export interface CollapseOptions {
 /**
  * Options for expanding comments
  *
+ * @doc [[CommentStateTypes]]
  * @public
  */
 export interface ExpandOptions {
@@ -178,6 +189,7 @@ export interface ExpandOptions {
 /**
  * Result of export operation
  *
+ * @doc [[CommentStateTypes]]
  * @public
  */
 export interface ExportResult {
@@ -205,6 +217,7 @@ export interface ExportResult {
 /**
  * Result of import operation
  *
+ * @doc [[CommentStateTypes]]
  * @public
  */
 export interface ImportResult {
@@ -232,6 +245,7 @@ export interface ImportResult {
 /**
  * Status summary for a file
  *
+ * @doc [[CommentStateTypes]]
  * @public
  */
 export interface FileStatusSummary {

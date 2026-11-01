@@ -1,4 +1,13 @@
-/** Dependency query against canonical graph with a legacy fallback. */
+/**
+ * Dependency query against canonical graph with a legacy fallback.
+ *
+ * @packageDocumentation
+ * @doc [[DepsCommand]]
+ * @context Outgoing symbol dependency lookup invoked via `tsdoc-edge symbol deps`
+ * @functionality Queries outgoing dependencies from the active canonical `@ttsc/graph` revision with fallback to `.tsdoc.db` and `SymbolRegistryManager`
+ * @sideEffect console: Writes dependency trees, `--json`, or `--xml` payloads to stdout
+ * @sideEffect database: Reads `GraphRepository` and `DatabaseManager` in read-only mode (read)
+ */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { CanonicalGraphNode } from '../indexer/contracts';
@@ -13,6 +22,7 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
  * Query reverse or outgoing symbol relationships.
  * @public
  * @doc [[DepsCommand]]
+ * @sideEffect console: Writes outgoing dependency output to stdout; reads canonical graph and symbol SQLite repositories
  */
 export class DepsCommand extends BaseCommand {
   private manager?: SymbolRegistryManager;

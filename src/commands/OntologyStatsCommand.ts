@@ -1,10 +1,16 @@
 /**
  * Ontology Statistics Command
  * @packageDocumentation
+ * @doc [[OntologyStatsCommand]]
+ * @doc [[Relationship Ontology]]
  *
  * @responsibility Show comprehensive 3-layer SSOT ontology model statistics
  * @problem Need to understand the complete knowledge graph structure
  * @solves Combines Canonical `@ttsc/graph` code facts with Enrichment domain/test relationships
+ * @context Knowledge-graph ontology statistics reporting via `tsdoc-edge ontology stats`
+ * @functionality Aggregates node types, relationship categories, strengths, directions, and graph density across canonical `@ttsc/graph` and `.tsdoc.db`
+ * @sideEffect console: Writes ontology statistics dashboards or `--json` payloads to stdout
+ * @sideEffect database: Reads canonical `@ttsc/graph` and `DatabaseManager` SQLite repositories (read)
  */
 
 import * as fs from 'node:fs';
@@ -47,6 +53,7 @@ interface OntologyStats {
  * Command for displaying ontology model statistics across Canonical `@ttsc/graph` and Enrichment DB.
  *
  * @doc [[OntologyStatsCommand]]
+ * @sideEffect console: Writes ontology model statistics to stdout; reads SQLite repositories
  * @public
  */
 export class OntologyStatsCommand extends BaseCommand {

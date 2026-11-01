@@ -1,8 +1,11 @@
 /**
  * Strict mode validator for enhanced documentation
+ *
  * @packageDocumentation
+ * @doc [[Validator System]]
  * @responsibility Validate compliance with 6-category strict mode requirements
  * @context Validation Layer - Strict Mode Enforcement
+ * @functionality Validates 6-category strict-mode symbol documentation completeness and calculates compliance scores
  */
 
 import type {
@@ -28,6 +31,7 @@ import type {
  * @testScenario Public API stricter validation
  * @doc [[ValidationFeatures#StrictMode]]
  * @doc [[StrictModeValidator]]
+ * @doc [[Validator System]]
  */
 export class StrictModeValidator {
   /**

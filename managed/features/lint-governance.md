@@ -20,10 +20,10 @@ in [[TtscPlatformSpecification]], [[TSDocStandardSpecification]], and
 | Surface | Policy | Reason |
 | --- | --- | --- |
 | All files (Biome) | Biome recommended errors, parsing, formatting (`0` warnings, `0` infos budget) | Deterministic repository baseline; CI blocks violations; `@ttsc/lint` omits `format` so Biome stays sole formatter. |
-| All TypeScript builds & tests (`lint.config.mjs`) | 18 enforced `@ttsc/lint` `error` rules (`tsdoc-edge/*` 6, `typescript/*` 7, `jsdoc/*` 5) | Auto-discovered on `npm run build`, `npm test`, and `ttscserver`; zero warning noise on ordinary builds. |
-| Type-aware & checkpoint backlog (`lint.ratchet.config.mjs`) | 7 `warn` ratchet rules enforced by `scripts/verify-ttsc-lint-baseline.cjs` | Monotonic downward ratchet (`scripts/ttsc-lint-baseline.json`); rules graduate to `lint.config.mjs` (`error`) at 0. |
+| All TypeScript builds & tests (`lint.config.mjs`) | 20 enforced `@ttsc/lint` `error` rules (`tsdoc-edge/*` 7, `typescript/*` 8, `jsdoc/*` 5) | Auto-discovered on `npm run build`, `npm test`, and `ttscserver`; `0` findings across `src/` and `src/__tests__/`. |
+| Production strict type-safety gate (`lint.ratchet.config.mjs`) | 5 additional `typescript/*` `error` rules (`25` total `error` rules, `0` `warn` rules) | Enforced via `tsconfig.lint.json` (`npm run lint:ttsc`) after graduating all 930 historical warnings down to `0` findings. |
 | Canonical governance kernel | Biome `noExplicitAny`, `noNonNullAssertion` are errors (`lint:governance`) | Revision-pinned analysis code must not inherit legacy trust shortcuts. |
-| Tests, demos, examples | `src/__tests__/fixtures/**` ignored only where intentional malformed fixtures are required | Fixtures may model loose input, while production and test suites share the 18-rule `error` gate. |
+| Tests, demos, examples | `src/__tests__/fixtures/**` ignored only where intentional malformed fixtures are required | Fixtures may model loose input, while production and test suites share the 20-rule global `error` gate (`25` on production `src/`). |
 
 The strict surface currently includes `src/convention`, `src/semantic-graph`, `src/spec-graph`,
 `src/lsp`, `src/indexer`, `mcp-server/src`, and the four immutable revision repositories. Adding a
@@ -55,11 +55,11 @@ semantic relationship requires it.
 
 ```bash
 npm run ttsc:prepare     # ahead-of-time Go compilation for @ttsc/lint + tools/ttsc-tsdoc
-npm run lint             # Biome check + lint:budget (0/0) + lint:governance + lint:ttsc ratchet
+npm run lint             # Biome check + lint:budget (0/0) + lint:governance + lint:ttsc (25 error rules)
 npm run lint:budget      # Biome warning/info budget gate
 npm run lint:governance  # canonical kernel: Biome warnings are failures
-npm run lint:ttsc        # @ttsc/lint 18 error rules + 7 warn ratchet baseline verification
-npm run typecheck        # ttsc + 18 enforced error rules on tsconfig.ttsc.json
+npm run lint:ttsc        # @ttsc/lint 25 error rules (0 findings, 0 warn rules)
+npm run typecheck        # ttsc + 20 global enforced error rules on tsconfig.ttsc.json
 ```
 
 `npm run lint` is the CI entry point. `--write --unsafe` is a maintenance action, never a required
@@ -82,9 +82,9 @@ typecheck and the affected test lane.
 
 ### Referenced By
 
-- [[CrossSpecIntegrationContract]] → managed/specs/domains/cross-spec-integration-contract.md:188
-- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:101
-- [[TtscPlatformSpecification]] → managed/specs/domains/ttsc-platform-spec.md:79
+- [[CrossSpecIntegrationContract]] → managed/specs/domains/cross-spec-integration-contract.md:230
+- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:164
+- [[TtscPlatformSpecification]] → managed/specs/domains/ttsc-platform-spec.md:100
 - [[Document Validation Warning Policy]] → managed/workflows/document-validation-warning-policy.md:13
 
 ### Implemented By

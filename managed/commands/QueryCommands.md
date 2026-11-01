@@ -20,7 +20,7 @@ Query commands for exploring dependencies, usage, and project statistics.
 
 Show dependencies of a symbol.
 
-**Usage**: `tsdoc-edge deps <symbol-name>`
+**Usage**: `tsdoc-edge symbol deps <symbol-name>`
 
 **Source**: `src/commands/Phase5Commands.ts`
 
@@ -33,9 +33,7 @@ Show dependencies of a symbol.
 
 Show reverse dependencies (who uses this symbol).
 
-**Usage**: `tsdoc-edge who-uses <symbol-name>`
-
-**Alias**: `used-by`
+**Usage**: `tsdoc-edge symbol who-uses <symbol-name>`
 
 **Source**: `src/commands/Phase5Commands.ts`
 
@@ -48,7 +46,7 @@ Show reverse dependencies (who uses this symbol).
 
 Find orphaned code (unreachable from entry points).
 
-**Usage**: `tsdoc-edge orphans`
+**Usage**: `tsdoc-edge symbol orphans`
 
 **Source**: `src/commands/Phase5Commands.ts`
 
@@ -75,7 +73,7 @@ Display project statistics.
 
 Find undocumented symbols.
 
-**Usage**: `tsdoc-edge undocumented`
+**Usage**: `tsdoc-edge symbol undocumented`
 
 **Source**: `src/commands/Phase7Commands.ts`
 
@@ -83,7 +81,7 @@ Find undocumented symbols.
 
 Find untested code.
 
-**Usage**: `tsdoc-edge untested`
+**Usage**: `tsdoc-edge symbol untested`
 
 **Source**: `src/commands/Phase7Commands.ts`
 
@@ -91,7 +89,7 @@ Find untested code.
 
 Lists all registered primary and auxiliary `[[Symbol]]` checkpoints and reference counts across managed documentation.
 
-**Usage**: `tsdoc-edge doc-symbols [path]`
+**Usage**: `tsdoc-edge docs symbols [path]`
 
 **Source**: `src/commands/DocSymbolsCommand.ts`
 
@@ -99,7 +97,7 @@ Lists all registered primary and auxiliary `[[Symbol]]` checkpoints and referenc
 
 Searches the indexed codebase for methods and functions matching a simple or qualified symbol name.
 
-**Usage**: `tsdoc-edge find-method <name>`
+**Usage**: `tsdoc-edge symbol find-method <name>`
 
 **Source**: `src/commands/FindMethodCommand.ts`
 
@@ -107,7 +105,7 @@ Searches the indexed codebase for methods and functions matching a simple or qua
 
 Identifies managed Markdown documents that have zero incoming document references or code `@doc` bindings.
 
-**Usage**: `tsdoc-edge find-unused-docs [path]`
+**Usage**: `tsdoc-edge docs find-unused [path]`
 
 **Source**: `src/commands/FindUnusedDocsCommand.ts`
 
@@ -115,7 +113,7 @@ Identifies managed Markdown documents that have zero incoming document reference
 
 Lists symbol and relationship instances matching specific relationship ontology categories and predicates.
 
-**Usage**: `tsdoc-edge ontology-list [options]`
+**Usage**: `tsdoc-edge ontology list [options]`
 
 **Source**: `src/commands/OntologyListCommand.ts`
 
@@ -147,7 +145,7 @@ Provides programmatic traversal, pathfinding, filtering, and subgraph querying o
 
 - [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:246
 - [[Impact Analysis]] → managed/features/ImpactAnalysis.md:291
-- [[Features Index]] → managed/features/index.md:283
+- [[Features Index]] → managed/features/index.md:297
 
 ### Implemented By
 

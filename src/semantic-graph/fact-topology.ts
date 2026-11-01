@@ -4,26 +4,67 @@
  * CanonicalProjectGraph.edges remains a compatibility projection. This module
  * keeps every provider observation independently addressable before producing
  * the endpoint-level topology used by queries.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @context Lossless compiler-fact occurrence and derived topology aggregation kernel underlying endpoint-level graph relationship queries.
+ * @functionality Normalizes provider fact occurrences, enforces duplicate-fact and unknown-endpoint quarantine/rejection policies, aggregates compiler facts into topology edges, and validates derived topology relations.
  * @packageDocumentation
  */
 
 import { createHash } from 'node:crypto';
 import type { CanonicalProjectGraph } from '../indexer/contracts';
 
+/**
+ * Schema contract version for fact occurrences and aggregated topology edges.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export const FACT_TOPOLOGY_CONTRACT_VERSION = '1.0' as const;
 
+/**
+ * Discriminator identifying whether a topology relation originates from compiler facts or derived owners.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export type TopologyPlane = 'compiler-fact' | 'producer-derived' | 'router-derived';
+
+/**
+ * Policy controlling how occurrences referencing unknown graph node IDs are handled.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export type UnknownEndpointPolicy = 'reject' | 'quarantine';
+
+/**
+ * Policy controlling whether identical duplicate fact occurrences are rejected or deduplicated.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export type DuplicateFactPolicy = 'reject' | 'deduplicate-identical';
 
-/** Identity of the concrete provider process/snapshot that emitted a fact. */
+/**
+ * Identity of the concrete provider process/snapshot that emitted a fact.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface FactProviderInstance {
   readonly instanceId: string;
   readonly contractId: string;
   readonly contractVersion: string;
 }
 
-/** JSON-shaped source anchor. Provider-specific fields are retained losslessly. */
+/**
+ * JSON-shaped source anchor. Provider-specific fields are retained losslessly.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface FactSourceAnchor extends Readonly<Record<string, unknown>> {
   readonly file: string;
   readonly startLine?: number;
@@ -32,7 +73,13 @@ export interface FactSourceAnchor extends Readonly<Record<string, unknown>> {
   readonly endCol?: number;
 }
 
-/** One observation reported by a compiler-fact provider. */
+/**
+ * One observation reported by a compiler-fact provider.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface FactOccurrence {
   readonly contractVersion: typeof FACT_TOPOLOGY_CONTRACT_VERSION;
   readonly id: string;
@@ -52,6 +99,12 @@ export interface FactOccurrence {
   readonly producerFields: Readonly<Record<string, unknown>>;
 }
 
+/**
+ * Input payload used to construct a content-addressed `FactOccurrence`.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface CreateFactOccurrenceInput {
   readonly kind: string;
   readonly from: string;
@@ -66,7 +119,12 @@ export interface CreateFactOccurrenceInput {
   readonly producerFields?: Readonly<Record<string, unknown>>;
 }
 
-/** Lossless occurrence contribution retained on an aggregate topology edge. */
+/**
+ * Lossless occurrence contribution retained on an aggregate topology edge.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface TopologyOccurrenceContribution {
   readonly occurrenceId: string;
   readonly providerInstanceId: string;
@@ -75,12 +133,24 @@ export interface TopologyOccurrenceContribution {
   readonly provenance: Readonly<Record<string, unknown>>;
 }
 
+/**
+ * Aggregated confidence summary across all occurrences contributing to a topology edge.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface TopologyConfidenceSummary {
   readonly strategy: 'maximum-reported';
   readonly value: number | null;
   readonly reportedOccurrenceCount: number;
 }
 
+/**
+ * Provenance and input-fact lineage for a producer-derived or router-derived topology edge.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface TopologyDerivation {
   readonly owner: string;
   readonly version: string;
@@ -101,14 +171,26 @@ interface TopologyEdgeBase {
   readonly contributions: readonly TopologyOccurrenceContribution[];
 }
 
-/** Query topology aggregated from one or more source occurrences. */
+/**
+ * Query topology aggregated from one or more source occurrences.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface CompilerFactTopologyEdge extends TopologyEdgeBase {
   readonly plane: 'compiler-fact';
   readonly occurrenceIds: readonly [string, ...string[]];
   readonly derivation?: never;
 }
 
-/** Topology synthesized by a named, versioned derivation owner. */
+/**
+ * Topology synthesized by a named, versioned derivation owner.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface DerivedTopologyEdge extends TopologyEdgeBase {
   readonly plane: 'producer-derived' | 'router-derived';
   readonly occurrenceIds: readonly [];
@@ -118,8 +200,21 @@ export interface DerivedTopologyEdge extends TopologyEdgeBase {
   readonly provenance: Readonly<Record<string, unknown>>;
 }
 
+/**
+ * Union of compiler-fact and derived topology edges used by relationship queries.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export type TopologyEdge = CompilerFactTopologyEdge | DerivedTopologyEdge;
 
+/**
+ * Input payload for synthesizing and validating a derived topology edge against a graph.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface CreateDerivedTopologyEdgeInput {
   /** Derived topology cannot be quarantined, so unknown endpoints are rejected. */
   readonly graph: CanonicalProjectGraph;
@@ -133,6 +228,12 @@ export interface CreateDerivedTopologyEdgeInput {
   readonly provenance: Readonly<Record<string, unknown>>;
 }
 
+/**
+ * Explicit unknown-endpoint and duplicate-fact policies governing topology projection.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface FactTopologyPolicies {
   /** Unknown graph endpoints are never silently dropped. */
   readonly unknownEndpoint: UnknownEndpointPolicy;
@@ -140,12 +241,24 @@ export interface FactTopologyPolicies {
   readonly duplicateFact: DuplicateFactPolicy;
 }
 
+/**
+ * Fact occurrence quarantined during projection due to unresolved graph endpoint IDs.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface QuarantinedFactOccurrence {
   readonly occurrence: FactOccurrence;
   readonly unknownEndpointIds: readonly string[];
 }
 
-/** Deterministic in-memory projection; persistence is intentionally out of scope. */
+/**
+ * Deterministic in-memory projection; persistence is intentionally out of scope.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface FactTopologyProjection {
   readonly contractVersion: typeof FACT_TOPOLOGY_CONTRACT_VERSION;
   readonly projectionId: string;
@@ -159,6 +272,10 @@ export interface FactTopologyProjection {
 /**
  * Create a source observation whose identity preserves provider instance,
  * provider-local fact, source anchor, raw kind, and semantic endpoints.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
  */
 export function createFactOccurrence(input: CreateFactOccurrenceInput): FactOccurrence {
   const kind = nonEmpty(input.kind, 'kind');
@@ -201,7 +318,13 @@ export function createFactOccurrence(input: CreateFactOccurrenceInput): FactOccu
   });
 }
 
-/** Create and validate a non-compiler topology relation. */
+/**
+ * Create and validate a non-compiler topology relation.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export function createDerivedTopologyEdge(
   input: CreateDerivedTopologyEdgeInput
 ): DerivedTopologyEdge {
@@ -255,6 +378,10 @@ export function createDerivedTopologyEdge(
  * Malformed facts always fail. Unknown graph endpoints follow the explicit
  * reject/quarantine policy. Exact duplicate facts may only be collapsed when
  * `deduplicate-identical` is selected; identity conflicts always fail.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
  */
 export function buildFactTopologyProjection(options: {
   readonly graph: CanonicalProjectGraph;
@@ -311,7 +438,13 @@ export function buildFactTopologyProjection(options: {
   });
 }
 
-/** Validate the structural invariants shared by persisted and transient topology. */
+/**
+ * Validate the structural invariants shared by persisted and transient topology.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export function assertTopologyEdge(edge: TopologyEdge, graph?: CanonicalProjectGraph): void {
   if (edge.contractVersion !== FACT_TOPOLOGY_CONTRACT_VERSION) {
     throw new Error(`Unsupported topology contract version: ${edge.contractVersion}`);

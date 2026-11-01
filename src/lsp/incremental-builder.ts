@@ -5,7 +5,12 @@
  * when files are modified, created, or deleted.
  *
  * @packageDocumentation
+ * @doc [[LspAndCoverageSurfaceSpecification]]
  * @doc [[LSP Integration]]
+ * @context Incremental single-file TypeScript AST extraction and legacy SQLite update layer for LSP buffers
+ * @functionality Single-file symbol and relationship extraction, in-memory buffer parsing, and incremental SQLite synchronization
+ * @sideEffect filesystem: Reads modified TypeScript source files from disk (read)
+ * @sideEffect database: Updates file symbols and relationships in SQLite database (write)
  */
 
 import * as fs from 'node:fs';
@@ -17,6 +22,10 @@ import type { SqliteDatabase } from '../types/database';
 
 /**
  * Extracted symbol from a single file
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
  */
 export interface ExtractedSymbol {
   id: string;
@@ -35,6 +44,10 @@ export interface ExtractedSymbol {
 
 /**
  * Extracted relationship from a single file
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
  */
 export interface ExtractedRelationship {
   fromSymbol: string;
@@ -46,6 +59,10 @@ export interface ExtractedRelationship {
 
 /**
  * Result of incremental extraction
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
  */
 export interface IncrementalExtractResult {
   filePath: string;
@@ -57,6 +74,10 @@ export interface IncrementalExtractResult {
 
 /**
  * Callback for build events
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
  */
 export type BuildEventCallback = (event: {
   type: 'update' | 'delete';
@@ -71,6 +92,10 @@ export type BuildEventCallback = (event: {
  * Designed for LSP integration to provide real-time symbol updates
  * as files are modified in the IDE.
  *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @sideEffect filesystem: Reads modified TypeScript source files from disk (read)
+ * @sideEffect database: Updates file symbols and relationships in SQLite database (write)
  * @public
  */
 export class IncrementalBuilder {

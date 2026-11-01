@@ -5,8 +5,8 @@
  * This provides more accurate symbol resolution than variable name matching.
  *
  * @packageDocumentation
-
- * @doc [[ImportAnalyzer]] */
+ * @doc [[ImportAnalyzer]]
+ */
 
 import * as ts from 'typescript';
 
@@ -38,6 +38,9 @@ export interface ImportAnalysisResult {
 
 /**
  * Analyzes import statements in TypeScript test files
+ *
+ * @doc [[ImportAnalyzer]]
+ * @public
  */
 export class ImportAnalyzer {
   /**

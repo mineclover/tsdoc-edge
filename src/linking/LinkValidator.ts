@@ -1,7 +1,12 @@
 /**
  * Link validation and auto-fix
+ *
  * @packageDocumentation
+ * @doc [[LinkValidator]]
  * @responsibility Validate doc-code links and suggest fixes
+ * @context Verifies target existence for bidirectional Markdown-to-code and code-to-Markdown links indexed by `DocCodeLinker`
+ * @functionality Broken-link detection, fuzzy replacement suggestion, and automated in-place link rewriting
+ * @sideEffect filesystem: Reads and rewrites Markdown documentation and TypeScript source files during validation and auto-fix (read/write)
  */
 
 import * as fs from 'node:fs';
@@ -19,8 +24,12 @@ import type { DocCodeLinker } from './DocCodeLinker';
 /**
  * Validates and fixes broken doc-code links
  *
+ * @doc [[LinkValidator]]
  * @public
  * @responsibility Validate links and auto-fix when possible
+ * @context Consumes `DocCodeLinker` and `ASTSymbolExtractor` to audit and repair doc-to-code and code-to-doc links
+ * @functionality Validates target files/symbols/headings, computes similarity suggestions, and applies link fixes on disk
+ * @sideEffect filesystem: Reads and rewrites Markdown documentation and TypeScript source files during validation and auto-fix (read/write)
  */
 export class LinkValidator {
   private linker: DocCodeLinker;

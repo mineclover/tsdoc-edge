@@ -21,5 +21,5 @@ Discovers cohesive architectural clusters and module boundaries within the unifi
 
 ### Implemented By
 
-- RelationshipClustersCommand → src/commands/RelationshipClustersCommand.ts:29
+- RelationshipClustersCommand → src/commands/RelationshipClustersCommand.ts:37
 

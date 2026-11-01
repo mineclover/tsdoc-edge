@@ -1,7 +1,9 @@
 /**
  * Enhancement Analyzer
+ *
  * @packageDocumentation
  * @responsibility Analyze `@enhances` tags in TSDoc comments
+ * @sideEffect filesystem: Recursively scans directories and reads TypeScript source files from disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -29,6 +31,7 @@ interface EnhancementSite {
  * @doc [[EnhancementAnalyzer]]
  * @public
  * @responsibility Detect code enhancements via `@enhances` tags
+ * @sideEffect filesystem: Recursively scans directories and reads TypeScript source files from disk (read)
  *
  * Pattern: A enhances B
  * - A extends B's functionality

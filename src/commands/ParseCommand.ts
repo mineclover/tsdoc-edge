@@ -1,6 +1,13 @@
 /**
  * Parse command - Parse and display enhanced documentation
+ *
  * @packageDocumentation
+ * @doc [[ParseCommand]]
+ * @doc [[CLI Commands]]
+ * @context File and directory TSDoc inspection via `tsdoc-edge symbol parse`
+ * @functionality Extracts enhanced TSDoc metadata and completeness scores from TypeScript files using `EnhancedDocExtractor`
+ * @sideEffect console: Writes extracted TSDoc summaries, tag breakdowns, and completeness scores to stdout
+ * @sideEffect filesystem: Reads target TypeScript files or recursively scans directories on disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -15,7 +22,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @responsibility Parse enhanced docs from TypeScript files
  * @contract Extract and display enhanced documentation with completeness metrics
  * @doc [[ParseCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#parse]]
+ * @sideEffect console: Writes parsed TSDoc completeness reports to stdout; reads TypeScript source files
  *
  * @problem Developers need to validate enhanced documentation completeness
  * @solves Parses TypeScript files and extracts enhanced doc tags with completeness scores

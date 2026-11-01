@@ -1490,8 +1490,74 @@ interface ConformanceReport {
 - [[ProjectIndexer]] → managed/architecture/project-indexer.md:189
 - [[Spec Management System]] → managed/core/spec-management-system.md:394
 - [[Convention Pack Check]] → managed/features/convention-pack-check.md:437
-- [[AuthoredProjectSpecifications]] → managed/specs/index.md:117
+- [[GraphAndPersistencePlaneSpecification]] → managed/specs/domains/graph-and-persistence-plane-spec.md:257
+- [[AuthoredProjectSpecifications]] → managed/specs/index.md:127
 - [[Semantic Graph Spec Governance Completed Work]] → managed/workflows/semantic-graph-spec-governance-completed.md:135
 - [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:273
 - [[TS7 Test Compilation Lane]] → managed/workflows/ts7-test-compilation-lane.md:337
+
+### Implemented By
+
+- CanonicalGraphIndex → src/graph-analysis/CanonicalGraphIndex.ts:28
+- RelationshipProjectionOptions → src/graph-analysis/GraphAnalysisService.ts:40
+- GraphAnalysisService → src/graph-analysis/GraphAnalysisService.ts:58
+- ExternalNodePolicy → src/graph-analysis/contracts.ts:19
+- GraphFilterOptions → src/graph-analysis/contracts.ts:27
+- GraphTraversalOptions → src/graph-analysis/contracts.ts:40
+- GraphNeighbor → src/graph-analysis/contracts.ts:51
+- SymbolResolution → src/graph-analysis/contracts.ts:63
+- GraphImpactNode → src/graph-analysis/contracts.ts:85
+- GraphImpactResult → src/graph-analysis/contracts.ts:96
+- GraphDegreeMetric → src/graph-analysis/contracts.ts:108
+- GraphMetricsOptions → src/graph-analysis/contracts.ts:127
+- GraphAnalysisSummary → src/graph-analysis/contracts.ts:138
+- GraphEdgeCategory → src/graph-analysis/contracts.ts:155
+- RELATION_SEMANTIC_REGISTRY_VERSION → src/graph-analysis/edge-semantics.ts:28
+- GraphEdgeSemantic → src/graph-analysis/edge-semantics.ts:37
+- RelationSemanticFamily → src/graph-analysis/edge-semantics.ts:58
+- RelationQueryPolicies → src/graph-analysis/edge-semantics.ts:72
+- graphEdgeSemantic → src/graph-analysis/edge-semantics.ts:261
+- PROJECTABLE_GRAPH_EDGE_KINDS → src/graph-analysis/edge-semantics.ts:271
+- DEPENDENCY_GRAPH_EDGE_KINDS → src/graph-analysis/edge-semantics.ts:284
+- CONTAINMENT_GRAPH_EDGE_KINDS → src/graph-analysis/edge-semantics.ts:297
+- assertValidatedBindingResolutionSet → src/semantic-graph/EffectiveAnalysisService.ts:59
+- EffectiveAnalysisService → src/semantic-graph/EffectiveAnalysisService.ts:77
+- createRuleSetRevision → src/semantic-graph/EffectiveAnalysisService.ts:300
+- observedEdgeSemanticDigest → src/semantic-graph/EffectiveAnalysisService.ts:844
+- providerAnalysisIdentityFromGraph → src/semantic-graph/EffectiveAnalysisService.ts:857
+- EvidenceRevision → src/semantic-graph/analysis-input-revisions.ts:165
+- EnrichmentRevision → src/semantic-graph/analysis-input-revisions.ts:182
+- createEvidenceRevision → src/semantic-graph/analysis-input-revisions.ts:223
+- createEnrichmentRevision → src/semantic-graph/analysis-input-revisions.ts:240
+- CodeViewStamp → src/semantic-graph/contracts.ts:27
+- EffectiveAnalysisInputStamp → src/semantic-graph/contracts.ts:47
+- EffectiveAnalysisStamp → src/semantic-graph/contracts.ts:72
+- CodeAnalysisView → src/semantic-graph/contracts.ts:83
+- ProviderAnalysisIdentity → src/semantic-graph/contracts.ts:136
+- EffectiveAnalysisInputs → src/semantic-graph/contracts.ts:163
+- EffectiveAnalysisSnapshot → src/semantic-graph/contracts.ts:183
+- BindingResolutionSet → src/semantic-graph/contracts.ts:202
+- EffectiveBindingResolver → src/semantic-graph/contracts.ts:218
+- FACT_TOPOLOGY_CONTRACT_VERSION → src/semantic-graph/fact-topology.ts:24
+- TopologyPlane → src/semantic-graph/fact-topology.ts:32
+- UnknownEndpointPolicy → src/semantic-graph/fact-topology.ts:40
+- DuplicateFactPolicy → src/semantic-graph/fact-topology.ts:48
+- FactProviderInstance → src/semantic-graph/fact-topology.ts:56
+- FactSourceAnchor → src/semantic-graph/fact-topology.ts:68
+- FactOccurrence → src/semantic-graph/fact-topology.ts:83
+- CreateFactOccurrenceInput → src/semantic-graph/fact-topology.ts:108
+- TopologyOccurrenceContribution → src/semantic-graph/fact-topology.ts:128
+- TopologyConfidenceSummary → src/semantic-graph/fact-topology.ts:142
+- TopologyDerivation → src/semantic-graph/fact-topology.ts:154
+- CompilerFactTopologyEdge → src/semantic-graph/fact-topology.ts:181
+- DerivedTopologyEdge → src/semantic-graph/fact-topology.ts:194
+- TopologyEdge → src/semantic-graph/fact-topology.ts:210
+- CreateDerivedTopologyEdgeInput → src/semantic-graph/fact-topology.ts:218
+- FactTopologyPolicies → src/semantic-graph/fact-topology.ts:237
+- QuarantinedFactOccurrence → src/semantic-graph/fact-topology.ts:250
+- FactTopologyProjection → src/semantic-graph/fact-topology.ts:262
+- createFactOccurrence → src/semantic-graph/fact-topology.ts:280
+- createDerivedTopologyEdge → src/semantic-graph/fact-topology.ts:328
+- buildFactTopologyProjection → src/semantic-graph/fact-topology.ts:386
+- assertTopologyEdge → src/semantic-graph/fact-topology.ts:448
 

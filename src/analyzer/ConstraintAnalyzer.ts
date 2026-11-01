@@ -33,6 +33,7 @@ interface CoRequirement {
 /**
  * Constraint Analyzer
  *
+ * @doc [[ConstraintAnalyzer]]
  * @public
  * @responsibility Detect and analyze constraint relationships
  */

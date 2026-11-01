@@ -201,12 +201,63 @@ legacy id에서 canonical id로 이동한다. alias와 diagnostics 내용도 rev
 ### Referenced By
 
 - [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1456
-- [[CrossSpecIntegrationContract]] → managed/specs/domains/cross-spec-integration-contract.md:187
-- [[TtscPlatformSpecification]] → managed/specs/domains/ttsc-platform-spec.md:162
+- [[CrossSpecIntegrationContract]] → managed/specs/domains/cross-spec-integration-contract.md:229
+- [[GraphAndPersistencePlaneSpecification]] → managed/specs/domains/graph-and-persistence-plane-spec.md:259
+- [[TtscPlatformSpecification]] → managed/specs/domains/ttsc-platform-spec.md:183
 - [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:274
 - [[TS7 Test Compilation Lane]] → managed/workflows/ts7-test-compilation-lane.md:412
 
 ### Implemented By
 
-- ProjectIndexer → src/indexer/ProjectIndexer.ts:1
+- ProjectIndexer → src/indexer/ProjectIndexer.ts:35
+- CanonicalAliasContext → src/indexer/CanonicalAliasContext.ts:28
+- DEFAULT_CANONICAL_GRAPH_DATABASE → src/indexer/CanonicalGraphCoordinator.ts:35
+- DEFAULT_GRAPH_ROUTER_CONFIG → src/indexer/CanonicalGraphCoordinator.ts:44
+- DEFAULT_GRAPH_TSCONFIG → src/indexer/CanonicalGraphCoordinator.ts:53
+- CanonicalGraphCoordinatorOptions → src/indexer/CanonicalGraphCoordinator.ts:62
+- CanonicalGraphCoordinatorDependencies → src/indexer/CanonicalGraphCoordinator.ts:83
+- CanonicalGraphRefreshResult → src/indexer/CanonicalGraphCoordinator.ts:94
+- CanonicalGraphCoordinator → src/indexer/CanonicalGraphCoordinator.ts:117
+- canonicalGraphOptionsFromEnvironment → src/indexer/CanonicalGraphCoordinator.ts:253
+- LegacyParityMismatch → src/indexer/LegacyAstParityAdapter.ts:29
+- LegacyParityResult → src/indexer/LegacyAstParityAdapter.ts:42
+- verifyLegacyAstParity → src/indexer/LegacyAstParityAdapter.ts:55
+- canonicalProjectGraphFingerprint → src/indexer/ProjectIndexer.ts:134
+- SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSION → src/indexer/TtscGraphRouterArtifactAdapter.ts:31
+- SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSIONS → src/indexer/TtscGraphRouterArtifactAdapter.ts:40
+- SupportedTtscGraphArtifactContractVersion → src/indexer/TtscGraphRouterArtifactAdapter.ts:49
+- TtscGraphRouterArtifactAdapterOptions → src/indexer/TtscGraphRouterArtifactAdapter.ts:142
+- TtscGraphRouterArtifactAdapter → src/indexer/TtscGraphRouterArtifactAdapter.ts:171
+- CANONICAL_ID_SCHEME → src/indexer/canonical-id.ts:18
+- OVERLAY_ID_SUFFIX → src/indexer/canonical-id.ts:26
+- ParsedCanonicalId → src/indexer/canonical-id.ts:35
+- parseCanonicalId → src/indexer/canonical-id.ts:49
+- formatCanonicalId → src/indexer/canonical-id.ts:70
+- isProvisionalOverlayId → src/indexer/canonical-id.ts:86
+- canonicalFsPath → src/indexer/canonical-path.ts:22
+- PROJECT_GRAPH_CONTRACT_VERSION → src/indexer/contracts.ts:23
+- ProjectGraphEvidence → src/indexer/contracts.ts:32
+- ProjectGraphSourceNode → src/indexer/contracts.ts:47
+- ProjectGraphSourceEdge → src/indexer/contracts.ts:65
+- ProjectGraphProvenance → src/indexer/contracts.ts:79
+- ProjectGraphInput → src/indexer/contracts.ts:113
+- ProjectIndexRequest → src/indexer/contracts.ts:130
+- ProjectGraphSource → src/indexer/contracts.ts:146
+- CanonicalGraphNode → src/indexer/contracts.ts:158
+- CanonicalGraphEdge → src/indexer/contracts.ts:167
+- ProjectIndexResult → src/indexer/contracts.ts:176
+- CanonicalProjectGraph → src/indexer/contracts.ts:188
+- CANONICAL_DIAGNOSTICS_CONTRACT_VERSION → src/indexer/diagnostics-contract.ts:18
+- CanonicalDiagnosticSeverity → src/indexer/diagnostics-contract.ts:27
+- CanonicalDiagnosticCategory → src/indexer/diagnostics-contract.ts:36
+- CanonicalDiagnostic → src/indexer/diagnostics-contract.ts:45
+- normalizeRouterDiagnostics → src/indexer/diagnostics-contract.ts:67
+- generateLegacyId → src/indexer/legacy-id.ts:22
+- normalizeLegacyKind → src/indexer/legacy-id.ts:45
+- AliasMatchStrategy → src/indexer/symbol-alias.ts:25
+- SymbolAliasRecord → src/indexer/symbol-alias.ts:34
+- LegacySymbolIdentity → src/indexer/symbol-alias.ts:50
+- buildLegacyIdentityMap → src/indexer/symbol-alias.ts:69
+- materializeAliases → src/indexer/symbol-alias.ts:157
+- InMemoryAliasResolver → src/indexer/symbol-alias.ts:229
 

@@ -1,6 +1,13 @@
 /**
  * Plans Command - Show future plans from documentation
+ *
  * @packageDocumentation
+ * @doc [[PlansCommand]]
+ * @doc [[CLI Commands]]
+ * @context Planned work inspection command invoked via `tsdoc-edge docs plans`
+ * @functionality Queries `@privateRemarks` future plans from `.tsdoc.db`, filters by optional `--status`, and sorts by priority
+ * @sideEffect console: Writes formatted plan listings and summary counts to stdout
+ * @sideEffect database: Reads future plan records from `DatabaseManager` (read)
  */
 
 import { DatabaseManager } from '../storage/DatabaseManager';
@@ -14,7 +21,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @responsibility Display future plans from enhanced documentation
  * @contract Reads database, extracts plans, displays with filtering
  * @doc [[PlansCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#plans]]
+ * @sideEffect console: Writes future plan listings to stdout; reads `.tsdoc.db`
  *
  * @problem Need to track and visualize future plans across codebase
  * @solves Shows all `@privateRemarks` plan items from enhanced docs with status and priority

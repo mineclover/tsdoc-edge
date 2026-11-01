@@ -3,6 +3,12 @@
  *
  * The resolver never chooses a candidate heuristically. A participant resolves
  * only when its selector has exactly one match in the current effective view.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @context Exact cross-plane binding resolver matching authored SpecGraph selectors against effective code nodes, code edges, spec nodes, test evidence, and API surface revisions.
+ * @functionality Indexes effective analysis snapshots and pinned evidence revisions, resolves binding participants deterministically without heuristics, and emits structured ambiguity, missing, and stale diagnostics.
+ * @packageDocumentation
  */
 
 import { createHash } from 'node:crypto';
@@ -27,7 +33,22 @@ import type {
 } from './contracts';
 import { bindingDeclarationDigest, bindingResolutionId, matchesNodeIdentity } from './identity';
 
+/**
+ * Canonical resolver identifier for exact SpecGraph binding resolution.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const EXACT_BINDING_RESOLVER_ID = 'tsdoc-edge/exact-binding-resolver';
+
+/**
+ * SemVer version of the exact SpecGraph binding resolver.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const EXACT_BINDING_RESOLVER_VERSION = '2.0.0';
 
 type CodeNodeRef = Extract<EndpointRef, { type: 'code-node' }>;
@@ -38,6 +59,12 @@ type ApiSurfaceRef = Extract<EndpointRef, { type: 'api-surface' }>;
 type ParticipantRole = ResolvedBindingParticipant['role'];
 type ResolutionStatus = ResolvedBindingParticipant['status'];
 
+/**
+ * Indexed code node candidate prepared for exact selector matching.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface IndexedCodeNode {
   readonly ref: CodeNodeRef;
   readonly providerId?: string;
@@ -49,15 +76,33 @@ export interface IndexedCodeNode {
   readonly sourceAnchor?: SourceRange;
 }
 
+/**
+ * Indexed code edge candidate prepared for exact selector matching.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface IndexedCodeEdge {
   readonly ref: CodeEdgeRef;
   readonly providerId?: string;
 }
 
+/**
+ * Indexed specification node candidate prepared for exact selector matching.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface IndexedSpecNode {
   readonly ref: SpecNodeRef;
 }
 
+/**
+ * Indexed test-evidence candidate prepared for exact verifier selector matching.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface IndexedTestEvidence {
   readonly ref: TestEvidenceRef;
   readonly providerId?: string;
@@ -68,6 +113,12 @@ export interface IndexedTestEvidence {
   readonly status?: 'passed' | 'failed' | 'skipped' | 'unknown';
 }
 
+/**
+ * Indexed API surface candidate prepared for governance and implementation selector matching.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface IndexedApiSurface {
   readonly ref: ApiSurfaceRef;
   readonly providerId?: string;
@@ -77,7 +128,13 @@ export interface IndexedApiSurface {
   readonly exportName?: string;
 }
 
-/** Additional revision-tagged candidates not derivable from the code/spec graphs. */
+/**
+ * Additional revision-tagged candidates not derivable from the code/spec graphs.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface BindingResolverInputIndex {
   readonly codeNodes?: readonly IndexedCodeNode[];
   readonly codeEdges?: readonly IndexedCodeEdge[];
@@ -86,6 +143,12 @@ export interface BindingResolverInputIndex {
   readonly apiSurfaces?: readonly IndexedApiSurface[];
 }
 
+/**
+ * Fully materialized candidate index across all five binding endpoint domains.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface MaterializedBindingResolverIndex {
   readonly codeNodes: readonly IndexedCodeNode[];
   readonly codeEdges: readonly IndexedCodeEdge[];
@@ -94,11 +157,23 @@ export interface MaterializedBindingResolverIndex {
   readonly apiSurfaces: readonly IndexedApiSurface[];
 }
 
+/**
+ * Lazy callback supplying supplemental indexed candidates for an effective snapshot.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export type BindingResolverIndexProvider = (
   snapshot: EffectiveAnalysisSnapshot
 ) => BindingResolverInputIndex;
 
-/** Materialize test-evidence and API-surface candidates from one pinned revision. */
+/**
+ * Materialize test-evidence and API-surface candidates from one pinned revision.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export function createAnalysisInputBindingResolverIndex(
   snapshot: EffectiveAnalysisSnapshot,
   evidence: EvidenceRevision,
@@ -162,18 +237,38 @@ export function createAnalysisInputBindingResolverIndex(
   });
 }
 
+/**
+ * Configuration options for `ExactBindingResolver`.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface ExactBindingResolverOptions {
   readonly identity?: BindingResolverIdentity;
   readonly graphNamespace?: string;
   readonly index?: BindingResolverInputIndex | BindingResolverIndexProvider;
 }
 
+/**
+ * Machine-readable diagnostic code explaining why a binding participant failed to resolve.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export type BindingResolutionDiagnosticCode =
   | 'binding-participant-ambiguous'
   | 'binding-participant-missing'
   | 'binding-participant-stale';
 
-/** A deterministic explanation for every participant that did not resolve. */
+/**
+ * A deterministic explanation for every participant that did not resolve.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface BindingResolutionDiagnostic {
   readonly diagnosticId: string;
   readonly code: BindingResolutionDiagnosticCode;
@@ -186,6 +281,13 @@ export interface BindingResolutionDiagnostic {
   readonly candidateRefs: readonly EndpointRef[];
 }
 
+/**
+ * Complete binding-resolution report pairing resolved bindings with participant diagnostics.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface BindingResolutionReport {
   readonly snapshotId: string;
   readonly resolver: BindingResolverIdentity;
@@ -204,6 +306,10 @@ interface ParticipantPlan {
  * Code and spec candidates are derived from the snapshot. Test evidence and API
  * surfaces, plus any historical candidates needed for stale diagnostics, enter
  * through the explicit revision-tagged input index.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
  */
 export class ExactBindingResolver implements EffectiveBindingResolver {
   readonly identity: BindingResolverIdentity;
@@ -297,7 +403,13 @@ export class ExactBindingResolver implements EffectiveBindingResolver {
   }
 }
 
-/** Build the current index, retaining supplied historical entries for stale detection. */
+/**
+ * Build the current index, retaining supplied historical entries for stale detection.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export function createSnapshotBindingResolverIndex(
   snapshot: EffectiveAnalysisSnapshot,
   options: {

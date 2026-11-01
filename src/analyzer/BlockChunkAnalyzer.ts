@@ -9,6 +9,9 @@
  * - Calculates cyclomatic complexity
  *
  * @packageDocumentation
+ * @doc [[Analyzer System]]
+ * @context Intra-function TypeScript AST chunker decomposing function and method bodies into semantic `CodeBlock` units
+ * @functionality Statement grouping, block-type inference, AST side-effect pattern detection, dependency tracking, and cyclomatic complexity scoring
  */
 
 import * as ts from 'typescript';
@@ -23,6 +26,11 @@ import {
 
 /**
  * Block chunking analyzer
+ *
+ * @doc [[Analyzer System]]
+ * @context Inspects function, method, and arrow-function AST bodies within a `ts.Program`
+ * @functionality Produces `BlockAnalysisResult` summaries with `CodeBlock` spans, inferred purposes, side effects, and complexity scores
+ * @public
  */
 export class BlockChunkAnalyzer {
   protected program: ts.Program;

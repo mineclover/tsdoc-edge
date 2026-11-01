@@ -21,5 +21,5 @@ Extracts co-requirement relationships from `@requires` tags and paired symbol us
 
 ### Implemented By
 
-- CoRequirementAnalyzer → src/analyzer/CoRequirementAnalyzer.ts:57
+- CoRequirementAnalyzer → src/analyzer/CoRequirementAnalyzer.ts:60
 

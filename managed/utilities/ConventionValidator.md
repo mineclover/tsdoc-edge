@@ -244,5 +244,5 @@ tsdoc-edge validate --strict --json > report.json
 
 ### Implemented By
 
-- ConventionValidator → src/validator/ConventionValidator.ts:31
+- ConventionValidator → src/validator/ConventionValidator.ts:36
 

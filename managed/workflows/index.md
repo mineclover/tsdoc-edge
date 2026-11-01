@@ -143,7 +143,7 @@ tsdoc-edge explore-entrypoint managed/relationships/index.md --detect-orphans
 **Path**: `document-validation-warning-policy.md`
 **Priority**: ⭐⭐ Governance
 
-`validate-docs managed` warning의 baseline, 허용 범위, 다음 정리 기준을 관리한다.
+`validate docs managed` warning의 baseline, 허용 범위, 다음 정리 기준을 관리한다.
 상세 처리 규칙은 [[Document Validation Warning Policy]]를 따른다.
 
 ### [[Relationship System Roadmap]]
@@ -216,10 +216,10 @@ TSDoc Edge 자체 개선 프로세스.
 **Commands**:
 ```bash
 # Validate documentation
-tsdoc-edge validate-symbol-refs managed
+tsdoc-edge validate refs managed
 
 # Update backlinks
-tsdoc-edge update-backlinks managed
+tsdoc-edge docs backlinks managed
 
 # Check for issues
 tsdoc-edge health managed

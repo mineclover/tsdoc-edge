@@ -1,10 +1,16 @@
 /**
  * Exposure and visibility tracking types
+ *
  * @packageDocumentation
+ * @doc [[Types Index]]
+ * @context Package, module, barrel, and symbol visibility boundary analysis contracts
+ * @functionality Defines ScopeLevel, Accessibility, ExposureScope, VisibilityBoundary, SymbolExposure, ExportAnalysis, PackageExportConfig, PackageExportMap, BarrelFile, and BarrelExport schemas
  */
 
 /**
  * Scope level (visibility boundary)
+ * @doc [[Types Index]]
+ * @public
  */
 export enum ScopeLevel {
   /** Accessible from external packages */
@@ -21,6 +27,8 @@ export enum ScopeLevel {
 
 /**
  * Accessibility modifier
+ * @doc [[Types Index]]
+ * @public
  */
 export enum Accessibility {
   /** TypeScript public */
@@ -35,6 +43,8 @@ export enum Accessibility {
 
 /**
  * Exposure scope configuration
+ * @doc [[Types Index]]
+ * @public
  */
 export interface ExposureScope {
   /** Scope level */
@@ -49,6 +59,8 @@ export interface ExposureScope {
 
 /**
  * Visibility boundary definition
+ * @doc [[Types Index]]
+ * @public
  */
 export interface VisibilityBoundary {
   /** Packages/modules that can import this symbol */
@@ -63,6 +75,8 @@ export interface VisibilityBoundary {
 
 /**
  * Symbol exposure information
+ * @doc [[Types Index]]
+ * @public
  */
 export interface SymbolExposure {
   /** Symbol ID */
@@ -83,6 +97,8 @@ export interface SymbolExposure {
 
 /**
  * Export analysis result
+ * @doc [[Types Index]]
+ * @public
  */
 export interface ExportAnalysis {
   /** Symbol ID */
@@ -109,6 +125,8 @@ export interface ExportAnalysis {
 
 /**
  * Package export configuration (from package.json)
+ * @doc [[Types Index]]
+ * @public
  */
 export interface PackageExportConfig {
   /** Package name */
@@ -132,6 +150,8 @@ export interface PackageExportConfig {
 
 /**
  * Package export map entry
+ * @doc [[Types Index]]
+ * @public
  */
 export interface PackageExportMap {
   /** CommonJS export */
@@ -149,6 +169,8 @@ export interface PackageExportMap {
 
 /**
  * Barrel file analysis
+ * @doc [[Types Index]]
+ * @public
  */
 export interface BarrelFile {
   /** Barrel file path */
@@ -163,6 +185,8 @@ export interface BarrelFile {
 
 /**
  * Barrel export entry
+ * @doc [[Types Index]]
+ * @public
  */
 export interface BarrelExport {
   /** Symbol name */

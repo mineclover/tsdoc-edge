@@ -150,4 +150,7 @@ tsdoc-edge validate
 ### Implemented By
 
 - ParseTypes → src/types/core/parse.ts:1
+- ParsedDocComment → src/types/core/parse.ts:17
+- ValidationResult → src/types/core/parse.ts:49
+- ParseResult → src/types/core/parse.ts:79
 

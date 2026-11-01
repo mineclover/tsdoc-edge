@@ -1,6 +1,11 @@
 /**
  * Commands module exports
+ *
  * @packageDocumentation
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[CLI Commands]]
+ * @context Public command barrel for the TSDoc Edge CLI command surface
+ * @functionality Re-exports top-level CLI commands, unified command routers, subcommands, and base command utilities
  */
 
 export { AnalyzeRelationshipsCommand } from './AnalyzeRelationshipsCommand';

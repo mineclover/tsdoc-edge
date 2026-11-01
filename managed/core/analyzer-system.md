@@ -469,4 +469,23 @@ violations.forEach(v => {
 ### Implemented By
 
 - Analyzer System → src/analyzer/:1
+- UsageTracker → src/analytics/UsageTracker.ts:49
+- AnalyzerRegistry → src/analyzer/AnalyzerRegistry.ts:222
+- getAnalyzerRegistry → src/analyzer/AnalyzerRegistry.ts:428
+- BlockChunkAnalyzer → src/analyzer/BlockChunkAnalyzer.ts:35
+- DocReferenceAnalyzer → src/analyzer/DocReferenceAnalyzer.ts:57
+- EndpointDetectionConfig → src/analyzer/EndpointDetectionAnalyzer.ts:26
+- EndpointDetectionAnalyzer → src/analyzer/EndpointDetectionAnalyzer.ts:41
+- EntryPointType → src/analyzer/EntryPointDetector.ts:27
+- EntryPoint → src/analyzer/EntryPointDetector.ts:43
+- EntryPointDetectionConfig → src/analyzer/EntryPointDetector.ts:62
+- EntryPointDetector → src/analyzer/EntryPointDetector.ts:85
+- ExposureAnalyzer → src/analyzer/ExposureAnalyzer.ts:40
+- InheritanceAnalyzer → src/analyzer/InheritanceAnalyzer.ts:42
+- SymbolIdentifiers → src/analyzer/SymbolIdentifierGenerator.ts:23
+- SymbolIdentifierGenerator → src/analyzer/SymbolIdentifierGenerator.ts:68
+- AnalyzerContext → src/analyzer/types.ts:25
+- RelationshipAnalyzer → src/analyzer/types.ts:46
+- AnalyzerMetadata → src/analyzer/types.ts:70
+- AnalyzerType → src/analyzer/types.ts:96
 

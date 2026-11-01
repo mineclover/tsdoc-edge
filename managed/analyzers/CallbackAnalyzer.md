@@ -21,5 +21,5 @@ Detects callback invocation, higher-order function parameter, and Promise/async 
 
 ### Implemented By
 
-- CallbackAnalyzer → src/analyzer/CallbackAnalyzer.ts:1
+- CallbackAnalyzer → src/analyzer/CallbackAnalyzer.ts:45
 

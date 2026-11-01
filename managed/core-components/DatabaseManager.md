@@ -390,7 +390,6 @@ tsdoc-edge import-registry
 - [[StatsCommand]] → managed/commands/StatsCommand.md:94
 - [[UndocumentedCommand]] → managed/commands/UndocumentedCommand.md:73
 - [[UntestedCommand]] → managed/commands/UntestedCommand.md:76
-- [[UsedByCommand]] → managed/commands/UsedByCommand.md:129
 - [[WhoUsesCommand]] → managed/commands/WhoUsesCommand.md:71
 - [[WorkContextCommand]] → managed/commands/WorkContextCommand.md:60
 - [[Unified Relationship Taxonomy]] → managed/concepts/unified-relationship-taxonomy.md:504

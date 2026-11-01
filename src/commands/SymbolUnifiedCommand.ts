@@ -1,7 +1,13 @@
 /**
  * Unified Symbol Command
  * Routes to appropriate symbol subcommand
+ *
  * @packageDocumentation
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[SymbolQueryCommand]]
+ * @context Unified `symbol` command group in the 20-command CLI surface
+ * @functionality Routes 13 symbol subcommands (`query`, `deps`, `who-uses`, `orphans`, `find-method`, `tree`, `core-api`, `undocumented`, `untested`, `parse`, `promote`, `fix`, `rename`)
+ * @sideEffect console: Writes subcommand routing errors and subcommand listings to stdout
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
@@ -46,6 +52,9 @@ type SubcommandName = keyof typeof SUBCOMMANDS;
 
 /**
  * Unified command for all symbol operations
+ *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[SymbolQueryCommand]]
  * @public
  */
 export class SymbolUnifiedCommand extends BaseCommand {

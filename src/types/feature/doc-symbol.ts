@@ -1,19 +1,29 @@
 /**
- * Document symbol types for [[]] notation
+ * Document symbol types for `[[]]` notation
+ *
  * @packageDocumentation
+ * @doc [[DocumentSymbol]]
+ * @context Markdown `[[Symbol]]` checkpoint definitions, code connections, backlinks, and validation results
+ * @functionality Defines DocumentSymbolType, CodeImplementationDisposition, DocumentSymbol, ParsedDocSymbols, CodeReference, SymbolFootnoteRef, CodeConnection, DocumentSymbolRegistry, Backlink, and DocSymbolValidation contracts
  */
 
 /**
  * Document symbol type
+ * @doc [[DocumentSymbol]]
  * @public
  */
 export type DocumentSymbolType = 'primary' | 'auxiliary' | 'reference';
 
-/** Explicit disposition for a document's code implementation connection. */
+/**
+ * Explicit disposition for a document's code implementation connection.
+ * @doc [[DocumentSymbol]]
+ * @public
+ */
 export type CodeImplementationDisposition = 'required' | 'not-applicable';
 
 /**
  * Document symbol definition
+ * @doc [[DocumentSymbol]]
  * @public
  */
 export interface DocumentSymbol {
@@ -44,6 +54,7 @@ export interface DocumentSymbol {
 
 /**
  * Parsed document symbols from a single file
+ * @doc [[DocumentSymbol]]
  * @public
  */
 export interface ParsedDocSymbols {
@@ -71,6 +82,7 @@ export interface ParsedDocSymbols {
 
 /**
  * Code reference from document
+ * @doc [[DocumentSymbol]]
  * @public
  */
 export interface CodeReference {
@@ -92,7 +104,8 @@ export interface CodeReference {
 
 /**
  * Symbol footnote reference
- * Syntax: [^sym-XXX] or [^SymbolName]
+ * Syntax: `[^sym-XXX]` or `[^SymbolName]`
+ * @doc [[DocumentSymbol]]
  * @public
  */
 export interface SymbolFootnoteRef {
@@ -108,6 +121,7 @@ export interface SymbolFootnoteRef {
 
 /**
  * Code connection to document symbol
+ * @doc [[DocumentSymbol]]
  * @public
  */
 export interface CodeConnection {
@@ -129,6 +143,7 @@ export interface CodeConnection {
 
 /**
  * Document symbol registry
+ * @doc [[DocumentSymbol]]
  * @public
  */
 export interface DocumentSymbolRegistry {
@@ -147,6 +162,7 @@ export interface DocumentSymbolRegistry {
 
 /**
  * Backlink entry
+ * @doc [[DocumentSymbol]]
  * @public
  */
 export interface Backlink {
@@ -168,6 +184,7 @@ export interface Backlink {
 
 /**
  * Document symbol validation result
+ * @doc [[DocumentSymbol]]
  * @public
  */
 export interface DocSymbolValidation {
@@ -183,6 +200,7 @@ export interface DocSymbolValidation {
 
 /**
  * Document symbol error
+ * @doc [[DocumentSymbol]]
  * @public
  */
 export interface DocSymbolError {
@@ -210,6 +228,7 @@ export interface DocSymbolError {
 
 /**
  * Document symbol warning
+ * @doc [[DocumentSymbol]]
  * @public
  */
 export interface DocSymbolWarning {

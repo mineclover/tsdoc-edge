@@ -1,4 +1,15 @@
-/** CLI adapter for the revision-pinned spec-binding convention loop. */
+/**
+ * CLI adapter for the revision-pinned spec-binding convention loop.
+ *
+ * @packageDocumentation
+ * @doc [[Convention Pack Check]]
+ * @doc [[ConventionCheck]]
+ * @context CLI adapter for deterministic, revision-pinned spec-binding convention evaluation and replay
+ * @functionality Compiles convention packs, resolves saved `@ttsc/graph` and `SpecGraph` revisions, evaluates bindings/naming/TSDoc/graph-lint/coverage gates, and persists optional history or JSON reports
+ * @sideEffect console: Writes human-readable or `--json` convention conformance reports to stdout/stderr
+ * @sideEffect database: Reads `GraphRepository`, `SpecGraphRepository`, and `CoverageMetricReportRepository`; appends optional `ConventionCheckHistoryRepository` and `AnalysisInputRevisionRepository` records
+ * @sideEffect filesystem: Reads convention pack and Jest evidence files; atomically writes `--output` JSON report when requested
+ */
 
 import { randomUUID } from 'node:crypto';
 import * as fs from 'node:fs';
@@ -26,6 +37,13 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 export type { ConventionFailureThreshold, ConventionGateDecision } from '../convention';
 
+/**
+ * Complete serialized output payload emitted by `ConventionCheckCommand`.
+ *
+ * @doc [[Convention Pack Check]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export type ConventionCheckCommandOutput = ConventionCheckResult & {
   readonly gate: ConventionGateDecision;
   readonly inputRevisionStore?: {
@@ -38,7 +56,13 @@ export type ConventionCheckCommandOutput = ConventionCheckResult & {
   };
 };
 
-/** Check one authored convention pack against a saved canonical graph revision. */
+/**
+ * Check one authored convention pack against a saved canonical graph revision.
+ *
+ * @doc [[Convention Pack Check]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export class ConventionCheckCommand extends BaseCommand {
   getName(): string {
     return 'convention-check';

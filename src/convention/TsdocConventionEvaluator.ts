@@ -1,4 +1,12 @@
-/** Deterministic first consuming rule for canonical-node-addressed TSDoc. */
+/**
+ * Deterministic first consuming rule for canonical-node-addressed TSDoc.
+ *
+ * @doc [[ConventionCheck]]
+ * @doc [[Convention Pack Check]]
+ * @context Revision-pinned TSDoc tag requirement evaluator operating purely over a canonical project graph and an immutable `EnrichmentRevision`.
+ * @functionality Matches canonical graph nodes against workspace-relative glob and kind rules, verifies required TSDoc tags from the enrichment revision, and emits a content-addressed report.
+ * @packageDocumentation
+ */
 
 import { createHash } from 'node:crypto';
 import type { CanonicalGraphNode, CanonicalProjectGraph } from '../indexer';
@@ -6,9 +14,28 @@ import { parseCanonicalId } from '../indexer/canonical-id';
 import type { EnrichmentRevision } from '../semantic-graph/analysis-input-revisions';
 import type { TsdocConventionConfig, TsdocConventionRule } from '../types/config';
 
+/**
+ * Canonical evaluator identifier for TSDoc tag convention reports.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const TSDOC_CONVENTION_EVALUATOR_ID = 'tsdoc-edge/tsdoc-convention-evaluator' as const;
+
+/**
+ * SemVer version of the TSDoc tag convention evaluator.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const TSDOC_CONVENTION_EVALUATOR_VERSION = '1.0.0' as const;
 
+/**
+ * Derived convention finding emitted when a canonical graph node lacks required TSDoc tags.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface TsdocConventionFinding {
   readonly resultKind: 'derived-tsdoc-finding';
   readonly findingId: string;
@@ -20,6 +47,12 @@ export interface TsdocConventionFinding {
   readonly missingTags: readonly string[];
 }
 
+/**
+ * Immutable content-addressed report produced by TSDoc convention evaluation.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface TsdocConventionReport {
   readonly contractVersion: '1.0';
   readonly resultKind: 'derived-tsdoc-report';
@@ -34,7 +67,12 @@ export interface TsdocConventionReport {
   readonly findings: readonly TsdocConventionFinding[];
 }
 
-/** Evaluate first-matching tag requirements against exactly one enrichment revision. */
+/**
+ * Evaluate first-matching tag requirements against exactly one enrichment revision.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export class TsdocConventionEvaluator {
   evaluate(
     graph: CanonicalProjectGraph,

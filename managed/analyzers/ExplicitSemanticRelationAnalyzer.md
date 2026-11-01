@@ -21,5 +21,5 @@ Extracts explicit non-AST semantic relationships declared with `@relatedTo` TSDo
 
 ### Implemented By
 
-- ExplicitSemanticRelationAnalyzer → src/analyzer/ExplicitSemanticRelationAnalyzer.ts:74
+- ExplicitSemanticRelationAnalyzer → src/analyzer/ExplicitSemanticRelationAnalyzer.ts:76
 

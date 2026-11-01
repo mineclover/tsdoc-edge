@@ -22,4 +22,6 @@ Caches and LRU-evicts compiled SQLite prepared statements for low-latency LSP da
 ### Implemented By
 
 - statement-manager → src/lsp/statement-manager.ts:1
+- StatementManagerOptions → src/lsp/statement-manager.ts:38
+- StatementManager → src/lsp/statement-manager.ts:63
 

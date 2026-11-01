@@ -51,7 +51,7 @@ Complete workflow for using .mmd diagrams as SSOT entrypoints to explore depende
 | 목적 | 다이어그램 기반 관계 표현 | 심볼의 SSOT 정의 |
 | 역할 | 진입점 문서에서 기존 심볼 참조 | 심볼의 실제 정의 및 구현 |
 | 파일 | 다이어그램 기반 문서에 함께 존재 | 독립 파일 (`symbol.md`) |
-| 자동 생성 | ✅ `parse-mermaid` (기존 canonical 재사용) | ❌ 수동 또는 `promote-symbol` |
+| 자동 생성 | ✅ `parse-mermaid` (기존 canonical 재사용) | ❌ 수동 또는 `symbol promote` |
 
 ### 3. Orphan Code Detection
 
@@ -290,10 +290,10 @@ rm src/legacy/OldParser.ts
 - 독립적인 설명이 필요함
 - 구현이 완료됨 (`status: implemented`)
 
-**4.2 `promote-symbol` 실행**
+**4.2 `symbol promote` 실행**
 
 ```bash
-tsdoc-edge promote-symbol managed/relationships/code-dependency.md "Code Dependency"
+tsdoc-edge symbol promote managed/relationships/code-dependency.md "Code Dependency"
 ```
 
 **출력**:
@@ -322,7 +322,7 @@ Promotion Summary
 Next steps:
   1. Review canonical file: managed/relationships/code-dependency.md
   2. Fill in TODO sections with implementation details
-  3. Validate: tsdoc-edge validate-symbol-refs managed
+  3. Validate: tsdoc-edge validate refs managed
 ```
 
 **4.3 생성된 Canonical 파일**
@@ -378,7 +378,7 @@ After:
 **5.1 심볼 참조 검증**
 
 ```bash
-tsdoc-edge validate-symbol-refs managed
+tsdoc-edge validate refs managed
 ```
 
 **출력**:
@@ -400,7 +400,7 @@ Symbol Reference Validation
 **5.2 문서 품질 검증**
 
 ```bash
-tsdoc-edge validate-docs
+tsdoc-edge validate docs
 ```
 
 **5.3 작업 컨텍스트 확인**
@@ -482,16 +482,16 @@ tsdoc-edge explore-entrypoint managed/architecture/diagrams/relationship-taxonom
 #   ...
 
 # 5. 핵심 심볼 승격
-tsdoc-edge promote-symbol managed/relationships/code-dependency.md "Code Dependency"
-tsdoc-edge promote-symbol managed/relationships/io-dependency.md "I/O Dependency"
+tsdoc-edge symbol promote managed/relationships/code-dependency.md "Code Dependency"
+tsdoc-edge symbol promote managed/relationships/io-dependency.md "I/O Dependency"
 
 # 6. TODO 채우기
 vim managed/relationships/code-dependency.md
 # Fill: Purpose, Implementation, Examples
 
 # 7. 검증
-tsdoc-edge validate-symbol-refs managed
-tsdoc-edge validate-docs
+tsdoc-edge validate refs managed
+tsdoc-edge validate docs
 
 # 8. 재탐색 (100% 도달 확인)
 tsdoc-edge explore-entrypoint managed/architecture/diagrams/relationship-taxonomy.mmd
@@ -591,7 +591,7 @@ vim managed/architecture/diagrams/dependency-meta-structure.mmd
 tsdoc-edge parse-mermaid <path> --generate-docs
 ```
 
-### 문제 3: `promote-symbol` 실행 시 "Symbol not found"
+### 문제 3: `symbol promote` 실행 시 "Symbol not found"
 
 **원인**: H2 섹션이 존재하지 않거나 형식 오류
 
@@ -620,8 +620,8 @@ tsdoc-edge parse-mermaid <path> --generate-docs
 |--------|------|------|-------|
 | `parse-mermaid` | `.mmd` | H2 참조 문서 | Phase 2 |
 | `explore-entrypoint` | `.md`/`.mmd` | 커버리지 통계 | Phase 3 |
-| `promote-symbol` | `.md` + 심볼명 | H1 canonical | Phase 4 |
-| `validate-symbol-refs` | 디렉토리 | 검증 리포트 | Phase 5 |
+| `symbol promote` | `.md` + 심볼명 | H1 canonical | Phase 4 |
+| `validate refs` | 디렉토리 | 검증 리포트 | Phase 5 |
 | `work-context` | 파일 경로 | 통합 컨텍스트 | Phase 5 |
 
 ---

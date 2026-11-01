@@ -184,7 +184,7 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:432
 - [[AutoIndexing]] → managed/features/auto-indexing.md:296
 - [[CoreFeatures]] → managed/features/core-features-catalog.md:47
-- [[Features Index]] → managed/features/index.md:277
+- [[Features Index]] → managed/features/index.md:291
 - [[LSP Integration]] → managed/features/lsp-integration.md:480
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:378
 - [[ValidationFeatures]] → managed/features/validation-features.md:412

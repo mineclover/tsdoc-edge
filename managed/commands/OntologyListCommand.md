@@ -21,5 +21,5 @@ Lists symbol and relationship instances matching specific relationship ontology 
 
 ### Implemented By
 
-- OntologyListCommand → src/commands/OntologyListCommand.ts:61
+- OntologyListCommand → src/commands/OntologyListCommand.ts:68
 

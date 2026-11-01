@@ -21,5 +21,5 @@ Validates referential integrity, endpoint existence, and schema consistency of s
 
 ### Implemented By
 
-- RelationshipValidateCommand → src/commands/RelationshipValidateCommand.ts:23
+- RelationshipValidateCommand → src/commands/RelationshipValidateCommand.ts:31
 

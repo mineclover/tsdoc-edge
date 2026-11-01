@@ -1,4 +1,14 @@
-/** Inspect exact, pointer-free convention analysis input revisions. */
+/**
+ * Inspect exact, pointer-free convention analysis input revisions.
+ *
+ * @packageDocumentation
+ * @doc [[Convention Pack Check]]
+ * @doc [[ConventionCheck]]
+ * @context Read-only operator CLI for pointer-free convention analysis input revisions
+ * @functionality Lists and reads pinned `evidence`, `enrichment`, and `policy` revisions from `AnalysisInputRevisionRepository`
+ * @sideEffect console: Writes formatted input revision pins or `--json` payloads to stdout and errors to stderr
+ * @sideEffect database: Reads `AnalysisInputRevisionRepository` SQLite storage in read-only mode (read)
+ */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -10,7 +20,13 @@ import {
 } from '../storage/AnalysisInputRevisionRepository';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
-/** Read-only operator access to evidence, enrichment, and policy revisions. */
+/**
+ * Read-only operator access to evidence, enrichment, and policy revisions.
+ *
+ * @doc [[Convention Pack Check]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export class ConventionInputsCommand extends BaseCommand {
   getName(): string {
     return 'convention-inputs';

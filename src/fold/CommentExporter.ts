@@ -1,6 +1,11 @@
 /**
  * TSDoc comment exporter to Markdown format
+ *
  * @packageDocumentation
+ * @doc [[CommentStateTypes]]
+ * @context Extracts full and collapsed TSDoc comment snapshots from TypeScript ASTs into `.tsdoc-comments` Markdown storage
+ * @functionality AST JSDoc extraction, SHA-256 content hashing, collapsed single-line comment synthesis, and Markdown state serialization
+ * @sideEffect filesystem: Creates comment state directories and writes exported comment Markdown files to disk (write)
  */
 
 import * as crypto from 'node:crypto';
@@ -13,6 +18,10 @@ import type { CommentLocation, CommentState, FileCommentState } from '../types/s
 /**
  * Exports TSDoc comments from TypeScript files to Markdown format
  *
+ * @doc [[CommentStateTypes]]
+ * @context Serializes `CommentState` and `FileCommentState` snapshots for comment fold/unfold workflows
+ * @functionality Parses TypeScript JSDoc ranges, computes content hashes, builds collapsed summaries, and writes Markdown state files
+ * @sideEffect filesystem: Creates comment state directories and writes exported comment Markdown files to disk (write)
  * @public
  */
 export class CommentExporter {

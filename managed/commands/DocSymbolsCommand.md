@@ -21,5 +21,5 @@ Lists all registered primary and auxiliary `[[Symbol]]` checkpoints and referenc
 
 ### Implemented By
 
-- DocSymbolsCommand → src/commands/DocSymbolsCommand.ts:1
+- DocSymbolsCommand → src/commands/DocSymbolsCommand.ts:45
 

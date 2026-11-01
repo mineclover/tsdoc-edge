@@ -40,5 +40,5 @@ Promote auxiliary symbols to primary definitions.
 
 ### Implemented By
 
-- PromoteSymbolCommand → src/commands/PromoteSymbolCommand.ts:31
+- PromoteSymbolCommand → src/commands/PromoteSymbolCommand.ts:36
 

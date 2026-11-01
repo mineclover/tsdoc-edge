@@ -1,6 +1,14 @@
 /**
  * Coverage Report command - Reports `@doc` tag coverage for SSOT validation
+ *
  * @packageDocumentation
+ * @doc [[CoverageReportCommand]]
+ * @doc [[Coverage Metrics Contract]]
+ * @context Top-level `coverage-report` command for measuring `@doc` checkpoint coverage and persisting source-identified coverage metric reports
+ * @functionality Evaluates `@doc` tag presence across symbol categories, projects coverage onto canonical `@ttsc/graph` nodes, and stores or reads reports in `CoverageMetricReportRepository`
+ * @sideEffect console: Writes formatted coverage breakdowns or `--json` payloads to stdout and operator errors to stderr
+ * @sideEffect database: Reads `.tsdoc.db` and `GraphRepository`; reads or writes `CoverageMetricReportRepository` SQLite storage
+ * @sideEffect filesystem: Reads TypeScript source files to inspect TSDoc `@doc` blocks (read)
  */
 
 import * as fs from 'node:fs';
@@ -74,6 +82,8 @@ interface CoverageReport {
  * @consequences Reveals true documentation status, not navigation completeness
  *
  * @doc [[CoverageReportCommand]]
+ * @doc [[Coverage Metrics Contract]]
+ * @sideEffect console: Writes coverage report output to stdout/stderr; reads source files and reads/writes coverage SQLite repositories
  */
 export class CoverageReportCommand extends BaseCommand {
   private db?: DatabaseManager;

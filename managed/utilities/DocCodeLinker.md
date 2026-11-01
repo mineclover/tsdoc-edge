@@ -79,5 +79,5 @@ const symbols = index.docToSymbol.get('managed/services.md');
 
 ### Implemented By
 
-- DocCodeLinker → src/linking/DocCodeLinker.ts:1
+- DocCodeLinker → src/linking/DocCodeLinker.ts:27
 

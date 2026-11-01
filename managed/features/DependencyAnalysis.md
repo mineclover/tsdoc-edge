@@ -153,7 +153,7 @@ Max Dependency Depth = Longest chain from root to leaf
 ## Commands
 
 - **[[DepsCommand]]**: Forward dependency lookup
-- **[[UsedByCommand]]**: Reverse dependency lookup (registry)
+- **[[WhoUsesCommand]]**: Reverse dependency lookup (registry)
 - **[[WhoUsesCommand]]**: Reverse dependency lookup (database)
 - **[[TypeChainCommand]]**: Transitive dependency chains
 - **[[DetectCircularTypesCommand]]**: Circular dependency detection
@@ -241,7 +241,7 @@ tsdoc-edge validate-architecture \
 
 - **[[Impact Analysis]]**: Uses dependency data for impact assessment
 - **[[DepsCommand]]**: Forward dependency tool
-- **[[UsedByCommand]]**: Reverse dependency tool
+- **[[WhoUsesCommand]]**: Reverse dependency tool
 - **[[TypeChainCommand]]**: Chain analysis
 - **[[QueryCommands]]**: Query tools group
 
@@ -257,7 +257,6 @@ tsdoc-edge validate-architecture \
 
 ### Referenced By
 
-- [[UsedByCommand]] → managed/commands/UsedByCommand.md:123
 - [[Impact Analysis]] → managed/features/ImpactAnalysis.md:288
 
 ### Implemented By

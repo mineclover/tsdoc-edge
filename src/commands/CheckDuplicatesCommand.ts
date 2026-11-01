@@ -1,6 +1,13 @@
 /**
  * Check Duplicates Command - Check for duplicate content in specifications
+ *
  * @packageDocumentation
+ * @doc [[CheckDuplicatesCommand]]
+ * @doc [[CLI Commands]]
+ * @context Duplicate and overlapping specification content detection via `tsdoc-edge spec duplicates`
+ * @functionality Recursively scans Markdown files and evaluates pairwise content similarity with `SpecContentSimilarityChecker`
+ * @sideEffect console: Writes similarity scores and merge/cross-reference recommendations to stdout
+ * @sideEffect filesystem: Recursively scans and reads Markdown specification files on disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -44,7 +51,9 @@ function findMarkdownFiles(dir: string): string[] {
  * @responsibility Check for content similarity across documents
  * @contract Analyzes documents, detects duplicates, suggests actions
  * @doc [[CheckDuplicatesCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#check-duplicates]]
+ * @sideEffect console: Writes duplicate content reports to stdout; scans Markdown specification files
  *
  * @problem Documentation may have duplicate or highly similar content
  * @solves Detects content similarity and suggests merging or cross-referencing

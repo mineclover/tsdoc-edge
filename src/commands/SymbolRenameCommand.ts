@@ -2,12 +2,16 @@
  * Symbol Rename Command - Rename symbol and update all references
  *
  * @packageDocumentation
+ * @doc [[SymbolRenameCommand]]
  * @responsibility Rename documentation symbols and update all references
  * @contract Safely rename symbols while maintaining SSOT and reference integrity
  *
  * @problem Renaming symbols manually breaks references across documentation
- * @solves Automatically updates all [[Symbol]] references when renaming
+ * @solves Automatically updates all `[[Symbol]]` references when renaming
  * @context TSDoc Edge SSOT documentation system
+ * @functionality Validates H1/H2 `[[Symbol]]` definitions, prompts or previews with `--dry-run`, and rewrites references across managed docs and `@doc` tags
+ * @sideEffect console: Writes validation summaries and interactive confirmation prompts via `readline` and stdout
+ * @sideEffect filesystem: Updates `[[Symbol]]` references across Markdown and TypeScript files via `SymbolReferenceUpdater`
  */
 
 import * as readline from 'node:readline';
@@ -43,6 +47,7 @@ interface RenameValidation {
  * @public
  * @responsibility Rename symbols safely with reference updates
  * @contract Find all references, update them, maintain SSOT principle
+ * @sideEffect filesystem: Rewrites `[[Symbol]]` references in managed docs and code; prompts and logs on console
  *
  * @example
  * ```bash

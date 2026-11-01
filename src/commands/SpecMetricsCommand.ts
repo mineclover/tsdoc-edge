@@ -1,6 +1,14 @@
 /**
  * Spec Metrics Command - Comprehensive specification metrics and cross-system dashboard
+ *
  * @packageDocumentation
+ * @doc [[SpecMetricsCommand]]
+ * @doc [[SpecCommands]]
+ * @context Multi-dimensional specification health dashboard invoked via `tsdoc-edge spec metrics`
+ * @functionality Aggregates document completeness, lifecycle distribution, `SpecGraph` revisions, 7-aspect TSDoc coverage, and code-to-spec connectivity via `SpecMetricsAggregator`
+ * @sideEffect console: Writes formatted specification metrics dashboard or `--json` output to stdout
+ * @sideEffect database: Reads `.tsdoc.db` and `.tsdoc/spec-graph.db` in read-only mode via `SpecMetricsAggregator` (read)
+ * @sideEffect filesystem: Scans managed Markdown specifications and TypeScript source files via `SpecMetricsAggregator` (read)
  */
 
 import { SpecMetricsAggregator, type UnifiedSpecMetrics } from '../spec/SpecMetricsAggregator';
@@ -13,6 +21,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @public
  * @responsibility Display multi-dimensional specification metrics, conformance, and code connectivity
  * @contract Aggregate spec quality, lifecycle, graph, 7-aspects, and report health score
+ * @sideEffect console: Writes specification health dashboard or JSON report to stdout; reads SQLite and Markdown/TypeScript files
  */
 export class SpecMetricsCommand extends BaseCommand {
   private aggregator: SpecMetricsAggregator;

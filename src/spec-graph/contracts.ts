@@ -4,18 +4,63 @@
  * Managed documents are the authored source of truth. A SpecGraphRevision is a
  * deterministic compiled projection and must not be edited as an independent
  * source.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @context Core data model for authored specification nodes, edges, cross-plane endpoint selectors, role-based binding declarations, resolved bindings, and policy revisions.
+ * @functionality Defines versioned TypeScript interfaces and discriminated unions for compiled `SpecGraphRevision` and `PolicyRevision` projections consumed by CLI, LSP, and CI.
  * @packageDocumentation
  */
 
 import type { SpecStatus } from '../types/spec';
 
+/**
+ * Schema contract version for compiled `SpecGraphRevision` payloads.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export const SPEC_GRAPH_CONTRACT_VERSION = '1.0' as const;
 
+/**
+ * Authored node category within a compiled specification graph.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export type SpecNodeKind = 'spec' | 'requirement' | 'invariant' | 'decision' | 'api-contract';
+
+/**
+ * Subset of `SpecNodeKind` values that may carry executable binding obligations.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export type ObligationNodeKind = Exclude<SpecNodeKind, 'spec' | 'decision'>;
+
+/**
+ * Directed structural or lineage relationship kind between specification nodes.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export type SpecEdgeKind = 'contains' | 'refines' | 'requires' | 'establishes' | 'supersedes';
+
+/**
+ * Role-based cross-plane binding obligation category linking specs to code or evidence.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export type SpecBindingKind = 'implementation' | 'verification' | 'constraint' | 'governance';
 
+/**
+ * One-based line and optional column span within a source document or file.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface SourceRange {
   readonly startLine: number;
   readonly startColumn?: number;
@@ -23,7 +68,12 @@ export interface SourceRange {
   readonly endColumn?: number;
 }
 
-/** Stable location in one authored managed document. */
+/**
+ * Stable location in one authored managed document.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface SpecSourceAnchor {
   readonly documentId: string;
   readonly file: string;
@@ -33,7 +83,12 @@ export interface SpecSourceAnchor {
   readonly contentDigest: string;
 }
 
-/** Child lifecycle either inherits from its aggregate or is independently governed. */
+/**
+ * Child lifecycle either inherits from its aggregate or is independently governed.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export type SpecLifecycle =
   | {
       readonly mode: 'inherited';
@@ -45,6 +100,12 @@ export type SpecLifecycle =
       readonly version?: string;
     };
 
+/**
+ * Compiled specification node projected from an authored managed document.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface SpecNode {
   readonly id: string;
   readonly kind: SpecNodeKind;
@@ -54,6 +115,12 @@ export interface SpecNode {
   readonly tags: readonly string[];
 }
 
+/**
+ * Extractor provenance attached to an authored specification edge or binding.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface SpecProvenance {
   readonly source: 'managed-document' | 'imported-baseline';
   readonly extractorId: string;
@@ -61,12 +128,23 @@ export interface SpecProvenance {
   readonly sourceRevision?: string;
 }
 
+/**
+ * Source anchor and optional description supporting a specification edge or resolution.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface SpecEvidence {
   readonly source: SpecSourceAnchor;
   readonly description?: string;
 }
 
-/** Durable authored relation between specification nodes. */
+/**
+ * Durable authored relation between specification nodes.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface SpecEdge {
   readonly id: string;
   readonly kind: SpecEdgeKind;
@@ -83,7 +161,13 @@ interface WorkspaceSelector {
   readonly providerId?: string;
 }
 
-/** Authored selector for one code entity; it is not a revision-specific resolution. */
+/**
+ * Authored selector for one code entity; it is not a revision-specific resolution.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface CodeNodeSelector extends WorkspaceSelector {
   readonly type: 'code-node';
   readonly graphNamespace?: string;
@@ -97,7 +181,13 @@ export interface CodeNodeSelector extends WorkspaceSelector {
   readonly sourceAnchor?: SourceRange;
 }
 
-/** Authored selector for a code interaction or type relation. */
+/**
+ * Authored selector for a code interaction or type relation.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface CodeEdgeSelector extends WorkspaceSelector {
   readonly type: 'code-edge';
   readonly graphNamespace?: string;
@@ -108,12 +198,25 @@ export interface CodeEdgeSelector extends WorkspaceSelector {
   readonly occurrenceId?: string;
 }
 
+/**
+ * Authored selector targeting a specification node within a workspace.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface SpecNodeSelector {
   readonly type: 'spec-node';
   readonly workspaceId: string;
   readonly specNodeId: string;
 }
 
+/**
+ * Authored selector targeting a test-runner evidence item within a workspace.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface TestEvidenceSelector extends WorkspaceSelector {
   readonly type: 'test-evidence';
   readonly evidenceId?: string;
@@ -122,6 +225,13 @@ export interface TestEvidenceSelector extends WorkspaceSelector {
   readonly runner?: string;
 }
 
+/**
+ * Authored selector targeting an exported package API surface observation.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface ApiSurfaceSelector extends WorkspaceSelector {
   readonly type: 'api-surface';
   readonly packageName: string;
@@ -130,7 +240,21 @@ export interface ApiSurfaceSelector extends WorkspaceSelector {
   readonly exportName?: string;
 }
 
+/**
+ * Union of code-plane subject selectors (`CodeNodeSelector`, `CodeEdgeSelector`, `ApiSurfaceSelector`).
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export type CodeSubjectSelector = CodeNodeSelector | CodeEdgeSelector | ApiSurfaceSelector;
+
+/**
+ * Union of all cross-plane endpoint selectors usable in bindings and suppressions.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export type BindingEndpointSelector = CodeSubjectSelector | SpecNodeSelector | TestEvidenceSelector;
 
 interface SpecBindingDeclarationBase {
@@ -141,34 +265,74 @@ interface SpecBindingDeclarationBase {
   readonly provenance: SpecProvenance;
 }
 
+/**
+ * Authored binding declaring that a code node or API surface implements a spec obligation.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface ImplementationBindingDeclaration extends SpecBindingDeclarationBase {
   readonly kind: 'implementation';
   readonly target: CodeNodeSelector | ApiSurfaceSelector;
 }
 
-/** Verification is intentionally role-based because it is commonly ternary. */
+/**
+ * Verification is intentionally role-based because it is commonly ternary.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface VerificationBindingDeclaration extends SpecBindingDeclarationBase {
   readonly kind: 'verification';
   readonly verifier: TestEvidenceSelector;
   readonly subject: SpecNodeSelector | CodeNodeSelector | CodeEdgeSelector | ApiSurfaceSelector;
 }
 
+/**
+ * Authored binding declaring that an invariant constrains a code or spec target.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface ConstraintBindingDeclaration extends SpecBindingDeclarationBase {
   readonly kind: 'constraint';
   readonly target: CodeSubjectSelector | SpecNodeSelector;
 }
 
+/**
+ * Authored binding declaring that an API contract governs a public API surface or code node.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface GovernanceBindingDeclaration extends SpecBindingDeclarationBase {
   readonly kind: 'governance';
   readonly target: ApiSurfaceSelector | CodeNodeSelector;
 }
 
+/**
+ * Discriminated union of all authored SpecGraph binding declarations.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export type SpecBindingDeclaration =
   | ImplementationBindingDeclaration
   | VerificationBindingDeclaration
   | ConstraintBindingDeclaration
   | GovernanceBindingDeclaration;
 
+/**
+ * Semantic plane identifier classifying code, specification, binding, evidence, and derived relations.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export type RelationPlane =
   | 'compiler-fact'
   | 'producer-derived'
@@ -178,6 +342,13 @@ export type RelationPlane =
   | 'evidence'
   | 'derived';
 
+/**
+ * Revision-pinned endpoint reference produced when resolving a `BindingEndpointSelector`.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export type EndpointRef =
   | {
       readonly type: 'code-node';
@@ -235,6 +406,13 @@ export type EndpointRef =
       readonly exportName?: string;
     };
 
+/**
+ * Resolution status and matched endpoint references for one role within a binding.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface ResolvedBindingParticipant {
   readonly role:
     | 'implementer'
@@ -248,6 +426,12 @@ export interface ResolvedBindingParticipant {
   readonly refs: readonly EndpointRef[];
 }
 
+/**
+ * Identifier, version, and configuration digest of a binding resolver implementation.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface BindingResolverIdentity {
   readonly id: string;
   readonly version: string;
@@ -255,6 +439,13 @@ export interface BindingResolverIdentity {
   readonly configDigest?: string;
 }
 
+/**
+ * Revision-specific resolution record produced for an authored `SpecBindingDeclaration`.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface ResolvedSpecBinding {
   readonly resolutionId: string;
   readonly declarationId: string;
@@ -270,11 +461,23 @@ export interface ResolvedSpecBinding {
   readonly evidence: readonly SpecEvidence[];
 }
 
+/**
+ * Revision-level provenance extending `SpecProvenance` with an authored source fingerprint.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface SpecGraphProvenance extends SpecProvenance {
   readonly authoredSourceFingerprint: string;
 }
 
-/** Deterministic compiled projection of authored managed documents. */
+/**
+ * Deterministic compiled projection of authored managed documents.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface SpecGraphRevision {
   readonly contractVersion: typeof SPEC_GRAPH_CONTRACT_VERSION;
   readonly revisionId: string;
@@ -286,6 +489,13 @@ export interface SpecGraphRevision {
   readonly provenance: SpecGraphProvenance;
 }
 
+/**
+ * Executable conformance policy rule configuration and severity override.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface PolicyRule {
   readonly id: string;
   readonly version: string;
@@ -294,6 +504,13 @@ export interface PolicyRule {
   readonly parameters?: Readonly<Record<string, unknown>>;
 }
 
+/**
+ * Exact-endpoint conformance rule suppression with mandatory rationale and optional RFC3339 expiry.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface PolicySuppression {
   readonly id: string;
   readonly ruleId: string;
@@ -302,6 +519,13 @@ export interface PolicySuppression {
   readonly expiresAt?: string;
 }
 
+/**
+ * Compiler provenance recorded on a content-addressed `PolicyRevision`.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface PolicyProvenance {
   readonly source: 'managed-policy' | 'workspace-config' | 'default';
   readonly compilerId: string;
@@ -309,7 +533,13 @@ export interface PolicyProvenance {
   readonly sourceFingerprint: string;
 }
 
-/** Versioned policy input shared by CLI, LSP, and CI. */
+/**
+ * Versioned policy input shared by CLI, LSP, and CI.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface PolicyRevision {
   readonly contractVersion: '1.0';
   readonly revisionId: string;

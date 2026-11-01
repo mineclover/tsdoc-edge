@@ -5,9 +5,13 @@
  * Streamlined 20-command CLI surface backed by the 3-Layer SSOT architecture.
  *
  * @packageDocumentation
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[CLI Commands]]
  * @problem Original cli.ts grew to 5,728 lines and 82 flat overlapping commands
  * @solves Modular command groups with a focused 20-command top-level surface
  * @context Core workflow (`sync`, `wc`, `dc`, `convention`) + 7 unified groups
+ * @functionality Dispatches top-level CLI commands, computes Levenshtein command suggestions, records usage telemetry, and flushes stdout/stderr streams before process exit
+ * @sideEffect console: Writes CLI output and error diagnostics to `process.stdout` and `process.stderr`; terminates via `process.exit`
  */
 
 import { UsageTracker } from './analytics/UsageTracker';

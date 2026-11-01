@@ -1,6 +1,13 @@
 /**
  * Validate command - Generate detailed validation report
+ *
  * @packageDocumentation
+ * @doc [[ValidateCommand]]
+ * @doc [[ValidationFeatures]]
+ * @context Symbol graph connectivity validation via `tsdoc-edge validate connectivity`
+ * @functionality Loads symbols and relationships from `.tsdoc.db`, builds a `SymbolGraphBuilder` graph, and evaluates connectivity scores via `ConnectivityValidator`
+ * @sideEffect console: Writes detailed connectivity validation reports to stdout
+ * @sideEffect database: Reads symbol and dependency rows from `DatabaseManager` (read)
  */
 
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
@@ -17,6 +24,7 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
  * @public
  * @responsibility Generate detailed validation report from database
  * @contract Read database, build symbol graph, validate connectivity
+ * @sideEffect console: Writes connectivity validation results to stdout; reads `.tsdoc.db`
  *
  * @problem Developers need comprehensive validation reports for code documentation
  * @solves Loads symbol data from database, builds graph, and generates validation report

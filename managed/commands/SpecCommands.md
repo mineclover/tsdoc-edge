@@ -37,7 +37,7 @@ tsdoc-edge spec graph read --spec-db .tsdoc/spec-graph.db --revision-id <revisio
 Increments the semantic version (`major`, `minor`, or `patch`) recorded in a specification document YAML frontmatter.
 
 ```bash
-tsdoc-edge spec-bump <file> [options]
+tsdoc-edge spec bump <file> [options]
   --major             Bump major version
   --minor             Bump minor version
   --patch             Bump patch version (default)
@@ -50,7 +50,7 @@ tsdoc-edge spec-bump <file> [options]
 Compares structural and content differences between two revisions of a managed specification document.
 
 ```bash
-tsdoc-edge spec-diff <file> [options]
+tsdoc-edge spec diff <file> [options]
   --from <version>    Base version
   --to <version>      Target version
 ```
@@ -62,7 +62,7 @@ tsdoc-edge spec-diff <file> [options]
 Displays the version and status transition history of a specification document from Git and spec metadata.
 
 ```bash
-tsdoc-edge spec-history <file> [options]
+tsdoc-edge spec history <file> [options]
   --limit <n>         Number of versions to show
 ```
 
@@ -75,7 +75,7 @@ tsdoc-edge spec-history <file> [options]
 Inspects and transitions a specification document lifecycle status (`draft`, `review`, `approved`, `active`, `deprecated`, `archived`).
 
 ```bash
-tsdoc-edge spec-status <file> [status]
+tsdoc-edge spec status <file> [status]
   --reason <text>     Reason for status change
 ```
 
@@ -86,19 +86,19 @@ tsdoc-edge spec-status <file> [status]
 Reports multi-dimensional specification completeness, conformance, and code-binding metrics across managed specs.
 
 ```bash
-tsdoc-edge spec-metrics [options]
+tsdoc-edge spec metrics [options]
   --dir <path>        Specification directory (default: managed/specs)
   --json              Emit machine-readable JSON metrics report
 ```
 
 **Source**: `src/commands/SpecMetricsCommand.ts`
 
-### validate-spec
+### validate spec
 
 Validate specification completeness.
 
 ```bash
-tsdoc-edge validate-spec <file> [options]
+tsdoc-edge validate spec <file> [options]
   --strict            Strict validation mode
 ```
 
@@ -117,9 +117,12 @@ tsdoc-edge validate-spec <file> [options]
 
 - [[CLI Commands]] → managed/CLI-COMMANDS.md:46
 - [[Commands Index]] → managed/COMMANDS.md:139
-- [[AuthoredProjectSpecifications]] → managed/specs/index.md:119
+- [[AuthoredProjectSpecifications]] → managed/specs/index.md:129
 
 ### Implemented By
 
 - SpecCommands → src/commands/SpecBumpCommand.ts:1
+- SpecCommand → src/commands/SpecCommand.ts:54
+- SpecExtractCommand → src/commands/SpecExtractCommand.ts:26
+- SpecGraphCommand → src/commands/SpecGraphCommand.ts:26
 

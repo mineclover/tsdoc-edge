@@ -1,12 +1,17 @@
 /**
  * Interface analysis and domain structure types
+ *
  * @packageDocumentation
+ * @doc [[InterfaceTypes]]
+ * @context Domain-driven interface structure, dependency classification, cohesion, and coupling analysis
+ * @functionality Defines InterfaceInfo, InterfaceProperty, InterfaceMethod, MethodParameter, DomainRole, InterfaceDependency, DomainStructure, and InterfaceDependencyGraph contracts
  */
 
 import type { Symbol } from '../graph';
 
 /**
  * Interface-specific information
+ * @doc [[InterfaceTypes]]
  * @public
  */
 export interface InterfaceInfo {
@@ -48,6 +53,7 @@ export interface InterfaceInfo {
 
 /**
  * Interface property information
+ * @doc [[InterfaceTypes]]
  * @public
  */
 export interface InterfaceProperty {
@@ -79,6 +85,7 @@ export interface InterfaceProperty {
 
 /**
  * Interface method information
+ * @doc [[InterfaceTypes]]
  * @public
  */
 export interface InterfaceMethod {
@@ -105,6 +112,7 @@ export interface InterfaceMethod {
 
 /**
  * Method parameter information
+ * @doc [[InterfaceTypes]]
  * @public
  */
 export interface MethodParameter {
@@ -126,6 +134,7 @@ export interface MethodParameter {
 
 /**
  * Domain role classification
+ * @doc [[InterfaceTypes]]
  * @public
  */
 export type DomainRole =
@@ -141,6 +150,7 @@ export type DomainRole =
 
 /**
  * Interface dependency information
+ * @doc [[InterfaceTypes]]
  * @public
  */
 export interface InterfaceDependency {
@@ -212,6 +222,7 @@ export interface InterfaceDependency {
 
 /**
  * Type of dependency between interfaces
+ * @doc [[InterfaceTypes]]
  * @public
  */
 export type DependencyType =
@@ -223,12 +234,14 @@ export type DependencyType =
 
 /**
  * Location where dependency occurs
+ * @doc [[InterfaceTypes]]
  * @public
  */
 export type DependencyLocation = 'property' | 'method' | 'extends' | 'typeParameter';
 
 /**
  * Domain structure analysis result
+ * @doc [[InterfaceTypes]]
  * @public
  */
 export interface DomainStructure {
@@ -267,6 +280,7 @@ export interface DomainStructure {
 
 /**
  * Interface dependency graph
+ * @doc [[InterfaceTypes]]
  * @public
  */
 export interface InterfaceDependencyGraph {
@@ -288,6 +302,7 @@ export interface InterfaceDependencyGraph {
 
 /**
  * Interface analysis options
+ * @doc [[InterfaceTypes]]
  * @public
  */
 export interface InterfaceAnalysisOptions {

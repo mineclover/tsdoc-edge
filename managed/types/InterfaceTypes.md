@@ -156,4 +156,15 @@ tsdoc-edge deps UserService
 ### Implemented By
 
 - InterfaceTypes → src/types/domain/interface.ts:1
+- InterfaceInfo → src/types/domain/interface.ts:17
+- InterfaceProperty → src/types/domain/interface.ts:59
+- InterfaceMethod → src/types/domain/interface.ts:91
+- MethodParameter → src/types/domain/interface.ts:118
+- DomainRole → src/types/domain/interface.ts:140
+- InterfaceDependency → src/types/domain/interface.ts:156
+- DependencyType → src/types/domain/interface.ts:228
+- DependencyLocation → src/types/domain/interface.ts:240
+- DomainStructure → src/types/domain/interface.ts:247
+- InterfaceDependencyGraph → src/types/domain/interface.ts:286
+- InterfaceAnalysisOptions → src/types/domain/interface.ts:308
 

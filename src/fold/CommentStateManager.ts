@@ -1,6 +1,11 @@
 /**
  * Comment state manager for fold/unfold operations
+ *
  * @packageDocumentation
+ * @doc [[CommentStateTypes]]
+ * @context Coordinates `CommentExporter` and `CommentImporter` to manage project-wide TSDoc comment fold/unfold state
+ * @functionality Loads persisted `.tsdoc-comments` archives, exports/imports file and directory comments, and toggles collapsed/expanded state
+ * @sideEffect filesystem: Recursively reads and writes `.tsdoc-comments` Markdown archives and rewrites folded/unfolded TypeScript files (read/write)
  */
 
 import * as fs from 'node:fs';
@@ -22,6 +27,10 @@ import { CommentImporter } from './CommentImporter';
 /**
  * Manages comment states across the project
  *
+ * @doc [[CommentStateTypes]]
+ * @context Stateful coordinator for workspace TSDoc comment folding, unfolding, and status reporting
+ * @functionality Orchestrates `CommentExporter` and `CommentImporter` across files and directories with in-memory `StateStorage` indexing
+ * @sideEffect filesystem: Recursively reads and writes `.tsdoc-comments` Markdown archives and rewrites folded/unfolded TypeScript files (read/write)
  * @public
  */
 export class CommentStateManager {

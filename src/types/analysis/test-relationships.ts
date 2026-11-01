@@ -1,10 +1,15 @@
 /**
  * Test relationship analysis types
+ *
  * @packageDocumentation
+ * @doc [[TestRelationships]]
+ * @context Integration and unit test traceability across symbol usages and verified code relationships
+ * @functionality Defines TestSymbolUsage, ImportedSymbol, UsagePattern, VerifiedRelationship, RelationshipEvidence, RelationshipCoverage, UnverifiedRelationship, and TestRelationshipAnalysis contracts
  */
 
 /**
  * Symbol usage in a test file
+ * @doc [[TestRelationships]]
  * @public
  */
 export interface TestSymbolUsage {
@@ -18,6 +23,7 @@ export interface TestSymbolUsage {
 
 /**
  * Imported symbol information
+ * @doc [[TestRelationships]]
  * @public
  */
 export interface ImportedSymbol {
@@ -33,6 +39,7 @@ export interface ImportedSymbol {
 
 /**
  * Usage pattern in test code
+ * @doc [[TestRelationships]]
  * @public
  */
 export interface UsagePattern {
@@ -55,6 +62,7 @@ export interface UsagePattern {
 
 /**
  * Verified relationship between symbols
+ * @doc [[TestRelationships]]
  * @public
  */
 export interface VerifiedRelationship {
@@ -72,6 +80,7 @@ export interface VerifiedRelationship {
 
 /**
  * Evidence of relationship verification
+ * @doc [[TestRelationships]]
  * @public
  */
 export interface RelationshipEvidence {
@@ -85,6 +94,7 @@ export interface RelationshipEvidence {
 
 /**
  * Relationship coverage analysis result
+ * @doc [[TestRelationships]]
  * @public
  */
 export interface RelationshipCoverage {
@@ -108,6 +118,7 @@ export interface RelationshipCoverage {
 
 /**
  * Unverified relationship
+ * @doc [[TestRelationships]]
  * @public
  */
 export interface UnverifiedRelationship {
@@ -127,6 +138,7 @@ export interface UnverifiedRelationship {
 
 /**
  * Test relationship analysis result
+ * @doc [[TestRelationships]]
  * @public
  */
 export interface TestRelationshipAnalysis {

@@ -1,6 +1,12 @@
 /**
  * Dead Code Tagger - Automatically annotates and explores dead code in TypeScript sources
+ *
  * @packageDocumentation
+ * @doc [[FixCommand]]
+ * @doc [[Dead Code Detection]]
+ * @context Source-rewriting utility that annotates unused TypeScript declarations with `@deprecated` and `@deadcode` TSDoc tags or removes stale tags
+ * @functionality AST declaration lookup, `@deprecated` / `@deadcode` tag insertion and removal, and workspace scanning for existing dead-code annotations
+ * @sideEffect filesystem: Reads and rewrites TypeScript source files when tagging, untagging, or scanning dead code (read/write)
  */
 
 import * as fs from 'node:fs';
@@ -9,6 +15,10 @@ import * as ts from 'typescript';
 
 /**
  * Options for dead code tagging
+ *
+ * @doc [[FixCommand]]
+ * @doc [[Dead Code Detection]]
+ * @public
  */
 export interface DeadCodeTagOptions {
   /** Dry run - preview changes without modifying files */
@@ -19,12 +29,16 @@ export interface DeadCodeTagOptions {
   confidence?: 'high' | 'medium' | 'low';
   /** Whether to add the standard `@deprecated` tag (default: true) */
   addDeprecated?: boolean;
-  /** Whether to add custom @deadcode tag (default: true) */
+  /** Whether to add custom `@deadcode` tag (default: true) */
   addDeadcode?: boolean;
 }
 
 /**
  * Result of tagging or untagging an individual symbol
+ *
+ * @doc [[FixCommand]]
+ * @doc [[Dead Code Detection]]
+ * @public
  */
 export interface TagResult {
   filePath: string;
@@ -38,6 +52,10 @@ export interface TagResult {
 
 /**
  * Information on an existing tagged dead code symbol
+ *
+ * @doc [[FixCommand]]
+ * @doc [[Dead Code Detection]]
+ * @public
  */
 export interface TaggedDeadCodeSymbol {
   name: string;
@@ -65,8 +83,13 @@ interface TargetNodeInfo {
 /**
  * Dead Code Tagger implementation
  *
+ * @doc [[FixCommand]]
+ * @doc [[Dead Code Detection]]
  * @public
  * @responsibility Annotate detected dead code with TSDoc tags and explore existing tagged symbols
+ * @context Automates `@deprecated` and `@deadcode` governance annotations across TypeScript declarations
+ * @functionality Tags and untags dead code symbols in single files or batches and lists tagged dead-code declarations
+ * @sideEffect filesystem: Reads and rewrites TypeScript source files when tagging, untagging, or scanning dead code (read/write)
  */
 export class DeadCodeTagger {
   /**

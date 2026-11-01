@@ -1,7 +1,13 @@
 /**
  * Build command for creating symbol database
+ *
  * @doc [[BuildCommand]]
  * @packageDocumentation
+ * @context Core indexing command (`tsdoc-edge build`) populating `.tsdoc.db`, JSONL data, and optional canonical `@ttsc/graph` revisions
+ * @functionality Scans TypeScript sources, extracts symbols and TSDoc AST metadata, infers relationships, projects test coverage, and persists SQLite and JSONL artifacts
+ * @sideEffect console: Writes indexing progress, diagnostics, and build summaries to stdout/stderr
+ * @sideEffect database: Populates `.tsdoc.db` and refreshes `.tsdoc/canonical-graph.db` when canonical graph indexing is enabled
+ * @sideEffect filesystem: Scans TypeScript and test files and exports JSONL symbol/relationship files
  */
 
 import * as crypto from 'node:crypto';
@@ -40,6 +46,12 @@ import type { UnifiedRelationship } from '../types/relationships/unified';
 import type { TestSymbol } from '../types/test-symbols';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 
+/**
+ * Injectable factory dependencies for `BuildCommand`.
+ *
+ * @doc [[BuildCommand]]
+ * @public
+ */
 export interface BuildCommandDependencies {
   readonly canonicalCoordinatorFactory?: (
     options: CanonicalGraphCoordinatorOptions
@@ -88,6 +100,7 @@ interface CanonicalTestCoverageSummary {
  * @requires DatabaseManager
  * @requires ConfigManager
  * @requires ASTSymbolExtractor
+ * @sideEffect database: Populates `.tsdoc.db` and optional `.tsdoc/canonical-graph.db`; exports JSONL artifacts and writes CLI progress to stdout
  *
  * @doc [[BuildCommand]]
  */

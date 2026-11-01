@@ -1,4 +1,14 @@
-/** Read-only operator access to saved managed SpecGraph revisions. */
+/**
+ * Read-only operator access to saved managed SpecGraph revisions.
+ *
+ * @packageDocumentation
+ * @doc [[SpecCommands]]
+ * @doc [[AuthoredProjectSpecifications]]
+ * @context Read-only operator CLI for inspecting persisted `SpecGraph` revisions
+ * @functionality Supports `status`, `list`, and `read` operations on `.tsdoc/spec-graph.db` with human and `--json` output
+ * @sideEffect console: Writes `SpecGraph` revision summaries or JSON payloads to stdout and operator errors to stderr
+ * @sideEffect database: Reads `SpecGraphRepository` SQLite storage in read-only mode (read)
+ */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -6,7 +16,13 @@ import type { SpecGraphRevision } from '../spec-graph';
 import { SpecGraphRepository, type SpecGraphRevisionSummary } from '../storage/SpecGraphRepository';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
-/** Inspect active and retained managed specification revisions without mutation. */
+/**
+ * Inspect active and retained managed specification revisions without mutation.
+ *
+ * @doc [[SpecCommands]]
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export class SpecGraphCommand extends BaseCommand {
   getName(): string {
     return 'spec-graph';

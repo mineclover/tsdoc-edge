@@ -21,5 +21,5 @@ Identifies integration tests that exercise multi-symbol interactions and cross-m
 
 ### Implemented By
 
-- IntegrationVerificationAnalyzer → src/analyzer/IntegrationVerificationAnalyzer.ts:1
+- IntegrationVerificationAnalyzer → src/analyzer/IntegrationVerificationAnalyzer.ts:34
 

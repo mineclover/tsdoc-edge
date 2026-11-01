@@ -343,7 +343,7 @@ it('BuildCommand � DatabaseManager integration', async () => {
 - Mutual relationship
 - Examples: collaboration, mutual exclusion
 
-**Undirected** (A  B):
+**Undirected** (A — B):
 - No inherent direction
 - Examples: substitution, conceptual relations
 
@@ -461,9 +461,9 @@ db.queryRelationships({
 ### Current Status
 
 **Implemented** (v1.0):
--  Structural: code-dependency, inheritance, implementation
--  Behavioral: calls
--  Verification: test-coverage
+- ✅ Structural: code-dependency, inheritance, implementation
+- ✅ Behavioral: calls
+- ✅ Verification: test-coverage
 
 **Planned** (v2.0):
 - � Data Flow: io-dependency, pipeline, event-flow

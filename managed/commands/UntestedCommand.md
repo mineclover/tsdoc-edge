@@ -249,5 +249,5 @@ Low Priority:
 
 ### Implemented By
 
-- UntestedCommand → src/commands/UntestedCommand.ts:22
+- UntestedCommand → src/commands/UntestedCommand.ts:29
 

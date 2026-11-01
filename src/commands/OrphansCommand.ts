@@ -1,6 +1,13 @@
 /**
  * Orphans Command - Find orphaned symbols
+ *
  * @packageDocumentation
+ * @doc [[OrphansCommand]]
+ * @doc [[CLI Commands]]
+ * @context Dead-code and disconnected symbol discovery via `tsdoc-edge symbol orphans`
+ * @functionality Scans canonical `@ttsc/graph` or `SymbolRegistryManager` to detect symbols with zero incoming and outgoing internal dependencies
+ * @sideEffect console: Writes orphaned symbol listings or `--json`/`--xml` output to stdout
+ * @sideEffect database: Reads `GraphRepository` and `DatabaseManager` SQLite repositories (read)
  */
 
 import * as fs from 'node:fs';
@@ -18,7 +25,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @responsibility Find symbols with no dependencies or usages
  * @contract Reads registry, identifies orphans, displays results
  * @doc [[OrphansCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#orphans]]
+ * @sideEffect console: Writes orphaned symbol reports to stdout; reads SQLite repositories
  *
  * @problem Need to identify unused or disconnected symbols
  * @solves Finds symbols that are neither used nor use others
@@ -539,6 +548,7 @@ export class OrphansCommand extends BaseCommand {
  * @responsibility Find symbols without documentation
  * @contract Loads database, builds graph, finds undocumented symbols
  * @doc [[UndocumentedCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#undocumented]]
  *
  * @problem Need to identify symbols lacking documentation

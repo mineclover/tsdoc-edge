@@ -198,4 +198,17 @@ contentHash = sha256(fullComment);
 ### Implemented By
 
 - CommentStateTypes → src/types/state/comment.ts:1
+- CommentExporter → src/fold/CommentExporter.ts:27
+- CommentImporter → src/fold/CommentImporter.ts:37
+- CommentStateManager → src/fold/CommentStateManager.ts:36
+- CommentStatus → src/types/state/comment.ts:16
+- CommentLocation → src/types/state/comment.ts:24
+- CommentState → src/types/state/comment.ts:52
+- FileCommentState → src/types/state/comment.ts:101
+- StateStorage → src/types/state/comment.ts:124
+- CollapseOptions → src/types/state/comment.ts:149
+- ExpandOptions → src/types/state/comment.ts:177
+- ExportResult → src/types/state/comment.ts:195
+- ImportResult → src/types/state/comment.ts:223
+- FileStatusSummary → src/types/state/comment.ts:251
 

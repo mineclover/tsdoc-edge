@@ -1,7 +1,11 @@
 /**
  * Mermaid diagram generator
  * Generates Mermaid diagrams for dependency visualization
+ *
  * @packageDocumentation
+ * @doc [[MermaidGenerator]]
+ * @context Pure visualization generator projecting `SymbolGraph` topologies, hotspots, and circular dependencies into Mermaid diagram syntax
+ * @functionality Dependency tree rendering, hotspot ranking diagrams, circular dependency graphs, and architecture overview flowcharts
  */
 
 import type { CircularDependency, Hotspot } from '../analyzer/DependencyChainAnalyzer';
@@ -9,6 +13,10 @@ import type { SymbolGraph } from '../types/graph';
 
 /**
  * Mermaid diagram generator
+ *
+ * @doc [[MermaidGenerator]]
+ * @context Renders `SymbolGraph` nodes, adjacency lists, hotspots, and cycles as Mermaid `graph TD` / `graph LR` diagrams
+ * @functionality Generates dependency trees, hotspot diagrams, circular dependency visualizations, and full graph summaries
  * @public
  */
 export class MermaidGenerator {

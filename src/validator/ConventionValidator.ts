@@ -1,7 +1,11 @@
 /**
  * Convention validator for TSDoc comments
  * Enforces TSDoc minimum conventions as defined in TSDOC_CONVENTIONS.md
+ *
  * @packageDocumentation
+ * @doc [[Validator System]]
+ * @context TSDoc minimum documentation convention validation by symbol kind
+ * @functionality Enforces summary, release visibility modifiers, parameter docs, return tags, and symbol-kind conventions
  */
 
 import type { DocComment } from '@microsoft/tsdoc';
@@ -24,6 +28,7 @@ type SymbolType = 'function' | 'class' | 'interface' | 'type' | 'enum' | 'variab
  * - Variables: summary, `@public` for exports
  *
  * @doc [[ConventionValidator]]
+ * @doc [[Validator System]]
  * @public
  * @responsibility Validate TSDoc comments against naming and documentation conventions
  * @contract Enforce summary, public tags, parameter docs, and return value documentation

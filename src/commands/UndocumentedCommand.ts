@@ -1,6 +1,13 @@
 /**
  * Undocumented Command - Find undocumented symbols
+ *
  * @packageDocumentation
+ * @doc [[UndocumentedCommand]]
+ * @doc [[CLI Commands]]
+ * @context Documentation gap discovery via `tsdoc-edge symbol undocumented`
+ * @functionality Loads symbols from `.tsdoc.db`, filters undocumented symbols via `SymbolSearchEngine`, and prints file-line locations
+ * @sideEffect console: Writes undocumented symbol listings to stdout
+ * @sideEffect database: Reads symbol graph data from `DatabaseManager` (read)
  */
 
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
@@ -17,7 +24,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @responsibility Find symbols without documentation
  * @contract Loads database, builds graph, finds undocumented symbols
  * @doc [[UndocumentedCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#undocumented]]
+ * @sideEffect console: Writes undocumented symbol reports to stdout; reads `.tsdoc.db`
  *
  * @problem Need to identify symbols lacking documentation
  * @solves Searches for symbols without summary or TSDoc
@@ -176,6 +185,7 @@ export class UndocumentedCommand extends BaseCommand {
  * @responsibility Display symbol hierarchy as tree structure
  * @contract Reads registry, builds hierarchy, displays tree
  * @doc [[TreeCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#tree]]
  *
  * @problem Need to visualize symbol relationships as tree

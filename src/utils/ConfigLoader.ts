@@ -1,10 +1,14 @@
 /**
  * Configuration loader for TSDoc Edge
  *
- * @remarks
- * Loads and validates configuration from .tsdoc.config.json file
- *
  * @packageDocumentation
+ * @doc [[ConfigLoader]]
+ * @context Workspace configuration resolution layer merging `.tsdoc.config.json` overrides with `DEFAULT_CONFIG`
+ * @functionality Ancestor directory search (up to 10 levels), JSON parsing, default fallback merging, and typed section accessors
+ * @sideEffect filesystem: Searches ancestor directories and reads `.tsdoc.config.json` from disk (read)
+ *
+ * @remarks
+ * Loads and validates configuration from `.tsdoc.config.json` file
  */
 
 import * as fs from 'node:fs';
@@ -19,6 +23,10 @@ import {
 /**
  * Configuration loader
  *
+ * @doc [[ConfigLoader]]
+ * @context Resolves project, path, fold, validation, generator, pre-commit, and document-management settings from `.tsdoc.config.json`
+ * @functionality Discovers `.tsdoc.config.json`, merges user overrides with `DEFAULT_CONFIG`, and exposes typed configuration getters
+ * @sideEffect filesystem: Searches ancestor directories and reads `.tsdoc.config.json` from disk (read)
  * @public
  */
 export class ConfigLoader {

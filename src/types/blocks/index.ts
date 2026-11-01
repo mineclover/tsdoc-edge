@@ -1,10 +1,16 @@
 /**
  * Block-level chunking types
+ *
  * @packageDocumentation
+ * @doc [[Types Index]]
+ * @context Sub-symbol code block chunking, side-effect classification, and block dependency analysis
+ * @functionality Defines BlockType, SideEffectType, SideEffect, BlockScope, CodeBlock, BlockAnalysisResult, BlockDependency, ChunkingStrategy, and BlockDetectionRule contracts
  */
 
 /**
  * Types of code blocks
+ * @doc [[Types Index]]
+ * @public
  */
 export enum BlockType {
   /** Input validation block */
@@ -37,6 +43,8 @@ export enum BlockType {
 
 /**
  * Side effect types
+ * @doc [[Types Index]]
+ * @public
  */
 export type SideEffectType =
   | 'io' // File I/O
@@ -50,6 +58,8 @@ export type SideEffectType =
 
 /**
  * Side effect representation
+ * @doc [[Types Index]]
+ * @public
  */
 export interface SideEffect {
   /** Type of side effect */
@@ -67,11 +77,15 @@ export interface SideEffect {
 
 /**
  * Block scope types
+ * @doc [[Types Index]]
+ * @public
  */
 export type BlockScope = 'local' | 'closure' | 'module' | 'global';
 
 /**
  * Code block representation
+ * @doc [[Types Index]]
+ * @public
  */
 export interface CodeBlock {
   /** Unique block ID (e.g., symbol-id::block-1) */
@@ -107,6 +121,8 @@ export interface CodeBlock {
 
 /**
  * Block analysis result
+ * @doc [[Types Index]]
+ * @public
  */
 export interface BlockAnalysisResult {
   /** Detected blocks */
@@ -127,6 +143,8 @@ export interface BlockAnalysisResult {
 
 /**
  * Block dependency graph edge
+ * @doc [[Types Index]]
+ * @public
  */
 export interface BlockDependency {
   /** Source block ID */
@@ -144,6 +162,8 @@ export interface BlockDependency {
 
 /**
  * Block chunking strategy configuration
+ * @doc [[Types Index]]
+ * @public
  */
 export interface ChunkingStrategy {
   /** Minimum block size (lines) */
@@ -164,6 +184,8 @@ export interface ChunkingStrategy {
 
 /**
  * Block detection rule
+ * @doc [[Types Index]]
+ * @public
  */
 export interface BlockDetectionRule {
   /** Block type to detect */

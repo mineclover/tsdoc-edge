@@ -17,7 +17,7 @@ Query and explore document symbols (`[[Symbol]]` references) across the document
 ## Usage
 
 ```bash
-tsdoc-edge symbol-query <subcommand> [options]
+tsdoc-edge symbol query <subcommand> [options]
 ```
 
 ## Subcommands
@@ -27,9 +27,9 @@ tsdoc-edge symbol-query <subcommand> [options]
 Display all defined symbols with their status and reference counts.
 
 ```bash
-tsdoc-edge symbol-query managed list
-tsdoc-edge symbol-query managed list --all              # Include symbols without primary
-tsdoc-edge symbol-query managed list --pattern="Command" # Filter by regex pattern
+tsdoc-edge symbol query managed list
+tsdoc-edge symbol query managed list --all              # Include symbols without primary
+tsdoc-edge symbol query managed list --pattern="Command" # Filter by regex pattern
 ```
 
 **Output**:
@@ -42,8 +42,8 @@ tsdoc-edge symbol-query managed list --pattern="Command" # Filter by regex patte
 Find symbols matching a search pattern (case-insensitive regex).
 
 ```bash
-tsdoc-edge symbol-query managed search "Build"
-tsdoc-edge symbol-query managed search ".*Command$"
+tsdoc-edge symbol query managed search "Build"
+tsdoc-edge symbol query managed search ".*Command$"
 ```
 
 **Use Cases**:
@@ -56,8 +56,8 @@ tsdoc-edge symbol-query managed search ".*Command$"
 Show comprehensive information about a specific symbol.
 
 ```bash
-tsdoc-edge symbol-query managed info "BuildCommand"
-tsdoc-edge symbol-query managed info "BuildCommand" --all  # Show all references
+tsdoc-edge symbol query managed info "BuildCommand"
+tsdoc-edge symbol query managed info "BuildCommand" --all  # Show all references
 ```
 
 **Information Displayed**:
@@ -94,7 +94,7 @@ References: 33
 List all documents that reference or define a symbol.
 
 ```bash
-tsdoc-edge symbol-query managed backlinks "BuildCommand"
+tsdoc-edge symbol query managed backlinks "BuildCommand"
 ```
 
 **Output**:
@@ -112,8 +112,8 @@ tsdoc-edge symbol-query managed backlinks "BuildCommand"
 Find symbols with similar names (typo detection, related concepts).
 
 ```bash
-tsdoc-edge symbol-query managed similar "BuildComand"  # Typo
-tsdoc-edge symbol-query managed similar "TypeAnalyzer"  # Related
+tsdoc-edge symbol query managed similar "BuildComand"  # Typo
+tsdoc-edge symbol query managed similar "TypeAnalyzer"  # Related
 ```
 
 **Similarity Factors**:
@@ -131,7 +131,7 @@ tsdoc-edge symbol-query managed similar "TypeAnalyzer"  # Related
 Show overall symbol system statistics.
 
 ```bash
-tsdoc-edge symbol-query managed stats
+tsdoc-edge symbol query managed stats
 ```
 
 **Metrics**:
@@ -192,42 +192,42 @@ Returns top N matches above threshold (score > 10).
 
 ```bash
 # 1. Find symbol causing error
-tsdoc-edge validate-symbol-refs managed 2>&1 | grep "missing_primary"
+tsdoc-edge validate refs managed 2>&1 | grep "missing_primary"
 
 # 2. Search for similar symbols
-tsdoc-edge symbol-query managed similar "SymolName"  # Typo
+tsdoc-edge symbol query managed similar "SymolName"  # Typo
 
 # 3. Get info about correct symbol
-tsdoc-edge symbol-query managed info "SymbolName"
+tsdoc-edge symbol query managed info "SymbolName"
 
 # 4. Fix reference in documentation
-# (Edit file manually or use symbol-fix)
+# (Edit file manually or use symbol fix)
 ```
 
 ### Workflow: Explore Documentation Network
 
 ```bash
 # 1. List all command symbols
-tsdoc-edge symbol-query managed list --pattern="Command$"
+tsdoc-edge symbol query managed list --pattern="Command$"
 
 # 2. Pick a command and see its usage
-tsdoc-edge symbol-query managed info "WorkContextCommand"
+tsdoc-edge symbol query managed info "WorkContextCommand"
 
 # 3. Find all docs that discuss it
-tsdoc-edge symbol-query managed backlinks "WorkContextCommand"
+tsdoc-edge symbol query managed backlinks "WorkContextCommand"
 ```
 
 ### Workflow: Find Documentation Gaps
 
 ```bash
 # 1. Get statistics
-tsdoc-edge symbol-query managed stats
+tsdoc-edge symbol query managed stats
 
 # 2. List symbols without primary
-tsdoc-edge symbol-query managed list | grep "❌"
+tsdoc-edge symbol query managed list | grep "❌"
 
 # 3. Check each one
-tsdoc-edge symbol-query managed info "<symbol-without-primary>"
+tsdoc-edge symbol query managed info "<symbol-without-primary>"
 ```
 
 ## Testing
@@ -240,9 +240,9 @@ npm test -- SymbolQueryCommand.test.ts
 ./scripts/test-symbol-query.sh
 
 # Manual testing
-tsdoc-edge symbol-query managed list
-tsdoc-edge symbol-query managed search "Build"
-tsdoc-edge symbol-query managed info "BuildCommand"
+tsdoc-edge symbol query managed list
+tsdoc-edge symbol query managed search "Build"
+tsdoc-edge symbol query managed info "BuildCommand"
 ```
 
 ## See Also
@@ -262,8 +262,10 @@ tsdoc-edge symbol-query managed info "BuildCommand"
 - [[SymbolFixCommand]] → managed/commands/SymbolFixCommand.md:326
 - [[DocumentSymbolParser]] → managed/features/DocumentSymbolParser.md:185
 - [[DocumentSymbolRegistry]] → managed/features/DocumentSymbolRegistry.md:291
+- [[CliCommandSurfaceSpecification]] → managed/specs/domains/cli-command-surface-spec.md:405
 
 ### Implemented By
 
-- SymbolQueryCommand → src/commands/SymbolQueryCommand.ts:79
+- SymbolQueryCommand → src/commands/SymbolQueryCommand.ts:85
+- SymbolUnifiedCommand → src/commands/SymbolUnifiedCommand.ts:60
 

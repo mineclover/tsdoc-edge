@@ -1,4 +1,13 @@
-/** Compile one authored convention-pack source into exact analysis revisions. */
+/**
+ * Compile one authored convention-pack source into exact analysis revisions.
+ *
+ * @doc [[ConventionCheck]]
+ * @doc [[Convention Pack Check]]
+ * @context Deterministic compiler translating workspace-authored convention-pack JSON descriptors and managed SpecGraph projections into content-addressed manifest, spec, policy, and rule-set revisions.
+ * @functionality Validates convention-pack schema contracts, SemVer and SHA-256 digests, executable policy rules, and manifest pins, and revalidates retained compiled packs before historical replay.
+ * @sideEffect filesystem: Resolves workspace paths and reads authored convention-pack JSON files from disk during file compilation.
+ * @packageDocumentation
+ */
 
 import { createHash } from 'node:crypto';
 import * as fs from 'node:fs';
@@ -54,6 +63,12 @@ const SUPPORTED_RULE_VERSIONS: Readonly<Record<string, string>> = Object.freeze(
 });
 const materializedConventionPacks = new WeakSet<object>();
 
+/**
+ * Source file identity and optional managed SpecGraph projection for pack compilation.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface ConventionPackSourceContext {
   /** Workspace-relative authored file path. */
   readonly file: string;
@@ -63,13 +78,24 @@ export interface ConventionPackSourceContext {
   readonly managedSpec?: SpecGraphRevision;
 }
 
+/**
+ * Options controlling workspace-local convention-pack file compilation.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface CompileConventionPackFileOptions {
   readonly workspaceRoot?: string;
   /** Use an exact managed SpecGraph revision instead of JSON spec declarations. */
   readonly managedSpec?: SpecGraphRevision;
 }
 
-/** Require the exact process-local object emitted by the convention compiler. */
+/**
+ * Require the exact process-local object emitted by the convention compiler.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export function assertCompiledConventionPack(pack: CompiledConventionPack): void {
   if (!materializedConventionPacks.has(pack)) {
     throw new Error('Compiled convention pack was not materialized by ConventionPackCompiler');
@@ -79,6 +105,9 @@ export function assertCompiledConventionPack(pack: CompiledConventionPack): void
 /**
  * Revalidate a retained compiled projection before replaying it in this process.
  * History never trusts a deserialized pack merely because it has familiar IDs.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
  */
 export function restoreCompiledConventionPack(value: unknown): CompiledConventionPack {
   const candidate = strictJsonClone(
@@ -119,7 +148,13 @@ export function restoreCompiledConventionPack(value: unknown): CompiledConventio
   return restored;
 }
 
-/** Read and compile one workspace-local JSON convention pack. */
+/**
+ * Read and compile one workspace-local JSON convention pack.
+ *
+ * @doc [[ConventionCheck]]
+ * @doc [[Convention Pack Check]]
+ * @public
+ */
 export function compileConventionPackFile(
   filePath: string,
   options: CompileConventionPackFileOptions = {}
@@ -156,7 +191,13 @@ export function compileConventionPackFile(
   });
 }
 
-/** Compile an already parsed source using explicit, deterministic source identity. */
+/**
+ * Compile an already parsed source using explicit, deterministic source identity.
+ *
+ * @doc [[ConventionCheck]]
+ * @doc [[Convention Pack Check]]
+ * @public
+ */
 export function compileConventionPackSource(
   source: unknown,
   context: ConventionPackSourceContext
@@ -400,7 +441,12 @@ export function compileConventionPackSource(
   return compiled;
 }
 
-/** Recompute and validate a compiled manifest before it selects analysis inputs. */
+/**
+ * Recompute and validate a compiled manifest before it selects analysis inputs.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export function validateConventionPackManifest(value: unknown): ConventionPackManifest {
   const normalized = strictJsonClone(value, 'convention pack manifest');
   const manifest = requireRecord(normalized, 'convention pack manifest');

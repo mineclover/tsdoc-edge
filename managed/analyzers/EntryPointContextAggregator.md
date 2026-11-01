@@ -21,5 +21,5 @@ Collects transitive code, document, and relationship context reachable from a fi
 
 ### Implemented By
 
-- EntryPointContextAggregator → src/analyzer/EntryPointContextAggregator.ts:122
+- EntryPointContextAggregator → src/analyzer/EntryPointContextAggregator.ts:128
 

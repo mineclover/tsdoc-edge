@@ -40,6 +40,7 @@ canonical: true
 - [[Phase Commands]] → managed/commands/PhaseCommands.md:102
 - [[StatsCommand]] → managed/commands/StatsCommand.md:224
 - [[SuggestCommand]] → managed/commands/SuggestCommand.md:483
+- [[SystemStatusCommand]] → managed/commands/SystemStatusCommand.md:31
 - [[UndocumentedCommand]] → managed/commands/UndocumentedCommand.md:178
 - [[UntestedCommand]] → managed/commands/UntestedCommand.md:197
 - [[ValidateSpecCommand]] → managed/commands/ValidateSpecCommand.md:320
@@ -54,5 +55,5 @@ canonical: true
 
 ### Implemented By
 
-- HealthCommand → src/commands/HealthCommand.ts:33
+- HealthCommand → src/commands/HealthCommand.ts:40
 

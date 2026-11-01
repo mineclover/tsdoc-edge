@@ -1,6 +1,13 @@
 /**
  * Relationship Clusters Command
+ *
  * @packageDocumentation
+ * @doc [[RelationshipClustersCommand]]
+ * @doc [[RelationshipCommands]]
+ * @context Architectural module boundary discovery via `tsdoc-edge relationship clusters`
+ * @functionality Runs community detection over canonical `@ttsc/graph` or `.tsdoc.db` edges and computes cluster cohesion scores
+ * @sideEffect console: Writes detected architectural clusters, cohesion metrics, or `--json` payloads to stdout
+ * @sideEffect database: Reads `GraphRepository` and `DatabaseManager` SQLite repositories (read)
  */
 
 import * as fs from 'node:fs';
@@ -24,6 +31,7 @@ interface Cluster {
 /**
  * Command for finding architectural clusters using community detection
  * @doc [[RelationshipClustersCommand]]
+ * @sideEffect console: Writes architectural cluster reports to stdout; reads SQLite repositories
  * @public
  */
 export class RelationshipClustersCommand extends BaseCommand {

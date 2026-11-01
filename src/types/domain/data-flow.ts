@@ -1,12 +1,17 @@
 /**
  * Data flow and transformation tracking types
+ *
  * @packageDocumentation
+ * @doc [[DataFlowTypes]]
+ * @context DTO classification and interface data transformation chain analysis
+ * @functionality Defines DTOPattern, DTOClassification, TransformationStep, DataTransformationChain, TransformationPath, and DataFlowAnalysisResult contracts
  */
 
 import type { InterfaceDependency } from './interface';
 
 /**
  * DTO naming pattern
+ * @doc [[DataFlowTypes]]
  * @public
  */
 export type DTOPattern =
@@ -21,6 +26,7 @@ export type DTOPattern =
 
 /**
  * DTO classification result
+ * @doc [[DataFlowTypes]]
  * @public
  */
 export interface DTOClassification {
@@ -52,6 +58,7 @@ export interface DTOClassification {
 
 /**
  * Transformation step in a chain
+ * @doc [[DataFlowTypes]]
  * @public
  */
 export interface TransformationStep {
@@ -83,6 +90,7 @@ export interface TransformationStep {
 
 /**
  * Complete transformation chain
+ * @doc [[DataFlowTypes]]
  * @public
  */
 export interface DataTransformationChain {
@@ -129,6 +137,7 @@ export interface DataTransformationChain {
 
 /**
  * Transformation path between two types
+ * @doc [[DataFlowTypes]]
  * @public
  */
 export interface TransformationPath {
@@ -165,6 +174,7 @@ export interface TransformationPath {
 
 /**
  * Data flow analysis result
+ * @doc [[DataFlowTypes]]
  * @public
  */
 export interface DataFlowAnalysisResult {

@@ -17,7 +17,7 @@ Validate specification completeness across documentation files by measuring desi
 ## Usage
 
 ```bash
-tsdoc-edge validate-spec [docs-dir]
+tsdoc-edge validate spec [docs-dir]
 ```
 
 ### Arguments
@@ -29,7 +29,7 @@ tsdoc-edge validate-spec [docs-dir]
 ### Basic Validation
 
 ```bash
-$ tsdoc-edge validate-spec managed
+$ tsdoc-edge validate spec managed
 
 ================================================================================
 Validating Specification Completeness
@@ -66,7 +66,7 @@ Incomplete Specifications
 ### Specific Directory
 
 ```bash
-tsdoc-edge validate-spec managed/commands
+tsdoc-edge validate spec managed/commands
 ```
 
 ## Specification Completeness
@@ -212,7 +212,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
       - name: Validate specifications
-        run: tsdoc-edge validate-spec managed
+        run: tsdoc-edge validate spec managed
 ```
 
 ### Pre-commit Hook
@@ -222,7 +222,7 @@ jobs:
 # .git/hooks/pre-commit
 
 # Validate specification completeness
-tsdoc-edge validate-spec managed || {
+tsdoc-edge validate spec managed || {
   echo "❌ Specification validation failed"
   echo "Fix incomplete specifications before committing"
   exit 1
@@ -235,7 +235,7 @@ tsdoc-edge validate-spec managed || {
 # scripts/quality-gate.sh
 
 # Run validation
-tsdoc-edge validate-spec managed > validation.txt 2>&1
+tsdoc-edge validate spec managed > validation.txt 2>&1
 
 # Check for incomplete specs
 if grep -q "Incomplete: [1-9]" validation.txt; then
@@ -332,7 +332,7 @@ const summary = validator.getSummary(results);
 
 ```bash
 # 1. Validate current state
-tsdoc-edge validate-spec managed
+tsdoc-edge validate spec managed
 
 # 2. Identify incomplete specs
 # (Check report for yellow/red items)
@@ -341,7 +341,7 @@ tsdoc-edge validate-spec managed
 # (Add missing sections: Input, Output, Logic, etc.)
 
 # 4. Re-validate
-tsdoc-edge validate-spec managed
+tsdoc-edge validate spec managed
 
 # 5. Iterate until all complete
 ```
@@ -350,10 +350,10 @@ tsdoc-edge validate-spec managed
 
 ```bash
 # Find specs with low design scores
-tsdoc-edge validate-spec managed | grep "Design: [0-5][0-9]%"
+tsdoc-edge validate spec managed | grep "Design: [0-5][0-9]%"
 
 # Find specs with low implementation scores
-tsdoc-edge validate-spec managed | grep "Implementation: [0-5][0-9]%"
+tsdoc-edge validate spec managed | grep "Implementation: [0-5][0-9]%"
 ```
 
 ## Best Practices
@@ -381,7 +381,7 @@ Design: 90%, Implementation: 85% (balanced)
 
 ```bash
 # Target incomplete specs first
-tsdoc-edge validate-spec managed | grep "⚠️" -A 1
+tsdoc-edge validate spec managed | grep "⚠️" -A 1
 
 # Fix one at a time
 # Verify improvement after each fix
@@ -410,5 +410,5 @@ tsdoc-edge validate-spec managed | grep "⚠️" -A 1
 ### Implemented By
 
 - ValidateSpecCommand → src/commands/Phase4Commands.ts:349:1
-- ValidateSpecCommand → src/commands/ValidateSpecCommand.ts:17
+- ValidateSpecCommand → src/commands/ValidateSpecCommand.ts:26
 

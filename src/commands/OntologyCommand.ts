@@ -1,7 +1,13 @@
 /**
  * Unified Ontology Command
  * Routes to appropriate ontology subcommand
+ *
  * @packageDocumentation
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[Relationship Ontology]]
+ * @context Unified `ontology` command group in the 20-command CLI surface
+ * @functionality Routes `stats` and `list` subcommands to `OntologyStatsCommand` and `OntologyListCommand`
+ * @sideEffect console: Writes subcommand routing errors and help listings to stdout
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
@@ -17,6 +23,9 @@ type SubcommandName = keyof typeof SUBCOMMANDS;
 
 /**
  * Unified command for all ontology operations
+ *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[Relationship Ontology]]
  * @public
  */
 export class OntologyCommand extends BaseCommand {

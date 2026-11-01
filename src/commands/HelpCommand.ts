@@ -4,8 +4,12 @@
  * Shows all available commands with their descriptions.
  * Uses CommandRegistry to dynamically list registered commands.
  *
-
- * @doc [[HelpCommand]] * @packageDocumentation
+ * @packageDocumentation
+ * @doc [[HelpCommand]]
+ * @doc [[CLI Commands]]
+ * @context Top-level `help` (`--help`, `-h`) command for the 20-command CLI surface
+ * @functionality Lists core workflow commands, unified command groups, revision/coverage commands, and per-command usage guides
+ * @sideEffect console: Writes formatted CLI help and command tables to stdout
  */
 
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
@@ -31,6 +35,11 @@ interface UnifiedCommandGroup {
 
 /**
  * HelpCommand - Display CLI help and available commands
+ *
+ * @doc [[HelpCommand]]
+ * @doc [[CLI Commands]]
+ * @sideEffect console: Writes formatted CLI help output to stdout
+ * @public
  */
 export class HelpCommand extends BaseCommand {
   private registry?: CommandRegistry;

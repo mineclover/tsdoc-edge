@@ -21,5 +21,5 @@ Compares structural and content differences between two revisions of a managed s
 
 ### Implemented By
 
-- SpecDiffCommand → src/commands/SpecDiffCommand.ts:35
+- SpecDiffCommand → src/commands/SpecDiffCommand.ts:44
 

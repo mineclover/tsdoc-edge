@@ -1,6 +1,13 @@
 /**
  * MoveCommand - Move documentation files with reference updates
+ *
  * @packageDocumentation
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[Document Symbol System]]
+ * @context Managed documentation file relocation within `tsdoc-edge docs move`
+ * @functionality Validates source and destination paths under `managed/`, discovers inbound references via `ReferenceUpdater`, and updates links before renaming files (or previews with `--dry-run`)
+ * @sideEffect console: Writes reference counts, dry-run previews, and validation errors to stdout
+ * @sideEffect filesystem: Updates markdown reference links and renames documentation files under `managed/` in write mode
  */
 
 import * as fs from 'node:fs';
@@ -10,6 +17,9 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /**
  * Command to move documentation files and update all references
+ *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[Document Symbol System]]
  * @public
  */
 export class MoveCommand extends BaseCommand {

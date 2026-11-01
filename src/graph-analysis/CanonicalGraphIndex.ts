@@ -1,5 +1,10 @@
 /**
  * Read-only indexes over a canonical project graph.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @context Deterministic in-memory lookup and adjacency index over immutable `CanonicalProjectGraph` snapshots without compiler runtime or database dependencies.
+ * @functionality Indexes canonical nodes by ID, unqualified name, qualified name, and file path, and indexes incoming, outgoing, and kind-grouped canonical edges in sorted immutable arrays.
  * @packageDocumentation
  */
 
@@ -15,6 +20,9 @@ const EMPTY_EDGES: readonly CanonicalGraphEdge[] = Object.freeze([]);
 /**
  * Builds deterministic lookup and adjacency indexes without importing a
  * compiler runtime, graph-router, or persistence layer.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
  * @public
  */
 export class CanonicalGraphIndex {

@@ -1,6 +1,11 @@
 /**
  * XML Output Builder
+ *
  * @packageDocumentation
+ * @doc [[Code Generation]]
+ * @context Schema-driven XML output serializer implementing `OutputBuilder` for token-efficient CLI payloads
+ * @functionality Escapes XML entities, serializes object/array/grouped-array sections according to `OutputSchema`, and prints to stdout
+ * @sideEffect process: Writes formatted XML output to stdout when `print()` is invoked (write)
  */
 
 import type {
@@ -68,6 +73,10 @@ function escapeXml(value: unknown): string {
  *   ])
  *   .print();
  * ```
+ *
+ * @doc [[Code Generation]]
+ * @sideEffect process: Writes formatted XML output to stdout when `print()` is invoked (write)
+ * @public
  */
 export class XmlBuilder implements OutputBuilder {
   private schema: OutputSchema;

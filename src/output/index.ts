@@ -1,6 +1,10 @@
 /**
  * Output Builder Module
+ *
  * @packageDocumentation
+ * @doc [[Code Generation]]
+ * @context Schema-driven structured CLI output layer supporting XML and JSON formats
+ * @functionality Barrel re-exports for `JsonBuilder`, `XmlBuilder`, `XmlParser`, schemas, types, and format-selection factory helpers
  */
 
 export { JsonBuilder } from './JsonBuilder';
@@ -21,6 +25,9 @@ import { XmlBuilder } from './XmlBuilder';
  * const builder = createBuilder(DepsSchema, 'xml');
  * builder.section('source', { name: 'Foo' }).print();
  * ```
+ *
+ * @doc [[Code Generation]]
+ * @public
  */
 export function createBuilder(schema: OutputSchema, format: OutputFormat): OutputBuilder {
   switch (format) {
@@ -35,6 +42,9 @@ export function createBuilder(schema: OutputSchema, format: OutputFormat): Outpu
 
 /**
  * Get output format from command args
+ *
+ * @doc [[Code Generation]]
+ * @public
  */
 export function getOutputFormat(args: string[]): OutputFormat {
   if (args.includes('--json')) {
@@ -45,6 +55,9 @@ export function getOutputFormat(args: string[]): OutputFormat {
 
 /**
  * Check if human-readable format is requested
+ *
+ * @doc [[Code Generation]]
+ * @public
  */
 export function isHumanFormat(args: string[]): boolean {
   return args.includes('--human');

@@ -263,7 +263,7 @@ getData((data) => {
   });
 });
 
-//  Good: Promises or async/await
+// ✅ Good: Promises or async/await
 async function process() {
   const data = await getData();
   const valid = await validate(data);
@@ -281,7 +281,7 @@ function fetchUser(id: string, callback: (data: User) => void) {
   // What about errors?
 }
 
-//  Good: Error-first callback pattern
+// ✅ Good: Error-first callback pattern
 function fetchUser(id: string, callback: (err: Error | null, data?: User) => void) {
   // ...
 }
@@ -294,7 +294,7 @@ function fetchUser(id: string, callback: (err: Error | null, data?: User) => voi
 function process(data: Data, onDone: () => void) {
   if (data.valid) {
     // ... process
-    onDone();  // 
+    onDone();  // ✅
   }
   // L Missing onDone() in else branch
 }
@@ -357,9 +357,9 @@ tsdoc-edge analyze --callback-depth
 ## Implementation Roadmap
 
 ### v2.0 (Q2 2025)
--  Basic parameter detection
--  Callback invocation tracking
--  Storage in unified_relationships
+- ✅ Basic parameter detection
+- ✅ Callback invocation tracking
+- ✅ Storage in unified_relationships
 
 ### v2.1 (Q3 2025)
 - � Nesting depth analysis

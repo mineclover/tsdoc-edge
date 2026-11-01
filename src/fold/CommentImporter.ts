@@ -1,6 +1,11 @@
 /**
  * Markdown comment importer to TypeScript files
+ *
  * @packageDocumentation
+ * @doc [[CommentStateTypes]]
+ * @context Restores or collapses TSDoc comments in TypeScript source files from `.tsdoc-comments` Markdown snapshots
+ * @functionality Parses Markdown comment state archives, matches AST JSDoc nodes by symbol and hash, and applies expanded or collapsed comments
+ * @sideEffect filesystem: Reads exported comment Markdown files and rewrites TypeScript source files on disk (read/write)
  */
 
 import * as crypto from 'node:crypto';
@@ -23,6 +28,10 @@ function getNodeJsDocs(node: ts.Node): readonly ts.JSDoc[] {
 /**
  * Imports comment states from Markdown and applies to TypeScript files
  *
+ * @doc [[CommentStateTypes]]
+ * @context Applies persisted `FileCommentState` archives back onto TypeScript source declarations
+ * @functionality Deserializes Markdown comment state files and replaces declaration JSDoc blocks in expanded or collapsed mode
+ * @sideEffect filesystem: Reads exported comment Markdown files and rewrites TypeScript source files on disk (read/write)
  * @public
  */
 export class CommentImporter {

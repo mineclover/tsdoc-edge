@@ -1,6 +1,10 @@
 /**
  * Connectivity validator for ensuring SSOT compliance
+ *
  * @packageDocumentation
+ * @doc [[Validator System]]
+ * @context Symbol graph connectivity, broken link, circular dependency, and contract validation
+ * @functionality Analyzes symbol graph connectivity scores, broken references, circular dependencies, and contract completeness
  */
 
 import type { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
@@ -17,6 +21,7 @@ import type {
  * Validates connectivity and completeness of documentation across the codebase
  * @public
  * @doc [[ValidationFeatures#Connectivity]]
+ * @doc [[Validator System]]
  * @responsibility Ensure SSOT compliance and documentation connectivity
  * @contract Validate all symbols have proper connections and documentation
  *

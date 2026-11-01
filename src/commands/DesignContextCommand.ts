@@ -10,6 +10,11 @@
  *
  * @doc [[DesignContextCommand]]
  * @packageDocumentation
+ * @context Pre-edit design governance and contract discovery via `tsdoc-edge dc`
+ * @functionality Extracts bound specs, `@contract` clauses, `@decision` ADRs, error patterns, and canonical `@ttsc/graph` metrics in human, `--llm`, or `--json` views
+ * @sideEffect console: Writes formatted design context or JSON payloads to stdout
+ * @sideEffect database: Reads symbol, relationship, and `SpecGraph` SQLite repositories (read)
+ * @sideEffect filesystem: Reads target TypeScript source and managed specification files (read)
  */
 
 import * as fs from 'node:fs';
@@ -108,6 +113,7 @@ interface WorkContext {
  * @requires SymbolGraphBuilder
  * @requires TSDocParser
  * @requires DocumentSymbolParser
+ * @sideEffect console: Writes formatted design context or JSON output to stdout; reads SQLite repositories and source files
  * @public
  */
 export class DesignContextCommand extends BaseCommand {

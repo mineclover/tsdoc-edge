@@ -1,4 +1,12 @@
-/** Deterministic identity and integrity helpers for the specification graph. */
+/**
+ * Deterministic identity and integrity helpers for the specification graph.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @context Content-addressed identity, structural validation, and strict JSON canonicalization kernel for `SpecGraphRevision`, `PolicyRevision`, `SpecEdge`, and binding resolutions.
+ * @functionality Validates node lifecycles, acyclic `supersedes` lineages, endpoint selector shapes, and calendar-valid RFC3339 timestamps, and computes deterministic SHA-256 revision digests.
+ * @packageDocumentation
+ */
 
 import { createHash } from 'node:crypto';
 import {
@@ -50,6 +58,12 @@ const RFC3339_WITH_TIMEZONE =
 
 type PlainRecord = Readonly<Record<string, unknown>>;
 
+/**
+ * Input payload used to construct a validated, content-addressed `SpecEdge`.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface CreateSpecEdgeInput {
   readonly kind: SpecEdgeKind;
   readonly from: string;
@@ -59,7 +73,12 @@ export interface CreateSpecEdgeInput {
   readonly provenance: SpecProvenance;
 }
 
-/** Create one deterministic durable spec edge. */
+/**
+ * Create one deterministic durable spec edge.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export function createSpecEdge(input: CreateSpecEdgeInput): SpecEdge {
   const normalized = immutableJson(input, 'spec edge input');
   const record = requireRecord(normalized, 'spec edge input');
@@ -98,12 +117,24 @@ export function createSpecEdge(input: CreateSpecEdgeInput): SpecEdge {
   );
 }
 
-/** Identity of an authored selector independent from a particular resolution. */
+/**
+ * Identity of an authored selector independent from a particular resolution.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export function bindingDeclarationDigest(declaration: SpecBindingDeclaration): string {
   return digest(declaration);
 }
 
-/** Identity of one revision-specific binding resolution. */
+/**
+ * Identity of one revision-specific binding resolution.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export function bindingResolutionId(
   resolution: Omit<ResolvedSpecBinding, 'resolutionId' | 'confidence' | 'evidence'>
 ): string {
@@ -134,6 +165,12 @@ export function bindingResolutionId(
   })}`;
 }
 
+/**
+ * Input payload used to compile and validate a `SpecGraphRevision`.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface CreateSpecGraphRevisionInput {
   readonly workspaceId: string;
   readonly nodes: readonly SpecNode[];
@@ -142,6 +179,13 @@ export interface CreateSpecGraphRevisionInput {
   readonly provenance: SpecGraphProvenance;
 }
 
+/**
+ * Input payload used to compile and validate a content-addressed `PolicyRevision`.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface CreatePolicyRevisionInput {
   readonly relationSemanticRegistryVersion: string;
   readonly lifecycleGateVersion: string;
@@ -150,7 +194,13 @@ export interface CreatePolicyRevisionInput {
   readonly provenance: PolicyProvenance;
 }
 
-/** Create a content-addressed policy revision shared by every consumer surface. */
+/**
+ * Create a content-addressed policy revision shared by every consumer surface.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export function createPolicyRevision(input: CreatePolicyRevisionInput): PolicyRevision {
   const normalized = immutableJson(input, 'policy revision input');
   const record = requireRecord(normalized, 'policy revision input');
@@ -207,7 +257,13 @@ export function createPolicyRevision(input: CreatePolicyRevisionInput): PolicyRe
   ) as PolicyRevision;
 }
 
-/** Validate and create a deterministic compiled spec projection. */
+/**
+ * Validate and create a deterministic compiled spec projection.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export function createSpecGraphRevision(input: CreateSpecGraphRevisionInput): SpecGraphRevision {
   const normalized = immutableJson(input, 'spec graph revision input');
   const record = requireRecord(normalized, 'spec graph revision input');
@@ -740,7 +796,13 @@ function validatePolicyProvenance(value: unknown): asserts value is PolicyProven
   requireNonEmpty(provenance.sourceFingerprint, 'policy provenance sourceFingerprint');
 }
 
-/** Normalize a strict calendar-valid RFC3339 timestamp to canonical UTC ISO form. */
+/**
+ * Normalize a strict calendar-valid RFC3339 timestamp to canonical UTC ISO form.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export function normalizeRfc3339Timestamp(value: unknown, label: string): string {
   requireNonEmpty(value, label);
   const match = RFC3339_WITH_TIMEZONE.exec(value);
@@ -1006,6 +1068,9 @@ function compareText(left: string, right: string): number {
 /**
  * Test whether a code node identity selector matches a canonical or provider node id.
  * Supports exact canonical match, provider-relative match, and trailing path match.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
  * @public
  */
 export function matchesNodeIdentity(

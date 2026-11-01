@@ -1,4 +1,14 @@
-/** Validated append-only retention for revision-pinned convention check results. */
+/**
+ * Validated append-only retention for revision-pinned convention check results.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @context Append-only SQLite audit and retention repository storing self-validating convention check envelopes, operator pins, and GC tombstones.
+ * @functionality Appends and re-verifies `RetainedConventionCheck` records against their `EffectiveAnalysisStamp`, manages operator retention pins, and executes tombstone-backed garbage collection.
+ * @sideEffect filesystem: Creates parent directories for the SQLite database file when opened in writable mode.
+ * @sideEffect database: Opens and mutates a `better-sqlite3` database in WAL mode for `convention_check_history`, pins, and tombstones.
+ * @packageDocumentation
+ */
 
 import { createHash } from 'node:crypto';
 import * as fs from 'node:fs';
@@ -20,11 +30,49 @@ import type { PolicyRevision } from '../spec-graph/contracts';
 import { createPolicyRevision } from '../spec-graph/identity';
 import type { NamingConventionConfig, TsdocConventionConfig } from '../types/config';
 
+/**
+ * Contract version identifier for `RetainedConventionCheck` envelopes.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export const CONVENTION_CHECK_HISTORY_CONTRACT_VERSION = '2.0' as const;
+
+/**
+ * SQLite schema version for `convention_check_history`.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export const CONVENTION_CHECK_HISTORY_SCHEMA_VERSION = 1 as const;
+
+/**
+ * Contract version identifier for `ConventionHistoryTombstone` records.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export const CONVENTION_CHECK_HISTORY_RETENTION_CONTRACT_VERSION = '1.0' as const;
+
+/**
+ * SQLite schema version for convention check history retention tombstones.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export const CONVENTION_CHECK_HISTORY_RETENTION_SCHEMA_VERSION = 1 as const;
 
+/**
+ * Canonical input revisions retained alongside a convention check history record.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface RetainedConventionCheckInputs {
   readonly evidence: EvidenceRevision;
   readonly enrichment: EnrichmentRevision;
@@ -32,9 +80,22 @@ export interface RetainedConventionCheckInputs {
   readonly ruleSet: RuleSetRevision;
 }
 
+/**
+ * Gate decision retained alongside a convention check history record.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type RetainedConventionGate = ConventionGateDecision;
 
-/** One self-validating append-only envelope; code/spec are retained by their own repositories. */
+/**
+ * One self-validating append-only envelope; code/spec are retained by their own repositories.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface RetainedConventionCheck {
   readonly contractVersion: typeof CONVENTION_CHECK_HISTORY_CONTRACT_VERSION;
   readonly historyId: string;
@@ -50,12 +111,25 @@ export interface RetainedConventionCheck {
   readonly gate: RetainedConventionGate;
 }
 
+/**
+ * Construction options for `ConventionCheckHistoryRepository`.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface ConventionCheckHistoryRepositoryOptions {
   readonly readOnly?: boolean;
   readonly clock?: () => Date;
 }
 
-/** Exact proof that a historical payload was garbage-collected. */
+/**
+ * Exact proof that a historical payload was garbage-collected.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface ConventionHistoryTombstone {
   readonly contractVersion: typeof CONVENTION_CHECK_HISTORY_RETENTION_CONTRACT_VERSION;
   readonly historyId: string;
@@ -66,7 +140,13 @@ export interface ConventionHistoryTombstone {
   readonly tombstonedAt: string;
 }
 
-/** Operator pin that protects one exact historical record from retention GC. */
+/**
+ * Operator pin that protects one exact historical record from retention GC.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface ConventionHistoryPin {
   readonly historyId: string;
   readonly workspaceId: string;
@@ -74,7 +154,13 @@ export interface ConventionHistoryPin {
   readonly pinnedAt: string;
 }
 
-/** Lightweight current-history projection used by retention operations. */
+/**
+ * Lightweight current-history projection used by retention operations.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface ConventionHistorySummary {
   readonly historyId: string;
   readonly workspaceId: string;
@@ -83,6 +169,13 @@ export interface ConventionHistorySummary {
   readonly pinned: boolean;
 }
 
+/**
+ * Outcome summary of a convention check history garbage-collection pass.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface ConventionHistoryRetentionResult {
   readonly before: string;
   readonly candidates: readonly ConventionHistorySummary[];
@@ -129,7 +222,13 @@ CREATE TABLE IF NOT EXISTS convention_check_history_tombstones (
 );
 `;
 
-/** Store only validated immutable envelopes; no latest pointer exists. */
+/**
+ * Store only validated immutable envelopes; no latest pointer exists.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export class ConventionCheckHistoryRepository {
   private readonly database: Database.Database;
   private readonly readOnly: boolean;

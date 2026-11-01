@@ -36,8 +36,11 @@ interface CallbackUsage {
 /**
  * Callback Analyzer
  *
+ * @doc [[CallbackAnalyzer]]
  * @public
  * @responsibility Detect and analyze callback relationships
+ * @context Traverses a `ts.Program` and `SymbolGraph` to infer higher-order callback, Promise chain, and `async`/`await` relationships
+ * @functionality Extracts parameter callbacks, `.then`/`.catch` handlers, and `await` call sites as `UnifiedRelationship` edges
  */
 export class CallbackAnalyzer {
   private graph: SymbolGraph;

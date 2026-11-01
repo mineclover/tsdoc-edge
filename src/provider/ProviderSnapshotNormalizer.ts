@@ -2,6 +2,10 @@
  * Canonical normalization for provider-owned raw snapshots.
  *
  * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @context Normalization boundary translating provider-local node, fact, and diagnostic payloads into namespaced canonical graph inputs and fact-topology projections.
+ * @functionality Validates raw `ProviderSnapshot` envelopes, allocates workspace-namespaced canonical symbol IDs, builds `FactOccurrence` and topology projections, and emits deterministic `ProjectGraphInput` payloads.
+ * @sideEffect filesystem: Resolves canonical workspace root and TypeScript configuration paths on disk via `canonicalFsPath`.
  * @packageDocumentation
  */
 
@@ -33,10 +37,31 @@ import {
   SEMANTIC_GRAPH_PROVIDER_CONTRACT_VERSION,
 } from './contracts';
 
+/**
+ * Adapter identifier recorded in provenance by `ProviderSnapshotNormalizer`.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export const PROVIDER_SNAPSHOT_NORMALIZER_ID = 'tsdoc-edge/provider-snapshot-normalizer' as const;
+
+/**
+ * Contract version identifier for `ProviderSnapshotNormalizer`.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export const PROVIDER_SNAPSHOT_NORMALIZER_VERSION = '1.0' as const;
 
-/** Transitional context required by the current CanonicalProjectGraph v1 envelope. */
+/**
+ * Transitional context required by the current CanonicalProjectGraph v1 envelope.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProviderSnapshotNormalizerOptions {
   readonly rootDir: string;
   /**
@@ -47,7 +72,13 @@ export interface ProviderSnapshotNormalizerOptions {
   readonly expectedWorkspaceId?: string;
 }
 
-/** Deterministic bridge from one provider snapshot into ProjectIndexer input. */
+/**
+ * Deterministic bridge from one provider snapshot into ProjectIndexer input.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface NormalizedProviderSnapshot {
   readonly snapshotId: string;
   readonly snapshotDigest: string;
@@ -84,6 +115,10 @@ interface EdgeAccumulator {
  *
  * The provider's local ids remain provenance only. ProjectIndexer remains the
  * final canonical graph assembler through the returned `projectInput`.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
  */
 export class ProviderSnapshotNormalizer {
   readonly rootDir: string;
@@ -248,7 +283,13 @@ export class ProviderSnapshotNormalizer {
   }
 }
 
-/** Allocate a canonical id without exposing the syntax to provider implementations. */
+/**
+ * Allocate a canonical id without exposing the syntax to provider implementations.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export function canonicalProviderNodeId(
   snapshot: Pick<ProviderSnapshot, 'workspaceId' | 'graphNamespace'>,
   node: ProviderNode,

@@ -1,7 +1,12 @@
 /**
  * Read projection over a transient code graph composed from one persisted
  * revision and one or more unsaved-file deltas.
+ *
  * @packageDocumentation
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @context Read-only transient overlay wrapper pairing a persisted `CodeGraphRevision` with sorted dirty-file `GraphDelta` snapshots
+ * @functionality Deterministic multi-delta composition and `CanonicalGraphLspView` query exposure over effective overlay graphs
  */
 
 import { CanonicalGraphLspView } from '../canonical-graph-view';
@@ -17,6 +22,10 @@ import {
  *
  * Consumers query `view`; persistence code must consume the original canonical
  * revision instead of `effectiveGraph`, whose fingerprint is overlay-scoped.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
  */
 export class EffectiveCodeGraphView {
   readonly viewKind = 'effective-code-graph-view' as const;

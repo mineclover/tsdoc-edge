@@ -1,6 +1,11 @@
 /**
  * JSON Output Builder
+ *
  * @packageDocumentation
+ * @doc [[Code Generation]]
+ * @context Schema-validated JSON output serializer implementing `OutputBuilder` for CLI commands
+ * @functionality Validates section names against `OutputSchema`, formats pretty or compact JSON strings, and prints to stdout
+ * @sideEffect process: Writes formatted JSON output to stdout when `print()` is invoked (write)
  */
 
 import type { OutputBuilder, OutputSchema, SectionData } from './types';
@@ -23,6 +28,10 @@ import type { OutputBuilder, OutputSchema, SectionData } from './types';
  *   .section('targets', [{ name: 'Bar', type: 'interface' }])
  *   .print();
  * ```
+ *
+ * @doc [[Code Generation]]
+ * @sideEffect process: Writes formatted JSON output to stdout when `print()` is invoked (write)
+ * @public
  */
 export class JsonBuilder implements OutputBuilder {
   private schema: OutputSchema;

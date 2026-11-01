@@ -259,6 +259,7 @@ fi
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:106
+- [[SystemStatusCommand]] → managed/commands/SystemStatusCommand.md:31
 - [[DatabaseManager]] → managed/core-components/DatabaseManager.md:291
 - [[CI/CD Integration]] → managed/features/CICDIntegration.md:247
 - [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:109
@@ -270,5 +271,5 @@ fi
 
 ### Implemented By
 
-- StatsCommand → src/commands/StatsCommand.ts:31
+- StatsCommand → src/commands/StatsCommand.ts:40
 

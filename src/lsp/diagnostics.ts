@@ -1,6 +1,11 @@
 /**
  * Canonical-to-LSP diagnostic boundary helpers.
+ *
  * @packageDocumentation
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @context Coordinate and severity boundary between one-based canonical diagnostics and zero-based LSP `Diagnostic` payloads
+ * @functionality Canonical diagnostic mapping and one-based-to-zero-based LSP range conversion
  */
 
 import {
@@ -9,7 +14,13 @@ import {
 } from 'vscode-languageserver/node';
 import type { CanonicalDiagnostic } from '../indexer';
 
-/** Diagnostic information exposed by {@link TsdocEdgeService}. */
+/**
+ * Diagnostic information exposed by {@link TsdocEdgeService}.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export interface DiagnosticInfo {
   /** One-based start line. */
   readonly line: number;
@@ -29,7 +40,13 @@ export interface DiagnosticInfo {
   readonly severity: DiagnosticSeverity;
 }
 
-/** Preserve canonical diagnostic coordinates and codes at the service boundary. */
+/**
+ * Preserve canonical diagnostic coordinates and codes at the service boundary.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export function mapCanonicalDiagnostic(diagnostic: CanonicalDiagnostic): DiagnosticInfo {
   const severityByCategory: Record<CanonicalDiagnostic['severity'], DiagnosticSeverity> = {
     error: DiagnosticSeverity.Error,
@@ -48,7 +65,13 @@ export function mapCanonicalDiagnostic(diagnostic: CanonicalDiagnostic): Diagnos
   };
 }
 
-/** Convert one-based service coordinates into a zero-based LSP diagnostic range. */
+/**
+ * Convert one-based service coordinates into a zero-based LSP diagnostic range.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export function toLanguageServerDiagnostic(
   diagnostic: DiagnosticInfo,
   source = 'tsdoc-edge'

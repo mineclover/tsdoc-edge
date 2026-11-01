@@ -1,7 +1,11 @@
 /**
  * Analyzer Registry
  * Provides unified access to all relationship analyzers
+ *
  * @packageDocumentation
+ * @doc [[Analyzer System]]
+ * @context Singleton registry adapting all structural, behavioral, semantic, constraint, and verification analyzers to `RelationshipAnalyzer`
+ * @functionality Metadata lookup, requirement validation against `AnalyzerContext`, single/category/all analyzer dispatch, and singleton retrieval
  */
 
 import type { UnifiedRelationship } from '../types/relationships';
@@ -211,6 +215,8 @@ const ANALYZER_METADATA: Record<AnalyzerType, AnalyzerMetadata> = {
 /**
  * Analyzer Registry
  * Provides unified access to all relationship analyzers
+ *
+ * @doc [[Analyzer System]]
  * @public
  */
 export class AnalyzerRegistry {
@@ -416,5 +422,7 @@ export class AnalyzerRegistry {
 /**
  * Get the singleton AnalyzerRegistry instance
  * @returns AnalyzerRegistry singleton
+ * @doc [[Analyzer System]]
+ * @public
  */
 export const getAnalyzerRegistry = () => AnalyzerRegistry.getInstance();

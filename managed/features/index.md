@@ -20,14 +20,14 @@ codeImplementation: not-applicable
 
 | Metric | Value |
 |--------|-------|
-| Commands | 67 |
-| Test Suites | 196 |
-| Tests | 2,885 |
-| Health Score | 74/100 (B) |
-| Symbols | 6,726 |
-| Relationships | 38,704 |
-| Relationship Types | 13/28 (46%) |
-| Build Time | 11s (optimized) |
+| Top-Level CLI Commands | 20 (10 Core + 7 Unified Groups + 3 Revision/Coverage) |
+| Test Suites | 237 |
+| Tests | 3,240+ |
+| Health Score | 90/100 (A) |
+| Symbols | 10,450+ |
+| Canonical `@ttsc/graph` | 8,424 internal (8,676 total) nodes / 21,236 edges |
+| `@ttsc/lint` | 25 error rules (0 findings) |
+| MCP Tools | 9 read-only tools |
 
 ## Quick Navigation
 
@@ -258,15 +258,29 @@ IDE 통합을 위한 Language Server Protocol 지원.
 
 ---
 
+### [[MCP Integration]]
+**Path**: `mcp-integration.md`
+
+Model Context Protocol `stdio` 서버를 통해 9종 읽기 전용 지식 그래프 도구(`tsdoc_get_work_context`, `tsdoc_get_design_context`, `tsdoc_get_impact`, `tsdoc_get_spec_bindings` 등)를 AI 에이전트에 제공.
+
+---
+
 ### MCP Testing Strategy
 **Path**: `mcp-testing-strategy.md` | **Link**: [[MCP Testing Strategy]]
 
-Model Context Protocol 도구 테스트 전략.
+Model Context Protocol 도구 테스트 전략 (`basic-test.js` 9/9, `detailed-test.js` 13/13).
 
 **주요 기능**:
 - MCP 도구 테스트 프레임워크
 - 통합 테스트 가이드
 - 도구별 테스트 시나리오
+
+---
+
+### [[Codebase Health Report]]
+**Path**: `codebase-health-report.md` (historical snapshot)
+
+초기 코드베이스 건강도 평가 기록. 현재 메트릭 계약은 [[Coverage Metrics Contract]]가 정본으로 소유합니다.
 
 ---
 

@@ -1,7 +1,9 @@
 /**
  * Co-Requirement Analyzer
+ *
  * @packageDocumentation
  * @responsibility Analyze co-requirement relationships
+ * @sideEffect filesystem: Recursively scans directories and reads TypeScript source files from disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -28,6 +30,7 @@ interface CoRequirementSite {
  * @doc [[CoRequirementAnalyzer]]
  * @public
  * @responsibility Detect co-requirement dependencies
+ * @sideEffect filesystem: Recursively scans directories and reads TypeScript source files from disk (read)
  *
  * Pattern: A requires B to be present
  * - A cannot function without B

@@ -88,5 +88,5 @@ Returns:
 
 ### Implemented By
 
-- LinkValidator → src/linking/LinkValidator.ts:1
+- LinkValidator → src/linking/LinkValidator.ts:34
 

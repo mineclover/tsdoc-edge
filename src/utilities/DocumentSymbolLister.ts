@@ -1,11 +1,16 @@
 /**
  * Document Symbol Lister
+ *
  * @packageDocumentation
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
  * @responsibility List all explicitly defined document symbols from managed/ directory
  *
  * @problem Need to see only intentionally managed concepts, not auto-generated code symbols
- * @solves Scans managed/ for H1 [[Symbol]] definitions and extracts summaries
+ * @solves Scans managed/ for H1 `[[Symbol]]` definitions and extracts summaries
  * @context SSOT principle: Each document symbol represents a core project concept
+ * @functionality Recursive Markdown discovery, H1 `[[Symbol]]` extraction, summary parsing, and category grouping
+ * @sideEffect filesystem: Recursively scans and reads Markdown files in the managed documentation directory (read)
  */
 
 import * as fs from 'node:fs';
@@ -14,6 +19,10 @@ import * as path from 'node:path';
 /**
  * Document Symbol metadata
  * Represents an explicitly defined project concept
+ *
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
+ * @public
  */
 export interface DocumentSymbol {
   /** Symbol name (without brackets) */
@@ -40,6 +49,9 @@ export interface DocumentSymbol {
  *
  * Scans managed documentation directory for explicit symbol definitions.
  *
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
+ * @sideEffect filesystem: Recursively scans and reads Markdown files in the managed documentation directory (read)
  * @public
  * @example
  * ```typescript

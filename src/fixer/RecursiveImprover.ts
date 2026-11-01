@@ -1,7 +1,13 @@
 /**
  * Recursive documentation improver
+ *
  * @packageDocumentation
+ * @doc [[FixCommand]]
+ * @doc [[Dead Code Detection]]
  * @responsibility Recursively improve documentation quality across the codebase
+ * @context Iterative health-check and auto-fix loop coupling `CodeHealthChecker` with `DocumentationFixer`
+ * @functionality Expands configured entry points, evaluates documentation quality scores per iteration, and applies fixes until `targetScore` or `maxIterations` is reached
+ * @sideEffect filesystem: Traverses workspace directories and rewrites TypeScript source files via `DocumentationFixer` (read/write)
  */
 
 import * as fs from 'node:fs';
@@ -13,6 +19,10 @@ import { DocumentationFixer, type FixOptions, type FixResult } from './Documenta
 
 /**
  * Options for recursive improvement
+ *
+ * @doc [[FixCommand]]
+ * @doc [[Dead Code Detection]]
+ * @public
  */
 export interface RecursiveImproveOptions {
   /** Target quality score to reach */
@@ -31,6 +41,10 @@ export interface RecursiveImproveOptions {
 
 /**
  * Result of recursive improvement
+ *
+ * @doc [[FixCommand]]
+ * @doc [[Dead Code Detection]]
+ * @public
  */
 export interface RecursiveImproveResult {
   /** Total iterations performed */
@@ -56,8 +70,13 @@ export interface RecursiveImproveResult {
 /**
  * Recursively improves documentation quality
  *
+ * @doc [[FixCommand]]
+ * @doc [[Dead Code Detection]]
  * @public
  * @responsibility Iteratively analyze and improve code documentation until target is reached
+ * @context Coordinates `CodeHealthChecker`, `DocumentationFixer`, and `ConfigManager` across multi-pass improvement runs
+ * @functionality Evaluates codebase health, applies targeted documentation fixes per pass, and reports score progression
+ * @sideEffect filesystem: Traverses workspace directories and rewrites TypeScript source files via `DocumentationFixer` (read/write)
  */
 export class RecursiveImprover {
   private checker: CodeHealthChecker;

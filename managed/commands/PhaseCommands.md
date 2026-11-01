@@ -28,9 +28,9 @@ Phase commands are organized by development phases, grouping related functionali
 Analyzes type dependencies and interface relationships.
 
 **Commands**:
-- `analyze-types` - Type dependency analysis
-- `type-chain` - Type inheritance chains
-- `detect-circular-types` - Circular type detection
+- `relationship analyze --type=types` - Type dependency analysis
+- `relationship type-chain` - Type inheritance chains
+- `relationship cycles` - Circular type detection
 
 **Related**: [[Type Dependency]], [[TypeDependencyAnalyzer]]
 
@@ -41,7 +41,7 @@ Analyzes type dependencies and interface relationships.
 Tracks test relationships and integration coverage.
 
 **Commands**:
-- `test-relationships` - Test-to-code mapping
+- `relationship analyze --type=tests` - Test-to-code mapping
 - `sync-coverage` - Coverage data synchronization
 - `coverage-report` - Coverage reporting
 
@@ -66,8 +66,8 @@ Analyzes code quality and maintainability.
 Tracks data flow and execution paths.
 
 **Commands**:
-- `analyze-calls` - Call graph analysis
-- `analyze-chains` - Dependency chains
+- `relationship analyze --type=calls` - Call graph analysis
+- `relationship analyze --type=chains` - Dependency chains
 
 **Related**: [[CallGraphAnalyzer]], [[Call Relationships]]
 
@@ -78,8 +78,8 @@ Tracks data flow and execution paths.
 Validates documentation completeness and SSOT compliance.
 
 **Commands**:
-- `check-links` - Link validation
-- `validate-docs` - Document validation
+- `docs check-links` - Link validation
+- `validate docs` - Document validation
 
 **Related**: [[SSOT]], [[Analyzers & Extractors]]
 
@@ -109,7 +109,7 @@ System-level management and validation.
 
 - [[Commands Index]] → managed/COMMANDS.md:184
 - [[TSDoc Edge Documentation]] → managed/README.md:108
-- [[QueryCommands]] → managed/commands/QueryCommands.md:138
+- [[QueryCommands]] → managed/commands/QueryCommands.md:136
 
 ### Implemented By
 

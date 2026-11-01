@@ -6,6 +6,10 @@
  * @problem Developers need all context before modifying code
  * @solves Uses relationship graph for comprehensive, instant context
  * @context SSOT principle: Minimal queries, maximum information
+ * @functionality Aggregates exported symbols, canonical `@ttsc/graph` edges, related docs, dependencies, dependents, and test coverage into human, XML, or `--llm` context views
+ * @sideEffect console: Writes formatted human, XML, or LLM work-context output to stdout
+ * @sideEffect database: Reads symbol, relationship, and canonical alias data from SQLite repositories (read)
+ * @sideEffect filesystem: Reads source files and writes optional `--output` context files on disk
  *
  * @doc [[WorkContextCommand]]
  */
@@ -37,7 +41,9 @@ interface CanonicalWorkContext {
  *
  * Shows comprehensive context for a file using relationship graph analysis.
  *
+ * @doc [[WorkContextCommand]]
  * @public
+ * @sideEffect console: Writes formatted work context to stdout; reads SQLite repositories and writes optional `--output` file
  * @example
  * ```bash
  * # Get complete context for a file

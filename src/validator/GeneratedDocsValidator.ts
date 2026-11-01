@@ -1,7 +1,12 @@
 /**
  * Generated Documentation Validator
+ *
  * @packageDocumentation
+ * @doc [[Validator System]]
  * @responsibility Validate generated markdown documentation against TSDoc sources
+ * @context Generated Markdown structure, metadata, and section completeness verification
+ * @functionality Validates H1 headers, required H2 sections, metadata fields, and directory-wide Markdown completeness
+ * @sideEffect filesystem: Reads generated Markdown files and directories from disk during validation (read)
  */
 
 import * as fs from 'node:fs';
@@ -9,6 +14,8 @@ import * as path from 'node:path';
 
 /**
  * Validation result for a single document
+ * @doc [[Validator System]]
+ * @public
  */
 export interface DocValidationResult {
   /** Document file path */
@@ -40,9 +47,11 @@ export interface DocValidationResult {
  * Validator for generated markdown documentation
  *
  * @doc [[GeneratedDocsValidator]]
+ * @doc [[Validator System]]
  * @public
  * @responsibility Validate markdown docs generated from TSDoc comments
  * @contract Check structure, required sections, and consistency
+ * @sideEffect filesystem: Reads generated Markdown files and directories from disk during validation (read)
  *
  * @problem Need to ensure generated docs maintain quality and completeness
  * @solves Automated validation of markdown structure and content
@@ -80,6 +89,8 @@ export class GeneratedDocsValidator {
    *
    * @param filePath - Path to markdown file
    * @returns Validation result
+   * @sideEffect filesystem: Reads Markdown file from disk (read)
+   * @public
    */
   validate(filePath: string): DocValidationResult {
     const result: DocValidationResult = {
@@ -166,6 +177,8 @@ export class GeneratedDocsValidator {
    *
    * @param dirPath - Directory containing markdown files
    * @returns Array of validation results
+   * @sideEffect filesystem: Lists directory entries and reads Markdown files from disk (read)
+   * @public
    */
   validateDirectory(dirPath: string): DocValidationResult[] {
     const results: DocValidationResult[] = [];

@@ -21,5 +21,5 @@ Extracts capability extension relationships declared via `@enhances` TSDoc tags.
 
 ### Implemented By
 
-- EnhancementAnalyzer → src/analyzer/EnhancementAnalyzer.ts:59
+- EnhancementAnalyzer → src/analyzer/EnhancementAnalyzer.ts:62
 

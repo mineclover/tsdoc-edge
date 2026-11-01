@@ -1,6 +1,13 @@
 /**
  * Relationship Validation Command
+ *
  * @packageDocumentation
+ * @doc [[RelationshipValidateCommand]]
+ * @doc [[RelationshipCommands]]
+ * @context Unified relationship integrity validation via `tsdoc-edge relationship validate`
+ * @functionality Checks `.tsdoc.db` unified relationships for dangling endpoints, duplicates, low-confidence edges, and metadata inconsistencies
+ * @sideEffect console: Writes relationship integrity findings or `--json` reports to stdout
+ * @sideEffect database: Reads symbol and unified relationship tables from `DatabaseManager` (read)
  */
 
 import { DatabaseManager } from '../storage/DatabaseManager';
@@ -18,6 +25,7 @@ interface ValidationIssue {
 /**
  * Command for validating relationship data integrity
  * @doc [[RelationshipValidateCommand]]
+ * @sideEffect console: Writes relationship validation diagnostics to stdout; reads `.tsdoc.db`
  * @public
  */
 export class RelationshipValidateCommand extends BaseCommand {

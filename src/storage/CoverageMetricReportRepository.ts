@@ -1,8 +1,14 @@
 /**
  * Immutable persistence for source-identified coverage metric reports.
  *
- * @packageDocumentation
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
  * @doc [[Coverage Metrics Contract]]
+ * @context Pointer-free SQLite persistence plane storing immutable source-identified coverage metric reports per workspace.
+ * @functionality Validates report and coverage source identities, persists immutable aggregate and file-level coverage metric reports, reads pinned reports, and lists workspace report pins.
+ * @sideEffect filesystem: Creates parent directories for the SQLite database file when opened in writable mode.
+ * @sideEffect database: Opens and mutates a `better-sqlite3` database in WAL mode for `coverage_metric_reports`.
+ * @packageDocumentation
  */
 
 import * as fs from 'node:fs';
@@ -15,15 +21,37 @@ import {
   deriveCoverageSourceIdentity,
 } from '../metrics/CoverageMetricContract';
 
+/**
+ * Current SQLite schema version for `CoverageMetricReportRepository`.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @doc [[Coverage Metrics Contract]]
+ * @public
+ */
 export const COVERAGE_METRIC_REPORT_REPOSITORY_SCHEMA_VERSION = 1 as const;
 
-/** Complete lookup identity for one persisted coverage report. */
+/**
+ * Complete lookup identity for one persisted coverage report.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @doc [[Coverage Metrics Contract]]
+ * @public
+ */
 export interface CoverageMetricReportPin {
   readonly workspaceId: string;
   readonly reportId: string;
 }
 
-/** Immutable coverage report payload stored by the repository. */
+/**
+ * Immutable coverage report payload stored by the repository.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @doc [[Coverage Metrics Contract]]
+ * @public
+ */
 export interface CoverageMetricReportRevision {
   readonly reportId: string;
   readonly workspaceId: string;
@@ -32,6 +60,14 @@ export interface CoverageMetricReportRevision {
   readonly fileMetrics: readonly CoverageMetricFileResult[];
 }
 
+/**
+ * Construction options for `CoverageMetricReportRepository`.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @doc [[Coverage Metrics Contract]]
+ * @public
+ */
 export interface CoverageMetricReportRepositoryOptions {
   readonly clock?: () => Date;
   readonly readOnly?: boolean;
@@ -64,7 +100,14 @@ CREATE INDEX IF NOT EXISTS idx_coverage_metric_reports_workspace
   ON coverage_metric_reports(workspace_id, stored_at);
 `;
 
-/** Stores source-identified reports without an active pointer or replacement. */
+/**
+ * Stores source-identified reports without an active pointer or replacement.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @doc [[Coverage Metrics Contract]]
+ * @public
+ */
 export class CoverageMetricReportRepository {
   private readonly database: Database.Database;
   private readonly clock: () => Date;

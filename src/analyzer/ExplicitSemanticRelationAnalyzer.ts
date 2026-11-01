@@ -7,6 +7,7 @@
  * @precondition TypeScript files with `@relatedTo` TSDoc tags
  * @postcondition explicit-semantic-relation relationships
  * @algorithm Parse JSDoc tags, extract related symbols
+ * @sideEffect filesystem: Recursively traverses workspace directories and reads TypeScript source files from disk (read)
  * @public
  *
  * @example
@@ -48,6 +49,7 @@ interface ExplicitRelationSite {
  * @doc [[ExplicitSemanticRelationAnalyzer]]
  * @public
  * @responsibility Parse `@relatedTo` tags and create semantic relationships
+ * @sideEffect filesystem: Recursively traverses workspace directories and reads TypeScript source files from disk (read)
  *
  * Algorithm:
  * 1. Traverse TypeScript source files

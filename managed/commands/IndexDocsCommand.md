@@ -17,7 +17,7 @@ Markdown 문서의 `[[Symbol]]` notation을 파싱하여 문서 심볼 레지스
 ## Workflow
 
 ```bash
-tsdoc-edge index-docs managed
+tsdoc-edge docs index managed
 ```
 
 **Process**:
@@ -87,6 +87,7 @@ Related: [[Concept#Section]]
 - [[CLI Commands]] → managed/CLI-COMMANDS.md:44
 - [[TSDoc Edge Documentation]] → managed/README.md:111
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:268
+- [[SyncCommand]] → managed/commands/SyncCommand.md:25
 - [[Symbol Reference System]] → managed/concepts/symbol-reference-system.md:290
 - [[DocumentSymbolParser]] → managed/features/DocumentSymbolParser.md:183
 - [[DocumentSymbolRegistry]] → managed/features/DocumentSymbolRegistry.md:290
@@ -100,5 +101,5 @@ Related: [[Concept#Section]]
 
 ### Implemented By
 
-- IndexDocsCommand → src/commands/IndexDocsCommand.ts:37
+- IndexDocsCommand → src/commands/IndexDocsCommand.ts:46
 

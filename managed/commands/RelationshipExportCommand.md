@@ -21,5 +21,5 @@ Exports symbol relationship subgraphs to JSON, CSV, DOT, and GraphML interchange
 
 ### Implemented By
 
-- RelationshipExportCommand → src/commands/RelationshipExportCommand.ts:1
+- RelationshipExportCommand → src/commands/RelationshipExportCommand.ts:48
 

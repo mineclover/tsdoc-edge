@@ -1,5 +1,11 @@
 /**
  * Canonical ↔ legacy symbol alias contract.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @context Bidirectional identity bridge mapping canonical `@ttsc/graph` symbol IDs to legacy build symbol IDs without heuristic guessing.
+ * @functionality Projects canonical nodes onto legacy symbol identities, verifies member declarations against `ASTSymbolExtractor`, materializes collision-safe alias records, and provides `InMemoryAliasResolver`.
+ * @sideEffect filesystem: Checks source file existence and reads TypeScript files from disk to verify legacy AST declaration peers for class members.
  * @packageDocumentation
  */
 
@@ -9,9 +15,22 @@ import { ASTSymbolExtractor } from '../analyzer/ASTSymbolExtractor';
 import type { CanonicalGraphNode, CanonicalProjectGraph, ProjectGraphEvidence } from './contracts';
 import { generateLegacyId } from './legacy-id';
 
+/**
+ * Match strategy recorded when linking a canonical symbol ID with a legacy symbol ID.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export type AliasMatchStrategy = 'exact' | 'position' | 'legacy-projection';
 
-/** Explicit alias between canonical and legacy symbol ids. */
+/**
+ * Explicit alias between canonical and legacy symbol ids.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface SymbolAliasRecord {
   readonly canonicalId: string;
   readonly legacyId: string;
@@ -21,7 +40,13 @@ export interface SymbolAliasRecord {
   readonly evidence?: ProjectGraphEvidence;
 }
 
-/** Legacy Build identity that can be projected without guessing. */
+/**
+ * Legacy Build identity that can be projected without guessing.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface LegacySymbolIdentity {
   readonly symbolName: string;
   readonly symbolType: string;
@@ -36,6 +61,10 @@ export interface LegacySymbolIdentity {
  * signatures, constructors, test-parser symbols, external nodes, and top-level
  * variables cannot be projected without source/runtime knowledge and are
  * deliberately omitted rather than guessed.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
  */
 export function buildLegacyIdentityMap(
   graph: CanonicalProjectGraph
@@ -118,7 +147,13 @@ export function buildLegacyIdentityMap(
   return identities;
 }
 
-/** Build deterministic, collision-safe alias rows for one canonical graph revision. */
+/**
+ * Build deterministic, collision-safe alias rows for one canonical graph revision.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export function materializeAliases(graph: CanonicalProjectGraph): readonly SymbolAliasRecord[] {
   const identities = buildLegacyIdentityMap(graph);
   const candidates: Array<{
@@ -184,7 +219,13 @@ export function materializeAliases(graph: CanonicalProjectGraph): readonly Symbo
   );
 }
 
-/** In-memory alias resolver for one revision. */
+/**
+ * In-memory alias resolver for one revision.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export class InMemoryAliasResolver {
   private readonly legacyByCanonical = new Map<string, string>();
   private readonly canonicalByLegacy = new Map<string, string>();

@@ -32,7 +32,7 @@ TSDoc Edge tracks **17 relationship types** across 7 dimensions. This guide show
 tsdoc-edge deps BuildCommand
 
 # Find who uses a symbol
-tsdoc-edge who-uses DatabaseManager
+tsdoc-edge symbol who-uses DatabaseManager
 
 # Find orphaned files (unreferenced)
 tsdoc-edge orphans
@@ -81,7 +81,7 @@ sqlite3 .tsdoc/symbols.db "
 **How to analyze**:
 ```bash
 # Find all implementations of interface
-tsdoc-edge who-uses --type=interface-impl ICommand
+tsdoc-edge symbol who-uses --type=interface-impl ICommand
 ```
 
 **Use Cases**:
@@ -100,7 +100,7 @@ tsdoc-edge who-uses --type=interface-impl ICommand
 **How to analyze**:
 ```bash
 # Analyze I/O dependencies
-tsdoc-edge analyze-io
+tsdoc-edge relationship analyze --type=io
 
 # Find data flow for a type
 tsdoc-edge deps --type=io ExtractionResult
@@ -131,7 +131,7 @@ tsdoc-edge deps --type=io ExtractionResult
 **How to analyze**:
 ```bash
 # Detect pipelines
-tsdoc-edge analyze-pipeline
+tsdoc-edge relationship analyze --type=chains
 
 # Find pipeline chains
 tsdoc-edge deps --type=pipeline BuildCommand
@@ -156,7 +156,7 @@ tsdoc-edge deps --type=pipeline BuildCommand
 **How to analyze**:
 ```bash
 # Analyze all calls
-tsdoc-edge analyze-calls
+tsdoc-edge relationship analyze --type=calls
 
 # Find call chains
 tsdoc-edge deps --type=calls BuildCommand
@@ -191,7 +191,7 @@ tsdoc-edge orphans --type=function
 **How to analyze**:
 ```bash
 # Analyze test coverage
-tsdoc-edge test-relationships
+tsdoc-edge relationship analyze --type=tests
 
 # Find untested code
 tsdoc-edge untested
@@ -217,7 +217,7 @@ tsdoc-edge health src/commands
 **How to analyze**:
 ```bash
 # Analyze type dependencies
-tsdoc-edge analyze-types
+tsdoc-edge relationship analyze --type=types
 
 # Find type usage
 tsdoc-edge deps --type=type-dependency Symbol
@@ -256,7 +256,7 @@ tsdoc-edge deps --type=generic-constraint
 **How to analyze**:
 ```bash
 # Detect circular dependencies
-tsdoc-edge detect-circular-types
+tsdoc-edge relationship cycles
 
 # Check specific module
 tsdoc-edge deps --detect-cycles src/commands
@@ -343,7 +343,7 @@ LIMIT 10;
 tsdoc-edge deps SymbolGraph
 
 # 2. Find reverse dependencies
-tsdoc-edge who-uses SymbolGraph
+tsdoc-edge symbol who-uses SymbolGraph
 
 # 3. Find call relationships
 tsdoc-edge deps --type=calls SymbolGraph
@@ -362,16 +362,16 @@ tsdoc-edge health src/graph/SymbolGraph.ts
 
 ```bash
 # 1. Check circular dependencies
-tsdoc-edge detect-circular-types
+tsdoc-edge relationship cycles
 
 # 2. Find all usages
-tsdoc-edge who-uses OldSymbol
+tsdoc-edge symbol who-uses OldSymbol
 
 # 3. Verify test coverage
-tsdoc-edge test-relationships OldSymbol
+tsdoc-edge relationship analyze --type=tests
 
 # 4. Check documentation
-tsdoc-edge validate-docs managed
+tsdoc-edge validate docs managed
 ```
 
 **Result**: Safe refactoring checklist
@@ -387,7 +387,7 @@ tsdoc-edge validate-docs managed
 tsdoc-edge deps --type=code-dependency commands
 
 # 2. Verify no circular deps
-tsdoc-edge detect-circular-types
+tsdoc-edge relationship cycles
 
 # 3. Check orphaned code
 tsdoc-edge orphans
@@ -452,25 +452,25 @@ See: [[Analyzers & Extractors]] (`managed/analyzers/index.md`)
 ```bash
 # After major changes
 tsdoc-edge build src
-tsdoc-edge analyze-calls
-tsdoc-edge analyze-io
-tsdoc-edge detect-circular-types
+tsdoc-edge relationship analyze --type=calls
+tsdoc-edge relationship analyze --type=io
+tsdoc-edge relationship cycles
 ```
 
 ### 2. Before Refactoring
 ```bash
 # Understand dependencies first
 tsdoc-edge deps TargetSymbol
-tsdoc-edge who-uses TargetSymbol
-tsdoc-edge test-relationships TargetSymbol
+tsdoc-edge symbol who-uses TargetSymbol
+tsdoc-edge relationship analyze --type=tests
 ```
 
 ### 3. Quality Gates
 ```bash
 # CI/CD integration
 tsdoc-edge health src --min-score 70
-tsdoc-edge detect-circular-types --fail-on-cycles
-tsdoc-edge validate-docs managed
+tsdoc-edge relationship cycles --fail-on-cycles
+tsdoc-edge validate docs managed
 ```
 
 ---
@@ -511,7 +511,7 @@ tsdoc-edge validate-docs managed
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:147
-- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:256
+- [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:255
 - [[RelationshipCommands]] → managed/commands/RelationshipCommands.md:168
 - [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:1002
 - [[Guides & Tutorials]] → managed/guides/index.md:27

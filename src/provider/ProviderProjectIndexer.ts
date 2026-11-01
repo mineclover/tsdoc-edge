@@ -1,4 +1,13 @@
-/** Application boundary composing a raw provider with the canonical ProjectIndexer. */
+/**
+ * Application boundary composing a raw provider with the canonical ProjectIndexer.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @context Application orchestration boundary ensuring every raw `SemanticGraphProvider` snapshot passes through `ProviderSnapshotNormalizer` and `ProjectIndexer`.
+ * @functionality Captures immutable whole-project provider snapshots, verifies workspace and provider identity consistency, normalizes provider facts, and assembles canonical project graph revisions.
+ * @sideEffect filesystem: Resolves canonical workspace root paths on disk via `canonicalFsPath`.
+ * @packageDocumentation
+ */
 
 import { canonicalFsPath } from '../indexer/canonical-path';
 import type {
@@ -14,7 +23,13 @@ import type {
   ProviderSnapshotNormalizer,
 } from './ProviderSnapshotNormalizer';
 
-/** One pinned raw snapshot and its canonical compatibility projection. */
+/**
+ * One pinned raw snapshot and its canonical compatibility projection.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface ProviderProjectIndexResult extends ProjectIndexResult {
   readonly providerSnapshot: ProviderSnapshot;
   readonly normalizedSnapshot: NormalizedProviderSnapshot;
@@ -25,6 +40,10 @@ export interface ProviderProjectIndexResult extends ProjectIndexResult {
  *
  * Provider implementations cannot bypass `ProviderSnapshotNormalizer` or hand
  * canonical ids directly to persistence through this boundary.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
  */
 export class ProviderProjectIndexer {
   constructor(

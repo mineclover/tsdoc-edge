@@ -21,6 +21,6 @@ Parses Istanbul/NYC `coverage-final.json` reports into normalized line, branch, 
 
 ### Implemented By
 
-- CoverageParser → src/analyzer/CoverageParser.ts:1
-- FileCoverage → src/analyzer/CoverageParser.ts:56
+- CoverageParser → src/analyzer/CoverageParser.ts:172
+- FileCoverage → src/analyzer/CoverageParser.ts:57
 

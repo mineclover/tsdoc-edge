@@ -128,20 +128,36 @@ status: draft
       expect(Array.isArray(result)).toBe(true);
     });
 
-    it('should count code connections', () => {
+    it('should count code connections from Source metadata and checkpoint symbols', () => {
       fs.writeFileSync(
-        path.join(tempDir, 'connected.md'),
-        `# Connected Doc
+        path.join(tempDir, 'connected-system.md'),
+        `---
+status: active
+source: src/system.ts
+---
 
-**Source**: \`src/file.ts\`
+# [[Connected System]]
+
+**Source**: \`src/system.ts\`
 
 Uses [[sym-symbol-1]] and [[sym-symbol-2]].
+`
+      );
+      fs.writeFileSync(
+        path.join(tempDir, 'index.md'),
+        `---
+status: active
+---
+
+# [[Index]]
+
+See [[Connected System]].
 `
       );
 
       const result = detector.detect(tempDir);
 
-      expect(Array.isArray(result)).toBe(true);
+      expect(result).toEqual([]);
     });
   });
 });

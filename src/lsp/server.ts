@@ -5,6 +5,7 @@
  * enabling real-time code analysis in IDEs like VS Code, Vim, and Emacs.
  *
  * @packageDocumentation
+ * @doc [[LspAndCoverageSurfaceSpecification]]
  * @doc [[LSP Integration]]
  *
  * @responsibility Provide LSP integration for TSDoc Edge features
@@ -12,6 +13,8 @@
  * @problem IDE users can't access TSDoc Edge insights in real-time
  * @solves Real-time impact analysis, hover info, and diagnostics via LSP
  * @context Integrates with VS Code, Vim, Emacs, and other LSP clients
+ * @functionality Stdio LSP connection lifecycle, hover, CodeLens, CodeActions, document links, definitions, workspace symbols, and diagnostics publishing
+ * @sideEffect process: Exchanges LSP JSON-RPC messages over stdio transport and manages watched-file lifecycle (io)
  *
  * ## Supported LSP Features
  *

@@ -265,7 +265,7 @@ Extracts [[Code Dependency]] relationships
 
 ### Check References
 ```bash
-tsdoc-edge validate-symbol-refs managed
+tsdoc-edge validate refs managed
 ```
 
 ### List All Primaries
@@ -275,12 +275,12 @@ cat .tsdoc/doc-symbols.json | jq -r '.symbols[]'
 
 ### Find Orphaned Auxiliaries
 ```bash
-tsdoc-edge validate-docs managed 2>&1 | grep "orphaned_auxiliary"
+tsdoc-edge validate docs managed 2>&1 | grep "orphaned_auxiliary"
 ```
 
 ### Find Missing Primaries
 ```bash
-tsdoc-edge validate-docs managed 2>&1 | grep "missing_primary"
+tsdoc-edge validate docs managed 2>&1 | grep "missing_primary"
 ```
 
 ## Related
@@ -306,4 +306,19 @@ tsdoc-edge validate-docs managed 2>&1 | grep "missing_primary"
 ### Implemented By
 
 - Symbol Reference System → src/commands/BuildCommand.ts:1
+- DocumentSymbol → src/utilities/DocumentSymbolLister.ts:27
+- DocumentSymbolLister → src/utilities/DocumentSymbolLister.ts:63
+- ReferenceType → src/utilities/FileReferenceUpdater.ts:24
+- FileReference → src/utilities/FileReferenceUpdater.ts:33
+- UpdateOptions → src/utilities/FileReferenceUpdater.ts:57
+- UpdateResult → src/utilities/FileReferenceUpdater.ts:79
+- FileReferenceUpdater → src/utilities/FileReferenceUpdater.ts:100
+- ReferenceType → src/utilities/ReferenceUpdater.ts:22
+- FileReference → src/utilities/ReferenceUpdater.ts:31
+- ReferenceUpdater → src/utilities/ReferenceUpdater.ts:57
+- SymbolReferenceType → src/utilities/SymbolReferenceUpdater.ts:27
+- SymbolReference → src/utilities/SymbolReferenceUpdater.ts:36
+- SymbolUpdateOptions → src/utilities/SymbolReferenceUpdater.ts:64
+- SymbolUpdateResult → src/utilities/SymbolReferenceUpdater.ts:86
+- SymbolReferenceUpdater → src/utilities/SymbolReferenceUpdater.ts:117
 

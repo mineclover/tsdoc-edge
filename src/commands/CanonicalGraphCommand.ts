@@ -1,4 +1,14 @@
-/** Operator access to saved ttsc canonical graph revisions and revision retention. */
+/**
+ * Operator access to saved ttsc canonical graph revisions and revision retention.
+ *
+ * @packageDocumentation
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @context Operator CLI surface for inspecting and pruning saved `@ttsc/graph` revisions in `.tsdoc/canonical-graph.db`
+ * @functionality Supports `status`, `list`, `read`, and `prune` subcommands with `--keep`, `--vacuum`, and `--json` options
+ * @sideEffect console: Writes formatted revision summaries or JSON output to stdout and operator errors to stderr
+ * @sideEffect database: Reads or prunes canonical graph revisions in `GraphRepository` SQLite storage
+ */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -13,6 +23,8 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 /**
  * Inspect active and retained canonical graph revisions or prune old historical revisions.
  *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[GraphAndPersistencePlaneSpecification]]
  * @public
  */
 export class CanonicalGraphCommand extends BaseCommand {

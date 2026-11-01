@@ -8,12 +8,22 @@
  * - Framework-specific entry points
  *
  * @packageDocumentation
+ * @doc [[Analyzer System]]
+ * @context Discovers executable CLI scripts, bootstrap functions, HTTP server listeners, and package entry points across a workspace
+ * @functionality Shebang inspection, `package.json` `bin`/`main` scanning, AST bootstrap function matching, and server `.listen` detection
+ * @sideEffect filesystem: Reads source file headers for CLI shebangs and `package.json` manifests from disk (read)
  */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';
 
+/**
+ * Categories of executable or bootstrap entry points discovered in a project.
+ *
+ * @doc [[Analyzer System]]
+ * @public
+ */
 export enum EntryPointType {
   CLI = 'cli',
   MAIN_FUNCTION = 'main-function',
@@ -24,6 +34,12 @@ export enum EntryPointType {
   SCRIPT = 'script',
 }
 
+/**
+ * Metadata describing one detected application or CLI entry point.
+ *
+ * @doc [[Analyzer System]]
+ * @public
+ */
 export interface EntryPoint {
   id: string;
   type: EntryPointType;
@@ -37,6 +53,12 @@ export interface EntryPoint {
   dependencies: string[];
 }
 
+/**
+ * Configuration flags controlling which entry-point heuristics are active.
+ *
+ * @doc [[Analyzer System]]
+ * @public
+ */
 export interface EntryPointDetectionConfig {
   detectCLI: boolean;
   detectMainFunctions: boolean;
@@ -53,6 +75,12 @@ const DEFAULT_CONFIG: EntryPointDetectionConfig = {
 
 /**
  * Entry point detector
+ *
+ * @doc [[Analyzer System]]
+ * @context Combines `ts.Program` AST traversal with filesystem shebang and `package.json` checks to locate project entry points
+ * @functionality Detects CLI shebangs, bootstrap/main functions, server `.listen` calls, and `package.json` entry files
+ * @sideEffect filesystem: Reads source file headers for CLI shebangs and `package.json` manifests from disk (read)
+ * @public
  */
 export class EntryPointDetector {
   private program: ts.Program;

@@ -1,6 +1,12 @@
 /**
  * Relationship Check Command - Quick Safety Check
+ *
  * @packageDocumentation
+ * @doc [[RelationshipCheckCommand]]
+ * @doc [[RelationshipCommands]]
+ * @context Composite pre-modification symbol safety check via `tsdoc-edge relationship check`
+ * @functionality Combines `RelationshipQueryCommand`, `RelationshipImpactCommand`, and `RelationshipMetricsCommand` for a target symbol
+ * @sideEffect console: Writes composite safety diagnostics and subcommand reports to stdout
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
@@ -21,6 +27,7 @@ interface RelationshipCheckOptions {
  * Quick command to check if it's safe to modify a symbol
  * Combines impact, metrics, and query for a comprehensive safety check
  * @doc [[RelationshipCheckCommand]]
+ * @sideEffect console: Writes composite safety reports to stdout via delegated relationship commands
  * @public
  */
 export class RelationshipCheckCommand extends BaseCommand {

@@ -34,6 +34,7 @@ interface TypeReference {
 /**
  * Type Dependency Analyzer
  *
+ * @doc [[TypeDependencyAnalyzer]]
  * @public
  * @responsibility Detect and analyze type-level dependencies
  */

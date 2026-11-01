@@ -21,5 +21,5 @@ Displays summary statistics and coverage across the 11 categories of the unified
 
 ### Implemented By
 
-- OntologyStatsCommand → src/commands/OntologyStatsCommand.ts:52
+- OntologyStatsCommand → src/commands/OntologyStatsCommand.ts:59
 

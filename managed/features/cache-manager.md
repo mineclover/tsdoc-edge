@@ -22,4 +22,7 @@ Manages TTL-bounded, LRU-evicted in-memory caches for LSP hover, CodeLens, diagn
 ### Implemented By
 
 - cache-manager → src/lsp/cache-manager.ts:1
+- CacheEntry → src/lsp/cache-manager.ts:25
+- CacheManagerOptions → src/lsp/cache-manager.ts:40
+- CacheManager → src/lsp/cache-manager.ts:73
 

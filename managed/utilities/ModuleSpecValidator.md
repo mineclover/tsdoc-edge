@@ -185,5 +185,9 @@ tsdoc-edge validate-spec --strict
 
 ### Implemented By
 
-- ModuleSpecValidator → src/validator/ModuleSpecValidator.ts:64
+- ModuleSpecValidator → src/validator/ModuleSpecValidator.ts:82
+- ValidationSeverity → src/validator/ModuleSpecValidator.ts:20
+- ValidationIssue → src/validator/ModuleSpecValidator.ts:28
+- ModuleSpecValidationResult → src/validator/ModuleSpecValidator.ts:41
+- ValidationOptions → src/validator/ModuleSpecValidator.ts:55
 

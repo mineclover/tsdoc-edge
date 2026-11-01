@@ -1,6 +1,12 @@
 /**
  * LintCommand - Unified code quality check
+ *
  * @packageDocumentation
+ * @doc [[LintCommand]]
+ * @context Top-level `lint` command running multi-category code health, documentation, relationship, and spec checks
+ * @functionality Evaluates 5 quality check categories across `CodeHealthChecker`, `.tsdoc.db`, and `SpecMetricsAggregator` with `--strict`, `--json`, and `--ci` modes
+ * @sideEffect console: Writes lint check progress, category scores, and JSON reports to stdout
+ * @sideEffect database: Reads symbol and relationship metrics from `DatabaseManager` and `SpecMetricsAggregator` (read)
  */
 
 import { CodeHealthChecker } from '../analyzer/CodeHealthChecker';
@@ -28,6 +34,7 @@ interface LintResult {
  * LintCommand - Run all quality checks in one command
  *
  * @doc [[LintCommand]]
+ * @sideEffect console: Writes formatted lint results to stdout; reads `.tsdoc.db` and `SpecMetricsAggregator` metrics
  * @public
  */
 export class LintCommand extends BaseCommand {

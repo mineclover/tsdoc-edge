@@ -107,7 +107,7 @@ tsdoc-edge stats --compare before-cleanup
 - **[[OrphansCommand]]**: Find orphaned symbols
 - **[[UntestedCommand]]**: Find untested symbols
 - **[[StatsCommand]]**: Track cleanup progress
-- **[[UsedByCommand]]**: Verify no usages before removal
+- **[[WhoUsesCommand]]**: Verify no usages before removal
 
 ## Metrics
 
@@ -195,4 +195,14 @@ tsdoc-edge orphans --diff origin/main
 ### Implemented By
 
 - Dead Code Detection → src/commands/DetectDeadCodeCommand.ts:1
+- DeadCodeTagOptions → src/fixer/DeadCodeTagger.ts:23
+- TagResult → src/fixer/DeadCodeTagger.ts:43
+- TaggedDeadCodeSymbol → src/fixer/DeadCodeTagger.ts:60
+- DeadCodeTagger → src/fixer/DeadCodeTagger.ts:94
+- FixOptions → src/fixer/DocumentationFixer.ts:34
+- FixResult → src/fixer/DocumentationFixer.ts:58
+- DocumentationFixer → src/fixer/DocumentationFixer.ts:80
+- RecursiveImproveOptions → src/fixer/RecursiveImprover.ts:27
+- RecursiveImproveResult → src/fixer/RecursiveImprover.ts:49
+- RecursiveImprover → src/fixer/RecursiveImprover.ts:81
 

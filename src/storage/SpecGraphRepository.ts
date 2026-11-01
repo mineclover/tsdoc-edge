@@ -4,6 +4,13 @@
  * Managed documents remain the authored source of truth. This repository only
  * stores immutable, reproducible projections created from those documents; a
  * stored row is never an alternate authoring surface.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @context Isolated SQLite persistence plane storing immutable compiled `SpecGraphRevision` projections derived from authored managed documents.
+ * @functionality Persists and activates validated specification graph revisions with compare-and-swap guards, reads active or pinned revisions, and lists retained revision summaries.
+ * @sideEffect filesystem: Creates parent directories for the SQLite database file when opened in writable mode.
+ * @sideEffect database: Opens and mutates a `better-sqlite3` database in WAL mode for `spec_graph_revisions` and `spec_graph_state`.
  * @packageDocumentation
  */
 
@@ -16,17 +23,35 @@ import {
   type SpecGraphRevision,
 } from '../spec-graph';
 
-/** Current schema for the isolated specification graph repository. */
+/**
+ * Current schema for the isolated specification graph repository.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export const SPEC_GRAPH_REPOSITORY_SCHEMA_VERSION = 1 as const;
 
-/** Construction options for a specification graph repository. */
+/**
+ * Construction options for a specification graph repository.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface SpecGraphRepositoryOptions {
   readonly clock?: () => Date;
   /** Open an existing database without schema initialization or writes. */
   readonly readOnly?: boolean;
 }
 
-/** Optional compare-and-swap guard for an active revision replacement. */
+/**
+ * Optional compare-and-swap guard for an active revision replacement.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface SpecGraphRepositoryReplaceOptions {
   /**
    * Expected active revision at commit time. `null` requires an empty active
@@ -35,7 +60,13 @@ export interface SpecGraphRepositoryReplaceOptions {
   readonly expectedActiveRevisionId?: string | null;
 }
 
-/** Read-only operator projection for one retained specification graph revision. */
+/**
+ * Read-only operator projection for one retained specification graph revision.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface SpecGraphRevisionSummary {
   readonly revisionId: string;
   readonly contentFingerprint: string;
@@ -50,7 +81,13 @@ export interface SpecGraphRevisionSummary {
   readonly active: boolean;
 }
 
-/** Raised when another process changes the active spec revision first. */
+/**
+ * Raised when another process changes the active spec revision first.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export class SpecGraphRepositoryConflictError extends Error {
   constructor(
     readonly expectedActiveRevisionId: string | null,
@@ -101,6 +138,8 @@ CREATE INDEX IF NOT EXISTS idx_spec_graph_revisions_workspace
  * documents. Every successful replacement retains prior revisions and changes
  * only which complete revision is active.
  *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
  * @public
  */
 export class SpecGraphRepository {

@@ -13,6 +13,8 @@
  * - 생성자 호출 패턴 감지 (new A(b))
  * - 의존성 주입 패턴 감지 (new A(new B()))
  * - 메서드 호출 체인 감지 (a.method(b))
+ *
+ * @sideEffect filesystem: Reads TypeScript test files from disk for AST import and usage extraction (read)
  */
 
 import * as fs from 'node:fs';
@@ -32,6 +34,7 @@ import type { SymbolGraph } from '../types/graph';
  * @doc [[TestRelationshipExtractor]]
  * @public
  * @responsibility 테스트 파일 분석 및 심볼 관계 추출
+ * @sideEffect filesystem: Reads TypeScript test files from disk for AST import and usage extraction (read)
  */
 export class TestRelationshipExtractor {
   private graph: SymbolGraph;

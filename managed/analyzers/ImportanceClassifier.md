@@ -21,5 +21,5 @@ Scores and classifies symbol architectural importance from graph centrality, exp
 
 ### Implemented By
 
-- ImportanceClassifier → src/analyzer/ImportanceClassifier.ts:20
+- ImportanceClassifier → src/analyzer/ImportanceClassifier.ts:26
 

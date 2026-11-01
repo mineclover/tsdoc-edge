@@ -240,4 +240,11 @@ tsdoc-edge find-unused-docs managed
 ### Implemented By
 
 - SpecTypes → src/types/spec.ts:1
+- SpecStatus → src/types/spec.ts:18
+- SpecMetadata → src/types/spec.ts:26
+- SpecRequirements → src/types/spec.ts:58
+- SpecCompletenessResult → src/types/spec.ts:81
+- ContentSimilarity → src/types/spec.ts:155
+- UnusedDocument → src/types/spec.ts:184
+- SpecStatusTransition → src/types/spec.ts:213
 

@@ -1,7 +1,11 @@
 /**
  * XML Context Generator for Claude
+ *
  * @packageDocumentation
+ * @doc [[Code Generation]]
  * @responsibility Generate compact XML-structured context for LLMs
+ * @context Pure serializer formatting `UnifiedContext` payloads from `EntryPointContextAggregator` into compact XML envelopes for LLM prompts
+ * @functionality Serializes primary symbol location, grouped dependencies, reverse callers, test coverage, impact counts, and `@doc` links into `<work-context>` XML
  */
 
 import type { UnifiedContext } from '../analyzer/EntryPointContextAggregator';
@@ -11,9 +15,19 @@ import type { UnifiedContext } from '../analyzer/EntryPointContextAggregator';
  *
  * Based on: https://platform.claude.com/docs/build-with-claude/prompt-engineering/use-xml-tags
  *
+ * @doc [[Code Generation]]
+ * @context Transforms `UnifiedContext` snapshots into token-efficient XML prompt blocks
+ * @functionality Deduplicates dependencies by relationship kind and escapes XML entities across work-context sections
  * @public
  */
 export class XMLContextGenerator {
+  /**
+   * Serialize a `UnifiedContext` snapshot into a `<work-context>` XML string.
+   *
+   * @param context - Aggregated entry-point context
+   * @returns Compact XML string representation
+   * @public
+   */
   generate(context: UnifiedContext): string {
     const parts: string[] = [];
 

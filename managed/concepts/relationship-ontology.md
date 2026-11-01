@@ -1435,5 +1435,9 @@ This will result in a more **precise, intuitive, and developer-friendly** ontolo
 - [[TSDoc Edge Documentation]] → managed/README.md:312
 - [[Feature Showcase]] → managed/examples/feature-showcase.md:264
 - [[Relationship Usage Examples]] → managed/examples/relationship-usage-examples.md:525
-- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:123
+- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:186
+
+### Implemented By
+
+- OntologyCommand → src/commands/OntologyCommand.ts:31
 

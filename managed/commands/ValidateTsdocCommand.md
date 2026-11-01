@@ -21,5 +21,7 @@ Validates all TypeScript TSDoc comments and `tsdoc.json` strictly against `@micr
 
 ### Implemented By
 
-- ValidateTsdocCommand → src/commands/ValidateTsdocCommand.ts:49
+- ValidateTsdocCommand → src/commands/ValidateTsdocCommand.ts:61
+- TsdocValidationIssue → src/commands/ValidateTsdocCommand.ts:25
+- TsdocValidationReport → src/commands/ValidateTsdocCommand.ts:38
 

@@ -1,7 +1,15 @@
 /**
  * Unified Analyze Relationships Command
- * Replaces 22 individual analyze commands with single --type parameter
+ * Replaces 22 individual analyze commands with single `--type` parameter
+ *
  * @packageDocumentation
+ * @doc [[RelationshipCommands]]
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @context Relationship analyzer execution engine invoked via `tsdoc-edge relationship analyze`
+ * @functionality Builds legacy AST/symbol-graph or canonical `@ttsc/graph` analysis contexts, runs selected or all registered analyzers, and persists unified relationships
+ * @sideEffect console: Writes analyzer progress, relationship samples, and summaries to stdout
+ * @sideEffect database: Reads symbol graph data and inserts unified relationships into `.tsdoc.db`; refreshes canonical `@ttsc/graph` revisions when configured
+ * @sideEffect filesystem: Scans TypeScript source directories to construct analyzer programs (read)
  */
 
 import * as fs from 'node:fs';
@@ -26,6 +34,9 @@ interface GraphRouterCliOptions {
 
 /**
  * Unified command for all relationship analysis
+ *
+ * @doc [[RelationshipCommands]]
+ * @doc [[CliCommandSurfaceSpecification]]
  * @public
  */
 export class AnalyzeRelationshipsCommand extends BaseCommand {

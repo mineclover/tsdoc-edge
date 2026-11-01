@@ -252,9 +252,9 @@ tsdoc-edge deps Engine --reverse --type=composition
 ## Implementation Roadmap
 
 ### v2.0 (Q2 2025)
--  Basic field detection
--  Constructor analysis
--  Storage in unified_relationships
+- ✅ Basic field detection
+- ✅ Constructor analysis
+- ✅ Storage in unified_relationships
 
 ### v2.1 (Q3 2025)
 - � Ownership strength detection

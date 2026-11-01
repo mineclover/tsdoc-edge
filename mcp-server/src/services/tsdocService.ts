@@ -2,6 +2,11 @@
  * TSDoc Service - Direct Database Access Layer
  *
  * @packageDocumentation
+ * @doc [[MCP Integration]]
+ * @context Direct read-only SQLite data access layer over `.tsdoc.db`, canonical `@ttsc/graph`, and `.tsdoc/spec-graph.db` for MCP tools
+ * @functionality Lazy read-only SQLite connection pooling, symbol search, ontology statistics, relationship traversal, work/design context, impact analysis, and spec bindings
+ * @sideEffect database: Opens and queries `.tsdoc.db`, canonical graph SQLite DB, and `.tsdoc/spec-graph.db` in read-only mode (read)
+ * @sideEffect filesystem: Reads `.tsdoc.config.json` and workspace files when resolving database paths and context (read)
  *
  * @remarks
  * Provides direct SQLite access to TSDoc Edge knowledge graph for MCP tools.
@@ -72,6 +77,9 @@ interface SpecSnapshot {
 /**
  * Service for direct TSDoc Edge database access
  *
+ * @doc [[MCP Integration]]
+ * @sideEffect database: Opens and queries `.tsdoc.db`, canonical graph SQLite DB, and `.tsdoc/spec-graph.db` in read-only mode (read)
+ * @sideEffect filesystem: Reads `.tsdoc.config.json` and workspace files when resolving database paths and context (read)
  * @public
  *
  * @remarks
@@ -1641,7 +1649,22 @@ export class TsDocService {
         )
       )
         return false;
-      if (query && !JSON.stringify(binding).toLowerCase().includes(query)) return false;
+      if (query) {
+        const haystacks = [
+          binding.id,
+          binding.specNodeId,
+          binding.kind,
+          source?.file,
+          target?.file,
+          target?.canonicalNodeId,
+          target?.symbolName,
+        ]
+          .filter((val): val is string => typeof val === 'string')
+          .map((val) => val.toLowerCase());
+        const matchesNode = nodeIds.has(String(binding.specNodeId));
+        const matchesField = haystacks.some((val) => val.includes(query));
+        if (!matchesNode && !matchesField) return false;
+      }
       return true;
     });
     return { revisionId: spec.revisionId, nodes, bindings };

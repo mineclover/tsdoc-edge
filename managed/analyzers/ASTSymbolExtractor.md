@@ -330,5 +330,5 @@ tsdoc-edge parse src/commands/BuildCommand.ts
 
 ### Implemented By
 
-- ASTSymbolExtractor → src/analyzer/ASTSymbolExtractor.ts:1
+- ASTSymbolExtractor → src/analyzer/ASTSymbolExtractor.ts:57
 

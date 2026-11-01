@@ -1,12 +1,16 @@
 /**
- * Validate Symbol References Command - [[Symbol]] 참조 일관성 검증
+ * Validate Symbol References Command - `[[Symbol]]` 참조 일관성 검증
  *
  * @packageDocumentation
- * @responsibility Validate all [[Symbol]] references across documentation
+ * @doc [[ValidateSymbolRefsCommand]]
+ * @responsibility Validate all `[[Symbol]]` references across documentation
  *
  * @problem Multiple docs may define the same symbol, references may be broken
  * @solves Build symbol registry, detect duplicates, validate all references
  * @context Enforce SSOT (Single Source of Truth) for documentation symbols
+ * @functionality Scans Markdown prose and Mermaid diagrams to detect duplicate H1 definitions, broken `[[Symbol]]` references, and circular reference chains
+ * @sideEffect console: Writes `[[Symbol]]` reference consistency diagnostics or `--json` payloads to stdout
+ * @sideEffect filesystem: Recursively scans and reads managed Markdown files on disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -74,6 +78,7 @@ interface SymbolRegistry {
  * Validate Symbol References Command
  *
  * @doc [[ValidateSymbolRefsCommand]]
+ * @sideEffect console: Writes symbol reference validation diagnostics to stdout; reads managed Markdown files
  * @public
  */
 export class ValidateSymbolRefsCommand extends BaseCommand {

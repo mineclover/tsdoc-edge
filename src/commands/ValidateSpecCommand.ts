@@ -1,6 +1,13 @@
 /**
  * Validate Spec Command - Validate specification completeness
+ *
  * @packageDocumentation
+ * @doc [[ValidateSpecCommand]]
+ * @doc [[CLI Commands]]
+ * @context Feature-specification template completeness validation via `tsdoc-edge spec validate` and `tsdoc-edge validate spec`
+ * @functionality Evaluates Markdown specification files with `SpecCompletenessValidator` and reports design, implementation, and overall completeness scores
+ * @sideEffect console: Writes specification completeness scores, missing sections, and warnings to stdout
+ * @sideEffect filesystem: Reads specification files or recursively scans specification directories on disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -12,7 +19,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * ValidateSpecCommand - Validate specifications
  * @public
  * @doc [[ValidateSpecCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#validate-spec]]
+ * @sideEffect console: Writes specification validation diagnostics to stdout; reads Markdown specification files
  */
 export class ValidateSpecCommand extends BaseCommand {
   constructor(private validator?: SpecCompletenessValidator) {
@@ -180,5 +189,6 @@ export class ValidateSpecCommand extends BaseCommand {
  * GenerateDocsCommand - Generate markdown docs from enhanced docs
  * @public
  * @doc [[GenerateDocsCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#generate-docs]]
  */

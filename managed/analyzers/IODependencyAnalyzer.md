@@ -47,5 +47,5 @@ canonical: true
 
 ### Implemented By
 
-- IODependencyAnalyzer → src/analyzer/IODependencyAnalyzer.ts:1
+- IODependencyAnalyzer → src/analyzer/IODependencyAnalyzer.ts:29
 

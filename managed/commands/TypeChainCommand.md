@@ -45,5 +45,5 @@ Trace and display type chains (A → B → C).
 
 ### Implemented By
 
-- TypeChainCommand → src/commands/TypeChainCommand.ts:29
+- TypeChainCommand → src/commands/TypeChainCommand.ts:38
 

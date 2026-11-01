@@ -94,10 +94,10 @@ Work Context: UserService.ts
 
 ```bash
 # 1. 누가 이 심볼을 사용하는지 확인
-tsdoc-edge who-uses DatabaseManager
+tsdoc-edge symbol who-uses DatabaseManager
 
 # 2. 상세 영향 분석 (심볼 ID 필요 시)
-tsdoc-edge relationship-impact class-databasemanager
+tsdoc-edge relationship impact class-databasemanager
 
 # 3. 관련 파일의 컨텍스트 확인
 tsdoc-edge wc src/storage/DatabaseManager.ts
@@ -132,16 +132,16 @@ This file depends on 5 other file(s)
 
 ```bash
 # 1. 문서 심볼 검증
-tsdoc-edge validate-symbol-refs
+tsdoc-edge validate refs
 
 # 2. 미사용 문서 찾기
-tsdoc-edge find-unused-docs
+tsdoc-edge docs find-unused
 
 # 3. 백링크 업데이트
-tsdoc-edge update-backlinks
+tsdoc-edge docs backlinks
 
 # 4. 전체 문서 검증
-tsdoc-edge validate-docs
+tsdoc-edge validate docs
 ```
 
 ### 예상 결과
@@ -218,13 +218,13 @@ tsdoc-edge orphans
 tsdoc-edge system-status
 
 # 2. 관계 통계 상세
-tsdoc-edge relationship-stats
+tsdoc-edge relationship stats
 
 # 3. 온톨로지 구조
-tsdoc-edge ontology-stats
+tsdoc-edge ontology stats
 
 # 4. 중요 심볼 (허브) 찾기
-tsdoc-edge relationship-metrics --top 10
+tsdoc-edge relationship metrics --top 10
 ```
 
 ### 예상 결과
@@ -265,8 +265,8 @@ CI 파이프라인에서 문서 품질을 자동 검증하고 싶습니다.
 tsdoc-edge build src
 
 # 2. 문서 검증 (실패 시 CI 중단)
-tsdoc-edge validate-docs
-tsdoc-edge validate-symbol-refs
+tsdoc-edge validate docs
+tsdoc-edge validate refs
 
 # 3. 상태 리포트 (compact 모드)
 tsdoc-edge system-status --compact
@@ -288,7 +288,7 @@ jobs:
           node-version: '24.x'
       - run: npm ci
       - run: npx tsdoc-edge build src
-      - run: npx tsdoc-edge validate-docs
+      - run: npx tsdoc-edge validate docs
       - run: npx tsdoc-edge system-status --compact
 ```
 
@@ -307,7 +307,7 @@ jobs:
 
 ```bash
 # 1. 관련 심볼 검색
-tsdoc-edge who-uses Authentication
+tsdoc-edge symbol who-uses Authentication
 
 # 2. 관련 파일들의 컨텍스트 확인
 tsdoc-edge wc src/services/AuthService.ts
@@ -398,13 +398,13 @@ export class MyNewFeature {
 tsdoc-edge build src
 
 # 2. 문서 인덱스 업데이트
-tsdoc-edge index-docs managed
+tsdoc-edge docs index managed
 
 # 3. 심볼 참조 검증
-tsdoc-edge validate-symbol-refs
+tsdoc-edge validate refs
 
 # 4. 백링크 업데이트
-tsdoc-edge update-backlinks
+tsdoc-edge docs backlinks
 ```
 
 ### 문서 구조 권장사항
@@ -423,12 +423,12 @@ tsdoc-edge update-backlinks
 - [ ] frontmatter에 `type`, `category`, `status` 포함
 - [ ] 관련 문서 `[[Symbol]]` 링크 추가
 - [ ] 코드에 `@doc [[SymbolName]]` 태그 추가
-- [ ] `validate-symbol-refs` 통과
-- [ ] `validate-docs` 통과
+- [ ] `validate refs` 통과
+- [ ] `validate docs` 통과
 
 ### 다음 단계
 - 개발 완료 후 `tsdoc-edge build src` 재실행
-- 문서 업데이트 후 `tsdoc-edge validate-docs`
+- 문서 업데이트 후 `tsdoc-edge validate docs`
 
 ---
 
@@ -495,11 +495,11 @@ tsdoc-edge system-status
 |---------|------------|
 | 시작 | `init`, `build`, `system-status` |
 | 파일 수정 | `wc <file>` |
-| 리팩토링 | `who-uses`, `relationship-impact` |
-| 문서 검증 | `validate-docs`, `validate-symbol-refs` |
+| 리팩토링 | `symbol who-uses`, `relationship impact` |
+| 문서 검증 | `validate docs`, `validate refs` |
 | 건강 점검 | `health`, `analyze`, `orphans` |
-| 관계 분석 | `relationship-stats`, `ontology-stats` |
-| CI/CD | `build`, `validate-docs`, `ss --compact` |
+| 관계 분석 | `relationship stats`, `ontology stats` |
+| CI/CD | `build`, `validate docs`, `ss --compact` |
 
 ---
 

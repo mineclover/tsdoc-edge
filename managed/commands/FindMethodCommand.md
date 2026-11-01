@@ -21,5 +21,5 @@ Searches the indexed codebase for methods and functions matching a simple or qua
 
 ### Implemented By
 
-- FindMethodCommand → src/commands/FindMethodCommand.ts:38
+- FindMethodCommand → src/commands/FindMethodCommand.ts:47
 

@@ -5,16 +5,21 @@
  * to replace `any` types with more specific types.
  *
  * @packageDocumentation
+ * @doc [[Types Index]]
+ * @context Typed SQLite database, prepared statement, transaction, and query row contracts
+ * @functionality Defines SqliteTransactionFunction, SqliteDatabase, SqliteStatement, SqliteRunResult, and SQLite row interfaces
  */
 
 /**
  * Transaction function type
+ * @doc [[Types Index]]
  * @public
  */
 export type SqliteTransactionFunction<T> = () => T;
 
 /**
  * SQLite Database interface (subset of better-sqlite3)
+ * @doc [[Types Index]]
  * @public
  */
 export interface SqliteDatabase {
@@ -57,6 +62,7 @@ export interface SqliteDatabase {
 
 /**
  * SQLite Statement interface (subset of better-sqlite3)
+ * @doc [[Types Index]]
  * @public
  */
 export interface SqliteStatement {
@@ -100,6 +106,7 @@ export interface SqliteStatement {
 
 /**
  * Result of running a statement
+ * @doc [[Types Index]]
  * @public
  */
 export interface SqliteRunResult {
@@ -111,6 +118,7 @@ export interface SqliteRunResult {
 
 /**
  * Common symbol row from database queries
+ * @doc [[Types Index]]
  * @public
  */
 export interface SymbolRow {
@@ -128,6 +136,7 @@ export interface SymbolRow {
 
 /**
  * Common relationship row from database queries
+ * @doc [[Types Index]]
  * @public
  */
 export interface RelationshipRow {
@@ -142,6 +151,7 @@ export interface RelationshipRow {
 
 /**
  * Count result from aggregate queries
+ * @doc [[Types Index]]
  * @public
  */
 export interface CountRow {
@@ -150,6 +160,7 @@ export interface CountRow {
 
 /**
  * Relationship type count row
+ * @doc [[Types Index]]
  * @public
  */
 export interface RelTypeCountRow {
@@ -159,6 +170,7 @@ export interface RelTypeCountRow {
 
 /**
  * Unified relationship row for LSP queries
+ * @doc [[Types Index]]
  * @public
  */
 export interface UnifiedRelRow {
@@ -173,6 +185,7 @@ export interface UnifiedRelRow {
 
 /**
  * High impact symbol row
+ * @doc [[Types Index]]
  * @public
  */
 export interface HighImpactRow {

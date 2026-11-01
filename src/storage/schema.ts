@@ -1,5 +1,10 @@
 /**
  * Drizzle ORM Schema for TSDoc Edge
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @context Drizzle ORM SQLite table and inferred row type definitions for the TSDoc Edge storage plane.
+ * @functionality Declares SQLite table schemas, foreign keys, and indexes for symbols, enhanced documentation, error experiences, decisions, future plans, relationships, contracts, responsibilities, tasks, endpoints, code blocks, and entry points, together with inferred select and insert row types.
  * @packageDocumentation
  */
 
@@ -7,6 +12,10 @@ import { index, integer, real, sqliteTable, text } from 'drizzle-orm/sqlite-core
 
 /**
  * Symbols table: Core symbol information
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
  */
 export const symbols = sqliteTable(
   'symbols',
@@ -64,6 +73,10 @@ export const symbols = sqliteTable(
 
 /**
  * Enhanced documentation table (Strict Mode)
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
  */
 export const enhancedDocs = sqliteTable('enhanced_docs', {
   symbolId: text('symbol_id')
@@ -83,6 +96,10 @@ export const enhancedDocs = sqliteTable('enhanced_docs', {
 
 /**
  * Error experiences table
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
  */
 export const errorExperiences = sqliteTable(
   'error_experiences',
@@ -106,6 +123,10 @@ export const errorExperiences = sqliteTable(
 
 /**
  * Decision records table
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
  */
 export const decisionRecords = sqliteTable(
   'decision_records',
@@ -127,6 +148,10 @@ export const decisionRecords = sqliteTable(
 
 /**
  * Future plans table
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
  */
 export const futurePlans = sqliteTable(
   'future_plans',
@@ -151,6 +176,10 @@ export const futurePlans = sqliteTable(
 
 /**
  * Dependencies table (Legacy)
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
  */
 export const dependencies = sqliteTable(
   'dependencies',
@@ -174,6 +203,10 @@ export const dependencies = sqliteTable(
 
 /**
  * Unified relationships table
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
  */
 export const unifiedRelationships = sqliteTable(
   'unified_relationships',
@@ -213,6 +246,10 @@ export const unifiedRelationships = sqliteTable(
 /**
  * Relationship symbols join table for fast O(1) lookups
  * Replaces expensive LIKE '%symbolId%' queries with indexed JOIN
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
  */
 export const relationshipSymbols = sqliteTable(
   'relationship_symbols',
@@ -231,6 +268,10 @@ export const relationshipSymbols = sqliteTable(
 
 /**
  * Test mappings table
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
  */
 export const testMappings = sqliteTable(
   'test_mappings',
@@ -252,6 +293,10 @@ export const testMappings = sqliteTable(
 
 /**
  * Contracts table
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
  */
 export const contracts = sqliteTable('contracts', {
   symbolId: text('symbol_id')
@@ -266,6 +311,10 @@ export const contracts = sqliteTable('contracts', {
 
 /**
  * Responsibilities table
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
  */
 export const responsibilities = sqliteTable('responsibilities', {
   symbolId: text('symbol_id')
@@ -280,6 +329,10 @@ export const responsibilities = sqliteTable('responsibilities', {
 
 /**
  * Indexing rules table
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
  */
 export const indexingRules = sqliteTable('indexing_rules', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -295,6 +348,10 @@ export const indexingRules = sqliteTable('indexing_rules', {
 
 /**
  * Sync metadata table
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
  */
 export const syncMetadata = sqliteTable('sync_metadata', {
   id: integer('id').primaryKey({ autoIncrement: true }),
@@ -307,6 +364,10 @@ export const syncMetadata = sqliteTable('sync_metadata', {
 
 /**
  * Tasks table for project management
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
  */
 export const tasks = sqliteTable(
   'tasks',
@@ -343,6 +404,10 @@ export const tasks = sqliteTable(
 
 /**
  * HTTP Endpoints table (for API route tracking)
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
  */
 export const endpoints = sqliteTable(
   'endpoints',
@@ -376,6 +441,10 @@ export const endpoints = sqliteTable(
 
 /**
  * Code Blocks table (for block-level chunking)
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
  */
 export const codeBlocks = sqliteTable(
   'code_blocks',
@@ -402,6 +471,13 @@ export const codeBlocks = sqliteTable(
   ]
 );
 
+/**
+ * Entry points table (for application and CLI bootstrap tracking)
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export const entryPoints = sqliteTable(
   'entry_points',
   {
@@ -426,87 +502,291 @@ export const entryPoints = sqliteTable(
 );
 
 // Type exports for use in application code
-/** Selected row record from the `symbols` table. @public */
+/**
+ * Selected row record from the `symbols` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type Symbol = typeof symbols.$inferSelect;
-/** Insert payload record for the `symbols` table. @public */
+/**
+ * Insert payload record for the `symbols` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewSymbol = typeof symbols.$inferInsert;
 
-/** Selected row record from the `enhanced_docs` table. @public */
+/**
+ * Selected row record from the `enhanced_docs` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type EnhancedDoc = typeof enhancedDocs.$inferSelect;
-/** Insert payload record for the `enhanced_docs` table. @public */
+/**
+ * Insert payload record for the `enhanced_docs` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewEnhancedDoc = typeof enhancedDocs.$inferInsert;
 
-/** Selected row record from the `error_experiences` table. @public */
+/**
+ * Selected row record from the `error_experiences` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type ErrorExperience = typeof errorExperiences.$inferSelect;
-/** Insert payload record for the `error_experiences` table. @public */
+/**
+ * Insert payload record for the `error_experiences` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewErrorExperience = typeof errorExperiences.$inferInsert;
 
-/** Selected row record from the `decision_records` table. @public */
+/**
+ * Selected row record from the `decision_records` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type DecisionRecord = typeof decisionRecords.$inferSelect;
-/** Insert payload record for the `decision_records` table. @public */
+/**
+ * Insert payload record for the `decision_records` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewDecisionRecord = typeof decisionRecords.$inferInsert;
 
-/** Selected row record from the `future_plans` table. @public */
+/**
+ * Selected row record from the `future_plans` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type FuturePlan = typeof futurePlans.$inferSelect;
-/** Insert payload record for the `future_plans` table. @public */
+/**
+ * Insert payload record for the `future_plans` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewFuturePlan = typeof futurePlans.$inferInsert;
 
-/** Selected row record from the `dependencies` table. @public */
+/**
+ * Selected row record from the `dependencies` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type Dependency = typeof dependencies.$inferSelect;
-/** Insert payload record for the `dependencies` table. @public */
+/**
+ * Insert payload record for the `dependencies` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewDependency = typeof dependencies.$inferInsert;
 
-/** Selected row record from the `unified_relationships` table. @public */
+/**
+ * Selected row record from the `unified_relationships` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type UnifiedRelationship = typeof unifiedRelationships.$inferSelect;
-/** Insert payload record for the `unified_relationships` table. @public */
+/**
+ * Insert payload record for the `unified_relationships` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewUnifiedRelationship = typeof unifiedRelationships.$inferInsert;
 
-/** Selected row record from the `relationship_symbols` table. @public */
+/**
+ * Selected row record from the `relationship_symbols` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type RelationshipSymbol = typeof relationshipSymbols.$inferSelect;
-/** Insert payload record for the `relationship_symbols` table. @public */
+/**
+ * Insert payload record for the `relationship_symbols` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewRelationshipSymbol = typeof relationshipSymbols.$inferInsert;
 
-/** Selected row record from the `test_mappings` table. @public */
+/**
+ * Selected row record from the `test_mappings` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type TestMapping = typeof testMappings.$inferSelect;
-/** Insert payload record for the `test_mappings` table. @public */
+/**
+ * Insert payload record for the `test_mappings` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewTestMapping = typeof testMappings.$inferInsert;
 
-/** Selected row record from the `contracts` table. @public */
+/**
+ * Selected row record from the `contracts` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type Contract = typeof contracts.$inferSelect;
-/** Insert payload record for the `contracts` table. @public */
+/**
+ * Insert payload record for the `contracts` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewContract = typeof contracts.$inferInsert;
 
-/** Selected row record from the `responsibilities` table. @public */
+/**
+ * Selected row record from the `responsibilities` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type Responsibility = typeof responsibilities.$inferSelect;
-/** Insert payload record for the `responsibilities` table. @public */
+/**
+ * Insert payload record for the `responsibilities` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewResponsibility = typeof responsibilities.$inferInsert;
 
-/** Selected row record from the `indexing_rules` table. @public */
+/**
+ * Selected row record from the `indexing_rules` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type IndexingRule = typeof indexingRules.$inferSelect;
-/** Insert payload record for the `indexing_rules` table. @public */
+/**
+ * Insert payload record for the `indexing_rules` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewIndexingRule = typeof indexingRules.$inferInsert;
 
-/** Selected row record from the `sync_metadata` table. @public */
+/**
+ * Selected row record from the `sync_metadata` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type SyncMetadataRow = typeof syncMetadata.$inferSelect;
-/** Insert payload record for the `sync_metadata` table. @public */
+/**
+ * Insert payload record for the `sync_metadata` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewSyncMetadata = typeof syncMetadata.$inferInsert;
 
-/** Selected row record from the `tasks` table. @public */
+/**
+ * Selected row record from the `tasks` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type TaskRow = typeof tasks.$inferSelect;
-/** Insert payload record for the `tasks` table. @public */
+/**
+ * Insert payload record for the `tasks` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewTask = typeof tasks.$inferInsert;
 
-/** Selected row record from the `endpoints` table. @public */
+/**
+ * Selected row record from the `endpoints` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type Endpoint = typeof endpoints.$inferSelect;
-/** Insert payload record for the `endpoints` table. @public */
+/**
+ * Insert payload record for the `endpoints` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewEndpoint = typeof endpoints.$inferInsert;
 
-/** Selected row record from the `code_blocks` table. @public */
+/**
+ * Selected row record from the `code_blocks` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type CodeBlock = typeof codeBlocks.$inferSelect;
-/** Insert payload record for the `code_blocks` table. @public */
+/**
+ * Insert payload record for the `code_blocks` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewCodeBlock = typeof codeBlocks.$inferInsert;
 
-/** Selected row record from the `entry_points` table. @public */
+/**
+ * Selected row record from the `entry_points` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type EntryPoint = typeof entryPoints.$inferSelect;
-/** Insert payload record for the `entry_points` table. @public */
+/**
+ * Insert payload record for the `entry_points` table.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type NewEntryPoint = typeof entryPoints.$inferInsert;

@@ -13,6 +13,8 @@
  * - Detect test files that test multiple production symbols
  * - Create integration-verification relationships between tested symbols
  * - Track which connections are verified by integration tests
+ *
+ * @sideEffect filesystem: Recursively scans workspace directories for `.test.ts` / `.spec.ts` files and reads test sources (read)
  */
 
 import * as fs from 'node:fs';
@@ -24,8 +26,10 @@ import { TestRelationshipExtractor } from './TestRelationshipExtractor';
 /**
  * Integration Verification Analyzer
  *
+ * @doc [[IntegrationVerificationAnalyzer]]
  * @public
  * @responsibility Detect integration tests and create verification relationships
+ * @sideEffect filesystem: Recursively scans workspace directories for `.test.ts` / `.spec.ts` files and reads test sources (read)
  */
 export class IntegrationVerificationAnalyzer {
   private graph: SymbolGraph;

@@ -3,6 +3,11 @@
  *
  * Raw kinds are never rewritten in the canonical graph. This table only tells
  * consumers which existing TSDoc Edge relationship type can represent a fact.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @context Versioned relation-semantic registry mapping raw `@ttsc/graph` edge kinds to traversal policies, endpoint roles, and TSDoc Edge `UnifiedRelationship` ontology projections.
+ * @functionality Classifies raw edge kinds into dependency, impact, and containment query policies and exposes projectable, dependency, and containment kind inventories.
  * @packageDocumentation
  */
 
@@ -13,9 +18,22 @@ import type {
 } from '../types/relationships';
 import type { GraphEdgeCategory } from './contracts';
 
-/** Version of the traversal/presentation semantics used in analysis identity. */
+/**
+ * Version of the traversal/presentation semantics used in analysis identity.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export const RELATION_SEMANTIC_REGISTRY_VERSION = '1.0.0' as const;
 
+/**
+ * Traversal policies, endpoint roles, and optional `UnifiedRelationship` projection metadata for a raw edge kind.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface GraphEdgeSemantic {
   readonly category: GraphEdgeCategory;
   /** Semantic family used by traversal and presentation policies. */
@@ -31,6 +49,12 @@ export interface GraphEdgeSemantic {
   readonly strength?: RelationshipStrength;
 }
 
+/**
+ * High-level semantic family grouping raw `@ttsc/graph` edge kinds.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export type RelationSemanticFamily =
   | 'execution'
   | 'type'
@@ -39,6 +63,12 @@ export type RelationSemanticFamily =
   | 'verification'
   | 'metadata';
 
+/**
+ * Explicit dependency, impact-direction, and containment traversal policies for an edge kind.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface RelationQueryPolicies {
   /** Whether `from` depends on `to` for dependency/degree queries. */
   readonly dependency: boolean;
@@ -221,12 +251,23 @@ const EDGE_SEMANTICS = new Map<string, GraphEdgeSemantic>([
   ],
 ]);
 
-/** Return presentation semantics without changing the raw producer edge. */
+/**
+ * Return presentation semantics without changing the raw producer edge.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export function graphEdgeSemantic(kind: string): GraphEdgeSemantic {
   return EDGE_SEMANTICS.get(kind) ?? UNKNOWN_SEMANTIC;
 }
 
-/** Raw edge kinds that can be projected into the current relationship ontology. */
+/**
+ * Raw edge kinds that can be projected into the current relationship ontology.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export const PROJECTABLE_GRAPH_EDGE_KINDS = Object.freeze(
   [...EDGE_SEMANTICS.entries()]
     .filter(([, semantic]) => semantic.relationshipType !== undefined)
@@ -234,7 +275,12 @@ export const PROJECTABLE_GRAPH_EDGE_KINDS = Object.freeze(
     .sort()
 );
 
-/** Raw kinds whose direction has the dependency meaning `from depends on to`. */
+/**
+ * Raw kinds whose direction has the dependency meaning `from depends on to`.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export const DEPENDENCY_GRAPH_EDGE_KINDS = Object.freeze(
   [...EDGE_SEMANTICS.entries()]
     .filter(([, semantic]) => semantic.queryPolicies.dependency)
@@ -242,7 +288,12 @@ export const DEPENDENCY_GRAPH_EDGE_KINDS = Object.freeze(
     .sort()
 );
 
-/** Known relation kinds that participate in containment rather than dependency traversal. */
+/**
+ * Known relation kinds that participate in containment rather than dependency traversal.
+ *
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export const CONTAINMENT_GRAPH_EDGE_KINDS = Object.freeze(
   [...EDGE_SEMANTICS.entries()]
     .filter(([, semantic]) => semantic.queryPolicies.containment)

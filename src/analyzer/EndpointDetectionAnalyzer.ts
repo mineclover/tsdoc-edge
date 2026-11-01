@@ -7,6 +7,9 @@
  * - Hono (app.get, app.post, etc.)
  *
  * @packageDocumentation
+ * @doc [[Analyzer System]]
+ * @context Static TypeScript AST route extractor discovering Express, Fastify, and Hono HTTP endpoints and handler bindings
+ * @functionality Framework import detection, HTTP route call-expression parsing, middleware/parameter extraction, and confidence filtering
  */
 
 import * as path from 'node:path';
@@ -16,6 +19,9 @@ import { type DetectedEndpoint, EndpointScope, type HTTPMethod } from '../types/
 
 /**
  * Configuration for endpoint detection
+ *
+ * @doc [[Analyzer System]]
+ * @public
  */
 export interface EndpointDetectionConfig {
   /** Frameworks to detect */
@@ -26,6 +32,11 @@ export interface EndpointDetectionConfig {
 
 /**
  * Detects HTTP endpoints from source files
+ *
+ * @doc [[Analyzer System]]
+ * @context Inspects `ts.Program` source files to extract HTTP method, route path, middleware, and handler metadata
+ * @functionality Detects Express, Fastify, and Hono route registrations and filters results by `minConfidence`
+ * @public
  */
 export class EndpointDetectionAnalyzer {
   private program: ts.Program;

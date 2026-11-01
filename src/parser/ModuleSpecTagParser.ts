@@ -4,7 +4,11 @@
  * Parses 7-part module specification custom and standard tags from `@microsoft/tsdoc` `DocComment` AST
  *
  * @packageDocumentation
+ * @doc [[ModuleSpecTagParser]]
+ * @doc [[ModuleSpecTagTypes]]
  * @responsibility Parse module spec tags from `@microsoft/tsdoc` AST
+ * @context 7-part module specification custom and standard tag extraction from `@microsoft/tsdoc` `DocComment` AST
+ * @functionality Parses `@algorithm`, `@complexity`, `@sideEffect`, state mutations, I/O projections, and release visibility scope
  */
 
 import type { ParserContext } from '@microsoft/tsdoc';
@@ -20,9 +24,12 @@ import { readTsdocComment, TSDocParser } from './TSDocParser';
  * Module specification tag parser backed by `@microsoft/tsdoc` `DocComment` AST.
  *
  * @doc [[ModuleSpecTagParser]]
+ * @doc [[ModuleSpecTagTypes]]
  * @doc [[TSDocStandardSpecification]]
  * @public
  * @responsibility Extract 7-part module spec tags from `@microsoft/tsdoc` `DocComment` AST
+ * @context Extracts logic, side-effect, state-mutation, I/O, and release-visibility metadata into `ModuleSpecTags`
+ * @functionality Parses `@algorithm`, `@complexity`, `@sideEffect`, and standard release visibility modifiers
  */
 export class ModuleSpecTagParser {
   private readonly tsdocParser = new TSDocParser();

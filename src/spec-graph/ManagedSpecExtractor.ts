@@ -2,7 +2,11 @@
  * Compile explicit managed-spec declarations from Markdown into a SpecGraph revision.
  *
  * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
  * @doc [[TsdocEdgePlatformSpecification]]
+ * @context Markdown specification compiler extracting explicit `tsdoc-spec` JSON blocks and `type: project-spec` frontmatter from workspace specification directories.
+ * @functionality Walks authored specification directories, validates H1 checkpoints, lifecycle frontmatter, and `tsdoc-spec` requirement/edge/binding declarations, and builds an immutable `SpecGraphRevision`.
+ * @sideEffect filesystem: Walks configured authored specification directories and reads Markdown specification documents from disk.
  * @packageDocumentation
  */
 
@@ -23,9 +27,31 @@ import {
   createSpecGraphRevision,
 } from './identity';
 
+/**
+ * Canonical extractor identifier recorded in managed SpecGraph provenance.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const MANAGED_SPEC_EXTRACTOR_ID = 'tsdoc-edge/managed-spec-extractor' as const;
+
+/**
+ * SemVer version of the managed Markdown specification extractor.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const MANAGED_SPEC_EXTRACTOR_VERSION = '1.0.0' as const;
 
+/**
+ * Workspace paths and identifier governing managed specification extraction.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface ExtractManagedSpecOptions {
   readonly workspaceRoot: string;
   readonly workspaceId: string;
@@ -50,6 +76,10 @@ interface ManagedSpecDeclaration {
 /**
  * The P4.4 authoring grammar intentionally has one explicit JSON declaration
  * block per `type: project-spec` document. Prose is never inferred as a binding.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
  */
 export function extractManagedSpecGraph(options: ExtractManagedSpecOptions): SpecGraphRevision {
   const root = realDirectory(options.workspaceRoot, 'Managed spec workspace root');

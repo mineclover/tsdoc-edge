@@ -21,5 +21,5 @@ Extracts test suites, test cases, `@testScenario` mappings, and tested-symbol ed
 
 ### Implemented By
 
-- TestRelationshipExtractor → src/analyzer/TestRelationshipExtractor.ts:36
+- TestRelationshipExtractor → src/analyzer/TestRelationshipExtractor.ts:39
 

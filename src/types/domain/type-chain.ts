@@ -1,12 +1,17 @@
 /**
  * Type chain and dependency path tracking types
+ *
  * @packageDocumentation
+ * @doc [[TypeChain]]
+ * @context Type dependency path traversal, tree projection, and cycle detection schemas
+ * @functionality Defines TypeChainStep, TypeChain, TypeDependencyNode, TypeChainAnalysisResult, and TypeChainOptions contracts
  */
 
 import type { InterfaceDependency } from './interface';
 
 /**
  * Single step in a type dependency chain
+ * @doc [[TypeChain]]
  * @public
  */
 export interface TypeChainStep {
@@ -38,6 +43,7 @@ export interface TypeChainStep {
 
 /**
  * Complete type dependency chain from source to target
+ * @doc [[TypeChain]]
  * @public
  */
 export interface TypeChain {
@@ -74,6 +80,7 @@ export interface TypeChain {
 
 /**
  * Tree node representing type dependencies
+ * @doc [[TypeChain]]
  * @public
  */
 export interface TypeDependencyNode {
@@ -110,6 +117,7 @@ export interface TypeDependencyNode {
 
 /**
  * Type chain analysis result
+ * @doc [[TypeChain]]
  * @public
  */
 export interface TypeChainAnalysisResult {
@@ -156,6 +164,7 @@ export interface TypeChainAnalysisResult {
 
 /**
  * Options for type chain analysis
+ * @doc [[TypeChain]]
  * @public
  */
 export interface TypeChainOptions {

@@ -19,6 +19,10 @@ Aggregates deterministic specification completeness, conformance, symbol binding
 
 ## Backlinks
 
+### Referenced By
+
+- [[LspAndCoverageSurfaceSpecification]] → managed/specs/domains/lsp-and-coverage-surface-spec.md:273
+
 ### Implemented By
 
 - SpecMetricsAggregator → src/spec/SpecMetricsAggregator.ts:179

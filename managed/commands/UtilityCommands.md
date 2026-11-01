@@ -64,22 +64,22 @@ tsdoc-edge find-doc <query>
 
 **Source**: `src/commands/FindDocCommand.ts`
 
-### find-unused-docs
+### docs find-unused
 
 Find unused documents.
 
 ```bash
-tsdoc-edge find-unused-docs [path]
+tsdoc-edge docs find-unused [path]
 ```
 
 **Source**: `src/commands/FindUnusedDocsCommand.ts`
 
-### doc-symbols
+### docs symbols
 
 List document symbols.
 
 ```bash
-tsdoc-edge doc-symbols [path]
+tsdoc-edge docs symbols [path]
 ```
 
 **Source**: `src/commands/DocSymbolsCommand.ts`
@@ -89,7 +89,7 @@ tsdoc-edge doc-symbols [path]
 Generates Markdown API and enhanced 6-category symbol documentation from annotated TypeScript sources.
 
 ```bash
-tsdoc-edge generate-docs [path] [options]
+tsdoc-edge docs generate [path] [options]
 ```
 
 **Source**: `src/commands/GenerateDocsCommand.ts`
@@ -99,7 +99,7 @@ tsdoc-edge generate-docs [path] [options]
 Verifies that generated Markdown documentation remains synchronized with current TypeScript TSDoc comments.
 
 ```bash
-tsdoc-edge validate-generated-docs [path]
+tsdoc-edge validate generated [path]
 ```
 
 **Source**: `src/commands/ValidateGeneratedDocsCommand.ts`
@@ -109,41 +109,31 @@ tsdoc-edge validate-generated-docs [path]
 Validates all TypeScript TSDoc comments and `tsdoc.json` strictly against `@microsoft/tsdoc` v0 rules.
 
 ```bash
-tsdoc-edge validate-tsdoc [path] [--strict] [--json]
+tsdoc-edge validate tsdoc [path] [--strict] [--json]
 ```
 
 **Source**: `src/commands/ValidateTsdocCommand.ts`
 
-## Symbol ID Commands
-
-### [[IdNewCommand]]
-
-Allocates a new unique symbol identifier in the JSONL symbol registry.
-
-```bash
-tsdoc-edge id-new [name]
-```
-
-**Source**: `src/commands/InitCommand.ts`
+## Symbol & Checkpoint Commands
 
 ### [[SymbolRenameCommand]]
 
 Renames a `[[Symbol]]` document checkpoint and updates all incoming Markdown and `@doc` references atomically.
 
 ```bash
-tsdoc-edge symbol-rename <old> <new>
+tsdoc-edge symbol rename <old> <new>
 ```
 
 **Source**: `src/commands/SymbolRenameCommand.ts`
 
 ## Code Quality Commands
 
-### find-method
+### symbol find-method
 
 Find methods by name.
 
 ```bash
-tsdoc-edge find-method <name>
+tsdoc-edge symbol find-method <name>
 ```
 
 **Source**: `src/commands/FindMethodCommand.ts`
@@ -153,7 +143,7 @@ tsdoc-edge find-method <name>
 Lists public exported API symbols alongside their immediate upstream and downstream dependencies.
 
 ```bash
-tsdoc-edge core-api [options]
+tsdoc-edge symbol core-api [options]
 ```
 
 **Source**: `src/commands/CoreApiCommand.ts`
@@ -163,7 +153,7 @@ tsdoc-edge core-api [options]
 Scans managed Markdown specifications for duplicate or near-duplicate content using similarity thresholds.
 
 ```bash
-tsdoc-edge check-duplicates [path]
+tsdoc-edge spec duplicates [path]
 ```
 
 **Source**: `src/commands/CheckDuplicatesCommand.ts`
@@ -232,22 +222,22 @@ tsdoc-edge docs todos [path]
 
 ## Ontology Commands
 
-### ontology-list
+### ontology list
 
 List ontology nodes and relationships.
 
 ```bash
-tsdoc-edge ontology-list [options]
+tsdoc-edge ontology list [options]
 ```
 
 **Source**: `src/commands/OntologyListCommand.ts`
 
-### ontology-stats
+### ontology stats
 
 Show ontology statistics.
 
 ```bash
-tsdoc-edge ontology-stats
+tsdoc-edge ontology stats
 ```
 
 **Source**: `src/commands/OntologyStatsCommand.ts`
@@ -331,7 +321,6 @@ tsdoc-edge docs move <from> <to>
 ### Referenced By
 
 - [[Commands Index]] → managed/COMMANDS.md:108
-- [[SyncCommand]] → managed/commands/SyncCommand.md:22
 
 ### Implemented By
 

@@ -1,4 +1,12 @@
-/** Project one exact saved convention check into file-scoped LSP diagnostics. */
+/**
+ * Project one exact saved convention check into file-scoped LSP diagnostics.
+ *
+ * @packageDocumentation
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @context Projects retained `ConventionCheckResult` findings into immutable editor diagnostics anchored to workspace source files
+ * @functionality Finding anchor resolution and file-scoped LSP diagnostic projection across conformance, naming, TSDoc, and graph-lint lanes
+ */
 
 import * as path from 'node:path';
 import { DiagnosticSeverity } from 'vscode-languageserver/node';
@@ -8,6 +16,8 @@ import type { DiagnosticInfo } from './diagnostics';
 /**
  * Immutable identity attached to saved convention LSP diagnostics.
  *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
  * @public
  */
 export interface SavedConventionDiagnosticData {
@@ -22,6 +32,8 @@ export interface SavedConventionDiagnosticData {
 /**
  * Authoritative workspace-relative source anchor of one saved convention finding.
  *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
  * @public
  */
 export interface SavedConventionFindingAnchor {
@@ -37,6 +49,8 @@ export interface SavedConventionFindingAnchor {
  * @param result - Retained convention check result owned by the server
  * @param findingId - Exact finding ID to resolve
  * @returns Authoritative finding anchor when present and active, otherwise `undefined`
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
  * @public
  */
 export function findSavedConventionFindingAnchor(
@@ -98,6 +112,8 @@ export function findSavedConventionFindingAnchor(
  * @param filePath - File path being diagnosed
  * @param historyId - Optional retained history ID
  * @returns Sorted immutable diagnostic projections for `filePath`
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
  * @public
  */
 export function conventionDiagnosticsForFile(

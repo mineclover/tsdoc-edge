@@ -6,6 +6,8 @@
  * @problem Need all context before editing a file
  * @solves Analyzes file through relationship graph to provide complete context
  * @context SSOT principle: Relationship-based context discovery
+ * @sideEffect database: Queries SQLite symbol and unified relationship tables via `DatabaseManager` (read)
+ * @sideEffect filesystem: Checks workspace paths and canonical graph configuration on disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -104,6 +106,9 @@ export interface EnhancedWorkContext {
  *
  * Analyzes a file and provides comprehensive context using relationship graph.
  *
+ * @doc [[EnhancedWorkContextAnalyzer]]
+ * @sideEffect database: Queries SQLite symbol and unified relationship tables via `DatabaseManager` (read)
+ * @sideEffect filesystem: Checks workspace paths and canonical graph configuration on disk (read)
  * @public
  * @example
  * ```typescript

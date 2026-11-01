@@ -1,4 +1,14 @@
-/** Operate exact convention history pins and tombstone-based retention GC. */
+/**
+ * Operate exact convention history pins and tombstone-based retention GC.
+ *
+ * @packageDocumentation
+ * @doc [[Convention Pack Check]]
+ * @doc [[ConventionCheck]]
+ * @context Operator CLI for convention check history pinning and tombstone-based garbage collection
+ * @functionality Supports `list`, `pin`, `unpin`, and `gc` (including `--dry-run`) operations on `ConventionCheckHistoryRepository`
+ * @sideEffect console: Writes retention summaries or `--json` output to stdout and errors to stderr
+ * @sideEffect database: Reads and mutates pins and tombstones in `ConventionCheckHistoryRepository` SQLite storage
+ */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -9,7 +19,13 @@ import {
 } from '../storage/ConventionCheckHistoryRepository';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
-/** Keep current history view separate from exact retained-history lookup. */
+/**
+ * Keep current history view separate from exact retained-history lookup.
+ *
+ * @doc [[Convention Pack Check]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export class ConventionRetentionCommand extends BaseCommand {
   getName(): string {
     return 'convention-retention';

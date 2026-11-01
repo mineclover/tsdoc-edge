@@ -21,5 +21,5 @@ Evaluates staged TypeScript and Markdown files against TSDoc completeness and co
 
 ### Implemented By
 
-- PreCommitChecker → src/analyzer/PreCommitChecker.ts:1
+- PreCommitChecker → src/analyzer/PreCommitChecker.ts:146
 

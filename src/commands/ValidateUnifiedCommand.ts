@@ -1,7 +1,13 @@
 /**
  * Unified Validate Command
  * Routes to appropriate validation subcommand
+ *
  * @packageDocumentation
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[ValidationFeatures]]
+ * @context Unified `validate` command group in the 20-command CLI surface
+ * @functionality Dispatches `connectivity`, `docs`, `generated`, `spec`, `refs`, and `tsdoc` validation subcommands
+ * @sideEffect console: Writes subcommand routing errors and validation subcommand help to stdout
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
@@ -29,6 +35,9 @@ type SubcommandName = keyof typeof SUBCOMMANDS;
 
 /**
  * Unified command for all validation operations
+ *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[ValidationFeatures]]
  * @public
  */
 export class ValidateUnifiedCommand extends BaseCommand {

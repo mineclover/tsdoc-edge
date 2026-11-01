@@ -35,10 +35,10 @@ TSDoc Edge는 두 가지 컨텍스트 명령어를 제공합니다:
 
 **기존 방식**: 4개 명령어를 따로따로 실행
 ```bash
-tsdoc-edge parse src/services/UserService.ts
-tsdoc-edge deps user-service
-tsdoc-edge test-relationships | grep user-service
-tsdoc-edge who-uses user-service
+tsdoc-edge symbol parse src/services/UserService.ts
+tsdoc-edge symbol deps user-service
+tsdoc-edge relationship analyze --type=tests | grep user-service
+tsdoc-edge symbol who-uses user-service
 ```
 
 **문제**: 너무 많은 단계, 정보가 분산됨.
@@ -601,13 +601,13 @@ tsdoc-edge work-context src/services/UserService.ts
 ### After: 상세 분석 (필요시)
 ```bash
 # 타입 변환 체인 상세 추적
-tsdoc-edge type-chain User UserDTO
+tsdoc-edge relationship type-chain User UserDTO
 
 # 의존성 트리 시각화
-tsdoc-edge visualize tree user-service
+tsdoc-edge relationship visualize tree user-service
 
 # 테스트 커버리지 상세
-tsdoc-edge test-relationships | grep user-service
+tsdoc-edge relationship analyze --type=tests | grep user-service
 ```
 
 **철학**:
@@ -764,11 +764,11 @@ done
 ## Related Commands
 
 개별 명령어 (상세 분석 필요 시):
-- `parse <file>` - TSDoc 파싱
-- `deps <symbol>` - 의존성
-- `who-uses <symbol>` - 역의존성
-- `type-chain <from> <to>` - 타입 체인
-- `test-relationships` - 테스트 매핑
+- `symbol parse <file>` - TSDoc 파싱
+- `symbol deps <symbol>` - 의존성
+- `symbol who-uses <symbol>` - 역의존성
+- `relationship type-chain <from> <to>` - 타입 체인
+- `relationship analyze --type=tests` - 테스트 매핑
 
 ---
 
@@ -786,7 +786,6 @@ done
 - [[TSDoc Edge Documentation]] → managed/README.md:158
 - [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1462
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:271
-- [[UsedByCommand]] → managed/commands/UsedByCommand.md:125
 - [[Feature Showcase]] → managed/examples/feature-showcase.md:268
 - [[Relationship Usage Examples]] → managed/examples/relationship-usage-examples.md:526
 - [[Codebase Health Report]] → managed/features/codebase-health-report.md:425

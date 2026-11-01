@@ -1,6 +1,14 @@
 /**
  * CLI commands for type chain analysis
+ *
  * @packageDocumentation
+ * @doc [[TypeChainCommand]]
+ * @doc [[FindRootTypesCommand]]
+ * @doc [[DetectCircularTypesCommand]]
+ * @context Interface and type dependency chain analysis via `tsdoc-edge relationship type-chain`, `roots`, and `cycles`
+ * @functionality Parses TypeScript interfaces with `InterfaceAnalyzer`, builds type dependency graphs, traces type chains, locates root/leaf types, and detects circular type dependencies
+ * @sideEffect console: Writes formatted type dependency trees, chains, root/leaf summaries, and cycle warnings to stdout
+ * @sideEffect filesystem: Recursively scans and reads TypeScript source files under `src/` (read)
  */
 
 import * as fs from 'node:fs';
@@ -24,6 +32,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * Command to analyze type dependency chains
  *
  * @doc [[TypeChainCommand]]
+ * @sideEffect console: Writes type dependency chains and trees to stdout; reads TypeScript source files
  * @public
  */
 export class TypeChainCommand extends BaseCommand {
@@ -370,6 +379,8 @@ export class TypeChainCommand extends BaseCommand {
 /**
  * Command to find root types (types with no incoming dependencies)
  *
+ * @doc [[FindRootTypesCommand]]
+ * @sideEffect console: Writes root and leaf type summaries to stdout; reads TypeScript source files
  * @public
  */
 export class FindRootTypesCommand extends BaseCommand {
@@ -549,6 +560,8 @@ export class FindRootTypesCommand extends BaseCommand {
 /**
  * Command to detect circular type dependencies
  *
+ * @doc [[DetectCircularTypesCommand]]
+ * @sideEffect console: Writes circular type dependency diagnostics to stdout; reads TypeScript source files
  * @public
  */
 export class DetectCircularTypesCommand extends BaseCommand {

@@ -1,6 +1,13 @@
 /**
  * Find Method Command - Find methods/functions by qualified name
+ *
  * @packageDocumentation
+ * @doc [[FindMethodCommand]]
+ * @doc [[CLI Commands]]
+ * @context Qualified method and function lookup via `tsdoc-edge symbol find-method`
+ * @functionality Searches `SymbolRegistryManager` and `.tsdoc.db` by exact or partial `Class#method` / `Class.method` patterns
+ * @sideEffect console: Writes matching method locations and metadata in XML or human format to stdout
+ * @sideEffect database: Reads `DatabaseManager` and symbol registry files on disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -18,7 +25,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @responsibility Search for methods/functions by qualified name
  * @contract Searches registry, displays matches with details
  * @doc [[FindMethodCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#find-method]]
+ * @sideEffect console: Writes matched method details to stdout; reads `.tsdoc.db` and symbol registry
  *
  * @problem Need to find specific methods/functions in codebase
  * @solves Searches by qualified name (Class#method or Class.method)

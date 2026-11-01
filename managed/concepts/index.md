@@ -79,9 +79,9 @@ Wiki 스타일 `[[Symbol]]` 문법으로 문서와 코드를 양방향 연결.
 - 코드 ↔ 문서 트레이서빌리티
 
 **Commands**:
-- `index-docs` - 문서 심볼 인덱스 생성
-- `update-backlinks` - Backlinks 자동 생성
-- `validate-symbol-refs` - 참조 무결성 검증
+- `docs index` - 문서 심볼 인덱스 생성
+- `docs backlinks` - Backlinks 자동 생성
+- `validate refs` - 참조 무결성 검증
 
 **Benefits**:
 - 빠른 문서 탐색

@@ -1,6 +1,10 @@
 /**
  * Test symbol types and interfaces
+ *
  * @packageDocumentation
+ * @doc [[Types Index]]
+ * @context Test suite, test case, test scenario, and test coverage extraction contracts
+ * @functionality Defines BaseTestSymbol, TestSuite, TestCase, TestScenario, TestSymbol, TestCoverageMetadata, TestExtractionResult, and TestExtractionOptions types
  * @see [[TEST_SYMBOL_EXTRACTION]] for extraction strategy
  */
 
@@ -9,6 +13,7 @@ import type { Symbol, TestSymbolType } from './graph/graph';
 /**
  * Base test symbol interface
  * Extends Symbol with test-specific properties
+ * @doc [[Types Index]]
  * @public
  */
 export interface BaseTestSymbol extends Omit<Symbol, 'type'> {
@@ -31,6 +36,7 @@ export interface BaseTestSymbol extends Omit<Symbol, 'type'> {
 /**
  * Test Suite symbol
  * Represents a describe() block in test files
+ * @doc [[Types Index]]
  * @public
  * @example
  * ```typescript
@@ -66,6 +72,7 @@ export interface TestSuite extends BaseTestSymbol {
 /**
  * Test Case symbol
  * Represents an it() or test() block in test files
+ * @doc [[Types Index]]
  * @public
  * @example
  * ```typescript
@@ -100,7 +107,8 @@ export interface TestCase extends BaseTestSymbol {
 
 /**
  * Test Scenario symbol
- * Represents a @testScenario JSDoc tag
+ * Represents a `@testScenario` JSDoc tag
+ * @doc [[Types Index]]
  * @public
  * @example
  * ```typescript
@@ -129,12 +137,14 @@ export interface TestScenario extends BaseTestSymbol {
 
 /**
  * Union of all test symbol types
+ * @doc [[Types Index]]
  * @public
  */
 export type TestSymbol = TestSuite | TestCase | TestScenario;
 
 /**
  * Test coverage relationship metadata
+ * @doc [[Types Index]]
  * @public
  */
 export interface TestCoverageMetadata {
@@ -162,6 +172,7 @@ export interface TestCoverageMetadata {
 
 /**
  * Test extraction result
+ * @doc [[Types Index]]
  * @public
  */
 export interface TestExtractionResult {
@@ -202,6 +213,7 @@ export interface TestExtractionResult {
 
 /**
  * Test symbol extraction options
+ * @doc [[Types Index]]
  * @public
  */
 export interface TestExtractionOptions {

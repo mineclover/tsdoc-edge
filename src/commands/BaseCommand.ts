@@ -1,6 +1,13 @@
 /**
  * Base command class for CLI commands
+ *
  * @packageDocumentation
+ * @doc [[BaseCommand]]
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @context Shared CLI execution, option parsing, validation, and output infrastructure for all TSDoc Edge commands
+ * @functionality Template-method command lifecycle, ANSI/XML output formatting, fail-closed flag validation, and symbol resolution
+ * @sideEffect console: Writes formatted headers, diagnostics, and XML/human output to stdout and stderr
+ * @sideEffect filesystem: Reads `.tsdoc.config.json` and checks database, source file, and directory paths on disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -11,6 +18,10 @@ import type { Symbol } from '../types/graph/graph';
 
 /**
  * Result of symbol resolution
+ *
+ * @doc [[BaseCommand]]
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @public
  */
 export interface ResolvedSymbol {
   symbol: Symbol | SymbolRow;
@@ -20,6 +31,10 @@ export interface ResolvedSymbol {
 
 /**
  * Command execution result
+ *
+ * @doc [[BaseCommand]]
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @public
  */
 export interface CommandResult {
   /** Exit code (0 = success) */
@@ -32,6 +47,10 @@ export interface CommandResult {
 
 /**
  * ANSI color codes for terminal output
+ *
+ * @doc [[BaseCommand]]
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @public
  */
 export const colors = {
   reset: '\x1b[0m',
@@ -47,6 +66,8 @@ export const colors = {
 /**
  * Base class for all CLI commands
  *
+ * @doc [[BaseCommand]]
+ * @doc [[CliCommandSurfaceSpecification]]
  * @public
  * @responsibility Provide common CLI command infrastructure
  * @contract Execute command and return structured result
@@ -60,6 +81,8 @@ export const colors = {
  * - Output formatting: Headers, sections, success/error messages
  * - Error handling: Structured error results with exit codes
  * - Testability: Returns result objects instead of process.exit
+ *
+ * @sideEffect console: Writes formatted CLI output to stdout/stderr; reads configuration and SQLite symbol lookups
  *
  * @decision Use abstract class instead of interface
  * @rationale Provides default implementations for common operations, enforces structure while allowing customization

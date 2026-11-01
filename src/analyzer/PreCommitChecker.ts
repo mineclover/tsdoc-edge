@@ -15,8 +15,10 @@
  * @rationale Standard git approach, Works with all git workflows
  * @consequences Requires git repository, Fast and reliable
  *
+ * @packageDocumentation
  * @doc [[PreCommitChecker]]
- * @public
+ * @sideEffect process: Executes `git diff --cached` subprocess to discover staged TypeScript files (read)
+ * @sideEffect filesystem: Reads staged and workspace TypeScript source files from disk (read)
  */
 
 import { execSync } from 'node:child_process';
@@ -136,6 +138,9 @@ export interface PreCommitReport {
  * }
  * ```
  *
+ * @doc [[PreCommitChecker]]
+ * @sideEffect process: Executes `git diff --cached` subprocess to discover staged TypeScript files (read)
+ * @sideEffect filesystem: Reads staged and workspace TypeScript source files from disk (read)
  * @public
  */
 export class PreCommitChecker {

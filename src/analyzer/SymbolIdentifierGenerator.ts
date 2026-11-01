@@ -1,7 +1,12 @@
 /**
  * Symbol Identifier Generator
  * Generates stable identifiers for symbols across refactorings
+ *
  * @packageDocumentation
+ * @doc [[Analyzer System]]
+ * @context Multi-tier symbol identity generator producing permanent UUIDs, workspace-local paths, package-scoped global paths, and legacy IDs
+ * @functionality Nearest-`package.json` scope discovery, `file::Symbol` local path formatting, `@scope/pkg::Symbol` global path synthesis, and legacy ID bridging
+ * @sideEffect filesystem: Searches ancestor directories and reads `package.json` manifests to resolve package scopes (read)
  */
 
 import { randomUUID } from 'node:crypto';
@@ -11,6 +16,9 @@ import { generateLegacyId } from '../indexer/legacy-id';
 
 /**
  * Symbol identifier components
+ *
+ * @doc [[Analyzer System]]
+ * @public
  */
 export interface SymbolIdentifiers {
   /** Permanent UUID (never changes) */
@@ -50,6 +58,12 @@ function parseJson<T>(raw: string): T {
 /**
  * Symbol Identifier Generator
  * Provides stable, refactoring-resistant identifiers
+ *
+ * @doc [[Analyzer System]]
+ * @context Assigns UUID, local, global, scope, and legacy identifiers to extracted TypeScript symbols
+ * @functionality Caches nearest `package.json` metadata and computes `SymbolIdentifiers` for top-level and member declarations
+ * @sideEffect filesystem: Searches ancestor directories and reads `package.json` manifests to resolve package scopes (read)
+ * @public
  */
 export class SymbolIdentifierGenerator {
   private packageCache = new Map<string, PackageInfo>();

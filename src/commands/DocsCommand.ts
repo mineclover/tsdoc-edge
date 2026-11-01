@@ -1,7 +1,13 @@
 /**
  * Unified Docs Command
  * Routes to appropriate docs subcommand
+ *
  * @packageDocumentation
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[Document Symbol System]]
+ * @context Unified `docs` command router in the 20-command CLI surface
+ * @functionality Dispatches document indexing, backlinks, link checking, symbol-ref updates, generation, validation, move, fix, suggest, todos, and plans subcommands
+ * @sideEffect console: Writes subcommand routing errors and available subcommand listings to stdout
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
@@ -45,6 +51,9 @@ type SubcommandName = keyof typeof SUBCOMMANDS;
 
 /**
  * Unified command for all docs operations
+ *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[Document Symbol System]]
  * @public
  */
 export class DocsCommand extends BaseCommand {

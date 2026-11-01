@@ -1,20 +1,28 @@
 /**
  * Enhanced inheritance tracking types
+ *
  * @packageDocumentation
+ * @doc [[Inheritance]]
+ * @context Class and interface inheritance hierarchy, abstraction level, and member override analysis
+ * @functionality Defines InheritanceDirection, AbstractionLevel, InheritanceType, InheritanceRelationship, OverriddenMember, SignatureChange, InheritanceChain, ChainNode, ChainIssue, InheritanceHierarchy, HierarchyNode, and AbstractionDetection types
  */
 
 /**
  * Inheritance direction
+ * @doc [[Inheritance]]
+ * @public
  */
 export enum InheritanceDirection {
-  /** Child → Parent (default) */
+  /** Child to Parent (default) */
   SUBCLASS_TO_BASE = 'subclass-to-base',
-  /** Parent → Children (reverse lookup) */
+  /** Parent to Children (reverse lookup) */
   BASE_TO_SUBCLASS = 'base-to-subclass',
 }
 
 /**
  * Abstraction level of class/interface
+ * @doc [[Inheritance]]
+ * @public
  */
 export enum AbstractionLevel {
   /** Concrete class (can be instantiated) */
@@ -29,11 +37,15 @@ export enum AbstractionLevel {
 
 /**
  * Inheritance relationship type
+ * @doc [[Inheritance]]
+ * @public
  */
 export type InheritanceType = 'extends' | 'implements' | 'mixins';
 
 /**
  * Enhanced inheritance relationship
+ * @doc [[Inheritance]]
+ * @public
  */
 export interface InheritanceRelationship {
   /** Relationship ID */
@@ -77,6 +89,8 @@ export interface InheritanceRelationship {
 
 /**
  * Overridden member information
+ * @doc [[Inheritance]]
+ * @public
  */
 export interface OverriddenMember {
   /** Member name */
@@ -100,6 +114,8 @@ export interface OverriddenMember {
 
 /**
  * Signature change details
+ * @doc [[Inheritance]]
+ * @public
  */
 export interface SignatureChange {
   /** Change type */
@@ -117,6 +133,8 @@ export interface SignatureChange {
 
 /**
  * Inheritance chain analysis
+ * @doc [[Inheritance]]
+ * @public
  */
 export interface InheritanceChain {
   /** Root symbol ID (most derived class) */
@@ -137,6 +155,8 @@ export interface InheritanceChain {
 
 /**
  * Chain node
+ * @doc [[Inheritance]]
+ * @public
  */
 export interface ChainNode {
   /** Symbol ID */
@@ -157,6 +177,8 @@ export interface ChainNode {
 
 /**
  * Chain issue
+ * @doc [[Inheritance]]
+ * @public
  */
 export interface ChainIssue {
   /** Issue type */
@@ -174,6 +196,8 @@ export interface ChainIssue {
 
 /**
  * Inheritance hierarchy (all subclasses)
+ * @doc [[Inheritance]]
+ * @public
  */
 export interface InheritanceHierarchy {
   /** Root symbol ID (base class) */
@@ -197,6 +221,8 @@ export interface InheritanceHierarchy {
 
 /**
  * Hierarchy node (subclass)
+ * @doc [[Inheritance]]
+ * @public
  */
 export interface HierarchyNode {
   /** Symbol ID */
@@ -220,6 +246,8 @@ export interface HierarchyNode {
 
 /**
  * Abstraction level detection result
+ * @doc [[Inheritance]]
+ * @public
  */
 export interface AbstractionDetection {
   /** Symbol ID */

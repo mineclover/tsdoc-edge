@@ -1,6 +1,13 @@
 /**
  * Spec Bump Command - Bump specification version
+ *
  * @packageDocumentation
+ * @doc [[SpecBumpCommand]]
+ * @doc [[CLI Commands]]
+ * @context Semantic version bumping for managed specifications via `tsdoc-edge spec bump`
+ * @functionality Parses YAML frontmatter semver versions and writes `--major`, `--minor`, or `--patch` updates via `SpecVersionManager`
+ * @sideEffect console: Writes old and new specification version transitions to stdout
+ * @sideEffect filesystem: Reads and updates YAML frontmatter version fields in Markdown specification files
  */
 
 import * as fs from 'node:fs';
@@ -15,7 +22,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @responsibility Increment specification version number
  * @contract Validates bump type, updates frontmatter, shows changes
  * @doc [[SpecBumpCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#spec-bump]]
+ * @sideEffect filesystem: Updates YAML frontmatter version in specification Markdown files; writes CLI status to stdout
  *
  * @problem Need to increment version following semver
  * @solves Bumps version (major, minor, patch) automatically

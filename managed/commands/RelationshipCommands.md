@@ -21,7 +21,7 @@ The relationship commands provide tools for exploring and analyzing the relation
 Queries incoming and outgoing unified relationships for a symbol filtered by type, category, and depth.
 
 ```bash
-tsdoc-edge relationship-query <symbol-id> [options]
+tsdoc-edge relationship query <symbol-id> [options]
   --type <type>       Filter by relationship type
   --direction <dir>   'incoming', 'outgoing', or 'both'
   --depth <n>         Traversal depth (default: 1)
@@ -34,7 +34,7 @@ tsdoc-edge relationship-query <symbol-id> [options]
 Finds shortest and filtered dependency connection paths between two symbols in the relationship graph.
 
 ```bash
-tsdoc-edge relationship-path <from> <to> [options]
+tsdoc-edge relationship path <from> <to> [options]
   --max-depth <n>     Maximum path length
   --type <type>       Filter by relationship type
 ```
@@ -58,7 +58,7 @@ tsdoc-edge query-inferred <symbol-id> [options]
 Computes direct and transitive downstream/upstream change impact for a given symbol up to a configurable depth.
 
 ```bash
-tsdoc-edge relationship-impact <symbol-id> [options]
+tsdoc-edge relationship impact <symbol-id> [options]
   --depth <n>         Impact traversal depth
   --output <format>   json, table, or mermaid
 ```
@@ -70,7 +70,7 @@ tsdoc-edge relationship-impact <symbol-id> [options]
 Calculates graph centrality, degree, betweenness, and hub/bridge importance metrics across symbols.
 
 ```bash
-tsdoc-edge relationship-metrics [options]
+tsdoc-edge relationship metrics [options]
   --top <n>           Show top N symbols
   --metric <type>     Specific metric to calculate
 ```
@@ -82,7 +82,7 @@ tsdoc-edge relationship-metrics [options]
 Discovers cohesive architectural clusters and module boundaries within the unified relationship graph.
 
 ```bash
-tsdoc-edge relationship-clusters [options]
+tsdoc-edge relationship clusters [options]
   --min-size <n>      Minimum cluster size
   --algorithm <alg>   Clustering algorithm
 ```
@@ -96,7 +96,7 @@ tsdoc-edge relationship-clusters [options]
 Validates referential integrity, endpoint existence, and schema consistency of stored relationship records.
 
 ```bash
-tsdoc-edge relationship-validate [options]
+tsdoc-edge relationship validate [options]
   --fix               Auto-fix issues
 ```
 
@@ -107,7 +107,7 @@ tsdoc-edge relationship-validate [options]
 Runs a pre-change safety check summarizing high-risk dependents and contract constraints for a target symbol.
 
 ```bash
-tsdoc-edge relationship-check <symbol-id>
+tsdoc-edge relationship check <symbol-id>
 ```
 
 **Source**: `src/commands/RelationshipCheckCommand.ts`
@@ -119,7 +119,7 @@ tsdoc-edge relationship-check <symbol-id>
 Exports symbol relationship subgraphs to JSON, CSV, DOT, and GraphML interchange formats.
 
 ```bash
-tsdoc-edge relationship-export [options]
+tsdoc-edge relationship export [options]
   --format <fmt>      json, graphml, dot, or csv
   --output <file>     Output file path
   --filter <type>     Filter by relationship type
@@ -132,7 +132,7 @@ tsdoc-edge relationship-export [options]
 Renders Mermaid relationship diagrams centered on a target symbol with configurable depth and edge filters.
 
 ```bash
-tsdoc-edge relationship-visualize <symbol-id> [options]
+tsdoc-edge relationship visualize <symbol-id> [options]
   --depth <n>         Visualization depth
   --type <type>       Filter by relationship type
 ```
@@ -146,7 +146,7 @@ tsdoc-edge relationship-visualize <symbol-id> [options]
 Reports aggregate counts and distributions of stored relationships grouped by type, category, and confidence.
 
 ```bash
-tsdoc-edge relationship-stats [options]
+tsdoc-edge relationship stats [options]
   --by-type           Group by relationship type
 ```
 
@@ -157,7 +157,7 @@ tsdoc-edge relationship-stats [options]
 Displays interactive usage guidance and workflow recipes for the relationship analysis CLI command suite.
 
 ```bash
-tsdoc-edge relationship-help
+tsdoc-edge relationship help
 ```
 
 **Source**: `src/commands/RelationshipHelpCommand.ts`
@@ -179,4 +179,6 @@ tsdoc-edge relationship-help
 ### Implemented By
 
 - RelationshipCommands → src/commands/RelationshipQueryCommand.ts:1
+- AnalyzeRelationshipsCommand → src/commands/AnalyzeRelationshipsCommand.ts:42
+- RelationshipCommand → src/commands/RelationshipCommand.ts:60
 

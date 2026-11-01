@@ -75,16 +75,19 @@ tsdoc-edge work-context src/analyzer/CallGraphAnalyzer.ts
 
 - [[CLI Commands]] → managed/CLI-COMMANDS.md:33
 - [[TSDoc Edge Documentation]] → managed/README.md:78
-- [[QueryCommands]] → managed/commands/QueryCommands.md:140
+- [[DesignContextCommand]] → managed/commands/DesignContextCommand.md:26
+- [[QueryCommands]] → managed/commands/QueryCommands.md:138
 - [[Module Specification Framework]] → managed/concepts/module-specification-framework.md:401
 - [[Impact Analysis]] → managed/features/ImpactAnalysis.md:202
 - [[CoreWorkflow]] → managed/features/core-workflow.md:90
+- [[MCP Integration]] → managed/features/mcp-integration.md:67
 - [[Guides & Tutorials]] → managed/guides/index.md:215
 - [[Mermaid Symbol Extractor]] → managed/parser/MermaidSymbolExtractor.md:81
-- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:197
+- [[CliCommandSurfaceSpecification]] → managed/specs/domains/cli-command-surface-spec.md:403
+- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:266
 - [[Work Context Workflow]] → managed/workflows/work-context-workflow.md:14
 
 ### Implemented By
 
-- WorkContextCommand → src/commands/WorkContextCommand.ts:1
+- WorkContextCommand → src/commands/WorkContextCommand.ts:63
 

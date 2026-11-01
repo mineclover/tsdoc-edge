@@ -195,7 +195,7 @@ tsdoc-edge impact-heatmap
 
 ## Commands
 
-- **[[UsedByCommand]]**: Direct reverse dependencies
+- **[[WhoUsesCommand]]**: Direct reverse dependencies
 - **[[DepsCommand]]**: Forward dependencies
 - **[[WhoUsesCommand]]**: Name-based dependency search
 - **[[TypeChainCommand]]**: Transitive dependency chains
@@ -286,7 +286,7 @@ Break large impacts into smaller steps:
 ## Related
 
 - **[[Dependency Analysis]]**: Provides dependency data
-- **[[UsedByCommand]]**: Impact analysis tool
+- **[[WhoUsesCommand]]**: Impact analysis tool
 - **[[WorkContextCommand]]**: Context before editing
 - **[[QueryCommands]]**: Analysis command group
 
@@ -302,7 +302,6 @@ Break large impacts into smaller steps:
 
 ### Referenced By
 
-- [[UsedByCommand]] → managed/commands/UsedByCommand.md:124
 - [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:178
 - [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:222
 

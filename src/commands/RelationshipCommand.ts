@@ -1,7 +1,13 @@
 /**
  * Unified Relationship Command
  * Routes to appropriate subcommand: query, impact, path, clusters, metrics, etc.
+ *
  * @packageDocumentation
+ * @doc [[RelationshipCommands]]
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @context Unified `relationship` command group in the 20-command CLI surface
+ * @functionality Routes 15 relationship subcommands (`query`, `impact`, `path`, `clusters`, `metrics`, `validate`, `export`, `stats`, `check`, `visualize`, `analyze`, `type-chain`, `cycles`, `roots`, `help`)
+ * @sideEffect console: Writes subcommand routing diagnostics and available subcommand help to stdout
  */
 
 import { AnalyzeRelationshipsCommand } from './AnalyzeRelationshipsCommand';
@@ -46,6 +52,9 @@ type SubcommandName = keyof typeof SUBCOMMANDS;
 
 /**
  * Unified command for all relationship operations
+ *
+ * @doc [[RelationshipCommands]]
+ * @doc [[CliCommandSurfaceSpecification]]
  * @public
  */
 export class RelationshipCommand extends BaseCommand {

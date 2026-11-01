@@ -206,7 +206,6 @@ Source: `src/commands/Phase5Commands.ts`
 - [[TSDoc Edge Documentation]] → managed/README.md:104
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:270
 - [[DepsCommand]] → managed/commands/DepsCommand.md:148
-- [[UsedByCommand]] → managed/commands/UsedByCommand.md:120
 - [[CI/CD Integration]] → managed/features/CICDIntegration.md:249
 - [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:105
 - [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:160
@@ -216,5 +215,5 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Implemented By
 
-- OrphansCommand → src/commands/OrphansCommand.ts:38
+- OrphansCommand → src/commands/OrphansCommand.ts:47
 

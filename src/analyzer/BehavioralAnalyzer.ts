@@ -61,6 +61,7 @@ interface TemporalOrder {
 /**
  * Behavioral Analyzer
  *
+ * @doc [[BehavioralAnalyzer]]
  * @public
  * @responsibility Detect and analyze behavioral relationships
  */

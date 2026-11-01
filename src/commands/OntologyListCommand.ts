@@ -1,10 +1,16 @@
 /**
  * Ontology List Command
  * @packageDocumentation
+ * @doc [[OntologyListCommand]]
+ * @doc [[Relationship Ontology]]
  *
  * @responsibility List instances of specific ontology elements from Canonical `@ttsc/graph` and Enrichment DB
  * @problem Need to explore specific relationship types or node types
  * @solves Provides detailed listing of instances with filtering, pagination, and format options
+ * @context Ontology node and relationship instance listing via `tsdoc-edge ontology list`
+ * @functionality Filters, paginates, and formats ontology nodes and projected edges across canonical `@ttsc/graph` and `.tsdoc.db` in table, JSON, or CSV format
+ * @sideEffect console: Writes formatted ontology element tables, JSON, or CSV output to stdout
+ * @sideEffect database: Reads canonical `@ttsc/graph` and `DatabaseManager` SQLite repositories (read)
  */
 
 import * as fs from 'node:fs';
@@ -56,6 +62,7 @@ interface ListedOntologyRelationship {
  * Command for listing ontology element instances across Canonical `@ttsc/graph` and Enrichment DB.
  *
  * @doc [[OntologyListCommand]]
+ * @sideEffect console: Writes ontology element listings to stdout; reads SQLite repositories
  * @public
  */
 export class OntologyListCommand extends BaseCommand {

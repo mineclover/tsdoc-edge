@@ -115,12 +115,14 @@ export class MyCommand extends BaseCommand {
 - [[SymbolQueryCommand]] → managed/commands/SymbolQueryCommand.md:187
 - [[UndocumentedCommand]] → managed/commands/UndocumentedCommand.md:76
 - [[UntestedCommand]] → managed/commands/UntestedCommand.md:78
-- [[UsedByCommand]] → managed/commands/UsedByCommand.md:65
 - [[WhoUsesCommand]] → managed/commands/WhoUsesCommand.md:73
 - [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:18
 - [[Guides & Tutorials]] → managed/guides/index.md:118
 
 ### Implemented By
 
-- BaseCommand → src/commands/BaseCommand.ts:1
+- BaseCommand → src/commands/BaseCommand.ts:91
+- ResolvedSymbol → src/commands/BaseCommand.ts:26
+- CommandResult → src/commands/BaseCommand.ts:39
+- colors → src/commands/BaseCommand.ts:55
 

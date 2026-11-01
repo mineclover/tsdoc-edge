@@ -1,6 +1,13 @@
 /**
  * Validate-docs command - Validate document symbols for SSOT compliance
+ *
  * @packageDocumentation
+ * @doc [[ValidateDocsCommand]]
+ * @doc [[CLI Commands]]
+ * @context Document checkpoint SSOT validation via `tsdoc-edge docs validate` and `tsdoc-edge validate docs`
+ * @functionality Scans managed Markdown documents, registers `[[Symbol]]` definitions and references, and reports duplicate H1s, missing primaries, and broken references
+ * @sideEffect console: Writes validation errors, warnings, and summary counts to stdout
+ * @sideEffect filesystem: Reads managed Markdown files and `.tsdoc/doc-symbols.json` index on disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -17,7 +24,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @responsibility Validate document symbols against SSOT rules
  * @contract Parse documents, validate symbols, report errors and warnings
  * @doc [[ValidateDocsCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#validate-docs]]
+ * @sideEffect console: Writes validation errors and warnings to stdout; reads managed Markdown files
  *
  * @problem Document symbols can have conflicts, orphans, or missing definitions
  * @solves Validates all document symbols and reports SSOT violations

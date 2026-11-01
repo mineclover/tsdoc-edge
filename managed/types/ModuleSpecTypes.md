@@ -229,4 +229,13 @@ tsdoc-edge improve src/services/UserService.ts
 ### Implemented By
 
 - ModuleSpecTypes → src/types/spec/module-spec.ts:1
+- ModuleSpecTemplate → src/types/spec/module-spec.ts:181
+- ModuleSpecResult → src/types/spec/module-spec.ts:219
+- SpecStatus → src/types/spec.ts:18
+- SpecMetadata → src/types/spec.ts:26
+- SpecRequirements → src/types/spec.ts:58
+- SpecCompletenessResult → src/types/spec.ts:81
+- ContentSimilarity → src/types/spec.ts:155
+- UnusedDocument → src/types/spec.ts:184
+- SpecStatusTransition → src/types/spec.ts:213
 

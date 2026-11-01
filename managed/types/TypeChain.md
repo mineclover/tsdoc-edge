@@ -134,5 +134,9 @@ tsdoc-edge analyze-chains
 
 ### Implemented By
 
-- TypeChain → src/types/domain/type-chain.ts:1
+- TypeChain → src/types/domain/type-chain.ts:49
+- TypeChainStep → src/types/domain/type-chain.ts:17
+- TypeDependencyNode → src/types/domain/type-chain.ts:86
+- TypeChainAnalysisResult → src/types/domain/type-chain.ts:123
+- TypeChainOptions → src/types/domain/type-chain.ts:170
 

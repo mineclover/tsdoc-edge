@@ -21,5 +21,5 @@ Lists public exported API symbols alongside their immediate upstream and downstr
 
 ### Implemented By
 
-- CoreApiCommand → src/commands/CoreApiCommand.ts:36
+- CoreApiCommand → src/commands/CoreApiCommand.ts:43
 

@@ -126,5 +126,6 @@ const tempId = tempIdGen.generate(); // "x7k"
 
 ### Implemented By
 
-- IdGenerator → src/utils/IdGenerator.ts:1
+- IdGenerator → src/utils/IdGenerator.ts:54
+- IdGeneratorOptions → src/utils/IdGenerator.ts:17
 

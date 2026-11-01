@@ -366,10 +366,10 @@ Change algorithm → Update Logic section
 
 ```bash
 # Validate all docs
-tsdoc-edge validate-spec managed
+tsdoc-edge validate spec managed
 
 # Show incomplete specs only
-tsdoc-edge validate-spec managed | grep "⚠️"
+tsdoc-edge validate spec managed | grep "⚠️"
 ```
 
 ### Generation
@@ -424,5 +424,5 @@ This framework is inspired by:
 - [[Concepts Index]] → managed/concepts/index.md:250
 - [[Feature Showcase]] → managed/examples/feature-showcase.md:265
 - [[EnhancedDocExtractor]] → managed/parser/EnhancedDocExtractor.md:406
-- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:121
+- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:184
 

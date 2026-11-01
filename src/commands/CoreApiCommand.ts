@@ -1,6 +1,12 @@
 /**
  * Core API Command - Show core API symbols
+ *
  * @packageDocumentation
+ * @doc [[CoreApiCommand]]
+ * @context Public API surface inspection command invoked via `tsdoc-edge symbol core-api`
+ * @functionality Loads symbol graph data from `.tsdoc.db`, filters exported symbols, expands 1-depth dependencies, and prints the core API surface
+ * @sideEffect console: Writes formatted exported symbol summaries to stdout
+ * @sideEffect database: Reads symbol and dependency rows from `DatabaseManager` (read)
  */
 
 import { SymbolGraphBuilder } from '../graph/SymbolGraphBuilder';
@@ -16,6 +22,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @responsibility Display exported symbols and their immediate dependencies
  * @contract Loads database, filters exports, computes 1-depth dependencies
  * @doc [[CoreApiCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#core-api]]
  *
  * @problem Need to identify public API surface of codebase

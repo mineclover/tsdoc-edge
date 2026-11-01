@@ -1,6 +1,13 @@
 /**
  * Spec Status Command - Manage specification status
+ *
  * @packageDocumentation
+ * @doc [[SpecStatusCommand]]
+ * @doc [[CLI Commands]]
+ * @context Specification frontmatter lifecycle management (`draft` `->` `review` `->` `approved` `->` `active`) via `tsdoc-edge spec status`
+ * @functionality Supports `show`, `promote`, `list-ready`, and `stats` subcommands backed by `SpecStatusManager`
+ * @sideEffect console: Writes lifecycle status details, promotion readiness, and distribution tables to stdout
+ * @sideEffect filesystem: Reads Markdown specification files and updates YAML frontmatter during `promote`
  */
 
 import * as fs from 'node:fs';
@@ -45,7 +52,9 @@ function findMarkdownFiles(dir: string): string[] {
  * @responsibility Manage document status lifecycle
  * @contract Validates and applies status transitions
  * @doc [[SpecStatusCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#spec-status]]
+ * @sideEffect filesystem: Reads and updates specification frontmatter status on disk; writes CLI summaries to stdout
  *
  * @problem Documents need lifecycle management (draft → review → approved → active)
  * @solves Enforces valid status transitions with validation checks

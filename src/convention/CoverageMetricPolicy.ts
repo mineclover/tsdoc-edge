@@ -1,4 +1,12 @@
-/** Bind coverage metric gate eligibility to the revision-pinned convention result. */
+/**
+ * Bind coverage metric gate eligibility to the revision-pinned convention result.
+ *
+ * @doc [[ConventionCheck]]
+ * @doc [[Convention Pack Check]]
+ * @context Coverage metric policy evaluator bridging revision-pinned coverage reports and gate eligibility rules into deterministic convention findings.
+ * @functionality Validates coverage metric gate eligibility against the pinned graph revision and fingerprint, checks explicit minimum ratio thresholds, and parses CLI threshold expressions.
+ * @packageDocumentation
+ */
 
 import { createHash } from 'node:crypto';
 import type { CoverageMetricId, CoverageMetricResult } from '../metrics/CoverageMetricContract';
@@ -8,8 +16,20 @@ import {
   resolveCoverageMetricGate,
 } from '../metrics/CoverageMetricGate';
 
+/**
+ * Schema contract version for coverage metric policy reports.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const COVERAGE_METRIC_POLICY_CONTRACT_VERSION = '1.0' as const;
 
+/**
+ * Revision-pinned coverage metric report and optional ratio thresholds evaluated by convention policy.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface CoverageMetricPolicyInput {
   readonly reportId: string;
   readonly graphRevisionId: string;
@@ -19,18 +39,34 @@ export interface CoverageMetricPolicyInput {
   readonly thresholds?: readonly CoverageMetricPolicyThreshold[];
 }
 
-/** Minimum ratio requested for one metric ID; values are fractions from 0 to 1. */
+/**
+ * Minimum ratio requested for one metric ID; values are fractions from 0 to 1.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface CoverageMetricPolicyThreshold {
   readonly metricId: CoverageMetricId;
   readonly minimum: number;
 }
 
+/**
+ * Evaluated coverage metric paired with its resolved gate eligibility decision.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface CoverageMetricPolicyMetric {
   readonly metric: CoverageMetricResult;
   readonly decision: CoverageMetricGateDecision;
 }
 
-/** A convention finding emitted when requested metric gate evidence is unsupported. */
+/**
+ * A convention finding emitted when requested metric gate evidence is unsupported.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface CoverageMetricPolicyFinding {
   readonly findingId: string;
   readonly ruleId: 'coverage.metric-gate';
@@ -42,6 +78,12 @@ export interface CoverageMetricPolicyFinding {
   readonly message: string;
 }
 
+/**
+ * Immutable report summarizing coverage metric gate decisions and threshold findings.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface CoverageMetricPolicyReport {
   readonly contractVersion: typeof COVERAGE_METRIC_POLICY_CONTRACT_VERSION;
   readonly reportId: string;
@@ -53,7 +95,12 @@ export interface CoverageMetricPolicyReport {
   readonly findings: readonly CoverageMetricPolicyFinding[];
 }
 
-/** Evaluate gate eligibility and explicit ratio thresholds without weakening evidence semantics. */
+/**
+ * Evaluate gate eligibility and explicit ratio thresholds without weakening evidence semantics.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export function evaluateCoverageMetricPolicy(
   input: CoverageMetricPolicyInput
 ): CoverageMetricPolicyReport {
@@ -125,7 +172,12 @@ export function evaluateCoverageMetricPolicy(
   });
 }
 
-/** Parse the CLI form `metric.id=0.8,other.metric=0.9` into canonical thresholds. */
+/**
+ * Parse the CLI form `metric.id=0.8,other.metric=0.9` into canonical thresholds.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export function parseCoverageMetricThresholds(
   value: string
 ): readonly CoverageMetricPolicyThreshold[] {

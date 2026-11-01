@@ -1,11 +1,16 @@
 /**
  * Symbol registry types for JSONL storage
+ *
  * @packageDocumentation
+ * @doc [[RegistryTypes]]
  * @responsibility Define minimal schema for symbol identification
+ * @context Persistent JSONL symbol registry mapping permanent symbol IDs to source locations and dependencies
+ * @functionality Defines SourceRef, DependencyRelation, SymbolRegistryEntry, and SymbolRegistry contracts
  */
 
 /**
  * Source reference pointing to code location
+ * @doc [[RegistryTypes]]
  * @public
  */
 export interface SourceRef {
@@ -79,6 +84,7 @@ export interface SourceRef {
 
 /**
  * Dependency relationship
+ * @doc [[RegistryTypes]]
  * @public
  */
 export interface DependencyRelation {
@@ -101,6 +107,7 @@ export interface DependencyRelation {
 /**
  * Symbol registry entry (stored in JSONL)
  * This is the minimal data needed to map IDs to source locations
+ * @doc [[RegistryTypes]]
  * @public
  */
 export interface SymbolRegistryEntry {
@@ -147,6 +154,7 @@ export interface SymbolRegistryEntry {
 
 /**
  * Symbol registry managing ID-to-source mappings
+ * @doc [[RegistryTypes]]
  * @public
  */
 export interface SymbolRegistry {

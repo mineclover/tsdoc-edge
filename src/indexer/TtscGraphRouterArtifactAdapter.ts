@@ -1,5 +1,11 @@
 /**
  * Adapter from ttsc-graph-router raw artifacts to ProjectIndexer input.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @context Cross-package artifact boundary loading and validating raw `@ttsc/graph` dumps through `@ttsc-ex/ttsc-graph-router` for TypeScript 7.0 compatibility.
+ * @functionality Dynamically loads the ESM graph-router module, verifies producer version, artifact contract, capabilities, and provenance envelopes, normalizes router diagnostics, and emits `ProjectGraphInput`.
+ * @sideEffect filesystem: Dynamically imports the external `ttsc-graph-router` ESM module and loads/refreshes repository graph artifacts on disk.
  * @packageDocumentation
  */
 
@@ -15,8 +21,31 @@ import type {
 } from './contracts';
 import { normalizeRouterDiagnostics } from './diagnostics-contract';
 
+/**
+ * Default `@ttsc-ex/ttsc-graph-router` raw artifact contract version expected by this adapter.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export const SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSION = '1.1.0' as const;
+
+/**
+ * Tuple of all raw `@ttsc-ex/ttsc-graph-router` artifact contract versions accepted when unpinned.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export const SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSIONS = ['1.0.0', '1.1.0'] as const;
+
+/**
+ * Union of supported raw `@ttsc-ex/ttsc-graph-router` artifact contract version strings.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export type SupportedTtscGraphArtifactContractVersion =
   (typeof SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSIONS)[number];
 
@@ -103,6 +132,13 @@ interface GraphRouterModule {
   validateGraphArtifact(artifact: unknown): unknown;
 }
 
+/**
+ * Configuration and version-pinning options for `TtscGraphRouterArtifactAdapter`.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface TtscGraphRouterArtifactAdapterOptions {
   configPath: string;
   repoId: string;
@@ -128,6 +164,7 @@ export interface TtscGraphRouterArtifactAdapterOptions {
  * The router is not reclassified as a compiler parser: `@ttsc/graph` remains
  * the producer and this adapter only crosses the package/cache boundary.
  *
+ * @doc [[ProjectIndexer]]
  * @doc [[TtscPlatformSpecification]]
  * @public
  */

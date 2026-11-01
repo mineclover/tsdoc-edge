@@ -41,5 +41,5 @@ Check validity of all [[Symbol]] links.
 
 ### Implemented By
 
-- CheckLinksCommand → src/commands/CheckLinksCommand.ts:36
+- CheckLinksCommand → src/commands/CheckLinksCommand.ts:45
 

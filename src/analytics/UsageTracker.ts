@@ -1,6 +1,12 @@
 /**
  * CLI usage analytics tracker
+ *
  * @packageDocumentation
+ * @doc [[AnalyticsTypes]]
+ * @doc [[Analyzer System]]
+ * @context Local-only CLI telemetry recorder persisting command execution durations, outcomes, and retention-bounded JSONL events
+ * @functionality Appends command usage events to `events.jsonl`, aggregates daily and per-command statistics, and prunes expired records
+ * @sideEffect filesystem: Creates local analytics storage directory and reads/appends/prunes `events.jsonl` on disk (read/write)
  */
 
 import * as fs from 'node:fs';
@@ -17,6 +23,8 @@ import type {
 /**
  * Tracks CLI command usage for analytics and optimization
  *
+ * @doc [[AnalyticsTypes]]
+ * @doc [[Analyzer System]]
  * @public
  * @responsibility Collect and analyze CLI usage patterns
  * @contract Record command executions and provide usage statistics
@@ -31,6 +39,8 @@ import type {
  * - Report generation: Daily summaries, top commands, error analysis
  * - Auto-cleanup: Remove events older than retention period
  * - Privacy-first: Local-only storage, no external transmission
+ *
+ * @sideEffect filesystem: Creates local analytics storage directory and reads/appends/prunes `events.jsonl` on disk (read/write)
  *
  * @decision Store events as JSONL instead of structured database
  * @rationale Human-readable, Git-friendly, no schema migrations, easy to parse line-by-line

@@ -21,5 +21,5 @@ Validates generated Markdown documentation files for structural completeness and
 
 ### Implemented By
 
-- GeneratedDocsValidator → src/validator/GeneratedDocsValidator.ts:62
+- GeneratedDocsValidator → src/validator/GeneratedDocsValidator.ts:71
 

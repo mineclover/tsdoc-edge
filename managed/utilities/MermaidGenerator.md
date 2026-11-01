@@ -144,5 +144,5 @@ tsdoc-edge detect-circular-types
 
 ### Implemented By
 
-- MermaidGenerator → src/visualization/MermaidGenerator.ts:1
+- MermaidGenerator → src/visualization/MermaidGenerator.ts:22
 

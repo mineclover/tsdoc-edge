@@ -58,10 +58,10 @@ See [[UserService]]...   ← Inline reference (OK, 무제한)
 
 ```bash
 # SSOT 위반 검사
-tsdoc-edge validate-docs managed
+tsdoc-edge validate docs managed
 
 # 중복 primary 탐지
-tsdoc-edge validate-symbol-refs managed --check-duplicates
+tsdoc-edge validate refs managed --check-duplicates
 ```
 
 ## Related Concepts
@@ -78,5 +78,5 @@ tsdoc-edge validate-symbol-refs managed --check-duplicates
 - [[Phase Commands]] → managed/commands/PhaseCommands.md:84
 - [[WorkContextCommand]] → managed/commands/WorkContextCommand.md:67
 - [[Feature Showcase]] → managed/examples/feature-showcase.md:31
-- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:95
+- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:158
 

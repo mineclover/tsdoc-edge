@@ -1,6 +1,13 @@
 /**
  * Relationship Statistics Command
+ *
  * @packageDocumentation
+ * @doc [[RelationshipStatsCommand]]
+ * @doc [[RelationshipCommands]]
+ * @context Relationship distribution and density reporting via `tsdoc-edge relationship stats`
+ * @functionality Aggregates edge counts by ontology category, relationship type, confidence, and discovery source across canonical `@ttsc/graph` and `.tsdoc.db`
+ * @sideEffect console: Writes formatted relationship statistics or `--json` payloads to stdout
+ * @sideEffect database: Reads canonical `@ttsc/graph` and `DatabaseManager` SQLite repositories (read)
  */
 
 import * as fs from 'node:fs';
@@ -15,6 +22,7 @@ import {
 /**
  * Command for showing relationship statistics across Canonical `@ttsc/graph` and Enrichment DB.
  * @doc [[RelationshipStatsCommand]]
+ * @sideEffect console: Writes relationship statistics to stdout; reads SQLite repositories
  * @public
  */
 export class RelationshipStatsCommand extends BaseCommand {

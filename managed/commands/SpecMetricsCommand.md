@@ -21,5 +21,5 @@ Reports multi-dimensional specification completeness, conformance, and code-bind
 
 ### Implemented By
 
-- SpecMetricsCommand → src/commands/SpecMetricsCommand.ts:17
+- SpecMetricsCommand → src/commands/SpecMetricsCommand.ts:26
 

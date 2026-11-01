@@ -43,5 +43,5 @@ Parse TypeScript files and extract TSDoc comments.
 
 ### Implemented By
 
-- ParseCommand → src/commands/ParseCommand.ts:35
+- ParseCommand → src/commands/ParseCommand.ts:44
 

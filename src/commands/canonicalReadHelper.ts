@@ -1,7 +1,14 @@
 /**
  * Read-only helpers for inspecting active Canonical `@ttsc/graph` and `SpecGraph`
  * revisions from CLI query and status commands.
+ *
  * @packageDocumentation
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[CLI Commands]]
+ * @context Read-only inspection helpers shared by CLI query, ontology, and system-status commands
+ * @functionality Resolves canonical `@ttsc/graph` and `SpecGraph` database paths, reads active revision snapshots, filters external nodes, and projects edges to ontology categories
+ * @sideEffect filesystem: Checks file existence and reads SQLite file metadata on disk (read)
+ * @sideEffect database: Reads active revisions from `GraphRepository` and `SpecGraphRepository` in read-only mode (read)
  */
 
 import * as fs from 'node:fs';
@@ -14,13 +21,22 @@ import type { SymbolAliasRecord } from '../indexer/symbol-alias';
 import { GraphRepository } from '../storage/GraphRepository';
 import { SpecGraphRepository } from '../storage/SpecGraphRepository';
 
-/** Default relative path for persisted SpecGraph projections. @public */
+/**
+ * Default relative path for persisted SpecGraph projections.
+ *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[CLI Commands]]
+ * @public
+ */
 export const DEFAULT_SPEC_GRAPH_DATABASE = '.tsdoc/spec-graph.db' as const;
 
 const EXTERNAL_SOURCE_PATTERN = /(?:bundled:|(?:^|[\\/])libs[\\/]|(?:^|[\\/])node_modules[\\/])/;
 
 /**
  * Read-only snapshot of the active Canonical `@ttsc/graph` plane.
+ *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[CLI Commands]]
  * @public
  */
 export interface CanonicalGraphPlaneSnapshot {
@@ -42,6 +58,9 @@ export interface CanonicalGraphPlaneSnapshot {
 
 /**
  * Read-only snapshot of the active `SpecGraph` plane.
+ *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[CLI Commands]]
  * @public
  */
 export interface SpecGraphPlaneSnapshot {
@@ -58,6 +77,9 @@ export interface SpecGraphPlaneSnapshot {
 
 /**
  * Ontology-projected metadata for a canonical `@ttsc/graph` edge.
+ *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[CLI Commands]]
  * @public
  */
 export interface ProjectedCanonicalOntologyEdge {
@@ -71,6 +93,8 @@ export interface ProjectedCanonicalOntologyEdge {
 /**
  * Resolve the configured or default Canonical `@ttsc/graph` SQLite path.
  *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[CLI Commands]]
  * @param cwd - Working directory base path
  * @returns Absolute path to the canonical graph SQLite file
  * @public
@@ -94,6 +118,8 @@ export function resolveCanonicalGraphDbPath(cwd = process.cwd()): string {
 /**
  * Resolve the configured or default `SpecGraph` SQLite path.
  *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[CLI Commands]]
  * @param cwd - Working directory base path
  * @returns Absolute path to the SpecGraph SQLite file
  * @public
@@ -109,6 +135,8 @@ export function resolveSpecGraphDbPath(cwd = process.cwd()): string {
 /**
  * Determine whether a canonical node originates from external/bundled declarations.
  *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[CLI Commands]]
  * @param node - Canonical graph node to classify
  * @returns True when the node belongs to external/bundled libraries
  * @public
@@ -124,6 +152,8 @@ export function isExternalCanonicalNode(node: CanonicalGraphNode): boolean {
 /**
  * Read a read-only snapshot of the active Canonical `@ttsc/graph` revision.
  *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[CLI Commands]]
  * @param options - Snapshot options (`cwd`, `includeExternal`)
  * @returns Active canonical graph snapshot, or `null` when unavailable
  * @public
@@ -195,6 +225,8 @@ export function readCanonicalGraphSnapshot(options?: {
 /**
  * Read a read-only snapshot of the active `SpecGraph` revision.
  *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[CLI Commands]]
  * @param options - Snapshot options (`cwd`)
  * @returns Active SpecGraph snapshot, or `null` when unavailable
  * @public
@@ -239,6 +271,8 @@ export function readSpecGraphSnapshot(options?: { cwd?: string }): SpecGraphPlan
 /**
  * Project a canonical `@ttsc/graph` edge into ontology relationship type & category.
  *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[CLI Commands]]
  * @param edge - Canonical graph edge
  * @returns Ontology relationship metadata
  * @public

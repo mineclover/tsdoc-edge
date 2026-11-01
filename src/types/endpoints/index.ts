@@ -1,15 +1,23 @@
 /**
  * Endpoint detection types
+ *
  * @packageDocumentation
+ * @doc [[Types Index]]
+ * @context HTTP route and framework endpoint discovery schemas
+ * @functionality Defines HTTPMethod, EndpointScope, HTTPEndpoint, DetectedEndpoint, and RoutePattern contracts
  */
 
 /**
  * HTTP method types
+ * @doc [[Types Index]]
+ * @public
  */
 export type HTTPMethod = 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH' | 'HEAD' | 'OPTIONS';
 
 /**
  * Endpoint scope (visibility/access level)
+ * @doc [[Types Index]]
+ * @public
  */
 export enum EndpointScope {
   /** External public API */
@@ -24,6 +32,8 @@ export enum EndpointScope {
 
 /**
  * HTTP endpoint representation
+ * @doc [[Types Index]]
+ * @public
  */
 export interface HTTPEndpoint {
   /** Unique endpoint ID (e.g., endpoint-get-api-users-id) */
@@ -71,6 +81,8 @@ export interface HTTPEndpoint {
 
 /**
  * Detected endpoint with metadata
+ * @doc [[Types Index]]
+ * @public
  */
 export interface DetectedEndpoint extends HTTPEndpoint {
   /** Framework used (express, fastify, hono, etc.) */
@@ -85,6 +97,8 @@ export interface DetectedEndpoint extends HTTPEndpoint {
 
 /**
  * Framework-specific route pattern
+ * @doc [[Types Index]]
+ * @public
  */
 export interface RoutePattern {
   /** Framework name */

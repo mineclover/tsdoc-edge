@@ -1,7 +1,11 @@
 /**
  * Classifies symbols by importance level
+ *
  * @packageDocumentation
+ * @doc [[ImportanceClassifier]]
  * @responsibility Determine importance level of symbols for tracking
+ * @context Pure symbol classification heuristic stratifying declarations into `critical`, `important`, and `normal` governance tiers
+ * @functionality Evaluates export visibility, `@public` modifier, contracts/responsibilities, structural kind, connectivity degree, and test coverage
  */
 
 import type { ImportanceCriteria, ImportanceLevel } from '../types/analysis';
@@ -15,6 +19,8 @@ import type { Symbol } from '../types/graph';
  * Normal: Private utilities, helpers
  *
  * @doc [[ImportanceClassifier]]
+ * @context Ranks `Symbol` nodes for prioritized documentation, coverage, and health tracking
+ * @functionality Computes `ImportanceCriteria` (`level` and `reasons`) and filters symbol sets by minimum importance tier
  * @public
  */
 export class ImportanceClassifier {

@@ -1,11 +1,18 @@
 /**
  * ID Generator for symbol identification
+ *
  * @packageDocumentation
+ * @doc [[IdGenerator]]
  * @responsibility Generate unique short IDs for symbols
+ * @context Collision-free short base-36 symbol identifier allocator supporting sequential and random generation modes
+ * @functionality Sequential and random short-ID generation, collision retry with automatic length expansion, and existing-ID registration
  */
 
 /**
  * ID generation options
+ *
+ * @doc [[IdGenerator]]
+ * @public
  */
 export interface IdGeneratorOptions {
   /**
@@ -30,9 +37,13 @@ export interface IdGeneratorOptions {
 /**
  * ID Generator
  *
+ * @doc [[IdGenerator]]
  * @public
  * @responsibility Generate unique short IDs for symbols
  * @contract Generate unique short IDs without collision
+ * @context Allocates compact base-36 identifiers while tracking previously issued IDs in memory
+ * @functionality Generates sequential or random IDs, registers existing IDs, and expands ID width when capacity saturates
+ * @sideEffect state: this.usedIds - Tracks allocated symbol IDs and advances sequential counter
  * @testScenario Sequential ID generation
  * @testScenario Random ID generation
  * @testScenario Collision prevention

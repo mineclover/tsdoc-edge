@@ -1,4 +1,13 @@
-/** Deterministic location-aware naming evaluation over canonical graph nodes. */
+/**
+ * Deterministic location-aware naming evaluation over canonical graph nodes.
+ *
+ * @doc [[ConventionCheck]]
+ * @doc [[Convention Pack Check]]
+ * @context Workspace naming convention evaluator enforcing file and exported symbol casing policies across canonical `@ttsc/graph` nodes and managed workspace files.
+ * @functionality Normalizes workspace-relative POSIX paths, matches glob and symbol-kind selectors, checks PascalCase, camelCase, snake_case, and kebab-case rules, and produces a content-addressed naming report.
+ * @sideEffect filesystem: Walks workspace directories to enumerate matching files when file-target naming rules and a workspace root are supplied.
+ * @packageDocumentation
+ */
 
 import { createHash } from 'node:crypto';
 import * as fs from 'node:fs';
@@ -7,9 +16,28 @@ import type { CanonicalGraphNode, CanonicalProjectGraph } from '../indexer';
 import { parseCanonicalId } from '../indexer/canonical-id';
 import type { NamingConventionConfig, NamingConventionRule } from '../types/config';
 
+/**
+ * Canonical evaluator identifier for deterministic naming convention reports.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const NAMING_CONVENTION_EVALUATOR_ID = 'tsdoc-edge/naming-convention-evaluator' as const;
+
+/**
+ * SemVer version of the naming convention evaluator.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const NAMING_CONVENTION_EVALUATOR_VERSION = '1.0.0' as const;
 
+/**
+ * Derived convention finding emitted when a file or graph symbol violates a naming rule.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface NamingConventionFinding {
   readonly resultKind: 'derived-naming-finding';
   readonly findingId: string;
@@ -24,6 +52,12 @@ export interface NamingConventionFinding {
   readonly expected: string;
 }
 
+/**
+ * Immutable content-addressed report produced by naming convention evaluation.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface NamingConventionReport {
   readonly contractVersion: '1.0';
   readonly resultKind: 'derived-naming-report';
@@ -46,6 +80,12 @@ interface EvaluatedSubject {
   readonly passed: boolean;
 }
 
+/**
+ * Optional workspace context used when evaluating file-target naming rules.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface NamingConventionEvaluationOptions {
   /** Optional workspace root used to evaluate document/artifact filename rules. */
   readonly workspaceRoot?: string;
@@ -54,6 +94,9 @@ export interface NamingConventionEvaluationOptions {
 /**
  * Evaluate the first matching naming rule for each file or graph node.
  * Paths are normalized to workspace-relative POSIX form before glob matching.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
  */
 export class NamingConventionEvaluator {
   evaluate(

@@ -1,4 +1,13 @@
-/** Load canonical-node-addressed TSDoc into one immutable enrichment revision. */
+/**
+ * Load canonical-node-addressed TSDoc into one immutable enrichment revision.
+ *
+ * @doc [[ConventionCheck]]
+ * @doc [[Convention Pack Check]]
+ * @context Source-file TSDoc enrichment projector linking TypeScript AST JSDoc blocks to canonical `@ttsc/graph` node IDs without mutating the canonical graph.
+ * @functionality Parses TypeScript source files referenced by canonical graph nodes, extracts summary text and tag metadata per symbol, and creates an immutable `EnrichmentRevision`.
+ * @sideEffect filesystem: Resolves and reads workspace TypeScript source files referenced by canonical graph nodes.
+ * @packageDocumentation
+ */
 
 import { createHash } from 'node:crypto';
 import * as fs from 'node:fs';
@@ -12,9 +21,28 @@ import {
   type TsdocEnrichmentItem,
 } from '../semantic-graph/analysis-input-revisions';
 
+/**
+ * Canonical producer identifier for the TSDoc enrichment loader.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const TSDOC_ENRICHMENT_LOADER_ID = 'tsdoc-edge/tsdoc-enrichment-loader' as const;
+
+/**
+ * SemVer version of the TSDoc enrichment loader.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const TSDOC_ENRICHMENT_LOADER_VERSION = '1.0.0' as const;
 
+/**
+ * Workspace and canonical graph inputs required to load a TSDoc enrichment revision.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface LoadTsdocEnrichmentOptions {
   readonly workspaceRoot: string;
   readonly workspaceId: string;
@@ -31,6 +59,9 @@ function nodeJsDocs(node: ts.Node): readonly ts.JSDoc[] {
 /**
  * Parse source files selected by canonical graph nodes. The result never mutates
  * the graph: source bytes and node IDs are only projected into enrichment items.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
  */
 export function loadTsdocEnrichment(options: LoadTsdocEnrichmentOptions): EnrichmentRevision {
   const workspaceRoot = realDirectory(options.workspaceRoot, 'TSDoc enrichment workspace root');

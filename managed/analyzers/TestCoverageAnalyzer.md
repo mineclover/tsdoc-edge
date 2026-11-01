@@ -52,5 +52,5 @@ Measures:
 
 ### Implemented By
 
-- TestCoverageAnalyzer → src/analyzer/TestCoverageAnalyzer.ts:65
+- TestCoverageAnalyzer → src/analyzer/TestCoverageAnalyzer.ts:70
 

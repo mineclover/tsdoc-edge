@@ -21,6 +21,7 @@ import type { UnifiedRelationship } from '../types/relationships';
 /**
  * I/O Dependency Analyzer
  *
+ * @doc [[IODependencyAnalyzer]]
  * @public
  * @responsibility Detect data flow relationships via type analysis
  * @requires SymbolGraph

@@ -1,6 +1,13 @@
 /**
  * Relationship Impact Analysis Command
+ *
  * @packageDocumentation
+ * @doc [[RelationshipImpactCommand]]
+ * @doc [[RelationshipCommands]]
+ * @context Transitive change-impact analysis invoked via `tsdoc-edge relationship impact`
+ * @functionality Traverses reverse dependency edges across canonical `@ttsc/graph` and `.tsdoc.db` up to `--depth` and computes risk levels
+ * @sideEffect console: Writes transitive impact trees, risk levels, or `--json` payloads to stdout
+ * @sideEffect database: Reads canonical `@ttsc/graph` and `DatabaseManager` SQLite repositories (read)
  */
 
 import { DEPENDENCY_GRAPH_EDGE_KINDS, graphEdgeSemantic } from '../graph-analysis/edge-semantics';
@@ -20,6 +27,7 @@ interface ImpactNode {
 /**
  * Command for analyzing change impact through relationships
  * @doc [[RelationshipImpactCommand]]
+ * @sideEffect console: Writes impact analysis results to stdout; reads SQLite repositories
  * @public
  */
 export class RelationshipImpactCommand extends BaseCommand {

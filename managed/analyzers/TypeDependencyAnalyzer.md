@@ -168,5 +168,5 @@ for (const [symbolId, symbol] of this.graph.symbols.entries()) {
 
 ### Implemented By
 
-- TypeDependencyAnalyzer → src/analyzer/TypeDependencyAnalyzer.ts:1
+- TypeDependencyAnalyzer → src/analyzer/TypeDependencyAnalyzer.ts:41
 

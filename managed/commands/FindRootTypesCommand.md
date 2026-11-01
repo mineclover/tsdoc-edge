@@ -152,5 +152,5 @@ tsdoc-edge find-roots
 
 ### Implemented By
 
-- FindRootTypesCommand → src/commands/TypeChainCommand.ts:1
+- FindRootTypesCommand → src/commands/TypeChainCommand.ts:386
 

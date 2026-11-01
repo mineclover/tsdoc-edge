@@ -21,7 +21,7 @@ Analyzer commands extract relationships from source code and populate the relati
 Analyze function call relationships.
 
 ```bash
-tsdoc-edge analyze-calls [path] [options]
+tsdoc-edge relationship analyze --type=calls [options]
 ```
 
 **Source**: `src/commands/AnalyzeCallsCommand.ts`
@@ -32,7 +32,7 @@ tsdoc-edge analyze-calls [path] [options]
 Analyze type dependencies.
 
 ```bash
-tsdoc-edge analyze-types [path] [options]
+tsdoc-edge relationship analyze --type=types [options]
 ```
 
 **Source**: `src/commands/AnalyzeTypesCommand.ts`
@@ -43,7 +43,7 @@ tsdoc-edge analyze-types [path] [options]
 Analyze I/O data flow dependencies.
 
 ```bash
-tsdoc-edge analyze-io [path] [options]
+tsdoc-edge relationship analyze --type=io [options]
 ```
 
 **Source**: `src/commands/AnalyzeIOCommand.ts`
@@ -54,7 +54,7 @@ tsdoc-edge analyze-io [path] [options]
 Analyze test coverage relationships.
 
 ```bash
-tsdoc-edge test-relationships [path] [options]
+tsdoc-edge relationship analyze --type=tests [options]
 ```
 
 **Source**: `src/commands/TestRelationshipsCommand.ts`
@@ -65,7 +65,7 @@ tsdoc-edge test-relationships [path] [options]
 Analyze dependency chains.
 
 ```bash
-tsdoc-edge analyze-chains [path] [options]
+tsdoc-edge relationship analyze --type=chains [options]
 ```
 
 **Source**: `src/commands/AnalyzeChainsCommand.ts`
@@ -78,7 +78,7 @@ tsdoc-edge analyze-chains [path] [options]
 Analyze mutual dependencies between symbols.
 
 ```bash
-tsdoc-edge analyze-collaboration [path]
+tsdoc-edge relationship analyze --type=collaboration [options]
 ```
 
 **Source**: `src/commands/AnalyzeCollaborationCommand.ts`
@@ -89,7 +89,7 @@ tsdoc-edge analyze-collaboration [path]
 Analyze has-a patterns.
 
 ```bash
-tsdoc-edge analyze-composition [path]
+tsdoc-edge relationship analyze --type=composition [options]
 ```
 
 **Source**: `src/commands/AnalyzeCompositionCommand.ts`
@@ -100,7 +100,7 @@ tsdoc-edge analyze-composition [path]
 Analyze execution sequence dependencies.
 
 ```bash
-tsdoc-edge analyze-temporal-order [path]
+tsdoc-edge relationship analyze --type=temporal-order [options]
 ```
 
 **Source**: `src/commands/AnalyzeTemporalOrderCommand.ts`
@@ -111,7 +111,7 @@ tsdoc-edge analyze-temporal-order [path]
 Run all behavioral analyzers.
 
 ```bash
-tsdoc-edge analyze-behavioral [path]
+tsdoc-edge relationship analyze --type=behavioral [options]
 ```
 
 **Source**: `src/commands/AnalyzeBehavioralCommand.ts`
@@ -123,7 +123,7 @@ tsdoc-edge analyze-behavioral [path]
 Analyze interchangeable implementations.
 
 ```bash
-tsdoc-edge analyze-substitution [path]
+tsdoc-edge relationship analyze --type=substitution [options]
 ```
 
 **Source**: `src/commands/AnalyzeSubstitutionCommand.ts`
@@ -134,7 +134,7 @@ tsdoc-edge analyze-substitution [path]
 Analyze error recovery patterns.
 
 ```bash
-tsdoc-edge analyze-fallback [path]
+tsdoc-edge relationship analyze --type=fallback [options]
 ```
 
 **Source**: `src/commands/AnalyzeFallbackCommand.ts`
@@ -145,7 +145,7 @@ tsdoc-edge analyze-fallback [path]
 Run all alternative analyzers.
 
 ```bash
-tsdoc-edge analyze-alternatives [path]
+tsdoc-edge relationship analyze --type=alternatives [options]
 ```
 
 **Source**: `src/commands/AnalyzeAlternativesCommand.ts`
@@ -157,7 +157,7 @@ tsdoc-edge analyze-alternatives [path]
 Analyze co-requirements and mutual exclusion.
 
 ```bash
-tsdoc-edge analyze-constraints [path]
+tsdoc-edge relationship analyze --type=constraints [options]
 ```
 
 **Source**: `src/commands/AnalyzeConstraintsCommand.ts`
@@ -168,7 +168,7 @@ tsdoc-edge analyze-constraints [path]
 Analyze callback patterns.
 
 ```bash
-tsdoc-edge analyze-callbacks [path]
+tsdoc-edge relationship analyze --type=callbacks [options]
 ```
 
 **Source**: `src/commands/AnalyzeCallbacksCommand.ts`
@@ -179,7 +179,7 @@ tsdoc-edge analyze-callbacks [path]
 Analyze event flow patterns.
 
 ```bash
-tsdoc-edge analyze-events [path]
+tsdoc-edge relationship analyze --type=events [options]
 ```
 
 **Source**: `src/commands/AnalyzeEventsCommand.ts`
@@ -192,7 +192,7 @@ tsdoc-edge analyze-events [path]
 Analyze @enhances tag relationships.
 
 ```bash
-tsdoc-edge analyze-enhancement [path]
+tsdoc-edge relationship analyze --type=enhancement [options]
 ```
 
 **Source**: `src/commands/AnalyzeEnhancementCommand.ts`
@@ -202,7 +202,7 @@ tsdoc-edge analyze-enhancement [path]
 Analyze architectural layer dependencies.
 
 ```bash
-tsdoc-edge analyze-layer-dependency [path]
+tsdoc-edge relationship analyze --type=layer-dependency [options]
 ```
 
 **Source**: `src/commands/AnalyzeLayerDependencyCommand.ts`
@@ -212,7 +212,7 @@ tsdoc-edge analyze-layer-dependency [path]
 Analyze Code-Doc connections via @doc tags.
 
 ```bash
-tsdoc-edge analyze-doc-reference [path]
+tsdoc-edge relationship analyze --type=doc-reference [options]
 ```
 
 **Source**: `src/commands/AnalyzeDocReferenceCommand.ts`
@@ -223,17 +223,17 @@ tsdoc-edge analyze-doc-reference [path]
 Run structural analyzers (implementation + test coverage).
 
 ```bash
-tsdoc-edge analyze-structural [path]
+tsdoc-edge relationship analyze --type=structural [options]
 ```
 
 **Source**: `src/commands/AnalyzeStructuralCommand.ts`
 
 ### analyze-final
 
-Run final analyzers (pipeline + feature-grouping).
+Run final analyzers (pipeline + feature-grouping / module-boundary).
 
 ```bash
-tsdoc-edge analyze-final [path]
+tsdoc-edge relationship analyze --type=module-boundary [options]
 ```
 
 **Source**: `src/commands/AnalyzeFinalCommand.ts`
@@ -243,8 +243,7 @@ tsdoc-edge analyze-final [path]
 Run all relationship analyzers.
 
 ```bash
-tsdoc-edge analyze-all [path] [options]
-  --parallel          Run analyzers in parallel
+tsdoc-edge relationship analyze --type=all [options]
 ```
 
 **Source**: `src/commands/AnalyzeAllCommand.ts`

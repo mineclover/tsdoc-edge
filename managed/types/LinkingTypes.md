@@ -165,4 +165,10 @@ See implementation: FixResult
 ### Implemented By
 
 - LinkingTypes → src/types/core/linking.ts:1
+- CodeLink → src/types/core/linking.ts:15
+- DocLink → src/types/core/linking.ts:35
+- LinkIndex → src/types/core/linking.ts:55
+- LinkValidationResult → src/types/core/linking.ts:71
+- LinkValidationReport → src/types/core/linking.ts:83
+- FixResult → src/types/core/linking.ts:95
 

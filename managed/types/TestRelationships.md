@@ -136,4 +136,12 @@ tsdoc-edge coverage-report --hierarchical
 ### Implemented By
 
 - TestRelationships → src/types/analysis/test-relationships.ts:1
+- TestSymbolUsage → src/types/analysis/test-relationships.ts:15
+- ImportedSymbol → src/types/analysis/test-relationships.ts:29
+- UsagePattern → src/types/analysis/test-relationships.ts:45
+- VerifiedRelationship → src/types/analysis/test-relationships.ts:68
+- RelationshipEvidence → src/types/analysis/test-relationships.ts:86
+- RelationshipCoverage → src/types/analysis/test-relationships.ts:100
+- UnverifiedRelationship → src/types/analysis/test-relationships.ts:124
+- TestRelationshipAnalysis → src/types/analysis/test-relationships.ts:144
 

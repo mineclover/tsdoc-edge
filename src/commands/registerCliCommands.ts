@@ -5,6 +5,10 @@
  * 7 unified command groups, and 3 revision/coverage contract commands).
  *
  * @packageDocumentation
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[CLI Commands]]
+ * @context Canonical 20-command top-level CLI surface assembly
+ * @functionality Instantiates and registers core workflow commands, unified command groups, and revision/coverage contract commands into a `CommandRegistry`
  */
 
 import { BuildCommand } from './BuildCommand';
@@ -32,6 +36,8 @@ import { WorkContextCommand } from './WorkContextCommand';
 /**
  * Populate a `CommandRegistry` with the canonical 20 top-level TSDoc Edge CLI commands.
  *
+ * @doc [[CliCommandSurfaceSpecification]]
+ * @doc [[CLI Commands]]
  * @param registry - Optional registry instance (creates a new `CommandRegistry` when omitted)
  * @returns Populated `CommandRegistry`
  * @public

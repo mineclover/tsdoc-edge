@@ -1,7 +1,12 @@
 /**
  * Doc Reference Analyzer
+ *
  * @packageDocumentation
+ * @doc [[Analyzer System]]
  * @responsibility Analyze `@doc [[Symbol]]` references in TSDoc comments
+ * @context Scans TypeScript source trees for TSDoc `@doc [[Symbol]]` tags and emits `doc-reference` edges into the symbol graph
+ * @functionality Recursive `.ts`/`.tsx` discovery, TSDoc `@doc` extraction via `TSDocSymbolParser`, and `UnifiedRelationship` construction
+ * @sideEffect filesystem: Recursively traverses workspace directories and reads TypeScript source files from disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -45,6 +50,9 @@ import type { UnifiedRelationship } from '../types/relationships/unified';
  *   // Creates 2 doc-reference relationships
  * }
  * ```
+ *
+ * @doc [[Analyzer System]]
+ * @sideEffect filesystem: Recursively traverses workspace directories and reads TypeScript source files from disk (read)
  */
 export class DocReferenceAnalyzer {
   private graph: SymbolGraph;

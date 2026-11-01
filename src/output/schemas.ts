@@ -1,6 +1,10 @@
 /**
  * Predefined Output Schemas
+ *
  * @packageDocumentation
+ * @doc [[Code Generation]]
+ * @context Canonical `OutputSchema` definitions governing XML and JSON CLI output payloads across `deps`, `who-uses`, `endpoints`, `hubs`, `layers`, `common`, `routes`, and `build`
+ * @functionality Exports declarative `OutputSchema` constants for core CLI commands
  */
 
 import type { OutputSchema } from './types';
@@ -8,6 +12,9 @@ import { arrayOf, groupedArrayOf } from './types';
 
 /**
  * Schema for deps command output (enhanced with semantic info)
+ *
+ * @doc [[Code Generation]]
+ * @public
  */
 export const DepsSchema: OutputSchema = {
   root: 'dependencies',
@@ -36,6 +43,9 @@ export const DepsSchema: OutputSchema = {
 
 /**
  * Schema for who-uses command output
+ *
+ * @doc [[Code Generation]]
+ * @public
  */
 export const WhoUsesSchema: OutputSchema = {
   root: 'who-uses',
@@ -58,6 +68,9 @@ export const WhoUsesSchema: OutputSchema = {
 
 /**
  * Schema for endpoints command output
+ *
+ * @doc [[Code Generation]]
+ * @public
  */
 export const EndpointsSchema: OutputSchema = {
   root: 'endpoints',
@@ -74,6 +87,9 @@ export const EndpointsSchema: OutputSchema = {
 
 /**
  * Schema for hubs command output
+ *
+ * @doc [[Code Generation]]
+ * @public
  */
 export const HubsSchema: OutputSchema = {
   root: 'hubs',
@@ -89,6 +105,9 @@ export const HubsSchema: OutputSchema = {
 
 /**
  * Schema for layers command output
+ *
+ * @doc [[Code Generation]]
+ * @public
  */
 export const LayersSchema: OutputSchema = {
   root: 'layers',
@@ -103,6 +122,9 @@ export const LayersSchema: OutputSchema = {
 
 /**
  * Schema for common command output
+ *
+ * @doc [[Code Generation]]
+ * @public
  */
 export const CommonSchema: OutputSchema = {
   root: 'common',
@@ -121,6 +143,9 @@ export const CommonSchema: OutputSchema = {
 
 /**
  * Schema for routes command output
+ *
+ * @doc [[Code Generation]]
+ * @public
  */
 export const RoutesSchema: OutputSchema = {
   root: 'routes',
@@ -136,6 +161,9 @@ export const RoutesSchema: OutputSchema = {
 
 /**
  * Schema for build command result
+ *
+ * @doc [[Code Generation]]
+ * @public
  */
 export const BuildResultSchema: OutputSchema = {
   root: 'build-result',

@@ -1,7 +1,10 @@
 /**
  * Entry Point Context Aggregator
+ *
  * @packageDocumentation
  * @responsibility Aggregate all context for a given entry point (file/symbol/doc)
+ * @sideEffect database: Queries SQLite symbols and unified relationships via `DatabaseManager` (read)
+ * @sideEffect filesystem: Reads source files from disk to extract `@packageDocumentation` module summaries (read)
  */
 
 import * as fs from 'node:fs';
@@ -114,6 +117,9 @@ export interface UnifiedContext {
  * - Include both explicit and inferred relationships
  * - Calculate impact radius
  * - Provide confidence scores
+ *
+ * @sideEffect database: Queries SQLite symbols and unified relationships via `DatabaseManager` (read)
+ * @sideEffect filesystem: Reads source files from disk to extract `@packageDocumentation` module summaries (read)
  *
  * @decision Aggregate at query time, don't cache
  * @rationale Always get fresh data, avoid stale cache

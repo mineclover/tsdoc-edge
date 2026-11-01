@@ -1,6 +1,12 @@
 /**
  * Relationship Help Command
+ *
  * @packageDocumentation
+ * @doc [[RelationshipHelpCommand]]
+ * @doc [[RelationshipCommands]]
+ * @context Interactive guide for the relationship analysis command suite (`tsdoc-edge relationship help`)
+ * @functionality Displays topic-specific tutorials covering workflows, commands, centrality metrics, and relationship ontology categories
+ * @sideEffect console: Writes formatted relationship tutorials and workflow guides to stdout
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
@@ -8,6 +14,7 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
 /**
  * Command providing guided help for the relationship system
  * @doc [[RelationshipHelpCommand]]
+ * @sideEffect console: Writes guided relationship help topics to stdout
  * @public
  */
 export class RelationshipHelpCommand extends BaseCommand {

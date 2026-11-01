@@ -21,5 +21,5 @@ Groups symbols into cohesive domain feature boundaries using `@feature` tags, di
 
 ### Implemented By
 
-- FeatureGroupingAnalyzer → src/analyzer/FeatureGroupingAnalyzer.ts:58
+- FeatureGroupingAnalyzer → src/analyzer/FeatureGroupingAnalyzer.ts:61
 

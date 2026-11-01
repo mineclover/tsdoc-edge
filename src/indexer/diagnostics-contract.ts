@@ -1,15 +1,47 @@
 /**
  * Canonical diagnostics plane contract (separate from node/edge facts).
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @context Separate diagnostics fact plane stored alongside canonical project graph revisions without affecting node and edge fingerprints.
+ * @functionality Defines canonical diagnostic severity, category, and record shapes, and normalizes raw router diagnostic dumps into deterministically sorted immutable records.
  * @packageDocumentation
  */
 
+/**
+ * Contract version identifier for the canonical diagnostics plane.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export const CANONICAL_DIAGNOSTICS_CONTRACT_VERSION = '1.0' as const;
 
+/**
+ * Supported diagnostic severity levels in the canonical diagnostics plane.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export type CanonicalDiagnosticSeverity = 'error' | 'warning' | 'info' | 'hint';
 
+/**
+ * Supported diagnostic origin categories in the canonical diagnostics plane.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export type CanonicalDiagnosticCategory = 'compiler' | 'router' | 'graph-integrity' | 'impact';
 
-/** One diagnostic stored with a canonical graph revision. */
+/**
+ * One diagnostic stored with a canonical graph revision.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface CanonicalDiagnostic {
   readonly id: string;
   readonly code?: string | number;
@@ -25,7 +57,13 @@ export interface CanonicalDiagnostic {
   readonly producerFields?: Readonly<Record<string, unknown>>;
 }
 
-/** Normalize router dump diagnostics into the canonical plane. */
+/**
+ * Normalize router dump diagnostics into the canonical plane.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export function normalizeRouterDiagnostics(
   values: readonly unknown[],
   _options: { rootDir: string } = { rootDir: process.cwd() }

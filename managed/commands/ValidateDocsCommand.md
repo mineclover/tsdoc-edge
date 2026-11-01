@@ -37,6 +37,7 @@ Validate documentation completeness and quality.
 - [[CLI Commands]] → managed/CLI-COMMANDS.md:44
 - [[TSDoc Edge Documentation]] → managed/README.md:112
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:269
+- [[SyncCommand]] → managed/commands/SyncCommand.md:25
 - [[ValidateSpecCommand]] → managed/commands/ValidateSpecCommand.md:318
 - [[DocumentSymbolParser]] → managed/features/DocumentSymbolParser.md:184
 - [[DocumentSymbolRegistry]] → managed/features/DocumentSymbolRegistry.md:289
@@ -46,5 +47,5 @@ Validate documentation completeness and quality.
 
 ### Implemented By
 
-- ValidateDocsCommand → src/commands/ValidateDocsCommand.ts:37
+- ValidateDocsCommand → src/commands/ValidateDocsCommand.ts:46
 

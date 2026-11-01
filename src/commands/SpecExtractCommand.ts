@@ -1,4 +1,14 @@
-/** Compile configured managed specifications and atomically promote their projection. */
+/**
+ * Compile configured managed specifications and atomically promote their projection.
+ *
+ * @packageDocumentation
+ * @doc [[SpecCommands]]
+ * @doc [[AuthoredProjectSpecifications]]
+ * @context Managed specification compiler invoked by `tsdoc-edge spec extract` and `tsdoc-edge sync`
+ * @functionality Extracts authored specifications from `specGovernance.authoredSpecDirs` into an immutable `SpecGraph` revision and atomically promotes it in `SpecGraphRepository`
+ * @sideEffect console: Writes active revision summaries or `--json` payloads to stdout
+ * @sideEffect database: Atomically replaces the active `SpecGraph` revision in `.tsdoc/spec-graph.db` (write)
+ */
 
 import * as path from 'node:path';
 import { ConfigManager } from '../config/ConfigManager';
@@ -6,7 +16,13 @@ import { extractManagedSpecGraph } from '../spec-graph';
 import { SpecGraphRepository } from '../storage/SpecGraphRepository';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 
-/** Extract managed project specs into the immutable SpecGraph repository. */
+/**
+ * Extract managed project specs into the immutable SpecGraph repository.
+ *
+ * @doc [[SpecCommands]]
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export class SpecExtractCommand extends BaseCommand {
   getName(): string {
     return 'spec-extract';

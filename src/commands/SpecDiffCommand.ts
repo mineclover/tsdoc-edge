@@ -1,6 +1,13 @@
 /**
  * Spec Diff Command - Compare specification versions
+ *
  * @packageDocumentation
+ * @doc [[SpecDiffCommand]]
+ * @doc [[CLI Commands]]
+ * @context Specification version comparison command invoked via `tsdoc-edge spec diff`
+ * @functionality Compares two historical Git versions of a specification file via `SpecVersionManager` and categorizes added, removed, and modified sections
+ * @sideEffect console: Writes section-level specification diffs and summaries to stdout
+ * @sideEffect filesystem: Verifies target specification path and queries Git history via `SpecVersionManager` (read)
  */
 
 import * as fs from 'node:fs';
@@ -15,7 +22,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @responsibility Compare two versions of a specification
  * @contract Reads versions from Git, computes diff, displays changes
  * @doc [[SpecDiffCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#spec-diff]]
+ * @sideEffect console: Writes specification version diffs to stdout; reads Git history and file metadata
  *
  * @problem Need to understand changes between versions
  * @solves Shows added, removed, and modified sections

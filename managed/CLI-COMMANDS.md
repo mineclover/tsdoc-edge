@@ -65,32 +65,45 @@ for SpecGraph lifecycle operations, and `convention check --pack <file>` for rev
 ### Referenced By
 
 - [[Phase Commands]] → managed/commands/PhaseCommands.md:100
-- [[UtilityCommands]] → managed/commands/UtilityCommands.md:325
+- [[UtilityCommands]] → managed/commands/UtilityCommands.md:315
 - [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:791
+- [[CliCommandSurfaceSpecification]] → managed/specs/domains/cli-command-surface-spec.md:332
 
 ### Implemented By
 
-- CheckDuplicatesCommand (check-duplicates) → src/commands/CheckDuplicatesCommand.ts:64
-- CheckLinksCommand (check-links) → src/commands/CheckLinksCommand.ts:36
-- CoreApiCommand (core-api) → src/commands/CoreApiCommand.ts:36
-- FindMethodCommand (find-method) → src/commands/FindMethodCommand.ts:38
-- FindUnusedDocsCommand (find-unused-docs) → src/commands/FindUnusedDocsCommand.ts:35
-- GenerateDocsCommand (generate-docs) → src/commands/GenerateDocsCommand.ts:18
-- InitCommand (init) → src/commands/InitCommand.ts:18
-- OrphansCommand (orphans) → src/commands/OrphansCommand.ts:38
-- ParseCommand (parse) → src/commands/ParseCommand.ts:35
-- PlansCommand (plans) → src/commands/PlansCommand.ts:34
-- SpecBumpCommand (spec-bump) → src/commands/SpecBumpCommand.ts:35
-- SpecDiffCommand (spec-diff) → src/commands/SpecDiffCommand.ts:35
-- SpecHistoryCommand (spec-history) → src/commands/SpecHistoryCommand.ts:35
-- SpecStatusCommand (spec-status) → src/commands/SpecStatusCommand.ts:64
-- StatsCommand (stats) → src/commands/StatsCommand.ts:31
-- SuggestCommand (suggest) → src/commands/SuggestCommand.ts:16
-- TodosCommand (todos) → src/commands/TodosCommand.ts:35
-- TreeCommand (tree) → src/commands/TreeCommand.ts:45
-- UndocumentedCommand (undocumented) → src/commands/UndocumentedCommand.ts:37
-- UpdateBacklinksCommand (update-backlinks) → src/commands/UpdateBacklinksCommand.ts:39
-- UpdateSymbolRefsCommand (update-symbol-refs) → src/commands/UpdateSymbolRefsCommand.ts:38
-- ValidateDocsCommand (validate-docs) → src/commands/ValidateDocsCommand.ts:37
-- ValidateSpecCommand (validate-spec) → src/commands/ValidateSpecCommand.ts:17
+- CheckDuplicatesCommand → src/commands/CheckDuplicatesCommand.ts:73
+- CheckLinksCommand → src/commands/CheckLinksCommand.ts:45
+- CoreApiCommand → src/commands/CoreApiCommand.ts:43
+- FindMethodCommand → src/commands/FindMethodCommand.ts:47
+- FindUnusedDocsCommand → src/commands/FindUnusedDocsCommand.ts:44
+- GenerateDocsCommand → src/commands/GenerateDocsCommand.ts:27
+- HelpCommand → src/commands/HelpCommand.ts:44
+- InitCommand → src/commands/InitCommand.ts:27
+- OrphansCommand → src/commands/OrphansCommand.ts:47
+- ParseCommand → src/commands/ParseCommand.ts:44
+- PlansCommand → src/commands/PlansCommand.ts:43
+- SpecBumpCommand → src/commands/SpecBumpCommand.ts:44
+- SpecDiffCommand → src/commands/SpecDiffCommand.ts:44
+- SpecHistoryCommand → src/commands/SpecHistoryCommand.ts:44
+- SpecStatusCommand → src/commands/SpecStatusCommand.ts:73
+- StatsCommand → src/commands/StatsCommand.ts:40
+- SuggestCommand → src/commands/SuggestCommand.ts:25
+- TodosCommand → src/commands/TodosCommand.ts:44
+- TreeCommand → src/commands/TreeCommand.ts:54
+- UndocumentedCommand → src/commands/UndocumentedCommand.ts:46
+- UpdateBacklinksCommand → src/commands/UpdateBacklinksCommand.ts:48
+- UpdateSymbolRefsCommand → src/commands/UpdateSymbolRefsCommand.ts:47
+- ValidateDocsCommand → src/commands/ValidateDocsCommand.ts:46
+- ValidateSpecCommand → src/commands/ValidateSpecCommand.ts:26
+- DEFAULT_SPEC_GRAPH_DATABASE → src/commands/canonicalReadHelper.ts:31
+- CanonicalGraphPlaneSnapshot → src/commands/canonicalReadHelper.ts:42
+- SpecGraphPlaneSnapshot → src/commands/canonicalReadHelper.ts:66
+- ProjectedCanonicalOntologyEdge → src/commands/canonicalReadHelper.ts:85
+- resolveCanonicalGraphDbPath → src/commands/canonicalReadHelper.ts:102
+- resolveSpecGraphDbPath → src/commands/canonicalReadHelper.ts:127
+- isExternalCanonicalNode → src/commands/canonicalReadHelper.ts:144
+- readCanonicalGraphSnapshot → src/commands/canonicalReadHelper.ts:161
+- readSpecGraphSnapshot → src/commands/canonicalReadHelper.ts:234
+- projectCanonicalEdgeToOntology → src/commands/canonicalReadHelper.ts:280
+- registerCliCommands → src/commands/registerCliCommands.ts:45
 

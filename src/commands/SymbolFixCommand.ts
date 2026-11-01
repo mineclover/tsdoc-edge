@@ -2,11 +2,15 @@
  * Symbol Fix Command - Auto-fix common symbol reference issues
  *
  * @packageDocumentation
- * @responsibility Automatically fix common [[Symbol]] reference issues
+ * @doc [[SymbolFixCommand]]
+ * @responsibility Automatically fix common `[[Symbol]]` reference issues
  *
  * @problem Manual fixing of symbol issues is time-consuming and error-prone
  * @solves Provides automated fixes for common patterns (typos, duplicates, formatting)
  * @context Part of symbol reference system for convention management
+ * @functionality Detects and repairs `[[Symbol]]` typos, duplicate H1 checkpoints, missing primary definitions, and orphaned H2 sections
+ * @sideEffect console: Writes detected symbol issues and fix summaries to stdout
+ * @sideEffect filesystem: Reads and updates managed Markdown files when applying fixes
  */
 
 import * as fs from 'node:fs';
@@ -36,6 +40,7 @@ interface FixSuggestion {
  * @public
  * @responsibility Detect and fix symbol reference issues
  * @contract Scan documents, detect issues, apply fixes safely
+ * @sideEffect filesystem: Reads and rewrites managed Markdown checkpoint references; writes diagnostics to stdout
  *
  * @functionality
  * - Typo detection: Find and fix common typos using similarity matching

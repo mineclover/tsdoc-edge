@@ -1,4 +1,12 @@
-/** Raw provider delta to canonical GraphDelta normalization. */
+/**
+ * Raw provider delta to canonical GraphDelta normalization.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @context Incremental semantic provider delta normalization boundary bridging raw `ProviderDelta` payloads and canonical `GraphDelta` overlays.
+ * @functionality Validates delta envelopes and single-document scope against persisted base snapshots, replays provider changes, and diffs canonical node, edge, fact, and topology projections into `NormalizedProviderDelta` outcomes.
+ * @packageDocumentation
+ */
 
 import { createHash } from 'node:crypto';
 import * as path from 'node:path';
@@ -33,12 +41,40 @@ import type {
   ProviderSnapshotNormalizer,
 } from './ProviderSnapshotNormalizer';
 
+/**
+ * Version identifier for `DeltaNormalizer` output contracts.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export const PROVIDER_DELTA_NORMALIZER_VERSION = '1.0' as const;
+
+/**
+ * Capability key indicating complete owned-outgoing relationship reporting in a provider delta.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export const OWNED_OUTGOING_RELATIONSHIPS_CAPABILITY = 'owned-outgoing-relationships' as const;
 
+/**
+ * Outcome state returned when normalizing a raw provider delta against a persisted base snapshot.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export type ProviderDeltaNormalizationState = 'dirty' | 'rebase-required' | 'fallback-required';
 
-/** Provider identity and state retained outside GraphDelta v1. */
+/**
+ * Provider identity and state retained outside GraphDelta v1.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface NormalizedProviderDelta {
   readonly state: ProviderDeltaNormalizationState;
   readonly providerDeltaId: string;
@@ -59,7 +95,13 @@ export interface NormalizedProviderDelta {
   readonly reason?: string;
 }
 
-/** Input needed to validate a raw delta against its exact persisted base. */
+/**
+ * Input needed to validate a raw delta against its exact persisted base.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface NormalizeProviderDeltaInput {
   readonly baseSnapshot: ProviderSnapshot;
   readonly baseRevision: CodeGraphRevision;
@@ -72,6 +114,10 @@ export interface NormalizeProviderDeltaInput {
  * A stale provider snapshot is a typed outcome rather than an exception. The
  * caller must ask the provider for a fresh delta; this class never rebases
  * canonical ids mechanically.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
  */
 export class DeltaNormalizer {
   constructor(private readonly snapshotNormalizer: ProviderSnapshotNormalizer) {}

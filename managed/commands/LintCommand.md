@@ -21,5 +21,5 @@ Runs unified TSDoc syntax, convention, and documentation connectivity checks acr
 
 ### Implemented By
 
-- LintCommand → src/commands/LintCommand.ts:33
+- LintCommand → src/commands/LintCommand.ts:40
 

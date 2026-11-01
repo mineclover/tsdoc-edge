@@ -69,12 +69,21 @@ export class UnusedDocumentDetector {
 
     const content = fs.readFileSync(filePath, 'utf-8');
     const status = this.extractStatus(content);
+    const codeImplementationNotApplicable = this.isCodeImplementationNotApplicable(
+      filePath,
+      content
+    );
 
-    // Count references to this document
+    // Count references to this document (by filename OR defined [[Checkpoint]] symbols)
     const fileName = path.basename(filePath, path.extname(filePath));
-    const referenceCount = referenceMap.get(fileName) || 0;
+    const definedSymbols = this.extractDefinedCheckpoints(content);
+    const lookupKeys = new Set<string>([fileName, ...definedSymbols]);
+    let referenceCount = 0;
+    for (const key of lookupKeys) {
+      referenceCount += referenceMap.get(key) || 0;
+    }
 
-    // Count code connections (symbol footnote references)
+    // Count code connections (symbol footnotes, source metadata, backlinks, inline symbols)
     const codeConnectionCount = this.countCodeConnections(content);
 
     // Check for various unused conditions
@@ -85,6 +94,7 @@ export class UnusedDocumentDetector {
       lastModified,
       referenceCount,
       codeConnectionCount,
+      codeImplementationNotApplicable,
     });
 
     return result;
@@ -100,6 +110,7 @@ export class UnusedDocumentDetector {
     lastModified: string;
     referenceCount: number;
     codeConnectionCount: number;
+    codeImplementationNotApplicable: boolean;
   }): UnusedDocument | null {
     const {
       filePath,
@@ -108,6 +119,7 @@ export class UnusedDocumentDetector {
       lastModified,
       referenceCount,
       codeConnectionCount,
+      codeImplementationNotApplicable,
     } = params;
 
     // Check 1: Stale draft (3+ months old, no references)
@@ -173,6 +185,7 @@ export class UnusedDocumentDetector {
 
     // Check 5: No code connections for technical specs
     if (
+      !codeImplementationNotApplicable &&
       codeConnectionCount === 0 &&
       (status === 'active' || status === 'approved') &&
       this.isTechnicalSpec(filePath)
@@ -192,20 +205,27 @@ export class UnusedDocumentDetector {
   }
 
   /**
-   * Build a map of document references
+   * Build a map of incoming document references (excluding self-definitions in headings)
    */
   private buildReferenceMap(filePaths: string[]): Map<string, number> {
     const referenceMap = new Map<string, number>();
 
     for (const filePath of filePaths) {
       const content = fs.readFileSync(filePath, 'utf-8');
+      const selfSymbols = new Set<string>([
+        path.basename(filePath, path.extname(filePath)),
+        ...this.extractDefinedCheckpoints(content),
+      ]);
 
-      // Find [[Document Symbol]] references
+      // Find [[Document Symbol]] references from other documents
       const symbolRefs = content.match(/\[\[([^\]]+)\]\]/g) || [];
 
       for (const ref of symbolRefs) {
-        const symbol = ref.slice(2, -2).trim();
-        // Increment reference count
+        const raw = ref.slice(2, -2).trim();
+        const symbol = raw.split('#')[0].trim();
+        if (!symbol || selfSymbols.has(symbol)) {
+          continue;
+        }
         referenceMap.set(symbol, (referenceMap.get(symbol) || 0) + 1);
       }
 
@@ -216,7 +236,9 @@ export class UnusedDocumentDetector {
         const match = ref.match(/\(([^)]+\.md)/);
         if (match) {
           const linkedFile = path.basename(match[1], '.md');
-          referenceMap.set(linkedFile, (referenceMap.get(linkedFile) || 0) + 1);
+          if (!selfSymbols.has(linkedFile)) {
+            referenceMap.set(linkedFile, (referenceMap.get(linkedFile) || 0) + 1);
+          }
         }
       }
     }
@@ -225,16 +247,66 @@ export class UnusedDocumentDetector {
   }
 
   /**
-   * Count code connections (symbol footnote references)
+   * Extract H1/H2+ checkpoint definitions declared by a Markdown document
+   */
+  private extractDefinedCheckpoints(content: string): string[] {
+    const body = content.replace(/```[\s\S]*?```/g, '');
+    const symbols: string[] = [];
+    const headingRegex = /^#{1,6}\s+\[\[([^\]]+)\]\]/gm;
+    let match = headingRegex.exec(body);
+    while (match !== null) {
+      const symbol = match[1].trim();
+      if (symbol) {
+        symbols.push(symbol);
+      }
+      match = headingRegex.exec(body);
+    }
+    return symbols;
+  }
+
+  /**
+   * Check whether code implementation connections are explicitly non-applicable
+   */
+  private isCodeImplementationNotApplicable(filePath: string, content: string): boolean {
+    const frontmatterMatch = content.match(/^---\n([\s\S]*?)\n---/);
+    if (
+      frontmatterMatch &&
+      /codeImplementation:\s*["']?not-applicable["']?/i.test(frontmatterMatch[1])
+    ) {
+      return true;
+    }
+    const normalized = filePath.split(path.sep).join('/');
+    return /\/(concepts|guides|workflows|relationships)\//.test(normalized);
+  }
+
+  /**
+   * Count code connections (symbol footnotes, source metadata, backlinks, tsdoc-spec bindings)
    */
   private countCodeConnections(content: string): number {
-    // Count [^sym-XXX] references
-    const symbolFootnotes = content.match(/\[\^sym-[^\]]+\]/g) || [];
+    // 1. [^sym-XXX] or [^PascalSymbol] / [^camelSymbol] code footnotes
+    const symbolFootnotes = content.match(/\[\^[A-Za-z][A-Za-z0-9_-]*\]/g) || [];
+    // 2. [[sym-...]] explicit code symbol references
+    const symBracketRefs = content.match(/\[\[sym-[^\]]+\]\]/g) || [];
+    // 3. Inline PascalCase code identifiers or explicit src/mcp-server file paths
+    const codeRefs = content.match(/`[A-Z][a-zA-Z0-9]+`/g) || [];
+    const sourcePathRefs =
+      content.match(/`(?:src|mcp-server|tools)\/[A-Za-z0-9_./-]+\.(?:ts|js|go)`/g) || [];
+    // 4. Frontmatter `source: src/...` or Backlinks `### Implemented By` entries
+    const frontmatterSource = /^source:\s*(?:src|mcp-server|tools)\/\S+/m.test(content) ? 1 : 0;
+    const implementedByLines =
+      content.match(/^-\s+\S+\s+→\s+(?:src|mcp-server|tools)\/\S+/gm) || [];
+    // 5. Explicit `canonicalNodeId` bindings in `tsdoc-spec` JSON blocks
+    const specBindings = content.match(/"canonicalNodeId"\s*:\s*"[^"]+"/g) || [];
 
-    // Count inline code symbol references
-    const codeRefs = content.match(/`[A-Z][a-zA-Z]+`/g) || [];
-
-    return symbolFootnotes.length + codeRefs.length;
+    return (
+      symbolFootnotes.length +
+      symBracketRefs.length +
+      codeRefs.length +
+      sourcePathRefs.length +
+      frontmatterSource +
+      implementedByLines.length +
+      specBindings.length
+    );
   }
 
   /**

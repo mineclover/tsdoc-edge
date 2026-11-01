@@ -21,6 +21,6 @@ Aggregates upstream/downstream dependencies, related documents, contracts, and t
 
 ### Implemented By
 
-- EnhancedWorkContextAnalyzer → src/analyzer/EnhancedWorkContextAnalyzer.ts:1
-- EnhancedWorkContext → src/analyzer/EnhancedWorkContextAnalyzer.ts:24
+- EnhancedWorkContextAnalyzer → src/analyzer/EnhancedWorkContextAnalyzer.ts:123
+- EnhancedWorkContext → src/analyzer/EnhancedWorkContextAnalyzer.ts:26
 

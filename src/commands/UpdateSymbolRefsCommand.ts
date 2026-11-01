@@ -1,6 +1,13 @@
 /**
  * Update-symbol-refs command - Update symbol references in documents
+ *
  * @packageDocumentation
+ * @doc [[UpdateSymbolRefsCommand]]
+ * @doc [[CLI Commands]]
+ * @context Footnote code-reference synchronization via `tsdoc-edge docs update-refs`
+ * @functionality Resolves `[^SymbolName]` footnote anchors against `SymbolRegistryManager` and updates file-line footnote definitions in Markdown documents
+ * @sideEffect console: Writes resolved and unresolved footnote counts to stdout
+ * @sideEffect filesystem: Reads symbol registry and updates footnote sections in managed Markdown files
  */
 
 import * as fs from 'node:fs';
@@ -18,7 +25,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @responsibility Update code symbol footnote references in documents
  * @contract Parse documents, resolve symbol references, update footnotes
  * @doc [[UpdateSymbolRefsCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#update-symbol-refs]]
+ * @sideEffect filesystem: Updates symbol footnote definitions in Markdown files; writes summary to stdout
  *
  * @problem Symbol footnotes [^SymbolName] need to be updated when code changes
  * @solves Automatically updates footnote references with current code locations

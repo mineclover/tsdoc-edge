@@ -286,9 +286,10 @@ echo "Coverage: $coverage%" > coverage-badge.txt
 - [[UntestedCommand]] → managed/commands/UntestedCommand.md:199
 - [[ValidateSpecCommand]] → managed/commands/ValidateSpecCommand.md:321
 - [[Coverage Metrics Contract]] → managed/features/coverage-metrics-contract.md:276
+- [[LspAndCoverageSurfaceSpecification]] → managed/specs/domains/lsp-and-coverage-surface-spec.md:272
 - [[TestRelationships]] → managed/types/TestRelationships.md:126
 
 ### Implemented By
 
-- CoverageReportCommand → src/commands/CoverageReportCommand.ts:78
+- CoverageReportCommand → src/commands/CoverageReportCommand.ts:88
 

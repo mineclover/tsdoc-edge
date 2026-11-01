@@ -473,3 +473,25 @@ DatabaseManager
 - [[Primary Types Index]] → managed/primary-types/index.md:449
 - [[Types Index]] → managed/types/index.md:378
 
+### Implemented By
+
+- DocumentSymbol → src/utilities/DocumentSymbolLister.ts:27
+- DocumentSymbolLister → src/utilities/DocumentSymbolLister.ts:63
+- ReferenceType → src/utilities/FileReferenceUpdater.ts:24
+- FileReference → src/utilities/FileReferenceUpdater.ts:33
+- UpdateOptions → src/utilities/FileReferenceUpdater.ts:57
+- UpdateResult → src/utilities/FileReferenceUpdater.ts:79
+- FileReferenceUpdater → src/utilities/FileReferenceUpdater.ts:100
+- ReferenceType → src/utilities/ReferenceUpdater.ts:22
+- FileReference → src/utilities/ReferenceUpdater.ts:31
+- ReferenceUpdater → src/utilities/ReferenceUpdater.ts:57
+- SymbolReferenceType → src/utilities/SymbolReferenceUpdater.ts:27
+- SymbolReference → src/utilities/SymbolReferenceUpdater.ts:36
+- SymbolUpdateOptions → src/utilities/SymbolReferenceUpdater.ts:64
+- SymbolUpdateResult → src/utilities/SymbolReferenceUpdater.ts:86
+- SymbolReferenceUpdater → src/utilities/SymbolReferenceUpdater.ts:117
+- isEmptyOrWhitespace → src/utils/index.ts:19
+- normalizeLineEndings → src/utils/index.ts:30
+- getFileExtension → src/utils/index.ts:41
+- isTypeScriptOrJavaScript → src/utils/index.ts:54
+

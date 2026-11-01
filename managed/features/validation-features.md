@@ -439,7 +439,7 @@ cycle_rate = symbols_in_cycles / total_symbols
 - [[AutoIndexing]] → managed/features/auto-indexing.md:295
 - [[CoreFeatures]] → managed/features/core-features-catalog.md:131
 - [[CoreWorkflow]] → managed/features/core-workflow.md:153
-- [[Features Index]] → managed/features/index.md:284
+- [[Features Index]] → managed/features/index.md:298
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:377
 - [[Guides & Tutorials]] → managed/guides/index.md:297
 - [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:496
@@ -447,6 +447,7 @@ cycle_rate = symbols_in_cycles / total_symbols
 
 ### Implemented By
 
-- ConnectivityValidator (Connectivity) → src/validator/ConnectivityValidator.ts:39
-- StrictModeValidator (StrictMode) → src/validator/StrictModeValidator.ts:32
+- ValidateUnifiedCommand → src/commands/ValidateUnifiedCommand.ts:43
+- ConnectivityValidator (Connectivity) → src/validator/ConnectivityValidator.ts:44
+- StrictModeValidator (StrictMode) → src/validator/StrictModeValidator.ts:36
 

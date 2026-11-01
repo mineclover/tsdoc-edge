@@ -1,4 +1,14 @@
-/** Invoke the upstream ttsc graph-lint evaluator and project its result into the convention plane. */
+/**
+ * Invoke the upstream ttsc graph-lint evaluator and project its result into the convention plane.
+ *
+ * @doc [[ConventionCheck]]
+ * @doc [[Convention Pack Check]]
+ * @context Convention-plane adapter bridging canonical `@ttsc/graph` snapshots into upstream `@ttsc/lint` graph-traversal rule evaluation.
+ * @functionality Loads graph-lint rule JSON files and the upstream `buildGraphLintRules` evaluator, normalizes rule results and violations, and emits deterministic `GraphLintReport` findings.
+ * @sideEffect filesystem: Reads workspace-local graph-lint rule JSON files and dynamically imports the upstream graph-lint evaluator module.
+ * @sideEffect environment: Reads `TSDOC_EDGE_GRAPH_LINT_MODULE` and `TSDOC_EDGE_GRAPH_ROUTER_MODULE` when `moduleSpecifier` is omitted.
+ * @packageDocumentation
+ */
 
 import { createHash } from 'node:crypto';
 import * as fs from 'node:fs';
@@ -6,13 +16,38 @@ import * as path from 'node:path';
 import { pathToFileURL } from 'node:url';
 import type { CanonicalProjectGraph } from '../indexer/contracts';
 
+/**
+ * Canonical evaluator identifier for upstream `ttsc` graph-lint projection reports.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const TTSC_GRAPH_LINT_ADAPTER_ID = 'tsdoc-edge/ttsc-graph-lint-adapter' as const;
+
+/**
+ * SemVer version of the `ttsc` graph-lint convention adapter.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const TTSC_GRAPH_LINT_ADAPTER_VERSION = '1.0.0' as const;
 
+/**
+ * Minimal upstream module contract exporting `buildGraphLintRules`.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface TtscGraphLintModule {
   buildGraphLintRules(dump: unknown, options: { rules: unknown }): unknown;
 }
 
+/**
+ * Derived convention finding projected from an upstream graph-lint rule violation.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface GraphLintFinding {
   readonly resultKind: 'derived-graph-lint-finding';
   readonly findingId: string;
@@ -27,6 +62,12 @@ export interface GraphLintFinding {
   readonly reached: number;
 }
 
+/**
+ * Normalized evaluation summary and violations for a single graph-lint rule.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface GraphLintRuleResult {
   readonly id: string;
   readonly description?: string;
@@ -40,6 +81,12 @@ export interface GraphLintRuleResult {
   readonly violations: readonly Readonly<Record<string, unknown>>[];
 }
 
+/**
+ * Immutable content-addressed report capturing graph-lint rule outcomes and findings.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface GraphLintReport {
   readonly contractVersion: '1.0';
   readonly resultKind: 'derived-graph-lint-report';
@@ -54,6 +101,12 @@ export interface GraphLintReport {
   readonly findings: readonly GraphLintFinding[];
 }
 
+/**
+ * Options for loading a workspace-local graph-lint rules file and upstream module.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface EvaluateTtscGraphLintFileOptions {
   readonly workspaceRoot: string;
   readonly graph: CanonicalProjectGraph;
@@ -62,7 +115,12 @@ export interface EvaluateTtscGraphLintFileOptions {
   readonly moduleLoader?: () => Promise<TtscGraphLintModule>;
 }
 
-/** Evaluate one canonical graph with the upstream graph-router graph-lint function. */
+/**
+ * Evaluate one canonical graph with the upstream graph-router graph-lint function.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export function evaluateTtscGraphLint(
   graph: CanonicalProjectGraph,
   rules: unknown,
@@ -103,7 +161,12 @@ export function evaluateTtscGraphLint(
   });
 }
 
-/** Load a workspace-local graph-lint rule file and its upstream evaluator module. */
+/**
+ * Load a workspace-local graph-lint rule file and its upstream evaluator module.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export async function evaluateTtscGraphLintFile(
   options: EvaluateTtscGraphLintFileOptions
 ): Promise<GraphLintReport> {
@@ -147,7 +210,12 @@ export async function evaluateTtscGraphLintFile(
   return evaluateTtscGraphLint(options.graph, rules, module);
 }
 
-/** Create an explicit no-rules report so every convention result has one graph-lint plane. */
+/**
+ * Create an explicit no-rules report so every convention result has one graph-lint plane.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export function emptyGraphLintReport(graphFingerprint: string): GraphLintReport {
   const summary = Object.freeze({
     rules: 0,

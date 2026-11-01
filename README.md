@@ -13,8 +13,9 @@ The platform keeps one connected source of truth across three layers: `@microsof
 the 29 standard TSDoc tags, `ttsc` with `@ttsc/graph` and `@ttsc/lint` provides the canonical code
 graph and 25 error rules, and `tsdoc-edge` owns 22 irreducible domain tags plus document and
 specification connectivity. Run `tsdoc-edge sync [--force] [--dry-run] [--check] [--json]` to
-refresh or verify the complete pipeline. Use `find-method` for symbol lookup, `spec` for SpecGraph
-lifecycle operations, and `convention` for revision-pinned governance checks.
+refresh or verify the complete pipeline. Use `symbol query` (or `symbol find-method`) for symbol
+lookup, `spec` for SpecGraph lifecycle operations, and `convention` for revision-pinned governance
+checks.
 
 ---
 
@@ -97,21 +98,23 @@ The `work-context` command provides everything you need before modifying code:
 
 | Feature | Command | Description |
 |---------|---------|-------------|
+| Unified Sync | `sync [--check]` | 1-step SSOT sync for symbols, canonical `@ttsc/graph`, `SpecGraph`, and backlinks |
 | Work Context | `wc <file>` | Complete context before file modification |
 | Design Context | `dc <file>` | Spec bindings, `@contract`, and `@decision` view |
 | Symbol Query | `symbol query <name>` | Code symbol (`@ttsc/graph`) + `[[Symbol]]` checkpoint lookup |
 | Relationship Analysis | `relationship stats` | Canonical `@ttsc/graph` + project relationship metrics |
 | Impact Analysis | `relationship impact <symbol>` | Change impact assessment |
-| Quality Check | `lint` | Code health, docs, tests, relationships |
+| Validation | `validate docs` / `validate tsdoc` | Checkpoint SSOT & Microsoft TSDoc syntax validation |
+| System Status | `system-status` / `health` | Multi-plane SSOT health, graph, and coverage dashboard |
 | Documentation | `docs index managed` | Index `[[Symbol]]` references |
 | Convention Check | `convention check --pack <file>` | Check exact spec bindings with policy and suppressions |
-| Convention Inputs | `convention inputs list|read` | Inspect exact evidence, enrichment, and policy pins read-only |
+| Convention Inputs | `convention inputs list\|read` | Inspect exact evidence, enrichment, and policy pins read-only |
 | Find Method | `symbol find-method <name>` | Find methods by name across the symbol graph |
-| Specifications | `spec extract` / `spec graph ...` | Compile and inspect managed SpecGraph revisions |
+| Specifications | `spec extract` / `spec metrics` | Compile `SpecGraph` revisions and evaluate specification health |
 | Canonical Graph | `canonical-graph status\|list\|read\|prune` | Inspect saved ttsc graph revisions read-only or prune historical revisions |
-| Spec Graph | `spec graph status|list|read` | Inspect saved managed SpecGraph revisions read-only |
-| Coverage Report | `coverage-report list|read` | Inspect persisted source-identified coverage reports read-only |
-| Coverage Baseline | `coverage-baseline save|compare|list|read` | Persist, compare, and inspect immutable metric baselines |
+| Spec Graph | `spec graph status\|list\|read` | Inspect saved managed SpecGraph revisions read-only |
+| Coverage Report | `coverage-report [list\|read]` | Inspect SSOT `@doc` coverage and persisted source-identified coverage reports |
+| Coverage Baseline | `coverage-baseline save\|compare\|list\|read` | Persist, compare, and inspect immutable metric baselines |
 
 ---
 
@@ -149,9 +152,11 @@ tsdoc-edge relationship impact <id>     # Full impact analysis
 
 ### Quality Checks
 ```bash
-tsdoc-edge lint                  # All checks
-tsdoc-edge health src            # Code health report
-tsdoc-edge docs suggest          # Improvement suggestions
+npm run lint                       # Biome + @ttsc/lint (25 error rules)
+tsdoc-edge sync --check            # Read-only SSOT & backlink verification
+tsdoc-edge validate tsdoc --strict # Official Microsoft TSDoc AST validation
+tsdoc-edge health src              # Code health report
+tsdoc-edge docs suggest            # Improvement suggestions
 ```
 
 ### Documentation Management
@@ -205,9 +210,9 @@ duplicating the upstream traversal algorithm.
 This command requires the built sibling `ttsc-graph-router` by default, falls back to the legacy
 `ttsc-ex/packages/ttsc-graph-router` layout, or accepts an explicit
 `TSDOC_EDGE_GRAPH_ROUTER_MODULE`. The proof command and its authored convention pack are repository
-development assets; the current npm package does not publish `scripts/` or `managed/`. Runner
-evidence and enrichment collectors, general naming/style evaluation, durable report history, and
-convention/spec-conformance LSP diagnostics/CodeAction remain later loops.
+development assets; the current npm package does not publish `scripts/` or `managed/`. Naming and
+TSDoc tag evaluators, durable convention check history, immutable analysis input revisions, and
+LSP conformance diagnostics/CodeActions are integrated on the same revision-pinned contract.
 
 ---
 
@@ -250,9 +255,11 @@ Create `.tsdoc.config.json`:
 |----------|-------------|
 | [Quick Start](managed/quick-start.md) | 5-minute setup guide |
 | [Usage Scenarios](managed/guides/usage-scenarios.md) | Real-world workflows |
-| [Commands Index](managed/COMMANDS.md) | CLI command reference |
+| [Commands Index](managed/COMMANDS.md) | 20 canonical top-level CLI commands & unified groups |
+| [Authored Project Specifications](managed/specs/index.md) | Normative `SpecGraph` specifications (8 domain/convention specs, 54 bindings) |
 | [Relationship Guide](managed/guides/relationship-analysis-guide.md) | Dependency analysis |
-| [LSP Integration](managed/features/lsp-integration.md) | IDE integration |
+| [LSP Integration](managed/features/lsp-integration.md) | Real-time IDE integration & overlay graph |
+| [MCP Integration](managed/features/mcp-integration.md) | 9-tool Model Context Protocol server specification |
 | [Convention Pack Check](managed/features/convention-pack-check.md) | Revision-pinned spec-binding governance loop |
 
 ---
@@ -261,17 +268,22 @@ Create `.tsdoc.config.json`:
 
 ```
 src/
-├── analyzer/      # Code analysis (health, coverage)
-├── commands/      # CLI command groups and adapters
-├── convention/    # Convention pack compilation and conformance orchestration
-├── doc-symbol/    # [[Symbol]] system
-├── graph/         # Symbol graph
-├── graph-analysis/# Canonical @ttsc/graph queries and projections
-├── indexer/       # graph-router adapter + canonical graph assembly
-├── lsp/           # LSP server
-├── parser/        # TSDoc parsing
-├── storage/       # SQLite + JSONL
-└── types/         # Type definitions
+├── analyzer/       # Code analysis (health, coverage, domain relationships)
+├── commands/       # 20 canonical top-level CLI commands & unified groups
+├── convention/     # Convention pack compilation and conformance evaluators
+├── doc-symbol/     # [[Symbol]] checkpoint registry & backlinks
+├── graph/          # Symbol graph
+├── graph-analysis/ # Canonical @ttsc/graph queries and projections
+├── indexer/        # graph-router adapter + canonical graph assembly
+├── lsp/            # LSP server & effective overlay graph
+├── parser/         # Unified Microsoft TSDoc AST reader & tag parsers
+├── provider/       # Semantic graph provider adapters
+├── semantic-graph/ # Effective code + SpecGraph composition
+├── spec/           # Specification metrics, completeness & unused-doc detection
+├── spec-graph/     # Executable SpecGraph extraction (`tsdoc-spec`)
+├── storage/        # SQLite (.tsdoc.db, canonical-graph.db, spec-graph.db) + JSONL
+├── types/          # Type definitions
+└── validator/      # Document, connectivity & specification validators
 ```
 
 ---
@@ -367,13 +379,13 @@ saved-file whole-project refreshes.
 
 | Metric | Value |
 |--------|-------|
-| CLI Commands | See `tsdoc-edge help --all` |
-| Symbols | 6,726 |
-| Relationships | 38,704 |
-| Relationship Types | 13/28 (46%) |
-| Test Suites | 190 |
-| Tests | 2,761 |
-| Build Time | 11s |
+| CLI Commands | 20 canonical top-level (`tsdoc-edge help --tree`) |
+| Canonical `@ttsc/graph` | 8,354 internal (8,606 total) nodes / 16,980 internal (21,133 total) edges |
+| Normative `SpecGraph` | 8 `project-spec` docs · 62 nodes · 54 bindings (`54/54` satisfied) |
+| Enrichment Symbol DB | 10,409 symbols / 22,064 domain+test relationships |
+| `@ttsc/lint` | 25 error rules (`0` findings) |
+| Health Scores | `90/100 (A)` system-status · `89/100 (A)` spec metrics |
+| Test Suites | 237 suites (3,247 tests) |
 
 ---
 

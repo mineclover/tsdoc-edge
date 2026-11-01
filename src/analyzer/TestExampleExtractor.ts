@@ -6,6 +6,8 @@
  * @problem Documentation examples become stale and disconnected from tests
  * @solves Automatically extracts test cases as living examples
  * @context SSOT principle: Tests are single source of truth for examples
+ * @sideEffect filesystem: Reads test source files and recursively scans `__tests__` directories on disk (read)
+ * @sideEffect database: Queries SQLite symbol records via `DatabaseManager` (read)
  *
  * Philosophy: **Test Code \> Generic Examples**
  */
@@ -55,6 +57,9 @@ export interface TestExample {
  *
  * Analyzes test files to extract reusable examples for documentation.
  *
+ * @doc [[TestExampleExtractor]]
+ * @sideEffect filesystem: Reads test source files and recursively scans `__tests__` directories on disk (read)
+ * @sideEffect database: Queries SQLite symbol records via `DatabaseManager` (read)
  * @public
  * @example
  * ```typescript

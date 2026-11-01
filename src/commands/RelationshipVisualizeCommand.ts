@@ -1,6 +1,14 @@
 /**
  * Relationship Visualization Command
+ *
  * @packageDocumentation
+ * @doc [[RelationshipVisualizeCommand]]
+ * @doc [[RelationshipCommands]]
+ * @context Mermaid and ASCII diagram rendering via `tsdoc-edge relationship visualize`
+ * @functionality Queries symbol neighborhoods from `.tsdoc.db` and renders Mermaid flowcharts, class diagrams, or `--output` diagram files
+ * @sideEffect console: Writes generated Mermaid diagram source to stdout
+ * @sideEffect database: Reads symbol and unified relationship rows from `DatabaseManager` (read)
+ * @sideEffect filesystem: Writes diagram files on disk when `--output` is specified
  */
 
 import * as fs from 'node:fs';
@@ -24,6 +32,7 @@ interface VisualizeOptions {
 /**
  * Command for visualizing relationships as diagrams
  * @doc [[RelationshipVisualizeCommand]]
+ * @sideEffect console: Writes Mermaid diagram output to stdout or `--output` file; reads `.tsdoc.db`
  * @public
  */
 export class RelationshipVisualizeCommand extends BaseCommand {

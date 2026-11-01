@@ -1,5 +1,10 @@
 /**
  * MCP Tool implementations for TSDoc Edge
+ *
+ * @packageDocumentation
+ * @doc [[MCP Integration]]
+ * @context Request handlers formatting `TsDocService` query outputs into Markdown or structured JSON MCP tool responses with character-limit truncation
+ * @functionality Implements all 9 read-only MCP tool handlers (`searchSymbolsTool`, `getOntologyStatsTool`, `listRelationshipsTool`, `getWorkContextTool`, `getDesignContextTool`, `queryRelationshipsTool`, `getImpactTool`, `getSpecBindingsTool`, `getSymbolDetailsTool`)
  */
 
 import { CHARACTER_LIMIT } from '../constants.js';
@@ -17,9 +22,81 @@ import type {
 import type { TsDocService } from '../services/tsdocService.js';
 
 /**
- * Format response with truncation if needed
+ * Deterministically compact or trim a JSON object/value so that the serialized
+ * string never exceeds `limit` characters while remaining 100% valid JSON.
+ */
+function fitJsonWithinLimit(
+  rawJson: string,
+  limit: number
+): { text: string; structured: Record<string, unknown>; truncated: boolean } {
+  const parsed: unknown = JSON.parse(rawJson);
+  const asRecord =
+    parsed !== null && typeof parsed === 'object' && !Array.isArray(parsed)
+      ? (parsed as Record<string, unknown>)
+      : { data: parsed };
+
+  if (rawJson.length <= limit) {
+    return { text: rawJson, structured: asRecord, truncated: false };
+  }
+
+  const compact = JSON.stringify(parsed);
+  if (compact.length <= limit) {
+    return { text: compact, structured: asRecord, truncated: false };
+  }
+
+  // Progressively trim top-level array fields while preserving schema keys
+  const working: Record<string, unknown> = {
+    ...asRecord,
+    truncated: true,
+    originalLength: rawJson.length,
+  };
+  const arrayKeys = Object.keys(working).filter((key) => Array.isArray(working[key]));
+
+  while (JSON.stringify(working).length > limit && arrayKeys.length > 0) {
+    let trimmedAny = false;
+    for (const key of arrayKeys) {
+      const current = working[key];
+      if (Array.isArray(current) && current.length > 0) {
+        const nextLen = current.length > 4 ? Math.floor(current.length / 2) : current.length - 1;
+        working[key] = current.slice(0, nextLen);
+        trimmedAny = true;
+      }
+    }
+    if (!trimmedAny) {
+      break;
+    }
+  }
+
+  const serialized = JSON.stringify(working);
+  if (serialized.length <= limit) {
+    return { text: serialized, structured: working, truncated: true };
+  }
+
+  const fallback: Record<string, unknown> = {
+    truncated: true,
+    originalLength: rawJson.length,
+    message: 'JSON payload exceeded character limit after array trimming; narrow query filters.',
+  };
+  return { text: JSON.stringify(fallback), structured: fallback, truncated: true };
+}
+
+/**
+ * Format response with truncation if needed.
+ * JSON responses are compacted or array-trimmed rather than substring-sliced
+ * so `content[0].text` is always valid JSON.
  */
 function formatResponse(content: string, format: 'markdown' | 'json') {
+  if (format === 'json') {
+    const fitted = fitJsonWithinLimit(content, CHARACTER_LIMIT);
+    return {
+      content: [{ type: 'text' as const, text: fitted.text }],
+      structuredContent: fitted.structured,
+      ...(fitted.truncated
+        ? { isError: false, _meta: { truncated: true, originalLength: content.length } }
+        : {}),
+    };
+  }
+
   const truncated = content.length > CHARACTER_LIMIT;
   const displayContent = truncated
     ? `${content.substring(0, CHARACTER_LIMIT)}\n\n[Response truncated due to size limit]`
@@ -27,7 +104,6 @@ function formatResponse(content: string, format: 'markdown' | 'json') {
 
   return {
     content: [{ type: 'text' as const, text: displayContent }],
-    ...(format === 'json' && !truncated ? { structuredContent: JSON.parse(content) } : {}),
     ...(truncated
       ? { isError: false, _meta: { truncated: true, originalLength: content.length } }
       : {}),
@@ -36,6 +112,9 @@ function formatResponse(content: string, format: 'markdown' | 'json') {
 
 /**
  * Search for symbols in the codebase
+ *
+ * @doc [[MCP Integration]]
+ * @public
  */
 export async function searchSymbolsTool(params: SearchSymbolsInput, service: TsDocService) {
   try {
@@ -94,6 +173,9 @@ export async function searchSymbolsTool(params: SearchSymbolsInput, service: TsD
 
 /**
  * Get ontology statistics
+ *
+ * @doc [[MCP Integration]]
+ * @public
  */
 export async function getOntologyStatsTool(params: GetOntologyStatsInput, service: TsDocService) {
   try {
@@ -151,6 +233,9 @@ export async function getOntologyStatsTool(params: GetOntologyStatsInput, servic
 
 /**
  * List relationships
+ *
+ * @doc [[MCP Integration]]
+ * @public
  */
 export async function listRelationshipsTool(params: ListRelationshipsInput, service: TsDocService) {
   try {
@@ -215,6 +300,9 @@ export async function listRelationshipsTool(params: ListRelationshipsInput, serv
 
 /**
  * Get work context for a file
+ *
+ * @doc [[MCP Integration]]
+ * @public
  */
 export async function getWorkContextTool(params: GetWorkContextInput, service: TsDocService) {
   try {
@@ -239,6 +327,9 @@ export async function getWorkContextTool(params: GetWorkContextInput, service: T
 
 /**
  * Get design context for a file
+ *
+ * @doc [[MCP Integration]]
+ * @public
  */
 export async function getDesignContextTool(params: GetDesignContextInput, service: TsDocService) {
   try {
@@ -259,6 +350,9 @@ export async function getDesignContextTool(params: GetDesignContextInput, servic
 
 /**
  * Query relationships for a specific symbol
+ *
+ * @doc [[MCP Integration]]
+ * @public
  */
 export async function queryRelationshipsTool(
   params: QueryRelationshipsInput,
@@ -290,6 +384,7 @@ export async function queryRelationshipsTool(
  * @param params - Validated impact query options.
  * @param service - TSDoc database service.
  * @returns MCP-formatted impact response.
+ * @doc [[MCP Integration]]
  * @public
  */
 export async function getImpactTool(params: GetImpactInput, service: TsDocService) {
@@ -324,6 +419,7 @@ export async function getImpactTool(params: GetImpactInput, service: TsDocServic
  * @param params - Validated specification filters.
  * @param service - TSDoc database service.
  * @returns MCP-formatted specification response.
+ * @doc [[MCP Integration]]
  * @public
  */
 export async function getSpecBindingsTool(params: GetSpecBindingsInput, service: TsDocService) {
@@ -356,6 +452,9 @@ export async function getSpecBindingsTool(params: GetSpecBindingsInput, service:
 
 /**
  * Get symbol details
+ *
+ * @doc [[MCP Integration]]
+ * @public
  */
 export async function getSymbolDetailsTool(params: GetSymbolDetailsInput, service: TsDocService) {
   try {

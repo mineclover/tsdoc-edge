@@ -21,5 +21,5 @@ Scans managed Markdown specifications for duplicate or near-duplicate content us
 
 ### Implemented By
 
-- CheckDuplicatesCommand → src/commands/CheckDuplicatesCommand.ts:64
+- CheckDuplicatesCommand → src/commands/CheckDuplicatesCommand.ts:73
 

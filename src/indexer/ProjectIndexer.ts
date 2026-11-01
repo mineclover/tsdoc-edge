@@ -1,5 +1,11 @@
 /**
  * Canonical project graph assembler.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @context Deterministic canonical graph assembly kernel uniting batch CLI indexing and saved-file LSP refreshes behind a single `CanonicalProjectGraph` contract.
+ * @functionality Canonicalizes root and `tsconfig` paths, validates canonical node identities and edge endpoints, sorts nodes and edges deterministically, computes SHA-256 graph fingerprints, and deep-freezes assembled graphs.
+ * @sideEffect filesystem: Canonicalizes workspace root and `tsconfig` filesystem paths and delegates project graph loading to the configured `ProjectGraphSource`.
  * @packageDocumentation
  */
 
@@ -22,6 +28,8 @@ import {
  * Batch and LSP persistence must call this class instead of maintaining their
  * own symbol ids or relationship extraction paths.
  *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
  * @public
  */
 export class ProjectIndexer {
@@ -116,7 +124,13 @@ export class ProjectIndexer {
   }
 }
 
-/** Recompute the canonical content fingerprint for an assembled graph. */
+/**
+ * Recompute the canonical content fingerprint for an assembled graph.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export function canonicalProjectGraphFingerprint(
   nodes: readonly CanonicalGraphNode[],
   edges: readonly CanonicalGraphEdge[]

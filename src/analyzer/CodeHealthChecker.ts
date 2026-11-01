@@ -1,7 +1,9 @@
 /**
  * Code health checker
+ *
  * @packageDocumentation
  * @responsibility Generate comprehensive health reports with improvement suggestions
+ * @sideEffect filesystem: Traverses target directories and reads TypeScript source files for documentation quality analysis (read)
  */
 
 import * as fs from 'node:fs';
@@ -30,6 +32,7 @@ import { DocumentationAnalyzer } from './DocumentationAnalyzer';
  * @context Need unified metrics to track code quality over time
  *
  * @functionality Health score calculation, Improvement suggestions, Documentation analysis, Test coverage analysis
+ * @sideEffect filesystem: Traverses target directories and reads TypeScript source files for documentation quality analysis (read)
  *
  * @decision Combine doc quality and test coverage into single metric
  * @rationale Both are essential for maintainability and should be tracked together

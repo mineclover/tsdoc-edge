@@ -1,6 +1,12 @@
 /**
  * TSDoc parser implementation
+ *
  * @packageDocumentation
+ * @doc [[TSDocParser]]
+ * @doc [[TSDocStandardSpecification]]
+ * @context Custom tag registration and TypeScript AST JSDoc comment parsing backed by `@microsoft/tsdoc`
+ * @functionality Registers the 22 TSDoc Edge custom tags, loads `tsdoc.json` overrides, emits `tsdoc.json` config, and parses strings or TypeScript source files
+ * @sideEffect filesystem: Reads `tsdoc.json` custom tag configuration from disk when present (read)
  */
 
 import * as fs from 'node:fs';
@@ -17,6 +23,10 @@ import type { ParsedDocComment, ParseResult } from '../types';
 
 /**
  * Custom tag specification for TSDoc Edge
+ *
+ * @doc [[TSDocParser]]
+ * @doc [[TSDocStandardSpecification]]
+ * @public
  */
 export interface CustomTagSpec {
   tagName: string;
@@ -31,6 +41,7 @@ export interface CustomTagSpec {
  * of `@microsoft/tsdoc` v0 standard tags (29 tags) and `ttsc` (`@ttsc/graph` + TypeScript AST);
  * see `CANONICAL_TTSC_RELATIONSHIP_BRIDGE` and `CANONICAL_TSDOC_STANDARD_BRIDGE`.
  *
+ * @doc [[TSDocParser]]
  * @doc [[TsdocEdgePlatformSpecification]]
  * @doc [[CrossSpecIntegrationContract]]
  * @public
@@ -72,6 +83,8 @@ export const TSDOC_EDGE_CUSTOM_TAGS: CustomTagSpec[] = [
 /**
  * Generate standard tsdoc.json configuration object compliant with Microsoft schema
  * @returns JSON-serializable tsdoc.json object
+ * @doc [[TSDocParser]]
+ * @doc [[TSDocStandardSpecification]]
  * @public
  */
 export function generateTsdocJson(): {
@@ -126,6 +139,7 @@ function isUnknownArray(value: unknown): value is readonly unknown[] {
  * @context Need structured metadata beyond standard TSDoc tags
  *
  * @functionality Custom tag registration, AST traversal, Comment extraction, TSDoc parsing
+ * @sideEffect filesystem: Reads `tsdoc.json` custom tag definitions from disk during initialization when present (read)
  *
  * @decision Wrap Microsoft TSDoc parser instead of forking
  * @rationale Benefit from upstream improvements and standards compliance

@@ -2,7 +2,13 @@
  * Relationship Export Command
  *
  * @doc [[RelationshipExportCommand]]
+ * @doc [[RelationshipCommands]]
  * @packageDocumentation
+ * @context Graph export utility invoked via `tsdoc-edge relationship export`
+ * @functionality Serializes symbols and unified relationships from `.tsdoc.db` into JSON, GraphML, DOT, CSV, Cypher, or Gephi formats
+ * @sideEffect console: Writes exported graph payloads or export summaries to stdout
+ * @sideEffect database: Reads symbol and unified relationship rows from `DatabaseManager` (read)
+ * @sideEffect filesystem: Writes exported graph files when `--output` is specified
  */
 
 import * as fs from 'node:fs';
@@ -34,6 +40,9 @@ type ExportFormat = 'json' | 'graphml' | 'dot' | 'csv' | 'cypher' | 'gephi';
 
 /**
  * Command for exporting relationships to various formats
+ *
+ * @doc [[RelationshipExportCommand]]
+ * @sideEffect console: Writes exported relationship graph data to stdout or `--output` file; reads `.tsdoc.db`
  * @public
  */
 export class RelationshipExportCommand extends BaseCommand {

@@ -50,6 +50,7 @@ export interface ExtractionResult {
 /**
  * AST-based symbol extractor
  *
+ * @doc [[ASTSymbolExtractor]]
  * @public
  * @responsibility Extract all symbols from TypeScript AST regardless of JSDoc presence
  */

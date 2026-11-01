@@ -1,6 +1,13 @@
 /**
  * Validate Generated Docs Command
+ *
  * @packageDocumentation
+ * @doc [[ValidateGeneratedDocsCommand]]
+ * @doc [[ValidationFeatures]]
+ * @context Structural validation for generated Markdown API documentation via `tsdoc-edge validate generated`
+ * @functionality Evaluates generated Markdown files or directories with `GeneratedDocsValidator` and reports completeness scores, errors, and warnings
+ * @sideEffect console: Writes generated documentation validation summaries and issues to stdout
+ * @sideEffect filesystem: Reads generated Markdown files or directories on disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -18,6 +25,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @public
  * @responsibility Validate generated markdown docs for structure and completeness
  * @contract Check required sections, metadata, and formatting
+ * @sideEffect console: Writes generated documentation validation reports to stdout; reads Markdown files
  *
  * @problem Generated docs may have missing sections or incorrect structure
  * @solves Automated validation ensures doc quality

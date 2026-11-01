@@ -1,4 +1,13 @@
-/** Shared application service for revision-pinned convention-pack checks. */
+/**
+ * Shared application service for revision-pinned convention-pack checks.
+ *
+ * @doc [[ConventionCheck]]
+ * @doc [[Convention Pack Check]]
+ * @context Revision-pinned convention governance pipeline binding compiled convention packs to persisted canonical code revisions, TSDoc enrichment, test evidence, graph-lint, and coverage gates.
+ * @functionality Validates manifest and revision pins, evaluates capability requirements, runs naming, TSDoc, graph-lint, coverage, and SpecGraph conformance evaluators, and returns an immutable content-addressed check result.
+ * @sideEffect filesystem: Resolves workspace root paths on disk and optionally loads TSDoc enrichment source files when enrichment is not pre-supplied.
+ * @packageDocumentation
+ */
 
 import { createHash } from 'node:crypto';
 import * as fs from 'node:fs';
@@ -47,6 +56,12 @@ import { TsdocConventionEvaluator, type TsdocConventionReport } from './TsdocCon
 import { loadTsdocEnrichment } from './TsdocEnrichmentLoader';
 import { emptyGraphLintReport, type GraphLintReport } from './TtscGraphLintAdapter';
 
+/**
+ * Observed provider status for a required convention-pack capability.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface ConventionCapabilityCheck {
   readonly id: string;
   readonly required: ConventionCapabilityRequirement;
@@ -54,6 +69,12 @@ export interface ConventionCapabilityCheck {
   readonly observedVersion?: string;
 }
 
+/**
+ * Revision-pinned inputs required to execute a single convention-pack check.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface ConventionCheckInput {
   readonly pack: CompiledConventionPack;
   readonly codeRevision: ActiveCanonicalGraphRevision;
@@ -76,6 +97,12 @@ export interface ConventionCheckInput {
   readonly suppressionAsOf?: string;
 }
 
+/**
+ * Immutable content-addressed result produced by a convention-pack check execution.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface ConventionCheckResult {
   readonly contractVersion: '1.0';
   readonly resultKind: 'convention-check';
@@ -112,6 +139,10 @@ export interface ConventionCheckResult {
 /**
  * Execute the first complete convention loop without persisting transient
  * snapshots or binding-resolution sets.
+ *
+ * @doc [[ConventionCheck]]
+ * @doc [[Convention Pack Check]]
+ * @public
  */
 export class ConventionCheckService {
   private readonly analysis = new EffectiveAnalysisService();

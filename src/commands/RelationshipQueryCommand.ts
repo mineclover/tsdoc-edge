@@ -1,6 +1,13 @@
 /**
  * Relationship Query Command
+ *
  * @packageDocumentation
+ * @doc [[RelationshipQueryCommand]]
+ * @doc [[RelationshipCommands]]
+ * @context Direct incoming and outgoing relationship lookup via `tsdoc-edge relationship query`
+ * @functionality Queries symbol edges across the active canonical `@ttsc/graph` revision and `.tsdoc.db` unified relationships with category and direction filters
+ * @sideEffect console: Writes formatted relationship tables or `--json` payloads to stdout
+ * @sideEffect database: Reads canonical `@ttsc/graph` and `DatabaseManager` SQLite repositories (read)
  */
 
 import * as fs from 'node:fs';
@@ -20,6 +27,7 @@ interface CanonicalRelationshipCandidate {
 /**
  * Command for querying symbol relationships across Canonical `@ttsc/graph` and Enrichment DB.
  * @doc [[RelationshipQueryCommand]]
+ * @sideEffect console: Writes symbol relationship tables or JSON output to stdout; reads SQLite repositories
  * @public
  */
 export class RelationshipQueryCommand extends BaseCommand {

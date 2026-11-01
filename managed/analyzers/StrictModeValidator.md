@@ -367,5 +367,5 @@ console.log(`Average compliance: ${avgScore.toFixed(2)}%`);
 
 ### Implemented By
 
-- StrictModeValidator → src/validator/StrictModeValidator.ts:32
+- StrictModeValidator → src/validator/StrictModeValidator.ts:36
 

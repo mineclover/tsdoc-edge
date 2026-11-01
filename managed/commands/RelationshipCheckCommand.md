@@ -21,5 +21,5 @@ Runs a pre-change safety check summarizing high-risk dependents and contract con
 
 ### Implemented By
 
-- RelationshipCheckCommand → src/commands/RelationshipCheckCommand.ts:26
+- RelationshipCheckCommand → src/commands/RelationshipCheckCommand.ts:33
 

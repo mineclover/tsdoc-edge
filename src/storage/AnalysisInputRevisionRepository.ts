@@ -3,6 +3,13 @@
  *
  * There is deliberately no active pointer. EffectiveAnalysisStamp is the
  * authority that selects an exact plane, workspace, and revision tuple.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @context Pointer-free SQLite persistence plane storing immutable `evidence`, `enrichment`, and `policy` revisions keyed by exact revision pins.
+ * @functionality Validates and persists canonical analysis input revisions without mutable active pointers, materializes pinned revisions on read, and lists stored revision pin summaries.
+ * @sideEffect filesystem: Creates parent directories for the SQLite database file when opened in writable mode.
+ * @sideEffect database: Opens and mutates a `better-sqlite3` database in WAL mode for `analysis_input_revisions`.
  * @packageDocumentation
  */
 
@@ -19,17 +26,44 @@ import {
 import type { PolicyRevision } from '../spec-graph/contracts';
 import { createPolicyRevision } from '../spec-graph/identity';
 
+/**
+ * Current schema version for `AnalysisInputRevisionRepository`.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export const ANALYSIS_INPUT_REVISION_REPOSITORY_SCHEMA_VERSION = 1 as const;
 
+/**
+ * Discriminant identifying one of the persisted analysis input planes.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export type StoredAnalysisInputPlane = 'evidence' | 'enrichment' | 'policy';
 
+/**
+ * Type map from each `StoredAnalysisInputPlane` to its canonical revision contract.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface AnalysisInputRevisionByPlane {
   readonly evidence: EvidenceRevision;
   readonly enrichment: EnrichmentRevision;
   readonly policy: PolicyRevision;
 }
 
-/** Exact lookup identity. No component is inferred from current process state. */
+/**
+ * Exact lookup identity. No component is inferred from current process state.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface AnalysisInputRevisionPin<
   Plane extends StoredAnalysisInputPlane = StoredAnalysisInputPlane,
 > {
@@ -38,13 +72,26 @@ export interface AnalysisInputRevisionPin<
   readonly revisionId: string;
 }
 
+/**
+ * Construction options for `AnalysisInputRevisionRepository`.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface AnalysisInputRevisionRepositoryOptions {
   readonly clock?: () => Date;
   /** Open an existing database without initializing schemas or permitting writes. */
   readonly readOnly?: boolean;
 }
 
-/** Read-only metadata projection used by operator tooling. */
+/**
+ * Read-only metadata projection used by operator tooling.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface AnalysisInputRevisionSummary {
   readonly plane: StoredAnalysisInputPlane;
   readonly workspaceId: string;
@@ -88,6 +135,8 @@ CREATE INDEX IF NOT EXISTS idx_analysis_input_revisions_workspace_plane
  * Stores immutable evidence, enrichment, and policy history in isolated planes.
  * Selection is always performed with a complete revision pin.
  *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
  * @public
  */
 export class AnalysisInputRevisionRepository {

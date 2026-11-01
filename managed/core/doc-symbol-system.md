@@ -433,4 +433,7 @@ symbols.forEach(sym => {
 ### Implemented By
 
 - Document Symbol System → src/doc-symbol/DocumentSymbolParser.ts:1
+- DocsCommand → src/commands/DocsCommand.ts:59
+- IndexDocsCommand → src/commands/IndexDocsCommand.ts:46
+- MoveCommand → src/commands/MoveCommand.ts:25
 

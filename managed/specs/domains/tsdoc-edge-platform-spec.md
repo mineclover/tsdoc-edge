@@ -33,6 +33,21 @@ tags:
       "id": "REQ-TSDOC-EDGE-WORK-CONTEXT-DELIVERY",
       "title": "WorkContextCommand must deliver composed canonical structure, spec bindings, dependencies, and impact context",
       "tags": ["tsdoc-edge", "work-context", "product-surface"]
+    },
+    {
+      "id": "REQ-TSDOC-EDGE-DESIGN-CONTEXT-DELIVERY",
+      "title": "DesignContextCommand must deliver normative SpecGraph bindings alongside @contract invariants and @decision ADR triads",
+      "tags": ["tsdoc-edge", "design-context", "product-surface"]
+    },
+    {
+      "id": "REQ-TSDOC-EDGE-MODULE-SPEC-TAG-PARSER",
+      "title": "ModuleSpecTagParser must extract the 7-aspect module specification tags cleanly from TSDoc DocComment AST blocks",
+      "tags": ["tsdoc-edge", "module-spec", "parser"]
+    },
+    {
+      "id": "REQ-TSDOC-EDGE-UNUSED-DOC-DETECTOR",
+      "title": "UnusedDocumentDetector must detect unreferenced and code-disconnected managed documents accurately via checkpoint and source links",
+      "tags": ["tsdoc-edge", "doc-hygiene", "ssot"]
     }
   ],
   "edges": [
@@ -50,6 +65,21 @@ tags:
       "kind": "contains",
       "from": "spec:TsdocEdgePlatformSpecification",
       "to": "REQ-TSDOC-EDGE-WORK-CONTEXT-DELIVERY"
+    },
+    {
+      "kind": "contains",
+      "from": "spec:TsdocEdgePlatformSpecification",
+      "to": "REQ-TSDOC-EDGE-DESIGN-CONTEXT-DELIVERY"
+    },
+    {
+      "kind": "contains",
+      "from": "spec:TsdocEdgePlatformSpecification",
+      "to": "REQ-TSDOC-EDGE-MODULE-SPEC-TAG-PARSER"
+    },
+    {
+      "kind": "contains",
+      "from": "spec:TsdocEdgePlatformSpecification",
+      "to": "REQ-TSDOC-EDGE-UNUSED-DOC-DETECTOR"
     }
   ],
   "bindings": [
@@ -84,6 +114,39 @@ tags:
         "workspaceId": "tsdoc-edge",
         "graphNamespace": "ttsc:tsdoc-edge",
         "canonicalNodeId": "src/commands/WorkContextCommand.ts#WorkContextCommand:class"
+      }
+    },
+    {
+      "id": "BIND-TSDOC-EDGE-DESIGN-CONTEXT-DELIVERY",
+      "kind": "implementation",
+      "specNodeId": "REQ-TSDOC-EDGE-DESIGN-CONTEXT-DELIVERY",
+      "target": {
+        "type": "code-node",
+        "workspaceId": "tsdoc-edge",
+        "graphNamespace": "ttsc:tsdoc-edge",
+        "canonicalNodeId": "src/commands/DesignContextCommand.ts#DesignContextCommand:class"
+      }
+    },
+    {
+      "id": "BIND-TSDOC-EDGE-MODULE-SPEC-TAG-PARSER",
+      "kind": "implementation",
+      "specNodeId": "REQ-TSDOC-EDGE-MODULE-SPEC-TAG-PARSER",
+      "target": {
+        "type": "code-node",
+        "workspaceId": "tsdoc-edge",
+        "graphNamespace": "ttsc:tsdoc-edge",
+        "canonicalNodeId": "src/parser/ModuleSpecTagParser.ts#ModuleSpecTagParser:class"
+      }
+    },
+    {
+      "id": "BIND-TSDOC-EDGE-UNUSED-DOC-DETECTOR",
+      "kind": "implementation",
+      "specNodeId": "REQ-TSDOC-EDGE-UNUSED-DOC-DETECTOR",
+      "target": {
+        "type": "code-node",
+        "workspaceId": "tsdoc-edge",
+        "graphNamespace": "ttsc:tsdoc-edge",
+        "canonicalNodeId": "src/spec/UnusedDocumentDetector.ts#UnusedDocumentDetector:class"
       }
     }
   ]
@@ -138,9 +201,9 @@ tags:
 - **Output**:
   - 작업 컨텍스트 리포트(`work-context` 인간 친화 / `--llm` XML·Markdown) 및 설계 의사결정 리포트(`design-context`).
   - 불변 리비전 저장소(`.tsdoc/canonical-graph.db`, `.tsdoc/spec-graph.db`) 및 컨벤션 적합성·게이트 리포트(`convention-check:<sha256>`, `convention-gate:<sha256>`).
-  - 정직한 읽기 전용 명세 메트릭(`spec-metrics`: 완성도·생명주기·SpecGraph·7관점·코드 연결성).
-- **Effect**: 명시적 빌드/추출 명령(`build`, `spec extract`, `update-backlinks`)에서만 영속 저장소를 갱신하며, 조회·검증 명령(`work-context`, `spec-metrics`, `convention check`, LSP)은 상태를 변이시키지 않습니다.
-- **Scope**: 60여 개 CLI 명령어, `tsdoc-edge-lsp` 서버([[LSP Integration]]), MCP 서버 및 프로그래밍 라이브러리 API(`dist/index.js`).
+  - 정직한 읽기 전용 명세 메트릭(`spec metrics`: 완성도·생명주기·SpecGraph·7관점·코드 연결성).
+- **Effect**: 명시적 동기화/추출 명령(`sync`, `build`, `spec extract`, `docs backlinks`)에서만 영속 저장소를 갱신하며, 조회·검증 명령(`work-context`, `design-context`, `spec metrics`, `convention check`, `sync --check`, LSP, MCP)은 상태를 변이시키지 않습니다.
+- **Scope**: 정본 20개 최상위 CLI 명령어([[CliCommandSurfaceSpecification]]), 5대 불변 리비전 저장소 및 정규 그래프 분석 계층([[GraphAndPersistencePlaneSpecification]]), `tsdoc-edge-lsp` 서버 및 커버리지 표면([[LspAndCoverageSurfaceSpecification]], [[LSP Integration]]), 9종 읽기 전용 MCP 서버([[MCP Integration]]) 및 프로그래밍 라이브러리 API(`dist/index.js`).
 
 ## 사용 시나리오 (Usage Scenarios)
 
@@ -159,30 +222,32 @@ node dist/cli.js design-context src/indexer/ProjectIndexer.ts
 
 ```bash
 node dist/cli.js spec extract --spec-db .tsdoc/spec-graph.db
-node dist/cli.js convention check --pack managed/conventions/tsdoc-edge-core.json --graph-db .tsdoc/canonical-graph.db --json
+node dist/cli.js convention check --pack managed/conventions/tsdoc-edge-core-policy.json --graph-db .tsdoc/canonical-graph.db --spec-db .tsdoc/spec-graph.db --json
 ```
 
 ### 시나리오 3: 관리 문서 SSOT 무결성 및 명세 건강도 측정
 
-중복 H1 체크포인트·깨진 각주 여부를 검증하고 `managed/specs`의 정량 완성도를 확인합니다.
+중복 H1 체크포인트·깨진 각주·미사용 문서 여부를 검증([^UnusedDocumentDetector])하고 `managed/specs`의 정량 완성도를 확인합니다.
 
 ```bash
 node dist/cli.js validate docs managed
-node dist/cli.js spec-metrics --dir managed/specs --detail
+node dist/cli.js docs find-unused managed --json
+node dist/cli.js spec metrics --dir managed/specs --detail
 ```
 
 ## CLI 명령어 (CLI Commands)
 
+- `tsdoc-edge sync [--check] [--dry-run] [--force]`: 3계층 SSOT 일괄 동기화 및 CI 검증.
 - `tsdoc-edge work-context <file> [--llm]`: 수정 전 필수 컨텍스트 조회.
-- `tsdoc-edge design-context <file>`: `@contract`, `@decision`, `@rationale` 추적.
-- `tsdoc-edge spec extract` / `tsdoc-edge spec-metrics`: 명세 그래프 컴파일 및 다차원 메트릭 조회.
+- `tsdoc-edge design-context <file>`: 규범 명세 바인딩 및 `@contract`, `@decision`, `@rationale` 추적.
+- `tsdoc-edge spec extract` / `tsdoc-edge spec metrics`: 명세 그래프 컴파일 및 다차원 메트릭 조회.
 - `tsdoc-edge convention check`: 코드·명세·증거·네이밍 리비전 고정 적합성 검증.
 - `tsdoc-edge validate docs managed`: `[[Checkpoint]]` SSOT 및 연결 무결성 검증.
 
 ## 설계 결정 및 경계 가이드 (Design Decisions)
 
 1. **산문 추론 금지 (Explicit `tsdoc-spec` Only)**: 자연어 설명은 작업자 이해를 돕지만 적합성 게이트의 요구사항이나 코드 바인딩으로 암묵 추론하지 않으며, 오직 `tsdoc-spec` JSON 블록만 `SpecGraphRevision`에 반영합니다.
-2. **평가되지 않은 지표의 허위 보고 금지**: `spec-metrics`는 적합성 엔진을 직접 실행하지 않으므로 `conformanceEvaluated: false`로 명시 보고하고 건강도 가중치에서 제외합니다.
+2. **평가되지 않은 지표의 허위 보고 금지**: `spec metrics`는 적합성 엔진을 직접 실행하지 않으므로 `conformanceEvaluated: false`로 명시 보고하고 건강도 가중치에서 제외합니다.
 
 ## 관련 기능 (Related Concepts)
 
@@ -190,6 +255,10 @@ node dist/cli.js spec-metrics --dir managed/specs --detail
 - [[TSDocStandardSpecification]]
 - [[TtscPlatformSpecification]]
 - [[CrossSpecIntegrationContract]]
+- [[CliCommandSurfaceSpecification]]
+- [[GraphAndPersistencePlaneSpecification]]
+- [[LspAndCoverageSurfaceSpecification]]
+- [[MCP Integration]]
 - [[SSOT]]
 - [[Module Specification Framework]]
 - [[Relationship Ontology]]
@@ -202,8 +271,13 @@ node dist/cli.js spec-metrics --dir managed/specs --detail
 
 ### Referenced By
 
-- [[ConventionCheck]] → managed/specs/conventions/convention-check.md:74
+- [[DesignContextCommand]] → managed/commands/DesignContextCommand.md:41
+- [[MCP Integration]] → managed/features/mcp-integration.md:65
+- [[ConventionCheck]] → managed/specs/conventions/convention-check.md:200
+- [[CliCommandSurfaceSpecification]] → managed/specs/domains/cli-command-surface-spec.md:399
 - [[CrossSpecIntegrationContract]] → managed/specs/domains/cross-spec-integration-contract.md:17
+- [[GraphAndPersistencePlaneSpecification]] → managed/specs/domains/graph-and-persistence-plane-spec.md:255
+- [[LspAndCoverageSurfaceSpecification]] → managed/specs/domains/lsp-and-coverage-surface-spec.md:267
 - [[TSDocStandardSpecification]] → managed/specs/domains/tsdoc-standard-spec.md:16
 - [[TtscPlatformSpecification]] → managed/specs/domains/ttsc-platform-spec.md:16
 - [[AuthoredProjectSpecifications]] → managed/specs/index.md:42
@@ -212,6 +286,52 @@ node dist/cli.js spec-metrics --dir managed/specs --detail
 
 - TsdocEdgePlatformSpecification → src/spec-graph/ManagedSpecExtractor.ts:1
 - TSDocSymbolParser → src/doc-symbol/TSDocSymbolParser.ts:23
-- TSDOC_EDGE_CUSTOM_TAGS → src/parser/TSDocParser.ts:38
+- TSDOC_EDGE_CUSTOM_TAGS → src/parser/TSDocParser.ts:49
+- assertValidatedBindingResolutionSet → src/semantic-graph/EffectiveAnalysisService.ts:59
+- EffectiveAnalysisService → src/semantic-graph/EffectiveAnalysisService.ts:77
+- createRuleSetRevision → src/semantic-graph/EffectiveAnalysisService.ts:300
+- observedEdgeSemanticDigest → src/semantic-graph/EffectiveAnalysisService.ts:844
+- providerAnalysisIdentityFromGraph → src/semantic-graph/EffectiveAnalysisService.ts:857
+- ANALYSIS_INPUT_REVISION_CONTRACT_VERSION → src/semantic-graph/analysis-input-revisions.ts:22
+- AnalysisInputRevisionPlane → src/semantic-graph/analysis-input-revisions.ts:30
+- AnalysisInputItemProvenance → src/semantic-graph/analysis-input-revisions.ts:38
+- AnalysisInputRevisionProvenance → src/semantic-graph/analysis-input-revisions.ts:53
+- AnalysisInputSourceAnchor → src/semantic-graph/analysis-input-revisions.ts:67
+- RawTestEvidenceItem → src/semantic-graph/analysis-input-revisions.ts:82
+- ApiSurfaceEvidenceItem → src/semantic-graph/analysis-input-revisions.ts:101
+- EvidenceItem → src/semantic-graph/analysis-input-revisions.ts:120
+- TsdocTagEnrichment → src/semantic-graph/analysis-input-revisions.ts:128
+- TsdocEnrichmentItem → src/semantic-graph/analysis-input-revisions.ts:139
+- EnrichmentItem → src/semantic-graph/analysis-input-revisions.ts:156
+- EvidenceRevision → src/semantic-graph/analysis-input-revisions.ts:165
+- EnrichmentRevision → src/semantic-graph/analysis-input-revisions.ts:182
+- CreateEvidenceRevisionInput → src/semantic-graph/analysis-input-revisions.ts:198
+- CreateEnrichmentRevisionInput → src/semantic-graph/analysis-input-revisions.ts:210
+- createEvidenceRevision → src/semantic-graph/analysis-input-revisions.ts:223
+- createEnrichmentRevision → src/semantic-graph/analysis-input-revisions.ts:240
+- createCanonicalEmptyEvidenceRevision → src/semantic-graph/analysis-input-revisions.ts:256
+- createCanonicalEmptyEnrichmentRevision → src/semantic-graph/analysis-input-revisions.ts:270
+- createCanonicalEmptyRevision → src/semantic-graph/analysis-input-revisions.ts:284
+- CodeViewStamp → src/semantic-graph/contracts.ts:27
+- EffectiveAnalysisInputStamp → src/semantic-graph/contracts.ts:47
+- EffectiveAnalysisStamp → src/semantic-graph/contracts.ts:72
+- CodeAnalysisView → src/semantic-graph/contracts.ts:83
+- SpecAnalysisView → src/semantic-graph/contracts.ts:103
+- RevisionInput → src/semantic-graph/contracts.ts:114
+- RuleSetRevision → src/semantic-graph/contracts.ts:125
+- ProviderAnalysisIdentity → src/semantic-graph/contracts.ts:136
+- EffectiveAnalysisInputs → src/semantic-graph/contracts.ts:163
+- EffectiveAnalysisSnapshot → src/semantic-graph/contracts.ts:183
+- BindingResolutionSet → src/semantic-graph/contracts.ts:202
+- EffectiveBindingResolver → src/semantic-graph/contracts.ts:218
+- FactOccurrence → src/semantic-graph/fact-topology.ts:83
+- CompilerFactTopologyEdge → src/semantic-graph/fact-topology.ts:181
+- DerivedTopologyEdge → src/semantic-graph/fact-topology.ts:194
+- TopologyEdge → src/semantic-graph/fact-topology.ts:210
+- FactTopologyProjection → src/semantic-graph/fact-topology.ts:262
+- createFactOccurrence → src/semantic-graph/fact-topology.ts:280
+- createDerivedTopologyEdge → src/semantic-graph/fact-topology.ts:328
+- buildFactTopologyProjection → src/semantic-graph/fact-topology.ts:386
+- assertTopologyEdge → src/semantic-graph/fact-topology.ts:448
 - CUSTOM_TAGS → src/types/tags/base.ts:15
 

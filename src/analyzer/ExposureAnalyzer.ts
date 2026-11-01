@@ -8,6 +8,10 @@
  * - Visibility boundaries
  *
  * @packageDocumentation
+ * @doc [[Analyzer System]]
+ * @context Determines effective API visibility boundaries (`public`, `package`, `module`, `file`, `private`) using `package.json` exports and barrel files
+ * @functionality Package export resolution, `index.ts` barrel re-export tracing, scope-level classification, and canonical import path computation
+ * @sideEffect filesystem: Reads `package.json` manifests and `index.ts` barrel files across workspace directories (read)
  */
 
 import * as fs from 'node:fs';
@@ -26,6 +30,12 @@ import type { Symbol } from '../types/graph/graph';
 
 /**
  * Analyzes symbol exposure and visibility
+ *
+ * @doc [[Analyzer System]]
+ * @context Evaluates how far a `Symbol` is exposed beyond its declaring file via barrel modules and `package.json` export maps
+ * @functionality Computes `SymbolExposure` records with cached `PackageExportConfig` and `BarrelFile` lookups
+ * @sideEffect filesystem: Reads `package.json` manifests and `index.ts` barrel files across workspace directories (read)
+ * @public
  */
 export class ExposureAnalyzer {
   private projectRoot: string;

@@ -1,6 +1,13 @@
 /**
  * Unified workspace synchronization command
+ *
  * @packageDocumentation
+ * @doc [[SyncCommand]]
+ * @context Top-level single-command SSOT synchronization across enrichment DB, canonical `@ttsc/graph`, document checkpoints, `SpecGraph`, and backlinks
+ * @functionality Coordinates `build`, `docs index`/`validate`, `spec extract`, and `docs backlinks` in write, `--dry-run`, and `--check` modes
+ * @sideEffect console: Writes stage progress summaries or `--json` pipeline reports to stdout
+ * @sideEffect database: Writes `.tsdoc.db`, `.tsdoc/canonical-graph.db`, and `.tsdoc/spec-graph.db` in write mode
+ * @sideEffect filesystem: Writes `.tsdoc/doc-symbols.json`, JSONL exports, and managed Markdown backlinks in write mode
  */
 
 import * as fs from 'node:fs';
@@ -15,6 +22,8 @@ import { ValidateDocsCommand } from './ValidateDocsCommand';
 
 /**
  * Execution report for one synchronization stage
+ *
+ * @doc [[SyncCommand]]
  * @public
  */
 export interface SyncStageReport {
@@ -26,6 +35,8 @@ export interface SyncStageReport {
 
 /**
  * Structured report emitted by `tsdoc-edge sync --json`
+ *
+ * @doc [[SyncCommand]]
  * @public
  */
 export interface SyncPipelineReport {
@@ -40,6 +51,8 @@ export interface SyncPipelineReport {
 
 /**
  * Injectable subcommand dependencies for isolated testing
+ *
+ * @doc [[SyncCommand]]
  * @public
  */
 export interface SyncCommandDependencies {
@@ -304,7 +317,40 @@ export class SyncCommand extends BaseCommand {
         }
       }
 
-      // Stage 3: Executable SpecGraph Extraction
+      // Stage 3: Bidirectional Backlinks (runs before SpecGraph extraction so
+      // `managed/specs/**/*.md` content digests include up-to-date `## Backlinks`)
+      if (this.hasFlag(args, '--skip-backlinks') || !docsDir) {
+        stages.push({
+          stage: 'backlinks',
+          status: 'skipped',
+          durationMs: 0,
+          message: docsDir ? 'Skipped via --skip-backlinks' : 'No managed/docs directory found',
+        });
+      } else {
+        const backlinksArgs = [docsDir, ...(checkOnly ? ['--check'] : dryRun ? ['--dry-run'] : [])];
+        const backlinksCmd = this.dependencies.updateBacklinksCommandFactory
+          ? this.dependencies.updateBacklinksCommandFactory()
+          : new UpdateBacklinksCommand();
+        const backlinksStage = await this.runStage('backlinks', jsonMode, () =>
+          this.runMuted(jsonMode, () => backlinksCmd.execute(backlinksArgs))
+        );
+        stages.push(backlinksStage.report);
+        if (backlinksStage.result.exitCode !== 0) {
+          return this.finishReport(
+            stages,
+            startedAt,
+            sourceDir,
+            docsDir,
+            canonicalPlan.enabled,
+            dryRun,
+            checkOnly,
+            jsonMode,
+            backlinksStage.result
+          );
+        }
+      }
+
+      // Stage 4: Executable SpecGraph Extraction
       const authoredSpecDirs = config.specGovernance?.authoredSpecDirs ?? [];
       const hasAuthoredSpecDir = authoredSpecDirs.some((dir) =>
         fs.existsSync(path.resolve(rootDir, dir))
@@ -349,38 +395,6 @@ export class SyncCommand extends BaseCommand {
             checkOnly,
             jsonMode,
             specStage.result
-          );
-        }
-      }
-
-      // Stage 4: Bidirectional Backlinks
-      if (this.hasFlag(args, '--skip-backlinks') || !docsDir) {
-        stages.push({
-          stage: 'backlinks',
-          status: 'skipped',
-          durationMs: 0,
-          message: docsDir ? 'Skipped via --skip-backlinks' : 'No managed/docs directory found',
-        });
-      } else {
-        const backlinksArgs = [docsDir, ...(checkOnly ? ['--check'] : dryRun ? ['--dry-run'] : [])];
-        const backlinksCmd = this.dependencies.updateBacklinksCommandFactory
-          ? this.dependencies.updateBacklinksCommandFactory()
-          : new UpdateBacklinksCommand();
-        const backlinksStage = await this.runStage('backlinks', jsonMode, () =>
-          this.runMuted(jsonMode, () => backlinksCmd.execute(backlinksArgs))
-        );
-        stages.push(backlinksStage.report);
-        if (backlinksStage.result.exitCode !== 0) {
-          return this.finishReport(
-            stages,
-            startedAt,
-            sourceDir,
-            docsDir,
-            canonicalPlan.enabled,
-            dryRun,
-            checkOnly,
-            jsonMode,
-            backlinksStage.result
           );
         }
       }

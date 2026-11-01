@@ -1,7 +1,12 @@
 /**
  * Document-Code bidirectional linker
+ *
  * @packageDocumentation
+ * @doc [[DocCodeLinker]]
  * @responsibility Build and maintain bidirectional links between docs and code
+ * @context Connects Markdown code links (`[text](path#symbol)`) and TypeScript `@doc` TSDoc tags into a bidirectional `LinkIndex`
+ * @functionality Markdown code-link extraction, TypeScript AST `@doc` tag parsing, and bidirectional doc-symbol index construction
+ * @sideEffect filesystem: Reads Markdown documentation and TypeScript source files from disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -12,8 +17,12 @@ import type { CodeLink, DocLink, LinkIndex } from '../types/core';
 /**
  * Builds bidirectional index between documentation and code
  *
+ * @doc [[DocCodeLinker]]
  * @public
  * @responsibility Parse and index doc-code links
+ * @context Bridges authored Markdown documentation and TypeScript declarations via `LinkIndex`
+ * @functionality Parses Markdown code anchors and TSDoc `@doc` tags across workspace files
+ * @sideEffect filesystem: Reads Markdown documentation and TypeScript source files from disk (read)
  */
 export class DocCodeLinker {
   private readonly tsdocParser = new TSDocParser();

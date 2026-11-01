@@ -4,6 +4,12 @@
  * Findings are derived analysis records. They intentionally do not implement
  * the durable graph-edge contract and must be recomputed for another effective
  * view, binding-resolution set, or policy revision.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @context Revision-pinned conformance evaluator scoring resolved SpecGraph bindings (`implementation`, `verification`, `constraint`, `governance`) against compiled policy rules and expiring suppressions.
+ * @functionality Validates binding-set and policy revision boundaries, evaluates obligation outcomes and test-evidence statuses, applies active exact-target suppressions, and produces immutable `ConformanceReport` digests.
+ * @packageDocumentation
  */
 
 import { createHash } from 'node:crypto';
@@ -32,9 +38,31 @@ import {
 type CodeNodeRef = Extract<EndpointRef, { type: 'code-node' }>;
 type CodeEdgeRef = Extract<EndpointRef, { type: 'code-edge' }>;
 
+/**
+ * Canonical engine identifier for SpecGraph conformance reports.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const CONFORMANCE_ENGINE_ID = 'tsdoc-edge/minimal-conformance-engine';
+
+/**
+ * SemVer version of the SpecGraph conformance evaluation engine.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const CONFORMANCE_ENGINE_VERSION = '2.0.0';
 
+/**
+ * Canonical policy rule identifiers mapped by `SpecBindingKind`.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const CONFORMANCE_RULE_IDS: Readonly<Record<SpecBindingKind, string>> = Object.freeze({
   implementation: 'binding.implementation',
   verification: 'binding.verification',
@@ -42,6 +70,13 @@ export const CONFORMANCE_RULE_IDS: Readonly<Record<SpecBindingKind, string>> = O
   governance: 'binding.governance',
 });
 
+/**
+ * Evaluation outcome assigned to a resolved specification binding under a policy rule.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export type ConformanceOutcome =
   | 'satisfied'
   | 'violated'
@@ -49,11 +84,24 @@ export type ConformanceOutcome =
   | 'suppressed'
   | 'disabled';
 
+/**
+ * Identifier and version stamp for the conformance engine instance.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @public
+ */
 export interface ConformanceEngineIdentity {
   readonly id: string;
   readonly version: string;
 }
 
+/**
+ * Explicit clock and evidence inputs supplied to `ConformanceEngine.evaluate`.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface ConformanceEvaluationOptions {
   /** Explicit clock input for expiring suppressions; it is included in report identity. */
   readonly suppressionAsOf?: string;
@@ -61,6 +109,13 @@ export interface ConformanceEvaluationOptions {
   readonly evidence?: EvidenceRevision;
 }
 
+/**
+ * Derived conformance finding emitted for one resolved SpecGraph binding declaration.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface ConformanceFinding {
   readonly resultKind: 'derived-conformance-finding';
   readonly findingId: string;
@@ -80,6 +135,13 @@ export interface ConformanceFinding {
   readonly suppressionId?: string;
 }
 
+/**
+ * Aggregate counts of conformance findings grouped by `ConformanceOutcome`.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface ConformanceSummary {
   readonly total: number;
   readonly satisfied: number;
@@ -89,6 +151,13 @@ export interface ConformanceSummary {
   readonly disabled: number;
 }
 
+/**
+ * Immutable content-addressed conformance report for a binding-resolution set and policy revision.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface ConformanceReport {
   readonly contractVersion: '1.0';
   readonly resultKind: 'derived-conformance-report';
@@ -123,7 +192,13 @@ interface FindingDraft {
   readonly suppressionId?: string;
 }
 
-/** Evaluate the four role-based binding obligations against one pinned policy. */
+/**
+ * Evaluate the four role-based binding obligations against one pinned policy.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export class ConformanceEngine {
   readonly identity: ConformanceEngineIdentity;
 

@@ -4,6 +4,12 @@
  * This repository deliberately does not read or write the legacy `symbols`,
  * `dependencies`, or `unified_relationships` tables.
  *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @context Isolated SQLite persistence plane storing immutable canonical `@ttsc/graph` revisions, symbol alias planes, and diagnostics planes.
+ * @functionality Commits complete canonical project graph revisions with compare-and-swap active pointer updates, materializes verified revisions, lists summaries, and prunes historical revisions with optional `VACUUM`.
+ * @sideEffect filesystem: Creates parent directories for the SQLite database file when opened in writable mode.
+ * @sideEffect database: Opens and mutates an isolated `better-sqlite3` database in WAL mode for canonical graph revisions, nodes, edges, aliases, diagnostics, and active pointer state.
  * @packageDocumentation
  */
 
@@ -21,9 +27,32 @@ import {
 import type { CanonicalDiagnostic } from '../indexer/diagnostics-contract';
 import type { SymbolAliasRecord } from '../indexer/symbol-alias';
 
+/**
+ * Current schema version for `GraphRepository` SQLite tables.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export const GRAPH_REPOSITORY_SCHEMA_VERSION = 2 as const;
 const LEGACY_GRAPH_REPOSITORY_SCHEMA_VERSION = 1 as const;
+
+/**
+ * Canonical artifact identifier stored with persisted graph revisions.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export const CANONICAL_GRAPH_ARTIFACT_NAME = 'tsdoc-edge/canonical-project-graph' as const;
+
+/**
+ * Content fingerprint algorithm identifier stored with canonical graph revisions.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export const CANONICAL_GRAPH_FINGERPRINT_ALGORITHM = 'sha256/canonical-json-v1' as const;
 
 /**
@@ -63,7 +92,13 @@ const REVISION_IDENTITY_PROVENANCE_KEYS = [
   'diagnosticsCollected',
 ] as const;
 
-/** Metadata describing the artifact contract stored with every revision. */
+/**
+ * Metadata describing the artifact contract stored with every revision.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface CanonicalGraphArtifactContract {
   readonly name: typeof CANONICAL_GRAPH_ARTIFACT_NAME;
   readonly contractVersion: typeof PROJECT_GRAPH_CONTRACT_VERSION;
@@ -74,7 +109,13 @@ export interface CanonicalGraphArtifactContract {
     | typeof GRAPH_REPOSITORY_SCHEMA_VERSION;
 }
 
-/** Durable metadata for one complete canonical graph revision. */
+/**
+ * Durable metadata for one complete canonical graph revision.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface CanonicalGraphRevisionMetadata {
   readonly revisionId: string;
   readonly contentFingerprint: string;
@@ -87,12 +128,24 @@ export interface CanonicalGraphRevisionMetadata {
   readonly storedAt: string;
 }
 
-/** Read-only operator projection for one retained canonical graph revision. */
+/**
+ * Read-only operator projection for one retained canonical graph revision.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface CanonicalGraphRevisionSummary extends CanonicalGraphRevisionMetadata {
   readonly active: boolean;
 }
 
-/** One transactionally consistent active revision read. */
+/**
+ * One transactionally consistent active revision read.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface ActiveCanonicalGraphRevision {
   readonly metadata: CanonicalGraphRevisionMetadata;
   readonly graph: CanonicalProjectGraph;
@@ -102,20 +155,39 @@ export interface ActiveCanonicalGraphRevision {
 
 const materializedGraphRevisions = new WeakSet<object>();
 
-/** Require the exact process-local object materialized by GraphRepository. */
+/**
+ * Require the exact process-local object materialized by GraphRepository.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export function assertGraphRepositoryRevision(revision: ActiveCanonicalGraphRevision): void {
   if (!materializedGraphRevisions.has(revision)) {
     throw new Error('Canonical graph revision was not materialized by GraphRepository');
   }
 }
 
+/**
+ * Construction options for `GraphRepository`.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface GraphRepositoryOptions {
   readonly clock?: () => Date;
   /** Open an existing database without schema initialization or graph writes. */
   readonly readOnly?: boolean;
 }
 
-/** Optional compare-and-swap guard for concurrent graph refreshes. */
+/**
+ * Optional compare-and-swap guard for concurrent graph refreshes.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export interface GraphRepositoryReplaceOptions {
   /**
    * Expected active revision at commit time. `null` means the repository must
@@ -129,6 +201,8 @@ export interface GraphRepositoryReplaceOptions {
 /**
  * Options for pruning historical canonical graph revisions.
  *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
  * @public
  */
 export interface GraphRepositoryPruneOptions {
@@ -145,6 +219,8 @@ export interface GraphRepositoryPruneOptions {
 /**
  * Summary of a canonical graph revision pruning pass.
  *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
  * @public
  */
 export interface GraphRepositoryPruneResult {
@@ -154,7 +230,13 @@ export interface GraphRepositoryPruneResult {
   readonly vacuumed: boolean;
 }
 
-/** Raised when another process committed a graph while a refresh was running. */
+/**
+ * Raised when another process committed a graph while a refresh was running.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
+ * @public
+ */
 export class GraphRepositoryConflictError extends Error {
   constructor(
     readonly expectedActiveRevisionId: string | null,
@@ -283,6 +365,8 @@ CREATE INDEX IF NOT EXISTS idx_canonical_graph_diagnostics_file
  * written last so readers see either the complete previous active revision or
  * the complete new one.
  *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Storage System]]
  * @public
  */
 export class GraphRepository {

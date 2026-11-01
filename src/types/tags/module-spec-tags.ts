@@ -5,6 +5,8 @@
  *
  * @packageDocumentation
  * @doc [[ModuleSpecTagTypes]]
+ * @context Custom TSDoc tag schemas for the 7-part module specification framework
+ * @functionality Defines AlgorithmDoc, ComplexityDoc, SideEffectDoc, MutationDoc, IODoc, ScopeDoc, and ModuleSpecTags contracts
  */
 
 /**
@@ -74,6 +76,9 @@ export interface ScopeDoc {
  *
  * This extends the existing EnhancedSymbolDoc with
  * 7-part framework specific tags
+ *
+ * @doc [[ModuleSpecTagTypes]]
+ * @public
  */
 export interface ModuleSpecTags {
   /** Algorithm description (`@algorithm`) */

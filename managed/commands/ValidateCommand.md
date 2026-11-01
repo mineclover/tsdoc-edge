@@ -53,5 +53,5 @@ Validate codebase and documentation integrity.
 
 ### Implemented By
 
-- ValidateCommand → src/commands/ValidateCommand.ts:35
+- ValidateCommand → src/commands/ValidateCommand.ts:43
 

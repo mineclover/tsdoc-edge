@@ -1,5 +1,12 @@
 /**
  * Shared ProjectIndexer-to-GraphRepository refresh boundary.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @context Serialized whole-project canonical graph refresh coordinator connecting `TtscSemanticGraphProvider` and `ProviderProjectIndexer` to transactional `GraphRepository` persistence.
+ * @functionality Queues and coalesces refresh generations, invokes the `@ttsc/graph` router provider pipeline, materializes legacy symbol aliases, and atomically commits active revisions with compare-and-swap conflict retry.
+ * @sideEffect database: Reads and atomically replaces the active canonical graph revision in SQLite via `GraphRepository`.
+ * @sideEffect environment: Reads `TSDOC_EDGE_GRAPH_*` and `TSDOC_EDGE_CANONICAL_GRAPH_DB` environment variables when resolving opt-in coordinator options.
  * @packageDocumentation
  */
 
@@ -19,11 +26,39 @@ import type { CanonicalProjectGraph, ProjectGraphSource } from './contracts';
 import { materializeAliases } from './symbol-alias';
 import { TtscGraphRouterArtifactAdapter } from './TtscGraphRouterArtifactAdapter';
 
+/**
+ * Default workspace-relative SQLite path for persisted canonical graph revisions.
+ *
+ * @doc [[ProjectIndexer]]
+ * @public
+ */
 export const DEFAULT_CANONICAL_GRAPH_DATABASE = '.tsdoc/canonical-graph.db' as const;
+
+/**
+ * Default workspace-relative configuration filename for `ttsc-graph-router`.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export const DEFAULT_GRAPH_ROUTER_CONFIG = 'ttsc-graph-router.config.json' as const;
+
+/**
+ * Default workspace-relative `tsconfig` filename used for `@ttsc/graph` indexing.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export const DEFAULT_GRAPH_TSCONFIG = 'tsconfig.ttsc.json' as const;
 
-/** Configuration shared by Build, structural analysis, and LSP saved-file refresh. */
+/**
+ * Configuration shared by Build, structural analysis, and LSP saved-file refresh.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface CanonicalGraphCoordinatorOptions {
   readonly rootDir: string;
   readonly moduleSpecifier?: string;
@@ -39,13 +74,23 @@ export interface CanonicalGraphCoordinatorOptions {
   readonly typescriptCompatibilityTarget?: string;
 }
 
-/** Injection points for tests and alternate graph producers. */
+/**
+ * Injection points for tests and alternate graph producers.
+ *
+ * @doc [[ProjectIndexer]]
+ * @public
+ */
 export interface CanonicalGraphCoordinatorDependencies {
   readonly source?: ProjectGraphSource;
   readonly repository?: GraphRepository;
 }
 
-/** Result of a refresh that was either committed or superseded by a newer request. */
+/**
+ * Result of a refresh that was either committed or superseded by a newer request.
+ *
+ * @doc [[ProjectIndexer]]
+ * @public
+ */
 export type CanonicalGraphRefreshResult =
   | {
       readonly status: 'committed';
@@ -65,6 +110,8 @@ export type CanonicalGraphRefreshResult =
  * a newer request. A repository compare-and-swap also prevents another process
  * from being overwritten by a stale dump; one fresh retry is allowed.
  *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
  * @public
  */
 export class CanonicalGraphCoordinator {
@@ -196,7 +243,13 @@ export class CanonicalGraphCoordinator {
   }
 }
 
-/** Resolve opt-in graph-router settings used by the LSP and CLI. */
+/**
+ * Resolve opt-in graph-router settings used by the LSP and CLI.
+ *
+ * @doc [[ProjectIndexer]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export function canonicalGraphOptionsFromEnvironment(
   rootDir: string,
   environment: NodeJS.ProcessEnv = process.env

@@ -19,7 +19,11 @@ Computes direct and transitive downstream/upstream change impact for a given sym
 
 ## Backlinks
 
+### Referenced By
+
+- [[MCP Integration]] → managed/features/mcp-integration.md:69
+
 ### Implemented By
 
-- RelationshipImpactCommand → src/commands/RelationshipImpactCommand.ts:25
+- RelationshipImpactCommand → src/commands/RelationshipImpactCommand.ts:33
 

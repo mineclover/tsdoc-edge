@@ -21,5 +21,5 @@ Renames a `[[Symbol]]` document checkpoint and updates all incoming Markdown and
 
 ### Implemented By
 
-- SymbolRenameCommand → src/commands/SymbolRenameCommand.ts:59
+- SymbolRenameCommand → src/commands/SymbolRenameCommand.ts:64
 

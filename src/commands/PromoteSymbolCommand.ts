@@ -2,11 +2,15 @@
  * Promote Symbol Command - H2 참조 정의를 H1 canonical로 승격
  *
  * @packageDocumentation
+ * @doc [[PromoteSymbolCommand]]
  * @responsibility Promote H2 reference to canonical H1 in separate file
  *
  * @problem H2 references need to become canonical SSOT definitions
  * @solves Extract H2 content, create new canonical file, replace original with inline ref
  * @context Enforce "one symbol = one file" for canonical definitions
+ * @functionality Extracts H2 `[[Symbol]]` auxiliary sections, writes a dedicated H1 canonical Markdown file, and rewrites the source section to an inline reference
+ * @sideEffect console: Writes promotion previews and completion status to stdout
+ * @sideEffect filesystem: Creates canonical H1 Markdown files and updates source Markdown files unless `--dry-run` is active
  */
 
 import * as fs from 'node:fs';
@@ -26,6 +30,7 @@ interface H2Section {
  * Promote Symbol Command - H2를 독립 파일의 H1으로 승격
  *
  * @doc [[PromoteSymbolCommand]]
+ * @sideEffect filesystem: Creates canonical H1 Markdown files and updates source Markdown references; writes CLI status to stdout
  * @public
  */
 export class PromoteSymbolCommand extends BaseCommand {

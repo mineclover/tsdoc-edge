@@ -1,10 +1,16 @@
 /**
  * Analytics and usage tracking types
+ *
  * @packageDocumentation
+ * @doc [[AnalyticsTypes]]
+ * @context Local CLI telemetry and command execution metrics schema
+ * @functionality Defines CommandUsageEvent, UsageStatistics, AnalyticsConfig, UsageReportOptions, and DailyUsageSummary types
  */
 
 /**
  * CLI command usage event
+ * @doc [[AnalyticsTypes]]
+ * @public
  */
 export interface CommandUsageEvent {
   /** Command name (e.g., "build", "analyze", "validate") */
@@ -29,6 +35,8 @@ export interface CommandUsageEvent {
 
 /**
  * CLI usage statistics
+ * @doc [[AnalyticsTypes]]
+ * @public
  */
 export interface UsageStatistics {
   /** Total commands executed */
@@ -49,6 +57,8 @@ export interface UsageStatistics {
 
 /**
  * Analytics configuration
+ * @doc [[AnalyticsTypes]]
+ * @public
  */
 export interface AnalyticsConfig {
   /** Enable analytics collection */
@@ -63,6 +73,8 @@ export interface AnalyticsConfig {
 
 /**
  * Usage report options
+ * @doc [[AnalyticsTypes]]
+ * @public
  */
 export interface UsageReportOptions {
   /** Start date for report */
@@ -77,6 +89,8 @@ export interface UsageReportOptions {
 
 /**
  * Daily usage summary
+ * @doc [[AnalyticsTypes]]
+ * @public
  */
 export interface DailyUsageSummary {
   /** Date (YYYY-MM-DD) */

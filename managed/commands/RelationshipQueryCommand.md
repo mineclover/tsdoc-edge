@@ -21,5 +21,5 @@ Queries incoming and outgoing unified relationships for a symbol filtered by typ
 
 ### Implemented By
 
-- RelationshipQueryCommand → src/commands/RelationshipQueryCommand.ts:25
+- RelationshipQueryCommand → src/commands/RelationshipQueryCommand.ts:33
 

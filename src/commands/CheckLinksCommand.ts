@@ -1,6 +1,13 @@
 /**
  * Check-links command - Check for broken links in documentation
+ *
  * @packageDocumentation
+ * @doc [[CheckLinksCommand]]
+ * @doc [[CLI Commands]]
+ * @context Broken Markdown and symbol link verification via `tsdoc-edge docs check-links`
+ * @functionality Scans documentation directories with `MissingLinkDetector` and reports broken links grouped by file with typo suggestions
+ * @sideEffect console: Writes broken link diagnostics and suggestions to stdout
+ * @sideEffect filesystem: Reads Markdown documentation and configuration files on disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -16,7 +23,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @responsibility Check documentation for broken links
  * @contract Analyze documentation, detect broken links, report issues
  * @doc [[CheckLinksCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#check-links]]
+ * @sideEffect console: Writes broken link reports to stdout; reads Markdown documentation files
  *
  * @problem Documentation contains broken links that break documentation flow
  * @solves Scans all documentation and reports broken links with suggestions

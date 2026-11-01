@@ -1,9 +1,22 @@
+/**
+ * Managed documentation path reference finder and updater.
+ *
+ * @packageDocumentation
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
+ * @context Synchronous Markdown path-refactoring helper scoped to a `managed/` documentation directory
+ * @functionality Locates backlink, inline path, Markdown link, and relative path references and updates them on file moves
+ * @sideEffect filesystem: Recursively reads and rewrites Markdown files inside the managed documentation directory (read/write)
+ */
+
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 
 /**
  * Type of reference found in documentation
  *
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
  * @public
  */
 export type ReferenceType = 'backlink' | 'path' | 'relative' | 'markdown-link';
@@ -11,6 +24,8 @@ export type ReferenceType = 'backlink' | 'path' | 'relative' | 'markdown-link';
 /**
  * A reference to a file path found in documentation
  *
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
  * @public
  */
 export interface FileReference {
@@ -34,6 +49,9 @@ export interface FileReference {
  * Scans markdown files for references to file paths and provides
  * utilities to update them when files are renamed or moved.
  *
+ * @doc [[Utilities Index]]
+ * @doc [[Symbol Reference System]]
+ * @sideEffect filesystem: Recursively reads and rewrites Markdown files inside the managed documentation directory (read/write)
  * @public
  */
 export class ReferenceUpdater {

@@ -1,7 +1,18 @@
 /**
  * Type definitions for TSDoc Edge MCP Server
+ *
+ * @packageDocumentation
+ * @doc [[MCP Integration]]
+ * @context Domain DTOs shared across `TsDocService` SQLite queries and MCP tool response formatters
+ * @functionality Defines symbol, relationship, ontology statistics, work context, workspace configuration, and multi-hop impact types
  */
 
+/**
+ * Code or documentation symbol returned by MCP queries.
+ *
+ * @doc [[MCP Integration]]
+ * @public
+ */
 export interface Symbol {
   id: string;
   name: string;
@@ -15,6 +26,12 @@ export interface Symbol {
   external?: boolean;
 }
 
+/**
+ * Directed or undirected semantic/structural edge between symbols.
+ *
+ * @doc [[MCP Integration]]
+ * @public
+ */
 export interface Relationship {
   id: string;
   type: string;
@@ -28,6 +45,12 @@ export interface Relationship {
   properties?: Record<string, unknown>;
 }
 
+/**
+ * Aggregate node, relationship, and graph-density statistics for the knowledge graph.
+ *
+ * @doc [[MCP Integration]]
+ * @public
+ */
 export interface OntologyStats {
   nodes: {
     total: number;
@@ -51,6 +74,12 @@ export interface OntologyStats {
   };
 }
 
+/**
+ * Aggregated file, symbol, or document work context payload.
+ *
+ * @doc [[MCP Integration]]
+ * @public
+ */
 export interface WorkContext {
   entryPoint: string;
   entryPointType: 'file' | 'symbol' | 'document';
@@ -66,13 +95,24 @@ export interface WorkContext {
   recommendations: string[];
 }
 
+/**
+ * Resolved workspace and SQLite database paths for the MCP server.
+ *
+ * @doc [[MCP Integration]]
+ * @public
+ */
 export interface TsDocConfig {
   rootDir: string;
   dbPath: string;
   managedDir: string;
 }
 
-/** One symbol reached during impact traversal. @public */
+/**
+ * One symbol reached during impact traversal.
+ *
+ * @doc [[MCP Integration]]
+ * @public
+ */
 export interface ImpactNode {
   symbolId: string;
   depth: number;
@@ -82,7 +122,12 @@ export interface ImpactNode {
   external?: boolean;
 }
 
-/** Structured multi-hop impact analysis result. @public */
+/**
+ * Structured multi-hop impact analysis result.
+ *
+ * @doc [[MCP Integration]]
+ * @public
+ */
 export interface ImpactResult {
   symbolId: string;
   direction: 'downstream' | 'upstream' | 'both';

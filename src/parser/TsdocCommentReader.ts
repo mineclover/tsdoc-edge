@@ -6,8 +6,11 @@
  * validators, and commands rely on the upstream TSDoc standard AST instead of ad-hoc regexes.
  *
  * @doc [[TSDocStandardSpecification]]
+ * @doc [[TSDocParser]]
  * @doc [[CrossSpecIntegrationContract]]
  * @packageDocumentation
+ * @context Canonical `@microsoft/tsdoc` `DocComment` AST projection and TypeScript JSDoc checkpoint extraction layer
+ * @functionality Renders `DocNode` trees cleanly, projects `DocComment` ASTs into `StructuredTsdocComment`, and extracts AST-safe `@doc` checkpoints
  */
 
 import {
@@ -32,6 +35,7 @@ import { TSDocParser } from './TSDocParser';
  * Rendering options for converting `@microsoft/tsdoc` `DocNode` trees into text.
  *
  * @doc [[TSDocStandardSpecification]]
+ * @doc [[TSDocParser]]
  * @public
  */
 export interface TsdocRenderOptions {
@@ -42,6 +46,8 @@ export interface TsdocRenderOptions {
 /**
  * Structured `@param` block entry extracted from a `DocComment`.
  *
+ * @doc [[TSDocStandardSpecification]]
+ * @doc [[TSDocParser]]
  * @public
  */
 export interface TsdocParameterEntry {
@@ -54,6 +60,8 @@ export interface TsdocParameterEntry {
 /**
  * Structured `@typeParam` block entry extracted from a `DocComment`.
  *
+ * @doc [[TSDocStandardSpecification]]
+ * @doc [[TSDocParser]]
  * @public
  */
 export interface TsdocTypeParameterEntry {
@@ -66,6 +74,8 @@ export interface TsdocTypeParameterEntry {
 /**
  * Structured `@doc [[Symbol#Section]]` checkpoint reference extracted from a `DocComment`.
  *
+ * @doc [[TSDocStandardSpecification]]
+ * @doc [[TSDocParser]]
  * @public
  */
 export interface TsdocDocCheckpointEntry {
@@ -80,6 +90,8 @@ export interface TsdocDocCheckpointEntry {
 /**
  * Standard `@microsoft/tsdoc` release visibility stage.
  *
+ * @doc [[TSDocStandardSpecification]]
+ * @doc [[TSDocParser]]
  * @public
  */
 export type TsdocReleaseVisibility = 'public' | 'beta' | 'alpha' | 'internal';
@@ -88,6 +100,7 @@ export type TsdocReleaseVisibility = 'public' | 'beta' | 'alpha' | 'internal';
  * Structured projection of a parsed `@microsoft/tsdoc` `DocComment` AST.
  *
  * @doc [[TSDocStandardSpecification]]
+ * @doc [[TSDocParser]]
  * @public
  */
 export interface StructuredTsdocComment {
@@ -138,6 +151,8 @@ export interface StructuredTsdocComment {
 /**
  * Source-anchored `@doc [[Symbol#Section]]` checkpoint reference extracted from TypeScript AST JSDoc.
  *
+ * @doc [[TSDocStandardSpecification]]
+ * @doc [[TSDocParser]]
  * @doc [[CrossSpecIntegrationContract]]
  * @public
  */
@@ -165,6 +180,8 @@ export interface SourceDocCheckpointReference {
 /**
  * Options for AST-safe `@doc` checkpoint extraction from TypeScript source code.
  *
+ * @doc [[TSDocStandardSpecification]]
+ * @doc [[TSDocParser]]
  * @public
  */
 export interface ExtractDocCheckpointsOptions {
@@ -185,6 +202,8 @@ interface DeclarationIdentity {
  *
  * @param node - TypeScript AST node
  * @returns Array of attached `ts.JSDoc` nodes
+ * @doc [[TSDocStandardSpecification]]
+ * @doc [[TSDocParser]]
  * @public
  */
 export function getDirectJsDocs(node: ts.Node): readonly ts.JSDoc[] {
@@ -325,6 +344,8 @@ function renderNodesInternal(nodes: readonly DocNode[], preserveMarkdown: boolea
  * @param nodes - Sequence of TSDoc AST nodes
  * @param options - Rendering options (`preserveMarkdown`)
  * @returns Trimmed rendered text
+ * @doc [[TSDocStandardSpecification]]
+ * @doc [[TSDocParser]]
  * @public
  */
 export function renderDocNodesText(
@@ -354,6 +375,8 @@ export function renderDocNodesText(
  * @param node - TSDoc AST node to render
  * @param options - Rendering options (`preserveMarkdown`)
  * @returns Trimmed rendered text
+ * @doc [[TSDocStandardSpecification]]
+ * @doc [[TSDocParser]]
  * @public
  */
 export function renderDocNodeText(
@@ -416,6 +439,14 @@ function collectInlineLinks(node: DocNode | undefined, out: Set<string>): void {
   }
 }
 
+/**
+ * Extract structured `[[Symbol]]` checkpoint entries from rendered `@doc` block text.
+ *
+ * @param text - Rendered `@doc` block payload
+ * @returns Parsed checkpoint entries
+ * @doc [[TSDocStandardSpecification]]
+ * @doc [[TSDocParser]]
+ */
 function extractDocCheckpointsFromText(text: string): TsdocDocCheckpointEntry[] {
   const entries: TsdocDocCheckpointEntry[] = [];
   for (const match of text.matchAll(DOC_CHECKPOINT_PATTERN)) {
@@ -465,6 +496,8 @@ function resolveReleaseVisibility(
  *
  * @param docComment - Parsed `@microsoft/tsdoc` `DocComment` root node
  * @returns Normalized read-only TSDoc projection
+ * @doc [[TSDocStandardSpecification]]
+ * @doc [[TSDocParser]]
  * @public
  */
 export function readTsdocComment(docComment: DocComment): StructuredTsdocComment {
@@ -612,6 +645,8 @@ function hasPackageDocTag(jsDoc: ts.JSDoc): boolean {
  * @param node - TypeScript declaration AST node
  * @param sourceFile - Owning TypeScript `SourceFile`
  * @returns Raw `/** ... *\/` comment text, or `null` when no declaration JSDoc is attached
+ * @doc [[TSDocStandardSpecification]]
+ * @doc [[TSDocParser]]
  * @public
  */
 export function extractLeadingJsDocText(node: ts.Node, sourceFile: ts.SourceFile): string | null {
@@ -712,6 +747,8 @@ function getDeclarationIdentity(
  * @param sourceCode - TypeScript source text
  * @param options - Extraction options (`requireDeclaration`, `parser`)
  * @returns Ordered checkpoint references discovered in real JSDoc comments
+ * @doc [[TSDocStandardSpecification]]
+ * @doc [[TSDocParser]]
  * @public
  */
 export function extractDocCheckpointsFromSource(

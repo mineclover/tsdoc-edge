@@ -5,9 +5,12 @@
  * in IDEs like VS Code, Vim, and Emacs.
  *
  * @packageDocumentation
+ * @doc [[LspAndCoverageSurfaceSpecification]]
  * @doc [[LSP Integration]]
  *
  * @responsibility Export LSP server components
+ * @context Entry surface for Language Server Protocol services, diagnostics, mutating CodeActions, and unsaved graph overlays
+ * @functionality Barrel re-exports for LSP caches, canonical views, convention diagnostics, fix-plan validation, and overlay deltas
  *
  * ## Components
  *

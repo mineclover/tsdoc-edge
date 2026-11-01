@@ -12,6 +12,8 @@
  *
  * @packageDocumentation
  * @doc [[ModuleSpecTypes]]
+ * @context 7-part module specification schema for Purpose, Input, Output, Context, Logic, Effect, and Scope
+ * @functionality Defines structured module specification templates, section schemas, and auto-completion results
  */
 
 /**
@@ -173,6 +175,8 @@ export interface ModuleScope {
 
 /**
  * Complete module specification using 7-part framework
+ * @doc [[ModuleSpecTypes]]
+ * @public
  */
 export interface ModuleSpecTemplate {
   /** Symbol identifier */
@@ -209,6 +213,8 @@ export interface ModuleSpecTemplate {
 
 /**
  * Auto-completion result with metadata
+ * @doc [[ModuleSpecTypes]]
+ * @public
  */
 export interface ModuleSpecResult {
   spec: ModuleSpecTemplate;

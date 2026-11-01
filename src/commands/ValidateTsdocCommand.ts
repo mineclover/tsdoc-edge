@@ -1,6 +1,13 @@
 /**
  * Validate TSDoc command - Validate TSDoc syntax and tsdoc.json configuration
+ *
  * @packageDocumentation
+ * @doc [[ValidateTsdocCommand]]
+ * @doc [[ValidationFeatures]]
+ * @context Microsoft `@microsoft/tsdoc` v0 syntax and `tsdoc.json` custom tag validation via `tsdoc-edge validate tsdoc`
+ * @functionality Verifies `tsdoc.json` tag declarations (or writes/syncs with `--init`), parses TypeScript JSDoc blocks with `TSDocParser`, and reports strict TSDoc syntax issues
+ * @sideEffect console: Writes TSDoc ecosystem validation results or `--json` payloads to stdout
+ * @sideEffect filesystem: Reads `tsdoc.json` and TypeScript source files; writes `tsdoc.json` when `--init` is requested
  */
 
 import * as fs from 'node:fs';
@@ -11,6 +18,8 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
  * Single TSDoc validation issue
+ *
+ * @doc [[ValidateTsdocCommand]]
  * @public
  */
 export interface TsdocValidationIssue {
@@ -22,6 +31,8 @@ export interface TsdocValidationIssue {
 
 /**
  * Result of TSDoc validation
+ *
+ * @doc [[ValidateTsdocCommand]]
  * @public
  */
 export interface TsdocValidationReport {
@@ -45,6 +56,7 @@ export interface TsdocValidationReport {
  * @public
  * @responsibility Validate TypeScript source comments and tsdoc.json against official TSDoc standards
  * @contract Scan project files, verify tsdoc.json, parse comments with TSDoc parser, report issues
+ * @sideEffect console: Writes TSDoc validation diagnostics to stdout; reads TypeScript files and reads/writes `tsdoc.json`
  */
 export class ValidateTsdocCommand extends BaseCommand {
   /**

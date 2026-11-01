@@ -27,6 +27,11 @@ tags:
       "id": "REQ-TTSC-SEMANTIC-PROVIDER-ISOLATION",
       "title": "ttsc semantic graph provider must preserve producer provenance and raw compiler facts without synthesizing spec semantics",
       "tags": ["ttsc", "provider", "provenance"]
+    },
+    {
+      "id": "REQ-TTSC-CANONICAL-GRAPH-COORDINATOR",
+      "title": "CanonicalGraphCoordinator must orchestrate ttsc raw artifact capture, normalization, and revision promotion atomically",
+      "tags": ["ttsc", "coordinator", "canonical-graph"]
     }
   ],
   "edges": [
@@ -39,6 +44,11 @@ tags:
       "kind": "contains",
       "from": "spec:TtscPlatformSpecification",
       "to": "REQ-TTSC-SEMANTIC-PROVIDER-ISOLATION"
+    },
+    {
+      "kind": "contains",
+      "from": "spec:TtscPlatformSpecification",
+      "to": "REQ-TTSC-CANONICAL-GRAPH-COORDINATOR"
     }
   ],
   "bindings": [
@@ -62,6 +72,17 @@ tags:
         "workspaceId": "tsdoc-edge",
         "graphNamespace": "ttsc:tsdoc-edge",
         "canonicalNodeId": "src/provider/TtscSemanticGraphProvider.ts#TtscSemanticGraphProvider:class"
+      }
+    },
+    {
+      "id": "BIND-TTSC-CANONICAL-GRAPH-COORDINATOR",
+      "kind": "implementation",
+      "specNodeId": "REQ-TTSC-CANONICAL-GRAPH-COORDINATOR",
+      "target": {
+        "type": "code-node",
+        "workspaceId": "tsdoc-edge",
+        "graphNamespace": "ttsc:tsdoc-edge",
+        "canonicalNodeId": "src/indexer/CanonicalGraphCoordinator.ts#CanonicalGraphCoordinator:class"
       }
     }
   ]
@@ -128,9 +149,9 @@ npm run ttsc:cache
 npm run ttsc:prepare
 ```
 
-### 시나리오 2: 단일 패스 빌드 `error` 게이트 및 백로그 래칫 검증
+### 시나리오 2: 단일 패스 빌드 20개 `error` 게이트 및 프로덕션 25개 `error` 엄격 검증
 
-일반 빌드(`lint.config.mjs`)에서는 0건이 보장된 `error` 규칙만 강제하고, 린트 게이트(`tsconfig.lint.json` → `lint.ratchet.config.mjs`)에서는 잔여 `warn` 백로그 증가를 차단합니다.
+일반 빌드·테스트(`lint.config.mjs`)에서는 20개 전역 `error` 규칙을 강제하고, 프로덕션 린트 게이트(`tsconfig.lint.json` → `lint.ratchet.config.mjs`)에서는 추가 타입 안전 규칙 5종을 포함한 총 **25개 `error` 규칙(0 findings)** 을 검증합니다.
 
 ```bash
 npm run build
@@ -139,17 +160,17 @@ npm run lint:ttsc
 
 ### 시나리오 3: 원시 `@ttsc/graph` 덤프 수집 및 정규화 전달
 
-[^TtscGraphRouterArtifactAdapter]가 `graph-router` 아티팩트의 프로듀서 버전과 스키마 계약을 검증한 뒤 [^TtscSemanticGraphProvider]와 [^ProjectIndexer]로 넘겨 정규 그래프 리비전을 생성합니다.
+[^CanonicalGraphCoordinator]와 [^TtscGraphRouterArtifactAdapter]가 `graph-router` 아티팩트의 프로듀서 버전과 스키마 계약을 검증한 뒤 [^TtscSemanticGraphProvider]와 [^ProjectIndexer]로 넘겨 정규 그래프 리비전을 생성합니다.
 
 ## CLI 명령어 (CLI Commands)
 
 - `npm run ttsc:prepare`: `@ttsc/lint` + contributor Go 바이너리 사전 빌드.
 - `npm run ttsc:check` / `npm run ttsc:fix`: 워크스페이스 check-stage 진단 및 자동수정 실행.
-- `npm run lint:ttsc`: `tsconfig.lint.json` 기준 래칫 베이스라인 검증.
+- `npm run lint:ttsc`: `tsconfig.lint.json` 기준 25개 `error` 규칙 무결성 검증.
 
 ## 설계 결정 및 경계 가이드 (Design Decisions)
 
-1. **2계층 설정 분리 (`lint.config.mjs` vs `lint.ratchet.config.mjs`)**: `0.34.3` 자동 탐색으로 인해 모든 `ttsc` 호출이 `lint.config.mjs`를 읽으므로, `lint.config.mjs`에는 100% 클린한 `error` 규칙만 두고 백로그 `warn` 규칙은 `extends: './lint.config.mjs'`를 사용하는 `lint.ratchet.config.mjs`로 격리합니다.
+1. **2계층 설정 분리 (`lint.config.mjs` 20 `error` + `lint.ratchet.config.mjs` 5 추가 프로덕션 `error`)**: `0.34.3` 자동 탐색으로 인해 모든 `ttsc` 호출이 `lint.config.mjs`(20개 전역 `error`)를 읽으며, `lint.ratchet.config.mjs`는 `extends: './lint.config.mjs'` 위에 `src/` 전용 엄격 타입 안전 `error` 규칙 5종을 추가하여 총 25개 `error` 게이트(경고 백로그 0건)를 유지합니다.
 2. **원시 그래프와 정규 그래프의 분리**: `@ttsc/graph`의 로컬 노드 ID를 영속 DB 기본키로 직접 노출하지 않고, 항상 [^ProviderSnapshotNormalizer]에서 `workspaceId`와 `graphNamespace`(`ttsc:<repoId>`)를 결합한 정규 ID로 변환합니다.
 3. **AST·그래프 사실과 중복되는 주석 태그 제거**: `@ttsc/graph`가 결정론적으로 산출하는 6종 정규 엣지(`implements`, `extends`, `calls`, `accesses`, `instantiates`, `type_ref`), `CanonicalNodeId`, TypeScript `import`/가시성 수식어가 코드 공간 의존성·식별자의 유일한 정본이므로, 수동 주석 태그 9종(`@implements`, `@extends`, `@uses`, `@usedBy`, `@dependsOn`, `@depends`, `@depType`, `@depReason`, `@id`)은 퇴출하고 관계 브리지로만 연결합니다.
 
@@ -171,13 +192,90 @@ npm run lint:ttsc
 - [[ProjectIndexer]] → managed/architecture/project-indexer.md:76
 - [[Lint Governance]] → managed/features/lint-governance.md:15
 - [[CrossSpecIntegrationContract]] → managed/specs/domains/cross-spec-integration-contract.md:17
-- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:100
+- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:163
 - [[TSDocStandardSpecification]] → managed/specs/domains/tsdoc-standard-spec.md:16
 - [[AuthoredProjectSpecifications]] → managed/specs/index.md:41
 
 ### Implemented By
 
 - TtscPlatformSpecification → src/indexer/TtscGraphRouterArtifactAdapter.ts:1
-- TtscGraphRouterArtifactAdapter → src/indexer/TtscGraphRouterArtifactAdapter.ts:134
+- CanonicalAliasContext → src/indexer/CanonicalAliasContext.ts:28
+- DEFAULT_GRAPH_ROUTER_CONFIG → src/indexer/CanonicalGraphCoordinator.ts:44
+- DEFAULT_GRAPH_TSCONFIG → src/indexer/CanonicalGraphCoordinator.ts:53
+- CanonicalGraphCoordinatorOptions → src/indexer/CanonicalGraphCoordinator.ts:62
+- CanonicalGraphCoordinator → src/indexer/CanonicalGraphCoordinator.ts:117
+- canonicalGraphOptionsFromEnvironment → src/indexer/CanonicalGraphCoordinator.ts:253
+- verifyLegacyAstParity → src/indexer/LegacyAstParityAdapter.ts:55
+- ProjectIndexer → src/indexer/ProjectIndexer.ts:35
+- canonicalProjectGraphFingerprint → src/indexer/ProjectIndexer.ts:134
+- SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSION → src/indexer/TtscGraphRouterArtifactAdapter.ts:31
+- SUPPORTED_TTSC_GRAPH_ARTIFACT_CONTRACT_VERSIONS → src/indexer/TtscGraphRouterArtifactAdapter.ts:40
+- SupportedTtscGraphArtifactContractVersion → src/indexer/TtscGraphRouterArtifactAdapter.ts:49
+- TtscGraphRouterArtifactAdapterOptions → src/indexer/TtscGraphRouterArtifactAdapter.ts:142
+- TtscGraphRouterArtifactAdapter → src/indexer/TtscGraphRouterArtifactAdapter.ts:171
+- CANONICAL_ID_SCHEME → src/indexer/canonical-id.ts:18
+- ParsedCanonicalId → src/indexer/canonical-id.ts:35
+- parseCanonicalId → src/indexer/canonical-id.ts:49
+- formatCanonicalId → src/indexer/canonical-id.ts:70
+- canonicalFsPath → src/indexer/canonical-path.ts:22
+- PROJECT_GRAPH_CONTRACT_VERSION → src/indexer/contracts.ts:23
+- ProjectGraphEvidence → src/indexer/contracts.ts:32
+- ProjectGraphSourceNode → src/indexer/contracts.ts:47
+- ProjectGraphSourceEdge → src/indexer/contracts.ts:65
+- ProjectGraphProvenance → src/indexer/contracts.ts:79
+- ProjectGraphInput → src/indexer/contracts.ts:113
+- ProjectIndexRequest → src/indexer/contracts.ts:130
+- ProjectGraphSource → src/indexer/contracts.ts:146
+- CanonicalGraphNode → src/indexer/contracts.ts:158
+- CanonicalGraphEdge → src/indexer/contracts.ts:167
+- ProjectIndexResult → src/indexer/contracts.ts:176
+- CanonicalProjectGraph → src/indexer/contracts.ts:188
+- CANONICAL_DIAGNOSTICS_CONTRACT_VERSION → src/indexer/diagnostics-contract.ts:18
+- CanonicalDiagnosticSeverity → src/indexer/diagnostics-contract.ts:27
+- CanonicalDiagnosticCategory → src/indexer/diagnostics-contract.ts:36
+- CanonicalDiagnostic → src/indexer/diagnostics-contract.ts:45
+- normalizeRouterDiagnostics → src/indexer/diagnostics-contract.ts:67
+- generateLegacyId → src/indexer/legacy-id.ts:22
+- normalizeLegacyKind → src/indexer/legacy-id.ts:45
+- AliasMatchStrategy → src/indexer/symbol-alias.ts:25
+- SymbolAliasRecord → src/indexer/symbol-alias.ts:34
+- LegacySymbolIdentity → src/indexer/symbol-alias.ts:50
+- buildLegacyIdentityMap → src/indexer/symbol-alias.ts:69
+- materializeAliases → src/indexer/symbol-alias.ts:157
+- InMemoryAliasResolver → src/indexer/symbol-alias.ts:229
+- PROVIDER_DELTA_NORMALIZER_VERSION → src/provider/DeltaNormalizer.ts:51
+- OWNED_OUTGOING_RELATIONSHIPS_CAPABILITY → src/provider/DeltaNormalizer.ts:60
+- ProviderDeltaNormalizationState → src/provider/DeltaNormalizer.ts:69
+- NormalizedProviderDelta → src/provider/DeltaNormalizer.ts:78
+- NormalizeProviderDeltaInput → src/provider/DeltaNormalizer.ts:105
+- DeltaNormalizer → src/provider/DeltaNormalizer.ts:122
+- ProviderProjectIndexResult → src/provider/ProviderProjectIndexer.ts:33
+- ProviderProjectIndexer → src/provider/ProviderProjectIndexer.ts:48
+- PROVIDER_SNAPSHOT_NORMALIZER_ID → src/provider/ProviderSnapshotNormalizer.ts:47
+- PROVIDER_SNAPSHOT_NORMALIZER_VERSION → src/provider/ProviderSnapshotNormalizer.ts:56
+- ProviderSnapshotNormalizerOptions → src/provider/ProviderSnapshotNormalizer.ts:65
+- NormalizedProviderSnapshot → src/provider/ProviderSnapshotNormalizer.ts:82
+- ProviderSnapshotNormalizer → src/provider/ProviderSnapshotNormalizer.ts:123
+- canonicalProviderNodeId → src/provider/ProviderSnapshotNormalizer.ts:293
+- TtscSemanticGraphProviderOptions → src/provider/TtscSemanticGraphProvider.ts:43
+- TtscSemanticGraphProvider → src/provider/TtscSemanticGraphProvider.ts:62
+- SEMANTIC_GRAPH_PROVIDER_CONTRACT_ID → src/provider/contracts.ts:27
+- SEMANTIC_GRAPH_PROVIDER_CONTRACT_VERSION → src/provider/contracts.ts:36
+- ProviderIdentity → src/provider/contracts.ts:45
+- ProviderCapabilityStatus → src/provider/contracts.ts:60
+- ProviderCapability → src/provider/contracts.ts:69
+- GraphCapabilities → src/provider/contracts.ts:82
+- ProviderNode → src/provider/contracts.ts:91
+- ProviderFactOccurrence → src/provider/contracts.ts:110
+- ProviderDiagnostic → src/provider/contracts.ts:131
+- ProviderProvenance → src/provider/contracts.ts:149
+- ProviderSnapshot → src/provider/contracts.ts:169
+- ProviderIdentityRemapReason → src/provider/contracts.ts:190
+- ProviderChange → src/provider/contracts.ts:199
+- ProviderDelta → src/provider/contracts.ts:221
+- ProviderProjectInput → src/provider/contracts.ts:243
+- ProviderDocumentInput → src/provider/contracts.ts:256
+- TypeScriptProviderConfig → src/provider/contracts.ts:269
+- SemanticGraphProvider → src/provider/contracts.ts:282
 - CANONICAL_TTSC_RELATIONSHIP_BRIDGE → src/types/tags/canonical-tag-bridge.ts:114
 

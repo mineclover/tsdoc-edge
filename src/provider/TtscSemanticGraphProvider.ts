@@ -1,4 +1,12 @@
-/** SemanticGraphProvider facade for the current ttsc graph-router source. */
+/**
+ * SemanticGraphProvider facade for the current ttsc graph-router source.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @context Adapter facade wrapping saved-file `ttsc` graph-router `ProjectGraphSource` loaders behind the `SemanticGraphProvider` contract.
+ * @functionality Translates router source nodes, edges, diagnostics, and provenance into immutable `ProviderSnapshot` envelopes with explicit partial fact-occurrence capability metadata.
+ * @packageDocumentation
+ */
 
 import { createHash } from 'node:crypto';
 import * as path from 'node:path';
@@ -25,6 +33,13 @@ import {
   type TypeScriptProviderConfig,
 } from './contracts';
 
+/**
+ * Configuration options for constructing a `TtscSemanticGraphProvider`.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
+ */
 export interface TtscSemanticGraphProviderOptions {
   readonly source: ProjectGraphSource;
   readonly providerVersion: string;
@@ -39,6 +54,10 @@ export interface TtscSemanticGraphProviderOptions {
  * The current router artifact may already collapse repeated facts. Therefore
  * this facade declares fact-occurrence completeness as `partial` and never
  * claims incremental-delta support.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @doc [[TtscPlatformSpecification]]
+ * @public
  */
 export class TtscSemanticGraphProvider implements SemanticGraphProvider {
   private readonly providerIdentity: ProviderIdentity;

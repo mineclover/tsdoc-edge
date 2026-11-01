@@ -1,4 +1,12 @@
-/** Cross-plane assembly and binding-resolution orchestration. */
+/**
+ * Cross-plane assembly and binding-resolution orchestration.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @context Cross-plane semantic analysis boundary uniting canonical code revisions, SpecGraph revisions, policy rules, test/API evidence, TSDoc enrichment, and provider identities.
+ * @functionality Validates content-addressed input revisions and workspace/namespace boundaries, assembles immutable `EffectiveAnalysisSnapshot` views and stamps, and verifies resolved SpecGraph binding sets.
+ * @packageDocumentation
+ */
 
 import { createHash } from 'node:crypto';
 import {
@@ -43,6 +51,10 @@ const validatedEffectiveAnalysisSnapshots = new WeakSet<object>();
  *
  * Binding resolution sets are transient derived values and are intentionally
  * not deserialized as trusted conformance inputs.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
  */
 export function assertValidatedBindingResolutionSet(set: BindingResolutionSet): void {
   if (!validatedBindingResolutionSets.has(set)) {
@@ -57,6 +69,10 @@ export function assertValidatedBindingResolutionSet(set: BindingResolutionSet): 
  *
  * Callers may build the code overlay in their own adapter, but binding,
  * conformance, coverage, and impact must all consume the snapshot produced here.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
  */
 export class EffectiveAnalysisService {
   /** Build a code-only stamp for topology and fact queries. */
@@ -274,7 +290,13 @@ export class EffectiveAnalysisService {
   }
 }
 
-/** Create a deterministic analyzer/rule implementation revision. */
+/**
+ * Create a deterministic analyzer/rule implementation revision.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export function createRuleSetRevision(input: {
   readonly analyzerVersions: Readonly<Record<string, string>>;
 }): RuleSetRevision {
@@ -812,14 +834,26 @@ function validateWorkspaceAndNamespaceBoundary(input: EffectiveAnalysisInputs): 
   }
 }
 
-/** Verify that a provider's observed kinds are inert or registry-classified. */
+/**
+ * Verify that a provider's observed kinds are inert or registry-classified.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export function observedEdgeSemanticDigest(kinds: readonly string[]): string {
   return digest(
     normalizedStrings(kinds).map((kind) => ({ kind, semantic: graphEdgeSemantic(kind) }))
   );
 }
 
-/** Derive the provider identity currently available on a canonical graph envelope. */
+/**
+ * Derive the provider identity currently available on a canonical graph envelope.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export function providerAnalysisIdentityFromGraph(
   graph: CanonicalProjectGraph
 ): ProviderAnalysisIdentity {

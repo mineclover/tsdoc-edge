@@ -204,4 +204,13 @@ tsdoc-edge improve src/services/UserService.ts
 ### Implemented By
 
 - EnhancedTagTypes → src/types/tags/enhanced.ts:1
+- ProblemSolving → src/types/tags/enhanced.ts:18
+- Functionality → src/types/tags/enhanced.ts:46
+- ErrorExperience → src/types/tags/enhanced.ts:81
+- DecisionRecord → src/types/tags/enhanced.ts:124
+- DependencySpec → src/types/tags/enhanced.ts:180
+- FuturePlan → src/types/tags/enhanced.ts:218
+- BaseSymbolDoc → src/types/tags/enhanced.ts:305
+- EnhancedSymbolDoc → src/types/tags/enhanced.ts:338
+- StrictModeValidation → src/types/tags/enhanced.ts:382
 

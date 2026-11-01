@@ -21,5 +21,5 @@ Calculates graph centrality, degree, betweenness, and hub/bridge importance metr
 
 ### Implemented By
 
-- RelationshipMetricsCommand → src/commands/RelationshipMetricsCommand.ts:30
+- RelationshipMetricsCommand → src/commands/RelationshipMetricsCommand.ts:38
 

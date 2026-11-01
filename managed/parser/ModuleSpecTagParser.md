@@ -21,5 +21,5 @@ Extracts `@algorithm`, `@complexity`, `@sideEffect`, and standard visibility mod
 
 ### Implemented By
 
-- ModuleSpecTagParser → src/parser/ModuleSpecTagParser.ts:27
+- ModuleSpecTagParser → src/parser/ModuleSpecTagParser.ts:34
 

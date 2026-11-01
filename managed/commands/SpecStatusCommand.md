@@ -21,5 +21,5 @@ Inspects and transitions a specification document lifecycle status (`draft`, `re
 
 ### Implemented By
 
-- SpecStatusCommand → src/commands/SpecStatusCommand.ts:64
+- SpecStatusCommand → src/commands/SpecStatusCommand.ts:73
 

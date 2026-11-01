@@ -528,7 +528,6 @@ Features:
 - [[TSDoc Edge Documentation]] → managed/README.md:231
 - [[DepsCommand]] → managed/commands/DepsCommand.md:64
 - [[OrphansCommand]] → managed/commands/OrphansCommand.md:68
-- [[UsedByCommand]] → managed/commands/UsedByCommand.md:64
 - [[DatabaseManager]] → managed/core-components/DatabaseManager.md:298
 - [[Core Components]] → managed/core-components/index.md:30
 - [[Feature Showcase]] → managed/examples/feature-showcase.md:30

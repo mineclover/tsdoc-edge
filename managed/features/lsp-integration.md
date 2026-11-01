@@ -489,11 +489,64 @@ vscode.commands.registerCommand('tsdoc.showImpactAnalysis', (symbolId, direction
 - [[ProjectIndexer]] → managed/architecture/project-indexer.md:193
 - [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1457
 - [[Convention Pack Check]] → managed/features/convention-pack-check.md:465
-- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:143
+- [[LspAndCoverageSurfaceSpecification]] → managed/specs/domains/lsp-and-coverage-surface-spec.md:201
+- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:206
 - [[Semantic Graph Spec Governance Changelog]] → managed/workflows/semantic-graph-spec-governance-changelog.md:24
 - [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:277
 
 ### Implemented By
 
 - LSP Integration → src/lsp/cache-manager.ts:1
+- CacheEntry → src/lsp/cache-manager.ts:25
+- CacheManagerOptions → src/lsp/cache-manager.ts:40
+- CacheManager → src/lsp/cache-manager.ts:73
+- CanonicalLspSymbolLocation → src/lsp/canonical-graph-view.ts:22
+- CanonicalLspRelatedSymbol → src/lsp/canonical-graph-view.ts:35
+- CanonicalGraphLspView → src/lsp/canonical-graph-view.ts:46
+- canonicalNodeDisplayName → src/lsp/canonical-graph-view.ts:156
+- SavedConventionDiagnosticData → src/lsp/convention-diagnostics.ts:23
+- SavedConventionFindingAnchor → src/lsp/convention-diagnostics.ts:39
+- findSavedConventionFindingAnchor → src/lsp/convention-diagnostics.ts:56
+- conventionDiagnosticsForFile → src/lsp/convention-diagnostics.ts:119
+- DiagnosticInfo → src/lsp/diagnostics.ts:24
+- mapCanonicalDiagnostic → src/lsp/diagnostics.ts:50
+- toLanguageServerDiagnostic → src/lsp/diagnostics.ts:75
+- ExtractedSymbol → src/lsp/incremental-builder.ts:30
+- ExtractedRelationship → src/lsp/incremental-builder.ts:52
+- IncrementalExtractResult → src/lsp/incremental-builder.ts:67
+- BuildEventCallback → src/lsp/incremental-builder.ts:82
+- IncrementalBuilder → src/lsp/incremental-builder.ts:101
+- RetainedConventionFixPlan → src/lsp/mutating-code-action.ts:93
+- ValidatedMutatingCodeAction → src/lsp/mutating-code-action.ts:163
+- ResolvedSavedConventionMutatingActions → src/lsp/mutating-code-action.ts:249
+- computeSourceContentDigest → src/lsp/mutating-code-action.ts:281
+- parseConventionFixPlanBundle → src/lsp/mutating-code-action.ts:294
+- loadConventionFixPlanBundleFile → src/lsp/mutating-code-action.ts:342
+- validateRetainedConventionFixPlan → src/lsp/mutating-code-action.ts:399
+- resolveSavedConventionMutatingActions → src/lsp/mutating-code-action.ts:642
+- EffectiveCodeGraphView → src/lsp/overlay/EffectiveCodeGraphView.ts:30
+- GraphDeltaEdgeKey → src/lsp/overlay/GraphDelta.ts:31
+- GRAPH_DELTA_CONTRACT_VERSION → src/lsp/overlay/GraphDelta.ts:44
+- GraphDeltaRelationshipCoverage → src/lsp/overlay/GraphDelta.ts:53
+- GraphDeltaExtractorIdentity → src/lsp/overlay/GraphDelta.ts:62
+- LSP_SYNTAX_GRAPH_DELTA_EXTRACTOR → src/lsp/overlay/GraphDelta.ts:79
+- GraphDeltaIdentityRemap → src/lsp/overlay/GraphDelta.ts:92
+- GraphDeltaProviderSourceContext → src/lsp/overlay/GraphDelta.ts:104
+- GraphDelta → src/lsp/overlay/GraphDelta.ts:122
+- GraphDeltaBuilder → src/lsp/overlay/GraphDelta.ts:153
+- CodeGraphRevision → src/lsp/overlay/GraphDelta.ts:416
+- EffectiveCodeGraph → src/lsp/overlay/GraphDelta.ts:428
+- applyGraphDelta → src/lsp/overlay/GraphDelta.ts:444
+- composeGraphDeltas → src/lsp/overlay/GraphDelta.ts:456
+- OverlayGraphView → src/lsp/overlay/OverlayGraphView.ts:21
+- CodeLensInfo → src/lsp/service.ts:84
+- SymbolSearchResult → src/lsp/service.ts:101
+- TsdocEdgeServiceOptions → src/lsp/service.ts:121
+- TsdocEdgeService → src/lsp/service.ts:162
+- StatementManagerOptions → src/lsp/statement-manager.ts:38
+- StatementManager → src/lsp/statement-manager.ts:63
+- filePathFromUri → src/lsp/uri.ts:20
+- fileUriFromPath → src/lsp/uri.ts:36
+- resolveWorkspaceRoot → src/lsp/uri.ts:49
+- isTypeScriptSourcePath → src/lsp/uri.ts:68
 

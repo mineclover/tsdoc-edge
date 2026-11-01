@@ -21,5 +21,5 @@ Detects asynchronous event emission and subscription (`event-flow`) relationship
 
 ### Implemented By
 
-- EventFlowAnalyzer → src/analyzer/EventFlowAnalyzer.ts:1
+- EventFlowAnalyzer → src/analyzer/EventFlowAnalyzer.ts:54
 

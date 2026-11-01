@@ -24,6 +24,16 @@ tags:
       "tags": ["tsdoc", "standard-spec", "parser"]
     },
     {
+      "id": "REQ-TSDOC-JSON-SCHEMA-GENERATOR",
+      "title": "generateTsdocJson must emit standards-compliant Microsoft TSDoc v0 configuration JSON",
+      "tags": ["tsdoc", "tsdoc-json"]
+    },
+    {
+      "id": "REQ-TSDOC-UNIFIED-COMMENT-READER",
+      "title": "readTsdocComment must provide a single unified DocComment AST reader across standard and custom blocks without regex drift",
+      "tags": ["tsdoc", "comment-reader", "doc-ast"]
+    },
+    {
       "id": "REQ-TSDOC-DOCNODE-EXTRACTION-BOUNDARY",
       "title": "Structured DocComment AST extraction must consume TSDoc parser output without redefining standard grammar",
       "tags": ["tsdoc", "doc-ast"]
@@ -34,6 +44,16 @@ tags:
       "kind": "contains",
       "from": "spec:TSDocStandardSpecification",
       "to": "REQ-TSDOC-STANDARD-PARSER-CONTRACT"
+    },
+    {
+      "kind": "contains",
+      "from": "spec:TSDocStandardSpecification",
+      "to": "REQ-TSDOC-JSON-SCHEMA-GENERATOR"
+    },
+    {
+      "kind": "contains",
+      "from": "spec:TSDocStandardSpecification",
+      "to": "REQ-TSDOC-UNIFIED-COMMENT-READER"
     },
     {
       "kind": "contains",
@@ -51,6 +71,28 @@ tags:
         "workspaceId": "tsdoc-edge",
         "graphNamespace": "ttsc:tsdoc-edge",
         "canonicalNodeId": "src/parser/TSDocParser.ts#TSDocParser:class"
+      }
+    },
+    {
+      "id": "BIND-TSDOC-JSON-SCHEMA-GENERATOR",
+      "kind": "implementation",
+      "specNodeId": "REQ-TSDOC-JSON-SCHEMA-GENERATOR",
+      "target": {
+        "type": "code-node",
+        "workspaceId": "tsdoc-edge",
+        "graphNamespace": "ttsc:tsdoc-edge",
+        "canonicalNodeId": "src/parser/TSDocParser.ts#generateTsdocJson:function"
+      }
+    },
+    {
+      "id": "BIND-TSDOC-UNIFIED-COMMENT-READER",
+      "kind": "implementation",
+      "specNodeId": "REQ-TSDOC-UNIFIED-COMMENT-READER",
+      "target": {
+        "type": "code-node",
+        "workspaceId": "tsdoc-edge",
+        "graphNamespace": "ttsc:tsdoc-edge",
+        "canonicalNodeId": "src/parser/TsdocCommentReader.ts#readTsdocComment:function"
       }
     },
     {
@@ -124,12 +166,12 @@ TSDoc 파서[^TSDocParser]는 마크다운 본문과 태그 구문의 모호성�
 코퍼스 전체의 `/** ... */` 블록이 `@microsoft/tsdoc` 어휘·구문 규칙과 `tsdoc.json` 태그 정의를 100% 준수하는지 확인합니다.
 
 ```bash
-node dist/cli.js validate-tsdoc src --strict --json
+node dist/cli.js validate tsdoc src --strict --json
 ```
 
 ### 시나리오 2: `DocComment` AST로부터 구조화 섹션 추출
 
-배치 문서 생성기나 모듈 명세 분석기가 [^TSDocParser]와 [^EnhancedDocExtractor]를 통해 `@param`, `@returns`, `customBlocks` 트리를 손실 없이 읽습니다.
+배치 문서 생성기나 모듈 명세 분석기가 [^TSDocParser], [^readTsdocComment], [^EnhancedDocExtractor]를 통해 `@param`, `@returns`, `customBlocks` 트리를 손실 없이 읽습니다.
 
 ```typescript
 const parser = new TSDocParser('./tsdoc.json');
@@ -143,7 +185,7 @@ const result = parser.parseFile('UserService.ts', sourceText);
 
 ## CLI 명령어 (CLI Commands)
 
-- `tsdoc-edge validate-tsdoc <dir> [--strict] [--json]`: `@microsoft/tsdoc` 레퍼런스 파서 기준 문법 및 `tsdoc.json` 정합성 검증.
+- `tsdoc-edge validate tsdoc <dir> [--strict] [--json]`: `@microsoft/tsdoc` 레퍼런스 파서 기준 문법 및 `tsdoc.json` 정합성 검증.
 
 ## 설계 결정 및 경계 가이드 (Design Decisions)
 
@@ -166,7 +208,7 @@ const result = parser.parseFile('UserService.ts', sourceText);
 
 - [[Lint Governance]] → managed/features/lint-governance.md:15
 - [[CrossSpecIntegrationContract]] → managed/specs/domains/cross-spec-integration-contract.md:17
-- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:99
+- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:162
 - [[TtscPlatformSpecification]] → managed/specs/domains/ttsc-platform-spec.md:16
 - [[AuthoredProjectSpecifications]] → managed/specs/index.md:40
 
@@ -175,9 +217,24 @@ const result = parser.parseFile('UserService.ts', sourceText);
 - TSDocStandardSpecification → src/parser/TSDocParser.ts:1
 - MarkdownGenerator → src/generator/MarkdownGenerator.ts:17
 - EnhancedDocExtractor → src/parser/EnhancedDocExtractor.ts:76
-- ModuleSpecTagParser → src/parser/ModuleSpecTagParser.ts:27
-- TSDocParser → src/parser/TSDocParser.ts:134
-- TsdocRenderOptions → src/parser/TsdocCommentReader.ts:37
-- StructuredTsdocComment → src/parser/TsdocCommentReader.ts:93
+- ModuleSpecTagParser → src/parser/ModuleSpecTagParser.ts:34
+- CustomTagSpec → src/parser/TSDocParser.ts:31
+- generateTsdocJson → src/parser/TSDocParser.ts:90
+- TSDocParser → src/parser/TSDocParser.ts:148
+- TsdocRenderOptions → src/parser/TsdocCommentReader.ts:41
+- TsdocParameterEntry → src/parser/TsdocCommentReader.ts:53
+- TsdocTypeParameterEntry → src/parser/TsdocCommentReader.ts:67
+- TsdocDocCheckpointEntry → src/parser/TsdocCommentReader.ts:81
+- TsdocReleaseVisibility → src/parser/TsdocCommentReader.ts:97
+- StructuredTsdocComment → src/parser/TsdocCommentReader.ts:106
+- SourceDocCheckpointReference → src/parser/TsdocCommentReader.ts:159
+- ExtractDocCheckpointsOptions → src/parser/TsdocCommentReader.ts:187
+- getDirectJsDocs → src/parser/TsdocCommentReader.ts:209
+- renderDocNodesText → src/parser/TsdocCommentReader.ts:351
+- renderDocNodeText → src/parser/TsdocCommentReader.ts:382
+- extractDocCheckpointsFromText → src/parser/TsdocCommentReader.ts:450
+- readTsdocComment → src/parser/TsdocCommentReader.ts:503
+- extractLeadingJsDocText → src/parser/TsdocCommentReader.ts:652
+- extractDocCheckpointsFromSource → src/parser/TsdocCommentReader.ts:754
 - CANONICAL_TSDOC_STANDARD_BRIDGE → src/types/tags/canonical-tag-bridge.ts:177
 

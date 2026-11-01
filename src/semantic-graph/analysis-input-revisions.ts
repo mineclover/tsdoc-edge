@@ -3,17 +3,38 @@
  *
  * These contracts intentionally contain JSON values only. They can therefore
  * be persisted, hashed, and reconstructed without process-local state.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @context Content-addressed evidence and TSDoc enrichment input planes consumed by effective cross-plane semantic analysis and historical check replay.
+ * @functionality Normalizes, validates, sorts, fingerprints, and freezes test-runner evidence, API surface evidence, TSDoc symbol enrichments, and canonical empty plane revisions.
  * @packageDocumentation
  */
 
 import { createHash } from 'node:crypto';
 
-/** Contract shared by the persisted evidence and enrichment planes. */
+/**
+ * Contract shared by the persisted evidence and enrichment planes.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export const ANALYSIS_INPUT_REVISION_CONTRACT_VERSION = '1.0' as const;
 
+/**
+ * Discriminator identifying the evidence or enrichment analysis-input plane.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export type AnalysisInputRevisionPlane = 'evidence' | 'enrichment';
 
-/** Provenance for one collected item. Times are evidence, not revision creation metadata. */
+/**
+ * Provenance for one collected item. Times are evidence, not revision creation metadata.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export interface AnalysisInputItemProvenance {
   readonly source: 'test-runner' | 'api-extractor' | 'tsdoc-parser' | 'workspace-scan';
   readonly producerId: string;
@@ -23,7 +44,12 @@ export interface AnalysisInputItemProvenance {
   readonly observedAt?: string;
 }
 
-/** Provenance for the deterministic collection operation that produced a revision. */
+/**
+ * Provenance for the deterministic collection operation that produced a revision.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export interface AnalysisInputRevisionProvenance {
   readonly source: 'collected' | 'imported-baseline' | 'canonical-empty';
   readonly producerId: string;
@@ -32,7 +58,12 @@ export interface AnalysisInputRevisionProvenance {
   readonly sourceFingerprint: string;
 }
 
-/** Stable one-based source location used by evidence and enrichment items. */
+/**
+ * Stable one-based source location used by evidence and enrichment items.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export interface AnalysisInputSourceAnchor {
   readonly file: string;
   readonly contentDigest: string;
@@ -42,7 +73,12 @@ export interface AnalysisInputSourceAnchor {
   readonly endColumn?: number;
 }
 
-/** Raw result emitted by a test runner before binding resolution. */
+/**
+ * Raw result emitted by a test runner before binding resolution.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export interface RawTestEvidenceItem {
   readonly kind: 'test-evidence';
   readonly id: string;
@@ -56,7 +92,12 @@ export interface RawTestEvidenceItem {
   readonly provenance: AnalysisInputItemProvenance;
 }
 
-/** Raw API export observation before it is bound to a contract or code node. */
+/**
+ * Raw API export observation before it is bound to a contract or code node.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export interface ApiSurfaceEvidenceItem {
   readonly kind: 'api-surface';
   readonly id: string;
@@ -70,14 +111,31 @@ export interface ApiSurfaceEvidenceItem {
   readonly provenance: AnalysisInputItemProvenance;
 }
 
+/**
+ * Union of supported evidence items collected for cross-plane verification.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export type EvidenceItem = RawTestEvidenceItem | ApiSurfaceEvidenceItem;
 
+/**
+ * Normalized TSDoc tag name and optional rendered text attached to an enrichment item.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export interface TsdocTagEnrichment {
   readonly name: string;
   readonly text?: string;
 }
 
-/** TSDoc projection that augments a code node without changing canonical code identity. */
+/**
+ * TSDoc projection that augments a code node without changing canonical code identity.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export interface TsdocEnrichmentItem {
   readonly kind: 'tsdoc';
   readonly id: string;
@@ -89,8 +147,21 @@ export interface TsdocEnrichmentItem {
   readonly provenance: AnalysisInputItemProvenance;
 }
 
+/**
+ * Union of supported enrichment items augmenting canonical code symbols.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export type EnrichmentItem = TsdocEnrichmentItem;
 
+/**
+ * Immutable content-addressed revision of collected verification evidence items.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface EvidenceRevision {
   readonly contractVersion: typeof ANALYSIS_INPUT_REVISION_CONTRACT_VERSION;
   readonly plane: 'evidence';
@@ -101,6 +172,13 @@ export interface EvidenceRevision {
   readonly provenance: AnalysisInputRevisionProvenance;
 }
 
+/**
+ * Immutable content-addressed revision of collected symbol enrichment items.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface EnrichmentRevision {
   readonly contractVersion: typeof ANALYSIS_INPUT_REVISION_CONTRACT_VERSION;
   readonly plane: 'enrichment';
@@ -111,19 +189,37 @@ export interface EnrichmentRevision {
   readonly provenance: AnalysisInputRevisionProvenance;
 }
 
+/**
+ * Unvalidated input payload used to construct an `EvidenceRevision`.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export interface CreateEvidenceRevisionInput {
   readonly workspaceId: string;
   readonly items: readonly EvidenceItem[];
   readonly provenance: AnalysisInputRevisionProvenance;
 }
 
+/**
+ * Unvalidated input payload used to construct an `EnrichmentRevision`.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export interface CreateEnrichmentRevisionInput {
   readonly workspaceId: string;
   readonly items: readonly EnrichmentItem[];
   readonly provenance: AnalysisInputRevisionProvenance;
 }
 
-/** Create a deterministic, deeply immutable evidence revision. */
+/**
+ * Create a deterministic, deeply immutable evidence revision.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export function createEvidenceRevision(input: CreateEvidenceRevisionInput): EvidenceRevision {
   const workspaceId = requiredText(input.workspaceId, 'workspaceId');
   const items = sortedUnique(
@@ -134,7 +230,13 @@ export function createEvidenceRevision(input: CreateEvidenceRevisionInput): Evid
   return createRevision('evidence', workspaceId, items, input.provenance);
 }
 
-/** Create a deterministic, deeply immutable enrichment revision. */
+/**
+ * Create a deterministic, deeply immutable enrichment revision.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export function createEnrichmentRevision(input: CreateEnrichmentRevisionInput): EnrichmentRevision {
   const workspaceId = requiredText(input.workspaceId, 'workspaceId');
   const items = sortedUnique(
@@ -145,7 +247,12 @@ export function createEnrichmentRevision(input: CreateEnrichmentRevisionInput): 
   return createRevision('enrichment', workspaceId, items, input.provenance);
 }
 
-/** Canonical empty evidence input used when no evidence provider is configured. */
+/**
+ * Canonical empty evidence input used when no evidence provider is configured.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export function createCanonicalEmptyEvidenceRevision(workspaceId: string): EvidenceRevision {
   return createEvidenceRevision({
     workspaceId,
@@ -154,7 +261,12 @@ export function createCanonicalEmptyEvidenceRevision(workspaceId: string): Evide
   });
 }
 
-/** Canonical empty enrichment input used when no enrichment provider is configured. */
+/**
+ * Canonical empty enrichment input used when no enrichment provider is configured.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export function createCanonicalEmptyEnrichmentRevision(workspaceId: string): EnrichmentRevision {
   return createEnrichmentRevision({
     workspaceId,
@@ -163,15 +275,32 @@ export function createCanonicalEmptyEnrichmentRevision(workspaceId: string): Enr
   });
 }
 
+/**
+ * Create the one canonical empty revision for the `evidence` plane and workspace.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export function createCanonicalEmptyRevision(
   plane: 'evidence',
   workspaceId: string
 ): EvidenceRevision;
+/**
+ * Create the one canonical empty revision for the `enrichment` plane and workspace.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export function createCanonicalEmptyRevision(
   plane: 'enrichment',
   workspaceId: string
 ): EnrichmentRevision;
-/** Create the one canonical empty revision for a plane and workspace. */
+/**
+ * Create the one canonical empty revision for a plane and workspace.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
+ */
 export function createCanonicalEmptyRevision(
   plane: AnalysisInputRevisionPlane,
   workspaceId: string

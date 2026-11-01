@@ -19,14 +19,16 @@ Define comprehensive testing strategy for TSDoc Edge MCP Server to ensure reliab
 
 ## Context
 
-MCP (Model Context Protocol) Server provides 7 tools to Claude:
-- tsdoc_search_symbols
-- tsdoc_get_ontology_stats
-- tsdoc_list_relationships
-- tsdoc_get_work_context
-- tsdoc_get_design_context
-- tsdoc_query_relationships
-- tsdoc_get_symbol_details
+MCP (Model Context Protocol) Server ([[MCP Integration]]) provides 9 read-only tools to AI agents:
+- `tsdoc_search_symbols`
+- `tsdoc_get_ontology_stats`
+- `tsdoc_list_relationships`
+- `tsdoc_get_work_context`
+- `tsdoc_get_design_context`
+- `tsdoc_query_relationships`
+- `tsdoc_get_symbol_details`
+- `tsdoc_get_impact`
+- `tsdoc_get_spec_bindings`
 
 Each tool must be tested at multiple levels to guarantee LLM-safe operation.
 
@@ -34,8 +36,8 @@ Each tool must be tested at multiple levels to guarantee LLM-safe operation.
 
 ### Level 1: Unit Tests (Service Layer)
 **File**: `basic-test.js`
-**Target**: TsDocService class methods directly
-**Coverage**: 7 core operations
+**Target**: `TsDocService` class methods directly
+**Coverage**: 9 core operations (9/9 passing)
 
 **Purpose**:
 - Validate API contracts
@@ -68,7 +70,7 @@ const results = await service.searchSymbols({ query: 'DatabaseManager' });
 ### Level 3: Detailed Tool Tests (Scenario Coverage)
 **File**: `detailed-test.js`
 **Target**: Each MCP tool with multiple scenarios
-**Coverage**: 10 test cases (7 happy paths + 3 edge cases)
+**Coverage**: 13 test cases (9 happy paths + 4 edge/canonical-graph cases, 13/13 passing)
 
 **Purpose**:
 - Test real-world use cases
@@ -116,24 +118,23 @@ const results = await service.searchSymbols({ query: 'DatabaseManager' });
 ## Test Data Requirements
 
 ### Database Prerequisites
-Tests require indexed codebase at `<workspace>/.tsdoc/symbols.db`:
+Tests require synchronized SSOT databases (`.tsdoc.db`, `.tsdoc/canonical-graph.db`, `.tsdoc/spec-graph.db`):
 
 ```bash
 # Run before tests
-tsdoc-edge build src
+tsdoc-edge sync
 ```
 
 **Expected Data**:
-- ~5,000 symbols (classes, functions, methods)
-- ~20,000 relationships (imports, calls, tests)
-- File paths relative to workspace root
+- ~10,450+ symbols and ~8,676 canonical `@ttsc/graph` nodes
+- ~21,236 canonical `@ttsc/graph` edges
+- Active `SpecGraphRevision` bindings from `managed/specs/`
 
 ### Test Fixtures
 Real codebase entities used:
-- `DatabaseManager` (class with multiple instances)
-- `src/commands/AnalyzeAllCommand.ts` (file with 6 symbols)
-- `imports` relationship type (~0 in current data)
-- `class-databasemanager` (symbol ID)
+- `DatabaseManager` (core storage class)
+- `src/commands/HealthCommand.ts` (`healthcommand-class-healthcommand`)
+- Canonical `@ttsc/graph` impact and `SpecGraph` binding queries
 
 ## Performance Optimization
 
@@ -237,5 +238,6 @@ Alert if any operation:
 
 ### Referenced By
 
-- [[Features Index]] → managed/features/index.md:262
+- [[Features Index]] → managed/features/index.md:269
+- [[MCP Integration]] → managed/features/mcp-integration.md:64
 

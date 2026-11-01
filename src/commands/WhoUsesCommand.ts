@@ -1,4 +1,13 @@
-/** Who-uses query against the canonical graph with a legacy fallback. */
+/**
+ * Who-uses query against the canonical graph with a legacy fallback.
+ *
+ * @packageDocumentation
+ * @doc [[WhoUsesCommand]]
+ * @context Reverse dependency lookup invoked via `tsdoc-edge symbol who-uses`
+ * @functionality Resolves incoming dependents from the active canonical `@ttsc/graph` revision with fallback to `.tsdoc.db`
+ * @sideEffect console: Writes reverse-dependency results in human, `--json`, or `--xml` formats to stdout
+ * @sideEffect database: Reads `GraphRepository` and `DatabaseManager` SQLite repositories (read)
+ */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { CanonicalGraphNode } from '../indexer/contracts';
@@ -12,6 +21,7 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
  * Query reverse or outgoing symbol relationships.
  * @public
  * @doc [[WhoUsesCommand]]
+ * @sideEffect console: Writes reverse dependency output to stdout; reads canonical graph and symbol SQLite repositories
  */
 export class WhoUsesCommand extends BaseCommand {
   private dbManager?: DatabaseManager;

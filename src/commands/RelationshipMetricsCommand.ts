@@ -1,6 +1,13 @@
 /**
  * Relationship Metrics Command
+ *
  * @packageDocumentation
+ * @doc [[RelationshipMetricsCommand]]
+ * @doc [[RelationshipCommands]]
+ * @context Graph centrality and symbol importance ranking via `tsdoc-edge relationship metrics`
+ * @functionality Computes degree, betweenness centrality, PageRank, and composite importance scores across canonical `@ttsc/graph` or `.tsdoc.db`
+ * @sideEffect console: Writes ranked symbol centrality metrics or `--json` output to stdout
+ * @sideEffect database: Reads `GraphRepository` and `DatabaseManager` SQLite repositories (read)
  */
 
 import * as fs from 'node:fs';
@@ -25,6 +32,7 @@ interface SymbolMetrics {
 /**
  * Command for calculating graph metrics to identify key symbols
  * @doc [[RelationshipMetricsCommand]]
+ * @sideEffect console: Writes ranked symbol centrality metrics to stdout; reads SQLite repositories
  * @public
  */
 export class RelationshipMetricsCommand extends BaseCommand {

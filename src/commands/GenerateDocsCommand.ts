@@ -1,6 +1,13 @@
 /**
  * Generate Docs Command - Generate enhanced documentation
+ *
  * @packageDocumentation
+ * @doc [[GenerateDocsCommand]]
+ * @doc [[CLI Commands]]
+ * @context Markdown API documentation generation via `tsdoc-edge docs generate`
+ * @functionality Extracts enhanced TSDoc metadata from TypeScript files via `EnhancedDocExtractor` and emits Markdown files via `EnhancedMarkdownGenerator`
+ * @sideEffect console: Writes generation progress and file counts to stdout
+ * @sideEffect filesystem: Reads TypeScript source files and writes generated Markdown documentation files to the output directory
  */
 
 import * as fs from 'node:fs';
@@ -13,7 +20,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * GenerateDocsCommand - Generate enhanced docs
  * @public
  * @doc [[GenerateDocsCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#generate-docs]]
+ * @sideEffect filesystem: Reads TypeScript sources and writes generated Markdown documentation files; logs status to stdout
  */
 export class GenerateDocsCommand extends BaseCommand {
   private extractor: EnhancedDocExtractor;

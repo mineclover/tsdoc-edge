@@ -21,5 +21,5 @@ Persists and queries historical snapshots of symbol, documentation, and relation
 
 ### Implemented By
 
-- StatsHistoryManager → src/analyzer/StatsHistoryManager.ts:17
+- StatsHistoryManager → src/analyzer/StatsHistoryManager.ts:23
 

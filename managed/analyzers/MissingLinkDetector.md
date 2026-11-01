@@ -21,6 +21,6 @@ Detects broken `[[Checkpoint]]` references, orphaned documentation links, and un
 
 ### Implemented By
 
-- MissingLinkDetector → src/analyzer/MissingLinkDetector.ts:1
-- LinkType → src/analyzer/MissingLinkDetector.ts:29
+- MissingLinkDetector → src/analyzer/MissingLinkDetector.ts:101
+- LinkType → src/analyzer/MissingLinkDetector.ts:30
 

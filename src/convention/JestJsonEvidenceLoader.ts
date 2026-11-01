@@ -1,4 +1,13 @@
-/** Load one complete Jest JSON artifact into an in-memory evidence revision. */
+/**
+ * Load one complete Jest JSON artifact into an in-memory evidence revision.
+ *
+ * @doc [[ConventionCheck]]
+ * @doc [[Convention Pack Check]]
+ * @context Deterministic test-runner evidence loader projecting completed Jest JSON handoff reports and `.test-dist` source maps into content-addressed `EvidenceRevision` payloads.
+ * @functionality Validates Jest aggregate counts and run health, maps emitted JavaScript test suites back to authored TypeScript test files via source maps, and constructs an immutable `EvidenceRevision`.
+ * @sideEffect filesystem: Reads Jest JSON report artifacts, emitted test source maps, and authored TypeScript test files from disk.
+ * @packageDocumentation
+ */
 
 import { createHash } from 'node:crypto';
 import * as fs from 'node:fs';
@@ -9,9 +18,28 @@ import {
   type EvidenceRevision,
 } from '../semantic-graph/analysis-input-revisions';
 
+/**
+ * Canonical producer identifier for the Jest JSON evidence loader.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const JEST_JSON_EVIDENCE_LOADER_ID = 'tsdoc-edge/jest-json-evidence-loader' as const;
+
+/**
+ * SemVer version of the Jest JSON evidence loader.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export const JEST_JSON_EVIDENCE_LOADER_VERSION = '1.0.0' as const;
 
+/**
+ * Options selecting the workspace-local Jest JSON report artifact to load.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
+ */
 export interface LoadJestJsonEvidenceOptions {
   readonly artifactPath: string;
   readonly workspaceRoot: string;
@@ -27,6 +55,9 @@ interface SourceMapMapping {
 /**
  * Validate a complete Jest JSON report and derive deterministic runner evidence.
  * The loader intentionally understands only the JSON handoff, never Jest APIs.
+ *
+ * @doc [[ConventionCheck]]
+ * @public
  */
 export function loadJestJsonEvidence(options: LoadJestJsonEvidenceOptions): EvidenceRevision {
   const workspaceRoot = realDirectory(options.workspaceRoot, 'Jest evidence workspace root');

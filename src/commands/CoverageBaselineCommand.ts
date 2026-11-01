@@ -1,4 +1,14 @@
-/** Operate immutable coverage metric baselines and their trend comparisons. */
+/**
+ * Operate immutable coverage metric baselines and their trend comparisons.
+ *
+ * @packageDocumentation
+ * @doc [[Coverage Metrics Contract]]
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @context CLI surface for immutable coverage metric baselines and trend comparisons
+ * @functionality Supports `save`, `compare`, `list`, and `read` operations across `CoverageMetricReportRepository` and `CoverageMetricBaselineRepository`
+ * @sideEffect console: Writes baseline summaries, comparisons, or `--json` output to stdout and errors to stderr
+ * @sideEffect database: Reads coverage reports and reads/writes immutable baselines in SQLite repositories
+ */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
@@ -11,7 +21,13 @@ import { CoverageMetricBaselineRepository } from '../storage/CoverageMetricBasel
 import { CoverageMetricReportRepository } from '../storage/CoverageMetricReportRepository';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
-/** Save or compare source-identified coverage metric reports. */
+/**
+ * Save or compare source-identified coverage metric reports.
+ *
+ * @doc [[Coverage Metrics Contract]]
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @public
+ */
 export class CoverageBaselineCommand extends BaseCommand {
   getName(): string {
     return 'coverage-baseline';

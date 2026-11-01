@@ -1,10 +1,15 @@
 /**
  * Types for doc-code linking and validation
+ *
  * @packageDocumentation
+ * @doc [[LinkingTypes]]
+ * @context Bidirectional code-to-document and document-to-code link indexing, validation, and auto-repair
+ * @functionality Defines CodeLink, DocLink, LinkIndex, LinkValidationResult, LinkValidationReport, and FixResult contracts
  */
 
 /**
  * Link from document to code
+ * @doc [[LinkingTypes]]
  * @public
  */
 export interface CodeLink {
@@ -24,6 +29,7 @@ export interface CodeLink {
 
 /**
  * Link from code to document
+ * @doc [[LinkingTypes]]
  * @public
  */
 export interface DocLink {
@@ -43,6 +49,7 @@ export interface DocLink {
 
 /**
  * Bidirectional link index
+ * @doc [[LinkingTypes]]
  * @public
  */
 export interface LinkIndex {
@@ -58,6 +65,7 @@ export interface LinkIndex {
 
 /**
  * Link validation result
+ * @doc [[LinkingTypes]]
  * @public
  */
 export interface LinkValidationResult {
@@ -69,6 +77,7 @@ export interface LinkValidationResult {
 
 /**
  * Validation report
+ * @doc [[LinkingTypes]]
  * @public
  */
 export interface LinkValidationReport {
@@ -80,6 +89,7 @@ export interface LinkValidationReport {
 
 /**
  * Link fix result
+ * @doc [[LinkingTypes]]
  * @public
  */
 export interface FixResult {

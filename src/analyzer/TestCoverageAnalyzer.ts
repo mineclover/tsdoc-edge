@@ -3,6 +3,9 @@
  * Creates relationships between tests and implementation symbols
  *
  * @packageDocumentation
+ * @doc [[TestCoverageAnalyzer]]
+ * @sideEffect database: Queries SQLite symbol and test symbol tables via `DatabaseManager` (read)
+ * @sideEffect filesystem: Reads test source files from disk for import resolution (read)
  * @see [[TEST_SYMBOL_EXTRACTION]] Phase 5
  */
 
@@ -61,6 +64,8 @@ export interface RelationshipExtractionResult {
  * @doc [[TestCoverageAnalyzer]]
  * @public
  * @responsibility Create test-coverage, contains, and covers-scenario relationships
+ * @sideEffect database: Queries SQLite symbol and test symbol tables via `DatabaseManager` (read)
+ * @sideEffect filesystem: Reads test source files from disk for import resolution (read)
  */
 export class TestCoverageAnalyzer {
   private db: DatabaseManager;

@@ -149,4 +149,35 @@ const spec = specGenerator.generate(moduleAnalysis);
 ### Implemented By
 
 - Code Generation → src/generator/CommentExporter.ts:1
+- XMLContextGenerator → src/generator/XMLContextGenerator.ts:23
+- JsonBuilder → src/output/JsonBuilder.ts:36
+- XmlBuilder → src/output/XmlBuilder.ts:81
+- XmlParseError → src/output/XmlParser.ts:25
+- SchemaValidationError → src/output/XmlParser.ts:43
+- ParsedData → src/output/XmlParser.ts:61
+- XmlParser → src/output/XmlParser.ts:209
+- createBuilder → src/output/index.ts:32
+- getOutputFormat → src/output/index.ts:49
+- isHumanFormat → src/output/index.ts:62
+- DepsSchema → src/output/schemas.ts:19
+- WhoUsesSchema → src/output/schemas.ts:50
+- EndpointsSchema → src/output/schemas.ts:75
+- HubsSchema → src/output/schemas.ts:94
+- LayersSchema → src/output/schemas.ts:112
+- CommonSchema → src/output/schemas.ts:129
+- RoutesSchema → src/output/schemas.ts:150
+- BuildResultSchema → src/output/schemas.ts:168
+- FieldType → src/output/types.ts:16
+- FieldDef → src/output/types.ts:24
+- ObjectSchema → src/output/types.ts:35
+- ArraySchema → src/output/types.ts:45
+- GroupedArraySchema → src/output/types.ts:58
+- OutputSchema → src/output/types.ts:72
+- arrayOf → src/output/types.ts:85
+- groupedArrayOf → src/output/types.ts:105
+- SectionData → src/output/types.ts:126
+- GroupedSectionData → src/output/types.ts:135
+- OutputData → src/output/types.ts:143
+- OutputFormat → src/output/types.ts:153
+- OutputBuilder → src/output/types.ts:161
 

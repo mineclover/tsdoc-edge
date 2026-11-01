@@ -39,5 +39,5 @@ Display help information for CLI commands.
 
 ### Implemented By
 
-- HelpCommand → src/commands/HelpCommand.ts:1
+- HelpCommand → src/commands/HelpCommand.ts:44
 

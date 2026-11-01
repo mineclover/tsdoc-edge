@@ -26,5 +26,5 @@ Renders Mermaid relationship diagrams centered on a target symbol with configura
 
 ### Implemented By
 
-- RelationshipVisualizeCommand → src/commands/RelationshipVisualizeCommand.ts:29
+- RelationshipVisualizeCommand → src/commands/RelationshipVisualizeCommand.ts:38
 

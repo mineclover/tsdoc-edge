@@ -1,17 +1,26 @@
 /**
  * Specification document types
+ *
  * @packageDocumentation
+ * @doc [[ModuleSpecTypes]]
+ * @doc [[SpecTypes]]
  * @responsibility Define types for specification management
+ * @context Specification lifecycle, completeness scoring, content similarity, and unused document governance
+ * @functionality Defines status transitions, metadata contracts, section requirements, and completeness result types
  */
 
 /**
  * Specification document status
+ * @doc [[SpecTypes]]
+ * @doc [[ModuleSpecTypes]]
  * @public
  */
 export type SpecStatus = 'draft' | 'review' | 'approved' | 'active' | 'deprecated' | 'archived';
 
 /**
  * Specification document metadata
+ * @doc [[SpecTypes]]
+ * @doc [[ModuleSpecTypes]]
  * @public
  */
 export interface SpecMetadata {
@@ -42,6 +51,8 @@ export interface SpecMetadata {
 
 /**
  * Required sections for specification documents
+ * @doc [[SpecTypes]]
+ * @doc [[ModuleSpecTypes]]
  * @public
  */
 export interface SpecRequirements {
@@ -63,6 +74,8 @@ export interface SpecRequirements {
 
 /**
  * Specification completeness validation result
+ * @doc [[SpecTypes]]
+ * @doc [[ModuleSpecTypes]]
  * @public
  */
 export interface SpecCompletenessResult {
@@ -135,6 +148,8 @@ export interface SpecCompletenessResult {
 
 /**
  * Content similarity detection result
+ * @doc [[SpecTypes]]
+ * @doc [[ModuleSpecTypes]]
  * @public
  */
 export interface ContentSimilarity {
@@ -162,6 +177,8 @@ export interface ContentSimilarity {
 
 /**
  * Unused document detection result
+ * @doc [[SpecTypes]]
+ * @doc [[ModuleSpecTypes]]
  * @public
  */
 export interface UnusedDocument {
@@ -189,6 +206,8 @@ export interface UnusedDocument {
 
 /**
  * Specification status transition
+ * @doc [[SpecTypes]]
+ * @doc [[ModuleSpecTypes]]
  * @public
  */
 export interface SpecStatusTransition {

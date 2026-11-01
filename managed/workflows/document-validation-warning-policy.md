@@ -8,7 +8,7 @@ canonical: true
 
 # [[Document Validation Warning Policy]]
 
-`validate-docs managed`의 warning은 오류와 같은 의미가 아니다. 이 문서는 문서 구조를
+`validate docs managed`의 warning은 오류와 같은 의미가 아니다. 이 문서는 문서 구조를
 개선해야 하는 경고와 설계 문서 특성상 허용되는 경고를 구분하고, baseline을 재현 가능하게
 관리한다. 정적 품질 규칙의 실행 계약은 [[Lint Governance]]가 소유하고, 이 문서는 문서
 검증 warning의 disposition과 baseline을 소유한다.

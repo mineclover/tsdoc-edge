@@ -1,6 +1,13 @@
 /**
  * Todos Command - Show TODO items from future plans
+ *
  * @packageDocumentation
+ * @doc [[TodosCommand]]
+ * @doc [[CLI Commands]]
+ * @context Pending `@privateRemarks` TODO listing invoked via `tsdoc-edge docs todos`
+ * @functionality Queries future plan items from `.tsdoc.db` and renders prioritized TODO lists with status icons and effort estimates
+ * @sideEffect console: Writes formatted TODO lists and counts to stdout
+ * @sideEffect database: Reads future plan rows from `DatabaseManager` (read)
  */
 
 import { DatabaseManager } from '../storage/DatabaseManager';
@@ -14,7 +21,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @responsibility Display all TODO items from future plans
  * @contract Reads database, extracts todos, displays with stats
  * @doc [[TodosCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#todos]]
+ * @sideEffect console: Writes TODO item listings to stdout; reads `.tsdoc.db`
  *
  * @problem Need to see all pending work items across codebase
  * @solves Shows all `@privateRemarks` plan items formatted as TODO list

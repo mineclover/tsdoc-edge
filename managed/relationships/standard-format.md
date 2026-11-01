@@ -297,7 +297,7 @@ See implementation: RelationshipCategory
 type RelationshipDirection =
   | 'unidirectional'  // A � B
   | 'bidirectional'   // A � B
-  | 'undirected';     // A  B (no direction)
+  | 'undirected';     // A — B (no direction)
 ```
 
 ### RelationshipStrength

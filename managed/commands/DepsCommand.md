@@ -143,7 +143,7 @@ tsdoc-edge deps --help
 ## Related
 
 - [[WhoUsesCommand]]: Reverse dependencies (who uses this symbol)
-- [[UsedByCommand]]: Registry-based reverse dependencies
+- [[WhoUsesCommand]]: Registry-based reverse dependencies
 - [[SymbolRegistryManager]]: Registry data access
 - [[OrphansCommand]]: Find symbols with no dependencies or usages
 
@@ -170,7 +170,6 @@ Source: `src/commands/Phase5Commands.ts`
 - [[TSDoc Edge Documentation]] → managed/README.md:102
 - [[OrphansCommand]] → managed/commands/OrphansCommand.md:179
 - [[TreeCommand]] → managed/commands/TreeCommand.md:293
-- [[UsedByCommand]] → managed/commands/UsedByCommand.md:118
 - [[WhoUsesCommand]] → managed/commands/WhoUsesCommand.md:168
 - [[DatabaseManager]] → managed/core-components/DatabaseManager.md:289
 - [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:155
@@ -183,5 +182,5 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Implemented By
 
-- DepsCommand → src/commands/DepsCommand.ts:17
+- DepsCommand → src/commands/DepsCommand.ts:27
 

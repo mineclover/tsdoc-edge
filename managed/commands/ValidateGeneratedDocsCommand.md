@@ -21,5 +21,5 @@ Verifies that generated Markdown documentation remains synchronized with current
 
 ### Implemented By
 
-- ValidateGeneratedDocsCommand → src/commands/ValidateGeneratedDocsCommand.ts:37
+- ValidateGeneratedDocsCommand → src/commands/ValidateGeneratedDocsCommand.ts:45
 

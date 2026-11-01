@@ -1,6 +1,13 @@
 /**
  * Suggest Command - Generate improvement suggestions
+ *
  * @packageDocumentation
+ * @doc [[SuggestCommand]]
+ * @doc [[CLI Commands]]
+ * @context Documentation improvement recommendation command invoked via `tsdoc-edge docs suggest`
+ * @functionality Evaluates TypeScript files via `CodeHealthChecker` and produces prioritized documentation improvement suggestions
+ * @sideEffect console: Writes prioritized documentation suggestions to stdout
+ * @sideEffect filesystem: Reads TypeScript source files on disk (read)
  */
 
 import * as fs from 'node:fs';
@@ -11,7 +18,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * SuggestCommand - Generate improvement suggestions
  * @public
  * @doc [[SuggestCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#suggest]]
+ * @sideEffect console: Writes documentation improvement suggestions to stdout; reads TypeScript source files
  */
 export class SuggestCommand extends BaseCommand {
   private checker: CodeHealthChecker;
@@ -166,5 +175,6 @@ export class SuggestCommand extends BaseCommand {
  * InitCommand - Initialize configuration
  * @public
  * @doc [[InitCommand]]
+ * @doc [[CLI Commands]]
  * @doc [[CLI Commands#init]]
  */

@@ -6,11 +6,20 @@
  *
  * @packageDocumentation
  * @internal
-
- * @doc [[cache-manager]] */
+ * @doc [[cache-manager]]
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @context Bounded in-memory caching layer for long-running LSP server sessions
+ * @functionality Named TTL cache creation, LRU capacity eviction, periodic timer sweeps, and deterministic disposal
+ * @sideEffect state: caches - Maintains TTL-bounded in-memory caches and periodic cleanup timer
+ */
 
 /**
  * Cache entry with TTL tracking
+ *
+ * @doc [[cache-manager]]
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
  * @internal
  */
 export interface CacheEntry<T> {
@@ -22,6 +31,10 @@ export interface CacheEntry<T> {
 
 /**
  * Configuration options for CacheManager
+ *
+ * @doc [[cache-manager]]
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
  * @internal
  */
 export interface CacheManagerOptions {
@@ -51,6 +64,10 @@ export interface CacheManagerOptions {
  * cacheManager.dispose();
  * ```
  *
+ * @doc [[cache-manager]]
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @sideEffect state: this.caches - Evicts expired entries and manages background cleanup interval
  * @internal
  */
 export class CacheManager {

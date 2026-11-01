@@ -49,6 +49,7 @@ interface Fallback {
 /**
  * Alternatives Analyzer
  *
+ * @doc [[AlternativesAnalyzer]]
  * @public
  * @responsibility Detect and analyze alternative relationships
  */

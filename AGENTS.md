@@ -2,17 +2,19 @@
 
 This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
-## 프로젝트 현황 (2026-11-01)
+## 프로젝트 현황 (2026-11-02)
 
 | Metric | Value |
 |--------|-------|
 | CLI Commands | 20 top-level (10 Core + 7 Unified Groups + 3 Revision/Coverage) |
-| Test Cases | 3,265 (238 suites) |
-| Symbols | 10,450+ |
-| Canonical `@ttsc/graph` | 8,424 internal (8,676 total) nodes / 17,075 internal (21,236 total) edges |
+| Test Cases | 3,247 (237 suites) |
+| Symbols | 10,409 (Enrichment DB) |
+| Canonical `@ttsc/graph` | 8,354 internal (8,606 total) nodes / 16,980 internal (21,133 total) edges |
+| Normative `SpecGraph` | 8 `project-spec` docs · 62 nodes · 54 bindings (`54/54` satisfied) |
+| Code ↔ Doc `@doc` Coverage | 310/310 `src/` files + 6/6 `mcp-server/src/` files (`100%` file coverage · `0` unused docs) |
 | Custom TSDoc Tags | 22 + Standard 29 + `@ttsc/graph` 6 |
 | `@ttsc/lint` | 25 error rules (0 findings) |
-| Health Score | 90/100 (A) system-status · 93/100 (A+) core modules |
+| Health Score | 90/100 (A) system-status · 89/100 (A) spec metrics · 93/100 (A+) core modules |
 
 ## 프로젝트 개요
 
@@ -191,21 +193,28 @@ node dist/lsp/server.js
 
 ```
 src/
-├── analyzer/      # 분석 (품질, 커버리지)
-├── cli.ts        # CLI 엔트리포인트
-├── commands/     # CLI 명령어
-├── doc-symbol/   # [[Symbol]] 시스템
-├── graph/        # 심볼 그래프
-├── lsp/          # LSP 서버 (server.ts, service.ts, cache-manager.ts, statement-manager.ts)
-├── parser/       # TSDoc 파싱
-├── storage/      # DB + JSONL
-├── validator/    # 검증
-└── types/        # 타입 정의
+├── analyzer/       # 분석 (품질, 커버리지, 도메인 관계)
+├── cli.ts          # CLI 엔트리포인트
+├── commands/       # 20개 정본 CLI 최상위 명령 및 통합 그룹
+├── convention/     # 규약 팩 컴파일 및 정합성 평가 엔진
+├── doc-symbol/     # [[Symbol]] 체크포인트 및 Backlinks 시스템
+├── graph/          # 심볼 그래프
+├── graph-analysis/ # 정본 @ttsc/graph 질의 및 프로젝션
+├── indexer/        # graph-router 어댑터 및 정본 그래프 조립
+├── lsp/            # LSP 서버 및 실시간 오버레이 그래프
+├── parser/         # 통합 Microsoft TSDoc AST 파싱
+├── provider/       # 시맨틱 그래프 프로바이더
+├── semantic-graph/ # 코드 그래프 + SpecGraph 통합 뷰
+├── spec/           # 명세 완성도·메트릭 및 미사용 문서 탐지
+├── spec-graph/     # 실행 가능한 SpecGraph(`tsdoc-spec`) 추출기
+├── storage/        # SQLite (.tsdoc.db, canonical-graph.db, spec-graph.db) + JSONL
+├── types/          # 타입 정의
+└── validator/      # 문서·연결성·명세 검증
 ```
 
 ## 추가 참고
 
 - `README.md`: 프로젝트 개요 및 전체 기능
+- `managed/specs/index.md`: 전 서브시스템 규범 명세(`SpecGraph`, 54개 코드 바인딩)
 - `managed/workflows/work-context-workflow.md`: work-context 명령어 상세
-- `managed/features/`: 기능별 명세서
-- `managed/features/lsp-integration.md`: LSP 통합 상세 문서
+- `managed/features/`: 기능별 명세서 (`lsp-integration.md`, `mcp-integration.md` 등)

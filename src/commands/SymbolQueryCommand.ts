@@ -2,11 +2,16 @@
  * Symbol Query Command - Search and explore document symbols
  *
  * @packageDocumentation
- * @responsibility Query and explore [[Symbol]] definitions and references
+ * @doc [[SymbolQueryCommand]]
+ * @responsibility Query and explore `[[Symbol]]` definitions and references
  *
  * @problem Users need to find symbols, check their usage, and explore connections
  * @solves Provides comprehensive symbol search and exploration capabilities
  * @context Part of symbol reference system for convention management
+ * @functionality Queries canonical `@ttsc/graph` code nodes, `.tsdoc.db` enrichment records, and `[[Symbol]]` document checkpoints with backlink and binding inspection
+ * @sideEffect console: Writes symbol matches, checkpoint details, and `--json` payloads to stdout
+ * @sideEffect database: Reads canonical `@ttsc/graph` and `.tsdoc.db` SQLite repositories (read)
+ * @sideEffect filesystem: Scans managed Markdown documents and TypeScript source files for `@doc` checkpoints (read)
  */
 
 import * as fs from 'node:fs';
@@ -64,6 +69,7 @@ interface SymbolInfo {
  * @public
  * @responsibility Provide symbol search and exploration capabilities
  * @contract Parse documents, index symbols, respond to queries
+ * @sideEffect console: Writes symbol query results to stdout; reads SQLite repositories and managed Markdown files
  *
  * @functionality
  * - Symbol search: Find symbols by name or pattern

@@ -21,5 +21,5 @@ Orchestrates behavioral relationship detection across collaboration, composition
 
 ### Implemented By
 
-- BehavioralAnalyzer → src/analyzer/BehavioralAnalyzer.ts:1
+- BehavioralAnalyzer → src/analyzer/BehavioralAnalyzer.ts:68
 

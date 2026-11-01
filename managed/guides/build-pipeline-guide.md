@@ -239,7 +239,7 @@ tsdoc-edge build src
 **Command**: Part of build or standalone
 
 ```bash
-tsdoc-edge analyze-calls
+tsdoc-edge relationship analyze --type=calls
 ```
 
 **What Happens**:
@@ -264,7 +264,7 @@ tsdoc-edge analyze-calls
 **Command**: Part of build or standalone
 
 ```bash
-tsdoc-edge analyze-io
+tsdoc-edge relationship analyze --type=io
 ```
 
 **What Happens**:
@@ -289,7 +289,7 @@ tsdoc-edge analyze-io
 **Command**: Uses I/O dependencies
 
 ```bash
-tsdoc-edge analyze-pipeline
+tsdoc-edge relationship analyze --type=chains
 ```
 
 **What Happens**:
@@ -394,7 +394,7 @@ tsdoc-edge search "BuildCommand"
 tsdoc-edge deps BuildCommand
 
 # Get reverse dependencies
-tsdoc-edge who-uses DatabaseManager
+tsdoc-edge symbol who-uses DatabaseManager
 
 # Find orphans
 tsdoc-edge orphans
@@ -486,8 +486,8 @@ tsdoc-edge parse src/commands/BuildCommand.ts
 
 **Issue**: Expected relationships not found
 **Solution**:
-- Run `tsdoc-edge analyze-calls` after build
-- Run `tsdoc-edge analyze-io` for data flow
+- Run `tsdoc-edge relationship analyze --type=calls` after build
+- Run `tsdoc-edge relationship analyze --type=io` for data flow
 - Check if symbols are exported
 
 ## Best Practices
@@ -521,15 +521,15 @@ tsdoc-edge build src && tsdoc-edge health src
 # .git/hooks/pre-commit
 #!/bin/bash
 tsdoc-edge build src
-tsdoc-edge validate-docs managed
+tsdoc-edge validate docs managed
 ```
 
 ## Related Documentation
 
 **Commands**:
 - [[BuildCommand]] (`managed/features/core-workflow.md`)
-- [[AnalyzeCallsCommand]] (analyze-calls)
-- [[AnalyzeIOCommand]] (analyze-io)
+- [[AnalyzeCallsCommand]] (`tsdoc-edge relationship analyze --type=calls`)
+- [[AnalyzeIOCommand]] (`tsdoc-edge relationship analyze --type=io`)
 
 **Analyzers**:
 - [[ASTSymbolExtractor]] (`managed/analyzers/ASTSymbolExtractor.md`)

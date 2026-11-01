@@ -1,5 +1,10 @@
 /**
  * Canonical graph queries and relationship projections.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @context Read-only semantic query and relationship projection service over an immutable `CanonicalProjectGraph` revision.
+ * @functionality Resolves symbols, traverses direct dependencies, dependents, and cycle-safe change impact, computes per-node degree metrics and graph summaries, and projects supported edges into `UnifiedRelationship` records.
  * @packageDocumentation
  */
 
@@ -25,6 +30,13 @@ import type {
 } from './contracts';
 import { DEPENDENCY_GRAPH_EDGE_KINDS, graphEdgeSemantic } from './edge-semantics';
 
+/**
+ * Filter options controlling which canonical edges are projected into `UnifiedRelationship` records.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
+ * @public
+ */
 export interface RelationshipProjectionOptions {
   /** Include only these raw producer kinds. */
   readonly edgeKinds?: readonly string[];
@@ -38,6 +50,9 @@ export interface RelationshipProjectionOptions {
  * Edge direction is explicit. Dependency-family relations use `from -> to` to
  * mean that `from` depends on `to`; ownership/module relations may use another
  * query policy and are excluded from dependency traversal by default.
+ *
+ * @doc [[GraphAndPersistencePlaneSpecification]]
+ * @doc [[Semantic Graph Analysis and Relationship Model]]
  * @public
  */
 export class GraphAnalysisService {

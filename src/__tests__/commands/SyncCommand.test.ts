@@ -118,8 +118,8 @@ describe('SyncCommand', () => {
     expect(report.stages.map((s) => `${s.stage}:${s.status}`)).toEqual([
       'build:passed',
       'docs:passed',
-      'specs:passed',
       'backlinks:passed',
+      'specs:passed',
     ]);
   });
 

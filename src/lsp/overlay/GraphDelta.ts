@@ -1,6 +1,11 @@
 /**
  * In-memory canonical graph delta for one dirty file.
+ *
  * @packageDocumentation
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @context Content-addressed unsaved-file delta model and pure composition algebra over persisted `@ttsc/graph` revisions
+ * @functionality Builds file-scoped `GraphDelta` snapshots from incremental extracts and composes deltas into transient `EffectiveCodeGraph` projections
  */
 
 import { createHash } from 'node:crypto';
@@ -16,17 +21,44 @@ import type { CanonicalDiagnostic } from '../../indexer/diagnostics-contract';
 import { normalizeLegacyKind } from '../../indexer/legacy-id';
 import type { ExtractedSymbol, IncrementalExtractResult } from '../incremental-builder';
 
+/**
+ * Identity tuple (`kind`, `from`, `to`) uniquely addressing a canonical graph edge in delta operations.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export interface GraphDeltaEdgeKey {
   readonly kind: string;
   readonly from: string;
   readonly to: string;
 }
 
+/**
+ * Contract version of the `GraphDelta` envelope.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export const GRAPH_DELTA_CONTRACT_VERSION = '1.0' as const;
 
+/**
+ * Outgoing relationship completeness guaranteed by an overlay delta extractor.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export type GraphDeltaRelationshipCoverage = 'none' | 'owned-outgoing-complete';
 
-/** Extractor identity included in every content-addressed delta. */
+/**
+ * Extractor identity included in every content-addressed delta.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export interface GraphDeltaExtractorIdentity {
   readonly id: string;
   readonly version: string;
@@ -37,20 +69,38 @@ export interface GraphDeltaExtractorIdentity {
   readonly relationshipCoverage: GraphDeltaRelationshipCoverage;
 }
 
-/** Default syntax-only extractor used for unsaved TypeScript buffers. */
+/**
+ * Default syntax-only extractor used for unsaved TypeScript buffers.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export const LSP_SYNTAX_GRAPH_DELTA_EXTRACTOR: GraphDeltaExtractorIdentity = Object.freeze({
   id: 'tsdoc-edge/lsp-incremental-builder',
   version: '1.0',
   relationshipCoverage: 'none',
 });
 
-/** Explicit provider assertion that a removed node and an upserted node share identity. */
+/**
+ * Explicit provider assertion that a removed node and an upserted node share identity.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export interface GraphDeltaIdentityRemap {
   readonly fromNodeId: string;
   readonly toNodeId: string;
 }
 
-/** Provider proof retained when canonical changes originate from a semantic delta. */
+/**
+ * Provider proof retained when canonical changes originate from a semantic delta.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export interface GraphDeltaProviderSourceContext {
   readonly kind: 'semantic-provider-delta';
   readonly baseProviderSnapshotId: string;
@@ -62,7 +112,13 @@ export interface GraphDeltaProviderSourceContext {
   readonly capabilityDigest: string;
 }
 
-/** File-scoped overlay delta applied on top of one saved canonical revision. */
+/**
+ * File-scoped overlay delta applied on top of one saved canonical revision.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export interface GraphDelta {
   readonly contractVersion: typeof GRAPH_DELTA_CONTRACT_VERSION;
   readonly deltaId: string;
@@ -86,7 +142,13 @@ export interface GraphDelta {
   readonly diagnostics?: readonly CanonicalDiagnostic[];
 }
 
-/** Build a canonical-id GraphDelta from a TS5 syntax overlay extract. */
+/**
+ * Build a canonical-id `GraphDelta` from a TS5 syntax overlay extract.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 // biome-ignore lint/complexity/noStaticOnlyClass: Preserve the established GraphDeltaBuilder API.
 export class GraphDeltaBuilder {
   static fromExtract(options: {
@@ -344,13 +406,25 @@ export class GraphDeltaBuilder {
   }
 }
 
-/** Identifies the persisted graph revision on which deltas were built. */
+/**
+ * Identifies the persisted graph revision on which deltas were built.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export interface CodeGraphRevision {
   readonly revisionId: string;
   readonly graph: CanonicalProjectGraph;
 }
 
-/** A transient code graph that must never be confused with a persisted revision. */
+/**
+ * A transient code graph that must never be confused with a persisted revision.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export interface EffectiveCodeGraph {
   readonly viewKind: 'effective-code-graph';
   readonly baseRevisionId: string;
@@ -360,7 +434,13 @@ export interface EffectiveCodeGraph {
   readonly graph: CanonicalProjectGraph;
 }
 
-/** Apply one validated file-scoped delta to its persisted base revision. */
+/**
+ * Apply one validated file-scoped delta to its persisted base revision.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
+ */
 export function applyGraphDelta(base: CodeGraphRevision, delta: GraphDelta): EffectiveCodeGraph {
   return composeGraphDeltas(base, [delta]);
 }
@@ -368,6 +448,10 @@ export function applyGraphDelta(base: CodeGraphRevision, delta: GraphDelta): Eff
 /**
  * Compose dirty-file deltas in normalized file order against one saved revision.
  * Every delta must name the same revision and base graph fingerprint.
+ *
+ * @doc [[LspAndCoverageSurfaceSpecification]]
+ * @doc [[LSP Integration]]
+ * @public
  */
 export function composeGraphDeltas(
   base: CodeGraphRevision,

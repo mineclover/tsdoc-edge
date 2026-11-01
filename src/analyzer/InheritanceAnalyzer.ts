@@ -8,6 +8,10 @@
  * - Override member detection
  *
  * @packageDocumentation
+ * @doc [[Inheritance]]
+ * @doc [[Analyzer System]]
+ * @context TypeScript AST heritage analyzer extracting `extends` and `implements` hierarchies, abstraction tiers, and member overrides
+ * @functionality Class and interface heritage traversal, abstraction classification, chain depth validation, and override detection
  */
 
 import * as ts from 'typescript';
@@ -28,6 +32,12 @@ import type {
 
 /**
  * Analyzes inheritance relationships with enhanced metadata
+ *
+ * @doc [[Inheritance]]
+ * @doc [[Analyzer System]]
+ * @context Resolves class/interface `extends` and `implements` clauses across a `ts.Program` and `Symbol` map
+ * @functionality Produces `InheritanceRelationship` edges, multi-level `InheritanceChain` diagnostics, and full `InheritanceHierarchy` trees
+ * @public
  */
 export class InheritanceAnalyzer {
   private program: ts.Program;

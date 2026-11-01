@@ -208,16 +208,16 @@ Files discovered: 87 / 126      (69.0%) ⬆️
 
 ---
 
-## Step 6: promote-symbol (선택)
+## Step 6: symbol promote (선택)
 
 핵심 심볼을 H1 canonical로 승격:
 
 ```bash
 # Code Dependency 승격
-node dist/cli.js promote-symbol managed/relationships/code-dependency.md "Code Dependency"
+node dist/cli.js symbol promote managed/relationships/code-dependency.md "Code Dependency"
 
 # I/O Dependency 승격
-node dist/cli.js promote-symbol managed/relationships/io-dependency.md "I/O Dependency"
+node dist/cli.js symbol promote managed/relationships/io-dependency.md "I/O Dependency"
 ```
 
 **Before** (`code-dependency.md`):
@@ -254,7 +254,7 @@ created-at: 2025-11-08T00:00:00Z
 ### 7.1 심볼 참조 검증
 
 ```bash
-node dist/cli.js validate-symbol-refs managed
+node dist/cli.js validate refs managed
 ```
 
 **결과**:
@@ -294,8 +294,8 @@ File coverage: 92.3% ✓
 | 3 | `explore-entrypoint` | 14.3% 심볼 커버리지 |
 | 4 | `--detect-orphans` | 89개 고아 파일, 1,295개 고아 심볼 |
 | 5 | 진입점 확장 | 33.9% 심볼 커버리지 (개선) |
-| 6 | `promote-symbol` | 2개 H1 canonical 생성 |
-| 7 | `validate-symbol-refs` | 모든 참조 유효 ✓ |
+| 6 | `symbol promote` | 2개 H1 canonical 생성 |
+| 7 | `validate refs` | 모든 참조 유효 ✓ |
 | 8 | 최종 탐색 | 95.1% 심볼 커버리지 ✓ |
 
 ---
