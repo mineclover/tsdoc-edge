@@ -88,7 +88,7 @@ export interface DependencyRelation {
   targetId: string;
 
   /**
-   * Why this dependency exists (from TSDoc @uses)
+   * Why this dependency exists (from TSDoc `@uses`)
    */
   reason: string;
 
@@ -135,12 +135,12 @@ export interface SymbolRegistryEntry {
   notes?: string;
 
   /**
-   * Dependencies (from @uses tags in TSDoc)
+   * Dependencies (from `@uses` tags in TSDoc)
    */
   uses?: DependencyRelation[];
 
   /**
-   * Reverse dependencies (from @usedBy tags in TSDoc)
+   * Reverse dependencies (from `@usedBy` tags in TSDoc)
    */
   usedBy?: DependencyRelation[];
 }

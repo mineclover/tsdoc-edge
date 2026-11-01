@@ -380,7 +380,7 @@ export class InterfaceAnalyzer {
    * Extract JSDoc comment from node
    *
    * @param node - AST node
-   * @param sourceFile - Source file
+   * @param _sourceFile - Source file
    * @returns Documentation string
    */
   private extractJSDocComment(node: ts.Node, _sourceFile: ts.SourceFile): string | undefined {

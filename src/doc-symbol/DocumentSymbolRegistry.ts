@@ -51,7 +51,7 @@ export class DocumentSymbolRegistry {
    * Register a parsed document
    *
    * @param symbols - Parsed document symbols
-   * @throws {Error} If duplicate primary definition in same file
+   * @throws `Error` if duplicate primary definition in same file
    * @returns void - No return value
    */
   registerDocument(symbols: ParsedDocSymbols): void {

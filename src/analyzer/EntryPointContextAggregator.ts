@@ -321,7 +321,7 @@ export class EntryPointContextAggregator {
    *
    * @param docSymbol - Document symbol
    * @param context - Context to populate
-   * @param depth - Traversal depth
+   * @param _depth - Traversal depth
    * @private
    */
   private gatherDocumentContext(docSymbol: string, context: UnifiedContext, _depth: number): void {

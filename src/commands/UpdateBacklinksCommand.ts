@@ -28,7 +28,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @functionality
  * - Document scanning: Find all markdown files
  * - Symbol registry: Build complete symbol reference map
- * - Code connections: Parse @doc tags from TypeScript files
+ * - Code connections: Parse `@doc` tags from TypeScript files
  * - Backlink generation: Create backlink sections for each symbol
  * - File updates: Write updated backlinks to documents
  *

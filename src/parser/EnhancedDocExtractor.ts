@@ -66,7 +66,7 @@ export interface ExtractedEnhancedDoc {
  * @rationale Structured tags are more reliable than NLP for extracting metadata
  * @consequences Requires developers to use custom tags, More predictable results
  *
- * @depends typescript, @microsoft/tsdoc
+ * @depends typescript, `@microsoft/tsdoc`
  * @depType external
  * @depReason TypeScript Compiler API for AST, TSDoc for comment parsing
  *

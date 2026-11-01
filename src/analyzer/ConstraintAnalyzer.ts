@@ -162,7 +162,7 @@ export class ConstraintAnalyzer {
    * Extract imports from a source file
    *
    * @param sourceFile - TypeScript source file
-   * @param filePath - File path
+   * @param _filePath - File path
    * @returns Array of imported symbols
    * @private
    */

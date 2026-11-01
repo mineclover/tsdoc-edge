@@ -139,7 +139,7 @@ export class DocCodeLinker {
   }
 
   /**
-   * Parse TSDoc @see and @link tags
+   * Parse TSDoc `@see` and `@link` tags
    *
    * @param codePath - Code file path
    * @returns Parsed doc links

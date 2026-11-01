@@ -16,15 +16,15 @@ type SymbolType = 'function' | 'class' | 'interface' | 'type' | 'enum' | 'variab
  * Validates TSDoc comments against defined conventions
  *
  * Enforces minimum documentation requirements based on symbol type:
- * - Functions: summary, @param, @returns, @doc [[ConventionValidator]]
- * @public
- * - Classes: summary, constructor docs, method docs, @public
- * - Interfaces: summary, property docs, @public
- * - Types: summary, usage description, @public
- * - Enums: summary, member docs, @public
- * - Variables: summary, @public for exports
+ * - Functions: summary, `@param`, `@returns`, `@doc [[ConventionValidator]]`
+ * - Classes: summary, constructor docs, method docs, `@public`
+ * - Interfaces: summary, property docs, `@public`
+ * - Types: summary, usage description, `@public`
+ * - Enums: summary, member docs, `@public`
+ * - Variables: summary, `@public` for exports
  *
  * @id 005
+ * @doc [[ConventionValidator]]
  * @public
  * @responsibility Validate TSDoc comments against naming and documentation conventions
  * @contract Enforce summary, public tags, parameter docs, and return value documentation
@@ -183,6 +183,9 @@ export class ConventionValidator {
           });
         }
         break;
+
+      case 'unknown':
+        break;
     }
   }
 
@@ -190,7 +193,7 @@ export class ConventionValidator {
    * Check if doc comment has a specific custom tag
    *
    * @param docComment - TSDoc comment
-   * @param tagName - Tag name to check (e.g., '@responsibility')
+   * @param tagName - Tag name to check (e.g., `@responsibility`)
    * @returns True if tag exists
    */
   private hasCustomTag(docComment: DocComment, tagName: string): boolean {
@@ -208,10 +211,10 @@ export class ConventionValidator {
   }
 
   /**
-   * Check if doc comment has @public tag
+   * Check if doc comment has `@public` tag
    *
    * @param docComment - TSDoc comment
-   * @returns True if @public tag exists
+   * @returns True if `@public` tag exists
    */
   private hasPublicTag(docComment: DocComment): boolean {
     const modifierTag = docComment.modifierTagSet.nodes.find((tag) => tag.tagName === '@public');
@@ -233,7 +236,7 @@ export class ConventionValidator {
   /**
    * Get list of undocumented parameters
    *
-   * @param docComment - TSDoc comment
+   * @param _docComment - TSDoc comment
    * @returns Array of parameter names that are not documented
    */
   private getUndocumentedParams(_docComment: DocComment): string[] {
@@ -243,10 +246,10 @@ export class ConventionValidator {
   }
 
   /**
-   * Check if doc comment has @returns tag
+   * Check if doc comment has `@returns` tag
    *
    * @param docComment - TSDoc comment
-   * @returns True if @returns tag exists
+   * @returns True if `@returns` tag exists
    */
   private hasReturnsTag(docComment: DocComment): boolean {
     return !!docComment.returnsBlock;
@@ -255,7 +258,7 @@ export class ConventionValidator {
   /**
    * Check if the function should document returns
    *
-   * @param parsedComment - Parsed doc comment
+   * @param _parsedComment - Parsed doc comment
    * @returns True if return documentation is required
    */
   private shouldHaveReturns(_parsedComment: ParsedDocComment): boolean {

@@ -171,7 +171,7 @@ export class FeatureGroupingAnalyzer {
   /**
    * Detect feature groups from directory structure
    *
-   * @param rootDir - Root directory
+   * @param _rootDir - Root directory
    * @returns Array of feature groups
    * @private
    */

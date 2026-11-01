@@ -11,17 +11,16 @@
 export default {
   extends: './lint.config.mjs',
   rules: {
+    // SSOT @doc [[Checkpoint]] target resolution against managed/**/*.md
+    'tsdoc-edge/doc-link-target': 'warn',
+
     // Promise / async hygiene backlog
-    'typescript/await-thenable': 'warn',
     'typescript/require-await': 'warn',
 
     // Checker-backed correctness & migration backlog
     'typescript/no-unnecessary-type-assertion': 'warn',
     'typescript/no-unnecessary-condition': 'warn',
-    'typescript/switch-exhaustiveness-check': 'warn',
     'typescript/no-deprecated': 'warn',
-    'typescript/no-base-to-string': 'warn',
-    'typescript/restrict-plus-operands': 'warn',
     'typescript/no-unsafe-argument': 'warn',
     'typescript/no-unsafe-assignment': 'warn',
   },

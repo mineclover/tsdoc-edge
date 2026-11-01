@@ -23,13 +23,13 @@ export interface DocQualityScore {
   hasDoc: boolean;
   /** Has summary */
   hasSummary: boolean;
-  /** Has @param tags for all parameters */
+  /** Has `@param` tags for all parameters */
   hasCompleteParams: boolean;
-  /** Has @returns tag */
+  /** Has `@returns` tag */
   hasReturns: boolean;
   /** Has examples */
   hasExamples: boolean;
-  /** Has custom tags (@responsibility, @contract, etc.) */
+  /** Has custom tags (`@responsibility`, `@contract`, etc.) */
   hasCustomTags: boolean;
   /** Overall quality score (0-100) */
   qualityScore: number;
@@ -39,9 +39,9 @@ export interface DocQualityScore {
   parentSymbol?: string;
   /** Child symbols */
   children: DocQualityScore[];
-  /** Mismatched @param names (documented but not in signature) */
+  /** Mismatched `@param` names (documented but not in signature) */
   mismatchedParams?: string[];
-  /** Missing @returns for non-void function */
+  /** Missing `@returns` for non-void function */
   missingReturns?: boolean;
 }
 

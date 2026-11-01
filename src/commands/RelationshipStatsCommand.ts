@@ -125,7 +125,7 @@ export class RelationshipStatsCommand extends BaseCommand {
         for (const category of categoryOrder) {
           const count = categoryMap.get(category) || 0;
           const icon = count > 0 ? `${this.colors.green}✓` : `${this.colors.dim}○`;
-          const countDisplay = count > 0 ? this.colors.cyan + count : `${this.colors.dim}0`;
+          const countDisplay = count > 0 ? `${this.colors.cyan}${count}` : `${this.colors.dim}0`;
 
           console.log(
             `  ${icon}${this.colors.reset} ${category.padEnd(15)} ${countDisplay}${this.colors.reset}`
@@ -193,7 +193,8 @@ export class RelationshipStatsCommand extends BaseCommand {
               const row = byType.find((r) => r.type === type);
               const count = row ? row.count : 0;
               const status = count > 0 ? `${this.colors.green}✓` : `${this.colors.red}✗`;
-              const countDisplay = count > 0 ? this.colors.cyan + count : `${this.colors.dim}-`;
+              const countDisplay =
+                count > 0 ? `${this.colors.cyan}${count}` : `${this.colors.dim}-`;
 
               console.log(
                 `    ${status}${this.colors.reset} ${type.padEnd(30)} ${countDisplay}${this.colors.reset}`

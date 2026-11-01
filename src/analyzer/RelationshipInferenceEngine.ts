@@ -40,10 +40,10 @@ export interface InferenceStats {
  * @responsibility Apply inference rules to generate new relationships
  *
  * Inference Rules:
- * 1. Naming Transitivity: A~B, B~C in same domain => A~C
+ * 1. Naming Transitivity: `A~B, B~C` in same domain `=> A~C`
  * 2. Feature Closure: Complete graph within feature
- * 3. Test Coverage Inheritance: Suite contains Case, Case covers Impl => Suite covers Impl
- * 4. Dependency Transitivity: A→B→C => A depends on C (indirect)
+ * 3. Test Coverage Inheritance: `Suite contains Case, Case covers Impl => Suite covers Impl`
+ * 4. Dependency Transitivity: `A→B→C => A depends on C` (indirect)
  *
  * @example
  * ```typescript

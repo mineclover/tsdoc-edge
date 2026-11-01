@@ -12,15 +12,15 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type {
-  Accessibility,
-  BarrelExport,
-  BarrelFile,
-  ExposureScope,
-  PackageExportConfig,
+import {
+  type Accessibility,
+  type BarrelExport,
+  type BarrelFile,
+  type ExposureScope,
+  type PackageExportConfig,
   ScopeLevel,
-  SymbolExposure,
-  VisibilityBoundary,
+  type SymbolExposure,
+  type VisibilityBoundary,
 } from '../types/exposure';
 import type { Symbol } from '../types/graph/graph';
 
@@ -132,11 +132,11 @@ export class ExposureAnalyzer {
     };
 
     switch (scopeLevel) {
-      case 'public':
+      case ScopeLevel.PUBLIC:
         boundary.canBeImportedBy = ['*'];
         break;
 
-      case 'package': {
+      case ScopeLevel.PACKAGE: {
         const packageName = this.extractPackageName(symbol.filePath);
         boundary.canBeImportedBy = packageName ? [packageName] : [];
         boundary.restrictedTo = packageName ? [packageName] : [];
@@ -144,7 +144,7 @@ export class ExposureAnalyzer {
         break;
       }
 
-      case 'module': {
+      case ScopeLevel.MODULE: {
         const modulePath = this.extractModulePath(symbol.filePath);
         boundary.canBeImportedBy = modulePath ? [modulePath] : [];
         boundary.restrictedTo = modulePath ? [modulePath] : [];
@@ -152,13 +152,13 @@ export class ExposureAnalyzer {
         break;
       }
 
-      case 'file':
+      case ScopeLevel.FILE:
         boundary.canBeImportedBy = [symbol.filePath];
         boundary.restrictedTo = [symbol.filePath];
         boundary.reason = 'File-internal';
         break;
 
-      case 'private':
+      case ScopeLevel.PRIVATE:
         boundary.canBeImportedBy = [];
         boundary.restrictedTo = [];
         boundary.reason = 'Private scope';

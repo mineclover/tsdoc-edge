@@ -33,7 +33,7 @@ export interface DocLink {
   codeLine: number;
   /** Symbol name */
   symbolName: string;
-  /** Tag type (@see, @link) */
+  /** Tag type (`@see`, `@link`) */
   tagType: string;
   /** Target document path */
   targetDoc: string;

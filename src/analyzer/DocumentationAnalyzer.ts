@@ -593,7 +593,7 @@ export class DocumentationAnalyzer {
    * Calculate quality score
    *
    * Scoring considers symbol type:
-   * - Type aliases, interfaces, enums: Higher base score, don't need @returns/@param
+   * - Type aliases, interfaces, enums: Higher base score, don't need `@returns`/`@param`
    * - Properties: Higher base score, documentation optional
    * - Functions, methods, classes: Full documentation expected
    *

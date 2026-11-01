@@ -1666,6 +1666,14 @@ export class DatabaseManager {
     }));
   }
 
+  private lowerSymbolNameSql() {
+    return sql.join([sql.raw('LOWER('), schema.symbols.name, sql.raw(')')]);
+  }
+
+  private symbolNameLengthSql() {
+    return sql.join([sql.raw('LENGTH('), schema.symbols.name, sql.raw(')')]);
+  }
+
   /**
    * Find symbol by name (exact match first, then case-insensitive, then partial)
    * @param name - Symbol name to search for
@@ -1685,7 +1693,7 @@ export class DatabaseManager {
       row = this.drizzleDb
         .select()
         .from(schema.symbols)
-        .where(sql`LOWER(${schema.symbols.name}) = ${name.toLowerCase()}`)
+        .where(eq(this.lowerSymbolNameSql(), name.toLowerCase()))
         .limit(1)
         .get();
     }
@@ -1696,7 +1704,7 @@ export class DatabaseManager {
         .select()
         .from(schema.symbols)
         .where(like(schema.symbols.name, `%${name}%`))
-        .orderBy(sql`LENGTH(${schema.symbols.name})`)
+        .orderBy(this.symbolNameLengthSql())
         .limit(1)
         .get();
     }
@@ -2644,8 +2652,8 @@ export class DatabaseManager {
         .from(schema.symbols)
         .where(
           or(
-            sql`LOWER(${schema.symbols.name}) = ${lowerName}`,
-            sql`LOWER(${schema.symbols.name}) LIKE ${`${lowerName}.%`}`
+            eq(this.lowerSymbolNameSql(), lowerName),
+            sql.join([this.lowerSymbolNameSql(), sql.raw(' LIKE '), sql.param(`${lowerName}.%`)])
           )
         )
         .all();
@@ -2656,8 +2664,14 @@ export class DatabaseManager {
       rows = this.drizzleDb
         .select()
         .from(schema.symbols)
-        .where(sql`LOWER(${schema.symbols.name}) LIKE ${`%${name.toLowerCase()}%`}`)
-        .orderBy(sql`LENGTH(${schema.symbols.name})`)
+        .where(
+          sql.join([
+            this.lowerSymbolNameSql(),
+            sql.raw(' LIKE '),
+            sql.param(`%${name.toLowerCase()}%`),
+          ])
+        )
+        .orderBy(this.symbolNameLengthSql())
         .limit(20)
         .all();
     }
@@ -2704,8 +2718,8 @@ export class DatabaseManager {
         and(
           or(eq(schema.symbols.type, 'method'), eq(schema.symbols.type, 'function')),
           or(
-            sql`LOWER(${schema.symbols.name}) = ${lowerName}`,
-            sql`LOWER(${schema.symbols.name}) LIKE ${`%.${lowerName}`}`
+            eq(this.lowerSymbolNameSql(), lowerName),
+            sql.join([this.lowerSymbolNameSql(), sql.raw(' LIKE '), sql.param(`%.${lowerName}`)])
           )
         )
       )

@@ -320,7 +320,7 @@ export class DocumentSymbolParser {
    * @returns Content with code blocks removed
    *
    * @remarks
-   * Removes both fenced code blocks (```) and indented code blocks
+   * Removes both fenced code blocks (\`\`\`) and indented code blocks
    * This prevents example code from being treated as actual references
    */
   private removeCodeBlocks(content: string): string {

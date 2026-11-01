@@ -552,27 +552,29 @@ export class BlockChunkAnalyzer {
       .substring(0, 100);
 
     switch (blockType) {
-      case 'validation':
+      case BlockType.VALIDATION:
         return 'Input validation and constraint checking';
-      case 'transformation':
+      case BlockType.TRANSFORMATION:
         return 'Data transformation and mapping';
-      case 'query':
+      case BlockType.QUERY:
         return 'Database query operation';
-      case 'mutation':
+      case BlockType.MUTATION:
         return 'State or data mutation';
-      case 'logging':
+      case BlockType.LOGGING:
         return 'Logging and debugging';
-      case 'error-handling':
+      case BlockType.ERROR_HANDLING:
         return 'Error handling and recovery';
-      case 'http':
+      case BlockType.HTTP:
         return 'HTTP request/response handling';
-      case 'conditional':
+      case BlockType.CONDITIONAL:
         return 'Conditional branching logic';
-      case 'loop':
+      case BlockType.LOOP:
         return 'Iteration and looping';
-      case 'business-logic':
+      case BlockType.BUSINESS_LOGIC:
         return 'Core business logic';
-      default:
+      case BlockType.SETUP:
+      case BlockType.CLEANUP:
+      case BlockType.OTHER:
         return text;
     }
   }

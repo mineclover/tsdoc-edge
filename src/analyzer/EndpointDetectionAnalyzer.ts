@@ -210,7 +210,7 @@ export class EndpointDetectionAnalyzer {
 
   /**
    * Detect Fastify routes
-   * Pattern: fastify.get('/path', { schema }, handler)
+   * Pattern: `fastify.get('/path', { schema }, handler)`
    */
   private detectFastifyRoutes(sourceFile: ts.SourceFile): DetectedEndpoint[] {
     const endpoints: DetectedEndpoint[] = [];
@@ -320,7 +320,7 @@ export class EndpointDetectionAnalyzer {
 
   /**
    * Detect Hono routes
-   * Pattern: app.get('/path', (c) => { ... })
+   * Pattern: `app.get('/path', (c) => { ... })`
    */
   private detectHonoRoutes(sourceFile: ts.SourceFile): DetectedEndpoint[] {
     const endpoints: DetectedEndpoint[] = [];
@@ -424,8 +424,8 @@ export class EndpointDetectionAnalyzer {
 
   /**
    * Extract path parameters from route
-   * Example: /api/users/:id -> ['id']
-   *          /api/users/:userId/posts/:postId -> ['userId', 'postId']
+   * Example: `/api/users/:id -> ['id']`
+   *          `/api/users/:userId/posts/:postId -> ['userId', 'postId']`
    */
   private extractPathParams(routePath: string): string[] {
     const params: string[] = [];

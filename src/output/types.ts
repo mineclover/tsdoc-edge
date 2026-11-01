@@ -69,8 +69,10 @@ export function arrayOf(itemName: string, items: ObjectSchema): ArraySchema {
  * Helper to create grouped array schema
  *
  * @example
+ * ```ts
  * // For structure: <dependents><relation-type name="X"><dependent/></relation-type></dependents>
  * groupedArrayOf('relation-type', 'name', 'dependent', { name: 'string', type: 'string' })
+ * ```
  */
 export function groupedArrayOf(
   groupTag: string,

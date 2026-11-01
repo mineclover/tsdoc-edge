@@ -157,7 +157,7 @@ Options:
         return `${colors.red}[-]${colors.reset}`;
       case TaskStatus.URGENT:
         return `${colors.red}[!]${colors.reset}`;
-      default:
+      case TaskStatus.TODO:
         return `${colors.dim}[ ]${colors.reset}`;
     }
   }
@@ -170,7 +170,7 @@ Options:
         return colors.yellow;
       case TaskPriority.MEDIUM:
         return colors.blue;
-      default:
+      case TaskPriority.LOW:
         return colors.dim;
     }
   }
@@ -451,7 +451,7 @@ export class TaskStatsCommand extends BaseCommand {
 
   /**
    * execute method
-   * @param args - args parameter
+   * @param _args - args parameter
    * @returns Returns Promise<CommandResult>
    * @public
    */

@@ -9,7 +9,15 @@ const path = require('node:path');
 
 /** @type {import('@ttsc/lint').ITtscLintPlugin} */
 module.exports = {
-  meta: { name: 'tsdoc-edge-ttsc-tsdoc', version: '0.2.0', namespace: 'tsdoc-edge' },
-  rules: ['tsdoc-config', 'check-tag-names'],
+  meta: { name: 'tsdoc-edge-ttsc-tsdoc', version: '0.3.0', namespace: 'tsdoc-edge' },
+  rules: [
+    'tsdoc-config',
+    'check-tag-names',
+    'tsdoc-escapes',
+    'param-signatures',
+    'spec-index',
+    'doc-link-syntax',
+    'doc-link-target',
+  ],
   source: path.resolve(__dirname, 'rules'),
 };

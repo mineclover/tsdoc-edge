@@ -414,11 +414,11 @@ export class DetectDeadCodeCommand extends BaseCommand {
   /**
    * Get all symbols from database
    */
-  private async getAllSymbols(): Promise<Symbol[]> {
+  private getAllSymbols(): Promise<Symbol[]> {
     try {
-      return await this.db.getAllSymbols();
+      return Promise.resolve(this.db.getAllSymbols()).catch((): Symbol[] => []);
     } catch (_error) {
-      return [];
+      return Promise.resolve([]);
     }
   }
 

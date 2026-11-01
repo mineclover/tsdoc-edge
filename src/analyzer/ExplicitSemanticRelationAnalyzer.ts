@@ -10,12 +10,14 @@
  * @scope Public API for relationship extraction
  *
  * @example
+ * ```typescript
  * /**
  *  * User authentication service
  *  * @relatedTo UserRepository - Data access layer
  *  * @relatedTo TokenManager - JWT token handling
  *  *\/
  * export class UserService {}
+ * ```
  *
  * Output relationships:
  *   UserService ~ UserRepository (explicit-semantic, confidence: 1.0)
@@ -171,11 +173,13 @@ export class ExplicitSemanticRelationAnalyzer {
    * @private
    *
    * @example
-   * @relatedTo UserRepository - Data access
-   * → { target: 'UserRepository', description: 'Data access' }
+   * ```typescript
+   * // @relatedTo UserRepository - Data access
+   * // → { target: 'UserRepository', description: 'Data access' }
    *
-   * @relatedTo TokenManager
-   * → { target: 'TokenManager', description: undefined }
+   * // @relatedTo TokenManager
+   * // → { target: 'TokenManager', description: undefined }
+   * ```
    */
   private parseRelatedToTag(tag: ts.JSDocTag): { target: string; description?: string } | null {
     const comment = this.getTagComment(tag);

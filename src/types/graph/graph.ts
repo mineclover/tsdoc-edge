@@ -66,7 +66,7 @@ export interface Symbol {
 
   /**
    * Global symbol path (export-scoped identifier)
-   * Format: "@package/scope::SymbolName" (for exported symbols)
+   * Format: `"@package/scope::SymbolName"` (for exported symbols)
    * Derived from package.json exports or module resolution
    * Only present if symbol is exported
    */
@@ -74,7 +74,7 @@ export interface Symbol {
 
   /**
    * Scope (package/module boundary)
-   * Format: "@package/scope" or "package/submodule"
+   * Format: `"@package/scope"` or `"package/submodule"`
    * Used for uniqueness validation within scope
    * Derived from nearest package.json or module boundary
    * Optional for backwards compatibility during migration
@@ -171,12 +171,12 @@ export interface SymbolGraph {
   relationships: SymbolRelationship[];
 
   /**
-   * Index: symbol name -> symbol IDs
+   * Index: `symbol name -> symbol IDs`
    */
   nameIndex: Map<string, string[]>;
 
   /**
-   * Index: file path -> symbol IDs
+   * Index: `file path -> symbol IDs`
    */
   fileIndex: Map<string, string[]>;
 

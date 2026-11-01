@@ -387,6 +387,19 @@ function replayDelta(
   });
 }
 
+function formatProvenancePin(value: unknown): string {
+  if (value === null || value === undefined) {
+    return '<missing>';
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') {
+    return String(value);
+  }
+  return JSON.stringify(value) ?? '<missing>';
+}
+
 function baseRevisionProviderPinMismatch(
   graph: CanonicalProjectGraph,
   normalized: NormalizedProviderSnapshot
@@ -401,7 +414,8 @@ function baseRevisionProviderPinMismatch(
   };
   for (const [field, value] of Object.entries(expected)) {
     if (graph.provenance[field] !== value) {
-      return `Provider snapshot base revision pin mismatch for ${field}: expected ${value}, received ${String(graph.provenance[field] ?? '<missing>')}`;
+      const received = formatProvenancePin(graph.provenance[field]);
+      return `Provider snapshot base revision pin mismatch for ${field}: expected ${value}, received ${received}`;
     }
   }
   return null;

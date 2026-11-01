@@ -1003,7 +1003,7 @@ export class TsdocEdgeService {
    * Uses batch query on relationship_symbols join table
    *
    * @param symbolIds - Array of symbol IDs
-   * @returns Map of symbolId -> { downstream, upstream }
+   * @returns Map of `symbolId -> { downstream, upstream }`
    */
   private getBatchImpactCounts(
     symbolIds: string[]
@@ -1754,7 +1754,7 @@ export class TsdocEdgeService {
    * Uses IN clause for efficient batch lookup
    *
    * @param names - Array of symbol names to search
-   * @returns Map of name -> symbol location
+   * @returns Map of `name -> symbol` location
    */
   findSymbolsByNames(
     names: string[]

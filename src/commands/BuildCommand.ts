@@ -1606,7 +1606,7 @@ export class BuildCommand extends BaseCommand {
   }
 
   /**
-   * Extract @doc tags from file content near a specific line
+   * Extract `@doc` tags from file content near a specific line
    * @param content - File content
    * @param symbolLine - Line number where symbol is defined
    * @returns Array of document references

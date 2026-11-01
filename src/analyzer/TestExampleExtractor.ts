@@ -7,7 +7,7 @@
  * @solves Automatically extracts test cases as living examples
  * @context SSOT principle: Tests are single source of truth for examples
  *
- * Philosophy: **Test Code > Generic Examples**
+ * Philosophy: **Test Code \> Generic Examples**
  */
 
 import * as fs from 'node:fs';
@@ -89,7 +89,7 @@ export class TestExampleExtractor {
   /**
    * Extract examples from all test files
    *
-   * @param testFilePattern - Glob pattern for test files (default: "**\/*.test.ts")
+   * @param _testFilePattern - Glob pattern for test files (default: "**\/*.test.ts")
    * @returns Array of test examples
    */
   extractAllExamples(_testFilePattern = '**/*.test.ts'): TestExample[] {

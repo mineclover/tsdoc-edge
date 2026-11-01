@@ -230,7 +230,7 @@ export class FrontmatterParser {
       codeImplementation !== 'not-applicable'
     ) {
       errors.push(
-        `Invalid codeImplementation value: ${String(codeImplementation)} ` +
+        `Invalid codeImplementation value: ${this.formatScalarValue(codeImplementation)} ` +
           '(expected "required" or "not-applicable")'
       );
     }
@@ -239,6 +239,29 @@ export class FrontmatterParser {
       valid: errors.length === 0,
       errors,
     };
+  }
+
+  private isUnknownArray(value: unknown): value is readonly unknown[] {
+    return Array.isArray(value);
+  }
+
+  private formatScalarValue(value: unknown): string {
+    if (typeof value === 'string') {
+      return value;
+    }
+    if (
+      typeof value === 'number' ||
+      typeof value === 'boolean' ||
+      typeof value === 'bigint' ||
+      value === null ||
+      value === undefined
+    ) {
+      return String(value);
+    }
+    if (typeof value === 'symbol') {
+      return value.description ?? '';
+    }
+    return JSON.stringify(value) ?? '';
   }
 
   /**
@@ -269,15 +292,13 @@ export class FrontmatterParser {
     for (const [key, value] of Object.entries(metadata)) {
       if (value === null || value === undefined) continue;
 
-      if (Array.isArray(value)) {
+      if (this.isUnknownArray(value)) {
         lines.push(`${key}:`);
         for (const item of value) {
-          lines.push(`  - ${item}`);
+          lines.push(`  - ${this.formatScalarValue(item)}`);
         }
-      } else if (typeof value === 'string') {
-        lines.push(`${key}: ${value}`);
       } else {
-        lines.push(`${key}: ${value}`);
+        lines.push(`${key}: ${this.formatScalarValue(value)}`);
       }
     }
 

@@ -26,9 +26,9 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @functionality
  * - Full scan mode: Index all markdown files in directory
  * - Incremental mode: Update index for single file (--file=path)
- * - Symbol extraction: Parse [[Symbol]] from markdown and @doc tags from code
+ * - Symbol extraction: Parse [[Symbol]] from markdown and `@doc` tags from code
  * - Registry management: Maintain central symbol registry with statistics
- * - Code connections: Link code symbols to document symbols via @doc tags
+ * - Code connections: Link code symbols to document symbols via `@doc` tags
  *
  * @decision Support both full scan and incremental update
  * @rationale Full scan for initial setup, incremental for fast updates during development

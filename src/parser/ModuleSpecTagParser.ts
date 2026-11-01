@@ -27,7 +27,7 @@ export class ModuleSpecTagParser {
   /**
    * Parse module spec tags from TSDoc context
    *
-   * @param tsdocContext - TSDoc parser context
+   * @param _tsdocContext - TSDoc parser context
    * @param jsDocText - Raw JSDoc comment text for custom tag parsing
    * @returns Parsed module spec tags
    * @public

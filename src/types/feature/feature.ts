@@ -62,7 +62,7 @@ export interface FeatureDocument {
 
 /**
  * Symbol reference in feature document
- * Syntax: {symbolId} or {@symbol symbolId}
+ * Syntax: `{symbolId}` or `{@symbol symbolId}`
  * @public
  */
 export interface SymbolReference {

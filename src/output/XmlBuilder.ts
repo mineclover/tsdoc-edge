@@ -13,14 +13,34 @@ import type {
   SectionData,
 } from './types';
 
+function isUnknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
+}
+
+function formatXmlValue(value: unknown): string {
+  if (value === null || value === undefined) {
+    return '';
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') {
+    return String(value);
+  }
+  if (typeof value === 'symbol') {
+    return value.description ?? '';
+  }
+  if (isUnknownArray(value)) {
+    return value.map((item) => formatXmlValue(item)).join(',');
+  }
+  return JSON.stringify(value) ?? '';
+}
+
 /**
  * Escape special XML characters
  */
 function escapeXml(value: unknown): string {
-  if (value === null || value === undefined) {
-    return '';
-  }
-  return String(value)
+  return formatXmlValue(value)
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
     .replace(/>/g, '&gt;')

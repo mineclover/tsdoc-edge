@@ -906,6 +906,19 @@ function validateRevision(base: CodeGraphRevision): void {
   requireNonEmpty(base.graph.fingerprint, 'graph.fingerprint');
 }
 
+function formatProvenancePin(value: unknown): string {
+  if (value === null || value === undefined) {
+    return '<missing>';
+  }
+  if (typeof value === 'string') {
+    return value;
+  }
+  if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') {
+    return String(value);
+  }
+  return JSON.stringify(value) ?? '<missing>';
+}
+
 function validateDeltaBase(base: CodeGraphRevision, delta: GraphDelta): void {
   validateDeltaIdentity(delta);
   if (delta.baseRevisionId !== base.revisionId) {
@@ -926,8 +939,9 @@ function validateDeltaBase(base: CodeGraphRevision, delta: GraphDelta): void {
     };
     for (const [field, expected] of Object.entries(expectedPins)) {
       if (base.graph.provenance[field] !== expected) {
+        const received = formatProvenancePin(base.graph.provenance[field]);
         throw new Error(
-          `GraphDelta provider base pin mismatch for ${field}: expected ${expected}, received ${String(base.graph.provenance[field] ?? '<missing>')}`
+          `GraphDelta provider base pin mismatch for ${field}: expected ${expected}, received ${received}`
         );
       }
     }

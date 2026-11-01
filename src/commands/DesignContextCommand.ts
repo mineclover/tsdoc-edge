@@ -1363,10 +1363,26 @@ export class DesignContextCommand extends BaseCommand {
     console.log();
   }
 
+  private formatGroupKey(value: unknown): string {
+    if (typeof value === 'string') {
+      return value;
+    }
+    if (
+      typeof value === 'number' ||
+      typeof value === 'boolean' ||
+      typeof value === 'bigint' ||
+      value === null ||
+      value === undefined
+    ) {
+      return String(value);
+    }
+    return JSON.stringify(value) ?? '';
+  }
+
   private groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
     return array.reduce(
       (groups, item) => {
-        const groupKey = String(item[key]);
+        const groupKey = this.formatGroupKey(item[key]);
         if (!groups[groupKey]) {
           groups[groupKey] = [];
         }

@@ -55,7 +55,7 @@ export interface MermaidRelationship {
   /** Target node ID */
   to: string;
 
-  /** Edge type (-->, -.->、==>, etc.) */
+  /** Edge type (`-->`, `-.->`, `==>`, etc.) */
   edgeType: 'solid' | 'dotted' | 'thick';
 
   /** Edge label if any */
@@ -113,7 +113,7 @@ export class MermaidSymbolExtractor {
    * Extract symbols and relationships from Mermaid diagram content
    *
    * @param content - Mermaid diagram source code
-   * @param filePath - Path to .mmd file (for context)
+   * @param _filePath - Path to .mmd file (for context)
    * @returns Extraction result with symbols, relationships, and suggestions
    * @public
    */

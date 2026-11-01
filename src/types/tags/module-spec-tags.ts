@@ -8,7 +8,7 @@
  */
 
 /**
- * Algorithm description from @algorithm tag
+ * Algorithm description from `@algorithm` tag
  */
 export interface AlgorithmDoc {
   /** Algorithm or approach description */
@@ -18,7 +18,7 @@ export interface AlgorithmDoc {
 }
 
 /**
- * Complexity information from @complexity tag
+ * Complexity information from `@complexity` tag
  */
 export interface ComplexityDoc {
   /** Complexity notation (e.g., "O(n)", "High", "Low") */
@@ -28,7 +28,7 @@ export interface ComplexityDoc {
 }
 
 /**
- * Side effect from @sideEffect tag
+ * Side effect from `@sideEffect` tag
  */
 export interface SideEffectDoc {
   /** Type of side effect */
@@ -40,7 +40,7 @@ export interface SideEffectDoc {
 }
 
 /**
- * State mutation from @mutates tag
+ * State mutation from `@mutates` tag
  */
 export interface MutationDoc {
   /** What state is being mutated */
@@ -50,7 +50,7 @@ export interface MutationDoc {
 }
 
 /**
- * I/O operation from @io tag
+ * I/O operation from `@io` tag
  */
 export interface IODoc {
   /** Type of I/O */
@@ -60,7 +60,7 @@ export interface IODoc {
 }
 
 /**
- * Scope information from @scope tag
+ * Scope information from `@scope` tag
  */
 export interface ScopeDoc {
   /** Scope description */
@@ -76,22 +76,22 @@ export interface ScopeDoc {
  * 7-part framework specific tags
  */
 export interface ModuleSpecTags {
-  /** Algorithm description (@algorithm) */
+  /** Algorithm description (`@algorithm`) */
   algorithm?: AlgorithmDoc;
 
-  /** Complexity information (@complexity) */
+  /** Complexity information (`@complexity`) */
   complexity?: ComplexityDoc;
 
-  /** Side effects (@sideEffect, can have multiple) */
+  /** Side effects (`@sideEffect`, can have multiple) */
   sideEffects?: SideEffectDoc[];
 
-  /** State mutations (@mutates, can have multiple) */
+  /** State mutations (`@mutates`, can have multiple) */
   mutations?: MutationDoc[];
 
-  /** I/O operations (@io, can have multiple) */
+  /** I/O operations (`@io`, can have multiple) */
   io?: IODoc[];
 
-  /** Scope description (@scope) */
+  /** Scope description (`@scope`) */
   scope?: ScopeDoc;
 }
 

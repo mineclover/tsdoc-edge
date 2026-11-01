@@ -1,7 +1,7 @@
 /**
  * Doc Reference Analyzer
  * @packageDocumentation
- * @responsibility Analyze @doc [[Symbol]] references in TSDoc comments
+ * @responsibility Analyze `@doc [[Symbol]]` references in TSDoc comments
  */
 
 import * as fs from 'node:fs';
@@ -12,21 +12,21 @@ import type { SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
- * Analyzes doc reference relationships (@doc [[Symbol]])
+ * Analyzes doc reference relationships (`@doc [[Symbol]]`)
  *
  * @public
- * @responsibility Detect code-to-documentation references via @doc tags
+ * @responsibility Detect code-to-documentation references via `@doc` tags
  *
  * Pattern: Code symbol references documentation symbol
- * - @doc [[FeatureName]]: Code points to feature documentation
- * - @doc [[ComponentName]]: Code points to component documentation
- * - @doc [[ConceptName]]: Code points to concept documentation
+ * - `@doc [[FeatureName]]`: Code points to feature documentation
+ * - `@doc [[ComponentName]]`: Code points to component documentation
+ * - `@doc [[ConceptName]]`: Code points to concept documentation
  *
  * Detection:
- * 1. Parse all TypeScript files for @doc tags in TSDoc comments
- * 2. Extract [[Symbol]] references from @doc tags
+ * 1. Parse all TypeScript files for `@doc` tags in TSDoc comments
+ * 2. Extract `[[Symbol]]` references from `@doc` tags
  * 3. Create relationships from code symbol to doc symbol
- * 4. Track section references (e.g., @doc [[Symbol#Section]])
+ * 4. Track section references (e.g., `@doc [[Symbol#Section]]`)
  *
  * Evidence:
  * - File path, line number
@@ -81,7 +81,7 @@ export class DocReferenceAnalyzer {
   }
 
   /**
-   * Collect all @doc connections from TypeScript files
+   * Collect all `@doc` connections from TypeScript files
    *
    * @param rootDir - Root directory
    * @returns Array of code connections

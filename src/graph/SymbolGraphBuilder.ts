@@ -170,8 +170,8 @@ export class SymbolGraphBuilder {
   /**
    * Detect circular dependencies in the graph
    * @returns Array of circular dependency chains
-   * @testScenario Simple cycle: A -> B -> A
-   * @testScenario Complex cycle: A -> B -> C -> A
+   * @testScenario Simple cycle: `A -> B -> A`
+   * @testScenario Complex cycle: `A -> B -> C -> A`
    * @testScenario No cycles
    */
   detectCircularDependencies(): string[][] {

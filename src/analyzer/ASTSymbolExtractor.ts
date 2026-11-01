@@ -284,7 +284,7 @@ export class ASTSymbolExtractor {
 
   /**
    * Extract re-export declaration
-   * Handles: export { Foo } from './foo' and export * from './foo'
+   * Handles: `export { Foo } from './foo'` and `export * from './foo'`
    */
   private extractReExport(node: ts.ExportDeclaration): void {
     if (!node.moduleSpecifier) return; // Skip export { Foo } without from

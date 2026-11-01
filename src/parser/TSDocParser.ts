@@ -153,7 +153,7 @@ interface NodeWithJSDoc extends ts.Node {
  * @responsibility Parse TypeScript files and extract TSDoc comments with custom tag support
  * @contract Initialize TSDoc parser with custom tags and provide file parsing capability
  * @testScenario Parse file with valid TSDoc comments
- * @testScenario Extract custom tags (@id, @contract, @responsibility)
+ * @testScenario Extract custom tags (`@id`, `@contract`, `@responsibility`)
  * @testScenario Handle files with no comments
  * @testScenario Handle malformed TSDoc
  *
@@ -165,9 +165,9 @@ interface NodeWithJSDoc extends ts.Node {
  *
  * @decision Wrap Microsoft TSDoc parser instead of forking
  * @rationale Benefit from upstream improvements and standards compliance
- * @consequences Dependent on @microsoft/tsdoc API stability, Clean architecture
+ * @consequences Dependent on `@microsoft/tsdoc` API stability, Clean architecture
  *
- * @depends @microsoft/tsdoc, typescript
+ * @depends `@microsoft/tsdoc`, typescript
  * @depType external
  * @depReason TSDoc parsing engine and TypeScript AST
  */

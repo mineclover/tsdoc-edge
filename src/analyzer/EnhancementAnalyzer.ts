@@ -23,7 +23,7 @@ interface EnhancementSite {
 }
 
 /**
- * Analyzes enhancement relationships (@enhances tags)
+ * Analyzes enhancement relationships (`@enhances` tags)
  *
  * @doc [[EnhancementAnalyzer]]
  * @public

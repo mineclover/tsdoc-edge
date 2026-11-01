@@ -17,7 +17,7 @@ export interface SymbolIdentifiers {
   uuid: string;
   /** Local path (file::symbol) */
   localPath: string;
-  /** Global path (@package/scope::symbol) for exported symbols */
+  /** Global path (`@package/scope::symbol`) for exported symbols */
   globalPath?: string;
   /** Scope (package/module boundary) */
   scope: string;
@@ -84,7 +84,7 @@ export class SymbolIdentifierGenerator {
   }
 
   /**
-   * Generate global path: "@package/scope::SymbolName"
+   * Generate global path: `"@package/scope::SymbolName"`
    * Only for exported symbols
    */
   private generateGlobalPath(
@@ -143,7 +143,7 @@ export class SymbolIdentifierGenerator {
   }
 
   /**
-   * Normalize scope to @package/subpath format
+   * Normalize scope to `@package/subpath` format
    */
   private normalizeScope(rawScope: string): string {
     // Already in @package format

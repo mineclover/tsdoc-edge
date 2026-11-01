@@ -26,17 +26,30 @@ export default {
   ignores: ['src/__tests__/fixtures/**'],
   plugins: { 'tsdoc-edge': tsdocEdgeRules },
   rules: {
-    // Native TSDoc SSOT: ProjectRule + ProjectInputRule + HintRule reading tsdoc.json,
-    // paired with parser-aware file tag validation.
+    // Native TSDoc SSOT & Spec Graph (`tools/ttsc-tsdoc` Go contributor):
+    // - `tsdoc-config`: ProjectRule + ProjectInputRule + HintRule reading tsdoc.json
+    // - `check-tag-names`: parser-aware @tag / {@inlineTag} validation
+    // - `tsdoc-escapes`: @microsoft/tsdoc prose escape validation with `ttsc fix` autofixes
+    // - `param-signatures`: @param `name - desc` hyphen syntax + AST parameter signature matching
+    // - `spec-index`: ProjectRule + ProjectInputGlob (`managed/**/*.md`) + HintRule + GraphRule
+    // - `doc-link-syntax`: enforces `@doc [[Checkpoint]]` block-tag syntax
     'tsdoc-edge/tsdoc-config': 'error',
     'tsdoc-edge/check-tag-names': 'error',
+    'tsdoc-edge/tsdoc-escapes': 'error',
+    'tsdoc-edge/param-signatures': 'error',
+    'tsdoc-edge/spec-index': 'error',
+    'tsdoc-edge/doc-link-syntax': 'error',
 
     // Promise safety (type-aware; 0 findings across src/ and src/__tests__/)
     'typescript/no-floating-promises': 'error',
     'typescript/no-misused-promises': 'error',
+    'typescript/await-thenable': 'error',
 
-    // Checker-backed return safety (0 findings across src/ and src/__tests__/)
+    // Checker-backed type correctness (0 findings across src/ and src/__tests__/)
     'typescript/no-unsafe-return': 'error',
+    'typescript/restrict-plus-operands': 'error',
+    'typescript/switch-exhaustiveness-check': 'error',
+    'typescript/no-base-to-string': 'error',
 
     // TSDoc / JSDoc structural invariants (0 findings across src/ and src/__tests__/)
     'jsdoc/tsdoc-syntax': 'error',

@@ -225,9 +225,9 @@ export class CodeHealthChecker {
    * Find test file for a source file
    *
    * Checks multiple common test file locations:
-   * 1. Same directory: foo.ts -> foo.test.ts
-   * 2. __tests__ directory: src/foo.ts -> src/__tests__/foo.test.ts
-   * 3. Top-level __tests__: src/dir/foo.ts -> src/__tests__/dir/foo.test.ts
+   * 1. Same directory: `foo.ts -> foo.test.ts`
+   * 2. __tests__ directory: `src/foo.ts -> src/__tests__/foo.test.ts`
+   * 3. Top-level __tests__: `src/dir/foo.ts -> src/__tests__/dir/foo.test.ts`
    *
    * @param sourceFile - Source file path
    * @param rootPath - Root directory path
@@ -364,7 +364,7 @@ export class CodeHealthChecker {
    * Generate improvement suggestions
    *
    * @param docScores - Documentation quality scores
-   * @param testCoverage - Test coverage information
+   * @param _testCoverage - Test coverage information
    * @param options - Analysis options
    * @returns Array of improvement suggestions
    */

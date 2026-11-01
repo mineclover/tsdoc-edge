@@ -190,7 +190,7 @@ export interface TrackableStatistics {
   byImportance: ImportanceStats;
 
   /**
-   * Symbol importance map (symbolId -> criteria)
+   * Symbol importance map (`symbolId -> criteria`)
    */
   symbolImportance: Record<string, ImportanceCriteria>;
 
@@ -307,12 +307,12 @@ export interface WarningConditions {
   criticalSymbolLoss: boolean;
 
   /**
-   * Overall documentation rate dropped significantly (>5%)
+   * Overall documentation rate dropped significantly (`>5%`)
    */
   significantRateDropOverall: boolean;
 
   /**
-   * Critical documentation rate dropped (>1%)
+   * Critical documentation rate dropped (`>1%`)
    */
   significantRateDropCritical: boolean;
 }

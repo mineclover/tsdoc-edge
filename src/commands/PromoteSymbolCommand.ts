@@ -272,6 +272,19 @@ export class PromoteSymbolCommand extends BaseCommand {
     return frontmatter;
   }
 
+  private formatFrontmatterValue(value: unknown, fallback: string): string {
+    if (!value) {
+      return fallback;
+    }
+    if (typeof value === 'string') {
+      return value;
+    }
+    if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') {
+      return String(value);
+    }
+    return JSON.stringify(value) ?? fallback;
+  }
+
   /**
    * Generate canonical H1 document
    */
@@ -282,8 +295,8 @@ export class PromoteSymbolCommand extends BaseCommand {
     sourceFile: string
   ): string {
     // Determine category from source or default
-    const category = sourceFrontmatter.category || 'unknown';
-    const status = sourceFrontmatter.status || 'planned';
+    const category = this.formatFrontmatterValue(sourceFrontmatter.category, 'unknown');
+    const status = this.formatFrontmatterValue(sourceFrontmatter.status, 'planned');
 
     return `---
 title: ${symbolName}

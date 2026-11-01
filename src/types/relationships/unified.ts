@@ -264,10 +264,10 @@ export interface UnifiedRelationship {
   /**
    * Type-specific properties
    * Examples:
-   * - io-dependency: { dataType: 'UserData' }
-   * - event-flow: { eventName: 'data-ready' }
-   * - collaboration: { role: 'payment-processor' }
-   * - feature-grouping: { featureName: 'Authentication' }
+   * - io-dependency: `{ dataType: 'UserData' }`
+   * - event-flow: `{ eventName: 'data-ready' }`
+   * - collaboration: `{ role: 'payment-processor' }`
+   * - feature-grouping: `{ featureName: 'Authentication' }`
    */
   properties: RelationshipProperties;
 

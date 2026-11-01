@@ -443,7 +443,7 @@ CREATE INDEX symbol_type IF NOT EXISTS FOR (s:Symbol) ON (s.type);
 
   /**
    * Export to Gephi Lite SDK format
-   * Based on @gephi/gephi-lite-sdk GraphDataset structure
+   * Based on `@gephi/gephi-lite-sdk` GraphDataset structure
    */
   private exportGephi(
     relationships: UnifiedRelationshipRow[],

@@ -651,15 +651,39 @@ export abstract class BaseCommand {
     return lines;
   }
 
+  private isUnknownArray(value: unknown): value is readonly unknown[] {
+    return Array.isArray(value);
+  }
+
+  /**
+   * Format an unknown value as a plain string before XML escaping
+   * @private
+   */
+  private formatXmlValue(value: unknown): string {
+    if (value === null || value === undefined) {
+      return '';
+    }
+    if (typeof value === 'string') {
+      return value;
+    }
+    if (typeof value === 'number' || typeof value === 'boolean' || typeof value === 'bigint') {
+      return String(value);
+    }
+    if (typeof value === 'symbol') {
+      return value.description ?? '';
+    }
+    if (this.isUnknownArray(value)) {
+      return value.map((item) => this.formatXmlValue(item)).join(',');
+    }
+    return JSON.stringify(value) ?? '';
+  }
+
   /**
    * Escape XML special characters
    * @private
    */
   private escapeXml(value: unknown): string {
-    if (value === null || value === undefined) {
-      return '';
-    }
-    return String(value)
+    return this.formatXmlValue(value)
       .replace(/&/g, '&amp;')
       .replace(/</g, '&lt;')
       .replace(/>/g, '&gt;')

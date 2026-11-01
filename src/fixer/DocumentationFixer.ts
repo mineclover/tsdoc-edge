@@ -23,13 +23,13 @@ interface DocFix {
 export interface FixOptions {
   /** Add missing summaries */
   addSummary?: boolean;
-  /** Add missing @param tags */
+  /** Add missing `@param` tags */
   addParams?: boolean;
-  /** Add missing @returns tags */
+  /** Add missing `@returns` tags */
   addReturns?: boolean;
-  /** Add @example tags */
+  /** Add `@example` tags */
   addExamples?: boolean;
-  /** Add custom tags (@responsibility, @contract) */
+  /** Add custom tags (`@responsibility`, `@contract`) */
   addCustomTags?: boolean;
   /** Dry run - don't actually modify files */
   dryRun?: boolean;
@@ -335,7 +335,7 @@ export class DocumentationFixer {
    * Get existing JSDoc comment node
    *
    * @param node - TypeScript AST node
-   * @param sourceFile - Source file
+   * @param _sourceFile - Source file
    * @returns JSDoc node or null
    */
   private getExistingJSDocComment(node: ts.Node, _sourceFile: ts.SourceFile): ts.JSDoc | null {
@@ -501,15 +501,6 @@ export class DocumentationFixer {
 }
 
 /**
- * Whether the fixer may attach a doc comment to this node.
- *
- * Statements (`for`, `try/catch`, destructuring) and function-local variables are never API
- * surface; inserting JSDoc there produced statement-level noise in earlier fixer runs.
- *
- * @param node - Node resolved from an analyzer line number
- * @returns True for declarations that carry API documentation
- */
-/**
  * Count syntax (parse) diagnostics for a source text.
  *
  * @param fileName - File name used for script-kind detection
@@ -524,6 +515,15 @@ function parseDiagnosticCount(fileName: string, text: string): number {
   );
 }
 
+/**
+ * Whether the fixer may attach a doc comment to this node.
+ *
+ * Statements (`for`, `try/catch`, destructuring) and function-local variables are never API
+ * surface; inserting JSDoc there produced statement-level noise in earlier fixer runs.
+ *
+ * @param node - Node resolved from an analyzer line number
+ * @returns True for declarations that carry API documentation
+ */
 export function isDocumentableDeclaration(node: ts.Node): boolean {
   if (
     ts.isFunctionDeclaration(node) ||

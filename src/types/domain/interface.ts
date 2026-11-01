@@ -172,16 +172,16 @@ export interface InterfaceDependency {
   /**
    * Type relationship context
    * - direct: Direct reference (e.g., user: User)
-   * - generic-param: Inside generic parameter (e.g., Promise<User>)
-   * - union: Part of union type (e.g., User | Admin)
-   * - intersection: Part of intersection type (e.g., User & Permissions)
-   * - array: Array element type (e.g., User[])
+   * - generic-param: Inside generic parameter (e.g., `Promise<User>`)
+   * - union: Part of union type (e.g., `User | Admin`)
+   * - intersection: Part of intersection type (e.g., `User & Permissions`)
+   * - array: Array element type (e.g., `User[]`)
    */
   typeRelation?: 'direct' | 'generic-param' | 'union' | 'intersection' | 'array';
 
   /**
    * Generic context information
-   * e.g., "Promise<T>" where T=User, "Map<K,V>" where V=User
+   * e.g., `"Promise<T>"` where `T=User`, `"Map<K,V>"` where `V=User`
    */
   genericContext?: string;
 
@@ -192,7 +192,7 @@ export interface InterfaceDependency {
 
   /**
    * Import source for external types
-   * e.g., "typescript", "@types/node"
+   * e.g., `"typescript"`, `"@types/node"`
    */
   importSource?: string;
 

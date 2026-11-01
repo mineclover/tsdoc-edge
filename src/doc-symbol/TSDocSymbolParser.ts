@@ -1,7 +1,7 @@
 /**
- * TSDoc @doc tag parser for code-to-document connections
+ * TSDoc `@doc` tag parser for code-to-document connections
  * @packageDocumentation
- * @responsibility Parse @doc [[]] tags from TypeScript code
+ * @responsibility Parse `@doc [[]]` tags from TypeScript code
  */
 
 import * as fs from 'node:fs';
@@ -9,14 +9,14 @@ import * as ts from 'typescript';
 import type { CodeConnection } from '../types/feature';
 
 /**
- * Parses @doc tags from TSDoc comments
+ * Parses `@doc` tags from TSDoc comments
  *
  * @public
- * @responsibility Extract @doc [[Symbol]] tags from code
+ * @responsibility Extract `@doc [[Symbol]]` tags from code
  */
 export class TSDocSymbolParser {
   /**
-   * Parse @doc tags from a code file
+   * Parse `@doc` tags from a code file
    *
    * @param filePath - Code file path
    * @returns Code connections
@@ -67,7 +67,7 @@ export class TSDocSymbolParser {
   }
 
   /**
-   * Parse @doc tag content
+   * Parse `@doc` tag content
    *
    * @param tag - JSDoc tag
    * @returns Parsed doc reference

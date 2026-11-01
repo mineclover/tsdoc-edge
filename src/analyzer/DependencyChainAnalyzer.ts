@@ -204,10 +204,10 @@ export class DependencyChainAnalyzer {
    * Determine chain type based on path structure
    *
    * Chain patterns:
-   * - linear: A -> B -> C (each node has exactly one outgoing edge)
-   * - fan-out: A -> B, A -> C, A -> D (one node has multiple outgoing edges)
-   * - fan-in: A -> D, B -> D, C -> D (multiple nodes converge to one)
-   * - diamond: A -> B -> D, A -> C -> D (both fan-out and fan-in)
+   * - linear: `A -> B -> C` (each node has exactly one outgoing edge)
+   * - fan-out: `A -> B, A -> C, A -> D` (one node has multiple outgoing edges)
+   * - fan-in: `A -> D, B -> D, C -> D` (multiple nodes converge to one)
+   * - diamond: `A -> B -> D, A -> C -> D` (both fan-out and fan-in)
    *
    * @performance O(n) time complexity with pre-computed incoming edges
    */

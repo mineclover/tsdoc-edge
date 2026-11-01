@@ -84,7 +84,7 @@ export class UserRepository {
   /**
    * findById method
    * @param id - id parameter
-   * @returns Returns { id: string; name: string } | null
+   * @returns Returns `{ id: string; name: string } | null`
    */
   findById(id: string): { id: string; name: string } | null {
     return { id, name: 'User' };
@@ -101,7 +101,7 @@ export class UserService {
   /**
    * getUser method
    * @param id - id parameter
-   * @returns Returns { id: string; name: string } | null
+   * @returns Returns `{ id: string; name: string } | null`
    */
   getUser(id: string): { id: string; name: string } | null {
     return this.repository.findById(id);

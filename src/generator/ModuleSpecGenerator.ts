@@ -59,11 +59,11 @@ export interface GeneratorOptions {
  * @public
  * @responsibility Extract and generate 7-part module specifications from TypeScript code
  * @functionality
- * - Purpose extraction from @problem, @responsibility tags
- * - Input extraction from function parameters and @precondition
- * - Output extraction from return types and @postcondition
- * - Context extraction from imports and @depends
- * - Logic extraction from @functionality and code analysis
+ * - Purpose extraction from `@problem`, `@responsibility` tags
+ * - Input extraction from function parameters and `@precondition`
+ * - Output extraction from return types and `@postcondition`
+ * - Context extraction from imports and `@depends`
+ * - Logic extraction from `@functionality` and code analysis
  * - Effect detection from side effect patterns
  * - Scope extraction from export modifiers
  */
@@ -545,7 +545,7 @@ export class ModuleSpecGenerator {
 
   /**
    * Extract Logic section (5/7)
-   * Confidence: 60% (partial automation) → 95% with @algorithm tag
+   * Confidence: 60% (partial automation) → 95% with `@algorithm` tag
    */
   private extractLogic(
     node: ts.Node,
@@ -684,7 +684,7 @@ export class ModuleSpecGenerator {
 
   /**
    * Extract Scope section (7/7)
-   * Confidence: 95% → 98% with @scope tag
+   * Confidence: 95% → 98% with `@scope` tag
    */
   private extractScope(
     node: ts.Node,

@@ -16,6 +16,15 @@ func init() {
 
 const tsdocConfigRuleName = "tsdoc-edge/tsdoc-config"
 
+var (
+	_ rule.ProjectRule                 = tsdocConfigRule{}
+	_ rule.ProjectInputRule            = tsdocConfigRule{}
+	_ rule.ProjectInputObservationRule = tsdocConfigRule{}
+	_ rule.HintRule                    = tsdocConfigRule{}
+	_ rule.TypeAwareRule               = tsdocConfigRule{}
+	_ rule.OptionsRule                 = tsdocConfigRule{}
+)
+
 // tsdocConfigRule loads and validates the workspace tsdoc.json once per Program
 // cycle via ProjectInputReader, publishes the resolved tag table to file rules,
 // and exposes JSDoc `@tag` completions to ttscserver via HintRule.

@@ -281,7 +281,9 @@ export class EntryPointDetector {
         return 'Application initialization';
       case EntryPointType.TEST_RUNNER:
         return 'Test runner entry point';
-      default:
+      case EntryPointType.CLI:
+      case EntryPointType.MAIN_FUNCTION:
+      case EntryPointType.SCRIPT:
         return 'Main entry point';
     }
   }

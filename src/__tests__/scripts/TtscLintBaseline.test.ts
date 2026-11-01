@@ -1,5 +1,5 @@
 /**
- * Tests for the @ttsc/lint ratchet parser.
+ * Tests for the `@ttsc/lint` ratchet parser.
  */
 
 const { parseTtscLintOutput, compareToBaseline } =

@@ -351,7 +351,7 @@ export class TestSymbolParser {
   }
 
   /**
-   * Extract test scenarios from JSDoc @testScenario tags
+   * Extract test scenarios from JSDoc `@testScenario` tags
    */
   private extractTestScenarios(sourceFile: ts.SourceFile, _sourceCode: string): void {
     // Find JSDoc comments at the top of the file
@@ -465,7 +465,7 @@ export class TestSymbolParser {
   /**
    * Generate test symbol ID
    *
-   * Format: {file-base}-{suite-chain}-{name}-{type}
+   * Format: `{file-base}-{suite-chain}-{name}-{type}`
    */
   private generateTestId(
     name: string,

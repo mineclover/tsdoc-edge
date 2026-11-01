@@ -393,7 +393,7 @@ export class MissingLinkDetector {
   /**
    * Get symbol registry for testing/debugging
    * @internal
-   * @returns Returns Map<string, ExtractedEnhancedDoc>
+   * @returns Returns `Map<string, ExtractedEnhancedDoc>`
    */
   getSymbolRegistry(): Map<string, ExtractedEnhancedDoc> {
     return this.symbolRegistry;

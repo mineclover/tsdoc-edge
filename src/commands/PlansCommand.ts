@@ -23,7 +23,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @functionality
  * - Database query: Extract future plans from enhanced_docs table
  * - Status filtering: Optional --status= filter
- * - Priority sorting: High > Medium > Low
+ * - Priority sorting: `High > Medium > Low`
  * - Detailed display: ID, title, status, priority, milestone, implementer
  * - Summary statistics: Total plan count
  *

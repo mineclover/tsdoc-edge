@@ -1,5 +1,5 @@
 /**
- * Coverage Report command - Reports @doc tag coverage for SSOT validation
+ * Coverage Report command - Reports `@doc` tag coverage for SSOT validation
  * @packageDocumentation
  */
 
@@ -52,25 +52,25 @@ interface CoverageReport {
 }
 
 /**
- * Command for reporting @doc tag coverage
+ * Command for reporting `@doc` tag coverage
  *
  * @public
- * @responsibility Report real SSOT coverage based on @doc tags
+ * @responsibility Report real SSOT coverage based on `@doc` tags
  * @contract Calculate and display coverage metrics for documentation
  *
  * @problem Current explore-entrypoint metric is misleading (9.2% but actually much higher)
- * @solves Measures actual @doc tag coverage in code (code → docs direction)
+ * @solves Measures actual `@doc` tag coverage in code (code → docs direction)
  * @context Phase 1 of SSOT improvement plan - fix coverage metric
  *
  * @functionality
  * - Symbol analysis: Read all symbols from database
- * - @doc tag detection: Parse source files to check for @doc tags
+ * - `@doc` tag detection: Parse source files to check for `@doc` tags
  * - Categorization: Group by symbol type (commands, analyzers, types, utilities)
  * - Priority ranking: Highlight high-priority undocumented symbols
  * - Report generation: Display coverage statistics and recommendations
  *
- * @decision Measure @doc tag presence, not .md traversal
- * @rationale @doc tags show code→docs links (SSOT direction), .md traversal only shows docs→docs
+ * @decision Measure `@doc` tag presence, not .md traversal
+ * @rationale `@doc` tags show code→docs links (SSOT direction), .md traversal only shows docs→docs
  * @consequences Reveals true documentation status, not navigation completeness
  *
  * @depends DatabaseManager, TSDocParser
@@ -276,12 +276,12 @@ export class CoverageReportCommand extends BaseCommand {
   /**
    * Get all symbols from database
    */
-  private async getAllSymbols(): Promise<Symbol[]> {
+  private getAllSymbols(): Promise<Symbol[]> {
     try {
-      return await this.getDatabase().getAllSymbols();
+      return Promise.resolve(this.getDatabase().getAllSymbols()).catch((): Symbol[] => []);
     } catch (_error) {
       // If database doesn't exist or method not available, return empty
-      return [];
+      return Promise.resolve([]);
     }
   }
 
@@ -338,7 +338,7 @@ export class CoverageReportCommand extends BaseCommand {
     }
   }
 
-  /** Collect the legacy @doc signal in the score shape expected by projection. */
+  /** Collect the legacy `@doc` signal in the score shape expected by projection. */
   private async collectDocumentationScores(symbols: Symbol[]): Promise<DocQualityScore[]> {
     const scores: DocQualityScore[] = [];
     for (const symbol of symbols) {
@@ -412,7 +412,7 @@ export class CoverageReportCommand extends BaseCommand {
   }
 
   /**
-   * Check if symbol has @doc tag
+   * Check if symbol has `@doc` tag
    */
   private async hasDocTag(symbol: Symbol): Promise<boolean> {
     try {
