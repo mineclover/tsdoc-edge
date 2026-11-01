@@ -5,6 +5,7 @@
  */
 
 import Database from 'better-sqlite3';
+import { existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
@@ -56,7 +57,10 @@ async function runBenchmarks() {
   console.log(`${colors.bright}TSDoc Edge MCP Server - Performance Benchmark${colors.reset}`);
   console.log(`${colors.cyan}${'='.repeat(120)}${colors.reset}\n`);
 
-  const dbPath = join(__dirname, '..', '.tsdoc', 'symbols.db');
+  const defaultDbPath = join(__dirname, '..', '.tsdoc.db');
+  const dbPath = existsSync(defaultDbPath)
+    ? defaultDbPath
+    : join(__dirname, '..', '.tsdoc', 'symbols.db');
   const db = new Database(dbPath, { readonly: true });
 
   console.log(`${colors.bright}Database Operations (100 iterations each)${colors.reset}\n`);

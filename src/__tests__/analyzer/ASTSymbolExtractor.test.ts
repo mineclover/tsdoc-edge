@@ -396,5 +396,26 @@ export function functionA() {}
       expect(result.symbols.length).toBe(6);
       expect(result.symbols.every((s) => s.isExported)).toBe(true);
     });
+
+    it('should not misattribute file-level @packageDocumentation summary to the first symbol', () => {
+      const testFile = path.join(tempDir, 'pkg-doc-first.ts');
+      const sourceCode = `
+/**
+ * File-level module overview
+ * @packageDocumentation
+ */
+
+/**
+ * Actual symbol summary
+ * @public
+ */
+export class FirstDeclaredClass {}
+`;
+
+      const result = extractor.extract(testFile, sourceCode);
+
+      expect(result.symbols).toHaveLength(1);
+      expect(result.symbols[0]?.summary).toBe('Actual symbol summary');
+    });
   });
 });

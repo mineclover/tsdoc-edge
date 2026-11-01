@@ -7,6 +7,7 @@
  */
 
 import * as ts from 'typescript';
+import { extractLeadingJsDocText, readTsdocComment, TSDocParser } from '../parser/TSDocParser';
 import type { Symbol, SymbolRelationship } from '../types/graph';
 
 /**
@@ -53,6 +54,7 @@ export interface ExtractionResult {
  * @responsibility Extract all symbols from TypeScript AST regardless of JSDoc presence
  */
 export class ASTSymbolExtractor {
+  private readonly tsdocParser = new TSDocParser();
   private symbols: ExtractedSymbol[] = [];
   private relationships: SymbolRelationship[] = [];
   private imports: ExtractionResult['imports'] = [];
@@ -602,25 +604,17 @@ export class ASTSymbolExtractor {
   }
 
   /**
-   * Extract JSDoc summary if available
+   * Extract JSDoc summary using `@microsoft/tsdoc` AST (`extractLeadingJsDocText` ensures
+   * file-level `@packageDocumentation` headers are never misattributed to the first declaration).
    */
   private extractJSDocSummary(node: ts.Node): string | undefined {
-    const jsDocComments = (node as ts.Node & { jsDoc?: ts.JSDoc[] }).jsDoc;
-    if (!jsDocComments || jsDocComments.length === 0) return undefined;
-
-    const firstJsDoc = jsDocComments[0];
-    if (firstJsDoc.comment) {
-      if (typeof firstJsDoc.comment === 'string') {
-        return firstJsDoc.comment;
-      }
-      // Handle complex JSDoc comment structures (array of JSDocText/JSDocLink)
-      return (firstJsDoc.comment as ts.NodeArray<ts.JSDocText | ts.JSDocLink>)
-        .map((part: ts.JSDocText | ts.JSDocLink) => ('text' in part ? part.text : ''))
-        .join('')
-        .trim();
+    const jsDocText = extractLeadingJsDocText(node, node.getSourceFile());
+    if (!jsDocText) {
+      return undefined;
     }
 
-    return undefined;
+    const structured = readTsdocComment(this.tsdocParser.parseString(jsDocText).docComment);
+    return structured.summary || undefined;
   }
 
   /**

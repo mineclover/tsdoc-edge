@@ -124,9 +124,9 @@ export class ParseCommand extends BaseCommand {
       if (allResults.length === 0) {
         this.printWarning('No enhanced documentation found');
         console.log();
-        console.log('Add custom TSDoc tags to your code:');
+        console.log('Add TSDoc tags to your code:');
         console.log(
-          `  ${colors.dim}@problem, @functionality, @errorExp, @decision, @dependency, @plan${colors.reset}`
+          `  ${colors.dim}@responsibility, @problem, @solves, @contract, @functionality, @decision, @privateRemarks${colors.reset}`
         );
         console.log();
         return this.success();

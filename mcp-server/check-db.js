@@ -3,13 +3,17 @@
  * Quick database check for Work Context test
  */
 import Database from 'better-sqlite3';
+import { existsSync } from 'fs';
 import { join, dirname } from 'path';
 import { fileURLToPath } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const dbPath = join(__dirname, '..', '.tsdoc', 'symbols.db');
+const defaultDbPath = join(__dirname, '..', '.tsdoc.db');
+const dbPath = existsSync(defaultDbPath)
+  ? defaultDbPath
+  : join(__dirname, '..', '.tsdoc', 'symbols.db');
 const db = new Database(dbPath, { readonly: true });
 
 console.log('Checking database for AnalyzeAllCommand...\n');

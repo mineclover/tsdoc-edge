@@ -127,8 +127,8 @@ async function runTests() {
 
   // Test 4: Get work context
   await test('Get work context for a file', async () => {
-    const context = await service.getWorkContext('src/commands/AnalyzeAllCommand.ts', 2);
-    if (!context || !context.includes('Work Context')) {
+    const context = await service.getWorkContext('src/commands/AnalyzeCommand.ts', 2);
+    if (!context || !context.includes('Work Context') || context.includes('No symbols found')) {
       throw new Error('Invalid work context');
     }
     console.log(`  Context length: ${context.length} chars`);
@@ -143,8 +143,8 @@ async function runTests() {
   // Test 6: Get symbol details
   await test('Get symbol details', async () => {
     const details = await service.getSymbolDetails('class-databasemanager');
-    const found = typeof details === 'string' && details.includes('Symbol');
-    console.log(`  Symbol found: ${found ? 'Yes' : 'No'}`);
+    const found = Boolean(details && (details.id || (typeof details === 'string' && details.includes('Symbol'))));
+    console.log(`  Symbol found: ${found ? `Yes (${details.id || details.name})` : 'No'}`);
     if (!details) {
       throw new Error('No details returned');
     }

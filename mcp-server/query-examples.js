@@ -12,7 +12,10 @@ import { existsSync } from 'fs';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const dbPath = join(__dirname, '..', '.tsdoc', 'symbols.db');
+const defaultDbPath = join(__dirname, '..', '.tsdoc.db');
+const dbPath = existsSync(defaultDbPath)
+  ? defaultDbPath
+  : join(__dirname, '..', '.tsdoc', 'symbols.db');
 
 if (!existsSync(dbPath)) {
   console.error('Database not found at:', dbPath);

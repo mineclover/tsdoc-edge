@@ -426,7 +426,7 @@ export class ConnectivityValidator {
         issueType: 'missing-tests',
         severity: 'error',
         message: `Public API '${symbol.name}' has no tests`,
-        suggestedFix: `Add @testedBy or @testScenario tags to link test files`,
+        suggestedFix: `Add unit tests importing '${symbol.name}' and annotate scenarios with @testScenario`,
       });
     }
 
@@ -512,7 +512,7 @@ export class ConnectivityValidator {
         issueType: 'orphaned',
         severity: 'info',
         message: `Symbol '${symbol.name}' is orphaned (no relationships)`,
-        suggestedFix: `Consider:\n- Exporting if it should be public\n- Adding @dependsOn/@usedBy tags\n- Removing if unused`,
+        suggestedFix: `Consider:\n- Exporting if it should be public\n- Adding @relatedTo or @doc [[Symbol]] tags\n- Removing if unused`,
       });
     }
 

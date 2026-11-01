@@ -2,7 +2,7 @@
   "tsdoc-edge/doc-link-target": 113,
   "typescript/no-deprecated": 180,
   "typescript/no-unnecessary-condition": 253,
-  "typescript/no-unnecessary-type-assertion": 90,
+  "typescript/no-unnecessary-type-assertion": 88,
   "typescript/no-unsafe-argument": 54,
   "typescript/no-unsafe-assignment": 133,
   "typescript/require-await": 109

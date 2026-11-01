@@ -4,6 +4,7 @@
  * @responsibility Aggregate all context for a given entry point (file/symbol/doc)
  */
 
+import * as fs from 'node:fs';
 import * as path from 'node:path';
 import type { DatabaseManager } from '../storage/DatabaseManager';
 import type { Symbol } from '../types/graph';
@@ -212,9 +213,61 @@ export class EntryPointContextAggregator {
       context.primarySymbol = symbols.find((s: Symbol) => s.isExported) || symbols[0];
 
       // Gather relationships for all symbols in file
+      const fileSymbolIds = new Set<string>();
       for (const symbol of symbols) {
-        this.gatherSymbolContext(symbol.id, context, depth);
+        const symbolKey = symbol.id;
+        fileSymbolIds.add(symbolKey);
+        this.gatherSymbolContext(symbolKey, context, depth);
       }
+
+      // Deduplicate file-level aggregated collections so shared @packageDocumentation and imports are not repeated per symbol
+      const dedupeBy = <T>(items: T[], keyFn: (item: T) => string): T[] => {
+        const seen = new Set<string>();
+        return items.filter((item) => {
+          const key = keyFn(item);
+          if (seen.has(key)) return false;
+          seen.add(key);
+          return true;
+        });
+      };
+
+      context.dependencies = dedupeBy(
+        context.dependencies.filter((d) => !fileSymbolIds.has(d.symbolId)),
+        (d) => `${d.symbolId}:${d.relationship}`
+      );
+      context.usedBy = dedupeBy(
+        context.usedBy.filter((u) => !fileSymbolIds.has(u.symbolId)),
+        (u) => `${u.symbolId}:${u.relationship}`
+      );
+      context.docReferences = dedupeBy(
+        context.docReferences,
+        (d) => `${d.docSymbol}#${d.section ?? ''}`
+      );
+      context.referencedByDocs = dedupeBy(context.referencedByDocs, (d) => d.docSymbol);
+      for (const mirrorTestFile of this.findMirrorTestFiles(normalizedPath)) {
+        context.testCoverage.push({
+          testSymbol: path.basename(mirrorTestFile, path.extname(mirrorTestFile)),
+          testFile: mirrorTestFile,
+          coverageType: mirrorTestFile.includes('integration') ? 'integration' : 'unit',
+        });
+      }
+      context.testCoverage = dedupeBy(context.testCoverage, (t) => `${t.testSymbol}:${t.testFile}`);
+      context.relatedSymbols = dedupeBy(
+        context.relatedSymbols.filter((r) => !fileSymbolIds.has(r.symbolId)),
+        (r) => `${r.symbolId}:${r.relationshipType}`
+      );
+
+      context.impact.directImpact = context.usedBy.length;
+      context.impact.affectedFiles = this.getAffectedFiles(context);
+      context.impact.affectedTests = Array.from(
+        new Set(context.testCoverage.map((t) => t.testFile).filter(Boolean))
+      );
+      context.impact.affectedDocs = Array.from(
+        new Set([
+          ...context.docReferences.map((d) => d.docSymbol),
+          ...context.referencedByDocs.map((d) => d.docSymbol),
+        ])
+      );
     }
   }
 
@@ -239,8 +292,10 @@ export class EntryPointContextAggregator {
 
     // Process relationships by type
     for (const rel of relevantRels) {
-      const from = Array.isArray(rel.from) ? rel.from[0] : rel.from;
-      const to = Array.isArray(rel.to) ? rel.to[0] : rel.to;
+      const fromList = Array.isArray(rel.from) ? rel.from : [rel.from];
+      const toList = Array.isArray(rel.to) ? rel.to : [rel.to];
+      const from = fromList[0];
+      const to = toList[0];
 
       // Count explicit vs inferred
       if (rel.properties?.inferred) {
@@ -283,7 +338,10 @@ export class EntryPointContextAggregator {
           type: rel.type,
           relationship: 'import',
         });
-      } else if (rel.type === 'test-coverage' && to === symbolId) {
+      } else if (
+        (rel.type === 'test-coverage' || rel.type === 'test-as-example') &&
+        toList.includes(symbolId)
+      ) {
         // Test covers this symbol
         context.testCoverage.push({
           testSymbol: from,
@@ -423,5 +481,35 @@ export class EntryPointContextAggregator {
     });
 
     return Array.from(files);
+  }
+
+  /**
+   * Discover conventional mirror/colocated test files (`src/__tests__/<dir>/<Base>.test.ts`).
+   */
+  private findMirrorTestFiles(relativePath: string): string[] {
+    const normalized = relativePath.replace(/\\/g, '/');
+    const ext = path.posix.extname(normalized);
+    if (!ext || normalized.endsWith(`.test${ext}`) || normalized.endsWith(`.spec${ext}`)) {
+      return [];
+    }
+    const baseWithoutExt = normalized.slice(0, -ext.length);
+    const candidates = new Set<string>([
+      `${baseWithoutExt}.test${ext}`,
+      `${baseWithoutExt}.spec${ext}`,
+    ]);
+    if (normalized.startsWith('src/')) {
+      const subPath = baseWithoutExt.slice('src/'.length);
+      candidates.add(path.posix.join('src/__tests__', `${subPath}.test${ext}`));
+      candidates.add(path.posix.join('src/__tests__', `${subPath}.spec${ext}`));
+    }
+
+    const found: string[] = [];
+    for (const candidate of candidates) {
+      const absCandidate = path.resolve(process.cwd(), candidate);
+      if (fs.existsSync(absCandidate)) {
+        found.push(path.relative(process.cwd(), absCandidate));
+      }
+    }
+    return found;
   }
 }

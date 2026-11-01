@@ -7,16 +7,8 @@ import * as crypto from 'node:crypto';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';
+import { getDirectJsDocs, readTsdocComment, TSDocParser } from '../parser/TSDocParser';
 import type { CommentLocation, CommentState, FileCommentState } from '../types/state';
-
-// TypeScript compiler API internal types
-/**
- * NodeWithJSDoc interface
- * @public
- */
-interface NodeWithJSDoc extends ts.Node {
-  jsDoc?: ts.JSDoc[];
-}
 
 /**
  * Exports TSDoc comments from TypeScript files to Markdown format
@@ -24,6 +16,7 @@ interface NodeWithJSDoc extends ts.Node {
  * @public
  */
 export class CommentExporter {
+  private readonly tsdocParser = new TSDocParser();
   /**
    * Extract comments from a TypeScript file
    *
@@ -55,9 +48,9 @@ export class CommentExporter {
     sourceCode: string,
     comments: CommentState[]
   ): void {
-    const jsDocComments = (node as NodeWithJSDoc).jsDoc;
+    const jsDocComments = getDirectJsDocs(node);
 
-    if (jsDocComments && jsDocComments.length > 0) {
+    if (jsDocComments.length > 0) {
       for (const jsDoc of jsDocComments) {
         const fullText = jsDoc.getFullText();
         const symbolName = this.getSymbolName(node);
@@ -132,36 +125,11 @@ export class CommentExporter {
    * @returns Collapsed comment (single line)
    */
   private createCollapsedForm(fullComment: string): string {
-    // Extract summary (first non-empty line after /**)
-    const lines = fullComment.split('\n');
-    let summary = '';
-
-    for (let i = 0; i < lines.length; i++) {
-      const line = lines[i].trim();
-
-      // Skip opening /**
-      if (line.startsWith('/**')) {
-        continue;
-      }
-
-      // Stop at first tag or closing */
-      if (line.startsWith('*') && (line.includes('@') || line === '*/')) {
-        break;
-      }
-
-      // Extract summary text
-      if (line.startsWith('*')) {
-        const text = line.substring(1).trim();
-        if (text) {
-          summary = text;
-          break;
-        }
-      }
-    }
-
-    if (!summary) {
-      summary = 'Comment';
-    }
+    const trimmed = fullComment.trim();
+    const structured = trimmed.startsWith('/**')
+      ? readTsdocComment(this.tsdocParser.parseString(trimmed).docComment)
+      : null;
+    const summary = structured?.summary.split('\n')[0]?.trim() || 'Comment';
 
     return `/** ${summary} */`;
   }

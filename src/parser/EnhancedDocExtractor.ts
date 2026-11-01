@@ -10,6 +10,7 @@ import type { ParserContext } from '@microsoft/tsdoc';
 import * as ts from 'typescript';
 import type { Symbol } from '../types/graph';
 import type {
+  ContractSpec,
   DecisionRecord,
   DependencySpec,
   EnhancedSymbolDoc,
@@ -106,13 +107,8 @@ export class EnhancedDocExtractor {
 
     const results: ExtractedEnhancedDoc[] = [];
 
-    const visit = (node: ts.Node, isInsideClass = false) => {
-      // Skip class members (methods, properties)
-      if (isInsideClass && (ts.isMethodDeclaration(node) || ts.isPropertyDeclaration(node))) {
-        return;
-      }
-
-      // Extract from exportable symbols
+    const visit = (node: ts.Node) => {
+      // Extract from top-level / module-level exportable declarations
       if (this.isExportableSymbol(node)) {
         const result = this.extractFromNode(node, sourceFile, filePath);
         if (result) {
@@ -120,9 +116,10 @@ export class EnhancedDocExtractor {
         }
       }
 
-      // Mark if we're inside a class
-      const insideClass = ts.isClassDeclaration(node);
-      ts.forEachChild(node, (child) => visit(child, insideClass));
+      // Only traverse module/source containers so local variables inside function or class bodies are never extracted
+      if (ts.isSourceFile(node) || ts.isModuleDeclaration(node) || ts.isModuleBlock(node)) {
+        ts.forEachChild(node, visit);
+      }
     };
 
     visit(sourceFile);
@@ -167,6 +164,9 @@ export class EnhancedDocExtractor {
 
     const symbol = this.extractSymbolInfo(node, sourceFile, filePath, name, structured);
     const doc = this.extractEnhancedDoc(structured, symbol, sourceFile);
+    if (!this.options.includePartial && !this.hasEnhancedMetadata(doc, symbol)) {
+      return null;
+    }
     const { completeness, missing } = this.calculateCompleteness(doc);
 
     return {
@@ -175,6 +175,22 @@ export class EnhancedDocExtractor {
       completeness,
       missing,
     };
+  }
+
+  /**
+   * Check whether an extracted symbol carries explicit enhanced TSDoc metadata
+   * beyond file-level AST imports.
+   */
+  private hasEnhancedMetadata(doc: EnhancedSymbolDoc, symbol: Symbol): boolean {
+    return Boolean(
+      doc.problemSolving ||
+        doc.functionality ||
+        (doc.errorExperiences && doc.errorExperiences.length > 0) ||
+        (doc.decisions && doc.decisions.length > 0) ||
+        (doc.futurePlans && doc.futurePlans.length > 0) ||
+        doc.dependencies?.some((dep) => dep.reason !== 'TypeScript AST import') ||
+        symbol.contract
+    );
   }
 
   /**
@@ -235,6 +251,7 @@ export class EnhancedDocExtractor {
     const id = this.options.autoGenerateIds ? `${name.toLowerCase()}-${Date.now()}` : name;
     const isPublic =
       structured?.releaseVisibility === 'internal' ? false : Boolean(hasExportKeyword);
+    const contract = this.extractContractSpec(structured, name, filePath);
 
     return {
       id,
@@ -246,8 +263,51 @@ export class EnhancedDocExtractor {
       isExported: Boolean(hasExportKeyword),
       isPublic,
       ...(structured?.summary ? { summary: structured.summary } : {}),
+      ...(contract ? { contract } : {}),
       tests: [],
       designDecisions: [],
+    };
+  }
+
+  /**
+   * Extract `@contract`, `@precondition`, `@postcondition`, and `@invariant` specifications from structured TSDoc.
+   */
+  private extractContractSpec(
+    structured: StructuredTsdocComment | null,
+    symbolName: string,
+    filePath: string
+  ): ContractSpec | undefined {
+    if (!structured) {
+      return undefined;
+    }
+
+    const contractDescription = structured.getFirstTagValue('@contract')?.trim() ?? '';
+    const preconditions = structured
+      .getTagValues('@precondition')
+      .flatMap((value) => this.parseList(value));
+    const postconditions = structured
+      .getTagValues('@postcondition')
+      .flatMap((value) => this.parseList(value));
+    const invariants = structured
+      .getTagValues('@invariant')
+      .flatMap((value) => this.parseList(value));
+
+    if (
+      !contractDescription &&
+      preconditions.length === 0 &&
+      postconditions.length === 0 &&
+      invariants.length === 0
+    ) {
+      return undefined;
+    }
+
+    return {
+      symbolName,
+      description: contractDescription || structured.summary || `${symbolName} contract`,
+      preconditions,
+      postconditions,
+      invariants,
+      filePath,
     };
   }
 

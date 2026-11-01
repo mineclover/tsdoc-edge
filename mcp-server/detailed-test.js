@@ -144,14 +144,14 @@ async function runDetailedTests() {
       name: '📁 Tool 4: Work Context - Real File',
       request: createMessage('tools/call', {
         name: 'tsdoc_get_work_context',
-        arguments: { filePath: 'src/commands/AnalyzeAllCommand.ts', depth: 2 },
+        arguments: { filePath: 'src/commands/AnalyzeCommand.ts', depth: 2 },
       }),
       validate: (res) => {
         const content = res.result?.content?.[0]?.text || '';
         const symbols = content.match(/Symbols.*?(\d+)/)?.[1];
         const rels = content.match(/Relationships.*?(\d+)/)?.[1];
         log('DETAIL', `File has ${symbols || 0} symbols, ${rels || 0} relationships`, colors.blue);
-        return content.includes('Work Context');
+        return content.includes('Work Context') && Number(symbols || 0) > 0;
       },
     },
 
@@ -159,12 +159,12 @@ async function runDetailedTests() {
       name: '📐 Tool 5: Design Context - Check Implementation',
       request: createMessage('tools/call', {
         name: 'tsdoc_get_design_context',
-        arguments: { filePath: 'src/commands/CommandRegistry.ts' },
+        arguments: { filePath: 'src/commands/BuildCommand.ts' },
       }),
       validate: (res) => {
         const content = res.result?.content?.[0]?.text || '';
         log('DETAIL', `Design context: ${content.length} chars`, colors.blue);
-        return content.includes('Design Context');
+        return content.includes('Design Context') && content.includes('Contracts');
       },
     },
 
@@ -178,7 +178,7 @@ async function runDetailedTests() {
         const content = res.result?.content?.[0]?.text || '';
         const found = content.match(/Found: (\d+)/)?.[1];
         log('DETAIL', `DatabaseManager has ${found || 0} direct relationships`, colors.blue);
-        return content.includes('Relationship Query');
+        return content.includes('Relationship Query') && Number(found || 0) > 0;
       },
     },
 
@@ -186,13 +186,13 @@ async function runDetailedTests() {
       name: '🔎 Tool 7: Symbol Details - Specific Class',
       request: createMessage('tools/call', {
         name: 'tsdoc_get_symbol_details',
-        arguments: { symbolId: 'class-analyzeallcommand', includeRelationships: true },
+        arguments: { symbolId: 'class-analyzecommand', includeRelationships: true },
       }),
       validate: (res) => {
         const content = res.result?.content?.[0]?.text || '';
-        const hasId = content.includes('class-analyzeallcommand') || content.includes('Symbol not found');
+        const hasId = content.includes('analyzecommand-class-analyzecommand');
         log('DETAIL', hasId ? 'Symbol found and detailed' : 'Symbol structure validated', colors.blue);
-        return true; // Always pass - tests error handling too
+        return hasId;
       },
     },
 

@@ -143,6 +143,23 @@ function findSimilarCommands(input: string, commands: string[], maxDistance = 3)
     .map(({ cmd }) => cmd);
 }
 
+/**
+ * Flush pending stdout/stderr buffer writes before terminating so large piped `--json` outputs never truncate.
+ */
+async function flushOutputsAndExit(exitCode: number): Promise<never> {
+  const flushStream = (stream: NodeJS.WriteStream): Promise<void> =>
+    new Promise((resolve) => {
+      if (stream.writableLength === 0) {
+        resolve();
+        return;
+      }
+      stream.write('', () => resolve());
+    });
+
+  await Promise.all([flushStream(process.stdout), flushStream(process.stderr)]);
+  process.exit(exitCode);
+}
+
 // Parse command line arguments
 const args = process.argv.slice(2);
 
@@ -282,7 +299,7 @@ async function main(): Promise<void> {
   if (commandName === '--version' || commandName === '-v' || commandName === 'version') {
     const version = require('../package.json').version;
     console.log(`tsdoc-edge v${version}`);
-    process.exit(0);
+    await flushOutputsAndExit(0);
   }
 
   // Track command execution
@@ -350,8 +367,8 @@ async function main(): Promise<void> {
 
   usageTracker.recordEvent(event);
 
-  // Exit with appropriate code
-  process.exit(result.exitCode);
+  // Exit with appropriate code after flushing buffered stdout/stderr pipes
+  await flushOutputsAndExit(result.exitCode);
 }
 
 // Run main function

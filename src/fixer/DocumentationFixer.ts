@@ -6,6 +6,7 @@
 
 import * as fs from 'node:fs';
 import * as ts from 'typescript';
+import { getDirectJsDocs, readTsdocComment, TSDocParser } from '../parser/TSDocParser';
 import type { DocQualityScore } from '../types/analysis';
 
 /** One planned edit: insert a new block, append tags to a multi-line block, or rewrite a one-line block. */
@@ -58,6 +59,8 @@ export interface FixResult {
  * @responsibility Generate and insert missing TSDoc comments
  */
 export class DocumentationFixer {
+  private readonly tsdocParser = new TSDocParser();
+
   /**
    * Fix documentation for a file based on quality scores
    *
@@ -302,10 +305,9 @@ export class DocumentationFixer {
       if (sourceLines[startLine].trim() !== docText.trim()) {
         return null; // the comment shares its line with code; leave it untouched
       }
-      const summary = docText
-        .replace(/^\/\*\*\s*/, '')
-        .replace(/\s*\*\/$/, '')
-        .trim();
+      const summary = readTsdocComment(
+        this.tsdocParser.parseString(docText).docComment
+      ).summary.trim();
       const replacement = [
         `${indent}/**`,
         ...(summary ? [`${indent} * ${summary}`] : []),
@@ -345,8 +347,8 @@ export class DocumentationFixer {
       targetNode = node.parent.parent; // VariableStatement
     }
 
-    const jsDocTags = (targetNode as unknown as { jsDoc?: ts.JSDoc[] }).jsDoc;
-    if (!jsDocTags || jsDocTags.length === 0) {
+    const jsDocTags = getDirectJsDocs(targetNode);
+    if (jsDocTags.length === 0) {
       return null;
     }
 

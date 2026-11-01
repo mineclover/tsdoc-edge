@@ -1,10 +1,9 @@
 /**
  * TSDoc Service - Direct Database Access Layer
  *
- * @module TsDocService
- * @category MCP Server
+ * @packageDocumentation
  *
- * @description
+ * @remarks
  * Provides direct SQLite access to TSDoc Edge knowledge graph for MCP tools.
  * This service replaces CLI execution with database queries for better performance.
  *
@@ -13,14 +12,14 @@
  *
  * ## Context
  * - Used by all 7 MCP tools ([[SearchSymbolsTool]], [[GetOntologyStatsTool]], etc.)
- * - Operates on TSDoc Edge database: `.tsdoc/symbols.db`
+ * - Operates on TSDoc Edge database: `.tsdoc.db` (configured via `.tsdoc.config.json`, with legacy `.tsdoc/symbols.db` fallback)
  * - Read-only operations for safety
  *
  * ## Design Decisions
  *
  * @decision Direct Database Access
  * Replaced exec-based CLI calls with better-sqlite3 for:
- * - 10x faster queries (<10ms avg)
+ * - 10x faster queries (under 10ms avg)
  * - No subprocess overhead
  * - Better error handling
  * - Connection pooling
@@ -30,8 +29,6 @@
  *
  * @decision Lazy Connection
  * Connection established on first query to minimize resource usage
- *
- * @public
  */
 
 import * as fs from 'node:fs';
@@ -45,7 +42,7 @@ import type { OntologyStats, Relationship, Symbol } from '../types.js';
  *
  * @public
  *
- * @description
+ * @remarks
  * Main service class for MCP server database operations.
  * Provides simplified API over TSDoc Edge database schema.
  *
@@ -66,11 +63,7 @@ import type { OntologyStats, Relationship, Symbol } from '../types.js';
  * - Database path MUST be valid TSDoc Edge workspace
  * - All queries are readonly and safe
  *
- * @errorPattern Database Not Found
- * If `.tsdoc/symbols.db` doesn't exist:
- * - isDatabaseAvailable() returns false
- * - getDb() throws ERROR_MESSAGES.DATABASE_NOT_FOUND
- * - Caller should instruct user to run: tsdoc-edge build src
+ * @throws Error - Database Not Found if `.tsdoc.db` doesn't exist; caller should run `tsdoc-edge build src`
  *
  * @example
  * ```typescript
@@ -88,6 +81,7 @@ import type { OntologyStats, Relationship, Symbol } from '../types.js';
  * ```
  */
 export class TsDocService {
+  private readonly workspaceRoot: string;
   private dbPath: string;
   private db: Database.Database | null = null;
   private relationshipsCache: Relationship[] | null = null;
@@ -97,23 +91,54 @@ export class TsDocService {
    *
    * @param workspaceRoot - Path to TSDoc Edge workspace (defaults to cwd)
    *
-   * @description
-   * Sets database path to `<workspaceRoot>/.tsdoc/symbols.db`.
+   * @remarks
+   * Resolves database path from `.tsdoc.config.json` (`paths.databasePath`),
+   * falling back to `.tsdoc.db` and legacy `.tsdoc/symbols.db`.
    * Does NOT open connection - connection is lazy loaded on first query.
-   *
-   * ## Purpose
-   * Configure database path based on workspace location
-   *
-   * ## Logic
-   * - Use workspaceRoot if provided, otherwise process.cwd()
-   * - Append `.tsdoc/symbols.db` to get full path
-   * - Store path for later connection
    *
    * @public
    */
   constructor(workspaceRoot?: string) {
-    const cwd = workspaceRoot || process.cwd();
-    this.dbPath = path.join(cwd, '.tsdoc', 'symbols.db');
+    this.workspaceRoot = path.resolve(workspaceRoot || process.cwd());
+    this.dbPath = this.resolveDatabasePath(this.workspaceRoot);
+  }
+
+  /**
+   * Resolve SQLite database path from `.tsdoc.config.json`, `.tsdoc.db`, or legacy `.tsdoc/symbols.db`.
+   *
+   * @internal
+   */
+  private resolveDatabasePath(rootDir: string): string {
+    const configPath = path.join(rootDir, '.tsdoc.config.json');
+    if (fs.existsSync(configPath)) {
+      try {
+        const parsed = JSON.parse(fs.readFileSync(configPath, 'utf-8')) as {
+          paths?: { databasePath?: string };
+          database?: string;
+        };
+        const configured = parsed.paths?.databasePath || parsed.database;
+        if (configured) {
+          const resolved = path.resolve(rootDir, configured);
+          if (fs.existsSync(resolved)) {
+            return resolved;
+          }
+        }
+      } catch {
+        // Fall through to default locations
+      }
+    }
+
+    const defaultDb = path.join(rootDir, '.tsdoc.db');
+    if (fs.existsSync(defaultDb)) {
+      return defaultDb;
+    }
+
+    const legacyDb = path.join(rootDir, '.tsdoc', 'symbols.db');
+    if (fs.existsSync(legacyDb)) {
+      return legacyDb;
+    }
+
+    return defaultDb;
   }
 
   /**
@@ -121,24 +146,15 @@ export class TsDocService {
    *
    * @returns True if database file exists at configured path
    *
-   * @description
-   * Checks filesystem for `.tsdoc/symbols.db` without opening connection.
-   *
-   * ## Purpose
-   * Early validation before attempting queries
-   *
-   * ## Usage Pattern
-   * Always check before starting MCP server:
-   * ```typescript
-   * if (!service.isDatabaseAvailable()) {
-   *   console.error('Database not found. Run: tsdoc-edge build src');
-   *   process.exit(1);
-   * }
-   * ```
+   * @remarks
+   * Checks filesystem for the resolved SQLite database without opening connection.
    *
    * @public
    */
   isDatabaseAvailable(): boolean {
+    if (!fs.existsSync(this.dbPath)) {
+      this.dbPath = this.resolveDatabasePath(this.workspaceRoot);
+    }
     return fs.existsSync(this.dbPath);
   }
 
@@ -146,32 +162,16 @@ export class TsDocService {
    * Get database connection (lazy loaded)
    *
    * @returns SQLite database instance
-   * @throws {Error} If database doesn't exist
+   * @throws Error - If database does not exist (run `tsdoc-edge build src`)
    *
-   * @description
+   * @remarks
    * Returns existing connection or creates new readonly connection.
    *
-   * ## Purpose
-   * Provide singleton connection for all queries
-   *
-   * ## Logic
-   * - Check if database file exists
-   * - Return existing connection if available
-   * - Create new readonly connection on first call
-   * - Store and return connection
-   *
-   * ## Effects
-   * - Opens file descriptor on first call
-   * - Locks database file in readonly mode
-   *
    * @contract
-   * - Connection MUST be closed with close() when done
+   * - Connection MUST be closed with `close()` when done
    * - Database opened readonly - cannot modify data
    *
-   * @errorPattern Database Not Found
-   * Throws error with guidance to run: tsdoc-edge build src
-   *
-   * @private
+   * @internal
    */
   private getDb(): Database.Database {
     if (!this.isDatabaseAvailable()) {
@@ -188,21 +188,8 @@ export class TsDocService {
   /**
    * Close database connection
    *
-   * @description
+   * @remarks
    * Explicitly closes connection and releases file descriptor.
-   *
-   * ## Purpose
-   * Clean up resources when service is no longer needed
-   *
-   * ## When to Call
-   * - MCP server shutdown
-   * - After batch operations
-   * - Before process exit
-   *
-   * ## Effects
-   * - Closes file descriptor
-   * - Releases database lock
-   * - Sets connection to null
    *
    * @contract
    * Safe to call multiple times - no-op if already closed
@@ -223,27 +210,14 @@ export class TsDocService {
    *
    * @returns Array of all relationships with parsed JSON fields
    *
-   * @description
+   * @remarks
    * Fetches all relationships and parses JSON columns into TypeScript types.
-   *
-   * ## Purpose
-   * Central method for loading relationship data
-   *
-   * ## Schema Mapping
-   * Database columns → TypeScript fields:
-   * - from_symbols (JSON) → from (string | string[])
-   * - to_symbols (JSON) → to (string | string[])
-   * - properties (JSON?) → properties (object?)
-   *
-   * ## Performance
-   * - Loads all relationships into memory (~20K rows = ~5MB)
-   * - Cached in memory for duration of query
-   * - Fast enough for MCP use case (<50ms)
+   * Cached in memory for duration of query (under 50ms for ~20K rows).
    *
    * @contract
    * Returns all relationships - caller must filter/paginate
    *
-   * @private
+   * @internal
    */
   private getAllUnifiedRelationships(): Relationship[] {
     // Return cached relationships if available (performance optimization)
@@ -295,7 +269,7 @@ export class TsDocService {
    * @param _detailed - Include detailed breakdowns (currently unused)
    * @returns Statistics about knowledge graph structure
    *
-   * @description
+   * @remarks
    * Calculates comprehensive statistics about codebase knowledge graph.
    * Used by [[tsdoc_get_ontology_stats]] MCP tool.
    *
@@ -440,17 +414,10 @@ export class TsDocService {
   /**
    * List relationships with filtering and pagination
    *
-   * @param params - Filter and pagination options
-   * @param params.type - Filter by relationship type (e.g., "imports", "test-coverage")
-   * @param params.category - Filter by category (e.g., "structural", "testing")
-   * @param params.strength - Filter by strength ("strong", "medium", "weak")
-   * @param params.from - Filter by source symbol ID
-   * @param params.to - Filter by target symbol ID
-   * @param params.limit - Maximum results to return (default: 20)
-   * @param params.offset - Results to skip for pagination (default: 0)
+   * @param params - Filter and pagination options (`type`, `category`, `strength`, `from`, `to`, `limit`, `offset`)
    * @returns Filtered relationships with total count
    *
-   * @description
+   * @remarks
    * Flexible relationship query with multiple filter dimensions.
    * Used by [[tsdoc_list_relationships]] MCP tool.
    *
@@ -469,7 +436,7 @@ export class TsDocService {
    * ## Performance
    * - O(n) where n = total relationships
    * - Filters in-memory (fast enough for 20K relationships)
-   * - Consider indexing if >100K relationships
+   * - Consider indexing if over 100K relationships
    *
    * @example
    * ```typescript
@@ -534,14 +501,10 @@ export class TsDocService {
   /**
    * Search for symbols by name or ID
    *
-   * @param params - Search and filter options
-   * @param params.query - Search string (matches name or ID, case-insensitive)
-   * @param params.type - Filter by symbol type (class, function, method, etc.)
-   * @param params.limit - Maximum results (default: 20)
-   * @param params.offset - Results to skip (default: 0)
+   * @param params - Search and filter options (`query`, `type`, `limit`, `offset`)
    * @returns Matching symbols with total count
    *
-   * @description
+   * @remarks
    * Flexible symbol search with type filtering and pagination.
    * Used by [[tsdoc_search_symbols]] MCP tool.
    *
@@ -601,7 +564,8 @@ export class TsDocService {
 
     sql += ' ORDER BY name';
 
-    let nodes = db.prepare(sql).all(...sqlParams) as Symbol[];
+    const rawNodes = db.prepare(sql).all(...sqlParams) as Array<Record<string, unknown>>;
+    let nodes = rawNodes.map((row) => this.mapSymbolRow(row));
 
     // Filter by query if provided
     if (params.query) {
@@ -628,37 +592,9 @@ export class TsDocService {
    * @param _depth - Context depth (currently unused, always depth=1)
    * @returns Markdown summary of file symbols and relationships
    *
-   * @description
+   * @remarks
    * Generates work context for a file including symbols and relationships.
    * Used by [[tsdoc_get_work_context]] MCP tool.
-   *
-   * ## Purpose
-   * Provide LLMs with essential context before editing a file
-   *
-   * ## Included Information
-   * - All symbols in the file
-   * - Relationships involving these symbols
-   * - Density metric
-   * - Relationship breakdown by category
-   *
-   * ## Limitations
-   * This is a simplified version. For full context aggregation:
-   * - Use CLI: `tsdoc-edge work-context <file> --llm`
-   * - Full version includes:
-   *   - Entry point context aggregation
-   *   - Multi-depth traversal
-   *   - Related tests
-   *   - Documentation links
-   *   - Recommendations
-   *
-   * ## Path Normalization
-   * - Converts absolute paths to project-relative
-   * - Ensures consistent lookup in database
-   *
-   * @errorPattern File Not Found
-   * Returns message with guidance if:
-   * - File has no symbols (not indexed or empty)
-   * - Suggests running: tsdoc-edge build src
    *
    * @example
    * ```typescript
@@ -673,15 +609,16 @@ export class TsDocService {
   async getWorkContext(filePath: string, _depth: number = 2): Promise<string> {
     const db = this.getDb();
 
-    // Normalize path
+    // Normalize path relative to workspaceRoot
     const normalizedPath = path.isAbsolute(filePath)
-      ? path.relative(process.cwd(), filePath)
+      ? path.relative(this.workspaceRoot, filePath)
       : filePath;
 
     // Get symbols in file
-    const symbols = db
+    const rawSymbols = db
       .prepare('SELECT * FROM symbols WHERE file_path = ?')
-      .all(normalizedPath) as Symbol[];
+      .all(normalizedPath) as Array<Record<string, unknown>>;
+    const symbols = rawSymbols.map((row) => this.mapSymbolRow(row));
 
     if (symbols.length === 0) {
       return `# Work Context\n\nNo symbols found in file: ${filePath}\n\nPlease ensure the file has been indexed with: tsdoc-edge build src`;
@@ -731,44 +668,228 @@ export class TsDocService {
    * Get design context for a file
    *
    * @param filePath - Path to file
-   * @returns Guidance message for full design context
+   * @returns Markdown summary of contracts, ADRs, error experiences, future plans, and related docs
    *
-   * @description
-   * Placeholder for design context retrieval.
-   * Used by [[tsdoc_get_design_context]] MCP tool.
-   *
-   * ## Current Limitation
-   * Full design context (contracts, decisions, error patterns) requires:
-   * - TSDoc parser integration
-   * - Custom tag extraction (@decision, @contract, @errorPattern)
-   * - Currently not implemented in MCP server
-   *
-   * ## Workaround
-   * Directs users to CLI command: `tsdoc-edge design-context <file>`
-   *
-   * ## Future Implementation
-   * To fully implement:
-   * 1. Import TSDoc parser from parent project
-   * 2. Parse file's JSDoc comments
-   * 3. Extract custom tags
-   * 4. Format as markdown
+   * @remarks
+   * Queries indexed contracts, decision records, error experiences, future plans, and doc references
+   * directly from SQLite for the target file. Used by [[tsdoc_get_design_context]] MCP tool.
    *
    * @public
    */
   async getDesignContext(filePath: string): Promise<string> {
-    return `# Design Context\n\nFor full design context (contracts, decisions, error patterns), use:\n\ntsdoc-edge design-context ${filePath}\n`;
+    const db = this.getDb();
+    const normalizedPath = path.isAbsolute(filePath)
+      ? path.relative(this.workspaceRoot, filePath)
+      : filePath;
+
+    const symbols = db
+      .prepare('SELECT id, name, type, summary FROM symbols WHERE file_path = ?')
+      .all(normalizedPath) as Array<{ id: string; name: string; type: string; summary?: string }>;
+
+    if (symbols.length === 0) {
+      return `# Design Context: ${path.basename(filePath)}\n\nNo indexed symbols found for \`${normalizedPath}\`.\nRun \`tsdoc-edge build src\` to index this file.\n`;
+    }
+
+    const symbolIds = symbols.map((s) => s.id);
+    const symbolIdSet = new Set(symbolIds);
+    const symbolNameById = new Map(symbols.map((s) => [s.id, s.name]));
+    const placeholders = symbolIds.map(() => '?').join(', ');
+
+    const contracts = db
+      .prepare(
+        `SELECT symbol_id, description, preconditions, postconditions, invariants FROM contracts WHERE symbol_id IN (${placeholders})`
+      )
+      .all(...symbolIds) as Array<{
+      symbol_id: string;
+      description: string;
+      preconditions: string;
+      postconditions: string;
+      invariants: string;
+    }>;
+
+    const decisions = db
+      .prepare(
+        `SELECT symbol_id, title, decision, rationale, status, date FROM decision_records WHERE symbol_id IN (${placeholders})`
+      )
+      .all(...symbolIds) as Array<{
+      symbol_id: string;
+      title: string;
+      decision: string;
+      rationale: string;
+      status: string;
+      date: string;
+    }>;
+
+    const errors = db
+      .prepare(
+        `SELECT symbol_id, error_type, message, solution FROM error_experiences WHERE symbol_id IN (${placeholders})`
+      )
+      .all(...symbolIds) as Array<{
+      symbol_id: string;
+      error_type: string;
+      message: string;
+      solution: string;
+    }>;
+
+    const plans = db
+      .prepare(
+        `SELECT symbol_id, description, priority, status FROM future_plans WHERE symbol_id IN (${placeholders})`
+      )
+      .all(...symbolIds) as Array<{
+      symbol_id: string;
+      description: string;
+      priority: string;
+      status: string;
+    }>;
+
+    const docRefs = new Set<string>();
+    for (const rel of this.getAllUnifiedRelationships()) {
+      if (rel.type !== 'doc-reference') continue;
+      const froms = Array.isArray(rel.from) ? rel.from : [rel.from];
+      if (!froms.some((id) => symbolIdSet.has(id))) continue;
+      const tos = Array.isArray(rel.to) ? rel.to : [rel.to];
+      for (const to of tos) {
+        if (to) docRefs.add(to);
+      }
+    }
+
+    let md = `# Design Context: ${path.basename(filePath)}\n\n`;
+    md += `- **File**: \`${normalizedPath}\`\n`;
+    md += `- **Symbols**: ${symbols.length}\n`;
+    md += `- **Related Docs**: ${docRefs.size}\n`;
+    md += `- **Contracts**: ${contracts.length} | **Decisions**: ${decisions.length} | **Errors**: ${errors.length} | **Plans**: ${plans.length}\n\n`;
+
+    if (docRefs.size > 0) {
+      md += `## Related Documents\n\n`;
+      for (const docRef of docRefs) {
+        md += `- [[${docRef}]]\n`;
+      }
+      md += `\n`;
+    }
+
+    if (contracts.length > 0) {
+      md += `## Contracts\n\n`;
+      for (const c of contracts) {
+        md += `- **${symbolNameById.get(c.symbol_id) ?? c.symbol_id}**: ${c.description}\n`;
+      }
+      md += `\n`;
+    }
+
+    if (decisions.length > 0) {
+      md += `## Design Decisions (ADR)\n\n`;
+      for (const d of decisions) {
+        md += `- **[${d.status}] ${symbolNameById.get(d.symbol_id) ?? d.symbol_id}**: ${d.decision}`;
+        if (d.rationale) md += ` — _${d.rationale}_`;
+        md += `\n`;
+      }
+      md += `\n`;
+    }
+
+    if (errors.length > 0) {
+      md += `## Error Experiences\n\n`;
+      for (const e of errors) {
+        md += `- **${e.error_type}** (${symbolNameById.get(e.symbol_id) ?? e.symbol_id}): ${e.message}`;
+        if (e.solution) md += ` → ${e.solution}`;
+        md += `\n`;
+      }
+      md += `\n`;
+    }
+
+    if (plans.length > 0) {
+      md += `## Future Plans & TODOs\n\n`;
+      for (const p of plans) {
+        md += `- **[${p.priority}]** (${symbolNameById.get(p.symbol_id) ?? p.symbol_id}): ${p.description}\n`;
+      }
+      md += `\n`;
+    }
+
+    return md;
+  }
+
+  /**
+   * Normalize a raw SQLite `symbols` row into the MCP `Symbol` shape.
+   *
+   * @internal
+   */
+  private mapSymbolRow(row: Record<string, unknown>): Symbol {
+    const filePath =
+      typeof row.filePath === 'string'
+        ? row.filePath
+        : typeof row.file_path === 'string'
+          ? row.file_path
+          : undefined;
+    const isExportedRaw = row.isExported ?? row.is_exported;
+    const isPublicRaw = row.isPublic ?? row.is_public;
+    return {
+      id: String(row.id ?? ''),
+      name: String(row.name ?? ''),
+      type: String(row.type ?? ''),
+      ...(typeof row.kind === 'string' && row.kind.length > 0 ? { kind: row.kind } : {}),
+      ...(filePath ? { filePath } : {}),
+      ...(typeof row.line === 'number' ? { line: row.line } : {}),
+      ...(isExportedRaw !== undefined && isExportedRaw !== null
+        ? { isExported: Boolean(isExportedRaw) }
+        : {}),
+      ...(isPublicRaw !== undefined && isPublicRaw !== null
+        ? { isPublic: Boolean(isPublicRaw) }
+        : {}),
+    };
+  }
+
+  /**
+   * Resolve a symbol record by exact ID, legacy `<type>-<name>` suffix, UUID, or symbol name.
+   *
+   * @internal
+   */
+  private resolveSymbolRecord(symbolIdOrQuery: string): Symbol | null {
+    const trimmed = symbolIdOrQuery.trim();
+    if (!trimmed) {
+      return null;
+    }
+
+    const db = this.getDb();
+
+    const exact = db.prepare('SELECT * FROM symbols WHERE id = ?').get(trimmed) as
+      | Record<string, unknown>
+      | undefined;
+    if (exact) {
+      return this.mapSymbolRow(exact);
+    }
+
+    const suffix = db
+      .prepare(
+        'SELECT * FROM symbols WHERE LOWER(id) LIKE LOWER(?) ORDER BY is_exported DESC, line ASC LIMIT 1'
+      )
+      .get(`%-${trimmed}`) as Record<string, unknown> | undefined;
+    if (suffix) {
+      return this.mapSymbolRow(suffix);
+    }
+
+    const byUuidOrName = db
+      .prepare(
+        `SELECT * FROM symbols
+         WHERE uuid = ?
+            OR LOWER(name) = LOWER(?)
+            OR REPLACE(LOWER(name), '-', '') = REPLACE(LOWER(?), '-', '')
+         ORDER BY is_exported DESC,
+                  CASE WHEN type IN ('class', 'interface', 'function', 'type') THEN 0 ELSE 1 END,
+                  line ASC
+         LIMIT 1`
+      )
+      .get(trimmed, trimmed, trimmed) as Record<string, unknown> | undefined;
+
+    return byUuidOrName ? this.mapSymbolRow(byUuidOrName) : null;
   }
 
   /**
    * Query relationships for a specific symbol
    *
-   * @param params - Query parameters
-   * @param params.symbolId - Symbol ID to query (kebab-case)
-   * @param params.direction - Relationship direction filter
-   * @param params.maxDepth - Traversal depth (currently unused, always depth=1)
+   * @param paramsOrSymbolId - Query parameters object (`symbolId`, `direction`, `maxDepth`) or symbol ID string
+   * @param directionArg - Optional direction when called positionally
+   * @param maxDepthArg - Optional depth when called positionally
    * @returns Markdown summary of symbol relationships
    *
-   * @description
+   * @remarks
    * Finds all relationships connected to a symbol.
    * Used by [[tsdoc_query_relationships]] MCP tool.
    *
@@ -781,11 +902,8 @@ export class TsDocService {
    * - **both**: All connected relationships
    *
    * ## Algorithm
-   * 1. Load all relationships
-   * 2. Filter by direction:
-   *    - Outgoing: symbolId in from array
-   *    - Incoming: symbolId in to array
-   *    - Both: either condition
+   * 1. Resolve target symbol ID (exact ID, legacy suffix, UUID, or name)
+   * 2. Load all relationships and filter by direction
    * 3. Format as markdown (max 50 shown)
    *
    * ## Performance
@@ -796,24 +914,41 @@ export class TsDocService {
    * ```typescript
    * // Find what DatabaseManager depends on
    * const deps = await service.queryRelationships({
-   *   symbolId: 'class-databasemanager',
+   *   symbolId: 'databasemanager-class-databasemanager',
    *   direction: 'outgoing'
    * });
    *
    * // Find what depends on DatabaseManager
    * const dependents = await service.queryRelationships({
-   *   symbolId: 'class-databasemanager',
+   *   symbolId: 'databasemanager-class-databasemanager',
    *   direction: 'incoming'
    * });
    * ```
    *
    * @public
    */
-  async queryRelationships(params: {
-    symbolId: string;
-    direction?: 'incoming' | 'outgoing' | 'both';
-    maxDepth?: number;
-  }): Promise<string> {
+  async queryRelationships(
+    paramsOrSymbolId:
+      | {
+          symbolId: string;
+          direction?: 'incoming' | 'outgoing' | 'both';
+          maxDepth?: number;
+        }
+      | string,
+    directionArg?: 'incoming' | 'outgoing' | 'both',
+    maxDepthArg?: number
+  ): Promise<string> {
+    const params =
+      typeof paramsOrSymbolId === 'string'
+        ? {
+            symbolId: paramsOrSymbolId,
+            direction: directionArg,
+            maxDepth: maxDepthArg,
+          }
+        : paramsOrSymbolId;
+
+    const resolvedSymbol = this.resolveSymbolRecord(params.symbolId);
+    const targetSymbolId = resolvedSymbol?.id ?? params.symbolId;
     const allRels = this.getAllUnifiedRelationships();
 
     let relationships: Relationship[] = [];
@@ -821,7 +956,7 @@ export class TsDocService {
     if (params.direction === 'outgoing' || params.direction === 'both' || !params.direction) {
       const outgoing = allRels.filter((rel) => {
         const froms = Array.isArray(rel.from) ? rel.from : [rel.from];
-        return froms.includes(params.symbolId);
+        return froms.includes(targetSymbolId);
       });
       relationships = relationships.concat(outgoing);
     }
@@ -829,13 +964,16 @@ export class TsDocService {
     if (params.direction === 'incoming' || params.direction === 'both' || !params.direction) {
       const incoming = allRels.filter((rel) => {
         const tos = Array.isArray(rel.to) ? rel.to : [rel.to];
-        return tos.includes(params.symbolId);
+        return tos.includes(targetSymbolId);
       });
       relationships = relationships.concat(incoming);
     }
 
     let markdown = `# Relationship Query\n\n`;
-    markdown += `Symbol: ${params.symbolId}\n`;
+    markdown += `Symbol: ${targetSymbolId}\n`;
+    if (resolvedSymbol && targetSymbolId !== params.symbolId) {
+      markdown += `Requested: ${params.symbolId}\n`;
+    }
     markdown += `Direction: ${params.direction || 'both'}\n`;
     markdown += `Found: ${relationships.length} relationships\n\n`;
 
@@ -860,38 +998,17 @@ export class TsDocService {
   /**
    * Get detailed information for a symbol
    *
-   * @param symbolId - Symbol ID (kebab-case, e.g., "class-databasemanager")
+   * @param symbolId - Symbol ID, legacy `<type>-<name>` suffix, UUID, or symbol name
    * @returns Symbol details or null if not found
    *
-   * @description
+   * @remarks
    * Retrieves full symbol record from database.
    * Used by [[tsdoc_get_symbol_details]] MCP tool.
-   *
-   * ## Purpose
-   * Provide complete information about a specific symbol
-   *
-   * ## Returned Fields
-   * - id: Symbol identifier (kebab-case)
-   * - name: Original symbol name
-   * - type: Symbol type (class, function, method, etc.)
-   * - filePath: Source file location
-   * - line, column: Position in file
-   * - documentation: TSDoc comments (if available)
-   * - tags: Custom tags (if available)
-   *
-   * ## Performance
-   * - O(1) database lookup by primary key
-   * - ~1ms query time
-   *
-   * @errorPattern Symbol Not Found
-   * Returns null if symbol doesn't exist.
-   * Caller should check and provide guidance:
-   * - Symbol ID must be kebab-case
-   * - Run `node query-examples.js` to see available symbols
+   * Returns `null` if symbol does not exist.
    *
    * @example
    * ```typescript
-   * const symbol = await service.getSymbolDetails('class-databasemanager');
+   * const symbol = await service.getSymbolDetails('databasemanager-class-databasemanager');
    *
    * if (!symbol) {
    *   console.error('Symbol not found');
@@ -904,12 +1021,6 @@ export class TsDocService {
    * @public
    */
   async getSymbolDetails(symbolId: string): Promise<Symbol | null> {
-    const db = this.getDb();
-
-    const symbol = db.prepare('SELECT * FROM symbols WHERE id = ?').get(symbolId) as
-      | Symbol
-      | undefined;
-
-    return symbol || null;
+    return this.resolveSymbolRecord(symbolId);
   }
 }

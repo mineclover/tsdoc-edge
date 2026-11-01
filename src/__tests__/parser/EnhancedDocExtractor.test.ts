@@ -198,5 +198,56 @@ export class Test {}
 
       expect(Array.isArray(result)).toBe(true);
     });
+
+    it('should not extract local variables inside function or class bodies', () => {
+      const source = `
+/**
+ * Top-level helper
+ * @privateRemarks TODO [high]: Optimize branch pruning
+ */
+export function computeSummary(input: string): string {
+  const trimmedInput = input.trim();
+  const normalized = trimmedInput.toLowerCase();
+  return normalized;
+}
+      `;
+
+      const result = extractor.extractFromFile('test.ts', source);
+
+      expect(result.map((entry) => entry.symbol.name)).toEqual(['computeSummary']);
+      expect(result[0]?.doc.futurePlans?.[0]?.description).toBe('Optimize branch pruning');
+    });
+
+    it('should skip symbols without enhanced TSDoc metadata when includePartial is false', () => {
+      const strictExtractor = new EnhancedDocExtractor({ includePartial: false });
+      const source = `
+import * as fs from 'node:fs';
+
+/**
+ * Plain symbol with summary only
+ */
+export function readPlain(p: string): string {
+  return fs.readFileSync(p, 'utf-8');
+}
+
+/**
+ * Enhanced symbol with contract and TODO
+ * @contract Reads UTF-8 configuration deterministically
+ * @precondition Path must exist
+ * @privateRemarks TODO: Support JSON5 fallback
+ */
+export function readEnhanced(p: string): string {
+  return fs.readFileSync(p, 'utf-8');
+}
+      `;
+
+      const result = strictExtractor.extractFromFile('test.ts', source);
+
+      expect(result.map((entry) => entry.symbol.name)).toEqual(['readEnhanced']);
+      expect(result[0]?.symbol.contract?.description).toBe(
+        'Reads UTF-8 configuration deterministically'
+      );
+      expect(result[0]?.symbol.contract?.preconditions).toEqual(['Path must exist']);
+    });
   });
 });

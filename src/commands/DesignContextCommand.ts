@@ -261,9 +261,14 @@ export class DesignContextCommand extends BaseCommand {
         requireDeclaration: false,
       });
       const specAggregator = new SpecMetricsAggregator();
+      const seenDocRefs = new Set<string>();
 
       for (const checkpoint of checkpoints) {
         const symbolRef = checkpoint.rawReference;
+        if (seenDocRefs.has(symbolRef)) {
+          continue;
+        }
+        seenDocRefs.add(symbolRef);
         const docPath = this.findDocumentPath(checkpoint.docSymbol);
         let specScore: number | undefined;
         let specStatus: string | undefined;
@@ -353,22 +358,36 @@ export class DesignContextCommand extends BaseCommand {
       }
     }
 
-    // 4. Get test files (using Drizzle ORM)
+    // 4. Get test files (test_mappings + unified test-coverage relationships + conventional mirror test paths)
+    const testPaths = new Set<string>();
     if (symbolIds.length > 0) {
       const symbolIdSet = new Set(symbolIds);
       const allTestMappings = dbManager.getAllTestMappings();
-      const relevantMappings = allTestMappings.filter((m) => symbolIdSet.has(m.symbolId));
-
-      const testPaths = new Set<string>();
-      for (const mapping of relevantMappings) {
-        testPaths.add(mapping.testFilePath);
+      for (const mapping of allTestMappings) {
+        if (symbolIdSet.has(mapping.symbolId)) {
+          testPaths.add(mapping.testFilePath);
+        }
       }
 
-      context.tests = Array.from(testPaths).map((testPath) => ({
-        path: testPath,
-        type: testPath.includes('integration') ? 'integration' : 'unit',
-      }));
+      const allRels = dbManager.getAllUnifiedRelationships();
+      for (const rel of allRels) {
+        if (rel.type !== 'test-coverage') continue;
+        const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
+        if (!toSymbols.some((target) => symbolIdSet.has(target))) continue;
+        if (rel.filePath) {
+          testPaths.add(path.relative(process.cwd(), path.resolve(process.cwd(), rel.filePath)));
+        }
+      }
     }
+
+    for (const candidateTestPath of this.findMirrorTestFiles(relativePath)) {
+      testPaths.add(candidateTestPath);
+    }
+
+    context.tests = Array.from(testPaths).map((testPath) => ({
+      path: testPath,
+      type: testPath.includes('integration') ? 'integration' : 'unit',
+    }));
 
     // 5. Get usedBy (what uses this file) - Use unified_relationships via Drizzle
     if (symbolIds.length > 0) {
@@ -504,6 +523,41 @@ export class DesignContextCommand extends BaseCommand {
     }
 
     return context;
+  }
+
+  /**
+   * Discover conventional mirror/colocated unit test files (`src/__tests__/<dir>/<Base>.test.ts`, etc.).
+   */
+  private findMirrorTestFiles(relativePath: string): string[] {
+    const normalized = relativePath.replace(/\\/g, '/');
+    const ext = path.posix.extname(normalized);
+    if (!ext || normalized.endsWith(`.test${ext}`) || normalized.endsWith(`.spec${ext}`)) {
+      return [];
+    }
+    const baseWithoutExt = normalized.slice(0, -ext.length);
+    const dir = path.posix.dirname(baseWithoutExt);
+    const base = path.posix.basename(baseWithoutExt);
+    const candidates = new Set<string>([
+      `${baseWithoutExt}.test${ext}`,
+      `${baseWithoutExt}.spec${ext}`,
+      path.posix.join(dir, '__tests__', `${base}.test${ext}`),
+      path.posix.join(dir, '__tests__', `${base}.spec${ext}`),
+    ]);
+
+    if (normalized.startsWith('src/')) {
+      const subPath = baseWithoutExt.slice('src/'.length);
+      candidates.add(path.posix.join('src/__tests__', `${subPath}.test${ext}`));
+      candidates.add(path.posix.join('src/__tests__', `${subPath}.spec${ext}`));
+    }
+
+    const found: string[] = [];
+    for (const candidate of candidates) {
+      const absCandidate = path.resolve(process.cwd(), candidate);
+      if (fs.existsSync(absCandidate)) {
+        found.push(path.relative(process.cwd(), absCandidate));
+      }
+    }
+    return found;
   }
 
   private findDocumentPath(symbolRef: string): string {

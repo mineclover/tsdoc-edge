@@ -279,7 +279,8 @@ export class ModuleSpecValidator {
         section: 'Context',
         severity: 'info',
         message: 'No dependencies documented',
-        suggestion: 'Add @depends tags for external dependencies',
+        suggestion:
+          'Declare TypeScript imports or @context / @requires tags for external dependencies',
       });
     } else {
       passed.push('Context has no dependencies (standalone)');

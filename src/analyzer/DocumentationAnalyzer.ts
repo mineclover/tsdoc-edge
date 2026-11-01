@@ -5,7 +5,7 @@
  */
 
 import * as ts from 'typescript';
-import { TSDocParser } from '../parser/TSDocParser';
+import { getDirectJsDocs, TSDOC_EDGE_CUSTOM_TAGS, TSDocParser } from '../parser/TSDocParser';
 import type { DocQualityScore } from '../types/analysis';
 
 /**
@@ -414,15 +414,11 @@ export class DocumentationAnalyzer {
       targetNode = node.parent.parent; // VariableStatement
     }
 
-    const jsDocTags = (targetNode as unknown as { jsDoc?: ts.JSDoc[] }).jsDoc;
-    if (!jsDocTags || jsDocTags.length === 0) {
+    const jsDocTags = getDirectJsDocs(targetNode);
+    if (jsDocTags.length === 0) {
       return null;
     }
 
-    /**
-     * jsDoc
-     * @public
-     */
     // Use the last JSDoc comment, which is the one directly above the declaration
     // (earlier JSDoc comments might be for the file/module)
     const jsDoc = jsDocTags[jsDocTags.length - 1];
@@ -525,17 +521,10 @@ export class DocumentationAnalyzer {
       // This is handled in quality score calculation
     }
 
-    // Check custom tags
-    const customTagNames = [
-      '@doc',
-      '@responsibility',
-      '@contract',
-      '@precondition',
-      '@postcondition',
-      '@testScenario',
-    ];
+    // Check custom tags against the canonical 22-tag tsdoc-edge domain SSOT
+    const customTagNames = new Set<string>(TSDOC_EDGE_CUSTOM_TAGS.map((spec) => spec.tagName));
     const hasCustomTags = docComment.customBlocks.some((b) =>
-      customTagNames.includes(b.blockTag.tagName)
+      customTagNames.has(b.blockTag.tagName)
     );
 
     return {

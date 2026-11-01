@@ -524,16 +524,23 @@ export class DatabaseManager {
    */
   insertEnhancedDoc(doc: EnhancedSymbolDoc, jsonlLine: number): boolean {
     try {
+      const problemSolvingJson = JSON.stringify(doc.problemSolving ?? null);
+      const functionalityJson = JSON.stringify(doc.functionality ?? null);
+      const errorExperiencesJson = JSON.stringify(doc.errorExperiences ?? []);
+      const decisionsJson = JSON.stringify(doc.decisions ?? []);
+      const dependenciesJson = JSON.stringify(doc.dependencies ?? []);
+      const futurePlansJson = JSON.stringify(doc.futurePlans ?? []);
+
       this.drizzleDb
         .insert(schema.enhancedDocs)
         .values({
           symbolId: doc.symbolId,
-          problemSolving: JSON.stringify(doc.problemSolving),
-          functionality: JSON.stringify(doc.functionality),
-          errorExperiences: JSON.stringify(doc.errorExperiences),
-          decisions: JSON.stringify(doc.decisions),
-          dependencies: JSON.stringify(doc.dependencies),
-          futurePlans: JSON.stringify(doc.futurePlans),
+          problemSolving: problemSolvingJson,
+          functionality: functionalityJson,
+          errorExperiences: errorExperiencesJson,
+          decisions: decisionsJson,
+          dependencies: dependenciesJson,
+          futurePlans: futurePlansJson,
           createdAt: doc.createdAt,
           updatedAt: doc.updatedAt,
           version: doc.version,
@@ -542,15 +549,133 @@ export class DatabaseManager {
         .onConflictDoUpdate({
           target: schema.enhancedDocs.symbolId,
           set: {
-            problemSolving: JSON.stringify(doc.problemSolving),
-            functionality: JSON.stringify(doc.functionality),
-            errorExperiences: JSON.stringify(doc.errorExperiences),
-            decisions: JSON.stringify(doc.decisions),
-            dependencies: JSON.stringify(doc.dependencies),
-            futurePlans: JSON.stringify(doc.futurePlans),
+            problemSolving: problemSolvingJson,
+            functionality: functionalityJson,
+            errorExperiences: errorExperiencesJson,
+            decisions: decisionsJson,
+            dependencies: dependenciesJson,
+            futurePlans: futurePlansJson,
             updatedAt: doc.updatedAt,
             version: doc.version,
             jsonlLine,
+          },
+        })
+        .run();
+
+      // Synchronize normalized ADR, error-experience, and future-plan tables for CLI queries
+      this.drizzleDb
+        .delete(schema.decisionRecords)
+        .where(eq(schema.decisionRecords.symbolId, doc.symbolId))
+        .run();
+      for (let i = 0; i < (doc.decisions?.length ?? 0); i++) {
+        const decision = doc.decisions?.[i];
+        if (!decision) continue;
+        this.drizzleDb
+          .insert(schema.decisionRecords)
+          .values({
+            id: `${doc.symbolId}:ADR:${i + 1}`,
+            symbolId: doc.symbolId,
+            title: decision.title,
+            decision: decision.decision,
+            rationale: decision.rationale,
+            status: decision.status,
+            date: decision.date,
+            supersededBy: decision.supersededBy ?? null,
+          })
+          .run();
+      }
+
+      this.drizzleDb
+        .delete(schema.errorExperiences)
+        .where(eq(schema.errorExperiences.symbolId, doc.symbolId))
+        .run();
+      for (let i = 0; i < (doc.errorExperiences?.length ?? 0); i++) {
+        const err = doc.errorExperiences?.[i];
+        if (!err) continue;
+        this.drizzleDb
+          .insert(schema.errorExperiences)
+          .values({
+            id: `${doc.symbolId}:ERR:${i + 1}`,
+            symbolId: doc.symbolId,
+            errorType: err.errorType,
+            message: err.message,
+            context: err.context,
+            solution: err.solution,
+            occurredAt: err.occurredAt ?? null,
+            prevention: err.prevention ?? null,
+          })
+          .run();
+      }
+
+      this.drizzleDb
+        .delete(schema.futurePlans)
+        .where(eq(schema.futurePlans.symbolId, doc.symbolId))
+        .run();
+      for (let i = 0; i < (doc.futurePlans?.length ?? 0); i++) {
+        const plan = doc.futurePlans?.[i];
+        if (!plan) continue;
+        this.drizzleDb
+          .insert(schema.futurePlans)
+          .values({
+            id: `${doc.symbolId}:PLAN:${i + 1}`,
+            symbolId: doc.symbolId,
+            title: plan.title,
+            description: plan.description,
+            priority: plan.priority ?? 'medium',
+            status: plan.status,
+            targetMilestone: plan.targetMilestone ?? null,
+            estimatedEffort: plan.estimatedEffort ?? null,
+            createdAt: plan.createdAt ?? doc.createdAt,
+            completedAt: plan.completedAt ?? null,
+          })
+          .run();
+      }
+
+      this.invalidateCache();
+      return true;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Insert or update a symbol contract specification
+   * @param symbolId - Symbol ID
+   * @param contract - Contract specification extracted from `@contract` / `@precondition` / `@postcondition` / `@invariant`
+   * @returns True if upsert succeeded
+   */
+  insertContract(
+    symbolId: string,
+    contract: {
+      description: string;
+      preconditions: string[];
+      postconditions: string[];
+      invariants: string[];
+      filePath: string;
+    }
+  ): boolean {
+    try {
+      const preconditionsJson = JSON.stringify(contract.preconditions);
+      const postconditionsJson = JSON.stringify(contract.postconditions);
+      const invariantsJson = JSON.stringify(contract.invariants);
+      this.drizzleDb
+        .insert(schema.contracts)
+        .values({
+          symbolId,
+          description: contract.description,
+          preconditions: preconditionsJson,
+          postconditions: postconditionsJson,
+          invariants: invariantsJson,
+          filePath: contract.filePath,
+        })
+        .onConflictDoUpdate({
+          target: schema.contracts.symbolId,
+          set: {
+            description: contract.description,
+            preconditions: preconditionsJson,
+            postconditions: postconditionsJson,
+            invariants: invariantsJson,
+            filePath: contract.filePath,
           },
         })
         .run();
@@ -745,8 +870,8 @@ export class DatabaseManager {
 
     return {
       symbolId: row.symbolId,
-      problemSolving: JSON.parse(row.problemSolving),
-      functionality: JSON.parse(row.functionality),
+      problemSolving: JSON.parse(row.problemSolving) ?? undefined,
+      functionality: JSON.parse(row.functionality) ?? undefined,
       errorExperiences: JSON.parse(row.errorExperiences),
       decisions: JSON.parse(row.decisions),
       dependencies: JSON.parse(row.dependencies),

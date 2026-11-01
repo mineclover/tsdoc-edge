@@ -166,8 +166,8 @@ export class IdCommand extends BaseCommand {
       );
       console.log(`  File: ${filePath}`);
       console.log();
-      console.log('Add this to your TSDoc comment:');
-      console.log(`${colors.cyan}  @id ${id}${colors.reset}`);
+      console.log('Reference this symbol ID in CLI queries or TSDoc links:');
+      console.log(`${colors.cyan}  {@link ${symbolName}} (${id})${colors.reset}`);
       console.log();
     } else {
       // XML output
@@ -182,7 +182,8 @@ export class IdCommand extends BaseCommand {
             type: type || 'unknown',
           },
           usage: {
-            tsdocTag: `@id ${id}`,
+            tsdocLink: `{@link ${symbolName}}`,
+            symbolId: id,
           },
         },
         args

@@ -16,6 +16,7 @@ import type {
   TestSuite,
   TestSymbol,
 } from '../types/test-symbols';
+import { readTsdocComment, TSDocParser } from './TSDocParser';
 
 /**
  * Context for tracking nested describe blocks
@@ -38,6 +39,7 @@ interface SuiteContext {
  * @responsibility Parse test files and extract test suites, cases, and scenarios
  */
 export class TestSymbolParser {
+  private readonly tsdocParser = new TSDocParser();
   private testSuites: TestSuite[] = [];
   private testCases: TestCase[] = [];
   private testScenarios: TestScenario[] = [];
@@ -369,10 +371,11 @@ export class TestSymbolParser {
       // Check if it's a JSDoc comment
       if (!commentText.startsWith('/**')) continue;
 
-      // Extract @testScenario tags
-      const scenarioRegex = /@testScenario\s+(.+)/g;
-      for (const match of commentText.matchAll(scenarioRegex)) {
-        const scenarioDescription = match[1].trim();
+      // Extract @testScenario tags via @microsoft/tsdoc AST
+      const structured = readTsdocComment(this.tsdocParser.parseString(commentText).docComment);
+      for (const rawScenario of structured.getTagValues('@testScenario')) {
+        const scenarioDescription = rawScenario.split('\n')[0]?.trim() ?? '';
+        if (!scenarioDescription) continue;
 
         // Generate scenario ID
         const scenarioId = this.generateTestId(scenarioDescription, null, 'test-scenario');

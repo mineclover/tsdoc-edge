@@ -30,6 +30,7 @@ import { projectTestCoverageToCanonicalNodes } from '../metrics/CanonicalCoverag
 import { createCoverageSourceIdentity } from '../metrics/CoverageMetricContract';
 import { BuildResultSchema } from '../output/schemas';
 import { XmlBuilder } from '../output/XmlBuilder';
+import { EnhancedDocExtractor } from '../parser/EnhancedDocExtractor';
 import { TestSymbolParser } from '../parser/TestSymbolParser';
 import { extractDocCheckpointsFromSource, TSDocParser } from '../parser/TSDocParser';
 import { DatabaseManager } from '../storage/DatabaseManager';
@@ -340,6 +341,10 @@ export class BuildCommand extends BaseCommand {
         // Track seen IDs to detect collisions
         const seenIds = new Map<string, string>(); // id -> first file path
         const tsdocParser = new TSDocParser();
+        const enhancedDocExtractor = new EnhancedDocExtractor({
+          includePartial: false,
+          autoGenerateIds: false,
+        });
 
         // Prepare JSONL registry (use .tsdoc directly for consistency with other commands)
         const registryDir = path.join(process.cwd(), '.tsdoc');
@@ -479,6 +484,9 @@ export class BuildCommand extends BaseCommand {
               // Collect relationships for later insertion
               allRelationships.push(...extractResult.relationships);
 
+              const fileSymbolIdsByKey = new Map<string, string>();
+              const fileSymbolIdsByName = new Map<string, string>();
+
               // Insert symbols
               for (const symbol of extractResult.symbols) {
                 // Generate stable identifiers using SymbolIdentifierGenerator
@@ -523,6 +531,10 @@ export class BuildCommand extends BaseCommand {
 
                   // Store mapping for relationship insertion
                   symbolIdMap.set(symbol.name, id);
+                  fileSymbolIdsByKey.set(`${symbol.name}:${symbol.line}`, id);
+                  if (!symbol.parentSymbol && !fileSymbolIdsByName.has(symbol.name)) {
+                    fileSymbolIdsByName.set(symbol.name, id);
+                  }
 
                   // Add to JSONL registry (SymbolRegistryEntry format)
                   const registryEntry = {
@@ -576,6 +588,39 @@ export class BuildCommand extends BaseCommand {
                     // Non-critical, continue
                   }
                 }
+              }
+
+              // Extract and persist enhanced TSDoc metadata (ADRs, TODO/PLANs, contracts, @throws) for this file
+              try {
+                const enhancedEntries = enhancedDocExtractor.extractFromFile(filePath, content);
+                for (const entry of enhancedEntries) {
+                  const matchedSymbolId =
+                    fileSymbolIdsByKey.get(`${entry.symbol.name}:${entry.symbol.line}`) ??
+                    fileSymbolIdsByName.get(entry.symbol.name);
+                  if (!matchedSymbolId) {
+                    continue;
+                  }
+
+                  dbManager.insertEnhancedDoc(
+                    {
+                      ...entry.doc,
+                      symbolId: matchedSymbolId,
+                    },
+                    0
+                  );
+
+                  if (entry.symbol.contract) {
+                    dbManager.insertContract(matchedSymbolId, {
+                      description: entry.symbol.contract.description,
+                      preconditions: entry.symbol.contract.preconditions,
+                      postconditions: entry.symbol.contract.postconditions,
+                      invariants: entry.symbol.contract.invariants,
+                      filePath: path.relative(process.cwd(), filePath),
+                    });
+                  }
+                }
+              } catch (_enhancedError) {
+                // Non-critical, continue
               }
 
               // Detect HTTP endpoints in this file
