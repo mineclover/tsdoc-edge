@@ -236,9 +236,10 @@ See [[Convention Pack Check]] for the source contract, limits, and CI exit seman
 | `canonical-graph status` | Show the active ttsc revision and retained count read-only |
 | `canonical-graph list` | List retained revision metadata and provenance read-only |
 | `canonical-graph read` | Read one exact retained graph revision by ID |
+| `canonical-graph prune` | Prune older historical revisions (`--keep <n> --vacuum`) while preserving the active revision |
 
 The default database is `.tsdoc/canonical-graph.db`; use `--graph-db` to override it and
-`--json` for automation. These commands never create or update the active pointer.
+`--json` for automation. `status`, `list`, and `read` open the database strictly read-only, and none of these commands alter the active pointer.
 
 Retention GC requires an explicit RFC3339 `--before` cutoff. `--dry-run` opens the history database
 read-only; pinned records are visible in the candidate projection and are never tombstoned. A

@@ -86,6 +86,8 @@ export interface CanonicalGraphConfig {
   tsconfigPath?: string;
   /** Optional SQLite path for persisted canonical graph revisions (default: `.tsdoc/canonical-graph.db`). */
   databasePath?: string;
+  /** Optional maximum number of canonical graph revisions to retain after refresh (minimum `1`, active revision always kept). */
+  maxRetainedRevisions?: number;
 }
 
 /**

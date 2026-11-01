@@ -163,7 +163,7 @@ const impacted = builder.getDependents('user-repository');
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:229
-- [[BuildCommand]] → managed/commands/BuildCommand.md:87
+- [[BuildCommand]] → managed/commands/BuildCommand.md:89
 - [[FindRootTypesCommand]] → managed/commands/FindRootTypesCommand.md:73
 - [[TreeCommand]] → managed/commands/TreeCommand.md:294
 - [[UndocumentedCommand]] → managed/commands/UndocumentedCommand.md:74

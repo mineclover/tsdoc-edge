@@ -197,10 +197,10 @@ async function runDetailedTests() {
     },
 
     {
-      name: '🎯 Tool 8: Canonical Impact - Multi-hop Risk',
+      name: '🎯 Tool 8: Canonical Impact - Multi-hop Risk (format: json)',
       request: createMessage('tools/call', {
         name: 'tsdoc_get_impact',
-        arguments: { symbol: 'analyzecommand-class-analyzecommand', direction: 'upstream', maxDepth: 1, response_format: 'json' },
+        arguments: { symbol: 'analyzecommand-class-analyzecommand', direction: 'upstream', maxDepth: 1, format: 'json' },
       }),
       validate: (res) => {
         const content = res.result?.content?.[0]?.text || '';
@@ -211,7 +211,21 @@ async function runDetailedTests() {
     },
 
     {
-      name: '📚 Tool 9: Spec Bindings - Normative Conformance',
+      name: '📚 Tool 9: Spec Bindings - Normative Conformance (format: json)',
+      request: createMessage('tools/call', {
+        name: 'tsdoc_get_spec_bindings',
+        arguments: { query: 'canonical', format: 'json' },
+      }),
+      validate: (res) => {
+        const content = res.result?.content?.[0]?.text || '';
+        const parsed = JSON.parse(content);
+        log('DETAIL', `Spec revision: ${parsed.revisionId}, bindings: ${parsed.bindings?.length || 0}`, colors.blue);
+        return Boolean(parsed.revisionId && Array.isArray(parsed.nodes) && Array.isArray(parsed.bindings));
+      },
+    },
+
+    {
+      name: '🔄 Tool 9 Alias: Spec Bindings Backward-Compatible response_format',
       request: createMessage('tools/call', {
         name: 'tsdoc_get_spec_bindings',
         arguments: { query: 'canonical', response_format: 'json' },
@@ -219,8 +233,7 @@ async function runDetailedTests() {
       validate: (res) => {
         const content = res.result?.content?.[0]?.text || '';
         const parsed = JSON.parse(content);
-        log('DETAIL', `Spec revision: ${parsed.revisionId}, bindings: ${parsed.bindings?.length || 0}`, colors.blue);
-        return Boolean(parsed.revisionId && Array.isArray(parsed.nodes) && Array.isArray(parsed.bindings));
+        return Boolean(parsed.revisionId && Array.isArray(parsed.nodes));
       },
     },
 

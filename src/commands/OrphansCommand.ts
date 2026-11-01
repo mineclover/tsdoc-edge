@@ -70,14 +70,16 @@ export class OrphansCommand extends BaseCommand {
     return `tsdoc-edge orphans [options]
 
   Options:
-    --accurate       Use database relationships for accurate detection (recommended)
-    --fast           Use registry for fast detection (may have false positives)
-    --exclude-tests  Exclude test files from results
-    --include-members Include class members (methods/properties) in results
-    --classes-only   Show only class-level symbols (exclude members)
+    --accurate         Use database relationships for accurate detection (recommended)
+    --fast             Use registry for fast detection (may have false positives)
+    --exclude-tests    Exclude test files from results
+    --include-members  Include container members (methods/properties/fields) in results
+    --classes-only     Show only container-level symbols (class/interface/type/enum)
     --include-external Include external and standard-library symbols
+    --json             Output JSON format
+    --xml              Output XML format
 
-  Default: --accurate (members of used classes are automatically excluded)`;
+  Default: --accurate (members of used containers are automatically excluded)`;
   }
 
   /**
@@ -188,22 +190,83 @@ export class OrphansCommand extends BaseCommand {
     classesOnly: boolean,
     includeExternal: boolean
   ): Array<{ id: string; name: string; filePath: string; type: string }> {
+    const containerKinds = new Set([
+      'class',
+      'interface',
+      'type',
+      'enum',
+      'namespace',
+      'module',
+      'variable',
+      'function',
+    ]);
+    const memberKinds = new Set([
+      'method',
+      'property',
+      'variable',
+      'enum_member',
+      'accessor',
+      'constructor',
+    ]);
     const incoming = new Set(edges.map((edge) => edge.to));
-    const usedClasses = new Set(
-      nodes
-        .filter((node) => node.kind === 'class' && incoming.has(node.id))
-        .map((node) => node.name)
+    const nodeById = new Map(nodes.map((node) => [node.id, node]));
+    const qualifiedById = new Map(
+      nodes.map((node) => [node.id, this.effectiveQualifiedName(node)])
     );
+
+    const usedContainers = new Set<string>();
+    for (const node of nodes) {
+      if (!containerKinds.has(node.kind)) continue;
+      const qualified = qualifiedById.get(node.id) ?? '';
+      if (!qualified) continue;
+      if (incoming.has(node.id)) {
+        usedContainers.add(this.containerKey(node.file, qualified));
+      }
+    }
+
+    // Mark containers whose static/member symbols are referenced from outside the container itself.
+    for (const edge of edges) {
+      const targetNode = nodeById.get(edge.to);
+      if (!targetNode) continue;
+      const targetQualified = qualifiedById.get(targetNode.id) ?? '';
+      if (!targetQualified.includes('.')) continue;
+
+      const sourceNode = nodeById.get(edge.from);
+      const sourceQualified = sourceNode ? (qualifiedById.get(sourceNode.id) ?? '') : '';
+      const sameFile = (sourceNode?.file ?? '') === (targetNode.file ?? '');
+
+      for (const ancestor of this.ancestorQualifiedNames(targetQualified)) {
+        const fromInsideSameContainer =
+          sameFile && (sourceQualified === ancestor || sourceQualified.startsWith(`${ancestor}.`));
+        if (!fromInsideSameContainer) {
+          usedContainers.add(this.containerKey(targetNode.file, ancestor));
+        }
+      }
+    }
+
     return nodes
-      .filter((node) => !incoming.has(node.id) && (includeExternal || !this.isExternal(node)))
+      .filter((node) => {
+        if (incoming.has(node.id)) return false;
+        const qualified = qualifiedById.get(node.id) ?? '';
+        if (
+          containerKinds.has(node.kind) &&
+          qualified &&
+          usedContainers.has(this.containerKey(node.file, qualified))
+        ) {
+          return false;
+        }
+        return includeExternal || !this.isExternal(node);
+      })
       .filter((node) => !excludeTests || !/(?:__tests__|\.test\.|\.spec\.)/.test(node.file ?? ''))
       .filter((node) => !classesOnly || ['class', 'interface', 'type', 'enum'].includes(node.kind))
-      .filter(
-        (node) =>
-          includeMembers ||
-          !['method', 'property', 'variable'].includes(node.kind) ||
-          !usedClasses.has(node.qualifiedName?.split('.').slice(-2, -1)[0] ?? '')
-      )
+      .filter((node) => {
+        if (includeMembers || !memberKinds.has(node.kind)) return true;
+        const qualified = qualifiedById.get(node.id) ?? '';
+        if (!qualified.includes('.')) return true;
+        return !this.ancestorQualifiedNames(qualified).some((ancestor) =>
+          usedContainers.has(this.containerKey(node.file, ancestor))
+        );
+      })
       .map((node) => ({
         id: node.id,
         name: node.name ?? node.qualifiedName ?? node.id,
@@ -212,6 +275,33 @@ export class OrphansCommand extends BaseCommand {
       }))
       .sort((a, b) => a.filePath.localeCompare(b.filePath) || a.name.localeCompare(b.name));
   }
+
+  private effectiveQualifiedName(node: CanonicalGraphNode): string {
+    if (node.qualifiedName) return node.qualifiedName;
+    const hashIndex = node.id.indexOf('#');
+    if (hashIndex !== -1) {
+      const tail = node.id.slice(hashIndex + 1);
+      const colonIndex = tail.lastIndexOf(':');
+      const extracted = colonIndex === -1 ? tail : tail.slice(0, colonIndex);
+      if (extracted) return extracted;
+    }
+    return node.name ?? '';
+  }
+
+  private ancestorQualifiedNames(qualifiedName: string): string[] {
+    const ancestors: string[] = [];
+    let cursor = qualifiedName.lastIndexOf('.');
+    while (cursor > 0) {
+      ancestors.push(qualifiedName.slice(0, cursor));
+      cursor = qualifiedName.lastIndexOf('.', cursor - 1);
+    }
+    return ancestors;
+  }
+
+  private containerKey(file: string | undefined, qualifiedName: string): string {
+    return `${file ?? ''}#${qualifiedName}`;
+  }
+
   private tryCanonical(): {
     repository: GraphRepository;
     revision: NonNullable<ReturnType<GraphRepository['readActiveRevision']>>;
@@ -241,6 +331,7 @@ export class OrphansCommand extends BaseCommand {
       }
       return { repository, revision };
     } catch {
+      repository?.close();
       return null;
     }
   }

@@ -102,5 +102,49 @@ describe('CanonicalGraphCommand', () => {
     expect(
       await new CanonicalGraphCommand().execute(['read', '--graph-db', databasePath, '--json'])
     ).toMatchObject({ exitCode: 2, message: '--revision-id is required for read' });
+    expect(
+      await new CanonicalGraphCommand().execute(['status', '--graph-db', databasePath, '--vacuum'])
+    ).toMatchObject({ exitCode: 2 });
+    expect(
+      await new CanonicalGraphCommand().execute([
+        'prune',
+        '--graph-db',
+        databasePath,
+        '--keep',
+        '0',
+      ])
+    ).toMatchObject({ exitCode: 2, message: '--keep must be a positive integer' });
+  });
+
+  it('prunes historical revisions while keeping the active revision intact', async () => {
+    const pruned = await new CanonicalGraphCommand().execute([
+      'prune',
+      '--graph-db',
+      databasePath,
+      '--keep',
+      '1',
+      '--vacuum',
+      '--json',
+    ]);
+    const payload = JSON.parse(log.mock.calls.flat().join('\n')) as {
+      operation: string;
+      keepLatest: number;
+      pruned: {
+        activeRevisionId: string;
+        retainedRevisionIds: string[];
+        deletedRevisionIds: string[];
+        vacuumed: boolean;
+      };
+    };
+
+    expect(pruned.exitCode).toBe(0);
+    expect(payload.operation).toBe('prune');
+    expect(payload.keepLatest).toBe(1);
+    expect(payload.pruned).toEqual({
+      activeRevisionId,
+      retainedRevisionIds: [activeRevisionId],
+      deletedRevisionIds: [firstRevisionId],
+      vacuumed: true,
+    });
   });
 });

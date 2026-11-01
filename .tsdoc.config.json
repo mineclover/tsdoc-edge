@@ -46,7 +46,8 @@
   },
   "canonicalGraph": {
     "routerModule": "../ttsc-graph-router/dist/artifact-source.js",
-    "tsconfigPath": "tsconfig.ttsc.json"
+    "tsconfigPath": "tsconfig.ttsc.json",
+    "maxRetainedRevisions": 2
   },
   "specGovernance": {
     "authoredSpecDirs": ["managed/specs"],

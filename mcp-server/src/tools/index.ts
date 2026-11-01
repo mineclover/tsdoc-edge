@@ -295,8 +295,8 @@ export async function queryRelationshipsTool(
 export async function getImpactTool(params: GetImpactInput, service: TsDocService) {
   try {
     const result = await service.getImpact(params);
-    if (params.response_format === 'json')
-      return formatResponse(JSON.stringify(result, null, 2), 'json');
+    const outputFormat = params.format ?? params.response_format ?? 'markdown';
+    if (outputFormat === 'json') return formatResponse(JSON.stringify(result, null, 2), 'json');
     let markdown = `# Impact Analysis\n\n- **Symbol**: \`${result.symbolId}\`\n- **Direction**: ${result.direction}\n- **Maximum depth**: ${result.maxDepth}\n- **Risk**: ${result.riskLevel}\n- **Source**: ${result.source}\n\n`;
     for (const [depth, nodes] of Object.entries(result.byDepth)) {
       markdown += `## Depth ${depth}\n\n`;
@@ -329,8 +329,8 @@ export async function getImpactTool(params: GetImpactInput, service: TsDocServic
 export async function getSpecBindingsTool(params: GetSpecBindingsInput, service: TsDocService) {
   try {
     const result = await service.getSpecBindings(params);
-    if (params.response_format === 'json')
-      return formatResponse(JSON.stringify(result, null, 2), 'json');
+    const outputFormat = params.format ?? params.response_format ?? 'markdown';
+    if (outputFormat === 'json') return formatResponse(JSON.stringify(result, null, 2), 'json');
     let markdown = `# Specification Bindings\n\nRevision: \`${result.revisionId ?? 'unavailable'}\`\n\n`;
     markdown += `Found ${result.nodes.length} specification nodes and ${result.bindings.length} bindings.\n\n`;
     for (const node of result.nodes)

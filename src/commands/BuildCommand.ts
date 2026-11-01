@@ -150,7 +150,8 @@ export class BuildCommand extends BaseCommand {
     --graph-workspace=<id>  Convention/spec workspace id (default: router repo id)
     --graph-namespace=<id>  Graph namespace (default: ttsc:<router repo id>)
     --graph-tsconfig=<path> Project graph tsconfig (default: tsconfig.ttsc.json)
-    --canonical-graph-db=<path> Canonical revision database`;
+    --canonical-graph-db=<path> Canonical revision database
+    --max-graph-revisions=<n> Maximum retained canonical graph revisions (minimum 1)`;
   }
 
   // Override print methods to suppress console output (use XML output instead)
@@ -185,6 +186,7 @@ export class BuildCommand extends BaseCommand {
           '--graph-namespace',
           '--graph-tsconfig',
           '--canonical-graph-db',
+          '--max-graph-revisions',
         ]
       );
       if (flagError) return flagError;
@@ -1644,16 +1646,32 @@ export class BuildCommand extends BaseCommand {
         process.env.TSDOC_EDGE_CANONICAL_GRAPH_DB ??
         canonicalConfig?.databasePath,
     };
+    const rawMaxRevisions =
+      this.getOption(args, '--max-graph-revisions') ?? process.env.TSDOC_EDGE_MAX_GRAPH_REVISIONS;
+    let maxRetainedRevisions = canonicalConfig?.maxRetainedRevisions;
+    if (rawMaxRevisions !== undefined) {
+      if (!/^\d+$/.test(rawMaxRevisions) || Number(rawMaxRevisions) < 1) {
+        throw new Error('--max-graph-revisions must be a positive integer');
+      }
+      maxRetainedRevisions = Number(rawMaxRevisions);
+    }
+
     const coordinator = this.dependencies.canonicalCoordinatorFactory
       ? this.dependencies.canonicalCoordinatorFactory(coordinatorOptions)
       : new CanonicalGraphCoordinator(coordinatorOptions);
 
+    let result: {
+      fingerprint: string;
+      nodeCount: number;
+      edgeCount: number;
+      databasePath: string;
+    };
     try {
       const refreshed = await coordinator.refresh();
       if (refreshed.status !== 'committed') {
         throw new Error('Canonical graph refresh was superseded unexpectedly');
       }
-      return {
+      result = {
         fingerprint: refreshed.graph.fingerprint,
         nodeCount: refreshed.graph.nodes.length,
         edgeCount: refreshed.graph.edges.length,
@@ -1662,6 +1680,23 @@ export class BuildCommand extends BaseCommand {
     } finally {
       coordinator.close();
     }
+
+    if (
+      maxRetainedRevisions !== undefined &&
+      Number.isInteger(maxRetainedRevisions) &&
+      maxRetainedRevisions >= 1 &&
+      result.databasePath !== ':memory:' &&
+      fs.existsSync(result.databasePath)
+    ) {
+      const repository = new GraphRepository(result.databasePath);
+      try {
+        repository.pruneRevisions({ keepLatest: maxRetainedRevisions });
+      } finally {
+        repository.close();
+      }
+    }
+
+    return result;
   }
 
   /** Find the source-directory positional argument without consuming option values. */
@@ -1674,6 +1709,7 @@ export class BuildCommand extends BaseCommand {
       '--graph-namespace',
       '--graph-tsconfig',
       '--canonical-graph-db',
+      '--max-graph-revisions',
     ]);
     for (let index = 0; index < args.length; index++) {
       const argument = args[index];

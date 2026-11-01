@@ -722,6 +722,62 @@ describe('GraphRepository', () => {
     expect(await exited).toBe(0);
   });
 
+  it('prunes historical revisions while always protecting the active revision and optionally vacuuming', async () => {
+    let tick = 0;
+    repository.close();
+    repository = new GraphRepository(databasePath, {
+      clock: () => new Date(Date.UTC(2026, 6, 11, 0, tick++, 0)),
+    });
+
+    const rev1 = repository.replaceActiveRevision(
+      await projectGraph({
+        nodes: [{ id: 'src/r1.ts#R1:class', kind: 'class', name: 'R1', file: 'src/r1.ts' }],
+        edges: [],
+      })
+    );
+    const rev2 = repository.replaceActiveRevision(
+      await projectGraph({
+        nodes: [{ id: 'src/r2.ts#R2:class', kind: 'class', name: 'R2', file: 'src/r2.ts' }],
+        edges: [],
+      })
+    );
+    const rev3 = repository.replaceActiveRevision(
+      await projectGraph({
+        nodes: [
+          { id: 'src/r3.ts#R3:class', kind: 'class', name: 'R3', file: 'src/r3.ts' },
+          { id: 'src/r3b.ts#R3B:class', kind: 'class', name: 'R3B', file: 'src/r3b.ts' },
+        ],
+        edges: [
+          {
+            kind: 'calls',
+            from: 'src/r3.ts#R3:class',
+            to: 'src/r3b.ts#R3B:class',
+            evidence: { file: 'src/r3.ts', startLine: 1 },
+          },
+        ],
+      })
+    );
+
+    expect(repository.listRevisionSummaries()).toHaveLength(3);
+    expect(() => repository.pruneRevisions({ keepLatest: 0 })).toThrow('keepLatest');
+
+    const pruned = repository.pruneRevisions({ keepLatest: 2, vacuum: true });
+    expect(pruned.activeRevisionId).toBe(rev3.revisionId);
+    expect(pruned.retainedRevisionIds).toEqual([rev3.revisionId, rev2.revisionId]);
+    expect(pruned.deletedRevisionIds).toEqual([rev1.revisionId]);
+    expect(pruned.vacuumed).toBe(true);
+    expect(repository.readRevision(rev1.revisionId)).toBeNull();
+    expect(repository.readRevision(rev2.revisionId)).not.toBeNull();
+    expect(repository.readActiveRevision()?.metadata.revisionId).toBe(rev3.revisionId);
+
+    const reader = new GraphRepository(databasePath, { readOnly: true });
+    try {
+      expect(() => reader.pruneRevisions({ keepLatest: 1 })).toThrow('read-only repository');
+    } finally {
+      reader.close();
+    }
+  });
+
   async function projectGraph(
     overrides: Partial<ProjectGraphInput> = {}
   ): Promise<CanonicalProjectGraph> {

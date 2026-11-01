@@ -236,11 +236,30 @@ export class DepsCommand extends BaseCommand {
       console.log();
       if (targets.length === 0) console.log('No dependencies found');
       else {
-        for (const target of targets)
+        const groupedTargets = new Map<
+          string,
+          { target: (typeof targets)[number]; relations: string[] }
+        >();
+        for (const target of targets) {
+          const existing = groupedTargets.get(target.id);
+          if (existing) {
+            if (!existing.relations.includes(target.relation)) {
+              existing.relations.push(target.relation);
+            }
+          } else {
+            groupedTargets.set(target.id, { target, relations: [target.relation] });
+          }
+        }
+        for (const { target, relations } of groupedTargets.values()) {
           console.log(
-            `  → ${target.name} (${target.kind}) ${target.file ?? ''}:${target.evidence?.startLine ?? '?'}`
+            `  → ${target.name} (${target.kind}) [${relations.join(', ')}] ${target.file ?? ''}:${target.evidence?.startLine ?? '?'}`
           );
-        console.log(`\nTotal: ${targets.length} dependencies`);
+        }
+        console.log(
+          groupedTargets.size === targets.length
+            ? `\nTotal: ${groupedTargets.size} dependencies`
+            : `\nTotal: ${groupedTargets.size} dependencies (${targets.length} edges)`
+        );
       }
     }
     return this.success();

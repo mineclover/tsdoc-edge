@@ -126,6 +126,34 @@ export interface GraphRepositoryReplaceOptions {
   readonly diagnostics?: readonly CanonicalDiagnostic[];
 }
 
+/**
+ * Options for pruning historical canonical graph revisions.
+ *
+ * @public
+ */
+export interface GraphRepositoryPruneOptions {
+  /**
+   * Maximum total revisions to retain, including the active revision (minimum `1`).
+   */
+  readonly keepLatest: number;
+  /**
+   * Run SQLite `VACUUM` after deleting pruned revisions to reclaim disk space.
+   */
+  readonly vacuum?: boolean;
+}
+
+/**
+ * Summary of a canonical graph revision pruning pass.
+ *
+ * @public
+ */
+export interface GraphRepositoryPruneResult {
+  readonly activeRevisionId: string | null;
+  readonly retainedRevisionIds: readonly string[];
+  readonly deletedRevisionIds: readonly string[];
+  readonly vacuumed: boolean;
+}
+
 /** Raised when another process committed a graph while a refresh was running. */
 export class GraphRepositoryConflictError extends Error {
   constructor(
@@ -507,6 +535,109 @@ export class GraphRepository {
   /** Read only the active graph, or `null` before the first replacement. */
   readActiveGraph(): CanonicalProjectGraph | null {
     return this.readActiveRevision()?.graph ?? null;
+  }
+
+  /**
+   * Prune historical canonical graph revisions while unconditionally preserving
+   * the active revision and up to `keepLatest - 1` most recently stored revisions.
+   *
+   * @param options - Pruning retention count and optional `VACUUM` flag
+   * @returns Summary of active, retained, and deleted revision IDs
+   * @public
+   */
+  pruneRevisions(options: GraphRepositoryPruneOptions): GraphRepositoryPruneResult {
+    if (this.readOnly) {
+      throw new Error('Cannot prune canonical graph revisions in a read-only repository');
+    }
+    if (!Number.isInteger(options.keepLatest) || options.keepLatest < 1) {
+      throw new Error('keepLatest must be an integer >= 1');
+    }
+
+    const prune = this.database.transaction(() => {
+      const state = this.database
+        .prepare('SELECT active_revision_id FROM canonical_graph_state WHERE singleton = 1')
+        .get() as { active_revision_id: string } | undefined;
+      const activeRevisionId = state?.active_revision_id ?? null;
+
+      const rows = this.database
+        .prepare(
+          `SELECT revision_id FROM canonical_graph_revisions
+           ORDER BY stored_at DESC, revision_id DESC`
+        )
+        .all() as Array<{ revision_id: string }>;
+
+      const keepSet = new Set<string>();
+      if (activeRevisionId !== null && rows.some((row) => row.revision_id === activeRevisionId)) {
+        keepSet.add(activeRevisionId);
+      }
+      for (const row of rows) {
+        if (keepSet.size >= options.keepLatest) break;
+        keepSet.add(row.revision_id);
+      }
+
+      const retainedRevisionIds: string[] = [];
+      if (activeRevisionId !== null && keepSet.has(activeRevisionId)) {
+        retainedRevisionIds.push(activeRevisionId);
+      }
+      const deletedRevisionIds: string[] = [];
+      for (const row of rows) {
+        if (keepSet.has(row.revision_id)) {
+          if (row.revision_id !== activeRevisionId) {
+            retainedRevisionIds.push(row.revision_id);
+          }
+        } else {
+          deletedRevisionIds.push(row.revision_id);
+        }
+      }
+
+      if (deletedRevisionIds.length > 0) {
+        const deleteEdges = this.database.prepare(
+          'DELETE FROM canonical_graph_edges WHERE revision_id = ?'
+        );
+        const deleteAliases = this.tableExists('canonical_symbol_aliases')
+          ? this.database.prepare('DELETE FROM canonical_symbol_aliases WHERE revision_id = ?')
+          : null;
+        const deleteDiagnostics = this.tableExists('canonical_graph_diagnostics')
+          ? this.database.prepare('DELETE FROM canonical_graph_diagnostics WHERE revision_id = ?')
+          : null;
+        const deleteNodes = this.database.prepare(
+          'DELETE FROM canonical_graph_nodes WHERE revision_id = ?'
+        );
+        const deleteRevision = this.database.prepare(
+          'DELETE FROM canonical_graph_revisions WHERE revision_id = ?'
+        );
+
+        for (const revisionId of deletedRevisionIds) {
+          deleteEdges.run(revisionId);
+          deleteAliases?.run(revisionId);
+          deleteDiagnostics?.run(revisionId);
+          deleteNodes.run(revisionId);
+          deleteRevision.run(revisionId);
+        }
+      }
+
+      return { activeRevisionId, retainedRevisionIds, deletedRevisionIds };
+    });
+
+    const txResult = prune.immediate();
+    let vacuumed = false;
+    if (options.vacuum) {
+      if (this.databasePath !== ':memory:') {
+        this.database.pragma('wal_checkpoint(TRUNCATE)');
+      }
+      this.database.exec('VACUUM');
+      if (this.databasePath !== ':memory:') {
+        this.database.pragma('wal_checkpoint(TRUNCATE)');
+      }
+      vacuumed = true;
+    }
+
+    return deepFreeze({
+      activeRevisionId: txResult.activeRevisionId,
+      retainedRevisionIds: txResult.retainedRevisionIds,
+      deletedRevisionIds: txResult.deletedRevisionIds,
+      vacuumed,
+    });
   }
 
   /** Close the isolated SQLite connection. */

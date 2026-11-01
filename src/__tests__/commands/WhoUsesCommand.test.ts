@@ -107,6 +107,11 @@ describe('WhoUsesCommand', () => {
           from: 'src/caller.ts#runCaller:function',
           to: 'src/core.ts#readCore:function',
         },
+        {
+          kind: 'type_ref',
+          from: 'src/caller.ts#runCaller:function',
+          to: 'src/core.ts#readCore:function',
+        },
       ];
       const graph: CanonicalProjectGraph = {
         contractVersion: '1.0',
@@ -122,12 +127,13 @@ describe('WhoUsesCommand', () => {
 
       const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
 
-      // 1. Default Human output excludes external caller
+      // 1. Default Human output excludes external caller and deduplicates multi-edge callers with relation badges
       const humanRes = await command.execute(['readCore']);
       expect(humanRes.exitCode).toBe(0);
       const humanOut = logSpy.mock.calls.map((c) => c.join(' ')).join('\n');
       expect(humanOut).toContain('Who Uses: readCore');
-      expect(humanOut).toContain('runCaller');
+      expect(humanOut).toContain('Referenced by 1 symbol(s) (2 edges):');
+      expect(humanOut).toContain('runCaller (function) [calls, type_ref]');
       expect(humanOut).not.toContain('extUser');
 
       // 2. --include-external + --json includes external caller

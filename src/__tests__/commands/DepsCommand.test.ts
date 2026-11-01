@@ -112,6 +112,11 @@ describe('DepsCommand', () => {
           to: 'src/repo.ts#UserRepo:class',
         },
         {
+          kind: 'instantiates',
+          from: 'src/service.ts#UserService:class',
+          to: 'src/repo.ts#UserRepo:class',
+        },
+        {
           kind: 'type_ref',
           from: 'src/service.ts#UserService:class',
           to: '/bundled:/libs/lib.es5.d.ts#Array:interface',
@@ -136,13 +141,14 @@ describe('DepsCommand', () => {
 
       const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
 
-      // 1. Default Human output excludes external Array
+      // 1. Default Human output excludes external Array and deduplicates multi-edge targets with relation badges
       const humanRes = await command.execute(['UserService']);
       expect(humanRes.exitCode).toBe(0);
       const humanOut = logSpy.mock.calls.map((c) => c.join(' ')).join('\n');
       expect(humanOut).toContain('Dependencies of UserService');
-      expect(humanOut).toContain('UserRepo');
-      expect(humanOut).toContain('UserRecord');
+      expect(humanOut).toContain('UserRepo (class) [calls, instantiates]');
+      expect(humanOut).toContain('UserRecord (interface) [type_ref]');
+      expect(humanOut).toContain('Total: 2 dependencies (3 edges)');
       expect(humanOut).not.toContain('Array');
 
       // 2. --include-external + --json includes external Array

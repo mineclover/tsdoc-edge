@@ -178,7 +178,7 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:280
-- [[BuildCommand]] → managed/commands/BuildCommand.md:89
+- [[BuildCommand]] → managed/commands/BuildCommand.md:91
 - [[ExploreEntrypointCommand]] → managed/commands/ExploreEntrypointCommand.md:30
 - [[WorkContextCommand]] → managed/commands/WorkContextCommand.md:66
 - [[Feature Showcase]] → managed/examples/feature-showcase.md:31

@@ -386,7 +386,7 @@ tsdoc-edge import-registry
 
 - [[TSDoc Edge Documentation]] → managed/README.md:64
 - [[ProjectIndexer]] → managed/architecture/project-indexer.md:195
-- [[BuildCommand]] → managed/commands/BuildCommand.md:88
+- [[BuildCommand]] → managed/commands/BuildCommand.md:90
 - [[StatsCommand]] → managed/commands/StatsCommand.md:94
 - [[UndocumentedCommand]] → managed/commands/UndocumentedCommand.md:73
 - [[UntestedCommand]] → managed/commands/UntestedCommand.md:76

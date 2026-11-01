@@ -316,7 +316,7 @@ tsdoc-edge parse src/commands/BuildCommand.ts
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:51
-- [[BuildCommand]] → managed/commands/BuildCommand.md:86
+- [[BuildCommand]] → managed/commands/BuildCommand.md:88
 - [[CoreWorkflow]] → managed/features/core-workflow.md:85
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:72
 - [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:215

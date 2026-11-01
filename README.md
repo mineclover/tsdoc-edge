@@ -106,7 +106,7 @@ The `work-context` command provides everything you need before modifying code:
 | Convention Inputs | `convention inputs list|read` | Inspect exact evidence, enrichment, and policy pins read-only |
 | Find Method | `find-method <name>` | Find methods by name across the symbol graph |
 | Specifications | `spec extract` / `spec graph ...` | Compile and inspect managed SpecGraph revisions |
-| Canonical Graph | `canonical-graph status|list|read` | Inspect saved ttsc graph revisions and provenance read-only |
+| Canonical Graph | `canonical-graph status\|list\|read\|prune` | Inspect saved ttsc graph revisions read-only or prune historical revisions |
 | Spec Graph | `spec graph status|list|read` | Inspect saved managed SpecGraph revisions read-only |
 | Coverage Report | `coverage-report list|read` | Inspect persisted source-identified coverage reports read-only |
 | Coverage Baseline | `coverage-baseline save|compare|list|read` | Persist, compare, and inspect immutable metric baselines |
@@ -341,10 +341,12 @@ Operators can inspect the saved graph without loading the router or opening a wr
 tsdoc-edge canonical-graph status --graph-db .tsdoc/canonical-graph.db --json
 tsdoc-edge canonical-graph list --graph-db .tsdoc/canonical-graph.db --json
 tsdoc-edge canonical-graph read --graph-db .tsdoc/canonical-graph.db --revision-id <revision-id> --json
+tsdoc-edge canonical-graph prune --graph-db .tsdoc/canonical-graph.db --keep 2 --vacuum --json
 ```
 
-These operations expose the active marker, retained revision metadata, provenance, and exact
-graph payload while keeping the SQLite database read-only.
+`status`, `list`, and `read` expose the active marker, retained revision metadata, provenance,
+and exact graph payload while keeping the SQLite database read-only; `prune` reclaims older
+historical revisions while always preserving the active revision.
 
 Build, structural analysis, and LSP saved-file refresh share the same
 `ProjectIndexer -> GraphRepository` boundary. LSP reads canonical impact,

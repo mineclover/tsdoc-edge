@@ -75,11 +75,13 @@ tsdoc-edge canonical-graph status --graph-db .tsdoc/canonical-graph.db --json
 tsdoc-edge canonical-graph list --graph-db .tsdoc/canonical-graph.db --json
 tsdoc-edge canonical-graph read --graph-db .tsdoc/canonical-graph.db \
   --revision-id <revision-id> --json
+tsdoc-edge canonical-graph prune --graph-db .tsdoc/canonical-graph.db --keep 2 --vacuum --json
 ```
 
 `status`는 active revision과 retained 개수를, `list`는 revision별 provenance/count를,
-`read`는 exact revision의 graph/alias/diagnostic envelope를 반환한다. 세 명령 모두 active
-pointer를 생성하거나 변경하지 않는다.
+`read`는 exact revision의 graph/alias/diagnostic envelope를 read-only로 반환한다. `prune`은
+active revision을 항상 보존하면서 오래된 revision을 정리하며, 네 명령 모두 active pointer를
+생성하거나 변경하지 않는다.
 
 ## Related
 

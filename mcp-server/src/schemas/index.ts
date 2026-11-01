@@ -146,7 +146,11 @@ export const GetImpactSchema = z
     direction: z.enum(['downstream', 'upstream', 'both']).default('downstream'),
     maxDepth: z.number().int().min(1).max(10).default(3),
     includeExternal: z.boolean().default(false),
-    response_format: z.enum(['markdown', 'json']).default('markdown'),
+    format: z.enum(['markdown', 'json']).optional().describe('Response format (default: markdown)'),
+    response_format: z
+      .enum(['markdown', 'json'])
+      .optional()
+      .describe('Backward-compatible alias for format'),
   })
   .strict();
 export type GetImpactInput = z.infer<typeof GetImpactSchema>;
@@ -156,7 +160,11 @@ export const GetSpecBindingsSchema = z
     filePath: z.string().min(1).max(500).optional(),
     specId: z.string().min(1).max(300).optional(),
     query: z.string().min(1).max(300).optional(),
-    response_format: z.enum(['markdown', 'json']).default('markdown'),
+    format: z.enum(['markdown', 'json']).optional().describe('Response format (default: markdown)'),
+    response_format: z
+      .enum(['markdown', 'json'])
+      .optional()
+      .describe('Backward-compatible alias for format'),
   })
   .strict();
 export type GetSpecBindingsInput = z.infer<typeof GetSpecBindingsSchema>;

@@ -253,12 +253,12 @@ Top Node Types:
 ### 8. **tsdoc_get_impact** - Canonical 영향 분석
 활성 `.tsdoc/canonical-graph.db`의 canonical 노드와 엣지를 사용해 다중 홉 영향 범위를 계산합니다. 활성 revision이 없으면 legacy `.tsdoc.db`로 자동 대체합니다.
 
-**Parameters:** `symbol` (required), `direction` (`downstream|upstream|both`), `maxDepth` (1-10), `includeExternal`, `response_format` (`markdown|json`). 결과에는 `impactedSymbols`, depth별 그룹, `riskLevel`, `source`가 포함됩니다.
+**Parameters:** `symbol` (required), `direction` (`downstream|upstream|both`), `maxDepth` (1-10), `includeExternal`, `format` (`markdown|json`, 하위 호환 별칭: `response_format`). 결과에는 `impactedSymbols`, depth별 그룹, `riskLevel`, `source`가 포함됩니다.
 
 ---
 
 ### 9. **tsdoc_get_spec_bindings** - SpecGraph 규범 바인딩
-활성 `.tsdoc/spec-graph.db`의 normative specification 노드와 코드 conformance 바인딩을 조회합니다. `filePath`, `specId`, `query` 중 하나 이상으로 필터링하고 `response_format`을 선택할 수 있습니다.
+활성 `.tsdoc/spec-graph.db`의 normative specification 노드와 코드 conformance 바인딩을 조회합니다. `filePath`, `specId`, `query` 중 하나 이상으로 필터링하고 `format` (`markdown|json`, 하위 호환 별칭: `response_format`)을 선택할 수 있습니다.
 
 Canonical graph와 SpecGraph는 read-only SQLite 연결로 열리고, external/stdlib 노드는 기본적으로 숨겨집니다. 기존 legacy 응답 필드와 alias는 유지됩니다.
 

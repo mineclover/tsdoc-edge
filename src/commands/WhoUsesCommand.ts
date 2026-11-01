@@ -222,11 +222,33 @@ export class WhoUsesCommand extends BaseCommand {
       console.log();
       if (payload.dependents.length === 0) console.log('Not used by any symbol');
       else {
-        console.log(`Referenced by ${payload.dependents.length} symbol(s):`);
-        for (const item of payload.dependents)
+        const groupedDependents = new Map<
+          string,
+          { dependent: (typeof payload.dependents)[number]; relationships: string[] }
+        >();
+        for (const item of payload.dependents) {
+          const existing = groupedDependents.get(item.id);
+          if (existing) {
+            if (!existing.relationships.includes(item.relationship)) {
+              existing.relationships.push(item.relationship);
+            }
+          } else {
+            groupedDependents.set(item.id, {
+              dependent: item,
+              relationships: [item.relationship],
+            });
+          }
+        }
+        console.log(
+          groupedDependents.size === payload.dependents.length
+            ? `Referenced by ${groupedDependents.size} symbol(s):`
+            : `Referenced by ${groupedDependents.size} symbol(s) (${payload.dependents.length} edges):`
+        );
+        for (const { dependent, relationships } of groupedDependents.values()) {
           console.log(
-            `  ← ${item.name} (${item.kind}) ${item.file ?? ''}:${item.evidence?.startLine ?? '?'}`
+            `  ← ${dependent.name} (${dependent.kind}) [${relationships.join(', ')}] ${dependent.file ?? ''}:${dependent.evidence?.startLine ?? '?'}`
           );
+        }
       }
     }
     return this.success();
