@@ -73,8 +73,8 @@ Examples:
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
@@ -251,8 +251,10 @@ Examples:
       // Some relationship kinds intentionally carry document, test-case, or file identifiers.
       const symbolToRelationships = new Map<string, string[]>();
       for (const rel of relationships) {
-        const fromSymbols = JSON.parse(rel.fromSymbols) as string[];
-        const toSymbols = JSON.parse(rel.toSymbols) as string[];
+        const rawFrom: unknown = JSON.parse(rel.fromSymbols);
+        const rawTo: unknown = JSON.parse(rel.toSymbols);
+        const fromSymbols = rawFrom as string[];
+        const toSymbols = rawTo as string[];
 
         for (const symbolId of this.materializedSymbolEndpoints(rel.type, fromSymbols, toSymbols)) {
           if (!symbolToRelationships.has(symbolId)) {
@@ -371,8 +373,10 @@ Examples:
       const bidirectional = dbManager.getBidirectionalRelationships();
 
       for (const rel of bidirectional) {
-        const fromSymbols = JSON.parse(rel.fromSymbols) as string[];
-        const toSymbols = JSON.parse(rel.toSymbols) as string[];
+        const rawFrom: unknown = JSON.parse(rel.fromSymbols);
+        const rawTo: unknown = JSON.parse(rel.toSymbols);
+        const fromSymbols = rawFrom as string[];
+        const toSymbols = rawTo as string[];
 
         if (fromSymbols.length === 0 || toSymbols.length === 0) {
           issues.push({

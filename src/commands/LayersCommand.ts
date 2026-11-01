@@ -21,11 +21,11 @@ export class LayersCommand extends BaseCommand {
     return 'Analyze package dependency layers';
   }
 
-  async execute(args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     const useXml = !args.includes('--human');
 
     const dbCheck = this.checkDatabaseExists();
-    if (dbCheck) return dbCheck;
+    if (dbCheck) return Promise.resolve(dbCheck);
 
     const dbPath = this.getDatabasePath();
     const db = new Database(dbPath, { readonly: true });
@@ -76,10 +76,10 @@ export class LayersCommand extends BaseCommand {
       }
 
       db.close();
-      return { exitCode: 0, message: `Found ${results.length} dependencies` };
+      return Promise.resolve({ exitCode: 0, message: `Found ${results.length} dependencies` });
     } catch (error) {
       db.close();
-      return { exitCode: 1, message: String(error) };
+      return Promise.resolve({ exitCode: 1, message: String(error) });
     }
   }
 }

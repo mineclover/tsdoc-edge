@@ -82,11 +82,15 @@ export class FileReferenceUpdater {
    * @param newPath - New file path (optional, for calculating new text)
    * @returns Array of file references found
    */
-  async findReferences(
-    oldPath: string,
-    baseDir: string,
-    newPath?: string
-  ): Promise<FileReference[]> {
+  findReferences(oldPath: string, baseDir: string, newPath?: string): Promise<FileReference[]> {
+    try {
+      return Promise.resolve(this.findReferencesSync(oldPath, baseDir, newPath));
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  private findReferencesSync(oldPath: string, baseDir: string, newPath?: string): FileReference[] {
     const references: FileReference[] = [];
 
     // Normalize paths
@@ -464,33 +468,37 @@ export class FileReferenceUpdater {
   /**
    * Update references in a single file
    */
-  private async updateFileReferences(file: string, references: FileReference[]): Promise<number> {
-    const content = fs.readFileSync(file, 'utf-8');
-    let updated = 0;
+  private updateFileReferences(file: string, references: FileReference[]): Promise<number> {
+    try {
+      const content = fs.readFileSync(file, 'utf-8');
+      let updated = 0;
 
-    // Sort by line and column (descending) to avoid offset issues
-    const sortedRefs = references.sort((a, b) => {
-      if (a.line !== b.line) return b.line - a.line;
-      return b.column - a.column;
-    });
+      // Sort by line and column (descending) to avoid offset issues
+      const sortedRefs = references.sort((a, b) => {
+        if (a.line !== b.line) return b.line - a.line;
+        return b.column - a.column;
+      });
 
-    const lines = content.split('\n');
+      const lines = content.split('\n');
 
-    for (const ref of sortedRefs) {
-      const lineIndex = ref.line - 1;
-      if (lineIndex >= 0 && lineIndex < lines.length) {
-        const line = lines[lineIndex];
-        const newLine = line.replace(ref.oldText, ref.newText);
+      for (const ref of sortedRefs) {
+        const lineIndex = ref.line - 1;
+        if (lineIndex >= 0 && lineIndex < lines.length) {
+          const line = lines[lineIndex];
+          const newLine = line.replace(ref.oldText, ref.newText);
 
-        if (newLine !== line) {
-          lines[lineIndex] = newLine;
-          updated++;
+          if (newLine !== line) {
+            lines[lineIndex] = newLine;
+            updated++;
+          }
         }
       }
-    }
 
-    fs.writeFileSync(file, lines.join('\n'), 'utf-8');
-    return updated;
+      fs.writeFileSync(file, lines.join('\n'), 'utf-8');
+      return Promise.resolve(updated);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   /**

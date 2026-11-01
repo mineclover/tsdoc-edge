@@ -260,7 +260,7 @@ export class LLMsTextGenerator {
     const strengthOrder: Array<'strong' | 'medium' | 'weak'> = ['strong', 'medium', 'weak'];
 
     for (const strength of strengthOrder) {
-      const items = byStrength[strength];
+      const items = Object.hasOwn(byStrength, strength) ? byStrength[strength] : undefined;
       if (!items || items.length === 0) continue;
 
       related += `### ${strength.charAt(0).toUpperCase() + strength.slice(1)} Relationship\n\n`;
@@ -371,14 +371,16 @@ export class LLMsTextGenerator {
    * Helper to group array by key
    */
   private groupBy<T>(array: T[], keyFn: (item: T) => string): Record<string, T[]> {
-    return array.reduce(
-      (acc, item) => {
-        const key = keyFn(item);
-        if (!acc[key]) acc[key] = [];
-        acc[key].push(item);
-        return acc;
-      },
-      {} as Record<string, T[]>
-    );
+    const groups = new Map<string, T[]>();
+    for (const item of array) {
+      const key = keyFn(item);
+      const existing = groups.get(key);
+      if (existing) {
+        existing.push(item);
+      } else {
+        groups.set(key, [item]);
+      }
+    }
+    return Object.fromEntries(groups);
   }
 }

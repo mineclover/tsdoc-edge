@@ -99,6 +99,18 @@ let hasConfigurationCapability = false;
 let hasWorkspaceFolderCapability = false;
 let hasWatchedFilesDynamicRegistration = false;
 
+function legacyRootUriFromParams(params: object): string | null | undefined {
+  if (!('rootUri' in params)) {
+    return undefined;
+  }
+  const candidate = params.rootUri;
+  return typeof candidate === 'string' || candidate === null ? candidate : undefined;
+}
+
+function readDiagnosticData(diagnostic: object): unknown {
+  return 'data' in diagnostic ? diagnostic.data : undefined;
+}
+
 connection.onInitialize((params: InitializeParams): InitializeResult => {
   const capabilities = params.capabilities;
 
@@ -112,7 +124,7 @@ connection.onInitialize((params: InitializeParams): InitializeResult => {
   // Initialize TSDoc Edge service
   const workspaceRoot = resolveWorkspaceRoot(
     params.workspaceFolders?.map((folder) => folder.uri),
-    params.rootUri,
+    legacyRootUriFromParams(params),
     process.cwd()
   );
 
@@ -375,7 +387,7 @@ connection.onCodeAction((params: CodeActionParams): CodeAction[] => {
           });
         }
 
-        const savedConvention = savedConventionDiagnosticData(diagnostic.data);
+        const savedConvention = savedConventionDiagnosticData(readDiagnosticData(diagnostic));
         if (savedConvention) {
           actions.push({
             title: '📖 Explain Saved Convention Finding',

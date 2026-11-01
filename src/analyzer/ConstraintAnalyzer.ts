@@ -179,8 +179,6 @@ export class ConstraintAnalyzer {
             if (ts.isNamedImports(clause.namedBindings)) {
               for (const element of clause.namedBindings.elements) {
                 try {
-                  if (!element || !element.name) continue;
-
                   const symbolName = element.name.text;
                   if (!symbolName) continue;
 
@@ -310,10 +308,11 @@ export class ConstraintAnalyzer {
     coRequirements: number;
     bySource: Record<string, number>;
   } {
+    const bySource: Record<string, number> = {};
     const stats = {
       totalConstraints: relationships.length,
       coRequirements: 0,
-      bySource: {} as Record<string, number>,
+      bySource,
     };
 
     for (const rel of relationships) {
@@ -321,7 +320,7 @@ export class ConstraintAnalyzer {
         stats.coRequirements++;
       }
 
-      const source = rel.discoveredBy || 'unknown';
+      const source = (rel.discoveredBy as string | undefined) || 'unknown';
       stats.bySource[source] = (stats.bySource[source] || 0) + 1;
     }
 

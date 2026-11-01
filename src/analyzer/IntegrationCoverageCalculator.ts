@@ -136,7 +136,8 @@ export class IntegrationCoverageCalculator {
     _targetSymbol: Symbol
   ): UnverifiedRelationship['reason'] {
     // Check if source has any tests
-    const sourceHasTests = sourceSymbol.tests && sourceSymbol.tests.length > 0;
+    const tests = sourceSymbol.tests as Symbol['tests'] | undefined;
+    const sourceHasTests = Boolean(tests && tests.length > 0);
 
     if (!sourceHasTests) {
       return 'no-test';

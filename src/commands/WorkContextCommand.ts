@@ -96,7 +96,7 @@ export class WorkContextCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     const valuedOptions = new Set(['--output', '--depth', '--category']);
     const positionalArgs: string[] = [];
     for (let i = 0; i < args.length; i++) {
@@ -136,7 +136,7 @@ export class WorkContextCommand extends BaseCommand {
       );
       console.log();
       console.log('Tip: Use this before editing a file to see all related context');
-      return { exitCode: 1, message: 'File path required' };
+      return Promise.resolve({ exitCode: 1, message: 'File path required' });
     }
 
     const useHumanFormat = args.includes('--human');
@@ -155,9 +155,9 @@ export class WorkContextCommand extends BaseCommand {
     if (originalConsoleLog && humanOutputPath) {
       this.capturedHumanOutput = [];
       this.capturedHumanOutputFile = humanOutputPath;
-      console.log = ((...values: unknown[]) => {
+      console.log = (...values: unknown[]) => {
         this.capturedHumanOutput?.push(format(...values));
-      }) as typeof console.log;
+      };
     } else {
       this.capturedHumanOutput = null;
       this.capturedHumanOutputFile = null;
@@ -168,7 +168,7 @@ export class WorkContextCommand extends BaseCommand {
 
     if (!fs.existsSync(absolutePath)) {
       this.printError(`File not found: ${targetFile}`);
-      return { exitCode: 1, message: 'File not found' };
+      return Promise.resolve({ exitCode: 1, message: 'File not found' });
     }
 
     // Only show header for human-readable format
@@ -187,16 +187,18 @@ export class WorkContextCommand extends BaseCommand {
       if (!fs.existsSync(dbPath)) {
         const canonical = this.gatherCanonicalContext([], canonicalContext, absolutePath);
         if (canonical) {
-          return this.outputCanonicalOnlyContext(
-            targetFile,
-            canonical,
-            useXmlFormat,
-            useLlmFormat,
-            outputFile
+          return Promise.resolve(
+            this.outputCanonicalOnlyContext(
+              targetFile,
+              canonical,
+              useXmlFormat,
+              useLlmFormat,
+              outputFile
+            )
           );
         }
         const dbCheck = this.checkDatabaseExists();
-        if (dbCheck) return dbCheck;
+        if (dbCheck) return Promise.resolve(dbCheck);
       }
 
       const config = this.configManager.get();
@@ -225,7 +227,7 @@ export class WorkContextCommand extends BaseCommand {
           console.log(output);
         }
 
-        return { exitCode: 0, message: 'XML context generated' };
+        return Promise.resolve({ exitCode: 0, message: 'XML context generated' });
       }
 
       if (useLlmFormat) {
@@ -260,7 +262,7 @@ export class WorkContextCommand extends BaseCommand {
           console.log(output);
         }
 
-        return { exitCode: 0, message: 'LLM context generated' };
+        return Promise.resolve({ exitCode: 0, message: 'LLM context generated' });
       }
 
       // Human-readable format (original behavior)
@@ -285,7 +287,7 @@ export class WorkContextCommand extends BaseCommand {
         console.log();
         console.log('This file may not have been indexed. Try rebuilding:');
         console.log('  tsdoc-edge build src --force');
-        return { exitCode: 0, message: 'No symbols found' };
+        return Promise.resolve({ exitCode: 0, message: 'No symbols found' });
       }
 
       // Display summary
@@ -527,12 +529,12 @@ export class WorkContextCommand extends BaseCommand {
 
       console.log();
 
-      return { exitCode: 0, message: 'Context displayed' };
+      return Promise.resolve({ exitCode: 0, message: 'Context displayed' });
     } catch (error) {
       this.printError(
         `Failed to analyze file: ${error instanceof Error ? error.message : String(error)}`
       );
-      return { exitCode: 1, message: 'Analysis failed' };
+      return Promise.resolve({ exitCode: 1, message: 'Analysis failed' });
     } finally {
       try {
         canonicalContext?.close();

@@ -100,11 +100,23 @@ export class SymbolReferenceUpdater {
    * @param newSymbol - New symbol name (optional, for calculating new text)
    * @returns Array of symbol references found
    */
-  async findReferences(
+  findReferences(
     oldSymbol: string,
     baseDir: string,
     newSymbol?: string
   ): Promise<SymbolReference[]> {
+    try {
+      return Promise.resolve(this.findReferencesSync(oldSymbol, baseDir, newSymbol));
+    } catch (error) {
+      return Promise.reject(error);
+    }
+  }
+
+  private findReferencesSync(
+    oldSymbol: string,
+    baseDir: string,
+    newSymbol?: string
+  ): SymbolReference[] {
     const references: SymbolReference[] = [];
 
     // Get all markdown files
@@ -295,33 +307,37 @@ export class SymbolReferenceUpdater {
   /**
    * Update references in a single file
    */
-  private async updateFileReferences(file: string, references: SymbolReference[]): Promise<number> {
-    const content = fs.readFileSync(file, 'utf-8');
-    let updated = 0;
+  private updateFileReferences(file: string, references: SymbolReference[]): Promise<number> {
+    try {
+      const content = fs.readFileSync(file, 'utf-8');
+      let updated = 0;
 
-    // Sort by line and column (descending) to avoid offset issues
-    const sortedRefs = references.sort((a, b) => {
-      if (a.line !== b.line) return b.line - a.line;
-      return b.column - a.column;
-    });
+      // Sort by line and column (descending) to avoid offset issues
+      const sortedRefs = references.sort((a, b) => {
+        if (a.line !== b.line) return b.line - a.line;
+        return b.column - a.column;
+      });
 
-    const lines = content.split('\n');
+      const lines = content.split('\n');
 
-    for (const ref of sortedRefs) {
-      const lineIndex = ref.line - 1;
-      if (lineIndex >= 0 && lineIndex < lines.length) {
-        const line = lines[lineIndex];
-        const newLine = line.replace(ref.oldText, ref.newText);
+      for (const ref of sortedRefs) {
+        const lineIndex = ref.line - 1;
+        if (lineIndex >= 0 && lineIndex < lines.length) {
+          const line = lines[lineIndex];
+          const newLine = line.replace(ref.oldText, ref.newText);
 
-        if (newLine !== line) {
-          lines[lineIndex] = newLine;
-          updated++;
+          if (newLine !== line) {
+            lines[lineIndex] = newLine;
+            updated++;
+          }
         }
       }
-    }
 
-    fs.writeFileSync(file, lines.join('\n'), 'utf-8');
-    return updated;
+      fs.writeFileSync(file, lines.join('\n'), 'utf-8');
+      return Promise.resolve(updated);
+    } catch (error) {
+      return Promise.reject(error);
+    }
   }
 
   /**

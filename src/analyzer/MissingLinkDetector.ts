@@ -27,7 +27,7 @@ import type { ConfigLoader } from '../utils/ConfigLoader';
  * @public
  */
 export type LinkType =
-  | 'dependency' // @depends references
+  | 'dependency' // AST import & @ttsc/graph dependency references
   | 'relatedProblem' // @relatedProblem references
   | 'symbol' // Symbol name references
   | 'file'; // File path references

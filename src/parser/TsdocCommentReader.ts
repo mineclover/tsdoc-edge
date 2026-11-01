@@ -671,17 +671,18 @@ function getDeclarationIdentity(
   ) {
     codeSymbol = node.name.text;
   } else if (
-    (ts.isMethodDeclaration(node) ||
-      ts.isMethodSignature(node) ||
-      ts.isPropertyDeclaration(node) ||
-      ts.isPropertySignature(node)) &&
-    node.name
+    ts.isMethodDeclaration(node) ||
+    ts.isMethodSignature(node) ||
+    ts.isPropertyDeclaration(node) ||
+    ts.isPropertySignature(node)
   ) {
     codeSymbol = getPropertyOrMemberName(node.name);
   } else if (ts.isVariableStatement(node)) {
-    const firstDecl = node.declarationList.declarations[0];
-    if (firstDecl && ts.isIdentifier(firstDecl.name)) {
-      codeSymbol = firstDecl.name.text;
+    if (
+      node.declarationList.declarations.length > 0 &&
+      ts.isIdentifier(node.declarationList.declarations[0].name)
+    ) {
+      codeSymbol = node.declarationList.declarations[0].name.text;
     }
   }
 

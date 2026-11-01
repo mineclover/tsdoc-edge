@@ -214,7 +214,7 @@ const ANALYZER_METADATA: Record<AnalyzerType, AnalyzerMetadata> = {
  * @public
  */
 export class AnalyzerRegistry {
-  private static instance: AnalyzerRegistry;
+  private static instance: AnalyzerRegistry | undefined;
 
   private constructor() {}
 
@@ -271,7 +271,7 @@ export class AnalyzerRegistry {
    * @returns Analyzer instance
    */
   create(type: AnalyzerType, context: AnalyzerContext): RelationshipAnalyzer {
-    const metadata = ANALYZER_METADATA[type];
+    const metadata = ANALYZER_METADATA[type] as AnalyzerMetadata | undefined;
     if (!metadata) {
       throw new Error(`Unknown analyzer type: ${type}`);
     }

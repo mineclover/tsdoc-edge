@@ -50,19 +50,19 @@ export class BlocksCommand extends BaseCommand {
     return 'Display code blocks for a symbol';
   }
 
-  async execute(args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     if (args.length === 0) {
-      return {
+      return Promise.resolve({
         exitCode: 1,
         message: 'Usage: blocks <symbol-id> [--type=<type>]',
-      };
+      });
     }
 
     const symbolId = args[0];
     const typeFilter = args.find((a) => a.startsWith('--type='))?.split('=')[1];
 
     const dbCheck = this.checkDatabaseExists();
-    if (dbCheck) return dbCheck;
+    if (dbCheck) return Promise.resolve(dbCheck);
 
     const dbPath = this.getDatabasePath();
     const db = new Database(dbPath, { readonly: true });
@@ -79,10 +79,10 @@ export class BlocksCommand extends BaseCommand {
 
       if (!symbol) {
         db.close();
-        return {
+        return Promise.resolve({
           exitCode: 1,
           message: `Symbol not found: ${symbolId}`,
-        };
+        });
       }
 
       // Get blocks
@@ -125,7 +125,7 @@ export class BlocksCommand extends BaseCommand {
           })
           .section('blocks', [])
           .print();
-        return { exitCode: 0, message: 'No blocks found' };
+        return Promise.resolve({ exitCode: 0, message: 'No blocks found' });
       }
 
       // Calculate statistics
@@ -140,16 +140,19 @@ export class BlocksCommand extends BaseCommand {
       }
 
       // Format blocks for output
-      const formattedBlocks = blocks.map((b) => ({
-        id: b.id,
-        type: b.type,
-        startLine: b.startLine,
-        endLine: b.endLine,
-        lines: b.endLine - b.startLine + 1,
-        purpose: b.purpose || '',
-        complexity: b.complexity || 0,
-        sideEffects: b.sideEffects ? JSON.parse(b.sideEffects).length : 0,
-      }));
+      const formattedBlocks = blocks.map((b) => {
+        const parsedSideEffects: unknown = b.sideEffects ? JSON.parse(b.sideEffects) : null;
+        return {
+          id: b.id,
+          type: b.type,
+          startLine: b.startLine,
+          endLine: b.endLine,
+          lines: b.endLine - b.startLine + 1,
+          purpose: b.purpose || '',
+          complexity: b.complexity || 0,
+          sideEffects: Array.isArray(parsedSideEffects) ? parsedSideEffects.length : 0,
+        };
+      });
 
       new XmlBuilder(BlocksSchema)
         .section('symbol', symbol)
@@ -163,13 +166,13 @@ export class BlocksCommand extends BaseCommand {
         .print();
 
       db.close();
-      return { exitCode: 0, message: `Found ${blocks.length} blocks` };
+      return Promise.resolve({ exitCode: 0, message: `Found ${blocks.length} blocks` });
     } catch (error) {
       db.close();
-      return {
+      return Promise.resolve({
         exitCode: 1,
         message: `Error: ${error instanceof Error ? error.message : String(error)}`,
-      };
+      });
     }
   }
 }

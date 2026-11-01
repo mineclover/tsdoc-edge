@@ -77,8 +77,8 @@ export class LintCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }

@@ -4,6 +4,7 @@
  */
 
 import { DatabaseManager } from '../storage/DatabaseManager';
+import type { FuturePlan } from '../types/tags';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 /**
@@ -72,8 +73,8 @@ export class TodosCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -110,7 +111,8 @@ export class TodosCommand extends BaseCommand {
 
         let totalTodos = 0;
         for (const row of results) {
-          const plans = JSON.parse(row.futurePlans || '[]');
+          const rawPlans: unknown = JSON.parse(row.futurePlans || '[]');
+          const plans = rawPlans as FuturePlan[];
           if (plans.length > 0) {
             console.log();
             console.log(`${colors.bold}Symbol: ${row.symbolId}${colors.reset}`);

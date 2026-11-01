@@ -65,7 +65,7 @@ export function isImplementationSymbol(symbol: Symbol): boolean {
  * @public
  */
 export function filterTestSymbols(symbols: Symbol[]): TestSymbol[] {
-  return symbols.filter(isTestSymbol) as TestSymbol[];
+  return symbols.filter(isTestSymbol);
 }
 
 /**

@@ -91,10 +91,7 @@ export class LayerDependencyAnalyzer {
     const layerDeps = this.collectLayerDependencies();
 
     for (const dep of layerDeps) {
-      const relationship = this.createRelationship(dep);
-      if (relationship) {
-        relationships.push(relationship);
-      }
+      relationships.push(this.createRelationship(dep));
     }
 
     return relationships;
@@ -287,10 +284,7 @@ export class LayerDependencyAnalyzer {
     const moduleDeps = this.collectModuleDependencies();
 
     for (const dep of moduleDeps) {
-      const relationship = this.createModuleBoundaryRelationship(dep);
-      if (relationship) {
-        relationships.push(relationship);
-      }
+      relationships.push(this.createModuleBoundaryRelationship(dep));
     }
 
     return relationships;
@@ -451,7 +445,7 @@ export class LayerDependencyAnalyzer {
    */
   private isProblematicBoundaryCross(fromModule: string, toModule: string): boolean {
     // Define allowed dependencies (module A can depend on module B)
-    const allowedDeps: Record<string, string[]> = {
+    const allowedDeps: Partial<Record<string, string[]>> = {
       // Common patterns - features can use core, but not other features
       commands: ['analyzer', 'graph', 'storage', 'types', 'parser', 'validator'],
       analyzer: ['graph', 'storage', 'types', 'parser'],
@@ -462,8 +456,9 @@ export class LayerDependencyAnalyzer {
     };
 
     // If we have specific rules for the source module
-    if (allowedDeps[fromModule]) {
-      return !allowedDeps[fromModule].includes(toModule);
+    const allowedTargets = allowedDeps[fromModule];
+    if (allowedTargets) {
+      return !allowedTargets.includes(toModule);
     }
 
     // By default, any cross-module dependency is flagged for review

@@ -140,7 +140,7 @@ Next steps:
 ```json
 {
   "parsing": {
-    "includePrivate": false,    // Parse @private symbols
+    "includePrivate": false,    // Include TypeScript private class members
     "includeInternal": false    // Parse @internal symbols
   }
 }

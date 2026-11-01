@@ -38,17 +38,17 @@ See implementation: SymbolReference
 
 ### Syntax
 
-Two reference formats:
-- `{symbolId}`: Inline reference
-- `{@symbol symbolId}`: Explicit reference tag
+Two canonical reference formats:
+- `[[Checkpoint]]`: Markdown document checkpoint reference
+- `{@link Symbol}`: Standard TSDoc inline code symbol reference
 
 ### Example
 
 ```markdown
 # User Authentication Feature
 
-The authentication system uses {user-service} to validate
-credentials and {@symbol session-manager} to maintain sessions.
+The authentication system routes through [[UserAuthentication]] to validate
+credentials and links to `{@link SessionManager}` to maintain sessions.
 ```
 
 ## Feature Index

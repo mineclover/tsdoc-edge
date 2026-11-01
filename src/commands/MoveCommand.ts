@@ -57,10 +57,10 @@ Examples:
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     // Check for help flag
     if (this.hasHelpFlag(args)) {
-      return this.displayHelp();
+      return Promise.resolve(this.displayHelp());
     }
 
     const [sourcePath, destPath] = args.filter((a) => !a.startsWith('--'));
@@ -69,7 +69,7 @@ Examples:
       this.printError('Source and destination paths required');
       console.log();
       console.log(this.getUsage());
-      return { exitCode: 1, message: 'Missing arguments' };
+      return Promise.resolve({ exitCode: 1, message: 'Missing arguments' });
     }
 
     const managedDir = path.resolve('managed');
@@ -84,10 +84,10 @@ Examples:
 
     // Validation
     if (!fs.existsSync(absSource)) {
-      return { exitCode: 1, message: 'Source file does not exist' };
+      return Promise.resolve({ exitCode: 1, message: 'Source file does not exist' });
     }
     if (fs.existsSync(absDest)) {
-      return { exitCode: 1, message: 'Destination already exists' };
+      return Promise.resolve({ exitCode: 1, message: 'Destination already exists' });
     }
 
     // Find and update references
@@ -99,6 +99,6 @@ Examples:
     updater.updateReferences(refs, path.relative(managedDir, absDest));
     fs.renameSync(absSource, absDest);
 
-    return { exitCode: 0, message: 'Move completed' };
+    return Promise.resolve({ exitCode: 0, message: 'Move completed' });
   }
 }

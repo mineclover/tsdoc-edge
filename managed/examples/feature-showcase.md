@@ -58,15 +58,17 @@ export class BuildCommand extends BaseCommand {
 
 ## Relationship Documentation
 
-### @depends / @depType / @depReason
+### AST Import & `@ttsc/graph` Dependencies (`@relatedTo` / `@context`)
 
-의존성을 명시적으로 문서화:
+코드 의존성은 TypeScript `import` 선언과 `@ttsc/graph` 시맨틱 엣지(`calls`, `accesses`, `instantiates`, `type_ref`)에서 자동으로 추출되며, 비-AST 의미 관계와 도메인 실행 맥락만 `@relatedTo` 및 `@context`로 문서화합니다:
 
 ```typescript
+import { DatabaseManager } from '../storage/DatabaseManager';
+import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
+
 /**
- * @depends DatabaseManager, SymbolRegistryManager
- * @depType internal, internal
- * @depReason Data persistence, Symbol ID management
+ * @context Persists extracted symbol graphs via DatabaseManager and tracks canonical IDs via SymbolRegistryManager
+ * @relatedTo WorkContextCommand
  */
 ```
 
@@ -86,8 +88,7 @@ export class BuildCommand extends BaseCommand {
 
 ```typescript
 /**
- * @enhances BaseCommand
- * @reason Adds relationship analysis capabilities
+ * @enhances BaseCommand - Adds relationship analysis capabilities
  */
 ```
 

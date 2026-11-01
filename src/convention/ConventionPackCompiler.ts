@@ -514,7 +514,7 @@ export function validateConventionPackManifest(value: unknown): ConventionPackMa
   if (contentDigest !== expectedDigest || manifestId !== `convention-pack:${expectedDigest}`) {
     throw new Error('Convention pack manifest identity does not match its canonical content');
   }
-  return immutableJson({ ...semanticPayload, manifestId, contentDigest }) as ConventionPackManifest;
+  return immutableJson({ ...semanticPayload, manifestId, contentDigest });
 }
 
 function normalizeScope(value: unknown): ConventionPackSource['scope'] {
@@ -628,13 +628,17 @@ function validateExecutablePolicy(
   }
 }
 
+function isUnknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
+}
+
 function strictJsonClone(value: unknown, label: string, seen = new Set<object>()): unknown {
   if (value === null || typeof value === 'string' || typeof value === 'boolean') return value;
   if (typeof value === 'number') {
     if (!Number.isFinite(value)) throw new Error(`${label} contains a non-finite number`);
     return value;
   }
-  if (Array.isArray(value)) {
+  if (isUnknownArray(value)) {
     if (seen.has(value)) throw new Error(`${label} contains a cycle`);
     seen.add(value);
     const clone = value.map((entry, index) => {
@@ -649,9 +653,9 @@ function strictJsonClone(value: unknown, label: string, seen = new Set<object>()
   if (typeof value !== 'object') {
     throw new Error(`${label} contains a non-JSON value`);
   }
-  const object = value as object;
+  const object: object = value;
   if (seen.has(object)) throw new Error(`${label} contains a cycle`);
-  const prototype = Object.getPrototypeOf(object);
+  const prototype: unknown = Object.getPrototypeOf(object);
   if (prototype !== Object.prototype && prototype !== null) {
     throw new Error(`${label} contains a non-plain object`);
   }
@@ -659,7 +663,8 @@ function strictJsonClone(value: unknown, label: string, seen = new Set<object>()
     throw new Error(`${label} contains symbol keys`);
   }
   seen.add(object);
-  const clone: Record<string, unknown> = Object.create(null) as Record<string, unknown>;
+  const rawClone: unknown = Object.create(null);
+  const clone = rawClone as Record<string, unknown>;
   for (const [key, child] of Object.entries(object as Record<string, unknown>)) {
     if (key === '__proto__' || key === 'prototype' || key === 'constructor') {
       throw new Error(`${label} contains a forbidden object key: ${key}`);
@@ -736,7 +741,7 @@ function stableJson(value: unknown): string {
 }
 
 function immutableJson<T>(value: T): T {
-  if (Array.isArray(value)) {
+  if (isUnknownArray(value)) {
     value.forEach((child) => immutableJson(child));
     return Object.freeze(value);
   }

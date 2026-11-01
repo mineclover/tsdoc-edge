@@ -39,12 +39,15 @@ export type SymbolType = ImplementationSymbolType | TestSymbolType;
  * Represents a symbol in the codebase
  * @public
  * @doc [[Symbol]]
- * @doc [[Primary Types#Symbol]]
  */
 export interface Symbol {
   /**
-   * Legacy unique identifier (name-based, may change on refactor)
-   * @deprecated Use uuid for stable references
+   * Primary identifier within the SQLite / in-memory symbol graph (`<file>-<type>-<name>`).
+   *
+   * @remarks
+   * Superseded at the C2 canonical graph plane by `@ttsc/graph` `CanonicalNodeId`
+   * (`@workspace/<ws>/graph/<ns>/<path>#<Name>:<kind>`), while remaining the required
+   * primary key of `Symbol` records in the SQLite enrichment store.
    */
   id: string;
 

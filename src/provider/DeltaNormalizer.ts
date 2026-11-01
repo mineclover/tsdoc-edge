@@ -480,8 +480,8 @@ class StaticProjectGraphSource implements ProjectGraphSource {
 
   constructor(private readonly input: ProjectGraphInput) {}
 
-  async load(_request: ProjectIndexRequest): Promise<ProjectGraphInput> {
-    return this.input;
+  load(_request: ProjectIndexRequest): Promise<ProjectGraphInput> {
+    return Promise.resolve(this.input);
   }
 }
 
@@ -608,8 +608,13 @@ function clone<T>(value: T): T {
   return strictJsonClone(value);
 }
 
+function isUnknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
+}
+
 function strictJsonClone<T>(value: T): T {
-  return JSON.parse(JSON.stringify(strictCanonicalize(value))) as T;
+  const parsed: unknown = JSON.parse(JSON.stringify(strictCanonicalize(value)));
+  return parsed as T;
 }
 
 function strictCanonicalize(value: unknown, seen = new Set<object>()): unknown {
@@ -624,8 +629,8 @@ function strictCanonicalize(value: unknown, seen = new Set<object>()): unknown {
   if (seen.has(value)) throw new Error('Provider delta cannot contain cycles');
   seen.add(value);
   try {
-    if (Array.isArray(value)) return value.map((entry) => strictCanonicalize(entry, seen));
-    const prototype = Object.getPrototypeOf(value);
+    if (isUnknownArray(value)) return value.map((entry) => strictCanonicalize(entry, seen));
+    const prototype: unknown = Object.getPrototypeOf(value);
     if (prototype !== Object.prototype && prototype !== null) {
       throw new Error('Provider delta requires plain JSON objects');
     }

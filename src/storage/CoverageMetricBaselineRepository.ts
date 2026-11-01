@@ -174,7 +174,8 @@ function requiredText(value: string, field: string): void {
 }
 
 function parseJson<T>(value: string): T {
-  return JSON.parse(value) as T;
+  const parsed: unknown = JSON.parse(value);
+  return parsed as T;
 }
 
 function stableJson(value: unknown): string {

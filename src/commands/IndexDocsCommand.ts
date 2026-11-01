@@ -82,8 +82,8 @@ export class IndexDocsCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -112,22 +112,22 @@ export class IndexDocsCommand extends BaseCommand {
 
       // Check if incremental update (single file)
       if (targetFile) {
-        return await this.incrementalUpdate(targetFile, outputDir, outputPath);
+        return this.incrementalUpdate(targetFile, outputDir, outputPath);
       }
 
       // Full scan mode
-      return await this.fullScan(docsDir, outputDir, outputPath);
+      return this.fullScan(docsDir, outputDir, outputPath);
     });
   }
 
   /**
    * Incremental update for single file
    */
-  private async incrementalUpdate(
+  private incrementalUpdate(
     targetFile: string,
     outputDir: string,
     outputPath: string
-  ): Promise<CommandResult> {
+  ): CommandResult {
     const targetPath = path.resolve(process.cwd(), targetFile);
 
     if (!fs.existsSync(targetPath)) {
@@ -141,7 +141,10 @@ export class IndexDocsCommand extends BaseCommand {
     const registry = this.registry || new DocumentSymbolRegistry();
     if (fs.existsSync(outputPath)) {
       try {
-        const indexData = JSON.parse(fs.readFileSync(outputPath, 'utf-8'));
+        const rawIndexData: unknown = JSON.parse(fs.readFileSync(outputPath, 'utf-8'));
+        const indexData = rawIndexData as {
+          registryData?: Parameters<DocumentSymbolRegistry['import']>[0];
+        };
         if (indexData.registryData) {
           registry.import(indexData.registryData);
           this.printInfo('Loaded existing index');
@@ -213,11 +216,7 @@ export class IndexDocsCommand extends BaseCommand {
   /**
    * Full scan mode
    */
-  private async fullScan(
-    docsDir: string,
-    outputDir: string,
-    outputPath: string
-  ): Promise<CommandResult> {
+  private fullScan(docsDir: string, outputDir: string, outputPath: string): CommandResult {
     const docsPath = path.resolve(process.cwd(), docsDir);
 
     if (!fs.existsSync(docsPath)) {

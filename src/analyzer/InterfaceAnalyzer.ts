@@ -109,7 +109,7 @@ export class InterfaceAnalyzer {
         const moduleSpecifier = node.moduleSpecifier;
         if (ts.isStringLiteral(moduleSpecifier)) {
           const source = moduleSpecifier.text;
-          const isTypeOnly = node.importClause?.isTypeOnly ?? false;
+          const isTypeOnly = node.importClause?.phaseModifier === ts.SyntaxKind.TypeKeyword;
 
           // Extract named imports
           if (
@@ -275,7 +275,7 @@ export class InterfaceAnalyzer {
     const properties: InterfaceProperty[] = [];
 
     for (const member of node.members) {
-      if (ts.isPropertySignature(member) && member.name) {
+      if (ts.isPropertySignature(member)) {
         const name = member.name.getText(sourceFile);
         const type = member.type ? member.type.getText(sourceFile) : 'any';
         const isOptional = !!member.questionToken;
@@ -312,7 +312,7 @@ export class InterfaceAnalyzer {
     const methods: InterfaceMethod[] = [];
 
     for (const member of node.members) {
-      if (ts.isMethodSignature(member) && member.name) {
+      if (ts.isMethodSignature(member)) {
         const name = member.name.getText(sourceFile);
 
         // Extract parameters

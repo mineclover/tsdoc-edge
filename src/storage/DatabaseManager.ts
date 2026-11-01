@@ -88,6 +88,45 @@ export interface UnifiedRelationshipRow {
   description: string | null;
 }
 
+interface ImportedSymbolData {
+  id: string;
+  name: string;
+  type: Symbol['type'];
+  file_path?: string;
+  filePath?: string;
+  line: number;
+  column: number;
+  is_exported?: number;
+  isExported?: boolean;
+  is_public?: number;
+  isPublic?: boolean;
+  summary?: string | null;
+}
+
+interface ImportedEnhancedDocData {
+  symbol_id?: string;
+  symbolId?: string;
+  problem_solving?: string;
+  problemSolving?: EnhancedSymbolDoc['problemSolving'];
+  functionality?: string | EnhancedSymbolDoc['functionality'];
+  error_experiences?: string;
+  errorExperiences?: EnhancedSymbolDoc['errorExperiences'];
+  decisions?: string | EnhancedSymbolDoc['decisions'];
+  dependencies?: string | EnhancedSymbolDoc['dependencies'];
+  future_plans?: string;
+  futurePlans?: EnhancedSymbolDoc['futurePlans'];
+  created_at?: string;
+  createdAt?: string;
+  updated_at?: string;
+  updatedAt?: string;
+  version: string;
+}
+
+type ImportedJsonlRecord =
+  | { type: 'symbol'; data: ImportedSymbolData }
+  | { type: 'enhanced_doc'; data: ImportedEnhancedDocData }
+  | { type: 'other'; data?: Record<string, unknown> };
+
 /**
  * Database manager for symbol and documentation storage
  * Uses Drizzle ORM for type-safe database operations
@@ -95,6 +134,10 @@ export interface UnifiedRelationshipRow {
  * @public
  */
 export class DatabaseManager {
+  private parseJson<T>(raw: string): T {
+    const parsed: unknown = JSON.parse(raw);
+    return parsed as T;
+  }
   /**
    * db property
    * @public
@@ -386,8 +429,8 @@ export class DatabaseManager {
         const insertAll = this.db.transaction(() => {
           for (const rel of relationships) {
             try {
-              const fromSymbols = JSON.parse(rel.from_symbols) as string[];
-              const toSymbols = JSON.parse(rel.to_symbols) as string[];
+              const fromSymbols = this.parseJson<string[]>(rel.from_symbols);
+              const toSymbols = this.parseJson<string[]>(rel.to_symbols);
 
               for (const symbolId of fromSymbols) {
                 insertStmt.run(rel.id, symbolId, 'from');
@@ -870,12 +913,14 @@ export class DatabaseManager {
 
     return {
       symbolId: row.symbolId,
-      problemSolving: JSON.parse(row.problemSolving) ?? undefined,
-      functionality: JSON.parse(row.functionality) ?? undefined,
-      errorExperiences: JSON.parse(row.errorExperiences),
-      decisions: JSON.parse(row.decisions),
-      dependencies: JSON.parse(row.dependencies),
-      futurePlans: JSON.parse(row.futurePlans),
+      problemSolving:
+        this.parseJson<EnhancedSymbolDoc['problemSolving'] | null>(row.problemSolving) ?? undefined,
+      functionality:
+        this.parseJson<EnhancedSymbolDoc['functionality'] | null>(row.functionality) ?? undefined,
+      errorExperiences: this.parseJson<EnhancedSymbolDoc['errorExperiences']>(row.errorExperiences),
+      decisions: this.parseJson<EnhancedSymbolDoc['decisions']>(row.decisions),
+      dependencies: this.parseJson<EnhancedSymbolDoc['dependencies']>(row.dependencies),
+      futurePlans: this.parseJson<EnhancedSymbolDoc['futurePlans']>(row.futurePlans),
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
       version: row.version,
@@ -927,19 +972,19 @@ export class DatabaseManager {
 
     for (let i = 0; i < lines.length; i++) {
       try {
-        const record = JSON.parse(lines[i]);
+        const record = this.parseJson<ImportedJsonlRecord>(lines[i]);
 
         if (record.type === 'symbol') {
           const symbol: Symbol = {
             id: record.data.id,
             name: record.data.name,
             type: record.data.type,
-            filePath: record.data.file_path || record.data.filePath,
+            filePath: record.data.file_path || record.data.filePath || '',
             line: record.data.line,
             column: record.data.column,
-            isExported: record.data.is_exported === 1 || record.data.isExported,
-            isPublic: record.data.is_public === 1 || record.data.isPublic,
-            summary: record.data.summary,
+            isExported: record.data.is_exported === 1 || Boolean(record.data.isExported),
+            isPublic: record.data.is_public === 1 || Boolean(record.data.isPublic),
+            summary: record.data.summary ?? undefined,
             tests: [],
             designDecisions: [],
           };
@@ -948,33 +993,39 @@ export class DatabaseManager {
           count++;
         } else if (record.type === 'enhanced_doc') {
           const doc: EnhancedSymbolDoc = {
-            symbolId: record.data.symbol_id || record.data.symbolId,
+            symbolId: record.data.symbol_id || record.data.symbolId || '',
             problemSolving:
               typeof record.data.problem_solving === 'string'
-                ? JSON.parse(record.data.problem_solving)
+                ? (this.parseJson<EnhancedSymbolDoc['problemSolving'] | null>(
+                    record.data.problem_solving
+                  ) ?? undefined)
                 : record.data.problemSolving,
             functionality:
               typeof record.data.functionality === 'string'
-                ? JSON.parse(record.data.functionality)
+                ? (this.parseJson<EnhancedSymbolDoc['functionality'] | null>(
+                    record.data.functionality
+                  ) ?? undefined)
                 : record.data.functionality,
             errorExperiences:
               typeof record.data.error_experiences === 'string'
-                ? JSON.parse(record.data.error_experiences)
+                ? this.parseJson<EnhancedSymbolDoc['errorExperiences']>(
+                    record.data.error_experiences
+                  )
                 : record.data.errorExperiences,
             decisions:
               typeof record.data.decisions === 'string'
-                ? JSON.parse(record.data.decisions)
+                ? this.parseJson<EnhancedSymbolDoc['decisions']>(record.data.decisions)
                 : record.data.decisions,
             dependencies:
               typeof record.data.dependencies === 'string'
-                ? JSON.parse(record.data.dependencies)
+                ? this.parseJson<EnhancedSymbolDoc['dependencies']>(record.data.dependencies)
                 : record.data.dependencies,
             futurePlans:
               typeof record.data.future_plans === 'string'
-                ? JSON.parse(record.data.future_plans)
+                ? this.parseJson<EnhancedSymbolDoc['futurePlans']>(record.data.future_plans)
                 : record.data.futurePlans,
-            createdAt: record.data.created_at || record.data.createdAt,
-            updatedAt: record.data.updated_at || record.data.updatedAt,
+            createdAt: record.data.created_at || record.data.createdAt || '',
+            updatedAt: record.data.updated_at || record.data.updatedAt || '',
             version: record.data.version,
           };
 
@@ -1012,7 +1063,7 @@ export class DatabaseManager {
 
     for (let i = 0; i < lines.length; i++) {
       try {
-        const record = JSON.parse(lines[i]);
+        const record = this.parseJson<ImportedJsonlRecord>(lines[i]);
 
         if (record.type === 'symbol') {
           const dbSymbol = this.getSymbol(record.data.id);
@@ -1023,11 +1074,10 @@ export class DatabaseManager {
           }
           symbolCount++;
         } else if (record.type === 'enhanced_doc') {
-          const dbDoc = this.getEnhancedDoc(record.data.symbol_id || record.data.symbolId);
+          const docSymbolId = record.data.symbol_id || record.data.symbolId || '';
+          const dbDoc = this.getEnhancedDoc(docSymbolId);
           if (!dbDoc) {
-            mismatches.push(
-              `Enhanced doc not found in DB: ${record.data.symbol_id || record.data.symbolId}`
-            );
+            mismatches.push(`Enhanced doc not found in DB: ${docSymbolId}`);
           }
           docCount++;
         }
@@ -1173,16 +1223,18 @@ export class DatabaseManager {
       id: row.id,
       type: row.type as UnifiedRelationship['type'],
       category: row.category as UnifiedRelationship['category'],
-      from: JSON.parse(row.fromSymbols) as string | string[],
-      to: JSON.parse(row.toSymbols) as string | string[],
+      from: this.parseJson<string | string[]>(row.fromSymbols),
+      to: this.parseJson<string | string[]>(row.toSymbols),
       direction: row.direction as UnifiedRelationship['direction'],
       strength: row.strength as UnifiedRelationship['strength'],
-      evidence: JSON.parse(row.evidence) as UnifiedRelationship['evidence'],
+      evidence: this.parseJson<UnifiedRelationship['evidence']>(row.evidence),
       discoveredBy: row.discoveredBy as UnifiedRelationship['discoveredBy'],
       confidence: row.confidence,
       filePath: row.filePath ?? undefined,
       line: row.line ?? undefined,
-      properties: row.properties ? JSON.parse(row.properties) : {},
+      properties: row.properties
+        ? this.parseJson<UnifiedRelationship['properties']>(row.properties)
+        : {},
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
       description: row.description ?? undefined,
@@ -1230,16 +1282,18 @@ export class DatabaseManager {
       id: row.id,
       type: row.type as UnifiedRelationship['type'],
       category: row.category as UnifiedRelationship['category'],
-      from: JSON.parse(row.fromSymbols) as string | string[],
-      to: JSON.parse(row.toSymbols) as string | string[],
+      from: this.parseJson<string | string[]>(row.fromSymbols),
+      to: this.parseJson<string | string[]>(row.toSymbols),
       direction: row.direction as UnifiedRelationship['direction'],
       strength: row.strength as UnifiedRelationship['strength'],
-      evidence: JSON.parse(row.evidence) as UnifiedRelationship['evidence'],
+      evidence: this.parseJson<UnifiedRelationship['evidence']>(row.evidence),
       discoveredBy: row.discoveredBy as UnifiedRelationship['discoveredBy'],
       confidence: row.confidence,
       filePath: row.filePath ?? undefined,
       line: row.line ?? undefined,
-      properties: row.properties ? JSON.parse(row.properties) : {},
+      properties: row.properties
+        ? this.parseJson<UnifiedRelationship['properties']>(row.properties)
+        : {},
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
       description: row.description ?? undefined,
@@ -1248,14 +1302,8 @@ export class DatabaseManager {
     return result;
   }
 
-  /**
-   * Rebuild search indexes (returns symbol counts for compatibility)
-   * @deprecated FTS5 has been removed. This method now returns symbol counts using standard queries.
-   */
-  rebuildFTS5Index(): { symbolsFts: number; enhancedDocsFts: number } {
-    // FTS5 removed - return counts from regular tables
+  private getSearchIndexCounts(): { symbolsFts: number; enhancedDocsFts: number } {
     const symbolsResult = this.drizzleDb.select({ count: count() }).from(schema.symbols).get();
-
     const enhancedDocsResult = this.drizzleDb
       .select({ count: count() })
       .from(schema.enhancedDocs)
@@ -1265,6 +1313,15 @@ export class DatabaseManager {
       symbolsFts: symbolsResult?.count || 0,
       enhancedDocsFts: enhancedDocsResult?.count || 0,
     };
+  }
+
+  /**
+   * Rebuild search indexes (returns symbol counts for compatibility)
+   * @deprecated FTS5 has been removed. This method now returns symbol counts using standard queries.
+   */
+  rebuildFTS5Index(): { symbolsFts: number; enhancedDocsFts: number } {
+    // FTS5 removed - return counts from regular tables
+    return this.getSearchIndexCounts();
   }
 
   /**
@@ -2027,16 +2084,18 @@ export class DatabaseManager {
       id: row.id,
       type: row.type as UnifiedRelationship['type'],
       category: row.category as UnifiedRelationship['category'],
-      from: JSON.parse(row.fromSymbols) as string | string[],
-      to: JSON.parse(row.toSymbols) as string | string[],
+      from: this.parseJson<string | string[]>(row.fromSymbols),
+      to: this.parseJson<string | string[]>(row.toSymbols),
       direction: row.direction as UnifiedRelationship['direction'],
       strength: row.strength as UnifiedRelationship['strength'],
-      evidence: JSON.parse(row.evidence) as UnifiedRelationship['evidence'],
+      evidence: this.parseJson<UnifiedRelationship['evidence']>(row.evidence),
       discoveredBy: row.discoveredBy as UnifiedRelationship['discoveredBy'],
       confidence: row.confidence,
       filePath: row.filePath ?? undefined,
       line: row.line ?? undefined,
-      properties: row.properties ? JSON.parse(row.properties) : {},
+      properties: row.properties
+        ? this.parseJson<UnifiedRelationship['properties']>(row.properties)
+        : {},
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
       description: row.description ?? undefined,
@@ -2118,8 +2177,8 @@ export class DatabaseManager {
     return rows.map((row) => ({
       testFilePath: row.testFilePath,
       testName: row.testName,
-      scenarios: JSON.parse(row.scenarios),
-      coverage: row.coverage ? JSON.parse(row.coverage) : null,
+      scenarios: this.parseJson<string[]>(row.scenarios),
+      coverage: row.coverage ? this.parseJson<Record<string, unknown>>(row.coverage) : null,
     }));
   }
 
@@ -2177,9 +2236,9 @@ export class DatabaseManager {
 
     return {
       description: row.description,
-      preconditions: JSON.parse(row.preconditions),
-      postconditions: JSON.parse(row.postconditions),
-      invariants: JSON.parse(row.invariants),
+      preconditions: this.parseJson<string[]>(row.preconditions),
+      postconditions: this.parseJson<string[]>(row.postconditions),
+      invariants: this.parseJson<string[]>(row.invariants),
       filePath: row.filePath,
     };
   }
@@ -2199,9 +2258,9 @@ export class DatabaseManager {
     return rows.map((row) => ({
       symbolId: row.symbolId,
       description: row.description,
-      preconditions: JSON.parse(row.preconditions),
-      postconditions: JSON.parse(row.postconditions),
-      invariants: JSON.parse(row.invariants),
+      preconditions: this.parseJson<string[]>(row.preconditions),
+      postconditions: this.parseJson<string[]>(row.postconditions),
+      invariants: this.parseJson<string[]>(row.invariants),
       filePath: row.filePath,
     }));
   }
@@ -2339,8 +2398,8 @@ export class DatabaseManager {
       symbolId: row.symbolId,
       testFilePath: row.testFilePath,
       testName: row.testName,
-      scenarios: JSON.parse(row.scenarios),
-      coverage: row.coverage ? JSON.parse(row.coverage) : null,
+      scenarios: this.parseJson<string[]>(row.scenarios),
+      coverage: row.coverage ? this.parseJson<Record<string, unknown>>(row.coverage) : null,
     }));
   }
 
@@ -2448,8 +2507,8 @@ export class DatabaseManager {
 
     return {
       description: row.description,
-      shouldDo: JSON.parse(row.shouldDo),
-      shouldNotDo: JSON.parse(row.shouldNotDo),
+      shouldDo: this.parseJson<string[]>(row.shouldDo),
+      shouldNotDo: this.parseJson<string[]>(row.shouldNotDo),
       pattern: row.pattern,
       architecture: row.architecture,
     };

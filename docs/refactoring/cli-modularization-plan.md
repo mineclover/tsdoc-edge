@@ -230,24 +230,20 @@ const command = new BuildCommand(mockScanner, db);
 
 ### 현재 상태
 ```typescript
+// TypeScript import AST + @ttsc/graph edges (dependencies)
 @problem ...
 @functionality ...
 @decision ...
-@depends ...
 // = 67% (4/6 카테고리)
 ```
 
 ### 83%로 향상 (선택 1개 추가)
 ```typescript
-// Option 1: futurePlans 추가
-@plan Add interactive mode for build command
-@planPriority medium
-@planStatus planned
+// Option 1: futurePlans 추가 (@privateRemarks)
+@privateRemarks PLAN [medium]: Add interactive mode for build command
 
-// Option 2: errorExperiences 추가 (실제 에러 발생 시)
-@errorExp "ENOENT: no such file or directory"
-@errorContext When srcDir doesn't exist
-@errorSolution Added directory existence check
+// Option 2: errorExperiences 추가 (실제 에러 발생 시 표준 @throws 사용)
+@throws ENOENTError - When srcDir does not exist - Added directory existence check
 ```
 
 ### 100%로 향상 (선택 2개 추가)

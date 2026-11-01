@@ -187,7 +187,7 @@ export class CallbackAnalyzer {
 
           // Pattern 2: Promise.then(callback) / Promise.catch(callback)
           const expression = node.expression;
-          if (ts.isPropertyAccessExpression(expression) && expression.name) {
+          if (ts.isPropertyAccessExpression(expression)) {
             const methodName = expression.name.text;
 
             if (methodName === 'then' || methodName === 'catch') {
@@ -308,7 +308,7 @@ export class CallbackAnalyzer {
    * @returns Symbol ID or null
    */
   private findEnclosingFunctionSymbol(node: ts.Node, sourceFile: ts.SourceFile): string | null {
-    let parent = node.parent;
+    let parent = node.parent as ts.Node | undefined;
 
     while (parent) {
       // Check for function declaration
@@ -322,11 +322,11 @@ export class CallbackAnalyzer {
       }
 
       // Check for arrow function assigned to variable
-      if (ts.isVariableDeclaration(parent) && parent.name && ts.isIdentifier(parent.name)) {
+      if (ts.isVariableDeclaration(parent) && ts.isIdentifier(parent.name)) {
         return this.findSymbolIdForExpression(parent.name, sourceFile);
       }
 
-      parent = parent.parent;
+      parent = parent.parent as ts.Node | undefined;
     }
 
     return null;

@@ -12,7 +12,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 /**
  * InitCommand - Initialize TSDoc Edge
  * @public
- * @doc [[Init Command]]
+ * @doc [[InitCommand]]
  * @doc [[CLI Commands#init]]
  */
 export class InitCommand extends BaseCommand {
@@ -54,8 +54,8 @@ export class InitCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -144,6 +144,6 @@ export class InitCommand extends BaseCommand {
 /**
  * IdNewCommand - Generate new symbol ID
  * @public
- * @doc [[ID New Command]]
+ * @doc [[IdNewCommand]]
  * @doc [[CLI Commands#id-new]]
  */

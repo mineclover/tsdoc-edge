@@ -21,7 +21,7 @@ export class CommonCommand extends BaseCommand {
     return 'Find common dependencies between files or symbols';
   }
 
-  async execute(args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     const useXml = !args.includes('--human');
     const targets = args.filter((a) => !a.startsWith('--'));
 
@@ -31,11 +31,11 @@ export class CommonCommand extends BaseCommand {
       console.log('Examples:');
       console.log('  tsdoc-edge common agent-graph.ts tool-executor.ts');
       console.log('  tsdoc-edge common AgentGraph DefaultToolExecutor');
-      return { exitCode: 1, message: 'At least 2 targets required' };
+      return Promise.resolve({ exitCode: 1, message: 'At least 2 targets required' });
     }
 
     const dbCheck = this.checkDatabaseExists();
-    if (dbCheck) return dbCheck;
+    if (dbCheck) return Promise.resolve(dbCheck);
 
     const dbPath = this.getDatabasePath();
     const db = new Database(dbPath, { readonly: true });
@@ -76,7 +76,7 @@ export class CommonCommand extends BaseCommand {
           console.log('\nNo common dependencies found.');
         }
         db.close();
-        return { exitCode: 0, message: 'No common dependencies' };
+        return Promise.resolve({ exitCode: 0, message: 'No common dependencies' });
       }
 
       const placeholders = commonIds.map(() => '?').join(',');
@@ -123,10 +123,13 @@ export class CommonCommand extends BaseCommand {
       }
 
       db.close();
-      return { exitCode: 0, message: `Found ${results.length} common dependencies` };
+      return Promise.resolve({
+        exitCode: 0,
+        message: `Found ${results.length} common dependencies`,
+      });
     } catch (error) {
       db.close();
-      return { exitCode: 1, message: String(error) };
+      return Promise.resolve({ exitCode: 1, message: String(error) });
     }
   }
 

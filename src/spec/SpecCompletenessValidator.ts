@@ -444,8 +444,7 @@ export class SpecCompletenessValidator {
   }
 
   /**
-   * Calculate overall completeness score (DEPRECATED)
-   * @deprecated Use designScore and implementationScore instead
+   * Calculate legacy overall completeness score retained for backward compatibility.
    */
   private calculateScore(breakdown: {
     requiredSections: number;

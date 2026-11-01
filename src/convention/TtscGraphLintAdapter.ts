@@ -261,7 +261,7 @@ function toGraphDump(graph: CanonicalProjectGraph): Readonly<Record<string, unkn
 
 async function loadModule(specifier: string): Promise<TtscGraphLintModule> {
   const resolved = path.resolve(specifier);
-  const moduleValue =
+  const moduleValue: unknown =
     path.isAbsolute(specifier) || fs.existsSync(resolved)
       ? await import(pathToFileURL(resolved).href)
       : await import(specifier);
@@ -317,7 +317,8 @@ function positiveOrZero(value: unknown, field: string): number {
 }
 
 function cloneRecord(record: Readonly<Record<string, unknown>>): Record<string, unknown> {
-  return JSON.parse(JSON.stringify(record)) as Record<string, unknown>;
+  const parsed: unknown = JSON.parse(JSON.stringify(record));
+  return parsed as Record<string, unknown>;
 }
 
 function digest(value: unknown): string {

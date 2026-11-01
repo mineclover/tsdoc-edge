@@ -469,7 +469,7 @@ function projectCompatibilityEdge(accumulator: EdgeAccumulator): ProjectGraphSou
     kind: accumulator.kind,
     from: accumulator.from,
     to: accumulator.to,
-    ...(occurrences[0]?.evidence ? { evidence: occurrences[0].evidence } : {}),
+    ...(occurrences.length > 0 ? { evidence: occurrences[0].evidence } : {}),
     occurrenceCount: occurrences.length,
     providerOccurrences: occurrences,
     ...(qualifiers.length === 1 ? { semanticQualifier: qualifiers[0] } : {}),
@@ -612,10 +612,10 @@ function canonicalJsonClone<T>(value: T, ancestors = new WeakSet<object>()): T {
   if (ancestors.has(value)) throw new Error('Provider payload contains a circular value');
   ancestors.add(value);
   try {
-    if (Array.isArray(value)) {
+    if (isUnknownArray(value)) {
       return value.map((child) => canonicalJsonClone(child, ancestors)) as T;
     }
-    const prototype = Object.getPrototypeOf(value);
+    const prototype: unknown = Object.getPrototypeOf(value);
     if (prototype !== Object.prototype && prototype !== null) {
       throw new Error('Provider payload contains a non-JSON object');
     }
@@ -629,6 +629,10 @@ function canonicalJsonClone<T>(value: T, ancestors = new WeakSet<object>()): T {
   } finally {
     ancestors.delete(value);
   }
+}
+
+function isUnknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
 }
 
 function deepFreeze<T>(value: T): T {

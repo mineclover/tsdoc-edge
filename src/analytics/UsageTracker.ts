@@ -134,7 +134,10 @@ export class UsageTracker {
       const content = fs.readFileSync(this.eventsPath, 'utf-8');
       const lines = content.trim().split('\n').filter(Boolean);
 
-      let events = lines.map((line) => JSON.parse(line) as CommandUsageEvent);
+      let events = lines.map((line): CommandUsageEvent => {
+        const parsed: unknown = JSON.parse(line);
+        return parsed as CommandUsageEvent;
+      });
 
       // Apply filters
       const startDate = options?.startDate;
@@ -175,9 +178,9 @@ export class UsageTracker {
       };
     }
 
-    const commandCounts: Record<string, number> = {};
-    const commandDurations: Record<string, number[]> = {};
-    const commandSuccess: Record<string, { success: number; total: number }> = {};
+    const commandCounts: Record<string, number | undefined> = {};
+    const commandDurations = new Map<string, number[]>();
+    const commandSuccess = new Map<string, { success: number; total: number }>();
 
     let totalDuration = 0;
     let firstUsed = events[0].timestamp;
@@ -185,22 +188,26 @@ export class UsageTracker {
 
     for (const event of events) {
       // Count
-      commandCounts[event.command] = (commandCounts[event.command] || 0) + 1;
+      commandCounts[event.command] = (commandCounts[event.command] ?? 0) + 1;
 
       // Duration
-      if (!commandDurations[event.command]) {
-        commandDurations[event.command] = [];
+      let durations = commandDurations.get(event.command);
+      if (!durations) {
+        durations = [];
+        commandDurations.set(event.command, durations);
       }
-      commandDurations[event.command].push(event.duration);
+      durations.push(event.duration);
       totalDuration += event.duration;
 
       // Success rate
-      if (!commandSuccess[event.command]) {
-        commandSuccess[event.command] = { success: 0, total: 0 };
+      let stats = commandSuccess.get(event.command);
+      if (!stats) {
+        stats = { success: 0, total: 0 };
+        commandSuccess.set(event.command, stats);
       }
-      commandSuccess[event.command].total++;
+      stats.total++;
       if (event.success) {
-        commandSuccess[event.command].success++;
+        stats.success++;
       }
 
       // Timestamps
@@ -214,19 +221,26 @@ export class UsageTracker {
 
     // Calculate averages
     const avgDuration: Record<string, number> = {};
-    for (const [command, durations] of Object.entries(commandDurations)) {
+    for (const [command, durations] of commandDurations) {
       const sum = durations.reduce((a, b) => a + b, 0);
       avgDuration[command] = sum / durations.length;
     }
 
     const successRate: Record<string, number> = {};
-    for (const [command, stats] of Object.entries(commandSuccess)) {
+    for (const [command, stats] of commandSuccess) {
       successRate[command] = (stats.success / stats.total) * 100;
+    }
+
+    const finalCommandCounts: Record<string, number> = {};
+    for (const [command, count] of Object.entries(commandCounts)) {
+      if (count !== undefined) {
+        finalCommandCounts[command] = count;
+      }
     }
 
     return {
       totalCommands: events.length,
-      commandCounts,
+      commandCounts: finalCommandCounts,
       avgDuration,
       successRate,
       firstUsed,

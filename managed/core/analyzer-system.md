@@ -122,11 +122,11 @@ Analyzer System은 코드 구조, 행위, 데이터 흐름, 테스트 커버리�
 ### 4. 의미/관계 분석
 
 ```typescript
+import type { SymbolGraph } from '../types/graph';
+
 /**
  * @doc [[Analyzer System]]
- * @depends SymbolGraph
- * @depType runtime
- * @depReason 심볼 정보 조회
+ * @context SymbolGraph와 @ttsc/graph 엣지에서 심볼 및 관계 정보를 조회
  */
 
 // NamingPatternRelationAnalyzer - 네이밍 패턴 (UserService~UserRepository)

@@ -60,8 +60,8 @@ export class SuggestCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -165,6 +165,6 @@ export class SuggestCommand extends BaseCommand {
 /**
  * InitCommand - Initialize configuration
  * @public
- * @doc [[Init Command]]
+ * @doc [[InitCommand]]
  * @doc [[CLI Commands#init]]
  */

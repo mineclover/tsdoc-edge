@@ -14,48 +14,41 @@ canonical: true
 
 Custom TSDoc tags for enhanced connectivity and traceability.
 
-## Custom Tag Definitions
+## Custom Tag Definitions (`CUSTOM_TAGS` — 22 Active Tags)
 
-### Relationship Tags
+Code-space structural, call, and type dependencies (`implementation`, `inheritance`, `calls`, `code-dependency`, `type-dependency`) are deterministically projected from TypeScript AST and `@ttsc/graph`, while standard API documentation tags are owned by `@microsoft/tsdoc` (29 standard tags). `CUSTOM_TAGS` defines the 22 irreducible `tsdoc-edge` block tags:
 
-Connect symbols to each other:
-- `@relatedTo`: General relationship
-- `@dependsOn`: Dependency relationship
-- `@usedBy`: Reverse dependency
-- `@implements`: Interface implementation
-- `@extends`: Inheritance
+### Checkpoint Routing
+- `@doc`: SSOT document checkpoint reference (`@doc [[Checkpoint]]`)
 
-### Contract Tags
+### Purpose & Design-by-Contract Tags
+- `@responsibility`: Core design responsibility of the symbol
+- `@problem`: Problem statement addressed by the symbol
+- `@solves`: Solution approach
+- `@context`: Runtime environment or domain assumptions
+- `@contract`: Overall behavioral contract summary
+- `@precondition`: Condition that must hold before execution
+- `@postcondition`: Guarantee that holds after execution
+- `@invariant`: Property that always holds across state transitions
 
-Define behavioral contracts:
-- `@contract`: Overall contract description
-- `@precondition`: Must be true before execution
-- `@postcondition`: Must be true after execution
-- `@invariant`: Always true during execution
+### Module Specification Logic & Side-Effect Tags
+- `@functionality`: Summary of capabilities provided
+- `@algorithm`: Processing steps or algorithmic approach
+- `@complexity`: Time and space complexity characteristics
+- `@sideEffect`: External I/O or state mutation (`filesystem`, `database`, `network`, `state`, `process`)
 
-### Testing Tags
+### Inline ADR Triad Tags
+- `@decision`: Architectural or design choice made
+- `@rationale`: Engineering reasoning behind the choice
+- `@consequences`: Trade-offs and downstream implications
 
-Link to tests:
-- `@testedBy`: Test file/suite
-- `@testScenario`: Test case description
-- `@coverage`: Coverage percentage
-
-### Design Tags
-
-Document decisions:
-- `@responsibility`: What it's responsible for
-- `@designDecision`: Design choice made
-- `@architecture`: Architectural pattern
-- `@pattern`: Design pattern used
-
-### Traceability Tags
-
-Track evolution:
-- `@requirement`: Business requirement
-- `@issue`: GitHub issue number
-- `@version`: Version introduced
-- `@since`: Release version
-- `@deprecatedInFavorOf`: Replacement symbol
+### Non-AST Semantic Relationship & Governance Tags
+- `@relatedTo`: Non-AST semantic relationship between symbols
+- `@enhances`: Capability extension or enhancement target
+- `@requires`: Co-requirement relationship
+- `@feature`: Domain feature grouping label
+- `@testScenario`: Behavioral test scenario covered
+- `@deadcode`: Intentional dead-code / retention marker (deprecation uses standard `@deprecated` with `{@link}`, external tracker links use standard `@see`, and runtime coverage comes from `CoverageParser`)
 
 ## Symbol Relationship
 
@@ -210,16 +203,20 @@ See implementation: DesignDecision
 
 ## Usage in TSDoc
 
-### Relationship Tags
+### Relationship Tags & `@ttsc/graph` Integration
 
 ```typescript
+import type { UserRepository } from '../repositories/UserRepository';
+
 /**
  * User service for account management
- * @relatedTo AuthService - Uses for authentication
- * @dependsOn UserRepository - Requires for data access
- * @usedBy UserController - Called by HTTP controller
+ * @doc [[CustomTagTypes]]
+ * @relatedTo AuthService - Coordinates authentication checks
+ * @requires AuditLogger - Requires audit trail support in production
  */
-export class UserService { }
+export class UserService {
+  constructor(private readonly repo: UserRepository) {}
+}
 ```
 
 ### Contract Tags
@@ -237,15 +234,15 @@ export class UserService { }
 async createUser(email: string, password: string): Promise<User> { }
 ```
 
-### Testing Tags
+### Testing Tags & AST Test Discovery
+
+Test-to-source links are discovered automatically from test AST imports/calls by `TestRelationshipExtractor`, and runtime coverage metrics are parsed by `CoverageParser`:
 
 ```typescript
 /**
  * User service
- * @testedBy src/__tests__/UserService.test.ts
  * @testScenario Create user with valid data
  * @testScenario Reject duplicate email
- * @coverage 85%
  */
 export class UserService { }
 ```

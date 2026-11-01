@@ -76,8 +76,8 @@ export class DepsCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -163,12 +163,12 @@ export class DepsCommand extends BaseCommand {
     });
   }
 
-  private async findDepsFromDatabase(
+  private findDepsFromDatabase(
     idOrName: string,
     typeFilter?: string,
     showAll?: boolean,
     useHuman?: boolean
-  ): Promise<CommandResult> {
+  ): CommandResult {
     const dbCheck = this.checkDatabaseExists();
     if (dbCheck) {
       this.printError(`Symbol not found: ${idOrName}`);
@@ -268,11 +268,12 @@ export class DepsCommand extends BaseCommand {
             // Construct method signature if available
             let signature: string | undefined;
             if (targetRow && (target.type === 'function' || target.type === 'method')) {
-              const params = targetRow.parameter_types ? JSON.parse(targetRow.parameter_types) : [];
-              const paramStr = params
-                .map(
-                  (p: { name: string; type?: string }) => `${p.name}${p.type ? `: ${p.type}` : ''}`
-                )
+              const rawParams: unknown = targetRow.parameter_types
+                ? JSON.parse(targetRow.parameter_types)
+                : [];
+              const params = rawParams as Array<{ name: string; type?: string }>;
+              const paramStr = (Array.isArray(params) ? params : [])
+                .map((p) => `${p.name}${p.type ? `: ${p.type}` : ''}`)
                 .join(', ');
               const returnType = targetRow.declared_type || 'unknown';
               signature = `${target.name}(${paramStr}): ${returnType}`;

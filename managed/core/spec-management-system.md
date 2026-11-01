@@ -148,11 +148,11 @@ class SpecVersionManager {
 미사용 문서 탐지
 
 ```typescript
+import type { DocumentSymbolRegistry } from '../doc-symbol/DocumentSymbolRegistry';
+
 /**
  * @doc [[Spec Management System]]
- * @depends DocumentSymbolRegistry
- * @depType runtime
- * @depReason 문서 참조 정보 조회
+ * @context DocumentSymbolRegistry와 @ttsc/graph에서 문서 및 코드 참조 정보를 조회
  */
 class UnusedDocumentDetector {
   detectUnused(docs: string[]): UnusedDocument[]
@@ -162,6 +162,12 @@ class UnusedDocumentDetector {
 ```
 
 **Source**: `src/spec/UnusedDocumentDetector.ts`
+
+### [[SpecMetricsAggregator]]
+
+명세 완성도, 적합성(conformance), 심볼 바인딩, TSDoc 커버리지 신호를 추정 없이 단일 리포트로 집계합니다.
+
+**Source**: `src/spec/SpecMetricsAggregator.ts`
 
 ---
 

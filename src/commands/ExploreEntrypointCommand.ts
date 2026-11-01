@@ -81,8 +81,8 @@ export class ExploreEntrypointCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -127,7 +127,7 @@ export class ExploreEntrypointCommand extends BaseCommand {
       const detectOrphans = args.includes('--detect-orphans');
 
       // Explore from entrypoint
-      const exploration = await this.exploreFromEntrypoint(
+      const exploration = this.exploreFromEntrypoint(
         absolutePath,
         entrypointPath,
         dbManager,
@@ -143,12 +143,12 @@ export class ExploreEntrypointCommand extends BaseCommand {
     });
   }
 
-  private async exploreFromEntrypoint(
+  private exploreFromEntrypoint(
     _absolutePath: string,
     relativePath: string,
     dbManager: DatabaseManager,
     detectOrphans: boolean
-  ): Promise<EntrypointExploration> {
+  ): EntrypointExploration {
     const exploration: EntrypointExploration = {
       entrypointPath: relativePath,
       discoveredSymbols: new Set(),

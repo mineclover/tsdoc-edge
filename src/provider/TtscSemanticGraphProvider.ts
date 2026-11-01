@@ -354,7 +354,8 @@ function canonicalize(value: unknown): unknown {
 }
 
 function clone<T>(value: T): T {
-  return JSON.parse(JSON.stringify(value)) as T;
+  const parsed: unknown = JSON.parse(JSON.stringify(value));
+  return parsed as T;
 }
 
 function deepFreeze<T>(value: T): T {

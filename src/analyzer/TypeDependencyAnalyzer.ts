@@ -283,7 +283,7 @@ export class TypeDependencyAnalyzer {
         visit(node.elementType);
       } else if (ts.isTupleTypeNode(node)) {
         for (const element of node.elements) {
-          visit(element as ts.TypeNode);
+          visit(element);
         }
       } else if (ts.isTypeLiteralNode(node)) {
         // Skip inline type literals
@@ -294,9 +294,7 @@ export class TypeDependencyAnalyzer {
             visit(param.type);
           }
         }
-        if (node.type) {
-          visit(node.type);
-        }
+        visit(node.type);
       }
     };
 
@@ -350,12 +348,12 @@ export class TypeDependencyAnalyzer {
    * @returns Class name or undefined
    */
   private findParentClassName(node: ts.Node): string | undefined {
-    let current: ts.Node | undefined = node.parent;
+    let current = node.parent as ts.Node | undefined;
     while (current) {
       if (ts.isClassDeclaration(current) && current.name) {
         return current.name.text;
       }
-      current = current.parent;
+      current = current.parent as ts.Node | undefined;
     }
     return undefined;
   }
@@ -373,10 +371,10 @@ export class TypeDependencyAnalyzer {
     if (ts.isClassDeclaration(node) && node.name) {
       return node.name.text;
     }
-    if (ts.isInterfaceDeclaration(node) && node.name) {
+    if (ts.isInterfaceDeclaration(node)) {
       return node.name.text;
     }
-    if (ts.isTypeAliasDeclaration(node) && node.name) {
+    if (ts.isTypeAliasDeclaration(node)) {
       return node.name.text;
     }
     return undefined;

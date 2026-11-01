@@ -374,7 +374,7 @@ export class BehavioralAnalyzer {
 
             // Detect lifecycle methods
             for (const member of node.members) {
-              if (ts.isMethodDeclaration(member) && member.name) {
+              if (ts.isMethodDeclaration(member)) {
                 const methodName = member.name.getText(sourceFile);
                 const methodSymbol = this.findSymbolByName(methodName);
 
@@ -505,13 +505,13 @@ export class BehavioralAnalyzer {
    * @returns Class declaration or null
    */
   private findParentClass(node: ts.Node): ts.ClassDeclaration | null {
-    let current: ts.Node | undefined = node;
+    let current = node as ts.Node | undefined;
 
     while (current) {
       if (ts.isClassDeclaration(current)) {
         return current;
       }
-      current = current.parent;
+      current = current.parent as ts.Node | undefined;
     }
 
     return null;
@@ -668,12 +668,13 @@ export class BehavioralAnalyzer {
     temporalOrders: number;
     byPattern: Record<string, number>;
   } {
+    const byPattern: Record<string, number> = {};
     const stats = {
       totalBehavioral: relationships.length,
       collaborations: 0,
       compositions: 0,
       temporalOrders: 0,
-      byPattern: {} as Record<string, number>,
+      byPattern,
     };
 
     for (const rel of relationships) {

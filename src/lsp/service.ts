@@ -928,7 +928,7 @@ export class TsdocEdgeService {
     if (canonicalView) {
       return canonicalView.symbolsInFile(filePath).flatMap(({ node, line }) => {
         const counts = canonicalView.impactCounts(node.id);
-        if (!counts || (counts.dependents === 0 && counts.dependencies === 0)) return [];
+        if (counts.dependents === 0 && counts.dependencies === 0) return [];
         return [
           {
             line,
@@ -1224,7 +1224,7 @@ export class TsdocEdgeService {
       const circulars = (circularStmt?.all(`%${fileName}`) || []) as UnifiedRelRow[];
 
       for (const circular of circulars) {
-        const props = JSON.parse(circular.properties || '{}');
+        const props = parseRelationshipProperties(circular.properties);
         diagnostics.push({
           line: circular.line || 1,
           message: `Circular dependency detected: ${props.cyclePath?.join(' → ') || 'unknown cycle'}`,
@@ -1246,10 +1246,10 @@ export class TsdocEdgeService {
       const violations = (violationStmt?.all(`%${fileName}`) || []) as UnifiedRelRow[];
 
       for (const violation of violations) {
-        const props = JSON.parse(violation.properties || '{}');
+        const props = parseRelationshipProperties(violation.properties);
         diagnostics.push({
           line: violation.line || 1,
-          message: `Architecture violation: ${props.fromLayer} → ${props.toLayer}`,
+          message: `Architecture violation: ${String(props.fromLayer)} → ${String(props.toLayer)}`,
           severity: DiagnosticSeverity.Warning,
         });
       }
@@ -1375,7 +1375,7 @@ export class TsdocEdgeService {
       );
       const circulars = (circularStmt?.all(`%${fileName}`) || []) as UnifiedRelRow[];
       for (const circular of circulars) {
-        const props = JSON.parse(circular.properties || '{}');
+        const props = parseRelationshipProperties(circular.properties);
         diagnostics.push({
           line: circular.line || 1,
           message: `Circular dependency detected: ${props.cyclePath?.join(' → ') || 'unknown cycle'}`,
@@ -1395,10 +1395,10 @@ export class TsdocEdgeService {
       );
       const violations = (violationStmt?.all(`%${fileName}`) || []) as UnifiedRelRow[];
       for (const violation of violations) {
-        const props = JSON.parse(violation.properties || '{}');
+        const props = parseRelationshipProperties(violation.properties);
         diagnostics.push({
           line: violation.line || 1,
-          message: `Architecture violation: ${props.fromLayer} → ${props.toLayer}`,
+          message: `Architecture violation: ${String(props.fromLayer)} → ${String(props.toLayer)}`,
           severity: DiagnosticSeverity.Warning,
         });
       }
@@ -1413,7 +1413,7 @@ export class TsdocEdgeService {
    * Map symbol type to LSP SymbolKind
    */
   private mapTypeToKind(type: string): SymbolKind {
-    const mapping: Record<string, SymbolKind> = {
+    const mapping: Record<string, SymbolKind | undefined> = {
       class: SymbolKind.Class,
       interface: SymbolKind.Interface,
       function: SymbolKind.Function,
@@ -1427,7 +1427,7 @@ export class TsdocEdgeService {
       module: SymbolKind.Module,
     };
 
-    return mapping[type.toLowerCase()] || SymbolKind.Variable;
+    return mapping[type.toLowerCase()] ?? SymbolKind.Variable;
   }
 
   /**
@@ -1903,6 +1903,26 @@ function uniqueDiagnostics(diagnostics: readonly DiagnosticInfo[]): DiagnosticIn
     if (!byKey.has(key)) byKey.set(key, diagnostic);
   }
   return [...byKey.values()];
+}
+
+function parseRelationshipProperties(raw: string | null | undefined): {
+  readonly cyclePath?: readonly string[];
+  readonly fromLayer?: unknown;
+  readonly toLayer?: unknown;
+} {
+  const parsed: unknown = JSON.parse(raw || '{}');
+  if (!parsed || typeof parsed !== 'object' || Array.isArray(parsed)) {
+    return {};
+  }
+  const record = parsed as Readonly<Record<string, unknown>>;
+  const cyclePath = Array.isArray(record.cyclePath)
+    ? record.cyclePath.filter((entry): entry is string => typeof entry === 'string')
+    : undefined;
+  return {
+    ...(cyclePath ? { cyclePath } : {}),
+    fromLayer: record.fromLayer,
+    toLayer: record.toLayer,
+  };
 }
 
 function compareText(left: string, right: string): number {

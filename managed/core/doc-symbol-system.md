@@ -111,16 +111,16 @@ class DocumentSymbolRegistry {
 
 **Source**: `src/doc-symbol/DocumentSymbolRegistry.ts`
 
-### [[Parser Components]]
+### [[BacklinkGenerator]]
 
-자동 Backlinks 섹션 생성
+들어오는 `[[Symbol]]` 및 `@doc` 역참조를 수집하여 문서의 `## Backlinks` 섹션을 자동으로 생성·갱신합니다.
 
 ```typescript
+import type { DocumentSymbolRegistry } from './DocumentSymbolRegistry';
+
 /**
  * @doc [[Document Symbol System]]
- * @depends DocumentSymbolRegistry
- * @depType runtime
- * @depReason 역참조 정보 조회
+ * @context DocumentSymbolRegistry와 @ttsc/graph에서 역참조 정보를 조회
  */
 class BacklinkGenerator {
   generateBacklinks(symbolName: string): string
@@ -131,9 +131,9 @@ class BacklinkGenerator {
 
 **Source**: `src/doc-symbol/BacklinkGenerator.ts`
 
-### SymbolReferenceGenerator
+### [[SymbolReferenceGenerator]]
 
-각주 형식 참조 생성
+문서 내 심볼 참조를 수집하여 `## Symbol References` 각주(`[^sym-XXX]`) 섹션을 자동으로 생성·동기화합니다.
 
 ```typescript
 /**
@@ -148,9 +148,9 @@ class SymbolReferenceGenerator {
 
 **Source**: `src/doc-symbol/SymbolReferenceGenerator.ts`
 
-### SymbolReferenceResolver
+### [[SymbolReferenceResolver]]
 
-심볼 참조를 코드/문서 위치로 해석
+`[[Symbol]]` 체크포인트 및 각주 참조를 실제 코드·문서의 파일 및 라인 위치로 해석합니다.
 
 ```typescript
 /**
@@ -202,8 +202,8 @@ See also:
 <!-- 소스 파일 참조 -->
 See implementation at `src/services/UserService.ts:42`
 
-<!-- 심볼 ID 참조 -->
-Related to `@id user-service`
+<!-- CanonicalNodeId 및 인라인 심볼 링크 참조 -->
+Related to `ttsc:tsdoc-edge:src/services/UserService.ts#UserService:class` ({@link UserService})
 ```
 
 ---

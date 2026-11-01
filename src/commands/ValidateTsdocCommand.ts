@@ -95,8 +95,8 @@ export class ValidateTsdocCommand extends BaseCommand {
    * @returns Command result
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
@@ -136,10 +136,13 @@ export class ValidateTsdocCommand extends BaseCommand {
       if (configExists) {
         try {
           const raw = fs.readFileSync(configPath, 'utf-8');
-          const parsed = JSON.parse(raw);
+          const rawParsed: unknown = JSON.parse(raw);
+          const parsed = rawParsed as { tagDefinitions?: Array<{ tagName?: string }> };
           configValid = true;
           const declaredTags: Set<string> = new Set(
-            (parsed.tagDefinitions || []).map((t: { tagName?: string }) => t.tagName)
+            (parsed.tagDefinitions ?? [])
+              .map((t) => t.tagName)
+              .filter((name): name is string => typeof name === 'string')
           );
           tagCount = declaredTags.size;
 

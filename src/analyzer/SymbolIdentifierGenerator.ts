@@ -36,6 +36,17 @@ interface PackageInfo {
   packageDir: string;
 }
 
+interface RawPackageJson {
+  name?: string;
+  version?: string;
+  exports?: Record<string, unknown>;
+}
+
+function parseJson<T>(raw: string): T {
+  const parsed: unknown = JSON.parse(raw);
+  return parsed as T;
+}
+
 /**
  * Symbol Identifier Generator
  * Provides stable, refactoring-resistant identifiers
@@ -118,12 +129,13 @@ export class SymbolIdentifierGenerator {
       const packageJsonPath = path.join(currentDir, 'package.json');
       if (fs.existsSync(packageJsonPath)) {
         try {
-          const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+          const packageJson = parseJson<RawPackageJson>(fs.readFileSync(packageJsonPath, 'utf-8'));
+          const packageName = packageJson.name || 'unknown';
           const packageInfo: PackageInfo = {
-            name: packageJson.name || 'unknown',
+            name: packageName,
             version: packageJson.version || '0.0.0',
             exports: packageJson.exports,
-            scope: this.normalizeScope(packageJson.name || 'unknown'),
+            scope: this.normalizeScope(packageName),
             packageDir: currentDir,
           };
 
@@ -190,12 +202,13 @@ export class SymbolIdentifierGenerator {
       const packageJsonPath = path.join(currentDir, 'package.json');
       if (fs.existsSync(packageJsonPath)) {
         try {
-          const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+          const packageJson = parseJson<RawPackageJson>(fs.readFileSync(packageJsonPath, 'utf-8'));
+          const packageName = packageJson.name || 'unknown';
           const packageInfo: PackageInfo = {
-            name: packageJson.name || 'unknown',
+            name: packageName,
             version: packageJson.version || '0.0.0',
             exports: packageJson.exports,
-            scope: this.normalizeScope(packageJson.name || 'unknown'),
+            scope: this.normalizeScope(packageName),
             packageDir: currentDir,
           };
 

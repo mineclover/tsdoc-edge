@@ -49,8 +49,8 @@ export class UninstallHookCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(_args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(_args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(_args)) {
         return this.displayHelp();

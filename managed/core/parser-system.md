@@ -16,7 +16,7 @@ canonical: true
 
 Parser System은 TypeScript AST와 TSDoc 주석을 분석하여 심볼, 문서, 테스트 정보를 추출합니다. Microsoft TSDoc을 래핑하고 커스텀 태그를 확장하여 풍부한 메타데이터를 지원합니다.
 
-**핵심 가치**: TSDoc 표준 호환 + 20개 이상 커스텀 태그 + 7-part 모듈 명세
+**핵심 가치**: `@microsoft/tsdoc` 공식 29개 표준 태그 + `tsdoc-edge` 22개 커스텀 태그 + 7-part 모듈 명세
 
 ---
 
@@ -89,11 +89,11 @@ class TSDocParser {
 6-카테고리 확장 문서 추출
 
 ```typescript
+import type { TSDocParser } from './TSDocParser';
+
 /**
  * @doc [[Parser System]]
- * @depends TSDocParser
- * @depType runtime
- * @depReason TSDoc 파싱 결과 활용
+ * @context TSDocParser 파싱 결과 및 TypeScript AST를 기반으로 6-카테고리 확장 문서를 추출
  */
 class EnhancedDocExtractor {
   extractFromFile(filePath: string, sourceCode: string): ExtractedEnhancedDoc[]
@@ -144,48 +144,54 @@ class TestSymbolParser {
 
 ---
 
-## 지원 커스텀 태그
+## 지원 태그 체계 (29개 표준 + 22개 커스텀)
 
-### 기본 태그
+### `@microsoft/tsdoc` 공식 표준 태그 (29개)
 
-| 태그 | 설명 | 예시 |
-|------|------|------|
-| `@id` | 심볼 고유 식별자 | `@id user-service` |
-| `@doc` | 문서 참조 | `@doc [[User Guide]]` |
-| `@contract` | 계약 명세 | `@contract pre: x > 0` |
-| `@responsibility` | 설계 책임 | `@responsibility 사용자 인증` |
-| `@testScenario` | 테스트 시나리오 | `@testScenario 로그인 성공` |
+| 구분 | 개수 | 태그 목록 |
+|------|------|-----------|
+| **Modifier 태그** | 11 | `@alpha`, `@beta`, `@eventProperty`, `@experimental`, `@internal`, `@override`, `@packageDocumentation`, `@public`, `@readonly`, `@sealed`, `@virtual` |
+| **Inline 태그** | 3 | `{@inheritDoc}`, `{@label}`, `{@link}` |
+| **Block 태그** | 15 | `@decorator`, `@defaultValue`, `@deprecated`, `@example`, `@jsx`, `@jsxFrag`, `@jsxImportSource`, `@jsxRuntime`, `@param`, `@privateRemarks`, `@remarks`, `@returns`, `@see`, `@throws`, `@typeParam` |
 
-### 확장 문서 태그 (6-카테고리)
+### `tsdoc-edge` 커스텀 블록 태그 (`tsdoc.json`, 22개)
 
-| 태그 | 카테고리 | 설명 |
-|------|----------|------|
-| `@problem` | problemSolving | 해결하는 문제 |
-| `@solves` | problemSolving | 해결 방식 |
-| `@context` | problemSolving | 사용 맥락 |
-| `@functionality` | functionality | 주요 기능 |
-| `@error` | errorExperiences | 오류 경험 |
-| `@decision` | decisions | 설계 결정 |
-| `@rationale` | decisions | 결정 근거 |
-| `@consequences` | decisions | 결정 결과 |
-| `@depends` | dependencies | 의존성 |
-| `@depType` | dependencies | 의존성 유형 |
-| `@depReason` | dependencies | 의존 이유 |
-| `@future` | futurePlans | 향후 계획 |
+| 카테고리 | 태그 | 복수 허용 | 설명 및 예시 |
+|----------|------|-----------|--------------|
+| **SSOT 체크포인트 라우팅 (1)** | `@doc` | Yes | 관리 문서 체크포인트 참조 (`@doc [[User Guide]]`) |
+| **목적 및 계약 명세 (8)** | `@responsibility` | No | 핵심 설계 책임 (`@responsibility 사용자 인증 처리`) |
+| | `@problem` | No | 해결하려는 문제 정의 |
+| | `@solves` | No | 문제 해결 접근 방식 |
+| | `@context` | No | 실행 환경 및 도메인 맥락 |
+| | `@contract` | No | 계약 요약 명세 |
+| | `@precondition` | Yes | 입력 및 사전 조건 (`@precondition token이 비어 있지 않아야 함`) |
+| | `@postcondition` | Yes | 반환 및 사후 보장 조건 |
+| | `@invariant` | Yes | 항상 유지되어야 하는 불변식 |
+| **모듈 로직 및 부수 효과 (4)** | `@functionality` | No | 주요 기능 요약 |
+| | `@algorithm` | No | 처리 알고리즘 및 단계 |
+| | `@complexity` | No | 시간/공간 복잡도 (`@complexity O(n)`) |
+| | `@sideEffect` | Yes | 부수 효과 및 I/O/상태 변경 (`@sideEffect database: 사용자 레코드 갱신 (write)`) |
+| **인라인 ADR 3원소 (3)** | `@decision` | Yes | 설계 의사결정 |
+| | `@rationale` | Yes | 의사결정 근거 |
+| | `@consequences` | Yes | 의사결정 결과 및 트레이드오프 |
+| **비-AST 의미 관계 및 거버넌스 (6)** | `@relatedTo` | Yes | 명시적 의미 관계 (`@relatedTo AuthGuard`) |
+| | `@enhances` | Yes | 기존 기능 확장/개선 대상 |
+| | `@requires` | Yes | 공동 요구사항 |
+| | `@feature` | Yes | 기능 도메인 그룹 매핑 |
+| | `@testScenario` | Yes | 검증 테스트 시나리오 (`@testScenario 로그인 성공`) |
+| | `@deadcode` | No | 의도적 미사용/보존 코드 표시 |
 
-### 모듈 명세 태그 (7-part)
+### 7-Part 모듈 명세 매핑
 
-| 태그 | Part | 설명 |
-|------|------|------|
-| `@purpose` | Purpose | 존재 이유 |
-| `@input` | Input | 입력 매개변수 |
-| `@output` | Output | 반환값/출력 |
-| `@algorithm` | Logic | 알고리즘 |
-| `@complexity` | Logic | 시간/공간 복잡도 |
-| `@sideEffect` | Effect | 부수 효과 |
-| `@mutates` | Effect | 변경 대상 |
-| `@io` | Effect | I/O 작업 |
-| `@scope` | Scope | 공개 범위 |
+| Aspect | 정본(SSOT) 소스 |
+|--------|-----------------|
+| **Purpose** | TSDoc 요약 문단(summary) + `@responsibility`, `@problem`, `@solves` |
+| **Input** | TypeScript 매개변수 타입 + `@param`, `@typeParam`, `@defaultValue`, `@precondition` |
+| **Output** | TypeScript 반환 타입 + `@returns`, `@throws`, `@postcondition` |
+| **Context** | TypeScript `import` AST 및 `@ttsc/graph` 엣지(`calls`, `accesses`, `instantiates`, `type_ref`) + `@context` |
+| **Logic** | `@algorithm`, `@complexity`, `@functionality`, `@remarks` |
+| **Effect** | `@sideEffect` (`state`, `filesystem`, `database`, `network`, `process`) |
+| **Scope** | `@public`, `@internal`, `@beta`, `@alpha`, `@packageDocumentation` + TS AST 접근 제한자 + `CanonicalNodeId` |
 
 ---
 
@@ -262,11 +268,6 @@ interface EnhancedSymbolDoc {
 
 ```typescript
 interface ModuleSpecTags {
-  purpose?: string
-  inputs?: Array<{ name: string; type: string; constraint?: string }>
-  outputs?: Array<{ name: string; type: string }>
-  context?: string
-  logic?: string
   algorithm?: AlgorithmDoc
   complexity?: ComplexityDoc
   sideEffects?: SideEffectDoc[]

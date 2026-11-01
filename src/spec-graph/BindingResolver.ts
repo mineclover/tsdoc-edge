@@ -696,7 +696,8 @@ function mergeIndexEntries<T extends IndexedEntry>(
 
 function mergeCompatible<T extends IndexedEntry>(left: T, right: T, label: string): T {
   const merged: Record<string, unknown> = { ...left };
-  for (const [key, value] of Object.entries(right)) {
+  const rightRecord: Record<string, unknown> = { ...right };
+  for (const [key, value] of Object.entries(rightRecord)) {
     const previous = merged[key];
     if (
       previous !== undefined &&
@@ -761,20 +762,28 @@ function codeRelationPlane(value: unknown): CodeEdgeRef['plane'] {
   return value === 'producer-derived' || value === 'router-derived' ? value : 'compiler-fact';
 }
 
+function isUnknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
+}
+
+function isObjectRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return typeof value === 'object' && value !== null;
+}
+
 function codeEdgeOccurrenceIds(edge: Readonly<Record<string, unknown>>): readonly string[] {
   const ids = new Set<string>();
   const direct = stringValue(edge.occurrenceId);
   if (direct) ids.add(direct);
-  if (Array.isArray(edge.occurrenceIds)) {
+  if (isUnknownArray(edge.occurrenceIds)) {
     for (const value of edge.occurrenceIds) {
       const id = stringValue(value);
       if (id) ids.add(id);
     }
   }
-  if (Array.isArray(edge.providerOccurrences)) {
+  if (isUnknownArray(edge.providerOccurrences)) {
     for (const value of edge.providerOccurrences) {
-      if (!value || typeof value !== 'object') continue;
-      const id = stringValue((value as Record<string, unknown>).occurrenceId);
+      if (!isObjectRecord(value)) continue;
+      const id = stringValue(value.occurrenceId);
       if (id) ids.add(id);
     }
   }

@@ -42,13 +42,13 @@ export class HttpEndpointsCommand extends BaseCommand {
     return 'List HTTP API endpoints (Express/Fastify/Hono)';
   }
 
-  async execute(args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     const methodFilter = args.find((a) => a.startsWith('--method='))?.split('=')[1];
     const scopeFilter = args.find((a) => a.startsWith('--scope='))?.split('=')[1];
     const pathFilter = args.find((a) => a.startsWith('--path='))?.split('=')[1];
 
     const dbCheck = this.checkDatabaseExists();
-    if (dbCheck) return dbCheck;
+    if (dbCheck) return Promise.resolve(dbCheck);
 
     const dbPath = this.getDatabasePath();
     const db = new Database(dbPath, { readonly: true });
@@ -127,13 +127,13 @@ export class HttpEndpointsCommand extends BaseCommand {
         .print();
 
       db.close();
-      return { exitCode: 0, message: `Found ${endpoints.length} endpoints` };
+      return Promise.resolve({ exitCode: 0, message: `Found ${endpoints.length} endpoints` });
     } catch (error) {
       db.close();
-      return {
+      return Promise.resolve({
         exitCode: 1,
         message: `Error: ${error instanceof Error ? error.message : String(error)}`,
-      };
+      });
     }
   }
 }

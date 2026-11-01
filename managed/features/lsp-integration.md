@@ -383,15 +383,21 @@ connection.onShutdown(() => {
 });
 ```
 
-### CacheManager
-`cache-manager.ts`에서 메모리 누수를 방지합니다:
+### [[cache-manager]]
+
+**Source**: `src/lsp/cache-manager.ts`
+
+TTL 기반 인메모리 캐시와 LRU eviction을 관리하여 LSP hover, CodeLens, 진단, 영향 분석 조회의 메모리 누수를 방지합니다:
 - **자동 정리**: 30초마다 만료 항목 제거
 - **크기 제한**: 캐시당 최대 500개 항목
 - **LRU Eviction**: 한도 초과 시 가장 오래된 항목 제거
 - **dispose()**: 서버 종료 시 타이머 정지 및 전체 정리
 
-### StatementManager
-`statement-manager.ts`에서 prepared statement 누수를 방지합니다:
+### [[statement-manager]]
+
+**Source**: `src/lsp/statement-manager.ts`
+
+SQLite prepared statement를 캐싱하고 LRU 방식으로 해제하여 저지연 LSP 쿼리와 리소스 안전성을 보장합니다:
 - **최대 50개**: statement 캐시 크기 제한
 - **LRU Eviction**: 사용 시점 기반 eviction
 - **dispose()**: 서버 종료 시 전체 statement 해제

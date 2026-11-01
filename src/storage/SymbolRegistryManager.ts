@@ -63,6 +63,11 @@ export class SymbolRegistryManager {
     this.idGenerator.registerExisting(existingIds);
   }
 
+  private parseJson<T>(raw: string): T {
+    const parsed: unknown = JSON.parse(raw);
+    return parsed as T;
+  }
+
   /**
    * Load registry from JSONL file
    * @returns Loaded registry
@@ -80,12 +85,16 @@ export class SymbolRegistryManager {
     }
 
     // First line is metadata
-    const metadata = JSON.parse(lines[0]);
+    const metadata = this.parseJson<{
+      version?: string;
+      idGeneratorMode?: SymbolRegistry['idGeneratorMode'];
+      nextSequentialId?: number;
+    }>(lines[0]);
 
     // Rest are entries
     const entries: SymbolRegistryEntry[] = [];
     for (let i = 1; i < lines.length; i++) {
-      entries.push(JSON.parse(lines[i]));
+      entries.push(this.parseJson<SymbolRegistryEntry>(lines[i]));
     }
 
     return {

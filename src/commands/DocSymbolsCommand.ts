@@ -100,10 +100,10 @@ Examples:
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     // Check for help flag
     if (this.hasHelpFlag(args)) {
-      return this.displayHelp();
+      return Promise.resolve(this.displayHelp());
     }
 
     const useLlmFormat = args.includes('--llm');
@@ -142,12 +142,12 @@ Examples:
         this.displayHumanReadable(symbols);
       }
 
-      return { exitCode: 0, message: `Found ${symbols.length} document symbols` };
+      return Promise.resolve({ exitCode: 0, message: `Found ${symbols.length} document symbols` });
     } catch (error) {
       this.printError(
         `Failed to list document symbols: ${error instanceof Error ? error.message : String(error)}`
       );
-      return { exitCode: 1, message: 'Failed to list document symbols' };
+      return Promise.resolve({ exitCode: 1, message: 'Failed to list document symbols' });
     }
   }
 

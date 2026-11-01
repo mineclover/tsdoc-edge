@@ -355,7 +355,7 @@ export class EntryPointContextAggregator {
           symbolId: relatedId,
           symbolName: relatedId,
           relationshipType: rel.type,
-          strength: rel.strength || 'medium',
+          strength: (rel.strength as typeof rel.strength | undefined) || 'medium',
         });
       }
     }

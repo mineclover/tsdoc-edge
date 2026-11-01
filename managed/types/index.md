@@ -193,7 +193,7 @@ TSDoc 파싱 결과를 표현하는 타입.
 
 모듈 명세서 태그 타입.
 
-**Tags**: `@responsibility`, `@contract`, `@input`, `@output`
+**Tags**: `@responsibility`, `@contract`, `@param`, `@returns`, `@precondition`, `@postcondition`, `@algorithm`, `@complexity`, `@sideEffect`
 
 **Used By**: ModuleSpecValidator
 

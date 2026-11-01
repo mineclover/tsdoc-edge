@@ -48,41 +48,47 @@ Manages comment state during fold/unfold operations.
 
 ## Documentation Generators
 
-### [[Code Generation]]
+### [[MarkdownGenerator]]
 
 **Source**: `src/generator/MarkdownGenerator.ts`
 
-Base markdown generation from structured data.
+Converts parsed `@microsoft/tsdoc` `DocComment` AST nodes into clean, standard Markdown API documentation.
 
 - Paragraphs, code spans, plain text
 - Consistent formatting
 - Extensible base class
 
-### [[Code Generation]]
+### [[EnhancedMarkdownGenerator]]
 
 **Source**: `src/generator/EnhancedMarkdownGenerator.ts`
 
-Enhanced markdown with additional features.
+Renders 6-category `EnhancedSymbolDoc` metadata, contracts, and cross-references into rich Markdown pages.
 
 - Rich formatting options
 - Symbol linking support
 - Cross-reference generation
 
-### [[Code Generation]]
+### [[InsightDocGenerator]]
 
 **Source**: `src/generator/InsightDocGenerator.ts`
 
-Generates insight documentation from code analysis.
+Generates hierarchical architectural insight documents organized by dependency depth and symbol importance.
 
 - Pattern insights
 - Usage analytics
 - Best practice recommendations
 
-### [[Code Generation]]
+### [[LLMsTextGenerator]]
+
+**Source**: `src/generator/LLMsTextGenerator.ts`
+
+Formats unified file, symbol, contract, and impact context into compact `llms.txt`-compatible prompts for AI agents.
+
+### [[RelatedDocsGenerator]]
 
 **Source**: `src/generator/RelatedDocsGenerator.ts`
 
-Generates related documentation suggestions.
+Generates context-aware related documentation and implementation links from symbol relationship neighborhoods.
 
 - Similarity-based recommendations
 - Symbol relationship links
@@ -90,21 +96,21 @@ Generates related documentation suggestions.
 
 ## Module Specification
 
-### [[Code Generation]]
+### [[ModuleSpecGenerator]]
 
 **Source**: `src/generator/ModuleSpecGenerator.ts`
 
-Generates module specifications from code analysis.
+Synthesizes 7-aspect `ModuleSpecTemplate` specifications from TypeScript AST signatures, imports, and TSDoc tags.
 
 - Purpose, input, output documentation
 - Dependency extraction
 - Effect documentation
 
-### [[Code Generation]]
+### [[ModuleSpecMarkdownFormatter]]
 
 **Source**: `src/generator/ModuleSpecMarkdownFormatter.ts`
 
-Formats module specifications as markdown.
+Formats `ModuleSpecTemplate` data structures into standardized 7-aspect Markdown specification documents.
 
 - Structured section output
 - Consistent formatting

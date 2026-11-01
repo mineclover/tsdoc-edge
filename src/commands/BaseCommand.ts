@@ -530,11 +530,11 @@ export abstract class BaseCommand {
   /**
    * Handle command execution with error catching
    *
-   * @param fn - Async function to execute
+   * @param fn - Sync or async function to execute
    * @returns Command result
    */
   protected async executeWithErrorHandling(
-    fn: () => Promise<CommandResult>
+    fn: () => Promise<CommandResult> | CommandResult
   ): Promise<CommandResult> {
     try {
       return await fn();
@@ -605,7 +605,7 @@ export abstract class BaseCommand {
       lines.push(`${indentStr}<${name} count="${data.length}">`);
       data.forEach((item, index) => {
         lines.push(`${indentStr}  <item index="${index + 1}">`);
-        for (const [key, value] of Object.entries(item as Record<string, unknown>)) {
+        for (const [key, value] of Object.entries(item)) {
           lines.push(`${indentStr}    <${key}>${this.escapeXml(value)}</${key}>`);
         }
         lines.push(`${indentStr}  </item>`);
@@ -701,8 +701,11 @@ export abstract class BaseCommand {
 
     if (fs.existsSync(configPath)) {
       try {
-        const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-        if (config.paths?.databasePath) {
+        const parsed: unknown = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+        const config = parsed as {
+          paths?: { databasePath?: string };
+        };
+        if (typeof config.paths?.databasePath === 'string' && config.paths.databasePath) {
           return path.resolve(process.cwd(), config.paths.databasePath);
         }
       } catch {
@@ -725,8 +728,11 @@ export abstract class BaseCommand {
 
     if (fs.existsSync(configPath)) {
       try {
-        const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-        if (config.paths?.jsonlDir) {
+        const parsed: unknown = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+        const config = parsed as {
+          paths?: { jsonlDir?: string };
+        };
+        if (typeof config.paths?.jsonlDir === 'string' && config.paths.jsonlDir) {
           return path.join(process.cwd(), config.paths.jsonlDir);
         }
       } catch {
@@ -753,7 +759,7 @@ export abstract class BaseCommand {
     // Try exact ID first
     const exactSymbol = dbManager.getSymbol(symbolIdOrName);
     if (exactSymbol) {
-      return { symbol: exactSymbol as Symbol, id: symbolIdOrName, autoSelected: false };
+      return { symbol: exactSymbol, id: symbolIdOrName, autoSelected: false };
     }
 
     // Try name pattern match
@@ -775,13 +781,13 @@ export abstract class BaseCommand {
       );
       console.log();
       const symbol = dbManager.getSymbol(primaryMatch.id);
-      return symbol ? { symbol: symbol as Symbol, id: primaryMatch.id, autoSelected: true } : null;
+      return symbol ? { symbol, id: primaryMatch.id, autoSelected: true } : null;
     }
 
     // Return first match if only one
     if (matches.length === 1) {
       const symbol = dbManager.getSymbol(matches[0].id);
-      return symbol ? { symbol: symbol as Symbol, id: matches[0].id, autoSelected: false } : null;
+      return symbol ? { symbol, id: matches[0].id, autoSelected: false } : null;
     }
 
     // If multiple matches, try to auto-select a class/interface
@@ -799,7 +805,7 @@ export abstract class BaseCommand {
       console.log(`${colors.dim}Selected: ${selected.name} (${selected.type})${colors.reset}`);
       console.log();
       const symbol = dbManager.getSymbol(selected.id);
-      return symbol ? { symbol: symbol as Symbol, id: selected.id, autoSelected: true } : null;
+      return symbol ? { symbol, id: selected.id, autoSelected: true } : null;
     }
 
     // Multiple ambiguous matches - show options

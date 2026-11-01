@@ -66,8 +66,8 @@ Examples:
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -173,7 +173,7 @@ Examples:
           confidence: r.confidence,
           file_path: r.filePath ?? null,
           line: r.line ?? null,
-          properties: r.properties ? JSON.stringify(r.properties) : null,
+          properties: JSON.stringify(r.properties),
           created_at: r.createdAt,
           updated_at: r.updatedAt,
           description: r.description ?? null,
@@ -241,13 +241,19 @@ Examples:
           );
           console.log();
 
+          const parseSymbolList = (raw: string): string[] => {
+            const parsed: unknown = JSON.parse(raw);
+            const list: readonly unknown[] = Array.isArray(parsed) ? parsed : [];
+            return list.filter((item): item is string => typeof item === 'string');
+          };
+
           for (const [category, rels] of byCategory.entries()) {
             console.log(`  ${this.colors.bold}${category}${this.colors.reset} (${rels.length})`);
             console.log();
 
             for (const rel of rels) {
-              const fromSymbols = JSON.parse(rel.from_symbols);
-              const toSymbols = JSON.parse(rel.to_symbols);
+              const fromSymbols = parseSymbolList(rel.from_symbols);
+              const toSymbols = parseSymbolList(rel.to_symbols);
 
               const directionSymbol =
                 rel.direction === 'unidirectional'
@@ -295,12 +301,17 @@ Examples:
           console.log();
         } else {
           // XML output
+          const parseSymbolList = (raw: string): string[] => {
+            const parsed: unknown = JSON.parse(raw);
+            const list: readonly unknown[] = Array.isArray(parsed) ? parsed : [];
+            return list.filter((item): item is string => typeof item === 'string');
+          };
           const categoriesData: Record<string, Array<Record<string, unknown>>> = {};
 
           for (const [category, rels] of byCategory.entries()) {
             categoriesData[category] = rels.map((rel) => {
-              const fromSymbols = JSON.parse(rel.from_symbols);
-              const toSymbols = JSON.parse(rel.to_symbols);
+              const fromSymbols = parseSymbolList(rel.from_symbols);
+              const toSymbols = parseSymbolList(rel.to_symbols);
 
               return {
                 id: rel.id,

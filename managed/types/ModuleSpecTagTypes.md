@@ -75,7 +75,7 @@ See implementation: SideEffectDoc
 
 ## Mutation Documentation
 
-From `@mutates` tag:
+Projected from `@sideEffect` (`state: <target> - <description>`) and `@ttsc/graph` `accesses`/`calls` edges:
 
 See implementation: MutationDoc
 
@@ -87,14 +87,14 @@ See implementation: MutationDoc
 
 ```typescript
 /**
- * @mutates userCache - Adds new user to cache
- * @mutates sessionStore - Creates new session
+ * @sideEffect state: userCache - Adds new user to cache
+ * @sideEffect state: sessionStore - Creates new session
  */
 ```
 
 ## I/O Documentation
 
-From `@io` tag:
+Projected from `@sideEffect` (`filesystem`, `database`, `network`) and `@ttsc/graph` `calls` edges:
 
 See implementation: IODoc
 
@@ -106,15 +106,15 @@ See implementation: IODoc
 
 ```typescript
 /**
- * @io file - Reads configuration from config.json
- * @io database - Queries user table
- * @io network - Fetches external API data
+ * @sideEffect filesystem: Reads configuration from config.json (read)
+ * @sideEffect database: Queries user table (read)
+ * @sideEffect network: Fetches external API data (read)
  */
 ```
 
 ## Scope Documentation
 
-From `@scope` tag:
+Derived from standard `@microsoft/tsdoc` release modifiers (`@public`, `@internal`, `@beta`, `@alpha`) and TypeScript AST access modifiers:
 
 See implementation: ScopeDoc
 
@@ -126,9 +126,16 @@ See implementation: ScopeDoc
 
 ```typescript
 /**
- * @scope Public API - Exported for external use
- * @scope Internal - Only used within this module
+ * Exported for external consumers.
+ * @public
  */
+export function publicEndpoint(): void {}
+
+/**
+ * Only used within internal workspace packages.
+ * @internal
+ */
+export function internalHelper(): void {}
 ```
 
 ## Module Spec Tags
@@ -141,23 +148,18 @@ See implementation: ModuleSpecTags
 - `algorithm`: Algorithm documentation (optional)
 - `complexity`: Complexity documentation (optional)
 - `sideEffects`: Side effect documentation (optional)
-- `mutations`: Mutation documentation (optional)
-- `io`: I/O documentation (optional)
-- `scope`: Scope documentation (optional)
+- `mutations`: Mutation documentation projected from `@sideEffect state:` (optional)
+- `io`: I/O documentation projected from `@sideEffect` (optional)
+- `scope`: Scope documentation derived from standard visibility modifiers (optional)
 
 ## Tag Names Constants
 
 ```typescript
 const MODULE_SPEC_TAG_NAMES = {
-  ALGORITHM: '@algorithm',
-  COMPLEXITY: '@complexity',
-  SIDE_EFFECT: '@sideEffect',
-  MUTATES: '@mutates',
-  IO: '@io',
-  SCOPE: '@scope',
-  PURE: '@pure',
-  IDEMPOTENT: '@idempotent'
-};
+  ALGORITHM: 'algorithm',
+  COMPLEXITY: 'complexity',
+  SIDE_EFFECT: 'sideEffect',
+} as const;
 ```
 
 ## Complete Example
@@ -166,23 +168,19 @@ const MODULE_SPEC_TAG_NAMES = {
 /**
  * Binary search implementation
  *
- * @algorithm Binary search with recursion
- * @algorithm Step 1: Check if array empty (base case)
- * @algorithm Step 2: Compare target with middle element
- * @algorithm Step 3: Recurse on appropriate half
+ * @public
+ * @algorithm Binary search with recursion:
+ * 1. Check if array empty (base case)
+ * 2. Compare target with middle element
+ * 3. Recurse on appropriate half
  *
  * @complexity O(log n) time, O(log n) space for call stack
  *
- * @sideEffect none - Pure function
- * @pure This function has no side effects
- *
- * @scope Public API - Exported utility function
- *
- * @param arr Sorted array to search
- * @param target Value to find
+ * @param arr - Sorted array to search
+ * @param target - Value to find
  * @returns Index of target or -1 if not found
  */
-function binarySearch<T>(arr: T[], target: T): number {
+export function binarySearch<T>(arr: T[], target: T): number {
   // Implementation
 }
 ```
@@ -193,25 +191,15 @@ function binarySearch<T>(arr: T[], target: T): number {
 /**
  * Save user to database and send email
  *
- * @algorithm 1. Validate user data
- * @algorithm 2. Insert into database
- * @algorithm 3. Send confirmation email
- * @algorithm 4. Update cache
- *
+ * @public
+ * @algorithm 1. Validate user data; 2. Insert into database; 3. Send confirmation email; 4. Update cache
  * @complexity O(1) time, O(1) space
  *
- * @sideEffect database - Inserts user record
- * @sideEffect network - Sends HTTP request to email service
- * @sideEffect state - Updates userCache map
- *
- * @mutates userCache - Adds user to in-memory cache
- *
- * @io database - Writes to users table
- * @io network - POST to email API
- *
- * @scope Public API - Main user creation endpoint
+ * @sideEffect database: Inserts user record into users table (write)
+ * @sideEffect network: Sends HTTP POST request to email service (write)
+ * @sideEffect state: userCache - Adds user to in-memory cache
  */
-async function saveUser(user: User): Promise<void> {
+export async function saveUser(user: User): Promise<void> {
   // Implementation
 }
 ```
@@ -222,10 +210,12 @@ async function saveUser(user: User): Promise<void> {
 
 ```typescript
 /**
- * @pure No side effects or mutations
- * @idempotent Same input always produces same output
+ * Pure addition with no external I/O or state mutations.
+ *
+ * @public
+ * @postcondition Same input always produces same output
  */
-function add(a: number, b: number): number {
+export function add(a: number, b: number): number {
   return a + b;
 }
 ```
@@ -234,8 +224,7 @@ function add(a: number, b: number): number {
 
 ```typescript
 /**
- * @sideEffect state - Modifies counter
- * @mutates counter - Increments value
+ * @sideEffect state: counter - Increments module-level counter value
  */
 let counter = 0;
 function increment(): void {
@@ -247,13 +236,13 @@ function increment(): void {
 
 Maps to framework sections:
 
-1. **Purpose**: From `@responsibility`, `@problem`, `@solves`
-2. **Input**: From `@param` tags
-3. **Output**: From `@returns` tags
-4. **Context**: From `@depends`, `@io`
-5. **Logic**: From `@algorithm`, `@complexity`
-6. **Effect**: From `@sideEffect`, `@mutates`
-7. **Scope**: From `@scope`, `@public`
+1. **Purpose**: From TSDoc summary + `@responsibility`, `@problem`, `@solves`
+2. **Input**: From `@param`, `@typeParam`, `@defaultValue`, `@precondition`, and TS parameter types
+3. **Output**: From `@returns`, `@throws`, `@postcondition`, and TS return types
+4. **Context**: From TypeScript `import` AST, `@ttsc/graph` edges (`accesses`, `calls`, `instantiates`, `type_ref`), and `@context`
+5. **Logic**: From `@algorithm`, `@complexity`, `@functionality`, and `@remarks`
+6. **Effect**: From `@sideEffect` (including projected `state` mutations and I/O operations)
+7. **Scope**: From `@public`, `@internal`, `@beta`, `@alpha`, `@packageDocumentation`, and TS AST visibility
 
 ## Symbol Count
 

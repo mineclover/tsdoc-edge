@@ -288,13 +288,13 @@ export class EventFlowAnalyzer {
       identifier = node.expression.getText(sourceFile);
     } else if (node.kind === ts.SyntaxKind.ThisKeyword) {
       // For 'this', try to find the enclosing class
-      let parent = node.parent;
+      let parent = node.parent as ts.Node | undefined;
       while (parent) {
         if (ts.isClassDeclaration(parent) && parent.name) {
           identifier = parent.name.text;
           break;
         }
-        parent = parent.parent;
+        parent = parent.parent as ts.Node | undefined;
       }
     } else {
       identifier = node.getText(sourceFile).split('.')[0];

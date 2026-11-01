@@ -81,10 +81,6 @@ import { DatabaseManager } from '../storage/DatabaseManager';
  * - [Feature 1]
  * - [Feature 2]
  * - [Feature 3]
- *
- * @depends [Dependencies]
- * @depType internal
- * @depReason [Why these dependencies?]
  */
 export class YourCommand extends BaseCommand {
   private dbManager?: DatabaseManager;
@@ -552,8 +548,8 @@ console.log(`${colors.green}Success${colors.reset}`);
  * @contract Input/output contract
  * @problem What problem it solves
  * @solves How it solves it
+ * @context Runtime and domain context (code dependencies come from TypeScript imports & @ttsc/graph)
  * @functionality Bullet points
- * @depends Dependencies
  */
 ```
 

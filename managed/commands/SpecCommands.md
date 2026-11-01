@@ -32,9 +32,9 @@ tsdoc-edge spec graph read --spec-db .tsdoc/spec-graph.db --revision-id <revisio
 
 ## Version Management
 
-### spec-bump
+### [[SpecBumpCommand]]
 
-Bump specification version.
+Increments the semantic version (`major`, `minor`, or `patch`) recorded in a specification document YAML frontmatter.
 
 ```bash
 tsdoc-edge spec-bump <file> [options]
@@ -45,9 +45,9 @@ tsdoc-edge spec-bump <file> [options]
 
 **Source**: `src/commands/SpecBumpCommand.ts`
 
-### spec-diff
+### [[SpecDiffCommand]]
 
-Compare specification versions.
+Compares structural and content differences between two revisions of a managed specification document.
 
 ```bash
 tsdoc-edge spec-diff <file> [options]
@@ -57,9 +57,9 @@ tsdoc-edge spec-diff <file> [options]
 
 **Source**: `src/commands/SpecDiffCommand.ts`
 
-### spec-history
+### [[SpecHistoryCommand]]
 
-Show version history of a specification.
+Displays the version and status transition history of a specification document from Git and spec metadata.
 
 ```bash
 tsdoc-edge spec-history <file> [options]
@@ -68,11 +68,11 @@ tsdoc-edge spec-history <file> [options]
 
 **Source**: `src/commands/SpecHistoryCommand.ts`
 
-## Status Management
+## Status & Metrics Management
 
-### spec-status
+### [[SpecStatusCommand]]
 
-Manage specification status (draft, review, approved, deprecated).
+Inspects and transitions a specification document lifecycle status (`draft`, `review`, `approved`, `active`, `deprecated`, `archived`).
 
 ```bash
 tsdoc-edge spec-status <file> [status]
@@ -80,6 +80,18 @@ tsdoc-edge spec-status <file> [status]
 ```
 
 **Source**: `src/commands/SpecStatusCommand.ts`
+
+### [[SpecMetricsCommand]]
+
+Reports multi-dimensional specification completeness, conformance, and code-binding metrics across managed specs.
+
+```bash
+tsdoc-edge spec-metrics [options]
+  --dir <path>        Specification directory (default: managed/specs)
+  --json              Emit machine-readable JSON metrics report
+```
+
+**Source**: `src/commands/SpecMetricsCommand.ts`
 
 ### validate-spec
 

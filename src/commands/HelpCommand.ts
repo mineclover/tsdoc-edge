@@ -175,8 +175,8 @@ export class HelpCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       const showAll = this.hasFlag(args, ['--all', '-a']);
       const showTree = this.hasFlag(args, ['--tree', '-t']);
       const specificCommand = args.find((arg) => !arg.startsWith('-'));

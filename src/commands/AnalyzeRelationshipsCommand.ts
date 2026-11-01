@@ -153,9 +153,7 @@ Examples:
 
             for (const metadata of metadataList) {
               try {
-                const hasRequired = metadata.requires.every(
-                  (req) => context[req as keyof AnalyzerContext]
-                );
+                const hasRequired = metadata.requires.every((req) => context[req]);
                 if (!hasRequired) {
                   console.log(
                     `  ${this.colors.dim}${metadata.name}: skipped (missing requirements)${this.colors.reset}`
@@ -355,7 +353,8 @@ Examples:
   private buildLegacyProgram(srcDir: string) {
     this.printInfo('Building legacy TypeScript Compiler API program...');
     // Keep TS5 loading out of graph-only analysis. Syntax analyzers still use it.
-    const ts = require('typescript') as typeof import('typescript');
+    const rawTs: unknown = require('typescript');
+    const ts = rawTs as typeof import('typescript');
     const files = this.findTypeScriptFiles(srcDir);
     return ts.createProgram(files, {
       target: ts.ScriptTarget.ES2020,

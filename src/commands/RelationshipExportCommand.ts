@@ -1,7 +1,7 @@
 /**
  * Relationship Export Command
  *
- * @doc [[Gephi Export]]
+ * @doc [[RelationshipExportCommand]]
  * @packageDocumentation
  */
 
@@ -12,6 +12,22 @@ import {
   type UnifiedRelationshipRow,
 } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
+
+function isUnknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
+}
+
+function parseStringArray(raw: string): string[] {
+  const parsed: unknown = JSON.parse(raw);
+  return isUnknownArray(parsed)
+    ? parsed.filter((item): item is string => typeof item === 'string')
+    : [];
+}
+
+function parseUnknownArray(raw: string): unknown[] {
+  const parsed: unknown = JSON.parse(raw);
+  return isUnknownArray(parsed) ? [...parsed] : [];
+}
 
 /** Supported export formats for relationship data */
 type ExportFormat = 'json' | 'graphml' | 'dot' | 'csv' | 'cypher' | 'gephi';
@@ -88,8 +104,8 @@ Examples:
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
@@ -210,13 +226,13 @@ Examples:
         id: r.id,
         type: r.type,
         category: r.category,
-        from: JSON.parse(r.from_symbols),
-        to: JSON.parse(r.to_symbols),
+        from: parseStringArray(r.from_symbols),
+        to: parseStringArray(r.to_symbols),
         direction: r.direction,
         strength: r.strength,
         confidence: r.confidence,
         description: r.description,
-        evidence: r.evidence ? JSON.parse(r.evidence) : [],
+        evidence: r.evidence ? parseUnknownArray(r.evidence) : [],
       })),
     };
 
@@ -271,8 +287,8 @@ Examples:
 
     // Add edges
     for (const rel of relationships) {
-      const fromSymbols = JSON.parse(rel.from_symbols);
-      const toSymbols = JSON.parse(rel.to_symbols);
+      const fromSymbols = parseStringArray(rel.from_symbols);
+      const toSymbols = parseStringArray(rel.to_symbols);
 
       for (const from of fromSymbols) {
         for (const to of toSymbols) {
@@ -332,8 +348,8 @@ Examples:
     };
 
     for (const rel of relationships) {
-      const fromSymbols = JSON.parse(rel.from_symbols);
-      const toSymbols = JSON.parse(rel.to_symbols);
+      const fromSymbols = parseStringArray(rel.from_symbols);
+      const toSymbols = parseStringArray(rel.to_symbols);
 
       const color = categoryColors[rel.category] || 'black';
       const style = rel.direction === 'bidirectional' ? 'dir=both' : '';
@@ -358,8 +374,8 @@ Examples:
       'id,type,category,from_symbols,to_symbols,direction,strength,confidence,description\n';
 
     const rows = relationships.map((r) => {
-      const from = JSON.parse(r.from_symbols).join('|');
-      const to = JSON.parse(r.to_symbols).join('|');
+      const from = parseStringArray(r.from_symbols).join('|');
+      const to = parseStringArray(r.to_symbols).join('|');
       const desc = (r.description || '').replace(/"/g, '""');
 
       return `"${r.id}","${r.type}","${r.category}","${from}","${to}","${r.direction}","${r.strength}",${r.confidence},"${desc}"`;
@@ -399,8 +415,8 @@ Examples:
 
     // Create relationships
     for (const rel of relationships) {
-      const fromSymbols = JSON.parse(rel.from_symbols);
-      const toSymbols = JSON.parse(rel.to_symbols);
+      const fromSymbols = parseStringArray(rel.from_symbols);
+      const toSymbols = parseStringArray(rel.to_symbols);
 
       for (const from of fromSymbols) {
         for (const to of toSymbols) {
@@ -481,8 +497,8 @@ CREATE INDEX symbol_type IF NOT EXISTS FOR (s:Symbol) ON (s.type);
     let edgeCounter = 0;
     for (const rel of relationships) {
       try {
-        const fromSymbols = JSON.parse(rel.from_symbols);
-        const toSymbols = JSON.parse(rel.to_symbols);
+        const fromSymbols = parseStringArray(rel.from_symbols);
+        const toSymbols = parseStringArray(rel.to_symbols);
 
         for (const from of fromSymbols) {
           for (const to of toSymbols) {

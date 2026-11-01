@@ -327,7 +327,8 @@ function validateRevisionIdentity(revision: SpecGraphRevision): SpecGraphRevisio
 }
 
 function parseJson<T>(value: string): T {
-  return JSON.parse(value) as T;
+  const parsed: unknown = JSON.parse(value);
+  return parsed as T;
 }
 
 function stableJson(value: unknown): string {

@@ -82,7 +82,7 @@ export class XmlBuilder implements OutputBuilder {
    * Set data for a section
    */
   section(name: string, data: SectionData | GroupedSectionData): this {
-    if (!this.schema.sections[name]) {
+    if (!Object.hasOwn(this.schema.sections, name)) {
       throw new Error(
         `Unknown section: ${name}. Available: ${Object.keys(this.schema.sections).join(', ')}`
       );
@@ -122,7 +122,7 @@ export class XmlBuilder implements OutputBuilder {
         this.buildObjectSection(
           lines,
           sectionName,
-          sectionSchema as ObjectSchema,
+          sectionSchema,
           sectionData as Record<string, unknown>,
           1
         );

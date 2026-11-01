@@ -78,19 +78,21 @@ export class EndpointDetectionAnalyzer {
    * Detect framework from imports
    */
   private detectFramework(sourceFile: ts.SourceFile): 'express' | 'fastify' | 'hono' | null {
-    let hasExpress = false;
-    let hasFastify = false;
-    let hasHono = false;
+    const flags = {
+      hasExpress: false,
+      hasFastify: false,
+      hasHono: false,
+    };
 
     const visit = (node: ts.Node) => {
       if (ts.isImportDeclaration(node)) {
         const moduleSpecifier = node.moduleSpecifier.getText().replace(/['"]/g, '');
         if (moduleSpecifier === 'express' || moduleSpecifier.startsWith('express/')) {
-          hasExpress = true;
+          flags.hasExpress = true;
         } else if (moduleSpecifier === 'fastify' || moduleSpecifier.startsWith('fastify/')) {
-          hasFastify = true;
+          flags.hasFastify = true;
         } else if (moduleSpecifier === 'hono' || moduleSpecifier.startsWith('hono/')) {
-          hasHono = true;
+          flags.hasHono = true;
         }
       }
       ts.forEachChild(node, visit);
@@ -99,9 +101,9 @@ export class EndpointDetectionAnalyzer {
     visit(sourceFile);
 
     // Prioritize in order
-    if (hasExpress) return 'express';
-    if (hasFastify) return 'fastify';
-    if (hasHono) return 'hono';
+    if (flags.hasExpress) return 'express';
+    if (flags.hasFastify) return 'fastify';
+    if (flags.hasHono) return 'hono';
     return null;
   }
 

@@ -49,7 +49,8 @@ export class ConfigLoader {
 
     try {
       const configContent = fs.readFileSync(configPath, 'utf-8');
-      const userConfig = JSON.parse(configContent) as Partial<TsdocEdgeConfig>;
+      const parsedConfig: unknown = JSON.parse(configContent);
+      const userConfig = parsedConfig as Partial<TsdocEdgeConfig>;
 
       this.configPath = configPath;
       return this.mergeConfig(userConfig);

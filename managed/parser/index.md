@@ -27,16 +27,16 @@ Parses TSDoc comments from TypeScript source files using the official TSDoc pars
 - Preserves source locations
 - Supports all standard TSDoc tags
 
-### [[Parser Components]]
+### [[ModuleSpecTagParser]]
 
 **Source**: `src/parser/ModuleSpecTagParser.ts`
 
-Parses module specification tags from TSDoc comments.
+Extracts `@algorithm`, `@complexity`, `@sideEffect`, and standard visibility modifiers from `@microsoft/tsdoc` comments into `ModuleSpecTags`.
 
-- @purpose, @responsibility, @context
-- @input, @output, @effect
-- @decision, @rationale, @consequences
-- Custom TSDoc Edge tags
+- `@responsibility`, `@problem`, `@solves`, `@context`
+- `@param`, `@returns`, `@precondition`, `@postcondition`, `@sideEffect`
+- `@algorithm`, `@complexity`, `@functionality`
+- `@decision`, `@rationale`, `@consequences`
 
 ### [[EnhancedDocExtractor]]
 
@@ -62,11 +62,11 @@ Parses `[[Symbol]]` references from markdown documentation.
 - References (inline links)
 - Code connection detection
 
-### [[Parser Components]]
+### [[FrontmatterParser]]
 
 **Source**: `src/parser/FrontmatterParser.ts`
 
-Parses YAML frontmatter from markdown documents.
+Parses and serializes YAML frontmatter metadata blocks at the head of managed Markdown documents.
 
 - Title, type, category extraction
 - Status and priority metadata
@@ -86,11 +86,11 @@ Extracts symbols and relationships from Mermaid diagrams.
 
 ## Test Parsing
 
-### TestSymbolParser
+### [[TestSymbolParser]]
 
 **Source**: `src/parser/TestSymbolParser.ts`
 
-Parses test files to extract test-to-code relationships.
+Parses Jest and Vitest test files to extract `describe` suites, `it`/`test` cases, and `@testScenario` annotations.
 
 - Test file detection
 - Import analysis

@@ -80,8 +80,8 @@ export class FindMethodCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -192,7 +192,7 @@ export class FindMethodCommand extends BaseCommand {
     return this.success();
   }
 
-  private async findFromDatabase(query: string): Promise<CommandResult> {
+  private findFromDatabase(query: string): CommandResult {
     const dbCheck = this.checkDatabaseExists();
     if (dbCheck) {
       console.log(`${colors.yellow}No symbols found${colors.reset}`);

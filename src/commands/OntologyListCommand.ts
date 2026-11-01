@@ -109,8 +109,8 @@ Examples:
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
@@ -134,9 +134,9 @@ Examples:
       const dbManager = new DatabaseManager(dbPath);
 
       if (options.type === 'node') {
-        await this.listNodes(dbManager, options);
+        this.listNodes(dbManager, options);
       } else {
-        await this.listRelationships(dbManager, options);
+        this.listRelationships(dbManager, options);
       }
 
       dbManager.close();
@@ -186,7 +186,7 @@ Examples:
     return options;
   }
 
-  private async listNodes(dbManager: DatabaseManager, options: ListOptions): Promise<void> {
+  private listNodes(dbManager: DatabaseManager, options: ListOptions): void {
     // Query symbols using Drizzle ORM
     const queryOptions: {
       type?: string;
@@ -288,7 +288,7 @@ Examples:
     }
   }
 
-  private async listRelationships(dbManager: DatabaseManager, options: ListOptions): Promise<void> {
+  private listRelationships(dbManager: DatabaseManager, options: ListOptions): void {
     let relationships = dbManager.getAllUnifiedRelationships();
 
     // Apply filters

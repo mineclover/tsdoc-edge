@@ -492,7 +492,7 @@ function materialize(row: HistoryRow): RetainedConventionCheck {
   let parsed: RetainedConventionCheck;
   let canonical: RetainedConventionCheck;
   try {
-    parsed = JSON.parse(row.payload_json) as RetainedConventionCheck;
+    parsed = parseJson<RetainedConventionCheck>(row.payload_json);
     canonical = canonicalEntry(parsed);
   } catch (error) {
     const detail = error instanceof Error ? error.message : String(error);
@@ -632,8 +632,13 @@ function canonicalize(value: unknown): unknown {
   return value;
 }
 
+function parseJson<T>(value: string): T {
+  const parsed: unknown = JSON.parse(value);
+  return parsed as T;
+}
+
 function immutableJson<T>(value: T): T {
-  return deepFreeze(JSON.parse(stableJson(value)) as T);
+  return deepFreeze(parseJson<T>(stableJson(value)));
 }
 
 function deepFreeze<T>(value: T): T {

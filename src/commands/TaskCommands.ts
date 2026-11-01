@@ -57,8 +57,8 @@ Options:
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
@@ -244,8 +244,8 @@ Options:
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       if (this.hasHelpFlag(args) || args.length === 0) {
         return this.displayHelp();
       }
@@ -371,8 +371,8 @@ Options:
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       if (this.hasHelpFlag(args) || args.length === 0) {
         return this.displayHelp();
       }
@@ -455,8 +455,8 @@ export class TaskStatsCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(_args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(_args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       const dbPath = this.getDatabasePath();
       const dbManager = new DatabaseManager(dbPath);
       const taskManager = new TaskManager(dbManager);

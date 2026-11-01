@@ -360,7 +360,7 @@ export class ConnectivityValidator {
 
     // Calculate summary statistics
     const documented = allSymbols.filter((s) => s.summary && s.summary.trim() !== '').length;
-    const tested = allSymbols.filter((s) => s.tests && s.tests.length > 0).length;
+    const tested = allSymbols.filter((s) => hasItems(s.tests)).length;
     const withResponsibility = allSymbols.filter((s) => s.responsibility).length;
     const withContract = allSymbols.filter((s) => s.contract).length;
 
@@ -470,14 +470,14 @@ export class ConnectivityValidator {
 
       if (
         (symbol.type === 'function' || symbol.type === 'method') &&
-        (!symbol.contract.preconditions || symbol.contract.preconditions.length === 0)
+        !hasItems(symbol.contract.preconditions)
       ) {
         missingItems.push('preconditions');
       }
 
       if (
         (symbol.type === 'function' || symbol.type === 'method') &&
-        (!symbol.contract.postconditions || symbol.contract.postconditions.length === 0)
+        !hasItems(symbol.contract.postconditions)
       ) {
         missingItems.push('postconditions');
       }
@@ -626,4 +626,8 @@ export class ConnectivityValidator {
 
     return output;
   }
+}
+
+function hasItems(items: readonly unknown[] | undefined): boolean {
+  return Boolean(items && items.length > 0);
 }

@@ -73,7 +73,7 @@ interface CoverageReport {
  * @rationale `@doc` tags show code→docs links (SSOT direction), .md traversal only shows docs→docs
  * @consequences Reveals true documentation status, not navigation completeness
  *
- * @doc [[Coverage Report Command]]
+ * @doc [[CoverageReportCommand]]
  */
 export class CoverageReportCommand extends BaseCommand {
   private db?: DatabaseManager;
@@ -170,11 +170,11 @@ export class CoverageReportCommand extends BaseCommand {
 
         // 3. Check coverage
         const report = hierarchical
-          ? await this.generateHierarchicalReport(symbols)
-          : await this.generateReport(symbols);
+          ? this.generateHierarchicalReport(symbols)
+          : this.generateReport(symbols);
 
         const canonicalProjection = canonicalGraphDatabase
-          ? await this.generateCanonicalProjection(symbols, canonicalGraphDatabase)
+          ? this.generateCanonicalProjection(symbols, canonicalGraphDatabase)
           : undefined;
         const outputReport = canonicalProjection ? { ...report, canonicalProjection } : report;
 
@@ -193,10 +193,7 @@ export class CoverageReportCommand extends BaseCommand {
     });
   }
 
-  private async inspectStoredReports(
-    operation: 'list' | 'read',
-    args: string[]
-  ): Promise<CommandResult> {
+  private inspectStoredReports(operation: 'list' | 'read', args: string[]): CommandResult {
     const config = ConfigManager.getInstance(process.cwd()).get();
     const workspaceId =
       this.getOption(args, '--workspace') ?? config.project?.name ?? path.basename(process.cwd());
@@ -297,10 +294,10 @@ export class CoverageReportCommand extends BaseCommand {
   }
 
   /** Build a canonical documentation projection from the selected graph revision. */
-  private async generateCanonicalProjection(
+  private generateCanonicalProjection(
     symbols: Symbol[],
     graphDatabasePath: string
-  ): Promise<CanonicalDocumentationCoverageProjection> {
+  ): CanonicalDocumentationCoverageProjection {
     const repository = new GraphRepository(path.resolve(process.cwd(), graphDatabasePath), {
       readOnly: true,
     });
@@ -309,7 +306,7 @@ export class CoverageReportCommand extends BaseCommand {
       if (!activeRevision) {
         throw new Error('Canonical graph database has no active revision');
       }
-      const scores = await this.collectDocumentationScores(symbols);
+      const scores = this.collectDocumentationScores(symbols);
       const source = createCoverageSourceIdentity(
         path.join(process.cwd(), '.tsdoc', 'coverage-report'),
         JSON.stringify(scores),
@@ -335,7 +332,7 @@ export class CoverageReportCommand extends BaseCommand {
   }
 
   /** Collect the legacy `@doc` signal in the score shape expected by projection. */
-  private async collectDocumentationScores(symbols: Symbol[]): Promise<DocQualityScore[]> {
+  private collectDocumentationScores(symbols: Symbol[]): DocQualityScore[] {
     const scores: DocQualityScore[] = [];
     for (const symbol of symbols) {
       scores.push({
@@ -345,7 +342,7 @@ export class CoverageReportCommand extends BaseCommand {
         filePath: symbol.filePath,
         line: symbol.line,
         isPublic: symbol.isPublic,
-        hasDoc: await this.hasDocTag(symbol),
+        hasDoc: this.hasDocTag(symbol),
         hasSummary: false,
         hasCompleteParams: false,
         hasReturns: false,
@@ -410,7 +407,7 @@ export class CoverageReportCommand extends BaseCommand {
   /**
    * Check if symbol has `@doc` tag
    */
-  private async hasDocTag(symbol: Symbol): Promise<boolean> {
+  private hasDocTag(symbol: Symbol): boolean {
     try {
       const fullPath = path.resolve(symbol.filePath);
 
@@ -448,7 +445,7 @@ export class CoverageReportCommand extends BaseCommand {
   /**
    * Generate coverage report
    */
-  private async generateReport(symbols: Symbol[]): Promise<CoverageReport> {
+  private generateReport(symbols: Symbol[]): CoverageReport {
     const byCategory = {
       commands: { total: 0, documented: 0, coverage: 0 },
       analyzers: { total: 0, documented: 0, coverage: 0 },
@@ -461,7 +458,7 @@ export class CoverageReportCommand extends BaseCommand {
     let totalDocumented = 0;
 
     for (const symbol of symbols) {
-      const hasDoc = await this.hasDocTag(symbol);
+      const hasDoc = this.hasDocTag(symbol);
       const category = this.categorizeSymbol(symbol);
 
       byCategory[category].total++;
@@ -505,9 +502,9 @@ export class CoverageReportCommand extends BaseCommand {
   /**
    * Generate hierarchical coverage report (file-level connections)
    */
-  private async generateHierarchicalReport(symbols: Symbol[]): Promise<CoverageReport> {
+  private generateHierarchicalReport(symbols: Symbol[]): CoverageReport {
     // Load code connections from doc-symbols.json
-    const connectedFiles = await this.getFilesWithCodeConnections();
+    const connectedFiles = this.getFilesWithCodeConnections();
 
     const byCategory = {
       commands: { total: 0, documented: 0, coverage: 0 },
@@ -565,7 +562,7 @@ export class CoverageReportCommand extends BaseCommand {
   /**
    * Get files with code connections from doc-symbols.json
    */
-  private async getFilesWithCodeConnections(): Promise<string[]> {
+  private getFilesWithCodeConnections(): string[] {
     try {
       const docSymbolsPath = path.join('.tsdoc', 'doc-symbols.json');
       if (!fs.existsSync(docSymbolsPath)) {
@@ -573,20 +570,31 @@ export class CoverageReportCommand extends BaseCommand {
       }
 
       const content = fs.readFileSync(docSymbolsPath, 'utf-8');
-      const data = JSON.parse(content);
+      const rawData: unknown = JSON.parse(content);
+      const data = rawData as {
+        registryData?: {
+          codeConnections?: Record<string, unknown>;
+        };
+      };
 
+      const isUnknownArray = (value: unknown): value is readonly unknown[] => Array.isArray(value);
       const files: string[] = [];
 
       // Extract file paths from codeConnections
-      const connections = data.registryData?.codeConnections || {};
+      const connections = data.registryData?.codeConnections ?? {};
       for (const [_symbol, connArray] of Object.entries(connections)) {
-        const conns = (connArray as unknown as Array<unknown>)[1] || [];
-        const connList = Array.isArray(conns) ? conns : [];
+        const conns = isUnknownArray(connArray) ? connArray[1] : undefined;
+        const connList = isUnknownArray(conns) ? conns : [];
         for (const conn of connList) {
-          const typedConn = conn as { filePath?: string };
-          if (typedConn.filePath) {
+          if (
+            typeof conn === 'object' &&
+            conn !== null &&
+            'filePath' in conn &&
+            typeof conn.filePath === 'string' &&
+            conn.filePath
+          ) {
             // Convert absolute path to relative
-            const relativePath = typedConn.filePath.replace(/.*\/tsdoc-edge\//, '');
+            const relativePath = conn.filePath.replace(/.*\/tsdoc-edge\//, '');
             if (!files.includes(relativePath)) {
               files.push(relativePath);
             }

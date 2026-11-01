@@ -137,7 +137,7 @@ Output includes:
 
       // Run metrics to see where this symbol ranks
       // We'll show if it's in top 20 critical symbols
-      const metricsResult = await this.getCentralityInfo(symbolId);
+      const metricsResult = this.getCentralityInfo(symbolId);
 
       if (metricsResult.isCritical) {
         this.printWarning(`This symbol is in TOP ${metricsResult.rank} most critical symbols!`);
@@ -211,7 +211,7 @@ Output includes:
   ): Promise<CommandResult> {
     try {
       const impactCmd = new RelationshipImpactCommand();
-      const metricsInfo = await this.getCentralityInfo(symbolId);
+      const metricsInfo = this.getCentralityInfo(symbolId);
 
       // Get impact data
       const _impactResult = await impactCmd.execute([
@@ -255,13 +255,13 @@ Output includes:
   /**
    * Get centrality information for a symbol
    */
-  private async getCentralityInfo(_symbolId: string): Promise<{
+  private getCentralityInfo(_symbolId: string): {
     isCritical: boolean;
     rank: number;
     importance: number;
     degree: number;
     pattern: string;
-  }> {
+  } {
     // This is a simplified version - in production you'd call the metrics command
     // and parse its output, but for now we'll return mock data structure
     // In real implementation, we'd need to refactor metrics command to be callable

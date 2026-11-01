@@ -17,7 +17,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @public
  * @responsibility Update code symbol footnote references in documents
  * @contract Parse documents, resolve symbol references, update footnotes
- * @doc [[Update Symbol References Command]]
+ * @doc [[UpdateSymbolRefsCommand]]
  * @doc [[CLI Commands#update-symbol-refs]]
  *
  * @problem Symbol footnotes [^SymbolName] need to be updated when code changes
@@ -77,8 +77,8 @@ export class UpdateSymbolRefsCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();

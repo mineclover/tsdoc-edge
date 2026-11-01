@@ -151,7 +151,7 @@ export class DetectDeadCodeCommand extends BaseCommand {
           console.log();
         }
 
-        const deadCode = await this.detectDeadCode(allSymbols);
+        const deadCode = this.detectDeadCode(allSymbols);
 
         // Apply filters: confidence, path, type
         let filtered = deadCode.filter((dc) => {
@@ -421,7 +421,7 @@ export class DetectDeadCodeCommand extends BaseCommand {
   /**
    * Detect dead code symbols across indexed symbols
    */
-  private async detectDeadCode(symbols: Symbol[]): Promise<DeadCodeSymbol[]> {
+  private detectDeadCode(symbols: Symbol[]): DeadCodeSymbol[] {
     const deadCode: DeadCodeSymbol[] = [];
     const entryPoints = this.identifyEntryPoints(symbols);
 
@@ -442,8 +442,8 @@ export class DetectDeadCodeCommand extends BaseCommand {
       }
 
       // Check incoming calls and dependencies from database
-      const incomingCalls = await this.getIncomingCalls(symbol.id);
-      const incomingDeps = await this.getIncomingDependencies(symbol.id);
+      const incomingCalls = this.getIncomingCalls(symbol.id);
+      const incomingDeps = this.getIncomingDependencies(symbol.id);
 
       if (incomingCalls === 0 && incomingDeps === 0) {
         // Multi-signal check: count intra-file references
@@ -497,7 +497,7 @@ export class DetectDeadCodeCommand extends BaseCommand {
         });
       } else if (incomingCalls > 0 && incomingDeps === 0 && symbol.type === 'function') {
         // Low confidence: Called exclusively by test files
-        if (await this.isOnlyCalledByTests(symbol.id)) {
+        if (this.isOnlyCalledByTests(symbol.id)) {
           deadCode.push({
             symbol,
             reason: 'test-only',
@@ -619,7 +619,7 @@ export class DetectDeadCodeCommand extends BaseCommand {
   /**
    * Get number of incoming calls to a symbol
    */
-  private async getIncomingCalls(symbolId: string): Promise<number> {
+  private getIncomingCalls(symbolId: string): number {
     try {
       return this.db.countIncomingCalls(symbolId);
     } catch (_error) {
@@ -630,7 +630,7 @@ export class DetectDeadCodeCommand extends BaseCommand {
   /**
    * Get number of incoming dependencies to a symbol
    */
-  private async getIncomingDependencies(symbolId: string): Promise<number> {
+  private getIncomingDependencies(symbolId: string): number {
     try {
       return this.db.countIncomingReferences(symbolId);
     } catch (_error) {
@@ -641,7 +641,7 @@ export class DetectDeadCodeCommand extends BaseCommand {
   /**
    * Check if symbol is only called by test files
    */
-  private async isOnlyCalledByTests(symbolId: string): Promise<boolean> {
+  private isOnlyCalledByTests(symbolId: string): boolean {
     try {
       const callerFilePaths = this.db.getCallerFilePaths(symbolId);
       if (callerFilePaths.length === 0) return false;

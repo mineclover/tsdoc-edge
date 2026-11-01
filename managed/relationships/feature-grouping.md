@@ -424,9 +424,16 @@ Feature: PaymentProcessing
 
 ### 3. **Bounded Dependencies**
 ```typescript
-// ✅ Feature dependencies are explicit
-@feature Checkout
-@dependsOn Authentication, ShoppingCart, Payment
+// ✅ Feature dependencies are expressed via TypeScript imports + @requires / @relatedTo
+import type { AuthSession } from '../auth/AuthSession';
+import type { ShoppingCart } from '../cart/ShoppingCart';
+import type { PaymentGateway } from '../payment/PaymentGateway';
+
+/**
+ * @feature Checkout
+ * @requires Authentication
+ * @relatedTo ShoppingCart, Payment
+ */
 class CheckoutFeature {}
 ```
 

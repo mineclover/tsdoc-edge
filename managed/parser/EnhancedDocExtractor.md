@@ -122,15 +122,15 @@ interface ExtractedEnhancedDoc {
 - TypeScript ≥ 4.5
 - Valid TypeScript source code
 
-### Custom Tags Supported
+### Custom & Standard Constructs Supported
 
 **6-Category System**:
-1. **Problem Solving**: `@problem`, `@solves`, `@context`, `@useCase`
-2. **Functionality**: `@functionality`, `@mainFeature`, `@component`
-3. **Error Experiences**: `@errorExp`, `@errorType`, `@errorMessage`, `@errorSolution`
-4. **Decisions**: `@decision`, `@rationale`, `@consequences`, `@alternatives`
-5. **Dependencies**: `@depends`, `@depType`, `@depReason`
-6. **Future Plans**: `@todo`, `@priority`, `@enhancement`
+1. **Problem Solving**: `@problem`, `@solves`, `@context`
+2. **Functionality**: `@functionality` (or standard `@remarks`)
+3. **Error Experiences**: standard `@throws`
+4. **Decisions**: `@decision`, `@rationale`, `@consequences`
+5. **Dependencies**: TypeScript `import` AST declarations & `@ttsc/graph` edges (plus `@relatedTo` for non-AST semantic links)
+6. **Future Plans**: standard `@privateRemarks` (`TODO: ...` / `PLAN [high|medium|low]: ...`) or `@enhances`
 
 ## Logic
 
@@ -338,29 +338,22 @@ docs.forEach(({ doc, missing }) => {
 
 **Input**:
 ```typescript
+import * as ts from 'typescript';
+
 /**
  * Build command implementation
  *
  * @problem Manual symbol extraction is tedious
  * @solves Automate extraction from TypeScript source
- * @context Large codebases need automated tooling
- * @useCase Extract symbols during CI/CD pipeline
+ * @context Large codebases running automated CI/CD symbol extraction pipelines
  *
  * @functionality AST traversal, Symbol extraction, Database storage
- * @mainFeature Extract all symbols from source directory
- * @component ASTSymbolExtractor
- * @component DatabaseManager
  *
  * @decision Use TypeScript Compiler API for AST
  * @rationale More reliable than regex parsing
  * @consequences Requires TypeScript as dependency
  *
- * @depends typescript
- * @depType external
- * @depReason AST parsing
- *
- * @todo Add incremental extraction
- * @priority high
+ * @privateRemarks PLAN [high]: Add incremental extraction
  */
 export class BuildCommand extends BaseCommand {
   // ...

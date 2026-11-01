@@ -78,7 +78,7 @@ Extract and generate 7-part module specifications from TypeScript code
 ### Main Features
 
 - - Purpose extraction from @problem
-- @responsibility tags - Input extraction from function parameters and @precondition - Output extraction from return types and @postcondition - Context extraction from imports and @depends - Logic extraction from @functionality and code analysis - Effect detection from side effect patterns - Scope extraction from export modifiers
+- @responsibility tags - Input extraction from function parameters, @param, and @precondition - Output extraction from return types, @returns, and @postcondition - Context extraction from TypeScript AST imports, @ttsc/graph edges, and @context - Logic extraction from @functionality, @algorithm, and code analysis - Effect detection from @sideEffect and side effect patterns - Scope extraction from export and @public/@internal modifiers
 
 ### Algorithm
 

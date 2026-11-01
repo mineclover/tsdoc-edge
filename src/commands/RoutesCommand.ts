@@ -30,7 +30,7 @@ export class RoutesCommand extends BaseCommand {
     return 'Extract HTTP route endpoints';
   }
 
-  async execute(args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     const useXml = !args.includes('--human');
     const targetDir = args.find((a) => !a.startsWith('--')) || 'packages';
 
@@ -56,7 +56,7 @@ export class RoutesCommand extends BaseCommand {
       }
     }
 
-    return { exitCode: 0, message: `Found ${routes.length} routes` };
+    return Promise.resolve({ exitCode: 0, message: `Found ${routes.length} routes` });
   }
 
   private extractRoutes(dir: string): RouteEndpoint[] {

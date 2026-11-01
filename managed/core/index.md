@@ -38,6 +38,13 @@ Symbol dependency graph construction and traversal.
 ### [[Validator System]]
 Documentation and code validation infrastructure.
 
+## Programmatic Facade
+
+### [[TSDocEdge]]
+Top-level programmatic SDK facade exposing TSDoc parsing, symbol graph construction, and connectivity validation APIs.
+
+**Source**: `src/index.ts`
+
 ## Related
 
 - [[Analyzers & Extractors]] - Concrete analyzer implementations

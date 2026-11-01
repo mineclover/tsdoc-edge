@@ -27,8 +27,8 @@ Options:
 The configured specGovernance.authoredSpecDirs are the only authored inputs.`;
   }
 
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       if (args.includes('--help') || args.includes('-h')) return this.displayHelp();
       const invalid = validateArguments(args);
       if (invalid) return this.failure(invalid, 2);

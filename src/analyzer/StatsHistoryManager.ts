@@ -33,7 +33,8 @@ export class StatsHistoryManager {
 
     try {
       const content = fs.readFileSync(filePath, 'utf-8');
-      return JSON.parse(content) as StatsHistory;
+      const parsed: unknown = JSON.parse(content);
+      return parsed as StatsHistory;
     } catch (error) {
       console.warn(`Failed to load history from ${filePath}:`, error);
       return null;
@@ -138,7 +139,9 @@ export class StatsHistoryManager {
     };
 
     for (const symbol of symbols) {
-      const importance = stats.symbolImportance[symbol.id];
+      const importance = stats.symbolImportance[symbol.id] as
+        | TrackableStatistics['symbolImportance'][string]
+        | undefined;
       if (!importance) continue;
 
       switch (importance.level) {

@@ -223,7 +223,7 @@ export class FrontmatterParser {
       }
     }
 
-    const codeImplementation = (metadata as Record<string, unknown>).codeImplementation;
+    const codeImplementation: unknown = metadata.codeImplementation;
     if (
       codeImplementation !== undefined &&
       codeImplementation !== 'required' &&

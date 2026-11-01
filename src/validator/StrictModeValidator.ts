@@ -193,7 +193,7 @@ export class StrictModeValidator {
    * @param func - Functionality data
    * @returns Array of missing fields
    */
-  private validateFunctionality(func: Functionality): string[] {
+  private validateFunctionality(func: Partial<Functionality>): string[] {
     const missing: string[] = [];
 
     if (!func.mainFeatures || func.mainFeatures.length === 0) {
@@ -230,7 +230,7 @@ export class StrictModeValidator {
    * @param decisions - Decision records
    * @returns Array of error messages
    */
-  private validateDecisions(decisions: DecisionRecord[]): string[] {
+  private validateDecisions(decisions: Array<Partial<DecisionRecord>>): string[] {
     const issues: string[] = [];
 
     decisions.forEach((dec, index) => {
@@ -250,7 +250,7 @@ export class StrictModeValidator {
    * @param deps - Dependencies
    * @returns Array of error messages
    */
-  private validateDependencies(deps: DependencySpec[]): string[] {
+  private validateDependencies(deps: Array<Partial<DependencySpec>>): string[] {
     const issues: string[] = [];
 
     deps.forEach((dep, index) => {
@@ -267,7 +267,7 @@ export class StrictModeValidator {
    * @param plans - Future plans
    * @returns Array of error messages
    */
-  private validateFuturePlans(plans: FuturePlan[]): string[] {
+  private validateFuturePlans(plans: Array<Partial<FuturePlan>>): string[] {
     const issues: string[] = [];
 
     plans.forEach((plan, index) => {

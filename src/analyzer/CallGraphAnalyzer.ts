@@ -258,7 +258,7 @@ export class CallGraphAnalyzer {
    * Uses name-based matching with line number as fallback
    */
   private findSymbolNode(sourceFile: ts.SourceFile, symbol: Symbol): ts.Node | null {
-    let foundNode: ts.Node | null = null;
+    const state: { foundNode: ts.Node | null } = { foundNode: null };
     const candidatesByName: ts.Node[] = [];
 
     // Extract method name from "ClassName.methodName" format
@@ -267,7 +267,7 @@ export class CallGraphAnalyzer {
       : symbol.name;
 
     const visitor = (node: ts.Node): void => {
-      if (!node || foundNode) return;
+      if (state.foundNode) return;
 
       try {
         // Check node type first
@@ -288,7 +288,7 @@ export class CallGraphAnalyzer {
 
               if (lineDiff === 0) {
                 // Perfect match
-                foundNode = node;
+                state.foundNode = node;
                 return;
               } else {
                 // Any name match is a candidate
@@ -310,11 +310,11 @@ export class CallGraphAnalyzer {
     visitor(sourceFile);
 
     // If no perfect match, use first candidate
-    if (!foundNode && candidatesByName.length > 0) {
-      foundNode = candidatesByName[0];
+    if (!state.foundNode && candidatesByName.length > 0) {
+      state.foundNode = candidatesByName[0];
     }
 
-    return foundNode;
+    return state.foundNode;
   }
 
   /**

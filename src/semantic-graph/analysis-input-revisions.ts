@@ -382,6 +382,10 @@ function stableJson(value: unknown): string {
   return JSON.stringify(canonicalize(value));
 }
 
+function isUnknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
+}
+
 function canonicalize(value: unknown, seen = new Set<object>()): unknown {
   if (value === null || typeof value === 'string' || typeof value === 'boolean') return value;
   if (typeof value === 'number') {
@@ -389,7 +393,7 @@ function canonicalize(value: unknown, seen = new Set<object>()): unknown {
     return value;
   }
   if (value === undefined) return undefined;
-  if (Array.isArray(value)) {
+  if (isUnknownArray(value)) {
     if (seen.has(value)) throw new Error('Analysis input revisions cannot contain cycles');
     seen.add(value);
     const result = value.map((entry) => {
@@ -425,7 +429,8 @@ function canonicalize(value: unknown, seen = new Set<object>()): unknown {
 }
 
 function immutableJson<T>(value: T): T {
-  return deepFreeze(JSON.parse(stableJson(value)) as T);
+  const parsed: unknown = JSON.parse(stableJson(value));
+  return deepFreeze(parsed as T);
 }
 
 function deepFreeze<T>(value: T): T {

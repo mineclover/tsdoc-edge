@@ -19,7 +19,7 @@ import type {
 /**
  * Parses [[]] document symbols from markdown
  *
- * @doc [[DocumentSymbolSystem#Parser]]
+ * @doc [[DocumentSymbolParser]]
  * @public
  * @responsibility Extract primary, auxiliary, and reference [[]] symbols
  */

@@ -261,14 +261,17 @@ export class EnhancedMarkdownGenerator {
     }
 
     // Group by type
-    const grouped: Record<string, typeof deps> = {};
+    const groupedMap = new Map<string, typeof deps>();
 
     deps.forEach((dep) => {
-      if (!grouped[dep.type]) {
-        grouped[dep.type] = [];
+      const bucket = groupedMap.get(dep.type);
+      if (bucket) {
+        bucket.push(dep);
+      } else {
+        groupedMap.set(dep.type, [dep]);
       }
-      grouped[dep.type].push(dep);
     });
+    const grouped: Record<string, typeof deps> = Object.fromEntries(groupedMap);
 
     Object.keys(grouped).forEach((type) => {
       md += `### ${this.capitalizeFirst(type)} Dependencies\n\n`;
@@ -306,22 +309,25 @@ export class EnhancedMarkdownGenerator {
     let md = `## 6. 🚀 Future Plans\n\n`;
 
     // Group by status
-    const grouped: Record<string, typeof plans> = {};
+    const grouped = new Map<string, typeof plans>();
 
     plans.forEach((plan) => {
-      if (!grouped[plan.status]) {
-        grouped[plan.status] = [];
+      const bucket = grouped.get(plan.status);
+      if (bucket) {
+        bucket.push(plan);
+      } else {
+        grouped.set(plan.status, [plan]);
       }
-      grouped[plan.status].push(plan);
     });
 
     const statusOrder = ['in-progress', 'planned', 'completed', 'cancelled'] as const;
 
     statusOrder.forEach((status) => {
-      if (grouped[status] && grouped[status].length > 0) {
+      const statusPlans = grouped.get(status);
+      if (statusPlans && statusPlans.length > 0) {
         md += `### ${this.getStatusEmoji(status)} ${this.capitalizeFirst(status)}\n\n`;
 
-        grouped[status].forEach((plan) => {
+        statusPlans.forEach((plan) => {
           md += `#### ${plan.id}: ${plan.title}\n\n`;
           if (plan.priority) {
             md += `**Priority**: ${this.getPriorityBadge(plan.priority)}\n\n`;

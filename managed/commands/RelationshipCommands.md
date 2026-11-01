@@ -16,9 +16,9 @@ The relationship commands provide tools for exploring and analyzing the relation
 
 ## Query Commands
 
-### relationship-query
+### [[RelationshipQueryCommand]]
 
-Query relationships for a specific symbol.
+Queries incoming and outgoing unified relationships for a symbol filtered by type, category, and depth.
 
 ```bash
 tsdoc-edge relationship-query <symbol-id> [options]
@@ -29,9 +29,9 @@ tsdoc-edge relationship-query <symbol-id> [options]
 
 **Source**: `src/commands/RelationshipQueryCommand.ts`
 
-### relationship-path
+### [[RelationshipPathCommand]]
 
-Find connection paths between two symbols.
+Finds shortest and filtered dependency connection paths between two symbols in the relationship graph.
 
 ```bash
 tsdoc-edge relationship-path <from> <to> [options]
@@ -53,9 +53,9 @@ tsdoc-edge query-inferred <symbol-id> [options]
 
 ## Analysis Commands
 
-### relationship-impact
+### [[RelationshipImpactCommand]]
 
-Analyze change impact for a symbol.
+Computes direct and transitive downstream/upstream change impact for a given symbol up to a configurable depth.
 
 ```bash
 tsdoc-edge relationship-impact <symbol-id> [options]
@@ -65,9 +65,9 @@ tsdoc-edge relationship-impact <symbol-id> [options]
 
 **Source**: `src/commands/RelationshipImpactCommand.ts`
 
-### relationship-metrics
+### [[RelationshipMetricsCommand]]
 
-Calculate graph metrics (centrality, clustering).
+Calculates graph centrality, degree, betweenness, and hub/bridge importance metrics across symbols.
 
 ```bash
 tsdoc-edge relationship-metrics [options]
@@ -77,9 +77,9 @@ tsdoc-edge relationship-metrics [options]
 
 **Source**: `src/commands/RelationshipMetricsCommand.ts`
 
-### relationship-clusters
+### [[RelationshipClustersCommand]]
 
-Find architectural clusters in the codebase.
+Discovers cohesive architectural clusters and module boundaries within the unified relationship graph.
 
 ```bash
 tsdoc-edge relationship-clusters [options]
@@ -91,9 +91,9 @@ tsdoc-edge relationship-clusters [options]
 
 ## Validation Commands
 
-### relationship-validate
+### [[RelationshipValidateCommand]]
 
-Validate data integrity of relationships.
+Validates referential integrity, endpoint existence, and schema consistency of stored relationship records.
 
 ```bash
 tsdoc-edge relationship-validate [options]
@@ -102,9 +102,9 @@ tsdoc-edge relationship-validate [options]
 
 **Source**: `src/commands/RelationshipValidateCommand.ts`
 
-### relationship-check
+### [[RelationshipCheckCommand]]
 
-Quick safety check before changes.
+Runs a pre-change safety check summarizing high-risk dependents and contract constraints for a target symbol.
 
 ```bash
 tsdoc-edge relationship-check <symbol-id>
@@ -114,9 +114,9 @@ tsdoc-edge relationship-check <symbol-id>
 
 ## Export Commands
 
-### relationship-export
+### [[RelationshipExportCommand]]
 
-Export relationships to various formats.
+Exports symbol relationship subgraphs to JSON, CSV, DOT, and GraphML interchange formats.
 
 ```bash
 tsdoc-edge relationship-export [options]
@@ -127,9 +127,9 @@ tsdoc-edge relationship-export [options]
 
 **Source**: `src/commands/RelationshipExportCommand.ts`
 
-### relationship-visualize
+### [[RelationshipVisualizeCommand]]
 
-Generate Mermaid diagrams from relationships.
+Renders Mermaid relationship diagrams centered on a target symbol with configurable depth and edge filters.
 
 ```bash
 tsdoc-edge relationship-visualize <symbol-id> [options]
@@ -141,9 +141,9 @@ tsdoc-edge relationship-visualize <symbol-id> [options]
 
 ## Utility Commands
 
-### relationship-stats
+### [[RelationshipStatsCommand]]
 
-Show relationship statistics.
+Reports aggregate counts and distributions of stored relationships grouped by type, category, and confidence.
 
 ```bash
 tsdoc-edge relationship-stats [options]
@@ -152,9 +152,9 @@ tsdoc-edge relationship-stats [options]
 
 **Source**: `src/commands/RelationshipStatsCommand.ts`
 
-### relationship-help
+### [[RelationshipHelpCommand]]
 
-Interactive guide for relationship commands.
+Displays interactive usage guidance and workflow recipes for the relationship analysis CLI command suite.
 
 ```bash
 tsdoc-edge relationship-help

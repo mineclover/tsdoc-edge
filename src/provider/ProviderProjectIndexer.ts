@@ -69,9 +69,13 @@ class NormalizedProjectGraphSource implements ProjectGraphSource {
 
   constructor(private readonly input: ProjectGraphInput) {}
 
-  async load(_request: ProjectIndexRequest): Promise<ProjectGraphInput> {
-    return this.input;
+  load(_request: ProjectIndexRequest): Promise<ProjectGraphInput> {
+    return Promise.resolve(this.input);
   }
+}
+
+function isUnknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
 }
 
 function stableJson(value: unknown): string {
@@ -90,8 +94,8 @@ function canonicalize(value: unknown, seen = new Set<object>()): unknown {
   if (seen.has(value)) throw new Error('Provider snapshot cannot contain cycles');
   seen.add(value);
   try {
-    if (Array.isArray(value)) return value.map((entry) => canonicalize(entry, seen));
-    const prototype = Object.getPrototypeOf(value);
+    if (isUnknownArray(value)) return value.map((entry) => canonicalize(entry, seen));
+    const prototype: unknown = Object.getPrototypeOf(value);
     if (prototype !== Object.prototype && prototype !== null) {
       throw new Error('Provider snapshot requires plain JSON objects');
     }
@@ -106,7 +110,8 @@ function canonicalize(value: unknown, seen = new Set<object>()): unknown {
 }
 
 function immutableJson<T>(value: T): T {
-  return deepFreeze(JSON.parse(stableJson(value)) as T);
+  const parsed: unknown = JSON.parse(stableJson(value));
+  return deepFreeze(parsed as T);
 }
 
 function deepFreeze<T>(value: T): T {

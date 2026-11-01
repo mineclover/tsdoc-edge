@@ -336,9 +336,7 @@ export class GraphRepository {
         // stored envelope before it is made active again. Operational
         // provenance is intentionally mutable because it is excluded from the
         // semantic revision identity.
-        if (!this.materializeRevision(existing)) {
-          throw new Error(`Canonical graph revision ${revisionId} disappeared during activation`);
-        }
+        this.materializeRevision(existing);
         persistedAt = existing.stored_at;
         this.database
           .prepare(
@@ -900,7 +898,8 @@ function freezeMetadata(value: CanonicalGraphRevisionMetadata): CanonicalGraphRe
 }
 
 function parseJson<T>(value: string): T {
-  return JSON.parse(value) as T;
+  const parsed: unknown = JSON.parse(value);
+  return parsed as T;
 }
 
 function stableJson(value: unknown): string {
@@ -915,7 +914,7 @@ function canonicalJsonValue(value: unknown, field: string): unknown {
   }
   if (typeof value !== 'object') throw new Error(`${field} contains a non-JSON value`);
   if (Array.isArray(value)) {
-    return value.map((child, index) => canonicalJsonValue(child, `${field}[${index}]`));
+    return value.map((child: unknown, index) => canonicalJsonValue(child, `${field}[${index}]`));
   }
 
   const object = value as Record<string, unknown>;

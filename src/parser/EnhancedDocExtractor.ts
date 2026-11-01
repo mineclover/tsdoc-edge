@@ -210,9 +210,11 @@ export class EnhancedDocExtractor {
       return node.name.text;
     }
     if (ts.isVariableStatement(node)) {
-      const declaration = node.declarationList.declarations[0];
-      if (declaration && ts.isIdentifier(declaration.name)) {
-        return declaration.name.text;
+      if (
+        node.declarationList.declarations.length > 0 &&
+        ts.isIdentifier(node.declarationList.declarations[0].name)
+      ) {
+        return node.declarationList.declarations[0].name.text;
       }
     }
     if (ts.isMethodDeclaration(node) && ts.isIdentifier(node.name)) {

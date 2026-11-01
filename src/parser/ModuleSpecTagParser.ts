@@ -130,7 +130,7 @@ export class ModuleSpecTagParser {
     const operation = operationMatch ? operationMatch[1] : undefined;
     const description = operation ? rest.replace(/\s*\([^)]+\)$/, '').trim() : rest;
 
-    const typeMap: Record<string, SideEffectDoc['type']> = {
+    const typeMap: Record<string, SideEffectDoc['type'] | undefined> = {
       filesystem: 'filesystem',
       fs: 'filesystem',
       file: 'filesystem',
@@ -144,7 +144,7 @@ export class ModuleSpecTagParser {
     };
 
     return {
-      type: typeMap[typeStr] || 'other',
+      type: typeMap[typeStr] ?? 'other',
       description,
       operation,
     };

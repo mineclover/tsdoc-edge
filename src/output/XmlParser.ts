@@ -215,7 +215,7 @@ export class XmlParser {
 
     for (const child of root.children) {
       const sectionName = child.tag;
-      const sectionSchema = this.schema.sections[sectionName];
+      const sectionSchema = lookupRecord(this.schema.sections, sectionName);
 
       if (!sectionSchema) {
         // Skip unknown sections
@@ -284,7 +284,7 @@ export class XmlParser {
 
     for (const child of element.children) {
       const fieldName = child.tag;
-      const fieldSchema = schema[fieldName];
+      const fieldSchema = lookupRecord(schema, fieldName);
 
       if (!fieldSchema) continue;
 
@@ -311,7 +311,7 @@ export class XmlParser {
 
         for (const itemChild of child.children) {
           const fieldName = itemChild.tag;
-          const fieldSchema = schema._items[fieldName];
+          const fieldSchema = lookupRecord(schema._items, fieldName);
 
           if (!fieldSchema) continue;
 
@@ -343,7 +343,7 @@ export class XmlParser {
 
             for (const fieldElement of itemElement.children) {
               const fieldName = fieldElement.tag;
-              const fieldSchema = schema._items[fieldName];
+              const fieldSchema = lookupRecord(schema._items, fieldName);
 
               if (!fieldSchema) continue;
 
@@ -375,4 +375,8 @@ export class XmlParser {
         return value;
     }
   }
+}
+
+function lookupRecord<V>(record: Readonly<Record<string, V>>, key: string): V | undefined {
+  return Object.hasOwn(record, key) ? record[key] : undefined;
 }

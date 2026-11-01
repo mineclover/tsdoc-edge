@@ -29,11 +29,9 @@ export class MarkdownGenerator {
     markdown += `## ${comment.symbolName}\n\n`;
 
     // Add summary
-    if (comment.docComment.summarySection) {
-      const summary = this.renderDocNodes(comment.docComment.summarySection.nodes);
-      if (summary) {
-        markdown += `${summary}\n\n`;
-      }
+    const summary = this.renderDocNodes(comment.docComment.summarySection.nodes);
+    if (summary) {
+      markdown += `${summary}\n\n`;
     }
 
     // Add parameters
@@ -62,7 +60,7 @@ export class MarkdownGenerator {
     }
 
     // Add custom blocks (responsibility, contract, decision, throws, example, etc.)
-    if (comment.docComment.customBlocks && comment.docComment.customBlocks.length > 0) {
+    if (comment.docComment.customBlocks.length > 0) {
       for (const block of comment.docComment.customBlocks) {
         const tagName = block.blockTag.tagName;
         const title = tagName.replace(/^@/, '').replace(/^[a-z]/, (c) => c.toUpperCase());

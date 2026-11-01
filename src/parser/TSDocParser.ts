@@ -93,18 +93,25 @@ export function generateTsdocJson(): {
 }
 
 // TypeScript compiler API internal types
-/**
- * NodeWithJSDoc interface
- * @doc [[TSDocParser]]
- * @public
- */
-interface NodeWithJSDoc extends ts.Node {
-  jsDoc?: ts.JSDoc[];
+function getNodeJsDocs(node: ts.Node): readonly ts.JSDoc[] {
+  if ('jsDoc' in node && Array.isArray(node.jsDoc)) {
+    return node.jsDoc.filter(ts.isJSDoc);
+  }
+  return [];
+}
+
+function isObjectRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isUnknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
 }
 
 /**
  * Parser for extracting and parsing TSDoc comments from TypeScript source files
  *
+ * @doc [[TSDocParser]]
  * @doc [[TSDocStandardSpecification]]
  * @public
  * @responsibility Parse TypeScript files and extract TSDoc comments with custom tag support
@@ -164,10 +171,10 @@ export class TSDocParser {
     if (!fs.existsSync(configPath)) return;
 
     try {
-      const config = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
-      if (Array.isArray(config.tagDefinitions)) {
+      const config: unknown = JSON.parse(fs.readFileSync(configPath, 'utf-8'));
+      if (isObjectRecord(config) && isUnknownArray(config.tagDefinitions)) {
         for (const def of config.tagDefinitions) {
-          if (!def.tagName) continue;
+          if (!isObjectRecord(def) || typeof def.tagName !== 'string' || !def.tagName) continue;
           const tagName = def.tagName.startsWith('@') ? def.tagName : `@${def.tagName}`;
           if (this.configuration.tryGetTagDefinition(tagName) !== undefined) continue;
 
@@ -251,9 +258,9 @@ export class TSDocParser {
     errors: Error[]
   ): void {
     // Check if node has JSDoc comments
-    const jsDocComments = (node as NodeWithJSDoc).jsDoc;
+    const jsDocComments = getNodeJsDocs(node);
 
-    if (jsDocComments && jsDocComments.length > 0) {
+    if (jsDocComments.length > 0) {
       for (const jsDoc of jsDocComments) {
         try {
           // Get the full JSDoc text including /** and */
@@ -292,13 +299,13 @@ export class TSDocParser {
     if (ts.isClassDeclaration(node) && node.name) {
       return node.name.text;
     }
-    if (ts.isInterfaceDeclaration(node) && node.name) {
+    if (ts.isInterfaceDeclaration(node)) {
       return node.name.text;
     }
-    if (ts.isMethodDeclaration(node) && node.name) {
+    if (ts.isMethodDeclaration(node)) {
       return node.name.getText();
     }
-    if (ts.isVariableDeclaration(node) && node.name) {
+    if (ts.isVariableDeclaration(node)) {
       return node.name.getText();
     }
     return 'unknown';

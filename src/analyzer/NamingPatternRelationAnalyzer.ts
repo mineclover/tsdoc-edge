@@ -79,10 +79,7 @@ export class NamingPatternRelationAnalyzer {
     const sites = this.detectDomainGroupings();
 
     for (const site of sites) {
-      const relationship = this.createRelationship(site);
-      if (relationship) {
-        relationships.push(relationship);
-      }
+      relationships.push(this.createRelationship(site));
     }
 
     return relationships;

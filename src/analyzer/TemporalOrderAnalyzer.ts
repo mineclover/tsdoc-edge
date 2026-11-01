@@ -186,7 +186,7 @@ export class TemporalOrderAnalyzer {
     if (!ts.isBlock(block)) return;
 
     const statements = block.statements;
-    if (!statements || statements.length < 2) return;
+    if (statements.length < 2) return;
 
     const callExpressions: { expr: ts.CallExpression; index: number }[] = [];
 
@@ -272,7 +272,7 @@ export class TemporalOrderAnalyzer {
 
         // Look for function calls within the callback
         if (ts.isArrowFunction(callback) || ts.isFunctionExpression(callback)) {
-          if (callback.body && ts.isBlock(callback.body)) {
+          if (ts.isBlock(callback.body)) {
             // Extract calls from the lifecycle callback
             const calls: ts.CallExpression[] = [];
 

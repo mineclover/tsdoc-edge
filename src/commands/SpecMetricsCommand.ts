@@ -72,8 +72,8 @@ Options:
    * @returns Command result
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
@@ -152,7 +152,7 @@ Options:
     console.log();
 
     console.log(`${colors.bold}2. Lifecycle (frontmatter status)${colors.reset}`);
-    const dist = (Object.entries(l.distribution) as Array<[string, number]>)
+    const dist = Object.entries(l.distribution)
       .filter(([, count]) => count > 0)
       .map(([status, count]) => `${status} ${count}`)
       .join(' · ');

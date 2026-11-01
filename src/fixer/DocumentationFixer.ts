@@ -343,7 +343,7 @@ export class DocumentationFixer {
   private getExistingJSDocComment(node: ts.Node, _sourceFile: ts.SourceFile): ts.JSDoc | null {
     // For variable declarations, check the parent VariableStatement
     let targetNode = node;
-    if (ts.isVariableDeclaration(node) && node.parent && node.parent.parent) {
+    if (ts.isVariableDeclaration(node) && ts.isVariableDeclarationList(node.parent)) {
       targetNode = node.parent.parent; // VariableStatement
     }
 
@@ -511,10 +511,9 @@ export class DocumentationFixer {
  */
 function parseDiagnosticCount(fileName: string, text: string): number {
   const sourceFile = ts.createSourceFile(fileName, text, ts.ScriptTarget.Latest, true);
-  return (
-    (sourceFile as ts.SourceFile & { parseDiagnostics?: readonly ts.Diagnostic[] }).parseDiagnostics
-      ?.length ?? 0
-  );
+  return 'parseDiagnostics' in sourceFile && Array.isArray(sourceFile.parseDiagnostics)
+    ? sourceFile.parseDiagnostics.length
+    : 0;
 }
 
 /**
@@ -550,7 +549,7 @@ export function isDocumentableDeclaration(node: ts.Node): boolean {
       : undefined;
   if (!statement || !ts.isVariableStatement(statement)) return false;
   const container = statement.parent;
-  if (!container || !(ts.isSourceFile(container) || ts.isModuleBlock(container))) return false;
+  if (!ts.isSourceFile(container) && !ts.isModuleBlock(container)) return false;
   // Destructuring statements have no single documentable name.
   return statement.declarationList.declarations.every((decl) => ts.isIdentifier(decl.name));
 }

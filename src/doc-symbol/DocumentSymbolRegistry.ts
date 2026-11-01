@@ -17,7 +17,7 @@ import type {
 /**
  * Registry for document symbols with SSOT enforcement
  *
- * @doc [[DocumentSymbolSystem#Registry]]
+ * @doc [[DocumentSymbolRegistry]]
  * @public
  * @responsibility Store and validate document symbols
  *

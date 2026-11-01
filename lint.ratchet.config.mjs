@@ -1,27 +1,19 @@
 /**
- * `@ttsc/lint` ratchet configuration (`npm run lint:ttsc` via `tsconfig.lint.json`).
+ * `@ttsc/lint` production-strict & ratchet configuration (`npm run lint:ttsc` via `tsconfig.lint.json`).
  *
- * Extends `./lint.config.mjs` (all enforced `error` rules) and layers the
- * remaining type-aware `warn` backlog rules. `scripts/verify-ttsc-lint-baseline.cjs`
- * enforces monotonic downward counts against `scripts/ttsc-lint-baseline.json`.
- * When a rule's count reaches 0, promote it to `error` in `lint.config.mjs`.
+ * Extends `./lint.config.mjs` (20 global `error` rules across `src/` and `src/__tests__/`)
+ * and enforces the 5 additional production type-safety rules at `error` severity across `src/`
+ * (graduated from 930 backlog warnings down to 0 findings).
  */
 
 /** @type {import('@ttsc/lint').ITtscLintConfig} */
 export default {
   extends: './lint.config.mjs',
   rules: {
-    // SSOT @doc [[Checkpoint]] target resolution against managed/**/*.md
-    'tsdoc-edge/doc-link-target': 'warn',
-
-    // Promise / async hygiene backlog
-    'typescript/require-await': 'warn',
-
-    // Checker-backed correctness & migration backlog
-    'typescript/no-unnecessary-type-assertion': 'warn',
-    'typescript/no-unnecessary-condition': 'warn',
-    'typescript/no-deprecated': 'warn',
-    'typescript/no-unsafe-argument': 'warn',
-    'typescript/no-unsafe-assignment': 'warn',
+    'typescript/require-await': 'error',
+    'typescript/no-unnecessary-type-assertion': 'error',
+    'typescript/no-unnecessary-condition': 'error',
+    'typescript/no-unsafe-argument': 'error',
+    'typescript/no-unsafe-assignment': 'error',
   },
 };

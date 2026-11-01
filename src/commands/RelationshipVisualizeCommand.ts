@@ -75,8 +75,8 @@ Examples:
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -206,7 +206,7 @@ Examples:
       confidence: r.confidence,
       file_path: r.filePath ?? null,
       line: r.line ?? null,
-      properties: r.properties ? JSON.stringify(r.properties) : null,
+      properties: JSON.stringify(r.properties),
       created_at: r.createdAt,
       updated_at: r.updatedAt,
       description: r.description ?? null,
@@ -252,6 +252,12 @@ Examples:
     }
   }
 
+  private parseSymbolIds(raw: string | null | undefined): string[] {
+    const parsed: unknown = JSON.parse(raw || '[]');
+    const list: readonly unknown[] = Array.isArray(parsed) ? parsed : [];
+    return list.filter((item): item is string => typeof item === 'string');
+  }
+
   /**
    * Generate Mermaid diagram
    */
@@ -276,8 +282,8 @@ Examples:
     symbols.set(symbol.id, { name: symbol.name, type: symbol.type });
 
     for (const rel of relationships) {
-      const fromSymbols = JSON.parse(rel.from_symbols || '[]');
-      const toSymbols = JSON.parse(rel.to_symbols || '[]');
+      const fromSymbols = this.parseSymbolIds(rel.from_symbols);
+      const toSymbols = this.parseSymbolIds(rel.to_symbols);
 
       for (const fromId of fromSymbols) {
         if (fromId && !symbols.has(fromId)) {
@@ -307,8 +313,8 @@ Examples:
 
     // Add relationships
     for (const rel of relationships) {
-      const fromSymbols = JSON.parse(rel.from_symbols || '[]');
-      const toSymbols = JSON.parse(rel.to_symbols || '[]');
+      const fromSymbols = this.parseSymbolIds(rel.from_symbols);
+      const toSymbols = this.parseSymbolIds(rel.to_symbols);
 
       for (const fromId of fromSymbols) {
         for (const toId of toSymbols) {
@@ -356,10 +362,14 @@ Examples:
     symbols.add(symbol.id);
 
     for (const rel of relationships) {
-      const fromSymbols = JSON.parse(rel.from_symbols || '[]');
-      const toSymbols = JSON.parse(rel.to_symbols || '[]');
-      fromSymbols.forEach((id: string) => id && symbols.add(id));
-      toSymbols.forEach((id: string) => id && symbols.add(id));
+      const fromSymbols = this.parseSymbolIds(rel.from_symbols);
+      const toSymbols = this.parseSymbolIds(rel.to_symbols);
+      for (const id of fromSymbols) {
+        if (id) symbols.add(id);
+      }
+      for (const id of toSymbols) {
+        if (id) symbols.add(id);
+      }
     }
 
     // Define nodes
@@ -374,8 +384,8 @@ Examples:
 
     // Add edges
     for (const rel of relationships) {
-      const fromSymbols = JSON.parse(rel.from_symbols || '[]');
-      const toSymbols = JSON.parse(rel.to_symbols || '[]');
+      const fromSymbols = this.parseSymbolIds(rel.from_symbols);
+      const toSymbols = this.parseSymbolIds(rel.to_symbols);
 
       for (const fromId of fromSymbols) {
         for (const toId of toSymbols) {

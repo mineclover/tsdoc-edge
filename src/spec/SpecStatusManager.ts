@@ -295,7 +295,8 @@ ${content}`;
    */
   getAllowedTransitions(filePath: string): SpecStatus[] {
     const currentStatus = this.getCurrentStatus(filePath);
-    return ALLOWED_TRANSITIONS[currentStatus] || [];
+    const transitions: SpecStatus[] | undefined = ALLOWED_TRANSITIONS[currentStatus];
+    return transitions ?? [];
   }
 
   /**

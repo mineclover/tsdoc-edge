@@ -61,7 +61,7 @@ export interface CreateSpecEdgeInput {
 
 /** Create one deterministic durable spec edge. */
 export function createSpecEdge(input: CreateSpecEdgeInput): SpecEdge {
-  const normalized = immutableJson(input, 'spec edge input') as CreateSpecEdgeInput;
+  const normalized = immutableJson(input, 'spec edge input');
   const record = requireRecord(normalized, 'spec edge input');
   assertAllowedKeys(
     record,
@@ -95,7 +95,7 @@ export function createSpecEdge(input: CreateSpecEdgeInput): SpecEdge {
       provenance: normalized.provenance,
     },
     'spec edge'
-  ) as SpecEdge;
+  );
 }
 
 /** Identity of an authored selector independent from a particular resolution. */
@@ -152,7 +152,7 @@ export interface CreatePolicyRevisionInput {
 
 /** Create a content-addressed policy revision shared by every consumer surface. */
 export function createPolicyRevision(input: CreatePolicyRevisionInput): PolicyRevision {
-  const normalized = immutableJson(input, 'policy revision input') as CreatePolicyRevisionInput;
+  const normalized = immutableJson(input, 'policy revision input');
   const record = requireRecord(normalized, 'policy revision input');
   assertAllowedKeys(
     record,
@@ -209,10 +209,7 @@ export function createPolicyRevision(input: CreatePolicyRevisionInput): PolicyRe
 
 /** Validate and create a deterministic compiled spec projection. */
 export function createSpecGraphRevision(input: CreateSpecGraphRevisionInput): SpecGraphRevision {
-  const normalized = immutableJson(
-    input,
-    'spec graph revision input'
-  ) as CreateSpecGraphRevisionInput;
+  const normalized = immutableJson(input, 'spec graph revision input');
   const record = requireRecord(normalized, 'spec graph revision input');
   assertAllowedKeys(
     record,
@@ -401,11 +398,11 @@ function validateBindingDeclaration(
   validateSourceAnchor(binding.source, `${label} source`);
   validateSpecProvenance(binding.provenance, `${label} provenance`);
 
-  const specNode = nodes.get(binding.specNodeId as string);
+  const specNode = nodes.get(binding.specNodeId);
   if (!specNode) {
     throw new Error(`Binding ${binding.id} references unknown spec node ${binding.specNodeId}`);
   }
-  validateBindingSpecNodeKind(binding.kind, specNode.kind, binding.id as string);
+  validateBindingSpecNodeKind(binding.kind, specNode.kind, binding.id);
 
   switch (binding.kind) {
     case 'implementation':
@@ -571,7 +568,7 @@ function validateSelector(
     case 'spec-node':
       assertAllowedKeys(record, ['type', 'workspaceId', 'specNodeId'], label);
       requireNonEmpty(record.specNodeId, `${label} specNodeId`);
-      if (nodes && !nodes.has(record.specNodeId as string)) {
+      if (nodes && !nodes.has(record.specNodeId)) {
         throw new Error(`${label} references unknown spec node ${record.specNodeId}`);
       }
       return;
@@ -709,7 +706,7 @@ function normalizePolicySuppression(value: unknown, label: string): PolicySuppre
   requireNonEmpty(suppression.reason, `${label} reason`);
   const target = requireRecord(suppression.target, `${label} target`);
   requireNonEmpty(target.workspaceId, `${label} target workspaceId`);
-  validateSelector(suppression.target, target.workspaceId as string, undefined, `${label} target`);
+  validateSelector(suppression.target, target.workspaceId, undefined, `${label} target`);
   const expiresAt =
     suppression.expiresAt === undefined
       ? undefined
@@ -723,7 +720,7 @@ function normalizePolicySuppression(value: unknown, label: string): PolicySuppre
       ...(expiresAt ? { expiresAt } : {}),
     },
     label
-  ) as PolicySuppression;
+  );
 }
 
 function validatePolicyProvenance(value: unknown): asserts value is PolicyProvenance {
@@ -964,14 +961,15 @@ function canonicalJson(value: unknown, ancestors: Set<object>, path: string): un
       if (!descriptor?.enumerable || descriptor.get || descriptor.set) {
         throw new Error(`${path}[${index}] must be an enumerable JSON data property`);
       }
-      return canonicalJson(descriptor.value, ancestors, `${path}[${index}]`);
+      const entryValue: unknown = descriptor.value;
+      return canonicalJson(entryValue, ancestors, `${path}[${index}]`);
     });
     ancestors.delete(value);
     return Object.freeze(clone);
   }
   if (typeof value === 'object') {
     const object = value as Record<string, unknown>;
-    const prototype = Object.getPrototypeOf(object);
+    const prototype: unknown = Object.getPrototypeOf(object);
     if (prototype !== Object.prototype && prototype !== null) {
       throw new Error(`${path} requires plain JSON objects`);
     }
@@ -987,8 +985,9 @@ function canonicalJson(value: unknown, ancestors: Set<object>, path: string): un
       if (!descriptor.enumerable || descriptor.get || descriptor.set) {
         throw new Error(`${path}.${key} must be an enumerable JSON data property`);
       }
+      const propValue: unknown = descriptor.value;
       Object.defineProperty(clone, key, {
-        value: canonicalJson(descriptor.value, ancestors, `${path}.${key}`),
+        value: canonicalJson(propValue, ancestors, `${path}.${key}`),
         enumerable: true,
         configurable: true,
         writable: true,

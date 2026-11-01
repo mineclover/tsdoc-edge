@@ -336,11 +336,19 @@ export class ExposureAnalyzer {
     }
 
     try {
-      const packageJson = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+      const parsed: unknown = JSON.parse(fs.readFileSync(packageJsonPath, 'utf-8'));
+      const packageJson = parsed as {
+        name?: string;
+        exports?: PackageExportConfig['exports'];
+        main?: string;
+        module?: string;
+        types?: string;
+      };
       const config: PackageExportConfig = {
         packageName: packageJson.name || '',
         packageRoot,
-        exports: packageJson.exports || {},
+        exports:
+          packageJson.exports && typeof packageJson.exports === 'object' ? packageJson.exports : {},
         main: packageJson.main,
         module: packageJson.module,
         types: packageJson.types,
@@ -357,7 +365,7 @@ export class ExposureAnalyzer {
    * Check if symbol is package export
    */
   private isPackageExport(symbol: Symbol, packageConfig: PackageExportConfig): boolean {
-    if (!packageConfig.exports || Object.keys(packageConfig.exports).length === 0) {
+    if (Object.keys(packageConfig.exports).length === 0) {
       return false;
     }
 

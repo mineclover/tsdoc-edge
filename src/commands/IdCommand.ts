@@ -77,8 +77,8 @@ export class IdCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -91,20 +91,20 @@ export class IdCommand extends BaseCommand {
 
       switch (subcommand) {
         case 'new':
-          return await this.handleNew(manager, args);
+          return this.handleNew(manager, args);
         case 'list':
-          return await this.handleList(manager, args);
+          return this.handleList(manager, args);
         case 'find':
-          return await this.handleFind(manager, args);
+          return this.handleFind(manager, args);
         case 'stats':
-          return await this.handleStats(manager, args);
+          return this.handleStats(manager, args);
         default:
           return this.showHelp();
       }
     });
   }
 
-  private async handleNew(manager: SymbolRegistryManager, args: string[]): Promise<CommandResult> {
+  private handleNew(manager: SymbolRegistryManager, args: string[]): CommandResult {
     // Filter out subcommand and flags
     const positionalArgs = args.slice(1).filter((arg) => !arg.startsWith('--'));
     const filePath = positionalArgs[0];
@@ -193,7 +193,7 @@ export class IdCommand extends BaseCommand {
     return { exitCode: 0, message: `ID generated: ${id}` };
   }
 
-  private async handleList(manager: SymbolRegistryManager, args: string[]): Promise<CommandResult> {
+  private handleList(manager: SymbolRegistryManager, args: string[]): CommandResult {
     const entries = manager.getAll();
 
     // If registry is empty, show symbols from database
@@ -240,7 +240,7 @@ export class IdCommand extends BaseCommand {
     return { exitCode: 0, message: `Listed ${entries.length} entries` };
   }
 
-  private async handleListFromDatabase(args: string[]): Promise<CommandResult> {
+  private handleListFromDatabase(args: string[]): CommandResult {
     const dbCheck = this.checkDatabaseExists();
     if (dbCheck) {
       console.log(`${colors.yellow}No registry entries and no database found.${colors.reset}`);
@@ -315,7 +315,7 @@ export class IdCommand extends BaseCommand {
     }
   }
 
-  private async handleFind(manager: SymbolRegistryManager, args: string[]): Promise<CommandResult> {
+  private handleFind(manager: SymbolRegistryManager, args: string[]): CommandResult {
     // Filter out subcommand and flags
     const positionalArgs = args.slice(1).filter((arg) => !arg.startsWith('--'));
     const id = positionalArgs[0];
@@ -369,7 +369,7 @@ export class IdCommand extends BaseCommand {
     return this.handleFindFromDatabase(id, args);
   }
 
-  private async handleFindFromDatabase(idOrName: string, args: string[]): Promise<CommandResult> {
+  private handleFindFromDatabase(idOrName: string, args: string[]): CommandResult {
     const dbCheck = this.checkDatabaseExists();
     if (dbCheck) {
       console.log(`${colors.red}❌ ID not found: ${idOrName}${colors.reset}`);
@@ -484,10 +484,7 @@ export class IdCommand extends BaseCommand {
     }
   }
 
-  private async handleStats(
-    manager: SymbolRegistryManager,
-    args: string[]
-  ): Promise<CommandResult> {
+  private handleStats(manager: SymbolRegistryManager, args: string[]): CommandResult {
     const stats = manager.getStats();
 
     if (this.hasFlag(args, '--human')) {

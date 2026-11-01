@@ -69,12 +69,12 @@ Validator System은 코드와 문서의 품질을 다양한 관점에서 검증�
 SSOT 연결성을 분석하고 검증
 
 ```typescript
+import type { SymbolSearchEngine } from '../graph/SymbolSearchEngine';
+
 /**
  * @doc [[Validator System]]
  * @functionality 연결성 분석, 끊어진 링크 탐지, 품질 점수 계산
- * @depends SymbolSearchEngine
- * @depType runtime
- * @depReason 심볼 검색 및 필터링
+ * @context SymbolSearchEngine을 통해 그래프 내 심볼 검색 및 필터링 수행
  */
 class ConnectivityValidator {
   analyze(): ConnectivityAnalysis
@@ -129,11 +129,11 @@ class StrictModeValidator {
 모듈 명세 완성도 검증
 
 ```typescript
+import type { ModuleSpecTagParser } from '../parser/ModuleSpecTagParser';
+
 /**
  * @doc [[Validator System]]
- * @depends ModuleSpecTagParser
- * @depType runtime
- * @depReason 명세 태그 파싱 결과 사용
+ * @context ModuleSpecTagParser가 추출한 7-part 명세 태그 파싱 결과를 검증
  */
 class ModuleSpecValidator {
   validate(spec: ModuleSpecTemplate): ModuleSpecValidationResult
@@ -143,6 +143,12 @@ class ModuleSpecValidator {
 ```
 
 **Source**: `src/validator/ModuleSpecValidator.ts`
+
+### [[GeneratedDocsValidator]]
+
+생성된 마크다운 문서의 구조적 완성도와 원본 TypeScript TSDoc 주석과의 동기화 상태를 검증합니다.
+
+**Source**: `src/validator/GeneratedDocsValidator.ts`
 
 ---
 

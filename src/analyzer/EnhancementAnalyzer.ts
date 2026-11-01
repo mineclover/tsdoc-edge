@@ -170,17 +170,19 @@ export class EnhancementAnalyzer {
     if (ts.isClassDeclaration(node) && node.name) {
       return node.name.text;
     }
-    if (ts.isInterfaceDeclaration(node) && node.name) {
+    if (ts.isInterfaceDeclaration(node)) {
       return node.name.text;
     }
-    if (ts.isTypeAliasDeclaration(node) && node.name) {
+    if (ts.isTypeAliasDeclaration(node)) {
       return node.name.text;
     }
-    if (ts.isMethodDeclaration(node) && node.name && ts.isIdentifier(node.name)) {
+    if (ts.isMethodDeclaration(node) && ts.isIdentifier(node.name)) {
       return node.name.text;
     }
     if (ts.isVariableStatement(node)) {
-      const declaration = node.declarationList.declarations[0];
+      const declaration = node.declarationList.declarations[0] as
+        | ts.VariableDeclaration
+        | undefined;
       if (declaration && ts.isIdentifier(declaration.name)) {
         return declaration.name.text;
       }

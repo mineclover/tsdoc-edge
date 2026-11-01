@@ -198,7 +198,8 @@ export class CoverageParser {
     let data: IstanbulCoverageData;
 
     try {
-      data = JSON.parse(content) as IstanbulCoverageData;
+      const parsed: unknown = JSON.parse(content);
+      data = parsed as IstanbulCoverageData;
     } catch (error) {
       throw new Error(`Invalid JSON in coverage file: ${error}`);
     }

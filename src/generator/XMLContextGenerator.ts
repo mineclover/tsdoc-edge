@@ -109,15 +109,17 @@ export class XMLContextGenerator {
   private groupByType(
     deps: Array<{ symbolName: string; relationship: string }>
   ): Record<string, typeof deps> {
-    return deps.reduce(
-      (acc, item) => {
-        const key = item.relationship;
-        if (!acc[key]) acc[key] = [];
-        acc[key].push(item);
-        return acc;
-      },
-      {} as Record<string, typeof deps>
-    );
+    const groups = new Map<string, typeof deps>();
+    for (const item of deps) {
+      const key = item.relationship;
+      const existing = groups.get(key);
+      if (existing) {
+        existing.push(item);
+      } else {
+        groups.set(key, [item]);
+      }
+    }
+    return Object.fromEntries(groups);
   }
 
   private escape(str: string): string {

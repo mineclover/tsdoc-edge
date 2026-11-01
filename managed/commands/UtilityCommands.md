@@ -32,9 +32,9 @@ tsdoc-edge context-to-llm <file> [options]
 
 **Source**: `src/commands/ContextToLLMCommand.ts`
 
-### design-context
+### [[DesignContextCommand]]
 
-Show design decisions for a file.
+Displays inline ADR decisions (`@decision`, `@rationale`, `@consequences`) and `@contract` invariants for a target file.
 
 ```bash
 tsdoc-edge design-context <file>
@@ -74,9 +74,9 @@ tsdoc-edge doc-symbols [path]
 
 **Source**: `src/commands/DocSymbolsCommand.ts`
 
-### generate-docs
+### [[GenerateDocsCommand]]
 
-Generate markdown documentation.
+Generates Markdown API and enhanced 6-category symbol documentation from annotated TypeScript sources.
 
 ```bash
 tsdoc-edge generate-docs [path] [options]
@@ -84,9 +84,9 @@ tsdoc-edge generate-docs [path] [options]
 
 **Source**: `src/commands/GenerateDocsCommand.ts`
 
-### validate-generated-docs
+### [[ValidateGeneratedDocsCommand]]
 
-Validate generated documentation.
+Verifies that generated Markdown documentation remains synchronized with current TypeScript TSDoc comments.
 
 ```bash
 tsdoc-edge validate-generated-docs [path]
@@ -94,11 +94,21 @@ tsdoc-edge validate-generated-docs [path]
 
 **Source**: `src/commands/ValidateGeneratedDocsCommand.ts`
 
+### [[ValidateTsdocCommand]]
+
+Validates all TypeScript TSDoc comments and `tsdoc.json` strictly against `@microsoft/tsdoc` v0 rules.
+
+```bash
+tsdoc-edge validate-tsdoc [path] [--strict] [--json]
+```
+
+**Source**: `src/commands/ValidateTsdocCommand.ts`
+
 ## Symbol ID Commands
 
-### id
+### [[IdCommand]]
 
-Manage symbol IDs.
+Queries, validates, and manages symbol identity entries in the workspace symbol registry.
 
 ```bash
 tsdoc-edge id <action> [options]
@@ -106,19 +116,19 @@ tsdoc-edge id <action> [options]
 
 **Source**: `src/commands/IdCommand.ts`
 
-### id-new
+### [[IdNewCommand]]
 
-Generate new symbol ID.
+Allocates a new unique symbol identifier in the JSONL symbol registry.
 
 ```bash
 tsdoc-edge id-new [name]
 ```
 
-**Source**: `src/commands/IdNewCommand.ts`
+**Source**: `src/commands/InitCommand.ts`
 
-### symbol-rename
+### [[SymbolRenameCommand]]
 
-Rename a symbol across the codebase.
+Renames a `[[Symbol]]` document checkpoint and updates all incoming Markdown and `@doc` references atomically.
 
 ```bash
 tsdoc-edge symbol-rename <old> <new>
@@ -138,9 +148,9 @@ tsdoc-edge find-method <name>
 
 **Source**: `src/commands/FindMethodCommand.ts`
 
-### core-api
+### [[CoreApiCommand]]
 
-Show core API symbols.
+Lists public exported API symbols alongside their immediate upstream and downstream dependencies.
 
 ```bash
 tsdoc-edge core-api [options]
@@ -148,9 +158,9 @@ tsdoc-edge core-api [options]
 
 **Source**: `src/commands/CoreApiCommand.ts`
 
-### check-duplicates
+### [[CheckDuplicatesCommand]]
 
-Check for duplicate content.
+Scans managed Markdown specifications for duplicate or near-duplicate content using similarity thresholds.
 
 ```bash
 tsdoc-edge check-duplicates [path]
@@ -178,9 +188,19 @@ tsdoc-edge without-responsibility [path]
 
 **Source**: `src/commands/WithoutResponsibilityCommand.ts`
 
-### fix
+### [[LintCommand]]
 
-Auto-fix common issues.
+Runs unified TSDoc syntax, convention, and documentation connectivity checks across TypeScript sources.
+
+```bash
+tsdoc-edge lint [path] [options]
+```
+
+**Source**: `src/commands/LintCommand.ts`
+
+### [[FixCommand]]
+
+Automatically repairs common TSDoc formatting, missing modifier, and document link issues in target files.
 
 ```bash
 tsdoc-edge fix [path] [options]
@@ -188,9 +208,9 @@ tsdoc-edge fix [path] [options]
 
 **Source**: `src/commands/FixCommand.ts`
 
-### improve
+### [[ImproveCommand]]
 
-Improve documentation quality.
+Analyzes documentation gaps and guides iterative TSDoc quality improvements across a source directory.
 
 ```bash
 tsdoc-edge improve [path]
@@ -198,11 +218,11 @@ tsdoc-edge improve [path]
 
 **Source**: `src/commands/ImproveCommand.ts`
 
-## Planning Commands
+## Planning & Task Commands
 
-### plans
+### [[PlansCommand]]
 
-Show future plans from documentation.
+Lists structured engineering backlog plans extracted from `@privateRemarks` and enhanced symbol documentation.
 
 ```bash
 tsdoc-edge plans [path]
@@ -210,15 +230,25 @@ tsdoc-edge plans [path]
 
 **Source**: `src/commands/PlansCommand.ts`
 
-### todos
+### [[TodosCommand]]
 
-Show TODO items from code.
+Aggregates and lists engineering `TODO` items extracted from `@privateRemarks` across indexed files.
 
 ```bash
 tsdoc-edge todos [path]
 ```
 
 **Source**: `src/commands/TodosCommand.ts`
+
+### [[TaskCommands]]
+
+Provides CLI subcommands for tracking and updating documentation and refactoring task checklists.
+
+```bash
+tsdoc-edge task <list|add|done> [options]
+```
+
+**Source**: `src/commands/TaskCommands.ts`
 
 ## Ontology Commands
 
@@ -244,6 +274,16 @@ tsdoc-edge ontology-stats
 
 ## System Commands
 
+### [[SystemStatusCommand]]
+
+Displays an executive summary of database state, indexed symbol counts, doc checkpoints, and health scores.
+
+```bash
+tsdoc-edge system-status
+```
+
+**Source**: `src/commands/SystemStatusCommand.ts`
+
 ### scan
 
 Scan directory for TypeScript files.
@@ -254,9 +294,9 @@ tsdoc-edge scan <path>
 
 **Source**: `src/commands/ScanCommand.ts`
 
-### sync-coverage
+### [[SyncCoverageCommand]]
 
-Sync Istanbul coverage data.
+Parses Istanbul/NYC coverage reports and persists source-identified execution metrics with optional canonical graph projection.
 
 ```bash
 tsdoc-edge sync-coverage [coverage-file] [options]
@@ -311,9 +351,9 @@ tsdoc-edge coverage-baseline read \
 
 **Source**: `src/commands/CoverageBaselineCommand.ts`
 
-### test-examples
+### [[TestExamplesCommand]]
 
-Extract test examples from code.
+Extracts and displays executable code examples mined from unit and integration test suites.
 
 ```bash
 tsdoc-edge test-examples [path]
@@ -341,9 +381,9 @@ tsdoc-edge rename <from> <to>
 
 **Source**: `src/commands/RenameCommand.ts`
 
-### rebuild-index
+### [[RebuildIndexCommand]]
 
-Rebuild FTS5 indexes.
+Rebuilds SQLite FTS5 full-text search indexes for symbols and unified relationships.
 
 ```bash
 tsdoc-edge rebuild-index
@@ -353,9 +393,9 @@ tsdoc-edge rebuild-index
 
 ## Hook Commands
 
-### install-hook
+### [[InstallHookCommand]]
 
-Install pre-commit hook.
+Installs the TSDoc Edge Git `pre-commit` quality gate hook into the local repository.
 
 ```bash
 tsdoc-edge install-hook
@@ -363,9 +403,19 @@ tsdoc-edge install-hook
 
 **Source**: `src/commands/InstallHookCommand.ts`
 
-### uninstall-hook
+### [[PreCommitRunCommand]]
 
-Uninstall pre-commit hook.
+Executes `PreCommitChecker` validation against staged files during Git `pre-commit` hook runs.
+
+```bash
+tsdoc-edge pre-commit-run
+```
+
+**Source**: `src/commands/PreCommitRunCommand.ts`
+
+### [[UninstallHookCommand]]
+
+Removes the TSDoc Edge Git `pre-commit` hook cleanly from `.git/hooks`.
 
 ```bash
 tsdoc-edge uninstall-hook

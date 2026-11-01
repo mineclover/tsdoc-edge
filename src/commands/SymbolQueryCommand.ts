@@ -107,8 +107,8 @@ export class SymbolQueryCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag before processing
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -121,7 +121,7 @@ export class SymbolQueryCommand extends BaseCommand {
 
       // Build symbol index
       this.printInfo('Building symbol index...');
-      await this.buildIndex(docsDir);
+      this.buildIndex(docsDir);
       console.log();
 
       // Execute subcommand
@@ -147,7 +147,7 @@ export class SymbolQueryCommand extends BaseCommand {
   /**
    * Build symbol index from documentation
    */
-  private async buildIndex(docsDir: string): Promise<void> {
+  private buildIndex(docsDir: string): void {
     const files = this.findMarkdownFiles(docsDir);
 
     for (const filePath of files) {

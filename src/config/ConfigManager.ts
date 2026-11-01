@@ -87,7 +87,8 @@ export class ConfigManager {
 
     try {
       const content = fs.readFileSync(this.configPath, 'utf-8');
-      const userConfig = JSON.parse(content) as Partial<TsdocEdgeConfig>;
+      const parsed: unknown = JSON.parse(content);
+      const userConfig = parsed as Partial<TsdocEdgeConfig>;
       return this.mergeConfig(DEFAULT_CONFIG, userConfig);
     } catch (error) {
       if (error instanceof SyntaxError) {
@@ -367,7 +368,7 @@ export class ConfigManager {
     section: K,
     value: Partial<TsdocEdgeConfig[K]>
   ): void {
-    this.config[section] = { ...this.config[section], ...value } as TsdocEdgeConfig[K];
+    this.config[section] = { ...this.config[section], ...value };
     this.save(this.config);
   }
 }

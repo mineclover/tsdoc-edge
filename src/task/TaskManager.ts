@@ -30,14 +30,13 @@ export class TaskManager {
 
   constructor(dbManager: DatabaseManager) {
     this.dbManager = dbManager;
-    this.dbManager.ensureTasksTable();
   }
 
   /**
    * Generate unique task ID
    */
   private generateId(): string {
-    return `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+    return `task-${Date.now()}-${Math.random().toString(36).slice(2, 11)}`;
   }
 
   /**
@@ -310,12 +309,19 @@ export class TaskManager {
       actualHours: row.actualHours || undefined,
       dueDate: row.dueDate || undefined,
       parentId: row.parentId || undefined,
-      dependencies: row.dependencies ? JSON.parse(row.dependencies) : undefined,
-      tags: row.tags ? JSON.parse(row.tags) : undefined,
+      dependencies: row.dependencies ? parseStringArray(row.dependencies) : undefined,
+      tags: row.tags ? parseStringArray(row.tags) : undefined,
       createdAt: row.createdAt,
       updatedAt: row.updatedAt,
       completedAt: row.completedAt || undefined,
       notes: row.notes || undefined,
     };
   }
+}
+
+function parseStringArray(json: string): string[] {
+  const parsed: unknown = JSON.parse(json);
+  return Array.isArray(parsed)
+    ? parsed.filter((item): item is string => typeof item === 'string')
+    : [];
 }

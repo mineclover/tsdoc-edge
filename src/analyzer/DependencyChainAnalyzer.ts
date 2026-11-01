@@ -379,7 +379,7 @@ export class DependencyChainAnalyzer {
       const length = rel.properties?.cycleLength || 0;
       byLength[length] = (byLength[length] || 0) + 1;
 
-      const involvedSymbols = (rel.properties?.involvedSymbols as string[]) || [];
+      const involvedSymbols = rel.properties?.involvedSymbols ?? [];
       for (const sym of involvedSymbols) {
         affectedSymbols.add(sym);
       }

@@ -229,6 +229,7 @@ export function createDerivedTopologyEdge(
     derivation,
   });
 
+  const emptyList: readonly [] = Object.freeze([]);
   const edge: DerivedTopologyEdge = Object.freeze({
     contractVersion: FACT_TOPOLOGY_CONTRACT_VERSION,
     id,
@@ -237,10 +238,10 @@ export function createDerivedTopologyEdge(
     from,
     to,
     ...(semanticQualifier ? { semanticQualifier } : {}),
-    occurrenceIds: Object.freeze([]) as readonly [],
+    occurrenceIds: emptyList,
     occurrenceCount: 0 as const,
     confidence,
-    contributions: Object.freeze([]) as readonly [],
+    contributions: emptyList,
     derivation,
     provenance,
   });
@@ -402,8 +403,8 @@ function aggregateCompilerFacts(
       .sort(([left], [right]) => compareText(left, right))
       .map(([id, facts]) => {
         const ordered = facts.sort((left, right) => compareText(left.id, right.id));
+        if (ordered.length === 0) throw new Error(`Topology edge ${id} has no occurrences`);
         const first = ordered[0];
-        if (!first) throw new Error(`Topology edge ${id} has no occurrences`);
         const occurrenceIds = Object.freeze(ordered.map((fact) => fact.id)) as readonly [
           string,
           ...string[],
@@ -617,6 +618,10 @@ function jsonRecord(
   return canonicalJsonClone(value, field);
 }
 
+function isUnknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
+}
+
 function canonicalJsonClone<T>(value: T, field: string, ancestors = new WeakSet<object>()): T {
   if (value === null || typeof value === 'string' || typeof value === 'boolean') return value;
   if (typeof value === 'number') {
@@ -627,12 +632,12 @@ function canonicalJsonClone<T>(value: T, field: string, ancestors = new WeakSet<
   if (ancestors.has(value)) throw new Error(`${field} contains a circular value`);
   ancestors.add(value);
   try {
-    if (Array.isArray(value)) {
+    if (isUnknownArray(value)) {
       return Object.freeze(
         value.map((entry, index) => canonicalJsonClone(entry, `${field}[${index}]`, ancestors))
       ) as T;
     }
-    const prototype = Object.getPrototypeOf(value);
+    const prototype: unknown = Object.getPrototypeOf(value);
     if (prototype !== Object.prototype && prototype !== null) {
       throw new Error(`${field} contains a non-JSON object`);
     }

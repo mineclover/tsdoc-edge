@@ -11,7 +11,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 /**
  * ValidateSpecCommand - Validate specifications
  * @public
- * @doc [[Validate Spec Command]]
+ * @doc [[ValidateSpecCommand]]
  * @doc [[CLI Commands#validate-spec]]
  */
 export class ValidateSpecCommand extends BaseCommand {
@@ -61,8 +61,8 @@ export class ValidateSpecCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -179,6 +179,6 @@ export class ValidateSpecCommand extends BaseCommand {
 /**
  * GenerateDocsCommand - Generate markdown docs from enhanced docs
  * @public
- * @doc [[Generate Docs Command]]
+ * @doc [[GenerateDocsCommand]]
  * @doc [[CLI Commands#generate-docs]]
  */

@@ -299,7 +299,7 @@ export function parseConventionFixPlanBundle(raw: unknown): ConventionFixPlanBun
       detail: `Unsupported fix-plan bundle contractVersion: ${contractVersion}`,
     };
   }
-  if (!Array.isArray(plans)) {
+  if (!isUnknownArray(plans)) {
     return {
       ok: false,
       reason: 'malformed-plan',
@@ -307,6 +307,10 @@ export function parseConventionFixPlanBundle(raw: unknown): ConventionFixPlanBun
     };
   }
   return { ok: true, rawPlans: Object.freeze([...plans]) };
+}
+
+function isUnknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
 }
 
 /**
@@ -765,7 +769,7 @@ function parseRetainedFixPlan(rawPlan: unknown):
       'Fix plan codeRevisionId must be a non-empty string'
     );
   }
-  if (!Array.isArray(rawPlan.targets) || rawPlan.targets.length === 0) {
+  if (!isUnknownArray(rawPlan.targets) || rawPlan.targets.length === 0) {
     return reject(rawPlan.planId, 'malformed-plan', 'Fix plan targets must be a non-empty array');
   }
 
@@ -856,7 +860,7 @@ function parseFixFileTarget(
       detail: 'Fix plan target expectedVersion must be a non-negative integer',
     };
   }
-  if (!Array.isArray(edits) || edits.length === 0) {
+  if (!isUnknownArray(edits) || edits.length === 0) {
     return {
       ok: false,
       planId,
@@ -1219,7 +1223,6 @@ function validateAndOrderEdits(
   for (let index = 1; index < ordered.length; index += 1) {
     const previous = ordered[index - 1];
     const current = ordered[index];
-    if (!previous || !current) continue;
     if (
       comparePositions(previous.range.start, current.range.start) === 0 &&
       comparePositions(previous.range.end, current.range.end) === 0 &&

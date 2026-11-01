@@ -12,7 +12,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 /**
  * GenerateDocsCommand - Generate enhanced docs
  * @public
- * @doc [[Generate Docs Command]]
+ * @doc [[GenerateDocsCommand]]
  * @doc [[CLI Commands#generate-docs]]
  */
 export class GenerateDocsCommand extends BaseCommand {
@@ -65,8 +65,8 @@ export class GenerateDocsCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();

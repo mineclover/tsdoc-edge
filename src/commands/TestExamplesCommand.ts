@@ -98,10 +98,10 @@ Examples:
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     // Check for help flag first
     if (this.hasHelpFlag(args)) {
-      return this.displayHelp();
+      return Promise.resolve(this.displayHelp());
     }
 
     // Parse options
@@ -114,7 +114,7 @@ Examples:
 
     try {
       const dbCheck = this.checkDatabaseExists();
-      if (dbCheck) return dbCheck;
+      if (dbCheck) return Promise.resolve(dbCheck);
 
       const _config = this.configManager.get();
       const dbPath = this.getDatabasePath();
@@ -187,7 +187,7 @@ Examples:
       if (examples.length === 0) {
         this.printWarning('No examples found matching criteria');
         dbManager.close();
-        return { exitCode: 0, message: 'No examples found' };
+        return Promise.resolve({ exitCode: 0, message: 'No examples found' });
       }
 
       this.printSection(`🌟 Top Examples (showing ${Math.min(examples.length, 20)})`);
@@ -241,12 +241,12 @@ Examples:
 
       dbManager.close();
 
-      return { exitCode: 0, message: 'Examples extracted' };
+      return Promise.resolve({ exitCode: 0, message: 'Examples extracted' });
     } catch (error) {
       this.printError(
         `Failed to extract examples: ${error instanceof Error ? error.message : String(error)}`
       );
-      return { exitCode: 1, message: 'Extraction failed' };
+      return Promise.resolve({ exitCode: 1, message: 'Extraction failed' });
     }
   }
 

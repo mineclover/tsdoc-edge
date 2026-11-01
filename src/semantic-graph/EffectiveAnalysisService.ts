@@ -607,6 +607,14 @@ function codeRelationPlane(value: unknown): Extract<EndpointRef, { type: 'code-e
   return value === 'producer-derived' || value === 'router-derived' ? value : 'compiler-fact';
 }
 
+function isUnknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
+}
+
+function isObjectRecord(value: unknown): value is Readonly<Record<string, unknown>> {
+  return typeof value === 'object' && value !== null;
+}
+
 function codeEdgeOccurrenceIds(edge: Readonly<Record<string, unknown>>): readonly string[] {
   const ids = new Set<string>();
   const add = (value: unknown): void => {
@@ -614,11 +622,11 @@ function codeEdgeOccurrenceIds(edge: Readonly<Record<string, unknown>>): readonl
     if (id) ids.add(id);
   };
   add(edge.occurrenceId);
-  if (Array.isArray(edge.occurrenceIds)) edge.occurrenceIds.forEach(add);
-  if (Array.isArray(edge.providerOccurrences)) {
+  if (isUnknownArray(edge.occurrenceIds)) edge.occurrenceIds.forEach(add);
+  if (isUnknownArray(edge.providerOccurrences)) {
     for (const value of edge.providerOccurrences) {
-      if (value && typeof value === 'object') {
-        add((value as Record<string, unknown>).occurrenceId);
+      if (isObjectRecord(value)) {
+        add(value.occurrenceId);
       }
     }
   }
@@ -926,7 +934,8 @@ function canonicalize(value: unknown): unknown {
 }
 
 function immutableJson<T>(value: T): T {
-  return deepFreeze(JSON.parse(JSON.stringify(strictCanonicalize(value))) as T);
+  const parsed: unknown = JSON.parse(JSON.stringify(strictCanonicalize(value)));
+  return deepFreeze(parsed as T);
 }
 
 function strictCanonicalize(value: unknown, seen = new Set<object>()): unknown {
@@ -942,8 +951,8 @@ function strictCanonicalize(value: unknown, seen = new Set<object>()): unknown {
   if (seen.has(value)) throw new Error('Effective analysis inputs cannot contain cycles');
   seen.add(value);
   try {
-    if (Array.isArray(value)) return value.map((entry) => strictCanonicalize(entry, seen));
-    const prototype = Object.getPrototypeOf(value);
+    if (isUnknownArray(value)) return value.map((entry) => strictCanonicalize(entry, seen));
+    const prototype: unknown = Object.getPrototypeOf(value);
     if (prototype !== Object.prototype && prototype !== null) {
       throw new Error('Effective analysis inputs require plain JSON objects');
     }

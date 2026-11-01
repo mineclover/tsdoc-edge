@@ -85,11 +85,11 @@ class SymbolGraphBuilder {
 다중 조건 기반 심볼 검색 엔진
 
 ```typescript
+import type { SymbolGraphBuilder } from './SymbolGraphBuilder';
+
 /**
  * @doc [[Symbol Graph System]]
- * @depends SymbolGraphBuilder
- * @depType runtime
- * @depReason 그래프 데이터 조회
+ * @context SymbolGraphBuilder와 @ttsc/graph 인덱스에서 그래프 데이터를 조회
  */
 class SymbolSearchEngine {
   search(query: SymbolQuery): SymbolQueryResult

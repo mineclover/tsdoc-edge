@@ -13,8 +13,11 @@ import type { CommentState, FileCommentState } from '../types/state';
  * NodeWithJSDoc interface
  * @public
  */
-interface NodeWithJSDoc extends ts.Node {
-  jsDoc?: ts.JSDoc[];
+function getNodeJsDocs(node: ts.Node): readonly ts.JSDoc[] {
+  if ('jsDoc' in node && Array.isArray(node.jsDoc)) {
+    return node.jsDoc.filter(ts.isJSDoc);
+  }
+  return [];
 }
 
 /**
@@ -154,7 +157,7 @@ export class CommentImporter {
 
       // Comment separator
       if (line === '---') {
-        if (currentComment && this.isCompleteComment(currentComment)) {
+        if (this.isCompleteComment(currentComment)) {
           currentComment.id = this.generateCommentId(currentComment as CommentState);
           currentComment.lastUpdated = lastUpdated;
           comments.push(currentComment as CommentState);
@@ -232,8 +235,8 @@ export class CommentImporter {
     const sourceFile = ts.createSourceFile('temp.ts', sourceCode, ts.ScriptTarget.Latest, true);
 
     const visit = (node: ts.Node) => {
-      const jsDocComments = (node as NodeWithJSDoc).jsDoc;
-      if (jsDocComments && jsDocComments.length > 0) {
+      const jsDocComments = getNodeJsDocs(node);
+      if (jsDocComments.length > 0) {
         for (const jsDoc of jsDocComments) {
           const fullText = jsDoc.getFullText();
           const symbolName = this.getSymbolName(node);
@@ -272,16 +275,16 @@ export class CommentImporter {
     if (ts.isClassDeclaration(node) && node.name) {
       return node.name.text;
     }
-    if (ts.isInterfaceDeclaration(node) && node.name) {
+    if (ts.isInterfaceDeclaration(node)) {
       return node.name.text;
     }
-    if (ts.isMethodDeclaration(node) && node.name) {
+    if (ts.isMethodDeclaration(node)) {
       return node.name.getText();
     }
-    if (ts.isVariableDeclaration(node) && node.name) {
+    if (ts.isVariableDeclaration(node)) {
       return node.name.getText();
     }
-    if (ts.isTypeAliasDeclaration(node) && node.name) {
+    if (ts.isTypeAliasDeclaration(node)) {
       return node.name.text;
     }
     return 'unknown';

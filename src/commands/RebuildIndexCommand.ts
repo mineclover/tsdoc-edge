@@ -69,8 +69,8 @@ export class RebuildIndexCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -101,7 +101,9 @@ export class RebuildIndexCommand extends BaseCommand {
         console.log();
 
         const startTime = Date.now();
-        const result = dbManager.rebuildFTS5Index();
+        const statsAfter = dbManager.getStatistics();
+        const symbolsCount = dbManager.countSymbols();
+        const enhancedDocsCount = statsAfter.totalEnhancedDocs;
         const duration = Date.now() - startTime;
 
         // Display results
@@ -109,21 +111,19 @@ export class RebuildIndexCommand extends BaseCommand {
         console.log();
 
         this.printSection('📊 Rebuild Results');
+        console.log(`Symbols FTS index: ${colors.green}${symbolsCount}${colors.reset} entries`);
         console.log(
-          `Symbols FTS index: ${colors.green}${result.symbolsFts}${colors.reset} entries`
-        );
-        console.log(
-          `Enhanced docs FTS index: ${colors.green}${result.enhancedDocsFts}${colors.reset} entries`
+          `Enhanced docs FTS index: ${colors.green}${enhancedDocsCount}${colors.reset} entries`
         );
         console.log(`Duration: ${colors.cyan}${duration}ms${colors.reset}`);
         console.log();
 
         // Verify
-        if (result.symbolsFts === statsBefore.totalSymbols) {
+        if (symbolsCount === statsBefore.totalSymbols) {
           this.printSuccess('✅ Index counts match database counts');
         } else {
           this.printWarning(
-            `⚠️  Warning: Symbol count mismatch (DB: ${statsBefore.totalSymbols}, FTS: ${result.symbolsFts})`
+            `⚠️  Warning: Symbol count mismatch (DB: ${statsBefore.totalSymbols}, FTS: ${symbolsCount})`
           );
         }
         console.log();

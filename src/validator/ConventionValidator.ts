@@ -344,7 +344,7 @@ export class ConventionValidator {
     }
 
     // @param documentation (simplified - assumes if params block exists, they're documented)
-    const paramBlocks = parsedComment.docComment.params?.blocks || [];
+    const paramBlocks = parsedComment.docComment.params.blocks;
     if (paramBlocks.length > 0) {
       score += 10;
     }

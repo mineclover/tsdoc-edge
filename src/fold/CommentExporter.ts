@@ -103,16 +103,16 @@ export class CommentExporter {
     if (ts.isClassDeclaration(node) && node.name) {
       return node.name.text;
     }
-    if (ts.isInterfaceDeclaration(node) && node.name) {
+    if (ts.isInterfaceDeclaration(node)) {
       return node.name.text;
     }
-    if (ts.isMethodDeclaration(node) && node.name) {
+    if (ts.isMethodDeclaration(node)) {
       return node.name.getText();
     }
-    if (ts.isVariableDeclaration(node) && node.name) {
+    if (ts.isVariableDeclaration(node)) {
       return node.name.getText();
     }
-    if (ts.isTypeAliasDeclaration(node) && node.name) {
+    if (ts.isTypeAliasDeclaration(node)) {
       return node.name.text;
     }
     return 'unknown';

@@ -82,8 +82,8 @@ Examples:
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
@@ -320,7 +320,7 @@ Examples:
       for (const symbol of symbols) {
         const currentCluster = clusterAssignment.get(symbol);
         if (currentCluster === undefined) continue;
-        const neighbors = adjacencyMap.get(symbol) || new Map();
+        const neighbors = adjacencyMap.get(symbol) ?? new Map<string, string>();
 
         if (neighbors.size === 0) continue;
 
@@ -372,7 +372,7 @@ Examples:
       const categoryCount = new Map<string, number>();
 
       for (const symbol of clusterSymbols) {
-        const neighbors = adjacencyMap.get(symbol) || new Map();
+        const neighbors = adjacencyMap.get(symbol) ?? new Map<string, string>();
 
         for (const [neighbor, category] of neighbors.entries()) {
           if (symbolSet.has(neighbor)) {

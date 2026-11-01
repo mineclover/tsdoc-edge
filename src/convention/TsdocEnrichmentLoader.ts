@@ -21,8 +21,11 @@ export interface LoadTsdocEnrichmentOptions {
   readonly graph: CanonicalProjectGraph;
 }
 
-interface NodeWithJsDoc extends ts.Node {
-  readonly jsDoc?: readonly ts.JSDoc[];
+function nodeJsDocs(node: ts.Node): readonly ts.JSDoc[] {
+  if ('jsDoc' in node && Array.isArray(node.jsDoc)) {
+    return node.jsDoc.filter(ts.isJSDoc);
+  }
+  return [];
 }
 
 /**
@@ -49,10 +52,9 @@ export function loadTsdocEnrichment(options: LoadTsdocEnrichmentOptions): Enrich
       const name = declarationName(node);
       if (!name) return;
       const candidates = nodes.filter((candidate) => nodeName(candidate) === name);
-      const docs = (node as NodeWithJsDoc).jsDoc;
-      if (!docs?.length) return;
+      const docs = nodeJsDocs(node);
+      if (docs.length === 0) return;
       const doc = docs[docs.length - 1];
-      if (!doc) return;
       for (const candidate of candidates) {
         if (matched.has(candidate.id)) continue;
         items.push(createItem(candidate.id, file, contentDigest, sourceFile, doc));

@@ -358,7 +358,7 @@ function capabilityValue(value: unknown): {
   if (typeof value === 'string' && value.trim()) {
     return { status: 'complete', version: value };
   }
-  if (!value || typeof value !== 'object' || Array.isArray(value)) {
+  if (typeof value !== 'object' || Array.isArray(value)) {
     return { status: 'unsupported' };
   }
   const record = value as Record<string, unknown>;

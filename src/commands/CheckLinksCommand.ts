@@ -15,7 +15,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @public
  * @responsibility Check documentation for broken links
  * @contract Analyze documentation, detect broken links, report issues
- * @doc [[Check Links Command]]
+ * @doc [[CheckLinksCommand]]
  * @doc [[CLI Commands#check-links]]
  *
  * @problem Documentation contains broken links that break documentation flow
@@ -74,13 +74,13 @@ export class CheckLinksCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     // Check for help flag
     if (this.hasHelpFlag(args)) {
-      return this.displayHelp();
+      return Promise.resolve(this.displayHelp());
     }
 
-    return this.executeWithErrorHandling(async () => {
+    return this.executeWithErrorHandling(() => {
       const sourcePath = args[0] || 'src';
 
       if (!fs.existsSync(sourcePath)) {

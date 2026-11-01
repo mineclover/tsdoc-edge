@@ -151,9 +151,13 @@ export class RelationshipQueryEngine {
     });
 
     // Group by type
-    const byType: Record<string, string[]> = {};
+    const byTypeMap = new Map<string, string[]>();
     for (const rel of direct) {
-      if (!byType[rel.type]) byType[rel.type] = [];
+      let bucket = byTypeMap.get(rel.type);
+      if (!bucket) {
+        bucket = [];
+        byTypeMap.set(rel.type, bucket);
+      }
 
       const from = Array.isArray(rel.from) ? rel.from : [rel.from];
       const to = Array.isArray(rel.to) ? rel.to : [rel.to];
@@ -168,16 +172,20 @@ export class RelationshipQueryEngine {
       }
 
       related.forEach((r) => {
-        if (r !== symbolId && !byType[rel.type].includes(r)) {
-          byType[rel.type].push(r);
+        if (r !== symbolId && !bucket.includes(r)) {
+          bucket.push(r);
         }
       });
     }
 
     // Group by category
-    const byCategory: Record<string, string[]> = {};
+    const byCategoryMap = new Map<string, string[]>();
     for (const rel of direct) {
-      if (!byCategory[rel.category]) byCategory[rel.category] = [];
+      let bucket = byCategoryMap.get(rel.category);
+      if (!bucket) {
+        bucket = [];
+        byCategoryMap.set(rel.category, bucket);
+      }
 
       const from = Array.isArray(rel.from) ? rel.from : [rel.from];
       const to = Array.isArray(rel.to) ? rel.to : [rel.to];
@@ -192,21 +200,23 @@ export class RelationshipQueryEngine {
       }
 
       related.forEach((r) => {
-        if (r !== symbolId && !byCategory[rel.category].includes(r)) {
-          byCategory[rel.category].push(r);
+        if (r !== symbolId && !bucket.includes(r)) {
+          bucket.push(r);
         }
       });
     }
 
     // Extract specific relationship types
-    const documentation = byType['doc-reference'] || [];
-    const tests = [...(byType['test-coverage'] || []), ...(byType.contains || [])];
-    const dependencies = byType['code-dependency'] || [];
+    const documentation = byTypeMap.get('doc-reference') ?? [];
+    const tests = [...(byTypeMap.get('test-coverage') ?? []), ...(byTypeMap.get('contains') ?? [])];
+    const dependencies = byTypeMap.get('code-dependency') ?? [];
     const semanticNeighbors = [
-      ...(byType['naming-pattern-relation'] || []),
-      ...(byType['feature-grouping'] || []),
-      ...(byType['explicit-semantic-relation'] || []),
+      ...(byTypeMap.get('naming-pattern-relation') ?? []),
+      ...(byTypeMap.get('feature-grouping') ?? []),
+      ...(byTypeMap.get('explicit-semantic-relation') ?? []),
     ];
+    const byType = Object.fromEntries(byTypeMap);
+    const byCategory = Object.fromEntries(byCategoryMap);
 
     return {
       symbolId,
@@ -360,14 +370,12 @@ export class RelationshipQueryEngine {
 
     // Filter by types
     if (options.types && options.types.length > 0) {
-      filtered = filtered.filter((rel) => options.types?.includes(rel.type as RelationshipType));
+      filtered = filtered.filter((rel) => options.types?.includes(rel.type));
     }
 
     // Filter by categories
     if (options.categories && options.categories.length > 0) {
-      filtered = filtered.filter((rel) =>
-        options.categories?.includes(rel.category as RelationshipCategory)
-      );
+      filtered = filtered.filter((rel) => options.categories?.includes(rel.category));
     }
 
     // Filter by confidence
@@ -378,9 +386,7 @@ export class RelationshipQueryEngine {
 
     // Exclude types
     if (options.excludeTypes && options.excludeTypes.length > 0) {
-      filtered = filtered.filter(
-        (rel) => !options.excludeTypes?.includes(rel.type as RelationshipType)
-      );
+      filtered = filtered.filter((rel) => !options.excludeTypes?.includes(rel.type));
     }
 
     return filtered;

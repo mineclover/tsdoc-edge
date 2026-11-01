@@ -14,7 +14,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @public
  * @responsibility Parse enhanced docs from TypeScript files
  * @contract Extract and display enhanced documentation with completeness metrics
- * @doc [[Parse Command]]
+ * @doc [[ParseCommand]]
  * @doc [[CLI Commands#parse]]
  *
  * @problem Developers need to validate enhanced documentation completeness
@@ -80,8 +80,8 @@ export class ParseCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();

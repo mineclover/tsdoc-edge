@@ -178,7 +178,7 @@ export class DeadCodeTagger {
         if (addDeprecated && !hasDeprecated) {
           tagsToAdd.push(`@deprecated Unused dead code: ${symReason}.`);
         }
-        if (addDeadcode && !hasDeadcode) {
+        if (addDeadcode) {
           tagsToAdd.push(`@deadcode reason="${symReason}" confidence="${symConfidence}"`);
         }
 
@@ -410,13 +410,13 @@ export class DeadCodeTagger {
         } else if (ts.isClassDeclaration(node) && node.name) {
           name = node.name.text;
           type = 'class';
-        } else if (ts.isInterfaceDeclaration(node) && node.name) {
+        } else if (ts.isInterfaceDeclaration(node)) {
           name = node.name.text;
           type = 'interface';
-        } else if (ts.isTypeAliasDeclaration(node) && node.name) {
+        } else if (ts.isTypeAliasDeclaration(node)) {
           name = node.name.text;
           type = 'type';
-        } else if (ts.isEnumDeclaration(node) && node.name) {
+        } else if (ts.isEnumDeclaration(node)) {
           name = node.name.text;
           type = 'enum';
         } else if (ts.isMethodDeclaration(node) && ts.isIdentifier(node.name)) {
@@ -520,7 +520,7 @@ export class DeadCodeTagger {
     name: string,
     targetLine: number
   ): TargetNodeInfo | null {
-    let closestNode: TargetNodeInfo | null = null;
+    const matchState: { closestNode: TargetNodeInfo | null } = { closestNode: null };
     let minDistance = Number.POSITIVE_INFINITY;
 
     const checkNode = (node: ts.Node, statementNode: ts.Node): void => {
@@ -530,7 +530,7 @@ export class DeadCodeTagger {
 
       if (distance < minDistance) {
         minDistance = distance;
-        closestNode = {
+        matchState.closestNode = {
           node,
           statementNode,
           startLine: nodeLine,
@@ -569,8 +569,8 @@ export class DeadCodeTagger {
     ts.forEachChild(sourceFile, visitor);
 
     // Only accept matches within reasonable line proximity (e.g. within 15 lines due to comments/edits)
-    if (closestNode && minDistance <= 15) {
-      return closestNode;
+    if (matchState.closestNode && minDistance <= 15) {
+      return matchState.closestNode;
     }
 
     return null;

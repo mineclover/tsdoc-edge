@@ -97,7 +97,8 @@ export class DocumentationAnalyzer {
     }
 
     // Skip catch clause variables (error parameters)
-    if (ts.isVariableDeclaration(node) && node.parent && ts.isCatchClause(node.parent)) {
+    const parentNode = node.parent as ts.Node | undefined;
+    if (ts.isVariableDeclaration(node) && parentNode && ts.isCatchClause(parentNode)) {
       return null;
     }
 
@@ -224,22 +225,22 @@ export class DocumentationAnalyzer {
     if (ts.isClassDeclaration(node) && node.name) {
       return node.name.text;
     }
-    if (ts.isInterfaceDeclaration(node) && node.name) {
+    if (ts.isInterfaceDeclaration(node)) {
       return node.name.text;
     }
-    if (ts.isMethodDeclaration(node) && node.name) {
+    if (ts.isMethodDeclaration(node)) {
       return node.name.getText();
     }
-    if (ts.isPropertyDeclaration(node) && node.name) {
+    if (ts.isPropertyDeclaration(node)) {
       return node.name.getText();
     }
-    if (ts.isVariableDeclaration(node) && node.name) {
+    if (ts.isVariableDeclaration(node)) {
       return node.name.getText();
     }
-    if (ts.isTypeAliasDeclaration(node) && node.name) {
+    if (ts.isTypeAliasDeclaration(node)) {
       return node.name.text;
     }
-    if (ts.isEnumDeclaration(node) && node.name) {
+    if (ts.isEnumDeclaration(node)) {
       return node.name.text;
     }
     return null;
@@ -369,8 +370,10 @@ export class DocumentationAnalyzer {
 
     // For variable declarations, check the parent VariableStatement
     let checkNode = node;
-    if (ts.isVariableDeclaration(node) && node.parent && node.parent.parent) {
-      checkNode = node.parent.parent; // VariableStatement
+    const varParent = node.parent as ts.Node | undefined;
+    const varGrandParent = varParent?.parent;
+    if (ts.isVariableDeclaration(node) && varGrandParent) {
+      checkNode = varGrandParent; // VariableStatement
     }
 
     if (ts.canHaveModifiers(checkNode)) {
@@ -387,7 +390,7 @@ export class DocumentationAnalyzer {
 
     // Class/interface members: public unless marked private/protected or ECMAScript-private,
     // and only when the containing declaration is itself exported.
-    const container = node.parent;
+    const container = node.parent as ts.Node | undefined;
     if (container && (ts.isClassLike(container) || ts.isInterfaceDeclaration(container))) {
       const memberModifiers = ts.canHaveModifiers(node) ? (ts.getModifiers(node) ?? []) : [];
       if (memberModifiers.some((m) => m.kind === ts.SyntaxKind.ProtectedKeyword)) return false;
@@ -410,8 +413,10 @@ export class DocumentationAnalyzer {
   private getJSDocComment(node: ts.Node, sourceFile: ts.SourceFile): string | null {
     // For variable declarations, check the parent VariableStatement
     let targetNode = node;
-    if (ts.isVariableDeclaration(node) && node.parent && node.parent.parent) {
-      targetNode = node.parent.parent; // VariableStatement
+    const parent = node.parent as ts.Node | undefined;
+    const grandParent = parent?.parent;
+    if (ts.isVariableDeclaration(node) && grandParent) {
+      targetNode = grandParent; // VariableStatement
     }
 
     const jsDocTags = getDirectJsDocs(targetNode);
@@ -464,7 +469,7 @@ export class DocumentationAnalyzer {
     const isFunctionLike = ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node);
 
     if (isFunctionLike) {
-      const params = (node as ts.FunctionDeclaration | ts.MethodDeclaration).parameters;
+      const params = node.parameters;
       const actualParamNames = params.map((p) => p.name.getText());
       // Filter out empty or invalid param names from documented params
       const documentedParams = docComment.params.blocks
@@ -497,10 +502,9 @@ export class DocumentationAnalyzer {
 
     if (isFunctionLike) {
       const isConstructor = ts.isConstructorDeclaration(node);
-      const funcNode = node as ts.FunctionDeclaration | ts.MethodDeclaration;
 
       // Check if function has void return type (explicit or implicit)
-      const hasVoidReturn = this.hasVoidReturnType(funcNode);
+      const hasVoidReturn = this.hasVoidReturnType(node);
 
       // Only require @returns for non-void, non-constructor functions
       if (!isConstructor && !hasVoidReturn && !docComment.returnsBlock) {
@@ -554,15 +558,16 @@ export class DocumentationAnalyzer {
       const body = node.body;
       if (!body) return true; // Abstract method or declaration
 
-      let hasNonVoidReturn = false;
-      const checkReturns = (n: ts.Node): void => {
+      const hasReturnWithValue = (n: ts.Node): boolean => {
         if (ts.isReturnStatement(n) && n.expression) {
-          hasNonVoidReturn = true;
+          return true;
         }
-        ts.forEachChild(n, checkReturns);
+        return (
+          ts.forEachChild<boolean>(n, (child) => (hasReturnWithValue(child) ? true : undefined)) ===
+          true
+        );
       };
-      checkReturns(body);
-      return !hasNonVoidReturn;
+      return !hasReturnWithValue(body);
     }
 
     // Explicit void type
@@ -670,10 +675,10 @@ export class DocumentationAnalyzer {
  * @returns True when the declaration belongs to a top-level or namespace-level variable statement
  */
 export function isModuleScopeVariable(node: ts.VariableDeclaration): boolean {
-  const list = node.parent;
+  const list = node.parent as ts.Node | undefined;
   if (!list || !ts.isVariableDeclarationList(list)) return false;
-  const statement = list.parent;
+  const statement = list.parent as ts.Node | undefined;
   if (!statement || !ts.isVariableStatement(statement)) return false;
-  const container = statement.parent;
+  const container = statement.parent as ts.Node | undefined;
   return !!container && (ts.isSourceFile(container) || ts.isModuleBlock(container));
 }

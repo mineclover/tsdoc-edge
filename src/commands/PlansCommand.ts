@@ -75,8 +75,8 @@ export class PlansCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -102,7 +102,8 @@ export class PlansCommand extends BaseCommand {
         const allPlans: Array<{ plan: FuturePlan; symbolId: string }> = [];
 
         for (const row of results) {
-          const plans = JSON.parse(row.futurePlans || '[]');
+          const rawPlans: unknown = JSON.parse(row.futurePlans || '[]');
+          const plans = rawPlans as FuturePlan[];
           for (const plan of plans) {
             allPlans.push({ plan, symbolId: row.symbolId });
           }

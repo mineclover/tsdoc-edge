@@ -296,9 +296,10 @@ async function main(): Promise<void> {
   }
 
   // Handle --version and -v flags
+  const rawPkg: unknown = require('../package.json');
+  const pkgVersion = String((rawPkg as { version?: string }).version ?? '0.0.0');
   if (commandName === '--version' || commandName === '-v' || commandName === 'version') {
-    const version = require('../package.json').version;
-    console.log(`tsdoc-edge v${version}`);
+    console.log(`tsdoc-edge v${pkgVersion}`);
     await flushOutputsAndExit(0);
   }
 
@@ -362,7 +363,7 @@ async function main(): Promise<void> {
     error: result.error?.message,
     cwd: process.cwd(),
     nodeVersion: process.version,
-    version: require('../package.json').version,
+    version: pkgVersion,
   };
 
   usageTracker.recordEvent(event);
@@ -372,7 +373,7 @@ async function main(): Promise<void> {
 }
 
 // Run main function
-main().catch((error) => {
+main().catch((error: unknown) => {
   console.error('\x1b[31m✗ Fatal error:\x1b[0m', error);
   process.exit(1);
 });

@@ -28,8 +28,8 @@ Options:
   --json                  Print machine-readable output`;
   }
 
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       if (this.hasHelpFlag(args)) return this.displayHelp();
       const operation = args[0];
       if (operation !== 'status' && operation !== 'list' && operation !== 'read') {

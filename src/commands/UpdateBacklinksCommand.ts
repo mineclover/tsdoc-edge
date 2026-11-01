@@ -18,7 +18,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @public
  * @responsibility Update backlinks in all managed documents
  * @contract Parse documents, generate backlinks, update files
- * @doc [[Update Backlinks Command]]
+ * @doc [[UpdateBacklinksCommand]]
  * @doc [[CLI Commands#update-backlinks]]
  *
  * @problem Document backlinks become outdated as references change
@@ -80,8 +80,8 @@ export class UpdateBacklinksCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();

@@ -119,7 +119,7 @@ export class ASTSymbolExtractor {
       // Identifier in expressions (e.g., new Foo(), Foo.bar)
       if (ts.isIdentifier(n) && importedNames.has(n.text)) {
         // Check if it's actually used as a type/value, not just a property name
-        const parent = n.parent;
+        const parent = n.parent as ts.Node | undefined;
         if (
           parent &&
           (ts.isNewExpression(parent) ||
@@ -199,7 +199,7 @@ export class ASTSymbolExtractor {
     }
 
     // Extract interface
-    if (ts.isInterfaceDeclaration(node) && node.name) {
+    if (ts.isInterfaceDeclaration(node)) {
       const symbol = this.extractInterfaceSymbol(node);
       this.symbols.push(symbol);
 
@@ -234,13 +234,13 @@ export class ASTSymbolExtractor {
     }
 
     // Extract type alias
-    if (ts.isTypeAliasDeclaration(node) && node.name) {
+    if (ts.isTypeAliasDeclaration(node)) {
       const symbol = this.extractTypeSymbol(node);
       this.symbols.push(symbol);
     }
 
     // Extract enum
-    if (ts.isEnumDeclaration(node) && node.name) {
+    if (ts.isEnumDeclaration(node)) {
       const symbol = this.extractEnumSymbol(node);
       this.symbols.push(symbol);
     }

@@ -66,12 +66,12 @@ Storage System은 심볼, 문서, 관계 데이터를 영속화하는 하이브�
 SQLite 데이터베이스 관리
 
 ```typescript
+import Database from 'better-sqlite3';
+
 /**
  * @doc [[Storage System]]
  * @functionality 심볼/문서/관계 저장, FTS5 검색, CRUD 작업
- * @depends better-sqlite3
- * @depType runtime
- * @depReason SQLite 네이티브 바인딩
+ * @context better-sqlite3 동기 네이티브 바인딩 기반 로컬 SQLite 엔진
  */
 class DatabaseManager {
   constructor(dbPath?: string, jsonlPath?: string)

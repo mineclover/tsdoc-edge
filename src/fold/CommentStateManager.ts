@@ -205,6 +205,10 @@ export class CommentStateManager {
     };
   }
 
+  private getFileState(filePath: string): FileCommentState | undefined {
+    return Object.hasOwn(this.storage.files, filePath) ? this.storage.files[filePath] : undefined;
+  }
+
   /**
    * Collapse comments in a file
    *
@@ -215,7 +219,7 @@ export class CommentStateManager {
    */
   collapse(filePath: string, options: CollapseOptions = {}): void {
     // Export if not already exported
-    if (!this.storage.files[filePath]) {
+    if (!this.getFileState(filePath)) {
       this.exportFile(filePath);
     }
 
@@ -277,7 +281,7 @@ export class CommentStateManager {
    * @returns void - No return value
    */
   expand(filePath: string, options: ExpandOptions = {}): void {
-    const fileState = this.storage.files[filePath];
+    const fileState = this.getFileState(filePath);
 
     if (!fileState) {
       throw new Error(`File not in storage: ${filePath}`);
@@ -322,7 +326,7 @@ export class CommentStateManager {
    * @public
    */
   getStatus(filePath: string): FileStatusSummary {
-    const fileState = this.storage.files[filePath];
+    const fileState = this.getFileState(filePath);
 
     if (!fileState) {
       return {

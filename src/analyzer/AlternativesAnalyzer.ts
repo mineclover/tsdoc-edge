@@ -511,11 +511,12 @@ export class AlternativesAnalyzer {
     fallbacks: number;
     byPattern: Record<string, number>;
   } {
+    const byPattern: Record<string, number> = {};
     const stats = {
       totalAlternatives: relationships.length,
       substitutions: 0,
       fallbacks: 0,
-      byPattern: {} as Record<string, number>,
+      byPattern,
     };
 
     for (const rel of relationships) {

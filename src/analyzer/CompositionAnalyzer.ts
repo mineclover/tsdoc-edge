@@ -136,7 +136,7 @@ export class CompositionAnalyzer {
           // Analyze class members
           for (const member of node.members) {
             try {
-              if (ts.isPropertyDeclaration(member) && member.name && member.type) {
+              if (ts.isPropertyDeclaration(member) && member.type) {
                 // Skip computed property names
                 if (!ts.isIdentifier(member.name)) {
                   continue;

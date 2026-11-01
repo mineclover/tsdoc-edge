@@ -66,10 +66,10 @@ export class TypeChainCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     // Check for help flag
     if (this.hasHelpFlag(args)) {
-      return this.displayHelp();
+      return Promise.resolve(this.displayHelp());
     }
 
     if (args.length < 1) {
@@ -84,7 +84,7 @@ export class TypeChainCommand extends BaseCommand {
       console.log('Examples:');
       console.log('  type-chain UserDTO User         # Find path from UserDTO to User');
       console.log('  type-chain UserService --tree   # Show UserService dependency tree');
-      return this.failure('Missing required argument');
+      return Promise.resolve(this.failure('Missing required argument'));
     }
 
     const sourceType = args[0];
@@ -118,7 +118,7 @@ export class TypeChainCommand extends BaseCommand {
 
     if (!fs.existsSync(srcDir)) {
       this.printError(`Source directory not found: ${srcDir}`);
-      return this.failure('Source directory not found');
+      return Promise.resolve(this.failure('Source directory not found'));
     }
 
     console.log(`${colors.cyan}ℹ${colors.reset} Analyzing interfaces in: ${srcDir}`);
@@ -169,7 +169,7 @@ export class TypeChainCommand extends BaseCommand {
       if (graph.interfaces.size > 10) {
         console.log(`  ... and ${graph.interfaces.size - 10} more`);
       }
-      return this.failure('Type not found');
+      return Promise.resolve(this.failure('Type not found'));
     }
 
     if (showTree) {
@@ -178,13 +178,13 @@ export class TypeChainCommand extends BaseCommand {
       this.displayDependencyTree(result);
     } else {
       if (!targetType) {
-        return this.failure('Target type is required unless --tree is used');
+        return Promise.resolve(this.failure('Target type is required unless --tree is used'));
       }
 
       // Check if target exists
       if (!graph.interfaces.has(targetType)) {
         this.printError(`Target type not found: ${targetType}`);
-        return this.failure('Target type not found');
+        return Promise.resolve(this.failure('Target type not found'));
       }
 
       // Find chain
@@ -192,7 +192,7 @@ export class TypeChainCommand extends BaseCommand {
       this.displayTypeChains(result);
     }
 
-    return this.success();
+    return Promise.resolve(this.success());
   }
 
   /**
@@ -409,10 +409,10 @@ export class FindRootTypesCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     // Check for help flag
     if (this.hasHelpFlag(args)) {
-      return this.displayHelp();
+      return Promise.resolve(this.displayHelp());
     }
 
     const options: TypeChainOptions = {
@@ -497,7 +497,7 @@ export class FindRootTypesCommand extends BaseCommand {
     console.log(`  Root Types: ${colors.cyan}${rootTypes.length}${colors.reset}`);
     console.log(`  Leaf Types: ${colors.cyan}${leafTypes.length}${colors.reset}`);
 
-    return this.success();
+    return Promise.resolve(this.success());
   }
 
   private buildGraph(): { tracer: TypeChainTracer; graph: InterfaceDependencyGraph } {
@@ -588,10 +588,10 @@ export class DetectCircularTypesCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     // Check for help flag
     if (this.hasHelpFlag(args)) {
-      return this.displayHelp();
+      return Promise.resolve(this.displayHelp());
     }
 
     const options: TypeChainOptions = {
@@ -652,7 +652,7 @@ export class DetectCircularTypesCommand extends BaseCommand {
       console.log(`   - Consider using interfaces to break cycles`);
     }
 
-    return this.success();
+    return Promise.resolve(this.success());
   }
 
   private buildGraph(): { tracer: TypeChainTracer; graph: InterfaceDependencyGraph } {

@@ -256,10 +256,10 @@ export class TestSymbolParser {
     this.suiteStack.push(suiteContext);
 
     // Get the function body (second argument)
-    const bodyArg = node.arguments[1];
-    if (bodyArg && (ts.isArrowFunction(bodyArg) || ts.isFunctionExpression(bodyArg))) {
-      // Visit children within this suite
-      if (ts.isFunctionExpression(bodyArg) || ts.isArrowFunction(bodyArg)) {
+    if (node.arguments.length > 1) {
+      const bodyArg = node.arguments[1];
+      if (ts.isArrowFunction(bodyArg) || ts.isFunctionExpression(bodyArg)) {
+        // Visit children within this suite
         const body = bodyArg.body;
         if (ts.isBlock(body)) {
           ts.forEachChild(body, (child) => this.visitNode(child, options));
@@ -357,8 +357,7 @@ export class TestSymbolParser {
    */
   private extractTestScenarios(sourceFile: ts.SourceFile, _sourceCode: string): void {
     // Find JSDoc comments at the top of the file
-    const firstStatement = sourceFile.statements[0];
-    if (!firstStatement) return;
+    if (sourceFile.statements.length === 0) return;
 
     const fullText = sourceFile.getFullText();
     const commentRanges = ts.getLeadingCommentRanges(fullText, 0);
@@ -420,8 +419,11 @@ export class TestSymbolParser {
     let assertionCount = 0;
 
     // Get the function body (second argument)
+    if (node.arguments.length <= 1) {
+      return { testedSymbols: [], testedMethods: [], assertionCount: 0 };
+    }
     const bodyArg = node.arguments[1];
-    if (!bodyArg || (!ts.isArrowFunction(bodyArg) && !ts.isFunctionExpression(bodyArg))) {
+    if (!ts.isArrowFunction(bodyArg) && !ts.isFunctionExpression(bodyArg)) {
       return { testedSymbols: [], testedMethods: [], assertionCount: 0 };
     }
 
@@ -533,8 +535,8 @@ export class TestSymbolParser {
    * Extract string argument from call expression
    */
   private extractStringArgument(node: ts.CallExpression, index: number): string | null {
+    if (index < 0 || index >= node.arguments.length) return null;
     const arg = node.arguments[index];
-    if (!arg) return null;
 
     if (ts.isStringLiteral(arg)) {
       return arg.text;

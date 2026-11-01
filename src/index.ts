@@ -155,7 +155,6 @@ export { StrictModeValidator } from './validator/StrictModeValidator';
  *
  * @doc [[CoreWorkflow]]
  * @doc [[TSDocEdge]]
- * @doc [[Core Architecture#TSDocEdge]]
  * @public
  */
 export class TSDocEdge {

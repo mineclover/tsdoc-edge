@@ -139,7 +139,7 @@ export class IncrementalBuilder {
 
       // Extract methods and properties
       node.members.forEach((member) => {
-        if (ts.isMethodDeclaration(member) && member.name) {
+        if (ts.isMethodDeclaration(member)) {
           result.symbols.push(
             this.createSymbol(member, member.name, 'method', sourceFile, filePath)
           );
@@ -147,14 +147,11 @@ export class IncrementalBuilder {
           result.symbols.push(
             this.createSymbol(member, '__constructor', 'method', sourceFile, filePath)
           );
-        } else if (
-          (ts.isGetAccessorDeclaration(member) || ts.isSetAccessorDeclaration(member)) &&
-          member.name
-        ) {
+        } else if (ts.isGetAccessorDeclaration(member) || ts.isSetAccessorDeclaration(member)) {
           result.symbols.push(
             this.createSymbol(member, member.name, 'method', sourceFile, filePath)
           );
-        } else if (ts.isPropertyDeclaration(member) && member.name) {
+        } else if (ts.isPropertyDeclaration(member)) {
           result.symbols.push(
             this.createSymbol(member, member.name, 'property', sourceFile, filePath)
           );
@@ -163,14 +160,14 @@ export class IncrementalBuilder {
     }
 
     // Extract interfaces
-    if (ts.isInterfaceDeclaration(node) && node.name) {
+    if (ts.isInterfaceDeclaration(node)) {
       result.symbols.push(this.createSymbol(node, node.name, 'interface', sourceFile, filePath));
       node.members.forEach((member) => {
-        if (ts.isMethodSignature(member) && member.name) {
+        if (ts.isMethodSignature(member)) {
           result.symbols.push(
             this.createSymbol(member, member.name, 'method', sourceFile, filePath)
           );
-        } else if (ts.isPropertySignature(member) && member.name) {
+        } else if (ts.isPropertySignature(member)) {
           result.symbols.push(
             this.createSymbol(member, member.name, 'property', sourceFile, filePath)
           );
@@ -180,7 +177,7 @@ export class IncrementalBuilder {
 
     // Extract enums. Enum members remain producer-owned because the canonical
     // graph currently exposes the enum declaration as the stable node.
-    if (ts.isEnumDeclaration(node) && node.name) {
+    if (ts.isEnumDeclaration(node)) {
       result.symbols.push(this.createSymbol(node, node.name, 'enum', sourceFile, filePath));
     }
 
@@ -190,7 +187,7 @@ export class IncrementalBuilder {
     }
 
     // Extract type aliases
-    if (ts.isTypeAliasDeclaration(node) && node.name) {
+    if (ts.isTypeAliasDeclaration(node)) {
       result.symbols.push(this.createSymbol(node, node.name, 'type', sourceFile, filePath));
     }
 
@@ -269,10 +266,8 @@ export class IncrementalBuilder {
     sourceFile: ts.SourceFile,
     result: IncrementalExtractResult
   ): void {
-    const parseDiagnostics = (
-      sourceFile as ts.SourceFile & { parseDiagnostics?: readonly ts.Diagnostic[] }
-    ).parseDiagnostics;
-    for (const diagnostic of parseDiagnostics ?? []) {
+    const parseDiagnostics = getSourceFileParseDiagnostics(sourceFile);
+    for (const diagnostic of parseDiagnostics) {
       const position =
         diagnostic.start === undefined
           ? null
@@ -452,4 +447,12 @@ export class IncrementalBuilder {
 
     return result;
   }
+}
+
+function getSourceFileParseDiagnostics(sourceFile: ts.SourceFile): readonly ts.Diagnostic[] {
+  if (!('parseDiagnostics' in sourceFile) || !Array.isArray(sourceFile.parseDiagnostics)) {
+    return [];
+  }
+  const raw: unknown = sourceFile.parseDiagnostics;
+  return raw as readonly ts.Diagnostic[];
 }

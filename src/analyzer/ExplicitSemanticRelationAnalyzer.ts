@@ -86,10 +86,7 @@ export class ExplicitSemanticRelationAnalyzer {
     const sites = this.collectRelatedToTags(rootDir);
 
     for (const site of sites) {
-      const relationship = this.createRelationship(site);
-      if (relationship) {
-        relationships.push(relationship);
-      }
+      relationships.push(this.createRelationship(site));
     }
 
     return relationships;
@@ -203,11 +200,13 @@ export class ExplicitSemanticRelationAnalyzer {
   private getSymbolName(node: ts.Node): string | null {
     if (ts.isFunctionDeclaration(node) && node.name) return node.name.text;
     if (ts.isClassDeclaration(node) && node.name) return node.name.text;
-    if (ts.isInterfaceDeclaration(node) && node.name) return node.name.text;
-    if (ts.isTypeAliasDeclaration(node) && node.name) return node.name.text;
-    if (ts.isEnumDeclaration(node) && node.name) return node.name.text;
+    if (ts.isInterfaceDeclaration(node)) return node.name.text;
+    if (ts.isTypeAliasDeclaration(node)) return node.name.text;
+    if (ts.isEnumDeclaration(node)) return node.name.text;
     if (ts.isVariableStatement(node)) {
-      const declaration = node.declarationList.declarations[0];
+      const declaration = node.declarationList.declarations[0] as
+        | ts.VariableDeclaration
+        | undefined;
       if (declaration && ts.isIdentifier(declaration.name)) {
         return declaration.name.text;
       }

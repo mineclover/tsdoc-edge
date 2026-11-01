@@ -48,12 +48,12 @@ export class TestCoverageUnifier {
     this.graph = graph;
     if ('drizzleDb' in db) {
       // It's a DatabaseManager
-      this.dbManager = db as DatabaseManager;
+      this.dbManager = db;
       this.db = null;
     } else {
       // It's a raw Database
       this.dbManager = null;
-      this.db = db as Database;
+      this.db = db;
     }
   }
 

@@ -263,9 +263,7 @@ export class CacheManager {
     }, this.cleanupInterval);
 
     // Prevent timer from keeping process alive
-    if (this.cleanupTimer.unref) {
-      this.cleanupTimer.unref();
-    }
+    this.cleanupTimer.unref();
   }
 
   /**

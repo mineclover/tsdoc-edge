@@ -214,7 +214,7 @@ export class DesignContextCommand extends BaseCommand {
     });
   }
 
-  private async gatherContext(
+  private gatherContext(
     absolutePath: string,
     relativePath: string,
     dbManager: DatabaseManager
@@ -508,8 +508,8 @@ export class DesignContextCommand extends BaseCommand {
             id: rel.id,
             type: rel.type,
             category: rel.category,
-            direction: rel.direction as 'unidirectional' | 'bidirectional' | 'undirected',
-            strength: rel.strength as 'strong' | 'medium' | 'weak',
+            direction: rel.direction,
+            strength: rel.strength,
             fromSymbols: Array.isArray(rel.from) ? rel.from : [rel.from],
             toSymbols: Array.isArray(rel.to) ? rel.to : [rel.to],
             confidence: rel.confidence,
@@ -522,7 +522,7 @@ export class DesignContextCommand extends BaseCommand {
       }
     }
 
-    return context;
+    return Promise.resolve(context);
   }
 
   /**
@@ -1468,17 +1468,16 @@ export class DesignContextCommand extends BaseCommand {
   }
 
   private groupBy<T>(array: T[], key: keyof T): Record<string, T[]> {
-    return array.reduce(
-      (groups, item) => {
-        const groupKey = this.formatGroupKey(item[key]);
-        if (!groups[groupKey]) {
-          groups[groupKey] = [];
-        }
+    const groups: Record<string, T[]> = {};
+    for (const item of array) {
+      const groupKey = this.formatGroupKey(item[key]);
+      if (Object.hasOwn(groups, groupKey)) {
         groups[groupKey].push(item);
-        return groups;
-      },
-      {} as Record<string, T[]>
-    );
+      } else {
+        groups[groupKey] = [item];
+      }
+    }
+    return groups;
   }
 
   private getCategoryIcon(category: string): string {

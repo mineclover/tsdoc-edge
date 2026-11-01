@@ -250,7 +250,7 @@ export class UnusedDocumentDetector {
     const frontmatter = frontmatterMatch[1];
     const statusMatch = frontmatter.match(/status:\s*["']?(\w+)["']?/);
 
-    return (statusMatch?.[1] as SpecStatus) || 'draft';
+    return statusMatch ? (statusMatch[1] as SpecStatus) : 'draft';
   }
 
   /**

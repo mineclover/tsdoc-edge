@@ -77,8 +77,8 @@ export class CoreApiCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -130,7 +130,7 @@ export class CoreApiCommand extends BaseCommand {
         // Add relationships
         for (const rel of depRows) {
           const relationship: SymbolRelationship = {
-            type: (rel.type as SymbolRelationship['type']) || 'dependsOn',
+            type: (rel.type || 'dependsOn') as SymbolRelationship['type'],
             from: rel.symbol_id,
             to: rel.target,
             filePath: rel.import_path || '',

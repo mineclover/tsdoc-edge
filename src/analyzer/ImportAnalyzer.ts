@@ -78,7 +78,7 @@ export class ImportAnalyzer {
     if (!ts.isStringLiteral(moduleSpecifier)) return;
 
     const modulePath = moduleSpecifier.text;
-    const isTypeOnly = node.importClause.isTypeOnly || false;
+    const isTypeOnly = node.importClause.phaseModifier === ts.SyntaxKind.TypeKeyword;
 
     // Handle default import: import Foo from './foo'
     if (node.importClause.name) {

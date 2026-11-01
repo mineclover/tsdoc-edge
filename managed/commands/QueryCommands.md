@@ -87,6 +87,60 @@ Find untested code.
 
 **Source**: `src/commands/Phase7Commands.ts`
 
+### [[DocSymbolsCommand]]
+
+Lists all registered primary and auxiliary `[[Symbol]]` checkpoints and reference counts across managed documentation.
+
+**Usage**: `tsdoc-edge doc-symbols [path]`
+
+**Source**: `src/commands/DocSymbolsCommand.ts`
+
+### [[FindMethodCommand]]
+
+Searches the indexed codebase for methods and functions matching a simple or qualified symbol name.
+
+**Usage**: `tsdoc-edge find-method <name>`
+
+**Source**: `src/commands/FindMethodCommand.ts`
+
+### [[FindUnusedDocsCommand]]
+
+Identifies managed Markdown documents that have zero incoming document references or code `@doc` bindings.
+
+**Usage**: `tsdoc-edge find-unused-docs [path]`
+
+**Source**: `src/commands/FindUnusedDocsCommand.ts`
+
+### [[OntologyListCommand]]
+
+Lists symbol and relationship instances matching specific relationship ontology categories and predicates.
+
+**Usage**: `tsdoc-edge ontology-list [options]`
+
+**Source**: `src/commands/OntologyListCommand.ts`
+
+### [[OntologyStatsCommand]]
+
+Displays summary statistics and coverage across the 11 categories of the unified relationship ontology.
+
+**Usage**: `tsdoc-edge ontology-stats`
+
+**Source**: `src/commands/OntologyStatsCommand.ts`
+
+### [[QueryInferredCommand]]
+
+Queries transitive and rule-inferred relationships computed dynamically by `RelationshipInferenceEngine`.
+
+**Usage**: `tsdoc-edge query-inferred <symbol-id> [options]`
+
+**Source**: `src/commands/QueryInferredCommand.ts`
+
+### [[RelationshipQueryEngine]]
+
+Provides programmatic traversal, pathfinding, filtering, and subgraph querying over `UnifiedRelationship` stores.
+
+**Source**: `src/query/RelationshipQueryEngine.ts`
+
 ## Related
 
 - [[Phase Commands]]: Dependencies and usage queries

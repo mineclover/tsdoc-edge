@@ -257,9 +257,11 @@ export class ModuleSpecGenerator {
       return node.name.text;
     }
     if (ts.isVariableStatement(node)) {
-      const decl = node.declarationList.declarations[0];
-      if (decl && ts.isIdentifier(decl.name)) {
-        return decl.name.text;
+      if (
+        node.declarationList.declarations.length > 0 &&
+        ts.isIdentifier(node.declarationList.declarations[0].name)
+      ) {
+        return node.declarationList.declarations[0].name.text;
       }
     }
     return null;
@@ -636,7 +638,7 @@ export class ModuleSpecGenerator {
 
     let visibility = this.getVisibility(node);
     if (specTags.scope?.accessLevel && specTags.scope.accessLevel !== 'internal') {
-      visibility = specTags.scope.accessLevel as 'public' | 'private' | 'protected';
+      visibility = specTags.scope.accessLevel;
     }
 
     const exposedAPI: string[] = [];

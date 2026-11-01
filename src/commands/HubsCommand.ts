@@ -21,12 +21,12 @@ export class HubsCommand extends BaseCommand {
     return 'Find most shared symbols (hub analysis)';
   }
 
-  async execute(args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     const useXml = !args.includes('--human');
     const minRefs = parseInt(args.find((a) => /^\d+$/.test(a)) || '2', 10);
 
     const dbCheck = this.checkDatabaseExists();
-    if (dbCheck) return dbCheck;
+    if (dbCheck) return Promise.resolve(dbCheck);
 
     const dbPath = this.getDatabasePath();
     const db = new Database(dbPath, { readonly: true });
@@ -71,10 +71,10 @@ export class HubsCommand extends BaseCommand {
       }
 
       db.close();
-      return { exitCode: 0, message: `Found ${results.length} hubs` };
+      return Promise.resolve({ exitCode: 0, message: `Found ${results.length} hubs` });
     } catch (error) {
       db.close();
-      return { exitCode: 1, message: String(error) };
+      return Promise.resolve({ exitCode: 1, message: String(error) });
     }
   }
 }

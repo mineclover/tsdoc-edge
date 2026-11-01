@@ -25,8 +25,13 @@ interface SymbolRow {
 
 interface ExposureScope {
   level: string;
-  boundaries: string[];
+  boundaries?: string[];
   exportedVia?: string;
+}
+
+function parseJson<T>(raw: string): T {
+  const parsed: unknown = JSON.parse(raw);
+  return parsed as T;
 }
 
 const dbPath = path.join(process.cwd(), '.tsdoc.db');
@@ -79,48 +84,40 @@ if (inheritanceRels.length > 0) {
   inheritanceRels.slice(0, 3).forEach((rel) => {
     const from = Array.isArray(rel.from) ? rel.from[0] : rel.from;
     const to = Array.isArray(rel.to) ? rel.to[0] : rel.to;
-    const inheritanceType =
-      typeof rel.properties === 'string'
-        ? JSON.parse(rel.properties).inheritanceType
-        : rel.properties?.inheritanceType;
+    const inheritanceType = rel.properties.inheritanceType;
     console.log(`     - ${from} ${inheritanceType || rel.type} ${to}`);
   });
 }
 
 // Test endpoint-handler relationships
-const endpointHandlerRels = allRels.filter((r) => {
-  if (r.type !== 'calls') return false;
-  if (typeof r.properties !== 'object' || r.properties === null) return false;
-  const props = typeof r.properties === 'string' ? JSON.parse(r.properties) : r.properties;
-  return props?.relationshipContext === 'endpoint-handler';
-});
+const endpointHandlerRels = allRels.filter(
+  (r) => r.type === 'calls' && r.properties.relationshipContext === 'endpoint-handler'
+);
 console.log(`\n   Endpoint-handler relationships: ${endpointHandlerRels.length}`);
 
 if (endpointHandlerRels.length > 0) {
   console.log('   Samples:');
   endpointHandlerRels.slice(0, 3).forEach((rel) => {
-    const props = typeof rel.properties === 'string' ? JSON.parse(rel.properties) : rel.properties;
+    const method = typeof rel.properties.method === 'string' ? rel.properties.method : '';
+    const routePath = typeof rel.properties.path === 'string' ? rel.properties.path : '';
     const to = Array.isArray(rel.to) ? rel.to[0] : rel.to;
-    console.log(`     - ${props?.method} ${props?.path} → ${to}`);
+    console.log(`     - ${method} ${routePath} → ${to}`);
   });
 }
 
 // Test block-dependency relationships
-const blockDependencyRels = allRels.filter((r) => {
-  if (r.type !== 'calls') return false;
-  if (typeof r.properties !== 'object' || r.properties === null) return false;
-  const props = typeof r.properties === 'string' ? JSON.parse(r.properties) : r.properties;
-  return props?.relationshipContext === 'block-dependency';
-});
+const blockDependencyRels = allRels.filter(
+  (r) => r.type === 'calls' && r.properties.relationshipContext === 'block-dependency'
+);
 console.log(`\n   Block-dependency relationships: ${blockDependencyRels.length}`);
 
 if (blockDependencyRels.length > 0) {
   console.log('   Samples:');
   blockDependencyRels.slice(0, 3).forEach((rel) => {
-    const props = typeof rel.properties === 'string' ? JSON.parse(rel.properties) : rel.properties;
+    const blockType = typeof rel.properties.blockType === 'string' ? rel.properties.blockType : '';
     const from = Array.isArray(rel.from) ? rel.from[0] : rel.from;
     const to = Array.isArray(rel.to) ? rel.to[0] : rel.to;
-    console.log(`     - ${from} (${props?.blockType}) → ${to}`);
+    console.log(`     - ${from} (${blockType}) → ${to}`);
   });
 }
 
@@ -160,9 +157,7 @@ if (symbolsWithExposure.length > 0) {
 
   console.log('\n   Samples:');
   symbolsWithExposure.slice(0, 3).forEach((symbol) => {
-    const scope: ExposureScope | null = symbol.exposure_scope
-      ? JSON.parse(symbol.exposure_scope)
-      : null;
+    const scope = symbol.exposure_scope ? parseJson<ExposureScope>(symbol.exposure_scope) : null;
     console.log(
       `     - ${symbol.name} (${symbol.type}): ${symbol.exposure_level}, export path: ${symbol.export_path || 'N/A'}`
     );

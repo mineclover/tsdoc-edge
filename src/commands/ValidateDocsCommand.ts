@@ -16,7 +16,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @public
  * @responsibility Validate document symbols against SSOT rules
  * @contract Parse documents, validate symbols, report errors and warnings
- * @doc [[Validate Docs Command]]
+ * @doc [[ValidateDocsCommand]]
  * @doc [[CLI Commands#validate-docs]]
  *
  * @problem Document symbols can have conflicts, orphans, or missing definitions
@@ -76,8 +76,8 @@ export class ValidateDocsCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -131,8 +131,14 @@ export class ValidateDocsCommand extends BaseCommand {
       const indexPath = path.resolve(process.cwd(), '.tsdoc/doc-symbols.json');
       if (fs.existsSync(indexPath)) {
         try {
-          const indexData = JSON.parse(fs.readFileSync(indexPath, 'utf-8'));
-          const codeConnections = indexData.registryData?.codeConnections || [];
+          type CodeConnectionArg = Parameters<DocumentSymbolRegistry['registerCodeConnection']>[0];
+          const rawIndexData: unknown = JSON.parse(fs.readFileSync(indexPath, 'utf-8'));
+          const indexData = rawIndexData as {
+            registryData?: {
+              codeConnections?: Array<[string, CodeConnectionArg[]]>;
+            };
+          };
+          const codeConnections = indexData.registryData?.codeConnections ?? [];
           for (const [_symbolName, connections] of codeConnections) {
             for (const conn of connections) {
               registry.registerCodeConnection(conn);
@@ -221,10 +227,10 @@ export class ValidateDocsCommand extends BaseCommand {
 
       if (stat.isDirectory()) {
         // Skip excluded directories
-        if (excludeDirs?.includes(entry)) {
+        if (excludeDirs.includes(entry)) {
           continue;
         }
-        files.push(...this.findMarkdownFiles(fullPath, excludeDirs || []));
+        files.push(...this.findMarkdownFiles(fullPath, excludeDirs));
       } else if (entry.endsWith('.md') || entry.endsWith('.mdx')) {
         files.push(fullPath);
       }

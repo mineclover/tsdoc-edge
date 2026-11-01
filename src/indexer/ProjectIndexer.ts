@@ -154,6 +154,10 @@ function compareText(left: string, right: string): number {
   return left < right ? -1 : left > right ? 1 : 0;
 }
 
+function isUnknownArray(value: unknown): value is readonly unknown[] {
+  return Array.isArray(value);
+}
+
 function canonicalJsonClone<T>(value: T, field: string, ancestors = new WeakSet<object>()): T {
   if (value === null || typeof value === 'string' || typeof value === 'boolean') return value;
   if (typeof value === 'number') {
@@ -166,12 +170,12 @@ function canonicalJsonClone<T>(value: T, field: string, ancestors = new WeakSet<
   if (ancestors.has(value)) throw new Error(`${field} contains a circular value`);
   ancestors.add(value);
   try {
-    if (Array.isArray(value)) {
+    if (isUnknownArray(value)) {
       return Object.freeze(
         value.map((child, index) => canonicalJsonClone(child, `${field}[${index}]`, ancestors))
       ) as T;
     }
-    const prototype = Object.getPrototypeOf(value);
+    const prototype: unknown = Object.getPrototypeOf(value);
     if (prototype !== Object.prototype && prototype !== null) {
       throw new Error(`${field} contains a non-JSON object`);
     }

@@ -487,8 +487,10 @@ function jsDocTagNames(fileName: string, source: string): Set<string> {
     }
     return false;
   };
+  const getNodeJsDocs = (node: ts.Node): readonly ts.JSDoc[] =>
+    'jsDoc' in node && Array.isArray(node.jsDoc) ? node.jsDoc.filter(ts.isJSDoc) : [];
   const visit = (node: ts.Node): void => {
-    for (const doc of (node as ts.Node & { jsDoc?: ts.JSDoc[] }).jsDoc ?? []) {
+    for (const doc of getNodeJsDocs(node)) {
       if (hasCommentSummary(doc.comment)) {
         names.add('summary');
       }
@@ -545,10 +547,11 @@ function buildRecommendations(
       message: `${lifecycle.readyForPromotionCount} documents meet the score for their next status ('tsdoc-edge spec status list-ready').`,
     });
   }
-  const weakest = (
+  const sortedAspects = (
     Object.entries(aspects.aspectCoverage) as Array<[ModuleSpecAspect, number]>
-  ).sort((a, b) => a[1] - b[1])[0];
-  if (weakest && weakest[1] < 50) {
+  ).sort((a, b) => a[1] - b[1]);
+  if (sortedAspects.length > 0 && sortedAspects[0][1] < 50) {
+    const weakest = sortedAspects[0];
     out.push({
       category: 'quality',
       severity: 'info',

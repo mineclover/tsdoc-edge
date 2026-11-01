@@ -62,8 +62,8 @@ export class ParallelWorkCommand extends BaseCommand {
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
-    return this.executeWithErrorHandling(async () => {
+  execute(args: string[]): Promise<CommandResult> {
+    return this.executeWithErrorHandling(() => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
@@ -74,7 +74,7 @@ export class ParallelWorkCommand extends BaseCommand {
       // Parse arguments
       const options = this.parseArgs(args);
 
-      if (!options.working || options.working.length === 0) {
+      if (options.working.length === 0) {
         this.printError('No working modules specified. Use --working "Module1,Module2"');
         return this.failure('No working modules specified');
       }

@@ -191,9 +191,13 @@ function optionalPositiveInt(value: unknown): number | undefined {
   return value;
 }
 
+function isStringArray(value: unknown): value is readonly string[] {
+  return Array.isArray(value) && value.every((entry) => typeof entry === 'string');
+}
+
 function optionalStringArray(value: unknown): readonly string[] | undefined {
   if (value === undefined) return undefined;
-  if (!Array.isArray(value) || value.some((entry) => typeof entry !== 'string')) {
+  if (!isStringArray(value)) {
     throw new Error('relatedNodeIds must be an array of strings');
   }
   return Object.freeze([...value]);
