@@ -308,5 +308,5 @@ describe('DocumentSymbolParser', () => {
 
 ### Implemented By
 
-- DocumentSymbolParser → src/doc-symbol/DocumentSymbolParser.ts:1
+- DocumentSymbolParser → src/doc-symbol/DocumentSymbolParser.ts:26
 

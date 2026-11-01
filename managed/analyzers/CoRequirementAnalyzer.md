@@ -14,3 +14,12 @@ source: src/analyzer/CoRequirementAnalyzer.ts
 ## Overview
 
 Extracts co-requirement relationships from `@requires` tags and paired symbol usage patterns.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- CoRequirementAnalyzer → src/analyzer/CoRequirementAnalyzer.ts:57
+

@@ -14,3 +14,13 @@ source: src/commands/TaskCommands.ts
 ## Overview
 
 Provides CLI subcommands for tracking and updating documentation and refactoring task checklists.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- TaskCommands → src/commands/TaskCommands.ts:1
+- TaskListCommand → src/commands/TaskCommands.ts:18
+

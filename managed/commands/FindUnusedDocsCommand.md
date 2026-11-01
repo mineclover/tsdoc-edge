@@ -14,3 +14,12 @@ source: src/commands/FindUnusedDocsCommand.ts
 ## Overview
 
 Identifies managed Markdown documents that have zero incoming document references or code `@doc` bindings.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- FindUnusedDocsCommand → src/commands/FindUnusedDocsCommand.ts:35
+

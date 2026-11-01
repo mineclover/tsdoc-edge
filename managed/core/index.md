@@ -60,3 +60,7 @@ Top-level programmatic SDK facade exposing TSDoc parsing, symbol graph construct
 - [[TSDoc Edge Documentation]] → managed/README.md:193
 - [[Core Components]] → managed/core-components/index.md:34
 
+### Implemented By
+
+- Core Systems → src/index.ts:1
+

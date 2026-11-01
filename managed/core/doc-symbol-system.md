@@ -413,7 +413,7 @@ symbols.forEach(sym => {
 
 - [[TSDoc Edge Documentation]] → managed/README.md:292
 - [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1461
-- [[Code Generation]] → managed/code-generation/index.md:132
+- [[Code Generation]] → managed/code-generation/index.md:138
 - [[CheckLinksCommand]] → managed/commands/CheckLinksCommand.md:29
 - [[ExploreEntrypointCommand]] → managed/commands/ExploreEntrypointCommand.md:31
 - [[IndexDocsCommand]] → managed/commands/IndexDocsCommand.md:79

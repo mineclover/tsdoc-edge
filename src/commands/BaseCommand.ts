@@ -493,6 +493,54 @@ export abstract class BaseCommand {
   }
 
   /**
+   * Validate CLI flags fail-closed so mutating or strict commands reject unknown options.
+   *
+   * @param args - Raw command arguments
+   * @param allowedBooleanFlags - Supported boolean flags (e.g. `['--dry-run', '-n', '--check']`)
+   * @param allowedValueFlags - Supported value-taking flags (e.g. `['--min-score', '--depth']`)
+   * @returns Error `CommandResult` if an unsupported flag is found, or `null` when valid
+   */
+  protected validateAllowedFlags(
+    args: readonly string[],
+    allowedBooleanFlags: readonly string[],
+    allowedValueFlags: readonly string[] = []
+  ): CommandResult | null {
+    const booleanSet = new Set(['--help', '-h', '--verbose', '-v', ...allowedBooleanFlags]);
+    const valueSet = new Set(allowedValueFlags);
+
+    for (let i = 0; i < args.length; i++) {
+      const arg = args[i];
+      if (!arg.startsWith('-') || arg === '-') {
+        continue;
+      }
+      if (arg === '--') {
+        break;
+      }
+      const eqIdx = arg.indexOf('=');
+      if (eqIdx !== -1) {
+        const flagName = arg.slice(0, eqIdx);
+        if (!valueSet.has(flagName) && !booleanSet.has(flagName)) {
+          this.printUsageError(`Unknown option: ${flagName}`);
+          return this.failure(`Unknown option: ${flagName}`, 1);
+        }
+        continue;
+      }
+      if (valueSet.has(arg)) {
+        if (i + 1 < args.length && !args[i + 1].startsWith('-')) {
+          i++;
+        }
+        continue;
+      }
+      if (!booleanSet.has(arg)) {
+        this.printUsageError(`Unknown option: ${arg}`);
+        return this.failure(`Unknown option: ${arg}`, 1);
+      }
+    }
+
+    return null;
+  }
+
+  /**
    * Get command usage information
    * Override this method to provide custom usage info
    *

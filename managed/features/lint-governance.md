@@ -82,6 +82,9 @@ typecheck and the affected test lane.
 
 ### Referenced By
 
+- [[CrossSpecIntegrationContract]] → managed/specs/domains/cross-spec-integration-contract.md:188
+- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:101
+- [[TtscPlatformSpecification]] → managed/specs/domains/ttsc-platform-spec.md:79
 - [[Document Validation Warning Policy]] → managed/workflows/document-validation-warning-policy.md:13
 
 ### Implemented By

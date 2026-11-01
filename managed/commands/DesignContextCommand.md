@@ -14,3 +14,12 @@ source: src/commands/DesignContextCommand.ts
 ## Overview
 
 Displays inline ADR decisions (`@decision`, `@rationale`, `@consequences`) and `@contract` invariants for a target file.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- DesignContextCommand → src/commands/DesignContextCommand.ts:113
+

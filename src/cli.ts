@@ -20,6 +20,7 @@ import {
   ConventionCommand,
   CoreApiCommand,
   CoverageBaselineCommand,
+  FindMethodCommand,
   FixCommand,
   HealthCommand,
   HelpCommand,
@@ -36,6 +37,7 @@ import {
   StatsCommand,
   SuggestCommand,
   SymbolUnifiedCommand,
+  SyncCommand,
   SyncCoverageCommand,
   TodosCommand,
   TreeCommand,
@@ -186,12 +188,14 @@ async function main(): Promise<void> {
 
   // Register commands - Core workflow
   registry.register(new BuildCommand());
+  registry.register(new SyncCommand());
   registry.register(new CanonicalGraphCommand());
   registry.register(new WorkContextCommand());
   registry.register(new DesignContextCommand());
   registry.register(new HealthCommand());
   registry.register(new StatsCommand());
   registry.register(new InitCommand());
+  registry.register(new FindMethodCommand());
 
   // Register commands - Unified commands
   registry.register(new ValidateUnifiedCommand());

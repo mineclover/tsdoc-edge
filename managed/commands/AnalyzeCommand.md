@@ -49,5 +49,5 @@ canonical: true
 
 ### Implemented By
 
-- AnalyzeCommand → src/commands/AnalyzeCommand.ts:37
+- AnalyzeCommand → src/commands/AnalyzeCommand.ts:33
 

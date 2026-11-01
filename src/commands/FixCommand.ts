@@ -13,8 +13,8 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  *
  * Analyzes code and automatically fixes documentation problems:
  * - Adds missing summaries
- * - Adds @param tags
- * - Adds @returns tags
+ * - Adds `@param` tags
+ * - Adds `@returns` tags
  * - Adds custom tags
  *
  * Supports dry-run mode for preview without modifications.
@@ -24,6 +24,11 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  */
 export class FixCommand extends BaseCommand {
   private checker?: CodeHealthChecker;
+
+  constructor(checker?: CodeHealthChecker) {
+    super();
+    this.checker = checker;
+  }
 
   /**
    * getName method
@@ -53,36 +58,39 @@ export class FixCommand extends BaseCommand {
 
   Default: src
   Options:
-    --dry-run         Preview changes without modifying files
-    --min-score=N     Minimum quality score threshold (default: 70)`;
+    --dry-run, -n     Preview changes without modifying files
+    --min-score <n>   Minimum quality score threshold (default: 70)`;
   }
 
   /**
    * execute method
    * @param args - args parameter
-   * @returns Returns Promise<CommandResult>
+   * @returns Returns `Promise<CommandResult>`
    * @public
    */
-  async execute(args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(async () => {
       // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
 
-      let targetPath = args[0] || 'src';
-      let dryRun = false;
-      let minScore = 70;
+      const flagError = this.validateAllowedFlags(args, ['--dry-run', '-n'], ['--min-score']);
+      if (flagError) {
+        return flagError;
+      }
 
-      // Parse options
-      for (const arg of args) {
-        if (arg === '--dry-run') {
-          dryRun = true;
-        } else if (arg.startsWith('--min-score=')) {
-          minScore = Number.parseInt(arg.split('=')[1], 10);
-        } else if (!arg.startsWith('--')) {
-          targetPath = arg;
+      const positionalArgs = this.getPositionalArgs(args, ['--min-score']);
+      const targetPath = positionalArgs[0] || 'src';
+      const dryRun = this.hasFlag(args, '--dry-run') || this.hasFlag(args, '-n');
+      const rawMinScore = this.getOption(args, '--min-score');
+      let minScore = 70;
+      if (rawMinScore !== undefined) {
+        const parsedScore = Number.parseInt(rawMinScore, 10);
+        if (Number.isNaN(parsedScore) || parsedScore < 0 || parsedScore > 100) {
+          return this.failure(`Invalid --min-score value: ${rawMinScore}`, 1);
         }
+        minScore = parsedScore;
       }
 
       console.log(`${colors.bold}TSDoc Edge - Fix Documentation${colors.reset}`);

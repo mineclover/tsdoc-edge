@@ -14,3 +14,12 @@ source: src/analyzer/CompositionAnalyzer.ts
 ## Overview
 
 Detects structural `has-a` composition relationships from class properties, constructor parameters, and member initializers.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- CompositionAnalyzer → src/analyzer/CompositionAnalyzer.ts:45
+

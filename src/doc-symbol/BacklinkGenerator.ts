@@ -183,9 +183,14 @@ export class BacklinkGenerator {
    *
    * @param filePath - Document path
    * @param symbolName - Symbol name
-   * @returns boolean - True if file content was modified and written to disk
+   * @param options - Optional execution flags
+   * @returns boolean - True if file content was modified (or would be modified in dry-run mode)
    */
-  updateBacklinksSection(filePath: string, symbolName: string): boolean {
+  updateBacklinksSection(
+    filePath: string,
+    symbolName: string,
+    options?: { dryRun?: boolean }
+  ): boolean {
     if (!fs.existsSync(filePath)) {
       throw new Error(`File not found: ${filePath}`);
     }
@@ -211,7 +216,9 @@ export class BacklinkGenerator {
     }
 
     if (updated !== content) {
-      fs.writeFileSync(filePath, updated, 'utf-8');
+      if (options?.dryRun !== true) {
+        fs.writeFileSync(filePath, updated, 'utf-8');
+      }
       return true;
     }
     return false;
@@ -265,17 +272,20 @@ export class BacklinkGenerator {
   /**
    * Update backlinks for all documents
    *
+   * @param options - Optional execution flags
    * @returns Updated file paths
    */
-  updateAllBacklinks(): string[] {
+  updateAllBacklinks(options?: { dryRun?: boolean }): string[] {
     const updated: string[] = [];
     const allSymbols = this.registry.getAllSymbolNames();
 
     for (const symbolName of allSymbols) {
       const definition = this.registry.getDefinition(symbolName);
       if (definition) {
-        this.updateBacklinksSection(definition.filePath, symbolName);
-        updated.push(definition.filePath);
+        const wasModified = this.updateBacklinksSection(definition.filePath, symbolName, options);
+        if (!options?.dryRun || wasModified) {
+          updated.push(definition.filePath);
+        }
       }
     }
 

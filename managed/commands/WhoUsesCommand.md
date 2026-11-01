@@ -200,10 +200,10 @@ Source: `src/commands/Phase5Commands.ts`
 - [[Impact Analysis]] → managed/features/ImpactAnalysis.md:200
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:275
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:259
-- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:688
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:684
 - [[Guides & Tutorials]] → managed/guides/index.md:282
 
 ### Implemented By
 
-- WhoUsesCommand → src/commands/WhoUsesCommand.ts:40
+- WhoUsesCommand → src/commands/WhoUsesCommand.ts:36
 

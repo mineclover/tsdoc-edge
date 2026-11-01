@@ -14,3 +14,12 @@ source: src/commands/OntologyListCommand.ts
 ## Overview
 
 Lists symbol and relationship instances matching specific relationship ontology categories and predicates.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- OntologyListCommand → src/commands/OntologyListCommand.ts:44
+

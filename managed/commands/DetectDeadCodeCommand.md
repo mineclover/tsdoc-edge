@@ -109,5 +109,5 @@ tsdoc-edge detect-dead-code --json
 
 ### Implemented By
 
-- DetectDeadCodeCommand → src/commands/DetectDeadCodeCommand.ts:46
+- DetectDeadCodeCommand → src/commands/DetectDeadCodeCommand.ts:42
 

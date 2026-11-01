@@ -14,3 +14,12 @@ source: src/commands/ImproveCommand.ts
 ## Overview
 
 Analyzes documentation gaps and guides iterative TSDoc quality improvements across a source directory.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- ImproveCommand → src/commands/ImproveCommand.ts:31
+

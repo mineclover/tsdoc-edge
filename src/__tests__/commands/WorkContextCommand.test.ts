@@ -540,5 +540,160 @@ export function testFunc(): void {}
       // Should not throw an error
       expect(result).toBeDefined();
     });
+
+    it('renders @packageDocumentation moduleSummary and multi-export Exported API Surface in --llm mode', async () => {
+      const multiFile = path.join(tempDir, 'src', 'MultiExportReader.ts');
+      fs.writeFileSync(
+        multiFile,
+        `/**
+ * TSDoc comment reader utilities for structured AST extraction.
+ * @packageDocumentation
+ */
+
+/** Options for rendering TSDoc nodes */
+export interface TsdocRenderOptions {
+  preserveNewlines?: boolean;
+}
+
+function internalHelper(): string {
+  return '';
+}
+
+/** Read a parsed TSDoc comment into structured sections */
+export function readTsdocComment(): string {
+  return internalHelper();
+}
+
+/** Render a TSDoc node list as plain text */
+export function renderDocNodesText(): string {
+  return '';
+}
+`,
+        'utf-8'
+      );
+
+      const dbManager = new DatabaseManager(dbPath, path.join(tempDir, '.tsdoc', 'data'));
+      dbManager.insertSymbol(
+        {
+          id: 'render-doc-nodes-text',
+          name: 'renderDocNodesText',
+          type: 'function',
+          filePath: 'src/MultiExportReader.ts',
+          line: 21,
+          column: 1,
+          isExported: true,
+          isPublic: true,
+          summary: 'Render a TSDoc node list as plain text',
+          tests: [],
+          designDecisions: [],
+        },
+        1
+      );
+      dbManager.insertSymbol(
+        {
+          id: 'tsdoc-render-options',
+          name: 'TsdocRenderOptions',
+          type: 'interface',
+          filePath: 'src/MultiExportReader.ts',
+          line: 7,
+          column: 1,
+          isExported: true,
+          isPublic: true,
+          summary: 'Options for rendering TSDoc nodes',
+          tests: [],
+          designDecisions: [],
+        },
+        2
+      );
+      dbManager.insertSymbol(
+        {
+          id: 'internal-helper',
+          name: 'internalHelper',
+          type: 'function',
+          filePath: 'src/MultiExportReader.ts',
+          line: 11,
+          column: 1,
+          isExported: false,
+          isPublic: false,
+          tests: [],
+          designDecisions: [],
+        },
+        3
+      );
+      dbManager.insertSymbol(
+        {
+          id: 'read-tsdoc-comment',
+          name: 'readTsdocComment',
+          type: 'function',
+          filePath: 'src/MultiExportReader.ts',
+          line: 16,
+          column: 1,
+          isExported: true,
+          isPublic: true,
+          summary: 'Read a parsed TSDoc comment into structured sections',
+          tests: [],
+          designDecisions: [],
+        },
+        4
+      );
+      dbManager.close();
+
+      jest.spyOn(CanonicalAliasContext, 'tryOpen').mockReturnValue(null);
+      const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+      const result = await command.execute(['src/MultiExportReader.ts', '--llm']);
+      const markdown = log.mock.calls.flat().join('\n');
+
+      expect(result.exitCode).toBe(0);
+      expect(markdown).toContain(
+        '**Module Overview**: TSDoc comment reader utilities for structured AST extraction.'
+      );
+      // Primary symbol sentence preserved for differential contract compatibility
+      expect(markdown).toContain(
+        '**renderDocNodesText** is a `function`: Render a TSDoc node list as plain text'
+      );
+      expect(markdown).toContain('### Exported API Surface (3)');
+      const idxOptions = markdown.indexOf(
+        '- **TsdocRenderOptions** (`interface`, line 7): Options for rendering TSDoc nodes'
+      );
+      const idxRead = markdown.indexOf(
+        '- **readTsdocComment** (`function`, line 16): Read a parsed TSDoc comment into structured sections'
+      );
+      const idxRender = markdown.indexOf(
+        '- **renderDocNodesText** (`function`, line 21): Render a TSDoc node list as plain text'
+      );
+      expect(idxOptions).toBeGreaterThan(-1);
+      expect(idxRead).toBeGreaterThan(idxOptions);
+      expect(idxRender).toBeGreaterThan(idxRead);
+      expect(markdown).not.toContain('- **internalHelper**');
+      expect(markdown).toContain('- **Total File Symbols**: 4 (3 exported)');
+    });
+
+    it('preserves "No primary symbol found." in --llm mode when file has @packageDocumentation but no DB symbols', async () => {
+      const docOnlyFile = path.join(tempDir, 'src', 'DocOnly.ts');
+      fs.writeFileSync(
+        docOnlyFile,
+        `/**
+ * Module overview before indexing.
+ * @packageDocumentation
+ */
+export const VERSION = '1.0.0';
+`,
+        'utf-8'
+      );
+
+      const dbManager = new DatabaseManager(dbPath, path.join(tempDir, '.tsdoc', 'data'));
+      dbManager.close();
+
+      jest.spyOn(CanonicalAliasContext, 'tryOpen').mockReturnValue(null);
+      const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+      const result = await command.execute(['src/DocOnly.ts', '--llm']);
+      const markdown = log.mock.calls.flat().join('\n');
+
+      expect(result.exitCode).toBe(0);
+      expect(markdown).toContain('**Module Overview**: Module overview before indexing.');
+      expect(markdown).toContain('No primary symbol found.');
+    });
   });
 });

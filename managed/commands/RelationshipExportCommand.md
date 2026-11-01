@@ -14,3 +14,12 @@ source: src/commands/RelationshipExportCommand.ts
 ## Overview
 
 Exports symbol relationship subgraphs to JSON, CSV, DOT, and GraphML interchange formats.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- RelationshipExportCommand → src/commands/RelationshipExportCommand.ts:1
+

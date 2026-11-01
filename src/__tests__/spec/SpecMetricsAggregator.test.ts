@@ -140,4 +140,183 @@ describe('SpecMetricsAggregator', () => {
       expect(agg.getSpecMetricsForFile('src/none.ts').recommendations[0]).toContain('not found');
     });
   });
+
+  describe('pure-module neutral effect scoring', () => {
+    it('does not penalize pure modules or recommend @sideEffect while keeping aspectCoverage.effect raw', () => {
+      fs.mkdirSync('pure-src', { recursive: true });
+      fs.writeFileSync(
+        'pure-src/pureParser.ts',
+        [
+          "import type { Stats } from 'node:fs';",
+          '/**',
+          ' * Parse input tokens purely.',
+          ' * @doc [[Alpha]]',
+          ' * @responsibility Parse tokens into an AST',
+          ' * @param input - Raw token text',
+          ' * @returns Token count',
+          ' * @see Alpha',
+          ' * @remarks Deterministic pure string scan.',
+          ' * @public',
+          ' */',
+          'export function parsePure(input: string, _unused?: Stats): number {',
+          '  return input.trim().length;',
+          '}',
+          '',
+        ].join('\n')
+      );
+
+      const agg = new SpecMetricsAggregator();
+      const metrics = agg.aggregate({
+        managedDir: 'specs',
+        dbPath: 'symbols.db',
+        specDbPath: 'no-spec-graph.db',
+        srcDir: 'pure-src',
+      });
+
+      expect(metrics.module7Aspects.analyzedFiles).toBe(1);
+      expect(metrics.module7Aspects.aspectCoverage.effect).toBe(0);
+      expect(metrics.module7Aspects.effectfulFiles).toBe(0);
+      expect(metrics.module7Aspects.effectCoverageOfEffectfulFiles).toBe(100);
+      expect(metrics.module7Aspects.averageAspectScore).toBe(100);
+      expect(
+        metrics.recommendations.some((r) => r.message.includes('Weakest module-spec aspect'))
+      ).toBe(false);
+
+      const fileCtx = agg.getSpecMetricsForFile('pure-src/pureParser.ts', {
+        managedDir: 'specs',
+      });
+      expect(fileCtx.aspectsCoverage?.effect).toBe(false);
+      expect(fileCtx.recommendations.some((r) => r.includes('No effect aspect tag'))).toBe(false);
+    });
+
+    it('detects impure modules, recommends @sideEffect, and recovers score once documented', () => {
+      fs.mkdirSync('mixed-src', { recursive: true });
+      fs.writeFileSync(
+        'mixed-src/pureModel.ts',
+        [
+          '/**',
+          ' * Pure value formatter.',
+          ' * @doc [[Alpha]]',
+          ' * @responsibility Format label',
+          ' * @param label - Raw label',
+          ' * @returns Trimmed label',
+          ' * @see Alpha',
+          ' * @remarks No runtime I/O.',
+          ' * @public',
+          ' */',
+          'export function formatLabel(label: string): string {',
+          '  return label.trim();',
+          '}',
+          '',
+        ].join('\n')
+      );
+      const impureHeaderWithoutEffect = [
+        "import * as fs from 'node:fs';",
+        '/**',
+        ' * Persist formatted label to disk.',
+        ' * @doc [[Alpha]]',
+        ' * @responsibility Write label file',
+        ' * @param target - File path',
+        ' * @returns Written byte count',
+        ' * @see Alpha',
+        ' * @remarks Performs synchronous disk write.',
+        ' * @public',
+        ' */',
+        'export function writeLabel(target: string): number {',
+        "  fs.writeFileSync(target, 'ok');",
+        '  return 2;',
+        '}',
+        '',
+      ].join('\n');
+      fs.writeFileSync('mixed-src/ioWriter.ts', impureHeaderWithoutEffect);
+
+      const agg = new SpecMetricsAggregator();
+      const before = agg.aggregate({
+        managedDir: 'specs',
+        dbPath: 'symbols.db',
+        specDbPath: 'no-spec-graph.db',
+        srcDir: 'mixed-src',
+      });
+
+      expect(before.module7Aspects.analyzedFiles).toBe(2);
+      expect(before.module7Aspects.effectfulFiles).toBe(1);
+      expect(before.module7Aspects.aspectCoverage.effect).toBe(0);
+      expect(before.module7Aspects.effectCoverageOfEffectfulFiles).toBe(0);
+      expect(before.module7Aspects.averageAspectScore).toBe(86);
+      expect(
+        before.recommendations.some((r) =>
+          r.message.includes('Weakest module-spec aspect: effect (0% of effectful files')
+        )
+      ).toBe(true);
+
+      const impureCtx = agg.getSpecMetricsForFile('mixed-src/ioWriter.ts', {
+        managedDir: 'specs',
+      });
+      expect(impureCtx.aspectsCoverage?.effect).toBe(false);
+      expect(
+        impureCtx.recommendations.some((r) => r.includes('No effect aspect tag (@sideEffect).'))
+      ).toBe(true);
+
+      // Document @sideEffect on the impure file; pureModel.ts remains without @sideEffect.
+      fs.writeFileSync(
+        'mixed-src/ioWriter.ts',
+        impureHeaderWithoutEffect.replace(
+          ' * @public',
+          ' * @sideEffect Writes target file on disk\n * @public'
+        )
+      );
+
+      const after = agg.aggregate({
+        managedDir: 'specs',
+        dbPath: 'symbols.db',
+        specDbPath: 'no-spec-graph.db',
+        srcDir: 'mixed-src',
+      });
+
+      expect(after.module7Aspects.effectfulFiles).toBe(1);
+      expect(after.module7Aspects.aspectCoverage.effect).toBe(50);
+      expect(after.module7Aspects.effectCoverageOfEffectfulFiles).toBe(100);
+      expect(after.module7Aspects.averageAspectScore).toBe(100);
+      expect(
+        after.recommendations.some((r) => r.message.includes('Weakest module-spec aspect: effect'))
+      ).toBe(false);
+
+      const documentedCtx = agg.getSpecMetricsForFile('mixed-src/ioWriter.ts', {
+        managedDir: 'specs',
+      });
+      expect(documentedCtx.aspectsCoverage?.effect).toBe(true);
+      expect(documentedCtx.recommendations.some((r) => r.includes('No effect aspect tag'))).toBe(
+        false
+      );
+    });
+
+    it('treats process and console globals or CommonJS require of stateful modules as effectful', () => {
+      fs.mkdirSync('globals-src', { recursive: true });
+      fs.writeFileSync(
+        'globals-src/envReader.ts',
+        `export const readMode = (): string => process.env.NODE_ENV ?? 'test';\n`
+      );
+      fs.writeFileSync(
+        'globals-src/cjsRunner.ts',
+        `const cp = require('child_process');\nexport const hasExec = (): boolean => Boolean(cp);\n`
+      );
+
+      const agg = new SpecMetricsAggregator();
+      const metrics = agg.aggregate({
+        managedDir: 'specs',
+        dbPath: 'symbols.db',
+        specDbPath: 'no-spec-graph.db',
+        srcDir: 'globals-src',
+      });
+
+      expect(metrics.module7Aspects.analyzedFiles).toBe(2);
+      expect(metrics.module7Aspects.effectfulFiles).toBe(2);
+      expect(metrics.module7Aspects.effectCoverageOfEffectfulFiles).toBe(0);
+      expect(
+        agg
+          .getSpecMetricsForFile('globals-src/envReader.ts', { managedDir: 'specs' })
+          .recommendations.some((r) => r.includes('No effect aspect tag (@sideEffect).'))
+      ).toBe(true);
+    });
+  });
 });

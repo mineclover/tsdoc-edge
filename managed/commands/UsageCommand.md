@@ -40,5 +40,5 @@ Shows:
 
 ### Implemented By
 
-- UsageCommand → src/commands/UsageCommand.ts:35
+- UsageCommand → src/commands/UsageCommand.ts:31
 

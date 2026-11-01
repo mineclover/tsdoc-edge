@@ -14,3 +14,13 @@ source: src/generator/InsightDocGenerator.ts
 ## Overview
 
 Generates hierarchical architectural insight documents organized by dependency depth and symbol importance.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- InsightDocGenerator → src/generator/InsightDocGenerator.ts:1
+- InsightGenOptions → src/generator/InsightDocGenerator.ts:15
+

@@ -14,3 +14,12 @@ source: src/analyzer/CollaborationAnalyzer.ts
 ## Overview
 
 Identifies mutual collaboration relationships between symbols that coordinate to fulfill a shared workflow.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- CollaborationAnalyzer → src/analyzer/CollaborationAnalyzer.ts:47
+

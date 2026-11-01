@@ -128,6 +128,14 @@ export class ConfigManager {
         ...userConfig.specGovernance,
         naming: userConfig.specGovernance?.naming ?? defaultConfig.specGovernance?.naming,
       },
+      ...(defaultConfig.canonicalGraph || userConfig.canonicalGraph
+        ? {
+            canonicalGraph: {
+              ...defaultConfig.canonicalGraph,
+              ...userConfig.canonicalGraph,
+            },
+          }
+        : {}),
     };
   }
 

@@ -1548,43 +1548,54 @@ export class BuildCommand extends BaseCommand {
       args.includes('--canonical-graph') || process.env.TSDOC_EDGE_CANONICAL_GRAPH === '1';
     if (!enabled) return null;
 
-    const moduleSpecifier =
-      this.getOption(args, '--router-module') ?? process.env.TSDOC_EDGE_GRAPH_ROUTER_MODULE;
-    if (!moduleSpecifier) {
+    const rootDir = this.configManager.getProjectRoot();
+    const canonicalConfig = this.configManager.get().canonicalGraph;
+    const rawModuleSpecifier =
+      this.getOption(args, '--router-module') ??
+      process.env.TSDOC_EDGE_GRAPH_ROUTER_MODULE ??
+      canonicalConfig?.routerModule;
+    if (!rawModuleSpecifier) {
       throw new Error(
-        '--canonical-graph requires --router-module or TSDOC_EDGE_GRAPH_ROUTER_MODULE'
+        '--canonical-graph requires --router-module or TSDOC_EDGE_GRAPH_ROUTER_MODULE (or canonicalGraph.routerModule in .tsdoc.config.json)'
       );
     }
+    const moduleSpecifier = rawModuleSpecifier.startsWith('.')
+      ? path.resolve(rootDir, rawModuleSpecifier)
+      : rawModuleSpecifier;
 
-    const rootDir = this.configManager.getProjectRoot();
+    const routerConfigPath =
+      this.getOption(args, '--router-config') ??
+      process.env.TSDOC_EDGE_GRAPH_ROUTER_CONFIG ??
+      canonicalConfig?.routerConfig;
+    const routerRepoId =
+      this.getOption(args, '--router-repo') ??
+      process.env.TSDOC_EDGE_GRAPH_ROUTER_REPO ??
+      canonicalConfig?.routerRepo;
+
     const coordinatorOptions: CanonicalGraphCoordinatorOptions = {
       rootDir,
       moduleSpecifier,
       workspaceId:
-        this.getOption(args, '--graph-workspace') ?? process.env.TSDOC_EDGE_GRAPH_WORKSPACE,
+        this.getOption(args, '--graph-workspace') ??
+        process.env.TSDOC_EDGE_GRAPH_WORKSPACE ??
+        canonicalConfig?.workspaceId,
       graphNamespace:
-        this.getOption(args, '--graph-namespace') ?? process.env.TSDOC_EDGE_GRAPH_NAMESPACE,
+        this.getOption(args, '--graph-namespace') ??
+        process.env.TSDOC_EDGE_GRAPH_NAMESPACE ??
+        canonicalConfig?.graphNamespace,
       typescript: {
         tsconfigPath:
           this.getOption(args, '--graph-tsconfig') ??
           process.env.TSDOC_EDGE_GRAPH_TSCONFIG ??
+          canonicalConfig?.tsconfigPath ??
           DEFAULT_GRAPH_TSCONFIG,
-        ...((this.getOption(args, '--router-config') ?? process.env.TSDOC_EDGE_GRAPH_ROUTER_CONFIG)
-          ? {
-              routerConfigPath:
-                this.getOption(args, '--router-config') ??
-                process.env.TSDOC_EDGE_GRAPH_ROUTER_CONFIG,
-            }
-          : {}),
-        ...((this.getOption(args, '--router-repo') ?? process.env.TSDOC_EDGE_GRAPH_ROUTER_REPO)
-          ? {
-              routerRepoId:
-                this.getOption(args, '--router-repo') ?? process.env.TSDOC_EDGE_GRAPH_ROUTER_REPO,
-            }
-          : {}),
+        ...(routerConfigPath ? { routerConfigPath } : {}),
+        ...(routerRepoId ? { routerRepoId } : {}),
       },
       repositoryPath:
-        this.getOption(args, '--canonical-graph-db') ?? process.env.TSDOC_EDGE_CANONICAL_GRAPH_DB,
+        this.getOption(args, '--canonical-graph-db') ??
+        process.env.TSDOC_EDGE_CANONICAL_GRAPH_DB ??
+        canonicalConfig?.databasePath,
     };
     const coordinator = this.dependencies.canonicalCoordinatorFactory
       ? this.dependencies.canonicalCoordinatorFactory(coordinatorOptions)

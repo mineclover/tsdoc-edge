@@ -116,7 +116,7 @@ tsdoc-edge validate-spec <file> [options]
 ### Referenced By
 
 - [[Commands Index]] → managed/COMMANDS.md:184
-- [[AuthoredProjectSpecifications]] → managed/specs/index.md:82
+- [[AuthoredProjectSpecifications]] → managed/specs/index.md:119
 
 ### Implemented By
 

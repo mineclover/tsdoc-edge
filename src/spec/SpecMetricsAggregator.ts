@@ -114,6 +114,10 @@ export interface UnifiedSpecMetrics {
     analyzedFiles: number;
     aspectCoverage: Record<ModuleSpecAspect, number>;
     averageAspectScore: number;
+    /** Count of analyzed files with a side-effect AST signal or explicit `@sideEffect` tag. */
+    effectfulFiles?: number;
+    /** Share of effectful files carrying `@sideEffect` (100 when `effectfulFiles === 0`). */
+    effectCoverageOfEffectfulFiles?: number;
   };
 
   /** 5. Code-to-spec links. */
@@ -269,13 +273,18 @@ export class SpecMetricsAggregator {
       };
     }
     const source = fs.readFileSync(resolved, 'utf8');
-    const tags = jsDocTagNames(resolved, source);
-    const aspectsCoverage = Object.fromEntries(
-      (Object.keys(MODULE_SPEC_ASPECT_TAGS) as ModuleSpecAspect[]).map((aspect) => [
-        aspect,
-        hasAspectEvidence(aspect, tags),
-      ])
-    ) as Record<ModuleSpecAspect, boolean>;
+    const sourceFile = ts.createSourceFile(resolved, source, ts.ScriptTarget.Latest, true);
+    const tags = jsDocTagNames(sourceFile);
+    const aspectsCoverage: Record<ModuleSpecAspect, boolean> = {
+      purpose: hasAspectEvidence('purpose', tags),
+      input: hasAspectEvidence('input', tags),
+      output: hasAspectEvidence('output', tags),
+      context: hasAspectEvidence('context', tags),
+      logic: hasAspectEvidence('logic', tags),
+      effect: hasAspectEvidence('effect', tags),
+      scope: hasAspectEvidence('scope', tags),
+    };
+    const isEffectfulFile = aspectsCoverage.effect || hasSideEffectSignal(sourceFile);
 
     const index = this.indexSpecDocuments(options.managedDir ?? 'managed');
     const refs = [
@@ -303,11 +312,12 @@ export class SpecMetricsAggregator {
         `@doc [[${unresolved.symbolRef}]] does not resolve to a managed document.`
       );
     }
-    for (const [aspect, covered] of Object.entries(aspectsCoverage)) {
-      if (!covered)
+    for (const aspect of ALL_ASPECTS) {
+      if (!aspectsCoverage[aspect] && (aspect !== 'effect' || isEffectfulFile)) {
         recommendations.push(
-          `No ${aspect} aspect tag (${MODULE_SPEC_ASPECT_TAGS[aspect as ModuleSpecAspect].join(', ')}).`
+          `No ${aspect} aspect tag (${MODULE_SPEC_ASPECT_TAGS[aspect].join(', ')}).`
         );
+      }
     }
     return { filePath, isSpecFile: false, boundSpecs, aspectsCoverage, recommendations };
   }
@@ -451,6 +461,131 @@ function readSpecGraph(specDbPath: string): UnifiedSpecMetrics['specGraph'] {
   }
 }
 
+const ALL_ASPECTS: readonly ModuleSpecAspect[] = [
+  'purpose',
+  'input',
+  'output',
+  'context',
+  'logic',
+  'effect',
+  'scope',
+];
+
+const UNIVERSAL_ASPECTS: readonly ModuleSpecAspect[] = [
+  'purpose',
+  'input',
+  'output',
+  'context',
+  'logic',
+  'scope',
+];
+
+const IMPURE_RUNTIME_MODULES: ReadonlySet<string> = new Set([
+  'node:fs',
+  'fs',
+  'node:child_process',
+  'child_process',
+  'node:http',
+  'http',
+  'node:https',
+  'https',
+  'node:net',
+  'net',
+  'better-sqlite3',
+  'sqlite3',
+  'drizzle-orm',
+]);
+
+const IMPURE_MEMBER_ACCESSES: ReadonlyMap<string, ReadonlySet<string>> = new Map([
+  ['process', new Set(['exit', 'stdout', 'stderr', 'chdir', 'env'])],
+  ['console', new Set(['log', 'error', 'warn'])],
+  ['fs', new Set(['writeFileSync', 'mkdirSync', 'rmSync', 'unlinkSync'])],
+]);
+
+function isImpureRuntimeModule(specifier: string): boolean {
+  if (IMPURE_RUNTIME_MODULES.has(specifier)) {
+    return true;
+  }
+  for (const mod of IMPURE_RUNTIME_MODULES) {
+    if (specifier.startsWith(`${mod}/`)) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function isValueImportClause(clause: ts.ImportClause | undefined): boolean {
+  if (!clause) {
+    return true;
+  }
+  if (clause.phaseModifier === ts.SyntaxKind.TypeKeyword) {
+    return false;
+  }
+  if (
+    !clause.name &&
+    clause.namedBindings &&
+    ts.isNamedImports(clause.namedBindings) &&
+    clause.namedBindings.elements.length > 0 &&
+    clause.namedBindings.elements.every((element) => element.isTypeOnly)
+  ) {
+    return false;
+  }
+  return true;
+}
+
+/** Deterministic AST check for concrete runtime I/O, stateful dependencies, or process/console globals. */
+function hasSideEffectSignal(sourceFile: ts.SourceFile): boolean {
+  const visit = (node: ts.Node): boolean => {
+    if (ts.isTypeNode(node) || ts.isInterfaceDeclaration(node) || ts.isTypeAliasDeclaration(node)) {
+      return false;
+    }
+
+    if (
+      ts.isImportDeclaration(node) &&
+      ts.isStringLiteral(node.moduleSpecifier) &&
+      isValueImportClause(node.importClause) &&
+      isImpureRuntimeModule(node.moduleSpecifier.text)
+    ) {
+      return true;
+    }
+
+    if (
+      ts.isImportEqualsDeclaration(node) &&
+      !node.isTypeOnly &&
+      ts.isExternalModuleReference(node.moduleReference) &&
+      ts.isStringLiteral(node.moduleReference.expression) &&
+      isImpureRuntimeModule(node.moduleReference.expression.text)
+    ) {
+      return true;
+    }
+
+    if (ts.isCallExpression(node) && node.arguments.length >= 1) {
+      const firstArg = node.arguments[0];
+      const isRequireOrDynamicImport =
+        (ts.isIdentifier(node.expression) && node.expression.text === 'require') ||
+        node.expression.kind === ts.SyntaxKind.ImportKeyword;
+      if (
+        isRequireOrDynamicImport &&
+        ts.isStringLiteral(firstArg) &&
+        isImpureRuntimeModule(firstArg.text)
+      ) {
+        return true;
+      }
+    }
+
+    if (ts.isPropertyAccessExpression(node) && ts.isIdentifier(node.expression)) {
+      const members = IMPURE_MEMBER_ACCESSES.get(node.expression.text);
+      if (members?.has(node.name.text)) {
+        return true;
+      }
+    }
+
+    return ts.forEachChild(node, visit) ?? false;
+  };
+
+  return visit(sourceFile);
+}
+
 function hasAspectEvidence(aspect: ModuleSpecAspect, tags: ReadonlySet<string>): boolean {
   if (aspect === 'purpose' && tags.has('summary')) {
     return true;
@@ -459,25 +594,63 @@ function hasAspectEvidence(aspect: ModuleSpecAspect, tags: ReadonlySet<string>):
 }
 
 function measureAspects(files: string[]): UnifiedSpecMetrics['module7Aspects'] {
-  const aspects = Object.keys(MODULE_SPEC_ASPECT_TAGS) as ModuleSpecAspect[];
-  const hits = Object.fromEntries(aspects.map((a) => [a, 0])) as Record<ModuleSpecAspect, number>;
+  const hits: Record<ModuleSpecAspect, number> = {
+    purpose: 0,
+    input: 0,
+    output: 0,
+    context: 0,
+    logic: 0,
+    effect: 0,
+    scope: 0,
+  };
+  let effectfulFiles = 0;
+  let effectHitsInEffectfulFiles = 0;
+
   for (const file of files) {
-    const tags = jsDocTagNames(file, fs.readFileSync(file, 'utf8'));
-    for (const aspect of aspects) {
+    const source = fs.readFileSync(file, 'utf8');
+    const sourceFile = ts.createSourceFile(file, source, ts.ScriptTarget.Latest, true);
+    const tags = jsDocTagNames(sourceFile);
+    for (const aspect of ALL_ASPECTS) {
       if (hasAspectEvidence(aspect, tags)) hits[aspect] += 1;
     }
+    const hasEffectTag = hasAspectEvidence('effect', tags);
+    if (hasEffectTag || hasSideEffectSignal(sourceFile)) {
+      effectfulFiles += 1;
+      if (hasEffectTag) {
+        effectHitsInEffectfulFiles += 1;
+      }
+    }
   }
-  const aspectCoverage = Object.fromEntries(
-    aspects.map((a) => [a, percent(hits[a], files.length)])
-  ) as Record<ModuleSpecAspect, number>;
-  const average = aspects.reduce((total, a) => total + aspectCoverage[a], 0) / aspects.length;
-  return { analyzedFiles: files.length, aspectCoverage, averageAspectScore: Math.round(average) };
+
+  const aspectCoverage: Record<ModuleSpecAspect, number> = {
+    purpose: percent(hits.purpose, files.length),
+    input: percent(hits.input, files.length),
+    output: percent(hits.output, files.length),
+    context: percent(hits.context, files.length),
+    logic: percent(hits.logic, files.length),
+    effect: percent(hits.effect, files.length),
+    scope: percent(hits.scope, files.length),
+  };
+  const effectCoverageOfEffectfulFiles =
+    effectfulFiles > 0 ? percent(effectHitsInEffectfulFiles, effectfulFiles) : 100;
+  const universalSum = UNIVERSAL_ASPECTS.reduce((total, a) => total + aspectCoverage[a], 0);
+  const average =
+    effectfulFiles > 0
+      ? (universalSum + effectCoverageOfEffectfulFiles) / ALL_ASPECTS.length
+      : universalSum / UNIVERSAL_ASPECTS.length;
+
+  return {
+    analyzedFiles: files.length,
+    aspectCoverage,
+    averageAspectScore: Math.round(average),
+    effectfulFiles,
+    effectCoverageOfEffectfulFiles,
+  };
 }
 
 /** Standard constructs (`summary`, `@link`) and `@tag` names that appear in real JSDoc blocks. */
-function jsDocTagNames(fileName: string, source: string): Set<string> {
+function jsDocTagNames(sourceFile: ts.SourceFile): Set<string> {
   const names = new Set<string>();
-  const sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true);
   const hasCommentSummary = (comment: ts.JSDoc['comment']): boolean => {
     if (typeof comment === 'string') {
       return comment.trim().length > 0;
@@ -547,15 +720,23 @@ function buildRecommendations(
       message: `${lifecycle.readyForPromotionCount} documents meet the score for their next status ('tsdoc-edge spec status list-ready').`,
     });
   }
-  const sortedAspects = (
-    Object.entries(aspects.aspectCoverage) as Array<[ModuleSpecAspect, number]>
-  ).sort((a, b) => a[1] - b[1]);
-  if (sortedAspects.length > 0 && sortedAspects[0][1] < 50) {
+  const effectfulFiles = aspects.effectfulFiles ?? 0;
+  const sortedAspects = ALL_ASPECTS.filter((aspect) => aspect !== 'effect' || effectfulFiles > 0)
+    .map((aspect) => ({
+      aspect,
+      coverage:
+        aspect === 'effect'
+          ? (aspects.effectCoverageOfEffectfulFiles ?? aspects.aspectCoverage.effect)
+          : aspects.aspectCoverage[aspect],
+    }))
+    .sort((a, b) => a.coverage - b.coverage);
+  if (sortedAspects.length > 0 && sortedAspects[0].coverage < 50) {
     const weakest = sortedAspects[0];
+    const scopeLabel = weakest.aspect === 'effect' ? 'effectful files' : 'files';
     out.push({
       category: 'quality',
       severity: 'info',
-      message: `Weakest module-spec aspect: ${weakest[0]} (${weakest[1]}% of files; tags ${MODULE_SPEC_ASPECT_TAGS[weakest[0]].join(', ')}).`,
+      message: `Weakest module-spec aspect: ${weakest.aspect} (${weakest.coverage}% of ${scopeLabel}; tags ${MODULE_SPEC_ASPECT_TAGS[weakest.aspect].join(', ')}).`,
     });
   }
   return out;

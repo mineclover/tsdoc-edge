@@ -39,7 +39,7 @@ Analyze file I/O dependencies.
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:215
 - [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:997
 - [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:532
-- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:701
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:697
 - [[DataFlowTypes]] → managed/types/DataFlowTypes.md:172
 
 ### Implemented By

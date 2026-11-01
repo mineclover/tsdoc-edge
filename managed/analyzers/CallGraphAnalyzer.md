@@ -492,7 +492,7 @@ console.log(`saveSymbols is called by ${callers.length} functions`);
 
 - [[TSDoc Edge Documentation]] → managed/README.md:60
 - [[ASTSymbolExtractor]] → managed/analyzers/ASTSymbolExtractor.md:296
-- [[Analyzers & Extractors]] → managed/analyzers/index.md:262
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:366
 - [[AnalyzeCallsCommand]] → managed/commands/AnalyzeCallsCommand.md:29
 - [[Phase Commands]] → managed/commands/PhaseCommands.md:72
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:211

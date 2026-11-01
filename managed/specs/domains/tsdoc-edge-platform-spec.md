@@ -195,3 +195,23 @@ node dist/cli.js spec-metrics --dir managed/specs --detail
 - [[Relationship Ontology]]
 - [[Convention Pack Check]]
 - [[WorkContextCommand]]
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ConventionCheck]] → managed/specs/conventions/convention-check.md:74
+- [[CrossSpecIntegrationContract]] → managed/specs/domains/cross-spec-integration-contract.md:17
+- [[TSDocStandardSpecification]] → managed/specs/domains/tsdoc-standard-spec.md:16
+- [[TtscPlatformSpecification]] → managed/specs/domains/ttsc-platform-spec.md:16
+- [[AuthoredProjectSpecifications]] → managed/specs/index.md:42
+
+### Implemented By
+
+- TsdocEdgePlatformSpecification → src/spec-graph/ManagedSpecExtractor.ts:1
+- TSDocSymbolParser → src/doc-symbol/TSDocSymbolParser.ts:23
+- TSDOC_EDGE_CUSTOM_TAGS → src/parser/TSDocParser.ts:38
+- CUSTOM_TAGS → src/types/tags/base.ts:15
+

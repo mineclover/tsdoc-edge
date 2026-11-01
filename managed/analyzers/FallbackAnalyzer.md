@@ -14,3 +14,12 @@ source: src/analyzer/FallbackAnalyzer.ts
 ## Overview
 
 Detects error-recovery, retry, and default-value `fallback` relationships in control-flow and catch blocks.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- FallbackAnalyzer → src/analyzer/FallbackAnalyzer.ts:42
+

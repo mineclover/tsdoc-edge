@@ -14,3 +14,12 @@ source: src/analyzer/PreCommitChecker.ts
 ## Overview
 
 Evaluates staged TypeScript and Markdown files against TSDoc completeness and connectivity thresholds before Git commits.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- PreCommitChecker → src/analyzer/PreCommitChecker.ts:1
+

@@ -6,6 +6,10 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { TSDocParser as MicrosoftTSDocParser } from '@microsoft/tsdoc';
+import * as ts from 'typescript';
+import { TSDocParser as EdgeTSDocParser } from '../parser/TSDocParser';
+import { readTsdocComment } from '../parser/TsdocCommentReader';
 import type { DatabaseManager } from '../storage/DatabaseManager';
 import type { Symbol } from '../types/graph';
 
@@ -18,6 +22,9 @@ export interface UnifiedContext {
 
   /** Entry point type */
   entryPointType: 'file' | 'symbol' | 'document';
+
+  /** Module-level overview extracted from `@packageDocumentation` */
+  moduleSummary?: string;
 
   /** Primary symbol information */
   primarySymbol?: Symbol;
@@ -202,6 +209,12 @@ export class EntryPointContextAggregator {
     let normalizedPath = filePath;
     if (path.isAbsolute(filePath)) {
       normalizedPath = path.relative(process.cwd(), filePath);
+    }
+
+    const diskPath = path.isAbsolute(filePath) ? filePath : path.resolve(process.cwd(), filePath);
+    const moduleSummary = this.extractModuleSummary(diskPath);
+    if (moduleSummary) {
+      context.moduleSummary = moduleSummary;
     }
 
     // Get all symbols in file
@@ -511,5 +524,75 @@ export class EntryPointContextAggregator {
       }
     }
     return found;
+  }
+
+  /**
+   * Extract module-level overview from top-level `@packageDocumentation` TSDoc comments.
+   */
+  private extractModuleSummary(diskPath: string): string | undefined {
+    if (!fs.existsSync(diskPath)) {
+      return undefined;
+    }
+
+    let source: string;
+    try {
+      source = fs.readFileSync(diskPath, 'utf-8');
+    } catch {
+      return undefined;
+    }
+
+    if (!source.includes('@packageDocumentation')) {
+      return undefined;
+    }
+
+    const shebang = ts.getShebang(source);
+    const startOffset = shebang ? shebang.length : 0;
+    const sourceFile = ts.createSourceFile(diskPath, source, ts.ScriptTarget.Latest, false);
+
+    const seenPositions = new Set<number>();
+    const candidateRanges: ts.CommentRange[] = [];
+    const collectRanges = (pos: number): void => {
+      const ranges = ts.getLeadingCommentRanges(source, pos);
+      if (!ranges) {
+        return;
+      }
+      for (const range of ranges) {
+        if (!seenPositions.has(range.pos)) {
+          seenPositions.add(range.pos);
+          candidateRanges.push(range);
+        }
+      }
+    };
+
+    collectRanges(startOffset);
+    for (const statement of sourceFile.statements) {
+      collectRanges(statement.pos);
+    }
+
+    const tsdocParser = new MicrosoftTSDocParser(new EdgeTSDocParser().getConfiguration());
+
+    for (const range of candidateRanges) {
+      if (range.kind !== ts.SyntaxKind.MultiLineCommentTrivia) {
+        continue;
+      }
+      const rawComment = source.slice(range.pos, range.end);
+      if (!rawComment.startsWith('/**') || !rawComment.includes('@packageDocumentation')) {
+        continue;
+      }
+
+      const parserContext = tsdocParser.parseString(rawComment);
+      if (!parserContext.docComment.modifierTagSet.isPackageDocumentation()) {
+        continue;
+      }
+
+      const parsed = readTsdocComment(parserContext.docComment);
+      const cleanSummary = parsed.summary.replace(/\s+/g, ' ').trim();
+      const cleanRemarks = parsed.remarks ? parsed.remarks.trim() : '';
+      if (cleanSummary) {
+        return cleanRemarks ? `${cleanSummary}\n\n${cleanRemarks}` : cleanSummary;
+      }
+    }
+
+    return undefined;
   }
 }

@@ -14,3 +14,12 @@ source: src/commands/UninstallHookCommand.ts
 ## Overview
 
 Removes the TSDoc Edge Git `pre-commit` hook cleanly from `.git/hooks`.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- UninstallHookCommand → src/commands/UninstallHookCommand.ts:18
+

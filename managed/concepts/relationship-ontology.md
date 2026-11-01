@@ -1433,6 +1433,7 @@ This will result in a more **precise, intuitive, and developer-friendly** ontolo
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:312
-- [[Feature Showcase]] → managed/examples/feature-showcase.md:263
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:264
 - [[Relationship Usage Examples]] → managed/examples/relationship-usage-examples.md:525
+- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:123
 

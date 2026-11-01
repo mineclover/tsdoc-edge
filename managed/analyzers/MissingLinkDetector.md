@@ -14,3 +14,13 @@ source: src/analyzer/MissingLinkDetector.ts
 ## Overview
 
 Detects broken `[[Checkpoint]]` references, orphaned documentation links, and unresolved code-symbol pointers.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- MissingLinkDetector → src/analyzer/MissingLinkDetector.ts:1
+- LinkType → src/analyzer/MissingLinkDetector.ts:29
+

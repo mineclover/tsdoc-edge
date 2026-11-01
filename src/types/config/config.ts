@@ -59,6 +59,33 @@ export interface TsdocEdgeConfig {
    * @remarks P4.2 consumes the naming policy; P4.4 makes the roots executable spec input.
    */
   specGovernance?: SpecGovernanceConfig;
+
+  /**
+   * Canonical `@ttsc/graph` refresh defaults (`routerModule`, `tsconfigPath`, `databasePath`).
+   */
+  canonicalGraph?: CanonicalGraphConfig;
+}
+
+/**
+ * Canonical `@ttsc/graph` indexing defaults for `build --canonical-graph` and `sync`.
+ *
+ * @public
+ */
+export interface CanonicalGraphConfig {
+  /** Workspace-relative or absolute path / package specifier for the graph-router artifact source. */
+  routerModule?: string;
+  /** Optional router configuration path (default: `ttsc-graph-router.config.json`). */
+  routerConfig?: string;
+  /** Optional router repository identifier (default: project directory name). */
+  routerRepo?: string;
+  /** Optional workspace identifier for canonical IDs. */
+  workspaceId?: string;
+  /** Optional graph namespace (default: `ttsc:<routerRepo>`). */
+  graphNamespace?: string;
+  /** Optional project tsconfig path for canonical graph extraction (default: `tsconfig.ttsc.json`). */
+  tsconfigPath?: string;
+  /** Optional SQLite path for persisted canonical graph revisions (default: `.tsdoc/canonical-graph.db`). */
+  databasePath?: string;
 }
 
 /**

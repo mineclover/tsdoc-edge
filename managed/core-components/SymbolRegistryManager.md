@@ -537,5 +537,5 @@ Features:
 
 ### Implemented By
 
-- SymbolRegistryManager → src/storage/SymbolRegistryManager.ts:34
+- SymbolRegistryManager → src/storage/SymbolRegistryManager.ts:33
 

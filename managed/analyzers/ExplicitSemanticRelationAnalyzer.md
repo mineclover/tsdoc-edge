@@ -14,3 +14,12 @@ source: src/analyzer/ExplicitSemanticRelationAnalyzer.ts
 ## Overview
 
 Extracts explicit non-AST semantic relationships declared with `@relatedTo` TSDoc tags.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- ExplicitSemanticRelationAnalyzer → src/analyzer/ExplicitSemanticRelationAnalyzer.ts:74
+

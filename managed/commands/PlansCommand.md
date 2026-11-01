@@ -14,3 +14,12 @@ source: src/commands/PlansCommand.ts
 ## Overview
 
 Lists structured engineering backlog plans extracted from `@privateRemarks` and enhanced symbol documentation.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- PlansCommand → src/commands/PlansCommand.ts:34
+

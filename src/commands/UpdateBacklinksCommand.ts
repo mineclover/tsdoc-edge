@@ -71,13 +71,19 @@ export class UpdateBacklinksCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge update-backlinks [docs-directory]\n\n  Default: managed (if exists), otherwise docs';
+    return `tsdoc-edge update-backlinks [docs-directory] [options]
+
+  Default: managed (if exists), otherwise docs
+
+  Options:
+    --dry-run, -n   Preview documents that would be updated without modifying files
+    --check         Exit with non-zero status if any document backlinks are out of sync`;
   }
 
   /**
    * execute method
    * @param args - args parameter
-   * @returns Returns Promise<CommandResult>
+   * @returns Returns `Promise<CommandResult>`
    * @public
    */
   execute(args: string[]): Promise<CommandResult> {
@@ -86,6 +92,14 @@ export class UpdateBacklinksCommand extends BaseCommand {
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
+
+      const flagErr = this.validateAllowedFlags(args, ['--dry-run', '-n', '--check']);
+      if (flagErr) {
+        return flagErr;
+      }
+
+      const dryRun = this.hasFlag(args, '--dry-run') || this.hasFlag(args, '-n');
+      const checkOnly = this.hasFlag(args, '--check');
 
       // Deprecation warning (only when called directly as legacy command)
       if (this.showDeprecationWarning) {
@@ -146,23 +160,41 @@ export class UpdateBacklinksCommand extends BaseCommand {
 
       // Update backlinks
       const generator = this.generator || new BacklinkGenerator(registry);
-      const updated = generator.updateAllBacklinks();
+      const updated =
+        dryRun || checkOnly
+          ? generator.updateAllBacklinks({ dryRun: true })
+          : generator.updateAllBacklinks();
+
+      if (checkOnly) {
+        if (updated.length > 0) {
+          this.printSection('Out of Sync');
+          for (const filePath of updated) {
+            console.log(`${colors.red}❌${colors.reset} ${filePath}`);
+          }
+          console.log();
+          this.printError(`Backlinks out of sync in ${updated.length} document(s)`);
+          return this.failure(`Backlinks out of sync in ${updated.length} document(s)`, 1);
+        }
+
+        this.printSuccess('All backlinks are up to date');
+        console.log();
+        return this.success('All backlinks are up to date');
+      }
+
+      if (dryRun) {
+        this.printSection('Would Update (Dry Run)');
+        for (const filePath of updated) {
+          this.printUpdatedDocument(registry, filePath);
+        }
+        console.log();
+        this.printSuccess(`Total: ${updated.length} documents would be updated (dry run)`);
+        console.log();
+        return this.success();
+      }
 
       this.printSection('Updated');
       for (const filePath of updated) {
-        const symbolName = Array.from(registry.getAllSymbolNames()).find(
-          (name) => registry.getDefinition(name)?.filePath === filePath
-        );
-
-        if (symbolName) {
-          const refs = registry.getReferences(symbolName);
-          const conns = registry.getCodeConnections(symbolName);
-          const total = refs.length + conns.length;
-
-          console.log(
-            `${colors.green}✅${colors.reset} ${filePath} (${colors.cyan}${total}${colors.reset} backlinks)`
-          );
-        }
+        this.printUpdatedDocument(registry, filePath);
       }
 
       console.log();
@@ -171,6 +203,22 @@ export class UpdateBacklinksCommand extends BaseCommand {
 
       return this.success();
     });
+  }
+
+  private printUpdatedDocument(registry: DocumentSymbolRegistry, filePath: string): void {
+    const symbolName = Array.from(registry.getAllSymbolNames()).find(
+      (name) => registry.getDefinition(name)?.filePath === filePath
+    );
+
+    if (symbolName) {
+      const refs = registry.getReferences(symbolName);
+      const conns = registry.getCodeConnections(symbolName);
+      const total = refs.length + conns.length;
+
+      console.log(
+        `${colors.green}✅${colors.reset} ${filePath} (${colors.cyan}${total}${colors.reset} backlinks)`
+      );
+    }
   }
 
   /**
@@ -182,7 +230,7 @@ export class UpdateBacklinksCommand extends BaseCommand {
    * 4. Fallback to 'docs'
    */
   private resolveDocsDir(args: string[]): string {
-    const target = args.find((arg) => !arg.startsWith('--'));
+    const target = args.find((arg) => !arg.startsWith('-'));
     if (target) {
       return target;
     }

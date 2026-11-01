@@ -14,3 +14,12 @@ source: src/commands/DocSymbolsCommand.ts
 ## Overview
 
 Lists all registered primary and auxiliary `[[Symbol]]` checkpoints and reference counts across managed documentation.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- DocSymbolsCommand → src/commands/DocSymbolsCommand.ts:1
+

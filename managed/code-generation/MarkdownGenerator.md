@@ -14,3 +14,12 @@ source: src/generator/MarkdownGenerator.ts
 ## Overview
 
 Converts parsed `@microsoft/tsdoc` `DocComment` AST nodes into clean, standard Markdown API documentation.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- MarkdownGenerator → src/generator/MarkdownGenerator.ts:17
+

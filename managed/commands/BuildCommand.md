@@ -99,6 +99,7 @@ pointer를 생성하거나 변경하지 않는다.
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:267
 - [[InitCommand]] → managed/commands/InitCommand.md:343
 - [[Phase Commands]] → managed/commands/PhaseCommands.md:101
+- [[SyncCommand]] → managed/commands/SyncCommand.md:23
 - [[Module Specification Framework]] → managed/concepts/module-specification-framework.md:399
 - [[DatabaseManager]] → managed/core-components/DatabaseManager.md:288
 - [[SymbolRegistryManager]] → managed/core-components/SymbolRegistryManager.md:475
@@ -107,7 +108,7 @@ pointer를 생성하거나 변경하지 않는다.
 - [[CoreWorkflow]] → managed/features/core-workflow.md:80
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:197
 - [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:202
-- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:713
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:709
 - [[Document Symbol Parser]] → managed/parser/DocumentSymbolParser.md:87
 - [[ExtractionResult]] → managed/primary-types/ExtractionResult.md:106
 - [[TsdocEdgeConfig]] → managed/primary-types/TsdocEdgeConfig.md:121
@@ -115,5 +116,5 @@ pointer를 생성하거나 변경하지 않는다.
 
 ### Implemented By
 
-- BuildCommand → src/commands/BuildCommand.ts:95
+- BuildCommand → src/commands/BuildCommand.ts:94
 

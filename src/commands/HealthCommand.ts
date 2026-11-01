@@ -71,7 +71,13 @@ export class HealthCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge health [directory]\n\n  Default: src';
+    return `tsdoc-edge health [directory] [options]
+
+  Default: src
+  Options:
+    --human  Human-readable terminal report (default)
+    --json   Structured JSON report
+    --xml    XML report`;
   }
 
   /**
@@ -87,8 +93,13 @@ export class HealthCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const flagError = this.validateAllowedFlags(args, ['--human', '--json', '--xml']);
+      if (flagError) {
+        return flagError;
+      }
+
       // Filter out flags to get positional arguments
-      const positionalArgs = args.filter((arg) => !arg.startsWith('--'));
+      const positionalArgs = args.filter((arg) => !arg.startsWith('-'));
       const targetPath = positionalArgs[0] || 'src';
 
       if (!fs.existsSync(targetPath)) {
@@ -104,37 +115,56 @@ export class HealthCommand extends BaseCommand {
         generateSuggestions: false,
       });
 
-      // Check if human-readable format is requested
-      if (this.hasFlag(args, '--human')) {
-        // Original color output
-        this.printHeader('TSDoc Edge - Health Check');
-        this.printInfo(`Checking health: ${targetPath}`);
-        console.log();
-        this.printHealthReport(report);
+      const { metrics } = report;
+      const healthScore = metrics.healthScore;
+      const healthGrade = this.getHealthGrade(healthScore);
+      const docScore = metrics.avgQualityScore;
+      const testScore =
+        metrics.totalFiles > 0
+          ? Math.round((metrics.filesWithTests / metrics.totalFiles) * 100)
+          : 0;
+      const documentedPercent =
+        metrics.totalSymbols > 0
+          ? Math.round((metrics.documentedSymbols / metrics.totalSymbols) * 100)
+          : 0;
+
+      const recommendations: string[] = [];
+      if (healthScore >= 80) {
+        recommendations.push('Your codebase health is excellent!');
+        recommendations.push('Keep maintaining this quality standard.');
+      } else if (healthScore >= 60) {
+        recommendations.push('Your codebase health is good but can be improved.');
+        recommendations.push(`Focus on: ${this.getHealthFocus(metrics)}`);
+      } else if (healthScore >= 40) {
+        recommendations.push('Your codebase health needs attention.');
+        recommendations.push(`Priority: ${this.getHealthFocus(metrics)}`);
       } else {
-        // XML output (default)
-        const { metrics } = report;
-        const healthScore = metrics.healthScore;
-        const healthGrade = this.getHealthGrade(healthScore);
-        const docScore = metrics.avgQualityScore;
-        const testScore = Math.round((metrics.filesWithTests / metrics.totalFiles) * 100);
+        recommendations.push('Your codebase health is critical.');
+        recommendations.push(`Urgent action required: ${this.getHealthFocus(metrics)}`);
+      }
 
-        // Build recommendations based on health score
-        const recommendations: string[] = [];
-        if (healthScore >= 80) {
-          recommendations.push('Your codebase health is excellent!');
-          recommendations.push('Keep maintaining this quality standard.');
-        } else if (healthScore >= 60) {
-          recommendations.push('Your codebase health is good but can be improved.');
-          recommendations.push(`Focus on: ${this.getHealthFocus(metrics)}`);
-        } else if (healthScore >= 40) {
-          recommendations.push('Your codebase health needs attention.');
-          recommendations.push(`Priority: ${this.getHealthFocus(metrics)}`);
-        } else {
-          recommendations.push('Your codebase health is critical.');
-          recommendations.push(`Urgent action required: ${this.getHealthFocus(metrics)}`);
-        }
-
+      if (this.hasFlag(args, '--json')) {
+        console.log(
+          JSON.stringify(
+            {
+              target: { path: targetPath },
+              overall: { healthScore, healthGrade, maxScore: 100 },
+              breakdown: { documentationQuality: docScore, testCoverage: testScore },
+              recommendations,
+              statistics: {
+                totalSymbols: metrics.totalSymbols,
+                documented: metrics.documentedSymbols,
+                documentedPercent,
+                filesWithTests: metrics.filesWithTests,
+                totalFiles: metrics.totalFiles,
+                filesNeedingAttention: report.filesNeedingAttention.length,
+              },
+            },
+            null,
+            2
+          )
+        );
+      } else if (this.hasFlag(args, '--xml')) {
         this.printOutput(
           'health',
           {
@@ -154,9 +184,7 @@ export class HealthCommand extends BaseCommand {
             statistics: {
               totalSymbols: metrics.totalSymbols,
               documented: metrics.documentedSymbols,
-              documentedPercent: Math.round(
-                (metrics.documentedSymbols / metrics.totalSymbols) * 100
-              ),
+              documentedPercent,
               filesWithTests: metrics.filesWithTests,
               totalFiles: metrics.totalFiles,
               filesNeedingAttention: report.filesNeedingAttention.length,
@@ -164,6 +192,12 @@ export class HealthCommand extends BaseCommand {
           },
           args
         );
+      } else {
+        // Human-readable output (default, also accepted explicitly via --human)
+        this.printHeader('TSDoc Edge - Health Check');
+        this.printInfo(`Checking health: ${targetPath}`);
+        console.log();
+        this.printHealthReport(report);
       }
 
       return this.success();
@@ -185,7 +219,8 @@ export class HealthCommand extends BaseCommand {
 
     // Show health breakdown
     const docScore = metrics.avgQualityScore;
-    const testScore = Math.round((metrics.filesWithTests / metrics.totalFiles) * 100);
+    const testScore =
+      metrics.totalFiles > 0 ? Math.round((metrics.filesWithTests / metrics.totalFiles) * 100) : 0;
 
     console.log(
       `   📝 Documentation Quality: ${this.getScoreColor(docScore)}${docScore}/100${colors.reset}`
@@ -217,11 +252,13 @@ export class HealthCommand extends BaseCommand {
     console.log();
 
     // Quick stats
+    const documentedPercent =
+      metrics.totalSymbols > 0
+        ? Math.round((metrics.documentedSymbols / metrics.totalSymbols) * 100)
+        : 0;
     this.printSection('📊 Quick Stats');
     console.log(`   Total Symbols: ${metrics.totalSymbols}`);
-    console.log(
-      `   Documented: ${metrics.documentedSymbols} (${Math.round((metrics.documentedSymbols / metrics.totalSymbols) * 100)}%)`
-    );
+    console.log(`   Documented: ${metrics.documentedSymbols} (${documentedPercent}%)`);
     console.log(`   Files with Tests: ${metrics.filesWithTests}/${metrics.totalFiles}`);
     console.log(`   Files Needing Attention: ${report.filesNeedingAttention.length}`);
     console.log();
@@ -268,7 +305,8 @@ export class HealthCommand extends BaseCommand {
    */
   private getHealthFocus(metrics: CodeHealthMetrics): string {
     const docScore = metrics.avgQualityScore;
-    const testScore = Math.round((metrics.filesWithTests / metrics.totalFiles) * 100);
+    const testScore =
+      metrics.totalFiles > 0 ? Math.round((metrics.filesWithTests / metrics.totalFiles) * 100) : 0;
 
     if (docScore < testScore) {
       return 'Improve documentation quality';

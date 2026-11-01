@@ -14,3 +14,12 @@ source: src/analyzer/ConstraintAnalyzer.ts
 ## Overview
 
 Analyzes mutual-exclusion and co-requirement architectural constraints across symbols.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- ConstraintAnalyzer → src/analyzer/ConstraintAnalyzer.ts:1
+

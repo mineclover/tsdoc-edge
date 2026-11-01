@@ -65,7 +65,7 @@ tsdoc-edge orphans --type=function
 - [[Commands Index]] → managed/COMMANDS.md:64
 - [[TSDoc Edge Documentation]] → managed/README.md:59
 - [[CallGraphAnalyzer]] → managed/analyzers/CallGraphAnalyzer.md:413
-- [[Analyzers & Extractors]] → managed/analyzers/index.md:296
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:400
 - [[AnalyzeCallsCommand]] → managed/commands/AnalyzeCallsCommand.md:30
 - [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:28
 - [[BuildCommand]] → managed/commands/BuildCommand.md:46

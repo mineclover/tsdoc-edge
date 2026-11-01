@@ -43,7 +43,7 @@ Measures:
 
 - [[TSDoc Edge Documentation]] → managed/README.md:66
 - [[CodeHealthChecker]] → managed/analyzers/CodeHealthChecker.md:33
-- [[Analyzers & Extractors]] → managed/analyzers/index.md:101
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:95
 - [[TestRelationshipsCommand]] → managed/commands/TestRelationshipsCommand.md:34
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:243
 - [[Coverage Metrics Contract]] → managed/features/coverage-metrics-contract.md:278

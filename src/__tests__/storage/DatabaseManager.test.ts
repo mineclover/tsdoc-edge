@@ -363,6 +363,71 @@ describe('DatabaseManager', () => {
       const problemSolving = JSON.parse(row.problem_solving);
       expect(problemSolving.description).toBe('New problem');
     });
+
+    it('should re-link decision_records and future_plans cleanly across incremental file rebuilds', () => {
+      const symbol: Symbol = {
+        id: 'test-adr-rebuild',
+        name: 'RebuildTarget',
+        type: 'class',
+        filePath: 'src/rebuild-target.ts',
+        line: 1,
+        column: 1,
+        isExported: true,
+        isPublic: true,
+        tests: [],
+        designDecisions: [],
+      };
+      dbManager.insertSymbol(symbol, 0);
+
+      const nowIso = new Date().toISOString();
+      const doc: EnhancedSymbolDoc = {
+        symbolId: 'test-adr-rebuild',
+        errorExperiences: [],
+        decisions: [
+          {
+            id: 'ADR-1',
+            title: 'Use deterministic IDs',
+            decision: 'Use deterministic IDs for ADR rows',
+            rationale: 'Keep incremental builds reproducible',
+            alternatives: [],
+            consequences: ['Clean re-indexing'],
+            date: '2026-11-01',
+            status: 'accepted',
+          },
+        ],
+        dependencies: [],
+        futurePlans: [
+          {
+            id: 'PLAN-1',
+            title: 'Support batching',
+            description: 'Support batching across large workspaces',
+            priority: 'medium',
+            status: 'planned',
+            createdAt: nowIso,
+          },
+        ],
+        createdAt: nowIso,
+        updatedAt: nowIso,
+        version: '1.0.0',
+      };
+
+      expect(dbManager.insertEnhancedDoc(doc, 0)).toBe(true);
+      expect(dbManager.getDecisionRecords('test-adr-rebuild')).toHaveLength(1);
+
+      // Simulate incremental file rebuild: delete symbols for file, re-insert symbol + enhanced doc
+      dbManager.deleteSymbolsByFile('src/rebuild-target.ts');
+      dbManager.insertSymbol(symbol, 0);
+      expect(dbManager.insertEnhancedDoc(doc, 0)).toBe(true);
+
+      const decisions = dbManager.getDecisionRecords('test-adr-rebuild');
+      expect(decisions).toHaveLength(1);
+      expect(decisions[0]?.decision).toBe('Use deterministic IDs for ADR rows');
+
+      const allDecisions = dbManager
+        .getAllDecisionRecords()
+        .filter((d) => d.symbolId === 'test-adr-rebuild');
+      expect(allDecisions).toHaveLength(1);
+    });
   });
 
   describe('insertDependency', () => {

@@ -91,7 +91,7 @@ Related: [[Concept#Section]]
 - [[DocumentSymbolParser]] → managed/features/DocumentSymbolParser.md:183
 - [[DocumentSymbolRegistry]] → managed/features/DocumentSymbolRegistry.md:290
 - [[AutoIndexing]] → managed/features/auto-indexing.md:66
-- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:217
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:213
 - [[Guides & Tutorials]] → managed/guides/index.md:140
 - [[Document Symbol Parser]] → managed/parser/DocumentSymbolParser.md:89
 - [[DocumentSymbol]] → managed/types/DocumentSymbol.md:111
@@ -100,5 +100,5 @@ Related: [[Concept#Section]]
 
 ### Implemented By
 
-- IndexDocsCommand → src/commands/IndexDocsCommand.ts:41
+- IndexDocsCommand → src/commands/IndexDocsCommand.ts:37
 

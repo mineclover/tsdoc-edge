@@ -324,7 +324,7 @@ tsdoc-edge health src --include-private
 
 - [[TSDoc Edge Documentation]] → managed/README.md:261
 - [[DocumentationAnalyzer]] → managed/analyzers/DocumentationAnalyzer.md:147
-- [[Analyzers & Extractors]] → managed/analyzers/index.md:99
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:93
 - [[AnalyzeCommand]] → managed/commands/AnalyzeCommand.md:26
 - [[HealthCommand]] → managed/commands/HealthCommand.md:26
 - [[Phase Commands]] → managed/commands/PhaseCommands.md:60

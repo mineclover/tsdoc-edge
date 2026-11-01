@@ -37,12 +37,16 @@
     "modifiedOnly": false
   },
   "documentManagement": {
-    "enabled": false,
-    "managedDirs": ["docs/managed"],
+    "enabled": true,
+    "managedDirs": ["managed", "docs/managed"],
     "excludeDirs": ["docs/examples", "docs/templates"],
     "requireFrontmatter": false,
     "strictMode": false,
     "ignoreCodeBlocks": true
+  },
+  "canonicalGraph": {
+    "routerModule": "../ttsc-graph-router/dist/artifact-source.js",
+    "tsconfigPath": "tsconfig.ttsc.json"
   },
   "specGovernance": {
     "authoredSpecDirs": ["managed/specs"],

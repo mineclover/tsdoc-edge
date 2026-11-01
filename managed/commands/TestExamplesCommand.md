@@ -14,3 +14,12 @@ source: src/commands/TestExamplesCommand.ts
 ## Overview
 
 Extracts and displays executable code examples mined from unit and integration test suites.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- TestExamplesCommand → src/commands/TestExamplesCommand.ts:1
+

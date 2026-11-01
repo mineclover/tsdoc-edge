@@ -289,6 +289,6 @@ tsdoc-edge analyze-parallel --task-list tasks.json
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:186
-- [[Core Systems]] → managed/core/index.md:45
+- [[Core Systems]] → managed/core/index.md:52
 - [[TSDoc Edge User Guide]] → managed/user-guide.md:31
 

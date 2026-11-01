@@ -14,3 +14,12 @@ source: src/commands/RelationshipVisualizeCommand.ts
 ## Overview
 
 Renders Mermaid relationship diagrams centered on a target symbol with configurable depth and edge filters.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- RelationshipVisualizeCommand → src/commands/RelationshipVisualizeCommand.ts:29
+

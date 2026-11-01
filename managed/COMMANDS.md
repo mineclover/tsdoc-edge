@@ -322,7 +322,7 @@ See [[Relationship Types]] for all 25 relationship type definitions.
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:177
-- [[UtilityCommands]] → managed/commands/UtilityCommands.md:378
+- [[UtilityCommands]] → managed/commands/UtilityCommands.md:438
 - [[Guides & Tutorials]] → managed/guides/index.md:350
 - [[Usage Scenarios]] → managed/guides/usage-scenarios.md:511
 - [[Primary Types Index]] → managed/primary-types/index.md:451

@@ -14,3 +14,12 @@ source: src/commands/ValidateTsdocCommand.ts
 ## Overview
 
 Validates all TypeScript TSDoc comments and `tsdoc.json` strictly against `@microsoft/tsdoc` v0 rules.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- ValidateTsdocCommand → src/commands/ValidateTsdocCommand.ts:49
+

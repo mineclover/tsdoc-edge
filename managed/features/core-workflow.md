@@ -186,15 +186,15 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 - [[AutoIndexing]] → managed/features/auto-indexing.md:296
 - [[CoreFeatures]] → managed/features/core-features-catalog.md:47
 - [[Features Index]] → managed/features/index.md:277
-- [[LSP Integration]] → managed/features/lsp-integration.md:474
+- [[LSP Integration]] → managed/features/lsp-integration.md:480
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:378
 - [[ValidationFeatures]] → managed/features/validation-features.md:412
 - [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:549
-- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:794
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:790
 - [[Guides & Tutorials]] → managed/guides/index.md:349
 - [[Work Context Workflow]] → managed/workflows/work-context-workflow.md:760
 
 ### Implemented By
 
-- TSDocEdge → src/index.ts:161
+- TSDocEdge → src/index.ts:160
 

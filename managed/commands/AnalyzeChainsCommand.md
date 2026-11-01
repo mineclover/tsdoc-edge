@@ -37,7 +37,7 @@ Analyze dependency chains.
 - [[TSDoc Edge Documentation]] → managed/README.md:58
 - [[DepthTraverser]] → managed/core-components/DepthTraverser.md:275
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:224
-- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:702
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:698
 - [[DataFlowTypes]] → managed/types/DataFlowTypes.md:173
 - [[TypeChain]] → managed/types/TypeChain.md:125
 - [[UnifiedRelationships]] → managed/types/UnifiedRelationships.md:206

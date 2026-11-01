@@ -42,5 +42,5 @@ Central registry for all CLI commands.
 
 ### Implemented By
 
-- CommandRegistry → src/commands/CommandRegistry.ts:34
+- CommandRegistry → src/commands/CommandRegistry.ts:30
 

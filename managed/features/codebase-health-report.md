@@ -438,7 +438,7 @@ TSDoc Edge 코드베이스는 **전반적으로 건강한 상태**입니다:
 
 ### Referenced By
 
-- [[Feature Showcase]] → managed/examples/feature-showcase.md:271
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:272
 - [[Phase Commands Refactoring Guide]] → managed/features/phase-commands-refactoring-guide.md:19
 - [[Usage Scenarios]] → managed/guides/usage-scenarios.md:205
 

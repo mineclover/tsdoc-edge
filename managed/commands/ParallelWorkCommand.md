@@ -40,5 +40,5 @@ Detect and suggest parallel work opportunities.
 
 ### Implemented By
 
-- ParallelWorkCommand → src/commands/ParallelWorkCommand.ts:33
+- ParallelWorkCommand → src/commands/ParallelWorkCommand.ts:27
 

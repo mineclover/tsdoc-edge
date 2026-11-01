@@ -312,7 +312,7 @@ scores.forEach(score => {
 ### Referenced By
 
 - [[CodeHealthChecker]] → managed/analyzers/CodeHealthChecker.md:33
-- [[Analyzers & Extractors]] → managed/analyzers/index.md:95
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:93
 - [[AnalyzeCommand]] → managed/commands/AnalyzeCommand.md:27
 - [[SuggestCommand]] → managed/commands/SuggestCommand.md:482
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:243

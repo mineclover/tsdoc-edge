@@ -38,5 +38,5 @@ Update symbol references in documentation.
 
 ### Implemented By
 
-- UpdateSymbolRefsCommand → src/commands/UpdateSymbolRefsCommand.ts:1
+- UpdateSymbolRefsCommand → src/commands/UpdateSymbolRefsCommand.ts:38
 

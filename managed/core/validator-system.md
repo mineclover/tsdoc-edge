@@ -366,8 +366,8 @@ issues.forEach(issue => {
 
 - [[Analyzer System]] → managed/core/analyzer-system.md:444
 - [[Document Symbol System]] → managed/core/doc-symbol-system.md:394
-- [[Parser System]] → managed/core/parser-system.md:356
-- [[Spec Management System]] → managed/core/spec-management-system.md:392
+- [[Parser System]] → managed/core/parser-system.md:357
+- [[Spec Management System]] → managed/core/spec-management-system.md:398
 - [[Symbol Graph System]] → managed/core/symbol-graph.md:262
 
 ### Implemented By

@@ -201,6 +201,8 @@ legacy id에서 canonical id로 이동한다. alias와 diagnostics 내용도 rev
 ### Referenced By
 
 - [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1456
+- [[CrossSpecIntegrationContract]] → managed/specs/domains/cross-spec-integration-contract.md:187
+- [[TtscPlatformSpecification]] → managed/specs/domains/ttsc-platform-spec.md:162
 - [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:274
 - [[TS7 Test Compilation Lane]] → managed/workflows/ts7-test-compilation-lane.md:412
 

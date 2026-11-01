@@ -14,3 +14,12 @@ source: src/commands/GenerateDocsCommand.ts
 ## Overview
 
 Generates Markdown API and enhanced 6-category symbol documentation from annotated TypeScript sources.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- GenerateDocsCommand → src/commands/GenerateDocsCommand.ts:18
+

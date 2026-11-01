@@ -14,3 +14,12 @@ source: src/commands/OntologyStatsCommand.ts
 ## Overview
 
 Displays summary statistics and coverage across the 11 categories of the unified relationship ontology.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- OntologyStatsCommand → src/commands/OntologyStatsCommand.ts:49
+

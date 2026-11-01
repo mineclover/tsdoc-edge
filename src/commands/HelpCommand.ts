@@ -206,9 +206,15 @@ export class HelpCommand extends BaseCommand {
       console.log(`${colors.bold}Quick Start:${colors.reset}`);
       console.log(`  ${colors.cyan}init${colors.reset}           Initialize project`);
       console.log(
+        `  ${colors.cyan}sync${colors.reset}           Sync symbols, canonical graph, specs, and backlinks`
+      );
+      console.log(
         `  ${colors.cyan}build src${colors.reset}      Build symbol database ${colors.dim}(alias: b)${colors.reset}`
       );
       console.log(`  ${colors.cyan}wc <file>${colors.reset}      Get work context before editing`);
+      console.log(
+        `  ${colors.cyan}dc <file>${colors.reset}      Get design contracts, ADRs, and spec bindings`
+      );
       console.log();
 
       // Core standalone commands

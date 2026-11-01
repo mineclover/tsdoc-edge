@@ -14,3 +14,12 @@ source: src/commands/RelationshipMetricsCommand.ts
 ## Overview
 
 Calculates graph centrality, degree, betweenness, and hub/bridge importance metrics across symbols.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- RelationshipMetricsCommand → src/commands/RelationshipMetricsCommand.ts:26
+

@@ -14,3 +14,12 @@ source: src/commands/IdCommand.ts
 ## Overview
 
 Queries, validates, and manages symbol identity entries in the workspace symbol registry.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- IdCommand → src/commands/IdCommand.ts:38
+

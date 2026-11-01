@@ -429,7 +429,7 @@ P4.1은 `loadJestJsonEvidence`로 complete Jest JSON artifact를 in-memory evide
 
 ### Referenced By
 
-- [[ProjectIndexer]] → managed/architecture/project-indexer.md:83
+- [[ProjectIndexer]] → managed/architecture/project-indexer.md:84
 - [[Workflows Index]] → managed/workflows/index.md:242
 - [[Semantic Graph Spec Governance Completed Work]] → managed/workflows/semantic-graph-spec-governance-completed.md:56
 - [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:276

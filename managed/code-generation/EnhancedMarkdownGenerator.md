@@ -14,3 +14,12 @@ source: src/generator/EnhancedMarkdownGenerator.ts
 ## Overview
 
 Renders 6-category `EnhancedSymbolDoc` metadata, contracts, and cross-references into rich Markdown pages.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- EnhancedMarkdownGenerator → src/generator/EnhancedMarkdownGenerator.ts:19
+

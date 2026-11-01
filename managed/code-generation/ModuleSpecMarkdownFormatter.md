@@ -14,3 +14,12 @@ source: src/generator/ModuleSpecMarkdownFormatter.ts
 ## Overview
 
 Formats `ModuleSpecTemplate` data structures into standardized 7-aspect Markdown specification documents.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- ModuleSpecMarkdownFormatter → src/generator/ModuleSpecMarkdownFormatter.ts:31
+

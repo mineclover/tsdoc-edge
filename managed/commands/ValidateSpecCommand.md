@@ -402,7 +402,7 @@ tsdoc-edge validate-spec managed | grep "⚠️" -A 1
 
 - [[Module Specification Framework]] → managed/concepts/module-specification-framework.md:391
 - [[ValidationFeatures]] → managed/features/validation-features.md:286
-- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:740
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:736
 - [[ModuleSpecTypes]] → managed/types/ModuleSpecTypes.md:219
 - [[ModuleSpecValidator]] → managed/utilities/ModuleSpecValidator.md:179
 - [[SpecCompletenessValidator]] → managed/utilities/SpecCompletenessValidator.md:75
@@ -410,4 +410,5 @@ tsdoc-edge validate-spec managed | grep "⚠️" -A 1
 ### Implemented By
 
 - ValidateSpecCommand → src/commands/Phase4Commands.ts:349:1
+- ValidateSpecCommand → src/commands/ValidateSpecCommand.ts:17
 

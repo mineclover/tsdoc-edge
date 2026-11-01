@@ -14,3 +14,12 @@ source: src/analyzer/IntegrationVerificationAnalyzer.ts
 ## Overview
 
 Identifies integration tests that exercise multi-symbol interactions and cross-module contracts.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- IntegrationVerificationAnalyzer → src/analyzer/IntegrationVerificationAnalyzer.ts:1
+

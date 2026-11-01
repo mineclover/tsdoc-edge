@@ -187,3 +187,28 @@ npm run verify:document-validation
 - [[ProjectIndexer]]
 - [[Lint Governance]]
 - [[Semantic Graph Spec Governance Roadmap]]
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ProjectIndexer]] → managed/architecture/project-indexer.md:76
+- [[Lint Governance]] → managed/features/lint-governance.md:16
+- [[ConventionCheck]] → managed/specs/conventions/convention-check.md:74
+- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:192
+- [[TSDocStandardSpecification]] → managed/specs/domains/tsdoc-standard-spec.md:118
+- [[TtscPlatformSpecification]] → managed/specs/domains/ttsc-platform-spec.md:161
+- [[AuthoredProjectSpecifications]] → managed/specs/index.md:43
+
+### Implemented By
+
+- CrossSpecIntegrationContract → src/provider/ProviderSnapshotNormalizer.ts:1
+- ModuleSpecGenerator → src/generator/ModuleSpecGenerator.ts:76
+- TSDOC_EDGE_CUSTOM_TAGS → src/parser/TSDocParser.ts:38
+- SourceDocCheckpointReference → src/parser/TsdocCommentReader.ts:144
+- CANONICAL_TTSC_RELATIONSHIP_BRIDGE → src/types/tags/canonical-tag-bridge.ts:114
+- CANONICAL_TSDOC_STANDARD_BRIDGE → src/types/tags/canonical-tag-bridge.ts:177
+- RETIRED_CUSTOM_TAG_MIGRATIONS → src/types/tags/canonical-tag-bridge.ts:247
+

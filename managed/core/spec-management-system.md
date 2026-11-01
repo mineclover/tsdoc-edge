@@ -416,9 +416,9 @@ interface UnusedDocument {
 ### Referenced By
 
 - [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1458
-- [[Validator System]] → managed/core/validator-system.md:340
+- [[Validator System]] → managed/core/validator-system.md:346
 - [[Convention Pack Check]] → managed/features/convention-pack-check.md:464
-- [[AuthoredProjectSpecifications]] → managed/specs/index.md:81
+- [[AuthoredProjectSpecifications]] → managed/specs/index.md:118
 - [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:278
 
 ### Implemented By

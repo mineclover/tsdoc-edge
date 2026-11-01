@@ -178,6 +178,70 @@ describe('EntryPointContextAggregator', () => {
 
       expect(context.fileSymbols?.length).toBe(1);
     });
+
+    it('should extract moduleSummary from top-level @packageDocumentation comment', () => {
+      const moduleFile = path.join(tempDir, 'MultiExportReader.ts');
+      fs.writeFileSync(
+        moduleFile,
+        `// Copyright notice
+/**
+ * AST-verified TSDoc comment reader and renderer.
+ *
+ * @remarks
+ * Parses leading JSDoc blocks and extracts structured metadata.
+ *
+ * @doc [[TsdocCommentReader]]
+ * @packageDocumentation
+ */
+
+export interface TsdocRenderOptions {
+  trim?: boolean;
+}
+
+export function readTsdocComment(): void {}
+`,
+        'utf-8'
+      );
+
+      const relPath = path.relative(process.cwd(), moduleFile);
+      const sym1: Symbol = {
+        ...createSymbol('tsdoc-render-options', 'TsdocRenderOptions', relPath, true),
+        type: 'interface',
+        line: 13,
+      };
+      const sym2: Symbol = {
+        ...createSymbol('read-tsdoc-comment', 'readTsdocComment', relPath, true),
+        type: 'function',
+        line: 17,
+      };
+      insertSymbol(sym1);
+      insertSymbol(sym2);
+
+      const context = aggregator.gatherContext(moduleFile);
+
+      expect(context.moduleSummary).toBe(
+        'AST-verified TSDoc comment reader and renderer.\n\nParses leading JSDoc blocks and extracts structured metadata.'
+      );
+      expect(context.primarySymbol?.name).toBe('TsdocRenderOptions');
+      expect(context.fileSymbols).toHaveLength(2);
+    });
+
+    it('should leave moduleSummary undefined when file has no @packageDocumentation tag', () => {
+      const plainFile = path.join(tempDir, 'PlainModule.ts');
+      fs.writeFileSync(
+        plainFile,
+        `/**
+ * Regular declaration doc comment without packageDocumentation.
+ */
+export function helper(): void {}
+`,
+        'utf-8'
+      );
+
+      const context = aggregator.gatherContext(plainFile);
+
+      expect(context.moduleSummary).toBeUndefined();
+    });
   });
 
   describe('gatherContext - symbol entry point', () => {

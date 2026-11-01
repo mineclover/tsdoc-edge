@@ -14,3 +14,12 @@ source: src/analyzer/SubstitutionAnalyzer.ts
 ## Overview
 
 Detects interchangeable implementations that satisfy a common interface or base class contract.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- SubstitutionAnalyzer → src/analyzer/SubstitutionAnalyzer.ts:42
+

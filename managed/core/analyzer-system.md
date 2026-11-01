@@ -461,10 +461,10 @@ violations.forEach(v => {
 
 ### Referenced By
 
-- [[Parser System]] → managed/core/parser-system.md:358
+- [[Parser System]] → managed/core/parser-system.md:359
 - [[Storage System]] → managed/core/storage-system.md:330
 - [[Symbol Graph System]] → managed/core/symbol-graph.md:40
-- [[Validator System]] → managed/core/validator-system.md:339
+- [[Validator System]] → managed/core/validator-system.md:345
 
 ### Implemented By
 

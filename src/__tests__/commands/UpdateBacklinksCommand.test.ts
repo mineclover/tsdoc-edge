@@ -285,4 +285,109 @@ Intro text.
       }
     });
   });
+
+  describe('dry-run, check, and fail-closed flag validation', () => {
+    it('previews updates with --dry-run and -n without writing to disk', async () => {
+      const managedDir = path.join(tempDir, 'managed');
+      fs.mkdirSync(managedDir, { recursive: true });
+      const docPath = path.join(managedDir, 'Service.md');
+      const initialContent = `---
+source: src/services/Service.ts
+---
+
+# [[Service]]
+
+Service overview.
+`;
+      fs.writeFileSync(docPath, initialContent, 'utf8');
+      const fixedPastDate = new Date('2025-01-01T00:00:00.000Z');
+      fs.utimesSync(docPath, fixedPastDate, fixedPastDate);
+      const initialMtimeMs = fs.statSync(docPath).mtimeMs;
+
+      const cwdSpy = jest.spyOn(process, 'cwd').mockReturnValue(tempDir);
+      try {
+        const dryRunResult = await command.execute([managedDir, '--dry-run']);
+        expect(dryRunResult.exitCode).toBe(0);
+        expect(fs.statSync(docPath).mtimeMs).toBe(initialMtimeMs);
+        expect(fs.readFileSync(docPath, 'utf8')).toBe(initialContent);
+
+        const output = consoleSpy.mock.calls.map((c) => c.join(' ')).join('\n');
+        expect(output).toContain('Would Update (Dry Run)');
+        expect(output).toContain('Total: 1 documents would be updated (dry run)');
+
+        // Short flag -n without explicit directory should resolve managed/ and also not write
+        consoleSpy.mockClear();
+        const shortFlagResult = await command.execute(['-n']);
+        expect(shortFlagResult.exitCode).toBe(0);
+        expect(fs.statSync(docPath).mtimeMs).toBe(initialMtimeMs);
+        expect(fs.readFileSync(docPath, 'utf8')).toBe(initialContent);
+      } finally {
+        cwdSpy.mockRestore();
+      }
+    });
+
+    it('returns exitCode 1 for --check when backlinks are out of sync and 0 once synced', async () => {
+      const managedDir = path.join(tempDir, 'managed');
+      fs.mkdirSync(managedDir, { recursive: true });
+      const docPath = path.join(managedDir, 'FeatureA.md');
+      const initialContent = `---
+source: src/features/FeatureA.ts
+---
+
+# [[FeatureA]]
+
+Feature documentation.
+`;
+      fs.writeFileSync(docPath, initialContent, 'utf8');
+
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+      const cwdSpy = jest.spyOn(process, 'cwd').mockReturnValue(tempDir);
+      try {
+        // Out of sync -> exitCode 1, file untouched
+        const checkFail = await command.execute([managedDir, '--check']);
+        expect(checkFail.exitCode).toBe(1);
+        expect(fs.readFileSync(docPath, 'utf8')).toBe(initialContent);
+
+        // Sync backlinks
+        const syncRes = await new UpdateBacklinksCommand().execute([managedDir]);
+        expect(syncRes.exitCode).toBe(0);
+
+        // Now synced -> exitCode 0
+        const checkPass = await new UpdateBacklinksCommand().execute([managedDir, '--check']);
+        expect(checkPass.exitCode).toBe(0);
+        expect(checkPass.message).toContain('All backlinks are up to date');
+      } finally {
+        errorSpy.mockRestore();
+        cwdSpy.mockRestore();
+      }
+    });
+
+    it('rejects unknown flags fail-closed with exitCode 1 without mutating files', async () => {
+      const managedDir = path.join(tempDir, 'managed');
+      fs.mkdirSync(managedDir, { recursive: true });
+      const docPath = path.join(managedDir, 'Doc.md');
+      const initialContent = `---
+source: src/Doc.ts
+---
+
+# [[Doc]]
+
+Doc body.
+`;
+      fs.writeFileSync(docPath, initialContent, 'utf8');
+      const fixedPastDate = new Date('2025-01-01T00:00:00.000Z');
+      fs.utimesSync(docPath, fixedPastDate, fixedPastDate);
+      const initialMtimeMs = fs.statSync(docPath).mtimeMs;
+
+      const errorSpy = jest.spyOn(console, 'error').mockImplementation(() => undefined);
+      try {
+        const result = await command.execute([managedDir, '--bogus']);
+        expect(result.exitCode).toBe(1);
+        expect(fs.statSync(docPath).mtimeMs).toBe(initialMtimeMs);
+        expect(fs.readFileSync(docPath, 'utf8')).toBe(initialContent);
+      } finally {
+        errorSpy.mockRestore();
+      }
+    });
+  });
 });

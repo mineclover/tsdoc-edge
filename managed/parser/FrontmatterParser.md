@@ -14,3 +14,13 @@ source: src/parser/FrontmatterParser.ts
 ## Overview
 
 Parses and serializes YAML frontmatter metadata blocks at the head of managed Markdown documents.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- FrontmatterParser → src/parser/FrontmatterParser.ts:1
+- FrontmatterMetadata → src/parser/FrontmatterParser.ts:13
+

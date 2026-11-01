@@ -400,13 +400,13 @@ tsdoc-edge tree
 - [[CoreFeatures]] → managed/features/core-features-catalog.md:102
 - [[CoreWorkflow]] → managed/features/core-workflow.md:154
 - [[Features Index]] → managed/features/index.md:282
-- [[LSP Integration]] → managed/features/lsp-integration.md:472
+- [[LSP Integration]] → managed/features/lsp-integration.md:478
 - [[ValidationFeatures]] → managed/features/validation-features.md:411
 - [[Guides & Tutorials]] → managed/guides/index.md:406
 
 ### Implemented By
 
 - DepthTraverser (Traversal) → src/graph/DepthTraverser.ts:64
-- SymbolGraphBuilder (Builder) → src/graph/SymbolGraphBuilder.ts:41
-- SymbolSearchEngine (Search) → src/graph/SymbolSearchEngine.ts:44
+- SymbolGraphBuilder (Builder) → src/graph/SymbolGraphBuilder.ts:36
+- SymbolSearchEngine (Search) → src/graph/SymbolSearchEngine.ts:39
 

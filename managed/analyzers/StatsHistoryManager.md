@@ -14,3 +14,12 @@ source: src/analyzer/StatsHistoryManager.ts
 ## Overview
 
 Persists and queries historical snapshots of symbol, documentation, and relationship metrics over time.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- StatsHistoryManager → src/analyzer/StatsHistoryManager.ts:17
+

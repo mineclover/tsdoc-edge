@@ -14,3 +14,12 @@ source: src/analyzer/TestRelationshipExtractor.ts
 ## Overview
 
 Extracts test suites, test cases, `@testScenario` mappings, and tested-symbol edges from test files.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- TestRelationshipExtractor → src/analyzer/TestRelationshipExtractor.ts:36
+

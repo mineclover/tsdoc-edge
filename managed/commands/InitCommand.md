@@ -390,4 +390,5 @@ if (configManager.exists()) {
 ### Implemented By
 
 - InitCommand → src/commands/Phase4Commands.ts:153:1
+- InitCommand → src/commands/InitCommand.ts:18
 

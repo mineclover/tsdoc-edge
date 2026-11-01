@@ -14,3 +14,13 @@ source: src/generator/RelatedDocsGenerator.ts
 ## Overview
 
 Generates context-aware related documentation and implementation links from symbol relationship neighborhoods.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- RelatedDocsGenerator → src/generator/RelatedDocsGenerator.ts:1
+- RelatedDocEntry → src/generator/RelatedDocsGenerator.ts:14
+

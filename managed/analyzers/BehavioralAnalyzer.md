@@ -14,3 +14,12 @@ source: src/analyzer/BehavioralAnalyzer.ts
 ## Overview
 
 Orchestrates behavioral relationship detection across collaboration, composition, and temporal-order patterns.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- BehavioralAnalyzer → src/analyzer/BehavioralAnalyzer.ts:1
+

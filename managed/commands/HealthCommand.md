@@ -44,12 +44,12 @@ canonical: true
 - [[ValidateSpecCommand]] → managed/commands/ValidateSpecCommand.md:320
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:238
 - [[CoreWorkflow]] → managed/features/core-workflow.md:128
-- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:739
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:735
 - [[Guides & Tutorials]] → managed/guides/index.md:278
 - [[AnalysisReport]] → managed/primary-types/AnalysisReport.md:94
 - [[CodeHealthMetrics]] → managed/types/CodeHealthMetrics.md:142
 
 ### Implemented By
 
-- HealthCommand → src/commands/HealthCommand.ts:37
+- HealthCommand → src/commands/HealthCommand.ts:33
 

@@ -576,7 +576,7 @@ Target (3 months):
 
 ### Referenced By
 
-- [[Feature Showcase]] → managed/examples/feature-showcase.md:268
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:269
 - [[Coverage Metrics Contract]] → managed/features/coverage-metrics-contract.md:281
 - [[TSDoc Edge User Guide]] → managed/user-guide.md:239
 - [[Workflows Index]] → managed/workflows/index.md:240

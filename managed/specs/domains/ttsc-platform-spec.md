@@ -161,3 +161,23 @@ npm run lint:ttsc
 - [[CrossSpecIntegrationContract]]
 - [[ProjectIndexer]]
 - [[Lint Governance]]
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[ProjectIndexer]] → managed/architecture/project-indexer.md:76
+- [[Lint Governance]] → managed/features/lint-governance.md:15
+- [[CrossSpecIntegrationContract]] → managed/specs/domains/cross-spec-integration-contract.md:17
+- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:100
+- [[TSDocStandardSpecification]] → managed/specs/domains/tsdoc-standard-spec.md:16
+- [[AuthoredProjectSpecifications]] → managed/specs/index.md:41
+
+### Implemented By
+
+- TtscPlatformSpecification → src/indexer/TtscGraphRouterArtifactAdapter.ts:1
+- TtscGraphRouterArtifactAdapter → src/indexer/TtscGraphRouterArtifactAdapter.ts:134
+- CANONICAL_TTSC_RELATIONSHIP_BRIDGE → src/types/tags/canonical-tag-bridge.ts:114
+

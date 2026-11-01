@@ -42,6 +42,16 @@ tsdoc-edge design-context <file>
 
 **Source**: `src/commands/DesignContextCommand.ts`
 
+### [[SyncCommand]]
+
+Synchronizes code symbols, canonical `@ttsc/graph` revisions, managed checkpoints, executable `SpecGraph`, and Markdown backlinks in a single command (`--dry-run`, `--check`, `--json`).
+
+```bash
+tsdoc-edge sync [--force] [--dry-run] [--check] [--json]
+```
+
+**Source**: `src/commands/SyncCommand.ts`
+
 ## Document Commands
 
 ### find-doc
@@ -435,6 +445,7 @@ tsdoc-edge uninstall-hook
 ### Referenced By
 
 - [[Commands Index]] → managed/COMMANDS.md:157
+- [[SyncCommand]] → managed/commands/SyncCommand.md:22
 
 ### Implemented By
 

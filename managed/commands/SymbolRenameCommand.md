@@ -14,3 +14,12 @@ source: src/commands/SymbolRenameCommand.ts
 ## Overview
 
 Renames a `[[Symbol]]` document checkpoint and updates all incoming Markdown and `@doc` references atomically.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- SymbolRenameCommand → src/commands/SymbolRenameCommand.ts:59
+

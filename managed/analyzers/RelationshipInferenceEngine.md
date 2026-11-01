@@ -14,3 +14,13 @@ source: src/analyzer/RelationshipInferenceEngine.ts
 ## Overview
 
 Derives transitive and rule-based inferred relationships over the unified symbol relationship graph.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- RelationshipInferenceEngine → src/analyzer/RelationshipInferenceEngine.ts:1
+- InferenceStats → src/analyzer/RelationshipInferenceEngine.ts:30
+

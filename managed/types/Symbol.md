@@ -100,12 +100,11 @@ Convention: kebab-case from file path + symbol name
 - [[Commands Index]] → managed/COMMANDS.md:164
 - [[TSDoc Edge Documentation]] → managed/README.md:115
 - [[ASTSymbolExtractor]] → managed/analyzers/ASTSymbolExtractor.md:124
-- [[Analyzers & Extractors]] → managed/analyzers/index.md:108
 - [[CheckLinksCommand]] → managed/commands/CheckLinksCommand.md:15
 - [[ExploreEntrypointCommand]] → managed/commands/ExploreEntrypointCommand.md:20
 - [[ValidateSymbolRefsCommand]] → managed/commands/ValidateSymbolRefsCommand.md:15
 - [[Analyzer System]] → managed/core/analyzer-system.md:269
-- [[Spec Management System]] → managed/core/spec-management-system.md:177
+- [[Spec Management System]] → managed/core/spec-management-system.md:183
 - [[DatabaseManager]] → managed/core-components/DatabaseManager.md:301
 - [[CoreWorkflow]] → managed/features/core-workflow.md:108
 - [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:993
@@ -119,7 +118,5 @@ Convention: kebab-case from file path + symbol name
 
 ### Implemented By
 
-- Symbol → src/types/graph/graph.ts:44
-- DocReferenceAnalyzer → src/analyzer/DocReferenceAnalyzer.ts:49
-- TSDocSymbolParser → src/doc-symbol/TSDocSymbolParser.ts:17
+- Symbol → src/types/graph/graph.ts:43
 

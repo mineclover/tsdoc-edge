@@ -65,7 +65,7 @@ tsdoc-edge orphans
 
 - [[TSDoc Edge Documentation]] → managed/README.md:50
 - [[ASTSymbolExtractor]] → managed/analyzers/ASTSymbolExtractor.md:174
-- [[Analyzers & Extractors]] → managed/analyzers/index.md:295
+- [[Analyzers & Extractors]] → managed/analyzers/index.md:399
 - [[BuildCommand]] → managed/commands/BuildCommand.md:45
 - [[VisualizeDepsCommand]] → managed/commands/VisualizeDepsCommand.md:29
 - [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:543

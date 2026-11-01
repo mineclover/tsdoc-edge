@@ -38,10 +38,10 @@ Parse TypeScript files and extract TSDoc comments.
 - [[ASTSymbolExtractor]] → managed/analyzers/ASTSymbolExtractor.md:173
 - [[Analyzers & Extractors]] → managed/analyzers/index.md:30
 - [[CoreWorkflow]] → managed/features/core-workflow.md:110
-- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:714
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:710
 - [[ExtractionResult]] → managed/primary-types/ExtractionResult.md:114
 
 ### Implemented By
 
-- ParseCommand → src/commands/ParseCommand.ts:1
+- ParseCommand → src/commands/ParseCommand.ts:35
 

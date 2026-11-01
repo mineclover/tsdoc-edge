@@ -349,8 +349,8 @@ registry.save();
 
 - [[Analyzer System]] → managed/core/analyzer-system.md:42
 - [[Document Symbol System]] → managed/core/doc-symbol-system.md:393
-- [[Parser System]] → managed/core/parser-system.md:357
-- [[Spec Management System]] → managed/core/spec-management-system.md:393
+- [[Parser System]] → managed/core/parser-system.md:358
+- [[Spec Management System]] → managed/core/spec-management-system.md:399
 - [[Symbol Graph System]] → managed/core/symbol-graph.md:39
 - [[Core Components]] → managed/core-components/index.md:35
 

@@ -14,3 +14,12 @@ source: src/analyzer/EntryPointContextAggregator.ts
 ## Overview
 
 Collects transitive code, document, and relationship context reachable from a file, symbol, or checkpoint entry point.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- EntryPointContextAggregator → src/analyzer/EntryPointContextAggregator.ts:122
+

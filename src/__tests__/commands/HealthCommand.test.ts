@@ -105,5 +105,44 @@ describe('HealthCommand', () => {
       expect(result.exitCode).toBe(1);
       expect(result.error?.message).toBe('Health check failed');
     });
+
+    it('emits structured JSON when --json is passed', async () => {
+      mockFsExists.mockReturnValue(true);
+      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+      const result = await command.execute(['src', '--json']);
+
+      expect(result.exitCode).toBe(0);
+      const parsed: unknown = JSON.parse(logSpy.mock.calls.flat().join('\n'));
+      expect(parsed).toMatchObject({
+        target: { path: 'src' },
+        overall: { healthScore: 90, healthGrade: 'A+', maxScore: 100 },
+        breakdown: { documentationQuality: 85, testCoverage: 80 },
+      });
+      logSpy.mockRestore();
+    });
+
+    it('emits XML when --xml is passed and human report by default', async () => {
+      mockFsExists.mockReturnValue(true);
+      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+
+      const xmlResult = await command.execute(['src', '--xml']);
+      expect(xmlResult.exitCode).toBe(0);
+      expect(logSpy.mock.calls.flat().join('\n')).toContain('<health>');
+
+      logSpy.mockClear();
+      const humanResult = await command.execute(['src']);
+      expect(humanResult.exitCode).toBe(0);
+      expect(logSpy.mock.calls.flat().join('\n')).toContain('Overall Health: A+ (90/100)');
+      logSpy.mockRestore();
+    });
+
+    it('rejects unknown flags fail-closed', async () => {
+      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const result = await command.execute(['src', '--unknown']);
+      expect(result.exitCode).toBe(1);
+      expect(result.message).toContain('Unknown option');
+      logSpy.mockRestore();
+    });
   });
 });

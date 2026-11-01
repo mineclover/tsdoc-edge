@@ -125,8 +125,14 @@ tsdoc-edge convention check --pack managed/conventions/tsdoc-edge-core-policy.js
 
 ### Referenced By
 
+- [[ConventionCheck]] → managed/specs/conventions/convention-check.md:69
+- [[CrossSpecIntegrationContract]] → managed/specs/domains/cross-spec-integration-contract.md:183
+- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:189
+- [[TSDocStandardSpecification]] → managed/specs/domains/tsdoc-standard-spec.md:155
+- [[TtscPlatformSpecification]] → managed/specs/domains/ttsc-platform-spec.md:158
 - [[Semantic Graph Spec Governance Roadmap]] → managed/workflows/semantic-graph-spec-governance-roadmap.md:37
 
 ### Implemented By
 
 - AuthoredProjectSpecifications → src/spec-graph/ManagedSpecExtractor.ts:1
+

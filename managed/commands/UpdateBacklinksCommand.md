@@ -34,13 +34,14 @@ canonical: true
 
 - [[CLI Commands]] → managed/CLI-COMMANDS.md:23
 - [[TSDoc Edge Documentation]] → managed/README.md:116
+- [[SyncCommand]] → managed/commands/SyncCommand.md:24
 - [[DocumentSymbolRegistry]] → managed/features/DocumentSymbolRegistry.md:292
 - [[AutoIndexing]] → managed/features/auto-indexing.md:72
-- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:254
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:250
 - [[Document Symbol Parser]] → managed/parser/DocumentSymbolParser.md:90
 - [[LinkValidator]] → managed/utilities/LinkValidator.md:78
 
 ### Implemented By
 
-- UpdateBacklinksCommand → src/commands/UpdateBacklinksCommand.ts:1
+- UpdateBacklinksCommand → src/commands/UpdateBacklinksCommand.ts:39
 

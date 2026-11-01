@@ -605,10 +605,17 @@ export class DatabaseManager {
         })
         .run();
 
-      // Synchronize normalized ADR, error-experience, and future-plan tables for CLI queries
+      // Synchronize normalized ADR, error-experience, and future-plan tables for CLI queries.
+      // Also match `:ADR:%` / `:PLAN:%` ID prefixes because `ON DELETE SET NULL` foreign keys
+      // on `decision_records` and `future_plans` clear `symbol_id` when symbols are deleted.
       this.drizzleDb
         .delete(schema.decisionRecords)
-        .where(eq(schema.decisionRecords.symbolId, doc.symbolId))
+        .where(
+          or(
+            eq(schema.decisionRecords.symbolId, doc.symbolId),
+            like(schema.decisionRecords.id, `${doc.symbolId}:ADR:%`)
+          )
+        )
         .run();
       for (let i = 0; i < (doc.decisions?.length ?? 0); i++) {
         const decision = doc.decisions?.[i];
@@ -630,7 +637,12 @@ export class DatabaseManager {
 
       this.drizzleDb
         .delete(schema.errorExperiences)
-        .where(eq(schema.errorExperiences.symbolId, doc.symbolId))
+        .where(
+          or(
+            eq(schema.errorExperiences.symbolId, doc.symbolId),
+            like(schema.errorExperiences.id, `${doc.symbolId}:ERR:%`)
+          )
+        )
         .run();
       for (let i = 0; i < (doc.errorExperiences?.length ?? 0); i++) {
         const err = doc.errorExperiences?.[i];
@@ -652,7 +664,12 @@ export class DatabaseManager {
 
       this.drizzleDb
         .delete(schema.futurePlans)
-        .where(eq(schema.futurePlans.symbolId, doc.symbolId))
+        .where(
+          or(
+            eq(schema.futurePlans.symbolId, doc.symbolId),
+            like(schema.futurePlans.id, `${doc.symbolId}:PLAN:%`)
+          )
+        )
         .run();
       for (let i = 0; i < (doc.futurePlans?.length ?? 0); i++) {
         const plan = doc.futurePlans?.[i];
@@ -2540,6 +2557,28 @@ export class DatabaseManager {
    * @returns Number of deleted symbols
    */
   deleteSymbolsByFile(filePath: string): number {
+    const fileSymbols = this.drizzleDb
+      .select({ id: schema.symbols.id })
+      .from(schema.symbols)
+      .where(eq(schema.symbols.filePath, filePath))
+      .all();
+
+    if (fileSymbols.length > 0) {
+      const symbolIds = fileSymbols.map((row) => row.id);
+      this.drizzleDb
+        .delete(schema.decisionRecords)
+        .where(inArray(schema.decisionRecords.symbolId, symbolIds))
+        .run();
+      this.drizzleDb
+        .delete(schema.futurePlans)
+        .where(inArray(schema.futurePlans.symbolId, symbolIds))
+        .run();
+      this.drizzleDb
+        .delete(schema.errorExperiences)
+        .where(inArray(schema.errorExperiences.symbolId, symbolIds))
+        .run();
+    }
+
     const result = this.drizzleDb
       .delete(schema.symbols)
       .where(eq(schema.symbols.filePath, filePath))

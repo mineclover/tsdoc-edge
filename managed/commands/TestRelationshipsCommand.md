@@ -49,5 +49,5 @@ Analyze and display test-to-code relationships.
 
 ### Implemented By
 
-- TestRelationshipsCommand → src/commands/TestRelationshipsCommand.ts:40
+- TestRelationshipsCommand → src/commands/TestRelationshipsCommand.ts:36
 

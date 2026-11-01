@@ -422,6 +422,7 @@ This framework is inspired by:
 - [[StrictModeValidator]] → managed/analyzers/StrictModeValidator.md:109
 - [[ValidateSpecCommand]] → managed/commands/ValidateSpecCommand.md:15
 - [[Concepts Index]] → managed/concepts/index.md:250
-- [[Feature Showcase]] → managed/examples/feature-showcase.md:264
-- [[EnhancedDocExtractor]] → managed/parser/EnhancedDocExtractor.md:413
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:265
+- [[EnhancedDocExtractor]] → managed/parser/EnhancedDocExtractor.md:406
+- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:121
 

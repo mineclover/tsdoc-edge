@@ -290,5 +290,5 @@ echo "Coverage: $coverage%" > coverage-badge.txt
 
 ### Implemented By
 
-- CoverageReportCommand → src/commands/CoverageReportCommand.ts:1
+- CoverageReportCommand → src/commands/CoverageReportCommand.ts:78
 

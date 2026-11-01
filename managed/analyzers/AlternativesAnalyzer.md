@@ -14,3 +14,12 @@ source: src/analyzer/AlternativesAnalyzer.ts
 ## Overview
 
 Detects interchangeable implementation (`substitution`) and error-recovery (`fallback`) relationships across symbols.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- AlternativesAnalyzer → src/analyzer/AlternativesAnalyzer.ts:1
+

@@ -40,7 +40,7 @@ Analyze function call relationships.
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:206
 - [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:610
 - [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:531
-- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:187
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:183
 - [[Guides & Tutorials]] → managed/guides/index.md:139
 - [[UnifiedRelationships]] → managed/types/UnifiedRelationships.md:204
 

@@ -133,5 +133,5 @@ Source Code → [TSDocParser] → ExtractionResult
 
 ### Implemented By
 
-- ExtractionResult → src/analyzer/ASTSymbolExtractor.ts:36
+- ExtractionResult → src/analyzer/ASTSymbolExtractor.ts:37
 

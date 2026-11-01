@@ -173,7 +173,7 @@ const impacted = builder.getDependents('user-repository');
 - [[DatabaseManager]] → managed/core-components/DatabaseManager.md:364
 - [[DepthTraverser]] → managed/core-components/DepthTraverser.md:277
 - [[SymbolRegistryManager]] → managed/core-components/SymbolRegistryManager.md:474
-- [[Feature Showcase]] → managed/examples/feature-showcase.md:80
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:82
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:244
 - [[CoreWorkflow]] → managed/features/core-workflow.md:97
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:63

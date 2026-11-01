@@ -14,3 +14,12 @@ source: src/analyzer/InterfaceDependencyMapper.ts
 ## Overview
 
 Maps dependencies between interfaces and the concrete classes or consumers coupled to them.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- InterfaceDependencyMapper → src/analyzer/InterfaceDependencyMapper.ts:28
+

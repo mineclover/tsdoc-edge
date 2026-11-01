@@ -14,3 +14,12 @@ source: src/commands/ValidateGeneratedDocsCommand.ts
 ## Overview
 
 Verifies that generated Markdown documentation remains synchronized with current TypeScript TSDoc comments.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- ValidateGeneratedDocsCommand → src/commands/ValidateGeneratedDocsCommand.ts:37
+

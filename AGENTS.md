@@ -43,31 +43,35 @@ node dist/cli.js <command>
 
 ### 주요 CLI 워크플로우
 ```bash
-# 1. 초기화
-tsdoc-edge init
-tsdoc-edge build src
+# 1. 단일 명령 전체 정본 동기화 (심볼 DB + @ttsc/graph + 체크포인트 + SpecGraph + Backlinks)
+tsdoc-edge sync
+tsdoc-edge sync --check          # CI / 읽기 전용 정합성 검증
+tsdoc-edge sync --dry-run        # 파일 변조 없이 갱신 대상 미리보기
 
 # 2. 파일 작업 전 컨텍스트 확인 (가장 중요)
-tsdoc-edge work-context <file-path>
+tsdoc-edge wc <file-path> --llm  # 모듈 개요 + 전체 export API + 의존/피의존/테스트
+tsdoc-edge dc <file-path>        # 규범 명세 바인딩 + 계약(@contract) + ADR(@decision)
 
-# 3. 문서 관리
-tsdoc-edge index-docs managed
-tsdoc-edge update-backlinks
-tsdoc-edge validate-docs
+# 3. 개별 문서 관리 (필요 시)
+tsdoc-edge docs index managed
+tsdoc-edge docs backlinks managed --dry-run
+tsdoc-edge validate docs managed
+tsdoc-edge spec extract
 ```
 
-### work-context 활용 가이드
+### work-context & design-context 활용 가이드
 
 **파일 수정 전 필수 실행**:
 ```bash
-# 기본 사용 (사람이 읽기 편한 형식)
-tsdoc-edge wc src/commands/BuildCommand.ts
+# 사람이 읽기 편한 터미널 형식
+tsdoc-edge wc src/commands/BuildCommand.ts --human
 
-# LLM 친화적 형식 (AI 어시스턴트와 협업 시)
+# LLM 친화적 형식 (모듈 개요 + 전체 공개 심볼 시그니처 + 테스트·영향 분석)
 tsdoc-edge wc src/commands/BuildCommand.ts --llm
 
-# 설계 의사결정 추적 (contracts, decisions)
-tsdoc-edge dc src/services/UserService.ts
+# 설계 의사결정 및 계약 집중 뷰 (규범 명세, @contract, ADR, 오류 패턴, JSON 지원)
+tsdoc-edge dc src/commands/BuildCommand.ts
+tsdoc-edge dc src/commands/BuildCommand.ts --json
 ```
 
 **제공되는 정보**:

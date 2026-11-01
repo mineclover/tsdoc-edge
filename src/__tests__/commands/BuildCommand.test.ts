@@ -366,6 +366,49 @@ describe('BuildCommand', () => {
       expect(result.message).toContain('requires --router-module');
     });
 
+    it('resolves canonicalGraph.routerModule from .tsdoc.config.json when --router-module is omitted', async () => {
+      delete process.env.TSDOC_EDGE_GRAPH_ROUTER_MODULE;
+      delete process.env.TSDOC_EDGE_CANONICAL_GRAPH_DB;
+      const canonicalDatabase = path.join(tempDir, '.tsdoc/config-canonical-graph.db');
+      const configPath = path.join(tempDir, '.tsdoc.config.json');
+      fs.writeFileSync(
+        configPath,
+        JSON.stringify({
+          project: { name: 'test', version: '1.0.0', srcDirs: ['src'] },
+          paths: {
+            commentsDir: 'docs/comments',
+            databasePath: path.join(tempDir, 'test.db'),
+            jsonlDir: path.join(tempDir, 'data'),
+          },
+          canonicalGraph: {
+            routerModule: './local-router.js',
+            databasePath: canonicalDatabase,
+          },
+        }),
+        'utf-8'
+      );
+      ConfigManager.reset();
+      configManager = ConfigManager.getInstance(tempDir, configPath);
+      const source: ProjectGraphSource = {
+        id: 'fixture',
+        load: async () => canonicalGraphInput(tempDir),
+      };
+      const canonicalCoordinatorFactory = jest.fn(
+        (options) => new CanonicalGraphCoordinator(options, { source })
+      );
+      command = new BuildCommand(configManager, { canonicalCoordinatorFactory });
+
+      const result = await command.execute([path.join(tempDir, 'src'), '--canonical-graph']);
+
+      expect(result.exitCode).toBe(0);
+      expect(canonicalCoordinatorFactory).toHaveBeenCalledWith(
+        expect.objectContaining({
+          moduleSpecifier: path.resolve(tempDir, './local-router.js'),
+          repositoryPath: canonicalDatabase,
+        })
+      );
+    });
+
     it('closes the legacy database when scanning fails after initialization', async () => {
       const close = jest.spyOn(DatabaseManager.prototype, 'close');
       const privateCommand = command as unknown as {

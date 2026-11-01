@@ -140,7 +140,9 @@ tsdoc-edge convention check \
 ### Referenced By
 
 - [[Convention Pack Check]] → managed/features/convention-pack-check.md:440
+- [[AuthoredProjectSpecifications]] → managed/specs/index.md:44
 
 ### Implemented By
 
 - ConventionCheck → src/convention/ConventionCheckService.ts:1
+

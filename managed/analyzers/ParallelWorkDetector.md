@@ -14,3 +14,13 @@ source: src/analyzer/ParallelWorkDetector.ts
 ## Overview
 
 Partitions files and symbols into disjoint dependency subgraphs that can be modified safely in parallel.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- ParallelWorkDetector → src/analyzer/ParallelWorkDetector.ts:1
+- ConflictType → src/analyzer/ParallelWorkDetector.ts:13
+

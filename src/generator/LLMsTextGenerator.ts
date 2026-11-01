@@ -103,18 +103,48 @@ export class LLMsTextGenerator {
    * Generate summary section
    */
   private generateSummary(context: UnifiedContext): string {
-    if (!context.primarySymbol) {
-      return `## Summary\n\nNo primary symbol found.\n\n`;
+    const primarySymbol = context.primarySymbol;
+    if (!primarySymbol) {
+      let summary = `## Summary\n\n`;
+      if (context.moduleSummary) {
+        summary += `**Module Overview**: ${context.moduleSummary}\n\n`;
+      }
+      summary += `No primary symbol found.\n\n`;
+      return summary;
     }
 
     let summary = `## Summary\n\n`;
-    summary += `**${context.primarySymbol.name}** is a \`${context.primarySymbol.type}\``;
+    if (context.moduleSummary) {
+      summary += `**Module Overview**: ${context.moduleSummary}\n\n`;
+    }
 
-    if (context.primarySymbol.summary) {
-      summary += `: ${context.primarySymbol.summary}`;
+    summary += `**${primarySymbol.name}** is a \`${primarySymbol.type}\``;
+
+    if (primarySymbol.summary) {
+      summary += `: ${primarySymbol.summary}`;
     }
 
     summary += `\n\n`;
+
+    if (context.entryPointType === 'file' && context.fileSymbols) {
+      const exportedSymbols = context.fileSymbols
+        .filter((s) => s.isExported)
+        .slice()
+        .sort((a, b) => a.line - b.line || a.name.localeCompare(b.name));
+
+      const hasAdditionalExports =
+        exportedSymbols.length > 1 || exportedSymbols.some((s) => s.id !== primarySymbol.id);
+
+      if (hasAdditionalExports && exportedSymbols.length > 0) {
+        summary += `### Exported API Surface (${exportedSymbols.length})\n\n`;
+        for (const sym of exportedSymbols) {
+          const cleanSymSummary = sym.summary ? sym.summary.replace(/\s+/g, ' ').trim() : '';
+          summary += `- **${sym.name}** (\`${sym.type}\`, line ${sym.line})${cleanSymSummary ? `: ${cleanSymSummary}` : ''}\n`;
+        }
+        summary += `\n`;
+      }
+    }
+
     return summary;
   }
 
@@ -129,7 +159,12 @@ export class LLMsTextGenerator {
     loc += `- **Line**: ${context.primarySymbol.line}\n`;
     loc += `- **Type**: \`${context.primarySymbol.type}\`\n`;
     loc += `- **Visibility**: ${context.primarySymbol.isPublic ? 'Public API' : 'Internal'}\n`;
-    loc += `- **Exported**: ${context.primarySymbol.isExported ? 'Yes' : 'No'}\n\n`;
+    loc += `- **Exported**: ${context.primarySymbol.isExported ? 'Yes' : 'No'}\n`;
+    if (context.entryPointType === 'file' && context.fileSymbols) {
+      const exportedCount = context.fileSymbols.filter((s) => s.isExported).length;
+      loc += `- **Total File Symbols**: ${context.fileSymbols.length} (${exportedCount} exported)\n`;
+    }
+    loc += `\n`;
 
     return loc;
   }

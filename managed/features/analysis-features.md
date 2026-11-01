@@ -453,7 +453,7 @@ jobs:
 - [[CoreFeatures]] → managed/features/core-features-catalog.md:65
 - [[CoreWorkflow]] → managed/features/core-workflow.md:152
 - [[Features Index]] → managed/features/index.md:279
-- [[LSP Integration]] → managed/features/lsp-integration.md:473
+- [[LSP Integration]] → managed/features/lsp-integration.md:479
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:376
 - [[ValidationFeatures]] → managed/features/validation-features.md:410
 - [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:550
@@ -465,6 +465,6 @@ jobs:
 
 ### Implemented By
 
-- CodeHealthChecker (Health) → src/analyzer/CodeHealthChecker.ts:42
+- CodeHealthChecker (Health) → src/analyzer/CodeHealthChecker.ts:38
 - DocumentationAnalyzer (Quality) → src/analyzer/DocumentationAnalyzer.ts:18
 

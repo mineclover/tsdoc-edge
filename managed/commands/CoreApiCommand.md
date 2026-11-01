@@ -14,3 +14,12 @@ source: src/commands/CoreApiCommand.ts
 ## Overview
 
 Lists public exported API symbols alongside their immediate upstream and downstream dependencies.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- CoreApiCommand → src/commands/CoreApiCommand.ts:36
+

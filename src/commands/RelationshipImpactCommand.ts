@@ -57,6 +57,8 @@ Options:
                         upstream (what this depends on), both (default: downstream)
   --category <cat>      Filter by relationship category
   --min-confidence <n>  Minimum confidence level (0-1, default: 0.5)
+  --include-external    Include TypeScript stdlib and external package symbols
+  --json                Output structured JSON
 
 Examples:
   # See what depends on BuildCommand
@@ -75,7 +77,7 @@ Examples:
   /**
    * execute method
    * @param args - args parameter
-   * @returns Returns Promise<CommandResult>
+   * @returns Returns `Promise<CommandResult>`
    * @public
    */
   execute(args: string[]): Promise<CommandResult> {
@@ -84,12 +86,29 @@ Examples:
         return this.displayHelp();
       }
 
-      const positionalArgs = this.getPositionalArgs(args, [
-        '--depth',
-        '--direction',
-        '--category',
-        '--min-confidence',
-      ]);
+      const valueFlags = ['--depth', '--direction', '--category', '--min-confidence'];
+      const flagError = this.validateAllowedFlags(
+        args,
+        ['--include-external', '--json'],
+        valueFlags
+      );
+      if (flagError) {
+        return flagError;
+      }
+
+      const rawDirection = this.getOption(args, '--direction');
+      if (rawDirection !== undefined) {
+        const directionError = this.validateOptionValue(
+          rawDirection,
+          ['downstream', 'upstream', 'both'],
+          '--direction'
+        );
+        if (directionError) {
+          return directionError;
+        }
+      }
+
+      const positionalArgs = this.getPositionalArgs(args, valueFlags);
       const symbolId = positionalArgs[0];
 
       if (!symbolId) {
@@ -100,9 +119,11 @@ Examples:
 
       const options = {
         depth: Number.parseInt(this.getOption(args, '--depth') || '3', 10),
-        direction: this.getOption(args, '--direction') || 'downstream',
+        direction: rawDirection || 'downstream',
         category: this.getOption(args, '--category'),
         minConfidence: Number.parseFloat(this.getOption(args, '--min-confidence') || '0.5'),
+        includeExternal: this.hasFlag(args, '--include-external'),
+        json: this.hasFlag(args, '--json'),
       };
 
       const dbPath = this.getDatabasePath();
@@ -132,12 +153,15 @@ Examples:
         const symbolName =
           resolved?.symbol.name ?? canonicalNode?.qualifiedName ?? canonicalNode?.name ?? symbolId;
         const symbolType = resolved?.symbol.type ?? canonicalNode?.kind ?? 'canonical';
-        this.printHeader(`Impact Analysis: ${symbolName}`);
 
-        console.log();
-        this.printInfo(`Analyzing impact for: ${symbolName} (${symbolType})`);
-        this.printInfo(`Direction: ${options.direction}, Max depth: ${options.depth}`);
-        console.log();
+        if (!options.json) {
+          this.printHeader(`Impact Analysis: ${symbolName}`);
+
+          console.log();
+          this.printInfo(`Analyzing impact for: ${symbolName} (${symbolType})`);
+          this.printInfo(`Direction: ${options.direction}, Max depth: ${options.depth}`);
+          console.log();
+        }
 
         // Perform impact analysis
         const impactedSymbols = resolvedId
@@ -158,9 +182,38 @@ Examples:
                 options.depth,
                 options.direction,
                 options.category,
-                options.minConfidence
+                options.minConfidence,
+                options.includeExternal
               )
             : [];
+
+        const legacyMaxDepth =
+          impactedSymbols.length > 0 ? Math.max(...impactedSymbols.map((node) => node.depth)) : 0;
+        const canonicalMaxDepth =
+          canonicalImpact.length > 0 ? Math.max(...canonicalImpact.map((node) => node.depth)) : 0;
+        const effectiveImpactCount = Math.max(impactedSymbols.length, canonicalImpact.length);
+        const effectiveMaxDepth = Math.max(legacyMaxDepth, canonicalMaxDepth);
+        const riskLevel = this.assessRisk(effectiveImpactCount, effectiveMaxDepth);
+
+        if (options.json) {
+          console.log(
+            JSON.stringify(
+              {
+                symbolId: resolvedId ?? canonicalId ?? symbolId,
+                symbolName,
+                symbolType,
+                direction: options.direction,
+                maxDepth: options.depth,
+                riskLevel,
+                impactedSymbols,
+                canonicalImpact,
+              },
+              null,
+              2
+            )
+          );
+          return this.success(`Impact analysis complete: ${effectiveImpactCount} symbols affected`);
+        }
 
         if (impactedSymbols.length === 0 && canonicalImpact.length === 0) {
           this.printSuccess('No impact found (symbol is isolated)');
@@ -170,8 +223,6 @@ Examples:
 
         if (impactedSymbols.length === 0) {
           this.printCanonicalImpact(canonicalImpact, options.direction);
-          const canonicalDepth = Math.max(...canonicalImpact.map((node) => node.depth));
-          const riskLevel = this.assessRisk(canonicalImpact.length, canonicalDepth);
           this.printInfo(`Canonical change risk: ${riskLevel}`);
           console.log();
           return this.success(
@@ -284,10 +335,6 @@ Examples:
         // Risk assessment
         this.printSection('Change Risk Assessment');
 
-        const riskLevel = this.assessRisk(
-          impactedSymbols.length,
-          Math.max(...Array.from(byDepth.keys()))
-        );
         const riskColor =
           riskLevel === 'High'
             ? this.colors.red
@@ -318,7 +365,7 @@ Examples:
 
         console.log();
 
-        return this.success(`Impact analysis complete: ${impactedSymbols.length} symbols affected`);
+        return this.success(`Impact analysis complete: ${effectiveImpactCount} symbols affected`);
       } finally {
         try {
           canonicalContext?.close();
@@ -373,22 +420,22 @@ Examples:
         let nextSymbols: string[] = [];
 
         if (direction === 'downstream') {
-          // Who uses current symbol
-          if (fromSymbols.includes(current.symbolId)) {
-            nextSymbols = toSymbols;
-          }
-        } else if (direction === 'upstream') {
-          // What current symbol uses
+          // Who depends on / breaks if current symbol changes (incoming edges: from -> to)
           if (toSymbols.includes(current.symbolId)) {
             nextSymbols = fromSymbols;
           }
+        } else if (direction === 'upstream') {
+          // What current symbol depends on (outgoing edges: from -> to)
+          if (fromSymbols.includes(current.symbolId)) {
+            nextSymbols = toSymbols;
+          }
         } else {
           // Both directions
-          if (fromSymbols.includes(current.symbolId)) {
-            nextSymbols.push(...toSymbols);
-          }
           if (toSymbols.includes(current.symbolId)) {
             nextSymbols.push(...fromSymbols);
+          }
+          if (fromSymbols.includes(current.symbolId)) {
+            nextSymbols.push(...toSymbols);
           }
         }
 
@@ -426,7 +473,8 @@ Examples:
     maxDepth: number,
     direction: string,
     category?: string,
-    minConfidence = 0.5
+    minConfidence = 0.5,
+    includeExternal = false
   ): ImpactNode[] {
     // Canonical compiler facts have confidence 1.0.
     if (minConfidence > 1) return [];
@@ -466,6 +514,11 @@ Examples:
 
         const node = context.analysis.index.getNode(nextId);
         if (!node) continue;
+        const isExternalNode =
+          node.external === true ||
+          nextId.includes('/bundled:/libs/') ||
+          nextId.includes('/node_modules/');
+        if (!includeExternal && isExternalNode) continue;
         visited.add(nextId);
         const depth = current.depth + 1;
         const nextPath = [...current.path, nextId];
@@ -476,7 +529,7 @@ Examples:
           relationshipType: semantic.relationshipType ?? edge.kind,
           category: relationshipCategory,
         });
-        if (node.external !== true) {
+        if (!isExternalNode) {
           queue.push({ symbolId: nextId, depth, path: nextPath });
         }
       }

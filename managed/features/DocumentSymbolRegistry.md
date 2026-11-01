@@ -389,10 +389,10 @@ describe('DocumentSymbolRegistry', () => {
 - [[IndexDocsCommand]] → managed/commands/IndexDocsCommand.md:78
 - [[DocumentSymbolParser]] → managed/features/DocumentSymbolParser.md:186
 - [[ValidationFeatures]] → managed/features/validation-features.md:243
-- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:729
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:725
 - [[DocumentSymbol]] → managed/types/DocumentSymbol.md:110
 
 ### Implemented By
 
-- DocumentSymbolRegistry → src/doc-symbol/DocumentSymbolRegistry.ts:1
+- DocumentSymbolRegistry → src/doc-symbol/DocumentSymbolRegistry.ts:39
 

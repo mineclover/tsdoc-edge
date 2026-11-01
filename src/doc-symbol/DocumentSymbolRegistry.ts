@@ -132,13 +132,43 @@ export class DocumentSymbolRegistry {
   }
 
   /**
-   * Get primary definition for symbol
+   * Get canonical H1 primary definition for symbol
+   *
+   * @param name - Symbol name
+   * @returns Primary definition or undefined
+   * @public
+   */
+  getPrimaryDefinition(name: string): DocumentSymbol | undefined {
+    return this.definitions.get(name);
+  }
+
+  /**
+   * Get unique auxiliary section definition when no H1 primary exists
+   */
+  private getUniqueAuxiliaryDefinition(name: string): DocumentSymbol | undefined {
+    const auxList = this.auxiliaries.get(name);
+    return auxList?.length === 1 ? auxList[0] : undefined;
+  }
+
+  /**
+   * Resolve canonical definition for symbol (H1 primary, or unique hub H2/H3 auxiliary section)
+   *
+   * @param name - Symbol name
+   * @returns Resolved definition or undefined when missing or ambiguous
+   * @public
+   */
+  resolveDefinition(name: string): DocumentSymbol | undefined {
+    return this.definitions.get(name) ?? this.getUniqueAuxiliaryDefinition(name);
+  }
+
+  /**
+   * Get resolved definition for symbol (H1 primary, or unique hub H2/H3 auxiliary section)
    *
    * @param name - Symbol name
    * @returns Definition or undefined
    */
   getDefinition(name: string): DocumentSymbol | undefined {
-    return this.definitions.get(name);
+    return this.resolveDefinition(name);
   }
 
   /**
@@ -181,6 +211,22 @@ export class DocumentSymbolRegistry {
   }
 
   /**
+   * Get all resolvable symbol names (H1 primaries plus unique hub H2/H3 auxiliary checkpoints)
+   *
+   * @returns Resolvable symbol names
+   * @public
+   */
+  getAllResolvableSymbolNames(): string[] {
+    const names = new Set<string>(this.definitions.keys());
+    for (const [name, auxList] of this.auxiliaries.entries()) {
+      if (!names.has(name) && auxList.length === 1) {
+        names.add(name);
+      }
+    }
+    return Array.from(names);
+  }
+
+  /**
    * Validate SSOT rules
    *
    * @returns Validation result
@@ -189,18 +235,18 @@ export class DocumentSymbolRegistry {
     const errors: DocSymbolError[] = [];
     const warnings: DocSymbolWarning[] = [];
 
-    // Check for orphaned auxiliaries
+    // Check for ambiguous orphaned auxiliaries (unique H2/H3 hub section checkpoints are valid)
     for (const [name, auxList] of this.auxiliaries.entries()) {
       const primary = this.definitions.get(name);
 
-      if (!primary) {
+      if (!primary && auxList.length > 1) {
         for (const aux of auxList) {
           errors.push({
             type: 'orphaned_auxiliary',
             symbolName: name,
             filePath: aux.filePath,
             line: aux.line,
-            message: `Auxiliary definition [[${name}]] has no primary (H1) definition`,
+            message: `Auxiliary definition [[${name}]] appears in ${auxList.length} locations without a canonical primary (H1) definition`,
           });
         }
       }
@@ -210,7 +256,7 @@ export class DocumentSymbolRegistry {
     for (const [name, refList] of this.references.entries()) {
       const primary = this.definitions.get(name);
 
-      if (!primary) {
+      if (!primary && (this.auxiliaries.get(name)?.length ?? 0) !== 1) {
         for (const ref of refList) {
           errors.push({
             type: 'missing_primary',
@@ -242,7 +288,7 @@ export class DocumentSymbolRegistry {
     // Check for symbols with many references (might need splitting)
     for (const [name, refList] of this.references.entries()) {
       if (refList.length > 20) {
-        const definition = this.definitions.get(name);
+        const definition = this.resolveDefinition(name);
         if (definition) {
           warnings.push({
             type: 'many_references',

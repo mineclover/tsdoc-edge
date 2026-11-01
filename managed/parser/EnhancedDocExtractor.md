@@ -445,5 +445,5 @@ export class BuildCommand extends BaseCommand {
 
 ### Implemented By
 
-- ExtractionOptions → src/parser/EnhancedDocExtractor.ts:25
+- ExtractionOptions → src/parser/EnhancedDocExtractor.ts:32
 

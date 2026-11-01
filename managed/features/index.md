@@ -345,7 +345,7 @@ tsdoc-edge test-impact database-manager
 
 - [[TSDoc Edge Documentation]] → managed/README.md:179
 - [[Concepts Index]] → managed/concepts/index.md:280
-- [[Core Systems]] → managed/core/index.md:44
+- [[Core Systems]] → managed/core/index.md:51
 - [[Core Components]] → managed/core-components/index.md:36
 - [[Examples]] → managed/examples/index.md:33
 - [[Primary Types Index]] → managed/primary-types/index.md:450

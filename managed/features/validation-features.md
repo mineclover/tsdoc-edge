@@ -432,7 +432,7 @@ cycle_rate = symbols_in_cycles / total_symbols
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:133
-- [[SpecCommands]] → managed/commands/SpecCommands.md:97
+- [[SpecCommands]] → managed/commands/SpecCommands.md:109
 - [[ValidateCommand]] → managed/commands/ValidateCommand.md:29
 - [[ValidateDocsCommand]] → managed/commands/ValidateDocsCommand.md:29
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:434
@@ -447,6 +447,6 @@ cycle_rate = symbols_in_cycles / total_symbols
 
 ### Implemented By
 
-- ConnectivityValidator (Connectivity) → src/validator/ConnectivityValidator.ts:43
-- StrictModeValidator (StrictMode) → src/validator/StrictModeValidator.ts:33
+- ConnectivityValidator (Connectivity) → src/validator/ConnectivityValidator.ts:39
+- StrictModeValidator (StrictMode) → src/validator/StrictModeValidator.ts:32
 

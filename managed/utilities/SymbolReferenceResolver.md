@@ -14,3 +14,13 @@ source: src/doc-symbol/SymbolReferenceResolver.ts
 ## Overview
 
 Resolves `[[Symbol]]` checkpoints and symbol footnote identifiers to concrete Markdown and TypeScript file/line locations.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- SymbolReferenceResolver → src/doc-symbol/SymbolReferenceResolver.ts:1
+- ResolvedSymbolRef → src/doc-symbol/SymbolReferenceResolver.ts:17
+

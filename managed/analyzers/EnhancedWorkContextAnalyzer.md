@@ -14,3 +14,13 @@ source: src/analyzer/EnhancedWorkContextAnalyzer.ts
 ## Overview
 
 Aggregates upstream/downstream dependencies, related documents, contracts, and test coverage into unified file work contexts.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- EnhancedWorkContextAnalyzer → src/analyzer/EnhancedWorkContextAnalyzer.ts:1
+- EnhancedWorkContext → src/analyzer/EnhancedWorkContextAnalyzer.ts:24
+

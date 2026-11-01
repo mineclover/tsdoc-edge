@@ -41,11 +41,11 @@ Validate codebase and documentation integrity.
 - [[UndocumentedCommand]] → managed/commands/UndocumentedCommand.md:179
 - [[CoreWorkflow]] → managed/features/core-workflow.md:136
 - [[ValidationFeatures]] → managed/features/validation-features.md:230
-- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:738
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:734
 - [[Guides & Tutorials]] → managed/guides/index.md:293
 - [[TsdocEdgeConfig]] → managed/primary-types/TsdocEdgeConfig.md:109
 - [[CodeHealthMetrics]] → managed/types/CodeHealthMetrics.md:144
-- [[CustomTagTypes]] → managed/types/CustomTagTypes.md:261
+- [[CustomTagTypes]] → managed/types/CustomTagTypes.md:258
 - [[ParseTypes]] → managed/types/ParseTypes.md:139
 - [[ConnectivityValidator]] → managed/utilities/ConnectivityValidator.md:174
 - [[ConventionValidator]] → managed/utilities/ConventionValidator.md:239
@@ -53,5 +53,5 @@ Validate codebase and documentation integrity.
 
 ### Implemented By
 
-- ValidateCommand → src/commands/ValidateCommand.ts:39
+- ValidateCommand → src/commands/ValidateCommand.ts:35
 

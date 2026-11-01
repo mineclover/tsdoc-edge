@@ -157,3 +157,27 @@ const result = parser.parseFile('UserService.ts', sourceText);
 - [[TsdocEdgePlatformSpecification]]
 - [[CrossSpecIntegrationContract]]
 - [[TSDocParser]]
+
+---
+
+## Backlinks
+
+### Referenced By
+
+- [[Lint Governance]] → managed/features/lint-governance.md:15
+- [[CrossSpecIntegrationContract]] → managed/specs/domains/cross-spec-integration-contract.md:17
+- [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:99
+- [[TtscPlatformSpecification]] → managed/specs/domains/ttsc-platform-spec.md:16
+- [[AuthoredProjectSpecifications]] → managed/specs/index.md:40
+
+### Implemented By
+
+- TSDocStandardSpecification → src/parser/TSDocParser.ts:1
+- MarkdownGenerator → src/generator/MarkdownGenerator.ts:17
+- EnhancedDocExtractor → src/parser/EnhancedDocExtractor.ts:77
+- ModuleSpecTagParser → src/parser/ModuleSpecTagParser.ts:27
+- TSDocParser → src/parser/TSDocParser.ts:134
+- TsdocRenderOptions → src/parser/TsdocCommentReader.ts:37
+- StructuredTsdocComment → src/parser/TsdocCommentReader.ts:93
+- CANONICAL_TSDOC_STANDARD_BRIDGE → src/types/tags/canonical-tag-bridge.ts:177
+

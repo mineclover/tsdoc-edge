@@ -14,3 +14,12 @@ source: src/commands/SyncCoverageCommand.ts
 ## Overview
 
 Parses Istanbul/NYC coverage reports and persists source-identified execution metrics with optional canonical graph projection.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- SyncCoverageCommand → src/commands/SyncCoverageCommand.ts:42
+

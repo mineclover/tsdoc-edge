@@ -787,7 +787,7 @@ done
 - [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1462
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:271
 - [[UsedByCommand]] → managed/commands/UsedByCommand.md:125
-- [[Feature Showcase]] → managed/examples/feature-showcase.md:267
+- [[Feature Showcase]] → managed/examples/feature-showcase.md:268
 - [[Relationship Usage Examples]] → managed/examples/relationship-usage-examples.md:526
 - [[Codebase Health Report]] → managed/features/codebase-health-report.md:425
 - [[CoreFeatures]] → managed/features/core-features-catalog.md:34

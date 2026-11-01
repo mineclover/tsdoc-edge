@@ -177,11 +177,11 @@ Source: `src/commands/Phase5Commands.ts`
 - [[Impact Analysis]] → managed/features/ImpactAnalysis.md:199
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:268
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:252
-- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:153
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:149
 - [[Guides & Tutorials]] → managed/guides/index.md:138
 - [[InterfaceTypes]] → managed/types/InterfaceTypes.md:146
 
 ### Implemented By
 
-- DepsCommand → src/commands/DepsCommand.ts:42
+- DepsCommand → src/commands/DepsCommand.ts:38
 

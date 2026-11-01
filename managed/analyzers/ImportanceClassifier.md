@@ -14,3 +14,12 @@ source: src/analyzer/ImportanceClassifier.ts
 ## Overview
 
 Scores and classifies symbol architectural importance from graph centrality, export visibility, and dependent counts.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- ImportanceClassifier → src/analyzer/ImportanceClassifier.ts:20
+

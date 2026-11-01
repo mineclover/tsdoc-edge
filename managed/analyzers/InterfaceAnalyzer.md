@@ -14,3 +14,12 @@ source: src/analyzer/InterfaceAnalyzer.ts
 ## Overview
 
 Extracts TypeScript interface declarations, member signatures, and structural implementation contracts.
+
+---
+
+## Backlinks
+
+### Implemented By
+
+- InterfaceAnalyzer → src/analyzer/InterfaceAnalyzer.ts:45
+

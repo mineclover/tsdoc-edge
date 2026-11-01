@@ -320,7 +320,7 @@ tsdoc-edge parse src/commands/BuildCommand.ts
 - [[CoreWorkflow]] → managed/features/core-workflow.md:85
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:72
 - [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:215
-- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:716
+- [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:712
 - [[Guides & Tutorials]] → managed/guides/index.md:46
 - [[Relationship Analysis Guide]] → managed/guides/relationship-analysis-guide.md:41
 - [[ExtractionResult]] → managed/primary-types/ExtractionResult.md:104
