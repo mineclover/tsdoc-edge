@@ -3,6 +3,7 @@
  * @packageDocumentation
  */
 
+import * as fs from 'node:fs';
 import { type GraphNeighbor, graphEdgeSemantic } from '../graph-analysis';
 import { CanonicalAliasContext } from '../indexer';
 import { DatabaseManager, type UnifiedRelationshipRow } from '../storage/DatabaseManager';
@@ -11,12 +12,13 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
 interface CanonicalRelationshipCandidate {
   readonly nodeId: string;
   readonly direction: 'from' | 'to';
+  readonly rawKind: string;
   readonly type: string;
   readonly category: string;
 }
 
 /**
- * Command for querying symbol relationships
+ * Command for querying symbol relationships across Canonical `@ttsc/graph` and Enrichment DB.
  * @doc [[RelationshipQueryCommand]]
  * @public
  */
@@ -48,16 +50,20 @@ export class RelationshipQueryCommand extends BaseCommand {
     return `tsdoc-edge relationship-query <symbol-id> [options]
 
 Options:
-  --type <type>         Filter by relationship type
-  --category <category> Filter by category
+  --type <type>         Filter by relationship type or canonical edge kind (e.g. calls, type_ref)
+  --category <category> Filter by category (e.g. behavioral, structural, type-system, testing)
   --direction <dir>     Filter by direction: from, to, both (default: both)
   --limit <n>           Limit results (default: 50)
+  --include-external    Include external/stdlib nodes from canonical graph
+  --human               Human-readable output (default)
+  --json                JSON output
+  --xml                 XML output
 
 Examples:
-  tsdoc-edge relationship-query build-command
-  tsdoc-edge relationship-query build-command --category behavioral
-  tsdoc-edge relationship-query build-command --type collaboration
-  tsdoc-edge relationship-query build-command --direction from`;
+  tsdoc-edge relationship-query readTsdocComment
+  tsdoc-edge relationship-query GraphRepository --category behavioral
+  tsdoc-edge relationship-query BuildCommand --type calls --limit 20
+  tsdoc-edge relationship-query BuildCommand --direction to --json`;
   }
 
   /**
@@ -68,12 +74,17 @@ Examples:
    */
   execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(() => {
-      // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
 
-      // Extract positional arguments by skipping valued options and flags
+      const flagError = this.validateAllowedFlags(
+        args,
+        ['--human', '--json', '--xml', '--include-external'],
+        ['--type', '--category', '--direction', '--limit']
+      );
+      if (flagError) return flagError;
+
       const positionalArgs = this.getPositionalArgs(args, [
         '--type',
         '--category',
@@ -89,25 +100,45 @@ Examples:
       const requestedSymbol = positionalArgs[0];
       let symbolId = requestedSymbol;
 
-      // Parse options
+      const directionOpt = this.getOption(args, '--direction') || 'both';
+      if (!['from', 'to', 'both'].includes(directionOpt)) {
+        this.printError(`Invalid direction '${directionOpt}'. Expected from, to, or both.`);
+        return this.failure('Invalid direction');
+      }
+
+      const parsedLimit = Number.parseInt(this.getOption(args, '--limit') || '50', 10);
       const options = {
         type: this.getOption(args, '--type'),
         category: this.getOption(args, '--category'),
-        direction: this.getOption(args, '--direction') || 'both',
-        limit: Number.parseInt(this.getOption(args, '--limit') || '50', 10),
+        direction: directionOpt,
+        limit: Number.isFinite(parsedLimit) && parsedLimit >= 0 ? parsedLimit : 50,
+        includeExternal: this.hasFlag(args, '--include-external'),
       };
+      const isJson = this.hasFlag(args, '--json');
+      const isXml = this.hasFlag(args, '--xml');
 
       const dbPath = this.getDatabasePath();
-      const dbManager = new DatabaseManager(dbPath);
+      const hasLegacyDb = fs.existsSync(dbPath);
       let canonicalContext: CanonicalAliasContext | null = null;
+      let dbManager: DatabaseManager | null = null;
+
       try {
         canonicalContext = CanonicalAliasContext.tryOpen(process.cwd());
-
-        // Resolve symbol name to ID if needed
-        const resolved = this.resolveSymbol(dbManager, symbolId);
-        if (resolved) {
-          symbolId = resolved.id;
+        if (!hasLegacyDb && !canonicalContext) {
+          const dbCheck = this.checkDatabaseExists();
+          if (dbCheck) return dbCheck;
         }
+        if (hasLegacyDb) {
+          dbManager = new DatabaseManager(dbPath);
+        }
+
+        if (dbManager) {
+          const resolved = this.resolveSymbol(dbManager, symbolId);
+          if (resolved) {
+            symbolId = resolved.id;
+          }
+        }
+
         const canonicalId = canonicalContext
           ? this.resolveCanonicalId(canonicalContext, requestedSymbol, symbolId)
           : null;
@@ -117,10 +148,13 @@ Examples:
             : [];
         const canonicalTotalFound = canonicalCandidates.length;
 
-        // Use Drizzle ORM to query relationships
-        let rels = dbManager.getUnifiedRelationshipsBySymbol(symbolId);
+        let rels = dbManager ? dbManager.getUnifiedRelationshipsBySymbol(symbolId) : [];
 
-        // Apply filters
+        // Skip duplicate legacy structural edges when canonical @ttsc/graph resolved the symbol
+        if (canonicalId) {
+          rels = rels.filter((r) => r.category !== 'structural');
+        }
+
         if (options.type) {
           rels = rels.filter((r) => r.type === options.type);
         }
@@ -128,7 +162,6 @@ Examples:
           rels = rels.filter((r) => r.category === options.category);
         }
 
-        // Filter by direction before applying the shared result limit.
         rels = rels.filter((rel) => {
           const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
           const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
@@ -142,8 +175,12 @@ Examples:
 
         const legacyTotalFound = rels.length;
         const limit = Math.max(0, options.limit);
-        rels = rels.slice(0, limit);
-        const canonicalReturned = canonicalCandidates.slice(0, Math.max(0, limit - rels.length));
+
+        // Prioritize canonical @ttsc/graph edges first, then enrichment relationships within shared limit
+        const canonicalReturned = canonicalCandidates.slice(0, limit);
+        const remainingLimit = Math.max(0, limit - canonicalReturned.length);
+        rels = rels.slice(0, remainingLimit);
+
         const canonicalStructural =
           canonicalId && canonicalTotalFound > 0
             ? {
@@ -159,7 +196,6 @@ Examples:
               }
             : null;
 
-        // Convert to row format for compatibility
         const relationships = rels.map((r) => ({
           id: r.id,
           type: r.type,
@@ -181,13 +217,34 @@ Examples:
 
         const totalFound = legacyTotalFound + canonicalTotalFound;
         const returned = relationships.length + canonicalReturned.length;
+        const xmlArgs = args.filter((arg) => arg !== '--human');
 
         if (totalFound === 0) {
-          if (this.hasFlag(args, '--human')) {
-            this.printHeader(`Relationships for: ${symbolId}`);
-            this.printInfo('No relationships found');
-            console.log();
-          } else {
+          if (isJson) {
+            console.log(
+              JSON.stringify(
+                {
+                  query: {
+                    symbolId,
+                    ...(canonicalId ? { canonicalId } : {}),
+                    type: options.type || 'all',
+                    category: options.category || 'all',
+                    direction: options.direction,
+                    limit: options.limit,
+                  },
+                  results: {
+                    totalFound: 0,
+                    returned: 0,
+                  },
+                  canonicalRelationships: [],
+                  enrichmentRelationships: [],
+                  message: 'No relationships found',
+                },
+                null,
+                2
+              )
+            );
+          } else if (isXml) {
             this.printOutput(
               'relationship-query',
               {
@@ -206,13 +263,16 @@ Examples:
                   text: 'No relationships found',
                 },
               },
-              args
+              xmlArgs
             );
+          } else {
+            this.printHeader(`Relationships for: ${symbolId}`);
+            this.printInfo('No relationships found');
+            console.log();
           }
           return this.success('Query complete');
         }
 
-        // Group by category
         const byCategory = new Map<string, UnifiedRelationshipRow[]>();
         for (const rel of relationships) {
           if (!byCategory.has(rel.category)) {
@@ -221,95 +281,67 @@ Examples:
           byCategory.get(rel.category)?.push(rel);
         }
 
-        // Build statistics by type
         const byType = new Map<string, number>();
+        for (const candidate of canonicalReturned) {
+          byType.set(candidate.rawKind, (byType.get(candidate.rawKind) || 0) + 1);
+        }
         for (const rel of relationships) {
           byType.set(rel.type, (byType.get(rel.type) || 0) + 1);
         }
 
-        if (this.hasFlag(args, '--human')) {
-          // Original color output
-          this.printHeader(`Relationships for: ${symbolId}`);
+        const parseSymbolList = (raw: string): string[] => {
+          const parsed: unknown = JSON.parse(raw);
+          const list: readonly unknown[] = Array.isArray(parsed) ? parsed : [];
+          return list.filter((item): item is string => typeof item === 'string');
+        };
 
-          // Display results
-          console.log();
-          this.printSection('Query Results');
-          this.printInfo(
-            returned === totalFound
-              ? `Found ${returned} relationships`
-              : `Found ${totalFound} relationships; returning ${returned}`
+        if (isJson) {
+          console.log(
+            JSON.stringify(
+              {
+                query: {
+                  symbolId,
+                  ...(canonicalId ? { canonicalId } : {}),
+                  type: options.type || 'all',
+                  category: options.category || 'all',
+                  direction: options.direction,
+                  limit: options.limit,
+                },
+                results: {
+                  totalFound,
+                  returned,
+                  canonicalFound: canonicalTotalFound,
+                  canonicalReturned: canonicalReturned.length,
+                  enrichmentFound: legacyTotalFound,
+                  enrichmentReturned: relationships.length,
+                },
+                canonicalRelationships: canonicalReturned,
+                enrichmentRelationships: relationships.map((rel) => ({
+                  id: rel.id,
+                  type: rel.type,
+                  category: rel.category,
+                  from: parseSymbolList(rel.from_symbols),
+                  to: parseSymbolList(rel.to_symbols),
+                  direction: rel.direction,
+                  strength: rel.strength,
+                  confidence: rel.confidence,
+                  description: rel.description || undefined,
+                })),
+                statistics: {
+                  byType: Object.fromEntries(
+                    Array.from(byType.entries()).sort((a, b) => b[1] - a[1])
+                  ),
+                },
+              },
+              null,
+              2
+            )
           );
-          console.log();
-
-          const parseSymbolList = (raw: string): string[] => {
-            const parsed: unknown = JSON.parse(raw);
-            const list: readonly unknown[] = Array.isArray(parsed) ? parsed : [];
-            return list.filter((item): item is string => typeof item === 'string');
-          };
-
-          for (const [category, rels] of byCategory.entries()) {
-            console.log(`  ${this.colors.bold}${category}${this.colors.reset} (${rels.length})`);
-            console.log();
-
-            for (const rel of rels) {
-              const fromSymbols = parseSymbolList(rel.from_symbols);
-              const toSymbols = parseSymbolList(rel.to_symbols);
-
-              const directionSymbol =
-                rel.direction === 'unidirectional'
-                  ? '→'
-                  : rel.direction === 'bidirectional'
-                    ? '↔'
-                    : '—';
-
-              const fromDisplay = fromSymbols.join(', ');
-              const toDisplay = toSymbols.join(', ');
-
-              console.log(`    ${this.colors.cyan}${rel.type}${this.colors.reset}`);
-              console.log(`    ${fromDisplay} ${directionSymbol} ${toDisplay}`);
-              console.log(
-                `    ${this.colors.dim}${rel.description || 'No description'}${this.colors.reset}`
-              );
-              console.log(
-                `    ${this.colors.dim}Strength: ${rel.strength}, Confidence: ${rel.confidence}${this.colors.reset}`
-              );
-              console.log();
-            }
-          }
-
-          // Statistics
-          console.log();
-          this.printSection('Statistics');
-
-          console.log(`  ${this.colors.dim}Relationships by type:${this.colors.reset}`);
-          for (const [type, count] of Array.from(byType.entries()).sort((a, b) => b[1] - a[1])) {
-            console.log(`    ${type}: ${this.colors.cyan}${count}${this.colors.reset}`);
-          }
-
-          if (canonicalStructural) {
-            console.log();
-            this.printSection('Canonical Structural Graph');
-            console.log(`  ${canonicalStructural.canonicalId}`);
-            console.log(
-              `  Dependencies: ${canonicalStructural.dependencies.length}, Dependents: ${canonicalStructural.dependents.length}`
-            );
-            console.log(
-              `  Returned: ${canonicalStructural.returned}/${canonicalStructural.totalFound}`
-            );
-          }
-
-          console.log();
-        } else {
-          // XML output
-          const parseSymbolList = (raw: string): string[] => {
-            const parsed: unknown = JSON.parse(raw);
-            const list: readonly unknown[] = Array.isArray(parsed) ? parsed : [];
-            return list.filter((item): item is string => typeof item === 'string');
-          };
+        } else if (isXml) {
           const categoriesData: Record<string, Array<Record<string, unknown>>> = {};
 
-          for (const [category, rels] of byCategory.entries()) {
-            categoriesData[category] = rels.map((rel) => {
+          for (const [category, catRels] of byCategory.entries()) {
+            categoriesData[category] = catRels.map((rel) => {
               const fromSymbols = parseSymbolList(rel.from_symbols);
               const toSymbols = parseSymbolList(rel.to_symbols);
 
@@ -355,8 +387,83 @@ Examples:
               },
               ...(canonicalStructural ? { canonicalStructural } : {}),
             },
-            args
+            xmlArgs
           );
+        } else {
+          this.printHeader(`Relationships for: ${requestedSymbol}`);
+          if (canonicalId) {
+            console.log(`  ${this.colors.dim}Canonical ID: ${canonicalId}${this.colors.reset}`);
+          }
+          console.log();
+
+          this.printSection('Query Results');
+          this.printInfo(
+            returned === totalFound
+              ? `Found ${returned} relationships`
+              : `Found ${totalFound} relationships; returning ${returned}`
+          );
+          console.log();
+
+          if (canonicalReturned.length > 0) {
+            const deps = canonicalReturned.filter((c) => c.direction === 'from');
+            const dependents = canonicalReturned.filter((c) => c.direction === 'to');
+
+            console.log(
+              `  ${this.colors.bold}Canonical @ttsc/graph${this.colors.reset} (${canonicalReturned.length}/${canonicalTotalFound})`
+            );
+            if (deps.length > 0) {
+              console.log(`    ${this.colors.cyan}Dependencies (→):${this.colors.reset}`);
+              for (const dep of deps) {
+                console.log(
+                  `      → ${dep.nodeId} ${this.colors.yellow}[${dep.rawKind}]${this.colors.reset} ${this.colors.dim}(${dep.category})${this.colors.reset}`
+                );
+              }
+            }
+            if (dependents.length > 0) {
+              console.log(`    ${this.colors.cyan}Dependents (←):${this.colors.reset}`);
+              for (const dep of dependents) {
+                console.log(
+                  `      ← ${dep.nodeId} ${this.colors.yellow}[${dep.rawKind}]${this.colors.reset} ${this.colors.dim}(${dep.category})${this.colors.reset}`
+                );
+              }
+            }
+            console.log();
+          }
+
+          for (const [category, catRels] of byCategory.entries()) {
+            console.log(`  ${this.colors.bold}${category}${this.colors.reset} (${catRels.length})`);
+            console.log();
+
+            for (const rel of catRels) {
+              const fromSymbols = parseSymbolList(rel.from_symbols);
+              const toSymbols = parseSymbolList(rel.to_symbols);
+              const directionSymbol =
+                rel.direction === 'unidirectional'
+                  ? '→'
+                  : rel.direction === 'bidirectional'
+                    ? '↔'
+                    : '—';
+
+              console.log(`    ${this.colors.cyan}${rel.type}${this.colors.reset}`);
+              console.log(
+                `    ${fromSymbols.join(', ')} ${directionSymbol} ${toSymbols.join(', ')}`
+              );
+              if (rel.description) {
+                console.log(`    ${this.colors.dim}${rel.description}${this.colors.reset}`);
+              }
+              console.log(
+                `    ${this.colors.dim}Strength: ${rel.strength}, Confidence: ${rel.confidence}${this.colors.reset}`
+              );
+              console.log();
+            }
+          }
+
+          this.printSection('Statistics');
+          console.log(`  ${this.colors.dim}Relationships by type:${this.colors.reset}`);
+          for (const [type, count] of Array.from(byType.entries()).sort((a, b) => b[1] - a[1])) {
+            console.log(`    ${type}: ${this.colors.cyan}${count}${this.colors.reset}`);
+          }
+          console.log();
         }
 
         return this.success(
@@ -366,7 +473,7 @@ Examples:
         try {
           canonicalContext?.close();
         } finally {
-          dbManager.close();
+          dbManager?.close();
         }
       }
     });
@@ -394,8 +501,10 @@ Examples:
     if (aliased) return aliased;
 
     for (const query of new Set([requestedSymbol, legacySymbolId])) {
-      const resolution = context.analysis.resolveSymbol(query);
-      if (resolution.status === 'found') return resolution.node.id;
+      if (typeof context.analysis.resolveSymbol === 'function') {
+        const resolution = context.analysis.resolveSymbol(query);
+        if (resolution.status === 'found') return resolution.node.id;
+      }
     }
     return null;
   }
@@ -403,27 +512,28 @@ Examples:
   private getCanonicalCandidates(
     context: CanonicalAliasContext,
     canonicalId: string,
-    options: { type?: string; category?: string; direction: string }
+    options: { type?: string; category?: string; direction: string; includeExternal: boolean }
   ): CanonicalRelationshipCandidate[] {
+    const externalMode = options.includeExternal ? 'include' : 'exclude';
     const candidates: CanonicalRelationshipCandidate[] = [];
     if (options.direction !== 'to') {
       candidates.push(
         ...context.analysis
-          .dependencies(canonicalId, { external: 'exclude' })
+          .dependencies(canonicalId, { external: externalMode })
           .flatMap((neighbor) => this.toCanonicalCandidate(neighbor, 'from'))
       );
     }
     if (options.direction !== 'from') {
       candidates.push(
         ...context.analysis
-          .dependents(canonicalId, { external: 'exclude' })
+          .dependents(canonicalId, { external: externalMode })
           .flatMap((neighbor) => this.toCanonicalCandidate(neighbor, 'to'))
       );
     }
 
     return candidates.filter(
       (candidate) =>
-        (!options.type || candidate.type === options.type) &&
+        (!options.type || candidate.type === options.type || candidate.rawKind === options.type) &&
         (!options.category || candidate.category === options.category)
     );
   }
@@ -438,6 +548,7 @@ Examples:
       {
         nodeId: neighbor.node.id,
         direction,
+        rawKind: neighbor.edge.kind,
         type: semantic.relationshipType,
         category: semantic.relationshipCategory,
       },

@@ -21,5 +21,5 @@ Displays an executive summary of database state, indexed symbol counts, doc chec
 
 ### Implemented By
 
-- SystemStatusCommand → src/commands/SystemStatusCommand.ts:28
+- SystemStatusCommand → src/commands/SystemStatusCommand.ts:27
 

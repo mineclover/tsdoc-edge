@@ -14,7 +14,10 @@ import { SymbolRenameCommand } from './SymbolRenameCommand';
 import { WhoUsesCommand } from './WhoUsesCommand';
 
 const SUBCOMMANDS = {
-  query: { command: SymbolQueryCommand, description: 'Query symbol information' },
+  query: {
+    command: SymbolQueryCommand,
+    description: 'Query code symbols (Canonical @ttsc/graph) and [[Symbol]] checkpoints',
+  },
   fix: { command: SymbolFixCommand, description: 'Fix symbol issues' },
   rename: { command: SymbolRenameCommand, description: 'Rename symbols across codebase' },
   deps: { command: DepsCommand, description: 'Show symbol dependencies' },

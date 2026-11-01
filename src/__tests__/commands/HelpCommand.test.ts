@@ -106,7 +106,10 @@ describe('HelpCommand', () => {
       expect(logOutput).toContain('retention');
       expect(logOutput).toContain('extract');
       expect(logOutput).toContain('graph');
+      expect(logOutput).toContain('metrics');
+      expect(logOutput).toContain('tsdoc');
       expect(logOutput).toContain('stats');
+      expect(logOutput).toContain('tsdoc-edge sync');
     });
 
     it('keeps documented group aliases registered by the command implementations', () => {

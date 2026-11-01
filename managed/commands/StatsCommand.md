@@ -270,5 +270,5 @@ fi
 
 ### Implemented By
 
-- StatsCommand → src/commands/StatsCommand.ts:33
+- StatsCommand → src/commands/StatsCommand.ts:31
 

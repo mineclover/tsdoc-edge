@@ -2,41 +2,58 @@
  * Ontology List Command
  * @packageDocumentation
  *
- * @responsibility List instances of specific ontology elements
+ * @responsibility List instances of specific ontology elements from Canonical `@ttsc/graph` and Enrichment DB
  * @problem Need to explore specific relationship types or node types
- * @solves Provides detailed listing of instances with filtering options
+ * @solves Provides detailed listing of instances with filtering, pagination, and format options
  */
 
+import * as fs from 'node:fs';
+import * as path from 'node:path';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
+import {
+  type CanonicalGraphPlaneSnapshot,
+  projectCanonicalEdgeToOntology,
+  readCanonicalGraphSnapshot,
+} from './canonicalReadHelper';
 
 /** Options for filtering ontology element listings */
 interface ListOptions {
-  /** Element type to list */
   type?: 'node' | 'relationship';
-  /** Filter by name */
   name?: string;
-  /** Filter by category */
   category?: string;
-  /** Filter by strength */
   strength?: string;
-  /** Maximum number of results */
-  limit?: number;
-  /** Offset for pagination */
-  offset?: number;
-  /** Output format */
-  format?: 'table' | 'json' | 'csv';
+  limit: number;
+  offset: number;
+  format: 'table' | 'json' | 'csv';
+  includeExternal: boolean;
+}
+
+interface ListedOntologyNode {
+  id: string;
+  name: string;
+  type: string;
+  kind: string;
+  filePath?: string;
+  line?: number;
+}
+
+interface ListedOntologyRelationship {
+  id: string;
+  type: string;
+  projectedType?: string;
+  category: string;
+  direction: string;
+  strength: string;
+  from: string | string[];
+  to: string | string[];
+  confidence: number;
+  description?: string;
+  properties?: Record<string, unknown>;
 }
 
 /**
- * Command for listing ontology element instances
- *
- * Lists all instances of:
- * - Specific node (symbol) types
- * - Specific relationship types
- * - Relationships by category or strength
- *
- * Supports filtering and pagination.
+ * Command for listing ontology element instances across Canonical `@ttsc/graph` and Enrichment DB.
  *
  * @doc [[OntologyListCommand]]
  * @public
@@ -78,29 +95,22 @@ export class OntologyListCommand extends BaseCommand {
     return `tsdoc-edge ontology-list [options]
 
 Options:
-  --nodes <type>        List all nodes of specific type (e.g., class, function)
-  --rels <type>         List all relationships of specific type
-  --category <name>     Filter relationships by category
+  --nodes <type>        List all nodes of specific type (e.g., class, function, method)
+  --rels <type>         List all relationships of specific type (e.g., calls, type_ref, test-coverage)
+  --category <name>     Filter relationships by category (e.g., structural, behavioral, type-system, testing)
   --strength <level>    Filter relationships by strength (strong, medium, weak)
   --limit <n>           Limit number of results (default: 50)
   --offset <n>          Skip first n results (default: 0)
   --format <fmt>        Output format: table, json, csv (default: table)
+  --json                Shorthand for --format json
+  --include-external    Include external/stdlib nodes from canonical graph
 
 Examples:
-  # List all class nodes
   tsdoc-edge ontology-list --nodes class
-
-  # List all test-coverage relationships
+  tsdoc-edge ontology-list --rels calls --limit 10
   tsdoc-edge ontology-list --rels test-coverage
-
-  # List structural relationships
   tsdoc-edge ontology-list --category structural
-
-  # List strong relationships with pagination
-  tsdoc-edge ontology-list --strength strong --limit 20 --offset 0
-
-  # Export to CSV
-  tsdoc-edge ontology-list --rels code-dependency --format csv`;
+  tsdoc-edge ontology-list --rels type_ref --format csv`;
   }
 
   /**
@@ -115,119 +125,144 @@ Examples:
         return this.displayHelp();
       }
 
+      const flagError = this.validateAllowedFlags(
+        args,
+        ['--json', '--include-external'],
+        ['--nodes', '--rels', '--category', '--strength', '--limit', '--offset', '--format']
+      );
+      if (flagError) return flagError;
+
       const options = this.parseOptions(args);
+      if (!['table', 'json', 'csv'].includes(options.format)) {
+        this.printError(`Invalid format '${options.format}'. Expected table, json, or csv.`);
+        return this.failure('Invalid format');
+      }
 
       if (!options.name && !options.category && !options.strength) {
         this.printError('Please specify what to list: --nodes, --rels, --category, or --strength');
         console.log();
         console.log('Examples:');
         console.log('  tsdoc-edge ontology-list --nodes class');
+        console.log('  tsdoc-edge ontology-list --rels calls');
         console.log('  tsdoc-edge ontology-list --rels test-coverage');
         console.log('  tsdoc-edge ontology-list --category structural');
         return this.failure('Missing required option');
       }
 
-      const dbCheck = this.checkDatabaseExists();
-      if (dbCheck) return dbCheck;
-
+      const canonicalSnapshot = readCanonicalGraphSnapshot({
+        includeExternal: options.includeExternal,
+      });
       const dbPath = this.getDatabasePath();
-      const dbManager = new DatabaseManager(dbPath);
+      const hasLegacyDb = fs.existsSync(dbPath);
 
-      if (options.type === 'node') {
-        this.listNodes(dbManager, options);
-      } else {
-        this.listRelationships(dbManager, options);
+      if (!canonicalSnapshot && !hasLegacyDb) {
+        const dbCheck = this.checkDatabaseExists();
+        if (dbCheck) return dbCheck;
       }
 
-      dbManager.close();
-
-      return this.success();
+      const dbManager = hasLegacyDb ? new DatabaseManager(dbPath) : null;
+      try {
+        if (options.type === 'node') {
+          this.listNodes(canonicalSnapshot, dbManager, options);
+        } else {
+          this.listRelationships(canonicalSnapshot, dbManager, options);
+        }
+        return this.success();
+      } finally {
+        dbManager?.close();
+      }
     });
   }
 
   private parseOptions(args: string[]): ListOptions {
-    const options: ListOptions = {
-      limit: 50,
-      offset: 0,
-      format: 'table',
+    const nodesOpt = this.getOption(args, '--nodes');
+    const relsOpt = this.getOption(args, '--rels');
+    const categoryOpt = this.getOption(args, '--category');
+    const strengthOpt = this.getOption(args, '--strength');
+    const limitRaw = Number.parseInt(this.getOption(args, '--limit') || '50', 10);
+    const offsetRaw = Number.parseInt(this.getOption(args, '--offset') || '0', 10);
+    const formatOpt = this.hasFlag(args, '--json')
+      ? 'json'
+      : ((this.getOption(args, '--format') || 'table') as 'table' | 'json' | 'csv');
+
+    return {
+      type: nodesOpt ? 'node' : 'relationship',
+      name: nodesOpt ?? relsOpt,
+      category: categoryOpt,
+      strength: strengthOpt,
+      limit: Number.isFinite(limitRaw) && limitRaw > 0 ? limitRaw : 50,
+      offset: Number.isFinite(offsetRaw) && offsetRaw >= 0 ? offsetRaw : 0,
+      format: formatOpt,
+      includeExternal: this.hasFlag(args, '--include-external'),
     };
-
-    for (let i = 0; i < args.length; i++) {
-      const arg = args[i];
-
-      if (arg === '--nodes' && args[i + 1]) {
-        options.type = 'node';
-        options.name = args[i + 1];
-        i++;
-      } else if (arg === '--rels' && args[i + 1]) {
-        options.type = 'relationship';
-        options.name = args[i + 1];
-        i++;
-      } else if (arg === '--category' && args[i + 1]) {
-        options.type = 'relationship';
-        options.category = args[i + 1];
-        i++;
-      } else if (arg === '--strength' && args[i + 1]) {
-        options.type = 'relationship';
-        options.strength = args[i + 1];
-        i++;
-      } else if (arg === '--limit' && args[i + 1]) {
-        options.limit = parseInt(args[i + 1], 10);
-        i++;
-      } else if (arg === '--offset' && args[i + 1]) {
-        options.offset = parseInt(args[i + 1], 10);
-        i++;
-      } else if (arg === '--format' && args[i + 1]) {
-        options.format = args[i + 1] as 'table' | 'json' | 'csv';
-        i++;
-      }
-    }
-
-    return options;
   }
 
-  private listNodes(dbManager: DatabaseManager, options: ListOptions): void {
-    // Query symbols using Drizzle ORM
-    const queryOptions: {
-      type?: string;
-      limit?: number;
-      offset?: number;
-      orderBy?: 'name' | 'type' | 'filePath';
-      orderDir?: 'asc' | 'desc';
-    } = {
-      orderBy: 'name',
-      orderDir: 'asc',
-    };
+  private listNodes(
+    canonicalSnapshot: CanonicalGraphPlaneSnapshot | null,
+    dbManager: DatabaseManager | null,
+    options: ListOptions
+  ): void {
+    const isTestNodeQuery = options.name === 'test-case' || options.name === 'test-suite';
+    let nodes: ListedOntologyNode[] = [];
+    let total = 0;
 
-    if (options.name) {
-      queryOptions.type = options.name;
-    }
-    if (options.limit) {
-      queryOptions.limit = options.limit;
-      queryOptions.offset = options.offset || 0;
-    }
+    if (canonicalSnapshot && !isTestNodeQuery) {
+      const matched = canonicalSnapshot.filteredNodes
+        .filter((node) => !options.name || node.kind === options.name)
+        .map((node) => {
+          const rawFile = node.file ?? node.evidence?.file;
+          const filePath = rawFile
+            ? path.isAbsolute(rawFile)
+              ? path.relative(canonicalSnapshot.rootDir, rawFile)
+              : rawFile
+            : undefined;
+          return {
+            id: node.id,
+            name: node.qualifiedName ?? node.name ?? node.id,
+            type: node.kind,
+            kind: node.kind,
+            filePath,
+            line: node.evidence?.startLine,
+          };
+        })
+        .sort((left, right) => left.name.localeCompare(right.name));
 
-    const symbolRows = dbManager.querySymbols(queryOptions);
-    const nodes = symbolRows.map((row) => ({
-      id: row.id,
-      name: row.name,
-      type: row.type,
-      kind: row.type,
-      filePath: row.file_path,
-      line: row.line,
-    }));
+      total = matched.length;
+      nodes = matched.slice(options.offset, options.offset + options.limit);
+    } else if (dbManager) {
+      const queryOptions: {
+        type?: string;
+        limit?: number;
+        offset?: number;
+        orderBy?: 'name' | 'type' | 'filePath';
+        orderDir?: 'asc' | 'desc';
+      } = {
+        orderBy: 'name',
+        orderDir: 'asc',
+        limit: options.limit,
+        offset: options.offset,
+      };
+      if (options.name) {
+        queryOptions.type = options.name;
+      }
 
-    // Get total count using Drizzle ORM
-    const countOptions: { type?: string } = {};
-    if (options.name) {
-      countOptions.type = options.name;
+      const symbolRows = dbManager.querySymbols(queryOptions);
+      nodes = symbolRows.map((row) => ({
+        id: row.id,
+        name: row.name,
+        type: row.type,
+        kind: row.type,
+        filePath: row.file_path,
+        line: row.line,
+      }));
+      total = dbManager.countSymbols(options.name ? { type: options.name } : {});
     }
-    const total = dbManager.countSymbols(countOptions);
 
     if (options.format === 'json') {
       console.log(
         JSON.stringify(
           {
+            source: canonicalSnapshot && !isTestNodeQuery ? 'canonical-graph' : 'enrichment-db',
             total,
             limit: options.limit,
             offset: options.offset,
@@ -250,7 +285,6 @@ Examples:
       return;
     }
 
-    // Table format
     const title = options.name ? `Nodes of type: ${options.name}` : 'All Nodes';
     this.printHeader(title);
 
@@ -279,34 +313,79 @@ Examples:
       console.log();
     }
 
-    // Pagination info
-    if (total > (options.offset || 0) + nodes.length) {
-      const nextOffset = (options.offset || 0) + (options.limit || 50);
+    if (total > options.offset + nodes.length) {
+      const nextOffset = options.offset + options.limit;
       console.log(
         `${colors.dim}More results available. Use --offset ${nextOffset} to see next page${colors.reset}`
       );
     }
   }
 
-  private listRelationships(dbManager: DatabaseManager, options: ListOptions): void {
-    let relationships = dbManager.getAllUnifiedRelationships();
+  private listRelationships(
+    canonicalSnapshot: CanonicalGraphPlaneSnapshot | null,
+    dbManager: DatabaseManager | null,
+    options: ListOptions
+  ): void {
+    let relationships: ListedOntologyRelationship[] = [];
 
-    // Apply filters
+    if (canonicalSnapshot) {
+      canonicalSnapshot.filteredEdges.forEach((edge, idx) => {
+        const projected = projectCanonicalEdgeToOntology(edge);
+        const loc =
+          edge.evidence?.file && edge.evidence?.startLine
+            ? `${path.relative(canonicalSnapshot.rootDir, path.resolve(canonicalSnapshot.rootDir, edge.evidence.file))}:${edge.evidence.startLine}`
+            : undefined;
+        relationships.push({
+          id: `canonical:${edge.kind}:${idx + 1}`,
+          type: projected.rawKind,
+          projectedType: projected.relationshipType,
+          category: projected.category,
+          direction: projected.direction,
+          strength: projected.strength,
+          from: [edge.from],
+          to: [edge.to],
+          confidence: 1.0,
+          description: loc ? `Canonical @ttsc/graph edge at ${loc}` : 'Canonical @ttsc/graph edge',
+          properties: { inferred: false, source: 'canonical-graph' },
+        });
+      });
+    }
+
+    if (dbManager) {
+      const legacyRels = dbManager.getAllUnifiedRelationships();
+      for (const rel of legacyRels) {
+        if (canonicalSnapshot && rel.category === 'structural') {
+          continue;
+        }
+        relationships.push({
+          id: rel.id,
+          type: rel.type,
+          category: rel.category,
+          direction: rel.direction,
+          strength: rel.strength,
+          from: rel.from,
+          to: rel.to,
+          confidence: rel.confidence,
+          description: rel.description,
+          properties: rel.properties,
+        });
+      }
+    }
+
     if (options.name) {
-      relationships = relationships.filter((r) => r.type === options.name);
+      relationships = relationships.filter(
+        (rel) => rel.type === options.name || rel.projectedType === options.name
+      );
     }
     if (options.category) {
-      relationships = relationships.filter((r) => r.category === options.category);
+      relationships = relationships.filter((rel) => rel.category === options.category);
     }
     if (options.strength) {
-      relationships = relationships.filter((r) => r.strength === options.strength);
+      relationships = relationships.filter((rel) => rel.strength === options.strength);
     }
 
     const total = relationships.length;
-
-    // Apply pagination
-    const offset = options.offset || 0;
-    const limit = options.limit || 50;
+    const { offset, limit } = options;
     relationships = relationships.slice(offset, offset + limit);
 
     if (options.format === 'json') {
@@ -314,8 +393,8 @@ Examples:
         JSON.stringify(
           {
             total,
-            limit: options.limit,
-            offset: options.offset,
+            limit,
+            offset,
             relationships,
           },
           null,
@@ -340,7 +419,6 @@ Examples:
       return;
     }
 
-    // Table format
     let title = 'Relationships';
     if (options.name) title = `Relationships of type: ${options.name}`;
     else if (options.category) title = `Relationships in category: ${options.category}`;
@@ -386,7 +464,6 @@ Examples:
       console.log();
     }
 
-    // Pagination info
     if (total > offset + relationships.length) {
       const nextOffset = offset + limit;
       console.log(
@@ -398,6 +475,7 @@ Examples:
   private getCategoryIcon(category: string): string {
     const icons: Record<string, string> = {
       structural: '🏗️',
+      'type-system': '🧬',
       'data-flow': '📊',
       behavioral: '⚙️',
       temporal: '⏱️',

@@ -38,7 +38,7 @@ export class ValidateUnifiedCommand extends BaseCommand {
    * @public
    */
   getName(): string {
-    return 'val';
+    return 'validate';
   }
 
   /**
@@ -47,7 +47,7 @@ export class ValidateUnifiedCommand extends BaseCommand {
    * @public
    */
   getAlias(): string[] {
-    return ['v', 'validate'];
+    return ['val', 'v'];
   }
 
   /**
@@ -69,20 +69,20 @@ export class ValidateUnifiedCommand extends BaseCommand {
       .map(([name, { description }]) => `  ${name.padEnd(14)} ${description}`)
       .join('\n');
 
-    return `tsdoc-edge val <subcommand> [options]
+    return `tsdoc-edge validate <subcommand> [options]
 
 Subcommands:
 ${subcommandList}
 
 Examples:
-  tsdoc-edge val connectivity
-  tsdoc-edge val docs
-  tsdoc-edge val generated
-  tsdoc-edge val spec <spec-file>
-  tsdoc-edge val refs
-  tsdoc-edge val tsdoc
+  tsdoc-edge validate connectivity
+  tsdoc-edge validate docs
+  tsdoc-edge validate generated
+  tsdoc-edge validate spec <spec-file>
+  tsdoc-edge validate refs
+  tsdoc-edge validate tsdoc
 
-Use 'tsdoc-edge val <subcommand> --help' for subcommand details.`;
+Use 'tsdoc-edge validate <subcommand> --help' for subcommand details.`;
   }
 
   /**

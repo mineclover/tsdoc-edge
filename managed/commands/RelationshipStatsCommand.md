@@ -21,5 +21,5 @@ Reports aggregate counts and distributions of stored relationships grouped by ty
 
 ### Implemented By
 
-- RelationshipStatsCommand → src/commands/RelationshipStatsCommand.ts:14
+- RelationshipStatsCommand → src/commands/RelationshipStatsCommand.ts:20
 

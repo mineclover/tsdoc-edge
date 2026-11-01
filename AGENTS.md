@@ -6,13 +6,13 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 | Metric | Value |
 |--------|-------|
-| CLI Commands | 68+ (하위 명령 포함) |
-| Test Cases | 3,372+ (257 suites) |
-| Symbols | 10,699 |
-| Canonical `@ttsc/graph` | 8,700+ nodes / 21,500+ edges |
+| CLI Commands | 82+ (하위 명령 포함) |
+| Test Cases | 3,418+ (258 suites) |
+| Symbols | 10,852 |
+| Canonical `@ttsc/graph` | 8,679 internal (8,932 total) nodes / 18,121 internal (22,404 total) edges |
 | Custom TSDoc Tags | 22 + Standard 29 + `@ttsc/graph` 6 |
 | `@ttsc/lint` | 25 error rules (0 findings) |
-| Health Score | 93/100 (A+) on core modules |
+| Health Score | 90/100 (A) system-status · 93/100 (A+) core modules |
 
 ## 프로젝트 개요
 

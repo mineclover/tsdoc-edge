@@ -1,34 +1,32 @@
 /**
- * Stats Command - Show documentation statistics
+ * Stats Command - Show documentation and SSOT graph statistics
  * @packageDocumentation
  */
 
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
+import { readCanonicalGraphSnapshot, readSpecGraphSnapshot } from './canonicalReadHelper';
 
 /**
- * Command for showing documentation statistics
+ * Command for showing documentation and SSOT graph statistics.
  *
  * @public
  * @responsibility Display comprehensive documentation statistics
- * @contract Analyzes database, computes stats, optionally compares/saves
+ * @contract Analyzes database, computes stats, supports human (default), JSON, and XML output
  * @doc [[StatsCommand]]
  * @doc [[CLI Commands#stats]]
  *
  * @problem Need to track documentation quality metrics over time
- * @solves Collects and displays stats with optional historical comparison
+ * @solves Collects and displays stats with human-readable default output and machine formats
  * @context Part of quality tracking and improvement
  *
  * @functionality
- * - Stats collection: Total symbols, coverage, health scores
- * - Historical comparison: Compare with previous snapshots
- * - Trend analysis: Show improvements or regressions
- * - Save snapshots: Store stats for future comparison
- * - Warnings-only mode: Show only regressions
+ * - Stats collection: Total symbols, coverage, SSOT graph summaries
+ * - Output formats: Human-readable default, `--json`, and `--xml`
  *
- * @decision Use TrackableStatsCollector and StatsHistoryManager
- * @rationale Centralized stats collection with history tracking
- * @consequences Requires database to be built first
+ * @decision Default to human-readable output with explicit `--json` and `--xml` flags
+ * @rationale Matches core CLI UX conventions while preserving machine-readable pipelines
+ * @consequences Callers needing XML pass `--xml`
  */
 export class StatsCommand extends BaseCommand {
   private dbManager?: DatabaseManager;
@@ -62,7 +60,7 @@ export class StatsCommand extends BaseCommand {
    * @public
    */
   getDescription(): string {
-    return 'Show documentation statistics with optional comparison';
+    return 'Show documentation and SSOT graph statistics';
   }
 
   /**
@@ -71,7 +69,12 @@ export class StatsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge stats';
+    return `tsdoc-edge stats [options]
+
+Options:
+  --human   Human-readable terminal output (default)
+  --json    JSON output
+  --xml     XML output`;
   }
 
   /**
@@ -82,10 +85,15 @@ export class StatsCommand extends BaseCommand {
    */
   execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(() => {
-      // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
+
+      const flagError = this.validateAllowedFlags(args, ['--human', '--json', '--xml']);
+      if (flagError) return flagError;
+
+      const isJson = this.hasFlag(args, '--json');
+      const isXml = this.hasFlag(args, '--xml');
 
       if (!this.dbManager) {
         const dbCheck = this.checkDatabaseExists();
@@ -98,27 +106,30 @@ export class StatsCommand extends BaseCommand {
 
       try {
         const stats = dbManager.getStatistics();
+        const canonicalSnapshot = this.dbManager ? null : readCanonicalGraphSnapshot();
+        const specSnapshot = this.dbManager ? null : readSpecGraphSnapshot();
 
-        // Count documented vs undocumented - separated by source/test using Drizzle
         const allSymbols = dbManager.getAllSymbolRows();
         const total = allSymbols.length;
 
-        // Show guidance if no symbols
         if (total === 0) {
-          if (this.hasFlag(args, '--human')) {
-            this.printHeader('TSDoc Edge - Documentation Statistics');
-            console.log(`${colors.yellow}No symbols found in database.${colors.reset}`);
-            console.log();
-            console.log(`${colors.bold}Getting Started:${colors.reset}`);
+          if (isJson) {
             console.log(
-              `  1. Run ${colors.cyan}tsdoc-edge build src${colors.reset} to build the symbol database`
+              JSON.stringify(
+                {
+                  database: {
+                    totalSymbols: 0,
+                    totalEnhancedDocs: 0,
+                    dbSizeKB: 0,
+                  },
+                  message:
+                    'No symbols found in database. Run tsdoc-edge sync to build the symbol database.',
+                },
+                null,
+                2
+              )
             );
-            console.log(
-              `  2. Run ${colors.cyan}tsdoc-edge stats${colors.reset} again to see statistics`
-            );
-            console.log();
-          } else {
-            // XML output for empty database
+          } else if (isXml) {
             this.printOutput(
               'statistics',
               {
@@ -128,11 +139,23 @@ export class StatsCommand extends BaseCommand {
                   dbSizeKB: 0,
                 },
                 message: {
-                  text: 'No symbols found in database. Run tsdoc-edge build src to build the symbol database.',
+                  text: 'No symbols found in database. Run tsdoc-edge sync to build the symbol database.',
                 },
               },
-              args
+              args.filter((arg) => arg !== '--human')
             );
+          } else {
+            this.printHeader('TSDoc Edge - Documentation Statistics');
+            console.log(`${colors.yellow}No symbols found in database.${colors.reset}`);
+            console.log();
+            console.log(`${colors.bold}Getting Started:${colors.reset}`);
+            console.log(
+              `  1. Run ${colors.cyan}tsdoc-edge sync${colors.reset} to build and sync SSOT planes`
+            );
+            console.log(
+              `  2. Run ${colors.cyan}tsdoc-edge stats${colors.reset} again to see statistics`
+            );
+            console.log();
           }
           return this.success();
         }
@@ -152,41 +175,60 @@ export class StatsCommand extends BaseCommand {
         const coverage = (documented / total) * 100;
         const sourceCoverage = sourceTotal > 0 ? (sourceDocumented / sourceTotal) * 100 : 0;
         const testPercent = (testTotal / total) * 100;
+        const dbSizeKB = Number((stats.dbSize / 1024).toFixed(2));
 
-        // Check if human-readable format is requested
-        if (this.hasFlag(args, '--human')) {
-          // Original color output
-          this.printHeader('TSDoc Edge - Documentation Statistics');
-
-          this.printSection('📊 Database Statistics');
-          console.log(`Total Symbols: ${colors.green}${stats.totalSymbols}${colors.reset}`);
+        if (isJson) {
           console.log(
-            `Total Enhanced Docs: ${colors.green}${stats.totalEnhancedDocs}${colors.reset}`
+            JSON.stringify(
+              {
+                database: {
+                  totalSymbols: stats.totalSymbols,
+                  totalEnhancedDocs: stats.totalEnhancedDocs,
+                  dbSizeKB,
+                },
+                coverage: {
+                  overall: {
+                    documented,
+                    total,
+                    coveragePercent: Number(coverage.toFixed(1)),
+                  },
+                  source: {
+                    documented: sourceDocumented,
+                    total: sourceTotal,
+                    coveragePercent: Number(sourceCoverage.toFixed(1)),
+                  },
+                  tests: {
+                    total: testTotal,
+                    percentOfTotal: Number(testPercent.toFixed(1)),
+                  },
+                },
+                ...(canonicalSnapshot
+                  ? {
+                      canonicalGraph: {
+                        activeRevisionId: canonicalSnapshot.activeRevisionId,
+                        retainedRevisions: canonicalSnapshot.retainedRevisions,
+                        internalNodes: canonicalSnapshot.internalNodes,
+                        internalEdges: canonicalSnapshot.internalEdges,
+                        totalNodes: canonicalSnapshot.totalNodes,
+                        totalEdges: canonicalSnapshot.totalEdges,
+                      },
+                    }
+                  : {}),
+                ...(specSnapshot
+                  ? {
+                      specGraph: {
+                        activeRevisionId: specSnapshot.activeRevisionId,
+                        nodes: specSnapshot.nodeCount,
+                        bindings: specSnapshot.bindingCount,
+                      },
+                    }
+                  : {}),
+              },
+              null,
+              2
+            )
           );
-          console.log(
-            `DB Size: ${colors.cyan}${(stats.dbSize / 1024).toFixed(2)} KB${colors.reset}`
-          );
-          console.log();
-
-          this.printSection('📈 Documentation Coverage');
-          console.log(`${colors.bold}Overall:${colors.reset}`);
-          console.log(`  Documented: ${colors.green}${documented}${colors.reset} / ${total}`);
-          console.log(`  Coverage: ${colors.bold}${coverage.toFixed(1)}%${colors.reset}`);
-          console.log();
-          console.log(
-            `${colors.bold}Source Code Only:${colors.reset} ${colors.dim}(excluding test-case, test-suite)${colors.reset}`
-          );
-          console.log(
-            `  Documented: ${colors.green}${sourceDocumented}${colors.reset} / ${sourceTotal}`
-          );
-          console.log(`  Coverage: ${colors.bold}${sourceCoverage.toFixed(1)}%${colors.reset}`);
-          console.log();
-          console.log(
-            `${colors.dim}Test Symbols: ${testTotal} (${testPercent.toFixed(1)}% of total)${colors.reset}`
-          );
-          console.log();
-        } else {
-          // XML output (default)
+        } else if (isXml) {
           this.printOutput(
             'statistics',
             {
@@ -212,8 +254,53 @@ export class StatsCommand extends BaseCommand {
                 },
               },
             },
-            args
+            args.filter((arg) => arg !== '--human')
           );
+        } else {
+          this.printHeader('TSDoc Edge - Documentation Statistics');
+
+          this.printSection('📊 Database Statistics');
+          console.log(`Total Symbols: ${colors.green}${stats.totalSymbols}${colors.reset}`);
+          console.log(
+            `Total Enhanced Docs: ${colors.green}${stats.totalEnhancedDocs}${colors.reset}`
+          );
+          console.log(
+            `DB Size: ${colors.cyan}${(stats.dbSize / 1024).toFixed(2)} KB${colors.reset}`
+          );
+          console.log();
+
+          if (canonicalSnapshot || specSnapshot) {
+            this.printSection('🔗 SSOT Graph Planes');
+            if (canonicalSnapshot) {
+              console.log(
+                `Canonical @ttsc/graph: ${colors.cyan}${canonicalSnapshot.internalNodes.toLocaleString()}${colors.reset} nodes / ${colors.cyan}${canonicalSnapshot.internalEdges.toLocaleString()}${colors.reset} edges (${canonicalSnapshot.retainedRevisions} retained revisions)`
+              );
+            }
+            if (specSnapshot) {
+              console.log(
+                `SpecGraph: ${colors.cyan}${specSnapshot.nodeCount}${colors.reset} spec nodes / ${colors.cyan}${specSnapshot.bindingCount}${colors.reset} bindings`
+              );
+            }
+            console.log();
+          }
+
+          this.printSection('📈 Documentation Coverage');
+          console.log(`${colors.bold}Overall:${colors.reset}`);
+          console.log(`  Documented: ${colors.green}${documented}${colors.reset} / ${total}`);
+          console.log(`  Coverage: ${colors.bold}${coverage.toFixed(1)}%${colors.reset}`);
+          console.log();
+          console.log(
+            `${colors.bold}Source Code Only:${colors.reset} ${colors.dim}(excluding test-case, test-suite)${colors.reset}`
+          );
+          console.log(
+            `  Documented: ${colors.green}${sourceDocumented}${colors.reset} / ${sourceTotal}`
+          );
+          console.log(`  Coverage: ${colors.bold}${sourceCoverage.toFixed(1)}%${colors.reset}`);
+          console.log();
+          console.log(
+            `${colors.dim}Test Symbols: ${testTotal} (${testPercent.toFixed(1)}% of total)${colors.reset}`
+          );
+          console.log();
         }
 
         return this.success();

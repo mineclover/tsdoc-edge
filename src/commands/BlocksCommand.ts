@@ -7,7 +7,7 @@ import Database from 'better-sqlite3';
 import type { OutputSchema } from '../output/types';
 import { arrayOf } from '../output/types';
 import { XmlBuilder } from '../output/XmlBuilder';
-import { BaseCommand, type CommandResult } from './BaseCommand';
+import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
 const BlocksSchema: OutputSchema = {
   root: 'code-blocks',
@@ -22,7 +22,7 @@ const BlocksSchema: OutputSchema = {
       totalBlocks: 'number',
       totalLines: 'number',
       averageComplexity: 'number',
-      byType: 'string', // JSON
+      byType: 'string',
     },
     blocks: arrayOf('block', {
       id: 'string',
@@ -37,142 +37,228 @@ const BlocksSchema: OutputSchema = {
   },
 };
 
+/**
+ * Command for displaying extracted code blocks and complexity metrics for a symbol.
+ *
+ * @public
+ */
 export class BlocksCommand extends BaseCommand {
+  /**
+   * getName method
+   * @returns Returns string
+   * @public
+   */
   getName(): string {
     return 'blocks';
   }
 
+  /**
+   * getAlias method
+   * @returns Returns string[]
+   * @public
+   */
   getAlias(): string[] {
     return ['bl'];
   }
 
+  /**
+   * getDescription method
+   * @returns Returns string
+   * @public
+   */
   getDescription(): string {
-    return 'Display code blocks for a symbol';
+    return 'Display code blocks and complexity breakdown for a symbol';
   }
 
+  /**
+   * getUsage method
+   * @returns Returns string
+   * @public
+   */
+  protected getUsage(): string {
+    return `tsdoc-edge blocks <symbol-id-or-name> [options]
+
+Options:
+  --type <type>   Filter blocks by block type
+  --human         Human-readable output (default)
+  --json          JSON output
+  --xml           XML output`;
+  }
+
+  /**
+   * execute method
+   * @param args - args parameter
+   * @returns Returns Promise<CommandResult>
+   * @public
+   */
   execute(args: string[]): Promise<CommandResult> {
-    if (args.length === 0) {
-      return Promise.resolve({
-        exitCode: 1,
-        message: 'Usage: blocks <symbol-id> [--type=<type>]',
-      });
-    }
+    return this.executeWithErrorHandling(() => {
+      if (this.hasHelpFlag(args)) {
+        return this.displayHelp();
+      }
 
-    const symbolId = args[0];
-    const typeFilter = args.find((a) => a.startsWith('--type='))?.split('=')[1];
+      const flagError = this.validateAllowedFlags(args, ['--human', '--json', '--xml'], ['--type']);
+      if (flagError) return flagError;
 
-    const dbCheck = this.checkDatabaseExists();
-    if (dbCheck) return Promise.resolve(dbCheck);
+      const positionalArgs = this.getPositionalArgs(args, ['--type']);
+      const requestedSymbol = positionalArgs[0];
+      if (!requestedSymbol) {
+        this.printError('Usage: tsdoc-edge blocks <symbol-id-or-name> [--type <type>]');
+        return this.failure('Usage: blocks <symbol-id> [--type=<type>]');
+      }
 
-    const dbPath = this.getDatabasePath();
-    const db = new Database(dbPath, { readonly: true });
+      const typeFilter = this.getOption(args, '--type');
+      const isJson = this.hasFlag(args, '--json');
+      const isXml = this.hasFlag(args, '--xml');
 
-    try {
-      // Get symbol info
-      const symbol = db
-        .prepare(`
-        SELECT id, name, type, file_path as file
-        FROM symbols
-        WHERE id = ?
-      `)
-        .get(symbolId) as { id: string; name: string; type: string; file: string } | undefined;
+      const dbCheck = this.checkDatabaseExists();
+      if (dbCheck) return dbCheck;
 
-      if (!symbol) {
-        db.close();
-        return Promise.resolve({
-          exitCode: 1,
-          message: `Symbol not found: ${symbolId}`,
+      const dbPath = this.getDatabasePath();
+      const db = new Database(dbPath, { readonly: true });
+
+      try {
+        const symbol = db
+          .prepare(
+            `SELECT id, name, type, file_path as file
+             FROM symbols
+             WHERE id = ? OR name = ? OR LOWER(name) = LOWER(?)
+             ORDER BY CASE
+               WHEN id = ? THEN 0
+               WHEN name = ? THEN 1
+               ELSE 2
+             END, is_exported DESC
+             LIMIT 1`
+          )
+          .get(
+            requestedSymbol,
+            requestedSymbol,
+            requestedSymbol,
+            requestedSymbol,
+            requestedSymbol
+          ) as { id: string; name: string; type: string; file: string } | undefined;
+
+        if (!symbol) {
+          this.printError(`Symbol not found: ${requestedSymbol}`);
+          return this.failure(`Symbol not found: ${requestedSymbol}`);
+        }
+
+        let query = `
+          SELECT
+            id, type, start_line as startLine, end_line as endLine,
+            purpose, complexity, side_effects as sideEffects
+          FROM code_blocks
+          WHERE symbol_id = ?
+        `;
+        const params: unknown[] = [symbol.id];
+
+        if (typeFilter) {
+          query += ' AND type = ?';
+          params.push(typeFilter);
+        }
+        query += ' ORDER BY start_line';
+
+        const blocks = db.prepare(query).all(...params) as Array<{
+          id: string;
+          type: string;
+          startLine: number;
+          endLine: number;
+          purpose: string;
+          complexity: number;
+          sideEffects: string;
+        }>;
+
+        const totalBlocks = blocks.length;
+        const totalLines = blocks.reduce((sum, b) => sum + (b.endLine - b.startLine + 1), 0);
+        const averageComplexity =
+          totalBlocks > 0
+            ? Math.round(
+                (blocks.reduce((sum, b) => sum + (b.complexity || 0), 0) / totalBlocks) * 10
+              ) / 10
+            : 0;
+
+        const byType: Record<string, number> = {};
+        for (const block of blocks) {
+          byType[block.type] = (byType[block.type] || 0) + 1;
+        }
+
+        const formattedBlocks = blocks.map((b) => {
+          const parsedSideEffects: unknown = b.sideEffects ? JSON.parse(b.sideEffects) : null;
+          return {
+            id: b.id,
+            type: b.type,
+            startLine: b.startLine,
+            endLine: b.endLine,
+            lines: b.endLine - b.startLine + 1,
+            purpose: b.purpose || '',
+            complexity: b.complexity || 0,
+            sideEffects: Array.isArray(parsedSideEffects) ? parsedSideEffects.length : 0,
+          };
         });
-      }
 
-      // Get blocks
-      let query = `
-        SELECT
-          id, type, start_line as startLine, end_line as endLine,
-          purpose, complexity, side_effects as sideEffects
-        FROM code_blocks
-        WHERE symbol_id = ?
-      `;
+        if (isJson) {
+          console.log(
+            JSON.stringify(
+              {
+                symbol,
+                summary: {
+                  totalBlocks,
+                  totalLines,
+                  averageComplexity,
+                  byType,
+                },
+                blocks: formattedBlocks,
+              },
+              null,
+              2
+            )
+          );
+        } else if (isXml) {
+          new XmlBuilder(BlocksSchema)
+            .section('symbol', symbol)
+            .section('summary', {
+              totalBlocks,
+              totalLines,
+              averageComplexity,
+              byType: JSON.stringify(byType),
+            })
+            .section('blocks', formattedBlocks)
+            .print();
+        } else {
+          this.printHeader(`Code Blocks: ${symbol.name} (${symbol.type})`);
+          console.log(`  ${colors.dim}${symbol.file} (${symbol.id})${colors.reset}`);
+          console.log();
 
-      const params: unknown[] = [symbolId];
+          if (formattedBlocks.length === 0) {
+            this.printInfo('No extracted code blocks recorded for this symbol');
+            console.log();
+          } else {
+            this.printSection('Summary');
+            console.log(
+              `  Total Blocks:       ${colors.cyan}${totalBlocks}${colors.reset} (${totalLines} lines)`
+            );
+            console.log(`  Average Complexity: ${colors.cyan}${averageComplexity}${colors.reset}`);
+            console.log();
 
-      if (typeFilter) {
-        query += ' AND type = ?';
-        params.push(typeFilter);
-      }
+            this.printSection('Blocks');
+            for (const block of formattedBlocks) {
+              console.log(
+                `  ${colors.cyan}[${block.type}]${colors.reset} lines ${block.startLine}-${block.endLine} (${block.lines} lines, complexity: ${colors.yellow}${block.complexity}${colors.reset}, side-effects: ${block.sideEffects})`
+              );
+              if (block.purpose) {
+                console.log(`    ${colors.dim}${block.purpose}${colors.reset}`);
+              }
+            }
+            console.log();
+          }
+        }
 
-      query += ' ORDER BY start_line';
-
-      const blocks = db.prepare(query).all(...params) as Array<{
-        id: string;
-        type: string;
-        startLine: number;
-        endLine: number;
-        purpose: string;
-        complexity: number;
-        sideEffects: string;
-      }>;
-
-      if (blocks.length === 0) {
+        return this.success(
+          totalBlocks === 0 ? 'No blocks found' : `Found ${formattedBlocks.length} blocks`
+        );
+      } finally {
         db.close();
-        new XmlBuilder(BlocksSchema)
-          .section('symbol', symbol)
-          .section('summary', {
-            totalBlocks: 0,
-            totalLines: 0,
-            averageComplexity: 0,
-            byType: '{}',
-          })
-          .section('blocks', [])
-          .print();
-        return Promise.resolve({ exitCode: 0, message: 'No blocks found' });
       }
-
-      // Calculate statistics
-      const totalBlocks = blocks.length;
-      const totalLines = blocks.reduce((sum, b) => sum + (b.endLine - b.startLine + 1), 0);
-      const averageComplexity =
-        blocks.reduce((sum, b) => sum + (b.complexity || 0), 0) / totalBlocks;
-
-      const byType: Record<string, number> = {};
-      for (const block of blocks) {
-        byType[block.type] = (byType[block.type] || 0) + 1;
-      }
-
-      // Format blocks for output
-      const formattedBlocks = blocks.map((b) => {
-        const parsedSideEffects: unknown = b.sideEffects ? JSON.parse(b.sideEffects) : null;
-        return {
-          id: b.id,
-          type: b.type,
-          startLine: b.startLine,
-          endLine: b.endLine,
-          lines: b.endLine - b.startLine + 1,
-          purpose: b.purpose || '',
-          complexity: b.complexity || 0,
-          sideEffects: Array.isArray(parsedSideEffects) ? parsedSideEffects.length : 0,
-        };
-      });
-
-      new XmlBuilder(BlocksSchema)
-        .section('symbol', symbol)
-        .section('summary', {
-          totalBlocks,
-          totalLines,
-          averageComplexity: Math.round(averageComplexity * 10) / 10,
-          byType: JSON.stringify(byType),
-        })
-        .section('blocks', formattedBlocks)
-        .print();
-
-      db.close();
-      return Promise.resolve({ exitCode: 0, message: `Found ${blocks.length} blocks` });
-    } catch (error) {
-      db.close();
-      return Promise.resolve({
-        exitCode: 1,
-        message: `Error: ${error instanceof Error ? error.message : String(error)}`,
-      });
-    }
+    });
   }
 }

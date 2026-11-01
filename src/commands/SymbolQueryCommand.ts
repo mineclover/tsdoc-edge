@@ -12,8 +12,23 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
+import { CanonicalAliasContext } from '../indexer';
+import { DatabaseManager } from '../storage/DatabaseManager';
 import type { ParsedDocSymbols } from '../types/feature';
 import { BaseCommand, type CommandResult } from './BaseCommand';
+import { isExternalCanonicalNode } from './canonicalReadHelper';
+
+interface UnifiedCodeSymbolMatch {
+  readonly id: string;
+  readonly name: string;
+  readonly kind: string;
+  readonly filePath?: string;
+  readonly line?: number;
+  readonly exported: boolean;
+  readonly dependencies: number;
+  readonly dependents: number;
+  readonly source: 'canonical-graph' | 'enrichment-db';
+}
 
 /**
  * Symbol information with full context
@@ -81,7 +96,7 @@ export class SymbolQueryCommand extends BaseCommand {
    * @public
    */
   getDescription(): string {
-    return 'Query and explore document symbols';
+    return 'Query and explore code symbols (Canonical @ttsc/graph) and [[Symbol]] checkpoints';
   }
 
   /**
@@ -90,15 +105,26 @@ export class SymbolQueryCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge symbol-query <subcommand> [options]
+    return `tsdoc-edge symbol query <symbol-or-subcommand> [options]
 
-  Subcommands:
-    list              List all symbols
-    search <query>    Search symbols by name
-    info <symbol>     Show detailed symbol information
-    backlinks <symbol> Show documents that reference the symbol
-    similar <symbol>  Find symbols with similar names
-    stats             Show symbol statistics`;
+  Direct Lookup:
+    <symbol>           Look up both code symbols (Canonical @ttsc/graph) and [[Symbol]] docs
+
+  Document Subcommands:
+    list               List all [[Symbol]] document checkpoints
+    search <query>     Search [[Symbol]] checkpoints by name
+    info <symbol>      Show detailed [[Symbol]] document context
+    backlinks <symbol> Show documents that reference [[Symbol]]
+    similar <symbol>   Find symbols with similar names
+    stats              Show [[Symbol]] checkpoint statistics
+
+  Options:
+    --json               Output as JSON (direct lookup)
+    --limit <n>          Maximum code symbol matches (default: 10)
+    --include-external   Include external/stdlib code symbols
+    --dir <path>         Documentation directory (default: managed)
+    --pattern <regex>    Filter list subcommand by regex
+    --all                Include undefined [[Symbol]] references in list`;
   }
 
   /**
@@ -109,13 +135,30 @@ export class SymbolQueryCommand extends BaseCommand {
    */
   execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(() => {
-      // Check for help flag before processing
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
 
+      const flagError = this.validateAllowedFlags(
+        args,
+        ['--all', '--json', '--include-external'],
+        ['--pattern', '--dir', '--limit']
+      );
+      if (flagError) return flagError;
+
       const docsDir = this.findDocsDir(args);
-      const subcommand = args.find((arg) => !arg.startsWith('--')) || 'help';
+      const positionalArgs = this.getPositionalArgs(args, ['--pattern', '--dir', '--limit']);
+      const subcommand = positionalArgs[0] || 'help';
+
+      if (subcommand === 'help') {
+        return this.displayHelp();
+      }
+
+      const docSubcommands = new Set(['list', 'search', 'info', 'backlinks', 'similar', 'stats']);
+
+      if (!docSubcommands.has(subcommand)) {
+        return this.queryUnifiedSymbol(subcommand, docsDir, args);
+      }
 
       this.printHeader('Symbol Query');
 
@@ -139,7 +182,7 @@ export class SymbolQueryCommand extends BaseCommand {
         case 'stats':
           return this.showStats();
         default:
-          return this.showHelp();
+          return this.displayHelp();
       }
     });
   }
@@ -147,7 +190,8 @@ export class SymbolQueryCommand extends BaseCommand {
   /**
    * Build symbol index from documentation
    */
-  private buildIndex(docsDir: string): void {
+  private buildIndex(docsDir: string, silent = false): void {
+    this.symbols.clear();
     const files = this.findMarkdownFiles(docsDir);
 
     for (const filePath of files) {
@@ -161,7 +205,267 @@ export class SymbolQueryCommand extends BaseCommand {
       }
     }
 
-    this.printSuccess(`Indexed ${this.symbols.size} symbols from ${files.length} documents`);
+    if (!silent) {
+      this.printSuccess(`Indexed ${this.symbols.size} symbols from ${files.length} documents`);
+    }
+  }
+
+  /**
+   * Unified lookup across Canonical `@ttsc/graph` code symbols, Enrichment DB fallback, and `[[Symbol]]` checkpoints.
+   */
+  private queryUnifiedSymbol(query: string, docsDir: string, args: string[]): CommandResult {
+    const isJson = this.hasFlag(args, '--json');
+    const includeExternal = this.hasFlag(args, '--include-external');
+    const parsedLimit = Number.parseInt(this.getOption(args, '--limit') || '10', 10);
+    const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 10;
+
+    this.buildIndex(docsDir, true);
+
+    let docMatch = this.symbols.get(query);
+    if (!docMatch) {
+      const lowerQuery = query.toLowerCase();
+      for (const [key, info] of this.symbols.entries()) {
+        if (key.toLowerCase() === lowerQuery) {
+          docMatch = info;
+          break;
+        }
+      }
+    }
+
+    const codeMatches: UnifiedCodeSymbolMatch[] = [];
+    const codeSuggestions: string[] = [];
+
+    let canonicalContext: CanonicalAliasContext | null = null;
+    try {
+      canonicalContext = CanonicalAliasContext.tryOpen(process.cwd());
+      if (canonicalContext) {
+        const externalMode = includeExternal ? 'include' : 'exclude';
+        const aliasedCanonicalId = canonicalContext.resolver.legacyToCanonical(query);
+        const candidates = canonicalContext.graph.nodes.filter(
+          (node) => includeExternal || !isExternalCanonicalNode(node)
+        );
+
+        let matchedNodes = candidates.filter(
+          (node) =>
+            node.id === query ||
+            (aliasedCanonicalId !== null && node.id === aliasedCanonicalId) ||
+            node.qualifiedName === query ||
+            node.name === query
+        );
+
+        if (matchedNodes.length === 0) {
+          const lower = query.toLowerCase();
+          matchedNodes = candidates.filter(
+            (node) =>
+              (node.qualifiedName ?? '').toLowerCase() === lower ||
+              (node.name ?? '').toLowerCase() === lower
+          );
+        }
+
+        if (matchedNodes.length === 0) {
+          const scoredCandidates: Array<{ label: string; score: number }> = [];
+          const seenNames = new Set<string>();
+          for (const node of candidates) {
+            const label = node.qualifiedName ?? node.name;
+            if (!label || seenNames.has(label)) continue;
+            seenNames.add(label);
+            const score = this.scoreSymbolSimilarity(query, label);
+            if (score > 10) {
+              scoredCandidates.push({ label, score });
+            }
+          }
+          scoredCandidates.sort((a, b) => b.score - a.score || a.label.localeCompare(b.label));
+          for (const item of scoredCandidates.slice(0, 5)) {
+            codeSuggestions.push(item.label);
+          }
+        }
+
+        matchedNodes.sort((left, right) => {
+          const leftExp = left.exported ? 0 : 1;
+          const rightExp = right.exported ? 0 : 1;
+          if (leftExp !== rightExp) return leftExp - rightExp;
+          return left.id.localeCompare(right.id);
+        });
+
+        for (const node of matchedNodes.slice(0, limit)) {
+          const rawFile = node.file ?? node.evidence?.file;
+          const filePath = rawFile
+            ? path.isAbsolute(rawFile)
+              ? path.relative(canonicalContext.graph.rootDir, rawFile)
+              : rawFile
+            : undefined;
+          codeMatches.push({
+            id: node.id,
+            name: node.qualifiedName ?? node.name ?? node.id,
+            kind: node.kind,
+            filePath,
+            line: node.evidence?.startLine,
+            exported: Boolean(node.exported),
+            dependencies: canonicalContext.analysis.dependencies(node.id, {
+              external: externalMode,
+            }).length,
+            dependents: canonicalContext.analysis.dependents(node.id, {
+              external: externalMode,
+            }).length,
+            source: 'canonical-graph',
+          });
+        }
+      }
+    } finally {
+      canonicalContext?.close();
+    }
+
+    if (codeMatches.length === 0) {
+      const dbPath = this.getDatabasePath();
+      if (fs.existsSync(dbPath)) {
+        const dbManager = new DatabaseManager(dbPath);
+        try {
+          const exact = dbManager.getSymbol(query);
+          const byName = dbManager
+            .findSymbolsByNamePattern(query)
+            .filter((sym) => sym.name === query || sym.name.toLowerCase() === query.toLowerCase());
+          const combined = exact ? [exact, ...byName.filter((s) => s.id !== exact.id)] : byName;
+
+          for (const sym of combined.slice(0, limit)) {
+            const rels = dbManager.getUnifiedRelationshipsBySymbol(sym.id);
+            let deps = 0;
+            let dependents = 0;
+            for (const rel of rels) {
+              const fromList = Array.isArray(rel.from) ? rel.from : [rel.from];
+              const toList = Array.isArray(rel.to) ? rel.to : [rel.to];
+              if (fromList.includes(sym.id)) deps++;
+              if (toList.includes(sym.id)) dependents++;
+            }
+            const symFilePath = 'filePath' in sym ? sym.filePath : sym.file_path;
+            const symExported =
+              'isExported' in sym ? Boolean(sym.isExported) : Boolean(sym.is_exported);
+            codeMatches.push({
+              id: sym.id,
+              name: sym.name,
+              kind: sym.type,
+              filePath: symFilePath,
+              line: sym.line,
+              exported: symExported,
+              dependencies: deps,
+              dependents,
+              source: 'enrichment-db',
+            });
+          }
+
+          if (codeMatches.length === 0 && codeSuggestions.length === 0) {
+            const partial = dbManager.findSymbolsByNamePattern(query);
+            for (const sym of partial) {
+              if (!codeSuggestions.includes(sym.name)) {
+                codeSuggestions.push(sym.name);
+                if (codeSuggestions.length >= 5) break;
+              }
+            }
+          }
+        } finally {
+          dbManager.close();
+        }
+      }
+    }
+
+    const docSuggestions = docMatch ? [] : this.findSimilarSymbols(query, 5);
+    const mergedSuggestions = Array.from(new Set([...codeSuggestions, ...docSuggestions])).slice(
+      0,
+      8
+    );
+    const found = codeMatches.length > 0 || Boolean(docMatch);
+
+    const docSummary = docMatch
+      ? {
+          name: docMatch.name,
+          primary: docMatch.primary
+            ? {
+                filePath: this.relativePath(docMatch.primary.filePath),
+                line: docMatch.primary.line,
+              }
+            : null,
+          sourceFilePath: docMatch.sourceFilePath ?? null,
+          auxiliaryCount: docMatch.auxiliaries.length,
+          referenceCount: docMatch.references.length,
+        }
+      : null;
+
+    if (isJson) {
+      console.log(
+        JSON.stringify(
+          {
+            query,
+            found,
+            codeSymbols: codeMatches,
+            documentSymbol: docSummary,
+            ...(mergedSuggestions.length > 0 ? { suggestions: mergedSuggestions } : {}),
+          },
+          null,
+          2
+        )
+      );
+      return found ? this.success() : this.failure(`Symbol '${query}' not found`);
+    }
+
+    this.printHeader(`Symbol Lookup: ${query}`);
+    console.log();
+
+    if (!found) {
+      this.printError(`Symbol '${query}' not found in code graph or [[Symbol]] checkpoints`);
+      if (mergedSuggestions.length > 0) {
+        console.log();
+        console.log(`  ${this.colors.bold}Similar symbols:${this.colors.reset}`);
+        for (const suggestion of mergedSuggestions) {
+          console.log(`    ${this.colors.cyan}• ${suggestion}${this.colors.reset}`);
+        }
+      }
+      console.log();
+      return this.failure(`Symbol '${query}' not found`);
+    }
+
+    if (codeMatches.length > 0) {
+      this.printSection(`Code Symbols (${codeMatches.length})`);
+      for (const match of codeMatches) {
+        const exportBadge = match.exported
+          ? `${this.colors.green}[exported]${this.colors.reset}`
+          : `${this.colors.dim}[internal]${this.colors.reset}`;
+        const location = match.filePath
+          ? `${match.filePath}${match.line ? `:${match.line}` : ''}`
+          : 'unknown';
+        console.log(
+          `  ${this.colors.cyan}${this.colors.bold}${match.name}${this.colors.reset} (${this.colors.yellow}${match.kind}${this.colors.reset}) ${exportBadge}`
+        );
+        console.log(`    Location:  ${this.colors.blue}${location}${this.colors.reset}`);
+        console.log(
+          `    Edges:     ↓ ${this.colors.cyan}${match.dependencies}${this.colors.reset} dependencies | ↑ ${this.colors.cyan}${match.dependents}${this.colors.reset} dependents`
+        );
+        console.log(`    ID:        ${this.colors.dim}${match.id}${this.colors.reset}`);
+        console.log();
+      }
+    }
+
+    if (docSummary) {
+      this.printSection(`Document Checkpoint [[${docSummary.name}]]`);
+      if (docSummary.primary) {
+        console.log(
+          `  Primary H1:  ${this.colors.green}${docSummary.primary.filePath}:${docSummary.primary.line}${this.colors.reset}`
+        );
+      } else {
+        console.log(
+          `  Primary H1:  ${this.colors.yellow}none (referenced without H1 checkpoint)${this.colors.reset}`
+        );
+      }
+      if (docSummary.sourceFilePath) {
+        console.log(
+          `  @source:     ${this.colors.cyan}${docSummary.sourceFilePath}${this.colors.reset}`
+        );
+      }
+      console.log(
+        `  Connections: ${this.colors.cyan}${docSummary.referenceCount}${this.colors.reset} backlink references, ${this.colors.cyan}${docSummary.auxiliaryCount}${this.colors.reset} auxiliary headings`
+      );
+      console.log();
+    }
+
+    return this.success();
   }
 
   /**
@@ -230,8 +534,8 @@ export class SymbolQueryCommand extends BaseCommand {
    * List all symbols
    */
   private listSymbols(args: string[]): CommandResult {
-    const showAll = args.includes('--all');
-    const pattern = args.find((arg) => arg.startsWith('--pattern='))?.split('=')[1];
+    const showAll = this.hasFlag(args, '--all');
+    const pattern = this.getOption(args, '--pattern');
 
     this.printSection('Symbol List');
 
@@ -547,77 +851,89 @@ export class SymbolQueryCommand extends BaseCommand {
   }
 
   /**
-   * Show help
-   */
-  private showHelp(): CommandResult {
-    console.log('Usage: symbol-query <subcommand> [options]\n');
-    console.log('Subcommands:');
-    console.log('  list              List all symbols');
-    console.log('    --all             Include symbols without primary');
-    console.log('    --pattern=REGEX   Filter by pattern');
-    console.log();
-    console.log('  search <query>    Search symbols by name');
-    console.log();
-    console.log('  info <symbol>     Show detailed symbol information');
-    console.log('    --all             Show all references');
-    console.log();
-    console.log('  backlinks <symbol> Show documents that reference the symbol');
-    console.log();
-    console.log('  similar <symbol>  Find symbols with similar names');
-    console.log();
-    console.log('  stats             Show symbol statistics');
-    console.log();
-    console.log('Examples:');
-    console.log('  symbol-query list --pattern="Command"');
-    console.log('  symbol-query search "Build"');
-    console.log('  symbol-query info "BuildCommand"');
-    console.log('  symbol-query backlinks "BuildCommand"');
-    console.log('  symbol-query similar "BuildComand"');
-    console.log();
-
-    return this.success();
-  }
-
-  /**
    * Find similar symbol names
    */
   private findSimilarSymbols(target: string, maxResults: number): string[] {
-    const normalized = this.normalizeSymbolName(target);
     const results: Array<{ name: string; score: number }> = [];
 
     for (const name of this.symbols.keys()) {
-      const symNormalized = this.normalizeSymbolName(name);
-
-      // Skip exact match
       if (name === target) continue;
-
-      // Calculate similarity score
-      let score = 0;
-
-      // Substring match
-      if (symNormalized.includes(normalized) || normalized.includes(symNormalized)) {
-        score += 50;
-      }
-
-      // Levenshtein distance
-      const distance = this.levenshteinDistance(normalized, symNormalized);
-      score += Math.max(0, 20 - distance * 2);
-
-      // Word overlap
-      const targetWords = new Set(normalized.split(/[-\s]/));
-      const symWords = new Set(symNormalized.split(/[-\s]/));
-      const overlap = Array.from(targetWords).filter((w) => symWords.has(w)).length;
-      score += overlap * 10;
-
+      const score = this.scoreSymbolSimilarity(target, name);
       if (score > 10) {
         results.push({ name, score });
       }
     }
 
     return results
-      .sort((a, b) => b.score - a.score)
+      .sort((a, b) => b.score - a.score || a.name.localeCompare(b.name))
       .slice(0, maxResults)
       .map((r) => r.name);
+  }
+
+  /**
+   * Score similarity between a target symbol query and a candidate symbol name.
+   */
+  private scoreSymbolSimilarity(target: string, candidate: string): number {
+    if (target === candidate) return 0;
+    const normalized = this.normalizeSymbolName(target);
+    const symNormalized = this.normalizeSymbolName(candidate);
+    if (!normalized || !symNormalized) return 0;
+
+    let score = 0;
+
+    if (symNormalized.includes(normalized) || normalized.includes(symNormalized)) {
+      score += 50;
+    }
+
+    // Shared prefix bonus (e.g. GraphRepositryTypo vs GraphRepository)
+    let prefixLen = 0;
+    const minLen = Math.min(normalized.length, symNormalized.length);
+    while (prefixLen < minLen && normalized[prefixLen] === symNormalized[prefixLen]) {
+      prefixLen++;
+    }
+    if (prefixLen >= 5) {
+      score += Math.min(20, prefixLen * 2);
+    }
+
+    // CamelCase / separator token overlap
+    const targetWords = this.tokenizeSymbolWords(target);
+    const symWords = this.tokenizeSymbolWords(candidate);
+    const symWordSet = new Set(symWords);
+    let overlap = 0;
+    for (const word of targetWords) {
+      if (symWordSet.has(word)) {
+        overlap++;
+      } else if (
+        word.length >= 4 &&
+        symWords.some(
+          (sw) =>
+            sw.length >= 4 &&
+            Math.abs(sw.length - word.length) <= 2 &&
+            this.levenshteinDistance(word, sw) <= 2
+        )
+      ) {
+        overlap++;
+      }
+    }
+    score += overlap * 10;
+
+    if (Math.abs(normalized.length - symNormalized.length) <= 10) {
+      const distance = this.levenshteinDistance(normalized, symNormalized);
+      score += Math.max(0, 22 - distance * 2);
+    }
+
+    return score;
+  }
+
+  /**
+   * Split CamelCase, snake_case, kebab-case, and qualified symbol names into lowercase tokens.
+   */
+  private tokenizeSymbolWords(name: string): string[] {
+    return name
+      .replace(/([a-z0-9])([A-Z])/g, '$1-$2')
+      .toLowerCase()
+      .split(/[^a-z0-9]+/)
+      .filter(Boolean);
   }
 
   /**
@@ -666,11 +982,7 @@ export class SymbolQueryCommand extends BaseCommand {
    * Uses --dir=<path> flag, defaults to 'managed'
    */
   private findDocsDir(args: string[]): string {
-    const dirArg = args.find((arg) => arg.startsWith('--dir='));
-    if (dirArg) {
-      return dirArg.split('=')[1];
-    }
-    return 'managed';
+    return this.getOption(args, '--dir') || 'managed';
   }
 
   /**

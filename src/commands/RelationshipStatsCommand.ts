@@ -3,11 +3,17 @@
  * @packageDocumentation
  */
 
+import * as fs from 'node:fs';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
+import {
+  type CanonicalGraphPlaneSnapshot,
+  projectCanonicalEdgeToOntology,
+  readCanonicalGraphSnapshot,
+} from './canonicalReadHelper';
 
 /**
- * Command for showing relationship statistics and implementation progress
+ * Command for showing relationship statistics across Canonical `@ttsc/graph` and Enrichment DB.
  * @doc [[RelationshipStatsCommand]]
  * @public
  */
@@ -27,7 +33,7 @@ export class RelationshipStatsCommand extends BaseCommand {
    * @public
    */
   getDescription(): string {
-    return 'Show relationship statistics and implementation progress';
+    return 'Show 3-layer SSOT relationship statistics across Canonical @ttsc/graph and Enrichment DB';
   }
 
   /**
@@ -36,7 +42,12 @@ export class RelationshipStatsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge relationship-stats [options]\n\n  Options:\n    --detailed    Show detailed breakdown by type';
+    return `tsdoc-edge relationship-stats [options]
+
+Options:
+  --detailed           Show detailed breakdown of all relationship types
+  --json               Output as JSON
+  --include-external   Include external/stdlib nodes from canonical graph`;
   }
 
   /**
@@ -47,213 +58,273 @@ export class RelationshipStatsCommand extends BaseCommand {
    */
   execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(() => {
-      // Check for help flag
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
 
-      const detailed = args.includes('--detailed');
+      const flagError = this.validateAllowedFlags(args, [
+        '--detailed',
+        '--json',
+        '--include-external',
+      ]);
+      if (flagError) return flagError;
 
-      this.printHeader('TSDoc Edge - Relationship Statistics');
+      const detailed = this.hasFlag(args, '--detailed');
+      const isJson = this.hasFlag(args, '--json');
+      const includeExternal = this.hasFlag(args, '--include-external');
 
-      const dbCheck = this.checkDatabaseExists();
-      if (dbCheck) return dbCheck;
+      const canonicalSnapshot = readCanonicalGraphSnapshot({ includeExternal });
+      const dbPath = this.getDatabasePath();
+      let dbManager: DatabaseManager | null = null;
 
-      const dbManager = new DatabaseManager(this.getDatabasePath());
+      if (!canonicalSnapshot) {
+        const dbCheck = this.checkDatabaseExists();
+        if (dbCheck) return dbCheck;
+        dbManager = new DatabaseManager(dbPath);
+      } else if (fs.existsSync(dbPath)) {
+        dbManager = new DatabaseManager(dbPath);
+      }
+
       try {
-        // Get total symbols using Drizzle
-        const totalSymbolsCount = dbManager.countSymbols();
+        const summary = this.collectStats(canonicalSnapshot, dbManager);
 
-        // Get relationships by category using Drizzle
-        const byCategory = dbManager.countRelationshipsByCategory();
-
-        // Get relationships by type using Drizzle
-        const byTypeRaw = dbManager.countRelationshipsByType();
-
-        // Build byType with category info from all relationships
-        const allRels = dbManager.getAllUnifiedRelationships();
-        const typeToCategory = new Map<string, string>();
-        for (const rel of allRels) {
-          if (!typeToCategory.has(rel.type)) {
-            typeToCategory.set(rel.type, rel.category);
-          }
-        }
-        const byType = byTypeRaw.map((row) => ({
-          type: row.type,
-          category: typeToCategory.get(row.type) || 'unknown',
-          count: row.count,
-        }));
-
-        console.log();
-
-        // Overall statistics
-        this.printSection('Overall Statistics');
-        console.log(`  Total symbols: ${this.colors.cyan}${totalSymbolsCount}${this.colors.reset}`);
-
-        const totalRelationships = byType.reduce((sum, row) => sum + row.count, 0);
-        console.log(
-          `  Total relationships: ${this.colors.cyan}${totalRelationships}${this.colors.reset}`
-        );
-
-        // Get inferred vs explicit breakdown (allRels already fetched above)
-        const inferredCount = allRels.filter((r) => r.properties?.inferred === true).length;
-        const explicitCount = totalRelationships - inferredCount;
-
-        console.log(
-          `  Explicit relationships: ${this.colors.green}${explicitCount}${this.colors.reset}`
-        );
-        console.log(
-          `  Inferred relationships: ${this.colors.yellow}${inferredCount}${this.colors.reset} (${((inferredCount / totalRelationships) * 100).toFixed(1)}%)`
-        );
-        console.log();
-
-        // Category breakdown
-        this.printSection('Relationships by Category');
-
-        const categoryOrder = [
-          'structural',
-          'data-flow',
-          'behavioral',
-          'alternative',
-          'constraint',
-          'semantic',
-          'verification',
-        ];
-
-        const categoryMap = new Map(byCategory.map((c) => [c.category, c.count]));
-
-        for (const category of categoryOrder) {
-          const count = categoryMap.get(category) || 0;
-          const icon = count > 0 ? `${this.colors.green}✓` : `${this.colors.dim}○`;
-          const countDisplay = count > 0 ? `${this.colors.cyan}${count}` : `${this.colors.dim}0`;
-
-          console.log(
-            `  ${icon}${this.colors.reset} ${category.padEnd(15)} ${countDisplay}${this.colors.reset}`
-          );
-        }
-        console.log();
-
-        // Implementation progress
-        this.printSection('Implementation Progress');
-
-        // Define all relationship types by category (28 types across 10 categories)
-        const allTypes = {
-          structural: ['code-dependency', 'inheritance', 'implementation'],
-          'data-flow': ['io-dependency', 'event-flow'],
-          behavioral: ['calls', 'callback', 'collaboration', 'composition', 'temporal-order'],
-          alternative: ['substitution', 'fallback'],
-          constraint: ['co-requirement', 'circular-dependency'],
-          semantic: [
-            'naming-pattern-relation',
-            'explicit-semantic-relation',
-            'feature-grouping',
-            'doc-reference',
-            'enhancement',
-          ],
-          verification: ['test-coverage', 'integration-verification'],
-          testing: ['contains', 'covers-scenario', 'test-as-example'],
-          'type-system': ['type-dependency', 'generic-constraint'],
-          architectural: ['layer-dependency', 'module-boundary'],
-        };
-
-        const implementedTypes = new Set(byType.map((r) => r.type));
-
-        let totalTypes = 0;
-        let implementedCount = 0;
-
-        for (const [category, types] of Object.entries(allTypes)) {
-          totalTypes += types.length;
-          const implemented = types.filter((t) => implementedTypes.has(t)).length;
-          implementedCount += implemented;
-
-          const percentage = types.length > 0 ? Math.round((implemented / types.length) * 100) : 0;
-          const progressBar = this.createProgressBar(percentage, 20);
-
-          console.log(
-            `  ${category.padEnd(15)} ${progressBar} ${percentage}% (${implemented}/${types.length})`
+        if (isJson) {
+          console.log(JSON.stringify(summary, null, 2));
+          return this.success(
+            `${summary.combined.totalRelationships} relationships across ${summary.combined.activeCategories} categories`
           );
         }
 
-        const overallPercentage = Math.round((implementedCount / totalTypes) * 100);
-        console.log();
-        console.log(
-          `  ${this.colors.bold}Overall Progress:${this.colors.reset} ${this.colors.cyan}${overallPercentage}%${this.colors.reset} (${implementedCount}/${totalTypes} types)`
-        );
-        console.log();
-
-        // Detailed breakdown
-        if (detailed) {
-          this.printSection('Detailed Breakdown by Type');
-
-          for (const [category, types] of Object.entries(allTypes)) {
-            console.log();
-            console.log(`  ${this.colors.bold}${category}:${this.colors.reset}`);
-
-            for (const type of types) {
-              const row = byType.find((r) => r.type === type);
-              const count = row ? row.count : 0;
-              const status = count > 0 ? `${this.colors.green}✓` : `${this.colors.red}✗`;
-              const countDisplay =
-                count > 0 ? `${this.colors.cyan}${count}` : `${this.colors.dim}-`;
-
-              console.log(
-                `    ${status}${this.colors.reset} ${type.padEnd(30)} ${countDisplay}${this.colors.reset}`
-              );
-            }
-          }
-          console.log();
-        }
-
-        // Missing types
-        const missingTypes: string[] = [];
-        for (const [category, types] of Object.entries(allTypes)) {
-          for (const type of types) {
-            if (!implementedTypes.has(type)) {
-              missingTypes.push(`${category}:${type}`);
-            }
-          }
-        }
-
-        if (missingTypes.length > 0) {
-          this.printSection('Missing Relationship Types');
-          console.log(
-            `  ${this.colors.yellow}${missingTypes.length} types not yet implemented:${this.colors.reset}`
-          );
-          console.log();
-
-          missingTypes.forEach((missing) => {
-            console.log(`    ${this.colors.dim}• ${missing}${this.colors.reset}`);
-          });
-          console.log();
-        }
-
-        // Recommendations
-        this.printSection('Next Steps');
-        console.log(
-          `  ${this.colors.blue}ℹ${this.colors.reset} Run ${this.colors.cyan}tsdoc-edge relationship-stats --detailed${this.colors.reset} for full breakdown`
-        );
-        console.log(
-          `  ${this.colors.blue}ℹ${this.colors.reset} See ${this.colors.cyan}managed/workflows/relationship-system-roadmap.md${this.colors.reset} for implementation plan`
-        );
-        console.log();
-
+        this.renderHuman(summary, detailed);
         return this.success(
-          `${implementedCount}/${totalTypes} relationship types implemented (${overallPercentage}%)`
+          `${summary.combined.totalRelationships} relationships across ${summary.combined.activeCategories} categories`
         );
       } finally {
-        dbManager.close();
+        dbManager?.close();
       }
     });
   }
 
+  private collectStats(
+    canonicalSnapshot: CanonicalGraphPlaneSnapshot | null,
+    dbManager: DatabaseManager | null
+  ): RelationshipStatsSummary {
+    const canonicalByKind: Record<string, number> = {};
+    const canonicalByCategory: Record<string, number> = {};
+    let canonicalEdges = 0;
+    let canonicalNodes = 0;
+
+    if (canonicalSnapshot) {
+      canonicalNodes = canonicalSnapshot.filteredNodes.length;
+      for (const edge of canonicalSnapshot.filteredEdges) {
+        const projected = projectCanonicalEdgeToOntology(edge);
+        canonicalByKind[projected.rawKind] = (canonicalByKind[projected.rawKind] ?? 0) + 1;
+        canonicalByCategory[projected.category] =
+          (canonicalByCategory[projected.category] ?? 0) + 1;
+        canonicalEdges++;
+      }
+    }
+
+    let legacySymbols = 0;
+    let legacyTotal = 0;
+    let legacyExplicit = 0;
+    let legacyInferred = 0;
+    const legacyByCategory: Record<string, number> = {};
+    const legacyByType: Array<{ type: string; category: string; count: number }> = [];
+
+    if (dbManager) {
+      legacySymbols = dbManager.countSymbols();
+      const byCategoryRows = dbManager.countRelationshipsByCategory();
+      const byTypeRows = dbManager.countRelationshipsByType();
+      const allRels = dbManager.getAllUnifiedRelationships();
+
+      const typeToCategory = new Map<string, string>();
+      for (const rel of allRels) {
+        if (!typeToCategory.has(rel.type)) {
+          typeToCategory.set(rel.type, rel.category);
+        }
+        if (rel.properties?.inferred === true) {
+          legacyInferred++;
+        } else {
+          legacyExplicit++;
+        }
+      }
+
+      for (const row of byCategoryRows) {
+        legacyByCategory[row.category] = row.count;
+      }
+      for (const row of byTypeRows) {
+        legacyByType.push({
+          type: row.type,
+          category: typeToCategory.get(row.type) ?? 'unknown',
+          count: row.count,
+        });
+        legacyTotal += row.count;
+      }
+    }
+
+    // Combined 3-Layer SSOT totals (skip duplicate legacy structural edges when canonical graph is active)
+    const combinedByCategory: Record<string, number> = { ...canonicalByCategory };
+    const combinedByType: Array<{
+      type: string;
+      category: string;
+      count: number;
+      plane: 'canonical-graph' | 'enrichment-db';
+    }> = Object.entries(canonicalByKind).map(([kind, count]) => ({
+      type: kind,
+      category: projectCanonicalEdgeToOntology({ kind, from: '', to: '' }).category,
+      count,
+      plane: 'canonical-graph' as const,
+    }));
+
+    let combinedEnrichmentCount = 0;
+    for (const [category, count] of Object.entries(legacyByCategory)) {
+      if (canonicalSnapshot && category === 'structural') {
+        continue;
+      }
+      combinedByCategory[category] = (combinedByCategory[category] ?? 0) + count;
+    }
+    for (const item of legacyByType) {
+      if (canonicalSnapshot && item.category === 'structural') {
+        continue;
+      }
+      combinedByType.push({
+        type: item.type,
+        category: item.category,
+        count: item.count,
+        plane: 'enrichment-db',
+      });
+      combinedEnrichmentCount += item.count;
+    }
+
+    combinedByType.sort((a, b) => b.count - a.count);
+    const totalRelationships = canonicalEdges + combinedEnrichmentCount;
+    const activeCategories = Object.values(combinedByCategory).filter((c) => c > 0).length;
+
+    return {
+      canonicalGraph: {
+        available: Boolean(canonicalSnapshot),
+        activeRevisionId: canonicalSnapshot?.activeRevisionId,
+        nodes: canonicalNodes,
+        edges: canonicalEdges,
+        byKind: canonicalByKind,
+        byCategory: canonicalByCategory,
+      },
+      enrichmentDb: {
+        available: Boolean(dbManager),
+        symbols: legacySymbols,
+        totalRelationships: legacyTotal,
+        explicit: legacyExplicit,
+        inferred: legacyInferred,
+        byCategory: legacyByCategory,
+        byType: legacyByType,
+      },
+      combined: {
+        totalRelationships,
+        canonicalEdges,
+        enrichmentRelationships: combinedEnrichmentCount,
+        activeCategories,
+        activeTypes: combinedByType.length,
+        byCategory: combinedByCategory,
+        byType: combinedByType,
+      },
+    };
+  }
+
+  private renderHuman(summary: RelationshipStatsSummary, detailed: boolean): void {
+    this.printHeader('TSDoc Edge - Relationship Statistics');
+    console.log();
+
+    this.printSection('SSOT Plane Overview');
+    if (summary.canonicalGraph.available) {
+      const revShort = (summary.canonicalGraph.activeRevisionId ?? '').slice(0, 12);
+      console.log(
+        `  Canonical @ttsc/graph: ${this.colors.cyan}${summary.canonicalGraph.nodes.toLocaleString()}${this.colors.reset} nodes / ${this.colors.cyan}${summary.canonicalGraph.edges.toLocaleString()}${this.colors.reset} edges ${this.colors.dim}(${revShort}…)${this.colors.reset}`
+      );
+    } else {
+      console.log(
+        `  Canonical @ttsc/graph: ${this.colors.yellow}not built${this.colors.reset} (run ${this.colors.cyan}tsdoc-edge sync${this.colors.reset})`
+      );
+    }
+
+    if (summary.enrichmentDb.available) {
+      const inferredPct =
+        summary.enrichmentDb.totalRelationships > 0
+          ? (
+              (summary.enrichmentDb.inferred / summary.enrichmentDb.totalRelationships) *
+              100
+            ).toFixed(1)
+          : '0.0';
+      console.log(
+        `  Enrichment Symbol DB:  ${this.colors.cyan}${summary.enrichmentDb.symbols.toLocaleString()}${this.colors.reset} symbols / ${this.colors.cyan}${summary.enrichmentDb.totalRelationships.toLocaleString()}${this.colors.reset} relationships ${this.colors.dim}(explicit: ${summary.enrichmentDb.explicit.toLocaleString()}, inferred: ${summary.enrichmentDb.inferred.toLocaleString()} [${inferredPct}%])${this.colors.reset}`
+      );
+    }
+
+    console.log(
+      `  Active Combined Graph: ${this.colors.green}${summary.combined.totalRelationships.toLocaleString()}${this.colors.reset} relationships (${summary.combined.activeTypes} types across ${summary.combined.activeCategories} categories)`
+    );
+    console.log();
+
+    if (summary.canonicalGraph.available) {
+      this.printSection('Canonical @ttsc/graph Edge Kinds');
+      const sortedKinds = Object.entries(summary.canonicalGraph.byKind).sort((a, b) => b[1] - a[1]);
+      for (const [kind, count] of sortedKinds) {
+        const pct =
+          summary.canonicalGraph.edges > 0
+            ? Math.round((count / summary.canonicalGraph.edges) * 1000) / 10
+            : 0;
+        const bar = this.createProgressBar(pct, 20);
+        console.log(
+          `  ${this.colors.green}✓${this.colors.reset} ${kind.padEnd(18)} ${bar} ${this.colors.cyan}${count.toLocaleString().padStart(7)}${this.colors.reset} (${pct}%)`
+        );
+      }
+      console.log();
+    }
+
+    this.printSection('Combined Relationships by Category');
+    const sortedCategories = Object.entries(summary.combined.byCategory).sort(
+      (a, b) => b[1] - a[1]
+    );
+    for (const [category, count] of sortedCategories) {
+      const pct =
+        summary.combined.totalRelationships > 0
+          ? Math.round((count / summary.combined.totalRelationships) * 1000) / 10
+          : 0;
+      const bar = this.createProgressBar(pct, 20);
+      console.log(
+        `  ${this.colors.green}✓${this.colors.reset} ${category.padEnd(18)} ${bar} ${this.colors.cyan}${count.toLocaleString().padStart(7)}${this.colors.reset} (${pct}%)`
+      );
+    }
+    console.log();
+
+    if (detailed) {
+      this.printSection('Detailed Breakdown by Relationship Type');
+      for (const item of summary.combined.byType) {
+        const badge =
+          item.plane === 'canonical-graph'
+            ? `${this.colors.green}[ttsc/graph]${this.colors.reset}`
+            : `${this.colors.blue}[enrichment]${this.colors.reset}`;
+        console.log(
+          `  ${badge} ${item.type.padEnd(26)} ${this.colors.dim}(${item.category})${this.colors.reset} ${this.colors.cyan}${item.count.toLocaleString()}${this.colors.reset}`
+        );
+      }
+      console.log();
+    } else {
+      this.printSection('Quick Tips');
+      console.log(
+        `  ${this.colors.blue}ℹ${this.colors.reset} Run ${this.colors.cyan}tsdoc-edge relationship-stats --detailed${this.colors.reset} for full per-type breakdown`
+      );
+      console.log(
+        `  ${this.colors.blue}ℹ${this.colors.reset} Run ${this.colors.cyan}tsdoc-edge relationship query <symbol>${this.colors.reset} to inspect symbol edges`
+      );
+      console.log();
+    }
+  }
+
   private createProgressBar(percentage: number, width: number): string {
-    const filled = Math.round((percentage / 100) * width);
+    const filled = Math.min(width, Math.max(0, Math.round((percentage / 100) * width)));
     const empty = width - filled;
-
-    const filledBar = this.colors.green + '█'.repeat(filled);
-    const emptyBar = this.colors.dim + '░'.repeat(empty);
-
-    return filledBar + emptyBar + this.colors.reset;
+    return `${this.colors.green}${'█'.repeat(filled)}${this.colors.dim}${'░'.repeat(empty)}${this.colors.reset}`;
   }
 
   private get colors() {
@@ -268,4 +339,38 @@ export class RelationshipStatsCommand extends BaseCommand {
       red: '\x1b[31m',
     };
   }
+}
+
+interface RelationshipStatsSummary {
+  canonicalGraph: {
+    available: boolean;
+    activeRevisionId?: string;
+    nodes: number;
+    edges: number;
+    byKind: Record<string, number>;
+    byCategory: Record<string, number>;
+  };
+  enrichmentDb: {
+    available: boolean;
+    symbols: number;
+    totalRelationships: number;
+    explicit: number;
+    inferred: number;
+    byCategory: Record<string, number>;
+    byType: Array<{ type: string; category: string; count: number }>;
+  };
+  combined: {
+    totalRelationships: number;
+    canonicalEdges: number;
+    enrichmentRelationships: number;
+    activeCategories: number;
+    activeTypes: number;
+    byCategory: Record<string, number>;
+    byType: Array<{
+      type: string;
+      category: string;
+      count: number;
+      plane: 'canonical-graph' | 'enrichment-db';
+    }>;
+  };
 }

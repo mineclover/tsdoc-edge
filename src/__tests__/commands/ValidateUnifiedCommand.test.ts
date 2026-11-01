@@ -12,8 +12,9 @@ describe('ValidateUnifiedCommand', () => {
   });
 
   describe('metadata', () => {
-    it('should return command name', () => {
-      expect(command.getName()).toBe('val');
+    it('should return command name and backward-compatible aliases', () => {
+      expect(command.getName()).toBe('validate');
+      expect(command.getAlias()).toEqual(['val', 'v']);
     });
 
     it('should return command description', () => {

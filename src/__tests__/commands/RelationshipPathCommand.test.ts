@@ -6,7 +6,15 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { RelationshipPathCommand } from '../../commands/RelationshipPathCommand';
+import { ConfigManager } from '../../config/ConfigManager';
+import {
+  type CanonicalGraphEdge,
+  type CanonicalGraphNode,
+  type CanonicalProjectGraph,
+  canonicalProjectGraphFingerprint,
+} from '../../indexer';
 import { DatabaseManager } from '../../storage/DatabaseManager';
+import { GraphRepository } from '../../storage/GraphRepository';
 
 describe('RelationshipPathCommand', () => {
   let command: RelationshipPathCommand;
@@ -134,6 +142,68 @@ describe('RelationshipPathCommand', () => {
 
       expect(result.exitCode).toBe(1);
       expect(dbCloseSpy).toHaveBeenCalledTimes(1);
+    });
+
+    it('finds paths across Canonical @ttsc/graph including class-member ownership bridges', async () => {
+      ConfigManager.reset();
+      const repo = new GraphRepository(path.join(tempDir, '.tsdoc', 'canonical-graph.db'));
+      const nodes: CanonicalGraphNode[] = [
+        {
+          id: 'src/cmd.ts#SyncCommand.execute:method',
+          sourceId: 'src/cmd.ts#SyncCommand.execute:method',
+          kind: 'method',
+          name: 'execute',
+          qualifiedName: 'SyncCommand.execute',
+          file: 'src/cmd.ts',
+        },
+        {
+          id: 'src/cmd.ts#SyncCommand:class',
+          sourceId: 'src/cmd.ts#SyncCommand:class',
+          kind: 'class',
+          name: 'SyncCommand',
+          qualifiedName: 'SyncCommand',
+          file: 'src/cmd.ts',
+          exported: true,
+        },
+        {
+          id: 'src/repo.ts#GraphRepository:class',
+          sourceId: 'src/repo.ts#GraphRepository:class',
+          kind: 'class',
+          name: 'GraphRepository',
+          qualifiedName: 'GraphRepository',
+          file: 'src/repo.ts',
+          exported: true,
+        },
+      ];
+      const edges: CanonicalGraphEdge[] = [
+        {
+          kind: 'instantiates',
+          from: 'src/cmd.ts#SyncCommand.execute:method',
+          to: 'src/repo.ts#GraphRepository:class',
+        },
+      ];
+      const graph: CanonicalProjectGraph = {
+        contractVersion: '1.0',
+        rootDir: tempDir,
+        tsconfigPath: path.join(tempDir, 'tsconfig.json'),
+        nodes,
+        edges,
+        provenance: { adapter: 'fixture', producer: '@ttsc/graph' },
+        fingerprint: canonicalProjectGraphFingerprint(nodes, edges),
+      };
+      repo.replaceActiveRevision(graph);
+      repo.close();
+
+      const logSpy = jest.spyOn(console, 'log').mockImplementation(() => undefined);
+      const res = await command.execute(['SyncCommand', 'GraphRepository', '--json']);
+      expect(res.exitCode).toBe(0);
+      const payload = JSON.parse(logSpy.mock.calls.flat().join('\n')) as {
+        source: string;
+        totalPaths: number;
+      };
+      expect(payload.source).toBe('canonical-graph');
+      expect(payload.totalPaths).toBeGreaterThanOrEqual(1);
+      ConfigManager.reset();
     });
   });
 });

@@ -6,6 +6,7 @@ import * as fs from 'node:fs';
 import * as os from 'node:os';
 import * as path from 'node:path';
 import { RelationshipQueryCommand } from '../../commands/RelationshipQueryCommand';
+import { ConfigManager } from '../../config/ConfigManager';
 import { CanonicalAliasContext } from '../../indexer';
 import { DatabaseManager } from '../../storage/DatabaseManager';
 
@@ -18,12 +19,14 @@ describe('RelationshipQueryCommand', () => {
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'relationship-query-'));
     fs.mkdirSync(path.join(tempDir, '.tsdoc'), { recursive: true });
     process.chdir(tempDir);
+    ConfigManager.reset();
     command = new RelationshipQueryCommand();
   });
 
   afterEach(() => {
     jest.restoreAllMocks();
     process.chdir(originalCwd);
+    ConfigManager.reset();
     fs.rmSync(tempDir, { recursive: true, force: true });
   });
 
@@ -43,7 +46,12 @@ describe('RelationshipQueryCommand', () => {
       expect(result.exitCode).toBe(0);
     });
 
-    it('returns canonical structural results when the legacy relationship set is empty', async () => {
+    it('rejects unknown flags fail-closed', async () => {
+      const result = await command.execute(['legacy-id', '--unknown-flag']);
+      expect(result.exitCode).toBe(1);
+    });
+
+    it('returns human-readable canonical structural results by default when legacy set is empty', async () => {
       const dbManager = new DatabaseManager(path.join(tempDir, '.tsdoc', 'symbols.db'));
       dbManager.close();
 
@@ -53,7 +61,7 @@ describe('RelationshipQueryCommand', () => {
           legacyId === 'legacy-id' ? 'src/a.ts#A:class' : null,
         analysis: {
           dependencies: () => [canonicalNeighbor('src/b.ts#B:class', 'calls')],
-          dependents: () => [canonicalNeighbor('src/c.ts#C:class', 'calls')],
+          dependents: () => [canonicalNeighbor('src/c.ts#C:class', 'type_ref')],
         },
         close,
       } as unknown as CanonicalAliasContext;
@@ -67,13 +75,15 @@ describe('RelationshipQueryCommand', () => {
       expect(result.exitCode).toBe(0);
       expect(output).toContain('src/a.ts#A:class');
       expect(output).toContain('src/b.ts#B:class');
+      expect(output).toContain('[calls]');
       expect(output).toContain('src/c.ts#C:class');
+      expect(output).toContain('[type_ref]');
       expect(output).not.toContain('No relationships found');
       expect(close).toHaveBeenCalledTimes(1);
       expect(databaseClose).toHaveBeenCalledTimes(1);
     });
 
-    it('applies type, category, direction, and a shared limit to canonical results', async () => {
+    it('applies type, category, direction, and a shared limit in --xml and --json modes', async () => {
       const close = jest.fn();
       const canonicalContext = {
         resolveCanonicalId: () => 'src/a.ts#A:class',
@@ -100,6 +110,7 @@ describe('RelationshipQueryCommand', () => {
         'from',
         '--limit',
         '1',
+        '--xml',
       ]);
       const output = log.mock.calls.flat().join('\n');
 
@@ -113,6 +124,17 @@ describe('RelationshipQueryCommand', () => {
       expect(output).toContain('<canonicalFound>2</canonicalFound>');
       expect(output).toContain('<canonicalReturned>1</canonicalReturned>');
       expect(close).toHaveBeenCalledTimes(1);
+
+      log.mockClear();
+      const jsonResult = await command.execute(['legacy-id', '--type', 'extends', '--json']);
+      expect(jsonResult.exitCode).toBe(0);
+      const jsonPayload = JSON.parse(log.mock.calls.flat().join('\n')) as {
+        results: { totalFound: number };
+        canonicalRelationships: Array<{ rawKind: string; nodeId: string }>;
+      };
+      expect(jsonPayload.results.totalFound).toBe(1);
+      expect(jsonPayload.canonicalRelationships[0].rawKind).toBe('extends');
+      expect(jsonPayload.canonicalRelationships[0].nodeId).toBe('src/base.ts#Base:class');
     });
 
     it.each(['src/a.ts#A:class', 'A'])(
@@ -136,7 +158,7 @@ describe('RelationshipQueryCommand', () => {
         jest.spyOn(CanonicalAliasContext, 'tryOpen').mockReturnValue(canonicalContext);
         const log = jest.spyOn(console, 'log').mockImplementation(() => undefined);
 
-        const result = await command.execute([query]);
+        const result = await command.execute([query, '--xml']);
         const output = log.mock.calls.flat().join('\n');
 
         expect(result.exitCode).toBe(0);
@@ -195,7 +217,7 @@ describe('RelationshipQueryCommand', () => {
 
     it('requires symbol ID when options passed without symbol', async () => {
       const result = await command.execute(['--type', 'calls']);
-      expect(result.exitCode).toBe(0); // displayHelp exits with 0
+      expect(result.exitCode).toBe(0);
     });
   });
 });

@@ -130,5 +130,27 @@ describe('StatsCommand', () => {
 
       expect(mockDb.close).not.toHaveBeenCalled();
     });
+
+    it('supports --json and --xml output modes and rejects unknown flags', async () => {
+      const mockDb = createMockDb({ totalSymbols: 20, totalEnhancedDocs: 4, dbSize: 2048 }, 15);
+      command = new StatsCommand(mockDb as any);
+
+      const jsonRes = await command.execute(['--json']);
+      expect(jsonRes.exitCode).toBe(0);
+      const jsonPayload = JSON.parse(consoleSpy.mock.calls.flat().join('\n')) as {
+        database: { totalSymbols: number };
+        coverage: { overall: { coveragePercent: number } };
+      };
+      expect(jsonPayload.database.totalSymbols).toBe(20);
+      expect(jsonPayload.coverage.overall.coveragePercent).toBe(75);
+
+      consoleSpy.mockClear();
+      const xmlRes = await command.execute(['--xml']);
+      expect(xmlRes.exitCode).toBe(0);
+      expect(consoleSpy.mock.calls.flat().join('\n')).toContain('<statistics>');
+
+      const badRes = await command.execute(['--invalid-flag']);
+      expect(badRes.exitCode).toBe(1);
+    });
   });
 });

@@ -5,8 +5,13 @@
  * @packageDocumentation
  */
 
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import { CanonicalAliasContext } from '../indexer';
+import type { CanonicalGraphNode } from '../indexer/contracts';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult } from './BaseCommand';
+import { isExternalCanonicalNode, projectCanonicalEdgeToOntology } from './canonicalReadHelper';
 
 /** A node in a relationship path */
 interface PathNode {
@@ -29,8 +34,10 @@ interface GraphEdge {
   category: string;
 }
 
+const CONTAINER_KINDS = new Set(['class', 'interface', 'enum', 'namespace', 'module', 'type']);
+
 /**
- * Optimized command for finding paths between symbols
+ * Optimized command for finding paths between symbols across Canonical `@ttsc/graph` and Enrichment DB.
  * @public
  */
 export class RelationshipPathCommand extends BaseCommand {
@@ -60,26 +67,20 @@ export class RelationshipPathCommand extends BaseCommand {
   protected getUsage(): string {
     return `tsdoc-edge relationship-path <from-symbol> <to-symbol> [options]
 
-Finds all paths connecting two symbols through the relationship graph.
+Finds paths connecting two symbols through Canonical @ttsc/graph and Enrichment relationships.
 
 Options:
-  --max-length <n>      Maximum path length (default: 5)
+  --max-length <n>      Maximum path length in hops (default: 6)
   --limit <n>           Maximum number of paths to show (default: 10)
   --category <cat>      Filter by relationship category
   --shortest-only       Show only shortest paths
+  --include-external    Include external/stdlib nodes from canonical graph
+  --json                Output as JSON
 
 Examples:
-  # Find how BuildCommand connects to DatabaseManager
-  tsdoc-edge relationship-path class-buildcommand class-databasemanager
-
-  # Find short paths only
-  tsdoc-edge relationship-path class-buildcommand class-databasemanager --max-length 3
-
-  # Find shortest paths only
-  tsdoc-edge relationship-path class-buildcommand class-databasemanager --shortest-only
-
-  # Filter by category
-  tsdoc-edge relationship-path class-buildcommand class-databasemanager --category structural`;
+  tsdoc-edge relationship-path SyncCommand GraphRepository
+  tsdoc-edge relationship-path BuildCommand DatabaseManager --shortest-only
+  tsdoc-edge relationship-path SyncCommand SpecGraphRepository --max-length 4 --json`;
   }
 
   /**
@@ -93,6 +94,13 @@ Examples:
       if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
+
+      const flagError = this.validateAllowedFlags(
+        args,
+        ['--shortest-only', '--json', '--include-external'],
+        ['--max-length', '--limit', '--category']
+      );
+      if (flagError) return flagError;
 
       const positionalArgs = this.getPositionalArgs(args, [
         '--max-length',
@@ -109,62 +117,150 @@ Examples:
       const fromSymbol = positionalArgs[0];
       const toSymbol = positionalArgs[1];
 
+      const parsedMaxLen = Number.parseInt(this.getOption(args, '--max-length') || '6', 10);
+      const parsedLimit = Number.parseInt(this.getOption(args, '--limit') || '10', 10);
       const options = {
-        maxLength: Number.parseInt(this.getOption(args, '--max-length') || '5', 10),
-        limit: Number.parseInt(this.getOption(args, '--limit') || '10', 10),
+        maxLength: Number.isFinite(parsedMaxLen) && parsedMaxLen > 0 ? parsedMaxLen : 6,
+        limit: Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 10,
         category: this.getOption(args, '--category'),
         shortestOnly: this.hasFlag(args, '--shortest-only'),
+        includeExternal: this.hasFlag(args, '--include-external'),
+        json: this.hasFlag(args, '--json'),
       };
 
-      this.printHeader(`Paths: ${fromSymbol} → ${toSymbol}`);
+      if (!options.json) {
+        this.printHeader(`Paths: ${fromSymbol} → ${toSymbol}`);
+      }
 
       const dbPath = this.getDatabasePath();
-      const dbManager = new DatabaseManager(dbPath);
+      const hasLegacyDb = fs.existsSync(dbPath);
+      let canonicalContext: CanonicalAliasContext | null = null;
+      let dbManager: DatabaseManager | null = null;
+
       try {
-        // Resolve both symbols by ID or name
-        const fromResolved = this.resolveSymbol(dbManager, fromSymbol);
-        const toResolved = this.resolveSymbol(dbManager, toSymbol);
+        canonicalContext = CanonicalAliasContext.tryOpen(process.cwd());
+        if (!hasLegacyDb && !canonicalContext) {
+          const dbCheck = this.checkDatabaseExists();
+          if (dbCheck) return dbCheck;
+        }
+        if (hasLegacyDb) {
+          dbManager = new DatabaseManager(dbPath);
+        }
 
-        if (!fromResolved) {
+        const legacyFrom = dbManager ? this.resolveSymbol(dbManager, fromSymbol) : null;
+        const legacyTo = dbManager ? this.resolveSymbol(dbManager, toSymbol) : null;
+
+        const canonicalFrom = canonicalContext
+          ? this.resolveCanonicalEndpoint(
+              canonicalContext,
+              fromSymbol,
+              legacyFrom?.id,
+              options.includeExternal
+            )
+          : null;
+        const canonicalTo = canonicalContext
+          ? this.resolveCanonicalEndpoint(
+              canonicalContext,
+              toSymbol,
+              legacyTo?.id,
+              options.includeExternal
+            )
+          : null;
+
+        const resolvedFromId = canonicalFrom?.id ?? legacyFrom?.id ?? null;
+        const resolvedFromName = canonicalFrom?.name ?? legacyFrom?.symbol.name ?? fromSymbol;
+        const resolvedToId = canonicalTo?.id ?? legacyTo?.id ?? null;
+        const resolvedToName = canonicalTo?.name ?? legacyTo?.symbol.name ?? toSymbol;
+
+        if (!resolvedFromId) {
           this.printError(`Source symbol not found: ${fromSymbol}`);
-          return { success: false, message: 'Source symbol not found', exitCode: 1 };
+          return { message: 'Source symbol not found', exitCode: 1 };
         }
 
-        if (!toResolved) {
+        if (!resolvedToId) {
           this.printError(`Target symbol not found: ${toSymbol}`);
-          return { success: false, message: 'Target symbol not found', exitCode: 1 };
+          return { message: 'Target symbol not found', exitCode: 1 };
         }
 
-        const resolvedFromSymbol = fromResolved.id;
-        const resolvedToSymbol = toResolved.id;
+        if (!options.json) {
+          console.log();
+          this.printInfo(
+            `Building relationship graph (${canonicalContext ? 'canonical @ttsc/graph' : 'enrichment DB'})...`
+          );
+        }
 
-        console.log();
-        this.printInfo(`Building relationship graph...`);
-
-        // Build adjacency list once
         const startBuild = Date.now();
-        const adjacency = this.buildAdjacencyList(dbManager, options.category);
+        const adjacency = this.buildAdjacencyList(
+          dbManager,
+          options.category,
+          canonicalContext,
+          options.includeExternal
+        );
         const buildTime = Date.now() - startBuild;
-        this.printInfo(`Graph built in ${buildTime}ms (${adjacency.size} nodes)`);
+        if (!options.json) {
+          this.printInfo(`Graph built in ${buildTime}ms (${adjacency.size} active source nodes)`);
+          console.log();
+          this.printInfo(`Searching for paths (max length: ${options.maxLength})...`);
+        }
 
-        console.log();
-        this.printInfo(`Searching for paths (max length: ${options.maxLength})...`);
         const startSearch = Date.now();
-
-        // Build reverse adjacency for bidirectional search
         const reverseAdjacency = this.buildReverseAdjacency(adjacency);
-        this.printInfo(`Reverse graph built`);
-
-        // Find paths using bidirectional BFS
         const paths = this.findPathsBidirectional(
           adjacency,
           reverseAdjacency,
-          resolvedFromSymbol,
-          resolvedToSymbol,
+          resolvedFromId,
+          resolvedToId,
           options.maxLength
         );
-
         const searchTime = Date.now() - startSearch;
+
+        paths.sort((a, b) => {
+          if (a.length !== b.length) return a.length - b.length;
+          return b.strength - a.strength;
+        });
+
+        let displayPaths = paths;
+        if (options.shortestOnly && paths.length > 0) {
+          const shortestLength = paths[0].length;
+          displayPaths = paths.filter((p) => p.length === shortestLength);
+        }
+        displayPaths = displayPaths.slice(0, options.limit);
+
+        if (options.json) {
+          console.log(
+            JSON.stringify(
+              {
+                source: canonicalContext ? 'canonical-graph' : 'enrichment-db',
+                from: { query: fromSymbol, id: resolvedFromId, name: resolvedFromName },
+                to: { query: toSymbol, id: resolvedToId, name: resolvedToName },
+                totalPaths: paths.length,
+                returned: displayPaths.length,
+                paths: displayPaths.map((p) => ({
+                  length: p.length,
+                  strength: Number(p.strength.toFixed(4)),
+                  nodes: p.nodes.map((n) => ({
+                    symbolId: n.symbolId,
+                    displayId: this.formatDisplayId(n.symbolId, canonicalContext),
+                    ...(n.relationshipType ? { relationshipType: n.relationshipType } : {}),
+                    ...(n.category ? { category: n.category } : {}),
+                  })),
+                })),
+                stats: {
+                  shortestLength: paths.length > 0 ? paths[0].length : 0,
+                  longestLength: paths.length > 0 ? paths[paths.length - 1].length : 0,
+                  buildTimeMs: buildTime,
+                  searchTimeMs: searchTime,
+                },
+              },
+              null,
+              2
+            )
+          );
+          return this.success(
+            `Found ${paths.length} path(s) between ${resolvedFromName} and ${resolvedToName}`
+          );
+        }
+
         this.printInfo(`Search completed in ${searchTime}ms`);
         console.log();
 
@@ -174,30 +270,13 @@ Examples:
           return this.success('Search complete');
         }
 
-        // Sort paths by length and strength
-        paths.sort((a, b) => {
-          if (a.length !== b.length) return a.length - b.length;
-          return b.strength - a.strength;
-        });
-
-        // Filter if shortest only
-        let displayPaths = paths;
-        if (options.shortestOnly && paths.length > 0) {
-          const shortestLength = paths[0].length;
-          displayPaths = paths.filter((p) => p.length === shortestLength);
-        }
-
-        // Limit number of paths
-        displayPaths = displayPaths.slice(0, options.limit);
-
-        // Display results
         this.printSection('Connection Paths');
         this.printInfo(`Found ${paths.length} path(s), showing ${displayPaths.length}`);
         console.log();
 
         for (let i = 0; i < displayPaths.length; i++) {
           const pathData = displayPaths[i];
-          const strengthBar = '█'.repeat(Math.round(pathData.strength * 10));
+          const strengthBar = '█'.repeat(Math.max(1, Math.round(pathData.strength * 10)));
 
           console.log(
             `  ${this.colors.bold}Path ${i + 1}${this.colors.reset} (length: ${pathData.length}, strength: ${strengthBar})`
@@ -206,21 +285,21 @@ Examples:
 
           for (let j = 0; j < pathData.nodes.length; j++) {
             const node = pathData.nodes[j];
+            const displayLabel = this.formatDisplayId(node.symbolId, canonicalContext);
 
             if (j === 0) {
-              console.log(`    ${this.colors.cyan}${node.symbolId}${this.colors.reset}`);
+              console.log(`    ${this.colors.cyan}${displayLabel}${this.colors.reset}`);
             } else {
               const prevNode = pathData.nodes[j - 1];
               console.log(
                 `      ${this.colors.dim}↓ ${prevNode.relationshipType} (${prevNode.category})${this.colors.reset}`
               );
-              console.log(`    ${this.colors.cyan}${node.symbolId}${this.colors.reset}`);
+              console.log(`    ${this.colors.cyan}${displayLabel}${this.colors.reset}`);
             }
           }
           console.log();
         }
 
-        // Statistics
         console.log();
         this.printSection('Path Statistics');
 
@@ -240,7 +319,6 @@ Examples:
         console.log(`  Search time: ${this.colors.cyan}${searchTime}ms${this.colors.reset}`);
         console.log();
 
-        // Analyze path categories
         const categoryCount = new Map<string, number>();
         for (const pathData of paths) {
           for (const node of pathData.nodes) {
@@ -263,53 +341,205 @@ Examples:
         }
 
         return this.success(
-          `Found ${paths.length} path(s) between ${fromResolved.symbol.name} and ${toResolved.symbol.name}`
+          `Found ${paths.length} path(s) between ${resolvedFromName} and ${resolvedToName}`
         );
       } finally {
-        dbManager.close();
+        try {
+          canonicalContext?.close();
+        } finally {
+          dbManager?.close();
+        }
       }
     });
   }
 
-  /**
-   * Build both forward and reverse adjacency lists from database (one-time operation)
-   */
-  private buildAdjacencyList(
-    dbManager: DatabaseManager,
-    category?: string
-  ): Map<string, GraphEdge[]> {
-    const adjacency = new Map<string, GraphEdge[]>();
-
-    // Use Drizzle ORM to query all relationships
-    let relationships = dbManager.getAllUnifiedRelationships();
-
-    if (category) {
-      relationships = relationships.filter((r) => r.category === category);
+  private resolveCanonicalEndpoint(
+    context: CanonicalAliasContext,
+    query: string,
+    legacyId: string | undefined,
+    includeExternal: boolean
+  ): { id: string; name: string } | null {
+    if (legacyId) {
+      const aliased = context.resolveCanonicalId(legacyId);
+      if (aliased) {
+        const node = context.analysis.index.getNode(aliased);
+        if (node && (includeExternal || !isExternalCanonicalNode(node))) {
+          return { id: node.id, name: node.qualifiedName ?? node.name ?? node.id };
+        }
+      }
     }
 
-    for (const rel of relationships) {
-      try {
+    const direct = context.resolveCanonicalId(query);
+    if (direct) {
+      const node = context.analysis.index.getNode(direct);
+      if (node && (includeExternal || !isExternalCanonicalNode(node))) {
+        return { id: node.id, name: node.qualifiedName ?? node.name ?? node.id };
+      }
+    }
+
+    const candidates = context.graph.nodes.filter(
+      (node) => includeExternal || !isExternalCanonicalNode(node)
+    );
+    const exactMatches = candidates.filter(
+      (node) => node.id === query || node.qualifiedName === query || node.name === query
+    );
+    if (exactMatches.length > 0) {
+      const best = this.pickBestCanonicalCandidate(exactMatches);
+      return { id: best.id, name: best.qualifiedName ?? best.name ?? best.id };
+    }
+
+    const lower = query.toLowerCase();
+    const caseMatches = candidates.filter(
+      (node) =>
+        (node.qualifiedName ?? '').toLowerCase() === lower ||
+        (node.name ?? '').toLowerCase() === lower
+    );
+    if (caseMatches.length > 0) {
+      const best = this.pickBestCanonicalCandidate(caseMatches);
+      return { id: best.id, name: best.qualifiedName ?? best.name ?? best.id };
+    }
+
+    return null;
+  }
+
+  private pickBestCanonicalCandidate(nodes: readonly CanonicalGraphNode[]): CanonicalGraphNode {
+    const kindRank = (kind: string): number => {
+      switch (kind) {
+        case 'class':
+          return 0;
+        case 'interface':
+          return 1;
+        case 'function':
+          return 2;
+        case 'type':
+          return 3;
+        case 'enum':
+          return 4;
+        case 'variable':
+          return 5;
+        case 'method':
+          return 6;
+        default:
+          return 7;
+      }
+    };
+
+    return [...nodes].sort((left, right) => {
+      const leftExport = left.exported ? 0 : 1;
+      const rightExport = right.exported ? 0 : 1;
+      if (leftExport !== rightExport) return leftExport - rightExport;
+      const leftRank = kindRank(left.kind);
+      const rightRank = kindRank(right.kind);
+      if (leftRank !== rightRank) return leftRank - rightRank;
+      return left.id.localeCompare(right.id);
+    })[0];
+  }
+
+  private formatDisplayId(symbolId: string, context: CanonicalAliasContext | null): string {
+    if (!context) return symbolId;
+    const node = context.analysis.index.getNode(symbolId);
+    if (!node) return symbolId;
+    const rawFile = node.file ?? node.evidence?.file;
+    const relFile = rawFile
+      ? path.isAbsolute(rawFile)
+        ? path.relative(context.graph.rootDir, rawFile)
+        : rawFile
+      : '';
+    const symbolLabel = node.qualifiedName ?? node.name ?? node.id;
+    return relFile ? `${relFile}#${symbolLabel}:${node.kind}` : `${symbolLabel}:${node.kind}`;
+  }
+
+  /**
+   * Build forward adjacency list from Canonical `@ttsc/graph` and Enrichment DB.
+   */
+  private buildAdjacencyList(
+    dbManager: DatabaseManager | null,
+    category?: string,
+    canonicalContext?: CanonicalAliasContext | null,
+    includeExternal = false
+  ): Map<string, GraphEdge[]> {
+    const adjacency = new Map<string, GraphEdge[]>();
+    const addEdge = (from: string, to: string, type: string, edgeCategory: string): void => {
+      if (!from || !to || from === to) return;
+      let list = adjacency.get(from);
+      if (!list) {
+        list = [];
+        adjacency.set(from, list);
+      }
+      list.push({ to, type, category: edgeCategory });
+    };
+
+    if (canonicalContext) {
+      const allowedNodes = canonicalContext.graph.nodes.filter(
+        (node) => includeExternal || !isExternalCanonicalNode(node)
+      );
+      const allowedSet = new Set(allowedNodes.map((n) => n.id));
+
+      for (const edge of canonicalContext.graph.edges) {
+        if (!allowedSet.has(edge.from) || !allowedSet.has(edge.to)) {
+          continue;
+        }
+        const projected = projectCanonicalEdgeToOntology(edge);
+        if (category && projected.category !== category) {
+          continue;
+        }
+        addEdge(edge.from, edge.to, projected.rawKind, projected.category);
+      }
+
+      // Bridge container symbols (Class/Interface) with their own member methods/fields in the same file
+      if (!category || category === 'structural') {
+        const containersByFile = new Map<string, CanonicalGraphNode[]>();
+        for (const node of allowedNodes) {
+          const fileKey = node.file ?? node.evidence?.file;
+          if (!fileKey || !CONTAINER_KINDS.has(node.kind)) continue;
+          let list = containersByFile.get(fileKey);
+          if (!list) {
+            list = [];
+            containersByFile.set(fileKey, list);
+          }
+          list.push(node);
+        }
+
+        for (const node of allowedNodes) {
+          const fileKey = node.file ?? node.evidence?.file;
+          const qName = node.qualifiedName;
+          if (!fileKey || !qName || !qName.includes('.')) continue;
+          const containers = containersByFile.get(fileKey);
+          if (!containers) continue;
+          for (const container of containers) {
+            const containerName = container.qualifiedName ?? container.name;
+            if (containerName && qName.startsWith(`${containerName}.`)) {
+              addEdge(container.id, node.id, 'has-member', 'structural');
+              addEdge(node.id, container.id, 'member-of', 'structural');
+            }
+          }
+        }
+      }
+    }
+
+    if (dbManager) {
+      let relationships = dbManager.getAllUnifiedRelationships();
+      if (canonicalContext) {
+        relationships = relationships.filter((r) => r.category !== 'structural');
+      }
+      if (category) {
+        relationships = relationships.filter((r) => r.category === category);
+      }
+
+      for (const rel of relationships) {
         const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
         const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
 
-        for (const from of fromSymbols) {
-          if (!from) continue;
-
-          if (!adjacency.has(from)) {
-            adjacency.set(from, []);
-          }
-
-          for (const to of toSymbols) {
-            if (!to) continue;
-
-            adjacency.get(from)?.push({
-              to,
-              type: rel.type,
-              category: rel.category,
-            });
+        for (const rawFrom of fromSymbols) {
+          if (!rawFrom) continue;
+          const from = canonicalContext?.resolver.legacyToCanonical(rawFrom) ?? rawFrom;
+          for (const rawTo of toSymbols) {
+            if (!rawTo) continue;
+            const to = canonicalContext?.resolver.legacyToCanonical(rawTo) ?? rawTo;
+            addEdge(from, to, rel.type, rel.category);
           }
         }
-      } catch (_error) {}
+      }
     }
 
     return adjacency;
@@ -340,7 +570,6 @@ Examples:
 
   /**
    * Find paths using memory-efficient BFS
-   * Limited to finding up to 100 paths to avoid memory issues
    */
   private findPathsBidirectional(
     forward: Map<string, GraphEdge[]>,
@@ -350,14 +579,12 @@ Examples:
     maxLength: number
   ): SymbolPath[] {
     const allPaths: SymbolPath[] = [];
-    const maxPaths = 100; // Limit total paths to prevent memory issues
+    const maxPaths = 100;
 
-    // Early termination checks
     if (!forward.has(fromSymbol) && fromSymbol !== toSymbol) {
       return [];
     }
 
-    // Simple BFS with path tracking (memory-limited)
     const queue: Array<{
       symbolId: string;
       path: PathNode[];
@@ -371,43 +598,37 @@ Examples:
     ];
 
     let iterations = 0;
-    const maxIterations = 50000; // Safety limit
+    const maxIterations = 50000;
 
     while (queue.length > 0 && iterations < maxIterations && allPaths.length < maxPaths) {
       iterations++;
 
       const current = queue.shift();
       if (!current) break;
-      const { symbolId, path, visited } = current;
+      const { symbolId, path: currentPath, visited } = current;
 
-      // Check if we've reached the target
-      if (symbolId === toSymbol && path.length > 1) {
-        const strength = this.calculatePathStrength(path);
+      if (symbolId === toSymbol && currentPath.length > 1) {
+        const strength = this.calculatePathStrength(currentPath);
         allPaths.push({
-          nodes: path,
-          length: path.length - 1,
+          nodes: currentPath,
+          length: currentPath.length - 1,
           strength,
         });
-
-        // Continue searching for more paths
         continue;
       }
 
-      // Don't expand if we've reached max length
-      if (path.length > maxLength) continue;
+      if (currentPath.length > maxLength) continue;
 
-      // Get neighbors from adjacency list (O(1) lookup)
       const neighbors = forward.get(symbolId);
       if (!neighbors) continue;
 
       for (const edge of neighbors) {
-        // Avoid cycles (except allow reaching target)
         if (visited.has(edge.to) && edge.to !== toSymbol) continue;
 
         const newPath = [
-          ...path.slice(0, -1),
+          ...currentPath.slice(0, -1),
           {
-            symbolId: path[path.length - 1].symbolId,
+            symbolId: currentPath[currentPath.length - 1].symbolId,
             relationshipType: edge.type,
             category: edge.category,
           },
@@ -429,15 +650,6 @@ Examples:
       }
     }
 
-    if (iterations >= maxIterations) {
-      console.warn(`  Warning: Search terminated after ${maxIterations} iterations`);
-    }
-
-    if (allPaths.length >= maxPaths) {
-      console.warn(`  Warning: Path limit reached (${maxPaths} paths found)`);
-    }
-
-    // Deduplicate paths
     const uniquePaths = new Map<string, SymbolPath>();
     for (const pathData of allPaths) {
       const key = pathData.nodes.map((n) => n.symbolId).join('→');
@@ -450,13 +662,9 @@ Examples:
     return Array.from(uniquePaths.values());
   }
 
-  /**
-   * Calculate path strength based on relationship confidence
-   */
-  private calculatePathStrength(path: PathNode[]): number {
-    if (path.length <= 1) return 1.0;
-    // Shorter paths = stronger connection
-    return 1.0 / path.length;
+  private calculatePathStrength(pathNodes: PathNode[]): number {
+    if (pathNodes.length <= 1) return 1.0;
+    return 1.0 / pathNodes.length;
   }
 
   private get colors() {

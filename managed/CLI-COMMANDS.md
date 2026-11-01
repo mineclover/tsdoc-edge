@@ -88,7 +88,7 @@ lifecycle operations, and `convention check --pack <file>` for revision-pinned g
 - SpecDiffCommand (spec-diff) → src/commands/SpecDiffCommand.ts:35
 - SpecHistoryCommand (spec-history) → src/commands/SpecHistoryCommand.ts:35
 - SpecStatusCommand (spec-status) → src/commands/SpecStatusCommand.ts:64
-- StatsCommand (stats) → src/commands/StatsCommand.ts:33
+- StatsCommand (stats) → src/commands/StatsCommand.ts:31
 - SuggestCommand (suggest) → src/commands/SuggestCommand.ts:16
 - TodosCommand (todos) → src/commands/TodosCommand.ts:35
 - TreeCommand (tree) → src/commands/TreeCommand.ts:45

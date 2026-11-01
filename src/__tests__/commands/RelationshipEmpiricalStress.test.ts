@@ -147,7 +147,7 @@ describe('Relationship Empirical Stress & Error-Path Safety', () => {
         });
       jest.spyOn(console, 'log').mockImplementation();
 
-      const result = await command.execute(['sym-alpha']);
+      const result = await command.execute(['sym-alpha', '--xml']);
 
       expect(result.exitCode).toBe(1);
       expect(dbCloseSpy).toHaveBeenCalledTimes(1);
@@ -168,7 +168,7 @@ describe('Relationship Empirical Stress & Error-Path Safety', () => {
       });
       jest.spyOn(console, 'log').mockImplementation();
 
-      const result = await command.execute(['sym-alpha']);
+      const result = await command.execute(['sym-alpha', '--xml']);
 
       expect(result.exitCode).toBe(1);
       expect(dbCloseSpy).toHaveBeenCalledTimes(1);

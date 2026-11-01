@@ -1,26 +1,25 @@
 /**
- * System Status Command - Comprehensive system overview
+ * System Status Command - Comprehensive 3-Layer SSOT system overview
  * @packageDocumentation
  *
- * @responsibility Show complete system status in one view
+ * @responsibility Show complete system status across Enrichment DB, Canonical `@ttsc/graph`, SpecGraph, and Managed Docs
  * @problem Users need to run multiple commands to understand system state
- * @solves Single command providing comprehensive system overview
+ * @solves Single command providing comprehensive 3-plane SSOT system overview
  */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
+import {
+  type CanonicalGraphPlaneSnapshot,
+  readCanonicalGraphSnapshot,
+  readSpecGraphSnapshot,
+  type SpecGraphPlaneSnapshot,
+} from './canonicalReadHelper';
 
 /**
- * Command for displaying comprehensive system status
- *
- * Shows all important metrics in one view:
- * - Symbol statistics
- * - Relationship statistics
- * - Document statistics
- * - Validation status
- * - System health
+ * Command for displaying comprehensive system status across all 3 SSOT planes.
  *
  * @doc [[SystemStatusCommand]]
  * @public
@@ -50,7 +49,7 @@ export class SystemStatusCommand extends BaseCommand {
    * @public
    */
   getDescription(): string {
-    return 'Show comprehensive system status and health overview';
+    return 'Show comprehensive 3-layer SSOT system status and health overview';
   }
 
   /**
@@ -62,8 +61,9 @@ export class SystemStatusCommand extends BaseCommand {
     return `tsdoc-edge system-status [options]
 
 Options:
-  --json    Output as JSON
-  --compact Compact single-line output`;
+  --json               Output as JSON
+  --compact            Compact single-line output
+  --include-external   Include external/stdlib nodes in canonical graph totals`;
   }
 
   /**
@@ -78,16 +78,31 @@ Options:
         return this.displayHelp();
       }
 
-      const jsonOutput = args.includes('--json');
-      const compact = args.includes('--compact');
+      const flagError = this.validateAllowedFlags(args, [
+        '--json',
+        '--compact',
+        '--include-external',
+      ]);
+      if (flagError) return flagError;
 
-      const dbCheck = this.checkDatabaseExists();
-      if (dbCheck) return dbCheck;
+      const jsonOutput = this.hasFlag(args, '--json');
+      const compact = this.hasFlag(args, '--compact');
+      const includeExternal = this.hasFlag(args, '--include-external');
 
-      const dbManager = new DatabaseManager(this.getDatabasePath());
+      const canonicalSnapshot = readCanonicalGraphSnapshot({ includeExternal });
+      const specSnapshot = readSpecGraphSnapshot();
+      const dbPath = this.getDatabasePath();
+      const hasLegacyDb = fs.existsSync(dbPath);
+
+      if (!hasLegacyDb && !canonicalSnapshot) {
+        const dbCheck = this.checkDatabaseExists();
+        if (dbCheck) return dbCheck;
+      }
+
+      const dbManager = hasLegacyDb ? new DatabaseManager(dbPath) : null;
 
       try {
-        const status = this.gatherSystemStatus(dbManager);
+        const status = this.gatherSystemStatus(dbManager, canonicalSnapshot, specSnapshot);
 
         if (jsonOutput) {
           console.log(JSON.stringify(status, null, 2));
@@ -99,39 +114,138 @@ Options:
 
         return this.success();
       } finally {
-        dbManager.close();
+        dbManager?.close();
       }
     });
   }
 
-  private gatherSystemStatus(dbManager: DatabaseManager): SystemStatus {
-    // Symbol stats
-    const symbolStats = this.getSymbolStats(dbManager);
-
-    // Relationship stats
-    const relationshipStats = this.getRelationshipStats(dbManager);
-
-    // Document stats
+  private gatherSystemStatus(
+    dbManager: DatabaseManager | null,
+    canonicalSnapshot: CanonicalGraphPlaneSnapshot | null,
+    specSnapshot: SpecGraphPlaneSnapshot | null
+  ): SystemStatus {
+    const symbolStats = dbManager
+      ? this.getSymbolStats(dbManager)
+      : this.getFallbackSymbolStats(canonicalSnapshot);
+    const relationshipStats = dbManager
+      ? this.getRelationshipStats(dbManager)
+      : { total: 0, types: 0, categories: 0, density: 0, byType: {}, byCategory: {} };
+    const canonicalStats = this.toCanonicalStatus(canonicalSnapshot);
+    const specStats = this.toSpecStatus(specSnapshot);
     const documentStats = this.getDocumentStats();
-
-    // Validation status
-    const validationStatus = this.getValidationStatus();
-
-    // System health
-    const health = this.calculateHealth(symbolStats, relationshipStats, documentStats);
+    const validationStatus = this.getValidationStatus(canonicalStats);
+    const health = this.calculateHealth(
+      symbolStats,
+      relationshipStats,
+      canonicalStats,
+      documentStats
+    );
 
     return {
       timestamp: new Date().toISOString(),
       symbols: symbolStats,
       relationships: relationshipStats,
+      canonicalGraph: canonicalStats,
+      specGraph: specStats,
       documents: documentStats,
       validation: validationStatus,
       health,
     };
   }
 
+  private getFallbackSymbolStats(
+    canonicalSnapshot: CanonicalGraphPlaneSnapshot | null
+  ): SymbolStats {
+    if (!canonicalSnapshot) {
+      return {
+        total: 0,
+        documented: 0,
+        undocumented: 0,
+        coverage: 0,
+        sourceTotal: 0,
+        sourceDocumented: 0,
+        sourceCoverage: 0,
+        testTotal: 0,
+        byType: {},
+      };
+    }
+
+    const byType: Record<string, number> = {};
+    for (const node of canonicalSnapshot.filteredNodes) {
+      byType[node.kind] = (byType[node.kind] ?? 0) + 1;
+    }
+    const total = canonicalSnapshot.filteredNodes.length;
+    return {
+      total,
+      documented: 0,
+      undocumented: total,
+      coverage: 0,
+      sourceTotal: total,
+      sourceDocumented: 0,
+      sourceCoverage: 0,
+      testTotal: 0,
+      byType,
+    };
+  }
+
+  private toCanonicalStatus(snapshot: CanonicalGraphPlaneSnapshot | null): CanonicalGraphStatus {
+    if (!snapshot) {
+      return {
+        available: false,
+        retainedRevisions: 0,
+        internalNodes: 0,
+        internalEdges: 0,
+        totalNodes: 0,
+        totalEdges: 0,
+        density: 0,
+      };
+    }
+
+    const density =
+      snapshot.internalNodes > 0
+        ? Math.round((snapshot.internalEdges / snapshot.internalNodes) * 100) / 100
+        : 0;
+
+    return {
+      available: true,
+      databasePath: snapshot.displayPath,
+      sizeBytes: snapshot.sizeBytes,
+      activeRevisionId: snapshot.activeRevisionId,
+      retainedRevisions: snapshot.retainedRevisions,
+      storedAt: snapshot.storedAt,
+      internalNodes: snapshot.internalNodes,
+      internalEdges: snapshot.internalEdges,
+      totalNodes: snapshot.totalNodes,
+      totalEdges: snapshot.totalEdges,
+      density,
+    };
+  }
+
+  private toSpecStatus(snapshot: SpecGraphPlaneSnapshot | null): SpecGraphStatus {
+    if (!snapshot) {
+      return {
+        available: false,
+        retainedRevisions: 0,
+        nodes: 0,
+        edges: 0,
+        bindings: 0,
+      };
+    }
+
+    return {
+      available: true,
+      databasePath: snapshot.displayPath,
+      sizeBytes: snapshot.sizeBytes,
+      activeRevisionId: snapshot.activeRevisionId,
+      retainedRevisions: snapshot.retainedRevisions,
+      storedAt: snapshot.storedAt,
+      nodes: snapshot.nodeCount,
+      edges: snapshot.edgeCount,
+      bindings: snapshot.bindingCount,
+    };
+  }
+
   private getSymbolStats(dbManager: DatabaseManager): SymbolStats {
-    // Use Drizzle ORM methods
     const allSymbols = dbManager.getAllSymbolRows();
 
     const total = allSymbols.length;
@@ -145,7 +259,6 @@ Options:
         s.type !== 'test-case' && s.type !== 'test-suite' && s.summary && s.summary.trim() !== ''
     ).length;
 
-    // Count by type using Drizzle
     const byTypeData = dbManager.countSymbolsByType();
     const byType: Record<string, number> = {};
     for (const row of byTypeData) {
@@ -167,7 +280,6 @@ Options:
   }
 
   private getRelationshipStats(dbManager: DatabaseManager): RelationshipStats {
-    // Use Drizzle ORM methods
     const total = dbManager.countRelationships();
 
     const byTypeData = dbManager.countRelationshipsByType();
@@ -235,13 +347,12 @@ Options:
     return files;
   }
 
-  private getValidationStatus(): ValidationStatus {
-    // Check for common issues
+  private getValidationStatus(canonicalGraph: CanonicalGraphStatus): ValidationStatus {
     const issues: string[] = [];
 
     const dbPath = this.getDatabasePath();
-    if (!fs.existsSync(dbPath)) {
-      issues.push('Database not found');
+    if (!fs.existsSync(dbPath) && !canonicalGraph.available) {
+      issues.push('No symbol or canonical graph database found');
     }
 
     const configPath = path.resolve(process.cwd(), '.tsdoc.config.json');
@@ -259,30 +370,41 @@ Options:
   private calculateHealth(
     symbols: SymbolStats,
     relationships: RelationshipStats,
+    canonicalGraph: CanonicalGraphStatus,
     documents: DocumentStats
   ): HealthStatus {
     let score = 100;
     const factors: string[] = [];
 
-    // Documentation coverage
-    if (symbols.coverage < 50) {
-      score -= 20;
-      factors.push(`Low doc coverage (${symbols.coverage}%)`);
-    } else if (symbols.coverage < 75) {
-      score -= 10;
-      factors.push(`Medium doc coverage (${symbols.coverage}%)`);
+    const effectiveDocCoverage =
+      symbols.sourceTotal > 0 ? symbols.sourceCoverage : symbols.coverage;
+    if (symbols.total > 0) {
+      if (effectiveDocCoverage < 50) {
+        score -= 20;
+        factors.push(`Low source doc coverage (${effectiveDocCoverage}%)`);
+      } else if (effectiveDocCoverage < 75) {
+        score -= 10;
+        factors.push(`Medium source doc coverage (${effectiveDocCoverage}%)`);
+      }
     }
 
-    // Relationship density
-    if (relationships.density < 5) {
-      score -= 15;
-      factors.push(`Low relationship density (${relationships.density})`);
+    if (canonicalGraph.available) {
+      if (canonicalGraph.density < 1.0 && relationships.density < 1.0) {
+        score -= 15;
+        factors.push(`Low canonical graph density (${canonicalGraph.density})`);
+      }
+    } else {
+      score -= 5;
+      factors.push('Canonical @ttsc/graph not built (run tsdoc-edge sync)');
+      if (relationships.density < 1.5) {
+        score -= 10;
+        factors.push(`Low relationship density (${relationships.density})`);
+      }
     }
 
-    // Document symbols
-    if (documents.coverage < 80) {
+    if (documents.total > 0 && documents.coverage < 80) {
       score -= 10;
-      factors.push(`Document symbol coverage (${documents.coverage}%)`);
+      factors.push(`Document [[Symbol]] coverage (${documents.coverage}%)`);
     }
 
     let grade: string;
@@ -296,19 +418,26 @@ Options:
   }
 
   private outputCompact(status: SystemStatus): void {
-    const { symbols, relationships, documents, health } = status;
+    const { symbols, relationships, canonicalGraph, specGraph, documents, health } = status;
+    const canonicalSegment = canonicalGraph.available
+      ? `Canonical: ${colors.cyan}${canonicalGraph.internalNodes.toLocaleString()}${colors.reset}/${colors.cyan}${canonicalGraph.internalEdges.toLocaleString()}${colors.reset} | `
+      : '';
+    const specSegment = specGraph.available
+      ? `Specs: ${colors.cyan}${specGraph.nodes}${colors.reset} (${specGraph.bindings} bindings) | `
+      : '';
     console.log(
       `${colors.bold}TSDoc Edge${colors.reset} | ` +
         `Symbols: ${colors.cyan}${symbols.total.toLocaleString()}${colors.reset} | ` +
-        `Relationships: ${colors.cyan}${relationships.total.toLocaleString()}${colors.reset} | ` +
-        `Types: ${colors.cyan}${relationships.types}${colors.reset} | ` +
+        canonicalSegment +
+        `Enrichment Rels: ${colors.cyan}${relationships.total.toLocaleString()}${colors.reset} | ` +
+        specSegment +
         `Docs: ${colors.cyan}${documents.total}${colors.reset} | ` +
-        `Health: ${this.colorGrade(health.grade)}`
+        `Health: ${this.colorGrade(health.grade)} (${health.score}/100)`
     );
   }
 
   private outputFull(status: SystemStatus): void {
-    const { symbols, relationships, documents, health } = status;
+    const { symbols, relationships, canonicalGraph, specGraph, documents, health } = status;
 
     this.printHeader('TSDoc Edge - System Status');
     console.log(`${colors.dim}Generated: ${status.timestamp}${colors.reset}`);
@@ -325,59 +454,84 @@ Options:
     }
     console.log();
 
-    // Quick Stats
-    this.printSection('Quick Stats');
-    console.log(`  Symbols:        ${colors.cyan}${symbols.total.toLocaleString()}${colors.reset}`);
+    // 3-Layer SSOT Planes
+    this.printSection('SSOT Planes');
+    if (canonicalGraph.available) {
+      const sizeMB = ((canonicalGraph.sizeBytes ?? 0) / (1024 * 1024)).toFixed(1);
+      const revShort = (canonicalGraph.activeRevisionId ?? '').slice(0, 12);
+      console.log(
+        `  Canonical @ttsc/graph: ${colors.green}active${colors.reset} (${revShort}…, ${canonicalGraph.retainedRevisions} retained, ${sizeMB} MB)`
+      );
+      console.log(
+        `    Internal Graph:      ${colors.cyan}${canonicalGraph.internalNodes.toLocaleString()}${colors.reset} nodes / ${colors.cyan}${canonicalGraph.internalEdges.toLocaleString()}${colors.reset} edges (${canonicalGraph.density} edges/node)`
+      );
+      console.log(
+        `    Total (w/ external): ${colors.dim}${canonicalGraph.totalNodes.toLocaleString()} nodes / ${canonicalGraph.totalEdges.toLocaleString()} edges${colors.reset}`
+      );
+    } else {
+      console.log(
+        `  Canonical @ttsc/graph: ${colors.yellow}not built${colors.reset} (run ${colors.cyan}tsdoc-edge sync${colors.reset})`
+      );
+    }
+
+    if (specGraph.available) {
+      const revShort = (specGraph.activeRevisionId ?? '').slice(0, 12);
+      console.log(
+        `  SpecGraph:             ${colors.green}active${colors.reset} (${revShort}…, ${specGraph.nodes} spec nodes, ${specGraph.bindings} bindings)`
+      );
+    } else {
+      console.log(`  SpecGraph:             ${colors.dim}not compiled${colors.reset}`);
+    }
+
     console.log(
-      `  Relationships:  ${colors.cyan}${relationships.total.toLocaleString()}${colors.reset}`
-    );
-    console.log(
-      `  Types:          ${colors.cyan}${relationships.types}${colors.reset} (${relationships.categories} categories)`
-    );
-    console.log(`  Documents:      ${colors.cyan}${documents.total}${colors.reset}`);
-    console.log(
-      `  Graph Density:  ${colors.cyan}${relationships.density}${colors.reset} rels/symbol`
+      `  Enrichment Symbol DB:  ${colors.cyan}${symbols.total.toLocaleString()}${colors.reset} symbols / ${colors.cyan}${relationships.total.toLocaleString()}${colors.reset} domain+test relationships`
     );
     console.log();
 
     // Symbol Distribution
     this.printSection('Symbol Distribution');
-    console.log(
-      `  ${colors.bold}Overall:${colors.reset}        ${colors.green}${symbols.documented.toLocaleString()}${colors.reset} / ${symbols.total.toLocaleString()} (${symbols.coverage}%)`
-    );
-    console.log(
-      `  ${colors.bold}Source Code:${colors.reset}    ${colors.green}${symbols.sourceDocumented.toLocaleString()}${colors.reset} / ${symbols.sourceTotal.toLocaleString()} (${symbols.sourceCoverage}%)`
-    );
-    console.log(
-      `  ${colors.dim}Test Symbols:   ${symbols.testTotal.toLocaleString()} (${Math.round((symbols.testTotal / symbols.total) * 1000) / 10}% of total)${colors.reset}`
-    );
-    const topTypes = Object.entries(symbols.byType).slice(0, 5);
-    if (topTypes.length > 0) {
-      console.log(`  Top types:`);
-      for (const [type, count] of topTypes) {
-        const pct = Math.round((count / symbols.total) * 1000) / 10;
-        console.log(
-          `    ${type}: ${colors.cyan}${count.toLocaleString()}${colors.reset} (${pct}%)`
-        );
+    if (symbols.total > 0) {
+      console.log(
+        `  ${colors.bold}Overall:${colors.reset}        ${colors.green}${symbols.documented.toLocaleString()}${colors.reset} / ${symbols.total.toLocaleString()} (${symbols.coverage}%)`
+      );
+      console.log(
+        `  ${colors.bold}Source Code:${colors.reset}    ${colors.green}${symbols.sourceDocumented.toLocaleString()}${colors.reset} / ${symbols.sourceTotal.toLocaleString()} (${symbols.sourceCoverage}%)`
+      );
+      console.log(
+        `  ${colors.dim}Test Symbols:   ${symbols.testTotal.toLocaleString()} (${Math.round((symbols.testTotal / symbols.total) * 1000) / 10}% of total)${colors.reset}`
+      );
+      const topTypes = Object.entries(symbols.byType).slice(0, 5);
+      if (topTypes.length > 0) {
+        console.log(`  Top types:`);
+        for (const [type, count] of topTypes) {
+          const pct = Math.round((count / symbols.total) * 1000) / 10;
+          console.log(
+            `    ${type}: ${colors.cyan}${count.toLocaleString()}${colors.reset} (${pct}%)`
+          );
+        }
       }
+    } else {
+      console.log(`  ${colors.dim}No symbols indexed${colors.reset}`);
     }
     console.log();
 
-    // Relationship Distribution
-    this.printSection('Relationship Distribution');
-    const topCategories = Object.entries(relationships.byCategory).slice(0, 5);
-    for (const [category, count] of topCategories) {
-      const pct = Math.round((count / relationships.total) * 1000) / 10;
-      const bar = this.progressBar(pct, 20);
-      console.log(
-        `  ${category.padEnd(15)} ${bar} ${colors.cyan}${count.toLocaleString()}${colors.reset} (${pct}%)`
-      );
+    // Enrichment Relationship Distribution
+    if (relationships.total > 0) {
+      this.printSection('Domain & Test Relationship Distribution');
+      const topCategories = Object.entries(relationships.byCategory).slice(0, 5);
+      for (const [category, count] of topCategories) {
+        const pct = Math.round((count / relationships.total) * 1000) / 10;
+        const bar = this.progressBar(pct, 20);
+        console.log(
+          `  ${category.padEnd(15)} ${bar} ${colors.cyan}${count.toLocaleString()}${colors.reset} (${pct}%)`
+        );
+      }
+      console.log();
     }
-    console.log();
 
     // Document Status
     this.printSection('Document Status');
-    console.log(`  Total docs:     ${colors.cyan}${documents.total}${colors.reset}`);
+    console.log(`  Total docs:      ${colors.cyan}${documents.total}${colors.reset}`);
     console.log(
       `  With [[Symbol]]: ${colors.green}${documents.withSymbols}${colors.reset} (${documents.coverage}%)`
     );
@@ -394,9 +548,18 @@ Options:
 
     // Quick Commands
     this.printSection('Quick Commands');
-    console.log(`  ${colors.dim}tsdoc-edge wc <file>${colors.reset}     Work context for a file`);
-    console.log(`  ${colors.dim}tsdoc-edge health <path>${colors.reset}  Health report`);
-    console.log(`  ${colors.dim}tsdoc-edge validate-docs${colors.reset}  Validate documents`);
+    console.log(
+      `  ${colors.dim}tsdoc-edge sync${colors.reset}                             Sync symbol DB, canonical graph, specs, and backlinks`
+    );
+    console.log(
+      `  ${colors.dim}tsdoc-edge wc <file> --llm${colors.reset}                  Full work context before editing a file`
+    );
+    console.log(
+      `  ${colors.dim}tsdoc-edge dc <file>${colors.reset}                        Normative specs, contracts, and ADRs`
+    );
+    console.log(
+      `  ${colors.dim}tsdoc-edge convention check --pack <file>${colors.reset}   Check revision-pinned conventions`
+    );
   }
 
   private colorGrade(grade: string): string {
@@ -444,6 +607,34 @@ interface RelationshipStats {
   byCategory: Record<string, number>;
 }
 
+/** Canonical `@ttsc/graph` status */
+interface CanonicalGraphStatus {
+  available: boolean;
+  databasePath?: string;
+  sizeBytes?: number;
+  activeRevisionId?: string;
+  retainedRevisions: number;
+  storedAt?: string;
+  internalNodes: number;
+  internalEdges: number;
+  totalNodes: number;
+  totalEdges: number;
+  density: number;
+}
+
+/** SpecGraph projection status */
+interface SpecGraphStatus {
+  available: boolean;
+  databasePath?: string;
+  sizeBytes?: number;
+  activeRevisionId?: string;
+  retainedRevisions: number;
+  storedAt?: string;
+  nodes: number;
+  edges: number;
+  bindings: number;
+}
+
 /** Document statistics for system status */
 interface DocumentStats {
   total: number;
@@ -470,6 +661,8 @@ interface SystemStatus {
   timestamp: string;
   symbols: SymbolStats;
   relationships: RelationshipStats;
+  canonicalGraph: CanonicalGraphStatus;
+  specGraph: SpecGraphStatus;
   documents: DocumentStats;
   validation: ValidationStatus;
   health: HealthStatus;

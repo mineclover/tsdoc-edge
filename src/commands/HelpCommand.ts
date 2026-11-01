@@ -85,6 +85,7 @@ export class HelpCommand extends BaseCommand {
         { name: 'connectivity', description: 'Check symbol connectivity' },
         { name: 'refs', description: 'Validate symbol references' },
         { name: 'spec', description: 'Validate specification files' },
+        { name: 'tsdoc', description: 'Validate TSDoc syntax and tsdoc.json configuration' },
       ],
     },
     {
@@ -111,6 +112,7 @@ export class HelpCommand extends BaseCommand {
         { name: 'diff', description: 'Compare specification versions' },
         { name: 'bump', description: 'Bump specification version' },
         { name: 'validate', description: 'Validate specifications' },
+        { name: 'metrics', description: 'Display specification metrics dashboard' },
         { name: 'extract', description: 'Compile managed project specs into SpecGraph' },
         { name: 'graph', description: 'Inspect saved SpecGraph revisions read-only' },
       ],
@@ -184,7 +186,10 @@ export class HelpCommand extends BaseCommand {
       // Show help for specific unified command
       if (specificCommand) {
         const group = this.unifiedCommands.find(
-          (g) => g.name === specificCommand || g.alias === specificCommand
+          (g) =>
+            g.name === specificCommand ||
+            g.alias === specificCommand ||
+            (g.name === 'validate' && specificCommand === 'val')
         );
         if (group) {
           this.printUnifiedCommandHelp(group);
@@ -303,7 +308,9 @@ export class HelpCommand extends BaseCommand {
       console.log(
         `  1. ${colors.cyan}tsdoc-edge init${colors.reset}        Initialize your project`
       );
-      console.log(`  2. ${colors.cyan}tsdoc-edge build src${colors.reset}   Build symbol database`);
+      console.log(
+        `  2. ${colors.cyan}tsdoc-edge sync${colors.reset}        Sync symbols, canonical graph, specs, and backlinks`
+      );
       console.log(
         `  3. ${colors.cyan}tsdoc-edge wc <file>${colors.reset}   Get context before editing`
       );
