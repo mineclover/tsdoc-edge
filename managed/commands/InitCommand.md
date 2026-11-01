@@ -382,7 +382,7 @@ if (configManager.exists()) {
 
 ### Referenced By
 
-- [[CLI Commands]] → managed/CLI-COMMANDS.md:39
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:53
 - [[CoreWorkflow]] → managed/features/core-workflow.md:72
 - [[TsdocEdgeConfig]] → managed/primary-types/TsdocEdgeConfig.md:108
 - [[ConfigLoader]] → managed/utilities/ConfigLoader.md:137

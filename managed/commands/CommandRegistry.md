@@ -34,7 +34,7 @@ Central registry for all CLI commands.
 
 ### Referenced By
 
-- [[CLI Commands]] → managed/CLI-COMMANDS.md:43
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:61
 - [[BaseCommand]] → managed/commands/BaseCommand.md:99
 - [[HelpCommand]] → managed/commands/HelpCommand.md:29
 - [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:19

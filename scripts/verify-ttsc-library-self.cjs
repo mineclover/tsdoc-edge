@@ -4,6 +4,7 @@
 /** Proves the current checkout's public library API matches the CLI result. */
 
 const childProcess = require('node:child_process');
+const crypto = require('node:crypto');
 const fs = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
@@ -114,12 +115,18 @@ function snapshotState() {
   return ['.tsdoc/canonical-graph.db', '.tsdoc/registry.jsonl', '.tsdoc/symbols.db'].flatMap(
     (relativePath) =>
       [relativePath, `${relativePath}-wal`, `${relativePath}-shm`, `${relativePath}-journal`].map(
-        (candidate) => ({
-          file: candidate,
-          content: fs.existsSync(path.join(projectRoot, candidate))
-            ? fs.readFileSync(path.join(projectRoot, candidate)).toString('base64')
-            : null,
-        })
+        (candidate) => {
+          const fullPath = path.join(projectRoot, candidate);
+          const exists = fs.existsSync(fullPath);
+          return {
+            file: candidate,
+            exists,
+            size: exists ? fs.statSync(fullPath).size : null,
+            digest: exists
+              ? crypto.createHash('sha256').update(fs.readFileSync(fullPath)).digest('hex')
+              : null,
+          };
+        }
       )
   );
 }

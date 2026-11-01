@@ -35,7 +35,39 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import Database from 'better-sqlite3';
 import { ERROR_MESSAGES } from '../constants.js';
-import type { OntologyStats, Relationship, Symbol } from '../types.js';
+import type { ImpactNode, ImpactResult, OntologyStats, Relationship, Symbol } from '../types.js';
+
+interface CanonicalNode {
+  id: string;
+  kind: string;
+  name?: string;
+  qualifiedName?: string;
+  file?: string;
+  exported?: boolean;
+  external?: boolean;
+  evidence?: { startLine?: number };
+}
+
+interface CanonicalEdge {
+  kind: string;
+  from: string;
+  to: string;
+  evidence?: Record<string, unknown>;
+}
+
+interface CanonicalSnapshot {
+  revisionId: string;
+  nodes: CanonicalNode[];
+  edges: CanonicalEdge[];
+  aliases: Array<{ canonicalId: string; legacyId: string }>;
+}
+
+interface SpecSnapshot {
+  revisionId: string;
+  nodes: Array<Record<string, unknown>>;
+  edges: Array<Record<string, unknown>>;
+  bindings: Array<Record<string, unknown>>;
+}
 
 /**
  * Service for direct TSDoc Edge database access
@@ -84,6 +116,10 @@ export class TsDocService {
   private readonly workspaceRoot: string;
   private dbPath: string;
   private db: Database.Database | null = null;
+  private canonicalDb: Database.Database | null = null;
+  private specDb: Database.Database | null = null;
+  private readonly canonicalDbPath: string;
+  private readonly specDbPath: string;
   private relationshipsCache: Relationship[] | null = null;
 
   /**
@@ -101,6 +137,175 @@ export class TsDocService {
   constructor(workspaceRoot?: string) {
     this.workspaceRoot = path.resolve(workspaceRoot || process.cwd());
     this.dbPath = this.resolveDatabasePath(this.workspaceRoot);
+    this.canonicalDbPath = this.resolveCanonicalGraphPath(this.workspaceRoot);
+    this.specDbPath = path.join(this.workspaceRoot, '.tsdoc', 'spec-graph.db');
+  }
+
+  /** Resolve the canonical graph database path from project configuration. @internal */
+  private resolveCanonicalGraphPath(rootDir: string): string {
+    const configPath = path.join(rootDir, '.tsdoc.config.json');
+    if (fs.existsSync(configPath)) {
+      try {
+        const parsed = JSON.parse(fs.readFileSync(configPath, 'utf-8')) as {
+          canonicalGraph?: { databasePath?: string };
+        };
+        if (parsed.canonicalGraph?.databasePath) {
+          return path.resolve(rootDir, parsed.canonicalGraph.databasePath);
+        }
+      } catch {
+        // Use the canonical default below.
+      }
+    }
+    return path.join(rootDir, '.tsdoc', 'canonical-graph.db');
+  }
+
+  /** Open the canonical graph database only when it exists. @internal */
+  private getCanonicalDb(): Database.Database | null {
+    if (!fs.existsSync(this.canonicalDbPath)) return null;
+    if (!this.canonicalDb) {
+      this.canonicalDb = new Database(this.canonicalDbPath, {
+        readonly: true,
+        fileMustExist: true,
+      });
+    }
+    return this.canonicalDb;
+  }
+
+  /** Open the specification graph database only when it exists. @internal */
+  private getSpecDb(): Database.Database | null {
+    if (!fs.existsSync(this.specDbPath)) return null;
+    if (!this.specDb) {
+      this.specDb = new Database(this.specDbPath, { readonly: true, fileMustExist: true });
+    }
+    return this.specDb;
+  }
+
+  /** Read the active canonical graph revision in one read-only snapshot. @internal */
+  private getCanonicalSnapshot(): CanonicalSnapshot | null {
+    const db = this.getCanonicalDb();
+    if (!db) return null;
+    const state = db
+      .prepare('SELECT active_revision_id FROM canonical_graph_state WHERE singleton = 1')
+      .get() as { active_revision_id: string } | undefined;
+    if (!state) return null;
+    const nodes = db
+      .prepare(
+        'SELECT payload_json FROM canonical_graph_nodes WHERE revision_id = ? ORDER BY ordinal'
+      )
+      .all(state.active_revision_id)
+      .map(
+        (row) => JSON.parse(String((row as { payload_json: string }).payload_json)) as CanonicalNode
+      );
+    const edges = db
+      .prepare(
+        'SELECT payload_json FROM canonical_graph_edges WHERE revision_id = ? ORDER BY ordinal'
+      )
+      .all(state.active_revision_id)
+      .map(
+        (row) => JSON.parse(String((row as { payload_json: string }).payload_json)) as CanonicalEdge
+      );
+    const aliases = db
+      .prepare('SELECT canonical_id, legacy_id FROM canonical_symbol_aliases WHERE revision_id = ?')
+      .all(state.active_revision_id) as Array<{ canonical_id: string; legacy_id: string }>;
+    return {
+      revisionId: state.active_revision_id,
+      nodes,
+      edges,
+      aliases: aliases.map((alias) => ({
+        canonicalId: alias.canonical_id,
+        legacyId: alias.legacy_id,
+      })),
+    };
+  }
+
+  /** Read the active specification graph revision. @internal */
+  private getSpecSnapshot(): SpecSnapshot | null {
+    const db = this.getSpecDb();
+    if (!db) return null;
+    const state = db
+      .prepare('SELECT active_revision_id FROM spec_graph_state WHERE singleton = 1')
+      .get() as { active_revision_id: string } | undefined;
+    if (!state) return null;
+    const row = db
+      .prepare('SELECT payload_json FROM spec_graph_revisions WHERE revision_id = ?')
+      .get(state.active_revision_id) as { payload_json: string } | undefined;
+    if (!row) return null;
+    const payload = JSON.parse(row.payload_json) as {
+      nodes?: Array<Record<string, unknown>>;
+      edges?: Array<Record<string, unknown>>;
+      bindings?: Array<Record<string, unknown>>;
+    };
+    return {
+      revisionId: state.active_revision_id,
+      nodes: payload.nodes ?? [],
+      edges: payload.edges ?? [],
+      bindings: payload.bindings ?? [],
+    };
+  }
+
+  /** Identify canonical external and standard-library nodes. @internal */
+  private isExternalNode(node: CanonicalNode): boolean {
+    return (
+      node.external === true ||
+      /(^|\/)(node_modules|libs)(\/|:)/.test(node.file ?? '') ||
+      (node.file ?? '').includes('/bundled:')
+    );
+  }
+
+  /** Convert a canonical node to the stable MCP symbol shape. @internal */
+  private mapCanonicalNode(node: CanonicalNode, snapshot: CanonicalSnapshot): Symbol {
+    const legacyId = snapshot.aliases.find((alias) => alias.canonicalId === node.id)?.legacyId;
+    return {
+      id: legacyId ?? node.id,
+      canonicalId: node.id,
+      name: node.name ?? node.qualifiedName?.split('.').pop() ?? node.id,
+      type: node.kind,
+      kind: node.kind,
+      ...(node.file ? { filePath: node.file } : {}),
+      ...(node.evidence?.startLine ? { line: node.evidence.startLine } : {}),
+      ...(node.exported !== undefined ? { isExported: node.exported } : {}),
+      ...(node.external !== undefined ? { external: node.external } : {}),
+    };
+  }
+
+  /** Resolve a requested identifier against canonical IDs and aliases. @internal */
+  private resolveCanonicalId(value: string, snapshot: CanonicalSnapshot): string | null {
+    if (snapshot.nodes.some((node) => node.id === value)) return value;
+    const alias = snapshot.aliases.find((entry) => entry.legacyId === value);
+    if (alias) return alias.canonicalId;
+    const lower = value.toLowerCase();
+    const node = snapshot.nodes.find((entry) => (entry.name ?? '').toLowerCase() === lower);
+    return node?.id ?? null;
+  }
+
+  /** Convert canonical edges into the backwards-compatible relationship shape. @internal */
+  private canonicalRelationships(
+    snapshot: CanonicalSnapshot,
+    includeExternal: boolean
+  ): Relationship[] {
+    const nodes = new Map(snapshot.nodes.map((node) => [node.id, node]));
+    const aliases = new Map(snapshot.aliases.map((alias) => [alias.canonicalId, alias.legacyId]));
+    return snapshot.edges
+      .filter((edge) => {
+        const from = nodes.get(edge.from);
+        const to = nodes.get(edge.to);
+        return Boolean(
+          from &&
+            to &&
+            (includeExternal || (!this.isExternalNode(from) && !this.isExternalNode(to)))
+        );
+      })
+      .map((edge) => ({
+        id: `canonical:${edge.kind}:${edge.from}:${edge.to}`,
+        type: edge.kind,
+        category: 'structural',
+        direction: 'unidirectional',
+        strength: 'strong',
+        from: aliases.get(edge.from) ?? edge.from,
+        to: aliases.get(edge.to) ?? edge.to,
+        confidence: 1,
+        properties: { canonical: true, evidence: edge.evidence },
+      }));
   }
 
   /**
@@ -155,7 +360,7 @@ export class TsDocService {
     if (!fs.existsSync(this.dbPath)) {
       this.dbPath = this.resolveDatabasePath(this.workspaceRoot);
     }
-    return fs.existsSync(this.dbPath);
+    return fs.existsSync(this.dbPath) || this.getCanonicalSnapshot() !== null;
   }
 
   /**
@@ -179,7 +384,7 @@ export class TsDocService {
     }
 
     if (!this.db) {
-      this.db = new Database(this.dbPath, { readonly: true });
+      this.db = new Database(this.dbPath, { readonly: true, fileMustExist: true });
     }
 
     return this.db;
@@ -200,6 +405,14 @@ export class TsDocService {
     if (this.db) {
       this.db.close();
       this.db = null;
+    }
+    if (this.canonicalDb) {
+      this.canonicalDb.close();
+      this.canonicalDb = null;
+    }
+    if (this.specDb) {
+      this.specDb.close();
+      this.specDb = null;
     }
     // Clear cache
     this.relationshipsCache = null;
@@ -316,7 +529,49 @@ export class TsDocService {
    *
    * @public
    */
-  async getOntologyStats(_detailed: boolean = false): Promise<OntologyStats> {
+  async getOntologyStats(
+    _detailed: boolean = false,
+    includeExternal: boolean = false
+  ): Promise<OntologyStats> {
+    const canonical = this.getCanonicalSnapshot();
+    if (canonical) {
+      const nodes = canonical.nodes.filter((node) => includeExternal || !this.isExternalNode(node));
+      const relationships = this.canonicalRelationships(canonical, includeExternal);
+      const byType = new Map<string, number>();
+      for (const node of nodes) byType.set(node.kind, (byType.get(node.kind) ?? 0) + 1);
+      const byRelType = new Map<string, number>();
+      for (const rel of relationships) byRelType.set(rel.type, (byRelType.get(rel.type) ?? 0) + 1);
+      const degree = new Map<string, number>();
+      for (const rel of relationships) {
+        for (const id of [rel.from, rel.to])
+          degree.set(String(id), (degree.get(String(id)) ?? 0) + 1);
+      }
+      const degrees = [...degree.values()];
+      return {
+        nodes: {
+          total: nodes.length,
+          byType: Object.fromEntries(byType),
+          byKind: Object.fromEntries(byType),
+        },
+        relationships: {
+          total: relationships.length,
+          byType: Object.fromEntries(byRelType),
+          byCategory: { structural: relationships.length },
+          byStrength: { strong: relationships.length },
+          byDirection: { unidirectional: relationships.length },
+          explicit: relationships.length,
+          inferred: 0,
+        },
+        metrics: {
+          density: nodes.length ? relationships.length / nodes.length : 0,
+          avgDegree: degrees.length
+            ? degrees.reduce((sum, value) => sum + value, 0) / degrees.length
+            : 0,
+          maxDegree: degrees.length ? Math.max(...degrees) : 0,
+          coverage: nodes.length ? (degree.size / nodes.length) * 100 : 0,
+        },
+      };
+    }
     const db = this.getDb();
 
     // Get all symbols
@@ -460,8 +715,12 @@ export class TsDocService {
     to?: string;
     limit?: number;
     offset?: number;
+    includeExternal?: boolean;
   }): Promise<{ total: number; relationships: Relationship[] }> {
-    let relationships = this.getAllUnifiedRelationships();
+    const canonical = this.getCanonicalSnapshot();
+    let relationships = canonical
+      ? this.canonicalRelationships(canonical, params.includeExternal ?? false)
+      : this.getAllUnifiedRelationships();
 
     // Apply filters
     if (params.type) {
@@ -551,7 +810,28 @@ export class TsDocService {
     type?: string;
     limit?: number;
     offset?: number;
+    includeExternal?: boolean;
   }): Promise<{ total: number; nodes: Symbol[] }> {
+    const canonical = this.getCanonicalSnapshot();
+    if (canonical) {
+      let nodes = canonical.nodes
+        .filter((node) => params.includeExternal || !this.isExternalNode(node))
+        .map((node) => this.mapCanonicalNode(node, canonical));
+      if (params.type) nodes = nodes.filter((node) => node.type === params.type);
+      if (params.query) {
+        const query = params.query.toLowerCase();
+        nodes = nodes.filter(
+          (node) =>
+            node.name.toLowerCase().includes(query) ||
+            node.id.toLowerCase().includes(query) ||
+            node.canonicalId?.toLowerCase().includes(query)
+        );
+      }
+      nodes.sort((left, right) => left.name.localeCompare(right.name));
+      const total = nodes.length;
+      const offset = params.offset ?? 0;
+      return { total, nodes: nodes.slice(offset, offset + (params.limit ?? 20)) };
+    }
     const db = this.getDb();
 
     let sql = 'SELECT * FROM symbols';
@@ -606,7 +886,44 @@ export class TsDocService {
    *
    * @public
    */
-  async getWorkContext(filePath: string, _depth: number = 2): Promise<string> {
+  async getWorkContext(
+    filePath: string,
+    _depth: number = 2,
+    includeExternal: boolean = false
+  ): Promise<string> {
+    const canonical = this.getCanonicalSnapshot();
+    if (canonical) {
+      const normalizedPath = path.isAbsolute(filePath)
+        ? path.relative(this.workspaceRoot, filePath)
+        : filePath;
+      const symbols = canonical.nodes
+        .filter(
+          (node) => node.file === normalizedPath && (includeExternal || !this.isExternalNode(node))
+        )
+        .map((node) => this.mapCanonicalNode(node, canonical));
+      if (symbols.length === 0) {
+        return `# Work Context\n\nNo symbols found in file: ${filePath}\n\nPlease ensure the file has been indexed with: tsdoc-edge build src`;
+      }
+      const ids = new Set(symbols.map((symbol) => symbol.canonicalId ?? symbol.id));
+      const relationships = this.canonicalRelationships(canonical, includeExternal).filter(
+        (rel) => {
+          const from = Array.isArray(rel.from) ? rel.from : [rel.from];
+          const to = Array.isArray(rel.to) ? rel.to : [rel.to];
+          return (
+            from.some((id) => ids.has(String(id)) || symbols.some((symbol) => symbol.id === id)) ||
+            to.some((id) => ids.has(String(id)) || symbols.some((symbol) => symbol.id === id))
+          );
+        }
+      );
+      let markdown = `# Work Context: ${path.basename(filePath)}\n\nFile: ${filePath}\n\n## Summary\n\n`;
+      markdown += `- **Symbols**: ${symbols.length}\n- **Relationships**: ${relationships.length}\n- **Density**: ${(relationships.length / symbols.length).toFixed(2)}\n- **Graph**: canonical revision \`${canonical.revisionId}\`\n\n## Symbols\n\n`;
+      for (const symbol of symbols.slice(0, 20))
+        markdown += `- **${symbol.name}** (${symbol.type})\n`;
+      markdown += '\n## Relationships\n\n';
+      for (const rel of relationships.slice(0, 50))
+        markdown += `- **${rel.type}**: ${String(rel.from)} → ${String(rel.to)}\n`;
+      return markdown;
+    }
     const db = this.getDb();
 
     // Normalize path relative to workspaceRoot
@@ -676,7 +993,33 @@ export class TsDocService {
    *
    * @public
    */
-  async getDesignContext(filePath: string): Promise<string> {
+  async getDesignContext(filePath: string, includeExternal: boolean = false): Promise<string> {
+    const canonicalOnly = this.getCanonicalSnapshot();
+    if (!fs.existsSync(this.dbPath) && canonicalOnly) {
+      const normalizedPath = path.isAbsolute(filePath)
+        ? path.relative(this.workspaceRoot, filePath)
+        : filePath;
+      const symbols = canonicalOnly.nodes
+        .filter(
+          (node) => node.file === normalizedPath && (includeExternal || !this.isExternalNode(node))
+        )
+        .map((node) => this.mapCanonicalNode(node, canonicalOnly));
+      let markdown = `# Design Context: ${path.basename(filePath)}\n\n- **File**: \`${normalizedPath}\`\n- **Symbols**: ${symbols.length}\n- **Contracts**: 0 | **Decisions**: 0 | **Errors**: 0 | **Plans**: 0\n- **Graph**: canonical revision \`${canonicalOnly.revisionId}\`\n\n`;
+      const spec = this.getSpecSnapshot();
+      if (spec) {
+        const canonicalIds = new Set(symbols.map((symbol) => symbol.canonicalId));
+        const bindings = spec.bindings.filter((binding) => {
+          const target = binding.target as Record<string, unknown> | undefined;
+          return (
+            typeof target?.canonicalNodeId === 'string' && canonicalIds.has(target.canonicalNodeId)
+          );
+        });
+        markdown += `## Normative Specification Bindings\n\n- **Revision**: \`${spec.revisionId}\`\n- **Bindings**: ${bindings.length}\n\n`;
+        for (const binding of bindings)
+          markdown += `- **${String(binding.kind)}** \`${String(binding.specNodeId)}\`\n`;
+      }
+      return markdown;
+    }
     const db = this.getDb();
     const normalizedPath = path.isAbsolute(filePath)
       ? path.relative(this.workspaceRoot, filePath)
@@ -758,6 +1101,41 @@ export class TsDocService {
     md += `- **Symbols**: ${symbols.length}\n`;
     md += `- **Related Docs**: ${docRefs.size}\n`;
     md += `- **Contracts**: ${contracts.length} | **Decisions**: ${decisions.length} | **Errors**: ${errors.length} | **Plans**: ${plans.length}\n\n`;
+
+    const spec = this.getSpecSnapshot();
+    if (spec) {
+      const canonical = this.getCanonicalSnapshot();
+      const canonicalIdsForFile = new Set(
+        canonical?.nodes.filter((node) => node.file === normalizedPath).map((node) => node.id) ?? []
+      );
+      const bindings = spec.bindings.filter((binding) => {
+        const target = binding.target as Record<string, unknown> | undefined;
+        const targetFile = typeof target?.file === 'string' ? target.file : undefined;
+        return (
+          includeExternal ||
+          !targetFile ||
+          !this.isExternalNode({ id: '', kind: '', file: targetFile })
+        );
+      });
+      const relevant = bindings.filter((binding) => {
+        const target = binding.target as Record<string, unknown> | undefined;
+        return (
+          target?.file === normalizedPath ||
+          symbols.some((symbol) => target?.canonicalNodeId === symbol.id) ||
+          (typeof target?.canonicalNodeId === 'string' &&
+            canonicalIdsForFile.has(target.canonicalNodeId))
+        );
+      });
+      md += `- **SpecGraph Revision**: \`${spec.revisionId}\`\n- **Normative Bindings**: ${relevant.length}\n\n`;
+      if (relevant.length > 0) {
+        md += '## Normative Specification Bindings\n\n';
+        for (const binding of relevant) {
+          const specNode = spec.nodes.find((node) => node.id === binding.specNodeId);
+          md += `- **${String(binding.kind)}** \`${String(binding.specNodeId)}\`: ${String(specNode?.title ?? '')}\n`;
+        }
+        md += '\n';
+      }
+    }
 
     if (docRefs.size > 0) {
       md += `## Related Documents\n\n`;
@@ -933,6 +1311,7 @@ export class TsDocService {
           symbolId: string;
           direction?: 'incoming' | 'outgoing' | 'both';
           maxDepth?: number;
+          includeExternal?: boolean;
         }
       | string,
     directionArg?: 'incoming' | 'outgoing' | 'both',
@@ -946,6 +1325,57 @@ export class TsDocService {
             maxDepth: maxDepthArg,
           }
         : paramsOrSymbolId;
+
+    const canonical = this.getCanonicalSnapshot();
+    if (canonical) {
+      const canonicalId = this.resolveCanonicalId(params.symbolId, canonical);
+      if (canonicalId) {
+        const aliases = new Map(
+          canonical.aliases.map((alias) => [alias.canonicalId, alias.legacyId])
+        );
+        const canonicalRelationships = this.canonicalRelationships(
+          canonical,
+          params.includeExternal ?? false
+        );
+        const selected = new Set<string>();
+        const queue: Array<{ id: string; depth: number }> = [{ id: canonicalId, depth: 0 }];
+        const visited = new Set<string>([canonicalId]);
+        while (queue.length > 0) {
+          const current = queue.shift();
+          if (!current || current.depth >= (params.maxDepth ?? 1)) continue;
+          for (const edge of canonical.edges) {
+            const forward =
+              params.direction === 'outgoing' || params.direction === 'both' || !params.direction;
+            const backward =
+              params.direction === 'incoming' || params.direction === 'both' || !params.direction;
+            const isForward = forward && edge.from === current.id;
+            const isBackward = backward && edge.to === current.id;
+            if (!isForward && !isBackward) continue;
+            const next = isForward ? edge.to : edge.from;
+            selected.add(`canonical:${edge.kind}:${edge.from}:${edge.to}`);
+            if (!visited.has(next)) {
+              visited.add(next);
+              queue.push({ id: next, depth: current.depth + 1 });
+            }
+          }
+        }
+        const rootIds = new Set([canonicalId, aliases.get(canonicalId) ?? canonicalId]);
+        const relationships = canonicalRelationships.filter((rel) => {
+          const from = Array.isArray(rel.from) ? rel.from : [rel.from];
+          const to = Array.isArray(rel.to) ? rel.to : [rel.to];
+          return (
+            selected.has(rel.id) ||
+            from.some((value) => rootIds.has(String(value))) ||
+            to.some((value) => rootIds.has(String(value)))
+          );
+        });
+        let markdown = '# Relationship Query\n\n';
+        markdown += `Symbol: ${canonicalId}\nDirection: ${params.direction || 'both'}\nFound: ${relationships.length} relationships\n\n`;
+        for (const rel of relationships.slice(0, 50))
+          markdown += `## ${rel.type}\n- From: ${String(rel.from)}\n- To: ${String(rel.to)}\n- Category: ${rel.category}\n- Strength: ${rel.strength}\n\n`;
+        return markdown;
+      }
+    }
 
     const resolvedSymbol = this.resolveSymbolRecord(params.symbolId);
     const targetSymbolId = resolvedSymbol?.id ?? params.symbolId;
@@ -999,6 +1429,7 @@ export class TsDocService {
    * Get detailed information for a symbol
    *
    * @param symbolId - Symbol ID, legacy `<type>-<name>` suffix, UUID, or symbol name
+   * @param includeExternal - Include canonical external and standard-library nodes
    * @returns Symbol details or null if not found
    *
    * @remarks
@@ -1020,7 +1451,199 @@ export class TsDocService {
    *
    * @public
    */
-  async getSymbolDetails(symbolId: string): Promise<Symbol | null> {
+  async getSymbolDetails(
+    symbolId: string,
+    includeExternal: boolean = false
+  ): Promise<Symbol | null> {
+    const canonical = this.getCanonicalSnapshot();
+    if (canonical) {
+      const canonicalId = this.resolveCanonicalId(symbolId, canonical);
+      const node = canonicalId
+        ? canonical.nodes.find((entry) => entry.id === canonicalId)
+        : undefined;
+      if (node && (includeExternal || !this.isExternalNode(node)))
+        return this.mapCanonicalNode(node, canonical);
+    }
     return this.resolveSymbolRecord(symbolId);
+  }
+
+  /**
+   * Analyze multi-hop canonical impact with legacy fallback.
+   * @param params - Symbol, direction, depth, and external-node options.
+   * @returns Structured impact analysis grouped by depth.
+   * @public
+   */
+  async getImpact(params: {
+    symbol: string;
+    direction: 'downstream' | 'upstream' | 'both';
+    maxDepth: number;
+    includeExternal: boolean;
+  }): Promise<ImpactResult> {
+    const canonical = this.getCanonicalSnapshot();
+    if (canonical) {
+      const root = this.resolveCanonicalId(params.symbol, canonical);
+      if (root) {
+        const nodes = new Map(canonical.nodes.map((node) => [node.id, node]));
+        const edges = canonical.edges.filter(
+          (edge) =>
+            params.includeExternal ||
+            (!this.isExternalNode(nodes.get(edge.from) ?? { id: '', kind: '' }) &&
+              !this.isExternalNode(nodes.get(edge.to) ?? { id: '', kind: '' }))
+        );
+        const results: ImpactNode[] = [];
+        const directions =
+          params.direction === 'both' ? (['downstream', 'upstream'] as const) : [params.direction];
+        for (const direction of directions) {
+          const queue: Array<{ id: string; depth: number; path: string[] }> = [
+            { id: root, depth: 0, path: [root] },
+          ];
+          const visited = new Set<string>([root]);
+          while (queue.length > 0) {
+            const current = queue.shift();
+            if (!current || current.depth >= params.maxDepth) continue;
+            const next = edges.filter((edge) =>
+              direction === 'downstream' ? edge.to === current.id : edge.from === current.id
+            );
+            for (const edge of next) {
+              const id = direction === 'downstream' ? edge.from : edge.to;
+              if (visited.has(id)) continue;
+              visited.add(id);
+              const pathValue = [...current.path, id];
+              results.push({
+                symbolId: id,
+                depth: current.depth + 1,
+                path: pathValue,
+                relationshipType: edge.kind,
+                direction,
+                external: nodes.get(id)?.external,
+              });
+              queue.push({ id, depth: current.depth + 1, path: pathValue });
+            }
+          }
+        }
+        const byDepth: Record<string, ImpactNode[]> = {};
+        for (const item of results) {
+          const bucket = byDepth[String(item.depth)] ?? [];
+          bucket.push(item);
+          byDepth[String(item.depth)] = bucket;
+        }
+        const riskLevel =
+          results.length > 25 || results.some((item) => item.depth >= 3)
+            ? 'High'
+            : results.length > 5
+              ? 'Medium'
+              : 'Low';
+        return {
+          symbolId: root,
+          direction: params.direction,
+          maxDepth: params.maxDepth,
+          impactedSymbols: results,
+          byDepth,
+          riskLevel,
+          source: 'canonical',
+        };
+      }
+    }
+    const symbol = this.resolveSymbolRecord(params.symbol);
+    const legacy = symbol ? this.getAllUnifiedRelationships() : [];
+    const root = symbol?.id ?? params.symbol;
+    const result: ImpactNode[] = [];
+    const queue: Array<{ id: string; depth: number; path: string[] }> = [
+      { id: root, depth: 0, path: [root] },
+    ];
+    const visited = new Set<string>([root]);
+    while (queue.length > 0) {
+      const current = queue.shift();
+      if (!current || current.depth >= params.maxDepth) continue;
+      for (const rel of legacy) {
+        const from = Array.isArray(rel.from) ? rel.from : [rel.from];
+        const to = Array.isArray(rel.to) ? rel.to : [rel.to];
+        const directions =
+          params.direction === 'both' ? (['downstream', 'upstream'] as const) : [params.direction];
+        for (const direction of directions) {
+          const matches =
+            direction === 'downstream' ? to.includes(current.id) : from.includes(current.id);
+          if (!matches) continue;
+          const ids = direction === 'downstream' ? from : to;
+          for (const id of ids) {
+            if (visited.has(id)) continue;
+            visited.add(id);
+            const pathValue = [...current.path, id];
+            result.push({
+              symbolId: id,
+              depth: current.depth + 1,
+              path: pathValue,
+              relationshipType: rel.type,
+              direction,
+            });
+            queue.push({ id, depth: current.depth + 1, path: pathValue });
+          }
+        }
+      }
+    }
+    const byDepth: Record<string, ImpactNode[]> = {};
+    for (const item of result) {
+      const bucket = byDepth[String(item.depth)] ?? [];
+      bucket.push(item);
+      byDepth[String(item.depth)] = bucket;
+    }
+    return {
+      symbolId: root,
+      direction: params.direction,
+      maxDepth: params.maxDepth,
+      impactedSymbols: result,
+      byDepth,
+      riskLevel: result.length > 25 ? 'High' : result.length > 5 ? 'Medium' : 'Low',
+      source: 'legacy',
+    };
+  }
+
+  /**
+   * Query active normative specification nodes and code bindings.
+   * @param params - Optional file, specification ID, and text filters.
+   * @returns Active revision metadata, specification nodes, and bindings.
+   * @public
+   */
+  async getSpecBindings(params: { filePath?: string; specId?: string; query?: string }): Promise<{
+    revisionId: string | null;
+    nodes: Array<Record<string, unknown>>;
+    bindings: Array<Record<string, unknown>>;
+  }> {
+    const spec = this.getSpecSnapshot();
+    if (!spec) return { revisionId: null, nodes: [], bindings: [] };
+    const canonical = this.getCanonicalSnapshot();
+    const fileCanonicalIds = new Set(
+      canonical?.nodes.filter((node) => node.file === params.filePath).map((node) => node.id) ?? []
+    );
+    const query = params.query?.toLowerCase();
+    const nodes = spec.nodes.filter((node) => {
+      if (params.specId && node.id !== params.specId) return false;
+      if (
+        query &&
+        !String(node.id).toLowerCase().includes(query) &&
+        !String(node.title).toLowerCase().includes(query)
+      )
+        return false;
+      return true;
+    });
+    const nodeIds = new Set(nodes.map((node) => String(node.id)));
+    const bindings = spec.bindings.filter((binding) => {
+      if (params.specId && !nodeIds.has(String(binding.specNodeId))) return false;
+      const source = binding.source as Record<string, unknown> | undefined;
+      const target = binding.target as Record<string, unknown> | undefined;
+      if (
+        params.filePath &&
+        source?.file !== params.filePath &&
+        target?.file !== params.filePath &&
+        !(
+          typeof target?.canonicalNodeId === 'string' &&
+          fileCanonicalIds.has(target.canonicalNodeId)
+        )
+      )
+        return false;
+      if (query && !JSON.stringify(binding).toLowerCase().includes(query)) return false;
+      return true;
+    });
+    return { revisionId: spec.revisionId, nodes, bindings };
   }
 }

@@ -75,3 +75,10 @@ describe('RelationshipClustersCommand', () => {
     });
   });
 });
+
+describe('RelationshipClustersCommand fail-closed flags', () => {
+  it('rejects unknown options', async () => {
+    const result = await new RelationshipClustersCommand().execute(['--unknown-flag']);
+    expect(result.exitCode).toBe(1);
+  });
+});

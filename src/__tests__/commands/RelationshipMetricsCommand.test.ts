@@ -75,3 +75,10 @@ describe('RelationshipMetricsCommand', () => {
     });
   });
 });
+
+describe('RelationshipMetricsCommand fail-closed flags', () => {
+  it('rejects unknown options', async () => {
+    const result = await new RelationshipMetricsCommand().execute(['--unknown-flag']);
+    expect(result.exitCode).toBe(1);
+  });
+});

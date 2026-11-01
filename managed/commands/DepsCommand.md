@@ -166,7 +166,7 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Referenced By
 
-- [[CLI Commands]] → managed/CLI-COMMANDS.md:28
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:42
 - [[TSDoc Edge Documentation]] → managed/README.md:102
 - [[OrphansCommand]] → managed/commands/OrphansCommand.md:179
 - [[TreeCommand]] → managed/commands/TreeCommand.md:293
@@ -183,5 +183,5 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Implemented By
 
-- DepsCommand → src/commands/DepsCommand.ts:38
+- DepsCommand → src/commands/DepsCommand.ts:17
 

@@ -41,21 +41,30 @@ export class InstallHookCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge install-hook';
+    return `tsdoc-edge install-hook [options]
+
+  Options:
+    --dry-run, -n   Preview hook installation without writing
+    --force, -f     Replace an existing hook`;
   }
 
   /**
    * execute method
-   * @param _args - _args parameter
+   * @param args - args parameter
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  execute(_args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(() => {
       // Check for help flag
-      if (this.hasHelpFlag(_args)) {
+      if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
+
+      const flagError = this.validateAllowedFlags(args, ['--dry-run', '-n', '--force', '-f']);
+      if (flagError) return flagError;
+      const dryRun = this.hasFlag(args, ['--dry-run', '-n']);
+      const force = this.hasFlag(args, ['--force', '-f']);
 
       console.log(`${colors.bold}TSDoc Edge - Install Pre-commit Hook${colors.reset}`);
       console.log();
@@ -77,26 +86,25 @@ export class InstallHookCommand extends BaseCommand {
       const hooksDir = path.join(gitDir, 'hooks');
       const hookPath = path.join(hooksDir, 'pre-commit');
 
-      // Create hooks directory if it doesn't exist
-      if (!fs.existsSync(hooksDir)) {
-        fs.mkdirSync(hooksDir, { recursive: true });
-      }
-
       // Check if hook already exists
       if (fs.existsSync(hookPath)) {
         const existing = fs.readFileSync(hookPath, 'utf-8');
-        if (existing.includes('tsdoc-edge pre-commit-run')) {
+        if (existing.includes('tsdoc-edge pre-commit-run') && !force) {
           console.log(`${colors.yellow}⚠  Pre-commit hook already installed${colors.reset}`);
           console.log();
           return { exitCode: 0, message: 'Hook already installed' };
         }
 
-        console.log(`${colors.yellow}⚠  Pre-commit hook already exists${colors.reset}`);
+        if (!force) {
+          console.log(`${colors.yellow}⚠  Pre-commit hook already exists${colors.reset}`);
+          console.log();
+          console.log('To preserve existing hook, add this to your pre-commit script:');
+          console.log(`  ${colors.cyan}tsdoc-edge pre-commit-run${colors.reset}`);
+          console.log();
+          return { exitCode: 1, message: 'Hook already exists' };
+        }
+        console.log(`${colors.yellow}⚠  Replacing existing pre-commit hook${colors.reset}`);
         console.log();
-        console.log('To preserve existing hook, add this to your pre-commit script:');
-        console.log(`  ${colors.cyan}tsdoc-edge pre-commit-run${colors.reset}`);
-        console.log();
-        return { exitCode: 1, message: 'Hook already exists' };
       }
 
       // Create hook script
@@ -108,6 +116,14 @@ npx tsdoc-edge pre-commit-run
 exit $?
 `;
 
+      if (dryRun) {
+        console.log(`${colors.cyan}Would install hook at: ${hookPath}${colors.reset}`);
+        return { exitCode: 0, message: 'Dry run complete' };
+      }
+
+      if (!fs.existsSync(hooksDir)) {
+        fs.mkdirSync(hooksDir, { recursive: true });
+      }
       fs.writeFileSync(hookPath, hookScript, 'utf-8');
       fs.chmodSync(hookPath, 0o755); // Make executable
 

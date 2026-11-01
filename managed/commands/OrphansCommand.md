@@ -202,7 +202,7 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Referenced By
 
-- [[CLI Commands]] → managed/CLI-COMMANDS.md:30
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:44
 - [[TSDoc Edge Documentation]] → managed/README.md:104
 - [[DepsCommand]] → managed/commands/DepsCommand.md:148
 - [[DetectDeadCodeCommand]] → managed/commands/DetectDeadCodeCommand.md:93
@@ -215,5 +215,5 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Implemented By
 
-- OrphansCommand → src/commands/OrphansCommand.ts:36
+- OrphansCommand → src/commands/OrphansCommand.ts:38
 

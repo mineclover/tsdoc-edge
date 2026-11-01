@@ -28,7 +28,7 @@ canonical graph 기반 metric으로 승격하려면 canonical node ID와 revisio
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:67
+- [[Commands Index]] → managed/COMMANDS.md:83
 - [[TSDoc Edge Documentation]] → managed/README.md:65
 - [[TestCoverageAnalyzer]] → managed/analyzers/TestCoverageAnalyzer.md:35
 - [[TestRelationshipAnalyzer]] → managed/analyzers/TestRelationshipAnalyzer.md:40

@@ -24,6 +24,7 @@ describe('BuildCommand', () => {
   const originalCanonicalGraphDatabase = process.env.TSDOC_EDGE_CANONICAL_GRAPH_DB;
 
   beforeEach(() => {
+    ConfigManager.reset();
     delete process.env.TSDOC_EDGE_CANONICAL_GRAPH;
     delete process.env.TSDOC_EDGE_GRAPH_ROUTER_MODULE;
     delete process.env.TSDOC_EDGE_CANONICAL_GRAPH_DB;
@@ -71,6 +72,7 @@ describe('BuildCommand', () => {
   });
 
   afterEach(() => {
+    ConfigManager.reset();
     jest.restoreAllMocks();
     restoreEnvironment('TSDOC_EDGE_CANONICAL_GRAPH', originalCanonicalGraphFlag);
     restoreEnvironment('TSDOC_EDGE_GRAPH_ROUTER_MODULE', originalRouterModule);
@@ -121,6 +123,12 @@ describe('BuildCommand', () => {
 
       expect(result.exitCode).toBe(1);
       expect(result.message).toContain('not found');
+    });
+
+    it('rejects unknown flags before touching the database', async () => {
+      const result = await command.execute([path.join(tempDir, 'src'), '--unknown']);
+      expect(result.exitCode).toBe(1);
+      expect(fs.existsSync(path.join(tempDir, 'test.db'))).toBe(false);
     });
 
     it('should handle scan errors gracefully', async () => {
@@ -407,6 +415,35 @@ describe('BuildCommand', () => {
           repositoryPath: canonicalDatabase,
         })
       );
+    });
+
+    it('skips a missing config-only local router with a warning', async () => {
+      const configPath = path.join(tempDir, '.tsdoc.config.json');
+      fs.writeFileSync(
+        configPath,
+        JSON.stringify({
+          project: { name: 'test', version: '1.0.0', srcDirs: ['src'] },
+          paths: {
+            commentsDir: 'docs/comments',
+            databasePath: path.join(tempDir, 'test.db'),
+            jsonlDir: path.join(tempDir, 'data'),
+          },
+          canonicalGraph: { routerModule: './missing-router.js' },
+        }),
+        'utf8'
+      );
+      ConfigManager.reset();
+      configManager = ConfigManager.getInstance(tempDir, configPath);
+      command = new BuildCommand(configManager);
+      const warning = jest.spyOn(console, 'warn').mockImplementation(() => undefined);
+
+      const result = await command.execute([path.join(tempDir, 'src')]);
+
+      expect(result.exitCode).toBe(0);
+      expect(warning).toHaveBeenCalledWith(
+        expect.stringContaining('skipping canonical graph refresh')
+      );
+      warning.mockRestore();
     });
 
     it('closes the legacy database when scanning fails after initialization', async () => {

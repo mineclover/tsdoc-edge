@@ -5,7 +5,9 @@
 import { CHARACTER_LIMIT } from '../constants.js';
 import type {
   GetDesignContextInput,
+  GetImpactInput,
   GetOntologyStatsInput,
+  GetSpecBindingsInput,
   GetSymbolDetailsInput,
   GetWorkContextInput,
   ListRelationshipsInput,
@@ -42,6 +44,7 @@ export async function searchSymbolsTool(params: SearchSymbolsInput, service: TsD
       type: params.type,
       limit: params.limit,
       offset: params.offset,
+      includeExternal: params.includeExternal,
     });
 
     if (params.format === 'json') {
@@ -94,7 +97,7 @@ export async function searchSymbolsTool(params: SearchSymbolsInput, service: TsD
  */
 export async function getOntologyStatsTool(params: GetOntologyStatsInput, service: TsDocService) {
   try {
-    const stats = await service.getOntologyStats(params.detailed);
+    const stats = await service.getOntologyStats(params.detailed, params.includeExternal);
 
     if (params.format === 'json') {
       return formatResponse(JSON.stringify(stats, null, 2), 'json');
@@ -159,6 +162,7 @@ export async function listRelationshipsTool(params: ListRelationshipsInput, serv
       to: params.to,
       limit: params.limit,
       offset: params.offset,
+      includeExternal: params.includeExternal,
     });
 
     if (params.format === 'json') {
@@ -214,7 +218,11 @@ export async function listRelationshipsTool(params: ListRelationshipsInput, serv
  */
 export async function getWorkContextTool(params: GetWorkContextInput, service: TsDocService) {
   try {
-    const context = await service.getWorkContext(params.filePath, params.depth);
+    const context = await service.getWorkContext(
+      params.filePath,
+      params.depth,
+      params.includeExternal
+    );
     return formatResponse(context, params.format);
   } catch (error) {
     return {
@@ -234,7 +242,7 @@ export async function getWorkContextTool(params: GetWorkContextInput, service: T
  */
 export async function getDesignContextTool(params: GetDesignContextInput, service: TsDocService) {
   try {
-    const context = await service.getDesignContext(params.filePath);
+    const context = await service.getDesignContext(params.filePath, params.includeExternal);
     return formatResponse(context, params.format);
   } catch (error) {
     return {
@@ -261,8 +269,78 @@ export async function queryRelationshipsTool(
       symbolId: params.symbolId,
       direction: params.direction,
       maxDepth: params.maxDepth,
+      includeExternal: params.includeExternal,
     });
     return formatResponse(result, params.format);
+  } catch (error) {
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        },
+      ],
+      isError: true,
+    };
+  }
+}
+
+/**
+ * Get multi-hop change impact for a symbol.
+ * @param params - Validated impact query options.
+ * @param service - TSDoc database service.
+ * @returns MCP-formatted impact response.
+ * @public
+ */
+export async function getImpactTool(params: GetImpactInput, service: TsDocService) {
+  try {
+    const result = await service.getImpact(params);
+    if (params.response_format === 'json')
+      return formatResponse(JSON.stringify(result, null, 2), 'json');
+    let markdown = `# Impact Analysis\n\n- **Symbol**: \`${result.symbolId}\`\n- **Direction**: ${result.direction}\n- **Maximum depth**: ${result.maxDepth}\n- **Risk**: ${result.riskLevel}\n- **Source**: ${result.source}\n\n`;
+    for (const [depth, nodes] of Object.entries(result.byDepth)) {
+      markdown += `## Depth ${depth}\n\n`;
+      for (const node of nodes)
+        markdown += `- \`${node.symbolId}\` via **${node.relationshipType}** (${node.direction})\n`;
+      markdown += '\n';
+    }
+    if (result.impactedSymbols.length === 0) markdown += 'No impacted symbols found.\n';
+    return formatResponse(markdown, 'markdown');
+  } catch (error) {
+    return {
+      content: [
+        {
+          type: 'text' as const,
+          text: `Error: ${error instanceof Error ? error.message : 'Unknown error'}`,
+        },
+      ],
+      isError: true,
+    };
+  }
+}
+
+/**
+ * Query normative specification nodes and conformance bindings.
+ * @param params - Validated specification filters.
+ * @param service - TSDoc database service.
+ * @returns MCP-formatted specification response.
+ * @public
+ */
+export async function getSpecBindingsTool(params: GetSpecBindingsInput, service: TsDocService) {
+  try {
+    const result = await service.getSpecBindings(params);
+    if (params.response_format === 'json')
+      return formatResponse(JSON.stringify(result, null, 2), 'json');
+    let markdown = `# Specification Bindings\n\nRevision: \`${result.revisionId ?? 'unavailable'}\`\n\n`;
+    markdown += `Found ${result.nodes.length} specification nodes and ${result.bindings.length} bindings.\n\n`;
+    for (const node of result.nodes)
+      markdown += `## ${String(node.title)}\n- **ID**: \`${String(node.id)}\`\n- **Kind**: ${String(node.kind)}\n\n`;
+    if (result.bindings.length > 0) {
+      markdown += '## Code Conformance\n\n';
+      for (const binding of result.bindings)
+        markdown += `- **${String(binding.kind)}** \`${String(binding.specNodeId)}\`: ${JSON.stringify(binding.target ?? {})}\n`;
+    }
+    return formatResponse(markdown, 'markdown');
   } catch (error) {
     return {
       content: [
@@ -281,7 +359,7 @@ export async function queryRelationshipsTool(
  */
 export async function getSymbolDetailsTool(params: GetSymbolDetailsInput, service: TsDocService) {
   try {
-    const symbol = await service.getSymbolDetails(params.symbolId);
+    const symbol = await service.getSymbolDetails(params.symbolId, params.includeExternal);
 
     if (!symbol) {
       return {

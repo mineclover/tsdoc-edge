@@ -107,7 +107,7 @@ System-level management and validation.
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:298
+- [[Commands Index]] → managed/COMMANDS.md:314
 - [[TSDoc Edge Documentation]] → managed/README.md:108
 - [[QueryCommands]] → managed/commands/QueryCommands.md:146
 

@@ -1,357 +1,317 @@
-/**
- * Deps Command - Show dependencies of a symbol
- * @packageDocumentation
- */
-
+/** Dependency query against canonical graph with a legacy fallback. */
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import type { CanonicalGraphNode } from '../indexer/contracts';
 import { DepsSchema } from '../output/schemas';
 import { XmlBuilder } from '../output/XmlBuilder';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { GraphRepository } from '../storage/GraphRepository';
 import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /**
- * Command for showing symbol dependencies
- *
+ * Query reverse or outgoing symbol relationships.
  * @public
- * @responsibility Show dependencies of a symbol from registry
- * @contract Reads registry, finds symbol, displays all dependencies
  * @doc [[DepsCommand]]
- * @doc [[CLI Commands#deps]]
- *
- * @problem Need to understand what a symbol depends on
- * @solves Displays all dependencies with their types and reasons
- * @context Part of symbol graph query system
- *
- * @functionality
- * - Symbol lookup: Find symbol by ID in registry
- * - Dependency retrieval: Get all dependencies of a symbol
- * - Detailed display: Show target symbol info and relationship
- * - Error handling: Validate registry and symbol existence
- * - Usage guidance: Show helpful error messages
- *
- * @decision Use SymbolRegistryManager for dependency data
- * @rationale Registry already stores dependency relationships
- * @consequences Requires registry to be built first
  */
 export class DepsCommand extends BaseCommand {
   private manager?: SymbolRegistryManager;
-
   constructor(manager?: SymbolRegistryManager) {
     super();
     this.manager = manager;
   }
-
-  /**
-   * getName method
-   * @returns Returns string
-   * @public
-   */
+  /** @returns Command name */
   getName(): string {
     return 'deps';
   }
-
-  /**
-   * getDescription method
-   * @returns Returns string
-   * @public
-   */
+  /** @returns Command description */
   getDescription(): string {
     return 'Show what a symbol depends on (A → B)';
   }
-
-  /**
-   * getUsage method
-   * @returns Returns string
-   * @public
-   */
   protected getUsage(): string {
-    return 'tsdoc-edge deps <symbol-id>';
+    return 'tsdoc-edge deps <symbol-id> [--all] [--type <kind>] [--json|--xml] [--include-external]';
   }
-
   /**
-   * execute method
-   * @param args - args parameter
-   * @returns Returns Promise<CommandResult>
-   * @public
+   * @param args - Command arguments
+   * @returns Command result
    */
   execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(() => {
-      // Check for help flag
-      if (this.hasHelpFlag(args)) {
-        return this.displayHelp();
-      }
-
-      // Parse options
-      const typeFilter = args.find((a) => a.startsWith('--type='))?.split('=')[1];
-      const showAll = args.includes('--all');
-      const useHuman = args.includes('--human');
-      const filteredArgs = args.filter((a) => !a.startsWith('--'));
-
-      const id = filteredArgs[0];
-      if (!id) {
-        console.log(`${colors.yellow}Usage:${colors.reset} tsdoc-edge deps <symbol-name>`);
-        console.log();
-        console.log('Examples:');
-        console.log(`  ${colors.dim}tsdoc-edge deps DatabaseManager${colors.reset}`);
-        console.log(`  ${colors.dim}tsdoc-edge deps BuildCommand${colors.reset}`);
-        console.log(
-          `  ${colors.dim}tsdoc-edge deps class-basecommand${colors.reset}  ${colors.dim}(exact ID)${colors.reset}`
-        );
-        console.log();
-        console.log(
-          `Tip: Use ${colors.cyan}tsdoc-edge stats${colors.reset} to see available symbols`
-        );
-        console.log();
-        return this.failure('Symbol name required');
-      }
-
-      const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
-      if (!fs.existsSync(registryPath)) {
-        this.printError('No registry found. Run "tsdoc-edge id new" first.');
-        console.log();
-        return this.failure('Registry not found');
-      }
-
-      const manager = this.manager || new SymbolRegistryManager(registryPath);
-      let entry = manager.findById(id);
-
-      // Try name pattern match if not found by ID
-      if (!entry) {
-        const matches = manager.findByNamePattern(id);
-        if (matches.length === 1) {
-          entry = matches[0];
-        } else if (matches.length > 1) {
-          // Auto-select if first match is exact class/interface match
-          const first = matches[0];
-          const isExactMatch = first.sourceRef.symbolName.toLowerCase() === id.toLowerCase();
-          const isPrimaryType = ['class', 'interface', 'function', 'type'].includes(
-            first.sourceRef.type || ''
+      if (this.hasHelpFlag(args)) return this.displayHelp();
+      const invalid = this.validateAllowedFlags(
+        args,
+        ['--all', '--json', '--xml', '--include-external'],
+        ['--type']
+      );
+      if (invalid) return invalid;
+      const query = this.extractPositionalQuery(args, ['--type']);
+      if (!query) return this.failure('Symbol name required');
+      const options = {
+        all: this.hasFlag(args, '--all'),
+        type: this.getOption(args, '--type'),
+        json: this.hasFlag(args, '--json'),
+        xml: this.hasFlag(args, '--xml'),
+        includeExternal: this.hasFlag(args, '--include-external'),
+      };
+      const canonical = this.openCanonical();
+      if (canonical) {
+        try {
+          const nodes = new Map(canonical.revision.graph.nodes.map((item) => [item.id, item]));
+          const symbolNode = this.resolveSymbolNode(
+            canonical.revision.graph.nodes,
+            query,
+            canonical.revision.aliases
           );
-
-          if (isExactMatch && isPrimaryType) {
-            entry = first;
-            if (useHuman) {
-              console.log(`Selected: ${first.sourceRef.symbolName} (${first.sourceRef.type})`);
-              console.log();
-            }
-          } else {
-            console.log(`${colors.yellow}Multiple matches found:${colors.reset}`);
-            for (const m of matches.slice(0, 10)) {
-              console.log(
-                `  ${colors.cyan}${m.id}${colors.reset} (${m.sourceRef.symbolName}) [${m.sourceRef.type || 'unknown'}]`
-              );
-            }
-            if (matches.length > 10) {
-              console.log(`  ... and ${matches.length - 10} more`);
-            }
-            console.log();
-            console.log('Please use a more specific ID or name.');
-            return this.failure(`Multiple matches found: ${id}`);
+          if (symbolNode) {
+            let deps = canonical.revision.graph.edges
+              .filter((edge) => edge.from === symbolNode.id)
+              .map((edge) => ({ edge, node: nodes.get(edge.to) }))
+              .filter(
+                (
+                  item
+                ): item is {
+                  edge: (typeof canonical.revision.graph.edges)[number];
+                  node: CanonicalGraphNode;
+                } => Boolean(item.node)
+              )
+              .filter((item) => options.includeExternal || !this.isExternal(item.node));
+            if (options.type) deps = deps.filter((item) => item.edge.kind === options.type);
+            return this.printResult(symbolNode, deps, options);
           }
+
+          const normalizedFile = this.normalizeFileQuery(query);
+          const fileNodes = canonical.revision.graph.nodes.filter(
+            (item) => item.file === normalizedFile
+          );
+          if (fileNodes.length > 0) {
+            const fileNodeIds = new Set(fileNodes.map((item) => item.id));
+            const seen = new Set<string>();
+            let deps = canonical.revision.graph.edges
+              .filter((edge) => fileNodeIds.has(edge.from) && !fileNodeIds.has(edge.to))
+              .map((edge) => ({ edge, node: nodes.get(edge.to) }))
+              .filter(
+                (
+                  item
+                ): item is {
+                  edge: (typeof canonical.revision.graph.edges)[number];
+                  node: CanonicalGraphNode;
+                } => Boolean(item.node)
+              )
+              .filter((item) => options.includeExternal || !this.isExternal(item.node))
+              .filter((item) => {
+                const key = `${item.node.id}:${item.edge.kind}`;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+              });
+            if (options.type) deps = deps.filter((item) => item.edge.kind === options.type);
+            const moduleNode: CanonicalGraphNode = {
+              id: normalizedFile,
+              sourceId: normalizedFile,
+              name: normalizedFile,
+              kind: 'module',
+              file: normalizedFile,
+              evidence: { startLine: 1 },
+              exported: true,
+            };
+            return this.printResult(moduleNode, deps, options);
+          }
+        } finally {
+          canonical.repository.close();
         }
       }
-
-      if (!entry) {
-        // Fall back to database search
-        return this.findDepsFromDatabase(id, typeFilter, showAll, useHuman);
-      }
-
-      // Use database for all lookups
-      return this.findDepsFromDatabase(entry.id, typeFilter, showAll, useHuman);
+      return this.fromLegacy(query, options);
     });
   }
-
+  private fromLegacy(
+    query: string,
+    options: { all: boolean; type?: string; json: boolean; xml: boolean; includeExternal: boolean }
+  ): CommandResult {
+    const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
+    const manager =
+      this.manager ||
+      (fs.existsSync(registryPath) ? new SymbolRegistryManager(registryPath) : undefined);
+    const entry = manager?.findById(query) ?? manager?.findByNamePattern(query)[0];
+    return this.findDepsFromDatabase(entry?.id ?? query, options);
+  }
   private findDepsFromDatabase(
     idOrName: string,
-    typeFilter?: string,
-    showAll?: boolean,
-    useHuman?: boolean
+    options: { all: boolean; type?: string; json: boolean; xml: boolean; includeExternal: boolean }
   ): CommandResult {
-    const dbCheck = this.checkDatabaseExists();
-    if (dbCheck) {
-      this.printError(`Symbol not found: ${idOrName}`);
-      console.log();
-      return this.failure(`Symbol not found: ${idOrName}`);
-    }
-
-    const dbPath = this.getDatabasePath();
-    const jsonlPath = this.getJsonlPath();
-    const dbManager = new DatabaseManager(dbPath, jsonlPath);
-
+    const check = this.checkDatabaseExists();
+    if (check) return check;
+    const db = new DatabaseManager(this.getDatabasePath(), this.getJsonlPath());
     try {
-      // Try exact ID match first
-      let symbol = dbManager.getSymbol(idOrName);
-
-      // Try name search if not found
-      if (!symbol) {
-        const matches = dbManager.findSymbolsByNamePattern(idOrName);
-        if (matches.length === 1) {
-          symbol = dbManager.getSymbol(matches[0].id);
-        } else if (matches.length > 1) {
-          // Auto-select if any match is exact class/interface/function/type match
-          const primaryMatch = matches.find(
-            (m) =>
-              m.name.toLowerCase() === idOrName.toLowerCase() &&
-              ['class', 'interface', 'function', 'type'].includes(m.type)
-          );
-
-          if (primaryMatch) {
-            symbol = dbManager.getSymbol(primaryMatch.id);
-            if (useHuman) {
-              console.log(`Selected: ${primaryMatch.name} (${primaryMatch.type})`);
-              console.log();
-            }
-          } else {
-            console.log('Multiple matches found:');
-            for (const m of matches.slice(0, 10)) {
-              console.log(`  ${colors.cyan}${m.id}${colors.reset} (${m.name}) [${m.type}]`);
-            }
-            if (matches.length > 10) {
-              console.log(`  ... and ${matches.length - 10} more`);
-            }
-            console.log();
-            console.log('Please use a more specific ID or name.');
-            return this.failure(`Multiple matches found: ${idOrName}`);
-          }
-        }
-      }
-
-      if (!symbol) {
-        this.printError(`Symbol not found: ${idOrName}`);
-        console.log();
-        return this.failure(`Symbol not found: ${idOrName}`);
-      }
-
-      // Get relationships from database using Drizzle ORM
-      const queryOptions: { symbolId: string; limit: number; type?: string } = {
-        symbolId: symbol.id,
-        limit: 200,
-      };
-      if (typeFilter) {
-        queryOptions.type = typeFilter;
-      }
-      const relationships = dbManager.queryRelationships(queryOptions);
-
-      // Filter for outgoing relationships (where this symbol is the source)
-      let outgoing = relationships.filter((rel) => {
-        const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
-        return fromSymbols.includes(symbol?.id);
-      });
-
-      // By default, only show code-dependency (unless --all or --type specified)
-      if (!showAll && !typeFilter) {
-        outgoing = outgoing.filter((rel) => rel.type === 'code-dependency');
-      }
-
-      // Collect dependency info
+      const matches = db.findSymbolsByNamePattern(idOrName);
+      const symbol = db.getSymbol(idOrName) ?? matches.at(0);
+      if (!symbol) return this.failure(`Symbol not found: ${idOrName}`);
+      let rels = db
+        .queryRelationships({
+          symbolId: symbol.id,
+          limit: 500,
+          ...(options.type ? { type: options.type } : {}),
+        })
+        .filter((rel) => (Array.isArray(rel.from) ? rel.from : [rel.from]).includes(symbol.id));
+      if (!options.all && !options.type)
+        rels = rels.filter((rel) => rel.type === 'code-dependency');
       const deps: Array<{
-        name: string;
-        type: string;
-        file: string;
-        line: number;
-        relType: string;
-        summary?: string;
-        signature?: string;
-        usageContext?: string;
+        edge: { kind: string; from: string; to: string };
+        node: CanonicalGraphNode;
       }> = [];
-      for (const rel of outgoing) {
-        const targetIds = Array.isArray(rel.to) ? rel.to : [rel.to];
-        for (const targetId of targetIds) {
-          const target = dbManager.getSymbol(targetId);
-          if (target) {
-            // Get extended symbol row data for signature construction
-            const targetRows = dbManager.getSymbolsByIds([targetId]);
-            const targetRow = targetRows.length > 0 ? targetRows[0] : null;
-
-            // Construct method signature if available
-            let signature: string | undefined;
-            if (targetRow && (target.type === 'function' || target.type === 'method')) {
-              const rawParams: unknown = targetRow.parameter_types
-                ? JSON.parse(targetRow.parameter_types)
-                : [];
-              const params = rawParams as Array<{ name: string; type?: string }>;
-              const paramStr = (Array.isArray(params) ? params : [])
-                .map((p) => `${p.name}${p.type ? `: ${p.type}` : ''}`)
-                .join(', ');
-              const returnType = targetRow.declared_type || 'unknown';
-              signature = `${target.name}(${paramStr}): ${returnType}`;
-            }
-
-            deps.push({
-              name: target.name,
-              type: target.type,
-              file: target.filePath,
-              line: target.line,
-              relType: rel.type,
-              summary: target.summary || undefined,
-              signature,
-              usageContext: rel.description || undefined,
-            });
-          }
-        }
-      }
-
-      if (useHuman) {
-        // Human-readable format
-        this.printHeader(`Dependencies of ${symbol.name} (${symbol.type})`);
-        console.log(`File: ${symbol.filePath}:${symbol.line}`);
-        console.log();
-
-        if (deps.length === 0) {
-          console.log('No dependencies found');
-          if (!showAll && !typeFilter) {
-            console.log('Tip: Use --all to see all relationship types');
-          }
-        } else {
-          const byType = new Map<string, typeof deps>();
-          for (const dep of deps) {
-            const list = byType.get(dep.relType) || [];
-            list.push(dep);
-            byType.set(dep.relType, list);
-          }
-
-          for (const [relType, typeDeps] of byType.entries()) {
-            console.log(`${relType} (${typeDeps.length}):`);
-            for (const dep of typeDeps) {
-              console.log(`  → ${dep.name} (${dep.type})`);
-              console.log(`    ${dep.file}:${dep.line}`);
-            }
-            console.log();
-          }
-          console.log(`Total: ${deps.length} dependencies`);
-        }
-      } else {
-        // XML format (default)
-        new XmlBuilder(DepsSchema)
-          .section('source', {
-            name: symbol.name,
-            type: symbol.type,
-            file: symbol.filePath,
-            line: symbol.line,
-            summary: symbol.summary || undefined,
-            exported: symbol.isExported,
-          })
-          .section(
-            'targets',
-            deps.map((dep) => ({
-              name: dep.name,
-              type: dep.type,
-              relation: dep.relType,
-              file: dep.file,
-              line: dep.line,
-              summary: dep.summary,
-              signature: dep.signature,
-              usageContext: dep.usageContext,
-            }))
+      for (const rel of rels)
+        for (const targetId of Array.isArray(rel.to) ? rel.to : [rel.to]) {
+          const target = db.getSymbol(targetId);
+          if (
+            target &&
+            (options.includeExternal ||
+              !this.isExternal({ file: target.filePath, external: false }))
           )
-          .print();
-      }
-
-      return this.success();
+            deps.push({
+              edge: { kind: rel.type, from: symbol.id, to: targetId },
+              node: {
+                id: target.id,
+                name: target.name,
+                kind: target.type,
+                file: target.filePath,
+                evidence: { startLine: target.line },
+                external: false,
+                sourceId: target.id,
+              },
+            });
+        }
+      return this.printResult(
+        {
+          id: symbol.id,
+          name: symbol.name,
+          kind: symbol.type,
+          file:
+            (symbol as { filePath?: string; file_path?: string }).filePath ??
+            (symbol as { file_path?: string }).file_path ??
+            '',
+          evidence: { startLine: symbol.line },
+          exported: Boolean(
+            (symbol as { isExported?: boolean; is_exported?: number }).isExported ??
+              (symbol as { is_exported?: number }).is_exported
+          ),
+          sourceId: symbol.id,
+        },
+        deps,
+        options
+      );
     } finally {
-      dbManager.close();
+      db.close();
+    }
+  }
+  private printResult(
+    source: CanonicalGraphNode,
+    deps: Array<{ edge: { kind: string; from: string; to: string }; node: CanonicalGraphNode }>,
+    options: { json: boolean; xml: boolean }
+  ): CommandResult {
+    const targets = deps.map((item) => ({ ...item.node, relation: item.edge.kind }));
+    if (options.json) console.log(JSON.stringify({ source, targets }, null, 2));
+    else if (options.xml)
+      new XmlBuilder(DepsSchema)
+        .section('source', {
+          name: source.name,
+          type: source.kind,
+          file: source.file ?? '',
+          line: source.evidence?.startLine ?? 0,
+          exported: source.exported ?? false,
+        })
+        .section(
+          'targets',
+          targets.map((item) => ({
+            name: item.name,
+            type: item.kind,
+            relation: item.relation,
+            file: item.file ?? '',
+            line: item.evidence?.startLine ?? 0,
+          }))
+        )
+        .print();
+    else {
+      this.printHeader(`Dependencies of ${source.name}`);
+      console.log(`Type: ${source.kind}`);
+      console.log(`File: ${source.file ?? 'unknown'}:${source.evidence?.startLine ?? '?'}`);
+      console.log();
+      if (targets.length === 0) console.log('No dependencies found');
+      else {
+        for (const target of targets)
+          console.log(
+            `  → ${target.name} (${target.kind}) ${target.file ?? ''}:${target.evidence?.startLine ?? '?'}`
+          );
+        console.log(`\nTotal: ${targets.length} dependencies`);
+      }
+    }
+    return this.success();
+  }
+  private extractPositionalQuery(args: string[], valueFlags: string[]): string | undefined {
+    const valueFlagSet = new Set(valueFlags);
+    for (let i = 0; i < args.length; i++) {
+      const arg = args[i];
+      if (!arg) continue;
+      if (valueFlagSet.has(arg)) {
+        i++;
+        continue;
+      }
+      if (!arg.startsWith('-')) {
+        return arg;
+      }
+    }
+    return undefined;
+  }
+  private normalizeFileQuery(query: string): string {
+    const relative = path.isAbsolute(query) ? path.relative(process.cwd(), query) : query;
+    return relative.split(path.sep).join('/').replace(/^\.\//, '');
+  }
+  private resolveSymbolNode(
+    nodes: readonly CanonicalGraphNode[],
+    query: string,
+    aliases: readonly { legacyId: string; canonicalId: string }[] = []
+  ): CanonicalGraphNode | undefined {
+    const canonicalId = aliases.find((alias) => alias.legacyId === query)?.canonicalId;
+    return (
+      nodes.find((node) => node.id === canonicalId) ??
+      nodes.find((node) => node.id === query) ??
+      nodes.find((node) => node.qualifiedName === query) ??
+      nodes.find((node) => node.name === query)
+    );
+  }
+  private isExternal(node: Pick<CanonicalGraphNode, 'external' | 'file'>): boolean {
+    return (
+      node.external === true ||
+      /(?:bundled:|(?:^|[\\/])libs[\\/]|(?:^|[\\/])node_modules[\\/])/.test(node.file ?? '')
+    );
+  }
+  private openCanonical(): {
+    repository: GraphRepository;
+    revision: NonNullable<ReturnType<GraphRepository['readActiveRevision']>>;
+  } | null {
+    const configPath = path.join(process.cwd(), '.tsdoc.config.json');
+    let configured: string | undefined;
+    try {
+      const parsed: unknown = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      const config = parsed as { canonicalGraph?: { databasePath?: string } };
+      configured = config.canonicalGraph?.databasePath;
+    } catch {
+      /* defaults */
+    }
+    const candidate =
+      process.env.TSDOC_EDGE_CANONICAL_GRAPH_DB ?? configured ?? '.tsdoc/canonical-graph.db';
+    const databasePath = path.resolve(process.cwd(), candidate);
+    if (!fs.existsSync(databasePath)) return null;
+    let repository: GraphRepository | undefined;
+    try {
+      repository = new GraphRepository(databasePath, { readOnly: true });
+      const revision = repository.readActiveRevision();
+      if (!revision) {
+        repository.close();
+        return null;
+      }
+      return { repository, revision };
+    } catch {
+      repository?.close();
+      return null;
     }
   }
 }

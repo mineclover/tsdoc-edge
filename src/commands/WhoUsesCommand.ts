@@ -1,275 +1,288 @@
-/**
- * Who Uses Command - Show who uses a symbol
- * @packageDocumentation
- */
-
+/** Who-uses query against the canonical graph with a legacy fallback. */
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import type { CanonicalGraphNode } from '../indexer/contracts';
 import { WhoUsesSchema } from '../output/schemas';
-import type { GroupedSectionData } from '../output/types';
 import { XmlBuilder } from '../output/XmlBuilder';
 import { DatabaseManager } from '../storage/DatabaseManager';
-import { BaseCommand, type CommandResult, colors } from './BaseCommand';
+import { GraphRepository } from '../storage/GraphRepository';
+import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /**
- * Command for showing who uses a symbol (database-driven)
- *
+ * Query reverse or outgoing symbol relationships.
  * @public
- * @responsibility Show reverse dependencies from database (by name)
- * @contract Searches database by name, builds graph, displays dependents
  * @doc [[WhoUsesCommand]]
- * @doc [[CLI Commands#who-uses]]
- *
- * @problem Need to find all usages of a symbol by its name
- * @solves Searches database by symbol name and shows all dependents
- * @context Part of database-driven symbol analysis
- *
- * @functionality
- * - Name-based search: Find symbols by name (exact or prefix)
- * - Multiple matches: Handle and display all matching symbols
- * - Dependent analysis: Find all symbols that depend on each match
- * - File grouping: Group dependents by file for clarity
- * - Export status: Show if symbol is exported
- *
- * @decision Use DatabaseManager for name-based search
- * @rationale Database allows efficient name queries
- * @consequences Requires database to be built first
  */
 export class WhoUsesCommand extends BaseCommand {
   private dbManager?: DatabaseManager;
-
   constructor(dbManager?: DatabaseManager) {
     super();
     this.dbManager = dbManager;
   }
-
-  /**
-   * getName method
-   * @returns Returns string
-   * @public
-   */
+  /** @returns Command name */
   getName(): string {
     return 'who-uses';
   }
-
-  /**
-   * getDescription method
-   * @returns Returns string
-   * @public
-   */
+  /** @returns Command description */
   getDescription(): string {
     return 'Show what depends on a symbol (B ← A)';
   }
-
-  /**
-   * getUsage method
-   * @returns Returns string
-   * @public
-   */
   protected getUsage(): string {
-    return 'tsdoc-edge who-uses <symbol-name>';
+    return 'tsdoc-edge who-uses <symbol-name> [--json|--xml] [--include-external]';
   }
 
   /**
-   * execute method
-   * @param args - args parameter
-   * @returns Returns Promise<CommandResult>
-   * @public
+   * @param args - Command arguments
+   * @returns Command result
    */
   execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(() => {
-      // Check for help flag
-      if (this.hasHelpFlag(args)) {
-        return this.displayHelp();
-      }
-
-      const useHuman = args.includes('--human');
-      const filteredArgs = args.filter((a) => !a.startsWith('--'));
-      const symbolName = filteredArgs[0];
-      if (!symbolName) {
-        this.printError('Usage: tsdoc-edge who-uses <symbol-name>');
-        console.log();
-        console.log('Examples:');
-        this.printInfo('  tsdoc-edge who-uses DocumentationAnalyzer');
-        this.printInfo('  tsdoc-edge who-uses TSDocParser');
-        this.printInfo('  tsdoc-edge who-uses DatabaseManager');
-        console.log();
-        return this.failure('Symbol name required');
-      }
-
-      if (!this.dbManager) {
-        const dbCheck = this.checkDatabaseExists();
-        if (dbCheck) return dbCheck;
-      }
-
-      const dbPath = this.getDatabasePath();
-      const jsonlPath = this.getJsonlPath();
-      const dbManager = this.dbManager || new DatabaseManager(dbPath, jsonlPath);
-
-      try {
-        // Find symbols matching the name
-        let symbols = dbManager.findSymbolsByNamePattern(symbolName);
-
-        if (symbols.length === 0) {
-          this.printError(`Symbol not found: ${symbolName}`);
-          console.log();
-          console.log('Tip: Try searching for the symbol first:');
-          this.printInfo(
-            `  sqlite3 .tsdoc/symbols.db "SELECT name, file_path FROM symbols WHERE name LIKE '%${symbolName}%'"`
+      if (this.hasHelpFlag(args)) return this.displayHelp();
+      const invalid = this.validateAllowedFlags(args, ['--json', '--xml', '--include-external']);
+      if (invalid) return invalid;
+      const query = args.find((arg) => !arg.startsWith('-'));
+      if (!query) return this.failure('Symbol name required');
+      const options = {
+        json: this.hasFlag(args, '--json'),
+        xml: this.hasFlag(args, '--xml'),
+        includeExternal: this.hasFlag(args, '--include-external'),
+      };
+      const canonical = this.openCanonical();
+      if (canonical) {
+        try {
+          const nodes = new Map(canonical.revision.graph.nodes.map((item) => [item.id, item]));
+          const node = this.resolveSymbolNode(
+            canonical.revision.graph.nodes,
+            query,
+            canonical.revision.aliases
           );
-          console.log();
-          return this.failure(`Symbol not found: ${symbolName}`);
-        }
+          if (node) {
+            const dependents = canonical.revision.graph.edges
+              .filter((edge) => edge.to === node.id)
+              .map((edge) => ({ edge, node: nodes.get(edge.from) }))
+              .filter(
+                (
+                  item
+                ): item is {
+                  edge: (typeof canonical.revision.graph.edges)[number];
+                  node: CanonicalGraphNode;
+                } => Boolean(item.node)
+              )
+              .filter((item) => options.includeExternal || !this.isExternal(item.node));
+            return this.printResult({ source: node, dependents }, options);
+          }
 
-        // Auto-select if exact name match with primary type (class, interface, function, type)
-        if (symbols.length > 1) {
-          const primaryMatch = symbols.find(
-            (s) =>
-              s.name.toLowerCase() === symbolName.toLowerCase() &&
-              ['class', 'interface', 'function', 'type'].includes(s.type)
+          const normalizedFile = this.normalizeFileQuery(query);
+          const fileNodes = canonical.revision.graph.nodes.filter(
+            (item) => item.file === normalizedFile
           );
-
-          if (primaryMatch) {
-            if (useHuman) {
-              console.log(`Selected: ${primaryMatch.name} (${primaryMatch.type})`);
-              console.log();
-            }
-            symbols = [primaryMatch];
-          } else {
-            // Show all matches and let user choose
-            console.log(
-              `${colors.cyan}Found ${symbols.length} symbols matching "${symbolName}":${colors.reset}`
-            );
-            console.log();
-            for (const sym of symbols.slice(0, 15)) {
-              console.log(`  • ${sym.name} (${sym.type}) in ${sym.file_path}`);
-            }
-            if (symbols.length > 15) {
-              console.log(`  ... and ${symbols.length - 15} more`);
-            }
-            console.log();
-            console.log('Use a more specific name or the full symbol ID.');
-            return this.success();
+          if (fileNodes.length > 0) {
+            const fileNodeIds = new Set(fileNodes.map((item) => item.id));
+            const seen = new Set<string>();
+            const dependents = canonical.revision.graph.edges
+              .filter((edge) => fileNodeIds.has(edge.to) && !fileNodeIds.has(edge.from))
+              .map((edge) => ({ edge, node: nodes.get(edge.from) }))
+              .filter(
+                (
+                  item
+                ): item is {
+                  edge: (typeof canonical.revision.graph.edges)[number];
+                  node: CanonicalGraphNode;
+                } => Boolean(item.node)
+              )
+              .filter((item) => options.includeExternal || !this.isExternal(item.node))
+              .filter((item) => {
+                const key = `${item.node.id}:${item.edge.kind}`;
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+              });
+            const moduleNode: CanonicalGraphNode = {
+              id: normalizedFile,
+              sourceId: normalizedFile,
+              name: normalizedFile,
+              kind: 'module',
+              file: normalizedFile,
+              evidence: { startLine: 1 },
+              exported: true,
+            };
+            return this.printResult({ source: moduleNode, dependents }, options);
           }
-        }
-
-        // Analyze selected symbol(s)
-        for (const symbol of symbols) {
-          // Query unified_relationships for incoming relationships
-          const relationships = dbManager.queryRelationships({ symbolId: symbol.id, limit: 200 });
-
-          // Filter for incoming relationships (where this symbol is the target)
-          const incoming = relationships.filter((rel) => {
-            const toSymbols = Array.isArray(rel.to) ? rel.to : [rel.to];
-            return toSymbols.includes(symbol.id);
-          });
-
-          // Group by relationship type
-          const byType = new Map<string, string[]>();
-          for (const rel of incoming) {
-            const fromSymbols = Array.isArray(rel.from) ? rel.from : [rel.from];
-            for (const fromId of fromSymbols) {
-              const list = byType.get(rel.type) || [];
-              if (!list.includes(fromId)) {
-                list.push(fromId);
-              }
-              byType.set(rel.type, list);
-            }
-          }
-
-          // Also check legacy dependencies table
-          const legacyDependents = dbManager.getDependents(symbol.id);
-          if (legacyDependents.length > 0) {
-            const existing = byType.get('code-dependency') || [];
-            for (const dep of legacyDependents) {
-              if (!existing.includes(dep)) {
-                existing.push(dep);
-              }
-            }
-            byType.set('code-dependency', existing);
-          }
-
-          const totalCount = Array.from(byType.values()).reduce((sum, arr) => sum + arr.length, 0);
-
-          if (useHuman) {
-            // Human-readable format
-            this.printHeader(`Who Uses: ${symbol.name}`);
-            console.log(`Name: ${symbol.name}`);
-            console.log(`Type: ${symbol.type}`);
-            console.log(`File: ${symbol.file_path}:${symbol.line}`);
-            console.log(`Exported: ${symbol.is_exported ? 'Yes' : 'No'}`);
-            if (symbol.summary) {
-              console.log(
-                `Summary: ${symbol.summary.substring(0, 80)}${symbol.summary.length > 80 ? '...' : ''}`
-              );
-            }
-            console.log();
-
-            if (byType.size === 0) {
-              console.log('Not used by any symbol');
-              if (!symbol.is_exported) {
-                console.log('Note: This symbol is not exported.');
-              }
-            } else {
-              console.log(`Referenced in ${totalCount} relationship(s):`);
-              console.log();
-
-              for (const [type, ids] of byType.entries()) {
-                console.log(`${type} (${ids.length}):`);
-                const depSymbols = dbManager.getSymbolsByIds(ids.slice(0, 10));
-                for (const dep of depSymbols) {
-                  console.log(`  <- ${dep.name} (${dep.type}) ${dep.file_path}:${dep.line}`);
-                }
-                if (ids.length > 10) {
-                  console.log(`  ... and ${ids.length - 10} more`);
-                }
-                console.log();
-              }
-            }
-          } else {
-            // XML format (default)
-            // Build grouped dependents data
-            const dependentsData: GroupedSectionData = {};
-            for (const [type, ids] of byType.entries()) {
-              const depSymbols = dbManager.getSymbolsByIds(ids);
-              const items: Array<Record<string, unknown>> = [];
-
-              for (const dep of depSymbols) {
-                items.push({
-                  name: dep.name,
-                  type: dep.type,
-                  file: dep.file_path,
-                  line: dep.line,
-                });
-              }
-
-              // For non-symbol refs (like file paths in re-export)
-              for (const id of ids) {
-                if (!depSymbols.find((d) => d.id === id)) {
-                  items.push({ name: id, type: 'unknown', file: '', line: 0 });
-                }
-              }
-
-              dependentsData[type] = items;
-            }
-
-            new XmlBuilder(WhoUsesSchema)
-              .section('source', {
-                name: symbol.name,
-                type: symbol.type,
-                file: symbol.file_path,
-                line: symbol.line,
-                exported: symbol.is_exported,
-              })
-              .section('dependents', dependentsData)
-              .print();
-          }
-        }
-
-        return this.success();
-      } finally {
-        if (!this.dbManager) {
-          dbManager.close();
+        } finally {
+          canonical.repository.close();
         }
       }
+      return this.fromLegacy(query, options);
     });
+  }
+
+  private fromLegacy(
+    query: string,
+    options: { json: boolean; xml: boolean; includeExternal: boolean }
+  ): CommandResult {
+    if (!this.dbManager) {
+      const check = this.checkDatabaseExists();
+      if (check) return check;
+    }
+    const db = this.dbManager || new DatabaseManager(this.getDatabasePath(), this.getJsonlPath());
+    try {
+      const matches = db.findSymbolsByNamePattern(query);
+      const symbol =
+        matches.find((item) => item.name.toLowerCase() === query.toLowerCase()) ?? matches.at(0);
+      if (!symbol) return this.failure(`Symbol not found: ${query}`);
+      const ids = new Set<string>();
+      for (const rel of db.queryRelationships({ symbolId: symbol.id, limit: 500 })) {
+        const to = Array.isArray(rel.to) ? rel.to : [rel.to];
+        if (to.includes(symbol.id))
+          for (const from of Array.isArray(rel.from) ? rel.from : [rel.from]) ids.add(from);
+      }
+      for (const item of db.getDependents(symbol.id)) ids.add(item);
+      const dependents = db
+        .getSymbolsByIds([...ids])
+        .filter(
+          (item) =>
+            options.includeExternal || !this.isExternal({ file: item.file_path, external: false })
+        );
+      return this.printResult(
+        {
+          source: {
+            id: symbol.id,
+            name: symbol.name,
+            kind: symbol.type,
+            file: symbol.file_path,
+            evidence: { startLine: symbol.line },
+            exported: Boolean(symbol.is_exported),
+            sourceId: symbol.id,
+          },
+          dependents: dependents.map((item) => ({
+            edge: { kind: 'code-dependency', from: item.id, to: symbol.id },
+            node: {
+              id: item.id,
+              name: item.name,
+              kind: item.type,
+              file: item.file_path,
+              evidence: { startLine: item.line },
+              external: false,
+              sourceId: item.id,
+            },
+          })),
+        },
+        options
+      );
+    } finally {
+      if (!this.dbManager) db.close();
+    }
+  }
+
+  private printResult(
+    value: {
+      source: CanonicalGraphNode;
+      dependents: Array<{
+        edge: { kind: string; from: string; to: string };
+        node: CanonicalGraphNode;
+      }>;
+    },
+    options: { json: boolean; xml: boolean }
+  ): CommandResult {
+    const source = value.source;
+    const payload = {
+      symbol: source,
+      dependents: value.dependents.map((item) => ({ ...item.node, relationship: item.edge.kind })),
+    };
+    if (options.json) console.log(JSON.stringify(payload, null, 2));
+    else if (options.xml) {
+      const groupedDependents: Record<
+        string,
+        Array<{ name: string; type: string; file: string; line: number }>
+      > = {};
+      for (const item of payload.dependents) {
+        const group = groupedDependents[item.relationship] ?? [];
+        group.push({
+          name: item.name ?? item.id,
+          type: item.kind,
+          file: item.file ?? '',
+          line: item.evidence?.startLine ?? 0,
+        });
+        groupedDependents[item.relationship] = group;
+      }
+      new XmlBuilder(WhoUsesSchema)
+        .section('source', {
+          name: source.name,
+          type: source.kind,
+          file: source.file ?? '',
+          line: source.evidence?.startLine ?? 0,
+          exported: source.exported ?? false,
+        })
+        .section('dependents', groupedDependents)
+        .print();
+    } else {
+      this.printHeader(`Who Uses: ${source.name}`);
+      console.log(`Type: ${source.kind}`);
+      console.log(`File: ${source.file ?? 'unknown'}:${source.evidence?.startLine ?? '?'}`);
+      console.log();
+      if (payload.dependents.length === 0) console.log('Not used by any symbol');
+      else {
+        console.log(`Referenced by ${payload.dependents.length} symbol(s):`);
+        for (const item of payload.dependents)
+          console.log(
+            `  ← ${item.name} (${item.kind}) ${item.file ?? ''}:${item.evidence?.startLine ?? '?'}`
+          );
+      }
+    }
+    return this.success();
+  }
+  private normalizeFileQuery(query: string): string {
+    const relative = path.isAbsolute(query) ? path.relative(process.cwd(), query) : query;
+    return relative.split(path.sep).join('/').replace(/^\.\//, '');
+  }
+  private resolveSymbolNode(
+    nodes: readonly CanonicalGraphNode[],
+    query: string,
+    aliases: readonly { legacyId: string; canonicalId: string }[] = []
+  ): CanonicalGraphNode | undefined {
+    const canonicalId = aliases.find((alias) => alias.legacyId === query)?.canonicalId;
+    return (
+      nodes.find((node) => node.id === canonicalId) ??
+      nodes.find((node) => node.id === query) ??
+      nodes.find((node) => node.qualifiedName === query) ??
+      nodes.find((node) => node.name === query)
+    );
+  }
+  private isExternal(node: Pick<CanonicalGraphNode, 'external' | 'file'>): boolean {
+    return (
+      node.external === true ||
+      /(?:bundled:|(?:^|[\\/])libs[\\/]|(?:^|[\\/])node_modules[\\/])/.test(node.file ?? '')
+    );
+  }
+  private openCanonical(): {
+    repository: GraphRepository;
+    revision: NonNullable<ReturnType<GraphRepository['readActiveRevision']>>;
+  } | null {
+    const configPath = path.join(process.cwd(), '.tsdoc.config.json');
+    let configured: string | undefined;
+    try {
+      const parsed: unknown = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      const config = parsed as { canonicalGraph?: { databasePath?: string } };
+      configured = config.canonicalGraph?.databasePath;
+    } catch {
+      /* defaults */
+    }
+    const candidate =
+      process.env.TSDOC_EDGE_CANONICAL_GRAPH_DB ?? configured ?? '.tsdoc/canonical-graph.db';
+    const databasePath = path.resolve(process.cwd(), candidate);
+    if (!fs.existsSync(databasePath)) return null;
+    let repository: GraphRepository | undefined;
+    try {
+      repository = new GraphRepository(databasePath, { readOnly: true });
+      const revision = repository.readActiveRevision();
+      if (!revision) {
+        repository.close();
+        return null;
+      }
+      return { repository, revision };
+    } catch {
+      repository?.close();
+      return null;
+    }
   }
 }

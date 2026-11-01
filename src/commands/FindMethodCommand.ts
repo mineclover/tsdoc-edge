@@ -5,6 +5,7 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import type { GroupedSectionData, SectionData } from '../output/types';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import type { SymbolRegistryEntry } from '../types/registry';
@@ -87,7 +88,9 @@ export class FindMethodCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const query = args[0];
+      const invalid = this.validateAllowedFlags(args, ['--json', '--xml']);
+      if (invalid) return invalid;
+      const query = args.find((arg) => !arg.startsWith('-'));
 
       if (!query) {
         this.printError('Usage: tsdoc-edge find-method <qualified-name>');
@@ -111,17 +114,57 @@ export class FindMethodCommand extends BaseCommand {
       if (manager) {
         const entry = manager.findByQualifiedName(query);
         if (entry) {
+          if (this.hasFlag(args, '--json')) {
+            console.log(JSON.stringify(entry, null, 2));
+            return this.success();
+          }
+          if (this.hasFlag(args, '--xml')) {
+            this.printStructured(
+              'find-method',
+              {
+                symbol: {
+                  id: entry.id,
+                  name: entry.sourceRef.qualifiedName || entry.sourceRef.symbolName,
+                  file: entry.sourceRef.filePath,
+                  line: entry.sourceRef.line || 0,
+                  type: entry.sourceRef.type || 'unknown',
+                },
+              },
+              args
+            );
+            return this.success();
+          }
           return this.displayRegistryEntry(entry, manager);
         }
 
         const results = manager.search(query);
         if (results.length > 0) {
+          if (this.hasFlag(args, '--json')) {
+            console.log(JSON.stringify(results, null, 2));
+            return this.success();
+          }
+          if (this.hasFlag(args, '--xml')) {
+            this.printStructured(
+              'find-method',
+              {
+                matches: results.map((item) => ({
+                  id: item.id,
+                  name: item.sourceRef.qualifiedName || item.sourceRef.symbolName,
+                  file: item.sourceRef.filePath,
+                  line: item.sourceRef.line || 0,
+                  type: item.sourceRef.type || 'unknown',
+                })),
+              },
+              args
+            );
+            return this.success();
+          }
           return this.displayRegistryResults(results, manager);
         }
       }
 
       // Fall back to database search
-      return this.findFromDatabase(query);
+      return this.findFromDatabase(query, args);
     });
   }
 
@@ -192,7 +235,19 @@ export class FindMethodCommand extends BaseCommand {
     return this.success();
   }
 
-  private findFromDatabase(query: string): CommandResult {
+  private printStructured(
+    rootTag: string,
+    sections: Record<string, SectionData | GroupedSectionData>,
+    args: string[]
+  ): void {
+    if (this.hasFlag(args, '--json')) {
+      console.log(JSON.stringify(sections, null, 2));
+      return;
+    }
+    this.printOutput(rootTag, sections, args);
+  }
+
+  private findFromDatabase(query: string, args: string[] = []): CommandResult {
     const dbCheck = this.checkDatabaseExists();
     if (dbCheck) {
       console.log(`${colors.yellow}No symbols found${colors.reset}`);
@@ -205,6 +260,23 @@ export class FindMethodCommand extends BaseCommand {
     const dbManager = new DatabaseManager(dbPath, jsonlPath);
 
     try {
+      if (this.hasFlag(args, '--xml')) {
+        const matches = dbManager.findMethodsByNamePart(query);
+        this.printOutput(
+          'find-method',
+          {
+            matches: matches.map((match) => ({
+              id: match.id,
+              name: match.name,
+              file: match.file_path,
+              line: match.line,
+              type: match.type,
+            })),
+          },
+          args
+        );
+        return this.success();
+      }
       // First try dedicated method search
       let methodMatches = dbManager.findMethodsByNamePart(query);
 
@@ -217,6 +289,10 @@ export class FindMethodCommand extends BaseCommand {
 
         // If still no methods, show all matching symbols
         if (methodMatches.length === 0 && allMatches.length > 0) {
+          if (this.hasFlag(args, '--json')) {
+            console.log(JSON.stringify(allMatches, null, 2));
+            return this.success();
+          }
           console.log(`Found ${colors.bold}${allMatches.length}${colors.reset} matching symbols:`);
           console.log();
 
@@ -231,6 +307,10 @@ export class FindMethodCommand extends BaseCommand {
       }
 
       if (methodMatches.length === 0) {
+        if (this.hasFlag(args, '--json')) {
+          console.log(JSON.stringify([], null, 2));
+          return this.success();
+        }
         console.log(`${colors.yellow}No methods found${colors.reset}`);
         console.log();
         return this.success();
@@ -240,6 +320,10 @@ export class FindMethodCommand extends BaseCommand {
         const match = methodMatches[0];
         const symbol = dbManager.getSymbol(match.id);
         if (symbol) {
+          if (this.hasFlag(args, '--json')) {
+            console.log(JSON.stringify(symbol, null, 2));
+            return this.success();
+          }
           console.log(`${colors.bold}${symbol.id}${colors.reset} → ${symbol.name}`);
           console.log();
           console.log(`File:       ${symbol.filePath}`);
@@ -256,6 +340,10 @@ export class FindMethodCommand extends BaseCommand {
         return this.success();
       }
 
+      if (this.hasFlag(args, '--json')) {
+        console.log(JSON.stringify(methodMatches, null, 2));
+        return this.success();
+      }
       console.log(
         `Found ${colors.bold}${methodMatches.length}${colors.reset} matching methods/functions:`
       );

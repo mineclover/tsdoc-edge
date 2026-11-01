@@ -42,7 +42,7 @@ export class MoveCommand extends BaseCommand {
 Move a documentation file and automatically update all references to it.
 
 Options:
-  --dry-run    Show what would be changed without making changes
+  --dry-run, -n Show what would be changed without making changes
   --yes        Skip confirmation prompt
 
 Examples:
@@ -63,7 +63,11 @@ Examples:
       return Promise.resolve(this.displayHelp());
     }
 
-    const [sourcePath, destPath] = args.filter((a) => !a.startsWith('--'));
+    const flagError = this.validateAllowedFlags(args, ['--dry-run', '-n', '--yes']);
+    if (flagError) return Promise.resolve(flagError);
+
+    const [sourcePath, destPath] = this.getPositionalArgs(args);
+    const dryRun = this.hasFlag(args, ['--dry-run', '-n']);
 
     if (!sourcePath || !destPath) {
       this.printError('Source and destination paths required');
@@ -95,6 +99,12 @@ Examples:
     const refs = updater.findReferences(path.relative(managedDir, absSource));
 
     console.log(`Found ${refs.length} references`);
+
+    if (dryRun) {
+      console.log(`Would update ${refs.length} references`);
+      console.log(`Would move ${absSource} to ${absDest}`);
+      return Promise.resolve({ exitCode: 0, message: 'Dry run complete' });
+    }
 
     updater.updateReferences(refs, path.relative(managedDir, absDest));
     fs.renameSync(absSource, absDest);

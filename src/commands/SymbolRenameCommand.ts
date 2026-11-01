@@ -95,7 +95,7 @@ export class SymbolRenameCommand extends BaseCommand {
     new-symbol  New symbol name (without [[ ]])
 
   Options:
-    --dry-run   Preview changes without applying
+    --dry-run, -n Preview changes without applying
     --yes, -y   Auto-confirm all changes
     --base-dir=DIR  Base directory (default: managed)
 
@@ -118,18 +118,24 @@ export class SymbolRenameCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const flagError = this.validateAllowedFlags(
+        args,
+        ['--dry-run', '-n', '--yes', '-y'],
+        ['--base-dir']
+      );
+      if (flagError) return flagError;
+
       // Parse arguments
-      const nonFlagArgs = args.filter((arg) => !arg.startsWith('--') && !arg.startsWith('-'));
+      const nonFlagArgs = this.getPositionalArgs(args, ['--base-dir']);
       if (nonFlagArgs.length < 2) {
         throw new Error('Missing required arguments: old-symbol and new-symbol');
       }
 
       const oldSymbol = nonFlagArgs[0];
       const newSymbol = nonFlagArgs[1];
-      const dryRun = args.includes('--dry-run');
-      const autoConfirm = args.includes('--yes') || args.includes('-y');
-      const baseDirArg = args.find((arg) => arg.startsWith('--base-dir='));
-      const baseDir = baseDirArg ? baseDirArg.split('=')[1] : 'managed';
+      const dryRun = this.hasFlag(args, ['--dry-run', '-n']);
+      const autoConfirm = this.hasFlag(args, ['--yes', '-y']);
+      const baseDir = this.getOption(args, '--base-dir') || 'managed';
 
       this.printHeader('Rename Symbol');
 

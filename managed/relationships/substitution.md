@@ -357,7 +357,7 @@ interface SubstitutionMetrics {
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:83
+- [[Commands Index]] → managed/COMMANDS.md:99
 - [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:130
 - [[Fallback]] → managed/relationships/fallback.md:212
 - [[Mutual Exclusion]] → managed/relationships/mutual-exclusion.md:215

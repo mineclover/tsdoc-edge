@@ -229,7 +229,7 @@ try {
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:84
+- [[Commands Index]] → managed/COMMANDS.md:100
 - [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:141
 - [[Substitution]] → managed/relationships/substitution.md:268
 

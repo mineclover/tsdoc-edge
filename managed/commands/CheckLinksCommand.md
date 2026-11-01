@@ -34,7 +34,7 @@ Check validity of all [[Symbol]] links.
 
 ### Referenced By
 
-- [[CLI Commands]] → managed/CLI-COMMANDS.md:24
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:38
 - [[ValidationFeatures]] → managed/features/validation-features.md:254
 - [[LinkingTypes]] → managed/types/LinkingTypes.md:155
 - [[LinkValidator]] → managed/utilities/LinkValidator.md:77

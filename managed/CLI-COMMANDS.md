@@ -10,6 +10,20 @@ canonical: true
 
 Complete reference for all TSDoc Edge CLI commands.
 
+## Unified SSOT workflow
+
+Run one pipeline to refresh the symbol database, canonical `@ttsc/graph` revision, managed
+checkpoints, SpecGraph, and backlinks:
+
+```bash
+tsdoc-edge sync [--force] [--dry-run] [--check] [--json]
+```
+
+The three SSOT tiers are `@microsoft/tsdoc` (29 standard tags), `ttsc`/`@ttsc/graph`/`@ttsc/lint`
+(canonical graph and 25 error rules), and `tsdoc-edge` (22 irreducible domain tags and connectivity).
+Use `find-method <name>` for method lookup, `spec extract` or `spec graph ...` for SpecGraph
+lifecycle operations, and `convention check --pack <file>` for revision-pinned governance.
+
 ## Command Categories
 
 ### Build & Analysis
@@ -37,6 +51,10 @@ Complete reference for all TSDoc Edge CLI commands.
 ### Workflow
 - [[WorkContextCommand]] - Show file context
 - [[InitCommand]] - Initialize configuration
+- `sync [--force] [--dry-run] [--check] [--json]` - Run the complete SSOT synchronization pipeline
+- `find-method <name>` - Find methods by name
+- `spec extract` / `spec graph ...` - Build or inspect managed specifications
+- `convention check --pack <file>` - Check exact convention bindings
 
 ## See Also
 
@@ -58,12 +76,11 @@ Complete reference for all TSDoc Edge CLI commands.
 - CheckDuplicatesCommand (check-duplicates) → src/commands/CheckDuplicatesCommand.ts:64
 - CheckLinksCommand (check-links) → src/commands/CheckLinksCommand.ts:36
 - CoreApiCommand (core-api) → src/commands/CoreApiCommand.ts:36
-- DepsCommand (deps) → src/commands/DepsCommand.ts:38
-- FindMethodCommand (find-method) → src/commands/FindMethodCommand.ts:37
+- FindMethodCommand (find-method) → src/commands/FindMethodCommand.ts:38
 - FindUnusedDocsCommand (find-unused-docs) → src/commands/FindUnusedDocsCommand.ts:35
 - GenerateDocsCommand (generate-docs) → src/commands/GenerateDocsCommand.ts:18
 - InitCommand (init) → src/commands/InitCommand.ts:18
-- OrphansCommand (orphans) → src/commands/OrphansCommand.ts:36
+- OrphansCommand (orphans) → src/commands/OrphansCommand.ts:38
 - ParseCommand (parse) → src/commands/ParseCommand.ts:35
 - PlansCommand (plans) → src/commands/PlansCommand.ts:34
 - RebuildIndexCommand (rebuild-index) → src/commands/RebuildIndexCommand.ts:31
@@ -80,5 +97,4 @@ Complete reference for all TSDoc Edge CLI commands.
 - UpdateSymbolRefsCommand (update-symbol-refs) → src/commands/UpdateSymbolRefsCommand.ts:38
 - ValidateDocsCommand (validate-docs) → src/commands/ValidateDocsCommand.ts:37
 - ValidateSpecCommand (validate-spec) → src/commands/ValidateSpecCommand.ts:17
-- WhoUsesCommand (who-uses) → src/commands/WhoUsesCommand.ts:36
 

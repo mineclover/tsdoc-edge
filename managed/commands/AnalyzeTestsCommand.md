@@ -40,7 +40,7 @@ Analyze test coverage and relationships.
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:67
+- [[Commands Index]] → managed/COMMANDS.md:83
 
 ### Implemented By
 

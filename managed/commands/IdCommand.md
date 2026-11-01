@@ -21,5 +21,5 @@ Queries, validates, and manages symbol identity entries in the workspace symbol 
 
 ### Implemented By
 
-- IdCommand → src/commands/IdCommand.ts:38
+- IdCommand → src/commands/IdCommand.ts:39
 

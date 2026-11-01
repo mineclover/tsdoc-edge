@@ -74,3 +74,10 @@ describe('IdCommand', () => {
     });
   });
 });
+
+describe('IdCommand fail-closed flags', () => {
+  it('rejects unknown options', async () => {
+    const result = await new IdCommand().execute(['--unknown-flag']);
+    expect(result.exitCode).toBe(1);
+  });
+});

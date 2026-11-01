@@ -159,5 +159,19 @@ describe('InitCommand', () => {
       expect(result.exitCode).toBe(0);
       expect(savedConfig.project.version).toBe('1.0.0');
     });
+
+    it('rejects unknown flags before writing', async () => {
+      const result = await command.execute(['--unknown']);
+      expect(result.exitCode).toBe(1);
+      expect(mockInit).not.toHaveBeenCalled();
+      expect(mockEnsureDirectories).not.toHaveBeenCalled();
+    });
+
+    it('previews with --dry-run and -n without mutating', async () => {
+      const result = await command.execute(['-n', '-f', '--name=preview']);
+      expect(result.exitCode).toBe(0);
+      expect(mockInit).not.toHaveBeenCalled();
+      expect(mockEnsureDirectories).not.toHaveBeenCalled();
+    });
   });
 });

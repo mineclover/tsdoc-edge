@@ -72,7 +72,6 @@ export interface ExtractedEnhancedDoc {
  * @rationale Upstream standard AST avoids regex drift, supports multiline blocks and repeated ADR tags, and trusts `@throws`/`@remarks`/`@privateRemarks`
  * @consequences Deterministic extraction aligned with `@microsoft/tsdoc` and `ttsc`
  *
- * @privateRemarks TODO: Add support for extracting from compiled `.d.ts` files
  */
 export class EnhancedDocExtractor {
   private tsdocParser: TSDocParser;
@@ -108,7 +107,7 @@ export class EnhancedDocExtractor {
     const results: ExtractedEnhancedDoc[] = [];
 
     const visit = (node: ts.Node) => {
-      // Extract from top-level / module-level exportable declarations
+      // Extract declarations at source/module scope and public members of declarations.
       if (this.isExportableSymbol(node)) {
         const result = this.extractFromNode(node, sourceFile, filePath);
         if (result) {
@@ -116,8 +115,15 @@ export class EnhancedDocExtractor {
         }
       }
 
-      // Only traverse module/source containers so local variables inside function or class bodies are never extracted
-      if (ts.isSourceFile(node) || ts.isModuleDeclaration(node) || ts.isModuleBlock(node)) {
+      // Declaration files commonly place exports in ambient namespaces/modules. Traverse
+      // declaration members, but never function bodies or ordinary implementation blocks.
+      if (
+        ts.isSourceFile(node) ||
+        ts.isModuleDeclaration(node) ||
+        ts.isModuleBlock(node) ||
+        ts.isInterfaceDeclaration(node) ||
+        ts.isClassDeclaration(node)
+      ) {
         ts.forEachChild(node, visit);
       }
     };
@@ -137,7 +143,11 @@ export class EnhancedDocExtractor {
       ts.isInterfaceDeclaration(node) ||
       ts.isTypeAliasDeclaration(node) ||
       ts.isVariableStatement(node) ||
-      ts.isMethodDeclaration(node)
+      ts.isEnumDeclaration(node) ||
+      ts.isMethodDeclaration(node) ||
+      ts.isMethodSignature(node) ||
+      ts.isPropertySignature(node) ||
+      ts.isPropertyDeclaration(node)
     );
   }
 
@@ -209,6 +219,9 @@ export class EnhancedDocExtractor {
     if (ts.isTypeAliasDeclaration(node)) {
       return node.name.text;
     }
+    if (ts.isEnumDeclaration(node)) {
+      return node.name.text;
+    }
     if (ts.isVariableStatement(node)) {
       if (
         node.declarationList.declarations.length > 0 &&
@@ -220,7 +233,66 @@ export class EnhancedDocExtractor {
     if (ts.isMethodDeclaration(node) && ts.isIdentifier(node.name)) {
       return node.name.text;
     }
+    if (
+      (ts.isMethodSignature(node) ||
+        ts.isPropertySignature(node) ||
+        ts.isPropertyDeclaration(node)) &&
+      (ts.isIdentifier(node.name) ||
+        ts.isStringLiteral(node.name) ||
+        ts.isNumericLiteral(node.name))
+    ) {
+      return node.name.text;
+    }
     return null;
+  }
+
+  private hasModifier(node: ts.Node, kind: ts.SyntaxKind): boolean {
+    return ts.canHaveModifiers(node)
+      ? (ts.getModifiers(node)?.some((modifier) => modifier.kind === kind) ?? false)
+      : false;
+  }
+
+  /**
+   * Declaration files have two useful export modes: script-style ambient declarations
+   * (where top-level declarations are visible globally) and external modules (where an
+   * explicit `export` is required). Ambient namespace/module members are visible through
+   * their container, while class/interface members are public unless marked private/protected.
+   */
+  private isDeclarationExported(
+    node: ts.Node,
+    sourceFile: ts.SourceFile,
+    hasExportKeyword: boolean
+  ): boolean {
+    if (hasExportKeyword) return true;
+
+    const parent = node.parent;
+    if (ts.isClassDeclaration(parent) || ts.isInterfaceDeclaration(parent)) {
+      const parentExported = this.isDeclarationExported(
+        parent,
+        sourceFile,
+        this.hasModifier(parent, ts.SyntaxKind.ExportKeyword)
+      );
+      return (
+        parentExported &&
+        !this.hasModifier(node, ts.SyntaxKind.PrivateKeyword) &&
+        !this.hasModifier(node, ts.SyntaxKind.ProtectedKeyword)
+      );
+    }
+
+    const isDeclarationFile = sourceFile.isDeclarationFile || sourceFile.fileName.endsWith('.d.ts');
+    if (!isDeclarationFile) return false;
+
+    // `declare module` / `declare namespace` bodies are ambient containers. Their
+    // declarations are part of the declaration surface even when `export` is omitted.
+    let ancestor: ts.Node = parent;
+    while (!ts.isSourceFile(ancestor)) {
+      if (ts.isModuleDeclaration(ancestor)) return true;
+      ancestor = ancestor.parent;
+    }
+
+    // A declaration-file script has implicit global exports. An external module created
+    // by imports/exports requires an explicit export modifier.
+    return !ts.isExternalModule(sourceFile);
   }
 
   /**
@@ -235,24 +307,26 @@ export class EnhancedDocExtractor {
   ): Symbol {
     const { line, character: column } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
 
-    let hasExportKeyword = false;
-    if (ts.canHaveModifiers(node)) {
-      const modifiers = ts.getModifiers(node);
-      hasExportKeyword =
-        modifiers?.some((mod: ts.Modifier) => mod.kind === ts.SyntaxKind.ExportKeyword) || false;
-    }
+    const hasExportKeyword = this.hasModifier(node, ts.SyntaxKind.ExportKeyword);
 
     let type: Symbol['type'] = 'function';
     if (ts.isFunctionDeclaration(node)) type = 'function';
     else if (ts.isClassDeclaration(node)) type = 'class';
     else if (ts.isInterfaceDeclaration(node)) type = 'interface';
     else if (ts.isTypeAliasDeclaration(node)) type = 'type';
+    else if (ts.isEnumDeclaration(node)) type = 'enum';
     else if (ts.isVariableStatement(node)) type = 'variable';
-    else if (ts.isMethodDeclaration(node)) type = 'method';
+    else if (ts.isMethodDeclaration(node) || ts.isMethodSignature(node)) type = 'method';
+    else if (ts.isPropertyDeclaration(node) || ts.isPropertySignature(node)) type = 'property';
 
     const id = this.options.autoGenerateIds ? `${name.toLowerCase()}-${Date.now()}` : name;
+    const isExported = this.isDeclarationExported(node, sourceFile, hasExportKeyword);
+    const isInternal = structured?.releaseVisibility === 'internal';
     const isPublic =
-      structured?.releaseVisibility === 'internal' ? false : Boolean(hasExportKeyword);
+      isExported &&
+      !isInternal &&
+      !this.hasModifier(node, ts.SyntaxKind.PrivateKeyword) &&
+      !this.hasModifier(node, ts.SyntaxKind.ProtectedKeyword);
     const contract = this.extractContractSpec(structured, name, filePath);
 
     return {
@@ -262,7 +336,7 @@ export class EnhancedDocExtractor {
       filePath,
       line: line + 1,
       column,
-      isExported: Boolean(hasExportKeyword),
+      isExported,
       isPublic,
       ...(structured?.summary ? { summary: structured.summary } : {}),
       ...(contract ? { contract } : {}),
@@ -473,24 +547,40 @@ export class EnhancedDocExtractor {
     const deps: DependencySpec[] = [];
     const seen = new Set<string>();
 
-    // 1. Canonical TypeScript AST imports
-    for (const stmt of sourceFile.statements) {
-      if (!ts.isImportDeclaration(stmt) || !ts.isStringLiteral(stmt.moduleSpecifier)) {
-        continue;
-      }
-      const specifier = stmt.moduleSpecifier.text.trim();
-      if (!specifier) continue;
-      const isRelative = specifier.startsWith('./') || specifier.startsWith('../');
+    // 1. Canonical TypeScript AST imports and declaration re-exports. This includes
+    // `import type` and both `export { ... } from` / `export * from` forms used by .d.ts files.
+    const addModuleDependency = (specifier: string, reason: string): void => {
+      const target = specifier.trim();
+      if (!target) return;
+      const isRelative = target.startsWith('./') || target.startsWith('../');
       const type: DependencySpec['type'] = isRelative ? 'file' : 'external';
-      const key = `${type}:${specifier}`;
-      if (seen.has(key)) continue;
+      const key = `${type}:${target}`;
+      if (seen.has(key)) return;
       seen.add(key);
-      deps.push({
-        target: specifier,
-        type,
-        reason: 'TypeScript AST import',
-      });
-    }
+      deps.push({ target, type, reason });
+    };
+
+    const visitModuleStatements = (container: ts.Node): void => {
+      for (const stmt of ts.isSourceFile(container) || ts.isModuleBlock(container)
+        ? container.statements
+        : []) {
+        if (ts.isImportDeclaration(stmt) && ts.isStringLiteral(stmt.moduleSpecifier)) {
+          addModuleDependency(stmt.moduleSpecifier.text, 'TypeScript AST import');
+        } else if (
+          ts.isExportDeclaration(stmt) &&
+          stmt.moduleSpecifier &&
+          ts.isStringLiteral(stmt.moduleSpecifier)
+        ) {
+          addModuleDependency(stmt.moduleSpecifier.text, 'TypeScript AST re-export');
+        }
+        if (ts.isModuleDeclaration(stmt)) {
+          let body: ts.ModuleBody | undefined = stmt.body;
+          while (body && ts.isModuleDeclaration(body)) body = body.body;
+          if (body && ts.isModuleBlock(body)) visitModuleStatements(body);
+        }
+      }
+    };
+    visitModuleStatements(sourceFile);
 
     if (!structured) {
       return deps;

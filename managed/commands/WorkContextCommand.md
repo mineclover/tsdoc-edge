@@ -73,7 +73,7 @@ tsdoc-edge work-context src/analyzer/CallGraphAnalyzer.ts
 
 ### Referenced By
 
-- [[CLI Commands]] → managed/CLI-COMMANDS.md:38
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:52
 - [[TSDoc Edge Documentation]] → managed/README.md:78
 - [[QueryCommands]] → managed/commands/QueryCommands.md:148
 - [[Module Specification Framework]] → managed/concepts/module-specification-framework.md:401

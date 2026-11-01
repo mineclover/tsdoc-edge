@@ -86,7 +86,7 @@ export class SymbolFixCommand extends BaseCommand {
   Default directory: managed
 
   Options:
-    --dry-run      Preview changes without applying
+    --dry-run, -n  Preview changes without applying
     --yes, -y      Auto-confirm all fixes
     --type=TYPE    Fix only specific type (typo/duplicate-h1/missing-primary/orphaned-aux/formatting)`;
   }
@@ -104,10 +104,18 @@ export class SymbolFixCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const docsDir = args[0] || 'managed';
-      const dryRun = args.includes('--dry-run');
-      const autoConfirm = args.includes('--yes') || args.includes('-y');
-      const fixType = args.find((arg) => arg.startsWith('--type='))?.split('=')[1];
+      const flagError = this.validateAllowedFlags(
+        args,
+        ['--dry-run', '-n', '--yes', '-y'],
+        ['--type']
+      );
+      if (flagError) return flagError;
+
+      const positional = this.getPositionalArgs(args, ['--type']);
+      const docsDir = positional[0] || 'managed';
+      const dryRun = this.hasFlag(args, ['--dry-run', '-n']);
+      const autoConfirm = this.hasFlag(args, ['--yes', '-y']);
+      const fixType = this.getOption(args, '--type');
 
       this.printHeader('Symbol Fix');
 

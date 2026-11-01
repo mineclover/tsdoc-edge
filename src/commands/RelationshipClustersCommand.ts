@@ -3,7 +3,11 @@
  * @packageDocumentation
  */
 
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import type { CanonicalGraphNode } from '../indexer/contracts';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { GraphRepository } from '../storage/GraphRepository';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /** A cluster of related symbols in the architecture */
@@ -88,23 +92,38 @@ Examples:
         return this.displayHelp();
       }
 
+      const invalid = this.validateAllowedFlags(
+        args,
+        ['--detailed', '--include-external', '--json'],
+        ['--min-size', '--max-clusters', '--category']
+      );
+      if (invalid) return invalid;
       const options = {
         minSize: Number.parseInt(this.getOption(args, '--min-size') || '3', 10),
         maxClusters: Number.parseInt(this.getOption(args, '--max-clusters') || '20', 10),
         category: this.getOption(args, '--category'),
         detailed: args.includes('--detailed'),
+        includeExternal: this.hasFlag(args, '--include-external'),
+        json: this.hasFlag(args, '--json'),
       };
+      if (options.json) return this.executeJsonClusters(options);
 
-      this.printHeader('Architectural Cluster Analysis');
-
+      const canonical = this.openCanonical();
       const dbPath = this.getDatabasePath();
-      const dbManager = new DatabaseManager(dbPath);
+      const dbManager = canonical ? undefined : new DatabaseManager(dbPath);
       try {
         console.log();
         this.printInfo('Building symbol graph...');
 
         // Build adjacency map
-        const adjacencyMap = this.buildAdjacencyMap(dbManager, options.category);
+        const adjacencyMap = canonical
+          ? this.buildCanonicalAdjacency(
+              canonical.revision.graph.nodes,
+              canonical.revision.graph.edges,
+              options.category,
+              options.includeExternal
+            )
+          : this.buildAdjacencyMap(dbManager as DatabaseManager, options.category);
         const symbols = Array.from(adjacencyMap.keys());
 
         this.printInfo(`Graph: ${symbols.length} symbols, ${this.countEdges(adjacencyMap)} edges`);
@@ -126,14 +145,14 @@ Examples:
         // Sort by cohesion
         clusters.sort((a, b) => b.cohesion - a.cohesion);
 
+        const displayClusters = clusters.slice(0, options.maxClusters);
         // Display clusters
+        this.printHeader('Architectural Cluster Analysis');
         this.printSection('Architectural Clusters');
         console.log(
           `  ${this.colors.dim}Showing top ${Math.min(options.maxClusters, clusters.length)} clusters sorted by cohesion${this.colors.reset}`
         );
         console.log();
-
-        const displayClusters = clusters.slice(0, options.maxClusters);
 
         for (let i = 0; i < displayClusters.length; i++) {
           const cluster = displayClusters[i];
@@ -240,9 +259,104 @@ Examples:
 
         return this.success(`Found ${clusters.length} architectural clusters`);
       } finally {
-        dbManager.close();
+        dbManager?.close();
+        canonical?.repository.close();
       }
     });
+  }
+
+  private executeJsonClusters(options: {
+    minSize: number;
+    maxClusters: number;
+    category?: string;
+    detailed: boolean;
+    includeExternal: boolean;
+    json: boolean;
+  }): CommandResult {
+    const canonical = this.openCanonical();
+    const db = canonical ? undefined : new DatabaseManager(this.getDatabasePath());
+    try {
+      const adjacency = canonical
+        ? this.buildCanonicalAdjacency(
+            canonical.revision.graph.nodes,
+            canonical.revision.graph.edges,
+            options.category,
+            options.includeExternal
+          )
+        : this.buildAdjacencyMap(db as DatabaseManager, options.category);
+      const clusters = this.findClusters(adjacency, options.minSize)
+        .sort((left, right) => right.cohesion - left.cohesion)
+        .slice(0, options.maxClusters);
+      console.log(
+        JSON.stringify(
+          { clusters, totalClusters: clusters.length, symbols: adjacency.size },
+          null,
+          2
+        )
+      );
+      return this.success(`Found ${clusters.length} architectural clusters`);
+    } finally {
+      db?.close();
+      canonical?.repository.close();
+    }
+  }
+
+  private buildCanonicalAdjacency(
+    nodes: readonly CanonicalGraphNode[],
+    edges: readonly { from: string; to: string; kind: string }[],
+    category: string | undefined,
+    includeExternal: boolean
+  ): Map<string, Map<string, string>> {
+    const allowed = new Set(
+      nodes.filter((node) => includeExternal || !this.isExternal(node)).map((node) => node.id)
+    );
+    const map = new Map<string, Map<string, string>>();
+    for (const id of allowed) map.set(id, new Map());
+    for (const edge of edges)
+      if (
+        (!category || edge.kind.includes(category)) &&
+        allowed.has(edge.from) &&
+        allowed.has(edge.to)
+      ) {
+        map.get(edge.from)?.set(edge.to, edge.kind);
+        map.get(edge.to)?.set(edge.from, edge.kind);
+      }
+    return map;
+  }
+  private isExternal(node: Pick<CanonicalGraphNode, 'external' | 'file'>): boolean {
+    return (
+      node.external === true ||
+      /(?:bundled:|(?:^|[\\/])libs[\\/]|(?:^|[\\/])node_modules[\\/])/.test(node.file ?? '')
+    );
+  }
+  private openCanonical(): {
+    repository: GraphRepository;
+    revision: NonNullable<ReturnType<GraphRepository['readActiveRevision']>>;
+  } | null {
+    const configPath = path.join(process.cwd(), '.tsdoc.config.json');
+    let configured: string | undefined;
+    try {
+      const parsed: unknown = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      const config = parsed as { canonicalGraph?: { databasePath?: string } };
+      configured = config.canonicalGraph?.databasePath;
+    } catch {}
+    const db = path.resolve(
+      process.cwd(),
+      process.env.TSDOC_EDGE_CANONICAL_GRAPH_DB ?? configured ?? '.tsdoc/canonical-graph.db'
+    );
+    if (!fs.existsSync(db)) return null;
+    let repository: GraphRepository | undefined;
+    try {
+      repository = new GraphRepository(db, { readOnly: true });
+      const revision = repository.readActiveRevision();
+      if (!revision) {
+        repository.close();
+        return null;
+      }
+      return { repository, revision };
+    } catch {
+      return null;
+    }
   }
 
   /**

@@ -190,7 +190,7 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Referenced By
 
-- [[CLI Commands]] → managed/CLI-COMMANDS.md:29
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:43
 - [[TSDoc Edge Documentation]] → managed/README.md:103
 - [[DepsCommand]] → managed/commands/DepsCommand.md:145
 - [[OrphansCommand]] → managed/commands/OrphansCommand.md:180
@@ -205,5 +205,5 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Implemented By
 
-- WhoUsesCommand → src/commands/WhoUsesCommand.ts:36
+- WhoUsesCommand → src/commands/WhoUsesCommand.ts:16
 

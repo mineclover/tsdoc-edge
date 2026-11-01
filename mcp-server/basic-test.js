@@ -10,7 +10,7 @@
  * Unit testing level for MCP Server service layer.
  * Part of [[MCP Testing Strategy]] - Level 1.
  *
- * ## Test Coverage (7 tests)
+ * ## Test Coverage (9 tests)
  * 1. searchSymbols - Symbol search by query
  * 2. getOntologyStats - Graph statistics retrieval
  * 3. listRelationships - Relationship filtering
@@ -18,6 +18,8 @@
  * 5. queryRelationships - Symbol relationship traversal
  * 6. getSymbolDetails - Symbol detail retrieval
  * 7. Database connection resilience - Auto-reconnect after close()
+ * 8. getImpact - Canonical multi-hop impact traversal
+ * 9. getSpecBindings - Active normative specification bindings
  *
  * ## Prerequisites
  * Requires indexed database at `<workspace>/.tsdoc/symbols.db`:
@@ -26,7 +28,7 @@
  * ```
  *
  * ## Expected Results
- * - Total: 7 tests
+ * - Total: 9 tests
  * - Pass Rate: 100%
  * - Duration: <1s
  *
@@ -156,6 +158,22 @@ async function runTests() {
     // Reconnect automatically on next query
     const results = await service.searchSymbols({ query: 'test', limit: 1 });
     console.log(`  Auto-reconnect successful`);
+  });
+
+  await test('Canonical multi-hop impact analysis', async () => {
+    const impact = await service.getImpact({ symbol: 'analyzecommand-class-analyzecommand', direction: 'both', maxDepth: 2, includeExternal: false });
+    if (!impact || !Array.isArray(impact.impactedSymbols) || !['canonical', 'combined', 'legacy'].includes(impact.source)) {
+      throw new Error('Invalid impact result');
+    }
+    console.log(`  Source: ${impact.source}, affected: ${impact.impactedSymbols.length}, risk: ${impact.riskLevel}`);
+  });
+
+  await test('Active normative specification bindings', async () => {
+    const bindings = await service.getSpecBindings({ query: 'canonical' });
+    if (!bindings.revisionId || !Array.isArray(bindings.nodes) || !Array.isArray(bindings.bindings)) {
+      throw new Error('No active SpecGraph result');
+    }
+    console.log(`  Revision: ${bindings.revisionId}, nodes: ${bindings.nodes.length}, bindings: ${bindings.bindings.length}`);
   });
 
   service.close();

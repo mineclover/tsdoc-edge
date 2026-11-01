@@ -42,6 +42,7 @@ describe('SyncCommand', () => {
   const originalCwd = process.cwd();
 
   beforeEach(() => {
+    ConfigManager.reset();
     tempDir = fs.mkdtempSync(path.join(os.tmpdir(), 'tsdoc-sync-test-'));
     fs.mkdirSync(path.join(tempDir, 'src'), { recursive: true });
     fs.mkdirSync(path.join(tempDir, 'managed', 'specs'), { recursive: true });
@@ -76,6 +77,7 @@ describe('SyncCommand', () => {
   });
 
   afterEach(() => {
+    ConfigManager.reset();
     jest.restoreAllMocks();
     process.chdir(originalCwd);
     fs.rmSync(tempDir, { recursive: true, force: true });
@@ -170,5 +172,36 @@ describe('SyncCommand', () => {
     expect(result.exitCode).toBe(1);
     expect(result.message).toContain('Unknown option');
     expect(buildStub.calls).toEqual([]);
+  });
+
+  it('skips a missing config-only local router without failing sync', async () => {
+    const configPath = path.join(tempDir, '.tsdoc.config.json');
+    fs.writeFileSync(
+      configPath,
+      JSON.stringify({
+        project: { name: 'sync-test', version: '1.0.0', srcDirs: ['src'] },
+        paths: { commentsDir: '.tsdoc-comments', databasePath: '.tsdoc.db', jsonlDir: 'docs/data' },
+        documentManagement: { enabled: true, managedDirs: ['managed'] },
+        specGovernance: { authoredSpecDirs: ['managed/specs'] },
+        canonicalGraph: { routerModule: './missing-router.cjs' },
+      }),
+      'utf8'
+    );
+    ConfigManager.reset();
+    configManager = ConfigManager.getInstance(tempDir, configPath);
+    const buildStub = new StubStageCommand('build');
+    const command = new SyncCommand({
+      configManager,
+      buildCommandFactory: () => buildStub,
+      indexDocsCommandFactory: () => new StubStageCommand('index-docs'),
+      validateDocsCommandFactory: () => new StubStageCommand('validate-docs'),
+      specExtractCommandFactory: () => new StubStageCommand('spec-extract'),
+      updateBacklinksCommandFactory: () => new StubStageCommand('update-backlinks'),
+    });
+
+    const result = await command.execute(['--force', '--skip-specs', '--skip-backlinks']);
+
+    expect(result.exitCode).toBe(0);
+    expect(buildStub.calls).toEqual([['src', '--force']]);
   });
 });

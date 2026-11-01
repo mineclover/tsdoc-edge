@@ -28,3 +28,10 @@ describe('OrphansCommand', () => {
     });
   });
 });
+
+describe('OrphansCommand fail-closed flags', () => {
+  it('rejects unknown options', async () => {
+    const result = await new OrphansCommand().execute(['--unknown-flag']);
+    expect(result.exitCode).toBe(1);
+  });
+});

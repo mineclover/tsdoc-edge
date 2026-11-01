@@ -250,4 +250,121 @@ export function readEnhanced(p: string): string {
       expect(result[0]?.symbol.contract?.preconditions).toEqual(['Path must exist']);
     });
   });
+
+  describe('declaration files', () => {
+    it('extracts ambient declarations and namespace members as public symbols', () => {
+      const source = `
+/**
+ * Resolve a globally available value.
+ * @contract Resolves the ambient value without implementation details
+ * @decision Keep the declaration surface minimal
+ * @rationale Consumers only need the stable contract
+ * @consequences Runtime implementations remain replaceable
+ * @throws ResolutionError - The value cannot be resolved - Retry with a fallback
+ */
+declare function resolveValue(input: string): string;
+
+/** @internal */
+declare class InternalImplementation {}
+
+declare namespace PublicApi {
+  /** Create a configured client. */
+  function createClient(): void;
+  interface Options {
+    /** Execution mode. */
+    mode: string;
+    /** Run one operation. */
+    run(): void;
+  }
+}
+
+declare module 'ambient-package' {
+  /** Exported from an ambient module. */
+  function moduleFunction(): void;
+}
+      `;
+
+      const result = new EnhancedDocExtractor({ autoGenerateIds: false }).extractFromFile(
+        'ambient.d.ts',
+        source
+      );
+
+      expect(result.map((entry) => entry.symbol.name)).toEqual([
+        'resolveValue',
+        'InternalImplementation',
+        'createClient',
+        'Options',
+        'mode',
+        'run',
+        'moduleFunction',
+      ]);
+      expect(result.find((entry) => entry.symbol.name === 'resolveValue')?.symbol).toMatchObject({
+        isExported: true,
+        isPublic: true,
+        type: 'function',
+      });
+      expect(
+        result.find((entry) => entry.symbol.name === 'InternalImplementation')?.symbol
+      ).toMatchObject({
+        isExported: true,
+        isPublic: false,
+      });
+      expect(result.find((entry) => entry.symbol.name === 'createClient')?.symbol.isPublic).toBe(
+        true
+      );
+      expect(result.find((entry) => entry.symbol.name === 'Options')?.symbol.type).toBe(
+        'interface'
+      );
+      expect(result.find((entry) => entry.symbol.name === 'mode')?.symbol.type).toBe('property');
+      expect(result.find((entry) => entry.symbol.name === 'run')?.symbol.type).toBe('method');
+
+      const resolveDoc = result.find((entry) => entry.symbol.name === 'resolveValue');
+      expect(resolveDoc?.symbol.contract?.description).toContain('ambient value');
+      expect(resolveDoc?.doc.decisions).toHaveLength(1);
+      expect(resolveDoc?.doc.errorExperiences?.[0]).toEqual(
+        expect.objectContaining({
+          errorType: 'ResolutionError',
+          message: 'The value cannot be resolved',
+          solution: 'Retry with a fallback',
+        })
+      );
+    });
+
+    it('extracts module declarations, internal visibility, and import/re-export dependencies', () => {
+      const source = `
+import type { Dependency } from './dependency';
+export { Shared } from '@scope/shared';
+
+/** Public declaration. */
+export declare function fetchData(): Promise<string>;
+
+/** @internal */
+export declare class InternalApi {}
+
+/** Public enum. */
+export declare enum Status { Ready, Done }
+      `;
+
+      const result = new EnhancedDocExtractor({ autoGenerateIds: false }).extractFromFile(
+        'module.d.ts',
+        source
+      );
+
+      expect(result.map((entry) => entry.symbol.name)).toEqual([
+        'fetchData',
+        'InternalApi',
+        'Status',
+      ]);
+      expect(result.every((entry) => entry.symbol.isExported)).toBe(true);
+      expect(result.find((entry) => entry.symbol.name === 'fetchData')?.symbol.isPublic).toBe(true);
+      expect(result.find((entry) => entry.symbol.name === 'InternalApi')?.symbol.isPublic).toBe(
+        false
+      );
+      expect(result.find((entry) => entry.symbol.name === 'Status')?.symbol.type).toBe('enum');
+      expect(result[0]?.doc.dependencies).toEqual([
+        { target: './dependency', type: 'file', reason: 'TypeScript AST import' },
+        { target: '@scope/shared', type: 'external', reason: 'TypeScript AST re-export' },
+      ]);
+    });
+  });
 });

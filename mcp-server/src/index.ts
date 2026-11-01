@@ -11,7 +11,9 @@ import { SERVER_NAME, SERVER_VERSION } from './constants.js';
 // Import tool schemas
 import {
   GetDesignContextSchema,
+  GetImpactSchema,
   GetOntologyStatsSchema,
+  GetSpecBindingsSchema,
   GetSymbolDetailsSchema,
   GetWorkContextSchema,
   ListRelationshipsSchema,
@@ -23,7 +25,9 @@ import { TsDocService } from './services/tsdocService.js';
 // Import tool implementations
 import {
   getDesignContextTool,
+  getImpactTool,
   getOntologyStatsTool,
+  getSpecBindingsTool,
   getSymbolDetailsTool,
   getWorkContextTool,
   listRelationshipsTool,
@@ -66,6 +70,41 @@ async function main() {
       },
     },
     async (params: unknown) => searchSymbolsTool(SearchSymbolsSchema.parse(params), tsdocService)
+  );
+
+  // 8. Multi-hop impact analysis
+  server.registerTool(
+    'tsdoc_get_impact',
+    {
+      title: 'Get Symbol Impact',
+      description: 'Analyze downstream and upstream impact through the canonical graph',
+      inputSchema: GetImpactSchema,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+      },
+    },
+    async (params: unknown) => getImpactTool(GetImpactSchema.parse(params), tsdocService)
+  );
+
+  // 9. Normative specification bindings
+  server.registerTool(
+    'tsdoc_get_spec_bindings',
+    {
+      title: 'Get Specification Bindings',
+      description: 'Query normative specification nodes and code conformance bindings',
+      inputSchema: GetSpecBindingsSchema,
+      annotations: {
+        readOnlyHint: true,
+        destructiveHint: false,
+        idempotentHint: true,
+        openWorldHint: false,
+      },
+    },
+    async (params: unknown) =>
+      getSpecBindingsTool(GetSpecBindingsSchema.parse(params), tsdocService)
   );
 
   // 2. Get Ontology Stats Tool

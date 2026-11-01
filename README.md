@@ -7,6 +7,15 @@ code evidence, and checks versioned conventions against an exact canonical graph
 The first convention loop covers spec-binding conformance; naming and formatting rules remain
 separate from this revision-pinned semantic check.
 
+## Three-tier SSOT
+
+The platform keeps one connected source of truth across three layers: `@microsoft/tsdoc` parses
+the 29 standard TSDoc tags, `ttsc` with `@ttsc/graph` and `@ttsc/lint` provides the canonical code
+graph and 25 error rules, and `tsdoc-edge` owns 22 irreducible domain tags plus document and
+specification connectivity. Run `tsdoc-edge sync [--force] [--dry-run] [--check] [--json]` to
+refresh or verify the complete pipeline. Use `find-method` for symbol lookup, `spec` for SpecGraph
+lifecycle operations, and `convention` for revision-pinned governance checks.
+
 ---
 
 ## Why TSDoc Edge?
@@ -69,6 +78,9 @@ npm install -g tsdoc-edge
 tsdoc-edge init
 tsdoc-edge build src
 
+# Synchronize code symbols, canonical graph, specs, and managed docs in one step
+tsdoc-edge sync [--force] [--dry-run] [--check] [--json]
+
 # Get context before modifying any file (most important!)
 tsdoc-edge work-context src/path/to/file.ts
 ```
@@ -92,6 +104,8 @@ The `work-context` command provides everything you need before modifying code:
 | Documentation | `index-docs managed` | Index `[[Symbol]]` references |
 | Convention Check | `convention check --pack <file>` | Check exact spec bindings with policy and suppressions |
 | Convention Inputs | `convention inputs list|read` | Inspect exact evidence, enrichment, and policy pins read-only |
+| Find Method | `find-method <name>` | Find methods by name across the symbol graph |
+| Specifications | `spec extract` / `spec graph ...` | Compile and inspect managed SpecGraph revisions |
 | Canonical Graph | `canonical-graph status|list|read` | Inspect saved ttsc graph revisions and provenance read-only |
 | Spec Graph | `spec graph status|list|read` | Inspect saved managed SpecGraph revisions read-only |
 | Coverage Report | `coverage-report list|read` | Inspect persisted source-identified coverage reports read-only |

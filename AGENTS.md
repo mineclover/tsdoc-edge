@@ -2,17 +2,17 @@
 
 This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
-## 프로젝트 현황 (2025-12-29)
+## 프로젝트 현황 (2026-11-01)
 
 | Metric | Value |
 |--------|-------|
-| CLI Commands | 55 |
-| Test Cases | 2,742 |
-| Symbols | 6,726 |
-| Relationships | 38,704 |
-| Relationship Types | 13/28 (46%) |
-| Build Time | 11s |
-| Health Score | 81/100 (A) |
+| CLI Commands | 68+ (하위 명령 포함) |
+| Test Cases | 3,372+ (257 suites) |
+| Symbols | 10,699 |
+| Canonical `@ttsc/graph` | 8,700+ nodes / 21,500+ edges |
+| Custom TSDoc Tags | 22 + Standard 29 + `@ttsc/graph` 6 |
+| `@ttsc/lint` | 25 error rules (0 findings) |
+| Health Score | 93/100 (A+) on core modules |
 
 ## 프로젝트 개요
 
@@ -47,10 +47,13 @@ node dist/cli.js <command>
 tsdoc-edge sync
 tsdoc-edge sync --check          # CI / 읽기 전용 정합성 검증
 tsdoc-edge sync --dry-run        # 파일 변조 없이 갱신 대상 미리보기
+tsdoc-edge sync --force --json   # 전체 재생성 및 기계 판독 결과
 
 # 2. 파일 작업 전 컨텍스트 확인 (가장 중요)
 tsdoc-edge wc <file-path> --llm  # 모듈 개요 + 전체 export API + 의존/피의존/테스트
 tsdoc-edge dc <file-path>        # 규범 명세 바인딩 + 계약(@contract) + ADR(@decision)
+tsdoc-edge find-method <name>    # 메서드 이름으로 심볼 검색
+tsdoc-edge convention check --pack managed/conventions/tsdoc-edge-core.json
 
 # 3. 개별 문서 관리 (필요 시)
 tsdoc-edge docs index managed
@@ -58,6 +61,13 @@ tsdoc-edge docs backlinks managed --dry-run
 tsdoc-edge validate docs managed
 tsdoc-edge spec extract
 ```
+
+TSDoc Edge는 세 계층 SSOT를 함께 동기화합니다. `@microsoft/tsdoc`이 표준 문서 AST(29개
+표준 태그)를 제공하고, `ttsc`/`@ttsc/graph`/`@ttsc/lint`가 정본 코드 그래프와 25개 오류
+규칙을 관리하며, `tsdoc-edge`가 22개 도메인 태그와 문서·명세 연결을 소유합니다.
+`tsdoc-edge sync [--force] [--dry-run] [--check] [--json]`은 이 계층을 한 단계로 갱신하거나
+검증합니다. `find-method`, `spec`, `convention`은 각각 심볼 검색, SpecGraph 생명주기,
+정확한 그래프 revision에 대한 규약 검사를 제공합니다.
 
 ### work-context & design-context 활용 가이드
 

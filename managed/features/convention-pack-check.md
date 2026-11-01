@@ -470,7 +470,7 @@ evaluator versions.
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:214
+- [[Commands Index]] → managed/COMMANDS.md:230
 - [[Coverage Metrics Contract]] → managed/features/coverage-metrics-contract.md:282
 - [[ConventionCheck]] → managed/specs/conventions/convention-check.md:133
 - [[TsdocEdgePlatformSpecification]] → managed/specs/domains/tsdoc-edge-platform-spec.md:196

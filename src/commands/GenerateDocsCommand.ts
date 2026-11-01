@@ -54,9 +54,11 @@ export class GenerateDocsCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge generate-docs <source-path> [output-dir]
+    return `tsdoc-edge generate-docs <source-path> [output-dir] [options]
 
-  Default output-dir: ./docs/generated`;
+  Default output-dir: ./docs/generated
+  Options:
+    --dry-run, -n   Preview generated files without writing`;
   }
 
   /**
@@ -72,8 +74,13 @@ export class GenerateDocsCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const sourcePath = args[0];
-      const outputDir = args[1] || './docs/generated';
+      const flagError = this.validateAllowedFlags(args, ['--dry-run', '-n']);
+      if (flagError) return flagError;
+
+      const positional = this.getPositionalArgs(args);
+      const sourcePath = positional[0];
+      const outputDir = positional[1] || './docs/generated';
+      const dryRun = this.hasFlag(args, ['--dry-run', '-n']);
 
       if (!sourcePath) {
         this.printError('Source path required');
@@ -116,7 +123,7 @@ export class GenerateDocsCommand extends BaseCommand {
         return this.success();
       }
 
-      if (!fs.existsSync(outputDir)) {
+      if (!dryRun && !fs.existsSync(outputDir)) {
         fs.mkdirSync(outputDir, { recursive: true });
       }
 
@@ -130,7 +137,7 @@ export class GenerateDocsCommand extends BaseCommand {
         const fileName = `${result.symbol.name}.md`;
         const outputPath = path.join(outputDir, fileName);
 
-        fs.writeFileSync(outputPath, markdown, 'utf-8');
+        if (!dryRun) fs.writeFileSync(outputPath, markdown, 'utf-8');
         generated++;
 
         const relPath = path.relative(process.cwd(), outputPath);
@@ -139,7 +146,7 @@ export class GenerateDocsCommand extends BaseCommand {
       }
 
       console.log();
-      this.printSuccess(`Generated ${generated} markdown file(s)`);
+      this.printSuccess(`${dryRun ? 'Would generate' : 'Generated'} ${generated} markdown file(s)`);
       console.log();
 
       return this.success();

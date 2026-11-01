@@ -21,7 +21,7 @@ Track type-level dependencies (parameter/return types, type aliases).
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:65
+- [[Commands Index]] → managed/COMMANDS.md:81
 - [[TSDoc Edge Documentation]] → managed/README.md:68
 - [[TypeChainTracer]] → managed/analyzers/TypeChainTracer.md:37
 - [[TypeDependencyAnalyzer]] → managed/analyzers/TypeDependencyAnalyzer.md:148

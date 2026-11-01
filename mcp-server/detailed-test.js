@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * Detailed MCP Tool Testing
- * Tests each of the 7 tools with realistic scenarios
+ * Tests each of the 9 tools with realistic scenarios
  */
 
 import { spawn } from 'child_process';
@@ -193,6 +193,34 @@ async function runDetailedTests() {
         const hasId = content.includes('analyzecommand-class-analyzecommand');
         log('DETAIL', hasId ? 'Symbol found and detailed' : 'Symbol structure validated', colors.blue);
         return hasId;
+      },
+    },
+
+    {
+      name: '🎯 Tool 8: Canonical Impact - Multi-hop Risk',
+      request: createMessage('tools/call', {
+        name: 'tsdoc_get_impact',
+        arguments: { symbol: 'analyzecommand-class-analyzecommand', direction: 'upstream', maxDepth: 1, response_format: 'json' },
+      }),
+      validate: (res) => {
+        const content = res.result?.content?.[0]?.text || '';
+        const parsed = JSON.parse(content);
+        log('DETAIL', `Impact source: ${parsed.source}, affected: ${parsed.impactedSymbols?.length || 0}`, colors.blue);
+        return Boolean(parsed.symbolId && Array.isArray(parsed.byDepth) === false && Array.isArray(parsed.impactedSymbols));
+      },
+    },
+
+    {
+      name: '📚 Tool 9: Spec Bindings - Normative Conformance',
+      request: createMessage('tools/call', {
+        name: 'tsdoc_get_spec_bindings',
+        arguments: { query: 'canonical', response_format: 'json' },
+      }),
+      validate: (res) => {
+        const content = res.result?.content?.[0]?.text || '';
+        const parsed = JSON.parse(content);
+        log('DETAIL', `Spec revision: ${parsed.revisionId}, bindings: ${parsed.bindings?.length || 0}`, colors.blue);
+        return Boolean(parsed.revisionId && Array.isArray(parsed.nodes) && Array.isArray(parsed.bindings));
       },
     },
 

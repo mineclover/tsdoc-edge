@@ -3,7 +3,11 @@
  * @packageDocumentation
  */
 
+import * as fs from 'node:fs';
+import * as path from 'node:path';
+import type { CanonicalGraphNode } from '../indexer/contracts';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { GraphRepository } from '../storage/GraphRepository';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 
 /** Graph metrics for a symbol */
@@ -99,11 +103,19 @@ Examples:
         return this.displayHelp();
       }
 
+      const invalid = this.validateAllowedFlags(
+        args,
+        ['--detailed', '--include-external', '--json'],
+        ['--top', '--category', '--metric']
+      );
+      if (invalid) return invalid;
       const options = {
         top: Number.parseInt(this.getOption(args, '--top') || '20', 10),
         category: this.getOption(args, '--category'),
         metric: (this.getOption(args, '--metric') || 'importance') as keyof SymbolMetrics,
         detailed: args.includes('--detailed'),
+        includeExternal: this.hasFlag(args, '--include-external'),
+        json: this.hasFlag(args, '--json'),
       };
 
       // Validate metric
@@ -113,17 +125,25 @@ Examples:
         this.printInfo(`Valid metrics: ${validMetrics.join(', ')}`);
         return { success: false, message: 'Invalid metric', exitCode: 1 };
       }
+      if (options.json) return this.executeJsonMetrics(options);
 
-      this.printHeader('Symbol Importance Analysis');
-
+      const canonical = this.openCanonical();
       const dbPath = this.getDatabasePath();
-      const dbManager = new DatabaseManager(dbPath);
+      const dbManager = canonical ? undefined : new DatabaseManager(dbPath);
       try {
         console.log();
         this.printInfo('Building relationship graph...');
 
         // Build adjacency lists
-        const { outgoing, incoming, symbolNames } = this.buildGraph(dbManager, options.category);
+        const graph = canonical
+          ? this.buildCanonicalGraph(
+              canonical.revision.graph.nodes,
+              canonical.revision.graph.edges,
+              options.category,
+              options.includeExternal
+            )
+          : this.buildGraph(dbManager as DatabaseManager, options.category);
+        const { outgoing, incoming, symbolNames } = graph;
 
         this.printInfo(`Analyzing ${symbolNames.size} symbols...`);
         console.log();
@@ -147,6 +167,7 @@ Examples:
         console.log();
 
         // Display results
+        this.printHeader('Symbol Importance Analysis');
         this.printSection(`Top ${topSymbols.length} Symbols by ${this.capitalize(options.metric)}`);
         console.log();
 
@@ -260,7 +281,8 @@ Examples:
 
         return this.success(`Analyzed ${metrics.length} symbols`);
       } finally {
-        dbManager.close();
+        dbManager?.close();
+        canonical?.repository.close();
       }
     });
   }
@@ -506,6 +528,107 @@ Examples:
     }
 
     return 'Standard component';
+  }
+
+  private executeJsonMetrics(options: {
+    top: number;
+    category?: string;
+    metric: keyof SymbolMetrics;
+    detailed: boolean;
+    includeExternal: boolean;
+    json: boolean;
+  }): CommandResult {
+    const canonical = this.openCanonical();
+    const db = canonical ? undefined : new DatabaseManager(this.getDatabasePath());
+    try {
+      const graph = canonical
+        ? this.buildCanonicalGraph(
+            canonical.revision.graph.nodes,
+            canonical.revision.graph.edges,
+            options.category,
+            options.includeExternal
+          )
+        : this.buildGraph(db as DatabaseManager, options.category);
+      const metrics = this.calculateMetrics(graph.outgoing, graph.incoming, graph.symbolNames)
+        .sort((left, right) => Number(right[options.metric]) - Number(left[options.metric]))
+        .slice(0, options.top);
+      console.log(
+        JSON.stringify({ metric: options.metric, top: options.top, symbols: metrics }, null, 2)
+      );
+      return this.success(`Analyzed ${metrics.length} symbols`);
+    } finally {
+      db?.close();
+      canonical?.repository.close();
+    }
+  }
+
+  private buildCanonicalGraph(
+    nodes: readonly CanonicalGraphNode[],
+    edges: readonly { from: string; to: string; kind: string }[],
+    category: string | undefined,
+    includeExternal: boolean
+  ): {
+    outgoing: Map<string, Set<string>>;
+    incoming: Map<string, Set<string>>;
+    symbolNames: Map<string, string>;
+  } {
+    const allowed = new Set(
+      nodes.filter((node) => includeExternal || !this.isExternal(node)).map((node) => node.id)
+    );
+    const outgoing = new Map<string, Set<string>>();
+    const incoming = new Map<string, Set<string>>();
+    const symbolNames = new Map<string, string>();
+    for (const node of nodes)
+      if (allowed.has(node.id)) {
+        symbolNames.set(node.id, node.name ?? node.qualifiedName ?? node.id);
+        outgoing.set(node.id, new Set());
+        incoming.set(node.id, new Set());
+      }
+    for (const edge of edges)
+      if (
+        (!category || edge.kind.includes(category)) &&
+        allowed.has(edge.from) &&
+        allowed.has(edge.to)
+      ) {
+        outgoing.get(edge.from)?.add(edge.to);
+        incoming.get(edge.to)?.add(edge.from);
+      }
+    return { outgoing, incoming, symbolNames };
+  }
+  private isExternal(node: Pick<CanonicalGraphNode, 'external' | 'file'>): boolean {
+    return (
+      node.external === true ||
+      /(?:bundled:|(?:^|[\\/])libs[\\/]|(?:^|[\\/])node_modules[\\/])/.test(node.file ?? '')
+    );
+  }
+  private openCanonical(): {
+    repository: GraphRepository;
+    revision: NonNullable<ReturnType<GraphRepository['readActiveRevision']>>;
+  } | null {
+    const configPath = path.join(process.cwd(), '.tsdoc.config.json');
+    let configured: string | undefined;
+    try {
+      const parsed: unknown = JSON.parse(fs.readFileSync(configPath, 'utf8'));
+      const config = parsed as { canonicalGraph?: { databasePath?: string } };
+      configured = config.canonicalGraph?.databasePath;
+    } catch {}
+    const db = path.resolve(
+      process.cwd(),
+      process.env.TSDOC_EDGE_CANONICAL_GRAPH_DB ?? configured ?? '.tsdoc/canonical-graph.db'
+    );
+    if (!fs.existsSync(db)) return null;
+    let repository: GraphRepository | undefined;
+    try {
+      repository = new GraphRepository(db, { readOnly: true });
+      const revision = repository.readActiveRevision();
+      if (!revision) {
+        repository.close();
+        return null;
+      }
+      return { repository, revision };
+    } catch {
+      return null;
+    }
   }
 
   private capitalize(str: string): string {

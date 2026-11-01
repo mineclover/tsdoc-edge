@@ -32,7 +32,7 @@ canonical: true
 
 ### Referenced By
 
-- [[CLI Commands]] → managed/CLI-COMMANDS.md:23
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:37
 - [[TSDoc Edge Documentation]] → managed/README.md:116
 - [[SyncCommand]] → managed/commands/SyncCommand.md:24
 - [[DocumentSymbolRegistry]] → managed/features/DocumentSymbolRegistry.md:292

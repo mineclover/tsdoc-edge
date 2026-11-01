@@ -141,6 +141,19 @@ export class SyncCommand extends BaseCommand {
         return flagError;
       }
 
+      if (
+        args.some((arg) => arg === '--router-module' || arg.startsWith('--router-module=')) &&
+        !this.getOption(args, '--router-module')
+      ) {
+        return this.failure('--router-module requires a value', 1);
+      }
+      if (
+        args.some((arg) => arg === '--docs-dir' || arg.startsWith('--docs-dir=')) &&
+        !this.getOption(args, '--docs-dir')
+      ) {
+        return this.failure('--docs-dir requires a value', 1);
+      }
+
       const startedAt = Date.now();
       const config = this.configManager.get();
       const rootDir = this.configManager.getProjectRoot();
@@ -154,6 +167,28 @@ export class SyncCommand extends BaseCommand {
       const sourceDir = positional[0] ?? config.project.srcDirs?.[0] ?? 'src';
       const docsDir = this.resolveDocsDir(args, rootDir);
       const canonicalPlan = this.resolveCanonicalPlan(args, rootDir);
+
+      const configuredRouter = config.canonicalGraph?.routerModule;
+      const explicitCanonicalRequest =
+        this.hasFlag(args, ['--canonical-graph', '--canonical-only']) ||
+        process.env.TSDOC_EDGE_CANONICAL_GRAPH === '1' ||
+        Boolean(process.env.TSDOC_EDGE_GRAPH_ROUTER_MODULE) ||
+        Boolean(this.getOption(args, '--router-module'));
+      if (
+        !jsonMode &&
+        !explicitCanonicalRequest &&
+        configuredRouter &&
+        (configuredRouter.startsWith('.') || path.isAbsolute(configuredRouter))
+      ) {
+        const resolvedRouter = path.isAbsolute(configuredRouter)
+          ? configuredRouter
+          : path.resolve(rootDir, configuredRouter);
+        if (!fs.existsSync(resolvedRouter)) {
+          this.printWarning(
+            `Configured canonical graph router module was not found at ${resolvedRouter}; skipping canonical graph refresh`
+          );
+        }
+      }
 
       if (!jsonMode) {
         this.printHeader(

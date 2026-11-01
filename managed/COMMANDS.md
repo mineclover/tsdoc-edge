@@ -17,6 +17,9 @@ Reference for the main TSDoc Edge CLI commands and command groups.
 # Initialize project
 tsdoc-edge init
 
+# One-step SSOT synchronization (use --check in CI)
+tsdoc-edge sync [--force] [--dry-run] [--check] [--json]
+
 # Build symbol database
 tsdoc-edge build src
 
@@ -28,7 +31,20 @@ tsdoc-edge work-context <file-path>
 
 # Check a revision-pinned spec-binding convention pack
 tsdoc-edge convention check --pack managed/conventions/tsdoc-edge-core.json
+
+# Search methods and manage the specification graph
+tsdoc-edge find-method <name>
+tsdoc-edge spec extract
+tsdoc-edge spec graph status
 ```
+
+## Three-tier SSOT architecture
+
+`@microsoft/tsdoc` supplies the 29 standard TSDoc tags; `ttsc`, `@ttsc/graph`, and `@ttsc/lint`
+own the canonical graph and its 25 error rules; `tsdoc-edge` owns 22 irreducible domain tags and
+the document/specification connectivity layer. The `sync` pipeline refreshes all connected planes,
+while `find-method`, `spec`, and `convention` provide focused lookup, SpecGraph lifecycle, and
+revision-pinned governance operations.
 
 ---
 

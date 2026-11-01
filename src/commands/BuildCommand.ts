@@ -174,6 +174,21 @@ export class BuildCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const flagError = this.validateAllowedFlags(
+        args,
+        ['--force', '--incremental', '--exclude-tests', '--canonical-graph', '--canonical-only'],
+        [
+          '--router-module',
+          '--router-config',
+          '--router-repo',
+          '--graph-workspace',
+          '--graph-namespace',
+          '--graph-tsconfig',
+          '--canonical-graph-db',
+        ]
+      );
+      if (flagError) return flagError;
+
       // Parse arguments
       const forceRebuild = args.includes('--force');
       const excludeTests = args.includes('--exclude-tests');
@@ -1544,12 +1559,44 @@ export class BuildCommand extends BaseCommand {
     edgeCount: number;
     databasePath: string;
   } | null> {
-    const enabled =
-      args.includes('--canonical-graph') || process.env.TSDOC_EDGE_CANONICAL_GRAPH === '1';
-    if (!enabled) return null;
-
     const rootDir = this.configManager.getProjectRoot();
     const canonicalConfig = this.configManager.get().canonicalGraph;
+    const explicitCanonical =
+      args.includes('--canonical-graph') ||
+      args.includes('--canonical-only') ||
+      process.env.TSDOC_EDGE_CANONICAL_GRAPH === '1';
+    const explicitRouter =
+      args.some((arg) => arg === '--router-module' || arg.startsWith('--router-module=')) ||
+      Boolean(process.env.TSDOC_EDGE_GRAPH_ROUTER_MODULE);
+    const configuredRouter = canonicalConfig?.routerModule;
+    const configOnly = Boolean(configuredRouter) && !explicitCanonical && !explicitRouter;
+
+    const routerModuleFlag = args.some(
+      (arg) => arg === '--router-module' || arg.startsWith('--router-module=')
+    );
+    if (routerModuleFlag && !this.getOption(args, '--router-module')) {
+      throw new Error('--router-module requires a value');
+    }
+
+    if (
+      configOnly &&
+      configuredRouter &&
+      (configuredRouter.startsWith('.') || path.isAbsolute(configuredRouter))
+    ) {
+      const resolvedPath = path.isAbsolute(configuredRouter)
+        ? configuredRouter
+        : path.resolve(rootDir, configuredRouter);
+      if (!fs.existsSync(resolvedPath) && !this.dependencies.canonicalCoordinatorFactory) {
+        console.warn(
+          `Configured canonical graph router module was not found at ${resolvedPath}; skipping canonical graph refresh`
+        );
+        return null;
+      }
+    }
+
+    const enabled = explicitCanonical || configOnly;
+    if (!enabled) return null;
+
     const rawModuleSpecifier =
       this.getOption(args, '--router-module') ??
       process.env.TSDOC_EDGE_GRAPH_ROUTER_MODULE ??

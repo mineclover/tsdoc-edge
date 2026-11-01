@@ -40,21 +40,28 @@ export class UninstallHookCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return 'tsdoc-edge uninstall-hook';
+    return `tsdoc-edge uninstall-hook [options]
+
+  Options:
+    --dry-run, -n   Preview hook removal without deleting files`;
   }
 
   /**
    * execute method
-   * @param _args - _args parameter
+   * @param args - args parameter
    * @returns Returns Promise<CommandResult>
    * @public
    */
-  execute(_args: string[]): Promise<CommandResult> {
+  execute(args: string[]): Promise<CommandResult> {
     return this.executeWithErrorHandling(() => {
       // Check for help flag
-      if (this.hasHelpFlag(_args)) {
+      if (this.hasHelpFlag(args)) {
         return this.displayHelp();
       }
+
+      const flagError = this.validateAllowedFlags(args, ['--dry-run', '-n']);
+      if (flagError) return flagError;
+      const dryRun = this.hasFlag(args, ['--dry-run', '-n']);
 
       console.log(`${colors.bold}TSDoc Edge - Uninstall Pre-commit Hook${colors.reset}`);
       console.log();
@@ -84,6 +91,11 @@ export class UninstallHookCommand extends BaseCommand {
         console.log(`  ${colors.cyan}rm ${hookPath}${colors.reset}`);
         console.log();
         return { exitCode: 1, message: 'Hook not installed by tsdoc-edge' };
+      }
+
+      if (dryRun) {
+        console.log(`${colors.cyan}Would remove pre-commit hook: ${hookPath}${colors.reset}`);
+        return { exitCode: 0, message: 'Dry run complete' };
       }
 
       fs.unlinkSync(hookPath);

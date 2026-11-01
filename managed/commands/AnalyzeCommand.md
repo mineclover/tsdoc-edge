@@ -32,7 +32,7 @@ canonical: true
 
 ### Referenced By
 
-- [[CLI Commands]] → managed/CLI-COMMANDS.md:17
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:31
 - [[TSDoc Edge Documentation]] → managed/README.md:265
 - [[CodeHealthChecker]] → managed/analyzers/CodeHealthChecker.md:301
 - [[DocumentationAnalyzer]] → managed/analyzers/DocumentationAnalyzer.md:149

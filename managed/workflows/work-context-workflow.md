@@ -782,7 +782,7 @@ done
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:316
+- [[Commands Index]] → managed/COMMANDS.md:332
 - [[TSDoc Edge Documentation]] → managed/README.md:158
 - [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1462
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:271

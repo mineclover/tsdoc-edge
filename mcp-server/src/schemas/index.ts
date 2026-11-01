@@ -25,6 +25,10 @@ export const SearchSymbolsSchema = z
       .describe('Maximum number of results to return'),
     offset: z.number().int().min(0).default(0).describe('Number of results to skip for pagination'),
     format: z.enum(['markdown', 'json']).default('markdown').describe('Response format'),
+    includeExternal: z
+      .boolean()
+      .default(false)
+      .describe('Include external and standard library symbols'),
   })
   .strict();
 
@@ -35,6 +39,10 @@ export const GetOntologyStatsSchema = z
   .object({
     detailed: z.boolean().default(false).describe('Include detailed breakdown of all types'),
     format: z.enum(['markdown', 'json']).default('markdown').describe('Response format'),
+    includeExternal: z
+      .boolean()
+      .default(false)
+      .describe('Include external and standard library nodes'),
   })
   .strict();
 
@@ -60,6 +68,10 @@ export const ListRelationshipsSchema = z
       .describe('Maximum number of results to return'),
     offset: z.number().int().min(0).default(0).describe('Number of results to skip for pagination'),
     format: z.enum(['markdown', 'json']).default('markdown').describe('Response format'),
+    includeExternal: z
+      .boolean()
+      .default(false)
+      .describe('Include external and standard library relationships'),
   })
   .strict();
 
@@ -71,6 +83,10 @@ export const GetWorkContextSchema = z
     filePath: z.string().min(1).max(500).describe('Relative or absolute path to the file'),
     depth: z.number().int().min(1).max(5).default(2).describe('Depth of context aggregation (1-5)'),
     format: z.enum(['markdown', 'json']).default('markdown').describe('Response format'),
+    includeExternal: z
+      .boolean()
+      .default(false)
+      .describe('Include external and standard library symbols'),
   })
   .strict();
 
@@ -81,6 +97,10 @@ export const GetDesignContextSchema = z
   .object({
     filePath: z.string().min(1).max(500).describe('Relative or absolute path to the file'),
     format: z.enum(['markdown', 'json']).default('markdown').describe('Response format'),
+    includeExternal: z
+      .boolean()
+      .default(false)
+      .describe('Include external and standard library symbols'),
   })
   .strict();
 
@@ -96,6 +116,10 @@ export const QueryRelationshipsSchema = z
       .describe('Direction of relationships to include'),
     maxDepth: z.number().int().min(1).max(3).default(1).describe('Maximum depth to traverse (1-3)'),
     format: z.enum(['markdown', 'json']).default('markdown').describe('Response format'),
+    includeExternal: z
+      .boolean()
+      .default(false)
+      .describe('Include external and standard library relationships'),
   })
   .strict();
 
@@ -107,7 +131,32 @@ export const GetSymbolDetailsSchema = z
     symbolId: z.string().min(1).max(200).describe('Symbol ID to retrieve details for'),
     includeRelationships: z.boolean().default(true).describe('Include relationship information'),
     format: z.enum(['markdown', 'json']).default('markdown').describe('Response format'),
+    includeExternal: z
+      .boolean()
+      .default(false)
+      .describe('Include external and standard library symbols'),
   })
   .strict();
 
 export type GetSymbolDetailsInput = z.infer<typeof GetSymbolDetailsSchema>;
+
+export const GetImpactSchema = z
+  .object({
+    symbol: z.string().min(1).max(300).describe('Canonical, legacy, or named symbol identifier'),
+    direction: z.enum(['downstream', 'upstream', 'both']).default('downstream'),
+    maxDepth: z.number().int().min(1).max(10).default(3),
+    includeExternal: z.boolean().default(false),
+    response_format: z.enum(['markdown', 'json']).default('markdown'),
+  })
+  .strict();
+export type GetImpactInput = z.infer<typeof GetImpactSchema>;
+
+export const GetSpecBindingsSchema = z
+  .object({
+    filePath: z.string().min(1).max(500).optional(),
+    specId: z.string().min(1).max(300).optional(),
+    query: z.string().min(1).max(300).optional(),
+    response_format: z.enum(['markdown', 'json']).default('markdown'),
+  })
+  .strict();
+export type GetSpecBindingsInput = z.infer<typeof GetSpecBindingsSchema>;

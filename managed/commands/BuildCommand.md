@@ -94,7 +94,7 @@ pointer를 생성하거나 변경하지 않는다.
 
 ### Referenced By
 
-- [[CLI Commands]] → managed/CLI-COMMANDS.md:16
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:30
 - [[TSDoc Edge Documentation]] → managed/README.md:52
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:267
 - [[InitCommand]] → managed/commands/InitCommand.md:343

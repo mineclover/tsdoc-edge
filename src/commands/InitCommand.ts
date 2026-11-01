@@ -43,7 +43,8 @@ export class InitCommand extends BaseCommand {
     return `tsdoc-edge init [options]
 
   Options:
-    --force          Overwrite existing configuration
+    --force, -f      Overwrite existing configuration
+    --dry-run, -n    Preview initialization without writing files
     --name=NAME      Project name
     --version=VER    Project version`;
   }
@@ -61,11 +62,19 @@ export class InitCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const flagError = this.validateAllowedFlags(
+        args,
+        ['--force', '-f', '--dry-run', '-n'],
+        ['--name', '--version']
+      );
+      if (flagError) return flagError;
+
       this.printHeader('TSDoc Edge - Initialize Project');
 
-      const hasForce = args.includes('--force');
-      const nameArg = args.find((arg) => arg.startsWith('--name='));
-      const versionArg = args.find((arg) => arg.startsWith('--version='));
+      const hasForce = this.hasFlag(args, ['--force', '-f']);
+      const dryRun = this.hasFlag(args, ['--dry-run', '-n']);
+      const projectName = this.getOption(args, '--name') || path.basename(process.cwd());
+      const projectVersion = this.getOption(args, '--version') || '1.0.0';
 
       const configManager = ConfigManager.getInstance();
 
@@ -78,8 +87,12 @@ export class InitCommand extends BaseCommand {
         return this.failure('Configuration already exists');
       }
 
-      const projectName = nameArg ? nameArg.split('=')[1] : path.basename(process.cwd());
-      const projectVersion = versionArg ? versionArg.split('=')[1] : '1.0.0';
+      if (dryRun) {
+        this.printInfo(`Would create configuration at: ${configManager.getConfigPath()}`);
+        this.printInfo(`Project: ${projectName} ${projectVersion}`);
+        this.printInfo('Would create tsdoc.json and configured directories');
+        return this.success('Dry run complete');
+      }
 
       configManager.init(
         {

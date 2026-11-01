@@ -5,7 +5,9 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import type { CanonicalGraphNode } from '../indexer/contracts';
 import { DatabaseManager } from '../storage/DatabaseManager';
+import { GraphRepository } from '../storage/GraphRepository';
 import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import { BaseCommand, type CommandResult, colors } from './BaseCommand';
 
@@ -73,6 +75,7 @@ export class OrphansCommand extends BaseCommand {
     --exclude-tests  Exclude test files from results
     --include-members Include class members (methods/properties) in results
     --classes-only   Show only class-level symbols (exclude members)
+    --include-external Include external and standard-library symbols
 
   Default: --accurate (members of used classes are automatically excluded)`;
   }
@@ -83,7 +86,8 @@ export class OrphansCommand extends BaseCommand {
   private findOrphansFromDatabase(
     excludeTests: boolean,
     includeMembers: boolean,
-    classesOnly: boolean
+    classesOnly: boolean,
+    includeExternal: boolean
   ): Array<{ id: string; name: string; filePath: string; type: string }> {
     const dbPath = this.getDatabasePath();
 
@@ -108,6 +112,7 @@ export class OrphansCommand extends BaseCommand {
       const allSymbols = dbManager.getAllSymbolRows();
       let orphans = allSymbols
         .filter((s) => !usedSymbolIds.has(s.id))
+        .filter((s) => includeExternal || !this.isExternal({ file: s.file_path, external: false }))
         .map((s) => ({
           id: s.id,
           name: s.name,
@@ -175,6 +180,78 @@ export class OrphansCommand extends BaseCommand {
     }
   }
 
+  private findCanonicalOrphans(
+    nodes: readonly CanonicalGraphNode[],
+    edges: readonly { from: string; to: string }[],
+    excludeTests: boolean,
+    includeMembers: boolean,
+    classesOnly: boolean,
+    includeExternal: boolean
+  ): Array<{ id: string; name: string; filePath: string; type: string }> {
+    const incoming = new Set(edges.map((edge) => edge.to));
+    const usedClasses = new Set(
+      nodes
+        .filter((node) => node.kind === 'class' && incoming.has(node.id))
+        .map((node) => node.name)
+    );
+    return nodes
+      .filter((node) => !incoming.has(node.id) && (includeExternal || !this.isExternal(node)))
+      .filter((node) => !excludeTests || !/(?:__tests__|\.test\.|\.spec\.)/.test(node.file ?? ''))
+      .filter((node) => !classesOnly || ['class', 'interface', 'type', 'enum'].includes(node.kind))
+      .filter(
+        (node) =>
+          includeMembers ||
+          !['method', 'property', 'variable'].includes(node.kind) ||
+          !usedClasses.has(node.qualifiedName?.split('.').slice(-2, -1)[0] ?? '')
+      )
+      .map((node) => ({
+        id: node.id,
+        name: node.name ?? node.qualifiedName ?? node.id,
+        filePath: node.file ?? '',
+        type: node.kind,
+      }))
+      .sort((a, b) => a.filePath.localeCompare(b.filePath) || a.name.localeCompare(b.name));
+  }
+  private tryCanonical(): {
+    repository: GraphRepository;
+    revision: NonNullable<ReturnType<GraphRepository['readActiveRevision']>>;
+  } | null {
+    let configured: string | undefined;
+    try {
+      const parsed: unknown = JSON.parse(
+        fs.readFileSync(path.join(process.cwd(), '.tsdoc.config.json'), 'utf8')
+      );
+      const config = parsed as { canonicalGraph?: { databasePath?: string } };
+      configured = config.canonicalGraph?.databasePath;
+    } catch {
+      /* defaults */
+    }
+    const db = path.resolve(
+      process.cwd(),
+      process.env.TSDOC_EDGE_CANONICAL_GRAPH_DB ?? configured ?? '.tsdoc/canonical-graph.db'
+    );
+    if (!fs.existsSync(db)) return null;
+    let repository: GraphRepository | undefined;
+    try {
+      repository = new GraphRepository(db, { readOnly: true });
+      const revision = repository.readActiveRevision();
+      if (!revision) {
+        repository.close();
+        return null;
+      }
+      return { repository, revision };
+    } catch {
+      return null;
+    }
+  }
+
+  private isExternal(node: Pick<CanonicalGraphNode, 'external' | 'file'>): boolean {
+    return (
+      node.external === true ||
+      /(?:bundled:|(?:^|[\\/])libs[\\/]|(?:^|[\\/])node_modules[\\/])/.test(node.file ?? '')
+    );
+  }
+
   /**
    * execute method
    * @param args - args parameter
@@ -188,11 +265,86 @@ export class OrphansCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const invalid = this.validateAllowedFlags(args, [
+        '--accurate',
+        '--fast',
+        '--exclude-tests',
+        '--include-members',
+        '--classes-only',
+        '--include-external',
+        '--json',
+        '--xml',
+      ]);
+      if (invalid) return invalid;
+      const useJson = this.hasFlag(args, '--json');
+      const useXml = this.hasFlag(args, '--xml');
+      const canonical = this.tryCanonical();
+      if (canonical) {
+        try {
+          const orphans = this.findCanonicalOrphans(
+            canonical.revision.graph.nodes,
+            canonical.revision.graph.edges,
+            args.includes('--exclude-tests'),
+            args.includes('--include-members'),
+            args.includes('--classes-only'),
+            args.includes('--include-external')
+          );
+          if (useJson) console.log(JSON.stringify({ orphans }, null, 2));
+          else if (useXml)
+            console.log(
+              `<orphans count="${orphans.length}">${orphans.map((item) => `<item><id>${item.id}</id><name>${item.name}</name><type>${item.type}</type><file>${item.filePath}</file></item>`).join('')}</orphans>`
+            );
+          else {
+            this.printHeader('Orphaned Symbols');
+            if (orphans.length === 0) console.log('No orphaned symbols found');
+            else
+              for (const orphan of orphans)
+                console.log(`${orphan.id} → ${orphan.name} (${orphan.type}) ${orphan.filePath}`);
+          }
+          return this.success();
+        } finally {
+          canonical.repository.close();
+        }
+      }
+
+      if (useXml) {
+        try {
+          const orphans = this.findOrphansFromDatabase(
+            args.includes('--exclude-tests'),
+            args.includes('--include-members'),
+            args.includes('--classes-only'),
+            args.includes('--include-external')
+          );
+          console.log(
+            `<orphans count="${orphans.length}">${orphans.map((item) => `<item><id>${item.id}</id><name>${item.name}</name><type>${item.type}</type><file>${item.filePath}</file></item>`).join('')}</orphans>`
+          );
+          return this.success();
+        } catch (error) {
+          return this.failure(String(error));
+        }
+      }
+
+      if (useJson) {
+        try {
+          const orphans = this.findOrphansFromDatabase(
+            args.includes('--exclude-tests'),
+            args.includes('--include-members'),
+            args.includes('--classes-only'),
+            args.includes('--include-external')
+          );
+          console.log(JSON.stringify({ orphans }, null, 2));
+          return this.success();
+        } catch (error) {
+          return this.failure(String(error));
+        }
+      }
+
       const useFast = args.includes('--fast');
       const _useAccurate = args.includes('--accurate') || !useFast; // Default to accurate
       const excludeTests = args.includes('--exclude-tests');
       const includeMembers = args.includes('--include-members');
       const classesOnly = args.includes('--classes-only');
+      const includeExternal = args.includes('--include-external');
 
       this.printHeader('Orphaned Symbols');
 
@@ -230,6 +382,12 @@ export class OrphansCommand extends BaseCommand {
               ) {
                 continue;
               }
+              if (
+                !includeExternal &&
+                this.isExternal({ external: false, file: entry.sourceRef.filePath })
+              ) {
+                continue;
+              }
 
               console.log(`${colors.bold}${id}${colors.reset} → ${entry.sourceRef.symbolName}`);
               console.log(`  Location: ${entry.sourceRef.filePath}`);
@@ -251,7 +409,12 @@ export class OrphansCommand extends BaseCommand {
         console.log();
 
         try {
-          const orphans = this.findOrphansFromDatabase(excludeTests, includeMembers, classesOnly);
+          const orphans = this.findOrphansFromDatabase(
+            excludeTests,
+            includeMembers,
+            classesOnly,
+            includeExternal
+          );
 
           if (orphans.length === 0) {
             this.printSuccess('No orphaned symbols found');

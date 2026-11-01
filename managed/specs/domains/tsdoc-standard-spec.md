@@ -174,7 +174,7 @@ const result = parser.parseFile('UserService.ts', sourceText);
 
 - TSDocStandardSpecification → src/parser/TSDocParser.ts:1
 - MarkdownGenerator → src/generator/MarkdownGenerator.ts:17
-- EnhancedDocExtractor → src/parser/EnhancedDocExtractor.ts:77
+- EnhancedDocExtractor → src/parser/EnhancedDocExtractor.ts:76
 - ModuleSpecTagParser → src/parser/ModuleSpecTagParser.ts:27
 - TSDocParser → src/parser/TSDocParser.ts:134
 - TsdocRenderOptions → src/parser/TsdocCommentReader.ts:37

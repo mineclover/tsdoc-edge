@@ -53,9 +53,11 @@ export class PromoteSymbolCommand extends BaseCommand {
    * @public
    */
   protected getUsage(): string {
-    return `tsdoc-edge promote-symbol <source-file> <symbol-name> [target-dir]
+    return `tsdoc-edge promote-symbol <source-file> <symbol-name> [target-dir] [options]
 
-  Default target-dir: managed/relationships`;
+  Default target-dir: managed/relationships
+  Options:
+    --dry-run, -n   Preview promotion without writing files`;
   }
 
   /**
@@ -71,9 +73,14 @@ export class PromoteSymbolCommand extends BaseCommand {
         return this.displayHelp();
       }
 
-      const sourceFile = args[0];
-      const symbolName = args[1];
-      const targetDir = args[2] || 'managed/relationships';
+      const flagError = this.validateAllowedFlags(args, ['--dry-run', '-n']);
+      if (flagError) return flagError;
+
+      const positional = this.getPositionalArgs(args);
+      const sourceFile = positional[0];
+      const symbolName = positional[1];
+      const targetDir = positional[2] || 'managed/relationships';
+      const dryRun = this.hasFlag(args, ['--dry-run', '-n']);
 
       if (!sourceFile || !symbolName) {
         this.printError('Usage: promote-symbol <source-file> <symbol-name> [target-dir]');
@@ -146,14 +153,18 @@ export class PromoteSymbolCommand extends BaseCommand {
         sourceFile
       );
 
-      // Ensure target directory exists
-      if (!fs.existsSync(targetDir)) {
-        fs.mkdirSync(targetDir, { recursive: true });
-        this.printInfo(`Created directory: ${targetDir}`);
-      }
+      if (dryRun) {
+        this.printInfo(`Would create: ${targetPath}`);
+      } else {
+        // Ensure target directory exists
+        if (!fs.existsSync(targetDir)) {
+          fs.mkdirSync(targetDir, { recursive: true });
+          this.printInfo(`Created directory: ${targetDir}`);
+        }
 
-      fs.writeFileSync(targetPath, canonicalContent, 'utf-8');
-      this.printSuccess(`Created: ${targetPath}`);
+        fs.writeFileSync(targetPath, canonicalContent, 'utf-8');
+        this.printSuccess(`Created: ${targetPath}`);
+      }
       console.log();
 
       // Update source file (replace H2 with inline reference)
@@ -161,8 +172,12 @@ export class PromoteSymbolCommand extends BaseCommand {
 
       const updatedContent = this.replaceH2WithReference(lines, h2Section, symbolName, targetPath);
 
-      fs.writeFileSync(sourceFile, updatedContent, 'utf-8');
-      this.printSuccess(`Updated: ${sourceFile}`);
+      if (dryRun) {
+        this.printInfo(`Would update: ${sourceFile}`);
+      } else {
+        fs.writeFileSync(sourceFile, updatedContent, 'utf-8');
+        this.printSuccess(`Updated: ${sourceFile}`);
+      }
       console.log(`  Replaced H2 section with inline reference to [[${symbolName}]]`);
       console.log();
 
@@ -181,7 +196,11 @@ export class PromoteSymbolCommand extends BaseCommand {
       console.log('  3. Validate: tsdoc-edge validate-symbol-refs managed');
       console.log();
 
-      return this.success(`Promoted [[${symbolName}]] to canonical H1`);
+      return this.success(
+        dryRun
+          ? `Would promote [[${symbolName}]] to canonical H1`
+          : `Promoted [[${symbolName}]] to canonical H1`
+      );
     });
   }
 

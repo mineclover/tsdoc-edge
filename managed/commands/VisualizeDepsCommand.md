@@ -34,7 +34,7 @@ Visualize dependency graphs.
 
 ### Referenced By
 
-- [[CLI Commands]] → managed/CLI-COMMANDS.md:35
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:49
 - [[MermaidGenerator]] → managed/utilities/MermaidGenerator.md:133
 
 ### Implemented By

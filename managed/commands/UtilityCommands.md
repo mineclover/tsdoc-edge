@@ -444,7 +444,7 @@ tsdoc-edge uninstall-hook
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:157
+- [[Commands Index]] → managed/COMMANDS.md:173
 - [[SyncCommand]] → managed/commands/SyncCommand.md:22
 
 ### Implemented By

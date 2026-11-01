@@ -75,7 +75,7 @@ tsdoc-edge analyze-pipeline
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:66
+- [[Commands Index]] → managed/COMMANDS.md:82
 - [[TSDoc Edge Documentation]] → managed/README.md:53
 - [[IODependencyAnalyzer]] → managed/analyzers/IODependencyAnalyzer.md:26
 - [[Analyzers & Extractors]] → managed/analyzers/index.md:401

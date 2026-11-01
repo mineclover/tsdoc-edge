@@ -11,6 +11,8 @@ export interface Symbol {
   line?: number;
   isExported?: boolean;
   isPublic?: boolean;
+  canonicalId?: string;
+  external?: boolean;
 }
 
 export interface Relationship {
@@ -68,4 +70,25 @@ export interface TsDocConfig {
   rootDir: string;
   dbPath: string;
   managedDir: string;
+}
+
+/** One symbol reached during impact traversal. @public */
+export interface ImpactNode {
+  symbolId: string;
+  depth: number;
+  path: string[];
+  relationshipType: string;
+  direction: 'downstream' | 'upstream';
+  external?: boolean;
+}
+
+/** Structured multi-hop impact analysis result. @public */
+export interface ImpactResult {
+  symbolId: string;
+  direction: 'downstream' | 'upstream' | 'both';
+  maxDepth: number;
+  impactedSymbols: ImpactNode[];
+  byDepth: Record<string, ImpactNode[]>;
+  riskLevel: 'Low' | 'Medium' | 'High';
+  source: 'canonical' | 'legacy' | 'combined';
 }

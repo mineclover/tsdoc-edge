@@ -374,7 +374,7 @@ await loadConfig();
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:76
+- [[Commands Index]] → managed/COMMANDS.md:92
 - [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:107
 - [[Analyzer Status]] → managed/features/analyzer-status.md:57
 - [[Collaboration]] → managed/relationships/collaboration.md:309

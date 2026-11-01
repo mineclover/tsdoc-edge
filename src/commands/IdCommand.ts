@@ -4,6 +4,7 @@
  */
 
 import * as path from 'node:path';
+import type { GroupedSectionData, SectionData } from '../output/types';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { SymbolRegistryManager } from '../storage/SymbolRegistryManager';
 import type { ImplementationSymbolType } from '../types/graph';
@@ -84,6 +85,12 @@ export class IdCommand extends BaseCommand {
         return this.displayHelp();
       }
 
+      const invalid = this.validateAllowedFlags(
+        args,
+        ['--human', '--json', '--xml'],
+        ['--type', '--parent', '--member-type']
+      );
+      if (invalid) return invalid;
       const registryPath = path.join(process.cwd(), '.tsdoc', 'registry.jsonl');
       const manager = this.manager || new SymbolRegistryManager(registryPath);
 
@@ -156,7 +163,7 @@ export class IdCommand extends BaseCommand {
 
     const entry = manager.findById(id);
 
-    if (this.hasFlag(args, '--human')) {
+    if (!this.hasFlag(args, '--xml') && !this.hasFlag(args, '--json')) {
       // Original color output
       console.log(`${colors.green}✅ ID generated:${colors.reset}`);
       console.log();
@@ -171,7 +178,7 @@ export class IdCommand extends BaseCommand {
       console.log();
     } else {
       // XML output
-      this.printOutput(
+      this.printStructured(
         'id-new',
         {
           result: {
@@ -201,7 +208,7 @@ export class IdCommand extends BaseCommand {
       return this.handleListFromDatabase(args);
     }
 
-    if (this.hasFlag(args, '--human')) {
+    if (!this.hasFlag(args, '--xml') && !this.hasFlag(args, '--json')) {
       // Original color output
       console.log(`${colors.bold}Symbol Registry${colors.reset}`);
       console.log(`Total entries: ${colors.green}${entries.length}${colors.reset}`);
@@ -218,7 +225,7 @@ export class IdCommand extends BaseCommand {
       }
     } else {
       // XML output
-      this.printOutput(
+      this.printStructured(
         'id-list',
         {
           source: {
@@ -258,7 +265,7 @@ export class IdCommand extends BaseCommand {
       const symbols = dbManager.querySymbols({ limit: 50, orderBy: 'name', orderDir: 'asc' });
       const total = dbManager.countSymbols({});
 
-      if (this.hasFlag(args, '--human')) {
+      if (!this.hasFlag(args, '--xml') && !this.hasFlag(args, '--json')) {
         // Original color output
         console.log(`${colors.bold}Symbols from Database${colors.reset}`);
         console.log(
@@ -286,7 +293,7 @@ export class IdCommand extends BaseCommand {
         }
       } else {
         // XML output
-        this.printOutput(
+        this.printStructured(
           'id-list',
           {
             source: {
@@ -328,7 +335,7 @@ export class IdCommand extends BaseCommand {
     // Try registry first
     const entry = manager.findById(id);
     if (entry) {
-      if (this.hasFlag(args, '--human')) {
+      if (!this.hasFlag(args, '--xml') && !this.hasFlag(args, '--json')) {
         // Original color output
         console.log(`${colors.bold}Symbol: ${id}${colors.reset}`);
         console.log();
@@ -343,7 +350,7 @@ export class IdCommand extends BaseCommand {
         console.log();
       } else {
         // XML output
-        this.printOutput(
+        this.printStructured(
           'id-find',
           {
             source: {
@@ -384,7 +391,7 @@ export class IdCommand extends BaseCommand {
       // Try exact ID match first
       const symbol = dbManager.getSymbol(idOrName);
       if (symbol) {
-        if (this.hasFlag(args, '--human')) {
+        if (!this.hasFlag(args, '--xml') && !this.hasFlag(args, '--json')) {
           // Original color output
           console.log(`${colors.bold}Symbol Found (from database)${colors.reset}`);
           console.log();
@@ -401,7 +408,7 @@ export class IdCommand extends BaseCommand {
           console.log();
         } else {
           // XML output
-          this.printOutput(
+          this.printStructured(
             'id-find',
             {
               source: {
@@ -426,7 +433,7 @@ export class IdCommand extends BaseCommand {
       // Try name search
       const matches = dbManager.findSymbolsByNamePattern(idOrName);
       if (matches.length > 0) {
-        if (this.hasFlag(args, '--human')) {
+        if (!this.hasFlag(args, '--xml') && !this.hasFlag(args, '--json')) {
           // Original color output
           console.log(`${colors.bold}Symbols matching "${idOrName}"${colors.reset}`);
           console.log(`Found: ${colors.green}${matches.length}${colors.reset} match(es)`);
@@ -445,7 +452,7 @@ export class IdCommand extends BaseCommand {
           }
         } else {
           // XML output
-          this.printOutput(
+          this.printStructured(
             'id-find',
             {
               source: {
@@ -487,7 +494,7 @@ export class IdCommand extends BaseCommand {
   private handleStats(manager: SymbolRegistryManager, args: string[]): CommandResult {
     const stats = manager.getStats();
 
-    if (this.hasFlag(args, '--human')) {
+    if (!this.hasFlag(args, '--xml') && !this.hasFlag(args, '--json')) {
       // Original color output
       console.log(`${colors.bold}Registry Statistics${colors.reset}`);
       console.log();
@@ -504,7 +511,7 @@ export class IdCommand extends BaseCommand {
       console.log();
     } else {
       // XML output
-      this.printOutput(
+      this.printStructured(
         'id-stats',
         {
           registry: {
@@ -525,6 +532,18 @@ export class IdCommand extends BaseCommand {
     }
 
     return { exitCode: 0, message: 'Statistics displayed' };
+  }
+
+  private printStructured(
+    rootTag: string,
+    sections: Record<string, SectionData | GroupedSectionData>,
+    args: string[]
+  ): void {
+    if (this.hasFlag(args, '--json')) {
+      console.log(JSON.stringify(sections, null, 2));
+      return;
+    }
+    this.printOutput(rootTag, sections, args);
   }
 
   private showHelp(): CommandResult {
