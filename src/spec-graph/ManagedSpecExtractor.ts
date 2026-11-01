@@ -1,4 +1,10 @@
-/** Compile explicit managed-spec declarations from Markdown into a SpecGraph revision. */
+/**
+ * Compile explicit managed-spec declarations from Markdown into a SpecGraph revision.
+ *
+ * @doc [[AuthoredProjectSpecifications]]
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @packageDocumentation
+ */
 
 import { createHash } from 'node:crypto';
 import * as fs from 'node:fs';

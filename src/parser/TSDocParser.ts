@@ -93,23 +93,22 @@ export const TSDOC_EDGE_CUSTOM_TAGS: CustomTagSpec[] = [
   { tagName: '@requires', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
   { tagName: '@feature', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
   { tagName: '@plan', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@overlay', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@ttsc', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@useCase', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@performance', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@priority', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@symbol', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@updated', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@changelog', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
 
-  // Common documentation & JSDoc compatibility tags
+  // Legacy JSDoc compatibility shims (not part of @microsoft/tsdoc v0 standard 29 tags
+  // nor tsdoc-edge semantic ontology; retained for existing JSDoc comment compatibility)
   { tagName: '@private', syntaxKind: TSDocTagSyntaxKind.ModifierTag, allowMultiple: false },
   { tagName: '@description', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
   { tagName: '@template', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
   { tagName: '@module', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
   { tagName: '@todo', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
   { tagName: '@default', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@useCase', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@performance', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@priority', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
   { tagName: '@version', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@symbol', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@updated', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@changelog', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
 ];
 
 /**
@@ -149,6 +148,7 @@ interface NodeWithJSDoc extends ts.Node {
  * Parser for extracting and parsing TSDoc comments from TypeScript source files
  *
  * @id 000
+ * @doc [[TSDocStandardSpecification]]
  * @public
  * @responsibility Parse TypeScript files and extract TSDoc comments with custom tag support
  * @contract Initialize TSDoc parser with custom tags and provide file parsing capability

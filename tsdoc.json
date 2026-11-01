@@ -233,16 +233,6 @@
       "allowMultiple": true
     },
     {
-      "tagName": "@overlay",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@ttsc",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
       "tagName": "@private",
       "syntaxKind": "modifier"
     },

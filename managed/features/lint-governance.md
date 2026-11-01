@@ -9,19 +9,21 @@ source: src/commands/LintCommand.ts
 
 # [[Lint Governance]]
 
-Biome owns formatting and local static hygiene; TypeScript 7 owns semantic type correctness. The
-two gates are complementary: a green formatter does not replace `npm run typecheck`, and a green
-typecheck does not permit new lint debt.
+Biome owns formatting and local syntax/style hygiene; `ttsc@0.34.3` + `@ttsc/lint@0.34.3` (backed
+by `typescript-native@7.0.2`) owns semantic type correctness, checker-backed lint gates, and native
+TSDoc/checkpoint check-stage enforcement via `tools/ttsc-tsdoc`. Detailed platform boundaries live
+in [[TtscPlatformSpecification]], [[TSDocStandardSpecification]], and
+[[CrossSpecIntegrationContract]].
 
 ## Severity policy
 
 | Surface | Policy | Reason |
 | --- | --- | --- |
-| All files | Biome recommended errors, parsing, formatting | Deterministic repository baseline; CI blocks violations. |
-| All TypeScript code | `noAssignInExpressions`, `noImplicitAnyLet` are errors | Regex/extraction loops use `matchAll()` or an explicit typed step. |
-| Canonical governance kernel | `noExplicitAny`, `noNonNullAssertion` are errors | New revision-pinned analysis code must not inherit legacy trust shortcuts. |
-| Legacy application, scripts, MCP server | `noExplicitAny`, `noNonNullAssertion` remain warnings during migration | Existing behavior is preserved while each touched subsystem removes debt deliberately. |
-| Tests, demos, examples | Test-specific exceptions only where the fixture requires them | Fixtures may model loose input, but production policy is not weakened. |
+| All files (Biome) | Biome recommended errors, parsing, formatting (`0` warnings, `0` infos budget) | Deterministic repository baseline; CI blocks violations; `@ttsc/lint` omits `format` so Biome stays sole formatter. |
+| All TypeScript builds & tests (`lint.config.mjs`) | 18 enforced `@ttsc/lint` `error` rules (`tsdoc-edge/*` 6, `typescript/*` 7, `jsdoc/*` 5) | Auto-discovered on `npm run build`, `npm test`, and `ttscserver`; zero warning noise on ordinary builds. |
+| Type-aware & checkpoint backlog (`lint.ratchet.config.mjs`) | 7 `warn` ratchet rules enforced by `scripts/verify-ttsc-lint-baseline.cjs` | Monotonic downward ratchet (`scripts/ttsc-lint-baseline.json`); rules graduate to `lint.config.mjs` (`error`) at 0. |
+| Canonical governance kernel | Biome `noExplicitAny`, `noNonNullAssertion` are errors (`lint:governance`) | Revision-pinned analysis code must not inherit legacy trust shortcuts. |
+| Tests, demos, examples | `src/__tests__/fixtures/**` ignored only where intentional malformed fixtures are required | Fixtures may model loose input, while production and test suites share the 18-rule `error` gate. |
 
 The strict surface currently includes `src/convention`, `src/semantic-graph`, `src/spec-graph`,
 `src/lsp`, `src/indexer`, `mcp-server/src`, and the four immutable revision repositories. Adding a
@@ -52,10 +54,12 @@ semantic relationship requires it.
 ## Commands and CI contract
 
 ```bash
-npm run lint             # baseline errors + warning budget + strict canonical kernel
-npm run lint:budget      # no new legacy warning debt
-npm run lint:governance  # canonical kernel: warnings are failures
-npm run typecheck        # TypeScript 7 semantic gate
+npm run ttsc:prepare     # ahead-of-time Go compilation for @ttsc/lint + tools/ttsc-tsdoc
+npm run lint             # Biome check + lint:budget (0/0) + lint:governance + lint:ttsc ratchet
+npm run lint:budget      # Biome warning/info budget gate
+npm run lint:governance  # canonical kernel: Biome warnings are failures
+npm run lint:ttsc        # @ttsc/lint 18 error rules + 7 warn ratchet baseline verification
+npm run typecheck        # ttsc + 18 enforced error rules on tsconfig.ttsc.json
 ```
 
 `npm run lint` is the CI entry point. `--write --unsafe` is a maintenance action, never a required

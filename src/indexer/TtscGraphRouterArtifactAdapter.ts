@@ -128,6 +128,7 @@ export interface TtscGraphRouterArtifactAdapterOptions {
  * The router is not reclassified as a compiler parser: `@ttsc/graph` remains
  * the producer and this adapter only crosses the package/cache boundary.
  *
+ * @doc [[TtscPlatformSpecification]]
  * @public
  */
 export class TtscGraphRouterArtifactAdapter implements ProjectGraphSource {

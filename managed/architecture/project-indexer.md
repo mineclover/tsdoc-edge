@@ -73,18 +73,18 @@ normalizer가 v1 assembler에 전달할 때만 `compatibilityTsconfigPath` bridg
 ## TypeScript 7.0 호환 목표와 안정화 기준
 
 첫 호환 목표는 ttsc-ex의 `typescript@7.0.x`, `ttsc`, `@ttsc/graph`, graph-router
-조합이다.
-저장소의 기본 build, typecheck, watch lane은 `ttsc@0.18.4`와 native TypeScript
-`7.0.2` 정식판을 사용한다. 기존 TypeScript Compiler API 코드는 별도의
-`typescript@5.9.x` 런타임에 남긴다. TypeScript 7은 루트 Compiler API export가
-달라 현재 AST 기반 코드와 `ts-jest`를 동시에 깨뜨리므로, build compiler 전환과
-runtime API 전환을 분리한다.
+조합이다([[TtscPlatformSpecification]], [[CrossSpecIntegrationContract]]).
+저장소의 기본 build, typecheck, watch, check-stage lint lane은 `ttsc@0.34.3`(`@ttsc/lint@0.34.3` 포함)과
+native TypeScript `7.0.2`(`devDependencies.typescript-native`) 정식판을 사용한다. 런타임에
+TypeScript JS Compiler API(`ts.createSourceFile` 등)를 직접 호출하는 파서·분석기 코드는
+`dependencies.typescript`(`6.0.3`) 런타임으로 분리 유지한다. npm `typescript@7.0.2` 패키지는 네이티브
+`tsgo` 바이너리 전용이라 JS Compiler API를 포함하지 않으므로, 네이티브 컴파일러 바이너리(`typescript-native`)와
+런타임 JS Compiler API(`typescript@6.0.3`)를 명시적으로 이원화한다.
 
 Test transformer는 [[TS7 Test Compilation Lane]] P4.0에서 별도로 정리했다. source/test를
 `ttsc`/TypeScript 7로 `.test-dist`에 선컴파일하고 Jest가 JavaScript만 실행하며,
-`ts-jest`는 제거됐다. 이 결정은 test toolchain의 TS5 결합을 제거하지만, legacy
-analyzer·문서 변환기·LSP syntax overlay가 직접 사용하는 `typescript@5.9.x` runtime
-제거를 의미하지 않는다.
+`ts-jest`는 제거됐다. 이 결정은 test toolchain의 구버전 TS 결합을 제거하면서 런타임 JS Compiler API
+소비 모듈과의 경계를 명확히 유지한다.
 
 graph-router raw artifact contract `1.1.0`은 raw fact plane, saved-file snapshot,
 합성 구조 없음, unsaved buffer 없음, one-based evidence, unknown field 보존을

@@ -1,4 +1,9 @@
-/** Canonical normalization for provider-owned raw snapshots. */
+/**
+ * Canonical normalization for provider-owned raw snapshots.
+ *
+ * @doc [[CrossSpecIntegrationContract]]
+ * @packageDocumentation
+ */
 
 import { createHash } from 'node:crypto';
 import * as path from 'node:path';

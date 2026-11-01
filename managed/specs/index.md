@@ -63,11 +63,31 @@ The P4.4 extraction syntax is versioned by `ManagedSpecExtractor@1.0.0`. Its exp
 can contain `requirements`, `edges`, and `bindings`; duplicate IDs, malformed selectors, and source
 provenance errors fail the compiled projection rather than selecting an alternate source.
 
+## Domain Specification Catalog (3 Independent Specs + Bridge Contract)
+
+The authored specification root separates external standard/platform contracts from `tsdoc-edge`'s
+own product governance plane so that no specification silently duplicates or pollutes another:
+
+| Domain | Canonical Spec | Independent Ownership Scope |
+| --- | --- | --- |
+| **1. `tsdoc` 독립 스펙** | [[TSDocStandardSpecification]] | `@microsoft/tsdoc` v0 comment grammar (`/** ... */`), 29 standard tags (`block`/`inline`/`modifier`), prose escape rules (`{` `}` `<` `>` `@`), `tsdoc.json` extension schema, `DocNode` AST & 46 parser message IDs |
+| **2. `ttsc` 독립 스펙** | [[TtscPlatformSpecification]] | `ttsc@0.34.3` + `tsgo 7.0.2` compiler/check/fix/prepare/cache CLI, `ttscserver` LSP, `@ttsc/lint@0.34.3` Go `rule` SPI (`ProjectInputRule`, `HintRule`, `GraphRule`, `FixReporter`) & `typescript/*` · `jsdoc/*` rules, `@ttsc/graph` (`graph-router` `1.1.0`) raw compiler facts |
+| **3. `tsdoc-edge` 독립 스펙** | [[TsdocEdgePlatformSpecification]] | SSOT `[[Checkpoint]]` flattening & backlinks, 56 domain extension tags (7-aspect Module Spec, Contract/ADR, 28-type Relationship Ontology), 6-plane revision-pinned governance kernel (`Code`, `Spec`, `Evidence`, `Enrichment`, `Policy`, `Overlay`), `work-context` / `design-context` / `convention` / `tsdoc-edge-lsp` / MCP |
+| **교차 연동 계약** | [[CrossSpecIntegrationContract]] | Single-owner matrix across 8 architectural dimensions, Bridge 1 (`tools/ttsc-tsdoc` Go contributor + `@microsoft/tsdoc` parity oracle), Bridge 2 (`@ttsc/graph` → `ProviderSnapshotNormalizer` → `ProjectIndexer` C2 capability matrix), and dual TypeScript runtime split (`typescript@6.0.3` JS API vs `typescript-native@7.0.2`) |
+| **컨벤션 수직 슬라이스** | [[ConventionCheck]] | P4.4 managed `tsdoc-spec` extraction and canonical implementation binding proof |
+
 ## Initial layout
 
 ```text
 managed/specs/
   index.md
+  conventions/
+    convention-check.md
+  domains/
+    tsdoc-standard-spec.md
+    ttsc-platform-spec.md
+    tsdoc-edge-platform-spec.md
+    cross-spec-integration-contract.md
   <area>/
     <spec-name>.md
     artifacts/
@@ -76,6 +96,11 @@ managed/specs/
 
 ## Related
 
+- [[TSDocStandardSpecification]]
+- [[TtscPlatformSpecification]]
+- [[TsdocEdgePlatformSpecification]]
+- [[CrossSpecIntegrationContract]]
+- [[ConventionCheck]]
 - [[Semantic Graph Spec Governance Roadmap]]
 - [[Semantic Graph Analysis and Relationship Model]]
 - [[Spec Management System]]
