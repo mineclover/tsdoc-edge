@@ -1,6 +1,6 @@
 /**
  * Tests for FeatureGroupingAnalyzer
- * @description Tests feature grouping detection from @feature tags and directory structure
+ * Tests feature grouping detection from `@feature` tags and directory structure
  */
 
 import * as fs from 'node:fs';

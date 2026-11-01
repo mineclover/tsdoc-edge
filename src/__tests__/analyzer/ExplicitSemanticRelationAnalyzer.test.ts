@@ -1,6 +1,6 @@
 /**
  * Tests for ExplicitSemanticRelationAnalyzer
- * @description Tests extraction of @relatedTo TSDoc tags
+ * Tests extraction of `@relatedTo` TSDoc tags
  */
 
 import * as fs from 'node:fs';

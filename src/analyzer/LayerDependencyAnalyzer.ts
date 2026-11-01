@@ -9,13 +9,13 @@ import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
  * Architectural layer types
- * @private
+ * @internal
  */
 type Layer = 'controller' | 'service' | 'repository' | 'model' | 'util' | 'unknown';
 
 /**
  * Layer dependency pattern
- * @private
+ * @internal
  */
 interface LayerDependency {
   from: string;
@@ -62,7 +62,6 @@ export class LayerDependencyAnalyzer {
 
   /**
    * Layer hierarchy (lower number = higher layer)
-   * @private
    */
   private layerHierarchy: Record<Layer, number> = {
     controller: 1,
@@ -105,7 +104,6 @@ export class LayerDependencyAnalyzer {
    * Collect layer dependencies from existing relationships
    *
    * @returns Array of layer dependencies
-   * @private
    */
   private collectLayerDependencies(): LayerDependency[] {
     const layerDeps: LayerDependency[] = [];
@@ -157,7 +155,6 @@ export class LayerDependencyAnalyzer {
    *
    * @param symbol - Symbol to classify
    * @returns Layer classification
-   * @private
    */
   private classifyLayer(symbol: Symbol): Layer {
     const filePath = symbol.filePath;
@@ -186,7 +183,6 @@ export class LayerDependencyAnalyzer {
    * @param fromLayer - Source layer
    * @param toLayer - Target layer
    * @returns True if violation
-   * @private
    */
   private isViolation(fromLayer: Layer, toLayer: Layer): boolean {
     const fromLevel = this.layerHierarchy[fromLayer];
@@ -202,7 +198,6 @@ export class LayerDependencyAnalyzer {
    *
    * @param dep - Layer dependency
    * @returns Unified relationship
-   * @private
    */
   private createRelationship(dep: LayerDependency): UnifiedRelationship {
     const timestamp = new Date().toISOString();
@@ -305,7 +300,6 @@ export class LayerDependencyAnalyzer {
    * Collect module dependencies from existing relationships
    *
    * @returns Array of module dependencies
-   * @private
    */
   private collectModuleDependencies(): Array<{
     from: string;
@@ -351,7 +345,6 @@ export class LayerDependencyAnalyzer {
    *
    * @param filePath - File path
    * @returns Module name or null
-   * @private
    */
   private extractModule(filePath: string): string | null {
     const normalized = filePath.replace(/\\/g, '/');
@@ -397,7 +390,6 @@ export class LayerDependencyAnalyzer {
    *
    * @param dep - Module dependency
    * @returns Unified relationship
-   * @private
    */
   private createModuleBoundaryRelationship(dep: {
     from: string;
@@ -456,7 +448,6 @@ export class LayerDependencyAnalyzer {
    * @param fromModule - Source module
    * @param toModule - Target module
    * @returns True if problematic
-   * @private
    */
   private isProblematicBoundaryCross(fromModule: string, toModule: string): boolean {
     // Define allowed dependencies (module A can depend on module B)
@@ -485,7 +476,6 @@ export class LayerDependencyAnalyzer {
    * @param fromModule - Source module
    * @param toModule - Target module
    * @returns Boundary type
-   * @private
    */
   private classifyBoundaryType(fromModule: string, toModule: string): string {
     // Core modules that are expected to be depended upon

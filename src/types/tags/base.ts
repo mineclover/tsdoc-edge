@@ -4,40 +4,45 @@
  */
 
 /**
- * Custom tag definitions for TSDoc Edge
- * These tags enable symbol relationships, contracts, and traceability
+ * Irreducible custom tag definitions owned by `tsdoc-edge`.
+ *
+ * Code-space structural/call/type relationships are owned by `ttsc` (`@ttsc/graph`)
+ * and standard API documentation tags are owned by `@microsoft/tsdoc`.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @public
  */
 export const CUSTOM_TAGS = {
-  // Relationship tags
-  RELATED_TO: '@relatedTo',
-  DEPENDS_ON: '@dependsOn',
-  USED_BY: '@usedBy',
-  IMPLEMENTS: '@implements',
-  EXTENDS: '@extends',
+  // Checkpoint Routing
+  DOC: '@doc',
 
-  // Contract tags
+  // Purpose & Design-by-Contract
+  RESPONSIBILITY: '@responsibility',
+  PROBLEM: '@problem',
+  SOLVES: '@solves',
+  CONTEXT: '@context',
   CONTRACT: '@contract',
   PRECONDITION: '@precondition',
   POSTCONDITION: '@postcondition',
   INVARIANT: '@invariant',
 
-  // Testing tags
-  TESTED_BY: '@testedBy',
+  // Module Specification Logic & Effect
+  FUNCTIONALITY: '@functionality',
+  ALGORITHM: '@algorithm',
+  COMPLEXITY: '@complexity',
+  SIDE_EFFECT: '@sideEffect',
+
+  // Inline ADR Triad
+  DECISION: '@decision',
+  RATIONALE: '@rationale',
+  CONSEQUENCES: '@consequences',
+
+  // Non-AST Semantic Relationships & Governance
+  RELATED_TO: '@relatedTo',
+  ENHANCES: '@enhances',
+  REQUIRES: '@requires',
+  FEATURE: '@feature',
   TEST_SCENARIO: '@testScenario',
-  COVERAGE: '@coverage',
-
-  // Design and Architecture
-  RESPONSIBILITY: '@responsibility',
-  DESIGN_DECISION: '@designDecision',
-  ARCHITECTURE: '@architecture',
-  PATTERN: '@pattern',
-
-  // Traceability
-  REQUIREMENT: '@requirement',
-  ISSUE: '@issue',
-  VERSION: '@version',
-  SINCE: '@since',
-  DEPRECATED_IN_FAVOR_OF: '@deprecatedInFavorOf',
   DEAD_CODE: '@deadcode',
 } as const;
 

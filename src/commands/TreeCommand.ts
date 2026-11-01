@@ -41,10 +41,6 @@ interface TreeNode {
  * @decision Use DatabaseManager with Drizzle ORM for hierarchy data
  * @rationale Database provides efficient queries for symbol relationships
  * @consequences Requires database to be built first
- *
- * @depends DatabaseManager
- * @depType internal
- * @depReason Symbol hierarchy data via Drizzle ORM
  */
 export class TreeCommand extends BaseCommand {
   private dbManager?: DatabaseManager;

@@ -31,10 +31,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use SpecVersionManager for diff computation
  * @rationale Integrates with Git for version comparison
  * @consequences Requires valid version numbers in Git history
- *
- * @depends SpecVersionManager
- * @depType internal
- * @depReason Version comparison
  */
 export class SpecDiffCommand extends BaseCommand {
   private manager?: SpecVersionManager;

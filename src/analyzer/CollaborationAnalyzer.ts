@@ -93,7 +93,6 @@ export class CollaborationAnalyzer {
    * Detect bidirectional code dependencies
    *
    * @param patterns - Array to collect patterns
-   * @private
    */
   private detectBidirectionalDependencies(patterns: CollaborationPattern[]): void {
     const dependencies = new Map<string, Set<string>>();
@@ -139,7 +138,6 @@ export class CollaborationAnalyzer {
    * Detect mutual call relationships
    *
    * @param patterns - Array to collect patterns
-   * @private
    */
   private detectMutualCalls(patterns: CollaborationPattern[]): void {
     const calls = new Map<string, Set<string>>();
@@ -185,7 +183,6 @@ export class CollaborationAnalyzer {
    * Detect mutual composition
    *
    * @param patterns - Array to collect patterns
-   * @private
    */
   private detectMutualComposition(patterns: CollaborationPattern[]): void {
     const compositions = new Map<string, Set<string>>();
@@ -233,7 +230,6 @@ export class CollaborationAnalyzer {
    *
    * @param pattern - Collaboration pattern
    * @returns Unified relationship
-   * @private
    */
   private createRelationship(pattern: CollaborationPattern): UnifiedRelationship {
     const timestamp = new Date().toISOString();

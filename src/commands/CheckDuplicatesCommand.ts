@@ -60,10 +60,6 @@ function findMarkdownFiles(dir: string): string[] {
  * @decision Use SpecContentSimilarityChecker for analysis
  * @rationale Specialized checker with configurable thresholds
  * @consequences Requires at least 2 files to compare
- *
- * @depends SpecContentSimilarityChecker
- * @depType internal
- * @depReason Content similarity analysis
  */
 export class CheckDuplicatesCommand extends BaseCommand {
   private checker?: SpecContentSimilarityChecker;

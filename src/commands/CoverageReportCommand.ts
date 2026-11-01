@@ -73,10 +73,6 @@ interface CoverageReport {
  * @rationale `@doc` tags show code→docs links (SSOT direction), .md traversal only shows docs→docs
  * @consequences Reveals true documentation status, not navigation completeness
  *
- * @depends DatabaseManager, TSDocParser
- * @depType internal
- * @depReason Need symbol data and TSDoc parsing
- *
  * @doc [[Coverage Report Command]]
  */
 export class CoverageReportCommand extends BaseCommand {

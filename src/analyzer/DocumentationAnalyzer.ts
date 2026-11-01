@@ -527,11 +527,12 @@ export class DocumentationAnalyzer {
 
     // Check custom tags
     const customTagNames = [
+      '@doc',
       '@responsibility',
       '@contract',
       '@precondition',
       '@postcondition',
-      '@testedBy',
+      '@testScenario',
     ];
     const hasCustomTags = docComment.customBlocks.some((b) =>
       customTagNames.includes(b.blockTag.tagName)

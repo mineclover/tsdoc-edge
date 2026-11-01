@@ -83,7 +83,6 @@ export class SubstitutionAnalyzer {
    * Find groups of classes that can substitute each other
    *
    * @returns Array of substitution groups
-   * @private
    */
   private findSubstitutionGroups(): SubstitutionGroup[] {
     const groups: SubstitutionGroup[] = [];
@@ -161,7 +160,6 @@ export class SubstitutionAnalyzer {
    * @param impl2 - Second implementation
    * @param group - Substitution group
    * @returns Unified relationship
-   * @private
    */
   private createSubstitutionRelationship(
     impl1: SubstitutionGroup['implementations'][0],

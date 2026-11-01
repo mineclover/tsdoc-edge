@@ -123,7 +123,6 @@ export class TemporalOrderAnalyzer {
    *
    * @param sourceFile - Source file
    * @param sites - Array to collect sites
-   * @private
    */
   private extractTemporalOrderSites(sourceFile: ts.SourceFile, sites: TemporalOrderSite[]): void {
     const visit = (node: ts.Node): void => {
@@ -178,7 +177,6 @@ export class TemporalOrderAnalyzer {
    * @param block - Block node
    * @param sourceFile - Source file
    * @param sites - Array to collect sites
-   * @private
    */
   private analyzeSequentialCalls(
     block: ts.Node,
@@ -252,7 +250,6 @@ export class TemporalOrderAnalyzer {
    * @param node - Call expression node
    * @param sourceFile - Source file
    * @param sites - Array to collect sites
-   * @private
    */
   private analyzeLifecyclePattern(
     node: ts.CallExpression,
@@ -323,7 +320,6 @@ export class TemporalOrderAnalyzer {
    * @param node - Call expression node
    * @param sourceFile - Source file
    * @param sites - Array to collect sites
-   * @private
    */
   private analyzePromiseChain(
     node: ts.CallExpression,
@@ -360,7 +356,6 @@ export class TemporalOrderAnalyzer {
    * @param constructor - Constructor declaration node
    * @param sourceFile - Source file
    * @param sites - Array to collect sites
-   * @private
    */
   private analyzeConstructorSequence(
     constructor: ts.ConstructorDeclaration,
@@ -415,7 +410,6 @@ export class TemporalOrderAnalyzer {
    * @param block - Block node from async function
    * @param sourceFile - Source file
    * @param sites - Array to collect sites
-   * @private
    */
   private analyzeAsyncSequence(
     block: ts.Block,
@@ -486,7 +480,6 @@ export class TemporalOrderAnalyzer {
    * @param expression - Expression node
    * @param sourceFile - Source file
    * @returns Symbol or null
-   * @private
    */
   private findSymbolForExpression(
     expression: ts.Expression,
@@ -537,7 +530,6 @@ export class TemporalOrderAnalyzer {
    *
    * @param site - Temporal order site
    * @returns Unified relationship
-   * @private
    */
   private createRelationship(site: TemporalOrderSite): UnifiedRelationship {
     const timestamp = new Date().toISOString();

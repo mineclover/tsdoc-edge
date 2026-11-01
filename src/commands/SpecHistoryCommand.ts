@@ -31,10 +31,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use SpecVersionManager for version tracking
  * @rationale Integrates with Git for version history
  * @consequences Requires Git repository and file in version control
- *
- * @depends SpecVersionManager
- * @depType internal
- * @depReason Version history management
  */
 export class SpecHistoryCommand extends BaseCommand {
   private manager?: SpecVersionManager;

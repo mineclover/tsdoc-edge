@@ -32,10 +32,6 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
  * - 관계 검증 커버리지 계산
  * - 미검증 관계 식별 및 제안
  * - 특정 모듈의 검증 상태 조회
- *
- * @depends TestRelationshipExtractor, IntegrationCoverageCalculator
- * @depType internal
- * @depReason 테스트 분석 및 커버리지 계산 로직 필요
  */
 export class TestRelationshipsCommand extends BaseCommand {
   /**

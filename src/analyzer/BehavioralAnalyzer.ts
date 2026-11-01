@@ -120,7 +120,6 @@ export class BehavioralAnalyzer {
    * Detect collaboration relationships
    *
    * @returns Array of collaboration relationships
-   * @private
    */
   private detectCollaborations(): Collaboration[] {
     if (!this.program) return [];
@@ -149,7 +148,6 @@ export class BehavioralAnalyzer {
    * @param sourceFile - TypeScript source file
    * @param filePath - File path
    * @param collaborations - Array to collect collaborations
-   * @private
    */
   private extractCollaborationPatterns(
     sourceFile: ts.SourceFile,
@@ -241,7 +239,6 @@ export class BehavioralAnalyzer {
    * Detect composition relationships
    *
    * @returns Array of composition relationships
-   * @private
    */
   private detectCompositions(): Composition[] {
     if (!this.program) return [];
@@ -270,7 +267,6 @@ export class BehavioralAnalyzer {
    * @param sourceFile - TypeScript source file
    * @param filePath - File path
    * @param compositions - Array to collect compositions
-   * @private
    */
   private extractCompositionPatterns(
     sourceFile: ts.SourceFile,
@@ -332,7 +328,6 @@ export class BehavioralAnalyzer {
    * Detect temporal-order relationships
    *
    * @returns Array of temporal-order relationships
-   * @private
    */
   private detectTemporalOrder(): TemporalOrder[] {
     if (!this.program) return [];
@@ -361,7 +356,6 @@ export class BehavioralAnalyzer {
    * @param sourceFile - TypeScript source file
    * @param filePath - File path
    * @param temporalOrders - Array to collect temporal orders
-   * @private
    */
   private extractTemporalOrderPatterns(
     sourceFile: ts.SourceFile,
@@ -470,7 +464,6 @@ export class BehavioralAnalyzer {
    * @param block - Block statement
    * @param sourceFile - Source file
    * @returns Array of call information
-   * @private
    */
   private extractSequentialCalls(
     block: ts.Block,
@@ -510,7 +503,6 @@ export class BehavioralAnalyzer {
    *
    * @param node - AST node
    * @returns Class declaration or null
-   * @private
    */
   private findParentClass(node: ts.Node): ts.ClassDeclaration | null {
     let current: ts.Node | undefined = node;
@@ -530,7 +522,6 @@ export class BehavioralAnalyzer {
    *
    * @param name - Symbol name
    * @returns Symbol ID or null
-   * @private
    */
   private findSymbolByName(name: string): string | null {
     for (const [symbolId, symbol] of this.graph.symbols.entries()) {
@@ -546,7 +537,6 @@ export class BehavioralAnalyzer {
    *
    * @param collaborations - Collaboration patterns
    * @returns Array of relationships
-   * @private
    */
   private createCollaborationRelationships(collaborations: Collaboration[]): UnifiedRelationship[] {
     return collaborations.map((collab) => ({
@@ -585,7 +575,6 @@ export class BehavioralAnalyzer {
    *
    * @param compositions - Composition patterns
    * @returns Array of relationships
-   * @private
    */
   private createCompositionRelationships(compositions: Composition[]): UnifiedRelationship[] {
     const relationships: UnifiedRelationship[] = [];
@@ -632,7 +621,6 @@ export class BehavioralAnalyzer {
    *
    * @param temporalOrders - Temporal order patterns
    * @returns Array of relationships
-   * @private
    */
   private createTemporalOrderRelationships(temporalOrders: TemporalOrder[]): UnifiedRelationship[] {
     return temporalOrders.map((order) => ({

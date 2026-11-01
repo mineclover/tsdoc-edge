@@ -151,6 +151,7 @@ npm run lint:ttsc
 
 1. **2계층 설정 분리 (`lint.config.mjs` vs `lint.ratchet.config.mjs`)**: `0.34.3` 자동 탐색으로 인해 모든 `ttsc` 호출이 `lint.config.mjs`를 읽으므로, `lint.config.mjs`에는 100% 클린한 `error` 규칙만 두고 백로그 `warn` 규칙은 `extends: './lint.config.mjs'`를 사용하는 `lint.ratchet.config.mjs`로 격리합니다.
 2. **원시 그래프와 정규 그래프의 분리**: `@ttsc/graph`의 로컬 노드 ID를 영속 DB 기본키로 직접 노출하지 않고, 항상 [^ProviderSnapshotNormalizer]에서 `workspaceId`와 `graphNamespace`(`ttsc:<repoId>`)를 결합한 정규 ID로 변환합니다.
+3. **AST·그래프 사실과 중복되는 주석 태그 제거**: `@ttsc/graph`가 결정론적으로 산출하는 6종 정규 엣지(`implements`, `extends`, `calls`, `accesses`, `instantiates`, `type_ref`), `CanonicalNodeId`, TypeScript `import`/가시성 수식어가 코드 공간 의존성·식별자의 유일한 정본이므로, 수동 주석 태그 9종(`@implements`, `@extends`, `@uses`, `@usedBy`, `@dependsOn`, `@depends`, `@depType`, `@depReason`, `@id`)은 퇴출하고 관계 브리지로만 연결합니다.
 
 ## 관련 기능 (Related Concepts)
 

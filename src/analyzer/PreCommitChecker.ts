@@ -15,10 +15,6 @@
  * @rationale Standard git approach, Works with all git workflows
  * @consequences Requires git repository, Fast and reliable
  *
- * @depends child_process, fs, path, EnhancedDocExtractor
- * @depType external, internal
- * @depReason Git commands for staged files, Enhanced doc parsing
- *
  * @doc [[PreCommitChecker]]
  * @public
  */

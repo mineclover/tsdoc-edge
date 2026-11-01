@@ -35,7 +35,6 @@ export class TaskManager {
 
   /**
    * Generate unique task ID
-   * @private
    */
   private generateId(): string {
     return `task-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
@@ -294,7 +293,6 @@ export class TaskManager {
    * Convert Drizzle ORM row to Task object
    * @param row - Drizzle ORM row (camelCase properties)
    * @returns Task object
-   * @private
    */
   private drizzleRowToTask(row: schema.TaskRow): Task {
     return {

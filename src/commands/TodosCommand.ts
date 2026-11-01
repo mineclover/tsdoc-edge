@@ -16,7 +16,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @doc [[CLI Commands#todos]]
  *
  * @problem Need to see all pending work items across codebase
- * @solves Shows all @plan tags formatted as TODO list
+ * @solves Shows all `@privateRemarks` plan items formatted as TODO list
  * @context Part of project tracking and planning
  *
  * @functionality
@@ -30,10 +30,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use DatabaseManager for TODO data
  * @rationale TODOs are stored as future plans in database
  * @consequences Requires database to be built first
- *
- * @depends DatabaseManager
- * @depType internal
- * @depReason TODO data storage
  */
 export class TodosCommand extends BaseCommand {
   private dbManager?: DatabaseManager;

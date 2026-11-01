@@ -27,10 +27,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use SQLite's special 'rebuild' command for FTS5
  * @rationale Native SQLite command is the safest and most efficient way
  * @consequences Requires exclusive database access during rebuild
- *
- * @depends DatabaseManager
- * @depType internal
- * @depReason Database access and FTS5 rebuild operations
  */
 export class RebuildIndexCommand extends BaseCommand {
   private dbManager?: DatabaseManager;

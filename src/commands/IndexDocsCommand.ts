@@ -33,10 +33,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Support both full scan and incremental update
  * @rationale Full scan for initial setup, incremental for fast updates during development
  * @consequences Flexible workflow - full rebuild when needed, fast updates otherwise
- *
- * @depends DocumentSymbolParser, DocumentSymbolRegistry, TSDocSymbolParser
- * @depType internal
- * @depReason Core document symbol infrastructure
  */
 export class IndexDocsCommand extends BaseCommand {
   constructor(

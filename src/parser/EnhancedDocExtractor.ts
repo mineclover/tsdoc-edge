@@ -50,28 +50,23 @@ export interface ExtractedEnhancedDoc {
 /**
  * Enhanced documentation extractor
  *
+ * @doc [[TSDocStandardSpecification]]
  * @public
  * @responsibility
  * Extract EnhancedSymbolDoc from TypeScript source files automatically.
  * Parses TSDoc comments and combines with AST information.
  *
  * @problem Manual creation of EnhancedSymbolDoc is tedious and error-prone
- * @solves Automatically extract enhanced docs from TSDoc custom tags
+ * @solves Automatically extract enhanced docs from TSDoc custom tags and TypeScript AST imports
  * @context 6-category documentation system requires structured metadata
- * @useCase Automate documentation generation from annotated source code
  *
  * @functionality AST traversal, Custom tag parsing, Completeness calculation, Symbol extraction
  *
- * @decision Parse custom TSDoc tags instead of natural language processing
- * @rationale Structured tags are more reliable than NLP for extracting metadata
- * @consequences Requires developers to use custom tags, More predictable results
+ * @decision Parse custom TSDoc tags and AST imports instead of natural language processing
+ * @rationale Structured tags and compiler AST are more reliable than NLP for extracting metadata
+ * @consequences Deterministic extraction aligned with `@microsoft/tsdoc` and `ttsc`
  *
- * @depends typescript, `@microsoft/tsdoc`
- * @depType external
- * @depReason TypeScript Compiler API for AST, TSDoc for comment parsing
- *
- * @todo Add support for extracting from compiled .d.ts files
- * @priority low
+ * @privateRemarks TODO: Add support for extracting from compiled `.d.ts` files
  *
  * Usage:
  * ```typescript
@@ -174,7 +169,7 @@ export class EnhancedDocExtractor {
     const symbol = this.extractSymbolInfo(node, sourceFile, filePath, name);
 
     // Extract enhanced doc
-    const doc = this.extractEnhancedDoc(tsdocContext, symbol, jsDocComment || '');
+    const doc = this.extractEnhancedDoc(tsdocContext, symbol, jsDocComment || '', sourceFile);
 
     // Calculate completeness
     const { completeness, missing } = this.calculateCompleteness(doc);
@@ -275,12 +270,13 @@ export class EnhancedDocExtractor {
   }
 
   /**
-   * Extract enhanced documentation from TSDoc
+   * Extract enhanced documentation from TSDoc and TypeScript AST
    */
   private extractEnhancedDoc(
     _tsdocContext: ParserContext | null,
     symbol: Symbol,
-    rawComment: string
+    rawComment: string,
+    sourceFile: ts.SourceFile
   ): EnhancedSymbolDoc {
     const now = new Date().toISOString();
 
@@ -325,13 +321,13 @@ export class EnhancedDocExtractor {
       doc.decisions = decisions;
     }
 
-    // Extract dependencies
-    const deps = this.parseDependencies(customTags);
+    // Extract dependencies from TypeScript AST imports + non-AST semantic relation tags
+    const deps = this.parseDependencies(customTags, rawComment, sourceFile);
     if (deps.length > 0) {
       doc.dependencies = deps;
     }
 
-    // Extract future plans
+    // Extract future plans from standard @privateRemarks (TODO:/PLAN:)
     const plans = this.parseFuturePlans(customTags);
     if (plans.length > 0) {
       doc.futurePlans = plans;
@@ -443,51 +439,88 @@ export class EnhancedDocExtractor {
   }
 
   /**
-   * Parse dependencies
+   * Extract dependencies from TypeScript AST `ImportDeclaration`s (canonical `ttsc`/AST SSOT)
+   * and non-AST semantic relation tags (`@relatedTo`, `@requires`, `@enhances`).
    */
-  private parseDependencies(tags: Record<string, string>): DependencySpec[] {
+  private parseDependencies(
+    _tags: Record<string, string>,
+    rawComment: string,
+    sourceFile: ts.SourceFile
+  ): DependencySpec[] {
     const deps: DependencySpec[] = [];
+    const seen = new Set<string>();
 
-    if (tags.depends || tags.dependson || tags.dependency) {
-      const depText = tags.depends || tags.dependson || tags.dependency || '';
-      const depList = this.parseList(depText);
-
-      // Validate dependency type
-      const depType = tags.deptype || 'module';
-      const validTypes = ['module', 'file', 'symbol', 'external'];
-      const type = validTypes.includes(depType)
-        ? (depType as 'module' | 'file' | 'symbol' | 'external')
-        : 'module';
-
-      for (const dep of depList) {
-        deps.push({
-          target: dep,
-          type,
-          reason: tags.depreason || '',
-        });
+    // 1. Canonical AST imports
+    for (const stmt of sourceFile.statements) {
+      if (!ts.isImportDeclaration(stmt) || !ts.isStringLiteral(stmt.moduleSpecifier)) {
+        continue;
       }
+      const specifier = stmt.moduleSpecifier.text.trim();
+      if (!specifier) continue;
+      const isRelative = specifier.startsWith('./') || specifier.startsWith('../');
+      const type: DependencySpec['type'] = isRelative ? 'file' : 'external';
+      const key = `${type}:${specifier}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      deps.push({
+        target: specifier,
+        type,
+        reason: 'TypeScript AST import',
+      });
+    }
+
+    // 2. Non-AST semantic relationship tags (@relatedTo, @requires, @enhances)
+    for (const line of rawComment.split('\n')) {
+      const trimmed = line
+        .trim()
+        .replace(/^\*\s*/, '')
+        .replace(/\*\/$/, '')
+        .trim();
+      const semanticMatch = trimmed.match(/^@(relatedTo|requires|enhances)\s+(.+)$/);
+      if (!semanticMatch) continue;
+      const tagKind = semanticMatch[1];
+      const payload = semanticMatch[2].trim();
+      const [rawTarget, ...reasonParts] = payload.split(/\s+-\s+/);
+      const target = rawTarget.trim().split(/[\s,]+/)[0];
+      if (!target) continue;
+      const key = `symbol:${target}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      deps.push({
+        target,
+        type: 'symbol',
+        reason: reasonParts.join(' - ').trim() || `@${tagKind} semantic relation`,
+      });
     }
 
     return deps;
   }
 
   /**
-   * Parse future plans
+   * Parse future plans from standard `@privateRemarks` (`TODO:` / `PLAN:` prefixes).
    */
   private parseFuturePlans(tags: Record<string, string>): FuturePlan[] {
     const plans: FuturePlan[] = [];
-
-    if (tags.todo || tags.future || tags.plan) {
-      const planText = tags.todo || tags.future || tags.plan || '';
-      plans.push({
-        id: `PLAN-${Date.now()}`,
-        title: planText.substring(0, 50),
-        description: planText,
-        priority: (tags.priority as FuturePlan['priority']) || 'medium',
-        status: 'planned',
-        createdAt: new Date().toISOString(),
-      });
+    const remark = tags.privateremarks;
+    if (!remark) {
+      return plans;
     }
+
+    const planMatch = remark.match(/^(?:TODO|PLAN)(?:\s*\[(high|medium|low)\])?:\s*(.+)$/i);
+    const planText = planMatch ? planMatch[2].trim() : remark.trim();
+    if (!planText) {
+      return plans;
+    }
+    const priority = (planMatch?.[1]?.toLowerCase() as FuturePlan['priority']) || 'medium';
+
+    plans.push({
+      id: `PLAN-${Date.now()}`,
+      title: planText.substring(0, 50),
+      description: planText,
+      priority,
+      status: 'planned',
+      createdAt: new Date().toISOString(),
+    });
 
     return plans;
   }

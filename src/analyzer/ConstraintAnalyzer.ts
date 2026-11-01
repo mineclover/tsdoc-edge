@@ -85,7 +85,6 @@ export class ConstraintAnalyzer {
    * Detect co-requirement constraints from code patterns
    *
    * @returns Array of co-requirement constraints
-   * @private
    */
   private detectCoRequirements(): CoRequirement[] {
     if (!this.program) return [];
@@ -164,7 +163,6 @@ export class ConstraintAnalyzer {
    * @param sourceFile - TypeScript source file
    * @param _filePath - File path
    * @returns Array of imported symbols
-   * @private
    */
   private extractImports(
     sourceFile: ts.SourceFile,
@@ -214,7 +212,6 @@ export class ConstraintAnalyzer {
    * Detect known co-requirement patterns
    *
    * @returns Array of co-requirement constraints
-   * @private
    */
   private detectKnownCoRequirements(): CoRequirement[] {
     const coRequirements: CoRequirement[] = [];
@@ -255,7 +252,6 @@ export class ConstraintAnalyzer {
    *
    * @param name - Symbol name
    * @returns Symbol ID or null
-   * @private
    */
   private findSymbolByName(name: string): string | null {
     for (const [symbolId, symbol] of this.graph.symbols.entries()) {
@@ -271,7 +267,6 @@ export class ConstraintAnalyzer {
    *
    * @param coRequirements - Co-requirement constraints
    * @returns Array of relationships
-   * @private
    */
   private createCoRequirementRelationships(coRequirements: CoRequirement[]): UnifiedRelationship[] {
     return coRequirements.map((req) => ({

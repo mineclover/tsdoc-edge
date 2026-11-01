@@ -3,11 +3,11 @@
  * @packageDocumentation
  * @responsibility Detect domain relationships based on naming conventions
  *
- * @purpose Group symbols by shared domain prefix
- * @input Symbol graph with symbol names
- * @output naming-pattern-relation relationships
- * @logic Extract domain prefix, create pairwise relationships
- * @scope Public API for relationship extraction
+ * @solves Group symbols by shared domain prefix
+ * @precondition Symbol graph with symbol names
+ * @postcondition naming-pattern-relation relationships
+ * @algorithm Extract domain prefix, create pairwise relationships
+ * @public
  *
  * @example
  * Input symbols: DatabaseManager, DatabaseConfig, DatabaseConnection
@@ -22,7 +22,7 @@ import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
  * Domain grouping site
- * @private
+ * @internal
  */
 interface DomainGroupingSite {
   symbolA: string;
@@ -92,7 +92,6 @@ export class NamingPatternRelationAnalyzer {
    * Detect domain groupings from symbol names
    *
    * @returns Array of domain grouping sites
-   * @private
    */
   private detectDomainGroupings(): DomainGroupingSite[] {
     const sites: DomainGroupingSite[] = [];
@@ -134,7 +133,6 @@ export class NamingPatternRelationAnalyzer {
    *
    * @param name - Symbol name
    * @returns Domain prefix or null
-   * @private
    *
    * @example
    * extractDomain('UserService') → 'User'
@@ -187,7 +185,6 @@ export class NamingPatternRelationAnalyzer {
    *
    * @param site - Domain grouping site
    * @returns Unified relationship
-   * @private
    */
   private createRelationship(site: DomainGroupingSite): UnifiedRelationship {
     const timestamp = new Date().toISOString();

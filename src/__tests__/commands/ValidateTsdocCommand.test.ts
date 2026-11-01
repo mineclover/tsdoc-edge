@@ -66,7 +66,7 @@ describe('ValidateTsdocCommand', () => {
       expect(fs.existsSync(tempConfigPath)).toBe(true);
       const content = JSON.parse(fs.readFileSync(tempConfigPath, 'utf-8'));
       expect(content.$schema).toContain('tsdoc.schema.json');
-      expect(content.tagDefinitions.length).toBeGreaterThan(50);
+      expect(content.tagDefinitions).toHaveLength(22);
       expect(result.exitCode).toBe(0);
     } finally {
       if (fs.existsSync(tempConfigPath)) {

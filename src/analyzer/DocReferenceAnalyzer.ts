@@ -85,7 +85,6 @@ export class DocReferenceAnalyzer {
    *
    * @param rootDir - Root directory
    * @returns Array of code connections
-   * @private
    */
   private collectDocConnections(rootDir: string): CodeConnection[] {
     const connections: CodeConnection[] = [];
@@ -108,7 +107,6 @@ export class DocReferenceAnalyzer {
    *
    * @param dir - Directory to search
    * @returns Array of file paths
-   * @private
    */
   private findTypeScriptFiles(dir: string): string[] {
     const files: string[] = [];
@@ -142,7 +140,6 @@ export class DocReferenceAnalyzer {
    *
    * @param connection - Code connection
    * @returns Unified relationship or null
-   * @private
    */
   private createRelationship(connection: CodeConnection): UnifiedRelationship | null {
     // Find code symbol in graph by name (symbols use format: type-lowercasename)

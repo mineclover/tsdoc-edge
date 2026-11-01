@@ -34,10 +34,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use subcommand pattern instead of separate top-level commands
  * @rationale Reduces CLI clutter, groups related operations, easier to discover features
  * @consequences All ID operations under single namespace, requires subcommand parsing
- *
- * @depends SymbolRegistryManager, BaseCommand
- * @depType internal, internal
- * @depReason Symbol storage backend, command framework
  */
 export class IdCommand extends BaseCommand {
   private manager?: SymbolRegistryManager;

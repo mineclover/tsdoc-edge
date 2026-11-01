@@ -35,15 +35,18 @@ export interface SpecMetricsOptions {
   srcDir?: string;
 }
 
-/** The 7 aspects of the module specification framework, keyed to the TSDoc tags that evidence them. */
+/**
+ * The 7 aspects of the module specification framework, keyed to the canonical
+ * `@microsoft/tsdoc` standard tags and irreducible `tsdoc-edge` domain tags that evidence them.
+ */
 export const MODULE_SPEC_ASPECT_TAGS = {
-  purpose: ['@problem', '@responsibility', '@solves', '@purpose'],
-  input: ['@param', '@precondition', '@contract', '@input'],
-  output: ['@returns', '@postcondition', '@output'],
-  context: ['@context', '@depends', '@dependsOn', '@uses', '@relatedTo'],
-  logic: ['@logic', '@algorithm', '@complexity', '@invariant'],
-  effect: ['@sideEffect', '@mutates', '@reads', '@writes', '@io'],
-  scope: ['@scope', '@public', '@internal', '@private'],
+  purpose: ['@problem', '@responsibility', '@solves'],
+  input: ['@param', '@precondition', '@contract'],
+  output: ['@returns', '@throws', '@postcondition'],
+  context: ['@context', '@relatedTo', '@requires', '@enhances'],
+  logic: ['@algorithm', '@complexity', '@functionality', '@invariant', '@remarks'],
+  effect: ['@sideEffect'],
+  scope: ['@public', '@internal', '@beta', '@alpha'],
 } as const;
 
 /** Module specification aspect name. */

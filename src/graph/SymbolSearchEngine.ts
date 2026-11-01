@@ -9,11 +9,10 @@ import type { SymbolGraphBuilder } from './SymbolGraphBuilder';
 /**
  * Search engine for finding symbols based on various criteria
  *
- * @id 004
  * @public
  * @responsibility Provide fast and flexible symbol search capabilities
  * @contract Execute multi-criteria symbol queries with filtering
- * @architecture Query layer over symbol graph
+ * @remarks Architecture: Query layer over symbol graph
  * @testScenario Search by name pattern
  * @testScenario Search by type
  * @testScenario Search by relationship
@@ -36,10 +35,6 @@ import type { SymbolGraphBuilder } from './SymbolGraphBuilder';
  * @decision Use filter chaining instead of SQL-like query builder
  * @rationale Simpler implementation, no query parsing needed, leverages native Array.filter performance
  * @consequences Straightforward code, easy to extend with new filters, performance scales with filter count
- *
- * @depends SymbolGraphBuilder
- * @depType internal
- * @depReason Requires access to complete symbol graph for querying
  */
 export class SymbolSearchEngine {
   private graphBuilder: SymbolGraphBuilder;

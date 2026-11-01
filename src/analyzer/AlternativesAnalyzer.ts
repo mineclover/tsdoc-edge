@@ -104,7 +104,6 @@ export class AlternativesAnalyzer {
    * Detect substitution relationships (same interface implementations)
    *
    * @returns Array of substitution relationships
-   * @private
    */
   private detectSubstitutions(): Substitution[] {
     if (!this.program || !this.checker) return [];
@@ -161,7 +160,6 @@ export class AlternativesAnalyzer {
    * @param sourceFile - TypeScript source file
    * @param filePath - File path
    * @param implementationsByInterface - Map to collect implementations
-   * @private
    */
   private extractImplementations(
     sourceFile: ts.SourceFile,
@@ -214,7 +212,6 @@ export class AlternativesAnalyzer {
    * Detect fallback relationships
    *
    * @returns Array of fallback relationships
-   * @private
    */
   private detectFallbacks(): Fallback[] {
     if (!this.program) return [];
@@ -243,7 +240,6 @@ export class AlternativesAnalyzer {
    * @param sourceFile - TypeScript source file
    * @param filePath - File path
    * @param fallbacks - Array to collect fallbacks
-   * @private
    */
   private extractFallbackPatterns(
     sourceFile: ts.SourceFile,
@@ -352,7 +348,6 @@ export class AlternativesAnalyzer {
    * @param statement - Statement node
    * @param sourceFile - Source file
    * @returns Symbol ID or null
-   * @private
    */
   private findSymbolInBlock(statement: ts.Statement, sourceFile: ts.SourceFile): string | null {
     let foundSymbol: string | null = null;
@@ -391,7 +386,6 @@ export class AlternativesAnalyzer {
    * @param expression - Expression node
    * @param sourceFile - Source file
    * @returns Symbol ID or null
-   * @private
    */
   private findSymbolInExpression(
     expression: ts.Expression,
@@ -417,7 +411,6 @@ export class AlternativesAnalyzer {
    *
    * @param name - Symbol name
    * @returns Symbol ID or null
-   * @private
    */
   private findSymbolByName(name: string): string | null {
     for (const [symbolId, symbol] of this.graph.symbols.entries()) {
@@ -433,7 +426,6 @@ export class AlternativesAnalyzer {
    *
    * @param substitutions - Substitution constraints
    * @returns Array of relationships
-   * @private
    */
   private createSubstitutionRelationships(substitutions: Substitution[]): UnifiedRelationship[] {
     return substitutions.map((sub) => ({
@@ -472,7 +464,6 @@ export class AlternativesAnalyzer {
    *
    * @param fallbacks - Fallback patterns
    * @returns Array of relationships
-   * @private
    */
   private createFallbackRelationships(fallbacks: Fallback[]): UnifiedRelationship[] {
     return fallbacks.map((fb) => ({

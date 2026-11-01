@@ -153,7 +153,6 @@ Examples:
 
   /**
    * Display symbols in human-readable format
-   * @private
    */
   private displayHumanReadable(symbols: DocumentSymbol[]): void {
     console.log();
@@ -227,7 +226,6 @@ Examples:
 
   /**
    * Generate LLM-friendly output
-   * @private
    */
   private generateLlmOutput(symbols: DocumentSymbol[]): string {
     let output = '';
@@ -300,7 +298,6 @@ Examples:
 
   /**
    * Get icon for category
-   * @private
    */
   private getCategoryIcon(category: string): string {
     const icons: Record<string, string> = {
@@ -317,7 +314,6 @@ Examples:
 
   /**
    * Capitalize first letter
-   * @private
    */
   private capitalize(str: string): string {
     return str.charAt(0).toUpperCase() + str.slice(1);
@@ -325,7 +321,6 @@ Examples:
 
   /**
    * Get option value from args
-   * @private
    */
   private getOptionValue(
     args: string[],

@@ -33,10 +33,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use DocumentSymbolRegistry validation
  * @rationale Centralized validation logic with comprehensive rule checking
  * @consequences Consistent validation across all document operations
- *
- * @depends DocumentSymbolParser, DocumentSymbolRegistry
- * @depType internal
- * @depReason Core document symbol infrastructure
  */
 export class ValidateDocsCommand extends BaseCommand {
   constructor(

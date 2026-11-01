@@ -1,6 +1,6 @@
 /**
  * Tests for RelationshipInferenceEngine
- * @description Tests relationship inference from existing relationships
+ * Tests relationship inference from existing relationships
  */
 
 import { RelationshipInferenceEngine } from '../../analyzer/RelationshipInferenceEngine';

@@ -121,7 +121,6 @@ export class CompositionAnalyzer {
    *
    * @param sourceFile - Source file to analyze
    * @returns Array of composition sites
-   * @private
    */
   private extractCompositionSites(sourceFile: ts.SourceFile): CompositionSite[] {
     const sites: CompositionSite[] = [];
@@ -189,7 +188,6 @@ export class CompositionAnalyzer {
    * @param typeNode - Type node to analyze
    * @param sourceFile - Source file for context
    * @returns Type information
-   * @private
    */
   private extractTypeInfo(
     typeNode: ts.TypeNode,
@@ -263,7 +261,6 @@ export class CompositionAnalyzer {
    *
    * @param typeName - Type name to check
    * @returns True if primitive
-   * @private
    */
   private isPrimitiveType(typeName: string): boolean {
     const primitives = [
@@ -297,7 +294,6 @@ export class CompositionAnalyzer {
    *
    * @param name - Symbol name
    * @returns Symbol if found
-   * @private
    */
   private findSymbolByName(name: string): Symbol | undefined {
     for (const symbol of this.graph.symbols.values()) {
@@ -313,7 +309,6 @@ export class CompositionAnalyzer {
    *
    * @param site - Composition site
    * @returns Unified relationship
-   * @private
    */
   private createRelationship(site: CompositionSite, composedSymbolId: string): UnifiedRelationship {
     const timestamp = new Date().toISOString();

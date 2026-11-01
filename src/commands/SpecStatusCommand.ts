@@ -60,10 +60,6 @@ function findMarkdownFiles(dir: string): string[] {
  * @decision Use SpecStatusManager for validation logic
  * @rationale Centralized status transition rules
  * @consequences Requires frontmatter in documents
- *
- * @depends SpecStatusManager
- * @depType internal
- * @depReason Status transition logic
  */
 export class SpecStatusCommand extends BaseCommand {
   private manager?: SpecStatusManager;

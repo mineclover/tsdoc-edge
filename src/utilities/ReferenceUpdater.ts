@@ -175,8 +175,6 @@ export class ReferenceUpdater {
 
   /**
    * Calculate new text for a reference
-   *
-   * @private
    */
   private calculateNewText(
     ref: FileReference,
@@ -220,8 +218,6 @@ export class ReferenceUpdater {
 
   /**
    * Update a single file with new references
-   *
-   * @private
    */
   private updateFile(filePath: string, references: FileReference[]): void {
     const content = fs.readFileSync(filePath, 'utf-8');
@@ -242,8 +238,6 @@ export class ReferenceUpdater {
 
   /**
    * Check if paths match (handles various path formats)
-   *
-   * @private
    */
   private pathsMatch(
     referencedPath: string,
@@ -278,8 +272,6 @@ export class ReferenceUpdater {
 
   /**
    * Resolve path relative to managed directory
-   *
-   * @private
    */
   private resolveToManaged(filePath: string): string {
     if (path.isAbsolute(filePath)) {
@@ -290,8 +282,6 @@ export class ReferenceUpdater {
 
   /**
    * Get all markdown files recursively
-   *
-   * @private
    */
   private getAllMarkdownFiles(dir: string, results: string[] = []): string[] {
     const entries = fs.readdirSync(dir, { withFileTypes: true });

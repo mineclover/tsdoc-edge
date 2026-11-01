@@ -25,90 +25,48 @@ export interface CustomTagSpec {
 }
 
 /**
- * Complete list of custom TSDoc tags used by TSDoc Edge
+ * Irreducible custom TSDoc tags owned exclusively by `tsdoc-edge`.
+ *
+ * Overlapping JSDoc compatibility tags and code-space dependency tags are retired in favor
+ * of `@microsoft/tsdoc` v0 standard tags (29 tags) and `ttsc` (`@ttsc/graph` + TypeScript AST);
+ * see `CANONICAL_TTSC_RELATIONSHIP_BRIDGE` and `CANONICAL_TSDOC_STANDARD_BRIDGE`.
+ *
+ * @doc [[TsdocEdgePlatformSpecification]]
+ * @doc [[CrossSpecIntegrationContract]]
+ * @public
  */
 export const TSDOC_EDGE_CUSTOM_TAGS: CustomTagSpec[] = [
-  // Core & Link tags
+  // 1. SSOT Document Checkpoint Routing (1)
   { tagName: '@doc', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@id', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@contract', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@precondition', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@postcondition', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@invariant', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+
+  // 2. Design-by-Contract & Purpose Ontology (8)
   { tagName: '@responsibility', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
   { tagName: '@problem', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
   { tagName: '@solves', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
   { tagName: '@context', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@contract', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@precondition', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@postcondition', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@invariant', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
 
-  // Dependency & Relationship tags
-  { tagName: '@depends', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@dependsOn', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@uses', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@usedBy', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@relatedTo', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@implements', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@extends', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@depType', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@depReason', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-
-  // Architecture & Design Decision tags
-  { tagName: '@decision', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@designDecision', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@rationale', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@consequences', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@architecture', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@pattern', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@requirement', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@issue', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-
-  // Module Specification Framework (7 aspects)
+  // 3. Module Specification Logic & Side-Effect Semantics (4)
   { tagName: '@functionality', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
   { tagName: '@algorithm', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
   { tagName: '@complexity', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
   { tagName: '@sideEffect', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@mutates', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@io', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@scope', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@purpose', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@input', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@output', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@logic', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@reads', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@writes', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
 
-  // Testing tags
-  { tagName: '@testedBy', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@testScenario', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@coverage', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@fixture', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  // 4. Inline Architecture Decision Record (ADR) Triad (3)
+  { tagName: '@decision', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@rationale', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@consequences', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
 
-  // Quality & Lifecycle tags
-  { tagName: '@deadcode', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  {
-    tagName: '@deprecatedInFavorOf',
-    syntaxKind: TSDocTagSyntaxKind.BlockTag,
-    allowMultiple: false,
-  },
+  // 5. Non-AST Semantic Relationships & Governance (6)
+  { tagName: '@relatedTo', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
   { tagName: '@enhances', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
   { tagName: '@requires', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
   { tagName: '@feature', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@plan', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@useCase', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@performance', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@priority', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@symbol', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@updated', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@changelog', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-
-  // Legacy JSDoc compatibility shims (not part of @microsoft/tsdoc v0 standard 29 tags
-  // nor tsdoc-edge semantic ontology; retained for existing JSDoc comment compatibility)
-  { tagName: '@private', syntaxKind: TSDocTagSyntaxKind.ModifierTag, allowMultiple: false },
-  { tagName: '@description', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@template', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@module', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@todo', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
-  { tagName: '@default', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
-  { tagName: '@version', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
+  { tagName: '@testScenario', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: true },
+  { tagName: '@deadcode', syntaxKind: TSDocTagSyntaxKind.BlockTag, allowMultiple: false },
 ];
 
 /**
@@ -147,29 +105,24 @@ interface NodeWithJSDoc extends ts.Node {
 /**
  * Parser for extracting and parsing TSDoc comments from TypeScript source files
  *
- * @id 000
  * @doc [[TSDocStandardSpecification]]
  * @public
  * @responsibility Parse TypeScript files and extract TSDoc comments with custom tag support
  * @contract Initialize TSDoc parser with custom tags and provide file parsing capability
  * @testScenario Parse file with valid TSDoc comments
- * @testScenario Extract custom tags (`@id`, `@contract`, `@responsibility`)
+ * @testScenario Extract custom tags (`@doc`, `@contract`, `@responsibility`)
  * @testScenario Handle files with no comments
  * @testScenario Handle malformed TSDoc
  *
  * @problem Standard TSDoc doesn't support custom tags needed for TSDoc Edge
  * @solves Extends Microsoft TSDoc parser with custom tag definitions
- * @context Need structured metadata beyond standard JSDoc tags
+ * @context Need structured metadata beyond standard TSDoc tags
  *
  * @functionality Custom tag registration, AST traversal, Comment extraction, TSDoc parsing
  *
  * @decision Wrap Microsoft TSDoc parser instead of forking
  * @rationale Benefit from upstream improvements and standards compliance
  * @consequences Dependent on `@microsoft/tsdoc` API stability, Clean architecture
- *
- * @depends `@microsoft/tsdoc`, typescript
- * @depType external
- * @depReason TSDoc parsing engine and TypeScript AST
  */
 export class TSDocParser {
   private parser: MicrosoftTSDocParser;

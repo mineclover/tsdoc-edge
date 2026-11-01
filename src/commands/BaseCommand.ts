@@ -591,7 +591,6 @@ export abstract class BaseCommand {
 
   /**
    * Build XML section recursively
-   * @private
    */
   private buildXmlSection(
     name: string,
@@ -657,7 +656,6 @@ export abstract class BaseCommand {
 
   /**
    * Format an unknown value as a plain string before XML escaping
-   * @private
    */
   private formatXmlValue(value: unknown): string {
     if (value === null || value === undefined) {
@@ -680,7 +678,6 @@ export abstract class BaseCommand {
 
   /**
    * Escape XML special characters
-   * @private
    */
   private escapeXml(value: unknown): string {
     return this.formatXmlValue(value)

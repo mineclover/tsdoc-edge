@@ -151,17 +151,13 @@ export interface CoverageParseResult {
  * @problem Test coverage data is tool-specific and hard to integrate with documentation
  * @solves Provides universal parser for Istanbul format used by all major JS/TS test tools
  * @context Different test runners (Jest, Vitest) output different formats
- * @useCase Automatically sync test coverage into TSDoc symbol metadata
+ * @remarks Use case: Automatically sync test coverage into TSDoc symbol metadata
  *
  * @functionality Parse coverage JSON, Calculate coverage percentages, Extract function-level coverage
  *
  * @decision Use Istanbul format as the standard
  * @rationale Istanbul is the de-facto standard format used by Jest, Vitest, NYC, c8
  * @consequences Works with all major test tools, No custom parsers needed
- *
- * @depends fs, path
- * @depType external
- * @depReason File I/O for reading coverage-final.json
  *
  * @example
  * ```typescript

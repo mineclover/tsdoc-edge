@@ -221,7 +221,6 @@ export class GeneratedDocsValidator {
    *
    * @param content - Markdown content
    * @returns Array of section names
-   * @private
    */
   private detectSections(content: string): string[] {
     const sections: string[] = [];

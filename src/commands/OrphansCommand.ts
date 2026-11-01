@@ -32,10 +32,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use SymbolRegistryManager for orphan detection
  * @rationale Registry already tracks all relationships
  * @consequences Requires registry to be built first
- *
- * @depends SymbolRegistryManager
- * @depType internal
- * @depReason Relationship data
  */
 export class OrphansCommand extends BaseCommand {
   private manager?: SymbolRegistryManager;
@@ -83,7 +79,6 @@ export class OrphansCommand extends BaseCommand {
 
   /**
    * Find orphans using database relationships (accurate but slower)
-   * @private
    */
   private findOrphansFromDatabase(
     excludeTests: boolean,
@@ -306,8 +301,4 @@ export class OrphansCommand extends BaseCommand {
  * @decision Use SymbolSearchEngine for undocumented search
  * @rationale SearchEngine has built-in undocumented filter
  * @consequences Requires database to be built first
- *
- * @depends DatabaseManager, SymbolGraphBuilder, SymbolSearchEngine
- * @depType internal
- * @depReason Symbol data and search capabilities
  */

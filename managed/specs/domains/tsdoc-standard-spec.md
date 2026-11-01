@@ -148,7 +148,7 @@ const result = parser.parseFile('UserService.ts', sourceText);
 ## 설계 결정 및 경계 가이드 (Design Decisions)
 
 1. **`tsdoc.json`의 오염 금지**: npm 패키지 스코프(`@ttsc/*`)나 내부 그래프 식별자 접미사(`@overlay`)는 TSDoc 태그가 아니므로 `tsdoc.json`에 등록해 우회하지 않고 산문 백틱 이스케이프로 처리합니다.
-2. **JSDoc 호환 심(Shim) 구분**: `@private`, `@description`, `@template`, `@module`, `@todo`, `@default`, `@version` 7종은 TSDoc v0 표준 29종이 아니라 레거시 JSDoc 호환용 확장 태그임을 명시적으로 구분합니다.
+2. **레거시 JSDoc 호환 심(Shim) 7종 전량 제거**: `@microsoft/tsdoc` v0 표준 29종 및 TypeScript AST 가시성 수식어로 100% 대체 가능한 레거시 JSDoc 태그 7종(`@private` → TS `private` / `@internal`, `@description` → Summary 단락, `@template` → `@typeParam`, `@module` → `@packageDocumentation`, `@todo` → `@privateRemarks`, `@default` → `@defaultValue`, `@version` → Git / 스펙 프론트매터)은 `tsdoc.json`에서 완전히 제거하고 정본 표준 태그만 사용합니다.
 
 ## 관련 기능 (Related Concepts)
 

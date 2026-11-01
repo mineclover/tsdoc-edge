@@ -31,10 +31,6 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
  * @decision Use demo database path as default
  * @rationale Matches existing CLI behavior for consistency
  * @consequences Users must run demo or specify custom database path
- *
- * @depends DatabaseManager, SymbolGraphBuilder, ConnectivityValidator
- * @depType internal
- * @depReason Core validation infrastructure
  */
 export class ValidateCommand extends BaseCommand {
   constructor(

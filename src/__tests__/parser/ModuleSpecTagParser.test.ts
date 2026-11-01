@@ -78,55 +78,60 @@ describe('ModuleSpecTagParser', () => {
       expect(result.sideEffects?.length).toBe(2);
     });
 
-    it('should parse @mutates tag', () => {
+    it('should project state mutations from @sideEffect state:', () => {
       const jsDoc = `/**
-       * @mutates this.items - Adds new item to array
+       * @sideEffect state: this.items - Adds new item to array
        */`;
 
       const result = parser.parseModuleSpecTags(null, jsDoc);
 
+      expect(result.sideEffects).toHaveLength(1);
       expect(result.mutations).toBeDefined();
-      expect(result.mutations?.length).toBeGreaterThan(0);
+      expect(result.mutations?.[0]?.target).toBe('this.items');
+      expect(result.mutations?.[0]?.description).toBe('Adds new item to array');
     });
 
-    it('should parse @reads tag', () => {
+    it('should project file read I/O from @sideEffect filesystem:', () => {
       const jsDoc = `/**
-       * @reads config - Application configuration
+       * @sideEffect filesystem: Application configuration (read)
        */`;
 
       const result = parser.parseModuleSpecTags(null, jsDoc);
 
-      // IO may or may not be parsed depending on implementation
-      expect(result).toBeDefined();
+      expect(result.io).toHaveLength(1);
+      expect(result.io?.[0]?.type).toBe('file');
+      expect(result.sideEffects?.[0]?.operation).toBe('read');
     });
 
-    it('should parse @writes tag', () => {
+    it('should project database write I/O from @sideEffect database:', () => {
       const jsDoc = `/**
-       * @writes database - Persists user data
+       * @sideEffect database: Persists user data (write)
        */`;
 
       const result = parser.parseModuleSpecTags(null, jsDoc);
 
-      // IO may or may not be parsed depending on implementation
-      expect(result).toBeDefined();
+      expect(result.io).toHaveLength(1);
+      expect(result.io?.[0]?.type).toBe('database');
+      expect(result.sideEffects?.[0]?.operation).toBe('write');
     });
 
-    it('should parse @scope tag', () => {
+    it('should derive scope from standard @internal visibility modifier', () => {
       const jsDoc = `/**
-       * @scope private
+       * @internal
        */`;
 
       const result = parser.parseModuleSpecTags(null, jsDoc);
 
       expect(result.scope).toBeDefined();
+      expect(result.scope?.accessLevel).toBe('internal');
     });
 
     it('should parse multiple tags together', () => {
       const jsDoc = `/**
        * @algorithm Quicksort implementation
        * @complexity O(n log n) - average case
-       * @mutates array - Sorts in place
-       * @sideEffect none
+       * @sideEffect state: array - Sorts in place
+       * @public
        */`;
 
       const result = parser.parseModuleSpecTags(null, jsDoc);
@@ -134,6 +139,7 @@ describe('ModuleSpecTagParser', () => {
       expect(result.algorithm).toBeDefined();
       expect(result.complexity).toBeDefined();
       expect(result.mutations).toBeDefined();
+      expect(result.scope?.accessLevel).toBe('public');
     });
 
     it('should handle multiline algorithm description', () => {

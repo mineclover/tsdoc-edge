@@ -83,9 +83,6 @@ interface CanonicalTestCoverageSummary {
  * @rationale Large codebases require non-blocking I/O, better UX with progress
  * @consequences Slightly more complex error handling, but better performance
  *
- * @depends DatabaseManager, ConfigManager, ASTSymbolExtractor
- * @depType internal
- * @depReason Core infrastructure for symbol extraction and storage
  * @requires DatabaseManager
  * @requires ConfigManager
  * @requires ASTSymbolExtractor

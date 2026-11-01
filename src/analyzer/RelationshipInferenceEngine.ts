@@ -3,18 +3,18 @@
  * @packageDocumentation
  * @responsibility Infer new relationships from existing ones using rules
  *
- * @purpose Increase relationship density without manual declaration
- * @input Existing relationships from database
- * @output Inferred relationships based on inference rules
- * @logic Apply transitive, closure, and co-membership rules
- * @scope Semantic relationship enrichment
+ * @solves Increase relationship density without manual declaration
+ * @precondition Existing relationships from database
+ * @postcondition Inferred relationships based on inference rules
+ * @algorithm Apply transitive, closure, and co-membership rules
+ * @public
  */
 
 import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
  * Inference rule
- * @private
+ * @internal
  */
 interface InferenceRule {
   name: string;
@@ -125,8 +125,6 @@ export class RelationshipInferenceEngine {
   /**
    * Rule 1: Naming Transitivity
    * If A~B and B~C in same domain, then A~C
-   *
-   * @private
    */
   private createNamingTransitivityRule(): InferenceRule {
     return {
@@ -213,8 +211,6 @@ export class RelationshipInferenceEngine {
   /**
    * Rule 2: Feature Closure
    * All symbols in same feature are related
-   *
-   * @private
    */
   private createFeatureClosureRule(): InferenceRule {
     return {
@@ -295,8 +291,6 @@ export class RelationshipInferenceEngine {
   /**
    * Rule 3: Test Coverage Inheritance
    * If suite contains case, and case covers impl, then suite covers impl
-   *
-   * @private
    */
   private createTestCoverageInheritanceRule(): InferenceRule {
     return {
@@ -370,8 +364,6 @@ export class RelationshipInferenceEngine {
 
   /**
    * Build set of existing relationship keys for deduplication
-   *
-   * @private
    */
   private buildRelationshipSet(relationships: UnifiedRelationship[]): Set<string> {
     const set = new Set<string>();
@@ -383,8 +375,6 @@ export class RelationshipInferenceEngine {
 
   /**
    * Generate unique key for relationship
-   *
-   * @private
    */
   private relationshipKey(rel: UnifiedRelationship): string {
     const from = typeof rel.from === 'string' ? rel.from : rel.from[0];

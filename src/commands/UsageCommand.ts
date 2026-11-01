@@ -27,10 +27,6 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
  * @decision Subcommands instead of separate commands
  * @rationale Related operations grouped under single namespace, consistent with git/npm patterns
  * @consequences Clearer command structure, easier discoverability
- *
- * @depends UsageTracker
- * @depType internal
- * @depReason Analytics data access and formatting
  */
 export class UsageCommand extends BaseCommand {
   private tracker: UsageTracker;

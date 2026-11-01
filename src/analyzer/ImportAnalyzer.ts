@@ -4,7 +4,7 @@
  * Analyzes import statements in test files to determine which symbols are being tested.
  * This provides more accurate symbol resolution than variable name matching.
  *
- * @module ImportAnalyzer
+ * @packageDocumentation
 
  * @doc [[ImportAnalyzer]] */
 

@@ -26,10 +26,6 @@ import type { BaseCommand } from './BaseCommand';
  * @decision Use Map with lazy instantiation
  * @rationale Avoids loading all command dependencies upfront, reduces startup time
  * @consequences Slightly more complex registration, but better performance
- *
- * @depends BaseCommand
- * @depType internal
- * @depReason Base interface for all commands
  */
 export class CommandRegistry {
   private commands: Map<string, BaseCommand>;

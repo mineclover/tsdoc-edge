@@ -27,10 +27,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use recursive approach instead of single-pass
  * @rationale Some fixes expose new issues, iteration ensures complete improvement
  * @consequences Slower but more thorough, may require multiple analysis passes
- *
- * @depends RecursiveImprover, BaseCommand
- * @depType internal, internal
- * @depReason Core improvement engine, command framework
  */
 export class ImproveCommand extends BaseCommand {
   private improver?: RecursiveImprover;

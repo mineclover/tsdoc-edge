@@ -80,7 +80,7 @@ tags:
 | 아키텍처 차원 | `tsdoc` 독립 스펙 (`@microsoft/tsdoc`) | `ttsc` 독립 스펙 (`ttsc` · `@ttsc/lint` · `@ttsc/graph`) | `tsdoc-edge` 독립 스펙 (본 플랫폼) |
 | --- | --- | --- | --- |
 | **주석 문법 & 이스케이프** | **정본 소유 (SSOT)** — `/** ... */`, `{` `}` `<` `>` `@` 규칙, 46개 `messageId` | 내장 `jsdoc/tsdoc-syntax` 기본 구조 검사 실행기 제공 | 어댑터(`tsdoc-escapes`)로 표준 규칙을 `ttsc`에 투영 + 패리티 검증 |
-| **태그 어휘 정의** | 표준 태그 **29종** + `tsdoc.json` 스키마 규격 소유 | 태그 어휘 비소유 (`HintRule` / `ProjectInputRule` SPI만 제공) | 도메인 태그 **56종** + JSDoc 호환 심 **7종**을 `tsdoc.json`에 선언 |
+| **태그 어휘 정의** | 표준 태그 **29종** + `tsdoc.json` 스키마 규격 소유 | 태그 어휘 비소유 (`HintRule` / `ProjectInputRule` SPI만 제공) | 비환원 도메인 태그 **22종**만 `tsdoc.json`에 선언 (중복·JSDoc 호환 태그 **41종 전량 퇴출**) |
 | **컴파일 & 타입체크** | 비소유 | **정본 소유 (SSOT)** — `tsgo 7.0.2` 네이티브 컴파일 & 타입 체커 | 런타임 AST 분석용 JS API(`typescript@6.0.3`)만 분리 소비 |
 | **정적 린트 & `fix` 호스트** | 비소유 | **정본 소유 (SSOT)** — `typescript/*` · `jsdoc/*` 규칙, `ttsc check`/`fix` | 2계층 정책(`lint.config.mjs` 18 `error` / `lint.ratchet.config.mjs` 7 `warn`) 구성 |
 | **원시 코드 구조 그래프** | 비소유 | **원시 사실 생산자 (`superseded`)** — `@ttsc/graph` 노드·호출·참조 덤프 | `ProviderSnapshotNormalizer` → `ProjectIndexer`로 정규 리비전 승격 |
@@ -114,6 +114,16 @@ tags:
 - **TypeScript 이중 패키지 분리**:
   - `dependencies.typescript` (`6.0.3`): 런타임 JS Compiler API(`ts.createSourceFile` 등)를 소비하는 `src/` 내 분석기·파서 전용.
   - `devDependencies.typescript-native` (`npm:typescript@7.0.2`): `ttsc`가 구동하는 네이티브 `tsgo` 컴파일러 바이너리 전용.
+
+### 4. 브리지 3 — 정본 태그·관계 매핑 계약 (`src/types/tags/canonical-tag-bridge.ts`) (Logic)
+
+역할이 겹치는 태그는 각 시스템의 정본(SSOT)만 남기고 `tsdoc-edge`에서는 관계 매핑만 정의·관리합니다.
+
+| 정본 소유자 | 정본 사실 / 표준 태그 | `tsdoc-edge` 투영 대상 (`RelationshipType` · 7관점) | 퇴출된 중복 태그 (총 41종) |
+| --- | --- | --- | --- |
+| **`ttsc` (`@ttsc/graph` + TS AST)** | `implements`, `extends`, `calls`, `accesses`, `instantiates`, `type_ref`, `ImportDeclaration`, `CanonicalNodeId`, TS `private`/`export` | `implementation`, `inheritance`, `calls`, `code-dependency`, `type-dependency`, `Context` · `Scope` 관점 | `@implements`, `@extends`, `@uses`, `@usedBy`, `@dependsOn`, `@depends`, `@depType`, `@depReason`, `@id`, `@private`, `@testedBy`, `@fixture` (12종) |
+| **`tsdoc` (`@microsoft/tsdoc` 표준 29종)** | Summary, `@param`, `@returns`, `@throws`, `@typeParam`, `@packageDocumentation`, `@defaultValue`, `@public`/`@internal`/`@beta`/`@alpha`, `@remarks`, `@privateRemarks`, `@deprecated`+`{@link}`, `@see` | `Purpose`, `Input`, `Output`, `Logic`, `Scope` 관점 및 인라인 백로그(`TODO:`/`PLAN:`) | `@description`, `@template`, `@module`, `@default`, `@todo`, `@plan`, `@priority`, `@scope`, `@input`, `@output`, `@deprecatedInFavorOf`, `@symbol`, `@issue` (13종) |
+| **`tsdoc-edge` 명세·통합 온톨로지** | `managed/specs/` `tsdoc-spec` JSON 블록, Git 이력, LCOV 런타임 리포트, 22종 핵심 도메인 태그(`@sideEffect`, `@decision`, `@complexity` 등) | `SpecGraphRevision`, `Effect`(`state:`/`filesystem:`/`database:`), ADR 트리아드 | `@version`, `@updated`, `@changelog`, `@requirement`, `@architecture`, `@coverage`, `@purpose`, `@useCase`, `@logic`, `@performance`, `@mutates`, `@io`, `@reads`, `@writes`, `@designDecision`, `@pattern` (16종) |
 
 ## 핵심 산출물 (Output · Effect · Scope)
 

@@ -38,10 +38,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use a separate report repository from the legacy symbol database
  * @rationale Coverage execution evidence and symbol relationships are different metric planes
  * @consequences Canonical node mapping remains a later migration phase
- *
- * @depends CoverageParser, CoverageMetricReportRepository, ConfigManager
- * @depType internal
- * @depReason Coverage data storage
  */
 export class SyncCoverageCommand extends BaseCommand {
   /**

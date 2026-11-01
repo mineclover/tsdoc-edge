@@ -5,7 +5,6 @@
  * in IDEs like VS Code, Vim, and Emacs.
  *
  * @packageDocumentation
- * @module lsp
  * @doc [[LSP Integration]]
  *
  * @responsibility Export LSP server components

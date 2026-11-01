@@ -23,7 +23,6 @@ type SymbolType = 'function' | 'class' | 'interface' | 'type' | 'enum' | 'variab
  * - Enums: summary, member docs, `@public`
  * - Variables: summary, `@public` for exports
  *
- * @id 005
  * @doc [[ConventionValidator]]
  * @public
  * @responsibility Validate TSDoc comments against naming and documentation conventions
@@ -374,11 +373,11 @@ export class ConventionValidator {
       score += 5;
     }
 
-    // Check for @testedBy tag
-    const hasTestedBy = parsedComment.docComment.customBlocks.some(
-      (block) => block.blockTag.tagName === '@testedBy'
+    // Check for @testScenario or @doc connectivity tag
+    const hasVerificationLink = parsedComment.docComment.customBlocks.some(
+      (block) => block.blockTag.tagName === '@testScenario' || block.blockTag.tagName === '@doc'
     );
-    if (hasTestedBy) {
+    if (hasVerificationLink) {
       score += 5;
     }
 

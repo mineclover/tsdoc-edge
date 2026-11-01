@@ -8,11 +8,10 @@ import type { Symbol, SymbolGraph, SymbolRelationship } from '../types/graph';
 /**
  * Builds and maintains a graph of all symbols and their relationships
  *
- * @id 006
  * @public
  * @responsibility Build and maintain symbol graph structure
  * @contract Initialize empty symbol graph and provide symbol/relationship management
- * @architecture Core component for connectivity tracking
+ * @remarks Architecture: Core component for connectivity tracking
  * @testScenario Add symbols to graph
  * @testScenario Add relationships between symbols
  * @testScenario Search by name and file path
@@ -33,10 +32,6 @@ import type { Symbol, SymbolGraph, SymbolRelationship } from '../types/graph';
  * @decision Use adjacency list representation instead of adjacency matrix
  * @rationale Sparse graphs (most symbols don't depend on each other) benefit from adjacency lists with O(1) edge lookup and O(V+E) space complexity
  * @consequences Better memory efficiency for large codebases, efficient DFS/BFS traversal for dependency analysis
- *
- * @depends Symbol, SymbolGraph, SymbolRelationship
- * @depType internal
- * @depReason Core type definitions for graph structure
  */
 export class SymbolGraphBuilder {
   private graph: SymbolGraph;

@@ -34,10 +34,6 @@ import { DocumentationAnalyzer } from './DocumentationAnalyzer';
  * @decision Combine doc quality and test coverage into single metric
  * @rationale Both are essential for maintainability and should be tracked together
  * @consequences Single score simplifies tracking, May oversimplify complex quality issues
- *
- * @depends DocumentationAnalyzer, TestCoverageAnalyzer
- * @depType module
- * @depReason Need separate analyzers for modular design
  */
 export class CodeHealthChecker {
   private docAnalyzer: DocumentationAnalyzer;

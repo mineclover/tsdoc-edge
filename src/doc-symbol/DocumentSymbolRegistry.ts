@@ -35,10 +35,6 @@ import type {
  * @decision Separate primary, auxiliary, and reference registries
  * @rationale Primary definitions must be unique (SSOT), auxiliaries can have multiple, references are just pointers
  * @consequences Clear semantic distinction, enables different validation rules per type
- *
- * @depends DocumentSymbol, ParsedDocSymbols, CodeConnection
- * @depType internal
- * @depReason Core types for document symbol system
  */
 export class DocumentSymbolRegistry {
   private definitions: Map<string, DocumentSymbol> = new Map();

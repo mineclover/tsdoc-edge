@@ -29,10 +29,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use CodeHealthChecker with configurable options
  * @rationale Allows flexible analysis based on user needs
  * @consequences Users can customize analysis depth and scope
- *
- * @depends CodeHealthChecker, AnalysisReport
- * @depType internal
- * @depReason Core analysis logic and type definitions
  */
 export class AnalyzeCommand extends BaseCommand {
   private checker: CodeHealthChecker;

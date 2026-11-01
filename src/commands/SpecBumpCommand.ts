@@ -31,10 +31,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use SpecVersionManager for version bumping
  * @rationale Centralized semver logic
  * @consequences Requires valid semver format in frontmatter
- *
- * @depends SpecVersionManager
- * @depType internal
- * @depReason Version bumping logic
  */
 export class SpecBumpCommand extends BaseCommand {
   private manager?: SpecVersionManager;

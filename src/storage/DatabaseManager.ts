@@ -2,7 +2,7 @@
  * SQLite database manager for TSDoc Edge using Drizzle ORM
  * @packageDocumentation
  * @responsibility Manage SQLite database operations and JSONL synchronization
- * @architecture Data Layer - Database Management
+ * @context Data Layer - Database Management
  */
 
 import * as fs from 'node:fs';

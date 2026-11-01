@@ -2,7 +2,7 @@
  * Enhanced markdown generator for strict mode documentation
  * @packageDocumentation
  * @responsibility Generate comprehensive markdown documentation from enhanced docs
- * @architecture Document Generation Layer
+ * @context Document Generation Layer
  */
 
 import type { Symbol } from '../types/graph';
@@ -11,7 +11,6 @@ import type { EnhancedSymbolDoc } from '../types/tags';
 /**
  * Generator for enhanced markdown documentation
  *
- * @id 007
  * @doc [[EnhancedMarkdownGenerator]]
  * @public
  * @responsibility Transform enhanced docs into readable markdown format

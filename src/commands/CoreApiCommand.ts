@@ -32,10 +32,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use SymbolGraphBuilder for dependency analysis
  * @rationale Graph structure efficiently computes dependencies
  * @consequences Requires database to be built first
- *
- * @depends DatabaseManager, SymbolGraphBuilder
- * @depType internal
- * @depReason Symbol graph and dependency analysis
  */
 export class CoreApiCommand extends BaseCommand {
   private dbManager?: DatabaseManager;

@@ -12,7 +12,7 @@ import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
  * Enhancement relationship data
- * @private
+ * @internal
  */
 interface EnhancementSite {
   enhancerSymbol: string;
@@ -92,7 +92,6 @@ export class EnhancementAnalyzer {
    *
    * @param rootDir - Root directory
    * @returns Array of enhancement sites
-   * @private
    */
   private collectEnhancementSites(rootDir: string): EnhancementSite[] {
     const sites: EnhancementSite[] = [];
@@ -118,7 +117,6 @@ export class EnhancementAnalyzer {
    * @param sourceFile - TypeScript source file
    * @param filePath - File path
    * @param sites - Array to collect sites
-   * @private
    */
   private extractEnhancementsFromFile(
     sourceFile: ts.SourceFile,
@@ -167,7 +165,6 @@ export class EnhancementAnalyzer {
    *
    * @param node - AST node
    * @returns Symbol name or null
-   * @private
    */
   private getSymbolName(node: ts.Node): string | null {
     if (ts.isFunctionDeclaration(node) && node.name) {
@@ -199,7 +196,6 @@ export class EnhancementAnalyzer {
    *
    * @param tag - JSDoc tag
    * @returns Comment text or null
-   * @private
    */
   private getTagComment(tag: ts.JSDocTag): string | null {
     if (tag.comment) {
@@ -221,7 +217,6 @@ export class EnhancementAnalyzer {
    *
    * @param dir - Directory to search
    * @returns Array of file paths
-   * @private
    */
   private findTypeScriptFiles(dir: string): string[] {
     const files: string[] = [];
@@ -255,7 +250,6 @@ export class EnhancementAnalyzer {
    *
    * @param site - Enhancement site
    * @returns Unified relationship or null
-   * @private
    */
   private createRelationship(site: EnhancementSite): UnifiedRelationship | null {
     // Check if enhancer symbol exists in graph
@@ -303,7 +297,6 @@ export class EnhancementAnalyzer {
    *
    * @param name - Symbol name
    * @returns Symbol if found
-   * @private
    */
   private findSymbolByName(name: string): Symbol | undefined {
     for (const symbol of this.graph.symbols.values()) {

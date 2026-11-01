@@ -9,7 +9,6 @@
 
 import type { ParserContext } from '@microsoft/tsdoc';
 import type {
-  IODoc,
   ModuleSpecTags,
   MutationDoc,
   ScopeDoc,
@@ -68,7 +67,7 @@ export class ModuleSpecTagParser {
         };
       }
 
-      // @sideEffect
+      // @sideEffect (canonical Effect tag unifying filesystem/database/network I/O and state mutations)
       const sideEffectMatch = trimmed.match(/^\*\s*@sideEffect\s+(.+)$/);
       if (sideEffectMatch) {
         const effect = this.parseSideEffect(sideEffectMatch[1]);
@@ -76,32 +75,37 @@ export class ModuleSpecTagParser {
           tags.sideEffects = [];
         }
         tags.sideEffects.push(effect);
-      }
 
-      // @mutates
-      const mutatesMatch = trimmed.match(/^\*\s*@mutates\s+(.+)$/);
-      if (mutatesMatch) {
-        const mutation = this.parseMutation(mutatesMatch[1]);
-        if (!tags.mutations) {
-          tags.mutations = [];
+        if (effect.type === 'state') {
+          if (!tags.mutations) {
+            tags.mutations = [];
+          }
+          tags.mutations.push(this.parseMutation(effect.description));
+        } else if (
+          effect.type === 'filesystem' ||
+          effect.type === 'network' ||
+          effect.type === 'database'
+        ) {
+          if (!tags.io) {
+            tags.io = [];
+          }
+          tags.io.push({
+            type: effect.type === 'filesystem' ? 'file' : effect.type,
+            description: effect.description,
+          });
         }
-        tags.mutations.push(mutation);
       }
 
-      // @io
-      const ioMatch = trimmed.match(/^\*\s*@io\s+(.+)$/);
-      if (ioMatch) {
-        const io = this.parseIO(ioMatch[1]);
-        if (!tags.io) {
-          tags.io = [];
-        }
-        tags.io.push(io);
-      }
-
-      // @scope
-      const scopeMatch = trimmed.match(/^\*\s*@scope\s+(.+)$/);
-      if (scopeMatch) {
-        tags.scope = this.parseScope(scopeMatch[1]);
+      // Standard @microsoft/tsdoc release-visibility modifiers -> Scope projection
+      const visibilityMatch = trimmed.match(/^\*\s*@(public|internal|beta|alpha)\b(?:\s+(.*))?$/);
+      if (visibilityMatch) {
+        const modifier = visibilityMatch[1].toLowerCase();
+        const accessLevel: ScopeDoc['accessLevel'] =
+          modifier === 'internal' ? 'internal' : 'public';
+        tags.scope = {
+          accessLevel,
+          description: visibilityMatch[2]?.trim() || `@${modifier}`,
+        };
       }
     }
 
@@ -163,63 +167,6 @@ export class ModuleSpecTagParser {
     return {
       target: parts[0].trim(),
       description: parts[1]?.trim() || '',
-    };
-  }
-
-  /**
-   * Parse I/O tag value
-   *
-   * Format: "type: description"
-   * Example: "file: Reads config.json"
-   */
-  private parseIO(value: string): IODoc {
-    const colonIndex = value.indexOf(':');
-    if (colonIndex === -1) {
-      return {
-        type: 'other',
-        description: value.trim(),
-      };
-    }
-
-    const typeStr = value.substring(0, colonIndex).trim().toLowerCase();
-    const description = value.substring(colonIndex + 1).trim();
-
-    const typeMap: Record<string, IODoc['type']> = {
-      file: 'file',
-      filesystem: 'file',
-      fs: 'file',
-      network: 'network',
-      net: 'network',
-      database: 'database',
-      db: 'database',
-      console: 'console',
-      log: 'console',
-      other: 'other',
-    };
-
-    return {
-      type: typeMap[typeStr] || 'other',
-      description,
-    };
-  }
-
-  /**
-   * Parse scope tag value
-   *
-   * Format: "description" or "access: description"
-   * Example: "public: Exported from main module"
-   */
-  private parseScope(value: string): ScopeDoc {
-    const accessMatch = value.match(/^(public|private|protected|internal):\s*(.+)$/i);
-    if (accessMatch) {
-      return {
-        accessLevel: accessMatch[1].toLowerCase() as ScopeDoc['accessLevel'],
-        description: accessMatch[2].trim(),
-      };
-    }
-
-    return {
-      description: value.trim(),
     };
   }
 }

@@ -53,9 +53,7 @@ describe('PreCommitChecker', () => {
  * @decision Use repository pattern
  * @rationale Better testability
  * @consequences More abstraction layers
- * @depends UserRepository
- * @depType module
- * @depReason Data access
+ * @relatedTo UserRepository - Data access
  * @public
  */
 export class UserService {}

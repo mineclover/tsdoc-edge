@@ -351,7 +351,6 @@ export class RelationshipQueryEngine {
 
   /**
    * Filter relationships based on query options
-   * @private
    */
   private filterRelationships(
     relationships: readonly UnifiedRelationship[],

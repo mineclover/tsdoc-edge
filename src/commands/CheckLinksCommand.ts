@@ -32,10 +32,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use ConfigLoader for link check settings
  * @rationale Allows project-specific external module configuration
  * @consequences Users can customize link checking behavior via config file
- *
- * @depends MissingLinkDetector, ConfigLoader
- * @depType internal
- * @depReason Link analysis and configuration infrastructure
  */
 export class CheckLinksCommand extends BaseCommand {
   constructor(

@@ -33,10 +33,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use SymbolSearchEngine for undocumented search
  * @rationale SearchEngine has built-in undocumented filter
  * @consequences Requires database to be built first
- *
- * @depends DatabaseManager, SymbolGraphBuilder, SymbolSearchEngine
- * @depType internal
- * @depReason Symbol data and search capabilities
  */
 export class UndocumentedCommand extends BaseCommand {
   private dbManager?: DatabaseManager;
@@ -196,8 +192,4 @@ export class UndocumentedCommand extends BaseCommand {
  * @decision Use SymbolRegistryManager for hierarchy data
  * @rationale Registry already has hierarchy structure
  * @consequences Requires registry to be built first
- *
- * @depends SymbolRegistryManager
- * @depType internal
- * @depReason Hierarchy data storage
  */

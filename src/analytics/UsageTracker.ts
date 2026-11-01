@@ -35,10 +35,6 @@ import type {
  * @decision Store events as JSONL instead of structured database
  * @rationale Human-readable, Git-friendly, no schema migrations, easy to parse line-by-line
  * @consequences Simple implementation, but aggregation requires full file scan
- *
- * @depends fs, path, os
- * @depType external
- * @depReason File I/O for JSONL storage and system info
  */
 export class UsageTracker {
   private config: AnalyticsConfig;

@@ -23,10 +23,6 @@ import { BaseCommand, type CommandResult } from './BaseCommand';
  * - 충돌 감지 및 상세 분석
  * - 병렬 작업 영역 제안
  * - Isolation barrier 추천
- *
- * @depends ParallelWorkDetector, SymbolGraphBuilder
- * @depType internal
- * @depReason 의존성 분석 로직 필요
  */
 export class ParallelWorkCommand extends BaseCommand {
   /**

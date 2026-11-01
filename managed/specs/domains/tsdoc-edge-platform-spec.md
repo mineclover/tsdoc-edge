@@ -110,17 +110,17 @@ tags:
 - **Auxiliary Checkpoint (`## [[SectionSymbol]]`)**: Primary 문서를 보완하는 하위 섹션 체크포인트.
 - **Code ↔ Doc 양방향 링크**: 코드의 `@doc [[SymbolName]]` 블록 태그([^TSDocSymbolParser])와 문서의 `[^SymbolName]` / `[^sym-NNN]` 코드 각주 및 `## Backlinks` 섹션이 양방향 그래프를 형성합니다.
 
-### 2. `tsdoc-edge` 고유 도메인 태그 온톨로지 56종 (Context)
+### 2. `tsdoc-edge` 비환원(Irreducible) 고유 도메인 태그 22종 (Context)
 
-`tsdoc.json`의 총 63개 커스텀 태그 중 JSDoc 호환 심 7종을 제외한 **56개 태그**가 `tsdoc-edge` 고유 도메인 어휘입니다.
+`@microsoft/tsdoc` 표준 29종이나 `ttsc`(`@ttsc/graph` + TypeScript AST)로부터 추론·대체 가능한 중복 태그 41종(레거시 JSDoc 심 7종, `ttsc` 코드 의존성·식별 태그 9종, TSDoc 표준 중복 9종, 내부 동의어·메타 중복 16종)을 전량 제거하고, 오직 **`tsdoc-edge`만이 표현할 수 있는 비환원 도메인 태그 22종**만 `tsdoc.json`에 유지합니다.
 
-| 도메인 축 | 소속 태그 (`tsdoc-edge` 소유) | 소비자 |
-| --- | --- | --- |
-| **SSOT 연결 & 식별 (2)** | `@doc`, `@id`, `@symbol` (식별·연결 3종) | [^TSDocSymbolParser], [^DocCodeLinker] |
-| **7관점 모듈 명세 (15)** | **Purpose**(`@purpose`, `@responsibility`, `@problem`, `@solves`), **Input**(`@input`, `@precondition`), **Output**(`@output`, `@postcondition`), **Context**(`@context`, `@depends`, `@dependsOn`), **Logic**(`@functionality`, `@logic`, `@algorithm`, `@complexity`), **Effect**(`@sideEffect`, `@mutates`, `@reads`, `@writes`, `@io`), **Scope**(`@scope`) | [^ModuleSpecTagParser], [[Module Specification Framework]] |
-| **계약 & ADR 의사결정 (10)** | `@contract`, `@invariant`, `@decision`, `@designDecision`, `@rationale`, `@consequences`, `@architecture`, `@pattern`, `@requirement`, `@issue` | [^DesignContextCommand], [^EnhancedDocExtractor] |
-| **관계 온톨로지 & 의존성 (9)** | `@uses`, `@usedBy`, `@relatedTo`, `@implements`, `@extends`, `@depType`, `@depReason`, `@enhances`, `@requires` | [[Relationship Ontology]], [^SymbolGraphBuilder] |
-| **테스트·품질·생명주기 (17)** | `@testedBy`, `@testScenario`, `@coverage`, `@fixture`, `@deadcode`, `@deprecatedInFavorOf`, `@feature`, `@plan`, `@useCase`, `@performance`, `@priority`, `@updated`, `@changelog` | [^SpecCompletenessValidator] |
+| 도메인 축 | 소속 태그 (`tsdoc-edge` 순수 소유 22종) | 정본 위임 경계 (`tsdoc` / `ttsc` 브리지) | 소비자 |
+| --- | --- | --- | --- |
+| **1. SSOT 체크포인트 라우팅 (1)** | `@doc` (`@doc [[Checkpoint]]`) | 인라인 코드 심볼 참조는 TSDoc 표준 `{@link}` 위임 | [^TSDocSymbolParser], `tools/ttsc-tsdoc` |
+| **2. 목적·맥락·계약 (8)** | `@responsibility`, `@problem`, `@solves`, `@context`, `@contract`, `@precondition`, `@postcondition`, `@invariant` | 파라미터·반환·예외·제네릭은 `@param`/`@returns`/`@throws`/`@typeParam` + `ttsc` `type_ref` 위임 | [^EnhancedDocExtractor], [^DesignContextCommand] |
+| **3. 모듈 로직 & 부수효과 (4)** | `@functionality`, `@algorithm`, `@complexity`, `@sideEffect` | 상태 변이(`state:`)·외부 I/O(`filesystem:`/`database:`/`network:`)를 `@sideEffect` 단일 태그로 통합; 공개 범위(Scope)는 `@public`/`@internal` + TS AST 위임 | [^ModuleSpecTagParser], [[Module Specification Framework]] |
+| **4. 인라인 ADR 트리아드 (3)** | `@decision`, `@rationale`, `@consequences` | 프로젝트 수준 요구사항·아키텍처 불변식은 `managed/specs/` `tsdoc-spec` JSON 블록이 소유 | [^DesignContextCommand], [^EnhancedDocExtractor] |
+| **5. 비-AST 의미 관계 & 거버넌스 (6)** | `@relatedTo`, `@enhances`, `@requires`, `@feature`, `@testScenario`, `@deadcode` | 코드 의존성·호출·상속·구현(`calls`/`accesses`/`instantiates`/`type_ref`/`extends`/`implements`)은 `@ttsc/graph` 정본 브리지로 위임 | [[Relationship Ontology]], [^SymbolGraphBuilder], [^SpecCompletenessValidator] |
 
 ### 3. 6-플레인 리비전 고정 거버넌스 커널 (Logic)
 

@@ -7,17 +7,12 @@
  * @problem Enhanced docs reference other symbols/files that may not exist
  * @solves Validates all references and reports missing links
  * @context Documentation quality requires valid cross-references
- * @useCase Find broken dependency links, Validate symbol references
  *
  * @functionality Link validation, Reference checking, Broken link reporting
  *
  * @decision Check references at analysis time, not write time
  * @rationale Symbols may be added/removed over time
  * @consequences Requires periodic validation, Catches issues early
- *
- * @depends EnhancedDocExtractor
- * @depType module
- * @depReason Need to extract docs before validating
  */
 
 import * as fs from 'node:fs';
@@ -340,11 +335,19 @@ export class MissingLinkDetector {
       return true;
     }
 
-    // Try relative to source file
+    // Try relative to source file (including .ts and /index.ts resolution)
     const sourceDir = path.dirname(sourceFile);
     const resolved = path.resolve(sourceDir, filePath);
-    if (this.fileRegistry.has(resolved)) {
-      return true;
+    const candidates = [
+      resolved,
+      `${resolved}.ts`,
+      `${resolved}.tsx`,
+      path.join(resolved, 'index.ts'),
+    ];
+    for (const candidate of candidates) {
+      if (this.fileRegistry.has(candidate) || fs.existsSync(candidate)) {
+        return true;
+      }
     }
 
     // Try as module path (src/...)

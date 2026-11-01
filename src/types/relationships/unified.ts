@@ -11,12 +11,6 @@
  *
  * @doc [[Relationship System Roadmap]]
  * @doc [[Relationship Types]]
- *
- * @version 2.0
- * @updated 2025-11-11
- * @changelog Added 9 missing types: circular-dependency, doc-reference, enhancement,
- *            type-dependency, generic-constraint, layer-dependency, module-boundary,
- *            and expanded categories from 7 to 10
  */
 
 /**

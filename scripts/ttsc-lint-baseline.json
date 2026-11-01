@@ -1,7 +1,7 @@
 {
   "tsdoc-edge/doc-link-target": 113,
   "typescript/no-deprecated": 180,
-  "typescript/no-unnecessary-condition": 263,
+  "typescript/no-unnecessary-condition": 262,
   "typescript/no-unnecessary-type-assertion": 92,
   "typescript/no-unsafe-argument": 54,
   "typescript/no-unsafe-assignment": 133,

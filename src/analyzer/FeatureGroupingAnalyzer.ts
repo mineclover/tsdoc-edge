@@ -12,7 +12,7 @@ import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
  * Feature group
- * @private
+ * @internal
  */
 interface FeatureGroup {
   featureName: string;
@@ -93,7 +93,6 @@ export class FeatureGroupingAnalyzer {
    *
    * @param rootDir - Root directory
    * @returns Array of feature groups
-   * @private
    */
   private collectFeatureGroups(rootDir: string): FeatureGroup[] {
     const groups = new Map<string, FeatureGroup>();
@@ -118,7 +117,6 @@ export class FeatureGroupingAnalyzer {
    * @param sourceFile - Source file
    * @param filePath - File path
    * @param groups - Map to collect groups
-   * @private
    */
   private extractFeatureTagsFromFile(
     sourceFile: ts.SourceFile,
@@ -173,7 +171,6 @@ export class FeatureGroupingAnalyzer {
    *
    * @param _rootDir - Root directory
    * @returns Array of feature groups
-   * @private
    */
   private detectFeatureDirectories(_rootDir: string): FeatureGroup[] {
     const groups: FeatureGroup[] = [];
@@ -215,7 +212,6 @@ export class FeatureGroupingAnalyzer {
    *
    * @param group - Feature group
    * @returns Array of relationships
-   * @private
    */
   private createGroupRelationships(group: FeatureGroup): UnifiedRelationship[] {
     if (group.members.length < 2) {
@@ -269,7 +265,6 @@ export class FeatureGroupingAnalyzer {
    *
    * @param node - AST node
    * @returns Symbol name or null
-   * @private
    */
   private getSymbolName(node: ts.Node): string | null {
     if (ts.isFunctionDeclaration(node) && node.name) return node.name.text;
@@ -284,7 +279,6 @@ export class FeatureGroupingAnalyzer {
    *
    * @param name - Symbol name
    * @returns Symbol if found
-   * @private
    */
   private findSymbolByName(name: string): Symbol | undefined {
     for (const symbol of this.graph.symbols.values()) {
@@ -298,7 +292,6 @@ export class FeatureGroupingAnalyzer {
    *
    * @param tag - JSDoc tag
    * @returns Comment text or null
-   * @private
    */
   private getTagComment(tag: ts.JSDocTag): string | null {
     if (tag.comment) {
@@ -317,7 +310,6 @@ export class FeatureGroupingAnalyzer {
    *
    * @param dir - Directory to search
    * @returns Array of file paths
-   * @private
    */
   private findTypeScriptFiles(dir: string): string[] {
     const files: string[] = [];

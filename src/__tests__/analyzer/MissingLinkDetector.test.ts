@@ -36,9 +36,7 @@ describe('MissingLinkDetector', () => {
         `
 /**
  * Service class
- * @depends NonExistentModule
- * @depType module
- * @depReason For data access
+ * @relatedTo NonExistentModule - For data access
  */
 export class UserService {}
 `,
@@ -94,9 +92,7 @@ export class Dependency {}
         `
 /**
  * Main class
- * @depends Dependency
- * @depType symbol
- * @depReason For processing
+ * @relatedTo Dependency - For processing
  */
 export class Main {}
 `,
@@ -116,11 +112,9 @@ export class Main {}
       fs.writeFileSync(
         testFile,
         `
+import 'fs';
 /**
  * Service class
- * @depends fs
- * @depType external
- * @depReason For file operations
  */
 export class FileService {}
 `,
@@ -150,9 +144,7 @@ export class UserService {}
         `
 /**
  * Client class
- * @depends UserServic
- * @depType symbol
- * @depReason For user management
+ * @relatedTo UserServic - For user management
  */
 export class Client {}
 `,
@@ -174,9 +166,7 @@ export class Client {}
         `
 /**
  * Complex class
- * @depends BrokenDep1
- * @depType symbol
- * @depReason Test
+ * @relatedTo BrokenDep1 - Test
  * @relatedProblem BrokenProblem
  */
 export class Complex {}
@@ -201,9 +191,7 @@ export class Complex {}
         `
 /**
  * Class 1
- * @depends Broken1
- * @depType symbol
- * @depReason Test
+ * @relatedTo Broken1 - Test
  */
 export class Class1 {}
 `,
@@ -215,9 +203,7 @@ export class Class1 {}
         `
 /**
  * Class 2
- * @depends Broken2
- * @depType symbol
- * @depReason Test
+ * @relatedTo Broken2 - Test
  */
 export class Class2 {}
 `,
@@ -236,12 +222,8 @@ export class Class2 {}
         `
 /**
  * Class with multiple deps
- * @depends Dep1
- * @depType symbol
- * @depReason Test 1
- * @depends Dep2
- * @depType symbol
- * @depReason Test 2
+ * @relatedTo Dep1 - Test 1
+ * @relatedTo Dep2 - Test 2
  */
 export class WithDeps {}
 `,
@@ -289,9 +271,7 @@ export class Simple {
         `
 /**
  * Test class
- * @depends BrokenDep
- * @depType symbol
- * @depReason Test
+ * @relatedTo BrokenDep - Test
  */
 export class TestClass {}
 `,
@@ -357,11 +337,9 @@ export class Example {}
       fs.writeFileSync(
         testFile,
         `
+import 'node:fs';
 /**
  * File handler
- * @depends node:fs
- * @depType external
- * @depReason File operations
  */
 export class FileHandler {}
 `,
@@ -379,11 +357,9 @@ export class FileHandler {}
       fs.writeFileSync(
         testFile,
         `
+import 'typescript';
 /**
  * Parser
- * @depends typescript
- * @depType external
- * @depReason AST parsing
  */
 export class Parser {}
 `,
@@ -405,17 +381,13 @@ export class Parser {}
         `
 /**
  * Class 1
- * @depends Missing1
- * @depType symbol
- * @depReason Test
+ * @relatedTo Missing1 - Test
  */
 export class Class1 {}
 
 /**
  * Class 2
- * @depends Missing2
- * @depType symbol
- * @depReason Test
+ * @relatedTo Missing2 - Test
  */
 export class Class2 {}
 `,
@@ -477,9 +449,7 @@ export class Independent {}
         `
 /**
  * Special class
- * @depends Special$Symbol_123
- * @depType symbol
- * @depReason Test
+ * @relatedTo Special$Symbol_123 - Test
  */
 export class Special {}
 `,
@@ -553,9 +523,7 @@ class PrivateClass {}
         `
 /**
  * Client
- * @depends UserRepo
- * @depType symbol
- * @depReason Test
+ * @relatedTo UserRepo - Test
  */
 export class Client {}
 `,
@@ -587,9 +555,7 @@ export class UserService4 {}
         `
 /**
  * Client
- * @depends User
- * @depType symbol
- * @depReason Test
+ * @relatedTo User - Test
  */
 export class Client {}
 `,

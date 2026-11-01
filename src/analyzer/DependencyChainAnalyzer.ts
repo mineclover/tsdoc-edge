@@ -209,7 +209,7 @@ export class DependencyChainAnalyzer {
    * - fan-in: `A -> D, B -> D, C -> D` (multiple nodes converge to one)
    * - diamond: `A -> B -> D, A -> C -> D` (both fan-out and fan-in)
    *
-   * @performance O(n) time complexity with pre-computed incoming edges
+   * @complexity O(n) time complexity with pre-computed incoming edges
    */
   private determineChainType(path: string[]): 'linear' | 'fan-out' | 'fan-in' | 'diamond' {
     if (path.length <= 1) {

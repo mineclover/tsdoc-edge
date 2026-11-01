@@ -568,7 +568,7 @@ CREATE INDEX symbol_type IF NOT EXISTS FOR (s:Symbol) ON (s.type);
   /**
    * Calculate node position based on layout algorithm
    *
-   * @todo Implement semantic layout using relationship categories and symbol types
+   * @privateRemarks TODO: Implement semantic layout using relationship categories and symbol types
    * - X axis: Map to 6 relationship categories (structural, behavioral, data-flow, semantic, verification, alternative)
    * - Y axis: Map to 9 symbol types (class, interface, function, method, property, etc.)
    * - Clustering: Group by file path/directory

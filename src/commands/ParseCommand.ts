@@ -31,10 +31,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use EnhancedDocExtractor with auto-ID generation
  * @rationale Ensures consistent extraction and automatic ID assignment
  * @consequences All symbols get IDs automatically, partial docs are included
- *
- * @depends EnhancedDocExtractor
- * @depType internal
- * @depReason Core enhanced documentation parsing logic
  */
 export class ParseCommand extends BaseCommand {
   private extractor: EnhancedDocExtractor;

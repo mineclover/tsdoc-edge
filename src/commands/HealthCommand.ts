@@ -29,10 +29,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Focus on quick health overview vs detailed analysis
  * @rationale Users need fast health snapshot without overwhelming detail
  * @consequences Simpler output than AnalyzeCommand, more actionable
- *
- * @depends CodeHealthChecker, AnalysisReport
- * @depType internal
- * @depReason Core health checking logic
  */
 export class HealthCommand extends BaseCommand {
   private checker: CodeHealthChecker;

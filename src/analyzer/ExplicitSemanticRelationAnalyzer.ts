@@ -3,11 +3,11 @@
  * @packageDocumentation
  * @responsibility Extract semantic relationships from @relatedTo tags
  *
- * @purpose Capture developer intent through explicit documentation
- * @input TypeScript files with @relatedTo TSDoc tags
- * @output explicit-semantic-relation relationships
- * @logic Parse JSDoc tags, extract related symbols
- * @scope Public API for relationship extraction
+ * @solves Capture developer intent through explicit documentation
+ * @precondition TypeScript files with `@relatedTo` TSDoc tags
+ * @postcondition explicit-semantic-relation relationships
+ * @algorithm Parse JSDoc tags, extract related symbols
+ * @public
  *
  * @example
  * ```typescript
@@ -31,7 +31,7 @@ import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
  * Explicit relation site from @relatedTo tag
- * @private
+ * @internal
  */
 interface ExplicitRelationSite {
   sourceSymbol: string;
@@ -97,7 +97,6 @@ export class ExplicitSemanticRelationAnalyzer {
    *
    * @param rootDir - Root directory
    * @returns Array of explicit relation sites
-   * @private
    */
   private collectRelatedToTags(rootDir: string): ExplicitRelationSite[] {
     const sites: ExplicitRelationSite[] = [];
@@ -123,7 +122,6 @@ export class ExplicitSemanticRelationAnalyzer {
    * @param sourceFile - TypeScript source file
    * @param filePath - File path
    * @param sites - Array to collect sites
-   * @private
    */
   private extractRelationsFromFile(
     sourceFile: ts.SourceFile,
@@ -170,7 +168,6 @@ export class ExplicitSemanticRelationAnalyzer {
    *
    * @param tag - JSDoc tag
    * @returns Parsed relation info or null
-   * @private
    *
    * @example
    * ```typescript
@@ -210,7 +207,6 @@ export class ExplicitSemanticRelationAnalyzer {
    *
    * @param node - AST node
    * @returns Symbol name or null
-   * @private
    */
   private getSymbolName(node: ts.Node): string | null {
     if (ts.isFunctionDeclaration(node) && node.name) return node.name.text;
@@ -232,7 +228,6 @@ export class ExplicitSemanticRelationAnalyzer {
    *
    * @param tag - JSDoc tag
    * @returns Comment text or null
-   * @private
    */
   private getTagComment(tag: ts.JSDocTag): string | null {
     if (tag.comment) {
@@ -251,7 +246,6 @@ export class ExplicitSemanticRelationAnalyzer {
    *
    * @param dir - Directory to search
    * @returns Array of file paths
-   * @private
    */
   private findTypeScriptFiles(dir: string): string[] {
     const files: string[] = [];
@@ -282,7 +276,6 @@ export class ExplicitSemanticRelationAnalyzer {
    *
    * @param site - Explicit relation site
    * @returns Unified relationship
-   * @private
    */
   private createRelationship(site: ExplicitRelationSite): UnifiedRelationship {
     const timestamp = new Date().toISOString();

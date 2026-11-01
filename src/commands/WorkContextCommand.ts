@@ -686,7 +686,6 @@ export class WorkContextCommand extends BaseCommand {
    * @param option - Option name (e.g., '--depth')
    * @param defaultValue - Default value if not found
    * @returns Option value
-   * @private
    */
   private getOptionValue(
     args: string[],

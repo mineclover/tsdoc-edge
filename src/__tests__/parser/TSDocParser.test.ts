@@ -226,7 +226,7 @@ function testFunc(): void {
  * @decision Use pipeline
  * @rationale High throughput
  * @consequences Moderate memory
- * @depends DatabaseManager
+ * @relatedTo DatabaseManager - Persistence coordination
  * @deadcode reason="deprecated" confidence="high"
  * @public
  */`;
@@ -240,10 +240,13 @@ function testFunc(): void {
   it('should generate official tsdoc.json schema compliant configuration', () => {
     const tsdocJson = generateTsdocJson();
     expect(tsdocJson.$schema).toContain('tsdoc.schema.json');
-    expect(tsdocJson.tagDefinitions.length).toBeGreaterThanOrEqual(40);
+    expect(tsdocJson.tagDefinitions).toHaveLength(22);
     expect(tsdocJson.tagDefinitions.some((t) => t.tagName === '@deadcode')).toBe(true);
     expect(tsdocJson.tagDefinitions.some((t) => t.tagName === '@doc')).toBe(true);
     expect(tsdocJson.tagDefinitions.some((t) => t.tagName === '@decision')).toBe(true);
+    expect(tsdocJson.tagDefinitions.some((t) => t.tagName === '@private')).toBe(false);
+    expect(tsdocJson.tagDefinitions.some((t) => t.tagName === '@depends')).toBe(false);
+    expect(tsdocJson.tagDefinitions.some((t) => t.tagName === '@implements')).toBe(false);
   });
 
   it('should load custom tags from custom tsdoc.json path', () => {

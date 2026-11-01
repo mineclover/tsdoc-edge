@@ -38,7 +38,6 @@ export class ConfigManager {
    *
    * @param projectRoot - Project root directory
    * @param configPath - Custom config file path (optional)
-   * @private
    */
   private constructor(projectRoot: string = process.cwd(), configPath?: string) {
     this.projectRoot = projectRoot;
@@ -80,8 +79,6 @@ export class ConfigManager {
    * @remarks
    * If config file doesn't exist, returns default configuration.
    * Invalid JSON will throw an error with helpful message.
-   *
-   * @private
    */
   private loadConfig(): TsdocEdgeConfig {
     if (!fs.existsSync(this.configPath)) {
@@ -109,8 +106,6 @@ export class ConfigManager {
    * @param defaultConfig - Default configuration
    * @param userConfig - User-provided configuration
    * @returns Merged configuration
-   *
-   * @private
    */
   private mergeConfig(
     defaultConfig: TsdocEdgeConfig,

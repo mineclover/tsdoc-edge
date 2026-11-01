@@ -31,10 +31,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use UnusedDocumentDetector for analysis
  * @rationale Specialized detector with configurable thresholds
  * @consequences Requires managed directory to scan
- *
- * @depends UnusedDocumentDetector
- * @depType internal
- * @depReason Unused document detection
  */
 export class FindUnusedDocsCommand extends BaseCommand {
   private detector?: UnusedDocumentDetector;

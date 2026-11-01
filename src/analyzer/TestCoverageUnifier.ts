@@ -76,7 +76,6 @@ export class TestCoverageUnifier {
    * Extract test coverages from database
    *
    * @returns Array of test coverages
-   * @private
    */
   private extractTestCoverages(): TestCoverage[] {
     const coverages: TestCoverage[] = [];
@@ -145,7 +144,6 @@ export class TestCoverageUnifier {
    *
    * @param coverages - Test coverage data
    * @returns Array of relationships
-   * @private
    */
   private createTestCoverageRelationships(coverages: TestCoverage[]): UnifiedRelationship[] {
     return coverages.map((coverage) => ({

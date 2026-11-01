@@ -10,19 +10,19 @@
 export interface IdGeneratorOptions {
   /**
    * Start with sequential (001, 002, ...) or random (a3f, b2k, ...)
-   * @default 'sequential'
+   * @defaultValue 'sequential'
    */
   mode?: 'random' | 'sequential';
 
   /**
    * Initial length of ID
-   * @default 3
+   * @defaultValue 3
    */
   length?: number;
 
   /**
    * Character set to use (0-9a-z = 36 characters)
-   * @default '0123456789abcdefghijklmnopqrstuvwxyz'
+   * @defaultValue '0123456789abcdefghijklmnopqrstuvwxyz'
    */
   charset?: string;
 }
@@ -30,7 +30,6 @@ export interface IdGeneratorOptions {
 /**
  * ID Generator
  *
- * @id 008
  * @public
  * @responsibility Generate unique short IDs for symbols
  * @contract Generate unique short IDs without collision

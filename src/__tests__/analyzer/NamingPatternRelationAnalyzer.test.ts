@@ -1,6 +1,6 @@
 /**
  * Tests for NamingPatternRelationAnalyzer
- * @description Tests domain-based relationship detection from naming conventions
+ * Tests domain-based relationship detection from naming conventions
  */
 
 import { NamingPatternRelationAnalyzer } from '../../analyzer/NamingPatternRelationAnalyzer';

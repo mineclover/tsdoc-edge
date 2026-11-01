@@ -77,7 +77,6 @@ export class TestExampleExtractor {
 
   /**
    * Get all symbols with caching
-   * @private
    */
   private getAllSymbolsCached(): ReturnType<DatabaseManager['getAllSymbols']> {
     if (!this.symbolsCache) {
@@ -205,7 +204,6 @@ export class TestExampleExtractor {
 
   /**
    * Extract test example from a test case node
-   * @private
    */
   private extractTestExample(
     node: ts.CallExpression,
@@ -266,7 +264,6 @@ export class TestExampleExtractor {
 
   /**
    * Infer tested module name from test file path
-   * @private
    */
   private inferTestedModule(testFilePath: string): string {
     const basename = path.basename(testFilePath, '.test.ts');
@@ -276,7 +273,6 @@ export class TestExampleExtractor {
   /**
    * Identify symbols being tested in the code
    * Uses intelligent matching to find relevant symbols without over-linking
-   * @private
    */
   private identifyTestedSymbols(
     fullSource: string,
@@ -403,7 +399,6 @@ export class TestExampleExtractor {
 
   /**
    * Assess code complexity
-   * @private
    */
   private assessComplexity(code: string): 'simple' | 'medium' | 'complex' {
     const lines = code.split('\n').length;
@@ -422,7 +417,6 @@ export class TestExampleExtractor {
 
   /**
    * Categorize example by purpose
-   * @private
    */
   private categorizeExample(
     description: string,
@@ -462,7 +456,6 @@ export class TestExampleExtractor {
 
   /**
    * Assess example quality (0-10)
-   * @private
    */
   private assessQuality(code: string, description: string, complexity: string): number {
     let score = 5; // Base score
@@ -500,7 +493,6 @@ export class TestExampleExtractor {
 
   /**
    * Get relationship strength based on quality
-   * @private
    */
   private getRelationshipStrength(quality: number): 'strong' | 'medium' | 'weak' {
     if (quality >= 8) return 'strong';
@@ -510,7 +502,6 @@ export class TestExampleExtractor {
 
   /**
    * Check if keyword is a common test framework keyword
-   * @private
    */
   private isCommonTestKeyword(name: string): boolean {
     const keywords = [
@@ -534,7 +525,6 @@ export class TestExampleExtractor {
 
   /**
    * Convert to kebab-case
-   * @private
    */
   private toKebabCase(str: string): string {
     return str

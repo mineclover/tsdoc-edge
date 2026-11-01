@@ -417,7 +417,7 @@ describe('ConventionValidator', () => {
  * @contract Ensure valid input
  * @example
  * processData("test")
- * @testedBy test.test.ts
+ * @testScenario Processes valid string input
  */`;
 
       const parserContext = parser.parseString(comment);

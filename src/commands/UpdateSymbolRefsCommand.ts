@@ -34,10 +34,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Require symbol registry existence
  * @rationale Symbol references depend on indexed code symbols
  * @consequences Users must run "id new" before updating references
- *
- * @depends DocumentSymbolParser, SymbolRegistryManager, SymbolReferenceGenerator
- * @depType internal
- * @depReason Symbol reference infrastructure
  */
 export class UpdateSymbolRefsCommand extends BaseCommand {
   constructor(

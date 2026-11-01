@@ -32,10 +32,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use DatabaseManager for name-based search
  * @rationale Database allows efficient name queries
  * @consequences Requires database to be built first
- *
- * @depends DatabaseManager
- * @depType internal
- * @depReason Symbol data and relationships
  */
 export class WhoUsesCommand extends BaseCommand {
   private dbManager?: DatabaseManager;

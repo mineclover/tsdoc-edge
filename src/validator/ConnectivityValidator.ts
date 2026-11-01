@@ -35,10 +35,6 @@ import type {
  * @decision Use weighted penalty system for connectivity scoring
  * @rationale Different issues have different impact: untested code (25%) is more critical than missing responsibility (15%)
  * @consequences Clear prioritization of issues, encourages focusing on high-impact problems first
- *
- * @depends SymbolGraphBuilder, SymbolSearchEngine
- * @depType internal
- * @depReason Requires graph data and search capabilities for connectivity analysis
  */
 export class ConnectivityValidator {
   private graphBuilder: SymbolGraphBuilder;

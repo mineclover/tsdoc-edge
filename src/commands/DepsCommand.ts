@@ -34,10 +34,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use SymbolRegistryManager for dependency data
  * @rationale Registry already stores dependency relationships
  * @consequences Requires registry to be built first
- *
- * @depends SymbolRegistryManager
- * @depType internal
- * @depReason Dependency data storage
  */
 export class DepsCommand extends BaseCommand {
   private manager?: SymbolRegistryManager;

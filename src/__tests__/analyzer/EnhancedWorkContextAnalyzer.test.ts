@@ -1,6 +1,6 @@
 /**
  * Tests for EnhancedWorkContextAnalyzer
- * @description Tests the work context analyzer that provides comprehensive file context
+ * Tests the work context analyzer that provides comprehensive file context
  */
 
 import { EnhancedWorkContextAnalyzer } from '../../analyzer/EnhancedWorkContextAnalyzer';

@@ -212,7 +212,7 @@ export interface Entity {
 
 /**
  * Repository with generic constraint
- * @template T - Entity type that extends Entity interface
+ * @typeParam T - Entity type that extends Entity interface
  */
 export class Repository<T extends Entity> {
   private items: Map<string, T> = new Map();

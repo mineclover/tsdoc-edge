@@ -38,10 +38,6 @@ export interface DeadCodeSymbol {
  * - Self-tagging: Automatically annotates dead code with `@deprecated` and `@deadcode` TSDoc tags
  * - Tag exploration: Search and inspect symbols already marked as dead code or deprecated
  * - Dry-run support: Safely preview tagging and untagging changes
- *
- * @depends DatabaseManager, DeadCodeTagger
- * @depType internal
- * @depReason Symbol and relationship data, AST-based TSDoc modification
  */
 export class DetectDeadCodeCommand extends BaseCommand {
   private db: DatabaseManager;

@@ -96,35 +96,40 @@ export class Simple {}
   });
 
   describe('tag extraction', () => {
-    it('should extract dependency tags', () => {
+    it('should extract dependencies from AST imports and semantic relation tags', () => {
       const source = `
+import { Database } from 'better-sqlite3';
+
 /**
  * Test class
- * @depends Database
- * @depType external
- * @depReason Stores user data
+ * @relatedTo UserCache - Caching layer
  */
 export class UserRepository {}
       `;
 
       const result = extractor.extractFromFile('test.ts', source);
 
-      expect(result.length).toBeGreaterThanOrEqual(0);
+      expect(result).toHaveLength(1);
+      expect(result[0].doc.dependencies).toEqual([
+        { target: 'better-sqlite3', type: 'external', reason: 'TypeScript AST import' },
+        { target: 'UserCache', type: 'symbol', reason: 'Caching layer' },
+      ]);
     });
 
-    it('should extract plan tags', () => {
+    it('should extract future plans from standard @privateRemarks', () => {
       const source = `
 /**
  * Test class
- * @plan Add caching layer
- * @planPriority high
+ * @privateRemarks PLAN [high]: Add caching layer
  */
 export class CacheService {}
       `;
 
       const result = extractor.extractFromFile('test.ts', source);
 
-      expect(result.length).toBeGreaterThanOrEqual(0);
+      expect(result).toHaveLength(1);
+      expect(result[0].doc.futurePlans?.[0]?.description).toBe('Add caching layer');
+      expect(result[0].doc.futurePlans?.[0]?.priority).toBe('high');
     });
 
     it('should extract error experience tags', () => {

@@ -252,7 +252,6 @@ Examples:
 
   /**
    * Display a single example
-   * @private
    */
   private displayExample(example: TestExample, index: number): void {
     const qualityColor =
@@ -273,7 +272,6 @@ Examples:
 
   /**
    * Get quality distribution
-   * @private
    */
   private getQualityDistribution(examples: TestExample[]): {
     high: number;
@@ -289,7 +287,6 @@ Examples:
 
   /**
    * Get complexity distribution
-   * @private
    */
   private getComplexityDistribution(examples: TestExample[]): Record<string, number> {
     return {
@@ -301,7 +298,6 @@ Examples:
 
   /**
    * Get category distribution
-   * @private
    */
   private getCategoryDistribution(examples: TestExample[]): Record<string, number> {
     return {
@@ -314,7 +310,6 @@ Examples:
 
   /**
    * Parse command options
-   * @private
    */
   private parseOptions(args: string[]): {
     file?: string;

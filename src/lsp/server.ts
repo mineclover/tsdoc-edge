@@ -5,7 +5,6 @@
  * enabling real-time code analysis in IDEs like VS Code, Vim, and Emacs.
  *
  * @packageDocumentation
- * @module lsp/server
  * @doc [[LSP Integration]]
  *
  * @responsibility Provide LSP integration for TSDoc Edge features

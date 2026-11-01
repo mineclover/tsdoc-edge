@@ -12,7 +12,7 @@ import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
  * Co-requirement pattern
- * @private
+ * @internal
  */
 interface CoRequirementSite {
   requirer: string;
@@ -85,7 +85,6 @@ export class CoRequirementAnalyzer {
    *
    * @param rootDir - Root directory
    * @returns Array of co-requirement sites
-   * @private
    */
   private collectCoRequirementSites(rootDir: string): CoRequirementSite[] {
     const sites: CoRequirementSite[] = [];
@@ -110,7 +109,6 @@ export class CoRequirementAnalyzer {
    * @param sourceFile - Source file
    * @param filePath - File path
    * @param sites - Array to collect sites
-   * @private
    */
   private extractCoRequirementsFromFile(
     sourceFile: ts.SourceFile,
@@ -156,7 +154,6 @@ export class CoRequirementAnalyzer {
    *
    * @param node - AST node
    * @returns Symbol name or null
-   * @private
    */
   private getSymbolName(node: ts.Node): string | null {
     if (ts.isFunctionDeclaration(node) && node.name) return node.name.text;
@@ -171,7 +168,6 @@ export class CoRequirementAnalyzer {
    *
    * @param tag - JSDoc tag
    * @returns Comment text or null
-   * @private
    */
   private getTagComment(tag: ts.JSDocTag): string | null {
     if (tag.comment) {
@@ -190,7 +186,6 @@ export class CoRequirementAnalyzer {
    *
    * @param dir - Directory to search
    * @returns Array of file paths
-   * @private
    */
   private findTypeScriptFiles(dir: string): string[] {
     const files: string[] = [];
@@ -218,7 +213,6 @@ export class CoRequirementAnalyzer {
    *
    * @param site - Co-requirement site
    * @returns Unified relationship or null
-   * @private
    */
   private createRelationship(site: CoRequirementSite): UnifiedRelationship | null {
     const requirer = this.findSymbolByName(site.requirer);
@@ -263,7 +257,6 @@ export class CoRequirementAnalyzer {
    *
    * @param name - Symbol name
    * @returns Symbol if found
-   * @private
    */
   private findSymbolByName(name: string): Symbol | undefined {
     for (const symbol of this.graph.symbols.values()) {

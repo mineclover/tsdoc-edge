@@ -5,7 +5,6 @@
  * to prevent unbounded memory growth.
  *
  * @packageDocumentation
- * @module lsp/statement-manager
  * @internal
 
  * @doc [[statement-manager]] */

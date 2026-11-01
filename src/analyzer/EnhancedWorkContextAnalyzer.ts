@@ -324,7 +324,6 @@ export class EnhancedWorkContextAnalyzer {
 
   /**
    * Find symbols that depend on the given symbol
-   * @private
    */
   private findDependents(symbolId: string): string[] {
     const dependents: string[] = [];
@@ -346,7 +345,6 @@ export class EnhancedWorkContextAnalyzer {
 
   /**
    * Resolve document reference to file path
-   * @private
    */
   private resolveDocPath(docRef: string): string | null {
     // Remove 'doc:' prefix if present

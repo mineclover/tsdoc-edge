@@ -33,10 +33,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use SymbolRegistryManager for search
  * @rationale Registry has qualified name and search capabilities
  * @consequences Requires registry to be built first
- *
- * @depends SymbolRegistryManager
- * @depType internal
- * @depReason Symbol search and metadata
  */
 export class FindMethodCommand extends BaseCommand {
   private manager?: SymbolRegistryManager;

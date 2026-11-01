@@ -535,7 +535,6 @@ export class DesignContextCommand extends BaseCommand {
 
   /**
    * Generate LLM-friendly output from work context
-   * @private
    */
   private generateLlmOutput(context: WorkContext): string {
     let output = '';

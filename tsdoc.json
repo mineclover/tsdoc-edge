@@ -7,7 +7,19 @@
       "allowMultiple": true
     },
     {
-      "tagName": "@id",
+      "tagName": "@responsibility",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@problem",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@solves",
+      "syntaxKind": "block"
+    },
+    {
+      "tagName": "@context",
       "syntaxKind": "block"
     },
     {
@@ -30,103 +42,6 @@
       "allowMultiple": true
     },
     {
-      "tagName": "@responsibility",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@problem",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@solves",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@context",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@depends",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@dependsOn",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@uses",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@usedBy",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@relatedTo",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@implements",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@extends",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@depType",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@depReason",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@decision",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@designDecision",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@rationale",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@consequences",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@architecture",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@pattern",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@requirement",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@issue",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
       "tagName": "@functionality",
       "syntaxKind": "block"
     },
@@ -144,73 +59,24 @@
       "allowMultiple": true
     },
     {
-      "tagName": "@mutates",
+      "tagName": "@decision",
       "syntaxKind": "block",
       "allowMultiple": true
     },
     {
-      "tagName": "@io",
+      "tagName": "@rationale",
       "syntaxKind": "block",
       "allowMultiple": true
     },
     {
-      "tagName": "@scope",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@purpose",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@input",
+      "tagName": "@consequences",
       "syntaxKind": "block",
       "allowMultiple": true
     },
     {
-      "tagName": "@output",
+      "tagName": "@relatedTo",
       "syntaxKind": "block",
       "allowMultiple": true
-    },
-    {
-      "tagName": "@logic",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@reads",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@writes",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@testedBy",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@testScenario",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@coverage",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@fixture",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@deadcode",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@deprecatedInFavorOf",
-      "syntaxKind": "block"
     },
     {
       "tagName": "@enhances",
@@ -228,63 +94,12 @@
       "allowMultiple": true
     },
     {
-      "tagName": "@plan",
+      "tagName": "@testScenario",
       "syntaxKind": "block",
       "allowMultiple": true
     },
     {
-      "tagName": "@private",
-      "syntaxKind": "modifier"
-    },
-    {
-      "tagName": "@description",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@template",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@module",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@todo",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@default",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@useCase",
-      "syntaxKind": "block",
-      "allowMultiple": true
-    },
-    {
-      "tagName": "@performance",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@priority",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@version",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@symbol",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@updated",
-      "syntaxKind": "block"
-    },
-    {
-      "tagName": "@changelog",
+      "tagName": "@deadcode",
       "syntaxKind": "block"
     }
   ]

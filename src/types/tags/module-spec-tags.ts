@@ -40,7 +40,7 @@ export interface SideEffectDoc {
 }
 
 /**
- * State mutation from `@mutates` tag
+ * State mutation extracted from `@sideEffect state: ...`
  */
 export interface MutationDoc {
   /** What state is being mutated */
@@ -50,7 +50,7 @@ export interface MutationDoc {
 }
 
 /**
- * I/O operation from `@io` tag
+ * I/O operation extracted from `@sideEffect`
  */
 export interface IODoc {
   /** Type of I/O */
@@ -60,7 +60,7 @@ export interface IODoc {
 }
 
 /**
- * Scope information from `@scope` tag
+ * Scope information derived from standard `@public` / `@internal` / `@beta` / `@alpha` modifiers
  */
 export interface ScopeDoc {
   /** Scope description */
@@ -85,26 +85,26 @@ export interface ModuleSpecTags {
   /** Side effects (`@sideEffect`, can have multiple) */
   sideEffects?: SideEffectDoc[];
 
-  /** State mutations (`@mutates`, can have multiple) */
+  /** State mutations projected from `@sideEffect state: ...` */
   mutations?: MutationDoc[];
 
-  /** I/O operations (`@io`, can have multiple) */
+  /** I/O operations projected from `@sideEffect` */
   io?: IODoc[];
 
-  /** Scope description (`@scope`) */
+  /** Scope description derived from standard TSDoc visibility modifiers */
   scope?: ScopeDoc;
 }
 
 /**
- * Tag names for module specification
+ * Irreducible tag names for module specification logic and effects.
+ *
+ * Scope and dependencies are owned by `@microsoft/tsdoc` standard modifiers
+ * (`@public`, `@internal`, `@beta`, `@alpha`) and `ttsc` AST/graph facts.
  */
 export const MODULE_SPEC_TAG_NAMES = {
   ALGORITHM: 'algorithm',
   COMPLEXITY: 'complexity',
   SIDE_EFFECT: 'sideEffect',
-  MUTATES: 'mutates',
-  IO: 'io',
-  SCOPE: 'scope',
 } as const;
 
 /**
@@ -124,19 +124,15 @@ export const MODULE_SPEC_TAG_TEMPLATE = `/**
  * @precondition Input constraints
  * @postcondition Output guarantees
  *
- * @depends DependencyName
  * @context Execution context requirements
  *
  * @functionality Feature 1, Feature 2, Feature 3
  * @algorithm Describe the algorithm or processing steps in detail
  * @complexity O(n) or High/Medium/Low with explanation
  *
- * @sideEffect filesystem: Writes configuration file
- * @sideEffect database: Updates user table
- * @mutates this.cache - Updates internal cache
- * @io file: Reads config.json
- *
- * @scope Public API, exported from main module
+ * @sideEffect filesystem: Writes configuration file (write)
+ * @sideEffect database: Updates user table (write)
+ * @sideEffect state: this.cache - Updates internal cache
  *
  * @example
  * \`\`\`typescript

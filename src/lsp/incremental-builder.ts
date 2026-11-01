@@ -5,7 +5,6 @@
  * when files are modified, created, or deleted.
  *
  * @packageDocumentation
- * @module lsp/incremental-builder
  * @doc [[LSP Integration]]
  */
 

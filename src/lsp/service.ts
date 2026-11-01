@@ -2,7 +2,6 @@
  * TSDoc Edge Service
  *
  * @packageDocumentation
- * @module lsp/service
  * @doc [[LSP Integration]]
  *
  * @responsibility Provide TSDoc Edge data to LSP server

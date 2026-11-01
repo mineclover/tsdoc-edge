@@ -173,7 +173,6 @@ export class EntryPointContextAggregator {
    *
    * @param entryPoint - Entry point string
    * @returns Entry point type
-   * @private
    */
   private detectEntryPointType(entryPoint: string): 'file' | 'symbol' | 'document' {
     // File path pattern: contains / or \ and ends with .ts
@@ -196,7 +195,6 @@ export class EntryPointContextAggregator {
    * @param filePath - File path (absolute or relative)
    * @param context - Context to populate
    * @param depth - Traversal depth
-   * @private
    */
   private gatherFileContext(filePath: string, context: UnifiedContext, depth: number): void {
     // Normalize to relative path if absolute (database stores relative paths)
@@ -226,7 +224,6 @@ export class EntryPointContextAggregator {
    * @param symbolId - Symbol ID
    * @param context - Context to populate
    * @param depth - Traversal depth
-   * @private
    */
   private gatherSymbolContext(symbolId: string, context: UnifiedContext, depth: number): void {
     // Get symbol details
@@ -322,7 +319,6 @@ export class EntryPointContextAggregator {
    * @param docSymbol - Document symbol
    * @param context - Context to populate
    * @param _depth - Traversal depth
-   * @private
    */
   private gatherDocumentContext(docSymbol: string, context: UnifiedContext, _depth: number): void {
     // Remove [[ ]] if present
@@ -368,7 +364,6 @@ export class EntryPointContextAggregator {
    * @param symbolId - Starting symbol
    * @param depth - How deep to traverse
    * @returns Number of transitively affected symbols
-   * @private
    */
   private calculateTransitiveImpact(symbolId: string, depth: number): number {
     if (depth === 0) return 0;
@@ -409,7 +404,6 @@ export class EntryPointContextAggregator {
    *
    * @param context - Context object
    * @returns Array of file paths
-   * @private
    */
   private getAffectedFiles(context: UnifiedContext): string[] {
     const files = new Set<string>();

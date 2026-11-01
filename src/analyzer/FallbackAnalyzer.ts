@@ -123,7 +123,6 @@ export class FallbackAnalyzer {
    *
    * @param sourceFile - Source file
    * @param sites - Array to collect sites
-   * @private
    */
   private extractFallbackSites(sourceFile: ts.SourceFile, sites: FallbackSite[]): void {
     const visit = (node: ts.Node): void => {
@@ -166,7 +165,6 @@ export class FallbackAnalyzer {
    * @param node - Try statement node
    * @param sourceFile - Source file
    * @param sites - Array to collect sites
-   * @private
    */
   private analyzeTryCatch(
     node: ts.TryStatement,
@@ -209,7 +207,6 @@ export class FallbackAnalyzer {
    * @param sourceFile - Source file
    * @param sites - Array to collect sites
    * @param pattern - Pattern type
-   * @private
    */
   private analyzeBinaryExpression(
     node: ts.BinaryExpression,
@@ -241,7 +238,6 @@ export class FallbackAnalyzer {
    * @param node - Conditional expression node
    * @param sourceFile - Source file
    * @param sites - Array to collect sites
-   * @private
    */
   private analyzeConditional(
     node: ts.ConditionalExpression,
@@ -271,7 +267,6 @@ export class FallbackAnalyzer {
    *
    * @param node - Node to search
    * @returns Array of call expressions
-   * @private
    */
   private findCallExpressions(node: ts.Node): ts.CallExpression[] {
     const calls: ts.CallExpression[] = [];
@@ -293,7 +288,6 @@ export class FallbackAnalyzer {
    * @param expression - Expression node
    * @param sourceFile - Source file
    * @returns Symbol or null
-   * @private
    */
   private findSymbolForExpression(
     expression: ts.Expression,
@@ -326,7 +320,6 @@ export class FallbackAnalyzer {
    *
    * @param site - Fallback site
    * @returns Unified relationship
-   * @private
    */
   private createRelationship(site: FallbackSite): UnifiedRelationship {
     const timestamp = new Date().toISOString();

@@ -5,7 +5,6 @@
  * to prevent memory leaks in long-running LSP server processes.
  *
  * @packageDocumentation
- * @module lsp/cache-manager
  * @internal
 
  * @doc [[cache-manager]] */

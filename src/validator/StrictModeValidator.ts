@@ -2,7 +2,7 @@
  * Strict mode validator for enhanced documentation
  * @packageDocumentation
  * @responsibility Validate compliance with 6-category strict mode requirements
- * @architecture Validation Layer - Strict Mode Enforcement
+ * @context Validation Layer - Strict Mode Enforcement
  */
 
 import type {
@@ -19,7 +19,6 @@ import type {
 /**
  * Validator for strict mode documentation requirements
  *
- * @id 003
  * @public
  * @responsibility Validate compliance with 6-category strict mode requirements
  * @contract Enforce all 6 categories for public APIs

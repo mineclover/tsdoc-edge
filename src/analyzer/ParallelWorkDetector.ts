@@ -65,10 +65,6 @@ export interface ParallelWorkResult {
  * @decision Use graph traversal (BFS) for path detection
  * @rationale BFS는 최단 경로 보장, 충돌 원인 명확히 제시 가능
  * @consequences O(V+E) 복잡도, 대규모 그래프에서도 효율적
- *
- * @depends SymbolGraph, SymbolGraphBuilder
- * @depType internal
- * @depReason 의존성 그래프 데이터 필요
  */
 export class ParallelWorkDetector {
   private graph: SymbolGraph;
@@ -116,8 +112,6 @@ export class ParallelWorkDetector {
    * @param workingSet - 작업 중인 모듈들
    * @param frozenSet - Frozen 모듈들
    * @returns 작업 가능한 모듈 목록
-   *
-   * @private
    */
   private findAvailableModules(workingSet: Set<string>, frozenSet: Set<string>): string[] {
     const available: string[] = [];
@@ -152,8 +146,6 @@ export class ParallelWorkDetector {
    * @param module2 - 두 번째 모듈
    * @param frozenSet - Frozen 모듈들
    * @returns 충돌 여부
-   *
-   * @private
    */
   private checkConflict(module1: string, module2: string, frozenSet: Set<string>): boolean {
     // Rule 1: Direct dependency
@@ -180,8 +172,6 @@ export class ParallelWorkDetector {
    * @param m1 - 모듈 1
    * @param m2 - 모듈 2
    * @returns 직접 의존 여부
-   *
-   * @private
    */
   private hasDirectDependency(m1: string, m2: string): boolean {
     const deps1 = this.graph.adjacencyList.get(m1) || [];
@@ -196,8 +186,6 @@ export class ParallelWorkDetector {
    * @param start - 시작 모듈
    * @param target - 목표 모듈
    * @returns 경로 존재 여부
-   *
-   * @private
    */
   private hasTransitiveDependency(start: string, target: string): boolean {
     return this.hasPath(start, target) || this.hasPath(target, start);
@@ -209,8 +197,6 @@ export class ParallelWorkDetector {
    * @param start - 시작 노드
    * @param target - 목표 노드
    * @returns 경로 존재 여부
-   *
-   * @private
    */
   private hasPath(start: string, target: string): boolean {
     if (start === target) return true;
@@ -246,8 +232,6 @@ export class ParallelWorkDetector {
    * @param m2 - 모듈 2
    * @param frozenSet - Frozen 모듈들
    * @returns 공유 가변 의존성 존재 여부
-   *
-   * @private
    */
   private hasSharedMutableDependency(m1: string, m2: string, frozenSet: Set<string>): boolean {
     const deps1 = this.getDependencies(m1);
@@ -264,8 +248,6 @@ export class ParallelWorkDetector {
    *
    * @param moduleId - 모듈 ID
    * @returns 의존성 목록
-   *
-   * @private
    */
   private getDependencies(moduleId: string): string[] {
     return this.graph.adjacencyList.get(moduleId) || [];
@@ -277,8 +259,6 @@ export class ParallelWorkDetector {
    * @param workingSet - 작업 중인 모듈들
    * @param frozenSet - Frozen 모듈들
    * @returns 충돌 리포트 목록
-   *
-   * @private
    */
   private detectConflicts(workingSet: Set<string>, frozenSet: Set<string>): ConflictReport[] {
     const conflicts: ConflictReport[] = [];
@@ -304,8 +284,6 @@ export class ParallelWorkDetector {
    * @param m2 - 모듈 2
    * @param frozenSet - Frozen 모듈들
    * @returns 충돌 리포트 또는 null
-   *
-   * @private
    */
   private analyzeConflict(m1: string, m2: string, frozenSet: Set<string>): ConflictReport | null {
     // Direct dependency
@@ -367,8 +345,6 @@ export class ParallelWorkDetector {
    * @param start - 시작 노드
    * @param target - 목표 노드
    * @returns 경로 배열
-   *
-   * @private
    */
   private findPath(start: string, target: string): string[] {
     if (start === target) return [start];
@@ -407,8 +383,6 @@ export class ParallelWorkDetector {
    * @param availableModules - 작업 가능한 모듈들
    * @param frozenSet - Frozen 모듈들
    * @returns 병렬 영역 목록
-   *
-   * @private
    */
   private findParallelZones(availableModules: string[], frozenSet: Set<string>): ParallelZone[] {
     const zones: ParallelZone[] = [];
@@ -451,8 +425,6 @@ export class ParallelWorkDetector {
    *
    * @param modules - 모듈 그룹
    * @returns Barrier 목록
-   *
-   * @private
    */
   private findBarriersForGroup(modules: string[]): string[] {
     if (modules.length === 0) return [];
@@ -472,8 +444,6 @@ export class ParallelWorkDetector {
    * @param workingSet - 작업 중인 모듈들
    * @param frozenSet - Frozen 모듈들
    * @returns Barrier 목록
-   *
-   * @private
    */
   private findIsolationBarriers(workingSet: Set<string>, frozenSet: Set<string>): string[] {
     const barriers: string[] = [];

@@ -29,10 +29,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use TrackableStatsCollector and StatsHistoryManager
  * @rationale Centralized stats collection with history tracking
  * @consequences Requires database to be built first
- *
- * @depends DatabaseManager, TrackableStatsCollector, StatsHistoryManager
- * @depType internal
- * @depReason Stats collection and history tracking
  */
 export class StatsCommand extends BaseCommand {
   private dbManager?: DatabaseManager;

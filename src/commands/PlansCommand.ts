@@ -17,7 +17,7 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @doc [[CLI Commands#plans]]
  *
  * @problem Need to track and visualize future plans across codebase
- * @solves Shows all @plan tags from enhanced docs with status and priority
+ * @solves Shows all `@privateRemarks` plan items from enhanced docs with status and priority
  * @context Part of project planning and tracking
  *
  * @functionality
@@ -30,10 +30,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Use DatabaseManager for plan data
  * @rationale Plans stored in database with symbol associations
  * @consequences Requires database to be built first
- *
- * @depends DatabaseManager
- * @depType internal
- * @depReason Plan data storage
  */
 export class PlansCommand extends BaseCommand {
   private dbManager?: DatabaseManager;

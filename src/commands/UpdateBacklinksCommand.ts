@@ -35,10 +35,6 @@ import { BaseCommand, type CommandResult, colors } from './BaseCommand';
  * @decision Parse both documents and code files
  * @rationale Complete backlink picture requires both doc and code references
  * @consequences Slower but more accurate backlink generation
- *
- * @depends DocumentSymbolParser, DocumentSymbolRegistry, TSDocSymbolParser, BacklinkGenerator
- * @depType internal
- * @depReason Complete document symbol infrastructure stack
  */
 export class UpdateBacklinksCommand extends BaseCommand {
   constructor(
