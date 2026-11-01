@@ -13,10 +13,13 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
 import { CanonicalAliasContext } from '../indexer';
+import { extractDocCheckpointsFromSource } from '../parser/TsdocCommentReader';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import type { ParsedDocSymbols } from '../types/feature';
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import { isExternalCanonicalNode } from './canonicalReadHelper';
+
+type DocBindingStatus = 'bound-@source' | 'bound-@doc' | 'unbound-homonym' | null;
 
 interface UnifiedCodeSymbolMatch {
   readonly id: string;
@@ -28,6 +31,7 @@ interface UnifiedCodeSymbolMatch {
   readonly dependencies: number;
   readonly dependents: number;
   readonly source: 'canonical-graph' | 'enrichment-db';
+  readonly docBinding: DocBindingStatus;
 }
 
 /**
@@ -108,7 +112,8 @@ export class SymbolQueryCommand extends BaseCommand {
     return `tsdoc-edge symbol query <symbol-or-subcommand> [options]
 
   Direct Lookup:
-    <symbol>           Look up both code symbols (Canonical @ttsc/graph) and [[Symbol]] docs
+    <symbol>           Look up both production code symbols and defined [[Symbol]] checkpoints
+    lookup <symbol>    Explicit lookup (use when a symbol name collides with a subcommand)
 
   Document Subcommands:
     list               List all [[Symbol]] document checkpoints
@@ -120,8 +125,11 @@ export class SymbolQueryCommand extends BaseCommand {
 
   Options:
     --json               Output as JSON (direct lookup)
-    --limit <n>          Maximum code symbol matches (default: 10)
+    --code-only          Query code symbols only (skip [[Symbol]] checkpoint lookup)
+    --doc-only           Query [[Symbol]] checkpoints only (skip code symbol lookup)
+    --include-tests      Include test and fixture symbols in code lookup/suggestions
     --include-external   Include external/stdlib code symbols
+    --limit <n>          Maximum code symbol matches (default: 10)
     --dir <path>         Documentation directory (default: managed)
     --pattern <regex>    Filter list subcommand by regex
     --all                Include undefined [[Symbol]] references in list`;
@@ -141,10 +149,15 @@ export class SymbolQueryCommand extends BaseCommand {
 
       const flagError = this.validateAllowedFlags(
         args,
-        ['--all', '--json', '--include-external'],
+        ['--all', '--json', '--include-external', '--include-tests', '--code-only', '--doc-only'],
         ['--pattern', '--dir', '--limit']
       );
       if (flagError) return flagError;
+
+      if (this.hasFlag(args, '--code-only') && this.hasFlag(args, '--doc-only')) {
+        this.printError('Cannot combine --code-only and --doc-only');
+        return this.failure('Cannot combine --code-only and --doc-only');
+      }
 
       const docsDir = this.findDocsDir(args);
       const positionalArgs = this.getPositionalArgs(args, ['--pattern', '--dir', '--limit']);
@@ -156,7 +169,22 @@ export class SymbolQueryCommand extends BaseCommand {
 
       const docSubcommands = new Set(['list', 'search', 'info', 'backlinks', 'similar', 'stats']);
 
+      if (subcommand === 'lookup') {
+        const target = positionalArgs[1];
+        if (!target || positionalArgs.length > 2) {
+          this.printError('Usage: tsdoc-edge symbol query lookup <symbol> [options]');
+          return this.failure('Usage: symbol query lookup <symbol>');
+        }
+        return this.queryUnifiedSymbol(target, docsDir, args);
+      }
+
       if (!docSubcommands.has(subcommand)) {
+        if (positionalArgs.length > 1) {
+          const nearSub = this.findClosestSubcommand(subcommand);
+          const hint = nearSub ? ` Did you mean '${nearSub}'?` : '';
+          this.printError(`Unknown subcommand '${subcommand}'.${hint}`);
+          return this.failure(`Unknown subcommand '${subcommand}'.${hint}`);
+        }
         return this.queryUnifiedSymbol(subcommand, docsDir, args);
       }
 
@@ -216,163 +244,224 @@ export class SymbolQueryCommand extends BaseCommand {
   private queryUnifiedSymbol(query: string, docsDir: string, args: string[]): CommandResult {
     const isJson = this.hasFlag(args, '--json');
     const includeExternal = this.hasFlag(args, '--include-external');
+    const includeTests = this.hasFlag(args, '--include-tests');
+    const codeOnly = this.hasFlag(args, '--code-only');
+    const docOnly = this.hasFlag(args, '--doc-only');
     const parsedLimit = Number.parseInt(this.getOption(args, '--limit') || '10', 10);
     const limit = Number.isFinite(parsedLimit) && parsedLimit > 0 ? parsedLimit : 10;
 
-    this.buildIndex(docsDir, true);
-
-    let docMatch = this.symbols.get(query);
-    if (!docMatch) {
-      const lowerQuery = query.toLowerCase();
-      for (const [key, info] of this.symbols.entries()) {
-        if (key.toLowerCase() === lowerQuery) {
-          docMatch = info;
-          break;
+    let docMatch: SymbolInfo | undefined;
+    if (!codeOnly) {
+      this.buildIndex(docsDir, true);
+      const exactDoc = this.symbols.get(query);
+      if (exactDoc && this.isDefinedCheckpoint(exactDoc)) {
+        docMatch = exactDoc;
+      } else {
+        const lowerQuery = query.toLowerCase();
+        for (const [key, info] of this.symbols.entries()) {
+          if (key.toLowerCase() === lowerQuery && this.isDefinedCheckpoint(info)) {
+            docMatch = info;
+            break;
+          }
         }
       }
     }
 
-    const codeMatches: UnifiedCodeSymbolMatch[] = [];
+    const rawCodeMatches: Array<Omit<UnifiedCodeSymbolMatch, 'docBinding'>> = [];
     const codeSuggestions: string[] = [];
 
-    let canonicalContext: CanonicalAliasContext | null = null;
-    try {
-      canonicalContext = CanonicalAliasContext.tryOpen(process.cwd());
-      if (canonicalContext) {
-        const externalMode = includeExternal ? 'include' : 'exclude';
-        const aliasedCanonicalId = canonicalContext.resolver.legacyToCanonical(query);
-        const candidates = canonicalContext.graph.nodes.filter(
-          (node) => includeExternal || !isExternalCanonicalNode(node)
-        );
-
-        let matchedNodes = candidates.filter(
-          (node) =>
-            node.id === query ||
-            (aliasedCanonicalId !== null && node.id === aliasedCanonicalId) ||
-            node.qualifiedName === query ||
-            node.name === query
-        );
-
-        if (matchedNodes.length === 0) {
-          const lower = query.toLowerCase();
-          matchedNodes = candidates.filter(
-            (node) =>
-              (node.qualifiedName ?? '').toLowerCase() === lower ||
-              (node.name ?? '').toLowerCase() === lower
-          );
-        }
-
-        if (matchedNodes.length === 0) {
-          const scoredCandidates: Array<{ label: string; score: number }> = [];
-          const seenNames = new Set<string>();
-          for (const node of candidates) {
-            const label = node.qualifiedName ?? node.name;
-            if (!label || seenNames.has(label)) continue;
-            seenNames.add(label);
-            const score = this.scoreSymbolSimilarity(query, label);
-            if (score > 10) {
-              scoredCandidates.push({ label, score });
+    if (!docOnly) {
+      let canonicalContext: CanonicalAliasContext | null = null;
+      try {
+        canonicalContext = CanonicalAliasContext.tryOpen(process.cwd());
+        if (canonicalContext) {
+          const rootDir = canonicalContext.graph.rootDir;
+          const externalMode = includeExternal ? 'include' : 'exclude';
+          const aliasedCanonicalId = canonicalContext.resolver.legacyToCanonical(query);
+          const candidates = canonicalContext.graph.nodes.filter((node) => {
+            if (!includeExternal && isExternalCanonicalNode(node)) return false;
+            if (!includeTests) {
+              const rawFile = node.file ?? node.evidence?.file;
+              const relFile = rawFile
+                ? path.isAbsolute(rawFile)
+                  ? path.relative(rootDir, rawFile)
+                  : rawFile
+                : undefined;
+              if (relFile && this.isTestOrFixturePath(relFile)) return false;
             }
-          }
-          scoredCandidates.sort((a, b) => b.score - a.score || a.label.localeCompare(b.label));
-          for (const item of scoredCandidates.slice(0, 5)) {
-            codeSuggestions.push(item.label);
-          }
-        }
-
-        matchedNodes.sort((left, right) => {
-          const leftExp = left.exported ? 0 : 1;
-          const rightExp = right.exported ? 0 : 1;
-          if (leftExp !== rightExp) return leftExp - rightExp;
-          return left.id.localeCompare(right.id);
-        });
-
-        for (const node of matchedNodes.slice(0, limit)) {
-          const rawFile = node.file ?? node.evidence?.file;
-          const filePath = rawFile
-            ? path.isAbsolute(rawFile)
-              ? path.relative(canonicalContext.graph.rootDir, rawFile)
-              : rawFile
-            : undefined;
-          codeMatches.push({
-            id: node.id,
-            name: node.qualifiedName ?? node.name ?? node.id,
-            kind: node.kind,
-            filePath,
-            line: node.evidence?.startLine,
-            exported: Boolean(node.exported),
-            dependencies: canonicalContext.analysis.dependencies(node.id, {
-              external: externalMode,
-            }).length,
-            dependents: canonicalContext.analysis.dependents(node.id, {
-              external: externalMode,
-            }).length,
-            source: 'canonical-graph',
+            return true;
           });
-        }
-      }
-    } finally {
-      canonicalContext?.close();
-    }
 
-    if (codeMatches.length === 0) {
-      const dbPath = this.getDatabasePath();
-      if (fs.existsSync(dbPath)) {
-        const dbManager = new DatabaseManager(dbPath);
-        try {
-          const exact = dbManager.getSymbol(query);
-          const byName = dbManager
-            .findSymbolsByNamePattern(query)
-            .filter((sym) => sym.name === query || sym.name.toLowerCase() === query.toLowerCase());
-          const combined = exact ? [exact, ...byName.filter((s) => s.id !== exact.id)] : byName;
+          let matchedNodes = candidates.filter(
+            (node) =>
+              node.id === query ||
+              (aliasedCanonicalId !== null && node.id === aliasedCanonicalId) ||
+              node.qualifiedName === query ||
+              node.name === query
+          );
 
-          for (const sym of combined.slice(0, limit)) {
-            const rels = dbManager.getUnifiedRelationshipsBySymbol(sym.id);
-            let deps = 0;
-            let dependents = 0;
-            for (const rel of rels) {
-              const fromList = Array.isArray(rel.from) ? rel.from : [rel.from];
-              const toList = Array.isArray(rel.to) ? rel.to : [rel.to];
-              if (fromList.includes(sym.id)) deps++;
-              if (toList.includes(sym.id)) dependents++;
-            }
-            const symFilePath = 'filePath' in sym ? sym.filePath : sym.file_path;
-            const symExported =
-              'isExported' in sym ? Boolean(sym.isExported) : Boolean(sym.is_exported);
-            codeMatches.push({
-              id: sym.id,
-              name: sym.name,
-              kind: sym.type,
-              filePath: symFilePath,
-              line: sym.line,
-              exported: symExported,
-              dependencies: deps,
-              dependents,
-              source: 'enrichment-db',
-            });
+          if (matchedNodes.length === 0) {
+            const lower = query.toLowerCase();
+            matchedNodes = candidates.filter(
+              (node) =>
+                (node.qualifiedName ?? '').toLowerCase() === lower ||
+                (node.name ?? '').toLowerCase() === lower
+            );
           }
 
-          if (codeMatches.length === 0 && codeSuggestions.length === 0) {
-            const partial = dbManager.findSymbolsByNamePattern(query);
-            for (const sym of partial) {
-              if (!codeSuggestions.includes(sym.name)) {
-                codeSuggestions.push(sym.name);
-                if (codeSuggestions.length >= 5) break;
+          if (matchedNodes.length === 0 && !docMatch) {
+            const queryHasDot = query.includes('.');
+            const scoredCandidates: Array<{ label: string; score: number }> = [];
+            const seenNames = new Set<string>();
+            for (const node of candidates) {
+              if (node.name === '__constructor') continue;
+              const label = node.qualifiedName ?? node.name;
+              if (!label || seenNames.has(label)) continue;
+              // Prevent private/member clutter (e.g. GraphRepository.clock) on dot-free queries
+              if (!queryHasDot && label.includes('.')) continue;
+              seenNames.add(label);
+              const score = this.scoreSymbolSimilarity(query, label);
+              if (score >= 45) {
+                scoredCandidates.push({ label, score });
               }
             }
+            scoredCandidates.sort((a, b) => b.score - a.score || a.label.localeCompare(b.label));
+            for (const item of scoredCandidates.slice(0, 5)) {
+              codeSuggestions.push(item.label);
+            }
           }
-        } finally {
-          dbManager.close();
+
+          for (const node of matchedNodes) {
+            const rawFile = node.file ?? node.evidence?.file;
+            const filePath = rawFile
+              ? path.isAbsolute(rawFile)
+                ? path.relative(rootDir, rawFile)
+                : rawFile
+              : undefined;
+            rawCodeMatches.push({
+              id: node.id,
+              name: node.qualifiedName ?? node.name ?? node.id,
+              kind: node.kind,
+              filePath,
+              line: node.evidence?.startLine,
+              exported: Boolean(node.exported),
+              dependencies: canonicalContext.analysis.dependencies(node.id, {
+                external: externalMode,
+              }).length,
+              dependents: canonicalContext.analysis.dependents(node.id, {
+                external: externalMode,
+              }).length,
+              source: 'canonical-graph',
+            });
+          }
+        }
+      } finally {
+        canonicalContext?.close();
+      }
+
+      if (rawCodeMatches.length === 0) {
+        const dbPath = this.getDatabasePath();
+        if (fs.existsSync(dbPath)) {
+          const dbManager = new DatabaseManager(dbPath);
+          try {
+            const exact = dbManager.getSymbol(query);
+            const byName = dbManager
+              .findSymbolsByNamePattern(query)
+              .filter(
+                (sym) => sym.name === query || sym.name.toLowerCase() === query.toLowerCase()
+              );
+            const combined = (
+              exact ? [exact, ...byName.filter((s) => s.id !== exact.id)] : byName
+            ).filter((sym) => {
+              if (includeTests) return true;
+              const symFilePath = 'filePath' in sym ? sym.filePath : sym.file_path;
+              return !symFilePath || !this.isTestOrFixturePath(symFilePath);
+            });
+
+            for (const sym of combined) {
+              const rels = dbManager.getUnifiedRelationshipsBySymbol(sym.id);
+              let deps = 0;
+              let dependents = 0;
+              for (const rel of rels) {
+                const fromList = Array.isArray(rel.from) ? rel.from : [rel.from];
+                const toList = Array.isArray(rel.to) ? rel.to : [rel.to];
+                if (fromList.includes(sym.id)) deps++;
+                if (toList.includes(sym.id)) dependents++;
+              }
+              const symFilePath = 'filePath' in sym ? sym.filePath : sym.file_path;
+              const symExported =
+                'isExported' in sym ? Boolean(sym.isExported) : Boolean(sym.is_exported);
+              rawCodeMatches.push({
+                id: sym.id,
+                name: sym.name,
+                kind: sym.type,
+                filePath: symFilePath,
+                line: sym.line,
+                exported: symExported,
+                dependencies: deps,
+                dependents,
+                source: 'enrichment-db',
+              });
+            }
+
+            if (rawCodeMatches.length === 0 && codeSuggestions.length === 0 && !docMatch) {
+              const scoredFallback: Array<{ label: string; score: number }> = [];
+              const seen = new Set<string>();
+              const partial = dbManager.findSymbolsByNamePattern(query);
+              for (const sym of partial) {
+                if (!includeTests && sym.file_path && this.isTestOrFixturePath(sym.file_path)) {
+                  continue;
+                }
+                if (seen.has(sym.name)) continue;
+                seen.add(sym.name);
+                const score = this.scoreSymbolSimilarity(query, sym.name);
+                if (score >= 45) {
+                  scoredFallback.push({ label: sym.name, score });
+                }
+              }
+              scoredFallback.sort((a, b) => b.score - a.score || a.label.localeCompare(b.label));
+              for (const item of scoredFallback.slice(0, 5)) {
+                codeSuggestions.push(item.label);
+              }
+            }
+          } finally {
+            dbManager.close();
+          }
         }
       }
     }
 
-    const docSuggestions = docMatch ? [] : this.findSimilarSymbols(query, 5);
-    const mergedSuggestions = Array.from(new Set([...codeSuggestions, ...docSuggestions])).slice(
-      0,
-      8
-    );
+    const docTagsCache = new Map<string, Set<string>>();
+    const codeMatches: UnifiedCodeSymbolMatch[] = rawCodeMatches
+      .map((item) => ({
+        ...item,
+        docBinding: this.resolveDocBinding(item.filePath, docMatch, docTagsCache),
+      }))
+      .sort((left, right) => {
+        const leftBound = left.docBinding?.startsWith('bound-') ? 0 : 1;
+        const rightBound = right.docBinding?.startsWith('bound-') ? 0 : 1;
+        if (leftBound !== rightBound) return leftBound - rightBound;
+
+        const leftTopLevel = left.name.includes('.') ? 1 : 0;
+        const rightTopLevel = right.name.includes('.') ? 1 : 0;
+        if (leftTopLevel !== rightTopLevel) return leftTopLevel - rightTopLevel;
+
+        const leftExp = left.exported ? 0 : 1;
+        const rightExp = right.exported ? 0 : 1;
+        if (leftExp !== rightExp) return leftExp - rightExp;
+
+        if (right.dependents !== left.dependents) return right.dependents - left.dependents;
+        return left.id.localeCompare(right.id);
+      })
+      .slice(0, limit);
+
     const found = codeMatches.length > 0 || Boolean(docMatch);
+    const subcommandHint = !found ? this.findClosestSubcommand(query) : null;
+    const docSuggestions = !found && !codeOnly ? this.findSimilarSymbols(query, 5) : [];
+    const mergedSuggestions =
+      found || subcommandHint
+        ? []
+        : Array.from(new Set([...codeSuggestions, ...docSuggestions])).slice(0, 6);
 
     const docSummary = docMatch
       ? {
@@ -397,6 +486,7 @@ export class SymbolQueryCommand extends BaseCommand {
             found,
             codeSymbols: codeMatches,
             documentSymbol: docSummary,
+            ...(subcommandHint ? { subcommandHint } : {}),
             ...(mergedSuggestions.length > 0 ? { suggestions: mergedSuggestions } : {}),
           },
           null,
@@ -411,7 +501,10 @@ export class SymbolQueryCommand extends BaseCommand {
 
     if (!found) {
       this.printError(`Symbol '${query}' not found in code graph or [[Symbol]] checkpoints`);
-      if (mergedSuggestions.length > 0) {
+      if (subcommandHint) {
+        console.log();
+        this.printInfo(`Did you mean subcommand: tsdoc-edge symbol query ${subcommandHint}`);
+      } else if (mergedSuggestions.length > 0) {
         console.log();
         console.log(`  ${this.colors.bold}Similar symbols:${this.colors.reset}`);
         for (const suggestion of mergedSuggestions) {
@@ -428,11 +521,19 @@ export class SymbolQueryCommand extends BaseCommand {
         const exportBadge = match.exported
           ? `${this.colors.green}[exported]${this.colors.reset}`
           : `${this.colors.dim}[internal]${this.colors.reset}`;
+        const bindingBadge =
+          match.docBinding === 'bound-@source'
+            ? ` ${this.colors.green}[bound ↔ [[${docSummary?.name}]] via @source]${this.colors.reset}`
+            : match.docBinding === 'bound-@doc'
+              ? ` ${this.colors.green}[bound ↔ [[${docSummary?.name}]] via @doc]${this.colors.reset}`
+              : match.docBinding === 'unbound-homonym'
+                ? ` ${this.colors.yellow}[homonym: not bound to [[${docSummary?.name}]]]${this.colors.reset}`
+                : '';
         const location = match.filePath
           ? `${match.filePath}${match.line ? `:${match.line}` : ''}`
           : 'unknown';
         console.log(
-          `  ${this.colors.cyan}${this.colors.bold}${match.name}${this.colors.reset} (${this.colors.yellow}${match.kind}${this.colors.reset}) ${exportBadge}`
+          `  ${this.colors.cyan}${this.colors.bold}${match.name}${this.colors.reset} (${this.colors.yellow}${match.kind}${this.colors.reset}) ${exportBadge}${bindingBadge}`
         );
         console.log(`    Location:  ${this.colors.blue}${location}${this.colors.reset}`);
         console.log(
@@ -451,7 +552,7 @@ export class SymbolQueryCommand extends BaseCommand {
         );
       } else {
         console.log(
-          `  Primary H1:  ${this.colors.yellow}none (referenced without H1 checkpoint)${this.colors.reset}`
+          `  Primary H1:  ${this.colors.yellow}auxiliary section checkpoint (${docSummary.auxiliaryCount} heading)${this.colors.reset}`
         );
       }
       if (docSummary.sourceFilePath) {
@@ -851,15 +952,96 @@ export class SymbolQueryCommand extends BaseCommand {
   }
 
   /**
-   * Find similar symbol names
+   * Check whether a document symbol entry has a real primary H1 or auxiliary heading definition.
+   */
+  private isDefinedCheckpoint(info: SymbolInfo): boolean {
+    return Boolean(info.primary) || info.auxiliaries.length > 0;
+  }
+
+  /**
+   * Check whether a relative file path belongs to tests, mocks, or test fixtures.
+   */
+  private isTestOrFixturePath(relPath: string): boolean {
+    const normalized = relPath.replace(/\\/g, '/');
+    return (
+      /(?:^|\/)(?:__tests__|fixtures|__mocks__)\//i.test(normalized) ||
+      /\.(?:test|spec)\.[cm]?tsx?$/i.test(normalized)
+    );
+  }
+
+  /**
+   * Resolve explicit provenance binding between a matched code file and a `[[Symbol]]` checkpoint.
+   */
+  private resolveDocBinding(
+    filePath: string | undefined,
+    docMatch: SymbolInfo | undefined,
+    docTagsCache: Map<string, Set<string>>
+  ): DocBindingStatus {
+    if (!docMatch) return null;
+    if (!filePath) return 'unbound-homonym';
+
+    const normalizedCodePath = filePath.replace(/\\/g, '/').replace(/^\.\//, '');
+    const normalizedDocSource = docMatch.sourceFilePath?.replace(/\\/g, '/').replace(/^\.\//, '');
+    if (normalizedDocSource && normalizedCodePath === normalizedDocSource) {
+      return 'bound-@source';
+    }
+
+    let fileDocTags = docTagsCache.get(normalizedCodePath);
+    if (!fileDocTags) {
+      fileDocTags = new Set<string>();
+      const absPath = path.resolve(process.cwd(), normalizedCodePath);
+      if (fs.existsSync(absPath)) {
+        try {
+          const sourceText = fs.readFileSync(absPath, 'utf-8');
+          for (const entry of extractDocCheckpointsFromSource(sourceText, absPath)) {
+            fileDocTags.add(entry.docSymbol);
+          }
+        } catch {
+          // Ignore unreadable files and treat as unbound
+        }
+      }
+      docTagsCache.set(normalizedCodePath, fileDocTags);
+    }
+
+    if (fileDocTags.has(docMatch.name)) {
+      return 'bound-@doc';
+    }
+
+    return 'unbound-homonym';
+  }
+
+  /**
+   * Detect if an input token is a close typo of a reserved `symbol query` subcommand.
+   */
+  private findClosestSubcommand(input: string): string | null {
+    // Only check lowercase/kebab tokens so PascalCase/camelCase symbol names never trigger subcommand hints
+    if (!/^[a-z-]+$/.test(input)) return null;
+    const subcommands = ['list', 'search', 'info', 'backlinks', 'similar', 'stats', 'lookup'];
+    let best: { name: string; distance: number } | null = null;
+    for (const sub of subcommands) {
+      if (sub === input) continue;
+      const distance = this.levenshteinDistance(input, sub);
+      const maxLen = Math.max(input.length, sub.length);
+      if (distance <= 2 && distance / maxLen <= 0.35) {
+        if (!best || distance < best.distance) {
+          best = { name: sub, distance };
+        }
+      }
+    }
+    return best ? best.name : null;
+  }
+
+  /**
+   * Find similar symbol names among defined document checkpoints
    */
   private findSimilarSymbols(target: string, maxResults: number): string[] {
     const results: Array<{ name: string; score: number }> = [];
 
-    for (const name of this.symbols.keys()) {
+    for (const [name, info] of this.symbols.entries()) {
       if (name === target) continue;
+      if (!this.isDefinedCheckpoint(info)) continue;
       const score = this.scoreSymbolSimilarity(target, name);
-      if (score > 10) {
+      if (score >= 45) {
         results.push({ name, score });
       }
     }
@@ -871,58 +1053,95 @@ export class SymbolQueryCommand extends BaseCommand {
   }
 
   /**
-   * Score similarity between a target symbol query and a candidate symbol name.
+   * Score similarity between a target symbol query and a candidate symbol name with strict false-positive rejection.
    */
   private scoreSymbolSimilarity(target: string, candidate: string): number {
     if (target === candidate) return 0;
     const normalized = this.normalizeSymbolName(target);
     const symNormalized = this.normalizeSymbolName(candidate);
-    if (!normalized || !symNormalized) return 0;
+    const compactTarget = normalized.replace(/-/g, '');
+    const compactCandidate = symNormalized.replace(/-/g, '');
+    if (compactTarget.length < 3 || compactCandidate.length < 3) return 0;
 
-    let score = 0;
+    const minLen = Math.min(compactTarget.length, compactCandidate.length);
+    const maxLen = Math.max(compactTarget.length, compactCandidate.length);
+    const isSubstring =
+      compactCandidate.includes(compactTarget) || compactTarget.includes(compactCandidate);
 
-    if (symNormalized.includes(normalized) || normalized.includes(symNormalized)) {
-      score += 50;
+    if (!isSubstring && maxLen > Math.floor(minLen * 1.8) + 2) {
+      return 0;
     }
 
-    // Shared prefix bonus (e.g. GraphRepositryTypo vs GraphRepository)
-    let prefixLen = 0;
-    const minLen = Math.min(normalized.length, symNormalized.length);
-    while (prefixLen < minLen && normalized[prefixLen] === symNormalized[prefixLen]) {
-      prefixLen++;
-    }
-    if (prefixLen >= 5) {
-      score += Math.min(20, prefixLen * 2);
-    }
+    const distance = this.levenshteinDistance(compactTarget, compactCandidate);
+    const normSim = 1 - distance / maxLen;
+    const dice = this.bigramDice(compactTarget, compactCandidate);
 
-    // CamelCase / separator token overlap
     const targetWords = this.tokenizeSymbolWords(target);
     const symWords = this.tokenizeSymbolWords(candidate);
-    const symWordSet = new Set(symWords);
-    let overlap = 0;
-    for (const word of targetWords) {
-      if (symWordSet.has(word)) {
-        overlap++;
-      } else if (
-        word.length >= 4 &&
-        symWords.some(
-          (sw) =>
-            sw.length >= 4 &&
-            Math.abs(sw.length - word.length) <= 2 &&
-            this.levenshteinDistance(word, sw) <= 2
-        )
-      ) {
-        overlap++;
-      }
+    let matchedCandidateTokens = 0;
+    for (const sw of symWords) {
+      const matched = targetWords.some((tw) => {
+        if (tw === sw) return true;
+        if (tw.length < 4 || sw.length < 4 || Math.abs(tw.length - sw.length) > 2) return false;
+        const wordDist = this.levenshteinDistance(tw, sw);
+        return 1 - wordDist / Math.max(tw.length, sw.length) >= 0.75;
+      });
+      if (matched) matchedCandidateTokens++;
     }
-    score += overlap * 10;
+    const candidateTokenCoverage =
+      symWords.length > 0 ? matchedCandidateTokens / symWords.length : 0;
 
-    if (Math.abs(normalized.length - symNormalized.length) <= 10) {
-      const distance = this.levenshteinDistance(normalized, symNormalized);
-      score += Math.max(0, 22 - distance * 2);
+    const passesWholeNameTypo = normSim >= 0.68 && dice >= 0.45;
+    const passesSubstring = isSubstring && minLen >= 4 && minLen / maxLen >= 0.45;
+    const passesMultiTokenTypo =
+      symWords.length >= 2 &&
+      matchedCandidateTokens >= 2 &&
+      candidateTokenCoverage >= 0.66 &&
+      dice >= 0.45;
+
+    if (!passesWholeNameTypo && !passesSubstring && !passesMultiTokenTypo) {
+      return 0;
     }
+
+    let prefixLen = 0;
+    while (prefixLen < minLen && compactTarget[prefixLen] === compactCandidate[prefixLen]) {
+      prefixLen++;
+    }
+
+    const score =
+      Math.round(normSim * 45) +
+      Math.round(dice * 30) +
+      Math.round(candidateTokenCoverage * 20) +
+      (passesSubstring ? 12 : 0) +
+      Math.min(10, prefixLen);
 
     return score;
+  }
+
+  /**
+   * Compute character bigram Sørensen–Dice coefficient in [0, 1].
+   */
+  private bigramDice(a: string, b: string): number {
+    if (a === b) return 1;
+    if (a.length < 2 || b.length < 2) return 0;
+
+    const bigramsA = new Map<string, number>();
+    for (let i = 0; i < a.length - 1; i++) {
+      const bg = a.slice(i, i + 2);
+      bigramsA.set(bg, (bigramsA.get(bg) || 0) + 1);
+    }
+
+    let intersection = 0;
+    for (let i = 0; i < b.length - 1; i++) {
+      const bg = b.slice(i, i + 2);
+      const count = bigramsA.get(bg) || 0;
+      if (count > 0) {
+        intersection++;
+        bigramsA.set(bg, count - 1);
+      }
+    }
+
+    return (2 * intersection) / (a.length - 1 + (b.length - 1));
   }
 
   /**

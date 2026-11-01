@@ -137,9 +137,13 @@ function levenshteinDistance(a: string, b: string): number {
  * @returns Returns string[]
  */
 function findSimilarCommands(input: string, commands: string[], maxDistance = 3): string[] {
+  const lowerInput = input.toLowerCase();
   return commands
-    .map((cmd) => ({ cmd, distance: levenshteinDistance(input.toLowerCase(), cmd.toLowerCase()) }))
-    .filter(({ distance }) => distance <= maxDistance)
+    .map((cmd) => ({ cmd, distance: levenshteinDistance(lowerInput, cmd.toLowerCase()) }))
+    .filter(({ cmd, distance }) => {
+      const maxLen = Math.max(lowerInput.length, cmd.length);
+      return distance <= maxDistance && distance < maxLen && distance / maxLen <= 0.45;
+    })
     .sort((a, b) => a.distance - b.distance)
     .slice(0, 3)
     .map(({ cmd }) => cmd);
