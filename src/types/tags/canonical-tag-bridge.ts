@@ -11,7 +11,13 @@
  * @packageDocumentation
  */
 
-import type { RelationshipType } from '../relationships/unified';
+import {
+  GraphAnalysisService,
+  graphEdgeSemantic,
+  type RelationshipProjectionOptions,
+} from '../../graph-analysis';
+import type { CanonicalProjectGraph } from '../../indexer/contracts';
+import type { RelationshipType, UnifiedRelationship } from '../relationships/unified';
 
 /**
  * Module specification aspect name in the 7-aspect framework.
@@ -499,29 +505,41 @@ export const RETIRED_CUSTOM_TAG_MIGRATIONS: readonly RetiredTagMigration[] = [
   },
 ] as const;
 
-const TTSC_EDGE_TO_RELATIONSHIP_MAP: Readonly<Record<TtscCanonicalEdgeKind, RelationshipType>> = {
-  implements: 'implementation',
-  extends: 'inheritance',
-  calls: 'calls',
-  accesses: 'code-dependency',
-  instantiates: 'code-dependency',
-  type_ref: 'type-dependency',
-};
-
 const RETIRED_BY_NAME: ReadonlyMap<string, RetiredTagMigration> = new Map(
   RETIRED_CUSTOM_TAG_MIGRATIONS.map((entry) => [entry.tagName, entry])
 );
 
 /**
  * Map a canonical `@ttsc/graph` edge kind onto its corresponding `tsdoc-edge`
- * unified relationship type.
+ * unified relationship type by delegating directly to the canonical
+ * `graphEdgeSemantic` registry (`src/graph-analysis/edge-semantics.ts`).
  *
  * @param kind - Canonical edge kind emitted by `@ttsc/graph`
  * @returns Corresponding `tsdoc-edge` `RelationshipType`
  * @public
  */
 export function mapTtscEdgeKindToRelationshipType(kind: TtscCanonicalEdgeKind): RelationshipType {
-  return TTSC_EDGE_TO_RELATIONSHIP_MAP[kind];
+  const relationshipType = graphEdgeSemantic(kind).relationshipType;
+  if (!relationshipType) {
+    throw new Error(`Unprojectable @ttsc/graph canonical edge kind: ${kind}`);
+  }
+  return relationshipType;
+}
+
+/**
+ * Project canonical `@ttsc/graph` compiler edges directly into `tsdoc-edge`
+ * `UnifiedRelationship` records via `GraphAnalysisService.projectUnifiedRelationships`.
+ *
+ * @param graph - Canonical project graph produced from `@ttsc/graph`
+ * @param options - Optional edge-kind or semantic-category filters
+ * @returns Immutable array of projected `UnifiedRelationship` records
+ * @public
+ */
+export function projectCanonicalTtscRelationships(
+  graph: CanonicalProjectGraph,
+  options: RelationshipProjectionOptions = {}
+): readonly UnifiedRelationship[] {
+  return new GraphAnalysisService(graph).projectUnifiedRelationships(options);
 }
 
 /**

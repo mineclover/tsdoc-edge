@@ -7,6 +7,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';
+import { extractLeadingJsDocText, readTsdocComment, TSDocParser } from '../parser/TSDocParser';
 import type { Symbol, SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 
@@ -34,8 +35,8 @@ interface FeatureGroup {
  * - Domain boundaries
  *
  * Detection:
- * 1. Parse @feature tags in TSDoc
- * 2. Analyze directory structure (features/auth/*, features/billing/*)
+ * 1. Parse `@feature` tags in TSDoc
+ * 2. Analyze directory structure (`features/auth/*`, `features/billing/*`)
  * 3. Detect shared feature prefix
  *
  * @example
@@ -56,6 +57,7 @@ interface FeatureGroup {
  */
 export class FeatureGroupingAnalyzer {
   private graph: SymbolGraph;
+  private readonly tsdocParser = new TSDocParser();
 
   constructor(graph: SymbolGraph) {
     this.graph = graph;
@@ -89,7 +91,7 @@ export class FeatureGroupingAnalyzer {
   }
 
   /**
-   * Collect feature groups from @feature tags
+   * Collect feature groups from `@feature` tags
    *
    * @param rootDir - Root directory
    * @returns Array of feature groups
@@ -112,7 +114,7 @@ export class FeatureGroupingAnalyzer {
   }
 
   /**
-   * Extract @feature tags from source file
+   * Extract `@feature` tags from source file
    *
    * @param sourceFile - Source file
    * @param filePath - File path
@@ -125,32 +127,27 @@ export class FeatureGroupingAnalyzer {
   ): void {
     const visit = (node: ts.Node): void => {
       try {
-        const jsDocTags = ts.getJSDocTags(node);
-        if (jsDocTags && jsDocTags.length > 0) {
-          const symbolName = this.getSymbolName(node);
-
-          if (symbolName) {
-            // Find symbol ID
-            const symbol = this.findSymbolByName(symbolName);
-            if (symbol) {
-              for (const tag of jsDocTags) {
-                if (tag.tagName.text === 'feature') {
-                  const featureName = this.getTagComment(tag);
-                  if (featureName) {
-                    const normalizedName = featureName.trim();
-                    if (!groups.has(normalizedName)) {
-                      const line =
-                        sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line +
-                        1;
-                      groups.set(normalizedName, {
-                        featureName: normalizedName,
-                        members: [],
-                        filePath,
-                        line,
-                      });
-                    }
-                    groups.get(normalizedName)?.members.push(symbol.id);
+        const symbolName = this.getSymbolName(node);
+        if (symbolName) {
+          const symbol = this.findSymbolByName(symbolName);
+          if (symbol) {
+            const jsDoc = extractLeadingJsDocText(node, sourceFile);
+            if (jsDoc) {
+              const structured = readTsdocComment(this.tsdocParser.parseString(jsDoc).docComment);
+              for (const rawFeature of structured.getTagValues('@feature')) {
+                const normalizedName = rawFeature.trim();
+                if (normalizedName) {
+                  if (!groups.has(normalizedName)) {
+                    const line =
+                      sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
+                    groups.set(normalizedName, {
+                      featureName: normalizedName,
+                      members: [],
+                      filePath,
+                      line,
+                    });
                   }
+                  groups.get(normalizedName)?.members.push(symbol.id);
                 }
               }
             }
@@ -285,24 +282,6 @@ export class FeatureGroupingAnalyzer {
       if (symbol.name === name) return symbol;
     }
     return undefined;
-  }
-
-  /**
-   * Get comment from JSDoc tag
-   *
-   * @param tag - JSDoc tag
-   * @returns Comment text or null
-   */
-  private getTagComment(tag: ts.JSDocTag): string | null {
-    if (tag.comment) {
-      if (typeof tag.comment === 'string') return tag.comment;
-      if (Array.isArray(tag.comment)) {
-        return tag.comment
-          .map((part: ts.JSDocText | ts.JSDocLink) => ('text' in part ? part.text : ''))
-          .join('');
-      }
-    }
-    return null;
   }
 
   /**

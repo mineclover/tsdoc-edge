@@ -14,6 +14,8 @@
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
+import { CanonicalAliasContext } from '../indexer/CanonicalAliasContext';
+import { extractDocCheckpointsFromSource } from '../parser/TSDocParser';
 import { SpecMetricsAggregator } from '../spec/SpecMetricsAggregator';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import type { SymbolType } from '../types/graph';
@@ -89,6 +91,12 @@ interface WorkContext {
     description?: string;
     properties?: Record<string, unknown>;
   }>;
+  canonicalGraph?: {
+    revisionId: string;
+    nodeCount: number;
+    internalDependencies: number;
+    internalDependents: number;
+  };
 }
 
 /**
@@ -246,46 +254,69 @@ export class DesignContextCommand extends BaseCommand {
     // Extract symbol IDs for batch queries
     const symbolIds = context.symbols.map((s) => s.id);
 
-    // 2. Parse file for @doc tags (related documents)
+    // 2. Parse file for AST-verified @doc tags (related documents) via @microsoft/tsdoc
     try {
       const fileContent = fs.readFileSync(absolutePath, 'utf-8');
-      const lines = fileContent.split('\n');
-
-      // Simple regex to find @doc tags
-      const docTagRegex = /@doc\s+\[\[([^\]]+)\]\]/g;
+      const checkpoints = extractDocCheckpointsFromSource(absolutePath, fileContent, {
+        requireDeclaration: false,
+      });
       const specAggregator = new SpecMetricsAggregator();
 
-      lines.forEach((line, index) => {
-        const matches = line.matchAll(docTagRegex);
-        for (const match of matches) {
-          const symbolRef = match[1];
-          const docPath = this.findDocumentPath(symbolRef);
-          let specScore: number | undefined;
-          let specStatus: string | undefined;
+      for (const checkpoint of checkpoints) {
+        const symbolRef = checkpoint.rawReference;
+        const docPath = this.findDocumentPath(checkpoint.docSymbol);
+        let specScore: number | undefined;
+        let specStatus: string | undefined;
 
-          if (docPath && docPath !== '(not found)' && fs.existsSync(docPath)) {
-            try {
-              const specMetrics = specAggregator.getSpecMetricsForFile(docPath);
-              specScore = specMetrics.score;
-              specStatus = specMetrics.status;
-            } catch {
-              // Ignore
-            }
+        if (docPath && docPath !== '(not found)' && fs.existsSync(docPath)) {
+          try {
+            const specMetrics = specAggregator.getSpecMetricsForFile(docPath);
+            specScore = specMetrics.score;
+            specStatus = specMetrics.status;
+          } catch {
+            // Ignore
           }
-
-          context.relatedDocs.push({
-            title: symbolRef,
-            path: docPath,
-            symbolRef,
-            sourceFile: relativePath,
-            sourceLine: index + 1,
-            specScore,
-            specStatus,
-          });
         }
-      });
+
+        context.relatedDocs.push({
+          title: symbolRef,
+          path: docPath,
+          symbolRef,
+          sourceFile: relativePath,
+          sourceLine: checkpoint.commentLine,
+          specScore,
+          specStatus,
+        });
+      }
     } catch (_error) {
       // Continue even if parsing fails
+    }
+
+    // 2b. Attach canonical @ttsc/graph structural facts when active canonical revision exists
+    const canonicalContext = CanonicalAliasContext.tryOpen(process.cwd());
+    if (canonicalContext) {
+      try {
+        const fileNodes = canonicalContext.nodesInFile(absolutePath);
+        if (fileNodes.length > 0) {
+          let internalDependencies = 0;
+          let internalDependents = 0;
+          for (const node of fileNodes) {
+            const counts = canonicalContext.structuralCounts(node.id);
+            if (counts) {
+              internalDependencies += counts.dependencies;
+              internalDependents += counts.dependents;
+            }
+          }
+          context.canonicalGraph = {
+            revisionId: canonicalContext.revisionId,
+            nodeCount: fileNodes.length,
+            internalDependencies,
+            internalDependents,
+          };
+        }
+      } finally {
+        canonicalContext.close();
+      }
     }
 
     // 3. Get dependencies (what this file uses) - Use unified_relationships via Drizzle
@@ -555,7 +586,11 @@ export class DesignContextCommand extends BaseCommand {
     output += `- **Tests**: ${context.tests.length}\n`;
     output += `- **Dependencies**: ${context.dependencies.length}\n`;
     output += `- **Used By**: ${context.usedBy.length} files\n`;
-    output += `- **Relationships**: ${context.relationships.length}\n\n`;
+    output += `- **Relationships**: ${context.relationships.length}\n`;
+    if (context.canonicalGraph) {
+      output += `- **Canonical @ttsc/graph**: ${context.canonicalGraph.nodeCount} nodes, ${context.canonicalGraph.internalDependencies} deps, ${context.canonicalGraph.internalDependents} dependents (${context.canonicalGraph.revisionId})\n`;
+    }
+    output += '\n';
 
     // Symbols
     if (context.symbols.length > 0) {

@@ -50,8 +50,11 @@ export class ConventionValidator {
       });
     }
 
-    // Rule 2: Public APIs must have @public tag
-    if (!this.hasPublicTag(parsedComment.docComment) && this.isPublicAPI(parsedComment)) {
+    // Rule 2: Exported APIs must declare a standard TSDoc release visibility modifier
+    if (
+      !this.hasReleaseVisibilityTag(parsedComment.docComment) &&
+      this.isPublicAPI(parsedComment)
+    ) {
       validationResults.push({
         ruleId: 'require-public-tag',
         severity: 'warning',
@@ -210,14 +213,15 @@ export class ConventionValidator {
   }
 
   /**
-   * Check if doc comment has `@public` tag
+   * Check if doc comment declares any standard `@microsoft/tsdoc` release visibility modifier
+   * (`@public`, `@beta`, `@alpha`, or `@internal`).
    *
    * @param docComment - TSDoc comment
-   * @returns True if `@public` tag exists
+   * @returns True if a standard release visibility modifier tag exists
    */
-  private hasPublicTag(docComment: DocComment): boolean {
-    const modifierTag = docComment.modifierTagSet.nodes.find((tag) => tag.tagName === '@public');
-    return !!modifierTag;
+  private hasReleaseVisibilityTag(docComment: DocComment): boolean {
+    const releaseTags = new Set(['@public', '@beta', '@alpha', '@internal']);
+    return docComment.modifierTagSet.nodes.some((tag) => releaseTags.has(tag.tagName));
   }
 
   /**
@@ -334,8 +338,8 @@ export class ConventionValidator {
       score += 40;
     }
 
-    // @public tag for public symbols
-    if (this.hasPublicTag(parsedComment.docComment)) {
+    // Standard release visibility modifier (@public, @beta, @alpha, @internal)
+    if (this.hasReleaseVisibilityTag(parsedComment.docComment)) {
       score += 10;
     }
 
@@ -373,10 +377,12 @@ export class ConventionValidator {
       score += 5;
     }
 
-    // Check for @testScenario or @doc connectivity tag
-    const hasVerificationLink = parsedComment.docComment.customBlocks.some(
-      (block) => block.blockTag.tagName === '@testScenario' || block.blockTag.tagName === '@doc'
-    );
+    // Check for @testScenario, @doc, or standard @see connectivity tag
+    const hasVerificationLink =
+      (parsedComment.docComment.seeBlocks?.length ?? 0) > 0 ||
+      parsedComment.docComment.customBlocks.some(
+        (block) => block.blockTag.tagName === '@testScenario' || block.blockTag.tagName === '@doc'
+      );
     if (hasVerificationLink) {
       score += 5;
     }

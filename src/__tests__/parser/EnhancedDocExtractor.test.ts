@@ -132,19 +132,39 @@ export class CacheService {}
       expect(result[0].doc.futurePlans?.[0]?.priority).toBe('high');
     });
 
-    it('should extract error experience tags', () => {
+    it('should extract error experiences from standard @throws tags and pair multiple ADR @decision blocks', () => {
       const source = `
 /**
- * Test class
- * @errorExp Connection timeout
- * @errorSolution Add retry logic
+ * Test class referencing {@link RetryPolicy}
+ * @throws NetworkTimeoutError - Connection timeout - Add retry logic
+ * @decision Use exponential backoff
+ * @rationale Avoid thundering herd
+ * @consequences Slight tail latency increase
+ * @decision Circuit-break after 3 failures
+ * @rationale Protect downstream storage
+ * @consequences Fast-fail under outage
  */
 export class NetworkService {}
       `;
 
       const result = extractor.extractFromFile('test.ts', source);
 
-      expect(result.length).toBeGreaterThanOrEqual(0);
+      expect(result).toHaveLength(1);
+      expect(result[0].doc.errorExperiences).toEqual([
+        expect.objectContaining({
+          errorType: 'NetworkTimeoutError',
+          message: 'Connection timeout',
+          solution: 'Add retry logic',
+        }),
+      ]);
+      expect(result[0].doc.decisions).toHaveLength(2);
+      expect(result[0].doc.decisions?.[0]?.decision).toBe('Use exponential backoff');
+      expect(result[0].doc.decisions?.[1]?.decision).toBe('Circuit-break after 3 failures');
+      expect(result[0].doc.dependencies).toContainEqual({
+        target: 'RetryPolicy',
+        type: 'symbol',
+        reason: 'TSDoc {@link} reference',
+      });
     });
   });
 

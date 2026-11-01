@@ -456,5 +456,30 @@ export class ExternalPackage {}
 
       expect(result).toEqual([]);
     });
+
+    it('should ignore backticked `@relatedTo` prose and `@example` fenced code blocks', () => {
+      fs.writeFileSync(
+        path.join(tempDir, 'analyzer-doc.ts'),
+        `
+/**
+ * Parses \`@relatedTo\` tags without false positives
+ * @responsibility Extract \`@relatedTo\` tags cleanly
+ * @example
+ * \`\`\`typescript
+ * /**
+ *  * @relatedTo FakeExampleTarget - Inside fenced example
+ *  *\\/
+ * export class ExampleService {}
+ * \`\`\`
+ */
+export class DocumentedAnalyzer {}
+`,
+        'utf-8'
+      );
+
+      const result = analyzer.analyze(tempDir);
+
+      expect(result).toEqual([]);
+    });
   });
 });

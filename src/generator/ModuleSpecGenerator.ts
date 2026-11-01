@@ -4,12 +4,11 @@
  * @packageDocumentation
  * @responsibility Generate module specifications using 7-part framework
  * @problem Manual module specification creation is time-consuming
- * @solves Automatically extract module specs from TypeScript source code
+ * @solves Automatically extract module specs from TypeScript source code and `@microsoft/tsdoc` AST
  */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
-import type { ParserContext } from '@microsoft/tsdoc';
 import * as ts from 'typescript';
 import {
   ASTSymbolExtractor,
@@ -18,7 +17,12 @@ import {
 } from '../analyzer/ASTSymbolExtractor';
 import { EnhancedDocExtractor, type ExtractedEnhancedDoc } from '../parser/EnhancedDocExtractor';
 import { ModuleSpecTagParser } from '../parser/ModuleSpecTagParser';
-import { TSDocParser } from '../parser/TSDocParser';
+import {
+  extractLeadingJsDocText,
+  readTsdocComment,
+  type StructuredTsdocComment,
+  TSDocParser,
+} from '../parser/TSDocParser';
 import type {
   DependencySpec,
   FailureCase,
@@ -40,6 +44,7 @@ import type { ModuleSpecTags } from '../types/tags/module-spec-tags';
 
 /**
  * Generator options
+ * @public
  */
 export interface GeneratorOptions {
   /** Include heuristic analysis for Logic section */
@@ -56,16 +61,17 @@ export interface GeneratorOptions {
  * Module specification generator
  *
  * @doc [[ModuleSpecGenerator]]
+ * @doc [[CrossSpecIntegrationContract]]
  * @public
- * @responsibility Extract and generate 7-part module specifications from TypeScript code
+ * @responsibility Extract and generate 7-part module specifications from TypeScript AST and `@microsoft/tsdoc` `DocComment` AST
  * @functionality
- * - Purpose extraction from `@problem`, `@responsibility` tags
- * - Input extraction from function parameters and `@precondition`
- * - Output extraction from return types and `@postcondition`
- * - Context extraction from imports and `@depends`
- * - Logic extraction from `@functionality` and code analysis
- * - Effect detection from side effect patterns
- * - Scope extraction from export modifiers
+ * - Purpose extraction from `@problem`, `@responsibility`, `@solves`, and standard TSDoc summary
+ * - Input extraction from function parameters, `@param`, `@defaultValue`, `@contract`, and `@precondition`
+ * - Output extraction from return types, `@returns`, `@throws`, and `@postcondition`
+ * - Context extraction from TypeScript AST imports, `@see`, `{@link}`, and semantic relation tags
+ * - Logic extraction from `@algorithm`, standard `@remarks`, `@functionality`, `@invariant`, and AST complexity
+ * - Effect detection from `@sideEffect` tags and side-effect AST patterns
+ * - Scope extraction from export/access modifiers and standard `@public`/`@internal`/`@beta`/`@alpha` tags
  */
 export class ModuleSpecGenerator {
   private tsdocParser: TSDocParser;
@@ -171,12 +177,10 @@ export class ModuleSpecGenerator {
           try {
             let results = this.generateSpecsForFile(fullPath);
 
-            // Filter by confidence
             if (minConfidence > 0) {
               results = results.filter((r) => r.confidence >= minConfidence);
             }
 
-            // Filter private symbols
             if (!includePrivate) {
               results = results.filter((r) => r.spec.scope.isPublicAPI);
             }
@@ -202,7 +206,6 @@ export class ModuleSpecGenerator {
     const visit = (node: ts.Node) => {
       const name = this.getNodeName(node);
 
-      // Only include exported symbols
       if (name && this.hasExportModifier(node)) {
         if (
           ts.isFunctionDeclaration(node) ||
@@ -255,7 +258,7 @@ export class ModuleSpecGenerator {
     }
     if (ts.isVariableStatement(node)) {
       const decl = node.declarationList.declarations[0];
-      if (ts.isIdentifier(decl.name)) {
+      if (decl && ts.isIdentifier(decl.name)) {
         return decl.name.text;
       }
     }
@@ -271,19 +274,15 @@ export class ModuleSpecGenerator {
     filePath: string,
     symbolName: string
   ): ModuleSpecTemplate {
-    const jsDoc = this.getJSDocComment(node, sourceFile);
+    const jsDoc = extractLeadingJsDocText(node, sourceFile);
     const tsdocContext = jsDoc ? this.tsdocParser.parseString(jsDoc) : null;
-    const customTags = this.parseCustomTags(jsDoc || '');
-
-    // Parse module spec tags (NEW!)
+    const structured = tsdocContext ? readTsdocComment(tsdocContext.docComment) : null;
     const specTags = this.specTagParser.parseModuleSpecTags(tsdocContext, jsDoc || '');
 
-    // Extract enhanced documentation
     const sourceCode = sourceFile.getFullText();
     const enhancedDocs = this.enhancedExtractor.extractFromFile(filePath, sourceCode);
     const enhancedDoc = enhancedDocs.find((d) => d.symbol.name === symbolName);
 
-    // Extract AST information
     const astResult = this.astExtractor.extract(filePath, sourceCode);
     const astSymbol = astResult.symbols.find((s) => s.name === symbolName);
 
@@ -292,120 +291,84 @@ export class ModuleSpecGenerator {
       symbolName,
       symbolKind: this.getSymbolKind(node),
       filePath,
-      purpose: this.extractPurpose(tsdocContext, customTags, enhancedDoc),
-      input: this.extractInput(node, tsdocContext, customTags),
-      output: this.extractOutput(node, tsdocContext, customTags, enhancedDoc),
-      context: this.extractContext(
-        filePath,
-        sourceCode,
-        customTags,
-        astResult.imports,
-        enhancedDoc
-      ),
-      logic: this.extractLogic(node, sourceFile, customTags, enhancedDoc, specTags),
-      effect: this.extractEffect(node, sourceFile, customTags, specTags),
-      scope: this.extractScope(node, astSymbol, customTags, specTags),
-      completionConfidence: 0, // Will be calculated
-      manualReviewNeeded: [], // Will be populated
+      purpose: this.extractPurpose(structured, enhancedDoc),
+      input: this.extractInput(node, structured),
+      output: this.extractOutput(node, structured, enhancedDoc),
+      context: this.extractContext(sourceCode, structured, astResult.imports, enhancedDoc),
+      logic: this.extractLogic(node, structured, enhancedDoc, specTags),
+      effect: this.extractEffect(node, sourceFile, specTags),
+      scope: this.extractScope(node, astSymbol, structured, specTags),
+      completionConfidence: 0,
+      manualReviewNeeded: [],
       generatedAt: new Date().toISOString(),
     };
   }
 
   /**
    * Extract Purpose section (1/7)
-   * Confidence: 95%
    */
   private extractPurpose(
-    tsdocContext: ParserContext | null,
-    customTags: Map<string, string[]>,
+    structured: StructuredTsdocComment | null,
     enhancedDoc?: ExtractedEnhancedDoc
   ): ModulePurpose {
-    const purpose: ModulePurpose = {
-      problem: '',
-      responsibility: '',
-      solution: '',
-      context: undefined,
+    const problem =
+      structured?.getFirstTagValue('@problem') ??
+      enhancedDoc?.doc.problemSolving?.description ??
+      '';
+    const responsibility =
+      structured?.getFirstTagValue('@responsibility') || structured?.summary || '';
+    const solution = structured?.getFirstTagValue('@solves') ?? '';
+    const context = structured?.getFirstTagValue('@context');
+
+    return {
+      problem,
+      responsibility,
+      solution,
+      context,
     };
-
-    // From @problem tag
-    if (customTags.has('problem')) {
-      purpose.problem = customTags.get('problem')?.[0] || '';
-    } else if (enhancedDoc?.doc.problemSolving?.description) {
-      purpose.problem = enhancedDoc.doc.problemSolving.description;
-    }
-
-    // From @responsibility tag
-    if (customTags.has('responsibility')) {
-      purpose.responsibility = customTags.get('responsibility')?.[0] || '';
-    }
-
-    // From @solves tag
-    if (customTags.has('solves')) {
-      purpose.solution = customTags.get('solves')?.[0] || '';
-    }
-
-    // From @context tag
-    if (customTags.has('context')) {
-      purpose.context = customTags.get('context')?.[0];
-    }
-
-    // Fallback: use summary
-    if (!purpose.problem && !purpose.responsibility && tsdocContext) {
-      const summary = this.extractTextFromDocNode(tsdocContext.docComment.summarySection);
-      if (summary) {
-        purpose.responsibility = summary;
-      }
-    }
-
-    return purpose;
   }
 
   /**
    * Extract Input section (2/7)
-   * Confidence: 90%
    */
-  private extractInput(
-    node: ts.Node,
-    tsdocContext: ParserContext | null,
-    customTags: Map<string, string[]>
-  ): ModuleInput {
+  private extractInput(node: ts.Node, structured: StructuredTsdocComment | null): ModuleInput {
     const parameters: ParamSpec[] = [];
-    const preconditions: string[] = customTags.get('precondition') || [];
-    const constraints: string[] = [];
+    const preconditions: string[] = [
+      ...(structured?.getTagValues('@precondition').filter((v) => v.length > 0) ?? []),
+    ];
+    const contractText = structured?.getFirstTagValue('@contract');
+    const constraints: string[] = contractText ? [contractText] : [];
 
-    // Extract parameters from AST
     if (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)) {
+      const paramDocs = new Map<string, string>();
+      for (const paramEntry of structured?.params ?? []) {
+        if (paramEntry.description) {
+          paramDocs.set(paramEntry.name, paramEntry.description);
+        }
+      }
+
       for (const param of node.parameters) {
         const paramSpec: ParamSpec = {
           name: param.name.getText(),
           type: param.type ? param.type.getText() : 'any',
-          optional: !!param.questionToken,
+          optional: Boolean(param.questionToken || param.initializer),
           constraints: [],
         };
 
-        // Add default value
         if (param.initializer) {
           paramSpec.defaultValue = param.initializer.getText();
+        } else if (node.parameters.length === 1 && structured?.defaultValue) {
+          paramSpec.defaultValue = structured.defaultValue;
         }
 
-        // Get description from @param tag
-        if (tsdocContext) {
-          const paramBlocks = tsdocContext.docComment.params.blocks;
-          for (const block of paramBlocks) {
-            if (block.parameterName === paramSpec.name) {
-              // Extract text content from DocNode
-              const contentText = this.extractTextFromDocNode(block.content);
-              if (contentText) {
-                paramSpec.description = contentText;
-              }
-            }
-          }
+        const description = paramDocs.get(paramSpec.name);
+        if (description) {
+          paramSpec.description = description;
         }
 
         parameters.push(paramSpec);
       }
 
-      // Generate type signature
       const typeSignature = this.generateTypeSignature(node);
       return {
         parameters,
@@ -424,47 +387,47 @@ export class ModuleSpecGenerator {
 
   /**
    * Extract Output section (3/7)
-   * Confidence: 90%
    */
   private extractOutput(
     node: ts.Node,
-    tsdocContext: ParserContext | null,
-    customTags: Map<string, string[]>,
+    structured: StructuredTsdocComment | null,
     enhancedDoc?: ExtractedEnhancedDoc
   ): ModuleOutput {
     const returnType: ReturnSpec = {
       type: 'void',
     };
-    const postconditions: string[] = customTags.get('postcondition') || [];
+    const postconditions: string[] = [
+      ...(structured?.getTagValues('@postcondition').filter((v) => v.length > 0) ?? []),
+    ];
     const successCases: string[] = [];
     const failureCases: FailureCase[] = [];
 
-    // Extract return type from AST
     if (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node)) {
       if (node.type) {
         returnType.type = node.type.getText();
       }
-
-      // Get @returns description
-      if (tsdocContext) {
-        const returnsBlock = tsdocContext.docComment.returnsBlock;
-        if (returnsBlock) {
-          const contentText = this.extractTextFromDocNode(returnsBlock.content);
-          if (contentText) {
-            // Trim content before custom module spec tags
-            returnType.description = this.trimBeforeModuleSpecTags(contentText);
-          }
-        }
+      if (structured?.returns) {
+        returnType.description = structured.returns;
       }
     }
 
-    // Extract failure cases from @errorExp or enhancedDoc
     if (enhancedDoc?.doc.errorExperiences?.length) {
       for (const error of enhancedDoc.doc.errorExperiences) {
         failureCases.push({
-          condition: error.context || 'Unknown condition',
+          condition: error.context || error.message || 'Unknown condition',
           errorType: error.errorType,
-          description: error.solution || error.context || '',
+          description: error.solution || error.message || '',
+        });
+      }
+    } else if (structured && structured.throws.length > 0) {
+      for (const throwsEntry of structured.throws) {
+        const typeMatch = throwsEntry.match(
+          /^([A-Z][A-Za-z0-9_.]*(?:Error|Exception))\s*(?:[-:]\s*)(.+)$/
+        );
+        failureCases.push({
+          condition: typeMatch ? typeMatch[2].trim() : throwsEntry,
+          errorType: typeMatch ? typeMatch[1] : 'Error',
+          description: typeMatch ? typeMatch[2].trim() : throwsEntry,
         });
       }
     }
@@ -479,34 +442,18 @@ export class ModuleSpecGenerator {
 
   /**
    * Extract Context section (4/7)
-   * Confidence: 85%
    */
   private extractContext(
-    _filePath: string,
     sourceCode: string,
-    customTags: Map<string, string[]>,
+    structured: StructuredTsdocComment | null,
     imports: ExtractionResult['imports'],
     enhancedDoc?: ExtractedEnhancedDoc
   ): ModuleContext {
     const dependencies: DependencySpec[] = [];
     const importSpecs: ImportSpec[] = [];
     const environment: string[] = [];
-    const requirements: string[] = customTags.get('requirement') || [];
+    const requirements: string[] = [...(structured?.see ?? [])];
 
-    // Extract from @depends tags
-    const dependencyTags = customTags.get('depends');
-    if (dependencyTags) {
-      for (const dep of dependencyTags) {
-        dependencies.push({
-          name: dep,
-          type: 'module',
-          purpose: 'Dependency',
-          critical: false,
-        });
-      }
-    }
-
-    // Extract from enhancedDoc dependencies
     if (enhancedDoc?.doc.dependencies?.length) {
       for (const dep of enhancedDoc.doc.dependencies) {
         dependencies.push({
@@ -518,7 +465,6 @@ export class ModuleSpecGenerator {
       }
     }
 
-    // Extract imports
     for (const imp of imports) {
       importSpecs.push({
         source: imp.modulePath,
@@ -527,7 +473,6 @@ export class ModuleSpecGenerator {
       });
     }
 
-    // Detect environment requirements (basic heuristics)
     if (sourceCode.includes('process.env')) {
       environment.push('Environment variables required');
     }
@@ -545,39 +490,39 @@ export class ModuleSpecGenerator {
 
   /**
    * Extract Logic section (5/7)
-   * Confidence: 60% (partial automation) → 95% with `@algorithm` tag
    */
   private extractLogic(
     node: ts.Node,
-    _sourceFile: ts.SourceFile,
-    customTags: Map<string, string[]>,
+    structured: StructuredTsdocComment | null,
     enhancedDoc: ExtractedEnhancedDoc | undefined,
     specTags: ModuleSpecTags
   ): ModuleLogic {
     const features: string[] = [];
     let algorithm = '';
-    const operations: string[] = [];
+    const operations: string[] = [
+      ...(structured?.getTagValues('@invariant').filter((v) => v.length > 0) ?? []),
+    ];
 
-    // Extract from @functionality tag
-    const functionalityTags = customTags.get('functionality');
-    if (functionalityTags) {
-      features.push(...functionalityTags);
+    const functionalityValues = structured
+      ?.getTagValues('@functionality')
+      .filter((v) => v.length > 0);
+    if (functionalityValues && functionalityValues.length > 0) {
+      features.push(...functionalityValues);
     } else if (enhancedDoc?.doc.functionality?.mainFeatures) {
       features.push(...enhancedDoc.doc.functionality.mainFeatures);
     }
 
-    // PRIORITY: Use @algorithm tag if available
     if (specTags.algorithm) {
       algorithm = specTags.algorithm.description;
       if (specTags.algorithm.steps) {
         algorithm += `\n\nSteps:\n${specTags.algorithm.steps.map((s, i) => `${i + 1}. ${s}`).join('\n')}`;
       }
+    } else if (structured?.remarks) {
+      algorithm = structured.remarks;
     } else if (this.options.includeTodos) {
-      // Provide more helpful default based on symbol kind
       algorithm = 'Add @algorithm tag to describe the processing logic';
     }
 
-    // PRIORITY: Use @complexity tag if available
     let complexity = 'Simple';
     if (specTags.complexity) {
       complexity = specTags.complexity.notation;
@@ -600,12 +545,10 @@ export class ModuleSpecGenerator {
 
   /**
    * Extract Effect section (6/7)
-   * Confidence: 50% (heuristic detection) → 95% with tags
    */
   private extractEffect(
     node: ts.Node,
     sourceFile: ts.SourceFile,
-    _customTags: Map<string, string[]>,
     specTags: ModuleSpecTags
   ): ModuleEffect {
     const sideEffects: SideEffectSpec[] = [];
@@ -613,7 +556,6 @@ export class ModuleSpecGenerator {
     const io: string[] = [];
     const observable: string[] = [];
 
-    // PRIORITY 1: Use explicit tags if available
     if (specTags.sideEffects && specTags.sideEffects.length > 0) {
       sideEffects.push(...specTags.sideEffects);
     }
@@ -626,12 +568,10 @@ export class ModuleSpecGenerator {
       io.push(...specTags.io.map((i) => `${i.type}: ${i.description}`));
     }
 
-    // PRIORITY 2: Fallback to heuristic detection if no tags
     if (sideEffects.length === 0 && io.length === 0 && mutations.length === 0) {
       if (this.options.analyzeSideEffects) {
         const nodeText = node.getText(sourceFile);
 
-        // Detect file system operations
         if (nodeText.includes('fs.writeFile') || nodeText.includes('fs.writeFileSync')) {
           sideEffects.push({
             type: 'filesystem',
@@ -644,7 +584,6 @@ export class ModuleSpecGenerator {
           io.push('File read operations');
         }
 
-        // Detect database operations
         if (nodeText.includes('db.prepare') || nodeText.includes('db.run')) {
           sideEffects.push({
             type: 'database',
@@ -653,7 +592,6 @@ export class ModuleSpecGenerator {
           io.push('Database queries');
         }
 
-        // Detect network operations
         if (nodeText.includes('fetch') || nodeText.includes('http.request')) {
           sideEffects.push({
             type: 'network',
@@ -662,12 +600,10 @@ export class ModuleSpecGenerator {
           io.push('Network calls');
         }
 
-        // Detect state mutations
         if (nodeText.includes('this.') && nodeText.includes(' = ')) {
           mutations.push('Mutates instance state');
         }
 
-        // Detect console logging
         if (nodeText.includes('console.log') || nodeText.includes('console.error')) {
           observable.push('Console output');
         }
@@ -684,18 +620,20 @@ export class ModuleSpecGenerator {
 
   /**
    * Extract Scope section (7/7)
-   * Confidence: 95% → 98% with `@scope` tag
    */
   private extractScope(
     node: ts.Node,
     _astSymbol: ExtractedSymbol | undefined,
-    customTags: Map<string, string[]>,
+    structured: StructuredTsdocComment | null,
     specTags: ModuleSpecTags
   ): ModuleScope {
     const hasExport = this.hasExportModifier(node);
-    const hasPublicTag = customTags.has('public');
+    const releaseVisibility = structured?.releaseVisibility;
+    const hasPublicReleaseTag =
+      releaseVisibility === 'public' ||
+      releaseVisibility === 'beta' ||
+      releaseVisibility === 'alpha';
 
-    // PRIORITY: Use @scope tag if available
     let visibility = this.getVisibility(node);
     if (specTags.scope?.accessLevel && specTags.scope.accessLevel !== 'internal') {
       visibility = specTags.scope.accessLevel as 'public' | 'private' | 'protected';
@@ -704,7 +642,6 @@ export class ModuleSpecGenerator {
     const exposedAPI: string[] = [];
     const exposedState: string[] = [];
 
-    // Extract public members for classes
     if (ts.isClassDeclaration(node)) {
       for (const member of node.members) {
         const memberName = this.getNodeName(member);
@@ -721,7 +658,6 @@ export class ModuleSpecGenerator {
       }
     }
 
-    // Add function/method to exposed API if exported
     if (hasExport && (ts.isFunctionDeclaration(node) || ts.isMethodDeclaration(node))) {
       const name = this.getNodeName(node);
       if (name) {
@@ -732,8 +668,8 @@ export class ModuleSpecGenerator {
     return {
       visibility,
       exposedAPI,
-      accessLevel: hasPublicTag ? 'public' : visibility,
-      isPublicAPI: hasExport && hasPublicTag,
+      accessLevel: releaseVisibility ?? visibility,
+      isPublicAPI: hasExport && hasPublicReleaseTag,
       exposedState: exposedState.length > 0 ? exposedState : undefined,
     };
   }
@@ -746,7 +682,6 @@ export class ModuleSpecGenerator {
     const manualRequired: string[] = [];
     const warnings: string[] = [];
 
-    // Check each section
     if (spec.purpose.problem || spec.purpose.responsibility) {
       autoCompleted.push('Purpose');
     } else {
@@ -754,24 +689,36 @@ export class ModuleSpecGenerator {
       warnings.push('Purpose section is empty - add @problem and @responsibility tags');
     }
 
-    if (spec.input.parameters.length > 0) {
+    if (spec.input.parameters.length > 0 || spec.input.preconditions.length > 0) {
       autoCompleted.push('Input');
     }
 
-    if (spec.output.returnType.type !== 'void') {
+    if (
+      spec.output.returnType.type !== 'void' ||
+      spec.output.postconditions.length > 0 ||
+      spec.output.failureCases.length > 0
+    ) {
       autoCompleted.push('Output');
     }
 
-    if (spec.context.imports.length > 0 || spec.context.dependencies.length > 0) {
+    if (
+      spec.context.imports.length > 0 ||
+      spec.context.dependencies.length > 0 ||
+      spec.context.requirements.length > 0
+    ) {
       autoCompleted.push('Context');
     }
 
-    if (spec.logic.features.length > 0) {
+    const hasAlgorithmDescription =
+      Boolean(spec.logic.algorithm) && !spec.logic.algorithm.startsWith('Add @algorithm');
+    if (hasAlgorithmDescription) {
+      autoCompleted.push('Logic');
+    } else if (spec.logic.features.length > 0) {
       autoCompleted.push('Logic (partial)');
       manualRequired.push('Logic (algorithm description)');
     } else {
       manualRequired.push('Logic');
-      warnings.push('Logic section needs manual description - add @functionality tag');
+      warnings.push('Logic section needs manual description - add @algorithm or @remarks tag');
     }
 
     if (spec.effect.sideEffects.length > 0) {
@@ -782,7 +729,6 @@ export class ModuleSpecGenerator {
 
     autoCompleted.push('Scope');
 
-    // Calculate confidence
     const totalSections = 7;
     const completedSections = autoCompleted.filter((s) => !s.includes('partial')).length;
     const confidence = Math.round((completedSections / totalSections) * 100);
@@ -796,109 +742,6 @@ export class ModuleSpecGenerator {
       warnings,
       confidence,
     };
-  }
-
-  // ========== Helper Methods ==========
-
-  /**
-   * Extract plain text from TSDoc DocNode
-   * Uses type assertions for the polymorphic TSDoc node structure
-   */
-  private extractTextFromDocNode(node: unknown): string {
-    if (!node) return '';
-
-    const n = node as Record<string, unknown>;
-
-    // Handle DocSection or DocNodeContainer
-    if (Array.isArray(n.nodes)) {
-      return (n.nodes as unknown[]).map((child) => this.extractTextFromDocNode(child)).join('');
-    }
-
-    // Handle DocPlainText
-    if (typeof n.text === 'string') {
-      return n.text;
-    }
-
-    // Handle DocParagraph or other containers
-    if (typeof n.getChildNodes === 'function') {
-      const children = (n.getChildNodes as () => unknown[])();
-      return children.map((child) => this.extractTextFromDocNode(child)).join('');
-    }
-
-    return '';
-  }
-
-  /**
-   * Trim content before custom module spec tags
-   * TSDoc doesn't recognize custom tags so they leak into previous block content
-   */
-  private trimBeforeModuleSpecTags(text: string): string {
-    const moduleSpecTags = [
-      '@functionality',
-      '@algorithm',
-      '@complexity',
-      '@sideEffect',
-      '@mutates',
-      '@io',
-      '@scope',
-    ];
-
-    let minIndex = text.length;
-    for (const tag of moduleSpecTags) {
-      const index = text.indexOf(tag);
-      if (index !== -1 && index < minIndex) {
-        minIndex = index;
-      }
-    }
-
-    return text.substring(0, minIndex).trim();
-  }
-
-  /**
-   * Get JSDoc comment text
-   */
-  private getJSDocComment(node: ts.Node, sourceFile: ts.SourceFile): string | null {
-    const fullText = sourceFile.getFullText();
-    const commentRanges = ts.getLeadingCommentRanges(fullText, node.pos);
-
-    if (!commentRanges || commentRanges.length === 0) return null;
-
-    const lastComment = commentRanges[commentRanges.length - 1];
-    return fullText.substring(lastComment.pos, lastComment.end);
-  }
-
-  /**
-   * Parse custom tags from JSDoc
-   */
-  private parseCustomTags(jsDoc: string): Map<string, string[]> {
-    const tags = new Map<string, string[]>();
-    const lines = jsDoc.split('\n');
-
-    for (const line of lines) {
-      // Match tags with values: @tagName value
-      const matchWithValue = line.match(/\*\s*@(\w+)\s+(.+)/);
-      if (matchWithValue) {
-        const [, tagName, tagValue] = matchWithValue;
-        if (!tags.has(tagName)) {
-          tags.set(tagName, []);
-        }
-        tags.get(tagName)?.push(tagValue.trim());
-        continue;
-      }
-
-      // Match tags without values: @tagName
-      const matchWithoutValue = line.match(/\*\s*@(\w+)\s*$/);
-      if (matchWithoutValue) {
-        const [, tagName] = matchWithoutValue;
-        if (!tags.has(tagName)) {
-          tags.set(tagName, []);
-        }
-        // Add empty string to indicate tag presence
-        tags.get(tagName)?.push('');
-      }
-    }
-
-    return tags;
   }
 
   /**
@@ -935,9 +778,9 @@ export class ModuleSpecGenerator {
    * Check if node has specific modifier
    */
   private hasModifier(node: ts.Node, kind: ts.SyntaxKind): boolean {
-    if (!('modifiers' in node) || !node.modifiers) return false;
-    const modifiers = node.modifiers as ts.NodeArray<ts.Modifier>;
-    return modifiers.some((m: ts.Modifier) => m.kind === kind);
+    if (!ts.canHaveModifiers(node)) return false;
+    const modifiers = ts.getModifiers(node);
+    return modifiers?.some((m: ts.Modifier) => m.kind === kind) ?? false;
   }
 
   /**

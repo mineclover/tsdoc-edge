@@ -31,6 +31,7 @@ import { createCoverageSourceIdentity } from '../metrics/CoverageMetricContract'
 import { BuildResultSchema } from '../output/schemas';
 import { XmlBuilder } from '../output/XmlBuilder';
 import { TestSymbolParser } from '../parser/TestSymbolParser';
+import { extractDocCheckpointsFromSource, TSDocParser } from '../parser/TSDocParser';
 import { DatabaseManager } from '../storage/DatabaseManager';
 import { GraphRepository } from '../storage/GraphRepository';
 import type { Symbol, SymbolGraph } from '../types/graph';
@@ -338,6 +339,7 @@ export class BuildCommand extends BaseCommand {
 
         // Track seen IDs to detect collisions
         const seenIds = new Map<string, string>(); // id -> first file path
+        const tsdocParser = new TSDocParser();
 
         // Prepare JSONL registry (use .tsdoc directly for consistency with other commands)
         const registryDir = path.join(process.cwd(), '.tsdoc');
@@ -469,6 +471,7 @@ export class BuildCommand extends BaseCommand {
             } else {
               // Process implementation file with ASTSymbolExtractor
               const extractResult = extractor.extract(filePath, content);
+              const fileDocTags = this.extractFileDocTagsMap(filePath, content, tsdocParser);
 
               result.symbolsFound += extractResult.symbols.length;
               result.relationshipsFound += extractResult.relationships.length;
@@ -536,8 +539,13 @@ export class BuildCommand extends BaseCommand {
                   };
                   registryLines.push(JSON.stringify(registryEntry));
 
-                  // Extract @doc tags for this symbol
-                  const docTags = this.extractDocTags(content, symbol.line);
+                  // Extract AST-verified @doc tags for this symbol (including @packageDocumentation for top-level exports)
+                  const docTags = this.resolveSymbolDocTags(
+                    fileDocTags,
+                    symbol.line,
+                    symbol.name,
+                    symbol.isExported && !symbol.parentSymbol
+                  );
                   for (const docRef of docTags) {
                     allDocRelationships.push({
                       symbolId: id,
@@ -1603,34 +1611,83 @@ export class BuildCommand extends BaseCommand {
   }
 
   /**
-   * Extract `@doc` tags from file content near a specific line
-   * @param content - File content
-   * @param symbolLine - Line number where symbol is defined
-   * @returns Array of document references
+   * Extract AST-verified `@doc [[Symbol]]` tags once per source file using `@microsoft/tsdoc`.
    */
-  private extractDocTags(content: string, symbolLine: number): string[] {
-    const docTags: string[] = [];
-    const lines = content.split('\n');
+  private extractFileDocTagsMap(
+    filePath: string,
+    content: string,
+    tsdocParser: TSDocParser
+  ): {
+    byLine: ReadonlyMap<number, readonly string[]>;
+    bySymbol: ReadonlyMap<string, readonly string[]>;
+    packageDocs: readonly string[];
+  } {
+    const byLine = new Map<number, string[]>();
+    const bySymbol = new Map<string, string[]>();
+    const packageDocs: string[] = [];
 
-    // Search backwards from symbol line to find TSDoc comment block
-    // Typically comments are within 50 lines before the symbol
-    const searchStart = Math.max(0, symbolLine - 50);
-    const searchEnd = symbolLine;
+    const entries = extractDocCheckpointsFromSource(filePath, content, {
+      requireDeclaration: false,
+      parser: tsdocParser,
+    });
 
-    for (let i = searchStart; i < searchEnd && i < lines.length; i++) {
-      const line = lines[i];
+    for (const entry of entries) {
+      if (entry.isPackageDocumentation) {
+        if (!packageDocs.includes(entry.rawReference)) {
+          packageDocs.push(entry.rawReference);
+        }
+        continue;
+      }
 
-      // Match @doc [[Symbol]] pattern
-      const docTagRegex = /@doc\s+\[\[([^\]]+)\]\]/g;
-      for (const match of line.matchAll(docTagRegex)) {
-        const docRef = match[1].trim();
-        if (docRef && !docTags.includes(docRef)) {
-          docTags.push(docRef);
+      if (entry.declarationLine !== undefined) {
+        const lineRefs = byLine.get(entry.declarationLine) ?? [];
+        if (!lineRefs.includes(entry.rawReference)) {
+          lineRefs.push(entry.rawReference);
+          byLine.set(entry.declarationLine, lineRefs);
+        }
+      }
+
+      const key = entry.qualifiedSymbol ?? entry.codeSymbol;
+      if (key) {
+        const symbolRefs = bySymbol.get(key) ?? [];
+        if (!symbolRefs.includes(entry.rawReference)) {
+          symbolRefs.push(entry.rawReference);
+          bySymbol.set(key, symbolRefs);
         }
       }
     }
 
-    return docTags;
+    return { byLine, bySymbol, packageDocs };
+  }
+
+  /**
+   * Resolve deduplicated `@doc` checkpoint references for one extracted symbol.
+   */
+  private resolveSymbolDocTags(
+    fileDocTags: {
+      byLine: ReadonlyMap<number, readonly string[]>;
+      bySymbol: ReadonlyMap<string, readonly string[]>;
+      packageDocs: readonly string[];
+    },
+    symbolLine: number,
+    symbolName: string,
+    includePackageDocs: boolean
+  ): string[] {
+    const resolved: string[] = [];
+    const direct = fileDocTags.byLine.get(symbolLine) ?? fileDocTags.bySymbol.get(symbolName) ?? [];
+    for (const ref of direct) {
+      if (!resolved.includes(ref)) {
+        resolved.push(ref);
+      }
+    }
+    if (includePackageDocs) {
+      for (const pkgRef of fileDocTags.packageDocs) {
+        if (!resolved.includes(pkgRef)) {
+          resolved.push(pkgRef);
+        }
+      }
+    }
+    return resolved;
   }
 
   /**

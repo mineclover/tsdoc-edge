@@ -6,6 +6,7 @@
 
 import * as fs from 'node:fs';
 import * as ts from 'typescript';
+import { getDirectJsDocs, readTsdocComment, TSDocParser } from '../parser/TSDocParser';
 import type { CodeLink, DocLink, LinkIndex } from '../types/core';
 
 /**
@@ -15,6 +16,8 @@ import type { CodeLink, DocLink, LinkIndex } from '../types/core';
  * @responsibility Parse and index doc-code links
  */
 export class DocCodeLinker {
+  private readonly tsdocParser = new TSDocParser();
+
   /**
    * Build bidirectional link index
    *
@@ -139,7 +142,7 @@ export class DocCodeLinker {
   }
 
   /**
-   * Parse TSDoc `@see` and `@link` tags
+   * Parse TSDoc `@see` and `{@link}` tags via `@microsoft/tsdoc` `DocComment` AST
    *
    * @param codePath - Code file path
    * @returns Parsed doc links
@@ -157,32 +160,48 @@ export class DocCodeLinker {
     );
 
     const links: DocLink[] = [];
+    const visitedJsDocPositions = new Set<number>();
 
     const visit = (node: ts.Node) => {
-      // Check for JSDoc comments
-      const jsDocTags = ts.getJSDocTags(node);
+      const jsDocs = getDirectJsDocs(node);
+      if (jsDocs.length > 0) {
+        const symbolName = this.getSymbolName(node) || 'unknown';
+        const codeLine = this.getLine(sourceFile, node);
 
-      if (jsDocTags && jsDocTags.length > 0) {
-        const symbolName = this.getSymbolName(node);
+        for (const jsDoc of jsDocs) {
+          const startPos = jsDoc.getStart(sourceFile);
+          if (visitedJsDocPositions.has(startPos)) {
+            continue;
+          }
+          visitedJsDocPositions.add(startPos);
 
-        for (const tag of jsDocTags) {
-          const tagName = tag.tagName.text;
+          const structured = readTsdocComment(
+            this.tsdocParser.parseString(jsDoc.getText(sourceFile)).docComment
+          );
+          const recordedKeys = new Set<string>();
 
-          if (tagName === 'see' || tagName === 'link') {
-            const comment = this.getTagComment(tag);
+          for (const seeTarget of structured.see) {
+            this.tryPushDocLink(
+              links,
+              recordedKeys,
+              codePath,
+              codeLine,
+              symbolName,
+              'see',
+              seeTarget
+            );
+          }
 
-            if (comment && this.isDocFile(comment)) {
-              const [docPath, section] = comment.split('#');
-
-              links.push({
-                codePath,
-                codeLine: this.getLine(sourceFile, node),
-                symbolName: symbolName || 'unknown',
-                tagType: tagName,
-                targetDoc: docPath.trim(),
-                targetSection: section?.trim(),
-              });
-            }
+          for (const linkTarget of structured.links) {
+            this.tryPushDocLink(
+              links,
+              recordedKeys,
+              codePath,
+              codeLine,
+              symbolName,
+              'link',
+              linkTarget
+            );
           }
         }
       }
@@ -192,6 +211,47 @@ export class DocCodeLinker {
 
     visit(sourceFile);
     return links;
+  }
+
+  /**
+   * Parse and append a normalized documentation link target if it points to a Markdown doc file
+   */
+  private tryPushDocLink(
+    links: DocLink[],
+    recordedKeys: Set<string>,
+    codePath: string,
+    codeLine: number,
+    symbolName: string,
+    tagType: 'see' | 'link',
+    rawTarget: string
+  ): void {
+    const cleaned = rawTarget.trim().replace(/^file:\/\//, '');
+    if (!cleaned) {
+      return;
+    }
+
+    const firstToken = cleaned.split(/\s+/)[0];
+    const [docPath, section] = firstToken.split('#');
+    const normalizedDoc = docPath.trim();
+    if (!this.isDocFile(normalizedDoc)) {
+      return;
+    }
+
+    const normalizedSection = section?.trim() || undefined;
+    const dedupKey = `${normalizedDoc}#${normalizedSection ?? ''}`;
+    if (recordedKeys.has(dedupKey)) {
+      return;
+    }
+    recordedKeys.add(dedupKey);
+
+    links.push({
+      codePath,
+      codeLine,
+      symbolName,
+      tagType,
+      targetDoc: normalizedDoc,
+      targetSection: normalizedSection,
+    });
   }
 
   /**
@@ -210,42 +270,8 @@ export class DocCodeLinker {
     if (ts.isTypeAliasDeclaration(node) && node.name) {
       return node.name.text;
     }
-    if (ts.isMethodDeclaration(node) && node.name) {
-      return (node.name as ts.Identifier).text;
-    }
-    return undefined;
-  }
-
-  /**
-   * Get comment text from JSDoc tag
-   */
-  private getTagComment(tag: ts.JSDocTag): string | undefined {
-    // Handle JSDocSeeTag specially - TypeScript parses "@see path/to/file.md" in complex ways:
-    // - For "doc.md": name has the full text, comment may be "*" from multiline JSDoc
-    // - For "/absolute/path.md": name is empty, comment has the full path
-    // - For "docs/guide.md": name is "docs", comment is "/guide.md" (TS interprets as code reference)
-    if (ts.isJSDocSeeTag(tag)) {
-      const seeTag = tag as ts.JSDocSeeTag;
-      const nameText = seeTag.name?.getText() || '';
-      let commentText = typeof tag.comment === 'string' ? tag.comment : '';
-
-      // Filter out JSDoc comment line markers (* from multiline comments)
-      if (commentText === '*' || commentText.startsWith('* ')) {
-        commentText = '';
-      }
-
-      // Combine name and comment to reconstruct the original path
-      const combined = nameText + commentText;
-      if (combined) {
-        return combined;
-      }
-    }
-
-    if (typeof tag.comment === 'string') {
-      return tag.comment;
-    }
-    if (Array.isArray(tag.comment)) {
-      return tag.comment.map((c) => c.text).join('');
+    if (ts.isMethodDeclaration(node) && node.name && ts.isIdentifier(node.name)) {
+      return node.name.text;
     }
     return undefined;
   }

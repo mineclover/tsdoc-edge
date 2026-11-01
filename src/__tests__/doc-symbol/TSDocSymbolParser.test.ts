@@ -356,5 +356,32 @@ export class TestClass {
       expect(connections).toHaveLength(1);
       expect(connections[0].codeSymbol).toBe('testProperty');
     });
+
+    it('should ignore @doc patterns inside string literals while exposing @packageDocumentation via parseFileDocReferences', () => {
+      const filePath = path.join(tempDir, 'literals.ts');
+      const code = `/**
+ * Module doc
+ * @doc [[PackageSpec]]
+ * @packageDocumentation
+ */
+
+export const SAMPLE_LITERAL = '@doc [[FakeLiteralDoc]]';
+
+/**
+ * Real constant doc
+ * @doc [[ConstSpec]]
+ */
+export const REAL_CONSTANT = 1;
+`;
+      fs.writeFileSync(filePath, code, 'utf-8');
+
+      const declarationConnections = parser.parseCodeFile(filePath);
+      expect(declarationConnections).toHaveLength(1);
+      expect(declarationConnections[0].codeSymbol).toBe('REAL_CONSTANT');
+      expect(declarationConnections[0].docSymbol).toBe('ConstSpec');
+
+      const allFileRefs = parser.parseFileDocReferences(filePath);
+      expect(allFileRefs.map((ref) => ref.rawReference)).toEqual(['PackageSpec', 'ConstSpec']);
+    });
   });
 });

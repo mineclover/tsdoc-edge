@@ -16,7 +16,12 @@ import type {
   ErrorExperience,
   FuturePlan,
 } from '../types/tags';
-import { TSDocParser } from './TSDocParser';
+import {
+  extractLeadingJsDocText,
+  readTsdocComment,
+  type StructuredTsdocComment,
+  TSDocParser,
+} from './TSDocParser';
 
 /**
  * Extraction options
@@ -54,25 +59,19 @@ export interface ExtractedEnhancedDoc {
  * @public
  * @responsibility
  * Extract EnhancedSymbolDoc from TypeScript source files automatically.
- * Parses TSDoc comments and combines with AST information.
+ * Parses TSDoc comments via `@microsoft/tsdoc` `DocComment` AST and combines with TypeScript AST information.
  *
  * @problem Manual creation of EnhancedSymbolDoc is tedious and error-prone
- * @solves Automatically extract enhanced docs from TSDoc custom tags and TypeScript AST imports
+ * @solves Automatically extract enhanced docs from `@microsoft/tsdoc` AST nodes and TypeScript AST imports
  * @context 6-category documentation system requires structured metadata
  *
- * @functionality AST traversal, Custom tag parsing, Completeness calculation, Symbol extraction
+ * @functionality AST traversal, Standard and custom TSDoc AST extraction, Completeness calculation, Symbol extraction
  *
- * @decision Parse custom TSDoc tags and AST imports instead of natural language processing
- * @rationale Structured tags and compiler AST are more reliable than NLP for extracting metadata
+ * @decision Delegate comment tokenization directly to `@microsoft/tsdoc` `DocComment` AST and TypeScript AST imports
+ * @rationale Upstream standard AST avoids regex drift, supports multiline blocks and repeated ADR tags, and trusts `@throws`/`@remarks`/`@privateRemarks`
  * @consequences Deterministic extraction aligned with `@microsoft/tsdoc` and `ttsc`
  *
  * @privateRemarks TODO: Add support for extracting from compiled `.d.ts` files
- *
- * Usage:
- * ```typescript
- * const extractor = new EnhancedDocExtractor();
- * const results = extractor.extractFromFile('src/foo.ts', sourceCode);
- * ```
  */
 export class EnhancedDocExtractor {
   private tsdocParser: TSDocParser;
@@ -93,6 +92,7 @@ export class EnhancedDocExtractor {
    * @param filePath - Source file path
    * @param sourceCode - Source code content
    * @returns Array of extracted enhanced docs
+   * @public
    *
    * @example
    * ```typescript
@@ -152,26 +152,21 @@ export class EnhancedDocExtractor {
     sourceFile: ts.SourceFile,
     filePath: string
   ): ExtractedEnhancedDoc | null {
-    // Get symbol name
     const name = this.getSymbolName(node);
     if (!name) return null;
 
-    // Get JSDoc comment
-    const jsDocComment = this.getJSDocComment(node, sourceFile);
+    const jsDocComment = extractLeadingJsDocText(node, sourceFile);
     if (!jsDocComment && !this.options.includePartial) {
       return null;
     }
 
-    // Parse TSDoc
-    const tsdocContext = jsDocComment ? this.tsdocParser.parseString(jsDocComment) : null;
+    const tsdocContext: ParserContext | null = jsDocComment
+      ? this.tsdocParser.parseString(jsDocComment)
+      : null;
+    const structured = tsdocContext ? readTsdocComment(tsdocContext.docComment) : null;
 
-    // Extract symbol info
-    const symbol = this.extractSymbolInfo(node, sourceFile, filePath, name);
-
-    // Extract enhanced doc
-    const doc = this.extractEnhancedDoc(tsdocContext, symbol, jsDocComment || '', sourceFile);
-
-    // Calculate completeness
+    const symbol = this.extractSymbolInfo(node, sourceFile, filePath, name, structured);
+    const doc = this.extractEnhancedDoc(structured, symbol, sourceFile);
     const { completeness, missing } = this.calculateCompleteness(doc);
 
     return {
@@ -200,7 +195,7 @@ export class EnhancedDocExtractor {
     }
     if (ts.isVariableStatement(node)) {
       const declaration = node.declarationList.declarations[0];
-      if (ts.isIdentifier(declaration.name)) {
+      if (declaration && ts.isIdentifier(declaration.name)) {
         return declaration.name.text;
       }
     }
@@ -211,33 +206,17 @@ export class EnhancedDocExtractor {
   }
 
   /**
-   * Get JSDoc comment text
-   */
-  private getJSDocComment(node: ts.Node, sourceFile: ts.SourceFile): string | null {
-    const jsDocTags = ts.getJSDocTags(node);
-    if (jsDocTags.length === 0) return null;
-
-    const fullText = sourceFile.getFullText();
-    const commentRanges = ts.getLeadingCommentRanges(fullText, node.pos);
-
-    if (!commentRanges || commentRanges.length === 0) return null;
-
-    const lastComment = commentRanges[commentRanges.length - 1];
-    return fullText.substring(lastComment.pos, lastComment.end);
-  }
-
-  /**
    * Extract basic symbol information
    */
   private extractSymbolInfo(
     node: ts.Node,
     sourceFile: ts.SourceFile,
     filePath: string,
-    name: string
+    name: string,
+    structured: StructuredTsdocComment | null
   ): Symbol {
     const { line, character: column } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
 
-    // Check for export keyword with type guards
     let hasExportKeyword = false;
     if (ts.canHaveModifiers(node)) {
       const modifiers = ts.getModifiers(node);
@@ -254,6 +233,8 @@ export class EnhancedDocExtractor {
     else if (ts.isMethodDeclaration(node)) type = 'method';
 
     const id = this.options.autoGenerateIds ? `${name.toLowerCase()}-${Date.now()}` : name;
+    const isPublic =
+      structured?.releaseVisibility === 'internal' ? false : Boolean(hasExportKeyword);
 
     return {
       id,
@@ -262,20 +243,20 @@ export class EnhancedDocExtractor {
       filePath,
       line: line + 1,
       column,
-      isExported: hasExportKeyword || false,
-      isPublic: hasExportKeyword || false,
+      isExported: Boolean(hasExportKeyword),
+      isPublic,
+      ...(structured?.summary ? { summary: structured.summary } : {}),
       tests: [],
       designDecisions: [],
     };
   }
 
   /**
-   * Extract enhanced documentation from TSDoc and TypeScript AST
+   * Extract enhanced documentation from `@microsoft/tsdoc` `StructuredTsdocComment` and TypeScript AST
    */
   private extractEnhancedDoc(
-    _tsdocContext: ParserContext | null,
+    structured: StructuredTsdocComment | null,
     symbol: Symbol,
-    rawComment: string,
     sourceFile: ts.SourceFile
   ): EnhancedSymbolDoc {
     const now = new Date().toISOString();
@@ -287,48 +268,44 @@ export class EnhancedDocExtractor {
       version: this.options.defaultVersion,
     };
 
-    // Parse custom tags from raw comment
-    const customTags = this.parseCustomTags(rawComment);
+    const problem = structured?.getFirstTagValue('@problem');
+    const solves = structured?.getFirstTagValue('@solves');
+    const contextText = structured?.getFirstTagValue('@context');
 
-    // Extract problem solving
-    if (customTags.problem || customTags.solves) {
+    if (problem || solves) {
       doc.problemSolving = {
-        description: customTags.problem || customTags.solves || '',
-        context: customTags.context || '',
-        targetUseCase: customTags.usecase,
-        relatedProblem: customTags.relatedproblem,
+        description: problem || solves || '',
+        context: contextText || '',
       };
     }
 
-    // Extract functionality
-    if (customTags.functionality || customTags.features) {
-      const features = this.parseList(customTags.features || customTags.functionality || '');
-      doc.functionality = {
-        mainFeatures: features,
-        components: [],
-      };
+    const functionalityText = structured?.getFirstTagValue('@functionality') ?? structured?.remarks;
+    if (functionalityText) {
+      const features = this.parseList(functionalityText);
+      if (features.length > 0) {
+        doc.functionality = {
+          mainFeatures: features,
+          components: [],
+        };
+      }
     }
 
-    // Extract error experiences
-    const errors = this.parseErrorExperiences(customTags);
+    const errors = this.parseErrorExperiences(structured);
     if (errors.length > 0) {
       doc.errorExperiences = errors;
     }
 
-    // Extract decisions
-    const decisions = this.parseDecisions(customTags);
+    const decisions = this.parseDecisions(structured);
     if (decisions.length > 0) {
       doc.decisions = decisions;
     }
 
-    // Extract dependencies from TypeScript AST imports + non-AST semantic relation tags
-    const deps = this.parseDependencies(customTags, rawComment, sourceFile);
+    const deps = this.parseDependencies(structured, sourceFile);
     if (deps.length > 0) {
       doc.dependencies = deps;
     }
 
-    // Extract future plans from standard @privateRemarks (TODO:/PLAN:)
-    const plans = this.parseFuturePlans(customTags);
+    const plans = this.parseFuturePlans(structured);
     if (plans.length > 0) {
       doc.futurePlans = plans;
     }
@@ -337,120 +314,104 @@ export class EnhancedDocExtractor {
   }
 
   /**
-   * Parse custom tags from raw JSDoc comment
-   */
-  private parseCustomTags(comment: string): Record<string, string> {
-    const tags: Record<string, string> = {};
-    const lines = comment.split('\n');
-
-    let currentTag = '';
-    let currentValue = '';
-
-    for (const line of lines) {
-      // Remove leading *, whitespace, and trailing */
-      const trimmed = line
-        .trim()
-        .replace(/^\*\s*/, '')
-        .replace(/\*\/$/, '')
-        .trim();
-
-      // Check for @tag
-      const tagMatch = trimmed.match(/^@(\w+)\s*(.*)/);
-      if (tagMatch) {
-        // Save previous tag
-        if (currentTag) {
-          tags[currentTag.toLowerCase()] = currentValue.trim();
-        }
-
-        currentTag = tagMatch[1];
-        currentValue = tagMatch[2];
-      } else if (currentTag && trimmed) {
-        // Continue multiline tag
-        currentValue += ` ${trimmed}`;
-      }
-    }
-
-    // Save last tag
-    if (currentTag) {
-      tags[currentTag.toLowerCase()] = currentValue.trim();
-    }
-
-    // Clean up all tag values (remove trailing / from */)
-    for (const key in tags) {
-      tags[key] = tags[key].replace(/\s*\/\s*$/, '').trim();
-    }
-
-    return tags;
-  }
-
-  /**
-   * Parse list from string
+   * Parse bullet list or comma/semicolon-separated items
    */
   private parseList(str: string): string[] {
-    return str
+    const trimmed = str.trim();
+    if (!trimmed) {
+      return [];
+    }
+    if (trimmed.startsWith('- ') || trimmed.includes('\n- ')) {
+      return trimmed
+        .split(/(?:^|\n)\s*-\s+/)
+        .map((item) => item.trim())
+        .filter((item) => item.length > 0);
+    }
+    return trimmed
       .split(/[,;]/)
       .map((s) => s.trim())
       .filter((s) => s.length > 0);
   }
 
   /**
-   * Parse error experiences
+   * Parse error experiences from standard `@microsoft/tsdoc` `@throws` blocks
    */
-  private parseErrorExperiences(tags: Record<string, string>): ErrorExperience[] {
-    const errors: ErrorExperience[] = [];
-
-    if (tags.error || tags.errorexperience) {
-      const errorText = tags.error || tags.errorexperience || '';
-      errors.push({
-        id: `ERR-${Date.now()}`,
-        errorType: tags.errortype || 'Error',
-        message: errorText,
-        context: tags.errorcontext || '',
-        solution: tags.errorsolution || tags.fix || '',
-        prevention: tags.prevention,
-        occurredAt: tags.errordate,
-      });
+  private parseErrorExperiences(structured: StructuredTsdocComment | null): ErrorExperience[] {
+    if (!structured || structured.throws.length === 0) {
+      return [];
     }
 
-    return errors;
+    const now = Date.now();
+    return structured.throws.map((throwsEntry, index) => {
+      const typePrefixMatch = throwsEntry.match(
+        /^([A-Z][A-Za-z0-9_.]*(?:Error|Exception))\s*(?:[-:]\s*)(.+)$/
+      );
+      const errorType = typePrefixMatch ? typePrefixMatch[1] : 'Error';
+      const body = typePrefixMatch ? typePrefixMatch[2].trim() : throwsEntry.trim();
+      const [messagePart, ...solutionParts] = body.split(/\s+-\s+/);
+      const message = messagePart.trim();
+      const solution = solutionParts.join(' - ').trim();
+
+      return {
+        id: `ERR-${now}-${index + 1}`,
+        errorType,
+        message,
+        context: message,
+        solution,
+      };
+    });
   }
 
   /**
-   * Parse decisions (ADRs)
+   * Parse inline ADRs from `@decision`, `@rationale`, and `@consequences` blocks,
+   * preserving multiple ADR triads on the same symbol by index.
    */
-  private parseDecisions(tags: Record<string, string>): DecisionRecord[] {
-    const decisions: DecisionRecord[] = [];
+  private parseDecisions(structured: StructuredTsdocComment | null): DecisionRecord[] {
+    if (!structured) {
+      return [];
+    }
 
-    if (tags.decision || tags.adr) {
-      const decisionText = tags.decision || tags.adr || '';
-      decisions.push({
-        id: tags.decisionid || `ADR-${Date.now()}`,
-        title: tags.decisiontitle || decisionText.substring(0, 50),
+    const decisionValues = structured
+      .getTagValues('@decision')
+      .map((value) => value.trim())
+      .filter((value) => value.length > 0);
+    if (decisionValues.length === 0) {
+      return [];
+    }
+
+    const rationales = structured.getTagValues('@rationale');
+    const consequences = structured.getTagValues('@consequences');
+    const today = new Date().toISOString().split('T')[0];
+    const now = Date.now();
+
+    return decisionValues.map((decisionText, index) => {
+      const rationale = rationales[index]?.trim() ?? '';
+      const consequenceText = consequences[index]?.trim() ?? '';
+      return {
+        id: `ADR-${now}-${index + 1}`,
+        title: decisionText.substring(0, 50),
         decision: decisionText,
-        rationale: tags.rationale || tags.reason || '',
+        rationale,
         alternatives: [],
-        consequences: tags.consequences ? this.parseList(tags.consequences) : [],
-        date: tags.decisiondate || new Date().toISOString().split('T')[0],
-        status: (tags.decisionstatus as DecisionRecord['status']) || 'accepted',
-      });
-    }
-
-    return decisions;
+        consequences: consequenceText ? this.parseList(consequenceText) : [],
+        date: today,
+        status: 'accepted',
+      };
+    });
   }
 
   /**
-   * Extract dependencies from TypeScript AST `ImportDeclaration`s (canonical `ttsc`/AST SSOT)
-   * and non-AST semantic relation tags (`@relatedTo`, `@requires`, `@enhances`).
+   * Extract dependencies from TypeScript AST `ImportDeclaration`s (canonical `ttsc`/AST SSOT),
+   * non-AST semantic relation tags (`@relatedTo`, `@requires`, `@enhances`), and inline `{@link}` targets.
    */
   private parseDependencies(
-    _tags: Record<string, string>,
-    rawComment: string,
+    structured: StructuredTsdocComment | null,
     sourceFile: ts.SourceFile
   ): DependencySpec[] {
     const deps: DependencySpec[] = [];
     const seen = new Set<string>();
 
-    // 1. Canonical AST imports
+    // 1. Canonical TypeScript AST imports
     for (const stmt of sourceFile.statements) {
       if (!ts.isImportDeclaration(stmt) || !ts.isStringLiteral(stmt.moduleSpecifier)) {
         continue;
@@ -469,27 +430,42 @@ export class EnhancedDocExtractor {
       });
     }
 
+    if (!structured) {
+      return deps;
+    }
+
     // 2. Non-AST semantic relationship tags (@relatedTo, @requires, @enhances)
-    for (const line of rawComment.split('\n')) {
-      const trimmed = line
-        .trim()
-        .replace(/^\*\s*/, '')
-        .replace(/\*\/$/, '')
-        .trim();
-      const semanticMatch = trimmed.match(/^@(relatedTo|requires|enhances)\s+(.+)$/);
-      if (!semanticMatch) continue;
-      const tagKind = semanticMatch[1];
-      const payload = semanticMatch[2].trim();
-      const [rawTarget, ...reasonParts] = payload.split(/\s+-\s+/);
-      const target = rawTarget.trim().split(/[\s,]+/)[0];
-      if (!target) continue;
-      const key = `symbol:${target}`;
+    const semanticTags = ['relatedTo', 'requires', 'enhances'] as const;
+    for (const tagKind of semanticTags) {
+      for (const rawPayload of structured.getTagValues(`@${tagKind}`)) {
+        const payload = rawPayload.trim();
+        if (!payload) continue;
+        const [rawTarget, ...reasonParts] = payload.split(/\s+-\s+/);
+        const target = rawTarget.trim().split(/[\s,]+/)[0];
+        if (!target) continue;
+        const key = `symbol:${target}`;
+        if (seen.has(key)) continue;
+        seen.add(key);
+        deps.push({
+          target,
+          type: 'symbol',
+          reason: reasonParts.join(' - ').trim() || `@${tagKind} semantic relation`,
+        });
+      }
+    }
+
+    // 3. Standard inline {@link} symbol references
+    for (const linkTarget of structured.links) {
+      if (linkTarget.startsWith('http://') || linkTarget.startsWith('https://')) {
+        continue;
+      }
+      const key = `symbol:${linkTarget}`;
       if (seen.has(key)) continue;
       seen.add(key);
       deps.push({
-        target,
+        target: linkTarget,
         type: 'symbol',
-        reason: reasonParts.join(' - ').trim() || `@${tagKind} semantic relation`,
+        reason: 'TSDoc {@link} reference',
       });
     }
 
@@ -497,30 +473,39 @@ export class EnhancedDocExtractor {
   }
 
   /**
-   * Parse future plans from standard `@privateRemarks` (`TODO:` / `PLAN:` prefixes).
+   * Parse future plans from standard `@privateRemarks` (`TODO:` / `PLAN:` lines).
    */
-  private parseFuturePlans(tags: Record<string, string>): FuturePlan[] {
-    const plans: FuturePlan[] = [];
-    const remark = tags.privateremarks;
+  private parseFuturePlans(structured: StructuredTsdocComment | null): FuturePlan[] {
+    const remark = structured?.privateRemarks;
     if (!remark) {
-      return plans;
+      return [];
     }
 
-    const planMatch = remark.match(/^(?:TODO|PLAN)(?:\s*\[(high|medium|low)\])?:\s*(.+)$/i);
-    const planText = planMatch ? planMatch[2].trim() : remark.trim();
-    if (!planText) {
-      return plans;
-    }
-    const priority = (planMatch?.[1]?.toLowerCase() as FuturePlan['priority']) || 'medium';
+    const lines = remark
+      .split('\n')
+      .map((line) => line.trim())
+      .filter((line) => line.length > 0);
+    const now = Date.now();
+    const createdAt = new Date().toISOString();
+    const plans: FuturePlan[] = [];
 
-    plans.push({
-      id: `PLAN-${Date.now()}`,
-      title: planText.substring(0, 50),
-      description: planText,
-      priority,
-      status: 'planned',
-      createdAt: new Date().toISOString(),
-    });
+    for (let index = 0; index < lines.length; index++) {
+      const line = lines[index];
+      const planMatch = line.match(/^(?:TODO|PLAN)(?:\s*\[(high|medium|low)\])?:\s*(.+)$/i);
+      const planText = planMatch ? planMatch[2].trim() : index === 0 ? line : '';
+      if (!planText) {
+        continue;
+      }
+      const priority = (planMatch?.[1]?.toLowerCase() as FuturePlan['priority']) || 'medium';
+      plans.push({
+        id: `PLAN-${now}-${index + 1}`,
+        title: planText.substring(0, 50),
+        description: planText,
+        priority,
+        status: 'planned',
+        createdAt,
+      });
+    }
 
     return plans;
   }

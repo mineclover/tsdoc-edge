@@ -1,146 +1,98 @@
 /**
  * TSDoc `@doc` tag parser for code-to-document connections
  * @packageDocumentation
- * @responsibility Parse `@doc [[]]` tags from TypeScript code
+ * @responsibility Parse `@doc [[]]` tags from TypeScript code via `@microsoft/tsdoc` AST
  */
 
 import * as fs from 'node:fs';
-import * as ts from 'typescript';
+import {
+  extractDocCheckpointsFromSource,
+  type SourceDocCheckpointReference,
+  TSDocParser,
+} from '../parser/TSDocParser';
 import type { CodeConnection } from '../types/feature';
 
 /**
- * Parses `@doc` tags from TSDoc comments
+ * Parses `@doc` tags from TypeScript JSDoc comments using the canonical
+ * `@microsoft/tsdoc` `DocComment` AST reader.
  *
+ * @doc [[TsdocEdgePlatformSpecification]]
  * @public
- * @responsibility Extract `@doc [[Symbol]]` tags from code
+ * @responsibility Extract `@doc [[Symbol]]` tags from TypeScript declarations and module headers
  */
 export class TSDocSymbolParser {
+  private readonly tsdocParser = new TSDocParser();
+
   /**
-   * Parse `@doc` tags from a code file
+   * Parse declaration-attached `@doc` tags from a TypeScript code file.
    *
    * @param filePath - Code file path
-   * @returns Code connections
+   * @returns Declaration-bound code connections
+   * @public
    */
   parseCodeFile(filePath: string): CodeConnection[] {
     if (!fs.existsSync(filePath)) {
       return [];
     }
 
-    const sourceFile = ts.createSourceFile(
-      filePath,
-      fs.readFileSync(filePath, 'utf-8'),
-      ts.ScriptTarget.Latest,
-      true
-    );
+    const sourceCode = fs.readFileSync(filePath, 'utf-8');
+    const entries = extractDocCheckpointsFromSource(filePath, sourceCode, {
+      requireDeclaration: true,
+      parser: this.tsdocParser,
+    });
 
-    const connections: CodeConnection[] = [];
-
-    const visit = (node: ts.Node) => {
-      // Get JSDoc tags
-      const jsDocTags = ts.getJSDocTags(node);
-
-      if (jsDocTags && jsDocTags.length > 0) {
-        const symbolName = this.getSymbolName(node);
-
-        for (const tag of jsDocTags) {
-          if (tag.tagName.text === 'doc') {
-            const parsed = this.parseDocTag(tag);
-
-            if (parsed && symbolName) {
-              connections.push({
-                codeSymbol: symbolName,
-                filePath,
-                line: this.getLine(sourceFile, node),
-                docSymbol: parsed.symbol,
-                section: parsed.section,
-              });
-            }
-          }
-        }
-      }
-
-      ts.forEachChild(node, visit);
-    };
-
-    visit(sourceFile);
-    return connections;
+    return entries
+      .filter((entry): entry is SourceDocCheckpointReference & { codeSymbol: string } =>
+        Boolean(entry.codeSymbol)
+      )
+      .map((entry) => ({
+        codeSymbol: entry.codeSymbol,
+        filePath,
+        line: entry.declarationLine ?? entry.commentLine,
+        docSymbol: entry.docSymbol,
+        section: entry.section,
+      }));
   }
 
   /**
-   * Parse `@doc` tag content
+   * Parse all JSDoc `@doc` checkpoint references in a file, including file-level
+   * `@packageDocumentation` headers, without matching string literals or code fences.
    *
-   * @param tag - JSDoc tag
-   * @returns Parsed doc reference
+   * @param filePath - Code file path
+   * @returns All AST-verified `@doc` checkpoint references in the file
+   * @public
    */
-  private parseDocTag(tag: ts.JSDocTag): { symbol: string; section?: string } | null {
-    const comment = this.getTagComment(tag);
-    if (!comment) {
-      return null;
+  parseFileDocReferences(filePath: string): readonly SourceDocCheckpointReference[] {
+    if (!fs.existsSync(filePath)) {
+      return [];
     }
-
-    // Match [[Symbol]] or [[Symbol#Section]]
-    const match = comment.match(/\[\[([^\]#]+)(?:#([^\]]+))?\]\]/);
-    if (!match) {
-      return null;
-    }
-
-    return {
-      symbol: match[1].trim(),
-      section: match[2]?.trim(),
-    };
+    return this.parseSourceDocReferences(filePath, fs.readFileSync(filePath, 'utf-8'));
   }
 
   /**
-   * Get symbol name from node
+   * Parse all JSDoc `@doc` checkpoint references from in-memory TypeScript source text.
+   *
+   * @param filePath - Logical source file path
+   * @param sourceCode - TypeScript source text
+   * @returns All AST-verified `@doc` checkpoint references
+   * @public
    */
-  private getSymbolName(node: ts.Node): string | undefined {
-    if (ts.isClassDeclaration(node) && node.name) {
-      return node.name.text;
-    }
-    if (ts.isFunctionDeclaration(node) && node.name) {
-      return node.name.text;
-    }
-    if (ts.isInterfaceDeclaration(node) && node.name) {
-      return node.name.text;
-    }
-    if (ts.isTypeAliasDeclaration(node) && node.name) {
-      return node.name.text;
-    }
-    if (ts.isMethodDeclaration(node) && node.name) {
-      return (node.name as ts.Identifier).text;
-    }
-    if (ts.isPropertyDeclaration(node) && node.name) {
-      return (node.name as ts.Identifier).text;
-    }
-    return undefined;
+  parseSourceDocReferences(
+    filePath: string,
+    sourceCode: string
+  ): readonly SourceDocCheckpointReference[] {
+    return extractDocCheckpointsFromSource(filePath, sourceCode, {
+      requireDeclaration: false,
+      parser: this.tsdocParser,
+    });
   }
 
   /**
-   * Get comment text from JSDoc tag
-   */
-  private getTagComment(tag: ts.JSDocTag): string | undefined {
-    if (typeof tag.comment === 'string') {
-      return tag.comment;
-    }
-    if (Array.isArray(tag.comment)) {
-      return tag.comment.map((c) => c.text).join('');
-    }
-    return undefined;
-  }
-
-  /**
-   * Get line number from node
-   */
-  private getLine(sourceFile: ts.SourceFile, node: ts.Node): number {
-    const { line } = sourceFile.getLineAndCharacterOfPosition(node.getStart());
-    return line + 1;
-  }
-
-  /**
-   * Parse multiple code files
+   * Parse multiple code files for declaration-attached `@doc` connections.
    *
    * @param filePaths - Code file paths
-   * @returns All code connections
+   * @returns All declaration-bound code connections
+   * @public
    */
   parseMultiple(filePaths: string[]): CodeConnection[] {
     const allConnections: CodeConnection[] = [];

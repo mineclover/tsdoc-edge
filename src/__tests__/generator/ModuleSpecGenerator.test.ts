@@ -511,6 +511,46 @@ export function process(
       expect(result.spec.input.parameters).toHaveLength(2);
       expect(result.spec.input.parameters[0].type).toContain('Array');
     });
+
+    it('should trust standard @microsoft/tsdoc summary, @remarks, @throws, and @see for 7-aspect specs', () => {
+      const testFile = path.join(testFilesDir, 'standard-tsdoc.ts');
+      fs.writeFileSync(
+        testFile,
+        `
+/**
+ * Normalizes user email addresses deterministically.
+ *
+ * @param email - Raw email string
+ * @returns Lowercased trimmed email
+ * @throws ValidationError - Invalid email format - Validate RFC 5322 format first
+ * @remarks
+ * Trims leading/trailing whitespace and lowercases ASCII domain characters in one pass.
+ * @see https://tsdoc.org/
+ * @public
+ */
+export function normalizeEmail(email: string): string {
+  return email.trim().toLowerCase();
+}
+      `.trim()
+      );
+
+      const result = generator.generateSpec(testFile, 'normalizeEmail');
+
+      expect(result.spec.purpose.responsibility).toBe(
+        'Normalizes user email addresses deterministically.'
+      );
+      expect(result.spec.logic.algorithm).toBe(
+        'Trims leading/trailing whitespace and lowercases ASCII domain characters in one pass.'
+      );
+      expect(result.spec.output.failureCases).toEqual([
+        expect.objectContaining({
+          errorType: 'ValidationError',
+          description: 'Validate RFC 5322 format first',
+        }),
+      ]);
+      expect(result.spec.context.requirements).toContain('https://tsdoc.org/');
+      expect(result.confidence).toBe(100);
+    });
   });
 
   afterAll(() => {

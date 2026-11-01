@@ -5,6 +5,11 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import { StandardTags } from '@microsoft/tsdoc';
+import { graphEdgeSemantic, PROJECTABLE_GRAPH_EDGE_KINDS } from '../../graph-analysis';
+import {
+  type CanonicalProjectGraph,
+  PROJECT_GRAPH_CONTRACT_VERSION,
+} from '../../indexer/contracts';
 import { generateTsdocJson, TSDOC_EDGE_CUSTOM_TAGS } from '../../parser/TSDocParser';
 import { MODULE_SPEC_ASPECT_TAGS } from '../../spec/SpecMetricsAggregator';
 import {
@@ -13,7 +18,9 @@ import {
   CUSTOM_TAGS,
   lookupRetiredTagMigration,
   mapTtscEdgeKindToRelationshipType,
+  projectCanonicalTtscRelationships,
   RETIRED_CUSTOM_TAG_MIGRATIONS,
+  type TtscCanonicalEdgeKind,
 } from '../../types/tags';
 
 describe('CanonicalTagBridge & Zero-Overlap Tag Governance', () => {
@@ -65,13 +72,55 @@ describe('CanonicalTagBridge & Zero-Overlap Tag Governance', () => {
     }
   });
 
-  it('maps all 6 canonical @ttsc/graph edge kinds deterministically onto tsdoc-edge RelationshipType', () => {
-    expect(mapTtscEdgeKindToRelationshipType('implements')).toBe('implementation');
-    expect(mapTtscEdgeKindToRelationshipType('extends')).toBe('inheritance');
-    expect(mapTtscEdgeKindToRelationshipType('calls')).toBe('calls');
-    expect(mapTtscEdgeKindToRelationshipType('accesses')).toBe('code-dependency');
-    expect(mapTtscEdgeKindToRelationshipType('instantiates')).toBe('code-dependency');
-    expect(mapTtscEdgeKindToRelationshipType('type_ref')).toBe('type-dependency');
+  it('maps all 6 canonical @ttsc/graph edge kinds deterministically via graphEdgeSemantic and projects UnifiedRelationships', () => {
+    for (const kind of PROJECTABLE_GRAPH_EDGE_KINDS) {
+      const typedKind = kind as TtscCanonicalEdgeKind;
+      expect(mapTtscEdgeKindToRelationshipType(typedKind)).toBe(
+        graphEdgeSemantic(kind).relationshipType
+      );
+    }
+
+    const graph: CanonicalProjectGraph = {
+      contractVersion: PROJECT_GRAPH_CONTRACT_VERSION,
+      rootDir: '/workspace',
+      tsconfigPath: '/workspace/tsconfig.json',
+      fingerprint: 'fp-canonical-test',
+      provenance: {
+        adapter: 'ttsc-graph-router',
+        producer: '@ttsc/graph',
+        workspaceId: 'tsdoc-edge',
+      },
+      nodes: [
+        {
+          id: 'src/A.ts#ServiceA:class',
+          sourceId: 'src/A.ts#ServiceA:class',
+          kind: 'class',
+          name: 'ServiceA',
+          file: 'src/A.ts',
+        },
+        {
+          id: 'src/B.ts#IService:interface',
+          sourceId: 'src/B.ts#IService:interface',
+          kind: 'interface',
+          name: 'IService',
+          file: 'src/B.ts',
+        },
+      ],
+      edges: [
+        {
+          kind: 'implements',
+          from: 'src/A.ts#ServiceA:class',
+          to: 'src/B.ts#IService:interface',
+          evidence: { file: 'src/A.ts', startLine: 10 },
+        },
+      ],
+    };
+
+    const projected = projectCanonicalTtscRelationships(graph);
+    expect(projected).toHaveLength(1);
+    expect(projected[0]?.type).toBe('implementation');
+    expect(projected[0]?.category).toBe('structural');
+    expect(projected[0]?.properties?.rawEdgeKind).toBe('implements');
   });
 
   it('resolves retired tag migrations with or without leading @', () => {

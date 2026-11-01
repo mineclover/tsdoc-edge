@@ -304,3 +304,20 @@ export class TSDocParser {
     return 'unknown';
   }
 }
+
+export {
+  type ExtractDocCheckpointsOptions,
+  extractDocCheckpointsFromSource,
+  extractLeadingJsDocText,
+  getDirectJsDocs,
+  readTsdocComment,
+  renderDocNodesText,
+  renderDocNodeText,
+  type SourceDocCheckpointReference,
+  type StructuredTsdocComment,
+  type TsdocDocCheckpointEntry,
+  type TsdocParameterEntry,
+  type TsdocReleaseVisibility,
+  type TsdocRenderOptions,
+  type TsdocTypeParameterEntry,
+} from './TsdocCommentReader';

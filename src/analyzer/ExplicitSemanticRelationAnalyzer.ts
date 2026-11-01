@@ -1,7 +1,7 @@
 /**
  * Explicit Semantic Relation Analyzer
  * @packageDocumentation
- * @responsibility Extract semantic relationships from @relatedTo tags
+ * @responsibility Extract semantic relationships from `@relatedTo` tags
  *
  * @solves Capture developer intent through explicit documentation
  * @precondition TypeScript files with `@relatedTo` TSDoc tags
@@ -27,10 +27,11 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';
+import { extractLeadingJsDocText, readTsdocComment, TSDocParser } from '../parser/TSDocParser';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 
 /**
- * Explicit relation site from @relatedTo tag
+ * Explicit relation site from `@relatedTo` tag
  * @internal
  */
 interface ExplicitRelationSite {
@@ -46,11 +47,11 @@ interface ExplicitRelationSite {
  *
  * @doc [[ExplicitSemanticRelationAnalyzer]]
  * @public
- * @responsibility Parse @relatedTo tags and create semantic relationships
+ * @responsibility Parse `@relatedTo` tags and create semantic relationships
  *
  * Algorithm:
  * 1. Traverse TypeScript source files
- * 2. Parse JSDoc comments for @relatedTo tags
+ * 2. Parse JSDoc comments for `@relatedTo` tags
  * 3. Extract source symbol and target symbol
  * 4. Create bidirectional semantic relationships
  *
@@ -71,6 +72,8 @@ interface ExplicitRelationSite {
  * - DatabaseManager ~ ConnectionPool (confidence: 1.0)
  */
 export class ExplicitSemanticRelationAnalyzer {
+  private readonly tsdocParser = new TSDocParser();
+
   /**
    * Analyze explicit semantic relationships
    *
@@ -93,7 +96,7 @@ export class ExplicitSemanticRelationAnalyzer {
   }
 
   /**
-   * Collect @relatedTo tags from TypeScript files
+   * Collect `@relatedTo` tags from TypeScript files
    *
    * @param rootDir - Root directory
    * @returns Array of explicit relation sites
@@ -117,7 +120,7 @@ export class ExplicitSemanticRelationAnalyzer {
   }
 
   /**
-   * Extract @relatedTo relations from source file
+   * Extract `@relatedTo` relations from source file
    *
    * @param sourceFile - TypeScript source file
    * @param filePath - File path
@@ -130,25 +133,23 @@ export class ExplicitSemanticRelationAnalyzer {
   ): void {
     const visit = (node: ts.Node): void => {
       try {
-        const jsDocTags = ts.getJSDocTags(node);
-        if (jsDocTags && jsDocTags.length > 0) {
-          const sourceSymbol = this.getSymbolName(node);
-
-          if (sourceSymbol) {
-            for (const tag of jsDocTags) {
-              if (tag.tagName.text === 'relatedTo') {
-                const relationInfo = this.parseRelatedToTag(tag);
-                if (relationInfo) {
-                  const line =
-                    sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
-                  sites.push({
-                    sourceSymbol,
-                    targetSymbol: relationInfo.target,
-                    filePath,
-                    line,
-                    description: relationInfo.description,
-                  });
-                }
+        const sourceSymbol = this.getSymbolName(node);
+        if (sourceSymbol) {
+          const jsDoc = extractLeadingJsDocText(node, sourceFile);
+          if (jsDoc) {
+            const structured = readTsdocComment(this.tsdocParser.parseString(jsDoc).docComment);
+            for (const rawValue of structured.getTagValues('@relatedTo')) {
+              const relationInfo = this.parseRelatedToValue(rawValue);
+              if (relationInfo) {
+                const line =
+                  sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
+                sites.push({
+                  sourceSymbol,
+                  targetSymbol: relationInfo.target,
+                  filePath,
+                  line,
+                  description: relationInfo.description,
+                });
               }
             }
           }
@@ -164,26 +165,17 @@ export class ExplicitSemanticRelationAnalyzer {
   }
 
   /**
-   * Parse @relatedTo tag content
+   * Parse `@relatedTo` tag content
    *
-   * @param tag - JSDoc tag
+   * @param rawValue - Rendered TSDoc block value
    * @returns Parsed relation info or null
-   *
-   * @example
-   * ```typescript
-   * // @relatedTo UserRepository - Data access
-   * // → { target: 'UserRepository', description: 'Data access' }
-   *
-   * // @relatedTo TokenManager
-   * // → { target: 'TokenManager', description: undefined }
-   * ```
    */
-  private parseRelatedToTag(tag: ts.JSDocTag): { target: string; description?: string } | null {
-    const comment = this.getTagComment(tag);
+  private parseRelatedToValue(rawValue: string): { target: string; description?: string } | null {
+    const comment = rawValue.trim();
     if (!comment) return null;
 
     // Format: "SymbolName - Description" or just "SymbolName"
-    const match = comment.match(/^([A-Za-z0-9_]+)(?:\s*-\s*(.+))?$/);
+    const match = comment.match(/^([A-Za-z0-9_.]+)(?:\s*-\s*(.+))?$/s);
     if (match) {
       return {
         target: match[1].trim(),
@@ -191,7 +183,7 @@ export class ExplicitSemanticRelationAnalyzer {
       };
     }
 
-    // Fallback: treat entire comment as symbol name
+    // Fallback: treat first token as symbol name
     const symbolName = comment.split(/\s/)[0].trim();
     if (symbolName) {
       return {
@@ -218,24 +210,6 @@ export class ExplicitSemanticRelationAnalyzer {
       const declaration = node.declarationList.declarations[0];
       if (declaration && ts.isIdentifier(declaration.name)) {
         return declaration.name.text;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Get comment from JSDoc tag
-   *
-   * @param tag - JSDoc tag
-   * @returns Comment text or null
-   */
-  private getTagComment(tag: ts.JSDocTag): string | null {
-    if (tag.comment) {
-      if (typeof tag.comment === 'string') return tag.comment;
-      if (Array.isArray(tag.comment)) {
-        return tag.comment
-          .map((part: ts.JSDocText | ts.JSDocLink) => ('text' in part ? part.text : ''))
-          .join('');
       }
     }
     return null;

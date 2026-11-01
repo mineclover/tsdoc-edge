@@ -165,5 +165,25 @@ describe('ModuleSpecTagParser', () => {
       expect(result.algorithm).toBeDefined();
       expect(Object.keys(result).length).toBe(1);
     });
+
+    it('should parse single-line @internal modifier and multiline @algorithm paragraphs via @microsoft/tsdoc AST', () => {
+      const singleLineInternal = parser.parseModuleSpecTags(null, '/** @internal */');
+      expect(singleLineInternal.scope?.accessLevel).toBe('internal');
+
+      const multilineAlgorithm = parser.parseModuleSpecTags(
+        null,
+        `/**
+          * @algorithm
+          * First normalize tokens via TSDocConfiguration,
+          * then traverse DocNode blocks without regexes.
+          */`
+      );
+      expect(multilineAlgorithm.algorithm?.description).toContain(
+        'First normalize tokens via TSDocConfiguration'
+      );
+      expect(multilineAlgorithm.algorithm?.description).toContain(
+        'then traverse DocNode blocks without regexes.'
+      );
+    });
   });
 });

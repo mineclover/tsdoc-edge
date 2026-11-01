@@ -12,6 +12,7 @@ import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';
 import { generateLegacyId } from '../indexer/legacy-id';
+import { extractLeadingJsDocText, readTsdocComment, TSDocParser } from '../parser/TSDocParser';
 import type { SqliteDatabase } from '../types/database';
 
 /**
@@ -293,34 +294,21 @@ export class IncrementalBuilder {
   }
 
   /**
-   * Extract JSDoc summary from node
+   * Extract JSDoc summary from node using `@microsoft/tsdoc` `DocComment` AST.
    */
   private extractJsDocSummary(node: ts.Node, sourceFile: ts.SourceFile): string | null {
-    const fullText = sourceFile.getFullText();
-    const nodeStart = node.getFullStart();
-
-    // Look for JSDoc comment before the node
-    const leadingComments = ts.getLeadingCommentRanges(fullText, nodeStart);
-    if (!leadingComments) return null;
-
-    for (const comment of leadingComments) {
-      const text = fullText.slice(comment.pos, comment.end);
-      if (text.startsWith('/**')) {
-        // Extract first line/paragraph as summary
-        const lines = text
-          .replace(/^\/\*\*/, '')
-          .replace(/\*\/$/, '')
-          .split('\n')
-          .map((l) => l.replace(/^\s*\*\s?/, '').trim())
-          .filter((l) => l && !l.startsWith('@'));
-
-        if (lines.length > 0) {
-          return lines[0];
-        }
-      }
+    const jsDocText = extractLeadingJsDocText(node, sourceFile);
+    if (!jsDocText) {
+      return null;
     }
 
-    return null;
+    const summary = readTsdocComment(new TSDocParser().parseString(jsDocText).docComment).summary;
+    if (!summary) {
+      return null;
+    }
+
+    const firstLine = summary.split('\n')[0]?.trim();
+    return firstLine || null;
   }
 
   /**

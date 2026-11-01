@@ -7,6 +7,7 @@
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';
+import { extractLeadingJsDocText, readTsdocComment, TSDocParser } from '../parser/TSDocParser';
 import type { Symbol, SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 
@@ -34,7 +35,7 @@ interface CoRequirementSite {
  * - Missing B causes runtime error
  *
  * Detection:
- * 1. Parse @requires tags in TSDoc
+ * 1. Parse `@requires` tags in TSDoc
  * 2. Detect constructor dependencies (A depends on B in constructor)
  * 3. Find required peer dependencies
  *
@@ -55,6 +56,7 @@ interface CoRequirementSite {
  */
 export class CoRequirementAnalyzer {
   private graph: SymbolGraph;
+  private readonly tsdocParser = new TSDocParser();
 
   constructor(graph: SymbolGraph) {
     this.graph = graph;
@@ -117,24 +119,22 @@ export class CoRequirementAnalyzer {
   ): void {
     const visit = (node: ts.Node): void => {
       try {
-        const jsDocTags = ts.getJSDocTags(node);
-        if (jsDocTags && jsDocTags.length > 0) {
-          const symbolName = this.getSymbolName(node);
-
-          if (symbolName) {
-            for (const tag of jsDocTags) {
-              if (tag.tagName.text === 'requires') {
-                const requiredSymbol = this.getTagComment(tag);
-                if (requiredSymbol) {
-                  const line =
-                    sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
-                  sites.push({
-                    requirer: symbolName,
-                    required: requiredSymbol.trim(),
-                    filePath,
-                    line,
-                  });
-                }
+        const symbolName = this.getSymbolName(node);
+        if (symbolName) {
+          const jsDoc = extractLeadingJsDocText(node, sourceFile);
+          if (jsDoc) {
+            const structured = readTsdocComment(this.tsdocParser.parseString(jsDoc).docComment);
+            for (const rawTarget of structured.getTagValues('@requires')) {
+              const requiredSymbol = rawTarget.trim();
+              if (requiredSymbol) {
+                const line =
+                  sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
+                sites.push({
+                  requirer: symbolName,
+                  required: requiredSymbol,
+                  filePath,
+                  line,
+                });
               }
             }
           }
@@ -160,24 +160,6 @@ export class CoRequirementAnalyzer {
     if (ts.isClassDeclaration(node) && node.name) return node.name.text;
     if (ts.isInterfaceDeclaration(node) && node.name) return node.name.text;
     if (ts.isTypeAliasDeclaration(node) && node.name) return node.name.text;
-    return null;
-  }
-
-  /**
-   * Get comment from JSDoc tag
-   *
-   * @param tag - JSDoc tag
-   * @returns Comment text or null
-   */
-  private getTagComment(tag: ts.JSDocTag): string | null {
-    if (tag.comment) {
-      if (typeof tag.comment === 'string') return tag.comment;
-      if (Array.isArray(tag.comment)) {
-        return tag.comment
-          .map((part: ts.JSDocText | ts.JSDocLink) => ('text' in part ? part.text : ''))
-          .join('');
-      }
-    }
     return null;
   }
 

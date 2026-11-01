@@ -15,6 +15,7 @@ import Database from 'better-sqlite3';
 import * as ts from 'typescript';
 import { ConfigManager } from '../config/ConfigManager';
 import { DocumentSymbolParser } from '../doc-symbol/DocumentSymbolParser';
+import { extractDocCheckpointsFromSource } from '../parser/TSDocParser';
 import { SpecGraphRepository } from '../storage/SpecGraphRepository';
 import type { SpecStatus } from '../types/spec';
 import { SpecCompletenessValidator } from './SpecCompletenessValidator';
@@ -37,16 +38,25 @@ export interface SpecMetricsOptions {
 
 /**
  * The 7 aspects of the module specification framework, keyed to the canonical
- * `@microsoft/tsdoc` standard tags and irreducible `tsdoc-edge` domain tags that evidence them.
+ * `@microsoft/tsdoc` standard constructs (`CANONICAL_TSDOC_STANDARD_BRIDGE`)
+ * and irreducible `tsdoc-edge` domain tags (`TSDOC_EDGE_CUSTOM_TAGS`) that evidence them.
  */
 export const MODULE_SPEC_ASPECT_TAGS = {
   purpose: ['@problem', '@responsibility', '@solves'],
-  input: ['@param', '@precondition', '@contract'],
+  input: ['@param', '@typeParam', '@defaultValue', '@precondition', '@contract'],
   output: ['@returns', '@throws', '@postcondition'],
-  context: ['@context', '@relatedTo', '@requires', '@enhances'],
+  context: ['@context', '@see', '@link', '@relatedTo', '@requires', '@enhances'],
   logic: ['@algorithm', '@complexity', '@functionality', '@invariant', '@remarks'],
   effect: ['@sideEffect'],
-  scope: ['@public', '@internal', '@beta', '@alpha'],
+  scope: [
+    '@public',
+    '@internal',
+    '@beta',
+    '@alpha',
+    '@packageDocumentation',
+    '@deprecated',
+    '@readonly',
+  ],
 } as const;
 
 /** Module specification aspect name. */
@@ -263,12 +273,18 @@ export class SpecMetricsAggregator {
     const aspectsCoverage = Object.fromEntries(
       (Object.keys(MODULE_SPEC_ASPECT_TAGS) as ModuleSpecAspect[]).map((aspect) => [
         aspect,
-        MODULE_SPEC_ASPECT_TAGS[aspect].some((tag) => tags.has(tag)),
+        hasAspectEvidence(aspect, tags),
       ])
     ) as Record<ModuleSpecAspect, boolean>;
 
     const index = this.indexSpecDocuments(options.managedDir ?? 'managed');
-    const refs = [...new Set([...source.matchAll(/@doc\s+\[\[([^\]]+)\]\]/g)].map((m) => m[1]))];
+    const refs = [
+      ...new Set(
+        extractDocCheckpointsFromSource(resolved, source, { requireDeclaration: false }).map(
+          (entry) => entry.rawReference
+        )
+      ),
+    ];
     const boundSpecs = refs.map((symbolRef) => {
       const doc = index.get(symbolRef.split('#')[0]);
       if (!doc) return { symbolRef };
@@ -435,13 +451,20 @@ function readSpecGraph(specDbPath: string): UnifiedSpecMetrics['specGraph'] {
   }
 }
 
+function hasAspectEvidence(aspect: ModuleSpecAspect, tags: ReadonlySet<string>): boolean {
+  if (aspect === 'purpose' && tags.has('summary')) {
+    return true;
+  }
+  return MODULE_SPEC_ASPECT_TAGS[aspect].some((tag) => tags.has(tag));
+}
+
 function measureAspects(files: string[]): UnifiedSpecMetrics['module7Aspects'] {
   const aspects = Object.keys(MODULE_SPEC_ASPECT_TAGS) as ModuleSpecAspect[];
   const hits = Object.fromEntries(aspects.map((a) => [a, 0])) as Record<ModuleSpecAspect, number>;
   for (const file of files) {
     const tags = jsDocTagNames(file, fs.readFileSync(file, 'utf8'));
     for (const aspect of aspects) {
-      if (MODULE_SPEC_ASPECT_TAGS[aspect].some((tag) => tags.has(tag))) hits[aspect] += 1;
+      if (hasAspectEvidence(aspect, tags)) hits[aspect] += 1;
     }
   }
   const aspectCoverage = Object.fromEntries(
@@ -451,12 +474,27 @@ function measureAspects(files: string[]): UnifiedSpecMetrics['module7Aspects'] {
   return { analyzedFiles: files.length, aspectCoverage, averageAspectScore: Math.round(average) };
 }
 
-/** Tag names that appear in real JSDoc blocks (not in strings or code), e.g. `@param`. */
+/** Standard constructs (`summary`, `@link`) and `@tag` names that appear in real JSDoc blocks. */
 function jsDocTagNames(fileName: string, source: string): Set<string> {
   const names = new Set<string>();
   const sourceFile = ts.createSourceFile(fileName, source, ts.ScriptTarget.Latest, true);
+  const hasCommentSummary = (comment: ts.JSDoc['comment']): boolean => {
+    if (typeof comment === 'string') {
+      return comment.trim().length > 0;
+    }
+    if (comment) {
+      return comment.some((part) => part.getText(sourceFile).trim().length > 0);
+    }
+    return false;
+  };
   const visit = (node: ts.Node): void => {
     for (const doc of (node as ts.Node & { jsDoc?: ts.JSDoc[] }).jsDoc ?? []) {
+      if (hasCommentSummary(doc.comment)) {
+        names.add('summary');
+      }
+      if (doc.getText(sourceFile).includes('{@link')) {
+        names.add('@link');
+      }
       for (const tag of doc.tags ?? []) names.add(`@${tag.tagName.text}`);
     }
     ts.forEachChild(node, visit);

@@ -1,12 +1,13 @@
 /**
  * Enhancement Analyzer
  * @packageDocumentation
- * @responsibility Analyze @enhances tags in TSDoc comments
+ * @responsibility Analyze `@enhances` tags in TSDoc comments
  */
 
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as ts from 'typescript';
+import { extractLeadingJsDocText, readTsdocComment, TSDocParser } from '../parser/TSDocParser';
 import type { Symbol, SymbolGraph } from '../types/graph';
 import type { UnifiedRelationship } from '../types/relationships/unified';
 
@@ -27,7 +28,7 @@ interface EnhancementSite {
  *
  * @doc [[EnhancementAnalyzer]]
  * @public
- * @responsibility Detect code enhancements via @enhances tags
+ * @responsibility Detect code enhancements via `@enhances` tags
  *
  * Pattern: A enhances B
  * - A extends B's functionality
@@ -35,8 +36,8 @@ interface EnhancementSite {
  * - A improves B's performance or capability
  *
  * Detection:
- * 1. Parse all TypeScript files for @enhances tags in TSDoc comments
- * 2. Extract symbol names from @enhances tags
+ * 1. Parse all TypeScript files for `@enhances` tags in TSDoc comments
+ * 2. Extract symbol names from `@enhances` tags
  * 3. Create relationships from enhancer to enhanced
  *
  * Evidence:
@@ -57,6 +58,7 @@ interface EnhancementSite {
  */
 export class EnhancementAnalyzer {
   private graph: SymbolGraph;
+  private readonly tsdocParser = new TSDocParser();
 
   /**
    * Creates an EnhancementAnalyzer instance
@@ -88,7 +90,7 @@ export class EnhancementAnalyzer {
   }
 
   /**
-   * Collect all @enhances tags from TypeScript files
+   * Collect all `@enhances` tags from TypeScript files
    *
    * @param rootDir - Root directory
    * @returns Array of enhancement sites
@@ -112,7 +114,7 @@ export class EnhancementAnalyzer {
   }
 
   /**
-   * Extract @enhances tags from a source file
+   * Extract `@enhances` tags from a source file
    *
    * @param sourceFile - TypeScript source file
    * @param filePath - File path
@@ -125,27 +127,22 @@ export class EnhancementAnalyzer {
   ): void {
     const visit = (node: ts.Node): void => {
       try {
-        // Get JSDoc tags
-        const jsDocTags = ts.getJSDocTags(node);
-
-        if (jsDocTags && jsDocTags.length > 0) {
-          const symbolName = this.getSymbolName(node);
-
-          if (symbolName) {
-            for (const tag of jsDocTags) {
-              if (tag.tagName.text === 'enhances') {
-                const enhancedSymbol = this.getTagComment(tag);
-
-                if (enhancedSymbol) {
-                  const line =
-                    sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
-                  sites.push({
-                    enhancerSymbol: symbolName,
-                    enhancedSymbol: enhancedSymbol.trim(),
-                    filePath,
-                    line,
-                  });
-                }
+        const symbolName = this.getSymbolName(node);
+        if (symbolName) {
+          const jsDoc = extractLeadingJsDocText(node, sourceFile);
+          if (jsDoc) {
+            const structured = readTsdocComment(this.tsdocParser.parseString(jsDoc).docComment);
+            for (const rawTarget of structured.getTagValues('@enhances')) {
+              const enhancedSymbol = rawTarget.trim();
+              if (enhancedSymbol) {
+                const line =
+                  sourceFile.getLineAndCharacterOfPosition(node.getStart(sourceFile)).line + 1;
+                sites.push({
+                  enhancerSymbol: symbolName,
+                  enhancedSymbol,
+                  filePath,
+                  line,
+                });
               }
             }
           }
@@ -186,27 +183,6 @@ export class EnhancementAnalyzer {
       const declaration = node.declarationList.declarations[0];
       if (declaration && ts.isIdentifier(declaration.name)) {
         return declaration.name.text;
-      }
-    }
-    return null;
-  }
-
-  /**
-   * Get comment text from JSDoc tag
-   *
-   * @param tag - JSDoc tag
-   * @returns Comment text or null
-   */
-  private getTagComment(tag: ts.JSDocTag): string | null {
-    if (tag.comment) {
-      if (typeof tag.comment === 'string') {
-        return tag.comment;
-      }
-      // Handle array of comment parts
-      if (Array.isArray(tag.comment)) {
-        return tag.comment
-          .map((part: ts.JSDocText | ts.JSDocLink) => ('text' in part ? part.text : ''))
-          .join('');
       }
     }
     return null;

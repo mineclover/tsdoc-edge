@@ -3,37 +3,15 @@
  * @packageDocumentation
  */
 
-import { type DocNode, DocNodeKind } from '@microsoft/tsdoc';
+import type { DocNode } from '@microsoft/tsdoc';
+import { renderDocNodesText } from '../parser/TSDocParser';
 import type { ParsedDocComment } from '../types';
 
-// TSDoc internal node types (not exposed in public API)
 /**
- * DocPlainText interface
+ * Generates markdown documentation from parsed `@microsoft/tsdoc` comments
+ *
  * @doc [[MarkdownGenerator]]
- * @public
- */
-interface DocPlainText extends DocNode {
-  text: string;
-}
-
-/**
- * DocParagraph interface
- * @public
- */
-interface DocParagraph extends DocNode {
-  nodes: ReadonlyArray<DocNode>;
-}
-
-/**
- * DocCodeSpan interface
- * @public
- */
-interface DocCodeSpan extends DocNode {
-  code: string;
-}
-
-/**
- * Generates markdown documentation from parsed TSDoc comments
+ * @doc [[TSDocStandardSpecification]]
  * @public
  */
 export class MarkdownGenerator {
@@ -53,7 +31,9 @@ export class MarkdownGenerator {
     // Add summary
     if (comment.docComment.summarySection) {
       const summary = this.renderDocNodes(comment.docComment.summarySection.nodes);
-      markdown += `${summary}\n\n`;
+      if (summary) {
+        markdown += `${summary}\n\n`;
+      }
     }
 
     // Add parameters
@@ -81,7 +61,7 @@ export class MarkdownGenerator {
       markdown += `${remarks}\n\n`;
     }
 
-    // Add custom blocks (responsibility, contract, decision, etc.)
+    // Add custom blocks (responsibility, contract, decision, throws, example, etc.)
     if (comment.docComment.customBlocks && comment.docComment.customBlocks.length > 0) {
       for (const block of comment.docComment.customBlocks) {
         const tagName = block.blockTag.tagName;
@@ -125,35 +105,12 @@ export class MarkdownGenerator {
   }
 
   /**
-   * Render an array of DocNodes to plain text
+   * Render an array of `@microsoft/tsdoc` `DocNode` items into Markdown text.
    *
    * @param nodes - Array of DocNodes
-   * @returns Rendered text
+   * @returns Rendered Markdown text
    */
   private renderDocNodes(nodes: ReadonlyArray<DocNode>): string {
-    let result = '';
-
-    for (const node of nodes) {
-      switch (node.kind) {
-        case DocNodeKind.PlainText:
-          result += (node as DocPlainText).text;
-          break;
-        case DocNodeKind.SoftBreak:
-          result += ' ';
-          break;
-        case DocNodeKind.Paragraph:
-          result += this.renderDocNodes((node as DocParagraph).nodes);
-          result += '\n\n';
-          break;
-        case DocNodeKind.CodeSpan:
-          result += `\`${(node as DocCodeSpan).code}\``;
-          break;
-        default:
-          // Handle other node types as needed
-          result += node.toString();
-      }
-    }
-
-    return result.trim();
+    return renderDocNodesText(nodes, { preserveMarkdown: true });
   }
 }

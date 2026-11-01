@@ -11,7 +11,8 @@
 
 import * as path from 'node:path';
 import * as ts from 'typescript';
-import type { DetectedEndpoint, EndpointScope, HTTPMethod } from '../types/endpoints';
+import { extractLeadingJsDocText, readTsdocComment, TSDocParser } from '../parser/TSDocParser';
+import { type DetectedEndpoint, EndpointScope, type HTTPMethod } from '../types/endpoints';
 
 /**
  * Configuration for endpoint detection
@@ -29,6 +30,7 @@ export interface EndpointDetectionConfig {
 export class EndpointDetectionAnalyzer {
   private program: ts.Program;
   private config: EndpointDetectionConfig;
+  private readonly tsdocParser = new TSDocParser();
 
   constructor(program: ts.Program, config: Partial<EndpointDetectionConfig> = {}) {
     this.program = program;
@@ -500,20 +502,31 @@ export class EndpointDetectionAnalyzer {
   ): EndpointScope {
     // Check path patterns
     if (routePath.startsWith('/api/admin') || routePath.includes('/admin/')) {
-      return 'admin' as EndpointScope;
+      return EndpointScope.ADMIN;
     }
 
     if (routePath.startsWith('/api/internal') || routePath.includes('/internal/')) {
-      return 'internal' as EndpointScope;
+      return EndpointScope.INTERNAL;
     }
 
     if (routePath.startsWith('/api/private') || routePath.includes('/private/')) {
-      return 'private' as EndpointScope;
+      return EndpointScope.PRIVATE;
     }
 
-    // Check JSDoc for @scope tag
-    const jsDoc = this.getJSDoc(node, sourceFile);
+    // Check JSDoc via @microsoft/tsdoc release modifiers (@internal/@public/@beta/@alpha), with legacy @scope fallback
+    const jsDoc = extractLeadingJsDocText(node, sourceFile);
     if (jsDoc) {
+      const structured = readTsdocComment(this.tsdocParser.parseString(jsDoc).docComment);
+      if (structured.releaseVisibility === 'internal') {
+        return EndpointScope.INTERNAL;
+      }
+      if (
+        structured.releaseVisibility === 'public' ||
+        structured.releaseVisibility === 'beta' ||
+        structured.releaseVisibility === 'alpha'
+      ) {
+        return EndpointScope.PUBLIC;
+      }
       const scopeMatch = jsDoc.match(/@scope\s+(public|internal|private|admin)/);
       if (scopeMatch) {
         return scopeMatch[1] as EndpointScope;
@@ -521,22 +534,7 @@ export class EndpointDetectionAnalyzer {
     }
 
     // Default: public
-    return 'public' as EndpointScope;
-  }
-
-  /**
-   * Get JSDoc comment for node
-   */
-  private getJSDoc(node: ts.Node, sourceFile: ts.SourceFile): string | null {
-    const fullText = sourceFile.getFullText();
-    const commentRanges = ts.getLeadingCommentRanges(fullText, node.getFullStart());
-
-    if (!commentRanges || commentRanges.length === 0) {
-      return null;
-    }
-
-    const lastComment = commentRanges[commentRanges.length - 1];
-    return fullText.substring(lastComment.pos, lastComment.end);
+    return EndpointScope.PUBLIC;
   }
 
   /**
