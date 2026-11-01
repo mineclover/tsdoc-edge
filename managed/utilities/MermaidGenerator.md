@@ -130,7 +130,7 @@ tsdoc-edge detect-circular-types
 
 ## Related
 
-- [[VisualizeDepsCommand]]: CLI visualization
+- [[RelationshipVisualizeCommand]]: CLI visualization
 - DependencyChainAnalyzer: Detect patterns
 - [[DetectCircularTypesCommand]]: Find cycles
 

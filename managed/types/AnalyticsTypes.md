@@ -133,7 +133,7 @@ const report = tracker.generateReport({
 ## Related
 
 - UsageTracker: Analytics implementation
-- [[UsageCommand]]: Display usage stats
+- [[UsageTracker]]: Display usage stats
 - ConfigManager: Analytics configuration
 
 ---

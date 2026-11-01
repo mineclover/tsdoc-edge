@@ -140,7 +140,7 @@ tsdoc-edge validate
 ## Related
 
 - [[HealthCommand]]: Display health metrics
-- [[AnalyzeCommand]]: Analyze code quality
+- [[HealthCommand]]: Analyze code quality
 - [[ValidateCommand]]: Enforce quality standards
 
 ---

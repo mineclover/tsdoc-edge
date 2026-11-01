@@ -44,13 +44,19 @@ export class HelpCommand extends BaseCommand {
       alias: 'sym',
       description: 'Symbol operations',
       subcommands: [
-        { name: 'query', description: 'Query symbol information' },
-        { name: 'fix', description: 'Fix symbol issues' },
-        { name: 'rename', description: 'Rename symbols across codebase' },
+        { name: 'query', description: 'Query code symbols and [[Symbol]] checkpoints' },
         { name: 'deps', description: 'Show dependencies (what this uses)' },
         { name: 'who-uses', description: 'Show reverse dependencies (what uses this)' },
         { name: 'orphans', description: 'Find symbols without dependents' },
         { name: 'find-method', description: 'Find methods by name' },
+        { name: 'tree', description: 'Show symbol hierarchy tree' },
+        { name: 'core-api', description: 'Show exported core API symbols' },
+        { name: 'undocumented', description: 'Find undocumented symbols' },
+        { name: 'untested', description: 'Find symbols without test coverage' },
+        { name: 'parse', description: 'Parse and display enhanced TSDoc for a file' },
+        { name: 'promote', description: 'Promote auxiliary heading to canonical H1' },
+        { name: 'fix', description: 'Fix [[Symbol]] issues' },
+        { name: 'rename', description: 'Rename [[Symbol]] across docs and code' },
       ],
     },
     {
@@ -81,11 +87,11 @@ export class HelpCommand extends BaseCommand {
       description: 'Validation commands',
       subcommands: [
         { name: 'docs', description: 'Validate documentation files' },
-        { name: 'generated', description: 'Validate generated docs' },
-        { name: 'connectivity', description: 'Check symbol connectivity' },
+        { name: 'tsdoc', description: 'Validate TSDoc syntax and tsdoc.json configuration' },
         { name: 'refs', description: 'Validate symbol references' },
         { name: 'spec', description: 'Validate specification files' },
-        { name: 'tsdoc', description: 'Validate TSDoc syntax and tsdoc.json configuration' },
+        { name: 'connectivity', description: 'Check symbol connectivity' },
+        { name: 'generated', description: 'Validate generated docs' },
       ],
     },
     {
@@ -100,6 +106,12 @@ export class HelpCommand extends BaseCommand {
         { name: 'generate', description: 'Generate documentation' },
         { name: 'validate', description: 'Validate documentation' },
         { name: 'find-unused', description: 'Find unused documentation' },
+        { name: 'move', description: 'Move documentation file and update references' },
+        { name: 'symbols', description: 'List defined [[Symbol]] project concepts' },
+        { name: 'fix', description: 'Automatically fix TSDoc documentation issues' },
+        { name: 'suggest', description: 'Generate documentation improvement suggestions' },
+        { name: 'todos', description: 'List @privateRemarks TODO items' },
+        { name: 'plans', description: 'List planned future items from documentation' },
       ],
     },
     {
@@ -107,14 +119,15 @@ export class HelpCommand extends BaseCommand {
       alias: 'sp',
       description: 'Specification management',
       subcommands: [
+        { name: 'extract', description: 'Compile managed project specs into SpecGraph' },
+        { name: 'graph', description: 'Inspect saved SpecGraph revisions read-only' },
+        { name: 'metrics', description: 'Display specification metrics dashboard' },
+        { name: 'validate', description: 'Validate specifications' },
+        { name: 'duplicates', description: 'Check for duplicate content across specifications' },
         { name: 'status', description: 'Show spec status' },
         { name: 'history', description: 'Show specification version history' },
         { name: 'diff', description: 'Compare specification versions' },
         { name: 'bump', description: 'Bump specification version' },
-        { name: 'validate', description: 'Validate specifications' },
-        { name: 'metrics', description: 'Display specification metrics dashboard' },
-        { name: 'extract', description: 'Compile managed project specs into SpecGraph' },
-        { name: 'graph', description: 'Inspect saved SpecGraph revisions read-only' },
       ],
     },
     {
@@ -139,14 +152,9 @@ export class HelpCommand extends BaseCommand {
   ];
 
   /**
-   * Legacy commands that are still supported but have unified alternatives
+   * Legacy commands list (empty after Wave 8 CLI surface pruning)
    */
-  private readonly legacyCommands = [
-    'validate-docs',
-    'index-docs',
-    'update-backlinks',
-    'find-unused-docs',
-  ];
+  private readonly legacyCommands: string[] = [];
 
   constructor(registry?: CommandRegistry) {
     super();
@@ -224,6 +232,9 @@ export class HelpCommand extends BaseCommand {
 
       // Core standalone commands
       console.log(`${colors.bold}Core Commands:${colors.reset}`);
+      console.log(
+        `  ${colors.cyan}system-status${colors.reset}  Show 3-plane SSOT system dashboard ${colors.dim}(status, ss)${colors.reset}`
+      );
       console.log(
         `  ${colors.cyan}stats${colors.reset}          Show documentation statistics ${colors.dim}(s)${colors.reset}`
       );

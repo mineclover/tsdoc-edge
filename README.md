@@ -98,13 +98,15 @@ The `work-context` command provides everything you need before modifying code:
 | Feature | Command | Description |
 |---------|---------|-------------|
 | Work Context | `wc <file>` | Complete context before file modification |
-| Relationship Analysis | `relationship stats` | 13 relationship types, 10 categories |
+| Design Context | `dc <file>` | Spec bindings, `@contract`, and `@decision` view |
+| Symbol Query | `symbol query <name>` | Code symbol (`@ttsc/graph`) + `[[Symbol]]` checkpoint lookup |
+| Relationship Analysis | `relationship stats` | Canonical `@ttsc/graph` + project relationship metrics |
 | Impact Analysis | `relationship impact <symbol>` | Change impact assessment |
 | Quality Check | `lint` | Code health, docs, tests, relationships |
-| Documentation | `index-docs managed` | Index `[[Symbol]]` references |
+| Documentation | `docs index managed` | Index `[[Symbol]]` references |
 | Convention Check | `convention check --pack <file>` | Check exact spec bindings with policy and suppressions |
 | Convention Inputs | `convention inputs list|read` | Inspect exact evidence, enrichment, and policy pins read-only |
-| Find Method | `find-method <name>` | Find methods by name across the symbol graph |
+| Find Method | `symbol find-method <name>` | Find methods by name across the symbol graph |
 | Specifications | `spec extract` / `spec graph ...` | Compile and inspect managed SpecGraph revisions |
 | Canonical Graph | `canonical-graph status\|list\|read\|prune` | Inspect saved ttsc graph revisions read-only or prune historical revisions |
 | Spec Graph | `spec graph status|list|read` | Inspect saved managed SpecGraph revisions read-only |
@@ -141,7 +143,7 @@ tsdoc-edge wc src/services/UserService.ts
 ### Refactoring Safely
 ```bash
 tsdoc-edge relationship query <symbol>  # Dependencies
-tsdoc-edge who-uses <symbol>            # Reverse dependencies
+tsdoc-edge symbol who-uses <symbol>     # Reverse dependencies
 tsdoc-edge relationship impact <id>     # Full impact analysis
 ```
 
@@ -149,14 +151,14 @@ tsdoc-edge relationship impact <id>     # Full impact analysis
 ```bash
 tsdoc-edge lint                  # All checks
 tsdoc-edge health src            # Code health report
-tsdoc-edge suggest               # Improvement suggestions
+tsdoc-edge docs suggest          # Improvement suggestions
 ```
 
 ### Documentation Management
 ```bash
-tsdoc-edge index-docs managed    # Index documents
-tsdoc-edge validate-docs         # Validate SSOT
-tsdoc-edge update-backlinks      # Update backlinks
+tsdoc-edge docs index managed    # Index documents
+tsdoc-edge validate docs managed # Validate SSOT
+tsdoc-edge docs backlinks        # Update backlinks
 ```
 
 ### Convention Governance

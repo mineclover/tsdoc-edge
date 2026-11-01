@@ -78,7 +78,7 @@ Core components that power relationship detection, symbol extraction, and qualit
 
 **Purpose**: Generate health reports with improvement suggestions
 **Output**: Health score (0-100) + suggestions
-**Used By**: [[HealthCommand]], [[AnalyzeCommand]]
+**Used By**: [[HealthCommand]], [[HealthCommand]]
 
 **Capabilities**:
 - Documentation quality analysis
@@ -423,7 +423,6 @@ Storage (SQLite + JSONL)
 - [[TSDoc Edge Documentation]] → managed/README.md:176
 - [[Code Generation]] → managed/code-generation/index.md:136
 - [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:254
-- [[ParallelWorkCommand]] → managed/commands/ParallelWorkCommand.md:29
 - [[Phase Commands]] → managed/commands/PhaseCommands.md:84
 - [[Core Systems]] → managed/core/index.md:50
 - [[Analyzer Status]] → managed/features/analyzer-status.md:306

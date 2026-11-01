@@ -99,7 +99,7 @@ System-level management and validation.
 
 - [[CLI Commands]] - Full command reference
 - [[BuildCommand]] - Core build command
-- [[AnalyzeCommand]] - Main analysis entry point
+- [[HealthCommand]] - Main analysis entry point
 
 ---
 
@@ -107,9 +107,9 @@ System-level management and validation.
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:315
+- [[Commands Index]] → managed/COMMANDS.md:184
 - [[TSDoc Edge Documentation]] → managed/README.md:108
-- [[QueryCommands]] → managed/commands/QueryCommands.md:146
+- [[QueryCommands]] → managed/commands/QueryCommands.md:138
 
 ### Implemented By
 

@@ -292,9 +292,7 @@ canonical graph 입력을 기준선에 포함하려면 `--graph-revision`과
 - [[TestCoverageAnalyzer]] → managed/analyzers/TestCoverageAnalyzer.md:17
 - [[TestRelationshipAnalyzer]] → managed/analyzers/TestRelationshipAnalyzer.md:15
 - [[Analyzers & Extractors]] → managed/analyzers/index.md:95
-- [[AnalyzeTestsCommand]] → managed/commands/AnalyzeTestsCommand.md:15
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:17
-- [[TestRelationshipsCommand]] → managed/commands/TestRelationshipsCommand.md:17
 - [[Analyzer System]] → managed/core/analyzer-system.md:214
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:104
 - [[Analyzer Status]] → managed/features/analyzer-status.md:19

@@ -96,7 +96,7 @@ active revision을 항상 보존하면서 오래된 revision을 정리하며, �
 
 ### Referenced By
 
-- [[CLI Commands]] → managed/CLI-COMMANDS.md:30
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:32
 - [[TSDoc Edge Documentation]] → managed/README.md:52
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:267
 - [[InitCommand]] → managed/commands/InitCommand.md:343

@@ -97,11 +97,9 @@ Convention: kebab-case from file path + symbol name
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:180
 - [[TSDoc Edge Documentation]] → managed/README.md:115
 - [[ASTSymbolExtractor]] → managed/analyzers/ASTSymbolExtractor.md:124
 - [[CheckLinksCommand]] → managed/commands/CheckLinksCommand.md:15
-- [[ExploreEntrypointCommand]] → managed/commands/ExploreEntrypointCommand.md:20
 - [[ValidateSymbolRefsCommand]] → managed/commands/ValidateSymbolRefsCommand.md:15
 - [[Analyzer System]] → managed/core/analyzer-system.md:269
 - [[Spec Management System]] → managed/core/spec-management-system.md:183

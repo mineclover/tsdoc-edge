@@ -62,7 +62,7 @@ tsdoc-edge build <directory>
 
 ...
 
-## [[ParseMermaidCommand]]
+## [[Mermaid Symbol Extractor]]
 
 In this workflow, ParseMermaidCommand generates H2 reference docs from
 .mmd diagram nodes. Unlike normal parsing, it creates auxiliary definitions

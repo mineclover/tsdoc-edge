@@ -44,10 +44,6 @@ interface TestCoverage {
 
 ## Backlinks
 
-### Referenced By
-
-- [[AnalyzeTestsCommand]] → managed/commands/AnalyzeTestsCommand.md:34
-
 ### Implemented By
 
 - TestRelationshipAnalyzer → src/analyzer/TestRelationshipAnalyzer.ts:1

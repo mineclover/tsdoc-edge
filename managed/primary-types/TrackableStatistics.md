@@ -113,7 +113,7 @@ console.log(`Critical symbols documented: ${criticalStats.documented}/${critical
 - `--save`: 스냅샷 저장
 - `--compare`: 이전 대비 비교
 
-**[[AnalyzeCommand]]** (`src/commands/AnalyzeCommand.ts`)
+**[[HealthCommand]]** (`src/commands/AnalyzeCommand.ts`)
 - 중요도별 통계 분석
 - `byImportance` 필드 활용
 

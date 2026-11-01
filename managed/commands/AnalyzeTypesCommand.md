@@ -36,7 +36,6 @@ Analyze type dependencies and usage.
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:97
-- [[DetectDeadCodeCommand]] → managed/commands/DetectDeadCodeCommand.md:96
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:232
 
 ### Implemented By

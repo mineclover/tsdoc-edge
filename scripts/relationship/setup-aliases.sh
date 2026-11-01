@@ -18,20 +18,20 @@ else
 fi
 
 # Core relationship commands
-alias rel-check="$TSDOC_CMD relationship-check"
-alias rel-impact="$TSDOC_CMD relationship-impact"
-alias rel-query="$TSDOC_CMD relationship-query"
-alias rel-path="$TSDOC_CMD relationship-path"
-alias rel-metrics="$TSDOC_CMD relationship-metrics"
-alias rel-clusters="$TSDOC_CMD relationship-clusters"
-alias rel-validate="$TSDOC_CMD relationship-validate"
-alias rel-export="$TSDOC_CMD relationship-export"
-alias rel-help="$TSDOC_CMD relationship-help"
+alias rel-check="$TSDOC_CMD relationship check"
+alias rel-impact="$TSDOC_CMD relationship impact"
+alias rel-query="$TSDOC_CMD relationship query"
+alias rel-path="$TSDOC_CMD relationship path"
+alias rel-metrics="$TSDOC_CMD relationship metrics"
+alias rel-clusters="$TSDOC_CMD relationship clusters"
+alias rel-validate="$TSDOC_CMD relationship validate"
+alias rel-export="$TSDOC_CMD relationship export"
+alias rel-help="$TSDOC_CMD relationship help"
 
 # Quick analysis aliases
-alias rel-critical="$TSDOC_CMD relationship-metrics --top 20"
-alias rel-bottlenecks="$TSDOC_CMD relationship-metrics --metric betweenness --top 15"
-alias rel-stats="$TSDOC_CMD relationship-query --stats"
+alias rel-critical="$TSDOC_CMD relationship metrics --top 20"
+alias rel-bottlenecks="$TSDOC_CMD relationship metrics --metric betweenness --top 15"
+alias rel-stats="$TSDOC_CMD relationship query --stats"
 
 # Workflow scripts
 if [ -f "$(dirname "$0")/check-symbol-safety.sh" ]; then
@@ -47,11 +47,11 @@ if [ -f "$(dirname "$0")/find-critical-changes.sh" ]; then
 fi
 
 # Quick export aliases
-alias rel-to-gephi="$TSDOC_CMD relationship-export --format graphml"
-alias rel-to-neo4j="$TSDOC_CMD relationship-export --format cypher"
-alias rel-to-dot="$TSDOC_CMD relationship-export --format dot"
-alias rel-to-json="$TSDOC_CMD relationship-export --format json"
-alias rel-to-csv="$TSDOC_CMD relationship-export --format csv"
+alias rel-to-gephi="$TSDOC_CMD relationship export --format graphml"
+alias rel-to-neo4j="$TSDOC_CMD relationship export --format cypher"
+alias rel-to-dot="$TSDOC_CMD relationship export --format dot"
+alias rel-to-json="$TSDOC_CMD relationship export --format json"
+alias rel-to-csv="$TSDOC_CMD relationship export --format csv"
 
 # Function: Safety check before modifying a symbol
 rel-before() {
@@ -63,7 +63,7 @@ rel-before() {
 
   echo "🔍 Running safety check for: $1"
   echo ""
-  $TSDOC_CMD relationship-check "$1"
+  $TSDOC_CMD relationship check "$1"
 }
 
 # Function: Find path between two symbols
@@ -76,7 +76,7 @@ rel-connect() {
 
   echo "🔗 Finding paths from $1 to $2"
   echo ""
-  $TSDOC_CMD relationship-path "$1" "$2"
+  $TSDOC_CMD relationship path "$1" "$2"
 }
 
 # Function: Quick impact check with custom depth
@@ -90,7 +90,7 @@ rel-blast() {
   local depth="${2:-3}"
   echo "💥 Impact analysis for: $1 (depth: $depth)"
   echo ""
-  $TSDOC_CMD relationship-impact "$1" --depth "$depth"
+  $TSDOC_CMD relationship impact "$1" --depth "$depth"
 }
 
 # Function: Generate visualization
@@ -99,7 +99,7 @@ rel-viz() {
   local output="${2:-graph.$format}"
 
   echo "📊 Exporting to $format format..."
-  $TSDOC_CMD relationship-export --format "$format" > "$output"
+  $TSDOC_CMD relationship export --format "$format" > "$output"
   echo "✓ Saved to: $output"
 
   if [ "$format" = "dot" ]; then

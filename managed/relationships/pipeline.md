@@ -22,7 +22,7 @@ Multi-step data pipelines (A → B → C → D, 3+ steps).
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:84
+- [[Commands Index]] → managed/COMMANDS.md:100
 - [[TSDoc Edge Documentation]] → managed/README.md:56
 - [[CallGraphAnalyzer]] → managed/analyzers/CallGraphAnalyzer.md:417
 - [[AnalyzerCommands]] → managed/commands/AnalyzerCommands.md:72

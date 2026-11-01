@@ -210,9 +210,9 @@ Complete workflow for creating diagram-based documentation.
 
 **What You'll Learn**:
 - Designing `.mmd` diagrams
-- Generating docs with [[ParseMermaidCommand]]
+- Generating docs with [[Mermaid Symbol Extractor]]
 - Promoting symbols with [[PromoteSymbolCommand]]
-- Exploring with [[ExploreEntrypointCommand]]
+- Exploring with [[WorkContextCommand]]
 
 **Example**: EXAMPLE-MERMAID-WORKFLOW - Real-world case showing 14.3% → 95.1% coverage
 
@@ -276,7 +276,7 @@ Understand the 20+ analyzers powering TSDoc Edge:
 
 **Commands Covered**:
 - [[HealthCommand]] - Code health reports
-- [[AnalyzeCommand]] - Comprehensive analysis
+- [[HealthCommand]] - Comprehensive analysis
 - [[StatsCommand]] - Project statistics
 - [[DepsCommand]] - Dependency queries
 - [[WhoUsesCommand]] - Reverse dependency queries

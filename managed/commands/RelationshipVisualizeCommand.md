@@ -19,6 +19,11 @@ Renders Mermaid relationship diagrams centered on a target symbol with configura
 
 ## Backlinks
 
+### Referenced By
+
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:43
+- [[MermaidGenerator]] → managed/utilities/MermaidGenerator.md:133
+
 ### Implemented By
 
 - RelationshipVisualizeCommand → src/commands/RelationshipVisualizeCommand.ts:29

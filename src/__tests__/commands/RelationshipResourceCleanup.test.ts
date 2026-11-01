@@ -11,7 +11,6 @@ import { RelationshipExportCommand } from '../../commands/RelationshipExportComm
 import { RelationshipStatsCommand } from '../../commands/RelationshipStatsCommand';
 import { RelationshipValidateCommand } from '../../commands/RelationshipValidateCommand';
 import { RelationshipVisualizeCommand } from '../../commands/RelationshipVisualizeCommand';
-import { VisualizeDepsCommand } from '../../commands/VisualizeDepsCommand';
 import { DatabaseManager } from '../../storage/DatabaseManager';
 
 describe('Relationship Resource Cleanup', () => {
@@ -130,47 +129,6 @@ describe('Relationship Resource Cleanup', () => {
       jest.spyOn(console, 'log').mockImplementation();
 
       const result = await command.execute([]);
-
-      expect(result.exitCode).toBe(1);
-      expect(closeSpy).toHaveBeenCalledTimes(1);
-    });
-  });
-
-  describe('VisualizeDepsCommand', () => {
-    it('ensures dbManager is closed when missing target symbol ID', async () => {
-      const dbPath = path.join(tempDir, '.tsdoc.db');
-      const db = new DatabaseManager(dbPath);
-      db.close();
-
-      const command = new VisualizeDepsCommand();
-      jest.spyOn(command as any, 'getDatabasePath').mockReturnValue(dbPath);
-      const closeSpy = jest.spyOn(DatabaseManager.prototype, 'close');
-      jest.spyOn(DatabaseManager.prototype, 'getGraphData').mockReturnValue({
-        symbols: [],
-        dependencies: [],
-      });
-      jest.spyOn(console, 'log').mockImplementation();
-
-      const result = await command.execute(['tree']);
-
-      expect(result.exitCode).toBe(1);
-      expect(closeSpy).toHaveBeenCalledTimes(1);
-    });
-
-    it('ensures dbManager is closed when graph processing throws', async () => {
-      const dbPath = path.join(tempDir, '.tsdoc.db');
-      const db = new DatabaseManager(dbPath);
-      db.close();
-
-      const command = new VisualizeDepsCommand();
-      jest.spyOn(command as any, 'getDatabasePath').mockReturnValue(dbPath);
-      const closeSpy = jest.spyOn(DatabaseManager.prototype, 'close');
-      jest.spyOn(DatabaseManager.prototype, 'getGraphData').mockImplementation(() => {
-        throw new Error('Graph data query failed');
-      });
-      jest.spyOn(console, 'log').mockImplementation();
-
-      const result = await command.execute(['tree', 'sym-id']);
 
       expect(result.exitCode).toBe(1);
       expect(closeSpy).toHaveBeenCalledTimes(1);

@@ -116,16 +116,6 @@ tsdoc-edge validate-tsdoc [path] [--strict] [--json]
 
 ## Symbol ID Commands
 
-### [[IdCommand]]
-
-Queries, validates, and manages symbol identity entries in the workspace symbol registry.
-
-```bash
-tsdoc-edge id <action> [options]
-```
-
-**Source**: `src/commands/IdCommand.ts`
-
 ### [[IdNewCommand]]
 
 Allocates a new unique symbol identifier in the JSONL symbol registry.
@@ -213,29 +203,19 @@ tsdoc-edge lint [path] [options]
 Automatically repairs common TSDoc formatting, missing modifier, and document link issues in target files.
 
 ```bash
-tsdoc-edge fix [path] [options]
+tsdoc-edge docs fix [path] [options]
 ```
 
 **Source**: `src/commands/FixCommand.ts`
 
-### [[ImproveCommand]]
-
-Analyzes documentation gaps and guides iterative TSDoc quality improvements across a source directory.
-
-```bash
-tsdoc-edge improve [path]
-```
-
-**Source**: `src/commands/ImproveCommand.ts`
-
-## Planning & Task Commands
+## Planning Commands
 
 ### [[PlansCommand]]
 
 Lists structured engineering backlog plans extracted from `@privateRemarks` and enhanced symbol documentation.
 
 ```bash
-tsdoc-edge plans [path]
+tsdoc-edge docs plans [path]
 ```
 
 **Source**: `src/commands/PlansCommand.ts`
@@ -245,20 +225,10 @@ tsdoc-edge plans [path]
 Aggregates and lists engineering `TODO` items extracted from `@privateRemarks` across indexed files.
 
 ```bash
-tsdoc-edge todos [path]
+tsdoc-edge docs todos [path]
 ```
 
 **Source**: `src/commands/TodosCommand.ts`
-
-### [[TaskCommands]]
-
-Provides CLI subcommands for tracking and updating documentation and refactoring task checklists.
-
-```bash
-tsdoc-edge task <list|add|done> [options]
-```
-
-**Source**: `src/commands/TaskCommands.ts`
 
 ## Ontology Commands
 
@@ -304,28 +274,6 @@ tsdoc-edge scan <path>
 
 **Source**: `src/commands/ScanCommand.ts`
 
-### [[SyncCoverageCommand]]
-
-Parses Istanbul/NYC coverage reports and persists source-identified execution metrics with optional canonical graph projection.
-
-```bash
-tsdoc-edge sync-coverage [coverage-file] [options]
-
-# options
---workspace <id>
---report-db <file>
---canonical-graph-db <file>
-```
-
-**Source**: `src/commands/SyncCoverageCommand.ts`
-
-현재 명령은 Istanbul/NYC coverage JSON을 파싱하고 source identity와 분자·분모를 포함한
-`execution.line|function|branch` report를 `.tsdoc/coverage-metrics.db`에 저장한다.
-`--canonical-graph-db`를 지정하면 활성 ttsc graph revision에 file/function evidence를
-추가로 투영하고 `report-only` 요약을 출력한다. graph DB에 활성 revision이 없으면 실패한다.
-
-저장된 report는 `coverage-report list|read`로 read-only inspection할 수 있다.
-
 ### coverage-baseline
 
 저장된 source-identified report를 immutable baseline으로 저장하거나, 명시한 baseline ID와
@@ -361,77 +309,15 @@ tsdoc-edge coverage-baseline read \
 
 **Source**: `src/commands/CoverageBaselineCommand.ts`
 
-### [[TestExamplesCommand]]
-
-Extracts and displays executable code examples mined from unit and integration test suites.
-
-```bash
-tsdoc-edge test-examples [path]
-```
-
-**Source**: `src/commands/TestExamplesCommand.ts`
-
 ### move
 
 Move document and update references.
 
 ```bash
-tsdoc-edge move <from> <to>
+tsdoc-edge docs move <from> <to>
 ```
 
 **Source**: `src/commands/MoveCommand.ts`
-
-### rename
-
-Rename document and update references.
-
-```bash
-tsdoc-edge rename <from> <to>
-```
-
-**Source**: `src/commands/RenameCommand.ts`
-
-### [[RebuildIndexCommand]]
-
-Rebuilds SQLite FTS5 full-text search indexes for symbols and unified relationships.
-
-```bash
-tsdoc-edge rebuild-index
-```
-
-**Source**: `src/commands/RebuildIndexCommand.ts`
-
-## Hook Commands
-
-### [[InstallHookCommand]]
-
-Installs the TSDoc Edge Git `pre-commit` quality gate hook into the local repository.
-
-```bash
-tsdoc-edge install-hook
-```
-
-**Source**: `src/commands/InstallHookCommand.ts`
-
-### [[PreCommitRunCommand]]
-
-Executes `PreCommitChecker` validation against staged files during Git `pre-commit` hook runs.
-
-```bash
-tsdoc-edge pre-commit-run
-```
-
-**Source**: `src/commands/PreCommitRunCommand.ts`
-
-### [[UninstallHookCommand]]
-
-Removes the TSDoc Edge Git `pre-commit` hook cleanly from `.git/hooks`.
-
-```bash
-tsdoc-edge uninstall-hook
-```
-
-**Source**: `src/commands/UninstallHookCommand.ts`
 
 ## Related
 
@@ -444,7 +330,7 @@ tsdoc-edge uninstall-hook
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:173
+- [[Commands Index]] → managed/COMMANDS.md:108
 - [[SyncCommand]] → managed/commands/SyncCommand.md:22
 
 ### Implemented By

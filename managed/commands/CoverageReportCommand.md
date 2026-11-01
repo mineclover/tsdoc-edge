@@ -267,7 +267,7 @@ echo "Coverage: $coverage%" > coverage-badge.txt
 - [[BuildCommand]]: Populates symbol database
 - [[IndexDocsCommand]]: Indexes documentation symbols
 - [[ValidateDocsCommand]]: Validates documentation quality
-- [[DetectDeadCodeCommand]]: Finds unused code
+- [[OrphansCommand]]: Finds unused code
 - [[Work Context Workflow]]: Shows context for file modifications
 
 ## See Also
@@ -282,7 +282,7 @@ echo "Coverage: $coverage%" > coverage-badge.txt
 
 ### Referenced By
 
-- [[DetectDeadCodeCommand]] → managed/commands/DetectDeadCodeCommand.md:94
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:52
 - [[UntestedCommand]] → managed/commands/UntestedCommand.md:199
 - [[ValidateSpecCommand]] → managed/commands/ValidateSpecCommand.md:321
 - [[Coverage Metrics Contract]] → managed/features/coverage-metrics-contract.md:276

@@ -121,8 +121,8 @@ tsdoc-edge coverage-report --hierarchical
 
 ## Related
 
-- [[TestRelationshipsCommand]]: Analyze test relationships
-- [[TestRelationshipsCommand]]: Show test coverage
+- [[UntestedCommand]]: Analyze test relationships
+- [[UntestedCommand]]: Show test coverage
 - [[CoverageReportCommand]]: Coverage metrics
 
 ---

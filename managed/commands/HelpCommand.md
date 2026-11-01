@@ -34,7 +34,8 @@ Display help information for CLI commands.
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:70
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:39
+- [[Commands Index]] → managed/COMMANDS.md:62
 
 ### Implemented By
 

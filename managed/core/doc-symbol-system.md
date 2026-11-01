@@ -415,7 +415,6 @@ symbols.forEach(sym => {
 - [[Semantic Graph Analysis and Relationship Model]] → managed/architecture/semantic-graph-analysis-and-relationship-model.md:1461
 - [[Code Generation]] → managed/code-generation/index.md:138
 - [[CheckLinksCommand]] → managed/commands/CheckLinksCommand.md:29
-- [[ExploreEntrypointCommand]] → managed/commands/ExploreEntrypointCommand.md:31
 - [[IndexDocsCommand]] → managed/commands/IndexDocsCommand.md:79
 - [[PromoteSymbolCommand]] → managed/commands/PromoteSymbolCommand.md:30
 - [[UpdateBacklinksCommand]] → managed/commands/UpdateBacklinksCommand.md:26

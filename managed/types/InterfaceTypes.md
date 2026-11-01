@@ -142,7 +142,7 @@ tsdoc-edge deps UserService
 ## Related
 
 - [[Symbol]]: Base symbol type
-- [[AnalyzeCommand]]: Domain analysis
+- [[HealthCommand]]: Domain analysis
 - [[DepsCommand]]: Dependency analysis
 
 ---

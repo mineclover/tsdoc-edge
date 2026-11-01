@@ -97,7 +97,7 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
   - Graph: [[SymbolGraphBuilder]] (`src/graph/SymbolGraphBuilder.ts`)
   - Storage: DatabaseManager (`src/storage/DatabaseManager.ts`)
 
-**[[ExploreEntrypointCommand]]** - `tsdoc-edge explore-entrypoint <doc-path> [--detect-orphans]`
+**[[WorkContextCommand]]** - `tsdoc-edge explore-entrypoint <doc-path> [--detect-orphans]`
 - 문서 진입점부터 코드 탐색
 - 심볼 커버리지 및 고아 코드 탐지
 - **Implementation Chain**:
@@ -118,7 +118,7 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 
 ### Supporting Commands
 
-**[[AnalyzeCommand]]** - `tsdoc-edge analyze <path>`
+**[[HealthCommand]]** - `tsdoc-edge analyze <path>`
 - 코드 품질 분석
 - **Implementation Chain**:
   - Command: `src/commands/AnalyzeCommand.ts:36`
@@ -179,7 +179,6 @@ TSDoc Edge의 메인 워크플로우는 TypeScript 소스 코드를 스캔하여
 
 - [[TSDoc Edge Documentation]] → managed/README.md:280
 - [[BuildCommand]] → managed/commands/BuildCommand.md:91
-- [[ExploreEntrypointCommand]] → managed/commands/ExploreEntrypointCommand.md:30
 - [[WorkContextCommand]] → managed/commands/WorkContextCommand.md:66
 - [[Feature Showcase]] → managed/examples/feature-showcase.md:31
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:432

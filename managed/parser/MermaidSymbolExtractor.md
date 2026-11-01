@@ -78,8 +78,8 @@ Maps relationship types to canonical names:
 
 Used by:
 - [[ValidateSymbolRefsCommand]] - Validate diagram symbols
-- [[ExploreEntrypointCommand]] - Explore from diagrams
-- [[ParseMermaidCommand]] - Extract diagram metadata
+- [[WorkContextCommand]] - Explore from diagrams
+- `Mermaid Symbol Extractor` - Extract diagram metadata
 
 ## Example
 
@@ -142,7 +142,8 @@ graph TD
 
 ### Referenced By
 
-- [[ParseMermaidCommand]] → managed/commands/ParseMermaidCommand.md:49
+- [[TSDoc Edge Documentation]] → managed/README.md:113
+- [[Guides & Tutorials]] → managed/guides/index.md:213
 - [[Document Symbol Parser]] → managed/parser/DocumentSymbolParser.md:133
 - [[MermaidExtractionResult]] → managed/primary-types/MermaidExtractionResult.md:30
 - [[MermaidRelationship]] → managed/primary-types/MermaidRelationship.md:36

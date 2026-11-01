@@ -30,42 +30,42 @@ echo ""
 
 # 1. Overall Statistics
 echo "📈 1. Generating overall statistics..."
-$TSDOC_CMD relationship-query --stats > "$REPORT_DIR/01-statistics.txt"
+$TSDOC_CMD relationship query --stats > "$REPORT_DIR/01-statistics.txt"
 echo "   ✓ Saved to 01-statistics.txt"
 
 # 2. Critical Symbols
 echo "🎯 2. Finding top 20 critical symbols..."
-$TSDOC_CMD relationship-metrics --top 20 > "$REPORT_DIR/02-critical-symbols.txt"
+$TSDOC_CMD relationship metrics --top 20 > "$REPORT_DIR/02-critical-symbols.txt"
 echo "   ✓ Saved to 02-critical-symbols.txt"
 
 # 3. Bottlenecks
 echo "🚦 3. Identifying bottlenecks (betweenness)..."
-$TSDOC_CMD relationship-metrics --metric betweenness --top 15 > "$REPORT_DIR/03-bottlenecks.txt"
+$TSDOC_CMD relationship metrics --metric betweenness --top 15 > "$REPORT_DIR/03-bottlenecks.txt"
 echo "   ✓ Saved to 03-bottlenecks.txt"
 
 # 4. Architectural Modules
 echo "🏗️  4. Discovering architectural modules..."
-$TSDOC_CMD relationship-clusters --min-size 5 > "$REPORT_DIR/04-modules.txt"
+$TSDOC_CMD relationship clusters --min-size 5 > "$REPORT_DIR/04-modules.txt"
 echo "   ✓ Saved to 04-modules.txt"
 
 # 5. Data Quality Check
 echo "✅ 5. Running data quality validation..."
-$TSDOC_CMD relationship-validate > "$REPORT_DIR/05-data-quality.txt" 2>&1 || true
+$TSDOC_CMD relationship validate > "$REPORT_DIR/05-data-quality.txt" 2>&1 || true
 echo "   ✓ Saved to 05-data-quality.txt"
 
 # 6. Export for Visualization
 echo "📊 6. Exporting for visualization tools..."
 
 echo "   • GraphML (for Gephi)..."
-$TSDOC_CMD relationship-export --format graphml > "$REPORT_DIR/06-graph.graphml"
+$TSDOC_CMD relationship export --format graphml > "$REPORT_DIR/06-graph.graphml"
 echo "     ✓ Saved to 06-graph.graphml"
 
 echo "   • DOT (for Graphviz)..."
-$TSDOC_CMD relationship-export --format dot --category structural > "$REPORT_DIR/06-structural.dot"
+$TSDOC_CMD relationship export --format dot --category structural > "$REPORT_DIR/06-structural.dot"
 echo "     ✓ Saved to 06-structural.dot"
 
 echo "   • JSON (for analysis)..."
-$TSDOC_CMD relationship-export --format json > "$REPORT_DIR/06-data.json"
+$TSDOC_CMD relationship export --format json > "$REPORT_DIR/06-data.json"
 echo "     ✓ Saved to 06-data.json"
 
 # 7. Generate Summary Report

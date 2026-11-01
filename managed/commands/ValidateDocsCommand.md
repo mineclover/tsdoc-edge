@@ -34,7 +34,7 @@ Validate documentation completeness and quality.
 
 ### Referenced By
 
-- [[CLI Commands]] → managed/CLI-COMMANDS.md:39
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:44
 - [[TSDoc Edge Documentation]] → managed/README.md:112
 - [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:269
 - [[ValidateSpecCommand]] → managed/commands/ValidateSpecCommand.md:318

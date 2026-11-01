@@ -15,10 +15,7 @@ import {
   FixCommand,
   GenerateDocsCommand,
   HelpCommand,
-  IdCommand,
-  ImproveCommand,
   InitCommand,
-  InstallHookCommand,
   OrphansCommand,
   ParseCommand,
   PlansCommand,
@@ -28,11 +25,9 @@ import {
   SpecStatusCommand,
   StatsCommand,
   SuggestCommand,
-  SyncCoverageCommand,
   TodosCommand,
   TreeCommand,
   UndocumentedCommand,
-  UninstallHookCommand,
   UntestedCommand,
   UpdateBacklinksCommand,
   UpdateSymbolRefsCommand,
@@ -231,14 +226,6 @@ describe('Phase 7 Commands', () => {
       expect(command.getDescription()).toContain('API');
     });
   });
-
-  describe('SyncCoverageCommand', () => {
-    it('should have correct name and description', () => {
-      const command = new SyncCoverageCommand();
-      expect(command.getName()).toBe('sync-coverage');
-      expect(command.getDescription()).toContain('coverage');
-    });
-  });
 });
 
 describe('Phase 8 Commands', () => {
@@ -265,40 +252,6 @@ describe('Phase 9 Commands', () => {
       const command = new HelpCommand();
       expect(command.getName()).toBe('help');
       expect(command.getDescription()).toContain('help');
-    });
-  });
-});
-
-describe('Phase 10 Commands', () => {
-  describe('IdCommand', () => {
-    it('should have correct name and description', () => {
-      const command = new IdCommand();
-      expect(command.getName()).toBe('id');
-      expect(command.getDescription()).toContain('ID');
-    });
-  });
-
-  describe('ImproveCommand', () => {
-    it('should have correct name and description', () => {
-      const command = new ImproveCommand();
-      expect(command.getName()).toBe('improve');
-      expect(command.getDescription()).toContain('improve');
-    });
-  });
-
-  describe('InstallHookCommand', () => {
-    it('should have correct name and description', () => {
-      const command = new InstallHookCommand();
-      expect(command.getName()).toBe('install-hook');
-      expect(command.getDescription()).toContain('hook');
-    });
-  });
-
-  describe('UninstallHookCommand', () => {
-    it('should have correct name and description', () => {
-      const command = new UninstallHookCommand();
-      expect(command.getName()).toBe('uninstall-hook');
-      expect(command.getDescription()).toContain('hook');
     });
   });
 });

@@ -146,7 +146,7 @@ Uses TypeScript compiler API for accurate analysis:
 
 - [[CodeHealthChecker]]: Overall code health analysis
 - [[HealthCommand]]: Health report generation
-- [[AnalyzeCommand]]: Code quality analysis
+- [[HealthCommand]]: Code quality analysis
 
 ### Depends On
 
@@ -313,7 +313,6 @@ scores.forEach(score => {
 
 - [[CodeHealthChecker]] → managed/analyzers/CodeHealthChecker.md:33
 - [[Analyzers & Extractors]] → managed/analyzers/index.md:93
-- [[AnalyzeCommand]] → managed/commands/AnalyzeCommand.md:27
 - [[SuggestCommand]] → managed/commands/SuggestCommand.md:482
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:243
 

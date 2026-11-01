@@ -92,7 +92,7 @@ if (report.metrics.overallScore < 70) {
 
 - [[AnalysisFeatures]] - 분석 기능 전체 설명
 - [[HealthCommand]] - `tsdoc-edge health` 명령어 구현
-- [[AnalyzeCommand]] - `tsdoc-edge analyze` 명령어 구현
+- [[HealthCommand]] - `tsdoc-edge analyze` 명령어 구현
 
 ## 6. Commands Using This Type
 
@@ -100,7 +100,7 @@ if (report.metrics.overallScore < 70) {
 - `AnalysisReport` 생성 및 출력
 - 전체 건강도 점수 계산
 
-**[[AnalyzeCommand]]** (`src/commands/AnalyzeCommand.ts`)
+**[[HealthCommand]]** (`src/commands/AnalyzeCommand.ts`)
 - 코드 품질 분석 수행
 - `AnalysisReport` 기반 개선 제안
 

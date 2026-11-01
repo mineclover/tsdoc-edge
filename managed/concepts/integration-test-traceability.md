@@ -542,8 +542,8 @@ Please add integration tests before committing.
 ---
 
 **Status**: Design Phase
-**Implementation**: [[TestRelationshipsCommand]] (`src/commands/TestRelationshipsCommand.ts`)
-**Related Commands**: [[TestRelationshipsCommand]], [[ParallelWorkCommand]]
+**Implementation**: [[UntestedCommand]] (`src/commands/TestRelationshipsCommand.ts`)
+**Related Commands**: [[UntestedCommand]], [[ParallelWorkDetector]]
 **Next Steps**: Add canonical node and execution evidence to the existing legacy analyzer path
 **Priority**: High (병렬 개발 안전성에 핵심)
 **Last Updated**: 2025-11-08

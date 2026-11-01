@@ -1,109 +1,25 @@
 #!/usr/bin/env node
 
 /**
- * TSDoc Edge CLI (Refactored)
- * Command-line interface with modular command pattern
+ * TSDoc Edge CLI
+ * Streamlined 20-command CLI surface backed by the 3-Layer SSOT architecture.
  *
- * @problem Original cli.ts is 5,728 lines with all logic in one file
- * @solves Command pattern with separate command classes
- * @context Gradual migration from monolithic to modular architecture
+ * @packageDocumentation
+ * @problem Original cli.ts grew to 5,728 lines and 82 flat overlapping commands
+ * @solves Modular command groups with a focused 20-command top-level surface
+ * @context Core workflow (`sync`, `wc`, `dc`, `convention`) + 7 unified groups
  */
 
 import { UsageTracker } from './analytics/UsageTracker';
-import {
-  AnalyzeCommand,
-  BuildCommand,
-  CanonicalGraphCommand,
-  CheckDuplicatesCommand,
-  CommandRegistry,
-  type CommandResult,
-  ConventionCommand,
-  CoreApiCommand,
-  CoverageBaselineCommand,
-  FindMethodCommand,
-  FixCommand,
-  HealthCommand,
-  HelpCommand,
-  IdCommand,
-  ImproveCommand,
-  IndexDocsCommand,
-  InitCommand,
-  InstallHookCommand,
-  ParseCommand,
-  PlansCommand,
-  QueryInferredCommand,
-  RebuildIndexCommand,
-  SpecMetricsCommand,
-  StatsCommand,
-  SuggestCommand,
-  SymbolUnifiedCommand,
-  SyncCommand,
-  SyncCoverageCommand,
-  TodosCommand,
-  TreeCommand,
-  UndocumentedCommand,
-  UninstallHookCommand,
-  UntestedCommand,
-  UpdateBacklinksCommand,
-  UsageCommand,
-  ValidateTsdocCommand,
-  ValidateUnifiedCommand,
-  VisualizeDepsCommand,
-} from './commands';
-import { AnalyzeRelationshipsCommand } from './commands/AnalyzeRelationshipsCommand';
-import { BlocksCommand } from './commands/BlocksCommand';
-import { CheckLinksCommand } from './commands/CheckLinksCommand';
-import { CommonCommand } from './commands/CommonCommand';
-import { CoverageReportCommand } from './commands/CoverageReportCommand';
-import { DepsCommand } from './commands/DepsCommand';
-import { DesignContextCommand } from './commands/DesignContextCommand';
-import { DetectDeadCodeCommand } from './commands/DetectDeadCodeCommand';
-import { DocSymbolsCommand } from './commands/DocSymbolsCommand';
-import { DocsCommand } from './commands/DocsCommand';
-import { EndpointsCommand } from './commands/EndpointsCommand';
-import { ExploreEntrypointCommand } from './commands/ExploreEntrypointCommand';
-import { HttpEndpointsCommand } from './commands/HttpEndpointsCommand';
-import { HubsCommand } from './commands/HubsCommand';
-import { LayersCommand } from './commands/LayersCommand';
-import { LintCommand } from './commands/LintCommand';
-import { MoveCommand } from './commands/MoveCommand';
-import { OntologyCommand } from './commands/OntologyCommand';
-import { OrphansCommand } from './commands/OrphansCommand';
-import { ParallelWorkCommand } from './commands/ParallelWorkCommand';
-import { ParseMermaidCommand } from './commands/ParseMermaidCommand';
-import { PreCommitRunCommand } from './commands/PreCommitRunCommand';
-import { PromoteSymbolCommand } from './commands/PromoteSymbolCommand';
-import { RelationshipCheckCommand } from './commands/RelationshipCheckCommand';
-import { RelationshipClustersCommand } from './commands/RelationshipClustersCommand';
-import { RelationshipCommand } from './commands/RelationshipCommand';
-import { RelationshipExportCommand } from './commands/RelationshipExportCommand';
-import { RelationshipHelpCommand } from './commands/RelationshipHelpCommand';
-import { RelationshipImpactCommand } from './commands/RelationshipImpactCommand';
-import { RelationshipMetricsCommand } from './commands/RelationshipMetricsCommand';
-import { RelationshipPathCommand } from './commands/RelationshipPathCommand';
-import { RelationshipQueryCommand } from './commands/RelationshipQueryCommand';
-import { RelationshipStatsCommand } from './commands/RelationshipStatsCommand';
-import { RelationshipValidateCommand } from './commands/RelationshipValidateCommand';
-import { RelationshipVisualizeCommand } from './commands/RelationshipVisualizeCommand';
-import { RoutesCommand } from './commands/RoutesCommand';
-import { SpecCommand } from './commands/SpecCommand';
-import { SystemStatusCommand } from './commands/SystemStatusCommand';
-import { TagDeadCodeCommand } from './commands/TagDeadCodeCommand';
-import { TaskCommand } from './commands/TaskCommand';
-import { TestExamplesCommand } from './commands/TestExamplesCommand';
-import { TestRelationshipsCommand } from './commands/TestRelationshipsCommand';
-import { ValidateDocsCommand } from './commands/ValidateDocsCommand';
-import { ValidateSymbolRefsCommand } from './commands/ValidateSymbolRefsCommand';
-import { WhoUsesCommand } from './commands/WhoUsesCommand';
-import { WorkContextCommand } from './commands/WorkContextCommand';
+import { type CommandResult, registerCliCommands } from './commands';
 import { ConfigManager } from './config/ConfigManager';
 import type { CommandUsageEvent } from './types/analytics';
 
 /**
  * Calculate Levenshtein distance between two strings
- * @param a - a parameter
- * @param b - b parameter
- * @returns Returns number
+ * @param a - First string
+ * @param b - Second string
+ * @returns Edit distance
  */
 function levenshteinDistance(a: string, b: string): number {
   const matrix: number[][] = [];
@@ -130,11 +46,11 @@ function levenshteinDistance(a: string, b: string): number {
 }
 
 /**
- * Find similar command names
- * @param input - input parameter
- * @param commands - commands parameter
- * @param maxDistance - maxDistance parameter
- * @returns Returns string[]
+ * Find similar command names with length-proportional precision filtering
+ * @param input - User command token
+ * @param commands - Registered command names and aliases
+ * @param maxDistance - Upper edit-distance bound
+ * @returns Up to 3 close command suggestions
  */
 function findSimilarCommands(input: string, commands: string[], maxDistance = 3): string[] {
   const lowerInput = input.toLowerCase();
@@ -188,110 +104,7 @@ if (configPath) {
  */
 async function main(): Promise<void> {
   const usageTracker = new UsageTracker();
-  const registry = new CommandRegistry();
-
-  // Register commands - Core workflow
-  registry.register(new BuildCommand());
-  registry.register(new SyncCommand());
-  registry.register(new CanonicalGraphCommand());
-  registry.register(new WorkContextCommand());
-  registry.register(new DesignContextCommand());
-  registry.register(new HealthCommand());
-  registry.register(new StatsCommand());
-  registry.register(new InitCommand());
-  registry.register(new FindMethodCommand());
-
-  // Register commands - Unified commands
-  registry.register(new ValidateUnifiedCommand());
-  registry.register(new SymbolUnifiedCommand());
-  registry.register(new RelationshipCommand());
-  registry.register(new SpecCommand());
-  registry.register(new SpecMetricsCommand());
-  registry.register(new TaskCommand());
-  registry.register(new OntologyCommand());
-  registry.register(new DocsCommand());
-  registry.register(new ConventionCommand());
-
-  // Preserve published flat command paths while docs/validate groups are the preferred surface.
-  registry.register(new IndexDocsCommand(undefined, undefined, undefined, true));
-  registry.register(new UpdateBacklinksCommand(undefined, undefined, undefined, undefined, true));
-  registry.register(new ValidateDocsCommand(undefined, undefined, true));
-  registry.register(new ValidateSymbolRefsCommand());
-  registry.register(new ValidateTsdocCommand());
-
-  // Preserve published flat command paths for relationship operations
-  registry.register(new RelationshipImpactCommand());
-  registry.register(new RelationshipMetricsCommand());
-  registry.register(new RelationshipClustersCommand());
-  registry.register(new RelationshipCheckCommand());
-  registry.register(new RelationshipValidateCommand());
-  registry.register(new RelationshipExportCommand());
-  registry.register(new RelationshipStatsCommand());
-  registry.register(new RelationshipQueryCommand());
-  registry.register(new RelationshipPathCommand());
-  registry.register(new RelationshipVisualizeCommand());
-  registry.register(new RelationshipHelpCommand());
-  registry.register(new AnalyzeRelationshipsCommand());
-
-  // Register commands - Analysis & tools
-  registry.register(new AnalyzeCommand());
-  registry.register(new SuggestCommand());
-  registry.register(new FixCommand());
-  registry.register(new ImproveCommand());
-  registry.register(new LintCommand());
-
-  // Register commands - Code exploration
-  registry.register(new ParseCommand());
-  registry.register(new TreeCommand());
-  registry.register(new UndocumentedCommand());
-  registry.register(new UntestedCommand());
-  registry.register(new CoreApiCommand());
-  registry.register(new DocSymbolsCommand());
-  registry.register(new PlansCommand());
-  registry.register(new TodosCommand());
-
-  // Register commands - Specialized
-  registry.register(new VisualizeDepsCommand());
-  registry.register(new CheckDuplicatesCommand());
-  registry.register(new ParallelWorkCommand());
-  registry.register(new TestRelationshipsCommand());
-  registry.register(new SystemStatusCommand());
-  registry.register(new TestExamplesCommand());
-  registry.register(new ExploreEntrypointCommand());
-  registry.register(new ParseMermaidCommand());
-  registry.register(new PromoteSymbolCommand());
-  registry.register(new CoverageReportCommand());
-  registry.register(new CoverageBaselineCommand());
-  registry.register(new DetectDeadCodeCommand());
-  registry.register(new TagDeadCodeCommand());
-  registry.register(new QueryInferredCommand());
-  registry.register(new MoveCommand());
-  registry.register(new SyncCoverageCommand());
-  registry.register(new RebuildIndexCommand());
-  registry.register(new IdCommand());
-
-  // Register commands - Utility
-  registry.register(new UsageCommand());
-  registry.register(new InstallHookCommand());
-  registry.register(new UninstallHookCommand());
-
-  // Standalone utility commands
-  registry.register(new CheckLinksCommand());
-  registry.register(new DepsCommand());
-  registry.register(new WhoUsesCommand());
-  registry.register(new OrphansCommand());
-  registry.register(new PreCommitRunCommand());
-
-  // Analysis commands
-  registry.register(new EndpointsCommand());
-  registry.register(new HttpEndpointsCommand());
-  registry.register(new BlocksCommand());
-  registry.register(new HubsCommand());
-  registry.register(new LayersCommand());
-  registry.register(new CommonCommand());
-  registry.register(new RoutesCommand());
-
-  registry.register(new HelpCommand(registry));
+  const registry = registerCliCommands();
 
   // Get command
   let commandName = args[0] || 'help';
@@ -319,11 +132,9 @@ async function main(): Promise<void> {
     const command = registry.get(commandName);
 
     if (!command) {
-      // Command not found - show error with suggestions
       console.log(`\x1b[31m✗ Unknown command: ${commandName}\x1b[0m`);
       console.log();
 
-      // Find similar commands
       const allNames = registry.getNames();
       const similar = findSimilarCommands(commandName, allNames);
 
@@ -347,7 +158,6 @@ async function main(): Promise<void> {
         error: new Error(`Unknown command: ${commandName}`),
       };
     } else {
-      // Execute command
       result = await command.execute(commandArgs);
     }
   } catch (error) {
@@ -358,7 +168,6 @@ async function main(): Promise<void> {
     };
   }
 
-  // Record usage event
   const endTime = performance.now();
   const duration = endTime - startTime;
 
@@ -375,13 +184,11 @@ async function main(): Promise<void> {
   };
 
   usageTracker.recordEvent(event);
-
-  // Exit with appropriate code after flushing buffered stdout/stderr pipes
   await flushOutputsAndExit(result.exitCode);
 }
 
-// Run main function
 main().catch((error: unknown) => {
-  console.error('\x1b[31m✗ Fatal error:\x1b[0m', error);
-  process.exit(1);
+  const detail = error instanceof Error ? error.message : String(error);
+  console.error(`\x1b[31m✗ Fatal error:\x1b[0m ${detail}`);
+  void flushOutputsAndExit(1);
 });

@@ -195,7 +195,7 @@ fi
 
 - [[UndocumentedCommand]]: Find symbols without documentation
 - [[HealthCommand]]: Overall code health including test coverage
-- [[TestRelationshipsCommand]]: Analyze test relationships
+- `UntestedCommand`: Analyze test relationships
 - [[CoverageReportCommand]]: Detailed coverage report
 
 ## Implementation
@@ -236,11 +236,16 @@ Low Priority:
 
 ### Referenced By
 
-- [[TSDoc Edge Documentation]] → managed/README.md:353
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:42
+- [[Commands Index]] → managed/COMMANDS.md:80
+- [[TSDoc Edge Documentation]] → managed/README.md:67
 - [[UndocumentedCommand]] → managed/commands/UndocumentedCommand.md:177
+- [[Integration Test Traceability]] → managed/concepts/integration-test-traceability.md:545
 - [[CI/CD Integration]] → managed/features/CICDIntegration.md:246
 - [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:108
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:296
+- [[TestRelationships]] → managed/types/TestRelationships.md:124
+- [[UnifiedRelationships]] → managed/types/UnifiedRelationships.md:205
 
 ### Implemented By
 

@@ -171,7 +171,7 @@ tsdoc-edge detect-dead-code
 
 - [[AnalyzeIOCommand]]: IO analysis
 - [[AnalyzeChainsCommand]]: Transformation chains
-- [[DetectDeadCodeCommand]]: Dead code detection
+- [[OrphansCommand]]: Dead code detection
 
 ---
 

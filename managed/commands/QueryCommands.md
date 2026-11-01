@@ -123,17 +123,9 @@ Lists symbol and relationship instances matching specific relationship ontology 
 
 Displays summary statistics and coverage across the 11 categories of the unified relationship ontology.
 
-**Usage**: `tsdoc-edge ontology-stats`
+**Usage**: `tsdoc-edge ontology stats`
 
 **Source**: `src/commands/OntologyStatsCommand.ts`
-
-### [[QueryInferredCommand]]
-
-Queries transitive and rule-inferred relationships computed dynamically by `RelationshipInferenceEngine`.
-
-**Usage**: `tsdoc-edge query-inferred <symbol-id> [options]`
-
-**Source**: `src/commands/QueryInferredCommand.ts`
 
 ### [[RelationshipQueryEngine]]
 

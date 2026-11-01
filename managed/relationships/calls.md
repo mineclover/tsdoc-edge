@@ -62,7 +62,7 @@ tsdoc-edge orphans --type=function
 
 ### Referenced By
 
-- [[Commands Index]] → managed/COMMANDS.md:80
+- [[Commands Index]] → managed/COMMANDS.md:100
 - [[TSDoc Edge Documentation]] → managed/README.md:59
 - [[CallGraphAnalyzer]] → managed/analyzers/CallGraphAnalyzer.md:413
 - [[Analyzers & Extractors]] → managed/analyzers/index.md:400

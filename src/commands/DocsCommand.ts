@@ -6,9 +6,15 @@
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
 import { CheckLinksCommand } from './CheckLinksCommand';
+import { DocSymbolsCommand } from './DocSymbolsCommand';
 import { FindUnusedDocsCommand } from './FindUnusedDocsCommand';
+import { FixCommand } from './FixCommand';
 import { GenerateDocsCommand } from './GenerateDocsCommand';
 import { IndexDocsCommand } from './IndexDocsCommand';
+import { MoveCommand } from './MoveCommand';
+import { PlansCommand } from './PlansCommand';
+import { SuggestCommand } from './SuggestCommand';
+import { TodosCommand } from './TodosCommand';
 import { UpdateBacklinksCommand } from './UpdateBacklinksCommand';
 import { UpdateSymbolRefsCommand } from './UpdateSymbolRefsCommand';
 import { ValidateDocsCommand } from './ValidateDocsCommand';
@@ -21,6 +27,18 @@ const SUBCOMMANDS = {
   generate: { command: GenerateDocsCommand, description: 'Generate markdown documentation' },
   validate: { command: ValidateDocsCommand, description: 'Validate documentation' },
   'find-unused': { command: FindUnusedDocsCommand, description: 'Find unused documents' },
+  move: { command: MoveCommand, description: 'Move documentation file and update references' },
+  symbols: {
+    command: DocSymbolsCommand,
+    description: 'List defined [[Symbol]] project concepts',
+  },
+  fix: { command: FixCommand, description: 'Automatically fix TSDoc documentation issues' },
+  suggest: {
+    command: SuggestCommand,
+    description: 'Generate documentation improvement suggestions',
+  },
+  todos: { command: TodosCommand, description: 'List @privateRemarks TODO items' },
+  plans: { command: PlansCommand, description: 'List planned future items from documentation' },
 } as const;
 
 type SubcommandName = keyof typeof SUBCOMMANDS;

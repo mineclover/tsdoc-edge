@@ -36,7 +36,6 @@ Checks:
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:115
-- [[ParseMermaidCommand]] → managed/commands/ParseMermaidCommand.md:51
 - [[SymbolFixCommand]] → managed/commands/SymbolFixCommand.md:384
 - [[SymbolQueryCommand]] → managed/commands/SymbolQueryCommand.md:181
 - [[ValidateSpecCommand]] → managed/commands/ValidateSpecCommand.md:319

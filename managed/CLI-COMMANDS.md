@@ -8,7 +8,7 @@ canonical: true
 
 # [[CLI Commands]]
 
-Complete reference for all TSDoc Edge CLI commands.
+Complete reference for the canonical **20 top-level TSDoc Edge CLI commands** (10 core workflow/status commands, 7 unified command groups, and 3 revision/coverage contract commands).
 
 ## Unified SSOT workflow
 
@@ -21,45 +21,42 @@ tsdoc-edge sync [--force] [--dry-run] [--check] [--json]
 
 The three SSOT tiers are `@microsoft/tsdoc` (29 standard tags), `ttsc`/`@ttsc/graph`/`@ttsc/lint`
 (canonical graph and 25 error rules), and `tsdoc-edge` (22 irreducible domain tags and connectivity).
-Use `find-method <name>` for method lookup, `spec extract` or `spec graph ...` for SpecGraph
-lifecycle operations, and `convention check --pack <file>` for revision-pinned governance.
+Use `symbol query <name>` or `symbol find-method <name>` for symbol lookup, `spec extract` or `spec graph ...`
+for SpecGraph lifecycle operations, and `convention check --pack <file>` for revision-pinned governance.
 
-## Command Categories
+## Top-Level Command Surface (20 Commands)
 
-### Build & Analysis
-- [[BuildCommand]] - Build symbol database
-- [[AnalyzeCommand]] - Analyze code health
-- [[HealthCommand]] - Check code health
+### 1. Core Workflow & Diagnostics (10)
+- [[InitCommand]] (`init`) - Initialize project configuration
+- `sync` - Synchronize symbol DB, canonical `@ttsc/graph`, SpecGraph, and backlinks
+- [[BuildCommand]] (`build`, `b`) - Build symbol database
+- [[WorkContextCommand]] (`work-context`, `wc`) - Show complete context before editing a file
+- `design-context` (`dc`) - Show spec bindings, `@contract`, and `@decision` context
+- `system-status` (`status`, `ss`) - Show 3-plane SSOT system dashboard
+- `stats` (`s`) - Show symbol, TSDoc, and canonical `@ttsc/graph` statistics
+- [[HealthCommand]] (`health`, `h`) - Check code health score
+- `lint` - Run quality and linting checks
+- [[HelpCommand]] (`help`) - Display CLI command tree and help
 
-### Documentation
-- [[SuggestCommand]] - Generate improvement suggestions
-- [[IndexDocsCommand]] - Index document symbols
-- [[UpdateBacklinksCommand]] - Update backlinks
-- [[CheckLinksCommand]] - Check broken links
-- [[ValidateDocsCommand]] - Validate documentation
+### 2. Unified Command Groups (7)
+- `symbol` (`sym`) - `query`, `deps` ([[DepsCommand]]), `who-uses` ([[WhoUsesCommand]]), `orphans` ([[OrphansCommand]]), `find-method`, `tree`, `core-api`, `undocumented`, `untested` ([[UntestedCommand]]), `parse`, `promote`, `fix`, `rename`
+- `relationship` (`rel`, `r`) - [[RelationshipCommands]] (`query`, `impact`, `path`, `clusters`, `metrics`, `validate`, `export`, `stats`, `check`, `visualize` / [[RelationshipVisualizeCommand]], `analyze` / [[AnalyzerCommands]], `type-chain`, `cycles`, `roots`, `help`)
+- `docs` (`d`) - `index` ([[IndexDocsCommand]]), `backlinks` ([[UpdateBacklinksCommand]]), `check-links` ([[CheckLinksCommand]]), `update-refs`, `generate`, `validate` ([[ValidateDocsCommand]]), `find-unused`, `move`, `symbols`, `fix`, `suggest` ([[SuggestCommand]]), `todos`, `plans`
+- `validate` (`val`, `v`) - `docs` ([[ValidateDocsCommand]]), `tsdoc`, `refs`, `spec`, `connectivity`, `generated`
+- `spec` (`sp`) - [[SpecCommands]] (`extract`, `graph`, `metrics`, `validate`, `duplicates`, `status`, `history`, `diff`, `bump`)
+- `convention` (`conv`) - `check`, `inputs`, `retention`
+- `ontology` (`ont`) - `stats`, `list`
 
-### Symbol Operations
-- [[DepsCommand]] - Show dependencies
-- [[WhoUsesCommand]] - Show symbol usage
-- [[OrphansCommand]] - Find orphaned symbols
-
-### Relationships
-- [[RelationshipCommands]] - Unified relationship analysis
-- [[AnalyzerCommands]] - Analyze relationships
-- [[VisualizeDepsCommand]] - Generate diagrams
-
-### Workflow
-- [[WorkContextCommand]] - Show file context
-- [[InitCommand]] - Initialize configuration
-- `sync [--force] [--dry-run] [--check] [--json]` - Run the complete SSOT synchronization pipeline
-- `find-method <name>` - Find methods by name
-- `spec extract` / `spec graph ...` - Build or inspect managed specifications
-- `convention check --pack <file>` - Check exact convention bindings
+### 3. Revision & Coverage Contracts (3)
+- `canonical-graph` - `status`, `list`, `read`, `prune`
+- [[CoverageReportCommand]] (`coverage-report`) - Generate or inspect persisted coverage reports (`list`, `read`)
+- `coverage-baseline` (`coverage-trend`) - `save`, `compare`, `list`, `read`
 
 ## See Also
 
 - [[CommandRegistry]] - Command registration system
 - [[BaseCommand]] - Base command class
+- [[Commands Index]] - Subcommand reference tables
 
 ---
 
@@ -68,7 +65,7 @@ lifecycle operations, and `convention check --pack <file>` for revision-pinned g
 ### Referenced By
 
 - [[Phase Commands]] → managed/commands/PhaseCommands.md:100
-- [[UtilityCommands]] → managed/commands/UtilityCommands.md:439
+- [[UtilityCommands]] → managed/commands/UtilityCommands.md:325
 - [[CLI Command Development Guide]] → managed/guides/command-development-guide.md:791
 
 ### Implemented By
@@ -83,7 +80,6 @@ lifecycle operations, and `convention check --pack <file>` for revision-pinned g
 - OrphansCommand (orphans) → src/commands/OrphansCommand.ts:38
 - ParseCommand (parse) → src/commands/ParseCommand.ts:35
 - PlansCommand (plans) → src/commands/PlansCommand.ts:34
-- RebuildIndexCommand (rebuild-index) → src/commands/RebuildIndexCommand.ts:31
 - SpecBumpCommand (spec-bump) → src/commands/SpecBumpCommand.ts:35
 - SpecDiffCommand (spec-diff) → src/commands/SpecDiffCommand.ts:35
 - SpecHistoryCommand (spec-history) → src/commands/SpecHistoryCommand.ts:35

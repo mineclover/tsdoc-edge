@@ -879,7 +879,7 @@ export class TsDocService {
    * @example
    * ```typescript
    * const context = await service.getWorkContext(
-   *   'src/commands/AnalyzeCommand.ts'
+   *   'src/commands/HealthCommand.ts'
    * );
    * console.log(context); // Markdown output
    * ```

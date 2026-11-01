@@ -36,7 +36,6 @@ Analyze function call relationships.
 ### Referenced By
 
 - [[TSDoc Edge Documentation]] → managed/README.md:61
-- [[DetectDeadCodeCommand]] → managed/commands/DetectDeadCodeCommand.md:95
 - [[SymbolGraphFeatures]] → managed/features/symbol-graph.md:206
 - [[Analyzer Development Guide]] → managed/guides/analyzer-development-guide.md:610
 - [[Build Pipeline Guide]] → managed/guides/build-pipeline-guide.md:531

@@ -243,7 +243,7 @@ Violations:
   - Uses: [[DocumentationAnalyzer]] (`src/analyzer/DocumentationAnalyzer.ts`), [[TestCoverageAnalyzer]] (`src/analyzer/TestCoverageAnalyzer.ts`)
   - Storage: [[SymbolGraphBuilder]] (`src/graph/SymbolGraph.ts`)
 
-**[[AnalyzeCommand]]** - `tsdoc-edge analyze [path]`
+**[[HealthCommand]]** - `tsdoc-edge analyze [path]`
 - 코드 품질 분석 (중요도별, 레이어별)
 - **Implementation Chain**:
   - Command: `src/commands/AnalyzeCommand.ts`

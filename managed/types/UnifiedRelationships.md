@@ -202,7 +202,7 @@ interface RelationshipGraph {
 ## Related
 
 - [[AnalyzeCallsCommand]]: Analyze call relationships
-- [[TestRelationshipsCommand]]: Test coverage relationships
+- [[UntestedCommand]]: Test coverage relationships
 - [[AnalyzeChainsCommand]]: Relationship chains
 
 ---

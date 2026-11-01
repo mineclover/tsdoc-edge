@@ -113,7 +113,7 @@ tsdoc-edge config set analytics.enabled false
 
 ## Related
 
-- [[UsageCommand]]: Display usage statistics
+- `UsageTracker`: Display usage statistics
 - ConfigManager: Analytics configuration
 - [[StatsCommand]]: Codebase statistics
 
@@ -123,6 +123,7 @@ tsdoc-edge config set analytics.enabled false
 
 ### Referenced By
 
+- [[AnalyticsTypes]] → managed/types/AnalyticsTypes.md:136
 - [[Utilities Index]] → managed/utilities/index.md:21
 
 ### Implemented By

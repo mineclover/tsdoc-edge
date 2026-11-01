@@ -19,6 +19,11 @@ Partitions files and symbols into disjoint dependency subgraphs that can be modi
 
 ## Backlinks
 
+### Referenced By
+
+- [[TSDoc Edge Documentation]] → managed/README.md:314
+- [[Integration Test Traceability]] → managed/concepts/integration-test-traceability.md:546
+
 ### Implemented By
 
 - ParallelWorkDetector → src/analyzer/ParallelWorkDetector.ts:1

@@ -39,7 +39,7 @@ echo ""
 # 1. Impact Analysis
 echo "📊 Step 1: Impact Analysis"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-$TSDOC_CMD relationship-impact "$SYMBOL_ID" --depth "$DEPTH"
+$TSDOC_CMD relationship impact "$SYMBOL_ID" --depth "$DEPTH"
 echo ""
 
 # 2. Check if critical
@@ -50,7 +50,7 @@ echo "Checking if symbol is in top 20 critical symbols..."
 echo ""
 
 # Run metrics and grep for our symbol
-METRICS_OUTPUT=$($TSDOC_CMD relationship-metrics --top 20 2>/dev/null || echo "")
+METRICS_OUTPUT=$($TSDOC_CMD relationship metrics --top 20 2>/dev/null || echo "")
 
 if echo "$METRICS_OUTPUT" | grep -q "$SYMBOL_ID"; then
   echo "⚠️  WARNING: This symbol is in TOP 20 most critical!"
@@ -69,7 +69,7 @@ fi
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🔗 Step 3: Connection Overview"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-$TSDOC_CMD relationship-query "$SYMBOL_ID" --limit 10
+$TSDOC_CMD relationship query "$SYMBOL_ID" --limit 10
 echo ""
 
 # 4. Final Recommendations
@@ -90,8 +90,8 @@ if [ "$IS_CRITICAL" = true ]; then
   echo "  ✓ Plan rollback strategy"
   echo ""
   echo "Commands to help:"
-  echo "  tsdoc-edge relationship-impact $SYMBOL_ID --depth 5"
-  echo "  tsdoc-edge relationship-path $SYMBOL_ID <other-symbol>"
+  echo "  tsdoc-edge relationship impact $SYMBOL_ID --depth 5"
+  echo "  tsdoc-edge relationship path $SYMBOL_ID <other-symbol>"
   echo ""
 else
   echo "✅ NORMAL RISK CHANGE"

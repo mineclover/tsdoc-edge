@@ -261,7 +261,7 @@ tsdoc-edge analyze-all [path] [options]
 
 ### Referenced By
 
-- [[CLI Commands]] → managed/CLI-COMMANDS.md:48
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:43
 
 ### Implemented By
 

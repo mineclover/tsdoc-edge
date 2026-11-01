@@ -650,7 +650,7 @@ export class WorkContextCommand extends BaseCommand {
       );
     } else if (useLlmFormat) {
       output = this.appendCanonicalMarkdown(
-        `# Work Context\n\n- **File**: \`${targetFile}\`\n- **Legacy database**: unavailable\n`,
+        `# Work Context\n\n- **File**: \`${targetFile}\`\n- **Legacy database**: unavailable\n\n## Summary\n\nNo primary symbol found.\n`,
         canonical
       );
     } else {

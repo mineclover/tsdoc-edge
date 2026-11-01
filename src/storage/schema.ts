@@ -426,53 +426,87 @@ export const entryPoints = sqliteTable(
 );
 
 // Type exports for use in application code
+/** Selected row record from the `symbols` table. @public */
 export type Symbol = typeof symbols.$inferSelect;
+/** Insert payload record for the `symbols` table. @public */
 export type NewSymbol = typeof symbols.$inferInsert;
 
+/** Selected row record from the `enhanced_docs` table. @public */
 export type EnhancedDoc = typeof enhancedDocs.$inferSelect;
+/** Insert payload record for the `enhanced_docs` table. @public */
 export type NewEnhancedDoc = typeof enhancedDocs.$inferInsert;
 
+/** Selected row record from the `error_experiences` table. @public */
 export type ErrorExperience = typeof errorExperiences.$inferSelect;
+/** Insert payload record for the `error_experiences` table. @public */
 export type NewErrorExperience = typeof errorExperiences.$inferInsert;
 
+/** Selected row record from the `decision_records` table. @public */
 export type DecisionRecord = typeof decisionRecords.$inferSelect;
+/** Insert payload record for the `decision_records` table. @public */
 export type NewDecisionRecord = typeof decisionRecords.$inferInsert;
 
+/** Selected row record from the `future_plans` table. @public */
 export type FuturePlan = typeof futurePlans.$inferSelect;
+/** Insert payload record for the `future_plans` table. @public */
 export type NewFuturePlan = typeof futurePlans.$inferInsert;
 
+/** Selected row record from the `dependencies` table. @public */
 export type Dependency = typeof dependencies.$inferSelect;
+/** Insert payload record for the `dependencies` table. @public */
 export type NewDependency = typeof dependencies.$inferInsert;
 
+/** Selected row record from the `unified_relationships` table. @public */
 export type UnifiedRelationship = typeof unifiedRelationships.$inferSelect;
+/** Insert payload record for the `unified_relationships` table. @public */
 export type NewUnifiedRelationship = typeof unifiedRelationships.$inferInsert;
 
+/** Selected row record from the `relationship_symbols` table. @public */
 export type RelationshipSymbol = typeof relationshipSymbols.$inferSelect;
+/** Insert payload record for the `relationship_symbols` table. @public */
 export type NewRelationshipSymbol = typeof relationshipSymbols.$inferInsert;
 
+/** Selected row record from the `test_mappings` table. @public */
 export type TestMapping = typeof testMappings.$inferSelect;
+/** Insert payload record for the `test_mappings` table. @public */
 export type NewTestMapping = typeof testMappings.$inferInsert;
 
+/** Selected row record from the `contracts` table. @public */
 export type Contract = typeof contracts.$inferSelect;
+/** Insert payload record for the `contracts` table. @public */
 export type NewContract = typeof contracts.$inferInsert;
 
+/** Selected row record from the `responsibilities` table. @public */
 export type Responsibility = typeof responsibilities.$inferSelect;
+/** Insert payload record for the `responsibilities` table. @public */
 export type NewResponsibility = typeof responsibilities.$inferInsert;
 
+/** Selected row record from the `indexing_rules` table. @public */
 export type IndexingRule = typeof indexingRules.$inferSelect;
+/** Insert payload record for the `indexing_rules` table. @public */
 export type NewIndexingRule = typeof indexingRules.$inferInsert;
 
+/** Selected row record from the `sync_metadata` table. @public */
 export type SyncMetadataRow = typeof syncMetadata.$inferSelect;
+/** Insert payload record for the `sync_metadata` table. @public */
 export type NewSyncMetadata = typeof syncMetadata.$inferInsert;
 
+/** Selected row record from the `tasks` table. @public */
 export type TaskRow = typeof tasks.$inferSelect;
+/** Insert payload record for the `tasks` table. @public */
 export type NewTask = typeof tasks.$inferInsert;
 
+/** Selected row record from the `endpoints` table. @public */
 export type Endpoint = typeof endpoints.$inferSelect;
+/** Insert payload record for the `endpoints` table. @public */
 export type NewEndpoint = typeof endpoints.$inferInsert;
 
+/** Selected row record from the `code_blocks` table. @public */
 export type CodeBlock = typeof codeBlocks.$inferSelect;
+/** Insert payload record for the `code_blocks` table. @public */
 export type NewCodeBlock = typeof codeBlocks.$inferInsert;
 
+/** Selected row record from the `entry_points` table. @public */
 export type EntryPoint = typeof entryPoints.$inferSelect;
+/** Insert payload record for the `entry_points` table. @public */
 export type NewEntryPoint = typeof entryPoints.$inferInsert;

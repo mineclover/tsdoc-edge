@@ -105,7 +105,7 @@ export class MyCommand extends BaseCommand {
 
 ### Referenced By
 
-- [[CLI Commands]] → managed/CLI-COMMANDS.md:62
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:58
 - [[CommandRegistry]] → managed/commands/CommandRegistry.md:29
 - [[DepsCommand]] → managed/commands/DepsCommand.md:65
 - [[FindRootTypesCommand]] → managed/commands/FindRootTypesCommand.md:74

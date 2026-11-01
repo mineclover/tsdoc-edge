@@ -6,10 +6,10 @@ This file provides guidance to Codex (Codex.ai/code) when working with code in t
 
 | Metric | Value |
 |--------|-------|
-| CLI Commands | 82+ (하위 명령 포함) |
-| Test Cases | 3,418+ (258 suites) |
-| Symbols | 10,852 |
-| Canonical `@ttsc/graph` | 8,679 internal (8,932 total) nodes / 18,121 internal (22,404 total) edges |
+| CLI Commands | 20 top-level (10 Core + 7 Unified Groups + 3 Revision/Coverage) |
+| Test Cases | 3,265 (238 suites) |
+| Symbols | 10,450+ |
+| Canonical `@ttsc/graph` | 8,424 internal (8,676 total) nodes / 17,075 internal (21,236 total) edges |
 | Custom TSDoc Tags | 22 + Standard 29 + `@ttsc/graph` 6 |
 | `@ttsc/lint` | 25 error rules (0 findings) |
 | Health Score | 90/100 (A) system-status · 93/100 (A+) core modules |
@@ -52,7 +52,8 @@ tsdoc-edge sync --force --json   # 전체 재생성 및 기계 판독 결과
 # 2. 파일 작업 전 컨텍스트 확인 (가장 중요)
 tsdoc-edge wc <file-path> --llm  # 모듈 개요 + 전체 export API + 의존/피의존/테스트
 tsdoc-edge dc <file-path>        # 규범 명세 바인딩 + 계약(@contract) + ADR(@decision)
-tsdoc-edge find-method <name>    # 메서드 이름으로 심볼 검색
+tsdoc-edge symbol query <name>   # 코드 심볼(@ttsc/graph) + [[Symbol]] 체크포인트 통합 조회
+tsdoc-edge symbol find-method <name> # 메서드 이름으로 심볼 검색
 tsdoc-edge convention check --pack managed/conventions/tsdoc-edge-core.json
 
 # 3. 개별 문서 관리 (필요 시)
@@ -66,7 +67,7 @@ TSDoc Edge는 세 계층 SSOT를 함께 동기화합니다. `@microsoft/tsdoc`�
 표준 태그)를 제공하고, `ttsc`/`@ttsc/graph`/`@ttsc/lint`가 정본 코드 그래프와 25개 오류
 규칙을 관리하며, `tsdoc-edge`가 22개 도메인 태그와 문서·명세 연결을 소유합니다.
 `tsdoc-edge sync [--force] [--dry-run] [--check] [--json]`은 이 계층을 한 단계로 갱신하거나
-검증합니다. `find-method`, `spec`, `convention`은 각각 심볼 검색, SpecGraph 생명주기,
+검증합니다. `symbol`, `spec`, `convention`은 각각 심볼 조회·검색, SpecGraph 생명주기,
 정확한 그래프 revision에 대한 규약 검사를 제공합니다.
 
 ### work-context & design-context 활용 가이드
@@ -91,16 +92,16 @@ tsdoc-edge dc src/commands/BuildCommand.ts --json
 - ⚠️ 영향 범위: 수정 시 영향받는 파일들
 - 💡 권장사항: 테스트 커버리지, 문서화 상태
 
-**관계 분석** (67개 명령어 중 핵심):
+**관계 분석** (`relationship` 그룹 핵심 하위 명령):
 ```bash
 # 변경 영향 분석
-tsdoc-edge relationship-impact <symbol-id>
+tsdoc-edge relationship impact <symbol-id>
 
 # 중요 심볼 찾기
-tsdoc-edge relationship-metrics --top 10
+tsdoc-edge relationship metrics --top 10
 
 # 모듈 경계 발견
-tsdoc-edge relationship-clusters
+tsdoc-edge relationship clusters
 ```
 
 ## 핵심 아키텍처

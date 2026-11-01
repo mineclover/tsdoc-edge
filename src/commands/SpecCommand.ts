@@ -5,6 +5,7 @@
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
+import { CheckDuplicatesCommand } from './CheckDuplicatesCommand';
 import { SpecBumpCommand } from './SpecBumpCommand';
 import { SpecDiffCommand } from './SpecDiffCommand';
 import { SpecExtractCommand } from './SpecExtractCommand';
@@ -15,12 +16,6 @@ import { SpecStatusCommand } from './SpecStatusCommand';
 import { ValidateSpecCommand } from './ValidateSpecCommand';
 
 const SUBCOMMANDS = {
-  status: { command: SpecStatusCommand, description: 'Manage specification status' },
-  history: { command: SpecHistoryCommand, description: 'Show specification version history' },
-  diff: { command: SpecDiffCommand, description: 'Compare specification versions' },
-  bump: { command: SpecBumpCommand, description: 'Bump specification version' },
-  validate: { command: ValidateSpecCommand, description: 'Validate specifications' },
-  metrics: { command: SpecMetricsCommand, description: 'Display specification metrics dashboard' },
   extract: {
     command: SpecExtractCommand,
     description: 'Compile managed project specs into SpecGraph',
@@ -29,6 +24,16 @@ const SUBCOMMANDS = {
     command: SpecGraphCommand,
     description: 'Inspect saved SpecGraph revisions read-only',
   },
+  metrics: { command: SpecMetricsCommand, description: 'Display specification metrics dashboard' },
+  validate: { command: ValidateSpecCommand, description: 'Validate specifications' },
+  duplicates: {
+    command: CheckDuplicatesCommand,
+    description: 'Check for duplicate content across specifications',
+  },
+  status: { command: SpecStatusCommand, description: 'Manage specification status' },
+  history: { command: SpecHistoryCommand, description: 'Show specification version history' },
+  diff: { command: SpecDiffCommand, description: 'Compare specification versions' },
+  bump: { command: SpecBumpCommand, description: 'Bump specification version' },
 } as const;
 
 type SubcommandName = keyof typeof SUBCOMMANDS;
@@ -62,7 +67,7 @@ export class SpecCommand extends BaseCommand {
    * @public
    */
   getDescription(): string {
-    return 'Unified spec operations (status|history|diff|bump|validate|metrics|extract|graph)';
+    return 'Unified spec operations (extract|graph|metrics|validate|duplicates|status|history|diff|bump)';
   }
 
   /**
@@ -72,7 +77,7 @@ export class SpecCommand extends BaseCommand {
    */
   protected getUsage(): string {
     const subcommandList = Object.entries(SUBCOMMANDS)
-      .map(([name, { description }]) => `  ${name.padEnd(10)} ${description}`)
+      .map(([name, { description }]) => `  ${name.padEnd(12)} ${description}`)
       .join('\n');
 
     return `tsdoc-edge spec <subcommand> [options]
@@ -112,7 +117,7 @@ Use 'tsdoc-edge spec <subcommand> --help' for subcommand details.`;
         console.log();
         console.log('Available subcommands:');
         for (const [name, { description }] of Object.entries(SUBCOMMANDS)) {
-          console.log(`  ${this.colors.cyan}${name.padEnd(10)}${this.colors.reset} ${description}`);
+          console.log(`  ${this.colors.cyan}${name.padEnd(12)}${this.colors.reset} ${description}`);
         }
         console.log();
         return this.failure(`Unknown subcommand: ${subcommandName}`);

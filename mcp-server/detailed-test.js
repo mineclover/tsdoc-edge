@@ -144,7 +144,7 @@ async function runDetailedTests() {
       name: '📁 Tool 4: Work Context - Real File',
       request: createMessage('tools/call', {
         name: 'tsdoc_get_work_context',
-        arguments: { filePath: 'src/commands/AnalyzeCommand.ts', depth: 2 },
+        arguments: { filePath: 'src/commands/HealthCommand.ts', depth: 2 },
       }),
       validate: (res) => {
         const content = res.result?.content?.[0]?.text || '';
@@ -186,11 +186,11 @@ async function runDetailedTests() {
       name: '🔎 Tool 7: Symbol Details - Specific Class',
       request: createMessage('tools/call', {
         name: 'tsdoc_get_symbol_details',
-        arguments: { symbolId: 'class-analyzecommand', includeRelationships: true },
+        arguments: { symbolId: 'class-healthcommand', includeRelationships: true },
       }),
       validate: (res) => {
         const content = res.result?.content?.[0]?.text || '';
-        const hasId = content.includes('analyzecommand-class-analyzecommand');
+        const hasId = content.includes('healthcommand-class-healthcommand');
         log('DETAIL', hasId ? 'Symbol found and detailed' : 'Symbol structure validated', colors.blue);
         return hasId;
       },
@@ -200,7 +200,7 @@ async function runDetailedTests() {
       name: '🎯 Tool 8: Canonical Impact - Multi-hop Risk (format: json)',
       request: createMessage('tools/call', {
         name: 'tsdoc_get_impact',
-        arguments: { symbol: 'analyzecommand-class-analyzecommand', direction: 'upstream', maxDepth: 1, format: 'json' },
+        arguments: { symbol: 'healthcommand-class-healthcommand', direction: 'upstream', maxDepth: 1, format: 'json' },
       }),
       validate: (res) => {
         const content = res.result?.content?.[0]?.text || '';

@@ -66,7 +66,7 @@ echo ""
 
 # Get top critical symbols
 echo "🎯 Loading critical symbols list..."
-CRITICAL_SYMBOLS=$($TSDOC_CMD relationship-metrics --top 30 2>/dev/null | \
+CRITICAL_SYMBOLS=$($TSDOC_CMD relationship metrics --top 30 2>/dev/null | \
   grep -E "^\s+[0-9]+\." | \
   awk '{print $2}' || echo "")
 
@@ -114,7 +114,7 @@ for file in $ALL_FILES; do
     # Get impact for first match
     first_match=$(echo "$matches" | head -1)
     echo "   Impact analysis:"
-    $TSDOC_CMD relationship-impact "$first_match" --depth 2 2>/dev/null | \
+    $TSDOC_CMD relationship impact "$first_match" --depth 2 2>/dev/null | \
       grep -E "(affected|Risk:|Depth)" | sed 's/^/     /' || echo "     Could not analyze"
     echo ""
   fi
@@ -154,7 +154,7 @@ if [ $critical_count -gt 0 ]; then
     pattern=$(echo "$file_base" | sed 's/\([A-Z]\)/-\L\1/g' | sed 's/^-//')
     symbol=$(echo "$CRITICAL_SYMBOLS" | grep -i "$pattern" | head -1)
     if [ -n "$symbol" ]; then
-      echo "  tsdoc-edge relationship-impact $symbol"
+      echo "  tsdoc-edge relationship impact $symbol"
     fi
   done
   echo ""

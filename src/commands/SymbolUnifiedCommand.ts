@@ -5,12 +5,18 @@
  */
 
 import { BaseCommand, type CommandResult } from './BaseCommand';
+import { CoreApiCommand } from './CoreApiCommand';
 import { DepsCommand } from './DepsCommand';
 import { FindMethodCommand } from './FindMethodCommand';
 import { OrphansCommand } from './OrphansCommand';
+import { ParseCommand } from './ParseCommand';
+import { PromoteSymbolCommand } from './PromoteSymbolCommand';
 import { SymbolFixCommand } from './SymbolFixCommand';
 import { SymbolQueryCommand } from './SymbolQueryCommand';
 import { SymbolRenameCommand } from './SymbolRenameCommand';
+import { TreeCommand } from './TreeCommand';
+import { UndocumentedCommand } from './UndocumentedCommand';
+import { UntestedCommand } from './UntestedCommand';
 import { WhoUsesCommand } from './WhoUsesCommand';
 
 const SUBCOMMANDS = {
@@ -18,12 +24,21 @@ const SUBCOMMANDS = {
     command: SymbolQueryCommand,
     description: 'Query code symbols (Canonical @ttsc/graph) and [[Symbol]] checkpoints',
   },
-  fix: { command: SymbolFixCommand, description: 'Fix symbol issues' },
-  rename: { command: SymbolRenameCommand, description: 'Rename symbols across codebase' },
   deps: { command: DepsCommand, description: 'Show symbol dependencies' },
   'who-uses': { command: WhoUsesCommand, description: 'Show who uses a symbol' },
   orphans: { command: OrphansCommand, description: 'Find orphaned symbols' },
   'find-method': { command: FindMethodCommand, description: 'Find methods by name' },
+  tree: { command: TreeCommand, description: 'Show symbol hierarchy tree' },
+  'core-api': { command: CoreApiCommand, description: 'Show exported core API symbols' },
+  undocumented: { command: UndocumentedCommand, description: 'Find undocumented symbols' },
+  untested: { command: UntestedCommand, description: 'Find symbols without test coverage' },
+  parse: { command: ParseCommand, description: 'Parse and display enhanced TSDoc for a file' },
+  promote: {
+    command: PromoteSymbolCommand,
+    description: 'Promote auxiliary heading to canonical H1',
+  },
+  fix: { command: SymbolFixCommand, description: 'Fix [[Symbol]] issues' },
+  rename: { command: SymbolRenameCommand, description: 'Rename [[Symbol]] across docs and code' },
 } as const;
 
 /** Available symbol subcommand names */
@@ -68,7 +83,7 @@ export class SymbolUnifiedCommand extends BaseCommand {
    */
   protected getUsage(): string {
     const subcommandList = Object.entries(SUBCOMMANDS)
-      .map(([name, { description }]) => `  ${name.padEnd(12)} ${description}`)
+      .map(([name, { description }]) => `  ${name.padEnd(14)} ${description}`)
       .join('\n');
 
     return `tsdoc-edge symbol <subcommand> [options]
@@ -107,7 +122,7 @@ Use 'tsdoc-edge symbol <subcommand> --help' for subcommand details.`;
         console.log();
         console.log('Available subcommands:');
         for (const [name, { description }] of Object.entries(SUBCOMMANDS)) {
-          console.log(`  ${this.colors.cyan}${name.padEnd(10)}${this.colors.reset} ${description}`);
+          console.log(`  ${this.colors.cyan}${name.padEnd(14)}${this.colors.reset} ${description}`);
         }
         console.log();
         return this.failure(`Unknown subcommand: ${subcommandName}`);

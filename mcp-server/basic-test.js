@@ -129,7 +129,7 @@ async function runTests() {
 
   // Test 4: Get work context
   await test('Get work context for a file', async () => {
-    const context = await service.getWorkContext('src/commands/AnalyzeCommand.ts', 2);
+    const context = await service.getWorkContext('src/commands/HealthCommand.ts', 2);
     if (!context || !context.includes('Work Context') || context.includes('No symbols found')) {
       throw new Error('Invalid work context');
     }
@@ -161,7 +161,7 @@ async function runTests() {
   });
 
   await test('Canonical multi-hop impact analysis', async () => {
-    const impact = await service.getImpact({ symbol: 'analyzecommand-class-analyzecommand', direction: 'both', maxDepth: 2, includeExternal: false });
+    const impact = await service.getImpact({ symbol: 'healthcommand-class-healthcommand', direction: 'both', maxDepth: 2, includeExternal: false });
     if (!impact || !Array.isArray(impact.impactedSymbols) || !['canonical', 'combined', 'legacy'].includes(impact.source)) {
       throw new Error('Invalid impact result');
     }

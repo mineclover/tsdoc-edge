@@ -178,7 +178,7 @@ tsdoc-edge orphans --help
 
 - [[DepsCommand]]: Show dependencies of a specific symbol
 - [[WhoUsesCommand]]: Find usages of a specific symbol
-- [[DetectDeadCodeCommand]]: Advanced dead code detection
+- `OrphansCommand`: Advanced dead code detection
 - [[SymbolRegistryManager]]: Relationship data source
 
 ## Implementation
@@ -202,16 +202,17 @@ Source: `src/commands/Phase5Commands.ts`
 
 ### Referenced By
 
-- [[CLI Commands]] → managed/CLI-COMMANDS.md:44
+- [[CLI Commands]] → managed/CLI-COMMANDS.md:42
 - [[TSDoc Edge Documentation]] → managed/README.md:104
+- [[CoverageReportCommand]] → managed/commands/CoverageReportCommand.md:270
 - [[DepsCommand]] → managed/commands/DepsCommand.md:148
-- [[DetectDeadCodeCommand]] → managed/commands/DetectDeadCodeCommand.md:93
 - [[UsedByCommand]] → managed/commands/UsedByCommand.md:120
 - [[CI/CD Integration]] → managed/features/CICDIntegration.md:249
-- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:107
+- [[Dead Code Detection]] → managed/features/DeadCodeDetection.md:105
 - [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:160
 - [[AnalysisFeatures]] → managed/features/analysis-features.md:282
 - [[ValidationFeatures]] → managed/features/validation-features.md:270
+- [[DataFlowTypes]] → managed/types/DataFlowTypes.md:174
 
 ### Implemented By
 

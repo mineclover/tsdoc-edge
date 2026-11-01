@@ -102,8 +102,8 @@ tsdoc-edge stats --compare before-cleanup
 
 ## Commands
 
-- **[[DetectDeadCodeCommand]]**: Detect, explore, and tag dead code
-- **[[TagDeadCodeCommand]]**: Direct command to annotate dead code with TSDoc tags
+- **[[OrphansCommand]]**: Detect, explore, and tag dead code
+- **[[OrphansCommand]]**: Direct command to annotate dead code with TSDoc tags
 - **[[OrphansCommand]]**: Find orphaned symbols
 - **[[UntestedCommand]]**: Find untested symbols
 - **[[StatsCommand]]**: Track cleanup progress
@@ -190,7 +190,6 @@ tsdoc-edge orphans --diff origin/main
 
 ### Referenced By
 
-- [[TagDeadCodeCommand]] → managed/commands/TagDeadCodeCommand.md:44
 - [[Dependency Analysis]] → managed/features/DependencyAnalysis.md:228
 
 ### Implemented By
